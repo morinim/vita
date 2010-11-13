@@ -3,7 +3,7 @@
  *  \file gene.h
  *
  *  \author Manlio Morini
- *  \date 2009/12/31
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
@@ -16,6 +16,12 @@
 
 namespace vita
 {
+
+  /**
+   * gene_args
+   * Maximum number of arguments for a vita function.
+   */
+  const unsigned gene_args(4);
 
   struct gene
   {

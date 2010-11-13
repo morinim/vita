@@ -3,7 +3,7 @@
  *  \file symbol_set.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
@@ -42,6 +42,18 @@ namespace vita
       _arguments.push_back(new argument(i));
 
     _sum = 0;
+  }
+
+  /**
+   * arg
+   * \param n[in]
+   * \return
+   */
+  const argument *
+  symbol_set::arg(unsigned n) const
+  {
+    assert(n < gene_args);
+    return _arguments[n];
   }
 
   /**

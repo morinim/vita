@@ -3,13 +3,14 @@
  *  \file argument.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
  */
 
 #include "argument.h"
+#include "gene.h"
 #include "interpreter.h"
 
 namespace vita

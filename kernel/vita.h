@@ -3,14 +3,13 @@
  *  \file vita.h
  *
  *  \author EOS di Manlio Morini
- *  \version 0.9.2
- *  \date 2010/06/11
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
- *  New versions of this program will be available at http://vita.ws
+ *  New versions of this program will be available at http://www.vita.cc
  *
- *  Please reports any sugestions and/or bugs to info@vita.ws
+ *  Please reports any sugestions and/or bugs to info@vita.cc
  *
  */
   
@@ -36,12 +35,6 @@ namespace vita
   typedef unsigned symbol_t;
 
   inline bool is_bad(double x) { return isinf(x) || isnan(x); };
-
-  /**
-   * gene_args
-   * Maximum number of arguments for a vita function.
-   */
-  const unsigned gene_args(4);
 
   /**
    * float_epsilon

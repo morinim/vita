@@ -3,7 +3,7 @@
  *  \file function.h
  *
  *  \author Manlio Morini
- *  \date 2009/10/20
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
@@ -16,6 +16,7 @@
 
 #include "vita.h"
 #include "symbol.h"
+#include "gene.h"
 
 namespace vita
 {
