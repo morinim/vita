@@ -16,7 +16,7 @@
 
 #include "environment.h"
 #include "primitive/sr_pri.h"
-#include "population.h"
+#include "evolution.h"
 
 #define BOOST_TEST_MODULE VITA
 #include "boost/test/included/unit_test.hpp"
@@ -318,14 +318,14 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
       env.code_length = l;
 
       BOOST_TEST_MESSAGE("Population " << n << "_" << l);
-      vita::population p(env);
+      vita::evolution evo(env);
 
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
       {
-        std::cout << p <<std::endl;
+        std::cout << evo.population() <<std::endl;
 
         vita::analyzer ay;
-        p.pick_stats(&ay);
+        evo.pick_stats(&ay);
 
         const unsigned long long nef(ay.functions(true));
         const unsigned long long net(ay.terminals(true));
@@ -351,7 +351,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
                   << std::endl << std::string(40,'-') << std::endl;
       }
 
-      BOOST_REQUIRE(p.check());
+      BOOST_REQUIRE(evo.check());
     }
 }
 

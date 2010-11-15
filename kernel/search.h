@@ -18,15 +18,15 @@
 namespace vita
 {
 
+  class evolution;
   class individual;
-  class population;
 
   class search
   {
   public:
     explicit search(environment &);
 
-    void arl(const individual &, population &);
+    void arl(const individual &, evolution &);
 
     individual run(bool=true, unsigned=1);
 

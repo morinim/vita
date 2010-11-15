@@ -14,7 +14,7 @@
 #include "search.h"
 #include "adf.h"
 #include "environment.h"
-#include "population.h"
+#include "evolution.h"
 
 namespace vita
 {
@@ -33,7 +33,7 @@ namespace vita
   /**
    * arl
    * \param[in] candidate Individual in which we are looking for.
-   * \param[in] pop Population including ind.
+   * \param[in] evo Evolution up to now.
    *
    * Adaptive Representation through Learning (ARL). The algorithm extract
    * common knowledge (building blocks) emerging during the evolutionary 
@@ -41,11 +41,11 @@ namespace vita
    * (see ARL - Justinian P. Rosca and Dana H. Ballard).
    */
   void
-  search::arl(const individual &candidate, population &pop)
+  search::arl(const individual &candidate, evolution &evo)
   {
     const unsigned arl_args(2);
 
-    const fitness_t base_f(pop.fitness(candidate));
+    const fitness_t base_f(evo.population().fitness(candidate));
     std::list<unsigned> bl(candidate.blocks());
 
     _env->sset.reset_adf_weights();
@@ -57,7 +57,7 @@ namespace vita
       // Building blocks should be simple.
       if (candidate_block.eff_size() <= 5+arl_args)
       {
-        const double d_f( base_f - pop.fitness(candidate.destroy_block(*i)) );
+        const double d_f( base_f - evo.population().fitness(candidate.destroy_block(*i)) );
 
         // Semantic introns cannot be building blocks.
         if (!is_bad(base_f) && !is_bad(d_f) &&
@@ -109,9 +109,9 @@ namespace vita
 
     for (unsigned i(0); i < n; ++i)
     {
-      population p(*_env);
+      evolution evo(*_env);
 
-      const summary s(p.evolution(verbose));
+      const summary s(evo.run(verbose));
 
       if (i == 0)
       {
@@ -146,7 +146,7 @@ namespace vita
       run_sum.ttable_probes += s.ttable_probes;
 
       if (_env->arl)
-        arl(run_sum.best,p);
+        arl(run_sum.best,evo);
     }
 
     if (_env->stat_summary)

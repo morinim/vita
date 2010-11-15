@@ -14,7 +14,7 @@
 #include <fstream>
 
 #include "environment.h"
-#include "population.h"
+#include "evolution.h"
 #include "primitive/sr_pri.h"
 
 class X : public vita::terminal
@@ -137,9 +137,9 @@ int main(int argc, char *argv[])
   env.insert(new vita::sr::ifl());
   env.insert(new vita::sr::ife());
 
-  vita::population p(env);
+  vita::evolution evo(env);
 
-  p.evolution(true);
+  evo.run(true);
 
   return EXIT_SUCCESS;
 }

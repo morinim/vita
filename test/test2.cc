@@ -14,7 +14,7 @@
 
 #include "vita.h"
 #include "environment.h"
-#include "population.h"
+#include "evolution.h"
 #include "primitive/sr_pri.h"
 
 int fitness(const vita::individual &)
@@ -36,12 +36,12 @@ int main(int argc, char *argv[])
   env.insert(new vita::sr::ifl());
   env.insert(new vita::sr::ife());
 
-  vita::population p(env);
+  vita::evolution e(env);
 
-  std::cout << p << std::endl;
+  std::cout << e.population() << std::endl;
 
   vita::analyzer ay;
-  p.pick_stats(&ay);
+  e.pick_stats(&ay);
 
   const unsigned long long nef(ay.functions(true));
   const unsigned long long net(ay.terminals(true));

@@ -3,7 +3,7 @@
  *  \file population.h
  *
  *  \author Manlio Morini
- *  \date 2010/06/10
+ *  \date 2010/11/13
  *
  *  This file is part of VITA
  *
@@ -22,28 +22,6 @@ namespace vita
 
   class environment;
 
-  struct summary
-  {
-    summary() { clear(); };
-
-    void clear();
-
-    unsigned long long ttable_probes;
-    unsigned long long   ttable_hits;
-
-    unsigned long long  mutations;
-    unsigned long long crossovers;
-
-    unsigned gen;
-    unsigned testset;
-    unsigned last_imp;
-
-    analyzer az;
-
-    individual  best;
-    fitness_t f_best;
-  };
-
   class population
   {
   public:
@@ -54,8 +32,8 @@ namespace vita
     typedef std::vector<value_type>::reference reference;
     typedef std::vector<value_type>::const_reference const_reference;
 
-    reference operator[](size_type);
-    const_reference operator[](size_type) const;
+    individual &operator[](size_type);
+    const individual &operator[](size_type) const;
     iterator begin();
     const_iterator begin() const;
     const_iterator end() const;
@@ -64,29 +42,19 @@ namespace vita
     explicit population(environment &);
     void build();
 
-    void pick_stats(analyzer *const);
-
+    fitness_t fitness(size_type) const;
     fitness_t fitness(const individual &) const;
-    const summary &evolution(bool);
+
+    unsigned long long probes() const;
+    unsigned long long hits() const;
 
     bool check() const;
 
+    mutable ttable _cache;
+
   private:
-    static unsigned run;
-
-    void log() const;
-    void pick_stats();
-
-    bool stop_condition() const;
-    unsigned tournament(unsigned,bool) const;
-
     environment *_env;
-
     std::vector<value_type> _pop;
-
-    mutable ttable cache;
-
-    summary stats;
   };
 
   std::ostream &operator<<(std::ostream &, const population &);
@@ -97,7 +65,7 @@ namespace vita
    * \return A reference to the individual at index i.
    */
   inline
-  population::reference
+  individual &
   population::operator[](size_type i)
   {
     assert(i < _pop.size());
@@ -110,7 +78,7 @@ namespace vita
    * \return A constant reference to the individual at index i.
    */
   inline
-  population::const_reference
+  const individual &
   population::operator[](size_type i) const
   { 
     assert(i < _pop.size());
@@ -162,13 +130,37 @@ namespace vita
   }
 
   /**
-   * pick_stats
+   * fitness
+   * \param[in] i Inidex of the individual whose fitness we are interested in.
+   * \return The fitness of the i-th individual.
    */
   inline
-  void
-  population::pick_stats()
+  fitness_t
+  population::fitness(size_type i) const
   {
-    pick_stats(&stats.az);
+    return fitness(_pop[i]);
+  }
+
+  /**
+   * probes
+   * \return Number of probes in the transposition table.
+   */
+  inline
+  unsigned long long
+  population::probes() const
+  {
+    return _cache.probes();
+  }
+
+  /**
+   * hits
+   * \return Number of transposition table hits.
+   */
+  inline
+  unsigned long long
+  population::hits() const
+  {
+    return _cache.hits();
   }
     
 }  // namespace vita
