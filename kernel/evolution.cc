@@ -363,7 +363,6 @@ namespace vita
     return _env && _pop->check();
   }
 
-
   /**
    * clear
    *

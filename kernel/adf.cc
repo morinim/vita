@@ -18,12 +18,11 @@ namespace vita
 
   unsigned adf::_adf_count(0);
 
-  /**
-   * adf
-   * \param ind[in]
-   * \param sv[in]
-   * \param w[in]
-   */
+  ///
+  /// \param ind[in]
+  /// \param sv[in]
+  /// \param w[in]
+  ///
   adf::adf(const individual &ind, const std::vector<symbol_t> &sv, unsigned w)
     : function("ADF",ind.type(),sv,w), _id(_adf_count++), _code(ind)
   {

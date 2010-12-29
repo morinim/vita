@@ -18,7 +18,7 @@ namespace vita
   /**
    * argument
    * \param n[in]
-   * \parma t[in]
+   * \param t[in]
    */
   argument::argument(unsigned n) 
     : terminal("ARG",sym_void,0), _index(n)

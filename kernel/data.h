@@ -3,7 +3,7 @@
  *  \file data.h
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2010/12/29
  *
  *  This file is part of VITA
  *
@@ -45,7 +45,7 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
-    data(unsigned = 1);
+    explicit data(unsigned = 1);
     explicit data(const std::string &, unsigned = 1);
 
     unsigned open(const std::string &);
@@ -64,35 +64,17 @@ namespace vita
 
     std::map<std::string,unsigned> _labels;
     
-    // The training set is partitioned.
+    /// The training set (partitioned).
     std::vector< std::list<value_type> > _training;
 
+    /// This is the active data partition.
     unsigned _active;
   };
 
-  /**
-   * data
-   * \param n
-   */
-  inline
-  data::data(unsigned n)
-  {
-    clear(n);
-  }
-
-  /**
-   * operator!.
-   */
-  inline
-  bool
-  data::operator!() const
-  {
-    return _training.empty();
-  }
-
-  /**
-   * begin
-   */
+  ///
+  /// \return Constant reference to the first element of the active training
+  //          set.
+  ///
   inline
   data::const_iterator
   data::begin() const
@@ -100,37 +82,17 @@ namespace vita
     return _training[_active].begin(); 
   }
 
-  /**
-   * end
-   */
+  ///
+  /// \return Constant reference to the last+1 element of the active training
+  ///         set.
+  ///
   inline
   data::const_iterator
   data::end() const
   {
     return _training[_active].end(); 
   }
-
-  /**
-   * variables
-   */
-  inline
-  unsigned
-  data::variables() const
-  {
-    return _training.empty() || _training[0].empty() 
-      ? 0 : _training[0].begin()->input.size(); 
-  }
-
-  /**
-   * classes
-   */
-  inline
-  unsigned
-  data::classes() const
-  {
-    return _labels.size();
-  }
-    
+   
 }  // namespace vita
 
 #endif  // DATA_H

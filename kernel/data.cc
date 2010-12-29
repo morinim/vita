@@ -3,7 +3,7 @@
  *  \file data.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2010/12/29
  *
  *  This file is part of VITA
  *
@@ -15,11 +15,25 @@
 namespace vita
 {
 
-  /**
-   * data
-   * \param filename[in]
-   * \param n[in]
-   */ 
+  ///
+  /// \param n[in] number of distinct training sets.
+  /// \see clear
+  ///
+  /// New empty data instance (partitioned in \a n training sets).
+  ///
+  data::data(unsigned n)
+  {
+    clear(n);
+    check();
+  }
+
+  ///
+  /// \param filename[in] nome of the file containing the learning collection.
+  /// \param n[in] number of distinct training sets.
+  ///
+  /// New data instance containing the learning collection from \a filename and
+  /// partitioned in \a n training sets.
+  /// 
   data::data(const std::string &filename, unsigned n)
   {
     clear(n);
@@ -27,10 +41,10 @@ namespace vita
     check();
   }
 
-  /**
-   * clear
-   * \param n[in]
-   */
+  ///
+  /// \param n[in] number of distinct training sets (if 1 the learning 
+  ///              collection won't be partitioned).
+  ///
   void
   data::clear(unsigned n)
   {
@@ -42,11 +56,30 @@ namespace vita
     // This is the active data partition.
     _active = 0;
   }
+
+  ///
+  /// \return input vector dimension.
+  ///
+  unsigned
+  data::variables() const
+  {
+    return _training.empty() || _training[0].empty() 
+      ? 0 : _training[0].begin()->input.size(); 
+  }
+
+  ///
+  /// \return number of classes of the classification problem (1 for a symbolic
+  ///         regression problem).
+  ///
+  unsigned
+  data::classes() const
+  {
+    return _labels.size();
+  }
  
-  /**
-   * encode
-   * \param label[in]
-   */
+  ///
+  /// \param label[in]
+  ///
   unsigned
   data::encode(const std::string &label)
   {
@@ -59,11 +92,10 @@ namespace vita
     return _labels[label];
   }
 
-  /**
-   * open
-   * \param filename[in]
-   * \return Number of lines read (0 in case of error).
-   */
+  ///
+  /// \param filename[in]
+  /// \return number of lines read (0 in case of error).
+  ///
   unsigned
   data::open(const std::string &filename)
   {
@@ -149,10 +181,26 @@ namespace vita
     return ln;
   }
 
-  /**
-   *  check.
-   * \return true if the individual passes the internal consistency check.
-   */
+  ///
+  /// \return true if the learning collection is empty.
+  ///
+  bool
+  data::operator!() const
+  {
+    bool found(false);
+
+    for (std::vector<std::list<value_type> >::const_iterator 
+           i(_training.begin());
+         i != _training.end() && !found;
+         ++i)
+      found = !i->empty();
+    
+    return !found;
+  }
+
+  ///
+  /// \return true if the individual passes the internal consistency check.
+  ///
   bool
   data::check() const
   {
