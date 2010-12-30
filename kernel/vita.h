@@ -3,10 +3,14 @@
  *  \file vita.h
  *
  *  \author EOS di Manlio Morini
- *  \date 2010/11/13
+ *  \date 2010/12/30
  *
  *  This file is part of VITA
  *
+ *
+ *  \mainpage VITA v0.9.0
+ *
+ *  \section note_sec Notes
  *  New versions of this program will be available at http://www.vita.cc
  *
  *  Please reports any sugestions and/or bugs to info@vita.cc

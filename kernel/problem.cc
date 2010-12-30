@@ -15,17 +15,17 @@
 namespace vita
 {
 
-  /**
-   * problem
-   */
+  ///
+  /// New empty data instance.
+  ///
   problem::problem()
   {
     clear();
   }
 
-  /**
-   * clear
-   */
+  ///
+  /// Resets the object.
+  ///
   void
   problem::clear()
   {
@@ -33,10 +33,10 @@ namespace vita
     dat.clear();
   }
 
-  /**
-   * load_data
-   * \param f
-   */
+  ///
+  /// \param[in] f name of the file containing the learning collection.
+  /// \return false if the file cannot be read.
+  ///
   bool
   problem::load_data(const std::string &f)
   {
@@ -62,11 +62,11 @@ namespace vita
     return false;
   }
 
-  /**
-   * load_symbols
-   * \param sf[in]
-   * \return
-   */
+  ///
+  /// \param[in] sf name of the file containing the symbols.
+  /// \return a space separated string containing the names of the loaded 
+  ///         symbols.
+  ///
   std::string
   problem::load_symbols(const std::string &sf)
   {
@@ -125,27 +125,29 @@ namespace vita
     return symbols;
   }
   
-  /**
-   * classes
-   */
+  ///
+  /// \return number of classes of the classification problem (1 for a symbolic
+  ///         regression problem).
+  ///
   unsigned
   problem::classes() const
   {
     return dat.classes();
   }
 
-  /**
-   * variables
-   */
+  ///
+  /// \return dimension of the input vectors (i.e. the number of variable of
+  ///         the problem).
+  ///
   unsigned
   problem::variables() const
   {
     return dat.variables();
   }
 
-  /**
-   * check
-   */
+  ///
+  /// \return true if the individual passes the internal consistency check.
+  ///
   bool
   problem::check() const
   {

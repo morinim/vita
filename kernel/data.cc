@@ -16,7 +16,7 @@ namespace vita
 {
 
   ///
-  /// \param n[in] number of distinct training sets.
+  /// \param[in] n number of distinct training sets.
   /// \see clear
   ///
   /// New empty data instance (partitioned in \a n training sets).
@@ -24,26 +24,31 @@ namespace vita
   data::data(unsigned n)
   {
     clear(n);
-    check();
+
+    assert(check());
   }
 
   ///
-  /// \param filename[in] nome of the file containing the learning collection.
-  /// \param n[in] number of distinct training sets.
+  /// \param[in] filename nome of the file containing the learning collection.
+  /// \param[in] n number of distinct training sets.
   ///
   /// New data instance containing the learning collection from \a filename and
   /// partitioned in \a n training sets.
   /// 
   data::data(const std::string &filename, unsigned n)
   {
+    assert(filename != "");
+
     clear(n);
     open(filename);
-    check();
+    
+    assert(check());
   }
 
   ///
-  /// \param n[in] number of distinct training sets (if 1 the learning 
+  /// \param[in] n number of distinct training sets (if 1 the learning 
   ///              collection won't be partitioned).
+  /// Resets the object.
   ///
   void
   data::clear(unsigned n)
@@ -55,6 +60,8 @@ namespace vita
 
     // This is the active data partition.
     _active = 0;
+
+    assert(check());
   }
 
   ///
@@ -78,7 +85,8 @@ namespace vita
   }
  
   ///
-  /// \param label[in]
+  /// \param[in] label name of a class of the training set.
+  /// \return a positive integer used as primary key for the class \a label.
   ///
   unsigned
   data::encode(const std::string &label)
@@ -93,7 +101,7 @@ namespace vita
   }
 
   ///
-  /// \param filename[in]
+  /// \param[in] filename name of the file containing the learning collection.
   /// \return number of lines read (0 in case of error).
   ///
   unsigned
@@ -150,14 +158,11 @@ namespace vita
           }
         }
 	else // output field
-	  if (format[field][1] == 'L')  // symbolic output field
-	  {
+          if (format[field][1] == 'L')  // symbolic output field
+          {
 	    std::string label;
 	    if (ist >> label)
-	    {
-	      v.label  = encode(label);
-	      v.output = 0.0;
-	    }
+	      v.output = encode(label);
 	    else
 	      return 1;
 	  }
@@ -165,10 +170,7 @@ namespace vita
           {
 	    double output;
             if (ist >> output)
-            {
               v.output = output;
-	      v.label = 0;
-            }
 	    else
 	      return 1;
           }
@@ -221,11 +223,11 @@ namespace vita
 	 ++l)
       for (const_iterator i(l->begin()); i != l->end(); ++i)
       {
-	if (i->input.size() != in_size)
-	  return false;
+        if (i->input.size() != in_size)
+          return false;
 
-	if (cl_size && i->label >= cl_size)
-	  return false;
+        if (cl_size && i->label() >= cl_size)
+          return false;
       }
 
     return _active < _training.size();

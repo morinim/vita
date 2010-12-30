@@ -58,11 +58,10 @@ namespace vita
     data dat;
   };
 
-  /**
-   * abs_fitness
-   * \param[in] ind An individual.
-   * \return The fitness of individual 'ind' (greater is better, max is 0).
-   */
+  ///
+  /// \param[in] ind an individual.
+  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  ///
   template<class T>
   fitness_t
   problem::abs_fitness(const vita::individual &ind) const
@@ -91,12 +90,11 @@ namespace vita
     return -err;
   }
 
-  /**
-   * binary_fitness
-   * \param[in] ind
-   * \param[in] label
-   * \return The fitness of individual 'ind' (greater is better, max is 0).
-   */
+  ///
+  /// \param[in] ind an individual.
+  /// \param[in] label
+  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  ///
   template<class T>
   fitness_t
   problem::binary_fitness(const vita::individual &ind, unsigned label) const
@@ -120,8 +118,8 @@ namespace vita
       else
       {
         const T val(boost::any_cast<T>(res));
-        if ( (t->label==label && val < 0.0) ||
-	     (t->label!=label && val >= 0.0) )
+        if ( (t->label() == label && val < 0.0) ||
+	     (t->label() != label && val >= 0.0) )
 	  err += std::fabs(val);
       }
     }
@@ -129,13 +127,12 @@ namespace vita
     return -err;
   }
 
-  /**
-   * dyn_slot_fitness
-   * \param[in] ind
-   * \return
-   *
-   * Slotted Dynamic Class Boundary Determination
-   */
+  ///
+  /// \param[in] ind an individual.
+  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  ///
+  /// Slotted Dynamic Class Boundary Determination
+  ///
   template<class T>
   fitness_t
   problem::dyn_slot_fitness(const vita::individual &ind) const
@@ -175,7 +172,7 @@ namespace vita
           slot = slots.size()-1;
       }
 
-      ++slots[slot][t->label];
+      ++slots[slot][t->label()];
     }
 
     std::vector<unsigned> slot_label(n_slots);
@@ -204,11 +201,10 @@ namespace vita
     return -err;
   }
 
-  /**
-   * count_fitness
-   * \param ind[in]
-   * \return
-   */
+  ///
+  /// \param[in] ind an individual.
+  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  ///
   template<class T>
   fitness_t
   problem::count_fitness(const vita::individual &ind) const
@@ -233,10 +229,10 @@ namespace vita
     return fitness_t(ok);
   }
 
-  /**
-   *  normalize_01
-   *  \param val
-   */
+  ///
+  /// \param[in] val the numeric value that should be mapped in the [0,1]
+  ///                interval.
+  ///
   template<class T>
   inline
   T

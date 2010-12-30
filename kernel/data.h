@@ -27,14 +27,29 @@
 namespace vita
 {
 
+  ///
+  /// \a data \c class stores the training set used to evolve the population.
+  ///
+  /// \todo The class should also contains a validation/test set to avoid
+  ///       overfitting.
+  /// 
+  ///
   class data
   {
   public:
+    ///
+    /// \a value_type stores a single element of the training set. The \c struct
+    /// consists of an input vector (\a input) and an answer value (\a output).
+    /// Depending on the kind of problem, \a output stores:
+    /// \li a numeric value (symbolic regression problem);
+    /// \li a label (classification problem).
+    ///
     struct value_type
     { 
       std::vector<boost::any> input;
       boost::any             output;
-      unsigned                label;
+
+      unsigned label() const { return boost::any_cast<unsigned>(output); };
     };
 
     typedef std::list<value_type>::iterator iterator;
@@ -67,13 +82,13 @@ namespace vita
     /// The training set (partitioned).
     std::vector< std::list<value_type> > _training;
 
-    /// This is the active data partition.
+    /// The active data partition.
     unsigned _active;
   };
 
   ///
-  /// \return Constant reference to the first element of the active training
-  //          set.
+  /// \return constant reference to the first element of the active training
+  ///         set.
   ///
   inline
   data::const_iterator
@@ -83,7 +98,7 @@ namespace vita
   }
 
   ///
-  /// \return Constant reference to the last+1 element of the active training
+  /// \return constant reference to the last+1 element of the active training
   ///         set.
   ///
   inline
