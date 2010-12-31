@@ -38,7 +38,7 @@ namespace vita
 
   typedef unsigned symbol_t;
 
-  inline bool is_bad(double x) { return isinf(x) || isnan(x); };
+  inline bool is_bad(double x) { return isinf(x) || isnan(x); }
 
   /**
    * float_epsilon
