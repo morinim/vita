@@ -3,7 +3,7 @@
  *  \file ttable.cc
  *
  *  \author Manlio Morini
- *  \date 2010/06/10
+ *  \date 2011/01/09
  *
  *  This file is part of VITA
  *
@@ -16,32 +16,27 @@
 namespace vita
 {
 
-  /**
-   * ttable
-   * \param[in] bits 2^bits is the number of elements of the table.
-   *
-   * Creates a new transposition (hash) table.
-   */
+  ///
+  /// \param[in] bits 2^\a bits is the number of elements of the table.
+  ///
+  /// Creates a new transposition (hash) table.
+  ///
   ttable::ttable(unsigned bits)
     : mask((1 << bits)-1), table(new slot[1 << bits]), _probes(0), _hits(0)
   {
     assert(check());
   }
 
-  /**
-   * ~ttable
-   */
+  ///
   ttable::~ttable()
   {
     delete table;
   }
 
-  /**
-   * clear
-   *
-   * Clears the content and the statistical informations of the table
-   * (allocated size isn't changed). 
-   */
+  ///
+  /// Clears the content and the statistical informations of the table
+  /// (allocated size isn't changed). 
+  ///
   void
   ttable::clear()
   {
@@ -55,14 +50,14 @@ namespace vita
     }
   }
 
-  /**
-   * find
-   * \param[in] ind The individual to look for.
-   * \param[out] fit The fitness of the individual (if found).
-   * \return true if ind is found in the transposition table, false otherwise.
-   *
-   * Looks for the fitness of an individual in the transposition table.
-   */
+  ///
+  /// \param[in] ind the individual to look for.
+  /// \param[out] fit the fitness of the individual (if found).
+  /// \return true if \a ind is found in the transposition table, false 
+  ///         otherwise.
+  ///
+  /// Looks for the fitness of an individual in the transposition table.
+  ///
   bool
   ttable::find(const individual &ind, fitness_t *const fit) const
   {
@@ -70,6 +65,7 @@ namespace vita
 
     std::vector<boost::uint8_t> packed;
     ind.pack(packed);
+
 
     const hash_t h(hash(packed));
 
@@ -86,13 +82,12 @@ namespace vita
     return ret;
   }
 
-  /**
-   * insert
-   * \param[in] ind A new individual to be stored in the table.
-   * \param[out] fit The fitnes of the individual.
-   *
-   * Stores fitness information in the transposition table.
-   */
+  ///
+  /// \param[in] ind a new individual to be stored in the table.
+  /// \param[out] fit the fitness of the individual.
+  ///
+  /// Stores fitness information in the transposition table.
+  ///
   void
   ttable::insert(const individual &ind, fitness_t fit)
   {
@@ -107,15 +102,14 @@ namespace vita
     table[s.hash & mask] = s; 
   }
 
-  /**
-   * hash
-   * \param[in] packed
-   *
-   * MurmurHash2, by Austin Appleby.
-   * This is a relatively simple hash algorithm. It is noted for being fast,
-   * with excellent distribution, avalanche behavior and overall collision
-   * resistance.
-   */
+  ///
+  /// \param[in] packed a byte level representation of an individual.
+  ///
+  /// MurmurHash2, by Austin Appleby.
+  /// This is a relatively simple hash algorithm. It is noted for being fast,
+  /// with excellent distribution, avalanche behavior and overall collision
+  /// resistance.
+  ///
   ttable::hash_t
   ttable::hash(const std::vector<boost::uint8_t> &packed)
   {
@@ -170,10 +164,9 @@ namespace vita
     return h;
   } 
 
-  /**
-   * check
-   * \return true if the table passes the internal consistency check.
-   */
+  ///
+  /// \return true if the table passes the internal consistency check.
+  ///
   bool
   ttable::check() const
   {

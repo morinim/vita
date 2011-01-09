@@ -72,17 +72,16 @@ namespace vita
     pick_stats(&_stats.az);
   }
 
-  /**
-   * tournament
-   * \param[in] target Index of an individual in the population.
-   * \param[in] best Are we looking for the best (or the worst) individual?
-   * \return Index of the best (worst) individual found.
-   * 
-   * Tournament selection works by selecting a number of individuals from the 
-   * population at random, a tournament, and then selecting only the best of 
-   * those individuals.
-   * Recall that better individuals have highter fitnesses.
-   */
+  ///
+  /// \param[in] target index of an individual in the population.
+  /// \param[in] best are we looking for the best (or the worst) individual?
+  /// \return index of the best (worst) individual found.
+  ///
+  /// Tournament selection works by selecting a number of individuals from the 
+  /// population at random, a tournament, and then selecting only the best of 
+  /// those individuals.
+  /// Recall that better individuals have highter fitnesses.
+  ///
   unsigned
   evolution::tournament(unsigned target, bool best) const
   {
@@ -112,11 +111,9 @@ namespace vita
     return sel;
   }
 
-  /**
-   * log
-   *
-   * Saves working / statistical informations in the log files.
-   */
+  ///
+  /// Saves working / statistical informations in the log files.
+  ///
   void
   evolution::log() const
   {
@@ -143,9 +140,9 @@ namespace vita
 
 	  for (unsigned active(0); active <= 1; ++active)
 	  {
-	    const unsigned long long nf(_stats.az.functions(active));
-	    const unsigned long long nt(_stats.az.terminals(active));
-	    const unsigned long long n(nf+nt);
+	    const boost::uint64_t nf(_stats.az.functions(active));
+	    const boost::uint64_t nt(_stats.az.terminals(active));
+	    const boost::uint64_t n(nf+nt);
 	    const std::string s(active ? "Active" : "Overall");
 	    
 	    logs << std::endl << '{' << s << " symbol frequency}" 
@@ -212,10 +209,9 @@ namespace vita
     }
   }
 
-  /**
-   * stop_condition
-   * \return true if evolution should be interrupted.
-   */
+  ///
+  /// \return true if evolution should be interrupted.
+  ///
   bool
   evolution::stop_condition() const
   {
@@ -241,23 +237,22 @@ namespace vita
     return _eva->run(ind);
   }
 
-  /**
-   * run
-   * \param[in] verbose Prints verbose informations.
-   *
-   * We enter the genetic programming loop. We begin the loop by choosing a
-   * genetic operation: reproduction, mutation or crossover. We then select 
-   * the individual(s) to participate in the genetic operation using either 
-   * tournament selection. If we are doing reproduction or mutation, we only 
-   * select one individual. For crossover, two individuals need to be selected.
-   * The genetic operation is then performed and a new offspring individual is
-   * created.
-   * The offspring is then placed into the original population (steady state)
-   * replacing a bad individual. 
-   * This whole process repeats until the termination criteria is satisfied.
-   * With any luck, this process will produce an individual that solves the 
-   * problem at hand. 
-   */
+  ///
+  /// \param[in] verbose prints verbose informations.
+  ///
+  /// We enter the genetic programming loop. We begin the loop by choosing a
+  /// genetic operation: reproduction, mutation or crossover. We then select 
+  /// the individual(s) to participate in the genetic operation using either 
+  /// tournament selection. If we are doing reproduction or mutation, we only 
+  /// select one individual. For crossover, two individuals need to be selected.
+  /// The genetic operation is then performed and a new offspring individual is
+  /// created.
+  /// The offspring is then placed into the original population (steady state)
+  /// replacing a bad individual. 
+  /// This whole process repeats until the termination criteria is satisfied.
+  /// With any luck, this process will produce an individual that solves the 
+  /// problem at hand. 
+  ///
   const summary &
   evolution::run(bool verbose)
   {
@@ -369,21 +364,19 @@ namespace vita
     return _stats;
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   evolution::check() const
   {
     return _env && _pop->check();
   }
 
-  /**
-   * clear
-   *
-   * Resets summary informations.
-   */
+  ///
+  ///
+  /// Resets summary informations.
+  ///
   void
   summary::clear() 
   { 

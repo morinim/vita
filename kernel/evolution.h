@@ -28,11 +28,11 @@ namespace vita
 
     void clear();
 
-    unsigned long long ttable_probes;
-    unsigned long long   ttable_hits;
+    boost::uint64_t ttable_probes;
+    boost::uint64_t   ttable_hits;
 
-    unsigned long long  mutations;
-    unsigned long long crossovers;
+    boost::uint64_t  mutations;
+    boost::uint64_t crossovers;
 
     unsigned gen;
     unsigned testset;

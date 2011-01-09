@@ -45,9 +45,9 @@ int main(int argc, char *argv[])
   vita::analyzer ay;
   e.pick_stats(&ay);
 
-  const unsigned long long nef(ay.functions(true));
-  const unsigned long long net(ay.terminals(true));
-  const unsigned long long ne(nef+net);
+  const boost::uint64_t nef(ay.functions(true));
+  const boost::uint64_t net(ay.terminals(true));
+  const boost::uint64_t ne(nef+net);
 
   std::cout << std::string(40,'-') << std::endl;
   for (vita::analyzer::const_iterator i(ay.begin()); i != ay.end(); ++i)
