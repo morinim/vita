@@ -27,6 +27,10 @@ namespace vita
 
   class environment;
 
+  ///
+  /// \example test1.cc
+  /// Create a random individual and show its content.
+  ///
   class individual
   {
   public:
@@ -93,8 +97,6 @@ namespace vita
     friend class const_iterator;
     friend class    interpreter;
 
-    static fitness_t (*fitness)(const individual &);
-    
   private:
     static unsigned normalize(const individual &, 
                               const std::vector<unsigned> *, unsigned &,
@@ -115,11 +117,9 @@ namespace vita
 
   std::ostream & operator<<(std::ostream &, const individual &);
 
-
-
-  /**
-   * operator()
-   */
+  ///
+  /// \return \c false when the iterator reaches the end.
+  ///
   inline
   bool
   individual::const_iterator::operator()() const
@@ -127,9 +127,9 @@ namespace vita
     return _l < _ind._code.size() && !_lines.empty();
   }
 
-  /**
-   * operator*
-   */
+  ///
+  /// \return reference to the current \c gene of the \c individual.
+  ///
   inline
   const gene &
   individual::const_iterator::operator*() const
@@ -138,10 +138,9 @@ namespace vita
     return _ind._code[_l];
   }
 
-  /**
-   * operator->
-   * \return
-   */
+  ///
+  /// \return pointer to the current \c gene of the \c individual.
+  ///
   inline
   const gene *
   individual::const_iterator::operator->() const
@@ -150,10 +149,10 @@ namespace vita
     return &_ind._code[_l];    
   }
 
-  /**
-   * operator[].
-   * \param i
-   */
+  ///
+  /// \param[in] i index of the \c gene of the \c individual.
+  /// \return the i-th \c gene of the \c individual.
+  ///
   inline
   const gene &
   individual::operator[](unsigned i) const
@@ -161,9 +160,9 @@ namespace vita
     return _code[i];
   }
 
-  /**
-   * type
-   */
+  ///
+  /// \return 
+  ///
   inline
   symbol_t
   individual::type() const
@@ -171,9 +170,9 @@ namespace vita
     return _type;
   }
   
-  /**
-   * size
-   */
+  ///
+  /// \return
+  ///
   inline
   unsigned
   individual::size() const
@@ -181,10 +180,9 @@ namespace vita
     return _code.size();
   }
 
-  /**
-   * eff_size
-   * \return
-   */
+  ///
+  /// \return
+  ///
   inline
   unsigned
   individual::eff_size() const
@@ -197,10 +195,6 @@ namespace vita
     return ef;
   }
 
-  /**
-   * individual
-   * \param n[in]
-   */
   /*
   inline
   individual::individual(unsigned n)
@@ -210,10 +204,10 @@ namespace vita
   }
   */
 
-  /**
-   * get_block
-   * \param locus
-   */
+  ///
+  /// \param[in] locus
+  /// \return
+  ///
   inline
   individual
   individual::get_block(unsigned locus) const
@@ -226,10 +220,9 @@ namespace vita
     return ret;
   }
 
-  /**
-   * tree
-   * \param s[out]
-   */
+  ///
+  /// \param[out] s
+  ///
   inline
   void
   individual::tree(std::ostream &s) const
@@ -237,10 +230,9 @@ namespace vita
     tree(s,_best,0,_best);
   }
 
-  /**
-   * pack.
-   * \param p[out]
-   */
+  ///
+  /// \param[out] p
+  ///
   inline
   void
   individual::pack(std::vector<boost::uint8_t> &p) const 

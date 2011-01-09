@@ -19,8 +19,6 @@
 namespace vita
 {
 
-  fitness_t (*individual::fitness)(const individual &) = 0;
-
   /**
    * individual
    * \param e[in]

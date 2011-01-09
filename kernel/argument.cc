@@ -15,32 +15,29 @@
 
 namespace vita
 {
-  /**
-   * argument
-   * \param n[in]
-   * \param t[in]
-   */
+  ///
+  /// \param[in] n
+  ///
   argument::argument(unsigned n) 
     : terminal("ARG",sym_void,0), _index(n)
   {
     assert(check());
   }
 
-  /**
-   * eval
-   * \param agent[in]
-   * \return
-   */
+  ///
+  ///
+  /// \param[in] agent
+  /// \return
+  ///
   boost::any
   argument::eval(interpreter &agent) const
   {
     return agent.eval_adf_arg(_index);
   }
 
-  /**
-   * check
-   * \return
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   argument::check() const
   {

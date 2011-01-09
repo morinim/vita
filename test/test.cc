@@ -328,9 +328,9 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
         vita::analyzer ay;
         evo.pick_stats(&ay);
 
-        const unsigned long long nef(ay.functions(true));
-        const unsigned long long net(ay.terminals(true));
-        const unsigned long long ne(nef+net);
+        const boost::uint64_t nef(ay.functions(true));
+        const boost::uint64_t net(ay.terminals(true));
+        const boost::uint64_t long ne(nef+net);
 
         std::cout << std::string(40,'-') << std::endl;
         for (vita::analyzer::const_iterator i(ay.begin());

@@ -3,7 +3,7 @@
  *  \file test1.cc
  *
  *  \author Manlio Morini
- *  \date 2009/11/15
+ *  \date 2011/01/09
  *
  *  This file is part of VITA
  *
