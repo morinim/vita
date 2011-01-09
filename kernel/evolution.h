@@ -3,7 +3,7 @@
  *  \file evolution.h
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/01/08
  *
  *  This file is part of VITA
  *
@@ -14,14 +14,13 @@
 
 #include "vita.h"
 #include "analyzer.h"
+#include "evaluator_proxy.h"
 #include "population.h"
-#include "ttable.h"
 
 namespace vita
 {
 
   class environment;
-
 
   struct summary
   {
@@ -48,12 +47,13 @@ namespace vita
   class evolution
   {
   public:
-    explicit evolution(environment &);
+    evolution(environment &, evaluator *const);
     ~evolution();
 
     const summary &run(bool);
 
     const vita::population &population() const;
+    fitness_t fitness(const individual &) const;
 
     void pick_stats(analyzer *const);
 
@@ -68,21 +68,10 @@ namespace vita
 
     environment            *_env;
     vita::population *const _pop;
+    evaluator_proxy *const  _eva;
     summary               _stats;
     unsigned          _run_count;
   };
-
-
-  /**
-   * population
-   * \return The population being evolved.
-   */
-  inline
-  const vita::population &
-  evolution::population() const
-  {
-    return *_pop;
-  }
 
 }  // namespace vita
 

@@ -3,7 +3,7 @@
  *  \file search.h
  *
  *  \author Manlio Morini
- *  \date 2010/06/11
+ *  \date 2011/01/08
  *
  *  This file is part of VITA
  *
@@ -13,6 +13,7 @@
 #define      SEARCH_H
 
 #include "vita.h"
+#include "evaluator.h"
 #include "individual.h"
 
 namespace vita
@@ -24,7 +25,7 @@ namespace vita
   class search
   {
   public:
-    explicit search(environment &);
+    search(environment &, evaluator *const);
 
     void arl(const individual &, evolution &);
 
@@ -36,6 +37,7 @@ namespace vita
 
   private:
     environment *const _env;
+    evaluator *const   _eva;
   };
     
 }  // namespace vita

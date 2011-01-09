@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/01/08
  *
  *  This file is part of VITA
  *
@@ -20,11 +20,13 @@
 namespace vita
 {
 
-  /**
-   * evolution
-   * \param[in] p population.
-   */
-  evolution::evolution(environment &e) : _env(&e), _pop(new vita::population(e))
+  ///
+  /// \param[in] e base environment.
+  /// \param[in] eva evaluator used during the evolution.
+  ///
+  evolution::evolution(environment &e, evaluator *const eva) 
+    : _env(&e), _pop(new vita::population(e)), 
+      _eva(new evaluator_proxy(eva,e.ttable_size)) 
   {
     assert(e.check());
 
@@ -33,38 +35,37 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * ~evolution
-   */
+  ///
   evolution::~evolution()
   {
     delete _pop;
+    delete _eva;
   }
 
+  ///
+  /// \return read-only access to the population being evolved.
+  ///
+  const vita::population &
+  evolution::population() const
+  {
+    return *_pop;
+  }
 
-  /**
-   * pick_stats
-   * \param[out] az Repository for the statistical informations.
-   *
-   * Gathers statistical informations about the elements of the population.
-   */
+  ///
+  /// \param[out] az repository for the statistical informations.
+  ///
+  /// Gathers statistical informations about the elements of the population.
+  ///
   void
   evolution::pick_stats(analyzer *const az)
   {
     az->clear();
 
     for (population::const_iterator i(_pop->begin()); i != _pop->end(); ++i)    
-    {
-      fitness_t f;
-      _pop->_cache.find(*i,&f);
-
-      az->add(*i,f);
-    }
+      az->add(*i,_eva->run(*i));
   }
 
-  /**
-   * pick_stats
-   */
+  ///
   void
   evolution::pick_stats()
   {
@@ -94,14 +95,16 @@ namespace vita
     {
       const unsigned j(random::ring(target,mate_zone,n));
 
+      const fitness_t fit_j(_eva->run((*_pop)[j]));
+      const fitness_t fit_sel(_eva->run((*_pop)[sel]));
       if (best)
       {
-        if (_pop->fitness(j) > _pop->fitness(sel))
+        if (fit_j > fit_sel)
           sel = j;
       }
       else  // worst.
       {
-        if (_pop->fitness(j) < _pop->fitness(sel))
+        if (fit_j < fit_sel)
 	  sel = j;
       }
     }
@@ -180,7 +183,7 @@ namespace vita
 	       << unsigned(_stats.az.length_dist().max) 
 	       << std::endl << std::endl 
 	       << "{Hit rate}" << std::endl
-	       << (_pop->probes() ? _pop->hits()*100/_pop->probes() : 0)
+	       << (_eva->probes() ? _eva->hits()*100/_eva->probes() : 0)
 	       << std::endl;
 	}
       }
@@ -202,7 +205,7 @@ namespace vita
 		  << ' ' << _stats.az.terminals(0)
 		  << ' ' << _stats.az.functions(1) 
 		  << ' ' << _stats.az.terminals(1)
-		  << ' ' << (_pop->probes() ? _pop->hits()*100/_pop->probes()
+		  << ' ' << (_eva->probes() ? _eva->hits()*100/_eva->probes()
 			                    : 0)
 		  << std::endl;
       }
@@ -228,6 +231,16 @@ namespace vita
          _stats.az.fit_dist().variance <= float_epsilon)) );
   }
 
+  ///
+  /// \param[in] ind individual whose fitness we are interested in.
+  /// \return the fitness of \a ind.
+  ///
+  fitness_t
+  evolution::fitness(const individual &ind) const
+  {
+    return _eva->run(ind);
+  }
+
   /**
    * run
    * \param[in] verbose Prints verbose informations.
@@ -250,9 +263,9 @@ namespace vita
   {
     _stats.clear();
     _stats.best   = *_pop->begin();
-    _stats.f_best = _pop->fitness(_stats.best);
+    _stats.f_best = _eva->run(_stats.best);
 
-    _pop->_cache.clear();
+    _eva->clear();
 
     std::clock_t start_c(clock());
     for (_stats.gen = 0; !stop_condition(); ++_stats.gen)
@@ -287,12 +300,14 @@ namespace vita
 	_stats.mutations += off.mutation();
 
 	// --------- REPLACEMENT --------
-	const fitness_t f_off(_pop->fitness(off));
+	const fitness_t f_off(_eva->run(off));
 
 	const unsigned rep_idx(tournament(r1,false));
-	const bool replace(_pop->fitness(rep_idx) < f_off);
+	const fitness_t f_rep_idx(_eva->run((*_pop)[rep_idx]));
+	const bool replace(f_rep_idx < f_off);
 
 #if !defined(NDEBUG)
+	/*
 	const fitness_t true_f_off(individual::fitness(off)), 
 	  true_f_rep(individual::fitness((*_pop)[rep_idx]));
 		
@@ -300,6 +315,7 @@ namespace vita
 	    true_f_off != f_off ||
 	    _stats.f_best != _pop->fitness(_stats.best))
 	  std::cerr << "--> COLLISION <--" << std::endl;
+	*/
 #endif
 
 	if (replace)
@@ -319,8 +335,8 @@ namespace vita
         }
       }
 
-      _stats.ttable_probes = _pop->probes();
-      _stats.ttable_hits   =   _pop->hits();
+      _stats.ttable_probes = _eva->probes();
+      _stats.ttable_hits   =   _eva->hits();
     }
 
     if (verbose)

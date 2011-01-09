@@ -318,7 +318,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
       env.code_length = l;
 
       BOOST_TEST_MESSAGE("Population " << n << "_" << l);
-      vita::evolution evo(env);
+      std::auto_ptr<vita::evaluator> eva(new vita::random_evaluator());
+      vita::evolution evo(env,eva.get());
 
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
       {

@@ -3,7 +3,7 @@
  *  \file search.cc
  *
  *  \author Manlio Morini
- *  \date 2010/06/11
+ *  \date 2011/01/08
  *
  *  This file is part of VITA
  *
@@ -22,8 +22,9 @@ namespace vita
   /**
    * search
    * \param[in] e
+   * \param[in] eva
    */
-  search::search(environment &e) : _env(&e)
+  search::search(environment &e, evaluator *const eva) : _env(&e), _eva(eva)
   {
     assert(e.check());
 
@@ -45,7 +46,7 @@ namespace vita
   {
     const unsigned arl_args(2);
 
-    const fitness_t base_f(evo.population().fitness(candidate));
+    const fitness_t base_f(evo.fitness(candidate));
     std::list<unsigned> bl(candidate.blocks());
 
     _env->sset.reset_adf_weights();
@@ -57,7 +58,7 @@ namespace vita
       // Building blocks should be simple.
       if (candidate_block.eff_size() <= 5+arl_args)
       {
-        const double d_f( base_f - evo.population().fitness(candidate.destroy_block(*i)) );
+        const double d_f( base_f - evo.fitness(candidate.destroy_block(*i)) );
 
         // Semantic introns cannot be building blocks.
         if (!is_bad(base_f) && !is_bad(d_f) &&
@@ -86,8 +87,8 @@ namespace vita
 
   /**
    * run
-   * \param[in] verbose Prints verbose information while running.
-   * \param[in] n Number of runs.
+   * \param[in] verbose prints verbose information while running.
+   * \param[in] n number of runs.
    */
   individual
   search::run(bool verbose, unsigned n)
@@ -109,7 +110,7 @@ namespace vita
 
     for (unsigned i(0); i < n; ++i)
     {
-      evolution evo(*_env);
+      evolution evo(*_env,_eva);
 
       const summary s(evo.run(verbose));
 
