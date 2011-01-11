@@ -19,10 +19,12 @@
 namespace vita
 {
 
-  /**
-   * individual
-   * \param e[in]
-   */
+  ///
+  /// \param[in] e base environment.
+  /// \param[in] gen if true generates a random initial code.
+  ///
+  /// 
+  ///
   individual::individual(const environment &e, bool gen)
     : _best(0), _env(&e), _code(e.code_length)
   {
@@ -38,19 +40,19 @@ namespace vita
     }
   }
 
-  /**
-   * compact
-   * \param last_symbol[out]
-   * \return a new compacted individual.
-   *
-   * Create a new individual functionally equivalent to 'this' but with the
-   * active symbols compacted and stored at the beginning of the code vector.
-   */
+  ///
+  /// \param[out] last_symbol pointer to the la symbol of the compacted 
+  ///                         individual.
+  /// \return a new compacted individual.
+  ///
+  /// Create a new individual functionally equivalent to \c this but with the
+  /// active symbols compacted and stored at the beginning of the code vector.
+  ///
   individual
   individual::compact(unsigned *last_symbol) const
   {
     assert(size() == _env->code_length);
-    individual dest(*_env,false);
+    individual dest(*this);
 
     unsigned new_line(0), old_line(_best);
     for (const_iterator it(*this); it(); ++new_line, old_line = ++it)
@@ -71,16 +73,16 @@ namespace vita
     return dest;
   }
 
-  /**
-   * optimize
-   * \param first_t[out]
-   * \param last_s[out]
-   * \return a new optimized individual.
-   *
-   * Create a new individual functionally equivalent to 'this' but with the
-   * active functions compacted and stored at the beginning of the code vector
-   * and active terminals grouped at the end of the functions' block.
-   */
+  ///
+  /// \param[out] first_t pointer to the first symbol of the optimized 
+  ///                     individual.
+  /// \param[out] last_s pointer to the last symbol of the optimized individual.
+  /// \return a new optimized individual.
+  ///
+  /// Create a new individual functionally equivalent to \c this but with the
+  /// active functions compacted and stored at the beginning of the code vector
+  /// and active terminals grouped at the end of the functions' block.
+  ///
   individual
   individual::optimize(unsigned *first_t, unsigned *last_s) const
   {
@@ -515,6 +517,15 @@ namespace vita
     assert(!positions || !types || positions->size() == types->size());
   }
 
+  ///
+  /// \return 
+  ///
+  symbol_t
+  individual::type() const
+  {
+    return _code[_best].sym->type();
+  }
+
   /**
    * operator==
    * \param x
@@ -696,20 +707,21 @@ namespace vita
     }
   }
     
-  /**
-   * tree
-   * \param s[out]
-   * \param idx[in]
-   * \param indt[in]
-   * \param father[in]
-   */
+  ///
+  /// \param[out] s
+  /// \param[in] locus
+  /// \param[in] indt
+  /// \param[in] father
+  ///
+  /// 
+  ///
   void
   individual::tree(std::ostream &s, 
-		      unsigned idx, unsigned indt, unsigned father) const
+		   unsigned locus, unsigned indt, unsigned father) const
   {
-    const gene &g(_code[idx]);
+    const gene &g(_code[locus]);
 
-    if (idx == father 
+    if (locus == father 
 	|| !_code[father].sym->associative() 
 	|| _code[father].sym != g.sym)
     {  
@@ -723,7 +735,18 @@ namespace vita
     const unsigned argc(g.sym->argc());
     if (argc)
       for (unsigned i(0); i < argc; ++i)
-	tree(s,g.args[i],indt,idx);
+	tree(s,g.args[i],indt,locus);
+  }
+
+  ///
+  /// \param[out] s
+  ///
+  /// 
+  ///
+  void
+  individual::tree(std::ostream &s) const
+  {
+    tree(s,_best,0,_best);
   }
 
   /**

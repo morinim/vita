@@ -27,6 +27,7 @@ namespace vita
 
   class environment;
 
+
   ///
   /// \example test1.cc
   /// Create a random individual and show its content.
@@ -105,8 +106,6 @@ namespace vita
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
     
-    symbol_t          _type;
-
     /// Active code in this individual.
     unsigned          _best;
 
@@ -159,16 +158,6 @@ namespace vita
   {
     return _code[i];
   }
-
-  ///
-  /// \return 
-  ///
-  inline
-  symbol_t
-  individual::type() const
-  {
-    return _type;
-  }
   
   ///
   /// \return
@@ -195,15 +184,6 @@ namespace vita
     return ef;
   }
 
-  /*
-  inline
-  individual::individual(unsigned n)
-    : _code(n)
-  {
-    assert(n);
-  }
-  */
-
   ///
   /// \param[in] locus
   /// \return
@@ -218,16 +198,6 @@ namespace vita
 
     assert(ret.check());
     return ret;
-  }
-
-  ///
-  /// \param[out] s
-  ///
-  inline
-  void
-  individual::tree(std::ostream &s) const
-  {
-    tree(s,_best,0,_best);
   }
 
   ///
