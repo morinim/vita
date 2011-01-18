@@ -66,7 +66,6 @@ namespace vita
     std::vector<boost::uint8_t> packed;
     ind.pack(packed);
 
-
     const hash_t h(hash(packed));
 
     const slot &s(table[h & mask]);

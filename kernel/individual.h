@@ -19,7 +19,6 @@
 #include <set>
 
 #include "vita.h"
-#include "fitness.h"
 #include "gene.h"
 
 namespace vita
@@ -77,6 +76,23 @@ namespace vita
 
     symbol_t type() const;
 
+  private:
+    static unsigned normalize(const individual &, 
+                              const std::vector<unsigned> *, unsigned &,
+                              individual &);
+    void pack(std::vector<boost::uint8_t> &, unsigned) const;
+    void tree(std::ostream &, unsigned, unsigned, unsigned) const;
+    unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
+    
+    /// Active code in this individual (the best sequence of genes is starting
+    /// here).
+    unsigned          _best;
+
+    const environment *_env;
+
+    std::vector<gene> _code;
+
+  public:
     class const_iterator
     {
     public:
@@ -97,21 +113,6 @@ namespace vita
 
     friend class const_iterator;
     friend class    interpreter;
-
-  private:
-    static unsigned normalize(const individual &, 
-                              const std::vector<unsigned> *, unsigned &,
-                              individual &);
-    void pack(std::vector<boost::uint8_t> &, unsigned) const;
-    void tree(std::ostream &, unsigned, unsigned, unsigned) const;
-    unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
-    
-    /// Active code in this individual.
-    unsigned          _best;
-
-    const environment *_env;
-
-    std::vector<gene> _code;
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
@@ -160,7 +161,8 @@ namespace vita
   }
   
   ///
-  /// \return
+  /// \return the total size of the individual (effective size + introns).
+  /// \see eff_size
   ///
   inline
   unsigned
@@ -170,7 +172,8 @@ namespace vita
   }
 
   ///
-  /// \return
+  /// \return the effective size of the individual.
+  /// \see size
   ///
   inline
   unsigned
@@ -185,8 +188,9 @@ namespace vita
   }
 
   ///
-  /// \param[in] locus
-  /// \return
+  /// \param[in] locus location of the individual.
+  /// \return an individual obtained from \c this choosing the best gene
+  ///         sequence.
   ///
   inline
   individual
@@ -201,7 +205,7 @@ namespace vita
   }
 
   ///
-  /// \param[out] p
+  /// \param[out] p packed version (byte stream) if \c this individual.
   ///
   inline
   void

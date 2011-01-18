@@ -301,18 +301,6 @@ namespace vita
 	const fitness_t f_rep_idx(_eva->run((*_pop)[rep_idx]));
 	const bool replace(f_rep_idx < f_off);
 
-#if !defined(NDEBUG)
-	/*
-	const fitness_t true_f_off(individual::fitness(off)), 
-	  true_f_rep(individual::fitness((*_pop)[rep_idx]));
-		
-	if (true_f_rep != _pop->fitness(rep_idx) || 
-	    true_f_off != f_off ||
-	    _stats.f_best != _pop->fitness(_stats.best))
-	  std::cerr << "--> COLLISION <--" << std::endl;
-	*/
-#endif
-
 	if (replace)
 	  (*_pop)[rep_idx] = off;
 

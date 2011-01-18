@@ -22,9 +22,8 @@ namespace vita
   ///
   /// Provide a surrogate for an \a evaluator to control access to it. The 
   /// reason for controlling access is to cache fitness scores of individuals.
-  /// \c evaluator_proxy uses two caches:
-  /// \li the \a fitness_memento object of an \a individual;
-  /// \li a ad-hoc internal transposition table (\a ttable).     
+  /// \c evaluator_proxy uses an ad-hoc internal transposition table 
+  /// (\a ttable).     
   ///
   class evaluator_proxy : public evaluator 
   {
@@ -42,7 +41,7 @@ namespace vita
     /// Pointer that lets the proxy access the real evaluator.
     evaluator *const _eva;
 
-    mutable ttable _cache;
+    ttable _cache;
   };
 
 }  // namespace vita

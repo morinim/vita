@@ -22,7 +22,7 @@ namespace vita
   evaluator_proxy::evaluator_proxy(evaluator *const eva, unsigned ts) 
     : _eva(eva), _cache(ts)
   {
-    assert(eva->check() && ts);
+    assert(eva && ts);
   }
 
   ///
@@ -36,14 +36,31 @@ namespace vita
     if (!_cache.find(ind,&f))
     {
       f = _eva->run(ind);
-      _cache.insert(ind,f);
-    }
 
-    return f;    
+      _cache.insert(ind,f);
+
+#if !defined(NDEBUG)
+      fitness_t f1;
+      assert(_cache.find(ind,&f1) && f==f1);
+#endif
+    }
+    /*
+    #if !defined(NDEBUG)
+    // Hash collision checking code can slow down the program very much.
+    else
+    {
+      const fitness_t f1(_eva->run(ind));
+      if (f != f1)
+	std::cerr << "********* COLLISION *********" << std::endl;
+    }
+    #endif
+    */
+
+    return f;
   }
 
   ///
-  /// Reset the transposition cache.
+  /// Resets the evaluation caches.
   ///
   void
   evaluator_proxy::clear()
