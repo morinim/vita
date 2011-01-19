@@ -20,11 +20,10 @@
 namespace vita
 {
 
-  /**
-   * population
-   * \param[in] e environment.
-   */
-  population::population(environment &e) : _cache(e.ttable_size), _env(&e)
+  ///
+  /// \param[in] e base environment.
+  ///
+  population::population(environment &e) : _env(&e)
   {
     assert(e.check());
 
@@ -45,27 +44,6 @@ namespace vita
       _pop.push_back(individual(*_env,true));
 
     assert(check());
-  }
-
-  /**
-   * fitness
-   * \param[in] ind Individual whose fitness we are interested in.
-   * \return The fitness of ind.
-   *
-   * First we try the transposition table. If the information is missing it
-   * will be calculated.
-   */
-  fitness_t
-  population::fitness(const individual &ind) const
-  {
-    fitness_t f;
-    if (!_cache.find(ind,&f))
-    {
-      f = individual::fitness(ind);
-      _cache.insert(ind,f);
-    }
-
-    return f;
   }
 
   /**

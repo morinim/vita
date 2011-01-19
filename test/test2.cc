@@ -11,16 +11,17 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 #include "vita.h"
 #include "environment.h"
 #include "evolution.h"
 #include "primitive/sr_pri.h"
 
-int fitness(const vita::individual &)
+class dummy : public vita::evaluator
 {
-  return 0;
-}
+  vita::fitness_t run(const vita::individual &) { return 0; };
+};
 
 int main(int argc, char *argv[])
 {
@@ -36,16 +37,17 @@ int main(int argc, char *argv[])
   env.insert(new vita::sr::ifl());
   env.insert(new vita::sr::ife());
 
-  vita::evolution e(env);
+  std::auto_ptr<vita::evaluator> eva(new dummy());
+  vita::evolution e(env,eva.get());
 
   std::cout << e.population() << std::endl;
 
   vita::analyzer ay;
   e.pick_stats(&ay);
 
-  const unsigned long long nef(ay.functions(true));
-  const unsigned long long net(ay.terminals(true));
-  const unsigned long long ne(nef+net);
+  const boost::uint64_t nef(ay.functions(true));
+  const boost::uint64_t net(ay.terminals(true));
+  const boost::uint64_t ne(nef+net);
 
   std::cout << std::string(40,'-') << std::endl;
   for (vita::analyzer::const_iterator i(ay.begin()); i != ay.end(); ++i)

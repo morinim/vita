@@ -18,7 +18,7 @@ LIB = lib/libboost_program_options.a
 # Add directories to the include path.
 INCPATH = ./kernel ./boost
 
-WARN = -ansi -Wall -Wextra
+WARN = -pedantic -ansi -Wall -Wextra
 DEFS = -march=native
 
 # The next blocks change some variables depending on the build type.

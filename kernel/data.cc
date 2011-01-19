@@ -201,7 +201,7 @@ namespace vita
   }
 
   ///
-  /// \return true if the individual passes the internal consistency check.
+  /// \return true if the object passes the internal consistency check.
   ///
   bool
   data::check() const

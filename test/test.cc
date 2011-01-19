@@ -3,7 +3,7 @@
  *  \file test.cc
  *
  *  \author Manlio Morini
- *  \date 2010/06/10
+ *  \date 2011/01/18
  *
  *  This file is part of VITA
  *
@@ -294,6 +294,36 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Compact)
+{
+  vita::environment env;
+  
+  env.insert(new vita::sr::number(-200,200));
+  env.insert(new vita::sr::add());
+  env.insert(new vita::sr::sub());
+  env.insert(new vita::sr::mul());
+  env.insert(new vita::sr::ifl());
+  env.insert(new vita::sr::ife());
+
+  env.code_length = 100;
+
+  for (unsigned n(0); n < 1000; ++n)
+  {
+    BOOST_TEST_MESSAGE("Individual " << n);
+
+    const vita::individual i1(env,true);
+    const vita::individual i2(i1.compact());
+
+    const boost::any v1(vita::interpreter(i1).run());
+    const boost::any v2(vita::interpreter(i2).run());
+
+    BOOST_REQUIRE(v1.empty() == v2.empty());
+    if (!v1.empty() && !v2.empty())
+      BOOST_REQUIRE_EQUAL(boost::any_cast<double>(v1),
+			  boost::any_cast<double>(v2));
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 
@@ -318,7 +348,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
       env.code_length = l;
 
       BOOST_TEST_MESSAGE("Population " << n << "_" << l);
-      vita::evolution evo(env);
+      std::auto_ptr<vita::evaluator> eva(new vita::random_evaluator());
+      vita::evolution evo(env,eva.get());
 
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
       {
@@ -327,9 +358,9 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
         vita::analyzer ay;
         evo.pick_stats(&ay);
 
-        const unsigned long long nef(ay.functions(true));
-        const unsigned long long net(ay.terminals(true));
-        const unsigned long long ne(nef+net);
+        const boost::uint64_t nef(ay.functions(true));
+        const boost::uint64_t net(ay.terminals(true));
+        const boost::uint64_t ne(nef+net);
 
         std::cout << std::string(40,'-') << std::endl;
         for (vita::analyzer::const_iterator i(ay.begin());

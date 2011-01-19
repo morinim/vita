@@ -43,14 +43,14 @@ namespace vita
 
     void clear();
 
-    unsigned long long functions(bool) const;
-    unsigned long long terminals(bool) const;
+    boost::uint64_t functions(bool) const;
+    boost::uint64_t terminals(bool) const;
 
     const distribution<fitness_t> &fit_dist() const;
     const distribution<double> &length_dist() const;
 
-    unsigned long long mutations() const;
-    unsigned long long crossovers() const;
+    boost::uint64_t mutations() const;
+    boost::uint64_t crossovers() const;
 
     bool check() const;
 
@@ -62,8 +62,8 @@ namespace vita
     distribution<fitness_t> _fit;
     distribution<double> _length;
 
-    unsigned long long _functions[2];
-    unsigned long long _terminals[2];
+    boost::uint64_t _functions[2];
+    boost::uint64_t _terminals[2];
   };
 
   /**
@@ -103,7 +103,7 @@ namespace vita
    * \return Number of functions in the population.
    */
   inline
-  unsigned long long
+  boost::uint64_t
   analyzer::functions(bool eff) const
   {
     return _functions[eff];
@@ -115,7 +115,7 @@ namespace vita
    * \return Number of terminals in the population.
    */
   inline
-  unsigned long long
+  boost::uint64_t
   analyzer::terminals(bool eff) const
   {
     return _terminals[eff];

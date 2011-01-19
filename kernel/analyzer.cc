@@ -37,7 +37,7 @@ namespace vita
    */
   /*
   inline
-  unsigned long long
+  boost::uint64_t
   analyzer::mutations() const
   {
     return _pop.stats.mutations;
@@ -49,7 +49,7 @@ namespace vita
    */
   /*
   inline
-  unsigned long long
+  boost::uint64_t
   analyzer::crossovers() const
   {
     return _pop.stats.crossovers;

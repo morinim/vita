@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/01/08
  *
  *  This file is part of VITA
  *
@@ -20,11 +20,13 @@
 namespace vita
 {
 
-  /**
-   * evolution
-   * \param[in] p population.
-   */
-  evolution::evolution(environment &e) : _env(&e), _pop(new vita::population(e))
+  ///
+  /// \param[in] e base environment.
+  /// \param[in] eva evaluator used during the evolution.
+  ///
+  evolution::evolution(environment &e, evaluator *const eva) 
+    : _env(&e), _pop(new vita::population(e)), 
+      _eva(new evaluator_proxy(eva,e.ttable_size)) 
   {
     assert(e.check());
 
@@ -33,55 +35,53 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * ~evolution
-   */
+  ///
   evolution::~evolution()
   {
     delete _pop;
+    delete _eva;
   }
 
+  ///
+  /// \return read-only access to the population being evolved.
+  ///
+  const vita::population &
+  evolution::population() const
+  {
+    return *_pop;
+  }
 
-  /**
-   * pick_stats
-   * \param[out] az Repository for the statistical informations.
-   *
-   * Gathers statistical informations about the elements of the population.
-   */
+  ///
+  /// \param[out] az repository for the statistical informations.
+  ///
+  /// Gathers statistical informations about the elements of the population.
+  ///
   void
   evolution::pick_stats(analyzer *const az)
   {
     az->clear();
 
     for (population::const_iterator i(_pop->begin()); i != _pop->end(); ++i)    
-    {
-      fitness_t f;
-      _pop->_cache.find(*i,&f);
-
-      az->add(*i,f);
-    }
+      az->add(*i,_eva->run(*i));
   }
 
-  /**
-   * pick_stats
-   */
+  ///
   void
   evolution::pick_stats()
   {
     pick_stats(&_stats.az);
   }
 
-  /**
-   * tournament
-   * \param[in] target Index of an individual in the population.
-   * \param[in] best Are we looking for the best (or the worst) individual?
-   * \return Index of the best (worst) individual found.
-   * 
-   * Tournament selection works by selecting a number of individuals from the 
-   * population at random, a tournament, and then selecting only the best of 
-   * those individuals.
-   * Recall that better individuals have highter fitnesses.
-   */
+  ///
+  /// \param[in] target index of an individual in the population.
+  /// \param[in] best are we looking for the best (or the worst) individual?
+  /// \return index of the best (worst) individual found.
+  ///
+  /// Tournament selection works by selecting a number of individuals from the 
+  /// population at random, a tournament, and then selecting only the best of 
+  /// those individuals.
+  /// Recall that better individuals have highter fitnesses.
+  ///
   unsigned
   evolution::tournament(unsigned target, bool best) const
   {
@@ -94,14 +94,16 @@ namespace vita
     {
       const unsigned j(random::ring(target,mate_zone,n));
 
+      const fitness_t fit_j(_eva->run((*_pop)[j]));
+      const fitness_t fit_sel(_eva->run((*_pop)[sel]));
       if (best)
       {
-        if (_pop->fitness(j) > _pop->fitness(sel))
+        if (fit_j > fit_sel)
           sel = j;
       }
       else  // worst.
       {
-        if (_pop->fitness(j) < _pop->fitness(sel))
+        if (fit_j < fit_sel)
 	  sel = j;
       }
     }
@@ -109,11 +111,9 @@ namespace vita
     return sel;
   }
 
-  /**
-   * log
-   *
-   * Saves working / statistical informations in the log files.
-   */
+  ///
+  /// Saves working / statistical informations in the log files.
+  ///
   void
   evolution::log() const
   {
@@ -140,9 +140,9 @@ namespace vita
 
 	  for (unsigned active(0); active <= 1; ++active)
 	  {
-	    const unsigned long long nf(_stats.az.functions(active));
-	    const unsigned long long nt(_stats.az.terminals(active));
-	    const unsigned long long n(nf+nt);
+	    const boost::uint64_t nf(_stats.az.functions(active));
+	    const boost::uint64_t nt(_stats.az.terminals(active));
+	    const boost::uint64_t n(nf+nt);
 	    const std::string s(active ? "Active" : "Overall");
 	    
 	    logs << std::endl << '{' << s << " symbol frequency}" 
@@ -180,7 +180,7 @@ namespace vita
 	       << unsigned(_stats.az.length_dist().max) 
 	       << std::endl << std::endl 
 	       << "{Hit rate}" << std::endl
-	       << (_pop->probes() ? _pop->hits()*100/_pop->probes() : 0)
+	       << (_eva->probes() ? _eva->hits()*100/_eva->probes() : 0)
 	       << std::endl;
 	}
       }
@@ -202,17 +202,16 @@ namespace vita
 		  << ' ' << _stats.az.terminals(0)
 		  << ' ' << _stats.az.functions(1) 
 		  << ' ' << _stats.az.terminals(1)
-		  << ' ' << (_pop->probes() ? _pop->hits()*100/_pop->probes()
+		  << ' ' << (_eva->probes() ? _eva->hits()*100/_eva->probes()
 			                    : 0)
 		  << std::endl;
       }
     }
   }
 
-  /**
-   * stop_condition
-   * \return true if evolution should be interrupted.
-   */
+  ///
+  /// \return true if evolution should be interrupted.
+  ///
   bool
   evolution::stop_condition() const
   {
@@ -228,31 +227,40 @@ namespace vita
          _stats.az.fit_dist().variance <= float_epsilon)) );
   }
 
-  /**
-   * run
-   * \param[in] verbose Prints verbose informations.
-   *
-   * We enter the genetic programming loop. We begin the loop by choosing a
-   * genetic operation: reproduction, mutation or crossover. We then select 
-   * the individual(s) to participate in the genetic operation using either 
-   * tournament selection. If we are doing reproduction or mutation, we only 
-   * select one individual. For crossover, two individuals need to be selected.
-   * The genetic operation is then performed and a new offspring individual is
-   * created.
-   * The offspring is then placed into the original population (steady state)
-   * replacing a bad individual. 
-   * This whole process repeats until the termination criteria is satisfied.
-   * With any luck, this process will produce an individual that solves the 
-   * problem at hand. 
-   */
+  ///
+  /// \param[in] ind individual whose fitness we are interested in.
+  /// \return the fitness of \a ind.
+  ///
+  fitness_t
+  evolution::fitness(const individual &ind) const
+  {
+    return _eva->run(ind);
+  }
+
+  ///
+  /// \param[in] verbose prints verbose informations.
+  ///
+  /// We enter the genetic programming loop. We begin the loop by choosing a
+  /// genetic operation: reproduction, mutation or crossover. We then select 
+  /// the individual(s) to participate in the genetic operation using either 
+  /// tournament selection. If we are doing reproduction or mutation, we only 
+  /// select one individual. For crossover, two individuals need to be selected.
+  /// The genetic operation is then performed and a new offspring individual is
+  /// created.
+  /// The offspring is then placed into the original population (steady state)
+  /// replacing a bad individual. 
+  /// This whole process repeats until the termination criteria is satisfied.
+  /// With any luck, this process will produce an individual that solves the 
+  /// problem at hand. 
+  ///
   const summary &
   evolution::run(bool verbose)
   {
     _stats.clear();
     _stats.best   = *_pop->begin();
-    _stats.f_best = _pop->fitness(_stats.best);
+    _stats.f_best = _eva->run(_stats.best);
 
-    _pop->_cache.clear();
+    _eva->clear();
 
     std::clock_t start_c(clock());
     for (_stats.gen = 0; !stop_condition(); ++_stats.gen)
@@ -287,20 +295,11 @@ namespace vita
 	_stats.mutations += off.mutation();
 
 	// --------- REPLACEMENT --------
-	const fitness_t f_off(_pop->fitness(off));
+	const fitness_t f_off(_eva->run(off));
 
 	const unsigned rep_idx(tournament(r1,false));
-	const bool replace(_pop->fitness(rep_idx) < f_off);
-
-#if !defined(NDEBUG)
-	const fitness_t true_f_off(individual::fitness(off)), 
-	  true_f_rep(individual::fitness((*_pop)[rep_idx]));
-		
-	if (true_f_rep != _pop->fitness(rep_idx) || 
-	    true_f_off != f_off ||
-	    _stats.f_best != _pop->fitness(_stats.best))
-	  std::cerr << "--> COLLISION <--" << std::endl;
-#endif
+	const fitness_t f_rep_idx(_eva->run((*_pop)[rep_idx]));
+	const bool replace(f_rep_idx < f_off);
 
 	if (replace)
 	  (*_pop)[rep_idx] = off;
@@ -319,8 +318,8 @@ namespace vita
         }
       }
 
-      _stats.ttable_probes = _pop->probes();
-      _stats.ttable_hits   =   _pop->hits();
+      _stats.ttable_probes = _eva->probes();
+      _stats.ttable_hits   =   _eva->hits();
     }
 
     if (verbose)
@@ -353,21 +352,19 @@ namespace vita
     return _stats;
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   evolution::check() const
   {
     return _env && _pop->check();
   }
 
-  /**
-   * clear
-   *
-   * Resets summary informations.
-   */
+  ///
+  ///
+  /// Resets summary informations.
+  ///
   void
   summary::clear() 
   { 

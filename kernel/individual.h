@@ -19,7 +19,6 @@
 #include <set>
 
 #include "vita.h"
-#include "fitness.h"
 #include "gene.h"
 
 namespace vita
@@ -27,6 +26,11 @@ namespace vita
 
   class environment;
 
+
+  ///
+  /// \example test1.cc
+  /// Create a random individual and show its content.
+  ///
   class individual
   {
   public:
@@ -72,6 +76,23 @@ namespace vita
 
     symbol_t type() const;
 
+  private:
+    static unsigned normalize(const individual &, 
+                              const std::vector<unsigned> *, unsigned &,
+                              individual &);
+    void pack(std::vector<boost::uint8_t> &, unsigned) const;
+    void tree(std::ostream &, unsigned, unsigned, unsigned) const;
+    unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
+    
+    /// Active code in this individual (the best sequence of genes is starting
+    /// here).
+    unsigned          _best;
+
+    const environment *_env;
+
+    std::vector<gene> _code;
+
+  public:
     class const_iterator
     {
     public:
@@ -92,34 +113,13 @@ namespace vita
 
     friend class const_iterator;
     friend class    interpreter;
-
-    static fitness_t (*fitness)(const individual &);
-    
-  private:
-    static unsigned normalize(const individual &, 
-                              const std::vector<unsigned> *, unsigned &,
-                              individual &);
-    void pack(std::vector<boost::uint8_t> &, unsigned) const;
-    void tree(std::ostream &, unsigned, unsigned, unsigned) const;
-    unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
-    
-    symbol_t          _type;
-
-    /// Active code in this individual.
-    unsigned          _best;
-
-    const environment *_env;
-
-    std::vector<gene> _code;
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
 
-
-
-  /**
-   * operator()
-   */
+  ///
+  /// \return \c false when the iterator reaches the end.
+  ///
   inline
   bool
   individual::const_iterator::operator()() const
@@ -127,9 +127,9 @@ namespace vita
     return _l < _ind._code.size() && !_lines.empty();
   }
 
-  /**
-   * operator*
-   */
+  ///
+  /// \return reference to the current \c gene of the \c individual.
+  ///
   inline
   const gene &
   individual::const_iterator::operator*() const
@@ -138,10 +138,9 @@ namespace vita
     return _ind._code[_l];
   }
 
-  /**
-   * operator->
-   * \return
-   */
+  ///
+  /// \return pointer to the current \c gene of the \c individual.
+  ///
   inline
   const gene *
   individual::const_iterator::operator->() const
@@ -150,30 +149,21 @@ namespace vita
     return &_ind._code[_l];    
   }
 
-  /**
-   * operator[].
-   * \param i
-   */
+  ///
+  /// \param[in] i index of the \c gene of the \c individual.
+  /// \return the i-th \c gene of the \c individual.
+  ///
   inline
   const gene &
   individual::operator[](unsigned i) const
   {
     return _code[i];
   }
-
-  /**
-   * type
-   */
-  inline
-  symbol_t
-  individual::type() const
-  {
-    return _type;
-  }
   
-  /**
-   * size
-   */
+  ///
+  /// \return the total size of the individual (effective size + introns).
+  /// \see eff_size
+  ///
   inline
   unsigned
   individual::size() const
@@ -181,10 +171,10 @@ namespace vita
     return _code.size();
   }
 
-  /**
-   * eff_size
-   * \return
-   */
+  ///
+  /// \return the effective size of the individual.
+  /// \see size
+  ///
   inline
   unsigned
   individual::eff_size() const
@@ -197,23 +187,11 @@ namespace vita
     return ef;
   }
 
-  /**
-   * individual
-   * \param n[in]
-   */
-  /*
-  inline
-  individual::individual(unsigned n)
-    : _code(n)
-  {
-    assert(n);
-  }
-  */
-
-  /**
-   * get_block
-   * \param locus
-   */
+  ///
+  /// \param[in] locus location of the individual.
+  /// \return an individual obtained from \c this choosing the best gene
+  ///         sequence.
+  ///
   inline
   individual
   individual::get_block(unsigned locus) const
@@ -226,21 +204,9 @@ namespace vita
     return ret;
   }
 
-  /**
-   * tree
-   * \param s[out]
-   */
-  inline
-  void
-  individual::tree(std::ostream &s) const
-  {
-    tree(s,_best,0,_best);
-  }
-
-  /**
-   * pack.
-   * \param p[out]
-   */
+  ///
+  /// \param[out] p packed version (byte stream) if \c this individual.
+  ///
   inline
   void
   individual::pack(std::vector<boost::uint8_t> &p) const 

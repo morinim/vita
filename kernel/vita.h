@@ -40,11 +40,10 @@ namespace vita
 
   inline bool is_bad(double x) { return isinf(x) || isnan(x); }
 
-  /**
-   * float_epsilon
-   * When absolute value of two real numbers is under float_epsilon, they are
-   * considered equivalent.
-   */
+  ///
+  /// When absolute value of two real numbers is under \a float_epsilon, they
+  /// are considered equivalent.
+  ///
   const double float_epsilon(0.0001);
 
 }  // namespace vita

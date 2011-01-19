@@ -18,7 +18,7 @@ namespace vita
 
   typedef double fitness_t;
 
-  inline bool distance(fitness_t f1, fitness_t f2) { return std::fabs(f1-f2); }
+  inline double distance(fitness_t f1, fitness_t f2) {return std::fabs(f1-f2);}
 
 }  // namespace vita
 

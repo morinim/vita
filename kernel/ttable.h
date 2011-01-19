@@ -3,7 +3,7 @@
  *  \file ttable.h
  *
  *  \author Manlio Morini
- *  \date 2010/06/10
+ *  \date 2011/01/09
  *
  *  This file is part of VITA
  *
@@ -21,6 +21,16 @@ namespace vita
 
   class individual;
 
+  ///
+  /// \a ttable \c class implements a hash table that links individuals to their
+  /// fitness (it's used by the \a evaluator_proxy \c class).
+  /// Note: \a ttable exploits a byte level representation of an individual
+  /// obtained from the \c individual::pack function. This function should
+  /// map sintatically distinct (but logically equivalent) individuals to the 
+  /// same byte stream. During the evolution semantically equivalent individuals
+  /// are often generated and \a ttable could give a significant speed 
+  /// improvement.
+  ///
   class ttable
   {
   public:
@@ -35,8 +45,8 @@ namespace vita
 
     bool find(const individual &, fitness_t *const) const;
 
-    unsigned long long probes() const { return _probes; };
-    unsigned long long hits() const { return _hits; };
+    boost::uint64_t probes() const { return _probes; };
+    boost::uint64_t hits() const { return _hits; };
 
     bool check() const;
 
@@ -52,10 +62,10 @@ namespace vita
     const hash_t mask;
     slot *const table;
 
-    mutable unsigned long long _probes;
-    mutable unsigned long long _hits;
+    mutable boost::uint64_t _probes;
+    mutable boost::uint64_t _hits;
   };
     
 }  // namespace vita
 
-#endif  // SYMBOL_H
+#endif  // TTABLE_H
