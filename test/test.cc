@@ -36,7 +36,7 @@ dummy_fitness(const vita::individual &)
 // **********************************************************************
 BOOST_AUTO_TEST_SUITE(Primitive)
 
-BOOST_AUTO_TEST_CASE(SymbolicRegression)
+BOOST_AUTO_TEST_CASE(SymbolicRegressionSymbols)
 {
   vita::sr::constant *const c0 = new vita::sr::constant(0);
   vita::sr::constant *const c1 = new vita::sr::constant(1);
@@ -71,186 +71,120 @@ BOOST_AUTO_TEST_CASE(SymbolicRegression)
   any ret;
 
   // -- ABS ---------------------------------------------------
-  BOOST_TEST_MESSAGE("ABS");
-  // *** ABS(-X) = X ***
+  BOOST_TEST_CHECKPOINT("ABS(-X) == X");
   i = i.replace(f_abs,assign::list_of(1),0);  // [0] ABS 1
   i = i.replace(neg_x,             empty,1);  // [1] -X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
-  // *** ABS(X) = X ***
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("ABS(X) == X");
   i = i.replace(f_abs,assign::list_of(1),0);  // [0] ABS 1
   i = i.replace(    x,             empty,1);  // [1] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
   
   // -- ADD ---------------------------------------------------
-  BOOST_TEST_MESSAGE("ADD");
-  // *** X+0 = X ***
+  BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
   i = i.replace(f_add,assign::list_of(1)(2),0);  // [0] ADD 1,2
   i = i.replace(   c0,                empty,1);  // [1] 0
   i = i.replace(    x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
-  // *** X+Y is right ***
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("ADD(X,Y)=X+Y");
   i = i.replace(f_add,assign::list_of(1)(2),0);  // [0] ADD 1,2
   i = i.replace(    y,                empty,1);  // [1] Y
   i = i.replace(    x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),y->val+x->val);
-  // *** X+(-X) = 0 ***
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),y->val+x->val);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==y->val+x->val,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   i = i.replace(f_add,assign::list_of(1)(2),0);  // [0] ADD 1,2
   i = i.replace(    x,                empty,1);  // [1] X
   i = i.replace(neg_x,                empty,2);  // [2] -X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),0);
-  // *** X+Y = Y+X ***
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),0);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==0,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
   i = i.replace(f_sub,assign::list_of(1)(2),0);  // [0] ADD 1,2
   i = i.replace(f_add,assign::list_of(3)(4),1);  // [1] ADD 3,4
   i = i.replace(f_add,assign::list_of(4)(3),2);  // [2] ADD 4,3
   i = i.replace(    x,                empty,3);  // [3] X
   i = i.replace(    y,                empty,4);  // [4] Y
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),0);
+  //BOOST_REQUIRE_EQUAL(any_cast<double>(ret),0);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==0,"\n" << i);
 
   // -- DIV ---------------------------------------------------
-  BOOST_TEST_MESSAGE("DIV");
-  // *** X/X = 1 ***
+  BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
   i = i.replace(f_div,assign::list_of(1)(2),0);  // [0] DIV 1, 2
   i = i.replace(    x,                empty,1);  // [1] X
   i = i.replace(    x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),1);
-  // *** X/1 = X ***
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==1,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
   i = i.replace(f_div,assign::list_of(1)(2),0);  // [0] DIV 1, 2
   i = i.replace(    x,                empty,1);  // [1] X
   i = i.replace(   c1,                empty,2);  // [2] 1
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
-  // *** -X/X = -1 ***
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
   i = i.replace(f_div,assign::list_of(1)(2),0);  // [0] DIV 1, 2
   i = i.replace(neg_x,                empty,1);  // [1] -X
   i = i.replace(    x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),-1);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==-1,"\n" << i);
+
   // -- IDIV ---------------------------------------------------
-  BOOST_TEST_MESSAGE("IDIV");
-  // *** X/X = 1 ***
+  BOOST_TEST_CHECKPOINT("IDIV(X,X) == 1");
   i = i.replace(f_idiv,assign::list_of(1)(2),0);  // [0] DIV 1, 2
   i = i.replace(     x,                empty,1);  // [1] X
   i = i.replace(     x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),1);
-  // *** X/1 = X ***
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==1,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("IDIV(X,1) == X");
   i = i.replace(f_idiv,assign::list_of(1)(2),0);  // [0] DIV 1, 2
   i = i.replace(     x,                empty,1);  // [1] X
   i = i.replace(    c1,                empty,2);  // [2] 1
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
-  // *** -X/X = -1 ***
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
   i = i.replace(f_idiv,assign::list_of(1)(2),0);  // [0] IDIV 1, 2
   i = i.replace( neg_x,                empty,1);  // [1] -X
   i = i.replace(     x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),-1);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==-1,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("IDIV(3,2) == 1");
+  i = i.replace(f_idiv,assign::list_of(1)(2),0);  // [0] IDIV 1, 2
+  i = i.replace(    c3,                empty,1);  // [1] 3
+  i = i.replace(    c2,                empty,2);  // [2] 2
+  ret = vita::interpreter(i).run();
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==1,"\n" << i);
 
   // -- SUB ---------------------------------------------------
-  BOOST_TEST_MESSAGE("SUB");
-  // *** X-X = 0 ***
+  BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
   i = i.replace(f_sub,assign::list_of(1)(2),0);  // [0] SUB 1, 2
   i = i.replace(    x,                empty,1);  // [1] X
   i = i.replace(    x,                empty,2);  // [2] X
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),0);
-  // *** X-0 = X ***
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==0,"\n" << i);
+
+  BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
   i = i.replace(f_sub,assign::list_of(1)(2),0);  // [0] SUB 1, 2
   i = i.replace(    x,                empty,1);  // [1] X
   i = i.replace(   c0,                empty,2);  // [2] 0
-  if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-  {
-    std::cout << std::string(40,'-') << std::endl;
-    i.list(std::cout);
-    std::cout << std::string(40,'-') << std::endl;
-  }
   ret = vita::interpreter(i).run();
-  BOOST_REQUIRE_EQUAL(any_cast<double>(ret),x->val);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret)==x->val,"\n" << i);
 
 }
 
@@ -273,21 +207,10 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
   for (unsigned l(1); l < 100; ++l)
   {
-    BOOST_TEST_MESSAGE("Individual " << l);
+    BOOST_TEST_CHECKPOINT("Individual " << l);
 
     env.code_length = l;
     vita::individual i(env,true);
-
-    if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
-    {
-      std::cout << std::string(40,'-') << std::endl;
-      i.dump(std::cout);
-      std::cout << std::endl;
-      i.list(std::cout);
-      std::cout << std::endl;
-      i.tree(std::cout);
-      std::cout << std::string(40,'-') << std::endl;
-    }
 
     BOOST_REQUIRE(i.check());
     BOOST_REQUIRE_EQUAL(i.size(),l);
@@ -309,7 +232,7 @@ BOOST_AUTO_TEST_CASE(Compact)
 
   for (unsigned n(0); n < 1000; ++n)
   {
-    BOOST_TEST_MESSAGE("Individual " << n);
+    BOOST_TEST_CHECKPOINT("Individual " << n);
 
     const vita::individual i1(env,true);
     const vita::individual i2(i1.compact());
@@ -347,14 +270,13 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
       env.individuals = n;
       env.code_length = l;
 
-      BOOST_TEST_MESSAGE("Population " << n << "_" << l);
+      BOOST_TEST_CHECKPOINT("Population " << n << "_" << l);
       std::auto_ptr<vita::evaluator> eva(new vita::random_evaluator());
       vita::evolution evo(env,eva.get());
 
+      /*
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
       {
-        std::cout << evo.population() <<std::endl;
-
         vita::analyzer ay;
         evo.pick_stats(&ay);
 
@@ -381,6 +303,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
                   << "Terminals: " << net << " (" << net*100/ne << "%)" 
                   << std::endl << std::string(40,'-') << std::endl;
       }
+      */
 
       BOOST_REQUIRE(evo.check());
     }

@@ -84,6 +84,7 @@ namespace vita
   /// Create a new individual functionally equivalent to \c this but with the
   /// active functions compacted and stored at the beginning of the code vector
   /// and active terminals grouped at the end of the block.
+  /// [<- Active functions ->|<- Active terminals ->|<- Introns ->]
   ///
   individual
   individual::optimize(unsigned *first_t, unsigned *last_s) const
