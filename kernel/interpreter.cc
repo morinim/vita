@@ -17,35 +17,39 @@
 namespace vita
 {
 
-  /**
-   * interpreter
-   * \param ind[in]
-   * \param ctx[in]
-   * \param ip[in]
-   */
+  ///
+  /// \param[in] ind individual whose value we are interested in,
+  /// \param[in] ctx context in which we calculate the output value (used for
+  ///                the evaluation of ADF).
+  ///
   interpreter::interpreter(const individual &ind, 
-                           interpreter *const ctx,
-                           unsigned ip) 
-    : _ip(ip), _context(ctx), _ind(ind), 
+                           interpreter *const ctx) 
+    : _ip(ind._best), _context(ctx), _ind(ind),
+      _cache(ind.size()),
       _context_cache(ctx ? ctx->_ind.size() : 0)
   {
   }
 
-  /**
-   * run
-   * \return
-   */
+  ///
+  /// \return the output value of \c this individual.
+  ///
   boost::any
   interpreter::run()
   {
+    for (unsigned i(0); i < _cache.size(); ++i)
+      _cache[i] = boost::any();
+    // Probably the \c _context_cache vector will be deleted (it was introduced 
+    // before the \c _cache vector).
+    for (unsigned i(0); i < _context_cache.size(); ++i)
+      _context_cache[i] = boost::any();
+
     _ip = _ind._best;
     return _ind._code[_ip].sym->eval(*this);
   }
 
-  /**
-   * eval
-   * \return
-   */
+  ///
+  /// \return the output value of the current terminal  symbol.
+  ///
   boost::any
   interpreter::eval()
   {
@@ -55,11 +59,10 @@ namespace vita
     return g.par;
   }
 
-  /**
-   * eval
-   * \param i[in]
-   * \return
-   */
+  ///
+  /// \param[in] i i-th argument of the current function.
+  /// \return the value of the i-th argument of the current function.
+  ///
   boost::any
   interpreter::eval(unsigned i)
   {
@@ -67,21 +70,42 @@ namespace vita
 
     assert(i < g.sym->argc());
 
-    const unsigned backup(_ip); 
-    _ip = g.args[i];
-    assert (_ip > backup);
-    const boost::any ret(_ind._code[_ip].sym->eval(*this));
-    _ip = backup;
-    return ret;
+    if (_cache[g.args[i]].empty())
+    {
+      const unsigned backup(_ip); 
+      _ip = g.args[i];
+      assert (_ip > backup);
+      const boost::any ret(_ind._code[_ip].sym->eval(*this));
+      _ip = backup;
+      _cache[g.args[i]] = ret;
+    }
+#if !defined(NDEBUG)
+    else
+    {
+      const unsigned backup(_ip); 
+      _ip = g.args[i];
+      assert (_ip > backup);
+      const boost::any ret(_ind._code[_ip].sym->eval(*this));
+      _ip = backup;
+      if (ret.type() == typeid(int))
+	assert(boost::any_cast<int>(ret) == 
+	       boost::any_cast<int>(_cache[g.args[i]]));
+      else if (ret.type() == typeid(double))
+	assert(boost::any_cast<double>(ret) == 
+	       boost::any_cast<double>(_cache[g.args[i]]));
+    }
+#endif
+    
+    return _cache[g.args[i]];
+
     //return _ind._code[g.args[i]].sym->eval(interpreter(_ind,_context,
     //                                                   g.args[i]));
   }
 
-  /**
-   * eval_adf_arg
-   * \param i[in]
-   * \return
-   */
+  ///
+  /// \param[in] i-th argument of the current ADF,
+  /// \return the value of the i-th argument of the curren ADF function.
+  ///
   boost::any
   interpreter::eval_adf_arg(unsigned i)
   {
@@ -96,10 +120,9 @@ namespace vita
     return _context_cache[context_g.args[i]];
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   interpreter::check() const
   {

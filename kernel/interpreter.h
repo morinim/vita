@@ -27,8 +27,7 @@ namespace vita
   {
   public:
     explicit interpreter(const individual &, 
-                         interpreter *const = 0,
-                         unsigned = -1);
+                         interpreter *const = 0);
 
     boost::any run();
 
@@ -46,6 +45,7 @@ namespace vita
 
     const individual &_ind;
 
+    mutable std::vector<boost::any> _cache;
     mutable std::vector<boost::any> _context_cache;
   };
     
