@@ -14,9 +14,10 @@
 namespace vita
 {
  
-  /**
-   * environment
-   */
+  ///
+  /// Class constructor. Default values are quite reasonable, but specific
+  /// problems need ad-hoc parameters.
+  ///
   environment::environment()
     : code_length(100),
       p_mutation(2.0/code_length),
@@ -35,10 +36,11 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * log
-   * \param[out] s
-   */
+  ///
+  /// \param[out] s output stream.
+  ///
+  /// Prints out the informations about the environment using the \a s output
+  /// stream.
   void
   environment::log(std::ostream &s) const
   {
@@ -77,20 +79,18 @@ namespace vita
       << "Dynamic execution file: " << stat_dynamic << std::endl;
   }
 
-  /**
-   * insert
-   * \param[in] i
-   */
+  ///
+  /// \param[in] i pointer to a new symbol for the symbol set.
+  ///
   void
   environment::insert(symbol *const i)
   {
     sset.insert(i);
   }
 
-  /**
-   * check
-   * \return true if the individual passes the internal consistency check.
-   */
+  ///
+  /// \return true if the individual passes the internal consistency check.
+  ///
   bool
   environment::check() const
   {

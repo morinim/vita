@@ -40,11 +40,16 @@ ifeq ($(TARGET),sr)
     OUTDIR = sr
   endif
   MAIN_SRC = sr/sr.cc
-else
+else ifneq (,$(findstring test,$(TARGET)))
   ifeq ($(strip $(OUTDIR)),)
     OUTDIR = test
   endif
   MAIN_SRC = test/$(TARGET).cc
+else ifneq (,$(findstring example,$(TARGET)))
+  ifeq ($(strip $(OUTDIR)),)
+    OUTDIR = examples
+  endif
+  MAIN_SRC = examples/$(TARGET).cc
 endif
 
 MAIN_OBJ = $(MAIN_SRC:.cc=.o)

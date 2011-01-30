@@ -318,7 +318,9 @@ namespace vita
 
     const unsigned cs(size());
 
-    assert(_env->code_length==cs);
+    assert(_env->code_length == cs);
+    assert(parent.size() == cs);
+
     individual offspring(*_env,false);
 
     for (unsigned i(0); i < cs; ++i)
@@ -542,7 +544,7 @@ namespace vita
   ///
   /// \param[in] ind an individual to compare with \c this.
   /// \return a numeric measurement of the difference between \a ind and 
-  /// \c this. 
+  /// \c this (the number of different genes between individuals). 
   ///
   unsigned
   individual::distance(const individual &ind) const
@@ -775,9 +777,11 @@ namespace vita
     }
   }
 
-  /**
-   *  operator<<
-   */
+  ///
+  /// \param[out] s output stream.
+  /// \param[in] ind individual to print.
+  /// \return output stream including \a ind.
+  ///
   std::ostream &
   operator<<(std::ostream &s, const individual &ind)
   {

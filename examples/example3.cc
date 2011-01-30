@@ -1,9 +1,9 @@
 /**
  *
- *  \file test4.cc
+ *  \file example3.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/20
+ *  \date 2011/01/30
  *
  *  This file is part of VITA
  *
@@ -16,6 +16,9 @@
 #include "individual.h"
 #include "primitive/sr_pri.h"
 
+//
+// Performs three types of crossover between two random individuals. 
+//
 int main(int argc, char *argv[])
 {
   vita::environment env;
@@ -44,13 +47,6 @@ int main(int argc, char *argv[])
   uc.dump(std::cout);
   std::cout << std::endl;
 
-  std::cout << "OFFSPRING (HOMOLOGOUS CROSSOVER)" << std::endl 
-	    << std::string(40,'-') << std::endl;
-
-  //const vita::individual hc(i1.hcross(i2));
-  //hc.dump(std::cout);
-  //std::cout << std::endl;
-
   std::cout << "OFFSPRING (ONE POINT CROSSOVER)" << std::endl 
 	    << std::string(40,'-') << std::endl;
 
@@ -63,36 +59,6 @@ int main(int argc, char *argv[])
 
   const vita::individual tpc(i1.cross2(i2));
   tpc.dump(std::cout);
-  std::cout << std::endl;
-
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 100);
-  std::cout << "AVERAGE DISTANCES" << std::endl << std::string(40,'-') 
-	    << std::endl; 
-  double dist1(0.0), dist2(0.0), dist3(0.0), dist4(0.0);
-  for (unsigned j(0); j < n; ++j)
-  { 
-    const vita::individual tmp1(i1.uniform_cross(i2));
-    dist1 += i1.distance(tmp1);
-    //const vita::individual tmp2(i1.hcross(i2));
-    //dist2 += i1.distance(tmp2);
-    const vita::individual tmp3(i1.cross1(i2));
-    dist3 += i1.distance(tmp3);
-    const vita::individual tmp4(i1.cross2(i2));
-    dist4 += i1.distance(tmp4);
-  }
-
-  dist1 /= n;
-  dist2 /= n;
-  dist3 /= n;
-  dist4 /= n;
-  std::cout << "Uniform crossover: " << 100*dist1/env.code_length << '%' 
-	    << std::endl
-	    << "Homologous crossover: " << 100*dist2/env.code_length << '%'
-	    << std::endl
-	    << "One point crossover: " << 100*dist3/env.code_length << '%'
-	    << std::endl
-	    << "Two points crossover: " << 100*dist4/env.code_length << '%'
-	    << std::endl;
 
   return EXIT_SUCCESS;
 }
