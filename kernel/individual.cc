@@ -523,7 +523,7 @@ namespace vita
   }
 
   ///
-  /// \return 
+  /// \return the type of the individual.
   ///
   symbol_t
   individual::type() const
@@ -531,10 +531,11 @@ namespace vita
     return _code[_best].sym->type();
   }
 
-  /**
-   * operator==
-   * \param x
-   */
+  ///
+  /// \param[in] x second term of comparison.
+  /// \return true if the two individuals are equal (symbol by symbol,
+  ///         including introns).
+  ///
   bool
   individual::operator==(const individual &x) const
   {

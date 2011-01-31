@@ -72,7 +72,7 @@ $(TARGET): $(MAIN_OBJ) $(KERNEL_OBJ)
 clean:
 	@echo Making clean...
 	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
-	@rm -f sr/sr test/test? test/test kernel/*.o sr/*.o test/*.o
+	@rm -f sr/sr test/test? examples/example? kernel/*.o sr/*.o test/*.o examples/*.o
 
 .phony:	backup
 backup:
