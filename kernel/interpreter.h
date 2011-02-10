@@ -23,11 +23,14 @@ namespace vita
 
   class individual;
 
+  ///
+  /// \example example5.cc
+  /// Output value calculation for an individual.
+  ///
   class interpreter
   {
   public:
-    explicit interpreter(const individual &, 
-                         interpreter *const = 0);
+    explicit interpreter(const individual &, interpreter *const = 0);
 
     boost::any run();
 

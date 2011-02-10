@@ -44,6 +44,10 @@ namespace vita
     fitness_t f_best;
   };
 
+  ///
+  /// \example example6.cc
+  /// Simple symbolic regression example (\f$x^2+y^2-z^2\f$).
+  ///
   class evolution
   {
   public:

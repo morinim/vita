@@ -48,4 +48,20 @@ namespace vita
 
 }  // namespace vita
 
+/// \page page1 VITA Architecture
+/// The object oriented architecture of VITA is divided into three pieces:
+/// <ol>
+///   <li>
+///     the Individual \c class, which is the underlying program representation;
+///   </li>
+///   <li>
+///     the Population \c class, which holds a population of Individual(s);
+///   </li>
+///   <li>
+///     the Problem \c class, which holds the objectives, functions and data
+///     necessary to define and solve a particular task.
+///   </li>
+/// </ul>
+///
+
 #endif  // VITA_H
