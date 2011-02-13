@@ -3,7 +3,7 @@
  *  \file interpreter.h
  *
  *  \author Manlio Morini
- *  \date 2009/12/30
+ *  \date 2011/01/25
  *
  *  This file is part of VITA
  *
@@ -23,12 +23,14 @@ namespace vita
 
   class individual;
 
+  ///
+  /// \example example5.cc
+  /// Output value calculation for an individual.
+  ///
   class interpreter
   {
   public:
-    explicit interpreter(const individual &, 
-                         interpreter *const = 0,
-                         unsigned = -1);
+    explicit interpreter(const individual &, interpreter *const = 0);
 
     boost::any run();
 
@@ -46,6 +48,7 @@ namespace vita
 
     const individual &_ind;
 
+    mutable std::vector<boost::any> _cache;
     mutable std::vector<boost::any> _context_cache;
   };
     

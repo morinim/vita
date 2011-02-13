@@ -84,6 +84,7 @@ namespace vita
   /// Create a new individual functionally equivalent to \c this but with the
   /// active functions compacted and stored at the beginning of the code vector
   /// and active terminals grouped at the end of the block.
+  /// [<- Active functions ->|<- Active terminals ->|<- Introns ->]
   ///
   individual
   individual::optimize(unsigned *first_t, unsigned *last_s) const
@@ -317,7 +318,9 @@ namespace vita
 
     const unsigned cs(size());
 
-    assert(_env->code_length==cs);
+    assert(_env->code_length == cs);
+    assert(parent.size() == cs);
+
     individual offspring(*_env,false);
 
     for (unsigned i(0); i < cs; ++i)
@@ -520,7 +523,7 @@ namespace vita
   }
 
   ///
-  /// \return 
+  /// \return the type of the individual.
   ///
   symbol_t
   individual::type() const
@@ -528,10 +531,11 @@ namespace vita
     return _code[_best].sym->type();
   }
 
-  /**
-   * operator==
-   * \param x
-   */
+  ///
+  /// \param[in] x second term of comparison.
+  /// \return true if the two individuals are equal (symbol by symbol,
+  ///         including introns).
+  ///
   bool
   individual::operator==(const individual &x) const
   {
@@ -541,7 +545,7 @@ namespace vita
   ///
   /// \param[in] ind an individual to compare with \c this.
   /// \return a numeric measurement of the difference between \a ind and 
-  /// \c this. 
+  /// \c this (the number of different genes between individuals). 
   ///
   unsigned
   individual::distance(const individual &ind) const
@@ -774,9 +778,11 @@ namespace vita
     }
   }
 
-  /**
-   *  operator<<
-   */
+  ///
+  /// \param[out] s output stream.
+  /// \param[in] ind individual to print.
+  /// \return output stream including \a ind.
+  ///
   std::ostream &
   operator<<(std::ostream &s, const individual &ind)
   {

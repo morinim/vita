@@ -1,9 +1,9 @@
 /**
  *
- *  \file test6.cc
+ *  \file example5.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/20
+ *  \date 2010/02/10
  *
  *  This file is part of VITA
  *
@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
 
   env.insert(new vita::sr::number(-200,200));
   env.insert(new vita::sr::add());
-  //env.insert(new vita::sr::div());
   env.insert(new vita::sr::ife());
   env.insert(new vita::sr::ifl());
   env.insert(new vita::sr::ifz());

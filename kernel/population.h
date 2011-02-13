@@ -21,6 +21,10 @@ namespace vita
 
   class environment;
 
+  ///
+  /// \example example2.cc
+  /// Creates a random population and shows its content.
+  ///
   class population
   {
   public:
@@ -52,7 +56,7 @@ namespace vita
 
   ///
   /// \param[in] i index of an individual (in the [0,population size[ range).
-  /// \return a reference to the individual at index i.
+  /// \return a reference to the individual at index \a i.
   ///
   inline
   individual &
@@ -64,7 +68,7 @@ namespace vita
 
   ///
   /// \param[in] i index of an individual (int the [0,population size[ range).
-  /// \return a constant reference to the individual at index i.
+  /// \return a constant reference to the individual at index \a i.
   ///
   inline
   const individual &

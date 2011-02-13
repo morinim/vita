@@ -1,6 +1,6 @@
 /**
  *
- *  \file test8.cc
+ *  \file example7.cc
  *
  *  \author Manlio Morini
  *  \date 2010/06/11

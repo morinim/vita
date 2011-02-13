@@ -31,6 +31,9 @@ namespace vita
   /// are often generated and \a ttable could give a significant speed 
   /// improvement.
   ///
+  /// \example example4.cc
+  /// Performs a speed test on the transposition table (insert-find cycle).
+  ///
   class ttable
   {
   public:

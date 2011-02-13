@@ -26,10 +26,11 @@ namespace vita
 
   class environment;
 
-
   ///
-  /// \example test1.cc
-  /// Create a random individual and show its content.
+  /// \example example1.cc
+  /// Creates a random individual and shows its content.
+  /// \example example3.cc
+  /// Performs three types of crossover between two random individuals. 
   ///
   class individual
   {

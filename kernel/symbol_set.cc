@@ -56,10 +56,11 @@ namespace vita
     return _arguments[n];
   }
 
-  /**
-   * insert
-   * \param i[in]
-   */
+  ///
+  /// \param[in] i symbol to be added.
+  ///
+  /// Adds a new \c symbol to the set.
+  ///
   void
   symbol_set::insert(symbol *const i)
   {
@@ -158,10 +159,9 @@ namespace vita
     return 0;
   }
 
-  /**
-   * check
-   * \return true if the individual passes the internal consistency check.
-   */
+  ///
+  /// \return true if the individual passes the internal consistency check.
+  ///
   bool
   symbol_set::check() const
   {

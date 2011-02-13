@@ -65,7 +65,6 @@ namespace vita
       az->add(*i,_eva->run(*i));
   }
 
-  ///
   void
   evolution::pick_stats()
   {
@@ -238,11 +237,11 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose prints verbose informations.
+  /// \param[in] verbose if true prints verbose informations.
   ///
-  /// We enter the genetic programming loop. We begin the loop by choosing a
+  /// the genetic programming loop. We begin the loop by choosing a
   /// genetic operation: reproduction, mutation or crossover. We then select 
-  /// the individual(s) to participate in the genetic operation using either 
+  /// the individual(s) to participate in the genetic operation using 
   /// tournament selection. If we are doing reproduction or mutation, we only 
   /// select one individual. For crossover, two individuals need to be selected.
   /// The genetic operation is then performed and a new offspring individual is
@@ -361,7 +360,6 @@ namespace vita
     return _env && _pop->check();
   }
 
-  ///
   ///
   /// Resets summary informations.
   ///

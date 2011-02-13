@@ -3,96 +3,117 @@
  *  \file test4.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/20
+ *  \date 2011/01/31
  *
  *  This file is part of VITA
  *
  */
 
 #include <cstdlib>
-#include <iostream>
+#include <sstream>
+
+#include "boost/assign.hpp"
 
 #include "environment.h"
-#include "individual.h"
 #include "primitive/sr_pri.h"
+#include "evolution.h"
 
-int main(int argc, char *argv[])
+#define BOOST_TEST_MODULE TranspositionTable
+#include "boost/test/included/unit_test.hpp"
+
+using namespace boost;
+
+struct F
 {
-  vita::environment env;
-
-  env.code_length = argc > 1 ? atoi(argv[1]) : 10;
-
-  env.insert(new vita::sr::number(-200,200));
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
-
-  vita::individual i1(env,true), i2(env,true);
-
-  std::cout << "PARENTS" << std::endl << std::string(40,'-') << std::endl; 
-  i1.dump(std::cout);
-  std::cout << std::endl;
-  i2.dump(std::cout);
-  std::cout << std::endl;
-  
-  std::cout << "OFFSPRING (UNIFORM CROSSOVER)" << std::endl 
-	    << std::string(40,'-') << std::endl;
-
-  const vita::individual uc(i1.uniform_cross(i2));
-  uc.dump(std::cout);
-  std::cout << std::endl;
-
-  std::cout << "OFFSPRING (HOMOLOGOUS CROSSOVER)" << std::endl 
-	    << std::string(40,'-') << std::endl;
-
-  //const vita::individual hc(i1.hcross(i2));
-  //hc.dump(std::cout);
-  //std::cout << std::endl;
-
-  std::cout << "OFFSPRING (ONE POINT CROSSOVER)" << std::endl 
-	    << std::string(40,'-') << std::endl;
-
-  const vita::individual upc(i1.cross1(i2));
-  upc.dump(std::cout);
-  std::cout << std::endl;
-
-  std::cout << "OFFSPRING (TWO POINTS CROSSOVER)" << std::endl 
-	    << std::string(40,'-') << std::endl;
-
-  const vita::individual tpc(i1.cross2(i2));
-  tpc.dump(std::cout);
-  std::cout << std::endl;
-
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 100);
-  std::cout << "AVERAGE DISTANCES" << std::endl << std::string(40,'-') 
-	    << std::endl; 
-  double dist1(0.0), dist2(0.0), dist3(0.0), dist4(0.0);
-  for (unsigned j(0); j < n; ++j)
+  F() 
+    : num(new vita::sr::number(-200,200)),
+      f_add(new vita::sr::add()),
+      f_sub(new vita::sr::sub()),
+      f_mul(new vita::sr::mul()),
+      f_ifl(new vita::sr::ifl()),
+      f_ife(new vita::sr::ife()),
+      cache(16)
   { 
-    const vita::individual tmp1(i1.uniform_cross(i2));
-    dist1 += i1.distance(tmp1);
-    //const vita::individual tmp2(i1.hcross(i2));
-    //dist2 += i1.distance(tmp2);
-    const vita::individual tmp3(i1.cross1(i2));
-    dist3 += i1.distance(tmp3);
-    const vita::individual tmp4(i1.cross2(i2));
-    dist4 += i1.distance(tmp4);
+    BOOST_TEST_MESSAGE("Setup fixture");
+    env.insert(num);
+    env.insert(f_add);
+    env.insert(f_sub);
+    env.insert(f_mul);
+    env.insert(f_ifl);
+    env.insert(f_ife);
   }
 
-  dist1 /= n;
-  dist2 /= n;
-  dist3 /= n;
-  dist4 /= n;
-  std::cout << "Uniform crossover: " << 100*dist1/env.code_length << '%' 
-	    << std::endl
-	    << "Homologous crossover: " << 100*dist2/env.code_length << '%'
-	    << std::endl
-	    << "One point crossover: " << 100*dist3/env.code_length << '%'
-	    << std::endl
-	    << "Two points crossover: " << 100*dist4/env.code_length << '%'
-	    << std::endl;
+  ~F()
+  { 
+    BOOST_TEST_MESSAGE("Teardown fixture");
+    delete num;
+    delete f_add;
+    delete f_sub;
+    delete f_mul;
+    delete f_ifl;
+    delete f_ife;
+  }
 
-  return EXIT_SUCCESS;
+  vita::sr::number *const num;
+  vita::sr::add *const f_add;
+  vita::sr::sub *const f_sub;
+  vita::sr::mul *const f_mul;
+  vita::sr::ifl *const f_ifl;
+  vita::sr::ife *const f_ife;
+  
+  vita::environment env;
+  vita::ttable cache;
+};
+
+
+BOOST_FIXTURE_TEST_SUITE(TranspositionTable,F)
+
+BOOST_AUTO_TEST_CASE(InsertFindCicle)
+{
+  env.code_length = 64;
+
+  const unsigned n(6000);
+
+  for (unsigned i(0); i < n; ++i)
+  {
+    vita::individual i1(env,true);
+
+    cache.insert(i1,i);
+
+    vita::fitness_t f1;
+    BOOST_REQUIRE(cache.find(i1,&f1));
+    BOOST_REQUIRE_EQUAL(f1,i);
+  }
 }
+
+BOOST_AUTO_TEST_CASE(CollisionDetection)
+{
+  env.code_length = 64;
+
+  const unsigned n(1000);
+
+  std::vector<vita::individual> vi;
+  for (unsigned i(0); i < n; ++i)
+  {
+    vita::individual i1(env,true);
+    const boost::any val(vita::interpreter(i1).run());
+    vita::fitness_t f(val.empty() ? 0 : any_cast<vita::fitness_t>(val));
+
+    cache.insert(i1,f);
+    vi.push_back(i1);
+  }
+
+  for (unsigned i(0); i < n; ++i)
+  {
+    vita::fitness_t f1;
+    if (cache.find(vi[i],&f1))
+    {
+      const boost::any val(vita::interpreter(vi[i]).run());
+      vita::fitness_t f(val.empty() ? 0	: any_cast<vita::fitness_t>(val));
+      
+      BOOST_CHECK_EQUAL(f1,f);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_SUITE_END()

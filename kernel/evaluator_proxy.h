@@ -41,6 +41,7 @@ namespace vita
     /// Pointer that lets the proxy access the real evaluator.
     evaluator *const _eva;
 
+    /// Transposition table (hash cache).
     ttable _cache;
   };
 

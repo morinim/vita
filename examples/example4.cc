@@ -1,9 +1,9 @@
 /**
  *
- *  \file test5.cc
+ *  \file example4.cc
  *
  *  \author Manlio Morini
- *  \date 2010/06/11
+ *  \date 2011/01/31
  *
  *  This file is part of VITA
  *
@@ -17,6 +17,9 @@
 #include "primitive/sr_pri.h"
 #include "ttable.h"
 
+//
+// Performs a speed test on the transposition table (insert-find cycle).
+//
 int main(int argc, char *argv[])
 {
   vita::environment env;
@@ -42,8 +45,7 @@ int main(int argc, char *argv[])
     cache.insert(i1,i);
 
     vita::fitness_t f1;
-    if (!cache.find(i1,&f1) || f1 != i)
-      std::cout << "ERROR" << i << std::endl;
+    cache.find(i1,&f1);
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;

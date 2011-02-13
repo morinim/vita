@@ -3,7 +3,7 @@
  *  \file test2.cc
  *
  *  \author Manlio Morini
- *  \date 2010/06/11
+ *  \date 2011/01/30
  *
  *  This file is part of VITA
  *
@@ -11,58 +11,179 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <memory>
 
-#include "vita.h"
+#include "boost/assign.hpp"
+
 #include "environment.h"
-#include "evolution.h"
 #include "primitive/sr_pri.h"
+#include "evolution.h"
 
-class dummy : public vita::evaluator
+#define BOOST_TEST_MODULE Individual
+#include "boost/test/included/unit_test.hpp"
+
+using namespace boost;
+
+struct F
 {
-  vita::fitness_t run(const vita::individual &) { return 0; };
+  F() 
+    : num(new vita::sr::number(-200,200)),
+      f_add(new vita::sr::add()),
+      f_sub(new vita::sr::sub()),
+      f_mul(new vita::sr::mul()),
+      f_ifl(new vita::sr::ifl()),
+      f_ife(new vita::sr::ife())
+  { 
+    BOOST_TEST_MESSAGE("Setup fixture");
+    env.insert(num);
+    env.insert(f_add);
+    env.insert(f_sub);
+    env.insert(f_mul);
+    env.insert(f_ifl);
+    env.insert(f_ife);
+  }
+
+  ~F()
+  { 
+    BOOST_TEST_MESSAGE("Teardown fixture");
+    delete num;
+    delete f_add;
+    delete f_sub;
+    delete f_mul;
+    delete f_ifl;
+    delete f_ife;
+  }
+
+  vita::sr::number *const num;
+  vita::sr::add *const f_add;
+  vita::sr::sub *const f_sub;
+  vita::sr::mul *const f_mul;
+  vita::sr::ifl *const f_ifl;
+  vita::sr::ife *const f_ife;
+  
+  vita::environment env;
 };
 
-int main(int argc, char *argv[])
+BOOST_FIXTURE_TEST_SUITE(Individual,F)
+
+BOOST_AUTO_TEST_CASE(Compact)
 {
-  vita::environment env;
+  env.code_length = 100;
 
-  env.individuals = argc > 1 ? atoi(argv[1]) : 100;
-  env.code_length = argc > 2 ? atoi(argv[2]) : 100;
+  for (unsigned n(0); n < 1000; ++n)
+  {
+    const vita::individual i1(env,true);
+    const vita::individual i2(i1.compact());
 
-  env.insert(new vita::sr::number(-200,200));
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
+    const boost::any v1(vita::interpreter(i1).run());
+    const boost::any v2(vita::interpreter(i2).run());
 
-  std::auto_ptr<vita::evaluator> eva(new dummy());
-  vita::evolution e(env,eva.get());
-
-  std::cout << e.population() << std::endl;
-
-  vita::analyzer ay;
-  e.pick_stats(&ay);
-
-  const boost::uint64_t nef(ay.functions(true));
-  const boost::uint64_t net(ay.terminals(true));
-  const boost::uint64_t ne(nef+net);
-
-  std::cout << std::string(40,'-') << std::endl;
-  for (vita::analyzer::const_iterator i(ay.begin()); i != ay.end(); ++i)
-    std::cout << std::setfill(' ') << (i->first)->display() << ": " 
-	      << std::setw(5) << i->second.counter[true]
-	      << " (" << std::setw(3) << 100*i->second.counter[true]/ne 
-	      << "%)" << std::endl;
-
-  std::cout << "Average code length: " << ay.length_dist().mean << std::endl;
-  std::cout << "Code length standard deviation: " 
-	    << std::sqrt(ay.length_dist().variance) << std::endl;
-  std::cout << "Max code length: " << ay.length_dist().max << std::endl;
-  std::cout << "Functions: " << nef << " (" << nef*100/ne << "%)" << std::endl;
-  std::cout << "Terminals: " << net << " (" << net*100/ne << "%)" << std::endl;
-  std::cout << std::string(40,'-') << std::endl;
-      
-  return EXIT_SUCCESS;
+    BOOST_REQUIRE(v1.empty() == v2.empty());
+    if (!v1.empty() && !v2.empty())
+      BOOST_REQUIRE_EQUAL(boost::any_cast<double>(v1),
+			  boost::any_cast<double>(v2));
+  }
 }
+
+BOOST_AUTO_TEST_CASE(Mutation)
+{
+  env.code_length = 100;
+
+  vita::individual ind(env,true);
+  const vita::individual orig(ind);
+
+  env.p_mutation = 0;
+
+  BOOST_TEST_CHECKPOINT("Zero probability mutation.");
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    ind.mutation();
+    BOOST_REQUIRE_EQUAL(ind,orig);
+  }
+
+  env.p_mutation = 0.5;
+  double dist(0.0);
+  BOOST_TEST_CHECKPOINT("50% probability mutation.");
+  const unsigned n(1000);
+  for (unsigned i(0); i < n; ++i)
+  { 
+    const vita::individual i1(ind);
+
+    ind.mutation();
+    dist += i1.distance(ind);
+  }
+
+  const double perc(100*dist/(env.code_length*n));
+  BOOST_CHECK_GT(perc,48.0);
+  BOOST_CHECK_LT(perc,52.0);
+}
+
+BOOST_AUTO_TEST_CASE(RandomCreation)
+{
+  for (unsigned l(1); l < 100; ++l)
+  {
+    env.code_length = l;
+    vita::individual i(env,true);
+
+    BOOST_REQUIRE(i.check());
+    BOOST_REQUIRE_EQUAL(i.size(),l);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(Cross0)
+{
+  env.code_length = 100;
+
+  vita::individual i1(env,true), i2(env,true);
+
+  const unsigned n(1000);
+  double dist(0.0);
+  for (unsigned j(0); j < n; ++j)
+  { 
+    const vita::individual tmp(i1.uniform_cross(i2));
+    dist += i1.distance(tmp);
+  }
+
+  const double perc(100*dist/(env.code_length*n));
+  BOOST_CHECK_GT(perc,48.0);
+  BOOST_CHECK_LT(perc,52.0);
+}
+
+BOOST_AUTO_TEST_CASE(Cross1)
+{
+  env.code_length = 100;
+
+  vita::individual i1(env,true), i2(env,true);
+
+  const unsigned n(1000);
+  double dist(0.0);
+  for (unsigned j(0); j < n; ++j)
+  { 
+    const vita::individual tmp(i1.cross1(i2));
+    dist += i1.distance(tmp);
+  }
+
+  const double perc(100*dist/(env.code_length*n));
+  BOOST_CHECK_GT(perc,48.0);
+  BOOST_CHECK_LT(perc,52.0);
+}
+
+BOOST_AUTO_TEST_CASE(Cross2)
+{
+  env.code_length = 100;
+
+  vita::individual i1(env,true), i2(env,true);
+
+  const unsigned n(1000);
+  double dist(0.0);
+  for (unsigned j(0); j < n; ++j)
+  { 
+    const vita::individual tmp(i1.cross2(i2));
+    dist += i1.distance(tmp);
+  }
+
+  const double perc(100*dist/(env.code_length*n));
+  BOOST_CHECK_GT(perc,48.0);
+  BOOST_CHECK_LT(perc,52.0);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

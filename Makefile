@@ -46,11 +46,16 @@ ifeq ($(TARGET),sr)
     OUTDIR = sr
   endif
   MAIN_SRC = sr/sr.cc
-else
+else ifneq (,$(findstring test,$(TARGET)))
   ifeq ($(strip $(OUTDIR)),)
     OUTDIR = test
   endif
   MAIN_SRC = test/$(TARGET).cc
+else ifneq (,$(findstring example,$(TARGET)))
+  ifeq ($(strip $(OUTDIR)),)
+    OUTDIR = examples
+  endif
+  MAIN_SRC = examples/$(TARGET).cc
 endif
 
 MAIN_OBJ = $(MAIN_SRC:.cc=.o)
@@ -73,7 +78,7 @@ $(TARGET): $(MAIN_OBJ) $(KERNEL_OBJ)
 clean:
 	@echo Making clean...
 	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
-	@rm -f sr/sr test/test? test/test kernel/*.o sr/*.o test/*.o
+	@rm -f sr/sr test/test? examples/example? kernel/*.o sr/*.o test/*.o examples/*.o
 
 .phony:	backup
 backup:
