@@ -16,13 +16,12 @@ namespace vita
 
   random::base_gen random::_rng(28071973u);
 
-  /**
-   * ring.
-   * \param base[in]
-   * \param width[in]
-   * \param n[in]
-   * \return
-   */
+  ///
+  /// \param[in] base 
+  /// \param[in] width
+  /// \param[in] n
+  /// \return the index of the choosen individual.
+  ///
   unsigned
   random::ring(unsigned base, unsigned width, unsigned n)
   {

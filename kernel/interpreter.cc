@@ -3,7 +3,7 @@
  *  \file interpreter.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/25
+ *  \date 2011/02/10
  *
  *  This file is part of VITA
  *
@@ -37,9 +37,13 @@ namespace vita
   interpreter::run()
   {
     for (unsigned i(0); i < _cache.size(); ++i)
-      _cache[i] = boost::any();
-    // Probably the \c _context_cache vector will be deleted (it was introduced 
-    // before the \c _cache vector).
+    {
+      _cache[i].empty = true;
+      _cache[i].value = boost::any();
+    }
+
+    // Probably the _context_cache vector will be deleted (it was introduced 
+    // before the _cache vector).
     for (unsigned i(0); i < _context_cache.size(); ++i)
       _context_cache[i] = boost::any();
 
@@ -70,33 +74,37 @@ namespace vita
 
     assert(i < g.sym->argc());
 
-    if (_cache[g.args[i]].empty())
+    const locus_t locus(g.args[i]);
+    if (_cache[locus].empty)
     {
       const unsigned backup(_ip); 
-      _ip = g.args[i];
+      _ip = locus;
       assert (_ip > backup);
       const boost::any ret(_ind._code[_ip].sym->eval(*this));
       _ip = backup;
-      _cache[g.args[i]] = ret;
+
+      _cache[locus].empty = false;
+      _cache[locus].value = ret;
     }
 #if !defined(NDEBUG)
     else
     {
       const unsigned backup(_ip); 
-      _ip = g.args[i];
+      _ip = locus;
       assert (_ip > backup);
       const boost::any ret(_ind._code[_ip].sym->eval(*this));
       _ip = backup;
       if (ret.type() == typeid(int))
 	assert(boost::any_cast<int>(ret) == 
-	       boost::any_cast<int>(_cache[g.args[i]]));
+	       boost::any_cast<int>(_cache[locus].value));
       else if (ret.type() == typeid(double))
 	assert(boost::any_cast<double>(ret) == 
-	       boost::any_cast<double>(_cache[g.args[i]]));
+	       boost::any_cast<double>(_cache[locus].value));
     }
 #endif
-    
-    return _cache[g.args[i]];
+
+    assert(!_cache[locus].empty);
+    return _cache[locus].value;
 
     //return _ind._code[g.args[i]].sym->eval(interpreter(_ind,_context,
     //                                                   g.args[i]));
