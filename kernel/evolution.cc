@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/08
+ *  \date 2011/03/04
  *
  *  This file is part of VITA
  *
@@ -21,11 +21,13 @@ namespace vita
 {
 
   ///
-  /// \param[in] e base environment.
+  /// \param[in] e base \ref environment.
+  /// \param[in] pop the \ref population that will be evolved. 
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(environment &e, evaluator *const eva) 
-    : _env(&e), _pop(new vita::population(e)), 
+  evolution::evolution(environment &e, vita::population &pop, 
+		       evaluator &eva) 
+    : _env(&e), _pop(pop), 
       _eva(new evaluator_proxy(eva,e.ttable_size)) 
   {
     assert(e.check());
@@ -38,7 +40,6 @@ namespace vita
   ///
   evolution::~evolution()
   {
-    delete _pop;
     delete _eva;
   }
 
@@ -48,7 +49,7 @@ namespace vita
   const vita::population &
   evolution::population() const
   {
-    return *_pop;
+    return _pop;
   }
 
   ///
@@ -61,7 +62,7 @@ namespace vita
   {
     az->clear();
 
-    for (population::const_iterator i(_pop->begin()); i != _pop->end(); ++i)    
+    for (population::const_iterator i(_pop.begin()); i != _pop.end(); ++i) 
       az->add(*i,_eva->run(*i));
   }
 
@@ -84,7 +85,7 @@ namespace vita
   unsigned
   evolution::tournament(unsigned target, bool best) const
   {
-    const unsigned n(_pop->size());
+    const unsigned n(_pop.size());
     const unsigned mate_zone(_env->mate_zone);
     const unsigned rounds(best ? _env->par_tournament : _env->rep_tournament);
 
@@ -93,8 +94,8 @@ namespace vita
     {
       const unsigned j(random::ring(target,mate_zone,n));
 
-      const fitness_t fit_j(_eva->run((*_pop)[j]));
-      const fitness_t fit_sel(_eva->run((*_pop)[sel]));
+      const fitness_t fit_j(_eva->run(_pop[j]));
+      const fitness_t fit_sel(_eva->run(_pop[sel]));
       if (best)
       {
         if (fit_j > fit_sel)
@@ -256,7 +257,7 @@ namespace vita
   evolution::run(bool verbose)
   {
     _stats.clear();
-    _stats.best   = *_pop->begin();
+    _stats.best   = *_pop.begin();
     _stats.f_best = _eva->run(_stats.best);
 
     _eva->clear();
@@ -268,28 +269,28 @@ namespace vita
 
       log();
 
-      for (unsigned k(0); k < _pop->size(); ++k)
+      for (unsigned k(0); k < _pop.size(); ++k)
       {
-	if ( verbose && k % std::max(_pop->size()/100,size_t(1)) )
+	if ( verbose && k % std::max(_pop.size()/100,size_t(1)) )
 	{
 	  std::cout << "Run " << _run_count << '.'
-		    << _stats.gen << " (" << std::setw(3) << 100*k/_pop->size() 
+		    << _stats.gen << " (" << std::setw(3) << 100*k/_pop.size() 
 		    << "%)\r" << std::flush;
 	}
 
 	// --------- SELECTION ---------
-	const unsigned r1(tournament(_pop->size(),true));
+	const unsigned r1(tournament(_pop.size(),true));
 	const unsigned r2(tournament(r1,true));
 
 	// --------- CROSSOVER / MUTATION ---------
 	individual off;
 	if (random::boolean(_env->p_cross))
 	{
-	  off = (*_pop)[r1].uniform_cross((*_pop)[r2]);
+	  off = _pop[r1].uniform_cross(_pop[r2]);
 	  ++_stats.crossovers;
 	}
 	else
-	  off = random::boolean() ? (*_pop)[r1] : (*_pop)[r2];
+	  off = random::boolean() ? _pop[r1] : _pop[r2];
 
 	_stats.mutations += off.mutation();
 
@@ -297,11 +298,11 @@ namespace vita
 	const fitness_t f_off(_eva->run(off));
 
 	const unsigned rep_idx(tournament(r1,false));
-	const fitness_t f_rep_idx(_eva->run((*_pop)[rep_idx]));
+	const fitness_t f_rep_idx(_eva->run(_pop[rep_idx]));
 	const bool replace(f_rep_idx < f_off);
 
 	if (replace)
-	  (*_pop)[rep_idx] = off;
+	  _pop[rep_idx] = off;
 
 	if (f_off - _stats.f_best > float_epsilon)
         {
@@ -312,7 +313,7 @@ namespace vita
 	  if (verbose)
 	    std::cout << "Run " << _run_count << '.' << std::setw(6) 
 		      << _stats.gen << " (" << std::setw(3) 
-		      << 100*k/_pop->size() << "%): fitness " << f_off 
+		      << 100*k/_pop.size() << "%): fitness " << f_off 
 		      << std::endl;
         }
       }
@@ -326,7 +327,7 @@ namespace vita
       double speed(0);
 
       if (clock() > start_c)
-	speed = double(_pop->size()*_stats.gen)*CLOCKS_PER_SEC/(clock()-start_c);
+	speed = double(_pop.size()*_stats.gen)*CLOCKS_PER_SEC/(clock()-start_c);
 	
       std::string unit("");
       if (speed >= 10)
@@ -357,7 +358,7 @@ namespace vita
   bool
   evolution::check() const
   {
-    return _env && _pop->check();
+    return _env && _pop.check();
   }
 
   ///

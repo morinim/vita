@@ -59,7 +59,7 @@ class fitness : public vita::evaluator
   {
     vita::interpreter agent(ind);
 
-    double err(0);
+    vita::fitness_t fit(0.0);
     for (double x(0); x < 10; ++x)
       for (double y(0); y < 10; ++y)
 	for (double z(0); z < 10; ++z)
@@ -70,17 +70,15 @@ class fitness : public vita::evaluator
 
 	  const boost::any res(agent.run());
 
-	  if (res.empty())
-	    err += 1000;
-	  else
+	  if (!res.empty())
 	  {
 	    const double dres(boost::any_cast<double>(res));
 	    assert(!is_bad(dres));
-	    err += std::fabs(dres - (x*x+y*y-z*z));
+	    fit += std::exp(-std::fabs(dres - (x*x+y*y-z*z)));
 	  }
 	}
 
-    return -err;
+    return fit;
   };
 };
 
@@ -103,7 +101,8 @@ int main(int argc, char *argv[])
 
   std::auto_ptr<vita::evaluator> eva(new fitness());
 
-  vita::evolution(env,eva.get()).run(true);
+  vita::population p(env);
+  vita::evolution(env,p,*eva.get()).run(true);
 
   return EXIT_SUCCESS;
 }

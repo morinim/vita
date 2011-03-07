@@ -26,12 +26,6 @@ namespace vita
 
   class environment;
 
-  ///
-  /// \example example1.cc
-  /// Creates a random individual and shows its content.
-  /// \example example3.cc
-  /// Performs three types of crossover between two random individuals. 
-  ///
   class individual
   {
   public:
@@ -214,6 +208,14 @@ namespace vita
   { 
     pack(p,_best); 
   }
+
+  ///
+  /// \example example1.cc
+  /// Creates a random individual and shows its content.
+  ///
+  /// \example example3.cc
+  /// Performs three types of crossover between two random individuals. 
+  ///
 
 }  // namespace vita
 

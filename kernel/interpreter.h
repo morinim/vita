@@ -3,7 +3,7 @@
  *  \file interpreter.h
  *
  *  \author Manlio Morini
- *  \date 2011/01/25
+ *  \date 2011/02/10
  *
  *  This file is part of VITA
  *
@@ -48,7 +48,13 @@ namespace vita
 
     const individual &_ind;
 
-    mutable std::vector<boost::any> _cache;
+    struct cache_elem
+    {
+      bool       empty;
+      boost::any value;
+    };
+
+    mutable std::vector<cache_elem> _cache;
     mutable std::vector<boost::any> _context_cache;
   };
     

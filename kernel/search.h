@@ -25,7 +25,7 @@ namespace vita
   class search
   {
   public:
-    search(environment &, evaluator *const);
+    search(environment &, evaluator &);
 
     void arl(const individual &, evolution &);
 
@@ -36,8 +36,8 @@ namespace vita
     bool check() const;
 
   private:
-    environment *const _env;
-    evaluator *const   _eva;
+    environment &_env;
+    evaluator &_eva;
   };
     
 }  // namespace vita

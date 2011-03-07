@@ -21,10 +21,6 @@ namespace vita
 
   class environment;
 
-  ///
-  /// \example example2.cc
-  /// Creates a random population and shows its content.
-  ///
   class population
   {
   public:
@@ -117,6 +113,11 @@ namespace vita
   {
     return _pop.size();
   }
+
+  ///
+  /// \example example2.cc
+  /// Creates a random population and shows its content.
+  ///
     
 }  // namespace vita
 

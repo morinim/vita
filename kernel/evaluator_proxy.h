@@ -28,7 +28,7 @@ namespace vita
   class evaluator_proxy : public evaluator 
   {
   public:
-    evaluator_proxy(evaluator *const, unsigned);
+    evaluator_proxy(evaluator &, unsigned);
 
     void clear();
 
@@ -38,8 +38,8 @@ namespace vita
     boost::uint64_t hits() const;
 
   private:
-    /// Pointer that lets the proxy access the real evaluator.
-    evaluator *const _eva;
+    /// Access to the real evaluator.
+    evaluator &_eva;
 
     /// Transposition table (hash cache).
     ttable _cache;
