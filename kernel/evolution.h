@@ -3,7 +3,7 @@
  *  \file evolution.h
  *
  *  \author Manlio Morini
- *  \date 2011/01/08
+ *  \date 2011/03/04
  *
  *  This file is part of VITA
  *
@@ -44,14 +44,10 @@ namespace vita
     fitness_t f_best;
   };
 
-  ///
-  /// \example example6.cc
-  /// Simple symbolic regression example (\f$x^2+y^2-z^2\f$).
-  ///
   class evolution
   {
   public:
-    evolution(environment &, evaluator *const);
+    evolution(environment &, vita::population &, evaluator &);
     ~evolution();
 
     const summary &run(bool);
@@ -71,11 +67,16 @@ namespace vita
     unsigned tournament(unsigned, bool) const;
 
     environment            *_env;
-    vita::population *const _pop;
+    vita::population       &_pop;
     evaluator_proxy *const  _eva;
     summary               _stats;
     unsigned          _run_count;
   };
+
+  ///
+  /// \example example6.cc
+  /// Simple symbolic regression example (\f$x^2+y^2-z^2\f$).
+  ///
 
 }  // namespace vita
 

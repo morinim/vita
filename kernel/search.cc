@@ -19,28 +19,27 @@
 namespace vita
 {
 
-  /**
-   * search
-   * \param[in] e
-   * \param[in] eva
-   */
-  search::search(environment &e, evaluator *const eva) : _env(&e), _eva(eva)
+  ///
+  /// \param[in] e
+  /// \param[in] eva
+  ///
+  search::search(environment &e, evaluator &eva) : _env(e), _eva(eva)
   {
     assert(e.check());
 
     assert(check());
   }
 
-  /**
-   * arl
-   * \param[in] candidate Individual in which we are looking for.
-   * \param[in] evo Evolution up to now.
-   *
-   * Adaptive Representation through Learning (ARL). The algorithm extract
-   * common knowledge (building blocks) emerging during the evolutionary 
-   * process and acquires the necessary structure for solving the problem 
-   * (see ARL - Justinian P. Rosca and Dana H. Ballard).
-   */
+  ///
+  /// \param[in] candidate individual in which we are looking for building
+  ///                      blocks.
+  /// \param[in] evo evolution up to now.
+  ///
+  /// Adaptive Representation through Learning (ARL). The algorithm extract
+  /// common knowledge (building blocks) emerging during the evolutionary 
+  /// process and acquires the necessary structure for solving the problem 
+  /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
+  ///
   void
   search::arl(const individual &candidate, evolution &evo)
   {
@@ -49,7 +48,7 @@ namespace vita
     const fitness_t base_f(evo.fitness(candidate));
     std::list<unsigned> bl(candidate.blocks());
 
-    _env->sset.reset_adf_weights();
+    _env.sset.reset_adf_weights();
 
     for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
     {
@@ -67,11 +66,11 @@ namespace vita
           std::vector<symbol_t> types;
           candidate_block.generalize(arl_args,0,&types);
           vita::adf *const p = new vita::adf(candidate_block,types,10);
-          _env->insert(p);
+          _env.insert(p);
         
-          if (_env->stat_arl)
+          if (_env.stat_arl)
           {
-            const std::string f_adf(_env->stat_dir + "/adf");
+            const std::string f_adf(_env.stat_dir + "/adf");
             std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
             if (adf_l.good())
             {
@@ -85,21 +84,21 @@ namespace vita
     }
   }
 
-  /**
-   * run
-   * \param[in] verbose prints verbose information while running.
-   * \param[in] n number of runs.
-   */
+  ///
+  /// \param[in] verbose prints verbose informations while running.
+  /// \param[in] n number of runs.
+  /// \return best individual found.
+  ///
   individual
   search::run(bool verbose, unsigned n)
   {   
-    if (_env->stat_env)
+    if (_env.stat_env)
     {
-      const std::string filename(_env->stat_dir + "/environment");
+      const std::string filename(_env.stat_dir + "/environment");
       std::ofstream logs(filename.c_str());
 
       if (logs.good())
-	_env->log(logs);
+	_env.log(logs);
     }
 
     summary run_sum;
@@ -108,9 +107,12 @@ namespace vita
     // Consecutive runs reporting the same best individuals.
     unsigned best_counter(0);
 
+    population p(_env);
+    evolution evo(_env,p,_eva);
     for (unsigned i(0); i < n; ++i)
     {
-      evolution evo(*_env,_eva);
+      if (i)
+	p = population(_env);
 
       const summary s(evo.run(verbose));
 
@@ -146,13 +148,13 @@ namespace vita
       run_sum.ttable_hits += s.ttable_hits;
       run_sum.ttable_probes += s.ttable_probes;
 
-      if (_env->arl)
+      if (_env.arl)
         arl(run_sum.best,evo);
     }
 
-    if (_env->stat_summary)
+    if (_env.stat_summary)
     {
-      const std::string f_sum(_env->stat_dir + "/summary");
+      const std::string f_sum(_env.stat_dir + "/summary");
       std::ofstream sum(f_sum.c_str());
       if (sum.good())
 	sum << run_sum.f_best 
@@ -174,14 +176,13 @@ namespace vita
     return run_sum.best;
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   search::check() const
   {
-    return _env != 0;
+    return true;
   }
 
 }  // namespace vita

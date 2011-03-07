@@ -31,9 +31,6 @@ namespace vita
   /// are often generated and \a ttable could give a significant speed 
   /// improvement.
   ///
-  /// \example example4.cc
-  /// Performs a speed test on the transposition table (insert-find cycle).
-  ///
   class ttable
   {
   public:
@@ -68,6 +65,9 @@ namespace vita
     mutable boost::uint64_t _probes;
     mutable boost::uint64_t _hits;
   };
+
+  /// \example example4.cc
+  /// Performs a speed test on the transposition table (insert-find cycle).
     
 }  // namespace vita
 

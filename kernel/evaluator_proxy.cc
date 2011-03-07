@@ -19,7 +19,7 @@ namespace vita
   /// \param[in] eva pointer that lets the proxy access the real evaluator.
   /// \param[in] ts 2^\a ts is the number of elements of the cache.
   ///
-  evaluator_proxy::evaluator_proxy(evaluator *const eva, unsigned ts) 
+  evaluator_proxy::evaluator_proxy(evaluator &eva, unsigned ts) 
     : _eva(eva), _cache(ts)
   {
     assert(eva && ts);
@@ -35,7 +35,7 @@ namespace vita
     fitness_t f;
     if (!_cache.find(ind,&f))
     {
-      f = _eva->run(ind);
+      f = _eva.run(ind);
 
       _cache.insert(ind,f);
 
@@ -49,7 +49,7 @@ namespace vita
     // Hash collision checking code can slow down the program very much.
     else
     {
-      const fitness_t f1(_eva->run(ind));
+      const fitness_t f1(_eva.run(ind));
       if (f != f1)
 	std::cerr << "********* COLLISION *********" << std::endl;
     }
