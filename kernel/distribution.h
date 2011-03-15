@@ -45,21 +45,15 @@ namespace vita
   };
 
 
-
-  /**
-   * distribution
-   */
   template<class T>
   distribution<T>::distribution()
   {
     clear();
   }
 
-  /**
-   * clear
-   *
-   * Resets gathered statics.
-   */
+  ///
+  /// Resets gathered statics.
+  ///
   template<class T>
   void
   distribution<T>::clear()
@@ -69,12 +63,11 @@ namespace vita
     delta = m2 = mean = variance = min = max = 0.0;
   }
 
-  /**
-   * add
-   * \param[in] val New fitness upon which statistics are recalculated.
-   *
-   * Gathers a new fitness for the statistics.
-   */
+  ///
+  /// \param[in] val new fitness upon which statistics are recalculated.
+  ///
+  /// Gathers a new fitness for the statistics.
+  ///
   template<class T>
   void
   distribution<T>::add(T val)
@@ -99,10 +92,9 @@ namespace vita
     variance = m2 / count;
   }    
 
-  /**
-   * standard_deviation
-   * \return The standard deviation of the distribution.
-   */
+  ///
+  /// \return The standard deviation of the distribution.
+  ///
   template<class T>
   T
   distribution<T>::standard_deviation() const
@@ -110,10 +102,9 @@ namespace vita
     return std::sqrt(variance);
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   template<class T>
   bool
   distribution<T>::check() const

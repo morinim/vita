@@ -3,17 +3,26 @@
  *  \file environment.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2011/03/15
  *
  *  This file is part of VITA
  *
  */
   
+#include <iostream>
+
 #include "environment.h"
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 namespace vita
 {
  
+  const char environment::dyn_filename[] =     "dynamic";
+  const char environment::env_filename[] = "environment";
+  const char environment::sum_filename[] =     "summary";
+
   ///
   /// Class constructor. Default values are quite reasonable, but specific
   /// problems need ad-hoc parameters.
@@ -37,46 +46,55 @@ namespace vita
   }
 
   ///
+  /// \return true if the operation succeed.
+  ///
+  /// Saves the informations regarding the environment in a new file
+  /// (name: env_filename, folder: stat_dir).
+  ///
+  bool
+  environment::log() const
+  {
+    assert(stat_env);
+
+    const std::string filename(stat_dir + "/" + env_filename);
+    std::ofstream logs(filename.c_str());
+
+    if (logs.good()) 
+      log(logs);
+
+    return logs.good();
+  }
+
+  ///
   /// \param[out] s output stream.
   ///
-  /// Prints out the informations about the environment using the \a s output
+  /// Saves the informations regarding the environment using the \a s output
   /// stream.
+  ///
   void
   environment::log(std::ostream &s) const
   {
-    s << "Population size: " << individuals << std::endl
+    boost::property_tree::ptree pt;
 
-      << "Maximum program length:  " << code_length << std::endl
+    pt.put("population_size",individuals);
+    pt.put("max_program_length",code_length);
+    pt.put("mutation_rate",p_mutation);  // p_mutation*code_length per program.
+    pt.put("crossover_rate",p_cross);
+    pt.put("parent_tournament_size",par_tournament);
+    pt.put("replacement_tournament_size",rep_tournament);
+    pt.put("mating_zone",mate_zone);
+    pt.put("max_gens_since_start",g_since_start);
+    pt.put("max_gens_wo_imp",g_without_improvement);
+    pt.put("arl",arl);
+    pt.put("ttable_bits",ttable_size); // size 1u << ttable_size.
+    pt.put("statistics.directory",stat_dir);
+    pt.put("statistics.period",stat_period);
+    pt.put("statistics.save_arl",stat_arl);
+    pt.put("statistics.save_dynamics",stat_dynamic);
+    pt.put("statistics.save_env",stat_env);
+    pt.put("statistics.save_summary",stat_summary);
 
-      << "Mutation rate: " << p_mutation << " (" << p_mutation*code_length
-      << " per program)" << std::endl
-
-      << "Crossover rate: " << p_cross << std::endl
-
-      << "Parents' tournament size: " << par_tournament << std::endl
-
-      << "Replacements' tournament size: " << rep_tournament << std::endl
-
-      << "Mating zone: " << mate_zone << std::endl
-
-      << "Maximum number of generations since start: " << g_since_start 
-      << std::endl
-
-      << "Maximum number of generations without improvements: " 
-      << g_without_improvement << std::endl
-
-      << "ARL: " << arl << std::endl
-
-      << "TTable size: " << (1u << ttable_size) << " (" << ttable_size 
-      << " bits)" << std::endl
-
-      << "Statistics directory: " << stat_dir << std::endl
-
-      << "Statistics period: " << stat_period << std::endl
-
-      << "List of ADF: " << stat_arl << std::endl
-
-      << "Dynamic execution file: " << stat_dynamic << std::endl;
+    write_xml(s,pt);
   }
 
   ///

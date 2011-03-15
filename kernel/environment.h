@@ -3,7 +3,7 @@
  *  \file environment.h
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2011/03/15
  *
  *  This file is part of VITA
  *
@@ -13,7 +13,6 @@
 #define      ENVIRONMENT_H
 
 #include <cmath>
-#include <iostream>
 #include <string>
 
 #include "vita.h"
@@ -22,12 +21,14 @@
 namespace vita
 {
 
+  class ostream;
+
   class environment
   {
   public:
     environment();
 
-    void log(std::ostream & = std::cout) const;
+    bool log() const;
 
     void insert(symbol *const);
 
@@ -94,6 +95,13 @@ namespace vita
     symbol_set   sset;
 
     bool check() const;
+
+    static const char dyn_filename[];
+    static const char env_filename[];
+    static const char sum_filename[];
+
+  private:
+    void log(std::ostream &) const;
   };
 
 }  // namespace vita

@@ -3,13 +3,16 @@
  *  \file search.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/08
+ *  \date 2011/03/14
  *
  *  This file is part of VITA
  *
  */
   
 #include <fstream>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "search.h"
 #include "adf.h"
@@ -85,28 +88,23 @@ namespace vita
   ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
+  /// \param[in] success_f when an individual reaches this fitness it is 
+  ///                      considered a solution.
   /// \return best individual found.
   ///
   individual
-  search::run(bool verbose, unsigned n)
+  search::run(bool verbose, unsigned n, fitness_t success_f)
   {   
     if (_prob.env.stat_env)
-    {
-      const std::string filename(_prob.env.stat_dir + "/environment");
-      std::ofstream logs(filename.c_str());
-
-      if (logs.good())
-	_prob.env.log(logs);
-    }
+      _prob.env.log();
 
     summary run_sum;
     distribution<fitness_t> fd;
 
-    // Consecutive runs reporting the same best individuals.
-    unsigned best_counter(0);
+    unsigned solutions(0);
 
     population p(_prob.env);
-    evolution evo(_prob.env,p,*_prob.get_evaluator());
+    evolution evo(_prob.env,p,_prob.get_evaluator());
     for (unsigned i(0); i < n; ++i)
     {
       if (i)
@@ -116,28 +114,20 @@ namespace vita
 
       if (i == 0)
       {
-	best_counter   =        1;
 	run_sum.best   =   s.best;
 	run_sum.f_best = s.f_best;
       }
       
-      const bool almost_equal( distance(s.f_best,run_sum.f_best) <= 
-			       float_epsilon );
+      const bool ok(s.f_best >= success_f);
 
-      if (almost_equal && i>0)
+      if (ok)
       {
-	++best_counter;
+	++solutions;
 	run_sum.last_imp += s.last_imp;
       }
 
       if (run_sum.f_best < s.f_best)
       {
-	if (!almost_equal)
-	{
-	  best_counter = 1;
-	  run_sum.last_imp = s.last_imp;
-	}
-
 	run_sum.best   =   s.best;
 	run_sum.f_best = s.f_best;
       }
@@ -151,27 +141,48 @@ namespace vita
     }
 
     if (_prob.env.stat_summary)
-    {
-      const std::string f_sum(_prob.env.stat_dir + "/summary");
-      std::ofstream sum(f_sum.c_str());
-      if (sum.good())
-	sum << run_sum.f_best 
-	    << ' ' << fd.mean
-	    << ' ' << fd.standard_deviation()
-	    << ' ' << best_counter
-	    << ' ' << run_sum.last_imp / best_counter
-	    << ' ' << run_sum.ttable_hits*100 / run_sum.ttable_probes
-	    << std::endl;
-
-      sum << std::endl << "{Best individual (list)}" << std::endl;
-      run_sum.best.list(sum);
-      sum << std::endl <<"{Best individual (tree)}" << std::endl;
-      run_sum.best.tree(sum);
-      sum << std::endl <<"{Best individual (graphviz)}" << std::endl;
-      run_sum.best.graphviz(sum);
-    }
+      log(run_sum,fd,solutions,n);
 
     return run_sum.best;
+  }
+
+  ///
+  /// \param[in] run_sum summary information regarding the search.
+  /// \param[in] fd statistics about population fitness.
+  /// \param[in] solutions number of solutions found.
+  /// \param[in] runs number of runs performed.
+  /// \return true if the write operation succeed.
+  ///
+  void
+  search::log(const summary &run_sum, const distribution<fitness_t> &fd,
+              unsigned solutions, unsigned runs) const
+  {
+    boost::property_tree::ptree pt;
+
+    std::ostringstream best_list, best_tree, best_graph;
+    run_sum.best.list(best_list);
+    run_sum.best.tree(best_tree);
+    run_sum.best.graphviz(best_graph);    
+
+    pt.put("success_rate",runs ? double(solutions)/double(runs) : 0);
+    pt.put("best.fitness",run_sum.f_best);
+    pt.put("best.times_reached",solutions);
+    pt.put("best.avg_depth_found",solutions 
+                        ? unsigned(double(run_sum.last_imp)/double(solutions))
+                        : 0);
+    pt.put("best.individual.tree",best_tree.str());
+    pt.put("best.individual.list",best_list.str());
+    pt.put("best.individual.graph",best_graph.str());
+    pt.put("population.mean_fitness",fd.mean);
+    pt.put("population.standard_deviation",fd.standard_deviation());
+    pt.put("ttable.found_perc",run_sum.ttable_probes 
+                        ? run_sum.ttable_hits*100 / run_sum.ttable_probes
+                        : 0);
+
+    const std::string f_sum(_prob.env.stat_dir + "/" + 
+                            environment::sum_filename);
+
+    write_xml(f_sum,pt);
   }
 
   ///
