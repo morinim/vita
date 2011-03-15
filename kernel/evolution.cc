@@ -113,6 +113,9 @@ namespace vita
 
   ///
   /// Saves working / statistical informations in the log files.
+  /// This function could generate two files:
+  /// <ul>
+  /// <li>
   ///
   void
   evolution::log() const

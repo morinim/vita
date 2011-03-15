@@ -13,19 +13,17 @@
 
 #include "search.h"
 #include "adf.h"
-#include "environment.h"
 #include "evolution.h"
 
 namespace vita
 {
 
   ///
-  /// \param[in] e
-  /// \param[in] eva
+  /// \param[in] prob
   ///
-  search::search(environment &e, evaluator &eva) : _env(e), _eva(eva)
+  search::search(problem &prob) : _prob(prob)
   {
-    assert(e.check());
+    assert(prob.check());
 
     assert(check());
   }
@@ -48,7 +46,7 @@ namespace vita
     const fitness_t base_f(evo.fitness(candidate));
     std::list<unsigned> bl(candidate.blocks());
 
-    _env.sset.reset_adf_weights();
+    _prob.env.sset.reset_adf_weights();
 
     for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
     {
@@ -66,11 +64,11 @@ namespace vita
           std::vector<symbol_t> types;
           candidate_block.generalize(arl_args,0,&types);
           vita::adf *const p = new vita::adf(candidate_block,types,10);
-          _env.insert(p);
+          _prob.env.insert(p);
         
-          if (_env.stat_arl)
+          if (_prob.env.stat_arl)
           {
-            const std::string f_adf(_env.stat_dir + "/adf");
+            const std::string f_adf(_prob.env.stat_dir + "/adf");
             std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
             if (adf_l.good())
             {
@@ -92,13 +90,13 @@ namespace vita
   individual
   search::run(bool verbose, unsigned n)
   {   
-    if (_env.stat_env)
+    if (_prob.env.stat_env)
     {
-      const std::string filename(_env.stat_dir + "/environment");
+      const std::string filename(_prob.env.stat_dir + "/environment");
       std::ofstream logs(filename.c_str());
 
       if (logs.good())
-	_env.log(logs);
+	_prob.env.log(logs);
     }
 
     summary run_sum;
@@ -107,12 +105,12 @@ namespace vita
     // Consecutive runs reporting the same best individuals.
     unsigned best_counter(0);
 
-    population p(_env);
-    evolution evo(_env,p,_eva);
+    population p(_prob.env);
+    evolution evo(_prob.env,p,*_prob.get_evaluator());
     for (unsigned i(0); i < n; ++i)
     {
       if (i)
-	p = population(_env);
+	p = population(_prob.env);
 
       const summary s(evo.run(verbose));
 
@@ -148,13 +146,13 @@ namespace vita
       run_sum.ttable_hits += s.ttable_hits;
       run_sum.ttable_probes += s.ttable_probes;
 
-      if (_env.arl)
+      if (_prob.env.arl)
         arl(run_sum.best,evo);
     }
 
-    if (_env.stat_summary)
+    if (_prob.env.stat_summary)
     {
-      const std::string f_sum(_env.stat_dir + "/summary");
+      const std::string f_sum(_prob.env.stat_dir + "/summary");
       std::ofstream sum(f_sum.c_str());
       if (sum.good())
 	sum << run_sum.f_best 

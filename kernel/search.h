@@ -13,19 +13,18 @@
 #define      SEARCH_H
 
 #include "vita.h"
-#include "evaluator.h"
 #include "individual.h"
+#include "problem.h"
 
 namespace vita
 {
 
   class evolution;
-  class individual;
 
   class search
   {
   public:
-    search(environment &, evaluator &);
+    search(problem &);
 
     void arl(const individual &, evolution &);
 
@@ -36,8 +35,7 @@ namespace vita
     bool check() const;
 
   private:
-    environment &_env;
-    evaluator &_eva;
+    problem &_prob;
   };
     
 }  // namespace vita

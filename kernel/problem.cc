@@ -3,7 +3,7 @@
  *  \file problem.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2011/03/11
  *
  *  This file is part of VITA
  *
@@ -16,7 +16,7 @@ namespace vita
 {
 
   ///
-  /// New empty data instance.
+  /// New empty instance.
   ///
   problem::problem()
   {
@@ -29,129 +29,59 @@ namespace vita
   void
   problem::clear()
   {
-    vars.clear();
-    dat.clear();
+    _active_eva = 0;
+    _evaluators.clear();
   }
 
   ///
-  /// \param[in] f name of the file containing the learning collection.
-  /// \return false if the file cannot be read.
+  /// \return the active evaluator.
   ///
-  bool
-  problem::load_data(const std::string &f)
+  evaluator *
+  problem::get_evaluator()
   {
-    dat.clear();
-
-    if (dat.open(f) > 1)
-    {
-      // Sets up the variables.
-      for (unsigned i(0); i < dat.variables(); ++i)
-      {
-	std::ostringstream s;
-	s << 'X' << i;   
-	const std::string str(s.str());
-   
-	vita::sr::variable *const x = new vita::sr::variable(str);
-	vars.push_back(x);
-	env.insert(x);
-      }
-
-      return true;
-    }
-    
-    return false;
+    return _active_eva;
   }
 
   ///
-  /// \param[in] sf name of the file containing the symbols.
-  /// \return a space separated string containing the names of the loaded 
-  ///         symbols.
+  /// param[in] eva a pointer to an evaluator.
   ///
-  std::string
-  problem::load_symbols(const std::string &sf)
+  /// Add a new avaluator to the set. Evaluators are used to score individual's
+  /// fitness.
+  ///
+  void
+  problem::add_evaluator(evaluator *const eva)
   {
-    std::string symbols;
+    _evaluators.push_back(eva);
 
-    // Set up the symbols (variables have already been prepared).
-    if (!sf.empty()) // Default functions.
-    {
-      std::ifstream from(sf.c_str());
-      if (!from)
-	return "";
-
-      std::string name;
-      while (from >> name)
-      {
-	symbols += name+" ";
-
-	std::stringstream s;
-	s << name;
-	double n;
-	if (s >> n)
-	  env.insert(new vita::sr::constant(n));
-	else if (name=="number")
-	  env.insert(new vita::sr::number(-128,127));
-	else if (name=="abs")
-	  env.insert(new vita::sr::abs());
-	else if (name=="add" || name=="+")
-	  env.insert(new vita::sr::add());
-	//else if (name=="and" || name=="&&")
-	//  env.insert(new vita::sr::bool_and());
-	//else if (name=="or" || name=="||")
-	//  env.insert(new vita::sr::bool_not());
-	//else if (name=="not" || name=="!")
-	//  env.insert(new vita::sr::bool_or());
-	else if (name=="div" || name=="/")
-	  env.insert(new vita::sr::div());
-	else if (name=="idiv")
-	  env.insert(new vita::sr::idiv());
-	else if (name=="ife")
-	  env.insert(new vita::sr::ife());
-	else if (name=="ifl")
-	  env.insert(new vita::sr::ifl());
-	else if (name=="ifz")
-	  env.insert(new vita::sr::ifz());
-	else if (name=="ln")
-	  env.insert(new vita::sr::ln());
-	else if (name=="mul" || name=="*")
-	  env.insert(new vita::sr::mul());
-	else if (name=="mod" || name=="%")
-	  env.insert(new vita::sr::mod());
-	else if (name=="sub" || name=="-")
-	  env.insert(new vita::sr::sub());
-      }
-    }
-
-    return symbols;
+    if (!_active_eva)
+      _active_eva = eva;
   }
-  
-  ///
-  /// \return number of classes of the classification problem (1 for a symbolic
-  ///         regression problem).
-  ///
-  unsigned
-  problem::classes() const
+
+  void
+  problem::delete_evaluators()
   {
-    return dat.classes();
+    for (std::vector<evaluator *>::const_iterator i(_evaluators.begin()); 
+         i != _evaluators.end();
+         ++i)
+      delete *i;
   }
 
   ///
-  /// \return dimension of the input vectors (i.e. the number of variable of
-  ///         the problem).
+  /// \param[in] i index of the evaluator that should be set as active.
   ///
-  unsigned
-  problem::variables() const
+  void
+  problem::set_evaluator(unsigned i)
   {
-    return dat.variables();
+    _active_eva = _evaluators[i];
   }
 
   ///
-  /// \return true if the individual passes the internal consistency check.
+  /// \return true if the object passes the internal consistency check.
   ///
   bool
   problem::check() const
   {
-    return dat.check() && vars.size() == dat.variables();
+    return env.check();
   }
 
 }  // namespace vita
