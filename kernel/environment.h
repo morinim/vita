@@ -96,6 +96,7 @@ namespace vita
 
     bool check() const;
 
+    static const char arl_filename[];
     static const char dyn_filename[];
     static const char env_filename[];
     static const char sum_filename[];

@@ -71,7 +71,8 @@ namespace vita
         
           if (_prob.env.stat_arl)
           {
-            const std::string f_adf(_prob.env.stat_dir + "/adf");
+            const std::string f_adf(_prob.env.stat_dir + "/" + 
+                                    environment::arl_filename);
             std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
             if (adf_l.good())
             {
@@ -164,18 +165,18 @@ namespace vita
     run_sum.best.tree(best_tree);
     run_sum.best.graphviz(best_graph);    
 
-    pt.put("success_rate",runs ? double(solutions)/double(runs) : 0);
-    pt.put("best.fitness",run_sum.f_best);
-    pt.put("best.times_reached",solutions);
-    pt.put("best.avg_depth_found",solutions 
+    pt.put("summary.success_rate",runs ? double(solutions)/double(runs) : 0);
+    pt.put("summary.best.fitness",run_sum.f_best);
+    pt.put("summary.best.times_reached",solutions);
+    pt.put("summary.best.avg_depth_found",solutions 
                         ? unsigned(double(run_sum.last_imp)/double(solutions))
                         : 0);
-    pt.put("best.individual.tree",best_tree.str());
-    pt.put("best.individual.list",best_list.str());
-    pt.put("best.individual.graph",best_graph.str());
-    pt.put("population.mean_fitness",fd.mean);
-    pt.put("population.standard_deviation",fd.standard_deviation());
-    pt.put("ttable.found_perc",run_sum.ttable_probes 
+    pt.put("summary.best.individual.tree",best_tree.str());
+    pt.put("summary.best.individual.list",best_list.str());
+    pt.put("summary.best.individual.graph",best_graph.str());
+    pt.put("summary.population.mean_fitness",fd.mean);
+    pt.put("summary.population.standard_deviation",fd.standard_deviation());
+    pt.put("summary.ttable.found_perc",run_sum.ttable_probes 
                         ? run_sum.ttable_hits*100 / run_sum.ttable_probes
                         : 0);
 

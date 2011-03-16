@@ -19,6 +19,7 @@
 namespace vita
 {
  
+  const char environment::arl_filename[] =         "arl";
   const char environment::dyn_filename[] =     "dynamic";
   const char environment::env_filename[] = "environment";
   const char environment::sum_filename[] =     "summary";
@@ -76,23 +77,23 @@ namespace vita
   {
     boost::property_tree::ptree pt;
 
-    pt.put("population_size",individuals);
-    pt.put("max_program_length",code_length);
-    pt.put("mutation_rate",p_mutation);  // p_mutation*code_length per program.
-    pt.put("crossover_rate",p_cross);
-    pt.put("parent_tournament_size",par_tournament);
-    pt.put("replacement_tournament_size",rep_tournament);
-    pt.put("mating_zone",mate_zone);
-    pt.put("max_gens_since_start",g_since_start);
-    pt.put("max_gens_wo_imp",g_without_improvement);
-    pt.put("arl",arl);
-    pt.put("ttable_bits",ttable_size); // size 1u << ttable_size.
-    pt.put("statistics.directory",stat_dir);
-    pt.put("statistics.period",stat_period);
-    pt.put("statistics.save_arl",stat_arl);
-    pt.put("statistics.save_dynamics",stat_dynamic);
-    pt.put("statistics.save_env",stat_env);
-    pt.put("statistics.save_summary",stat_summary);
+    pt.put("environment.population_size",individuals);
+    pt.put("environment.max_program_length",code_length);
+    pt.put("environment.mutation_rate",p_mutation);
+    pt.put("environment.crossover_rate",p_cross);
+    pt.put("environment.parent_tournament_size",par_tournament);
+    pt.put("environment.replacement_tournament_size",rep_tournament);
+    pt.put("environment.mating_zone",mate_zone);
+    pt.put("environment.max_gens_since_start",g_since_start);
+    pt.put("environment.max_gens_wo_imp",g_without_improvement);
+    pt.put("environment.arl",arl);
+    pt.put("environment.ttable_bits",ttable_size); // size 1u << ttable_size.
+    pt.put("environment.statistics.directory",stat_dir);
+    pt.put("environment.statistics.period",stat_period);
+    pt.put("environment.statistics.save_arl",stat_arl);
+    pt.put("environment.statistics.save_dynamics",stat_dynamic);
+    pt.put("environment.statistics.save_env",stat_env);
+    pt.put("environment.statistics.save_summary",stat_summary);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(s,pt,xml_writer_make_settings(' ',2));
