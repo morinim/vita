@@ -94,7 +94,8 @@ namespace vita
     pt.put("statistics.save_env",stat_env);
     pt.put("statistics.save_summary",stat_summary);
 
-    write_xml(s,pt);
+    using namespace boost::property_tree::xml_parser;
+    write_xml(s,pt,xml_writer_make_settings(' ',2));
   }
 
   ///

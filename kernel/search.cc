@@ -182,7 +182,8 @@ namespace vita
     const std::string f_sum(_prob.env.stat_dir + "/" + 
                             environment::sum_filename);
 
-    write_xml(f_sum,pt);
+    using namespace boost::property_tree::xml_parser;
+    write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));
   }
 
   ///
