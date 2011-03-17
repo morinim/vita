@@ -37,7 +37,7 @@ namespace vita
 
   ///
   /// \a random_evaluator \c class is used for debug purpose.
-  /// NOTE: the fitness is population independent.
+  /// NOTE: the output is population independent.
   /// 
   class random_evaluator : public evaluator
   {

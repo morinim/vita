@@ -1,3 +1,9 @@
+# Further details / ideas:
+# * http://gpwiki.org/index.php/Makefile
+# * http://mad-scientist.net/make/autodep.html 
+
+
+
 # Specify the main target.
 TARGET = sr
 

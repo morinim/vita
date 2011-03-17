@@ -29,6 +29,7 @@ namespace vita
   {
   public:
     symbol_set();
+    ~symbol_set();
 
     void insert(symbol *const);
 
@@ -40,7 +41,9 @@ namespace vita
     const symbol *decode(unsigned) const;
     const symbol *decode(const std::string &) const;
 
-    bool check() const;    
+    void delete_symbols();
+
+    bool check() const;
 
   private:
     void clear();

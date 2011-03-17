@@ -3,7 +3,7 @@
  *  \file search.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/08
+ *  \date 2011/03/14
  *
  *  This file is part of VITA
  *
@@ -11,21 +11,22 @@
   
 #include <fstream>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 #include "search.h"
 #include "adf.h"
-#include "environment.h"
 #include "evolution.h"
 
 namespace vita
 {
 
   ///
-  /// \param[in] e
-  /// \param[in] eva
+  /// \param[in] prob
   ///
-  search::search(environment &e, evaluator &eva) : _env(e), _eva(eva)
+  search::search(problem &prob) : _prob(prob)
   {
-    assert(e.check());
+    assert(prob.check());
 
     assert(check());
   }
@@ -48,7 +49,7 @@ namespace vita
     const fitness_t base_f(evo.fitness(candidate));
     std::list<unsigned> bl(candidate.blocks());
 
-    _env.sset.reset_adf_weights();
+    _prob.env.sset.reset_adf_weights();
 
     for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
     {
@@ -66,11 +67,12 @@ namespace vita
           std::vector<symbol_t> types;
           candidate_block.generalize(arl_args,0,&types);
           vita::adf *const p = new vita::adf(candidate_block,types,10);
-          _env.insert(p);
+          _prob.env.insert(p);
         
-          if (_env.stat_arl)
+          if (_prob.env.stat_arl)
           {
-            const std::string f_adf(_env.stat_dir + "/adf");
+            const std::string f_adf(_prob.env.stat_dir + "/" + 
+                                    environment::arl_filename);
             std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
             if (adf_l.good())
             {
@@ -87,59 +89,46 @@ namespace vita
   ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
+  /// \param[in] success_f when an individual reaches this fitness it is 
+  ///                      considered a solution.
   /// \return best individual found.
   ///
   individual
-  search::run(bool verbose, unsigned n)
+  search::run(bool verbose, unsigned n, fitness_t success_f)
   {   
-    if (_env.stat_env)
-    {
-      const std::string filename(_env.stat_dir + "/environment");
-      std::ofstream logs(filename.c_str());
-
-      if (logs.good())
-	_env.log(logs);
-    }
+    if (_prob.env.stat_env)
+      _prob.env.log();
 
     summary run_sum;
     distribution<fitness_t> fd;
 
-    // Consecutive runs reporting the same best individuals.
-    unsigned best_counter(0);
+    unsigned solutions(0);
 
-    population p(_env);
-    evolution evo(_env,p,_eva);
+    population p(_prob.env);
+    evolution evo(_prob.env,p,_prob.get_evaluator());
     for (unsigned i(0); i < n; ++i)
     {
       if (i)
-	p = population(_env);
+	p = population(_prob.env);
 
       const summary s(evo.run(verbose));
 
       if (i == 0)
       {
-	best_counter   =        1;
 	run_sum.best   =   s.best;
 	run_sum.f_best = s.f_best;
       }
       
-      const bool almost_equal( distance(s.f_best,run_sum.f_best) <= 
-			       float_epsilon );
+      const bool ok(s.f_best >= success_f);
 
-      if (almost_equal && i>0)
+      if (ok)
       {
-	++best_counter;
+	++solutions;
 	run_sum.last_imp += s.last_imp;
       }
 
       if (run_sum.f_best < s.f_best)
       {
-	if (!almost_equal)
-	{
-	  best_counter = 1;
-	  run_sum.last_imp = s.last_imp;
-	}
-
 	run_sum.best   =   s.best;
 	run_sum.f_best = s.f_best;
       }
@@ -148,32 +137,54 @@ namespace vita
       run_sum.ttable_hits += s.ttable_hits;
       run_sum.ttable_probes += s.ttable_probes;
 
-      if (_env.arl)
+      if (_prob.env.arl)
         arl(run_sum.best,evo);
     }
 
-    if (_env.stat_summary)
-    {
-      const std::string f_sum(_env.stat_dir + "/summary");
-      std::ofstream sum(f_sum.c_str());
-      if (sum.good())
-	sum << run_sum.f_best 
-	    << ' ' << fd.mean
-	    << ' ' << fd.standard_deviation()
-	    << ' ' << best_counter
-	    << ' ' << run_sum.last_imp / best_counter
-	    << ' ' << run_sum.ttable_hits*100 / run_sum.ttable_probes
-	    << std::endl;
-
-      sum << std::endl << "{Best individual (list)}" << std::endl;
-      run_sum.best.list(sum);
-      sum << std::endl <<"{Best individual (tree)}" << std::endl;
-      run_sum.best.tree(sum);
-      sum << std::endl <<"{Best individual (graphviz)}" << std::endl;
-      run_sum.best.graphviz(sum);
-    }
+    if (_prob.env.stat_summary)
+      log(run_sum,fd,solutions,n);
 
     return run_sum.best;
+  }
+
+  ///
+  /// \param[in] run_sum summary information regarding the search.
+  /// \param[in] fd statistics about population fitness.
+  /// \param[in] solutions number of solutions found.
+  /// \param[in] runs number of runs performed.
+  /// \return true if the write operation succeed.
+  ///
+  void
+  search::log(const summary &run_sum, const distribution<fitness_t> &fd,
+              unsigned solutions, unsigned runs) const
+  {
+    boost::property_tree::ptree pt;
+
+    std::ostringstream best_list, best_tree, best_graph;
+    run_sum.best.list(best_list);
+    run_sum.best.tree(best_tree);
+    run_sum.best.graphviz(best_graph);    
+
+    pt.put("summary.success_rate",runs ? double(solutions)/double(runs) : 0);
+    pt.put("summary.best.fitness",run_sum.f_best);
+    pt.put("summary.best.times_reached",solutions);
+    pt.put("summary.best.avg_depth_found",solutions 
+                        ? unsigned(double(run_sum.last_imp)/double(solutions))
+                        : 0);
+    pt.put("summary.best.individual.tree",best_tree.str());
+    pt.put("summary.best.individual.list",best_list.str());
+    pt.put("summary.best.individual.graph",best_graph.str());
+    pt.put("summary.population.mean_fitness",fd.mean);
+    pt.put("summary.population.standard_deviation",fd.standard_deviation());
+    pt.put("summary.ttable.found_perc",run_sum.ttable_probes 
+                        ? run_sum.ttable_hits*100 / run_sum.ttable_probes
+                        : 0);
+
+    const std::string f_sum(_prob.env.stat_dir + "/" + 
+                            environment::sum_filename);
+
+    using namespace boost::property_tree::xml_parser;
+    write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));
   }
 
   ///

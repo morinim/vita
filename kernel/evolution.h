@@ -47,7 +47,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(environment &, vita::population &, evaluator &);
+    evolution(environment &, vita::population &, evaluator *const);
     ~evolution();
 
     const summary &run(bool);

@@ -26,11 +26,11 @@ namespace vita
   /// \param[in] eva evaluator used during the evolution.
   ///
   evolution::evolution(environment &e, vita::population &pop, 
-		       evaluator &eva) 
+		       evaluator *const eva) 
     : _env(&e), _pop(pop), 
       _eva(new evaluator_proxy(eva,e.ttable_size)) 
   {
-    assert(e.check());
+    assert(e.check() && eva);
 
     _run_count = 0;
 
@@ -113,6 +113,9 @@ namespace vita
 
   ///
   /// Saves working / statistical informations in the log files.
+  /// This function could generate two files:
+  /// <ul>
+  /// <li>
   ///
   void
   evolution::log() const

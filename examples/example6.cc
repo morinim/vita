@@ -3,7 +3,7 @@
  *  \file example6.cc
  *
  *  \author Manlio Morini
- *  \date 2011/02/10
+ *  \date 2011/03/15
  *
  *  This file is part of VITA
  *
@@ -102,7 +102,9 @@ int main(int argc, char *argv[])
   std::auto_ptr<vita::evaluator> eva(new fitness());
 
   vita::population p(env);
-  vita::evolution(env,p,*eva.get()).run(true);
+  vita::evolution(env,p,eva.get()).run(true);
+
+  env.sset.delete_symbols();
 
   return EXIT_SUCCESS;
 }

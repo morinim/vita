@@ -3,7 +3,7 @@
  *  \file test3.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/30
+ *  \date 2011/03/15
  *
  *  This file is part of VITA
  *
@@ -75,7 +75,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
       env.code_length = l;
 
       std::auto_ptr<vita::evaluator> eva(new vita::random_evaluator());
-      vita::evolution evo(env,eva.get());
+      vita::population p(env);
+      vita::evolution evo(env,p,eva.get());
 
       /*
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)

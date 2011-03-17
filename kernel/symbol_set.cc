@@ -17,19 +17,24 @@
 namespace vita
 {
 
-  /**
-   * symbol_set
-   */
   symbol_set::symbol_set()
   {
     clear();
 
+    for (unsigned i(0); i < gene_args; ++i)
+      _arguments.push_back(new argument(i));
+
     assert(check());
   }
+ 
+  symbol_set::~symbol_set()
+  {
+    for (std::vector<argument *>::const_iterator i(_arguments.begin());
+         i != _arguments.end();
+         ++i)
+      delete *i;
+  }
 
-  /**
-   * clear
-   */
   void
   symbol_set::clear()
   {
@@ -37,18 +42,24 @@ namespace vita
     _terminals.clear();
     _adf.clear();
 
-    _arguments.clear();
-    for (unsigned i(0); i < gene_args; ++i)
-      _arguments.push_back(new argument(i));
-
     _sum = 0;
   }
 
-  /**
-   * arg
-   * \param n[in]
-   * \return
-   */
+  void
+  symbol_set::delete_symbols()
+  {
+    for (std::vector<symbol *>::const_iterator i(_symbols.begin());
+         i != _symbols.end();
+         ++i)
+      delete *i;
+
+    clear();
+  }
+
+  ///
+  /// \param[in] n index of an argument symbol.
+  /// \return a pointer to the n-th argument symbol.
+  ///
   const argument *
   symbol_set::arg(unsigned n) const
   {
@@ -85,9 +96,6 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * reset_adf_weights
-   */
   void
   symbol_set::reset_adf_weights()
   {
@@ -99,11 +107,13 @@ namespace vita
     }
   }
 
-  /**
-   * roulette
-   * \param only_t[in]
-   * \return a random terminal if only_t==true, else a random symbol.
-   */
+  ///
+  /// \param[in] only_t if true extracts only terminals.
+  /// \return a random symbol.
+  ///
+  /// If only_t==true extracts a terminal else a random symbol (may be a
+  /// terminal, a primitive function or an ADF).
+  ///
   const symbol *
   symbol_set::roulette(bool only_t) const
   {
@@ -129,11 +139,11 @@ namespace vita
     return _symbols[i];
   }
 
-  /**
-   * decode
-   * \param opcode[in]
-   * \return a pointer to the class identified by 'opcode' (0 if not found).
-   */
+  ///
+  /// \param[in] opcode numerical code used as primary key for a symbol.
+  /// \return a pointer to the \c symbol identified by 'opcode' (0 if not 
+  ///         found).
+  ///
   const symbol *
   symbol_set::decode(unsigned opcode) const
   {
@@ -144,11 +154,14 @@ namespace vita
     return 0;
   }
 
-  /**
-   * decode
-   * \param dex[in]
-   * \return a pointer to the class identified by 'dex' (0 if not found).
-   */
+  ///
+  /// \param[in] dex the name of a symbol.
+  /// \return a pointer to the \c symbol identified by 'dex' (0 if not found).
+  ///
+  /// Please note that opcode are primary key for symbols because they are 
+  /// automatically assigned. The name of a symbol is choosen by the user,
+  /// so if you don't pay attention different symbols may have the same name.
+  ///
   const symbol *
   symbol_set::decode(const std::string &dex) const
   {
