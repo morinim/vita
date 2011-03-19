@@ -77,23 +77,25 @@ namespace vita
   {
     boost::property_tree::ptree pt;
 
-    pt.put("environment.population_size",individuals);
-    pt.put("environment.max_program_length",code_length);
-    pt.put("environment.mutation_rate",p_mutation);
-    pt.put("environment.crossover_rate",p_cross);
-    pt.put("environment.parent_tournament_size",par_tournament);
-    pt.put("environment.replacement_tournament_size",rep_tournament);
-    pt.put("environment.mating_zone",mate_zone);
-    pt.put("environment.max_gens_since_start",g_since_start);
-    pt.put("environment.max_gens_wo_imp",g_without_improvement);
-    pt.put("environment.arl",arl);
-    pt.put("environment.ttable_bits",ttable_size); // size 1u << ttable_size.
-    pt.put("environment.statistics.directory",stat_dir);
-    pt.put("environment.statistics.period",stat_period);
-    pt.put("environment.statistics.save_arl",stat_arl);
-    pt.put("environment.statistics.save_dynamics",stat_dynamic);
-    pt.put("environment.statistics.save_env",stat_env);
-    pt.put("environment.statistics.save_summary",stat_summary);
+    const std::string env("environment.");
+
+    pt.put(env+"population_size",individuals);
+    pt.put(env+"max_program_length",code_length);
+    pt.put(env+"mutation_rate",p_mutation);
+    pt.put(env+"crossover_rate",p_cross);
+    pt.put(env+"parent_tournament_size",par_tournament);
+    pt.put(env+"replacement_tournament_size",rep_tournament);
+    pt.put(env+"mating_zone",mate_zone);
+    pt.put(env+"max_gens_since_start",g_since_start);
+    pt.put(env+"max_gens_wo_imp",g_without_improvement);
+    pt.put(env+"arl",arl);
+    pt.put(env+"ttable_bits",ttable_size); // size 1u << ttable_size.
+    pt.put(env+"statistics.directory",stat_dir);
+    pt.put(env+"statistics.period",stat_period);
+    pt.put(env+"statistics.save_arl",stat_arl);
+    pt.put(env+"statistics.save_dynamics",stat_dynamic);
+    pt.put(env+"statistics.save_env",stat_env);
+    pt.put(env+"statistics.save_summary",stat_summary);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(s,pt,xml_writer_make_settings(' ',2));
