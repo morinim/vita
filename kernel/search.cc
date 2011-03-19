@@ -96,9 +96,6 @@ namespace vita
   individual
   search::run(bool verbose, unsigned n, fitness_t success_f)
   {   
-    if (_prob.env.stat_env)
-      _prob.env.log();
-
     summary run_sum;
     distribution<fitness_t> fd;
 
@@ -139,10 +136,10 @@ namespace vita
 
       if (_prob.env.arl)
         arl(run_sum.best,evo);
-    }
 
-    if (_prob.env.stat_summary)
-      log(run_sum,fd,solutions,n);
+      if (_prob.env.stat_summary)
+        log(run_sum,fd,solutions,n);
+    }
 
     return run_sum.best;
   }
@@ -183,6 +180,8 @@ namespace vita
 
     const std::string f_sum(_prob.env.stat_dir + "/" + 
                             environment::sum_filename);
+
+    _prob.env.log(pt);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));

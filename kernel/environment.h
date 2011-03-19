@@ -3,7 +3,7 @@
  *  \file environment.h
  *
  *  \author Manlio Morini
- *  \date 2011/03/15
+ *  \date 2011/03/19
  *
  *  This file is part of VITA
  *
@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <string>
+#include <boost/property_tree/ptree.hpp>
 
 #include "vita.h"
 #include "symbol_set.h"
@@ -21,14 +22,12 @@
 namespace vita
 {
 
-  class ostream;
-
   class environment
   {
   public:
     environment();
 
-    bool log() const;
+    void log(boost::property_tree::ptree &) const;
 
     void insert(symbol *const);
 
@@ -74,17 +73,11 @@ namespace vita
     /// 2^ttable_size is the number of elements of the transposition table.
     unsigned ttable_size;
 
-    /// Save a list of active ADF?
-    bool stat_arl;
-
     /// Where shuld we save statistics / status files?
     std::string stat_dir;
 
-    /// Save statistics every 'stat_period' generation (0 means don't save).
-    unsigned stat_period;
-
-    /// Save the environment details before a run?
-    bool stat_env;
+    /// Save a list of active ADF?
+    bool stat_arl;
 
     /// Should we save a dynamic execution status file?
     bool stat_dynamic;
@@ -92,17 +85,13 @@ namespace vita
     /// Should we save a summary of the run?
     bool stat_summary;
 
-    symbol_set   sset;
+    symbol_set sset;
 
     bool check() const;
 
     static const char arl_filename[];
     static const char dyn_filename[];
-    static const char env_filename[];
     static const char sum_filename[];
-
-  private:
-    void log(std::ostream &) const;
   };
 
 }  // namespace vita

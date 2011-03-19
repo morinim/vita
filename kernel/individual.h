@@ -3,7 +3,7 @@
  *  \file individual.h
  *
  *  \author Manlio Morini
- *  \date 2010/06/11
+ *  \date 2011/03/14
  *
  *  This file is part of VITA
  *
@@ -34,6 +34,7 @@ namespace vita
 
     void dump(std::ostream &) const;
     void list(std::ostream &) const;
+    void inline_tree(std::ostream &) const;
     void tree(std::ostream &) const;
     void graphviz(std::ostream &, const std::string & = "") const;
 

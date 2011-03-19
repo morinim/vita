@@ -3,7 +3,7 @@
  *  \file sr.cc
  *
  *  \author Manlio Morini
- *  \date 2011/01/09
+ *  \date 2011/03/19
  *
  *  This file is part of VITA
  *
@@ -125,12 +125,6 @@ bool parse_command_line(int argc, char *argv[])
       ("stat-dir",
        po::value(&problem.env.stat_dir),
        "Log statistics in 'stat_dir' folder/directory.")
-      ("stat-period",
-       po::value(&problem.env.stat_period)->default_value(problem.env.stat_period),
-       "Save statistics every 'stat-period' generations.")
-      ("stat-env",
-       po::bool_switch(&problem.env.stat_env),
-       "Save the environment details.")
       ("stat-dynamic",
        po::bool_switch(&problem.env.stat_dynamic),
        "Generate a dynamic execution status file.")
