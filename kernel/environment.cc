@@ -3,7 +3,7 @@
  *  \file environment.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/15
+ *  \date 2011/03/19
  *
  *  This file is part of VITA
  *
@@ -13,15 +13,11 @@
 
 #include "environment.h"
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-
 namespace vita
 {
  
   const char environment::arl_filename[] =         "arl";
   const char environment::dyn_filename[] =     "dynamic";
-  const char environment::env_filename[] = "environment";
   const char environment::sum_filename[] =     "summary";
 
   ///
@@ -39,64 +35,39 @@ namespace vita
       g_since_start(100), g_without_improvement(0),
       arl(true),
       ttable_size(16),
-      stat_arl(false),
-      stat_dir(""), stat_period(0), 
-      stat_env(false), stat_dynamic(false), stat_summary(false)
+      stat_dir(""), 
+      stat_arl(false), stat_dynamic(false), stat_summary(false)
   {
     assert(check());
   }
 
   ///
-  /// \return true if the operation succeed.
+  /// \param[out] pt output tree.
   ///
-  /// Saves the informations regarding the environment in a new file
-  /// (name: env_filename, folder: stat_dir).
-  ///
-  bool
-  environment::log() const
-  {
-    assert(stat_env);
-
-    const std::string filename(stat_dir + "/" + env_filename);
-    std::ofstream logs(filename.c_str());
-
-    if (logs.good()) 
-      log(logs);
-
-    return logs.good();
-  }
-
-  ///
-  /// \param[out] s output stream.
-  ///
-  /// Saves the informations regarding the environment using the \a s output
-  /// stream.
+  /// Saves the informations regarding the environment using the \a pt boost
+  /// property tree.
   ///
   void
-  environment::log(std::ostream &s) const
+  environment::log(boost::property_tree::ptree &pt) const
   {
-    boost::property_tree::ptree pt;
+    assert(stat_summary);
 
-    pt.put("environment.population_size",individuals);
-    pt.put("environment.max_program_length",code_length);
-    pt.put("environment.mutation_rate",p_mutation);
-    pt.put("environment.crossover_rate",p_cross);
-    pt.put("environment.parent_tournament_size",par_tournament);
-    pt.put("environment.replacement_tournament_size",rep_tournament);
-    pt.put("environment.mating_zone",mate_zone);
-    pt.put("environment.max_gens_since_start",g_since_start);
-    pt.put("environment.max_gens_wo_imp",g_without_improvement);
-    pt.put("environment.arl",arl);
-    pt.put("environment.ttable_bits",ttable_size); // size 1u << ttable_size.
-    pt.put("environment.statistics.directory",stat_dir);
-    pt.put("environment.statistics.period",stat_period);
-    pt.put("environment.statistics.save_arl",stat_arl);
-    pt.put("environment.statistics.save_dynamics",stat_dynamic);
-    pt.put("environment.statistics.save_env",stat_env);
-    pt.put("environment.statistics.save_summary",stat_summary);
-
-    using namespace boost::property_tree::xml_parser;
-    write_xml(s,pt,xml_writer_make_settings(' ',2));
+    const std::string env("environment.");
+    pt.put(env+"population_size",individuals);
+    pt.put(env+"max_program_length",code_length);
+    pt.put(env+"mutation_rate",p_mutation);
+    pt.put(env+"crossover_rate",p_cross);
+    pt.put(env+"parent_tournament_size",par_tournament);
+    pt.put(env+"replacement_tournament_size",rep_tournament);
+    pt.put(env+"mating_zone",mate_zone);
+    pt.put(env+"max_gens_since_start",g_since_start);
+    pt.put(env+"max_gens_wo_imp",g_without_improvement);
+    pt.put(env+"arl",arl);
+    pt.put(env+"ttable_bits",ttable_size); // size 1u << ttable_size.
+    pt.put(env+"statistics.directory",stat_dir);
+    pt.put(env+"statistics.save_arl",stat_arl);
+    pt.put(env+"statistics.save_dynamics",stat_dynamic);
+    pt.put(env+"statistics.save_summary",stat_summary);
   }
 
   ///

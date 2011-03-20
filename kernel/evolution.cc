@@ -112,102 +112,55 @@ namespace vita
   }
 
   ///
-  /// Saves working / statistical informations in the log files.
-  /// This function could generate two files:
-  /// <ul>
-  /// <li>
+  /// Saves working / statistical informations in the log file.
+  /// Data are written in a CSV-like fashion:
   ///
   void
   evolution::log() const
   {
-    if ( (_env->stat_period && _stats.gen % _env->stat_period == 0) || 
-	 _env->stat_dynamic)
+    static unsigned last_run(0);
+
+    if (_env->stat_dynamic)
     {
-      if (_env->stat_period)
-      { 
-	std::ostringstream f_logs;
-	f_logs << _env->stat_dir << '/' << _run_count << '_' << _stats.gen;
-	std::ofstream logs(f_logs.str().c_str());
-
-	if (logs.good())
-	{
-	  logs << "{Best individual (fitness)}" << std::endl
-	       << _stats.f_best << std::endl;
-
-	  logs << std::endl << "{Best individual (list)}" << std::endl;
-	  _stats.best.list(logs);
-	  logs << std::endl <<"{Best individual (tree)}" << std::endl;
-	  _stats.best.tree(logs);
-	  logs << std::endl <<"{Best individual (graphviz)}" << std::endl;
-	  _stats.best.graphviz(logs);
-
-	  for (unsigned active(0); active <= 1; ++active)
-	  {
-	    const boost::uint64_t nf(_stats.az.functions(active));
-	    const boost::uint64_t nt(_stats.az.terminals(active));
-	    const boost::uint64_t n(nf+nt);
-	    const std::string s(active ? "Active" : "Overall");
-	    
-	    logs << std::endl << '{' << s << " symbol frequency}" 
-		 << std::endl;
-	    for (analyzer::const_iterator i(_stats.az.begin());
-		 i != _stats.az.end();
-		 ++i)
-	      logs << (i->first)->display() << ' ' 
-		   << i->second.counter[active] << ' ' 
-		   << 100*i->second.counter[active]/n << '%' << std::endl;
-
-	    logs << std::endl << '{' << s << " functions}" << std::endl
-		 << nf << " (" << nf*100/n << "%)" << std::endl
-	         << std::endl << '{' << s << " terminals}" << std::endl
-		 << nt << " (" << nt*100/n << "%)" << std::endl;
-	  }
-
-	  logs << std::endl << "{Mutations}" << std::endl
-	       << _stats.mutations << std::endl
-	       << std::endl << "{Crossovers}" << std::endl
-	       << _stats.crossovers 
-	       << std::endl << std::endl 
-	       << "{Average fitness}" << std::endl
-	       << _stats.az.fit_dist().mean << std::endl
-	       << std::endl << "{Worst fitness}" << std::endl
-	       << _stats.az.fit_dist().min << std::endl
-	       << std::endl << "{Fitness standard deviation}" << std::endl
-	       << _stats.az.fit_dist().standard_deviation() 
-	       << std::endl << std::endl 
-	       << "{Average code length}" << std::endl
-	       << unsigned(_stats.az.length_dist().mean) << std::endl
-	       << std::endl << "{Lenth standard deviation}" << std::endl
-	       << std::sqrt(_stats.az.length_dist().variance) << std::endl
-	       << std::endl << "{Max code length}" << std::endl
-	       << unsigned(_stats.az.length_dist().max) 
-	       << std::endl << std::endl 
-	       << "{Hit rate}" << std::endl
-	       << (_eva->probes() ? _eva->hits()*100/_eva->probes() : 0)
-	       << std::endl;
-	}
-      }
-
-      if (_env->stat_dynamic)
+      const std::string f_dynamic(_env->stat_dir + "/dynamic");
+      std::ofstream dynamic(f_dynamic.c_str(),std::ios_base::app);
+      if (dynamic.good())
       {
-	const std::string f_dynamic(_env->stat_dir + "/dynamic");
-	std::ofstream dynamic(f_dynamic.c_str(),std::ios_base::app);
-	if (dynamic.good())
-	  dynamic << _run_count << ' ' << _stats.gen
-		  << ' ' << _stats.f_best << ' ' << _stats.az.fit_dist().mean 
-		  << ' ' << _stats.az.fit_dist().min
-		  << ' ' << _stats.az.fit_dist().standard_deviation()
-		  << ' ' << unsigned(_stats.az.length_dist().mean) 
-		  << ' ' << std::sqrt(_stats.az.length_dist().variance)
-		  << ' ' << unsigned(_stats.az.length_dist().max)
-		  << ' ' << _stats.mutations << ' ' << _stats.crossovers
-		  << ' ' << _stats.az.functions(0) 
-		  << ' ' << _stats.az.terminals(0)
-		  << ' ' << _stats.az.functions(1) 
-		  << ' ' << _stats.az.terminals(1)
-		  << ' ' << (_eva->probes() ? _eva->hits()*100/_eva->probes()
-			                    : 0)
-		  << std::endl;
+        if (last_run != _run_count)
+        {
+          dynamic << std::endl << std::endl;
+          last_run = _run_count;
+        }
+        
+        dynamic << _run_count << ' ' << _stats.gen
+                << ' ' << _stats.f_best << ' ' << _stats.az.fit_dist().mean 
+                << ' ' << _stats.az.fit_dist().min
+                << ' ' << _stats.az.fit_dist().standard_deviation()
+                << ' ' << unsigned(_stats.az.length_dist().mean) 
+                << ' ' << std::sqrt(_stats.az.length_dist().variance)
+                << ' ' << unsigned(_stats.az.length_dist().max)
+                << ' ' << _stats.mutations << ' ' << _stats.crossovers
+                << ' ' << _stats.az.functions(0) 
+                << ' ' << _stats.az.terminals(0)
+                << ' ' << _stats.az.functions(1) 
+                << ' ' << _stats.az.terminals(1)
+                << ' ' << (_eva->probes() ? _eva->hits()*100/_eva->probes()
+                                          : 0)
+                << ' ' << _stats.az.functions(0)
+                << ' ' << _stats.az.terminals(0)
+                << ' ' << _stats.az.functions(1)
+                << ' ' << _stats.az.terminals(1);
+        
+        for (unsigned active(0); active <= 1; ++active)
+          for (analyzer::const_iterator i(_stats.az.begin());
+               i != _stats.az.end();
+               ++i)
+            dynamic << ' ' << (i->first)->display() << ' ' 
+                    << i->second.counter[active];
+
+        dynamic << " \"";
+        _stats.best.inline_tree(dynamic);
+        dynamic << '"' << std::endl;
       }
     }
   }

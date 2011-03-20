@@ -3,7 +3,7 @@
  *  \file individual.cc
  *
  *  \author Manlio Morini
- *  \date 2009/09/14
+ *  \date 2011/03/19
  *
  *  This file is part of VITA
  *
@@ -658,11 +658,10 @@ namespace vita
       _env->check();
   }
 
-  /**
-   * graphviz
-   * \param s[out]
-   * \param id[in]
-   */
+  ///
+  /// \param[out] s output stream.
+  /// \param[in] id 
+  ///
   void
   individual::graphviz(std::ostream &s, const std::string &id) const
   {
@@ -677,9 +676,9 @@ namespace vita
     {
       const gene &g(*it);
 
-      s << 'g' << line << " [label=\"" 
+      s << 'g' << line << " [label=" 
 	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-	<< "\"];";
+	<< "];";
 
       for (unsigned j(0); j < g.sym->argc(); ++j)
 	s << 'g' << line << " -- g" << g.args[j] << ';';
@@ -688,10 +687,36 @@ namespace vita
     s << '}' << std::endl;
   }
 
-  /**
-   * list
-   * \param s[out]
-   */
+  ///
+  /// \param[out] s output stream
+  ///
+  /// The \a individual is printed on a single line with symbols separated by
+  /// spaces. Not at all human readable, but a compact representation for
+  /// import / export.
+  ///
+  void
+  individual::inline_tree(std::ostream &s) const
+  {
+    unsigned line(_best);
+    for (const_iterator it(*this); it(); line = ++it)
+    {
+      const gene &g(*it);
+
+      if (line != _best)
+        s << ' ';
+      s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+    }
+  }
+
+  ///
+  /// \param[out] s output stream
+  ///
+  /// Do you remember C=64 list? :-)
+  ///
+  /// 10 PRINT "HOME"
+  /// 20 PRINT "SWEET"
+  /// 30 GOTO 10
+  ///
   void
   individual::list(std::ostream &s) const
   {
@@ -719,8 +744,6 @@ namespace vita
   /// \param[in] indt
   /// \param[in] father
   ///
-  /// 
-  ///
   void
   individual::tree(std::ostream &s, 
 		   unsigned locus, unsigned indt, unsigned father) const
@@ -747,18 +770,15 @@ namespace vita
   ///
   /// \param[out] s
   ///
-  /// 
-  ///
   void
   individual::tree(std::ostream &s) const
   {
     tree(s,_best,0,_best);
   }
 
-  /**
-   * dump
-   * \param s[out]
-   */
+  ///
+  /// \param[out] s
+  ///
   void
   individual::dump(std::ostream &s) const
   {
@@ -791,15 +811,17 @@ namespace vita
     return s;
   }
 
-  /**
-   * const_iterator
-   */
+  ///
+  /// \param[in] id
+  ///
   individual::const_iterator::const_iterator(const individual &id) 
     : _ind(id), _l(id._best)
   {
     _lines.insert(_l);
   }
 
+  ///
+  /// \return
   ///
   unsigned
   individual::const_iterator::operator++()

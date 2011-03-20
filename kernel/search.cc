@@ -96,9 +96,6 @@ namespace vita
   individual
   search::run(bool verbose, unsigned n, fitness_t success_f)
   {   
-    if (_prob.env.stat_env)
-      _prob.env.log();
-
     summary run_sum;
     distribution<fitness_t> fd;
 
@@ -119,9 +116,9 @@ namespace vita
 	run_sum.f_best = s.f_best;
       }
       
-      const bool ok(s.f_best >= success_f);
+      const bool found(s.f_best >= success_f);
 
-      if (ok)
+      if (found)
       {
 	++solutions;
 	run_sum.last_imp += s.last_imp;
@@ -139,10 +136,10 @@ namespace vita
 
       if (_prob.env.arl)
         arl(run_sum.best,evo);
-    }
 
-    if (_prob.env.stat_summary)
-      log(run_sum,fd,solutions,n);
+      if (_prob.env.stat_summary)
+        log(run_sum,fd,solutions,n);
+    }
 
     return run_sum.best;
   }
@@ -165,23 +162,26 @@ namespace vita
     run_sum.best.tree(best_tree);
     run_sum.best.graphviz(best_graph);    
 
-    pt.put("summary.success_rate",runs ? double(solutions)/double(runs) : 0);
-    pt.put("summary.best.fitness",run_sum.f_best);
-    pt.put("summary.best.times_reached",solutions);
-    pt.put("summary.best.avg_depth_found",solutions 
+    const std::string summary("summary.");
+    pt.put(summary+"success_rate",runs ? double(solutions)/double(runs) : 0);
+    pt.put(summary+"best.fitness",run_sum.f_best);
+    pt.put(summary+"best.times_reached",solutions);
+    pt.put(summary+"best.avg_depth_found",solutions 
                         ? unsigned(double(run_sum.last_imp)/double(solutions))
                         : 0);
-    pt.put("summary.best.individual.tree",best_tree.str());
-    pt.put("summary.best.individual.list",best_list.str());
-    pt.put("summary.best.individual.graph",best_graph.str());
-    pt.put("summary.population.mean_fitness",fd.mean);
-    pt.put("summary.population.standard_deviation",fd.standard_deviation());
-    pt.put("summary.ttable.found_perc",run_sum.ttable_probes 
+    pt.put(summary+"best.mean_fitness",fd.mean);
+    pt.put(summary+"best.standard_deviation",fd.standard_deviation());
+    pt.put(summary+"best.individual.tree","\n"+best_tree.str());
+    pt.put(summary+"best.individual.list","\n"+best_list.str());
+    pt.put(summary+"best.individual.graph","\n"+best_graph.str());
+    pt.put(summary+"ttable.found_perc",run_sum.ttable_probes 
                         ? run_sum.ttable_hits*100 / run_sum.ttable_probes
                         : 0);
 
     const std::string f_sum(_prob.env.stat_dir + "/" + 
                             environment::sum_filename);
+
+    _prob.env.log(pt);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));
