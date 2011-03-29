@@ -158,6 +158,9 @@ namespace vita
   
   ///
   /// \return the total size of the individual (effective size + introns).
+  ///
+  /// The size is constant for any individual (it's choosen at initialization
+  /// time).
   /// \see eff_size
   ///
   inline
