@@ -22,7 +22,7 @@ namespace vita
 {
 
   ///
-  /// \param[in] prob
+  /// \param[in] prob a \c problem used for search initialization.
   ///
   search::search(problem &prob) : _prob(prob)
   {
@@ -117,7 +117,6 @@ namespace vita
       }
       
       const bool found(s.f_best >= success_f);
-
       if (found)
       {
 	++solutions;
@@ -155,14 +154,15 @@ namespace vita
   search::log(const summary &run_sum, const distribution<fitness_t> &fd,
               unsigned solutions, unsigned runs) const
   {
-    boost::property_tree::ptree pt;
-
     std::ostringstream best_list, best_tree, best_graph;
     run_sum.best.list(best_list);
     run_sum.best.tree(best_tree);
     run_sum.best.graphviz(best_graph);    
 
-    const std::string summary("summary.");
+    const std::string path("vita.");
+    const std::string summary(path+"summary.");  
+
+    boost::property_tree::ptree pt;
     pt.put(summary+"success_rate",runs ? double(solutions)/double(runs) : 0);
     pt.put(summary+"best.fitness",run_sum.f_best);
     pt.put(summary+"best.times_reached",solutions);
@@ -171,17 +171,16 @@ namespace vita
                         : 0);
     pt.put(summary+"best.mean_fitness",fd.mean);
     pt.put(summary+"best.standard_deviation",fd.standard_deviation());
-    pt.put(summary+"best.individual.tree","\n"+best_tree.str());
-    pt.put(summary+"best.individual.list","\n"+best_list.str());
-    pt.put(summary+"best.individual.graph","\n"+best_graph.str());
-    pt.put(summary+"ttable.found_perc",run_sum.ttable_probes 
-                        ? run_sum.ttable_hits*100 / run_sum.ttable_probes
-                        : 0);
-
+    pt.put(summary+"best.individual.tree",best_tree.str());
+    pt.put(summary+"best.individual.list",best_list.str());
+    pt.put(summary+"best.individual.graph",best_graph.str());
+    pt.put(summary+"ttable.hits",run_sum.ttable_hits);
+    pt.put(summary+"ttable.probes",run_sum.ttable_probes);
+    
     const std::string f_sum(_prob.env.stat_dir + "/" + 
                             environment::sum_filename);
 
-    _prob.env.log(pt);
+    _prob.env.log(pt,path);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));

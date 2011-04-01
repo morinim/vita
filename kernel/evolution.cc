@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/04
+ *  \date 2011/03/20
  *
  *  This file is part of VITA
  *
@@ -112,9 +112,20 @@ namespace vita
   }
 
   ///
-  /// Saves working / statistical informations in the log file.
-  /// Data are written in a CSV-like fashion:
-  ///
+  /// Saves working / statistical informations in a log file.
+  /// Data are written in a CSV-like fashion and are partitioned in blocks
+  /// separated by two blank lines:
+  /// [BLOCK_1]\n\n
+  /// [BLOCK_2]\n\n 
+  /// ...
+  /// [BLOCK_x]
+  /// where each block is a set of line like this:
+  /// data_1 [space] data_2 [space] ... [space] data_n
+  /// We use this format, instead of XML, because statistics are produced
+  /// incrementally and so it's simple and fast to append new data to a 
+  /// CSV-like file. Note also that data sets are ready to be plotted by 
+  /// GNUPlot.
+  /// 
   void
   evolution::log() const
   {
@@ -137,19 +148,15 @@ namespace vita
                 << ' ' << _stats.az.fit_dist().min
                 << ' ' << _stats.az.fit_dist().standard_deviation()
                 << ' ' << unsigned(_stats.az.length_dist().mean) 
-                << ' ' << std::sqrt(_stats.az.length_dist().variance)
+                << ' ' << _stats.az.length_dist().standard_deviation()
                 << ' ' << unsigned(_stats.az.length_dist().max)
                 << ' ' << _stats.mutations << ' ' << _stats.crossovers
                 << ' ' << _stats.az.functions(0) 
                 << ' ' << _stats.az.terminals(0)
                 << ' ' << _stats.az.functions(1) 
                 << ' ' << _stats.az.terminals(1)
-                << ' ' << (_eva->probes() ? _eva->hits()*100/_eva->probes()
-                                          : 0)
-                << ' ' << _stats.az.functions(0)
-                << ' ' << _stats.az.terminals(0)
-                << ' ' << _stats.az.functions(1)
-                << ' ' << _stats.az.terminals(1);
+                << ' ' << _eva->hits()
+                << ' ' << _eva->probes();
         
         for (unsigned active(0); active <= 1; ++active)
           for (analyzer::const_iterator i(_stats.az.begin());

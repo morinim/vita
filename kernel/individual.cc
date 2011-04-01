@@ -471,12 +471,11 @@ namespace vita
     return ret;    
   }
   
-  /**
-   * generalize
-   * \param max_args[in]
-   * \param positions[out]
-   * \param types[out]
-   */
+  ///
+  /// \param[in] max_args
+  /// \param[out] positions
+  /// \param[out] types
+  ///
   void
   individual::generalize(std::size_t max_args,
                          std::vector<unsigned> *const positions,

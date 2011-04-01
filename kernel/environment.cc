@@ -48,11 +48,12 @@ namespace vita
   /// property tree.
   ///
   void
-  environment::log(boost::property_tree::ptree &pt) const
+  environment::log(boost::property_tree::ptree &pt, 
+                   const std::string &path) const
   {
     assert(stat_summary);
 
-    const std::string env("environment.");
+    const std::string env(path+"environment.");
     pt.put(env+"population_size",individuals);
     pt.put(env+"max_program_length",code_length);
     pt.put(env+"mutation_rate",p_mutation);

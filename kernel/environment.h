@@ -27,7 +27,7 @@ namespace vita
   public:
     environment();
 
-    void log(boost::property_tree::ptree &) const;
+    void log(boost::property_tree::ptree &, const std::string & = "") const;
 
     void insert(symbol *const);
 
