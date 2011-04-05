@@ -98,6 +98,7 @@ namespace vita
   {   
     summary run_sum;
     distribution<fitness_t> fd;
+    unsigned best_run(0);
 
     unsigned solutions(0);
 
@@ -127,6 +128,7 @@ namespace vita
       {
 	run_sum.best   =   s.best;
 	run_sum.f_best = s.f_best;
+	best_run       =        i;
       }
      
       fd.add(s.f_best);
@@ -137,7 +139,7 @@ namespace vita
         arl(run_sum.best,evo);
 
       if (_prob.env.stat_summary)
-        log(run_sum,fd,solutions,n);
+        log(run_sum,fd,solutions,best_run,n);
     }
 
     return run_sum.best;
@@ -147,12 +149,13 @@ namespace vita
   /// \param[in] run_sum summary information regarding the search.
   /// \param[in] fd statistics about population fitness.
   /// \param[in] solutions number of solutions found.
+  /// \param[in] best_run best run of the search.
   /// \param[in] runs number of runs performed.
   /// \return true if the write operation succeed.
   ///
   void
   search::log(const summary &run_sum, const distribution<fitness_t> &fd,
-              unsigned solutions, unsigned runs) const
+              unsigned solutions, unsigned best_run, unsigned runs) const
   {
     std::ostringstream best_list, best_tree, best_graph;
     run_sum.best.list(best_list);
@@ -166,6 +169,7 @@ namespace vita
     pt.put(summary+"success_rate",runs ? double(solutions)/double(runs) : 0);
     pt.put(summary+"best.fitness",run_sum.f_best);
     pt.put(summary+"best.times_reached",solutions);
+    pt.put(summary+"best.run",best_run);
     pt.put(summary+"best.avg_depth_found",solutions 
                         ? unsigned(double(run_sum.last_imp)/double(solutions))
                         : 0);

@@ -3,7 +3,7 @@
  *  \file search.h
  *
  *  \author Manlio Morini
- *  \date 2011/03/14
+ *  \date 2011/04/04
  *
  *  This file is part of VITA
  *
@@ -32,12 +32,12 @@ namespace vita
 
     individual run(bool=true, unsigned=1, fitness_t = -5.0);
 
-    void log(const summary &, const distribution<fitness_t> &, 
-             unsigned, unsigned) const;
-
     bool check() const;
 
   private:
+    void log(const summary &, const distribution<fitness_t> &, 
+             unsigned, unsigned, unsigned) const;
+
     problem &_prob;
   };
     

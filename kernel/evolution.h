@@ -65,6 +65,7 @@ namespace vita
 
     bool stop_condition() const;
     unsigned tournament(unsigned, bool) const;
+    unsigned rep_tournament(fitness_t) const;
 
     environment            *_env;
     vita::population       &_pop;

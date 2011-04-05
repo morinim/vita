@@ -21,47 +21,17 @@ namespace po = boost::program_options;
 
 #include "environment.h"
 #include "search.h"
-<<<<<<< HEAD
-#include "problem.h"
-
-const std::string vita_sr_version("Vita v1.01 - Symbolic Regression and classification\nCopyright EOS Development (http://www.eosdev.it)");
-=======
 #include "src_problem.h"
 
 const std::string vita_sr_version("Vita v1.02 - Symbolic Regression and classification\nCopyright EOS Development (http://www.eosdev.it)");
->>>>>>> e125df83ed9d99ff856d5f39a3933428a1a4ce58
 
 bool verbose(false);
 
 unsigned runs(1);
 
-<<<<<<< HEAD
-vita::problem problem;
 
-class abs_fitness : public vita::evaluator
-{
-  vita::fitness_t run(const vita::individual &ind)
-  {
-    return problem.abs_fitness<vita::fitness_t>(ind); 
-  };
-};
-
-class dyn_slot_fitness : public vita::evaluator
-{
-  vita::fitness_t run(const vita::individual &ind)
-  {
-    return problem.dyn_slot_fitness<vita::fitness_t>(ind);
-  };  
-};
-
-/**
- * setup_symbols
- * \param sf
- */
-=======
 vita::src_problem problem;
 
->>>>>>> e125df83ed9d99ff856d5f39a3933428a1a4ce58
 void setup_default_symbols()
 {  
   problem.env.insert(new vita::sr::constant(1));
@@ -83,19 +53,11 @@ void setup_default_symbols()
   problem.env.insert(new vita::sr::sub());
 }
 
-<<<<<<< HEAD
-/**
- * parse_command_line
- * \param argc
- * \param argv
- */
-=======
 ///
 /// \param[in] argc
 /// \param[in] argv
 /// \return
 ///
->>>>>>> e125df83ed9d99ff856d5f39a3933428a1a4ce58
 bool parse_command_line(int argc, char *argv[])
 {
   unsigned random_seed;
@@ -252,20 +214,6 @@ bool parse_command_line(int argc, char *argv[])
 }
 
 ///
-<<<<<<< HEAD
-bool
-run()
-{
-  std::auto_ptr<vita::evaluator> eva(
-    problem.classes() > 1 
-    ? (vita::evaluator *)new dyn_slot_fitness() // Classification problem
-    : (vita::evaluator *)new abs_fitness()      // Symbolic regression problem
-  );
-
-  vita::search s(problem.env,*eva.get());
-
-  const vita::individual ind(s.run(verbose,runs));
-=======
 /// \return
 ///
 bool
@@ -274,7 +222,6 @@ run()
   vita::search s(problem);
 
   s.run(verbose,runs);
->>>>>>> e125df83ed9d99ff856d5f39a3933428a1a4ce58
 
   // vita::interpreter agent(ind);
 

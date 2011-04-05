@@ -78,8 +78,8 @@ namespace vita
   /// \return index of the best (worst) individual found.
   ///
   /// Tournament selection works by selecting a number of individuals from the 
-  /// population at random, a tournament, and then selecting only the best of 
-  /// those individuals.
+  /// population at random, a tournament, and then choosing only the best 
+  /// (worst) of those individuals.
   /// Recall that better individuals have highter fitnesses.
   ///
   unsigned
@@ -106,6 +106,26 @@ namespace vita
         if (fit_j < fit_sel)
 	  sel = j;
       }
+    }
+
+    return sel;
+  }
+
+  unsigned
+  evolution::rep_tournament(fitness_t f_off) const
+  {
+    const unsigned n(_pop.size());
+    const unsigned rounds(4);
+
+    unsigned sel(random::ring(0,n,n));
+    for (unsigned i(1); i < rounds; ++i)
+    {
+      const unsigned j(random::ring(0,n,n));
+
+      const fitness_t fit_j(_eva->run(_pop[j]));
+      const fitness_t fit_sel(_eva->run(_pop[sel]));
+      if (fit_j > fit_sel && fit_j < f_off)
+	sel = j;
     }
 
     return sel;
@@ -260,7 +280,8 @@ namespace vita
 	// --------- REPLACEMENT --------
 	const fitness_t f_off(_eva->run(off));
 
-	const unsigned rep_idx(tournament(r1,false));
+	//const unsigned rep_idx(tournament(r1,false));
+	const unsigned rep_idx(rep_tournament(f_off));
 	const fitness_t f_rep_idx(_eva->run(_pop[rep_idx]));
 	const bool replace(f_rep_idx < f_off);
 
