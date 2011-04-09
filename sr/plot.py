@@ -65,7 +65,8 @@ def plot(opts, args):
     pipe = subprocess.Popen("gnuplot -persist", shell=True, 
                             stdin=subprocess.PIPE).stdin
 
-    while True:
+    loop = True
+    while loop:
         reparse_args(opts,args)
 
         if (opts.image is not None):
@@ -122,12 +123,21 @@ def plot(opts, args):
         # Remove all customizations
         print >>pipe, "reset"
 
-        time.sleep(4)
+        if (opts.loop is None):
+            loop = False
+        else:
+            time.sleep(opts.loop)
 
 
 def get_max_dataset(filename):
-    with open(filename, "rb") as file:
-        return int(list(file)[-1].split(' ')[0])
+    count = 4
+    while count > 0:
+        try:
+            with open(filename, "rb") as file:
+                return int(list(file)[-1].split(' ')[0])
+        except IOError:
+            time.sleep(1)
+            --count       
 
 
 def get_cmd_line_options():
@@ -137,7 +147,7 @@ def get_cmd_line_options():
 
     parser.add_option("-g", "--graph", dest="graph", type="int",
                       help="Plot only one graph")
-    parser.add_option("-r", "--refresh", dest="refresh", type="int",
+    parser.add_option("-l", "--loop", dest="loop", type="int",
                       help="Refresh the plot reloading data every x seconds.")
     parser.add_option("", "--image", dest="image",
                       help="Saves the plot to a png file")

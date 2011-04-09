@@ -280,8 +280,8 @@ namespace vita
 	// --------- REPLACEMENT --------
 	const fitness_t f_off(_eva->run(off));
 
-	//const unsigned rep_idx(tournament(r1,false));
-	const unsigned rep_idx(rep_tournament(f_off));
+	const unsigned rep_idx(tournament(r1,false));
+	//const unsigned rep_idx(rep_tournament(f_off));
 	const fitness_t f_rep_idx(_eva->run(_pop[rep_idx]));
 	const bool replace(f_rep_idx < f_off);
 

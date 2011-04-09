@@ -24,6 +24,7 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
         random.seed()
         rnd = "--random-seed "+str(random.randint(0,1000000000))
         rounds *= 2
+        generations = (generations*3)/2
 
     if arl:
         rounds /= 2
@@ -75,11 +76,13 @@ def test_dataset(data_set, generations, individuals, prog_size, rounds,
 
 def start_testing(options, tests):
     testcases = {
-        "petalrose":  [ "petalrose.dat", 80, 500, 200,  80, "arithmetic"],
-        "mep_bias":   [       "mep.dat", 80,  30,  20, 100,        "mep"],
-        "x2y2_z2":    [   "x2y2_z2.dat", 80, 200, 500,  40,       "math"],
-        "mep":        [       "mep.dat", 80, 200, 500, 100],
-        "petalrose3": ["petalrose3.dat", 60, 500, 200,  80, "arithmetic"]
+        "mep":          [       "mep.dat", 100, 200, 500, 100],
+        "mep_bias":     [       "mep.dat", 100, 200,  20, 100,        "mep"],
+        "petalrose":    [ "petalrose.dat", 100, 500, 200,  80, "arithmetic"],
+        "petalrose3":   ["petalrose3.dat", 100, 500, 200,  80, "arithmetic"],
+        "petalrose2":   ["petalrose3.dat", 100, 500, 200,  80, "arithmetic"],
+        "x2y2_z2":      [   "x2y2_z2.dat", 100, 200, 500,  80,       "math"],
+        "x2y2_z2_bias": [   "x2y2_z2.dat", 100, 200, 100,  80, "arithmetic"]
     }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
