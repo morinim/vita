@@ -3,7 +3,7 @@
  *  \file population.cc
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/04/11
  *
  *  This file is part of VITA
  *
@@ -21,7 +21,7 @@ namespace vita
 {
 
   ///
-  /// \param[in] e base environment.
+  /// \param[in] e base \a environment.
   ///
   population::population(environment &e) : _env(&e)
   {
@@ -30,11 +30,9 @@ namespace vita
     build();
   }
 
-  /**
-   * build
-   *
-   * Creates a random population.
-   */
+  ///
+  /// Creates a random population.
+  ///
   void
   population::build()
   {
@@ -46,10 +44,18 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
+  ///
+  /// \return a constant reference to the active environment.
+  ///
+  const environment &
+  population::env() const
+  {
+    return *_env;
+  }
+
+  ///
+  /// \return true if the object passes the internal consistency check.
+  ///
   bool
   population::check() const
   {
@@ -60,12 +66,11 @@ namespace vita
     return _env;
   }
 
-  /**
-   * operator<<
-   * \param[in,out] s
-   * \param[in] pop
-   * \return
-   */
+  ///
+  /// \param[in,out] s
+  /// \param[in] pop
+  /// \return
+  ///
   std::ostream &
   operator<<(std::ostream &s, const population &pop)
   {

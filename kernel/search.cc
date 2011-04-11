@@ -3,7 +3,7 @@
  *  \file search.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/14
+ *  \date 2011/04/11
  *
  *  This file is part of VITA
  *
@@ -103,7 +103,7 @@ namespace vita
     unsigned solutions(0);
 
     population p(_prob.env);
-    evolution evo(_prob.env,p,_prob.get_evaluator());
+    evolution evo(p,_prob.get_evaluator());
     for (unsigned i(0); i < n; ++i)
     {
       if (i)

@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/20
+ *  \date 2011/04/11
  *
  *  This file is part of VITA
  *
@@ -20,17 +20,69 @@
 namespace vita
 {
 
+  selection_strategy::selection_strategy(const evolution &evo)
+    : _evo(evo)
+  {    
+  }
+
+  tournament_selection::tournament_selection(const evolution &evo)
+    : selection_strategy(evo)
+  {    
+  }
+
   ///
-  /// \param[in] e base \ref environment.
+  /// \param[in] target index of an individual in the population.
+  /// \return index of the best individual found.
+  ///
+  /// Tournament selection works by selecting a number of individuals from the 
+  /// population at random, a tournament, and then choosing only the best 
+  /// of those individuals.
+  /// Recall that better individuals have highter fitnesses.
+  ///
+  unsigned
+  tournament_selection::tournament(unsigned target) const
+  {
+    const unsigned n(_evo.population().size());
+    const unsigned mate_zone(_evo.population().env().mate_zone);
+    const unsigned rounds(_evo.population().env().par_tournament);
+
+    unsigned sel(random::ring(target,mate_zone,n));
+    for (unsigned i(1); i < rounds; ++i)
+    {
+      const unsigned j(random::ring(target,mate_zone,n));
+
+      const fitness_t fit_j(_evo.fitness(_evo.population()[j]));
+      const fitness_t fit_sel(_evo.fitness(_evo.population()[sel]));
+
+      if (fit_j > fit_sel)
+        sel = j;
+    }
+
+    return sel;
+  }
+
+  ///
+  /// \return
+  ///
+  std::vector<unsigned> 
+  tournament_selection::run()
+  {
+    std::vector<unsigned> ret(2);
+
+    ret.push_back(tournament(_evo.population().size()));
+    ret.push_back(tournament(ret[0]));
+
+    return ret;
+  }
+
+  ///
   /// \param[in] pop the \ref population that will be evolved. 
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(environment &e, vita::population &pop, 
-		       evaluator *const eva) 
-    : _env(&e), _pop(pop), 
-      _eva(new evaluator_proxy(eva,e.ttable_size)) 
+  evolution::evolution(vita::population &pop, evaluator *const eva) 
+    : _pop(pop), _eva(new evaluator_proxy(eva,pop.env().ttable_size)) 
   {
-    assert(e.check() && eva);
+    assert(eva);
 
     _run_count = 0;
 
@@ -72,60 +124,22 @@ namespace vita
     pick_stats(&_stats.az);
   }
 
-  ///
-  /// \param[in] target index of an individual in the population.
-  /// \param[in] best are we looking for the best (or the worst) individual?
-  /// \return index of the best (worst) individual found.
-  ///
-  /// Tournament selection works by selecting a number of individuals from the 
-  /// population at random, a tournament, and then choosing only the best 
-  /// (worst) of those individuals.
-  /// Recall that better individuals have highter fitnesses.
-  ///
   unsigned
-  evolution::tournament(unsigned target, bool best) const
+  evolution::rep_tournament(unsigned target) const
   {
     const unsigned n(_pop.size());
-    const unsigned mate_zone(_env->mate_zone);
-    const unsigned rounds(best ? _env->par_tournament : _env->rep_tournament);
+    const unsigned mate_zone(_pop.env().mate_zone);
+    const unsigned rounds(_pop.env().rep_tournament);
 
     unsigned sel(random::ring(target,mate_zone,n));
     for (unsigned i(1); i < rounds; ++i)
     {
       const unsigned j(random::ring(target,mate_zone,n));
 
-      const fitness_t fit_j(_eva->run(_pop[j]));
-      const fitness_t fit_sel(_eva->run(_pop[sel]));
-      if (best)
-      {
-        if (fit_j > fit_sel)
-          sel = j;
-      }
-      else  // worst.
-      {
-        if (fit_j < fit_sel)
-	  sel = j;
-      }
-    }
-
-    return sel;
-  }
-
-  unsigned
-  evolution::rep_tournament(fitness_t f_off) const
-  {
-    const unsigned n(_pop.size());
-    const unsigned rounds(4);
-
-    unsigned sel(random::ring(0,n,n));
-    for (unsigned i(1); i < rounds; ++i)
-    {
-      const unsigned j(random::ring(0,n,n));
-
-      const fitness_t fit_j(_eva->run(_pop[j]));
-      const fitness_t fit_sel(_eva->run(_pop[sel]));
-      if (fit_j > fit_sel && fit_j < f_off)
-	sel = j;
+      const fitness_t fit_j(fitness(_pop[j]));
+      const fitness_t fit_sel(fitness(_pop[sel]));
+      if (fit_j < fit_sel)
+        sel = j;
     }
 
     return sel;
@@ -151,9 +165,9 @@ namespace vita
   {
     static unsigned last_run(0);
 
-    if (_env->stat_dynamic)
+    if (_pop.env().stat_dynamic)
     {
-      const std::string f_dynamic(_env->stat_dir + "/dynamic");
+      const std::string f_dynamic(_pop.env().stat_dir + "/dynamic");
       std::ofstream dynamic(f_dynamic.c_str(),std::ios_base::app);
       if (dynamic.good())
       {
@@ -199,14 +213,14 @@ namespace vita
   evolution::stop_condition() const
   {
     return 
-      (_env->g_since_start && _stats.gen > _env->g_since_start) ||
+      (_pop.env().g_since_start && _stats.gen > _pop.env().g_since_start) ||
 
       // We use an accelerated stop condition when all the individuals have
       // the same fitness and after gwi/2 generations the situation isn't
       // changed. 
-      ( _env->g_without_improvement && 
-        (_stats.gen-_stats.last_imp > _env->g_without_improvement ||
-	 (_stats.gen-_stats.last_imp > _env->g_without_improvement/2 &&
+      ( _pop.env().g_without_improvement && 
+        (_stats.gen-_stats.last_imp > _pop.env().g_without_improvement ||
+	 (_stats.gen-_stats.last_imp > _pop.env().g_without_improvement/2 &&
          _stats.az.fit_dist().variance <= float_epsilon)) );
   }
 
@@ -237,7 +251,7 @@ namespace vita
   /// problem at hand. 
   ///
   const summary &
-  evolution::run(bool verbose)
+  evolution::run(bool verbose, selection_strategy *const sel)
   {
     _stats.clear();
     _stats.best   = *_pop.begin();
@@ -262,12 +276,20 @@ namespace vita
 	}
 
 	// --------- SELECTION ---------
-	const unsigned r1(tournament(_pop.size(),true));
-	const unsigned r2(tournament(r1,true));
+        selection_strategy *const selection = sel 
+          ? sel 
+          : new tournament_selection(*this);         
+        
+        std::vector<unsigned> choosen(selection->run());
+        const unsigned r1(choosen[1]);
+	const unsigned r2(choosen[0]);
+
+        if (!sel)
+          delete selection;
 
 	// --------- CROSSOVER / MUTATION ---------
 	individual off;
-	if (random::boolean(_env->p_cross))
+	if (random::boolean(_pop.env().p_cross))
 	{
 	  off = _pop[r1].uniform_cross(_pop[r2]);
 	  ++_stats.crossovers;
@@ -280,7 +302,7 @@ namespace vita
 	// --------- REPLACEMENT --------
 	const fitness_t f_off(_eva->run(off));
 
-	const unsigned rep_idx(tournament(r1,false));
+	const unsigned rep_idx(rep_tournament(r1));
 	//const unsigned rep_idx(rep_tournament(f_off));
 	const fitness_t f_rep_idx(_eva->run(_pop[rep_idx]));
 	const bool replace(f_rep_idx < f_off);
@@ -342,7 +364,7 @@ namespace vita
   bool
   evolution::check() const
   {
-    return _env && _pop.check();
+    return _pop.check();
   }
 
   ///

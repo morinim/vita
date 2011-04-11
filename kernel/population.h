@@ -3,7 +3,7 @@
  *  \file population.h
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/04/11
  *
  *  This file is part of VITA
  *
@@ -40,6 +40,8 @@ namespace vita
 
     explicit population(environment &);
     void build();
+
+    const environment &env() const;
 
     bool check() const;
 
