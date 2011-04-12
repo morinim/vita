@@ -1,139 +1,139 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import argparse
 import os
 import subprocess
 import time
-from optparse import OptionParser
 
 
 verbose = False
 
 
-def plot1(pipe, opts, args):
-    print >>pipe, "set xlabel 'GENERATION'"
-    print >>pipe, "set ylabel 'FITNESS'"
+def plot1(pipe, args):
+    pipe.write(b"set xlabel 'GENERATION'\n")
+    pipe.write(b"set ylabel 'FITNESS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:6 title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2".format(
-        from_gen = "" if opts.from_gen is None else opts.from_gen,
-        to_gen = "" if opts.to_gen is None else opts.to_gen,
-        data = args[0],
-        from_run = opts.from_run,
-        to_run = opts.to_run)
-
-    if verbose:
-        print(cmd)
-    print >>pipe, cmd
-
-
-def plot2(pipe, opts, args):
-    print >>pipe, "set xlabel 'GENERATION'"
-    print >>pipe, "set ylabel 'EFFECTIVE SIZE'"
-
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:7:8 title 'Population' with yerrorbars linestyle 1".format(
-        from_gen = "" if opts.from_gen is None else opts.from_gen,
-        to_gen = "" if opts.to_gen is None else opts.to_gen,
-        data = args[0],
-        from_run = opts.from_run,
-        to_run = opts.to_run)
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:6 title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
+        from_gen = "" if args.from_gen is None else args.from_gen,
+        to_gen = "" if args.to_gen is None else args.to_gen,
+        data = args.dynfile,
+        from_run = args.from_run,
+        to_run = args.to_run)
 
     if verbose:
         print(cmd)
-    print >>pipe, cmd
+    pipe.write(str.encode(cmd))
+
+
+def plot2(pipe, args):
+    pipe.write(b"set xlabel 'GENERATION'\n")
+    pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
+
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:7:8 title 'Population' with yerrorbars linestyle 1\n".format(
+        from_gen = "" if args.from_gen is None else args.from_gen,
+        to_gen = "" if args.to_gen is None else args.to_gen,
+        data = args.dynfile,
+        from_run = args.from_run,
+        to_run = args.to_run)
+
+    if verbose:
+        print(cmd)
+    pipe.write(str.encode(cmd))
 
  
-def plot3(pipe, opts, args):
-    print >>pipe, "set xlabel 'GENERATION'"
-    print >>pipe, "set ylabel 'NR. OF SYMBOLS'"
+def plot3(pipe, args):
+    pipe.write(b"set xlabel 'GENERATION'\n")
+    pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:12 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using 2:13 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using 2:14 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using 2:15 title 'Active terminals' with lines".format(
-        from_gen = "" if opts.from_gen is None else opts.from_gen,
-        to_gen = "" if opts.to_gen is None else opts.to_gen,
-        data = args[0],
-        from_run = opts.from_run,
-        to_run = opts.to_run)
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:12 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using 2:13 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using 2:14 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using 2:15 title 'Active terminals' with lines\n".format(
+        from_gen = "" if args.from_gen is None else args.from_gen,
+        to_gen = "" if args.to_gen is None else args.to_gen,
+        data = args.dynfile,
+        from_run = args.from_run,
+        to_run = args.to_run)
 
     if verbose:
         print(cmd)
-    print >>pipe, cmd
+    pipe.write(str.encode(cmd))
 
 
-def plot4(pipe, opts, args):
+def plot4(pipe, args):
     pass
 
 
-def plot(opts, args):
-    pipe = subprocess.Popen("gnuplot -persist", shell=True, 
+def plot(args):
+    pipe = subprocess.Popen("gnuplot -persist", shell=True,
                             stdin=subprocess.PIPE).stdin
 
     loop = True
     while loop:
-        reparse_args(opts,args)
+        reparse_args(args)
 
-        if (opts.image is not None):
-            print >>pipe, "set terminal png"
-            print >>pipe, "set output '"+opts.image+"'"
+        if (args.image is not None):
+            pipe.write(b"set terminal png"+"\n")
+            pipe.write(b"set output '"+args.image+"'\n")
 
-        print >>pipe, "set grid"
-        print >>pipe, "set key bottom right"
-        print >>pipe, "set style line 1 lt 1 pt 13"
-        print >>pipe, "set style line 2 lt 1 lw 2 lc 2"
+        pipe.write(b"set grid\n")
+        pipe.write(b"set key bottom right\n")
+        pipe.write(b"set style line 1 lt 1 pt 13\n")
+        pipe.write(b"set style line 2 lt 1 lw 2 lc 2\n")
 
-        if (opts.graph is None):
+        if (args.graph is None):
             # Uncomment the following to line up the axes
-            print >>pipe, "set lmargin 11"
+            pipe.write(b"set lmargin 11\n")
             # Gnuplot recommends setting the size and origin before going to
             # multiplot mode.
             # This sets up bounding boxes and may be required on some terminals
-            print >>pipe, "set size 1,1"
-            print >>pipe, "set origin 0,0"
-            print >>pipe, "set multiplot"
+            pipe.write(b"set size 1,1\n")
+            pipe.write(b"set origin 0,0\n")
+            pipe.write(b"set multiplot\n")
 
         # Plot the first graph so that it takes a quarter of the screen
-        if (opts.graph is None):
-            print >>pipe, "set size 0.5,0.5"
-            print >>pipe, "set origin 0,0.5"
-        if (opts.graph is None or opts.graph==1):
-            plot1(pipe,opts,args)
+        if (args.graph is None):
+            pipe.write(b"set size 0.5,0.5\n")
+            pipe.write(b"set origin 0,0.5\n")
+        if (args.graph is None or args.graph==1):
+            plot1(pipe, args)
 
         # Plot the second graph so that it takes a quarter of the screen
-        if (opts.graph is None):
-            print >>pipe, "set size 0.5,0.5"
-            print >>pipe, "set origin 0,0" 
-        if (opts.graph is None or opts.graph==2):
-            plot2(pipe,opts,args) 
+        if (args.graph is None):
+            pipe.write(b"set size 0.5,0.5\n")
+            pipe.write(b"set origin 0,0\n")
+        if (args.graph is None or args.graph==2):
+            plot2(pipe, args) 
 
         # Plot the third graph so that it takes a quarter of the screen
-        if (opts.graph is None):
-            print >>pipe, "set size 0.5,0.5"
-            print >>pipe, "set origin 0.5,0.5" 
-        if (opts.graph is None or opts.graph==3):
-            plot3(pipe,opts,args) 
+        if (args.graph is None):
+            pipe.write(b"set size 0.5,0.5\n")
+            pipe.write(b"set origin 0.5,0.5\n")
+        if (args.graph is None or args.graph==3):
+            plot3(pipe, args) 
     
         # Plot the fourth graph so that it takes a quarter of the screen
-        if (opts.graph is None):
-            print >>pipe, "set size 0.5,0.5"
-            print >>pipe, "set origin 0.5,0" 
-        if (opts.graph is None or opts.graph==4):
-            plot4(pipe,opts,args) 
+        if (args.graph is None):
+            pipe.write(b"set size 0.5,0.5\n")
+            pipe.write(b"set origin 0.5,0\n")
+        if (args.graph is None or args.graph==4):
+            plot4(pipe, args) 
 
         # On some terminals, nothing gets plotted until this command is issued
-        if (opts.graph is None):
-            print >>pipe, "unset multiplot"
+        if (args.graph is None):
+            pipe.write(b"unset multiplot\n")
 
         # Remove all customizations
-        print >>pipe, "reset"
+        pipe.write(b"reset\n")
 
-        if (opts.loop is None):
+        if (args.loop is None):
             loop = False
         else:
-            time.sleep(opts.loop)
+            time.sleep(args.loop)
 
 
 def get_max_dataset(filename):
     count = 4
     while count > 0:
         try:
-            with open(filename, "rb") as file:
+            with open(filename, "r") as file:
                 return int(list(file)[-1].split(' ')[0])
         except IOError:
             time.sleep(1)
@@ -141,65 +141,58 @@ def get_max_dataset(filename):
 
 
 def get_cmd_line_options():
-    usage = "Usage: %prog [options] datafile"
-    version = "%prog 1.0"
-    parser = OptionParser(usage=usage, version=version)
+    description = "Plot a dynamic execution summary"
+    parser = argparse.ArgumentParser(description = description)
 
-    parser.add_option("-g", "--graph", dest="graph", type="int",
-                      help="Plot only one graph")
-    parser.add_option("-l", "--loop", dest="loop", type="int",
-                      help="Refresh the plot reloading data every x seconds.")
-    parser.add_option("", "--image", dest="image",
-                      help="Saves the plot to a png file")
-    parser.add_option("", "--from_gen", dest="from_gen", type="int",
-                      help="Plots statistic starting from a minimum generation")
-    parser.add_option("", "--to_gen", dest="to_gen", type="int",
-                      help="Plots statistics up to a maximum generation")
-    parser.add_option("-r", "--run", dest="run", type="int",
-                      help="Plots statistics regarding one run")
-    parser.add_option("", "--from_run", dest="from_run", default=0, type="int",
-                      help="Plots statistics starting from a minimum run")
-    parser.add_option("", "--to_run", dest="to_run", type="int",
-                      help="Plots statistics up up to a maximum run")
-    parser.add_option("-v", "--verbose", action="store_true", default=False, 
-                      dest="verbose",
-                      help="Turns on verbose mode")
+    parser.add_argument("-g", "--graph", type=int, help="Plot only graph nr. GRAPH")
+    parser.add_argument("-l", "--loop", type=int,
+                        help="Refresh the plot reloading data every LOOP seconds.")
+    parser.add_argument("--image", help="Saves the plot to IMAGE file (png format)")
+    parser.add_argument("--from_gen", type=int,
+                        help="Plot statistics starting from FROM_GEN generation")
+    parser.add_argument("--to_gen", type=int,
+                        help="Plot statistics up to a TO_GEN generation")
+    parser.add_argument("-r", "--run", type=int,
+                        help="Plot statistics regarding run RUN only")
+    parser.add_argument("--from_run", default=0, type=int,
+                        help="Plot statistics starting from FROM_RUN run (default: %(default))")
+    parser.add_argument("--to_run", type=int,
+                        help="Plot statistics up to TO_RUN run")
+    parser.add_argument("-v", "--verbose", action="store_true", default=False, 
+                        help="Turn on verbose mode")
+    parser.add_argument("dynfile")
 
     return parser
 
 
-def reparse_args(options, args):
-    max_dataset = get_max_dataset(args[0])
+def reparse_args(args):
+    max_dataset = get_max_dataset(args.dynfile)
 
-    if options.run is not None:
-        options.from_run = options.run
-        options.to_run   = options.run
+    if args.run is not None:
+        args.from_run = args.run
+        args.to_run   = args.run
 
-    if options.to_run is None or options.to_run > max_dataset:
-        options.to_run = max_dataset
-    elif options.to_run <= 0:
-        options.to_run = max_dataset + options.to_run + 1
+    if args.to_run is None or args.to_run > max_dataset:
+        args.to_run = max_dataset
+    elif args.to_run <= 0:
+        args.to_run = max_dataset + args.to_run + 1
 
-    if options.from_run < 0:
-        options.from_run = max_dataset + options.from_run + 1
+    if args.from_run < 0:
+        args.from_run = max_dataset + args.from_run + 1
 
-    if options.from_run > options.to_run:
-        options.from_run = options.to_run
+    if args.from_run > args.to_run:
+        args.from_run = args.to_run
 
 
 def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
-    (options,args) = parser.parse_args()
+    args = parser.parse_args()
 
     global verbose
-    verbose = options.verbose
+    verbose = args.verbose
    
-    # Print out usage if no arguments are present
-    if len(args) < 1:
-        parser.error("\n\tPlease specify a datafile.")
-
-    plot(options,args)
+    plot(args)
 
 
 if __name__ == "__main__":

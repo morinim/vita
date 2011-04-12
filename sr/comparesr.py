@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import argparse
 import os
-from optparse import OptionParser
 from xml.etree.ElementTree import ElementTree
 
 
@@ -75,7 +75,7 @@ def compare_file(file1, file2, html):
                                        mean_fitness, standard_deviation))
 
     results = []
-    for f, a in result.iteritems():
+    for f, a in result.items():
         results.append([f] + a)
 
     html.append(generate_html_table(["FILE", "SUCCESS RATE", "AVG. DEPTH", 
@@ -92,45 +92,44 @@ def compare_file(file1, file2, html):
     return 0
 
 
-def start_comparison(options, args):
+def start_comparison(args):
     html = []
     diff = 0
 
     print(format_string_head.format("FILE", "SUCCESS RATE", "AVG.DEPTH",
                                     "AVG.FIT.", "FIT.ST.DEV."))
 
-    if os.path.isdir(args[0]) and os.path.isdir(args[1]):
-        dir_list = os.listdir(args[0])
+    if os.path.isdir(args.filepath[0]) and os.path.isdir(args.filepath[1]):
+        dir_list = os.listdir(args.filepath[0])
         for f1 in dir_list:
             if os.path.splitext(f1)[1] == ".sum":
-                f1 = os.path.join(args[0],os.path.basename(f1))
-                f2 = os.path.join(args[1],os.path.basename(f1))
+                f1 = os.path.join(args.filepath[0],os.path.basename(f1))
+                f2 = os.path.join(args.filepath[1],os.path.basename(f1))
                 if os.path.isfile(f2):
                     diff += compare_file(f1,f2,html)
                     html += "\n<br>\n"
                     print("-"*79)
                 else:
                     print("Missing {0} file".format(f2))
-    elif os.path.isfile(args[0]) and os.path.isfile(args[1]):
-        diff = compare_file(args[0],args[1],html)
+    elif os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
+        diff = compare_file(args.filepath[0],args.filepath[1],html)
 
     print(format_string_head.format("Overall testsets comparison:", diff, 
                                     "", "", ""))
 
-    if options.html is not None:
-        with open(options.html,"w") as out:
+    if args.html is not None:
+        with open(args.html,"w") as out:
             out.write("".join(html))
 
 
 def get_cmd_line_options():
-    usage = "Usage: %prog [options] first_path second_path"
-    version = "%prog 1.0"
-    parser = OptionParser(usage=usage, version=version)
+    description = "Compare execution summaries of datasets"
+    parser = argparse.ArgumentParser(description = description)
 
-    parser.add_option("","--html", dest="html",
-                      help="Generate html report")
-    parser.add_option("-v","--verbose", action="store_true", dest="verbose",
-                      help="Turn on verbose mode")
+    parser.add_argument("--html", help="Generate a html report")
+    parser.add_argument("-v","--verbose", action="store_true",
+                        help="Turn on verbose mode")
+    parser.add_argument("filepath", nargs=2)
 
     return parser
 
@@ -138,15 +137,11 @@ def get_cmd_line_options():
 def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
-    (options,args) = parser.parse_args()
+    args = parser.parse_args()
 
-    verbose = options.verbose
+    verbose = args.verbose
 
-    # Print out usage if no arguments are present
-    if len(args) < 2:
-        parser.error("\n\tPlease specify two files.")
-
-    start_comparison(options,args)
+    start_comparison(args)
 
 
 if __name__ == "__main__":

@@ -69,8 +69,8 @@ namespace vita
   {
     std::vector<unsigned> ret(2);
 
-    ret.push_back(tournament(_evo.population().size()));
-    ret.push_back(tournament(ret[0]));
+    ret[0] = tournament(_evo.population().size());
+    ret[1] = tournament(ret[0]);
 
     return ret;
   }
@@ -281,8 +281,8 @@ namespace vita
           : new tournament_selection(*this);         
         
         std::vector<unsigned> choosen(selection->run());
-        const unsigned r1(choosen[1]);
-	const unsigned r2(choosen[0]);
+        const unsigned r1(choosen[0]);
+	const unsigned r2(choosen[1]);
 
         if (!sel)
           delete selection;

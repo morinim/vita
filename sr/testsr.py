@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import argparse
 import os
 import random
-from optparse import OptionParser
 from string import Template
 
 
@@ -74,7 +74,7 @@ def test_dataset(data_set, generations, individuals, prog_size, rounds,
 
 
 
-def start_testing(options, tests):
+def start_testing(args):
     testcases = {
         "mep":          [       "mep.dat", 100, 200, 500, 100],
         "mep_bias":     [       "mep.dat", 100, 200,  20, 100,        "mep"],
@@ -87,39 +87,32 @@ def start_testing(options, tests):
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
 
-    for k, a in testcases.iteritems():
-        if (tests == []) or (k in tests):
-            test_dataset(name = k, arl = options.arl, debug = options.debug, *a)
+    for k, a in testcases.items():
+        if (args.test == []) or (k in args.test):
+            test_dataset(name = k, arl = args.arl, debug = args.debug, *a)
 
 
 
 def get_cmd_line_options():
-    usage = "Usage: %prog [options] "
-    version = "%prog 1.0"
-    parser = OptionParser(usage=usage, version=version)
-    parser.add_option("-r","--random", action="store_false", default=True,
-                      dest="debug",
-                      help="Randomize the test")
-
-    parser.add_option("","--arl", action="store_true",  dest="arl", 
-                      default=False,
-                      help="Turn on ARL")
-
-    parser.add_option("-v","--verbose", action="store_true", dest="verbose",
-                      help="Turn on verbose mode")
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-r","--random", dest="debug", action="store_false", 
+                        default=True, help="Randomize the test")
+    parser.add_argument("--arl", action="store_true", default=False,
+                        help="Turn on ARL")
+    parser.add_argument("-v","--verbose", action="store_true", dest="verbose",
+                        help="Turn on verbose mode")
+    parser.add_argument("test", nargs="*")
     return parser
 
 
 def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
-    (options,args) = parser.parse_args()
+    args = parser.parse_args()
 
-    global verbose
-    verbose = options.verbose
+    verbose = args.verbose
 
-    start_testing(options,args)
+    start_testing(args)
 
 
 if __name__ == "__main__":
