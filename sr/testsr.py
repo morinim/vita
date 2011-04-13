@@ -57,7 +57,7 @@ def save_results(data_set, name):
               dynamic_filename: ".dyn", 
               summary_filename: ".sum"}
 
-    for f, e in files.iteritems():
+    for f, e in files.items():
         before = os.path.join(stat_dir,f)
         if os.path.exists(before):
             after = os.path.join(stat_dir, name+e)

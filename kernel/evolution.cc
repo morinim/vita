@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *
  *  \author Manlio Morini
- *  \date 2011/04/11
+ *  \date 2011/04/13
  *
  *  This file is part of VITA
  *
@@ -20,67 +20,13 @@
 namespace vita
 {
 
-  selection_strategy::selection_strategy(const evolution &evo)
-    : _evo(evo)
-  {    
-  }
-
-  tournament_selection::tournament_selection(const evolution &evo)
-    : selection_strategy(evo)
-  {    
-  }
-
-  ///
-  /// \param[in] target index of an individual in the population.
-  /// \return index of the best individual found.
-  ///
-  /// Tournament selection works by selecting a number of individuals from the 
-  /// population at random, a tournament, and then choosing only the best 
-  /// of those individuals.
-  /// Recall that better individuals have highter fitnesses.
-  ///
-  unsigned
-  tournament_selection::tournament(unsigned target) const
-  {
-    const unsigned n(_evo.population().size());
-    const unsigned mate_zone(_evo.population().env().mate_zone);
-    const unsigned rounds(_evo.population().env().par_tournament);
-
-    unsigned sel(random::ring(target,mate_zone,n));
-    for (unsigned i(1); i < rounds; ++i)
-    {
-      const unsigned j(random::ring(target,mate_zone,n));
-
-      const fitness_t fit_j(_evo.fitness(_evo.population()[j]));
-      const fitness_t fit_sel(_evo.fitness(_evo.population()[sel]));
-
-      if (fit_j > fit_sel)
-        sel = j;
-    }
-
-    return sel;
-  }
-
-  ///
-  /// \return
-  ///
-  std::vector<unsigned> 
-  tournament_selection::run()
-  {
-    std::vector<unsigned> ret(2);
-
-    ret[0] = tournament(_evo.population().size());
-    ret[1] = tournament(ret[0]);
-
-    return ret;
-  }
-
   ///
   /// \param[in] pop the \ref population that will be evolved. 
   /// \param[in] eva evaluator used during the evolution.
   ///
   evolution::evolution(vita::population &pop, evaluator *const eva) 
-    : _pop(pop), _eva(new evaluator_proxy(eva,pop.env().ttable_size)) 
+    : selection(this), _pop(pop), 
+      _eva(new evaluator_proxy(eva,pop.env().ttable_size)) 
   {
     assert(eva);
 
@@ -236,6 +182,7 @@ namespace vita
 
   ///
   /// \param[in] verbose if true prints verbose informations.
+  /// \param[in] selection index of the active selection strategy.
   ///
   /// the genetic programming loop. We begin the loop by choosing a
   /// genetic operation: reproduction, mutation or crossover. We then select 
@@ -251,7 +198,7 @@ namespace vita
   /// problem at hand. 
   ///
   const summary &
-  evolution::run(bool verbose, selection_strategy *const sel)
+  evolution::run(bool verbose, unsigned sel_id)
   {
     _stats.clear();
     _stats.best   = *_pop.begin();
@@ -276,16 +223,9 @@ namespace vita
 	}
 
 	// --------- SELECTION ---------
-        selection_strategy *const selection = sel 
-          ? sel 
-          : new tournament_selection(*this);         
-        
-        std::vector<unsigned> choosen(selection->run());
+        std::vector<unsigned> choosen(selection.get(sel_id)->run());
         const unsigned r1(choosen[0]);
 	const unsigned r2(choosen[1]);
-
-        if (!sel)
-          delete selection;
 
 	// --------- CROSSOVER / MUTATION ---------
 	individual off;

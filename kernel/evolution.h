@@ -3,7 +3,7 @@
  *  \file evolution.h
  *
  *  \author Manlio Morini
- *  \date 2011/04/11
+ *  \date 2011/04/13
  *
  *  This file is part of VITA
  *
@@ -15,6 +15,7 @@
 #include "vita.h"
 #include "analyzer.h"
 #include "evaluator_proxy.h"
+#include "evolution_selection.h"
 #include "population.h"
 
 namespace vita
@@ -45,40 +46,13 @@ namespace vita
     fitness_t f_best;
   };
 
-  ///
-  /// The selection strategy for the \a evolution class. In a strategy design
-  /// pattern, this \c class is the strategy and \a evolution is the context.
-  ///
-  class selection_strategy
-  {
-  public:
-    explicit selection_strategy(const evolution &evo);
-
-    virtual std::vector<unsigned> run() = 0;
-
-  protected:
-    const evolution &_evo;
-  };
-
-  class tournament_selection : public selection_strategy
-  {
-  public:
-    explicit tournament_selection(const evolution &evo);
-
-    virtual std::vector<unsigned> run();
-
-  protected:
-    unsigned tournament(unsigned) const;
-  };
-
-
   class evolution
   {
   public:
     evolution(vita::population &, evaluator *const);
     ~evolution();
 
-    const summary &run(bool, selection_strategy *const = 0);
+    const summary &run(bool, unsigned = 0);
 
     const vita::population &population() const;
     fitness_t fitness(const individual &) const;
@@ -86,6 +60,8 @@ namespace vita
     void pick_stats(analyzer *const);
 
     bool check() const;
+
+    selection_factory selection;
 
   private:
     void log() const;
