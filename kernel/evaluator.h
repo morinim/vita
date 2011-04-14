@@ -23,7 +23,8 @@ namespace vita
 
   ///
   /// \a evaluator \c class calculates the fitness of an individual (how good
-  /// he is). It's an abstract \c class because the fitness is domain dependent 
+  /// he is). It maps an \a individual (its genome) to a \a fitness_t value.
+  /// This is an abstract \c class because the fitness is domain dependent 
   /// (symbolic regression, data classification, automation...).
   /// Note: this \c class shouldn't be confused with the \a interpreter 
   /// \c class (that calculates the output of an individual given an input 

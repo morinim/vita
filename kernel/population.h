@@ -21,6 +21,11 @@ namespace vita
 
   class environment;
 
+  ///
+  /// A group of individual which may interact together (for example by mating)
+  /// producing offspring. Typical population size in GP range from ten to
+  /// many thousands.
+  ///
   class population
   {
   public:

@@ -26,6 +26,11 @@ namespace vita
 
   class environment;
 
+  ///
+  /// A single member of a \a population. Each individual contains a genome 
+  /// which represents a possible solution to the task being tackled (i.e. a
+  /// point in the search space).
+  ///
   class individual
   {
   public:
@@ -86,6 +91,7 @@ namespace vita
 
     const environment *_env;
 
+    /// This is the genome: the entire collection of genes.
     std::vector<gene> _code;
 
   public:

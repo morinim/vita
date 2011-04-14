@@ -18,6 +18,11 @@
 namespace vita
 {
 
+  ///
+  /// A terminal (leaf) node in the parse trees representing the programs in the
+  /// population. A termina might be a variable, a constant value or a function
+  /// taking no arguments (e.g. move-north).
+  ///
   class terminal : public symbol
   {
   public:

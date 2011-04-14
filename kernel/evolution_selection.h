@@ -19,13 +19,12 @@
 namespace vita
 {
 
-  class environment;
   class evolution;
   
   ///
-  /// The selection strategy for the \a evolution \c class. In the strategy 
-  /// design pattern, this \c class is the strategy interface and \a evolution
-  /// is the context.
+  /// The selection strategy (tournament, fitness proportional...) for the
+  /// \a evolution \c class. In the strategy design pattern, this \c class is
+  /// the strategy interface and \a evolution is the context.
   ///
   class selection_strategy
   {
@@ -39,7 +38,7 @@ namespace vita
   };
 
   ///
-  /// selection_factory \c class create a new strategy for the \a evolution
+  /// selection_factory \c class creates a new strategy for the \a evolution
   /// \c class (the context).
   ///
   class selection_factory

@@ -23,6 +23,9 @@ namespace vita
   class evolution;
   class summary;
 
+  ///
+  /// This \c class drives the evolution.
+  ///
   class search
   {
   public:

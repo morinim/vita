@@ -25,7 +25,7 @@ namespace vita
   /// \param[in] eva evaluator used during the evolution.
   ///
   evolution::evolution(vita::population &pop, evaluator *const eva) 
-    : selection(this), _pop(pop), 
+    : selection(this), operation(this), replacement(this), _pop(pop), 
       _eva(new evaluator_proxy(eva,pop.env().ttable_size)) 
   {
     assert(eva);
@@ -42,9 +42,9 @@ namespace vita
   }
 
   ///
-  /// \return read-only access to the population being evolved.
+  /// \return access to the population being evolved.
   ///
-  const vita::population &
+  vita::population &
   evolution::population() const
   {
     return _pop;
@@ -68,27 +68,6 @@ namespace vita
   evolution::pick_stats()
   {
     pick_stats(&_stats.az);
-  }
-
-  unsigned
-  evolution::rep_tournament(unsigned target) const
-  {
-    const unsigned n(_pop.size());
-    const unsigned mate_zone(_pop.env().mate_zone);
-    const unsigned rounds(_pop.env().rep_tournament);
-
-    unsigned sel(random::ring(target,mate_zone,n));
-    for (unsigned i(1); i < rounds; ++i)
-    {
-      const unsigned j(random::ring(target,mate_zone,n));
-
-      const fitness_t fit_j(fitness(_pop[j]));
-      const fitness_t fit_sel(fitness(_pop[sel]));
-      if (fit_j < fit_sel)
-        sel = j;
-    }
-
-    return sel;
   }
 
   ///
@@ -182,7 +161,9 @@ namespace vita
 
   ///
   /// \param[in] verbose if true prints verbose informations.
-  /// \param[in] selection index of the active selection strategy.
+  /// \param[in] sel_id index of the active selection strategy.
+  /// \param[in] op_id index of the active operation strategy.
+  /// \param[in] rep_id index of the active replacement strategy.
   ///
   /// the genetic programming loop. We begin the loop by choosing a
   /// genetic operation: reproduction, mutation or crossover. We then select 
@@ -198,7 +179,7 @@ namespace vita
   /// problem at hand. 
   ///
   const summary &
-  evolution::run(bool verbose, unsigned sel_id)
+  evolution::run(bool verbose, unsigned sel_id, unsigned op_id, unsigned rep_id)
   {
     _stats.clear();
     _stats.best   = *_pop.begin();
@@ -223,45 +204,20 @@ namespace vita
 	}
 
 	// --------- SELECTION ---------
-        std::vector<unsigned> choosen(selection.get(sel_id)->run());
-        const unsigned r1(choosen[0]);
-	const unsigned r2(choosen[1]);
+        std::vector<unsigned> parents(selection.get(sel_id)->run());
 
 	// --------- CROSSOVER / MUTATION ---------
-	individual off;
-	if (random::boolean(_pop.env().p_cross))
-	{
-	  off = _pop[r1].uniform_cross(_pop[r2]);
-	  ++_stats.crossovers;
-	}
-	else
-	  off = random::boolean() ? _pop[r1] : _pop[r2];
-
-	_stats.mutations += off.mutation();
+        std::vector<individual> off(operation.get(op_id)->run(parents,&_stats));
 
 	// --------- REPLACEMENT --------
-	const fitness_t f_off(_eva->run(off));
+        const fitness_t before(_stats.f_best);
+        replacement.get(rep_id)->run(parents,off,&_stats);
 
-	const unsigned rep_idx(rep_tournament(r1));
-	//const unsigned rep_idx(rep_tournament(f_off));
-	const fitness_t f_rep_idx(_eva->run(_pop[rep_idx]));
-	const bool replace(f_rep_idx < f_off);
-
-	if (replace)
-	  _pop[rep_idx] = off;
-
-	if (f_off - _stats.f_best > float_epsilon)
-        {
-	  _stats.last_imp = _stats.gen;
-	  _stats.best = off;
-	  _stats.f_best = f_off;
-
-	  if (verbose)
-	    std::cout << "Run " << _run_count << '.' << std::setw(6) 
-		      << _stats.gen << " (" << std::setw(3) 
-		      << 100*k/_pop.size() << "%): fitness " << f_off 
-		      << std::endl;
-        }
+        if (verbose && _stats.f_best != before)
+          std::cout << "Run " << _run_count << '.' << std::setw(6) 
+                    << _stats.gen << " (" << std::setw(3) 
+                    << 100*k/_pop.size() << "%): fitness " << _stats.f_best 
+                    << std::endl;
       }
 
       _stats.ttable_probes = _eva->probes();

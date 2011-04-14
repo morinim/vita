@@ -16,6 +16,10 @@
 namespace vita
 {
 
+  ///
+  /// A value assigned to an individual which reflects how well the individual
+  /// solves the task.
+  ///
   typedef double fitness_t;
 
   inline double distance(fitness_t f1, fitness_t f2) {return std::fabs(f1-f2);}

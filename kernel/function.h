@@ -21,6 +21,11 @@
 namespace vita
 {
 
+  ///
+  /// An operator used in GP. A \a function label the internal (non-leaf) points
+  /// of the parse trees that represent the programs in the \a population. An
+  /// example function set might be {+,-,*}.
+  ///
   class function : public symbol
   {
   public:

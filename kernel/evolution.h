@@ -15,6 +15,8 @@
 #include "vita.h"
 #include "analyzer.h"
 #include "evaluator_proxy.h"
+#include "evolution_operation.h"
+#include "evolution_replacement.h"
 #include "evolution_selection.h"
 #include "population.h"
 
@@ -52,23 +54,24 @@ namespace vita
     evolution(vita::population &, evaluator *const);
     ~evolution();
 
-    const summary &run(bool, unsigned = 0);
+    const summary &run(bool, unsigned = 0, unsigned = 0, unsigned = 0);
 
-    const vita::population &population() const;
+    vita::population &population() const;
     fitness_t fitness(const individual &) const;
 
     void pick_stats(analyzer *const);
 
     bool check() const;
 
-    selection_factory selection;
+    selection_factory     selection;
+    operation_factory     operation;
+    replacement_factory replacement;
 
   private:
     void log() const;
     void pick_stats();
 
     bool stop_condition() const;
-    unsigned rep_tournament(unsigned) const;
 
     vita::population       &_pop;
     evaluator_proxy *const  _eva;
