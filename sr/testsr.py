@@ -80,7 +80,7 @@ def start_testing(args):
         "mep_bias":     [       "mep.dat", 100, 200,  20, 100,        "mep"],
         "petalrose":    [ "petalrose.dat", 100, 500, 200,  80, "arithmetic"],
         "petalrose3":   ["petalrose3.dat", 100, 500, 200,  80, "arithmetic"],
-        "petalrose2":   ["petalrose3.dat", 100, 500, 200,  80, "arithmetic"],
+        "petalrose2":   ["petalrose2.dat", 100, 500, 200,  80, "arithmetic"],
         "x2y2_z2":      [   "x2y2_z2.dat", 100, 200, 500,  80,       "math"],
         "x2y2_z2_bias": [   "x2y2_z2.dat", 100, 200, 100,  80, "arithmetic"]
     }
