@@ -3,7 +3,7 @@
  *  \file evolution_replacement.cc
  *
  *  \author Manlio Morini
- *  \date 2011/04/14
+ *  \date 2011/04/15
  *
  *  This file is part of VITA
  *
@@ -20,10 +20,10 @@ namespace vita
   {    
   }
 
-  class tournament_elitist_rp : public replacement_strategy
+  class tournament_rp : public replacement_strategy
   {
   public:
-    explicit tournament_elitist_rp(evolution *const);
+    explicit tournament_rp(evolution *const);
 
     virtual void run(const std::vector<unsigned> &,
                      const std::vector<individual> &,
@@ -33,13 +33,13 @@ namespace vita
     unsigned tournament(unsigned) const;
   };
 
-  tournament_elitist_rp::tournament_elitist_rp(evolution *const evo)
+  tournament_rp::tournament_rp(evolution *const evo)
     : replacement_strategy(evo)
   {    
   }
 
   unsigned
-  tournament_elitist_rp::tournament(unsigned target) const
+  tournament_rp::tournament(unsigned target) const
   {
     const population &pop = _evo->population();
 
@@ -62,10 +62,21 @@ namespace vita
   }
 
   ///
+  /// \param[in] parent indexes of the parents (in the population).
+  /// \param[in] offspring vector of the "children".
+  /// \param[in] s statistical summary.
+  ///
+  /// Parameters from the environment:
+  /// <ul>
+  /// <li>
+  ///   if elitism is true, child replaces a member of the population only if 
+  ///   child is better.
+  /// </li>
+  /// </ul>
   void
-  tournament_elitist_rp::run(const std::vector<unsigned> &parent,
-                             const std::vector<individual> &offspring,
-                             summary *const s)
+  tournament_rp::run(const std::vector<unsigned> &parent,
+                     const std::vector<individual> &offspring,
+                     summary *const s)
   {
     population &pop = _evo->population();
 
@@ -75,7 +86,7 @@ namespace vita
     const fitness_t f_rep_idx(_evo->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < f_off);
 
-    if (replace)
+    if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
     if (f_off - s->f_best > float_epsilon)
@@ -88,12 +99,12 @@ namespace vita
 
   replacement_factory::replacement_factory(evolution *const evo)
   {
-    put(new tournament_elitist_rp(evo));
+    put(new tournament_rp(evo));
   }
 
   replacement_factory::~replacement_factory()
   {
-    delete _strategy[tournament_elitist];
+    delete _strategy[tournament];
   }
 
   replacement_strategy *

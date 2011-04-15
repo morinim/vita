@@ -3,7 +3,7 @@
  *  \file environment.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/19
+ *  \date 2011/04/15
  *
  *  This file is part of VITA
  *
@@ -26,6 +26,7 @@ namespace vita
   ///
   environment::environment()
     : code_length(100),
+      elitism(true),
       p_mutation(2.0/code_length),
       p_cross(0.7),
       individuals(100),
@@ -56,6 +57,7 @@ namespace vita
     const std::string env(path+"environment.");
     pt.put(env+"population_size",individuals);
     pt.put(env+"max_program_length",code_length);
+    pt.put(env+"elitism",elitism);
     pt.put(env+"mutation_rate",p_mutation);
     pt.put(env+"crossover_rate",p_cross);
     pt.put(env+"parent_tournament_size",par_tournament);

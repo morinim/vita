@@ -48,7 +48,7 @@ namespace vita
   class replacement_factory
   {
   public:
-    enum replacement {tournament_elitist=0};
+    enum replacement {tournament=0};
 
     replacement_factory(evolution *const);
     ~replacement_factory();

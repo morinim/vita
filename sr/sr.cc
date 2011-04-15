@@ -3,7 +3,7 @@
  *  \file sr.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/19
+ *  \date 2011/04/15
  *
  *  This file is part of VITA
  *
@@ -23,7 +23,7 @@ namespace po = boost::program_options;
 #include "search.h"
 #include "src_problem.h"
 
-const std::string vita_sr_version("Vita v1.02 - Symbolic Regression and classification\nCopyright EOS Development (http://www.eosdev.it)");
+const std::string vita_sr_version("Vita v1.03 - Symbolic Regression and classification\nCopyright EOS Development (http://www.eosdev.it)");
 
 bool verbose(false);
 
@@ -96,6 +96,9 @@ bool parse_command_line(int argc, char *argv[])
       ("program-size,p",
        po::value(&problem.env.code_length),
        "Sets the maximum length of an evolved program in the population.")
+      ("elitism",
+       po::bool_switch(&problem.env.elitism),
+       "When elitism is true a new individual will never replace a better individual of the population.")
       ("mutation-rate,m",
        po::value(&problem.env.p_mutation),
        "Sets the overall probability of mutation of the individuals that have been selected as winners in a tournament. Range is [0,1].")

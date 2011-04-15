@@ -13,7 +13,8 @@ def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:6 title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
+    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:6 title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
@@ -62,7 +63,7 @@ def plot4(pipe, args):
 
 
 def plot(args):
-    pipe = subprocess.Popen("gnuplot -persist", shell=True,
+    pipe = subprocess.Popen("gnuplot -persist", shell=True, bufsize=0,
                             stdin=subprocess.PIPE).stdin
 
     loop = True
@@ -127,6 +128,7 @@ def plot(args):
             loop = False
         else:
             time.sleep(args.loop)
+            pipe.flush()
 
 
 def get_max_dataset(filename):

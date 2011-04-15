@@ -3,7 +3,7 @@
  *  \file environment.h
  *
  *  \author Manlio Morini
- *  \date 2011/03/19
+ *  \date 2011/04/15
  *
  *  This file is part of VITA
  *
@@ -34,6 +34,11 @@ namespace vita
     /// The number of genes (maximum length of an evolved program in the 
     /// population).
     unsigned code_length;
+
+    /// An elitist algorithm is one that ALWAYS retains in the population the
+    /// best individual found so far. With higher elitism the population will
+    /// converge quicker but losing diversity. 
+    bool elitism;
 
     /// Mutation probability. Mutation is one of the principal "search 
     /// operators" used to transform programs in the Genetic Programming
