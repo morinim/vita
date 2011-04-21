@@ -13,8 +13,10 @@ def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
 
-    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:6 title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with lines linestyle 2\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using 2:(-2*$3+$4 > 0 ? $4 : NaN):($3+$5 < 0 ? $5 : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
+    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using 2:(-2*$3+$4 > 0 ? $4 : 1/0):($3+$5 < 0 ? $5 : 1/0) title 'Population' with yerrorbars linestyle 1\n".format(
+    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:($5/10 + $4 > 0 ? 1/0 : $5) title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2\n".format(
+    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
@@ -28,9 +30,9 @@ def plot1(pipe, args):
 
 def plot2(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
-    pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
+    pipe.write(b"set ylabel 'ENTROPY'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:7:8 title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:6 title 'Entropy' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
@@ -44,9 +46,9 @@ def plot2(pipe, args):
  
 def plot3(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
-    pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
+    pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:12 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using 2:13 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using 2:14 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using 2:15 title 'Active terminals' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:8:9 title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
@@ -59,7 +61,19 @@ def plot3(pipe, args):
 
 
 def plot4(pipe, args):
-    pass
+    pipe.write(b"set xlabel 'GENERATION'\n")
+    pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
+
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:13 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using 2:14 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using 2:15 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using 2:16 title 'Active terminals' with lines\n".format(
+        from_gen = "" if args.from_gen is None else args.from_gen,
+        to_gen = "" if args.to_gen is None else args.to_gen,
+        data = args.dynfile,
+        from_run = args.from_run,
+        to_run = args.to_run)
+
+    if verbose:
+        print(cmd)
+    pipe.write(str.encode(cmd))
 
 
 def plot(args):
@@ -76,6 +90,7 @@ def plot(args):
 
         pipe.write(b"set grid\n")
         pipe.write(b"set key bottom right\n")
+        # pipe.write(b"set autoscale fix\n")
         pipe.write(b"set style line 1 lt 1 pt 13\n")
         pipe.write(b"set style line 2 lt 1 lw 2 lc 2\n")
 

@@ -97,8 +97,8 @@ bool parse_command_line(int argc, char *argv[])
        po::value(&problem.env.code_length),
        "Sets the maximum length of an evolved program in the population.")
       ("elitism",
-       po::bool_switch(&problem.env.elitism),
-       "When elitism is true a new individual will never replace a better individual of the population.")
+       po::value<bool>(&problem.env.elitism)->default_value(true),
+       "When elitism is true an individual will never replace a better one.")
       ("mutation-rate,m",
        po::value(&problem.env.p_mutation),
        "Sets the overall probability of mutation of the individuals that have been selected as winners in a tournament. Range is [0,1].")

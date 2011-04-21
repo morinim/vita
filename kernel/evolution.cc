@@ -102,14 +102,18 @@ namespace vita
           last_run = _run_count;
         }
         
-        dynamic << _run_count << ' ' << _stats.gen
-                << ' ' << _stats.f_best << ' ' << _stats.az.fit_dist().mean 
-                << ' ' << _stats.az.fit_dist().min
+        dynamic << _run_count 
+                << ' ' << _stats.gen
+                << ' ' << _stats.f_best 
+                << ' ' << _stats.az.fit_dist().mean 
                 << ' ' << _stats.az.fit_dist().standard_deviation()
+                << ' ' << _stats.az.fit_dist().entropy()
+                << ' ' << _stats.az.fit_dist().min
                 << ' ' << unsigned(_stats.az.length_dist().mean) 
                 << ' ' << _stats.az.length_dist().standard_deviation()
                 << ' ' << unsigned(_stats.az.length_dist().max)
-                << ' ' << _stats.mutations << ' ' << _stats.crossovers
+                << ' ' << _stats.mutations 
+                << ' ' << _stats.crossovers
                 << ' ' << _stats.az.functions(0) 
                 << ' ' << _stats.az.terminals(0)
                 << ' ' << _stats.az.functions(1) 

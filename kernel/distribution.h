@@ -12,6 +12,9 @@
 #if !defined(DISTRIBUTION_H)
 #define      DISTRIBUTION_H
 
+#include <cmath>
+#include <map>
+
 #include "vita.h"
 #include "fitness.h"
 
@@ -29,6 +32,7 @@ namespace vita
     void add(T);
 
     T standard_deviation() const;
+    double entropy() const;
 
     bool check() const;
 
@@ -40,6 +44,10 @@ namespace vita
     T      max;
     
   private:
+    void update_variance(T);
+
+    std::map<T, unsigned> freq;
+
     T delta;
     T    m2;
   };
@@ -61,6 +69,8 @@ namespace vita
     count = 0;
 
     delta = m2 = mean = variance = min = max = 0.0;
+
+    freq.clear();
   }
 
   ///
@@ -80,8 +90,43 @@ namespace vita
       max = val;
 
     ++count;
-    
-    // Calculate running variance and cumulative average fitness.
+    ++freq[val];
+
+    update_variance(val);
+  }    
+
+  ///
+  /// \return the entropy of the distribution.
+  ///
+  /// \fH(X)=-\sum_{i=1}^n p(x_i) \dot log_b(p(x_i))
+  ///
+  template<class T>
+  double
+  distribution<T>::entropy() const
+  {
+    const double c(1.0/std::log(2.0));
+
+    double h(0.0);
+    for (typename std::map<T, unsigned>::const_iterator j(freq.begin());
+         j != freq.end();
+         ++j)
+    {
+      const double p(double(j->second) / count);
+      h -= p * std::log(p) * c;
+    }
+
+    return h;
+  }
+
+  ///
+  /// \param[in] val new fitness upon which statistics are recalculated.
+  ///
+  /// Calculate running variance and cumulative average fitness.
+  ///
+  template<class T>
+  void
+  distribution<T>::update_variance(T val)
+  {   
     delta = val - mean;
 	
     mean = (mean/count)*(count-1) + val/count;

@@ -24,13 +24,13 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
         random.seed()
         rnd = "--random-seed "+str(random.randint(0,1000000000))
         rounds *= 2
-        generations = (generations*3)/2
+        generations = (generations*3)//2
 
     if arl:
-        rounds /= 2
-        generations /= 2
+        rounds //= 2
+        generations //= 2
 
-    cmd = Template("sr --verbose --stat-dir $sd --stat-dynamic "\
+    cmd = Template("sr --verbose --elitism 1 --stat-dir $sd --stat-dynamic "\
                    "--stat-summary --ttable $tt -g $gen -P $nind "\
                    "-p $ps -r $rs $rnd_switch $arl_switch $ss $ds")
     s = cmd.substitute(sd = stat_dir,
@@ -51,7 +51,6 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
     return os.system(s) == 0
 
 
-
 def save_results(data_set, name):
     files = { arl_filename: ".arl",
               dynamic_filename: ".dyn", 
@@ -64,14 +63,12 @@ def save_results(data_set, name):
             os.rename(before, after)
 
 
-
 def test_dataset(data_set, generations, individuals, prog_size, rounds, 
                  symbol_set = "", name = "", arl = False, debug = True):
     print("Testing "+name+" (arl: "+str(arl)+", debug: "+str(debug)+")")
     sr(data_set, generations, individuals, prog_size, rounds, symbol_set, arl,
        debug)
     save_results(data_set, name)
-
 
 
 def start_testing(args):
