@@ -3,7 +3,7 @@
  *  \file distribution.h
  *
  *  \author Manlio Morini
- *  \date 2010/06/10
+ *  \date 2011/04/20
  *
  *  This file is part of VITA
  *
@@ -121,15 +121,17 @@ namespace vita
   ///
   /// \param[in] val new fitness upon which statistics are recalculated.
   ///
-  /// Calculate running variance and cumulative average fitness.
+  /// Calculate running variance and cumulative average fitness. The
+  /// algorithm used is due to Knuth (Donald E. Knuth - The Art of Computer
+  /// Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232. 
+  /// Addison-Wesley)
   ///
   template<class T>
   void
   distribution<T>::update_variance(T val)
   {   
     delta = val - mean;
-	
-    mean = (mean/count)*(count-1) + val/count;
+    mean += delta/count;
       
     // This expression uses the new value of mean.
     m2 += delta * (val-mean);
