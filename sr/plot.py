@@ -14,9 +14,6 @@ def plot1(pipe, args):
     pipe.write(b"set ylabel 'FITNESS'\n")
 
     cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using 2:(-2*$3+$4 > 0 ? $4 : NaN):($3+$5 < 0 ? $5 : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
-    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using 2:(-2*$3+$4 > 0 ? $4 : 1/0):($3+$5 < 0 ? $5 : 1/0) title 'Population' with yerrorbars linestyle 1\n".format(
-    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:4:($5/10 + $4 > 0 ? 1/0 : $5) title 'Population' with yerrorbars linestyle 1, '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2\n".format(
-    #cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
@@ -161,7 +158,8 @@ def get_cmd_line_options():
     description = "Plot a dynamic execution summary"
     parser = argparse.ArgumentParser(description = description)
 
-    parser.add_argument("-g", "--graph", type=int, help="Plot only graph nr. GRAPH")
+    parser.add_argument("-g", "--graph", type=int, choices=range(1,5),
+                        help="Plot only graph nr. GRAPH")
     parser.add_argument("-l", "--loop", type=int,
                         help="Refresh the plot reloading data every LOOP seconds.")
     parser.add_argument("--image", help="Saves the plot to IMAGE file (png format)")
@@ -208,6 +206,9 @@ def main():
 
     global verbose
     verbose = args.verbose
+
+    if os.path.isdir(args.dynfile):
+        args.dynfile = os.path.join(args.dynfile,"dynamic")
    
     plot(args)
 
