@@ -76,6 +76,7 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 
 def start_testing(args):
     testcases = {
+        "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80, "arithmetic"],
         "mep":        [       "mep.dat", 100, 200, 500, 100],
         "mepbias":    [       "mep.dat", 100, 200,  20, 100,        "mep"],
         "petalrose":  [ "petalrose.dat", 100, 500, 200,  80, "arithmetic"],
