@@ -77,10 +77,13 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * init
-   * \return
-   */
+  ///
+  /// \return 0.
+  ///
+  /// This function is used to initialize the symbol's internal parameter.
+  /// Derived classes should redefine the init member function in a
+  /// meaningful way.
+  ///
   inline
   int
   symbol::init() const

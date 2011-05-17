@@ -3,7 +3,7 @@
  *  \file gene.cc
  *
  *  \author Manlio Morini
- *  \date 2009/12/31
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -17,10 +17,9 @@
 namespace vita
 {
 
-  /**
-   * gene
-   * \param sset[in]
-   */
+  ///
+  /// \param[in] sset the set of symbols to choose from.
+  ///
   gene::gene(const symbol_set &sset)
   {
     sym = sset.roulette(true);
@@ -29,12 +28,11 @@ namespace vita
       par = sym->init();
   }
 
-  /**
-   * gene
-   * \param sset[in]
-   * \param from[in]
-   * \param sup[in]
-   */
+  ///
+  /// \param[in] sset the set of symbols to choose from.
+  /// \param[in] from minimum index for function arguments.
+  /// \param[in] sup upper bound for the indexes of function arguments.
+  ///
   gene::gene(const symbol_set &sset, unsigned from, unsigned sup)
   {
     sym = sset.roulette(from==sup);
@@ -49,10 +47,21 @@ namespace vita
     }
   }
 
-  /**
-   * operator==
-   * \param g
-   */
+  ///
+  /// \param[in] sset the set of symbols to choose from.
+  /// \param[in] var index of a variable in the symbol_set.
+  ///
+  gene::gene(const symbol_set &sset, unsigned var)
+  {
+    sym = sset.variable(var);
+    if (sym->parametric())
+      par = sym->init();
+  }
+
+  ///
+  /// \param[in] g
+  /// \return true if \c this == \a g
+  ///
   bool
   gene::operator==(const gene &g) const
   { 

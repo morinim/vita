@@ -22,7 +22,7 @@
 class X : public vita::terminal
 {
 public:
-  X() : vita::terminal("X",vita::sym_real) {};
+  X() : vita::terminal("X",vita::sym_real,true) {};
   
   boost::any eval(vita::interpreter &) const { return val; };
 
@@ -32,7 +32,7 @@ public:
 class Y : public vita::terminal
 {
 public:
-  Y() : vita::terminal("Y",vita::sym_real) {};
+  Y() : vita::terminal("Y",vita::sym_real,true) {};
   
   boost::any eval(vita::interpreter &) const { return val; };
 
@@ -42,7 +42,7 @@ public:
 class Z : public vita::terminal
 {
 public:
-  Z() : vita::terminal("Z",vita::sym_real) {};
+  Z() : vita::terminal("Z",vita::sym_real,true) {};
   
   boost::any eval(vita::interpreter &) const { return val; };
 
@@ -102,7 +102,8 @@ int main(int argc, char *argv[])
   std::auto_ptr<vita::evaluator> eva(new fitness());
 
   vita::population p(env);
-  vita::evolution(env,p,eva.get()).run(true);
+  std::cout << p;
+  vita::evolution(p,eva.get()).run(true);
 
   env.sset.delete_symbols();
 

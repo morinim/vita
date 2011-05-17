@@ -11,9 +11,8 @@
  *  \mainpage VITA v0.9.0
  *
  *  \section note_sec Notes
- *  New versions of this program will be available at http://www.vita.cc
- *
- *  Please reports any sugestions and/or bugs to info@vita.cc
+ *  New versions of this program will be available at http://www.vita.cc .
+ *  Please reports any suggestions and/or bugs to info@vita.cc .
  *
  */
   

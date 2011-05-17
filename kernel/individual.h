@@ -3,7 +3,7 @@
  *  \file individual.h
  *
  *  \author Manlio Morini
- *  \date 2011/03/14
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -194,8 +194,8 @@ namespace vita
 
   ///
   /// \param[in] locus location of the individual.
-  /// \return an individual obtained from \c this choosing the best gene
-  ///         sequence.
+  /// \return an individual obtained from \c this choosing the gene
+  ///         sequence starting at \a locus.
   ///
   inline
   individual

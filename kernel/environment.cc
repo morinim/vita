@@ -3,7 +3,7 @@
  *  \file environment.cc
  *
  *  \author Manlio Morini
- *  \date 2011/04/15
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -35,6 +35,7 @@ namespace vita
       mate_zone(9),
       g_since_start(100), g_without_improvement(0),
       arl(true),
+      input(true),
       ttable_size(16),
       stat_dir(""), 
       stat_arl(false), stat_dynamic(false), stat_summary(false)
@@ -66,6 +67,7 @@ namespace vita
     pt.put(env+"max_gens_since_start",g_since_start);
     pt.put(env+"max_gens_wo_imp",g_without_improvement);
     pt.put(env+"arl",arl);
+    pt.put(env+"input",input);
     pt.put(env+"ttable_bits",ttable_size); // size 1u << ttable_size.
     pt.put(env+"statistics.directory",stat_dir);
     pt.put(env+"statistics.save_arl",stat_arl);

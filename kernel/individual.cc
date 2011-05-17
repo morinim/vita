@@ -24,8 +24,6 @@ namespace vita
   /// \param[in] gen if true generates a random sequence of genes to initialize
   ///                the individual.
   ///
-  /// 
-  ///
   individual::individual(const environment &e, bool gen)
     : _best(0), _env(&e), _code(e.code_length)
   {
@@ -34,8 +32,16 @@ namespace vita
     // **** Random generate initial code. ****
     if (gen)
     {
-      for (unsigned i(0); i < e.code_length; ++i)
+      const unsigned variables(e.sset.variables());
+      const bool input(e.input && variables < e.code_length);
+
+      const unsigned sup(input ? e.code_length-variables : e.code_length);
+      for (unsigned i(0); i < sup; ++i)
         _code[i] = gene(e.sset,i+1,e.code_length);
+
+      if (input)
+        for (unsigned i(0); i < variables; ++i)
+          _code[sup+i] = gene(e.sset,i);
 
       assert(check());
     }
@@ -52,7 +58,6 @@ namespace vita
   individual
   individual::compact(unsigned *last_symbol) const
   {
-    assert(size() == _env->code_length);
     individual dest(*this);
 
     unsigned new_line(0), old_line(_best);
@@ -198,7 +203,6 @@ namespace vita
   {
     unsigned index(size());
 
-    assert(size() == _env->code_length);
     individual dest(*_env,false);
     
     const unsigned ret(normalize(*this,0,index,dest));
@@ -318,7 +322,6 @@ namespace vita
 
     const unsigned cs(size());
 
-    assert(_env->code_length == cs);
     assert(parent.size() == cs);
 
     individual offspring(*_env,false);
@@ -346,7 +349,6 @@ namespace vita
     const individual *parents[2] = {this, &parent};
     const bool base(random::boolean());
 
-    assert(size() == _env->code_length);
     individual offspring(*_env,false);
 
     for (unsigned i(0); i < cut; ++i)
@@ -375,7 +377,6 @@ namespace vita
     const individual *parents[2] = {this, &parent};
     const bool base(random::boolean());
 
-    assert(size() == _env->code_length);
     individual offspring(*_env,false);
 
     for (unsigned i(0); i < cut1; ++i)
@@ -629,9 +630,6 @@ namespace vita
   bool
   individual::check() const
   {
-    if (size() != _env->code_length)
-      return false;
-
     bool last_is_terminal(false);
     unsigned line(_best);
     for (const_iterator it(*this); it(); line = ++it)

@@ -57,6 +57,13 @@ namespace vita
       _active_eva = eva;
   }
 
+  ///
+  /// The basic rule of memory management in Vita is that any object that is
+  /// created by the client must be deleted by the client... but, you know,
+  /// every rule has an exception: subclasses of \a problem need to free
+  /// memory in their destructors and the deallocation process is "factored"
+  /// in the \a delete_evaluators member function.
+  ///
   void
   problem::delete_evaluators()
   {

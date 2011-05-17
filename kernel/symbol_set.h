@@ -3,7 +3,7 @@
  *  \file symbol_set.h
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -24,6 +24,7 @@ namespace vita
   class argument;
   class symbol;
   class terminal;
+  class variable;
 
   class symbol_set
   {
@@ -35,6 +36,8 @@ namespace vita
 
     const symbol *roulette(bool = false) const;
     const argument *arg(unsigned) const;
+    const symbol *variable(unsigned) const;
+    unsigned variables() const;
 
     void reset_adf_weights();
 
@@ -52,6 +55,7 @@ namespace vita
     std::vector<terminal *> _terminals;
     std::vector<adf *>            _adf;
     std::vector<argument *> _arguments;
+    std::vector<terminal *> _variables;
 
     unsigned long _sum;
   };

@@ -20,19 +20,20 @@ namespace vita
 
   ///
   /// A terminal (leaf) node in the parse trees representing the programs in the
-  /// population. A termina might be a variable, a constant value or a function
+  /// population. A terminal might be a variable, a constant value or a function
   /// taking no arguments (e.g. move-north).
   ///
   class terminal : public symbol
   {
   public:
-    terminal(const std::string &, symbol_t, unsigned=default_weight, 
-             bool=false);
+    terminal(const std::string &, symbol_t, bool=false, bool=false,
+             unsigned=default_weight);
 
     symbol_t arg_type(unsigned) const;
 
     bool associative() const;
-    bool parametric() const;    
+    bool input() const;
+    bool parametric() const;
 
     unsigned argc() const;
 
@@ -42,13 +43,14 @@ namespace vita
 
   private:
     const bool _parametric;
+    const bool      _input;
   };
 
-  /**
-   * arg_type
-   * \return 0
-   * no arguments for terminals!
-   */
+  ///
+  /// \return \a sym_void
+  ///
+  /// No arguments for terminals!
+  ///
   inline
   symbol_t
   terminal::arg_type(unsigned) const
@@ -56,11 +58,10 @@ namespace vita
     return sym_void;
   }
 
-  /**
-   * argc
-   * \return 0
-   * 0 arguments <=> terminal.
-   */
+  ///
+  /// \return 0
+  /// 0 arguments <=> terminal.
+  ///
   inline
   unsigned
   terminal::argc() const
@@ -68,10 +69,9 @@ namespace vita
     return 0;
   }
 
-  /**
-   * associative.
-   * \return false
-   */
+  ///
+  /// \return false
+  ///
   inline
   bool
   terminal::associative() const
@@ -79,10 +79,19 @@ namespace vita
     return false;
   }
 
-  /**
-   * parametric
-   * \return
-   */
+  ///
+  /// \return true if the terminal is an input variable.
+  ///
+  inline
+  bool
+  terminal::input() const
+  {
+    return _input;
+  }
+
+  ///
+  /// \return true if the terminal is parametric.
+  ///
   inline
   bool
   terminal::parametric() const

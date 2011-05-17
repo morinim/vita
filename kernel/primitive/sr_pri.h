@@ -36,8 +36,8 @@ namespace sr
   class variable : public terminal
   {
   public:
-    variable(const std::string &name, symbol_t t=sym_real) 
-      : terminal(name,t) {};
+    variable(const std::string &name, symbol_t t=sym_real)
+      : terminal(name,t,true) {};
     
     boost::any eval(vita::interpreter &) const
     { 

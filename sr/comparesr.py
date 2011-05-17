@@ -95,7 +95,7 @@ def start_comparison(args):
                 fn1 = os.path.join(args.filepath[0],os.path.basename(f))
                 fn2 = os.path.join(args.filepath[1],os.path.basename(f))
                 if os.path.isfile(fn2):
-                    compare_file([f1n,fn2],scores)
+                    compare_file([fn1,fn2],scores)
                     print("-"*79)
                 else:
                     print("Missing {0} file".format(fn2))

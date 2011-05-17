@@ -39,10 +39,9 @@ namespace vita
     static base_gen _rng;
   };
 
-  /**
-   * seed
-   * \param s
-   */
+  ///
+  /// \param[in] s
+  ///
   inline
   void
   random::seed(unsigned long s)
@@ -50,11 +49,11 @@ namespace vita
     _rng.seed(s);
   }
 
-  /**
-   * between.
-   * \param min
-   * \param sup
-   */
+  ///
+  /// \param[in] min
+  /// \param[in] sup
+  /// \return 
+  ///
   template<>
   inline
   double
@@ -89,10 +88,10 @@ namespace vita
     return ret;
   }
 
-  /**
-   * boolean.
-   * \param p
-   */
+  ///
+  /// \param[in] p
+  /// \return
+  ///
   inline
   bool
   random::boolean(double p)
@@ -102,9 +101,9 @@ namespace vita
     return random::between<double>(0,1) < p;
   }
 
-  /**
-   * boolean.
-   */
+  ///
+  /// \return
+  ///
   inline
   bool
   random::boolean()

@@ -3,7 +3,7 @@
  *  \file symbol_set.cc
  *
  *  \author Manlio Morini
- *  \date 2010/11/13
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -17,6 +17,10 @@
 namespace vita
 {
 
+  ///
+  /// Sets up the object.
+  /// The constructor allocates memory for up to \a gene_args argument.
+  ///
   symbol_set::symbol_set()
   {
     clear();
@@ -27,6 +31,10 @@ namespace vita
     assert(check());
   }
  
+  ///
+  /// The destructor frees only memory allocated by the constructor. Object
+  /// created by the client must be deleted by the client.
+  ///
   symbol_set::~symbol_set()
   {
     for (std::vector<argument *>::const_iterator i(_arguments.begin());
@@ -35,16 +43,28 @@ namespace vita
       delete *i;
   }
 
+  ///
+  /// Utility function used to help the constructor and the delete_symbols
+  /// member function in the clean up process.
+  ///
   void
   symbol_set::clear()
   {
+    _adf.clear();
     _symbols.clear();
     _terminals.clear();
-    _adf.clear();
+    _variables.clear();
 
     _sum = 0;
   }
 
+  ///
+  /// The basic rule of memory management in Vita is that any object that is
+  /// created by the client must be deleted by the client... but, you know,
+  /// every rule has an exception: subclasses of \a problem need to free
+  /// memory in their destructors and the deallocation process is "factored"
+  /// in the \a delete_symbols member function.
+  ///
   void
   symbol_set::delete_symbols()
   {
@@ -68,6 +88,26 @@ namespace vita
   }
 
   ///
+  /// \param[in] n index of a variable.
+  /// \return a pointer to the n-th variable.
+  ///
+  const symbol *
+  symbol_set::variable(unsigned n) const
+  {
+    assert(n < _variables.size());
+    return _variables[n];
+  }
+
+  ///
+  /// \return the number of variables in the symbol set.
+  ///
+  unsigned
+  symbol_set::variables() const
+  {
+    return _variables.size();
+  }
+
+  ///
   /// \param[in] i symbol to be added.
   ///
   /// Adds a new \c symbol to the set.
@@ -85,6 +125,9 @@ namespace vita
     {
       assert(!i->argc());
       _terminals.push_back(trml);
+
+      if (trml->input())
+        _variables.push_back(trml);
     }
     else
     {
@@ -111,8 +154,8 @@ namespace vita
   /// \param[in] only_t if true extracts only terminals.
   /// \return a random symbol.
   ///
-  /// If only_t==true extracts a terminal else a random symbol (may be a
-  /// terminal, a primitive function or an ADF).
+  /// If \a only_t == \c true extracts a \a terminal else a random \a symbol 
+  /// (may be a \a terminal, a primitive function or an ADF).
   ///
   const symbol *
   symbol_set::roulette(bool only_t) const
@@ -187,13 +230,26 @@ namespace vita
 
       sum += _symbols[j]->weight;
 
-      bool found(false);
+      bool found(false);    
       if (dynamic_cast<terminal *>(_symbols[j]))
-        for (unsigned i(0); i < _terminals.size() && !found; ++i)      
-          found = (_symbols[j] ==_terminals[i]);
+      {
+        // Terminals must be in the _terminals vector.
+        for (unsigned i(0); i < _terminals.size() && !found; ++i)
+          found = (_symbols[j] == _terminals[i]);
+
+        // Variables must be in the _variables vector.
+        if (found && static_cast<terminal *>(_symbols[j])->input())
+        {
+          bool found2(false);
+          for (unsigned i(0); i < _variables.size() && !found2; ++i)
+            found2 = (_symbols[j] == _variables[i]);
+
+          found = found2;
+        }
+      }
       else if (dynamic_cast<adf *>(_symbols[j]))
-        for (unsigned i(0); i < _adf.size() && !found; ++i)      
-          found = (_symbols[j] ==_adf[i]);
+        for (unsigned i(0); i < _adf.size() && !found; ++i)
+          found = (_symbols[j] == _adf[i]);
       else
         found = true;
      

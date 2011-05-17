@@ -3,7 +3,7 @@
  *  \file environment.h
  *
  *  \author Manlio Morini
- *  \date 2011/04/15
+ *  \date 2011/05/11
  *
  *  This file is part of VITA
  *
@@ -74,6 +74,9 @@ namespace vita
 
     /// Should we use Adaptive Representation through Learning?
     bool arl;
+
+    /// Should we always insert input variables at the end of individual?
+    bool input;
 
     /// 2^ttable_size is the number of elements of the transposition table.
     unsigned ttable_size;
