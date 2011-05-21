@@ -35,6 +35,7 @@ namespace vita
   ///
   gene::gene(const symbol_set &sset, unsigned from, unsigned sup)
   {
+    assert(from < sup);
     sym = sset.roulette(from==sup);
     
     if (sym->parametric())
@@ -59,7 +60,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] g
+  /// \param[in] g second term of comparison.
   /// \return true if \c this == \a g
   ///
   bool

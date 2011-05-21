@@ -3,7 +3,7 @@
  *  \file sr.cc
  *
  *  \author Manlio Morini
- *  \date 2011/04/15
+ *  \date 2011/05/19
  *
  *  This file is part of VITA
  *
@@ -24,7 +24,7 @@ namespace po = boost::program_options;
 #include "src_problem.h"
 
 const std::string vita_sr_version(
-  "Vita v1.03 - Symbolic Regression and classification\n"\
+  "Vita v1.04 - Symbolic Regression and classification\n"\
   "Copyright EOS Development (http://www.eosdev.it)"
 );
 
@@ -226,7 +226,6 @@ bool
 run()
 {
   vita::search s(problem);
-
   s.run(verbose,runs);
 
   // vita::interpreter agent(ind);

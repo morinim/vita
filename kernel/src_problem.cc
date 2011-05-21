@@ -56,11 +56,6 @@ namespace vita
 
       const boost::any res(agent.run());
 
-      /*      
-      if (!res.empty())
-	fit += std::exp(-std::fabs(boost::any_cast<T>(res) - 
-                                   boost::any_cast<T>(t->output)));
-      */
       if (res.empty())
         err += std::pow(100.0,++illegals);
       else     

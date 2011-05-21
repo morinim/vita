@@ -3,7 +3,7 @@
  *  \file sr_pri.h
  *
  *  \author Manlio Morini
- *  \date 2009/10/31
+ *  \date 2011/05/19
  *
  *  This file is part of VITA
  *
@@ -54,7 +54,7 @@ namespace sr
   {
   public:
     constant(double c, symbol_t t=sym_real) 
-      : terminal("CONST",t,terminal::default_weight*2), val(c) {};
+      : terminal("CONST",t,false,false,default_weight*2), val(c) {};
 
     std::string display() const
     {
@@ -75,7 +75,7 @@ namespace sr
   {
   public:
     number(int m, int u, symbol_t t=sym_real) 
-      : terminal("NUM",t,default_weight*2,true), min(m), upp(u) {}; 
+      : terminal("NUM",t,false,true,default_weight*2), min(m), upp(u) {}; 
 
     int init() const { return random::between<int>(min,upp); };
 

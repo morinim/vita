@@ -3,7 +3,7 @@
  *  \file individual.cc
  *
  *  \author Manlio Morini
- *  \date 2011/03/19
+ *  \date 2011/05/19
  *
  *  This file is part of VITA
  *
@@ -32,16 +32,15 @@ namespace vita
     // **** Random generate initial code. ****
     if (gen)
     {
-      const unsigned variables(e.sset.variables());
-      const bool input(e.input && variables < e.code_length);
+      const unsigned inputs(e.force_input ? e.sset.variables() : 0);
+      assert(inputs < size());
 
-      const unsigned sup(input ? e.code_length-variables : e.code_length);
+      const unsigned sup(size() - inputs);
       for (unsigned i(0); i < sup; ++i)
         _code[i] = gene(e.sset,i+1,e.code_length);
 
-      if (input)
-        for (unsigned i(0); i < variables; ++i)
-          _code[sup+i] = gene(e.sset,i);
+      for (unsigned i(0); i < inputs; ++i)
+        _code[sup+i] = gene(e.sset,i);
 
       assert(check());
     }
@@ -193,11 +192,10 @@ namespace vita
     return source;
   }
 
-  /**
-   * normalize
-   * \param norm[out]
-   * \return 
-   */
+  ///
+  /// \param[out] norm
+  /// \return 
+  ///
   unsigned
   individual::normalize(individual &norm) const
   {
@@ -218,14 +216,13 @@ namespace vita
     return ret;
   }
 
-  /**
-   * normalize
-   * \param src[in]
-   * \param args[in]
-   * \param dest_l[in,out]
-   * \param dest[out]
-   * \return
-   */
+  ///
+  /// \param[in] src
+  /// \param[in] args
+  /// \param[in,out] dest_l
+  /// \param[out] dest
+  /// \return
+  ///
   unsigned
   individual::normalize(const individual &src,
                         const std::vector<unsigned> *args,
@@ -290,20 +287,24 @@ namespace vita
     return ret;
   }
 
-  /**
-   * mutation
-   */
+  ///
+  /// \return number of mutations performed.
+  ///
   unsigned
   individual::mutation()
   {
     unsigned n_mut(0);
 
-    const unsigned cs(size());
+    //const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
+    const unsigned inputs(0);
+    assert(inputs < size());
+
+    const unsigned cs(size() - inputs);
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(_env->p_mutation))
       {
 	++n_mut;
-	_code[i] = gene(_env->sset,i+1,cs);
+	_code[i] = gene(_env->sset,i+1,size());
       }
 
     assert(check());
@@ -311,10 +312,10 @@ namespace vita
     return n_mut;
   }
 
-  /**
-   * uniform_cross
-   * \param parent[in]
-   */
+  ///
+  /// \param[in] parent
+  /// \return
+  ///
   individual
   individual::uniform_cross(const individual &parent) const
   {
@@ -333,10 +334,10 @@ namespace vita
     return offspring;
   }
 
-  /**
-   * cross1
-   * \param parent[in]
-   */
+  ///
+  /// \param[in] parent
+  /// \return
+  ///
   individual
   individual::cross1(const individual &parent)
   {
@@ -360,10 +361,10 @@ namespace vita
     return offspring;   
   }
 
-  /**
-   * cross2
-   * \param parent[in]
-   */
+  ///
+  /// \param[in] parent
+  /// \return
+  ///
   individual
   individual::cross2(const individual &parent)
   {
@@ -390,10 +391,9 @@ namespace vita
     return offspring;   
   }
   
-  /**
-   * blocks
-   * \return
-   */
+  ///
+  /// \return
+  ///
   std::list<unsigned>
   individual::blocks() const
   {
@@ -411,16 +411,15 @@ namespace vita
     return bl;
   }
 
-  /**
-   * replace
-   * \param sym[in]
-   * \param args[in]
-   * \param line[in]
-   * \return a new individual with a line replaced.
-   *
-   * Create a new individual obtained from 'this' replacing the original
-   * symbol at line 'line' with a new one ('sym' + 'args').
-   */
+  ///
+  /// \param[in] sym symbol used for replacement.
+  /// \param[in] args new arguments.
+  /// \param[in] line locus where replacement take place.
+  /// \return a new individual with a line replaced.
+  ///
+  /// Create a new \a individual obtained from \c this replacing the original
+  /// \a symbol at line \a line with a new one ('sym' + 'args').
+  ///
   individual
   individual::replace(const symbol *const sym,
                       const std::vector<unsigned> &args,
@@ -438,15 +437,14 @@ namespace vita
     return ret;    
   }
 
-  /**
-   * replace
-   * \param sym[in]
-   * \param args[in]
-   * \return a new individual with _best line replaced.
-   *
-   * Create a new individual obtained from 'this' replacing the original
-   * symbol at line '_best' with a new one ('sym' + 'args').
-   */
+  ///
+  /// \param[in] sym
+  /// \param[in] args
+  /// \return a new individual with _best line replaced.
+  ///
+  /// Create a new \a individual obtained from \c this replacing the original
+  /// \a symbol at line \a _best with a new one ('sym' + 'args').
+  ///
   individual
   individual::replace(const symbol *const sym,
                       const std::vector<unsigned> &args) const
@@ -646,6 +644,12 @@ namespace vita
 
       last_is_terminal = _code[line].sym->terminal();
     }
+
+    const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
+    for (unsigned i(size()-inputs); i < size(); ++i)
+      if (!_code[i].sym->terminal() ||
+          !dynamic_cast<const terminal *>(_code[i].sym)->input())
+        return false;
 
     return 
       _best < size() && 

@@ -75,8 +75,8 @@ namespace vita
     /// Should we use Adaptive Representation through Learning?
     bool arl;
 
-    /// Should we always insert input variables at the end of individual?
-    bool input;
+    /// Should we always insert input variables at the end of individual? 
+    bool force_input;
 
     /// 2^ttable_size is the number of elements of the transposition table.
     unsigned ttable_size;

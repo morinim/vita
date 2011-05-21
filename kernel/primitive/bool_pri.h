@@ -37,7 +37,7 @@ namespace boolean
   class variable : public terminal
   {
   public:
-    variable(const std::string &name) : terminal(name,sym_bool) {};
+    variable(const std::string &name) : terminal(name,sym_bool,true) {};
     
     boost::any eval(vita::interpreter &) const { return val; };
 
@@ -50,7 +50,7 @@ namespace boolean
   class zero : public terminal
   {
   public:
-    zero() : terminal("0",sym_bool,terminal::default_weight*3) {};
+    zero() : terminal("0",sym_bool,false,false,default_weight*3) {};
 
     std::string display() const { return "0"; };
 
@@ -63,7 +63,7 @@ namespace boolean
   class one : public terminal
   {
   public:
-    one() : terminal("1",sym_bool,terminal::default_weight*3) {};
+    one() : terminal("1",sym_bool,false,false,default_weight*3) {};
 
     std::string display() const { return "1"; };
 

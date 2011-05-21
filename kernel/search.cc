@@ -104,6 +104,7 @@ namespace vita
 
     population p(_prob.env);
     evolution evo(p,_prob.get_evaluator());
+
     for (unsigned i(0); i < n; ++i)
     {
       if (i)

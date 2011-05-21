@@ -55,6 +55,8 @@ namespace vita
 
     s->mutations += off[0].mutation();
 
+    assert(off[0].check());
+
     return off;
   }
 
