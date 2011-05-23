@@ -295,8 +295,8 @@ namespace vita
   {
     unsigned n_mut(0);
 
-    //const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
-    const unsigned inputs(0);
+    const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
+    //const unsigned inputs(0);
     assert(inputs < size());
 
     const unsigned cs(size() - inputs);
@@ -314,7 +314,19 @@ namespace vita
 
   ///
   /// \param[in] parent
-  /// \return
+  /// \return the individual result of the crossover.
+  ///
+  /// Uniform crossover, as the name suggests, is a GP operator inspired by the
+  /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic 
+  /// algorithms - Proceedings of the Third International Conference on Genetic
+  /// Algorithms. 1989). GA uniform crossover constructs offspring on a 
+  /// bitwise basis, copying each allele from each parent with a 50% 
+  /// probability. Thus the information at each gene location is equally likely
+  /// to have come from either parent and on average each parent donates 50%
+  /// of its genetic material. The whole operation, of course, relies on the
+  /// fact that all the chromosomes, in the population are of the same structure
+  /// and the same length. GP uniform crossover begins with the observation that
+  /// many parse trees are at least partially structurally similar.
   ///
   individual
   individual::uniform_cross(const individual &parent) const

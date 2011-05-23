@@ -91,14 +91,22 @@ bool parse_command_line(int argc, char *argv[])
 
     // Declare a group of options that will be allowed both on command line 
     // and in config file.
+    po::options_description individual("Individual");
+    individual.add_options()
+      ("force-input,f",
+       po::value<bool>(&problem.env.force_input)->default_value(false),
+       "Include all the input variables in every generated individual.")
+      ("program-size,p",
+       po::value(&problem.env.code_length),
+       "Sets the maximum length of a program (it might be shorter)");
+
+    // Declare a group of options that will be allowed both on command line 
+    // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
       ("population-size,P", 
        po::value(&problem.env.individuals),
        "Sets the number of programs/individuals in the population.")
-      ("program-size,p",
-       po::value(&problem.env.code_length),
-       "Sets the maximum length of an evolved program in the population.")
       ("elitism",
        po::value<bool>(&problem.env.elitism)->default_value(true),
        "When elitism is true an individual will never replace a better one.")
@@ -143,7 +151,7 @@ bool parse_command_line(int argc, char *argv[])
       "Save the list of active ADF");
         
     po::options_description cmdl_opt(vita_sr_version+"\n\nsr [options] data_file\n\nAllowed options");
-    cmdl_opt.add(generic).add(data).add(config).add(evolution).add(statistics);
+    cmdl_opt.add(generic).add(data).add(config).add(evolution).add(individual).add(statistics);
        
     po::positional_options_description p;
     p.add("data",-1);
