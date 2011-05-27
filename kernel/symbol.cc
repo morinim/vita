@@ -16,13 +16,19 @@ namespace vita
 
   unsigned symbol::_opc_count(0);
 
+  ///
+  /// \return the name of the symbol.
+  ///
+  std::string
+  symbol::display() const
+  {
+    return _display;
+  }
 
-
-  /**
-   * display
-   * \param v[in]
-   * \return
-   */
+  ///
+  /// \param[in] v
+  /// \return
+  ///
   std::string
   symbol::display(int v) const
   {

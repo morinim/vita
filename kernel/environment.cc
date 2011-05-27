@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "environment.h"
+#include "terminal.h"
 
 namespace vita
 {
@@ -81,7 +82,9 @@ namespace vita
   void
   environment::insert(symbol *const i)
   {
-    sset.insert(i);
+    const bool special(force_input && i->terminal() &&
+                       static_cast<terminal *>(i)->input());
+    sset.insert(i,special);
   }
 
   ///

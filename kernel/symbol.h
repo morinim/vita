@@ -91,10 +91,9 @@ namespace vita
     return 0;
   }
 
-  /**
-   * terminal
-   * \return true if this symbol is a terminal.
-   */
+  ///
+  /// \return true if this symbol is a terminal.
+  ///
   inline
   bool
   symbol::terminal() const
@@ -102,10 +101,9 @@ namespace vita
     return !argc();
   }
 
-  /**
-   * type
-   * \return the type of the symbol.
-   */
+  ///
+  /// \return the type of the \a symbol.
+  ///
   inline
   symbol_t
   symbol::type() const
@@ -113,28 +111,17 @@ namespace vita
     return _type;
   }
 
-  /**
-   * opcode
-   * \return the opcode of the symbol (an unsigned int used as primary key).
-   */
+  ///
+  /// \return the opcode of the symbol (an \c unsigned \c int used as primary 
+  /// key).
+  ///
   inline
   opcode_t
   symbol::opcode() const
   {
     return _opcode;
   }
-
-  /**
-   * display
-   * \return the name of the symbol.
-   */
-  inline
-  std::string
-  symbol::display() const
-  {
-    return _display;
-  }
-    
+   
 }  // namespace vita
 
 #endif  // SYMBOL_H

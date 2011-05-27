@@ -175,6 +175,9 @@ namespace vita
     add_evaluator(new dyn_slot_evaluator(dat,vars));
   }
 
+  ///
+  /// Class destructor frees memory allocated by src_problem constructor.
+  /// 
   src_problem::~src_problem()
   {
     delete_evaluators();

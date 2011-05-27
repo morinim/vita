@@ -53,7 +53,7 @@ namespace vita
     _adf.clear();
     _symbols.clear();
     _terminals.clear();
-    _variables.clear();
+    _specials.clear();
 
     _sum = 0;
   }
@@ -88,48 +88,54 @@ namespace vita
   }
 
   ///
-  /// \param[in] n index of a variable.
-  /// \return a pointer to the n-th variable.
+  /// \param[in] n index of a special \a symbol.
+  /// \return a pointer to the n-th special \a symbol.
   ///
   const symbol *
-  symbol_set::variable(unsigned n) const
+  symbol_set::special(unsigned n) const
   {
-    assert(n < _variables.size());
-    return _variables[n];
+    assert(n < _specials.size());
+    return _specials[n];
   }
 
   ///
-  /// \return the number of variables in the symbol set.
+  /// \return the number of special symbols in the symbol set.
   ///
   unsigned
-  symbol_set::variables() const
+  symbol_set::specials() const
   {
-    return _variables.size();
+    return _specials.size();
   }
 
   ///
   /// \param[in] i symbol to be added.
+  /// \param[in] special if \c true the \a symbol is not used during initial
+  ///            random generation but it's inserted at the end of the genome
+  ///            in a protected area.
   ///
-  /// Adds a new \c symbol to the set.
+  /// Adds a new \a symbol to the set.
   ///
   void
-  symbol_set::insert(symbol *const i)
+  symbol_set::insert(symbol *const i, bool special)
   {
     assert(i && i->weight && i->check());
     
-    _symbols.push_back(i);
-    _sum += i->weight;
-
-    terminal *const trml = dynamic_cast<terminal *>(i);
-    if (trml)
+    if (special)
     {
-      assert(!i->argc());
-      _terminals.push_back(trml);
-
-      if (trml->input())
-        _variables.push_back(trml);
+      assert(i->terminal());
+      _specials.push_back(static_cast<terminal *>(i));
     }
     else
+    {
+      _symbols.push_back(i);
+      _sum += i->weight;
+    }
+
+    terminal *const trml = dynamic_cast<terminal *>(i);
+
+    if (i->terminal())
+      _terminals.push_back(static_cast<terminal *>(trml));
+    else  // not a terminal
     {
       adf *const df = dynamic_cast<adf *>(i);
       if (df)
@@ -231,22 +237,10 @@ namespace vita
       sum += _symbols[j]->weight;
 
       bool found(false);    
-      if (dynamic_cast<terminal *>(_symbols[j]))
-      {
+      if (_symbols[j]->terminal())
         // Terminals must be in the _terminals vector.
         for (unsigned i(0); i < _terminals.size() && !found; ++i)
           found = (_symbols[j] == _terminals[i]);
-
-        // Variables must be in the _variables vector.
-        if (found && static_cast<terminal *>(_symbols[j])->input())
-        {
-          bool found2(false);
-          for (unsigned i(0); i < _variables.size() && !found2; ++i)
-            found2 = (_symbols[j] == _variables[i]);
-
-          found = found2;
-        }
-      }
       else if (dynamic_cast<adf *>(_symbols[j]))
         for (unsigned i(0); i < _adf.size() && !found; ++i)
           found = (_symbols[j] == _adf[i]);
@@ -256,7 +250,7 @@ namespace vita
       if (!found)
 	return false;
     }
-    
+  
     if (sum != _sum)
       return false;
 

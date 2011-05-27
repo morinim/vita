@@ -32,14 +32,14 @@ namespace vita
     // **** Random generate initial code. ****
     if (gen)
     {
-      const unsigned inputs(e.force_input ? e.sset.variables() : 0);
-      assert(inputs < size());
+      const unsigned specials(e.sset.specials());
+      assert(specials < size());
 
-      const unsigned sup(size() - inputs);
+      const unsigned sup(size() - specials);
       for (unsigned i(0); i < sup; ++i)
         _code[i] = gene(e.sset,i+1,e.code_length);
 
-      for (unsigned i(0); i < inputs; ++i)
+      for (unsigned i(0); i < specials; ++i)
         _code[sup+i] = gene(e.sset,i);
 
       assert(check());
@@ -295,11 +295,9 @@ namespace vita
   {
     unsigned n_mut(0);
 
-    const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
-    //const unsigned inputs(0);
-    assert(inputs < size());
-
-    const unsigned cs(size() - inputs);
+    const unsigned specials(_env->sset.specials());
+    assert(specials < size());
+    const unsigned cs(size() - specials);
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(_env->p_mutation))
       {
@@ -657,10 +655,9 @@ namespace vita
       last_is_terminal = _code[line].sym->terminal();
     }
 
-    const unsigned inputs(_env->force_input ? _env->sset.variables() : 0);
-    for (unsigned i(size()-inputs); i < size(); ++i)
-      if (!_code[i].sym->terminal() ||
-          !dynamic_cast<const terminal *>(_code[i].sym)->input())
+    const unsigned specials(_env->sset.specials());
+    for (unsigned i(size()-specials); i < size(); ++i)
+      if (!_code[i].sym->terminal())
         return false;
 
     return 

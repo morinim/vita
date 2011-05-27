@@ -50,11 +50,11 @@ namespace vita
 
   ///
   /// \param[in] sset the set of symbols to choose from.
-  /// \param[in] var index of a variable in the symbol_set.
+  /// \param[in] var index of a special symbol in the \a symbol_set.
   ///
   gene::gene(const symbol_set &sset, unsigned var)
   {
-    sym = sset.variable(var);
+    sym = sset.special(var);
     if (sym->parametric())
       par = sym->init();
   }

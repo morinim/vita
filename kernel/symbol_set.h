@@ -32,12 +32,12 @@ namespace vita
     symbol_set();
     ~symbol_set();
 
-    void insert(symbol *const);
+    void insert(symbol *const, bool);
 
     const symbol *roulette(bool = false) const;
     const argument *arg(unsigned) const;
-    const symbol *variable(unsigned) const;
-    unsigned variables() const;
+    const symbol *special(unsigned) const;
+    unsigned specials() const;
 
     void reset_adf_weights();
 
@@ -55,7 +55,7 @@ namespace vita
     std::vector<terminal *> _terminals;
     std::vector<adf *>            _adf;
     std::vector<argument *> _arguments;
-    std::vector<terminal *> _variables;
+    std::vector<terminal *>  _specials;
 
     unsigned long _sum;
   };

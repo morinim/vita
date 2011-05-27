@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import configparser
 import os
 import random
 from string import Template
@@ -32,7 +33,7 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
     cmd = Template("sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "-P $nind -p $ps -r $rs $rnd_switch $arl_switch $ss $ds")
-    s = cmd.substitute(elitism_switch = "--elitism "+str(args.elitist),
+    s = cmd.substitute(elitism_switch = "--elitism "+str(args.elitism),
                        sd = stat_dir,
                        tt = ttable_bit,
                        gen = generations,
@@ -59,10 +60,8 @@ def save_results(name, data_set, args):
     for f, ext in files.items():
         before = os.path.join(stat_dir,f)
         if os.path.exists(before):
-            after = os.path.join(stat_dir, name +
-                                 ("_arl" if args.arl else "")+
-                                 ("_debug" if args.debug else "")+
-                                 ("_elitism" if args.elitist>0 else "")+
+            after = os.path.join(stat_dir, name + "_" + 
+                                 os.path.basename(args.config) +
                                  ext)
             os.rename(before, after)
 
@@ -88,30 +87,73 @@ def start_testing(args):
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
 
-    print(args)
+    print(str(args))
     for k, a in testcases.items():
         if (args.test == []) or (k in args.test):
             test_dataset(k, args, *a)
 
 
-def get_cmd_line_options():
+def get_cmd_line_options(defaults):
     parser = argparse.ArgumentParser(fromfile_prefix_chars="@")
+
+    parser.set_defaults(**defaults)
+
+    parser.add_argument("-c", "--config", 
+                        help="Load configuration from config file")
+
     parser.add_argument("-r","--random", dest="debug", action="store_false", 
-                        default=True, help="Randomize the test")
-    parser.add_argument("--arl", action="store_true", default=False,
+                        help="Randomize the test")
+    parser.add_argument("-d","--debug", action="store_true",
+                        help="Make the test reproducible")
+
+    parser.add_argument("--arl", action="store_true",
                         help="Turn on ARL")
-    parser.add_argument("--elitist", type=int, default=1,
-                        help="Enable/disable elitism")
-    parser.add_argument("-v","--verbose", action="store_true", dest="verbose",
+
+    parser.add_argument("--elitism", action="store_true", 
+                        help="Enable elitism")
+    parser.add_argument("--no_elitism", action="store_false", dest="elitism",
+                        help="Disable elitism")
+    parser.add_argument("--force_input", action="store_true", 
+                        help="Input variables in every individual")
+    parser.add_argument("--free_input", action="store_false", 
+                        dest="force_input",
+                        help="Input variables used randomly")
+
+    parser.add_argument("-q","--quiet", action="store_false", dest="verbose",
+                        help="Turn off verbose mode")
+    parser.add_argument("-v","--verbose", action="store_true",
                         help="Turn on verbose mode")
+
     parser.add_argument("test", nargs="*")
-    return parser
+
+    return parser.parse_args()
+
+
+def load_defaults(filename, defaults):
+    config = configparser.ConfigParser()
+    config.read(filename)
+
+    opt = config["Options"]
+    defaults["arl"]         = opt.get("arl", defaults["arl"])
+    defaults["debug"]       = opt.get("debug", defaults["debug"])
+    defaults["elitism"]     = opt.get("elitism", defaults["elitism"])
+    defaults["force_input"] = opt.get("force_input", defaults["force_input"])
+    defaults["verbose"]     = opt.get("verbose", defaults["verbose"])
 
 
 def main():
+    defaults = {"arl": False, 
+                "debug": True,
+                "elitism": True,
+                "force_input": False,
+                "verbose": False}
+
     # Get argument flags and command options
-    parser = get_cmd_line_options()
-    args = parser.parse_args()
+    args = get_cmd_line_options(defaults)
+    
+    if args.config is not None:
+        load_defaults(args.config, defaults)
+        args = get_cmd_line_options(defaults)
 
     verbose = args.verbose
 
