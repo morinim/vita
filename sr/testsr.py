@@ -87,7 +87,6 @@ def start_testing(args):
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
 
-    print(str(args))
     for k, a in testcases.items():
         if (args.test == []) or (k in args.test):
             test_dataset(k, args, *a)
@@ -134,11 +133,12 @@ def load_defaults(filename, defaults):
     config.read(filename)
 
     opt = config["Options"]
-    defaults["arl"]         = opt.get("arl", defaults["arl"])
-    defaults["debug"]       = opt.get("debug", defaults["debug"])
-    defaults["elitism"]     = opt.get("elitism", defaults["elitism"])
-    defaults["force_input"] = opt.get("force_input", defaults["force_input"])
-    defaults["verbose"]     = opt.get("verbose", defaults["verbose"])
+    defaults["arl"]         = opt.getboolean("arl", defaults["arl"])
+    defaults["debug"]       = opt.getboolean("debug", defaults["debug"])
+    defaults["elitism"]     = opt.getboolean("elitism", defaults["elitism"])
+    defaults["force_input"] = opt.getboolean("force_input", 
+                                             defaults["force_input"])
+    defaults["verbose"]     = opt.getboolean("verbose", defaults["verbose"])
 
 
 def main():

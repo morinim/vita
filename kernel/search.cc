@@ -32,8 +32,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] candidate individual in which we are looking for building
-  ///                      blocks.
+  /// \param[in] base \a individual in which we are looking for building blocks.
   /// \param[in] evo evolution up to now.
   ///
   /// Adaptive Representation through Learning (ARL). The algorithm extract
@@ -42,41 +41,59 @@ namespace vita
   /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
   ///
   void
-  search::arl(const individual &candidate, evolution &evo)
+  search::arl(const individual &base, evolution &evo)
   {
-    const unsigned arl_args(2);
+    const unsigned arl_args(0);
 
-    const fitness_t base_f(evo.fitness(candidate));
-    std::list<unsigned> bl(candidate.blocks());
-
-    _prob.env.sset.reset_adf_weights();
-
-    for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
+    const fitness_t base_fit(evo.fitness(base));
+    if (!is_bad(base_fit))
     {
-      individual candidate_block(candidate.get_block(*i));
+      const std::string f_adf(_prob.env.stat_dir + "/" + 
+                              environment::arl_filename);
+      std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
 
-      // Building blocks should be simple.
-      if (candidate_block.eff_size() <= 5+arl_args)
+      if (_prob.env.stat_arl && adf_l.good())
       {
-        const double d_f( base_f - evo.fitness(candidate.destroy_block(*i)) );
+        unsigned i(0);         
+        for (const adf0 *f = _prob.env.sset.get_adf0(i); 
+             f; 
+             f = _prob.env.sset.get_adf0(++i))
+          adf_l << f->display() << ' ' << f->weight << std::endl;
+        adf_l << std::endl;
+      }
 
-        // Semantic introns cannot be building blocks.
-        if (!is_bad(base_f) && !is_bad(d_f) &&
-            std::fabs(base_f/10.0) < d_f)
+      std::list<unsigned> block_index(base.blocks());
+      for (std::list<unsigned>::const_iterator i(block_index.begin()); 
+           i != block_index.end();
+           ++i)
+      {
+        individual candidate_block(base.get_block(*i));
+
+        // Building blocks should be simple.
+        if (candidate_block.eff_size() <= 5+arl_args)
         {
-          std::vector<symbol_t> types;
-          candidate_block.generalize(arl_args,0,&types);
-          vita::adf *const p = new vita::adf(candidate_block,types,10);
-          _prob.env.insert(p);
-        
-          if (_prob.env.stat_arl)
+          const double d_f( base_fit - evo.fitness(base.destroy_block(*i)) );
+
+          // Semantic introns cannot be building blocks.
+          if (!is_bad(d_f) && std::fabs(base_fit/10.0) < d_f)
           {
-            const std::string f_adf(_prob.env.stat_dir + "/" + 
-                                    environment::arl_filename);
-            std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
-            if (adf_l.good())
+            vita::symbol *p;
+            if (arl_args)
             {
-              adf_l << p->display() << " (DF: " << d_f << ')' << std::endl;
+              std::vector<symbol_t> types;
+              candidate_block.generalize(arl_args,0,&types);
+              p = new vita::adf(candidate_block,types,10);
+            }
+            else
+              p = new vita::adf0(candidate_block,100);
+            _prob.env.insert(p);
+        
+            if (_prob.env.stat_arl && adf_l.good())
+            {
+              adf_l << p->display() << " (Base: " << base_fit 
+                    << "  DF: " << d_f 
+                    << "  Weight: " << std::fabs(d_f/base_fit)*100.0 << "%)" 
+                    << std::endl;
               candidate_block.list(adf_l);
               adf_l << std::endl;
             }
@@ -105,6 +122,7 @@ namespace vita
     population p(_prob.env);
     evolution evo(p,_prob.get_evaluator());
 
+    summary previous;
     for (unsigned i(0); i < n; ++i)
     {
       if (i)
@@ -137,10 +155,17 @@ namespace vita
       run_sum.ttable_probes += s.ttable_probes;
 
       if (_prob.env.arl)
-        arl(run_sum.best,evo);
+      {
+        if (i==0 || previous.f_best < s.f_best)
+          arl(s.best,evo);
+        else
+          _prob.env.sset.reset_adf_weights();
+      }
 
       if (_prob.env.stat_summary)
         log(run_sum,fd,solutions,best_run,n);
+
+      previous = s;
     }
 
     return run_sum.best;

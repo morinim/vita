@@ -35,7 +35,7 @@ namespace vita
   ///
   gene::gene(const symbol_set &sset, unsigned from, unsigned sup)
   {
-    assert(from < sup);
+    assert(from <= sup);
     sym = sset.roulette(from==sup);
     
     if (sym->parametric())
@@ -50,11 +50,11 @@ namespace vita
 
   ///
   /// \param[in] sset the set of symbols to choose from.
-  /// \param[in] var index of a special symbol in the \a symbol_set.
+  /// \param[in] i index of a special symbol in the \a symbol_set.
   ///
-  gene::gene(const symbol_set &sset, unsigned var)
+  gene::gene(const symbol_set &sset, unsigned i)
   {
-    sym = sset.special(var);
+    sym = sset.get_special(i);
     if (sym->parametric())
       par = sym->init();
   }

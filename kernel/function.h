@@ -50,10 +50,9 @@ namespace vita
     const bool   _associative;
   };
 
-  /**
-   * argc
-   * \return the number of arguments (0 arguments => terminal).
-   */
+  ///
+  /// \return the number of arguments (0 arguments => terminal).
+  ///
   inline
   unsigned
   function::argc() const

@@ -36,6 +36,7 @@ namespace vita
       assert(specials < size());
 
       const unsigned sup(size() - specials);
+
       for (unsigned i(0); i < sup; ++i)
         _code[i] = gene(e.sset,i+1,e.code_length);
 
@@ -402,7 +403,11 @@ namespace vita
   }
   
   ///
-  /// \return
+  /// \return a list of indexes referring to active symbols.
+  ///
+  /// The function extract from the individual a list of indexes to blocks 
+  /// that are subsets of the active code. Indexes can be used as they would be
+  /// individuals by the get_block function.
   ///
   std::list<unsigned>
   individual::blocks() const
@@ -411,12 +416,16 @@ namespace vita
 
     unsigned line(_best);
     for (const_iterator i(*this); i(); line = ++i)
+      if (_code[line].sym->argc())
+        bl.push_back(line);
+      /*
       for (unsigned j(0); j < _code[line].sym->argc(); ++j)
 	if ( _code[_code[line].args[j]].sym->argc() )  // At least depth 3
 	{
 	  bl.push_back(line);
 	  break;;
 	}
+      */
 
     return bl;
   }
@@ -462,11 +471,11 @@ namespace vita
     return replace(sym,args,_best);
   }
 
-  /**
-   * destroy_block
-   * \param line[in]
-   * \return 
-   */
+  ///
+  /// \param[in] line index of a \a symbol in the \a individual.
+  /// \return a new \a individual obtained from \c this inserting a random 
+  ///         \a terminal at index \a line.
+  ///
   individual
   individual::destroy_block(unsigned line) const
   {

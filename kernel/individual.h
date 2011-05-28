@@ -193,9 +193,11 @@ namespace vita
   }
 
   ///
-  /// \param[in] locus location of the individual.
+  /// \param[in] locus location of the \a individual.
   /// \return an individual obtained from \c this choosing the gene
   ///         sequence starting at \a locus.
+  ///
+  /// This function is often used along with the \ref blocks function.
   ///
   inline
   individual

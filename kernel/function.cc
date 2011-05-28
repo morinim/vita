@@ -16,14 +16,13 @@ namespace vita
 
   unsigned function::default_weight(100);
 
-  /**
-   * function
-   * \param dis[in]
-   * \param t[in]
-   * \param args[in]
-   * \param w[in]
-   * \param asve[in]
-   */
+  ///
+  /// \param[in] dis
+  /// \param[in] t
+  /// \param[in] args
+  /// \param[in] w
+  /// \param[in] asve
+  ///
   function::function(const std::string &dis, symbol_t t, 
                      const std::vector<symbol_t> &args, unsigned w, bool asve)
     : symbol(dis,t,w), _associative(asve)
@@ -60,10 +59,9 @@ namespace vita
     assert(check());
   }
 
-  /**
-   * check
-   * \return true if the individual passes the internal consistency check.
-   */
+  ///
+  /// \return true if the individual passes the internal consistency check.
+  ///
   bool
   function::check() const
   {
