@@ -135,11 +135,9 @@ namespace vita
       _sum += i->weight;
     }
 
-    terminal *const trml = dynamic_cast<terminal *>(i);
-
     if (i->terminal())
     {
-      _terminals.push_back(static_cast<terminal *>(trml));
+      _terminals.push_back(static_cast<terminal *>(i));
 
       adf0 *const df = dynamic_cast<adf0 *>(i);
       if (df)
