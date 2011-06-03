@@ -3,7 +3,7 @@
  *  \file search.cc
  *
  *  \author Manlio Morini
- *  \date 2011/04/11
+ *  \date 2011/05/29
  *
  *  This file is part of VITA
  *
@@ -113,7 +113,7 @@ namespace vita
   individual
   search::run(bool verbose, unsigned n, fitness_t success_f)
   {   
-    summary run_sum;
+    summary overall_run_sum;
     distribution<fitness_t> fd;
     unsigned best_run(0);
 
@@ -132,43 +132,41 @@ namespace vita
 
       if (i == 0)
       {
-	run_sum.best   =   s.best;
-	run_sum.f_best = s.f_best;
+	overall_run_sum.best   =   s.best;
+	overall_run_sum.f_best = s.f_best;
       }
       
       const bool found(s.f_best >= success_f);
       if (found)
       {
 	++solutions;
-	run_sum.last_imp += s.last_imp;
+	overall_run_sum.last_imp += s.last_imp;
       }
 
-      if (run_sum.f_best < s.f_best)
+      if (overall_run_sum.f_best < s.f_best)
       {
-	run_sum.best   =   s.best;
-	run_sum.f_best = s.f_best;
-	best_run       =        i;
+	overall_run_sum.best   =   s.best;
+	overall_run_sum.f_best = s.f_best;
+	best_run               =        i;
       }
      
       fd.add(s.f_best);
-      run_sum.ttable_hits += s.ttable_hits;
-      run_sum.ttable_probes += s.ttable_probes;
+      overall_run_sum.ttable_hits += s.ttable_hits;
+      overall_run_sum.ttable_probes += s.ttable_probes;
 
-      if (_prob.env.arl)
+      if (_prob.env.arl && best_run == i)
       {
-        if (i==0 || previous.f_best < s.f_best)
-          arl(s.best,evo);
-        else
-          _prob.env.sset.reset_adf_weights();
+        _prob.env.sset.reset_adf_weights();
+        arl(s.best,evo);
       }
 
       if (_prob.env.stat_summary)
-        log(run_sum,fd,solutions,best_run,n);
+        log(overall_run_sum,fd,solutions,best_run,n);
 
       previous = s;
     }
 
-    return run_sum.best;
+    return overall_run_sum.best;
   }
 
   ///

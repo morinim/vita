@@ -3,11 +3,13 @@
 import argparse
 import os
 from collections import defaultdict
+from decimal import *
 from xml.etree.ElementTree import ElementTree
 
 
-format_string_head = "{0:<32} {1:>12} {2:>9} {3:>11} {4:>11}"
-format_string_row  = "{0:<32} {1:>+11.2f}% {2:>+8.2f} {3:>+12.2f} {4:>+11.2f}"
+format_string_head = "\n{:<32} {:>8} {:>9} {:>12} {:>11}"
+format_string_row  = "{:<32} {:>+8.2%} {:>+9.2f} {:>+12.2f} {:>+11.2f}"
+format_string_row2  = "{:<32} {:>+8.2%} {:>+9.2f} {:>+12.6g} {:>+11.5g}"
 
 verbose = False
 
@@ -42,9 +44,20 @@ def compare_file(files, scores):
             standard_deviation[f] = float(best.find("standard_deviation").text)
 
         fn = f if len(f) <= 32 else "..."+f[-29:]
-        print(format_string_row.format(fn, success_rate[f]*100, 
-                                       avg_depth_found[f], mean_fitness[f],
-                                       standard_deviation[f]))
+        if mean_fitness[f] < -1000000 or standard_deviation[f] > 1000000:
+            format_str = format_string_row2
+        else:
+            format_str = format_string_row
+
+        print(format_str.format(fn, success_rate[f], 
+                                avg_depth_found[f], mean_fitness[f],
+                                standard_deviation[f]))
+
+    l = len(files)
+    for f in files:
+        opt = decode_opt(f,files)
+        if scores[opt] is None:
+            scores[opt] = Decimal("0.00")
 
     best = [files[0]]
     for f in files[1:]:
@@ -55,22 +68,45 @@ def compare_file(files, scores):
 
     if success_rate[best[0]] > 0:
         for f in best:
-            scores[files.index(f)] += 1
+            scores[decode_opt(f,files)] += Decimal("1.00")
     else:
         good = [best[0]]
         for f in best[1:]:
-            if mean_fitness[f] > mean_fitness[good[0]]:
+            mff = round(mean_fitness[f],4)
+            mfg = round(mean_fitness[good[0]],4)
+            if mff > mfg:
                 good = [f]
-            elif mean_fitness[f] == mean_fitness[good[0]]:
+            elif mff == mfg:
                 good.append(f)
         for f in good:
-            scores[files.index(f)] += .01
+            scores[decode_opt(f,files)] += Decimal(".01")
     
 
-def start_comparison(args):
-    scores = defaultdict(float)
+def decode_opt(f, files):
+    if len(files) > 2:
+        (fn,ext) = os.path.splitext(os.path.basename(f))
+        (l,s,r) = fn.rpartition("_")
+    
+        values = {
+            "00": "(00) DEBUG elitism",
+            "01": "(01) DEBUG",
+            "02": "(02) elitism",
+            "03": "(03)",
+            "04": "(04) DEBUG arl elitism",
+            "05": "(05) DEBUG arl",
+            "06": "(06) arl elitism",
+            "07": "(07) arl",
+            "08": "(08) arl elitism force_input"
+        }
+        return values.get(r,"UNKNOWN")
+    else:
+        return files.index(f)        
 
-    print(format_string_head.format("FILE", "SUCCESS RATE", "AVG.DEPTH",
+
+def start_comparison(args):
+    scores = defaultdict(Decimal)
+
+    print(format_string_head.format("FILE", "SUCCESS", "AVG.DEPTH",
                                     "AVG.FIT.", "FIT.ST.DEV."))
 
     if len(args.filepath) == 1 and os.path.isdir(args.filepath[0]):
@@ -102,9 +138,9 @@ def start_comparison(args):
     elif os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
         compare_file([args.filepath[0],args.filepath[1]],scores)
 
-    print("Overall testsets comparison")
-    for idx, score in scores.items():
-        print(idx, " --> ", score)
+    print("\nOverall testsets comparison")
+    for f in sorted(scores.keys()):
+        print("{:<32}".format(f), " --> ", "{:>3.2f}".format(scores[f]))
 
 
 def get_cmd_line_options():
