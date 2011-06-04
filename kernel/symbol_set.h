@@ -20,8 +20,8 @@
 namespace vita
 {
 
-  class adf;
-  class adf0;
+  class adf_0;
+  class adf_n;
   class argument;
   class symbol;
   class terminal;
@@ -39,7 +39,7 @@ namespace vita
     const argument *arg(unsigned) const;
     const symbol *get_special(unsigned) const;
     unsigned specials() const;
-    const adf0 *get_adf0(unsigned) const;
+    const adf_0 *get_adf0(unsigned) const;
     
     void reset_adf_weights();   
 
@@ -55,8 +55,8 @@ namespace vita
 
     std::vector<symbol *>     _symbols;
     std::vector<terminal *> _terminals;
-    std::vector<adf *>            _adf;
-    std::vector<adf0 *>          _adf0;
+    std::vector<adf_n *>          _adf;
+    std::vector<adf_0 *>         _adf0;
     std::vector<argument *> _arguments;
     std::vector<terminal *>  _specials;
 

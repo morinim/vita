@@ -83,7 +83,7 @@ namespace vita
   environment::insert(symbol *const i)
   {
     const bool special(force_input && i->terminal() &&
-                       static_cast<terminal *>(i)->input());
+                       static_cast<terminal *>(i)->input());    
     sset.insert(i,special);
   }
 

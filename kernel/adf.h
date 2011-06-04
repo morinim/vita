@@ -34,42 +34,77 @@
 
 namespace vita
 {
+  class adf_0;
+  class adf_n;
   class interpreter;
 
-  class adf : public function
+  ///
+  /// Human programmers organise sequences of repeated steps into reusable
+  /// components such as subroutines, functions and classes. They then
+  /// repeatedly invoke these components, typically with different inputs.
+  /// Reuse eliminates the need to "reinvent the wheel" every time a particular
+  /// sequence of steps is needed. Reuse also makes it possible to exploit a
+  /// problem's modularities, symmetries and regularities (thereby potentially
+  /// accelerate the problem-solving process). This can be taken further, as
+  /// programmers typically organise these components into hierarchies in which
+  /// top level components call lower level ones, which call still lower levels.
+  /// Although the acronym ADF is from Koza's automatically defined functions
+  /// in Vita subroutines are used using the ARL scheme described in <"Discovery
+  /// of subroutines in genetic programming" J.P. Rosca and D.H. Ballard>.
+  ///
+  struct adf_core
   {
-  public:
-    adf(const individual &, const std::vector<symbol_t> &, unsigned);
+  private:
+    friend class adf_0;
+    friend class adf_n;
 
-    boost::any eval(interpreter *) const;
-
-    std::string display() const;
-
-    const individual &get_code() const;
+    explicit adf_core(const individual &);
 
     bool check() const;
 
-  private:
-    const unsigned id_;
-    individual   code_;
+    const unsigned id;
+    individual   code;
+
+    static unsigned adf_count;
   };
 
-  class adf0 : public terminal
+  ///
+  /// Subroutine with arguments.
+  ///
+  class adf_n : public function
   {
   public:
-    adf0(const individual &, unsigned);
+    adf_n(const individual &, const std::vector<symbol_t> &, unsigned);
 
     boost::any eval(interpreter *) const;
 
-    std::string display() const;
-
     const individual &get_code() const;
+    std::string display() const;
 
     bool check() const;
 
   private:
-    const unsigned id_;
-    individual   code_;
+    adf_core adf_;
+  };
+
+  ///
+  /// Subroutines without arguments (see <"An Analysis of Automatic Subroutine
+  /// Discovery in Genetic Programming" A.Dessi', A.Giani, A.Starita>).
+  ///
+  class adf_0 : public terminal
+  {
+  public:
+    adf_0(const individual &, unsigned);
+
+    boost::any eval(interpreter *) const;
+
+    const individual &get_code() const;
+    std::string display() const;
+
+    bool check() const;
+
+  private:
+    adf_core adf_;
   };
 
 }  // namespace vita

@@ -180,7 +180,7 @@ namespace vita
   /// 
   src_problem::~src_problem()
   {
-    delete_evaluators();
+    delete_evaluators();  
     env.sset.delete_symbols();
   }
 

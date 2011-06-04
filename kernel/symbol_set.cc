@@ -89,7 +89,7 @@ namespace vita
   /// \param[in] i index of an adf0 function.
   /// \return a pointer to the i-th adf0 function.
   ///
-  const adf0 *symbol_set::get_adf0(unsigned i) const
+  const adf_0 *symbol_set::get_adf0(unsigned i) const
   {
     return i < _adf0.size() ? _adf0[i] : 0;
   }
@@ -139,13 +139,13 @@ namespace vita
     {
       _terminals.push_back(static_cast<terminal *>(i));
 
-      adf0 *const df = dynamic_cast<adf0 *>(i);
+      adf_0 *const df = dynamic_cast<adf_0 *>(i);
       if (df)
         _adf0.push_back(df);
     }
     else  // not a terminal
     {
-      adf *const df = dynamic_cast<adf *>(i);
+      adf_n *const df = dynamic_cast<adf_n *>(i);
       if (df)
         _adf.push_back(df);
     }
@@ -278,11 +278,11 @@ namespace vita
         for (unsigned i(0); i < _terminals.size() && !found; ++i)
           found = (_symbols[j] == _terminals[i]);
 
-        if (dynamic_cast<adf0 *>(_symbols[j]))
+        if (dynamic_cast<adf_0 *>(_symbols[j]))
           for (unsigned i(0); i < _adf0.size() && !found; ++i)
             found = (_symbols[j] == _adf0[i]);
       }
-      else if (dynamic_cast<adf *>(_symbols[j]))
+      else if (dynamic_cast<adf_n *>(_symbols[j]))
         for (unsigned i(0); i < _adf.size() && !found; ++i)
           found = (_symbols[j] == _adf[i]);
       else

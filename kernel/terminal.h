@@ -47,7 +47,7 @@ namespace vita
   };
 
   ///
-  /// \return \a sym_void
+  /// \return \a sym_void.
   ///
   /// No arguments for terminals!
   ///

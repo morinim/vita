@@ -31,7 +31,7 @@ namespace vita
   }
 
   ///
-  /// \return the output value of \c this individual.
+  /// \return the output value of \c this \a individual.
   ///
   boost::any
   interpreter::run()
@@ -120,7 +120,7 @@ namespace vita
     const gene context_g(_context->_ind._code[_context->_ip]);
 
     assert( _context && _context->check() && i < gene_args && 
-            dynamic_cast<const adf *>(context_g.sym) );
+            dynamic_cast<const adf_n *>(context_g.sym) );
 
     if (_context_cache[context_g.args[i]].empty())
       _context_cache[context_g.args[i]] = _context->eval(i);

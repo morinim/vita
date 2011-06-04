@@ -18,7 +18,6 @@
 
 namespace vita
 {
-
   ///
   /// \param[in] e base environment.
   /// \param[in] gen if true generates a random sequence of genes to initialize
@@ -250,15 +249,28 @@ namespace vita
 
       if (ll[i] >= 0)
       {
-        const adf *padf = dynamic_cast<const adf *>(source._code[i].sym);
-        if (padf)
+        const symbol *const s = source._code[i].sym;
+        const adf_n *const padf_n = dynamic_cast<const adf_n *>(s);
+        const adf_0 *const padf_0 = dynamic_cast<const adf_0 *>(s);
+        if (padf_n || padf_0)
         {
-          std::vector<unsigned> args1(padf->argc());
-          for (unsigned j(0); j < padf->argc(); ++j)
-            args1[j] = ll[source._code[i].args[j]];
+          if (padf_n)
+          {
+            const unsigned n_arg(s->argc());
+            std::vector<unsigned> args1(n_arg);
+            for (unsigned j(0); j < n_arg; ++j)
+              args1[j] = ll[source._code[i].args[j]];
 
-          if (!normalize(padf->get_code(),&args1,dest_l,dest))
+            if (!normalize(padf_n->get_code(),&args1,dest_l,dest))
             return 0;
+          }
+          else  // padf_0
+          {
+            std::vector<unsigned> args1(0);
+            if (!normalize(padf_0->get_code(),&args1,dest_l,dest))
+              return 0;
+          }
+
           ll[i] = dest_l;
         }
         else  // Not ADF

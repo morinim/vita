@@ -19,12 +19,11 @@ namespace vita
   /// \param[in] n
   ///
   argument::argument(unsigned n) 
-    : terminal("ARG",sym_void,0), _index(n)
+    : terminal("ARG",sym_void,false,false,0), _index(n)
   {
     assert(check());
   }
 
-  ///
   ///
   /// \param[in] agent
   /// \return
