@@ -48,7 +48,7 @@ namespace vita
       _context_cache[i] = boost::any();
 
     _ip = _ind._best;
-    return _ind._code[_ip].sym->eval(*this);
+    return _ind._code[_ip].sym->eval(this);
   }
 
   ///
@@ -80,7 +80,7 @@ namespace vita
       const unsigned backup(_ip); 
       _ip = locus;
       assert (_ip > backup);
-      const boost::any ret(_ind._code[_ip].sym->eval(*this));
+      const boost::any ret(_ind._code[_ip].sym->eval(this));
       _ip = backup;
 
       _cache[locus].empty = false;
@@ -92,7 +92,7 @@ namespace vita
       const unsigned backup(_ip); 
       _ip = locus;
       assert (_ip > backup);
-      const boost::any ret(_ind._code[_ip].sym->eval(*this));
+      const boost::any ret(_ind._code[_ip].sym->eval(this));
       _ip = backup;
       if (ret.type() == typeid(int))
 	assert(boost::any_cast<int>(ret) == 

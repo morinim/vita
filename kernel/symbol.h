@@ -49,7 +49,7 @@ namespace vita
 
     virtual unsigned argc() const = 0;
 
-    virtual boost::any eval(interpreter &) const = 0;
+    virtual boost::any eval(interpreter *) const = 0;
 
     bool check() const;
 

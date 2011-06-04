@@ -41,7 +41,7 @@ namespace vita
   public:
     adf(const individual &, const std::vector<symbol_t> &, unsigned);
 
-    boost::any eval(interpreter &) const;
+    boost::any eval(interpreter *) const;
 
     std::string display() const;
 
@@ -50,8 +50,8 @@ namespace vita
     bool check() const;
 
   private:
-    const unsigned _id;
-    individual   _code;
+    const unsigned id_;
+    individual   code_;
   };
 
   class adf0 : public terminal
@@ -59,7 +59,7 @@ namespace vita
   public:
     adf0(const individual &, unsigned);
 
-    boost::any eval(interpreter &) const;
+    boost::any eval(interpreter *) const;
 
     std::string display() const;
 
@@ -68,8 +68,8 @@ namespace vita
     bool check() const;
 
   private:
-    const unsigned _id;
-    individual   _code;
+    const unsigned id_;
+    individual   code_;
   };
 
 }  // namespace vita

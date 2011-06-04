@@ -2,21 +2,32 @@
  *
  *  \file adf.cc
  *
- *  \author Manlio Morini
- *  \date 2011/05/27
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *  
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along 
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>. 
  *
  */
 
-#include "adf.h"
-#include "individual.h"
-#include "interpreter.h"
+#include "kernel/adf.h"
+#include "kernel/individual.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {
-
-  static unsigned _adf_count(0);
+  static unsigned adf_count_(0);
 
   ///
   /// \param[in] ind the code for the ADF.
@@ -24,7 +35,7 @@ namespace vita
   /// \param[in] w the weight of the ADF.
   ///
   adf::adf(const individual &ind, const std::vector<symbol_t> &sv, unsigned w)
-    : function("ADF",ind.type(),sv,w), _id(_adf_count++), _code(ind)
+    : function("ADF", ind.type(), sv, w), id_(adf_count_++), code_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 
@@ -37,7 +48,7 @@ namespace vita
   const individual &
   adf::get_code() const
   {
-    return _code;
+    return code_;
   }
 
   ///
@@ -45,9 +56,9 @@ namespace vita
   /// \return
   ///
   boost::any
-  adf::eval(interpreter &i) const
-  {  
-    return interpreter(_code,&i).run();
+  adf::eval(interpreter *i) const
+  {
+    return interpreter(code_, i).run();
   }
 
   ///
@@ -57,24 +68,24 @@ namespace vita
   adf::display() const
   {
     std::ostringstream s;
-    s << "ADF" << '_' << _id;
+    s << "ADF" << '_' << id_;
 
     return s.str();
   }
 
   ///
-  /// \return \c true if the \a individual passes the internal consistency 
+  /// \return \c true if the \a individual passes the internal consistency
   ///         check.
   ///
   bool
   adf::check() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(_code); i(); ++i)
+    for (individual::const_iterator i(code_); i(); ++i)
       if (i->sym == this)
         return false;
-    
-    return _code.eff_size() > 2 && function::check();
+
+    return code_.eff_size() > 2 && function::check();
   }
 
 
@@ -84,7 +95,8 @@ namespace vita
   /// \param[in] w the weight of the ADF.
   ///
   adf0::adf0(const individual &ind, unsigned w)
-    : terminal("ADF0",ind.type(),false,false,w), _id(_adf_count++), _code(ind)
+    : terminal("ADF0", ind.type(), false, false, w), id_(adf_count_++),
+      code_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 
@@ -97,16 +109,16 @@ namespace vita
   const individual &
   adf0::get_code() const
   {
-    return _code;
+    return code_;
   }
 
   ///
   /// \return
   ///
   boost::any
-  adf0::eval(interpreter &) const
-  {  
-    return interpreter(_code).run();
+  adf0::eval(interpreter *) const
+  {
+    return interpreter(code_).run();
   }
 
   ///
@@ -116,24 +128,23 @@ namespace vita
   adf0::display() const
   {
     std::ostringstream s;
-    s << "ADF0" << '_' << _id;
+    s << "ADF0" << '_' << id_;
 
     return s.str();
   }
 
   ///
-  /// \return \c true if the \a individual passes the internal consistency 
+  /// \return \c true if the \a individual passes the internal consistency
   ///         check.
   ///
   bool
   adf0::check() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(_code); i(); ++i)
+    for (individual::const_iterator i(code_); i(); ++i)
       if (i->sym == this)
         return false;
-    
-    return _code.eff_size() >= 2 && terminal::check();
-  }
 
+    return code_.eff_size() >= 2 && terminal::check();
+  }
 }  // Namespace vita

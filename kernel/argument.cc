@@ -30,9 +30,9 @@ namespace vita
   /// \return
   ///
   boost::any
-  argument::eval(interpreter &agent) const
+  argument::eval(interpreter *agent) const
   {
-    return agent.eval_adf_arg(_index);
+    return agent->eval_adf_arg(_index);
   }
 
   ///

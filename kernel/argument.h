@@ -29,7 +29,7 @@ namespace vita
 
     unsigned index() const;
 
-    boost::any eval(interpreter &) const;
+    boost::any eval(interpreter *) const;
 
     bool check() const;
 
