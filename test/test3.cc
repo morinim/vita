@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
       std::auto_ptr<vita::evaluator> eva(new vita::random_evaluator());
       vita::population p(env);
-      vita::evolution evo(env,p,eva.get());
+      vita::evolution evo(p,eva.get());
 
       /*
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)
