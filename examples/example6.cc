@@ -24,7 +24,7 @@ class X : public vita::terminal
 public:
   X() : vita::terminal("X",vita::sym_real,true) {};
   
-  boost::any eval(vita::interpreter &) const { return val; };
+  boost::any eval(vita::interpreter *) const { return val; };
 
   static double val;
 };
@@ -34,7 +34,7 @@ class Y : public vita::terminal
 public:
   Y() : vita::terminal("Y",vita::sym_real,true) {};
   
-  boost::any eval(vita::interpreter &) const { return val; };
+  boost::any eval(vita::interpreter *) const { return val; };
 
   static double val;
 };
@@ -44,7 +44,7 @@ class Z : public vita::terminal
 public:
   Z() : vita::terminal("Z",vita::sym_real,true) {};
   
-  boost::any eval(vita::interpreter &) const { return val; };
+  boost::any eval(vita::interpreter *) const { return val; };
 
   static double val;
 };

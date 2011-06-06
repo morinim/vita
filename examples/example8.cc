@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
           std::vector<unsigned> positions;
           std::vector<vita::symbol_t> types;
           blk2.generalize(2,&positions,&types);
-          vita::adf *const f = new vita::adf(blk2,types,100);
+          vita::adf_n *const f = new vita::adf_n(blk2,types,100);
           env.insert(f);
           std::cout << std::endl << f->display() << std::endl;
           blk2.list(std::cout);
