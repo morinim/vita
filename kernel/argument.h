@@ -2,28 +2,45 @@
  *
  *  \file argument.h
  *
- *  \author Manlio Morini
- *  \date 2009/09/14
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *  
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along 
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>. 
  *
  */
-  
+
 #if !defined(ARGUMENT_H)
 #define      ARGUMENT_H
 
-#include "vita.h"
-#include "terminal.h"
+#include <string>
+
+#include "kernel/vita.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
-
   class interpreter;
 
+  ///
+  /// \a argument is a special \a terminal used by \a adf_n functions for
+  /// parameter input.
+  ///
   class argument : public terminal
   {
   public:
-    argument(unsigned);
+    explicit argument(unsigned);
 
     std::string display() const;
 
@@ -34,33 +51,8 @@ namespace vita
     bool check() const;
 
   private:
-    const unsigned _index;
+    const unsigned index_;
   };
-
-  /**
-   * index
-   * \return
-   */
-  inline
-  unsigned
-  argument::index() const
-  {
-    return _index;
-  }
-
-  /**
-   * display
-   * \return
-   */
-  inline
-  std::string
-  argument::display() const
-  {
-    std::ostringstream s;
-    s << "ARG" << '_' << _index;
-    return s.str();
-  }
-    
 }  // namespace vita
 
 #endif  // ARGUMENT_H

@@ -107,8 +107,7 @@ namespace vita
   /// \param[in] ind individual to be analyzed.
   /// \return effective length of individual we gathered statistics about.
   ///
-  unsigned
-  analyzer::count(const individual &ind)
+  unsigned analyzer::count(const individual &ind)
   {
     for (unsigned i(0); i < ind.size(); ++i)
       count(ind[i].sym, false);
@@ -129,8 +128,7 @@ namespace vita
   ///
   /// Used by count(const individual &).
   ///
-  void
-  analyzer::count(const symbol *const sym, bool active)
+  void analyzer::count(const symbol *const sym, bool active)
   {
     ++info_[sym].counter[active];
 
@@ -146,8 +144,7 @@ namespace vita
   ///
   /// Adds a new individual to the pool used to calculate statistics.
   ///
-  void
-  analyzer::add(const individual &ind, fitness_t f)
+  void analyzer::add(const individual &ind, fitness_t f)
   {
     length_.add(count(ind));
 
@@ -158,8 +155,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool
-  analyzer::check() const
+  bool analyzer::check() const
   {
     for (const_iterator i(begin()); i != end(); ++i)
       if (i->second.counter[true] > i->second.counter[false])
