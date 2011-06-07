@@ -2,13 +2,25 @@
  *
  *  \file data.h
  *
- *  \author Manlio Morini
- *  \date 2010/12/29
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *  
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along 
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>. 
  *
  */
-  
+
 #if !defined(DATA_H)
 #define      DATA_H
 
@@ -21,18 +33,16 @@
 
 #include <boost/any.hpp>
 
-#include "vita.h"
-#include "distribution.h"
+#include "kernel/vita.h"
+#include "kernel/distribution.h"
 
 namespace vita
 {
-
   ///
-  /// \a data \c class stores the training set used to evolve the population.
+  /// \a data \c class stores the training set used to evolve the \a population.
   ///
-  /// \todo The class should also contains a validation/test set to avoid
+  /// \todo The \c class should also contains a validation/test set to avoid
   ///       overfitting.
-  /// 
   ///
   class data
   {
@@ -45,11 +55,11 @@ namespace vita
     /// \li a label (classification problem).
     ///
     struct value_type
-    { 
+    {
       std::vector<boost::any> input;
       boost::any             output;
 
-      unsigned label() const { return boost::any_cast<unsigned>(output); };
+      unsigned label() const { return boost::any_cast<unsigned>(output); }
     };
 
     typedef std::list<value_type>::iterator iterator;
@@ -57,11 +67,11 @@ namespace vita
     typedef std::list<value_type>::reference reference;
     typedef std::list<value_type>::const_reference const_reference;
 
-    const_iterator begin() const;
-    const_iterator end() const;
-
     explicit data(unsigned = 1);
     explicit data(const std::string &, unsigned = 1);
+
+    const_iterator begin() const;
+    const_iterator end() const;
 
     unsigned open(const std::string &);
 
@@ -71,43 +81,20 @@ namespace vita
 
     unsigned variables() const;
     unsigned classes() const;
-  
+
     bool check() const;
 
   private:
     unsigned encode(const std::string &);
 
-    std::map<std::string,unsigned> _labels;
-    
+    std::map<std::string, unsigned> labels_;
+
     /// The training set (partitioned).
-    std::vector< std::list<value_type> > _training;
+    std::vector< std::list<value_type> > training_;
 
     /// The active data partition.
-    unsigned _active;
+    unsigned active_;
   };
-
-  ///
-  /// \return constant reference to the first element of the active training
-  ///         set.
-  ///
-  inline
-  data::const_iterator
-  data::begin() const
-  {
-    return _training[_active].begin(); 
-  }
-
-  ///
-  /// \return constant reference to the last+1 element of the active training
-  ///         set.
-  ///
-  inline
-  data::const_iterator
-  data::end() const
-  {
-    return _training[_active].end(); 
-  }
-   
 }  // namespace vita
 
 #endif  // DATA_H
