@@ -16,7 +16,7 @@ TYPE = release
 LIB = lib/libboost_program_options.a
 
 # Add directories to the include path.
-INCPATH = ./kernel ./boost
+INCPATH = ./ ./kernel ./boost
 
 WARN = -pedantic -ansi -Wall -Wextra
 DEFS = -march=native
