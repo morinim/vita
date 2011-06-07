@@ -184,17 +184,17 @@ namespace vita
     std::ostringstream best_list, best_tree, best_graph;
     run_sum.best.list(best_list);
     run_sum.best.tree(best_tree);
-    run_sum.best.graphviz(best_graph);    
+    run_sum.best.graphviz(best_graph);
 
     const std::string path("vita.");
-    const std::string summary(path+"summary.");  
+    const std::string summary(path+"summary.");
 
     boost::property_tree::ptree pt;
     pt.put(summary+"success_rate",runs ? double(solutions)/double(runs) : 0);
     pt.put(summary+"best.fitness",run_sum.f_best);
     pt.put(summary+"best.times_reached",solutions);
     pt.put(summary+"best.run",best_run);
-    pt.put(summary+"best.avg_depth_found",solutions 
+    pt.put(summary+"best.avg_depth_found",solutions
                         ? unsigned(double(run_sum.last_imp)/double(solutions))
                         : 0);
     pt.put(summary+"best.mean_fitness",fd.mean);
@@ -204,11 +204,11 @@ namespace vita
     pt.put(summary+"best.individual.graph",best_graph.str());
     pt.put(summary+"ttable.hits",run_sum.ttable_hits);
     pt.put(summary+"ttable.probes",run_sum.ttable_probes);
-    
-    const std::string f_sum(_prob.env.stat_dir + "/" + 
+
+    const std::string f_sum(_prob.env.stat_dir + "/" +
                             environment::sum_filename);
 
-    _prob.env.log(pt,path);
+    _prob.env.log(&pt,path);
 
     using namespace boost::property_tree::xml_parser;
     write_xml(f_sum,pt,std::locale(),xml_writer_make_settings(' ',2));

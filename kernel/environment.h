@@ -2,45 +2,57 @@
  *
  *  \file environment.h
  *
- *  \author Manlio Morini
- *  \date 2011/05/11
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(ENVIRONMENT_H)
 #define      ENVIRONMENT_H
 
 #include <cmath>
 #include <string>
+
 #include <boost/property_tree/ptree.hpp>
 
-#include "vita.h"
-#include "symbol_set.h"
+#include "kernel/vita.h"
+#include "kernel/symbol_set.h"
 
 namespace vita
 {
-
-  class environment
+  struct environment
   {
-  public:
     environment();
 
-    void log(boost::property_tree::ptree &, const std::string & = "") const;
+    void log(boost::property_tree::ptree *const,
+             const std::string & = "") const;
 
     void insert(symbol *const);
 
-    /// The number of genes (maximum length of an evolved program in the 
+    /// The number of genes (maximum length of an evolved program in the
     /// population).
     unsigned code_length;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
-    /// converge quicker but losing diversity. 
+    /// converge quicker but losing diversity.
     bool elitism;
 
-    /// Mutation probability. Mutation is one of the principal "search 
+    /// Mutation probability. Mutation is one of the principal "search
     /// operators" used to transform programs in the Genetic Programming
     /// algorithm. Mutation causes random changes in individuals.
     double p_mutation;
@@ -53,13 +65,13 @@ namespace vita
     /// Size of the tournament to choose the parents.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
-    /// selective pressure. Note that a tournament size of 1 would be 
+    /// selective pressure. Note that a tournament size of 1 would be
     /// equivalent to selecting individuals at random (within the mate zone).
     unsigned par_tournament;
     /// Size of the tournament to choose replaced individuals.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
-    /// selective pressure. Note that a tournament size of 1 would be 
+    /// selective pressure. Note that a tournament size of 1 would be
     /// equivalent to selecting individuals at random (within the mate zone).
     unsigned rep_tournament;
     /// Mating zone. 0 for panmictic.
@@ -75,7 +87,7 @@ namespace vita
     /// Should we use Adaptive Representation through Learning?
     bool arl;
 
-    /// Should we always insert input variables at the end of individual? 
+    /// Should we always insert input variables at the end of individual?
     bool force_input;
 
     /// 2^ttable_size is the number of elements of the transposition table.
@@ -101,7 +113,6 @@ namespace vita
     static const char dyn_filename[];
     static const char sum_filename[];
   };
-
 }  // namespace vita
 
 #endif  // ENVIRONMENT_H
