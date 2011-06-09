@@ -2,35 +2,49 @@
  *
  *  \file evolution.cc
  *
- *  \author Manlio Morini
- *  \date 2011/04/13
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
+#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <string>
+#include <vector>
 
-#include "evolution.h"
-#include "environment.h"
-#include "random.h"
+#include "kernel/evolution.h"
+#include "kernel/environment.h"
+#include "kernel/random.h"
 
 namespace vita
 {
-
   ///
-  /// \param[in] pop the \ref population that will be evolved. 
+  /// \param[in] pop the \ref population that will be evolved.
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(vita::population &pop, evaluator *const eva) 
-    : selection(this), operation(this), replacement(this), _pop(pop), 
-      _eva(new evaluator_proxy(eva,pop.env().ttable_size)) 
+  evolution::evolution(vita::population *const pop, evaluator *const eva)
+    : selection(this), operation(this), replacement(this), pop_(pop),
+      eva_(new evaluator_proxy(eva, pop->env().ttable_size))
   {
     assert(eva);
 
-    _run_count = 0;
+    run_count_ = 0;
 
     assert(check());
   }
@@ -38,16 +52,15 @@ namespace vita
   ///
   evolution::~evolution()
   {
-    delete _eva;
+    delete eva_;
   }
 
   ///
   /// \return access to the population being evolved.
   ///
-  vita::population &
-  evolution::population() const
+  vita::population &evolution::population() const
   {
-    return _pop;
+    return *pop_;
   }
 
   ///
@@ -55,19 +68,17 @@ namespace vita
   ///
   /// Gathers statistical informations about the elements of the population.
   ///
-  void
-  evolution::pick_stats(analyzer *const az)
+  void evolution::pick_stats(analyzer *const az)
   {
     az->clear();
 
-    for (population::const_iterator i(_pop.begin()); i != _pop.end(); ++i) 
-      az->add(*i,_eva->run(*i));
+    for (population::const_iterator i(pop_->begin()); i != pop_->end(); ++i)
+      az->add(*i, eva_->run(*i));
   }
 
-  void
-  evolution::pick_stats()
+  void evolution::pick_stats()
   {
-    pick_stats(&_stats.az);
+    pick_stats(&stats_.az);
   }
 
   ///
@@ -75,61 +86,60 @@ namespace vita
   /// Data are written in a CSV-like fashion and are partitioned in blocks
   /// separated by two blank lines:
   /// [BLOCK_1]\n\n
-  /// [BLOCK_2]\n\n 
+  /// [BLOCK_2]\n\n
   /// ...
   /// [BLOCK_x]
   /// where each block is a set of line like this:
   /// data_1 [space] data_2 [space] ... [space] data_n
   /// We use this format, instead of XML, because statistics are produced
-  /// incrementally and so it's simple and fast to append new data to a 
-  /// CSV-like file. Note also that data sets are ready to be plotted by 
+  /// incrementally and so it's simple and fast to append new data to a
+  /// CSV-like file. Note also that data sets are ready to be plotted by
   /// GNUPlot.
-  /// 
-  void
-  evolution::log() const
+  ///
+  void evolution::log() const
   {
     static unsigned last_run(0);
 
-    if (_pop.env().stat_dynamic)
+    if (pop_->env().stat_dynamic)
     {
-      const std::string f_dynamic(_pop.env().stat_dir + "/dynamic");
-      std::ofstream dynamic(f_dynamic.c_str(),std::ios_base::app);
+      const std::string f_dynamic(pop_->env().stat_dir + "/dynamic");
+      std::ofstream dynamic(f_dynamic.c_str(), std::ios_base::app);
       if (dynamic.good())
       {
-        if (last_run != _run_count)
+        if (last_run != run_count_)
         {
           dynamic << std::endl << std::endl;
-          last_run = _run_count;
+          last_run = run_count_;
         }
-        
-        dynamic << _run_count 
-                << ' ' << _stats.gen
-                << ' ' << _stats.f_best 
-                << ' ' << _stats.az.fit_dist().mean 
-                << ' ' << _stats.az.fit_dist().standard_deviation()
-                << ' ' << _stats.az.fit_dist().entropy()
-                << ' ' << _stats.az.fit_dist().min
-                << ' ' << unsigned(_stats.az.length_dist().mean) 
-                << ' ' << _stats.az.length_dist().standard_deviation()
-                << ' ' << unsigned(_stats.az.length_dist().max)
-                << ' ' << _stats.mutations 
-                << ' ' << _stats.crossovers
-                << ' ' << _stats.az.functions(0) 
-                << ' ' << _stats.az.terminals(0)
-                << ' ' << _stats.az.functions(1) 
-                << ' ' << _stats.az.terminals(1)
-                << ' ' << _eva->hits()
-                << ' ' << _eva->probes();
-        
+
+        dynamic << run_count_
+                << ' ' << stats_.gen
+                << ' ' << stats_.f_best
+                << ' ' << stats_.az.fit_dist().mean
+                << ' ' << stats_.az.fit_dist().standard_deviation()
+                << ' ' << stats_.az.fit_dist().entropy()
+                << ' ' << stats_.az.fit_dist().min
+                << ' ' << unsigned(stats_.az.length_dist().mean)
+                << ' ' << stats_.az.length_dist().standard_deviation()
+                << ' ' << unsigned(stats_.az.length_dist().max)
+                << ' ' << stats_.mutations
+                << ' ' << stats_.crossovers
+                << ' ' << stats_.az.functions(0)
+                << ' ' << stats_.az.terminals(0)
+                << ' ' << stats_.az.functions(1)
+                << ' ' << stats_.az.terminals(1)
+                << ' ' << eva_->hits()
+                << ' ' << eva_->probes();
+
         for (unsigned active(0); active <= 1; ++active)
-          for (analyzer::const_iterator i(_stats.az.begin());
-               i != _stats.az.end();
+          for (analyzer::const_iterator i(stats_.az.begin());
+               i != stats_.az.end();
                ++i)
-            dynamic << ' ' << (i->first)->display() << ' ' 
+            dynamic << ' ' << (i->first)->display() << ' '
                     << i->second.counter[active];
 
         dynamic << " \"";
-        _stats.best.inline_tree(dynamic);
+        stats_.best.inline_tree(dynamic);
         dynamic << '"' << std::endl;
       }
     }
@@ -138,29 +148,27 @@ namespace vita
   ///
   /// \return true if evolution should be interrupted.
   ///
-  bool
-  evolution::stop_condition() const
+  bool evolution::stop_condition() const
   {
-    return 
-      (_pop.env().g_since_start && _stats.gen > _pop.env().g_since_start) ||
+    return
+      (pop_->env().g_since_start && stats_.gen > pop_->env().g_since_start) ||
 
       // We use an accelerated stop condition when all the individuals have
       // the same fitness and after gwi/2 generations the situation isn't
-      // changed. 
-      ( _pop.env().g_without_improvement && 
-        (_stats.gen-_stats.last_imp > _pop.env().g_without_improvement ||
-	 (_stats.gen-_stats.last_imp > _pop.env().g_without_improvement/2 &&
-         _stats.az.fit_dist().variance <= float_epsilon)) );
+      // changed.
+      (pop_->env().g_without_improvement &&
+       (stats_.gen-stats_.last_imp > pop_->env().g_without_improvement ||
+        (stats_.gen-stats_.last_imp > pop_->env().g_without_improvement/2 &&
+         stats_.az.fit_dist().variance <= float_epsilon)));
   }
 
   ///
   /// \param[in] ind individual whose fitness we are interested in.
   /// \return the fitness of \a ind.
   ///
-  fitness_t
-  evolution::fitness(const individual &ind) const
+  fitness_t evolution::fitness(const individual &ind) const
   {
-    return _eva->run(ind);
+    return eva_->run(ind);
   }
 
   ///
@@ -170,62 +178,63 @@ namespace vita
   /// \param[in] rep_id index of the active replacement strategy.
   ///
   /// the genetic programming loop. We begin the loop by choosing a
-  /// genetic operation: reproduction, mutation or crossover. We then select 
-  /// the individual(s) to participate in the genetic operation using 
-  /// tournament selection. If we are doing reproduction or mutation, we only 
+  /// genetic operation: reproduction, mutation or crossover. We then select
+  /// the individual(s) to participate in the genetic operation using
+  /// tournament selection. If we are doing reproduction or mutation, we only
   /// select one individual. For crossover, two individuals need to be selected.
   /// The genetic operation is then performed and a new offspring individual is
   /// created.
   /// The offspring is then placed into the original population (steady state)
-  /// replacing a bad individual. 
+  /// replacing a bad individual.
   /// This whole process repeats until the termination criteria is satisfied.
-  /// With any luck, this process will produce an individual that solves the 
-  /// problem at hand. 
+  /// With any luck, this process will produce an individual that solves the
+  /// problem at hand.
   ///
-  const summary &
-  evolution::run(bool verbose, unsigned sel_id, unsigned op_id, unsigned rep_id)
+  const summary &evolution::run(bool verbose, unsigned sel_id, unsigned op_id,
+                                unsigned rep_id)
   {
-    _stats.clear();
-    _stats.best   = *_pop.begin();
-    _stats.f_best = _eva->run(_stats.best);
+    stats_.clear();
+    stats_.best   = *pop_->begin();
+    stats_.f_best = eva_->run(stats_.best);
 
-    _eva->clear();
+    eva_->clear();
 
     std::clock_t start_c(clock());
-    for (_stats.gen = 0; !stop_condition(); ++_stats.gen)
+    for (stats_.gen = 0; !stop_condition(); ++stats_.gen)
     {
-      pick_stats(&_stats.az);
+      pick_stats(&stats_.az);
 
       log();
 
-      for (unsigned k(0); k < _pop.size(); ++k)
+      for (unsigned k(0); k < pop_->size(); ++k)
       {
-	if ( verbose && k % std::max(_pop.size()/100,size_t(1)) )
-	{
-	  std::cout << "Run " << _run_count << '.'
-		    << _stats.gen << " (" << std::setw(3) << 100*k/_pop.size() 
-		    << "%)\r" << std::flush;
-	}
+        if ( verbose && k % std::max(pop_->size()/100, size_t(1)) )
+        {
+          std::cout << "Run " << run_count_ << '.'
+                    << stats_.gen << " (" << std::setw(3) << 100*k/pop_->size()
+                    << "%)\r" << std::flush;
+        }
 
-	// --------- SELECTION ---------
+        // --------- SELECTION ---------
         std::vector<unsigned> parents(selection.get(sel_id)->run());
 
-	// --------- CROSSOVER / MUTATION ---------
-        std::vector<individual> off(operation.get(op_id)->run(parents,&_stats));
+        // --------- CROSSOVER / MUTATION ---------
+        std::vector<individual> off(operation.get(op_id)->run(parents,
+                                                              &stats_));
 
-	// --------- REPLACEMENT --------
-        const fitness_t before(_stats.f_best);
-        replacement.get(rep_id)->run(parents,off,&_stats);
+        // --------- REPLACEMENT --------
+        const fitness_t before(stats_. f_best);
+        replacement.get(rep_id)->run(parents, off, &stats_);
 
-        if (verbose && _stats.f_best != before)
-          std::cout << "Run " << _run_count << '.' << std::setw(6) 
-                    << _stats.gen << " (" << std::setw(3) 
-                    << 100*k/_pop.size() << "%): fitness " << _stats.f_best 
+        if (verbose && stats_.f_best != before)
+          std::cout << "Run " << run_count_ << '.' << std::setw(6)
+                    << stats_.gen << " (" << std::setw(3)
+                    << 100*k/pop_->size() << "%): fitness " << stats_.f_best
                     << std::endl;
       }
 
-      _stats.ttable_probes = _eva->probes();
-      _stats.ttable_hits   =   _eva->hits();
+      stats_.ttable_probes = eva_->probes();
+      stats_.ttable_hits   =   eva_->hits();
     }
 
     if (verbose)
@@ -233,46 +242,45 @@ namespace vita
       double speed(0);
 
       if (clock() > start_c)
-	speed = double(_pop.size()*_stats.gen)*CLOCKS_PER_SEC/(clock()-start_c);
-	
+        speed = static_cast<double>(pop_->size()*stats_.gen) * CLOCKS_PER_SEC
+                / (clock()-start_c);
+
       std::string unit("");
       if (speed >= 10)
-	unit = "n/s";
+        unit = "n/s";
       else if (speed >= 1)
       {
-	speed *= 3600;
-	unit = "n/h";
+        speed *= 3600;
+        unit = "n/h";
       }
-      else // speed < 1
+      else  // speed < 1
       {
-	speed *= 3600*24;
-	unit = "n/d";
+        speed *= 3600*24;
+        unit = "n/d";
       }
 
-      std::cout << unsigned(speed) << unit << std::string(10,' ') 
-		<< std::endl << std::string(40,'-') << std::endl;
+      std::cout << unsigned(speed) << unit << std::string(10, ' ')
+                << std::endl << std::string(40, '-') << std::endl;
     }
 
-    ++_run_count;
+    ++run_count_;
 
-    return _stats;
+    return stats_;
   }
 
   ///
   /// \return true if the object passes the internal consistency check.
   ///
-  bool
-  evolution::check() const
+  bool evolution::check() const
   {
-    return _pop.check();
+    return pop_->check();
   }
 
   ///
   /// Resets summary informations.
   ///
-  void
-  summary::clear() 
-  { 
+  void summary::clear()
+  {
     ttable_probes = 0;
     ttable_hits   = 0;
     mutations     = 0;
@@ -283,5 +291,4 @@ namespace vita
 
     az.clear();
   }
-
 }  // namespace vita

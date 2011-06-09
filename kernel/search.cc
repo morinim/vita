@@ -106,13 +106,13 @@ namespace vita
   ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
-  /// \param[in] success_f when an individual reaches this fitness it is 
+  /// \param[in] success_f when an individual reaches this fitness it is
   ///                      considered a solution.
   /// \return best individual found.
   ///
   individual
   search::run(bool verbose, unsigned n, fitness_t success_f)
-  {   
+  {
     summary overall_run_sum;
     distribution<fitness_t> fd;
     unsigned best_run(0);
@@ -120,36 +120,36 @@ namespace vita
     unsigned solutions(0);
 
     population p(_prob.env);
-    evolution evo(p,_prob.get_evaluator());
+    evolution evo(&p,_prob.get_evaluator());
 
     summary previous;
     for (unsigned i(0); i < n; ++i)
     {
       if (i)
-	p = population(_prob.env);
+        p = population(_prob.env);
 
       const summary s(evo.run(verbose));
 
       if (i == 0)
       {
-	overall_run_sum.best   =   s.best;
-	overall_run_sum.f_best = s.f_best;
+        overall_run_sum.best   =   s.best;
+        overall_run_sum.f_best = s.f_best;
       }
-      
+
       const bool found(s.f_best >= success_f);
       if (found)
       {
-	++solutions;
-	overall_run_sum.last_imp += s.last_imp;
+        ++solutions;
+        overall_run_sum.last_imp += s.last_imp;
       }
 
       if (overall_run_sum.f_best < s.f_best)
       {
-	overall_run_sum.best   =   s.best;
-	overall_run_sum.f_best = s.f_best;
-	best_run               =        i;
+        overall_run_sum.best   =   s.best;
+        overall_run_sum.f_best = s.f_best;
+        best_run               =        i;
       }
-     
+
       fd.add(s.f_best);
       overall_run_sum.ttable_hits += s.ttable_hits;
       overall_run_sum.ttable_probes += s.ttable_probes;

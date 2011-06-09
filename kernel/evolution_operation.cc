@@ -17,7 +17,7 @@ namespace vita
 
   operation_strategy::operation_strategy(const evolution *const evo)
     : _evo(evo)
-  {    
+  {
   }
 
   class uniformcross_op : public operation_strategy
@@ -31,7 +31,7 @@ namespace vita
 
   uniformcross_op::uniformcross_op(const evolution *const evo)
     : operation_strategy(evo)
-  {    
+  {
   }
 
   ///

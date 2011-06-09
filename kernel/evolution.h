@@ -2,33 +2,44 @@
  *
  *  \file evolution.h
  *
- *  \author Manlio Morini
- *  \date 2011/04/13
+ *  Copyright 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(EVOLUTION_H)
 #define      EVOLUTION_H
 
-#include "vita.h"
-#include "analyzer.h"
-#include "evaluator_proxy.h"
-#include "evolution_operation.h"
-#include "evolution_replacement.h"
-#include "evolution_selection.h"
-#include "population.h"
+#include "kernel/vita.h"
+#include "kernel/analyzer.h"
+#include "kernel/evaluator_proxy.h"
+#include "kernel/evolution_operation.h"
+#include "kernel/evolution_replacement.h"
+#include "kernel/evolution_selection.h"
+#include "kernel/population.h"
 
 namespace vita
 {
-
   class environment;
   class evolution;
 
   struct summary
   {
-    summary() { clear(); };
+    summary() { clear(); }
 
     void clear();
 
@@ -51,7 +62,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(vita::population &, evaluator *const);
+    evolution(vita::population *const, evaluator *const);
     ~evolution();
 
     const summary &run(bool, unsigned = 0, unsigned = 0, unsigned = 0);
@@ -73,10 +84,10 @@ namespace vita
 
     bool stop_condition() const;
 
-    vita::population       &_pop;
-    evaluator_proxy *const  _eva;
-    summary               _stats;
-    unsigned          _run_count;
+    vita::population      *pop_;
+    evaluator_proxy *const eva_;
+    summary              stats_;
+    unsigned         run_count_;
   };
 
   ///
