@@ -2,19 +2,31 @@
  *
  *  \file evolution_operation.cc
  *
- *  \author Manlio Morini
- *  \date 2011/04/14
+ *  Copyright (c) 2011 EOS di Manlio Morini. All rights reserved.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
-#include "environment.h"
-#include "evolution.h"
+
+#include "kernel/evolution_operation.h"
+#include "kernel/environment.h"
+#include "kernel/evolution.h"
 
 namespace vita
 {
-
   operation_strategy::operation_strategy(const evolution *const evo)
     : _evo(evo)
   {
@@ -37,9 +49,9 @@ namespace vita
   ///
   /// \return
   ///
-  std::vector<individual>
-  uniformcross_op::run(const std::vector<unsigned> &parent,
-                       summary *const s)
+  std::vector<individual> uniformcross_op::run(
+    const std::vector<unsigned> &parent,
+    summary *const s)
   {
     const population &pop = _evo->population();
     const unsigned r1(parent[0]), r2(parent[1]);
@@ -70,17 +82,14 @@ namespace vita
     delete _strategy[unicross_mutation];
   }
 
-  operation_strategy *
-  operation_factory::get(unsigned s)
+  operation_strategy *operation_factory::get(unsigned s)
   {
     return _strategy[s];
   }
 
-  unsigned
-  operation_factory::put(operation_strategy *const s)
+  unsigned operation_factory::put(operation_strategy *const s)
   {
     _strategy.push_back(s);
     return _strategy.size();
   }
-
 }  // namespace vita
