@@ -219,8 +219,7 @@ namespace vita
         std::vector<unsigned> parents(selection.get(sel_id)->run());
 
         // --------- CROSSOVER / MUTATION ---------
-        std::vector<individual> off(operation.get(op_id)->run(parents,
-                                                              &stats_));
+        std::vector<individual> off(operation[op_id](parents, &stats_));
 
         // --------- REPLACEMENT --------
         const fitness_t before(stats_. f_best);

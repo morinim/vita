@@ -2,7 +2,7 @@
  *
  *  \file evolution_operation.cc
  *
- *  Copyright (c) 2011 EOS di Manlio Morini. All rights reserved.
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
  *  This file is part of VITA.
  *
@@ -37,8 +37,8 @@ namespace vita
   public:
     explicit uniformcross_op(const evolution *const);
 
-    virtual std::vector<individual> run(const std::vector<unsigned> &,
-                                        summary *const);
+    virtual std::vector<individual> operator()(const std::vector<unsigned> &,
+                                               summary *const);
   };
 
   uniformcross_op::uniformcross_op(const evolution *const evo)
@@ -47,9 +47,11 @@ namespace vita
   }
 
   ///
-  /// \return
+  /// \return the offspring.
   ///
-  std::vector<individual> uniformcross_op::run(
+  /// This is a quite standard crossover + mutation operator.
+  ///
+  std::vector<individual> uniformcross_op::operator()(
     const std::vector<unsigned> &parent,
     summary *const s)
   {
@@ -84,9 +86,9 @@ namespace vita
     delete strategy_[unicross_mutation];
   }
 
-  operation_strategy *operation_factory::get(unsigned s)
+  operation_strategy &operation_factory::operator[](unsigned s) const
   {
-    return strategy_[s];
+    return *strategy_[s];
   }
 
   unsigned operation_factory::put(operation_strategy *const s)
