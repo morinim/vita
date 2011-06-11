@@ -216,7 +216,7 @@ namespace vita
         }
 
         // --------- SELECTION ---------
-        std::vector<unsigned> parents(selection.get(sel_id)->run());
+        std::vector<unsigned> parents(selection[sel_id]());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation[op_id](parents, &stats_));
