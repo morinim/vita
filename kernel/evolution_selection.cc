@@ -98,17 +98,17 @@ namespace vita
 
   selection_factory::~selection_factory()
   {
-    delete _strategy[tournament];
+    delete strategy_[tournament];
   }
 
   selection_strategy &selection_factory::operator[](unsigned s)
   {
-    return *_strategy[s];
+    return *strategy_[s];
   }
 
   unsigned selection_factory::put(selection_strategy *const s)
   {
-    _strategy.push_back(s);
-    return _strategy.size();
+    strategy_.push_back(s);
+    return strategy_.size();
   }
 }  // namespace vita

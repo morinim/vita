@@ -64,7 +64,7 @@ namespace vita
     unsigned put(selection_strategy *const);
 
   private:
-    std::vector<selection_strategy *> _strategy;
+    std::vector<selection_strategy *> strategy_;
   };
 }  // namespace vita
 
