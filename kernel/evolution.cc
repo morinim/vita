@@ -223,7 +223,7 @@ namespace vita
 
         // --------- REPLACEMENT --------
         const fitness_t before(stats_. f_best);
-        replacement.get(rep_id)->run(parents, off, &stats_);
+        replacement[rep_id](parents, off, &stats_);
 
         if (verbose && stats_.f_best != before)
           std::cout << "Run " << run_count_ << '.' << std::setw(6)
