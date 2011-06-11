@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #include <fstream>
 
 #include <boost/property_tree/ptree.hpp>
@@ -36,8 +36,8 @@ namespace vita
   /// \param[in] evo evolution up to now.
   ///
   /// Adaptive Representation through Learning (ARL). The algorithm extract
-  /// common knowledge (building blocks) emerging during the evolutionary 
-  /// process and acquires the necessary structure for solving the problem 
+  /// common knowledge (building blocks) emerging during the evolutionary
+  /// process and acquires the necessary structure for solving the problem
   /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
   ///
   void
@@ -48,22 +48,22 @@ namespace vita
     const fitness_t base_fit(evo.fitness(base));
     if (!is_bad(base_fit))
     {
-      const std::string f_adf(_prob.env.stat_dir + "/" + 
+      const std::string f_adf(_prob.env.stat_dir + "/" +
                               environment::arl_filename);
       std::ofstream adf_l(f_adf.c_str(),std::ios_base::app);
 
       if (_prob.env.stat_arl && adf_l.good())
       {
-        unsigned i(0);         
-        for (const adf_0 *f = _prob.env.sset.get_adf0(i); 
-             f; 
+        unsigned i(0);
+        for (const adf_0 *f = _prob.env.sset.get_adf0(i);
+             f;
              f = _prob.env.sset.get_adf0(++i))
           adf_l << f->display() << ' ' << f->weight << std::endl;
         adf_l << std::endl;
       }
 
       std::list<unsigned> block_index(base.blocks());
-      for (std::list<unsigned>::const_iterator i(block_index.begin()); 
+      for (std::list<unsigned>::const_iterator i(block_index.begin());
            i != block_index.end();
            ++i)
       {
@@ -87,12 +87,12 @@ namespace vita
             else
               p = new vita::adf_0(candidate_block,100);
             _prob.env.insert(p);
-        
+
             if (_prob.env.stat_arl && adf_l.good())
             {
-              adf_l << p->display() << " (Base: " << base_fit 
-                    << "  DF: " << d_f 
-                    << "  Weight: " << std::fabs(d_f/base_fit)*100.0 << "%)" 
+              adf_l << p->display() << " (Base: " << base_fit
+                    << "  DF: " << d_f
+                    << "  Weight: " << std::fabs(d_f/base_fit)*100.0 << "%)"
                     << std::endl;
               candidate_block.list(adf_l);
               adf_l << std::endl;
@@ -119,16 +119,11 @@ namespace vita
 
     unsigned solutions(0);
 
-    population p(_prob.env);
-    evolution evo(&p,_prob.get_evaluator());
-
     summary previous;
     for (unsigned i(0); i < n; ++i)
     {
-      if (i)
-        p = population(_prob.env);
-
-      const summary s(evo.run(verbose));
+      evolution evo(&_prob.env,_prob.get_evaluator());
+      const summary s(evo(verbose,i));
 
       if (i == 0)
       {

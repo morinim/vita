@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -23,9 +23,9 @@ namespace vita
   ///
   /// \param[in] e base \a environment.
   ///
-  population::population(environment &e) : _env(&e)
+  population::population(environment *const e) : _env(e)
   {
-    assert(e.check());
+    assert(e->check());
 
     build();
   }

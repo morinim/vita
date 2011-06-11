@@ -2,7 +2,7 @@
  *
  *  \file evolution.h
  *
- *  Copyright (c) 2011 EOS di Manlio Morini. All rights reserved.
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
  *  This file is part of VITA.
  *
@@ -62,12 +62,14 @@ namespace vita
   class evolution
   {
   public:
-    evolution(vita::population *const, evaluator *const);
+    evolution(environment *const, evaluator *const);
     ~evolution();
 
-    const summary &run(bool, unsigned = 0, unsigned = 0, unsigned = 0);
+    const summary &operator()(bool, unsigned, unsigned = 0, unsigned = 0,
+                              unsigned = 0);
 
-    vita::population &population() const;
+    const vita::population &population() const;
+    vita::population &population();
     fitness_t fitness(const individual &) const;
 
     void pick_stats(analyzer *const);
@@ -79,15 +81,14 @@ namespace vita
     replacement_factory replacement;
 
   private:
-    void log() const;
+    void log(unsigned) const;
     void pick_stats();
 
     bool stop_condition() const;
 
-    vita::population      *pop_;
+    vita::population       pop_;
     evaluator_proxy *const eva_;
     summary              stats_;
-    unsigned         run_count_;
   };
 
   ///

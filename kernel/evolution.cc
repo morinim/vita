@@ -2,7 +2,7 @@
  *
  *  \file evolution.cc
  *
- *  Copyright (c) 2011 EOS di Manlio Morini. All rights reserved.
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
  *  This file is part of VITA.
  *
@@ -35,16 +35,14 @@
 namespace vita
 {
   ///
-  /// \param[in] pop the \ref population that will be evolved.
+  /// \param[in] env environment (mostly used for population initialization).
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(vita::population *const pop, evaluator *const eva)
-    : selection(this), operation(this), replacement(this), pop_(pop),
-      eva_(new evaluator_proxy(eva, pop->env().ttable_size))
+  evolution::evolution(environment *const env, evaluator *const eva)
+    : selection(this), operation(this), replacement(this), pop_(env),
+      eva_(new evaluator_proxy(eva, env->ttable_size))
   {
     assert(eva);
-
-    run_count_ = 0;
 
     assert(check());
   }
@@ -58,9 +56,17 @@ namespace vita
   ///
   /// \return access to the population being evolved.
   ///
-  vita::population &evolution::population() const
+  vita::population &evolution::population()
   {
-    return *pop_;
+    return pop_;
+  }
+
+  ///
+  /// \return constant reference to the population being evolved.
+  ///
+  const vita::population &evolution::population() const
+  {
+    return pop_;
   }
 
   ///
@@ -72,7 +78,7 @@ namespace vita
   {
     az->clear();
 
-    for (population::const_iterator i(pop_->begin()); i != pop_->end(); ++i)
+    for (population::const_iterator i(pop_.begin()); i != pop_.end(); ++i)
       az->add(*i, eva_->run(*i));
   }
 
@@ -81,6 +87,8 @@ namespace vita
     pick_stats(&stats_.az);
   }
 
+  ///
+  /// \param[in] run_count run number.
   ///
   /// Saves working / statistical informations in a log file.
   /// Data are written in a CSV-like fashion and are partitioned in blocks
@@ -96,23 +104,23 @@ namespace vita
   /// CSV-like file. Note also that data sets are ready to be plotted by
   /// GNUPlot.
   ///
-  void evolution::log() const
+  void evolution::log(unsigned run_count) const
   {
     static unsigned last_run(0);
 
-    if (pop_->env().stat_dynamic)
+    if (pop_.env().stat_dynamic)
     {
-      const std::string f_dynamic(pop_->env().stat_dir + "/dynamic");
+      const std::string f_dynamic(pop_.env().stat_dir + "/dynamic");
       std::ofstream dynamic(f_dynamic.c_str(), std::ios_base::app);
       if (dynamic.good())
       {
-        if (last_run != run_count_)
+        if (last_run != run_count)
         {
           dynamic << std::endl << std::endl;
-          last_run = run_count_;
+          last_run = run_count;
         }
 
-        dynamic << run_count_
+        dynamic << run_count
                 << ' ' << stats_.gen
                 << ' ' << stats_.f_best
                 << ' ' << stats_.az.fit_dist().mean
@@ -151,14 +159,14 @@ namespace vita
   bool evolution::stop_condition() const
   {
     return
-      (pop_->env().g_since_start && stats_.gen > pop_->env().g_since_start) ||
+      (pop_.env().g_since_start && stats_.gen > pop_.env().g_since_start) ||
 
       // We use an accelerated stop condition when all the individuals have
       // the same fitness and after gwi/2 generations the situation isn't
       // changed.
-      (pop_->env().g_without_improvement &&
-       (stats_.gen-stats_.last_imp > pop_->env().g_without_improvement ||
-        (stats_.gen-stats_.last_imp > pop_->env().g_without_improvement/2 &&
+      (pop_.env().g_without_improvement &&
+       (stats_.gen-stats_.last_imp > pop_.env().g_without_improvement ||
+        (stats_.gen-stats_.last_imp > pop_.env().g_without_improvement/2 &&
          stats_.az.fit_dist().variance <= float_epsilon)));
   }
 
@@ -173,6 +181,7 @@ namespace vita
 
   ///
   /// \param[in] verbose if true prints verbose informations.
+  /// \param[in] run_count run number (used for print and log).
   /// \param[in] sel_id index of the active selection strategy.
   /// \param[in] op_id index of the active operation strategy.
   /// \param[in] rep_id index of the active replacement strategy.
@@ -190,11 +199,12 @@ namespace vita
   /// With any luck, this process will produce an individual that solves the
   /// problem at hand.
   ///
-  const summary &evolution::run(bool verbose, unsigned sel_id, unsigned op_id,
-                                unsigned rep_id)
+  const summary &evolution::operator()(bool verbose, unsigned run_count,
+                                       unsigned sel_id, unsigned op_id,
+                                       unsigned rep_id)
   {
     stats_.clear();
-    stats_.best   = *pop_->begin();
+    stats_.best   = *pop_.begin();
     stats_.f_best = eva_->run(stats_.best);
 
     eva_->clear();
@@ -204,14 +214,14 @@ namespace vita
     {
       pick_stats(&stats_.az);
 
-      log();
+      log(run_count);
 
-      for (unsigned k(0); k < pop_->size(); ++k)
+      for (unsigned k(0); k < pop_.size(); ++k)
       {
-        if ( verbose && k % std::max(pop_->size()/100, size_t(1)) )
+        if ( verbose && k % std::max(pop_.size()/100, size_t(1)) )
         {
-          std::cout << "Run " << run_count_ << '.'
-                    << stats_.gen << " (" << std::setw(3) << 100*k/pop_->size()
+          std::cout << "Run " << run_count << '.'
+                    << stats_.gen << " (" << std::setw(3) << 100*k/pop_.size()
                     << "%)\r" << std::flush;
         }
 
@@ -226,9 +236,9 @@ namespace vita
         replacement[rep_id](parents, off, &stats_);
 
         if (verbose && stats_.f_best != before)
-          std::cout << "Run " << run_count_ << '.' << std::setw(6)
+          std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
-                    << 100*k/pop_->size() << "%): fitness " << stats_.f_best
+                    << 100*k/pop_.size() << "%): fitness " << stats_.f_best
                     << std::endl;
       }
 
@@ -241,7 +251,7 @@ namespace vita
       double speed(0);
 
       if (clock() > start_c)
-        speed = static_cast<double>(pop_->size()*stats_.gen) * CLOCKS_PER_SEC
+        speed = static_cast<double>(pop_.size()*stats_.gen) * CLOCKS_PER_SEC
                 / (clock()-start_c);
 
       std::string unit("");
@@ -262,8 +272,6 @@ namespace vita
                 << std::endl << std::string(40, '-') << std::endl;
     }
 
-    ++run_count_;
-
     return stats_;
   }
 
@@ -272,7 +280,7 @@ namespace vita
   ///
   bool evolution::check() const
   {
-    return pop_->check();
+    return pop_.check() && eva_;
   }
 
   ///
