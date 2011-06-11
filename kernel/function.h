@@ -2,37 +2,49 @@
  *
  *  \file function.h
  *
- *  \author Manlio Morini
- *  \date 2010/11/13
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(FUNCTION_H)
 #define      FUNCTION_H
 
+#include <string>
 #include <vector>
 
-#include "vita.h"
-#include "symbol.h"
-#include "gene.h"
+#include "kernel/vita.h"
+#include "kernel/gene.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
-
   ///
-  /// An operator used in GP. A \a function label the internal (non-leaf) points
+  /// A symbol used in GP. A \a function label the internal (non-leaf) points
   /// of the parse trees that represent the programs in the \a population. An
   /// example function set might be {+,-,*}.
   ///
   class function : public symbol
   {
   public:
-    function(const std::string &, symbol_t, const std::vector<symbol_t> &, 
-             unsigned, bool=false);
-    function(const std::string &, symbol_t, unsigned, unsigned=default_weight,
-             bool=false);
+    function(const std::string &, symbol_t, const std::vector<symbol_t> &,
+             unsigned, bool = false);
+    function(const std::string &, symbol_t, unsigned, unsigned = default_weight,
+             bool = false);
 
     bool associative() const;
     bool parametric() const;
@@ -45,57 +57,10 @@ namespace vita
     static unsigned default_weight;
 
   private:
-    symbol_t _argt[gene_args];
-    unsigned            _argc;
-    const bool   _associative;
+    symbol_t argt_[gene::k_args];
+    unsigned               argc_;
+    const bool      associative_;
   };
-
-  ///
-  /// \return the number of arguments (0 arguments => terminal).
-  ///
-  inline
-  unsigned
-  function::argc() const
-  {
-    assert(_argc);
-    return _argc;
-  }
-
-  /**
-   * arg_type
-   * \param i[in]
-   * \return i-th argument type of the function.
-   */
-  inline
-  symbol_t
-  function::arg_type(unsigned i) const
-  {
-    assert(i < gene_args);
-    return _argt[i];
-  }
-
-  /**
-   * associative
-   * \return
-   */
-  inline
-  bool
-  function::associative() const
-  {
-    return _associative;
-  }
-
-  /**
-   * parametric
-   * \return false (function are never parametric). 
-   */
-  inline
-  bool
-  function::parametric() const
-  {
-    return false;
-  }
-    
 }  // namespace vita
 
 #endif  // FUNCTION_H

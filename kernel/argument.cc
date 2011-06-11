@@ -30,7 +30,7 @@ namespace vita
   ///
   /// \param[in] n argument index.
   ///
-  /// An \a adf_n function may have up to \a gene_args arguments.
+  /// An \a adf_n function may have up to \a k_args arguments.
   ///
   argument::argument(unsigned n)
     : terminal("ARG", sym_void, false, false, 0), index_(n)
@@ -70,6 +70,6 @@ namespace vita
   ///
   bool argument::check() const
   {
-    return index_ < gene_args && terminal::check();
+    return index_ < gene::k_args && terminal::check();
   }
 }  // Namespace vita

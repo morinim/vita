@@ -19,13 +19,13 @@ namespace vita
 
   ///
   /// Sets up the object.
-  /// The constructor allocates memory for up to \a gene_args argument.
+  /// The constructor allocates memory for up to \a k_args argument.
   ///
   symbol_set::symbol_set()
   {
     clear();
 
-    for (unsigned i(0); i < gene_args; ++i)
+    for (unsigned i(0); i < gene::k_args; ++i)
       _arguments.push_back(new argument(i));
 
     assert(check());
@@ -81,7 +81,7 @@ namespace vita
   ///
   const argument *symbol_set::arg(unsigned n) const
   {
-    assert(n < gene_args);
+    assert(n < gene::k_args);
     return _arguments[n];
   }
 

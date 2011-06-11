@@ -664,10 +664,10 @@ namespace vita
     for (const_iterator it(*this); it(); line = ++it)
     {
       if (!_code[line].sym)
-	return false;
+        return false;
 
-      if (_code[line].sym->argc() > gene_args)
-	return false;
+      if (_code[line].sym->argc() > gene::k_args)
+        return false;
       
       for (unsigned j(0); j < _code[line].sym->argc(); ++j)
 	if (_code[line].args[j] >= size() || _code[line].args[j] <= line)
