@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(PROBLEM_H)
 #define      PROBLEM_H
 
@@ -31,7 +31,7 @@ namespace vita
     void set_evaluator(unsigned);
 
     virtual void clear();
-    virtual bool check() const; 
+    virtual bool check() const;
 
     environment env;
 

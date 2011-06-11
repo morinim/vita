@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(SRC_PROBLEM_H)
 #define      SRC_PROBLEM_H
 
@@ -21,7 +21,6 @@
 
 namespace vita
 {
-
   class src_problem : public problem
   {
   public:
@@ -37,12 +36,11 @@ namespace vita
     unsigned variables() const;
 
     bool check() const;
-    
+
   private:
     std::vector<vita::sr::variable *> vars;
     data dat;
   };
-
 }  // namespace vita
 
 #endif  // SRC_PROBLEM_H

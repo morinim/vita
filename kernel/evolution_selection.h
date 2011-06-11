@@ -20,7 +20,7 @@ namespace vita
 {
 
   class evolution;
-  
+
   ///
   /// The selection strategy (tournament, fitness proportional...) for the
   /// \a evolution \c class. In the strategy design pattern, this \c class is
@@ -51,7 +51,7 @@ namespace vita
 
     selection_strategy *get(unsigned);
     unsigned put(selection_strategy *const);
-    
+
   private:
     std::vector<selection_strategy *> _strategy;
   };

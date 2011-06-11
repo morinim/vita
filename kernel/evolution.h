@@ -2,7 +2,7 @@
  *
  *  \file evolution.h
  *
- *  Copyright 2011 EOS di Manlio Morini.
+ *  Copyright (c) 2011 EOS di Manlio Morini. All rights reserved.
  *
  *  This file is part of VITA.
  *

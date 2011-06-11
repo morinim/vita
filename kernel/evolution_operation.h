@@ -48,7 +48,7 @@ namespace vita
                                         summary *const) = 0;
 
   protected:
-    const evolution *const _evo;
+    const evolution *const evo_;
   };
 
   ///
@@ -67,7 +67,7 @@ namespace vita
     unsigned put(operation_strategy *const);
 
   private:
-    std::vector<operation_strategy *> _strategy;
+    std::vector<operation_strategy *> strategy_;
   };
 }  // namespace vita
 

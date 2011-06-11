@@ -28,7 +28,7 @@
 namespace vita
 {
   operation_strategy::operation_strategy(const evolution *const evo)
-    : _evo(evo)
+    : evo_(evo)
   {
   }
 
@@ -53,7 +53,9 @@ namespace vita
     const std::vector<unsigned> &parent,
     summary *const s)
   {
-    const population &pop = _evo->population();
+    assert(parent.check() && s);
+
+    const population &pop = evo_->population();
     const unsigned r1(parent[0]), r2(parent[1]);
 
     std::vector<individual> off(1);
@@ -79,17 +81,17 @@ namespace vita
 
   operation_factory::~operation_factory()
   {
-    delete _strategy[unicross_mutation];
+    delete strategy_[unicross_mutation];
   }
 
   operation_strategy *operation_factory::get(unsigned s)
   {
-    return _strategy[s];
+    return strategy_[s];
   }
 
   unsigned operation_factory::put(operation_strategy *const s)
   {
-    _strategy.push_back(s);
-    return _strategy.size();
+    strategy_.push_back(s);
+    return strategy_.size();
   }
 }  // namespace vita
