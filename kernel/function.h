@@ -50,7 +50,7 @@ namespace vita
     bool parametric() const;
 
     symbol_t arg_type(unsigned) const;
-    unsigned argc() const;
+    unsigned arity() const;
 
     bool check() const;
 
@@ -58,7 +58,7 @@ namespace vita
 
   private:
     symbol_t argt_[gene::k_args];
-    unsigned               argc_;
+    unsigned              arity_;
     const bool      associative_;
   };
 }  // namespace vita

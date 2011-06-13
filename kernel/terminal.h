@@ -36,7 +36,7 @@ namespace vita
     bool input() const;
     bool parametric() const;
 
-    unsigned argc() const;
+    unsigned arity() const;
 
     bool check() const;
 
@@ -65,7 +65,7 @@ namespace vita
   ///
   inline
   unsigned
-  terminal::argc() const
+  terminal::arity() const
   {
     return 0;
   }

@@ -65,7 +65,7 @@ namespace vita
       dest._code[new_line] = *it;
 
       for (unsigned i(0); i < new_line; ++i)
-        for (unsigned j(0); j < dest._code[i].sym->argc(); ++j)
+        for (unsigned j(0); j < dest._code[i].sym->arity(); ++j)
           if (dest._code[i].args[j] == old_line)
             dest._code[i].args[j] = new_line;
     }
@@ -128,7 +128,7 @@ namespace vita
           {
             source._code[j] = source._code[j-1];
 
-            for (unsigned k(0); k < source._code[j].sym->argc(); ++k)
+            for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
             {
               locus_t &arg(source._code[j].args[k]);
               if (arg == i)
@@ -149,7 +149,7 @@ namespace vita
             // Rearrange the arguments of the functions before the terminal 
             // that will be moved.
             for (unsigned j(source._best); j < i; ++j)
-              for (unsigned k(0); k < source._code[j].sym->argc(); ++k)
+              for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
               {
                 locus_t &arg(source._code[j].args[k]);
 
@@ -158,7 +158,7 @@ namespace vita
                 else if (i < arg && arg <= first_terminal)
                   --arg;
               }
-            
+
             const gene g(source._code[i]);
 
             // Move the symbols after the terminal one location backward. The
@@ -169,7 +169,7 @@ namespace vita
             {
               source._code[j] = source._code[j+1];
 
-              for (unsigned k(0); k < source._code[j].sym->argc(); ++k)
+              for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
               {
                 locus_t &arg(source._code[j].args[k]);
 
@@ -256,7 +256,7 @@ namespace vita
         {
           if (padf_n)
           {
-            const unsigned n_arg(s->argc());
+            const unsigned n_arg(s->arity());
             std::vector<unsigned> args1(n_arg);
             for (unsigned j(0); j < n_arg; ++j)
               args1[j] = ll[source._code[i].args[j]];
@@ -288,7 +288,7 @@ namespace vita
             if (sym->parametric())
               dest._code[dest_l].par = source._code[i].par;
             else  // not parametric
-              for (unsigned j(0); j < source._code[i].sym->argc(); ++j)
+              for (unsigned j(0); j < source._code[i].sym->arity(); ++j)
                 dest._code[dest_l].args[j] = ll[source._code[i].args[j]];
 
             ll[i] = dest_l;
@@ -428,11 +428,11 @@ namespace vita
 
     unsigned line(_best);
     for (const_iterator i(*this); i(); line = ++i)
-      if (_code[line].sym->argc())
+      if (_code[line].sym->arity())
         bl.push_back(line);
       /*
-      for (unsigned j(0); j < _code[line].sym->argc(); ++j)
-	if ( _code[_code[line].args[j]].sym->argc() )  // At least depth 3
+      for (unsigned j(0); j < _code[line].sym->arity(); ++j)
+	if ( _code[_code[line].args[j]].sym->arity() )  // At least depth 3
 	{
 	  bl.push_back(line);
 	  break;;
@@ -615,7 +615,7 @@ namespace vita
 	p.push_back(s2[i]);
     }
     else
-      for (unsigned i(0); i < g.sym->argc(); ++i)
+      for (unsigned i(0); i < g.sym->arity(); ++i)
         pack(p,g.args[i]);
   }
 
@@ -644,7 +644,7 @@ namespace vita
 
     _code.push_back(g);
     const unsigned base(size()-1);
-    for (unsigned i(0); i < g.sym->argc(); ++i)
+    for (unsigned i(0); i < g.sym->arity(); ++i)
     {
       _code[base].args[i] = size();
       unpacked += unpack(packed,idx+unpacked);
@@ -666,10 +666,10 @@ namespace vita
       if (!_code[line].sym)
         return false;
 
-      if (_code[line].sym->argc() > gene::k_args)
+      if (_code[line].sym->arity() > gene::k_args)
         return false;
       
-      for (unsigned j(0); j < _code[line].sym->argc(); ++j)
+      for (unsigned j(0); j < _code[line].sym->arity(); ++j)
 	if (_code[line].args[j] >= size() || _code[line].args[j] <= line)
 	  return false;
 
@@ -711,7 +711,7 @@ namespace vita
 	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
 	<< "];";
 
-      for (unsigned j(0); j < g.sym->argc(); ++j)
+      for (unsigned j(0); j < g.sym->arity(); ++j)
 	s << 'g' << line << " -- g" << g.args[j] << ';';
     }
 
@@ -762,7 +762,7 @@ namespace vita
       s << '[' << std::setfill('0') << std::setw(width) << line << "] " 
 	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-      for (unsigned j(0); j < g.sym->argc(); ++j)
+      for (unsigned j(0); j < g.sym->arity(); ++j)
 	s << ' ' << std::setw(width) << g.args[j];
 
       s << std::endl;
@@ -792,9 +792,9 @@ namespace vita
       indt += 2;
     }
     
-    const unsigned argc(g.sym->argc());
-    if (argc)
-      for (unsigned i(0); i < argc; ++i)
+    const unsigned arity(g.sym->arity());
+    if (arity)
+      for (unsigned i(0); i < arity; ++i)
 	tree(s,g.args[i],indt,locus);
   }
 
@@ -822,7 +822,7 @@ namespace vita
       s << '[' << std::setfill('0') << std::setw(width) << i << "] " 
 	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-      for (unsigned j(0); j < g.sym->argc(); ++j)
+      for (unsigned j(0); j < g.sym->arity(); ++j)
 	s << ' ' << std::setw(width) << g.args[j];
 
       s << std::endl;
@@ -864,7 +864,7 @@ namespace vita
       assert(_l < _ind._code.size());
       const gene &g(_ind._code[_l]);
 
-      for (unsigned j(0); j < g.sym->argc(); ++j)
+      for (unsigned j(0); j < g.sym->arity(); ++j)
 	_lines.insert(g.args[j]);
 
       _l = *_lines.begin();

@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(SYMBOL_H)
 #define      SYMBOL_H
 
@@ -51,9 +51,11 @@ namespace vita
     virtual int init() const;
 
     virtual bool associative() const = 0;
-    virtual bool parametric() const = 0;    
+    virtual bool parametric() const = 0;
 
-    virtual unsigned argc() const = 0;
+    // The arity of a function is the number of inputs to or arguments of that
+    // funtion.
+    virtual unsigned arity() const = 0;
 
     virtual boost::any eval(interpreter *) const = 0;
 
@@ -104,7 +106,7 @@ namespace vita
   bool
   symbol::terminal() const
   {
-    return !argc();
+    return arity() == 0;
   }
 
   ///

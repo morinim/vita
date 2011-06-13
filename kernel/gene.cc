@@ -52,8 +52,8 @@ namespace vita
       par = sym->init();
     else
     {
-      const unsigned argc(sym->argc());
-      for (unsigned j(0); j < argc; ++j)
+      const unsigned arity(sym->arity());
+      for (unsigned j(0); j < arity; ++j)
         args[j] = random::between<unsigned>(from, sup);
     }
   }
@@ -81,7 +81,7 @@ namespace vita
     if (sym->parametric())
       return par == g.par;
 
-    const unsigned n(sym->argc());
+    const unsigned n(sym->arity());
     for (unsigned i(0); i < n; ++i)
       if (args[i] != g.args[i])
         return false;

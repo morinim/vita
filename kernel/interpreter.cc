@@ -72,12 +72,12 @@ namespace vita
   {
     const gene &g(_ind._code[_ip]);
 
-    assert(i < g.sym->argc());
+    assert(i < g.sym->arity());
 
     const locus_t locus(g.args[i]);
     if (_cache[locus].empty)
     {
-      const unsigned backup(_ip); 
+      const unsigned backup(_ip);
       _ip = locus;
       assert (_ip > backup);
       const boost::any ret(_ind._code[_ip].sym->eval(this));

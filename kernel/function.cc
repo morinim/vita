@@ -42,10 +42,10 @@ namespace vita
   {
     assert(args.size() <= gene::k_args);
 
-    for (argc_ = 0; argc_ < args.size(); ++argc_)
-      argt_[argc_] = args[argc_];
+    for (arity_ = 0; arity_ < args.size(); ++arity_)
+      argt_[arity_] = args[arity_];
 
-    for (unsigned i(argc()); i < gene::k_args; ++i)
+    for (unsigned i(arity()); i < gene::k_args; ++i)
       argt_[i] = sym_void;
 
     assert(check());
@@ -65,12 +65,12 @@ namespace vita
   ///
   function::function(const std::string &dis, symbol_t t,
                      unsigned n, unsigned w, bool asve)
-    : symbol(dis, t, w), argc_(n), associative_(asve)
+    : symbol(dis, t, w), arity_(n), associative_(asve)
   {
     assert(n <= gene::k_args);
 
     unsigned i(0);
-    for (; i <     argc_; ++i)     argt_[i] =        t;
+    for (; i <     arity_; ++i)    argt_[i] =        t;
     for (; i < gene::k_args; ++i)  argt_[i] = sym_void;
 
     assert(check());
@@ -79,10 +79,10 @@ namespace vita
   ///
   /// \return the number of arguments (0 arguments => terminal).
   ///
-  unsigned function::argc() const
+  unsigned function::arity() const
   {
-    assert(argc_);
-    return argc_;
+    assert(arity_);
+    return arity_;
   }
 
   ///
@@ -117,6 +117,6 @@ namespace vita
   ///
   bool function::check() const
   {
-    return argc_ && argc_ <= gene::k_args && symbol::check();
+    return arity_ && arity_ <= gene::k_args && symbol::check();
   }
 }  // Namespace vita
