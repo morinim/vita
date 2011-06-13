@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(TERMINAL_H)
 #define      TERMINAL_H
 
@@ -20,8 +20,9 @@ namespace vita
 
   ///
   /// A terminal (leaf) node in the parse trees representing the programs in the
-  /// population. A terminal might be a variable, a constant value or a function
-  /// taking no arguments (e.g. move-north).
+  /// population. A terminal might be a variable (input to the program), a
+  /// constant value or a function taking no arguments (e.g. move-north).
+  /// Terminals are symbols with an arity of zero.
   ///
   class terminal : public symbol
   {

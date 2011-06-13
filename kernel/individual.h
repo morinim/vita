@@ -2,13 +2,25 @@
  *
  *  \file individual.h
  *
- *  \author Manlio Morini
- *  \date 2011/05/11
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(INDIVIDUAL_H)
 #define      INDIVIDUAL_H
 
@@ -17,17 +29,18 @@
 #include <iomanip>
 #include <list>
 #include <set>
+#include <string>
+#include <vector>
 
-#include "vita.h"
-#include "gene.h"
+#include "kernel/vita.h"
+#include "kernel/gene.h"
 
 namespace vita
 {
-
   class environment;
 
   ///
-  /// A single member of a \a population. Each individual contains a genome 
+  /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
   /// point in the search space).
   ///
@@ -47,16 +60,16 @@ namespace vita
     individual uniform_cross(const individual &) const;
     individual cross1(const individual &);
     individual cross2(const individual &);
-    
+
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
-    individual replace(const symbol *const, 
+    individual replace(const symbol *const,
                        const std::vector<unsigned> &) const;
     individual replace(const symbol *const, const std::vector<unsigned> &,
                        unsigned) const;
 
-    void generalize(std::size_t, 
+    void generalize(std::size_t,
                     std::vector<unsigned> *, std::vector<symbol_t> *);
 
     individual compact(unsigned * = 0) const;
@@ -78,13 +91,13 @@ namespace vita
     symbol_t type() const;
 
   private:
-    static unsigned normalize(const individual &, 
+    static unsigned normalize(const individual &,
                               const std::vector<unsigned> *, unsigned &,
                               individual &);
     void pack(std::vector<boost::uint8_t> &, unsigned) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
-    
+
     /// Active code in this individual (the best sequence of genes is starting
     /// here).
     unsigned          _best;
@@ -99,14 +112,14 @@ namespace vita
     {
     public:
       const_iterator(const individual &);
-    
+
       bool operator()() const;
-      
+
       unsigned operator++();
-      
+
       const gene &operator*() const;
       const gene *operator->() const;
-    
+
     private:
       const individual    &_ind;
       unsigned               _l;
@@ -148,7 +161,7 @@ namespace vita
   individual::const_iterator::operator->() const
   {
     assert(_l < _ind._code.size());
-    return &_ind._code[_l];    
+    return &_ind._code[_l];
   }
 
   ///
@@ -161,7 +174,7 @@ namespace vita
   {
     return _code[i];
   }
-  
+
   ///
   /// \return the total size of the individual (effective size + introns).
   ///
@@ -216,9 +229,9 @@ namespace vita
   ///
   inline
   void
-  individual::pack(std::vector<boost::uint8_t> &p) const 
-  { 
-    pack(p,_best); 
+  individual::pack(std::vector<boost::uint8_t> &p) const
+  {
+    pack(p, _best);
   }
 
   ///
@@ -226,9 +239,8 @@ namespace vita
   /// Creates a random individual and shows its content.
   ///
   /// \example example3.cc
-  /// Performs three types of crossover between two random individuals. 
+  /// Performs three types of crossover between two random individuals.
   ///
-
 }  // namespace vita
 
 #endif  // INDIVIDUAL_H
