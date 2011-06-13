@@ -64,7 +64,7 @@ namespace vita
     ++_probes;
 
     std::vector<boost::uint8_t> packed;
-    ind.pack(packed);
+    ind.pack(&packed);
 
     const hash_t h(hash(packed));
 
@@ -91,20 +91,19 @@ namespace vita
   ttable::insert(const individual &ind, fitness_t fit)
   {
     std::vector<boost::uint8_t> packed;
-
-    ind.pack(packed);
+    ind.pack(&packed);
 
     slot s;
     s.hash = hash(packed);
     s.fit  =          fit;
-    
-    table[s.hash & mask] = s; 
+
+    table[s.hash & mask] = s;
   }
 
   ///
   /// \param[in] packed a byte level representation of an individual.
   ///
-  /// MurmurHash2, by Austin Appleby.
+  /// MurmurHash2 (<http://code.google.com/p/smhasher/>), by Austin Appleby.
   /// This is a relatively simple hash algorithm. It is noted for being fast,
   /// with excellent distribution, avalanche behavior and overall collision
   /// resistance.

@@ -22,9 +22,9 @@ namespace vita
   /// \param[in] ctx context in which we calculate the output value (used for
   ///                the evaluation of ADF).
   ///
-  interpreter::interpreter(const individual &ind, 
-                           interpreter *const ctx) 
-    : _ip(ind._best), _context(ctx), _ind(ind),
+  interpreter::interpreter(const individual &ind,
+                           interpreter *const ctx)
+    : _ip(ind.best_), _context(ctx), _ind(ind),
       _cache(ind.size()),
       _context_cache(ctx ? ctx->_ind.size() : 0)
   {
@@ -47,8 +47,8 @@ namespace vita
     for (unsigned i(0); i < _context_cache.size(); ++i)
       _context_cache[i] = boost::any();
 
-    _ip = _ind._best;
-    return _ind._code[_ip].sym->eval(this);
+    _ip = _ind.best_;
+    return _ind.code_[_ip].sym->eval(this);
   }
 
   ///
@@ -57,7 +57,7 @@ namespace vita
   boost::any
   interpreter::eval()
   {
-    const gene &g(_ind._code[_ip]);
+    const gene &g(_ind.code_[_ip]);
 
     assert(g.sym->parametric());
     return g.par;
@@ -70,7 +70,7 @@ namespace vita
   boost::any
   interpreter::eval(unsigned i)
   {
-    const gene &g(_ind._code[_ip]);
+    const gene &g(_ind.code_[_ip]);
 
     assert(i < g.sym->arity());
 
@@ -80,7 +80,7 @@ namespace vita
       const unsigned backup(_ip);
       _ip = locus;
       assert (_ip > backup);
-      const boost::any ret(_ind._code[_ip].sym->eval(this));
+      const boost::any ret(_ind.code_[_ip].sym->eval(this));
       _ip = backup;
 
       _cache[locus].empty = false;
@@ -117,7 +117,7 @@ namespace vita
   boost::any
   interpreter::eval_adf_arg(unsigned i)
   {
-    const gene context_g(_context->_ind._code[_context->_ip]);
+    const gene context_g(_context->_ind.code_[_context->_ip]);
 
     assert( _context && _context->check() && i < gene_args && 
             dynamic_cast<const adf_n *>(context_g.sym) );
@@ -135,7 +135,7 @@ namespace vita
   interpreter::check() const
   {
     return
-      _ip < _ind._code.size() &&
+      _ip < _ind.code_.size() &&
       (!_context || _context->check());
   }
 

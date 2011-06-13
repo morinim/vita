@@ -47,7 +47,7 @@ namespace vita
   class individual
   {
   public:
-    individual() {};
+    individual() {}
     individual(const environment &, bool);
 
     void dump(std::ostream &) const;
@@ -74,18 +74,34 @@ namespace vita
 
     individual compact(unsigned * = 0) const;
     individual optimize(unsigned * = 0, unsigned * = 0) const;
-    unsigned normalize(individual &) const;
+    unsigned normalize(individual *const) const;
 
     bool operator==(const individual &) const;
-    bool operator!=(const individual &x) const { return !(*this == x); };
+    bool operator!=(const individual &x) const { return !(*this == x); }
     unsigned distance(const individual &) const;
 
-    void pack(std::vector<boost::uint8_t> &) const;
+    ///
+    /// \param[out] p packed version (byte stream) of \c this individual.
+    ///
+    void pack(std::vector<boost::uint8_t> *const p) const { pack(p, best_); }
 
     bool check() const;
 
-    const gene &operator[](unsigned) const;
-    unsigned size() const;
+    ///
+    /// \param[in] i index of the \c gene of the \c individual.
+    /// \return the i-th \c gene of the \c individual.
+    ///
+    const gene &operator[](unsigned i) const { return code_[i]; }
+
+    ///
+    /// \return the total size of the individual (effective size + introns).
+    ///
+    /// The size is constant for any individual (it's choosen at initialization
+    /// time).
+    /// \see eff_size
+    ///
+    unsigned size() const { return code_.size(); }
+
     unsigned eff_size() const;
 
     symbol_t type() const;
@@ -94,36 +110,49 @@ namespace vita
     static unsigned normalize(const individual &,
                               const std::vector<unsigned> *, unsigned &,
                               individual &);
-    void pack(std::vector<boost::uint8_t> &, unsigned) const;
+    void pack(std::vector<boost::uint8_t> *const, unsigned) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
 
-    /// Active code in this individual (the best sequence of genes is starting
-    /// here).
-    unsigned          _best;
+    // Active code in this individual (the best sequence of genes is starting
+    // here).
+    unsigned          best_;
 
-    const environment *_env;
+    const environment *env_;
 
-    /// This is the genome: the entire collection of genes.
-    std::vector<gene> _code;
+    // This is the genome: the entire collection of genes.
+    std::vector<gene> code_;
 
   public:
     class const_iterator
     {
     public:
-      const_iterator(const individual &);
+      explicit const_iterator(const individual &);
 
-      bool operator()() const;
+      ///
+      /// \return \c false when the iterator reaches the end.
+      ///
+      bool operator()() const
+      { return l_ < ind_.code_.size() && !lines_.empty(); }
 
       unsigned operator++();
 
-      const gene &operator*() const;
-      const gene *operator->() const;
+      ///
+      /// \return reference to the current \c gene of the \c individual.
+      ///
+      const gene &operator*() const
+      { assert(l_ < ind_._code.size()); return ind_.code_[l_]; }
+
+      ///
+      /// \return pointer to the current \c gene of the \c individual.
+      ///
+      const gene *operator->() const
+      { assert(l_ < ind_.code_.size()); return &ind_.code_[l_]; }
 
     private:
-      const individual    &_ind;
-      unsigned               _l;
-      std::set<unsigned> _lines;
+      const individual    &ind_;
+      unsigned               l_;
+      std::set<unsigned> lines_;
     };
 
     friend class const_iterator;
@@ -131,108 +160,6 @@ namespace vita
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
-
-  ///
-  /// \return \c false when the iterator reaches the end.
-  ///
-  inline
-  bool
-  individual::const_iterator::operator()() const
-  {
-    return _l < _ind._code.size() && !_lines.empty();
-  }
-
-  ///
-  /// \return reference to the current \c gene of the \c individual.
-  ///
-  inline
-  const gene &
-  individual::const_iterator::operator*() const
-  {
-    assert(_l < _ind._code.size());
-    return _ind._code[_l];
-  }
-
-  ///
-  /// \return pointer to the current \c gene of the \c individual.
-  ///
-  inline
-  const gene *
-  individual::const_iterator::operator->() const
-  {
-    assert(_l < _ind._code.size());
-    return &_ind._code[_l];
-  }
-
-  ///
-  /// \param[in] i index of the \c gene of the \c individual.
-  /// \return the i-th \c gene of the \c individual.
-  ///
-  inline
-  const gene &
-  individual::operator[](unsigned i) const
-  {
-    return _code[i];
-  }
-
-  ///
-  /// \return the total size of the individual (effective size + introns).
-  ///
-  /// The size is constant for any individual (it's choosen at initialization
-  /// time).
-  /// \see eff_size
-  ///
-  inline
-  unsigned
-  individual::size() const
-  {
-    return _code.size();
-  }
-
-  ///
-  /// \return the effective size of the individual.
-  /// \see size
-  ///
-  inline
-  unsigned
-  individual::eff_size() const
-  {
-    unsigned ef(0);
-
-    for (const_iterator it(*this); it(); ++it)
-      ++ef;
-
-    return ef;
-  }
-
-  ///
-  /// \param[in] locus location of the \a individual.
-  /// \return an individual obtained from \c this choosing the gene
-  ///         sequence starting at \a locus.
-  ///
-  /// This function is often used along with the \ref blocks function.
-  ///
-  inline
-  individual
-  individual::get_block(unsigned locus) const
-  {
-    individual ret(*this);
-
-    ret._best = locus;
-
-    assert(ret.check());
-    return ret;
-  }
-
-  ///
-  /// \param[out] p packed version (byte stream) if \c this individual.
-  ///
-  inline
-  void
-  individual::pack(std::vector<boost::uint8_t> &p) const
-  {
-    pack(p, _best);
-  }
 
   ///
   /// \example example1.cc

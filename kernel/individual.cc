@@ -2,19 +2,33 @@
  *
  *  \file individual.cc
  *
- *  \author Manlio Morini
- *  \date 2011/05/19
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "adf.h"
-#include "argument.h"
-#include "environment.h"
-#include "individual.h"
-#include "random.h"
-#include "symbol.h"
+#include <algorithm>
+
+#include "kernel/adf.h"
+#include "kernel/argument.h"
+#include "kernel/environment.h"
+#include "kernel/individual.h"
+#include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
@@ -24,7 +38,7 @@ namespace vita
   ///                the individual.
   ///
   individual::individual(const environment &e, bool gen)
-    : _best(0), _env(&e), _code(e.code_length)
+    : best_(0), env_(&e), code_(e.code_length)
   {
     assert(e.check());
 
@@ -37,50 +51,63 @@ namespace vita
       const unsigned sup(size() - specials);
 
       for (unsigned i(0); i < sup; ++i)
-        _code[i] = gene(e.sset,i+1,e.code_length);
+        code_[i] = gene(e.sset, i+1, e.code_length);
 
       for (unsigned i(0); i < specials; ++i)
-        _code[sup+i] = gene(e.sset,i);
+        code_[sup+i] = gene(e.sset, i);
 
       assert(check());
     }
   }
 
   ///
-  /// \param[out] last_symbol pointer to the la symbol of the compacted 
+  /// \return the effective size of the individual.
+  /// \see size
+  ///
+  unsigned individual::eff_size() const
+  {
+    unsigned ef(0);
+
+    for (const_iterator it(*this); it(); ++it)
+      ++ef;
+
+    return ef;
+  }
+
+  ///
+  /// \param[out] last_symbol pointer to the la symbol of the compacted
   ///                         individual.
   /// \return a new compacted individual.
   ///
   /// Create a new individual functionally equivalent to \c this but with the
   /// active symbols compacted and stored at the beginning of the code vector.
   ///
-  individual
-  individual::compact(unsigned *last_symbol) const
+  individual individual::compact(unsigned *last_symbol) const
   {
     individual dest(*this);
 
-    unsigned new_line(0), old_line(_best);
+    unsigned new_line(0), old_line(best_);
     for (const_iterator it(*this); it(); ++new_line, old_line = ++it)
     {
-      dest._code[new_line] = *it;
+      dest.code_[new_line] = *it;
 
       for (unsigned i(0); i < new_line; ++i)
-        for (unsigned j(0); j < dest._code[i].sym->arity(); ++j)
-          if (dest._code[i].args[j] == old_line)
-            dest._code[i].args[j] = new_line;
+        for (unsigned j(0); j < dest.code_[i].sym->arity(); ++j)
+          if (dest.code_[i].args[j] == old_line)
+            dest.code_[i].args[j] = new_line;
     }
 
     if (last_symbol && new_line)
       *last_symbol = new_line-1;
 
-    assert( new_line==0 ||
-	    (eff_size() && 0 < new_line && new_line <= dest.size()) );
+    assert(new_line == 0 ||
+           (eff_size() && 0 < new_line && new_line <= dest.size()));
 
     return dest;
   }
 
   ///
-  /// \param[out] first_t pointer to the first symbol of the optimized 
+  /// \param[out] first_t pointer to the first symbol of the optimized
   ///                     individual.
   /// \param[out] last_s pointer to the last symbol of the optimized individual.
   /// \return a new optimized individual.
@@ -90,8 +117,7 @@ namespace vita
   /// and active terminals grouped at the end of the block.
   /// [<- Active functions ->|<- Active terminals ->|<- Introns ->]
   ///
-  individual
-  individual::optimize(unsigned *first_t, unsigned *last_s) const
+  individual individual::optimize(unsigned *first_t, unsigned *last_s) const
   {
     // Step 1: compact the active symbols and put them at the beginning of the
     // code vector.
@@ -100,23 +126,23 @@ namespace vita
 
     // Step 2: reorganize the symbols so that terminals will be at the end of
     // the active symbols's block.
-    assert(source._code[first_terminal].sym->terminal());
+    assert(source.code_[first_terminal].sym->terminal());
     const unsigned last_terminal(first_terminal);
 
     for (unsigned i(1); i < first_terminal; ++i)   // Looking for terminals.
-      if (source._code[i].sym->terminal())
+      if (source.code_[i].sym->terminal())
       {
         // We have a new terminal that should moved at the end of the active
         // symbols' block.
         unsigned found(0);
         for (unsigned j(first_terminal); j <= last_terminal && !found; ++j)
         {
-          assert(source._code[j].sym->terminal());
-          if (source._code[i] == source._code[j])
+          assert(source.code_[j].sym->terminal());
+          if (source.code_[i] == source.code_[j])
             found = j;
         }
 
-        // The new terminal could be already present (because it was 
+        // The new terminal could be already present (because it was
         // duplicated). We only need one terminal for each type.
         if (found)
         {
@@ -126,11 +152,11 @@ namespace vita
           // moved functions.
           for (unsigned j(i); j > 0; --j)
           {
-            source._code[j] = source._code[j-1];
+            source.code_[j] = source.code_[j-1];
 
-            for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
+            for (unsigned k(0); k < source.code_[j].sym->arity(); ++k)
             {
-              locus_t &arg(source._code[j].args[k]);
+              locus_t &arg(source.code_[j].args[k]);
               if (arg == i)
                 arg = found;
               else if (arg < i)
@@ -138,20 +164,20 @@ namespace vita
             }
           }
 
-          ++source._best;
+          ++source.best_;
         }
-        else // !found
+        else  // !found
         {
           --first_terminal;
 
           if (first_terminal != i)
           {
-            // Rearrange the arguments of the functions before the terminal 
+            // Rearrange the arguments of the functions before the terminal
             // that will be moved.
-            for (unsigned j(source._best); j < i; ++j)
-              for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
+            for (unsigned j(source.best_); j < i; ++j)
+              for (unsigned k(0); k < source.code_[j].sym->arity(); ++k)
               {
-                locus_t &arg(source._code[j].args[k]);
+                locus_t &arg(source.code_[j].args[k]);
 
                 if (arg == i)
                   arg = first_terminal;
@@ -159,7 +185,7 @@ namespace vita
                   --arg;
               }
 
-            const gene g(source._code[i]);
+            const gene g(source.code_[i]);
 
             // Move the symbols after the terminal one location backward. The
             // duplicated terminal will be overwritten (but we have a copy).
@@ -167,18 +193,18 @@ namespace vita
             // moved functions.
             for (unsigned j(i); j < first_terminal; ++j)
             {
-              source._code[j] = source._code[j+1];
+              source.code_[j] = source.code_[j+1];
 
-              for (unsigned k(0); k < source._code[j].sym->arity(); ++k)
+              for (unsigned k(0); k < source.code_[j].sym->arity(); ++k)
               {
-                locus_t &arg(source._code[j].args[k]);
+                locus_t &arg(source.code_[j].args[k]);
 
                 if (arg <= first_terminal)
                   --arg;
               }
             }
-          
-            source._code[first_terminal] = g;
+
+            source.code_[first_terminal] = g;
             --i;
           }
         }
@@ -193,24 +219,42 @@ namespace vita
   }
 
   ///
-  /// \param[out] norm
-  /// \return 
+  /// \param[in] locus location of the \a individual.
+  /// \return an individual obtained from \c this choosing the gene
+  ///         sequence starting at \a locus.
   ///
-  unsigned
-  individual::normalize(individual &norm) const
+  /// This function is often used along with the \ref blocks function.
+  ///
+  individual individual::get_block(unsigned locus) const
   {
+    individual ret(*this);
+
+    ret.best_ = locus;
+
+    assert(ret.check());
+    return ret;
+  }
+
+  ///
+  /// \param[out] norm
+  /// \return
+  ///
+  unsigned individual::normalize(individual *const norm) const
+  {
+    assert(norm);
+
     unsigned index(size());
 
-    individual dest(*_env,false);
-    
-    const unsigned ret(normalize(*this,0,index,dest));
+    individual dest(*env_, false);
+
+    const unsigned ret(normalize(*this, 0, index, dest));
 
     if (ret)
     {
-      dest._best = index;
+      dest.best_ = index;
 
-      norm = dest;
-      assert(norm.eff_size() == norm.size()-norm._best);
+      *norm = dest;
+      assert(norm.eff_size() == norm.size()-norm.best_);
     }
 
     return ret;
@@ -223,33 +267,32 @@ namespace vita
   /// \param[out] dest
   /// \return
   ///
-  unsigned
-  individual::normalize(const individual &src,
-                        const std::vector<unsigned> *args,
-                        unsigned &dest_l, individual &dest)
+  unsigned individual::normalize(const individual &src,
+                                 const std::vector<unsigned> *args,
+                                 unsigned &dest_l, individual &dest)
   {
     unsigned first_terminal, last_terminal;
-    individual source(src.optimize(&first_terminal,&last_terminal));
+    individual source(src.optimize(&first_terminal, &last_terminal));
     const unsigned ret(src.size() - (last_terminal - first_terminal + 1));
 
     // Step 1: mark the active terminal symbols.
     const unsigned cs(source.size());
-    std::vector<int> ll(cs,-1);
-    for (unsigned i(source._best); i <= last_terminal; ++i)
+    std::vector<int> ll(cs, -1);
+    for (unsigned i(source.best_); i <= last_terminal; ++i)
       ll[i] = i;
 
-    assert (source._best < last_terminal);
+    assert(source.best_ < last_terminal);
     unsigned i(last_terminal+1);
-    do 
+    do
     {
       if (!dest_l)
         return 0;
-      
+
       --i;
 
       if (ll[i] >= 0)
       {
-        const symbol *const s = source._code[i].sym;
+        const symbol *const s = source.code_[i].sym;
         const adf_n *const padf_n = dynamic_cast<const adf_n *>(s);
         const adf_0 *const padf_0 = dynamic_cast<const adf_0 *>(s);
         if (padf_n || padf_0)
@@ -259,15 +302,15 @@ namespace vita
             const unsigned n_arg(s->arity());
             std::vector<unsigned> args1(n_arg);
             for (unsigned j(0); j < n_arg; ++j)
-              args1[j] = ll[source._code[i].args[j]];
+              args1[j] = ll[source.code_[i].args[j]];
 
-            if (!normalize(padf_n->get_code(),&args1,dest_l,dest))
-            return 0;
+            if (!normalize(padf_n->get_code(), &args1, dest_l, dest))
+              return 0;
           }
           else  // padf_0
           {
             std::vector<unsigned> args1(0);
-            if (!normalize(padf_0->get_code(),&args1,dest_l,dest))
+            if (!normalize(padf_0->get_code(), &args1, dest_l, dest))
               return 0;
           }
 
@@ -275,7 +318,7 @@ namespace vita
         }
         else  // Not ADF
         {
-          const symbol *const sym = source._code[i].sym; 
+          const symbol *const sym = source.code_[i].sym;
 
           const argument *parg = dynamic_cast<const argument *>(sym);
           if (args && parg)
@@ -284,18 +327,18 @@ namespace vita
           {
             --dest_l;
 
-            dest._code[dest_l].sym = sym;
+            dest.code_[dest_l].sym = sym;
             if (sym->parametric())
-              dest._code[dest_l].par = source._code[i].par;
+              dest.code_[dest_l].par = source.code_[i].par;
             else  // not parametric
-              for (unsigned j(0); j < source._code[i].sym->arity(); ++j)
-                dest._code[dest_l].args[j] = ll[source._code[i].args[j]];
+              for (unsigned j(0); j < source.code_[i].sym->arity(); ++j)
+                dest.code_[dest_l].args[j] = ll[source.code_[i].args[j]];
 
             ll[i] = dest_l;
           }
         }
       }
-    } while (i > source._best);
+    } while (i > source.best_);
 
     return ret;
   }
@@ -303,19 +346,18 @@ namespace vita
   ///
   /// \return number of mutations performed.
   ///
-  unsigned
-  individual::mutation()
+  unsigned individual::mutation()
   {
     unsigned n_mut(0);
 
-    const unsigned specials(_env->sset.specials());
+    const unsigned specials(env_->sset.specials());
     assert(specials < size());
     const unsigned cs(size() - specials);
     for (unsigned i(0); i < cs; ++i)
-      if (random::boolean(_env->p_mutation))
+      if (random::boolean(env_->p_mutation))
       {
-	++n_mut;
-	_code[i] = gene(_env->sset,i+1,size());
+        ++n_mut;
+        code_[i] = gene(env_->sset, i+1, size());
       }
 
     assert(check());
@@ -328,10 +370,10 @@ namespace vita
   /// \return the individual result of the crossover.
   ///
   /// Uniform crossover, as the name suggests, is a GP operator inspired by the
-  /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic 
+  /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
   /// algorithms - Proceedings of the Third International Conference on Genetic
-  /// Algorithms. 1989). GA uniform crossover constructs offspring on a 
-  /// bitwise basis, copying each allele from each parent with a 50% 
+  /// Algorithms. 1989). GA uniform crossover constructs offspring on a
+  /// bitwise basis, copying each allele from each parent with a 50%
   /// probability. Thus the information at each gene location is equally likely
   /// to have come from either parent and on average each parent donates 50%
   /// of its genetic material. The whole operation, of course, relies on the
@@ -339,8 +381,7 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual
-  individual::uniform_cross(const individual &parent) const
+  individual individual::uniform_cross(const individual &parent) const
   {
     assert(check() && parent.check());
 
@@ -348,10 +389,10 @@ namespace vita
 
     assert(parent.size() == cs);
 
-    individual offspring(*_env,false);
+    individual offspring(*env_, false);
 
     for (unsigned i(0); i < cs; ++i)
-      offspring._code[i] = random::boolean() ? _code[i] : parent._code[i];
+      offspring.code_[i] = random::boolean() ? code_[i] : parent.code_[i];
 
     assert(offspring.check());
     return offspring;
@@ -361,83 +402,80 @@ namespace vita
   /// \param[in] parent
   /// \return
   ///
-  individual
-  individual::cross1(const individual &parent)
+  individual individual::cross1(const individual &parent)
   {
     assert(check() && parent.check());
 
     const unsigned cs(size());
 
-    const unsigned cut(random::between<unsigned>(0,cs-1));
-    
+    const unsigned cut(random::between<unsigned>(0, cs-1));
+
     const individual *parents[2] = {this, &parent};
     const bool base(random::boolean());
 
-    individual offspring(*_env,false);
+    individual offspring(*env_, false);
 
     for (unsigned i(0); i < cut; ++i)
-      offspring._code[i] = parents[base]->_code[i];
+      offspring.code_[i] = parents[base]->code_[i];
     for (unsigned i(cut); i < cs; ++i)
-      offspring._code[i] = parents[!base]->_code[i];
+      offspring.code_[i] = parents[!base]->code_[i];
 
     assert(offspring.check());
-    return offspring;   
+    return offspring;
   }
 
   ///
   /// \param[in] parent
   /// \return
   ///
-  individual
-  individual::cross2(const individual &parent)
+  individual individual::cross2(const individual &parent)
   {
     assert(check() && parent.check());
 
     const unsigned cs(size());
 
-    const unsigned cut1(random::between<unsigned>(0,cs-1));
-    const unsigned cut2(random::between<unsigned>(cut1+1,cs));
+    const unsigned cut1(random::between<unsigned>(0, cs-1));
+    const unsigned cut2(random::between<unsigned>(cut1+1, cs));
 
     const individual *parents[2] = {this, &parent};
     const bool base(random::boolean());
 
-    individual offspring(*_env,false);
+    individual offspring(*env_, false);
 
     for (unsigned i(0); i < cut1; ++i)
-      offspring._code[i] = parents[base]->_code[i];
+      offspring.code_[i] = parents[base]->code_[i];
     for (unsigned i(cut1); i < cut2; ++i)
-      offspring._code[i] = parents[!base]->_code[i];
+      offspring.code_[i] = parents[!base]->code_[i];
     for (unsigned i(cut2); i < cs; ++i)
-      offspring._code[i] = parents[base]->_code[i];
+      offspring.code_[i] = parents[base]->code_[i];
 
     assert(offspring.check());
-    return offspring;   
+    return offspring;
   }
-  
+
   ///
   /// \return a list of indexes referring to active symbols.
   ///
-  /// The function extract from the individual a list of indexes to blocks 
+  /// The function extract from the individual a list of indexes to blocks
   /// that are subsets of the active code. Indexes can be used as they would be
   /// individuals by the get_block function.
   ///
-  std::list<unsigned>
-  individual::blocks() const
+  std::list<unsigned> individual::blocks() const
   {
     std::list<unsigned> bl;
 
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator i(*this); i(); line = ++i)
-      if (_code[line].sym->arity())
+      if (code_[line].sym->arity())
         bl.push_back(line);
-      /*
-      for (unsigned j(0); j < _code[line].sym->arity(); ++j)
-	if ( _code[_code[line].args[j]].sym->arity() )  // At least depth 3
-	{
-	  bl.push_back(line);
-	  break;;
-	}
-      */
+        /*
+        for (unsigned j(0); j < code_[line].sym->arity(); ++j)
+          if ( code_[code_[line].args[j]].sym->arity() )  // At least depth 3
+          {
+            bl.push_back(line);
+            break;
+          }
+        */
 
     return bl;
   }
@@ -451,99 +489,95 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a line with a new one ('sym' + 'args').
   ///
-  individual
-  individual::replace(const symbol *const sym,
-                      const std::vector<unsigned> &args,
-                      unsigned line) const
+  individual individual::replace(const symbol *const sym,
+                                 const std::vector<unsigned> &args,
+                                 unsigned line) const
   {
     assert(sym);
 
     individual ret(*this);
 
-    ret._code[line].sym = sym;
+    ret.code_[line].sym = sym;
     for (unsigned i(0); i < args.size(); ++i)
-      ret._code[line].args[i] = args[i];
+      ret.code_[line].args[i] = args[i];
 
     assert(ret.check());
-    return ret;    
+    return ret;
   }
 
   ///
   /// \param[in] sym
   /// \param[in] args
-  /// \return a new individual with _best line replaced.
+  /// \return a new individual with \a best_ line replaced.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
-  /// \a symbol at line \a _best with a new one ('sym' + 'args').
+  /// \a symbol at line \a best_ with a new one ('sym' + 'args').
   ///
-  individual
-  individual::replace(const symbol *const sym,
-                      const std::vector<unsigned> &args) const
+  individual individual::replace(const symbol *const sym,
+                                 const std::vector<unsigned> &args) const
   {
-    return replace(sym,args,_best);
+    return replace(sym, args, best_);
   }
 
   ///
   /// \param[in] line index of a \a symbol in the \a individual.
-  /// \return a new \a individual obtained from \c this inserting a random 
+  /// \return a new \a individual obtained from \c this inserting a random
   ///         \a terminal at index \a line.
   ///
-  individual
-  individual::destroy_block(unsigned line) const
+  individual individual::destroy_block(unsigned line) const
   {
-    assert(line < size() && !_code[line].sym->terminal());
+    assert(line < size() && !code_[line].sym->terminal());
 
     individual ret(*this);
 
-    ret._code[line] = gene(_env->sset);
+    ret.code_[line] = gene(env_->sset);
 
     assert(ret.check());
-    return ret;    
+    return ret;
   }
-  
+
   ///
   /// \param[in] max_args
   /// \param[out] positions
   /// \param[out] types
   ///
-  void
-  individual::generalize(std::size_t max_args,
-                         std::vector<unsigned> *const positions,
-                         std::vector<symbol_t> *const types)
+  void individual::generalize(std::size_t max_args,
+                              std::vector<unsigned> *const positions,
+                              std::vector<symbol_t> *const types)
   {
     assert(max_args && max_args <= gene_args);
 
     std::vector<unsigned> terminals;
 
     // Step 1: mark the active terminal symbols.
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator i(*this); i(); line = ++i)
-      if (_code[line].sym->terminal())
-	terminals.push_back(line);
+      if (code_[line].sym->terminal())
+        terminals.push_back(line);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
-    const unsigned n(std::min(max_args,terminals.size()));
+    const unsigned n(std::min(max_args, terminals.size()));
     assert(n);
 
     if (n < size())
       for (unsigned j(0); j < n; ++j)
       {
-	const unsigned r(random::between<unsigned>(j,terminals.size()));
+        const unsigned r(random::between<unsigned>(j, terminals.size()));
 
-	const unsigned tmp(terminals[j]);
-	terminals[j] = terminals[r];
-	terminals[r] = tmp;
+        const unsigned tmp(terminals[j]);
+        terminals[j] = terminals[r];
+        terminals[r] = tmp;
       }
-    
+
     // Step 3: randomly substitute n terminals with function arguments.
     for (unsigned j(0); j < n; ++j)
     {
-      gene &g(_code[terminals[j]]);
+      gene &g(code_[terminals[j]]);
       if (types)
         types->push_back(g.sym->type());
       if (positions)
         positions->push_back(terminals[j]);
-      g.sym = _env->sset.arg(j);
+      g.sym = env_->sset.arg(j);
     }
 
     assert(!positions || (positions->size() && positions->size() <= max_args));
@@ -554,10 +588,9 @@ namespace vita
   ///
   /// \return the type of the individual.
   ///
-  symbol_t
-  individual::type() const
+  symbol_t individual::type() const
   {
-    return _code[_best].sym->type();
+    return code_[best_].sym->type();
   }
 
   ///
@@ -565,28 +598,26 @@ namespace vita
   /// \return true if the two individuals are equal (symbol by symbol,
   ///         including introns).
   ///
-  bool
-  individual::operator==(const individual &x) const
+  bool individual::operator==(const individual &x) const
   {
-    return _code == x._code && _best == x._best;
+    return code_ == x.code_ && best_ == x.best_;
   }
 
   ///
   /// \param[in] ind an individual to compare with \c this.
-  /// \return a numeric measurement of the difference between \a ind and 
-  /// \c this (the number of different genes between individuals). 
+  /// \return a numeric measurement of the difference between \a ind and
+  /// \c this (the number of different genes between individuals).
   ///
-  unsigned
-  individual::distance(const individual &ind) const
-  {  
+  unsigned individual::distance(const individual &ind) const
+  {
     const unsigned cs(size());
 
     unsigned d(0);
     for (unsigned i(0); i < cs; ++i)
-      if (_code[i] != ind._code[i])
-	++d;
+      if (code_[i] != ind.code_[i])
+        ++d;
 
-    return d;      
+    return d;
   }
 
   ///
@@ -595,59 +626,59 @@ namespace vita
   /// \param[in] idx locus in \c this individual.
   ///
   /// The generated byte stream has some interesting properties:
-  /// - 
+  /// -
   ///
-  void
-  individual::pack(std::vector<boost::uint8_t> &p, unsigned idx) const
+  void individual::pack(std::vector<boost::uint8_t> *const p,
+                        unsigned idx) const
   {
-    const gene &g(_code[idx]);
+    const gene &g(code_[idx]);
 
     const opcode_t opcode(g.sym->opcode());
 
     const boost::uint8_t *const s1 = (boost::uint8_t *)(&opcode);
     for (unsigned i(0); i < sizeof(opcode); ++i)
-      p.push_back(s1[i]);
+      p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
       const boost::uint8_t *const s2 = (boost::uint8_t *)(&g.par);
       for (unsigned i(0); i < sizeof(g.par); ++i)
-	p.push_back(s2[i]);
+        p->push_back(s2[i]);
     }
     else
       for (unsigned i(0); i < g.sym->arity(); ++i)
-        pack(p,g.args[i]);
+        pack(p, g.args[i]);
   }
 
   ///
   /// \param[in] packed packed byte stream representation of an individual.
-  /// \param[in] idx locus starting from where unpack \c packed.  
-  /// \return 
+  /// \param[in] idx locus starting from where unpack \c packed.
+  /// \return
   ///
-  unsigned
-  individual::unpack(const std::vector<boost::uint8_t> &packed, unsigned idx)
+  unsigned individual::unpack(const std::vector<boost::uint8_t> &packed,
+                              unsigned idx)
   {
     unsigned unpacked(0);
 
     opcode_t opcode;
-    std::memcpy(&opcode,&packed[idx],sizeof(opcode));
+    std::memcpy(&opcode, &packed[idx], sizeof(opcode));
     unpacked += sizeof(opcode);
 
     gene g;
-    g.sym = _env->sset.decode(opcode);
+    g.sym = env_->sset.decode(opcode);
 
     if (g.sym->parametric())
     {
-      std::memcpy(&g.par,&packed[idx+unpacked],sizeof(g.par));
+      std::memcpy(&g.par, &packed[idx+unpacked], sizeof(g.par));
       unpacked += sizeof(g.par);
     }
 
-    _code.push_back(g);
+    code_.push_back(g);
     const unsigned base(size()-1);
     for (unsigned i(0); i < g.sym->arity(); ++i)
     {
-      _code[base].args[i] = size();
-      unpacked += unpack(packed,idx+unpacked);
+      code_[base].args[i] = size();
+      unpacked += unpack(packed, idx+unpacked);
     }
 
     return unpacked;
@@ -656,45 +687,43 @@ namespace vita
   ///
   /// \return true if the individual passes the internal consistency check.
   ///
-  bool
-  individual::check() const
+  bool individual::check() const
   {
     bool last_is_terminal(false);
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator it(*this); it(); line = ++it)
     {
-      if (!_code[line].sym)
+      if (!code_[line].sym)
         return false;
 
-      if (_code[line].sym->arity() > gene::k_args)
+      if (code_[line].sym->arity() > gene::k_args)
         return false;
-      
-      for (unsigned j(0); j < _code[line].sym->arity(); ++j)
-	if (_code[line].args[j] >= size() || _code[line].args[j] <= line)
-	  return false;
 
-      last_is_terminal = _code[line].sym->terminal();
+      for (unsigned j(0); j < code_[line].sym->arity(); ++j)
+        if (code_[line].args[j] >= size() || code_[line].args[j] <= line)
+          return false;
+
+      last_is_terminal = code_[line].sym->terminal();
     }
 
-    const unsigned specials(_env->sset.specials());
+    const unsigned specials(env_->sset.specials());
     for (unsigned i(size()-specials); i < size(); ++i)
-      if (!_code[i].sym->terminal())
+      if (!code_[i].sym->terminal())
         return false;
 
-    return 
-      _best < size() && 
+    return
+      best_ < size() &&
       last_is_terminal &&
-      size() < (1u << 8*sizeof(locus_t)) && 
+      size() < (1u << 8*sizeof(locus_t)) &&
       eff_size() <= size() &&
-      _env->check();
+      env_->check();
   }
 
   ///
   /// \param[out] s output stream.
-  /// \param[in] id 
+  /// \param[in] id
   ///
-  void
-  individual::graphviz(std::ostream &s, const std::string &id) const
+  void individual::graphviz(std::ostream &s, const std::string &id) const
   {
     if (id.empty())
       s << "graph";
@@ -702,17 +731,17 @@ namespace vita
       s << "subgraph " << id;
     s << " {";
 
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator it(*this); it(); line = ++it)
     {
       const gene &g(*it);
 
-      s << 'g' << line << " [label=" 
-	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-	<< "];";
+      s << 'g' << line << " [label="
+        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
+        << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-	s << 'g' << line << " -- g" << g.args[j] << ';';
+        s << 'g' << line << " -- g" << g.args[j] << ';';
     }
 
     s << '}' << std::endl;
@@ -725,15 +754,14 @@ namespace vita
   /// spaces. Not at all human readable, but a compact representation for
   /// import / export.
   ///
-  void
-  individual::inline_tree(std::ostream &s) const
+  void individual::inline_tree(std::ostream &s) const
   {
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator it(*this); it(); line = ++it)
     {
       const gene &g(*it);
 
-      if (line != _best)
+      if (line != best_)
         s << ' ';
       s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
     }
@@ -748,82 +776,78 @@ namespace vita
   /// 20 PRINT "SWEET"
   /// 30 GOTO 10
   ///
-  void
-  individual::list(std::ostream &s) const
+  void individual::list(std::ostream &s) const
   {
-    const unsigned width( 1 + 
-                          static_cast<unsigned>(std::log10(static_cast<double>(size()-1))) );
+    const unsigned width(
+      1 + static_cast<unsigned>(std::log10(static_cast<double>(size()-1))) );
 
-    unsigned line(_best);
+    unsigned line(best_);
     for (const_iterator it(*this); it(); line = ++it)
     {
       const gene &g(*it);
 
-      s << '[' << std::setfill('0') << std::setw(width) << line << "] " 
-	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+      s << '[' << std::setfill('0') << std::setw(width) << line << "] "
+        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-	s << ' ' << std::setw(width) << g.args[j];
+        s << ' ' << std::setw(width) << g.args[j];
 
       s << std::endl;
     }
   }
-    
+
   ///
   /// \param[out] s
   /// \param[in] locus
   /// \param[in] indt
   /// \param[in] father
   ///
-  void
-  individual::tree(std::ostream &s, 
-		   unsigned locus, unsigned indt, unsigned father) const
+  void individual::tree(std::ostream &s,
+                        unsigned locus, unsigned indt, unsigned father) const
   {
-    const gene &g(_code[locus]);
+    const gene &g(code_[locus]);
 
-    if (locus == father 
-	|| !_code[father].sym->associative() 
-	|| _code[father].sym != g.sym)
-    {  
-      std::string spaces(indt,' '); 
-      s << spaces 
-	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-	<< std::endl;
+    if (locus == father
+        || !code_[father].sym->associative()
+        || code_[father].sym != g.sym)
+    {
+      std::string spaces(indt, ' ');
+      s << spaces
+        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
+        << std::endl;
       indt += 2;
     }
-    
+
     const unsigned arity(g.sym->arity());
     if (arity)
       for (unsigned i(0); i < arity; ++i)
-	tree(s,g.args[i],indt,locus);
+        tree(s, g.args[i], indt, locus);
   }
 
   ///
   /// \param[out] s
   ///
-  void
-  individual::tree(std::ostream &s) const
+  void individual::tree(std::ostream &s) const
   {
-    tree(s,_best,0,_best);
+    tree(s, best_, 0, best_);
   }
 
   ///
   /// \param[out] s
   ///
-  void
-  individual::dump(std::ostream &s) const
+  void individual::dump(std::ostream &s) const
   {
-    const unsigned width( 1 + std::log10(size()-1) );
+    const unsigned width(1 + std::log10(size()-1));
 
     for (unsigned i(0); i < size(); ++i)
     {
-      const gene &g(_code[i]);
+      const gene &g(code_[i]);
 
-      s << '[' << std::setfill('0') << std::setw(width) << i << "] " 
-	<< (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+      s << '[' << std::setfill('0') << std::setw(width) << i << "] "
+        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-	s << ' ' << std::setw(width) << g.args[j];
+        s << ' ' << std::setw(width) << g.args[j];
 
       s << std::endl;
     }
@@ -834,8 +858,7 @@ namespace vita
   /// \param[in] ind individual to print.
   /// \return output stream including \a ind.
   ///
-  std::ostream &
-  operator<<(std::ostream &s, const individual &ind)
+  std::ostream &operator<<(std::ostream &s, const individual &ind)
   {
     ind.list(s);
 
@@ -845,32 +868,30 @@ namespace vita
   ///
   /// \param[in] id
   ///
-  individual::const_iterator::const_iterator(const individual &id) 
-    : _ind(id), _l(id._best)
+  individual::const_iterator::const_iterator(const individual &id)
+    : ind_(id), l_(id.best_)
   {
-    _lines.insert(_l);
+    lines_.insert(l_);
   }
 
   ///
   /// \return
   ///
-  unsigned
-  individual::const_iterator::operator++()
+  unsigned individual::const_iterator::operator++()
   {
-    if (!_lines.empty())
+    if (!lines_.empty())
     {
-      _lines.erase(_lines.begin());
+      lines_.erase(lines_.begin());
 
-      assert(_l < _ind._code.size());
-      const gene &g(_ind._code[_l]);
+      assert(l_ < ind_.code_.size());
+      const gene &g(ind_.code_[l_]);
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-	_lines.insert(g.args[j]);
+        lines_.insert(g.args[j]);
 
-      _l = *_lines.begin();
+      l_ = *lines_.begin();
     }
 
-    return _l;
+    return l_;
   }
-
 }  // Namespace vita
