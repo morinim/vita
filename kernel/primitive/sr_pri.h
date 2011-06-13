@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(SR_PRIMITIVE_H)
 #define      SR_PRIMITIVE_H
 
@@ -47,9 +47,6 @@ namespace sr
     double val;
   };
 
-  /**
-   * constant
-   */
   class constant : public terminal
   {
   public:

@@ -27,6 +27,16 @@ namespace vita
   class terminal;
   class variable;
 
+  ///
+  /// This is a container for the symbol set. Symbols are stored to be quickly
+  /// recalled by type and randomly extracted.
+  /// Memory management for symbols is a user's responsibility (anyway to help
+  /// in this task there is the delete_symbols() function).
+  /// The function and terminals used should be powerful enough to be able to
+  /// represent a solution to the problem. On the other hand, it is better not
+  /// to use too large a symbol set (this enalarges the search space and can
+  /// sometimes make the search for a solution harder).
+  ///
   class symbol_set
   {
   public:
@@ -40,8 +50,8 @@ namespace vita
     const symbol *get_special(unsigned) const;
     unsigned specials() const;
     const adf_0 *get_adf0(unsigned) const;
-    
-    void reset_adf_weights();   
+
+    void reset_adf_weights();
 
     const symbol *decode(unsigned) const;
     const symbol *decode(const std::string &) const;

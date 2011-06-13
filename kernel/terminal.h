@@ -83,6 +83,8 @@ namespace vita
   ///
   /// \return true if the terminal is an input variable.
   ///
+  /// An input variable is a feature from the learning domain.
+  ///
   inline
   bool
   terminal::input() const
