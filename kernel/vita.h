@@ -15,7 +15,7 @@
  *  Please reports any suggestions and/or bugs to info@vita.cc .
  *
  */
-  
+
 #if !defined(VITA_H)
 #define      VITA_H
 
@@ -28,8 +28,15 @@ namespace vita
 {
 
 #if defined(_MSC_VER)
-#  define isnan(x) _isnan(x)
-#  define isinf(x) !_finite(x)
+#  define isnan(x)      _isnan(x)
+#  define isinf(x)      !_finite(x)
+#  define ROTL64(x, y)  _rotl64(x, y)
+#else
+   inline boost::uint64_t rotl64(boost::uint64_t x, boost::uint8_t r)
+   {
+     return (x << r) | (x >> (64-r));
+   }
+#  define ROTL64(x, y)  rotl64(x, y)
 #endif
 
   typedef boost::uint16_t locus_t;

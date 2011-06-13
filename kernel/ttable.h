@@ -8,7 +8,7 @@
  *  This file is part of VITA
  *
  */
-  
+
 #if !defined(TTABLE_H)
 #define      TTABLE_H
 
@@ -18,7 +18,6 @@
 
 namespace vita
 {
-
   class individual;
 
   ///
@@ -26,15 +25,23 @@ namespace vita
   /// fitness (it's used by the \a evaluator_proxy \c class).
   /// Note: \a ttable exploits a byte level representation of an individual
   /// obtained from the \c individual::pack function. This function should
-  /// map sintatically distinct (but logically equivalent) individuals to the 
+  /// map sintatically distinct (but logically equivalent) individuals to the
   /// same byte stream. During the evolution semantically equivalent individuals
-  /// are often generated and \a ttable could give a significant speed 
+  /// are often generated and \a ttable could give a significant speed
   /// improvement.
   ///
   class ttable
   {
   public:
-    typedef boost::uint64_t hash_t;
+    //typedef boost::uint64_t hash_t;
+    struct hash_t
+    {
+      hash_t(boost::uint64_t a = 0, boost::uint64_t b = 0) : p1(a), p2(b) {}
+      bool operator==(hash_t h) const { return p1 == h.p1 && p2 == h.p2; }
+
+      boost::uint64_t p1;
+      boost::uint64_t p2;
+    };
 
     explicit ttable(unsigned);
     ~ttable();
@@ -45,8 +52,8 @@ namespace vita
 
     bool find(const individual &, fitness_t *const) const;
 
-    boost::uint64_t probes() const { return _probes; };
-    boost::uint64_t hits() const { return _hits; };
+    boost::uint64_t probes() const { return _probes; }
+    boost::uint64_t hits() const { return _hits; }
 
     bool check() const;
 
@@ -59,7 +66,7 @@ namespace vita
       fitness_t fit;
     };
 
-    const hash_t mask;
+    const boost::uint64_t mask;
     slot *const table;
 
     mutable boost::uint64_t _probes;
@@ -68,7 +75,6 @@ namespace vita
 
   /// \example example4.cc
   /// Performs a speed test on the transposition table (insert-find cycle).
-    
 }  // namespace vita
 
 #endif  // TTABLE_H
