@@ -2,10 +2,22 @@
  *
  *  \file problem.h
  *
- *  \author Manlio Morini
- *  \date 2011/03/14
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -14,13 +26,12 @@
 
 #include <vector>
 
-#include "vita.h"
-#include "environment.h"
-#include "evaluator.h"
+#include "kernel/vita.h"
+#include "kernel/environment.h"
+#include "kernel/evaluator.h"
 
 namespace vita
 {
-
   class problem
   {
   public:
@@ -39,10 +50,9 @@ namespace vita
     void delete_evaluators();
 
   private:
-    std::vector<evaluator *> _evaluators;
-    vita::evaluator *_active_eva;
+    std::vector<evaluator *> evaluators_;
+    vita::evaluator         *active_eva_;
   };
-
 }  // namespace vita
 
 #endif  // PROBLEM_H

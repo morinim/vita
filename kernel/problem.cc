@@ -2,19 +2,30 @@
  *
  *  \file problem.cc
  *
- *  \author Manlio Morini
- *  \date 2011/03/11
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "problem.h"
-#include "search.h"
+#include "kernel/problem.h"
+#include "kernel/search.h"
 
 namespace vita
 {
-
   ///
   /// New empty instance.
   ///
@@ -26,20 +37,18 @@ namespace vita
   ///
   /// Resets the object.
   ///
-  void
-  problem::clear()
+  void problem::clear()
   {
-    _active_eva = 0;
-    _evaluators.clear();
+    active_eva_ = 0;
+    evaluators_.clear();
   }
 
   ///
   /// \return the active evaluator.
   ///
-  evaluator *
-  problem::get_evaluator()
+  evaluator *problem::get_evaluator()
   {
-    return _active_eva;
+    return active_eva_;
   }
 
   ///
@@ -48,13 +57,12 @@ namespace vita
   /// Add a new avaluator to the set. Evaluators are used to score individual's
   /// fitness.
   ///
-  void
-  problem::add_evaluator(evaluator *const eva)
+  void problem::add_evaluator(evaluator *const eva)
   {
-    _evaluators.push_back(eva);
+    evaluators_.push_back(eva);
 
-    if (!_active_eva)
-      _active_eva = eva;
+    if (!active_eva_)
+      active_eva_ = eva;
   }
 
   ///
@@ -64,11 +72,10 @@ namespace vita
   /// memory in their destructors and the deallocation process is "factored"
   /// in the \a delete_evaluators member function.
   ///
-  void
-  problem::delete_evaluators()
+  void problem::delete_evaluators()
   {
-    for (std::vector<evaluator *>::const_iterator i(_evaluators.begin()); 
-         i != _evaluators.end();
+    for (std::vector<evaluator *>::const_iterator i(evaluators_.begin());
+         i != evaluators_.end();
          ++i)
       delete *i;
   }
@@ -76,19 +83,16 @@ namespace vita
   ///
   /// \param[in] i index of the evaluator that should be set as active.
   ///
-  void
-  problem::set_evaluator(unsigned i)
+  void problem::set_evaluator(unsigned i)
   {
-    _active_eva = _evaluators[i];
+    active_eva_ = evaluators_[i];
   }
 
   ///
-  /// \return true if the object passes the internal consistency check.
+  /// \return \c true if the object passes the internal consistency check.
   ///
-  bool
-  problem::check() const
+  bool problem::check() const
   {
     return env.check();
   }
-
 }  // namespace vita
