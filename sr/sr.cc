@@ -36,7 +36,7 @@ unsigned runs(1);
 vita::src_problem problem;
 
 void setup_default_symbols()
-{  
+{
   problem.env.insert(new vita::sr::constant(1));
   problem.env.insert(new vita::sr::constant(2));
   problem.env.insert(new vita::sr::constant(3));
@@ -46,7 +46,7 @@ void setup_default_symbols()
   problem.env.insert(new vita::sr::constant(7));
   problem.env.insert(new vita::sr::constant(8));
   problem.env.insert(new vita::sr::constant(9));
-  
+
   problem.env.insert(new vita::sr::abs());
   problem.env.insert(new vita::sr::add());
   problem.env.insert(new vita::sr::div());
@@ -233,7 +233,7 @@ bool parse_command_line(int argc, char *argv[])
 bool
 run()
 {
-  vita::search s(problem);
+  vita::search s(&problem);
   s.run(verbose,runs);
 
   // vita::interpreter agent(ind);
@@ -242,7 +242,7 @@ run()
   std::map<number,vita::distribution<vita::fitness_t> > classes;
   for (vita::data<number>::const_iterator t(data.begin());
        t != data.end();
-       ++t) 
+       ++t)
   {
     for (unsigned i(0); i < vars.size(); ++i)
       vars[i]->val = (*t)[i];
@@ -252,7 +252,7 @@ run()
     const number c((*t)[vars.size()]);
 
     classes[c].add(res);
-  }    
+  }
 
   typedef std::map<number,vita::distribution<vita::fitness_t> >::const_iterator const_iterator;
     for (const_iterator i(classes.begin()); i != classes.end(); ++i)

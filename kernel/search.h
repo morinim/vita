@@ -2,23 +2,34 @@
  *
  *  \file search.h
  *
- *  \author Manlio Morini
- *  \date 2011/04/04
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(SEARCH_H)
 #define      SEARCH_H
 
-#include "vita.h"
-#include "individual.h"
-#include "problem.h"
+#include "kernel/vita.h"
+#include "kernel/individual.h"
+#include "kernel/problem.h"
 
 namespace vita
 {
-  
   template <class T> class distribution;
   class evolution;
   class summary;
@@ -29,21 +40,20 @@ namespace vita
   class search
   {
   public:
-    search(problem &);
+    explicit search(problem *const);
 
     void arl(const individual &, evolution &);
 
-    individual run(bool=true, unsigned=1, fitness_t = -5.0);
+    individual run(bool = true, unsigned = 1, fitness_t = -5.0);
 
     bool check() const;
 
   private:
-    void log(const summary &, const distribution<fitness_t> &, 
+    void log(const summary &, const distribution<fitness_t> &,
              unsigned, unsigned, unsigned) const;
 
-    problem &_prob;
+    problem *prob_;
   };
-    
 }  // namespace vita
 
 #endif  // SEARCH_H
