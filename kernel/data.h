@@ -5,7 +5,7 @@
  *  Copyright 2011 EOS di Manlio Morini.
  *
  *  This file is part of VITA.
- *  
+ *
  *  VITA is free software: you can redistribute it and/or modify it under the
  *  terms of the GNU General Public License as published by the Free Software
  *  Foundation, either version 3 of the License, or (at your option) any later
@@ -16,13 +16,15 @@
  *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  *  details.
  *
- *  You should have received a copy of the GNU General Public License along 
- *  with VITA. If not, see <http://www.gnu.org/licenses/>. 
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 #if !defined(DATA_H)
 #define      DATA_H
+
+#include <boost/any.hpp>
 
 #include <fstream>
 #include <list>
@@ -30,8 +32,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-#include <boost/any.hpp>
 
 #include "kernel/vita.h"
 #include "kernel/distribution.h"
@@ -74,7 +74,6 @@ namespace vita
     const_iterator end() const;
 
     unsigned open(const std::string &);
-
     bool operator!() const;
 
     void clear(unsigned = 1);

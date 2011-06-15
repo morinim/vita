@@ -24,10 +24,10 @@
 #if !defined(ENVIRONMENT_H)
 #define      ENVIRONMENT_H
 
+#include <boost/property_tree/ptree.hpp>
+
 #include <cmath>
 #include <string>
-
-#include <boost/property_tree/ptree.hpp>
 
 #include "kernel/vita.h"
 #include "kernel/symbol_set.h"
