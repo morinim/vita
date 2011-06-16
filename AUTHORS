@@ -1,1 +1,16 @@
-Manlio Morini <morinim@gmail.com>
+    This is at least a partial credits-file of people that have contributed to
+    the Vita project.
+    It is sorted by name and formatted to allow easy grepping and beautification
+    by scripts.
+    The fields are: name (N), email (E), web-address (W), PGP key ID and
+    fingerprint (P), description (D) and snail-mail address (S).
+
+    Thanks,
+                        Manlio
+---------
+
+N: Manlio Morini
+E: morinim@gmail.com
+W: http://www.eosdev.it
+D: original Vita hacker
+S: Italy
