@@ -1,0 +1,95 @@
+VITA <http://www.vita.cc/>
+
+These are the release notes for Vita.  Read them carefully, as they tell you
+what this is all about, explain how to install the software and what to do if
+something goes wrong.
+
+OVERVIEW
+
+  Vita is a scalable, high performance C++ environment / toolkit for
+  classification, symbolic regression, content base image retrieval, data mining
+  and agent control.
+
+  It's distributed under the GNU General Public License - see the accompanying
+  COPYING file for more details.
+
+REQUIREMENTS
+
+  Vita is designed to have fairly minimal requirements to build and use with
+  your projects, but there are some.  Currently, we support Linux and Windows.
+  We will also make our best effort to support other platforms (e.g. Mac OS X,
+  Solaris, AIX, Cygwin).
+  However, since core members of the Vita project have no access to these
+  platforms, Vita may have outstanding issues there.  If you notice any
+  problems on your platform, please notify vita@googlecode.com. Patches for
+  fixing them are even more welcome!
+
+  ### Linux requirements ###
+
+  * GNU-compatible make;
+  * POSIX-standard shell;
+  * Boost library (<http://www.boost.org>);
+  * A C++98-standard-compliant compiler.
+
+  ### Windows requirements ###
+
+  * Microsoft Visual C++ 2010
+
+GETTING THE SOURCE
+
+  There are two primary ways of getting Vita's source code: you can download a
+  stable source release in your preferred archive format or directly check out
+  the source from the Mercurial (HG) repositary.
+  The HG checkout requires a few extra steps and some extra software packages
+  on your system, but lets you track the latest development and make patches
+  much more easily, so we highly encourage it.
+
+  ### Source Package ###
+
+  Vita is released in versioned source packages which can be downloaded from
+  the download page [1].  Several different archive formats are provided, but
+  the only difference is the tools used to manipulate them, and the size of the
+  resulting file.  Download whichever you are most comfortable with.
+
+  [1] http://code.google.com/p/vita/downloads/list
+
+  Once the package is downloaded, expand it using whichever tools you prefer
+  for that type.  This will result in a new directory with the name
+  "vita-X.Y.Z" which contains all of the source code.  Here are some examples
+  on Linux:
+
+    tar -xvJf vita-X.Y.Z.txz
+    tar -xvjf vita-X.Y.Z.tar.bz2
+    unzip vita-X.Y.Z.zip
+
+  ### HG Checkout ###
+
+  Run the following Mercurial command:
+
+    hg clone https://vita.googlecode.com/hg/ vita
+
+SETTING UP THE BUILD
+
+  If they are not already installed, you need the following libraries:
+
+  * BOOST (<http://www.boost.org>)
+
+  Vita needs Boost's Program Options Library to compile.
+
+  ### Linux ###
+
+  cd vita-X.Y.Z
+
+  * To build the kernel library: make TARGET=kernel
+  * To build the sr tool:        make TARGET=sr
+  * To build test n:             make TARGET=testn
+  * To build example n:          make TARGET=examplen
+
+  If you see errors, try to tweak the contents of Makefile to make them go
+  away.
+  All output files will per default be stored together with the source code.
+
+  ### Windows ###
+
+  You should use the project file.
+
