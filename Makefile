@@ -1,32 +1,39 @@
 # Further details / ideas:
 # * http://gpwiki.org/index.php/Makefile
-# * http://mad-scientist.net/make/autodep.html 
+# * http://mad-scientist.net/make/autodep.html
 
 
 
 # Specify the main target.
-TARGET = sr
+TARGET =
 
 # Build type: debug, profile, release.
 TYPE = release
 
-#-------------------------------------------------------------------------
+# Boost library <-- PLEASE CHECK THE PATH!
+BOOST_INCLUDE = ./boost
+BOOST_LIB = ./boost/stage/lib
+
+
+
+# NO USER SERVICEABLE PARTS BELOW THIS LINE
+# -------------------------------------------------------------------------
 
 # Which libraries are linked
-LIB = lib/libboost_program_options.a
+LIB = $(BOOST_LIB)/libboost_program_options.a
 
 # Add directories to the include path.
-INCPATH = ./ ./kernel ./boost
+INCPATH = ./ ./kernel $(BOOST_INCLUDE)
 
 WARN = -pedantic -ansi -Wall -Wextra
 DEFS = -march=native
 
 # The next blocks change some variables depending on the build type.
-ifeq ($(TYPE),debug)
+ifeq ($(TYPE), debug)
   TYPE_PARAM = -g
 endif
 
-ifeq ($(TYPE),profile)
+ifeq ($(TYPE), profile)
   TYPE_PARAM = -Wall -pg $(WARN) $(DEFS) -DNDEBUG
 endif
 
@@ -41,17 +48,22 @@ CXX = g++ -pipe $(CXXFLAGS)
 KERNEL_SRC = $(wildcard kernel/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 
-ifeq ($(TARGET),sr)
+ifeq ($(TARGET), kernel)
+  ifeq ($(strip $(OUTDIR)),)
+    OUTDIR = kernel
+  endif
+  MAIN_SRC =
+else ifeq ($(TARGET), sr)
   ifeq ($(strip $(OUTDIR)),)
     OUTDIR = sr
   endif
   MAIN_SRC = sr/sr.cc
-else ifneq (,$(findstring test,$(TARGET)))
+else ifneq (, $(findstring test, $(TARGET)))
   ifeq ($(strip $(OUTDIR)),)
     OUTDIR = test
   endif
   MAIN_SRC = test/$(TARGET).cc
-else ifneq (,$(findstring example,$(TARGET)))
+else ifneq (, $(findstring example, $(TARGET)))
   ifeq ($(strip $(OUTDIR)),)
     OUTDIR = examples
   endif
@@ -66,6 +78,10 @@ $(TARGET): $(MAIN_OBJ) $(KERNEL_OBJ)
 	@echo Linking $(TARGET)...
 	$(CXX) $(MAIN_OBJ) $(KERNEL_OBJ) -o $(OUTDIR)/$(TARGET) $(LIB)
 
+libvita.a: $(KERNEL_OBJ)
+	@echo Linking $(TARGET)...
+	ar rcs kernel/libvita.a $(KERNEL_OBJ)
+
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
 	$(CXX) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
@@ -78,7 +94,7 @@ $(TARGET): $(MAIN_OBJ) $(KERNEL_OBJ)
 clean:
 	@echo Making clean...
 	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
-	@rm -f sr/sr test/test? examples/example? kernel/*.o sr/*.o test/*.o examples/*.o
+	@rm -f sr/sr test/test? examples/example? kernel/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
 
 .phony:	backup
 backup:
