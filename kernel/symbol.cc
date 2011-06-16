@@ -2,51 +2,60 @@
  *
  *  \file symbol.cc
  *
- *  \author Manlio Morini
- *  \date 2009/09/14
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "symbol.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
-
-  unsigned symbol::_opc_count(0);
+  unsigned symbol::opc_count_(0);
 
   ///
   /// \return the name of the symbol.
   ///
-  std::string
-  symbol::display() const
+  std::string symbol::display() const
   {
-    return _display;
+    return display_;
   }
 
   ///
   /// \param[in] v
-  /// \return
+  /// \return a string representing the symbol.
   ///
-  std::string
-  symbol::display(int v) const
+  /// This function is called by parametric symbols only. The \a v argument is
+  /// used to build a more meaningful name for the symbol.
+  ///
+  std::string symbol::display(int v) const
   {
     assert(parametric());
 
     std::ostringstream s;
-    s << _display << '_' << v;
+    s << display_ << '_' << v;
     return s.str();
   }
 
-  /**
-   * check
-   * \return true if the object passes the internal consistency check.
-   */
-  bool
-  symbol::check() const
+  ///
+  /// \return \c true if the object passes the internal consistency check.
+  ///
+  bool symbol::check() const
   {
-    return _display.size() > 0;
+    return display_.size() > 0;
   }
-  
 }  // Namespace vita

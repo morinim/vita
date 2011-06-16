@@ -2,26 +2,37 @@
  *
  *  \file symbol.h
  *
- *  \author Manlio Morini
- *  \date 2009/10/14
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 #if !defined(SYMBOL_H)
 #define      SYMBOL_H
 
+#include <boost/any.hpp>
+
 #include <sstream>
 #include <string>
 
-#include <boost/any.hpp>
-
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
-
   const symbol_t sym_void(0);
   const symbol_t sym_bool(1);
   const symbol_t sym_real(2);
@@ -64,23 +75,23 @@ namespace vita
     unsigned weight;
 
   private:
-    static unsigned _opc_count;
+    static unsigned opc_count_;
 
-    const opcode_t     _opcode;
+    const opcode_t     opcode_;
 
-    const symbol_t       _type;
+    const symbol_t       type_;
 
-    const std::string _display;
+    const std::string display_;
   };
 
-  /**
-   * symbol
-   * \param dis[in]
-   * \param w[in]
-   */
+  ///
+  /// \param[in] dis
+  /// \param[in] t
+  /// \param[in] w
+  ///
   inline
   symbol::symbol(const std::string &dis, symbol_t t, unsigned w)
-    : weight(w), _opcode(++_opc_count), _type(t), _display(dis)
+    : weight(w), opcode_(++opc_count_), type_(t), display_(dis)
   {
     assert(check());
   }
@@ -93,18 +104,16 @@ namespace vita
   /// meaningful way.
   ///
   inline
-  int
-  symbol::init() const
+  int symbol::init() const
   {
     return 0;
   }
 
   ///
-  /// \return true if this symbol is a terminal.
+  /// \return \c true if this symbol is a \c terminal.
   ///
   inline
-  bool
-  symbol::terminal() const
+  bool symbol::terminal() const
   {
     return arity() == 0;
   }
@@ -113,23 +122,20 @@ namespace vita
   /// \return the type of the \a symbol.
   ///
   inline
-  symbol_t
-  symbol::type() const
+  symbol_t symbol::type() const
   {
-    return _type;
+    return type_;
   }
 
   ///
-  /// \return the opcode of the symbol (an \c unsigned \c int used as primary 
+  /// \return the opcode of the symbol (an \c unsigned \c int used as primary
   /// key).
   ///
   inline
-  opcode_t
-  symbol::opcode() const
+  opcode_t symbol::opcode() const
   {
-    return _opcode;
+    return opcode_;
   }
-   
 }  // namespace vita
 
 #endif  // SYMBOL_H
