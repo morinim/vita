@@ -2,22 +2,35 @@
  *
  *  \file terminal.h
  *
- *  \author Manlio Morini
- *  \date 2009/09/14
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
 #if !defined(TERMINAL_H)
 #define      TERMINAL_H
 
-#include "vita.h"
-#include "symbol.h"
+#include <string>
+
+#include "kernel/vita.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
-
   ///
   /// A terminal (leaf) node in the parse trees representing the programs in the
   /// population. A terminal might be a variable (input to the program), a
@@ -27,8 +40,8 @@ namespace vita
   class terminal : public symbol
   {
   public:
-    terminal(const std::string &, symbol_t, bool=false, bool=false,
-             unsigned=default_weight);
+    terminal(const std::string &, symbol_t, bool = false, bool = false,
+             unsigned = default_weight);
 
     symbol_t arg_type(unsigned) const;
 
@@ -43,8 +56,8 @@ namespace vita
     static unsigned default_weight;
 
   private:
-    const bool _parametric;
-    const bool      _input;
+    const bool parametric_;
+    const bool      input_;
   };
 
   ///
@@ -53,8 +66,7 @@ namespace vita
   /// No arguments for terminals!
   ///
   inline
-  symbol_t
-  terminal::arg_type(unsigned) const
+  symbol_t terminal::arg_type(unsigned) const
   {
     return sym_void;
   }
@@ -64,18 +76,16 @@ namespace vita
   /// 0 arguments <=> terminal.
   ///
   inline
-  unsigned
-  terminal::arity() const
+  unsigned terminal::arity() const
   {
     return 0;
   }
 
   ///
-  /// \return false
+  /// \return \c false
   ///
   inline
-  bool
-  terminal::associative() const
+  bool terminal::associative() const
   {
     return false;
   }
@@ -86,22 +96,19 @@ namespace vita
   /// An input variable is a feature from the learning domain.
   ///
   inline
-  bool
-  terminal::input() const
+  bool terminal::input() const
   {
-    return _input;
+    return input_;
   }
 
   ///
   /// \return true if the terminal is parametric.
   ///
   inline
-  bool
-  terminal::parametric() const
+  bool terminal::parametric() const
   {
-    return _parametric;
+    return parametric_;
   }
-    
 }  // namespace vita
 
 #endif  // TERMINAL_H
