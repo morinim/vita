@@ -26,14 +26,16 @@ REQUIREMENTS
 
   ### Linux requirements ###
 
-  * GNU-compatible make;
-  * POSIX-standard shell;
-  * Boost library (<http://www.boost.org>);
-  * A C++98-standard-compliant compiler.
+  * GNU-compatible make
+  * POSIX-standard shell
+  * Boost library (<http://www.boost.org>)
+  * A C++98-standard-compliant compiler
+  * Python v3
 
   ### Windows requirements ###
 
   * Microsoft Visual C++ 2010
+  * Python v3
 
 GETTING THE SOURCE
 
@@ -68,13 +70,25 @@ GETTING THE SOURCE
 
     hg clone https://vita.googlecode.com/hg/ vita
 
+THE VITA DISTRIBUTION
+
+  This is a sketch of the resulting directory structure:
+
+  vita-X.Y.Z
+    Makefile
+    examples/..............Various examples
+    kernel/ ...............Vita kernel(core library)
+    sr/ ...................Symbolic regression and classification utility
+    test/ .................Vita-wide testsuite
+    tools/ ................Utilities (C++ lint checker...)
+
 SETTING UP THE BUILD
 
   If they are not already installed, you need the following libraries:
 
   * BOOST (<http://www.boost.org>)
 
-  Vita needs Boost's Program Options Library to compile.
+  Kernel can be built Vita needs Boost's Program Options Library to compile.
 
   ### Linux ###
 
