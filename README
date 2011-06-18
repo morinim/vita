@@ -88,7 +88,9 @@ SETTING UP THE BUILD
 
   * BOOST (<http://www.boost.org>)
 
-  Kernel can be built Vita needs Boost's Program Options Library to compile.
+  Kernel can be built with a header-only Boost library; other programs may
+  need boost separately-compiled library binaries (e.g. SR utility needs
+  Program Options Library to compile).
 
   ### Linux ###
 
@@ -107,4 +109,3 @@ SETTING UP THE BUILD
   ### Windows ###
 
   You should use the project file.
-
