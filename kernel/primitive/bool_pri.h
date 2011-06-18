@@ -2,116 +2,107 @@
  *
  *  \file bool_pri.h
  *
- *  \author Manlio Morini
- *  \date 2009/10/31
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-  
 #if !defined(SR_PRIMITIVE_H)
 #define      SR_PRIMITIVE_H
+
+#include <boost/any.hpp>
 
 #include <cstdlib>
 #include <limits>
 #include <sstream>
+#include <string>
 
-#include <boost/any.hpp>
-
-#include "vita.h"
-#include "function.h"
-#include "interpreter.h"
-#include "random.h"
-#include "terminal.h"
+#include "kernel/vita.h"
+#include "kernel/function.h"
+#include "kernel/interpreter.h"
+#include "kernel/random.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
-
-namespace boolean
-{
-
-  /**
-   * variable
-   */
-  class variable : public terminal
+  namespace boolean
   {
-  public:
-    variable(const std::string &name) : terminal(name,sym_bool,true) {};
-    
-    boost::any eval(vita::interpreter &) const { return val; };
+    class variable : public terminal
+    {
+    public:
+      explicit variable(const std::string &name)
+        : terminal(name, sym_bool, true) {}
 
-    bool val;
-  };
+      boost::any eval(vita::interpreter *) const { return val; }
 
-  /**
-   * zero
-   */
-  class zero : public terminal
-  {
-  public:
-    zero() : terminal("0",sym_bool,false,false,default_weight*3) {};
-
-    std::string display() const { return "0"; };
-
-    boost::any eval(interpreter &) const { return false; };
-  };
-
-  /**
-   * one
-   */
-  class one : public terminal
-  {
-  public:
-    one() : terminal("1",sym_bool,false,false,default_weight*3) {};
-
-    std::string display() const { return "1"; };
-
-    boost::any eval(interpreter &) const { return true; };
-  };
-
-  /**
-   * and
-   */
-  class and : public function
-  {
-  public:
-    and() : function("AND",sym_bool,2,function::default_weight,true) {};
-
-    boost::any eval(interpreter &i) const
-    { 
-      return boost::any_cast<bool>(i.eval(0)) && 
-             boost::any_cast<bool>(i.eval(1)) );
+      bool val;
     };
-  };
 
-  /**
-   * not
-   */
-  class not : public function
-  {
-  public:
-    not() : function("NOT",sym_bool,1) {};
+    class zero : public terminal
+    {
+    public:
+      zero() : terminal("0", sym_bool, false, false, default_weight*3) {}
 
-    boost::any eval(interpreter &i) const 
-    { return !boost::any_cast<bool>(i.eval(0)); };
-  };
+      std::string display() const { return "0"; }
 
-  /**
-   * or
-   */
-  class or : public function
-  {
-  public:
-    or() : function("OR",sym_bool,2,function::default_weight,true) {};
-
-    boost::any eval(interpreter &i) const
-    { 
-      return boost::any_cast<bool>(i.eval(0)) || 
-             boost::any_cast<bool>(i.eval(1)); 
+      boost::any eval(vita::interpreter *) const { return false; }
     };
-  };
 
-}  // namespace boolean
+    class one : public terminal
+    {
+    public:
+      one() : terminal("1", sym_bool, false, false, default_weight*3) {}
 
+      std::string display() const { return "1"; }
+
+      boost::any eval(vita::interpreter *) const { return true; }
+    };
+
+    class and : public function
+    {
+    public:
+      and() : function("AND", sym_bool, 2, function::default_weight, true) {}
+
+      boost::any eval(vita::interpreter *i) const
+      {
+        return boost::any_cast<bool>(i->eval(0)) &&
+          boost::any_cast<bool>(i->eval(1));
+      }
+    };
+
+    class not : public function
+    {
+    public:
+      not() : function("NOT", sym_bool, 1) {}
+
+      boost::any eval(vita::interpreter *i) const
+      { return !boost::any_cast<bool>(i->eval(0)); }
+    };
+
+    class or : public function
+    {
+    public:
+      or() : function("OR", sym_bool, 2, function::default_weight, true) {}
+
+      boost::any eval(vita::interpreter *i) const
+      {
+        return boost::any_cast<bool>(i->eval(0)) ||
+          boost::any_cast<bool>(i->eval(1));
+      }
+    };
+  }  // namespace boolean
 }  // namespace vita

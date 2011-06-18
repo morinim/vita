@@ -2,10 +2,23 @@
  *
  *  \file vita.h
  *
- *  \author EOS di Manlio Morini
- *  \date 2010/12/30
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  *
  *  \mainpage VITA v0.9.0
@@ -19,14 +32,14 @@
 #if !defined(VITA_H)
 #define      VITA_H
 
+#include <boost/cstdint.hpp>
+
 #include <cassert>
 #include <climits>
 #include <cmath>
-#include <boost/cstdint.hpp>
 
 namespace vita
 {
-
 #if defined(_MSC_VER)
 #  define isnan(x)      _isnan(x)
 #  define isinf(x)      !_finite(x)
@@ -51,7 +64,6 @@ namespace vita
   /// are considered equivalent.
   ///
   const double float_epsilon(0.0001);
-
 }  // namespace vita
 
 /// \page page1 VITA Architecture
