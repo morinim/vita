@@ -2,10 +2,22 @@
  *
  *  \file sr.cc
  *
- *  \author Manlio Morini
- *  \date 2011/05/19
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -19,12 +31,12 @@ namespace po = boost::program_options;
 #include <iterator>
 #include <string>
 
-#include "environment.h"
-#include "search.h"
-#include "src_problem.h"
+#include "kernel/environment.h"
+#include "kernel/search.h"
+#include "kernel/src_problem.h"
 
 const std::string vita_sr_version(
-  "Vita v1.04 - Symbolic Regression and classification\n"\
+  "Vita v1.04 - Symbolic Regression and classification\n"   \
   "Copyright EOS Development (http://www.eosdev.it)"
 );
 
@@ -67,29 +79,31 @@ bool parse_command_line(int argc, char *argv[])
   std::string data_file, f_f, symbols_file;
 
   try
-  {   
+  {
     // Declare a group of options that will be allowed only on command line.
     po::options_description generic("Generic options");
     generic.add_options()
-      ("version,v","print version string.")
-      ("help,h","produces help message.")
-      ("verbose",po::bool_switch(&verbose),"shows more details.");
-    
+      ("version,v", "print version string.")
+      ("help,h", "produces help message.")
+      ("verbose", po::bool_switch(&verbose), "shows more details.");
+
     po::options_description data("Data");
     data.add_options()
-      ("data,d",po::value(&data_file),"Data file.")
-      ("symbols,s",po::value(&symbols_file),"Symbols file.");
+      ("data,d", po::value(&data_file), "Data file.")
+      ("symbols,s", po::value(&symbols_file), "Symbols file.");
 
     po::options_description config("Config");
     config.add_options()
       ("ttable",
-       po::value(&problem.env.ttable_size)->default_value(problem.env.ttable_size),
+       po::value(&problem.env.ttable_size)->default_value(
+         problem.env.ttable_size),
        "Number of bits used for the ttable (ttable contains 2^bit elements).")
       ("random-seed",
        po::value(&random_seed),
-       "Sets the seed for the pseudo-random number generator. Pseudo-random sequences are repeatable by using the same seed value.");
+       "Sets the seed for the pseudo-random number generator. "\
+       "Pseudo-random sequences are repeatable by using the same seed value.");
 
-    // Declare a group of options that will be allowed both on command line 
+    // Declare a group of options that will be allowed both on command line
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
@@ -100,11 +114,11 @@ bool parse_command_line(int argc, char *argv[])
        po::value(&problem.env.code_length),
        "Sets the maximum length of a program (it might be shorter)");
 
-    // Declare a group of options that will be allowed both on command line 
+    // Declare a group of options that will be allowed both on command line
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      ("population-size,P", 
+      ("population-size,P",
        po::value(&problem.env.individuals),
        "Sets the number of programs/individuals in the population.")
       ("elitism",
@@ -112,13 +126,16 @@ bool parse_command_line(int argc, char *argv[])
        "When elitism is true an individual will never replace a better one.")
       ("mutation-rate,m",
        po::value(&problem.env.p_mutation),
-       "Sets the overall probability of mutation of the individuals that have been selected as winners in a tournament. Range is [0,1].")
+       "Sets the overall probability of mutation of the individuals that have "\
+       "been selected as winners in a tournament. Range is [0,1].")
       ("crossover-rate,c",
        po::value(&problem.env.p_cross),
-       "Sets the overall probability that crossover will occour between two winners in a tournament. Range is [0,1].")
+       "Sets the overall probability that crossover will occour between two "\
+       "winners in a tournament. Range is [0,1].")
       ("parent-tournament,T",
        po::value(&problem.env.par_tournament),
-       "Number of individuals chosen at random from the population to identify a parent.") 
+       "Number of individuals chosen at random from the population to "\
+       "identify a parent.")
       ("g-since-start,g",
        po::value(&problem.env.g_since_start),
        "Sets the maximum number of generations in a run.")
@@ -149,17 +166,22 @@ bool parse_command_line(int argc, char *argv[])
       ("stat-arl",
        po::bool_switch(&problem.env.stat_arl),
       "Save the list of active ADF");
-        
-    po::options_description cmdl_opt(vita_sr_version+"\n\nsr [options] data_file\n\nAllowed options");
-    cmdl_opt.add(generic).add(data).add(config).add(evolution).add(individual).add(statistics);
-       
+
+    po::options_description cmdl_opt(vita_sr_version +
+                                     "\n\n" +
+                                     "sr [options] data_file" +
+                                     "\n\n" +
+                                     "Allowed options");
+    cmdl_opt.add(generic).add(data).add(config).add(evolution).add(individual).
+      add(statistics);
+
     po::positional_options_description p;
-    p.add("data",-1);
-        
+    p.add("data", -1);
+
     po::variables_map vm;
 
-    store(po::command_line_parser(argc,argv).
-          options(cmdl_opt).positional(p).run(),vm);
+    store(po::command_line_parser(argc, argv).
+          options(cmdl_opt).positional(p).run(), vm);
 
     notify(vm);
 
@@ -174,7 +196,7 @@ bool parse_command_line(int argc, char *argv[])
       std::cout << cmdl_opt << std::endl;
 
       if (data_file.empty())
-	std::cerr << "Missing data file." << std::endl;
+        std::cerr << "Missing data file." << std::endl;
 
       return false;
     }
@@ -183,58 +205,59 @@ bool parse_command_line(int argc, char *argv[])
     {
       vita::random::seed(random_seed);
       if (verbose)
-	std::cout << "Random seed is " << random_seed << std::endl;
+        std::cout << "Random seed is " << random_seed << std::endl;
     }
-    
+
     if (verbose && !problem.env.stat_dir.empty())
-      std::cout << "Statistics/status files directory is " 
-		<< problem.env.stat_dir	<< std::endl;
+      std::cout << "Statistics/status files directory is "
+                << problem.env.stat_dir << std::endl;
   }
   catch (std::exception &e)
   {
     std::cout << e.what() << std::endl;
     return false;
-  }    
+  }
 
-  if (verbose) std::cout << "Reading data file (" << data_file << ")... ";
+  if (verbose)
+    std::cout << "Reading data file (" << data_file << ")... ";
   if (!problem.load_data(data_file))
     return false;
   if (verbose)
-  { 
+  {
     std::cout << "ok" << std::endl
-	      << "  (" << problem.variables() << " variables, " 
-	      << problem.classes() << " classes)" << std::endl;
+              << "  (" << problem.variables() << " variables, "
+              << problem.classes() << " classes)" << std::endl;
   }
-  
+
 
   if (symbols_file.empty())
-  { 
-    if (verbose) std::cout << "  (default symbol set)" << std::endl;
+  {
+    if (verbose)
+      std::cout << "  (default symbol set)" << std::endl;
     setup_default_symbols();
   }
   else
   {
-    if (verbose) std::cout << "Reading symbols' file (" << symbols_file 
-			   << ")... ";
+    if (verbose) std::cout << "Reading symbols' file (" << symbols_file
+                           << ")... ";
     const std::string s(problem.load_symbols(symbols_file));
     if (s.empty())
       return false;
     if (verbose)
       std::cout << "ok" << std::endl
-		<< "  (" << s << ')' << std::endl;
+                << "  (" << s << ')' << std::endl;
   }
-  
+
   return true;
 }
 
 ///
 /// \return
 ///
-bool
-run()
+bool run()
 {
   vita::search s(&problem);
-  s.run(verbose,runs);
+  s.run(verbose, runs);
 
   // vita::interpreter agent(ind);
 
@@ -269,20 +292,20 @@ run()
       vars[i]->val = (*t)[i];
 
     const vita::fitness_t res(agent.run());
-  
+
     std::cout << res << std::endl;
 
     number best_class;
     for (const_iterator i(classes.begin()); i != classes.end(); ++i)
       if (std::fabs(res-classes[i->first].mean) < min)
       {
-	min = std::fabs(res-classes[i->first].mean);
-	best_class = i->first;
+        min = std::fabs(res-classes[i->first].mean);
+        best_class = i->first;
       }
-			
+
     if (best_class == (*t)[vars.size()])
       f += 1.0 - ind.eff_size()/1200.0;
-  }  
+  }
   */
 
   return true;
@@ -290,7 +313,7 @@ run()
 
 int main(int argc, char *argv[])
 {
-  if (!parse_command_line(argc,argv))
+  if (!parse_command_line(argc, argv))
     return EXIT_FAILURE;
 
   run();
