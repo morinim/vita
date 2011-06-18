@@ -80,10 +80,11 @@ SETTING UP THE BUILD
 
   cd vita-X.Y.Z
 
-  * To build the kernel library: make
-  * To build the sr tool:        make TARGET=sr
-  * To build test <n>:           make TARGET=testn
-  * To build example <n>:        make TARGET=examplen
+  * To build all:                             make
+  * To build the kernel library (libvita.a):  make kerne
+  * To build the sr tool:                     make sr
+  * To build test <n>:                        make testn
+  * To build example <n>:                     make examplen
 
   If you see errors, try to tweak the contents of Makefile to make them go
   away.

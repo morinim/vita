@@ -47,46 +47,36 @@ CXX = g++ -pipe $(CXXFLAGS)
 
 KERNEL_SRC = $(wildcard kernel/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
+EXAMPLES_SRC = $(wildcard examples/*.cc)
+SR_SRC = $(wildcard sr/*.cc)
+TESTS_SRC = $(wildcard test/*.cc)
 
-ifeq ($(TARGET), kernel)
-  ifeq ($(strip $(OUTDIR)),)
-    OUTDIR = kernel
-  endif
-  MAIN_SRC =
-else ifeq ($(TARGET), sr)
-  ifeq ($(strip $(OUTDIR)),)
-    OUTDIR = sr
-  endif
-  MAIN_SRC = sr/sr.cc
-else ifneq (, $(findstring test, $(TARGET)))
-  ifeq ($(strip $(OUTDIR)),)
-    OUTDIR = test
-  endif
-  MAIN_SRC = test/$(TARGET).cc
-else ifneq (, $(findstring example, $(TARGET)))
-  ifeq ($(strip $(OUTDIR)),)
-    OUTDIR = examples
-  endif
-  MAIN_SRC = examples/$(TARGET).cc
-endif
+ALL_SRC = $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
 
-MAIN_OBJ = $(MAIN_SRC:.cc=.o)
+.PRECIOUS: %.o
 
-ALL_SRC = $(KERNEL_SRC) $(MAIN_SRC)
+all: kernel sr
 
-$(TARGET): $(MAIN_OBJ) $(KERNEL_OBJ)
-	@echo Linking $(TARGET)...
-	$(CXX) $(MAIN_OBJ) $(KERNEL_OBJ) -o $(OUTDIR)/$(TARGET) $(LIB)
+sr: sr/sr.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(CXX) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
 
-libvita.a: $(KERNEL_OBJ)
-	@echo Linking $(TARGET)...
-	ar rcs kernel/libvita.a $(KERNEL_OBJ)
+example%: examples/example%.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
+
+test%: test/test%.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(CXX) $< $(KERNEL_OBJ) -o test/$@
+
+kernel: $(KERNEL_OBJ)
+	@echo Linking libvita.a
+	@ar rcs kernel/libvita.a $(KERNEL_OBJ)
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
-	$(CXX) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
+	@$(CXX) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
 	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; rm -f $*.d
-	@echo ; echo
 
 -include $(ALL_SRC:.cc=.P)
 
