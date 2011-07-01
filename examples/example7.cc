@@ -2,10 +2,23 @@
  *
  *  \file example7.cc
  *
- *  \author Manlio Morini
- *  \date 2010/06/11
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  *  Building blocks infrastructure test.
  */
@@ -14,10 +27,10 @@
 #include <iostream>
 #include <fstream>
 
-#include "adf.h"
-#include "distribution.h"
-#include "environment.h"
-#include "primitive/sr_pri.h"
+#include "kernel/adf.h"
+#include "kernel/distribution.h"
+#include "kernel/environment.h"
+#include "kernel/primitive/sr_pri.h"
 
 int main(int argc, char *argv[])
 {
@@ -26,7 +39,7 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  env.insert(new vita::sr::number(-200,200));
+  env.insert(new vita::sr::number(-200, 200));
   env.insert(new vita::sr::add());
   env.insert(new vita::sr::sub());
   env.insert(new vita::sr::mul());
@@ -43,13 +56,13 @@ int main(int argc, char *argv[])
     unsigned base_es;
     do
     {
-      base = vita::individual(env,true);
+      base = vita::individual(env, true);
       base_es = base.eff_size();
     } while (base_es < 5);
-      
+
     individuals.add(base_es);
 
-    std::cout << std::string(40,'-') << std::endl;
+    std::cout << std::string(40, '-') << std::endl;
     base.list(std::cout);
     std::cout << std::endl;
 
@@ -58,13 +71,13 @@ int main(int argc, char *argv[])
     {
       vita::individual ib(base.get_block(*i));
       vita::individual norm;
-      const unsigned first_terminal(ib.normalize(norm));
+      const unsigned first_terminal(ib.normalize(&norm));
 
       if (first_terminal)
       {
         std::vector<unsigned> positions;
         std::vector<vita::symbol_t> types;
-        norm.generalize(2,&positions,&types);
+        norm.generalize(2, &positions, &types);
 
         std::cout << std::endl;
         ib.list(std::cout);
@@ -78,26 +91,26 @@ int main(int argc, char *argv[])
           std::cout << " (pos=" << positions[j] << ",type=" << types[j]
                     << ")";
         std::cout << std::endl;
-	
+
         blocks_len.add(ib.eff_size());
         arguments.add(arg_n);
       }
     }
   }
 
-  std::cout << std::string(40,'-') << std::endl
-	    << "Individuals effective lengths." << std::endl
-	    << "Min: " << individuals.min << "  Mean: " << individuals.mean
-	    << "  StdDev: " << std::sqrt(individuals.variance)
-	    << "  Max: " << individuals.max << std::endl
-	    << "Blocks effective lengths." << std::endl
-	    << "Min: " << blocks_len.min << "  Mean: " << blocks_len.mean
-	    << "  StdDev: " << std::sqrt(blocks_len.variance)
-	    << "  Max: " << blocks_len.max << std::endl
-	    << "Number of arguments." << std::endl
-	    << "Min: " << arguments.min << "  Mean: " << arguments.mean
-	    << "  StdDev: " << std::sqrt(arguments.variance)
-	    << "  Max: " << arguments.max << std::endl;
- 
+  std::cout << std::string(40, '-') << std::endl
+            << "Individuals effective lengths." << std::endl
+            << "Min: " << individuals.min << "  Mean: " << individuals.mean
+            << "  StdDev: " << std::sqrt(individuals.variance)
+            << "  Max: " << individuals.max << std::endl
+            << "Blocks effective lengths." << std::endl
+            << "Min: " << blocks_len.min << "  Mean: " << blocks_len.mean
+            << "  StdDev: " << std::sqrt(blocks_len.variance)
+            << "  Max: " << blocks_len.max << std::endl
+            << "Number of arguments." << std::endl
+            << "Min: " << arguments.min << "  Mean: " << arguments.mean
+            << "  StdDev: " << std::sqrt(arguments.variance)
+            << "  Max: " << arguments.max << std::endl;
+
   return EXIT_SUCCESS;
 }
