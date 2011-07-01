@@ -30,7 +30,7 @@ namespace vita
 
     assert(check());
   }
- 
+
   ///
   /// The destructor frees only memory allocated by the constructor. Object
   /// created by the client must be deleted by the client.

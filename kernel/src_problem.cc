@@ -42,16 +42,15 @@ namespace vita
     abs_evaluator(data *d, std::vector<vita::sr::variable *> *v)
       : src_evaluator(d, v) {}
 
-    fitness_t run(const individual &);
+    fitness_t operator()(const individual &);
   };
 
   ///
-  /// \param[in] ind an individual.
-  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  /// \return the fitness (greater is better, max is 0).
   ///
-  fitness_t abs_evaluator::run(const individual &ind)
+  fitness_t abs_evaluator::operator()(const individual &ind)
   {
-    assert(!dat_.classes());
+    assert(!dat_->classes());
 
     interpreter agent(ind);
 
@@ -82,9 +81,13 @@ namespace vita
   {
   public:
     dyn_slot_evaluator(data *d, std::vector<vita::sr::variable *> *v)
-      : src_evaluator(d, v) {}
+      : src_evaluator(d, v)
+    {
+      assert(d);
+      assert(v);
+    }
 
-    fitness_t run(const individual &);
+    fitness_t operator()(const individual &);
 
   private:
     static double normalize_01(double);
@@ -101,14 +104,13 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind an individual.
-  /// \return the fitness of individual \a ind (greater is better, max is 0).
+  /// \return the fitness (greater is better, max is 0).
   ///
   /// Slotted Dynamic Class Boundary Determination
   ///
-  fitness_t dyn_slot_evaluator::run(const individual &ind)
+  fitness_t dyn_slot_evaluator::operator()(const individual &ind)
   {
-    assert(dat_.classes() >= 2);
+    assert(dat_->classes() >= 2);
 
     const unsigned n_slots(dat_->classes()*10);
     std::vector< std::vector<unsigned> > slots(n_slots);
@@ -170,6 +172,107 @@ namespace vita
           err += slots[i][j];
 
     return fitness_t(-err);
+  }
+
+  class gaussian_evaluator : public src_evaluator
+  {
+  public:
+    gaussian_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+      : src_evaluator(d, v), gauss_(d->classes())
+    {
+      assert(d);
+      assert(v);
+      assert(d->classes() >= 2);
+    }
+
+    unsigned class_label(const individual &, const data::value_type &);
+    double success_rate() const;
+
+    fitness_t operator()(const individual &);
+
+  private:
+    std::vector< distribution<double> > gauss_;
+  };
+
+  ///
+  /// \return the fitness (greater is better, max is 0).
+  ///
+  /// For details about this algorithm see:
+  /// * "Using Gaussian Distribution to Construct Fitnesss Functions in Genetic
+  ///   Programming for Multiclass Object Classification" - Mengjie Zhang, Will
+  ///   Smart (december 2005).
+  ///
+  fitness_t gaussian_evaluator::operator()(const individual &ind)
+  {
+    interpreter agent(ind);
+
+    // For a set of training data, we assume that the behaviour of a program
+    // classifier is modelled using multiple Gaussian distributions, each of
+    // which corresponds to a particular class. The distribution of a class is
+    // determined by evaluating the program on the examples of the class in
+    // the training set. This is done by taking the mean and standard deviation
+    // of the program outputs for those training examples for that class.
+    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    {
+      for (unsigned i(0); i < var_->size(); ++i)
+        (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
+
+      const boost::any res(agent.run());
+      const double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
+
+      gauss_[t->label()].add(val);
+    }
+
+    fitness_t d(0.0);
+    for (unsigned i(0); i < gauss_.size(); ++i)
+      for (unsigned j(i+1); j < gauss_.size(); ++j)
+      {
+        const double mean_i(gauss_[i].mean);
+        const double mean_j(gauss_[j].mean);
+        const double stddev_i(gauss_[i].standard_deviation());
+        const double stddev_j(gauss_[j].standard_deviation());
+
+        d += std::fabs(mean_j - mean_i) / (stddev_j + stddev_i);
+      }
+
+    return -1.0 / (1.0 + d);
+  }
+
+  ///
+  /// \param[in] ind
+  /// \param[in] val input value whose class we are interested in.
+  /// \return the class of \a val.
+  ///
+  unsigned gaussian_evaluator::class_label(const individual &ind,
+                                           const data::value_type &val)
+  {
+    interpreter agent( ind );
+    for (unsigned i(0); i < var_->size(); ++i)
+      (*var_)[i]->val = boost::any_cast<double>(val.input[i]);
+
+    const boost::any res(agent.run());
+    const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
+    const double pi2(2*std::acos(-1.0));
+
+    assert(dat_->classes() == gauss_->size());
+
+    double prob_c(0.0);
+    unsigned c(0);
+    for (unsigned i(0); i < dat_->classes(); ++i)
+    {
+      const double m(gauss_[i].mean);
+      const double s(gauss_[i].variance);
+
+      const double prob(std::exp((x-m)*(m-x) / (2*s*s)) / std::sqrt(pi2*s*s));
+
+      if (prob > prob_c)
+      {
+        prob_c = prob;
+        c = i;
+      }
+    }
+
+    return c;
   }
 
   ///

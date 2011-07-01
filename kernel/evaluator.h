@@ -44,7 +44,7 @@ namespace vita
   class evaluator
   {
   public:
-    virtual fitness_t run(const individual &) = 0;
+    virtual fitness_t operator()(const individual &) = 0;
   };
 
   ///
@@ -54,7 +54,7 @@ namespace vita
   class random_evaluator : public evaluator
   {
   public:
-    fitness_t run(const individual &)
+    fitness_t operator()(const individual &)
     {
       return random::between<unsigned>(0, 16000);
     }

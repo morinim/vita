@@ -79,7 +79,7 @@ namespace vita
     az->clear();
 
     for (population::const_iterator i(pop_.begin()); i != pop_.end(); ++i)
-      az->add(*i, eva_->run(*i));
+      az->add(*i, (*eva_)(*i));
   }
 
   void evolution::pick_stats()
@@ -176,7 +176,7 @@ namespace vita
   ///
   fitness_t evolution::fitness(const individual &ind) const
   {
-    return eva_->run(ind);
+    return (*eva_)(ind);
   }
 
   ///
@@ -205,7 +205,7 @@ namespace vita
   {
     stats_.clear();
     stats_.best   = *pop_.begin();
-    stats_.f_best = eva_->run(stats_.best);
+    stats_.f_best = (*eva_)(stats_.best);
 
     eva_->clear();
 

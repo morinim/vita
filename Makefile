@@ -23,7 +23,7 @@ BOOST_LIB = ./boost/stage/lib
 LIB = $(BOOST_LIB)/libboost_program_options.a
 
 # Add directories to the include path.
-INCPATH = ./ ./kernel $(BOOST_INCLUDE)
+INCPATH = ./ $(BOOST_INCLUDE)
 
 WARN = -pedantic -ansi -Wall -Wextra
 DEFS = -march=native
@@ -60,6 +60,8 @@ all: kernel sr
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
+
+examples: example1 example2 example3 example4 example5 example6 example7 example8
 
 example%: examples/example%.o $(KERNEL_OBJ)
 	@echo Linking $@

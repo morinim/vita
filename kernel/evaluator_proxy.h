@@ -43,7 +43,7 @@ namespace vita
 
     void clear();
 
-    fitness_t run(const individual &);
+    fitness_t operator()(const individual &);
 
     boost::uint64_t probes() const;
     boost::uint64_t hits() const;

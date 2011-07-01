@@ -40,12 +40,12 @@ namespace vita
   /// \param[in] ind the individual whose fitness we want to know.
   /// \return the fitness of \a ind.
   ///
-  fitness_t evaluator_proxy::run(const individual &ind)
+  fitness_t evaluator_proxy::operator()(const individual &ind)
   {
     fitness_t f;
     if (!cache_.find(ind, &f))
     {
-      f = eva_->run(ind);
+      f = (*eva_)(ind);
 
       cache_.insert(ind, f);
 
@@ -60,7 +60,7 @@ namespace vita
     // Hash collision checking code can slow down the program very much.
     else
     {
-      const fitness_t f1(_eva->run(ind));
+      const fitness_t f1((*_eva)(ind));
       if (f != f1)
 	std::cerr << "********* COLLISION *********" << std::endl;
     }
