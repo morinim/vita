@@ -67,6 +67,8 @@ example%: examples/example%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
 
+tests: test1 test2 test3 test4
+
 test%: test/test%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o test/$@
