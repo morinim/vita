@@ -81,6 +81,7 @@ BOOST_AUTO_TEST_CASE(Compact)
 {
   env.code_length = 100;
 
+  BOOST_TEST_CHECKPOINT("Functional equivalence.");
   for (unsigned n(0); n < 1000; ++n)
   {
     const vita::individual i1(env, true);
@@ -93,6 +94,20 @@ BOOST_AUTO_TEST_CASE(Compact)
     if (!v1.empty() && !v2.empty())
       BOOST_REQUIRE_EQUAL(boost::any_cast<double>(v1),
                           boost::any_cast<double>(v2));
+  }
+
+  BOOST_TEST_CHECKPOINT("Not interleaved active symbols.");
+  for (unsigned n(0); n < 1000; ++n)
+  {
+    const vita::individual ind(vita::individual(env, true).compact());
+
+    unsigned line(0), old_line(0);
+    for (vita::individual::const_iterator it(ind); it(); line = ++it)
+      if (line)
+      {
+        BOOST_REQUIRE_EQUAL(old_line, line-1);
+        ++old_line;
+      }
   }
 }
 
