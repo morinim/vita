@@ -81,6 +81,8 @@ namespace vita
   ///
   /// Create a new individual functionally equivalent to \c this but with the
   /// active symbols compacted and stored at the beginning of the code vector.
+  /// [<- active symbols ->][<- introns ->]
+  /// 0 1 2 3 ...                         n    <- locus
   ///
   individual individual::compact(unsigned *last_symbol) const
   {
@@ -114,7 +116,8 @@ namespace vita
   ///
   /// Create a new individual functionally equivalent to \c this but with the
   /// active functions compacted and stored at the beginning of the code vector
-  /// and active terminals grouped at the end of the block.
+  /// and active terminals grouped at the end of the block. Redundant terminals
+  /// are removed.
   /// [<- Active functions ->|<- Active terminals ->|<- Introns ->]
   ///
   individual individual::optimize(unsigned *first_t, unsigned *last_s) const
@@ -236,7 +239,7 @@ namespace vita
   }
 
   ///
-  /// \param[out] norm
+  /// \param[out] norm individual that have to be normalized.
   /// \return locus of the first terminal.
   ///
   unsigned individual::normalize(individual *const norm) const
@@ -261,7 +264,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] src
+  /// \param[in] src individual that should be normalized.
   /// \param[in] args
   /// \param[in,out] dest_l
   /// \param[out] dest
@@ -377,7 +380,7 @@ namespace vita
   /// probability. Thus the information at each gene location is equally likely
   /// to have come from either parent and on average each parent donates 50%
   /// of its genetic material. The whole operation, of course, relies on the
-  /// fact that all the chromosomes, in the population are of the same structure
+  /// fact that all the chromosomes in the population are of the same structure
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
@@ -651,17 +654,17 @@ namespace vita
   }
 
   ///
-  /// \param[in] packed packed byte stream representation of an individual.
-  /// \param[in] idx locus starting from where unpack \c packed.
-  /// \return
+  /// \param[in] p packed byte stream representation of an individual.
+  /// \param[in] idx locus starting from where unpack \a p stream.
+  /// \return number of bytes unpacked.
   ///
-  unsigned individual::unpack(const std::vector<boost::uint8_t> &packed,
+  unsigned individual::unpack(const std::vector<boost::uint8_t> &p,
                               unsigned idx)
   {
     unsigned unpacked(0);
 
     opcode_t opcode;
-    std::memcpy(&opcode, &packed[idx], sizeof(opcode));
+    std::memcpy(&opcode, &p[idx], sizeof(opcode));
     unpacked += sizeof(opcode);
 
     gene g;
@@ -669,7 +672,7 @@ namespace vita
 
     if (g.sym->parametric())
     {
-      std::memcpy(&g.par, &packed[idx+unpacked], sizeof(g.par));
+      std::memcpy(&g.par, &p[idx+unpacked], sizeof(g.par));
       unpacked += sizeof(g.par);
     }
 
@@ -678,14 +681,14 @@ namespace vita
     for (unsigned i(0); i < g.sym->arity(); ++i)
     {
       code_[base].args[i] = size();
-      unpacked += unpack(packed, idx+unpacked);
+      unpacked += unpack(p, idx+unpacked);
     }
 
     return unpacked;
   }
 
   ///
-  /// \return true if the individual passes the internal consistency check.
+  /// \return \c true if the individual passes the internal consistency check.
   ///
   bool individual::check() const
   {

@@ -106,6 +106,10 @@ namespace vita
 
     symbol_t type() const;
 
+    class const_iterator;
+    friend class const_iterator;
+    friend class    interpreter;
+
   private:
     static unsigned normalize(const individual &,
                               const std::vector<unsigned> *, unsigned &,
@@ -122,44 +126,46 @@ namespace vita
 
     // This is the genome: the entire collection of genes.
     std::vector<gene> code_;
-
-  public:
-    class const_iterator
-    {
-    public:
-      explicit const_iterator(const individual &);
-
-      ///
-      /// \return \c false when the iterator reaches the end.
-      ///
-      bool operator()() const
-      { return l_ < ind_.code_.size() && !lines_.empty(); }
-
-      unsigned operator++();
-
-      ///
-      /// \return reference to the current \c gene of the \c individual.
-      ///
-      const gene &operator*() const
-      { assert(l_ < ind_._code.size()); return ind_.code_[l_]; }
-
-      ///
-      /// \return pointer to the current \c gene of the \c individual.
-      ///
-      const gene *operator->() const
-      { assert(l_ < ind_.code_.size()); return &ind_.code_[l_]; }
-
-    private:
-      const individual    &ind_;
-      unsigned               l_;
-      std::set<unsigned> lines_;
-    };
-
-    friend class const_iterator;
-    friend class    interpreter;
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
+
+  class individual::const_iterator
+  {
+  public:
+    explicit const_iterator(const individual &);
+
+    ///
+    /// \return \c false when the iterator reaches the end.
+    ///
+    bool operator()() const
+    { return l_ < ind_.code_.size() && !lines_.empty(); }
+
+    unsigned operator++();
+
+    ///
+    /// \return reference to the current \a gene of the \a individual.
+    ///
+    const gene &operator*() const
+    {
+      assert(l_ < ind_._code.size());
+      return ind_.code_[l_];
+    }
+
+    ///
+    /// \return pointer to the current \c gene of the \c individual.
+    ///
+    const gene *operator->() const
+    {
+      assert(l_ < ind_.code_.size());
+      return &ind_.code_[l_];
+    }
+
+  private:
+    const individual    &ind_;
+    unsigned               l_;
+    std::set<unsigned> lines_;
+  };
 
   ///
   /// \example example1.cc
