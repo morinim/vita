@@ -84,17 +84,17 @@ namespace vita
   ///
   individual individual::compact(unsigned *last_symbol) const
   {
-    individual dest(*this);
+    individual dest(*env_, false);
 
     unsigned new_line(0), old_line(best_);
     for (const_iterator it(*this); it(); ++new_line, old_line = ++it)
     {
       dest.code_[new_line] = *it;
 
-      for (unsigned i(0); i < new_line; ++i)
-        for (unsigned j(0); j < dest.code_[i].sym->arity(); ++j)
-          if (dest.code_[i].args[j] == old_line)
-            dest.code_[i].args[j] = new_line;
+      for (unsigned l(0); l < new_line; ++l)
+        for (unsigned arg(0); arg < dest.code_[l].sym->arity(); ++arg)
+          if (dest.code_[l].args[arg] == old_line)
+            dest.code_[l].args[arg] = new_line;
     }
 
     if (last_symbol && new_line)
@@ -237,7 +237,7 @@ namespace vita
 
   ///
   /// \param[out] norm
-  /// \return
+  /// \return locus of the first terminal.
   ///
   unsigned individual::normalize(individual *const norm) const
   {
@@ -247,7 +247,7 @@ namespace vita
 
     individual dest(*env_, false);
 
-    const unsigned ret(normalize(*this, 0, index, dest));
+    const unsigned ret(normalize(*this, 0, index, &dest));
 
     if (ret)
     {
@@ -265,11 +265,11 @@ namespace vita
   /// \param[in] args
   /// \param[in,out] dest_l
   /// \param[out] dest
-  /// \return
+  /// \return locus of the first terminal.
   ///
   unsigned individual::normalize(const individual &src,
                                  const std::vector<unsigned> *args,
-                                 unsigned &dest_l, individual &dest)
+                                 unsigned &dest_l, individual *dest)
   {
     unsigned first_terminal, last_terminal;
     individual source(src.optimize(&first_terminal, &last_terminal));
@@ -327,12 +327,12 @@ namespace vita
           {
             --dest_l;
 
-            dest.code_[dest_l].sym = sym;
+            dest->code_[dest_l].sym = sym;
             if (sym->parametric())
-              dest.code_[dest_l].par = source.code_[i].par;
+              dest->code_[dest_l].par = source.code_[i].par;
             else  // not parametric
               for (unsigned j(0); j < source.code_[i].sym->arity(); ++j)
-                dest.code_[dest_l].args[j] = ll[source.code_[i].args[j]];
+                dest->code_[dest_l].args[j] = ll[source.code_[i].args[j]];
 
             ll[i] = dest_l;
           }

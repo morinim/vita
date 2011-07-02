@@ -109,7 +109,7 @@ namespace vita
   private:
     static unsigned normalize(const individual &,
                               const std::vector<unsigned> *, unsigned &,
-                              individual &);
+                              individual *);
     void pack(std::vector<boost::uint8_t> *const, unsigned) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
