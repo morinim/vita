@@ -5,7 +5,7 @@
  *  Copyright 2011 EOS di Manlio Morini.
  *
  *  This file is part of VITA.
- *  
+ *
  *  VITA is free software: you can redistribute it and/or modify it under the
  *  terms of the GNU General Public License as published by the Free Software
  *  Foundation, either version 3 of the License, or (at your option) any later
@@ -16,8 +16,8 @@
  *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  *  details.
  *
- *  You should have received a copy of the GNU General Public License along 
- *  with VITA. If not, see <http://www.gnu.org/licenses/>. 
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
@@ -69,7 +69,7 @@ namespace vita
   ///
   boost::any adf_n::eval(interpreter *i) const
   {
-    return interpreter(adf_.code, i).run();
+    return interpreter(adf_.code, i)();
   }
 
   ///
@@ -125,7 +125,7 @@ namespace vita
   ///
   boost::any adf_0::eval(interpreter *) const
   {
-    return interpreter(adf_.code).run();
+    return interpreter(adf_.code)();
   }
 
   ///

@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
       {
         std::cout << std::endl << "BLOCK at line " << *i << std::endl;
         blk.list(std::cout);
-        const boost::any val(vita::interpreter(blk).run());
+        const boost::any val((vita::interpreter(blk))());
         if (val.empty())
           std::cout << "Incorrect output.";
         else
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 
         std::cout << std::endl << "NORMALIZED" << std::endl;
         norm.list(std::cout);
-        const boost::any val_n(vita::interpreter(norm).run());
+        const boost::any val_n((vita::interpreter(norm))());
 
         if ( val.empty() != val_n.empty() ||
              (!val.empty() && !val_n.empty() &&
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
           vita::individual blk3(norm.replace(f, positions));
           std::cout << std::endl;
           blk3.list(std::cout);
-          const boost::any val3(vita::interpreter(blk3).run());
+          const boost::any val3((vita::interpreter(blk3))());
           if (val3.empty())
             std::cout << "Incorrect output.";
           else

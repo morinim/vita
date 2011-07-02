@@ -44,7 +44,7 @@ namespace vita
   ///
   /// \return the output value of \c this \a individual.
   ///
-  boost::any interpreter::run()
+  boost::any interpreter::operator()()
   {
     for (unsigned i(0); i < cache_.size(); ++i)
     {

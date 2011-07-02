@@ -63,7 +63,7 @@ namespace vita
       for (unsigned i(0); i < var_->size(); ++i)
         (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
 
-      const boost::any res(agent.run());
+      const boost::any res(agent());
 
       if (res.empty())
         err += std::pow(100.0, ++illegals);
@@ -132,7 +132,7 @@ namespace vita
       for (unsigned i(0); i < var_->size(); ++i)
         (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
 
-      const boost::any res(agent.run());
+      const boost::any res(agent());
 
       unsigned slot;
       if (res.empty())
@@ -217,7 +217,7 @@ namespace vita
       for (unsigned i(0); i < var_->size(); ++i)
         (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
 
-      const boost::any res(agent.run());
+      const boost::any res(agent());
       const double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
 
       gauss_[t->label()].add(val);
@@ -250,7 +250,7 @@ namespace vita
     for (unsigned i(0); i < var_->size(); ++i)
       (*var_)[i]->val = boost::any_cast<double>(val.input[i]);
 
-    const boost::any res(agent.run());
+    const boost::any res(agent());
     const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
     const double pi2(2*std::acos(-1.0));
 
@@ -447,7 +447,7 @@ namespace vita
       for (unsigned i(0); i < vars_.size(); ++i)
         vars_[i]->val = t->input[i];
 
-      const boost::any res(agent.run());
+      const boost::any res(agent());
 
       if (res.empty())
         err += std::pow(100.0,++illegals);
@@ -484,7 +484,7 @@ namespace vita
       for (unsigned i(0); i < vars_.size(); ++i)
         vars[i]->val = t->input[i];
 
-      const boost::any res(agent.run());
+      const boost::any res(agent());
 
       if (!res.empty() && boost::any_cast<T>(res) == t->output)
         ++ok;

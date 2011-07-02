@@ -113,13 +113,13 @@ BOOST_AUTO_TEST_CASE(ABS)
   BOOST_TEST_CHECKPOINT("ABS(-X) == X");
   i = i.replace(f_abs, assign::list_of(1), 0);  // [0] ABS 1
   i = i.replace(neg_x,              empty, 1);  // [1] -X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ABS(X) == X");
   i = i.replace(f_abs, assign::list_of(1), 0);  // [0] ABS 1
   i = i.replace(    x,              empty, 1);  // [1] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 }
 
@@ -131,21 +131,21 @@ BOOST_AUTO_TEST_CASE(ADD)
   i = i.replace(f_add, assign::list_of(1)(2), 0);  // [0] ADD 1,2
   i = i.replace(   c0,                 empty, 1);  // [1] 0
   i = i.replace(    x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y)=X+Y");
   i = i.replace(f_add, assign::list_of(1)(2), 0);  // [0] ADD 1,2
   i = i.replace(    y,                 empty, 1);  // [1] Y
   i = i.replace(    x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == y->val+x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   i = i.replace(f_add, assign::list_of(1)(2), 0);  // [0] ADD 1,2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(neg_x,                 empty, 2);  // [2] -X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(ADD)
   i = i.replace(f_add, assign::list_of(4)(3), 2);  // [2] ADD 4,3
   i = i.replace(    x,                 empty, 3);  // [3] X
   i = i.replace(    y,                 empty, 4);  // [4] Y
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
 }
 
@@ -166,21 +166,21 @@ BOOST_AUTO_TEST_CASE(DIV)
   i = i.replace(f_div, assign::list_of(1)(2), 0);  // [0] DIV 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(    x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
   i = i.replace(f_div, assign::list_of(1)(2), 0);  // [0] DIV 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(   c1,                 empty, 2);  // [2] 1
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
   i = i.replace(f_div, assign::list_of(1)(2), 0);  // [0] DIV 1, 2
   i = i.replace(neg_x,                 empty, 1);  // [1] -X
   i = i.replace(    x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == -1, "\n" << i);
 }
 
@@ -192,28 +192,28 @@ BOOST_AUTO_TEST_CASE(IDIV)
   i = i.replace(f_idiv, assign::list_of(1)(2), 0);  // [0] DIV 1, 2
   i = i.replace(     x,                 empty, 1);  // [1] X
   i = i.replace(     x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,1) == X");
   i = i.replace(f_idiv, assign::list_of(1)(2), 0);  // [0] DIV 1, 2
   i = i.replace(     x,                 empty, 1);  // [1] X
   i = i.replace(    c1,                 empty, 2);  // [2] 1
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
   i = i.replace(f_idiv, assign::list_of(1)(2), 0);  // [0] IDIV 1, 2
   i = i.replace( neg_x,                 empty, 1);  // [1] -X
   i = i.replace(     x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == -1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IDIV(3,2) == 1");
   i = i.replace(f_idiv, assign::list_of(1)(2), 0);  // [0] IDIV 1, 2
   i = i.replace(    c3,                 empty, 1);  // [1] 3
   i = i.replace(    c2,                 empty, 2);  // [2] 2
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
 }
 
@@ -225,14 +225,14 @@ BOOST_AUTO_TEST_CASE(MUL)
   i = i.replace(f_mul, assign::list_of(1)(2), 0);  // [0] MUL 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(   c0,                 empty, 2);  // [2] 0
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
   i = i.replace(f_mul, assign::list_of(1)(2), 0);  // [0] MUL 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(   c1,                 empty, 2);  // [2] 1
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE(MUL)
   i = i.replace(f_mul, assign::list_of(3)(4), 2);  // [2] MUL 3, 4
   i = i.replace(    x,                 empty, 3);  // [3] X
   i = i.replace(   c2,                 empty, 4);  // [4] 2
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
 }
 
@@ -253,14 +253,14 @@ BOOST_AUTO_TEST_CASE(SUB)
   i = i.replace(f_sub, assign::list_of(1)(2), 0);  // [0] SUB 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(    x,                 empty, 2);  // [2] X
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
   i = i.replace(f_sub, assign::list_of(1)(2), 0);  // [0] SUB 1, 2
   i = i.replace(    x,                 empty, 1);  // [1] X
   i = i.replace(   c0,                 empty, 2);  // [2] 0
-  ret = vita::interpreter(i).run();
+  ret = (vita::interpreter(i))();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
 }
 

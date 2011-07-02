@@ -80,7 +80,7 @@ class fitness : public vita::evaluator
           Y::val = y;
           Z::val = z;
 
-          const boost::any res(agent.run());
+          const boost::any res(agent());
 
           if (!res.empty())
           {

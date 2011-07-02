@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_CASE(Compact)
     const vita::individual i1(env, true);
     const vita::individual i2(i1.compact());
 
-    const boost::any v1(vita::interpreter(i1).run());
-    const boost::any v2(vita::interpreter(i2).run());
+    const boost::any v1( (vita::interpreter(i1))() );
+    const boost::any v2( (vita::interpreter(i2))() );
 
     BOOST_REQUIRE(v1.empty() == v2.empty());
     if (!v1.empty() && !v2.empty())

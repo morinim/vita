@@ -49,7 +49,8 @@ int main(int argc, char *argv[])
   ind.list(std::cout);
   std::cout << std::endl;
 
-  const boost::any val(vita::interpreter(ind).run());
+  vita::interpreter agent(ind);
+  const boost::any val(agent());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else
