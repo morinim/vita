@@ -46,6 +46,7 @@ namespace vita
   };
 
   ///
+  /// \param[in] ind program used for fitness evaluation.
   /// \return the fitness (greater is better, max is 0).
   ///
   fitness_t abs_evaluator::operator()(const individual &ind)
@@ -104,6 +105,7 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind program used for class recognition.
   /// \return the fitness (greater is better, max is 0).
   ///
   /// Slotted Dynamic Class Boundary Determination
@@ -195,6 +197,7 @@ namespace vita
   };
 
   ///
+  /// \param[in] ind program used for class recognition.
   /// \return the fitness (greater is better, max is 0).
   ///
   /// For details about this algorithm see:
@@ -246,33 +249,32 @@ namespace vita
   unsigned gaussian_evaluator::class_label(const individual &ind,
                                            const data::value_type &val)
   {
-    interpreter agent( ind );
     for (unsigned i(0); i < var_->size(); ++i)
       (*var_)[i]->val = boost::any_cast<double>(val.input[i]);
 
-    const boost::any res(agent());
+    const boost::any res( (interpreter(ind))() );
     const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
     const double pi2(2*std::acos(-1.0));
 
     assert(dat_->classes() == gauss_->size());
 
-    double prob_c(0.0);
-    unsigned c(0);
+    double max_probability(0.0);
+    unsigned probable_class(0);
     for (unsigned i(0); i < dat_->classes(); ++i)
     {
       const double m(gauss_[i].mean);
       const double s(gauss_[i].variance);
 
-      const double prob(std::exp((x-m)*(m-x) / (2*s*s)) / std::sqrt(pi2*s*s));
+      const double p(std::exp((x-m)*(m-x) / (2*s*s)) / std::sqrt(pi2*s*s));
 
-      if (prob > prob_c)
+      if (p > max_probability)
       {
-        prob_c = prob;
-        c = i;
+        max_probability = p;
+        probable_class = i;
       }
     }
 
-    return c;
+    return probable_class;
   }
 
   ///
@@ -283,7 +285,8 @@ namespace vita
     clear();
 
     add_evaluator(new abs_evaluator(&dat_, &vars_));
-    add_evaluator(new dyn_slot_evaluator(&dat_, &vars_));
+    add_evaluator(new gaussian_evaluator(&dat_, &vars_));
+    //add_evaluator(new dyn_slot_evaluator(&dat_, &vars_));
   }
 
   ///
