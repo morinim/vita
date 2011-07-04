@@ -77,7 +77,7 @@ def start_testing(args):
     testcases = {
         "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80,     "arithmetic"],
         "iris":       [      "iris.dat", 100, 200, 200,  80, "classification"],
-        "mep":        [       "mep.dat", 100, 200, 500, 100],
+        "mep":        [       "mep.dat", 100, 200, 500, 1],
         "mepbias":    [       "mep.dat", 100, 200,  20, 100,            "mep"],
         "petalrose":  [ "petalrose.dat", 100, 500, 200,  80,     "arithmetic"],
         "petalrose3": ["petalrose3.dat", 100, 500, 200,  80,     "arithmetic"],
@@ -155,6 +155,8 @@ def main():
     if args.config is not None:
         load_defaults(args.config, defaults)
         args = get_cmd_line_options(defaults)
+    else:
+        args.config = "default"
 
     verbose = args.verbose
 
