@@ -257,7 +257,7 @@ namespace vita
       dest.best_ = index;
 
       *norm = dest;
-      assert(norm.eff_size() == norm.size()-norm.best_);
+      assert(norm->eff_size() == norm->size() - norm->best_);
     }
 
     return ret;
@@ -548,7 +548,7 @@ namespace vita
                               std::vector<unsigned> *const positions,
                               std::vector<symbol_t> *const types)
   {
-    assert(max_args && max_args <= gene_args);
+    assert(max_args && max_args <= gene::k_args);
 
     std::vector<unsigned> terminals;
 

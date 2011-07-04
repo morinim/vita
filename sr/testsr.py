@@ -42,7 +42,7 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
                        rs = rounds,
                        rnd_switch = rnd,
                        arl_switch = "--arl --stat-arl" if args.arl else "",
-                       ss = "-s "+os.path.join(symbol_set_dir, symbol_set) 
+                       ss = "-s "+os.path.join(symbol_set_dir, symbol_set)
                                   if symbol_set != "" else "",
                        ds = os.path.join(data_set_dir, data_set))
 
@@ -54,19 +54,19 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
 
 def save_results(name, data_set, args):
     files = { arl_filename: ".arl",
-              dynamic_filename: ".dyn", 
+              dynamic_filename: ".dyn",
               summary_filename: ".sum"}
 
     for f, ext in files.items():
         before = os.path.join(stat_dir,f)
         if os.path.exists(before):
-            after = os.path.join(stat_dir, name + "_" + 
+            after = os.path.join(stat_dir, name + "_" +
                                  os.path.basename(args.config) +
                                  ext)
             os.rename(before, after)
 
 
-def test_dataset(name, args, data_set, generations, individuals, prog_size, 
+def test_dataset(name, args, data_set, generations, individuals, prog_size,
                  rounds, symbol_set = ""):
     print("Testing "+name+" ["+str(args)+"]")
     sr(data_set, generations, individuals, prog_size, rounds, symbol_set, args)
@@ -75,14 +75,15 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 
 def start_testing(args):
     testcases = {
-        "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80, "arithmetic"],
+        "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80,     "arithmetic"],
+        "iris":       [      "iris.dat", 100, 200, 200,  80, "classification"],
         "mep":        [       "mep.dat", 100, 200, 500, 100],
-        "mepbias":    [       "mep.dat", 100, 200,  20, 100,        "mep"],
-        "petalrose":  [ "petalrose.dat", 100, 500, 200,  80, "arithmetic"],
-        "petalrose3": ["petalrose3.dat", 100, 500, 200,  80, "arithmetic"],
-        "petalrose2": ["petalrose2.dat", 100, 500, 200,  80, "arithmetic"],
-        "x2y2z2":     [   "x2y2_z2.dat", 100, 200, 500,  80,       "math"],
-        "x2y2z2bias": [   "x2y2_z2.dat", 100, 200, 100,  80, "arithmetic"]
+        "mepbias":    [       "mep.dat", 100, 200,  20, 100,            "mep"],
+        "petalrose":  [ "petalrose.dat", 100, 500, 200,  80,     "arithmetic"],
+        "petalrose3": ["petalrose3.dat", 100, 500, 200,  80,     "arithmetic"],
+        "petalrose2": ["petalrose2.dat", 100, 500, 200,  80,     "arithmetic"],
+        "x2y2z2":     [   "x2y2_z2.dat", 100, 200, 500,  80,           "math"],
+        "x2y2z2bias": [   "x2y2_z2.dat", 100, 200, 100,  80,     "arithmetic"]
     }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
@@ -97,10 +98,10 @@ def get_cmd_line_options(defaults):
 
     parser.set_defaults(**defaults)
 
-    parser.add_argument("-c", "--config", 
+    parser.add_argument("-c", "--config",
                         help="Load configuration from config file")
 
-    parser.add_argument("-r","--random", dest="debug", action="store_false", 
+    parser.add_argument("-r","--random", dest="debug", action="store_false",
                         help="Randomize the test")
     parser.add_argument("-d","--debug", action="store_true",
                         help="Make the test reproducible")
@@ -108,13 +109,13 @@ def get_cmd_line_options(defaults):
     parser.add_argument("--arl", action="store_true",
                         help="Turn on ARL")
 
-    parser.add_argument("--elitism", action="store_true", 
+    parser.add_argument("--elitism", action="store_true",
                         help="Enable elitism")
     parser.add_argument("--no_elitism", action="store_false", dest="elitism",
                         help="Disable elitism")
-    parser.add_argument("--force_input", action="store_true", 
+    parser.add_argument("--force_input", action="store_true",
                         help="Input variables in every individual")
-    parser.add_argument("--free_input", action="store_false", 
+    parser.add_argument("--free_input", action="store_false",
                         dest="force_input",
                         help="Input variables used randomly")
 
@@ -136,13 +137,13 @@ def load_defaults(filename, defaults):
     defaults["arl"]         = opt.getboolean("arl", defaults["arl"])
     defaults["debug"]       = opt.getboolean("debug", defaults["debug"])
     defaults["elitism"]     = opt.getboolean("elitism", defaults["elitism"])
-    defaults["force_input"] = opt.getboolean("force_input", 
+    defaults["force_input"] = opt.getboolean("force_input",
                                              defaults["force_input"])
     defaults["verbose"]     = opt.getboolean("verbose", defaults["verbose"])
 
 
 def main():
-    defaults = {"arl": False, 
+    defaults = {"arl": False,
                 "debug": True,
                 "elitism": True,
                 "force_input": False,
@@ -150,7 +151,7 @@ def main():
 
     # Get argument flags and command options
     args = get_cmd_line_options(defaults)
-    
+
     if args.config is not None:
         load_defaults(args.config, defaults)
         args = get_cmd_line_options(defaults)

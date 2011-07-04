@@ -21,6 +21,7 @@
  *
  */
 
+#include "kernel/individual.h"
 #include "kernel/src_problem.h"
 
 namespace vita
@@ -180,20 +181,17 @@ namespace vita
   {
   public:
     gaussian_evaluator(data *d, std::vector<vita::sr::variable *> *v)
-      : src_evaluator(d, v), gauss_(d->classes())
+      : src_evaluator(d, v)
     {
       assert(d);
       assert(v);
-      assert(d->classes() >= 2);
     }
 
-    unsigned class_label(const individual &, const data::value_type &);
+    unsigned class_label(const individual &, const data::value_type &,
+                         const std::vector< distribution<double> > &);
     double success_rate() const;
 
     fitness_t operator()(const individual &);
-
-  private:
-    std::vector< distribution<double> > gauss_;
   };
 
   ///
@@ -207,6 +205,10 @@ namespace vita
   ///
   fitness_t gaussian_evaluator::operator()(const individual &ind)
   {
+    assert(dat_->classes() >= 2);
+    std::vector< distribution<double> > gauss(dat_->classes());
+
+    assert(ind.check());
     interpreter agent(ind);
 
     // For a set of training data, we assume that the behaviour of a program
@@ -223,17 +225,17 @@ namespace vita
       const boost::any res(agent());
       const double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
 
-      gauss_[t->label()].add(val);
+      gauss[t->label()].add(val);
     }
 
     fitness_t d(0.0);
-    for (unsigned i(0); i < gauss_.size(); ++i)
-      for (unsigned j(i+1); j < gauss_.size(); ++j)
+    for (unsigned i(0); i < gauss.size(); ++i)
+      for (unsigned j(i+1); j < gauss.size(); ++j)
       {
-        const double mean_i(gauss_[i].mean);
-        const double mean_j(gauss_[j].mean);
-        const double stddev_i(gauss_[i].standard_deviation());
-        const double stddev_j(gauss_[j].standard_deviation());
+        const double mean_i(gauss[i].mean);
+        const double mean_j(gauss[j].mean);
+        const double stddev_i(gauss[i].standard_deviation());
+        const double stddev_j(gauss[j].standard_deviation());
 
         d += std::fabs(mean_j - mean_i) / (stddev_j + stddev_i);
       }
@@ -244,10 +246,13 @@ namespace vita
   ///
   /// \param[in] ind
   /// \param[in] val input value whose class we are interested in.
+  /// \param[in] gauss parameters of the gaussian distributions.
   /// \return the class of \a val.
   ///
-  unsigned gaussian_evaluator::class_label(const individual &ind,
-                                           const data::value_type &val)
+  unsigned gaussian_evaluator::class_label(
+    const individual &ind,
+    const data::value_type &val,
+    const std::vector< distribution<double> > &gauss)
   {
     for (unsigned i(0); i < var_->size(); ++i)
       (*var_)[i]->val = boost::any_cast<double>(val.input[i]);
@@ -256,14 +261,14 @@ namespace vita
     const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
     const double pi2(2*std::acos(-1.0));
 
-    assert(dat_->classes() == gauss_->size());
+    assert(dat_->classes() == gauss.size());
 
     double max_probability(0.0);
     unsigned probable_class(0);
     for (unsigned i(0); i < dat_->classes(); ++i)
     {
-      const double m(gauss_[i].mean);
-      const double s(gauss_[i].variance);
+      const double m(gauss[i].mean);
+      const double s(gauss[i].variance);
 
       const double p(std::exp((x-m)*(m-x) / (2*s*s)) / std::sqrt(pi2*s*s));
 

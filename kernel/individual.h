@@ -148,7 +148,7 @@ namespace vita
     ///
     const gene &operator*() const
     {
-      assert(l_ < ind_._code.size());
+      assert(l_ < ind_.code_.size());
       return ind_.code_[l_];
     }
 

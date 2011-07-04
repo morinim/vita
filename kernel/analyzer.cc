@@ -88,7 +88,7 @@ namespace vita
   ///
   const distribution<fitness_t> &analyzer::fit_dist() const
   {
-    assert(_fit.check());
+    assert(fit_.check());
 
     return fit_;
   }

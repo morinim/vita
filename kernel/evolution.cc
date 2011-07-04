@@ -180,7 +180,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose if true prints verbose informations.
+  /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
   /// \param[in] sel_id index of the active selection strategy.
   /// \param[in] op_id index of the active operation strategy.

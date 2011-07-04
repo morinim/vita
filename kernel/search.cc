@@ -40,7 +40,7 @@ namespace vita
   ///
   search::search(problem *const prob) : prob_(prob)
   {
-    assert(prob.check());
+    assert(prob->check());
 
     assert(check());
   }

@@ -77,7 +77,7 @@ namespace vita
   inline
   individual &population::operator[](size_type i)
   {
-    assert(i < _pop.size());
+    assert(i < pop_.size());
     return pop_[i];
   }
 
@@ -88,7 +88,7 @@ namespace vita
   inline
   const individual &population::operator[](size_type i) const
   {
-    assert(i < _pop.size());
+    assert(i < pop_.size());
     return pop_[i];
   }
 
