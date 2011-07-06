@@ -180,6 +180,15 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind individual whose success rate we are interested in.
+  /// \return the success rate of \a ind (on the current test set).
+  ///
+  fitness_t evolution::success_rate(const individual &ind) const
+  {
+    return eva_->success_rate(ind);
+  }
+
+  ///
   /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
   /// \param[in] sel_id index of the active selection strategy.
@@ -204,8 +213,9 @@ namespace vita
                                        unsigned rep_id)
   {
     stats_.clear();
-    stats_.best   = *pop_.begin();
-    stats_.f_best = (*eva_)(stats_.best);
+    stats_.best    = *pop_.begin();
+    stats_.f_best  = (*eva_)(stats_.best);
+    stats_.sr_best = 0.0;
 
     eva_->clear();
 
@@ -236,10 +246,14 @@ namespace vita
         replacement[rep_id](parents, off, &stats_);
 
         if (verbose && stats_.f_best != before)
+        {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
-                    << 100*k/pop_.size() << "%): fitness " << stats_.f_best
-                    << std::endl;
+                    << 100*k/pop_.size() << "%): success rate "
+                    << std::setprecision(2) << std::fixed
+                    << 100.0*stats_.sr_best << std::setprecision(-1)
+                    << "%   fitness " << stats_.f_best << std::endl;
+        }
       }
 
       stats_.ttable_probes = eva_->probes();

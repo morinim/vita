@@ -57,6 +57,7 @@ namespace vita
 
     individual  best;
     fitness_t f_best;
+    double   sr_best;
   };
 
   class evolution
@@ -70,7 +71,9 @@ namespace vita
 
     const vita::population &population() const;
     vita::population &population();
+
     fitness_t fitness(const individual &) const;
+    double success_rate(const individual &) const;
 
     void pick_stats(analyzer *const);
 

@@ -45,6 +45,8 @@ namespace vita
   {
   public:
     virtual fitness_t operator()(const individual &) = 0;
+
+    virtual double success_rate(const individual &) const { return -1; }
   };
 
   ///

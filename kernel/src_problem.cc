@@ -32,10 +32,23 @@ namespace vita
     src_evaluator(data *d, std::vector<vita::sr::variable *> *v)
       : dat_(d), var_(v) {}
 
+    void load_vars(const data::value_type &);
+
   protected:
     data *dat_;
     std::vector<vita::sr::variable *> *var_;
   };
+
+  ///
+  /// \param[in] d values to be stored in the input variables.
+  ///
+  void src_evaluator::load_vars(const data::value_type &d)
+  {
+    assert(d.input.size() == var_.size());
+
+    for (unsigned i(0); i < var_->size(); ++i)
+      (*var_)[i]->val = boost::any_cast<double>(d.input[i]);
+  }
 
   class abs_evaluator : public src_evaluator
   {
@@ -62,8 +75,7 @@ namespace vita
 
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
-      for (unsigned i(0); i < var_->size(); ++i)
-        (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
+      load_vars(*t);
 
       const boost::any res(agent());
 
@@ -89,10 +101,18 @@ namespace vita
       assert(v);
     }
 
+    unsigned class_label(const individual &, const data::value_type &,
+                         const std::vector< distribution<double> > &) const;
+
     fitness_t operator()(const individual &);
+    double success_rate(const individual &);
 
   private:
     static double normalize_01(double);
+
+    void fill_slots(const individual &ind,
+                    std::vector < std::vector<unsigned> > *,
+                    std::vector<unsigned> *);
   };
 
   ///
@@ -106,25 +126,25 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind program used for class recognition.
-  /// \return the fitness (greater is better, max is 0).
+  /// \param[in] ind
+  /// \param[out] slots
   ///
-  /// Slotted Dynamic Class Boundary Determination
-  ///
-  fitness_t dyn_slot_evaluator::operator()(const individual &ind)
+  void dyn_slot_evaluator::fill_slots(
+    const individual &ind,
+    std::vector < std::vector<unsigned> > *slots,
+    std::vector<unsigned> *slot_label
+    )
   {
-    assert(dat_->classes() >= 2);
-
-    const unsigned n_slots(dat_->classes()*10);
-    std::vector< std::vector<unsigned> > slots(n_slots);
-    for (unsigned i(0); i < slots.size(); ++i)
+    const unsigned n_slots(slots->size());
+    for (unsigned i(0); i < n_slots; ++i)
     {
-      slots[i].resize(dat_->classes());
+      (*slots)[i].resize(dat_->classes());
 
       for (unsigned j(0); j < slots[i].size(); ++j)
-        slots[i][j] = 0;
+        (*slots)[i][j] = 0;
     }
 
+    assert(ind.check());
     interpreter agent(ind);
 
     // In the first step this method evaluates the program to obtain an output
@@ -132,26 +152,24 @@ namespace vita
     // a bidimentional array is built (slots[slot][class]).
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
-      for (unsigned i(0); i < var_->size(); ++i)
-        (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
+      load_vars(*t);
 
       const boost::any res(agent());
 
       unsigned slot;
       if (res.empty())
-        slot = slots.size()-1;
+        slot = slots->size()-1;
       else
       {
         const double val(boost::any_cast<double>(res));
         slot = static_cast<unsigned>(normalize_01(val) * n_slots);
-        if (slot >= slots.size())
-          slot = slots.size()-1;
+        if (slot >= slots->size())
+          slot = slots->size()-1;
       }
 
-      ++slots[slot][t->label()];
+      ++((*slots)[slot][t->label()]);
     }
 
-    std::vector<unsigned> slot_label(n_slots);
     const unsigned unknown(dat_->classes());
 
     // In the second step the method dynamically determine to which class each
@@ -165,8 +183,25 @@ namespace vita
         if (slots[i][j] >= slots[i][best_class])
           best_class = j;
 
-      slot_label[i] = slots[i][best_class] ? best_class : unknown;
+      (*slot_label)[i] = (*slots)[i][best_class] ? best_class : unknown;
     }
+  }
+
+  ///
+  /// \param[in] ind program used for class recognition.
+  /// \return the fitness (greater is better, max is 0).
+  ///
+  /// Slotted Dynamic Class Boundary Determination
+  ///
+  fitness_t dyn_slot_evaluator::operator()(const individual &ind)
+  {
+    assert(ind.check());
+    assert(dat_->classes() >= 2);
+
+    const unsigned n_slots(dat_->classes()*10);
+    std::vector< std::vector<unsigned> > slots(n_slots);
+    std::vector<unsigned> slot_label(n_slots);
+    fill_slots(ind, &slots, &slot_label);
 
     fitness_t err(0.0);
     for (unsigned i(0); i < n_slots; ++i)
@@ -189,10 +224,46 @@ namespace vita
 
     unsigned class_label(const individual &, const data::value_type &,
                          const std::vector< distribution<double> > &);
-    double success_rate() const;
 
     fitness_t operator()(const individual &);
+    double success_rate(const individual &);
+
+  private:
+    void gaussian_distribution(const individual &,
+                               std::vector< distribution<double> > *);
   };
+
+  void gaussian_evaluator::gaussian_distribution(
+    const individual &ind,
+    std::vector< distribution<double> > *gauss)
+  {
+    assert(dat_->classes() == gauss->size());
+
+    assert(ind.check());
+    interpreter agent(ind);
+
+    // For a set of training data, we assume that the behaviour of a program
+    // classifier is modelled using multiple Gaussian distributions, each of
+    // which corresponds to a particular class. The distribution of a class is
+    // determined by evaluating the program on the examples of the class in
+    // the training set. This is done by taking the mean and standard deviation
+    // of the program outputs for those training examples for that class.
+    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    {
+      load_vars(*t);
+
+      const boost::any res(agent());
+
+      const double cut(1000);
+      double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
+      if (val > cut)
+        val = cut;
+      else if (val < -cut)
+        val = -cut;
+
+      (*gauss)[t->label()].add(val);
+    }
+  }
 
   ///
   /// \param[in] ind program used for class recognition.
@@ -207,26 +278,7 @@ namespace vita
   {
     assert(dat_->classes() >= 2);
     std::vector< distribution<double> > gauss(dat_->classes());
-
-    assert(ind.check());
-    interpreter agent(ind);
-
-    // For a set of training data, we assume that the behaviour of a program
-    // classifier is modelled using multiple Gaussian distributions, each of
-    // which corresponds to a particular class. The distribution of a class is
-    // determined by evaluating the program on the examples of the class in
-    // the training set. This is done by taking the mean and standard deviation
-    // of the program outputs for those training examples for that class.
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
-    {
-      for (unsigned i(0); i < var_->size(); ++i)
-        (*var_)[i]->val = boost::any_cast<double>(t->input[i]);
-
-      const boost::any res(agent());
-      const double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
-
-      gauss[t->label()].add(val);
-    }
+    gaussian_distribution(ind, &gauss);
 
     fitness_t d(0.0);
     for (unsigned i(0); i < gauss.size(); ++i)
@@ -237,10 +289,35 @@ namespace vita
         const double stddev_i(gauss[i].standard_deviation());
         const double stddev_j(gauss[j].standard_deviation());
 
-        d += std::fabs(mean_j - mean_i) / (stddev_j + stddev_i);
+        const double delta(std::fabs(mean_j - mean_i));
+        const double radius(stddev_j + stddev_i);
+
+        d += 200.0*std::log(delta) - radius;
       }
 
-    return -1.0 / (1.0 + d);
+    return d;
+  }
+
+  ///
+  /// \param[in] ind program used for class recognition.
+  /// \return the success rate (between 0.0 and 1.0).
+  ///
+  double gaussian_evaluator::success_rate(const individual &ind)
+  {
+    assert(dat_->classes() >= 2);
+    std::vector< distribution<double> > gauss(dat_->classes());
+    gaussian_distribution(ind, &gauss);
+
+    for (unsigned i(0); i < gauss.size(); ++i)
+      std::cout << "Class " << i << " mean: " << gauss[i].mean << " variance: "
+                << gauss[i].variance << std::endl;
+
+    unsigned ok(0), count(0);
+    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++count, ++t)
+      if (class_label(ind, *t, gauss) == t->label())
+        ++ok;
+
+    return count ? double(ok) / double(count) : 0.0;
   }
 
   ///
@@ -254,29 +331,37 @@ namespace vita
     const data::value_type &val,
     const std::vector< distribution<double> > &gauss)
   {
-    for (unsigned i(0); i < var_->size(); ++i)
-      (*var_)[i]->val = boost::any_cast<double>(val.input[i]);
+    load_vars(val);
 
     const boost::any res( (interpreter(ind))() );
     const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
-    const double pi2(2*std::acos(-1.0));
+    //const double pi2(2*std::acos(-1.0));
 
     assert(dat_->classes() == gauss.size());
 
-    double max_probability(0.0);
+    //double max_probability(0.0);
+    double min_distance(std::fabs(x - gauss[0].mean));
     unsigned probable_class(0);
     for (unsigned i(0); i < dat_->classes(); ++i)
     {
       const double m(gauss[i].mean);
+      const double distance(std::fabs(x - m));
+      if (distance < min_distance)
+      {
+        min_distance = distance;
+        probable_class = i;
+      }
+/*
+
       const double s(gauss[i].variance);
 
       const double p(std::exp((x-m)*(m-x) / (2*s*s)) / std::sqrt(pi2*s*s));
-
       if (p > max_probability)
       {
         max_probability = p;
         probable_class = i;
       }
+*/
     }
 
     return probable_class;

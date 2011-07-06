@@ -104,6 +104,7 @@ namespace vita
       s->last_imp = s->gen;
       s->best = offspring[0];
       s->f_best = f_off;
+      s->sr_best = evo_->success_rate(s->best);
     }
   }
 

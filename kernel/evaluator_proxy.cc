@@ -37,6 +37,15 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind the individual whose success rate we want to know.
+  /// \return the success rate of \a ind (on the current test set).
+  ///
+  double evaluator_proxy::success_rate(const individual &ind) const
+  {
+    return eva_->success_rate(ind);
+  }
+
+  ///
   /// \param[in] ind the individual whose fitness we want to know.
   /// \return the fitness of \a ind.
   ///
@@ -51,7 +60,8 @@ namespace vita
 
 #if !defined(NDEBUG)
       fitness_t f1;
-      assert(cache_.find(ind, &f1) && f == f1);
+      assert(cache_.find(ind, &f1));
+      assert(f == f1);
 #endif
     }
 
