@@ -76,12 +76,14 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 def start_testing(args):
     testcases = {
         "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80,     "arithmetic"],
-        "iris":       [      "iris.dat", 150, 500, 100, 100, "classification"],
+        "krkopt":     [    "krkopt.dat", 100, 999, 100,  50, "classification"],
+        "iris":       [      "iris.dat", 100, 500, 100,  80, "classification"],
         "mep":        [       "mep.dat", 100, 200, 500, 100],
         "mepbias":    [       "mep.dat", 100, 200,  20, 100,            "mep"],
         "petalrose":  [ "petalrose.dat", 100, 500, 200,  80,     "arithmetic"],
         "petalrose3": ["petalrose3.dat", 100, 500, 200,  80,     "arithmetic"],
         "petalrose2": ["petalrose2.dat", 100, 500, 200,  80,     "arithmetic"],
+        "spambase":   [  "spambase.dat", 100, 999, 100,  50, "classification"],
         "x2y2z2":     [   "x2y2_z2.dat", 100, 200, 500,  80,           "math"],
         "x2y2z2bias": [   "x2y2_z2.dat", 100, 200, 100,  80,     "arithmetic"]
         }
