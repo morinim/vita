@@ -39,7 +39,7 @@ namespace vita
   /// \param[in] eva evaluator used during the evolution.
   ///
   evolution::evolution(environment *const env, evaluator *const eva)
-    : selection(this), operation(this), replacement(this), pop_(env),
+    : selection(this), operation(this, &stats_), replacement(this), pop_(env),
       eva_(new evaluator_proxy(eva, env->ttable_size))
   {
     assert(eva);
@@ -239,7 +239,7 @@ namespace vita
         std::vector<unsigned> parents(selection[sel_id]());
 
         // --------- CROSSOVER / MUTATION ---------
-        std::vector<individual> off(operation[op_id](parents, &stats_));
+        std::vector<individual> off(operation[op_id](parents));
 
         // --------- REPLACEMENT --------
         const fitness_t before(stats_. f_best);
@@ -249,10 +249,16 @@ namespace vita
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
-                    << 100*k/pop_.size() << "%): success rate "
-                    << std::setprecision(2) << std::fixed
-                    << 100.0*stats_.sr_best << std::setprecision(-1)
-                    << "%   fitness " << stats_.f_best << std::endl;
+                    << 100*k/pop_.size() << "%): fitness "
+                    << std::setw(16) << stats_.f_best;
+
+          if (stats_.sr_best >= 0.0)
+            std::cout << std::setprecision(2) << " (" << std::fixed
+                      << std::setw(6) << 100.0*stats_.sr_best << "%)"
+                      << std::setprecision(-1)
+                      << std::resetiosflags(std::ios::fixed);
+
+          std::cout << std::endl;
         }
       }
 

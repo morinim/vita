@@ -27,23 +27,56 @@
 
 namespace vita
 {
-  operation_strategy::operation_strategy(const evolution *const evo)
-    : evo_(evo)
+  operation_strategy::operation_strategy(const evolution *const evo,
+                                         summary *const stats)
+    : evo_(evo), stats_(stats)
+  {
+    assert(evo);
+    assert(stats);
+  }
+
+  ///
+  /// This \c class defines the program skeleton of a standard genetic
+  /// programming crossover plus mutation operation. It's a template method
+  /// design pattern: one or more of the algorithm steps can be overriden
+  /// by subclasses to allow differing behaviors while ensuring that the
+  /// iverarching algorithm is still followed.
+  ///
+  class standard_op : public operation_strategy
+  {
+  public:
+    standard_op(const evolution *const, summary *const);
+
+    std::vector<individual> operator()(const std::vector<unsigned> &);
+
+    virtual individual crossover(const individual &, const individual &) const;
+    virtual unsigned mutation(individual *const) const;
+
+    summary *stats;
+  };
+
+  standard_op::standard_op(const evolution *const evo, summary *const s)
+    : operation_strategy(evo, s)
   {
   }
 
-  class uniformcross_op : public operation_strategy
+  ///
+  /// \param[in] p1 first parent for crossover.
+  /// \param[in] p2 second parent for crossover.
+  /// \return the result of the crossover operation between \a p1 and \a p2.
+  ///
+  individual standard_op::crossover(const individual &p1,
+                                    const individual &p2) const
   {
-  public:
-    explicit uniformcross_op(const evolution *const);
+    return p1.uniform_cross(p2);
+  }
 
-    virtual std::vector<individual> operator()(const std::vector<unsigned> &,
-                                               summary *const);
-  };
-
-  uniformcross_op::uniformcross_op(const evolution *const evo)
-    : operation_strategy(evo)
+  ///
+  /// \param [in,out] ind individual that should be mutated.
+  ///
+  unsigned standard_op::mutation(individual *const ind) const
   {
+    return ind->mutation();
   }
 
   ///
@@ -51,9 +84,8 @@ namespace vita
   ///
   /// This is a quite standard crossover + mutation operator.
   ///
-  std::vector<individual> uniformcross_op::operator()(
-    const std::vector<unsigned> &parent,
-    summary *const s)
+  std::vector<individual> standard_op::operator()(
+    const std::vector<unsigned> &parent)
   {
     assert(parent.size() >= 2);
     assert(s);
@@ -64,27 +96,60 @@ namespace vita
     std::vector<individual> off(1);
     if (random::boolean(pop.env().p_cross))
     {
-      off[0] = pop[r1].uniform_cross(pop[r2]);
-      ++s->crossovers;
+      ++stats_->crossovers;
+      off[0] = crossover(pop[r1], pop[r2]);
     }
     else
       off[0] = pop[random::boolean() ? r1 : r2];
 
-    s->mutations += off[0].mutation();
+    stats_->mutations += mutation(&off[0]);
 
     assert(off[0].check());
 
     return off;
   }
 
-  operation_factory::operation_factory(const evolution *const evo)
+  class cross1_op : public standard_op
   {
-    put(new uniformcross_op(evo));
+  public:
+    cross1_op(const evolution *const, summary *const);
+
+    individual crossover(const individual &, const individual &) const;
+  };
+
+  cross1_op::cross1_op(const evolution *const evo, summary *const stats)
+    : standard_op(evo, stats)
+  {
+  }
+
+  ///
+  /// \param[in] p1 first parent for crossover.
+  /// \param[in] p2 second parent for crossover.
+  /// \return the result of the crossover operation between \a p1 and \a p2.
+  ///
+  individual cross1_op::crossover(const individual &p1,
+                                  const individual &p2) const
+  {
+    return p1.cross1(p2);
+  }
+
+  operation_factory::operation_factory(const evolution *const evo,
+                                       summary *const stats)
+  {
+    assert(evo);
+    assert(stats);
+
+    put(new standard_op(evo, stats));
+    put(new cross1_op(evo, stats));
   }
 
   operation_factory::~operation_factory()
   {
-    delete strategy_[unicross_mutation];
+    for (unsigned i(0); i < strategy_.size(); ++i)
+    {
+      delete strategy_[i];
+      strategy_[i] = 0;
+    }
   }
 
   operation_strategy &operation_factory::operator[](unsigned s) const

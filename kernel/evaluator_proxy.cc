@@ -40,7 +40,7 @@ namespace vita
   /// \param[in] ind the individual whose success rate we want to know.
   /// \return the success rate of \a ind (on the current test set).
   ///
-  double evaluator_proxy::success_rate(const individual &ind) const
+  double evaluator_proxy::success_rate(const individual &ind)
   {
     return eva_->success_rate(ind);
   }

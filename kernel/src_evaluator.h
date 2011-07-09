@@ -26,7 +26,6 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/data.h"
 #include "kernel/evaluator.h"
 #include "kernel/primitive/sr_pri.h"
@@ -36,8 +35,7 @@ namespace vita
   class src_evaluator : public evaluator
   {
   public:
-    src_evaluator(data *d, std::vector<vita::sr::variable *> *v)
-      : dat_(d), var_(v) {}
+    src_evaluator(data *, std::vector<vita::sr::variable *> *);
 
     void load_vars(const data::value_type &);
 

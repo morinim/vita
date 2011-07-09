@@ -28,6 +28,15 @@
 namespace vita
 {
   ///
+  /// \param[in] d
+  /// \param[in] v
+  ///
+  src_evaluator::src_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+    : dat_(d), var_(v)
+  {
+  }
+
+  ///
   /// \param[in] d values to be stored in the input variables.
   ///
   void src_evaluator::load_vars(const data::value_type &d)
@@ -165,6 +174,21 @@ namespace vita
           err += slots[i][j];
 
     return fitness_t(-err);
+  }
+
+  ///
+  /// \param[in] ind program used for class recognition.
+  /// \return the success rate (between 0.0 and 1.0).
+  ///
+  double dyn_slot_evaluator::success_rate(const individual &ind)
+  {
+    unsigned count(0);
+    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+      ++count;
+
+    const unsigned ok(count + operator()(ind));
+
+    return count ? double(ok) / double(count) : 0.0;
   }
 
   void gaussian_evaluator::gaussian_distribution(

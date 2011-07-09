@@ -58,8 +58,8 @@ namespace vita
 
     unsigned mutation();
     individual uniform_cross(const individual &) const;
-    individual cross1(const individual &);
-    individual cross2(const individual &);
+    individual cross1(const individual &) const;
+    individual cross2(const individual &) const;
 
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;

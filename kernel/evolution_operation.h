@@ -49,16 +49,17 @@ namespace vita
   class operation_strategy
   {
   public:
-    explicit operation_strategy(const evolution *const);
+    operation_strategy(const evolution *const, summary *const);
 
     // Defining offspring as a set of individuals lets the generalized operation
     // encompass recent additions, such as scan mutation, that generates
     // numerous offspring from a single parent.
-    virtual std::vector<individual> operator()(const std::vector<unsigned> &,
-                                               summary *const) = 0;
+    virtual std::vector<individual> operator()(
+      const std::vector<unsigned> &) = 0;
 
   protected:
     const evolution *const evo_;
+    summary *stats_;
   };
 
   ///
@@ -68,9 +69,9 @@ namespace vita
   class operation_factory
   {
   public:
-    enum operation {unicross_mutation = 0};
+    enum operation {unicross_mutation = 0, cross1_mutation};
 
-    explicit operation_factory(const evolution *const);
+    operation_factory(const evolution *const, summary *const);
     ~operation_factory();
 
     operation_strategy &operator[](unsigned) const;

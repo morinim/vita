@@ -36,8 +36,8 @@ namespace po = boost::program_options;
 #include "kernel/src_problem.h"
 
 const std::string vita_sr_version(
-  "Vita v1.04 - Symbolic Regression and classification\n"   \
-  "Copyright EOS Development (http://www.eosdev.it)"
+  "Vita - Symbolic Regression and classification v0.9.0\n"\
+  "Copyright (c) 2011 EOS Development (http://www.eosdev.it)"
 );
 
 bool verbose(false);

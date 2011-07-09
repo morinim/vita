@@ -405,7 +405,7 @@ namespace vita
   /// \param[in] parent
   /// \return
   ///
-  individual individual::cross1(const individual &parent)
+  individual individual::cross1(const individual &parent) const
   {
     assert(check() && parent.check());
 
@@ -431,7 +431,7 @@ namespace vita
   /// \param[in] parent
   /// \return
   ///
-  individual individual::cross2(const individual &parent)
+  individual individual::cross2(const individual &parent) const
   {
     assert(check() && parent.check());
 

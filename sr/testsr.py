@@ -76,7 +76,6 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 def start_testing(args):
     testcases = {
         "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80,     "arithmetic"],
-        "krkopt":     [    "krkopt.dat", 100, 999, 100,  50, "classification"],
         "iris":       [      "iris.dat", 100, 500, 100,  80, "classification"],
         "mep":        [       "mep.dat", 100, 200, 500, 100],
         "mepbias":    [       "mep.dat", 100, 200,  20, 100,            "mep"],
