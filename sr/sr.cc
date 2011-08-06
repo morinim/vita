@@ -35,8 +35,10 @@ namespace po = boost::program_options;
 #include "kernel/search.h"
 #include "kernel/src_problem.h"
 
-const std::string vita_sr_version(
-  "Vita - Symbolic Regression and classification v0.9.0\n"\
+const std::string vita_sr_version1(
+  "Vita - Symbolic Regression and classification v0.9.0"
+);
+const std::string vita_sr_version2(
   "Copyright (c) 2011 EOS Development (http://www.eosdev.it)"
 );
 
@@ -167,11 +169,16 @@ bool parse_command_line(int argc, char *argv[])
        po::bool_switch(&problem.env.stat_arl),
       "Save the list of active ADF");
 
-    po::options_description cmdl_opt(vita_sr_version +
-                                     "\n\n" +
-                                     "sr [options] data_file" +
-                                     "\n\n" +
-                                     "Allowed options");
+    po::options_description cmdl_opt(
+      "(==(     )==)\n"
+      " `-.`. ,',-' \n"
+      "    _,-'       " + vita_sr_version1         + "\n" \
+      " ,-',' `.`-.   " + vita_sr_version2         + "\n" \
+      "(==(     )==)  "                            + "\n" \
+      " `-.`. ,',-'   "                            + "\n" \
+      "    _,-'\"      "+ "sr [options] data_file" + "\n" \
+      " ,-',' `.`-.   "                            + "\n" \
+      "(==(     )==)  " + "Allowed options");
     cmdl_opt.add(generic).add(data).add(config).add(evolution).add(individual).
       add(statistics);
 
@@ -187,7 +194,8 @@ bool parse_command_line(int argc, char *argv[])
 
     if (vm.count("version"))
     {
-      std::cout << vita_sr_version << std::endl;
+      std::cout << vita_sr_version1 << std::endl << vita_sr_version2
+                << std::endl;
       return false;
     }
 
