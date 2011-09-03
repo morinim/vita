@@ -88,7 +88,6 @@ namespace vita
     const std::vector<unsigned> &parent)
   {
     assert(parent.size() >= 2);
-    assert(s);
 
     const population &pop = evo_->population();
     const unsigned r1(parent[0]), r2(parent[1]);
