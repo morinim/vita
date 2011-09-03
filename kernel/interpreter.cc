@@ -40,18 +40,34 @@ namespace vita
   }
 
   ///
+  /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  boost::any interpreter::operator()()
+  boost::any interpreter::operator()(unsigned ip)
   {
     for (unsigned i(0); i < cache_.size(); ++i)
     {
       cache_[i].empty = true;
+#if !defined(NDEBUG)
+      // There are assertions to check that cache_[i].value.empty() is true
+      // when cache_[i] is empty (cache_[i].empty == true).
       cache_[i].value = boost::any();
+#endif
     }
 
-    ip_ = ind_.best_;
+    ip_ = ip;
     return ind_.code_[ip_].sym->eval(this);
+  }
+
+  ///
+  /// \return the output value of \c this \a individual.
+  ///
+  /// Calls operator()(unsigned) using the the locus of the individual
+  /// (ind_.best).
+  ///
+  boost::any interpreter::operator()()
+  {
+    return operator()(ind_.best_);
   }
 
   ///
@@ -85,6 +101,8 @@ namespace vita
 
     if (cache_[locus].empty)
     {
+      assert(cache_[locus].value.empty());
+
       const unsigned backup(ip_);
       ip_ = locus;
       assert(ip_ > backup);

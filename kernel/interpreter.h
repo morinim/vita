@@ -40,6 +40,7 @@ namespace vita
     explicit interpreter(const individual &, interpreter *const = 0);
 
     boost::any operator()();
+    boost::any operator()(unsigned);
 
     boost::any eval();
     boost::any eval(unsigned);
