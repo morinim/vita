@@ -35,9 +35,7 @@ namespace vita
   ///
   interpreter::interpreter(const individual &ind,
                            interpreter *const ctx)
-    : ip_(ind.best_), context_(ctx), ind_(ind),
-      cache_(ind.size()),
-      context_cache_(ctx ? ctx->ind_.size() : 0)
+    : ip_(ind.best_), context_(ctx), ind_(ind), cache_(ind.size())
   {
   }
 
@@ -51,11 +49,6 @@ namespace vita
       cache_[i].empty = true;
       cache_[i].value = boost::any();
     }
-
-    // Probably the context_cache_ vector will be deleted (it was introduced
-    // before the cache_ vector).
-    for (unsigned i(0); i < context_cache_.size(); ++i)
-      context_cache_[i] = boost::any();
 
     ip_ = ind_.best_;
     return ind_.code_[ip_].sym->eval(this);
@@ -76,6 +69,12 @@ namespace vita
   /// \param[in] i i-th argument of the current function.
   /// \return the value of the i-th argument of the current function.
   ///
+  /// We use a cache to avoid recalculating the same value during one
+  /// interpreter execution.
+  /// This means that side effects are not evaluated to date: WE ASSUME
+  /// REFERENTIAL TRANSPARENCY for all the expressions.
+  /// [http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)]
+  ///
   boost::any interpreter::eval(unsigned i)
   {
     const gene &g(ind_.code_[ip_]);
@@ -83,6 +82,7 @@ namespace vita
     assert(i < g.sym->arity());
 
     const locus_t locus(g.args[i]);
+
     if (cache_[locus].empty)
     {
       const unsigned backup(ip_);
@@ -95,7 +95,7 @@ namespace vita
       cache_[locus].value = ret;
     }
 #if !defined(NDEBUG)
-    else
+    else // Cache not empty... checking if the cached value is right.
     {
       const unsigned backup(ip_);
       ip_ = locus;
@@ -129,10 +129,7 @@ namespace vita
     assert(context_ && context_->check() && i < gene::k_args &&
            dynamic_cast<const adf_n *>(context_g.sym));
 
-    if (context_cache_[context_g.args[i]].empty())
-      context_cache_[context_g.args[i]] = context_->eval(i);
-
-    return context_cache_[context_g.args[i]];
+    return context_->eval(i);
   }
 
   ///

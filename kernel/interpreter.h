@@ -62,7 +62,6 @@ namespace vita
     };
 
     mutable std::vector<cache_elem> cache_;
-    mutable std::vector<boost::any> context_cache_;
   };
 
   ///
