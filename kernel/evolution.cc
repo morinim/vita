@@ -88,6 +88,23 @@ namespace vita
   }
 
   ///
+  /// \param[out] probes number of probes in the transposition table.
+  /// \param[out] hits number of hits in the transposition table (hits <=
+  ///             probes).
+  ///
+  void evolution::get_probes(boost::uint64_t *probes,
+                             boost::uint64_t *hits) const
+  {
+    *probes = *hits = 0;
+
+    if (typeid(*eva_) == typeid(evaluator_proxy))
+    {
+      *probes = static_cast<evaluator_proxy *>(eva_)->probes();
+      *hits   = static_cast<evaluator_proxy *>(eva_)->hits();
+    }
+  }
+
+  ///
   /// \param[in] run_count run number.
   ///
   /// Saves working / statistical informations in a log file.
@@ -120,6 +137,9 @@ namespace vita
           last_run = run_count;
         }
 
+        boost::uint64_t hits(0), probes(0);
+        get_probes(&probes, &hits);
+
         dynamic << run_count
                 << ' ' << stats_.gen
                 << ' ' << stats_.f_best
@@ -136,8 +156,8 @@ namespace vita
                 << ' ' << stats_.az.terminals(0)
                 << ' ' << stats_.az.functions(1)
                 << ' ' << stats_.az.terminals(1)
-                << ' ' << eva_->hits()
-                << ' ' << eva_->probes();
+                << ' ' << hits
+                << ' ' << probes;
 
         for (unsigned active(0); active <= 1; ++active)
           for (analyzer::const_iterator i(stats_.az.begin());
@@ -262,8 +282,7 @@ namespace vita
         }
       }
 
-      stats_.ttable_probes = eva_->probes();
-      stats_.ttable_hits   =   eva_->hits();
+      get_probes(&stats_.ttable_probes, &stats_.ttable_hits);
     }
 
     if (verbose)

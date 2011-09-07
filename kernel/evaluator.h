@@ -44,6 +44,8 @@ namespace vita
   class evaluator
   {
   public:
+    virtual void clear() {}
+
     virtual fitness_t operator()(const individual &) = 0;
 
     virtual double success_rate(const individual &) { return -1; }

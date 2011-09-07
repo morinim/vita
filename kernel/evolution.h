@@ -84,14 +84,15 @@ namespace vita
     replacement_factory replacement;
 
   private:
+    void get_probes(boost::uint64_t *, boost::uint64_t *) const;
     void log(unsigned) const;
     void pick_stats();
 
     bool stop_condition() const;
 
-    vita::population       pop_;
-    evaluator_proxy *const eva_;
-    summary              stats_;
+    vita::population pop_;
+    evaluator *const eva_;
+    summary        stats_;
   };
 
   ///
