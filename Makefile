@@ -25,7 +25,7 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 # Add directories to the include path.
 INCPATH = ./ $(BOOST_INCLUDE)
 
-WARN = -pedantic -ansi -Wall -Wextra
+WARN = -pedantic --std=c++0x -Wall -Wextra
 DEFS = -march=native
 
 # The next blocks change some variables depending on the build type.

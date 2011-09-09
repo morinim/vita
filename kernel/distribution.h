@@ -121,9 +121,7 @@ namespace vita
     const double c(1.0/std::log(2.0));
 
     double h(0.0);
-    for (typename std::map<T, unsigned>::const_iterator j(freq.begin());
-         j != freq.end();
-         ++j)
+    for (auto j(freq.begin()); j != freq.end(); ++j)
     {
       const double p(static_cast<double>(j->second) / count);
       h -= p * std::log(p) * c;
