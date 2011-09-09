@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "boost/assign.hpp"
+#include <boost/assign.hpp>
 
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
