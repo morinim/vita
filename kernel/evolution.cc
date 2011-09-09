@@ -48,12 +48,6 @@ namespace vita
   }
 
   ///
-  evolution::~evolution()
-  {
-    delete eva_;
-  }
-
-  ///
   /// \return access to the population being evolved.
   ///
   vita::population &evolution::population()
@@ -99,8 +93,8 @@ namespace vita
 
     if (typeid(*eva_) == typeid(evaluator_proxy))
     {
-      *probes = static_cast<evaluator_proxy *>(eva_)->probes();
-      *hits   = static_cast<evaluator_proxy *>(eva_)->hits();
+      *probes = static_cast<evaluator_proxy *>(eva_.get())->probes();
+      *hits   = static_cast<evaluator_proxy *>(eva_.get())->hits();
     }
   }
 
