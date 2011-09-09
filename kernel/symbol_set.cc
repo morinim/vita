@@ -2,21 +2,32 @@
  *
  *  \file symbol_set.cc
  *
- *  \author Manlio Morini
- *  \date 2011/05/27
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "symbol_set.h"
-#include "adf.h"
-#include "argument.h"
-#include "random.h"
+#include "kernel/symbol_set.h"
+#include "kernel/adf.h"
+#include "kernel/argument.h"
+#include "kernel/random.h"
 
 namespace vita
 {
-
   ///
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
@@ -26,7 +37,7 @@ namespace vita
     clear();
 
     for (unsigned i(0); i < gene::k_args; ++i)
-      _arguments.push_back(new argument(i));
+      arguments_.push_back(new argument(i));
 
     assert(check());
   }
@@ -37,9 +48,7 @@ namespace vita
   ///
   symbol_set::~symbol_set()
   {
-    for (std::vector<argument *>::const_iterator i(_arguments.begin());
-         i != _arguments.end();
-         ++i)
+    for (auto i(arguments_.begin()); i != arguments_.end(); ++i)
       delete *i;
   }
 
@@ -49,13 +58,13 @@ namespace vita
   ///
   void symbol_set::clear()
   {
-    _adf.clear();
-    _adf0.clear();
-    _symbols.clear();
-    _terminals.clear();
-    _specials.clear();
+    adf_.clear();
+    adf0_.clear();
+    symbols_.clear();
+    terminals_.clear();
+    specials_.clear();
 
-    _sum = 0;
+    sum_ = 0;
   }
 
   ///
@@ -67,9 +76,7 @@ namespace vita
   ///
   void symbol_set::delete_symbols()
   {
-    for (std::vector<symbol *>::const_iterator i(_symbols.begin());
-         i != _symbols.end();
-         ++i)
+    for (auto i(symbols_.begin()); i != symbols_.end(); ++i)
       delete *i;
 
     clear();
@@ -82,7 +89,7 @@ namespace vita
   const argument *symbol_set::arg(unsigned n) const
   {
     assert(n < gene::k_args);
-    return _arguments[n];
+    return arguments_[n];
   }
 
   ///
@@ -91,7 +98,7 @@ namespace vita
   ///
   const adf_0 *symbol_set::get_adf0(unsigned i) const
   {
-    return i < _adf0.size() ? _adf0[i] : 0;
+    return i < adf0_.size() ? adf0_[i] : 0;
   }
 
   ///
@@ -100,8 +107,8 @@ namespace vita
   ///
   const symbol *symbol_set::get_special(unsigned n) const
   {
-    assert(n < _specials.size());
-    return _specials[n];
+    assert(n < specials_.size());
+    return specials_[n];
   }
 
   ///
@@ -109,7 +116,7 @@ namespace vita
   ///
   unsigned symbol_set::specials() const
   {
-    return _specials.size();
+    return specials_.size();
   }
 
   ///
@@ -123,31 +130,31 @@ namespace vita
   void symbol_set::insert(symbol *const i, bool special)
   {
     assert(i && i->weight && i->check());
-    
+
     if (special)
     {
       assert(i->terminal());
-      _specials.push_back(static_cast<terminal *>(i));
+      specials_.push_back(static_cast<terminal *>(i));
     }
     else
     {
-      _symbols.push_back(i);
-      _sum += i->weight;
+      symbols_.push_back(i);
+      sum_ += i->weight;
     }
 
     if (i->terminal())
     {
-      _terminals.push_back(static_cast<terminal *>(i));
+      terminals_.push_back(static_cast<terminal *>(i));
 
       adf_0 *const df = dynamic_cast<adf_0 *>(i);
       if (df)
-        _adf0.push_back(df);
+        adf0_.push_back(df);
     }
     else  // not a terminal
     {
       adf_n *const df = dynamic_cast<adf_n *>(i);
       if (df)
-        _adf.push_back(df);
+        adf_.push_back(df);
     }
 
     assert(check());
@@ -156,39 +163,39 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    for (unsigned i(0); i < _adf0.size(); ++i)
+    for (unsigned i(0); i < adf0_.size(); ++i)
     {
-      const unsigned w(_adf0[i]->weight);
+      const unsigned w(adf0_[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
                            w == 1 ? 1 : 0);
-      _sum -= delta;
-      _adf0[i]->weight -= delta;
+      sum_ -= delta;
+      adf0_[i]->weight -= delta;
 
-      if (delta && _adf0[i]->weight == 0)
+      if (delta && adf0_[i]->weight == 0)
       {
-        for (unsigned j(0); j < _terminals.size(); ++j)
-          if (_terminals[j]->opcode() == _adf0[i]->opcode())
+        for (unsigned j(0); j < terminals_.size(); ++j)
+          if (terminals_[j]->opcode() == adf0_[i]->opcode())
           {
-            _terminals.erase(_terminals.begin()+j);
+            terminals_.erase(terminals_.begin()+j);
             break;
           }
 
-        for (unsigned j(0); j < _symbols.size(); ++j)
-          if (_symbols[j]->opcode() == _adf0[i]->opcode())
+        for (unsigned j(0); j < symbols_.size(); ++j)
+          if (symbols_[j]->opcode() == adf0_[i]->opcode())
           {
-            _symbols.erase(_symbols.begin()+j);
+            symbols_.erase(symbols_.begin()+j);
             break;
           }
       }
     }
 
-    for (unsigned i(0); i < _adf.size(); ++i)
+    for (unsigned i(0); i < adf_.size(); ++i)
     {
-      const unsigned w(_adf[i]->weight);
+      const unsigned w(adf_[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
                            w == 1 ? 1 : 0);
-      _sum -= delta;
-      _adf[i]->weight -= delta; 
+      sum_ -= delta;
+      adf_[i]->weight -= delta;
     }
   }
 
@@ -196,43 +203,43 @@ namespace vita
   /// \param[in] only_t if true extracts only terminals.
   /// \return a random symbol.
   ///
-  /// If \a only_t == \c true extracts a \a terminal else a random \a symbol 
+  /// If \a only_t == \c true extracts a \a terminal else a random \a symbol
   /// (may be a \a terminal, a primitive function or an ADF).
   ///
   const symbol *symbol_set::roulette(bool only_t) const
   {
-    assert(_sum);
+    assert(sum_);
 
     if (only_t)
     {
-      const unsigned i(random::between<unsigned>(0,_terminals.size()));
+      const unsigned i(random::between<unsigned>(0, terminals_.size()));
 
-      assert( !dynamic_cast<argument *>(_terminals[i]) );
-      return _terminals[i];
+      assert(!dynamic_cast<argument *>(terminals_[i]));
+      return terminals_[i];
     }
 
-    const unsigned slot(random::between<unsigned>(0,_sum)); 
+    const unsigned slot(random::between<unsigned>(0, sum_));
 
     unsigned i(0);
-    for (unsigned wedge(_symbols[i]->weight);
-	 wedge <= slot && i+1 < _symbols.size();
-	 wedge += _symbols[++i]->weight)
-      ;
+    for (unsigned wedge(symbols_[i]->weight);
+         wedge <= slot && i+1 < symbols_.size();
+         wedge += symbols_[++i]->weight)
+    {}
 
-    assert( !dynamic_cast<argument *>(_symbols[i]) );
-    return _symbols[i];
+    assert(!dynamic_cast<argument *>(symbols_[i]));
+    return symbols_[i];
   }
 
   ///
   /// \param[in] opcode numerical code used as primary key for a symbol.
-  /// \return a pointer to the \c symbol identified by 'opcode' (0 if not 
+  /// \return a pointer to the \c symbol identified by 'opcode' (0 if not
   ///         found).
   ///
   const symbol *symbol_set::decode(unsigned opcode) const
   {
-    for (unsigned i(0); i < _symbols.size(); ++i)
-      if (_symbols[i]->opcode() == opcode)
-	return _symbols[i];
+    for (unsigned i(0); i < symbols_.size(); ++i)
+      if (symbols_[i]->opcode() == opcode)
+        return symbols_[i];
 
     return 0;
   }
@@ -241,62 +248,61 @@ namespace vita
   /// \param[in] dex the name of a symbol.
   /// \return a pointer to the \c symbol identified by 'dex' (0 if not found).
   ///
-  /// Please note that opcode are primary key for symbols because they are 
+  /// Please note that opcode are primary key for symbols because they are
   /// automatically assigned. The name of a symbol is choosen by the user,
   /// so if you don't pay attention different symbols may have the same name.
   ///
   const symbol *symbol_set::decode(const std::string &dex) const
   {
-    for (unsigned i(0); i < _symbols.size(); ++i)
-      if (_symbols[i]->display() == dex)
-	return _symbols[i];
+    for (unsigned i(0); i < symbols_.size(); ++i)
+      if (symbols_[i]->display() == dex)
+        return symbols_[i];
 
     return 0;
   }
 
   ///
-  /// \return true if the individual passes the internal consistency check.
+  /// \return true if the object passes the internal consistency check.
   ///
   bool symbol_set::check() const
   {
-    unsigned long sum(0);
+    boost::uint64_t sum(0);
 
-    for (unsigned j(0); j < _symbols.size(); ++j)
+    for (unsigned j(0); j < symbols_.size(); ++j)
     {
-      if (!_symbols[j]->check())
-	return false;
-
-      sum += _symbols[j]->weight;
-
-      if (_symbols[j]->weight == 0)
+      if (!symbols_[j]->check())
         return false;
 
-      bool found(false);    
-      if (_symbols[j]->terminal())
+      sum += symbols_[j]->weight;
+
+      if (symbols_[j]->weight == 0)
+        return false;
+
+      bool found(false);
+      if (symbols_[j]->terminal())
       {
         // Terminals must be in the _terminals vector.
-        for (unsigned i(0); i < _terminals.size() && !found; ++i)
-          found = (_symbols[j] == _terminals[i]);
+        for (unsigned i(0); i < terminals_.size() && !found; ++i)
+          found = (symbols_[j] == terminals_[i]);
 
-        if (dynamic_cast<adf_0 *>(_symbols[j]))
-          for (unsigned i(0); i < _adf0.size() && !found; ++i)
-            found = (_symbols[j] == _adf0[i]);
+        if (dynamic_cast<adf_0 *>(symbols_[j]))
+          for (unsigned i(0); i < adf0_.size() && !found; ++i)
+            found = (symbols_[j] == adf0_[i]);
       }
-      else if (dynamic_cast<adf_n *>(_symbols[j]))
-        for (unsigned i(0); i < _adf.size() && !found; ++i)
-          found = (_symbols[j] == _adf[i]);
+      else if (dynamic_cast<adf_n *>(symbols_[j]))
+        for (unsigned i(0); i < adf_.size() && !found; ++i)
+          found = (symbols_[j] == adf_[i]);
       else
         found = true;
-     
+
       if (!found)
-	return false;
+        return false;
     }
-  
-    if (sum != _sum)
+
+    if (sum != sum_)
       return false;
 
     // There should be one terminal at least.
-    return _symbols.size()==0 || _terminals.size()>0;
+    return symbols_.size() == 0 || terminals_.size() > 0;
   }
-
 }  // Namespace vita

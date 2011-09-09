@@ -2,24 +2,35 @@
  *
  *  \file symbol_set.h
  *
- *  \author Manlio Morini
- *  \date 2011/05/27
+ *  Copyright (c) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA
+ *  This file is part of VITA.
+ *
+ *  VITA is free software: you can redistribute it and/or modify it under the
+ *  terms of the GNU General Public License as published by the Free Software
+ *  Foundation, either version 3 of the License, or (at your option) any later
+ *  version.
+ *
+ *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+ *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ *  details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-  
+
 #if !defined(SYMBOL_SET_H)
 #define      SYMBOL_SET_H
 
 #include <string>
 #include <vector>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
-
   class adf_0;
   class adf_n;
   class argument;
@@ -63,16 +74,15 @@ namespace vita
   private:
     void clear();
 
-    std::vector<symbol *>     _symbols;
-    std::vector<terminal *> _terminals;
-    std::vector<adf_n *>          _adf;
-    std::vector<adf_0 *>         _adf0;
-    std::vector<argument *> _arguments;
-    std::vector<terminal *>  _specials;
+    std::vector<symbol *>     symbols_;
+    std::vector<terminal *> terminals_;
+    std::vector<adf_n *>          adf_;
+    std::vector<adf_0 *>         adf0_;
+    std::vector<argument *> arguments_;
+    std::vector<terminal *>  specials_;
 
-    unsigned long _sum;
+    boost::uint64_t sum_;
   };
-  
 }  // namespace vita
 
 #endif  // SYMBOL_SET_H
