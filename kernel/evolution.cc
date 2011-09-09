@@ -167,7 +167,7 @@ namespace vita
                     << i->second.counter[active];
 
         dynamic << " \"";
-        stats_.best.inline_tree(dynamic);
+        stats_.best->inline_tree(dynamic);
         dynamic << '"' << std::endl;
       }
     }
@@ -233,9 +233,9 @@ namespace vita
                                        unsigned rep_id)
   {
     stats_.clear();
-    stats_.best    = *pop_.begin();
-    stats_.f_best  = (*eva_)(stats_.best);
-    stats_.sr_best = 0.0;
+    stats_.best.reset(new individual(pop_[0]));
+    stats_.f_best  = (*eva_)(*stats_.best);
+    stats_.sr_best =                   0.0;
 
     eva_->clear();
 
@@ -323,6 +323,14 @@ namespace vita
   }
 
   ///
+  /// Default constructor just call the summary::clear method.
+  ///
+  summary::summary()
+  {
+    clear();
+  }
+
+  ///
   /// Resets summary informations.
   ///
   void summary::clear()
@@ -334,6 +342,8 @@ namespace vita
     gen           = 0;
     testset       = 0;
     last_imp      = 0;
+
+    best.reset();
 
     az.clear();
   }

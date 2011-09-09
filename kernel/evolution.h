@@ -24,6 +24,8 @@
 #if !defined(EVOLUTION_H)
 #define      EVOLUTION_H
 
+#include <memory>
+
 #include "kernel/vita.h"
 #include "kernel/analyzer.h"
 #include "kernel/evaluator_proxy.h"
@@ -36,10 +38,12 @@ namespace vita
 {
   class environment;
   class evolution;
+  class individual;
 
   struct summary
   {
-    summary() { clear(); }
+  public:
+    summary();
 
     void clear();
 
@@ -55,9 +59,9 @@ namespace vita
 
     analyzer az;
 
-    individual  best;
-    fitness_t f_best;
-    double   sr_best;
+    std::shared_ptr<individual> best;
+    fitness_t                 f_best;
+    double                   sr_best;
   };
 
   class evolution

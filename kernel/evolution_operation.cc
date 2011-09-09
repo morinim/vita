@@ -92,14 +92,12 @@ namespace vita
     const population &pop = evo_->population();
     const unsigned r1(parent[0]), r2(parent[1]);
 
-    std::vector<individual> off(1);
-    if (random::boolean(pop.env().p_cross))
-    {
+    const bool cross(random::boolean(pop.env().p_cross));
+    std::vector<individual> off
+    { cross ? crossover(pop[r1], pop[r2]) : pop[random::boolean() ? r1 : r2]};
+
+    if (cross)
       ++stats_->crossovers;
-      off[0] = crossover(pop[r1], pop[r2]);
-    }
-    else
-      off[0] = pop[random::boolean() ? r1 : r2];
 
     stats_->mutations += mutation(&off[0]);
 

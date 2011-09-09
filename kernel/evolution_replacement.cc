@@ -102,9 +102,9 @@ namespace vita
     if (f_off - s->f_best > float_epsilon)
     {
       s->last_imp = s->gen;
-      s->best = offspring[0];
+      s->best.reset(new individual(offspring[0]));
       s->f_best = f_off;
-      s->sr_best = evo_->success_rate(s->best);
+      s->sr_best = evo_->success_rate(*s->best);
     }
   }
 

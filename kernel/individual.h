@@ -47,7 +47,6 @@ namespace vita
   class individual
   {
   public:
-    individual() {}
     individual(const environment &, bool);
 
     void dump(std::ostream &) const;

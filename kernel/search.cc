@@ -164,7 +164,7 @@ namespace vita
       if (prob_->env.arl && best_run == i)
       {
         prob_->env.sset.reset_adf_weights();
-        arl(s.best, evo);
+        arl(*s.best, evo);
       }
 
       if (prob_->env.stat_summary)
@@ -173,7 +173,7 @@ namespace vita
       previous = s;
     }
 
-    return overall_run_sum.best;
+    return *overall_run_sum.best;
   }
 
   ///
@@ -188,9 +188,9 @@ namespace vita
                    unsigned solutions, unsigned best_run, unsigned runs) const
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best.list(best_list);
-    run_sum.best.tree(best_tree);
-    run_sum.best.graphviz(best_graph);
+    run_sum.best->list(best_list);
+    run_sum.best->tree(best_tree);
+    run_sum.best->graphviz(best_graph);
 
     const std::string path("vita.");
     const std::string summary(path+"summary.");
