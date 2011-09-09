@@ -55,30 +55,6 @@ namespace vita
   }
 
   ///
-  /// \return a reference to the first individual of the population.
-  ///
-  population::iterator population::begin()
-  {
-    return pop_.begin();
-  }
-
-  ///
-  /// \return a constant reference to the first individual of the population.
-  ///
-  population::const_iterator population::begin() const
-  {
-    return pop_.begin();
-  }
-
-  ///
-  /// \return a constant reference to the last+1 individual of the population.
-  ///
-  population::const_iterator population::end() const
-  {
-    return pop_.end();
-  }
-
-  ///
   /// \return a constant reference to the active environment.
   ///
   const environment &population::env() const
@@ -105,8 +81,8 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &s, const population &pop)
   {
-    for (population::const_iterator it(pop.begin()); it != pop.end(); ++it)
-      s << *it << std::endl;
+    for (unsigned i(0); i < pop.size(); ++i)
+      s << pop[i] << std::endl;
 
     return s;
   }

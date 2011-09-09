@@ -78,8 +78,8 @@ namespace vita
   {
     az->clear();
 
-    for (population::const_iterator i(pop_.begin()); i != pop_.end(); ++i)
-      az->add(*i, (*eva_)(*i));
+    for (unsigned i(0); i < pop_.size(); ++i)
+      az->add(pop_[i], (*eva_)(pop_[i]));
   }
 
   void evolution::pick_stats()

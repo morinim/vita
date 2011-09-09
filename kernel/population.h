@@ -44,19 +44,12 @@ namespace vita
   public:
     typedef individual value_type;
     typedef std::vector<value_type>::size_type size_type;
-    typedef std::vector<value_type>::iterator iterator;
-    typedef std::vector<value_type>::const_iterator const_iterator;
-    typedef std::vector<value_type>::reference reference;
-    typedef std::vector<value_type>::const_reference const_reference;
 
     explicit population(environment *const);
     void build();
 
     individual &operator[](size_type);
     const individual &operator[](size_type) const;
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator end() const;
     size_type size() const;
 
     const environment &env() const;
