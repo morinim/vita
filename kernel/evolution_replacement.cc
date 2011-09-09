@@ -115,16 +115,20 @@ namespace vita
 
   replacement_factory::~replacement_factory()
   {
+    // Only predefined operation strategies should be deleted. User defined
+    // operation aren't under our responsability.
     delete strategy_[tournament];
   }
 
   replacement_strategy &replacement_factory::operator[](unsigned s)
   {
+    assert(s < strategy_.size());
     return *strategy_[s];
   }
 
   unsigned replacement_factory::put(replacement_strategy *const s)
   {
+    assert(s);
     strategy_.push_back(s);
     return strategy_.size();
   }

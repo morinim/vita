@@ -142,20 +142,21 @@ namespace vita
 
   operation_factory::~operation_factory()
   {
-    for (unsigned i(0); i < strategy_.size(); ++i)
-    {
-      delete strategy_[i];
-      strategy_[i] = 0;
-    }
+    // Only predefined operation strategies should be deleted. User defined
+    // operation aren't under our responsability.
+    delete strategy_[unicross_mutation];
+    delete strategy_[cross1_mutation];
   }
 
   operation_strategy &operation_factory::operator[](unsigned s) const
   {
+    assert(s < strategy_.size());
     return *strategy_[s];
   }
 
   unsigned operation_factory::put(operation_strategy *const s)
   {
+    assert(s);
     strategy_.push_back(s);
     return strategy_.size();
   }

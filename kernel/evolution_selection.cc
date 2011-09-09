@@ -98,16 +98,20 @@ namespace vita
 
   selection_factory::~selection_factory()
   {
+    // Only predefined operation strategies should be deleted. User defined
+    // operation aren't under our responsability.
     delete strategy_[tournament];
   }
 
   selection_strategy &selection_factory::operator[](unsigned s)
   {
+    assert(s < strategy_.size());
     return *strategy_[s];
   }
 
   unsigned selection_factory::put(selection_strategy *const s)
   {
+    assert(s);
     strategy_.push_back(s);
     return strategy_.size();
   }
