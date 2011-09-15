@@ -295,9 +295,9 @@ namespace vita
 
       if (ll[i] >= 0)
       {
-        const symbol *const s = source.code_[i].sym;
-        const adf_n *const padf_n = dynamic_cast<const adf_n *>(s);
-        const adf_0 *const padf_0 = dynamic_cast<const adf_0 *>(s);
+        const symbol *const s(source.code_[i].sym.get());
+        const adf_n *const padf_n(dynamic_cast<const adf_n *>(s));
+        const adf_0 *const padf_0(dynamic_cast<const adf_0 *>(s));
         if (padf_n || padf_0)
         {
           if (padf_n)
@@ -321,9 +321,9 @@ namespace vita
         }
         else  // Not ADF
         {
-          const symbol *const sym = source.code_[i].sym;
+          symbol_ptr sym(source.code_[i].sym);
 
-          const argument *parg = dynamic_cast<const argument *>(sym);
+          const argument *parg(dynamic_cast<const argument *>(sym.get()));
           if (args && parg)
             ll[i] = (*args)[parg->index()];
           else
@@ -492,7 +492,7 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a line with a new one ('sym' + 'args').
   ///
-  individual individual::replace(const symbol *const sym,
+  individual individual::replace(symbol_ptr sym,
                                  const std::vector<unsigned> &args,
                                  unsigned line) const
   {
@@ -516,7 +516,7 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a best_ with a new one ('sym' + 'args').
   ///
-  individual individual::replace(const symbol *const sym,
+  individual individual::replace(symbol_ptr sym,
                                  const std::vector<unsigned> &args) const
   {
     return replace(sym, args, best_);

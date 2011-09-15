@@ -25,13 +25,14 @@
 #define      SEARCH_H
 
 #include "kernel/vita.h"
-#include "kernel/individual.h"
-#include "kernel/problem.h"
+#include "kernel/fitness.h"
 
 namespace vita
 {
   template <class T> class distribution;
   class evolution;
+  class individual;
+  class problem;
   class summary;
 
   ///
@@ -44,7 +45,7 @@ namespace vita
 
     void arl(const individual &, evolution &);
 
-    individual run(bool = true, unsigned = 1, fitness_t = -5.0);
+    const individual &run(bool = true, unsigned = 1, fitness_t = -5.0);
 
     bool check() const;
 

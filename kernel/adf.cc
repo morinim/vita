@@ -98,7 +98,7 @@ namespace vita
   {
     // No recursive calls.
     for (individual::const_iterator i(adf_.code); i(); ++i)
-      if (i->sym == this)
+      if (i->sym.get() == this)
         return false;
 
     return adf_.check() && function::check();
@@ -154,7 +154,7 @@ namespace vita
   {
     // No recursive calls.
     for (individual::const_iterator i(adf_.code); i(); ++i)
-      if (i->sym == this)
+      if (i->sym.get() == this)
         return false;
 
     return adf_.check() && terminal::check();

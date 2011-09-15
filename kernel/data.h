@@ -38,6 +38,9 @@
 
 namespace vita
 {
+  namespace sr { class variable; }
+  typedef std::shared_ptr<sr::variable> variable_ptr;
+
   ///
   /// \a data \c class stores the training set used to evolve the \a population.
   ///

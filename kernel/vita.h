@@ -37,9 +37,13 @@
 #include <cassert>
 #include <climits>
 #include <cmath>
+#include <memory>
 
 namespace vita
 {
+  class symbol;
+  typedef std::shared_ptr<symbol> symbol_ptr;
+
 #if defined(_MSC_VER)
 #  define isnan(x)      _isnan(x)
 #  define isinf(x)      !_finite(x)

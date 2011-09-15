@@ -31,12 +31,7 @@
 
 namespace vita
 {
-  class adf_0;
-  class adf_n;
   class argument;
-  class symbol;
-  class terminal;
-  class variable;
 
   ///
   /// This is a container for the symbol set. Symbols are stored to be quickly
@@ -52,34 +47,31 @@ namespace vita
   {
   public:
     symbol_set();
-    ~symbol_set();
 
-    void insert(symbol *const, bool);
+    void insert(symbol_ptr, bool);
 
-    const symbol *roulette(bool = false) const;
-    const argument *arg(unsigned) const;
-    const symbol *get_special(unsigned) const;
+    symbol_ptr roulette(bool = false) const;
+    symbol_ptr arg(unsigned) const;
+    symbol_ptr get_special(unsigned) const;
     unsigned specials() const;
-    const adf_0 *get_adf0(unsigned) const;
+    symbol_ptr get_adf0(unsigned) const;
 
     void reset_adf_weights();
 
-    const symbol *decode(unsigned) const;
-    const symbol *decode(const std::string &) const;
-
-    void delete_symbols();
+    symbol_ptr decode(unsigned) const;
+    symbol_ptr decode(const std::string &) const;
 
     bool check() const;
 
   private:
     void clear();
 
-    std::vector<symbol *>     symbols_;
-    std::vector<terminal *> terminals_;
-    std::vector<adf_n *>          adf_;
-    std::vector<adf_0 *>         adf0_;
-    std::vector<argument *> arguments_;
-    std::vector<terminal *>  specials_;
+    std::vector<symbol_ptr>   symbols_;
+    std::vector<symbol_ptr> terminals_;
+    std::vector<symbol_ptr>       adf_;
+    std::vector<symbol_ptr>      adf0_;
+    std::vector<symbol_ptr> arguments_;
+    std::vector<symbol_ptr>  specials_;
 
     boost::uint64_t sum_;
   };

@@ -34,8 +34,6 @@
 
 namespace vita
 {
-  class adf_0;
-  class adf_n;
   class interpreter;
 
   ///
@@ -106,7 +104,6 @@ namespace vita
   private:
     adf_core adf_;
   };
-
 }  // namespace vita
 
 #endif  // ADF_H

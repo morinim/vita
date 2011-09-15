@@ -34,18 +34,12 @@ namespace vita
   {
     clear();
 
-    add_evaluator(new abs_evaluator(&dat_, &vars_));
-    //add_evaluator(new gaussian_evaluator(&dat_, &vars_));
-    add_evaluator(new dyn_slot_evaluator(&dat_, &vars_));
-  }
-
-  ///
-  /// Class destructor frees memory allocated by src_problem constructor.
-  ///
-  src_problem::~src_problem()
-  {
-    delete_evaluators();
-    env.sset.delete_symbols();
+    evaluator_ptr e1(new abs_evaluator(&dat_, &vars_));
+    add_evaluator(e1);
+    //evaluator_ptr e2(new gaussian_evaluator(&dat_, &vars_));
+    //add_evaluator(e2);
+    evaluator_ptr e3(new dyn_slot_evaluator(&dat_, &vars_));
+    add_evaluator(e3);
   }
 
   ///
@@ -75,7 +69,7 @@ namespace vita
         s << 'X' << i;
         const std::string str(s.str());
 
-        vita::sr::variable *const x = new vita::sr::variable(str);
+        variable_ptr x(new vita::sr::variable(str));
         vars_.push_back(x);
         env.insert(x);
       }
@@ -111,41 +105,45 @@ namespace vita
       {
         symbols += name+" ";
 
+        symbol_ptr sp;
+
         std::stringstream s;
         s << name;
         double n;
         if (s >> n)
-          env.insert(new vita::sr::constant(n));
+          sp.reset(new vita::sr::constant(n));
         else if (name == "number")
-          env.insert(new vita::sr::number(-128, 127));
+          sp.reset(new vita::sr::number(-128, 127));
         else if (name == "abs")
-          env.insert(new vita::sr::abs());
+          sp.reset(new vita::sr::abs());
         else if (name == "add" || name == "+")
-          env.insert(new vita::sr::add());
+          sp.reset(new vita::sr::add());
         // else if (name=="and" || name=="&&")
-        //   env.insert(new vita::sr::bool_and());
+        //   sp.reset(new vita::sr::bool_and());
         // else if (name == "or" || name == "||")
-        //   env.insert(new vita::sr::bool_not());
+        //   sp.reset(new vita::sr::bool_not());
         // else if (name == "not" || name == "!")
-        //   env.insert(new vita::sr::bool_or());
+        //   sp.reset(new vita::sr::bool_or());
         else if (name == "div" || name == "/")
-          env.insert(new vita::sr::div());
+          sp.reset(new vita::sr::div());
         else if (name == "idiv")
-          env.insert(new vita::sr::idiv());
+          sp.reset(new vita::sr::idiv());
         else if (name == "ife")
-          env.insert(new vita::sr::ife());
+          sp.reset(new vita::sr::ife());
         else if (name == "ifl")
-          env.insert(new vita::sr::ifl());
+          sp.reset(new vita::sr::ifl());
         else if (name == "ifz")
-          env.insert(new vita::sr::ifz());
+          sp.reset(new vita::sr::ifz());
         else if (name == "ln")
-          env.insert(new vita::sr::ln());
+          sp.reset(new vita::sr::ln());
         else if (name == "mul" || name == "*")
-          env.insert(new vita::sr::mul());
+          sp.reset(new vita::sr::mul());
         else if (name == "mod" || name == "%")
-          env.insert(new vita::sr::mod());
+          sp.reset(new vita::sr::mod());
         else if (name == "sub" || name == "-")
-          env.insert(new vita::sr::sub());
+          sp.reset(new vita::sr::sub());
+
+        env.insert(sp);
       }
     }
 

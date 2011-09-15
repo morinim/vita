@@ -35,19 +35,19 @@ namespace vita
   class src_evaluator : public evaluator
   {
   public:
-    src_evaluator(data *, std::vector<vita::sr::variable *> *);
+    src_evaluator(data *, std::vector<variable_ptr> *);
 
     void load_vars(const data::value_type &);
 
   protected:
-    data *dat_;
-    std::vector<vita::sr::variable *> *var_;
+    data                      *dat_;
+    std::vector<variable_ptr> *var_;
   };
 
   class abs_evaluator : public src_evaluator
   {
   public:
-    abs_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+    abs_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v) {}
 
     fitness_t operator()(const individual &);
@@ -56,7 +56,7 @@ namespace vita
   class dyn_slot_evaluator : public src_evaluator
   {
   public:
-    dyn_slot_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+    dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v)
     {
       assert(d);
@@ -80,7 +80,7 @@ namespace vita
   class gaussian_evaluator : public src_evaluator
   {
   public:
-    gaussian_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+    gaussian_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v)
     {
       assert(d);

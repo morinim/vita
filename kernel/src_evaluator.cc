@@ -31,7 +31,7 @@ namespace vita
   /// \param[in] d
   /// \param[in] v
   ///
-  src_evaluator::src_evaluator(data *d, std::vector<vita::sr::variable *> *v)
+  src_evaluator::src_evaluator(data *d, std::vector<variable_ptr> *v)
     : dat_(d), var_(v)
   {
   }

@@ -32,6 +32,7 @@
 #include "kernel/search.h"
 #include "kernel/adf.h"
 #include "kernel/evolution.h"
+#include "kernel/problem.h"
 
 namespace vita
 {
@@ -68,9 +69,9 @@ namespace vita
       if (prob_->env.stat_arl && adf_l.good())
       {
         unsigned i(0);
-        for (const adf_0 *f = prob_->env.sset.get_adf0(i);
+        for (const symbol *f(prob_->env.sset.get_adf0(i).get());
              f;
-             f = prob_->env.sset.get_adf0(++i))
+             f = prob_->env.sset.get_adf0(++i).get())
           adf_l << f->display() << ' ' << f->weight << std::endl;
         adf_l << std::endl;
       }
@@ -90,15 +91,15 @@ namespace vita
           // Semantic introns cannot be building blocks.
           if (!is_bad(d_f) && std::fabs(base_fit/10.0) < d_f)
           {
-            vita::symbol *p;
+            symbol_ptr p;
             if (arl_args)
             {
               std::vector<symbol_t> types;
               candidate_block.generalize(arl_args, 0, &types);
-              p = new vita::adf_n(candidate_block, types, 10);
+              p.reset(new vita::adf_n(candidate_block, types, 10));
             }
             else
-              p = new vita::adf_0(candidate_block, 100);
+              p.reset(new vita::adf_0(candidate_block, 100));
             prob_->env.insert(p);
 
             if (prob_->env.stat_arl && adf_l.good())
@@ -123,7 +124,7 @@ namespace vita
   ///                      considered a solution.
   /// \return best individual found.
   ///
-  individual search::run(bool verbose, unsigned n, fitness_t success_f)
+  const individual &search::run(bool verbose, unsigned n, fitness_t success_f)
   {
     summary overall_run_sum;
     distribution<fitness_t> fd;

@@ -90,10 +90,10 @@ namespace vita
   ///
   /// \param[in] i pointer to a new symbol for the symbol set.
   ///
-  void environment::insert(symbol *const i)
+  void environment::insert(symbol_ptr i)
   {
     const bool special(force_input && i->terminal() &&
-                       static_cast<terminal *>(i)->input());
+                       static_cast<terminal *>(i.get())->input());
     sset.insert(i, special);
   }
 

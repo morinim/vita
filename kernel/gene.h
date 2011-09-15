@@ -47,7 +47,7 @@ namespace vita
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
-    const symbol      *sym;
+    symbol_ptr         sym;
     union
     {
       int              par;

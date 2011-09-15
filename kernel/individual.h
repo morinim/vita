@@ -63,9 +63,9 @@ namespace vita
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
-    individual replace(const symbol *const,
+    individual replace(symbol_ptr,
                        const std::vector<unsigned> &) const;
-    individual replace(const symbol *const, const std::vector<unsigned> &,
+    individual replace(symbol_ptr, const std::vector<unsigned> &,
                        unsigned) const;
 
     void generalize(std::size_t,

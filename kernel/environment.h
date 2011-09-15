@@ -41,7 +41,7 @@ namespace vita
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
 
-    void insert(symbol *const);
+    void insert(symbol_ptr);
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).

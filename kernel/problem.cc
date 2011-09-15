@@ -22,6 +22,7 @@
  */
 
 #include "kernel/problem.h"
+#include "kernel/evaluator.h"
 #include "kernel/search.h"
 
 namespace vita
@@ -39,7 +40,7 @@ namespace vita
   ///
   void problem::clear()
   {
-    active_eva_ = 0;
+    active_eva_.reset();
     evaluators_.clear();
   }
 
@@ -48,7 +49,7 @@ namespace vita
   ///
   evaluator *problem::get_evaluator()
   {
-    return active_eva_;
+    return active_eva_.get();
   }
 
   ///
@@ -57,27 +58,12 @@ namespace vita
   /// Add a new avaluator to the set. Evaluators are used to score individual's
   /// fitness.
   ///
-  void problem::add_evaluator(evaluator *const eva)
+  void problem::add_evaluator(evaluator_ptr eva)
   {
     evaluators_.push_back(eva);
 
     if (!active_eva_)
       active_eva_ = eva;
-  }
-
-  ///
-  /// The basic rule of memory management in Vita is that any object that is
-  /// created by the client must be deleted by the client... but, you know,
-  /// every rule has an exception: subclasses of \a problem need to free
-  /// memory in their destructors and the deallocation process is "factored"
-  /// in the \a delete_evaluators member function.
-  ///
-  void problem::delete_evaluators()
-  {
-    for (std::vector<evaluator *>::const_iterator i(evaluators_.begin());
-         i != evaluators_.end();
-         ++i)
-      delete *i;
   }
 
   ///

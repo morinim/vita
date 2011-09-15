@@ -39,7 +39,6 @@ namespace vita
   {
   public:
     src_problem();
-    ~src_problem();
 
     bool load_data(const std::string &);
     std::string load_symbols(const std::string &);
@@ -52,8 +51,8 @@ namespace vita
     bool check() const;
 
   private:
-    std::vector<vita::sr::variable *> vars_;
-    data dat_;
+    std::vector<variable_ptr> vars_;
+    data                       dat_;
   };
 }  // namespace vita
 

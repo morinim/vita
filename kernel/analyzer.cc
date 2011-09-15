@@ -110,12 +110,12 @@ namespace vita
   unsigned analyzer::count(const individual &ind)
   {
     for (unsigned i(0); i < ind.size(); ++i)
-      count(ind[i].sym, false);
+      count(ind[i].sym.get(), false);
 
     unsigned length(0);
     for (individual::const_iterator it(ind); it(); ++it)
     {
-      count(it->sym, true);
+      count(it->sym.get(), true);
       ++length;
     }
 

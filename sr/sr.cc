@@ -51,23 +51,41 @@ vita::src_problem problem;
 
 void setup_default_symbols()
 {
-  problem.env.insert(new vita::sr::constant(1));
-  problem.env.insert(new vita::sr::constant(2));
-  problem.env.insert(new vita::sr::constant(3));
-  problem.env.insert(new vita::sr::constant(4));
-  problem.env.insert(new vita::sr::constant(5));
-  problem.env.insert(new vita::sr::constant(6));
-  problem.env.insert(new vita::sr::constant(7));
-  problem.env.insert(new vita::sr::constant(8));
-  problem.env.insert(new vita::sr::constant(9));
+  vita::symbol_ptr c1(new vita::sr::constant(1));
+  vita::symbol_ptr c2(new vita::sr::constant(2));
+  vita::symbol_ptr c3(new vita::sr::constant(3));
+  vita::symbol_ptr c4(new vita::sr::constant(4));
+  vita::symbol_ptr c5(new vita::sr::constant(5));
+  vita::symbol_ptr c6(new vita::sr::constant(6));
+  vita::symbol_ptr c7(new vita::sr::constant(7));
+  vita::symbol_ptr c8(new vita::sr::constant(8));
+  vita::symbol_ptr c9(new vita::sr::constant(9));
 
-  problem.env.insert(new vita::sr::abs());
-  problem.env.insert(new vita::sr::add());
-  problem.env.insert(new vita::sr::div());
-  problem.env.insert(new vita::sr::ln());
-  problem.env.insert(new vita::sr::mul());
-  problem.env.insert(new vita::sr::mod());
-  problem.env.insert(new vita::sr::sub());
+  problem.env.insert(c1);
+  problem.env.insert(c2);
+  problem.env.insert(c3);
+  problem.env.insert(c4);
+  problem.env.insert(c5);
+  problem.env.insert(c6);
+  problem.env.insert(c7);
+  problem.env.insert(c8);
+  problem.env.insert(c9);
+
+  vita::symbol_ptr s_abs(new vita::sr::abs());
+  vita::symbol_ptr s_add(new vita::sr::add());
+  vita::symbol_ptr s_div(new vita::sr::div());
+  vita::symbol_ptr s_ln(new vita::sr::ln());
+  vita::symbol_ptr s_mul(new vita::sr::mul());
+  vita::symbol_ptr s_mod(new vita::sr::mod());
+  vita::symbol_ptr s_sub(new vita::sr::sub());
+
+  problem.env.insert(s_abs);
+  problem.env.insert(s_add);
+  problem.env.insert(s_div);
+  problem.env.insert(s_ln);
+  problem.env.insert(s_mul);
+  problem.env.insert(s_mod);
+  problem.env.insert(s_sub);
 }
 
 ///

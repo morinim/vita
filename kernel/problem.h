@@ -28,16 +28,18 @@
 
 #include "kernel/vita.h"
 #include "kernel/environment.h"
-#include "kernel/evaluator.h"
 
 namespace vita
 {
+  class evaluator;
+  typedef std::shared_ptr<evaluator> evaluator_ptr;
+
   class problem
   {
   public:
     problem();
 
-    void add_evaluator(evaluator *const);
+    void add_evaluator(evaluator_ptr);
     evaluator *get_evaluator();
     void set_evaluator(unsigned);
 
@@ -46,12 +48,9 @@ namespace vita
 
     environment env;
 
-  protected:
-    void delete_evaluators();
-
   private:
-    std::vector<evaluator *> evaluators_;
-    vita::evaluator         *active_eva_;
+    std::vector<evaluator_ptr> evaluators_;
+    evaluator_ptr              active_eva_;
   };
 }  // namespace vita
 
