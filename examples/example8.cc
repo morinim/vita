@@ -104,11 +104,10 @@ int main(int argc, char *argv[])
 
         if (opt.eff_size() <= 20)
         {
-          vita::individual blk2(opt);
-          std::vector<unsigned> positions;
+          std::vector<vita::locus_t> positions;
           std::vector<vita::symbol_t> types;
-          blk2.generalize(2, &positions, &types);
-          vita::symbol_ptr f(new vita::adf_n(blk2, types, 100));
+          vita::individual blk2(opt.generalize(2, &positions, &types));
+          vita::symbol_ptr f(new vita::adf(blk2, types, 100));
           env.insert(f);
           std::cout << std::endl << f->display() << std::endl;
           blk2.list(std::cout);

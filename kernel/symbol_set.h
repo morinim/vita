@@ -54,7 +54,7 @@ namespace vita
     symbol_ptr arg(unsigned) const;
     symbol_ptr get_special(unsigned) const;
     unsigned specials() const;
-    symbol_ptr get_adf0(unsigned) const;
+    symbol_ptr get_adt(unsigned) const;
 
     void reset_adf_weights();
 
@@ -69,7 +69,7 @@ namespace vita
     std::vector<symbol_ptr>   symbols_;
     std::vector<symbol_ptr> terminals_;
     std::vector<symbol_ptr>       adf_;
-    std::vector<symbol_ptr>      adf0_;
+    std::vector<symbol_ptr>       adt_;
     std::vector<symbol_ptr> arguments_;
     std::vector<symbol_ptr>  specials_;
 

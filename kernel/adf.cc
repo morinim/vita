@@ -44,17 +44,13 @@ namespace vita
     return code.eff_size() >= 2;
   }
 
-
-
-
   ///
   /// \param[in] ind the code for the ADF.
   /// \param[in] sv types of the function arguments.
   /// \param[in] w the weight of the ADF.
   ///
-  adf_n::adf_n(const individual &ind, const std::vector<symbol_t> &sv,
-               unsigned w)
-    : function("ADFn", ind.type(), sv, w), adf_(ind)
+  adf::adf(const individual &ind, const std::vector<symbol_t> &sv, unsigned w)
+    : function("ADF", ind.type(), sv, w), core_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 
@@ -67,26 +63,26 @@ namespace vita
   ///
   /// adf_n functions need input parameters from the \a i context.
   ///
-  boost::any adf_n::eval(interpreter *i) const
+  boost::any adf::eval(interpreter *i) const
   {
-    return interpreter(adf_.code, i)();
+    return interpreter(core_.code, i)();
   }
 
   ///
   /// \return the code (\a individual) of the ADF.
   ///
-  const individual &adf_n::get_code() const
+  const individual &adf::get_code() const
   {
-    return adf_.code;
+    return core_.code;
   }
 
   ///
   /// \return the name of the ADF.
   ///
-  std::string adf_n::display() const
+  std::string adf::display() const
   {
     std::ostringstream s;
-    s << "ADFn" << '_' << adf_.id;
+    s << "ADF" << '_' << core_.id;
 
     return s.str();
   }
@@ -94,24 +90,22 @@ namespace vita
   ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
-  bool adf_n::check() const
+  bool adf::check() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(adf_.code); i(); ++i)
+    for (individual::const_iterator i(core_.code); i(); ++i)
       if (i->sym.get() == this)
         return false;
 
-    return adf_.check() && function::check();
+    return core_.check() && function::check();
   }
 
-
-
   ///
-  /// \param[in] ind the code for the ADF.
-  /// \param[in] w the weight of the ADF.
+  /// \param[in] ind the code for the ADT.
+  /// \param[in] w the weight of the ADT.
   ///
-  adf_0::adf_0(const individual &ind, unsigned w)
-    : terminal("ADF0", ind.type(), false, false, w), adf_(ind)
+  adt::adt(const individual &ind, unsigned w)
+    : terminal("ADT", ind.type(), false, false, w), core_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 
@@ -119,30 +113,30 @@ namespace vita
   }
 
   ///
-  /// \return the output of the ADF.
+  /// \return the output of the ADT.
   ///
-  /// adf_0 functions haven't input parameters so the context is not used.
+  /// adt hasn't input parameters so the context is not used.
   ///
-  boost::any adf_0::eval(interpreter *) const
+  boost::any adt::eval(interpreter *) const
   {
-    return interpreter(adf_.code)();
+    return interpreter(core_.code)();
   }
 
   ///
-  /// \return the code (\a individual) of the ADF.
+  /// \return the code (\a individual) of the ADT.
   ///
-  const individual &adf_0::get_code() const
+  const individual &adt::get_code() const
   {
-    return adf_.code;
+    return core_.code;
   }
 
   ///
-  /// \return the name of the ADF.
+  /// \return the name of the ADT.
   ///
-  std::string adf_0::display() const
+  std::string adt::display() const
   {
     std::ostringstream s;
-    s << "ADF0" << '_' << adf_.id;
+    s << "ADT" << '_' << core_.id;
 
     return s.str();
   }
@@ -150,13 +144,13 @@ namespace vita
   ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
-  bool adf_0::check() const
+  bool adt::check() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(adf_.code); i(); ++i)
+    for (individual::const_iterator i(core_.code); i(); ++i)
       if (i->sym.get() == this)
         return false;
 
-    return adf_.check() && terminal::check();
+    return core_.check() && terminal::check();
   }
 }  // Namespace vita

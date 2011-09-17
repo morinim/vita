@@ -49,7 +49,7 @@ namespace vita
   void symbol_set::clear()
   {
     adf_.clear();
-    adf0_.clear();
+    adt_.clear();
     symbols_.clear();
     terminals_.clear();
     specials_.clear();
@@ -68,12 +68,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] i index of an adf0 function.
-  /// \return a pointer to the i-th adf0 function.
+  /// \param[in] i index of an ADT symbol.
+  /// \return a pointer to the i-th ADT symbol.
   ///
-  symbol_ptr symbol_set::get_adf0(unsigned i) const
+  symbol_ptr symbol_set::get_adt(unsigned i) const
   {
-    return i < adf0_.size() ? adf0_[i] : symbol_ptr();
+    return i < adt_.size() ? adt_[i] : symbol_ptr();
   }
 
   ///
@@ -121,13 +121,13 @@ namespace vita
     {
       terminals_.push_back(i);
 
-      const adf_0 *const df(dynamic_cast<adf_0 *>(i.get()));
+      const adt *const df(dynamic_cast<adt *>(i.get()));
       if (df)
-        adf0_.push_back(i);
+        adt_.push_back(i);
     }
     else  // not a terminal
     {
-      const adf_n *const df(dynamic_cast<adf_n *>(i.get()));
+      const adf *const df(dynamic_cast<adf *>(i.get()));
       if (df)
         adf_.push_back(i);
     }
@@ -138,25 +138,25 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    for (unsigned i(0); i < adf0_.size(); ++i)
+    for (unsigned i(0); i < adt_.size(); ++i)
     {
-      const unsigned w(adf0_[i]->weight);
+      const unsigned w(adt_[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
                            w == 1 ? 1 : 0);
       sum_ -= delta;
-      adf0_[i]->weight -= delta;
+      adt_[i]->weight -= delta;
 
-      if (delta && adf0_[i]->weight == 0)
+      if (delta && adt_[i]->weight == 0)
       {
         for (unsigned j(0); j < terminals_.size(); ++j)
-          if (terminals_[j]->opcode() == adf0_[i]->opcode())
+          if (terminals_[j]->opcode() == adt_[i]->opcode())
           {
             terminals_.erase(terminals_.begin()+j);
             break;
           }
 
         for (unsigned j(0); j < symbols_.size(); ++j)
-          if (symbols_[j]->opcode() == adf0_[i]->opcode())
+          if (symbols_[j]->opcode() == adt_[i]->opcode())
           {
             symbols_.erase(symbols_.begin()+j);
             break;
@@ -260,11 +260,11 @@ namespace vita
         for (unsigned i(0); i < terminals_.size() && !found; ++i)
           found = (symbols_[j] == terminals_[i]);
 
-        if (dynamic_cast<adf_0 *>(symbols_[j].get()))
-          for (unsigned i(0); i < adf0_.size() && !found; ++i)
-            found = (symbols_[j] == adf0_[i]);
+        if (dynamic_cast<adt *>(symbols_[j].get()))
+          for (unsigned i(0); i < adt_.size() && !found; ++i)
+            found = (symbols_[j] == adt_[i]);
       }
-      else if (dynamic_cast<adf_n *>(symbols_[j].get()))
+      else if (dynamic_cast<adf *>(symbols_[j].get()))
         for (unsigned i(0); i < adf_.size() && !found; ++i)
           found = (symbols_[j] == adf_[i]);
       else

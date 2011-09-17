@@ -69,9 +69,9 @@ namespace vita
       if (prob_->env.stat_arl && adf_l.good())
       {
         unsigned i(0);
-        for (const symbol *f(prob_->env.sset.get_adf0(i).get());
+        for (const symbol *f(prob_->env.sset.get_adt(i).get());
              f;
-             f = prob_->env.sset.get_adf0(++i).get())
+             f = prob_->env.sset.get_adt(++i).get())
           adf_l << f->display() << ' ' << f->weight << std::endl;
         adf_l << std::endl;
       }
@@ -97,10 +97,10 @@ namespace vita
               std::vector<symbol_t> types;
               individual generalized(candidate_block.generalize(arl_args,
                                                                 0, &types));
-              p.reset(new vita::adf_n(generalized, types, 10));
+              p.reset(new vita::adf(generalized, types, 10));
             }
             else
-              p.reset(new vita::adf_0(candidate_block, 100));
+              p.reset(new vita::adt(candidate_block, 100));
             prob_->env.insert(p);
 
             if (prob_->env.stat_arl && adf_l.good())

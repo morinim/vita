@@ -27,7 +27,6 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/function.h"
 #include "kernel/individual.h"
 #include "kernel/terminal.h"
@@ -37,7 +36,7 @@ namespace vita
   class interpreter;
 
   ///
-  /// Human programmers organise sequences of repeated steps into reusable
+  /// Human programmers organize sequences of repeated steps into reusable
   /// components such as subroutines, functions and classes. They then
   /// repeatedly invoke these components, typically with different inputs.
   /// Reuse eliminates the need to "reinvent the wheel" every time a particular
@@ -50,11 +49,10 @@ namespace vita
   /// in Vita subroutines are used using the ARL scheme described in <"Discovery
   /// of subroutines in genetic programming" J.P. Rosca and D.H. Ballard>.
   ///
-  struct adf_core
+  class adf_core
   {
-  private:
-    friend class adf_0;
-    friend class adf_n;
+    friend class adf;
+    friend class adt;
 
     explicit adf_core(const individual &);
 
@@ -69,10 +67,10 @@ namespace vita
   ///
   /// Subroutine with arguments.
   ///
-  class adf_n : public function
+  class adf : public function
   {
   public:
-    adf_n(const individual &, const std::vector<symbol_t> &, unsigned);
+    adf(const individual &, const std::vector<symbol_t> &, unsigned);
 
     boost::any eval(interpreter *) const;
 
@@ -82,17 +80,17 @@ namespace vita
     bool check() const;
 
   private:
-    adf_core adf_;
+    adf_core core_;
   };
 
   ///
   /// Subroutines without arguments (see <"An Analysis of Automatic Subroutine
   /// Discovery in Genetic Programming" A.Dessi', A.Giani, A.Starita>).
   ///
-  class adf_0 : public terminal
+  class adt : public terminal
   {
   public:
-    adf_0(const individual &, unsigned);
+    adt(const individual &, unsigned);
 
     boost::any eval(interpreter *) const;
 
@@ -102,7 +100,7 @@ namespace vita
     bool check() const;
 
   private:
-    adf_core adf_;
+    adf_core core_;
   };
 }  // namespace vita
 

@@ -83,15 +83,15 @@ int main(int argc, char *argv[])
 
       if (first_terminal)
       {
-        std::vector<unsigned> positions;
+        std::vector<vita::locus_t> positions;
         std::vector<vita::symbol_t> types;
-        opt.generalize(2, &positions, &types);
+        vita::individual generalized(opt.generalize(2, &positions, &types));
 
         std::cout << std::endl;
         ib.list(std::cout);
 
         std::cout << "OPTIMIZED" << std::endl;
-        opt.list(std::cout);
+        generalized.list(std::cout);
 
         const unsigned arg_n(positions.size());
         std::cout << std::endl << "Arguments:";

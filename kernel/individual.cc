@@ -395,7 +395,7 @@ namespace vita
   /// \a symbol at line \a line with a new one ('sym' + 'args').
   ///
   individual individual::replace(symbol_ptr sym,
-                                 const std::vector<unsigned> &args,
+                                 const std::vector<locus_t> &args,
                                  unsigned line) const
   {
     assert(sym);
@@ -419,7 +419,7 @@ namespace vita
   /// \a symbol at line \a best_ with a new one ('sym' + 'args').
   ///
   individual individual::replace(symbol_ptr sym,
-                                 const std::vector<unsigned> &args) const
+                                 const std::vector<locus_t> &args) const
   {
     return replace(sym, args, best_);
   }
