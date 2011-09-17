@@ -239,11 +239,19 @@ namespace vita
   }
 
   ///
-  /// \return number of mutations performed.
+  /// \param[out] n_mutations number of mutations performed.
+  /// \return the mutated individual.
   ///
-  unsigned individual::mutation()
+  /// A new individual is created mutating \c this individual. If there are
+  /// special symbols (env_->sset.specials() > 0) they are protected from
+  /// mutation.
+  ///
+  individual individual::mutation(unsigned *n_mutations) const
   {
-    unsigned n_mut(0);
+    individual ret(*this);
+
+    if (n_mutations)
+      *n_mutations = 0;
 
     const unsigned specials(env_->sset.specials());
     assert(specials < size());
@@ -251,13 +259,15 @@ namespace vita
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(env_->p_mutation))
       {
-        ++n_mut;
-        code_[i] = gene(env_->sset, i+1, size());
+        if (n_mutations)
+          ++(*n_mutations);
+
+        ret.code_[i] = gene(env_->sset, i+1, size());
       }
 
     assert(check());
 
-    return n_mut;
+    return ret;
   }
 
   ///
@@ -432,17 +442,22 @@ namespace vita
   }
 
   ///
-  /// \param[in] max_args
-  /// \param[out] positions
-  /// \param[out] types
+  /// \param[in] max_args maximum number of arguments for the ADF.
+  /// \param[out] positions locus of the ADF arguments.
+  /// \param[out] types type of the ADF arguments.
+  /// \return the generalized individual.
   ///
-  void individual::generalize(std::size_t max_args,
-                              std::vector<unsigned> *const positions,
-                              std::vector<symbol_t> *const types)
+  /// Changes up to \a max_args terminals (exactly \a max_args when available)
+  /// of \c this individual with formal arguments, thus producing the body
+  /// for a ADF.
+  ///
+  individual individual::generalize(std::size_t max_args,
+                                    std::vector<locus_t> *const positions,
+                                    std::vector<symbol_t> *const types) const
   {
     assert(max_args && max_args <= gene::k_args);
 
-    std::vector<unsigned> terminals;
+    std::vector<locus_t> terminals;
 
     // Step 1: mark the active terminal symbols.
     unsigned line(best_);
@@ -465,9 +480,10 @@ namespace vita
       }
 
     // Step 3: randomly substitute n terminals with function arguments.
+    individual ret(*this);
     for (unsigned j(0); j < n; ++j)
     {
-      gene &g(code_[terminals[j]]);
+      gene &g(ret.code_[terminals[j]]);
       if (types)
         types->push_back(g.sym->type());
       if (positions)
@@ -478,6 +494,8 @@ namespace vita
     assert(!positions || (positions->size() && positions->size() <= max_args));
     assert(!types || (types->size() && types->size() <= max_args));
     assert(!positions || !types || positions->size() == types->size());
+
+    return ret;
   }
 
   ///

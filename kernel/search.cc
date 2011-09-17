@@ -95,8 +95,9 @@ namespace vita
             if (arl_args)
             {
               std::vector<symbol_t> types;
-              candidate_block.generalize(arl_args, 0, &types);
-              p.reset(new vita::adf_n(candidate_block, types, 10));
+              individual generalized(candidate_block.generalize(arl_args,
+                                                                0, &types));
+              p.reset(new vita::adf_n(generalized, types, 10));
             }
             else
               p.reset(new vita::adf_0(candidate_block, 100));

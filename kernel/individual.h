@@ -54,7 +54,7 @@ namespace vita
     virtual void list(std::ostream &) const;
     virtual void tree(std::ostream &) const;
 
-    virtual unsigned mutation();
+    virtual individual mutation(unsigned *const = 0) const;
     virtual individual uniform_cross(const individual &) const;
     virtual individual cross1(const individual &) const;
     virtual individual cross2(const individual &) const;
@@ -67,8 +67,8 @@ namespace vita
     individual replace(symbol_ptr, const std::vector<unsigned> &,
                        unsigned) const;
 
-    void generalize(std::size_t,
-                    std::vector<unsigned> *, std::vector<symbol_t> *);
+    individual generalize(std::size_t, std::vector<locus_t> *,
+                          std::vector<symbol_t> *) const;
 
     individual compact(unsigned * = 0) const;
     individual optimize(unsigned * = 0, unsigned * = 0) const;
