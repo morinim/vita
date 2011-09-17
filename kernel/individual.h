@@ -32,7 +32,6 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/gene.h"
 
 namespace vita
@@ -49,22 +48,22 @@ namespace vita
   public:
     individual(const environment &, bool);
 
-    void dump(std::ostream &) const;
-    void list(std::ostream &) const;
-    void inline_tree(std::ostream &) const;
-    void tree(std::ostream &) const;
-    void graphviz(std::ostream &, const std::string & = "") const;
+    virtual void dump(std::ostream &) const;
+    virtual void graphviz(std::ostream &, const std::string & = "") const;
+    virtual void in_line(std::ostream &) const;
+    virtual void list(std::ostream &) const;
+    virtual void tree(std::ostream &) const;
 
-    unsigned mutation();
-    individual uniform_cross(const individual &) const;
-    individual cross1(const individual &) const;
-    individual cross2(const individual &) const;
+    virtual unsigned mutation();
+    virtual individual uniform_cross(const individual &) const;
+    virtual individual cross1(const individual &) const;
+    virtual individual cross2(const individual &) const;
 
-    std::list<unsigned> blocks() const;
-    individual destroy_block(unsigned) const;
-    individual get_block(unsigned) const;
-    individual replace(symbol_ptr,
-                       const std::vector<unsigned> &) const;
+    virtual std::list<unsigned> blocks() const;
+    virtual individual destroy_block(unsigned) const;
+    virtual individual get_block(unsigned) const;
+    virtual individual replace(symbol_ptr,
+                               const std::vector<unsigned> &) const;
     individual replace(symbol_ptr, const std::vector<unsigned> &,
                        unsigned) const;
 
@@ -73,7 +72,7 @@ namespace vita
 
     individual compact(unsigned * = 0) const;
     individual optimize(unsigned * = 0, unsigned * = 0) const;
-    unsigned normalize(individual *const) const;
+    individual normalize(unsigned *const = 0) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }

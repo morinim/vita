@@ -102,20 +102,26 @@ int main(int argc, char *argv[])
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
   env.g_since_start = argc > 3 ? atoi(argv[3]) : 100;
 
-  env.insert(new X());
-  env.insert(new Y());
-  env.insert(new Z());
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
+  vita::symbol_ptr s_X(new X());
+  vita::symbol_ptr s_Y(new Y());
+  vita::symbol_ptr s_Z(new Z());
+  vita::symbol_ptr s_add(new vita::sr::add());
+  vita::symbol_ptr s_sub(new vita::sr::sub());
+  vita::symbol_ptr s_mul(new vita::sr::mul());
+  vita::symbol_ptr s_ifl(new vita::sr::ifl());
+  vita::symbol_ptr s_ife(new vita::sr::ife());
+  env.insert(s_X);
+  env.insert(s_Y);
+  env.insert(s_Z);
+  env.insert(s_add);
+  env.insert(s_sub);
+  env.insert(s_mul);
+  env.insert(s_ifl);
+  env.insert(s_ife);
 
-  std::auto_ptr<vita::evaluator> eva(new fitness());
+  std::unique_ptr<vita::evaluator> eva(new fitness());
 
   vita::evolution(&env, eva.get())(true, 1);
-
-  env.sset.delete_symbols();
 
   return EXIT_SUCCESS;
 }

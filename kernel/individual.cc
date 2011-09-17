@@ -239,13 +239,11 @@ namespace vita
   }
 
   ///
-  /// \param[out] norm individual that have to be normalized.
-  /// \return locus of the first terminal.
+  /// \param[out] ft locus of the first terminal after normalization.
+  /// \return individual normalized.
   ///
-  unsigned individual::normalize(individual *const norm) const
+  individual individual::normalize(unsigned *const ft) const
   {
-    assert(norm);
-
     unsigned index(size());
 
     individual dest(*env_, false);
@@ -255,12 +253,13 @@ namespace vita
     if (ret)
     {
       dest.best_ = index;
-
-      *norm = dest;
-      assert(norm->eff_size() == norm->size() - norm->best_);
+      assert(dest.eff_size() == dest.size() - dest.best_);
     }
 
-    return ret;
+    if (ft)
+      *ft = ret;
+
+    return dest;
   }
 
   ///
@@ -487,7 +486,7 @@ namespace vita
   /// \param[in] sym symbol used for replacement.
   /// \param[in] args new arguments.
   /// \param[in] line locus where replacement take place.
-  /// \return a new individual with a line replaced.
+  /// \return a new \a individual with a gene replaced.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a line with a new one ('sym' + 'args').
@@ -757,7 +756,7 @@ namespace vita
   /// spaces. Not at all human readable, but a compact representation for
   /// import / export.
   ///
-  void individual::inline_tree(std::ostream &s) const
+  void individual::in_line(std::ostream &s) const
   {
     unsigned line(best_);
     for (const_iterator it(*this); it(); line = ++it)

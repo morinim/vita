@@ -39,26 +39,34 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  env.insert(new vita::sr::number(-200, 200));
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
-  env.insert(new vita::sr::abs());
-  env.insert(new vita::sr::ln());
+  vita::symbol_ptr s1(new vita::sr::number(-200, 200));
+  vita::symbol_ptr s2(new vita::sr::add());
+  vita::symbol_ptr s3(new vita::sr::sub());
+  vita::symbol_ptr s4(new vita::sr::mul());
+  vita::symbol_ptr s5(new vita::sr::ifl());
+  vita::symbol_ptr s6(new vita::sr::ife());
+  vita::symbol_ptr s7(new vita::sr::abs());
+  vita::symbol_ptr s8(new vita::sr::ln());
+  env.insert(s1);
+  env.insert(s2);
+  env.insert(s3);
+  env.insert(s4);
+  env.insert(s5);
+  env.insert(s6);
+  env.insert(s7);
+  env.insert(s8);
 
   vita::distribution<double> individuals, blocks_len, blocks_n, arguments;
 
   for (unsigned k(0); k < n; ++k)
   {
-    vita::individual base;
-    unsigned base_es;
-    do
+    vita::individual base(env, true);
+    unsigned base_es(base.eff_size());
+    while (base_es < 5)
     {
       base = vita::individual(env, true);
       base_es = base.eff_size();
-    } while (base_es < 5);
+    }
 
     individuals.add(base_es);
 
@@ -70,8 +78,8 @@ int main(int argc, char *argv[])
     for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
     {
       vita::individual ib(base.get_block(*i));
-      vita::individual norm;
-      const unsigned first_terminal(ib.normalize(&norm));
+      unsigned first_terminal;
+      vita::individual norm(ib.normalize(&first_terminal));
 
       if (first_terminal)
       {

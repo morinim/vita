@@ -32,7 +32,6 @@
 #include <sstream>
 #include <string>
 
-#include "kernel/vita.h"
 #include "kernel/function.h"
 #include "kernel/interpreter.h"
 #include "kernel/random.h"

@@ -161,7 +161,7 @@ namespace vita
                     << i->second.counter[active];
 
         dynamic << " \"";
-        stats_.best->inline_tree(dynamic);
+        stats_.best->in_line(dynamic);
         dynamic << '"' << std::endl;
       }
     }

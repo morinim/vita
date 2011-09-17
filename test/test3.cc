@@ -24,8 +24,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "boost/assign.hpp"
-
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
 #include "kernel/primitive/sr_pri.h"
@@ -57,20 +55,14 @@ struct F
   ~F()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
-    delete num;
-    delete f_add;
-    delete f_sub;
-    delete f_mul;
-    delete f_ifl;
-    delete f_ife;
   }
 
-  vita::sr::number *const num;
-  vita::sr::add *const f_add;
-  vita::sr::sub *const f_sub;
-  vita::sr::mul *const f_mul;
-  vita::sr::ifl *const f_ifl;
-  vita::sr::ife *const f_ife;
+  vita::symbol_ptr num;
+  vita::symbol_ptr f_add;
+  vita::symbol_ptr f_sub;
+  vita::symbol_ptr f_mul;
+  vita::symbol_ptr f_ifl;
+  vita::symbol_ptr f_ife;
 
   vita::environment env;
 };

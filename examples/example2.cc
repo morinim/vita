@@ -25,7 +25,6 @@
 #include <iostream>
 #include <memory>
 
-#include "kernel/vita.h"
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
 #include "kernel/primitive/sr_pri.h"
@@ -42,12 +41,18 @@ int main(int argc, char *const argv[])
   // Size of an individual.
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
 
-  env.insert(new vita::sr::number(-200, 200));
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
+  vita::symbol_ptr s1(new vita::sr::number(-200, 200));
+  vita::symbol_ptr s2(new vita::sr::add());
+  vita::symbol_ptr s3(new vita::sr::sub());
+  vita::symbol_ptr s4(new vita::sr::mul());
+  vita::symbol_ptr s5(new vita::sr::ifl());
+  vita::symbol_ptr s6(new vita::sr::ife());
+  env.insert(s1);
+  env.insert(s2);
+  env.insert(s3);
+  env.insert(s4);
+  env.insert(s5);
+  env.insert(s6);
 
   vita::population p(&env);
 

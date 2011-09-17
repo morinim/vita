@@ -4,9 +4,6 @@
 
 
 
-# Specify the main target.
-TARGET =
-
 # Build type: debug, profile, release.
 TYPE = release
 

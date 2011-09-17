@@ -39,26 +39,34 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 5;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  env.insert(new vita::sr::number(-200, 200));
-  env.insert(new vita::sr::add());
-  env.insert(new vita::sr::sub());
-  env.insert(new vita::sr::mul());
-  env.insert(new vita::sr::ifl());
-  env.insert(new vita::sr::ife());
-  env.insert(new vita::sr::abs());
-  env.insert(new vita::sr::ln());
+  vita::symbol_ptr s1(new vita::sr::number(-200, 200));
+  vita::symbol_ptr s2(new vita::sr::add());
+  vita::symbol_ptr s3(new vita::sr::sub());
+  vita::symbol_ptr s4(new vita::sr::mul());
+  vita::symbol_ptr s5(new vita::sr::ifl());
+  vita::symbol_ptr s6(new vita::sr::ife());
+  vita::symbol_ptr s7(new vita::sr::abs());
+  vita::symbol_ptr s8(new vita::sr::ln());
+  env.insert(s1);
+  env.insert(s2);
+  env.insert(s3);
+  env.insert(s4);
+  env.insert(s5);
+  env.insert(s6);
+  env.insert(s7);
+  env.insert(s8);
 
   for (unsigned k(0); k < n; ++k)
   {
     // We build, by repeated trials, an individual we an effective size greater
     // than 4.
-    vita::individual base;
-    unsigned base_es;
-    do
+    vita::individual base(env, true);
+    unsigned base_es(base.eff_size());
+    while (base_es < 5)
     {
       base = vita::individual(env, true);
       base_es = base.eff_size();
-    } while (base_es < 5);
+    }
 
     std::cout << std::string(40, '-') << std::endl << "BASE" << std::endl;
     base.list(std::cout);
@@ -69,8 +77,8 @@ int main(int argc, char *argv[])
     {
       vita::individual blk(base.get_block(*i));
 
-      vita::individual norm;
-      const unsigned first_terminal(blk.normalize(&norm));
+      unsigned first_terminal;
+      vita::individual norm(blk.normalize(&first_terminal));
       if (first_terminal)
       {
         std::cout << std::endl << "BLOCK at line " << *i << std::endl;
@@ -100,7 +108,7 @@ int main(int argc, char *argv[])
           std::vector<unsigned> positions;
           std::vector<vita::symbol_t> types;
           blk2.generalize(2, &positions, &types);
-          vita::adf_n *const f = new vita::adf_n(blk2, types, 100);
+          vita::symbol_ptr f(new vita::adf_n(blk2, types, 100));
           env.insert(f);
           std::cout << std::endl << f->display() << std::endl;
           blk2.list(std::cout);

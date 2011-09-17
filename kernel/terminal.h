@@ -26,7 +26,6 @@
 
 #include <string>
 
-#include "kernel/vita.h"
 #include "kernel/symbol.h"
 
 namespace vita

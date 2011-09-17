@@ -145,7 +145,7 @@ namespace vita
     const gene context_g(context_->ind_.code_[context_->ip_]);
 
     assert(context_ && context_->check() && i < gene::k_args &&
-           dynamic_cast<const adf_n *>(context_g.sym));
+           dynamic_cast<const adf_n *>(context_g.sym.get()));
 
     return context_->eval(i);
   }

@@ -24,7 +24,6 @@
 #if !defined(EVALUATOR_H)
 #define      EVALUATOR_H
 
-#include "kernel/vita.h"
 #include "kernel/fitness.h"
 #include "kernel/random.h"
 
