@@ -72,7 +72,6 @@ namespace vita
 
     individual compact(unsigned * = 0) const;
     individual optimize(unsigned * = 0, unsigned * = 0) const;
-    individual normalize(unsigned *const = 0) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }
@@ -109,9 +108,6 @@ namespace vita
     friend class    interpreter;
 
   private:
-    static unsigned normalize(const individual &,
-                              const std::vector<unsigned> *, unsigned &,
-                              individual *);
     void pack(std::vector<boost::uint8_t> *const, unsigned) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);

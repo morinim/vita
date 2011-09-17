@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
       vita::individual blk(base.get_block(*i));
 
       unsigned first_terminal;
-      vita::individual norm(blk.normalize(&first_terminal));
+      vita::individual opt(blk.optimize(&first_terminal));
       if (first_terminal)
       {
         std::cout << std::endl << "BLOCK at line " << *i << std::endl;
@@ -90,21 +90,21 @@ int main(int argc, char *argv[])
           std::cout << "Output: " << boost::any_cast<double>(val);
         std::cout << std::endl;
 
-        std::cout << std::endl << "NORMALIZED" << std::endl;
-        norm.list(std::cout);
-        const boost::any val_n((vita::interpreter(norm))());
+        std::cout << std::endl << "OPTIMIZED" << std::endl;
+        opt.list(std::cout);
+        const boost::any val_n((vita::interpreter(opt))());
 
         if ( val.empty() != val_n.empty() ||
              (!val.empty() && !val_n.empty() &&
               boost::any_cast<double>(val) != boost::any_cast<double>(val_n)) )
         {
-          std::cout << "NORMALIZED BLOCK EVAL ERROR." << std::endl;
+          std::cout << "OPTIMIZED BLOCK EVAL ERROR." << std::endl;
           return EXIT_FAILURE;
         }
 
-        if (norm.eff_size() <= 20)
+        if (opt.eff_size() <= 20)
         {
-          vita::individual blk2(norm);
+          vita::individual blk2(opt);
           std::vector<unsigned> positions;
           std::vector<vita::symbol_t> types;
           blk2.generalize(2, &positions, &types);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
           std::cout << std::endl << f->display() << std::endl;
           blk2.list(std::cout);
 
-          vita::individual blk3(norm.replace(f, positions));
+          vita::individual blk3(opt.replace(f, positions));
           std::cout << std::endl;
           blk3.list(std::cout);
           const boost::any val3((vita::interpreter(blk3))());

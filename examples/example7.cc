@@ -79,19 +79,19 @@ int main(int argc, char *argv[])
     {
       vita::individual ib(base.get_block(*i));
       unsigned first_terminal;
-      vita::individual norm(ib.normalize(&first_terminal));
+      vita::individual opt(ib.optimize(&first_terminal));
 
       if (first_terminal)
       {
         std::vector<unsigned> positions;
         std::vector<vita::symbol_t> types;
-        norm.generalize(2, &positions, &types);
+        opt.generalize(2, &positions, &types);
 
         std::cout << std::endl;
         ib.list(std::cout);
 
-        std::cout << "NORMALIZED" << std::endl;
-        norm.list(std::cout);
+        std::cout << "OPTIMIZED" << std::endl;
+        opt.list(std::cout);
 
         const unsigned arg_n(positions.size());
         std::cout << std::endl << "Arguments:";

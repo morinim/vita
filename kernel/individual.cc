@@ -114,7 +114,7 @@ namespace vita
   /// \param[out] last_s pointer to the last symbol of the optimized individual.
   /// \return a new optimized individual.
   ///
-  /// Create a new individual functionally equivalent to \c this but with the
+  /// Create a new \a individual functionally equivalent to \c this but with the
   /// active functions compacted and stored at the beginning of the code vector
   /// and active terminals grouped at the end of the block. Redundant terminals
   /// are removed.
@@ -235,113 +235,6 @@ namespace vita
     ret.best_ = locus;
 
     assert(ret.check());
-    return ret;
-  }
-
-  ///
-  /// \param[out] ft locus of the first terminal after normalization.
-  /// \return individual normalized.
-  ///
-  individual individual::normalize(unsigned *const ft) const
-  {
-    unsigned index(size());
-
-    individual dest(*env_, false);
-
-    const unsigned ret(normalize(*this, 0, index, &dest));
-
-    if (ret)
-    {
-      dest.best_ = index;
-      assert(dest.eff_size() == dest.size() - dest.best_);
-    }
-
-    if (ft)
-      *ft = ret;
-
-    return dest;
-  }
-
-  ///
-  /// \param[in] src individual that should be normalized.
-  /// \param[in] args
-  /// \param[in,out] dest_l
-  /// \param[out] dest
-  /// \return locus of the first terminal.
-  ///
-  unsigned individual::normalize(const individual &src,
-                                 const std::vector<unsigned> *args,
-                                 unsigned &dest_l, individual *dest)
-  {
-    unsigned first_terminal, last_terminal;
-    individual source(src.optimize(&first_terminal, &last_terminal));
-    const unsigned ret(src.size() - (last_terminal - first_terminal + 1));
-
-    // Step 1: mark the active terminal symbols.
-    const unsigned cs(source.size());
-    std::vector<int> ll(cs, -1);
-    for (unsigned i(source.best_); i <= last_terminal; ++i)
-      ll[i] = i;
-
-    assert(source.best_ < last_terminal);
-    unsigned i(last_terminal+1);
-    do
-    {
-      if (!dest_l)
-        return 0;
-
-      --i;
-
-      if (ll[i] >= 0)
-      {
-        const symbol *const s(source.code_[i].sym.get());
-        const adf_n *const padf_n(dynamic_cast<const adf_n *>(s));
-        const adf_0 *const padf_0(dynamic_cast<const adf_0 *>(s));
-        if (padf_n || padf_0)
-        {
-          if (padf_n)
-          {
-            const unsigned n_arg(s->arity());
-            std::vector<unsigned> args1(n_arg);
-            for (unsigned j(0); j < n_arg; ++j)
-              args1[j] = ll[source.code_[i].args[j]];
-
-            if (!normalize(padf_n->get_code(), &args1, dest_l, dest))
-              return 0;
-          }
-          else  // padf_0
-          {
-            std::vector<unsigned> args1(0);
-            if (!normalize(padf_0->get_code(), &args1, dest_l, dest))
-              return 0;
-          }
-
-          ll[i] = dest_l;
-        }
-        else  // Not ADF
-        {
-          symbol_ptr sym(source.code_[i].sym);
-
-          const argument *parg(dynamic_cast<const argument *>(sym.get()));
-          if (args && parg)
-            ll[i] = (*args)[parg->index()];
-          else
-          {
-            --dest_l;
-
-            dest->code_[dest_l].sym = sym;
-            if (sym->parametric())
-              dest->code_[dest_l].par = source.code_[i].par;
-            else  // not parametric
-              for (unsigned j(0); j < source.code_[i].sym->arity(); ++j)
-                dest->code_[dest_l].args[j] = ll[source.code_[i].args[j]];
-
-            ll[i] = dest_l;
-          }
-        }
-      }
-    } while (i > source.best_);
-
     return ret;
   }
 
@@ -508,8 +401,8 @@ namespace vita
   }
 
   ///
-  /// \param[in] sym
-  /// \param[in] args
+  /// \param[in] sym symbol ysed for replacement.
+  /// \param[in] args new arguments.
   /// \return a new individual with \a best_ line replaced.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
