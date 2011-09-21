@@ -85,8 +85,8 @@ namespace vita
   /// \param[in] i i-th argument of the current function.
   /// \return the value of the i-th argument of the current function.
   ///
-  /// We use a cache to avoid recalculating the same value during one
-  /// interpreter execution.
+  /// We use a cache to avoid recalculating the same value during the same
+  /// \a interpreter execution.
   /// This means that side effects are not evaluated to date: WE ASSUME
   /// REFERENTIAL TRANSPARENCY for all the expressions.
   /// [http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)]
@@ -142,11 +142,12 @@ namespace vita
   ///
   boost::any interpreter::eval_adf_arg(unsigned i)
   {
+#if !defined(NDEBUG)
     const gene context_g(context_->ind_.code_[context_->ip_]);
 
     assert(context_ && context_->check() && i < gene::k_args &&
-           dynamic_cast<const adf_n *>(context_g.sym.get()));
-
+           (!context_g.sym->terminal() && context_g.sym->auto_defined()));
+#endif
     return context_->eval(i);
   }
 

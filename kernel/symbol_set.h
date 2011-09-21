@@ -50,11 +50,12 @@ namespace vita
 
     void insert(symbol_ptr, bool);
 
-    symbol_ptr roulette(bool = false) const;
-    symbol_ptr arg(unsigned) const;
-    symbol_ptr get_special(unsigned) const;
+    const symbol_ptr &roulette(bool = false) const;
+    const symbol_ptr &arg(unsigned) const;
+    const symbol_ptr &get_adt(unsigned) const;
+    unsigned adts() const;
+    const symbol_ptr &get_special(unsigned) const;
     unsigned specials() const;
-    symbol_ptr get_adt(unsigned) const;
 
     void reset_adf_weights();
 

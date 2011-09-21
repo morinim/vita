@@ -88,6 +88,14 @@ namespace vita
   }
 
   ///
+  /// \return \c true.
+  ///
+  bool adf::auto_defined() const
+  {
+    return true;
+  }
+
+  ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
   bool adf::check() const
@@ -139,6 +147,14 @@ namespace vita
     s << "ADT" << '_' << core_.id;
 
     return s.str();
+  }
+
+  ///
+  /// \return \c true.
+  ///
+  bool adt::auto_defined() const
+  {
+    return true;
   }
 
   ///

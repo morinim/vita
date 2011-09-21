@@ -90,7 +90,7 @@ namespace vita
   }
 
   ///
-  /// \return true if the terminal is an input variable.
+  /// \return \c true if the terminal is an input variable.
   ///
   /// An input variable is a feature from the learning domain.
   ///

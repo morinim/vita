@@ -57,6 +57,8 @@ namespace vita
     symbol_t type() const;
     virtual symbol_t arg_type(unsigned) const = 0;
 
+    virtual bool auto_defined() const;
+
     virtual std::string display() const;
     virtual std::string display(int) const;
     virtual int init() const;
@@ -85,9 +87,9 @@ namespace vita
   };
 
   ///
-  /// \param[in] dis
-  /// \param[in] t
-  /// \param[in] w
+  /// \param[in] dis string used for printing.
+  /// \param[in] t type of the symbol.
+  /// \param[in] w weight (used for random selection).
   ///
   inline
   symbol::symbol(const std::string &dis, symbol_t t, unsigned w)
@@ -135,6 +137,16 @@ namespace vita
   opcode_t symbol::opcode() const
   {
     return opcode_;
+  }
+
+  ///
+  /// \return \c true if the \a symbol has been automatically defined (e.g.
+  ///         ADF / ADT), \c false otherwise (this is the default value).
+  ///
+  inline
+  bool symbol::auto_defined() const
+  {
+    return false;
   }
 }  // namespace vita
 

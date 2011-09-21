@@ -61,7 +61,7 @@ namespace vita
   /// \param[in] n index of an argument symbol.
   /// \return a pointer to the n-th argument symbol.
   ///
-  symbol_ptr symbol_set::arg(unsigned n) const
+  const symbol_ptr &symbol_set::arg(unsigned n) const
   {
     assert(n < gene::k_args);
     return arguments_[n];
@@ -71,16 +71,25 @@ namespace vita
   /// \param[in] i index of an ADT symbol.
   /// \return a pointer to the i-th ADT symbol.
   ///
-  symbol_ptr symbol_set::get_adt(unsigned i) const
+  const symbol_ptr &symbol_set::get_adt(unsigned i) const
   {
-    return i < adt_.size() ? adt_[i] : symbol_ptr();
+    assert(i < adt_.size());
+    return adt_[i];
+  }
+
+  ///
+  /// \return the number of ADT functions stored.
+  ///
+  unsigned symbol_set::adts() const
+  {
+    return adt_.size();
   }
 
   ///
   /// \param[in] n index of a special \a symbol.
   /// \return a pointer to the n-th special \a symbol.
   ///
-  symbol_ptr symbol_set::get_special(unsigned n) const
+  const symbol_ptr &symbol_set::get_special(unsigned n) const
   {
     assert(n < specials_.size());
     return specials_[n];
@@ -121,16 +130,12 @@ namespace vita
     {
       terminals_.push_back(i);
 
-      const adt *const df(dynamic_cast<adt *>(i.get()));
-      if (df)
+      if (i->auto_defined())
         adt_.push_back(i);
     }
     else  // not a terminal
-    {
-      const adf *const df(dynamic_cast<adf *>(i.get()));
-      if (df)
+      if (i->auto_defined())
         adf_.push_back(i);
-    }
 
     assert(check());
   }
@@ -138,7 +143,7 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    for (unsigned i(0); i < adt_.size(); ++i)
+    for (unsigned i(0); i < adts(); ++i)
     {
       const unsigned w(adt_[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
@@ -181,7 +186,7 @@ namespace vita
   /// If \a only_t == \c true extracts a \a terminal else a random \a symbol
   /// (may be a \a terminal, a primitive function or an ADF).
   ///
-  symbol_ptr symbol_set::roulette(bool only_t) const
+  const symbol_ptr &symbol_set::roulette(bool only_t) const
   {
     assert(sum_);
 
@@ -260,15 +265,16 @@ namespace vita
         for (unsigned i(0); i < terminals_.size() && !found; ++i)
           found = (symbols_[j] == terminals_[i]);
 
-        if (dynamic_cast<adt *>(symbols_[j].get()))
-          for (unsigned i(0); i < adt_.size() && !found; ++i)
+        if (symbols_[j]->auto_defined())
+          for (unsigned i(0); i < adts() && !found; ++i)
             found = (symbols_[j] == adt_[i]);
       }
-      else if (dynamic_cast<adf *>(symbols_[j].get()))
-        for (unsigned i(0); i < adf_.size() && !found; ++i)
-          found = (symbols_[j] == adf_[i]);
-      else
-        found = true;
+      else  // Function
+        if (symbols_[j]->auto_defined())
+          for (unsigned i(0); i < adf_.size() && !found; ++i)
+            found = (symbols_[j] == adf_[i]);
+        else
+          found = true;
 
       if (!found)
         return false;

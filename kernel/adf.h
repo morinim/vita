@@ -77,6 +77,8 @@ namespace vita
     const individual &get_code() const;
     std::string display() const;
 
+    bool auto_defined() const;
+
     bool check() const;
 
   private:
@@ -96,6 +98,8 @@ namespace vita
 
     const individual &get_code() const;
     std::string display() const;
+
+    bool auto_defined() const;
 
     bool check() const;
 

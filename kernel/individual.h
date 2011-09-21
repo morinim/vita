@@ -48,21 +48,21 @@ namespace vita
   public:
     individual(const environment &, bool);
 
-    virtual void dump(std::ostream &) const;
-    virtual void graphviz(std::ostream &, const std::string & = "") const;
-    virtual void in_line(std::ostream &) const;
-    virtual void list(std::ostream &) const;
-    virtual void tree(std::ostream &) const;
+    void dump(std::ostream &) const;
+    void graphviz(std::ostream &, const std::string & = "") const;
+    void in_line(std::ostream &) const;
+    void list(std::ostream &) const;
+    void tree(std::ostream &) const;
 
-    virtual individual mutation(unsigned *const = 0) const;
-    virtual individual uniform_cross(const individual &) const;
-    virtual individual cross1(const individual &) const;
-    virtual individual cross2(const individual &) const;
+    unsigned mutation();
+    individual &uniform_cross(const individual &);
+    individual cross1(const individual &) const;
+    individual cross2(const individual &) const;
 
-    virtual std::list<unsigned> blocks() const;
-    virtual individual destroy_block(unsigned) const;
-    virtual individual get_block(unsigned) const;
-    virtual individual replace(symbol_ptr, const std::vector<locus_t> &) const;
+    std::list<unsigned> blocks() const;
+    individual &destroy_block(unsigned);
+    individual get_block(unsigned) const;
+    individual replace(symbol_ptr, const std::vector<locus_t> &) const;
     individual replace(symbol_ptr, const std::vector<locus_t> &,
                        unsigned) const;
 

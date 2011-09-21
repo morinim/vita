@@ -239,19 +239,15 @@ namespace vita
   }
 
   ///
-  /// \param[out] n_mutations number of mutations performed.
-  /// \return the mutated individual.
+  /// \return number of mutations performed.
   ///
   /// A new individual is created mutating \c this individual. If there are
   /// special symbols (env_->sset.specials() > 0) they are protected from
   /// mutation.
   ///
-  individual individual::mutation(unsigned *n_mutations) const
+  unsigned individual::mutation()
   {
-    individual ret(*this);
-
-    if (n_mutations)
-      *n_mutations = 0;
+    unsigned n_mutations(0);
 
     const unsigned specials(env_->sset.specials());
     assert(specials < size());
@@ -259,20 +255,19 @@ namespace vita
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(env_->p_mutation))
       {
-        if (n_mutations)
-          ++(*n_mutations);
+        ++n_mutations;
 
-        ret.code_[i] = gene(env_->sset, i+1, size());
+        code_[i] = gene(env_->sset, i+1, size());
       }
 
     assert(check());
 
-    return ret;
+    return n_mutations;
   }
 
   ///
-  /// \param[in] parent
-  /// \return the individual result of the crossover.
+  /// \param[in] parent the second parent (being this the first).
+  /// \return a pointer to \c this.
   ///
   /// Uniform crossover, as the name suggests, is a GP operator inspired by the
   /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
@@ -286,7 +281,7 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual individual::uniform_cross(const individual &parent) const
+  individual &individual::uniform_cross(const individual &parent)
   {
     assert(check() && parent.check());
 
@@ -294,13 +289,10 @@ namespace vita
 
     assert(parent.size() == cs);
 
-    individual offspring(*env_, false);
-
     for (unsigned i(0); i < cs; ++i)
-      offspring.code_[i] = random::boolean() ? code_[i] : parent.code_[i];
+      code_[i] = random::boolean() ? code_[i] : parent.code_[i];
 
-    assert(offspring.check());
-    return offspring;
+    return *this;
   }
 
   ///
@@ -426,19 +418,19 @@ namespace vita
 
   ///
   /// \param[in] line index of a \a symbol in the \a individual.
-  /// \return a new \a individual obtained from \c this inserting a random
-  ///         \a terminal at index \a line.
+  /// \return a reference to \c this.
   ///
-  individual individual::destroy_block(unsigned line) const
+  /// Modify \c this inserting a random \a terminal at index \a line.
+  ///
+  individual &individual::destroy_block(unsigned line)
   {
     assert(line < size() && !code_[line].sym->terminal());
 
-    individual ret(*this);
+    code_[line] = gene(env_->sset);
 
-    ret.code_[line] = gene(env_->sset);
+    assert(check());
 
-    assert(ret.check());
-    return ret;
+    return *this;
   }
 
   ///

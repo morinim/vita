@@ -50,7 +50,7 @@ namespace vita
     std::vector<individual> operator()(const std::vector<unsigned> &);
 
     virtual individual crossover(const individual &, const individual &) const;
-    virtual individual mutation(const individual &, unsigned * = 0) const;
+    virtual unsigned mutation(individual *const) const;
 
     summary *stats;
   };
@@ -68,18 +68,16 @@ namespace vita
   individual standard_op::crossover(const individual &p1,
                                     const individual &p2) const
   {
-    return p1.uniform_cross(p2);
+    return individual(p1).uniform_cross(p2);
   }
 
   ///
   /// \param[in] ind individual that should be mutated.
-  /// \param[out] n_mutations number of mutations performed.
-  /// \return the mutated individual.
+  /// \return number of mutations performed.
   ///
-  individual standard_op::mutation(const individual &ind,
-                                   unsigned *n_mutations) const
+  unsigned standard_op::mutation(individual *const ind) const
   {
-    return ind.mutation(n_mutations);
+    return ind->mutation();
   }
 
   ///
@@ -96,15 +94,14 @@ namespace vita
     const unsigned r1(parent[0]), r2(parent[1]);
 
     const bool cross(random::boolean(pop.env().p_cross));
+
     std::vector<individual> off
     { cross ? crossover(pop[r1], pop[r2]) : pop[random::boolean() ? r1 : r2]};
 
     if (cross)
       ++stats_->crossovers;
 
-    unsigned n_mutations(0);
-    off[0] = mutation(off[0], &n_mutations);
-    stats_->mutations += n_mutations;
+    stats_->mutations += mutation(&off[0]);
 
     assert(off[0].check());
 
