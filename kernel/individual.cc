@@ -23,22 +23,30 @@
 
 #include <algorithm>
 
+#include "kernel/individual.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
 #include "kernel/environment.h"
-#include "kernel/individual.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
+#include "kernel/transformer.h"
 
 namespace vita
 {
+  std::vector<std::shared_ptr<const transformer>> individual::cross_array_
+  {
+    std::shared_ptr<const transformer>(new uniform_crossover()),
+    std::shared_ptr<const transformer>(new one_point_crossover()),
+    std::shared_ptr<const transformer>(new two_point_crossover())
+  };
+
   ///
   /// \param[in] e base environment.
   /// \param[in] gen if true generates a random sequence of genes to initialize
   ///                the individual.
   ///
   individual::individual(const environment &e, bool gen)
-    : best_(0), env_(&e), code_(e.code_length)
+    : active_cross_(0), best_(0), env_(&e), code_(e.code_length)
   {
     assert(e.check());
 
@@ -266,88 +274,20 @@ namespace vita
   }
 
   ///
-  /// \param[in] parent the second parent (being this the first).
+  /// \param[in] parent2 the second parent (being \c this the first).
   /// \return a pointer to \c this.
   ///
-  /// Uniform crossover, as the name suggests, is a GP operator inspired by the
-  /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
-  /// algorithms - Proceedings of the Third International Conference on Genetic
-  /// Algorithms. 1989). GA uniform crossover constructs offspring on a
-  /// bitwise basis, copying each allele from each parent with a 50%
-  /// probability. Thus the information at each gene location is equally likely
-  /// to have come from either parent and on average each parent donates 50%
-  /// of its genetic material. The whole operation, of course, relies on the
-  /// fact that all the chromosomes in the population are of the same structure
-  /// and the same length. GP uniform crossover begins with the observation that
-  /// many parse trees are at least partially structurally similar.
+  /// There are some predefined crossover operators: we use the \c active_cross_
+  /// index to choose which one to use. For a description of the available
+  /// operators see the \see transformation \c class.
   ///
-  individual &individual::uniform_cross(const individual &parent)
+  individual individual::crossover(const individual &parent2) const
   {
-    assert(check() && parent.check());
+    assert(check());
+    assert(parent2.check());
+    assert(active_cross_ < cross_array.size());
 
-    const unsigned cs(size());
-
-    assert(parent.size() == cs);
-
-    for (unsigned i(0); i < cs; ++i)
-      code_[i] = random::boolean() ? code_[i] : parent.code_[i];
-
-    return *this;
-  }
-
-  ///
-  /// \param[in] parent
-  /// \return
-  ///
-  individual individual::cross1(const individual &parent) const
-  {
-    assert(check() && parent.check());
-
-    const unsigned cs(size());
-
-    const unsigned cut(random::between<unsigned>(0, cs-1));
-
-    const individual *parents[2] = {this, &parent};
-    const bool base(random::boolean());
-
-    individual offspring(*env_, false);
-
-    for (unsigned i(0); i < cut; ++i)
-      offspring.code_[i] = parents[base]->code_[i];
-    for (unsigned i(cut); i < cs; ++i)
-      offspring.code_[i] = parents[!base]->code_[i];
-
-    assert(offspring.check());
-    return offspring;
-  }
-
-  ///
-  /// \param[in] parent
-  /// \return
-  ///
-  individual individual::cross2(const individual &parent) const
-  {
-    assert(check() && parent.check());
-
-    const unsigned cs(size());
-
-    const unsigned cut1(random::between<unsigned>(0, cs-1));
-    const unsigned cut2(random::between<unsigned>(cut1+1, cs));
-
-    const individual *parents[2] = {this, &parent};
-    const bool base(random::boolean());
-
-    individual offspring(*env_, false);
-
-    for (unsigned i(0); i < cut1; ++i)
-      offspring.code_[i] = parents[base]->code_[i];
-    for (unsigned i(cut1); i < cut2; ++i)
-      offspring.code_[i] = parents[!base]->code_[i];
-    for (unsigned i(cut2); i < cs; ++i)
-      offspring.code_[i] = parents[base]->code_[i];
-
-    assert(offspring.check());
-    return offspring;
+    return (*cross_array_[active_cross_])(*this, parent2);
   }
 
   ///

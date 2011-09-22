@@ -69,13 +69,13 @@ namespace vita
   class operation_factory
   {
   public:
-    enum operation {unicross_mutation = 0, cross1_mutation};
+    enum operation {crossover_mutation = 0};
 
     operation_factory(const evolution *const, summary *const);
     ~operation_factory();
 
     operation_strategy &operator[](unsigned) const;
-    unsigned put(operation_strategy *const);
+    unsigned add(operation_strategy *const);
 
   private:
     std::vector<operation_strategy *> strategy_;

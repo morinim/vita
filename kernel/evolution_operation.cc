@@ -49,35 +49,12 @@ namespace vita
 
     std::vector<individual> operator()(const std::vector<unsigned> &);
 
-    virtual individual crossover(const individual &, const individual &) const;
-    virtual unsigned mutation(individual *const) const;
-
     summary *stats;
   };
 
   standard_op::standard_op(const evolution *const evo, summary *const s)
     : operation_strategy(evo, s)
   {
-  }
-
-  ///
-  /// \param[in] p1 first parent for crossover.
-  /// \param[in] p2 second parent for crossover.
-  /// \return the result of the crossover operation between \a p1 and \a p2.
-  ///
-  individual standard_op::crossover(const individual &p1,
-                                    const individual &p2) const
-  {
-    return individual(p1).uniform_cross(p2);
-  }
-
-  ///
-  /// \param[in] ind individual that should be mutated.
-  /// \return number of mutations performed.
-  ///
-  unsigned standard_op::mutation(individual *const ind) const
-  {
-    return ind->mutation();
   }
 
   ///
@@ -96,40 +73,16 @@ namespace vita
     const bool cross(random::boolean(pop.env().p_cross));
 
     std::vector<individual> off
-    { cross ? crossover(pop[r1], pop[r2]) : pop[random::boolean() ? r1 : r2]};
+    { cross ? pop[r1].crossover(pop[r2]) : pop[random::boolean() ? r1 : r2]};
 
     if (cross)
       ++stats_->crossovers;
 
-    stats_->mutations += mutation(&off[0]);
+    stats_->mutations += off[0].mutation();
 
     assert(off[0].check());
 
     return off;
-  }
-
-  class cross1_op : public standard_op
-  {
-  public:
-    cross1_op(const evolution *const, summary *const);
-
-    individual crossover(const individual &, const individual &) const;
-  };
-
-  cross1_op::cross1_op(const evolution *const evo, summary *const stats)
-    : standard_op(evo, stats)
-  {
-  }
-
-  ///
-  /// \param[in] p1 first parent for crossover.
-  /// \param[in] p2 second parent for crossover.
-  /// \return the result of the crossover operation between \a p1 and \a p2.
-  ///
-  individual cross1_op::crossover(const individual &p1,
-                                  const individual &p2) const
-  {
-    return p1.cross1(p2);
   }
 
   operation_factory::operation_factory(const evolution *const evo,
@@ -138,16 +91,14 @@ namespace vita
     assert(evo);
     assert(stats);
 
-    put(new standard_op(evo, stats));
-    put(new cross1_op(evo, stats));
+    add(new standard_op(evo, stats));
   }
 
   operation_factory::~operation_factory()
   {
     // Only predefined operation strategies should be deleted. User defined
     // operation aren't under our responsability.
-    delete strategy_[unicross_mutation];
-    delete strategy_[cross1_mutation];
+    delete strategy_[crossover_mutation];
   }
 
   operation_strategy &operation_factory::operator[](unsigned s) const
@@ -156,7 +107,7 @@ namespace vita
     return *strategy_[s];
   }
 
-  unsigned operation_factory::put(operation_strategy *const s)
+  unsigned operation_factory::add(operation_strategy *const s)
   {
     assert(s);
     strategy_.push_back(s);
