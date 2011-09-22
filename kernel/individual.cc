@@ -285,7 +285,7 @@ namespace vita
   {
     assert(check());
     assert(parent2.check());
-    assert(active_cross_ < cross_array.size());
+    assert(active_cross_ < cross_array_.size());
 
     return (*cross_array_[active_cross_])(*this, parent2);
   }

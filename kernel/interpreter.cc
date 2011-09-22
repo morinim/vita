@@ -137,7 +137,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] i-th argument of the current ADF,
+  /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the curren ADF function.
   ///
   boost::any interpreter::eval_adf_arg(unsigned i)

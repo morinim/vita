@@ -34,6 +34,10 @@
 
 namespace vita
 {
+  ///
+  /// This is a container for Vita's parameters. Contained values are used
+  /// during object initialization and program execution.
+  ///
   struct environment
   {
     environment();
