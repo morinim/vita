@@ -24,7 +24,7 @@
 #if !defined(FITNESS_H)
 #define      FITNESS_H
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {

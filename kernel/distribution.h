@@ -27,7 +27,6 @@
 #include <cmath>
 #include <map>
 
-#include "kernel/vita.h"
 #include "kernel/fitness.h"
 
 namespace vita
@@ -61,10 +60,10 @@ namespace vita
   private:
     void update_variance(T);
 
-    std::map<T, unsigned> freq;
+    std::map<T, unsigned> freq_;
 
-    T delta;
-    T    m2;
+    T delta_;
+    T    m2_;
   };
 
 
@@ -82,15 +81,15 @@ namespace vita
   {
     count = 0;
 
-    delta = m2 = mean = variance = min = max = 0.0;
+    delta_ = m2_ = mean = variance = min = max = 0.0;
 
-    freq.clear();
+    freq_.clear();
   }
 
   ///
   /// \param[in] val new fitness upon which statistics are recalculated.
   ///
-  /// Gathers a new fitness for the statistics.
+  /// Add a new fitness for the statistics.
   ///
   template<class T>
   void distribution<T>::add(T val)
@@ -103,7 +102,7 @@ namespace vita
       max = val;
 
     ++count;
-    ++freq[val];
+    ++freq_[val];
 
     update_variance(val);
   }
@@ -111,7 +110,7 @@ namespace vita
   ///
   /// \return the entropy of the distribution.
   ///
-  /// \fH(X)=-\sum_{i=1}^n p(x_i) \dot log_b(p(x_i))
+  /// \f$H(X)=-\sum_{i=1}^n p(x_i) \dot log_b(p(x_i))\f$
   /// We use an offline algorithm
   /// (<http://en.wikipedia.org/wiki/Online_algorithm>).
   ///
@@ -121,7 +120,7 @@ namespace vita
     const double c(1.0/std::log(2.0));
 
     double h(0.0);
-    for (auto j(freq.begin()); j != freq.end(); ++j)
+    for (auto j(freq_.begin()); j != freq_.end(); ++j)
     {
       const double p(static_cast<double>(j->second) / count);
       h -= p * std::log(p) * c;
@@ -143,17 +142,17 @@ namespace vita
   template<class T>
   void distribution<T>::update_variance(T val)
   {
-    delta = val - mean;
-    mean += delta/count;
+    delta_ = val - mean;
+    mean += delta_/count;
 
     // This expression uses the new value of mean.
-    m2 += delta * (val-mean);
+    m2_ += delta_ * (val-mean);
 
-    variance = m2 / count;
+    variance = m2_ / count;
   }
 
   ///
-  /// \return The standard deviation of the distribution.
+  /// \return the standard deviation of the distribution.
   ///
   template<class T>
   T distribution<T>::standard_deviation() const
@@ -162,7 +161,7 @@ namespace vita
   }
 
   ///
-  /// \return true if the object passes the internal consistency check.
+  /// \return \c true if the object passes the internal consistency check.
   ///
   template<class T>
   bool distribution<T>::check() const
