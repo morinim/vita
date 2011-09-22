@@ -250,7 +250,7 @@ namespace vita
         }
 
         // --------- SELECTION ---------
-        std::vector<unsigned> parents(selection[sel_id]());
+        std::vector<locus_t> parents(selection[sel_id]());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation[op_id](parents));

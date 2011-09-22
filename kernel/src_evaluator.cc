@@ -95,7 +95,7 @@ namespace vita
   ///
   void dyn_slot_evaluator::fill_slots(
     const individual &ind,
-    std::vector < std::vector<unsigned> > *slots,
+    std::vector <std::vector<unsigned>> *slots,
     std::vector<unsigned> *slot_label
     )
   {
@@ -163,7 +163,7 @@ namespace vita
     assert(dat_->classes() >= 2);
 
     const unsigned n_slots(dat_->classes()*10);
-    std::vector< std::vector<unsigned> > slots(n_slots);
+    std::vector<std::vector<unsigned>> slots(n_slots);
     std::vector<unsigned> slot_label(n_slots);
     fill_slots(ind, &slots, &slot_label);
 

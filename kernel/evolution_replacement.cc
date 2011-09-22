@@ -37,7 +37,7 @@ namespace vita
   public:
     explicit tournament_rp(evolution *const);
 
-    virtual void operator()(const std::vector<unsigned> &,
+    virtual void operator()(const std::vector<locus_t> &,
                             const std::vector<individual> &,
                             summary *const);
 
@@ -84,7 +84,7 @@ namespace vita
   ///   child is better.
   /// </li>
   /// </ul>
-  void tournament_rp::operator()(const std::vector<unsigned> &parent,
+  void tournament_rp::operator()(const std::vector<locus_t> &parent,
                                  const std::vector<individual> &offspring,
                                  summary *const s)
   {
@@ -110,7 +110,7 @@ namespace vita
 
   replacement_factory::replacement_factory(evolution *const evo)
   {
-    put(new tournament_rp(evo));
+    add(new tournament_rp(evo));
   }
 
   replacement_factory::~replacement_factory()
@@ -126,7 +126,7 @@ namespace vita
     return *strategy_[s];
   }
 
-  unsigned replacement_factory::put(replacement_strategy *const s)
+  unsigned replacement_factory::add(replacement_strategy *const s)
   {
     assert(s);
     strategy_.push_back(s);

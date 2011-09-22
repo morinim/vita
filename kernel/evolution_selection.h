@@ -42,7 +42,7 @@ namespace vita
   public:
     explicit selection_strategy(const evolution *const);
 
-    virtual std::vector<unsigned> operator()() = 0;
+    virtual std::vector<locus_t> operator()() = 0;
 
   protected:
     const evolution *const evo_;
@@ -61,7 +61,7 @@ namespace vita
     ~selection_factory();
 
     selection_strategy &operator[](unsigned);
-    unsigned put(selection_strategy *const);
+    unsigned add(selection_strategy *const);
 
   private:
     std::vector<selection_strategy *> strategy_;

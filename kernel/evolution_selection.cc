@@ -37,7 +37,7 @@ namespace vita
   public:
     explicit tournament_selection(const evolution *const);
 
-    virtual std::vector<unsigned> operator()();
+    virtual std::vector<locus_t> operator()();
 
   protected:
     unsigned tournament(unsigned) const;
@@ -81,9 +81,9 @@ namespace vita
   ///
   /// \return
   ///
-  std::vector<unsigned> tournament_selection::operator()()
+  std::vector<locus_t> tournament_selection::operator()()
   {
-    std::vector<unsigned> ret(2);
+    std::vector<locus_t> ret(2);
 
     ret[0] = tournament(evo_->population().size());
     ret[1] = tournament(ret[0]);
@@ -93,7 +93,7 @@ namespace vita
 
   selection_factory::selection_factory(const evolution *const evo)
   {
-    put(new tournament_selection(evo));
+    add(new tournament_selection(evo));
   }
 
   selection_factory::~selection_factory()
@@ -109,7 +109,7 @@ namespace vita
     return *strategy_[s];
   }
 
-  unsigned selection_factory::put(selection_strategy *const s)
+  unsigned selection_factory::add(selection_strategy *const s)
   {
     assert(s);
     strategy_.push_back(s);

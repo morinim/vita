@@ -44,7 +44,7 @@ namespace vita
   public:
     explicit replacement_strategy(evolution *const);
 
-    virtual void operator()(const std::vector<unsigned> &,
+    virtual void operator()(const std::vector<locus_t> &,
                             const std::vector<individual> &,
                             summary *const) = 0;
 
@@ -65,7 +65,7 @@ namespace vita
     ~replacement_factory();
 
     replacement_strategy &operator[](unsigned);
-    unsigned put(replacement_strategy *const);
+    unsigned add(replacement_strategy *const);
 
   private:
     std::vector<replacement_strategy *> strategy_;

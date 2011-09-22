@@ -55,7 +55,7 @@ namespace vita
     // encompass recent additions, such as scan mutation, that generates
     // numerous offspring from a single parent.
     virtual std::vector<individual> operator()(
-      const std::vector<unsigned> &) = 0;
+      const std::vector<locus_t> &) = 0;
 
   protected:
     const evolution *const evo_;
