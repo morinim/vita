@@ -33,7 +33,6 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/distribution.h"
 
 namespace vita

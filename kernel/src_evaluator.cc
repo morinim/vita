@@ -28,8 +28,8 @@
 namespace vita
 {
   ///
-  /// \param[in] d
-  /// \param[in] v
+  /// \param[in] d pointer to data that the evaluator will use.
+  /// \param[in] v vector of input variables of the dataset.
   ///
   src_evaluator::src_evaluator(data *d, std::vector<variable_ptr> *v)
     : dat_(d), var_(v)
@@ -180,7 +180,8 @@ namespace vita
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the success rate (between 0.0 and 1.0).
+  /// \return the success rate (between 0.0 and 1.0 is there are available data,
+  ///                           -1.0 is the dataset is empty).
   ///
   double dyn_slot_evaluator::success_rate(const individual &ind)
   {
@@ -190,7 +191,7 @@ namespace vita
 
     const unsigned ok(count + operator()(ind));
 
-    return count ? double(ok) / double(count) : 0.0;
+    return count ? double(ok) / double(count) : -1.0;
   }
 
   void gaussian_evaluator::gaussian_distribution(
@@ -260,7 +261,8 @@ namespace vita
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the success rate (between 0.0 and 1.0).
+  /// \return the success rate (between 0.0 and 1.0 is there are available data,
+  ///                           -1.0 is the dataset is empty).
   ///
   double gaussian_evaluator::success_rate(const individual &ind)
   {
@@ -277,7 +279,7 @@ namespace vita
       if (class_label(ind, *t, gauss) == t->label())
         ++ok;
 
-    return count ? double(ok) / double(count) : 0.0;
+    return count ? double(ok) / double(count) : -1.0;
   }
 
   ///

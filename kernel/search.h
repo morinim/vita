@@ -45,7 +45,7 @@ namespace vita
 
     void arl(const individual &, evolution &);
 
-    const individual &run(bool = true, unsigned = 1, fitness_t = -5.0);
+    const individual &run(bool = true, unsigned = 1);
 
     bool check() const;
 

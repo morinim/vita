@@ -122,11 +122,9 @@ namespace vita
   ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
-  /// \param[in] success_f when an individual reaches this fitness it is
-  ///                      considered a solution.
   /// \return best individual found.
   ///
-  const individual &search::run(bool verbose, unsigned n, fitness_t success_f)
+  const individual &search::run(bool verbose, unsigned n)
   {
     summary overall_run_sum;
     distribution<fitness_t> fd;
@@ -146,7 +144,7 @@ namespace vita
         overall_run_sum.f_best = s.f_best;
       }
 
-      const bool found(s.f_best >= success_f);
+      const bool found(s.f_best >= prob_->threashold);
       if (found)
       {
         ++solutions;

@@ -47,7 +47,7 @@ bool verbose(false);
 unsigned runs(1);
 
 
-vita::src_problem problem;
+vita::src_problem problem(-5.0);
 
 void setup_default_symbols()
 {

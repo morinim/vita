@@ -26,18 +26,19 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/environment.h"
+#include "kernel/fitness.h"
 
 namespace vita
 {
   class evaluator;
+
   typedef std::shared_ptr<evaluator> evaluator_ptr;
 
   class problem
   {
   public:
-    problem();
+    explicit problem(fitness_t);
 
     void add_evaluator(evaluator_ptr);
     evaluator *get_evaluator();
@@ -47,6 +48,8 @@ namespace vita
     virtual bool check() const;
 
     environment env;
+
+    fitness_t threashold;
 
   private:
     std::vector<evaluator_ptr> evaluators_;

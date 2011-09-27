@@ -28,9 +28,13 @@
 namespace vita
 {
   ///
+  /// \param[in] st success threashold: when fitness is greater than this value,
+  ///               the the datum is considered learned (matched, classified,
+  ///               resolved...)
+  ///
   /// New empty instance.
   ///
-  problem::problem()
+  problem::problem(fitness_t st) : threashold(st)
   {
     clear();
   }

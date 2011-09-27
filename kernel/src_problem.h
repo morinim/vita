@@ -28,7 +28,6 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
 #include "kernel/data.h"
 #include "kernel/problem.h"
 #include "kernel/primitive/sr_pri.h"
@@ -38,7 +37,7 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    src_problem();
+    explicit src_problem(fitness_t);
 
     bool load_data(const std::string &);
     std::string load_symbols(const std::string &);
