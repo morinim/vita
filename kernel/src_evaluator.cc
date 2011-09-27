@@ -34,6 +34,8 @@ namespace vita
   src_evaluator::src_evaluator(data *d, std::vector<variable_ptr> *v)
     : dat_(d), var_(v)
   {
+    assert(d);
+    assert(v);
   }
 
   ///

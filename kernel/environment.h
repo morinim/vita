@@ -60,8 +60,20 @@ namespace vita
     /// operators" used to transform programs in the Genetic Programming
     /// algorithm. Mutation causes random changes in individuals.
     double p_mutation;
-    /// Crossover probability.
+    /// Crossover probability. See \see operation_strategy::operator().
     double p_cross;
+    /// In nature it is common for organisms to produce many offspring and then
+    /// neglect, abort, resorb, eat some of them or allow them to eat each
+    /// other. There are manu reasons for this behavior ("Kozlowski & Stearns,
+    /// 1989"). This phenomenon is known variously as soft selection, brood
+    /// selection, spontaneous abortion. The "bottom line" of this behaior in
+    /// nature is the reduction of parental resource investment in offspring who
+    /// are potentially less fit than others.
+    /// See "Greedy recombination and genetic search on the space of computer
+    /// programs" (Walter Alden Tackett - 1995) for further details.
+    /// This parameter controls the brood recombination/selection level (0 is
+    /// not present).
+    unsigned brood_recombination;
 
     /// Population's size (number of programs/individuals in the population).
     unsigned long individuals;

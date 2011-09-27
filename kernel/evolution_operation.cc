@@ -68,21 +68,44 @@ namespace vita
     assert(parent.size() >= 2);
 
     const population &pop = evo_->population();
+    const environment &env = pop.env();
     const unsigned r1(parent[0]), r2(parent[1]);
 
-    const bool cross(random::boolean(pop.env().p_cross));
-
-    std::vector<individual> off
-    { cross ? pop[r1].crossover(pop[r2]) : pop[random::boolean() ? r1 : r2]};
-
-    if (cross)
+    individual off(env, false);
+    if (random::boolean(env.p_cross))
+    {
       ++stats_->crossovers;
+      off = pop[r1].crossover(pop[r2]);
+      stats_->mutations += off.mutation();
 
-    stats_->mutations += off[0].mutation();
+      if (env.brood_recombination)
+      {
+        fitness_t fit_off(evo_->fitness(off));
 
-    assert(off[0].check());
+        unsigned i(0);
+        do
+        {
+          individual tmp(pop[r1].crossover(pop[r2]));
+          tmp.mutation();
 
-    return off;
+          const fitness_t fit_tmp(evo_->fitness(tmp));
+          if (fit_tmp > fit_off)
+          {
+            off     =     tmp;
+            fit_off = fit_tmp;
+          }
+        } while (++i < env.brood_recombination);
+      }
+    }
+    else // !crossover
+    {
+      off = pop[random::boolean() ? r1 : r2];
+      stats_->mutations += off.mutation();
+    }
+
+    assert(off.check());
+
+    return {off};
   }
 
   operation_factory::operation_factory(const evolution *const evo,

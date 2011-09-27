@@ -53,7 +53,7 @@ namespace vita
     /// Access to the real evaluator.
     evaluator *const eva_;
 
-    /// Transposition table (hash cache).
+    /// Transposition table (hash table cache).
     ttable cache_;
   };
 }  // namespace vita

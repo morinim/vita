@@ -40,7 +40,7 @@ def plot2(pipe, args):
         print(cmd)
     pipe.write(str.encode(cmd))
 
- 
+
 def plot3(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
@@ -113,21 +113,21 @@ def plot(args):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0,0\n")
         if (args.graph is None or args.graph==2):
-            plot2(pipe, args) 
+            plot2(pipe, args)
 
         # Plot the third graph so that it takes a quarter of the screen
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0.5,0.5\n")
         if (args.graph is None or args.graph==3):
-            plot3(pipe, args) 
-    
+            plot3(pipe, args)
+
         # Plot the fourth graph so that it takes a quarter of the screen
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0.5,0\n")
         if (args.graph is None or args.graph==4):
-            plot4(pipe, args) 
+            plot4(pipe, args)
 
         # On some terminals, nothing gets plotted until this command is issued
         if (args.graph is None):
@@ -151,7 +151,7 @@ def get_max_dataset(filename):
                 return int(list(file)[-1].split(' ')[0])
         except IOError:
             time.sleep(1)
-            --count       
+            --count
 
 
 def get_cmd_line_options():
@@ -173,7 +173,7 @@ def get_cmd_line_options():
                         help="Plot statistics starting from FROM_RUN run (default: %(default))")
     parser.add_argument("--to_run", type=int,
                         help="Plot statistics up to TO_RUN run")
-    parser.add_argument("-v", "--verbose", action="store_true", default=False, 
+    parser.add_argument("-v", "--verbose", action="store_true", default=False,
                         help="Turn on verbose mode")
     parser.add_argument("dynfile")
 
@@ -209,7 +209,7 @@ def main():
 
     if os.path.isdir(args.dynfile):
         args.dynfile = os.path.join(args.dynfile,"dynamic")
-   
+
     plot(args)
 
 
