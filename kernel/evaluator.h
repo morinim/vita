@@ -47,7 +47,14 @@ namespace vita
 
     virtual fitness_t operator()(const individual &) = 0;
 
-    virtual double success_rate(const individual &) { return -1; }
+    /// The accuracy of a genetic programming refers to the number of training
+    /// examples that are correctly scored/classified as a proportion of the
+    /// total number of examples in the training set. According to this
+    /// design, the best accuracy is 1 (100%), meaning that all the training
+    /// examples have been correctly recognised.
+    /// Accuracy could be used as the fitness function but often it hasn't
+    /// enough "granularity".
+    virtual double accuracy(const individual &) { return -1; }
   };
 
   ///

@@ -71,7 +71,7 @@ namespace vita
                          const std::vector< distribution<double> > &) const;
 
     fitness_t operator()(const individual &);
-    double success_rate(const individual &);
+    double accuracy(const individual &);
 
   private:
     static double normalize_01(double);
@@ -95,7 +95,7 @@ namespace vita
                          const std::vector< distribution<double> > &);
 
     fitness_t operator()(const individual &);
-    double success_rate(const individual &);
+    double accuracy(const individual &);
 
   private:
     void gaussian_distribution(const individual &,

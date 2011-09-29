@@ -180,10 +180,10 @@ namespace vita
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the success rate (between 0.0 and 1.0 is there are available data,
-  ///                           -1.0 is the dataset is empty).
+  /// \return the accuracy (between 0.0 and 1.0 if there are available data,
+  ///         -1.0 is the dataset is empty).
   ///
-  double dyn_slot_evaluator::success_rate(const individual &ind)
+  double dyn_slot_evaluator::accuracy(const individual &ind)
   {
     unsigned count(0);
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
@@ -261,10 +261,10 @@ namespace vita
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the success rate (between 0.0 and 1.0 is there are available data,
-  ///                           -1.0 is the dataset is empty).
+  /// \return the accuracy (between 0.0 and 1.0 if there are available data,
+  ///         -1.0 is the dataset is empty).
   ///
-  double gaussian_evaluator::success_rate(const individual &ind)
+  double gaussian_evaluator::accuracy(const individual &ind)
   {
     assert(dat_->classes() >= 2);
     std::vector< distribution<double> > gauss(dat_->classes());

@@ -61,7 +61,7 @@ namespace vita
 
     std::shared_ptr<individual> best;
     fitness_t                 f_best;
-    double                   sr_best;
+    double                 accu_best;
   };
 
   class evolution
@@ -76,7 +76,7 @@ namespace vita
     vita::population &population();
 
     fitness_t fitness(const individual &) const;
-    double success_rate(const individual &) const;
+    double accuracy(const individual &) const;
 
     void pick_stats(analyzer *const);
 

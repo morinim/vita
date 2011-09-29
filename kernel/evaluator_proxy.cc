@@ -37,12 +37,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind the individual whose success rate we want to know.
-  /// \return the success rate of \a ind (on the current test set).
+  /// \param[in] ind the individual whose accuracy we want to know.
+  /// \return the accuracy of \a ind (on the current test set).
   ///
-  double evaluator_proxy::success_rate(const individual &ind)
+  double evaluator_proxy::accuracy(const individual &ind)
   {
-    return eva_->success_rate(ind);
+    return eva_->accuracy(ind);
   }
 
   ///

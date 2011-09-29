@@ -194,12 +194,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual whose success rate we are interested in.
-  /// \return the success rate of \a ind (on the current test set).
+  /// \param[in] ind individual whose accuracy we are interested in.
+  /// \return the accuracy of \a ind (on the current test set).
   ///
-  fitness_t evolution::success_rate(const individual &ind) const
+  double evolution::accuracy(const individual &ind) const
   {
-    return eva_->success_rate(ind);
+    return eva_->accuracy(ind);
   }
 
   ///
@@ -228,8 +228,8 @@ namespace vita
   {
     stats_.clear();
     stats_.best.reset(new individual(pop_[0]));
-    stats_.f_best  = (*eva_)(*stats_.best);
-    stats_.sr_best =                   0.0;
+    stats_.f_best    = (*eva_)(*stats_.best);
+    stats_.accu_best =                   0.0;
 
     eva_->clear();
 
@@ -266,9 +266,9 @@ namespace vita
                     << 100*k/pop_.size() << "%): fitness "
                     << std::setw(16) << stats_.f_best;
 
-          if (stats_.sr_best >= 0.0)
+          if (stats_.accu_best >= 0.0)
             std::cout << std::setprecision(2) << " (" << std::fixed
-                      << std::setw(6) << 100.0*stats_.sr_best << "%)"
+                      << std::setw(6) << 100.0*stats_.accu_best << "%)"
                       << std::setprecision(-1)
                       << std::resetiosflags(std::ios::fixed);
 
