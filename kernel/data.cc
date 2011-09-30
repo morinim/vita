@@ -27,7 +27,11 @@
 namespace vita
 {
   ///
-  /// \param[in] n number of distinct training sets.
+  /// \param[in] n number of distinct datasets. E.g.:
+  ///              (0) auto choose;
+  ///              (1) not partitioned;
+  ///              (2) one training set and one validation set;
+  ///              (3) two training sets and one validation set...
   /// \see clear
   ///
   /// New empty data instance (partitioned in \a n training sets).
@@ -43,10 +47,10 @@ namespace vita
 
   ///
   /// \param[in] filename nome of the file containing the learning collection.
-  /// \param[in] n number of distinct training sets.
+  /// \param[in] n number of distinct datasets.
   ///
   /// New \a data instance containing the learning collection from \a filename
-  /// and partitioned in \a n training sets.
+  /// and partitioned in \a n datasets.
   ///
   data::data(const std::string &filename, unsigned n)
   {
@@ -60,8 +64,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] n number of distinct training sets (if 1 the learning
-  ///              collection won't be partitioned).
+  /// \param[in] n number of distinct datasets.
   ///
   /// Resets the object.
   ///
@@ -71,8 +74,8 @@ namespace vita
 
     labels_.clear();
 
-    training_.clear();
-    training_.resize(n ? n : 1);
+    datasets_.clear();
+    datasets_.resize(n ? n : 1);
 
     // This is the active data partition.
     active_ = 0;
@@ -81,23 +84,22 @@ namespace vita
   }
 
   ///
-  /// \return constant reference to the first element of the active training
-  ///         set.
+  /// \return constant reference to the first element of the active dataset.
   ///
   data::const_iterator data::begin() const
   {
-    assert(active_ < training_.size());
-    return training_[active_].begin();
+    assert(active_ < datasets_.size());
+    return datasets_[active_].begin();
   }
 
   ///
   /// \return constant reference to the last+1 (sentry) element of the active
-  ///         training set.
+  ///         dataset.
   ///
   data::const_iterator data::end() const
   {
-    assert(active_ < training_.size());
-    return training_[active_].end();
+    assert(active_ < datasets_.size());
+    return datasets_[active_].end();
   }
 
   ///
@@ -105,7 +107,7 @@ namespace vita
   ///
   unsigned data::variables() const
   {
-    return training_.empty() || training_[0].empty()
+    return datasets_.empty() || datasets_[0].empty()
       ? 0 : begin()->input.size();
   }
 
@@ -119,7 +121,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] label name of a class of the training set.
+  /// \param[in] label name of a class of the learing collection.
   /// \return a positive integer used as primary key for the class \a label.
   ///
   unsigned data::encode(const std::string &label)
@@ -207,8 +209,8 @@ namespace vita
               return 1;
           }
 
-      const unsigned set(vita::random::between<unsigned>(0, training_.size()));
-      training_[set].push_back(v);
+      const unsigned set(vita::random::between<unsigned>(0, datasets_.size()));
+      datasets_[set].push_back(v);
     }
 
     check();
@@ -222,10 +224,7 @@ namespace vita
   {
     bool found(false);
 
-    for (std::vector<std::list<value_type> >::const_iterator
-           i(training_.begin());
-         i != training_.end() && !found;
-         ++i)
+    for (auto i(datasets_.begin()); i != datasets_.end() && !found; ++i)
       found = !i->empty();
 
     return !found;
@@ -236,7 +235,7 @@ namespace vita
   ///
   bool data::check() const
   {
-    if (training_.empty())
+    if (datasets_.empty())
       return false;
 
     const unsigned cl_size(classes());
@@ -245,13 +244,10 @@ namespace vita
     if (cl_size == 1)
       return false;
 
-    const unsigned in_size(training_[0].begin()->input.size());
+    const unsigned in_size(datasets_[0].begin()->input.size());
 
-    for (std::vector<std::list<value_type> >::const_iterator
-           l(training_.begin());
-         l != training_.end();
-         ++l)
-      for (const_iterator i(l->begin()); i != l->end(); ++i)
+    for (auto l(datasets_.begin()); l != datasets_.end(); ++l)
+      for (auto i(l->begin()); i != l->end(); ++i)
       {
         if (i->input.size() != in_size)
           return false;
@@ -260,6 +256,6 @@ namespace vita
           return false;
       }
 
-    return active_ < training_.size();
+    return active_ < datasets_.size();
   }
 }  // Namespace vita
