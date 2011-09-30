@@ -74,6 +74,7 @@ namespace vita
 
     const_iterator begin() const;
     const_iterator end() const;
+    unsigned size() const;
 
     unsigned open(const std::string &);
     bool operator!() const;

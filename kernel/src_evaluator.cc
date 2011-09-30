@@ -82,6 +82,37 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind program used for fitness evaluation.
+  /// \return the fitness (greater is better, max is 0).
+  ///
+  fitness_t abs_evaluator::fast(const individual &ind)
+  {
+    assert(!dat_->classes());
+
+    interpreter agent(ind);
+
+    double err(0.0);
+    int illegals(0);
+    unsigned counter(0);
+
+    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+      if (dat_->size() <= 20 || (counter++ % 5) == 0)
+      {
+        load_vars(*t);
+
+        const boost::any res(agent());
+
+        if (res.empty())
+          err += std::pow(100.0, ++illegals);
+        else
+          err += std::fabs(boost::any_cast<double>(res) -
+                           boost::any_cast<double>(t->output));
+      }
+
+    return fitness_t(-err);
+  }
+
+  ///
   /// \param[in] val the numeric value that should be mapped in the [0,1]
   ///                interval.
   ///

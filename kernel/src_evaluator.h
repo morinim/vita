@@ -51,6 +51,7 @@ namespace vita
       : src_evaluator(d, v) {}
 
     fitness_t operator()(const individual &);
+    fitness_t fast(const individual &);
   };
 
   ///

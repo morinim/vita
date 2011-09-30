@@ -76,6 +76,7 @@ namespace vita
     vita::population &population();
 
     fitness_t fitness(const individual &) const;
+    fitness_t fast_fitness(const individual &) const;
     double accuracy(const individual &) const;
 
     void pick_stats(analyzer *const);

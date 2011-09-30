@@ -80,7 +80,7 @@ namespace vita
 
       if (env.brood_recombination)
       {
-        fitness_t fit_off(evo_->fitness(off));
+        fitness_t fit_off(evo_->fast_fitness(off));
 
         unsigned i(0);
         do
@@ -88,7 +88,7 @@ namespace vita
           individual tmp(pop[r1].crossover(pop[r2]));
           tmp.mutation();
 
-          const fitness_t fit_tmp(evo_->fitness(tmp));
+          const fitness_t fit_tmp(evo_->fast_fitness(tmp));
           if (fit_tmp > fit_off)
           {
             off     =     tmp;

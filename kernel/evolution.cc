@@ -194,6 +194,15 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind individual whose fitness we are interested in.
+  /// \return the fitness of \a ind.
+  ///
+  fitness_t evolution::fast_fitness(const individual &ind) const
+  {
+    return eva_->fast(ind);
+  }
+
+  ///
   /// \param[in] ind individual whose accuracy we are interested in.
   /// \return the accuracy of \a ind (on the current test set).
   ///

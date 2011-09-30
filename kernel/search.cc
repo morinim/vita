@@ -183,7 +183,7 @@ namespace vita
   /// \param[in] solutions number of solutions found.
   /// \param[in] best_run best run of the search.
   /// \param[in] runs number of runs performed.
-  /// \return true if the write operation succeed.
+  /// \return \c true if the write operation succeed.
   ///
   void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
                    unsigned solutions, unsigned best_run, unsigned runs) const

@@ -103,6 +103,14 @@ namespace vita
   }
 
   ///
+  /// \return the size of the active dataset.
+  ///
+  unsigned data::size() const
+  {
+    return datasets_[active_].size();
+  }
+
+  ///
   /// \return input vector dimension.
   ///
   unsigned data::variables() const
