@@ -41,7 +41,7 @@ namespace vita
       elitism(true),
       p_mutation(2.0/code_length),
       p_cross(0.7),
-      brood_recombination(3),
+      brood_recombination(0),
       individuals(100),
       par_tournament(2),
       rep_tournament(unsigned(std::log(static_cast<double>(individuals)))),

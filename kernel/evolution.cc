@@ -23,10 +23,11 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <ctime>
 #include <fstream>
 #include <string>
 #include <vector>
+
+#include <boost/timer.hpp>
 
 #include "kernel/evolution.h"
 #include "kernel/environment.h"
@@ -64,21 +65,28 @@ namespace vita
   }
 
   ///
-  /// \param[out] az repository for the statistical informations.
+  /// \param[in] elapsed time, in seconds, elapsed from the start of evolution.
+  /// \return speed of execution (cycles / s).
   ///
-  /// Gathers statistical informations about the elements of the population.
-  ///
-  void evolution::pick_stats(analyzer *const az)
+  double evolution::get_speed(double elapsed) const
   {
-    az->clear();
+    double speed(0.0);
+    if (stats_.gen && elapsed > 0)
+      speed = (pop_.size() * stats_.gen) / elapsed;
 
-    for (unsigned i(0); i < pop_.size(); ++i)
-      az->add(pop_[i], (*eva_)(pop_[i]));
+    return speed;
   }
 
-  void evolution::pick_stats()
+  ///
+  /// \return statistical informations about the elements of the population.
+  ///
+  analyzer evolution::get_stats() const
   {
-    pick_stats(&stats_.az);
+    analyzer az;
+    for (unsigned i(0); i < pop_.size(); ++i)
+      az.add(pop_[i], (*eva_)(pop_[i]));
+
+    return az;
   }
 
   ///
@@ -242,11 +250,10 @@ namespace vita
 
     eva_->clear();
 
-    std::clock_t start_c(clock());
+    boost::timer timer;
     for (stats_.gen = 0; !stop_condition(); ++stats_.gen)
     {
-      pick_stats(&stats_.az);
-
+      stats_.az = get_stats();
       log(run_count);
 
       for (unsigned k(0); k < pop_.size(); ++k)
@@ -265,7 +272,7 @@ namespace vita
         std::vector<individual> off(operation[op_id](parents));
 
         // --------- REPLACEMENT --------
-        const fitness_t before(stats_. f_best);
+        const fitness_t before(stats_.f_best);
         replacement[rep_id](parents, off, &stats_);
 
         if (verbose && stats_.f_best != before)
@@ -285,32 +292,29 @@ namespace vita
         }
       }
 
+      stats_.speed = get_speed(timer.elapsed());
       get_probes(&stats_.ttable_probes, &stats_.ttable_hits);
     }
 
     if (verbose)
     {
-      double speed(0);
-
-      if (clock() > start_c)
-        speed = static_cast<double>(pop_.size()*stats_.gen) * CLOCKS_PER_SEC
-                / (clock()-start_c);
-
+      double speed(stats_.speed);
       std::string unit("");
-      if (speed >= 10)
-        unit = "n/s";
-      else if (speed >= 1)
+
+      if (speed >= 1.0)
+        unit = "cycles/s";
+      else if (speed >= 0.1)
       {
-        speed *= 3600;
-        unit = "n/h";
+        speed *= 3600.0;
+        unit = "cycles/h";
       }
-      else  // speed < 1
+      else  // speed < 0.1
       {
-        speed *= 3600*24;
-        unit = "n/d";
+        speed *= 3600.0*24.0;
+        unit = "cycles/day";
       }
 
-      std::cout << unsigned(speed) << unit << std::string(10, ' ')
+      std::cout << static_cast<unsigned>(speed) << unit << std::string(10, ' ')
                 << std::endl << std::string(40, '-') << std::endl;
     }
 
@@ -345,6 +349,7 @@ namespace vita
     gen           = 0;
     testset       = 0;
     last_imp      = 0;
+    speed         = 0.0;
 
     best.reset();
 

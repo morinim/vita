@@ -161,6 +161,7 @@ namespace vita
       fd.add(s.f_best);
       overall_run_sum.ttable_hits += s.ttable_hits;
       overall_run_sum.ttable_probes += s.ttable_probes;
+      overall_run_sum.speed = ((overall_run_sum.speed * i) + s.speed) / (i + 1);
 
       if (prob_->env.arl && best_run == i)
       {
@@ -199,6 +200,7 @@ namespace vita
     boost::property_tree::ptree pt;
     pt.put(summary+"success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
+    pt.put(summary+"speed", run_sum.speed);
     pt.put(summary+"best.fitness", run_sum.f_best);
     pt.put(summary+"best.times_reached", solutions);
     pt.put(summary+"best.run", best_run);

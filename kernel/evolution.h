@@ -53,6 +53,8 @@ namespace vita
     boost::uint64_t  mutations;
     boost::uint64_t crossovers;
 
+    double speed;
+
     unsigned gen;
     unsigned testset;
     unsigned last_imp;
@@ -79,8 +81,6 @@ namespace vita
     fitness_t fast_fitness(const individual &) const;
     double accuracy(const individual &) const;
 
-    void pick_stats(analyzer *const);
-
     bool check() const;
 
     selection_factory     selection;
@@ -88,9 +88,10 @@ namespace vita
     replacement_factory replacement;
 
   private:
+    double get_speed(double) const;
     void get_probes(boost::uint64_t *, boost::uint64_t *) const;
+    analyzer get_stats() const;
     void log(unsigned) const;
-    void pick_stats();
 
     bool stop_condition() const;
 
