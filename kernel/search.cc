@@ -197,7 +197,7 @@ namespace vita
     const std::string summary(path+"summary.");
 
     boost::property_tree::ptree pt;
-    pt.put(summary+"accuracy", runs ?
+    pt.put(summary+"success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
     pt.put(summary+"best.fitness", run_sum.f_best);
     pt.put(summary+"best.times_reached", solutions);
