@@ -247,30 +247,36 @@ namespace vita
   }
 
   ///
-  /// \return number of mutations performed.
+  /// \param[out] number of mutations performed.
+  /// \return a new, mutated, individual.
   ///
   /// A new individual is created mutating \c this individual. If there are
   /// special symbols (env_->sset.specials() > 0) they are protected from
   /// mutation.
   ///
-  unsigned individual::mutation()
+  individual individual::mutation(unsigned *const n_mutations) const
   {
-    unsigned n_mutations(0);
+    individual ret(*this);
+    unsigned n(0);
 
     const unsigned specials(env_->sset.specials());
     assert(specials < size());
     const unsigned cs(size() - specials);
+
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(env_->p_mutation))
       {
-        ++n_mutations;
+        ++n;
 
-        code_[i] = gene(env_->sset, i+1, size());
+        ret.code_[i] = gene(env_->sset, i+1, size());
       }
 
-    assert(check());
+    assert(ret.check());
 
-    return n_mutations;
+    if (n_mutations)
+      *n_mutations = n;
+
+    return ret;
   }
 
   ///

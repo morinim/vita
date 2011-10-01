@@ -71,12 +71,14 @@ namespace vita
     const environment &env = pop.env();
     const unsigned r1(parent[0]), r2(parent[1]);
 
+    unsigned mutations(0);
     individual off(env, false);
     if (random::boolean(env.p_cross))
     {
+      off = (pop[r1].crossover(pop[r2])).mutation(&mutations);
+
       ++stats_->crossovers;
-      off = pop[r1].crossover(pop[r2]);
-      stats_->mutations += off.mutation();
+      stats_->mutations += mutations;
 
       if (env.brood_recombination)
       {
@@ -85,8 +87,7 @@ namespace vita
         unsigned i(0);
         do
         {
-          individual tmp(pop[r1].crossover(pop[r2]));
-          tmp.mutation();
+          individual tmp((pop[r1].crossover(pop[r2])).mutation(&mutations));
 
           const fitness_t fit_tmp(evo_->fast_fitness(tmp));
           if (fit_tmp > fit_off)
@@ -98,11 +99,9 @@ namespace vita
       }
     }
     else // !crossover
-    {
-      off = pop[random::boolean() ? r1 : r2];
-      stats_->mutations += off.mutation();
-    }
+      off = pop[random::boolean() ? r1 : r2].mutation(&mutations);
 
+    stats_->mutations += mutations;
     assert(off.check());
 
     return {off};
