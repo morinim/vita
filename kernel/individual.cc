@@ -29,24 +29,16 @@
 #include "kernel/environment.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
-#include "kernel/transformer.h"
 
 namespace vita
 {
-  std::vector<std::shared_ptr<const transformer>> individual::cross_array_
-  {
-    std::shared_ptr<const transformer>(new uniform_crossover()),
-    std::shared_ptr<const transformer>(new one_point_crossover()),
-    std::shared_ptr<const transformer>(new two_point_crossover())
-  };
-
   ///
   /// \param[in] e base environment.
   /// \param[in] gen if true generates a random sequence of genes to initialize
   ///                the individual.
   ///
   individual::individual(const environment &e, bool gen)
-    : active_cross_(0), best_(0), env_(&e), code_(e.code_length)
+    : crossover_{uniform_crossover}, best_(0), env_(&e), code_(e.code_length)
   {
     assert(e.check());
 
@@ -283,17 +275,26 @@ namespace vita
   /// \param[in] parent2 the second parent (being \c this the first).
   /// \return a pointer to \c this.
   ///
-  /// There are some predefined crossover operators: we use the \c active_cross_
-  /// index to choose which one to use. For a description of the available
-  /// operators see the \see transformation \c class.
+  /// There are some predefined crossover operators: we use the \a cross_
+  /// function wrapper to choose which one to use.
   ///
   individual individual::crossover(const individual &parent2) const
   {
     assert(check());
     assert(parent2.check());
-    assert(active_cross_ < cross_array_.size());
 
-    return (*cross_array_[active_cross_])(*this, parent2);
+    return crossover_(*this, parent2);
+  }
+
+  //
+  // \param[in] cw a function pointer / functor / anonymous (lambda) function
+  //               used for crossover operation.
+  //
+  // Crossover implementation can be changed/selected at runtime by this
+  // polymorhic wrapper for function objects.
+  void individual::set_crossover(const crossover_wrapper &cw)
+  {
+    crossover_ = cw;
   }
 
   ///
@@ -744,5 +745,110 @@ namespace vita
     }
 
     return l_;
+  }
+
+  ///
+  /// \param[in] p1 the first parent.
+  /// \param[in] p2 the second parent.
+  /// \return the transformed \a individual.
+  ///
+  /// The i-th locus of the offspring has a 50% probability to be filled with
+  /// the i-th gene of \a p1 and 50% with i-th gene of \a p2. Parents must have
+  /// the same size.
+  /// Uniform crossover, as the name suggests, is a GP operator inspired by the
+  /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
+  /// algorithms - Proceedings of the Third International Conference on Genetic
+  /// Algorithms. 1989). GA uniform crossover constructs offspring on a
+  /// bitwise basis, copying each allele from each parent with a 50%
+  /// probability. Thus the information at each gene location is equally likely
+  /// to have come from either parent and on average each parent donates 50%
+  /// of its genetic material. The whole operation, of course, relies on the
+  /// fact that all the chromosomes in the population are of the same structure
+  /// and the same length. GP uniform crossover begins with the observation that
+  /// many parse trees are at least partially structurally similar.
+  ///
+  individual uniform_crossover(const individual &p1, const individual &p2)
+  {
+    assert(p1.check());
+    assert(p2.check());
+    assert(p1.size() == p2.size());
+
+    const unsigned cs(p1.size());
+
+    individual offspring(p1);
+    for (unsigned i(0); i < cs; ++i)
+      if (!random::boolean())
+        offspring[i] = p2[i];
+
+    assert(offspring.check());
+    return offspring;
+  }
+
+  ///
+  /// \param[in] p1 the first parent.
+  /// \param[in] p2 the second parent.
+  /// \return a the transformed \a individual.
+  ///
+  /// We randomly select a parent (between \a p1 and \a p2) and a single locus
+  /// (common crossover point). The offspring is created with genes from the
+  /// choosen parent up to the crossover point and genes from the other parent
+  /// beyond that point. Parents must have the same size.
+  /// One-point crossover is the oldest homologous crossover in tree-based GP.
+  ///
+  individual one_point_crossover(const individual &p1, const individual &p2)
+  {
+    assert(p1.check());
+    assert(p2.check());
+    assert(p1.size() == p2.size());
+
+    const unsigned cs(p1.size());
+
+    const unsigned cut(random::between<unsigned>(0, cs-1));
+
+    const individual *parents[2] = {&p1, &p2};
+    const bool base(random::boolean());
+
+    individual offspring(*parents[base]);
+
+    for (unsigned i(cut); i < cs; ++i)
+      offspring[i] = (*parents[!base])[i];
+
+    assert(offspring.check());
+    return offspring;
+  }
+
+  ///
+  /// \param[in] p1 the first parent.
+  /// \param[in] p2 the second parent.
+  /// \return a the transformed \a individual.
+  ///
+  /// We randomly select a parent (between \a p1 and \a p2) and a two loci
+  /// (common crossover points). The offspring is created with genes from the
+  /// choosen parent before the first crossover point and after the second
+  /// crossover point; genes between crossover points are taken from the other
+  /// parent.
+  /// Parents must have the same size.
+  ///
+  individual two_point_crossover(const individual &p1, const individual &p2)
+  {
+    assert(p1.check());
+    assert(p2.check());
+    assert(p1.size() == p2.size());
+
+    const unsigned cs(p1.size());
+
+    const unsigned cut1(random::between<unsigned>(0, cs-1));
+    const unsigned cut2(random::between<unsigned>(cut1+1, cs));
+
+    const individual *parents[2] = {&p1, &p2};
+    const bool base(random::boolean());
+
+    individual offspring(*parents[base]);
+
+    for (unsigned i(cut1); i < cut2; ++i)
+      offspring[i] = (*parents[!base])[i];
+
+    assert(offspring.check());
+    return offspring;
   }
 }  // Namespace vita

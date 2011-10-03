@@ -35,7 +35,7 @@ ifeq ($(TYPE), profile)
 endif
 
 ifeq ($(TYPE), release)
-  TYPE_PARAM = -s -O2 -fomit-frame-pointer -DNDEBUG
+  TYPE_PARAM = -s -O3 -fomit-frame-pointer -DNDEBUG
 endif
 
 CXXFLAGS = $(TYPE_PARAM) $(WARN) $(DEFS)

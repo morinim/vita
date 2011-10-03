@@ -26,6 +26,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <functional>
 #include <iomanip>
 #include <list>
 #include <set>
@@ -37,7 +38,6 @@
 namespace vita
 {
   class environment;
-  class transformer;
 
   ///
   /// A single member of a \a population. Each individual contains a genome
@@ -47,6 +47,9 @@ namespace vita
   class individual
   {
   public:
+    typedef std::function<individual (const individual &, const individual &)>
+    crossover_wrapper;
+
     individual(const environment &, bool);
 
     void dump(std::ostream &) const;
@@ -55,8 +58,10 @@ namespace vita
     void list(std::ostream &) const;
     void tree(std::ostream &) const;
 
-    individual mutation(unsigned *) const;
     individual crossover(const individual &) const;
+    individual mutation(unsigned *) const;
+
+    void set_crossover(const crossover_wrapper &);
 
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;
@@ -83,10 +88,11 @@ namespace vita
     bool check() const;
 
     ///
-    /// \param[in] i index of the \c gene of the \c individual.
-    /// \return the i-th \c gene of the \c individual.
+    /// \param[in] i index of a \c gene.
+    /// \return the i-th \c gene of \a this \c individual.
     ///
     const gene &operator[](unsigned i) const { return code_[i]; }
+    gene &operator[](unsigned i) { return code_[i]; }
 
     ///
     /// \return the total size of the individual (effective size + introns).
@@ -102,24 +108,22 @@ namespace vita
     symbol_t type() const;
 
     class const_iterator;
-    friend class const_iterator;
-    friend class    interpreter;
-    friend class    transformer;
+    friend class interpreter;
 
   private:
-    static std::vector<std::shared_ptr<const transformer>> cross_array_;
-
     void pack(std::vector<boost::uint8_t> *const, unsigned) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
 
-    // Index of the active crossover operator for \c this individual (see the
-    // cross_array_ private vector).
-    unsigned  active_cross_;
+    // Crossover implementation can be changed/selected at runtime by this
+    // polymorhic wrapper for function objects.
+    // std::function can be easily bound to function pointers, member function
+    // pointers, functors or anonymous (lambda) functions.
+    crossover_wrapper crossover_;
 
     // Active code in this individual (the best sequence of genes is starting
     // here).
-    unsigned          best_;
+    unsigned best_;
 
     const environment *env_;
 
@@ -128,6 +132,10 @@ namespace vita
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
+
+  individual one_point_crossover(const individual &, const individual &);
+  individual two_point_crossover(const individual &, const individual &);
+  individual uniform_crossover(const individual &, const individual &);
 
   class individual::const_iterator
   {
