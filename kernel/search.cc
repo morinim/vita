@@ -86,8 +86,7 @@ namespace vita
         // Building blocks should be simple.
         if (candidate_block.eff_size() <= 5+arl_args)
         {
-          const double d_f(base_fit -
-                           evo.fitness(individual(base).destroy_block(*i)));
+          const double d_f(base_fit - evo.fitness(base.destroy_block(*i)));
 
           // Semantic introns cannot be building blocks.
           if (!is_bad(d_f) && std::fabs(base_fit/10.0) < d_f)

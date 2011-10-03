@@ -59,7 +59,7 @@ namespace vita
     individual crossover(const individual &) const;
 
     std::list<unsigned> blocks() const;
-    individual &destroy_block(unsigned);
+    individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
     individual replace(symbol_ptr, const std::vector<locus_t> &) const;
     individual replace(symbol_ptr, const std::vector<locus_t> &,
@@ -114,7 +114,7 @@ namespace vita
     unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
 
     // Index of the active crossover operator for \c this individual (see the
-    // cross_array private vector).
+    // cross_array_ private vector).
     unsigned  active_cross_;
 
     // Active code in this individual (the best sequence of genes is starting

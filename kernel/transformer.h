@@ -61,7 +61,7 @@ namespace vita
   class uniform_crossover : public transformer
   {
   public:
-    virtual individual operator()(const individual &, const individual &) const;
+    individual operator()(const individual &, const individual &) const;
   };
 
   ///
@@ -72,7 +72,7 @@ namespace vita
   class one_point_crossover : public transformer
   {
   public:
-    virtual individual operator()(const individual &, const individual &) const;
+    individual operator()(const individual &, const individual &) const;
   };
 
   ///
@@ -83,7 +83,7 @@ namespace vita
   class two_point_crossover : public transformer
   {
   public:
-    virtual individual operator()(const individual &, const individual &) const;
+    individual operator()(const individual &, const individual &) const;
   };
 }  // namespace vita
 

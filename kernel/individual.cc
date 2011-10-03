@@ -364,19 +364,19 @@ namespace vita
 
   ///
   /// \param[in] line index of a \a symbol in the \a individual.
-  /// \return a reference to \c this.
+  /// \return a new individual obtained from \c this inserting a random
+  ///         \a terminal at index \a line.
   ///
-  /// Modify \c this inserting a random \a terminal at index \a line.
-  ///
-  individual &individual::destroy_block(unsigned line)
+  individual individual::destroy_block(unsigned line) const
   {
     assert(line < size() && !code_[line].sym->terminal());
 
-    code_[line] = gene(env_->sset);
+    individual ret(*this);
+    ret.code_[line] = gene(env_->sset);
 
-    assert(check());
+    assert(ret.check());
 
-    return *this;
+    return ret;
   }
 
   ///
