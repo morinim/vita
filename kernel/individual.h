@@ -61,8 +61,6 @@ namespace vita
     individual crossover(const individual &) const;
     individual mutation(unsigned *) const;
 
-    void set_crossover(const crossover_wrapper &);
-
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
@@ -92,7 +90,6 @@ namespace vita
     /// \return the i-th \c gene of \a this \c individual.
     ///
     const gene &operator[](unsigned i) const { return code_[i]; }
-    gene &operator[](unsigned i) { return code_[i]; }
 
     ///
     /// \return the total size of the individual (effective size + introns).
@@ -106,6 +103,17 @@ namespace vita
     unsigned eff_size() const;
 
     symbol_t type() const;
+
+    ///
+    /// \param[in] i index of a \c gene.
+    /// \return the i-th \c gene of \a this \c individual.
+    ///
+    /// Please note that this is one of the very few methods that aren't const.
+    ///
+    gene &operator[](unsigned i) { return code_[i]; }
+
+    // Please note that this is one of the very few methods that aren't const.
+    void set_crossover(const crossover_wrapper &);
 
     class const_iterator;
     friend class interpreter;

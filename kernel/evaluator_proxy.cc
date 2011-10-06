@@ -47,9 +47,6 @@ namespace vita
 
   ///
   /// \param[in] ind the individual whose fitness we want to know.
-  /// \param[in] fast when \c true evaluator performs a fast, approximate
-  ///                 calculation (e.g. using only a subset of the available
-  ///                 training data).
   /// \return the fitness of \a ind.
   ///
   fitness_t evaluator_proxy::operator()(const individual &ind)

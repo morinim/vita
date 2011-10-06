@@ -43,9 +43,6 @@ namespace vita
   ///
   /// \a data \c class stores the training set used to evolve the \a population.
   ///
-  /// \todo The \c class should also contains a validation/test set to avoid
-  ///       overfitting.
-  ///
   class data
   {
   public:

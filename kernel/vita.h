@@ -21,11 +21,19 @@
  *
  *
  *
- *  \mainpage VITA v0.9.0
+ *  \mainpage VITA v0.9.1
  *
  *  \section note_sec Notes
- *  New versions of this program will be available at http://www.vita.cc .
- *  Please reports any suggestions and/or bugs to info@vita.cc .
+ *  New versions of this program will be available at
+ *  http://code.google.com/p/vita/
+ *
+ *  Please reports any suggestions and/or bugs to:
+ *  <dl>
+ *    <dt>Forum</dt>
+ *    <dd>http://groups.google.com/group/vita-prj</dd>
+ *    <dt>Issue tracking system</dt>
+ *    <dd>http://code.google.com/p/vita/issues/list</dd>
+ *  </dl>
  *
  */
 
@@ -71,19 +79,6 @@ namespace vita
 }  // namespace vita
 
 /// \page page1 VITA Architecture
-/// The object oriented architecture of VITA is divided into three pieces:
-/// <ol>
-///   <li>
-///     the Individual \c class, which is the underlying program representation;
-///   </li>
-///   <li>
-///     the Population \c class, which holds a population of Individual(s);
-///   </li>
-///   <li>
-///     the Problem \c class, which holds the objectives, functions and data
-///     necessary to define and solve a particular task.
-///   </li>
-/// </ul>
-///
+/// http://code.google.com/p/vita/wiki/Anatomy
 
 #endif  // VITA_H

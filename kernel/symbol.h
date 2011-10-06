@@ -66,14 +66,16 @@ namespace vita
     virtual bool associative() const = 0;
     virtual bool parametric() const = 0;
 
-    // The arity of a function is the number of inputs to or arguments of that
-    // funtion.
+    /// The arity of a function is the number of inputs to or arguments of that
+    /// funtion.
     virtual unsigned arity() const = 0;
 
     virtual boost::any eval(interpreter *) const = 0;
 
     bool check() const;
 
+    /// Weights is used by the symbol_set::roulette method to control the
+    /// probability of extraction of the symbol.
     unsigned weight;
 
   private:

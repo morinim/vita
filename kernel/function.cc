@@ -25,6 +25,9 @@
 
 namespace vita
 {
+  /// This is the default value for the function constructor. Weights are
+  /// used by the symbol_set::roulette method to control the probability of
+  /// extraction of the symbols.
   unsigned function::default_weight(100);
 
   ///

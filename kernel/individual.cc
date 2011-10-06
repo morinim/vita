@@ -239,7 +239,7 @@ namespace vita
   }
 
   ///
-  /// \param[out] number of mutations performed.
+  /// \param[out] n_mutations number of mutations performed.
   /// \return a new, mutated, individual.
   ///
   /// A new individual is created mutating \c this individual. If there are
@@ -286,12 +286,15 @@ namespace vita
     return crossover_(*this, parent2);
   }
 
-  //
-  // \param[in] cw a function pointer / functor / anonymous (lambda) function
-  //               used for crossover operation.
-  //
-  // Crossover implementation can be changed/selected at runtime by this
-  // polymorhic wrapper for function objects.
+  ///
+  /// \param[in] cw a function pointer / functor / anonymous (lambda) function
+  ///               used for crossover operation.
+  ///
+  /// Crossover implementation can be changed / selected at runtime by this
+  /// method.
+  /// Please note that this is one of the very few individual methods that
+  /// aren't const.
+  ///
   void individual::set_crossover(const crossover_wrapper &cw)
   {
     crossover_ = cw;
