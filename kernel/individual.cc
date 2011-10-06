@@ -38,7 +38,7 @@ namespace vita
   ///                the individual.
   ///
   individual::individual(const environment &e, bool gen)
-    : crossover_{uniform_crossover}, best_(0), env_(&e), code_(e.code_length)
+    : crossover_(uniform_crossover), best_(0), env_(&e), code_(e.code_length)
   {
     assert(e.check());
 

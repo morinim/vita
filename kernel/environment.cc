@@ -48,7 +48,7 @@ namespace vita
       mate_zone(9),
       g_since_start(100), g_without_improvement(0),
       arl(true),
-      force_input(true),
+      force_input(false),
       ttable_size(16),
       stat_dir(""),
       stat_arl(false), stat_dynamic(false), stat_summary(false)

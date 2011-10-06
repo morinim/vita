@@ -92,7 +92,7 @@ namespace vita
     std::map<std::string, unsigned> labels_;
 
     // The training set (partitioned).
-    std::vector< std::list<value_type> > datasets_;
+    std::vector<std::list<value_type>> datasets_;
 
     // The active data partition.
     // Data are partitioned in multiple datasets:

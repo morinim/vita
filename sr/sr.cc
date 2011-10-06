@@ -36,7 +36,7 @@ namespace po = boost::program_options;
 #include "kernel/src_problem.h"
 
 const std::string vita_sr_version1(
-  "Vita - Symbolic Regression and classification v0.9.0"
+  "Vita - Symbolic Regression and classification v0.9.1"
 );
 const std::string vita_sr_version2(
   "Copyright (c) 2011 EOS Development (http://www.eosdev.it)"
@@ -128,10 +128,12 @@ bool parse_command_line(int argc, char *argv[])
     po::options_description individual("Individual");
     individual.add_options()
       ("force-input,f",
-       po::value<bool>(&problem.env.force_input)->default_value(false),
+       po::value<bool>(&problem.env.force_input)->default_value(
+         problem.env.force_input),
        "Include all the input variables in every generated individual.")
       ("program-size,p",
-       po::value(&problem.env.code_length),
+       po::value(&problem.env.code_length)->default_value(
+         problem.env.code_length),
        "Sets the maximum length of a program (it might be shorter)");
 
     // Declare a group of options that will be allowed both on command line
@@ -156,12 +158,18 @@ bool parse_command_line(int argc, char *argv[])
        po::value(&problem.env.par_tournament),
        "Number of individuals chosen at random from the population to "\
        "identify a parent.")
+      ("brood",
+       po::value(&problem.env.brood_recombination)->default_value(
+         problem.env.brood_recombination),
+       "Sets the brood size for recombination (-1 auto-select, 0 disable).")
       ("g-since-start,g",
-       po::value(&problem.env.g_since_start),
+       po::value(&problem.env.g_since_start)->default_value(
+         problem.env.g_since_start),
        "Sets the maximum number of generations in a run.")
       ("gwi",
-       po::value(&problem.env.g_without_improvement),
-       "Sets the maximum number of generations without improvement in a run.")
+       po::value(&problem.env.g_without_improvement)->default_value(
+         problem.env.g_without_improvement),
+       "Sets the maximum number of generations without improvement in a run (0 disable).")
       ("runs,r",
        po::value(&runs),
        "Number of runs to be tried.")
