@@ -4,7 +4,7 @@ import ConfigParser
 import os.path
 import subprocess
 
-from vita_sr_gui import *
+from sr_gui import *
 
 class VitaSrConfiguration:
     def __init__(self):
@@ -18,7 +18,7 @@ class VitaSrConfiguration:
 
         #float = config.getfloat("Section1", "float")
         #int = config.getint("Section1", "int")
-            
+
         section = "DATA"
         if (config.has_section(section)):
             self.training_data = config.get(section, "Training data")
@@ -27,7 +27,7 @@ class VitaSrConfiguration:
         section = "OPTIONS"
         if (config.has_section(section)):
             self.program_path = config.get(section, "Program path")
-        
+
         return True
 
 
@@ -35,7 +35,7 @@ class VitaSrConfiguration:
         # When adding sections or items, add them in the reverse order of
         # how you want them to be displayed in the actual file.
         config = ConfigParser.SafeConfigParser()
-        
+
         print(filename)
 
         section = "OPTIONS"
@@ -126,10 +126,10 @@ class VitaSrGui:
         if (name != "" and self.config_.save(name)):
             self.set_project_name(name)
             return True
-        
+
         return False
 
-        
+
     def set_file(self, le):
         file_name = self.get_filename()
         if (file_name != ""):
@@ -147,12 +147,12 @@ class VitaSrGui:
             self.ui_.WindowTitle += " - " + unicode(name)
             #self.ui_.WindowTitle = self.ui_.WindowTitle.join(unicode(name_))
 
-   
+
     def set_symbols_file(self):
         self.set_file(self.ui_.le_symbols)
 
 
-    def set_training_data_file(self): 
+    def set_training_data_file(self):
         self.set_file(self.ui_.le_training_data)
 
 
