@@ -1,4 +1,4 @@
-VITA <http://www.vita.cc/>
+VITA <http://code.google.com/p/vita/>
 
 These are the release notes for Vita.  Read them carefully, as they tell you
 what this is all about, explain how to install the software and what to do if
@@ -21,7 +21,8 @@ REQUIREMENTS
   Solaris, AIX, Cygwin).
   However, since core members of the Vita project have no access to these
   platforms, Vita may have outstanding issues there.  If you notice any
-  problems on your platform, please notify vita@googlecode.com. Patches for
+  problems on your platform, please notify vita@googlecode.com or use the
+  issue tracking system (http://code.google.com/p/vita/issues/list). Patches for
   fixing them are even more welcome!
 
   ### Linux requirements ###
@@ -29,12 +30,14 @@ REQUIREMENTS
   * GNU-compatible make
   * POSIX-standard shell
   * Boost library (<http://www.boost.org>)
-  * A C++98-standard-compliant compiler
+  * A C++11-standard-compliant compiler (or, at least, partially compatible:
+    e.g. gcc v4.5.x or newer)
   * Python v3
 
   ### Windows requirements ###
 
-  * Microsoft Visual C++ 2010
+  * A C++11-standard-compliant compiler (or, at least, partially compatible:
+    e.g. MinGW / Cygwin).
   * Python v3
 
 GETTING THE SOURCE
@@ -75,7 +78,10 @@ THE VITA DISTRIBUTION
   This is a sketch of the resulting directory structure:
 
   vita-X.Y.Z
+    AUTHORS
+    COPYING
     Makefile
+    README
     examples/..............Various examples
     kernel/ ...............Vita kernel(core library)
     sr/ ...................Symbolic regression and classification utility
@@ -92,20 +98,16 @@ SETTING UP THE BUILD
   need boost separately-compiled library binaries (e.g. SR utility needs
   Program Options Library to compile).
 
-  ### Linux ###
+  ### GCC / MinGW ###
 
   cd vita-X.Y.Z
 
   * To build all:                             make
-  * To build the kernel library (libvita.a):  make kerne
+  * To build the kernel library (libvita.a):  make kernel
   * To build the sr tool:                     make sr
-  * To build test <n>:                        make testn
-  * To build example <n>:                     make examplen
+  * To build test <n>:                        make test<n>
+  * To build example <n>:                     make example<n>
 
   If you see errors, try to tweak the contents of Makefile to make them go
   away.
   All output files will per default be stored together with the source code.
-
-  ### Windows ###
-
-  You should use the project file.
