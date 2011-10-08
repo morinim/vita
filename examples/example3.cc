@@ -61,22 +61,18 @@ int main(int argc, char *argv[])
   std::cout << "OFFSPRING (UNIFORM CROSSOVER)" << std::endl
             << std::string(40, '-') << std::endl;
 
-  const vita::individual uc(i1.uniform_cross(i2));
-  uc.dump(std::cout);
+  uniform_crossover(i1, i2).dump(std::cout);
   std::cout << std::endl;
 
   std::cout << "OFFSPRING (ONE POINT CROSSOVER)" << std::endl
             << std::string(40, '-') << std::endl;
 
-  const vita::individual upc(i1.cross1(i2));
-  upc.dump(std::cout);
+  one_point_crossover(i1, i2).dump(std::cout);
   std::cout << std::endl;
 
   std::cout << "OFFSPRING (TWO POINTS CROSSOVER)" << std::endl
             << std::string(40, '-') << std::endl;
 
-  const vita::individual tpc(i1.cross2(i2));
-  tpc.dump(std::cout);
-
+  two_point_crossover(i1, i2).dump(std::cout);
   return EXIT_SUCCESS;
 }
