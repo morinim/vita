@@ -57,6 +57,12 @@ namespace vita
 #  define isinf(x)      !_finite(x)
 #  define ROTL64(x, y)  _rotl64(x, y)
 #else
+   ///
+   /// \param[in] x unsigned 64-bit to be rotated.
+   /// \param[in] r number of steps.
+   /// \return the value corresponding to rotating the bits of \a x \a r-steps
+   ///         to the right (r must be between 1 to 31 inclusive).
+   ///
    inline boost::uint64_t rotl64(boost::uint64_t x, boost::uint8_t r)
    {
      return (x << r) | (x >> (64-r));

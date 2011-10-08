@@ -33,33 +33,41 @@ namespace vita
   class individual;
 
   ///
-  /// \a ttable \c class implements a hash table that links individuals to their
+  /// This is a 128 bit stream used as individual signature / hash table
+  /// look up key.
+  ///
+  struct hash_t
+  {
+    /// Hash signature is a 128 bit unsigned and is built by two 64 bit
+    /// halves.
+    hash_t(boost::uint64_t a = 0, boost::uint64_t b = 0) : p1(a), p2(b) {}
+
+    /// Resets the content of hash_t.
+    void clear() { p1 = 0; p2 = 0; }
+
+    /// Standard equality operator for hash signature.
+    bool operator==(hash_t h) const { return p1 == h.p1 && p2 == h.p2; }
+
+    /// We assume that a string of 128 zero bits means empty.
+    bool empty() const { return !p1 && !p2; }
+
+    /// First half of the hash signature.
+    boost::uint64_t p1;
+    /// Second half of the hash signature.
+    boost::uint64_t p2;
+  };
+
+  ///
+  /// \a ttable \c class implements a hash table that links individuals to
   /// fitness (it's used by the \a evaluator_proxy \c class).
-  /// Note: \a ttable exploits a byte level representation of an individual
-  /// obtained from the \c individual::pack function. This function should
-  /// map sintatically distinct (but logically equivalent) individuals to the
-  /// same byte stream. During the evolution semantically equivalent individuals
-  /// are often generated and \a ttable could give a significant speed
-  /// improvement.
+  /// The key used for table lookup is the individual's signature.
+  /// During the evolution semantically equivalent (but syntactically distinct)
+  /// individuals are often generated and \a ttable could give a significant
+  /// speed improvement avoiding the recalculation of shared information.
   ///
   class ttable
   {
   public:
-    struct hash_t
-    {
-      /// Hash signature is a 128 bit unsigned and is built by two 64 bit
-      /// halves.
-      hash_t(boost::uint64_t a = 0, boost::uint64_t b = 0) : p1(a), p2(b) {}
-
-      /// Standard equality operator for hash signature.
-      bool operator==(hash_t h) const { return p1 == h.p1 && p2 == h.p2; }
-
-      /// First half of the hash signature.
-      boost::uint64_t p1;
-      /// Second half of the hash signature.
-      boost::uint64_t p2;
-    };
-
     explicit ttable(unsigned);
     ~ttable();
 
@@ -69,18 +77,16 @@ namespace vita
 
     bool find(const individual &, fitness_t *const) const;
 
-    /// Number of searches in the hash table (every call to the \c find method
-    /// increment the counter).
+    /// \return number of searches in the hash table
+    /// Every call to the \c find method increment the counter.
     boost::uint64_t probes() const { return probes_; }
 
-    /// Number of successful searches in the hash table.
+    /// \return number of successful searches in the hash table.
     boost::uint64_t hits() const { return hits_; }
 
     bool check() const;
 
   private:
-    static hash_t hash(const std::vector<boost::uint8_t> &);
-
     struct slot
     {
       hash_t   hash;

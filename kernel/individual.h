@@ -34,6 +34,7 @@
 #include <vector>
 
 #include "kernel/gene.h"
+#include "kernel/ttable.h"
 
 namespace vita
 {
@@ -78,10 +79,7 @@ namespace vita
     bool operator!=(const individual &x) const { return !(*this == x); }
     unsigned distance(const individual &) const;
 
-    ///
-    /// \param[out] p packed version (byte stream) of \c this individual.
-    ///
-    void pack(std::vector<boost::uint8_t> *const p) const { pack(p, best_); }
+    hash_t signature() const;
 
     bool check() const;
 
@@ -106,11 +104,16 @@ namespace vita
 
     ///
     /// \param[in] i index of a \c gene.
-    /// \return the i-th \c gene of \a this \c individual.
+    /// \param[in] g a new gene.
     ///
-    /// Please note that this is one of the very few methods that aren't const.
+    /// Set the \a i-th locus of the genome to \a g. Please note that this is
+    /// one of the very few methods that aren't const.
     ///
-    gene &operator[](unsigned i) { return code_[i]; }
+    void set(unsigned i, const gene &g)
+    {
+      code_[i] = g;
+      signature_.clear();
+    }
 
     // Please note that this is one of the very few methods that aren't const.
     void set_crossover(const crossover_wrapper &);
@@ -119,9 +122,9 @@ namespace vita
     friend class interpreter;
 
   private:
-    void pack(std::vector<boost::uint8_t> *const, unsigned) const;
+    hash_t hash() const;
+    void pack(unsigned, std::vector<boost::uint8_t> *const) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
-    unsigned unpack(const std::vector<boost::uint8_t> &, unsigned);
 
     // Crossover implementation can be changed/selected at runtime by this
     // polymorhic wrapper for function objects.
@@ -137,6 +140,11 @@ namespace vita
 
     // This is the genome: the entire collection of genes.
     std::vector<gene> code_;
+
+    // Note that sintactically distinct (but logically equivalent) individuals
+    // have the same signature. This is a very interesting  property, useful
+    // for individual comparison, information retrieval, entropy calculation...
+    mutable hash_t signature_;
   };
 
   std::ostream & operator<<(std::ostream &, const individual &);
