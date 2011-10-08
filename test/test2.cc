@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < 1000; ++i)
   {
-    ind.mutation();
+    ind = ind.mutation();
     BOOST_REQUIRE_EQUAL(ind, orig);
   }
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     const vita::individual i1(ind);
 
-    ind.mutation();
+    ind = ind.mutation();
     dist += i1.distance(ind);
   }
 
@@ -157,12 +157,9 @@ BOOST_AUTO_TEST_CASE(Cross0)
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual tmp(i1.uniform_cross(i2));
-    dist += i1.distance(tmp);
-  }
+    dist += i1.distance(uniform_crossover(i1, i2));
 
-  const double perc(100*dist / (env.code_length*n));
+  const double perc(100.0 * dist / (env.code_length*n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -176,12 +173,9 @@ BOOST_AUTO_TEST_CASE(Cross1)
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual tmp(i1.cross1(i2));
-    dist += i1.distance(tmp);
-  }
+    dist += i1.distance(one_point_crossover(i1, i2));
 
-  const double perc(100*dist / (env.code_length*n));
+  const double perc(100.0 * dist / (env.code_length*n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -195,10 +189,7 @@ BOOST_AUTO_TEST_CASE(Cross2)
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual tmp(i1.cross2(i2));
-    dist += i1.distance(tmp);
-  }
+    dist += i1.distance(two_point_crossover(i1, i2));
 
   const double perc(100*dist / (env.code_length*n));
   BOOST_CHECK_GT(perc, 48.0);

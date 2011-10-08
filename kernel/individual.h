@@ -60,7 +60,7 @@ namespace vita
     void tree(std::ostream &) const;
 
     individual crossover(const individual &) const;
-    individual mutation(unsigned *) const;
+    individual mutation(unsigned * = 0) const;
 
     std::list<unsigned> blocks() const;
     individual destroy_block(unsigned) const;
