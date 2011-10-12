@@ -258,12 +258,9 @@ bool parse_command_line(int argc, char *argv[])
   if (!parsed)
     return false;
   if (verbose)
-  {
     std::cout << parsed << " lines" << std::endl
               << "  (" << problem.variables() << " variables, "
               << problem.classes() << " classes)" << std::endl;
-  }
-
 
   if (symbols_file.empty())
   {
@@ -293,55 +290,6 @@ bool run()
 {
   vita::search s(&problem);
   s.run(verbose, runs);
-
-  // vita::interpreter agent(ind);
-
-  /*
-  std::map<number,vita::distribution<vita::fitness_t> > classes;
-  for (vita::data<number>::const_iterator t(data.begin());
-       t != data.end();
-       ++t)
-  {
-    for (unsigned i(0); i < vars.size(); ++i)
-      vars[i]->val = (*t)[i];
-
-    const vita::fitness_t res(agent.run());
-
-    const number c((*t)[vars.size()]);
-
-    classes[c].add(res);
-  }
-
-  typedef std::map<number,vita::distribution<vita::fitness_t> >::const_iterator const_iterator;
-    for (const_iterator i(classes.begin()); i != classes.end(); ++i)
-      std::cout << i->first << "    "
-		<< i->second.mean << "    " << i->second.variance << "    "
-		<< i->second.min << "    " << i->second.max << std::endl;
-  */
-  /*
-  for (vita::data<number>::const_iterator t(data.begin());
-       t != data.end();
-       ++t)
-  {
-    for (unsigned i(0); i < vars.size(); ++i)
-      vars[i]->val = (*t)[i];
-
-    const vita::fitness_t res(agent.run());
-
-    std::cout << res << std::endl;
-
-    number best_class;
-    for (const_iterator i(classes.begin()); i != classes.end(); ++i)
-      if (std::fabs(res-classes[i->first].mean) < min)
-      {
-        min = std::fabs(res-classes[i->first].mean);
-        best_class = i->first;
-      }
-
-    if (best_class == (*t)[vars.size()])
-      f += 1.0 - ind.eff_size()/1200.0;
-  }
-  */
 
   return true;
 }
