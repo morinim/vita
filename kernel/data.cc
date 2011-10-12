@@ -21,6 +21,9 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
+
 #include "kernel/data.h"
 #include "kernel/random.h"
 
@@ -144,8 +147,86 @@ namespace vita
   }
 
   ///
+  /// \param[in] line line to be parsed.
+  /// \param[in] delimiter separator character for fields.
+  /// \param[in] trim if \c true trims leading and trailing spaces adjacent to
+  ///                 commas (this practice is contentious and in fact is
+  ///                 specifically prohibited by RFC 4180, which states,
+  ///                 "Spaces are considered part of a field and should not be
+  ///                 ignored."
+  /// \return a vector where each element is a field of the CSV line.
+  ///
+  /// This function parses a line of data by a delimiter. If you pass in a
+  /// comma as your delimiter it will parse out a Comma Separated Value (CSV)
+  /// file. If you pass in a '\t' char it will parse out a tab delimited file
+  /// (.txt or .tsv). CSV files often have commas in the actual data, but
+  /// accounts for this by surrounding the data in quotes. This also means the
+  /// quotes need to be parsed out, this function accounts for that as well.
+  /// The only (known) problem with this code, is that the definition of a csv
+  /// (<http://en.wikipedia.org/wiki/Comma-separated_values>) allows for the
+  /// newline character '\n' to be part of a csv field if the field is
+  /// surrounded by quotes. The csvline function takes care of this properly,
+  /// but the data::open function, which calls csvline, doesn't handle it. Most
+  /// CSV files do not have a \n in the middle of the field, so it is usually
+  /// not worth worrying about.
+  /// This is a slightly modified version of the function at
+  /// <http://www.zedwood.com/article/112/cpp-csv-parser>.
+  /// Escaped List Separator class from Boost C++ libraries is also very nice
+  /// and efficient for parsing,but it is not as easily applied.
+  ///
+  std::vector<std::string> data::csvline(const std::string &line,
+                                         char delimiter,
+                                         bool trim)
+  {
+    std::vector<std::string> record;
+
+    const unsigned linemax(line.length());
+    bool inquotes(false);
+    unsigned linepos(0);
+    std::string curstring;
+    while(line[linepos] != 0 && linepos < linemax)
+    {
+      const char c(line[linepos]);
+
+      if (!inquotes && curstring.length() == 0 && c == '"')  // begin quote char
+        inquotes = true;
+      else if (inquotes && c == '"')
+      {
+        // Quote char.
+        if (linepos+1 < linemax && line[linepos+1] == '"')
+        {
+          // Encountered 2 double quotes in a row (resolves to 1 double quote).
+          curstring.push_back(c);
+          ++linepos;
+        }
+        else  // end quote char
+          inquotes = false;
+      }
+      else if (!inquotes && c == delimiter)  // end of field
+      {
+        record.push_back(curstring);
+        curstring = "";
+      }
+      else if (!inquotes && (c=='\r' || c=='\n'))
+        break;
+      else
+        curstring.push_back(c);
+
+      ++linepos;
+    }
+
+    record.push_back(curstring);
+
+    if (trim)
+      for (unsigned i(0); i < record.size(); ++i)
+        boost::trim(record[i]);
+
+    return record;
+  }
+
+  ///
   /// \param[in] filename name of the file containing the learning collection.
-  /// \return number of lines read (0 in case of error).
+  /// \return number of lines parsed (0 in case of errors).
   ///
   unsigned data::open(const std::string &filename)
   {
@@ -160,69 +241,73 @@ namespace vita
       return 0;
 
     // format will contain the data file line format.
-    // IN IN IN OL IN means: first three fields are input fields (I) and their
-    // type is numeric (N). Fourth field is an output field and it is a
-    // label (L). The last field is a numerical input.
+    // The line
+    //   IN,IN,IN,OL,IN
+    // means: first three fields are input fields (I) and their type is numeric
+    // (N). Fourth field is an output field and it is a label (L). The last
+    // field is a numerical input.
     // If output field is numeric this is a symbolic regression problem,
     // otherwise it's a classification problem.
-    // No more than one output field, please!
-    std::vector<std::string> format;
-
-    std::istringstream ifs(line);
-    std::string f;
-    while (ifs >> f)
-      format.push_back(f);
+    // *No more than one output field, please!*
+    const std::vector<std::string> format(csvline(line));
+    const unsigned size(format.size());
 
     // We know the format, let's read the data.
-    unsigned ln(1);
-    for (; std::getline(from, line); ++ln)
+    unsigned parsed(0);
+    while (std::getline(from, line))
     {
-      std::istringstream ist(line);
+      const std::vector<std::string> record(csvline(line));
 
-      value_type v;
+      if (record.size() == size)
+      {
+        value_type v;
 
-      for (unsigned field(0); field < format.size(); ++field)
-        if (format[field][0] == 'I')
-        {
-          const char intype(std::toupper(format[field][1]));
-
-          switch (intype)
+        for (unsigned field(0); field < size; ++field)
+          if (format[field][0] == 'I')  // input field
           {
-          case 'N':
+            const char intype(std::toupper(format[field][1]));
+
+            switch (intype)
             {
-              double d;
-              if (ist >> d)
-                v.input.push_back(d);
-              else
-                return ln;
+            case 'N':
+              try
+              {
+                v.input.push_back(boost::lexical_cast<double>(record[field]));
+              }
+              catch (boost::bad_lexical_cast &)
+              {
+                v.clear();
+                continue;
+              }
+              break;
             }
-            break;
           }
-        }
-        else  // output field
-          if (format[field][1] == 'L')  // symbolic output field
-          {
-            std::string label;
-            if (ist >> label)
-              v.output = encode(label);
-            else
-              return 1;
-          }
-          else  // numerical output field
-          {
-            double output;
-            if (ist >> output)
-              v.output = output;
-            else
-              return 1;
-          }
+          else  // output field
+            if (format[field][1] == 'L')  // symbolic output field
+              v.output = encode(record[field]);
+            else  // numerical output field
+              try
+              {
+                v.output = boost::lexical_cast<double>(record[field]);
+              }
+              catch (boost::bad_lexical_cast &)
+              {
+                v.clear();
+                continue;
+              }
 
-      const unsigned set(vita::random::between<unsigned>(0, datasets_.size()));
-      datasets_[set].push_back(v);
+        if (v.input.size() + 1 == size)
+        {
+          const unsigned set(vita::random::between<unsigned>(0,
+                                                             datasets_.size()));
+          datasets_[set].push_back(v);
+          ++parsed;
+        }
+      }
     }
 
     check();
-    return ln;
+    return parsed;
   }
 
   ///

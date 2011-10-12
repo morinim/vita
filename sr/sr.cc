@@ -254,11 +254,12 @@ bool parse_command_line(int argc, char *argv[])
 
   if (verbose)
     std::cout << "Reading data file (" << data_file << ")... ";
-  if (!problem.load_data(data_file))
+  const unsigned parsed(problem.load_data(data_file));
+  if (!parsed)
     return false;
   if (verbose)
   {
-    std::cout << "ok" << std::endl
+    std::cout << parsed << " lines" << std::endl
               << "  (" << problem.variables() << " variables, "
               << problem.classes() << " classes)" << std::endl;
   }

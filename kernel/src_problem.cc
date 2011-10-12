@@ -58,13 +58,14 @@ namespace vita
 
   ///
   /// \param[in] f name of the file containing the learning collection.
-  /// \return false if the file cannot be read.
+  /// \return number of lines read.
   ///
-  bool src_problem::load_data(const std::string &f)
+  unsigned src_problem::load_data(const std::string &f)
   {
     dat_.clear();
 
-    if (dat_.open(f) > 1)
+    const unsigned parsed(dat_.open(f));
+    if (parsed > 0)
     {
       // Sets up the variables.
       for (unsigned i(0); i < dat_.variables(); ++i)
@@ -81,11 +82,9 @@ namespace vita
       set_evaluator(classes() > 1
         ? 1     // Symbolic regression problem
         : 0);   // Classification problem
-
-      return true;
     }
 
-    return false;
+    return parsed;
   }
 
   ///

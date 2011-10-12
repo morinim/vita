@@ -59,6 +59,7 @@ namespace vita
       boost::any             output;
 
       unsigned label() const { return boost::any_cast<unsigned>(output); }
+      void clear() { input.clear(); output = boost::any(); }
     };
 
     typedef std::list<value_type>::iterator iterator;
@@ -84,6 +85,8 @@ namespace vita
     bool check() const;
 
   private:
+    static std::vector<std::string> csvline(const std::string &, char = ',',
+                                            bool = false);
     unsigned encode(const std::string &);
 
     std::map<std::string, unsigned> labels_;
