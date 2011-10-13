@@ -55,7 +55,6 @@ namespace vita
     bool terminal() const;
 
     symbol_t type() const;
-    virtual symbol_t arg_type(unsigned) const = 0;
 
     virtual bool auto_defined() const;
 
@@ -63,13 +62,23 @@ namespace vita
     virtual std::string display(int) const;
     virtual int init() const;
 
+    /// The associative law of arithmetic: if OP is associative then
+    /// a OP (b OP c) = (a OP b) OP c = a OP b OP c
+    /// This information can be used for optimization and visualization.
     virtual bool associative() const = 0;
+
+    /// A parametric symbol needs an additional argument to be evaluated.
+    /// A value for this argument is stored in every gene where the parametric
+    /// symbol is used and it's fetched at run-time.
+    /// Functions are never parametric; terminals can be parametric.
     virtual bool parametric() const = 0;
 
     /// The arity of a function is the number of inputs to or arguments of that
     /// funtion.
     virtual unsigned arity() const = 0;
 
+    /// Calculates the value of / performs the action associated to the symbol
+    /// (it is implementation specific).
     virtual boost::any eval(interpreter *) const = 0;
 
     bool check() const;

@@ -49,11 +49,28 @@ namespace vita
     function(const std::string &, symbol_t, unsigned, unsigned = default_weight,
              bool = false);
 
-    bool associative() const;
-    bool parametric() const;
+    ///
+    /// \return \c true if the function is associative (e.g. sum is associative,
+    ///         division isn't).
+    ///
+    bool associative() const { return associative_; }
 
-    symbol_t arg_type(unsigned) const;
-    unsigned arity() const;
+    ///
+    /// \return \c false (function are never parametric).
+    ///
+    bool parametric() const { return false; }
+
+    ///
+    /// \param[in] index of a function argument.
+    /// \return type of the i-th function argument.
+    ///
+    symbol_t arg_type(unsigned i) const
+    { assert(i < gene::k_args); return argt_[i]; }
+
+    ///
+    /// \return the number of arguments (0 arguments => terminal).
+    ///
+    unsigned arity() const { assert(arity_); return arity_; }
 
     bool check() const;
 

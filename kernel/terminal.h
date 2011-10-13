@@ -42,13 +42,28 @@ namespace vita
     terminal(const std::string &, symbol_t, bool = false, bool = false,
              unsigned = default_weight);
 
-    symbol_t arg_type(unsigned) const;
+    ///
+    /// \return \c false (terminals haven't arguments and cannot be
+    ///         associative).
+    ///
+    bool associative() const { return false; }
 
-    bool associative() const;
-    bool input() const;
-    bool parametric() const;
+    ///
+    /// \return \c true if the terminal is an input variable.
+    ///
+    /// An input variable is a feature from the learning domain.
+    ///
+    bool input() const { return input_; }
 
-    unsigned arity() const;
+    ///
+    /// \return \c true if the terminal is parametric.
+    ///
+    bool parametric() const { return parametric_; }
+
+    ///
+    /// \return 0 (0 arguments <=> terminal).
+    ///
+    unsigned arity() const { return 0; }
 
     bool check() const;
 
@@ -58,56 +73,6 @@ namespace vita
     const bool parametric_;
     const bool      input_;
   };
-
-  ///
-  /// \return \a sym_void.
-  ///
-  /// No arguments for terminals!
-  ///
-  inline
-  symbol_t terminal::arg_type(unsigned) const
-  {
-    return sym_void;
-  }
-
-  ///
-  /// \return 0
-  /// 0 arguments <=> terminal.
-  ///
-  inline
-  unsigned terminal::arity() const
-  {
-    return 0;
-  }
-
-  ///
-  /// \return \c false
-  ///
-  inline
-  bool terminal::associative() const
-  {
-    return false;
-  }
-
-  ///
-  /// \return \c true if the terminal is an input variable.
-  ///
-  /// An input variable is a feature from the learning domain.
-  ///
-  inline
-  bool terminal::input() const
-  {
-    return input_;
-  }
-
-  ///
-  /// \return true if the terminal is parametric.
-  ///
-  inline
-  bool terminal::parametric() const
-  {
-    return parametric_;
-  }
 }  // namespace vita
 
 #endif  // TERMINAL_H

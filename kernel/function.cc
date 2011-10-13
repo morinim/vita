@@ -80,42 +80,6 @@ namespace vita
   }
 
   ///
-  /// \return the number of arguments (0 arguments => terminal).
-  ///
-  unsigned function::arity() const
-  {
-    assert(arity_);
-    return arity_;
-  }
-
-  ///
-  /// \param[in] index of a function argument.
-  /// \return type of the i-th function argument.
-  ///
-  symbol_t function::arg_type(unsigned i) const
-  {
-    assert(i < gene::k_args);
-    return argt_[i];
-  }
-
-  ///
-  /// \return \c true if the function is associative (e.g. sum is associative,
-  ///         division isn't).
-  ///
-  bool function::associative() const
-  {
-    return associative_;
-  }
-
-  ///
-  /// \return \c false (function are never parametric).
-  ///
-  bool function::parametric() const
-  {
-    return false;
-  }
-
-  ///
   /// \return \c true if the \a function passes the internal consistency check.
   ///
   bool function::check() const

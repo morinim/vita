@@ -184,7 +184,7 @@ namespace vita
     bool inquotes(false);
     unsigned linepos(0);
     std::string curstring;
-    while(line[linepos] != 0 && linepos < linemax)
+    while (line[linepos] != 0 && linepos < linemax)
     {
       const char c(line[linepos]);
 
@@ -207,7 +207,7 @@ namespace vita
         record.push_back(curstring);
         curstring = "";
       }
-      else if (!inquotes && (c=='\r' || c=='\n'))
+      else if (!inquotes && (c == '\r' || c == '\n'))
         break;
       else
         curstring.push_back(c);
