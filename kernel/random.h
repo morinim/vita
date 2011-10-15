@@ -45,15 +45,25 @@ namespace vita
     static void seed(unsigned);
 
   private:
+    // This generator produces integers in the range [0, 2^32-1] with a good
+    // uniform distribution in up to 623 dimensions .
     typedef boost::mt19937 base_gen;
 
+    // We are using a *global* generator object here. This is important because
+    // we don't want to create a new pseudo-random number generator at every
+    // call.
+    // The numbers produced will be the same every time the program is run.
     static base_gen rng_;
   };
 
   ///
   /// \param[in] min minimum random number.
   /// \param[in] sup upper bound.
-  /// \return a random number in the [min;sup[ range.
+  /// \return a random \c double in the [min;sup[ range.
+  ///
+  /// This is a specialization for double values of the \c random::between(T, T)
+  /// template function. The main difference is that here we use
+  /// \c uniform_real<> distribution instead of \c uniform_int<>.
   ///
   template<>
   inline
@@ -61,27 +71,34 @@ namespace vita
   {
     assert(min < sup);
 
-    typedef boost::uniform_real<> dist_t;
-    typedef boost::variate_generator<base_gen &, dist_t> gen_t;
+    boost::uniform_real<> dist(min, sup);
 
-    gen_t die(rng_, dist_t(min, sup));
-    const double ret(die());
+    const double ret(dist(rng_));
     assert(min <= ret && ret < sup);
 
     return ret;
   }
 
+  ///
+  /// \param[in] min minimum random number.
+  /// \param[in] sup upper bound.
+  /// \return a random number in the [min;sup[ range.
+  ///
+  /// Picks up a random integer value uniformly distributed in the set of
+  /// integers {min, min+1, ..., sup-1}.
+  /// Please note that contrary to boost usage this function does not take a
+  /// closed range. Instead it takes a half-open range (C++ usage and same
+  /// behaviour of the real number distribution).
+  ///
   template<class T>
   inline
   T random::between(T min, T sup)
   {
     assert(min < sup);
 
-    typedef boost::uniform_int<> dist_t;
-    typedef boost::variate_generator<base_gen &, dist_t> gen_t;
+    boost::uniform_int<> dist(min, sup-1);
 
-    gen_t die(rng_, dist_t(min, sup-1));
-    const T ret(die());
+    const T ret(dist(rng_));
     assert(min <= ret && ret < sup);
 
     return ret;

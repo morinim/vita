@@ -68,17 +68,14 @@ namespace vita
       assert(v);
     }
 
-    unsigned class_label(const individual &, const data::value_type &,
-                         const std::vector< distribution<double> > &) const;
-
     fitness_t operator()(const individual &);
     double accuracy(const individual &);
 
   private:
     static double normalize_01(double);
 
-    void fill_slots(const individual &ind,
-                    std::vector < std::vector<unsigned> > *,
+    void fill_slots(const individual &,
+                    std::vector <std::vector<unsigned>> *,
                     std::vector<unsigned> *);
   };
 

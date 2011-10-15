@@ -25,10 +25,16 @@
 
 namespace vita
 {
+  // Magic!!!
   random::base_gen random::rng_(28071973u);
 
   ///
   /// \param[in] s the seed for the random number generator.
+  ///
+  /// The seed is used to initalize the random number generator. With the same
+  /// seed the numbers produced will be the same every time the program is
+  /// run. One common method to change this is to seed with the current time
+  /// (\c std::time(0) ).
   ///
   void random::seed(unsigned s)
   {
@@ -40,6 +46,13 @@ namespace vita
   /// \param[in] width
   /// \param[in] n
   /// \return the index of the choosen individual.
+  ///
+  /// Return a random number in the range [base-width/2, base+width/2] mod n.
+  /// This is like a circular protractor marked from 0 to \c n. Starting from
+  /// position \a base we want a random number whose distance from \a base
+  /// is less than or equal to \c width/2.
+  /// If \c base is greater than \c n we take a random starting position on the
+  /// protractor.
   ///
   unsigned random::ring(unsigned base, unsigned width, unsigned n)
   {

@@ -322,7 +322,7 @@ namespace vita
   unsigned gaussian_evaluator::class_label(
     const individual &ind,
     const data::value_type &val,
-    const std::vector< distribution<double> > &gauss)
+    const std::vector<distribution<double>> &gauss)
   {
     load_vars(val);
 
