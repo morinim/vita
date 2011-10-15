@@ -48,7 +48,7 @@ namespace vita
   /// \return the index of the choosen individual.
   ///
   /// Return a random number in the range [base-width/2, base+width/2] mod n.
-  /// This is like a circular protractor marked from 0 to \c n. Starting from
+  /// This is like a circular protractor marked from 0 to \c n: starting from
   /// position \a base we want a random number whose distance from \a base
   /// is less than or equal to \c width/2.
   /// If \c base is greater than \c n we take a random starting position on the
@@ -56,7 +56,7 @@ namespace vita
   ///
   unsigned random::ring(unsigned base, unsigned width, unsigned n)
   {
-    assert(width && n>1);
+    assert(width && n > 1);
 
     if (base >= n)
       return random::between<unsigned>(0, n);

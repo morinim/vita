@@ -71,12 +71,7 @@ namespace vita
   {
     assert(min < sup);
 
-    boost::uniform_real<> dist(min, sup);
-
-    const double ret(dist(rng_));
-    assert(min <= ret && ret < sup);
-
-    return ret;
+    return boost::uniform_real<>(min, sup)(rng_);
   }
 
   ///
@@ -96,12 +91,7 @@ namespace vita
   {
     assert(min < sup);
 
-    boost::uniform_int<> dist(min, sup-1);
-
-    const T ret(dist(rng_));
-    assert(min <= ret && ret < sup);
-
-    return ret;
+    return boost::uniform_int<>(min, sup-1)(rng_);
   }
 
   ///
