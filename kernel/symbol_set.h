@@ -72,8 +72,14 @@ namespace vita
     std::vector<symbol_ptr>       adf_;
     std::vector<symbol_ptr>       adt_;
     std::vector<symbol_ptr> arguments_;
+
+    // A special symbol is not used during initial random generation but it's
+    // inserted at the end of the genome in a protected area. Terminals only
+    // can be special.
     std::vector<symbol_ptr>  specials_;
 
+    // The sum of the weights of all the symbols in the symbol set that are NOT
+    // special.
     boost::uint64_t sum_;
   };
 }  // namespace vita

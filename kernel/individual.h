@@ -138,14 +138,15 @@ namespace vita
 
     const environment *env_;
 
-    // This is the genome: the entire collection of genes.
+    // This is the genome: the entire collection of genes (the entirety of an
+    // organism's hereditary information).
     std::vector<gene> code_;
 
     // Note that sintactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
     // for individual comparison, information retrieval, entropy calculation...
     mutable hash_t signature_;
-  };
+  };  // class individual
 
   std::ostream & operator<<(std::ostream &, const individual &);
 

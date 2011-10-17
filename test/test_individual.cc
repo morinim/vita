@@ -1,6 +1,6 @@
 /**
  *
- *  \file test2.cc
+ *  \file test_individual.cc
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *
@@ -25,11 +25,11 @@
 #include <iostream>
 
 #include "kernel/environment.h"
+#include "kernel/individual.h"
 #include "kernel/primitive/sr_pri.h"
-#include "kernel/evolution.h"
 
 #define BOOST_TEST_MODULE Individual
-#include "boost/test/included/unit_test.hpp"
+#include "boost/test/unit_test.hpp"
 
 using namespace boost;
 
@@ -145,6 +145,22 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
     BOOST_REQUIRE(i.check());
     BOOST_REQUIRE_EQUAL(i.size(), l);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(Comparison)
+{
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    vita::individual a(env, true);
+    BOOST_REQUIRE_EQUAL(a, a);
+
+    vita::individual b(a);
+    BOOST_REQUIRE(a.signature() == b.signature());
+
+    vita::individual c(env, true);
+    if (!(a.signature() == c.signature()))
+      BOOST_REQUIRE(a != c);
   }
 }
 

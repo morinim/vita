@@ -1,6 +1,6 @@
 /**
  *
- *  \file test3.cc
+ *  \file test_evolution.cc
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *
@@ -28,8 +28,8 @@
 #include "kernel/evolution.h"
 #include "kernel/primitive/sr_pri.h"
 
-#define BOOST_TEST_MODULE Population
-#include "boost/test/included/unit_test.hpp"
+#define BOOST_TEST_MODULE Evolution
+#include "boost/test/unit_test.hpp"
 
 using namespace boost;
 
@@ -68,9 +68,9 @@ struct F
 };
 
 
-BOOST_FIXTURE_TEST_SUITE(Population, F)
+BOOST_FIXTURE_TEST_SUITE(Evolution, F)
 
-BOOST_AUTO_TEST_CASE(RandomCreation)
+BOOST_AUTO_TEST_CASE(Creation)
 {
   for (unsigned n(4); n <= 100; ++n)
     for (unsigned l(1); l <= 100; l+=(l < 10 ? 1 : 30))

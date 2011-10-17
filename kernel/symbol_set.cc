@@ -107,7 +107,7 @@ namespace vita
   /// \param[in] i symbol to be added.
   /// \param[in] special if \c true the \a symbol is not used during initial
   ///            random generation but it's inserted at the end of the genome
-  ///            in a protected area.
+  ///            in a protected area. Only terminals can be special.
   ///
   /// Adds a new \a symbol to the set.
   ///

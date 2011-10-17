@@ -60,7 +60,7 @@ namespace vita
 
   ///
   /// \param[in] sset the set of symbols used to build individuals.
-  /// \param[in] i index of a special symbol in the \a symbol_set.
+  /// \param[in] i index of a special symbol in the symbol_set.
   ///
   gene::gene(const symbol_set &sset, unsigned i)
   {

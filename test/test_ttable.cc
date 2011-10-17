@@ -1,6 +1,6 @@
 /**
  *
- *  \file test4.cc
+ *  \file test_ttable.cc
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *
@@ -25,11 +25,11 @@
 #include <sstream>
 
 #include "kernel/environment.h"
-#include "kernel/evolution.h"
+#include "kernel/individual.h"
 #include "kernel/primitive/sr_pri.h"
 
 #define BOOST_TEST_MODULE TranspositionTable
-#include "boost/test/included/unit_test.hpp"
+#include "boost/test/unit_test.hpp"
 
 using namespace boost;
 

@@ -9,7 +9,7 @@ TYPE = release
 
 # Boost library <-- PLEASE CHECK THE PATH!
 BOOST_INCLUDE = ./boost
-BOOST_LIB = ./boost/stage/lib
+BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 
 
 
@@ -18,6 +18,7 @@ BOOST_LIB = ./boost/stage/lib
 
 # Which libraries are linked
 LIB = $(BOOST_LIB)/libboost_program_options.a
+DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
 INCPATH = ./ $(BOOST_INCLUDE)
@@ -64,12 +65,12 @@ example%: examples/example%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
 
-tests: test1 test2 test3 test4
+tests: test_evolution test_individual test_primitive test_ttable
 
 test%: test/test%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(CXX) $< $(KERNEL_OBJ) -o test/$@
-	test/$@
+	@$(CXX) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
+	test/$@ --show_progress
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a
