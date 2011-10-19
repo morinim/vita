@@ -70,7 +70,7 @@ tests: test_evolution test_individual test_primitive test_ttable
 test%: test/test%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	test/$@ --show_progress
+	@test/$@ --show_progress
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a

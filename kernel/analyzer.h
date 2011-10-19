@@ -37,7 +37,11 @@ namespace vita
 {
   struct stats
   {
-    unsigned counter[2];
+    stats() : counter{0, 0} {}
+
+    /// Typical use: \c counter[active] / \c counter[!active] (where \c active
+    /// is a boolean).
+    boost::uint64_t counter[2];
   };
 
   ///
@@ -52,6 +56,8 @@ namespace vita
   class analyzer
   {
   public:
+    // Type returned by \c begin() and \c end() methods to iterate through the
+    // statistics of the various symbols.
     typedef std::map<const symbol *, stats>::const_iterator const_iterator;
 
     const_iterator begin() const;
@@ -80,8 +86,8 @@ namespace vita
     distribution<fitness_t> fit_;
     distribution<double> length_;
 
-    boost::uint64_t functions_[2];
-    boost::uint64_t terminals_[2];
+    stats functions_;
+    stats terminals_;
   };
 }  // namespace vita
 

@@ -42,8 +42,8 @@ namespace vita
 
     fit_.clear();
 
-    functions_[0] = functions_[1] = 0;
-    terminals_[0] = terminals_[1] = 0;
+    functions_.counter = {0, 0};
+    terminals_.counter = {0, 0};
 
     info_.clear();
   }
@@ -71,7 +71,7 @@ namespace vita
   ///
   boost::uint64_t analyzer::functions(bool eff) const
   {
-    return functions_[eff];
+    return functions_.counter[eff];
   }
 
   ///
@@ -80,7 +80,7 @@ namespace vita
   ///
   boost::uint64_t analyzer::terminals(bool eff) const
   {
-    return terminals_[eff];
+    return terminals_.counter[eff];
   }
 
   ///
@@ -126,16 +126,16 @@ namespace vita
   /// \param[in] sym symbol we are gathering statistics about.
   /// \param[in] active is this an active gene?
   ///
-  /// Used by count(const individual &).
+  /// Used by \c count(const individual &)
   ///
   void analyzer::count(const symbol *const sym, bool active)
   {
     ++info_[sym].counter[active];
 
     if (sym->terminal())
-      ++terminals_[active];
+      ++terminals_.counter[active];
     else
-      ++functions_[active];
+      ++functions_.counter[active];
   }
 
   ///
