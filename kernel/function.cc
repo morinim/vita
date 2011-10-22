@@ -34,7 +34,8 @@ namespace vita
   /// \param[in] dis string representation of the function (e.g. for the plus
   ///                \a function it could by "ADD" or "+").
   /// \param[in] t type of the function (i.e. the type of the output value).
-  /// \param[in] args parameters (type and number) of the function.
+  /// \param[in] args input parameters (type and number) of the function (in
+  ///                 C++ they would be called the "function signature").
   /// \param[in] w the weight of the function (used for random initialization).
   /// \param[in] asve \c true if the function is associative (e.g. addition is
   ///                 associative, division isn't).
@@ -64,7 +65,7 @@ namespace vita
   ///                 associative, division isn't).
   ///
   /// This constructor is used to quickly create a function of homogeneous
-  /// signature (all parameters are of the same type).
+  /// signature (all input parameters are of the same type).
   ///
   function::function(const std::string &dis, symbol_t t,
                      unsigned n, unsigned w, bool asve)
@@ -73,7 +74,7 @@ namespace vita
     assert(n <= gene::k_args);
 
     unsigned i(0);
-    for (; i <     arity_; ++i)    argt_[i] =        t;
+    for (; i <       arity_; ++i)  argt_[i] =        t;
     for (; i < gene::k_args; ++i)  argt_[i] = sym_void;
 
     assert(check());

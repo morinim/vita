@@ -34,8 +34,8 @@ namespace vita
   class interpreter;
 
   ///
-  /// \a argument is a special \a terminal used by \a adf_n functions for
-  /// parameter input.
+  /// \a argument is a special \a terminal used by \a adf functions for
+  /// input parameters passing.
   ///
   class argument : public terminal
   {
