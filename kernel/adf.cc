@@ -61,7 +61,7 @@ namespace vita
   /// \param[in] i the context in which this ADF is evaluated.
   /// \return the output of the ADF.
   ///
-  /// adf_n functions need input parameters from the \a i context.
+  /// adf functions need input parameters from the \a i context.
   ///
   boost::any adf::eval(interpreter *i) const
   {
