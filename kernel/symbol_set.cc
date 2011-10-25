@@ -43,18 +43,12 @@ namespace vita
   }
 
   ///
-  /// Utility function used to help the constructor and the delete_symbols
-  /// member function in the clean up process.
+  /// Utility function used to help the constructor in the clean up process.
   ///
   void symbol_set::clear()
   {
-    adf_.clear();
-    adt_.clear();
-    symbols_.clear();
-    terminals_.clear();
-    specials_.clear();
-
-    sum_ = 0;
+    all_ = collection();
+    by_ = by_type();
   }
 
   ///
@@ -73,8 +67,8 @@ namespace vita
   ///
   const symbol_ptr &symbol_set::get_adt(unsigned i) const
   {
-    assert(i < adt_.size());
-    return adt_[i];
+    assert(i < all_.adt.size());
+    return all_.adt[i];
   }
 
   ///
@@ -82,7 +76,7 @@ namespace vita
   ///
   unsigned symbol_set::adts() const
   {
-    return adt_.size();
+    return all_.adt.size();
   }
 
   ///
@@ -91,8 +85,8 @@ namespace vita
   ///
   const symbol_ptr &symbol_set::get_special(unsigned n) const
   {
-    assert(n < specials_.size());
-    return specials_[n];
+    assert(n < all_.specials.size());
+    return all_.specials[n];
   }
 
   ///
@@ -100,7 +94,7 @@ namespace vita
   ///
   unsigned symbol_set::specials() const
   {
-    return specials_.size();
+    return all_.specials.size();
   }
 
   ///
@@ -115,29 +109,30 @@ namespace vita
   {
     assert(i && i->weight && i->check());
 
+    // Special aren't inserted in the symbols' vector.
     if (special)
     {
       assert(i->terminal());
-      specials_.push_back(i);
+      all_.specials.push_back(i);
     }
     else
     {
-      symbols_.push_back(i);
-      sum_ += i->weight;
+      all_.symbols.push_back(i);
+      all_.sum += i->weight;
     }
 
     if (i->terminal())
     {
-      terminals_.push_back(i);
+      all_.terminals.push_back(i);
 
       if (i->auto_defined())
-        adt_.push_back(i);
+        all_.adt.push_back(i);
     }
     else  // not a terminal
       if (i->auto_defined())
-        adf_.push_back(i);
+        all_.adf.push_back(i);
 
-    assert(check());
+    by_ = by_type(all_);
   }
 
   ///
@@ -145,69 +140,71 @@ namespace vita
   {
     for (unsigned i(0); i < adts(); ++i)
     {
-      const unsigned w(adt_[i]->weight);
+      const unsigned w(all_.adt[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
                            w == 1 ? 1 : 0);
-      sum_ -= delta;
-      adt_[i]->weight -= delta;
+      all_.sum -= delta;
+      all_.adt[i]->weight -= delta;
 
-      if (delta && adt_[i]->weight == 0)
+      if (delta && all_.adt[i]->weight == 0)
       {
-        for (unsigned j(0); j < terminals_.size(); ++j)
-          if (terminals_[j]->opcode() == adt_[i]->opcode())
+        for (unsigned j(0); j < all_.terminals.size(); ++j)
+          if (all_.terminals[j]->opcode() == all_.adt[i]->opcode())
           {
-            terminals_.erase(terminals_.begin()+j);
+            all_.terminals.erase(all_.terminals.begin()+j);
             break;
           }
 
-        for (unsigned j(0); j < symbols_.size(); ++j)
-          if (symbols_[j]->opcode() == adt_[i]->opcode())
+        for (unsigned j(0); j < all_.symbols.size(); ++j)
+          if (all_.symbols[j]->opcode() == all_.adt[i]->opcode())
           {
-            symbols_.erase(symbols_.begin()+j);
+            all_.symbols.erase(all_.symbols.begin()+j);
             break;
           }
       }
     }
 
-    for (unsigned i(0); i < adf_.size(); ++i)
+    for (unsigned i(0); i < all_.adf.size(); ++i)
     {
-      const unsigned w(adf_[i]->weight);
+      const unsigned w(all_.adf[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
                            w == 1 ? 1 : 0);
-      sum_ -= delta;
-      adf_[i]->weight -= delta;
+      all_.sum -= delta;
+      all_.adf[i]->weight -= delta;
     }
+
+    by_ = by_type(all_);
   }
 
   ///
-  /// \param[in] only_t if true extracts only terminals.
+  /// \param[in] only_t if \c true extracts only terminals.
   /// \return a random symbol.
   ///
   /// If \a only_t == \c true extracts a \a terminal else a random \a symbol
-  /// (may be a \a terminal, a primitive function or an ADF).
+  /// (may be a terminal, a primitive function or an ADF).
   ///
   const symbol_ptr &symbol_set::roulette(bool only_t) const
   {
-    assert(sum_);
+    assert(all_.sum);
 
     if (only_t)
     {
-      const unsigned i(random::between<unsigned>(0, terminals_.size()));
+      const unsigned i(random::between<unsigned>(0, all_.terminals.size()));
 
-      assert(!dynamic_cast<argument *>(terminals_[i].get()));
-      return terminals_[i];
+      assert(!dynamic_cast<argument *>(all_.terminals[i].get()));
+      return all_.terminals[i];
     }
 
-    const unsigned slot(random::between<unsigned>(0, sum_));
+    const unsigned slot(random::between<unsigned>(0, all_.sum));
 
     unsigned i(0);
-    for (unsigned wedge(symbols_[i]->weight);
-         wedge <= slot && i+1 < symbols_.size();
-         wedge += symbols_[++i]->weight)
+    for (unsigned wedge(all_.symbols[i]->weight);
+         wedge <= slot && i+1 < all_.symbols.size();
+         wedge += all_.symbols[++i]->weight)
     {}
 
-    assert(!dynamic_cast<argument *>(symbols_[i].get()));
-    return symbols_[i];
+    assert(!dynamic_cast<argument *>(all_.symbols[i].get()));
+    return all_.symbols[i];
   }
 
   ///
@@ -217,9 +214,9 @@ namespace vita
   ///
   symbol_ptr symbol_set::decode(unsigned opcode) const
   {
-    for (unsigned i(0); i < symbols_.size(); ++i)
-      if (symbols_[i]->opcode() == opcode)
-        return symbols_[i];
+    for (unsigned i(0); i < all_.symbols.size(); ++i)
+      if (all_.symbols[i]->opcode() == opcode)
+        return all_.symbols[i];
 
     return symbol_ptr();
   }
@@ -234,45 +231,80 @@ namespace vita
   ///
   symbol_ptr symbol_set::decode(const std::string &dex) const
   {
-    for (unsigned i(0); i < symbols_.size(); ++i)
-      if (symbols_[i]->display() == dex)
-        return symbols_[i];
+    for (unsigned i(0); i < all_.symbols.size(); ++i)
+      if (all_.symbols[i]->display() == dex)
+        return all_.symbols[i];
 
     return symbol_ptr();
   }
 
   ///
-  /// \return true if the object passes the internal consistency check.
+  /// \return \c true if there are enough terminals for individual generation.
+  ///
+  bool symbol_set::enough_terminals() const
+  {
+    std::set<unsigned> need;
+
+    for (unsigned i(0); i < all_.symbols.size(); ++i)
+      for (unsigned j(0); j < all_.symbols[i]->arity(); ++j)
+        need.insert(static_cast<function *>(all_.symbols[i].get())
+                    ->arg_type(j));
+
+    for (auto t(need.begin()); t != need.end(); ++t)
+      if (by_.type.size() <= *t ||
+          (!by_.type[*t].terminals.size() && !by_.type[*t].specials.size()))
+        return false;
+
+    return true;
+  }
+
+  ///
+  /// \return \c true if the object passes the internal consistency check.
   ///
   bool symbol_set::check() const
   {
-    boost::uint64_t sum(0);
+    if (!all_.check())
+      return false;
 
-    for (unsigned j(0); j < symbols_.size(); ++j)
-    {
-      if (!symbols_[j]->check())
+    for (unsigned t(0); t < by_.type.size(); ++t)
+      if (!by_.type[t].check())
         return false;
 
-      sum += symbols_[j]->weight;
+    return enough_terminals();
+  }
 
-      if (symbols_[j]->weight == 0)
+  ///
+  /// \return \c true if the object passes the internal consistency check.
+  ///
+  bool symbol_set::collection::check() const
+  {
+    boost::uint64_t sum(0);
+
+    for (unsigned j(0); j < symbols.size(); ++j)
+    {
+      if (!symbols[j]->check())
+        return false;
+
+      sum += symbols[j]->weight;
+
+      if (symbols[j]->weight == 0)
         return false;
 
       bool found(false);
-      if (symbols_[j]->terminal())
+      if (symbols[j]->terminal())
       {
         // Terminals must be in the _terminals vector.
-        for (unsigned i(0); i < terminals_.size() && !found; ++i)
-          found = (symbols_[j] == terminals_[i]);
+        for (unsigned i(0); i < terminals.size() && !found; ++i)
+          found = (symbols[j] == terminals[i]);
 
-        if (symbols_[j]->auto_defined())
-          for (unsigned i(0); i < adts() && !found; ++i)
-            found = (symbols_[j] == adt_[i]);
+        if (symbols[j]->auto_defined())
+          for (unsigned i(0); i < adt.size() && !found; ++i)
+            found = (symbols[j] == adt[i]);
       }
       else  // Function
-        if (symbols_[j]->auto_defined())
-          for (unsigned i(0); i < adf_.size() && !found; ++i)
-            found = (symbols_[j] == adf_[i]);
+        if (symbols[j]->auto_defined())
+          for (unsigned i(0); i < adf.size() && !found; ++i)
+            found = (symbols[j] == adf[i]);
         else
           found = true;
 
@@ -280,10 +312,70 @@ namespace vita
         return false;
     }
 
-    if (sum != sum_)
+    if (sum != sum)
       return false;
 
     // There should be one terminal at least.
-    return symbols_.size() == 0 || terminals_.size() > 0;
+    return symbols.size() == 0 || terminals.size() > 0;
+  }
+
+  ///
+  /// \param[in] c a collection containing many types of symbol.
+  ///
+  /// Initialize the struct using collection \a c as input parameter.
+  ///
+  symbol_set::by_type::by_type(const collection &c)
+    : type(free_symbol), n_types(0)
+  {
+    for (unsigned i(0); i < c.symbols.size(); ++i)
+    {
+      const unsigned t(c.symbols[i]->type());
+      if (t >= type.size())
+        type.reserve(t + 1);
+
+      type[t].symbols.push_back(c.symbols[i]);
+      type[t].sum += c.symbols[i]->weight;
+    }
+
+    for (unsigned i(0); i < c.terminals.size(); ++i)
+      type[c.terminals[i]->type()].terminals.push_back(c.terminals[i]);
+
+    for (unsigned i(0); i < c.adf.size(); ++i)
+      type[c.adf[i]->type()].adf.push_back(c.adf[i]);
+
+    for (unsigned i(0); i < c.adt.size(); ++i)
+      type[c.adt[i]->type()].adt.push_back(c.adt[i]);
+
+    for (unsigned i(0); i < c.specials.size(); ++i)
+    {
+      const unsigned t(c.specials[i]->type());
+      if (t >= type.size())
+        type.reserve(t + 1);
+
+      type[t].specials.push_back(c.specials[i]);
+    }
+
+    for (unsigned t(0); t < type.size(); ++t)
+      if (type[t].symbols.size() || type[t].specials.size())
+        ++n_types;
+
+    assert(check());
+  }
+
+  ///
+  /// \return \c true if the object passes the internal consistency check.
+  ///
+  bool symbol_set::by_type::check() const
+  {
+    for (unsigned t(0); t < type.size(); ++t)
+    {
+      const unsigned s(type[t].symbols.size());
+      if (s < type[t].terminals.size() ||
+          s < type[t].adf.size() ||
+          s < type[t].adt.size())
+        return false;
+    }
+
+    return types() <= type.size();
   }
 }  // Namespace vita

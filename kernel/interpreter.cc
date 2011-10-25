@@ -71,7 +71,7 @@ namespace vita
   }
 
   ///
-  /// \return the output value of the current terminal  symbol.
+  /// \return the output value of the current terminal symbol.
   ///
   boost::any interpreter::eval()
   {

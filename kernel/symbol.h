@@ -36,7 +36,7 @@ namespace vita
   const symbol_t sym_void(0);
   const symbol_t sym_bool(1);
   const symbol_t sym_real(2);
-  const symbol_t sym_argument(3);
+  const symbol_t sym_string(3);
   const symbol_t free_symbol(4);
 
   class interpreter;

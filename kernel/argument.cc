@@ -31,14 +31,14 @@ namespace vita
   /// \param[in] n argument index.
   ///
   /// An adf function may have up to \a k_args arguments. Arguments' type is
-  /// special (\c sym_argument but we could say they haven't a type) because
+  /// special (\c sym_void but we could say they haven't a type) because
   /// arguments are communication channels among adf functions and their
   /// calling environments. So the type that is travelling on channel \c i
   /// (argument(i)) varies depending on the function being evaluated (instead,
   /// adf functions have a precise, fixed signature).
   ///
   argument::argument(unsigned n)
-    : terminal("ARG", sym_argument, false, false, 0), index_(n)
+    : terminal("ARG", sym_void, false, false, 0), index_(n)
   {
     assert(check());
   }

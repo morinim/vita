@@ -36,8 +36,6 @@ namespace vita
   ///
   /// This is a container for the symbol set. Symbols are stored to be quickly
   /// recalled by type and randomly extracted.
-  /// Memory management for symbols is a user's responsibility (anyway to help
-  /// in this task there is the delete_symbols() function).
   /// The function and terminals used should be powerful enough to be able to
   /// represent a solution to the problem. On the other hand, it is better not
   /// to use too large a symbol set (this enalarges the search space and can
@@ -52,8 +50,10 @@ namespace vita
 
     const symbol_ptr &roulette(bool = false) const;
     const symbol_ptr &arg(unsigned) const;
+
     const symbol_ptr &get_adt(unsigned) const;
     unsigned adts() const;
+
     const symbol_ptr &get_special(unsigned) const;
     unsigned specials() const;
 
@@ -62,25 +62,56 @@ namespace vita
     symbol_ptr decode(unsigned) const;
     symbol_ptr decode(const std::string &) const;
 
+    bool enough_terminals() const;
     bool check() const;
 
   private:
     void clear();
 
-    std::vector<symbol_ptr>   symbols_;
-    std::vector<symbol_ptr> terminals_;
-    std::vector<symbol_ptr>       adf_;
-    std::vector<symbol_ptr>       adt_;
+    // \a arguments_ is not included in the \a collection struct because type
+    // isn't fixed for an argument (see \c argument constructor for more
+    // details).
     std::vector<symbol_ptr> arguments_;
 
-    // A special symbol is not used during initial random generation but it's
-    // inserted at the end of the genome in a protected area. Terminals only
-    // can be special.
-    std::vector<symbol_ptr>  specials_;
+    struct collection
+    {
+      std::vector<symbol_ptr>   symbols;
+      std::vector<symbol_ptr> terminals;
+      std::vector<symbol_ptr>       adf;
+      std::vector<symbol_ptr>       adt;
 
-    // The sum of the weights of all the symbols in the symbol set that are NOT
-    // special.
-    boost::uint64_t sum_;
+      // A special symbol is not used during initial random generation but it's
+      // inserted at the end of the genome in a protected area. Only terminals
+      // can be special.
+      std::vector<symbol_ptr>  specials;
+
+      // The sum of the weights of all the symbols in the collection that are
+      // NOT special.
+      boost::uint64_t sum;
+
+      bool check() const;
+    };
+
+    // Symbols of every type are inserted in this collection.
+    collection all_;
+
+    // This struct contains all the symbols (\a all_) divided by type.
+    class by_type
+    {
+    public:
+      explicit by_type(const collection & = collection());
+
+      /// Number of different types loaded in the collection. Note that
+      /// \c type() could be less than \c type.size()
+      unsigned types() const { return n_types; }
+
+      std::vector<collection> type;
+
+      bool check() const;
+
+    private:
+      unsigned n_types;
+    } by_;
   };
 }  // namespace vita
 

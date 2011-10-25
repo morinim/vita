@@ -87,7 +87,9 @@ kernel: $(KERNEL_OBJ)
 clean:
 	@echo Making clean...
 	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
-	@rm -f sr/sr test/test? examples/example? kernel/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
+	@find ./test/ -executable -not -name "*.*" -type f -delete -print
+	@find ./examples/ -executable -not -name "*.*" -type f -delete -print
+	@rm -f sr/sr kernel/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
 
 .phony:	backup
 backup:
