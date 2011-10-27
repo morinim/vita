@@ -41,7 +41,7 @@ namespace vita
   typedef std::shared_ptr<sr::variable> variable_ptr;
 
   ///
-  /// \a data \c class stores the training set used to evolve the \a population.
+  /// \a data class stores the training set used to evolve the \a population.
   ///
   class data
   {
@@ -87,7 +87,10 @@ namespace vita
   private:
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
+
     unsigned encode(const std::string &);
+    unsigned load_csv(const std::string &);
+    unsigned load_xrff(const std::string &);
 
     std::map<std::string, unsigned> labels_;
 

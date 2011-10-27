@@ -21,11 +21,16 @@
  *
  */
 
-#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/data.h"
 #include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
@@ -224,11 +229,177 @@ namespace vita
     return record;
   }
 
+  boost::any convert(const std::string &s, symbol_t t)
+  {
+    switch (t)
+    {
+    case sym_void: throw boost::bad_lexical_cast();
+    case sym_bool: return boost::lexical_cast<bool>(s);
+    case sym_real: return boost::lexical_cast<double>(s);
+    default:       return s;
+    }
+  }
+
+# pragma GCC diagnostic ignored "-Wtype-limits"
   ///
-  /// \param[in] filename name of the file containing the learning collection.
+  /// \param[in] filename the xrff file.
   /// \return number of lines parsed (0 in case of errors).
   ///
-  unsigned data::open(const std::string &filename)
+  /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
+  /// of instances sharing a set of attributes. To date we don't suppert
+  /// compressed XRFF files.
+  ///
+  unsigned data::load_xrff(const std::string &filename)
+  {
+    static std::map<const std::string, symbol_t> from_weka =
+    {
+      // This type is vita-specific (not standard).
+      {"boolean", sym_bool},
+
+      // Integer, real and numeric are treated as double precisione number
+      // (sym_real).
+      {"integer", sym_real},
+      {"numeric", sym_real},
+      {"real", sym_real},
+
+      // Nominal values are deined by providing a list of possible values.
+      {"nominal", sym_string},
+
+      // String attributes allow us to create attributes containing arbitrary
+      // textual values. This is very useful in text-mining applications.
+      {"string", sym_string}
+
+      //{"date", ?}, {"relational", ?}
+    };
+
+    using namespace boost::property_tree;
+
+    ptree pt;
+    read_xml(filename, pt);
+
+    struct attribute
+    {
+      std::string name;
+      symbol_t    type;
+      bool      output;
+    };
+    std::vector<attribute> header;
+
+    // Iterate over dataset.header.attributes selection and store all found
+    // attributes in the header vector. The get_child() function returns a
+    // reference to the child at the specified path; if there is no such child
+    // IT THROWS. Property tree iterators are models of BidirectionalIterator.
+    BOOST_FOREACH(ptree::value_type dha,
+                  pt.get_child("dataset.header.attributes"))
+      if (dha.first == "attribute")
+      {
+        attribute a;
+
+        // Structure ptree does not have a concept of an attribute, so xml
+        // attributes are just sub-elements of a special element <xmlattr>.
+        // Note that we don't have to provide the template parameter when it is
+        // deduced from the default value.
+        a.name = dha.second.get("<xmlattr>.name", "");
+
+        const std::string type(dha.second.get("<xmlattr>.type", ""));
+        if (type == "nominal")
+        {
+          BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
+            if (l.first == "label")
+            {
+              // Store label1... labelN}
+            }
+        }
+        a.type = from_weka[type];
+
+        // Via the class="yes" attribute in the attribute specification in the
+        // header, one can define which attribute should act as output value.
+        a.output = dha.second.get("<xmlattr>.class", "no") == "yes";
+
+        header.push_back(a);
+      }
+
+    unsigned parsed(0);
+    BOOST_FOREACH(ptree::value_type bi, pt.get_child("body.instances"))
+      if (bi.first == "instance")
+      {
+        value_type instance;
+
+        for (auto v(bi.second.begin()); v != bi.second.end(); ++v)
+          if (v->first == "value")
+          {
+            const unsigned index(std::distance(v, bi.second.begin()));
+            const symbol_t type(header[index].type);
+
+            try
+            {
+              if (header[index].output)
+              {
+                if (type == sym_string)
+                  instance.output = encode(v->second.data());
+                else
+                  instance.output = convert(v->second.data(), type);
+              }
+              else  // input value
+                instance.input.push_back(convert(v->second.data(), type));
+            }
+            catch (boost::bad_lexical_cast &)
+            {
+              instance.clear();
+              continue;
+            }
+          }
+
+        if (instance.input.size() + 1 == header.size())
+        {
+          const unsigned set(vita::random::between<unsigned>(0,
+                                                             datasets_.size()));
+          datasets_[set].push_back(instance);
+          ++parsed;
+        }
+      }
+
+    return parsed;
+  }
+
+  ///
+  /// \param[in] filename the csv file.
+  /// \return number of lines parsed (0 in case of errors).
+  ///
+  /// We follow the Google Prediction API convention
+  /// (<http://code.google.com/intl/it/apis/predict/docs/developer-guide.html#data-format>):
+  /// * no header row is allowed;
+  /// * only one example is allowed per line. A single example cannot contain
+  ///   newlines and cannot span multiple lines;
+  /// * columns are separated by commas. Commas inside a quoted string are not
+  ///   column delimiters;
+  /// * the first column represents the value (numeric or string) for that
+  ///   example. If the first column is numetic, this model is a regression
+  ///   model; if the first column is a string, it is a categorization model.
+  ///   Each column must describe the same kind of information for that example;
+  /// * the column order of features in the table does not weight the results;
+  ///   the first feature is not weighted any more than the last;
+  /// * as a best practice, remove punctuation (other than apostrophes) from
+  ///   your data. This is because commas, periods, and other punctuation
+  ///   rarely add meaning to the training data, but are treated as meaningful
+  ///   elements by the learning engine. For example, "end." is not matched to
+  ///   "end";
+  /// * TEXT STRINGS:
+  ///   * place double quotes around all text strings;
+  ///   * text matching is case-sensitive: "wine" is different from "Wine.";
+  ///   * if a string contains a double quote, the double quote must be escaped
+  ///     with another double quote, for example:
+  ///     "sentence with a ""double"" quote inside";
+  /// * NUMERIC VALUES:
+  ///   * both integer and decimal values are supported;
+  ///   * numbers in quotes without whitespace will be treated as numbers, even
+  ///     if they are in quotation marks. Multiple numeric values within
+  ///     quotation marks in the same field will be treated as a string. For
+  ///     example:
+  ///       Numbers: "2", "12", "236"
+  ///       Strings: "2 12", "a 23"
+  ///
+  unsigned data::load_csv(const std::string &filename)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -308,6 +479,18 @@ namespace vita
 
     check();
     return parsed;
+  }
+
+  ///
+  /// \param[in] filename name of the file containing the learning collection.
+  /// \return number of lines parsed (0 in case of errors).
+  ///
+  unsigned data::open(const std::string &filename)
+  {
+    if (boost::algorithm::iends_with(filename, ".xrff"))
+      return 1;
+
+    return load_csv(filename);
   }
 
   ///

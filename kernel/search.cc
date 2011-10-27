@@ -220,7 +220,7 @@ namespace vita
 
     prob_->env.log(&pt, path);
 
-    using namespace boost::property_tree::xml_parser;
+    using namespace boost::property_tree;
     write_xml(f_sum, pt, std::locale(), xml_writer_make_settings(' ', 2));
   }
 
