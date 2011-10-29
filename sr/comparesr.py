@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
 
+#
+#  Copyright 2011 EOS di Manlio Morini.
+#
+#  This file is part of VITA.
+#
+#  VITA is free software: you can redistribute it and/or modify it under the
+#  terms of the GNU General Public License as published by the Free Software
+#  Foundation, either version 3 of the License, or (at your option) any later
+#  version.
+#
+#  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#  details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with VITA. If not, see <http://www.gnu.org/licenses/>.
+#
+
 import argparse
 import os
 from collections import defaultdict
@@ -49,13 +68,13 @@ def compare_file(files, scores):
         else:
             format_str = format_string_row
 
-        print(format_str.format(fn, success_rate[f], 
+        print(format_str.format(fn, success_rate[f],
                                 avg_depth_found[f], mean_fitness[f],
                                 standard_deviation[f]))
 
     l = len(files)
     for f in files:
-        opt = decode_opt(f,files)
+        opt = decode_opt(f, files)
         if scores[opt] is None:
             scores[opt] = Decimal("0.00")
 
@@ -68,25 +87,25 @@ def compare_file(files, scores):
 
     if success_rate[best[0]] > 0:
         for f in best:
-            scores[decode_opt(f,files)] += Decimal("1.00")
+            scores[decode_opt(f, files)] += Decimal("1.00")
     else:
         good = [best[0]]
         for f in best[1:]:
-            mff = round(mean_fitness[f],4)
-            mfg = round(mean_fitness[good[0]],4)
+            mff = round(mean_fitness[f], 4)
+            mfg = round(mean_fitness[good[0]], 4)
             if mff > mfg:
                 good = [f]
             elif mff == mfg:
                 good.append(f)
         for f in good:
-            scores[decode_opt(f,files)] += Decimal(".01")
-    
+            scores[decode_opt(f, files)] += Decimal(".01")
+
 
 def decode_opt(f, files):
     if len(files) > 2:
-        (fn,ext) = os.path.splitext(os.path.basename(f))
-        (l,s,r) = fn.rpartition("_")
-    
+        (fn, ext) = os.path.splitext(os.path.basename(f))
+        (l, s, r) = fn.rpartition("_")
+
         values = {
             "00": "(00) DEBUG elitism",
             "01": "(01) DEBUG",
@@ -100,7 +119,7 @@ def decode_opt(f, files):
         }
         return values.get(r,"UNKNOWN")
     else:
-        return files.index(f)        
+        return files.index(f)
 
 
 def start_comparison(args):
@@ -116,27 +135,27 @@ def start_comparison(args):
         for f in dir_list:
             if os.path.splitext(f)[1] == ".sum":
                 dataset = os.path.splitext(f.split("_")[0])[0]
-                fn = os.path.join(args.filepath[0],os.path.basename(f))
+                fn = os.path.join(args.filepath[0], os.path.basename(f))
                 if groups.get(dataset) is None:
                     groups[dataset] = [fn]
                 else:
                     groups[dataset].append(fn)
         for k in groups.keys():
-            compare_file(groups[k],scores)
-            print("-"*79)               
+            compare_file(groups[k], scores)
+            print("-" * 79)
     elif os.path.isdir(args.filepath[0]) and os.path.isdir(args.filepath[1]):
         dir_list = os.listdir(args.filepath[0])
         for f in dir_list:
             if os.path.splitext(f)[1] == ".sum":
-                fn1 = os.path.join(args.filepath[0],os.path.basename(f))
-                fn2 = os.path.join(args.filepath[1],os.path.basename(f))
+                fn1 = os.path.join(args.filepath[0], os.path.basename(f))
+                fn2 = os.path.join(args.filepath[1], os.path.basename(f))
                 if os.path.isfile(fn2):
-                    compare_file([fn1,fn2],scores)
+                    compare_file([fn1, fn2], scores)
                     print("-"*79)
                 else:
                     print("Missing {0} file".format(fn2))
     elif os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
-        compare_file([args.filepath[0],args.filepath[1]],scores)
+        compare_file([args.filepath[0], args.filepath[1]], scores)
 
     print("\nOverall testsets comparison")
     for f in sorted(scores.keys()):
@@ -147,9 +166,9 @@ def get_cmd_line_options():
     description = "Compare execution summaries of datasets"
     parser = argparse.ArgumentParser(description = description)
 
-    parser.add_argument("-v","--verbose", action="store_true",
-                        help="Turn on verbose mode")
-    parser.add_argument("filepath", nargs="*")
+    parser.add_argument("-v", "--verbose", action = "store_true",
+                        help = "Turn on verbose mode")
+    parser.add_argument("filepath", nargs = "*")
 
     return parser
 

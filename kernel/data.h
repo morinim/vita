@@ -85,6 +85,8 @@ namespace vita
     bool check() const;
 
   private:
+    static boost::any convert(const std::string &, symbol_t);
+    static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
@@ -93,6 +95,18 @@ namespace vita
     unsigned load_xrff(const std::string &);
 
     std::map<std::string, unsigned> labels_;
+
+    // Informations about a "column" of data.
+    struct column
+    {
+      std::string name;
+      symbol_t    type;
+      bool      output;
+    };
+
+    // How is the dataset organized? Sometimes we have a dataset header (XRFF
+    // file format), other times it has to be implicitly derived (e.g. CSV).
+    std::vector<column> header;
 
     // The training set (partitioned).
     std::vector<std::list<value_type>> datasets_;

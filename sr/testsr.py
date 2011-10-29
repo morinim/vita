@@ -1,5 +1,24 @@
 #!/usr/bin/env python3
 
+#
+#  Copyright 2011 EOS di Manlio Morini.
+#
+#  This file is part of VITA.
+#
+#  VITA is free software: you can redistribute it and/or modify it under the
+#  terms of the GNU General Public License as published by the Free Software
+#  Foundation, either version 3 of the License, or (at your option) any later
+#  version.
+#
+#  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
+#  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#  details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with VITA. If not, see <http://www.gnu.org/licenses/>.
+#
+
 import argparse
 import configparser
 import os
@@ -75,16 +94,16 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 
 def start_testing(args):
     testcases = {
-        "fibonacci":  [ "fibonacci.dat", 120, 500, 200,  80,     "arithmetic"],
-        "iris":       [      "iris.dat", 100, 500, 100,  80, "classification"],
-        "mep":        [       "mep.dat", 100, 200, 500, 100],
-        "mepbias":    [       "mep.dat", 100, 200,  20, 100,            "mep"],
-        "petalrose":  [ "petalrose.dat", 100, 500, 200,  80,     "arithmetic"],
-        "petalrose3": ["petalrose3.dat", 100, 500, 200,  80,     "arithmetic"],
-        "petalrose2": ["petalrose2.dat", 100, 500, 200,  80,     "arithmetic"],
-        "spambase":   [  "spambase.dat", 100, 999, 100,  50, "classification"],
-        "x2y2z2":     [   "x2y2_z2.dat", 100, 200, 500,  80,           "math"],
-        "x2y2z2bias": [   "x2y2_z2.dat", 100, 200, 100,  80,     "arithmetic"]
+        "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80,     "arithmetic"],
+        "iris":       [      "iris.xrff", 100, 500, 100,  80, "classification"],
+        "mep":        [       "mep.csv", 100, 200, 500, 100],
+        "mepbias":    [       "mep.csv", 100, 200,  20, 100,            "mep"],
+        "petalrose":  [ "petalrose.csv", 100, 500, 200,  80,     "arithmetic"],
+        "petalrose3": ["petalrose3.csv", 100, 500, 200,  80,     "arithmetic"],
+        "petalrose2": ["petalrose2.csv", 100, 500, 200,  80,     "arithmetic"],
+        "spambase":   [  "spambase.csv", 100, 999, 100,  50, "classification"],
+        "x2y2z2":     [   "x2y2_z2.csv", 100, 200, 500,  80,           "math"],
+        "x2y2z2bias": [   "x2y2_z2.csv", 100, 200, 100,  80,     "arithmetic"]
         }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]

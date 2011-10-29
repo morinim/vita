@@ -229,7 +229,14 @@ namespace vita
     return record;
   }
 
-  boost::any convert(const std::string &s, symbol_t t)
+  ///
+  /// \param[in] s the string to be converted.
+  /// \param[in] t what type should \a s be converted in?
+  /// \return the converted data.
+  ///
+  /// convert("123.1", sym_real) == 123.1f
+  ///
+  boost::any data::convert(const std::string &s, symbol_t t)
   {
     switch (t)
     {
@@ -238,6 +245,24 @@ namespace vita
     case sym_real: return boost::lexical_cast<double>(s);
     default:       return s;
     }
+  }
+
+  ///
+  /// \param[in] s the string to be tested.
+  /// \return \c true if \a s contains a number.
+  ///
+  bool data::is_number(const std::string &s)
+  {
+    try
+    {
+      boost::lexical_cast<double>(s);
+    }
+    catch (boost::bad_lexical_cast &)
+    {
+      return false;
+    }
+
+    return true;
   }
 
 # pragma GCC diagnostic ignored "-Wtype-limits"
@@ -277,14 +302,6 @@ namespace vita
     ptree pt;
     read_xml(filename, pt);
 
-    struct attribute
-    {
-      std::string name;
-      symbol_t    type;
-      bool      output;
-    };
-    std::vector<attribute> header;
-
     // Iterate over dataset.header.attributes selection and store all found
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
@@ -293,7 +310,7 @@ namespace vita
                   pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
       {
-        attribute a;
+        column a;
 
         // Structure ptree does not have a concept of an attribute, so xml
         // attributes are just sub-elements of a special element <xmlattr>.
@@ -320,15 +337,15 @@ namespace vita
       }
 
     unsigned parsed(0);
-    BOOST_FOREACH(ptree::value_type bi, pt.get_child("body.instances"))
+    BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
         value_type instance;
 
-        for (auto v(bi.second.begin()); v != bi.second.end(); ++v)
+        unsigned index(0);
+        for (auto v(bi.second.begin()); v != bi.second.end(); ++v, ++index)
           if (v->first == "value")
           {
-            const unsigned index(std::distance(v, bi.second.begin()));
             const symbol_t type(header[index].type);
 
             try
@@ -359,6 +376,7 @@ namespace vita
         }
       }
 
+    assert(check());
     return parsed;
   }
 
@@ -368,15 +386,16 @@ namespace vita
   ///
   /// We follow the Google Prediction API convention
   /// (<http://code.google.com/intl/it/apis/predict/docs/developer-guide.html#data-format>):
-  /// * no header row is allowed;
+  /// * NO HEADER ROW is allowed;
   /// * only one example is allowed per line. A single example cannot contain
   ///   newlines and cannot span multiple lines;
   /// * columns are separated by commas. Commas inside a quoted string are not
   ///   column delimiters;
-  /// * the first column represents the value (numeric or string) for that
-  ///   example. If the first column is numetic, this model is a regression
-  ///   model; if the first column is a string, it is a categorization model.
-  ///   Each column must describe the same kind of information for that example;
+  /// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
+  ///   example. If the first column is numetic, this model is a REGRESSION
+  ///   model; if the first column is a string, it is a CATEGORIZATION
+  ///   (i.e. classification) model. Each column must describe the same kind of
+  ///   information for that example;
   /// * the column order of features in the table does not weight the results;
   ///   the first feature is not weighted any more than the last;
   /// * as a best practice, remove punctuation (other than apostrophes) from
@@ -406,78 +425,55 @@ namespace vita
       return 0;
 
     std::string line;
-
-    // First line is special, it codes type and mean of each field.
-    if (!std::getline(from, line))
-      return 0;
-
-    // format will contain the data file line format.
-    // The line
-    //   IN,IN,IN,OL,IN
-    // means: first three fields are input fields (I) and their type is numeric
-    // (N). Fourth field is an output field and it is a label (L). The last
-    // field is a numerical input.
-    // If output field is numeric this is a symbolic regression problem,
-    // otherwise it's a classification problem.
-    // *No more than one output field, please!*
-    const std::vector<std::string> format(csvline(line));
-    const unsigned size(format.size());
-
-    // We know the format, let's read the data.
     unsigned parsed(0);
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
+      const unsigned size(parsed ? header.size() : record.size());
 
       if (record.size() == size)
       {
-        value_type v;
+        value_type instance;
 
         for (unsigned field(0); field < size; ++field)
-          if (format[field][0] == 'I')  // input field
+        {
+          // The first line is (also) used to learn data format.
+          if (!parsed)
+            header.push_back(column{"",
+                  is_number(record[field]) ? sym_real : sym_string, field==0});
+
+          const symbol_t type(header[field].type);
+
+          try
           {
-            const char intype(std::toupper(format[field][1]));
-
-            switch (intype)
+            if (field == 0)  // output value
             {
-            case 'N':
-              try
-              {
-                v.input.push_back(boost::lexical_cast<double>(record[field]));
-              }
-              catch (boost::bad_lexical_cast &)
-              {
-                v.clear();
-                continue;
-              }
-              break;
+              if (type == sym_string)
+                instance.output = encode(record[field]);
+              else
+                instance.output = convert(record[field], type);
             }
+            else  // input value
+              instance.input.push_back(convert(record[field], type));
           }
-          else  // output field
-            if (format[field][1] == 'L')  // symbolic output field
-              v.output = encode(record[field]);
-            else  // numerical output field
-              try
-              {
-                v.output = boost::lexical_cast<double>(record[field]);
-              }
-              catch (boost::bad_lexical_cast &)
-              {
-                v.clear();
-                continue;
-              }
+          catch (boost::bad_lexical_cast &)
+          {
+            instance.clear();
+            continue;
+          }
+        }
 
-        if (v.input.size() + 1 == size)
+        if (instance.input.size() + 1 == header.size())
         {
           const unsigned set(vita::random::between<unsigned>(0,
                                                              datasets_.size()));
-          datasets_[set].push_back(v);
+          datasets_[set].push_back(instance);
           ++parsed;
         }
       }
     }
 
-    check();
+    assert(check());
     return parsed;
   }
 
@@ -487,10 +483,10 @@ namespace vita
   ///
   unsigned data::open(const std::string &filename)
   {
-    if (boost::algorithm::iends_with(filename, ".xrff"))
-      return 1;
+    header.clear();
 
-    return load_csv(filename);
+    return boost::algorithm::iends_with(filename, ".xrff") ?
+      load_xrff(filename) : load_csv(filename);
   }
 
   ///
