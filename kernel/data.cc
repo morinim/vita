@@ -257,7 +257,7 @@ namespace vita
     {
       boost::lexical_cast<double>(s);
     }
-    catch (boost::bad_lexical_cast &)
+    catch(boost::bad_lexical_cast &)
     {
       return false;
     }
@@ -294,7 +294,7 @@ namespace vita
       // textual values. This is very useful in text-mining applications.
       {"string", sym_string}
 
-      //{"date", ?}, {"relational", ?}
+      // {"date", ?}, {"relational", ?}
     };
 
     using namespace boost::property_tree;
@@ -320,13 +320,18 @@ namespace vita
 
         const std::string type(dha.second.get("<xmlattr>.type", ""));
         if (type == "nominal")
-        {
-          BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
-            if (l.first == "label")
-            {
-              // Store label1... labelN}
-            }
-        }
+          try
+          {
+            BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
+              if (l.first == "label")
+              {
+                // Store label1... labelN}
+              }
+          }
+          catch(...)
+          {
+          }
+
         a.type = from_weka[type];
 
         // Via the class="yes" attribute in the attribute specification in the
@@ -360,7 +365,7 @@ namespace vita
               else  // input value
                 instance.input.push_back(convert(v->second.data(), type));
             }
-            catch (boost::bad_lexical_cast &)
+            catch(boost::bad_lexical_cast &)
             {
               instance.clear();
               continue;
@@ -456,7 +461,7 @@ namespace vita
             else  // input value
               instance.input.push_back(convert(record[field], type));
           }
-          catch (boost::bad_lexical_cast &)
+          catch(boost::bad_lexical_cast &)
           {
             instance.clear();
             continue;

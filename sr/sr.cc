@@ -141,21 +141,25 @@ bool parse_command_line(int argc, char *argv[])
     po::options_description evolution("Evolution");
     evolution.add_options()
       ("population-size,P",
-       po::value(&problem.env.individuals),
+       po::value(&problem.env.individuals)->default_value(
+         problem.env.individuals),
        "Sets the number of programs/individuals in the population.")
       ("elitism",
        po::value<bool>(&problem.env.elitism)->default_value(true),
        "When elitism is true an individual will never replace a better one.")
       ("mutation-rate,m",
-       po::value(&problem.env.p_mutation),
+       po::value(&problem.env.p_mutation)->default_value(
+         problem.env.p_mutation),
        "Sets the overall probability of mutation of the individuals that have "\
        "been selected as winners in a tournament. Range is [0,1].")
       ("crossover-rate,c",
-       po::value(&problem.env.p_cross),
+       po::value(&problem.env.p_cross)->default_value(
+         problem.env.p_cross),
        "Sets the overall probability that crossover will occour between two "\
        "winners in a tournament. Range is [0,1].")
       ("parent-tournament,T",
-       po::value(&problem.env.par_tournament),
+       po::value(&problem.env.par_tournament)->default_value(
+         problem.env.par_tournament),
        "Number of individuals chosen at random from the population to "\
        "identify a parent.")
       ("brood",
@@ -169,12 +173,14 @@ bool parse_command_line(int argc, char *argv[])
       ("gwi",
        po::value(&problem.env.g_without_improvement)->default_value(
          problem.env.g_without_improvement),
-       "Sets the maximum number of generations without improvement in a run (0 disable).")
+       "Sets the maximum number of generations without improvement in a run "\
+       "(0 disable).")
       ("runs,r",
        po::value(&runs),
        "Number of runs to be tried.")
       ("mate-zone",
-       po::value(&problem.env.mate_zone),
+       po::value(&problem.env.mate_zone)->default_value(
+         problem.env.mate_zone),
        "Mating zone. 0 for panmictic.")
       ("arl",
        po::bool_switch(&problem.env.arl),
@@ -246,7 +252,7 @@ bool parse_command_line(int argc, char *argv[])
       std::cout << "Statistics/status files directory is "
                 << problem.env.stat_dir << std::endl;
   }
-  catch (std::exception &e)
+  catch(std::exception &e)
   {
     std::cout << e.what() << std::endl;
     return false;
@@ -254,9 +260,21 @@ bool parse_command_line(int argc, char *argv[])
 
   if (verbose)
     std::cout << "Reading data file (" << data_file << ")... ";
-  const unsigned parsed(problem.load_data(data_file));
+  unsigned parsed(0);
+  try
+  {
+    parsed = problem.load_data(data_file);
+  }
+  catch(...)
+  {
+    parsed = 0;
+  }
   if (!parsed)
+  {
+    if (verbose)
+      std::cout << "Dataset file format error." << std::endl;
     return false;
+  }
   if (verbose)
     std::cout << parsed << " lines" << std::endl
               << "  (" << problem.variables() << " variables, "
