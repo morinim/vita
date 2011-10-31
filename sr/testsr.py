@@ -95,7 +95,7 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 def start_testing(args):
     testcases = {
         "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80,     "arithmetic"],
-        "iris":       [      "iris.xrff", 100, 500, 100,  80, "classification"],
+        "iris":       [     "iris.xrff", 100, 500, 100,  80, "classification"],
         "mep":        [       "mep.csv", 100, 200, 500, 100],
         "mepbias":    [       "mep.csv", 100, 200,  20, 100,            "mep"],
         "petalrose":  [ "petalrose.csv", 100, 500, 200,  80,     "arithmetic"],

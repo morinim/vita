@@ -32,14 +32,14 @@ namespace vita
 
   ///
   /// \param[in] dis string printed to identify the terminal.
-  /// \param[in] t type of the terminal.
+  /// \param[in] c category of the terminal.
   /// \param[in] par true if the terminal is parametric.
   /// \param[in] in true if the terminal is an input value.
   /// \param[in] w weight used for symbol frequency control.
   ///
-  terminal::terminal(const std::string &dis, symbol_t t, bool in, bool par,
+  terminal::terminal(const std::string &dis, category_t c, bool in, bool par,
                      unsigned w)
-    : symbol(dis, t, w), parametric_(par), input_(in)
+    : symbol(dis, c, w), parametric_(par), input_(in)
   {
     assert(check());
   }

@@ -39,7 +39,7 @@ namespace vita
   class terminal : public symbol
   {
   public:
-    terminal(const std::string &, symbol_t, bool = false, bool = false,
+    terminal(const std::string &, category_t, bool = false, bool = false,
              unsigned = default_weight);
 
     ///

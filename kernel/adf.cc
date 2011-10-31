@@ -46,11 +46,11 @@ namespace vita
 
   ///
   /// \param[in] ind the code for the ADF.
-  /// \param[in] sv types of the function arguments.
+  /// \param[in] sv categories of the function arguments.
   /// \param[in] w the weight of the ADF.
   ///
-  adf::adf(const individual &ind, const std::vector<symbol_t> &sv, unsigned w)
-    : function("ADF", ind.type(), sv, w), core_(ind)
+  adf::adf(const individual &ind, const std::vector<category_t> &sv, unsigned w)
+    : function("ADF", ind.category(), sv, w), core_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 
@@ -113,7 +113,7 @@ namespace vita
   /// \param[in] w the weight of the ADT.
   ///
   adt::adt(const individual &ind, unsigned w)
-    : terminal("ADT", ind.type(), false, false, w), core_(ind)
+    : terminal("ADT", ind.category(), false, false, w), core_(ind)
   {
     assert(ind.check() && ind.eff_size() >= 2);
 

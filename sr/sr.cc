@@ -277,8 +277,9 @@ bool parse_command_line(int argc, char *argv[])
   }
   if (verbose)
     std::cout << parsed << " lines" << std::endl
-              << "  (" << problem.variables() << " variables, "
-              << problem.classes() << " classes)" << std::endl;
+              << "  (" << problem.categories() << " category(ies), "
+              << problem.variables() << " variable(s), "
+              << problem.classes() << " class(es))" << std::endl;
 
   if (symbols_file.empty())
   {

@@ -70,7 +70,7 @@ namespace vita
                        unsigned) const;
 
     individual generalize(std::size_t, std::vector<locus_t> *,
-                          std::vector<symbol_t> *) const;
+                          std::vector<category_t> *) const;
 
     individual compact(unsigned * = 0) const;
     individual optimize(unsigned * = 0, unsigned * = 0) const;
@@ -100,7 +100,7 @@ namespace vita
 
     unsigned eff_size() const;
 
-    symbol_t type() const;
+    category_t category() const;
 
     ///
     /// \param[in] i index of a \c gene.

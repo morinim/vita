@@ -44,7 +44,7 @@ namespace vita
     class variable : public terminal
     {
     public:
-      variable(const std::string &name, symbol_t t = sym_real)
+      variable(const std::string &name, category_t t = 0)
         : terminal(name, t, true) {}
 
       boost::any eval(vita::interpreter *) const
@@ -56,7 +56,7 @@ namespace vita
     class constant : public terminal
     {
     public:
-      constant(double c, symbol_t t = sym_real)
+      constant(double c, category_t t = 0)
         : terminal("CONST", t, false, false, default_weight*2), val(c) {}
 
       std::string display() const
@@ -74,7 +74,7 @@ namespace vita
     class number : public terminal
     {
     public:
-      number(int m, int u, symbol_t t = sym_real)
+      number(int m, int u, category_t t = 0)
         : terminal("NUM", t, false, true, default_weight*2), min(m), upp(u) {}
 
       int init() const { return random::between<int>(min, upp); }
@@ -96,7 +96,7 @@ namespace vita
     class abs : public function
     {
     public:
-      explicit abs(symbol_t t = sym_real) : function("ABS", t, 1) {}
+      explicit abs(category_t t = 0) : function("ABS", t, 1) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -110,7 +110,7 @@ namespace vita
     class add : public function
     {
     public:
-      explicit add(symbol_t t = sym_real)
+      explicit add(category_t t = 0)
         : function("ADD", t, 2, function::default_weight, true) {}
 
       boost::any eval(interpreter *i) const
@@ -132,7 +132,7 @@ namespace vita
     class div : public function
     {
     public:
-      explicit div(symbol_t t = sym_real) : function("DIV", t, 2) {}
+      explicit div(category_t t = 0) : function("DIV", t, 2) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -153,7 +153,7 @@ namespace vita
     class idiv : public function
     {
     public:
-      explicit idiv(symbol_t t = sym_real) : function("IDIV", t, 2) {}
+      explicit idiv(category_t t = 0) : function("IDIV", t, 2) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -174,7 +174,7 @@ namespace vita
     class ife : public function
     {
     public:
-      explicit ife(symbol_t t = sym_real) : function("IFE", t, 4) {}
+      explicit ife(category_t t = 0) : function("IFE", t, 4) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -197,7 +197,7 @@ namespace vita
     class ifl : public function
     {
     public:
-      explicit ifl(symbol_t t = sym_real) : function("IFL", t, 4) {}
+      explicit ifl(category_t t = 0) : function("IFL", t, 4) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -217,7 +217,7 @@ namespace vita
     class ifz : public function
     {
     public:
-      explicit ifz(symbol_t t = sym_real) : function("IFZ", t, 3) {}
+      explicit ifz(category_t t = 0) : function("IFZ", t, 3) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -234,7 +234,7 @@ namespace vita
     class ln : public function
     {
     public:
-      explicit ln(symbol_t t = sym_real)
+      explicit ln(category_t t = 0)
         : function("LN", t, 1, function::default_weight/2) {}
 
       boost::any eval(interpreter *i) const
@@ -252,7 +252,7 @@ namespace vita
     class mod : public function
     {
     public:
-      explicit mod(symbol_t t = sym_real) : function("MOD", t, 2) {}
+      explicit mod(category_t t = 0) : function("MOD", t, 2) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -273,7 +273,7 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(symbol_t t = sym_real)
+      explicit mul(category_t t = 0)
         : function("MUL", t, 2, function::default_weight, true) {}
 
       boost::any eval(interpreter *i) const
@@ -295,7 +295,7 @@ namespace vita
     class sin : public function
     {
     public:
-      explicit sin(symbol_t t = sym_real) : function("SIN", t, 1) {}
+      explicit sin(category_t t = 0) : function("SIN", t, 1) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -309,7 +309,7 @@ namespace vita
     class sub : public function
     {
     public:
-      explicit sub(symbol_t t = sym_real) : function("SUB", t, 2) {}
+      explicit sub(category_t t = 0) : function("SUB", t, 2) {}
 
       boost::any eval(interpreter *i) const
       {

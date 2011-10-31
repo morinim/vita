@@ -29,7 +29,6 @@
 #include <fstream>
 #include <list>
 #include <map>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -46,6 +45,8 @@ namespace vita
   class data
   {
   public:
+    enum domain_t {d_bool, d_double, d_int, d_string, d_void};
+
     ///
     /// \a value_type stores a single element of the training set. The \c struct
     /// consists of an input vector (\a input) and an answer value (\a output).
@@ -79,34 +80,63 @@ namespace vita
 
     void clear(unsigned = 1);
 
-    unsigned variables() const;
+    unsigned categories() const;
     unsigned classes() const;
+    unsigned variables() const;
 
     bool check() const;
 
   private:
-    static boost::any convert(const std::string &, symbol_t);
+    static boost::any convert(const std::string &, domain_t);
+    static unsigned encode(const std::string &,
+                           std::map<std::string, unsigned> *);
     static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
-    unsigned encode(const std::string &);
     unsigned load_csv(const std::string &);
     unsigned load_xrff(const std::string &);
 
-    std::map<std::string, unsigned> labels_;
+    // Integer are simpler to manage than textual data, so, when appropriate,
+    // input strings are converted into integers by these maps (and the encode
+    // static function).
+    std::map<std::string, unsigned> categories_map_;
+    std::map<std::string, unsigned> classes_map_;
 
-    // Informations about a "column" of data.
+    // Informations about a "column" of the dataset.
     struct column
     {
-      std::string name;
-      symbol_t    type;
-      bool      output;
+      std::string       name;
+      category_t category_id;
+      bool            output;
     };
 
     // How is the dataset organized? Sometimes we have a dataset header (XRFF
     // file format), other times it has to be implicitly derived (e.g. CSV).
-    std::vector<column> header;
+    std::vector<column> header_;
+
+    // Information about a category of the dataset. For example:
+    //   <attribute type="nominal">
+    //     <labels>
+    //       <label>Iris-setosa</label>
+    //       <label>Iris-versicolor</label>
+    //       <label>Iris-virginica</label>
+    //     </labels>
+    //   </attribute>
+    // is mapped to category:
+    //   {d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+    // while:
+    //   <attribute type="numeric" />
+    // is mapped to category:
+    //   {d_double, {}}
+    struct category
+    {
+      domain_t               domain;
+      std::list<boost::any> symbols;
+    };
+
+    // What are the categories we are dealing with?
+    std::vector<category> categories_;
 
     // The training set (partitioned).
     std::vector<std::list<value_type>> datasets_;

@@ -48,7 +48,7 @@ namespace vita
   void symbol_set::clear()
   {
     all_ = collection();
-    by_ = by_type();
+    by_ = by_category();
   }
 
   ///
@@ -132,7 +132,7 @@ namespace vita
       if (i->auto_defined())
         all_.adf.push_back(i);
 
-    by_ = by_type(all_);
+    by_ = by_category(all_);
   }
 
   ///
@@ -173,7 +173,7 @@ namespace vita
       all_.adf[i]->weight -= delta;
     }
 
-    by_ = by_type(all_);
+    by_ = by_category(all_);
   }
 
   ///
@@ -243,16 +243,17 @@ namespace vita
   ///
   bool symbol_set::enough_terminals() const
   {
-    std::set<unsigned> need;
+    std::set<category_t> need;
 
     for (unsigned i(0); i < all_.symbols.size(); ++i)
       for (unsigned j(0); j < all_.symbols[i]->arity(); ++j)
         need.insert(static_cast<function *>(all_.symbols[i].get())
-                    ->arg_type(j));
+                    ->arg_category(j));
 
-    for (auto t(need.begin()); t != need.end(); ++t)
-      if (by_.type.size() <= *t ||
-          (!by_.type[*t].terminals.size() && !by_.type[*t].specials.size()))
+    for (auto c(need.begin()); c != need.end(); ++c)
+      if (by_.category.size() <= *c ||
+          (!by_.category[*c].terminals.size() &&
+           !by_.category[*c].specials.size()))
         return false;
 
     return true;
@@ -266,8 +267,8 @@ namespace vita
     if (!all_.check())
       return false;
 
-    for (unsigned t(0); t < by_.type.size(); ++t)
-      if (!by_.type[t].check())
+    for (unsigned i(0); i < by_.category.size(); ++i)
+      if (!by_.category[i].check())
         return false;
 
     return enough_terminals();
@@ -320,44 +321,46 @@ namespace vita
   }
 
   ///
-  /// \param[in] c a collection containing many types of symbol.
+  /// \param[in] c a collection containing many categories of symbol.
   ///
-  /// Initialize the struct using collection \a c as input parameter.
+  /// Initialize the struct using collection \a c as input parameter (\a c
+  /// should be a collection containing more than one category).
   ///
-  symbol_set::by_type::by_type(const collection &c)
-    : type(free_symbol), n_types(0)
+  symbol_set::by_category::by_category(const collection &c)
   {
+    category.clear();
+
     for (unsigned i(0); i < c.symbols.size(); ++i)
     {
-      const unsigned t(c.symbols[i]->type());
-      if (t >= type.size())
-        type.reserve(t + 1);
+      const category_t cat(c.symbols[i]->category());
+      if (cat >= category.size())
+        category.resize(cat + 1);
 
-      type[t].symbols.push_back(c.symbols[i]);
-      type[t].sum += c.symbols[i]->weight;
+      category[cat].symbols.push_back(c.symbols[i]);
+      category[cat].sum += c.symbols[i]->weight;
     }
 
     for (unsigned i(0); i < c.terminals.size(); ++i)
-      type[c.terminals[i]->type()].terminals.push_back(c.terminals[i]);
+      category[c.terminals[i]->category()].terminals.push_back(c.terminals[i]);
 
     for (unsigned i(0); i < c.adf.size(); ++i)
-      type[c.adf[i]->type()].adf.push_back(c.adf[i]);
+      category[c.adf[i]->category()].adf.push_back(c.adf[i]);
 
     for (unsigned i(0); i < c.adt.size(); ++i)
-      type[c.adt[i]->type()].adt.push_back(c.adt[i]);
+      category[c.adt[i]->category()].adt.push_back(c.adt[i]);
 
     for (unsigned i(0); i < c.specials.size(); ++i)
     {
-      const unsigned t(c.specials[i]->type());
-      if (t >= type.size())
-        type.reserve(t + 1);
+      const unsigned cat(c.specials[i]->category());
+      if (cat >= category.size())
+        category.resize(cat + 1);
 
-      type[t].specials.push_back(c.specials[i]);
+      category[cat].specials.push_back(c.specials[i]);
     }
 
-    for (unsigned t(0); t < type.size(); ++t)
-      if (type[t].symbols.size() || type[t].specials.size())
-        ++n_types;
+    //for (unsigned i(0); i < category.size(); ++i)
+    //  if (category[i].symbols.size() || category[i].specials.size())
+    //    ++n_categories;
 
     assert(check());
   }
@@ -365,17 +368,17 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool symbol_set::by_type::check() const
+  bool symbol_set::by_category::check() const
   {
-    for (unsigned t(0); t < type.size(); ++t)
+    for (unsigned t(0); t < category.size(); ++t)
     {
-      const unsigned s(type[t].symbols.size());
-      if (s < type[t].terminals.size() ||
-          s < type[t].adf.size() ||
-          s < type[t].adt.size())
+      const unsigned s(category[t].symbols.size());
+      if (s < category[t].terminals.size() ||
+          s < category[t].adf.size() ||
+          s < category[t].adt.size())
         return false;
     }
 
-    return types() <= type.size();
+    return true;
   }
 }  // Namespace vita

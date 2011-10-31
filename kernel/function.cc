@@ -33,24 +33,25 @@ namespace vita
   ///
   /// \param[in] dis string representation of the function (e.g. for the plus
   ///                \a function it could by "ADD" or "+").
-  /// \param[in] t type of the function (i.e. the type of the output value).
+  /// \param[in] c category of the function (i.e. the category of the output
+  ///              value).
   /// \param[in] args input parameters (type and number) of the function (in
   ///                 C++ they would be called the "function signature").
   /// \param[in] w the weight of the function (used for random initialization).
   /// \param[in] asve \c true if the function is associative (e.g. addition is
   ///                 associative, division isn't).
   ///
-  function::function(const std::string &dis, symbol_t t,
-                     const std::vector<symbol_t> &args, unsigned w, bool asve)
-    : symbol(dis, t, w), associative_(asve)
+  function::function(const std::string &dis, category_t c,
+                     const std::vector<category_t> &args, unsigned w, bool asve)
+    : symbol(dis, c, w), associative_(asve)
   {
     assert(args.size() <= gene::k_args);
 
     for (arity_ = 0; arity_ < args.size(); ++arity_)
       argt_[arity_] = args[arity_];
 
-    for (unsigned i(arity()); i < gene::k_args; ++i)
-      argt_[i] = sym_void;
+    // for (unsigned i(arity()); i < gene::k_args; ++i)
+    //   argt_[i] = std::numeric_limits<category_t>::max();
 
     assert(check());
   }
@@ -58,7 +59,8 @@ namespace vita
   ///
   /// \param[in] dis string representation of the function (e.g. for the plus
   ///                \a function it could by "ADD" or "+").
-  /// \param[in] t type of the function (i.e. the type of the output value).
+  /// \param[in] c category of the function (i.e. the category of the output
+  ///              value).
   /// \param[in] n number of input parameter of the function.
   /// \param[in] w the weight of the function (used for random initialization).
   /// \param[in] asve \c true if the function is associative (e.g. addition is
@@ -67,15 +69,17 @@ namespace vita
   /// This constructor is used to quickly create a function of homogeneous
   /// signature (all input parameters are of the same type).
   ///
-  function::function(const std::string &dis, symbol_t t,
+  function::function(const std::string &dis, category_t c,
                      unsigned n, unsigned w, bool asve)
-    : symbol(dis, t, w), arity_(n), associative_(asve)
+    : symbol(dis, c, w), arity_(n), associative_(asve)
   {
     assert(n <= gene::k_args);
 
     unsigned i(0);
-    for (; i <       arity_; ++i)  argt_[i] =        t;
-    for (; i < gene::k_args; ++i)  argt_[i] = sym_void;
+    for (; i < arity_; ++i)
+      argt_[i] = c;
+    // for (; i < gene::k_args; ++i)
+    //   argt_[i] = std::numeric_limits<category_t>::max();
 
     assert(check());
   }

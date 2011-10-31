@@ -35,7 +35,7 @@ namespace vita
 
   ///
   /// This is a container for the symbol set. Symbols are stored to be quickly
-  /// recalled by type and randomly extracted.
+  /// recalled by category and randomly extracted.
   /// The function and terminals used should be powerful enough to be able to
   /// represent a solution to the problem. On the other hand, it is better not
   /// to use too large a symbol set (this enalarges the search space and can
@@ -68,9 +68,9 @@ namespace vita
   private:
     void clear();
 
-    // \a arguments_ is not included in the \a collection struct because type
-    // isn't fixed for an argument (see \c argument constructor for more
-    // details).
+    // \a arguments_ is not included in the \a collection struct because
+    // category isn't fixed for an argument (see \c argument constructor for
+    // more details).
     std::vector<symbol_ptr> arguments_;
 
     struct collection
@@ -92,25 +92,17 @@ namespace vita
       bool check() const;
     };
 
-    // Symbols of every type are inserted in this collection.
+    // Symbols of every category are inserted in this collection.
     collection all_;
 
-    // This struct contains all the symbols (\a all_) divided by type.
-    class by_type
+    // This struct contains all the symbols (\a all_) divided by category.
+    struct by_category
     {
-    public:
-      explicit by_type(const collection & = collection());
-
-      /// Number of different types loaded in the collection. Note that
-      /// \c type() could be less than \c type.size()
-      unsigned types() const { return n_types; }
-
-      std::vector<collection> type;
+      explicit by_category(const collection & = collection());
 
       bool check() const;
 
-    private:
-      unsigned n_types;
+      std::vector<collection> category;
     } by_;
   };
 }  // namespace vita

@@ -30,7 +30,7 @@
 
 #include "kernel/data.h"
 #include "kernel/problem.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 namespace vita
 {
@@ -44,6 +44,7 @@ namespace vita
 
     void clear();
 
+    unsigned categories() const;
     unsigned classes() const;
     unsigned variables() const;
 

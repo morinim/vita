@@ -154,8 +154,16 @@ namespace vita
   }
 
   ///
-  /// \return number of classes of the classification problem (1 for a symbolic
-  ///         regression problem).
+  /// \return number of categories of the problem (>= 1).
+  ///
+  unsigned src_problem::categories() const
+  {
+    return dat_.categories();
+  }
+
+  ///
+  /// \return number of classes of the problem (== 0 for a symbolic regression
+  ///         problem, > 1 for a classification problem).
   ///
   unsigned src_problem::classes() const
   {

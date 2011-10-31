@@ -33,12 +33,6 @@
 
 namespace vita
 {
-  const symbol_t sym_void(0);
-  const symbol_t sym_bool(1);
-  const symbol_t sym_real(2);
-  const symbol_t sym_string(3);
-  const symbol_t free_symbol(4);
-
   class interpreter;
 
   ///
@@ -50,12 +44,12 @@ namespace vita
   class symbol
   {
   public:
-    symbol(const std::string &, symbol_t, unsigned);
+    symbol(const std::string &, category_t, unsigned);
 
     opcode_t opcode() const;
     bool terminal() const;
 
-    symbol_t type() const;
+    category_t category() const;
 
     virtual bool auto_defined() const;
 
@@ -93,19 +87,19 @@ namespace vita
 
     const opcode_t     opcode_;
 
-    const symbol_t       type_;
+    const category_t category_;
 
     const std::string display_;
   };
 
   ///
   /// \param[in] dis string used for printing.
-  /// \param[in] t type of the symbol.
+  /// \param[in] t category of the symbol.
   /// \param[in] w weight (used for random selection).
   ///
   inline
-  symbol::symbol(const std::string &dis, symbol_t t, unsigned w)
-    : weight(w), opcode_(++opc_count_), type_(t), display_(dis)
+  symbol::symbol(const std::string &dis, category_t c, unsigned w)
+    : weight(w), opcode_(++opc_count_), category_(c), display_(dis)
   {
     assert(check());
   }
@@ -133,12 +127,12 @@ namespace vita
   }
 
   ///
-  /// \return the type of the \a symbol.
+  /// \return the category of the \a symbol.
   ///
   inline
-  symbol_t symbol::type() const
+  category_t symbol::category() const
   {
-    return type_;
+    return category_;
   }
 
   ///

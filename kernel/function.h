@@ -44,10 +44,10 @@ namespace vita
   class function : public symbol
   {
   public:
-    function(const std::string &, symbol_t, const std::vector<symbol_t> &,
+    function(const std::string &, category_t, const std::vector<category_t> &,
              unsigned, bool = false);
-    function(const std::string &, symbol_t, unsigned, unsigned = default_weight,
-             bool = false);
+    function(const std::string &, category_t, unsigned,
+             unsigned = default_weight, bool = false);
 
     ///
     /// \return \c true if the function is associative (e.g. sum is associative,
@@ -62,9 +62,9 @@ namespace vita
 
     ///
     /// \param[in] index of a function argument.
-    /// \return type of the i-th function argument.
+    /// \return category of the i-th function argument.
     ///
-    symbol_t arg_type(unsigned i) const
+    category_t arg_category(unsigned i) const
     { assert(i < gene::k_args); return argt_[i]; }
 
     ///
@@ -77,9 +77,9 @@ namespace vita
     static unsigned default_weight;
 
   private:
-    symbol_t argt_[gene::k_args];
-    unsigned              arity_;
-    const bool      associative_;
+    category_t argt_[gene::k_args];
+    unsigned                arity_;
+    const bool        associative_;
   };
 }  // namespace vita
 

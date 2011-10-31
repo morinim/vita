@@ -28,7 +28,7 @@
 
 #include "kernel/data.h"
 #include "kernel/evaluator.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 namespace vita
 {

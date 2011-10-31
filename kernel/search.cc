@@ -94,10 +94,11 @@ namespace vita
             symbol_ptr p;
             if (arl_args)
             {
-              std::vector<symbol_t> types;
+              std::vector<category_t> categories;
               individual generalized(candidate_block.generalize(arl_args,
-                                                                0, &types));
-              p.reset(new vita::adf(generalized, types, 10));
+                                                                0,
+                                                                &categories));
+              p.reset(new vita::adf(generalized, categories, 10));
             }
             else
               p.reset(new vita::adt(candidate_block, 100));
@@ -107,7 +108,7 @@ namespace vita
             {
               adf_l << p->display() << " (Base: " << base_fit
                     << "  DF: " << d_f
-                    << "  Weight: " << std::fabs(d_f/base_fit)*100.0 << "%)"
+                    << "  Weight: " << std::fabs(d_f / base_fit) * 100.0 << "%)"
                     << std::endl;
               candidate_block.list(adf_l);
               adf_l << std::endl;

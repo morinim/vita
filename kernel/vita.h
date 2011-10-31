@@ -73,7 +73,7 @@ namespace vita
   typedef boost::uint16_t locus_t;
   typedef boost::uint16_t opcode_t;
 
-  typedef unsigned symbol_t;
+  typedef unsigned category_t;
 
   inline bool is_bad(double x) { return isinf(x) || isnan(x); }
 

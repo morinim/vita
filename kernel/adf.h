@@ -70,7 +70,7 @@ namespace vita
   class adf : public function
   {
   public:
-    adf(const individual &, const std::vector<symbol_t> &, unsigned);
+    adf(const individual &, const std::vector<category_t> &, unsigned);
 
     boost::any eval(interpreter *) const;
 

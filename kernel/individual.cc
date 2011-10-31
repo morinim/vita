@@ -396,16 +396,17 @@ namespace vita
   ///
   /// \param[in] max_args maximum number of arguments for the ADF.
   /// \param[out] positions locus of the ADF arguments.
-  /// \param[out] types type of the ADF arguments.
+  /// \param[out] categories catagories of the ADF arguments.
   /// \return the generalized individual.
   ///
   /// Changes up to \a max_args terminals (exactly \a max_args when available)
   /// of \c this individual with formal arguments, thus producing the body
   /// for a ADF.
   ///
-  individual individual::generalize(std::size_t max_args,
-                                    std::vector<locus_t> *const positions,
-                                    std::vector<symbol_t> *const types) const
+  individual individual::generalize(
+    std::size_t max_args,
+    std::vector<locus_t> *const positions,
+    std::vector<category_t> *const categories) const
   {
     assert(max_args && max_args <= gene::k_args);
 
@@ -436,8 +437,8 @@ namespace vita
     for (unsigned j(0); j < n; ++j)
     {
       gene &g(ret.code_[terminals[j]]);
-      if (types)
-        types->push_back(g.sym->type());
+      if (categories)
+        categories->push_back(g.sym->category());
       if (positions)
         positions->push_back(terminals[j]);
       g.sym = env_->sset.arg(j);
@@ -445,19 +446,21 @@ namespace vita
     }
 
     assert(!positions || (positions->size() && positions->size() <= max_args));
-    assert(!types || (types->size() && types->size() <= max_args));
-    assert(!positions || !types || positions->size() == types->size());
+    assert(!categories ||
+           (categories->size() && categories->size() <= max_args));
+    assert(!positions || !categories ||
+           positions->size() == categories->size());
     assert(ret.check());
 
     return ret;
   }
 
   ///
-  /// \return the type of the individual.
+  /// \return the category of the individual.
   ///
-  symbol_t individual::type() const
+  category_t individual::category() const
   {
-    return code_[best_].sym->type();
+    return code_[best_].sym->category();
   }
 
   ///

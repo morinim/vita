@@ -80,7 +80,8 @@ namespace vita
   {
     assert(n);
 
-    labels_.clear();
+    categories_map_.clear();
+    classes_map_.clear();
 
     datasets_.clear();
     datasets_.resize(n ? n : 1);
@@ -119,6 +120,23 @@ namespace vita
   }
 
   ///
+  /// \return number of categories of the problem (>= 1).
+  ///
+  unsigned data::categories() const
+  {
+    return categories_.size();
+  }
+
+  ///
+  /// \return number of classes of the problem (== 0 for a symbolic regression
+  ///         problem, > 1 for a classification problem).
+  ///
+  unsigned data::classes() const
+  {
+    return classes_map_.size();
+  }
+
+  ///
   /// \return input vector dimension.
   ///
   unsigned data::variables() const
@@ -128,27 +146,20 @@ namespace vita
   }
 
   ///
-  /// \return number of classes of the classification problem (1 for a symbolic
-  ///         regression problem).
-  ///
-  unsigned data::classes() const
-  {
-    return labels_.size();
-  }
-
-  ///
-  /// \param[in] label name of a class of the learing collection.
+  /// \param[in] label name of a class of the learning collection.
+  /// \param[in,out] map map used to encode the \a label.
   /// \return a positive integer used as primary key for the class \a label.
   ///
-  unsigned data::encode(const std::string &label)
+  unsigned data::encode(const std::string &label,
+                        std::map<std::string, unsigned> *map)
   {
-    if (labels_.find(label) == labels_.end())
+    if (map->find(label) == map->end())
     {
-      const unsigned n(labels_.size());
-      labels_[label] = n;
+      const unsigned n(map->size());
+      (*map)[label] = n;
     }
 
-    return labels_[label];
+    return (*map)[label];
   }
 
   ///
@@ -236,14 +247,15 @@ namespace vita
   ///
   /// convert("123.1", sym_real) == 123.1f
   ///
-  boost::any data::convert(const std::string &s, symbol_t t)
+  boost::any data::convert(const std::string &s, domain_t d)
   {
-    switch (t)
+    switch (d)
     {
-    case sym_void: throw boost::bad_lexical_cast();
-    case sym_bool: return boost::lexical_cast<bool>(s);
-    case sym_real: return boost::lexical_cast<double>(s);
-    default:       return s;
+    case d_bool:   return   boost::lexical_cast<bool>(s);
+    case d_int:    return    boost::lexical_cast<int>(s);
+    case d_double: return boost::lexical_cast<double>(s);
+    case d_string: return                              s;
+    default: throw boost::bad_lexical_cast();
     }
   }
 
@@ -276,23 +288,23 @@ namespace vita
   ///
   unsigned data::load_xrff(const std::string &filename)
   {
-    static std::map<const std::string, symbol_t> from_weka =
+    static std::map<const std::string, domain_t> from_weka =
     {
       // This type is vita-specific (not standard).
-      {"boolean", sym_bool},
+      {"boolean", domain_t::d_bool},
 
-      // Integer, real and numeric are treated as double precisione number
-      // (sym_real).
-      {"integer", sym_real},
-      {"numeric", sym_real},
-      {"real", sym_real},
+      {"integer", domain_t::d_int},
+
+      // Real and numeric are treated as double precisione number (d_double).
+      {"numeric", domain_t::d_double},
+      {"real", domain_t::d_double},
 
       // Nominal values are deined by providing a list of possible values.
-      {"nominal", sym_string},
+      {"nominal", domain_t::d_string},
 
       // String attributes allow us to create attributes containing arbitrary
       // textual values. This is very useful in text-mining applications.
-      {"string", sym_string}
+      {"string", domain_t::d_string}
 
       // {"date", ?}, {"relational", ?}
     };
@@ -319,6 +331,14 @@ namespace vita
         a.name = dha.second.get("<xmlattr>.name", "");
 
         const std::string type(dha.second.get("<xmlattr>.type", ""));
+        const std::string category_name(type);
+        a.category_id = encode(category_name, &categories_map_);
+        if (a.category_id >= categories_.size())
+        {
+          assert(a.category_id == categories_.size());
+          categories_.push_back(category{from_weka[type], {}});
+        }
+
         if (type == "nominal")
           try
           {
@@ -332,13 +352,11 @@ namespace vita
           {
           }
 
-        a.type = from_weka[type];
-
         // Via the class="yes" attribute in the attribute specification in the
         // header, one can define which attribute should act as output value.
         a.output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
-        header.push_back(a);
+        header_.push_back(a);
       }
 
     unsigned parsed(0);
@@ -351,19 +369,20 @@ namespace vita
         for (auto v(bi.second.begin()); v != bi.second.end(); ++v, ++index)
           if (v->first == "value")
           {
-            const symbol_t type(header[index].type);
+            const domain_t domain(
+              categories_[header_[index].category_id].domain);
 
             try
             {
-              if (header[index].output)
+              if (header_[index].output)
               {
-                if (type == sym_string)
-                  instance.output = encode(v->second.data());
+                if (domain == d_string)
+                  instance.output = encode(v->second.data(), &classes_map_);
                 else
-                  instance.output = convert(v->second.data(), type);
+                  instance.output = convert(v->second.data(), domain);
               }
               else  // input value
-                instance.input.push_back(convert(v->second.data(), type));
+                instance.input.push_back(convert(v->second.data(), domain));
             }
             catch(boost::bad_lexical_cast &)
             {
@@ -372,7 +391,7 @@ namespace vita
             }
           }
 
-        if (instance.input.size() + 1 == header.size())
+        if (instance.input.size() + 1 == header_.size())
         {
           const unsigned set(vita::random::between<unsigned>(0,
                                                              datasets_.size()));
@@ -381,8 +400,7 @@ namespace vita
         }
       }
 
-    assert(check());
-    return parsed;
+    return check() ? parsed : 0;
   }
 
   ///
@@ -434,7 +452,7 @@ namespace vita
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
-      const unsigned size(parsed ? header.size() : record.size());
+      const unsigned size(parsed ? header_.size() : record.size());
 
       if (record.size() == size)
       {
@@ -444,22 +462,39 @@ namespace vita
         {
           // The first line is (also) used to learn data format.
           if (!parsed)
-            header.push_back(column{"",
-                  is_number(record[field]) ? sym_real : sym_string, field==0});
+          {
+            column a;
 
-          const symbol_t type(header[field].type);
+            const std::string s_domain(is_number(record[field])
+                                       ? "numeric" : "string");
+            const domain_t domain(is_number(record[field])
+                                  ? d_double : d_string);
+
+            a.name = "";
+            a.category_id = encode(s_domain, &categories_map_);
+            if (a.category_id >= categories_.size())
+            {
+              assert(a.category_id == categories_.size());
+              categories_.push_back(category{domain, {}});
+            }
+            a.output = (field==0);
+
+            header_.push_back(a);
+          }
+
+          const domain_t domain(categories_[header_[field].category_id].domain);
 
           try
           {
             if (field == 0)  // output value
             {
-              if (type == sym_string)
-                instance.output = encode(record[field]);
+              if (domain == d_string)
+                instance.output = encode(record[field], &classes_map_);
               else
-                instance.output = convert(record[field], type);
+                instance.output = convert(record[field], domain);
             }
             else  // input value
-              instance.input.push_back(convert(record[field], type));
+              instance.input.push_back(convert(record[field], domain));
           }
           catch(boost::bad_lexical_cast &)
           {
@@ -468,7 +503,7 @@ namespace vita
           }
         }
 
-        if (instance.input.size() + 1 == header.size())
+        if (instance.input.size() + 1 == header_.size())
         {
           const unsigned set(vita::random::between<unsigned>(0,
                                                              datasets_.size()));
@@ -478,8 +513,7 @@ namespace vita
       }
     }
 
-    assert(check());
-    return parsed;
+    return check() ? parsed : 0;
   }
 
   ///
@@ -488,7 +522,7 @@ namespace vita
   ///
   unsigned data::open(const std::string &filename)
   {
-    header.clear();
+    header_.clear();
 
     return boost::algorithm::iends_with(filename, ".xrff") ?
       load_xrff(filename) : load_csv(filename);
