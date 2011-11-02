@@ -76,7 +76,7 @@ namespace vita
   }
 
   ///
-  /// \param[out] last_symbol pointer to the la symbol of the compacted
+  /// \param[out] last_symbol pointer to the last symbol of the compacted
   ///                         individual.
   /// \return a new compacted individual.
   ///
@@ -87,7 +87,10 @@ namespace vita
   ///
   individual individual::compact(unsigned *last_symbol) const
   {
-    individual dest(*env_, false);
+    individual dest(*this);
+
+    // First active symbol will be at locus 0.
+    dest.best_ = 0;
 
     unsigned new_line(0), old_line(best_);
     for (const_iterator it(*this); it(); ++new_line, old_line = ++it)
@@ -151,7 +154,7 @@ namespace vita
         }
 
         // The new terminal could be already present (because it was
-        // duplicated). We only need one terminal for each type.
+        // duplicated). We only need one terminal!
         if (found)
         {
           // Move the symbols before the duplicated terminal one location
@@ -238,9 +241,11 @@ namespace vita
   ///
   individual individual::get_block(unsigned locus) const
   {
-    individual ret(*this);
+    assert(locus < size());
 
+    individual ret(*this);
     ret.best_ = locus;
+    ret.signature_.clear();
 
     assert(ret.check());
     return ret;
@@ -315,9 +320,9 @@ namespace vita
   /// that are subsets of the active code. Indexes can be used as they would be
   /// individuals by the get_block function.
   ///
-  std::list<unsigned> individual::blocks() const
+  std::list<locus_t> individual::blocks() const
   {
-    std::list<unsigned> bl;
+    std::list<locus_t> bl;
 
     unsigned line(best_);
     for (const_iterator i(*this); i(); line = ++i)
@@ -727,14 +732,18 @@ namespace vita
 
     // Type checking.
     for (unsigned i(0); i < size(); ++i)
+    {
+      const function *const func(static_cast<function *>(code_[i].sym.get()));
+
       for (unsigned j(0); j < code_[i].sym->arity(); ++j)
       {
-        const function *const this_function(static_cast<function *>(
-                                              code_[i].sym.get()));
-        if (this_function->arg_category(j) !=
-            code_[code_[i].args[j]].sym->category())
-          return false;
+        const gene &current_arg(code_[code_[i].args[j]]);
+
+        if (!dynamic_cast<argument *>(current_arg.sym.get()))
+          if (func->arg_category(j) != current_arg.sym->category())
+            return false;
       }
+    }
 
     return
       best_ < size() &&
@@ -901,7 +910,7 @@ namespace vita
   }
 
   ///
-  /// \return
+  /// \return locus of the next line containing an active symbol.
   ///
   unsigned individual::const_iterator::operator++()
   {

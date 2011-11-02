@@ -62,7 +62,7 @@ namespace vita
     individual crossover(const individual &) const;
     individual mutation(unsigned * = 0) const;
 
-    std::list<unsigned> blocks() const;
+    std::list<locus_t> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
     individual replace(symbol_ptr, const std::vector<locus_t> &) const;

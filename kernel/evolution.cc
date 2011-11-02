@@ -257,7 +257,7 @@ namespace vita
 
       for (unsigned k(0); k < pop_.size(); ++k)
       {
-        if ( verbose && k % std::max(pop_.size()/100, size_t(1)) )
+        if (verbose && k % std::max(pop_.size()/100, static_cast<size_t>(1)))
         {
           std::cout << "Run " << run_count << '.'
                     << stats_.gen << " (" << std::setw(3) << 100*k/pop_.size()

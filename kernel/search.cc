@@ -76,8 +76,8 @@ namespace vita
         adf_l << std::endl;
       }
 
-      std::list<unsigned> block_index(base.blocks());
-      for (std::list<unsigned>::const_iterator i(block_index.begin());
+      std::list<locus_t> block_index(base.blocks());
+      for (std::list<locus_t>::const_iterator i(block_index.begin());
            i != block_index.end();
            ++i)
       {
