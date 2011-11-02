@@ -26,7 +26,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/individual.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 #define BOOST_TEST_MODULE TranspositionTable
 #include "boost/test/unit_test.hpp"

@@ -26,7 +26,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 #define BOOST_TEST_MODULE Evolution
 #include "boost/test/unit_test.hpp"
