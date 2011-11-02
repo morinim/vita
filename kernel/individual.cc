@@ -701,20 +701,40 @@ namespace vita
       if (!code_[line].sym)
         return false;
 
+      // Maximum number of function arguments is gene::k_args.
       if (code_[line].sym->arity() > gene::k_args)
         return false;
 
+      // Checking arguments' addresses.
       for (unsigned j(0); j < code_[line].sym->arity(); ++j)
-        if (code_[line].args[j] >= size() || code_[line].args[j] <= line)
+      {
+        // Arguments' addresses must be smaller than the size of the genome.
+        if (code_[line].args[j] >= size())
           return false;
+        // Function address must be smaller than its arguments' addresses.
+        if (code_[line].args[j] <= line)
+          return false;
+      }
 
       last_is_terminal = code_[line].sym->terminal();
     }
 
+    // Only terminals can be special.
     const unsigned specials(env_->sset.specials());
     for (unsigned i(size()-specials); i < size(); ++i)
       if (!code_[i].sym->terminal())
         return false;
+
+    // Type checking.
+    for (unsigned i(0); i < size(); ++i)
+      for (unsigned j(0); j < code_[i].sym->arity(); ++j)
+      {
+        const function *const this_function(static_cast<function *>(
+                                              code_[i].sym.get()));
+        if (this_function->arg_category(j) !=
+            code_[code_[i].args[j]].sym->category())
+          return false;
+      }
 
     return
       best_ < size() &&
