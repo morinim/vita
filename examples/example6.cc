@@ -28,13 +28,13 @@
 
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 // This class models the first input.
 class X : public vita::terminal
 {
 public:
-  X() : vita::terminal("X", vita::sym_real, true) {}
+  X() : vita::terminal("X", 0, true) {}
 
   boost::any eval(vita::interpreter *) const { return val; }
 
@@ -44,7 +44,7 @@ public:
 class Y : public vita::terminal
 {
 public:
-  Y() : vita::terminal("Y", vita::sym_real, true) {}
+  Y() : vita::terminal("Y", 0, true) {}
 
   boost::any eval(vita::interpreter *) const { return val; }
 
@@ -54,7 +54,7 @@ public:
 class Z : public vita::terminal
 {
 public:
-  Z() : vita::terminal("Z", vita::sym_real, true) {}
+  Z() : vita::terminal("Z", 0, true) {}
 
   boost::any eval(vita::interpreter *) const { return val; }
 

@@ -27,7 +27,7 @@
 #include "kernel/environment.h"
 #include "kernel/individual.h"
 #include "kernel/interpreter.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 int main(int argc, char *argv[])
 {

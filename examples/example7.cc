@@ -30,7 +30,7 @@
 #include "kernel/adf.h"
 #include "kernel/distribution.h"
 #include "kernel/environment.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 int main(int argc, char *argv[])
 {
@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<unsigned> bl(base.blocks());
-    for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
+    std::list<vita::locus_t> bl(base.blocks());
+    for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       vita::individual ib(base.get_block(*i));
       unsigned first_terminal;
@@ -84,8 +84,9 @@ int main(int argc, char *argv[])
       if (first_terminal)
       {
         std::vector<vita::locus_t> positions;
-        std::vector<vita::symbol_t> types;
-        vita::individual generalized(opt.generalize(2, &positions, &types));
+        std::vector<vita::category_t> categories;
+        vita::individual generalized(opt.generalize(2, &positions,
+                                                    &categories));
 
         std::cout << std::endl;
         ib.list(std::cout);
@@ -96,7 +97,7 @@ int main(int argc, char *argv[])
         const unsigned arg_n(positions.size());
         std::cout << std::endl << "Arguments:";
         for (unsigned j(0); j < arg_n; ++j)
-          std::cout << " (pos=" << positions[j] << ",type=" << types[j]
+          std::cout << " (pos=" << positions[j] << ",category=" << categories[j]
                     << ")";
         std::cout << std::endl;
 

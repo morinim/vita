@@ -27,7 +27,7 @@
 #include "kernel/environment.h"
 #include "kernel/individual.h"
 #include "kernel/ttable.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 //
 // Performs a speed test on the transposition table (insert-find cycle).

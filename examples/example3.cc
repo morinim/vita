@@ -26,7 +26,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/individual.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 //
 // Performs three types of crossover between two random individuals.

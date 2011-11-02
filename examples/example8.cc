@@ -30,7 +30,7 @@
 #include "kernel/adf.h"
 #include "kernel/distribution.h"
 #include "kernel/environment.h"
-#include "kernel/primitive/sr_pri.h"
+#include "kernel/primitive/double_pri.h"
 
 int main(int argc, char *argv[])
 {
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<unsigned> bl(base.blocks());
-    for (std::list<unsigned>::const_iterator i(bl.begin()); i != bl.end(); ++i)
+    std::list<vita::locus_t> bl(base.blocks());
+    for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       vita::individual blk(base.get_block(*i));
 
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
         if (opt.eff_size() <= 20)
         {
           std::vector<vita::locus_t> positions;
-          std::vector<vita::symbol_t> types;
-          vita::individual blk2(opt.generalize(2, &positions, &types));
-          vita::symbol_ptr f(new vita::adf(blk2, types, 100));
+          std::vector<vita::category_t> categories;
+          vita::individual blk2(opt.generalize(2, &positions, &categories));
+          vita::symbol_ptr f(new vita::adf(blk2, categories, 100));
           env.insert(f);
           std::cout << std::endl << f->display() << std::endl;
           blk2.list(std::cout);
