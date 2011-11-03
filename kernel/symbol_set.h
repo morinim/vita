@@ -54,8 +54,8 @@ namespace vita
     const symbol_ptr &get_adt(unsigned) const;
     unsigned adts() const;
 
-    const symbol_ptr &get_special(unsigned) const;
-    unsigned specials() const;
+    const symbol_ptr &get_sticky(unsigned) const;
+    unsigned stickies() const;
 
     void reset_adf_weights();
 
@@ -80,13 +80,13 @@ namespace vita
       std::vector<symbol_ptr>       adf;
       std::vector<symbol_ptr>       adt;
 
-      // A special symbol is not used during initial random generation but it's
+      // A sticky symbol is not used during initial random generation but it's
       // inserted at the end of the genome in a protected area. Only terminals
-      // can be special.
-      std::vector<symbol_ptr>  specials;
+      // can be sticky.
+      std::vector<symbol_ptr>  stickies;
 
       // The sum of the weights of all the symbols in the collection that are
-      // NOT special.
+      // NOT sticky.
       boost::uint64_t sum;
 
       bool check() const;

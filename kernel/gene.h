@@ -34,9 +34,7 @@ namespace vita
   ///
   struct gene
   {
-    ///
     /// Maximum number of arguments for a function.
-    ///
     enum {k_args = 4};
 
     gene() {}

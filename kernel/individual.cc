@@ -46,15 +46,15 @@ namespace vita
     // **** Random generate initial code. ****
     if (gen)
     {
-      const unsigned specials(e.sset.specials());
-      assert(specials < size());
+      const unsigned stickies(e.sset.stickies());
+      assert(stickies < size());
 
-      const unsigned sup(size() - specials);
+      const unsigned sup(size() - stickies);
 
       for (unsigned i(0); i < sup; ++i)
         code_[i] = gene(e.sset, i+1, e.code_length);
 
-      for (unsigned i(0); i < specials; ++i)
+      for (unsigned i(0); i < stickies; ++i)
         code_[sup+i] = gene(e.sset, i);
 
       assert(check());
@@ -256,7 +256,7 @@ namespace vita
   /// \return a new, mutated, individual.
   ///
   /// A new individual is created mutating \c this individual. If there are
-  /// special symbols (env_->sset.specials() > 0) they are protected from
+  /// sticky symbols (env_->sset.stickies() > 0) they are protected from
   /// mutation.
   ///
   individual individual::mutation(unsigned *const n_mutations) const
@@ -264,9 +264,9 @@ namespace vita
     individual ret(*this);
     unsigned n(0);
 
-    const unsigned specials(env_->sset.specials());
-    assert(specials < size());
-    const unsigned cs(size() - specials);
+    const unsigned stickies(env_->sset.stickies());
+    assert(stickies < size());
+    const unsigned cs(size() - stickies);
 
     for (unsigned i(0); i < cs; ++i)
       if (random::boolean(env_->p_mutation))
@@ -724,9 +724,9 @@ namespace vita
       last_is_terminal = code_[line].sym->terminal();
     }
 
-    // Only terminals can be special.
-    const unsigned specials(env_->sset.specials());
-    for (unsigned i(size()-specials); i < size(); ++i)
+    // Only terminals can be sticky.
+    const unsigned stickies(env_->sset.stickies());
+    for (unsigned i(size() - stickies); i < size(); ++i)
       if (!code_[i].sym->terminal())
         return false;
 

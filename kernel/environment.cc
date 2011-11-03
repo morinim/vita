@@ -94,9 +94,9 @@ namespace vita
   ///
   void environment::insert(symbol_ptr i)
   {
-    const bool special(force_input && i->terminal() &&
-                       static_cast<terminal *>(i.get())->input());
-    sset.insert(i, special);
+    const bool sticky(force_input && i->terminal() &&
+                      std::static_pointer_cast<terminal>(i)->input());
+    sset.insert(i, sticky);
   }
 
   ///

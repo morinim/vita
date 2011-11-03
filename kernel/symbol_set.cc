@@ -80,40 +80,40 @@ namespace vita
   }
 
   ///
-  /// \param[in] n index of a special \a symbol.
-  /// \return a pointer to the n-th special \a symbol.
+  /// \param[in] n index of a sticky \a symbol.
+  /// \return a pointer to the n-th sticky \a symbol.
   ///
-  const symbol_ptr &symbol_set::get_special(unsigned n) const
+  const symbol_ptr &symbol_set::get_sticky(unsigned n) const
   {
-    assert(n < all_.specials.size());
-    return all_.specials[n];
+    assert(n < all_.stickies.size());
+    return all_.stickies[n];
   }
 
   ///
-  /// \return the number of special symbols in the symbol set.
+  /// \return the number of sticky symbols in the symbol set.
   ///
-  unsigned symbol_set::specials() const
+  unsigned symbol_set::stickies() const
   {
-    return all_.specials.size();
+    return all_.stickies.size();
   }
 
   ///
   /// \param[in] i symbol to be added.
-  /// \param[in] special if \c true the \a symbol is not used during initial
+  /// \param[in] sticky if \c true the \a symbol is not used during initial
   ///            random generation but it's inserted at the end of the genome
-  ///            in a protected area. Only terminals can be special.
+  ///            in a protected area. Only terminals can be sticky.
   ///
   /// Adds a new \a symbol to the set.
   ///
-  void symbol_set::insert(symbol_ptr i, bool special)
+  void symbol_set::insert(symbol_ptr i, bool sticky)
   {
     assert(i && i->weight && i->check());
 
-    // Special aren't inserted in the symbols' vector.
-    if (special)
+    // Stickies aren't inserted in the symbols' vector.
+    if (sticky)
     {
       assert(i->terminal());
-      all_.specials.push_back(i);
+      all_.stickies.push_back(i);
     }
     else
     {
@@ -209,7 +209,7 @@ namespace vita
 
   ///
   /// \param[in] opcode numerical code used as primary key for a symbol.
-  /// \return a pointer to the \c symbol identified by 'opcode' (0 if not
+  /// \return a pointer to the \a symbol identified by 'opcode' (0 if not
   ///         found).
   ///
   symbol_ptr symbol_set::decode(unsigned opcode) const
@@ -239,7 +239,8 @@ namespace vita
   }
 
   ///
-  /// \return \c true if there are enough terminals for individual generation.
+  /// \return \c true if there are enough terminals for secure individual
+  ///         generation.
   ///
   bool symbol_set::enough_terminals() const
   {
@@ -253,7 +254,7 @@ namespace vita
     for (auto c(need.begin()); c != need.end(); ++c)
       if (by_.category.size() <= *c ||
           (!by_.category[*c].terminals.size() &&
-           !by_.category[*c].specials.size()))
+           !by_.category[*c].stickies.size()))
         return false;
 
     return true;
@@ -349,17 +350,17 @@ namespace vita
     for (unsigned i(0); i < c.adt.size(); ++i)
       category[c.adt[i]->category()].adt.push_back(c.adt[i]);
 
-    for (unsigned i(0); i < c.specials.size(); ++i)
+    for (unsigned i(0); i < c.stickies.size(); ++i)
     {
-      const unsigned cat(c.specials[i]->category());
+      const unsigned cat(c.stickies[i]->category());
       if (cat >= category.size())
         category.resize(cat + 1);
 
-      category[cat].specials.push_back(c.specials[i]);
+      category[cat].stickies.push_back(c.stickies[i]);
     }
 
     //for (unsigned i(0); i < category.size(); ++i)
-    //  if (category[i].symbols.size() || category[i].specials.size())
+    //  if (category[i].symbols.size() || category[i].stickies.size())
     //    ++n_categories;
 
     assert(check());

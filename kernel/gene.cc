@@ -60,11 +60,11 @@ namespace vita
 
   ///
   /// \param[in] sset the set of symbols used to build individuals.
-  /// \param[in] i index of a special symbol in the symbol_set.
+  /// \param[in] i index of a sticky symbol in the symbol_set.
   ///
   gene::gene(const symbol_set &sset, unsigned i)
   {
-    sym = sset.get_special(i);
+    sym = sset.get_sticky(i);
     if (sym->parametric())
       par = sym->init();
   }
