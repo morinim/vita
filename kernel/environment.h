@@ -46,6 +46,7 @@ namespace vita
              const std::string & = "") const;
 
     void insert(symbol_ptr);
+    void insert(symbol_ptr, bool);
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).

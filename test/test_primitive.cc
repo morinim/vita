@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(ABS)
   vita::individual i(env, true);
 
   // With a not C++11 conformant compiler the {1} expression can be changed
-  // with assign::list_of(1).
+  // with boost::assign::list_of(1).
   BOOST_TEST_CHECKPOINT("ABS(-X) == X");
   i = i.replace(f_abs, {1}, 0);  // [0] ABS 1
   i = i.replace(neg_x,  {}, 1);  // [1] -X

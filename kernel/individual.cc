@@ -699,36 +699,46 @@ namespace vita
   ///
   bool individual::check() const
   {
-    bool last_is_terminal(false);
     unsigned line(best_);
-    for (const_iterator it(*this); it(); line = ++it)
+    for (locus_t locus(0); locus < size(); ++locus)
     {
-      if (!code_[line].sym)
+      if (!code_[locus].sym)
         return false;
 
       // Maximum number of function arguments is gene::k_args.
-      if (code_[line].sym->arity() > gene::k_args)
+      if (code_[locus].sym->arity() > gene::k_args)
         return false;
 
       // Checking arguments' addresses.
-      for (unsigned j(0); j < code_[line].sym->arity(); ++j)
+      for (unsigned j(0); j < code_[locus].sym->arity(); ++j)
       {
         // Arguments' addresses must be smaller than the size of the genome.
-        if (code_[line].args[j] >= size())
+        if (code_[locus].args[j] >= size())
           return false;
         // Function address must be smaller than its arguments' addresses.
-        if (code_[line].args[j] <= line)
+        if (code_[locus].args[j] <= line)
           return false;
       }
-
-      last_is_terminal = code_[line].sym->terminal();
     }
+
+    const bool last_is_terminal(code_[size()-1].sym->terminal());
 
     // Only terminals can be sticky.
     const unsigned stickies(env_->sset.stickies());
     for (unsigned i(size() - stickies); i < size(); ++i)
       if (!code_[i].sym->terminal())
         return false;
+
+    // All the sticky symbols must be present.
+    for (unsigned i(0); i < stickies; ++i)
+    {
+      bool found(false);
+      for (unsigned j(size() - stickies); j < size(); ++j)
+        found = (code_[j].sym == env_->sset.get_sticky(i));
+
+      if (!found)
+        return false;
+    }
 
     // Type checking.
     for (unsigned i(0); i < size(); ++i)

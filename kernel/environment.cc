@@ -92,10 +92,30 @@ namespace vita
   ///
   /// \param[in] i pointer to a new symbol for the symbol set.
   ///
+  /// This is a shortcut for sset.insert with sticky symbols support.
+  /// If \c force_input is \c true all the input terminals are marked as sticky.
+  ///
   void environment::insert(symbol_ptr i)
   {
+    assert(i);
+
     const bool sticky(force_input && i->terminal() &&
                       std::static_pointer_cast<terminal>(i)->input());
+    insert(i, sticky);
+  }
+
+  ///
+  /// \param[in] i pointer to a new symbol for the symbol set.
+  /// \param[in] sticky is \a i a sticky symbol?
+  ///
+  /// This is a shortcut for sset.insert with sticky symbols support. Sticky
+  /// symbols are always appended at the end of the genome.
+  ///
+  void environment::insert(symbol_ptr i, bool sticky)
+  {
+    assert(i);
+    assert(!sticky || i->terminal());
+
     sset.insert(i, sticky);
   }
 

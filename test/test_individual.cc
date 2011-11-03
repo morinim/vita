@@ -33,6 +33,8 @@
 
 using namespace boost;
 
+typedef std::shared_ptr<vita::sr::constant> constant_ptr;
+
 struct F
 {
   F()
@@ -41,7 +43,8 @@ struct F
       f_sub(new vita::sr::sub()),
       f_mul(new vita::sr::mul()),
       f_ifl(new vita::sr::ifl()),
-      f_ife(new vita::sr::ife())
+      f_ife(new vita::sr::ife()),
+      n_123(new vita::sr::constant(123))
   {
     BOOST_TEST_MESSAGE("Setup fixture");
     env.insert(num);
@@ -63,6 +66,8 @@ struct F
   vita::symbol_ptr f_mul;
   vita::symbol_ptr f_ifl;
   vita::symbol_ptr f_ife;
+
+  constant_ptr n_123;
 
   vita::environment env;
 };
@@ -147,6 +152,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
+  BOOST_TEST_CHECKPOINT("Variable length random creation.");
   for (unsigned l(1); l < 100; ++l)
   {
     env.code_length = l;
@@ -154,6 +160,16 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
     BOOST_REQUIRE(i.check());
     BOOST_REQUIRE_EQUAL(i.size(), l);
+  }
+
+  BOOST_TEST_CHECKPOINT("Sticky symbol must exits!");
+  env.insert(n_123, true);
+  for (unsigned l(2); l < 100; ++l)
+  {
+    env.code_length = l;
+    vita::individual i(env, true);
+
+    BOOST_REQUIRE_EQUAL(i[l-1].sym, n_123);
   }
 }
 
