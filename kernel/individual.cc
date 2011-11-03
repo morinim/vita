@@ -751,7 +751,7 @@ namespace vita
       size() < (1u << 8*sizeof(locus_t)) &&
       eff_size() <= size() &&
       env_->check() &&
-      signature() == hash();
+      (signature_.empty() || signature_ == hash());
   }
 
   ///

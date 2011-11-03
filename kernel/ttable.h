@@ -58,6 +58,19 @@ namespace vita
   };
 
   ///
+  /// \param[out] o output stream.
+  /// \param[in] h hash signature to be printed.
+  ///
+  /// Mainly useful for debugging / testing.
+  ///
+  inline
+  std::ostream &operator<<(std::ostream &o, hash_t h)
+  {
+    return o << h.p1 << h.p2;
+  }
+
+
+  ///
   /// \a ttable \c class implements a hash table that links individuals to
   /// fitness (it's used by the \a evaluator_proxy \c class).
   /// The key used for table lookup is the individual's signature.

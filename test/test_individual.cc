@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(Compact)
     const boost::any v1( (vita::interpreter(i1))() );
     const boost::any v2( (vita::interpreter(i2))() );
 
-    BOOST_REQUIRE(v1.empty() == v2.empty());
+    BOOST_REQUIRE_EQUAL(v1.empty(), v2.empty());
     if (!v1.empty() && !v2.empty())
       BOOST_REQUIRE_EQUAL(boost::any_cast<double>(v1),
                           boost::any_cast<double>(v2));
@@ -100,6 +100,15 @@ BOOST_AUTO_TEST_CASE(Compact)
         BOOST_REQUIRE_EQUAL(old_line, line-1);
         ++old_line;
       }
+  }
+
+  BOOST_TEST_CHECKPOINT("Same signature.");
+  for (unsigned n(0); n < 1000; ++n)
+  {
+    const vita::individual i1(env, true);
+    const vita::individual i2(i1.compact());
+
+    BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
   }
 }
 
@@ -156,11 +165,11 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_REQUIRE_EQUAL(a, a);
 
     vita::individual b(a);
-    BOOST_REQUIRE(a.signature() == b.signature());
+    BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
     vita::individual c(env, true);
     if (!(a.signature() == c.signature()))
-      BOOST_REQUIRE(a != c);
+      BOOST_REQUIRE_NE(a, c);
   }
 }
 

@@ -148,11 +148,13 @@ namespace vita
     mutable hash_t signature_;
   };  // class individual
 
-  std::ostream & operator<<(std::ostream &, const individual &);
+
+  std::ostream &operator<<(std::ostream &, const individual &);
 
   individual one_point_crossover(const individual &, const individual &);
   individual two_point_crossover(const individual &, const individual &);
   individual uniform_crossover(const individual &, const individual &);
+
 
   class individual::const_iterator
   {
