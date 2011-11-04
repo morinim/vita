@@ -26,8 +26,10 @@
 
 #include <vector>
 
+#include "kernel/classifier.h"
 #include "kernel/data.h"
 #include "kernel/evaluator.h"
+#include "kernel/individual.h"
 #include "kernel/primitive/double_pri.h"
 
 namespace vita
@@ -71,6 +73,8 @@ namespace vita
     fitness_t operator()(const individual &);
     double accuracy(const individual &);
 
+    friend class dyn_slot_classifier;
+
   private:
     static double normalize_01(double);
 
@@ -79,6 +83,18 @@ namespace vita
     void fill_slots(const individual &,
                     std::vector <std::vector<unsigned>> *,
                     std::vector<unsigned> *);
+  };
+
+  class dyn_slot_classifier : public classifier
+  {
+  public:
+    dyn_slot_classifier(const individual &, dyn_slot_evaluator *);
+
+    std::string operator()(const data::value_type &) const;
+
+  private:
+    dyn_slot_evaluator             *eva_;
+    std::vector<std::string> slot_class_;
   };
 
   class gaussian_evaluator : public src_evaluator
@@ -91,15 +107,29 @@ namespace vita
       assert(v);
     }
 
-    unsigned class_label(const individual &, const data::value_type &,
-                         const std::vector< distribution<double> > &);
-
     fitness_t operator()(const individual &);
     double accuracy(const individual &);
 
+    friend class gaussian_classifier;
+
   private:
     void gaussian_distribution(const individual &,
-                               std::vector< distribution<double> > *);
+                               std::vector<distribution<double>> *);
+
+    unsigned class_label(const individual &, const data::value_type &,
+                         const std::vector<distribution<double>> &);
+  };
+
+  class gaussian_classifier : public classifier
+  {
+  public:
+    gaussian_classifier(const individual &, gaussian_evaluator *);
+
+    std::string operator()(const data::value_type &) const;
+
+  private:
+    gaussian_evaluator                 *eva_;
+    std::vector<distribution<double>> gauss_;
   };
 }  // namespace vita
 

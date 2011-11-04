@@ -183,6 +183,23 @@ namespace vita
   }
 
   ///
+  /// \param[in] i the encoded (data::encode()) value of a class.
+  /// \return the name of the class encoded with the \c unsigned \a i (or an
+  ///         empty string if such class cannot be find).
+  ///
+  /// Boost Bimap could be used to speed up the search in classes_map_, but
+  /// to date speed isn't an issue.
+  ///
+  std::string data::class_name(unsigned i) const
+  {
+    for (auto p(classes_map_.begin()); p != classes_map_.end(); ++p)
+      if (p->second == i)
+        return p->first;
+
+    return "";
+  }
+
+  ///
   /// \param[in] line line to be parsed.
   /// \param[in] delimiter separator character for fields.
   /// \param[in] trim if \c true trims leading and trailing spaces adjacent to

@@ -84,6 +84,8 @@ namespace vita
     unsigned classes() const;
     unsigned variables() const;
 
+    std::string class_name(unsigned) const;
+
     bool check() const;
 
   private:

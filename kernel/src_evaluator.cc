@@ -113,6 +113,53 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind individual used for classification.
+  /// \param[in] eva evaluator for \a ind.
+  ///
+  dyn_slot_classifier::dyn_slot_classifier(const individual &ind,
+                                           dyn_slot_evaluator *eva)
+    : classifier(ind), eva_(eva)
+  {
+    assert(ind.check());
+    assert(eva);
+
+    const unsigned n_slots(eva_->dat_->classes() * 10);
+    std::vector <std::vector<unsigned>> slot_matrix(n_slots);
+    std::vector<unsigned> slot_class(n_slots);
+    eva_->fill_slots(ind, &slot_matrix, &slot_class);
+
+    for (unsigned i(0); i < slot_class.size(); ++i)
+      slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
+  }
+
+  ///
+  /// \param[in] instance data to be classified.
+  /// \return the class that include the \a instance.
+  ///
+  std::string dyn_slot_classifier::operator()(
+    const data::value_type &instance) const
+  {
+    eva_->load_vars(instance);
+
+    const boost::any res( (interpreter(ind_))() );
+
+    const unsigned n_slots(slot_class_.size());
+    unsigned where(n_slots - 1);
+
+    if (!res.empty())
+    {
+      const double val(boost::any_cast<double>(res));
+
+      where = static_cast<unsigned>(dyn_slot_evaluator::normalize_01(val) *
+                                    n_slots);
+      if (where >= n_slots)
+        where = n_slots - 1;
+    }
+
+    return slot_class_[where];
+  }
+
+  ///
   /// \param[in] val the numeric value that should be mapped in the [0,1]
   ///                interval.
   ///
@@ -249,9 +296,13 @@ namespace vita
     return count ? double(ok) / double(count) : -1.0;
   }
 
+  ///
+  /// \param[in] ind individual used for classification.
+  /// \param[out] gauss
+  ///
   void gaussian_evaluator::gaussian_distribution(
     const individual &ind,
-    std::vector< distribution<double> > *gauss)
+    std::vector<distribution<double>> *gauss)
   {
     assert(dat_->classes() == gauss->size());
 
@@ -308,7 +359,7 @@ namespace vita
         const double delta(std::fabs(mean_j - mean_i));
         const double radius(stddev_j + stddev_i);
 
-        d += 200.0*std::log(delta) - radius;
+        d += 200.0 * std::log(delta) - radius;
       }
 
     return d;
@@ -322,12 +373,8 @@ namespace vita
   double gaussian_evaluator::accuracy(const individual &ind)
   {
     assert(dat_->classes() >= 2);
-    std::vector< distribution<double> > gauss(dat_->classes());
+    std::vector<distribution<double>> gauss(dat_->classes());
     gaussian_distribution(ind, &gauss);
-
-    for (unsigned i(0); i < gauss.size(); ++i)
-      std::cout << "Class " << i << " mean: " << gauss[i].mean << " variance: "
-                << gauss[i].variance << std::endl;
 
     unsigned ok(0), count(0);
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++count, ++t)
@@ -339,24 +386,22 @@ namespace vita
 
   ///
   /// \param[in] ind program used for classification.
-  /// \param[in] val input value whose class we are interested in.
+  /// \param[in] instance input value whose class we are interested in.
   /// \param[in] gauss parameters of the gaussian distributions.
-  /// \return the class of \a val.
+  /// \return the class of \a instance.
   ///
   unsigned gaussian_evaluator::class_label(
     const individual &ind,
-    const data::value_type &val,
+    const data::value_type &instance,
     const std::vector<distribution<double>> &gauss)
   {
-    load_vars(val);
+    load_vars(instance);
 
     const boost::any res( (interpreter(ind))() );
     const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
-    //const double pi2(2*std::acos(-1.0));
 
     assert(dat_->classes() == gauss.size());
 
-    //double max_probability(0.0);
     double min_distance(std::fabs(x - gauss[0].mean));
     unsigned probable_class(0);
     for (unsigned i(0); i < dat_->classes(); ++i)
@@ -371,6 +416,32 @@ namespace vita
     }
 
     return probable_class;
+  }
+
+  ///
+  /// \param[in] ind individual used for classification.
+  /// \param[in] eva evaluator for \a ind.
+  ///
+  gaussian_classifier::gaussian_classifier(const individual &ind,
+                                           gaussian_evaluator *eva)
+    : classifier(ind), eva_(eva)
+  {
+    assert(ind.check());
+    assert(eva);
+
+    eva_->gaussian_distribution(ind, &gauss_);
+  }
+
+  ///
+  /// \param[in] ind program used for classification.
+  /// \param[in] val input value whose class we are interested in.
+  /// \param[in] gauss parameters of the gaussian distributions.
+  /// \return the class of \a val.
+  ///
+  std::string gaussian_classifier::operator()(
+    const data::value_type &instance) const
+  {
+    return eva_->dat_->class_name(eva_->class_label(ind_, instance, gauss_));
   }
 
   /*

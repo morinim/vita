@@ -52,9 +52,9 @@ namespace vita
     /// examples that are correctly scored/classified as a proportion of the
     /// total number of examples in the training set. According to this
     /// design, the best accuracy is 1 (100%), meaning that all the training
-    /// examples have been correctly recognised.
-    /// Accuracy could be used as the fitness function but it often hasn't
-    /// enough "granularity".
+    /// examples have been correctly recognized.
+    /// Accuracy could be used as fitness function but it often hasn't enough
+    /// "granularity".
     virtual double accuracy(const individual &) { return -1; }
   };
 
