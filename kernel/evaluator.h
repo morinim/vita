@@ -32,12 +32,12 @@ namespace vita
   class individual;
 
   ///
-  /// \a evaluator \c class calculates the fitness of an individual (how good
-  /// he is). It maps an \a individual (its genome) to a \a fitness_t value.
-  /// This is an abstract \c class because the fitness is domain dependent
+  /// \a evaluator class calculates the fitness of an individual (how good
+  /// he is). It maps vita::individual (its genome) to a fitness_t value.
+  /// This is an abstract class because the fitness is domain dependent
   /// (symbolic regression, data classification, automation...).
-  /// Note: this \c class shouldn't be confused with the \a interpreter
-  /// \c class (that calculates the output of an individual given an input
+  /// Note: this class shouldn't be confused with the vita::interpreter
+  /// class (that calculates the output of an individual given an input
   /// vector).
   ///
   class evaluator
@@ -51,7 +51,7 @@ namespace vita
     /// The accuracy of a genetic programming refers to the number of training
     /// examples that are correctly scored/classified as a proportion of the
     /// total number of examples in the training set. According to this
-    /// design, the best accuracy is 1 (100%), meaning that all the training
+    /// design, the best accuracy is 1.0 (100%), meaning that all the training
     /// examples have been correctly recognized.
     /// Accuracy could be used as fitness function but it often hasn't enough
     /// "granularity".

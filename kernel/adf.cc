@@ -61,7 +61,8 @@ namespace vita
   /// \param[in] i the context in which this ADF is evaluated.
   /// \return the output of the ADF.
   ///
-  /// adf functions need input parameters from the \a i context.
+  /// Adf functions need input parameters from the a context (contrary to
+  /// adt::eval).
   ///
   boost::any adf::eval(interpreter *i) const
   {
@@ -123,7 +124,8 @@ namespace vita
   ///
   /// \return the output of the ADT.
   ///
-  /// adt hasn't input parameters so the context is not used.
+  /// Adt hasn't input parameters so the context is ignored (contrary to
+  /// adf::eval).
   ///
   boost::any adt::eval(interpreter *) const
   {

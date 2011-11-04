@@ -46,6 +46,12 @@ namespace vita
     std::vector<variable_ptr> *var_;
   };
 
+  ///
+  /// This evaluator will drive the evolution towards the minimum sum of
+  /// absolute errors (\f$-\sum_{i=1}^n abs(target_i - actual_i)\f$).
+  /// There is also a penality for illegal values (it is a function of the
+  /// number of illegal values).
+  ///
   class abs_evaluator : public src_evaluator
   {
   public:

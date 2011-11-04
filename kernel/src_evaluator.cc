@@ -85,6 +85,11 @@ namespace vita
   /// \param[in] ind program used for fitness evaluation.
   /// \return the fitness (greater is better, max is 0).
   ///
+  /// This function is similar to operator()() but will skip 3 out of 4
+  /// training instances, so it's faster ;-) but...
+  /// \attention output value of this method and of the operator()() method
+  /// cannot be compared (I know, it's a pity).
+  ///
   fitness_t abs_evaluator::fast(const individual &ind)
   {
     assert(!dat_->classes());
@@ -167,6 +172,7 @@ namespace vita
   double dyn_slot_evaluator::normalize_01(double val)
   {
     return 0.5 + std::atan(val)/3.1415926535;
+    // return 1.0 / (1 + std::exp(-val));
   }
 
   ///
