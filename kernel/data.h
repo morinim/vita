@@ -26,7 +26,6 @@
 
 #include <boost/any.hpp>
 
-#include <fstream>
 #include <list>
 #include <map>
 #include <string>
@@ -45,7 +44,8 @@ namespace vita
   class data
   {
   public:
-    enum domain_t {d_bool, d_double, d_int, d_string, d_void};
+    /// Categories are defined over some domain.
+    enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 
     ///
     /// \a value_type stores a single element of the training set. The \c struct

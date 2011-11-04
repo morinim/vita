@@ -209,8 +209,8 @@ namespace vita
 
   ///
   /// \param[in] opcode numerical code used as primary key for a symbol.
-  /// \return a pointer to the \a symbol identified by 'opcode' (0 if not
-  ///         found).
+  /// \return a pointer to the \c vita::symbol identified by 'opcode'
+  ///         (\c nullptr if not found).
   ///
   symbol_ptr symbol_set::decode(unsigned opcode) const
   {
@@ -225,12 +225,15 @@ namespace vita
   /// \param[in] dex the name of a symbol.
   /// \return a pointer to the \c symbol identified by 'dex' (0 if not found).
   ///
-  /// Please note that opcode are primary key for symbols because they are
-  /// automatically assigned. The name of a symbol is choosen by the user,
-  /// so if you don't pay attention different symbols may have the same name.
+  /// \attention Please note that opcodes (automatically assigned) are primary
+  /// keys for symbols. Conversely the name of a symbol is choosen by the
+  /// user, so, if you don't pay attention, different symbols may have the same
+  /// name.
   ///
   symbol_ptr symbol_set::decode(const std::string &dex) const
   {
+    assert(dex != "");
+
     for (unsigned i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->display() == dex)
         return all_.symbols[i];
@@ -239,8 +242,20 @@ namespace vita
   }
 
   ///
+  /// \return number of categories in the symbol set (>= 1).
+  ///
+  /// See also \c data::categories().
+  ///
+  unsigned symbol_set::categories() const
+  {
+    return by_.category.size();
+  }
+
+  ///
   /// \return \c true if there are enough terminals for secure individual
   ///         generation.
+  ///
+  /// We want at least one terminal for every category.
   ///
   bool symbol_set::enough_terminals() const
   {
@@ -251,10 +266,10 @@ namespace vita
         need.insert(static_cast<function *>(all_.symbols[i].get())
                     ->arg_category(j));
 
-    for (auto c(need.begin()); c != need.end(); ++c)
-      if (by_.category.size() <= *c ||
-          (!by_.category[*c].terminals.size() &&
-           !by_.category[*c].stickies.size()))
+    for (auto cat(need.begin()); cat != need.end(); ++cat)
+      if (*cat >= categories() ||
+          (!by_.category[*cat].terminals.size() &&
+           !by_.category[*cat].stickies.size()))
         return false;
 
     return true;

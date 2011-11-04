@@ -21,6 +21,8 @@
  *
  */
 
+#include <fstream>
+
 #include "kernel/src_problem.h"
 #include "kernel/individual.h"
 #include "kernel/src_evaluator.h"
@@ -167,6 +169,8 @@ namespace vita
   ///
   unsigned src_problem::classes() const
   {
+    assert(dat_.classes() != 1);
+
     return dat_.classes();
   }
 

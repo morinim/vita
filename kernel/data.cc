@@ -122,6 +122,25 @@ namespace vita
   ///
   /// \return number of categories of the problem (>= 1).
   ///
+  /// \attention Please note that \c data::categories() may differ from the
+  /// intuitive number of categories of the dataset.
+  ///
+  /// For instance consider the simple Iris classification problem (nominal
+  /// attribute as output):
+  /// \verbatim
+  /// <attribute class="yes" name="class" type="nominal">
+  ///   <labels>
+  ///     <label>Iris-setosa</label> ... <label>Iris-virginica</label>
+  ///   </labels>
+  /// </attribute>
+  /// \endverbatim
+  /// Genetic programming algorithms for classification don't manipulate the
+  /// output category (it is "superfluous", the only relevant information is the
+  /// number of output classes).
+  ///
+  /// So Dataset (m categories) => \c vita::data (n categories) =>
+  /// \c vita::src_problem => \c vita::symbol_set (n categories).
+  ///
   unsigned data::categories() const
   {
     return categories_.size();
@@ -283,7 +302,7 @@ namespace vita
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
-  /// of instances sharing a set of attributes. To date we don't suppert
+  /// of instances sharing a set of attributes. To date we don't support
   /// compressed XRFF files.
   ///
   unsigned data::load_xrff(const std::string &filename)
@@ -314,6 +333,8 @@ namespace vita
     ptree pt;
     read_xml(filename, pt);
 
+    bool classification(false);
+
     // Iterate over dataset.header.attributes selection and store all found
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
@@ -330,34 +351,75 @@ namespace vita
         // deduced from the default value.
         a.name = dha.second.get("<xmlattr>.name", "");
 
-        const std::string type(dha.second.get("<xmlattr>.type", ""));
-        const std::string category_name(type);
-        a.category_id = encode(category_name, &categories_map_);
-        if (a.category_id >= categories_.size())
-        {
-          assert(a.category_id == categories_.size());
-          categories_.push_back(category{from_weka[type], {}});
-        }
-
-        if (type == "nominal")
-          try
-          {
-            BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
-              if (l.first == "label")
-              {
-                // Store label1... labelN}
-              }
-          }
-          catch(...)
-          {
-          }
-
         // Via the class="yes" attribute in the attribute specification in the
         // header, one can define which attribute should act as output value.
         a.output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
+        const std::string xml_type(dha.second.get("<xmlattr>.type", ""));
+
+        if (a.output)
+          classification = (xml_type == "nominal" || xml_type == "string");
+
+        const std::string category_name(xml_type);
+
+        // Note the special treatment of the output column of a classification
+        // problem: for category_id calculation, we completely ignore the type
+        // recorded in the dataset file.
+        // The reason is that genetic programming classification algorithms
+        // don't manimulate the labels of the output category (they only need
+        // the number of classes of the classification problem).
+        // So category_id isn't meaningful for the output column of a
+        // classification problem.
+        if (a.output && classification)
+          a.category_id = 0;
+        else
+        {
+          a.category_id = encode(category_name, &categories_map_);
+
+          if (a.category_id >= categories_.size())
+          {
+            assert(a.category_id == categories_.size());
+            categories_.push_back(category{from_weka[xml_type], {}});
+          }
+
+          if (xml_type == "nominal")
+            try
+            {
+              BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
+                if (l.first == "label")
+                {
+                  // Store label1... labelN}
+                }
+            }
+            catch(...)
+            {
+            }
+        }
+
         header_.push_back(a);
       }
+
+    // XRFF needs informations about the columns.
+    if (!header_.size())
+      return 0;
+
+    // Picks some data about output(s).
+    unsigned output_column, n_output(0);
+    for (unsigned i(0); i < header_.size(); ++i)
+      if (header_[i].output)
+      {
+        output_column = i;
+        ++n_output;
+      }
+
+    // We can manage only one output column.
+    if (n_output > 1)
+      return 0;
+
+    // If there isn't an explicitly defined output column, we assume it is the
+    // last one.
+    if (!n_output)
+      header_[header_.size()-1].output = true;
 
     unsigned parsed(0);
     BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
@@ -368,15 +430,14 @@ namespace vita
         unsigned index(0);
         for (auto v(bi.second.begin()); v != bi.second.end(); ++v, ++index)
           if (v->first == "value")
-          {
-            const domain_t domain(
-              categories_[header_[index].category_id].domain);
-
             try
             {
+              const domain_t domain(
+                categories_[header_[index].category_id].domain);
+
               if (header_[index].output)
               {
-                if (domain == d_string)
+                if (classification)
                   instance.output = encode(v->second.data(), &classes_map_);
                 else
                   instance.output = convert(v->second.data(), domain);
@@ -389,7 +450,6 @@ namespace vita
               instance.clear();
               continue;
             }
-          }
 
         if (instance.input.size() + 1 == header_.size())
         {
@@ -447,6 +507,8 @@ namespace vita
     if (!from)
       return 0;
 
+    bool classification(false);
+
     std::string line;
     unsigned parsed(0);
     while (std::getline(from, line))
@@ -458,6 +520,9 @@ namespace vita
       {
         value_type instance;
 
+        if (!parsed)
+          classification = !is_number(record[0]);
+
         for (unsigned field(0); field < size; ++field)
         {
           // The first line is (also) used to learn data format.
@@ -465,36 +530,42 @@ namespace vita
           {
             column a;
 
-            const std::string s_domain(is_number(record[field])
-                                       ? "numeric" : "string");
-            const domain_t domain(is_number(record[field])
-                                  ? d_double : d_string);
-
             a.name = "";
-            a.category_id = encode(s_domain, &categories_map_);
-            if (a.category_id >= categories_.size())
+            a.output = (field == 0);
+
+            const std::string s_domain(is_number(record[field]) ?
+                                       "numeric" : "string");
+            const domain_t domain(s_domain == "numeric" ? d_double : d_string);
+
+            if (a.output && classification)
+              a.category_id = 0;
+            else
             {
-              assert(a.category_id == categories_.size());
-              categories_.push_back(category{domain, {}});
+              a.category_id = encode(s_domain, &categories_map_);
+              if (a.category_id >= categories_.size())
+              {
+                assert(a.category_id == categories_.size());
+                categories_.push_back(category{domain, {}});
+              }
             }
-            a.output = (field==0);
 
             header_.push_back(a);
           }
 
-          const domain_t domain(categories_[header_[field].category_id].domain);
-
           try
           {
+            const category_t c(header_[field].category_id);
+
             if (field == 0)  // output value
             {
-              if (domain == d_string)
+              if (classification)
                 instance.output = encode(record[field], &classes_map_);
               else
-                instance.output = convert(record[field], domain);
+                instance.output = convert(record[field], categories_[c].domain);
             }
             else  // input value
-              instance.input.push_back(convert(record[field], domain));
+              instance.input.push_back(convert(record[field],
+                                               categories_[c].domain));
           }
           catch(boost::bad_lexical_cast &)
           {
@@ -550,7 +621,7 @@ namespace vita
       return false;
 
     const unsigned cl_size(classes());
-    // If this is a classification problem, there should be at least two
+    // If this is a classification problem then there should be at least two
     //  classes.
     if (cl_size == 1)
       return false;

@@ -62,6 +62,7 @@ namespace vita
     symbol_ptr decode(unsigned) const;
     symbol_ptr decode(const std::string &) const;
 
+    unsigned categories() const;
     bool enough_terminals() const;
     bool check() const;
 

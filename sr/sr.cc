@@ -276,10 +276,10 @@ bool parse_command_line(int argc, char *argv[])
     return false;
   }
   if (verbose)
-    std::cout << parsed << " lines" << std::endl
-              << "  (" << problem.categories() << " category(ies), "
+    std::cout << "ok (" << parsed << " instance(s)" << ")" << std::endl
+              << "  [" << problem.categories() << " category(ies), "
               << problem.variables() << " variable(s), "
-              << problem.classes() << " class(es))" << std::endl;
+              << problem.classes() << " class(es)]" << std::endl;
 
   if (symbols_file.empty())
   {
@@ -289,14 +289,14 @@ bool parse_command_line(int argc, char *argv[])
   }
   else
   {
-    if (verbose) std::cout << "Reading symbols' file (" << symbols_file
-                           << ")... ";
+    if (verbose) std::cout << "Reading symbols' file \"" << symbols_file
+                           << "\"... ";
     const std::string s(problem.load_symbols(symbols_file));
     if (s.empty())
       return false;
     if (verbose)
       std::cout << "ok" << std::endl
-                << "  (" << s << ')' << std::endl;
+                << "  [" << s << ']' << std::endl;
   }
 
   return true;
