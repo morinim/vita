@@ -134,7 +134,8 @@ namespace vita
   ///   </labels>
   /// </attribute>
   /// \endverbatim
-  /// Genetic programming algorithms for classification don't manipulate the
+  /// Genetic programming algorithms for classification (at least the
+  /// algorithms that learn a discriminant function) don't manipulate the
   /// output category (it is "superfluous", the only relevant information is the
   /// number of output classes).
   ///

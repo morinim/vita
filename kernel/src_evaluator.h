@@ -74,6 +74,8 @@ namespace vita
   private:
     static double normalize_01(double);
 
+    unsigned slot(const individual &, data::const_iterator, unsigned);
+
     void fill_slots(const individual &,
                     std::vector <std::vector<unsigned>> *,
                     std::vector<unsigned> *);

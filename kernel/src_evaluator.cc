@@ -123,25 +123,61 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind
-  /// \param[out] slots
+  /// \param[in] ind individual used for classification.
+  /// \param[in] t input data for \a ind.
+  /// \param[in] n_slots number of slots used for Slotted Dynamic Class
+  ///                    Boundary Determination.
+  /// \return in which slot the input data must be put.
+  ///
+  unsigned dyn_slot_evaluator::slot(const individual &ind,
+                                    data::const_iterator t,
+                                    unsigned n_slots)
+  {
+    assert(ind.check());
+    assert(n_slots);
+
+    load_vars(*t);
+
+    interpreter agent(ind);
+    const boost::any res(agent());
+
+    if (res.empty())
+      return n_slots - 1;
+
+
+    const double val(boost::any_cast<double>(res));
+    const unsigned where(static_cast<unsigned>(normalize_01(val) * n_slots));
+
+    return (where >= n_slots) ? n_slots - 1 : where;
+  }
+
+  ///
+  /// \param[in] ind individual used for classification.
+  /// \param[out] slot_matrix the main matrix of the dynamic slot algorithm.
+  /// \param[out] slot_class slot_class[i] = "label of the predominant class"
+  ///                        for the i-th slot.
   ///
   void dyn_slot_evaluator::fill_slots(
     const individual &ind,
-    std::vector <std::vector<unsigned>> *slots,
-    std::vector<unsigned> *slot_label
+    std::vector <std::vector<unsigned>> *slot_matrix,
+    std::vector<unsigned> *slot_class
     )
   {
-    const unsigned n_slots(slots->size());
+    assert(ind.check());
+    assert(slot_matrix);
+    assert(slot_class);
+
+    const unsigned n_slots(slot_matrix->size());
     for (unsigned i(0); i < n_slots; ++i)
     {
-      (*slots)[i].resize(dat_->classes());
+      (*slot_matrix)[i].resize(dat_->classes());
 
-      for (unsigned j(0); j < (*slots)[i].size(); ++j)
-        (*slots)[i][j] = 0;
+      for (unsigned j(0); j < (*slot_matrix)[i].size(); ++j)
+        (*slot_matrix)[i][j] = 0;
     }
 
     assert(ind.check());
+
     interpreter agent(ind);
 
     // In the first step this method evaluates the program to obtain an output
@@ -149,22 +185,9 @@ namespace vita
     // a bidimentional array is built (slots[slot][class]).
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
-      load_vars(*t);
+      const unsigned where(slot(ind, t, n_slots));
 
-      const boost::any res(agent());
-
-      unsigned slot;
-      if (res.empty())
-        slot = slots->size()-1;
-      else
-      {
-        const double val(boost::any_cast<double>(res));
-        slot = static_cast<unsigned>(normalize_01(val) * n_slots);
-        if (slot >= slots->size())
-          slot = slots->size()-1;
-      }
-
-      ++((*slots)[slot][t->label()]);
+      ++((*slot_matrix)[where][t->label()]);
     }
 
     const unsigned unknown(dat_->classes());
@@ -176,11 +199,11 @@ namespace vita
     {
       unsigned best_class(0);
 
-      for (unsigned j(1); j < (*slots)[i].size(); ++j)
-        if ((*slots)[i][j] >= (*slots)[i][best_class])
+      for (unsigned j(1); j < (*slot_matrix)[i].size(); ++j)
+        if ((*slot_matrix)[i][j] >= (*slot_matrix)[i][best_class])
           best_class = j;
 
-      (*slot_label)[i] = (*slots)[i][best_class] ? best_class : unknown;
+      (*slot_class)[i] = (*slot_matrix)[i][best_class] ? best_class : unknown;
     }
   }
 
@@ -196,15 +219,16 @@ namespace vita
     assert(dat_->classes() >= 2);
 
     const unsigned n_slots(dat_->classes()*10);
-    std::vector<std::vector<unsigned>> slots(n_slots);
-    std::vector<unsigned> slot_label(n_slots);
-    fill_slots(ind, &slots, &slot_label);
+
+    std::vector<std::vector<unsigned>> slot_matrix(n_slots);
+    std::vector<unsigned> slot_class(n_slots);
+    fill_slots(ind, &slot_matrix, &slot_class);
 
     fitness_t err(0.0);
     for (unsigned i(0); i < n_slots; ++i)
-      for (unsigned j(0); j < slots[i].size(); ++j)
-        if (j != slot_label[i])
-          err += slots[i][j];
+      for (unsigned j(0); j < slot_matrix[i].size(); ++j)
+        if (j != slot_class[i])
+          err += slot_matrix[i][j];
 
     return fitness_t(-err);
   }
@@ -314,7 +338,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind
+  /// \param[in] ind program used for classification.
   /// \param[in] val input value whose class we are interested in.
   /// \param[in] gauss parameters of the gaussian distributions.
   /// \return the class of \a val.
