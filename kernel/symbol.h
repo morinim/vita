@@ -129,6 +129,10 @@ namespace vita
   ///
   /// \return the category of the \a symbol.
   ///
+  /// In strongly typed GP, every terminal has a type (i.e. category) and every
+  /// function has types for each of its arguments and a type for its return
+  /// value.
+  ///
   inline
   category_t symbol::category() const
   {

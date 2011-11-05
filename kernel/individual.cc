@@ -37,6 +37,10 @@ namespace vita
   /// \param[in] gen if true generates a random sequence of genes to initialize
   ///                the individual.
   ///
+  /// The process that generates the initial, random expressions have to be
+  /// implemented so as to ensure that they do not violate the type system's
+  /// constraints.
+  ///
   individual::individual(const environment &e, bool gen)
     : crossover_(uniform_crossover), best_(0), env_(&e), code_(e.code_length),
       signature_()
