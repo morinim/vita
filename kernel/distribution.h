@@ -112,7 +112,7 @@ namespace vita
   ///
   /// \f$H(X)=-\sum_{i=1}^n p(x_i) \dot log_b(p(x_i))\f$
   /// We use an offline algorithm
-  /// (<http://en.wikipedia.org/wiki/Online_algorithm>).
+  /// (http://en.wikipedia.org/wiki/Online_algorithm).
   ///
   template<class T>
   double distribution<T>::entropy() const
@@ -137,7 +137,7 @@ namespace vita
   /// Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232.
   /// Addison-Wesley).
   /// This is an online algorithm
-  /// (<http://en.wikipedia.org/wiki/Online_algorithm>).
+  /// (http://en.wikipedia.org/wiki/Online_algorithm).
   ///
   template<class T>
   void distribution<T>::update_variance(T val)

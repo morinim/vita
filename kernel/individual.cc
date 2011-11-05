@@ -531,9 +531,9 @@ namespace vita
   ///
   /// Converts \c this individual in a packed byte level representation and
   /// performs the MurmurHash3 algorithm on it.
-  /// MurmurHash3 (<http://code.google.com/p/smhasher/>), by Austin Appleby, is
-  /// a relatively simple non-cryptographic hash algorithm. It is noted for
-  /// being fast, with excellent distribution, avalanche behavior and overall
+  /// MurmurHash3 (http://code.google.com/p/smhasher/), by Austin Appleby, is a
+  /// relatively simple non-cryptographic hash algorithm. It is noted for being
+  /// fast, with excellent distribution, avalanche behavior and overall
   /// collision resistance.
   ///
   hash_t individual::hash() const

@@ -39,7 +39,10 @@ namespace vita
   typedef std::shared_ptr<sr::variable> variable_ptr;
 
   ///
-  /// \a data class stores the training set used to evolve the \a population.
+  /// \a data class stores the data set used to evolve the vita::population.
+  /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
+  /// (http://code.google.com/intl/it/apis/predict/docs/developer-guide.html)
+  /// files.
   ///
   class data
   {
@@ -48,9 +51,9 @@ namespace vita
     enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 
     ///
-    /// \a value_type stores a single element of the training set. The \c struct
-    /// consists of an input vector (\a input) and an answer value (\a output).
-    /// Depending on the kind of problem, \a output stores:
+    /// \a value_type stores a single element of the data set (instance). The
+    /// \c struct consists of an input vector (\a input) and an answer value
+    /// (\a output). Depending on the kind of problem, \a output stores:
     /// \li a numeric value (symbolic regression problem);
     /// \li a label (classification problem).
     ///
@@ -63,10 +66,10 @@ namespace vita
       void clear() { input.clear(); output = boost::any(); }
     };
 
+    /// value_type *
     typedef std::list<value_type>::iterator iterator;
+    /// const value_type *
     typedef std::list<value_type>::const_iterator const_iterator;
-    typedef std::list<value_type>::reference reference;
-    typedef std::list<value_type>::const_reference const_reference;
 
     explicit data(unsigned = 1);
     explicit data(const std::string &, unsigned = 1);
@@ -133,6 +136,7 @@ namespace vita
     //   {d_double, {}}
     struct category
     {
+      std::string              name;
       domain_t               domain;
       std::list<boost::any> symbols;
     };

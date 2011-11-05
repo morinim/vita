@@ -36,10 +36,12 @@ namespace vita
 {
   ///
   /// \param[in] n number of distinct datasets. E.g.:
-  ///              (0) auto choose;
-  ///              (1) not partitioned;
-  ///              (2) one training set and one validation set;
-  ///              (3) two training sets and one validation set...
+  ///              <ol>
+  ///                <li>auto choose;</li>
+  ///                <li>not partitioned;</li>
+  ///                <li>one training set and one validation set;</li>
+  ///                <li>two training sets and one validation set...</li>
+  ///              </ol>
   /// \see clear
   ///
   /// New empty data instance (partitioned in \a n training sets).
@@ -187,8 +189,8 @@ namespace vita
   /// \return the name of the class encoded with the \c unsigned \a i (or an
   ///         empty string if such class cannot be find).
   ///
-  /// Boost Bimap could be used to speed up the search in classes_map_, but
-  /// to date speed isn't an issue.
+  /// \note Boost Bimap could be used to speed up the search in \a classes_map_,
+  /// but to date speed isn't an issue.
   ///
   std::string data::class_name(unsigned i) const
   {
@@ -216,14 +218,14 @@ namespace vita
   /// accounts for this by surrounding the data in quotes. This also means the
   /// quotes need to be parsed out, this function accounts for that as well.
   /// The only (known) problem with this code, is that the definition of a csv
-  /// (<http://en.wikipedia.org/wiki/Comma-separated_values>) allows for the
+  /// (http://en.wikipedia.org/wiki/Comma-separated_values) allows for the
   /// newline character '\n' to be part of a csv field if the field is
   /// surrounded by quotes. The csvline function takes care of this properly,
   /// but the data::open function, which calls csvline, doesn't handle it. Most
   /// CSV files do not have a \n in the middle of the field, so it is usually
   /// not worth worrying about.
   /// This is a slightly modified version of the function at
-  /// <http://www.zedwood.com/article/112/cpp-csv-parser>.
+  /// http://www.zedwood.com/article/112/cpp-csv-parser.
   /// Escaped List Separator class from Boost C++ libraries is also very nice
   /// and efficient for parsing,but it is not as easily applied.
   ///
@@ -322,6 +324,15 @@ namespace vita
   /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
   /// of instances sharing a set of attributes. To date we don't support
   /// compressed XRFF files.
+  /// The original format is defined in http://weka.wikispaces.com/XRFF, we
+  /// extend it with an additional (non-standard) feature: attribute category.
+  /// \verbatim
+  /// <attribute name="vehicle length" type="numeric" category="length" /
+  /// <attribute name="vehicle width" type="numeric" category="length" />
+  /// <attribute name="vehicle weight" type="numeric" category="weight" />
+  /// \endverbatim
+  /// This feature is used to constrain GP search (Strongly Typed Genetic
+  /// Programming).
   ///
   unsigned data::load_xrff(const std::string &filename)
   {
@@ -378,7 +389,8 @@ namespace vita
         if (a.output)
           classification = (xml_type == "nominal" || xml_type == "string");
 
-        const std::string category_name(xml_type);
+        const std::string category_name(dha.second.get("<xmlattr>.category",
+                                                       xml_type));
 
         // Note the special treatment of the output column of a classification
         // problem: for category_id calculation, we completely ignore the type
@@ -397,7 +409,9 @@ namespace vita
           if (a.category_id >= categories_.size())
           {
             assert(a.category_id == categories_.size());
-            categories_.push_back(category{from_weka[xml_type], {}});
+            categories_.push_back(category{category_name,
+                                           from_weka[xml_type],
+                                           {}});
           }
 
           if (xml_type == "nominal")
@@ -486,7 +500,7 @@ namespace vita
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// We follow the Google Prediction API convention
-  /// (<http://code.google.com/intl/it/apis/predict/docs/developer-guide.html#data-format>):
+  /// (http://code.google.com/intl/it/apis/predict/docs/developer-guide.html#data-format):
   /// * NO HEADER ROW is allowed;
   /// * only one example is allowed per line. A single example cannot contain
   ///   newlines and cannot span multiple lines;
@@ -563,7 +577,7 @@ namespace vita
               if (a.category_id >= categories_.size())
               {
                 assert(a.category_id == categories_.size());
-                categories_.push_back(category{domain, {}});
+                categories_.push_back(category{s_domain, domain, {}});
               }
             }
 
@@ -613,8 +627,10 @@ namespace vita
   {
     header_.clear();
 
-    return boost::algorithm::iends_with(filename, ".xrff") ?
-      load_xrff(filename) : load_csv(filename);
+    const bool xrff(boost::algorithm::iends_with(filename, ".xrff") ||
+                    boost::algorithm::iends_with(filename, ".xml"));
+
+    return xrff ? load_xrff(filename) : load_csv(filename);
   }
 
   ///

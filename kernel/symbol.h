@@ -94,7 +94,7 @@ namespace vita
 
   ///
   /// \param[in] dis string used for printing.
-  /// \param[in] t category of the symbol.
+  /// \param[in] c category of the symbol.
   /// \param[in] w weight (used for random selection).
   ///
   inline
@@ -105,7 +105,7 @@ namespace vita
   }
 
   ///
-  /// \return 0.
+  /// \return \c 0.
   ///
   /// This function is used to initialize the symbol's internal parameter.
   /// Derived classes should redefine the init member function in a

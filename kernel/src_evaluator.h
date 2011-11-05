@@ -64,7 +64,7 @@ namespace vita
 
   ///
   /// Slotted Dynamic Class Boundary Determination
-  /// (<http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html>).
+  /// (http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html).
   ///
   class dyn_slot_evaluator : public src_evaluator
   {
