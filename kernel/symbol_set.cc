@@ -28,6 +28,8 @@
 
 namespace vita
 {
+  const symbol_ptr symbol_set::empty_ptr;
+
   ///
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
@@ -105,7 +107,7 @@ namespace vita
   ///
   /// Adds a new \a symbol to the set.
   ///
-  void symbol_set::insert(symbol_ptr i, bool sticky)
+  void symbol_set::insert(const symbol_ptr &i, bool sticky)
   {
     assert(i && i->weight && i->check());
 
@@ -212,13 +214,13 @@ namespace vita
   /// \return a pointer to the \c vita::symbol identified by 'opcode'
   ///         (\c nullptr if not found).
   ///
-  symbol_ptr symbol_set::decode(unsigned opcode) const
+  const symbol_ptr &symbol_set::decode(unsigned opcode) const
   {
     for (unsigned i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->opcode() == opcode)
         return all_.symbols[i];
 
-    return symbol_ptr();
+    return empty_ptr;
   }
 
   ///
@@ -230,7 +232,7 @@ namespace vita
   /// user, so, if you don't pay attention, different symbols may have the same
   /// name.
   ///
-  symbol_ptr symbol_set::decode(const std::string &dex) const
+  const symbol_ptr &symbol_set::decode(const std::string &dex) const
   {
     assert(dex != "");
 
@@ -238,7 +240,7 @@ namespace vita
       if (all_.symbols[i]->display() == dex)
         return all_.symbols[i];
 
-    return symbol_ptr();
+    return empty_ptr;
   }
 
   ///

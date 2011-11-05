@@ -38,7 +38,7 @@ namespace vita
     enum {k_args = 4};
 
     gene() {}
-    gene(const symbol_set &);
+    explicit gene(const symbol_set &);
     gene(const symbol_set &, unsigned, unsigned);
     gene(const symbol_set &, unsigned);
 

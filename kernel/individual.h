@@ -65,8 +65,8 @@ namespace vita
     std::list<locus_t> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(unsigned) const;
-    individual replace(symbol_ptr, const std::vector<locus_t> &) const;
-    individual replace(symbol_ptr, const std::vector<locus_t> &,
+    individual replace(const symbol_ptr &, const std::vector<locus_t> &) const;
+    individual replace(const symbol_ptr &, const std::vector<locus_t> &,
                        unsigned) const;
 
     individual generalize(std::size_t, std::vector<locus_t> *,

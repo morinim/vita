@@ -45,13 +45,22 @@ namespace vita
   };
 
   ///
-  /// Analyzer takes a statistics snapshot of a set of individuals. First
-  /// the set should be specified adding (\a add method) one \a invividual
-  /// at time, then statistics are calculated executing the \a run method.
+  /// Analyzer takes a statistics snapshot of a set of individuals.
+  /// Procedute:
+  /// <ol>
+  /// <li>
+  ///   the set should be specified adding (analyzer::add method) one invividual
+  ///   at time;
+  /// </li>
+  /// <li>
+  ///   statistics can be checked executing the desidered methods.
+  /// </li>
+  /// </ol>
   /// Informations regard:
-  /// * the set as a whole (\a fit_dist, \a length dist, \a functions,
-  ///   \a terminals methods);
-  /// * symbols appearing in the set (accessed by \a begin and \a end methods).
+  /// \li the set as a whole (analyzer::fit_dist, analyzer::length dist,
+  ///     analyzer::functions>, analyzer::terminals methods);
+  /// \li symbols appearing in the set (accessed by analyzer::begin and
+  ///     analyzer::end methods).
   ///
   class analyzer
   {

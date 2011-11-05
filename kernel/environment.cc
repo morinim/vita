@@ -95,7 +95,7 @@ namespace vita
   /// This is a shortcut for sset.insert with sticky symbols support.
   /// If \c force_input is \c true all the input terminals are marked as sticky.
   ///
-  void environment::insert(symbol_ptr i)
+  void environment::insert(const symbol_ptr &i)
   {
     assert(i);
 
@@ -111,7 +111,7 @@ namespace vita
   /// This is a shortcut for sset.insert with sticky symbols support. Sticky
   /// symbols are always appended at the end of the genome.
   ///
-  void environment::insert(symbol_ptr i, bool sticky)
+  void environment::insert(const symbol_ptr &i, bool sticky)
   {
     assert(i);
     assert(!sticky || i->terminal());

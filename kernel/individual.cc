@@ -349,7 +349,7 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a line with a new one ('sym' + 'args').
   ///
-  individual individual::replace(symbol_ptr sym,
+  individual individual::replace(const symbol_ptr &sym,
                                  const std::vector<locus_t> &args,
                                  unsigned line) const
   {
@@ -376,7 +376,7 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// \a symbol at line \a best_ with a new one ('sym' + 'args').
   ///
-  individual individual::replace(symbol_ptr sym,
+  individual individual::replace(const symbol_ptr &sym,
                                  const std::vector<locus_t> &args) const
   {
     return replace(sym, args, best_);

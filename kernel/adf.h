@@ -45,9 +45,10 @@ namespace vita
   /// accelerate the problem-solving process). This can be taken further, as
   /// programmers typically organise these components into hierarchies in which
   /// top level components call lower level ones, which call still lower levels.
-  /// Although the acronym ADF is from Koza's automatically defined functions
-  /// in Vita subroutines are used using the ARL scheme described in <"Discovery
-  /// of subroutines in genetic programming" J.P. Rosca and D.H. Ballard>.
+  /// Although the acronym ADF is from Koza's automatically defined functions,
+  /// in Vita subroutines are created using the ARL scheme described in
+  /// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.
+  /// Ballard.
   ///
   class adf_core
   {
@@ -86,8 +87,8 @@ namespace vita
   };
 
   ///
-  /// Subroutines without arguments (see <"An Analysis of Automatic Subroutine
-  /// Discovery in Genetic Programming" A.Dessi', A.Giani, A.Starita>).
+  /// Subroutines WITHOUT arguments (see "An Analysis of Automatic Subroutine
+  /// Discovery in Genetic Programming" - A.Dessi', A.Giani, A.Starita>).
   ///
   class adt : public terminal
   {

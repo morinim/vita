@@ -46,7 +46,7 @@ namespace vita
   public:
     symbol_set();
 
-    void insert(symbol_ptr, bool);
+    void insert(const symbol_ptr &, bool);
 
     const symbol_ptr &roulette(bool = false) const;
     const symbol_ptr &arg(unsigned) const;
@@ -59,14 +59,16 @@ namespace vita
 
     void reset_adf_weights();
 
-    symbol_ptr decode(unsigned) const;
-    symbol_ptr decode(const std::string &) const;
+    const symbol_ptr &decode(unsigned) const;
+    const symbol_ptr &decode(const std::string &) const;
 
     unsigned categories() const;
     bool enough_terminals() const;
     bool check() const;
 
   private:
+    static const symbol_ptr empty_ptr;
+
     void clear();
 
     // \a arguments_ is not included in the \a collection struct because
