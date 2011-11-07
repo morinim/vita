@@ -35,8 +35,8 @@
 
 namespace vita
 {
-  namespace sr { class variable; }
-  typedef std::shared_ptr<sr::variable> variable_ptr;
+  class variable;
+  typedef std::shared_ptr<variable> variable_ptr;
 
   ///
   /// \a data class stores the data set used to evolve the vita::population.
@@ -129,11 +129,11 @@ namespace vita
     //     </labels>
     //   </attribute>
     // is mapped to category:
-    //   {d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+    //   {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
     // while:
-    //   <attribute type="numeric" />
+    //   <attribute type="numeric" category="A" />
     // is mapped to category:
-    //   {d_double, {}}
+    //   {"A", d_double, {}}
     struct category
     {
       std::string              name;

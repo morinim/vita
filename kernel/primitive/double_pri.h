@@ -1,6 +1,6 @@
 /**
  *
- *  \file sr_pri.h
+ *  \file double_pri.h
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *
@@ -21,8 +21,8 @@
  *
  */
 
-#if !defined(SR_PRIMITIVE_H)
-#define      SR_PRIMITIVE_H
+#if !defined(DOUBLE_PRIMITIVE_H)
+#define      DOUBLE_PRIMITIVE_H
 
 #include <boost/any.hpp>
 
@@ -39,24 +39,12 @@
 
 namespace vita
 {
-  namespace sr
+  namespace dbl
   {
-    class variable : public terminal
-    {
-    public:
-      variable(const std::string &name, category_t t = 0)
-        : terminal(name, t, true) {}
-
-      boost::any eval(vita::interpreter *) const
-      { return is_bad(val) ? boost::any() : val; }
-
-      double val;
-    };
-
     class constant : public terminal
     {
     public:
-      constant(double c, category_t t = 0)
+      explicit constant(double c, category_t t = 0)
         : terminal("CONST", t, false, false, default_weight*2), val(c) {}
 
       std::string display() const
@@ -326,7 +314,7 @@ namespace vita
         return ret;
       }
     };
-  }  // namespace sr
+  }  // namespace dbl
 }  // namespace vita
 
-#endif  // PRIMITIVE_H
+#endif  // DOUBLE_PRIMITIVE_H

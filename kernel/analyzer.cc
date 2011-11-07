@@ -130,6 +130,8 @@ namespace vita
   ///
   void analyzer::count(const symbol *const sym, bool active)
   {
+    assert(sym);
+
     ++info_[sym].counter[active];
 
     if (sym->terminal())

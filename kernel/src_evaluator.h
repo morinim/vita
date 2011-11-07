@@ -29,11 +29,12 @@
 #include "kernel/classifier.h"
 #include "kernel/data.h"
 #include "kernel/evaluator.h"
-#include "kernel/individual.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/primitive/factory.h"
 
 namespace vita
 {
+  class individual;
+
   class src_evaluator : public evaluator
   {
   public:

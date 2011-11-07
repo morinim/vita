@@ -34,6 +34,7 @@ namespace po = boost::program_options;
 #include "kernel/environment.h"
 #include "kernel/search.h"
 #include "kernel/src_problem.h"
+#include "kernel/primitive/factory.h"
 
 const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification v0.9.1"
@@ -51,15 +52,15 @@ vita::src_problem problem(-5.0);
 
 void setup_default_symbols()
 {
-  vita::symbol_ptr c1(new vita::sr::constant(1));
-  vita::symbol_ptr c2(new vita::sr::constant(2));
-  vita::symbol_ptr c3(new vita::sr::constant(3));
-  vita::symbol_ptr c4(new vita::sr::constant(4));
-  vita::symbol_ptr c5(new vita::sr::constant(5));
-  vita::symbol_ptr c6(new vita::sr::constant(6));
-  vita::symbol_ptr c7(new vita::sr::constant(7));
-  vita::symbol_ptr c8(new vita::sr::constant(8));
-  vita::symbol_ptr c9(new vita::sr::constant(9));
+  vita::symbol_ptr c1(new vita::dbl::constant(1));
+  vita::symbol_ptr c2(new vita::dbl::constant(2));
+  vita::symbol_ptr c3(new vita::dbl::constant(3));
+  vita::symbol_ptr c4(new vita::dbl::constant(4));
+  vita::symbol_ptr c5(new vita::dbl::constant(5));
+  vita::symbol_ptr c6(new vita::dbl::constant(6));
+  vita::symbol_ptr c7(new vita::dbl::constant(7));
+  vita::symbol_ptr c8(new vita::dbl::constant(8));
+  vita::symbol_ptr c9(new vita::dbl::constant(9));
 
   problem.env.insert(c1);
   problem.env.insert(c2);
@@ -71,13 +72,13 @@ void setup_default_symbols()
   problem.env.insert(c8);
   problem.env.insert(c9);
 
-  vita::symbol_ptr s_abs(new vita::sr::abs());
-  vita::symbol_ptr s_add(new vita::sr::add());
-  vita::symbol_ptr s_div(new vita::sr::div());
-  vita::symbol_ptr s_ln(new vita::sr::ln());
-  vita::symbol_ptr s_mul(new vita::sr::mul());
-  vita::symbol_ptr s_mod(new vita::sr::mod());
-  vita::symbol_ptr s_sub(new vita::sr::sub());
+  vita::symbol_ptr s_abs(new vita::dbl::abs());
+  vita::symbol_ptr s_add(new vita::dbl::add());
+  vita::symbol_ptr s_div(new vita::dbl::div());
+  vita::symbol_ptr s_ln(new vita::dbl::ln());
+  vita::symbol_ptr s_mul(new vita::dbl::mul());
+  vita::symbol_ptr s_mod(new vita::dbl::mod());
+  vita::symbol_ptr s_sub(new vita::dbl::sub());
 
   problem.env.insert(s_abs);
   problem.env.insert(s_add);

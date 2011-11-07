@@ -21,8 +21,8 @@
  *
  */
 
-#if !defined(SR_PRIMITIVE_H)
-#define      SR_PRIMITIVE_H
+#if !defined(BOOL_PRIMITIVE_H)
+#define      BOOL_PRIMITIVE_H
 
 #include <boost/any.hpp>
 
@@ -106,3 +106,5 @@ namespace vita
     };
   }  // namespace boolean
 }  // namespace vita
+
+#endif  // BOOL_PRIMITIVE_H

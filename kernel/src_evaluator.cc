@@ -22,7 +22,6 @@
  */
 
 #include "kernel/src_evaluator.h"
-#include "kernel/data.h"
 #include "kernel/individual.h"
 
 namespace vita
@@ -46,7 +45,7 @@ namespace vita
     assert(d.input.size() == var_->size());
 
     for (unsigned i(0); i < var_->size(); ++i)
-      (*var_)[i]->val = boost::any_cast<double>(d.input[i]);
+      (*var_)[i]->val = d.input[i];
   }
 
   ///

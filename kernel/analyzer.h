@@ -39,7 +39,7 @@ namespace vita
   {
     stats() : counter{0, 0} {}
 
-    /// Typical use: \c counter[active] / \c counter[!active] (where \c active
+    /// Typical use: \c counter[active] or \c counter[!active] (where \c active
     /// is a boolean).
     boost::uint64_t counter[2];
   };

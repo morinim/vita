@@ -26,6 +26,7 @@
 #include "kernel/src_problem.h"
 #include "kernel/individual.h"
 #include "kernel/src_evaluator.h"
+#include "kernel/primitive/factory.h"
 
 namespace vita
 {
@@ -76,7 +77,7 @@ namespace vita
         s << 'X' << i;
         const std::string str(s.str());
 
-        variable_ptr x(new vita::sr::variable(str));
+        variable_ptr x(new variable(str));
         vars_.push_back(x);
         env.insert(x);
       }
@@ -116,37 +117,37 @@ namespace vita
         s << name;
         double n;
         if (s >> n)
-          sp.reset(new vita::sr::constant(n));
+          sp.reset(new vita::dbl::constant(n));
         else if (name == "number")
-          sp.reset(new vita::sr::number(-128, 127));
+          sp.reset(new vita::dbl::number(-128, 127));
         else if (name == "abs")
-          sp.reset(new vita::sr::abs());
+          sp.reset(new vita::dbl::abs());
         else if (name == "add" || name == "+")
-          sp.reset(new vita::sr::add());
+          sp.reset(new vita::dbl::add());
         // else if (name=="and" || name=="&&")
-        //   sp.reset(new vita::sr::bool_and());
+        //   sp.reset(new vita::dbl::bool_and());
         // else if (name == "or" || name == "||")
-        //   sp.reset(new vita::sr::bool_not());
+        //   sp.reset(new vita::dbl::bool_not());
         // else if (name == "not" || name == "!")
-        //   sp.reset(new vita::sr::bool_or());
+        //   sp.reset(new vita::dbl::bool_or());
         else if (name == "div" || name == "/")
-          sp.reset(new vita::sr::div());
+          sp.reset(new vita::dbl::div());
         else if (name == "idiv")
-          sp.reset(new vita::sr::idiv());
+          sp.reset(new vita::dbl::idiv());
         else if (name == "ife")
-          sp.reset(new vita::sr::ife());
+          sp.reset(new vita::dbl::ife());
         else if (name == "ifl")
-          sp.reset(new vita::sr::ifl());
+          sp.reset(new vita::dbl::ifl());
         else if (name == "ifz")
-          sp.reset(new vita::sr::ifz());
+          sp.reset(new vita::dbl::ifz());
         else if (name == "ln")
-          sp.reset(new vita::sr::ln());
+          sp.reset(new vita::dbl::ln());
         else if (name == "mul" || name == "*")
-          sp.reset(new vita::sr::mul());
+          sp.reset(new vita::dbl::mul());
         else if (name == "mod" || name == "%")
-          sp.reset(new vita::sr::mod());
+          sp.reset(new vita::dbl::mod());
         else if (name == "sub" || name == "-")
-          sp.reset(new vita::sr::sub());
+          sp.reset(new vita::dbl::sub());
 
         env.insert(sp);
       }

@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_problem.h
+ *  \file factory.h
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *
@@ -21,38 +21,26 @@
  *
  */
 
-#if !defined(SRC_PROBLEM_H)
-#define      SRC_PROBLEM_H
+#if !defined(PRIMITIVE_FACTORY_H)
+#define      PRIMITIVE_FACTORY_H
 
-#include <cmath>
-#include <string>
-#include <vector>
+#include <boost/any.hpp>
 
-#include "kernel/data.h"
-#include "kernel/problem.h"
+#include "kernel/vita.h"
+#include "kernel/primitive/double_pri.h"
 
 namespace vita
 {
-  class src_problem : public problem
+  class variable : public terminal
   {
   public:
-    explicit src_problem(fitness_t);
+    explicit variable(const std::string &name, category_t t = 0)
+      : terminal(name, t, true) {}
 
-    unsigned load_data(const std::string &);
-    std::string load_symbols(const std::string &);
+    boost::any eval(vita::interpreter *) const { return val; }
 
-    void clear();
-
-    unsigned categories() const;
-    unsigned classes() const;
-    unsigned variables() const;
-
-    bool check() const;
-
-  private:
-    std::vector<variable_ptr> vars_;
-    data                       dat_;
+    boost::any val;
   };
 }  // namespace vita
 
-#endif  // SRC_PROBLEM_H
+#endif  // PRIMITIVE_FACTORY_H

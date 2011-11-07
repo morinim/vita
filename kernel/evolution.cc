@@ -258,11 +258,9 @@ namespace vita
       for (unsigned k(0); k < pop_.size(); ++k)
       {
         if (verbose && k % std::max(pop_.size()/100, static_cast<size_t>(1)))
-        {
-          std::cout << "Run " << run_count << '.'
-                    << stats_.gen << " (" << std::setw(3) << 100*k/pop_.size()
-                    << "%)\r" << std::flush;
-        }
+          std::cout << "Run " << run_count << '.' << stats_.gen << " ("
+                    << std::setw(3) << 100 * k / pop_.size() << "%)\r"
+                    << std::flush;
 
         // --------- SELECTION ---------
         std::vector<locus_t> parents(selection[sel_id]());
@@ -278,7 +276,7 @@ namespace vita
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
-                    << 100*k/pop_.size() << "%): fitness "
+                    << 100 * k / pop_.size() << "%): fitness "
                     << std::setw(16) << stats_.f_best;
 
           if (stats_.accu_best >= 0.0)
