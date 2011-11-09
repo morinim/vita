@@ -26,33 +26,36 @@
 
 #include "kernel/environment.h"
 #include "kernel/individual.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/interpreter.h"
+#include "kernel/primitive/factory.h"
 
 #define BOOST_TEST_MODULE Primitive
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
 
-typedef std::shared_ptr<vita::sr::constant> constant_ptr;
-
 struct F
 {
   F()
-    : c0(new vita::sr::constant(0)),
-      c1(new vita::sr::constant(1)),
-      c2(new vita::sr::constant(2)),
-      c3(new vita::sr::constant(3)),
-      x(new vita::sr::constant(123)),
-      neg_x(new vita::sr::constant(-123)),
-      y(new vita::sr::constant(321)),
-      f_abs(new vita::sr::abs()),
-      f_add(new vita::sr::add()),
-      f_div(new vita::sr::div()),
-      f_idiv(new vita::sr::idiv()),
-      f_mul(new vita::sr::mul()),
-      f_sub(new vita::sr::sub())
   {
     BOOST_TEST_MESSAGE("Setup fixture");
+
+    static vita::symbol_factory &factory(vita::symbol_factory::instance());
+
+    c0 = factory.make("0", vita::d_double, 0);
+    c1 = factory.make("1", vita::d_double, 0);
+    c2 = factory.make("2", vita::d_double, 0);
+    c3 = factory.make("3", vita::d_double, 0);
+    x = factory.make("123", vita::d_double, 0);
+    neg_x = factory.make("-123", vita::d_double, 0);
+    y = factory.make("321", vita::d_double, 0);
+    f_abs = factory.make("ABS", vita::d_double, 0);
+    f_add = factory.make("ADD", vita::d_double, 0);
+    f_div = factory.make("DIV", vita::d_double, 0);
+    f_idiv = factory.make("IDIV", vita::d_double, 0);
+    f_mul = factory.make("MUL", vita::d_double, 0);
+    f_sub = factory.make("SUB", vita::d_double, 0);
+
     env.insert(c0);
     env.insert(c1);
     env.insert(c2);
@@ -74,13 +77,13 @@ struct F
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
 
-  constant_ptr c0;
-  constant_ptr c1;
-  constant_ptr c2;
-  constant_ptr c3;
-  constant_ptr x;
-  constant_ptr neg_x;
-  constant_ptr y;
+  vita::symbol_ptr c0;
+  vita::symbol_ptr c1;
+  vita::symbol_ptr c2;
+  vita::symbol_ptr c3;
+  vita::symbol_ptr x;
+  vita::symbol_ptr neg_x;
+  vita::symbol_ptr y;
 
   vita::symbol_ptr f_abs;
   vita::symbol_ptr f_add;
@@ -105,13 +108,15 @@ BOOST_AUTO_TEST_CASE(ABS)
   i = i.replace(f_abs, {1}, 0);  // [0] ABS 1
   i = i.replace(neg_x,  {}, 1);  // [1] -X
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ABS(X) == X");
   i = i.replace(f_abs, {1}, 0);  // [0] ABS 1
   i = i.replace(    x,  {}, 1);  // [1] X
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 }
 
 BOOST_AUTO_TEST_CASE(ADD)
@@ -123,14 +128,16 @@ BOOST_AUTO_TEST_CASE(ADD)
   i = i.replace(   c0,     {}, 1);  // [1] 0
   i = i.replace(    x,     {}, 2);  // [2] X
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y)=X+Y");
   i = i.replace(f_add, {1, 2}, 0);  // [0] ADD 1,2
   i = i.replace(    y,     {}, 1);  // [1] Y
   i = i.replace(    x,     {}, 2);  // [2] X
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == y->val+x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(y->eval(0)) +
+                        any_cast<double>(x->eval(0)), "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   i = i.replace(f_add, {1, 2}, 0);  // [0] ADD 1,2
@@ -165,7 +172,8 @@ BOOST_AUTO_TEST_CASE(DIV)
   i = i.replace(    x,     {}, 1);  // [1] X
   i = i.replace(   c1,     {}, 2);  // [2] 1
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
   i = i.replace(f_div, {1, 2}, 0);  // [0] DIV 1, 2
@@ -191,7 +199,8 @@ BOOST_AUTO_TEST_CASE(IDIV)
   i = i.replace(     x,     {}, 1);  // [1] X
   i = i.replace(    c1,     {}, 2);  // [2] 1
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
   i = i.replace(f_idiv, {1, 2}, 0);  // [0] IDIV 1, 2
@@ -224,7 +233,8 @@ BOOST_AUTO_TEST_CASE(MUL)
   i = i.replace(    x,     {}, 1);  // [1] X
   i = i.replace(   c1,     {}, 2);  // [2] 1
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
   i = i.replace(f_sub, {1, 2}, 0);  // [0] SUB 1, 2
@@ -252,7 +262,8 @@ BOOST_AUTO_TEST_CASE(SUB)
   i = i.replace(    x,     {}, 1);  // [1] X
   i = i.replace(   c0,     {}, 2);  // [2] 0
   ret = (vita::interpreter(i))();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == x->val, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+                        "\n" << i);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

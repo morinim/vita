@@ -36,6 +36,7 @@
 namespace vita
 {
   class variable;
+  /// Just a shortcut (similar to symbol_ptr).
   typedef std::shared_ptr<variable> variable_ptr;
 
   ///
@@ -47,9 +48,6 @@ namespace vita
   class data
   {
   public:
-    /// Categories are defined over some domain.
-    enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
-
     ///
     /// \a value_type stores a single element of the data set (instance). The
     /// \c struct consists of an input vector (\a input) and an answer value
@@ -64,6 +62,42 @@ namespace vita
 
       unsigned label() const { return boost::any_cast<unsigned>(output); }
       void clear() { input.clear(); output = boost::any(); }
+    };
+
+    /// Informations about a "column" of the dataset.
+    struct column
+    {
+      std::string       name;
+      category_t category_id;
+      bool            output;
+    };
+
+    ///
+    /// \brief Information about a category of the dataset.
+    ///
+    /// For example:
+    /// \verbatim
+    ///   <attribute type="nominal">
+    ///     <labels>
+    ///       <label>Iris-setosa</label>
+    ///       <label>Iris-versicolor</label>
+    ///       <label>Iris-virginica</label>
+    ///     </labels>
+    ///   </attribute>
+    /// \endverbatim
+    /// is mapped to category:
+    /// \li {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+    ///
+    /// while:
+    /// \verbatim <attribute type="numeric" category="A" /> \endverbatim
+    /// is mapped to category:
+    /// \li  {"A", d_double, {}}
+    ///
+    struct category
+    {
+      std::string              name;
+      domain_t               domain;
+      std::list<boost::any> symbols;
     };
 
     /// value_type *
@@ -83,8 +117,13 @@ namespace vita
 
     void clear(unsigned = 1);
 
+    category_t get_category(const std::string &) const;
+    const category &get_category(unsigned) const;
+    const column &get_column(unsigned) const;
+
     unsigned categories() const;
     unsigned classes() const;
+    unsigned columns() const;
     unsigned variables() const;
 
     std::string class_name(unsigned) const;
@@ -108,38 +147,9 @@ namespace vita
     std::map<std::string, unsigned> categories_map_;
     std::map<std::string, unsigned> classes_map_;
 
-    // Informations about a "column" of the dataset.
-    struct column
-    {
-      std::string       name;
-      category_t category_id;
-      bool            output;
-    };
-
     // How is the dataset organized? Sometimes we have a dataset header (XRFF
     // file format), other times it has to be implicitly derived (e.g. CSV).
     std::vector<column> header_;
-
-    // Information about a category of the dataset. For example:
-    //   <attribute type="nominal">
-    //     <labels>
-    //       <label>Iris-setosa</label>
-    //       <label>Iris-versicolor</label>
-    //       <label>Iris-virginica</label>
-    //     </labels>
-    //   </attribute>
-    // is mapped to category:
-    //   {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
-    // while:
-    //   <attribute type="numeric" category="A" />
-    // is mapped to category:
-    //   {"A", d_double, {}}
-    struct category
-    {
-      std::string              name;
-      domain_t               domain;
-      std::list<boost::any> symbols;
-    };
 
     // What are the categories we are dealing with?
     std::vector<category> categories_;

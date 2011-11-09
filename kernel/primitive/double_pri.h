@@ -26,9 +26,6 @@
 
 #include <boost/any.hpp>
 
-#include <algorithm>
-#include <cstdlib>
-#include <limits>
 #include <sstream>
 #include <string>
 
@@ -41,28 +38,10 @@ namespace vita
 {
   namespace dbl
   {
-    class constant : public terminal
-    {
-    public:
-      explicit constant(double c, category_t t = 0)
-        : terminal("CONST", t, false, false, default_weight*2), val(c) {}
-
-      std::string display() const
-      {
-        std::ostringstream s;
-        s << val;
-        return s.str();
-      }
-
-      boost::any eval(interpreter *) const { return val; }
-
-      const double val;
-    };
-
     class number : public terminal
     {
     public:
-      number(int m, int u, category_t t = 0)
+      explicit number(category_t t = 0, int m = -128, int u = 127)
         : terminal("NUM", t, false, true, default_weight*2), min(m), upp(u) {}
 
       int init() const { return random::between<int>(min, upp); }

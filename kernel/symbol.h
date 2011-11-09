@@ -140,8 +140,7 @@ namespace vita
   }
 
   ///
-  /// \return the opcode of the symbol (an \c unsigned \c int used as primary
-  /// key).
+  /// \return the opcode of the symbol (used as primary key).
   ///
   inline
   opcode_t symbol::opcode() const

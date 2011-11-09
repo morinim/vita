@@ -26,48 +26,34 @@
 
 #include "kernel/environment.h"
 #include "kernel/individual.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/interpreter.h"
+#include "kernel/primitive/factory.h"
 
 #define BOOST_TEST_MODULE Individual
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
 
-typedef std::shared_ptr<vita::sr::constant> constant_ptr;
-
 struct F
 {
   F()
-    : num(new vita::sr::number(-200, 200)),
-      f_add(new vita::sr::add()),
-      f_sub(new vita::sr::sub()),
-      f_mul(new vita::sr::mul()),
-      f_ifl(new vita::sr::ifl()),
-      f_ife(new vita::sr::ife()),
-      n_123(new vita::sr::constant(123))
   {
     BOOST_TEST_MESSAGE("Setup fixture");
-    env.insert(num);
-    env.insert(f_add);
-    env.insert(f_sub);
-    env.insert(f_mul);
-    env.insert(f_ifl);
-    env.insert(f_ife);
+
+    vita::symbol_factory &factory(vita::symbol_factory::instance());
+
+    env.insert(factory.make("NUMBER", vita::d_double, 0));
+    env.insert(factory.make("ADD", vita::d_double, 0));
+    env.insert(factory.make("SUB", vita::d_double, 0));
+    env.insert(factory.make("MUL", vita::d_double, 0));
+    env.insert(factory.make("IFL", vita::d_double, 0));
+    env.insert(factory.make("IFE", vita::d_double, 0));
   }
 
   ~F()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
-
-  vita::symbol_ptr num;
-  vita::symbol_ptr f_add;
-  vita::symbol_ptr f_sub;
-  vita::symbol_ptr f_mul;
-  vita::symbol_ptr f_ifl;
-  vita::symbol_ptr f_ife;
-
-  constant_ptr n_123;
 
   vita::environment env;
 };
@@ -163,6 +149,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   }
 
   BOOST_TEST_CHECKPOINT("Sticky symbol must exits!");
+  const vita::symbol_ptr n_123(vita::symbol_factory::instance().make(
+                                  "123", vita::d_double, 0));
   env.insert(n_123, true);
   for (unsigned l(2); l < 100; ++l)
   {

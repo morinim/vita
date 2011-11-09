@@ -30,7 +30,7 @@
 #include "kernel/adf.h"
 #include "kernel/distribution.h"
 #include "kernel/environment.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/primitive/factory.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,22 +39,15 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  vita::symbol_ptr s1(new vita::sr::number(-200, 200));
-  vita::symbol_ptr s2(new vita::sr::add());
-  vita::symbol_ptr s3(new vita::sr::sub());
-  vita::symbol_ptr s4(new vita::sr::mul());
-  vita::symbol_ptr s5(new vita::sr::ifl());
-  vita::symbol_ptr s6(new vita::sr::ife());
-  vita::symbol_ptr s7(new vita::sr::abs());
-  vita::symbol_ptr s8(new vita::sr::ln());
-  env.insert(s1);
-  env.insert(s2);
-  env.insert(s3);
-  env.insert(s4);
-  env.insert(s5);
-  env.insert(s6);
-  env.insert(s7);
-  env.insert(s8);
+  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  env.insert(factory.make("NUMBER", vita::d_double, 0, -200, 200));
+  env.insert(factory.make("ADD", vita::d_double, 0));
+  env.insert(factory.make("SUB", vita::d_double, 0));
+  env.insert(factory.make("MUL", vita::d_double, 0));
+  env.insert(factory.make("IFL", vita::d_double, 0));
+  env.insert(factory.make("IFE", vita::d_double, 0));
+  env.insert(factory.make("ABS", vita::d_double, 0));
+  env.insert(factory.make("LN", vita::d_double, 0));
 
   vita::distribution<double> individuals, blocks_len, blocks_n, arguments;
 

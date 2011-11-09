@@ -94,16 +94,16 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 
 def start_testing(args):
     testcases = {
-        "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80,     "arithmetic"],
-        "iris":       [     "iris.xrff", 100, 500, 100,  80, "classification"],
+        "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80, "arithmetic.xml"],
+        "iris":       [     "iris.xrff", 100, 500, 100,  80,      "class.xml"],
         "mep":        [       "mep.csv", 100, 200, 500, 100],
-        "mepbias":    [       "mep.csv", 100, 200,  20, 100,            "mep"],
-        "petalrose":  [ "petalrose.csv", 100, 500, 200,  80,     "arithmetic"],
-        "petalrose3": ["petalrose3.csv", 100, 500, 200,  80,     "arithmetic"],
-        "petalrose2": ["petalrose2.csv", 100, 500, 200,  80,     "arithmetic"],
-        "spambase":   [  "spambase.csv", 100, 999, 100,  50, "classification"],
-        "x2y2z2":     [   "x2y2_z2.csv", 100, 200, 500,  80,           "math"],
-        "x2y2z2bias": [   "x2y2_z2.csv", 100, 200, 100,  80,     "arithmetic"]
+        "mepbias":    [       "mep.csv", 100, 200,  20, 100,        "mep.xml"],
+        "petalrose":  [ "petalrose.csv", 100, 500, 200,  80, "arithmetic.xml"],
+        "petalrose3": ["petalrose3.csv", 100, 500, 200,  80, "arithmetic.xml"],
+        "petalrose2": ["petalrose2.csv", 100, 500, 200,  80, "arithmetic.xml"],
+        "spambase":   [  "spambase.csv", 100, 999, 100,  50,      "class.xml"],
+        "x2y2z2":     [   "x2y2_z2.csv", 100, 200, 500,  80,       "math.xml"],
+        "x2y2z2bias": [   "x2y2_z2.csv", 100, 200, 100,  80, "arithmetic.xml"]
         }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]

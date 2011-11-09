@@ -85,6 +85,9 @@ namespace vita
     categories_map_.clear();
     classes_map_.clear();
 
+    header_.clear();
+    categories_.clear();
+
     datasets_.clear();
     datasets_.resize(n ? n : 1);
 
@@ -122,9 +125,42 @@ namespace vita
   }
 
   ///
+  /// \param[in] name name of a category.
+  /// \return the index of the \a name category (0 if it doesn't exist ).
+  ///
+  category_t data::get_category(const std::string &name) const
+  {
+    const auto cat(categories_map_.find(name));
+
+    assert(cat == categories_map_.end() || cat->second < categories_.size());
+
+    return cat == categories_map_.end() ? 0 : cat->second;
+  }
+
+  ///
+  /// \param[in] i index of a category.
+  /// \return a const reference to the i-th category.
+  ///
+  const data::category &data::get_category(unsigned i) const
+  {
+    assert(i < categories_.size());
+    return categories_[i];
+  }
+
+  ///
+  /// \param[in] i index of a column.
+  /// \return a const reference to the i-th column of the dataset.
+  ///
+  const data::column &data::get_column(unsigned i) const
+  {
+    assert(i < header_.size());
+    return header_[i];
+  }
+
+  ///
   /// \return number of categories of the problem (>= 1).
   ///
-  /// \attention Please note that \c data::categories() may differ from the
+  /// \attention please note that \c data::categories() may differ from the
   /// intuitive number of categories of the dataset.
   ///
   /// For instance consider the simple Iris classification problem (nominal
@@ -150,6 +186,18 @@ namespace vita
   }
 
   ///
+  /// \return number of columns of the dataset.
+  ///
+  /// \note data class supports just one output for every instance, so, if
+  /// the dataset is not empty, variables() + 1 == columns().
+  ///
+  unsigned data::columns() const
+  {
+    assert(datasets_.empty() || variables() + 1 == header_.size());
+    return header_.size();
+  }
+
+  ///
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
@@ -161,8 +209,12 @@ namespace vita
   ///
   /// \return input vector dimension.
   ///
+  /// \note data class supports just one output for every instance, so, if
+  /// the dataset is not empty, variables() + 1 == columns().
+  ///
   unsigned data::variables() const
   {
+    assert(datasets_.empty() || begin()->input.size() + 1 == header_.size());
     return datasets_.empty() || datasets_[0].empty()
       ? 0 : begin()->input.size();
   }

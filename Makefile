@@ -43,7 +43,7 @@ CXXFLAGS = $(TYPE_PARAM) $(WARN) $(DEFS)
 
 CXX = g++ -pipe $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc)
+KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC = $(wildcard examples/*.cc)
 SR_SRC = $(wildcard sr/*.cc)

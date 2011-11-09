@@ -26,7 +26,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/primitive/factory.h"
 
 #define BOOST_TEST_MODULE Evolution
 #include "boost/test/unit_test.hpp"
@@ -36,33 +36,23 @@ using namespace boost;
 struct F
 {
   F()
-    : num(new vita::sr::number(-200, 200)),
-      f_add(new vita::sr::add()),
-      f_sub(new vita::sr::sub()),
-      f_mul(new vita::sr::mul()),
-      f_ifl(new vita::sr::ifl()),
-      f_ife(new vita::sr::ife())
   {
     BOOST_TEST_MESSAGE("Setup fixture");
-    env.insert(num);
-    env.insert(f_add);
-    env.insert(f_sub);
-    env.insert(f_mul);
-    env.insert(f_ifl);
-    env.insert(f_ife);
+
+    vita::symbol_factory &factory(vita::symbol_factory::instance());
+
+    env.insert(factory.make("NUMBER", vita::d_double, 0));
+    env.insert(factory.make("ADD", vita::d_double, 0));
+    env.insert(factory.make("SUB", vita::d_double, 0));
+    env.insert(factory.make("MUL", vita::d_double, 0));
+    env.insert(factory.make("IFL", vita::d_double, 0));
+    env.insert(factory.make("IFE", vita::d_double, 0));
   }
 
   ~F()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
-
-  vita::symbol_ptr num;
-  vita::symbol_ptr f_add;
-  vita::symbol_ptr f_sub;
-  vita::symbol_ptr f_mul;
-  vita::symbol_ptr f_ifl;
-  vita::symbol_ptr f_ife;
 
   vita::environment env;
 };

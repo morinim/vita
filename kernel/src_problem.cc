@@ -21,6 +21,10 @@
  *
  */
 
+#include <boost/foreach.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+
 #include <fstream>
 
 #include "kernel/src_problem.h"
@@ -77,7 +81,8 @@ namespace vita
         s << 'X' << i;
         const std::string str(s.str());
 
-        variable_ptr x(new variable(str));
+        const category_t category(dat_.get_column(i).category_id);
+        variable_ptr x(new variable(str, category));
         vars_.push_back(x);
         env.insert(x);
       }
@@ -90,70 +95,41 @@ namespace vita
     return parsed;
   }
 
+# pragma GCC diagnostic ignored "-Wtype-limits"
   ///
   /// \param[in] sf name of the file containing the symbols.
-  /// \return a space separated string containing the names of the loaded
-  ///         symbols.
+  /// \return number of symbols parsed.
   ///
-  std::string src_problem::load_symbols(const std::string &sf)
+  unsigned src_problem::load_symbols(const std::string &sf)
   {
+    using namespace boost::property_tree;
+
     std::string symbols;
 
-    // Set up the symbols (variables have already been prepared).
-    if (!sf.empty())  // Default functions.
-    {
-      std::ifstream from(sf.c_str());
-      if (!from)
-        return "";
+    unsigned parsed(0);
 
-      std::string name;
-      while (from >> name)
+    ptree pt;
+    read_xml(sf, pt);
+
+    BOOST_FOREACH(ptree::value_type scc,
+                  pt.get_child("symbolset.categories.category"))
+      if (scc.first == "symbol")
       {
-        symbols += name+" ";
+        const std::string name(scc.second.data());
 
-        symbol_ptr sp;
+        const std::string xml_category(scc.second.get("<xmlattr>.category",
+                                                      "numeric"));
 
-        std::stringstream s;
-        s << name;
-        double n;
-        if (s >> n)
-          sp.reset(new vita::dbl::constant(n));
-        else if (name == "number")
-          sp.reset(new vita::dbl::number(-128, 127));
-        else if (name == "abs")
-          sp.reset(new vita::dbl::abs());
-        else if (name == "add" || name == "+")
-          sp.reset(new vita::dbl::add());
-        // else if (name=="and" || name=="&&")
-        //   sp.reset(new vita::dbl::bool_and());
-        // else if (name == "or" || name == "||")
-        //   sp.reset(new vita::dbl::bool_not());
-        // else if (name == "not" || name == "!")
-        //   sp.reset(new vita::dbl::bool_or());
-        else if (name == "div" || name == "/")
-          sp.reset(new vita::dbl::div());
-        else if (name == "idiv")
-          sp.reset(new vita::dbl::idiv());
-        else if (name == "ife")
-          sp.reset(new vita::dbl::ife());
-        else if (name == "ifl")
-          sp.reset(new vita::dbl::ifl());
-        else if (name == "ifz")
-          sp.reset(new vita::dbl::ifz());
-        else if (name == "ln")
-          sp.reset(new vita::dbl::ln());
-        else if (name == "mul" || name == "*")
-          sp.reset(new vita::dbl::mul());
-        else if (name == "mod" || name == "%")
-          sp.reset(new vita::dbl::mod());
-        else if (name == "sub" || name == "-")
-          sp.reset(new vita::dbl::sub());
+        const category_t category_id(dat_.get_category(xml_category));
 
-        env.insert(sp);
+        env.insert(symbol_factory::instance().make(
+                     name,
+                     dat_.get_category(category_id).domain,
+                     category_id));
+        ++parsed;
       }
-    }
 
-    return symbols;
+    return parsed;
   }
 
   ///

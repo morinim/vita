@@ -39,7 +39,7 @@ namespace vita
     explicit src_problem(fitness_t);
 
     unsigned load_data(const std::string &);
-    std::string load_symbols(const std::string &);
+    unsigned load_symbols(const std::string &);
 
     void clear();
 

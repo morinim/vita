@@ -28,7 +28,8 @@
 
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/interpreter.h"
+#include "kernel/primitive/factory.h"
 
 // This class models the first input.
 class X : public vita::terminal
@@ -102,22 +103,15 @@ int main(int argc, char *argv[])
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
   env.g_since_start = argc > 3 ? atoi(argv[3]) : 100;
 
-  vita::symbol_ptr s_X(new X());
-  vita::symbol_ptr s_Y(new Y());
-  vita::symbol_ptr s_Z(new Z());
-  vita::symbol_ptr s_add(new vita::sr::add());
-  vita::symbol_ptr s_sub(new vita::sr::sub());
-  vita::symbol_ptr s_mul(new vita::sr::mul());
-  vita::symbol_ptr s_ifl(new vita::sr::ifl());
-  vita::symbol_ptr s_ife(new vita::sr::ife());
-  env.insert(s_X);
-  env.insert(s_Y);
-  env.insert(s_Z);
-  env.insert(s_add);
-  env.insert(s_sub);
-  env.insert(s_mul);
-  env.insert(s_ifl);
-  env.insert(s_ife);
+  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  env.insert(std::make_shared<X>());
+  env.insert(std::make_shared<Y>());
+  env.insert(std::make_shared<Z>());
+  env.insert(factory.make("ADD", vita::d_double, 0));
+  env.insert(factory.make("SUB", vita::d_double, 0));
+  env.insert(factory.make("MUL", vita::d_double, 0));
+  env.insert(factory.make("IFL", vita::d_double, 0));
+  env.insert(factory.make("IFE", vita::d_double, 0));
 
   std::unique_ptr<vita::evaluator> eva(new fitness());
 

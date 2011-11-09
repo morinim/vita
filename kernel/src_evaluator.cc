@@ -23,6 +23,7 @@
 
 #include "kernel/src_evaluator.h"
 #include "kernel/individual.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {
@@ -438,10 +439,9 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind program used for classification.
-  /// \param[in] val input value whose class we are interested in.
-  /// \param[in] gauss parameters of the gaussian distributions.
-  /// \return the class of \a val.
+  ///
+  /// \param[in] instance data to be classified.
+  /// \return the class that include the \a instance.
   ///
   std::string gaussian_classifier::operator()(
     const data::value_type &instance) const

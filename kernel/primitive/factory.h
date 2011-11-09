@@ -24,13 +24,20 @@
 #if !defined(PRIMITIVE_FACTORY_H)
 #define      PRIMITIVE_FACTORY_H
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/any.hpp>
+#include <boost/lexical_cast.hpp>
 
-#include "kernel/vita.h"
-#include "kernel/primitive/double_pri.h"
+#include <map>
+
+#include "kernel/terminal.h"
 
 namespace vita
 {
+  ///
+  /// A variable is an input argument for a symbolic regression or
+  /// classification problem.
+  ///
   class variable : public terminal
   {
   public:
@@ -40,6 +47,97 @@ namespace vita
     boost::any eval(vita::interpreter *) const { return val; }
 
     boost::any val;
+  };
+
+  class constant : public terminal
+  {
+    //private:
+    // C++11 allows constructors to call other peer constructors (known as
+    // delegation). This allows constructors to utilize another constructor's
+    // behavior with a minimum of added code.
+    //constant(const std::string &name, const boost::any &c, category_t = 0)
+    //  : terminal(name, t, false, false, default_weight*2), val(c) {}
+  public:
+    explicit constant(bool c, category_t t = 0)
+      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
+                 default_weight*2), val(c) {}
+    explicit constant(double c, category_t t = 0)
+      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
+                 default_weight*2), val(c) {}
+    explicit constant(int c, category_t t = 0)
+      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
+                 default_weight*2), val(c) {}
+    explicit constant(const std::string &c, category_t t = 0)
+      : terminal(c, t, false, false, default_weight*2), val(c) {}
+
+    /// The argument is not used: the value of a constant is stored with the
+    /// class, we don't need an interpreter to discover it.
+    boost::any eval(interpreter *) const { return val; }
+
+  private:
+    const boost::any val;
+  };
+
+  ///
+  /// \a symbol_factory is an abstract factory (the essence of the pattern is to
+  /// provide an interface for creating families of related or dependent
+  /// objects without specifying ther concrete classes).
+  /// The factory determines the actual concrete type of object to be created
+  /// (\a symbol) and it is here that the object is actually created. However,
+  /// the factory only returns an abstract pointer to the created concrete
+  /// object.
+  /// This insulates client code from object creation by having clients ask a
+  /// factory object to create an object of the desired abstract type and to
+  /// return an abstract pointer to the object.
+  ///
+  class symbol_factory
+  {
+  private:
+    symbol_factory();
+
+    typedef std::shared_ptr<symbol> (*make_func)(category_t);
+    typedef std::pair<std::string, domain_t> map_key;
+
+    template<typename T> static std::shared_ptr<symbol> make(category_t c)
+    {
+      return std::make_shared<T>(c);
+    }
+
+    std::map<map_key, make_func> factories_;
+
+  public:
+    ///
+    /// \return an instance of the singleton object symbol_factory.
+    ///
+    static symbol_factory &instance()
+    {
+      static symbol_factory singleton;
+      return singleton;
+    }
+
+    std::shared_ptr<symbol> make(const std::string &, domain_t, category_t = 0);
+    std::shared_ptr<symbol> make(const std::string &, domain_t, category_t,
+                                 int, int);
+
+    ///
+    /// \param[in] name name of the symbol to be registered (UPPERCASE!).
+    /// \param[in] domain of the symbol.
+    /// \return \c true if the symbol \a T has been added to the factory.
+    ///
+    template<typename T> bool register_symbol(const std::string &name,
+                                              domain_t d)
+    {
+      const std::string un(boost::to_upper_copy(name));
+      const map_key k{un, d};
+
+      if (factories_.find(k) != factories_.end())
+        return false;
+
+      factories_[k] = &make<T>;
+      return true;
+    }
+
+    bool unregister_symbol(const std::string &, domain_t);
   };
 }  // namespace vita
 

@@ -50,6 +50,7 @@
 namespace vita
 {
   class symbol;
+  /// Just a shortcut.
   typedef std::shared_ptr<symbol> symbol_ptr;
 
 #if defined(_MSC_VER)
@@ -71,8 +72,26 @@ namespace vita
 #endif
 
   typedef boost::uint16_t locus_t;
+
+  /// This is the type used as key for symbol identification.
   typedef boost::uint16_t opcode_t;
 
+  /// In an environmnet where a symbol such as + may have many different
+  /// meanings, it is useful to specify a "domain of computation" to restrict
+  /// attention to specific meanings of interest (e.g. double domain: 1 + 1 = 2;
+  /// string domain: "a" + "b" = "ab").
+  /// The operations of a domain are defined in files named after the domain
+  /// and grouped in the \c primitive/ folder.
+  enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
+
+  /// A category is a restriction on the class of all domains.
+  /// A category provide operations which supplement or supersede those of the
+  /// domain but which are restricted to values lying in the (sub)domain by
+  /// which is parametrized.
+  /// For instance the number 4.0 (in the domain \c d_double) may be present in
+  /// two distinct category 2 (e.g. the category km/h) and 3 (e.g. the category
+  /// kg).
+  /// Categories are the way strong type GP is implemented in Vita.
   typedef unsigned category_t;
 
   inline bool is_bad(double x) { return isinf(x) || isnan(x); }

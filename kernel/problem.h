@@ -33,6 +33,7 @@ namespace vita
 {
   class evaluator;
 
+  /// Just a shortcut.
   typedef std::shared_ptr<evaluator> evaluator_ptr;
 
   class problem

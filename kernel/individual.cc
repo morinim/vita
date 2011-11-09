@@ -28,7 +28,6 @@
 #include "kernel/argument.h"
 #include "kernel/environment.h"
 #include "kernel/random.h"
-#include "kernel/symbol.h"
 
 namespace vita
 {
@@ -703,7 +702,6 @@ namespace vita
   ///
   bool individual::check() const
   {
-    unsigned line(best_);
     for (locus_t locus(0); locus < size(); ++locus)
     {
       if (!code_[locus].sym)
@@ -720,7 +718,7 @@ namespace vita
         if (code_[locus].args[j] >= size())
           return false;
         // Function address must be smaller than its arguments' addresses.
-        if (code_[locus].args[j] <= line)
+        if (code_[locus].args[j] <= locus)
           return false;
       }
     }

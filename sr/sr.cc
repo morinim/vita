@@ -32,6 +32,7 @@ namespace po = boost::program_options;
 #include <string>
 
 #include "kernel/environment.h"
+#include "kernel/random.h"
 #include "kernel/search.h"
 #include "kernel/src_problem.h"
 #include "kernel/primitive/factory.h"
@@ -52,41 +53,25 @@ vita::src_problem problem(-5.0);
 
 void setup_default_symbols()
 {
-  vita::symbol_ptr c1(new vita::dbl::constant(1));
-  vita::symbol_ptr c2(new vita::dbl::constant(2));
-  vita::symbol_ptr c3(new vita::dbl::constant(3));
-  vita::symbol_ptr c4(new vita::dbl::constant(4));
-  vita::symbol_ptr c5(new vita::dbl::constant(5));
-  vita::symbol_ptr c6(new vita::dbl::constant(6));
-  vita::symbol_ptr c7(new vita::dbl::constant(7));
-  vita::symbol_ptr c8(new vita::dbl::constant(8));
-  vita::symbol_ptr c9(new vita::dbl::constant(9));
+  vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-  problem.env.insert(c1);
-  problem.env.insert(c2);
-  problem.env.insert(c3);
-  problem.env.insert(c4);
-  problem.env.insert(c5);
-  problem.env.insert(c6);
-  problem.env.insert(c7);
-  problem.env.insert(c8);
-  problem.env.insert(c9);
+  problem.env.insert(factory.make("1", vita::d_double, 0));
+  problem.env.insert(factory.make("2", vita::d_double, 0));
+  problem.env.insert(factory.make("3", vita::d_double, 0));
+  problem.env.insert(factory.make("4", vita::d_double, 0));
+  problem.env.insert(factory.make("5", vita::d_double, 0));
+  problem.env.insert(factory.make("6", vita::d_double, 0));
+  problem.env.insert(factory.make("7", vita::d_double, 0));
+  problem.env.insert(factory.make("8", vita::d_double, 0));
+  problem.env.insert(factory.make("9", vita::d_double, 0));
 
-  vita::symbol_ptr s_abs(new vita::dbl::abs());
-  vita::symbol_ptr s_add(new vita::dbl::add());
-  vita::symbol_ptr s_div(new vita::dbl::div());
-  vita::symbol_ptr s_ln(new vita::dbl::ln());
-  vita::symbol_ptr s_mul(new vita::dbl::mul());
-  vita::symbol_ptr s_mod(new vita::dbl::mod());
-  vita::symbol_ptr s_sub(new vita::dbl::sub());
-
-  problem.env.insert(s_abs);
-  problem.env.insert(s_add);
-  problem.env.insert(s_div);
-  problem.env.insert(s_ln);
-  problem.env.insert(s_mul);
-  problem.env.insert(s_mod);
-  problem.env.insert(s_sub);
+  problem.env.insert(factory.make("ABS", vita::d_double, 0));
+  problem.env.insert(factory.make("ADD", vita::d_double, 0));
+  problem.env.insert(factory.make("DIV", vita::d_double, 0));
+  problem.env.insert(factory.make("LN",  vita::d_double, 0));
+  problem.env.insert(factory.make("MUL", vita::d_double, 0));
+  problem.env.insert(factory.make("MOD", vita::d_double, 0));
+  problem.env.insert(factory.make("SUB", vita::d_double, 0));
 }
 
 ///
@@ -281,23 +266,39 @@ bool parse_command_line(int argc, char *argv[])
               << "  [" << problem.categories() << " category(ies), "
               << problem.variables() << " variable(s), "
               << problem.classes() << " class(es)]" << std::endl;
+  if (problem.categories() > 1)
+  {
+    std::cout << "Multi-categories aren't supported to date"
+              << " (please use just one numeric category)." << std::endl;
+    return false;
+  }
 
   if (symbols_file.empty())
   {
     if (verbose)
-      std::cout << "  (default symbol set)" << std::endl;
+      std::cout << "  [default symbol set]" << std::endl;
     setup_default_symbols();
   }
   else
   {
     if (verbose) std::cout << "Reading symbols' file \"" << symbols_file
                            << "\"... ";
-    const std::string s(problem.load_symbols(symbols_file));
-    if (s.empty())
+    try
+    {
+      parsed = problem.load_symbols(symbols_file);
+    }
+    catch(...)
+    {
+      parsed = 0;
+    }
+    if (!parsed)
+    {
+      if (verbose)
+        std::cout << "Symbol file format error." << std::endl;
       return false;
+    }
     if (verbose)
-      std::cout << "ok" << std::endl
-                << "  [" << s << ']' << std::endl;
+      std::cout << "ok (" << parsed << " symbols)" << std::endl;
   }
 
   return true;
