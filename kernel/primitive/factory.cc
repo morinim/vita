@@ -22,7 +22,7 @@
  */
 
 #include "kernel/primitive/factory.h"
-#include "kernel/primitive/double_pri.h"
+#include "kernel/primitive/double.h"
 
 namespace vita
 {

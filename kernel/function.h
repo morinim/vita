@@ -45,7 +45,7 @@ namespace vita
   {
   public:
     function(const std::string &, category_t, const std::vector<category_t> &,
-             unsigned, bool = false);
+             unsigned = default_weight, bool = false);
     function(const std::string &, category_t, unsigned,
              unsigned = default_weight, bool = false);
 

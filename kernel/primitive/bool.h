@@ -1,6 +1,6 @@
 /**
  *
- *  \file bool_pri.h
+ *  \file bool.h
  *
  *  Copyright (c) 2011 EOS di Manlio Morini.
  *

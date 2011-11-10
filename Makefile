@@ -4,7 +4,7 @@
 
 
 
-# Build type: debug, profile, release.
+# Build type: debug, release.
 TYPE = release
 
 # Boost library <-- PLEASE CHECK THE PATH!
