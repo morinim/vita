@@ -81,9 +81,10 @@ namespace vita
   ///
   /// \a symbol_factory is an abstract factory (the essence of the pattern is to
   /// provide an interface for creating families of related or dependent
-  /// objects without specifying ther concrete classes).
-  /// The factory determines the actual concrete type of object to be created
-  /// (\a symbol) and it is here that the object is actually created. However,
+  /// objects, i.e. symbols, without specifying ther concrete classes, e.g.
+  /// numbers, functions...).
+  /// The factory determines the actual concrete type of the symbol to be
+  /// created and it is here that the object is actually created. However,
   /// the factory only returns an abstract pointer to the created concrete
   /// object.
   /// This insulates client code from object creation by having clients ask a
@@ -95,15 +96,21 @@ namespace vita
   private:
     symbol_factory();
 
-    typedef std::shared_ptr<symbol> (*make_func)(category_t);
+    typedef std::shared_ptr<symbol> (*make_func1)(category_t);
+    typedef std::shared_ptr<symbol> (*make_func2)(category_t, category_t);
     typedef std::pair<std::string, domain_t> map_key;
+    typedef std::pair<unsigned, make_func1> map_data1;
+    typedef std::pair<unsigned, make_func2> map_data2;
 
-    template<typename T> static std::shared_ptr<symbol> make(category_t c)
-    {
-      return std::make_shared<T>(c);
-    }
+    template<typename T> static std::shared_ptr<symbol> make1(category_t c)
+    { return std::make_shared<T>(c); }
 
-    std::map<map_key, make_func> factories_;
+    template<typename T> static std::shared_ptr<symbol> make2(category_t c1,
+                                                              category_t c2)
+    { return std::make_shared<T>(c1, c2); }
+
+    std::map<map_key, map_data1> factory1_;
+    std::map<map_key, map_data2> factory2_;
 
   public:
     ///
@@ -115,30 +122,53 @@ namespace vita
       return singleton;
     }
 
-    std::shared_ptr<symbol> make(const std::string &, domain_t, category_t = 0);
+    std::shared_ptr<symbol> make(const std::string &, domain_t,
+                                 std::initializer_list<category_t>);
     std::shared_ptr<symbol> make(const std::string &, domain_t, category_t,
                                  int, int);
 
-    ///
-    /// \param[in] name name of the symbol to be registered (UPPERCASE!).
-    /// \param[in] domain of the symbol.
-    /// \return \c true if the symbol \a T has been added to the factory.
-    ///
-    template<typename T> bool register_symbol(const std::string &name,
-                                              domain_t d)
-    {
-      const std::string un(boost::to_upper_copy(name));
-      const map_key k{un, d};
+    unsigned args(const std::string &, domain_t) const;
 
-      if (factories_.find(k) != factories_.end())
-        return false;
-
-      factories_[k] = &make<T>;
-      return true;
-    }
+    template<typename T> bool register_symbol1(const std::string &, domain_t);
+    template<typename T> bool register_symbol2(const std::string &, domain_t);
 
     bool unregister_symbol(const std::string &, domain_t);
   };
+
+  ///
+  /// \param[in] name name of the symbol to be registered (UPPERCASE!).
+  /// \param[in] domain of the symbol.
+  /// \return \c true if the symbol \a T has been added to the factory.
+  ///
+  template<typename T>
+  bool symbol_factory::register_symbol1(const std::string &name,
+                                        domain_t d)
+  {
+    const std::string un(boost::to_upper_copy(name));
+    const map_key k{un, d};
+
+    if (factory1_.find(k) != factory1_.end())
+      return false;
+
+    factory1_[k] = {1, &make1<T>};
+
+    return true;
+  }
+
+  template<typename T>
+  bool symbol_factory::register_symbol2(const std::string &name,
+                                        domain_t d)
+  {
+    const std::string un(boost::to_upper_copy(name));
+    const map_key k{un, d};
+
+    if (factory2_.find(k) != factory2_.end())
+      return false;
+
+    factory2_[k] = {2, &make2<T>};
+
+    return true;
+  }
 }  // namespace vita
 
 #endif  // PRIMITIVE_FACTORY_H

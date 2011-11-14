@@ -44,7 +44,7 @@ const std::string vita_sr_version2(
   "Copyright (c) 2011 EOS Development (http://www.eosdev.it)"
 );
 
-bool verbose(false);
+unsigned verbose(true);
 
 unsigned runs(1);
 
@@ -55,23 +55,23 @@ void setup_default_symbols()
 {
   vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-  problem.env.insert(factory.make("1", vita::d_double, 0));
-  problem.env.insert(factory.make("2", vita::d_double, 0));
-  problem.env.insert(factory.make("3", vita::d_double, 0));
-  problem.env.insert(factory.make("4", vita::d_double, 0));
-  problem.env.insert(factory.make("5", vita::d_double, 0));
-  problem.env.insert(factory.make("6", vita::d_double, 0));
-  problem.env.insert(factory.make("7", vita::d_double, 0));
-  problem.env.insert(factory.make("8", vita::d_double, 0));
-  problem.env.insert(factory.make("9", vita::d_double, 0));
+  problem.env.insert(factory.make("1", vita::d_double, {}));
+  problem.env.insert(factory.make("2", vita::d_double, {}));
+  problem.env.insert(factory.make("3", vita::d_double, {}));
+  problem.env.insert(factory.make("4", vita::d_double, {}));
+  problem.env.insert(factory.make("5", vita::d_double, {}));
+  problem.env.insert(factory.make("6", vita::d_double, {}));
+  problem.env.insert(factory.make("7", vita::d_double, {}));
+  problem.env.insert(factory.make("8", vita::d_double, {}));
+  problem.env.insert(factory.make("9", vita::d_double, {}));
 
-  problem.env.insert(factory.make("ABS", vita::d_double, 0));
-  problem.env.insert(factory.make("ADD", vita::d_double, 0));
-  problem.env.insert(factory.make("DIV", vita::d_double, 0));
-  problem.env.insert(factory.make("LN",  vita::d_double, 0));
-  problem.env.insert(factory.make("MUL", vita::d_double, 0));
-  problem.env.insert(factory.make("MOD", vita::d_double, 0));
-  problem.env.insert(factory.make("SUB", vita::d_double, 0));
+  problem.env.insert(factory.make("ABS", vita::d_double, {}));
+  problem.env.insert(factory.make("ADD", vita::d_double, {}));
+  problem.env.insert(factory.make("DIV", vita::d_double, {}));
+  problem.env.insert(factory.make("LN",  vita::d_double, {}));
+  problem.env.insert(factory.make("MUL", vita::d_double, {}));
+  problem.env.insert(factory.make("MOD", vita::d_double, {}));
+  problem.env.insert(factory.make("SUB", vita::d_double, {}));
 }
 
 ///
@@ -91,7 +91,8 @@ bool parse_command_line(int argc, char *argv[])
     generic.add_options()
       ("version,v", "print version string.")
       ("help,h", "produces help message.")
-      ("verbose", po::bool_switch(&verbose), "shows more details.");
+      ("verbose", po::value<unsigned>(&verbose)->implicit_value(1),
+       "verbosity (optionally specify level, 0 == quiet).");
 
     po::options_description data("Data");
     data.add_options()

@@ -27,35 +27,35 @@
 namespace vita
 {
   ///
-  /// The factory is preloaded with a number of common symbol.
+  /// The factory is preloaded with a number of common symbols.
   ///
   symbol_factory::symbol_factory()
   {
-    register_symbol<dbl::abs>   ("ABS",    d_double);
-    register_symbol<dbl::add>   ("ADD",    d_double);
-    register_symbol<dbl::add>   ("+",      d_double);
-    register_symbol<dbl::div>   ("DIV",    d_double);
-    register_symbol<dbl::div>   ("/",      d_double);
-    register_symbol<dbl::idiv>  ("IDIV",   d_double);
-    register_symbol<dbl::ife>   ("IFE",    d_double);
-    register_symbol<dbl::ife>   ("IFEQ" ,  d_double);
-    register_symbol<dbl::ifl>   ("IFL",    d_double);
-    register_symbol<dbl::ifz>   ("IFZ",    d_double);
-    register_symbol<dbl::ln>    ("LN",     d_double);
-    register_symbol<dbl::mod>   ("MOD",    d_double);
-    register_symbol<dbl::mod>   ("%",      d_double);
-    register_symbol<dbl::mul>   ("MUL",    d_double);
-    register_symbol<dbl::mul>   ("*",      d_double);
-    register_symbol<dbl::number>("NUMBER", d_double);
-    register_symbol<dbl::sin>   ("SIN",    d_double);
-    register_symbol<dbl::sub>   ("SUB",    d_double);
-    register_symbol<dbl::sub>   ("-",      d_double);
+    register_symbol1<dbl::abs>   ("ABS",    d_double);
+    register_symbol1<dbl::add>   ("ADD",    d_double);
+    register_symbol1<dbl::add>   ("+",      d_double);
+    register_symbol1<dbl::div>   ("DIV",    d_double);
+    register_symbol1<dbl::div>   ("/",      d_double);
+    register_symbol1<dbl::idiv>  ("IDIV",   d_double);
+    register_symbol2<dbl::ife>   ("IFE",    d_double);
+    register_symbol2<dbl::ife>   ("IFEQ" ,  d_double);
+    register_symbol2<dbl::ifl>   ("IFL",    d_double);
+    register_symbol1<dbl::ifz>   ("IFZ",    d_double);
+    register_symbol1<dbl::ln>    ("LN",     d_double);
+    register_symbol1<dbl::mod>   ("MOD",    d_double);
+    register_symbol1<dbl::mod>   ("%",      d_double);
+    register_symbol1<dbl::mul>   ("MUL",    d_double);
+    register_symbol1<dbl::mul>   ("*",      d_double);
+    register_symbol1<dbl::number>("NUMBER", d_double);
+    register_symbol1<dbl::sin>   ("SIN",    d_double);
+    register_symbol1<dbl::sub>   ("SUB",    d_double);
+    register_symbol1<dbl::sub>   ("-",      d_double);
   }
 
   ///
   /// \param[in] name name of the symbol to be created.
   /// \param[in] d domain of the symbol to be created.
-  /// \param[in] c category of the symbol to be created.
+  /// \param[in] c a list of categories used by the the symbol constructor.
   /// \return an abstract pointer to the created symbol.
   ///
   /// As the factory only returns an abstract pointer, the client code (which
@@ -87,27 +87,72 @@ namespace vita
   ///     for object creation, changing factories is as easy as changing the
   ///     singleton object.
   ///
-  std::shared_ptr<symbol> symbol_factory::make(const std::string &name,
-                                               domain_t d, category_t c)
+  std::shared_ptr<symbol> symbol_factory::make(
+    const std::string &name,
+    domain_t d,
+    std::initializer_list<category_t> c)
   {
     const std::string un(boost::to_upper_copy(name));
+    const map_key k({un, d});
 
-    const auto it(factories_.find({un, d}));
-    if (it != factories_.end())
-      return (it->second)(c);
+    auto it(c.begin());
+    const category_t c1(it == c.end() ? 0 : *it++);
+    const category_t c2(it == c.end() ? 0 : *it);
 
-    return std::make_shared<constant>(boost::lexical_cast<double>(un), c);
+    const auto it1(factory1_.find(k));
+    if (it1 != factory1_.end())
+      return (it1->second.second)(c1);
+    else
+    {
+      const auto it2(factory2_.find(k));
+      if (it2 != factory2_.end())
+        return (it2->second.second)(c1, c2);
+    }
+
+    return std::make_shared<constant>(boost::lexical_cast<double>(un),
+                                      *c.begin());
   }
 
-  std::shared_ptr<symbol> symbol_factory::make(const std::string &name,
-                                               domain_t d, category_t c,
+  ///
+  /// \param[in] c a category used by the symbol constructor.
+  /// \param[in] min lower bound for the number value.
+  /// \param[in] max upper bound for the number value.
+  /// \return an abstract pointer to the created symbol.
+  ///
+  /// This is an alternative way to build a dbl::number.
+  ///
+  std::shared_ptr<symbol> symbol_factory::make(const std::string &,
+                                               domain_t, category_t c,
                                                int min, int max)
   {
     return std::make_shared<dbl::number>(c, min, max);
   }
 
+  ///
+  /// \param[in] name name of the symbol.
+  /// \param[in] d domain of the symbol.
+  /// \return number of distinct categories needed to build the symbol.
+  ///
+  unsigned symbol_factory::args(const std::string &name, domain_t d) const
+  {
+    const auto p(factory2_.find({name, d}));
+
+    return p == factory2_.end() ? 1 : 2;
+  }
+
+  ///
+  /// \param[in] name name of the symbol.
+  /// \param[in] d domain of the symbol.
+  /// \return \c true if the symbol has been unregistered.
+  ///
+  /// Unregister the symbol from the factory.
+  /// \note constants and variable aren't registered in the factory, so they
+  /// cannot be unregistered.
+  ///
   bool symbol_factory::unregister_symbol(const std::string &name, domain_t d)
   {
-    return factories_.erase({name, d}) == 1;
+    const map_key k{name, d};
+
+    return factory1_.erase(k) == 1 || factory2_.erase(k) == 1;
   }
 }  // namespace vita

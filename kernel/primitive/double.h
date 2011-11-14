@@ -151,7 +151,8 @@ namespace vita
     class ife : public function
     {
     public:
-      explicit ife(category_t t = 0) : function("IFE", t, 4) {}
+      explicit ife(category_t t1 = 0, category_t t2 = 0)
+        : function("IFE", t1, {t2, t2, t1, t1}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -174,7 +175,8 @@ namespace vita
     class ifl : public function
     {
     public:
-      explicit ifl(category_t t = 0) : function("IFL", t, 4) {}
+      explicit ifl(category_t t1 = 0, category_t t2 = 0)
+        : function("IFL", t1, {t2, t2, t1, t1}) {}
 
       boost::any eval(interpreter *i) const
       {

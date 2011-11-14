@@ -121,11 +121,19 @@ namespace vita
                                                       "numeric"));
 
         const category_t category_id(dat_.get_category(xml_category));
+        const domain_t domain(dat_.get_category(category_id).domain);
 
-        env.insert(symbol_factory::instance().make(
-                     name,
-                     dat_.get_category(category_id).domain,
-                     category_id));
+        if (symbol_factory::instance().args(name, domain) == 1)
+          env.insert(symbol_factory::instance().make(
+                       name,
+                       domain,
+                       {category_id}));
+        else
+          env.insert(symbol_factory::instance().make(
+                       name,
+                       domain,
+                       {category_id, category_id}));
+
         ++parsed;
       }
 
