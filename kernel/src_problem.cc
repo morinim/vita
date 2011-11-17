@@ -75,17 +75,22 @@ namespace vita
     if (parsed > 0)
     {
       // Sets up the variables.
-      for (unsigned i(0); i < dat_.variables(); ++i)
-      {
-        std::ostringstream s;
-        s << 'X' << i;
-        const std::string str(s.str());
+      for (unsigned i(0); i < dat_.columns(); ++i)
+        if (!dat_.get_column(i).output)
+        {
+          std::string name(dat_.get_column(i).name);
+          if (name.empty())
+          {
+            std::ostringstream s;
+            s << 'X' << i;
+            name = s.str();
+          }
 
-        const category_t category(dat_.get_column(i).category_id);
-        variable_ptr x(new variable(str, category));
-        vars_.push_back(x);
-        env.insert(x);
-      }
+          const category_t category(dat_.get_column(i).category_id);
+          variable_ptr x(new variable(name, category));
+          vars_.push_back(x);
+          env.insert(x);
+        }
 
       set_evaluator(classes() > 1
         ? 1     // Symbolic regression problem
