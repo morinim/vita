@@ -122,10 +122,11 @@ namespace vita
       return singleton;
     }
 
-    std::shared_ptr<symbol> make(const std::string &, domain_t,
-                                 std::initializer_list<category_t>);
-    std::shared_ptr<symbol> make(const std::string &, domain_t, category_t,
-                                 int, int);
+    std::shared_ptr<symbol> make(
+      const std::string &, domain_t,
+      const std::vector<category_t> & = std::vector<category_t>());
+    std::shared_ptr<symbol> make(const std::string &, domain_t, int, int,
+                                 category_t = 0);
 
     unsigned args(const std::string &, domain_t) const;
 

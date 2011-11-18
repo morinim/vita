@@ -107,11 +107,11 @@ int main(int argc, char *argv[])
   env.insert(std::make_shared<X>());
   env.insert(std::make_shared<Y>());
   env.insert(std::make_shared<Z>());
-  env.insert(factory.make("ADD", vita::d_double, 0));
-  env.insert(factory.make("SUB", vita::d_double, 0));
-  env.insert(factory.make("MUL", vita::d_double, 0));
-  env.insert(factory.make("IFL", vita::d_double, 0));
-  env.insert(factory.make("IFE", vita::d_double, 0));
+  env.insert(factory.make("ADD", vita::d_double));
+  env.insert(factory.make("SUB", vita::d_double));
+  env.insert(factory.make("MUL", vita::d_double));
+  env.insert(factory.make("IFL", vita::d_double));
+  env.insert(factory.make("IFE", vita::d_double));
 
   std::unique_ptr<vita::evaluator> eva(new fitness());
 

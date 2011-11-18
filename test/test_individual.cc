@@ -42,12 +42,12 @@ struct F
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("NUMBER", vita::d_double, 0));
-    env.insert(factory.make("ADD", vita::d_double, 0));
-    env.insert(factory.make("SUB", vita::d_double, 0));
-    env.insert(factory.make("MUL", vita::d_double, 0));
-    env.insert(factory.make("IFL", vita::d_double, 0));
-    env.insert(factory.make("IFE", vita::d_double, 0));
+    env.insert(factory.make("NUMBER", vita::d_double, {}));
+    env.insert(factory.make("ADD", vita::d_double, {}));
+    env.insert(factory.make("SUB", vita::d_double, {}));
+    env.insert(factory.make("MUL", vita::d_double, {}));
+    env.insert(factory.make("IFL", vita::d_double, {}));
+    env.insert(factory.make("IFE", vita::d_double, {}));
   }
 
   ~F()
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
   BOOST_TEST_CHECKPOINT("Sticky symbol must exits!");
   const vita::symbol_ptr n_123(vita::symbol_factory::instance().make(
-                                  "123", vita::d_double, 0));
+                                 "123", vita::d_double, {}));
   env.insert(n_123, true);
   for (unsigned l(2); l < 100; ++l)
   {

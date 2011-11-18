@@ -40,14 +40,14 @@ int main(int argc, char *argv[])
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make("NUMBER", vita::d_double, 0, -200, 200));
-  env.insert(factory.make("ADD", vita::d_double, 0));
-  env.insert(factory.make("SUB", vita::d_double, 0));
-  env.insert(factory.make("MUL", vita::d_double, 0));
-  env.insert(factory.make("IFL", vita::d_double, 0));
-  env.insert(factory.make("IFE", vita::d_double, 0));
-  env.insert(factory.make("ABS", vita::d_double, 0));
-  env.insert(factory.make("LN", vita::d_double, 0));
+  env.insert(factory.make("NUMBER", vita::d_double, -200, 200));
+  env.insert(factory.make("ADD", vita::d_double));
+  env.insert(factory.make("SUB", vita::d_double));
+  env.insert(factory.make("MUL", vita::d_double));
+  env.insert(factory.make("IFL", vita::d_double));
+  env.insert(factory.make("IFE", vita::d_double));
+  env.insert(factory.make("ABS", vita::d_double));
+  env.insert(factory.make("LN", vita::d_double));
 
   vita::distribution<double> individuals, blocks_len, blocks_n, arguments;
 

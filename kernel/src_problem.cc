@@ -103,7 +103,7 @@ namespace vita
 # pragma GCC diagnostic ignored "-Wtype-limits"
   ///
   /// \param[in] sf name of the file containing the symbols.
-  /// \return number of symbols parsed.
+  /// \return number of parsed symbols.
   ///
   unsigned src_problem::load_symbols(const std::string &sf)
   {
@@ -125,24 +125,75 @@ namespace vita
         const std::string xml_category(scc.second.get("<xmlattr>.category",
                                                       "numeric"));
 
-        const category_t category_id(dat_.get_category(xml_category));
-        const domain_t domain(dat_.get_category(category_id).domain);
+        const category_t base_category(dat_.get_category(xml_category));
+        const domain_t domain(dat_.get_category(base_category).domain);
 
-        if (symbol_factory::instance().args(name, domain) == 1)
-          env.insert(symbol_factory::instance().make(
-                       name,
-                       domain,
-                       {category_id}));
-        else
-          env.insert(symbol_factory::instance().make(
-                       name,
-                       domain,
-                       {category_id, category_id}));
+        const unsigned args(symbol_factory::instance().args(name, domain));
+
+        std::vector<category_t> categories(dat_.categories());
+        for (unsigned i(0); i < dat_.categories(); ++i)
+          categories[i] = i;
+
+        std::list<std::vector<category_t>> sequences(seq_with_rep(categories,
+                                                                  args));
+
+        for (auto i(sequences.begin()); i != sequences.end(); ++i)
+          if ((*i)[0] == base_category)
+            env.insert(symbol_factory::instance().make(
+                         name,
+                         domain,
+                         *i));
 
         ++parsed;
       }
 
     return parsed;
+  }
+
+  ///
+  /// \param[in] categories this is the "dictionary" for the sequence.
+  /// \param[in] args size of the sequence.
+  /// \return a list of sequences with repetition of fixed length (\a args) of
+  ///         elements taken from the given set (\a categories).
+  ///
+  std::list<std::vector<category_t>> src_problem::seq_with_rep(
+    const std::vector<category_t> &categories, unsigned args)
+  {
+    assert(categories.size());
+    assert(args);
+
+    class swr
+    {
+    public:
+      swr(const std::vector<category_t> &categories, unsigned args)
+        : categories_(categories), args_(args)
+      {
+      }
+
+      void operator()(unsigned level,
+                      const std::vector<category_t> &base,
+                      std::list<std::vector<category_t>> *out)
+      {
+        for (unsigned i(0); i < categories_.size(); ++i)
+        {
+          std::vector<category_t> current(base);
+          current.push_back(categories_[i]);
+
+          if (level+1 < args_)
+            operator()(level+1, current, out);
+          else
+            out->push_back(current);
+        }
+      }
+
+    private:
+      const std::vector<category_t> &categories_;
+      const unsigned args_;
+    };
+
+    std::list<std::vector<category_t>> out;
+    swr(categories, args)(0, {}, &out);
+    return out;
   }
 
   ///

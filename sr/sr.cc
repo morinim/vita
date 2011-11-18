@@ -245,6 +245,7 @@ bool parse_command_line(int argc, char *argv[])
     return false;
   }
 
+  // We read the dataset...
   if (verbose)
     std::cout << "Reading data file (" << data_file << ")... ";
   unsigned parsed(0);
@@ -274,6 +275,7 @@ bool parse_command_line(int argc, char *argv[])
     return false;
   }
 
+  // ... and the symbol file (if available).
   if (symbols_file.empty())
   {
     if (verbose)
@@ -282,8 +284,8 @@ bool parse_command_line(int argc, char *argv[])
   }
   else
   {
-    if (verbose) std::cout << "Reading symbols' file \"" << symbols_file
-                           << "\"... ";
+    if (verbose) std::cout << "Reading symbols' file )" << symbols_file
+                           << ")... ";
     try
     {
       parsed = problem.load_symbols(symbols_file);

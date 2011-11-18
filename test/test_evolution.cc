@@ -41,12 +41,12 @@ struct F
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("NUMBER", vita::d_double, 0));
-    env.insert(factory.make("ADD", vita::d_double, 0));
-    env.insert(factory.make("SUB", vita::d_double, 0));
-    env.insert(factory.make("MUL", vita::d_double, 0));
-    env.insert(factory.make("IFL", vita::d_double, 0));
-    env.insert(factory.make("IFE", vita::d_double, 0));
+    env.insert(factory.make("NUMBER", vita::d_double, {}));
+    env.insert(factory.make("ADD", vita::d_double, {}));
+    env.insert(factory.make("SUB", vita::d_double, {}));
+    env.insert(factory.make("MUL", vita::d_double, {}));
+    env.insert(factory.make("IFL", vita::d_double, {}));
+    env.insert(factory.make("IFE", vita::d_double, {}));
   }
 
   ~F()

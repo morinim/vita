@@ -50,6 +50,9 @@ namespace vita
     bool check() const;
 
   private:
+    std::list<std::vector<category_t>> seq_with_rep(
+      const std::vector<category_t> &, unsigned);
+
     std::vector<variable_ptr> vars_;
     data                       dat_;
   };

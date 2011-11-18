@@ -87,17 +87,15 @@ namespace vita
   ///     for object creation, changing factories is as easy as changing the
   ///     singleton object.
   ///
-  std::shared_ptr<symbol> symbol_factory::make(
-    const std::string &name,
-    domain_t d,
-    std::initializer_list<category_t> c)
+  std::shared_ptr<symbol> symbol_factory::make(const std::string &name,
+                                               domain_t d,
+                                               const std::vector<category_t> &c)
   {
     const std::string un(boost::to_upper_copy(name));
     const map_key k({un, d});
 
-    auto it(c.begin());
-    const category_t c1(it == c.end() ? 0 : *it++);
-    const category_t c2(it == c.end() ? 0 : *it);
+    const category_t c1(c.size() > 0 ? c[0] : 0);
+    const category_t c2(c.size() > 1 ? c[1] : 0);
 
     const auto it1(factory1_.find(k));
     if (it1 != factory1_.end())
@@ -109,21 +107,20 @@ namespace vita
         return (it2->second.second)(c1, c2);
     }
 
-    return std::make_shared<constant>(boost::lexical_cast<double>(un),
-                                      *c.begin());
+    return std::make_shared<constant>(boost::lexical_cast<double>(un), c1);
   }
 
   ///
-  /// \param[in] c a category used by the symbol constructor.
   /// \param[in] min lower bound for the number value.
   /// \param[in] max upper bound for the number value.
+  /// \param[in] c a category used by the symbol constructor.
   /// \return an abstract pointer to the created symbol.
   ///
   /// This is an alternative way to build a dbl::number.
   ///
   std::shared_ptr<symbol> symbol_factory::make(const std::string &,
-                                               domain_t, category_t c,
-                                               int min, int max)
+                                               domain_t, int min, int max,
+                                               category_t c)
   {
     return std::make_shared<dbl::number>(c, min, max);
   }

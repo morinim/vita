@@ -42,19 +42,19 @@ struct F
 
     static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    c0 = factory.make("0", vita::d_double, 0);
-    c1 = factory.make("1", vita::d_double, 0);
-    c2 = factory.make("2", vita::d_double, 0);
-    c3 = factory.make("3", vita::d_double, 0);
-    x = factory.make("123", vita::d_double, 0);
-    neg_x = factory.make("-123", vita::d_double, 0);
-    y = factory.make("321", vita::d_double, 0);
-    f_abs = factory.make("ABS", vita::d_double, 0);
-    f_add = factory.make("ADD", vita::d_double, 0);
-    f_div = factory.make("DIV", vita::d_double, 0);
-    f_idiv = factory.make("IDIV", vita::d_double, 0);
-    f_mul = factory.make("MUL", vita::d_double, 0);
-    f_sub = factory.make("SUB", vita::d_double, 0);
+    c0 = factory.make("0", vita::d_double, {});
+    c1 = factory.make("1", vita::d_double, {});
+    c2 = factory.make("2", vita::d_double, {});
+    c3 = factory.make("3", vita::d_double, {});
+    x = factory.make("123", vita::d_double, {});
+    neg_x = factory.make("-123", vita::d_double, {});
+    y = factory.make("321", vita::d_double, {});
+    f_abs = factory.make("ABS", vita::d_double, {});
+    f_add = factory.make("ADD", vita::d_double, {});
+    f_div = factory.make("DIV", vita::d_double, {});
+    f_idiv = factory.make("IDIV", vita::d_double, {});
+    f_mul = factory.make("MUL", vita::d_double, {});
+    f_sub = factory.make("SUB", vita::d_double, {});
 
     env.insert(c0);
     env.insert(c1);
