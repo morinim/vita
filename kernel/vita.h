@@ -54,8 +54,6 @@ namespace vita
   typedef std::shared_ptr<symbol> symbol_ptr;
 
 #if defined(_MSC_VER)
-#  define isnan(x)      _isnan(x)
-#  define isinf(x)      !_finite(x)
 #  define ROTL64(x, y)  _rotl64(x, y)
 #else
    ///
@@ -94,7 +92,7 @@ namespace vita
   /// Categories are the way strong type GP is implemented in Vita.
   typedef unsigned category_t;
 
-  inline bool is_bad(double x) { return isinf(x) || isnan(x); }
+  inline bool is_bad(double x) { return std::isinf(x) || std::isnan(x); }
 
   ///
   /// When absolute value of two real numbers is under \a float_epsilon, they

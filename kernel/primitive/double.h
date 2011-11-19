@@ -26,7 +26,6 @@
 
 #include <boost/any.hpp>
 
-#include <sstream>
 #include <string>
 
 #include "kernel/function.h"
@@ -36,6 +35,16 @@
 
 namespace vita
 {
+  /// We assume that errors during floating-point operations aren't terminal
+  /// error. So we dont't try to prevent domain errors (e.g. square root of a
+  /// negative number) or range error (e.g. pow(10.0, 1e6)) checking arguments
+  /// beforehand (domain errors could be prevented by carefully bounds checking
+  /// the arguments before calling functions and taking alternative action if
+  /// the bounds are violated; range errors usually can not be prevented, as
+  /// they are dependent on the implementation of floating-point numbers, as
+  /// well as the function being applied).
+  /// Instead we detect them and take alternative action (usually returning
+  /// an empty boost::any()).
   namespace dbl
   {
     ///
@@ -57,11 +66,7 @@ namespace vita
       int init() const { return random::between<int>(min, upp); }
 
       std::string display(int v) const
-      {
-        std::ostringstream s;
-        s << static_cast<double>(v);
-        return s.str();
-      }
+      { return boost::lexical_cast<std::string>(v); }
 
       boost::any eval(interpreter *i) const
       { return static_cast<double>(boost::any_cast<int>(i->eval())); }

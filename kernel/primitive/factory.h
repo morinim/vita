@@ -96,15 +96,14 @@ namespace vita
   private:
     symbol_factory();
 
-    typedef std::shared_ptr<symbol> (*make_func1)(category_t);
-    typedef std::shared_ptr<symbol> (*make_func2)(category_t, category_t);
+    typedef symbol_ptr (*make_func1)(category_t);
+    typedef symbol_ptr (*make_func2)(category_t, category_t);
     typedef std::pair<std::string, domain_t> map_key;
 
-    template<typename T> static std::shared_ptr<symbol> make1(category_t c)
+    template<typename T> static symbol_ptr make1(category_t c)
     { return std::make_shared<T>(c); }
 
-    template<typename T> static std::shared_ptr<symbol> make2(category_t c1,
-                                                              category_t c2)
+    template<typename T> static symbol_ptr make2(category_t c1, category_t c2)
     { return std::make_shared<T>(c1, c2); }
 
     std::map<map_key, make_func1> factory1_;
@@ -113,11 +112,10 @@ namespace vita
   public:
     static symbol_factory &instance();
 
-    std::shared_ptr<symbol> make(
+    symbol_ptr make(
       const std::string &, domain_t,
       const std::vector<category_t> & = std::vector<category_t>());
-    std::shared_ptr<symbol> make(const std::string &, domain_t, int, int,
-                                 category_t = 0);
+    symbol_ptr make(const std::string &, domain_t, int, int, category_t = 0);
 
     unsigned args(const std::string &, domain_t) const;
 

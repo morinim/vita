@@ -114,9 +114,8 @@ namespace vita
   ///     for object creation, changing factories is as easy as changing the
   ///     singleton object.
   ///
-  std::shared_ptr<symbol> symbol_factory::make(const std::string &name,
-                                               domain_t d,
-                                               const std::vector<category_t> &c)
+  symbol_ptr symbol_factory::make(const std::string &name, domain_t d,
+                                  const std::vector<category_t> &c)
   {
     const std::string un(boost::to_upper_copy(name));
     const map_key k({un, d});
@@ -138,18 +137,28 @@ namespace vita
   }
 
   ///
+  /// \param[in] d domain of the symbol.
   /// \param[in] min lower bound for the number value.
   /// \param[in] max upper bound for the number value.
   /// \param[in] c a category used by the symbol constructor.
   /// \return an abstract pointer to the created symbol.
   ///
-  /// This is an alternative way to build a dbl::number.
+  /// This is an alternative way to build a number.
   ///
-  std::shared_ptr<symbol> symbol_factory::make(const std::string &,
-                                               domain_t, int min, int max,
-                                               category_t c)
+  symbol_ptr symbol_factory::make(const std::string &, domain_t d, int min,
+                                  int max, category_t c)
   {
-    return std::make_shared<dbl::number>(c, min, max);
+    assert(d == d_double || d == d_int);
+
+    switch (d)
+    {
+    case d_double:
+      return std::make_shared<dbl::number>(c, min, max);
+    case d_int:
+      return std::make_shared<integer::number>(c, min, max);
+    default:
+      return symbol_ptr();
+    }
   }
 
   ///

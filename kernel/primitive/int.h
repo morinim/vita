@@ -27,7 +27,6 @@
 #include <boost/any.hpp>
 
 #include <limits>
-#include <sstream>
 #include <string>
 
 #include "kernel/function.h"
@@ -60,11 +59,7 @@ namespace vita
       int init() const { return random::between<int>(min, upp); }
 
       std::string display(int v) const
-      {
-        std::ostringstream s;
-        s << static_cast<int>(v);
-        return s.str();
-      }
+      { return boost::lexical_cast<std::string>(v); }
 
       boost::any eval(interpreter *i) const
       { return boost::any_cast<int>(i->eval()); }
