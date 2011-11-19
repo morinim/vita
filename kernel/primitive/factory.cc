@@ -22,10 +22,20 @@
  */
 
 #include "kernel/primitive/factory.h"
+#include "kernel/primitive/int.h"
 #include "kernel/primitive/double.h"
 
 namespace vita
 {
+  ///
+  /// \return an instance of the singleton object symbol_factory.
+  ///
+  symbol_factory &symbol_factory::instance()
+  {
+    static symbol_factory singleton;
+    return singleton;
+  }
+
   ///
   /// The factory is preloaded with a number of common symbols.
   ///
@@ -38,7 +48,7 @@ namespace vita
     register_symbol1<dbl::div>   ("/",      d_double);
     register_symbol1<dbl::idiv>  ("IDIV",   d_double);
     register_symbol2<dbl::ife>   ("IFE",    d_double);
-    register_symbol2<dbl::ife>   ("IFEQ" ,  d_double);
+    register_symbol2<dbl::ife>   ("IFEQ",   d_double);
     register_symbol2<dbl::ifl>   ("IFL",    d_double);
     register_symbol1<dbl::ifz>   ("IFZ",    d_double);
     register_symbol1<dbl::ln>    ("LN",     d_double);
@@ -50,6 +60,23 @@ namespace vita
     register_symbol1<dbl::sin>   ("SIN",    d_double);
     register_symbol1<dbl::sub>   ("SUB",    d_double);
     register_symbol1<dbl::sub>   ("-",      d_double);
+
+    register_symbol1<integer::add>   ("ADD",    d_int);
+    register_symbol1<integer::add>   ("+",      d_int);
+    register_symbol1<integer::div>   ("DIV",    d_int);
+    register_symbol1<integer::div>   ("/",      d_int);
+    register_symbol2<integer::ife>   ("IFE",    d_int);
+    register_symbol2<integer::ife>   ("IFEQ",   d_int);
+    register_symbol2<integer::ifl>   ("IFL",    d_int);
+    register_symbol1<integer::ifz>   ("IFZ",    d_int);
+    register_symbol1<integer::mod>   ("MOD",    d_int);
+    register_symbol1<integer::mod>   ("%",      d_int);
+    register_symbol1<integer::mul>   ("MUL",    d_int);
+    register_symbol1<integer::mul>   ("*",      d_int);
+    register_symbol1<integer::number>("NUMBER", d_int);
+    register_symbol1<integer::shl>   ("SHL",    d_int);
+    register_symbol1<integer::sub>   ("SUB",    d_int);
+    register_symbol1<integer::sub>   ("-",      d_int);
   }
 
   ///
@@ -99,12 +126,12 @@ namespace vita
 
     const auto it1(factory1_.find(k));
     if (it1 != factory1_.end())
-      return (it1->second.second)(c1);
+      return (it1->second)(c1);
     else
     {
       const auto it2(factory2_.find(k));
       if (it2 != factory2_.end())
-        return (it2->second.second)(c1, c2);
+        return (it2->second)(c1, c2);
     }
 
     return std::make_shared<constant>(boost::lexical_cast<double>(un), c1);
@@ -132,7 +159,8 @@ namespace vita
   ///
   unsigned symbol_factory::args(const std::string &name, domain_t d) const
   {
-    const auto p(factory2_.find({name, d}));
+    const std::string un(boost::to_upper_copy(name));
+    const auto p(factory2_.find({un, d}));
 
     return p == factory2_.end() ? 1 : 2;
   }
@@ -148,7 +176,8 @@ namespace vita
   ///
   bool symbol_factory::unregister_symbol(const std::string &name, domain_t d)
   {
-    const map_key k{name, d};
+    const std::string un(boost::to_upper_copy(name));
+    const map_key k{un, d};
 
     return factory1_.erase(k) == 1 || factory2_.erase(k) == 1;
   }

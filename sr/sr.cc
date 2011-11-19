@@ -268,12 +268,6 @@ bool parse_command_line(int argc, char *argv[])
               << "  [" << problem.categories() << " category(ies), "
               << problem.variables() << " variable(s), "
               << problem.classes() << " class(es)]" << std::endl;
-  if (problem.categories() > 1)
-  {
-    std::cout << "Multi-categories aren't supported to date"
-              << " (please use just one numeric category)." << std::endl;
-    return false;
-  }
 
   // ... and the symbol file (if available).
   if (symbols_file.empty())
@@ -284,7 +278,7 @@ bool parse_command_line(int argc, char *argv[])
   }
   else
   {
-    if (verbose) std::cout << "Reading symbols' file )" << symbols_file
+    if (verbose) std::cout << "Reading symbols' file (" << symbols_file
                            << ")... ";
     try
     {
@@ -302,6 +296,13 @@ bool parse_command_line(int argc, char *argv[])
     }
     if (verbose)
       std::cout << "ok (" << parsed << " symbols)" << std::endl;
+  }
+
+  if (problem.categories() > 1)
+  {
+    std::cout << std::endl << "Multi-categories aren't supported to date"\
+      " (please use just one numeric category)." << std::endl;
+    return false;
   }
 
   return true;

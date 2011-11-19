@@ -116,35 +116,61 @@ namespace vita
     ptree pt;
     read_xml(sf, pt);
 
-    BOOST_FOREACH(ptree::value_type scc,
-                  pt.get_child("symbolset.categories.category"))
-      if (scc.first == "symbol")
+#if !defined(NDEBUG)
+    std::cout << std::endl;
+    for (unsigned i(0); i < dat_.categories(); ++i)
+      std::cout << i << " " << dat_.get_category(i).name << " "
+                << dat_.get_category(i).domain << std::endl;
+#endif
+
+    BOOST_FOREACH(ptree::value_type sc,
+                  pt.get_child("symbolset.categories"))
+      if (sc.first == "category")
       {
-        const std::string name(scc.second.data());
-
-        const std::string xml_category(scc.second.get("<xmlattr>.category",
+        const std::string xml_category(sc.second.get("<xmlattr>.name",
                                                       "numeric"));
-
         const category_t base_category(dat_.get_category(xml_category));
         const domain_t domain(dat_.get_category(base_category).domain);
 
-        const unsigned args(symbol_factory::instance().args(name, domain));
+        for (auto cat(sc.second.begin()); cat != sc.second.end(); ++cat)
+          if (cat->first == "symbol")
+          {
+            const std::string name(cat->second.data());
+            const unsigned args(symbol_factory::instance().args(name, domain));
 
-        std::vector<category_t> categories(dat_.categories());
-        for (unsigned i(0); i < dat_.categories(); ++i)
-          categories[i] = i;
+#if !defined(NDEBUG)
+            std::cout << std::endl
+                      << "Symbol: " << name << std::endl
+                      << "XML category: " << xml_category
+                      << "   Base category: " << base_category
+                      << "   Domain: " << domain
+                      << "   Arg: " << args << std::endl;
+#endif
 
-        std::list<std::vector<category_t>> sequences(seq_with_rep(categories,
-                                                                  args));
+            std::vector<category_t> categories(dat_.categories());
+            for (unsigned i(0); i < dat_.categories(); ++i)
+              categories[i] = i;
 
-        for (auto i(sequences.begin()); i != sequences.end(); ++i)
-          if ((*i)[0] == base_category)
-            env.insert(symbol_factory::instance().make(
-                         name,
-                         domain,
-                         *i));
+            std::list<std::vector<category_t>> sequences(
+              seq_with_rep(categories, args));
 
-        ++parsed;
+            for (auto i(sequences.begin()); i != sequences.end(); ++i)
+              if ((*i)[0] == base_category)
+              {
+#if !defined(NDEBUG)
+                std::cout << "(";
+                for (unsigned j(0); j < i->size(); ++j)
+                  std::cout << (*i)[j] << (j+1==i->size() ? ')' : ',');
+                std::cout << std::endl;
+#endif
+                env.insert(symbol_factory::instance().make(
+                             name,
+                             domain,
+                             *i));
+              }
+
+            ++parsed;
+          }
       }
 
     return parsed;

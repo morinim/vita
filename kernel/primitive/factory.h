@@ -99,8 +99,6 @@ namespace vita
     typedef std::shared_ptr<symbol> (*make_func1)(category_t);
     typedef std::shared_ptr<symbol> (*make_func2)(category_t, category_t);
     typedef std::pair<std::string, domain_t> map_key;
-    typedef std::pair<unsigned, make_func1> map_data1;
-    typedef std::pair<unsigned, make_func2> map_data2;
 
     template<typename T> static std::shared_ptr<symbol> make1(category_t c)
     { return std::make_shared<T>(c); }
@@ -109,18 +107,11 @@ namespace vita
                                                               category_t c2)
     { return std::make_shared<T>(c1, c2); }
 
-    std::map<map_key, map_data1> factory1_;
-    std::map<map_key, map_data2> factory2_;
+    std::map<map_key, make_func1> factory1_;
+    std::map<map_key, make_func2> factory2_;
 
   public:
-    ///
-    /// \return an instance of the singleton object symbol_factory.
-    ///
-    static symbol_factory &instance()
-    {
-      static symbol_factory singleton;
-      return singleton;
-    }
+    static symbol_factory &instance();
 
     std::shared_ptr<symbol> make(
       const std::string &, domain_t,
@@ -151,7 +142,7 @@ namespace vita
     if (factory1_.find(k) != factory1_.end())
       return false;
 
-    factory1_[k] = {1, &make1<T>};
+    factory1_[k] = &make1<T>;
 
     return true;
   }
@@ -166,7 +157,7 @@ namespace vita
     if (factory2_.find(k) != factory2_.end())
       return false;
 
-    factory2_[k] = {2, &make2<T>};
+    factory2_[k] = &make2<T>;
 
     return true;
   }
