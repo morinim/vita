@@ -167,9 +167,11 @@ namespace vita
   bool distribution<T>::check() const
   {
     return
-      (is_bad(min) || is_bad(mean) || min <= mean+float_epsilon) &&
-      (is_bad(max) || is_bad(mean) || mean <= max+float_epsilon) &&
-      (isnan(variance) || 0.0 <= variance+float_epsilon);
+      (!std::isfinite(min) || !std::isfinite(mean) ||
+       min <= mean+float_epsilon) &&
+      (!std::isfinite(max) || !std::isfinite(mean) ||
+       mean <= max+float_epsilon) &&
+      (std::isnan(variance) || 0.0 <= variance+float_epsilon);
   }
 }  // Namespace vita
 

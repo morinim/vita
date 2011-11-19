@@ -92,8 +92,6 @@ namespace vita
   /// Categories are the way strong type GP is implemented in Vita.
   typedef unsigned category_t;
 
-  inline bool is_bad(double x) { return std::isinf(x) || std::isnan(x); }
-
   ///
   /// When absolute value of two real numbers is under \a float_epsilon, they
   /// are considered equivalent.

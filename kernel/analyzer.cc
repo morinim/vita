@@ -150,7 +150,7 @@ namespace vita
   {
     length_.add(count(ind));
 
-    if (!is_bad(f))
+    if (std::isfinite(f))
       fit_.add(f);
   }
 

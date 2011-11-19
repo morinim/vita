@@ -60,7 +60,7 @@ namespace vita
     const unsigned arl_args(0);
 
     const fitness_t base_fit(evo.fitness(base));
-    if (!is_bad(base_fit))
+    if (std::isfinite(base_fit))
     {
       const std::string f_adf(prob_->env.stat_dir + "/" +
                               environment::arl_filename);
@@ -89,7 +89,7 @@ namespace vita
           const double d_f(base_fit - evo.fitness(base.destroy_block(*i)));
 
           // Semantic introns cannot be building blocks.
-          if (!is_bad(d_f) && std::fabs(base_fit/10.0) < d_f)
+          if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
           {
             symbol_ptr p;
             if (arl_args)

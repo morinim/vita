@@ -126,7 +126,7 @@ namespace vita
 
         const double ret(boost::any_cast<double>(ev0) /
                          boost::any_cast<double>(ev1));
-        if (is_bad(ret))  return boost::any();
+        if (!std::isfinite(ret))  return boost::any();
 
         return ret;
       }
@@ -147,7 +147,7 @@ namespace vita
 
         const double ret(std::floor(boost::any_cast<double>(ev0) /
                                     boost::any_cast<double>(ev1)));
-        if (is_bad(ret))  return boost::any();
+        if (!std::isfinite(ret))  return boost::any();
 
         return ret;
       }
@@ -227,7 +227,7 @@ namespace vita
         if (ev0.empty())  return ev0;
 
         const double ret(std::log(boost::any_cast<double>(i->eval(0))));
-        if (is_bad(ret))  return boost::any();
+        if (!std::isfinite(ret))  return boost::any();
 
         return ret;
       }
@@ -248,7 +248,7 @@ namespace vita
 
         const double ret(std::fmod(boost::any_cast<double>(ev0),
                                    boost::any_cast<double>(ev1)));
-        if (is_bad(ret))  return boost::any();
+        if (!std::isfinite(ret))  return boost::any();
 
         return ret;
       }
