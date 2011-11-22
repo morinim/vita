@@ -34,6 +34,7 @@
 
 namespace vita
 {
+# pragma GCC diagnostic ignored "-Wformat"
   ///
   /// \param[in] st success threashold: when fitness is greater than this value,
   ///               the the datum is considered learned (matched, classified,

@@ -27,6 +27,8 @@
 
 namespace vita
 {
+# pragma GCC diagnostic ignored "-Wformat"
+
   ///
   /// \param[in] d pointer to data that the evaluator will use.
   /// \param[in] v vector of input variables of the dataset.

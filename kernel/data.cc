@@ -333,10 +333,10 @@ namespace vita
 
   ///
   /// \param[in] s the string to be converted.
-  /// \param[in] t what type should \a s be converted in?
+  /// \param[in] d what type should \a s be converted in?
   /// \return the converted data.
   ///
-  /// convert("123.1", sym_real) == 123.1f
+  /// convert("123.1", sym_double) == 123.1f
   ///
   boost::any data::convert(const std::string &s, domain_t d)
   {

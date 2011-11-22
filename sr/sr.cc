@@ -37,6 +37,8 @@ namespace po = boost::program_options;
 #include "kernel/src_problem.h"
 #include "kernel/primitive/factory.h"
 
+#pragma GCC diagnostic ignored "-Wformat"
+
 const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification v0.9.1"
 );
