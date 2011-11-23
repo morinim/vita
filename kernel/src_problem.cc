@@ -25,8 +25,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <fstream>
-
 #include "kernel/src_problem.h"
 #include "kernel/individual.h"
 #include "kernel/src_evaluator.h"
@@ -81,11 +79,7 @@ namespace vita
         {
           std::string name(dat_.get_column(i).name);
           if (name.empty())
-          {
-            std::ostringstream s;
-            s << 'X' << i;
-            name = s.str();
-          }
+            name = "X" + boost::lexical_cast<std::string>(i);
 
           const category_t category(dat_.get_column(i).category_id);
           variable_ptr x(new variable(name, category));
