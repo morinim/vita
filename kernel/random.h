@@ -36,6 +36,7 @@ namespace vita
   {
   public:
     template<class T> static T between(T, T);
+    template<class T> static const T &element(const std::vector<T> &);
 
     static unsigned ring(unsigned, unsigned, unsigned);
 
@@ -92,6 +93,18 @@ namespace vita
     assert(min < sup);
 
     return boost::uniform_int<>(min, sup-1)(rng_);
+  }
+
+  ///
+  /// \param[in] vect a vector.
+  /// \return a random element of the vector \a vect.
+  ///
+  template<class T>
+  inline
+  const T &random::element(const std::vector<T> &vect)
+  {
+    assert(vect.size());
+    return vect[between(0u, static_cast<unsigned>(vect.size()))];
   }
 
   ///

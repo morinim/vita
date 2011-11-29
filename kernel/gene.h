@@ -24,10 +24,14 @@
 #if !defined(GENE_H)
 #define      GENE_H
 
-#include "kernel/symbol_set.h"
+#include <vector>
+
+#include "kernel/vita.h"
 
 namespace vita
 {
+  class symbol_set;
+
   ///
   /// A gene is a unit of heredity in a living organism. The \c struct \a gene
   /// is the building block for an \a individual.
@@ -38,9 +42,9 @@ namespace vita
     enum {k_args = 4};
 
     gene() {}
-    explicit gene(const symbol_set &);
-    gene(const symbol_set &, unsigned, unsigned);
-    gene(const symbol_set &, unsigned);
+    explicit gene(const symbol_ptr &);
+    gene(const symbol_ptr &, const std::vector<std::vector<unsigned>> &);
+    gene(const symbol_ptr &, unsigned, unsigned);
 
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }

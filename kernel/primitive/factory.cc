@@ -24,6 +24,7 @@
 #include "kernel/primitive/factory.h"
 #include "kernel/primitive/int.h"
 #include "kernel/primitive/double.h"
+#include "kernel/primitive/string.h"
 
 namespace vita
 {
@@ -48,7 +49,6 @@ namespace vita
     register_symbol1<dbl::div>   ("/",      d_double);
     register_symbol1<dbl::idiv>  ("IDIV",   d_double);
     register_symbol2<dbl::ife>   ("IFE",    d_double);
-    register_symbol2<dbl::ife>   ("IFEQ",   d_double);
     register_symbol2<dbl::ifl>   ("IFL",    d_double);
     register_symbol1<dbl::ifz>   ("IFZ",    d_double);
     register_symbol1<dbl::ln>    ("LN",     d_double);
@@ -77,6 +77,8 @@ namespace vita
     register_symbol1<integer::shl>   ("SHL",    d_int);
     register_symbol1<integer::sub>   ("SUB",    d_int);
     register_symbol1<integer::sub>   ("-",      d_int);
+
+    register_symbol2<str::ife>   ("IFE",    d_string);
   }
 
   ///
@@ -133,7 +135,19 @@ namespace vita
         return (it2->second)(c1, c2);
     }
 
-    return std::make_shared<constant>(boost::lexical_cast<double>(un), c1);
+    switch (d)
+    {
+    case d_bool:
+      return std::make_shared<constant>(boost::lexical_cast<bool>(un), c1);
+    case d_double:
+      return std::make_shared<constant>(boost::lexical_cast<double>(un), c1);
+    case d_int:
+      return std::make_shared<constant>(boost::lexical_cast<int>(un), c1);
+    case d_string:
+      return std::make_shared<constant>(un, c1);
+    default:
+      return symbol_ptr();
+    }
   }
 
   ///

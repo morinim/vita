@@ -37,6 +37,8 @@
  *
  */
 
+# pragma GCC diagnostic ignored "-Wformat"
+
 #if !defined(VITA_H)
 #define      VITA_H
 

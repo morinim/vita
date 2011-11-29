@@ -179,34 +179,55 @@ namespace vita
   }
 
   ///
-  /// \param[in] only_t if \c true extracts only terminals.
+  /// \param[in] c a category.
+  /// \return a random terminal of category \a c.
+  ///
+  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
+  ///
+  const symbol_ptr &symbol_set::roulette_terminal(category_t c) const
+  {
+    assert(c < categories());
+
+    return random::element(by_.category[c].terminals);
+  }
+
+  ///
+  /// \param[in] c a category.
+  /// \return a random symbol of category \a c.
+  ///
+  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
+  ///
+  const symbol_ptr &symbol_set::roulette(category_t c) const
+  {
+    const std::vector<symbol_ptr> &symbols(by_.category[c].symbols);
+    const unsigned slot(random::between<unsigned>(0, by_.category[c].sum));
+
+    unsigned i(0);
+    for (unsigned wedge(symbols[i]->weight);
+         wedge <= slot && i+1 < symbols.size();
+         wedge += symbols[++i]->weight)
+    {}
+
+    return symbols[i];
+  }
+
+  ///
   /// \return a random symbol.
   ///
-  /// If \a only_t == \c true extracts a \a terminal else a random \a symbol
-  /// (may be a terminal, a primitive function or an ADF).
+  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
   ///
-  const symbol_ptr &symbol_set::roulette(bool only_t) const
+  const symbol_ptr &symbol_set::roulette() const
   {
-    assert(all_.sum);
-
-    if (only_t)
-    {
-      const unsigned i(random::between<unsigned>(0, all_.terminals.size()));
-
-      assert(!dynamic_cast<argument *>(all_.terminals[i].get()));
-      return all_.terminals[i];
-    }
-
+    const std::vector<symbol_ptr> &symbols(all_.symbols);
     const unsigned slot(random::between<unsigned>(0, all_.sum));
 
     unsigned i(0);
-    for (unsigned wedge(all_.symbols[i]->weight);
-         wedge <= slot && i+1 < all_.symbols.size();
-         wedge += all_.symbols[++i]->weight)
+    for (unsigned wedge(symbols[i]->weight);
+         wedge <= slot && i+1 < symbols.size();
+         wedge += symbols[++i]->weight)
     {}
 
-    assert(!dynamic_cast<argument *>(all_.symbols[i].get()));
-    return all_.symbols[i];
+    return symbols[i];
   }
 
   ///
@@ -265,15 +286,17 @@ namespace vita
 
     for (unsigned i(0); i < all_.symbols.size(); ++i)
       for (unsigned j(0); j < all_.symbols[i]->arity(); ++j)
-        need.insert(static_cast<function *>(all_.symbols[i].get())
+        need.insert(std::static_pointer_cast<function>(all_.symbols[i])
                     ->arg_category(j));
+        // static_cast<function *>(all_.symbols[i].get())->arg_category(j)
 
     for (auto cat(need.begin()); cat != need.end(); ++cat)
-      if (*cat >= categories() ||
-          (!by_.category[*cat].terminals.size() &&
-           !by_.category[*cat].stickies.size()))
-        return false;
+    {
+      const collection &cc(by_.category[*cat]);
 
+      if (*cat >= categories() || !(cc.terminals.size() + cc.stickies.size()))
+        return false;
+    }
     return true;
   }
 

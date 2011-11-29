@@ -22,51 +22,58 @@
  */
 
 #include "kernel/gene.h"
+#include "kernel/function.h"
 #include "kernel/random.h"
-#include "kernel/symbol.h"
 
 namespace vita
 {
   ///
-  /// \param[in] sset the set of symbols used to build individuals.
+  /// \param[in] t a terminal.
   ///
-  gene::gene(const symbol_set &sset)
+  /// A new gene built from terminal \a t.
+  ///
+  gene::gene(const symbol_ptr &t) : sym(t)
   {
-    sym = sset.roulette(true);
+    assert(sym->terminal());
 
     if (sym->parametric())
       par = sym->init();
   }
 
-  ///
-  /// \param[in] sset the set of symbols used to build individuals.
-  /// \param[in] from minimum index for function arguments.
-  /// \param[in] sup upper bound for the indexes of function arguments.
-  ///
-  gene::gene(const symbol_set &sset, unsigned from, unsigned sup)
+  gene::gene(const symbol_ptr &s, unsigned from, unsigned sup) : sym(s)
   {
-    assert(from <= sup);
-    sym = sset.roulette(from == sup);
+    assert(from < sup);
 
     if (sym->parametric())
       par = sym->init();
     else
     {
       const unsigned arity(sym->arity());
-      for (unsigned j(0); j < arity; ++j)
-        args[j] = random::between<unsigned>(from, sup);
+      for (unsigned i(0); i < arity; ++i)
+        args[i] = random::between(from+1, sup);
     }
   }
 
   ///
   /// \param[in] sset the set of symbols used to build individuals.
-  /// \param[in] i index of a sticky symbol in the symbol_set.
+  /// \param[in] where an array used for category -> locus tracking.
   ///
-  gene::gene(const symbol_set &sset, unsigned i)
+  gene::gene(const symbol_ptr &s,
+             const std::vector<std::vector<unsigned>> &where)
+    : sym(s)
   {
-    sym = sset.get_sticky(i);
     if (sym->parametric())
       par = sym->init();
+    else
+    {
+      const unsigned arity(sym->arity());
+      for (unsigned i(0); i < arity; ++i)
+      {
+        const category_t c(std::static_pointer_cast<function>(sym)
+                           ->arg_category(i));
+        args[i] = random::element(where[c]);
+      }
+    }
   }
 
   ///

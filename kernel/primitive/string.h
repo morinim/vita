@@ -44,7 +44,8 @@ namespace vita
     class length : public function
     {
     public:
-      explicit length(category_t t) : function("LENGTH", t, 1) {}
+      explicit length(category_t t1, category_t t2)
+        : function("LENGTH", t1, {t2}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -58,7 +59,8 @@ namespace vita
     class ife : public function
     {
     public:
-      explicit ife(category_t t) : function("IFE", t, 4) {}
+      explicit ife(category_t t1, category_t t2)
+        : function("IFE", t1, {t2, t2, t1, t1}) {}
 
       boost::any eval(interpreter *i) const
       {

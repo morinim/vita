@@ -32,10 +32,9 @@
 
 namespace vita
 {
-# pragma GCC diagnostic ignored "-Wformat"
   ///
   /// \param[in] st success threashold: when fitness is greater than this value,
-  ///               the the datum is considered learned (matched, classified,
+  ///               the datum is considered learned (matched, classified,
   ///               resolved...)
   ///
   /// New empty instance.
@@ -155,7 +154,7 @@ namespace vita
 #if !defined(NDEBUG)
                 std::cout << "(";
                 for (unsigned j(0); j < i->size(); ++j)
-                  std::cout << (*i)[j] << (j+1==i->size() ? ')' : ',');
+                  std::cout << (*i)[j] << (j+1 == i->size() ? ')' : ',');
                 std::cout << std::endl;
 #endif
                 env.insert(symbol_factory::instance().make(

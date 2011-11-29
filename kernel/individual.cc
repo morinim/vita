@@ -52,13 +52,49 @@ namespace vita
       const unsigned stickies(e.sset.stickies());
       assert(stickies < size());
 
+      const unsigned categories(e.sset.categories());
+      assert(categories);
+      assert(categories < size());
+
       const unsigned sup(size() - stickies);
 
-      for (unsigned i(0); i < sup; ++i)
-        code_[i] = gene(e.sset, i+1, e.code_length);
+      // An alternative could be boost::multi_array:
+      //   typedef boost::multi_array<unsigned, 2> category_matrix;
+      //   category_matrix where(boost::extents[categories][size()]);
+      //   std::fill(where.data(), where.data() + where.num_elements(), 0);
+      std::vector<std::vector<unsigned>> where(categories);
 
+      // Placing sticky terminals.
       for (unsigned i(0); i < stickies; ++i)
-        code_[sup+i] = gene(e.sset, i);
+      {
+        const gene g(e.sset.get_sticky(i));
+        const unsigned locus(sup + i);
+        code_[locus] = g;
+        where[g.sym->category()].push_back(locus);
+      }
+
+      // Placing non-sticky terminals for satisfying closure property.
+      unsigned locus(sup);
+      for (unsigned c(0); c < categories; ++c)
+        if (where[c].empty())
+        {
+          --locus;
+
+          const gene g(e.sset.roulette_terminal(c));
+          code_[locus] = g;
+          where[g.sym->category()].push_back(locus);
+        }
+
+      // Filling the remaining genome with random symbols.
+      do
+      {
+        --locus;
+
+        const gene g(e.sset.roulette(), where);
+        code_[locus] = g;
+        where[g.sym->category()].push_back(locus);
+      } while (locus);
+
 
       assert(check());
     }
@@ -255,6 +291,19 @@ namespace vita
   }
 
   ///
+  /// \return a matrix for category -> locus tracking.
+  ///
+  std::vector<std::vector<unsigned>> individual::compile() const
+  {
+    std::vector<std::vector<unsigned>> where(env_->sset.categories());
+
+    for (unsigned i(0); i < size(); ++i)
+      where[code_[i].sym->category()].push_back(i);
+
+    return where;
+  }
+
+  ///
   /// \param[out] n_mutations number of mutations performed.
   /// \return a new, mutated, individual.
   ///
@@ -276,7 +325,11 @@ namespace vita
       {
         ++n;
 
-        ret.set(i, gene(env_->sset, i+1, size()));
+        const category_t c(code_[i].sym->category());
+        if (i+1 == cs)
+          ret.set(i, gene(env_->sset.roulette_terminal(c)));
+        else
+          ret.set(i, gene(env_->sset.roulette(c), i, cs));
       }
 
     assert(ret.check());
@@ -395,7 +448,8 @@ namespace vita
     assert(line < size() && !code_[line].sym->terminal());
 
     individual ret(*this);
-    ret.set(line, gene(env_->sset));
+    ret.set(line,
+            gene(env_->sset.roulette_terminal(code_[line].sym->category())));
 
     assert(ret.check());
     return ret;
@@ -700,26 +754,44 @@ namespace vita
   ///
   /// \return \c true if the individual passes the internal consistency check.
   ///
-  bool individual::check() const
+  bool individual::check(bool verbose) const
   {
     for (locus_t locus(0); locus < size(); ++locus)
     {
       if (!code_[locus].sym)
+      {
+        if (verbose)
+          std::cerr << "Empty symbol pointer at locus" << locus << "."
+                    << std::endl;
         return false;
+      }
 
       // Maximum number of function arguments is gene::k_args.
       if (code_[locus].sym->arity() > gene::k_args)
+      {
+        if (verbose)
+          std::cerr << "Function arity exceeds maximum size." << std::endl;
         return false;
+      }
 
       // Checking arguments' addresses.
       for (unsigned j(0); j < code_[locus].sym->arity(); ++j)
       {
         // Arguments' addresses must be smaller than the size of the genome.
         if (code_[locus].args[j] >= size())
+        {
+          if (verbose)
+            std::cerr << "Argument is out of range." << std::endl;
           return false;
+        }
         // Function address must be smaller than its arguments' addresses.
         if (code_[locus].args[j] <= locus)
+        {
+          if (verbose)
+            std::cerr << "Self reference in locus " << locus << "."
+                      << std::endl;
           return false;
+        }
       }
     }
 
@@ -729,7 +801,12 @@ namespace vita
     const unsigned stickies(env_->sset.stickies());
     for (unsigned i(size() - stickies); i < size(); ++i)
       if (!code_[i].sym->terminal())
+      {
+        if (verbose)
+          std::cerr << "Found not terminal sticky at locus " << i << "."
+                    << std::endl;
         return false;
+      }
 
     // All the sticky symbols must be present.
     for (unsigned i(0); i < stickies; ++i)

@@ -48,7 +48,10 @@ namespace vita
 
     void insert(const symbol_ptr &, bool);
 
-    const symbol_ptr &roulette(bool = false) const;
+    const symbol_ptr &roulette() const;
+    const symbol_ptr &roulette(category_t) const;
+    const symbol_ptr &roulette_terminal(category_t) const;
+
     const symbol_ptr &arg(unsigned) const;
 
     const symbol_ptr &get_adt(unsigned) const;

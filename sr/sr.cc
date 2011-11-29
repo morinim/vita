@@ -293,7 +293,7 @@ bool parse_command_line(int argc, char *argv[])
     if (!parsed)
     {
       if (verbose)
-        std::cout << "Symbol file format error." << std::endl;
+        std::cerr << "Symbol file format error." << std::endl;
       return false;
     }
     if (verbose)
@@ -302,7 +302,10 @@ bool parse_command_line(int argc, char *argv[])
 
   if (problem.categories() > 1)
   {
-    std::cout << std::endl << "Multi-categories aren't supported to date"\
+    if (!problem.env.sset.enough_terminals())
+      std::cerr << std::endl << "Too few terminals." << std::endl;
+
+    std::cerr << std::endl << "Multi-categories aren't supported to date"\
       " (please use just one numeric category)." << std::endl;
     return false;
   }
@@ -311,10 +314,26 @@ bool parse_command_line(int argc, char *argv[])
 }
 
 ///
+/// fix_parameters
+///
+void fix_parameters()
+{
+  if (problem.env.code_length <= problem.categories())
+  {
+    const unsigned new_length(2 * problem.categories());
+    std::cout << "[WARNING] Adjusting code length (" << problem.env.code_length
+              << " => " << new_length << std::endl;
+    problem.env.code_length = new_length;
+  }
+}
+
+///
 /// \return
 ///
 bool run()
 {
+  fix_parameters();
+
   vita::search s(&problem);
   s.run(verbose, runs);
 

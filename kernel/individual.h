@@ -81,7 +81,7 @@ namespace vita
 
     hash_t signature() const;
 
-    bool check() const;
+    bool check(bool = true) const;
 
     ///
     /// \param[in] i index of a \c gene.
@@ -122,6 +122,7 @@ namespace vita
     friend class interpreter;
 
   private:
+    std::vector<std::vector<unsigned>> compile() const;
     hash_t hash() const;
     void pack(unsigned, std::vector<boost::uint8_t> *const) const;
     void tree(std::ostream &, unsigned, unsigned, unsigned) const;
