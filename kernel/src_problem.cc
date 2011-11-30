@@ -107,6 +107,10 @@ namespace vita
 
     unsigned parsed(0);
 
+    std::vector<category_t> categories(dat_.categories());
+    for (unsigned i(0); i < dat_.categories(); ++i)
+      categories[i] = i;
+
     ptree pt;
     read_xml(sf, pt);
 
@@ -117,57 +121,108 @@ namespace vita
                 << dat_.get_category(i).domain << std::endl;
 #endif
 
-    BOOST_FOREACH(ptree::value_type sc,
-                  pt.get_child("symbolset.categories"))
-      if (sc.first == "category")
+    BOOST_FOREACH(ptree::value_type s, pt.get_child("symbolset"))
+      if (s.first == "symbol")
       {
-        const std::string xml_category(sc.second.get("<xmlattr>.name",
-                                                      "numeric"));
-        const category_t base_category(dat_.get_category(xml_category));
-        const domain_t domain(dat_.get_category(base_category).domain);
+        const std::string sym_name(s.second.get<std::string>("<xmlattr>.name"));
+        const std::string sym_sig(s.second.get<std::string>(
+                                    "<xmlattr>.signature", ""));
 
-        for (auto cat(sc.second.begin()); cat != sc.second.end(); ++cat)
-          if (cat->first == "symbol")
-          {
-            const std::string name(cat->second.data());
-            const unsigned args(symbol_factory::instance().args(name, domain));
+        if (sym_sig.empty())
+        {
+          BOOST_FOREACH(ptree::value_type sig, s.second)
+            if (sig.first == "signature")
+            {
+              std::vector<std::string> args;
+              BOOST_FOREACH(ptree::value_type arg, sig.second)
+                if (arg.first == "arg")
+                  args.push_back(arg.second.data());
 
+              const std::list<std::vector<category_t>> sequences(
+                seq_with_rep(categories, args.size()));
+
+              for (auto i(sequences.begin()); i != sequences.end(); ++i)
+                if (compatible(*i, args))
+                {
 #if !defined(NDEBUG)
-            std::cout << std::endl
-                      << "Symbol: " << name << std::endl
-                      << "XML category: " << xml_category
-                      << "   Base category: " << base_category
-                      << "   Domain: " << domain
-                      << "   Arg: " << args << std::endl;
+                  std::cout << sym_name << "(";
+                  for (unsigned j(0); j < i->size(); ++j)
+                    std::cout << dat_.get_category((*i)[j]).name
+                              << (j+1 == i->size() ? ")" : ", ");
+                  std::cout << std::endl;
 #endif
+                  const domain_t domain(dat_.get_category((*i)[0]).domain);
+                  env.insert(symbol_factory::instance().make(sym_name, domain,
+                                                             *i));
+                }
+            }
+        }
+        else  // !sym_sig.empty() => one category, uniform symbol initialization
+        {
+          for (unsigned category(0); category < categories.size(); ++category)
+            if (compatible({category}, {sym_sig}))
+            {
+              const domain_t domain(dat_.get_category(category).domain);
 
-            std::vector<category_t> categories(dat_.categories());
-            for (unsigned i(0); i < dat_.categories(); ++i)
-              categories[i] = i;
-
-            std::list<std::vector<category_t>> sequences(
-              seq_with_rep(categories, args));
-
-            for (auto i(sequences.begin()); i != sequences.end(); ++i)
-              if ((*i)[0] == base_category)
-              {
+              const unsigned n_args(symbol_factory::instance().args(sym_name,
+                                                                    domain));
 #if !defined(NDEBUG)
-                std::cout << "(";
-                for (unsigned j(0); j < i->size(); ++j)
-                  std::cout << (*i)[j] << (j+1 == i->size() ? ')' : ',');
-                std::cout << std::endl;
+              std::cout << sym_name << "(";
+              for (unsigned j(0); j < n_args; ++j)
+                std::cout << dat_.get_category(category).name
+                          << (j+1 == n_args ? ")" : ", ");
+              std::cout << std::endl;
 #endif
-                env.insert(symbol_factory::instance().make(
-                             name,
-                             domain,
-                             *i));
-              }
+              env.insert(symbol_factory::instance().make(
+                           sym_name, domain,
+                           std::vector<category_t>(n_args, category)));
+            }
+        }
 
-            ++parsed;
-          }
+        ++parsed;
       }
 
     return parsed;
+  }
+
+  ///
+  /// \param[in] instance a vector of categories.
+  /// \param[in] pattern a mixed vector of category names and domain names.
+  /// \return \c true if \a instance match \a pattern.
+  ///
+  /// For instance:
+  /// \verbatim
+  /// category_t km_h, name;
+  /// compatible({km_h}, {"km/h"}) == true
+  /// compatible({km_h}, {"numeric"}) == true
+  /// compatible({km_h}, {"string"}) == false
+  /// compatible({km_h}, {"name"}) == false
+  /// compatible({name}, {"string"}) == true
+  /// \endverbatim
+  ///
+  bool src_problem::compatible(const std::vector<category_t> &instance,
+                               const std::vector<std::string> &pattern) const
+  {
+    assert(instance.size() == pattern.size());
+
+    for (unsigned i(0); i < instance.size(); ++i)
+    {
+      bool generic(data::from_weka.find(pattern[i]) != data::from_weka.end());
+
+      if (generic)
+      {
+        if (dat_.get_category(instance[i]).domain !=
+            data::from_weka.find(pattern[i])->second)
+          return false;
+      }
+      else
+      {
+        if (instance[i] != dat_.get_category(pattern[i]))
+          return false;
+      }
+    }
+
+    return true;
   }
 
   ///

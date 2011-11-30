@@ -130,6 +130,8 @@ namespace vita
 
     bool check() const;
 
+    static const std::map<const std::string, domain_t> from_weka;
+
   private:
     static boost::any convert(const std::string &, domain_t);
     static unsigned encode(const std::string &,

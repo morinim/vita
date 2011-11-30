@@ -34,6 +34,27 @@
 
 namespace vita
 {
+  const std::map<const std::string, domain_t> data::from_weka =
+  {
+    // This type is vita-specific (not standard).
+    {"boolean", domain_t::d_bool},
+
+    {"integer", domain_t::d_int},
+
+    // Real and numeric are treated as double precisione number (d_double).
+    {"numeric", domain_t::d_double},
+    {"real", domain_t::d_double},
+
+    // Nominal values are defined by providing a list of possible values.
+    {"nominal", domain_t::d_string},
+
+    // String attributes allow us to create attributes containing arbitrary
+    // textual values. This is very useful in text-mining applications.
+    {"string", domain_t::d_string}
+
+    // {"date", ?}, {"relational", ?}
+  };
+
   ///
   /// \param[in] n number of distinct datasets. E.g.:
   ///              <ol>
@@ -388,27 +409,6 @@ namespace vita
   ///
   unsigned data::load_xrff(const std::string &filename)
   {
-    static std::map<const std::string, domain_t> from_weka =
-    {
-      // This type is vita-specific (not standard).
-      {"boolean", domain_t::d_bool},
-
-      {"integer", domain_t::d_int},
-
-      // Real and numeric are treated as double precisione number (d_double).
-      {"numeric", domain_t::d_double},
-      {"real", domain_t::d_double},
-
-      // Nominal values are deined by providing a list of possible values.
-      {"nominal", domain_t::d_string},
-
-      // String attributes allow us to create attributes containing arbitrary
-      // textual values. This is very useful in text-mining applications.
-      {"string", domain_t::d_string}
-
-      // {"date", ?}, {"relational", ?}
-    };
-
     using namespace boost::property_tree;
 
     ptree pt;
@@ -462,7 +462,7 @@ namespace vita
           {
             assert(a.category_id == categories_.size());
             categories_.push_back(category{category_name,
-                                           from_weka[xml_type],
+                                           from_weka.find(xml_type)->second,
                                            {}});
           }
 

@@ -60,7 +60,7 @@ namespace vita
     {
     public:
       explicit ife(category_t t1, category_t t2)
-        : function("IFE", t1, {t2, t2, t1, t1}) {}
+        : function("IFE", t2, {t1, t1, t2, t2}) {}
 
       boost::any eval(interpreter *i) const
       {
