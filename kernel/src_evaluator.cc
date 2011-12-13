@@ -180,7 +180,7 @@ namespace vita
   /// \param[in] t input data for \a ind.
   /// \param[in] n_slots number of slots used for Slotted Dynamic Class
   ///                    Boundary Determination.
-  /// \return in which slot the input data must be put.
+  /// \return the slot the input data fall into into.
   ///
   unsigned dyn_slot_evaluator::slot(const individual &ind,
                                     data::const_iterator t,
@@ -196,7 +196,6 @@ namespace vita
 
     if (res.empty())
       return n_slots - 1;
-
 
     const double val(boost::any_cast<double>(res));
     const unsigned where(static_cast<unsigned>(normalize_01(val) * n_slots));

@@ -79,6 +79,7 @@ namespace vita
     register_symbol1<integer::sub>   ("-",      d_int);
 
     register_symbol2<str::ife>("IFE", d_string);
+    //register_symbol2<str::length>("LENGTH", d_string);
   }
 
   ///

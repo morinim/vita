@@ -45,7 +45,7 @@ namespace vita
     {
     public:
       explicit length(category_t t1, category_t t2)
-        : function("LENGTH", t1, {t2}) {}
+        : function("LENGTH", t2, {t1}) {}
 
       boost::any eval(interpreter *i) const
       {

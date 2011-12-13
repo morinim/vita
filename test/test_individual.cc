@@ -54,8 +54,8 @@ struct F
     env.insert(factory.make("apple", vita::d_string, {1}));
     env.insert(factory.make("pear", vita::d_string, {1}));
     env.insert(factory.make("grapefruit", vita::d_string, {1}));
-    env.insert(factory.make("IFE", vita::d_string, {1, 0}));
-    env.insert(factory.make("LENGTH", vita::d_string, {0, 1}));
+    env.insert(factory.make("IFE", vita::d_string, {0, 1}));
+    env.insert(factory.make("LENGTH", vita::d_string, {1, 0}));
   }
 
   ~F()
@@ -67,7 +67,7 @@ struct F
 };
 
 BOOST_FIXTURE_TEST_SUITE(Individual, F)
-/*
+
 BOOST_AUTO_TEST_CASE(Compact)
 {
   env.code_length = 100;
@@ -77,6 +77,8 @@ BOOST_AUTO_TEST_CASE(Compact)
   {
     const vita::individual i1(env, true);
     const vita::individual i2(i1.compact());
+
+    std::cout << i1 << std::endl << i2 << std::endl;
 
     const boost::any v1( (vita::interpreter(i1))() );
     const boost::any v2( (vita::interpreter(i2))() );
@@ -110,7 +112,7 @@ BOOST_AUTO_TEST_CASE(Compact)
     BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
   }
 }
-
+/*
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
@@ -151,7 +153,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   {
     env.code_length = l;
     vita::individual i(env, true);
-    std::cout << i << std::endl;
+    // std::cout << i << std::endl;
 
     BOOST_REQUIRE(i.check());
     BOOST_REQUIRE_EQUAL(i.size(), l);

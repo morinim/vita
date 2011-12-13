@@ -47,7 +47,7 @@ namespace vita
 
   private:
     // This generator produces integers in the range [0, 2^32-1] with a good
-    // uniform distribution in up to 623 dimensions .
+    // uniform distribution in up to 623 dimensions.
     typedef boost::mt19937 base_gen;
 
     // We are using a *global* generator object here. This is important because

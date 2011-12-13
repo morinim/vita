@@ -115,10 +115,12 @@ namespace vita
     read_xml(sf, pt);
 
 #if !defined(NDEBUG)
-    std::cout << std::endl;
+    std::cout << std::endl << std::endl;
     for (unsigned i(0); i < dat_.categories(); ++i)
-      std::cout << i << " " << dat_.get_category(i).name << " "
-                << dat_.get_category(i).domain << std::endl;
+      std::cout << "Category " << i << ": " << dat_.get_category(i).name
+                << " (domain " << dat_.get_category(i).domain << ")"
+                << std::endl;
+    std::cout << std::endl;
 #endif
 
     BOOST_FOREACH(ptree::value_type s, pt.get_child("symbolset"))
@@ -138,9 +140,13 @@ namespace vita
                 if (arg.first == "arg")
                   args.push_back(arg.second.data());
 
+              // From the list of all the sequences with repetition of
+              // args.size() elements (categories)...
               const std::list<std::vector<category_t>> sequences(
                 seq_with_rep(categories, args.size()));
 
+              // ...we choose those compatible with the xml signature of the
+              // current symbol.
               for (auto i(sequences.begin()); i != sequences.end(); ++i)
                 if (compatible(*i, args))
                 {
@@ -209,7 +215,7 @@ namespace vita
     {
       bool generic(data::from_weka.find(pattern[i]) != data::from_weka.end());
 
-      if (generic)
+      if (generic)  // numeric, string, integer...
       {
         if (dat_.get_category(instance[i]).domain !=
             data::from_weka.find(pattern[i])->second)

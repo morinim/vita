@@ -84,7 +84,7 @@ void setup_default_symbols()
 bool parse_command_line(int argc, char *argv[])
 {
   unsigned random_seed;
-  std::string data_file, f_f, symbols_file;
+  std::string data_file, f_f, symbol_file;
 
   try
   {
@@ -99,7 +99,7 @@ bool parse_command_line(int argc, char *argv[])
     po::options_description data("Data");
     data.add_options()
       ("data,d", po::value(&data_file), "Data file.")
-      ("symbols,s", po::value(&symbols_file), "Symbols file.");
+      ("symbols,s", po::value(&symbol_file), "Symbol file.");
 
     po::options_description config("Config");
     config.add_options()
@@ -272,7 +272,7 @@ bool parse_command_line(int argc, char *argv[])
               << problem.classes() << " class(es)]" << std::endl;
 
   // ... and the symbol file (if available).
-  if (symbols_file.empty())
+  if (symbol_file.empty())
   {
     if (verbose)
       std::cout << "  [default symbol set]" << std::endl;
@@ -280,11 +280,11 @@ bool parse_command_line(int argc, char *argv[])
   }
   else
   {
-    if (verbose) std::cout << "Reading symbols' file (" << symbols_file
+    if (verbose) std::cout << "Reading symbol file (" << symbol_file
                            << ")... ";
     try
     {
-      parsed = problem.load_symbols(symbols_file);
+      parsed = problem.load_symbols(symbol_file);
     }
     catch(...)
     {

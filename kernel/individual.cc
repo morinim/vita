@@ -46,8 +46,7 @@ namespace vita
   {
     assert(e.check());
 
-    // **** Random generate initial code. ****
-    if (gen)
+    if (gen)  // random generate initial code
     {
       const unsigned stickies(e.sset.stickies());
       assert(stickies < size());
@@ -85,6 +84,8 @@ namespace vita
           where[g.sym->category()].push_back(locus);
         }
 
+      assert(locus);
+
       // Filling the remaining genome with random symbols.
       do
       {
@@ -94,7 +95,6 @@ namespace vita
         code_[locus] = g;
         where[g.sym->category()].push_back(locus);
       } while (locus);
-
 
       assert(check());
     }
@@ -143,7 +143,7 @@ namespace vita
     }
 
     if (last_symbol && new_line)
-      *last_symbol = new_line-1;
+      *last_symbol = new_line - 1;
 
     assert(dest.check());
     assert(new_line == 0 ||
@@ -616,8 +616,8 @@ namespace vita
 
     for (unsigned i(0); i < n_blocks; ++i)
     {
-      boost::uint64_t k1(blocks[i*2+0]);
-      boost::uint64_t k2(blocks[i*2+1]);
+      boost::uint64_t k1(blocks[i*2 + 0]);
+      boost::uint64_t k2(blocks[i*2 + 1]);
 
       k1 *= c1;
       k1  = ROTL64(k1, 31);

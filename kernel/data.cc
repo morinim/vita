@@ -199,7 +199,7 @@ namespace vita
   /// number of output classes).
   ///
   /// So Dataset (m categories) => \c vita::data (n categories) =>
-  /// \c vita::src_problem => \c vita::symbol_set (n categories).
+  /// \c vita::src_problem (n categories) => \c vita::symbol_set (n categories).
   ///
   unsigned data::categories() const
   {
@@ -404,7 +404,7 @@ namespace vita
   /// <attribute name="vehicle width" type="numeric" category="length" />
   /// <attribute name="vehicle weight" type="numeric" category="weight" />
   /// \endverbatim
-  /// This feature is used to constrain GP search (Strongly Typed Genetic
+  /// This feature is used to constrain the search (Strongly Typed Genetic
   /// Programming).
   ///
   unsigned data::load_xrff(const std::string &filename)
@@ -419,7 +419,7 @@ namespace vita
     // Iterate over dataset.header.attributes selection and store all found
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
-    // IT THROWS. Property tree iterators are models of BidirectionalIterator.
+    // IT THROWS.
     BOOST_FOREACH(ptree::value_type dha,
                   pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
@@ -448,12 +448,12 @@ namespace vita
         // problem: for category_id calculation, we completely ignore the type
         // recorded in the dataset file.
         // The reason is that genetic programming classification algorithms
-        // don't manimulate the labels of the output category (they only need
+        // don't manipulate the labels of the output category (they only need
         // the number of classes of the classification problem).
         // So category_id isn't meaningful for the output column of a
         // classification problem.
         if (a.output && classification)
-          a.category_id = 0;
+          a.category_id = encode("numeric", &categories_map_);
         else
         {
           a.category_id = encode(category_name, &categories_map_);
@@ -472,7 +472,7 @@ namespace vita
               BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
                 if (l.first == "label")
                 {
-                  // Store label1... labelN}
+                  // Store label1... labelN
                 }
             }
             catch(...)
