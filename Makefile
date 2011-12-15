@@ -32,7 +32,7 @@ ifeq ($(TYPE), debug)
 endif
 
 ifeq ($(TYPE), profile)
-  TYPE_PARAM = -Wall -pg $(WARN) $(DEFS) -DNDEBUG
+  TYPE_PARAM = -pg -DNDEBUG
 endif
 
 ifeq ($(TYPE), release)
