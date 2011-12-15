@@ -326,10 +326,10 @@ namespace vita
         ++n;
 
         const category_t c(code_[i].sym->category());
-        if (i+1 == cs)
+        if (i+1 >= cs)
           ret.set(i, gene(env_->sset.roulette_terminal(c)));
         else
-          ret.set(i, gene(env_->sset.roulette(c), i, cs));
+          ret.set(i, gene(env_->sset.roulette(c), i+1, size()));
       }
 
     assert(ret.check());

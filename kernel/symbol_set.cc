@@ -38,6 +38,7 @@ namespace vita
   {
     clear();
 
+    arguments_.clear();
     for (unsigned i(0); i < gene::k_args; ++i)
       arguments_.push_back(std::shared_ptr<argument>(new argument(i)));
 
@@ -111,7 +112,7 @@ namespace vita
   {
     assert(i && i->weight && i->check());
 
-    // Stickies aren't inserted in the symbols' vector.
+    // Stickies aren't inserted in the symbol vector.
     if (sticky)
     {
       assert(i->terminal());
@@ -208,6 +209,7 @@ namespace vita
          wedge += symbols[++i]->weight)
     {}
 
+    assert(i < symbols.size());
     return symbols[i];
   }
 
@@ -301,6 +303,26 @@ namespace vita
   }
 
   ///
+  /// \param[out] o output stream.
+  /// \param[in] ss symbol set to be printed.
+  /// \return output stream including \a ss.
+  ///
+  /// Useful for debugging purpouse.
+  ///
+  std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
+  {
+    for (auto i(ss.all_.symbols.begin()); i != ss.all_.symbols.end(); ++i)
+      o << (*i)->display() << " (category " << (*i)->category() << ", opcode "
+        << (*i)->opcode() << ", arity " << (*i)->arity()
+        << ", parametric " << (*i)->parametric() << ", weight " << (*i)->weight
+        << ")" << std::endl;
+
+    o << "Sum: " << ss.all_.sum << std::endl;
+
+    return o;
+  }
+
+  ///
   /// \return \c true if the object passes the internal consistency check.
   ///
   bool symbol_set::check() const
@@ -320,14 +342,14 @@ namespace vita
   ///
   bool symbol_set::collection::check() const
   {
-    boost::uint64_t sum(0);
+    boost::uint64_t check_sum(0);
 
     for (unsigned j(0); j < symbols.size(); ++j)
     {
       if (!symbols[j]->check())
         return false;
 
-      sum += symbols[j]->weight;
+      check_sum += symbols[j]->weight;
 
       if (symbols[j]->weight == 0)
         return false;
@@ -354,7 +376,7 @@ namespace vita
         return false;
     }
 
-    if (sum != sum)
+    if (check_sum != sum)
       return false;
 
     // There should be one terminal at least.
@@ -375,7 +397,11 @@ namespace vita
     {
       const category_t cat(c.symbols[i]->category());
       if (cat >= category.size())
+      {
         category.resize(cat + 1);
+        category[cat].symbols.clear();
+        category[cat].sum = 0;
+      }
 
       category[cat].symbols.push_back(c.symbols[i]);
       category[cat].sum += c.symbols[i]->weight;
@@ -394,14 +420,13 @@ namespace vita
     {
       const unsigned cat(c.stickies[i]->category());
       if (cat >= category.size())
+      {
         category.resize(cat + 1);
+        category[cat].stickies.clear();
+      }
 
       category[cat].stickies.push_back(c.stickies[i]);
     }
-
-    //for (unsigned i(0); i < category.size(); ++i)
-    //  if (category[i].symbols.size() || category[i].stickies.size())
-    //    ++n_categories;
 
     assert(check());
   }
@@ -414,9 +439,14 @@ namespace vita
     for (unsigned t(0); t < category.size(); ++t)
     {
       const unsigned s(category[t].symbols.size());
-      if (s < category[t].terminals.size() ||
-          s < category[t].adf.size() ||
-          s < category[t].adt.size())
+      if (s < category[t].terminals.size())
+        return false;
+      if (s < category[t].adf.size())
+        return false;
+      if (s < category[t].adt.size())
+        return false;
+
+      if (!category[t].check())
         return false;
     }
 

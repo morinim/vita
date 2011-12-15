@@ -72,6 +72,8 @@ namespace vita
   private:
     static const symbol_ptr empty_ptr;
 
+    friend std::ostream &operator<<(std::ostream &, const symbol_set &);
+
     void clear();
 
     // \a arguments_ is not included in the \a collection struct because
@@ -111,6 +113,8 @@ namespace vita
       std::vector<collection> category;
     } by_;
   };
+
+  std::ostream &operator<<(std::ostream &, const symbol_set &);
 }  // namespace vita
 
 #endif  // SYMBOL_SET_H

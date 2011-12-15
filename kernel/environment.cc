@@ -68,25 +68,25 @@ namespace vita
   {
     assert(stat_summary);
 
-    const std::string env(path+"environment.");
-    pt->put(env+"population_size", individuals);
-    pt->put(env+"max_program_length", code_length);
-    pt->put(env+"elitism", elitism);
-    pt->put(env+"mutation_rate", p_mutation);
-    pt->put(env+"crossover_rate", p_cross);
-    pt->put(env+"brood_recombination", brood_recombination);
-    pt->put(env+"parent_tournament_size", par_tournament);
-    pt->put(env+"replacement_tournament_size", rep_tournament);
-    pt->put(env+"mating_zone", mate_zone);
-    pt->put(env+"max_gens_since_start", g_since_start);
-    pt->put(env+"max_gens_wo_imp", g_without_improvement);
-    pt->put(env+"arl", arl);
-    pt->put(env+"force_input", force_input);
-    pt->put(env+"ttable_bits", ttable_size);  // size 1u << ttable_size.
-    pt->put(env+"statistics.directory", stat_dir);
-    pt->put(env+"statistics.save_arl", stat_arl);
-    pt->put(env+"statistics.save_dynamics", stat_dynamic);
-    pt->put(env+"statistics.save_summary", stat_summary);
+    const std::string env(path + "environment.");
+    pt->put(env + "population_size", individuals);
+    pt->put(env + "max_program_length", code_length);
+    pt->put(env + "elitism", elitism);
+    pt->put(env + "mutation_rate", p_mutation);
+    pt->put(env + "crossover_rate", p_cross);
+    pt->put(env + "brood_recombination", brood_recombination);
+    pt->put(env + "parent_tournament_size", par_tournament);
+    pt->put(env + "replacement_tournament_size", rep_tournament);
+    pt->put(env + "mating_zone", mate_zone);
+    pt->put(env + "max_gens_since_start", g_since_start);
+    pt->put(env + "max_gens_wo_imp", g_without_improvement);
+    pt->put(env + "arl", arl);
+    pt->put(env + "force_input", force_input);
+    pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
+    pt->put(env + "statistics.directory", stat_dir);
+    pt->put(env + "statistics.save_arl", stat_arl);
+    pt->put(env + "statistics.save_dynamics", stat_dynamic);
+    pt->put(env + "statistics.save_summary", stat_summary);
   }
 
   ///

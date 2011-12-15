@@ -104,7 +104,7 @@ namespace vita
   const T &random::element(const std::vector<T> &vect)
   {
     assert(vect.size());
-    return vect[between(0u, static_cast<unsigned>(vect.size()))];
+    return vect[between<unsigned>(0, vect.size())];
   }
 
   ///

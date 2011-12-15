@@ -103,12 +103,10 @@ namespace vita
   {
     using namespace boost::property_tree;
 
-    std::string symbols;
-
     unsigned parsed(0);
 
     std::vector<category_t> categories(dat_.categories());
-    for (unsigned i(0); i < dat_.categories(); ++i)
+    for (unsigned i(0); i < categories.size(); ++i)
       categories[i] = i;
 
     ptree pt;
@@ -122,6 +120,8 @@ namespace vita
                 << std::endl;
     std::cout << std::endl;
 #endif
+
+    symbol_factory &factory(symbol_factory::instance());
 
     BOOST_FOREACH(ptree::value_type s, pt.get_child("symbolset"))
       if (s.first == "symbol")
@@ -158,30 +158,29 @@ namespace vita
                   std::cout << std::endl;
 #endif
                   const domain_t domain(dat_.get_category((*i)[0]).domain);
-                  env.insert(symbol_factory::instance().make(sym_name, domain,
-                                                             *i));
+                  env.insert(factory.make(sym_name, domain, *i));
                 }
             }
         }
         else  // !sym_sig.empty() => one category, uniform symbol initialization
         {
-          for (unsigned category(0); category < categories.size(); ++category)
+          for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
             {
               const domain_t domain(dat_.get_category(category).domain);
 
-              const unsigned n_args(symbol_factory::instance().args(sym_name,
-                                                                    domain));
+              const unsigned n_args(factory.args(sym_name, domain));
+
 #if !defined(NDEBUG)
-              std::cout << sym_name << "(";
+              std::cout << "Domain " << domain << ": " << sym_name << "(";
               for (unsigned j(0); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
                           << (j+1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
-              env.insert(symbol_factory::instance().make(
-                           sym_name, domain,
-                           std::vector<category_t>(n_args, category)));
+              env.insert(factory.make(sym_name, domain,
+                                      std::vector<category_t>(n_args,
+                                                              category)));
             }
         }
 

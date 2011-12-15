@@ -56,7 +56,8 @@ namespace vita
   ///
   unsigned random::ring(unsigned base, unsigned width, unsigned n)
   {
-    assert(width && n > 1);
+    assert(width);
+    assert(n > 1);
 
     if (base >= n)
       return random::between<unsigned>(0, n);

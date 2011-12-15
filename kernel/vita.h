@@ -89,7 +89,6 @@ namespace vita
   /// and grouped in the \c primitive/ folder.
   enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 
-  /// A category is a restriction on the class of all domains.
   /// A category provide operations which supplement or supersede those of the
   /// domain but which are restricted to values lying in the (sub)domain by
   /// which is parametrized.

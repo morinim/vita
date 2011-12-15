@@ -50,7 +50,7 @@ namespace vita
     {
       const unsigned arity(sym->arity());
       for (unsigned i(0); i < arity; ++i)
-        args[i] = random::between(from+1, sup);
+        args[i] = random::between(from, sup);
     }
   }
 
