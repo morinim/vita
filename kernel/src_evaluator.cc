@@ -118,50 +118,18 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual used for classification.
-  /// \param[in] eva evaluator for \a ind.
+  /// \param[in] d training data.
+  /// \param[in] v vector of input variables.
+  /// \param[in] x_slots basic parameter for the Slotted Dynamic Class Boundary
+  ///                    Determination algorithm.
   ///
-  dyn_slot_classifier::dyn_slot_classifier(const individual &ind,
-                                           dyn_slot_evaluator *eva)
-    : classifier(ind), eva_(eva)
+  dyn_slot_evaluator::dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v,
+                                         unsigned x_slot)
+    : src_evaluator(d, v), x_slot_(x_slot)
   {
-    assert(ind.check());
-    assert(eva);
-
-    const unsigned n_slots(eva_->dat_->classes() * 10);
-    std::vector <std::vector<unsigned>> slot_matrix(n_slots);
-    std::vector<unsigned> slot_class(n_slots);
-    eva_->fill_slots(ind, &slot_matrix, &slot_class);
-
-    for (unsigned i(0); i < slot_class.size(); ++i)
-      slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
-  }
-
-  ///
-  /// \param[in] instance data to be classified.
-  /// \return the class that include the \a instance.
-  ///
-  std::string dyn_slot_classifier::operator()(
-    const data::value_type &instance) const
-  {
-    eva_->load_vars(instance);
-
-    const boost::any res( (interpreter(ind_))() );
-
-    const unsigned n_slots(slot_class_.size());
-    unsigned where(n_slots - 1);
-
-    if (!res.empty())
-    {
-      const double val(boost::any_cast<double>(res));
-
-      where = static_cast<unsigned>(dyn_slot_evaluator::normalize_01(val) *
-                                    n_slots);
-      if (where >= n_slots)
-        where = n_slots - 1;
-    }
-
-    return slot_class_[where];
+    assert(d);
+    assert(v);
+    assert(x_slot);
   }
 
   ///
@@ -171,36 +139,35 @@ namespace vita
   inline
   double dyn_slot_evaluator::normalize_01(double val)
   {
-    return 0.5 + std::atan(val)/3.1415926535;
+    return 0.5 + std::atan(val) / 3.1415926535;
     // return 1.0 / (1 + std::exp(-val));
   }
 
   ///
   /// \param[in] ind individual used for classification.
   /// \param[in] t input data for \a ind.
-  /// \param[in] n_slots number of slots used for Slotted Dynamic Class
-  ///                    Boundary Determination.
-  /// \return the slot the input data fall into into.
+  /// \return the slot the input instance falls into.
   ///
   unsigned dyn_slot_evaluator::slot(const individual &ind,
-                                    data::const_iterator t,
-                                    unsigned n_slots)
+                                    data::const_iterator t)
   {
     assert(ind.check());
-    assert(n_slots);
 
     load_vars(*t);
 
     interpreter agent(ind);
     const boost::any res(agent());
 
+    const unsigned n_slots(dat_->classes() * x_slot_);
+    const unsigned last_slot(n_slots - 1);
+
     if (res.empty())
-      return n_slots - 1;
+      return last_slot;
 
     const double val(boost::any_cast<double>(res));
     const unsigned where(static_cast<unsigned>(normalize_01(val) * n_slots));
 
-    return (where >= n_slots) ? n_slots - 1 : where;
+    return (where >= n_slots) ? last_slot : where;
   }
 
   ///
@@ -209,23 +176,24 @@ namespace vita
   /// \param[out] slot_class slot_class[i] = "label of the predominant class"
   ///                        for the i-th slot.
   ///
-  void dyn_slot_evaluator::fill_slots(
-    const individual &ind,
-    std::vector <std::vector<unsigned>> *slot_matrix,
-    std::vector<unsigned> *slot_class
-    )
+  void dyn_slot_evaluator::fill_slots(const individual &ind,
+                                      std::vector<uvect> *slot_matrix,
+                                      uvect *slot_class)
   {
     assert(ind.check());
     assert(slot_matrix);
     assert(slot_class);
 
-    const unsigned n_slots(slot_matrix->size());
+    std::vector<uvect> &sm(*slot_matrix);  // just for convenience
+    const unsigned n_slots(dat_->classes() * x_slot_);
+    assert(sm.size() == n_slots);
+
     for (unsigned i(0); i < n_slots; ++i)
     {
-      (*slot_matrix)[i].resize(dat_->classes());
+      assert(sm[i].size() == dat_->classes());
 
-      for (unsigned j(0); j < (*slot_matrix)[i].size(); ++j)
-        (*slot_matrix)[i][j] = 0;
+      for (unsigned j(0); j < sm[i].size(); ++j)
+        sm[i][j] = 0;
     }
 
     assert(ind.check());
@@ -237,9 +205,9 @@ namespace vita
     // a bidimentional array is built (slots[slot][class]).
     for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
-      const unsigned where(slot(ind, t, n_slots));
+      const unsigned where(slot(ind, t));
 
-      ++((*slot_matrix)[where][t->label()]);
+      ++sm[where][t->label()];
     }
 
     const unsigned unknown(dat_->classes());
@@ -251,11 +219,11 @@ namespace vita
     {
       unsigned best_class(0);
 
-      for (unsigned j(1); j < (*slot_matrix)[i].size(); ++j)
-        if ((*slot_matrix)[i][j] >= (*slot_matrix)[i][best_class])
+      for (unsigned j(1); j < sm[i].size(); ++j)
+        if (sm[i][j] >= sm[i][best_class])
           best_class = j;
 
-      (*slot_class)[i] = (*slot_matrix)[i][best_class] ? best_class : unknown;
+      (*slot_class)[i] = sm[i][best_class] ? best_class : unknown;
     }
   }
 
@@ -270,10 +238,9 @@ namespace vita
     assert(ind.check());
     assert(dat_->classes() >= 2);
 
-    const unsigned n_slots(dat_->classes()*10);
-
-    std::vector<std::vector<unsigned>> slot_matrix(n_slots);
-    std::vector<unsigned> slot_class(n_slots);
+    const unsigned n_slots(dat_->classes() * x_slot_);
+    std::vector<uvect> slot_matrix(n_slots, uvect(dat_->classes()));
+    uvect slot_class(n_slots);
     fill_slots(ind, &slot_matrix, &slot_class);
 
     fitness_t err(0.0);
@@ -299,6 +266,56 @@ namespace vita
     const unsigned ok(count + operator()(ind));
 
     return count ? double(ok) / double(count) : -1.0;
+  }
+
+  ///
+  /// \param[in] ind individual used for classification.
+  /// \param[in] eva evaluator for \a ind.
+  ///
+  dyn_slot_classifier::dyn_slot_classifier(const individual &ind,
+                                           dyn_slot_evaluator *eva)
+    : classifier(ind), eva_(eva)
+  {
+    assert(ind.check());
+    assert(eva);
+
+    const unsigned n_slots(eva_->dat_->classes() * eva_->x_slot_);
+    typedef std::vector<unsigned> uvect;
+
+    std::vector<uvect> slot_matrix(n_slots, uvect(eva_->dat_->classes()));
+    uvect slot_class(n_slots);
+    eva_->fill_slots(ind, &slot_matrix, &slot_class);
+
+    for (unsigned i(0); i < slot_class.size(); ++i)
+      slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
+  }
+
+  ///
+  /// \param[in] instance data to be classified.
+  /// \return the class that include the \a instance.
+  ///
+  std::string dyn_slot_classifier::operator()(
+    const data::value_type &instance) const
+  {
+    eva_->load_vars(instance);
+
+    const boost::any res( (interpreter(ind_))() );
+
+    const unsigned n_slots(slot_class_.size());
+    assert(n_slots == eva->dat_->classes() * eva_->x_slot_);
+    unsigned where(n_slots - 1);
+
+    if (!res.empty())
+    {
+      const double val(boost::any_cast<double>(res));
+
+      where = static_cast<unsigned>(dyn_slot_evaluator::normalize_01(val) *
+                                    n_slots);
+      if (where >= n_slots)
+        where = n_slots - 1;
+    }
+
+    return slot_class_[where];
   }
 
   ///

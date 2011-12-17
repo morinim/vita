@@ -70,12 +70,7 @@ namespace vita
   class dyn_slot_evaluator : public src_evaluator
   {
   public:
-    dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v)
-      : src_evaluator(d, v)
-    {
-      assert(d);
-      assert(v);
-    }
+    dyn_slot_evaluator(data *, std::vector<variable_ptr> *, unsigned = 10);
 
     fitness_t operator()(const individual &);
     double accuracy(const individual &);
@@ -85,11 +80,13 @@ namespace vita
   private:
     static double normalize_01(double);
 
-    unsigned slot(const individual &, data::const_iterator, unsigned);
+    unsigned slot(const individual &, data::const_iterator);
 
-    void fill_slots(const individual &,
-                    std::vector <std::vector<unsigned>> *,
-                    std::vector<unsigned> *);
+    typedef std::vector<unsigned> uvect;
+    void fill_slots(const individual &, std::vector<uvect> *, uvect *);
+
+    // How many slots for each class of the problem?
+    unsigned x_slot_;
   };
 
   class dyn_slot_classifier : public classifier

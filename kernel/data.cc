@@ -453,7 +453,7 @@ namespace vita
         // So category_id isn't meaningful for the output column of a
         // classification problem.
         if (a.output && classification)
-          a.category_id = encode("numeric", &categories_map_);
+          a.category_id = 0; //encode("numeric", &categories_map_);
         else
         {
           a.category_id = encode(category_name, &categories_map_);
