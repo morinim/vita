@@ -45,16 +45,6 @@ namespace vita
   ///
   boost::any interpreter::operator()(unsigned ip)
   {
-    for (unsigned i(0); i < cache_.size(); ++i)
-    {
-      cache_[i].empty = true;
-#if !defined(NDEBUG)
-      // There are assertions to check that cache_[i].value.empty() is true
-      // when cache_[i] is empty (cache_[i].empty == true).
-      cache_[i].value = boost::any();
-#endif
-    }
-
     ip_ = ip;
     return ind_.code_[ip_].sym->eval(this);
   }
@@ -89,7 +79,10 @@ namespace vita
   /// \a interpreter execution.
   /// This means that side effects are not evaluated to date: WE ASSUME
   /// REFERENTIAL TRANSPARENCY for all the expressions.
+  /// \li
   /// [http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)]
+  /// \li
+  /// [http://en.wikipedia.org/wiki/Memoization]
   ///
   boost::any interpreter::eval(unsigned i)
   {
@@ -99,18 +92,15 @@ namespace vita
 
     const locus_t locus(g.args[i]);
 
-    if (cache_[locus].empty)
+    if (!cache_[locus])
     {
-      assert(cache_[locus].value.empty());
-
       const unsigned backup(ip_);
       ip_ = locus;
       assert(ip_ > backup);
       const boost::any ret(ind_.code_[ip_].sym->eval(this));
       ip_ = backup;
 
-      cache_[locus].empty = false;
-      cache_[locus].value = ret;
+      cache_[locus] = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
@@ -120,17 +110,12 @@ namespace vita
       assert(ip_ > backup);
       const boost::any ret(ind_.code_[ip_].sym->eval(this));
       ip_ = backup;
-      if (ret.type() == typeid(int))
-        assert(boost::any_cast<int>(ret) ==
-               boost::any_cast<int>(cache_[locus].value));
-      else if (ret.type() == typeid(double))
-        assert(boost::any_cast<double>(ret) ==
-               boost::any_cast<double>(cache_[locus].value));
+      assert(to_double(ret) == to_double(*cache_[locus]));
     }
 #endif
 
-    assert(!cache_[locus].empty);
-    return cache_[locus].value;
+    assert(cache_[locus]);
+    return *cache_[locus];
 
     // return ind_.code_[g.args[i]].sym->eval(interpreter(ind_,context_,
     //                                                    g.args[i]));
@@ -159,5 +144,24 @@ namespace vita
     return
       ip_ < ind_.code_.size() &&
       (!context_ || context_->check());
+  }
+
+  ///
+  /// \param[in] a value that should be converted to \c double.
+  /// \return the result of the conversion of \a a in a \c double.
+  ///
+  /// This function is useful for:
+  /// \li debugging purpose (otherwise comparison of boost::any values is
+  ///     complex);
+  /// \li symbolic regression and classification task (the value returned by
+  ///     the interpeter will be used in a "numeric way").
+  ///
+  double interpreter::to_double(const boost::any &a)
+  {
+    return
+      a.type() == typeid(double) ? boost::any_cast<double>(a) :
+      a.type() == typeid(int) ? static_cast<double>(boost::any_cast<int>(a)) :
+      a.type() == typeid(bool) ? static_cast<double>(boost::any_cast<bool>(a)) :
+      0;
   }
 }  // Namespace vita

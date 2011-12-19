@@ -25,6 +25,7 @@
 #define      INTERPRETER_H
 
 #include <boost/any.hpp>
+#include <boost/optional.hpp>
 
 #include <vector>
 
@@ -48,6 +49,8 @@ namespace vita
 
     bool check() const;
 
+    static double to_double(const boost::any &);
+
   private:
     // Instruction pointer.
     unsigned ip_;
@@ -56,13 +59,7 @@ namespace vita
 
     const individual &ind_;
 
-    struct cache_elem
-    {
-      bool       empty;
-      boost::any value;
-    };
-
-    mutable std::vector<cache_elem> cache_;
+    mutable std::vector<boost::optional<boost::any>> cache_;
   };
 
   ///
