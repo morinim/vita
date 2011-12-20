@@ -27,6 +27,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 
 #include <map>
 
@@ -91,7 +92,7 @@ namespace vita
   /// factory object to create an object of the desired abstract type and to
   /// return an abstract pointer to the object.
   ///
-  class symbol_factory
+  class symbol_factory : boost::noncopyable
   {
   private:
     symbol_factory();

@@ -33,7 +33,10 @@ namespace vita
   ///
   symbol_factory &symbol_factory::instance()
   {
+    // The so called "static stack variable Singleton" implementation.
     static symbol_factory singleton;
+    // Returning a reference removes the temptation to try and delete the
+    // returned instance.
     return singleton;
   }
 
@@ -79,7 +82,7 @@ namespace vita
     register_symbol1<integer::sub>   ("-",      d_int);
 
     register_symbol2<str::ife>("IFE", d_string);
-    //register_symbol2<str::length>("LENGTH", d_string);
+    register_symbol2<str::length>("LENGTH", d_string);
   }
 
   ///
