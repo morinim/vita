@@ -21,6 +21,8 @@
  *
  */
 
+#include <boost/none.hpp>
+
 #include "kernel/interpreter.h"
 #include "kernel/adf.h"
 #include "kernel/individual.h"
@@ -45,6 +47,9 @@ namespace vita
   ///
   boost::any interpreter::operator()(unsigned ip)
   {
+    for (unsigned i(0); i < cache_.size(); ++i)
+      cache_[i] = boost::none;
+
     ip_ = ip;
     return ind_.code_[ip_].sym->eval(this);
   }
@@ -162,6 +167,6 @@ namespace vita
       a.type() == typeid(double) ? boost::any_cast<double>(a) :
       a.type() == typeid(int) ? static_cast<double>(boost::any_cast<int>(a)) :
       a.type() == typeid(bool) ? static_cast<double>(boost::any_cast<bool>(a)) :
-      0;
+      0.0;
   }
 }  // Namespace vita
