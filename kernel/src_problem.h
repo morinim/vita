@@ -40,6 +40,7 @@ namespace vita
 
     unsigned load_data(const std::string &);
     unsigned load_symbols(const std::string &);
+    void setup_default_symbols();
 
     void clear();
 

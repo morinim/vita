@@ -73,25 +73,53 @@ namespace vita
     if (parsed > 0)
     {
       // Sets up the variables.
-      for (unsigned i(0); i < dat_.columns(); ++i)
-        if (!dat_.get_column(i).output)
-        {
-          std::string name(dat_.get_column(i).name);
-          if (name.empty())
-            name = "X" + boost::lexical_cast<std::string>(i);
+      for (unsigned i(1); i < dat_.columns(); ++i)
+      {
+        std::string name(dat_.get_column(i).name);
+        if (name.empty())
+          name = "X" + boost::lexical_cast<std::string>(i);
 
-          const category_t category(dat_.get_column(i).category_id);
-          variable_ptr x(new variable(name, category));
-          vars_.push_back(x);
-          env.insert(x);
-        }
+        const category_t category(dat_.get_column(i).category_id);
+        variable_ptr x(new variable(name, category));
+        vars_.push_back(x);
+        env.insert(x);
+      }
 
       set_evaluator(classes() > 1
-        ? 1     // Symbolic regression problem
-        : 0);   // Classification problem
+        ? 1     // symbolic regression problem
+        : 0);   // classification problem
     }
 
     return parsed;
+  }
+
+  ///
+  /// Default symbol set.
+  ///
+  void src_problem::setup_default_symbols()
+  {
+    symbol_factory &factory(symbol_factory::instance());
+
+    for (category_t category(0); category < dat_.categories(); ++category)
+      if (compatible({category}, {"numeric"}))
+      {
+        env.insert(factory.make("1", vita::d_double, {category}));
+        env.insert(factory.make("2", vita::d_double, {category}));
+        env.insert(factory.make("3", vita::d_double, {category}));
+        env.insert(factory.make("4", vita::d_double, {category}));
+        env.insert(factory.make("5", vita::d_double, {category}));
+        env.insert(factory.make("6", vita::d_double, {category}));
+        env.insert(factory.make("7", vita::d_double, {category}));
+        env.insert(factory.make("8", vita::d_double, {category}));
+        env.insert(factory.make("9", vita::d_double, {category}));
+        env.insert(factory.make("ABS", vita::d_double, {category}));
+        env.insert(factory.make("ADD", vita::d_double, {category}));
+        env.insert(factory.make("DIV", vita::d_double, {category}));
+        env.insert(factory.make("LN",  vita::d_double, {category}));
+        env.insert(factory.make("MUL", vita::d_double, {category}));
+        env.insert(factory.make("MOD", vita::d_double, {category}));
+        env.insert(factory.make("SUB", vita::d_double, {category}));
+      }
   }
 
 # pragma GCC diagnostic ignored "-Wtype-limits"

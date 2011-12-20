@@ -72,8 +72,8 @@ namespace vita
       if (res.empty())
         err += std::pow(100.0, ++illegals);
       else
-        err += std::fabs(boost::any_cast<double>(res) -
-                         boost::any_cast<double>(t->output));
+        err += std::fabs(interpreter::to_double(res) -
+                         interpreter::to_double(t->output));
     }
 
     return fitness_t(-err);
@@ -110,8 +110,8 @@ namespace vita
         if (res.empty())
           err += std::pow(100.0, ++illegals);
         else
-          err += std::fabs(boost::any_cast<double>(res) -
-                           boost::any_cast<double>(t->output));
+          err += std::fabs(interpreter::to_double(res) -
+                           interpreter::to_double(t->output));
       }
 
     return fitness_t(-err);
@@ -164,7 +164,7 @@ namespace vita
     if (res.empty())
       return last_slot;
 
-    const double val(boost::any_cast<double>(res));
+    const double val(interpreter::to_double(res));
     const unsigned where(static_cast<unsigned>(normalize_01(val) * n_slots));
 
     return (where >= n_slots) ? last_slot : where;
@@ -302,12 +302,12 @@ namespace vita
     const boost::any res( (interpreter(ind_))() );
 
     const unsigned n_slots(slot_class_.size());
-    assert(n_slots == eva->dat_->classes() * eva_->x_slot_);
+    assert(n_slots == eva_->dat_->classes() * eva_->x_slot_);
     unsigned where(n_slots - 1);
 
     if (!res.empty())
     {
-      const double val(boost::any_cast<double>(res));
+      const double val(interpreter::to_double(res));
 
       where = static_cast<unsigned>(dyn_slot_evaluator::normalize_01(val) *
                                     n_slots);
@@ -344,7 +344,7 @@ namespace vita
       const boost::any res(agent());
 
       const double cut(1000);
-      double val(res.empty() ? 0.0 : boost::any_cast<double>(res));
+      double val(res.empty() ? 0.0 : interpreter::to_double(res));
       if (val > cut)
         val = cut;
       else if (val < -cut)
@@ -366,7 +366,7 @@ namespace vita
   fitness_t gaussian_evaluator::operator()(const individual &ind)
   {
     assert(dat_->classes() >= 2);
-    std::vector< distribution<double> > gauss(dat_->classes());
+    std::vector<distribution<double>> gauss(dat_->classes());
     gaussian_distribution(ind, &gauss);
 
     fitness_t d(0.0);
@@ -420,7 +420,7 @@ namespace vita
     load_vars(instance);
 
     const boost::any res( (interpreter(ind))() );
-    const double x(res.empty() ? 0.0 : boost::any_cast<double>(res));
+    const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     assert(dat_->classes() == gauss.size());
 

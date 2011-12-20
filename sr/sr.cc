@@ -53,29 +53,6 @@ unsigned runs(1);
 
 vita::src_problem problem(-5.0);
 
-void setup_default_symbols()
-{
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
-
-  problem.env.insert(factory.make("1", vita::d_double, {}));
-  problem.env.insert(factory.make("2", vita::d_double, {}));
-  problem.env.insert(factory.make("3", vita::d_double, {}));
-  problem.env.insert(factory.make("4", vita::d_double, {}));
-  problem.env.insert(factory.make("5", vita::d_double, {}));
-  problem.env.insert(factory.make("6", vita::d_double, {}));
-  problem.env.insert(factory.make("7", vita::d_double, {}));
-  problem.env.insert(factory.make("8", vita::d_double, {}));
-  problem.env.insert(factory.make("9", vita::d_double, {}));
-
-  problem.env.insert(factory.make("ABS", vita::d_double, {}));
-  problem.env.insert(factory.make("ADD", vita::d_double, {}));
-  problem.env.insert(factory.make("DIV", vita::d_double, {}));
-  problem.env.insert(factory.make("LN",  vita::d_double, {}));
-  problem.env.insert(factory.make("MUL", vita::d_double, {}));
-  problem.env.insert(factory.make("MOD", vita::d_double, {}));
-  problem.env.insert(factory.make("SUB", vita::d_double, {}));
-}
-
 ///
 /// \param[in] argc
 /// \param[in] argv
@@ -276,7 +253,7 @@ bool parse_command_line(int argc, char *argv[])
   {
     if (verbose)
       std::cout << "  [default symbol set]" << std::endl;
-    setup_default_symbols();
+    problem.setup_default_symbols();
   }
   else
   {
@@ -300,7 +277,8 @@ bool parse_command_line(int argc, char *argv[])
       std::cout << "ok (" << parsed << " symbols)" << std::endl;
   }
 
-  if (problem.categories() > 1)
+  if ((problem.classes() >  1 && problem.categories() > 2) ||
+      (problem.classes() <= 1 && problem.categories() > 1))
   {
     if (!problem.env.sset.enough_terminals())
       std::cerr << std::endl << "Too few terminals." << std::endl;

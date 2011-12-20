@@ -69,7 +69,6 @@ namespace vita
     {
       std::string       name;
       category_t category_id;
-      bool            output;
     };
 
     ///

@@ -414,6 +414,7 @@ namespace vita
     ptree pt;
     read_xml(filename, pt);
 
+    unsigned n_output(0);
     bool classification(false);
 
     // Iterate over dataset.header.attributes selection and store all found
@@ -424,6 +425,8 @@ namespace vita
                   pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
       {
+        bool output(false);
+
         column a;
 
         // Structure ptree does not have a concept of an attribute, so xml
@@ -434,76 +437,56 @@ namespace vita
 
         // Via the class="yes" attribute in the attribute specification in the
         // header, one can define which attribute should act as output value.
-        a.output = dha.second.get("<xmlattr>.class", "no") == "yes";
+        output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
         const std::string xml_type(dha.second.get("<xmlattr>.type", ""));
 
-        if (a.output)
+        if (output)
+        {
           classification = (xml_type == "nominal" || xml_type == "string");
+          ++n_output;
+
+          // We can manage only one output column.
+          if (n_output > 1)
+            return 0;
+        }
 
         const std::string category_name(dha.second.get("<xmlattr>.category",
                                                        xml_type));
 
-        // Note the special treatment of the output column of a classification
-        // problem: for category_id calculation, we completely ignore the type
-        // recorded in the dataset file.
-        // The reason is that genetic programming classification algorithms
-        // don't manipulate the labels of the output category (they only need
-        // the number of classes of the classification problem).
-        // So category_id isn't meaningful for the output column of a
-        // classification problem.
-        if (a.output && classification)
-          a.category_id = 0; //encode("numeric", &categories_map_);
-        else
+        a.category_id = encode(category_name, &categories_map_);
+
+        if (a.category_id >= categories_.size())
         {
-          a.category_id = encode(category_name, &categories_map_);
-
-          if (a.category_id >= categories_.size())
-          {
-            assert(a.category_id == categories_.size());
-            categories_.push_back(category{category_name,
-                                           from_weka.find(xml_type)->second,
-                                           {}});
-          }
-
-          if (xml_type == "nominal")
-            try
-            {
-              BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
-                if (l.first == "label")
-                {
-                  // Store label1... labelN
-                }
-            }
-            catch(...)
-            {
-            }
+          assert(a.category_id == categories_.size());
+          categories_.push_back(category{category_name,
+                                         from_weka.find(xml_type)->second,
+                                         {}});
         }
 
-        header_.push_back(a);
+        if (xml_type == "nominal")
+          try
+          {
+            BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
+              if (l.first == "label")
+              {
+                // Store label1... labelN
+              }
+          }
+          catch(...)
+          {
+          }
+
+        // Output column is always the first one.
+        if (output)
+          header_.insert(header_.begin(), a);
+        else
+          header_.push_back(a);
       }
 
     // XRFF needs informations about the columns.
     if (!header_.size())
       return 0;
-
-    // Picks some data about output(s).
-    unsigned output_column, n_output(0);
-    for (unsigned i(0); i < header_.size(); ++i)
-      if (header_[i].output)
-      {
-        output_column = i;
-        ++n_output;
-      }
-
-    // We can manage only one output column.
-    if (n_output > 1)
-      return 0;
-
-    // If there isn't an explicitly defined output column, we assume it is the
-    // last one.
-    if (!n_output)
-      header_[header_.size()-1].output = true;
 
     unsigned parsed(0);
     BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
@@ -519,8 +502,10 @@ namespace vita
               const domain_t domain(
                 categories_[header_[index].category_id].domain);
 
-              if (header_[index].output)
+              if (index == 0)  // output value
               {
+                // Strings could be used as label for classes, but integers
+                // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
                   instance.output = encode(v->second.data(), &classes_map_);
                 else
@@ -615,22 +600,16 @@ namespace vita
             column a;
 
             a.name = "";
-            a.output = (field == 0);
 
             const std::string s_domain(is_number(record[field]) ?
                                        "numeric" : "string");
             const domain_t domain(s_domain == "numeric" ? d_double : d_string);
 
-            if (a.output && classification)
-              a.category_id = 0;
-            else
+            a.category_id = encode(s_domain, &categories_map_);
+            if (a.category_id >= categories_.size())
             {
-              a.category_id = encode(s_domain, &categories_map_);
-              if (a.category_id >= categories_.size())
-              {
-                assert(a.category_id == categories_.size());
-                categories_.push_back(category{s_domain, domain, {}});
-              }
+              assert(a.category_id == categories_.size());
+              categories_.push_back(category{s_domain, domain, {}});
             }
 
             header_.push_back(a);
