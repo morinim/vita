@@ -75,7 +75,7 @@ namespace vita
       // Placing non-sticky terminals for satisfying closure property.
       unsigned locus(sup);
       for (unsigned c(0); c < categories; ++c)
-        if (where[c].empty())
+        if (where[c].empty() && e.sset.terminals(c))
         {
           --locus;
 
@@ -762,7 +762,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << "Empty symbol pointer at locus" << locus << "."
-                    << std::endl;
+                    << std::endl << std::flush;
         return false;
       }
 
@@ -770,7 +770,8 @@ namespace vita
       if (code_[locus].sym->arity() > gene::k_args)
       {
         if (verbose)
-          std::cerr << "Function arity exceeds maximum size." << std::endl;
+          std::cerr << "Function arity exceeds maximum size." << std::endl
+                    << std::flush;
         return false;
       }
 
@@ -781,7 +782,8 @@ namespace vita
         if (code_[locus].args[j] >= size())
         {
           if (verbose)
-            std::cerr << "Argument is out of range." << std::endl;
+            std::cerr << "Argument is out of range." << std::endl
+                      << std::flush;
           return false;
         }
         // Function address must be smaller than its arguments' addresses.
@@ -789,7 +791,7 @@ namespace vita
         {
           if (verbose)
             std::cerr << "Self reference in locus " << locus << "."
-                      << std::endl;
+                      << std::endl << std::flush;
           return false;
         }
       }
@@ -803,8 +805,8 @@ namespace vita
       if (!code_[i].sym->terminal())
       {
         if (verbose)
-          std::cerr << "Found not terminal sticky at locus " << i << "."
-                    << std::endl;
+          std::cerr << "Found not sticky terminal at locus " << i << "."
+                    << std::endl << std::flush;
         return false;
       }
 
@@ -816,23 +818,36 @@ namespace vita
         found = (code_[j].sym == env_->sset.get_sticky(i));
 
       if (!found)
+      {
+        if (verbose)
+          std::cerr << "Missing sticky value in genome." << std::endl
+                    << std::flush;
         return false;
+      }
     }
 
     // Type checking.
     for (unsigned i(0); i < size(); ++i)
-    {
-      const function *const func(static_cast<function *>(code_[i].sym.get()));
-
       for (unsigned j(0); j < code_[i].sym->arity(); ++j)
       {
         const gene &current_arg(code_[code_[i].args[j]]);
 
         if (!dynamic_cast<argument *>(current_arg.sym.get()))
+        {
+          const function *func(static_cast<function *>(code_[i].sym.get()));
+
           if (func->arg_category(j) != current_arg.sym->category())
+          {
+            if (verbose)
+              std::cerr << "Wrong category: [" << i << "] " << func->display()
+                        << " argument " << j << " needs category "
+                        << func->arg_category(j) << " takes category "
+                        << current_arg.sym->category() << std::endl
+                        << std::flush;
             return false;
+          }
+        }
       }
-    }
 
     return
       best_ < size() &&
@@ -1053,7 +1068,7 @@ namespace vita
       if (!random::boolean())
         offspring.set(i, p2[i]);
 
-    assert(offspring.check());
+    assert(offspring.check(true));
     return offspring;
   }
 

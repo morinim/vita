@@ -66,6 +66,8 @@ namespace vita
     const symbol_ptr &decode(const std::string &) const;
 
     unsigned categories() const;
+    unsigned terminals(category_t) const;
+
     bool enough_terminals() const;
     bool check() const;
 
@@ -83,6 +85,8 @@ namespace vita
 
     struct collection
     {
+      collection();
+
       std::vector<symbol_ptr>   symbols;
       std::vector<symbol_ptr> terminals;
       std::vector<symbol_ptr>       adf;

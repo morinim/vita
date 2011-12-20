@@ -277,6 +277,16 @@ namespace vita
   }
 
   ///
+  /// \param[in] c a category.
+  /// \return number of terminals in category \a c.
+  ///
+  unsigned symbol_set::terminals(category_t c) const
+  {
+    assert(c < by_.category.size());
+    return by_.category[c].terminals.size();
+  }
+
+  ///
   /// \return \c true if there are enough terminals for secure individual
   ///         generation.
   ///
@@ -338,6 +348,21 @@ namespace vita
   }
 
   ///
+  /// New empty collection.
+  ///
+  symbol_set::collection::collection()
+  {
+    symbols.clear();
+    terminals.clear();
+    adf.clear();
+    adt.clear();
+
+    stickies.clear();
+
+    sum = 0;
+  }
+
+  ///
   /// \return \c true if the object passes the internal consistency check.
   ///
   bool symbol_set::collection::check() const
@@ -357,7 +382,7 @@ namespace vita
       bool found(false);
       if (symbols[j]->terminal())
       {
-        // Terminals must be in the _terminals vector.
+        // Terminals must be in the terminals_ vector.
         for (unsigned i(0); i < terminals.size() && !found; ++i)
           found = (symbols[j] == terminals[i]);
 
@@ -399,8 +424,7 @@ namespace vita
       if (cat >= category.size())
       {
         category.resize(cat + 1);
-        category[cat].symbols.clear();
-        category[cat].sum = 0;
+        category[cat] = collection();
       }
 
       category[cat].symbols.push_back(c.symbols[i]);
@@ -422,7 +446,7 @@ namespace vita
       if (cat >= category.size())
       {
         category.resize(cat + 1);
-        category[cat].stickies.clear();
+        category[cat] = collection();
       }
 
       category[cat].stickies.push_back(c.stickies[i]);
