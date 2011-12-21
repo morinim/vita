@@ -20,7 +20,7 @@
  *  with VITA. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-
+#include <iostream>
 #include "kernel/function.h"
 
 namespace vita
@@ -36,7 +36,7 @@ namespace vita
   /// \param[in] c category of the function (i.e. the category of the output
   ///              value).
   /// \param[in] args input parameters (type and number) of the function (in
-  ///                 C++ they would be called the "function signature").
+  ///                 C++ they are called the "function signature").
   /// \param[in] w the weight of the function (used for random initialization).
   /// \param[in] asve \c true if the function is associative (e.g. addition is
   ///                 associative, division isn't).
@@ -51,34 +51,6 @@ namespace vita
       argt_[arity_] = args[arity_];
 
     // for (unsigned i(arity()); i < gene::k_args; ++i)
-    //   argt_[i] = std::numeric_limits<category_t>::max();
-
-    assert(check());
-  }
-
-  ///
-  /// \param[in] dis string representation of the function (e.g. for the plus
-  ///                \a function it could by "ADD" or "+").
-  /// \param[in] c category of the function (i.e. the category of the output
-  ///              value).
-  /// \param[in] n number of input parameter of the function.
-  /// \param[in] w the weight of the function (used for random initialization).
-  /// \param[in] asve \c true if the function is associative (e.g. addition is
-  ///                 associative, division isn't).
-  ///
-  /// This constructor is used to quickly create a function of homogeneous
-  /// signature (all input parameters are of the same type).
-  ///
-  function::function(const std::string &dis, category_t c,
-                     unsigned n, unsigned w, bool asve)
-    : symbol(dis, c, w), arity_(n), associative_(asve)
-  {
-    assert(n <= gene::k_args);
-
-    unsigned i(0);
-    for (; i < arity_; ++i)
-      argt_[i] = c;
-    // for (; i < gene::k_args; ++i)
     //   argt_[i] = std::numeric_limits<category_t>::max();
 
     assert(check());

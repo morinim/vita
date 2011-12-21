@@ -21,6 +21,7 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
 #include <boost/none.hpp>
 
 #include "kernel/interpreter.h"
@@ -115,7 +116,7 @@ namespace vita
       assert(ip_ > backup);
       const boost::any ret(ind_.code_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_double(ret) == to_double(*cache_[locus]));
+      assert(to_string(ret) == to_string(*cache_[locus]));
     }
 #endif
 
@@ -156,7 +157,7 @@ namespace vita
   /// \return the result of the conversion of \a a in a \c double.
   ///
   /// This function is useful for:
-  /// \li debugging purpose (otherwise comparison of boost::any values is
+  /// \li debugging purpose (otherwise comparison of \c boost::any values is
   ///     complex);
   /// \li symbolic regression and classification task (the value returned by
   ///     the interpeter will be used in a "numeric way").
@@ -168,5 +169,24 @@ namespace vita
       a.type() == typeid(int) ? static_cast<double>(boost::any_cast<int>(a)) :
       a.type() == typeid(bool) ? static_cast<double>(boost::any_cast<bool>(a)) :
       0.0;
+  }
+
+  ///
+  /// \param[in] a value that should be converted to \c std::string.
+  /// \return the result of the conversion of \a a in a string.
+  ///
+  /// This function is useful for debugging purpose (otherwise comparison /
+  /// printing of \c boost::any values is complex).
+  ///
+  std::string interpreter::to_string(const boost::any &a)
+  {
+    return
+      a.type() == typeid(double) ?
+      boost::lexical_cast<std::string>(boost::any_cast<double>(a)) :
+      a.type() == typeid(int) ?
+      boost::lexical_cast<std::string>(boost::any_cast<int>(a)) :
+      a.type() == typeid(bool) ?
+      boost::lexical_cast<std::string>(boost::any_cast<bool>(a)) :
+      boost::any_cast<std::string>(a);
   }
 }  // Namespace vita

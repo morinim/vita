@@ -46,8 +46,6 @@ namespace vita
   public:
     function(const std::string &, category_t, const std::vector<category_t> &,
              unsigned = default_weight, bool = false);
-    function(const std::string &, category_t, unsigned,
-             unsigned = default_weight, bool = false);
 
     ///
     /// \return \c true if the function is associative (e.g. sum is associative,

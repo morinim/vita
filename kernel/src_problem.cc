@@ -94,7 +94,8 @@ namespace vita
   }
 
   ///
-  /// Default symbol set.
+  /// Default symbol set. This is useful for simple problems (single category
+  /// regression / classification).
   ///
   void src_problem::setup_default_symbols()
   {

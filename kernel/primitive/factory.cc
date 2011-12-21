@@ -54,6 +54,7 @@ namespace vita
     register_symbol2<dbl::ife>   ("IFE",    d_double);
     register_symbol2<dbl::ifl>   ("IFL",    d_double);
     register_symbol1<dbl::ifz>   ("IFZ",    d_double);
+    register_symbol2<dbl::length>("LENGTH", d_double);
     register_symbol1<dbl::ln>    ("LN",     d_double);
     register_symbol1<dbl::mod>   ("MOD",    d_double);
     register_symbol1<dbl::mod>   ("%",      d_double);
@@ -82,7 +83,6 @@ namespace vita
     register_symbol1<integer::sub>   ("-",      d_int);
 
     register_symbol2<str::ife>("IFE", d_string);
-    register_symbol2<str::length>("LENGTH", d_string);
   }
 
   ///
@@ -148,7 +148,7 @@ namespace vita
     case d_int:
       return std::make_shared<constant>(boost::lexical_cast<int>(un), c1);
     case d_string:
-      return std::make_shared<constant>(un, c1);
+      return std::make_shared<constant>(name, c1);
     default:
       return symbol_ptr();
     }

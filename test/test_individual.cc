@@ -49,13 +49,13 @@ struct F
     env.insert(factory.make("SUB", vita::d_double, {0}));
     env.insert(factory.make("MUL", vita::d_double, {0}));
     env.insert(factory.make("IFL", vita::d_double, {0}));
-    env.insert(factory.make("IFE", vita::d_double, {0}));
+    env.insert(factory.make("IFE", vita::d_double, {0, 0}));
+    env.insert(factory.make("LENGTH", vita::d_double, {1, 0}));
 
     env.insert(factory.make("apple", vita::d_string, {1}));
     env.insert(factory.make("pear", vita::d_string, {1}));
     env.insert(factory.make("grapefruit", vita::d_string, {1}));
-    env.insert(factory.make("IFE", vita::d_string, {0, 1}));
-    env.insert(factory.make("LENGTH", vita::d_string, {1, 0}));
+    env.insert(factory.make("IFE", vita::d_string, {1, 0}));
   }
 
   ~F()
@@ -72,6 +72,8 @@ BOOST_AUTO_TEST_CASE(Compact)
 {
   env.code_length = 100;
 
+  std::cout << env.sset << std::endl;
+
   BOOST_TEST_CHECKPOINT("Functional equivalence.");
   for (unsigned n(0); n < 1000; ++n)
   {
@@ -79,14 +81,15 @@ BOOST_AUTO_TEST_CASE(Compact)
     const vita::individual i2(i1.compact());
 
     std::cout << i1 << std::endl << i2 << std::endl;
+    BOOST_REQUIRE(i1.check(true));
 
     const boost::any v1( (vita::interpreter(i1))() );
     const boost::any v2( (vita::interpreter(i2))() );
 
     BOOST_REQUIRE_EQUAL(v1.empty(), v2.empty());
     if (!v1.empty() && !v2.empty())
-      BOOST_REQUIRE_EQUAL(boost::any_cast<double>(v1),
-                          boost::any_cast<double>(v2));
+      BOOST_REQUIRE_EQUAL(vita::interpreter::to_string(v1),
+                          vita::interpreter::to_string(v2));
   }
 
   BOOST_TEST_CHECKPOINT("Not interleaved active symbols.");
@@ -120,7 +123,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   vita::individual ind(env, true);
   const vita::individual orig(ind);
 
-  env.p_mutation = 0;
+  env.p_mutation = 0.0;
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < 1000; ++i)
@@ -132,7 +135,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   env.p_mutation = 0.5;
   double dist(0.0);
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
-  const unsigned n(1000);
+  const unsigned n(2000);
   for (unsigned i(0); i < n; ++i)
   {
     const vita::individual i1(ind);
@@ -141,7 +144,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
     dist += i1.distance(ind);
   }
 
-  const double perc(100*dist / (env.code_length*n));
+  const double perc(100.0 * dist / (env.code_length * n));
   BOOST_CHECK_GT(perc, 47.0);
   BOOST_CHECK_LT(perc, 53.0);
 }
@@ -168,6 +171,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     env.code_length = l;
     vita::individual i(env, true);
 
+    BOOST_REQUIRE(i.check());
+    BOOST_REQUIRE_EQUAL(i.size(), l);
     BOOST_REQUIRE_EQUAL(i[l-1].sym, n_123);
   }
 }

@@ -44,6 +44,10 @@ int main(int argc, char *argv[])
   env.insert(factory.make("MOD", vita::d_double));
   env.insert(factory.make("MUL", vita::d_double));
   env.insert(factory.make("SUB", vita::d_double));
+  env.insert(factory.make("LENGTH", vita::d_double, {1, 0}));
+  env.insert(factory.make("apple", vita::d_string, {1}));
+  env.insert(factory.make("grapefruit", vita::d_string, {1}));
+  env.insert(factory.make("orange", vita::d_string, {1}));
 
   vita::individual ind(env, true);
 
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else
-    std::cout << "Output: " << boost::any_cast<double>(val) << std::endl;
+    std::cout << "Output: " << vita::interpreter::to_string(val) << std::endl;
 
   return EXIT_SUCCESS;
 }

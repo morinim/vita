@@ -73,7 +73,7 @@ namespace vita
     {
     public:
       explicit add(category_t t)
-        : function("ADD", t, 2, function::default_weight, true) {}
+        : function("ADD", t, {t, t}, function::default_weight, true) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -93,7 +93,7 @@ namespace vita
     class div : public function
     {
     public:
-      explicit div(category_t t) : function("DIV", t, 2) {}
+      explicit div(category_t t) : function("DIV", t, {t, t}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -146,7 +146,7 @@ namespace vita
     class ifz : public function
     {
     public:
-      explicit ifz(category_t t) : function("IFZ", t, 3) {}
+      explicit ifz(category_t t) : function("IFZ", t, {t, t, t}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -163,7 +163,7 @@ namespace vita
     class mod : public function
     {
     public:
-      explicit mod(category_t t) : function("MOD", t, 2) {}
+      explicit mod(category_t t) : function("MOD", t, {t, t}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -182,7 +182,7 @@ namespace vita
     {
     public:
       explicit mul(category_t t)
-        : function("MUL", t, 2, function::default_weight, true) {}
+        : function("MUL", t, {t, t}, function::default_weight, true) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -224,7 +224,7 @@ namespace vita
     class shl : public function
     {
     public:
-      explicit shl(category_t t) : function("SHL", t, 2) {}
+      explicit shl(category_t t) : function("SHL", t, {t, t}) {}
 
       boost::any eval(interpreter *i) const
       {
@@ -244,7 +244,7 @@ namespace vita
     class sub : public function
     {
     public:
-      explicit sub(category_t t) : function("SUB", t, 2) {}
+      explicit sub(category_t t) : function("SUB", t, {t, t}) {}
 
       boost::any eval(interpreter *i) const
       {

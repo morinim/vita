@@ -322,11 +322,24 @@ namespace vita
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
     for (auto i(ss.all_.symbols.begin()); i != ss.all_.symbols.end(); ++i)
-      o << (*i)->display() << " (category " << (*i)->category() << ", opcode "
-        << (*i)->opcode() << ", arity " << (*i)->arity()
-        << ", parametric " << (*i)->parametric() << ", weight " << (*i)->weight
-        << ")" << std::endl;
+    {
+      o << (*i)->display();
 
+      const unsigned arity((*i)->arity());
+      if (arity)
+        o << '(';
+      for (unsigned j(0); j < arity; ++j)
+      {
+        const function* f(static_cast<function *>((*i).get()));
+        o << f->arg_category(j) << (j+1 == arity ? "" : ", ");
+      }
+      if (arity)
+        o << ')';
+
+        o << " -> " << (*i)->category() << " (opcode "
+          << (*i)->opcode() << ", parametric " << (*i)->parametric()
+          << ", weight " << (*i)->weight << ")" << std::endl;
+    }
     o << "Sum: " << ss.all_.sum << std::endl;
 
     return o;

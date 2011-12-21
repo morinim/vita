@@ -41,21 +41,6 @@ namespace vita
 {
   namespace str
   {
-    class length : public function
-    {
-    public:
-      explicit length(category_t t1, category_t t2)
-        : function("LENGTH", t2, {t1}) {}
-
-      boost::any eval(interpreter *i) const
-      {
-        const boost::any ev(i->eval(0));
-        if (ev.empty())  return ev;
-
-        return boost::any_cast<std::string>(ev).size();
-      }
-    };
-
     class ife : public function
     {
     public:
@@ -64,14 +49,14 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
-        if (ev0.empty())  return ev0;
+        const boost::any v0(i->eval(0));
+        if (v0.empty())  return v0;
 
-        const boost::any ev1(i->eval(1));
-        if (ev1.empty())  return ev1;
+        const boost::any v1(i->eval(1));
+        if (v1.empty())  return v1;
 
-        if (boost::any_cast<std::string>(ev0) ==
-            boost::any_cast<std::string>(ev1))
+        if (boost::any_cast<std::string>(v0) ==
+            boost::any_cast<std::string>(v1))
           return i->eval(2);
         else
           return i->eval(3);

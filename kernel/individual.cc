@@ -326,7 +326,7 @@ namespace vita
         ++n;
 
         const category_t c(code_[i].sym->category());
-        if (i+1 >= cs)
+        if (i+1 == cs)
           ret.set(i, gene(env_->sset.roulette_terminal(c)));
         else
           ret.set(i, gene(env_->sset.roulette(c), i+1, size()));
@@ -762,7 +762,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << "Empty symbol pointer at locus" << locus << "."
-                    << std::endl << std::flush;
+                    << std::endl;
         return false;
       }
 
@@ -770,8 +770,7 @@ namespace vita
       if (code_[locus].sym->arity() > gene::k_args)
       {
         if (verbose)
-          std::cerr << "Function arity exceeds maximum size." << std::endl
-                    << std::flush;
+          std::cerr << "Function arity exceeds maximum size." << std::endl;
         return false;
       }
 
@@ -782,8 +781,7 @@ namespace vita
         if (code_[locus].args[j] >= size())
         {
           if (verbose)
-            std::cerr << "Argument is out of range." << std::endl
-                      << std::flush;
+            std::cerr << "Argument is out of range." << std::endl;
           return false;
         }
         // Function address must be smaller than its arguments' addresses.
@@ -791,7 +789,7 @@ namespace vita
         {
           if (verbose)
             std::cerr << "Self reference in locus " << locus << "."
-                      << std::endl << std::flush;
+                      << std::endl;
           return false;
         }
       }
@@ -806,7 +804,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << "Found not sticky terminal at locus " << i << "."
-                    << std::endl << std::flush;
+                    << std::endl;
         return false;
       }
 
@@ -820,8 +818,7 @@ namespace vita
       if (!found)
       {
         if (verbose)
-          std::cerr << "Missing sticky value in genome." << std::endl
-                    << std::flush;
+          std::cerr << "Missing sticky value in genome." << std::endl;
         return false;
       }
     }
@@ -842,15 +839,20 @@ namespace vita
               std::cerr << "Wrong category: [" << i << "] " << func->display()
                         << " argument " << j << " needs category "
                         << func->arg_category(j) << " takes category "
-                        << current_arg.sym->category() << std::endl
-                        << std::flush;
+                        << current_arg.sym->category() << std::endl;
             return false;
           }
         }
       }
 
+    if (best_ >= size())
+    {
+      if (verbose)
+        std::cerr << "Incorrect index for first active symbol." << std::endl;
+      return false;
+    }
+
     return
-      best_ < size() &&
       last_is_terminal &&
       size() < (1u << 8*sizeof(locus_t)) &&
       eff_size() <= size() &&

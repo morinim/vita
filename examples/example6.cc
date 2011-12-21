@@ -86,7 +86,7 @@ class fitness : public vita::evaluator
           if (!res.empty())
           {
             const double dres(boost::any_cast<double>(res));
-            assert(!vita::is_bad(dres));
+            assert(std::isfinite(dres));
             fit += std::exp(-std::fabs(dres - (x*x+y*y-z*z)));
           }
         }

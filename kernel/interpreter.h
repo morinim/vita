@@ -50,6 +50,7 @@ namespace vita
     bool check() const;
 
     static double to_double(const boost::any &);
+    static std::string to_string(const boost::any &);
 
   private:
     // Instruction pointer.
