@@ -63,7 +63,7 @@ namespace vita
       //   std::fill(where.data(), where.data() + where.num_elements(), 0);
       std::vector<std::vector<unsigned>> where(categories);
 
-      // Placing sticky terminals.
+      // STICKY SUBSECTION. Placing sticky terminals.
       for (unsigned i(0); i < stickies; ++i)
       {
         const gene g(e.sset.get_sticky(i));
@@ -72,7 +72,8 @@ namespace vita
         where[g.sym->category()].push_back(locus);
       }
 
-      // Placing non-sticky terminals for satisfying closure property.
+      // PATCH SUBSECTION. Placing non-sticky terminals for satisfying
+      // constraints on types.
       unsigned locus(sup);
       for (unsigned c(0); c < categories; ++c)
         if (where[c].empty() && e.sset.terminals(c))
@@ -86,7 +87,7 @@ namespace vita
 
       assert(locus);
 
-      // Filling the remaining genome with random symbols.
+      // STANDARD SECTION. Filling the remaining genome with random symbols.
       do
       {
         --locus;
