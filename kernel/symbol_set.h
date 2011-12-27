@@ -46,7 +46,7 @@ namespace vita
   public:
     symbol_set();
 
-    void insert(const symbol_ptr &, bool);
+    void insert(const symbol_ptr &);
 
     const symbol_ptr &roulette() const;
     const symbol_ptr &roulette(category_t) const;
@@ -56,9 +56,6 @@ namespace vita
 
     const symbol_ptr &get_adt(unsigned) const;
     unsigned adts() const;
-
-    const symbol_ptr &get_sticky(unsigned) const;
-    unsigned stickies() const;
 
     void reset_adf_weights();
 
@@ -92,13 +89,7 @@ namespace vita
       std::vector<symbol_ptr>       adf;
       std::vector<symbol_ptr>       adt;
 
-      // A sticky symbol is not used during initial random generation but it's
-      // inserted at the end of the genome in a protected area. Only terminals
-      // can be sticky.
-      std::vector<symbol_ptr>  stickies;
-
-      // The sum of the weights of all the symbols in the collection that are
-      // NOT sticky.
+      // The sum of the weights of all the symbols in the collection.
       boost::uint64_t sum;
 
       bool check() const;

@@ -29,7 +29,7 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
+#include "kernel/locus.h"
 
 namespace vita
 {
@@ -41,7 +41,7 @@ namespace vita
     explicit interpreter(const individual &, interpreter *const = 0);
 
     boost::any operator()();
-    boost::any operator()(unsigned);
+    boost::any operator()(const loc_t &);
 
     boost::any eval();
     boost::any eval(unsigned);
@@ -54,13 +54,13 @@ namespace vita
 
   private:
     // Instruction pointer.
-    unsigned ip_;
+    loc_t ip_;
 
     interpreter *const context_;
 
     const individual &ind_;
 
-    mutable std::vector<boost::optional<boost::any>> cache_;
+    mutable std::vector<std::vector<boost::optional<boost::any>>> cache_;
   };
 
   ///

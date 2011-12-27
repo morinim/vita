@@ -43,7 +43,6 @@ namespace vita
 
     gene() {}
     explicit gene(const symbol_ptr &);
-    gene(const symbol_ptr &, const std::vector<std::vector<unsigned>> &);
     gene(const symbol_ptr &, unsigned, unsigned);
 
     bool operator==(const gene &) const;

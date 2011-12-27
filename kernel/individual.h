@@ -25,7 +25,6 @@
 #define      INDIVIDUAL_H
 
 #include <cmath>
-#include <cstring>
 #include <functional>
 #include <iomanip>
 #include <list>
@@ -33,13 +32,13 @@
 #include <string>
 #include <vector>
 
+#include "kernel/environment.h"
 #include "kernel/gene.h"
+#include "kernel/locus.h"
 #include "kernel/ttable.h"
 
 namespace vita
 {
-  class environment;
-
   ///
   /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
@@ -62,18 +61,14 @@ namespace vita
     individual crossover(const individual &) const;
     individual mutation(unsigned * = 0) const;
 
-    std::list<locus_t> blocks() const;
+    std::list<loc_t> blocks() const;
     individual destroy_block(unsigned) const;
-    individual get_block(unsigned) const;
-    individual replace(const symbol_ptr &, const std::vector<locus_t> &) const;
-    individual replace(const symbol_ptr &, const std::vector<locus_t> &,
-                       unsigned) const;
+    individual get_block(const loc_t &) const;
+    individual replace(const symbol_ptr &, const std::vector<unsigned> &) const;
+    individual replace(const symbol_ptr &, const std::vector<unsigned> &,
+                       const loc_t &) const;
 
-    individual generalize(std::size_t, std::vector<locus_t> *,
-                          std::vector<category_t> *) const;
-
-    individual compact(unsigned * = 0) const;
-    individual optimize(unsigned * = 0, unsigned * = 0) const;
+    individual generalize(unsigned, std::vector<loc_t> *const) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }
@@ -81,13 +76,16 @@ namespace vita
 
     hash_t signature() const;
 
+    const environment &env() const { return *env_; }
+
     bool check(bool = true) const;
 
     ///
-    /// \param[in] i index of a \c gene.
-    /// \return the i-th \c gene of \a this \c individual.
+    /// \param[in] l locus of a \c gene.
+    /// \return the l-th \c gene of \a this \c individual.
     ///
-    const gene &operator[](unsigned i) const { return code_[i]; }
+    const gene &operator[](const loc_t &l) const
+    { return genome_[l.index][l.category]; }
 
     ///
     /// \return the total size of the individual (effective size + introns).
@@ -96,22 +94,22 @@ namespace vita
     /// time).
     /// \see eff_size
     ///
-    unsigned size() const { return code_.size(); }
+    unsigned size() const { return genome_.size(); }
 
     unsigned eff_size() const;
 
     category_t category() const;
 
     ///
-    /// \param[in] i index of a \c gene.
+    /// \param[in] locus locust of a \c gene.
     /// \param[in] g a new gene.
     ///
-    /// Set the \a i-th locus of the genome to \a g. Please note that this is
-    /// one of the very few methods that aren't const.
+    /// Set the \a locus of the genome to \a g. Please note that this is one of
+    /// the very few methods that aren't const.
     ///
-    void set(unsigned i, const gene &g)
+    void set(const loc_t &locus, const gene &g)
     {
-      code_[i] = g;
+      genome_[locus.index][locus.category] = g;
       signature_.clear();
     }
 
@@ -122,10 +120,9 @@ namespace vita
     friend class interpreter;
 
   private:
-    std::vector<std::vector<unsigned>> compile() const;
     hash_t hash() const;
-    void pack(unsigned, std::vector<boost::uint8_t> *const) const;
-    void tree(std::ostream &, unsigned, unsigned, unsigned) const;
+    void pack(const loc_t &, std::vector<boost::uint8_t> *const) const;
+    void tree(std::ostream &, const loc_t &, unsigned, const loc_t &) const;
 
     // Crossover implementation can be changed/selected at runtime by this
     // polymorhic wrapper for function objects.
@@ -133,15 +130,17 @@ namespace vita
     // pointers, functors or anonymous (lambda) functions.
     crossover_wrapper crossover_;
 
-    // Active code in this individual (the best sequence of genes is starting
-    // here).
-    unsigned best_;
+    // Starting point of the active code in this individual (the best sequence
+    // of genes is starting here).
+    loc_t best_;
 
     const environment *env_;
 
+    typedef std::vector<gene> gvect;
+
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
-    std::vector<gene> code_;
+    std::vector<gvect> genome_;
 
     // Note that sintactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
@@ -166,17 +165,17 @@ namespace vita
     /// \return \c false when the iterator reaches the end.
     ///
     bool operator()() const
-    { return l_ < ind_.code_.size() && !lines_.empty(); }
+    { return l_.index < ind_.genome_.size() && !loci_.empty(); }
 
-    unsigned operator++();
+    const loc_t &operator++();
 
     ///
     /// \return reference to the current \a gene of the \a individual.
     ///
     const gene &operator*() const
     {
-      assert(l_ < ind_.code_.size());
-      return ind_.code_[l_];
+      assert(l_.index < ind_.genome_.size());
+      return ind_.genome_[l_.index][l_.category];
     }
 
     ///
@@ -184,14 +183,14 @@ namespace vita
     ///
     const gene *operator->() const
     {
-      assert(l_ < ind_.code_.size());
-      return &ind_.code_[l_];
+      assert(l_.index < ind_.genome_.size());
+      return &ind_.genome_[l_.index][l_.category];
     }
 
   private:
-    const individual    &ind_;
-    unsigned               l_;
-    std::set<unsigned> lines_;
+    const individual &ind_;
+    loc_t               l_;
+    std::set<loc_t>  loci_;
   };
 
   ///

@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
 
   for (unsigned k(0); k < n; ++k)
   {
-    // We build, by repeated trials, an individual we an effective size greater
-    // than 4.
+    // We build, by repeated trials, an individual with an effective size
+    // greater than 4.
     vita::individual base(env, true);
     unsigned base_es(base.eff_size());
     while (base_es < 5)
@@ -66,64 +66,55 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<vita::locus_t> bl(base.blocks());
+    std::list<vita::loc_t> bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       vita::individual blk(base.get_block(*i));
 
-      unsigned first_terminal;
-      vita::individual opt(blk.optimize(&first_terminal));
-      if (first_terminal)
+      std::cout << std::endl << "BLOCK at locus " << *i << std::endl;
+      blk.list(std::cout);
+      const boost::any val((vita::interpreter(blk))());
+      if (val.empty())
+        std::cout << "Incorrect output.";
+      else
+        std::cout << "Output: " << vita::interpreter::to_string(val);
+      std::cout << std::endl;
+
+      if (blk.eff_size() <= 20)
       {
-        std::cout << std::endl << "BLOCK at line " << *i << std::endl;
-        blk.list(std::cout);
-        const boost::any val((vita::interpreter(blk))());
-        if (val.empty())
+        std::vector<vita::loc_t> loci;
+        vita::individual blk2(blk.generalize(2, &loci));
+
+        std::vector<vita::category_t> categories(loci.size());
+        for (unsigned l(0); l < loci.size(); ++l)
+          categories[l] = loci[l].category;
+
+        vita::symbol_ptr f(new vita::adf(blk2, categories, 100));
+        env.insert(f);
+        std::cout << std::endl << f->display() << std::endl;
+        blk2.list(std::cout);
+
+        std::vector<unsigned> positions(loci.size());
+        for (unsigned p(0); p < loci.size(); ++p)
+          positions[p] = loci[p].index;
+
+        vita::individual blk3(blk.replace(f, positions));
+        std::cout << std::endl;
+        blk3.list(std::cout);
+        const boost::any val3((vita::interpreter(blk3))());
+        if (val3.empty())
           std::cout << "Incorrect output.";
         else
-          std::cout << "Output: " << boost::any_cast<double>(val);
-        std::cout << std::endl;
+          std::cout << "Output: " << vita::interpreter::to_string(val3);
+        std::cout << std::endl << std::endl;
 
-        std::cout << std::endl << "OPTIMIZED" << std::endl;
-        opt.list(std::cout);
-        const boost::any val_n((vita::interpreter(opt))());
-
-        if ( val.empty() != val_n.empty() ||
-             (!val.empty() && !val_n.empty() &&
-              boost::any_cast<double>(val) != boost::any_cast<double>(val_n)) )
+        if (val.empty() != val3.empty() ||
+            (!val.empty() && !val3.empty() &&
+             vita::interpreter::to_string(val) !=
+             vita::interpreter::to_string(val3)))
         {
-          std::cout << "OPTIMIZED BLOCK EVAL ERROR." << std::endl;
+          std::cout << "ADF EVAL ERROR." << std::endl;
           return EXIT_FAILURE;
-        }
-
-        if (opt.eff_size() <= 20)
-        {
-          std::vector<vita::locus_t> positions;
-          std::vector<vita::category_t> categories;
-          vita::individual blk2(opt.generalize(2, &positions, &categories));
-          vita::symbol_ptr f(new vita::adf(blk2, categories, 100));
-          env.insert(f);
-          std::cout << std::endl << f->display() << std::endl;
-          blk2.list(std::cout);
-
-          vita::individual blk3(opt.replace(f, positions));
-          std::cout << std::endl;
-          blk3.list(std::cout);
-          const boost::any val3((vita::interpreter(blk3))());
-          if (val3.empty())
-            std::cout << "Incorrect output.";
-          else
-            std::cout << "Output: " << boost::any_cast<double>(val3);
-          std::cout << std::endl << std::endl;
-
-          if ( val.empty() != val3.empty() ||
-               (!val.empty() && !val3.empty() &&
-                boost::any_cast<double>(val) !=
-                boost::any_cast<double>(val3)) )
-          {
-            std::cout << "ADF EVAL ERROR." << std::endl;
-            return EXIT_FAILURE;
-          }
         }
       }
       else

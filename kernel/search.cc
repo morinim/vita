@@ -76,17 +76,16 @@ namespace vita
         adf_l << std::endl;
       }
 
-      std::list<locus_t> block_index(base.blocks());
-      for (std::list<locus_t>::const_iterator i(block_index.begin());
-           i != block_index.end();
-           ++i)
+      std::list<loc_t> block_locus(base.blocks());
+      for (auto i(block_locus.begin()); i != block_locus.end(); ++i)
       {
         individual candidate_block(base.get_block(*i));
 
         // Building blocks should be simple.
-        if (candidate_block.eff_size() <= 5+arl_args)
+        if (candidate_block.eff_size() <= 5 + arl_args)
         {
-          const double d_f(base_fit - evo.fitness(base.destroy_block(*i)));
+          const double d_f(base_fit -
+                           evo.fitness(base.destroy_block(i->index)));
 
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
@@ -94,10 +93,13 @@ namespace vita
             symbol_ptr p;
             if (arl_args)
             {
-              std::vector<category_t> categories;
+              std::vector<loc_t> loci;
               individual generalized(candidate_block.generalize(arl_args,
-                                                                0,
-                                                                &categories));
+                                                                &loci));
+              std::vector<category_t> categories(loci.size());
+              for (unsigned i(0); i != loci.size(); ++i)
+                categories[i] = loci[i].category;
+
               p.reset(new vita::adf(generalized, categories, 10));
             }
             else

@@ -46,7 +46,6 @@ namespace vita
              const std::string & = "") const;
 
     void insert(const symbol_ptr &);
-    void insert(const symbol_ptr &, bool);
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).
@@ -103,9 +102,6 @@ namespace vita
 
     /// Should we use Adaptive Representation through Learning?
     bool arl;
-
-    /// Should we always insert input variables at the end of individual?
-    bool force_input;
 
     /// 2^ttable_size is the number of elements of the transposition table.
     unsigned ttable_size;

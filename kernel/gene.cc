@@ -55,28 +55,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] sset the set of symbols used to build individuals.
-  /// \param[in] where an array used for category -> locus tracking.
-  ///
-  gene::gene(const symbol_ptr &s,
-             const std::vector<std::vector<unsigned>> &where)
-    : sym(s)
-  {
-    if (sym->parametric())
-      par = sym->init();
-    else
-    {
-      const unsigned arity(sym->arity());
-      for (unsigned i(0); i < arity; ++i)
-      {
-        const category_t c(std::static_pointer_cast<function>(sym)
-                           ->arg_category(i));
-        args[i] = random::element(where[c]);
-      }
-    }
-  }
-
-  ///
   /// \param[in] g second term of comparison.
   /// \return \c true if \c this == \a g
   ///

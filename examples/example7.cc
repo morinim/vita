@@ -67,36 +67,29 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<vita::locus_t> bl(base.blocks());
+    std::list<vita::loc_t> bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       vita::individual ib(base.get_block(*i));
-      unsigned first_terminal;
-      vita::individual opt(ib.optimize(&first_terminal));
 
-      if (first_terminal)
-      {
-        std::vector<vita::locus_t> positions;
-        std::vector<vita::category_t> categories;
-        vita::individual generalized(opt.generalize(2, &positions,
-                                                    &categories));
+      std::vector<vita::loc_t> loci;
+      vita::individual generalized(ib.generalize(2, &loci));
 
-        std::cout << std::endl;
-        ib.list(std::cout);
+      std::cout << std::endl;
+      ib.list(std::cout);
 
-        std::cout << "OPTIMIZED" << std::endl;
-        generalized.list(std::cout);
+      std::cout << "GENERALIZED" << std::endl;
+      generalized.list(std::cout);
 
-        const unsigned arg_n(positions.size());
-        std::cout << std::endl << "Arguments:";
-        for (unsigned j(0); j < arg_n; ++j)
-          std::cout << " (pos=" << positions[j] << ",category=" << categories[j]
-                    << ")";
+      const unsigned arg_n(loci.size());
+      std::cout << std::endl << "Arguments:";
+      for (unsigned j(0); j < arg_n; ++j)
+        std::cout << " (pos=" << loci[j].index << ",category="
+                  << loci[j].category << ")";
         std::cout << std::endl;
 
         blocks_len.add(ib.eff_size());
         arguments.add(arg_n);
-      }
     }
   }
 

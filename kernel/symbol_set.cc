@@ -83,46 +83,16 @@ namespace vita
   }
 
   ///
-  /// \param[in] n index of a sticky \a symbol.
-  /// \return a pointer to the n-th sticky \a symbol.
-  ///
-  const symbol_ptr &symbol_set::get_sticky(unsigned n) const
-  {
-    assert(n < all_.stickies.size());
-    return all_.stickies[n];
-  }
-
-  ///
-  /// \return the number of sticky symbols in the symbol set.
-  ///
-  unsigned symbol_set::stickies() const
-  {
-    return all_.stickies.size();
-  }
-
-  ///
   /// \param[in] i symbol to be added.
-  /// \param[in] sticky if \c true the \a symbol is not used during initial
-  ///            random generation but it's inserted at the end of the genome
-  ///            in a protected area. Only terminals can be sticky.
   ///
   /// Adds a new \a symbol to the set.
   ///
-  void symbol_set::insert(const symbol_ptr &i, bool sticky)
+  void symbol_set::insert(const symbol_ptr &i)
   {
     assert(i && i->weight && i->check());
 
-    // Stickies aren't inserted in the symbol vector.
-    if (sticky)
-    {
-      assert(i->terminal());
-      all_.stickies.push_back(i);
-    }
-    else
-    {
-      all_.symbols.push_back(i);
-      all_.sum += i->weight;
-    }
+    all_.symbols.push_back(i);
+    all_.sum += i->weight;
 
     if (i->terminal())
     {
@@ -306,7 +276,7 @@ namespace vita
     {
       const collection &cc(by_.category[*cat]);
 
-      if (*cat >= categories() || !(cc.terminals.size() + cc.stickies.size()))
+      if (*cat >= categories() || !cc.terminals.size())
         return false;
     }
     return true;
@@ -369,8 +339,6 @@ namespace vita
     terminals.clear();
     adf.clear();
     adt.clear();
-
-    stickies.clear();
 
     sum = 0;
   }
@@ -452,18 +420,6 @@ namespace vita
 
     for (unsigned i(0); i < c.adt.size(); ++i)
       category[c.adt[i]->category()].adt.push_back(c.adt[i]);
-
-    for (unsigned i(0); i < c.stickies.size(); ++i)
-    {
-      const unsigned cat(c.stickies[i]->category());
-      if (cat >= category.size())
-      {
-        category.resize(cat + 1);
-        category[cat] = collection();
-      }
-
-      category[cat].stickies.push_back(c.stickies[i]);
-    }
 
     assert(check());
   }

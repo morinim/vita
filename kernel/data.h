@@ -142,6 +142,8 @@ namespace vita
     unsigned load_csv(const std::string &);
     unsigned load_xrff(const std::string &);
 
+    void swap_category(category_t, category_t);
+
     // Integer are simpler to manage than textual data, so, when appropriate,
     // input strings are converted into integers by these maps (and the encode
     // static function).

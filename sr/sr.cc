@@ -93,10 +93,6 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
-      ("force-input,f",
-       po::value<bool>(&problem.env.force_input)->default_value(
-         problem.env.force_input),
-       "Include all the input variables in every generated individual.")
       ("program-size,p",
        po::value(&problem.env.code_length)->default_value(
          problem.env.code_length),

@@ -21,6 +21,8 @@
  *
  */
 
+#include <algorithm>
+
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/foreach.hpp>
@@ -300,7 +302,7 @@ namespace vita
   /// This is a slightly modified version of the function at
   /// http://www.zedwood.com/article/112/cpp-csv-parser.
   /// Escaped List Separator class from Boost C++ libraries is also very nice
-  /// and efficient for parsing,but it is not as easily applied.
+  /// and efficient for parsing, but it is not as easily applied.
   ///
   std::vector<std::string> data::csvline(const std::string &line,
                                          char delimiter,
@@ -389,6 +391,27 @@ namespace vita
     return true;
   }
 
+  ///
+  /// \param[in] c1 a category.
+  /// \param[in] c2 a category.
+  ///
+  /// Swap catagories \a c1 and \a c2, updating the \a header_ and
+  /// \a cateogries_ vector.
+  ///
+  void data::swap_category(category_t c1, category_t c2)
+  {
+    assert(c1 < header_.size());
+    assert(c2 < header_.size());
+
+    std::swap(categories_[c1], categories_[c2]);
+
+    for (unsigned i(0); i < header_.size(); ++i)
+      if (header_[i].category_id == c1)
+        header_[i].category_id = c2;
+      else if (header_[i].category_id == c2)
+        header_[i].category_id = c1;
+  }
+
 # pragma GCC diagnostic ignored "-Wtype-limits"
   ///
   /// \param[in] filename the xrff file.
@@ -406,6 +429,13 @@ namespace vita
   /// \endverbatim
   /// This feature is used to constrain the search (Strongly Typed Genetic
   /// Programming).
+  ///
+  /// Postconditions are:
+  /// \li \a header_[0] is the output column (it contains informations about
+  ///     problem's output);
+  /// \li \a category(0) is the output category (for symbolic regresssion
+  ///     problems it is the output type of the xrff file, for classification
+  ///     problems it is the \a numeric type).
   ///
   unsigned data::load_xrff(const std::string &filename)
   {
@@ -439,20 +469,28 @@ namespace vita
         // header, one can define which attribute should act as output value.
         output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
-        const std::string xml_type(dha.second.get("<xmlattr>.type", ""));
+        std::string xml_type(dha.second.get("<xmlattr>.type", ""));
+
+        std::string category_name(dha.second.get("<xmlattr>.category",
+                                                 xml_type));
 
         if (output)
         {
-          classification = (xml_type == "nominal" || xml_type == "string");
           ++n_output;
 
           // We can manage only one output column.
           if (n_output > 1)
             return 0;
-        }
 
-        const std::string category_name(dha.second.get("<xmlattr>.category",
-                                                       xml_type));
+          // For classification problems we use discriminant functions, so the
+          // actual output type is always numeric.
+          classification = (xml_type == "nominal" || xml_type == "string");
+          if (classification)
+          {
+            xml_type = "numeric";
+            category_name = "numeric";
+          }
+        }
 
         a.category_id = encode(category_name, &categories_map_);
 
@@ -487,6 +525,17 @@ namespace vita
     // XRFF needs informations about the columns.
     if (!header_.size())
       return 0;
+
+    // If no output column is specified the default XRFF output column is the
+    // last one (and it is the first element of the header_ vector).
+    if (n_output == 0)
+    {
+      header_.insert(header_.begin(), header_.back());
+      header_.pop_back();
+    }
+
+    // Category 0 is the output category.
+    swap_category(category_t(0), header_[0].category_id);
 
     unsigned parsed(0);
     BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
@@ -601,8 +650,13 @@ namespace vita
 
             a.name = "";
 
-            const std::string s_domain(is_number(record[field]) ?
-                                       "numeric" : "string");
+            std::string s_domain(is_number(record[field]) ?
+                                 "numeric" : "string");
+            // For classification problems we use discriminant functions, so the
+            // actual output type is always numeric.
+            if (field == 0 && classification)
+              s_domain = "numeric";
+
             const domain_t domain(s_domain == "numeric" ? d_double : d_string);
 
             a.category_id = encode(s_domain, &categories_map_);

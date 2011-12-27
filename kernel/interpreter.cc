@@ -36,9 +36,10 @@ namespace vita
   /// \param[in] ctx context in which we calculate the output value (used for
   ///                the evaluation of ADF).
   ///
-  interpreter::interpreter(const individual &ind,
-                           interpreter *const ctx)
-    : ip_(ind.best_), context_(ctx), ind_(ind), cache_(ind.size())
+  interpreter::interpreter(const individual &ind, interpreter *const ctx)
+    : ip_(ind.best_), context_(ctx), ind_(ind),
+      cache_(ind.size(),
+             std::vector<boost::optional<boost::any>>(ind.env_->sset.categories()))
   {
   }
 
@@ -46,13 +47,14 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  boost::any interpreter::operator()(unsigned ip)
+  boost::any interpreter::operator()(const loc_t &ip)
   {
     for (unsigned i(0); i < cache_.size(); ++i)
-      cache_[i] = boost::none;
+      for (category_t c(0); c < cache_[i].size(); ++c)
+        cache_[i][c] = boost::none;
 
     ip_ = ip;
-    return ind_.code_[ip_].sym->eval(this);
+    return ind_[ip_].sym->eval(this);
   }
 
   ///
@@ -71,7 +73,7 @@ namespace vita
   ///
   boost::any interpreter::eval()
   {
-    const gene &g(ind_.code_[ip_]);
+    const gene &g(ind_[ip_]);
 
     assert(g.sym->parametric());
     return g.par;
@@ -92,39 +94,39 @@ namespace vita
   ///
   boost::any interpreter::eval(unsigned i)
   {
-    const gene &g(ind_.code_[ip_]);
+    const gene &g(ind_[ip_]);
 
+    assert(g.sym->arity());
     assert(i < g.sym->arity());
 
-    const locus_t locus(g.args[i]);
+    const function *const f(static_cast<function *>(g.sym.get()));
 
-    if (!cache_[locus])
+    const loc_t locus{g.args[i], f->arg_category(i)};
+
+    if (!cache_[locus.index][locus.category])
     {
-      const unsigned backup(ip_);
+      const loc_t backup(ip_);
       ip_ = locus;
-      assert(ip_ > backup);
-      const boost::any ret(ind_.code_[ip_].sym->eval(this));
+      assert(ip_.index > backup.index);
+      const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
-      cache_[locus] = ret;
+      cache_[locus.index][locus.category] = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
     {
-      const unsigned backup(ip_);
+      const loc_t backup(ip_);
       ip_ = locus;
-      assert(ip_ > backup);
-      const boost::any ret(ind_.code_[ip_].sym->eval(this));
+      assert(ip_.index > backup.index);
+      const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_string(ret) == to_string(*cache_[locus]));
+      assert(to_string(ret) == to_string(*cache_[locus.index][locus.category]));
     }
 #endif
 
-    assert(cache_[locus]);
-    return *cache_[locus];
-
-    // return ind_.code_[g.args[i]].sym->eval(interpreter(ind_,context_,
-    //                                                    g.args[i]));
+    assert(cache_[locus.index][locus.category]);
+    return *cache_[locus.index][locus.category];
   }
 
   ///
@@ -134,7 +136,7 @@ namespace vita
   boost::any interpreter::eval_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
-    const gene context_g(context_->ind_.code_[context_->ip_]);
+    const gene context_g(context_->ind_[context_->ip_]);
 
     assert(context_ && context_->check() && i < gene::k_args &&
            (!context_g.sym->terminal() && context_g.sym->auto_defined()));
@@ -148,7 +150,7 @@ namespace vita
   bool interpreter::check() const
   {
     return
-      ip_ < ind_.code_.size() &&
+      ip_.index < ind_.size() &&
       (!context_ || context_->check());
   }
 

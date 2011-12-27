@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
   vita::individual ind(env, true);
 
-  ind.list(std::cout);
+  ind.dump(std::cout);
   std::cout << std::endl;
 
   vita::interpreter agent(ind);

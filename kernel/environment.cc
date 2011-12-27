@@ -48,7 +48,6 @@ namespace vita
       mate_zone(9),
       g_since_start(100), g_without_improvement(0),
       arl(true),
-      force_input(false),
       ttable_size(16),
       stat_dir(""),
       stat_arl(false), stat_dynamic(false), stat_summary(false)
@@ -81,7 +80,6 @@ namespace vita
     pt->put(env + "max_gens_since_start", g_since_start);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
-    pt->put(env + "force_input", force_input);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
     pt->put(env + "statistics.save_arl", stat_arl);
@@ -92,31 +90,13 @@ namespace vita
   ///
   /// \param[in] i pointer to a new symbol for the symbol set.
   ///
-  /// This is a shortcut for sset.insert with sticky symbols support.
-  /// If \c force_input is \c true all the input terminals are marked as sticky.
+  /// This is a shortcut for sset.insert.
   ///
   void environment::insert(const symbol_ptr &i)
   {
     assert(i);
 
-    const bool sticky(force_input && i->terminal() &&
-                      std::static_pointer_cast<terminal>(i)->input());
-    insert(i, sticky);
-  }
-
-  ///
-  /// \param[in] i pointer to a new symbol for the symbol set.
-  /// \param[in] sticky is \a i a sticky symbol?
-  ///
-  /// This is a shortcut for sset.insert with sticky symbols support. Sticky
-  /// symbols are always appended at the end of the genome.
-  ///
-  void environment::insert(const symbol_ptr &i, bool sticky)
-  {
-    assert(i);
-    assert(!sticky || i->terminal());
-
-    sset.insert(i, sticky);
+    sset.insert(i);
   }
 
   ///
