@@ -44,7 +44,7 @@ namespace vita
   public:
     explicit replacement_strategy(evolution *const);
 
-    virtual void operator()(const std::vector<locus_t> &,
+    virtual void operator()(const std::vector<index_t> &,
                             const std::vector<individual> &,
                             summary *const) = 0;
 

@@ -37,7 +37,7 @@ namespace vita
   public:
     explicit tournament_selection(const evolution *const);
 
-    virtual std::vector<locus_t> operator()();
+    virtual std::vector<index_t> operator()();
 
   protected:
     unsigned tournament(unsigned) const;
@@ -79,11 +79,12 @@ namespace vita
   }
 
   ///
-  /// \return
+  /// \return a couple of indexes to individuals to be used by the evolution
+  ///         class.
   ///
-  std::vector<locus_t> tournament_selection::operator()()
+  std::vector<index_t> tournament_selection::operator()()
   {
-    std::vector<locus_t> ret(2);
+    std::vector<index_t> ret(2);
 
     ret[0] = tournament(evo_->population().size());
     ret[1] = tournament(ret[0]);
@@ -91,6 +92,9 @@ namespace vita
     return ret;
   }
 
+  ///
+  /// \param[in] evo pointer to the evolution class.
+  ///
   selection_factory::selection_factory(const evolution *const evo)
   {
     add(new tournament_selection(evo));
@@ -109,6 +113,10 @@ namespace vita
     return *strategy_[s];
   }
 
+  ///
+  /// \param[in] s pointer to a selection_strategy.
+  /// \return number of strategies inserted after (\a s included).
+  ///
   unsigned selection_factory::add(selection_strategy *const s)
   {
     assert(s);

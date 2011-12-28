@@ -33,8 +33,8 @@ namespace vita
 {
   ///
   /// \param[in] e base environment.
-  /// \param[in] gen if true generates a random sequence of genes to initialize
-  ///                the individual.
+  /// \param[in] gen if \c true generates a random sequence of genes to
+  ///                initialize the individual.
   ///
   /// The process that generates the initial, random expressions have to be
   /// implemented so as to ensure that they do not violate the type system's
@@ -50,14 +50,14 @@ namespace vita
     if (gen)  // random generate initial code
     {
       assert(2 <= size());
-      const unsigned sup(size() - 1);
+      const index_t sup(size() - 1);
 
-      const unsigned categories(e.sset.categories());
+      const category_t categories(e.sset.categories());
       assert(categories);
       assert(categories < sup);
 
       // STANDARD SECTION. Filling the genome with random symbols.
-      for (unsigned i(0); i < sup; ++i)
+      for (index_t i(0); i < sup; ++i)
         for (category_t c(0); c < categories; ++c)
           genome_[i][c] = gene(e.sset.roulette(c), i+1, size());
 
@@ -311,20 +311,12 @@ namespace vita
 
   ///
   /// \param[in] x second term of comparison.
-  /// \return true if the two individuals are equal (symbol by symbol,
+  /// \return \c true if the two individuals are equal (symbol by symbol,
   ///         including introns).
   ///
   bool individual::operator==(const individual &x) const
   {
-    const unsigned cs(size());
-    const unsigned categories(env_->sset.categories());
-
-    for (unsigned i(0); i < cs; ++i)
-      for (category_t c(0); c < categories; ++c)
-        if (genome_[i][c] != x.genome_[i][c])
-          return false;
-
-    return best_ == x.best_;
+    return genome_ == x.genome_ && best_ == x.best_;
   }
 
   ///
@@ -338,10 +330,13 @@ namespace vita
     const unsigned categories(env_->sset.categories());
 
     unsigned d(0);
-    for (unsigned i(0); i < cs; ++i)
+    for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
-        if (genome_[i][c] != ind.genome_[i][c])
-        ++d;
+      {
+        const locus l{{i, c}};
+        if (genome_(l) != ind.genome_(l))
+          ++d;
+      }
 
     return d;
   }
@@ -560,23 +555,30 @@ namespace vita
         }
       }
 
-    bool last_is_terminal(true);
     for (category_t c(0); c < categories; ++c)
-      last_is_terminal = last_is_terminal &&
-                         genome_[genome_.size() - 1][c].sym->terminal();
+      if (!genome_[genome_.size() - 1][c].sym->terminal())
+      {
+        if (verbose)
+          std::cerr << "Last symbol of type " << c
+                    << " in the genome isn't a terminal." << std::endl;
+        return false;
+      }
 
     // Type checking.
     for (unsigned i(0); i < size(); ++i)
       for (unsigned c(0); c < categories; ++c)
-        if (genome_[i][c].sym->category() != c)
+      {
+        const locus l{{i, c}};
+
+        if (genome_(l).sym->category() != c)
         {
-          const locus l{{i, c}};
           if (verbose)
             std::cerr << "Wrong category: " << l << genome_(l).sym->display()
                       << " -> " << genome_(l).sym->category()
                       << " should be " << c << std::endl;
           return false;
         }
+      }
 
     if (best_[0] >= size())
     {
@@ -592,8 +594,6 @@ namespace vita
     }
 
     return
-      last_is_terminal &&
-      size() < (1u << 8*sizeof(locus_t)) &&
       eff_size() <= size() &&
       env_->check() &&
       (signature_.empty() || signature_ == hash());

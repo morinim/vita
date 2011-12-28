@@ -263,7 +263,7 @@ namespace vita
                     << std::flush;
 
         // --------- SELECTION ---------
-        std::vector<locus_t> parents(selection[sel_id]());
+        std::vector<index_t> parents(selection[sel_id]());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation[op_id](parents));

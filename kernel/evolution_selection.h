@@ -42,7 +42,7 @@ namespace vita
   public:
     explicit selection_strategy(const evolution *const);
 
-    virtual std::vector<locus_t> operator()() = 0;
+    virtual std::vector<index_t> operator()() = 0;
 
   protected:
     const evolution *const evo_;

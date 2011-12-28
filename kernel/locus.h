@@ -34,6 +34,11 @@
 namespace vita
 {
 
+  static_assert(sizeof(index_t) <= sizeof(unsigned),
+                "index_t sizes expected to be <= unsigned");
+  static_assert(sizeof(category_t) <= sizeof(unsigned),
+                "category_t sizes expected to be <= unsigned");
+
   typedef std::array<unsigned, 2> locus;
 
   ///

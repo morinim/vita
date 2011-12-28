@@ -37,7 +37,7 @@ namespace vita
   public:
     explicit tournament_rp(evolution *const);
 
-    virtual void operator()(const std::vector<locus_t> &,
+    virtual void operator()(const std::vector<index_t> &,
                             const std::vector<individual> &,
                             summary *const);
 
@@ -84,7 +84,7 @@ namespace vita
   ///   child is better.
   /// </li>
   /// </ul>
-  void tournament_rp::operator()(const std::vector<locus_t> &parent,
+  void tournament_rp::operator()(const std::vector<index_t> &parent,
                                  const std::vector<individual> &offspring,
                                  summary *const s)
   {

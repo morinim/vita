@@ -52,7 +52,7 @@ namespace vita
     union
     {
       int              par;
-      locus_t args[k_args];
+      index_t args[k_args];
     };
   };
 }  // namespace vita

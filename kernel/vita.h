@@ -76,8 +76,6 @@ namespace vita
 #  define ROTL64(x, y)  rotl64(x, y)
 #endif
 
-  typedef boost::uint16_t locus_t;
-
   /// This is the type used as key for symbol identification.
   typedef boost::uint16_t opcode_t;
 
@@ -93,10 +91,13 @@ namespace vita
   /// domain but which are restricted to values lying in the (sub)domain by
   /// which is parametrized.
   /// For instance the number 4.0 (in the domain \c d_double) may be present in
-  /// two distinct category 2 (e.g. the category km/h) and 3 (e.g. the category
-  /// kg).
-  /// Categories are the way strong type GP is implemented in Vita.
+  /// two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
+  /// category "kg").
+  /// Categories are the way strong typing GP is implemented in Vita.
   typedef unsigned category_t;
+
+  /// Index in the genome. Locus is uniqyely identified by a couple of indexes.
+  typedef unsigned index_t;
 
   ///
   /// When absolute value of two real numbers is under \a float_epsilon, they

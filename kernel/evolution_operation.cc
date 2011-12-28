@@ -47,7 +47,7 @@ namespace vita
   public:
     standard_op(const evolution *const, summary *const);
 
-    std::vector<individual> operator()(const std::vector<locus_t> &);
+    std::vector<individual> operator()(const std::vector<index_t> &);
 
     summary *stats;
   };
@@ -63,7 +63,7 @@ namespace vita
   /// This is a quite standard crossover + mutation operator.
   ///
   std::vector<individual> standard_op::operator()(
-    const std::vector<locus_t> &parent)
+    const std::vector<index_t> &parent)
   {
     assert(parent.size() >= 2);
 
