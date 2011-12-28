@@ -85,7 +85,7 @@ namespace vita
         if (candidate_block.eff_size() <= 5 + arl_args)
         {
           const double d_f(base_fit -
-                           evo.fitness(base.destroy_block(i->index)));
+                           evo.fitness(base.destroy_block((*i)[0])));
 
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
@@ -97,8 +97,8 @@ namespace vita
               individual generalized(candidate_block.generalize(arl_args,
                                                                 &loci));
               std::vector<category_t> categories(loci.size());
-              for (unsigned i(0); i != loci.size(); ++i)
-                categories[i] = loci[i].category;
+              for (unsigned j(0); j != loci.size(); ++j)
+                categories[j] = loci[j][1];
 
               p.reset(new vita::adf(generalized, categories, 10));
             }

@@ -101,32 +101,32 @@ namespace vita
 
     const function *const f(static_cast<function *>(g.sym.get()));
 
-    const loc_t locus{g.args[i], f->arg_category(i)};
+    const loc_t locus{{g.args[i], f->arg_category(i)}};
 
-    if (!cache_[locus.index][locus.category])
+    if (!cache_[locus[0]][locus[1]])
     {
       const loc_t backup(ip_);
       ip_ = locus;
-      assert(ip_.index > backup.index);
+      assert(ip_[0] > backup[0]);
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
-      cache_[locus.index][locus.category] = ret;
+      cache_[locus[0]][locus[1]] = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
     {
       const loc_t backup(ip_);
       ip_ = locus;
-      assert(ip_.index > backup.index);
+      assert(ip_[0] > backup[0]);
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_string(ret) == to_string(*cache_[locus.index][locus.category]));
+      assert(to_string(ret) == to_string(*cache_[locus[0]][locus[1]]));
     }
 #endif
 
-    assert(cache_[locus.index][locus.category]);
-    return *cache_[locus.index][locus.category];
+    assert(cache_[locus[0]][locus[1]]);
+    return *cache_[locus[0]][locus[1]];
   }
 
   ///
@@ -149,9 +149,7 @@ namespace vita
   ///
   bool interpreter::check() const
   {
-    return
-      ip_.index < ind_.size() &&
-      (!context_ || context_->check());
+    return ip_[0] < ind_.size() && (!context_ || context_->check());
   }
 
   ///

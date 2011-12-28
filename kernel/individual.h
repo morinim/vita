@@ -84,8 +84,7 @@ namespace vita
     /// \param[in] l locus of a \c gene.
     /// \return the l-th \c gene of \a this \c individual.
     ///
-    const gene &operator[](const loc_t &l) const
-    { return genome_[l.index][l.category]; }
+    const gene &operator[](const loc_t &l) const { return genome_(l); }
 
     ///
     /// \return the total size of the individual (effective size + introns).
@@ -109,7 +108,7 @@ namespace vita
     ///
     void set(const loc_t &locus, const gene &g)
     {
-      genome_[locus.index][locus.category] = g;
+      genome_(locus) = g;
       signature_.clear();
     }
 
@@ -136,11 +135,9 @@ namespace vita
 
     const environment *env_;
 
-    typedef std::vector<gene> gvect;
-
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
-    std::vector<gvect> genome_;
+    g_matrix genome_;
 
     // Note that sintactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
@@ -165,7 +162,7 @@ namespace vita
     /// \return \c false when the iterator reaches the end.
     ///
     bool operator()() const
-    { return l_.index < ind_.genome_.size() && !loci_.empty(); }
+    { return l_[0] < ind_.genome_.size() && !loci_.empty(); }
 
     const loc_t &operator++();
 
@@ -174,8 +171,8 @@ namespace vita
     ///
     const gene &operator*() const
     {
-      assert(l_.index < ind_.genome_.size());
-      return ind_.genome_[l_.index][l_.category];
+      assert(l_[0] < ind_.genome_.size());
+      return ind_.genome_(l_);
     }
 
     ///
@@ -183,8 +180,8 @@ namespace vita
     ///
     const gene *operator->() const
     {
-      assert(l_.index < ind_.genome_.size());
-      return &ind_.genome_[l_.index][l_.category];
+      assert(l_[0] < ind_.genome_.size());
+      return &ind_.genome_(l_);
     }
 
   private:

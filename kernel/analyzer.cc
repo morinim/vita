@@ -111,7 +111,10 @@ namespace vita
   {
     for (unsigned i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
-        count(ind[loc_t{i, c}].sym.get(), false);
+      {
+        const loc_t l{{i, c}};
+        count(ind[l].sym.get(), false);
+      }
 
     unsigned length(0);
     for (individual::const_iterator it(ind); it(); ++it)

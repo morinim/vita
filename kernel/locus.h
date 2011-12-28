@@ -24,13 +24,24 @@
 #if !defined(LOCUS_H)
 #define      LOCUS_H
 
+#include <array>
 #include <iostream>
 
-#include "kernel/vita.h"
+#include "boost/multi_array.hpp"
+
+#include "kernel/gene.h"
 
 namespace vita
 {
 
+  typedef boost::multi_array<gene, 2> g_matrix;
+  typedef std::array<unsigned, 2> loc_t;
+
+  inline
+  bool operator<(const loc_t &l1, const loc_t &l2)
+  { return l1[0] < l2[0] || (l1[0] == l2[0] && l1[1] < l2[1]); }
+
+/*
   ///
   /// These are the coordinates (locus) of a gene in the genome.
   ///
@@ -48,6 +59,7 @@ namespace vita
     unsigned      index;
     category_t category;
   };
+*/
 
   ///
   /// \param[out] s output stream.
@@ -57,10 +69,11 @@ namespace vita
   inline
   std::ostream &operator<<(std::ostream &s, const loc_t &l)
   {
-    s << '(' << l.index << ',' << l.category << ')';
+    s << '(' << l[0] << ',' << l[1] << ')';
 
     return s;
   }
+
 }  // namespace vita
 
 #endif  // LOCUS_H
