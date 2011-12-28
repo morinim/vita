@@ -61,14 +61,14 @@ namespace vita
     individual crossover(const individual &) const;
     individual mutation(unsigned * = 0) const;
 
-    std::list<loc_t> blocks() const;
+    std::list<locus> blocks() const;
     individual destroy_block(unsigned) const;
-    individual get_block(const loc_t &) const;
+    individual get_block(const locus &) const;
     individual replace(const symbol_ptr &, const std::vector<unsigned> &) const;
     individual replace(const symbol_ptr &, const std::vector<unsigned> &,
-                       const loc_t &) const;
+                       const locus &) const;
 
-    individual generalize(unsigned, std::vector<loc_t> *const) const;
+    individual generalize(unsigned, std::vector<locus> *const) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }
@@ -84,7 +84,7 @@ namespace vita
     /// \param[in] l locus of a \c gene.
     /// \return the l-th \c gene of \a this \c individual.
     ///
-    const gene &operator[](const loc_t &l) const { return genome_(l); }
+    const gene &operator[](const locus &l) const { return genome_(l); }
 
     ///
     /// \return the total size of the individual (effective size + introns).
@@ -106,7 +106,7 @@ namespace vita
     /// Set the \a locus of the genome to \a g. Please note that this is one of
     /// the very few methods that aren't const.
     ///
-    void set(const loc_t &locus, const gene &g)
+    void set(const locus &locus, const gene &g)
     {
       genome_(locus) = g;
       signature_.clear();
@@ -120,8 +120,8 @@ namespace vita
 
   private:
     hash_t hash() const;
-    void pack(const loc_t &, std::vector<boost::uint8_t> *const) const;
-    void tree(std::ostream &, const loc_t &, unsigned, const loc_t &) const;
+    void pack(const locus &, std::vector<boost::uint8_t> *const) const;
+    void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
     // Crossover implementation can be changed/selected at runtime by this
     // polymorhic wrapper for function objects.
@@ -131,13 +131,13 @@ namespace vita
 
     // Starting point of the active code in this individual (the best sequence
     // of genes is starting here).
-    loc_t best_;
+    locus best_;
 
     const environment *env_;
 
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
-    g_matrix genome_;
+    boost::multi_array<gene, 2> genome_;
 
     // Note that sintactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
@@ -164,7 +164,7 @@ namespace vita
     bool operator()() const
     { return l_[0] < ind_.genome_.size() && !loci_.empty(); }
 
-    const loc_t &operator++();
+    const locus &operator++();
 
     ///
     /// \return reference to the current \a gene of the \a individual.
@@ -186,8 +186,8 @@ namespace vita
 
   private:
     const individual &ind_;
-    loc_t               l_;
-    std::set<loc_t>  loci_;
+    locus               l_;
+    std::set<locus>  loci_;
   };
 
   ///

@@ -41,7 +41,7 @@ namespace vita
     explicit interpreter(const individual &, interpreter *const = 0);
 
     boost::any operator()();
-    boost::any operator()(const loc_t &);
+    boost::any operator()(const locus &);
 
     boost::any eval();
     boost::any eval(unsigned);
@@ -54,7 +54,7 @@ namespace vita
 
   private:
     // Instruction pointer.
-    loc_t ip_;
+    locus ip_;
 
     interpreter *const context_;
 

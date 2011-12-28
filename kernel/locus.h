@@ -34,44 +34,26 @@
 namespace vita
 {
 
-  typedef boost::multi_array<gene, 2> g_matrix;
-  typedef std::array<unsigned, 2> loc_t;
+  typedef std::array<unsigned, 2> locus;
 
+  ///
+  /// \param[in] l1 first locus.
+  /// \param[in] l2 second locus.
+  /// \return \c true if \a l1 precedes \a l2 in lexicographic order
+  ///         (http://en.wikipedia.org/wiki/Lexicographical_order).
   inline
-  bool operator<(const loc_t &l1, const loc_t &l2)
+  bool operator<(const locus &l1, const locus &l2)
   { return l1[0] < l2[0] || (l1[0] == l2[0] && l1[1] < l2[1]); }
-
-/*
-  ///
-  /// These are the coordinates (locus) of a gene in the genome.
-  ///
-  struct loc_t
-  {
-    bool operator==(const loc_t &l) const
-    { return index == l.index && category == l.category; }
-
-    bool operator!=(const loc_t &l) const
-    { return index != l.index || category != l.category; }
-
-    bool operator<(const loc_t &l) const
-    { return index < l.index || (index == l.index && category < l.category); }
-
-    unsigned      index;
-    category_t category;
-  };
-*/
 
   ///
   /// \param[out] s output stream.
   /// \param[in] l locus to print.
-  /// \return output stream including \a k.
+  /// \return output stream including \a l.
   ///
   inline
-  std::ostream &operator<<(std::ostream &s, const loc_t &l)
+  std::ostream &operator<<(std::ostream &s, const locus &l)
   {
-    s << '(' << l[0] << ',' << l[1] << ')';
-
-    return s;
+    return s << '(' << l[0] << ',' << l[1] << ')';
   }
 
 }  // namespace vita

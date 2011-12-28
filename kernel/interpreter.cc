@@ -47,7 +47,7 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  boost::any interpreter::operator()(const loc_t &ip)
+  boost::any interpreter::operator()(const locus &ip)
   {
     for (unsigned i(0); i < cache_.size(); ++i)
       for (category_t c(0); c < cache_[i].size(); ++c)
@@ -101,32 +101,32 @@ namespace vita
 
     const function *const f(static_cast<function *>(g.sym.get()));
 
-    const loc_t locus{{g.args[i], f->arg_category(i)}};
+    const locus l{{g.args[i], f->arg_category(i)}};
 
-    if (!cache_[locus[0]][locus[1]])
+    if (!cache_[l[0]][l[1]])
     {
-      const loc_t backup(ip_);
-      ip_ = locus;
+      const locus backup(ip_);
+      ip_ = l;
       assert(ip_[0] > backup[0]);
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
-      cache_[locus[0]][locus[1]] = ret;
+      cache_[l[0]][l[1]] = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
     {
-      const loc_t backup(ip_);
-      ip_ = locus;
+      const locus backup(ip_);
+      ip_ = l;
       assert(ip_[0] > backup[0]);
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_string(ret) == to_string(*cache_[locus[0]][locus[1]]));
+      assert(to_string(ret) == to_string(*cache_[l[0]][l[1]]));
     }
 #endif
 
-    assert(cache_[locus[0]][locus[1]]);
-    return *cache_[locus[0]][locus[1]];
+    assert(cache_[l[0]][l[1]]);
+    return *cache_[l[0]][l[1]];
   }
 
   ///

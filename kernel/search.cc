@@ -76,7 +76,7 @@ namespace vita
         adf_l << std::endl;
       }
 
-      std::list<loc_t> block_locus(base.blocks());
+      std::list<locus> block_locus(base.blocks());
       for (auto i(block_locus.begin()); i != block_locus.end(); ++i)
       {
         individual candidate_block(base.get_block(*i));
@@ -93,7 +93,7 @@ namespace vita
             symbol_ptr p;
             if (arl_args)
             {
-              std::vector<loc_t> loci;
+              std::vector<locus> loci;
               individual generalized(candidate_block.generalize(arl_args,
                                                                 &loci));
               std::vector<category_t> categories(loci.size());

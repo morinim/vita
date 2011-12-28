@@ -41,7 +41,7 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, bool gen)
-    : crossover_(uniform_crossover), best_(loc_t{{0, 0}}), env_(&e),
+    : crossover_(uniform_crossover), best_(locus{{0, 0}}), env_(&e),
       genome_(boost::extents[e.code_length][e.sset.categories()]),
       signature_()
   {
@@ -85,16 +85,16 @@ namespace vita
   }
 
   ///
-  /// \param[in] locus locus of the genome.
+  /// \param[in] l locus of the genome.
   /// \return an individual obtained from \c this choosing the gene
-  ///         sequence starting at \a locus.
+  ///         sequence starting at \a l.
   ///
   /// This function is often used along with the \ref blocks function.
   ///
-  individual individual::get_block(const loc_t &locus) const
+  individual individual::get_block(const locus &l) const
   {
     individual ret(*this);
-    ret.best_ = locus;
+    ret.best_ = l;
     ret.signature_.clear();
 
     assert(ret.check());
@@ -121,7 +121,7 @@ namespace vita
         {
           ++n;
 
-          ret.set(loc_t{{i, c}}, gene(env_->sset.roulette(c), i+1, size()));
+          ret.set(locus{{i, c}}, gene(env_->sset.roulette(c), i+1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
@@ -129,7 +129,7 @@ namespace vita
       {
         ++n;
 
-        ret.set(loc_t{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+        ret.set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 
     assert(ret.check());
@@ -176,14 +176,14 @@ namespace vita
   /// that are subsets of the active code. Indexes can be used by the
   /// individual::get_block function.
   ///
-  std::list<loc_t> individual::blocks() const
+  std::list<locus> individual::blocks() const
   {
-    std::list<loc_t> bl;
+    std::list<locus> bl;
 
-    loc_t locus(best_);
-    for (const_iterator i(*this); i(); locus = ++i)
-      if (genome_(locus).sym->arity())
-        bl.push_back(locus);
+    locus l(best_);
+    for (const_iterator i(*this); i(); l = ++i)
+      if (genome_(l).sym->arity())
+        bl.push_back(l);
 
     return bl;
   }
@@ -191,23 +191,23 @@ namespace vita
   ///
   /// \param[in] sym symbol used for replacement.
   /// \param[in] args new arguments.
-  /// \param[in] locus locus where replacement take place.
+  /// \param[in] l locus where replacement take place.
   /// \return a new \a individual with a gene replaced.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
-  /// \a symbol at locus \a locus with a new one ('sym' + 'args').
+  /// \a symbol at locus \a l with a new one ('sym' + 'args').
   ///
   individual individual::replace(const symbol_ptr &sym,
                                  const std::vector<unsigned> &args,
-                                 const loc_t &locus) const
+                                 const locus &l) const
   {
     assert(sym);
 
     individual ret(*this);
 
-    ret.genome_(locus).sym = sym;
+    ret.genome_(l).sym = sym;
     for (unsigned i(0); i < args.size(); ++i)
-      ret.genome_(locus).args[i] = args[i];
+      ret.genome_(l).args[i] = args[i];
 
     ret.signature_.clear();
 
@@ -241,7 +241,7 @@ namespace vita
     individual ret(*this);
     const unsigned categories(env_->sset.categories());
     for (category_t c(0); c < categories; ++c)
-      ret.set(loc_t{{index, c}}, gene(env_->sset.roulette_terminal(c)));
+      ret.set(locus{{index, c}}, gene(env_->sset.roulette_terminal(c)));
 
     assert(ret.check());
     return ret;
@@ -257,17 +257,17 @@ namespace vita
   /// for a ADF.
   ///
   individual individual::generalize(unsigned max_args,
-                                    std::vector<loc_t> *const loci) const
+                                    std::vector<locus> *const loci) const
   {
     assert(max_args && max_args <= gene::k_args);
 
-    std::vector<loc_t> terminals;
+    std::vector<locus> terminals;
 
     // Step 1: mark the active terminal symbols.
-    loc_t locus(best_);
-    for (const_iterator i(*this); i(); locus = ++i)
-      if (genome_(locus).sym->terminal())
-        terminals.push_back(locus);
+    locus l(best_);
+    for (const_iterator i(*this); i(); l = ++i)
+      if (genome_(l).sym->terminal())
+        terminals.push_back(l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
     const unsigned n(std::min(max_args,
@@ -279,7 +279,7 @@ namespace vita
       {
         const unsigned r(random::between<unsigned>(j, terminals.size()));
 
-        const loc_t tmp(terminals[j]);
+        const locus tmp(terminals[j]);
         terminals[j] = terminals[r];
         terminals[r] = tmp;
       }
@@ -347,18 +347,18 @@ namespace vita
   }
 
   ///
-  /// \param[in] locus locus in \c this individual.
+  /// \param[in] l locus in \c this individual.
   /// \param[out] p byte stream compacted version of the gene sequence
-  ///               starting at locus \a idx.
+  ///               starting at locus \a l.
   ///
   /// This function map syntactically distinct (but logically equivalent)
   /// individuals to the same byte stream. This is a very interesting
   /// property, useful for individual comparison / information retrieval.
   ///
-  void individual::pack(const loc_t &locus,
+  void individual::pack(const locus &l,
                         std::vector<boost::uint8_t> *const p) const
   {
-    const gene &g(genome_(locus));
+    const gene &g(genome_(l));
 
     const opcode_t opcode(g.sym->opcode());
 
@@ -374,8 +374,8 @@ namespace vita
     }
     else
       for (unsigned i(0); i < g.sym->arity(); ++i)
-        pack(loc_t{{g.args[i],
-                static_cast<function *>(g.sym.get())->arg_category(i)}},
+        pack(locus{{g.args[i],
+                    static_cast<function *>(g.sym.get())->arg_category(i)}},
              p);
   }
 
@@ -521,16 +521,18 @@ namespace vita
     for (unsigned i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        if (!genome_[i][c].sym)
+        const locus l{{i, c}};
+
+        if (!genome_(l).sym)
         {
           if (verbose)
-            std::cerr << "Empty symbol pointer at locus " << loc_t{{i, c}}
-                      << "." << std::endl;
+            std::cerr << "Empty symbol pointer at locus " << l << '.'
+                      << std::endl;
           return false;
         }
 
         // Maximum number of function arguments is gene::k_args.
-        if (genome_[i][c].sym->arity() > gene::k_args)
+        if (genome_(l).sym->arity() > gene::k_args)
         {
           if (verbose)
             std::cerr << "Function arity exceeds maximum size." << std::endl;
@@ -538,10 +540,10 @@ namespace vita
         }
 
         // Checking arguments' addresses.
-        for (unsigned j(0); j < genome_[i][c].sym->arity(); ++j)
+        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
         {
           // Arguments' addresses must be smaller than the size of the genome.
-          if (genome_[i][c].args[j] >= size())
+          if (genome_(l).args[j] >= size())
           {
             if (verbose)
               std::cerr << "Argument is out of range." << std::endl;
@@ -549,16 +551,14 @@ namespace vita
           }
 
           // Function address must be smaller than its arguments' addresses.
-          if (genome_[i][c].args[j] <= i)
+          if (genome_(l).args[j] <= i)
           {
             if (verbose)
-              std::cerr << "Self reference in locus " << loc_t{{i, c}} << '.'
-                        << std::endl;
+              std::cerr << "Self reference in locus " << l << '.' << std::endl;
             return false;
           }
         }
       }
-
 
     bool last_is_terminal(true);
     for (category_t c(0); c < categories; ++c)
@@ -570,10 +570,10 @@ namespace vita
       for (unsigned c(0); c < categories; ++c)
         if (genome_[i][c].sym->category() != c)
         {
+          const locus l{{i, c}};
           if (verbose)
-            std::cerr << "Wrong category: " << loc_t{{i, c}}
-                      << genome_[i][c].sym->display()
-                      << " -> " << genome_[i][c].sym->category()
+            std::cerr << "Wrong category: " << l << genome_(l).sym->display()
+                      << " -> " << genome_(l).sym->category()
                       << " should be " << c << std::endl;
           return false;
         }
@@ -611,18 +611,18 @@ namespace vita
       s << "subgraph " << id;
     s << " {";
 
-    loc_t locus(best_);
-    for (const_iterator it(*this); it(); locus = ++it)
+    locus l(best_);
+    for (const_iterator it(*this); it(); l = ++it)
     {
       const gene &g(*it);
 
-      s << 'g' << locus << " [label="
+      s << 'g' << l << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
         << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << locus << " -- g"
-          << loc_t{{g.args[j],
+        s << 'g' << l << " -- g"
+          << locus{{g.args[j],
                     static_cast<function *>(g.sym.get())->arg_category(j)}}
           << ';';
     }
@@ -639,12 +639,12 @@ namespace vita
   ///
   void individual::in_line(std::ostream &s) const
   {
-    loc_t locus(best_);
-    for (const_iterator it(*this); it(); locus = ++it)
+    locus l(best_);
+    for (const_iterator it(*this); it(); l = ++it)
     {
       const gene &g(*it);
 
-      if (locus != best_)
+      if (l != best_)
         s << ' ';
       s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
     }
@@ -667,15 +667,15 @@ namespace vita
     const unsigned w2(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
 
-    loc_t locus(best_);
-    for (const_iterator it(*this); it(); locus = ++it)
+    locus l(best_);
+    for (const_iterator it(*this); it(); l = ++it)
     {
       const gene &g(*it);
 
-      s << '[' << std::setfill('0') << std::setw(w1) << locus[0];
+      s << '[' << std::setfill('0') << std::setw(w1) << l[0];
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << locus[1];
+        s << ", " << std::setw(w2) << l[1];
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
@@ -693,8 +693,8 @@ namespace vita
   /// \param[in] indent indentation level.
   /// \param[in] parent parent of \a child.
   ///
-  void individual::tree(std::ostream &s, const loc_t &child, unsigned indent,
-                        const loc_t &parent) const
+  void individual::tree(std::ostream &s, const locus &child, unsigned indent,
+                        const locus &parent) const
   {
     const gene &g(genome_(child));
 
@@ -713,7 +713,7 @@ namespace vita
     if (arity)
       for (unsigned i(0); i < arity; ++i)
         tree(s,
-             loc_t{{g.args[i],
+             locus{{g.args[i],
                     static_cast<function *>(g.sym.get())->arg_category(i)}},
              indent, child);
   }
@@ -779,7 +779,7 @@ namespace vita
   ///
   /// \return locus of the next line containing an active symbol.
   ///
-  const loc_t &individual::const_iterator::operator++()
+  const locus &individual::const_iterator::operator++()
   {
     if (!loci_.empty())
     {
@@ -789,7 +789,7 @@ namespace vita
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
       {
-        const loc_t l{
+        const locus l{
           {g.args[j], static_cast<function *>(g.sym.get())->arg_category(j)}};
 
         loci_.insert(l);
@@ -838,8 +838,8 @@ namespace vita
       for (category_t c(0); c < categories; ++c)
         if (random::boolean())
         {
-          const loc_t locus{{i,c}};
-          offspring.set(locus, p2[locus]);
+          const locus l{{i,c}};
+          offspring.set(l, p2[l]);
         }
 
     assert(offspring.check(true));
@@ -876,7 +876,7 @@ namespace vita
     for (unsigned i(cut); i < cs; ++i)
       for (unsigned c(0); c < categories; ++c)
       {
-        const loc_t l{{i,c}};
+        const locus l{{i,c}};
         offspring.set(l, (*parents[!base])[l]);
       }
 
@@ -916,7 +916,7 @@ namespace vita
     for (unsigned i(cut1); i < cut2; ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const loc_t l{{i, c}};
+        const locus l{{i, c}};
         offspring.set(l, (*parents[!base])[l]);
       }
 
