@@ -38,8 +38,7 @@ namespace vita
   ///
   interpreter::interpreter(const individual &ind, interpreter *const ctx)
     : ip_(ind.best_), context_(ctx), ind_(ind),
-      cache_(ind.size(),
-             std::vector<boost::optional<boost::any>>(ind.env_->sset.categories()))
+      cache_(boost::extents[ind.size()][ind.env_->sset.categories()])
   {
   }
 
@@ -49,9 +48,8 @@ namespace vita
   ///
   boost::any interpreter::operator()(const locus &ip)
   {
-    for (unsigned i(0); i < cache_.size(); ++i)
-      for (category_t c(0); c < cache_[i].size(); ++c)
-        cache_[i][c] = boost::none;
+    std::fill(cache_.data(), cache_.data() + cache_.num_elements(),
+              boost::none);
 
     ip_ = ip;
     return ind_[ip_].sym->eval(this);
@@ -103,7 +101,7 @@ namespace vita
 
     const locus l{{g.args[i], f->arg_category(i)}};
 
-    if (!cache_[l[0]][l[1]])
+    if (!cache_(l))
     {
       const locus backup(ip_);
       ip_ = l;
@@ -111,7 +109,7 @@ namespace vita
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
-      cache_[l[0]][l[1]] = ret;
+      cache_(l) = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
@@ -121,12 +119,12 @@ namespace vita
       assert(ip_[0] > backup[0]);
       const boost::any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_string(ret) == to_string(*cache_[l[0]][l[1]]));
+      assert(to_string(ret) == to_string(*cache_(l)));
     }
 #endif
 
-    assert(cache_[l[0]][l[1]]);
-    return *cache_[l[0]][l[1]];
+    assert(cache_(l));
+    return *cache_(l);
   }
 
   ///

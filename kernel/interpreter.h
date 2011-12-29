@@ -25,9 +25,8 @@
 #define      INTERPRETER_H
 
 #include <boost/any.hpp>
+#include <boost/multi_array.hpp>
 #include <boost/optional.hpp>
-
-#include <vector>
 
 #include "kernel/locus.h"
 
@@ -60,7 +59,7 @@ namespace vita
 
     const individual &ind_;
 
-    mutable std::vector<std::vector<boost::optional<boost::any>>> cache_;
+    mutable boost::multi_array<boost::optional<boost::any>, 2> cache_;
   };
 
   ///
