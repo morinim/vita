@@ -729,6 +729,8 @@ namespace vita
   ///
   /// \param[out] s output stream.
   ///
+  /// Print the complete content of this individual.
+  ///
   void individual::dump(std::ostream &s) const
   {
     const unsigned categories(env_->sset.categories());
@@ -742,13 +744,16 @@ namespace vita
       {
         const gene &g(genome_[i][c]);
 
-        s << '{'
-          << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+        if (categories > 1)
+          s << '{';
+
+        s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
         for (unsigned j(0); j < g.sym->arity(); ++j)
           s << ' ' << std::setw(width) << g.args[j];
 
-        s << '}';
+        if (categories > 1)
+          s << '}';
       }
 
       s << std::endl;
