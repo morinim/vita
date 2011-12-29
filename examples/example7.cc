@@ -34,30 +34,31 @@
 
 int main(int argc, char *argv[])
 {
-  vita::environment env;
+  using namespace vita;
+  environment env;
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make("NUMBER", vita::d_double, -200, 200));
-  env.insert(factory.make("ADD", vita::d_double));
-  env.insert(factory.make("SUB", vita::d_double));
-  env.insert(factory.make("MUL", vita::d_double));
-  env.insert(factory.make("IFL", vita::d_double));
-  env.insert(factory.make("IFE", vita::d_double));
-  env.insert(factory.make("ABS", vita::d_double));
-  env.insert(factory.make("LN", vita::d_double));
+  symbol_factory &factory(symbol_factory::instance());
+  env.insert(factory.make("NUMBER", d_double, -200, 200));
+  env.insert(factory.make("ADD", d_double));
+  env.insert(factory.make("SUB", d_double));
+  env.insert(factory.make("MUL", d_double));
+  env.insert(factory.make("IFL", d_double));
+  env.insert(factory.make("IFE", d_double));
+  env.insert(factory.make("ABS", d_double));
+  env.insert(factory.make("LN", d_double));
 
-  vita::distribution<double> individuals, blocks_len, blocks_n, arguments;
+  distribution<double> individuals, blocks_len, blocks_n, arguments;
 
   for (unsigned k(0); k < n; ++k)
   {
-    vita::individual base(env, true);
+    individual base(env, true);
     unsigned base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = vita::individual(env, true);
+      base = individual(env, true);
       base_es = base.eff_size();
     }
 
@@ -67,13 +68,13 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<vita::loc_t> bl(base.blocks());
+    std::list<locus> bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
-      vita::individual ib(base.get_block(*i));
+      individual ib(base.get_block(*i));
 
-      std::vector<vita::loc_t> loci;
-      vita::individual generalized(ib.generalize(2, &loci));
+      std::vector<locus> arg_loc;
+      individual generalized(ib.generalize(2, &arg_loc));
 
       std::cout << std::endl;
       ib.list(std::cout);
@@ -81,15 +82,13 @@ int main(int argc, char *argv[])
       std::cout << "GENERALIZED" << std::endl;
       generalized.list(std::cout);
 
-      const unsigned arg_n(loci.size());
-      std::cout << std::endl << "Arguments:";
-      for (unsigned j(0); j < arg_n; ++j)
-        std::cout << " (pos=" << loci[j].index << ",category="
-                  << loci[j].category << ")";
-        std::cout << std::endl;
+      std::cout << std::endl << "Arguments: [";
+      for (unsigned j(0); j < arg_loc.size(); ++j)
+        std::cout << ' ' << arg_loc[j];
+      std::cout << " ]" << std::endl;
 
-        blocks_len.add(ib.eff_size());
-        arguments.add(arg_n);
+      blocks_len.add(ib.eff_size());
+      arguments.add(arg_loc.size());
     }
   }
 

@@ -35,30 +35,32 @@
 
 int main(int argc, char *argv[])
 {
-  vita::environment env;
+  using namespace vita;
+
+  environment env;
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 5;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make("NUMBER", vita::d_double, -200, 200));
-  env.insert(factory.make("ADD", vita::d_double));
-  env.insert(factory.make("SUB", vita::d_double));
-  env.insert(factory.make("MUL", vita::d_double));
-  env.insert(factory.make("IFL", vita::d_double));
-  env.insert(factory.make("IFE", vita::d_double));
-  env.insert(factory.make("ABS", vita::d_double));
-  env.insert(factory.make("LN", vita::d_double));
+  symbol_factory &factory(symbol_factory::instance());
+  env.insert(factory.make("NUMBER", d_double, -200, 200));
+  env.insert(factory.make("ADD", d_double));
+  env.insert(factory.make("SUB", d_double));
+  env.insert(factory.make("MUL", d_double));
+  env.insert(factory.make("IFL", d_double));
+  env.insert(factory.make("IFE", d_double));
+  env.insert(factory.make("ABS", d_double));
+  env.insert(factory.make("LN", d_double));
 
   for (unsigned k(0); k < n; ++k)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    vita::individual base(env, true);
+    individual base(env, true);
     unsigned base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = vita::individual(env, true);
+      base = individual(env, true);
       base_es = base.eff_size();
     }
 
@@ -66,52 +68,51 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<vita::loc_t> bl(base.blocks());
+    std::list<locus> bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
-      vita::individual blk(base.get_block(*i));
+      individual blk(base.get_block(*i));
 
       std::cout << std::endl << "BLOCK at locus " << *i << std::endl;
       blk.list(std::cout);
-      const boost::any val((vita::interpreter(blk))());
+      const boost::any val((interpreter(blk))());
       if (val.empty())
         std::cout << "Incorrect output.";
       else
-        std::cout << "Output: " << vita::interpreter::to_string(val);
+        std::cout << "Output: " << interpreter::to_string(val);
       std::cout << std::endl;
 
       if (blk.eff_size() <= 20)
       {
-        std::vector<vita::loc_t> loci;
-        vita::individual blk2(blk.generalize(2, &loci));
+        std::vector<locus> loci;
+        individual blk2(blk.generalize(2, &loci));
 
-        std::vector<vita::category_t> categories(loci.size());
-        for (unsigned l(0); l < loci.size(); ++l)
-          categories[l] = loci[l].category;
+        std::vector<index_t> positions(loci.size());
+        std::vector<category_t> categories(loci.size());
+        for (unsigned j(0); j < loci.size(); ++j)
+        {
+          positions[j]  = loci[j][0];
+          categories[j] = loci[j][1];
+        }
 
-        vita::symbol_ptr f(new vita::adf(blk2, categories, 100));
+        symbol_ptr f(new adf(blk2, categories, 100));
         env.insert(f);
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
 
-        std::vector<unsigned> positions(loci.size());
-        for (unsigned p(0); p < loci.size(); ++p)
-          positions[p] = loci[p].index;
-
-        vita::individual blk3(blk.replace(f, positions));
+        individual blk3(blk.replace(f, positions));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const boost::any val3((vita::interpreter(blk3))());
+        const boost::any val3((interpreter(blk3))());
         if (val3.empty())
           std::cout << "Incorrect output.";
         else
-          std::cout << "Output: " << vita::interpreter::to_string(val3);
+          std::cout << "Output: " << interpreter::to_string(val3);
         std::cout << std::endl << std::endl;
 
         if (val.empty() != val3.empty() ||
             (!val.empty() && !val3.empty() &&
-             vita::interpreter::to_string(val) !=
-             vita::interpreter::to_string(val3)))
+             interpreter::to_string(val) != interpreter::to_string(val3)))
         {
           std::cout << "ADF EVAL ERROR." << std::endl;
           return EXIT_FAILURE;

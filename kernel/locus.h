@@ -46,6 +46,9 @@ namespace vita
   /// \param[in] l2 second locus.
   /// \return \c true if \a l1 precedes \a l2 in lexicographic order
   ///         (http://en.wikipedia.org/wiki/Lexicographical_order).
+  ///
+  /// This operator is required by the STL std::map container.
+  ///
   inline
   bool operator<(const locus &l1, const locus &l2)
   { return l1[0] < l2[0] || (l1[0] == l2[0] && l1[1] < l2[1]); }
