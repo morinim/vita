@@ -72,6 +72,18 @@ namespace vita
 
     bool check() const;
 
+    ///
+    /// \param[in] s symbol pointer.
+    /// \return a cast of \s to a function pointer.
+    ///
+    /// This is a short cut function.
+    ///
+    static const function *cast(const symbol_ptr &s)
+    {
+      assert(s->arity());
+      return static_cast<function *>(s.get());
+    }
+
     static unsigned default_weight;
 
   private:

@@ -38,7 +38,7 @@ namespace vita
     template<class T> static T between(T, T);
     template<class T> static const T &element(const std::vector<T> &);
 
-    static unsigned ring(unsigned, unsigned, unsigned);
+    static index_t ring(index_t, unsigned, unsigned);
 
     static bool boolean(double);
     static bool boolean();

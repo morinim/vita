@@ -54,7 +54,7 @@ namespace vita
   /// If \c base is greater than \c n we take a random starting position on the
   /// protractor.
   ///
-  unsigned random::ring(unsigned base, unsigned width, unsigned n)
+  index_t random::ring(index_t base, unsigned width, unsigned n)
   {
     assert(width);
     assert(n > 1);

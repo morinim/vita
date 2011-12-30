@@ -268,9 +268,7 @@ namespace vita
 
     for (unsigned i(0); i < all_.symbols.size(); ++i)
       for (unsigned j(0); j < all_.symbols[i]->arity(); ++j)
-        need.insert(std::static_pointer_cast<function>(all_.symbols[i])
-                    ->arg_category(j));
-        // static_cast<function *>(all_.symbols[i].get())->arg_category(j)
+        need.insert(function::cast(all_.symbols[i])->arg_category(j));
 
     for (auto cat(need.begin()); cat != need.end(); ++cat)
     {
@@ -299,10 +297,7 @@ namespace vita
       if (arity)
         o << '(';
       for (unsigned j(0); j < arity; ++j)
-      {
-        const function* f(static_cast<function *>((*i).get()));
-        o << f->arg_category(j) << (j+1 == arity ? "" : ", ");
-      }
+        o << function::cast(*i)->arg_category(j) << (j+1 == arity ? "" : ", ");
       if (arity)
         o << ')';
 

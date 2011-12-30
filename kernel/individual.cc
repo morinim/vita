@@ -369,8 +369,7 @@ namespace vita
     }
     else
       for (unsigned i(0); i < g.sym->arity(); ++i)
-        pack(locus{{g.args[i],
-                    static_cast<function *>(g.sym.get())->arg_category(i)}},
+        pack(locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
              p);
   }
 
@@ -629,8 +628,7 @@ namespace vita
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
         s << 'g' << l << " -- g"
-          << locus{{g.args[j],
-                    static_cast<function *>(g.sym.get())->arg_category(j)}}
+          << locus{{g.args[j], function::cast(g.sym)->arg_category(j)}}
           << ';';
     }
 
@@ -719,9 +717,7 @@ namespace vita
     const unsigned arity(g.sym->arity());
     if (arity)
       for (unsigned i(0); i < arity; ++i)
-        tree(s,
-             locus{{g.args[i],
-                    static_cast<function *>(g.sym.get())->arg_category(i)}},
+        tree(s, locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
              indent, child);
   }
 
@@ -801,8 +797,7 @@ namespace vita
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
       {
-        const locus l{
-          {g.args[j], static_cast<function *>(g.sym.get())->arg_category(j)}};
+        const locus l{{g.args[j], function::cast(g.sym)->arg_category(j)}};
 
         loci_.insert(l);
       }

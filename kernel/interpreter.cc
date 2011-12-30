@@ -97,7 +97,7 @@ namespace vita
     assert(g.sym->arity());
     assert(i < g.sym->arity());
 
-    const function *const f(static_cast<function *>(g.sym.get()));
+    const function *const f(function::cast(g.sym));
 
     const locus l{{g.args[i], f->arg_category(i)}};
 
