@@ -66,7 +66,7 @@ namespace vita
       for (category_t c(0); c < categories; ++c)
         genome_[sup][c] = gene(e.sset.roulette_terminal(c));
 
-      assert(check());
+      assert(check(true));
     }
   }
 
@@ -115,7 +115,7 @@ namespace vita
     const unsigned sup(size() - 1);
     const unsigned categories(env_->sset.categories());
 
-    for (unsigned i(0); i < sup; ++i)
+    for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
         if (random::boolean(env_->p_mutation))
         {
@@ -593,8 +593,15 @@ namespace vita
       return false;
     }
 
+    if (categories == 1 && eff_size() > size())
+    {
+      if (verbose)
+        std::cerr << "eff_size() cannot be greater than size() in single "\
+                     "category individuals." << std::endl;
+      return false;
+    }
+
     return
-      eff_size() <= size() &&
       env_->check() &&
       (signature_.empty() || signature_ == hash());
   }

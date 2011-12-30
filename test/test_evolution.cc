@@ -63,7 +63,7 @@ BOOST_FIXTURE_TEST_SUITE(Evolution, F)
 BOOST_AUTO_TEST_CASE(Creation)
 {
   for (unsigned n(4); n <= 100; ++n)
-    for (unsigned l(2); l <= 100; l+=(l < 10 ? 1 : 30))
+    for (unsigned l(env.sset.categories() + 2); l <= 100; l+=(l < 10 ? 1 : 30))
     {
       env.individuals = n;
       env.code_length = l;

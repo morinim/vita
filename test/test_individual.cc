@@ -48,13 +48,25 @@ struct F
     env.insert(factory.make("ADD", vita::d_double, {0}));
     env.insert(factory.make("SUB", vita::d_double, {0}));
     env.insert(factory.make("MUL", vita::d_double, {0}));
+    env.insert(factory.make("DIV", vita::d_double, {0}));
+    env.insert(factory.make("LN", vita::d_double, {0}));
     env.insert(factory.make("IFL", vita::d_double, {0}));
+    env.insert(factory.make("IFZ", vita::d_double, {0}));
     env.insert(factory.make("IFE", vita::d_double, {0, 0}));
+    env.insert(factory.make("SIN", vita::d_double, {0}));
+    env.insert(factory.make("ABS", vita::d_double, {0}));
     env.insert(factory.make("LENGTH", vita::d_double, {1, 0}));
 
     env.insert(factory.make("apple", vita::d_string, {1}));
     env.insert(factory.make("pear", vita::d_string, {1}));
     env.insert(factory.make("grapefruit", vita::d_string, {1}));
+    env.insert(factory.make("orange", vita::d_string, {1}));
+    env.insert(factory.make("blueberry", vita::d_string, {1}));
+    env.insert(factory.make("blackberry", vita::d_string, {1}));
+    env.insert(factory.make("passion fruit", vita::d_string, {1}));
+    env.insert(factory.make("plum", vita::d_string, {1}));
+    env.insert(factory.make("date", vita::d_string, {1}));
+    env.insert(factory.make("peach", vita::d_string, {1}));
     env.insert(factory.make("IFE", vita::d_string, {1, 0}));
   }
 
@@ -67,7 +79,7 @@ struct F
 };
 
 BOOST_FIXTURE_TEST_SUITE(Individual, F)
-
+/*
 BOOST_AUTO_TEST_CASE(Compact)
 {
   env.code_length = 100;
@@ -115,7 +127,8 @@ BOOST_AUTO_TEST_CASE(Compact)
     BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
   }
 }
-/*
+*/
+
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
@@ -144,15 +157,16 @@ BOOST_AUTO_TEST_CASE(Mutation)
     dist += i1.distance(ind);
   }
 
-  const double perc(100.0 * dist / (env.code_length * n));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  const double perc(100.0 * dist /
+                    (env.code_length * env.sset.categories() * n));
+  BOOST_CHECK_GT(perc, 45.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
-*/
+
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(env.sset.categories() + 1); l < 100; ++l)
+  for (unsigned l(env.sset.categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
     vita::individual i(env, true);
@@ -160,20 +174,6 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
     BOOST_REQUIRE(i.check());
     BOOST_REQUIRE_EQUAL(i.size(), l);
-  }
-
-  BOOST_TEST_CHECKPOINT("Sticky symbol must exits!");
-  const vita::symbol_ptr n_123(vita::symbol_factory::instance().make(
-                                 "123", vita::d_double, {}));
-  env.insert(n_123, true);
-  for (unsigned l(env.sset.categories() + 2); l < 100; ++l)
-  {
-    env.code_length = l;
-    vita::individual i(env, true);
-
-    BOOST_REQUIRE(i.check());
-    BOOST_REQUIRE_EQUAL(i.size(), l);
-    BOOST_REQUIRE_EQUAL(i[l-1].sym, n_123);
   }
 }
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
       BOOST_REQUIRE_NE(a, c);
   }
 }
-/*
+
 BOOST_AUTO_TEST_CASE(Cross0)
 {
   env.code_length = 100;
@@ -204,9 +204,10 @@ BOOST_AUTO_TEST_CASE(Cross0)
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(uniform_crossover(i1, i2));
 
-  const double perc(100.0 * dist / (env.code_length*n));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  const double perc(100.0 * dist /
+                    (env.code_length * env.sset.categories() * n));
+  BOOST_CHECK_GT(perc, 45.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Cross1)
@@ -220,9 +221,10 @@ BOOST_AUTO_TEST_CASE(Cross1)
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(one_point_crossover(i1, i2));
 
-  const double perc(100.0 * dist / (env.code_length*n));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  const double perc(100.0 * dist /
+                    (env.code_length * env.sset.categories() * n));
+  BOOST_CHECK_GT(perc, 45.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Cross2)
@@ -236,9 +238,10 @@ BOOST_AUTO_TEST_CASE(Cross2)
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(two_point_crossover(i1, i2));
 
-  const double perc(100*dist / (env.code_length*n));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  const double perc(100.0 * dist /
+                    (env.code_length * env.sset.categories() * n));
+  BOOST_CHECK_GT(perc, 45.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()

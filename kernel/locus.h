@@ -64,6 +64,18 @@ namespace vita
     return s << '(' << l[0] << ',' << l[1] << ')';
   }
 
+  ///
+  /// \param[in] l starting locus.
+  /// \param[in] i displacement.
+  /// \return a new locus obtained from \a l incrementing index component by
+  ///         \a i (and not changing category component).
+  ///
+  inline
+  locus operator+(const locus &l, unsigned i)
+  {
+    return locus{{l[0] + i, l[1]}};
+  }
+
 }  // namespace vita
 
 #endif  // LOCUS_H
