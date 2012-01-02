@@ -68,35 +68,36 @@ namespace vita
     bool enough_terminals() const;
     bool check() const;
 
+    friend std::ostream &operator<<(std::ostream &, const symbol_set &);
+
   private:
     static const symbol_ptr empty_ptr;
 
-    friend std::ostream &operator<<(std::ostream &, const symbol_set &);
+    typedef std::vector<symbol_ptr> s_vector;
 
     void clear();
+    const symbol_ptr &roulette(const s_vector &, boost::uint64_t) const;
 
     // \a arguments_ is not included in the \a collection struct because
-    // category isn't fixed for an argument (see \c argument constructor for
+    // an argument isn't bounded to a category (see \c argument constructor for
     // more details).
-    std::vector<symbol_ptr> arguments_;
+    s_vector arguments_;
 
+    // Symbols of every category are inserted in this collection.
     struct collection
     {
       collection();
 
-      std::vector<symbol_ptr>   symbols;
-      std::vector<symbol_ptr> terminals;
-      std::vector<symbol_ptr>       adf;
-      std::vector<symbol_ptr>       adt;
+      s_vector   symbols;
+      s_vector terminals;
+      s_vector       adf;
+      s_vector       adt;
 
       // The sum of the weights of all the symbols in the collection.
       boost::uint64_t sum;
 
       bool check() const;
-    };
-
-    // Symbols of every category are inserted in this collection.
-    collection all_;
+    } all_;
 
     // This struct contains all the symbols (\a all_) divided by category.
     struct by_category

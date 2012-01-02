@@ -24,9 +24,9 @@
 #if !defined(RANDOM_H)
 #define      RANDOM_H
 
-#include <boost/random.hpp>
-
 #include <cstdlib>
+
+#include <boost/random.hpp>
 
 #include "kernel/vita.h"
 

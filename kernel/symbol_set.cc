@@ -85,7 +85,8 @@ namespace vita
   ///
   /// \param[in] i symbol to be added.
   ///
-  /// Adds a new \a symbol to the set.
+  /// Adds a new \a symbol to the set. We manage to sort the symbols in
+  /// descending order so the selection algorithm will run faster.
   ///
   void symbol_set::insert(const symbol_ptr &i)
   {
@@ -106,6 +107,10 @@ namespace vita
         all_.adf.push_back(i);
 
     by_ = by_category(all_);
+
+    std::sort(all_.symbols.begin(), all_.symbols.end(),
+              [](const symbol_ptr &s1, const symbol_ptr &s2)
+              { return s1->weight > s2->weight; });
   }
 
   ///
@@ -153,8 +158,6 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random terminal of category \a c.
   ///
-  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
-  ///
   const symbol_ptr &symbol_set::roulette_terminal(category_t c) const
   {
     assert(c < categories());
@@ -166,39 +169,63 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random symbol of category \a c.
   ///
-  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
-  ///
   const symbol_ptr &symbol_set::roulette(category_t c) const
   {
-    const std::vector<symbol_ptr> &symbols(by_.category[c].symbols);
-    const unsigned slot(random::between<unsigned>(0, by_.category[c].sum));
-
-    unsigned i(0);
-    for (unsigned wedge(symbols[i]->weight);
-         wedge <= slot && i+1 < symbols.size();
-         wedge += symbols[++i]->weight)
-    {}
-
-    assert(i < symbols.size());
-    return symbols[i];
+    return roulette(by_.category[c].symbols, by_.category[c].sum);
   }
 
   ///
-  /// \return a random symbol.
-  ///
-  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
+  /// \return a random symbol from the set of all symbols.
   ///
   const symbol_ptr &symbol_set::roulette() const
   {
-    const std::vector<symbol_ptr> &symbols(all_.symbols);
-    const unsigned slot(random::between<unsigned>(0, all_.sum));
+    return roulette(all_.symbols, all_.sum);
+  }
+
+  ///
+  /// \param[in] symbols set of symbols.
+  /// \param[in] sum sum of the weights of the elements contained in \a symbols.
+  /// \return a random symbol from \a symbols.
+  ///
+  /// Probably the fastest way to produce a realization of a random variable X
+  /// in a computer is to create a big table where each outcome \a i is
+  /// inserterted a number of times proportional to P(X=i).
+  ///
+  /// Two fast methods are described in "Fast Generation of Discrete Random
+  /// Variables" (Marsaglia, Tsang, Wang).
+  /// Also boost::random::discrete_distribution seems quite fast.
+  ///
+  /// Anyway we choose the "roulette algorithm" because it's very simple and
+  /// allows changing weights dynamically (performance differences can hardly
+  /// be measured).
+  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
+  ///
+  const symbol_ptr &symbol_set::roulette(const s_vector & symbols,
+                                         boost::uint64_t sum) const
+  {
+    const boost::uint64_t slot(random::between<boost::uint64_t>(0, sum));
 
     unsigned i(0);
-    for (unsigned wedge(symbols[i]->weight);
-         wedge <= slot && i+1 < symbols.size();
+    for (boost::uint64_t wedge(symbols[i]->weight);
+         wedge <= slot;
          wedge += symbols[++i]->weight)
     {}
 
+    // This is a different approach from Eli Bendersky
+    // (http://eli.thegreenplace.net):
+    // boost::uint64_t total(0);
+    // for (unsigned i(0), winner(0); i < symbols.size(); ++i)
+    // {
+    //   total += symbols[i]->weight;
+    //   if (random::between<boost::uint64_t>(0, total+1) < symbols[i]->weight)
+    //     winner = i;
+    //   return winner;
+    // }
+    // The interesting property of this algorithm is that you don't need to
+    // know the sum of weights in advance in order to use it. The method is
+    // cool, but slower than the standard roulette.
+
+    assert(i < symbols.size());
     return symbols[i];
   }
 
@@ -415,6 +442,11 @@ namespace vita
 
     for (unsigned i(0); i < c.adt.size(); ++i)
       category[c.adt[i]->category()].adt.push_back(c.adt[i]);
+
+    for (category_t j(0); j < category.size(); ++j)
+      std::sort(category[j].symbols.begin(), category[j].symbols.end(),
+                [](const symbol_ptr &s1, const symbol_ptr &s2)
+                { return s1->weight > s2->weight; });
 
     assert(check());
   }
