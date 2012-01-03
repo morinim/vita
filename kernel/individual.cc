@@ -607,7 +607,10 @@ namespace vita
 
   ///
   /// \param[out] s output stream.
-  /// \param[in] id
+  /// \param[in] id used for subgraph plot (usually this is an empty string).
+  ///
+  /// The output stream contains a graph, described in dot language
+  /// (http://www.graphviz.org), of \c this individual.
   ///
   void individual::graphviz(std::ostream &s, const std::string &id) const
   {
@@ -622,14 +625,13 @@ namespace vita
     {
       const gene &g(*it);
 
-      s << 'g' << l << " [label="
+      s << 'g' << l[0] << '_' << l[1] << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-        << "];";
+        << ", shape=" << (g.sym->arity() ? "box" : "parallelogram") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << l << " -- g"
-          << locus{{g.args[j], function::cast(g.sym)->arg_category(j)}}
-          << ';';
+        s << 'g' << l[0] << '_' << l[1] << " -- g"
+          << g.args[j] << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
     s << '}' << std::endl;
