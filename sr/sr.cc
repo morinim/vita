@@ -273,14 +273,9 @@ bool parse_command_line(int argc, char *argv[])
       std::cout << "ok (" << parsed << " symbols)" << std::endl;
   }
 
-  if ((problem.classes() >  1 && problem.categories() > 2) ||
-      (problem.classes() <= 1 && problem.categories() > 1))
+  if (!problem.env.sset.enough_terminals())
   {
-    if (!problem.env.sset.enough_terminals())
-      std::cerr << std::endl << "Too few terminals." << std::endl;
-
-    std::cerr << std::endl << "Multi-categories aren't supported to date"\
-      " (please use just one numeric category)." << std::endl;
+    std::cerr << std::endl << "Too few terminals." << std::endl;
     return false;
   }
 

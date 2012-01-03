@@ -27,7 +27,6 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/data.h"
@@ -164,7 +163,7 @@ namespace vita
   /// \param[in] i index of a category.
   /// \return a const reference to the i-th category.
   ///
-  const data::category &data::get_category(unsigned i) const
+  const data::category &data::get_category(category_t i) const
   {
     assert(i < categories_.size());
     return categories_[i];
@@ -505,11 +504,10 @@ namespace vita
         if (xml_type == "nominal")
           try
           {
+            // Store label1... labelN.
             BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
               if (l.first == "label")
-              {
-                // Store label1... labelN
-              }
+                categories_[a.category_id].labels.insert(l.second.data());
           }
           catch(...)
           {
@@ -650,8 +648,10 @@ namespace vita
 
             a.name = "";
 
-            std::string s_domain(is_number(record[field]) ?
-                                 "numeric" : "string");
+            std::string s_domain(is_number(record[field])
+                                 ? "numeric"
+                                 : "string" +
+                                   boost::lexical_cast<std::string>(field));
             // For classification problems we use discriminant functions, so the
             // actual output type is always numeric.
             if (field == 0 && classification)
@@ -681,8 +681,12 @@ namespace vita
                 instance.output = convert(record[field], categories_[c].domain);
             }
             else  // input value
+            {
               instance.input.push_back(convert(record[field],
                                                categories_[c].domain));
+              if (categories_[c].domain == d_string)
+                categories_[c].labels.insert(record[field]);
+            }
           }
           catch(boost::bad_lexical_cast &)
           {

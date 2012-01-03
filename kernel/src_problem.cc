@@ -63,7 +63,7 @@ namespace vita
 
   ///
   /// \param[in] f name of the file containing the learning collection.
-  /// \return number of lines read.
+  /// \return number of lines parsed.
   ///
   unsigned src_problem::load_data(const std::string &f)
   {
@@ -80,9 +80,20 @@ namespace vita
           name = "X" + boost::lexical_cast<std::string>(i);
 
         const category_t category(dat_.get_column(i).category_id);
-        variable_ptr x(new variable(name, category));
+        variable_ptr x(std::make_shared<variable>(name, category));
         vars_.push_back(x);
         env.insert(x);
+      }
+
+      // Sets up the labels for nominal attributes.
+      for (category_t c(0); c < dat_.categories(); ++c)
+      {
+        const data::category &cat(dat_.get_category(c));
+        for (auto lp(cat.labels.begin()); lp != cat.labels.end(); ++lp)
+        {
+          const symbol_ptr label(std::make_shared<constant>(*lp, c));
+          env.insert(label);
+        }
       }
 
       set_evaluator(classes() > 1
@@ -180,7 +191,8 @@ namespace vita
                 if (compatible(*i, args))
                 {
 #if !defined(NDEBUG)
-                  std::cout << sym_name << "(";
+                  const domain_t domain(dat_.get_category(i->back()).domain);
+                  std::cout << "Domain " << domain << ": " << sym_name << '(';
                   for (unsigned j(0); j < i->size(); ++j)
                     std::cout << dat_.get_category((*i)[j]).name
                               << (j+1 == i->size() ? ")" : ", ");
@@ -201,7 +213,7 @@ namespace vita
               const unsigned n_args(factory.args(sym_name, domain));
 
 #if !defined(NDEBUG)
-              std::cout << "Domain " << domain << ": " << sym_name << "(";
+              std::cout << "Domain " << domain << ": " << sym_name << '(';
               for (unsigned j(0); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
                           << (j+1 == n_args ? ")" : ", ");

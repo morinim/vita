@@ -117,6 +117,7 @@ namespace vita
     assert(0 <= p && p <= 1);
 
     return random::between<double>(0, 1) < p;
+    //return boost::uniform_01<double>()(rng_) < p;
   }
 
   ///
@@ -126,6 +127,7 @@ namespace vita
   bool random::boolean()
   {
     return random::between<unsigned>(0, 2) != 0;
+    //return boost::uniform_smallint<unsigned>(0,1)(rng_) != 0;
   }
 }  // namespace vita
 

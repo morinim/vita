@@ -28,6 +28,7 @@
 
 #include <list>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -94,9 +95,9 @@ namespace vita
     ///
     struct category
     {
-      std::string              name;
-      domain_t               domain;
-      std::list<boost::any> symbols;
+      std::string             name;
+      domain_t              domain;
+      std::set<std::string> labels;
     };
 
     /// value_type *
@@ -117,7 +118,7 @@ namespace vita
     void clear(unsigned = 1);
 
     category_t get_category(const std::string &) const;
-    const category &get_category(unsigned) const;
+    const category &get_category(category_t) const;
     const column &get_column(unsigned) const;
 
     unsigned categories() const;
