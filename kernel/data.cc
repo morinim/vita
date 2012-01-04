@@ -58,15 +58,13 @@ namespace vita
 
   ///
   /// \param[in] n number of distinct datasets. E.g.:
-  ///              <ol>
-  ///                <li>auto choose;</li>
-  ///                <li>not partitioned;</li>
-  ///                <li>one training set and one validation set;</li>
-  ///                <li>two training sets and one validation set...</li>
-  ///              </ol>
+  ///              \li 0 auto choose;
+  ///              \li 1 not partitioned;
+  ///              \li 2 one training set and one validation set;
+  ///              \li 3 two training sets and one validation set...
   /// \see clear
   ///
-  /// New empty data instance (partitioned in \a n training sets).
+  /// New empty data instance (eventually partitioned in training sets).
   ///
   data::data(unsigned n)
   {
@@ -569,8 +567,7 @@ namespace vita
 
         if (instance.input.size() + 1 == header_.size())
         {
-          const unsigned set(vita::random::between<unsigned>(0,
-                                                             datasets_.size()));
+          const unsigned set(random::between<unsigned>(0, datasets_.size()));
           datasets_[set].push_back(instance);
           ++parsed;
         }
@@ -697,8 +694,7 @@ namespace vita
 
         if (instance.input.size() + 1 == header_.size())
         {
-          const unsigned set(vita::random::between<unsigned>(0,
-                                                             datasets_.size()));
+          const unsigned set(random::between<unsigned>(0, datasets_.size()));
           datasets_[set].push_back(instance);
           ++parsed;
         }

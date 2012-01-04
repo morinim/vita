@@ -23,7 +23,7 @@
  *
  *  \mainpage VITA v0.9.1
  *
- *  \section Introduciton
+ *  \section Introduction
  *  Welcome to the Vita project.
  *
  *  This is the reference guide for the Vita APIs.

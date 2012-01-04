@@ -102,12 +102,15 @@ namespace vita
   private:
     struct slot
     {
-      hash_t   hash;
-      fitness_t fit;
+      hash_t       hash;
+      fitness_t     fit;
+      unsigned birthday;
     };
 
     const boost::uint64_t k_mask;
     slot *const table_;
+
+    unsigned year_;
 
     mutable boost::uint64_t probes_;
     mutable boost::uint64_t hits_;

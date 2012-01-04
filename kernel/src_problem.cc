@@ -190,15 +190,15 @@ namespace vita
               for (auto i(sequences.begin()); i != sequences.end(); ++i)
                 if (compatible(*i, args))
                 {
+                  const domain_t domain(dat_.get_category((*i)[0]).domain);
 #if !defined(NDEBUG)
-                  const domain_t domain(dat_.get_category(i->back()).domain);
+                  //const domain_t domain(dat_.get_category(i->back()).domain);
                   std::cout << "Domain " << domain << ": " << sym_name << '(';
                   for (unsigned j(0); j < i->size(); ++j)
                     std::cout << dat_.get_category((*i)[j]).name
                               << (j+1 == i->size() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
-                  const domain_t domain(dat_.get_category((*i)[0]).domain);
                   env.insert(factory.make(sym_name, domain, *i));
                 }
             }
