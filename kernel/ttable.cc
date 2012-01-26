@@ -32,7 +32,7 @@ namespace vita
   /// Creates a new transposition (hash) table.
   ///
   ttable::ttable(unsigned bits)
-    : k_mask((1 << bits)-1), table_(new slot[1 << bits]), year_(1),
+    : k_mask((1 << bits)-1), table_(new slot[1 << bits]), period_(1),
       probes_(0), hits_(0)
   {
     assert(check());
@@ -53,7 +53,7 @@ namespace vita
     probes_ = 0;
     hits_   = 0;
 
-    ++year_;
+    ++period_;
     //for (unsigned i(0); i <= k_mask; ++i)
     //{
     //  table_[i].hash = hash_t();
@@ -77,7 +77,7 @@ namespace vita
 
     const slot &s(table_[h.p1 & k_mask]);
 
-    const bool ret(year_ == s.birthday && h == s.hash);
+    const bool ret(period_ == s.birthday && h == s.hash);
 
     if (ret)
     {
@@ -99,7 +99,7 @@ namespace vita
     slot s;
     s.hash     = ind.signature();
     s.fit      =             fit;
-    s.birthday =           year_;
+    s.birthday =         period_;
 
     table_[s.hash.p1 & k_mask] = s;
   }

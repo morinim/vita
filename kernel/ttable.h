@@ -110,7 +110,7 @@ namespace vita
     const boost::uint64_t k_mask;
     slot *const table_;
 
-    unsigned year_;
+    unsigned period_;
 
     mutable boost::uint64_t probes_;
     mutable boost::uint64_t hits_;
