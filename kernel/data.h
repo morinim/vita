@@ -56,13 +56,25 @@ namespace vita
     /// \li a numeric value (symbolic regression problem);
     /// \li a label (classification problem).
     ///
+    /// \a difficulty and \a age are parameters used by the Dynamic Subset
+    /// Selection algorithm (see "Dynamic Training Subset Selection for
+    /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
+    /// Ross).
+    ///
     struct value_type
     {
+      value_type() { clear(); }
+
       std::vector<boost::any> input;
       boost::any             output;
 
+      boost::uint64_t difficulty;
+      unsigned               age;
+
       unsigned label() const { return boost::any_cast<unsigned>(output); }
-      void clear() { input.clear(); output = boost::any(); }
+
+      void clear()
+      { input.clear(); output = boost::any(); difficulty = 0; age = 0; }
     };
 
     /// Informations about a "column" of the dataset.
@@ -105,8 +117,11 @@ namespace vita
     /// const value_type *
     typedef std::list<value_type>::const_iterator const_iterator;
 
-    explicit data(unsigned = 1);
-    explicit data(const std::string &, unsigned = 1);
+    data();
+    explicit data(const std::string &);
+
+    enum dataset_t {training = 0, validation};
+    void dataset(dataset_t);
 
     const_iterator begin() const;
     const_iterator end() const;
@@ -115,7 +130,7 @@ namespace vita
     unsigned open(const std::string &);
     bool operator!() const;
 
-    void clear(unsigned = 1);
+    void clear();
 
     category_t get_category(const std::string &) const;
     const category &get_category(category_t) const;
@@ -158,15 +173,16 @@ namespace vita
     // What are the categories we are dealing with?
     std::vector<category> categories_;
 
-    // The training set (partitioned).
-    std::vector<std::list<value_type>> datasets_;
-
-    // The active data partition.
-    // Data are partitioned in multiple datasets:
-    // * one or more training sets used directly for learning;
-    // * one validation set for controlling overfitting and measuring the
+    // Data are stored in two datasets:
+    // * a training set used directly for learning;
+    // * a validation set for controlling overfitting and measuring the
     //   performance of an individual.
-    unsigned active_;
+    std::list<value_type> dataset_[2];
+
+    // Used to choose the data we want to operate on (training / validation
+    // set).
+    // begin(), end() and size() methods operate on the selected set.
+    dataset_t active_dataset_;
   };
 }  // namespace vita
 
