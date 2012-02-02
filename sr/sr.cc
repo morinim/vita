@@ -128,6 +128,9 @@ bool parse_command_line(int argc, char *argv[])
        po::value(&problem.env.brood_recombination)->default_value(
          problem.env.brood_recombination),
        "Sets the brood size for recombination (-1 auto-select, 0 disable).")
+      ("dss",
+       po::value<bool>(&problem.env.dss)->default_value(true),
+       "Turn on/off the Dynamic Subset Selection algorithm.")
       ("g-since-start,g",
        po::value(&problem.env.g_since_start)->default_value(
          problem.env.g_since_start),

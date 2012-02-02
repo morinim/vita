@@ -61,24 +61,37 @@ namespace vita
 
     double err(0.0);
     int illegals(0);
-    // double fit(0.0);
+    unsigned ok(0);
 
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
       load_vars(*t);
 
       const boost::any res(agent());
 
+      double e;
       if (res.empty())
-        err += std::pow(100.0, ++illegals);
+        e = std::pow(100.0, ++illegals);
       else
-        err += std::fabs(interpreter::to_double(res) -
-                         interpreter::to_double(t->output));
+        e = std::fabs(interpreter::to_double(res) -
+                      interpreter::to_double(t->output));
+
+      if (e > 0.1)
+        ++t->difficulty;
+
+      err += e;
+/*
+      if (!res.empty() &&
+          std::fabs(interpreter::to_double(res) -
+                    interpreter::to_double(t->output) < float_epsilon))
+        ++ok;
+      else
+        ++t->difficulty;
+*/
     }
 
     return fitness_t(-err);
-    // return fitness_t(1000.0*std::exp(-err));
-    // return fitness_t(fit);
+    //return ok;
   }
 
   ///
@@ -100,7 +113,7 @@ namespace vita
     int illegals(0);
     unsigned counter(0);
 
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
       if (dat_->size() <= 20 || (counter++ % 5) == 0)
       {
         load_vars(*t);
@@ -203,7 +216,7 @@ namespace vita
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
     // a bidimentional array is built (slots[slot][class]).
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
     {
       const unsigned where(slot(ind, t));
 
@@ -260,7 +273,7 @@ namespace vita
   double dyn_slot_evaluator::accuracy(const individual &ind)
   {
     unsigned count(0);
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
       ++count;
 
     const unsigned ok(count + operator()(ind));
@@ -337,7 +350,7 @@ namespace vita
     // determined by evaluating the program on the examples of the class in
     // the training set. This is done by taking the mean and standard deviation
     // of the program outputs for those training examples for that class.
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
     {
       load_vars(*t);
 
@@ -399,7 +412,7 @@ namespace vita
     gaussian_distribution(ind, &gauss);
 
     unsigned ok(0), count(0);
-    for (data::const_iterator t(dat_->begin()); t != dat_->end(); ++count, ++t)
+    for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
       if (class_label(ind, *t, gauss) == t->label())
         ++ok;
 

@@ -26,6 +26,7 @@
 
 #include <vector>
 
+#include "kernel/data.h"
 #include "kernel/environment.h"
 #include "kernel/fitness.h"
 
@@ -45,6 +46,8 @@ namespace vita
     evaluator *get_evaluator();
     void set_evaluator(unsigned);
 
+    virtual data *get_data() { return 0; }
+
     virtual void clear();
     virtual bool check() const;
 
@@ -52,7 +55,7 @@ namespace vita
 
     fitness_t threashold;
 
-  private:
+  protected:
     std::vector<evaluator_ptr> evaluators_;
     evaluator_ptr              active_eva_;
   };

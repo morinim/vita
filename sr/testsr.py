@@ -49,9 +49,13 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
         rounds //= 2
         generations //= 2
 
+    if args.dss:
+        individuals *= 2
+
     cmd = Template("sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
-                   "-P $nind -p $ps -r $rs $rnd_switch $arl_switch $ss $ds")
+                   "-P $nind -p $ps -r $rs $rnd_switch $arl_switch "\
+                   "$dss_switch $ss $ds")
     s = cmd.substitute(elitism_switch = "--elitism "+str(args.elitism),
                        sd = stat_dir,
                        tt = ttable_bit,
@@ -61,6 +65,7 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
                        rs = rounds,
                        rnd_switch = rnd,
                        arl_switch = "--arl --stat-arl" if args.arl else "",
+                       dss_switch = "--dss 1" if args.dss else "--dss 0",
                        ss = "-s "+os.path.join(symbol_set_dir, symbol_set)
                                   if symbol_set != "" else "",
                        ds = os.path.join(data_set_dir, data_set))
@@ -129,6 +134,8 @@ def get_cmd_line_options(defaults):
 
     parser.add_argument("--arl", action="store_true",
                         help="Turn on ARL")
+    parser.add_argument("--dss", action="store_true",
+                        help="Turn on Dynamic Subset Training")
 
     parser.add_argument("--elitism", action="store_true",
                         help="Enable elitism")
@@ -156,6 +163,7 @@ def load_defaults(filename, defaults):
 
     opt = config["Options"]
     defaults["arl"]         = opt.getboolean("arl", defaults["arl"])
+    defaults["dss"]         = opt.getboolean("dss", defaults["dss"])
     defaults["debug"]       = opt.getboolean("debug", defaults["debug"])
     defaults["elitism"]     = opt.getboolean("elitism", defaults["elitism"])
     defaults["force_input"] = opt.getboolean("force_input",
@@ -165,6 +173,7 @@ def load_defaults(filename, defaults):
 
 def main():
     defaults = {"arl": False,
+                "dss": False,
                 "debug": True,
                 "elitism": True,
                 "force_input": False,

@@ -99,35 +99,61 @@ namespace vita
 
     active_dataset_ = training;
 
+    end_ = dataset_[active_dataset_].end();
+
     assert(check());
   }
 
   ///
   /// \param[in] d the active dataset.
+  /// \param[in] percentage the percentage of the active dataset used.
   ///
   /// We can choose the data we want to operate on (training / validation set).
   /// begin(), end() and size() methods operate on the selected set.
   ///
-  void data::dataset(dataset_t d)
+  void data::dataset(dataset_t d, unsigned percentage)
   {
+    assert(percentage && percentage <= 100);
+
     active_dataset_ = d;
+
+    const unsigned n(dataset_[active_dataset_].size() * percentage / 100);
+    end_ = cbegin();
+    std::advance(end_, n);
   }
 
   ///
-  /// \return constant reference to the first element of the active dataset.
+  /// \return reference to the first element of the active dataset.
   ///
-  data::const_iterator data::begin() const
+  data::iterator data::begin()
   {
     return dataset_[active_dataset_].begin();
   }
 
   ///
-  /// \return constant reference to the last+1 (sentry) element of the active
+  /// \return constant reference to the first element of the active dataset.
+  ///
+  data::const_iterator data::cbegin() const
+  {
+    return dataset_[active_dataset_].cbegin();
+  }
+
+  ///
+  /// \return a constant reference to the last+1 (sentry) element of the active
+  ///         dataset.
+  ///
+  data::const_iterator data::cend() const
+  {
+    return end_;
+  }
+
+  ///
+  /// \return reference to the last+1 (sentry) element of the active
   ///         dataset.
   ///
   data::const_iterator data::end() const
   {
-    return dataset_[active_dataset_].end();
+    return end_;
   }
 
   ///
@@ -169,6 +195,16 @@ namespace vita
   {
     assert(i < header_.size());
     return header_[i];
+  }
+
+  ///
+  /// \param[in] f the comparer used for sorting.
+  ///
+  void data::sort(
+    std::function<bool (const value_type &, const value_type &)> f)
+  {
+    dataset_[active_dataset_].sort(f);
+    end_ = dataset_[active_dataset_].end();
   }
 
   ///

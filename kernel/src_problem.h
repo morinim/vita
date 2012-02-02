@@ -25,10 +25,10 @@
 #define      SRC_PROBLEM_H
 
 #include <cmath>
+#include <list>
 #include <string>
 #include <vector>
 
-#include "kernel/data.h"
 #include "kernel/problem.h"
 
 namespace vita
@@ -41,6 +41,8 @@ namespace vita
     unsigned load_data(const std::string &);
     unsigned load_symbols(const std::string &);
     void setup_default_symbols();
+
+    data *get_data() { return &dat_; }
 
     void clear();
 

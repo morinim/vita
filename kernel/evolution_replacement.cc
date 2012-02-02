@@ -99,12 +99,12 @@ namespace vita
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
-    if (f_off - s->f_best > float_epsilon)
+    if (f_off - s->f_sub_best > float_epsilon)
     {
       s->last_imp = s->gen;
-      s->best.reset(new individual(offspring[0]));
-      s->f_best = f_off;
-      s->accu_best = evo_->accuracy(*s->best);
+      s->best = std::make_shared<individual>(offspring[0]);
+      s->f_sub_best = f_off;
+      s->accu_sub_best = evo_->accuracy(*s->best);
     }
   }
 

@@ -39,6 +39,9 @@ namespace vita
   static_assert(sizeof(category_t) <= sizeof(unsigned),
                 "category_t sizes expected to be <= unsigned");
 
+  enum {locus_index = 0, locus_category = 1};
+
+  /// locus[index in the genome][type of the symbol].
   typedef std::array<unsigned, 2> locus;
 
   ///

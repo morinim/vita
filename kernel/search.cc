@@ -98,12 +98,12 @@ namespace vita
                                                                 &loci));
               std::vector<category_t> categories(loci.size());
               for (unsigned j(0); j != loci.size(); ++j)
-                categories[j] = loci[j][1];
+                categories[j] = loci[j][locus_category];
 
-              p.reset(new vita::adf(generalized, categories, 10));
+              p = std::make_shared<vita::adf>(generalized, categories, 10);
             }
             else
-              p.reset(new vita::adt(candidate_block, 100));
+              p = std::make_shared<vita::adt>(candidate_block, 100);
             prob_->env.insert(p);
 
             if (prob_->env.stat_arl && adf_l.good())
@@ -122,6 +122,60 @@ namespace vita
   }
 
   ///
+  /// \param[in] generation the generation that has been reached by the
+  ///            evolution. The method uses this parameter to setup some
+  ///            structures when generation == 0.
+  ///
+  /// Dynamic Training Subset Selection for Supervised Learning in Genetic
+  /// Programming.
+  /// When using GP on a difficult problem, with a large set of training data,
+  /// a large population size is needed and a very large number of
+  /// function-trees evaluation must be carried out. DSS is a subset selection
+  /// method which uses the current run to select:
+  /// \li firstly 'difficult' cases:
+  /// \li secondly cases which have not been looked at for several generations.
+  ///
+  void search::dss(unsigned generation)
+  {
+    data *const d(prob_->get_data());
+
+    if (d && d->size() > 200)
+    {
+      d->dataset(data::training, 100);
+      if (generation == 0)
+        for (data::iterator i(d->begin()); i != d->end(); ++i)
+        {
+          i->difficulty = 0;
+          i->age        = 0;
+        }
+      else
+        for (data::iterator i(d->begin()); i != d->end(); ++i)
+          ++i->age;
+
+      d->sort(
+        [](const data::value_type &v1, const data::value_type &v2) -> bool
+        {
+          double w1(v1.difficulty + v1.age * v1.age * v1.age);
+          double w2(v2.difficulty + v2.age * v2.age * v2.age);
+
+          w1 *= random::between<double>(0.9, 1.1);
+          w2 *= random::between<double>(0.9, 1.1);
+
+          return w1 > w2;
+        });
+
+      d->dataset(data::training, 20);
+      prob_->get_evaluator()->clear();
+
+      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      {
+        i->difficulty = 0;
+        i->age        = 0;
+      }
+    }
+  }
+
+  ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
@@ -135,14 +189,26 @@ namespace vita
     unsigned solutions(0);
 
     summary previous;
-    for (unsigned i(0); i < n; ++i)
+    for (unsigned run(0); run < n; ++run)
     {
-      evolution evo(&prob_->env, prob_->get_evaluator());
-      const summary s(evo(verbose, i));
+      std::function<void (unsigned)> shake_data;
+      if (prob_->env.dss)
+        shake_data = std::bind(&search::dss, this, std::placeholders::_1);
 
-      if (i == 0)
+      evolution evo(&prob_->env, prob_->get_evaluator(), shake_data);
+      summary s(evo(verbose, run));
+
+      prob_->get_data()->dataset(data::training, 100);
+      s.f_best = (*prob_->get_evaluator())(*s.best);
+
+      if (verbose && prob_->env.dss)
+        std::cout << s.f_best << std::endl;
+
+      if (run == 0)
       {
-        overall_run_sum.best   =   s.best;
+        overall_run_sum.best       = s.best;
+        overall_run_sum.f_sub_best = s.f_sub_best;
+
         overall_run_sum.f_best = s.f_best;
       }
 
@@ -157,15 +223,18 @@ namespace vita
       {
         overall_run_sum.best   =   s.best;
         overall_run_sum.f_best = s.f_best;
-        best_run               =        i;
+        best_run               =      run;
       }
 
-      fd.add(s.f_best);
+      if (std::isfinite(s.f_best))
+        fd.add(s.f_best);
+
       overall_run_sum.ttable_hits += s.ttable_hits;
       overall_run_sum.ttable_probes += s.ttable_probes;
-      overall_run_sum.speed = ((overall_run_sum.speed * i) + s.speed) / (i + 1);
+      overall_run_sum.speed = ((overall_run_sum.speed * run) + s.speed) /
+                              (run + 1);
 
-      if (prob_->env.arl && best_run == i)
+      if (prob_->env.arl && best_run == run)
       {
         prob_->env.sset.reset_adf_weights();
         arl(*s.best, evo);

@@ -44,6 +44,7 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
+    void dss(unsigned);
 
     const individual &run(bool = true, unsigned = 1);
 

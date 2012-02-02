@@ -42,6 +42,7 @@ namespace vita
       p_mutation(2.0/code_length),
       p_cross(0.7),
       brood_recombination(0),
+      dss(true),
       individuals(100),
       par_tournament(2),
       rep_tournament(unsigned(std::log(static_cast<double>(individuals)))),
@@ -74,6 +75,7 @@ namespace vita
     pt->put(env + "mutation_rate", p_mutation);
     pt->put(env + "crossover_rate", p_cross);
     pt->put(env + "brood_recombination", brood_recombination);
+    pt->put(env + "dss", dss);
     pt->put(env + "parent_tournament_size", par_tournament);
     pt->put(env + "replacement_tournament_size", rep_tournament);
     pt->put(env + "mating_zone", mate_zone);

@@ -37,6 +37,7 @@
 namespace vita
 {
   class variable;
+
   /// Just a shortcut (similar to symbol_ptr).
   typedef std::shared_ptr<variable> variable_ptr;
 
@@ -48,7 +49,7 @@ namespace vita
   ///
   class data
   {
-  public:
+  public:  // Structures.
     ///
     /// \a value_type stores a single element of the data set (instance). The
     /// \c struct consists of an input vector (\a input) and an answer value
@@ -112,25 +113,31 @@ namespace vita
       std::set<std::string> labels;
     };
 
+  public:
     /// value_type *
     typedef std::list<value_type>::iterator iterator;
     /// const value_type *
     typedef std::list<value_type>::const_iterator const_iterator;
 
+  public:  // Construction, convenience.
     data();
     explicit data(const std::string &);
 
     enum dataset_t {training = 0, validation};
-    void dataset(dataset_t);
+    void dataset(dataset_t, unsigned = 100);
 
-    const_iterator begin() const;
+    iterator begin();
     const_iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
     unsigned size() const;
 
     unsigned open(const std::string &);
     bool operator!() const;
 
     void clear();
+
+    void sort(std::function<bool (const value_type &, const value_type &)>);
 
     category_t get_category(const std::string &) const;
     const category &get_category(category_t) const;
@@ -183,6 +190,9 @@ namespace vita
     // set).
     // begin(), end() and size() methods operate on the selected set.
     dataset_t active_dataset_;
+
+    // Used to select a subset of the active dataset.
+    data::const_iterator end_;
   };
 }  // namespace vita
 

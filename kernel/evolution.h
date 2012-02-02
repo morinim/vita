@@ -63,13 +63,16 @@ namespace vita
 
     std::shared_ptr<individual> best;
     fitness_t                 f_best;
+    fitness_t             f_sub_best;
     double                 accu_best;
+    double             accu_sub_best;
   };
 
   class evolution
   {
   public:
-    evolution(environment *const, evaluator *const);
+    evolution(environment *const, evaluator *const,
+              std::function<void (unsigned)>);
 
     const summary &operator()(bool, unsigned, unsigned = 0, unsigned = 0,
                               unsigned = 0);
@@ -98,6 +101,8 @@ namespace vita
     vita::population           pop_;
     std::shared_ptr<evaluator> eva_;
     summary                  stats_;
+
+    std::function<void (unsigned)> shake_data_;
   };
 
   ///

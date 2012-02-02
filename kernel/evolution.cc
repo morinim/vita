@@ -38,9 +38,10 @@ namespace vita
   /// \param[in] env environment (mostly used for population initialization).
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(environment *const env, evaluator *const eva)
+  evolution::evolution(environment *const env, evaluator *const eva,
+                       std::function<void (unsigned)> sd)
     : selection(this), operation(this, &stats_), replacement(this), pop_(env),
-      eva_(new evaluator_proxy(eva, env->ttable_size))
+      eva_(new evaluator_proxy(eva, env->ttable_size)), shake_data_(sd)
   {
     assert(eva);
 
@@ -143,7 +144,7 @@ namespace vita
 
         dynamic << run_count
                 << ' ' << stats_.gen
-                << ' ' << stats_.f_best
+                << ' ' << stats_.f_sub_best
                 << ' ' << stats_.az.fit_dist().mean
                 << ' ' << stats_.az.fit_dist().standard_deviation()
                 << ' ' << stats_.az.fit_dist().entropy()
@@ -243,15 +244,27 @@ namespace vita
                                        unsigned rep_id)
   {
     stats_.clear();
-    stats_.best.reset(new individual(pop_[0]));
-    stats_.f_best    = (*eva_)(*stats_.best);
-    stats_.accu_best =                   0.0;
+    stats_.best = std::make_shared<individual>(pop_[0]);
+    stats_.f_sub_best    = (*eva_)(*stats_.best);
+    stats_.accu_sub_best =                   0.0;
 
     eva_->clear();
 
     boost::timer timer;
     for (stats_.gen = 0; !stop_condition(); ++stats_.gen)
     {
+      if (shake_data_)
+      {
+        shake_data_(stats_.gen);
+
+        // If we 'shake' the data, the statistics picked so far have to be
+        // cleared (the best individual and its fitness refer to the old
+        // dataset).
+        stats_.best = std::make_shared<individual>(pop_[0]);
+        stats_.f_sub_best    = (*eva_)(*stats_.best);
+        stats_.accu_sub_best =                   0.0;
+      }
+
       stats_.az = get_stats();
       log(run_count);
 
@@ -269,19 +282,19 @@ namespace vita
         std::vector<individual> off(operation[op_id](parents));
 
         // --------- REPLACEMENT --------
-        const fitness_t before(stats_.f_best);
+        const fitness_t before(stats_.f_sub_best);
         replacement[rep_id](parents, off, &stats_);
 
-        if (verbose && stats_.f_best != before)
+        if (verbose && stats_.f_sub_best != before)
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << std::setw(16) << stats_.f_best;
+                    << std::setw(16) << stats_.f_sub_best;
 
-          if (stats_.accu_best >= 0.0)
+          if (stats_.accu_sub_best >= 0.0)
             std::cout << std::setprecision(2) << " (" << std::fixed
-                      << std::setw(6) << 100.0*stats_.accu_best << "%)"
+                      << std::setw(6) << 100.0*stats_.accu_sub_best << "%)"
                       << std::setprecision(-1)
                       << std::resetiosflags(std::ios::fixed);
 
