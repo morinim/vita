@@ -86,8 +86,6 @@ namespace vita
   ///
   void data::clear()
   {
-    assert(n);
-
     categories_map_.clear();
     classes_map_.clear();
 
