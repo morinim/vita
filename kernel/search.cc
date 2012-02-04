@@ -59,7 +59,7 @@ namespace vita
   {
     const unsigned arl_args(0);
 
-    const fitness_t base_fit(evo.fitness(base));
+    const fitness_t base_fit(evo.fitness(base).first);
     if (std::isfinite(base_fit))
     {
       const std::string f_adf(prob_->env.stat_dir + "/" +
@@ -85,7 +85,7 @@ namespace vita
         if (candidate_block.eff_size() <= 5 + arl_args)
         {
           const double d_f(base_fit -
-                           evo.fitness(base.destroy_block((*i)[0])));
+                           evo.fitness(base.destroy_block((*i)[0])).first);
 
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
@@ -189,6 +189,8 @@ namespace vita
     unsigned solutions(0);
 
     summary previous;
+    eva_pair pair_run_best;
+
     for (unsigned run(0); run < n; ++run)
     {
       std::function<void (unsigned)> shake_data;
@@ -198,36 +200,44 @@ namespace vita
       evolution evo(&prob_->env, prob_->get_evaluator(), shake_data);
       summary s(evo(verbose, run));
 
-      prob_->get_data()->dataset(data::training, 100);
-      s.f_best = (*prob_->get_evaluator())(*s.best);
+      // If shake_data == true, the values returned by the evolution refer to a
+      // subset of the available dataset. Since we need an overall fitness /
+      // accuracy, a new calculation have to be performed.
+      if (shake_data)
+      {
+        prob_->get_data()->dataset(data::training, 100);
+        prob_->get_evaluator()->clear();
+        pair_run_best = (*prob_->get_evaluator())(*s.best_ind);
 
-      if (verbose && prob_->env.dss)
-        std::cout << s.f_best << std::endl;
+        if (verbose)
+          std::cout << pair_run_best.first << " ("
+                    << 100.0 * pair_run_best.second << "%)" << std::endl;
+      }
+      else
+        pair_run_best = s.best_pair;
 
       if (run == 0)
       {
-        overall_run_sum.best       = s.best;
-        overall_run_sum.f_sub_best = s.f_sub_best;
-
-        overall_run_sum.f_best = s.f_best;
+        overall_run_sum.best_ind  = s.best_ind;
+        overall_run_sum.best_pair = pair_run_best;
       }
 
-      const bool found(s.f_best >= prob_->threashold);
+      const bool found(pair_run_best.first >= prob_->threashold);
       if (found)
       {
         ++solutions;
         overall_run_sum.last_imp += s.last_imp;
       }
 
-      if (overall_run_sum.f_best < s.f_best)
+      if (overall_run_sum.best_pair.first < pair_run_best.first)
       {
-        overall_run_sum.best   =   s.best;
-        overall_run_sum.f_best = s.f_best;
-        best_run               =      run;
+        overall_run_sum.best_ind  =    s.best_ind;
+        overall_run_sum.best_pair = pair_run_best;
+        best_run                  =           run;
       }
 
-      if (std::isfinite(s.f_best))
-        fd.add(s.f_best);
+      if (std::isfinite(pair_run_best.first))
+        fd.add(pair_run_best.first);
 
       overall_run_sum.ttable_hits += s.ttable_hits;
       overall_run_sum.ttable_probes += s.ttable_probes;
@@ -237,7 +247,7 @@ namespace vita
       if (prob_->env.arl && best_run == run)
       {
         prob_->env.sset.reset_adf_weights();
-        arl(*s.best, evo);
+        arl(*s.best_ind, evo);
       }
 
       if (prob_->env.stat_summary)
@@ -246,7 +256,7 @@ namespace vita
       previous = s;
     }
 
-    return *overall_run_sum.best;
+    return *overall_run_sum.best_ind;
   }
 
   ///
@@ -261,9 +271,9 @@ namespace vita
                    unsigned solutions, unsigned best_run, unsigned runs) const
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best->list(best_list);
-    run_sum.best->tree(best_tree);
-    run_sum.best->graphviz(best_graph);
+    run_sum.best_ind->list(best_list);
+    run_sum.best_ind->tree(best_tree);
+    run_sum.best_ind->graphviz(best_graph);
 
     const std::string path("vita.");
     const std::string summary(path+"summary.");
@@ -272,7 +282,8 @@ namespace vita
     pt.put(summary+"success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
     pt.put(summary+"speed", run_sum.speed);
-    pt.put(summary+"best.fitness", run_sum.f_best);
+    pt.put(summary+"best.fitness", run_sum.best_pair.first);
+    pt.put(summary+"best.accuracy", run_sum.best_pair.second);
     pt.put(summary+"best.times_reached", solutions);
     pt.put(summary+"best.run", best_run);
     pt.put(summary+"best.avg_depth_found", solutions

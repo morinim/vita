@@ -44,6 +44,7 @@ namespace vita
     clear();
 
     evaluator_ptr e1(new abs_evaluator(&dat_, &vars_));
+    //evaluator_ptr e1(new count_evaluator(&dat_, &vars_));
     add_evaluator(e1);
     //evaluator_ptr e2(new gaussian_evaluator(&dat_, &vars_));
     //add_evaluator(e2);

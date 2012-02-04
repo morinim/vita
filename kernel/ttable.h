@@ -26,7 +26,7 @@
 
 #include <vector>
 
-#include "kernel/fitness.h"
+#include "kernel/evaluator.h"
 
 namespace vita
 {
@@ -86,9 +86,9 @@ namespace vita
 
     void clear();
 
-    void insert(const individual &, fitness_t);
+    void insert(const individual &, const eva_pair &);
 
-    bool find(const individual &, fitness_t *const) const;
+    bool find(const individual &, eva_pair *const) const;
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.
@@ -103,7 +103,7 @@ namespace vita
     struct slot
     {
       hash_t       hash;
-      fitness_t     fit;
+      eva_pair       ep;
       unsigned birthday;
     };
 

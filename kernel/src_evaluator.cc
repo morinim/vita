@@ -51,9 +51,10 @@ namespace vita
 
   ///
   /// \param[in] ind program used for fitness evaluation.
-  /// \return the fitness (greater is better, max is 0).
+  /// \return the fitness (greater is better, max is 0) and the accuracy
+  ///         (percentage).
   ///
-  fitness_t abs_evaluator::operator()(const individual &ind)
+  eva_pair abs_evaluator::operator()(const individual &ind)
   {
     assert(!dat_->classes());
 
@@ -61,11 +62,13 @@ namespace vita
 
     double err(0.0);
     int illegals(0);
-    unsigned ok(0);
+    unsigned ok(0), count(0);
 
     for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
       load_vars(*t);
+
+      ++count;
 
       const boost::any res(agent());
 
@@ -78,20 +81,16 @@ namespace vita
 
       if (e > 0.1)
         ++t->difficulty;
+      else
+        ++ok;
 
       err += e;
-/*
-      if (!res.empty() &&
-          std::fabs(interpreter::to_double(res) -
-                    interpreter::to_double(t->output) < float_epsilon))
-        ++ok;
-      else
-        ++t->difficulty;
-*/
     }
 
-    return fitness_t(-err);
-    //return ok;
+    assert(count);
+
+    return eva_pair(fitness_t(-err),
+                    static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
@@ -128,6 +127,42 @@ namespace vita
       }
 
     return fitness_t(-err);
+  }
+
+  ///
+  /// \param[in] ind an individual.
+  /// \return the fitness (greater is better, max is equal to the number of
+  ///         training cases) and the accuracy (percantage) of individual
+  ///         \a ind.
+  ///
+  eva_pair count_evaluator::operator()(const vita::individual &ind)
+  {
+    assert(!dat_->classes());
+
+    interpreter agent(ind);
+
+    unsigned ok(0), count(0);
+
+    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
+    {
+      load_vars(*t);
+
+      ++count;
+
+      const boost::any res(agent());
+
+      if (!res.empty() &&
+          std::fabs(interpreter::to_double(res) -
+                    interpreter::to_double(t->output)) < float_epsilon)
+        ++ok;
+      else
+        ++t->difficulty;
+    }
+
+    assert(count);
+
+    return eva_pair(fitness_t(ok),
+                    static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
@@ -191,7 +226,8 @@ namespace vita
   ///
   void dyn_slot_evaluator::fill_slots(const individual &ind,
                                       std::vector<uvect> *slot_matrix,
-                                      uvect *slot_class)
+                                      uvect *slot_class,
+                                      unsigned *dataset_size)
   {
     assert(ind.check());
     assert(slot_matrix);
@@ -216,8 +252,11 @@ namespace vita
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
     // a bidimentional array is built (slots[slot][class]).
+    *dataset_size = 0;
     for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
     {
+      ++(*dataset_size);
+
       const unsigned where(slot(ind, t));
 
       ++sm[where][t->label()];
@@ -242,11 +281,12 @@ namespace vita
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the fitness (greater is better, max is 0).
+  /// \return the fitness (greater is better, max is 0) and the accuracy
+  ///         (percentage).
   ///
   /// Slotted Dynamic Class Boundary Determination
   ///
-  fitness_t dyn_slot_evaluator::operator()(const individual &ind)
+  eva_pair dyn_slot_evaluator::operator()(const individual &ind)
   {
     assert(ind.check());
     assert(dat_->classes() >= 2);
@@ -254,7 +294,10 @@ namespace vita
     const unsigned n_slots(dat_->classes() * x_slot_);
     std::vector<uvect> slot_matrix(n_slots, uvect(dat_->classes()));
     uvect slot_class(n_slots);
-    fill_slots(ind, &slot_matrix, &slot_class);
+    unsigned count(0);
+    fill_slots(ind, &slot_matrix, &slot_class, &count);
+
+    assert(count);
 
     fitness_t err(0.0);
     for (unsigned i(0); i < n_slots; ++i)
@@ -262,23 +305,9 @@ namespace vita
         if (j != slot_class[i])
           err += slot_matrix[i][j];
 
-    return fitness_t(-err);
-  }
-
-  ///
-  /// \param[in] ind program used for class recognition.
-  /// \return the accuracy (between 0.0 and 1.0 if there are available data,
-  ///         -1.0 is the dataset is empty).
-  ///
-  double dyn_slot_evaluator::accuracy(const individual &ind)
-  {
-    unsigned count(0);
-    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
-      ++count;
-
-    const unsigned ok(count + operator()(ind));
-
-    return count ? double(ok) / double(count) : -1.0;
+    return eva_pair(fitness_t(-err),
+                    static_cast<double>(count - err) /
+                    static_cast<double>(count));
   }
 
   ///
@@ -297,7 +326,8 @@ namespace vita
 
     std::vector<uvect> slot_matrix(n_slots, uvect(eva_->dat_->classes()));
     uvect slot_class(n_slots);
-    eva_->fill_slots(ind, &slot_matrix, &slot_class);
+    unsigned dummy(0);
+    eva_->fill_slots(ind, &slot_matrix, &slot_class, &dummy);
 
     for (unsigned i(0); i < slot_class.size(); ++i)
       slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
@@ -376,7 +406,7 @@ namespace vita
   ///   Programming for Multiclass Object Classification" - Mengjie Zhang, Will
   ///   Smart (december 2005).
   ///
-  fitness_t gaussian_evaluator::operator()(const individual &ind)
+  eva_pair gaussian_evaluator::operator()(const individual &ind)
   {
     assert(dat_->classes() >= 2);
     std::vector<distribution<double>> gauss(dat_->classes());
@@ -397,26 +427,14 @@ namespace vita
         d += 200.0 * std::log(delta) - radius;
       }
 
-    return d;
-  }
-
-  ///
-  /// \param[in] ind program used for class recognition.
-  /// \return the accuracy (between 0.0 and 1.0 if there are available data,
-  ///         -1.0 is the dataset is empty).
-  ///
-  double gaussian_evaluator::accuracy(const individual &ind)
-  {
-    assert(dat_->classes() >= 2);
-    std::vector<distribution<double>> gauss(dat_->classes());
-    gaussian_distribution(ind, &gauss);
-
     unsigned ok(0), count(0);
     for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
       if (class_label(ind, *t, gauss) == t->label())
         ++ok;
 
-    return count ? double(ok) / double(count) : -1.0;
+    assert(count);
+
+    return eva_pair(d, static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
@@ -514,36 +532,6 @@ namespace vita
     }
 
     return -err;
-  }
-  */
-
-  /*
-  ///
-  /// \param[in] ind an individual.
-  /// \return the fitness of individual \a ind (greater is better, max is 0).
-  ///
-  template<class T>
-  fitness_t
-  problem::count_fitness(const vita::individual &ind) const
-  {
-    assert(!dat.classes());
-
-    interpreter agent(ind);
-
-    unsigned ok(0);
-
-    for (data::const_iterator t(dat.begin()); t != dat.end(); ++t)
-    {
-      for (unsigned i(0); i < vars_.size(); ++i)
-        vars[i]->val = t->input[i];
-
-      const boost::any res(agent());
-
-      if (!res.empty() && boost::any_cast<T>(res) == t->output)
-        ++ok;
-    }
-
-    return fitness_t(ok);
   }
   */
 }  // namespace vita

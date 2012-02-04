@@ -31,6 +31,9 @@ namespace vita
 {
   class individual;
 
+  /// the fitness and the accuracy (percentage) of an individual.
+  typedef std::pair<fitness_t, double> eva_pair;
+
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
   /// he is). It maps vita::individual (its genome) to a fitness_t value.
@@ -45,17 +48,17 @@ namespace vita
   public:
     virtual void clear() {}
 
-    virtual fitness_t operator()(const individual &) = 0;
-    virtual fitness_t fast(const individual &i) { return operator()(i); }
-
-    /// The accuracy of a genetic programming refers to the number of training
-    /// examples that are correctly scored/classified as a proportion of the
-    /// total number of examples in the training set. According to this
+    /// \return the fitness and the accuracy (percentage) of the individual.
+    ///
+    /// The accuracy of a program refers to the number of training examples
+    /// that are correctly scored/classified as a proportion of the total
+    /// number of examples in the training set. According to this
     /// design, the best accuracy is 1.0 (100%), meaning that all the training
     /// examples have been correctly recognized.
     /// Accuracy could be used as fitness function but it often hasn't enough
     /// "granularity".
-    virtual double accuracy(const individual &) { return -1; }
+    virtual eva_pair operator()(const individual &) = 0;
+    virtual fitness_t fast(const individual &i) { return operator()(i).first; }
   };
 
   ///
@@ -65,9 +68,11 @@ namespace vita
   class random_evaluator : public evaluator
   {
   public:
-    fitness_t operator()(const individual &)
+    eva_pair operator()(const individual &)
     {
-      return random::between<unsigned>(0, 16000);
+      const double sup(16000);
+      const fitness_t f(random::between<unsigned>(0, sup));
+      return eva_pair(f, f / (sup - 1));
     }
   };
 }  // namespace vita

@@ -43,8 +43,7 @@ namespace vita
 
     void clear();
 
-    double accuracy(const individual &);
-    fitness_t operator()(const individual &);
+    eva_pair operator()(const individual &);
 
     boost::uint64_t probes() const;
     boost::uint64_t hits() const;

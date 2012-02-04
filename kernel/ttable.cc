@@ -63,13 +63,13 @@ namespace vita
 
   ///
   /// \param[in] ind the individual to look for.
-  /// \param[out] fit the fitness of the individual (if found).
+  /// \param[out] ep the fitness and the accuracy of the individual (if found).
   /// \return \c true if \a ind is found in the transposition table, \c false
   ///         otherwise.
   ///
   /// Looks for the fitness of an individual in the transposition table.
   ///
-  bool ttable::find(const individual &ind, fitness_t *const fit) const
+  bool ttable::find(const individual &ind, eva_pair *const ep) const
   {
     ++probes_;
 
@@ -82,7 +82,7 @@ namespace vita
     if (ret)
     {
       ++hits_;
-      *fit = s.fit;
+      *ep = s.ep;
     }
 
     return ret;
@@ -90,15 +90,15 @@ namespace vita
 
   ///
   /// \param[in] ind a (possibly) new individual to be stored in the table.
-  /// \param[out] fit the fitness of the individual.
+  /// \param[out] ep the fitness and the accuracy of the individual.
   ///
   /// Stores fitness information in the transposition table.
   ///
-  void ttable::insert(const individual &ind, fitness_t fit)
+  void ttable::insert(const individual &ind, const eva_pair &ep)
   {
     slot s;
     s.hash     = ind.signature();
-    s.fit      =             fit;
+    s.ep      =               ep;
     s.birthday =         period_;
 
     table_[s.hash.p1 & k_mask] = s;

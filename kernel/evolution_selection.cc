@@ -68,8 +68,8 @@ namespace vita
     {
       const unsigned j(random::ring(target, mate_zone, n));
 
-      const fitness_t fit_j(evo_->fitness(evo_->population()[j]));
-      const fitness_t fit_sel(evo_->fitness(evo_->population()[sel]));
+      const fitness_t fit_j(evo_->fitness(evo_->population()[j]).first);
+      const fitness_t fit_sel(evo_->fitness(evo_->population()[sel]).first);
 
       if (fit_j > fit_sel)
         sel = j;

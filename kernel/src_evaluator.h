@@ -59,8 +59,21 @@ namespace vita
     abs_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v) {}
 
-    fitness_t operator()(const individual &);
+    eva_pair operator()(const individual &);
     fitness_t fast(const individual &);
+  };
+
+  ///
+  /// This evaluator will drive the evolution towards the maximum sum of
+  /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
+  ///
+  class count_evaluator : public src_evaluator
+  {
+  public:
+    count_evaluator(data *d, std::vector<variable_ptr> *v)
+      : src_evaluator(d, v) {}
+
+    eva_pair operator()(const individual &);
   };
 
   ///
@@ -72,8 +85,7 @@ namespace vita
   public:
     dyn_slot_evaluator(data *, std::vector<variable_ptr> *, unsigned = 10);
 
-    fitness_t operator()(const individual &);
-    double accuracy(const individual &);
+    eva_pair operator()(const individual &);
 
     friend class dyn_slot_classifier;
 
@@ -83,7 +95,8 @@ namespace vita
     unsigned slot(const individual &, data::const_iterator);
 
     typedef std::vector<unsigned> uvect;
-    void fill_slots(const individual &, std::vector<uvect> *, uvect *);
+    void fill_slots(const individual &, std::vector<uvect> *, uvect *,
+                    unsigned *);
 
     // How many slots for each class of the problem?
     unsigned x_slot_;
@@ -111,8 +124,7 @@ namespace vita
       assert(v);
     }
 
-    fitness_t operator()(const individual &);
-    double accuracy(const individual &);
+    eva_pair operator()(const individual &);
 
     friend class gaussian_classifier;
 

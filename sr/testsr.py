@@ -99,7 +99,7 @@ def test_dataset(name, args, data_set, generations, individuals, prog_size,
 
 def start_testing(args):
     testcases = {
-        "adult":      [     "adult.csv",  50, 300, 100,  50,      "class.xml"],
+        "adult":      [     "adult.csv",  50, 300, 100,  10,      "class.xml"],
         "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80, "arithmetic.xml"],
         "iris":       [     "iris.xrff", 100, 500, 100,  80,      "class.xml"],
         "mep":        [       "mep.csv", 100, 200, 500, 100],

@@ -71,12 +71,12 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, true);
+    vita::eva_pair p(i, 0.0);
 
-    cache.insert(i1, i);
+    cache.insert(i1, p);
 
-    vita::fitness_t f1;
-    BOOST_REQUIRE(cache.find(i1, &f1));
-    BOOST_REQUIRE_EQUAL(f1, i);
+    BOOST_REQUIRE(cache.find(i1, &p));
+    BOOST_REQUIRE_EQUAL(p.first, i);
   }
 }
 
@@ -92,20 +92,21 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::individual i1(env, true);
     const boost::any val( (vita::interpreter(i1))() );
     vita::fitness_t f(val.empty() ? 0 : any_cast<vita::fitness_t>(val));
+    vita::eva_pair p(f, 0.0);
 
-    cache.insert(i1, f);
+    cache.insert(i1, p);
     vi.push_back(i1);
   }
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::fitness_t f1;
-    if (cache.find(vi[i], &f1))
+    vita::eva_pair p;
+    if (cache.find(vi[i], &p))
     {
-      const boost::any val( (vita::interpreter(vi[i]))() );
+      const boost::any val((vita::interpreter(vi[i]))());
       vita::fitness_t f(val.empty() ? 0 : any_cast<vita::fitness_t>(val));
 
-      BOOST_CHECK_EQUAL(f1, f);
+      BOOST_CHECK_EQUAL(p.first, f);
     }
   }
 }

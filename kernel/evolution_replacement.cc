@@ -63,8 +63,8 @@ namespace vita
     {
       const unsigned j(random::ring(target, mate_zone, n));
 
-      const fitness_t fit_j(evo_->fitness(pop[j]));
-      const fitness_t fit_sel(evo_->fitness(pop[sel]));
+      const fitness_t fit_j(evo_->fitness(pop[j]).first);
+      const fitness_t fit_sel(evo_->fitness(pop[sel]).first);
       if (fit_j < fit_sel)
         sel = j;
     }
@@ -90,21 +90,20 @@ namespace vita
   {
     population &pop = evo_->population();
 
-    const fitness_t f_off(evo_->fitness(offspring[0]));
+    const eva_pair f_off(evo_->fitness(offspring[0]));
 
     const unsigned rep_idx(tournament(parent[0]));
-    const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
-    const bool replace(f_rep_idx < f_off);
+    const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]).first);
+    const bool replace(f_rep_idx < f_off.first);
 
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
-    if (f_off - s->f_sub_best > float_epsilon)
+    if (f_off.first - s->best_pair.first > float_epsilon)
     {
       s->last_imp = s->gen;
-      s->best = std::make_shared<individual>(offspring[0]);
-      s->f_sub_best = f_off;
-      s->accu_sub_best = evo_->accuracy(*s->best);
+      s->best_ind = std::make_shared<individual>(offspring[0]);
+      s->best_pair = f_off;
     }
   }
 

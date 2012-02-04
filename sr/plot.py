@@ -27,17 +27,23 @@ import time
 
 verbose = False
 
+col_run = 1;
+col_gen = 2;
+col_fitness = 3;
+col_accuracy = 4;
 
 def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:3 title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using 2:(-2*$3+$4 > 0 ? $4 : NaN):($3+$5 < 0 ? $5 : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:{c2} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {c1}:(-2*${c2}+$5 > 0 ? $5 : NaN):(${c2}+$6 < 0 ? $6 : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
-        to_run = args.to_run)
+        to_run = args.to_run,
+        c1 = col_gen,
+        c2 = col_fitness)
 
     if verbose:
         print(cmd)
@@ -48,12 +54,13 @@ def plot2(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'ENTROPY'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:6 title 'Entropy' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:7 title 'Entropy' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
-        to_run = args.to_run)
+        to_run = args.to_run,
+        c1 = col_gen)
 
     if verbose:
         print(cmd)
@@ -64,12 +71,13 @@ def plot3(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:8:9 title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:9:10 title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
-        to_run = args.to_run)
+        to_run = args.to_run,
+        c1 = col_gen)
 
     if verbose:
         print(cmd)
@@ -80,12 +88,13 @@ def plot4(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using 2:13 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using 2:14 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using 2:15 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using 2:16 title 'Active terminals' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:14 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using {c1}:15 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using {c1}:16 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using {c1}:17 title 'Active terminals' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
-        to_run = args.to_run)
+        to_run = args.to_run,
+        c1 = col_gen)
 
     if verbose:
         print(cmd)

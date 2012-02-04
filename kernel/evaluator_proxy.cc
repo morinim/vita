@@ -37,21 +37,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind the individual whose accuracy we want to know.
-  /// \return the accuracy of \a ind (on the current test set).
-  ///
-  double evaluator_proxy::accuracy(const individual &ind)
-  {
-    return eva_->accuracy(ind);
-  }
-
-  ///
   /// \param[in] ind the individual whose fitness we want to know.
-  /// \return the fitness of \a ind.
+  /// \return the fitness and the accuracy of \a ind.
   ///
-  fitness_t evaluator_proxy::operator()(const individual &ind)
+  eva_pair evaluator_proxy::operator()(const individual &ind)
   {
-    fitness_t f;
+    eva_pair f;
     if (!cache_.find(ind, &f))
     {
       f = (*eva_)(ind);

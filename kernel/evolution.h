@@ -61,18 +61,15 @@ namespace vita
 
     analyzer az;
 
-    std::shared_ptr<individual> best;
-    fitness_t                 f_best;
-    fitness_t             f_sub_best;
-    double                 accu_best;
-    double             accu_sub_best;
+    std::shared_ptr<individual> best_ind;
+    eva_pair                   best_pair;
   };
 
   class evolution
   {
   public:
     evolution(environment *const, evaluator *const,
-              std::function<void (unsigned)>);
+              std::function<void (unsigned)> = 0);
 
     const summary &operator()(bool, unsigned, unsigned = 0, unsigned = 0,
                               unsigned = 0);
@@ -80,9 +77,8 @@ namespace vita
     const vita::population &population() const;
     vita::population &population();
 
-    fitness_t fitness(const individual &) const;
+    eva_pair fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
-    double accuracy(const individual &) const;
 
     bool check() const;
 

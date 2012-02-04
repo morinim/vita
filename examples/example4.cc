@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
   {
     vita::individual i1(env, true);
 
-    cache.insert(i1, i);
+    vita::eva_pair p(i, 0.0);
+    cache.insert(i1, p);
 
-    vita::fitness_t f1;
-    cache.find(i1, &f1);
+    cache.find(i1, &p);
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;

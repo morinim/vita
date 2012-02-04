@@ -68,7 +68,7 @@ double Z::val;
 
 class fitness : public vita::evaluator
 {
-  vita::fitness_t operator()(const vita::individual &ind)
+  vita::eva_pair operator()(const vita::individual &ind)
   {
     vita::interpreter agent(ind);
 
@@ -87,11 +87,11 @@ class fitness : public vita::evaluator
           {
             const double dres(boost::any_cast<double>(res));
             assert(std::isfinite(dres));
-            fit += std::exp(-std::fabs(dres - (x*x+y*y-z*z)));
+            fit += std::exp(-std::fabs(dres - (x*x + y*y - z*z)));
           }
         }
 
-    return fit;
+    return vita::eva_pair(fit, -1.0);
   }
 };
 

@@ -84,7 +84,7 @@ namespace vita
   {
     analyzer az;
     for (unsigned i(0); i < pop_.size(); ++i)
-      az.add(pop_[i], (*eva_)(pop_[i]));
+      az.add(pop_[i], (*eva_)(pop_[i]).first);
 
     return az;
   }
@@ -144,7 +144,8 @@ namespace vita
 
         dynamic << run_count
                 << ' ' << stats_.gen
-                << ' ' << stats_.f_sub_best
+                << ' ' << stats_.best_pair.first
+                << ' ' << stats_.best_pair.second
                 << ' ' << stats_.az.fit_dist().mean
                 << ' ' << stats_.az.fit_dist().standard_deviation()
                 << ' ' << stats_.az.fit_dist().entropy()
@@ -169,7 +170,7 @@ namespace vita
                     << i->second.counter[active];
 
         dynamic << " \"";
-        stats_.best->in_line(dynamic);
+        stats_.best_ind->in_line(dynamic);
         dynamic << '"' << std::endl;
       }
     }
@@ -194,9 +195,9 @@ namespace vita
 
   ///
   /// \param[in] ind individual whose fitness we are interested in.
-  /// \return the fitness of \a ind.
+  /// \return the fitness and the accuracy of \a ind.
   ///
-  fitness_t evolution::fitness(const individual &ind) const
+  eva_pair evolution::fitness(const individual &ind) const
   {
     return (*eva_)(ind);
   }
@@ -208,15 +209,6 @@ namespace vita
   fitness_t evolution::fast_fitness(const individual &ind) const
   {
     return eva_->fast(ind);
-  }
-
-  ///
-  /// \param[in] ind individual whose accuracy we are interested in.
-  /// \return the accuracy of \a ind (on the current test set).
-  ///
-  double evolution::accuracy(const individual &ind) const
-  {
-    return eva_->accuracy(ind);
   }
 
   ///
@@ -244,9 +236,8 @@ namespace vita
                                        unsigned rep_id)
   {
     stats_.clear();
-    stats_.best = std::make_shared<individual>(pop_[0]);
-    stats_.f_sub_best    = (*eva_)(*stats_.best);
-    stats_.accu_sub_best =                   0.0;
+    stats_.best_ind = std::make_shared<individual>(pop_[0]);
+    stats_.best_pair = (*eva_)(*stats_.best_ind);
 
     eva_->clear();
 
@@ -258,11 +249,10 @@ namespace vita
         shake_data_(stats_.gen);
 
         // If we 'shake' the data, the statistics picked so far have to be
-        // cleared (the best individual and its fitness refer to the old
+        // cleared (the best individual and its fitness refer to an old
         // dataset).
-        stats_.best = std::make_shared<individual>(pop_[0]);
-        stats_.f_sub_best    = (*eva_)(*stats_.best);
-        stats_.accu_sub_best =                   0.0;
+        stats_.best_ind = std::make_shared<individual>(pop_[0]);
+        stats_.best_pair = (*eva_)(*stats_.best_ind);
       }
 
       stats_.az = get_stats();
@@ -282,20 +272,20 @@ namespace vita
         std::vector<individual> off(operation[op_id](parents));
 
         // --------- REPLACEMENT --------
-        const fitness_t before(stats_.f_sub_best);
+        const fitness_t before(stats_.best_pair.first);
         replacement[rep_id](parents, off, &stats_);
 
-        if (verbose && stats_.f_sub_best != before)
+        if (verbose && stats_.best_pair.first != before)
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << std::setw(16) << stats_.f_sub_best;
+                    << std::setw(16) << stats_.best_pair.first;
 
-          if (stats_.accu_sub_best >= 0.0)
+          if (stats_.best_pair.second >= 0.0)
             std::cout << std::setprecision(2) << " (" << std::fixed
-                      << std::setw(6) << 100.0*stats_.accu_sub_best << "%)"
-                      << std::setprecision(-1)
+                      << std::setw(6) << 100.0 * stats_.best_pair.second
+                      << "%)" << std::setprecision(-1)
                       << std::resetiosflags(std::ios::fixed);
 
           std::cout << std::endl;
@@ -361,7 +351,7 @@ namespace vita
     last_imp      = 0;
     speed         = 0.0;
 
-    best.reset();
+    best_ind.reset();
 
     az.clear();
   }
