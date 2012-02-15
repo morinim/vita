@@ -66,6 +66,7 @@ namespace vita
   ///
   /// This evaluator will drive the evolution towards the maximum sum of
   /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
+  /// All incorrect answers receive the same fitness penality.
   ///
   class count_evaluator : public src_evaluator
   {

@@ -141,36 +141,61 @@ namespace vita
 
     if (d && d->size() > 200)
     {
-      d->dataset(data::training, 100);
-      if (generation == 0)
-        for (data::iterator i(d->begin()); i != d->end(); ++i)
+      std::function<boost::uint64_t (const data::value_type &)>
+        weight([](const data::value_type &v) -> boost::uint64_t
+               {
+                 return v.difficulty + v.age * v.age * v.age;
+               });
+
+      boost::uint64_t weight_sum(0);
+      d->dataset(data::training);
+      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      {
+        if (generation == 0)  // preliminary setup for generation 0
         {
           i->difficulty = 0;
-          i->age        = 0;
+          i->age        = 1;
         }
-      else
-        for (data::iterator i(d->begin()); i != d->end(); ++i)
+        else
           ++i->age;
 
-      d->sort(
-        [](const data::value_type &v1, const data::value_type &v2) -> bool
+        weight_sum += weight(*i);
+      }
+
+      const boost::uint64_t target_size(d->size() * 20 / 100);
+      data::iterator base(d->begin());
+      unsigned count(0);
+      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      {
+        const double prob(
+          std::min(static_cast<double>(weight(*i)) * target_size / weight_sum,
+                   1.0));
+
+        if (random::boolean(prob))
         {
-          double w1(v1.difficulty + v1.age * v1.age * v1.age);
-          double w2(v2.difficulty + v2.age * v2.age * v2.age);
+          std::iter_swap(base, i);
+          ++base;
+          ++count;
+        }
+      }
 
-          w1 *= random::between<double>(0.9, 1.1);
-          w2 *= random::between<double>(0.9, 1.1);
+      //d->sort(
+      //  [](const data::value_type &v1, const data::value_type &v2) -> bool
+      //  {
+      //    double w1(v1.difficulty + v1.age * v1.age * v1.age);
+      //    double w2(v2.difficulty + v2.age * v2.age * v2.age);
+      //    w1 *= random::between<double>(0.9, 1.1);
+      //    w2 *= random::between<double>(0.9, 1.1);
+      //    return w1 > w2;
+      //  });
 
-          return w1 > w2;
-        });
-
-      d->dataset(data::training, 20);
+      d->dataset(data::training, std::max(10, count));
       prob_->get_evaluator()->clear();
 
       for (data::iterator i(d->begin()); i != d->end(); ++i)
       {
         i->difficulty = 0;
-        i->age        = 0;
+        i->age        = 1;
       }
     }
   }
@@ -205,7 +230,7 @@ namespace vita
       // accuracy, a new calculation have to be performed.
       if (shake_data)
       {
-        prob_->get_data()->dataset(data::training, 100);
+        prob_->get_data()->dataset(data::training);
         prob_->get_evaluator()->clear();
         pair_run_best = (*prob_->get_evaluator())(*s.best_ind);
 

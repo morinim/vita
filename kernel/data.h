@@ -124,7 +124,7 @@ namespace vita
     explicit data(const std::string &);
 
     enum dataset_t {training = 0, validation};
-    void dataset(dataset_t, unsigned = 100);
+    void dataset(dataset_t, unsigned = 0);
 
     iterator begin();
     const_iterator end() const;

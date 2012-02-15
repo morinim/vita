@@ -104,20 +104,18 @@ namespace vita
 
   ///
   /// \param[in] d the active dataset.
-  /// \param[in] percentage the percentage of the active dataset used.
+  /// \param[in] slice the number of istances in the active dataset used.
   ///
-  /// We can choose the data we want to operate on (training / validation set).
-  /// begin(), end() and size() methods operate on the selected set.
+  /// We can choose the data we want to operate on (training / validation set)
+  /// and, optionally, a slice of that dataset (end() method will refer to a
+  /// subset of the available data).
   ///
-  void data::dataset(dataset_t d, unsigned percentage)
+  void data::dataset(dataset_t d, unsigned slice)
   {
-    assert(percentage && percentage <= 100);
-
     active_dataset_ = d;
 
-    const unsigned n(dataset_[active_dataset_].size() * percentage / 100);
-    end_ = cbegin();
-    std::advance(end_, n);
+    end_ = (slice == 0 || slice >= size()) ?
+      dataset_[active_dataset_].end() : std::next(cbegin(), slice);
   }
 
   ///

@@ -114,7 +114,7 @@ namespace vita
   inline
   bool random::boolean(double p)
   {
-    assert(0 <= p && p <= 1);
+    assert(0.0 <= p && p <= 1.0);
 
     return random::between<double>(0, 1) < p;
     //return boost::uniform_01<double>()(rng_) < p;
