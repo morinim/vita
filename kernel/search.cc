@@ -189,7 +189,7 @@ namespace vita
       //    return w1 > w2;
       //  });
 
-      d->dataset(data::training, std::max(10, count));
+      d->dataset(data::training, std::max(10u, count));
       prob_->get_evaluator()->clear();
 
       for (data::iterator i(d->begin()); i != d->end(); ++i)

@@ -50,7 +50,7 @@ namespace vita
       cache_.insert(ind, f);
 
 #if !defined(NDEBUG)
-      fitness_t f1;
+      eva_pair f1;
       assert(cache_.find(ind, &f1));
       assert(f == f1);
 #endif
