@@ -161,7 +161,7 @@ namespace vita
 
     assert(count);
 
-    return eva_pair(fitness_t(ok),
+    return eva_pair(fitness_t(ok) - fitness_t(count),
                     static_cast<double>(ok) / static_cast<double>(count));
   }
 
