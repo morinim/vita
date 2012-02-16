@@ -42,7 +42,7 @@ namespace vita
   public:
     explicit problem(fitness_t);
 
-    void add_evaluator(evaluator_ptr);
+    unsigned add_evaluator(evaluator_ptr);
     evaluator *get_evaluator();
     void set_evaluator(unsigned);
 

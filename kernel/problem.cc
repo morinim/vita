@@ -57,17 +57,20 @@ namespace vita
   }
 
   ///
-  /// param[in] eva a pointer to an evaluator.
+  /// \param[in] eva a pointer to an evaluator.
+  /// \return numeric index of the just added evaluator.
   ///
   /// Add a new avaluator to the set. Evaluators are used to score individual's
-  /// fitness.
+  /// fitness / accuracy.
   ///
-  void problem::add_evaluator(evaluator_ptr eva)
+  unsigned problem::add_evaluator(evaluator_ptr eva)
   {
     evaluators_.push_back(eva);
 
     if (!active_eva_)
       active_eva_ = eva;
+
+    return evaluators_.size() - 1;
   }
 
   ///

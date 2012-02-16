@@ -36,6 +36,8 @@ namespace vita
   class src_problem : public problem
   {
   public:
+    enum {k_abs_evaluator = 0, k_count_evaluator, k_dyn_slot_evaluator};
+
     explicit src_problem(fitness_t);
 
     unsigned load_data(const std::string &);
@@ -53,11 +55,10 @@ namespace vita
     bool check() const;
 
   private:
-    std::list<std::vector<category_t>> seq_with_rep(
-      const std::vector<category_t> &,
-      unsigned);
-    bool compatible(const std::vector<category_t> &,
-                    const std::vector<std::string> &) const;
+    typedef std::vector<category_t> cvect;
+
+    std::list<cvect> seq_with_rep(const cvect &, unsigned);
+    bool compatible(const cvect &, const std::vector<std::string> &) const;
 
     std::vector<variable_ptr> vars_;
     data                       dat_;

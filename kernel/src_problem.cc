@@ -43,13 +43,17 @@ namespace vita
   {
     clear();
 
-    evaluator_ptr e1(new abs_evaluator(&dat_, &vars_));
-    //evaluator_ptr e1(new count_evaluator(&dat_, &vars_));
-    add_evaluator(e1);
-    //evaluator_ptr e2(new gaussian_evaluator(&dat_, &vars_));
-    //add_evaluator(e2);
-    evaluator_ptr e3(new dyn_slot_evaluator(&dat_, &vars_));
-    add_evaluator(e3);
+    unsigned i;
+    i = add_evaluator(std::make_shared<abs_evaluator>(&dat_, &vars_));
+    assert(i == k_abs_evaluator);
+
+    i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
+    assert(i == k_count_evalutor);
+
+    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_, &vars_));
+    assert(i == k_dyn_slot_evaluator);
+
+    //add_evaluator(std::make_shared<gaussian_evaluator>(&dat_, &vars_));
   }
 
   ///
@@ -81,7 +85,7 @@ namespace vita
           name = "X" + boost::lexical_cast<std::string>(i);
 
         const category_t category(dat_.get_column(i).category_id);
-        variable_ptr x(std::make_shared<variable>(name, category));
+        const variable_ptr x(std::make_shared<variable>(name, category));
         vars_.push_back(x);
         env.insert(x);
       }
@@ -98,8 +102,8 @@ namespace vita
       }
 
       set_evaluator(classes() > 1
-        ? 1     // symbolic regression problem
-        : 0);   // classification problem
+        ? k_dyn_slot_evaluator   // classification problem
+        : k_abs_evaluator);      // symbolic regression problem
     }
 
     return parsed;
@@ -146,7 +150,7 @@ namespace vita
 
     unsigned parsed(0);
 
-    std::vector<category_t> categories(dat_.categories());
+    cvect categories(dat_.categories());
     for (unsigned i(0); i < categories.size(); ++i)
       categories[i] = i;
 
@@ -183,8 +187,8 @@ namespace vita
 
               // From the list of all the sequences with repetition of
               // args.size() elements (categories)...
-              const std::list<std::vector<category_t>> sequences(
-                seq_with_rep(categories, args.size()));
+              const std::list<cvect> sequences(seq_with_rep(categories,
+                                                            args.size()));
 
               // ...we choose those compatible with the xml signature of the
               // current symbol.
@@ -221,8 +225,7 @@ namespace vita
               std::cout << std::endl;
 #endif
               env.insert(factory.make(sym_name, domain,
-                                      std::vector<category_t>(n_args,
-                                                              category)));
+                                      cvect(n_args, category)));
             }
         }
 
@@ -247,7 +250,7 @@ namespace vita
   /// compatible({name}, {"string"}) == true
   /// \endverbatim
   ///
-  bool src_problem::compatible(const std::vector<category_t> &instance,
+  bool src_problem::compatible(const cvect &instance,
                                const std::vector<std::string> &pattern) const
   {
     assert(instance.size() == pattern.size());
@@ -278,8 +281,9 @@ namespace vita
   /// \return a list of sequences with repetition of fixed length (\a args) of
   ///         elements taken from the given set (\a categories).
   ///
-  std::list<std::vector<category_t>> src_problem::seq_with_rep(
-    const std::vector<category_t> &categories, unsigned args)
+  std::list<src_problem::cvect> src_problem::seq_with_rep(
+    const cvect &categories,
+    unsigned args)
   {
     assert(categories.size());
     assert(args);
@@ -287,18 +291,16 @@ namespace vita
     class swr
     {
     public:
-      swr(const std::vector<category_t> &categories, unsigned args)
+      swr(const cvect &categories, unsigned args)
         : categories_(categories), args_(args)
       {
       }
 
-      void operator()(unsigned level,
-                      const std::vector<category_t> &base,
-                      std::list<std::vector<category_t>> *out)
+      void operator()(unsigned level, const cvect &base, std::list<cvect> *out)
       {
         for (unsigned i(0); i < categories_.size(); ++i)
         {
-          std::vector<category_t> current(base);
+          cvect current(base);
           current.push_back(categories_[i]);
 
           if (level+1 < args_)
@@ -309,11 +311,11 @@ namespace vita
       }
 
     private:
-      const std::vector<category_t> &categories_;
+      const cvect &categories_;
       const unsigned args_;
     };
 
-    std::list<std::vector<category_t>> out;
+    std::list<cvect> out;
     swr(categories, args)(0, {}, &out);
     return out;
   }
