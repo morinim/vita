@@ -48,7 +48,7 @@ namespace vita
     assert(i == k_abs_evaluator);
 
     i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
-    assert(i == k_count_evalutor);
+    assert(i == k_count_evaluator);
 
     i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_, &vars_));
     assert(i == k_dyn_slot_evaluator);
