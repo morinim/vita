@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(new fitness());
 
-  vita::evolution(&env, eva.get())(true, 1);
+  vita::evolution(env, eva.get())(true, 1);
 
   return EXIT_SUCCESS;
 }

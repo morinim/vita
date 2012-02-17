@@ -49,7 +49,7 @@ int main(int argc, char *const argv[])
   env.insert(factory.make("IFL", vita::d_double));
   env.insert(factory.make("IFE", vita::d_double));
 
-  vita::population p(&env);
+  vita::population p(env);
 
   std::cout << p << std::endl;
 

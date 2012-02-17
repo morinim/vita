@@ -28,12 +28,11 @@
 
 #include "kernel/vita.h"
 #include "kernel/analyzer.h"
+#include "kernel/environment.h"
 #include "kernel/individual.h"
 
 namespace vita
 {
-  class environment;
-
   ///
   /// A group of individual which may interact together (for example by mating)
   /// producing offspring. Typical population size in GP range from ten to
@@ -45,8 +44,7 @@ namespace vita
     typedef individual value_type;
     typedef std::vector<value_type>::size_type size_type;
 
-    explicit population(environment *const);
-    void build();
+    explicit population(const environment &);
 
     individual &operator[](size_type);
     const individual &operator[](size_type) const;
@@ -57,7 +55,6 @@ namespace vita
     bool check() const;
 
   private:
-    environment            *env_;
     std::vector<value_type> pop_;
   };
 
@@ -92,6 +89,15 @@ namespace vita
   population::size_type population::size() const
   {
     return pop_.size();
+  }
+
+  ///
+  /// \return a constant reference to the active environment.
+  ///
+  inline
+  const environment &population::env() const
+  {
+    return pop_[0].env();
   }
 
   ///

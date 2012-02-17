@@ -68,7 +68,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(environment *const, evaluator *const,
+    evolution(const environment &, evaluator *const,
               std::function<void (unsigned)> = 0);
 
     const summary &operator()(bool, unsigned, unsigned = 0, unsigned = 0,
@@ -100,6 +100,24 @@ namespace vita
 
     std::function<void (unsigned)> shake_data_;
   };
+
+  ///
+  /// \return access to the population being evolved.
+  ///
+  inline
+  vita::population &evolution::population()
+  {
+    return pop_;
+  }
+
+  ///
+  /// \return constant reference to the population being evolved.
+  ///
+  inline
+  const vita::population &evolution::population() const
+  {
+    return pop_;
+  }
 
   ///
   /// \example example6.cc

@@ -25,41 +25,27 @@
 #include <ctime>
 #include <fstream>
 
-#include "kernel/environment.h"
 #include "kernel/population.h"
 #include "kernel/random.h"
 
 namespace vita
 {
   ///
-  /// \param[in] e base \a environment.
-  ///
-  population::population(environment *const e) : env_(e)
-  {
-    assert(e->check());
-
-    build();
-  }
-
+  /// \param[in] e base vita::environment.
   ///
   /// Creates a random population.
   ///
-  void population::build()
+  population::population(const environment &e)
   {
+    assert(e.check());
+
+    pop_.reserve(e.individuals);
     pop_.clear();
 
-    for (unsigned i(0); i < env_->individuals; ++i)
-      pop_.push_back(individual(*env_, true));
+    for (unsigned i(0); i < e.individuals; ++i)
+      pop_.push_back(individual(e, true));
 
     assert(check());
-  }
-
-  ///
-  /// \return a constant reference to the active environment.
-  ///
-  const environment &population::env() const
-  {
-    return *env_;
   }
 
   ///
@@ -71,7 +57,7 @@ namespace vita
       if (!pop_[i].check())
         return false;
 
-    return env_;
+    return true;
   }
 
   ///

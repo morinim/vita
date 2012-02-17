@@ -222,7 +222,7 @@ namespace vita
       if (prob_->env.dss)
         shake_data = std::bind(&search::dss, this, std::placeholders::_1);
 
-      evolution evo(&prob_->env, prob_->get_evaluator(), shake_data);
+      evolution evo(prob_->env, prob_->get_evaluator(), shake_data);
       summary s(evo(verbose, run));
 
       // If shake_data == true, the values returned by the evolution refer to a

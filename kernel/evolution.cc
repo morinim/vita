@@ -38,30 +38,14 @@ namespace vita
   /// \param[in] env environment (mostly used for population initialization).
   /// \param[in] eva evaluator used during the evolution.
   ///
-  evolution::evolution(environment *const env, evaluator *const eva,
+  evolution::evolution(const environment &env, evaluator *const eva,
                        std::function<void (unsigned)> sd)
     : selection(this), operation(this, &stats_), replacement(this), pop_(env),
-      eva_(new evaluator_proxy(eva, env->ttable_size)), shake_data_(sd)
+      eva_(new evaluator_proxy(eva, env.ttable_size)), shake_data_(sd)
   {
     assert(eva);
 
     assert(check());
-  }
-
-  ///
-  /// \return access to the population being evolved.
-  ///
-  vita::population &evolution::population()
-  {
-    return pop_;
-  }
-
-  ///
-  /// \return constant reference to the population being evolved.
-  ///
-  const vita::population &evolution::population() const
-  {
-    return pop_;
   }
 
   ///
