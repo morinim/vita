@@ -68,8 +68,8 @@ namespace vita
     {
       const unsigned j(random::ring(target, mate_zone, n));
 
-      const fitness_t fit_j(evo_->fitness(evo_->population()[j]).first);
-      const fitness_t fit_sel(evo_->fitness(evo_->population()[sel]).first);
+      const fitness_t fit_j(evo_->fitness(evo_->population()[j]));
+      const fitness_t fit_sel(evo_->fitness(evo_->population()[sel]));
 
       if (fit_j > fit_sel)
         sel = j;
@@ -79,17 +79,15 @@ namespace vita
   }
 
   ///
-  /// \return a couple of indexes to individuals to be used by the evolution
-  ///         class.
+  /// \return a couple of indexes to individuals to be used by the
+  ///         vita::evolution class.
   ///
   std::vector<index_t> tournament_selection::operator()()
   {
-    std::vector<index_t> ret(2);
+    const index_t i1(tournament(evo_->population().size()));
+    const index_t i2(tournament(i1));
 
-    ret[0] = tournament(evo_->population().size());
-    ret[1] = tournament(ret[0]);
-
-    return ret;
+    return {i1, i2};
   }
 
   ///

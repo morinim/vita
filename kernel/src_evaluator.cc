@@ -54,7 +54,7 @@ namespace vita
   /// \return the fitness (greater is better, max is 0) and the accuracy
   ///         (percentage).
   ///
-  eva_pair abs_evaluator::operator()(const individual &ind)
+  score_t abs_evaluator::operator()(const individual &ind)
   {
     assert(!dat_->classes());
 
@@ -89,8 +89,8 @@ namespace vita
 
     assert(count);
 
-    return eva_pair(fitness_t(-err),
-                    static_cast<double>(ok) / static_cast<double>(count));
+    return score_t(fitness_t(-err),
+                   static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
@@ -135,7 +135,7 @@ namespace vita
   ///         training cases) and the accuracy (percantage) of individual
   ///         \a ind.
   ///
-  eva_pair count_evaluator::operator()(const vita::individual &ind)
+  score_t count_evaluator::operator()(const vita::individual &ind)
   {
     assert(!dat_->classes());
 
@@ -161,8 +161,8 @@ namespace vita
 
     assert(count);
 
-    return eva_pair(fitness_t(ok) - fitness_t(count),
-                    static_cast<double>(ok) / static_cast<double>(count));
+    return score_t(fitness_t(ok) - fitness_t(count),
+                   static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
@@ -286,7 +286,7 @@ namespace vita
   ///
   /// Slotted Dynamic Class Boundary Determination
   ///
-  eva_pair dyn_slot_evaluator::operator()(const individual &ind)
+  score_t dyn_slot_evaluator::operator()(const individual &ind)
   {
     assert(ind.check());
     assert(dat_->classes() >= 2);
@@ -305,9 +305,8 @@ namespace vita
         if (j != slot_class[i])
           err += slot_matrix[i][j];
 
-    return eva_pair(fitness_t(-err),
-                    static_cast<double>(count - err) /
-                    static_cast<double>(count));
+    return score_t(fitness_t(-err),
+                   static_cast<double>(count-err) / static_cast<double>(count));
   }
 
   ///
@@ -406,7 +405,7 @@ namespace vita
   ///   Programming for Multiclass Object Classification" - Mengjie Zhang, Will
   ///   Smart (december 2005).
   ///
-  eva_pair gaussian_evaluator::operator()(const individual &ind)
+  score_t gaussian_evaluator::operator()(const individual &ind)
   {
     assert(dat_->classes() >= 2);
     std::vector<distribution<double>> gauss(dat_->classes());
@@ -434,7 +433,7 @@ namespace vita
 
     assert(count);
 
-    return eva_pair(d, static_cast<double>(ok) / static_cast<double>(count));
+    return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///

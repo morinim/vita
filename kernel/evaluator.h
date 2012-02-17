@@ -31,8 +31,24 @@ namespace vita
 {
   class individual;
 
-  /// the fitness and the accuracy (percentage) of an individual.
-  typedef std::pair<fitness_t, double> eva_pair;
+  ///
+  /// The fitness and the accuracy (percentage) of an individual.
+  ///
+  struct score_t
+  {
+    score_t() {}
+
+    score_t(fitness_t f, double a) : fitness(f), accuracy(a)
+    {
+      assert(a <= 1.0);  // accuracy could be less than 0.0 (meaning N.A.)
+    }
+
+    bool operator==(const score_t &s) const
+    { return fitness == s.fitness && accuracy == s.accuracy; }
+
+    fitness_t fitness;
+    double   accuracy;
+  };
 
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
@@ -57,8 +73,10 @@ namespace vita
     /// examples have been correctly recognized.
     /// Accuracy could be used as fitness function but it often hasn't enough
     /// "granularity".
-    virtual eva_pair operator()(const individual &) = 0;
-    virtual fitness_t fast(const individual &i) { return operator()(i).first; }
+    virtual score_t operator()(const individual &) = 0;
+
+    virtual fitness_t fast(const individual &i)
+    { return operator()(i).fitness; }
   };
 
   ///
@@ -68,11 +86,11 @@ namespace vita
   class random_evaluator : public evaluator
   {
   public:
-    eva_pair operator()(const individual &)
+    score_t operator()(const individual &)
     {
       const double sup(16000);
       const fitness_t f(random::between<unsigned>(0, sup));
-      return eva_pair(f, f / (sup - 1));
+      return score_t(f, f / (sup - 1));
     }
   };
 }  // namespace vita

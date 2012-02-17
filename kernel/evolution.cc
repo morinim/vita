@@ -68,7 +68,7 @@ namespace vita
   {
     analyzer az;
     for (unsigned i(0); i < pop_.size(); ++i)
-      az.add(pop_[i], (*eva_)(pop_[i]).first);
+      az.add(pop_[i], fitness(pop_[i]));
 
     return az;
   }
@@ -127,10 +127,15 @@ namespace vita
         get_probes(&probes, &hits);
 
         dynamic << run_count
-                << ' ' << stats_.gen
-                << ' ' << stats_.best_pair.first
-                << ' ' << stats_.best_pair.second
-                << ' ' << stats_.az.fit_dist().mean
+                << ' ' << stats_.gen;
+
+        if (stats_.best)
+          dynamic << ' ' << stats_.best->score.fitness
+                  << ' ' << stats_.best->score.accuracy;
+        else
+          dynamic << " ? ?";
+
+        dynamic << ' ' << stats_.az.fit_dist().mean
                 << ' ' << stats_.az.fit_dist().standard_deviation()
                 << ' ' << stats_.az.fit_dist().entropy()
                 << ' ' << stats_.az.fit_dist().min
@@ -153,8 +158,9 @@ namespace vita
             dynamic << ' ' << (i->first)->display() << ' '
                     << i->second.counter[active];
 
-        dynamic << " \"";
-        stats_.best_ind->in_line(dynamic);
+        dynamic << ' ' << '"';
+        if (stats_.best)
+          stats_.best->ind.in_line(dynamic);
         dynamic << '"' << std::endl;
       }
     }
@@ -178,12 +184,21 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual whose fitness we are interested in.
+  /// \param[in] ind individual whose accuracy/fitness we are interested in.
   /// \return the fitness and the accuracy of \a ind.
   ///
-  eva_pair evolution::fitness(const individual &ind) const
+  score_t evolution::score(const individual &ind) const
   {
     return (*eva_)(ind);
+  }
+
+  ///
+  /// \param[in] ind individual whose fitness we are interested in.
+  /// \return the fitness of \a ind.
+  ///
+  fitness_t evolution::fitness(const individual &ind) const
+  {
+    return score(ind).fitness;
   }
 
   ///
@@ -220,8 +235,7 @@ namespace vita
                                        unsigned rep_id)
   {
     stats_.clear();
-    stats_.best_ind = std::make_shared<individual>(pop_[0]);
-    stats_.best_pair = (*eva_)(*stats_.best_ind);
+    stats_.best = {pop_[0], score(pop_[0])};
 
     eva_->clear();
 
@@ -235,8 +249,7 @@ namespace vita
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
         // dataset).
-        stats_.best_ind = std::make_shared<individual>(pop_[0]);
-        stats_.best_pair = (*eva_)(*stats_.best_ind);
+        stats_.best = {pop_[0], score(pop_[0])};
       }
 
       stats_.az = get_stats();
@@ -256,19 +269,19 @@ namespace vita
         std::vector<individual> off(operation[op_id](parents));
 
         // --------- REPLACEMENT --------
-        const fitness_t before(stats_.best_pair.first);
+        const fitness_t before(stats_.best->score.fitness);
         replacement[rep_id](parents, off, &stats_);
 
-        if (verbose && stats_.best_pair.first != before)
+        if (verbose && stats_.best->score.fitness != before)
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << std::setw(16) << stats_.best_pair.first;
+                    << std::setw(16) << stats_.best->score.fitness;
 
-          if (stats_.best_pair.second >= 0.0)
+          if (stats_.best->score.accuracy >= 0.0)
             std::cout << std::setprecision(2) << " (" << std::fixed
-                      << std::setw(6) << 100.0 * stats_.best_pair.second
+                      << std::setw(6) << 100.0 * stats_.best->score.accuracy
                       << "%)" << std::setprecision(-1)
                       << std::resetiosflags(std::ios::fixed);
 
@@ -283,7 +296,7 @@ namespace vita
     if (verbose)
     {
       double speed(stats_.speed);
-      std::string unit("");
+      std::string unit;
 
       if (speed >= 1.0)
         unit = "cycles/s";
@@ -335,8 +348,8 @@ namespace vita
     last_imp      = 0;
     speed         = 0.0;
 
-    best_ind.reset();
-
     az.clear();
+
+    best = boost::none;
   }
 }  // namespace vita

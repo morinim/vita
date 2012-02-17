@@ -43,7 +43,7 @@ namespace vita
 
     void clear();
 
-    eva_pair operator()(const individual &);
+    score_t operator()(const individual &);
 
     boost::uint64_t probes() const;
     boost::uint64_t hits() const;

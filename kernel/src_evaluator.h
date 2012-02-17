@@ -59,7 +59,7 @@ namespace vita
     abs_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v) {}
 
-    eva_pair operator()(const individual &);
+    score_t operator()(const individual &);
     fitness_t fast(const individual &);
   };
 
@@ -74,7 +74,7 @@ namespace vita
     count_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v) {}
 
-    eva_pair operator()(const individual &);
+    score_t operator()(const individual &);
   };
 
   ///
@@ -86,7 +86,7 @@ namespace vita
   public:
     dyn_slot_evaluator(data *, std::vector<variable_ptr> *, unsigned = 10);
 
-    eva_pair operator()(const individual &);
+    score_t operator()(const individual &);
 
     friend class dyn_slot_classifier;
 
@@ -125,7 +125,7 @@ namespace vita
       assert(v);
     }
 
-    eva_pair operator()(const individual &);
+    score_t operator()(const individual &);
 
     friend class gaussian_classifier;
 

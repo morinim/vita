@@ -59,7 +59,7 @@ namespace vita
   {
     const unsigned arl_args(0);
 
-    const fitness_t base_fit(evo.fitness(base).first);
+    const fitness_t base_fit(evo.fitness(base));
     if (std::isfinite(base_fit))
     {
       const std::string f_adf(prob_->env.stat_dir + "/" +
@@ -85,7 +85,7 @@ namespace vita
         if (candidate_block.eff_size() <= 5 + arl_args)
         {
           const double d_f(base_fit -
-                           evo.fitness(base.destroy_block((*i)[0])).first);
+                           evo.fitness(base.destroy_block((*i)[0])));
 
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
@@ -207,14 +207,13 @@ namespace vita
   ///
   const individual &search::run(bool verbose, unsigned n)
   {
-    summary overall_run_sum;
+    summary overall_summary, previous;
     distribution<fitness_t> fd;
     unsigned best_run(0);
 
     unsigned solutions(0);
 
-    summary previous;
-    eva_pair pair_run_best;
+    score_t run_best_score;
 
     for (unsigned run(0); run < n; ++run)
     {
@@ -225,63 +224,64 @@ namespace vita
       evolution evo(prob_->env, prob_->get_evaluator(), shake_data);
       summary s(evo(verbose, run));
 
-      // If shake_data == true, the values returned by the evolution refer to a
-      // subset of the available dataset. Since we need an overall fitness /
-      // accuracy, a new calculation have to be performed.
+      // If \c shake_data == \c true, the values returned by the evolution
+      // refer to a subset of the available dataset. Since we need an overall
+      // fitness / accuracy, a new calculation have to be performed.
       if (shake_data)
       {
         prob_->get_data()->dataset(data::training);
         prob_->get_evaluator()->clear();
-        pair_run_best = (*prob_->get_evaluator())(*s.best_ind);
+        run_best_score = (*prob_->get_evaluator())(s.best->ind);
 
         if (verbose)
-          std::cout << pair_run_best.first << " ("
-                    << 100.0 * pair_run_best.second << "%)" << std::endl;
+        {
+          std::cout << run_best_score.fitness;
+
+          if (run_best_score.accuracy >= 0.0)
+            std::cout << " (" << 100.0 * run_best_score.accuracy << "%)"
+                      << std::endl;
+        }
       }
       else
-        pair_run_best = s.best_pair;
+        run_best_score = s.best->score;
 
       if (run == 0)
-      {
-        overall_run_sum.best_ind  = s.best_ind;
-        overall_run_sum.best_pair = pair_run_best;
-      }
+        overall_summary.best = {s.best->ind, run_best_score};
 
-      const bool found(pair_run_best.first >= prob_->threashold);
+      const bool found(run_best_score.fitness >= prob_->threashold);
       if (found)
       {
         ++solutions;
-        overall_run_sum.last_imp += s.last_imp;
+        overall_summary.last_imp += s.last_imp;
       }
 
-      if (overall_run_sum.best_pair.first < pair_run_best.first)
+      if (overall_summary.best->score.fitness < run_best_score.fitness)
       {
-        overall_run_sum.best_ind  =    s.best_ind;
-        overall_run_sum.best_pair = pair_run_best;
-        best_run                  =           run;
+        overall_summary.best = {s.best->ind, run_best_score};
+        best_run             =                           run;
       }
 
-      if (std::isfinite(pair_run_best.first))
-        fd.add(pair_run_best.first);
+      if (std::isfinite(run_best_score.fitness))
+        fd.add(run_best_score.fitness);
 
-      overall_run_sum.ttable_hits += s.ttable_hits;
-      overall_run_sum.ttable_probes += s.ttable_probes;
-      overall_run_sum.speed = ((overall_run_sum.speed * run) + s.speed) /
+      overall_summary.ttable_hits += s.ttable_hits;
+      overall_summary.ttable_probes += s.ttable_probes;
+      overall_summary.speed = ((overall_summary.speed * run) + s.speed) /
                               (run + 1);
 
       if (prob_->env.arl && best_run == run)
       {
         prob_->env.sset.reset_adf_weights();
-        arl(*s.best_ind, evo);
+        arl(s.best->ind, evo);
       }
 
       if (prob_->env.stat_summary)
-        log(overall_run_sum, fd, solutions, best_run, n);
+        log(overall_summary, fd, solutions, best_run, n);
 
       previous = s;
     }
 
-    return *overall_run_sum.best_ind;
+    return overall_summary.best->ind;
   }
 
   ///
@@ -296,9 +296,9 @@ namespace vita
                    unsigned solutions, unsigned best_run, unsigned runs) const
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best_ind->list(best_list);
-    run_sum.best_ind->tree(best_tree);
-    run_sum.best_ind->graphviz(best_graph);
+    run_sum.best->ind.list(best_list);
+    run_sum.best->ind.tree(best_tree);
+    run_sum.best->ind.graphviz(best_graph);
 
     const std::string path("vita.");
     const std::string summary(path+"summary.");
@@ -307,8 +307,8 @@ namespace vita
     pt.put(summary+"success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
     pt.put(summary+"speed", run_sum.speed);
-    pt.put(summary+"best.fitness", run_sum.best_pair.first);
-    pt.put(summary+"best.accuracy", run_sum.best_pair.second);
+    pt.put(summary+"best.fitness", run_sum.best->score.fitness);
+    pt.put(summary+"best.accuracy", run_sum.best->score.accuracy);
     pt.put(summary+"best.times_reached", solutions);
     pt.put(summary+"best.run", best_run);
     pt.put(summary+"best.avg_depth_found", solutions

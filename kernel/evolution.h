@@ -42,7 +42,6 @@ namespace vita
 
   struct summary
   {
-  public:
     summary();
 
     void clear();
@@ -61,8 +60,12 @@ namespace vita
 
     analyzer az;
 
-    std::shared_ptr<individual> best_ind;
-    eva_pair                   best_pair;
+    struct best_
+    {
+      individual ind;
+      score_t  score;
+    };
+    boost::optional<best_> best;
   };
 
   class evolution
@@ -77,7 +80,8 @@ namespace vita
     const vita::population &population() const;
     vita::population &population();
 
-    eva_pair fitness(const individual &) const;
+    score_t score(const individual &) const;
+    fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
 
     bool check() const;

@@ -68,7 +68,7 @@ double Z::val;
 
 class fitness : public vita::evaluator
 {
-  vita::eva_pair operator()(const vita::individual &ind)
+  vita::score_t operator()(const vita::individual &ind)
   {
     vita::interpreter agent(ind);
 
@@ -91,7 +91,7 @@ class fitness : public vita::evaluator
           }
         }
 
-    return vita::eva_pair(fit, -1.0);
+    return vita::score_t(fit, -1.0);
   }
 };
 
