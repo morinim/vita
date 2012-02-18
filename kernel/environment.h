@@ -24,6 +24,7 @@
 #if !defined(ENVIRONMENT_H)
 #define      ENVIRONMENT_H
 
+#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <cmath>
@@ -49,7 +50,9 @@ namespace vita
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).
-    unsigned code_length;
+    /// Code length have to be chosen before population is created and cannot
+    /// be changed afterwards.
+    boost::optional<unsigned> code_length;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will

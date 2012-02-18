@@ -25,6 +25,7 @@
 #define      SEARCH_H
 
 #include "kernel/vita.h"
+#include "kernel/environment.h"
 #include "kernel/fitness.h"
 
 namespace vita
@@ -44,7 +45,8 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
-    void dss(unsigned);
+    void dss(unsigned) const;
+    void tune_parameters();
 
     const individual &run(bool = true, unsigned = 1);
 
@@ -54,7 +56,8 @@ namespace vita
     void log(const summary &, const distribution<fitness_t> &,
              unsigned, unsigned, unsigned) const;
 
-    problem *prob_;
+    environment env_;
+    problem   *prob_;
   };
 }  // namespace vita
 

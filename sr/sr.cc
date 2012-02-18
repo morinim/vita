@@ -93,10 +93,9 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
-      ("program-size,p",
-       po::value(&problem.env.code_length)->default_value(
-         problem.env.code_length),
-       "Sets the maximum length of a program (it might be shorter)");
+      ("code-length,l",
+       po::value<unsigned>(),
+       "Sets the code/genome length of an individual");
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
@@ -206,6 +205,9 @@ bool parse_command_line(int argc, char *argv[])
       return false;
     }
 
+    if (vm.count("code-length"))
+      problem.env.code_length = vm["code-length"].as<unsigned>();
+
     if (vm.count("random-seed"))
     {
       vita::random::seed(random_seed);
@@ -290,11 +292,12 @@ bool parse_command_line(int argc, char *argv[])
 ///
 void fix_parameters()
 {
-  if (problem.env.code_length <= problem.categories())
+  if (problem.env.code_length &&
+      *problem.env.code_length <= problem.categories())
   {
     const unsigned new_length(2 * problem.categories());
-    std::cout << "[WARNING] Adjusting code length (" << problem.env.code_length
-              << " => " << new_length << std::endl;
+    std::cout << "[WARNING] Adjusting code length (" << *problem.env.code_length
+              << " => " << new_length << ')' << std::endl;
     problem.env.code_length = new_length;
   }
 }

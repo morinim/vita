@@ -42,7 +42,7 @@ namespace vita
   ///
   individual::individual(const environment &e, bool gen)
     : crossover_(uniform_crossover), best_(locus{{0, 0}}), env_(&e),
-      genome_(boost::extents[e.code_length][e.sset.categories()]),
+      genome_(boost::extents[*e.code_length][e.sset.categories()]),
       signature_()
   {
     assert(e.check());

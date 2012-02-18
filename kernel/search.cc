@@ -21,7 +21,6 @@
  *
  */
 
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include <fstream>
@@ -39,7 +38,7 @@ namespace vita
   ///
   /// \param[in] prob a \c problem used for search initialization.
   ///
-  search::search(problem *const prob) : prob_(prob)
+  search::search(problem *const prob) : env_(prob->env), prob_(prob)
   {
     assert(prob->check());
 
@@ -62,15 +61,14 @@ namespace vita
     const fitness_t base_fit(evo.fitness(base));
     if (std::isfinite(base_fit))
     {
-      const std::string f_adf(prob_->env.stat_dir + "/" +
-                              environment::arl_filename);
+      const std::string f_adf(env_.stat_dir + "/" + environment::arl_filename);
       std::ofstream adf_l(f_adf.c_str(), std::ios_base::app);
 
-      if (prob_->env.stat_arl && adf_l.good())
+      if (env_.stat_arl && adf_l.good())
       {
-        for (unsigned i(0); i < prob_->env.sset.adts(); ++i)
+        for (unsigned i(0); i < env_.sset.adts(); ++i)
         {
-          const symbol *f(prob_->env.sset.get_adt(i).get());
+          const symbol *f(env_.sset.get_adt(i).get());
           adf_l << f->display() << ' ' << f->weight << std::endl;
         }
         adf_l << std::endl;
@@ -104,9 +102,9 @@ namespace vita
             }
             else
               p = std::make_shared<vita::adt>(candidate_block, 100);
-            prob_->env.insert(p);
+            env_.insert(p);
 
-            if (prob_->env.stat_arl && adf_l.good())
+            if (env_.stat_arl && adf_l.good())
             {
               adf_l << p->display() << " (Base: " << base_fit
                     << "  DF: " << d_f
@@ -135,7 +133,7 @@ namespace vita
   /// \li firstly 'difficult' cases:
   /// \li secondly cases which have not been looked at for several generations.
   ///
-  void search::dss(unsigned generation)
+  void search::dss(unsigned generation) const
   {
     data *const d(prob_->get_data());
 
@@ -201,32 +199,43 @@ namespace vita
   }
 
   ///
+  ///
+  ///
+  void search::tune_parameters()
+  {
+    if (!prob_->env.code_length)
+      env_.code_length = 100;
+  }
+
+  ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
   const individual &search::run(bool verbose, unsigned n)
   {
-    summary overall_summary, previous;
+    summary overall_summary;
     distribution<fitness_t> fd;
-    unsigned best_run(0);
 
     unsigned solutions(0);
 
+    unsigned best_run(0);
     score_t run_best_score;
+
+    std::function<void (unsigned)> shake_data;
+    if (env_.dss)
+      shake_data = std::bind(&search::dss, this, std::placeholders::_1);
+
+    tune_parameters();
 
     for (unsigned run(0); run < n; ++run)
     {
-      std::function<void (unsigned)> shake_data;
-      if (prob_->env.dss)
-        shake_data = std::bind(&search::dss, this, std::placeholders::_1);
-
-      evolution evo(prob_->env, prob_->get_evaluator(), shake_data);
+      evolution evo(env_, prob_->get_evaluator(), shake_data);
       summary s(evo(verbose, run));
 
       // If \c shake_data == \c true, the values returned by the evolution
-      // refer to a subset of the available dataset. Since we need an overall
-      // fitness / accuracy, a new calculation have to be performed.
+      // object refer to a subset of the available dataset. Since we need an
+      // overall score, a new calculation have to be performed.
       if (shake_data)
       {
         prob_->get_data()->dataset(data::training);
@@ -266,19 +275,17 @@ namespace vita
 
       overall_summary.ttable_hits += s.ttable_hits;
       overall_summary.ttable_probes += s.ttable_probes;
-      overall_summary.speed = ((overall_summary.speed * run) + s.speed) /
+      overall_summary.speed = (overall_summary.speed * run + s.speed) /
                               (run + 1);
 
-      if (prob_->env.arl && best_run == run)
+      if (env_.arl && best_run == run)
       {
-        prob_->env.sset.reset_adf_weights();
+        env_.sset.reset_adf_weights();
         arl(s.best->ind, evo);
       }
 
-      if (prob_->env.stat_summary)
+      if (env_.stat_summary)
         log(overall_summary, fd, solutions, best_run, n);
-
-      previous = s;
     }
 
     return overall_summary.best->ind;
@@ -301,7 +308,7 @@ namespace vita
     run_sum.best->ind.graphviz(best_graph);
 
     const std::string path("vita.");
-    const std::string summary(path+"summary.");
+    const std::string summary(path + "summary.");
 
     boost::property_tree::ptree pt;
     pt.put(summary+"success_rate", runs ?
@@ -323,10 +330,9 @@ namespace vita
     pt.put(summary+"ttable.hits", run_sum.ttable_hits);
     pt.put(summary+"ttable.probes", run_sum.ttable_probes);
 
-    const std::string f_sum(prob_->env.stat_dir + "/" +
-                            environment::sum_filename);
+    const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 
-    prob_->env.log(&pt, path);
+    env_.log(&pt, path);
 
     using namespace boost::property_tree;
     write_xml(f_sum, pt, std::locale(), xml_writer_make_settings(' ', 2));

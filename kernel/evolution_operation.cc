@@ -67,8 +67,8 @@ namespace vita
   {
     assert(parent.size() >= 2);
 
-    const population &pop = evo_->population();
-    const environment &env = pop.env();
+    const population &pop(evo_->population());
+    const environment &env(pop.env());
     const unsigned r1(parent[0]), r2(parent[1]);
 
     unsigned mutations(0);
@@ -78,7 +78,6 @@ namespace vita
       off = (pop[r1].crossover(pop[r2])).mutation(&mutations);
 
       ++stats_->crossovers;
-      stats_->mutations += mutations;
 
       if (env.brood_recombination)
       {

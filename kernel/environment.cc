@@ -37,9 +37,8 @@ namespace vita
   /// problems need ad-hoc parameters.
   ///
   environment::environment()
-    : code_length(100),
-      elitism(true),
-      p_mutation(2.0/code_length),
+    : elitism(true),
+      p_mutation(0.1),
       p_cross(0.7),
       brood_recombination(0),
       dss(true),
@@ -70,7 +69,7 @@ namespace vita
 
     const std::string env(path + "environment.");
     pt->put(env + "population_size", individuals);
-    pt->put(env + "max_program_length", code_length);
+    pt->put(env + "code_length", code_length);
     pt->put(env + "elitism", elitism);
     pt->put(env + "mutation_rate", p_mutation);
     pt->put(env + "crossover_rate", p_cross);
@@ -106,9 +105,10 @@ namespace vita
   ///
   bool environment::check() const
   {
-    return
-      code_length &&
+    if (code_length && *code_length < 5)
+      return false;
 
+    return
       0 <= p_mutation && 0 <= p_cross && 0 < p_mutation+p_cross &&
 
       3 < individuals &&

@@ -35,7 +35,7 @@ symbol_set_dir = "symbolset/"
 ttable_bit = 20
 verbose = False
 
-def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
+def sr(data_set, generations, individuals, code_length, rounds, symbol_set,
        args):
     if args.debug:
         rnd = "";
@@ -54,14 +54,14 @@ def sr(data_set, generations, individuals, prog_size, rounds, symbol_set,
 
     cmd = Template("sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
-                   "-P $nind -p $ps -r $rs $rnd_switch $arl_switch "\
+                   "-P $nind -l $cl -r $rs $rnd_switch $arl_switch "\
                    "$dss_switch $ss $ds")
     s = cmd.substitute(elitism_switch = "--elitism "+str(args.elitism),
                        sd = stat_dir,
                        tt = ttable_bit,
                        gen = generations,
                        nind = individuals,
-                       ps = prog_size,
+                       cl = code_length,
                        rs = rounds,
                        rnd_switch = rnd,
                        arl_switch = "--arl --stat-arl" if args.arl else "",
@@ -90,10 +90,11 @@ def save_results(name, data_set, args):
             os.rename(before, after)
 
 
-def test_dataset(name, args, data_set, generations, individuals, prog_size,
+def test_dataset(name, args, data_set, generations, individuals, code_length,
                  rounds, symbol_set = ""):
     print("Testing "+name+" ["+str(args)+"]")
-    sr(data_set, generations, individuals, prog_size, rounds, symbol_set, args)
+    sr(data_set, generations, individuals, code_length, rounds, symbol_set,
+       args)
     save_results(name, data_set, args)
 
 
