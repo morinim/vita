@@ -45,7 +45,7 @@ namespace vita
       genome_(boost::extents[*e.code_length][e.sset.categories()]),
       signature_()
   {
-    assert(e.check());
+    assert(e.check(true));
 
     if (gen)  // random generate initial code
     {
@@ -601,7 +601,7 @@ namespace vita
     }
 
     return
-      env_->check() &&
+      env_->check(true) &&
       (signature_.empty() || signature_ == hash());
   }
 

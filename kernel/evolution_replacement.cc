@@ -80,7 +80,7 @@ namespace vita
   /// Parameters from the environment:
   /// <ul>
   /// <li>
-  ///   elitism is true => child replaces a member of the population only if
+  ///   elitism is \c true => child replaces a member of the population only if
   ///   child is better.
   /// </li>
   /// </ul>
@@ -96,6 +96,7 @@ namespace vita
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < score_off.fitness);
 
+    assert(!boost::indeterminate(pop.env().elitism));
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 

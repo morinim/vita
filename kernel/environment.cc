@@ -37,7 +37,7 @@ namespace vita
   /// problems need ad-hoc parameters.
   ///
   environment::environment()
-    : elitism(true),
+    : elitism(boost::indeterminate),
       p_mutation(0.1),
       p_cross(0.7),
       brood_recombination(0),
@@ -52,7 +52,7 @@ namespace vita
       stat_dir(""),
       stat_arl(false), stat_dynamic(false), stat_summary(false)
   {
-    assert(check());
+    assert(check(false));
   }
 
   ///
@@ -101,15 +101,23 @@ namespace vita
   }
 
   ///
+  /// \param force_defined all the optional parameter have to be in a
+  ///                      'well defined' state for the function to pass
+  ///                      the test.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool environment::check() const
+  bool environment::check(bool force_defined) const
   {
+    if (force_defined && !code_length)
+      return false;
     if (code_length && *code_length < 5)
       return false;
 
+    if (force_defined && boost::indeterminate(elitism))
+      return false;
+
     return
-      0 <= p_mutation && 0 <= p_cross && 0 < p_mutation+p_cross &&
+      0 <= p_mutation && 0 <= p_cross && 0 < p_mutation + p_cross &&
 
       3 < individuals &&
 

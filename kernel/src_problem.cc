@@ -139,7 +139,6 @@ namespace vita
       }
   }
 
-# pragma GCC diagnostic ignored "-Wtype-limits"
   ///
   /// \param[in] sf name of the file containing the symbols.
   /// \return number of parsed symbols.

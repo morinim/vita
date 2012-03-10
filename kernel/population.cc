@@ -37,7 +37,7 @@ namespace vita
   ///
   population::population(const environment &e)
   {
-    assert(e.check());
+    assert(e.check(true));
 
     pop_.reserve(e.individuals);
     pop_.clear();

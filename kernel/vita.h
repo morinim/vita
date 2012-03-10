@@ -42,7 +42,7 @@
  *
  */
 
-# pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wformat"
 
 #if !defined(VITA_H)
 #define      VITA_H
@@ -57,6 +57,7 @@
 namespace vita
 {
   class symbol;
+
   /// Just a shortcut.
   typedef std::shared_ptr<symbol> symbol_ptr;
 

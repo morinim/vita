@@ -199,12 +199,32 @@ namespace vita
   }
 
   ///
-  ///
+  /// Parameter tuning is a typical approach to algorithm design. Such tuning
+  /// is done by experimenting with different values and selecting the ones
+  /// that give the best results on the test problems at hand. However, the
+  /// number of possible parameters and their different values means that this
+  /// is a very complex and time-consuming task; it is something we do
+  /// not/ want users to worry about (power users can force many parameters, but
+  /// our idea is "simple by default").
+  /// It has been formally proven, in the No-Free-Lunch theorem, that it is
+  /// impossible to tune a search algorithm such that it will have optimal
+  /// settings for all possible problems, but parameters can be properly
+  /// set for a given problem.
+  /// This function tries to guess a good starting point and changes its hint
+  /// after every run. The code is a mix of black magic, experience, common
+  /// logic and randomness but it seems reasonable.
+  /// \see "Parameter Setting in Evolutionary Algorithms" (F.G. Lobo, C.F. Lima,
+  ///      Z. Michalewicz) - Springer
   ///
   void search::tune_parameters()
   {
     if (!prob_->env.code_length)
       env_.code_length = 100;
+
+    if (boost::indeterminate(prob_->env.elitism))
+      env_.elitism = true;
+
+    assert(env_.check(true));
   }
 
   ///

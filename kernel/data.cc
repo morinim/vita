@@ -441,7 +441,6 @@ namespace vita
         header_[i].category_id = c1;
   }
 
-# pragma GCC diagnostic ignored "-Wtype-limits"
   ///
   /// \param[in] filename the xrff file.
   /// \return number of lines parsed (0 in case of errors).

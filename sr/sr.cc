@@ -93,8 +93,7 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
-      ("code-length,l",
-       po::value<unsigned>(),
+      ("code-length,l", po::value<unsigned>(),
        "Sets the code/genome length of an individual");
 
     // Declare a group of options that will be allowed both on command line
@@ -105,8 +104,7 @@ bool parse_command_line(int argc, char *argv[])
        po::value(&problem.env.individuals)->default_value(
          problem.env.individuals),
        "Sets the number of programs/individuals in the population.")
-      ("elitism",
-       po::value<bool>(&problem.env.elitism)->default_value(true),
+      ("elitism", po::value<bool>(),
        "When elitism is true an individual will never replace a better one.")
       ("mutation-rate,m",
        po::value(&problem.env.p_mutation)->default_value(
@@ -207,6 +205,8 @@ bool parse_command_line(int argc, char *argv[])
 
     if (vm.count("code-length"))
       problem.env.code_length = vm["code-length"].as<unsigned>();
+    if (vm.count("elitism"))
+      problem.env.elitism = vm["elitism"].as<bool>();
 
     if (vm.count("random-seed"))
     {

@@ -25,6 +25,7 @@
 #define      ENVIRONMENT_H
 
 #include <boost/lexical_cast.hpp>
+#include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <cmath>
@@ -57,7 +58,7 @@ namespace vita
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
     /// converge quicker but losing diversity.
-    bool elitism;
+    boost::tribool elitism;
 
     /// Mutation probability. Mutation is one of the principal "search
     /// operators" used to transform programs in the Genetic Programming
@@ -129,7 +130,7 @@ namespace vita
 
     symbol_set sset;
 
-    bool check() const;
+    bool check(bool) const;
 
     static const char arl_filename[];
     static const char dyn_filename[];

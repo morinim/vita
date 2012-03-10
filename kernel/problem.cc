@@ -86,6 +86,6 @@ namespace vita
   ///
   bool problem::check() const
   {
-    return env.check();
+    return env.check(false);
   }
 }  // namespace vita
