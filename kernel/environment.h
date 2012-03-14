@@ -63,7 +63,7 @@ namespace vita
     /// Mutation probability. Mutation is one of the principal "search
     /// operators" used to transform programs in the Genetic Programming
     /// algorithm. Mutation causes random changes in individuals.
-    double p_mutation;
+    boost::optional<double> p_mutation;
 
     /// Crossover probability. See \see operation_strategy::operator().
     double p_cross;

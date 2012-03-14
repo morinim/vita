@@ -38,7 +38,6 @@ namespace vita
   ///
   environment::environment()
     : elitism(boost::indeterminate),
-      p_mutation(0.1),
       p_cross(0.7),
       brood_recombination(0),
       dss(true),
@@ -116,8 +115,13 @@ namespace vita
     if (force_defined && boost::indeterminate(elitism))
       return false;
 
+    if (force_defined && !p_mutation)
+      return false;
+    if (p_mutation && *p_mutation < 0)
+      return false;
+
     return
-      0 <= p_mutation && 0 <= p_cross && 0 < p_mutation + p_cross &&
+      0 <= p_cross &&
 
       3 < individuals &&
 

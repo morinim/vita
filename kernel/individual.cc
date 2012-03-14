@@ -105,7 +105,7 @@ namespace vita
   /// \param[out] n_mutations number of mutations performed.
   /// \return a new, mutated, individual.
   ///
-  /// A new individual is created mutating \c this individual.
+  /// A new individual is created mutating \c this.
   ///
   individual individual::mutation(unsigned *const n_mutations) const
   {
@@ -117,7 +117,7 @@ namespace vita
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
-        if (random::boolean(env_->p_mutation))
+        if (random::boolean(*env_->p_mutation))
         {
           ++n;
 
@@ -125,7 +125,7 @@ namespace vita
         }
 
     for (category_t c(0); c < categories; ++c)
-      if (random::boolean(env_->p_mutation))
+      if (random::boolean(*env_->p_mutation))
       {
         ++n;
 

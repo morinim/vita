@@ -106,9 +106,7 @@ bool parse_command_line(int argc, char *argv[])
        "Sets the number of programs/individuals in the population.")
       ("elitism", po::value<bool>(),
        "When elitism is true an individual will never replace a better one.")
-      ("mutation-rate,m",
-       po::value(&problem.env.p_mutation)->default_value(
-         problem.env.p_mutation),
+      ("mutation-rate,m", po::value<double>(),
        "Sets the overall probability of mutation of the individuals that have "\
        "been selected as winners in a tournament. Range is [0,1].")
       ("crossover-rate,c",
@@ -207,6 +205,8 @@ bool parse_command_line(int argc, char *argv[])
       problem.env.code_length = vm["code-length"].as<unsigned>();
     if (vm.count("elitism"))
       problem.env.elitism = vm["elitism"].as<bool>();
+    if (vm.count("mutation-rate"))
+      problem.env.p_mutation = vm["mutation-rate"].as<double>();
 
     if (vm.count("random-seed"))
     {

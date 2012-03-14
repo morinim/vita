@@ -224,6 +224,9 @@ namespace vita
     if (boost::indeterminate(prob_->env.elitism))
       env_.elitism = true;
 
+    if (!prob_->env.p_mutation)
+      env_.p_mutation = 0.1;
+
     assert(env_.check(true));
   }
 
