@@ -77,16 +77,16 @@ namespace vita
     /// are potentially less fit than others.
     /// See "Greedy recombination and genetic search on the space of computer
     /// programs" (Walter Alden Tackett - 1995) for further details.
-    /// This parameter controls the brood recombination/selection level (0 is
-    /// not present).
-    unsigned brood_recombination;
+    /// This parameter controls the brood recombination/selection level (0 to
+    /// turn it off).
+    boost::optional<unsigned> brood_recombination;
 
     /// Switch Dynamic Subset Selection on/off.
     /// \see search::dss()
     bool dss;
 
     /// Population's size (number of programs/individuals in the population).
-    unsigned long individuals;
+    boost::optional<unsigned> individuals;
 
     /// Size of the tournament to choose the parents.
     /// Tournament sizes tend to be small relative to the population size. The

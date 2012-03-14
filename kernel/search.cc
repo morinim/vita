@@ -230,6 +230,12 @@ namespace vita
     if (!prob_->env.p_cross)
       env_.p_cross = 0.7;
 
+    if (!prob_->env.brood_recombination)
+      env_.brood_recombination = 0;
+
+    if (!prob_->env.individuals)
+      env_.individuals = 100;
+
     assert(env_.check(true));
   }
 

@@ -39,10 +39,10 @@ namespace vita
   {
     assert(e.check(true));
 
-    pop_.reserve(e.individuals);
+    pop_.reserve(*e.individuals);
     pop_.clear();
 
-    for (unsigned i(0); i < e.individuals; ++i)
+    for (unsigned i(0); i < *e.individuals; ++i)
       pop_.push_back(individual(e, true));
 
     assert(check());

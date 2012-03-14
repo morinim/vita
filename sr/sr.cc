@@ -21,6 +21,7 @@
  *
  */
 
+#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
@@ -37,8 +38,6 @@ namespace po = boost::program_options;
 #include "kernel/src_problem.h"
 #include "kernel/primitive/factory.h"
 
-#pragma GCC diagnostic ignored "-Wformat"
-
 const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification v0.9.1"
 );
@@ -52,6 +51,15 @@ unsigned runs(1);
 
 
 vita::src_problem problem(-5.0);
+
+///
+/// \param[in] s
+/// \return
+///
+bool is_true(const std::string &s)
+{
+  return s != "0" && !boost::iequals(s, "false");
+}
 
 ///
 /// \param[in] argc
@@ -100,11 +108,9 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      ("population-size,P",
-       po::value(&problem.env.individuals)->default_value(
-         problem.env.individuals),
+      ("population-size,P", po::value<unsigned>(),
        "Sets the number of programs/individuals in the population.")
-      ("elitism", po::value<bool>(),
+      ("elitism", po::value<std::string>(),
        "When elitism is true an individual will never replace a better one.")
       ("mutation-rate,m", po::value<double>(),
        "Sets the overall probability of mutation of the individuals that have "\
@@ -117,10 +123,8 @@ bool parse_command_line(int argc, char *argv[])
          problem.env.par_tournament),
        "Number of individuals chosen at random from the population to "\
        "identify a parent.")
-      ("brood",
-       po::value(&problem.env.brood_recombination)->default_value(
-         problem.env.brood_recombination),
-       "Sets the brood size for recombination (-1 auto-select, 0 disable).")
+      ("brood", po::value<unsigned>(),
+       "Sets the brood size for recombination (0 to disable).")
       ("dss",
        po::value<bool>(&problem.env.dss)->default_value(true),
        "Turn on/off the Dynamic Subset Selection algorithm.")
@@ -202,11 +206,15 @@ bool parse_command_line(int argc, char *argv[])
     if (vm.count("code-length"))
       problem.env.code_length = vm["code-length"].as<unsigned>();
     if (vm.count("elitism"))
-      problem.env.elitism = vm["elitism"].as<bool>();
+      problem.env.elitism = is_true(vm["elitism"].as<std::string>());
     if (vm.count("mutation-rate"))
       problem.env.p_mutation = vm["mutation-rate"].as<double>();
     if (vm.count("crossover-rate"))
       problem.env.p_cross = vm["crossover-rate"].as<double>();
+    if (vm.count("brood"))
+      problem.env.brood_recombination = vm["brood"].as<unsigned>();
+    if (vm.count("population-size"))
+      problem.env.individuals = vm["population-size"].as<unsigned>();
 
     if (vm.count("random-seed"))
     {

@@ -38,11 +38,9 @@ namespace vita
   ///
   environment::environment()
     : elitism(boost::indeterminate),
-      brood_recombination(0),
       dss(true),
-      individuals(100),
       par_tournament(2),
-      rep_tournament(unsigned(std::log(static_cast<double>(individuals)))),
+      rep_tournament(unsigned(std::log(100.0))),
       mate_zone(9),
       g_since_start(100), g_without_improvement(0),
       arl(true),
@@ -124,9 +122,15 @@ namespace vita
     if (p_cross && (*p_cross < 0.0 || *p_cross > 1.0))
       return false;
 
-    return
-      3 < individuals &&
+    if (force_defined && !brood_recombination)
+      return false;
 
+    if (force_defined && !individuals)
+      return false;
+    if (individuals && *individuals <= 3)
+      return false;
+
+    return
       0 < par_tournament && par_tournament <= individuals &&
       0 < rep_tournament && rep_tournament <= individuals &&
 

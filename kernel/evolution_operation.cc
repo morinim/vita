@@ -79,7 +79,7 @@ namespace vita
 
       ++stats_->crossovers;
 
-      if (env.brood_recombination)
+      if (*env.brood_recombination > 0)
       {
         fitness_t fit_off(evo_->fast_fitness(off));
 
@@ -94,7 +94,7 @@ namespace vita
             off     =     tmp;
             fit_off = fit_tmp;
           }
-        } while (++i < env.brood_recombination);
+        } while (++i < *env.brood_recombination);
       }
     }
     else // !crossover
