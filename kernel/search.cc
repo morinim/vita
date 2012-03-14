@@ -227,6 +227,9 @@ namespace vita
     if (!prob_->env.p_mutation)
       env_.p_mutation = 0.1;
 
+    if (!prob_->env.p_cross)
+      env_.p_cross = 0.7;
+
     assert(env_.check(true));
   }
 

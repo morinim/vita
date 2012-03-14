@@ -109,9 +109,7 @@ bool parse_command_line(int argc, char *argv[])
       ("mutation-rate,m", po::value<double>(),
        "Sets the overall probability of mutation of the individuals that have "\
        "been selected as winners in a tournament. Range is [0,1].")
-      ("crossover-rate,c",
-       po::value(&problem.env.p_cross)->default_value(
-         problem.env.p_cross),
+      ("crossover-rate,c", po::value<double>(),
        "Sets the overall probability that crossover will occour between two "\
        "winners in a tournament. Range is [0,1].")
       ("parent-tournament,T",
@@ -207,6 +205,8 @@ bool parse_command_line(int argc, char *argv[])
       problem.env.elitism = vm["elitism"].as<bool>();
     if (vm.count("mutation-rate"))
       problem.env.p_mutation = vm["mutation-rate"].as<double>();
+    if (vm.count("crossover-rate"))
+      problem.env.p_cross = vm["crossover-rate"].as<double>();
 
     if (vm.count("random-seed"))
     {
@@ -299,6 +299,38 @@ void fix_parameters()
     std::cout << "[WARNING] Adjusting code length (" << *problem.env.code_length
               << " => " << new_length << ')' << std::endl;
     problem.env.code_length = new_length;
+  }
+
+  if (problem.env.p_mutation)
+  {
+    if (*problem.env.p_mutation < 0.0)
+    {
+      std::cout << "[WARNING] Adjusting mutation probability ("
+                << *problem.env.p_mutation << " => 0.0)" << std::endl;
+      problem.env.p_mutation = 0.0;
+    }
+    else if (*problem.env.p_mutation > 1.0)
+    {
+      std::cout << "[WARNING] Adjusting mutation probability ("
+                << *problem.env.p_mutation << " => 1.0)" << std::endl;
+      problem.env.p_mutation = 1.0;
+    }
+  }
+
+  if (problem.env.p_cross)
+  {
+    if (*problem.env.p_cross < 0.0)
+    {
+      std::cout << "[WARNING] Adjusting crossover probability ("
+                << *problem.env.p_cross << " => 0.0)" << std::endl;
+      problem.env.p_cross = 0.0;
+    }
+    else if (*problem.env.p_cross > 1.0)
+    {
+      std::cout << "[WARNING] Adjusting crossover probability ("
+                << *problem.env.p_cross << " => 1.0)" << std::endl;
+      problem.env.p_cross = 0.0;
+    }
   }
 }
 

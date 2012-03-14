@@ -66,7 +66,7 @@ namespace vita
     boost::optional<double> p_mutation;
 
     /// Crossover probability. See \see operation_strategy::operator().
-    double p_cross;
+    boost::optional<double> p_cross;
 
     /// In nature it is common for organisms to produce many offspring and then
     /// neglect, abort, resorb, eat some of them or allow them to eat each

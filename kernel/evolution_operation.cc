@@ -73,7 +73,7 @@ namespace vita
 
     unsigned mutations(0);
     individual off(env, false);
-    if (random::boolean(env.p_cross))
+    if (random::boolean(*env.p_cross))
     {
       off = (pop[r1].crossover(pop[r2])).mutation(&mutations);
 
