@@ -98,11 +98,10 @@ namespace vita
     /// to \c par_tournament.
     boost::optional<unsigned> rep_tournament;
     /// Mating zone. 0 for panmictic.
-    unsigned mate_zone;
+    boost::optional<unsigned> mate_zone;
 
-    /// Maximun number of generations allowed before terminate a run (0 means
-    /// no limit).
-    unsigned g_since_start;
+    /// Maximun number of generations allowed before terminate a run.
+    boost::optional<unsigned> g_since_start;
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
     unsigned g_without_improvement;

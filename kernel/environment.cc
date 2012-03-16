@@ -39,8 +39,7 @@ namespace vita
   environment::environment()
     : elitism(boost::indeterminate),
       dss(boost::indeterminate),
-      mate_zone(9),
-      g_since_start(100), g_without_improvement(0),
+      g_without_improvement(0),
       arl(true),
       ttable_size(16),
       stat_dir(""),
@@ -150,6 +149,12 @@ namespace vita
       if (individuals && *rep_tournament > *individuals)
         return false;
     }
+
+    if (force_defined && !mate_zone)
+      return false;
+
+    if (force_defined && !g_since_start)
+      return false;
 
     return sset.check();
       // g_since_start > g_without_improvement;

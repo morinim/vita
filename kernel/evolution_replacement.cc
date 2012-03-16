@@ -55,7 +55,7 @@ namespace vita
     const population &pop(evo_->population());
 
     const unsigned n(pop.size());
-    const unsigned mate_zone(pop.env().mate_zone);
+    const unsigned mate_zone(*pop.env().mate_zone);
     const unsigned rounds(*pop.env().rep_tournament);
 
     index_t sel(random::ring(target, mate_zone, n));

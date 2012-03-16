@@ -172,14 +172,14 @@ namespace vita
   bool evolution::stop_condition() const
   {
     return
-      (pop_.env().g_since_start && stats_.gen > pop_.env().g_since_start) ||
+      (*pop_.env().g_since_start && stats_.gen > *pop_.env().g_since_start) ||
 
       // We use an accelerated stop condition when all the individuals have
       // the same fitness and after gwi/2 generations the situation isn't
       // changed.
       (pop_.env().g_without_improvement &&
-       (stats_.gen-stats_.last_imp > pop_.env().g_without_improvement ||
-        (stats_.gen-stats_.last_imp > pop_.env().g_without_improvement/2 &&
+       (stats_.gen - stats_.last_imp > pop_.env().g_without_improvement ||
+        (stats_.gen - stats_.last_imp > pop_.env().g_without_improvement / 2 &&
          stats_.az.fit_dist().variance <= float_epsilon)));
   }
 

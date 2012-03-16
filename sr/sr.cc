@@ -70,15 +70,18 @@ bool parse_command_line(int argc, char *argv[])
 {
   const std::string k_brood("brood");
   const std::string k_code_length("code-length");
-  const std::string k_code_length_f(k_code_length + ",l");
+  const std::string k_code_length_l(k_code_length + ",l");
   const std::string k_crossover_rate("crossover-rate");
-  const std::string k_crossover_rate_f(k_crossover_rate + ",c");
+  const std::string k_crossover_rate_c(k_crossover_rate + ",c");
   const std::string k_dss("dss");
   const std::string k_elitism("elitism");
+  const std::string k_g_since_start("g-since-start");
+  const std::string k_g_since_start_g(k_g_since_start + ",g");
+  const std::string k_mate_zone("mate-zone");
   const std::string k_mutation_rate("mutation-rate");
   const std::string k_parent_tournament("parent-tournament");
   const std::string k_population_size("population-size");
-  const std::string k_population_size_f(k_population_size + ",P");
+  const std::string k_population_size_P(k_population_size + ",P");
 
   unsigned random_seed;
   std::string data_file, f_f, symbol_file;
@@ -113,21 +116,35 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
-      (k_code_length_f.c_str(), po::value<unsigned>(),
+      (k_code_length_l.c_str(), po::value<unsigned>(),
        "Sets the code/genome length of an individual");
+
+    // ------> About boost::optional and boost::program_options <------
+    // To date there isn't a direct approach:
+    //
+    //   optional<double> x;
+    //   desc.add_options()("x", po::value(&x));
+    //
+    // is NOT supported, while this works:
+    //
+    //   desc.add_options()("x", po::value<double>()->notifier(var(x) = _1));
+    //
+    // but it is quite involuted and I prefer a longer but simpler approach.
+    // See also http://lists.boost.org/Archives/boost/2004/06/66572.php
+    // ----------------------------------------------------------------
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      (k_population_size_f.c_str(), po::value<unsigned>(),
+      (k_population_size_P.c_str(), po::value<unsigned>(),
        "Sets the number of programs/individuals in the population.")
       (k_elitism.c_str(), po::value<std::string>(),
        "When elitism is true an individual will never replace a better one.")
       (k_mutation_rate.c_str(), po::value<double>(),
        "Sets the overall probability of mutation of the individuals that have "\
        "been selected as winners in a tournament. Range is [0,1].")
-      (k_crossover_rate_f.c_str(), po::value<double>(),
+      (k_crossover_rate_c.c_str(), po::value<double>(),
        "Sets the overall probability that crossover will occour between two "\
        "winners in a tournament. Range is [0,1].")
       (k_parent_tournament.c_str(), po::value<unsigned>(),
@@ -137,9 +154,7 @@ bool parse_command_line(int argc, char *argv[])
        "Sets the brood size for recombination (0 to disable).")
       (k_dss.c_str(), po::value<std::string>(),
        "Turn on/off the Dynamic Subset Selection algorithm.")
-      ("g-since-start,g",
-       po::value(&problem.env.g_since_start)->default_value(
-         problem.env.g_since_start),
+      (k_g_since_start_g.c_str(), po::value<unsigned>(),
        "Sets the maximum number of generations in a run.")
       ("gwi",
        po::value(&problem.env.g_without_improvement)->default_value(
@@ -149,9 +164,7 @@ bool parse_command_line(int argc, char *argv[])
       ("runs,r",
        po::value(&runs),
        "Number of runs to be tried.")
-      ("mate-zone",
-       po::value(&problem.env.mate_zone)->default_value(
-         problem.env.mate_zone),
+      (k_mate_zone.c_str(), po::value<unsigned>(),
        "Mating zone. 0 for panmictic.")
       ("arl",
        po::bool_switch(&problem.env.arl),
@@ -222,6 +235,10 @@ bool parse_command_line(int argc, char *argv[])
       problem.env.dss = is_true(vm[k_dss].as<std::string>());
     if (vm.count(k_elitism))
       problem.env.elitism = is_true(vm[k_elitism].as<std::string>());
+    if (vm.count(k_g_since_start))
+      problem.env.g_since_start = vm[k_g_since_start].as<unsigned>();
+    if (vm.count(k_mate_zone))
+      problem.env.mate_zone = vm[k_mate_zone].as<unsigned>();
     if (vm.count(k_mutation_rate))
       problem.env.p_mutation = vm[k_mutation_rate].as<double>();
     if (vm.count(k_parent_tournament))

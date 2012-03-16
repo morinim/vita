@@ -245,6 +245,12 @@ namespace vita
     if (!prob_->env.rep_tournament)
       env_.rep_tournament = static_cast<unsigned>(std::log(100.0));
 
+    if (!prob_->env.mate_zone)
+      env_.mate_zone = 9;
+
+    if (!prob_->env.g_since_start)
+      env_.g_since_start = 100;
+
     assert(env_.check(true));
   }
 
