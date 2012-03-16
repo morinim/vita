@@ -83,7 +83,7 @@ namespace vita
 
     /// Switch Dynamic Subset Selection on/off.
     /// \see search::dss()
-    bool dss;
+    boost::tribool dss;
 
     /// Population's size (number of programs/individuals in the population).
     boost::optional<unsigned> individuals;
@@ -93,13 +93,10 @@ namespace vita
     /// ratio of tournament size to population size can be used as a measure of
     /// selective pressure. Note that a tournament size of 1 would be
     /// equivalent to selecting individuals at random (within the mate zone).
-    unsigned par_tournament;
-    /// Size of the tournament to choose replaced individuals.
-    /// Tournament sizes tend to be small relative to the population size. The
-    /// ratio of tournament size to population size can be used as a measure of
-    /// selective pressure. Note that a tournament size of 1 would be
-    /// equivalent to selecting individuals at random (within the mate zone).
-    unsigned rep_tournament;
+    boost::optional<unsigned> par_tournament;
+    /// Size of the tournament to choose replaced individuals. This is similar
+    /// to \c par_tournament.
+    boost::optional<unsigned> rep_tournament;
     /// Mating zone. 0 for panmictic.
     unsigned mate_zone;
 

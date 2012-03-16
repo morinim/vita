@@ -42,7 +42,7 @@ namespace vita
                             summary *const);
 
   protected:
-    unsigned tournament(unsigned) const;
+    index_t tournament(index_t) const;
   };
 
   tournament_rp::tournament_rp(evolution *const evo)
@@ -50,18 +50,18 @@ namespace vita
   {
   }
 
-  unsigned tournament_rp::tournament(unsigned target) const
+  index_t tournament_rp::tournament(index_t target) const
   {
-    const population &pop = evo_->population();
+    const population &pop(evo_->population());
 
     const unsigned n(pop.size());
     const unsigned mate_zone(pop.env().mate_zone);
-    const unsigned rounds(pop.env().rep_tournament);
+    const unsigned rounds(*pop.env().rep_tournament);
 
-    unsigned sel(random::ring(target, mate_zone, n));
+    index_t sel(random::ring(target, mate_zone, n));
     for (unsigned i(1); i < rounds; ++i)
     {
-      const unsigned j(random::ring(target, mate_zone, n));
+      const index_t j(random::ring(target, mate_zone, n));
 
       const fitness_t fit_j(evo_->fitness(pop[j]));
       const fitness_t fit_sel(evo_->fitness(pop[sel]));

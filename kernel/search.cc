@@ -233,8 +233,17 @@ namespace vita
     if (!prob_->env.brood_recombination)
       env_.brood_recombination = 0;
 
+    if (boost::indeterminate(prob_->env.dss))
+      env_.dss = true;
+
     if (!prob_->env.individuals)
       env_.individuals = 100;
+
+    if (!prob_->env.par_tournament)
+      env_.par_tournament = 2;
+
+    if (!prob_->env.rep_tournament)
+      env_.rep_tournament = static_cast<unsigned>(std::log(100.0));
 
     assert(env_.check(true));
   }

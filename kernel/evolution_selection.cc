@@ -40,7 +40,7 @@ namespace vita
     virtual std::vector<index_t> operator()();
 
   protected:
-    unsigned tournament(unsigned) const;
+    index_t tournament(index_t) const;
   };
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -57,20 +57,21 @@ namespace vita
   /// of those individuals.
   /// Recall that better individuals have highter fitnesses.
   ///
-  unsigned tournament_selection::tournament(unsigned target) const
+  index_t tournament_selection::tournament(index_t target) const
   {
-    const unsigned n(evo_->population().size());
-    const unsigned mate_zone(evo_->population().env().mate_zone);
-    const unsigned rounds(evo_->population().env().par_tournament);
+    const population &pop(evo_->population());
 
-    unsigned sel(random::ring(target, mate_zone, n));
+    const unsigned n(pop.size());
+    const unsigned mate_zone(pop.env().mate_zone);
+    const unsigned rounds(*pop.env().par_tournament);
+
+    index_t sel(random::ring(target, mate_zone, n));
     for (unsigned i(1); i < rounds; ++i)
     {
-      const unsigned j(random::ring(target, mate_zone, n));
+      const index_t j(random::ring(target, mate_zone, n));
 
-      const fitness_t fit_j(evo_->fitness(evo_->population()[j]));
-      const fitness_t fit_sel(evo_->fitness(evo_->population()[sel]));
-
+      const fitness_t fit_j(evo_->fitness(pop[j]));
+      const fitness_t fit_sel(evo_->fitness(pop[sel]));
       if (fit_j > fit_sel)
         sel = j;
     }

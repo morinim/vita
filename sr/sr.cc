@@ -68,6 +68,18 @@ bool is_true(const std::string &s)
 ///
 bool parse_command_line(int argc, char *argv[])
 {
+  const std::string k_brood("brood");
+  const std::string k_code_length("code-length");
+  const std::string k_code_length_f(k_code_length + ",l");
+  const std::string k_crossover_rate("crossover-rate");
+  const std::string k_crossover_rate_f(k_crossover_rate + ",c");
+  const std::string k_dss("dss");
+  const std::string k_elitism("elitism");
+  const std::string k_mutation_rate("mutation-rate");
+  const std::string k_parent_tournament("parent-tournament");
+  const std::string k_population_size("population-size");
+  const std::string k_population_size_f(k_population_size + ",P");
+
   unsigned random_seed;
   std::string data_file, f_f, symbol_file;
 
@@ -101,32 +113,29 @@ bool parse_command_line(int argc, char *argv[])
     // and in config file.
     po::options_description individual("Individual");
     individual.add_options()
-      ("code-length,l", po::value<unsigned>(),
+      (k_code_length_f.c_str(), po::value<unsigned>(),
        "Sets the code/genome length of an individual");
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      ("population-size,P", po::value<unsigned>(),
+      (k_population_size_f.c_str(), po::value<unsigned>(),
        "Sets the number of programs/individuals in the population.")
-      ("elitism", po::value<std::string>(),
+      (k_elitism.c_str(), po::value<std::string>(),
        "When elitism is true an individual will never replace a better one.")
-      ("mutation-rate,m", po::value<double>(),
+      (k_mutation_rate.c_str(), po::value<double>(),
        "Sets the overall probability of mutation of the individuals that have "\
        "been selected as winners in a tournament. Range is [0,1].")
-      ("crossover-rate,c", po::value<double>(),
+      (k_crossover_rate_f.c_str(), po::value<double>(),
        "Sets the overall probability that crossover will occour between two "\
        "winners in a tournament. Range is [0,1].")
-      ("parent-tournament,T",
-       po::value(&problem.env.par_tournament)->default_value(
-         problem.env.par_tournament),
+      (k_parent_tournament.c_str(), po::value<unsigned>(),
        "Number of individuals chosen at random from the population to "\
        "identify a parent.")
-      ("brood", po::value<unsigned>(),
+      (k_brood.c_str(), po::value<unsigned>(),
        "Sets the brood size for recombination (0 to disable).")
-      ("dss",
-       po::value<bool>(&problem.env.dss)->default_value(true),
+      (k_dss.c_str(), po::value<std::string>(),
        "Turn on/off the Dynamic Subset Selection algorithm.")
       ("g-since-start,g",
        po::value(&problem.env.g_since_start)->default_value(
@@ -203,18 +212,22 @@ bool parse_command_line(int argc, char *argv[])
       return false;
     }
 
-    if (vm.count("code-length"))
-      problem.env.code_length = vm["code-length"].as<unsigned>();
-    if (vm.count("elitism"))
-      problem.env.elitism = is_true(vm["elitism"].as<std::string>());
-    if (vm.count("mutation-rate"))
-      problem.env.p_mutation = vm["mutation-rate"].as<double>();
-    if (vm.count("crossover-rate"))
-      problem.env.p_cross = vm["crossover-rate"].as<double>();
-    if (vm.count("brood"))
-      problem.env.brood_recombination = vm["brood"].as<unsigned>();
-    if (vm.count("population-size"))
-      problem.env.individuals = vm["population-size"].as<unsigned>();
+    if (vm.count(k_brood))
+      problem.env.brood_recombination = vm[k_brood].as<unsigned>();
+    if (vm.count(k_code_length))
+      problem.env.code_length = vm[k_code_length].as<unsigned>();
+    if (vm.count(k_crossover_rate))
+      problem.env.p_cross = vm[k_crossover_rate].as<double>();
+    if (vm.count(k_dss))
+      problem.env.dss = is_true(vm[k_dss].as<std::string>());
+    if (vm.count(k_elitism))
+      problem.env.elitism = is_true(vm[k_elitism].as<std::string>());
+    if (vm.count(k_mutation_rate))
+      problem.env.p_mutation = vm[k_mutation_rate].as<double>();
+    if (vm.count(k_parent_tournament))
+      problem.env.par_tournament = vm[k_parent_tournament].as<unsigned>();
+    if (vm.count(k_population_size))
+      problem.env.individuals = vm[k_population_size].as<unsigned>();
 
     if (vm.count("random-seed"))
     {

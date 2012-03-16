@@ -28,9 +28,9 @@
 
 namespace vita
 {
-  const char environment::arl_filename[] =         "arl";
-  const char environment::dyn_filename[] =     "dynamic";
-  const char environment::sum_filename[] =     "summary";
+  const char environment::arl_filename[] =     "arl";
+  const char environment::dyn_filename[] = "dynamic";
+  const char environment::sum_filename[] = "summary";
 
   ///
   /// Class constructor. Default values are quite reasonable, but specific
@@ -38,9 +38,7 @@ namespace vita
   ///
   environment::environment()
     : elitism(boost::indeterminate),
-      dss(true),
-      par_tournament(2),
-      rep_tournament(unsigned(std::log(100.0))),
+      dss(boost::indeterminate),
       mate_zone(9),
       g_since_start(100), g_without_improvement(0),
       arl(true),
@@ -125,17 +123,35 @@ namespace vita
     if (force_defined && !brood_recombination)
       return false;
 
+    if (force_defined && boost::indeterminate(dss))
+      return false;
+
     if (force_defined && !individuals)
       return false;
     if (individuals && *individuals <= 3)
       return false;
 
-    return
-      0 < par_tournament && par_tournament <= individuals &&
-      0 < rep_tournament && rep_tournament <= individuals &&
+    if (force_defined && !par_tournament)
+      return false;
+    if (par_tournament)
+    {
+      if (*par_tournament == 0)
+        return false;
+      if (individuals && *par_tournament > *individuals)
+        return false;
+    }
 
-      sset.check();
+    if (force_defined && !rep_tournament)
+      return false;
+    if (rep_tournament)
+    {
+      if (*rep_tournament == 0)
+        return false;
+      if (individuals && *rep_tournament > *individuals)
+        return false;
+    }
 
+    return sset.check();
       // g_since_start > g_without_improvement;
   }
 }  // Namespace vita
