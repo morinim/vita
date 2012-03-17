@@ -25,6 +25,8 @@
 #define      SYMBOL_H
 
 #include <boost/any.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 
 #include <sstream>
 #include <string>
@@ -78,11 +80,16 @@ namespace vita
 
     bool check() const;
 
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+  public:  // Public data member.
     /// Weights is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
     unsigned weight;
 
-  private:
+  private:  // Private data member.
     static unsigned opc_count_;
 
     const opcode_t     opcode_;
@@ -157,6 +164,24 @@ namespace vita
   {
     return false;
   }
+
+  ///
+  /// \see http://www.boost.org/doc/libs/1_49_0/libs/serialization/
+  ///
+  template<class Archive>
+  void symbol::serialize(Archive &ar, unsigned)
+  {
+    // To ensure that the primitive static members opc_count_ is will be
+    // stored/loaded only once, use BOOST_STRONG_TYPEDEF.
+    ar & opc_count_;
+
+    ar & weight;
+    ar & opcode_;
+    ar & category_;
+    ar & display_;
+  }
+  BOOST_SERIALIZATION_ASSUME_ABSTRACT(symbol)
+
 }  // namespace vita
 
 #endif  // SYMBOL_H
