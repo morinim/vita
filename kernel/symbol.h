@@ -166,7 +166,7 @@ namespace vita
   }
 
   ///
-  /// \see http://www.boost.org/doc/libs/1_49_0/libs/serialization/
+  /// \see \c boost::serialization
   ///
   template<class Archive>
   void symbol::serialize(Archive &ar, unsigned)
