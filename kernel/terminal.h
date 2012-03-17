@@ -67,12 +67,29 @@ namespace vita
 
     bool check() const;
 
+  private: // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+  public:   // Public data member.
     static unsigned default_weight;
 
-  private:
+  private:  // Private data member.
     const bool parametric_;
     const bool      input_;
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void terminal::serialize(Archive &ar, unsigned)
+  {
+    ar & boost::serialization::base_object<symbol>(*this);
+    ar & default_weight;
+    ar & parametric_;
+    ar & input_;
+  }
 }  // namespace vita
 
 #endif  // TERMINAL_H
