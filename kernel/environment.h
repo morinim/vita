@@ -104,10 +104,10 @@ namespace vita
     boost::optional<unsigned> g_since_start;
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
-    unsigned g_without_improvement;
+    boost::optional<unsigned> g_without_improvement;
 
     /// Should we use Adaptive Representation through Learning?
-    bool arl;
+    boost::tribool arl;
 
     /// 2^ttable_size is the number of elements of the transposition table.
     unsigned ttable_size;

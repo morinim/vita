@@ -39,8 +39,7 @@ namespace vita
   environment::environment()
     : elitism(boost::indeterminate),
       dss(boost::indeterminate),
-      g_without_improvement(0),
-      arl(true),
+      arl(boost::indeterminate),
       ttable_size(16),
       stat_dir(""),
       stat_arl(false), stat_dynamic(false), stat_summary(false)
@@ -156,7 +155,12 @@ namespace vita
     if (force_defined && !g_since_start)
       return false;
 
+    if (force_defined && !g_without_improvement)
+      return false;
+
+    if (force_defined && !arl)
+      return false;
+
     return sset.check();
-      // g_since_start > g_without_improvement;
   }
 }  // Namespace vita

@@ -68,6 +68,7 @@ bool is_true(const std::string &s)
 ///
 bool parse_command_line(int argc, char *argv[])
 {
+  const std::string k_arl("arl");
   const std::string k_brood("brood");
   const std::string k_code_length("code-length");
   const std::string k_code_length_l(k_code_length + ",l");
@@ -77,6 +78,7 @@ bool parse_command_line(int argc, char *argv[])
   const std::string k_elitism("elitism");
   const std::string k_g_since_start("g-since-start");
   const std::string k_g_since_start_g(k_g_since_start + ",g");
+  const std::string k_gwi("gwi");
   const std::string k_mate_zone("mate-zone");
   const std::string k_mutation_rate("mutation-rate");
   const std::string k_parent_tournament("parent-tournament");
@@ -156,9 +158,7 @@ bool parse_command_line(int argc, char *argv[])
        "Turn on/off the Dynamic Subset Selection algorithm.")
       (k_g_since_start_g.c_str(), po::value<unsigned>(),
        "Sets the maximum number of generations in a run.")
-      ("gwi",
-       po::value(&problem.env.g_without_improvement)->default_value(
-         problem.env.g_without_improvement),
+      (k_gwi.c_str(), po::value<unsigned>(),
        "Sets the maximum number of generations without improvement in a run "\
        "(0 disable).")
       ("runs,r",
@@ -166,8 +166,7 @@ bool parse_command_line(int argc, char *argv[])
        "Number of runs to be tried.")
       (k_mate_zone.c_str(), po::value<unsigned>(),
        "Mating zone. 0 for panmictic.")
-      ("arl",
-       po::bool_switch(&problem.env.arl),
+      (k_arl.c_str(), po::value<std::string>(),
        "Adaptive Representation through Learning.");
 
     po::options_description statistics("Statistics");
@@ -225,6 +224,8 @@ bool parse_command_line(int argc, char *argv[])
       return false;
     }
 
+    if (vm.count(k_arl))
+      problem.env.arl = is_true(vm[k_arl].as<std::string>());
     if (vm.count(k_brood))
       problem.env.brood_recombination = vm[k_brood].as<unsigned>();
     if (vm.count(k_code_length))
@@ -237,6 +238,8 @@ bool parse_command_line(int argc, char *argv[])
       problem.env.elitism = is_true(vm[k_elitism].as<std::string>());
     if (vm.count(k_g_since_start))
       problem.env.g_since_start = vm[k_g_since_start].as<unsigned>();
+    if (vm.count(k_gwi))
+      problem.env.g_without_improvement = vm[k_gwi].as<unsigned>();
     if (vm.count(k_mate_zone))
       problem.env.mate_zone = vm[k_mate_zone].as<unsigned>();
     if (vm.count(k_mutation_rate))
@@ -263,7 +266,7 @@ bool parse_command_line(int argc, char *argv[])
     return false;
   }
 
-  // We read the dataset...
+  // Reading dataset...
   if (verbose)
     std::cout << "Reading data file (" << data_file << ")... ";
   unsigned parsed(0);

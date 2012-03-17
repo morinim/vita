@@ -251,6 +251,12 @@ namespace vita
     if (!prob_->env.g_since_start)
       env_.g_since_start = 100;
 
+    if (!prob_->env.g_without_improvement)
+      env_.g_without_improvement = 0;
+
+    if (boost::indeterminate(prob_->env.arl))
+      env_.arl = false;
+
     assert(env_.check(true));
   }
 
