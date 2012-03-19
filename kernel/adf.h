@@ -59,6 +59,11 @@ namespace vita
 
     bool check() const;
 
+    // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+    // Data members
     const unsigned id;
     individual   code;
 
@@ -82,7 +87,11 @@ namespace vita
 
     bool check() const;
 
-  private:
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+  private:  // Data member.
     adf_core core_;
   };
 
@@ -104,9 +113,44 @@ namespace vita
 
     bool check() const;
 
-  private:
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+  private:  // Data member.
     adf_core core_;
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void adf_core::serialize(Archive &ar, unsigned)
+  {
+    ar & adf_count;
+    ar & id;
+    ar & code;
+  }
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void adf::serialize(Archive &ar, unsigned)
+  {
+    ar & boost::serialization::base_object<function>(*this);
+    ar & core_;
+  }
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void adt::serialize(Archive &ar, unsigned)
+  {
+    ar & boost::serialization::base_object<terminal>(*this);
+    ar & core_;
+  }
 }  // namespace vita
 
 #endif  // ADF_H
