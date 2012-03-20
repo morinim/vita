@@ -48,27 +48,27 @@ struct F
     double val;
   };
 
-  F() : l0(locus{{0, 0}})
+  F() : env(true), l0(locus{{0, 0}})
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
     static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    c0 = factory.make("0", vita::d_double, {});
-    c1 = factory.make("1", vita::d_double, {});
-    c2 = factory.make("2", vita::d_double, {});
-    c3 = factory.make("3", vita::d_double, {});
-    x = factory.make("123", vita::d_double, {});
-    neg_x = factory.make("-123", vita::d_double, {});
-    y = factory.make("321", vita::d_double, {});
+    c0 = factory.make("0.0", {});
+    c1 = factory.make("1.0", {});
+    c2 = factory.make("2.0", {});
+    c3 = factory.make("3.0", {});
+    x = factory.make("123.0", {});
+    neg_x = factory.make("-123.0", {});
+    y = factory.make("321.0", {});
     z = std::make_shared<Z>();
-    f_abs = factory.make("ABS", vita::d_double, {});
-    f_add = factory.make("ADD", vita::d_double, {});
-    f_div = factory.make("DIV", vita::d_double, {});
-    f_idiv = factory.make("IDIV", vita::d_double, {});
-    f_ln = factory.make("LN", vita::d_double, {});
-    f_mul = factory.make("MUL", vita::d_double, {});
-    f_sub = factory.make("SUB", vita::d_double, {});
+    f_abs = factory.make("FABS", {});
+    f_add = factory.make("FADD", {});
+    f_div = factory.make("FDIV", {});
+    f_idiv = factory.make("FIDIV", {});
+    f_ln = factory.make("FLN", {});
+    f_mul = factory.make("FMUL", {});
+    f_sub = factory.make("FSUB", {});
 
     env.insert(c0);
     env.insert(c1);

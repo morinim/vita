@@ -45,7 +45,7 @@ namespace vita
       genome_(boost::extents[*e.code_length][e.sset.categories()]),
       signature_()
   {
-    assert(e.check(true));
+    assert(e.check(true, true));
 
     if (gen)  // random generate initial code
     {
@@ -506,6 +506,7 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the individual passes the internal consistency check.
   ///
   bool individual::check(bool verbose) const
@@ -601,7 +602,7 @@ namespace vita
     }
 
     return
-      env_->check(true) &&
+      env_->check(verbose, true) &&
       (signature_.empty() || signature_ == hash());
   }
 

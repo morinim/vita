@@ -97,7 +97,7 @@ class fitness : public vita::evaluator
 
 int main(int argc, char *argv[])
 {
-  vita::environment env;
+  vita::environment env(true);
 
   env.individuals = argc > 1 ? atoi(argv[1]) : 100;
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
@@ -107,11 +107,11 @@ int main(int argc, char *argv[])
   env.insert(std::make_shared<X>());
   env.insert(std::make_shared<Y>());
   env.insert(std::make_shared<Z>());
-  env.insert(factory.make("ADD", vita::d_double));
-  env.insert(factory.make("SUB", vita::d_double));
-  env.insert(factory.make("MUL", vita::d_double));
-  env.insert(factory.make("IFL", vita::d_double));
-  env.insert(factory.make("IFE", vita::d_double));
+  env.insert(factory.make("FADD"));
+  env.insert(factory.make("FSUB"));
+  env.insert(factory.make("FMUL"));
+  env.insert(factory.make("FIFL"));
+  env.insert(factory.make("FIFE"));
 
   std::unique_ptr<vita::evaluator> eva(new fitness());
 

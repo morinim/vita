@@ -38,36 +38,36 @@ using namespace boost;
 
 struct F
 {
-  F()
+  F() : env(true)
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("NUMBER", vita::d_double, {0}));
-    env.insert(factory.make("ADD", vita::d_double, {0}));
-    env.insert(factory.make("SUB", vita::d_double, {0}));
-    env.insert(factory.make("MUL", vita::d_double, {0}));
-    env.insert(factory.make("DIV", vita::d_double, {0}));
-    env.insert(factory.make("LN", vita::d_double, {0}));
-    env.insert(factory.make("IFL", vita::d_double, {0}));
-    env.insert(factory.make("IFZ", vita::d_double, {0}));
-    env.insert(factory.make("IFE", vita::d_double, {0, 0}));
-    env.insert(factory.make("SIN", vita::d_double, {0}));
-    env.insert(factory.make("ABS", vita::d_double, {0}));
-    env.insert(factory.make("LENGTH", vita::d_double, {1, 0}));
+    env.insert(factory.make("REAL", {0}));
+    env.insert(factory.make("FADD", {0}));
+    env.insert(factory.make("FSUB", {0}));
+    env.insert(factory.make("FMUL", {0}));
+    env.insert(factory.make("FDIV", {0}));
+    env.insert(factory.make("FLN", {0}));
+    env.insert(factory.make("FIFL", {0}));
+    env.insert(factory.make("FIFZ", {0}));
+    env.insert(factory.make("FIFE", {0, 0}));
+    env.insert(factory.make("FSIN", {0}));
+    env.insert(factory.make("FABS", {0}));
+    env.insert(factory.make("FLENGTH", {1, 0}));
 
-    env.insert(factory.make("apple", vita::d_string, {1}));
-    env.insert(factory.make("pear", vita::d_string, {1}));
-    env.insert(factory.make("grapefruit", vita::d_string, {1}));
-    env.insert(factory.make("orange", vita::d_string, {1}));
-    env.insert(factory.make("blueberry", vita::d_string, {1}));
-    env.insert(factory.make("blackberry", vita::d_string, {1}));
-    env.insert(factory.make("passion fruit", vita::d_string, {1}));
-    env.insert(factory.make("plum", vita::d_string, {1}));
-    env.insert(factory.make("date", vita::d_string, {1}));
-    env.insert(factory.make("peach", vita::d_string, {1}));
-    env.insert(factory.make("IFE", vita::d_string, {1, 0}));
+    env.insert(factory.make("apple", {1}));
+    env.insert(factory.make("pear", {1}));
+    env.insert(factory.make("grapefruit", {1}));
+    env.insert(factory.make("orange", {1}));
+    env.insert(factory.make("blueberry", {1}));
+    env.insert(factory.make("blackberry", {1}));
+    env.insert(factory.make("passion fruit", {1}));
+    env.insert(factory.make("plum", {1}));
+    env.insert(factory.make("date", {1}));
+    env.insert(factory.make("peach", {1}));
+    env.insert(factory.make("IFE", {1, 0}));
   }
 
   ~F()
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+                    (*env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(Cross0)
     dist += i1.distance(uniform_crossover(i1, i2));
 
   const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+                    (*env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(Cross1)
     dist += i1.distance(one_point_crossover(i1, i2));
 
   const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+                    (*env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE(Cross2)
     dist += i1.distance(two_point_crossover(i1, i2));
 
   const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+                    (*env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }

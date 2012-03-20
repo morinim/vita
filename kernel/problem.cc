@@ -82,10 +82,11 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool problem::check() const
+  bool problem::check(bool verbose) const
   {
-    return env.check(false);
+    return env.check(false, verbose);
   }
 }  // namespace vita

@@ -47,6 +47,7 @@ namespace vita
 
     boost::any eval(vita::interpreter *) const { return val; }
 
+  public:  // Data members.
     boost::any val;
   };
 
@@ -75,7 +76,7 @@ namespace vita
     /// class, we don't need an interpreter to discover it.
     boost::any eval(interpreter *) const { return val; }
 
-  private:
+  private:  // Data members.
     const boost::any val;
   };
 
@@ -94,12 +95,26 @@ namespace vita
   ///
   class symbol_factory : boost::noncopyable
   {
+  public:
+    static symbol_factory &instance();
+
+    symbol_ptr make(
+      const std::string &,
+      const std::vector<category_t> & = std::vector<category_t>());
+    symbol_ptr make(domain_t, int, int, category_t = 0);
+
+    unsigned args(const std::string &) const;
+
+    template<typename T> bool register_symbol1(const std::string &);
+    template<typename T> bool register_symbol2(const std::string &);
+
+    bool unregister_symbol(const std::string &);
+
   private:
     symbol_factory();
 
     typedef symbol_ptr (*make_func1)(category_t);
     typedef symbol_ptr (*make_func2)(category_t, category_t);
-    typedef std::pair<std::string, domain_t> map_key;
 
     template<typename T> static symbol_ptr make1(category_t c)
     { return std::make_shared<T>(c); }
@@ -107,58 +122,41 @@ namespace vita
     template<typename T> static symbol_ptr make2(category_t c1, category_t c2)
     { return std::make_shared<T>(c1, c2); }
 
+  private:  // Data members.
+    typedef std::string map_key;
+
     std::map<map_key, make_func1> factory1_;
     std::map<map_key, make_func2> factory2_;
-
-  public:
-    static symbol_factory &instance();
-
-    symbol_ptr make(
-      const std::string &, domain_t,
-      const std::vector<category_t> & = std::vector<category_t>());
-    symbol_ptr make(const std::string &, domain_t, int, int, category_t = 0);
-
-    unsigned args(const std::string &, domain_t) const;
-
-    template<typename T> bool register_symbol1(const std::string &, domain_t);
-    template<typename T> bool register_symbol2(const std::string &, domain_t);
-
-    bool unregister_symbol(const std::string &, domain_t);
   };
 
   ///
   /// \param[in] name name of the symbol to be registered (UPPERCASE!).
-  /// \param[in] domain of the symbol.
   /// \return \c true if the symbol \a T has been added to the factory.
   ///
   template<typename T>
-  bool symbol_factory::register_symbol1(const std::string &name,
-                                        domain_t d)
+  bool symbol_factory::register_symbol1(const std::string &name)
   {
-    const std::string un(boost::to_upper_copy(name));
-    const map_key k{un, d};
+    const map_key k(boost::to_upper_copy(name));
 
-    if (factory1_.find(k) != factory1_.end())
-      return false;
+    const bool missing(factory1_.find(k) == factory1_.end());
 
-    factory1_[k] = &make1<T>;
+    if (missing)
+      factory1_[k] = &make1<T>;
 
-    return true;
+    return missing;
   }
 
   template<typename T>
-  bool symbol_factory::register_symbol2(const std::string &name,
-                                        domain_t d)
+  bool symbol_factory::register_symbol2(const std::string &name)
   {
-    const std::string un(boost::to_upper_copy(name));
-    const map_key k{un, d};
+    const map_key k(boost::to_upper_copy(name));
 
-    if (factory2_.find(k) != factory2_.end())
-      return false;
+    const bool missing(factory2_.find(k) == factory2_.end());
 
-    factory2_[k] = &make2<T>;
+    if (missing)
+      factory2_[k] = &make2<T>;
 
-    return true;
+    return missing;
   }
 }  // namespace vita
 

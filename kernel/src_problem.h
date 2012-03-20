@@ -52,7 +52,7 @@ namespace vita
     unsigned classes() const;
     unsigned variables() const;
 
-    bool check() const;
+    bool check(bool) const;
 
   private:
     typedef std::vector<category_t> cvect;

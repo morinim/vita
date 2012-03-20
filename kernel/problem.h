@@ -49,7 +49,7 @@ namespace vita
     virtual data *get_data() { return 0; }
 
     virtual void clear();
-    virtual bool check() const;
+    virtual bool check(bool) const;
 
     environment env;
 

@@ -42,7 +42,7 @@ namespace vita
   ///
   struct environment
   {
-    environment();
+    explicit environment(bool = false);
 
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
@@ -126,7 +126,7 @@ namespace vita
 
     symbol_set sset;
 
-    bool check(bool) const;
+    bool check(bool, bool) const;
 
     static const char arl_filename[];
     static const char dyn_filename[];

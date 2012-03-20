@@ -36,18 +36,18 @@ using namespace boost;
 
 struct F
 {
-  F() : cache(16)
+  F() : env(true), cache(16)
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("NUMBER", vita::d_double, {}));
-    env.insert(factory.make("ADD", vita::d_double, {}));
-    env.insert(factory.make("SUB", vita::d_double, {}));
-    env.insert(factory.make("MUL", vita::d_double, {}));
-    env.insert(factory.make("IFL", vita::d_double, {}));
-    env.insert(factory.make("IFE", vita::d_double, {}));
+    env.insert(factory.make("REAL", {}));
+    env.insert(factory.make("FADD", {}));
+    env.insert(factory.make("FSUB", {}));
+    env.insert(factory.make("FMUL", {}));
+    env.insert(factory.make("FIFL", {}));
+    env.insert(factory.make("FIFE", {}));
   }
 
   ~F()

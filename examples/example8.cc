@@ -37,20 +37,20 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  environment env;
+  environment env(true);
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 5;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
   symbol_factory &factory(symbol_factory::instance());
-  env.insert(factory.make("NUMBER", d_double, -200, 200));
-  env.insert(factory.make("ADD", d_double));
-  env.insert(factory.make("SUB", d_double));
-  env.insert(factory.make("MUL", d_double));
-  env.insert(factory.make("IFL", d_double));
-  env.insert(factory.make("IFE", d_double));
-  env.insert(factory.make("ABS", d_double));
-  env.insert(factory.make("LN", d_double));
+  env.insert(factory.make(d_double, -200, 200));
+  env.insert(factory.make("FADD"));
+  env.insert(factory.make("FSUB"));
+  env.insert(factory.make("FMUL"));
+  env.insert(factory.make("FIFL"));
+  env.insert(factory.make("FIFE"));
+  env.insert(factory.make("FABS"));
+  env.insert(factory.make("FLN"));
 
   for (unsigned k(0); k < n; ++k)
   {

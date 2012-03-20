@@ -50,7 +50,7 @@ namespace vita
 
     const individual &run(bool = true, unsigned = 1);
 
-    bool check() const;
+    bool check(bool) const;
 
   private:
     void log(const summary &, const distribution<fitness_t> &,

@@ -38,11 +38,11 @@ namespace vita
   ///
   /// \param[in] prob a \c problem used for search initialization.
   ///
-  search::search(problem *const prob) : env_(prob->env), prob_(prob)
+  search::search(problem *const prob) : env_(true), prob_(prob)
   {
-    assert(prob->check());
+    assert(prob->check(true));
 
-    assert(check());
+    assert(check(true));
   }
 
   ///
@@ -218,46 +218,46 @@ namespace vita
   ///
   void search::tune_parameters()
   {
-    if (!prob_->env.code_length)
-      env_.code_length = 100;
+    if (prob_->env.code_length)
+      env_.code_length = *prob_->env.code_length;
 
-    if (boost::indeterminate(prob_->env.elitism))
-      env_.elitism = true;
+    if (!boost::indeterminate(prob_->env.elitism))
+      env_.elitism = prob_->env.elitism;
 
-    if (!prob_->env.p_mutation)
-      env_.p_mutation = 0.1;
+    if (prob_->env.p_mutation)
+      env_.p_mutation = *prob_->env.p_mutation;
 
-    if (!prob_->env.p_cross)
-      env_.p_cross = 0.7;
+    if (prob_->env.p_cross)
+      env_.p_cross = *prob_->env.p_cross;
 
-    if (!prob_->env.brood_recombination)
-      env_.brood_recombination = 0;
+    if (prob_->env.brood_recombination)
+      env_.brood_recombination = *prob_->env.brood_recombination;
 
-    if (boost::indeterminate(prob_->env.dss))
-      env_.dss = true;
+    if (!boost::indeterminate(prob_->env.dss))
+      env_.dss = prob_->env.dss;
 
-    if (!prob_->env.individuals)
-      env_.individuals = 100;
+    if (prob_->env.individuals)
+      env_.individuals = *prob_->env.individuals;
 
-    if (!prob_->env.par_tournament)
-      env_.par_tournament = 2;
+    if (prob_->env.par_tournament)
+      env_.par_tournament = *prob_->env.par_tournament;
 
-    if (!prob_->env.rep_tournament)
-      env_.rep_tournament = static_cast<unsigned>(std::log(100.0));
+    if (prob_->env.rep_tournament)
+      env_.rep_tournament = *prob_->env.rep_tournament;
 
-    if (!prob_->env.mate_zone)
-      env_.mate_zone = 9;
+    if (prob_->env.mate_zone)
+      env_.mate_zone = *prob_->env.mate_zone;
 
-    if (!prob_->env.g_since_start)
-      env_.g_since_start = 100;
+    if (prob_->env.g_since_start)
+      env_.g_since_start = *prob_->env.g_since_start;
 
-    if (!prob_->env.g_without_improvement)
-      env_.g_without_improvement = 0;
+    if (prob_->env.g_without_improvement)
+      env_.g_without_improvement = *prob_->env.g_without_improvement;
 
-    if (boost::indeterminate(prob_->env.arl))
-      env_.arl = false;
+    if (!boost::indeterminate(prob_->env.arl))
+      env_.arl = prob_->env.arl;
 
-    assert(env_.check(true));
+    assert(env_.check(true, true));
   }
 
   ///
@@ -392,10 +392,11 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool search::check() const
+  bool search::check(bool verbose) const
   {
-    return prob_->check();
+    return prob_->check(verbose);
   }
 }  // namespace vita

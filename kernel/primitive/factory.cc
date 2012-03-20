@@ -45,49 +45,58 @@ namespace vita
   ///
   symbol_factory::symbol_factory()
   {
-    register_symbol1<dbl::abs>   ("ABS",    d_double);
-    register_symbol1<dbl::add>   ("ADD",    d_double);
-    register_symbol1<dbl::add>   ("+",      d_double);
-    register_symbol1<dbl::div>   ("DIV",    d_double);
-    register_symbol1<dbl::div>   ("/",      d_double);
-    register_symbol1<dbl::idiv>  ("IDIV",   d_double);
-    register_symbol2<dbl::ife>   ("IFE",    d_double);
-    register_symbol2<dbl::ifl>   ("IFL",    d_double);
-    register_symbol1<dbl::ifz>   ("IFZ",    d_double);
-    register_symbol2<dbl::length>("LENGTH", d_double);
-    register_symbol1<dbl::ln>    ("LN",     d_double);
-    register_symbol1<dbl::mod>   ("MOD",    d_double);
-    register_symbol1<dbl::mod>   ("%",      d_double);
-    register_symbol1<dbl::mul>   ("MUL",    d_double);
-    register_symbol1<dbl::mul>   ("*",      d_double);
-    register_symbol1<dbl::number>("NUMBER", d_double);
-    register_symbol1<dbl::sin>   ("SIN",    d_double);
-    register_symbol1<dbl::sub>   ("SUB",    d_double);
-    register_symbol1<dbl::sub>   ("-",      d_double);
+    register_symbol1<dbl::abs>   ("FABS");
+    register_symbol1<dbl::add>   ("FADD");
+    register_symbol1<dbl::div>   ("FDIV");
+    register_symbol1<dbl::idiv>  ("FIDIV");
+    register_symbol2<dbl::ife>   ("FIFE");
+    register_symbol2<dbl::ifl>   ("FIFL");
+    register_symbol1<dbl::ifz>   ("FIFZ");
+    register_symbol2<dbl::length>("FLENGTH");
+    register_symbol1<dbl::ln>    ("FLN");
+    register_symbol1<dbl::mod>   ("FMOD");
+    register_symbol1<dbl::mul>   ("FMUL");
+    register_symbol1<dbl::number>("REAL");
+    register_symbol1<dbl::sin>   ("FSIN");
+    register_symbol1<dbl::sub>   ("FSUB");
 
-    register_symbol1<integer::add>   ("ADD",    d_int);
-    register_symbol1<integer::add>   ("+",      d_int);
-    register_symbol1<integer::div>   ("DIV",    d_int);
-    register_symbol1<integer::div>   ("/",      d_int);
-    register_symbol2<integer::ife>   ("IFE",    d_int);
-    register_symbol2<integer::ife>   ("IFEQ",   d_int);
-    register_symbol2<integer::ifl>   ("IFL",    d_int);
-    register_symbol1<integer::ifz>   ("IFZ",    d_int);
-    register_symbol1<integer::mod>   ("MOD",    d_int);
-    register_symbol1<integer::mod>   ("%",      d_int);
-    register_symbol1<integer::mul>   ("MUL",    d_int);
-    register_symbol1<integer::mul>   ("*",      d_int);
-    register_symbol1<integer::number>("NUMBER", d_int);
-    register_symbol1<integer::shl>   ("SHL",    d_int);
-    register_symbol1<integer::sub>   ("SUB",    d_int);
-    register_symbol1<integer::sub>   ("-",      d_int);
+    register_symbol1<integer::add>   ("ADD");
+    register_symbol1<integer::div>   ("DIV");
+    register_symbol2<integer::ife>   ("IFE");
+    register_symbol2<integer::ifl>   ("IFL");
+    register_symbol1<integer::ifz>   ("IFZ");
+    register_symbol1<integer::mod>   ("MOD");
+    register_symbol1<integer::mul>   ("MUL");
+    register_symbol1<integer::number>("INT");
+    register_symbol1<integer::shl>   ("SHL");
+    register_symbol1<integer::sub>   ("SUB");
 
-    register_symbol2<str::ife>("IFE", d_string);
+    register_symbol2<str::ife>("SIFE");
+  }
+
+  ///
+  /// \param[in] s the string to be tested.
+  /// \return \c the domain \a s is element of.
+  ///
+  domain_t find_domain(const std::string &s)
+  {
+    try
+    {
+      boost::lexical_cast<double>(s);
+    }
+    catch(boost::bad_lexical_cast &)  // not a number
+    {
+      if (s == "{TRUE}" || s == "{FALSE}")
+        return d_bool;
+
+      return d_string;
+    }
+
+    return s.find('.') == std::string::npos ? d_int : d_double;
   }
 
   ///
   /// \param[in] name name of the symbol to be created.
-  /// \param[in] d domain of the symbol to be created.
   /// \param[in] c a list of categories used by the the symbol constructor.
   /// \return an abstract pointer to the created symbol.
   ///
@@ -95,7 +104,7 @@ namespace vita
   /// requests the object from the factory) does not know - and is not burdened
   /// by - the actual concrete type of the object which was just created.
   /// However, the type of the concrete object is known by the abstract
-  /// factory via the \a name, \a d, \a c arguments.
+  /// factory via the \a name and \a c arguments.
   /// \attention If \a name is not recognized as a preregistered symbol, it is
   /// registered on the fly as a \a constant.
   /// \note
@@ -120,11 +129,10 @@ namespace vita
   ///     for object creation, changing factories is as easy as changing the
   ///     singleton object.
   ///
-  symbol_ptr symbol_factory::make(const std::string &name, domain_t d,
+  symbol_ptr symbol_factory::make(const std::string &name,
                                   const std::vector<category_t> &c)
   {
-    const std::string un(boost::to_upper_copy(name));
-    const map_key k({un, d});
+    const map_key k(boost::to_upper_copy(name));
 
     const category_t c1(c.size() > 0 ? c[0] : 0);
     const category_t c2(c.size() > 1 ? c[1] : 0);
@@ -139,14 +147,14 @@ namespace vita
         return (it2->second)(c1, c2);
     }
 
-    switch (d)
+    switch (find_domain(k))
     {
     case d_bool:
-      return std::make_shared<constant>(boost::lexical_cast<bool>(un), c1);
+      return std::make_shared<constant>(boost::lexical_cast<bool>(k), c1);
     case d_double:
-      return std::make_shared<constant>(boost::lexical_cast<double>(un), c1);
+      return std::make_shared<constant>(boost::lexical_cast<double>(k), c1);
     case d_int:
-      return std::make_shared<constant>(boost::lexical_cast<int>(un), c1);
+      return std::make_shared<constant>(boost::lexical_cast<int>(k), c1);
     case d_string:
       return std::make_shared<constant>(name, c1);
     default:
@@ -163,8 +171,7 @@ namespace vita
   ///
   /// This is an alternative way to build a number.
   ///
-  symbol_ptr symbol_factory::make(const std::string &, domain_t d, int min,
-                                  int max, category_t c)
+  symbol_ptr symbol_factory::make(domain_t d, int min, int max, category_t c)
   {
     assert(d == d_double || d == d_int);
 
@@ -181,30 +188,26 @@ namespace vita
 
   ///
   /// \param[in] name name of the symbol.
-  /// \param[in] d domain of the symbol.
   /// \return number of distinct categories needed to build the symbol.
   ///
-  unsigned symbol_factory::args(const std::string &name, domain_t d) const
+  unsigned symbol_factory::args(const std::string &name) const
   {
-    const std::string un(boost::to_upper_copy(name));
-    const auto p(factory2_.find({un, d}));
+    const map_key k(boost::to_upper_copy(name));
 
-    return p == factory2_.end() ? 1 : 2;
+    return factory2_.find(k) == factory2_.end() ? 1 : 2;
   }
 
   ///
   /// \param[in] name name of the symbol.
-  /// \param[in] d domain of the symbol.
   /// \return \c true if the symbol has been unregistered.
   ///
   /// Unregister the symbol from the factory.
   /// \note constants and variable aren't registered in the factory, so they
   /// cannot be unregistered.
   ///
-  bool symbol_factory::unregister_symbol(const std::string &name, domain_t d)
+  bool symbol_factory::unregister_symbol(const std::string &name)
   {
-    const std::string un(boost::to_upper_copy(name));
-    const map_key k{un, d};
+    const map_key k(boost::to_upper_copy(name));
 
     return factory1_.erase(k) == 1 || factory2_.erase(k) == 1;
   }

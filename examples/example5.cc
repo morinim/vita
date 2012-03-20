@@ -31,23 +31,23 @@
 
 int main(int argc, char *argv[])
 {
-  vita::environment env;
+  vita::environment env(true);
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 14;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make("NUMBER", vita::d_double, -200, 200));
-  env.insert(factory.make("ADD", vita::d_double));
-  env.insert(factory.make("IFE", vita::d_double));
-  env.insert(factory.make("IFL", vita::d_double));
-  env.insert(factory.make("IFZ", vita::d_double));
-  env.insert(factory.make("MOD", vita::d_double));
-  env.insert(factory.make("MUL", vita::d_double));
-  env.insert(factory.make("SUB", vita::d_double));
-  env.insert(factory.make("LENGTH", vita::d_double, {1, 0}));
-  env.insert(factory.make("apple", vita::d_string, {1}));
-  env.insert(factory.make("grapefruit", vita::d_string, {1}));
-  env.insert(factory.make("orange", vita::d_string, {1}));
+  env.insert(factory.make(vita::d_double, -200, 200));
+  env.insert(factory.make("FADD"));
+  env.insert(factory.make("FIFE"));
+  env.insert(factory.make("FIFL"));
+  env.insert(factory.make("FIFZ"));
+  env.insert(factory.make("FMOD"));
+  env.insert(factory.make("FMUL"));
+  env.insert(factory.make("FSUB"));
+  env.insert(factory.make("FLENGTH", {1, 0}));
+  env.insert(factory.make("apple", {1}));
+  env.insert(factory.make("grapefruit", {1}));
+  env.insert(factory.make("orange", {1}));
 
   vita::individual ind(env, true);
 

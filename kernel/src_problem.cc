@@ -120,22 +120,22 @@ namespace vita
     for (category_t category(0); category < dat_.categories(); ++category)
       if (compatible({category}, {"numeric"}))
       {
-        env.insert(factory.make("1", vita::d_double, {category}));
-        env.insert(factory.make("2", vita::d_double, {category}));
-        env.insert(factory.make("3", vita::d_double, {category}));
-        env.insert(factory.make("4", vita::d_double, {category}));
-        env.insert(factory.make("5", vita::d_double, {category}));
-        env.insert(factory.make("6", vita::d_double, {category}));
-        env.insert(factory.make("7", vita::d_double, {category}));
-        env.insert(factory.make("8", vita::d_double, {category}));
-        env.insert(factory.make("9", vita::d_double, {category}));
-        env.insert(factory.make("ABS", vita::d_double, {category}));
-        env.insert(factory.make("ADD", vita::d_double, {category}));
-        env.insert(factory.make("DIV", vita::d_double, {category}));
-        env.insert(factory.make("LN",  vita::d_double, {category}));
-        env.insert(factory.make("MUL", vita::d_double, {category}));
-        env.insert(factory.make("MOD", vita::d_double, {category}));
-        env.insert(factory.make("SUB", vita::d_double, {category}));
+        env.insert(factory.make("1.0", {category}));
+        env.insert(factory.make("2.0", {category}));
+        env.insert(factory.make("3.0", {category}));
+        env.insert(factory.make("4.0", {category}));
+        env.insert(factory.make("5.0", {category}));
+        env.insert(factory.make("6.0", {category}));
+        env.insert(factory.make("7.0", {category}));
+        env.insert(factory.make("8.0", {category}));
+        env.insert(factory.make("9.0", {category}));
+        env.insert(factory.make("FABS", {category}));
+        env.insert(factory.make("FADD", {category}));
+        env.insert(factory.make("FDIV", {category}));
+        env.insert(factory.make("FLN",  {category}));
+        env.insert(factory.make("FMUL", {category}));
+        env.insert(factory.make("FMOD", {category}));
+        env.insert(factory.make("FSUB", {category}));
       }
   }
 
@@ -194,16 +194,15 @@ namespace vita
               for (auto i(sequences.begin()); i != sequences.end(); ++i)
                 if (compatible(*i, args))
                 {
-                  const domain_t domain(dat_.get_category((*i)[0]).domain);
 #if !defined(NDEBUG)
                   //const domain_t domain(dat_.get_category(i->back()).domain);
-                  std::cout << "Domain " << domain << ": " << sym_name << '(';
+                  std::cout << sym_name << '(';
                   for (unsigned j(0); j < i->size(); ++j)
                     std::cout << dat_.get_category((*i)[j]).name
                               << (j+1 == i->size() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
-                  env.insert(factory.make(sym_name, domain, *i));
+                  env.insert(factory.make(sym_name, *i));
                 }
             }
         }
@@ -212,19 +211,16 @@ namespace vita
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
             {
-              const domain_t domain(dat_.get_category(category).domain);
-
-              const unsigned n_args(factory.args(sym_name, domain));
+              const unsigned n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
-              std::cout << "Domain " << domain << ": " << sym_name << '(';
+              std::cout << sym_name << '(';
               for (unsigned j(0); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
                           << (j+1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
-              env.insert(factory.make(sym_name, domain,
-                                      cvect(n_args, category)));
+              env.insert(factory.make(sym_name, cvect(n_args, category)));
             }
         }
 
@@ -348,10 +344,14 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool src_problem::check() const
+  bool src_problem::check(bool verbose) const
   {
-    return problem::check() && dat_.check() && vars_.size() == dat_.variables();
+    return
+      problem::check(verbose) &&
+      dat_.check() &&
+      vars_.size() == dat_.variables();
   }
 }  // namespace vita
