@@ -51,11 +51,11 @@ namespace vita
     virtual void clear();
     virtual bool check(bool) const;
 
+  public:  // Public data members.
     environment env;
-
     fitness_t threashold;
 
-  protected:
+  protected:  // Private data members.
     std::vector<evaluator_ptr> evaluators_;
     evaluator_ptr              active_eva_;
   };

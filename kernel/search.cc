@@ -38,7 +38,7 @@ namespace vita
   ///
   /// \param[in] prob a \c problem used for search initialization.
   ///
-  search::search(problem *const prob) : env_(true), prob_(prob)
+  search::search(problem *const prob) : env_(prob->env), prob_(prob)
   {
     assert(prob->check(true));
 
@@ -218,44 +218,46 @@ namespace vita
   ///
   void search::tune_parameters()
   {
-    if (prob_->env.code_length)
-      env_.code_length = *prob_->env.code_length;
+    const environment dflt(true);
 
-    if (!boost::indeterminate(prob_->env.elitism))
-      env_.elitism = prob_->env.elitism;
+    if (!prob_->env.code_length)
+      env_.code_length = *dflt.code_length;
 
-    if (prob_->env.p_mutation)
-      env_.p_mutation = *prob_->env.p_mutation;
+    if (boost::indeterminate(prob_->env.elitism))
+      env_.elitism = dflt.elitism;
 
-    if (prob_->env.p_cross)
-      env_.p_cross = *prob_->env.p_cross;
+    if (!prob_->env.p_mutation)
+      env_.p_mutation = *dflt.p_mutation;
 
-    if (prob_->env.brood_recombination)
-      env_.brood_recombination = *prob_->env.brood_recombination;
+    if (!prob_->env.p_cross)
+      env_.p_cross = *dflt.p_cross;
 
-    if (!boost::indeterminate(prob_->env.dss))
-      env_.dss = prob_->env.dss;
+    if (!prob_->env.brood_recombination)
+      env_.brood_recombination = *dflt.brood_recombination;
 
-    if (prob_->env.individuals)
-      env_.individuals = *prob_->env.individuals;
+    if (boost::indeterminate(prob_->env.dss))
+      env_.dss = dflt.dss;
 
-    if (prob_->env.par_tournament)
-      env_.par_tournament = *prob_->env.par_tournament;
+    if (!prob_->env.individuals)
+      env_.individuals = *dflt.individuals;
 
-    if (prob_->env.rep_tournament)
-      env_.rep_tournament = *prob_->env.rep_tournament;
+    if (!prob_->env.par_tournament)
+      env_.par_tournament = *dflt.par_tournament;
 
-    if (prob_->env.mate_zone)
-      env_.mate_zone = *prob_->env.mate_zone;
+    if (!prob_->env.rep_tournament)
+      env_.rep_tournament = *dflt.rep_tournament;
 
-    if (prob_->env.g_since_start)
-      env_.g_since_start = *prob_->env.g_since_start;
+    if (!prob_->env.mate_zone)
+      env_.mate_zone = *dflt.mate_zone;
 
-    if (prob_->env.g_without_improvement)
-      env_.g_without_improvement = *prob_->env.g_without_improvement;
+    if (!prob_->env.g_since_start)
+      env_.g_since_start = *dflt.g_since_start;
 
-    if (!boost::indeterminate(prob_->env.arl))
-      env_.arl = prob_->env.arl;
+    if (!prob_->env.g_without_improvement)
+      env_.g_without_improvement = *dflt.g_without_improvement;
+
+    if (boost::indeterminate(prob_->env.arl))
+      env_.arl = dflt.arl;
 
     assert(env_.check(true, true));
   }

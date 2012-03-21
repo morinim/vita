@@ -34,7 +34,7 @@ namespace vita
   ///
   /// New empty instance.
   ///
-  problem::problem(fitness_t st) : threashold(st)
+  problem::problem(fitness_t st) : env(false), threashold(st)
   {
     clear();
   }
@@ -87,6 +87,6 @@ namespace vita
   ///
   bool problem::check(bool verbose) const
   {
-    return env.check(false, verbose);
+    return env.check(verbose, false);
   }
 }  // namespace vita
