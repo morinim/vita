@@ -102,14 +102,13 @@ namespace vita
   }
 
   ///
-  /// \param[out] n_mutations number of mutations performed.
-  /// \return a new, mutated, individual.
+  /// \param[in] p probability of gene mutation.
+  /// \return number of mutations performed.
   ///
   /// A new individual is created mutating \c this.
   ///
-  individual individual::mutation(unsigned *const n_mutations) const
+  unsigned individual::mutation(double p)
   {
-    individual ret(*this);
     unsigned n(0);
 
     const unsigned sup(size() - 1);
@@ -117,27 +116,24 @@ namespace vita
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
-        if (random::boolean(*env_->p_mutation))
+        if (random::boolean(p))
         {
           ++n;
 
-          ret.set(locus{{i, c}}, gene(env_->sset.roulette(c), i+1, size()));
+          set(locus{{i, c}}, gene(env_->sset.roulette(c), i+1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
-      if (random::boolean(*env_->p_mutation))
+      if (random::boolean(p))
       {
         ++n;
 
-        ret.set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+        set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 
-    assert(ret.check());
+    assert(check());
 
-    if (n_mutations)
-      *n_mutations = n;
-
-    return ret;
+    return n;
   }
 
   ///
@@ -814,7 +810,7 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return a the transformed \a individual.
+  /// \return the result of the crossover.
   ///
   /// The i-th locus of the offspring has a 50% probability to be filled with
   /// the i-th gene of \a p1 and 50% with i-th gene of \a p2. Parents must have
@@ -859,7 +855,7 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return a the transformed \a individual.
+  /// \return the result of the crossover.
   ///
   /// We randomly select a parent (between \a p1 and \a p2) and a single locus
   /// (common crossover point). The offspring is created with genes from the
@@ -897,7 +893,7 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return a the transformed \a individual.
+  /// \return the result of the crossover.
   ///
   /// We randomly select a parent (between \a p1 and \a p2) and a two loci
   /// (common crossover points). The offspring is created with genes from the

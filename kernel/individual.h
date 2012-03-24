@@ -59,7 +59,8 @@ namespace vita
     void tree(std::ostream &) const;
 
     individual crossover(const individual &) const;
-    individual mutation(unsigned * = 0) const;
+    unsigned mutation() { return mutation(*env_->p_mutation); }
+    unsigned mutation(double);
 
     std::list<locus> blocks() const;
     individual destroy_block(unsigned) const;
@@ -123,6 +124,7 @@ namespace vita
     void pack(const locus &, std::vector<boost::uint8_t> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
+  private:  // Private data members.
     // Crossover implementation can be changed/selected at runtime by this
     // polymorhic wrapper for function objects.
     // std::function can be easily bound to function pointers, member function
