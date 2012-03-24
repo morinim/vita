@@ -128,7 +128,7 @@ namespace vita
         std::cerr << "Undefined code_length data member." << std::endl;
       return false;
     }
-    if (code_length && *code_length < 3)
+    if (code_length && *code_length < 1)
     {
       if (verbose)
         std::cerr << "code_length is too short." << std::endl;

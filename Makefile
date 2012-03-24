@@ -45,7 +45,7 @@ CXX = g++ -pipe $(CXXFLAGS)
 
 KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
-EXAMPLES_SRC = $(wildcard examples/*.cc)
+EXAMPLES_SRC = $(wildcard examples/*.cc) examples/sudoku.cc
 SR_SRC = $(wildcard sr/*.cc)
 TESTS_SRC = $(wildcard test/*.cc)
 
@@ -59,9 +59,13 @@ sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
 
-examples: example1 example2 example3 example4 example5 example6 example7 example8
+examples: example1 example2 example3 example4 example5 example6 example7 example8 sudoku
 
 example%: examples/example%.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
+
+sudoku: examples/sudoku.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
 

@@ -48,6 +48,9 @@ namespace vita
     /// Standard equality operator for hash signature.
     bool operator==(hash_t h) const { return p1 == h.p1 && p2 == h.p2; }
 
+    /// Standard inequality operator for hash signature.
+    bool operator!=(hash_t h) const { return p1 != h.p1 || p2 != h.p2; }
+
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !p1 && !p2; }
 

@@ -49,7 +49,7 @@ namespace vita
 
     if (gen)  // random generate initial code
     {
-      assert(2 <= size());
+      assert(size());
       const index_t sup(size() - 1);
 
       const category_t categories(e.sset.categories());

@@ -74,10 +74,16 @@ namespace vita
     if (random::boolean(*env.p_cross))
     {
       individual off(pop[r1].crossover(pop[r2]));
-      stats_->mutations += off.mutation();
-
       ++stats_->crossovers;
 
+      stats_->mutations += off.mutation();
+/*
+      do
+      {
+        stats_->mutations += off.mutation();
+      } while (pop[r1].signature() == off.signature() ||
+               pop[r2].signature() == off.signature());
+*/
       if (*env.brood_recombination > 0)
       {
         fitness_t fit_off(evo_->fast_fitness(off));
