@@ -43,7 +43,7 @@ namespace vita
     pop_.clear();
 
     for (unsigned i(0); i < *e.individuals; ++i)
-      pop_.push_back(individual(e, true));
+      pop_.push_back(std::unique_ptr<individual>(new individual(e, true)));
 
     assert(check());
   }
@@ -54,7 +54,7 @@ namespace vita
   bool population::check() const
   {
     for (unsigned i(0); i < size(); ++i)
-      if (!pop_[i].check())
+      if (!pop_[i]->check())
         return false;
 
     return true;

@@ -41,7 +41,7 @@ namespace vita
   class population
   {
   public:
-    typedef individual value_type;
+    typedef std::unique_ptr<individual> value_type;
     typedef std::vector<value_type>::size_type size_type;
 
     explicit population(const environment &);
@@ -68,7 +68,7 @@ namespace vita
   individual &population::operator[](size_type i)
   {
     assert(i < pop_.size());
-    return pop_[i];
+    return *pop_[i];
   }
 
   ///
@@ -79,7 +79,7 @@ namespace vita
   const individual &population::operator[](size_type i) const
   {
     assert(i < pop_.size());
-    return pop_[i];
+    return *pop_[i];
   }
 
   ///
@@ -97,7 +97,7 @@ namespace vita
   inline
   const environment &population::env() const
   {
-    return pop_[0].env();
+    return pop_[0]->env();
   }
 
   ///
