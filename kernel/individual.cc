@@ -872,7 +872,7 @@ namespace vita
     const unsigned cs(p1.size());
     const unsigned categories(p1.env().sset.categories());
 
-    const index_t cut(random::between<unsigned>(0, cs-1));
+    const index_t cut(random::between<unsigned>(1, cs-1));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());
