@@ -47,6 +47,15 @@ namespace vita
   /// an empty boost::any()).
   namespace dbl
   {
+    typedef double base_t;
+
+    ///
+    /// \param[in] v the value that must be casted to base type.
+    ///
+    /// Just a simple shortcut.
+    inline
+    base_t cast(const boost::any &v) { return boost::any_cast<base_t>(v); }
+
     ///
     /// It is assumed that the creation of floating-point constants is
     /// necessary to do symbolic regression in evolutionary computation.
@@ -70,7 +79,7 @@ namespace vita
       { return boost::lexical_cast<std::string>(v); }
 
       boost::any eval(interpreter *i) const
-      { return static_cast<double>(boost::any_cast<int>(i->eval())); }
+      { return static_cast<base_t>(boost::any_cast<int>(i->eval())); }
 
     private: // Serialization.
       friend class boost::serialization::access;
@@ -97,7 +106,7 @@ namespace vita
         const boost::any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return std::fabs(boost::any_cast<double>(ev));
+        return std::fabs(dbl::cast(ev));
       }
 
     private: // Serialization.
@@ -122,8 +131,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(boost::any_cast<double>(ev0) +
-                         boost::any_cast<double>(ev1));
+        const base_t ret(dbl::cast(ev0) + dbl::cast(ev1));
         if (isinf(ret))  return boost::any();
 
         return ret;
@@ -150,8 +158,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(boost::any_cast<double>(ev0) /
-                         boost::any_cast<double>(ev1));
+        const base_t ret(dbl::cast(ev0) / dbl::cast(ev1));
         if (!std::isfinite(ret))  return boost::any();
 
         return ret;
@@ -178,8 +185,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(std::floor(boost::any_cast<double>(ev0) /
-                                    boost::any_cast<double>(ev1)));
+        const base_t ret(std::floor(dbl::cast(ev0) / dbl::cast(ev1)));
         if (!std::isfinite(ret))  return boost::any();
 
         return ret;
@@ -207,8 +213,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double cmp(std::fabs(boost::any_cast<double>(ev0) -
-                                   boost::any_cast<double>(ev1)));
+        const base_t cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
 
         if (cmp < float_epsilon)
           return i->eval(2);
@@ -238,7 +243,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        if (boost::any_cast<double>(ev0) < boost::any_cast<double>(ev1))
+        if (dbl::cast(ev0) < dbl::cast(ev1))
           return i->eval(2);
         else
           return i->eval(3);
@@ -262,7 +267,7 @@ namespace vita
         const boost::any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        if (std::fabs(boost::any_cast<double>(ev0)) < float_epsilon)
+        if (std::fabs(dbl::cast(ev0)) < float_epsilon)
           return i->eval(1);
         else
           return i->eval(2);
@@ -287,7 +292,7 @@ namespace vita
         const boost::any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return static_cast<double>(boost::any_cast<std::string>(ev).size());
+        return static_cast<base_t>(boost::any_cast<std::string>(ev).size());
       }
 
     private: // Serialization.
@@ -309,7 +314,7 @@ namespace vita
         const boost::any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const double ret(std::log(boost::any_cast<double>(i->eval(0))));
+        const base_t ret(std::log(dbl::cast(i->eval(0))));
         if (!std::isfinite(ret))  return boost::any();
 
         return ret;
@@ -336,8 +341,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(std::fmod(boost::any_cast<double>(ev0),
-                                   boost::any_cast<double>(ev1)));
+        const base_t ret(std::fmod(dbl::cast(ev0), dbl::cast(ev1)));
         if (!std::isfinite(ret))  return boost::any();
 
         return ret;
@@ -365,8 +369,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(boost::any_cast<double>(ev0) *
-                         boost::any_cast<double>(ev1));
+        const base_t ret(dbl::cast(ev0) * dbl::cast(ev1));
         if (isinf(ret))  return boost::any();
 
         return ret;
@@ -390,7 +393,7 @@ namespace vita
         const boost::any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return std::sin(boost::any_cast<double>(ev));
+        return std::sin(dbl::cast(ev));
       }
 
     private: // Serialization.
@@ -414,8 +417,7 @@ namespace vita
         const boost::any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const double ret(boost::any_cast<double>(ev0) -
-                         boost::any_cast<double>(ev1));
+        const base_t ret(dbl::cast(ev0) - dbl::cast(ev1));
         if (isinf(ret))  return boost::any();
 
         return ret;
