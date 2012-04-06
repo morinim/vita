@@ -61,7 +61,8 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t, false, true, default_weight*2), min(m), upp(u) {}
+        : terminal("REAL", t, false, true, default_weight*2), min(m), upp(u)
+      { assert(m < u); }
 
       int init() const { return random::between<int>(min, upp); }
 
@@ -71,7 +72,18 @@ namespace vita
       boost::any eval(interpreter *i) const
       { return static_cast<double>(boost::any_cast<int>(i->eval())); }
 
-    private:
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      {
+        ar & boost::serialization::base_object<terminal>(*this);
+        ar & min;
+        ar & upp;
+      }
+
+    private: // Private data members.
       const int min, upp;
     };
 
@@ -87,6 +99,13 @@ namespace vita
 
         return std::fabs(boost::any_cast<double>(ev));
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class add : public function
@@ -109,6 +128,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class div : public function
@@ -130,6 +156,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class idiv : public function
@@ -151,6 +184,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ife : public function
@@ -175,6 +215,13 @@ namespace vita
         else
           return i->eval(3);
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ifl : public function
@@ -196,6 +243,13 @@ namespace vita
         else
           return i->eval(3);
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ifz : public function
@@ -213,6 +267,13 @@ namespace vita
         else
           return i->eval(2);
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class length : public function
@@ -228,6 +289,13 @@ namespace vita
 
         return static_cast<double>(boost::any_cast<std::string>(ev).size());
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ln : public function
@@ -246,6 +314,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class mod : public function
@@ -267,6 +342,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class mul : public function
@@ -289,6 +371,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class sin : public function
@@ -303,6 +392,13 @@ namespace vita
 
         return std::sin(boost::any_cast<double>(ev));
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class sub : public function
@@ -324,6 +420,13 @@ namespace vita
 
         return ret;
       }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
     };
   }  // namespace dbl
 }  // namespace vita

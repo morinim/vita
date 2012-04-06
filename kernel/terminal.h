@@ -71,10 +71,10 @@ namespace vita
     friend class boost::serialization::access;
     template<class Archive> void serialize(Archive &, unsigned);
 
-  public:   // Public data member.
+  public:   // Public data members.
     static unsigned default_weight;
 
-  private:  // Private data member.
+  private:  // Private data members.
     const bool parametric_;
     const bool      input_;
   };
