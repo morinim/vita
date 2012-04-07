@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < 1000; ++i)
   {
-    ind = ind.mutation();
+    ind.mutation();
     BOOST_REQUIRE_EQUAL(ind, orig);
   }
 
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     const vita::individual i1(ind);
 
-    ind = ind.mutation();
+    ind.mutation();
     dist += i1.distance(ind);
   }
 
