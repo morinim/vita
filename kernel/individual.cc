@@ -840,7 +840,7 @@ namespace vita
 
     individual offspring(p1);
 
-    for (unsigned i(0); i < cs; ++i)
+    for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
         if (random::boolean())
         {
@@ -872,15 +872,15 @@ namespace vita
     const unsigned cs(p1.size());
     const unsigned categories(p1.env().sset.categories());
 
-    const unsigned cut(random::between<unsigned>(0, cs-1));
+    const index_t cut(random::between<unsigned>(1, cs-1));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());
 
     individual offspring(*parents[base]);
 
-    for (unsigned i(cut); i < cs; ++i)
-      for (unsigned c(0); c < categories; ++c)
+    for (index_t i(cut); i < cs; ++i)
+      for (category_t c(0); c < categories; ++c)
       {
         const locus l{{i,c}};
         offspring.set(l, (*parents[!base])[l]);
@@ -911,15 +911,15 @@ namespace vita
     const unsigned cs(p1.size());
     const unsigned categories(p1.env().sset.categories());
 
-    const unsigned cut1(random::between<unsigned>(0, cs-1));
-    const unsigned cut2(random::between<unsigned>(cut1+1, cs));
+    const index_t cut1(random::between<unsigned>(0, cs-1));
+    const index_t cut2(random::between<unsigned>(cut1+1, cs));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());
 
     individual offspring(*parents[base]);
 
-    for (unsigned i(cut1); i < cut2; ++i)
+    for (index_t i(cut1); i < cut2; ++i)
       for (category_t c(0); c < categories; ++c)
       {
         const locus l{{i, c}};

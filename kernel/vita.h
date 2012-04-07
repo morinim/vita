@@ -97,7 +97,7 @@ namespace vita
   /// Categories are the way strong typing GP is implemented in Vita.
   typedef unsigned category_t;
 
-  /// Index in the genome. Locus is uniqyely identified by a couple of indexes.
+  /// Index in the genome. Locus is uniquely identified by a couple of indexes.
   typedef unsigned index_t;
 
   ///
