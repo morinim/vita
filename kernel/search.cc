@@ -137,7 +137,7 @@ namespace vita
   {
     data *const d(prob_->get_data());
 
-    if (d && d->size() > 200)
+    if (d)
     {
       std::function<boost::uint64_t (const data::value_type &)>
         weight([](const data::value_type &v) -> boost::uint64_t
@@ -236,7 +236,11 @@ namespace vita
       env_.brood_recombination = *dflt.brood_recombination;
 
     if (boost::indeterminate(prob_->env.dss))
-      env_.dss = dflt.dss;
+    {
+      data *const d(prob_->get_data());
+
+      env_.dss = d && d->size() > 200;
+    }
 
     if (!prob_->env.individuals)
       env_.individuals = *dflt.individuals;
