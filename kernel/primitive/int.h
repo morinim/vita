@@ -54,7 +54,8 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("NUM", t, false, true, default_weight*2), min(m), upp(u) {}
+        : terminal("INT", t, false, true, default_weight*2), min(m), upp(u)
+      { assert(m < u); }
 
       int init() const { return random::between<int>(min, upp); }
 
@@ -64,7 +65,7 @@ namespace vita
       boost::any eval(interpreter *i) const
       { return boost::any_cast<int>(i->eval()); }
 
-    private:
+    private:  // Private data members.
       const int min, upp;
     };
 
