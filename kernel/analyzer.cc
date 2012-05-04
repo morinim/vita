@@ -1,23 +1,13 @@
 /**
  *
  *  \file analyzer.cc
+ *  \remark This file is part of VITA.
  *
- *  Copyright 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011 EOS di Manlio Morini.
  *
- *  This file is part of VITA.
- *
- *  VITA is free software: you can redistribute it and/or modify it under the
- *  terms of the GNU General Public License as published by the Free Software
- *  Foundation, either version 3 of the License, or (at your option) any later
- *  version.
- *
- *  VITA is distributed in the hope that it will be useful, but WITHOUT ANY
- *  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- *  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- *  details.
- *
- *  You should have received a copy of the GNU General Public License along
- *  with VITA. If not, see <http://www.gnu.org/licenses/>.
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
  */
 
