@@ -10,8 +10,8 @@ OVERVIEW
   classification, symbolic regression, content base image retrieval, data mining
   and agent control.
 
-  It's distributed under the GNU General Public License - see the accompanying
-  COPYING file for more details.
+  It's distributed under the Mozilla Public License v2.0 - see the accompanying
+  LICENSE file for more details.
 
 REQUIREMENTS
 
@@ -79,7 +79,7 @@ THE VITA DISTRIBUTION
 
   vita-X.Y.Z
     AUTHORS
-    COPYING
+    LICENSE
     Makefile
     README
     examples/..............Various examples
