@@ -125,7 +125,7 @@ namespace vita
   ///
   void search::dss(unsigned generation) const
   {
-    data *const d(prob_->get_data());
+    data *const d(prob_->data());
 
     if (d)
     {
@@ -227,7 +227,7 @@ namespace vita
 
     if (boost::indeterminate(prob_->env.dss))
     {
-      data *const d(prob_->get_data());
+      data *const d(prob_->data());
 
       env_.dss = d && d->size() > 200;
     }
@@ -287,7 +287,7 @@ namespace vita
       // overall score, a new calculation have to be performed.
       if (shake_data)
       {
-        prob_->get_data()->dataset(data::training);
+        prob_->data()->dataset(data::training);
         prob_->get_evaluator()->clear();
         run_best_score = (*prob_->get_evaluator())(s.best->ind);
 

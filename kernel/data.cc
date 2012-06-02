@@ -738,7 +738,7 @@ namespace vita
   }
 
   ///
-  /// \return \c true if the training set is empty.
+  /// \return \c true if the current dataset is empty.
   ///
   bool data::operator!() const
   {

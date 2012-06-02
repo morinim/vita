@@ -332,7 +332,7 @@ void fix_parameters()
     problem.env.code_length = new_length;
   }
 
-  if (problem.env.dss && problem.get_data()->size() <= 10)
+  if (problem.env.dss && problem.data()->size() <= 10)
   {
     std::cout << "[WARNING] Adjusting DSS (true => false)" << std::endl;
     problem.env.dss = false;

@@ -36,7 +36,7 @@ namespace vita
     evaluator *get_evaluator();
     void set_evaluator(unsigned);
 
-    virtual data *get_data() { return 0; }
+    virtual vita::data *data() { return 0; }
 
     virtual void clear();
     virtual bool check(bool) const;

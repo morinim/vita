@@ -34,7 +34,7 @@ namespace vita
     unsigned load_symbols(const std::string &);
     void setup_default_symbols();
 
-    data *get_data() { return &dat_; }
+    vita::data *data() { return &dat_; }
 
     void clear();
 
@@ -51,7 +51,7 @@ namespace vita
     bool compatible(const cvect &, const std::vector<std::string> &) const;
 
     std::vector<variable_ptr> vars_;
-    data                       dat_;
+    vita::data                 dat_;
   };
 }  // namespace vita
 
