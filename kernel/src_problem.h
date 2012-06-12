@@ -3,7 +3,7 @@
  *  \file src_problem.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -30,7 +30,8 @@ namespace vita
 
     explicit src_problem(fitness_t);
 
-    unsigned load_data(const std::string &);
+    std::pair<unsigned, unsigned> load(const std::string &,
+                                       const std::string & = "");
     unsigned load_symbols(const std::string &);
     void setup_default_symbols();
 
@@ -49,6 +50,7 @@ namespace vita
 
     std::list<cvect> seq_with_rep(const cvect &, unsigned);
     bool compatible(const cvect &, const std::vector<std::string> &) const;
+    void setup_terminals_from_data();
 
     std::vector<variable_ptr> vars_;
     vita::data                 dat_;

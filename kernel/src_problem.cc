@@ -3,7 +3,7 @@
  *  \file src_problem.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -33,8 +33,7 @@ namespace vita
   {
     clear();
 
-    unsigned i;
-    i = add_evaluator(std::make_shared<abs_evaluator>(&dat_, &vars_));
+    unsigned i(add_evaluator(std::make_shared<abs_evaluator>(&dat_, &vars_)));
     assert(i == k_abs_evaluator);
 
     i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
@@ -57,46 +56,65 @@ namespace vita
   }
 
   ///
-  /// \param[in] f name of the file containing the learning collection.
-  /// \return number of lines parsed.
+  /// \param[in] data name of the file containing the learning collection.
+  /// \param[in] symbols name of the file containing the symbols. If it is
+  ///                    empty, \c src_problem::setup_default_symbols is called.
+  /// \return number of examples (lines) parsed and number of sumbols parsed.
   ///
-  unsigned src_problem::load_data(const std::string &f)
+  std::pair<unsigned, unsigned> src_problem::load(const std::string &data,
+                                                  const std::string &symbols)
   {
+    env.sset = vita::symbol_set();
+    vars_.clear();
     dat_.clear();
 
-    const unsigned parsed(dat_.open(f));
-    if (parsed > 0)
-    {
-      // Sets up the variables.
-      for (unsigned i(1); i < dat_.columns(); ++i)
-      {
-        std::string name(dat_.get_column(i).name);
-        if (name.empty())
-          name = "X" + boost::lexical_cast<std::string>(i);
-
-        const category_t category(dat_.get_column(i).category_id);
-        const variable_ptr x(std::make_shared<variable>(name, category));
-        vars_.push_back(x);
-        env.insert(x);
-      }
-
-      // Sets up the labels for nominal attributes.
-      for (category_t c(0); c < dat_.categories(); ++c)
-      {
-        const data::category &cat(dat_.get_category(c));
-        for (auto lp(cat.labels.begin()); lp != cat.labels.end(); ++lp)
-        {
-          const symbol_ptr label(std::make_shared<constant>(*lp, c));
-          env.insert(label);
-        }
-      }
-
+    const unsigned n_examples(dat_.open(data));
+    if (n_examples > 0)
       set_evaluator(classes() > 1
         ? k_dyn_slot_evaluator   // classification problem
         : k_abs_evaluator);      // symbolic regression problem
+
+    unsigned n_symbols(0);
+    if (symbols.empty())
+      setup_default_symbols();
+    else
+      n_symbols = load_symbols(symbols);
+
+    return std::pair<unsigned, unsigned>(n_examples, n_symbols);
+  }
+
+  ///
+  /// Inserts into the symbol_set variables and labels for nominal
+  /// attributes.
+  ///
+  void src_problem::setup_terminals_from_data()
+  {
+    env.sset = vita::symbol_set();
+    vars_.clear();
+
+    // Sets up the variables (features).
+    for (unsigned i(1); i < dat_.columns(); ++i)
+    {
+      std::string name(dat_.get_column(i).name);
+      if (name.empty())
+        name = "X" + boost::lexical_cast<std::string>(i);
+
+      const category_t category(dat_.get_column(i).category_id);
+      const variable_ptr x(std::make_shared<variable>(name, category));
+      vars_.push_back(x);
+      env.insert(x);
     }
 
-    return parsed;
+    // Sets up the labels for nominal attributes.
+    for (category_t c(0); c < dat_.categories(); ++c)
+    {
+      const data::category &cat(dat_.get_category(c));
+      for (auto lp(cat.labels.begin()); lp != cat.labels.end(); ++lp)
+      {
+        const symbol_ptr label(std::make_shared<constant>(*lp, c));
+        env.insert(label);
+      }
+    }
   }
 
   ///
@@ -105,6 +123,8 @@ namespace vita
   ///
   void src_problem::setup_default_symbols()
   {
+    setup_terminals_from_data();
+
     symbol_factory &factory(symbol_factory::instance());
 
     for (category_t category(0); category < dat_.categories(); ++category)
@@ -133,9 +153,13 @@ namespace vita
   /// \param[in] sf name of the file containing the symbols.
   /// \return number of parsed symbols.
   ///
+  /// Data should be loaded before symbols: if we haven't data we don't know,
+  /// among other things, how many features the dataset has.
+  /// This function is used to change the symbols mantaining the same dataset.
+  ///
   unsigned src_problem::load_symbols(const std::string &sf)
   {
-    using namespace boost::property_tree;
+    setup_terminals_from_data();
 
     unsigned parsed(0);
 
@@ -143,6 +167,8 @@ namespace vita
     for (unsigned i(0); i < categories.size(); ++i)
       categories[i] = i;
 
+    // Load the XML file (sf) into the property tree (pt).
+    using namespace boost::property_tree;
     ptree pt;
     read_xml(sf, pt);
 

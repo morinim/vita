@@ -3,7 +3,7 @@
  *  \file factory.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -26,7 +26,7 @@
 namespace vita
 {
   ///
-  /// A variable is an input argument for a symbolic regression or
+  /// A variable is an input argument (feature) for a symbolic regression or
   /// classification problem.
   ///
   class variable : public terminal
@@ -60,7 +60,7 @@ namespace vita
       : terminal(boost::lexical_cast<std::string>(c), t, false, false,
                  default_weight*2), val(c) {}
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\""+c+"\"", t, false, false, default_weight*2), val(c) {}
+      : terminal("\"" + c + "\"", t, false, false, default_weight*2), val(c) {}
 
     /// The argument is not used: the value of a constant is stored with the
     /// class, we don't need an interpreter to discover it.

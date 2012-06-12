@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011 EOS di Manlio Morini.
+#  Copyright (C) 2011, 2012 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -45,7 +45,7 @@ def sr(data_set, generations, individuals, code_length, rounds, symbol_set,
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "-P $nind -l $cl -r $rs $rnd_switch $arl_switch "\
                    "$dss_switch $ss $ds")
-    s = cmd.substitute(elitism_switch = "--elitism "+str(args.elitism),
+    s = cmd.substitute(elitism_switch = "--elitism " + str(args.elitism),
                        sd = stat_dir,
                        tt = ttable_bit,
                        gen = generations,
@@ -55,8 +55,8 @@ def sr(data_set, generations, individuals, code_length, rounds, symbol_set,
                        rnd_switch = rnd,
                        arl_switch = "--arl --stat-arl" if args.arl else "",
                        dss_switch = "--dss 1" if args.dss else "--dss 0",
-                       ss = "-s "+os.path.join(symbol_set_dir, symbol_set)
-                                  if symbol_set != "" else "",
+                       ss = "-s " + os.path.join(symbol_set_dir, symbol_set)
+                                    if symbol_set != "" else "",
                        ds = os.path.join(data_set_dir, data_set))
 
     if verbose:
@@ -137,9 +137,9 @@ def get_cmd_line_options(defaults):
                         dest="force_input",
                         help="Input variables used randomly")
 
-    parser.add_argument("-q","--quiet", action="store_false", dest="verbose",
+    parser.add_argument("-q", "--quiet", action="store_false", dest="verbose",
                         help="Turn off verbose mode")
-    parser.add_argument("-v","--verbose", action="store_true",
+    parser.add_argument("-v", "--verbose", action="store_true", dest="verbose",
                         help="Turn on verbose mode")
 
     parser.add_argument("test", nargs="*")
