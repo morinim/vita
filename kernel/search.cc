@@ -3,7 +3,7 @@
  *  \file search.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -271,6 +271,8 @@ namespace vita
     unsigned best_run(0);
     score_t run_best_score;
 
+    // For std::placeholders and std::bind see:
+    //  http://en.cppreference.com/w/cpp/utility/functional/placeholders
     std::function<void (unsigned)> shake_data;
     if (env_.dss)
       shake_data = std::bind(&search::dss, this, std::placeholders::_1);

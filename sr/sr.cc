@@ -276,15 +276,18 @@ namespace ui
   ///
   void go(bool = true)
   {
-    if (problem.env.sset.enough_terminals())
-    {
-      fix_parameters();
+    if (problem.data()->size())
+      if (problem.env.sset.enough_terminals())
+      {
+        fix_parameters();
 
-      vita::search s(&problem);
-      s.run(verbose, runs);
-    }
+        vita::search s(&problem);
+        s.run(verbose, runs);
+      }
+      else
+        std::cerr << "Too few terminals." << std::endl;
     else
-      std::cerr << "Too few terminals." << std::endl;
+      std::cerr << "Missing dataset." << std::endl;
   }
 
   ///
