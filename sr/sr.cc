@@ -88,7 +88,10 @@ bool is_true(const std::string &s)
 }
 
 ///
-/// Contains the text-based user interface.
+/// Contains the text-based command line interface. The interface is not
+/// intented to be human friendly (no code completion, command history,
+/// submenu...). We just want a light interface for the Python GUI and a simple
+/// way to debug.
 ///
 namespace ui
 {

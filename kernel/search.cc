@@ -11,12 +11,12 @@
  *
  */
 
-#include <boost/property_tree/xml_parser.hpp>
-
 #include <fstream>
 #include <list>
 #include <string>
 #include <vector>
+
+#include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/search.h"
 #include "kernel/adf.h"
@@ -46,31 +46,30 @@ namespace vita
   ///
   void search::arl(const individual &base, evolution &evo)
   {
-    const unsigned arl_args(0);
-
     const fitness_t base_fit(evo.fitness(base));
     if (std::isfinite(base_fit))
     {
-      const std::string f_adf(env_.stat_dir + "/" + environment::arl_filename);
-      std::ofstream adf_l(f_adf.c_str(), std::ios_base::app);
-
-      if (env_.stat_arl && adf_l.good())
+      const std::string filename(env_.stat_dir + "/" +
+                                 environment::arl_filename);
+      std::ofstream log(filename.c_str(), std::ios_base::app);
+      if (env_.stat_arl && log.good())
       {
         for (unsigned i(0); i < env_.sset.adts(); ++i)
         {
           const symbol *f(env_.sset.get_adt(i).get());
-          adf_l << f->display() << ' ' << f->weight << std::endl;
+          log << f->display() << ' ' << f->weight << std::endl;
         }
-        adf_l << std::endl;
+        log << std::endl;
       }
 
+      const unsigned adf_args(0);
       std::list<locus> block_locus(base.blocks());
       for (auto i(block_locus.begin()); i != block_locus.end(); ++i)
       {
         individual candidate_block(base.get_block(*i));
 
         // Building blocks should be simple.
-        if (candidate_block.eff_size() <= 5 + arl_args)
+        if (candidate_block.eff_size() <= 5 + adf_args)
         {
           const double d_f(base_fit -
                            evo.fitness(base.destroy_block((*i)[0])));
@@ -79,29 +78,29 @@ namespace vita
           if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
           {
             symbol_ptr p;
-            if (arl_args)
+            if (adf_args)
             {
               std::vector<locus> loci;
-              individual generalized(candidate_block.generalize(arl_args,
+              individual generalized(candidate_block.generalize(adf_args,
                                                                 &loci));
               std::vector<category_t> categories(loci.size());
-              for (unsigned j(0); j != loci.size(); ++j)
+              for (unsigned j(0); j < loci.size(); ++j)
                 categories[j] = loci[j][locus_category];
 
               p = std::make_shared<vita::adf>(generalized, categories, 10);
             }
-            else
+            else  // !adf_args
               p = std::make_shared<vita::adt>(candidate_block, 100);
             env_.insert(p);
 
-            if (env_.stat_arl && adf_l.good())
+            if (env_.stat_arl && log.good())
             {
-              adf_l << p->display() << " (Base: " << base_fit
-                    << "  DF: " << d_f
-                    << "  Weight: " << std::fabs(d_f / base_fit) * 100.0 << "%)"
-                    << std::endl;
-              candidate_block.list(adf_l);
-              adf_l << std::endl;
+              log << p->display() << " (Base: " << base_fit
+                  << "  DF: " << d_f
+                  << "  Weight: " << std::fabs(d_f / base_fit) * 100.0 << "%)"
+                  << std::endl;
+              candidate_block.list(log);
+              log << std::endl;
             }
           }
         }
@@ -120,7 +119,7 @@ namespace vita
   /// a large population size is needed and a very large number of
   /// function-trees evaluation must be carried out. DSS is a subset selection
   /// method which uses the current run to select:
-  /// \li firstly 'difficult' cases:
+  /// \li firstly 'difficult' cases;
   /// \li secondly cases which have not been looked at for several generations.
   ///
   void search::dss(unsigned generation) const

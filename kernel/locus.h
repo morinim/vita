@@ -3,7 +3,7 @@
  *  \file individual.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,7 +23,6 @@
 
 namespace vita
 {
-
   static_assert(sizeof(index_t) <= sizeof(unsigned),
                 "index_t sizes expected to be <= unsigned");
   static_assert(sizeof(category_t) <= sizeof(unsigned),
@@ -44,7 +43,9 @@ namespace vita
   ///
   inline
   bool operator<(const locus &l1, const locus &l2)
-  { return l1[0] < l2[0] || (l1[0] == l2[0] && l1[1] < l2[1]); }
+  { return l1[locus_index] < l2[locus_index] ||
+           (l1[locus_index] == l2[locus_index] &&
+            l1[locus_category] < l2[locus_category]); }
 
   ///
   /// \param[out] s output stream.
@@ -54,7 +55,7 @@ namespace vita
   inline
   std::ostream &operator<<(std::ostream &s, const locus &l)
   {
-    return s << '(' << l[0] << ',' << l[1] << ')';
+    return s << '(' << l[locus_index] << ',' << l[locus_category] << ')';
   }
 
   ///
@@ -66,9 +67,8 @@ namespace vita
   inline
   locus operator+(const locus &l, unsigned i)
   {
-    return locus{{l[0] + i, l[1]}};
+    return locus{{l[locus_index] + i, l[locus_category]}};
   }
-
 }  // namespace vita
 
 #endif  // LOCUS_H
