@@ -1,0 +1,15 @@
+<symbolset name="classification">
+  <symbol name="FIFE" signature="numeric" />
+  <symbol name="FIFL" signature="numeric" />
+  <symbol name="FADD" signature="numeric" />
+  <symbol name="FSUB" signature="numeric" />
+  <symbol name="FMUL" signature="numeric" />
+  <symbol name="FABS" signature="numeric" />
+  <symbol name="REAL" signature="numeric" />
+  <symbol name="SIFE">
+    <signature>
+      <arg>string</arg>
+      <arg>numeric</arg>
+    </signature>
+  </symbol>
+</symbolset>

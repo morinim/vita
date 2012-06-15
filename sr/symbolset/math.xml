@@ -1,0 +1,10 @@
+<symbolset name="math">
+  <symbol name="FABS" signature="numeric" />
+  <symbol name="FADD" signature="numeric" />
+  <symbol name="FDIV" signature="numeric" />
+  <symbol name="FLN" signature="numeric" />
+  <symbol name="FMUL" signature="numeric" />
+  <symbol name="FMOD" signature="numeric" />
+  <symbol name="FSUB" signature="numeric" />
+  <symbol name="REAL" signature="numeric" />
+</symbolset>

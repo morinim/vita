@@ -1,0 +1,5 @@
+<symbolset name="logic">
+  <symbol name="AND" signature="boolean" />
+  <symbol name="OR" signature="boolean" />
+  <symbol name="NOT" signature="boolean" />
+</symbolset>

@@ -1,0 +1,5 @@
+[Options]
+elitism = true
+debug = false
+arl = false
+force_input = true

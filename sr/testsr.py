@@ -96,7 +96,7 @@ def start_testing(args):
         "petalrose":  [ "petalrose.csv", 100, 500, 200,  80, "arithmetic.xml"],
         "petalrose3": ["petalrose3.csv", 100, 500, 200,  80, "arithmetic.xml"],
         "petalrose2": ["petalrose2.csv", 100, 500, 200,  80, "arithmetic.xml"],
-        "petalrosec": ["petalrosec.csv", 100, 500, 200,  80,     "class3.xml"],
+        "petalrosec": ["petalrosec.csv", 100, 500, 200,  30,     "class3.xml"],
         "spambase":   [  "spambase.csv", 100, 999, 100,  50,      "class.xml"],
         "wine":       [      "wine.csv", 120, 500, 100,  80,      "class.xml"],
         "x2y2z2":     [   "x2y2_z2.csv", 100, 200, 500,  80,       "math.xml"],
