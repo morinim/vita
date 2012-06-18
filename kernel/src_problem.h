@@ -26,7 +26,8 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    enum {k_abs_evaluator = 0, k_count_evaluator, k_dyn_slot_evaluator};
+    enum {k_count_evaluator = 0, k_sae_evaluator, k_sse_evaluator,
+          k_dyn_slot_evaluator};
 
     explicit src_problem(fitness_t);
 

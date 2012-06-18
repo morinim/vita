@@ -33,11 +33,16 @@ namespace vita
   {
     clear();
 
-    unsigned i(add_evaluator(std::make_shared<abs_evaluator>(&dat_, &vars_)));
-    assert(i == k_abs_evaluator);
+    unsigned i;
 
     i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
     assert(i == k_count_evaluator);
+
+    i = add_evaluator(std::make_shared<sae_evaluator>(&dat_, &vars_));
+    assert(i == k_sae_evaluator);
+
+    i = add_evaluator(std::make_shared<sse_evaluator>(&dat_, &vars_));
+    assert(i == k_sse_evaluator);
 
     i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_, &vars_));
     assert(i == k_dyn_slot_evaluator);
@@ -72,7 +77,7 @@ namespace vita
     if (n_examples > 0)
       set_evaluator(classes() > 1
         ? k_dyn_slot_evaluator   // classification problem
-        : k_abs_evaluator);      // symbolic regression problem
+        : k_sse_evaluator);      // symbolic regression problem
 
     unsigned n_symbols(0);
     if (symbols.empty())

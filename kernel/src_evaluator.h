@@ -3,7 +3,7 @@
  *  \file src_evaluator.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -38,19 +38,63 @@ namespace vita
   };
 
   ///
-  /// This evaluator will drive the evolution towards the minimum sum of
-  /// absolute errors (\f$-\sum_{i=1}^n abs(target_i - actual_i)\f$).
-  /// There is also a penality for illegal values (it is a function of the
-  /// number of illegal values).
+  /// This class models the evaluators that will drive the evolution towards
+  /// the minimum sum of some sort of error.
+  /// \see \ref sse_evaluator and \ref sae_evaluator.
   ///
-  class abs_evaluator : public src_evaluator
+  class sum_of_errors_evaluator : public src_evaluator
   {
   public:
-    abs_evaluator(data *d, std::vector<variable_ptr> *v)
+    sum_of_errors_evaluator(data *d, std::vector<variable_ptr> *v)
       : src_evaluator(d, v) {}
 
     score_t operator()(const individual &);
-    fitness_t fast(const individual &);
+    score_t fast(const individual &);
+
+  private:
+    virtual double error(interpreter &, data::iterator, int *const,
+                         unsigned *const) = 0;
+  };
+
+  ///
+  /// This evaluator will drive the evolution towards the minimum sum of
+  /// absolute errors (\f$\sum_{i=1}^n abs(target_i - actual_i)\f$).
+  /// There is also a penality for illegal values (it is a function of the
+  /// number of illegal values).
+  /// It is interesting to note that the sum of absolute errors is also
+  /// minimized in the least absolute deviations (LAD) approach to regression.
+  /// LAD is a robust estimation technique in that it is less sensitive to the
+  /// presence of outliers than OLS (Ordinary Least Squares), but is less
+  /// efficient than OLS when no outliers are present). It is equivalent to
+  /// maximum likelihood estimation under a Laplace distribution model for
+  /// \f$epsilon\f$.
+  /// \see \ref sse_evaluator.
+  ///
+  class sae_evaluator : public sum_of_errors_evaluator
+  {
+  public:
+    sae_evaluator(data *d, std::vector<variable_ptr> *v)
+      : sum_of_errors_evaluator(d, v) {}
+
+  private:
+    double error(interpreter &, data::iterator, int *const, unsigned *const);
+  };
+
+  ///
+  /// This evaluator will drive the evolution towards the minimum sum of
+  /// squared errors (\f$\sum_{i=1}^n (target_i - actual_i)^2\f$).
+  /// There is also a penality for illegal values (it is a function of the
+  /// number of illegal values).
+  /// \see \ref sae_evaluator.
+  ///
+  class sse_evaluator : public sum_of_errors_evaluator
+  {
+  public:
+    sse_evaluator(data *d, std::vector<variable_ptr> *v)
+      : sum_of_errors_evaluator(d, v) {}
+
+  private:
+    double error(interpreter &, data::iterator, int *const, unsigned *const);
   };
 
   ///
@@ -58,13 +102,14 @@ namespace vita
   /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
   /// All incorrect answers receive the same fitness penality.
   ///
-  class count_evaluator : public src_evaluator
+  class count_evaluator : public sum_of_errors_evaluator
   {
   public:
     count_evaluator(data *d, std::vector<variable_ptr> *v)
-      : src_evaluator(d, v) {}
+      : sum_of_errors_evaluator(d, v) {}
 
-    score_t operator()(const individual &);
+  private:
+    double error(interpreter &, data::iterator, int *const, unsigned *const);
   };
 
   ///

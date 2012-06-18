@@ -3,7 +3,7 @@
  *  \file src_evaluator.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -44,115 +44,163 @@ namespace vita
   /// \return the fitness (greater is better, max is 0) and the accuracy
   ///         (percentage).
   ///
-  score_t abs_evaluator::operator()(const individual &ind)
+  score_t sum_of_errors_evaluator::operator()(const individual &ind)
   {
     assert(!dat_->classes());
+    assert(dat_->cbegin() != dat_->cend());
 
     interpreter agent(ind);
 
     double err(0.0);
     int illegals(0);
-    unsigned ok(0), count(0);
+    unsigned ok(0), total_nr(0);
 
     for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
     {
-      load_vars(*t);
+      err += error(agent, t, &illegals, &ok);
 
-      ++count;
-
-      const boost::any res(agent());
-
-      double e;
-      if (res.empty())
-        e = std::pow(100.0, ++illegals);
-      else
-        e = std::fabs(interpreter::to_double(res) -
-                      interpreter::to_double(t->output));
-
-      if (e > 0.1)
-        ++t->difficulty;
-      else
-        ++ok;
-
-      err += e;
+      ++total_nr;
     }
 
-    assert(count);
+    assert(total_nr);
 
     return score_t(fitness_t(-err),
-                   static_cast<double>(ok) / static_cast<double>(count));
+                   static_cast<double>(ok) / static_cast<double>(total_nr));
   }
 
   ///
   /// \param[in] ind program used for fitness evaluation.
-  /// \return the fitness (greater is better, max is 0).
+  /// \return the fitness (greater is better, max is 0) and the accuracy
+  ///         (percentage).
   ///
   /// This function is similar to operator()() but will skip 3 out of 4
   /// training instances, so it's faster ;-) but...
   /// \attention output value of this method and of the operator()() method
   /// cannot be compared (I know, it's a pity).
   ///
-  fitness_t abs_evaluator::fast(const individual &ind)
+  score_t sum_of_errors_evaluator::fast(const individual &ind)
   {
     assert(!dat_->classes());
+    assert(dat_->cbegin() != dat_->cend());
 
     interpreter agent(ind);
 
     double err(0.0);
     int illegals(0);
+    unsigned ok(0), total_nr(0);
     unsigned counter(0);
 
-    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
+    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
       if (dat_->size() <= 20 || (counter++ % 5) == 0)
       {
-        load_vars(*t);
+        err += error(agent, t, &illegals, &ok);
 
-        const boost::any res(agent());
-
-        if (res.empty())
-          err += std::pow(100.0, ++illegals);
-        else
-          err += std::fabs(interpreter::to_double(res) -
-                           interpreter::to_double(t->output));
+        ++total_nr;
       }
 
-    return fitness_t(-err);
+    assert(total_nr);
+
+    return score_t(fitness_t(-err),
+                   static_cast<double>(ok) / static_cast<double>(total_nr));
   }
 
   ///
-  /// \param[in] ind an individual.
-  /// \return the fitness (greater is better, max is equal to the number of
-  ///         training cases) and the accuracy (percantage) of individual
-  ///         \a ind.
+  /// \param[in] agent interpreter used for the evaluation of the current
+  ///                  individual. Note that this isn't a constant reference
+  ///                  because the internal state of agent changes during
+  ///                  evaluation; anyway this is an input-only parameter.
+  /// \param[in] t the current training case.
+  /// \param[in,out] illegals number of illegals values found evaluating the
+  ///                         current individual so far.
+  /// \param[in,out] ok corret answers of the current individual so far.
+  /// \return a measurement of the error of the current individual on the
+  ///         training case \a t.
   ///
-  score_t count_evaluator::operator()(const vita::individual &ind)
+  double sae_evaluator::error(interpreter &agent, data::iterator t,
+                              int *const illegals, unsigned *const ok)
   {
-    assert(!dat_->classes());
+    load_vars(*t);
 
-    interpreter agent(ind);
+    const boost::any res(agent());
+    double err;
+    if (res.empty())
+      err = std::pow(100.0, ++(*illegals));
+    else
+      err = std::fabs(interpreter::to_double(res) -
+                      interpreter::to_double(t->output));
 
-    unsigned ok(0), count(0);
+    if (err > 0.1)
+      ++t->difficulty;
+    else
+      ++(*ok);
 
-    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
+    return err;
+  }
+
+  ///
+  /// \param[in] agent interpreter used for the evaluation of the current
+  ///                  individual. Note that this isn't a constant reference
+  ///                  because the internal state of agent changes during
+  ///                  evaluation; anyway this is an input-only parameter.
+  /// \param[in] t the current training case.
+  /// \param[in,out] illegals number of illegals values found evaluating the
+  ///                         current individual so far.
+  /// \param[in,out] ok corret answers of the current individual so far.
+  /// \return a measurement of the error of the current individual on the
+  ///         training case \a t.
+  ///
+  double sse_evaluator::error(interpreter &agent, data::iterator t,
+                              int *const illegals, unsigned *const ok)
+  {
+    load_vars(*t);
+
+    const boost::any res(agent());
+    double err;
+    if (res.empty())
+      err = std::pow(100.0, ++(*illegals));
+    else
     {
-      load_vars(*t);
-
-      ++count;
-
-      const boost::any res(agent());
-
-      if (!res.empty() &&
-          std::fabs(interpreter::to_double(res) -
-                    interpreter::to_double(t->output)) < float_epsilon)
-        ++ok;
-      else
-        ++t->difficulty;
+      err = interpreter::to_double(res) - interpreter::to_double(t->output);
+      err *= err;
     }
 
-    assert(count);
+    if (err > 0.1)
+      ++t->difficulty;
+    else
+      ++(*ok);
 
-    return score_t(fitness_t(ok) - fitness_t(count),
-                   static_cast<double>(ok) / static_cast<double>(count));
+    return err;
+  }
+
+  ///
+  /// \param[in] agent interpreter used for the evaluation of the current
+  ///                  individual. Note that this isn't a constant reference
+  ///                  because the internal state of agent changes during
+  ///                  evaluation; anyway this is an input-only parameter.
+  /// \param[in] t the current training case.
+  /// \param[in,out]
+  /// \param[in,out] ok corret answers of the current individual so far.
+  /// \return a measurement of the error of the current individual on the
+  ///         training case \a t.
+  ///
+  double count_evaluator::error(interpreter &agent, data::iterator t,
+                                int *const, unsigned *const ok)
+  {
+    load_vars(*t);
+
+    const boost::any res(agent());
+
+    const bool err(res.empty() ||
+                   std::fabs(interpreter::to_double(res) -
+                             interpreter::to_double(t->output)) >=
+                   float_epsilon);
+
+    if (err)
+      ++t->difficulty;
+    else
+      ++(*ok);
+
+    return static_cast<double>(err);
   }
 
   ///
