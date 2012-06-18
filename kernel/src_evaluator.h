@@ -65,9 +65,9 @@ namespace vita
   /// minimized in the least absolute deviations (LAD) approach to regression.
   /// LAD is a robust estimation technique in that it is less sensitive to the
   /// presence of outliers than OLS (Ordinary Least Squares), but is less
-  /// efficient than OLS when no outliers are present). It is equivalent to
+  /// efficient than OLS when no outliers are present. It is equivalent to
   /// maximum likelihood estimation under a Laplace distribution model for
-  /// \f$epsilon\f$.
+  /// \f$epsilon\f$ (sampling error).
   /// \see \ref sse_evaluator.
   ///
   class sae_evaluator : public sum_of_errors_evaluator
@@ -85,6 +85,11 @@ namespace vita
   /// squared errors (\f$\sum_{i=1}^n (target_i - actual_i)^2\f$).
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
+  /// \note Real data always have noise (sampling/measurement errors) and noise
+  /// tends to follow a Gaussian distribution. It can be shown that when we
+  /// have a bunch of data with errors drawn from such a distribution you are
+  /// most likely to find the "correct" underlying model if you seek to
+  /// minimize the sum of squared errors.
   /// \see \ref sae_evaluator.
   ///
   class sse_evaluator : public sum_of_errors_evaluator
