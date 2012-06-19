@@ -3,7 +3,7 @@
  *  \file evolution_replacement.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -90,7 +90,7 @@ namespace vita
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
-    if (score_off.fitness - s->best->score.fitness > float_epsilon)
+    if (score_off.fitness > s->best->score.fitness)
     {
       s->last_imp =                    s->gen;
       s->best     = {offspring[0], score_off};

@@ -61,8 +61,8 @@ namespace vita
     /// number of examples in the training set. According to this
     /// design, the best accuracy is 1.0 (100%), meaning that all the training
     /// examples have been correctly recognized.
-    /// Accuracy could be used as fitness function but it often hasn't enough
-    /// "granularity".
+    /// Accuracy could be used as fitness function but it sometimes hasn't
+    /// enough "granularity".
     virtual score_t operator()(const individual &) = 0;
 
     virtual score_t fast(const individual &i) { return operator()(i); }

@@ -238,7 +238,7 @@ namespace vita
 
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
-        // dataset).
+        // training set).
         stats_.best = {pop_[0], score(pop_[0])};
       }
 

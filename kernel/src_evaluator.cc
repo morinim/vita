@@ -200,7 +200,7 @@ namespace vita
     else
       ++(*ok);
 
-    return static_cast<double>(err);
+    return err ? 1.0 : 0.0;
   }
 
   ///
