@@ -3,7 +3,7 @@
  *  \file environment.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -87,7 +87,13 @@ namespace vita
     /// Size of the tournament to choose replaced individuals. This is similar
     /// to \c par_tournament.
     boost::optional<unsigned> rep_tournament;
-    /// Mating zone. 0 for panmictic.
+    /// This is used for the trivial geography scheme (Spector, Klein 2005).
+    /// The population is viewed as having a 1-dimensional spatial structure -
+    /// actually a circle, as we consider the first and last locations to be
+    /// adiacent. The production of an individual from location i is permitted
+    /// to involve only parents from i's local neightborhood, where the
+    /// neightborhood is defined as all individuals within distance
+    /// \c mate_zone/2 of i (0 for panmictic).
     boost::optional<unsigned> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.

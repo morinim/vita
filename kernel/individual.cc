@@ -3,7 +3,7 @@
  *  \file individual.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -90,6 +90,32 @@ namespace vita
     assert(ret.check());
     return ret;
   }
+
+  /*
+  void individual::hoist()
+  {
+    const unsigned sup(size() - 1);
+    const unsigned categories(env_->sset.categories());
+
+    for (index_t i(0); i < sup; ++i)
+      for (category_t c(0); c < categories; ++c)
+      {
+        const locus l{{i, c}};
+
+        set(l, genome_(locus{{i+1, c}}));
+
+        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
+        {
+          --genome_(l).args[j];
+
+          assert(genome_(l).args[j] > i);
+        }
+      }
+
+    for (category_t c(0); c < categories; ++c)
+      set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+  }
+  */
 
   ///
   /// \param[in] p probability of gene mutation.

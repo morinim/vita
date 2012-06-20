@@ -238,7 +238,11 @@ namespace vita
       env_.par_tournament = *dflt.par_tournament;
 
     if (!prob_->env.rep_tournament)
-      env_.rep_tournament = *dflt.rep_tournament;
+    {
+      assert(env_.individuals);
+      env_.rep_tournament = static_cast<unsigned>(std::log(*env_.individuals));
+      //env_.rep_tournament = *dflt.rep_tournament;
+    }
 
     if (!prob_->env.mate_zone)
       env_.mate_zone = *dflt.mate_zone;
