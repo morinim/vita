@@ -64,7 +64,9 @@ namespace vita
 
     assert(total_nr);
 
-    return score_t(fitness_t(-err),
+    // Note that we take the average error: this way fast() and operator()
+    // outputs can be compared.
+    return score_t(fitness_t(-err / total_nr),
                    static_cast<double>(ok) / static_cast<double>(total_nr));
   }
 
@@ -74,9 +76,7 @@ namespace vita
   ///         (percentage).
   ///
   /// This function is similar to operator()() but will skip 3 out of 4
-  /// training instances, so it's faster ;-) but...
-  /// \attention output value of this method and of the operator()() method
-  /// cannot be compared (I know, it's a pity).
+  /// training instances, so it's faster ;-)
   ///
   score_t sum_of_errors_evaluator::fast(const individual &ind)
   {
@@ -100,7 +100,9 @@ namespace vita
 
     assert(total_nr);
 
-    return score_t(fitness_t(-err),
+    // Note that we take the average error: this way fast() and operator()
+    // outputs can be compared.
+    return score_t(fitness_t(-err / total_nr),
                    static_cast<double>(ok) / static_cast<double>(total_nr));
   }
 
