@@ -30,9 +30,9 @@ def sr(data_set, generations, individuals, code_length, rounds, symbol_set,
         rnd = "";
     else:
         random.seed()
-        rnd = "--random-seed "+str(random.randint(0,1000000000))
+        rnd = "--random-seed " + str(random.randint(0,1000000000))
         rounds *= 2
-        generations = (generations*3)//2
+        generations = (generations * 3) // 2
 
     if args.arl:
         rounds //= 2
@@ -66,9 +66,9 @@ def sr(data_set, generations, individuals, code_length, rounds, symbol_set,
 
 
 def save_results(name, data_set, args):
-    files = { arl_filename: ".arl",
-              dynamic_filename: ".dyn",
-              summary_filename: ".sum"}
+    files = {arl_filename: ".arl",
+             dynamic_filename: ".dyn",
+             summary_filename: ".sum"}
 
     for f, ext in files.items():
         before = os.path.join(stat_dir,f)
@@ -81,7 +81,7 @@ def save_results(name, data_set, args):
 
 def test_dataset(name, args, data_set, generations, individuals, code_length,
                  rounds, symbol_set = ""):
-    print("Testing "+name+" ["+str(args)+"]")
+    print("Testing " + name + " [" + str(args) + "]")
     sr(data_set, generations, individuals, code_length, rounds, symbol_set,
        args)
     save_results(name, data_set, args)
