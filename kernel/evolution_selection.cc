@@ -3,7 +3,7 @@
  *  \file evolution_selection.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -78,6 +78,12 @@ namespace vita
     const index_t i1(tournament(evo_->population().size()));
     const index_t i2(tournament(i1));
 
+    /*
+    const unsigned n(evo_->population().size());
+    const unsigned mate_zone(*evo_->population().env().mate_zone);
+    const index_t i1(random::between<index_t>(0, n));
+    const index_t i2(random::ring(i1, mate_zone, n));
+    */
     return {i1, i2};
   }
 
@@ -86,14 +92,17 @@ namespace vita
   ///
   selection_factory::selection_factory(const evolution *const evo)
   {
-    add(new tournament_selection(evo));
+    unsigned i;
+
+    i = add(new tournament_selection(evo));
+    assert(i == k_tournament);
   }
 
   selection_factory::~selection_factory()
   {
     // Only predefined operation strategies should be deleted. User defined
     // operation aren't under our responsability.
-    delete strategy_[tournament];
+    delete strategy_[k_tournament];
   }
 
   selection_strategy &selection_factory::operator[](unsigned s)

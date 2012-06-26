@@ -46,7 +46,7 @@ namespace vita
       dss = true;
       individuals = 100;
       par_tournament = 2;
-      rep_tournament = static_cast<unsigned>(std::log(100.0));
+      rep_tournament = 4;
       mate_zone = 20;
       g_since_start = 100;
       g_without_improvement = 0;

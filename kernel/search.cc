@@ -240,8 +240,7 @@ namespace vita
     if (!prob_->env.rep_tournament)
     {
       assert(env_.individuals);
-      env_.rep_tournament = static_cast<unsigned>(std::log(*env_.individuals));
-      //env_.rep_tournament = *dflt.rep_tournament;
+      env_.rep_tournament = std::round(std::log10(*env_.individuals));
     }
 
     if (!prob_->env.mate_zone)
@@ -285,7 +284,10 @@ namespace vita
     for (unsigned run(0); run < n; ++run)
     {
       evolution evo(env_, prob_->get_evaluator(), shake_data);
-      summary s(evo(verbose, run));
+      summary s(evo(verbose, run,
+                    selection_factory::k_tournament,
+                    operation_factory::k_crossover_mutation,
+                    replacement_factory::k_tournament));
 
       // If \c shake_data == \c true, the values returned by the evolution
       // object refer to a subset of the available dataset. Since we need an

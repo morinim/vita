@@ -37,7 +37,7 @@ const std::string vita_sr_version2(
   "Copyright 2011-2012 EOS di Manlio Morini (http://www.eosdev.it)"
 );
 
-vita::src_problem problem(-5.0);
+vita::src_problem problem(-0.01);
 
 ///
 /// fix_parameters
@@ -505,6 +505,21 @@ namespace ui
   }
 
   ///
+  /// \param[in] v the threashold value
+  ///
+  /// When the output value of a run is greater than \c v it's a scored as a
+  /// success.
+  ///
+  void threashold(double v)
+  {
+    assert(v <= 0.0);
+    problem.threashold = v;
+
+    if (verbose)
+      std::cout << "Threashold is " << v << std::endl;
+  }
+
+  ///
   /// \param[in] bits number of bits used for the ttable (ttable contains
   ///                 \c 2^bits elements).
   ///
@@ -612,7 +627,7 @@ int parse_command_line(int argc, char *const argv[])
       ("brood", po::value<unsigned>()->notifier(&ui::brood),
        "sets the brood size for recombination (0 to disable)")
       ("dss", po::value<std::string>()->notifier(&ui::dss),
-       "turn on/off the Dynamic Subset Selection algorithm")
+       "turns on/off the Dynamic Subset Selection algorithm")
       ("generations,g", po::value<unsigned>()->notifier(&ui::generations),
        "sets the maximum number of generations in a run")
       ("gwi", po::value<unsigned>()->notifier(&ui::gwi),
@@ -630,11 +645,13 @@ int parse_command_line(int argc, char *const argv[])
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
        "log statistics in 'stat_dir' folder/directory")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
-       "generate a dynamic execution status file")
+       "generates a dynamic execution status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
-       "save a summary of the runs")
+       "saves a summary of the runs")
       ("stat-arl", po::value<std::string>()->notifier(&ui::stat_arl),
-       "save the list of active ADFs");
+       "saves the list of active ADFs")
+      ("threashold", po::value<double>()->notifier(&ui::threashold),
+       "sets the success threashold for a run");
 
     ui::cmdl_opt.add(generic).add(data).add(config).add(evolution).
       add(individual).add(statistics);

@@ -3,7 +3,7 @@
  *  \file evolution_operation.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -114,14 +114,17 @@ namespace vita
     assert(evo);
     assert(stats);
 
-    add(new standard_op(evo, stats));
+    unsigned i;
+
+    i = add(new standard_op(evo, stats));
+    assert(i == k_crossover_mutation);
   }
 
   operation_factory::~operation_factory()
   {
     // Only predefined operation strategies should be deleted. User defined
     // operation aren't under our responsability.
-    delete strategy_[crossover_mutation];
+    delete strategy_[k_crossover_mutation];
   }
 
   operation_strategy &operation_factory::operator[](unsigned s) const

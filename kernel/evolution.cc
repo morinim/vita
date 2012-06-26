@@ -221,8 +221,9 @@ namespace vita
   /// problem at hand.
   ///
   const summary &evolution::operator()(bool verbose, unsigned run_count,
-                                       unsigned sel_id, unsigned op_id,
-                                       unsigned rep_id)
+                                       selection_factory::strategy sel_id,
+                                       operation_factory::strategy op_id,
+                                       replacement_factory::strategy rep_id)
   {
     stats_.clear();
     stats_.best = {pop_[0], score(pop_[0])};
