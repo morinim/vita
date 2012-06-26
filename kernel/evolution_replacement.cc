@@ -30,10 +30,9 @@ namespace vita
   /// closest to the new elements. In this way, children compete with their
   /// parents to be included in the population. A child replaces the worst
   /// parent if it has a higher fitness (deterministic crowding and
-  /// elitist recombination) or if \c elitism is \c false.
-  /// \note Mengshoel proposed probabistic crowding as a probabilistic
-  /// extension of this method: the winner of the parent-offspring tournament
-  /// is chosen by using the probability proportional to the fitness.
+  /// elitist recombination); if \c elitism is \c false, the winner of the
+  /// parent-offspring tournament is chosen by using a probability proportional
+  /// to the fitness (probabistic crowding).
   ///
   class family_competition_rp : public replacement_strategy
   {
@@ -85,19 +84,26 @@ namespace vita
     {
       if (score_off.fitness > f_parent[id_worst])
         pop[parent[id_worst]] = offspring[0];
-
-      //double replace(1.0 / (1.0 + exp(f_parent[id_worst] - score_off.fitness)));
-      //if (random::boolean(replace))
-      //  pop[parent[id_worst]] = offspring[0];
-      //else
-      //{
-        //replace = 1.0 / (1.0 + exp(f_parent[!id_worst] - score_off.fitness));
-        //if (random::boolean(replace))
-        //  pop[parent[!id_worst]] = offspring[0];
-      //}
     }
     else  // !elitism
-      pop[parent[id_worst]] = offspring[0];
+    {
+      //double replace(1.0/(1.0 + exp(f_parent[id_worst] - score_off.fitness)));
+      double replace(1.0 - (score_off.fitness /
+                            (score_off.fitness + f_parent[id_worst])));
+      if (random::boolean(replace))
+        pop[parent[id_worst]] = offspring[0];
+      else
+      {
+        //replace = 1.0 / (1.0 + exp(f_parent[!id_worst] - score_off.fitness));
+        replace = 1.0 - (score_off.fitness /
+                         (score_off.fitness + f_parent[!id_worst]));
+
+        if (random::boolean(replace))
+          pop[parent[!id_worst]] = offspring[0];
+      }
+
+      //pop[parent[id_worst]] = offspring[0];
+    }
 
     if (score_off.fitness > s->best->score.fitness)
     {
@@ -106,7 +112,33 @@ namespace vita
     }
   }
 
-  /*
+  class tournament_rp : public replacement_strategy
+  {
+  public:
+    explicit tournament_rp(evolution *const);
+
+    virtual void operator()(const std::vector<index_t> &,
+                            const std::vector<individual> &,
+                            summary *const);
+
+  private:
+    index_t tournament(index_t) const;
+  };
+
+  tournament_rp::tournament_rp(evolution *const evo)
+    : replacement_strategy(evo)
+  {
+  }
+
+  ///
+  /// \param[in] target index of an \a individual in the \a population.
+  /// \return index of the worst \a individual found.
+  ///
+  /// Tournament selection works by selecting a number of individuals from the
+  /// population at random, a tournament, and then choosing only the worst
+  /// of those individuals.
+  /// Recall that better individuals have highter fitnesses.
+  ///
   index_t tournament_rp::tournament(index_t target) const
   {
     const population &pop(evo_->population());
@@ -129,6 +161,19 @@ namespace vita
     return sel;
   }
 
+  ///
+  /// \param[in] parent indexes of the parents (in the population).
+  /// \param[in] offspring vector of the "children".
+  /// \param[in] s statistical \a summary.
+  ///
+  /// Parameters from the environment:
+  /// <ul>
+  /// <li>
+  ///   elitism is \c true => child replaces a member of the population only if
+  ///   child is better.
+  /// </li>
+  /// </ul>
+  ///
   void tournament_rp::operator()(const std::vector<index_t> &parent,
                                  const std::vector<individual> &offspring,
                                  summary *const s)
@@ -151,18 +196,24 @@ namespace vita
       s->best     = {offspring[0], score_off};
     }
   }
-  */
 
   replacement_factory::replacement_factory(evolution *const evo)
   {
-    add(new family_competition_rp(evo));
+    unsigned i;
+
+    i = add(new family_competition_rp(evo));
+    assert(i == k_crowding);
+
+    i = add(new tournament_rp(evo));
+    assert(i == k_tournament);
   }
 
   replacement_factory::~replacement_factory()
   {
     // Only predefined operation strategies should be deleted. User defined
     // operation aren't under our responsability.
-    delete strategy_[tournament];
+    delete strategy_[k_crowding];
+    delete strategy_[k_tournament];
   }
 
   replacement_strategy &replacement_factory::operator[](unsigned s)

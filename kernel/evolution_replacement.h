@@ -3,7 +3,7 @@
  *  \file evolution_replacement.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -49,7 +49,7 @@ namespace vita
   class replacement_factory
   {
   public:
-    enum replacement {tournament = 0};
+    enum strategy {k_crowding = 0, k_tournament = 1};
 
     explicit replacement_factory(evolution *const);
     ~replacement_factory();
