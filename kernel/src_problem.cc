@@ -77,7 +77,7 @@ namespace vita
     if (n_examples > 0)
       set_evaluator(classes() > 1
         ? k_dyn_slot_evaluator   // classification problem
-        : k_sse_evaluator);      // symbolic regression problem
+        : k_sae_evaluator);      // symbolic regression problem
 
     unsigned n_symbols(0);
     if (symbols.empty())
