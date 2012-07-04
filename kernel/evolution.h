@@ -64,9 +64,11 @@ namespace vita
     evolution(const environment &, evaluator *const,
               std::function<void (unsigned)> = 0);
 
-    const summary &operator()(bool, unsigned, selection_factory::strategy,
-                              operation_factory::strategy,
-                              replacement_factory::strategy);
+    const summary &operator()(
+      bool, unsigned,
+      selection_factory::strategy = selection_factory::k_tournament,
+      operation_factory::strategy = operation_factory::k_crossover_mutation,
+      replacement_factory::strategy = replacement_factory::k_tournament);
 
     const vita::population &population() const;
     vita::population &population();
