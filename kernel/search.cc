@@ -234,14 +234,8 @@ namespace vita
     if (!prob_->env.individuals)
       env_.individuals = *dflt.individuals;
 
-    if (!prob_->env.par_tournament)
-      env_.par_tournament = *dflt.par_tournament;
-
-    if (!prob_->env.rep_tournament)
-    {
-      assert(env_.individuals);
-      env_.rep_tournament = std::round(std::log10(*env_.individuals));
-    }
+    if (!prob_->env.tournament_size)
+      env_.tournament_size = *dflt.tournament_size;
 
     if (!prob_->env.mate_zone)
       env_.mate_zone = *dflt.mate_zone;

@@ -117,7 +117,7 @@ namespace vita
     unsigned i;
 
     i = add(new standard_op(evo, stats));
-    assert(i == k_crossover_mutation);
+    assert(i - 1 == k_crossover_mutation);
   }
 
   operation_factory::~operation_factory()

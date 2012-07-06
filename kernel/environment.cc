@@ -45,8 +45,7 @@ namespace vita
       brood_recombination = 0;
       dss = true;
       individuals = 100;
-      par_tournament = 2;
-      rep_tournament = 4;
+      tournament_size = 5;
       mate_zone = 20;
       g_since_start = 100;
       g_without_improvement = 0;
@@ -78,8 +77,7 @@ namespace vita
     pt->put(env + "crossover_rate", p_cross);
     pt->put(env + "brood_recombination", brood_recombination);
     pt->put(env + "dss", dss);
-    pt->put(env + "parent_tournament_size", par_tournament);
-    pt->put(env + "replacement_tournament_size", rep_tournament);
+    pt->put(env + "tournament_size", tournament_size);
     pt->put(env + "mating_zone", mate_zone);
     pt->put(env + "max_gens_since_start", g_since_start);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
@@ -185,47 +183,24 @@ namespace vita
       return false;
     }
 
-    if (force_defined && !par_tournament)
+    if (force_defined && !tournament_size)
     {
       if (verbose)
-        std::cerr << "Undefined par_tournament data member." << std::endl;
+        std::cerr << "Undefined tournament_size data member." << std::endl;
       return false;
-    }
-    if (par_tournament)
-    {
-      if (*par_tournament == 0)
+
+      if (individuals && *tournament_size > *individuals)
       {
         if (verbose)
-          std::cerr << "par_tournament must be greater than 0." << std::endl;
-        return false;
-      }
-      if (individuals && *par_tournament > *individuals)
-      {
-        if (verbose)
-          std::cerr << "par_tournament cannot be greater than individuals."
+          std::cerr << "tournament_size cannot be greater than individuals."
                     << std::endl;
         return false;
       }
-    }
 
-    if (force_defined && !rep_tournament)
-    {
-      if (verbose)
-        std::cerr << "Undefined rep_tournament data member." << std::endl;
-      return false;
-    }
-    if (rep_tournament)
-    {
-      if (*rep_tournament == 0)
+      if (mate_zone && *tournament_size > *mate_zone)
       {
         if (verbose)
-          std::cerr << "rep_tournament must be greater than 0." << std::endl;
-        return false;
-      }
-      if (individuals && *rep_tournament > *individuals)
-      {
-        if (verbose)
-          std::cerr << "rep_tournament cannot be greater than individuals."
+          std::cerr << "tournament_size cannot be greater than mate_zone."
                     << std::endl;
         return false;
       }

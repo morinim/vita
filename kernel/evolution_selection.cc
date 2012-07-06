@@ -28,9 +28,6 @@ namespace vita
     explicit tournament_selection(const evolution *const);
 
     virtual std::vector<index_t> operator()();
-
-  protected:
-    index_t tournament(index_t) const;
   };
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -38,6 +35,7 @@ namespace vita
   {
   }
 
+  /*
   ///
   /// \param[in] target index of an \a individual in the \a population.
   /// \return index of the best \a individual found.
@@ -53,7 +51,7 @@ namespace vita
 
     const unsigned n(pop.size());
     const unsigned mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().par_tournament);
+    const unsigned rounds(*pop.env().tournament_size);
 
     index_t sel(random::ring(target, mate_zone, n));
     for (unsigned i(1); i < rounds; ++i)
@@ -68,23 +66,48 @@ namespace vita
 
     return sel;
   }
+  */
 
   ///
-  /// \return a couple of indexes to individuals to be used by the
-  ///         vita::evolution class.
+  /// \return a vector of indexes to individuals ordered in descending
+  ///         fitness score.
   ///
   std::vector<index_t> tournament_selection::operator()()
   {
-    const index_t i1(tournament(evo_->population().size()));
-    const index_t i2(tournament(i1));
+    const population &pop(evo_->population());
 
-    /*
-    const unsigned n(evo_->population().size());
-    const unsigned mate_zone(*evo_->population().env().mate_zone);
-    const index_t i1(random::between<index_t>(0, n));
-    const index_t i2(random::ring(i1, mate_zone, n));
-    */
-    return {i1, i2};
+    const unsigned n(pop.size());
+    const unsigned mate_zone(*pop.env().mate_zone);
+    const unsigned rounds(*pop.env().tournament_size);
+    const index_t target(random::between<unsigned>(0, n));
+
+    assert(rounds);
+    std::vector<index_t> ret(rounds);
+
+    // This is the inner loop of an insertion sort algorithm. It is simple,
+    // fast (if rounds is small) and doesn't perform too much comparisons.
+    // DO NOT USE std::sort it is way slower.
+    for (unsigned i(0); i < rounds; ++i)
+    {
+      const index_t new_index(random::ring(target, mate_zone, n));
+      const fitness_t new_fitness(evo_->fitness(pop[new_index]));
+
+      index_t j(0);
+      while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
+        ++j;
+
+      for (index_t k(j); k < i; ++k)
+        ret[k + 1] = ret[k];
+
+      ret[j] = new_index;
+    }
+
+#if !defined(NDEBUG)
+    for (unsigned i(0); i + 1 < rounds; ++i)
+      assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
+#endif
+
+    return ret;
   }
 
   ///
@@ -95,7 +118,7 @@ namespace vita
     unsigned i;
 
     i = add(new tournament_selection(evo));
-    assert(i == k_tournament);
+    assert(i - 1 == k_tournament);
   }
 
   selection_factory::~selection_factory()

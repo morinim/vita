@@ -752,7 +752,7 @@ namespace vita
   void individual::dump(std::ostream &s) const
   {
     const unsigned categories(env_->sset.categories());
-    const unsigned width(1 + std::log10(size()-1));
+    const unsigned width(1 + std::log10(size() - 1));
 
     for (unsigned i(0); i < size(); ++i)
     {

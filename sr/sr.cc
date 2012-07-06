@@ -59,21 +59,31 @@ void fix_parameters()
     problem.env.dss = false;
   }
 
-  if (problem.env.par_tournament)
+  if (problem.env.tournament_size)
   {
-    if (*problem.env.par_tournament < 2)
+    if (*problem.env.tournament_size < 2)
     {
-      std::cout << "[WARNING] Adjusting parent tournament (0 => 2)"
+      std::cout << "[WARNING] Adjusting tournament size (=> 2)"
                 << std::endl;
-      problem.env.par_tournament = 2;
+      problem.env.tournament_size = 2;
     }
-    else if (problem.env.individuals &&
-             *problem.env.par_tournament > *problem.env.individuals)
+
+    if (problem.env.mate_zone &&
+        *problem.env.tournament_size > *problem.env.mate_zone)
     {
-      std::cout << "[WARNING] Adjusting parent tournament ("
-                << *problem.env.par_tournament << " => "
+      std::cout << "[WARNING] Adjusting tournament size ("
+                << *problem.env.tournament_size << " => "
+                << *problem.env.mate_zone << ")" << std::endl;
+      problem.env.tournament_size = *problem.env.mate_zone;
+    }
+
+    if (problem.env.individuals &&
+        *problem.env.tournament_size > *problem.env.individuals)
+    {
+      std::cout << "[WARNING] Adjusting tournament size ("
+                << *problem.env.tournament_size << " => "
                 << *problem.env.individuals << ")" << std::endl;
-      problem.env.par_tournament = *problem.env.individuals;
+      problem.env.tournament_size = *problem.env.individuals;
     }
   }
 }
@@ -358,14 +368,14 @@ namespace ui
   ///
   /// \param[in] n number of individuals.
   ///
-  /// Sets the number of individuals examined before choosing a parent.
+  /// Sets the number of individuals examined for choosing parents.
   ///
-  void parent_tournament(unsigned n)
+  void tournament_size(unsigned n)
   {
-    problem.env.par_tournament = n;
+    problem.env.tournament_size = n;
 
     if (verbose)
-      std::cout << "Parent tournament size is " << n << std::endl;
+      std::cout << "Tournament size is " << n << std::endl;
   }
 
   ///
@@ -621,9 +631,9 @@ int parse_command_line(int argc, char *const argv[])
       ("crossover-rate,c", po::value<double>()->notifier(&ui::crossover_rate),
        "sets the overall probability that crossover will occour between "\
        "winners in a tournament. Range is [0,1]")
-      ("parent-tournament",
-       po::value<unsigned>()->notifier(&ui::parent_tournament),
-       "number of individuals examined before choosing a parent")
+      ("tournament-size",
+       po::value<unsigned>()->notifier(&ui::tournament_size),
+       "number of individuals examined for choosing parents")
       ("brood", po::value<unsigned>()->notifier(&ui::brood),
        "sets the brood size for recombination (0 to disable)")
       ("dss", po::value<std::string>()->notifier(&ui::dss),

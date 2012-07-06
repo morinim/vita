@@ -78,15 +78,13 @@ namespace vita
     /// Population's size (number of programs/individuals in the population).
     boost::optional<unsigned> individuals;
 
-    /// Size of the tournament to choose the parents.
+    /// Size of the tournament to choose the parents from.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
     /// selective pressure. Note that a tournament size of 1 would be
-    /// equivalent to selecting individuals at random (within the mate zone).
-    boost::optional<unsigned> par_tournament;
-    /// Size of the tournament to choose replaced individuals. This is similar
-    /// to \c par_tournament.
-    boost::optional<unsigned> rep_tournament;
+    /// equivalent to selecting individuals at random.
+    boost::optional<unsigned> tournament_size;
+
     /// This is used for the trivial geography scheme (Spector, Klein 2005).
     /// The population is viewed as having a 1-dimensional spatial structure -
     /// actually a circle, as we consider the first and last locations to be

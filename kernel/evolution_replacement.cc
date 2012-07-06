@@ -67,9 +67,8 @@ namespace vita
     const std::vector<individual> &offspring,
     summary *const s)
   {
-    assert(!boost::indeterminate(pop.env().elitism));
-
     population &pop = evo_->population();
+    assert(!boost::indeterminate(pop.env().elitism));
 
     const score_t score_off(evo_->score(offspring[0]));
 
@@ -120,9 +119,6 @@ namespace vita
     virtual void operator()(const std::vector<index_t> &,
                             const std::vector<individual> &,
                             summary *const);
-
-  private:
-    index_t tournament(index_t) const;
   };
 
   tournament_rp::tournament_rp(evolution *const evo)
@@ -131,38 +127,10 @@ namespace vita
   }
 
   ///
-  /// \param[in] target index of an \a individual in the \a population.
-  /// \return index of the worst \a individual found.
-  ///
-  /// Tournament selection works by selecting a number of individuals from the
-  /// population at random, a tournament, and then choosing only the worst
-  /// of those individuals.
-  /// Recall that better individuals have highter fitnesses.
-  ///
-  index_t tournament_rp::tournament(index_t target) const
-  {
-    const population &pop(evo_->population());
-
-    const unsigned n(pop.size());
-    const unsigned mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().rep_tournament);
-
-    index_t sel(random::ring(target, mate_zone, n));
-    for (unsigned i(1); i < rounds; ++i)
-    {
-      const index_t j(random::ring(target, mate_zone, n));
-
-      const fitness_t fit_j(evo_->fitness(pop[j]));
-      const fitness_t fit_sel(evo_->fitness(pop[sel]));
-      if (fit_j < fit_sel)
-        sel = j;
-    }
-
-    return sel;
-  }
-
-  ///
-  /// \param[in] parent indexes of the parents (in the population).
+  /// \param[in] parent indexes of the candidate parents.
+  ///                   The list is sorted in descending fitness score, so the
+  ///                   last element is the index of the worst individual of
+  ///                   the tournament.
   /// \param[in] offspring vector of the "children".
   /// \param[in] s statistical \a summary.
   ///
@@ -182,7 +150,19 @@ namespace vita
 
     const score_t score_off(evo_->score(offspring[0]));
 
-    const unsigned rep_idx(tournament(parent[0]));
+    // In old versions of Vita, the individual to be replaced was choosed with
+    // a ad-hoc negative tournament. Something like:
+    //
+    //   const index_t rep_idx(negative_tournament(parent[0]));
+    //
+    // Now we perform just one tournament for choosing the parents and the
+    // individual to be replaced is selected among the worst individuals of
+    // that tournament.
+    // The new way is simpler and more general. Note that when tournament_size
+    // is greater than 2 we perform a traditional selection / replacement
+    // scheme; if it is smaller we perform a family competition replacement
+    // (aka deterministic / probabilistic crowding).
+    const index_t rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < score_off.fitness);
 
@@ -202,10 +182,10 @@ namespace vita
     unsigned i;
 
     i = add(new family_competition_rp(evo));
-    assert(i == k_crowding);
+    assert(i - 1 == k_crowding);
 
     i = add(new tournament_rp(evo));
-    assert(i == k_tournament);
+    assert(i - 1 == k_tournament);
   }
 
   replacement_factory::~replacement_factory()
