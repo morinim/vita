@@ -149,6 +149,13 @@ namespace vita
         weight_sum += weight(*i);
       }
 
+      // Select a subset of the training examples.
+      // Training examples, contained in d, are partitioned into two subsets
+      // by multiple swaps (first subset: [0, count[,  second subset:
+      // [count, d.size()[).
+      // Note that the actual size of the selected subset (count) is not fixed
+      // and, in fact, it averages slightly above target_size (Gathercole and
+      // Ross felt that this might improve performance).
       const boost::uint64_t target_size(d->size() * 20 / 100);
       data::iterator base(d->begin());
       unsigned count(0);
@@ -179,6 +186,7 @@ namespace vita
       d->dataset(data::training, std::max(10u, count));
       prob_->get_evaluator()->clear();
 
+      // Selected training examples have their difficulties and ages reset.
       for (data::iterator i(d->begin()); i != d->end(); ++i)
       {
         i->difficulty = 0;

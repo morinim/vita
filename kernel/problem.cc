@@ -26,6 +26,7 @@ namespace vita
   ///
   problem::problem(fitness_t st) : env(false), threashold(st)
   {
+    assert(st <= 0.0);
     clear();
   }
 
