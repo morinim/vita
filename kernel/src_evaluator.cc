@@ -425,8 +425,8 @@ namespace vita
 
       const boost::any res(agent());
 
-      const double cut(1000);
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
+      const double cut(10000000);
       if (val > cut)
         val = cut;
       else if (val < -cut)
@@ -451,6 +451,7 @@ namespace vita
     std::vector<distribution<double>> gauss(dat_->classes());
     gaussian_distribution(ind, &gauss);
 
+    /*
     fitness_t d(0.0);
     for (unsigned i(0); i < gauss.size(); ++i)
       for (unsigned j(i+1); j < gauss.size(); ++j)
@@ -473,27 +474,92 @@ namespace vita
 
     assert(count);
 
+    d = double(ok) - double(count);
+    return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
+    */
+
+    fitness_t d(0.0);
+    unsigned ok(0), count(0);
+    for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
+    {
+      load_vars(*t);
+      const boost::any res((interpreter(ind))());
+      const double x(res.empty() ? 0.0 : interpreter::to_double(res));
+
+      double max_val(-1.0), sum(0.0);
+      unsigned probable_class(0);
+
+      for (unsigned i(0); i < dat_->classes(); ++i)
+      {
+        const double distance(std::fabs(x - gauss[i].mean));
+        const double variance(gauss[i].variance);
+
+        double val(0.0);
+        if (distance == 0.0)
+          val = 1.0;
+        else if (variance == 0.0)
+          val = 0.0;
+        else
+          val = std::exp(-distance * distance / (2 * variance));
+
+        if (val > max_val)
+        {
+          max_val = val;
+          probable_class = i;
+        }
+
+        sum += val;
+      }
+
+      if (probable_class == t->label())
+      {
+        ++ok;
+        d += (max_val - sum) / dat_->classes();
+      }
+      else
+        d -= 1.0;
+    }
+
     return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
   }
 
   ///
   /// \param[in] ind program used for classification.
-  /// \param[in] instance input value whose class we are interested in.
+  /// \param[in] example input value whose class we are interested in.
   /// \param[in] gauss parameters of the gaussian distributions.
   /// \return the class of \a instance.
   ///
   unsigned gaussian_evaluator::class_label(
     const individual &ind,
-    const data::value_type &instance,
+    const data::value_type &example,
     const std::vector<distribution<double>> &gauss)
   {
-    load_vars(instance);
+    load_vars(example);
 
-    const boost::any res( (interpreter(ind))() );
+    const boost::any res((interpreter(ind))());
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     assert(dat_->classes() == gauss.size());
 
+    double max_prob(0.0);
+    unsigned probable_class(0);
+
+    for (unsigned i(0); i < dat_->classes(); ++i)
+    {
+      const double distance(x - gauss[i].mean);
+      const double variance(gauss[i].variance);
+
+      const double prob(std::exp(-distance * distance / variance));
+      if (prob > max_prob)
+      {
+        max_prob = prob;
+        probable_class = i;
+      }
+    }
+
+    return probable_class;
+
+    /*
     double min_distance(std::fabs(x - gauss[0].mean));
     unsigned probable_class(0);
     for (unsigned i(0); i < dat_->classes(); ++i)
@@ -508,6 +574,7 @@ namespace vita
     }
 
     return probable_class;
+    */
   }
 
   ///
@@ -526,13 +593,13 @@ namespace vita
 
   ///
   ///
-  /// \param[in] instance data to be classified.
+  /// \param[in] example data to be classified.
   /// \return the class that include the \a instance.
   ///
   std::string gaussian_classifier::operator()(
-    const data::value_type &instance) const
+    const data::value_type &example) const
   {
-    return eva_->dat_->class_name(eva_->class_label(ind_, instance, gauss_));
+    return eva_->dat_->class_name(eva_->class_label(ind_, example, gauss_));
   }
 
   /*

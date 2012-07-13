@@ -47,7 +47,8 @@ namespace vita
     i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_, &vars_));
     assert(i == k_dyn_slot_evaluator);
 
-    //add_evaluator(std::make_shared<gaussian_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<gaussian_evaluator>(&dat_, &vars_));
+    assert(i == k_gaussian_evaluator);
   }
 
   ///
@@ -76,7 +77,7 @@ namespace vita
     const unsigned n_examples(dat_.open(data));
     if (n_examples > 0)
       set_evaluator(classes() > 1
-        ? k_dyn_slot_evaluator   // classification problem
+        ? k_gaussian_evaluator   // classification problem
         : k_sae_evaluator);      // symbolic regression problem
 
     unsigned n_symbols(0);
