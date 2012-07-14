@@ -3,7 +3,7 @@
  *  \file distribution.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,7 +17,7 @@
 #include <cmath>
 #include <map>
 
-#include "kernel/fitness.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
@@ -25,7 +25,7 @@ namespace vita
   /// \a distribution \c class simplify the calculation of statistics regarding
   /// a sequence (mean, variance, standard deviation, entropy, min and max).
   ///
-  template<class T>
+  template<class T = double>
   class distribution
   {
   public:
@@ -36,7 +36,7 @@ namespace vita
     void add(T);
 
     T standard_deviation() const;
-    double entropy() const;
+    T entropy() const;
 
     bool check() const;
 
@@ -56,7 +56,9 @@ namespace vita
     T    m2_;
   };
 
-
+  ///
+  /// Just the initial setup.
+  ///
   template<class T>
   distribution<T>::distribution()
   {
@@ -77,9 +79,9 @@ namespace vita
   }
 
   ///
-  /// \param[in] val new fitness upon which statistics are recalculated.
+  /// \param[in] val new value upon which statistics are recalculated.
   ///
-  /// Add a new fitness for the statistics.
+  /// Add a new value to the distribution.
   ///
   template<class T>
   void distribution<T>::add(T val)
@@ -105,14 +107,15 @@ namespace vita
   /// (http://en.wikipedia.org/wiki/Online_algorithm).
   ///
   template<class T>
-  double distribution<T>::entropy() const
+  T distribution<T>::entropy() const
   {
-    const double c(1.0/std::log(2.0));
+    const T c(1.0 / std::log(2.0));
 
-    double h(0.0);
+    T h(0.0);
     for (auto j(freq_.begin()); j != freq_.end(); ++j)
     {
-      const double p(static_cast<double>(j->second) / count);
+      const double p(static_cast<T>(j->second) / static_cast<T>(count));
+
       h -= p * std::log(p) * c;
     }
 
@@ -120,9 +123,9 @@ namespace vita
   }
 
   ///
-  /// \param[in] val new fitness upon which statistics are recalculated.
+  /// \param[in] val new value upon which statistics are recalculated.
   ///
-  /// Calculate running variance and cumulative average fitness. The
+  /// Calculate running variance and cumulative average of a set. The
   /// algorithm used is due to Knuth (Donald E. Knuth - The Art of Computer
   /// Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232.
   /// Addison-Wesley).
@@ -133,10 +136,10 @@ namespace vita
   void distribution<T>::update_variance(T val)
   {
     delta_ = val - mean;
-    mean += delta_/count;
+    mean += delta_ / count;
 
     // This expression uses the new value of mean.
-    m2_ += delta_ * (val-mean);
+    m2_ += delta_ * (val - mean);
 
     variance = m2_ / count;
   }
@@ -158,11 +161,11 @@ namespace vita
   {
     return
       (!std::isfinite(min) || !std::isfinite(mean) ||
-       min <= mean+float_epsilon) &&
+       min <= mean + float_epsilon) &&
       (!std::isfinite(max) || !std::isfinite(mean) ||
-       mean <= max+float_epsilon) &&
-      (std::isnan(variance) || 0.0 <= variance+float_epsilon);
+       mean <= max + float_epsilon) &&
+      (std::isnan(variance) || 0.0 <= variance + float_epsilon);
   }
-}  // Namespace vita
+}  // namespace vita
 
 #endif  // DISTRIBUTION_H
