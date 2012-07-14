@@ -49,6 +49,11 @@ namespace vita
   /// class (that calculates the output of an individual given an input
   /// vector).
   ///
+  /// Our convention is to convert raw fitness to standardized fitness. The
+  /// requirements for standardized fitness are:
+  /// \li bigger values represent better choices;
+  /// \li optimal value is 0.
+  ///
   class evaluator
   {
   public:

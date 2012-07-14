@@ -170,11 +170,11 @@ namespace vita
     friend class gaussian_classifier;
 
   private:
-    void gaussian_distribution(const individual &,
-                               std::vector<distribution<double>> *);
+    std::vector<distribution<double>> gaussian_distribution(const individual &);
 
     unsigned class_label(const individual &, const data::value_type &,
-                         const std::vector<distribution<double>> &);
+                         const std::vector<distribution<double>> &,
+                         double *, double *);
   };
 
   class gaussian_classifier : public classifier

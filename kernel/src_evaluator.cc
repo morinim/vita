@@ -402,13 +402,14 @@ namespace vita
 
   ///
   /// \param[in] ind individual used for classification.
-  /// \param[out] gauss
+  /// \return a vector containing the distribution parameters for each class
+  ///         of training set.
   ///
-  void gaussian_evaluator::gaussian_distribution(
-    const individual &ind,
-    std::vector<distribution<double>> *gauss)
+  std::vector<distribution<double>> gaussian_evaluator::gaussian_distribution(
+    const individual &ind)
   {
-    assert(dat_->classes() == gauss->size());
+    assert(dat_->classes() >= 2);
+    std::vector<distribution<double>> gauss(dat_->classes());
 
     assert(ind.check());
     interpreter agent(ind);
@@ -432,8 +433,10 @@ namespace vita
       else if (val < -cut)
         val = -cut;
 
-      (*gauss)[t->label()].add(val);
+      gauss[t->label()].add(val);
     }
+
+    return gauss;
   }
 
   ///
@@ -447,9 +450,7 @@ namespace vita
   ///
   score_t gaussian_evaluator::operator()(const individual &ind)
   {
-    assert(dat_->classes() >= 2);
-    std::vector<distribution<double>> gauss(dat_->classes());
-    gaussian_distribution(ind, &gauss);
+    std::vector<distribution<double>> gauss(gaussian_distribution(ind));
 
     /*
     fitness_t d(0.0);
@@ -482,41 +483,26 @@ namespace vita
     unsigned ok(0), count(0);
     for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
     {
-      load_vars(*t);
-      const boost::any res((interpreter(ind))());
-      const double x(res.empty() ? 0.0 : interpreter::to_double(res));
-
-      double max_val(-1.0), sum(0.0);
-      unsigned probable_class(0);
-
-      for (unsigned i(0); i < dat_->classes(); ++i)
-      {
-        const double distance(std::fabs(x - gauss[i].mean));
-        const double variance(gauss[i].variance);
-
-        double val(0.0);
-        if (distance == 0.0)
-          val = 1.0;
-        else if (variance == 0.0)
-          val = 0.0;
-        else
-          val = std::exp(-distance * distance / (2 * variance));
-
-        if (val > max_val)
-        {
-          max_val = val;
-          probable_class = i;
-        }
-
-        sum += val;
-      }
+      double max_val, sum;
+      const unsigned probable_class(class_label(ind, *t, gauss, &max_val,
+                                                &sum));
 
       if (probable_class == t->label())
       {
         ++ok;
+
+        // Note:
+        // * (sum - max_val) is the sum of the errors;
+        // * (max_val - sum) is the opposite (we want a standardized fitness);
+        // * (max_val - sum) / dat_->classes() is the opposite of the average
+        //   error.
         d += (max_val - sum) / dat_->classes();
       }
       else
+        // Note:
+        // * the maximum single class error is -1.0;
+        // * the maximum average class error is -1.0 / dat_->classes();
+        // So -1.0 is like to say that we have a complete failure.
         d -= 1.0;
     }
 
@@ -532,7 +518,8 @@ namespace vita
   unsigned gaussian_evaluator::class_label(
     const individual &ind,
     const data::value_type &example,
-    const std::vector<distribution<double>> &gauss)
+    const std::vector<distribution<double>> &gauss,
+    double *prob, double *prob_sum)
   {
     load_vars(example);
 
@@ -541,40 +528,33 @@ namespace vita
 
     assert(dat_->classes() == gauss.size());
 
-    double max_prob(0.0);
+    *prob = *prob_sum = 0.0;
     unsigned probable_class(0);
 
     for (unsigned i(0); i < dat_->classes(); ++i)
     {
-      const double distance(x - gauss[i].mean);
+      const double distance(std::abs(x - gauss[i].mean));
       const double variance(gauss[i].variance);
 
-      const double prob(std::exp(-distance * distance / variance));
-      if (prob > max_prob)
+      double p(0.0);
+      if (variance == 0.0)
+        if (distance == 0.0)
+          p = 1.0;
+        else
+          p = 0.0;
+      else
+        p = std::exp(-0.5 * distance * distance / variance);
+
+      if (p > *prob)
       {
-        max_prob = prob;
+        *prob = p;
         probable_class = i;
       }
+
+      *prob_sum += p;
     }
 
     return probable_class;
-
-    /*
-    double min_distance(std::fabs(x - gauss[0].mean));
-    unsigned probable_class(0);
-    for (unsigned i(0); i < dat_->classes(); ++i)
-    {
-      const double m(gauss[i].mean);
-      const double distance(std::fabs(x - m));
-      if (distance < min_distance)
-      {
-        min_distance = distance;
-        probable_class = i;
-      }
-    }
-
-    return probable_class;
-    */
   }
 
   ///
@@ -588,7 +568,7 @@ namespace vita
     assert(ind.check());
     assert(eva);
 
-    eva_->gaussian_distribution(ind, &gauss_);
+    gauss_ = eva_->gaussian_distribution(ind);
   }
 
   ///
@@ -599,7 +579,9 @@ namespace vita
   std::string gaussian_classifier::operator()(
     const data::value_type &example) const
   {
-    return eva_->dat_->class_name(eva_->class_label(ind_, example, gauss_));
+    double dummy;
+    return eva_->dat_->class_name(eva_->class_label(ind_, example, gauss_,
+                                                    &dummy, &dummy));
   }
 
   /*
