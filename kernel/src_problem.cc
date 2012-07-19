@@ -23,13 +23,9 @@
 namespace vita
 {
   ///
-  /// \param[in] st success threashold: when fitness is greater than this value,
-  ///               the datum is considered learned (matched, classified,
-  ///               resolved...)
-  ///
   /// New empty instance.
   ///
-  src_problem::src_problem(fitness_t st) : problem(st)
+  src_problem::src_problem()
   {
     clear();
 
@@ -371,9 +367,15 @@ namespace vita
   ///
   bool src_problem::check(bool verbose) const
   {
-    return
-      problem::check(verbose) &&
-      dat_.check() &&
-      vars_.size() == dat_.variables();
+    if (!problem::check(verbose))
+      return false;
+
+    if (!dat_.check())
+      return false;
+
+    if (vars_.size() == dat_.variables())
+      return false;
+
+    return true;
   }
 }  // namespace vita

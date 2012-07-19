@@ -37,7 +37,7 @@ const std::string vita_sr_version2(
   "Copyright 2011-2012 EOS di Manlio Morini (http://www.eosdev.it)"
 );
 
-vita::src_problem problem(-0.01);
+vita::src_problem problem;
 
 ///
 /// fix_parameters
@@ -84,6 +84,26 @@ void fix_parameters()
                 << *problem.env.tournament_size << " => "
                 << *problem.env.individuals << ")" << std::endl;
       problem.env.tournament_size = *problem.env.individuals;
+    }
+  }
+
+  if (!problem.threashold.fitness && !problem.threashold.accuracy)
+  {
+    if (problem.classes() > 1)  // classification
+    {
+      problem.threashold.fitness  = boost::none;
+      problem.threashold.accuracy =        0.99;
+
+      std::cout << "[WARNING] Adjusting accuracy threashold (=>"
+                << problem.threashold.accuracy << ")" << std::endl;
+    }
+    else  // symbolic regression
+    {
+      problem.threashold.fitness  =    -0.00001;
+      problem.threashold.accuracy = boost::none;
+
+      std::cout << "[WARNING] Adjusting fitness threashold (=>"
+                << problem.threashold.fitness << ")" << std::endl;
     }
   }
 }
@@ -517,13 +537,29 @@ namespace ui
   ///
   /// \param[in] v the threashold value
   ///
-  /// When the output value of a run is greater than \c v it's a scored as a
-  /// success.
+  /// if the output value of a run is greater than \a v it's a scored as a
+  /// success. The output value considered is the fitness when \a v is a simple
+  /// number or the accuracy when \a v is a percentage
   ///
-  void threashold(double v)
+  void threashold(const std::string &v)
   {
-    assert(v <= 0.0);
-    problem.threashold = v;
+    problem.threashold.accuracy = boost::none;
+    problem.threashold.fitness  = boost::none;
+
+    if (*v.rbegin() == '%')
+    {
+      const double accuracy(std::stod(v) / 100.0);
+      assert(0.0 <= accuracy && accuracy <= 1.0);
+
+      problem.threashold.accuracy = accuracy;
+    }
+    else
+    {
+      const vita::fitness_t fitness(std::stod(v));
+      assert(fitness <= 0.0);
+
+      problem.threashold.fitness = fitness;
+    }
 
     if (verbose)
       std::cout << "Threashold is " << v << std::endl;
@@ -660,7 +696,7 @@ int parse_command_line(int argc, char *const argv[])
        "saves a summary of the runs")
       ("stat-arl", po::value<std::string>()->notifier(&ui::stat_arl),
        "saves the list of active ADFs")
-      ("threashold", po::value<double>()->notifier(&ui::threashold),
+      ("threashold", po::value<std::string>()->notifier(&ui::threashold),
        "sets the success threashold for a run");
 
     ui::cmdl_opt.add(generic).add(data).add(config).add(evolution).

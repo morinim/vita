@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011 EOS di Manlio Morini.
+#  Copyright (C) 2011, 2012 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -24,8 +24,8 @@ verbose = False
 
 def compare_file(files, scores):
     avg_depth_found = dict()
-    mean_fitness = dict()
-    standard_deviation = dict()
+    f_mean = dict()
+    f_deviation = dict()
     success_rate = dict()
 
     for f in files:
@@ -36,30 +36,29 @@ def compare_file(files, scores):
             print("Missing success rate in file {0}.".format(f))
         else:
             success_rate[f] = float(summary.find("success_rate").text)
+        if summary.find("mean_fitness") is None:
+            print("Missing mean fitness in file {0}.".format(f))
+        else:
+            f_mean[f] = float(summary.find("mean_fitness").text)
+        if summary.find("standard_deviation") is None:
+            print("Missing standard deviation in file {0}.".format(f))
+        else:
+            f_deviation[f] = float(summary.find("standard_deviation").text)
 
         best = summary.find("best")
         if best.find("avg_depth_found") is None:
             print("Missing solution average depth in file {0}.".format(f))
         else:
             avg_depth_found[f] = int(best.find("avg_depth_found").text)
-        if best.find("mean_fitness") is None:
-            print("Missing mean fitness in file {0}.".format(f))
-        else:
-            mean_fitness[f] = float(best.find("mean_fitness").text)
-        if best.find("standard_deviation") is None:
-            print("Missing standard deviation in file {0}.".format(f))
-        else:
-            standard_deviation[f] = float(best.find("standard_deviation").text)
 
         fn = f if len(f) <= 32 else "..."+f[-29:]
-        if mean_fitness[f] < -1000000 or standard_deviation[f] > 1000000:
+        if f_mean[f] < -1000000 or f_deviation[f] > 1000000:
             format_str = format_string_row2
         else:
             format_str = format_string_row
 
         print(format_str.format(fn, success_rate[f],
-                                avg_depth_found[f], mean_fitness[f],
-                                standard_deviation[f]))
+                                avg_depth_found[f], f_mean[f], f_deviation[f]))
 
     l = len(files)
     for f in files:
@@ -80,8 +79,8 @@ def compare_file(files, scores):
     else:
         good = [best[0]]
         for f in best[1:]:
-            mff = round(mean_fitness[f], 4)
-            mfg = round(mean_fitness[good[0]], 4)
+            mff = round(f_mean[f], 4)
+            mfg = round(f_mean[good[0]], 4)
             if mff > mfg:
                 good = [f]
             elif mff == mfg:

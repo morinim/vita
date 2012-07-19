@@ -267,12 +267,18 @@ namespace vita
   ///
   const individual &search::run(bool verbose, unsigned n)
   {
+    assert(prob_->threashold.fitness || prob_->threashold.accuracy);
+
+    // This is used in comparisons between fitnesses: we considered values
+    // distinct only when their distance is greater than tolerance.
+    const fitness_t tolerance(0.0001);
+
     summary overall_summary;
     distribution<fitness_t> fd;
 
     unsigned solutions(0);
 
-    unsigned best_run(0);
+    std::list<unsigned> best_runs;
     score_t run_best_score;
 
     // For std::placeholders and std::bind see:
@@ -315,17 +321,44 @@ namespace vita
       if (run == 0)
         overall_summary.best = {s.best->ind, run_best_score};
 
-      const bool found(run_best_score.fitness >= prob_->threashold);
-      if (found)
+      // We can use accuracy or fitness to identify successfully runs (it
+      // depends on prob_->threashold).
+      const bool solution_found(
+        prob_->threashold.fitness ?
+        run_best_score.fitness >= *prob_->threashold.fitness :
+        run_best_score.accuracy >= *prob_->threashold.accuracy);
+
+      if (solution_found)
       {
         ++solutions;
         overall_summary.last_imp += s.last_imp;
       }
 
-      if (overall_summary.best->score.fitness < run_best_score.fitness)
+      const bool best(
+        prob_->threashold.fitness ?
+
+        run_best_score.fitness + tolerance >=
+        overall_summary.best->score.fitness :
+
+        run_best_score.accuracy >= overall_summary.best->score.accuracy);
+
+      if (best)
       {
-        overall_summary.best = {s.best->ind, run_best_score};
-        best_run             =                           run;
+        const bool new_best(
+          prob_->threashold.fitness ?
+
+          run_best_score.fitness > overall_summary.best->score.fitness +
+          tolerance :
+
+          run_best_score.accuracy > overall_summary.best->score.accuracy);
+
+        if (new_best)
+        {
+          overall_summary.best = {s.best->ind, run_best_score};
+          best_runs.clear();
+        }
+
+        best_runs.push_back(run);
       }
 
       if (std::isfinite(run_best_score.fitness))
@@ -333,17 +366,17 @@ namespace vita
 
       overall_summary.ttable_hits += s.ttable_hits;
       overall_summary.ttable_probes += s.ttable_probes;
-      overall_summary.speed = (overall_summary.speed * run + s.speed) /
-                              (run + 1);
+      overall_summary.speed = overall_summary.speed +
+        (s.speed - overall_summary.speed) / (run + 1);
 
-      if (env_.arl && best_run == run)
+      if (env_.arl && best_runs.front() == run)
       {
         env_.sset.reset_adf_weights();
         arl(s.best->ind, evo);
       }
 
       if (env_.stat_summary)
-        log(overall_summary, fd, solutions, best_run, n);
+        log(overall_summary, fd, best_runs, solutions, n);
     }
 
     return overall_summary.best->ind;
@@ -353,12 +386,13 @@ namespace vita
   /// \param[in] run_sum summary information regarding the search.
   /// \param[in] fd statistics about population fitness.
   /// \param[in] solutions number of solutions found.
-  /// \param[in] best_run best run of the search.
+  /// \param[in] best_runs list of the best runs of the search.
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
   ///
   void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
-                   unsigned solutions, unsigned best_run, unsigned runs) const
+                   const std::list<unsigned> &best_runs, unsigned solutions,
+                   unsigned runs) const
   {
     std::ostringstream best_list, best_tree, best_graph;
     run_sum.best->ind.list(best_list);
@@ -372,16 +406,17 @@ namespace vita
     pt.put(summary+"success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
     pt.put(summary+"speed", run_sum.speed);
+    pt.put(summary+"mean_fitness", fd.mean);
+    pt.put(summary+"standard_deviation", fd.standard_deviation());
     pt.put(summary+"best.fitness", run_sum.best->score.fitness);
     pt.put(summary+"best.accuracy", run_sum.best->score.accuracy);
-    pt.put(summary+"best.times_reached", solutions);
-    pt.put(summary+"best.run", best_run);
+    pt.put(summary+"best.times_reached", best_runs.size());
     pt.put(summary+"best.avg_depth_found", solutions
            ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
                                    static_cast<double>(solutions))
            : 0);
-    pt.put(summary+"best.mean_fitness", fd.mean);
-    pt.put(summary+"best.standard_deviation", fd.standard_deviation());
+    for (auto p(best_runs.cbegin()); p != best_runs.cend(); ++p)
+      pt.add(summary+"best.runs.run", *p);
     pt.put(summary+"best.individual.tree", best_tree.str());
     pt.put(summary+"best.individual.list", best_list.str());
     pt.put(summary+"best.individual.graph", best_graph.str());

@@ -18,7 +18,7 @@
 
 #include "kernel/data.h"
 #include "kernel/environment.h"
-#include "kernel/fitness.h"
+#include "kernel/score.h"
 
 namespace vita
 {
@@ -30,7 +30,7 @@ namespace vita
   class problem
   {
   public:
-    explicit problem(fitness_t = -0.00001);
+    problem();
 
     unsigned add_evaluator(evaluator_ptr);
     evaluator *get_evaluator();
@@ -43,7 +43,16 @@ namespace vita
 
   public:  // Public data members.
     environment env;
-    fitness_t threashold;
+
+    /// \a threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples.
+    /// As a comparison term fitness is used (if it is defined), otherwise
+    /// accuracy (they cannot both be set to boost::none).
+    struct
+    {
+      boost::optional<fitness_t> fitness;
+      boost::optional<double>   accuracy;
+    } threashold;
 
   protected:  // Private data members.
     std::vector<evaluator_ptr> evaluators_;

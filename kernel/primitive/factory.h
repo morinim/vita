@@ -52,15 +52,16 @@ namespace vita
   public:
     explicit constant(bool c, category_t t = 0)
       : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight*2), val(c) {}
+                 default_weight * 2), val(c) {}
     explicit constant(double c, category_t t = 0)
       : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight*2), val(c) {}
+                 default_weight * 2), val(c) {}
     explicit constant(int c, category_t t = 0)
       : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight*2), val(c) {}
+                 default_weight * 2), val(c) {}
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\"" + c + "\"", t, false, false, default_weight*2), val(c) {}
+      : terminal("\"" + c + "\"", t, false, false, default_weight * 2),
+        val(c) {}
 
     /// The argument is not used: the value of a constant is stored with the
     /// class, we don't need an interpreter to discover it.
