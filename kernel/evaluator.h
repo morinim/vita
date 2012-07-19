@@ -14,31 +14,12 @@
 #if !defined(EVALUATOR_H)
 #define      EVALUATOR_H
 
-#include "kernel/fitness.h"
 #include "kernel/random.h"
+#include "kernel/score.h"
 
 namespace vita
 {
   class individual;
-
-  ///
-  /// The fitness and the accuracy (percentage) of an individual.
-  ///
-  struct score_t
-  {
-    score_t() {}
-
-    score_t(fitness_t f, double a) : fitness(f), accuracy(a)
-    {
-      assert(a <= 1.0);  // accuracy could be less than 0.0 (meaning N.A.)
-    }
-
-    bool operator==(const score_t &s) const
-    { return fitness == s.fitness && accuracy == s.accuracy; }
-
-    fitness_t fitness;
-    double   accuracy;
-  };
 
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
