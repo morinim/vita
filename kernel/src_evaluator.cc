@@ -408,7 +408,7 @@ namespace vita
   std::vector<distribution<double>> gaussian_evaluator::gaussian_distribution(
     const individual &ind)
   {
-    assert(dat_->classes() >= 2);
+    assert(dat_->classes() > 1);
     std::vector<distribution<double>> gauss(dat_->classes());
 
     assert(ind.check());
@@ -479,6 +479,8 @@ namespace vita
     return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
     */
 
+    assert(dat_->classes() > 1);
+
     fitness_t d(0.0);
     unsigned ok(0), count(0);
     for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
@@ -494,16 +496,20 @@ namespace vita
         // Note:
         // * (sum - max_val) is the sum of the errors;
         // * (max_val - sum) is the opposite (we want a standardized fitness);
-        // * (max_val - sum) / dat_->classes() is the opposite of the average
-        //   error.
-        d += (max_val - sum) / dat_->classes();
+        // * (max_val - sum) / (dat_->classes() - 1) is the opposite of the
+        //   average error;
+        // * (max_val - 1.0) is the uncertainty about the right class;
+        // * 0.001 is a scaling factor.
+        d += (max_val - sum) / (dat_->classes() - 1) + 0.001 * (max_val - 1.0);
       }
       else
+      {
         // Note:
         // * the maximum single class error is -1.0;
         // * the maximum average class error is -1.0 / dat_->classes();
         // So -1.0 is like to say that we have a complete failure.
         d -= 1.0;
+      }
     }
 
     return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
