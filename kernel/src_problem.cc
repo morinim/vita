@@ -373,7 +373,7 @@ namespace vita
     if (!dat_.check())
       return false;
 
-    if (vars_.size() == dat_.variables())
+    if (vars_.size() != dat_.variables())
       return false;
 
     return true;
