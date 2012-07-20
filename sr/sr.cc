@@ -99,7 +99,7 @@ void fix_parameters()
     }
     else  // symbolic regression
     {
-      problem.threashold.fitness  =    -0.00001;
+      problem.threashold.fitness  =     -0.0001;
       problem.threashold.accuracy = boost::none;
 
       std::cout << "[WARNING] Adjusting fitness threashold (=>"

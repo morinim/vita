@@ -304,7 +304,7 @@ namespace vita
         const boost::any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const base_t ret(std::log(dbl::cast(i->eval(0))));
+        const base_t ret(std::log(dbl::cast(ev0)));
         if (!std::isfinite(ret))  return boost::any();
 
         return ret;
