@@ -3,7 +3,7 @@
  *  \file int.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -14,10 +14,10 @@
 #if !defined(INT_PRIMITIVE_H)
 #define      INT_PRIMITIVE_H
 
-#include <boost/any.hpp>
-
 #include <limits>
 #include <string>
+
+#include <boost/any.hpp>
 
 #include "kernel/function.h"
 #include "kernel/interpreter.h"
@@ -36,6 +36,15 @@ namespace vita
   /// integers do no result in signed overflow
   namespace integer
   {
+    typedef int base_t;
+
+    ///
+    /// \param[in] v the value that must be casted to base type (\c base_t).
+    ///
+    /// Just a simple shortcut.
+    inline
+    base_t cast(const boost::any &v) { return boost::any_cast<base_t>(v); }
+
     ///
     /// Integer ephemeral random constant.
     /// \see dbl::number
@@ -52,8 +61,7 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      boost::any eval(interpreter *i) const
-      { return boost::any_cast<int>(i->eval()); }
+      boost::any eval(interpreter *i) const { return integer::cast(i->eval()); }
 
     private:  // Private data members.
       const int min, upp;
@@ -68,13 +76,13 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
-        if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<int>::max() - v1))
-          return std::numeric_limits<int>::max();
-        if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<int>::min() - v1))
-          return std::numeric_limits<int>::min();
+        if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
+          return std::numeric_limits<base_t>::max();
+        if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<base_t>::min() - v1))
+          return std::numeric_limits<base_t>::min();
 
         return v0 + v1;
       }
@@ -88,10 +96,10 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<int>::min() && (v1 == -1)))
+        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return v0;
         else
           return v1 / v0;
@@ -106,8 +114,8 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 == v1)
           return i->eval(2);
@@ -124,8 +132,8 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 < v1)
           return i->eval(2);
@@ -141,7 +149,7 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
+        const base_t v0(integer::cast(i->eval(0)));
 
         if (v0 == 0)
           return i->eval(1);
@@ -158,10 +166,10 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<int>::min() && (v1 == -1)))
+        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return v1;
         else
           return v0 % v1;
@@ -177,34 +185,34 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 > 0)
           if (v1 > 0)
           {
             assert(v0 > 0 && v1 > 0);
-            if (v0 > std::numeric_limits<int>::max() / v1)
-              return std::numeric_limits<int>::max();
+            if (v0 > std::numeric_limits<base_t>::max() / v1)
+              return std::numeric_limits<base_t>::max();
           }
           else  // v1 is non-positive
           {
             assert(v0 > 0 && v1 <= 0);
-            if (v1 < std::numeric_limits<int>::min() / v0)
-              return std::numeric_limits<int>::min();
+            if (v1 < std::numeric_limits<base_t>::min() / v0)
+              return std::numeric_limits<base_t>::min();
           }
         else  // v0 is non-positive
           if (v1 > 0)
           {
             assert(v0 <= 0 && v1 > 0);
-            if (v0 < std::numeric_limits<int>::min() / v1)
-              return std::numeric_limits<int>::min();
+            if (v0 < std::numeric_limits<base_t>::min() / v1)
+              return std::numeric_limits<base_t>::min();
           }
           else  // v1 is non-positive
           {
             assert(v0 <= 0 && v1 <= 0);
-            if (v0 != 0 && v1 < std::numeric_limits<int>::max() / v0)
-              return std::numeric_limits<int>::max();
+            if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
+              return std::numeric_limits<base_t>::max();
           }
 
         return v0 * v1;
@@ -219,12 +227,12 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 < 0 || v1 < 0 ||
-            v1 >= static_cast<int>(sizeof(int) * CHAR_BIT) ||
-            v0 > std::numeric_limits<int>::max() >> v1)
+            v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
+            v0 > std::numeric_limits<base_t>::max() >> v1)
           return v0;
 
         return v0 << v1;
@@ -239,13 +247,13 @@ namespace vita
 
       boost::any eval(interpreter *i) const
       {
-        const int v0(boost::any_cast<int>(i->eval(0)));
-        const int v1(boost::any_cast<int>(i->eval(1)));
+        const base_t v0(integer::cast(i->eval(0)));
+        const base_t v1(integer::cast(i->eval(1)));
 
-        if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<int>::min() + v1))
-          return std::numeric_limits<int>::min();
-        if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<int>::max() + v1))
-          return std::numeric_limits<int>::max();
+        if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
+          return std::numeric_limits<base_t>::min();
+        if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<base_t>::max() + v1))
+          return std::numeric_limits<base_t>::max();
 
         return v0 - v1;
       }

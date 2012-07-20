@@ -14,9 +14,9 @@
 #if !defined(DOUBLE_PRIMITIVE_H)
 #define      DOUBLE_PRIMITIVE_H
 
-#include <boost/any.hpp>
-
 #include <string>
+
+#include <boost/any.hpp>
 
 #include "kernel/function.h"
 #include "kernel/interpreter.h"
@@ -40,18 +40,11 @@ namespace vita
     typedef double base_t;
 
     ///
-    /// \param[in] v the value that must be casted to base type.
+    /// \param[in] v the value that must be casted to base type (\c base_t).
     ///
     /// Just a simple shortcut.
     inline
-    base_t cast(const boost::any &v)
-    {
-#if defined(NDEBUG)
-      return boost::unsafe_any_cast<base_t>(v);
-#else
-      return boost::any_cast<base_t>(v);
-#endif
-    }
+    base_t cast(const boost::any &v) { return boost::any_cast<base_t>(v); }
 
     ///
     /// It is assumed that the creation of floating-point constants is
