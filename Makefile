@@ -89,7 +89,7 @@ clean:
 	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
 	@find ./test/ -executable -not -name "*.*" -type f -delete -print
 	@find ./examples/ -executable -not -name "*.*" -type f -delete -print
-	@rm -f sr/sr kernel/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
+	@rm -f sr/sr kernel/*.o kernel/primitive/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
 
 .phony:	backup
 backup:
