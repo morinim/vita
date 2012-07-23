@@ -14,13 +14,15 @@
 #if !defined(PRIMITIVE_FACTORY_H)
 #define      PRIMITIVE_FACTORY_H
 
+#include <map>
+
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/variant.hpp>
 
-#include <map>
-
+#include "kernel/data.h"
 #include "kernel/terminal.h"
 
 namespace vita
@@ -35,10 +37,10 @@ namespace vita
     explicit variable(const std::string &name, category_t t = 0)
       : terminal(name, t, true) {}
 
-    boost::any eval(vita::interpreter *) const { return val; }
+    boost::any eval(vita::interpreter *) const;
 
   public:  // Data members.
-    boost::any val;
+    data::example::value_t val;
   };
 
   class constant : public terminal
@@ -64,7 +66,7 @@ namespace vita
         val(c) {}
 
     /// The argument is not used: the value of a constant is stored with the
-    /// class, we don't need an interpreter to discover it.
+    /// object, we don't need an interpreter to discover it.
     boost::any eval(interpreter *) const { return val; }
 
   private:  // Data members.

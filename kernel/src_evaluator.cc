@@ -31,7 +31,7 @@ namespace vita
   ///
   /// \param[in] d values to be stored in the input variables.
   ///
-  void src_evaluator::load_vars(const data::value_type &d)
+  void src_evaluator::load_vars(const data::example &d)
   {
     assert(d.input.size() == var_->size());
 
@@ -129,7 +129,7 @@ namespace vita
       err = std::pow(100.0, ++(*illegals));
     else
       err = std::fabs(interpreter::to_double(res) -
-                      interpreter::to_double(t->output));
+                      data::cast<double>(t->output));
 
     if (err > 0.1)
       ++t->difficulty;
@@ -162,7 +162,7 @@ namespace vita
       err = std::pow(100.0, ++(*illegals));
     else
     {
-      err = interpreter::to_double(res) - interpreter::to_double(t->output);
+      err = interpreter::to_double(res) - data::cast<double>(t->output);
       err *= err;
     }
 
@@ -194,7 +194,7 @@ namespace vita
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
-                             interpreter::to_double(t->output)) >=
+                             data::cast<double>(t->output)) >=
                    float_epsilon);
 
     if (err)
@@ -377,7 +377,7 @@ namespace vita
   /// \return the class that include the \a instance.
   ///
   std::string dyn_slot_classifier::operator()(
-    const data::value_type &instance) const
+    const data::example &instance) const
   {
     eva_->load_vars(instance);
 
@@ -523,7 +523,7 @@ namespace vita
   ///
   unsigned gaussian_evaluator::class_label(
     const individual &ind,
-    const data::value_type &example,
+    const data::example &example,
     const std::vector<distribution<double>> &gauss,
     double *prob, double *prob_sum)
   {
@@ -583,7 +583,7 @@ namespace vita
   /// \return the class that include the \a instance.
   ///
   std::string gaussian_classifier::operator()(
-    const data::value_type &example) const
+    const data::example &example) const
   {
     double dummy;
     return eva_->dat_->class_name(eva_->class_label(ind_, example, gauss_,

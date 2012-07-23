@@ -30,7 +30,7 @@ namespace vita
   public:
     src_evaluator(data *, std::vector<variable_ptr> *);
 
-    void load_vars(const data::value_type &);
+    void load_vars(const data::example &);
 
   protected:
     data                      *dat_;
@@ -148,7 +148,7 @@ namespace vita
   public:
     dyn_slot_classifier(const individual &, dyn_slot_evaluator *);
 
-    std::string operator()(const data::value_type &) const;
+    std::string operator()(const data::example &) const;
 
   private:
     dyn_slot_evaluator             *eva_;
@@ -172,7 +172,7 @@ namespace vita
   private:
     std::vector<distribution<double>> gaussian_distribution(const individual &);
 
-    unsigned class_label(const individual &, const data::value_type &,
+    unsigned class_label(const individual &, const data::example &,
                          const std::vector<distribution<double>> &,
                          double *, double *);
   };
@@ -182,7 +182,7 @@ namespace vita
   public:
     gaussian_classifier(const individual &, gaussian_evaluator *);
 
-    std::string operator()(const data::value_type &) const;
+    std::string operator()(const data::example &) const;
 
   private:
     gaussian_evaluator                 *eva_;

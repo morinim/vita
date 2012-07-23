@@ -3,7 +3,7 @@
  *  \file data.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -187,7 +187,7 @@ namespace vita
   /// \param[in] f the comparer used for sorting.
   ///
   void data::sort(
-    std::function<bool (const value_type &, const value_type &)> f)
+    std::function<bool (const example &, const example &)> f)
   {
     dataset_[active_dataset_].sort(f);
     end_ = dataset_[active_dataset_].end();
@@ -380,14 +380,14 @@ namespace vita
   ///
   /// convert("123.1", sym_double) == 123.1f
   ///
-  boost::any data::convert(const std::string &s, domain_t d)
+  data::example::value_t data::convert(const std::string &s, domain_t d)
   {
     switch (d)
     {
-    case d_bool:   return   boost::lexical_cast<bool>(s);
-    case d_int:    return    boost::lexical_cast<int>(s);
-    case d_double: return boost::lexical_cast<double>(s);
-    case d_string: return                              s;
+    case d_bool:  return   data::example::value_t(boost::lexical_cast<bool>(s));
+    case d_int:   return    data::example::value_t(boost::lexical_cast<int>(s));
+    case d_double:return data::example::value_t(boost::lexical_cast<double>(s));
+    case d_string:return                              data::example::value_t(s);
     default: throw boost::bad_lexical_cast();
     }
   }
@@ -558,7 +558,7 @@ namespace vita
     BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
-        value_type instance;
+        example instance;
 
         unsigned index(0);
         for (auto v(bi.second.begin()); v != bi.second.end(); ++v, ++index)
@@ -573,7 +573,8 @@ namespace vita
                 // Strings could be used as label for classes, but integers
                 // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
-                  instance.output = encode(v->second.data(), &classes_map_);
+                  instance.output =
+                    static_cast<int>(encode(v->second.data(), &classes_map_));
                 else
                   instance.output = convert(v->second.data(), domain);
               }
@@ -651,7 +652,7 @@ namespace vita
 
       if (record.size() == size)
       {
-        value_type instance;
+        example instance;
 
         if (!parsed)
           classification = !is_number(record[0]);
@@ -693,7 +694,8 @@ namespace vita
             if (field == 0)  // output value
             {
               if (classification)
-                instance.output = encode(record[field], &classes_map_);
+                instance.output =
+                  static_cast<int>(encode(record[field], &classes_map_));
               else
                 instance.output = convert(record[field], categories_[c].domain);
             }

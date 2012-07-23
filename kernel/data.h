@@ -3,7 +3,7 @@
  *  \file data.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -14,13 +14,13 @@
 #if !defined(DATA_H)
 #define      DATA_H
 
-#include <boost/any.hpp>
-
 #include <list>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+#include <boost/variant.hpp>
 
 #include "kernel/distribution.h"
 
@@ -41,7 +41,7 @@ namespace vita
   {
   public:  // Structures.
     ///
-    /// \a value_type stores a single element of the data set (instance). The
+    /// \a example stores a single element of the data set. The
     /// \c struct consists of an input vector (\a input) and an answer value
     /// (\a output). Depending on the kind of problem, \a output stores:
     /// \li a numeric value (symbolic regression problem);
@@ -52,21 +52,26 @@ namespace vita
     /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
     /// Ross).
     ///
-    struct value_type
+    struct example
     {
-      value_type() { clear(); }
+      typedef boost::variant<bool, int, double, std::string> value_t;
 
-      std::vector<boost::any> input;
-      boost::any             output;
+      example() { clear(); }
+
+      std::vector<value_t> input;
+      value_t             output;
 
       boost::uint64_t difficulty;
       unsigned               age;
 
-      unsigned label() const { return boost::any_cast<unsigned>(output); }
+      unsigned label() const
+      { return static_cast<unsigned>(boost::get<int>(output)); }
 
       void clear()
-      { input.clear(); output = boost::any(); difficulty = 0; age = 0; }
+      { input.clear(); output = value_t(); difficulty = 0; age = 0; }
     };
+
+    template<class T> static T cast(const example::value_t &);
 
     /// Informations about a "column" of the dataset.
     struct column
@@ -104,10 +109,10 @@ namespace vita
     };
 
   public:
-    /// value_type *
-    typedef std::list<value_type>::iterator iterator;
-    /// const value_type *
-    typedef std::list<value_type>::const_iterator const_iterator;
+    /// example *
+    typedef std::list<example>::iterator iterator;
+    /// const example *
+    typedef std::list<example>::const_iterator const_iterator;
 
   public:  // Construction, convenience.
     data();
@@ -127,7 +132,7 @@ namespace vita
 
     void clear();
 
-    void sort(std::function<bool (const value_type &, const value_type &)>);
+    void sort(std::function<bool (const example &, const example &)>);
 
     category_t get_category(const std::string &) const;
     const category &get_category(category_t) const;
@@ -145,7 +150,7 @@ namespace vita
     static const std::map<const std::string, domain_t> from_weka;
 
   private:
-    static boost::any convert(const std::string &, domain_t);
+    static example::value_t convert(const std::string &, domain_t);
     static unsigned encode(const std::string &,
                            std::map<std::string, unsigned> *);
     static bool is_number(const std::string &);
@@ -174,7 +179,7 @@ namespace vita
     // * a training set used directly for learning;
     // * a validation set for controlling overfitting and measuring the
     //   performance of an individual.
-    std::list<value_type> dataset_[2];
+    std::list<example> dataset_[2];
 
     // Used to choose the data we want to operate on (training / validation
     // set).
@@ -184,6 +189,18 @@ namespace vita
     // Used to select a subset of the active dataset.
     data::const_iterator end_;
   };
+
+  template<class T>
+  T data::cast(const example::value_t &e)
+  {
+    switch (e.which())
+    {
+    case 0:  return static_cast<T>(boost::get<bool>(e));
+    case 1:  return static_cast<T>(boost::get<int>(e));
+    case 2:  return static_cast<T>(boost::get<double>(e));
+    default: return static_cast<T>(0.0);
+    }
+  }
 }  // namespace vita
 
 #endif  // DATA_H

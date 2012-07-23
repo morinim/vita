@@ -3,7 +3,7 @@
  *  \file classifier.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -27,7 +27,7 @@ namespace vita
     explicit classifier(const individual &ind) : ind_(ind)
     { assert(ind.check()); }
 
-    virtual std::string operator()(const data::value_type &) const = 0;
+    virtual std::string operator()(const data::example &) const = 0;
 
   protected:
     individual ind_;

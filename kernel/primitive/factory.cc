@@ -3,7 +3,7 @@
  *  \file factory.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -18,6 +18,23 @@
 
 namespace vita
 {
+  ///
+  /// \return the value of the variable (as a \c boost::any).
+  ///
+  /// The argument is not used: the value of a variable is stored with the
+  /// object and we don't need an interpreter to discover it.
+  ///
+  boost::any variable::eval(vita::interpreter *) const
+  {
+    switch (val.which())
+    {
+    case 0:  return boost::any(boost::get<bool>(val));
+    case 1:  return boost::any(boost::get<int>(val));
+    case 2:  return boost::any(boost::get<double>(val));
+    default: return boost::any(boost::get<std::string>(val));
+    }
+  }
+
   ///
   /// \return an instance of the singleton object symbol_factory.
   ///
