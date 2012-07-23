@@ -128,8 +128,8 @@ namespace vita
 
     if (d)
     {
-      std::function<boost::uint64_t (const data::value_type &)>
-        weight([](const data::value_type &v) -> boost::uint64_t
+      std::function<boost::uint64_t (const data::example &)>
+        weight([](const data::example &v) -> boost::uint64_t
                {
                  return v.difficulty + v.age * v.age * v.age;
                });
@@ -174,7 +174,7 @@ namespace vita
       }
 
       //d->sort(
-      //  [](const data::value_type &v1, const data::value_type &v2) -> bool
+      //  [](const data::example &v1, const data::example &v2) -> bool
       //  {
       //    double w1(v1.difficulty + v1.age * v1.age * v1.age);
       //    double w2(v2.difficulty + v2.age * v2.age * v2.age);
@@ -278,7 +278,7 @@ namespace vita
 
     unsigned solutions(0);
 
-    std::list<unsigned> best_runs;
+    std::list<unsigned> good_runs;
     score_t run_best_score;
 
     // For std::placeholders and std::bind see:
@@ -334,7 +334,10 @@ namespace vita
         overall_summary.last_imp += s.last_imp;
       }
 
-      const bool best(
+      // Good is true when the present individual/solution satisfies (is
+      // greater than OR equal to) the current threashold criterion (accuracy
+      // OR fitness).
+      const bool good(
         prob_->threashold.fitness ?
 
         run_best_score.fitness + tolerance >=
@@ -342,23 +345,34 @@ namespace vita
 
         run_best_score.accuracy >= overall_summary.best->score.accuracy);
 
-      if (best)
+      if (good)
       {
-        const bool new_best(
-          prob_->threashold.fitness ?
+        // Well, we have found a good individual, is it a new best?
 
-          run_best_score.fitness > overall_summary.best->score.fitness +
-          tolerance :
-
-          run_best_score.accuracy > overall_summary.best->score.accuracy);
-
-        if (new_best)
+        if (run_best_score.fitness > overall_summary.best->score.fitness +
+            tolerance)
         {
-          overall_summary.best = {s.best->ind, run_best_score};
-          best_runs.clear();
+          overall_summary.best->score.fitness = run_best_score.fitness;
+
+          if (prob_->threashold.fitness)
+          {
+            overall_summary.best->ind = s.best->ind;
+            good_runs.clear();
+          }
         }
 
-        best_runs.push_back(run);
+        if (run_best_score.accuracy > overall_summary.best->score.accuracy)
+        {
+          overall_summary.best->score.accuracy = run_best_score.accuracy;
+
+          if (prob_->threashold.accuracy)
+          {
+            overall_summary.best->ind = s.best->ind;
+            good_runs.clear();
+          }
+        }
+
+        good_runs.push_back(run);
       }
 
       if (std::isfinite(run_best_score.fitness))
@@ -369,14 +383,14 @@ namespace vita
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);
 
-      if (env_.arl && best_runs.front() == run)
+      if (env_.arl && good_runs.front() == run)
       {
         env_.sset.reset_adf_weights();
         arl(s.best->ind, evo);
       }
 
       if (env_.stat_summary)
-        log(overall_summary, fd, best_runs, solutions, n);
+        log(overall_summary, fd, good_runs, solutions, n);
     }
 
     return overall_summary.best->ind;
