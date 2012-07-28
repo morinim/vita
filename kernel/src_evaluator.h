@@ -17,8 +17,8 @@
 #include <vector>
 
 #include "kernel/classifier.h"
-#include "kernel/data.h"
 #include "kernel/evaluator.h"
+#include "kernel/src_variable.h"
 #include "kernel/primitive/factory.h"
 
 namespace vita

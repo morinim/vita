@@ -18,7 +18,6 @@
 #include "kernel/src_problem.h"
 #include "kernel/individual.h"
 #include "kernel/src_evaluator.h"
-#include "kernel/primitive/factory.h"
 
 namespace vita
 {

@@ -20,29 +20,11 @@
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/variant.hpp>
 
-#include "kernel/data.h"
 #include "kernel/terminal.h"
 
 namespace vita
 {
-  ///
-  /// A variable is an input argument (feature) for a symbolic regression or
-  /// classification problem.
-  ///
-  class variable : public terminal
-  {
-  public:
-    explicit variable(const std::string &name, category_t t = 0)
-      : terminal(name, t, true) {}
-
-    boost::any eval(vita::interpreter *) const;
-
-  public:  // Data members.
-    data::example::value_t val;
-  };
-
   class constant : public terminal
   {
     //private:
