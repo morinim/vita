@@ -17,6 +17,7 @@
 
 #include "kernel/src_problem.h"
 #include "kernel/individual.h"
+#include "kernel/src_constant.h"
 #include "kernel/src_evaluator.h"
 
 namespace vita

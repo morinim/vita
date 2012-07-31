@@ -17,44 +17,13 @@
 #include <map>
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "kernel/terminal.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
-  class constant : public terminal
-  {
-    //private:
-    // C++11 allows constructors to call other peer constructors (known as
-    // delegation). This allows constructors to utilize another constructor's
-    // behavior with a minimum of added code.
-    //constant(const std::string &name, const boost::any &c, category_t = 0)
-    //  : terminal(name, t, false, false, default_weight*2), val(c) {}
-  public:
-    explicit constant(bool c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2), val(c) {}
-    explicit constant(double c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2), val(c) {}
-    explicit constant(int c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2), val(c) {}
-    explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\"" + c + "\"", t, false, false, default_weight * 2),
-        val(c) {}
-
-    /// The argument is not used: the value of a constant is stored with the
-    /// object, we don't need an interpreter to discover it.
-    boost::any eval(interpreter *) const { return val; }
-
-  private:  // Data members.
-    const boost::any val;
-  };
-
   ///
   /// \a symbol_factory is an abstract factory (the essence of the pattern is to
   /// provide an interface for creating families of related or dependent
