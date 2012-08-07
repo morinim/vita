@@ -19,6 +19,7 @@
 #include "kernel/environment.h"
 #include "kernel/evolution.h"
 #include "kernel/interpreter.h"
+#include "kernel/terminal.h"
 #include "kernel/primitive/factory.h"
 
 // This class models the first input.
