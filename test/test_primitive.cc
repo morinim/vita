@@ -3,7 +3,7 @@
  *  \file test_primitive.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,8 +17,9 @@
 #include "kernel/environment.h"
 #include "kernel/individual.h"
 #include "kernel/interpreter.h"
-#include "kernel/primitive/factory.h"
 #include "kernel/random.h"
+#include "kernel/terminal.h"
+#include "kernel/primitive/factory.h"
 
 #define BOOST_TEST_MODULE Primitive
 #include "boost/test/unit_test.hpp"
