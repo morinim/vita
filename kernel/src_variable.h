@@ -50,6 +50,20 @@ namespace vita
 
   public:  // Data members.
     data::example::value_t val;
+
+  private: // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void variable::serialize(Archive &ar, unsigned)
+  {
+    ar & boost::serialization::base_object<terminal>(*this);
+    ar & val;
+  }
 }  // namespace vita
 #endif  // SRC_VARIABLE_H
