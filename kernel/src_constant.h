@@ -60,8 +60,22 @@ namespace vita
       }
     }
 
+  private: // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
   private:  // Data members.
     data::example::value_t val;
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void constant::serialize(Archive &ar, unsigned)
+  {
+    ar & boost::serialization::base_object<terminal>(*this);
+    ar & val;
+  }
 }  // namespace vita
 #endif // SRC_CONSTANT_H
