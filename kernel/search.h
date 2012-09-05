@@ -35,7 +35,6 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
-    void dss(unsigned) const;
     void tune_parameters();
 
     const individual &run(bool = true, unsigned = 1);
@@ -43,6 +42,7 @@ namespace vita
     bool check(bool) const;
 
   private:
+    void dss(unsigned) const;
     void log(const summary &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, unsigned) const;
 
