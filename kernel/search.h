@@ -45,6 +45,7 @@ namespace vita
     void dss(unsigned) const;
     void log(const summary &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, unsigned) const;
+    bool stop_condition(const summary &) const;
 
     environment env_;
     problem   *prob_;

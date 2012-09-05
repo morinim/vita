@@ -225,7 +225,7 @@ def main():
     verbose = args.verbose
 
     if os.path.isdir(args.dynfile):
-        args.dynfile = os.path.join(args.dynfile,"dynamic")
+        args.dynfile = os.path.join(args.dynfile, "dynamic")
 
     plot(args)
 

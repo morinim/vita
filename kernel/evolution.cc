@@ -27,11 +27,19 @@ namespace vita
   ///
   /// \param[in] env environment (mostly used for population initialization).
   /// \param[in] eva evaluator used during the evolution.
+  /// \param[in] sc function used to identify a stop condition (i.e. it's
+  ///               most improbable that evolution will discover better
+  ///               solutions).
+  /// \param[in] sd the "shake data" function. It is used to alter the training
+  ///               set so that evolution would take place in a dynamic
+  ///               environment.
   ///
   evolution::evolution(const environment &env, evaluator *const eva,
+                       std::function<bool (const summary &)> sc,
                        std::function<void (unsigned)> sd)
     : selection(this), operation(this, &stats_), replacement(this), pop_(env),
-      eva_(new evaluator_proxy(eva, env.ttable_size)), shake_data_(sd)
+      eva_(new evaluator_proxy(eva, env.ttable_size)), stop_condition_(sc),
+      shake_data_(sd)
   {
     assert(eva);
 
@@ -157,23 +165,6 @@ namespace vita
   }
 
   ///
-  /// \return true if evolution should be interrupted.
-  ///
-  bool evolution::stop_condition() const
-  {
-    return
-      (*pop_.env().g_since_start && stats_.gen > *pop_.env().g_since_start) ||
-
-      // We use an accelerated stop condition when all the individuals have
-      // the same fitness and after gwi/2 generations the situation isn't
-      // changed.
-      (*pop_.env().g_without_improvement &&
-       (stats_.gen - stats_.last_imp > *pop_.env().g_without_improvement ||
-        (stats_.gen - stats_.last_imp > *pop_.env().g_without_improvement / 2 &&
-         stats_.az.fit_dist().variance <= float_epsilon)));
-  }
-
-  ///
   /// \param[in] ind individual whose accuracy/fitness we are interested in.
   /// \return the fitness and the accuracy of \a ind.
   ///
@@ -231,8 +222,15 @@ namespace vita
     eva_->clear();
 
     boost::timer timer;
-    for (stats_.gen = 0; !stop_condition(); ++stats_.gen)
+
+    bool stop(false);
+    for (stats_.gen = 0; !stop; ++stats_.gen)
     {
+      // When we have a stop_condition function we use it; otherwise the stop
+      // criterion is the number of generations.
+      stop = stop_condition_ ? stop_condition_(stats_)
+                             : (stats_.gen >= *pop_.env().g_since_start);
+
       if (shake_data_)
       {
         shake_data_(stats_.gen);

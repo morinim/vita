@@ -196,6 +196,26 @@ namespace vita
   }
 
   ///
+  /// \return true when evolution should be interrupted.
+  ///
+  bool search::stop_condition(const summary &s) const
+  {
+    if (env_.g_since_start && s.gen >= *env_.g_since_start)
+      return true;
+
+    // We use an accelerated stop condition when all the individuals have
+    // the same fitness and after gwi/2 generations the situation isn't
+    // changed.
+    if (env_.g_without_improvement &&
+        (s.gen - s.last_imp > *env_.g_without_improvement ||
+         (s.gen - s.last_imp > *env_.g_without_improvement / 2 &&
+          s.az.fit_dist().variance <= float_epsilon)))
+      return true;
+
+    return false;
+  }
+
+  ///
   /// Parameter tuning is a typical approach to algorithm design. Such tuning
   /// is done by experimenting with different values and selecting the ones
   /// that give the best results on the test problems at hand. However, the
@@ -289,16 +309,20 @@ namespace vita
 
     tune_parameters();
 
+    std::function<bool (const summary &s)> stop;
+    if (*env_.g_without_improvement > 0)
+      stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
+
     for (unsigned run(0); run < n; ++run)
     {
-      evolution evo(env_, prob_->get_evaluator(), shake_data);
+      evolution evo(env_, prob_->get_evaluator(), stop, shake_data);
       summary s(evo(verbose, run,
                     selection_factory::k_tournament,
                     operation_factory::k_crossover_mutation,
                     replacement_factory::k_tournament));
 
-      // If \c shake_data == \c true, the values returned by the evolution
-      // object refer to a subset of the available dataset. Since we need an
+      // If shake_data is true, the values returned by the evolution object
+      // refers to a subset of the available dataset. Since we need an
       // overall score, a new calculation have to be performed.
       if (shake_data)
       {

@@ -62,6 +62,7 @@ namespace vita
   {
   public:
     evolution(const environment &, evaluator *const,
+              std::function<bool (const summary &)> = 0,
               std::function<void (unsigned)> = 0);
 
     const summary &operator()(
@@ -89,12 +90,11 @@ namespace vita
     analyzer get_stats() const;
     void log(unsigned) const;
 
-    bool stop_condition() const;
-
     vita::population           pop_;
     std::shared_ptr<evaluator> eva_;
     summary                  stats_;
 
+    std::function<bool (const summary &)> stop_condition_;
     std::function<void (unsigned)> shake_data_;
   };
 
