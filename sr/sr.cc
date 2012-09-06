@@ -537,7 +537,7 @@ namespace ui
   ///
   /// \param[in] v the threashold value
   ///
-  /// if the output value of a run is greater than \a v it's a scored as a
+  /// If the output value of a run is greater than \a v it's scored as a
   /// success. The output value considered is the fitness when \a v is a simple
   /// number or the accuracy when \a v is a percentage
   ///

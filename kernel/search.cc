@@ -301,13 +301,13 @@ namespace vita
     std::list<unsigned> good_runs;
     score_t run_best_score;
 
+    tune_parameters();
+
     // For std::placeholders and std::bind see:
     //  http://en.cppreference.com/w/cpp/utility/functional/placeholders
     std::function<void (unsigned)> shake_data;
     if (env_.dss)
       shake_data = std::bind(&search::dss, this, std::placeholders::_1);
-
-    tune_parameters();
 
     std::function<bool (const summary &s)> stop;
     if (*env_.g_without_improvement > 0)
