@@ -196,20 +196,23 @@ namespace vita
   }
 
   ///
-  /// \return true when evolution should be interrupted.
+  /// \return true when a run should be interrupted.
   ///
   bool search::stop_condition(const summary &s) const
   {
-    if (env_.g_since_start && s.gen >= *env_.g_since_start)
+    assert(env_.g_since_start);
+
+    if (*env_.g_since_start > 0 && s.gen > *env_.g_since_start)
       return true;
 
     // We use an accelerated stop condition when all the individuals have
     // the same fitness and after gwi/2 generations the situation isn't
     // changed.
-    if (env_.g_without_improvement &&
-        (s.gen - s.last_imp > *env_.g_without_improvement ||
-         (s.gen - s.last_imp > *env_.g_without_improvement / 2 &&
-          s.az.fit_dist().variance <= float_epsilon)))
+    assert(env_.g_without_improvement);
+
+    if (*env_.g_without_improvement &&
+        (s.gen - s.last_imp > *env_.g_without_improvement &&
+         s.az.fit_dist().variance <= float_epsilon))
       return true;
 
     return false;

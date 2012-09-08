@@ -43,6 +43,15 @@ namespace vita
   {
     assert(eva);
 
+    // When we have a stop_condition function we use it; otherwise the stop
+    // criterion is the number of generations.
+    if (!stop_condition_)
+      stop_condition_ = [this](const summary &s) -> bool
+                        {
+                          return *pop_.env().g_since_start > 0 &&
+                                 s.gen > *pop_.env().g_since_start;
+                        };
+
     assert(check());
   }
 
@@ -223,14 +232,8 @@ namespace vita
 
     boost::timer timer;
 
-    bool stop(false);
-    for (stats_.gen = 0; !stop; ++stats_.gen)
+    for (stats_.gen = 0; !stop_condition_(stats_); ++stats_.gen)
     {
-      // When we have a stop_condition function we use it; otherwise the stop
-      // criterion is the number of generations.
-      stop = stop_condition_ ? stop_condition_(stats_)
-                             : (stats_.gen >= *pop_.env().g_since_start);
-
       if (shake_data_)
       {
         shake_data_(stats_.gen);
@@ -312,7 +315,7 @@ namespace vita
   ///
   bool evolution::check() const
   {
-    return pop_.check() && eva_;
+    return pop_.check() && eva_ && stop_condition_;
   }
 
   ///
