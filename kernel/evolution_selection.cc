@@ -115,7 +115,7 @@ namespace vita
   ///
   selection_factory::selection_factory(const evolution *const evo)
   {
-    unsigned i;
+    unsigned VARIABLE_IS_NOT_USED i;
 
     i = add(new tournament_selection(evo));
     assert(i - 1 == k_tournament);

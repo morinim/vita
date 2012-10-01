@@ -31,6 +31,7 @@ namespace vita
   {
   public:
     explicit selection_strategy(const evolution *const);
+    virtual ~selection_strategy() {}
 
     virtual std::vector<index_t> operator()() = 0;
 
