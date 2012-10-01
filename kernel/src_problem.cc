@@ -29,7 +29,7 @@ namespace vita
   {
     clear();
 
-    unsigned i;
+    unsigned VARIABLE_IS_NOT_USED i;
 
     i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
     assert(i == k_count_evaluator);
