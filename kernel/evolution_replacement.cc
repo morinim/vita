@@ -179,7 +179,7 @@ namespace vita
 
   replacement_factory::replacement_factory(evolution *const evo)
   {
-    unsigned i;
+    unsigned VARIABLE_IS_NOT_USED i;
 
     i = add(new family_competition_rp(evo));
     assert(i - 1 == k_crowding);

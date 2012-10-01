@@ -33,6 +33,7 @@ namespace vita
   {
   public:
     explicit replacement_strategy(evolution *const);
+    virtual ~replacement_strategy() {}
 
     virtual void operator()(const std::vector<index_t> &,
                             const std::vector<individual> &,
