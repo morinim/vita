@@ -114,9 +114,10 @@ namespace vita
     assert(evo);
     assert(stats);
 
-    unsigned i;
+    unsigned VARIABLE_IS_NOT_USED i;
 
     i = add(new standard_op(evo, stats));
+
     assert(i - 1 == k_crossover_mutation);
   }
 

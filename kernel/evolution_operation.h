@@ -40,6 +40,7 @@ namespace vita
   {
   public:
     operation_strategy(const evolution *const, summary *const);
+    virtual ~operation_strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized operation
     // encompass recent additions, such as scan mutation, that generates
