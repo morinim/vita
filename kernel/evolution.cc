@@ -16,11 +16,10 @@
 #include <string>
 #include <vector>
 
-#include <boost/timer.hpp>
-
 #include "kernel/evolution.h"
 #include "kernel/environment.h"
 #include "kernel/random.h"
+#include "kernel/timer.h"
 
 namespace vita
 {
@@ -56,14 +55,15 @@ namespace vita
   }
 
   ///
-  /// \param[in] elapsed time, in seconds, elapsed from the start of evolution.
+  /// \param[in] elapsed_milli time, in milliseconds, elapsed from the start
+  ///                          of evolution.
   /// \return speed of execution (cycles / s).
   ///
-  double evolution::get_speed(double elapsed) const
+  double evolution::get_speed(double elapsed_milli) const
   {
     double speed(0.0);
-    if (stats_.gen && elapsed > 0)
-      speed = (pop_.size() * stats_.gen) / elapsed;
+    if (stats_.gen && elapsed_milli > 0)
+      speed = 1000.0 * (pop_.size() * stats_.gen) / elapsed_milli;
 
     return speed;
   }
@@ -230,7 +230,7 @@ namespace vita
 
     eva_->clear();
 
-    boost::timer timer;
+    timer measure;
 
     for (stats_.gen = 0; !stop_condition_(stats_); ++stats_.gen)
     {
@@ -281,7 +281,7 @@ namespace vita
         }
       }
 
-      stats_.speed = get_speed(timer.elapsed());
+      stats_.speed = get_speed(measure.elapsed());
       get_probes(&stats_.ttable_probes, &stats_.ttable_hits);
     }
 

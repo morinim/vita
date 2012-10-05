@@ -7,7 +7,7 @@
 # Build type: debug, release.
 TYPE = release
 
-# Boost library <-- PLEASE CHECK THE PATH!
+# Boost library <-- PLEASE CHECK THE PATHS!
 BOOST_INCLUDE = ./boost
 BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 
