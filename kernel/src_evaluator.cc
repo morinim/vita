@@ -208,8 +208,8 @@ namespace vita
   ///
   /// \param[in] d training data.
   /// \param[in] v vector of input variables.
-  /// \param[in] x_slots basic parameter for the Slotted Dynamic Class Boundary
-  ///                    Determination algorithm.
+  /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
+  ///                   Determination algorithm.
   ///
   dyn_slot_evaluator::dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v,
                                          unsigned x_slot)

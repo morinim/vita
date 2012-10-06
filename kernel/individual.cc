@@ -242,7 +242,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] line index of a \a symbol in the \a individual.
+  /// \param[in] index index of a \a symbol in the \a individual.
   /// \return a new individual obtained from \c this inserting a random
   ///         \a terminal at index \a line.
   ///

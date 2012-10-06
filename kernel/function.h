@@ -3,7 +3,7 @@
  *  \file function.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -49,7 +49,7 @@ namespace vita
     bool parametric() const { return false; }
 
     ///
-    /// \param[in] index of a function argument.
+    /// \param[in] i index of a function argument.
     /// \return category of the i-th function argument.
     ///
     category_t arg_category(unsigned i) const
@@ -64,7 +64,7 @@ namespace vita
 
     ///
     /// \param[in] s symbol pointer.
-    /// \return a cast of \s to a function pointer.
+    /// \return \a s casted to a vita::function pointer.
     ///
     /// This is a short cut function.
     ///

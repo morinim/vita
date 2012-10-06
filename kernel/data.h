@@ -84,20 +84,20 @@ namespace vita
     /// \brief Information about a category of the dataset.
     ///
     /// For example:
-    /// \verbatim
-    ///   <attribute type="nominal">
-    ///     <labels>
-    ///       <label>Iris-setosa</label>
-    ///       <label>Iris-versicolor</label>
-    ///       <label>Iris-virginica</label>
-    ///     </labels>
-    ///   </attribute>
-    /// \endverbatim
+    ///
+    ///     <attribute type="nominal">
+    ///       <labels>
+    ///         <label>Iris-setosa</label>
+    ///         <label>Iris-versicolor</label>
+    ///         <label>Iris-virginica</label>
+    ///       </labels>
+    ///     </attribute>
+    ///
     /// is mapped to category:
     /// \li {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
     ///
     /// while:
-    /// \verbatim <attribute type="numeric" category="A" /> \endverbatim
+    ///     <attribute type="numeric" category="A" />
     /// is mapped to category:
     /// \li  {"A", d_double, {}}
     ///

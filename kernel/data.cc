@@ -59,7 +59,7 @@ namespace vita
   ///
   /// \param[in] filename nome of the file containing the learning collection.
   ///
-  /// New \a data instance containing the learning collection from \a filename.
+  /// New data instance containing the learning collection from \a filename.
   ///
   data::data(const std::string &filename)
   {
@@ -196,25 +196,26 @@ namespace vita
   ///
   /// \return number of categories of the problem (>= 1).
   ///
-  /// \attention please note that \c data::categories() may differ from the
-  /// intuitive number of categories of the dataset.
+  /// \attention
+  /// please note that the value categories() returns may differ from the
+  /// intuitive number of categories of the dataset (it can 1 unit smaller).
+  /// For instance consider the simple Iris classification problem:
   ///
-  /// For instance consider the simple Iris classification problem (nominal
-  /// attribute as output):
-  /// \verbatim
-  /// <attribute class="yes" name="class" type="nominal">
-  ///   <labels>
-  ///     <label>Iris-setosa</label> ... <label>Iris-virginica</label>
-  ///   </labels>
-  /// </attribute>
-  /// \endverbatim
-  /// Genetic programming algorithms for classification (at least the
-  /// algorithms that learn a discriminant function) don't manipulate the
-  /// output category (it is "superfluous", the only relevant information is the
-  /// number of output classes).
-  ///
-  /// So Dataset (m categories) => \c vita::data (n categories) =>
-  /// \c vita::src_problem (n categories) => \c vita::symbol_set (n categories).
+  ///     ...
+  ///     <attribute class="yes" name="class" type="nominal">
+  ///       <labels>
+  ///         <label>Iris-setosa</label> ... <label>Iris-virginica</label>
+  ///       </labels>
+  ///     </attribute>
+  ///     <attribute name="sepallength" type="numeric" />
+  ///     ...
+  /// It has a nominal attribute to describe output classes and four numeric
+  /// attributes as inputs. So there are two distinct attribute types
+  /// (nominal and numeric), i.e. two categories.
+  /// But... categories() would return 1.
+  /// This happens because the genetic programming algorithm for classification
+  /// we use (based on a discriminant function) doesn't manipulate the output
+  /// category (it only uses the number of output classes).
   ///
   unsigned data::categories() const
   {
@@ -225,7 +226,7 @@ namespace vita
   /// \return number of columns of the dataset.
   ///
   /// \note data class supports just one output for every instance, so, if
-  /// the dataset is not empty, variables() + 1 == columns().
+  /// the dataset is not empty: \code variables() + 1 == columns() \endcode.
   ///
   unsigned data::columns() const
   {
@@ -415,7 +416,7 @@ namespace vita
   /// \param[in] c2 a category.
   ///
   /// Swap catagories \a c1 and \a c2, updating the \a header_ and
-  /// \a cateogries_ vector.
+  /// \a categories_ vector.
   ///
   void data::swap_category(category_t c1, category_t c2)
   {

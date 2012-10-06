@@ -27,22 +27,29 @@ namespace vita
   /// needs (so less general).
   ///
   /// The simplest and most common use is:
-  /// \code{.cc}
-  ///   #include <kernel/timer.h>
-  ///   #include <cmath>
   ///
-  ///   int main()
-  ///   {
-  ///     vita::timer t;
+  ///     #include <kernel/timer.h>
+  ///     #include <cmath>
   ///
-  ///     for (long i(0); i < 100000000; ++i)
-  ///       std::sqrt(123.456L); // burn some time
+  ///     int main()
+  ///     {
+  ///       vita::timer t;
   ///
-  ///     std::cout << "Elapsed (milliseconds): " << t.elapsed() << std::endl
+  ///       for (long i(0); i < 100000000; ++i)
+  ///         std::sqrt(123.456L); // burn some time
   ///
-  ///     return 0;
-  ///   }
-  /// \endcode
+  ///       std::cout << "Elapsed (milliseconds): " << t.elapsed() << std::endl
+  ///
+  ///       return 0;
+  ///     }
+  ///
+  /// \warning
+  /// A useful recommendation is to never trust timings unless they are:
+  /// * at least 100 times longer than the CPU time resolution
+  /// * run multiple times
+  /// * run on release builds.
+  /// And results that are too good to be true need to be investigated
+  /// skeptically.
   ///
   /// \remark
   /// The original idea is of Kjellkod (http://kjellkod.wordpress.com).

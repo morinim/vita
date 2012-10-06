@@ -3,7 +3,7 @@
  *  \file ttable.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,7 +23,7 @@ namespace vita
   class individual;
 
   ///
-  /// This is a 128 bit stream used as individual signature / hash table
+  /// This is a 128bit stream used as individual signature / hash table
   /// look up key.
   ///
   struct hash_t
