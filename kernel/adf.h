@@ -3,7 +3,7 @@
  *  \file adf.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -35,6 +35,10 @@ namespace vita
   /// accelerate the problem-solving process). This can be taken further, as
   /// programmers typically organise these components into hierarchies in which
   /// top level components call lower level ones, which call still lower levels.
+  ///
+  /// \c adf_core is the core of \c adt and \c adf classes (they are in a HAS-A
+  /// relationship with it).
+  ///
   /// Although the acronym ADF is from Koza's automatically defined functions,
   /// in Vita subroutines are created using the ARL scheme described in
   /// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.

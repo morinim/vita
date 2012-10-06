@@ -3,7 +3,7 @@
  *  \file symbol.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -30,7 +30,8 @@ namespace vita
   /// \return a string representing the symbol.
   ///
   /// This function is called by parametric symbols only. The \a v argument is
-  /// used to build a more meaningful name for the symbol.
+  /// used to build a more meaningful name for the symbol (i.e. for a numeric
+  /// terminal it's better to print 123 than "NUMBER").
   ///
   std::string symbol::display(int v) const
   {

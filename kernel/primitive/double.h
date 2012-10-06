@@ -293,12 +293,20 @@ namespace vita
       { ar & boost::serialization::base_object<function>(*this); }
     };
 
+    ///
+    /// Simply the natural logarithm of a real number.
+    ///
     class ln : public function
     {
     public:
       explicit ln(category_t t)
-        : function("FLN", t, {t}, function::default_weight/2) {}
+        : function("FLN", t, {t}, function::default_weight / 2) {}
 
+      ///
+      /// \param[in] i pointer to the active interpreter.
+      /// \return the natural logarithm of its argument or an empty boost::any
+      //          in case of invalid argument / infinite result.
+      ///
       boost::any eval(interpreter *i) const
       {
         const boost::any ev0(i->eval(0));

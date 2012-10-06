@@ -34,7 +34,7 @@ namespace vita
   ///
   /// \a data class stores the data set used to evolve the vita::population.
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
-  /// (http://code.google.com/intl/it/apis/predict/docs/developer-guide.html)
+  /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
   /// files.
   ///
   class data
@@ -97,7 +97,7 @@ namespace vita
     /// \li {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
     ///
     /// while:
-    ///     <attribute type="numeric" category="A" />
+    ///     <attribute type="numeric" category="A" name="Speed" />
     /// is mapped to category:
     /// \li  {"A", d_double, {}}
     ///

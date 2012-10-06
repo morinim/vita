@@ -198,7 +198,7 @@ namespace vita
   ///
   /// \attention
   /// please note that the value categories() returns may differ from the
-  /// intuitive number of categories of the dataset (it can 1 unit smaller).
+  /// intuitive number of categories of the dataset (it can be 1 unit smaller).
   /// For instance consider the simple Iris classification problem:
   ///
   ///     ...
@@ -214,8 +214,8 @@ namespace vita
   /// (nominal and numeric), i.e. two categories.
   /// But... categories() would return 1.
   /// This happens because the genetic programming algorithm for classification
-  /// we use (based on a discriminant function) doesn't manipulate the output
-  /// category (it only uses the number of output classes).
+  /// we use (based on a discriminant function) doesn't manipulate (skips) the
+  /// output category (it only uses the number of output classes).
   ///
   unsigned data::categories() const
   {
@@ -249,7 +249,7 @@ namespace vita
   /// \return input vector dimension.
   ///
   /// \note data class supports just one output for every instance, so, if
-  /// the dataset is not empty, variables() + 1 == columns().
+  /// the dataset is not empty, \code variables() + 1 == columns() \endcode.
   ///
   unsigned data::variables() const
   {
@@ -437,24 +437,26 @@ namespace vita
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
-  /// of instances sharing a set of attributes. To date we don't support
-  /// compressed XRFF files.
+  /// of instances sharing a set of attributes.
   /// The original format is defined in http://weka.wikispaces.com/XRFF, we
   /// extend it with an additional (non-standard) feature: attribute category.
-  /// \verbatim
-  /// <attribute name="vehicle length" type="numeric" category="length" /
-  /// <attribute name="vehicle width" type="numeric" category="length" />
-  /// <attribute name="vehicle weight" type="numeric" category="weight" />
-  /// \endverbatim
+  ///
+  ///     <attribute name="vehicle length" type="numeric" category="length" /
+  ///     <attribute name="vehicle width" type="numeric" category="length" />
+  ///     <attribute name="vehicle weight" type="numeric" category="weight" />
+  ///
   /// This feature is used to constrain the search (Strongly Typed Genetic
   /// Programming).
   ///
-  /// Postconditions are:
+  /// \post
   /// \li \a header_[0] is the output column (it contains informations about
   ///     problem's output);
   /// \li \a category(0) is the output category (for symbolic regresssion
   ///     problems it is the output type of the xrff file, for classification
   ///     problems it is the \a numeric type).
+  ///
+  /// \warning
+  /// To date we don't support compressed XRFF files.
   ///
   unsigned data::load_xrff(const std::string &filename)
   {
@@ -484,8 +486,8 @@ namespace vita
         // deduced from the default value.
         a.name = dha.second.get("<xmlattr>.name", "");
 
-        // Via the class="yes" attribute in the attribute specification in the
-        // header, one can define which attribute should act as output value.
+        // One can define which attribute should act as output value via the
+        // class="yes" attribute in the attribute specification in the header.
         output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
         std::string xml_type(dha.second.get("<xmlattr>.type", ""));
@@ -603,7 +605,7 @@ namespace vita
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// We follow the Google Prediction API convention
-  /// (http://code.google.com/intl/it/apis/predict/docs/developer-guide.html#data-format):
+  /// (https://developers.google.com/prediction/docs/developer-guide?hl=it#data-format):
   /// * NO HEADER ROW is allowed;
   /// * only one example is allowed per line. A single example cannot contain
   ///   newlines and cannot span multiple lines;
