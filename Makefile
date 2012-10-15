@@ -39,9 +39,9 @@ ifeq ($(TYPE), release)
   TYPE_PARAM = -s -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
-CXXFLAGS = $(TYPE_PARAM) $(WARN) $(DEFS)
-
-CXX = g++ -pipe $(CXXFLAGS)
+CXXFLAGS = -pipe $(TYPE_PARAM) $(WARN) $(DEFS)
+CXX = g++
+COMPILE = $(CXX) $(CXXFLAGS)
 
 KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
@@ -57,19 +57,19 @@ all: kernel sr
 
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(CXX) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
+	@$(COMPILE) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
 
 examples: example1 example2 example3 example4 example5 example6 example7 example8
 
 example%: examples/example%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(CXX) $< $(KERNEL_OBJ) -o examples/$@
+	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
 
 tests: test_evolution test_individual test_primitive test_ttable
 
 test_%: test/test_%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(CXX) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
+	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
 	@test/$@ --show_progress
 
 kernel: $(KERNEL_OBJ)
@@ -78,7 +78,7 @@ kernel: $(KERNEL_OBJ)
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
-	@$(CXX) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
+	@$(COMPILE) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
 	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; rm -f $*.d
 
 -include $(ALL_SRC:.cc=.P)
