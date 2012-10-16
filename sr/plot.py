@@ -175,23 +175,24 @@ def get_cmd_line_options():
     description = "Plot a dynamic execution summary"
     parser = argparse.ArgumentParser(description = description)
 
-    parser.add_argument("-g", "--graph", type=int, choices=range(1,5),
-                        help="Plot only graph nr. GRAPH")
-    parser.add_argument("-l", "--loop", type=int,
-                        help="Refresh the plot reloading data every LOOP seconds.")
-    parser.add_argument("--image", help="Saves the plot to IMAGE file (png format)")
-    parser.add_argument("--from_gen", type=int,
-                        help="Plot statistics starting from FROM_GEN generation")
-    parser.add_argument("--to_gen", type=int,
-                        help="Plot statistics up to a TO_GEN generation")
-    parser.add_argument("-r", "--run", type=int,
-                        help="Plot statistics regarding run RUN only")
-    parser.add_argument("--from_run", default=0, type=int,
-                        help="Plot statistics starting from FROM_RUN run (default: %(default))")
-    parser.add_argument("--to_run", type=int,
-                        help="Plot statistics up to TO_RUN run")
-    parser.add_argument("-v", "--verbose", action="store_true", default=False,
-                        help="Turn on verbose mode")
+    parser.add_argument("-g", "--graph", type = int, choices = range(1,5),
+                        help = "Plot only graph nr. GRAPH")
+    parser.add_argument("-l", "--loop", type = int,
+                        help = "Refresh the plot reloading data every LOOP seconds.")
+    parser.add_argument("--image",
+                        help = "Save the plot to IMAGE file (png format)")
+    parser.add_argument("--from_gen", type = int,
+                        help = "Plot statistics starting from FROM_GEN generation")
+    parser.add_argument("--to_gen", type = int,
+                        help = "Plot statistics up to a TO_GEN generation")
+    parser.add_argument("-r", "--run", type = int,
+                        help = "Plot statistics regarding run RUN only")
+    parser.add_argument("--from_run", default = 0, type = int,
+                        help = "Plot statistics starting from FROM_RUN run")
+    parser.add_argument("--to_run", type = int,
+                        help = "Plot statistics up to TO_RUN run")
+    parser.add_argument("-v", "--verbose", action = "store_true",
+                        default  = False, help = "Turn on verbose mode")
     parser.add_argument("dynfile")
 
     return parser
