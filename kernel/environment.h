@@ -52,26 +52,29 @@ namespace vita
 
     /// Mutation probability. Mutation is one of the principal "search
     /// operators" used to transform programs in the Genetic Programming
-    /// algorithm. Mutation causes random changes in individuals.
+    /// algorithm. It causes random changes in individuals.
     boost::optional<double> p_mutation;
 
-    /// Crossover probability. See \see operation_strategy::operator().
+    /// Crossover probability.
+    /// \see operation_strategy::operator().
     boost::optional<double> p_cross;
 
-    /// In nature it is common for organisms to produce many offspring and then
-    /// neglect, abort, resorb, eat some of them or allow them to eat each
-    /// other. There are manu reasons for this behavior ("Kozlowski & Stearns,
-    /// 1989"). This phenomenon is known variously as soft selection, brood
-    /// selection, spontaneous abortion. The "bottom line" of this behaior in
-    /// nature is the reduction of parental resource investment in offspring who
-    /// are potentially less fit than others.
-    /// See "Greedy recombination and genetic search on the space of computer
-    /// programs" (Walter Alden Tackett - 1995) for further details.
     /// This parameter controls the brood recombination/selection level (0 to
     /// turn it off).
+    ///
+    /// In nature it is common for organisms to produce many offspring and then
+    /// neglect, abort, resorb, eat some of them or allow them to eat each
+    /// other. There are many reasons for this behavior ("Kozlowski & Stearns,
+    /// 1989"). This phenomenon is known variously as soft selection, brood
+    /// selection, spontaneous abortion. The "bottom line" of this behaviour in
+    /// nature is the reduction of parental resource investment in offspring who
+    /// are potentially less fit than others.
+    /// \see
+    /// "Greedy recombination and genetic search on the space of computer
+    /// programs" (Walter Alden Tackett - 1995).
     boost::optional<unsigned> brood_recombination;
 
-    /// Switch Dynamic Subset Selection on/off.
+    /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
     boost::tribool dss;
 

@@ -23,10 +23,14 @@ namespace vita
   const char environment::sum_filename[] = "summary";
 
   ///
-  /// \param[in] initialize if \c true initialize every parameter so that
-  ///                       \c check(true) passes the test.
+  /// \param[in] initialize if \c true initializes every parameter in such a
+  ///                       way as to allow the object to pass
+  ///                       environment::check().
+  ///
   /// Class constructor. Default values are quite standard, but specific
   /// problems need ad-hoc tuning.
+  ///
+  /// \see search::tune_parameters
   ///
   environment::environment(bool initialize)
     : elitism(boost::indeterminate),
@@ -61,8 +65,7 @@ namespace vita
   /// \param[out] pt output tree.
   /// \param[in] path \a path where to store the environment data file.
   ///
-  /// Saves the informations regarding the environment using the \a pt boost
-  /// property tree.
+  /// Saves the environment using the \a pt boost property tree.
   ///
   void environment::log(boost::property_tree::ptree *const pt,
                         const std::string &path) const
@@ -92,7 +95,7 @@ namespace vita
   ///
   /// \param[in] i pointer to a new symbol for the symbol set.
   ///
-  /// This is a shortcut for sset.insert.
+  /// This is a shortcut for symbol_set::insert.
   ///
   void environment::insert(const symbol_ptr &i)
   {

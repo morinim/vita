@@ -78,7 +78,8 @@ namespace vita
   /// \param[in] i symbol to be added.
   ///
   /// Adds a new \a symbol to the set. We manage to sort the symbols in
-  /// descending order so the selection algorithm will run faster.
+  /// descending order, with respect to the weight, so the selection algorithm
+  /// would run faster.
   ///
   void symbol_set::insert(const symbol_ptr &i)
   {
