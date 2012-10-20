@@ -27,8 +27,12 @@
 namespace vita
 {
   ///
-  /// This is a container for Vita's parameters. Contained values are used
-  /// during object initialization and program execution.
+  /// This is a container for Vita's parameters. Included values are used
+  /// as parameters for object initializations and runtime execution control.
+  ///
+  /// \note
+  /// Because using \c boost::optional<bool> can lead to subtle errors due to
+  /// the implicit \c bool conversion, we prefer to use \c boost::tribool.
   ///
   struct environment
   {
