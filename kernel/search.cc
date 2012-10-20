@@ -221,24 +221,35 @@ namespace vita
   ///
   /// Parameter tuning is a typical approach to algorithm design. Such tuning
   /// is done by experimenting with different values and selecting the ones
-  /// that give the best results on the test problems at hand. However, the
-  /// number of possible parameters and their different values means that this
-  /// is a very complex and time-consuming task; it is something we do
-  /// not/ want users to worry about (power users can force many parameters, but
-  /// our idea is "simple by default").
+  /// that give the best results on the test problems at hand.
+  ///
+  /// However, the number of possible parameters and their different values
+  /// means that this is a very complex and time-consuming task; it is
+  /// something we do not want users to worry about (power users can force many
+  /// parameters, but our idea is "simple by default").
+  ///
+  /// So if user sets an environment parameter he will force the search class
+  /// to use it as is. Otherwise this function will try to guess a good
+  /// starting point and changes its hint after every run. The code is a mix of
+  /// black magic, experience, common logic and randomness but it seems
+  /// reasonable.
+  ///
+  /// \note
   /// It has been formally proven, in the No-Free-Lunch theorem, that it is
   /// impossible to tune a search algorithm such that it will have optimal
   /// settings for all possible problems, but parameters can be properly
   /// set for a given problem.
-  /// This function tries to guess a good starting point and changes its hint
-  /// after every run. The code is a mix of black magic, experience, common
-  /// logic and randomness but it seems reasonable.
-  /// \see "Parameter Setting in Evolutionary Algorithms" (F.G. Lobo, C.F. Lima,
-  ///      Z. Michalewicz) - Springer
+  ///
+  /// \see
+  /// * "Parameter Setting in Evolutionary Algorithms" (F.G. Lobo, C.F. Lima,
+  ///   Z. Michalewicz) - Springer;
+  /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
+  ///   Francone).
   ///
   void search::tune_parameters()
   {
     const environment dflt(true);
+    data *const dt(prob_->data());
 
     if (!prob_->env.code_length)
       env_.code_length = *dflt.code_length;
@@ -255,15 +266,28 @@ namespace vita
     if (!prob_->env.brood_recombination)
       env_.brood_recombination = *dflt.brood_recombination;
 
+    // With a small number of training case:
+    // * we need every training case;
+    // * DSS speed up isn't so sensible;
+    // BUT
+    // * DSS can help against overfitting.
     if (boost::indeterminate(prob_->env.dss))
-    {
-      data *const d(prob_->data());
+      env_.dss = dt && dt->size() > 200;
 
-      env_.dss = d && d->size() > 200;
-    }
-
+    // A larger number of training cases requires an increase in the population
+    // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
+    // and Francone suggest 10 - 1000 individuals for smaller problems (say,
+    // less than 10 fitness cases); between 1000 and 10000 individuals for
+    // complex problem (more than 200 fitness cases).
+    // We choosed a strictly increasing function to map training set size
+    // and population size, but our population size is smaller.
     if (!prob_->env.individuals)
-      env_.individuals = *dflt.individuals;
+    {
+      if (dt)
+        env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
+      else
+        env_.individuals = *dflt.individuals;
+    }
 
     if (!prob_->env.tournament_size)
       env_.tournament_size = *dflt.tournament_size;
