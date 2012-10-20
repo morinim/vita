@@ -38,7 +38,8 @@ namespace vita
       arl(boost::indeterminate),
       ttable_size(16),
       stat_dir(""),
-      stat_arl(false), stat_dynamic(false), stat_summary(false)
+      stat_arl(false), stat_dynamic(false), stat_summary(false),
+      threashold{boost::none, boost::none}
   {
     if (initialize)
     {

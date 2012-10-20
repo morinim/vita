@@ -21,7 +21,7 @@
 #include <cmath>
 #include <string>
 
-#include "kernel/vita.h"
+#include "kernel/fitness.h"
 #include "kernel/symbol_set.h"
 
 namespace vita
@@ -124,6 +124,16 @@ namespace vita
 
     /// Should we save a summary of the run?
     bool stat_summary;
+
+    /// \a threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples.
+    /// Fitness, if defined, is used as comparison term; otherwise
+    /// accuracy (they cannot both be set to boost::none).
+    struct
+    {
+      boost::optional<fitness_t> fitness;
+      boost::optional<double>   accuracy;
+    } threashold;
 
     symbol_set sset;
 

@@ -219,6 +219,8 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose prints additional informations while running.
+  ///
   /// Parameter tuning is a typical approach to algorithm design. Such tuning
   /// is done by experimenting with different values and selecting the ones
   /// that give the best results on the test problems at hand.
@@ -246,24 +248,26 @@ namespace vita
   /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
   ///   Francone).
   ///
-  void search::tune_parameters()
+  void search::tune_parameters(bool verbose)
   {
     const environment dflt(true);
-    data *const dt(prob_->data());
+    const environment &constrained(prob_->env);
 
-    if (!prob_->env.code_length)
+    const data *const dt = prob_->data();
+
+    if (!constrained.code_length)
       env_.code_length = *dflt.code_length;
 
-    if (boost::indeterminate(prob_->env.elitism))
+    if (boost::indeterminate(constrained.elitism))
       env_.elitism = dflt.elitism;
 
-    if (!prob_->env.p_mutation)
+    if (!constrained.p_mutation)
       env_.p_mutation = *dflt.p_mutation;
 
-    if (!prob_->env.p_cross)
+    if (!constrained.p_cross)
       env_.p_cross = *dflt.p_cross;
 
-    if (!prob_->env.brood_recombination)
+    if (!constrained.brood_recombination)
       env_.brood_recombination = *dflt.brood_recombination;
 
     // With a small number of training case:
@@ -271,7 +275,7 @@ namespace vita
     // * DSS speed up isn't so sensible;
     // BUT
     // * DSS can help against overfitting.
-    if (boost::indeterminate(prob_->env.dss))
+    if (boost::indeterminate(constrained.dss))
       env_.dss = dt && dt->size() > 200;
 
     // A larger number of training cases requires an increase in the population
@@ -281,27 +285,32 @@ namespace vita
     // complex problem (more than 200 fitness cases).
     // We choosed a strictly increasing function to map training set size
     // and population size, but our population size is smaller.
-    if (!prob_->env.individuals)
+    if (!constrained.individuals)
     {
       if (dt)
+      {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
+        if (verbose)
+          std::cout << "[INFO] Population size set to " << env_.individuals
+                    << std::endl;
+      }
       else
         env_.individuals = *dflt.individuals;
     }
 
-    if (!prob_->env.tournament_size)
+    if (!constrained.tournament_size)
       env_.tournament_size = *dflt.tournament_size;
 
-    if (!prob_->env.mate_zone)
+    if (!constrained.mate_zone)
       env_.mate_zone = *dflt.mate_zone;
 
-    if (!prob_->env.g_since_start)
+    if (!constrained.g_since_start)
       env_.g_since_start = *dflt.g_since_start;
 
-    if (!prob_->env.g_without_improvement)
+    if (!constrained.g_without_improvement)
       env_.g_without_improvement = *dflt.g_without_improvement;
 
-    if (boost::indeterminate(prob_->env.arl))
+    if (boost::indeterminate(constrained.arl))
       env_.arl = dflt.arl;
 
     assert(env_.check(true, true));
@@ -328,7 +337,7 @@ namespace vita
     std::list<unsigned> good_runs;
     score_t run_best_score;
 
-    tune_parameters();
+    tune_parameters(verbose);
 
     // For std::placeholders and std::bind see:
     //  http://en.cppreference.com/w/cpp/utility/functional/placeholders
@@ -373,11 +382,11 @@ namespace vita
         overall_summary.best = {s.best->ind, run_best_score};
 
       // We can use accuracy or fitness to identify successfully runs (it
-      // depends on prob_->threashold).
+      // depends on prob_->env.threashold).
       const bool solution_found(
-        prob_->threashold.fitness ?
-        run_best_score.fitness >= *prob_->threashold.fitness :
-        run_best_score.accuracy >= *prob_->threashold.accuracy);
+        prob_->env.threashold.fitness ?
+        run_best_score.fitness >= *prob_->env.threashold.fitness :
+        run_best_score.accuracy >= *prob_->env.threashold.accuracy);
 
       if (solution_found)
       {
@@ -389,34 +398,37 @@ namespace vita
       // greater than OR equal to) the current threashold criterion (accuracy
       // OR fitness).
       const bool good(
-        prob_->threashold.fitness ?
+        prob_->env.threashold.fitness ?
 
         run_best_score.fitness + tolerance >=
         overall_summary.best->score.fitness :
 
         run_best_score.accuracy >= overall_summary.best->score.accuracy);
 
-      if (good)
+      if (good)  // Well, we have found a good individual...
       {
-        // Well, we have found a good individual, is it a new best?
+        // ...is it a new best? We know that, considering the current
+        // threashold criterion, it is at least equal to the best individual so
+        // far.
 
         if (run_best_score.fitness > overall_summary.best->score.fitness +
-            tolerance)
+            tolerance)  // better fitness
         {
           overall_summary.best->score.fitness = run_best_score.fitness;
 
-          if (prob_->threashold.fitness)
+          if (prob_->env.threashold.fitness)
           {
             overall_summary.best->ind = s.best->ind;
             good_runs.clear();
           }
         }
 
-        if (run_best_score.accuracy > overall_summary.best->score.accuracy)
+        if (run_best_score.accuracy >
+            overall_summary.best->score.accuracy)  // better accuracy
         {
           overall_summary.best->score.accuracy = run_best_score.accuracy;
 
-          if (prob_->threashold.accuracy)
+          if (prob_->env.threashold.accuracy)
           {
             overall_summary.best->ind = s.best->ind;
             good_runs.clear();

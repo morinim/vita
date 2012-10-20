@@ -33,7 +33,6 @@ namespace vita
     env.sset = vita::symbol_set();
     active_eva_.reset();
     evaluators_.clear();
-    threashold = {boost::none, boost::none};
   }
 
   ///

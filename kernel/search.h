@@ -35,7 +35,7 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
-    void tune_parameters();
+    void tune_parameters(bool);
 
     const individual &run(bool = true, unsigned = 1);
 
