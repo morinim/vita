@@ -1,6 +1,0 @@
-[Options]
-arl = false
-dss = true
-debug = true
-elitism = true
-force_input = false

@@ -127,8 +127,8 @@ namespace ui
   const std::string header(
     "(==(     )==)\n"
     " `-.`. ,',-' \n"
-    "    _,-'       " + vita_sr_version1          + "\n" \
-    " ,-',' `.`-.   " + vita_sr_version2          + "\n" \
+    "    _,-'       " + vita_sr_version1 + "\n" \
+    " ,-',' `.`-.   " + vita_sr_version2 + "\n" \
     "(==(     )==)\n"
     " `-.`. ,',-' \n"
     "    _,-'\"   \n"
