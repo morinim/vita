@@ -323,7 +323,7 @@ namespace vita
   ///
   const individual &search::run(bool verbose, unsigned n)
   {
-    assert(prob_->threashold.fitness || prob_->threashold.accuracy);
+    assert(prob_->env.threashold.fitness || prob_->env.threashold.accuracy);
 
     // This is used in comparisons between fitnesses: we considered values
     // distinct only when their distance is greater than tolerance.
