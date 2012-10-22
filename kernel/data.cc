@@ -612,7 +612,7 @@ namespace vita
   /// * columns are separated by commas. Commas inside a quoted string are not
   ///   column delimiters;
   /// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
-  ///   example. If the first column is numetic, this model is a REGRESSION
+  ///   example. If the first column is numeric, this model is a REGRESSION
   ///   model; if the first column is a string, it is a CATEGORIZATION
   ///   (i.e. classification) model. Each column must describe the same kind of
   ///   information for that example;

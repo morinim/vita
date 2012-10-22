@@ -189,6 +189,45 @@ namespace vita
       { ar & boost::serialization::base_object<function>(*this); }
     };
 
+    class ifb : public function
+    {
+    public:
+      ifb(category_t t1, category_t t2)
+        : function("FIFB", t2, {t1, t1, t1, t2, t2})
+      { assert(gene::k_args > 4); }
+
+      boost::any eval(interpreter *i) const
+      {
+        const boost::any ev0(i->eval(0));
+        if (ev0.empty())  return ev0;
+
+        const boost::any ev1(i->eval(1));
+        if (ev1.empty())  return ev1;
+
+        const boost::any ev2(i->eval(2));
+        if (ev2.empty())  return ev2;
+
+        const base_t v0(dbl::cast(ev0));
+        const base_t v1(dbl::cast(ev1));
+        const base_t v2(dbl::cast(ev2));
+
+        const base_t min(std::fmin(v1, v2));
+        const base_t max(std::fmax(v1, v2));
+
+        if (min <= v0 && v0 <= max)
+          return i->eval(3);
+        else
+          return i->eval(4);
+      }
+
+    private: // Serialization.
+      friend class boost::serialization::access;
+
+      /// \see \c boost::serialization
+      template<class Archive> void serialize(Archive &ar, unsigned)
+      { ar & boost::serialization::base_object<function>(*this); }
+    };
+
     class ife : public function
     {
     public:
