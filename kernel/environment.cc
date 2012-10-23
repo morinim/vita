@@ -55,6 +55,7 @@ namespace vita
       g_since_start = 100;
       g_without_improvement = 0;
       arl = false;
+      validation_ratio = 0.2;
 
       assert(check(true, true));
     }
@@ -86,6 +87,7 @@ namespace vita
     pt->put(env + "max_gens_since_start", g_since_start);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
+    pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
     pt->put(env + "statistics.save_arl", stat_arl);
@@ -236,6 +238,13 @@ namespace vita
     {
       if (verbose)
         std::cerr << "Undefined arl data member." << std::endl;
+      return false;
+    }
+
+    if (force_defined && !validation_ratio)
+    {
+      if (verbose)
+        std::cerr << "Undefined validation_ratio data member." << std::endl;
       return false;
     }
 

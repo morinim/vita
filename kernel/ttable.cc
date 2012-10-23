@@ -3,7 +3,7 @@
  *  \file ttable.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -49,6 +49,18 @@ namespace vita
     //  table_[i].hash = hash_t();
     //  table_[i].fit  = 0;
     //}
+  }
+
+  ///
+  /// \param[in] ind individual whose informations we have to clear.
+  ///
+  /// Clears the cached information for individual \a ind.
+  ///
+  void ttable::clear(const individual &ind)
+  {
+    const hash_t h(ind.signature());
+
+    table_[h.p1 & k_mask].hash = hash_t();
   }
 
   ///

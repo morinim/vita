@@ -39,6 +39,7 @@ namespace vita
   {
   public:
     virtual void clear() {}
+    virtual void clear(const individual &) {}
 
     /// \return the fitness and the accuracy (percentage) of the individual.
     ///

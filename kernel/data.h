@@ -32,7 +32,7 @@ namespace vita
   typedef std::shared_ptr<variable> variable_ptr;
 
   ///
-  /// \a data class stores the data set used to evolve the vita::population.
+  /// Stores the dataset used to evolve vita::population.
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
   /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
   /// files.
@@ -132,6 +132,7 @@ namespace vita
 
     void clear();
 
+    void divide(double);
     void sort(std::function<bool (const example &, const example &)>);
 
     category_t get_category(const std::string &) const;

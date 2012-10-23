@@ -78,6 +78,7 @@ namespace vita
     ~ttable();
 
     void clear();
+    void clear(const individual &);
 
     void insert(const individual &, const score_t &);
 

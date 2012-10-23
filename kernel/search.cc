@@ -276,7 +276,12 @@ namespace vita
     // BUT
     // * DSS can help against overfitting.
     if (boost::indeterminate(constrained.dss))
+    {
       env_.dss = dt && dt->size() > 200;
+
+      if (verbose)
+        std::cout << "[INFO] DSS set to " << env_.dss << std::endl;
+    }
 
     // A larger number of training cases requires an increase in the population
     // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
@@ -296,6 +301,24 @@ namespace vita
       }
       else
         env_.individuals = *dflt.individuals;
+    }
+
+    // Note that this setting, once set, will not be changed.
+    if (!constrained.validation_ratio && !env_.validation_ratio)
+    {
+      if (dt)
+      {
+        if (dt->size() * (*dflt.validation_ratio) < 100.0)
+          env_.validation_ratio = 0.0;
+        else
+          env_.validation_ratio = *dflt.validation_ratio;
+
+        if (verbose)
+          std::cout << "[INFO] Validation ratio set to "
+                    << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
+      }
+      else
+        env_.validation_ratio = *dflt.validation_ratio;
     }
 
     if (!constrained.tournament_size)
@@ -335,7 +358,6 @@ namespace vita
     unsigned solutions(0);
 
     std::list<unsigned> good_runs;
-    score_t run_best_score;
 
     tune_parameters(verbose);
 
@@ -349,6 +371,11 @@ namespace vita
     if (*env_.g_without_improvement > 0)
       stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
 
+    const bool validation(env_.validation_ratio &&
+                          *env_.validation_ratio > 0.0);
+    if (validation)
+      prob_->data()->divide(*env_.validation_ratio);
+
     for (unsigned run(0); run < n; ++run)
     {
       evolution evo(env_, prob_->get_evaluator(), stop, shake_data);
@@ -357,36 +384,56 @@ namespace vita
                     operation_factory::k_crossover_mutation,
                     replacement_factory::k_tournament));
 
-      // If shake_data is true, the values returned by the evolution object
-      // refers to a subset of the available dataset. Since we need an
-      // overall score, a new calculation have to be performed.
-      if (shake_data)
+      // Depending on validation, this can be the training score or the
+      // validation score for the current run.
+      score_t score;
+
+      if (validation)
       {
+        prob_->data()->dataset(data::validation);
+        prob_->get_evaluator()->clear(s.best->ind);
+
+        score = (*prob_->get_evaluator())(s.best->ind);
+
         prob_->data()->dataset(data::training);
-        prob_->get_evaluator()->clear();
-        run_best_score = (*prob_->get_evaluator())(s.best->ind);
-
-        if (verbose)
-        {
-          std::cout << run_best_score.fitness;
-
-          if (run_best_score.accuracy >= 0.0)
-            std::cout << " (" << 100.0 * run_best_score.accuracy << "%)"
-                      << std::endl;
-        }
+        prob_->get_evaluator()->clear(s.best->ind);
       }
-      else
-        run_best_score = s.best->score;
+      else  // not using a validation set
+      {
+        // If shake_data is true, the values calculated during the evolution
+        // refer to a subset of the available training set. Since we need an
+        // overall score for comparison, a new calculation has to be performed.
+        if (shake_data)
+        {
+          prob_->data()->dataset(data::training);
+          prob_->get_evaluator()->clear();
+
+          score = (*prob_->get_evaluator())(s.best->ind);
+        }
+        else
+          score = s.best->score;
+      }
+
+      if (verbose)
+      {
+        std::cout << "Score (" << (validation ? "validation" : "training")
+                  << "): " << score.fitness;
+
+        if (score.accuracy >= 0.0)
+          std::cout << " (" << 100.0 * score.accuracy << "%)";
+
+        std::cout << std::endl << std::endl;
+      }
 
       if (run == 0)
-        overall_summary.best = {s.best->ind, run_best_score};
+        overall_summary.best = {s.best->ind, score};
 
-      // We can use accuracy or fitness to identify successfully runs (it
-      // depends on prob_->env.threashold).
+      // We can use accuracy or fitness to identify successful runs (based on
+      // prob_->env.threashold).
       const bool solution_found(
         prob_->env.threashold.fitness ?
-        run_best_score.fitness >= *prob_->env.threashold.fitness :
-        run_best_score.accuracy >= *prob_->env.threashold.accuracy);
+        score.fitness >= *prob_->env.threashold.fitness :
+        score.accuracy >= *prob_->env.threashold.accuracy);
 
       if (solution_found)
       {
@@ -399,11 +446,8 @@ namespace vita
       // OR fitness).
       const bool good(
         prob_->env.threashold.fitness ?
-
-        run_best_score.fitness + tolerance >=
-        overall_summary.best->score.fitness :
-
-        run_best_score.accuracy >= overall_summary.best->score.accuracy);
+        score.fitness + tolerance >= overall_summary.best->score.fitness :
+        score.accuracy >= overall_summary.best->score.accuracy);
 
       if (good)  // Well, we have found a good individual...
       {
@@ -411,10 +455,9 @@ namespace vita
         // threashold criterion, it is at least equal to the best individual so
         // far.
 
-        if (run_best_score.fitness > overall_summary.best->score.fitness +
-            tolerance)  // better fitness
-        {
-          overall_summary.best->score.fitness = run_best_score.fitness;
+        if (score.fitness > overall_summary.best->score.fitness + tolerance)
+        {  // better fitness
+          overall_summary.best->score.fitness = score.fitness;
 
           if (prob_->env.threashold.fitness)
           {
@@ -423,10 +466,9 @@ namespace vita
           }
         }
 
-        if (run_best_score.accuracy >
-            overall_summary.best->score.accuracy)  // better accuracy
-        {
-          overall_summary.best->score.accuracy = run_best_score.accuracy;
+        if (score.accuracy > overall_summary.best->score.accuracy)
+        {  // better accuracy
+          overall_summary.best->score.accuracy = score.accuracy;
 
           if (prob_->env.threashold.accuracy)
           {
@@ -438,8 +480,8 @@ namespace vita
         good_runs.push_back(run);
       }
 
-      if (std::isfinite(run_best_score.fitness))
-        fd.add(run_best_score.fitness);
+      if (std::isfinite(score.fitness))
+        fd.add(score.fitness);
 
       overall_summary.ttable_hits += s.ttable_hits;
       overall_summary.ttable_probes += s.ttable_probes;

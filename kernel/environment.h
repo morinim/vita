@@ -107,6 +107,11 @@ namespace vita
     /// generations.
     boost::optional<unsigned> g_without_improvement;
 
+    /// How much data should be reserved for the validation set?
+    /// validation_ratio is the fraction of the original data that goes into
+    /// the validation set.
+    boost::optional<double> validation_ratio;
+
     /// Should we use Adaptive Representation through Learning?
     boost::tribool arl;
 

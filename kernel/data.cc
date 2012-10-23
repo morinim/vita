@@ -194,6 +194,61 @@ namespace vita
   }
 
   ///
+  /// \param[in] r this is the size_of_validation_set / size_of_dataset ratio.
+  ///
+  /// Splits the dataset in two subset (training set, validation set) according
+  /// to the \a r ratio.
+  ///
+  void data::divide(double r)
+  {
+    assert(0.0 <= r && r <= 1.0);
+
+    // Validation set items are moved to the training set.
+    while (!dataset_[validation].empty())
+    {
+      dataset_[training].push_back(dataset_[validation].front());
+      dataset_[validation].pop_front();
+    }
+
+    if (r > 0.0)
+    {
+      // The requested validation examples are selected (the algorithm hint is
+      // due to Kyle Cronin)...
+      //
+      // "Iterate through and for each element make the probability of
+      //  selection = (number needed)/(number left)
+      //
+      //  So if you had 40 items, the first would have a 5/40 chance of being
+      //  selected. If it is, the next has a 4/39 chance, otherwise it has a
+      //  5/39 chance. By the time you get to the end you will have your 5
+      //  items, and often you'll have all of them before that".
+      unsigned available(dataset_[training].size());
+
+      const unsigned k(available * r);
+      assert(0 <= k && k <= available);
+
+      unsigned needed(k);
+
+      auto iter(dataset_[training].begin());
+      while (dataset_[validation].size() < k)
+      {
+        if (random::boolean(static_cast<double>(needed) / available))
+        {   // selected
+          dataset_[validation].push_back(*iter);
+          iter = dataset_[training].erase(iter);
+          --needed;
+        }
+        else  // not selected
+          ++iter;
+
+        --available;
+      }
+
+      assert(!needed);
+    }
+  }
+
+  ///
   /// \return number of categories of the problem (>= 1).
   ///
   /// \attention
