@@ -82,30 +82,47 @@ namespace vita
     header_.clear();
     categories_.clear();
 
-    dataset_[training].clear();
-    dataset_[validation].clear();
+    for (size_t i(0); i <= k_max_dataset; ++i)
+    {
+      dataset_[i].clear();
+      end_[i] = dataset_[i].end();
+    }
 
     active_dataset_ = training;
-
-    end_ = dataset_[active_dataset_].end();
 
     assert(check());
   }
 
   ///
   /// \param[in] d the active dataset.
-  /// \param[in] slice the number of istances in the active dataset used.
   ///
-  /// We can choose the data we want to operate on (training / validation set)
-  /// and, optionally, a slice of that dataset (end() method will refer to a
-  /// subset of the available data).
+  /// We can choose the data we want to operate on (training / validation /
+  /// test set).
   ///
-  void data::dataset(dataset_t d, unsigned slice)
+  void data::dataset(dataset_t d)
   {
     active_dataset_ = d;
+  }
 
-    end_ = (slice == 0 || slice >= size()) ?
-      dataset_[active_dataset_].end() : std::next(cbegin(), slice);
+  ///
+  /// \return the type (training, validation, test) of the active dataset.
+  ///
+  data::dataset_t data::dataset() const
+  {
+    return active_dataset_;
+  }
+
+  ///
+  /// \param[in] n number of elements for the slice.
+  ///
+  /// Cuts a 'slice' of \a n elements in the active dataset. Future calls to
+  /// data::end() will refer to the active slice (a subset of the dataset).
+  /// To reset the slice call data::slice with argument 0.
+  ///
+  void data::slice(size_t n)
+  {
+    end_[dataset()] = (n == 0 || n >= size()) ?
+      dataset_[dataset()].end() : std::next(cbegin(), n);
   }
 
   ///
@@ -113,7 +130,7 @@ namespace vita
   ///
   data::iterator data::begin()
   {
-    return dataset_[active_dataset_].begin();
+    return dataset_[dataset()].begin();
   }
 
   ///
@@ -121,7 +138,7 @@ namespace vita
   ///
   data::const_iterator data::cbegin() const
   {
-    return dataset_[active_dataset_].cbegin();
+    return dataset_[dataset()].cbegin();
   }
 
   ///
@@ -130,7 +147,7 @@ namespace vita
   ///
   data::const_iterator data::cend() const
   {
-    return end_;
+    return end_[dataset()];
   }
 
   ///
@@ -139,15 +156,24 @@ namespace vita
   ///
   data::const_iterator data::end() const
   {
-    return end_;
+    return end_[dataset()];
+  }
+
+  ///
+  /// \param[in] d a dataset (training / validation / test set).
+  /// \return the size of the dataset \a d.
+  ///
+  size_t data::size(dataset_t d) const
+  {
+    return dataset_[d].size();
   }
 
   ///
   /// \return the size of the active dataset.
   ///
-  unsigned data::size() const
+  size_t data::size() const
   {
-    return dataset_[active_dataset_].size();
+    return size(dataset());
   }
 
   ///
@@ -179,18 +205,25 @@ namespace vita
   ///
   const data::column &data::get_column(unsigned i) const
   {
-    assert(i < header_.size());
+    assert(i < columns());
     return header_[i];
   }
 
   ///
   /// \param[in] f the comparer used for sorting.
   ///
+  /// \note
+  /// Sorting preserves the partition of the dataset
+  ///
   void data::sort(
     std::function<bool (const example &, const example &)> f)
   {
-    dataset_[active_dataset_].sort(f);
-    end_ = dataset_[active_dataset_].end();
+    const dataset_t d(dataset());
+    const size_t partition_size(std::distance(dataset_[d].cbegin(), end_[d]));
+
+    dataset_[d].sort(f);
+
+    slice(partition_size);
   }
 
   ///
@@ -222,12 +255,12 @@ namespace vita
       //  selected. If it is, the next has a 4/39 chance, otherwise it has a
       //  5/39 chance. By the time you get to the end you will have your 5
       //  items, and often you'll have all of them before that".
-      unsigned available(dataset_[training].size());
+      size_t available(dataset_[training].size());
 
-      const unsigned k(available * r);
-      assert(0 <= k && k <= available);
+      const size_t k(available * r);
+      assert(k <= available);
 
-      unsigned needed(k);
+      size_t needed(k);
 
       auto iter(dataset_[training].begin());
       while (dataset_[validation].size() < k)
@@ -272,7 +305,7 @@ namespace vita
   /// we use (based on a discriminant function) doesn't manipulate (skips) the
   /// output category (it only uses the number of output classes).
   ///
-  unsigned data::categories() const
+  size_t data::categories() const
   {
     return categories_.size();
   }
@@ -283,10 +316,9 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty: \code variables() + 1 == columns() \endcode.
   ///
-  unsigned data::columns() const
+  size_t data::columns() const
   {
-    assert(dataset_[active_dataset_].empty() ||
-           variables() + 1 == header_.size());
+    assert(dataset_[dataset()].empty() || variables() + 1 == header_.size());
 
     return header_.size();
   }
@@ -295,7 +327,7 @@ namespace vita
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
-  unsigned data::classes() const
+  size_t data::classes() const
   {
     return classes_map_.size();
   }
@@ -306,13 +338,11 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty, \code variables() + 1 == columns() \endcode.
   ///
-  unsigned data::variables() const
+  size_t data::variables() const
   {
-    const unsigned n(dataset_[active_dataset_].empty() ?
-                     0 :
-                     dataset_[active_dataset_].begin()->input.size());
+    const size_t n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
 
-    assert(dataset_[active_dataset_].empty() || n + 1 == header_.size());
+    assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
     return n;
   }
@@ -327,7 +357,7 @@ namespace vita
   {
     if (map->find(label) == map->end())
     {
-      const unsigned n(map->size());
+      const size_t n(map->size());
       (*map)[label] = n;
     }
 
@@ -475,12 +505,12 @@ namespace vita
   ///
   void data::swap_category(category_t c1, category_t c2)
   {
-    assert(c1 < header_.size());
-    assert(c2 < header_.size());
+    assert(c1 < columns());
+    assert(c2 < columns());
 
     std::swap(categories_[c1], categories_[c2]);
 
-    for (unsigned i(0); i < header_.size(); ++i)
+    for (size_t i(0); i < columns(); ++i)
       if (header_[i].category_id == c1)
         header_[i].category_id = c2;
       else if (header_[i].category_id == c2)
@@ -491,6 +521,9 @@ namespace vita
   /// \param[in] filename the xrff file.
   /// \return number of lines parsed (0 in case of errors).
   ///
+  /// Loads the content of \a filename into the active dataset.
+  ///
+  /// \note
   /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
   /// of instances sharing a set of attributes.
   /// The original format is defined in http://weka.wikispaces.com/XRFF, we
@@ -511,16 +544,24 @@ namespace vita
   ///     problems it is the \a numeric type).
   ///
   /// \warning
-  /// To date we don't support compressed XRFF files.
+  /// To date:
+  /// * we don't support compressed XRFF files;
+  /// * XRFF files cannot be uset to load test set (problems with missing
+  ///   output column and possible column category redefinition).
   ///
-  unsigned data::load_xrff(const std::string &filename)
+  /// \note
+  /// Test set can have an empty output value.
+  ///
+  size_t data::load_xrff(const std::string &filename)
   {
+    assert(dataset() == training);
+
     using namespace boost::property_tree;
 
     ptree pt;
     read_xml(filename, pt);
 
-    unsigned n_output(0);
+    size_t n_output(0);
     bool classification(false);
 
     // Iterate over dataset.header.attributes selection and store all found
@@ -598,7 +639,7 @@ namespace vita
       }
 
     // XRFF needs informations about the columns.
-    if (!header_.size())
+    if (!columns())
       return 0;
 
     // If no output column is specified the default XRFF output column is the
@@ -612,7 +653,7 @@ namespace vita
     // Category 0 is the output category.
     swap_category(category_t(0), header_[0].category_id);
 
-    unsigned parsed(0);
+    size_t parsed(0);
     BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
@@ -626,18 +667,20 @@ namespace vita
               const domain_t domain(
                 categories_[header_[index].category_id].domain);
 
+              const std::string value(v->second.data());
+
               if (index == 0)  // output value
               {
                 // Strings could be used as label for classes, but integers
                 // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
-                  instance.output =
-                    static_cast<int>(encode(v->second.data(), &classes_map_));
+                  instance.output = static_cast<int>(encode(value,
+                                                            &classes_map_));
                 else
-                  instance.output = convert(v->second.data(), domain);
+                  instance.output = convert(value, domain);
               }
               else  // input value
-                instance.input.push_back(convert(v->second.data(), domain));
+                instance.input.push_back(convert(value, domain));
             }
             catch(boost::bad_lexical_cast &)
             {
@@ -645,9 +688,9 @@ namespace vita
               continue;
             }
 
-        if (instance.input.size() + 1 == header_.size())
+        if (instance.input.size() + 1 == columns())
         {
-          dataset_[active_dataset_].push_back(instance);
+          dataset_[dataset()].push_back(instance);
           ++parsed;
         }
       }
@@ -693,7 +736,10 @@ namespace vita
   ///       Numbers: "2", "12", "236"
   ///       Strings: "2 12", "a 23"
   ///
-  unsigned data::load_csv(const std::string &filename)
+  /// \note
+  /// Test set can have an empty output value.
+  ///
+  size_t data::load_csv(const std::string &filename)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -702,11 +748,11 @@ namespace vita
     bool classification(false);
 
     std::string line;
-    unsigned parsed(0);
+    size_t parsed(0);
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
-      const unsigned size(parsed ? header_.size() : record.size());
+      const size_t size(columns() ? columns() : record.size());
 
       if (record.size() == size)
       {
@@ -715,13 +761,14 @@ namespace vita
         if (!parsed)
           classification = !is_number(record[0]);
 
-        for (unsigned field(0); field < size; ++field)
+        for (size_t field(0); field < size; ++field)
         {
           // The first line is (also) used to learn data format.
-          if (!parsed)
+          if (columns() != size)
           {
-            column a;
+            assert(!parsed);
 
+            column a;
             a.name = "";
 
             std::string s_domain(is_number(record[field])
@@ -749,20 +796,30 @@ namespace vita
           {
             const category_t c(header_[field].category_id);
 
+            const std::string value(record[field]);
+
             if (field == 0)  // output value
             {
-              if (classification)
-                instance.output =
-                  static_cast<int>(encode(record[field], &classes_map_));
+              if (value.empty())
+              {
+                assert(dataset() == test);
+                // For test set the output class/value could be missing (e.g.
+                // for Kaggle.com competition test set).
+              }
               else
-                instance.output = convert(record[field], categories_[c].domain);
+              {
+                if (classification)
+                  instance.output = static_cast<int>(encode(value,
+                                                            &classes_map_));
+                else
+                  instance.output = convert(value, categories_[c].domain);
+              }
             }
             else  // input value
             {
-              instance.input.push_back(convert(record[field],
-                                               categories_[c].domain));
+              instance.input.push_back(convert(value, categories_[c].domain));
               if (categories_[c].domain == d_string)
-                categories_[c].labels.insert(record[field]);
+                categories_[c].labels.insert(value);
             }
           }
           catch(boost::bad_lexical_cast &)
@@ -772,9 +829,9 @@ namespace vita
           }
         }
 
-        if (instance.input.size() + 1 == header_.size())
+        if (instance.input.size() + 1 == columns())
         {
-          dataset_[active_dataset_].push_back(instance);
+          dataset_[dataset()].push_back(instance);
           ++parsed;
         }
       }
@@ -784,17 +841,36 @@ namespace vita
   }
 
   ///
-  /// \param[in] filename name of the file containing the learning collection.
+  /// \param[in] f name of the file containing the data set.
   /// \return number of lines parsed (0 in case of errors).
   ///
-  unsigned data::open(const std::string &filename)
+  /// Loads the content of \a f into the active dataset.
+  ///
+  /// \warning
+  /// * Training/valutation set must be loaded before test set.
+  /// * Before changing problem the data object should be clear.
+  ///
+  /// So:
+  ///
+  ///     dataset(training);
+  ///     open("training.csv");
+  ///     dataset(test);
+  ///     open("test.csv");
+  ///     ...
+  ///     clear();
+  ///     dataset(training);
+  ///     open("training2.csv");
+  ///     ...
+  ///
+  /// \note
+  /// Test set can have an empty output value.
+  ///
+  size_t data::open(const std::string &f)
   {
-    header_.clear();
+    const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
+                    boost::algorithm::iends_with(f, ".xml"));
 
-    const bool xrff(boost::algorithm::iends_with(filename, ".xrff") ||
-                    boost::algorithm::iends_with(filename, ".xml"));
-
-    return xrff ? load_xrff(filename) : load_csv(filename);
+    return xrff ? load_xrff(f) : load_csv(f);
   }
 
   ///
@@ -802,7 +878,7 @@ namespace vita
   ///
   bool data::operator!() const
   {
-    return dataset_[active_dataset_].empty();
+    return size() == 0;
   }
 
   ///
@@ -810,16 +886,16 @@ namespace vita
   ///
   bool data::check() const
   {
-    const unsigned cl_size(classes());
+    const size_t cl_size(classes());
     // If this is a classification problem then there should be at least two
     // classes.
     if (cl_size == 1)
       return false;
 
-    for (unsigned j(0); j < 2; ++j)
+    for (unsigned j(0); j <= k_max_dataset; ++j)
       if (!dataset_[j].empty())
       {
-        const unsigned in_size(dataset_[j].begin()->input.size());
+        const size_t in_size(dataset_[j].begin()->input.size());
 
         for (auto i(dataset_[j].begin()); i != dataset_[j].end(); ++i)
         {

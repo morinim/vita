@@ -269,6 +269,9 @@ namespace vita
                                       uvect *slot_class,
                                       unsigned *dataset_size)
   {
+    const data::dataset_t backup(dat_->dataset());
+    dat_->dataset(data::training);
+
     assert(ind.check());
     assert(slot_matrix);
     assert(slot_class);
@@ -317,6 +320,8 @@ namespace vita
 
       (*slot_class)[i] = sm[i][best_class] ? best_class : unknown;
     }
+
+    dat_->dataset(backup);
   }
 
   ///
@@ -408,6 +413,9 @@ namespace vita
   std::vector<distribution<double>> gaussian_evaluator::gaussian_distribution(
     const individual &ind)
   {
+    const data::dataset_t backup(dat_->dataset());
+    dat_->dataset(data::training);
+
     assert(dat_->classes() > 1);
     std::vector<distribution<double>> gauss(dat_->classes());
 
@@ -436,6 +444,7 @@ namespace vita
       gauss[t->label()].add(val);
     }
 
+    dat_->dataset(backup);
     return gauss;
   }
 

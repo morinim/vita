@@ -31,25 +31,27 @@ namespace vita
 
     src_problem();
 
-    std::pair<unsigned, unsigned> load(const std::string &,
-                                       const std::string & = "");
-    unsigned load_symbols(const std::string &);
+    std::pair<size_t, size_t> load(const std::string &,
+                                   const std::string & = "",
+                                   const std::string & = "");
+    size_t load_symbols(const std::string &);
+    size_t load_test_set(const std::string &);
     void setup_default_symbols();
 
     vita::data *data() { return &dat_; }
 
     void clear();
 
-    unsigned categories() const;
-    unsigned classes() const;
-    unsigned variables() const;
+    size_t categories() const;
+    size_t classes() const;
+    size_t variables() const;
 
     bool check(bool) const;
 
   private:
     typedef std::vector<category_t> cvect;
 
-    std::list<cvect> seq_with_rep(const cvect &, unsigned);
+    std::list<cvect> seq_with_rep(const cvect &, size_t);
     bool compatible(const cvect &, const std::vector<std::string> &) const;
     void setup_terminals_from_data();
 

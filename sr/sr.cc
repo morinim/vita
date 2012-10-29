@@ -25,6 +25,7 @@ namespace po = boost::program_options;
 #include "kernel/environment.h"
 #include "kernel/random.h"
 #include "kernel/search.h"
+#include "kernel/src_evaluator.h"
 #include "kernel/src_problem.h"
 #include "kernel/primitive/factory.h"
 
@@ -117,6 +118,33 @@ bool is_true(const std::string &s)
 }
 
 ///
+///
+///
+void predict_test_set(const vita::individual &ind)
+{
+  vita::data *const data = problem.data();
+
+  if (data->size(vita::data::test))
+  {
+    const vita::data::dataset_t backup(data->dataset());
+
+    data->dataset(vita::data::test);
+
+    vita::gaussian_classifier
+      cl(ind,
+         reinterpret_cast<vita::gaussian_evaluator *>(problem.get_evaluator()));
+
+    std::ofstream tf("test");
+    for (vita::data::iterator t(data->begin()); t != data->end(); ++t)
+    {
+      tf << cl(*t) << std::endl;
+    }
+
+    data->dataset(backup);
+  }
+}
+
+///
 /// Contains the text-based command line interface. The interface is not
 /// intented to be human friendly (no code completion, command history,
 /// submenu...). We just want a light interface for the Python GUI and a simple
@@ -136,7 +164,7 @@ namespace ui
     "(==(     )==)\n");
 
   po::options_description cmdl_opt(
-    "sr [options] [dataset]\n\nAllowed options");
+    "sr [options] [data set]\n\nAllowed options");
 
   /// Number of runs to be tried.
   unsigned runs(1);
@@ -235,7 +263,7 @@ namespace ui
     if (verbose)
     {
       if (!parsed)
-        std::cerr << "dataset file format error." << std::endl;
+        std::cerr << "data set file format error." << std::endl;
       else
         std::cout << "ok" << std::endl << "  [examples: " << parsed
                   << ", categories: " << problem.categories()
@@ -313,12 +341,14 @@ namespace ui
         fix_parameters();
 
         vita::search s(&problem);
-        s.run(verbose, runs);
+        vita::individual ind(s.run(verbose, runs));
+
+        predict_test_set(ind);
       }
       else
         std::cerr << "[ERROR] Too few terminals." << std::endl;
     else
-      std::cerr << "[ERROR] Missing dataset." << std::endl;
+      std::cerr << "[ERROR] Missing data set." << std::endl;
   }
 
   ///
@@ -381,6 +411,39 @@ namespace ui
 
     if (verbose)
       std::cout << "[INFO] Mutation rate is " << r << std::endl;
+  }
+
+  ///
+  /// \param[in] ts The dataset used as test set.
+  /// \return \c true if data have been correctly read and parsed.
+  ///
+  bool testset(const std::string &ts)
+  {
+    if (verbose)
+      std::cout << "Reading test set file (" << ts << ")... ";
+
+    unsigned parsed(0);
+    try
+    {
+      parsed = problem.load_test_set(ts);
+    }
+    catch(...)
+    {
+      parsed = 0;
+    }
+
+    if (verbose)
+    {
+      if (!parsed)
+        std::cerr << "test set file format error." << std::endl;
+      else
+        std::cout << "ok" << std::endl << "  [examples: " << parsed
+                  << ", categories: " << problem.categories()
+                  << ", features: " << problem.variables()
+                  << ", classes: " << problem.classes() << "]" << std::endl;
+    }
+
+    return parsed;
   }
 
   ///
@@ -624,18 +687,22 @@ int parse_command_line(int argc, char *const argv[])
       ("help,h", po::value<bool>()->zero_tokens()->notifier(&ui::help),
        "produce the help message")
       ("quiet",
-       po::value<unsigned>()->zero_tokens()->implicit_value(0)->notifier(&ui::verbosity),
+       po::value<unsigned>()->zero_tokens()->implicit_value(0)->notifier(
+         &ui::verbosity),
        "turn off verbosity")
       ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(1)->notifier(&ui::verbosity),
+       po::value<unsigned>()->zero_tokens()->implicit_value(1)->notifier(
+         &ui::verbosity),
        "turn on verbosity");
 
     po::options_description data("Data");
     data.add_options()
-      ("data,d", po::value<std::string>()->notifier(&ui::data), "dataset")
+      ("data,d", po::value<std::string>()->notifier(&ui::data), "data set")
       ("symbols,s",
        po::value<std::string>()->implicit_value("")->notifier(&ui::symbols),
-       "symbols file");
+       "symbols file")
+      ("testset,t", po::value<std::string>()->notifier(&ui::testset),
+       "test set");
 
     po::options_description config("Config");
     config.add_options()

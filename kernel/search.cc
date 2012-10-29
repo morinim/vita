@@ -136,6 +136,7 @@ namespace vita
 
       boost::uint64_t weight_sum(0);
       d->dataset(data::training);
+      d->slice(0);
       for (data::iterator i(d->begin()); i != d->end(); ++i)
       {
         if (generation == 0)  // preliminary setup for generation 0
@@ -183,7 +184,7 @@ namespace vita
       //    return w1 > w2;
       //  });
 
-      d->dataset(data::training, std::max(10u, count));
+      d->slice(std::max(10u, count));
       prob_->get_evaluator()->clear();
 
       // Selected training examples have their difficulties and ages reset.
@@ -344,7 +345,7 @@ namespace vita
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
-  const individual &search::run(bool verbose, unsigned n)
+  individual search::run(bool verbose, unsigned n)
   {
     assert(prob_->env.threashold.fitness || prob_->env.threashold.accuracy);
 
@@ -390,12 +391,14 @@ namespace vita
 
       if (validation)
       {
+        const data::dataset_t backup(prob_->data()->dataset());
+
         prob_->data()->dataset(data::validation);
         prob_->get_evaluator()->clear(s.best->ind);
 
         score = (*prob_->get_evaluator())(s.best->ind);
 
-        prob_->data()->dataset(data::training);
+        prob_->data()->dataset(backup);
         prob_->get_evaluator()->clear(s.best->ind);
       }
       else  // not using a validation set
@@ -406,6 +409,7 @@ namespace vita
         if (shake_data)
         {
           prob_->data()->dataset(data::training);
+          prob_->data()->slice(0);
           prob_->get_evaluator()->clear();
 
           score = (*prob_->get_evaluator())(s.best->ind);

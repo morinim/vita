@@ -37,7 +37,7 @@ namespace vita
     void arl(const individual &, evolution &);
     void tune_parameters(bool);
 
-    const individual &run(bool = true, unsigned = 1);
+    individual run(bool = true, unsigned = 1);
 
     bool check(bool) const;
 

@@ -58,31 +58,55 @@ namespace vita
   }
 
   ///
-  /// \param[in] data name of the file containing the learning collection.
+  /// \param[in] ds name of the dataset file (training/validation set).
+  /// \param[in] ts name of the test set.
   /// \param[in] symbols name of the file containing the symbols. If it is
   ///                    empty, \c src_problem::setup_default_symbols is called.
   /// \return number of examples (lines) parsed and number of sumbols parsed.
   ///
-  std::pair<unsigned, unsigned> src_problem::load(const std::string &data,
-                                                  const std::string &symbols)
+  /// Loads \a data into the active dataset.
+  ///
+  std::pair<size_t, size_t> src_problem::load(const std::string &ds,
+                                              const std::string &ts,
+                                              const std::string &symbols)
   {
     env.sset = vita::symbol_set();
     vars_.clear();
     dat_.clear();
 
-    const unsigned n_examples(dat_.open(data));
+    const size_t n_examples(dat_.open(ds));
     if (n_examples > 0)
       set_evaluator(classes() > 1
         ? k_gaussian_evaluator   // classification problem
         : k_sae_evaluator);      // symbolic regression problem
 
-    unsigned n_symbols(0);
+    if (!ds.empty())
+      load_test_set(ts);
+
+    size_t n_symbols(0);
     if (symbols.empty())
       setup_default_symbols();
     else
       n_symbols = load_symbols(symbols);
 
-    return std::pair<unsigned, unsigned>(n_examples, n_symbols);
+    return std::pair<size_t, size_t>(n_examples, n_symbols);
+  }
+
+  ///
+  /// \param[in] ts name of the file containing the test set.
+  /// \return number of examples parsed.
+  ///
+  /// Load the test set.
+  ///
+  size_t src_problem::load_test_set(const std::string &ts)
+  {
+    const data::dataset_t backup(dat_.dataset());
+    dat_.dataset(data::test);
+
+    const size_t n(dat_.open(ts));
+
+    dat_.dataset(backup);
+    return n;
   }
 
   ///
@@ -95,7 +119,7 @@ namespace vita
     vars_.clear();
 
     // Sets up the variables (features).
-    for (unsigned i(1); i < dat_.columns(); ++i)
+    for (size_t i(1); i < dat_.columns(); ++i)
     {
       std::string name(dat_.get_column(i).name);
       if (name.empty())
@@ -159,14 +183,14 @@ namespace vita
   /// among other things, how many features the dataset has.
   /// This function is used to change the symbols mantaining the same dataset.
   ///
-  unsigned src_problem::load_symbols(const std::string &sf)
+  size_t src_problem::load_symbols(const std::string &sf)
   {
     setup_terminals_from_data();
 
-    unsigned parsed(0);
+    size_t parsed(0);
 
     cvect categories(dat_.categories());
-    for (unsigned i(0); i < categories.size(); ++i)
+    for (size_t i(0); i < categories.size(); ++i)
       categories[i] = i;
 
     // Load the XML file (sf) into the property tree (pt).
@@ -176,7 +200,7 @@ namespace vita
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
-    for (unsigned i(0); i < dat_.categories(); ++i)
+    for (size_t i(0); i < dat_.categories(); ++i)
       std::cout << "Category " << i << ": " << dat_.get_category(i).name
                 << " (domain " << dat_.get_category(i).domain << ")"
                 << std::endl;
@@ -215,7 +239,7 @@ namespace vita
 #if !defined(NDEBUG)
                   //const domain_t domain(dat_.get_category(i->back()).domain);
                   std::cout << sym_name << '(';
-                  for (unsigned j(0); j < i->size(); ++j)
+                  for (size_t j(0); j < i->size(); ++j)
                     std::cout << dat_.get_category((*i)[j]).name
                               << (j+1 == i->size() ? ")" : ", ");
                   std::cout << std::endl;
@@ -229,13 +253,13 @@ namespace vita
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
             {
-              const unsigned n_args(factory.args(sym_name));
+              const size_t n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
               std::cout << sym_name << '(';
-              for (unsigned j(0); j < n_args; ++j)
+              for (size_t j(0); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
-                          << (j+1 == n_args ? ")" : ", ");
+                          << (j + 1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
               env.insert(factory.make(sym_name, cvect(n_args, category)));
@@ -254,21 +278,20 @@ namespace vita
   /// \return \c true if \a instance match \a pattern.
   ///
   /// For instance:
-  /// \verbatim
-  /// category_t km_h, name;
-  /// compatible({km_h}, {"km/h"}) == true
-  /// compatible({km_h}, {"numeric"}) == true
-  /// compatible({km_h}, {"string"}) == false
-  /// compatible({km_h}, {"name"}) == false
-  /// compatible({name}, {"string"}) == true
-  /// \endverbatim
+  ///
+  ///     category_t km_h, name;
+  ///     compatible({km_h}, {"km/h"}) == true
+  ///     compatible({km_h}, {"numeric"}) == true
+  ///     compatible({km_h}, {"string"}) == false
+  ///     compatible({km_h}, {"name"}) == false
+  ///     compatible({name}, {"string"}) == true
   ///
   bool src_problem::compatible(const cvect &instance,
                                const std::vector<std::string> &pattern) const
   {
     assert(instance.size() == pattern.size());
 
-    for (unsigned i(0); i < instance.size(); ++i)
+    for (size_t i(0); i < instance.size(); ++i)
     {
       bool generic(data::from_weka.find(pattern[i]) != data::from_weka.end());
 
@@ -296,7 +319,7 @@ namespace vita
   ///
   std::list<src_problem::cvect> src_problem::seq_with_rep(
     const cvect &categories,
-    unsigned args)
+    size_t args)
   {
     assert(categories.size());
     assert(args);
@@ -304,14 +327,14 @@ namespace vita
     class swr
     {
     public:
-      swr(const cvect &categories, unsigned args)
+      swr(const cvect &categories, size_t args)
         : categories_(categories), args_(args)
       {
       }
 
       void operator()(unsigned level, const cvect &base, std::list<cvect> *out)
       {
-        for (unsigned i(0); i < categories_.size(); ++i)
+        for (size_t i(0); i < categories_.size(); ++i)
         {
           cvect current(base);
           current.push_back(categories_[i]);
@@ -325,7 +348,7 @@ namespace vita
 
     private:
       const cvect &categories_;
-      const unsigned args_;
+      const size_t args_;
     };
 
     std::list<cvect> out;
@@ -336,7 +359,7 @@ namespace vita
   ///
   /// \return number of categories of the problem (>= 1).
   ///
-  unsigned src_problem::categories() const
+  size_t src_problem::categories() const
   {
     return dat_.categories();
   }
@@ -345,7 +368,7 @@ namespace vita
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
-  unsigned src_problem::classes() const
+  size_t src_problem::classes() const
   {
     assert(dat_.classes() != 1);
 
@@ -356,7 +379,7 @@ namespace vita
   /// \return dimension of the input vectors (i.e. the number of variable of
   ///         the problem).
   ///
-  unsigned src_problem::variables() const
+  size_t src_problem::variables() const
   {
     return dat_.variables();
   }
