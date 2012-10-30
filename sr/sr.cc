@@ -228,7 +228,7 @@ namespace ui
       std::cout << "[WARNING] Adjusting crossover probability (" << r
                 << " => 0.0)" << std::endl;
     }
-    else if (*problem.env.p_cross > 1.0)
+    else if (r > 1.0)
     {
       r = 1.0;
       std::cout << "[WARNING] Adjusting crossover probability (" << r
@@ -658,6 +658,32 @@ namespace ui
   }
 
   ///
+  /// \param[in] r range is [0,1].
+  ///
+  /// Sets percent of the dataset used for validation.
+  ///
+  void validation(double r)
+  {
+    if (r < 0.0)
+    {
+      r = 0.0;
+      std::cout << "[WARNING] Adjusting validation set ratio (" << r
+                << " => 0.0)" << std::endl;
+    }
+    else if (r > 1.0)
+    {
+      r = 1.0;
+      std::cout << "[WARNING] Adjusting validation set ratio (" << r
+                << " => 1.0)" << std::endl;
+    }
+
+    problem.env.validation_ratio = r;
+
+    if (verbose)
+      std::cout << "[INFO] Validation set ratio is " << r << std::endl;
+  }
+
+  ///
   /// \param[in] v verbosity level.
   ///
   void verbosity(bool v)
@@ -702,7 +728,9 @@ int parse_command_line(int argc, char *const argv[])
        po::value<std::string>()->implicit_value("")->notifier(&ui::symbols),
        "symbols file")
       ("testset,t", po::value<std::string>()->notifier(&ui::testset),
-       "test set");
+       "test set")
+      ("validation", po::value<double>()->notifier(&ui::validation),
+       "sets the percent of the dataset used for validation");
 
     po::options_description config("Config");
     config.add_options()

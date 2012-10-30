@@ -410,7 +410,7 @@ namespace vita
         {
           prob_->data()->dataset(data::training);
           prob_->data()->slice(0);
-          prob_->get_evaluator()->clear();
+          prob_->get_evaluator()->clear(s.best->ind);
 
           score = (*prob_->get_evaluator())(s.best->ind);
         }
