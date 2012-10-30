@@ -892,17 +892,17 @@ namespace vita
     if (cl_size == 1)
       return false;
 
-    for (unsigned j(0); j <= k_max_dataset; ++j)
-      if (!dataset_[j].empty())
+    for (const auto &d : dataset_)
+      if (!d.empty() && &d != &dataset_[test])
       {
-        const size_t in_size(dataset_[j].begin()->input.size());
+        const size_t in_size(d.begin()->input.size());
 
-        for (auto i(dataset_[j].begin()); i != dataset_[j].end(); ++i)
+        for (const auto &e : d)
         {
-          if (i->input.size() != in_size)
+          if (e.input.size() != in_size)
             return false;
 
-          if (cl_size && i->label() >= cl_size)
+          if (cl_size && e.label() >= cl_size)
             return false;
         }
       }
