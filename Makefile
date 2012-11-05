@@ -21,9 +21,9 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
-INCPATH = ./ $(BOOST_INCLUDE)
+INCPATH = ./kernel $(BOOST_INCLUDE)
 
-WARN = -pedantic --std=c++0x -Wall -Wextra
+WARN = -pedantic --std=c++11 -Wall -Wextra
 DEFS = -march=native
 
 # The next blocks change some variables depending on the build type.
@@ -86,14 +86,18 @@ kernel: $(KERNEL_OBJ)
 .phony:	clean
 clean:
 	@echo Making clean...
-	@find ./ -name '*~' -exec rm '{}' \; -print -o -name ".*~" -exec rm {} \; -print -o -name "*.P" -exec rm {} \; -print -o -name "#*#" -exec rm {} \; -print
-	@find ./test/ -executable -not -name "*.*" -type f -delete -print
-	@find ./examples/ -executable -not -name "*.*" -type f -delete -print
-	@rm -f sr/sr kernel/*.o kernel/primitive/*.o sr/*.o test/*.o examples/*.o kernel/libvita.a
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*~" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name ".*~" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.P" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "#*#" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.o" -type f -delete -print
+	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
+	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
+	@rm -f sr/sr kernel/libvita.a
 
 .phony:	backup
 backup:
 	@echo Making backup...
 	@-if [ ! -e ../backup ]; then mkdir ../backup; fi;
 	@make clean
-	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --exclude=".make-debug" --exclude=".make-profile" --exclude=".make-release" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.tar.xz ../../vita
+	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.tar.xz ../../vita
