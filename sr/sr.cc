@@ -609,7 +609,7 @@ namespace ui
   ///
   /// If the output value of a run is greater than \a v it's scored as a
   /// success. The output value considered is the fitness when \a v is a simple
-  /// number or the accuracy when \a v is a percentage
+  /// number or the accuracy when \a v is a percentage.
   ///
   void threashold(const std::string &v)
   {
@@ -618,21 +618,25 @@ namespace ui
 
     bool set(false);
 
-    if (*v.rbegin() == '%')
+    if (v.length())
     {
-      const double accuracy(boost::lexical_cast<double>(v) / 100.0);
+      if (v.back() == '%')
+      {
+        const double accuracy(boost::lexical_cast<double>(
+                                v.substr(0, v.length() - 1)) / 100.0);
 
-      set = (0.0 <= accuracy) && (accuracy <= 1.0);
-      if (set)
-        problem.env.threashold.accuracy = accuracy;
-    }
-    else
-    {
-      const vita::fitness_t fitness(boost::lexical_cast<double>(v));
+        set = (0.0 <= accuracy) && (accuracy <= 1.0);
+        if (set)
+          problem.env.threashold.accuracy = accuracy;
+      }
+      else
+      {
+        const vita::fitness_t fitness(boost::lexical_cast<double>(v));
 
-      set = (fitness <= 0.0);
-      if (set)
-        problem.env.threashold.fitness = fitness;
+        set = (fitness <= 0.0);
+        if (set)
+          problem.env.threashold.fitness = fitness;
+      }
     }
 
     if (verbose)
@@ -658,29 +662,36 @@ namespace ui
   }
 
   ///
-  /// \param[in] r range is [0,1].
+  /// \param[in] v range is [0,1] or [0%,100%].
   ///
   /// Sets percent of the dataset used for validation.
   ///
-  void validation(double r)
+  void validation(const std::string &v)
   {
-    if (r < 0.0)
-    {
-      r = 0.0;
-      std::cout << "[WARNING] Adjusting validation set ratio (" << r
-                << " => 0.0)" << std::endl;
-    }
-    else if (r > 1.0)
-    {
-      r = 1.0;
-      std::cout << "[WARNING] Adjusting validation set ratio (" << r
-                << " => 1.0)" << std::endl;
-    }
+    bool set(false);
 
-    problem.env.validation_ratio = r;
+    if (v.length())
+    {
+      double ratio;
+      if (v.back() == '%')
+        ratio = boost::lexical_cast<double>(v.substr(0, v.length() - 1)) /
+                100.0;
+      else
+        ratio = boost::lexical_cast<double>(v);
+
+      set = (0.0 <= ratio) && (ratio <= 0.9);
+      if (set)
+        problem.env.validation_ratio = ratio;
+
+    }
 
     if (verbose)
-      std::cout << "[INFO] Validation set ratio is " << r << std::endl;
+    {
+      if (set)
+        std::cout << "[INFO] Validation set ratio is " << v << std::endl;
+      else
+        std::cerr << "[ERROR] Invalid validation ratio." << std::endl;
+    }
   }
 
   ///
@@ -729,7 +740,7 @@ int parse_command_line(int argc, char *const argv[])
        "symbols file")
       ("testset,t", po::value<std::string>()->notifier(&ui::testset),
        "test set")
-      ("validation", po::value<double>()->notifier(&ui::validation),
+      ("validation", po::value<std::string>()->notifier(&ui::validation),
        "sets the percent of the dataset used for validation");
 
     po::options_description config("Config");
