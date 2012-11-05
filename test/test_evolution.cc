@@ -14,9 +14,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/environment.h"
-#include "kernel/evolution.h"
-#include "kernel/primitive/factory.h"
+#include "environment.h"
+#include "evolution.h"
+#include "primitive/factory.h"
 
 #define BOOST_TEST_MODULE Evolution
 #include "boost/test/unit_test.hpp"

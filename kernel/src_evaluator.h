@@ -16,10 +16,10 @@
 
 #include <vector>
 
-#include "kernel/classifier.h"
-#include "kernel/evaluator.h"
-#include "kernel/src_variable.h"
-#include "kernel/primitive/factory.h"
+#include "classifier.h"
+#include "evaluator.h"
+#include "src_variable.h"
+#include "primitive/factory.h"
 
 namespace vita
 {

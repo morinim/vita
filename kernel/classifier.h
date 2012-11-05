@@ -16,8 +16,8 @@
 
 #include <string>
 
-#include "kernel/data.h"
-#include "kernel/individual.h"
+#include "data.h"
+#include "individual.h"
 
 namespace vita
 {

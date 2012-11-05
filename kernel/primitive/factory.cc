@@ -11,11 +11,11 @@
  *
  */
 
-#include "kernel/primitive/factory.h"
-#include "kernel/primitive/int.h"
-#include "kernel/primitive/double.h"
-#include "kernel/primitive/string.h"
-#include "kernel/src_constant.h"
+#include "primitive/factory.h"
+#include "primitive/int.h"
+#include "primitive/double.h"
+#include "primitive/string.h"
+#include "src_constant.h"
 
 namespace vita
 {

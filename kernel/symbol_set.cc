@@ -11,10 +11,10 @@
  *
  */
 
-#include "kernel/symbol_set.h"
-#include "kernel/adf.h"
-#include "kernel/argument.h"
-#include "kernel/random.h"
+#include "symbol_set.h"
+#include "adf.h"
+#include "argument.h"
+#include "random.h"
 
 namespace vita
 {

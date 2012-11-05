@@ -16,8 +16,8 @@
 
 #include <vector>
 
-#include "kernel/data.h"
-#include "kernel/environment.h"
+#include "data.h"
+#include "environment.h"
 
 namespace vita
 {

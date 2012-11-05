@@ -31,14 +31,14 @@ REQUIREMENTS
   * POSIX-standard shell
   * Boost library (<http://www.boost.org>)
   * A C++11-standard-compliant compiler (or, at least, partially compatible:
-    e.g. gcc v4.5.x or newer)
-  * Python v3
+    e.g. gcc v4.7.x or newer)
+  * Python v3 (for some functionalities)
 
   ### Windows requirements ###
 
   * A C++11-standard-compliant compiler (or, at least, partially compatible:
     e.g. MinGW / Cygwin).
-  * Python v3
+  * Python v3 (for some functionalities)
 
 GETTING THE SOURCE
 
@@ -71,13 +71,13 @@ GETTING THE SOURCE
 
   Run the following Mercurial command:
 
-    hg clone https://vita.googlecode.com/hg/ vita
+    hg clone https://code.google.com/p/vita/
 
 THE VITA DISTRIBUTION
 
   This is a sketch of the resulting directory structure:
 
-  vita-X.Y.Z
+  vita
     AUTHORS
     LICENSE
     Makefile
@@ -100,7 +100,7 @@ SETTING UP THE BUILD
 
   ### GCC / MinGW ###
 
-  cd vita-X.Y.Z
+  cd vita
 
   * To build all:                             make
   * To build the kernel library (libvita.a):  make kernel
@@ -111,3 +111,15 @@ SETTING UP THE BUILD
   If you see errors, try to tweak the contents of Makefile to make them go
   away.
   All output files will per default be stored together with the source code.
+
+  ### Additional instructions for building Boost on MinGW / MSYS ###
+
+  1. Set up a MinGW/MSYS environment;
+  2. Get bjam (<http://sourceforge.net/projects/boost/files/boost-binaries/1.51.0/boost_1_51_tools.zip/download> or newer version);
+  3. Get the latest Boost (<http://www.boost.org>);
+  4. Extract them both to the same dir (overlaid);
+  5. Open msys and cd to your boost directory;
+  6. Execute
+       bjam link=static runtime-link=static target-os=windows threadapi=win32 threading=multi toolset=gcc variant=release --build-type=minimal --layout=system
+  7. Go and make yourself several cups of green tea;
+  8. The stage subdir now contains libs.

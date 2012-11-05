@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "kernel/evaluator.h"
+#include "evaluator.h"
 
 namespace vita
 {

@@ -11,8 +11,8 @@
  *
  */
 
-#include "kernel/evaluator_proxy.h"
-#include "kernel/individual.h"
+#include "evaluator_proxy.h"
+#include "individual.h"
 
 namespace vita
 {

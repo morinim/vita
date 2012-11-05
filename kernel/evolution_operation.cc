@@ -11,9 +11,9 @@
  *
  */
 
-#include "kernel/evolution_operation.h"
-#include "kernel/environment.h"
-#include "kernel/evolution.h"
+#include "evolution_operation.h"
+#include "environment.h"
+#include "evolution.h"
 
 namespace vita
 {

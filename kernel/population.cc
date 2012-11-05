@@ -15,8 +15,8 @@
 #include <ctime>
 #include <fstream>
 
-#include "kernel/population.h"
-#include "kernel/random.h"
+#include "population.h"
+#include "random.h"
 
 namespace vita
 {

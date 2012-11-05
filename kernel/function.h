@@ -17,9 +17,8 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
-#include "kernel/gene.h"
-#include "kernel/symbol.h"
+#include "gene.h"
+#include "symbol.h"
 
 namespace vita
 {

@@ -11,8 +11,8 @@
  *
  */
 
-#include "kernel/ttable.h"
-#include "kernel/individual.h"
+#include "ttable.h"
+#include "individual.h"
 
 namespace vita
 {

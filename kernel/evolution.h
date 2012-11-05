@@ -16,13 +16,12 @@
 
 #include <memory>
 
-#include "kernel/vita.h"
-#include "kernel/analyzer.h"
-#include "kernel/evaluator_proxy.h"
-#include "kernel/evolution_operation.h"
-#include "kernel/evolution_replacement.h"
-#include "kernel/evolution_selection.h"
-#include "kernel/population.h"
+#include "analyzer.h"
+#include "evaluator_proxy.h"
+#include "evolution_operation.h"
+#include "evolution_replacement.h"
+#include "evolution_selection.h"
+#include "population.h"
 
 namespace vita
 {

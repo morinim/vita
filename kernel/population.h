@@ -16,10 +16,9 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
-#include "kernel/analyzer.h"
-#include "kernel/environment.h"
-#include "kernel/individual.h"
+#include "analyzer.h"
+#include "environment.h"
+#include "individual.h"
 
 namespace vita
 {

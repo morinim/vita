@@ -14,9 +14,8 @@
 #if !defined(EVALUATOR_PROXY_H)
 #define      EVALUATOR_PROXY_H
 
-#include "kernel/vita.h"
-#include "kernel/evaluator.h"
-#include "kernel/ttable.h"
+#include "evaluator.h"
+#include "ttable.h"
 
 namespace vita
 {

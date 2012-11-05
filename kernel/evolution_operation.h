@@ -16,8 +16,7 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
-#include "kernel/individual.h"
+#include "individual.h"
 
 namespace vita
 {

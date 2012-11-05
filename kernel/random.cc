@@ -11,7 +11,7 @@
  *
  */
 
-#include "kernel/random.h"
+#include "random.h"
 
 namespace vita
 {

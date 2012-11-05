@@ -11,7 +11,7 @@
  *
  */
 
-#include "kernel/terminal.h"
+#include "terminal.h"
 
 namespace vita
 {

@@ -21,7 +21,7 @@
 #include <sstream>
 #include <string>
 
-#include "kernel/vita.h"
+#include "vita.h"
 
 namespace vita
 {

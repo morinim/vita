@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "kernel/problem.h"
+#include "problem.h"
 
 namespace vita
 {

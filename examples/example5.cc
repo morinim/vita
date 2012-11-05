@@ -14,10 +14,10 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/environment.h"
-#include "kernel/individual.h"
-#include "kernel/interpreter.h"
-#include "kernel/primitive/factory.h"
+#include "environment.h"
+#include "individual.h"
+#include "interpreter.h"
+#include "primitive/factory.h"
 
 int main(int argc, char *argv[])
 {

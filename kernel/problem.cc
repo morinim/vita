@@ -11,9 +11,9 @@
  *
  */
 
-#include "kernel/problem.h"
-#include "kernel/evaluator.h"
-#include "kernel/search.h"
+#include "problem.h"
+#include "evaluator.h"
+#include "search.h"
 
 namespace vita
 {

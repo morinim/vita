@@ -11,9 +11,9 @@
  *
  */
 
-#include "kernel/src_evaluator.h"
-#include "kernel/individual.h"
-#include "kernel/interpreter.h"
+#include "src_evaluator.h"
+#include "individual.h"
+#include "interpreter.h"
 
 namespace vita
 {

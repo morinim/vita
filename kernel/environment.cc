@@ -13,8 +13,8 @@
 
 #include <iostream>
 
-#include "kernel/environment.h"
-#include "kernel/terminal.h"
+#include "environment.h"
+#include "terminal.h"
 
 namespace vita
 {

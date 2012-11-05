@@ -18,10 +18,10 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "kernel/search.h"
-#include "kernel/adf.h"
-#include "kernel/evolution.h"
-#include "kernel/problem.h"
+#include "search.h"
+#include "adf.h"
+#include "evolution.h"
+#include "problem.h"
 
 namespace vita
 {

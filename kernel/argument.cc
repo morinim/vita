@@ -11,9 +11,9 @@
  *
  */
 
-#include "kernel/argument.h"
-#include "kernel/gene.h"
-#include "kernel/interpreter.h"
+#include "argument.h"
+#include "gene.h"
+#include "interpreter.h"
 
 namespace vita
 {

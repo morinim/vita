@@ -16,11 +16,11 @@
 #include <iostream>
 #include <fstream>
 
-#include "kernel/adf.h"
-#include "kernel/distribution.h"
-#include "kernel/environment.h"
-#include "kernel/interpreter.h"
-#include "kernel/primitive/factory.h"
+#include "adf.h"
+#include "distribution.h"
+#include "environment.h"
+#include "interpreter.h"
+#include "primitive/factory.h"
 
 int main(int argc, char *argv[])
 {

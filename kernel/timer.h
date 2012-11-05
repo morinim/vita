@@ -16,6 +16,8 @@
 
 #include <chrono>
 
+#include "vita.h"
+
 namespace vita
 {
   ///

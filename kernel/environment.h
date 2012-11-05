@@ -21,8 +21,8 @@
 #include <cmath>
 #include <string>
 
-#include "kernel/fitness.h"
-#include "kernel/symbol_set.h"
+#include "fitness.h"
+#include "symbol_set.h"
 
 namespace vita
 {

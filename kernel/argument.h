@@ -16,8 +16,7 @@
 
 #include <string>
 
-#include "kernel/vita.h"
-#include "kernel/terminal.h"
+#include "terminal.h"
 
 namespace vita
 {

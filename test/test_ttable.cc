@@ -14,10 +14,10 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/environment.h"
-#include "kernel/individual.h"
-#include "kernel/interpreter.h"
-#include "kernel/primitive/factory.h"
+#include "environment.h"
+#include "individual.h"
+#include "interpreter.h"
+#include "primitive/factory.h"
 
 #define BOOST_TEST_MODULE TranspositionTable
 #include "boost/test/unit_test.hpp"

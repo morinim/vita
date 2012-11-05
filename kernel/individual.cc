@@ -13,11 +13,11 @@
 
 #include <algorithm>
 
-#include "kernel/individual.h"
-#include "kernel/adf.h"
-#include "kernel/argument.h"
-#include "kernel/environment.h"
-#include "kernel/random.h"
+#include "individual.h"
+#include "adf.h"
+#include "argument.h"
+#include "environment.h"
+#include "random.h"
 
 namespace vita
 {

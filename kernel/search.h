@@ -14,9 +14,8 @@
 #if !defined(SEARCH_H)
 #define      SEARCH_H
 
-#include "kernel/vita.h"
-#include "kernel/environment.h"
-#include "kernel/fitness.h"
+#include "environment.h"
+#include "fitness.h"
 
 namespace vita
 {

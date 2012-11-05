@@ -14,10 +14,10 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/none.hpp>
 
-#include "kernel/interpreter.h"
-#include "kernel/adf.h"
-#include "kernel/individual.h"
-#include "kernel/symbol.h"
+#include "interpreter.h"
+#include "adf.h"
+#include "individual.h"
+#include "symbol.h"
 
 namespace vita
 {

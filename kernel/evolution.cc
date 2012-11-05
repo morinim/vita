@@ -16,10 +16,10 @@
 #include <string>
 #include <vector>
 
-#include "kernel/evolution.h"
-#include "kernel/environment.h"
-#include "kernel/random.h"
-#include "kernel/timer.h"
+#include "evolution.h"
+#include "environment.h"
+#include "random.h"
+#include "timer.h"
 
 namespace vita
 {

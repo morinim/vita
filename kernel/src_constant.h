@@ -16,8 +16,8 @@
 
 #include <boost/variant.hpp>
 
-#include "kernel/data.h"
-#include "kernel/terminal.h"
+#include "data.h"
+#include "terminal.h"
 
 namespace vita
 {

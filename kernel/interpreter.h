@@ -18,7 +18,7 @@
 #include <boost/multi_array.hpp>
 #include <boost/optional.hpp>
 
-#include "kernel/locus.h"
+#include "locus.h"
 
 namespace vita
 {

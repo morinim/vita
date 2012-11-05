@@ -31,17 +31,17 @@
  *
  */
 
-#pragma GCC diagnostic ignored "-Wformat"
-
 #if !defined(VITA_H)
 #define      VITA_H
-
-#include <boost/cstdint.hpp>
 
 #include <cassert>
 #include <climits>
 #include <cmath>
 #include <memory>
+
+#include <boost/cstdint.hpp>
+
+#include "compatibility_patch.h"
 
 namespace vita
 {
@@ -49,31 +49,6 @@ namespace vita
 
   /// Just a shortcut.
   typedef std::shared_ptr<symbol> symbol_ptr;
-
-#if defined(_MSC_VER)
-#  define ROTL64(x, y)  _rotl64(x, y)
-#else
-   ///
-   /// \param[in] x unsigned 64-bit to be rotated.
-   /// \param[in] r number of steps.
-   /// \return the value corresponding to rotating the bits of \a x \a r-steps
-   ///         to the right (r must be between 1 to 31 inclusive).
-   ///
-   inline boost::uint64_t rotl64(boost::uint64_t x, boost::uint8_t r)
-   {
-     return (x << r) | (x >> (64-r));
-   }
-#  define ROTL64(x, y)  rotl64(x, y)
-#endif
-
-  // A way to hide warnings about variables only used in compile time asserts.
-  // There are GCC compiler flags that control unused warnings, but I want a
-  // selective behaviour (generally it is useful to check for dead code).
-#if defined(__GNUC__)
-#  define VARIABLE_IS_NOT_USED __attribute__ ((unused))
-#else
-#  define VARIABLE_IS_NOT_USED
-#endif
 
   /// This is the type used as key for symbol identification.
   typedef boost::uint16_t opcode_t;

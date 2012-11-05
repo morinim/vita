@@ -17,7 +17,7 @@
 #include <cmath>
 #include <map>
 
-#include "kernel/vita.h"
+#include "vita.h"
 
 namespace vita
 {

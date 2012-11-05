@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "kernel/vita.h"
+#include "vita.h"
 
 namespace vita
 {

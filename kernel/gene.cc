@@ -11,9 +11,9 @@
  *
  */
 
-#include "kernel/gene.h"
-#include "kernel/function.h"
-#include "kernel/random.h"
+#include "gene.h"
+#include "function.h"
+#include "random.h"
 
 namespace vita
 {

@@ -15,10 +15,10 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "kernel/src_problem.h"
-#include "kernel/individual.h"
-#include "kernel/src_constant.h"
-#include "kernel/src_evaluator.h"
+#include "src_problem.h"
+#include "individual.h"
+#include "src_constant.h"
+#include "src_evaluator.h"
 
 namespace vita
 {

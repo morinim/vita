@@ -21,11 +21,10 @@
 #include <sstream>
 #include <string>
 
-#include "kernel/vita.h"
-#include "kernel/function.h"
-#include "kernel/interpreter.h"
-#include "kernel/random.h"
-#include "kernel/terminal.h"
+#include "function.h"
+#include "interpreter.h"
+#include "random.h"
+#include "terminal.h"
 
 namespace vita
 {

@@ -11,7 +11,7 @@
  *
  */
 
-#include "kernel/analyzer.h"
+#include "analyzer.h"
 
 namespace vita
 {

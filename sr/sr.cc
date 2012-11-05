@@ -22,12 +22,12 @@ namespace po = boost::program_options;
 #include <iterator>
 #include <string>
 
-#include "kernel/environment.h"
-#include "kernel/random.h"
-#include "kernel/search.h"
-#include "kernel/src_evaluator.h"
-#include "kernel/src_problem.h"
-#include "kernel/primitive/factory.h"
+#include "environment.h"
+#include "random.h"
+#include "search.h"
+#include "src_evaluator.h"
+#include "src_problem.h"
+#include "primitive/factory.h"
 
 #include "command_line_interpreter.h"
 
@@ -620,7 +620,7 @@ namespace ui
 
     if (*v.rbegin() == '%')
     {
-      const double accuracy(std::stod(v) / 100.0);
+      const double accuracy(boost::lexical_cast<double>(v) / 100.0);
 
       set = (0.0 <= accuracy) && (accuracy <= 1.0);
       if (set)
@@ -628,7 +628,7 @@ namespace ui
     }
     else
     {
-      const vita::fitness_t fitness(std::stod(v));
+      const vita::fitness_t fitness(boost::lexical_cast<double>(v));
 
       set = (fitness <= 0.0);
       if (set)

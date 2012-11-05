@@ -15,9 +15,9 @@
 #include <iostream>
 #include <memory>
 
-#include "kernel/environment.h"
-#include "kernel/evolution.h"
-#include "kernel/primitive/factory.h"
+#include "environment.h"
+#include "evolution.h"
+#include "primitive/factory.h"
 
 //
 // Creates a random population and prints it out.

@@ -22,10 +22,10 @@
 #include <string>
 #include <vector>
 
-#include "kernel/environment.h"
-#include "kernel/gene.h"
-#include "kernel/locus.h"
-#include "kernel/ttable.h"
+#include "environment.h"
+#include "gene.h"
+#include "locus.h"
+#include "ttable.h"
 
 namespace vita
 {

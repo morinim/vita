@@ -14,7 +14,7 @@
 #if !defined(SCORE_H)
 #define      SCORE_H
 
-#include "kernel/fitness.h"
+#include "fitness.h"
 
 namespace vita
 {

@@ -11,7 +11,7 @@
  *
  */
 
-#include "kernel/symbol.h"
+#include "symbol.h"
 
 namespace vita
 {

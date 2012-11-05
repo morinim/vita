@@ -18,10 +18,10 @@
 
 #include <boost/any.hpp>
 
-#include "kernel/function.h"
-#include "kernel/interpreter.h"
-#include "kernel/random.h"
-#include "kernel/terminal.h"
+#include "function.h"
+#include "interpreter.h"
+#include "random.h"
+#include "terminal.h"
 
 namespace vita
 {
@@ -122,7 +122,7 @@ namespace vita
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) + dbl::cast(ev1));
-        if (isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return boost::any();
 
         return ret;
       }
@@ -407,7 +407,7 @@ namespace vita
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) * dbl::cast(ev1));
-        if (isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return boost::any();
 
         return ret;
       }
@@ -455,7 +455,7 @@ namespace vita
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) - dbl::cast(ev1));
-        if (isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return boost::any();
 
         return ret;
       }

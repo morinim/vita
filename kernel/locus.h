@@ -19,7 +19,7 @@
 
 #include "boost/multi_array.hpp"
 
-#include "kernel/gene.h"
+#include "gene.h"
 
 namespace vita
 {
