@@ -373,7 +373,7 @@ namespace vita
     unsigned dummy(0);
     eva_->fill_slots(ind, &slot_matrix, &slot_class, &dummy);
 
-    for (unsigned i(0); i < slot_class.size(); ++i)
+    for (size_t i(0); i < slot_class.size(); ++i)
       slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
   }
 
@@ -527,7 +527,10 @@ namespace vita
   ///
   /// \param[in] ind program used for classification.
   /// \param[in] example input value whose class we are interested in.
-  /// \param[in] gauss parameters of the gaussian distributions.
+  /// \param[in] gauss parameters of the gaussian distributions. We have one
+  ///                  gaussian distribution for every class.
+  /// \param[out] prob
+  /// \param[out] prob_sum
   /// \return the class of \a instance.
   ///
   unsigned gaussian_evaluator::class_label(
@@ -546,18 +549,18 @@ namespace vita
     *prob = *prob_sum = 0.0;
     unsigned probable_class(0);
 
-    for (unsigned i(0); i < dat_->classes(); ++i)
+    for (size_t i(0); i < dat_->classes(); ++i)
     {
       const double distance(std::abs(x - gauss[i].mean));
       const double variance(gauss[i].variance);
 
       double p(0.0);
-      if (variance == 0.0)
-        if (distance == 0.0)
+      if (variance == 0.0)     // These are borderline cases
+        if (distance == 0.0)   // These are borderline cases
           p = 1.0;
         else
           p = 0.0;
-      else
+      else                     // This is the standard case
         p = std::exp(-0.5 * distance * distance / variance);
 
       if (p > *prob)
