@@ -119,7 +119,16 @@ namespace vita
 
   ///
   /// Slotted Dynamic Class Boundary Determination
-  /// (http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html).
+  ///
+  /// Rather than using fixed static thresholds as boundaries to distinguish
+  /// between different classes, this approach introduces a method of
+  /// classification where the boundaries between different classes can be
+  /// dynamically determined during the evolutionary process.
+  ///
+  /// \see
+  /// "Multiclass Object Classification Using Genetic Programming" - CS-RE-04/2
+  /// - Mengjie Zhang, Will Smart -
+  /// <http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html>
   ///
   class dyn_slot_evaluator : public src_evaluator
   {
@@ -155,6 +164,19 @@ namespace vita
     std::vector<std::string> slot_class_;
   };
 
+  ///
+  /// This evaluator uses Gaussian distribution for multiclass object
+  /// classification.
+  /// Instead of using predefined multiple thresholds to form different regions
+  /// in the program output space for different classes, this approach uses
+  /// probabilities of different classes, derived from Gaussian distributions,
+  /// to construct the fitness function for classification.
+  ///
+  /// \see
+  /// "Using Gaussian Distribution to Construct Fitness Functions in Genetic
+  /// Programming for Multiclass Object Classification" - CS-TR-05-5 - Mangjie
+  /// Zhang, Will Smart.
+  ///
   class gaussian_evaluator : public src_evaluator
   {
   public:
