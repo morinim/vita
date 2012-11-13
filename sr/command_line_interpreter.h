@@ -143,19 +143,23 @@ private:
     }
     catch (boost::program_options::ambiguous_option &e)
     {
-      std::cerr << "[ERROR] Ambiguous command '" << e.get_option_name() << "'"
-                << std::endl;
+      std::cerr << "[ERROR] Ambiguous command '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "'" << std::endl;
     }
     catch (boost::program_options::invalid_command_line_syntax &e)
     {
-      std::cerr << "[ERROR] " << e.what() << std::endl;
+      std::cerr << "[ERROR] The required argument for option '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "' is missing" << std::endl;
     }
     catch (boost::program_options::unknown_option &e)
     {
-      std::cerr << "[ERROR] Unknown command '" << e.get_option_name() << "'"
-                << std::endl;
+      std::cerr << "[ERROR] Unknown command '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "'" << std::endl;
     }
-    catch (boost::program_options::validation_error &e)
+    catch (boost::program_options::error &e)
     {
       std::cerr << "[ERROR] " << e.what() << std::endl;
     }
