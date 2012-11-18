@@ -89,7 +89,7 @@ void fix_parameters()
 
   if (!env.threashold.fitness && !env.threashold.accuracy)
   {
-    if (problem.classes() > 1)  // classification
+    if (problem.classification())
     {
       env.threashold.fitness  = boost::none;
       env.threashold.accuracy =        0.99;
@@ -134,7 +134,7 @@ void predict_test_set(const vita::individual &ind)
       cl(ind,
          reinterpret_cast<vita::gaussian_evaluator *>(problem.get_evaluator()));
 
-    std::ofstream tf("test");
+    std::ofstream tf(problem.env.stat_dir + "/" + vita::environment::tst_filename);
     for (vita::data::iterator t(data->begin()); t != data->end(); ++t)
     {
       tf << cl(*t) << std::endl;
@@ -304,6 +304,37 @@ namespace ui
   void environment(bool)
   {
     std::cout << "NOT READY" << std::endl;
+  }
+
+  ///
+  /// param[in] v the chosen evaluator.
+  ///
+  /// \note
+  /// The evaluator should fit the current problem kind (symbolic regression,
+  /// classification) or it won't be used.
+  ///
+  void evaluator(const std::string &v)
+  {
+    static bool init(false);
+    static std::vector<std::string> options(vita::src_problem::k_max_evaluator + 1);
+
+    if (!init)
+    {
+      options[vita::src_problem::k_count_evaluator] = "count";
+      options[vita::src_problem::k_sae_evaluator] = "sae";
+      options[vita::src_problem::k_sse_evaluator] = "sse";
+      options[vita::src_problem::k_dyn_slot_evaluator] = "dynslot";
+      options[vita::src_problem::k_gaussian_evaluator] = "gaussian";
+    }
+
+    const auto i(find(options.begin(), options.end(), v));
+    if (i != options.end())
+    {
+      problem.set_evaluator(std::distance(options.begin(), i));
+      std::cout << "[INFO] Evaluator is " << v << std::endl;
+    }
+    else
+      std::cerr << "[ERROR] Wrong argument for evaluator command." << std::endl;
   }
 
   ///
@@ -707,6 +738,7 @@ namespace ui
 }  // namespace ui
 
 ///
+///
 /// \param[in] argc
 /// \param[in] argv
 /// \return -1 if command line parsing is enough (no further computing),
@@ -745,13 +777,13 @@ int parse_command_line(int argc, char *const argv[])
 
     po::options_description config("Config");
     config.add_options()
-      ("ttable",
-       po::value<unsigned>()->notifier(&ui::ttable),
-       "number of bits used for the ttable (ttable contains 2^bits elements)")
-      ("random-seed",
-       po::value<unsigned>()->notifier(&ui::random_seed),
+      ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
+       "sets the preferred evaluator (count, sae, sse, dynslot, gaussian)")
+      ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
        "sets the seed for the pseudo-random number generator. "\
-       "Pseudo-random sequences are repeatable by using the same seed value");
+       "Pseudo-random sequences are repeatable by using the same seed value")
+      ("ttable", po::value<unsigned>()->notifier(&ui::ttable),
+       "number of bits used for the ttable (ttable contains 2^bits elements)");
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
@@ -811,7 +843,7 @@ int parse_command_line(int argc, char *const argv[])
     po::options_description statistics("Statistics");
     statistics.add_options()
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
-       "log statistics in 'stat_dir' folder/directory")
+       "log statistics in the specified folder/directory")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),

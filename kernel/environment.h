@@ -147,6 +147,7 @@ namespace vita
     static const char arl_filename[];
     static const char dyn_filename[];
     static const char sum_filename[];
+    static const char tst_filename[];
   };
 }  // namespace vita
 

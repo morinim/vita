@@ -21,6 +21,7 @@ namespace vita
   const char environment::arl_filename[] =     "arl";
   const char environment::dyn_filename[] = "dynamic";
   const char environment::sum_filename[] = "summary";
+  const char environment::tst_filename[] =    "test";
 
   ///
   /// \param[in] initialize if \c true initializes every parameter in such a

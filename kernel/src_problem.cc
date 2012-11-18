@@ -52,6 +52,9 @@ namespace vita
   ///
   void src_problem::clear()
   {
+    p_symre = k_sae_evaluator;
+    p_class = k_gaussian_evaluator;
+    
     problem::clear();
     vars_.clear();
     dat_.clear();
@@ -76,9 +79,7 @@ namespace vita
 
     const size_t n_examples(dat_.open(ds));
     if (n_examples > 0)
-      set_evaluator(classes() > 1
-        ? k_gaussian_evaluator   // classification problem
-        : k_sae_evaluator);      // symbolic regression problem
+      set_evaluator(classification() ? p_class : p_symre);
 
     if (!ds.empty())
       load_test_set(ts);
@@ -339,8 +340,8 @@ namespace vita
           cvect current(base);
           current.push_back(categories_[i]);
 
-          if (level+1 < args_)
-            operator()(level+1, current, out);
+          if (level + 1 < args_)
+            operator()(level + 1, current, out);
           else
             out->push_back(current);
         }
@@ -398,6 +399,20 @@ namespace vita
 
     if (vars_.size() != dat_.variables())
       return false;
+
+    if (p_symre > k_max_evaluator)
+    {
+      if (verbose)
+        std::cerr << "Incorrect ID for preferred symbolic regression evaluator." << std::endl;
+      return false;
+    }
+
+    if (p_class > k_max_evaluator)
+    {
+      if (verbose)
+        std::cerr << "Incorrect ID for preferred classification evaluator." << std::endl;
+      return false;
+    }
 
     return true;
   }

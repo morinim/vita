@@ -35,6 +35,7 @@ namespace vita
     evaluator *get_evaluator();
     void set_evaluator(unsigned);
 
+    /// \return an access point for the dataset.
     virtual vita::data *data() { return 0; }
 
     virtual void clear();

@@ -96,7 +96,8 @@ SETTING UP THE BUILD
 
   Kernel can be built with a header-only Boost library; other programs may
   need boost separately-compiled library binaries (e.g. SR utility needs
-  Program Options Library to compile).
+  Program Options Library to compile). To build Boost library under MinGW
+  see below.
 
   ### GCC / MinGW ###
 

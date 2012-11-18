@@ -26,8 +26,9 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    enum {k_count_evaluator = 0, k_sae_evaluator, k_sse_evaluator,
-          k_dyn_slot_evaluator, k_gaussian_evaluator};
+    enum evaluator_id {k_count_evaluator = 0, k_sae_evaluator, k_sse_evaluator,
+                       k_dyn_slot_evaluator, k_gaussian_evaluator,
+                       k_max_evaluator = k_gaussian_evaluator};
 
     src_problem();
 
@@ -42,11 +43,21 @@ namespace vita
 
     void clear();
 
+    /// Just a shortcur for checking number of classes.
+    bool classification() { return classes() > 1; }
+    
     size_t categories() const;
     size_t classes() const;
     size_t variables() const;
 
     bool check(bool) const;
+
+  public:  // Public data members.
+    // Preferred evaluator for symbolic regression.
+    evaluator_id p_symre;
+    
+    // Preferred evaluator for classification.
+    evaluator_id p_class;
 
   private:
     typedef std::vector<category_t> cvect;
@@ -55,6 +66,7 @@ namespace vita
     bool compatible(const cvect &, const std::vector<std::string> &) const;
     void setup_terminals_from_data();
 
+  private:  // Private data members.
     std::vector<variable_ptr> vars_;
     vita::data                 dat_;
   };

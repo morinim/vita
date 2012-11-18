@@ -46,6 +46,7 @@ namespace vita
              const std::list<unsigned> &, unsigned, unsigned) const;
     bool stop_condition(const summary &) const;
 
+  private:  // Private data members.
     environment env_;
     problem   *prob_;
   };
