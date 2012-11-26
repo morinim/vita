@@ -16,8 +16,6 @@
 
 #include <string>
 
-#include <boost/any.hpp>
-
 #include "function.h"
 #include "interpreter.h"
 #include "random.h"
@@ -34,7 +32,7 @@ namespace vita
   /// they are dependent on the implementation of floating-point numbers, as
   /// well as the function being applied).
   /// Instead we detect them and take alternative action (usually returning
-  /// an empty boost::any()).
+  /// an empty \c any()).
   namespace dbl
   {
     typedef double base_t;
@@ -44,7 +42,7 @@ namespace vita
     ///
     /// Just a simple shortcut.
     inline
-    base_t cast(const boost::any &v) { return boost::any_cast<base_t>(v); }
+    base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
     /// It is assumed that the creation of floating-point constants is
@@ -68,8 +66,8 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      boost::any eval(interpreter *i) const
-      { return static_cast<base_t>(boost::any_cast<int>(i->eval())); }
+      any eval(interpreter *i) const
+      { return any(static_cast<base_t>(any_cast<int>(i->eval()))); }
 
     private: // Serialization.
       friend class boost::serialization::access;
@@ -91,12 +89,12 @@ namespace vita
     public:
       explicit abs(category_t t) : function("FABS", t, {t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev(i->eval(0));
+        const any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return std::fabs(dbl::cast(ev));
+        return any(std::fabs(dbl::cast(ev)));
       }
 
     private: // Serialization.
@@ -113,18 +111,18 @@ namespace vita
       explicit add(category_t t)
         : function("FADD", t, {t, t}, function::default_weight, true) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) + dbl::cast(ev1));
-        if (std::isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -140,18 +138,18 @@ namespace vita
     public:
       explicit div(category_t t) : function("FDIV", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) / dbl::cast(ev1));
-        if (!std::isfinite(ret))  return boost::any();
+        if (!std::isfinite(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -167,18 +165,18 @@ namespace vita
     public:
       explicit idiv(category_t t) : function("FIDIV", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(std::floor(dbl::cast(ev0) / dbl::cast(ev1)));
-        if (!std::isfinite(ret))  return boost::any();
+        if (!std::isfinite(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -196,15 +194,15 @@ namespace vita
         : function("FIFB", t2, {t1, t1, t1, t2, t2})
       { assert(gene::k_args > 4); }
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const boost::any ev2(i->eval(2));
+        const any ev2(i->eval(2));
         if (ev2.empty())  return ev2;
 
         const base_t v0(dbl::cast(ev0));
@@ -234,12 +232,12 @@ namespace vita
       ife(category_t t1, category_t t2)
         : function("FIFE", t2, {t1, t1, t2, t2}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
@@ -264,12 +262,12 @@ namespace vita
       ifl(category_t t1, category_t t2)
         : function("FIFL", t2, {t1, t1, t2, t2}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         if (dbl::cast(ev0) < dbl::cast(ev1))
@@ -291,9 +289,9 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("FIFZ", t, {t, t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
         if (std::fabs(dbl::cast(ev0)) < float_epsilon)
@@ -316,12 +314,12 @@ namespace vita
       explicit length(category_t t1, category_t t2)
         : function("FLENGTH", t2, {t1}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev(i->eval(0));
+        const any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return static_cast<base_t>(boost::any_cast<std::string>(ev).size());
+        return any(static_cast<base_t>(any_cast<std::string>(ev).size()));
       }
 
     private: // Serialization.
@@ -343,18 +341,18 @@ namespace vita
 
       ///
       /// \param[in] i pointer to the active interpreter.
-      /// \return the natural logarithm of its argument or an empty boost::any
+      /// \return the natural logarithm of its argument or an empty \c any
       //          in case of invalid argument / infinite result.
       ///
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
         const base_t ret(std::log(dbl::cast(ev0)));
-        if (!std::isfinite(ret))  return boost::any();
+        if (!std::isfinite(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -370,18 +368,18 @@ namespace vita
     public:
       explicit mod(category_t t) : function("FMOD", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(std::fmod(dbl::cast(ev0), dbl::cast(ev1)));
-        if (!std::isfinite(ret))  return boost::any();
+        if (!std::isfinite(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -398,18 +396,18 @@ namespace vita
       explicit mul(category_t t)
         : function("FMUL", t, {t, t}, function::default_weight, true) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) * dbl::cast(ev1));
-        if (std::isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.
@@ -425,12 +423,12 @@ namespace vita
     public:
       explicit sin(category_t t) : function("FSIN", t, {t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev(i->eval(0));
+        const any ev(i->eval(0));
         if (ev.empty())  return ev;
 
-        return std::sin(dbl::cast(ev));
+        return any(std::sin(dbl::cast(ev)));
       }
 
     private: // Serialization.
@@ -446,18 +444,18 @@ namespace vita
     public:
       explicit sub(category_t t) : function("FSUB", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any ev0(i->eval(0));
+        const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
 
-        const boost::any ev1(i->eval(1));
+        const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) - dbl::cast(ev1));
-        if (std::isinf(ret))  return boost::any();
+        if (std::isinf(ret))  return any();
 
-        return ret;
+        return any(ret);
       }
 
     private: // Serialization.

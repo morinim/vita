@@ -40,6 +40,7 @@
 #include <memory>
 
 #include <boost/cstdint.hpp>
+#include <boost/spirit/home/support/detail/hold_any.hpp>
 
 #include "compatibility_patch.h"
 
@@ -78,6 +79,24 @@ namespace vita
   /// are considered equivalent.
   ///
   const double float_epsilon(0.0001);
+
+  ///
+  /// A shortcut for the any type (usually boost::any or boost::spirit::any).
+  ///
+  typedef boost::spirit::hold_any any;
+
+  ///
+  /// \param a an any.
+  /// \return the value contained in \a a.
+  ///
+  template<class T> inline T any_cast(const any &a)
+  {
+    // We must choose the right \c any_cast (it depends on \c any \c typedef).
+    // The alternative is: return boost::any_cast<T>(a);
+    return boost::spirit::any_cast<T>(a);
+  }
+
+
 }  // namespace vita
 
 /// \page page1 VITA Architecture

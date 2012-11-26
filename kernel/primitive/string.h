@@ -3,7 +3,7 @@
  *  \file string.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -13,8 +13,6 @@
 
 #if !defined(STRING_PRIMITIVE_H)
 #define      STRING_PRIMITIVE_H
-
-#include <boost/any.hpp>
 
 #include <algorithm>
 #include <cstdlib>
@@ -37,16 +35,15 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("SIFE", t2, {t1, t1, t2, t2}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
-        const boost::any v0(i->eval(0));
+        const any v0(i->eval(0));
         if (v0.empty())  return v0;
 
-        const boost::any v1(i->eval(1));
+        const any v1(i->eval(1));
         if (v1.empty())  return v1;
 
-        if (boost::any_cast<std::string>(v0) ==
-            boost::any_cast<std::string>(v1))
+        if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
           return i->eval(2);
         else
           return i->eval(3);

@@ -3,7 +3,7 @@
  *  \file argument.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -55,7 +55,7 @@ namespace vita
   /// \param[in] agent current interpreter
   /// \return the value of the argument.
   ///
-  boost::any argument::eval(interpreter *agent) const
+  any argument::eval(interpreter *agent) const
   {
     return agent->eval_adf_arg(index_);
   }

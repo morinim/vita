@@ -3,7 +3,7 @@
  *  \file bool.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -13,8 +13,6 @@
 
 #if !defined(BOOL_PRIMITIVE_H)
 #define      BOOL_PRIMITIVE_H
-
-#include <boost/any.hpp>
 
 #include <cstdlib>
 #include <limits>
@@ -36,7 +34,7 @@ namespace vita
       explicit variable(const std::string &name)
         : terminal(name, sym_bool, true) {}
 
-      boost::any eval(vita::interpreter *) const { return val; }
+      any eval(vita::interpreter *) const { return val; }
 
       bool val;
     };
@@ -48,7 +46,7 @@ namespace vita
 
       std::string display() const { return "0"; }
 
-      boost::any eval(vita::interpreter *) const { return false; }
+      any eval(vita::interpreter *) const { return false; }
     };
 
     class one : public terminal
@@ -58,7 +56,7 @@ namespace vita
 
       std::string display() const { return "1"; }
 
-      boost::any eval(vita::interpreter *) const { return true; }
+      any eval(vita::interpreter *) const { return true; }
     };
 
     class and : public function
@@ -66,10 +64,9 @@ namespace vita
     public:
       and() : function("AND", sym_bool, 2, function::default_weight, true) {}
 
-      boost::any eval(vita::interpreter *i) const
+      any eval(vita::interpreter *i) const
       {
-        return boost::any_cast<bool>(i->eval(0)) &&
-          boost::any_cast<bool>(i->eval(1));
+        return any_cast<bool>(i->eval(0)) && any_cast<bool>(i->eval(1));
       }
     };
 
@@ -78,8 +75,8 @@ namespace vita
     public:
       not() : function("NOT", sym_bool, 1) {}
 
-      boost::any eval(vita::interpreter *i) const
-      { return !boost::any_cast<bool>(i->eval(0)); }
+      any eval(vita::interpreter *i) const
+      { return !any_cast<bool>(i->eval(0)); }
     };
 
     class or : public function
@@ -87,10 +84,9 @@ namespace vita
     public:
       or() : function("OR", sym_bool, 2, function::default_weight, true) {}
 
-      boost::any eval(vita::interpreter *i) const
+      any eval(vita::interpreter *i) const
       {
-        return boost::any_cast<bool>(i->eval(0)) ||
-          boost::any_cast<bool>(i->eval(1));
+        return any_cast<bool>(i->eval(0)) || any_cast<bool>(i->eval(1));
       }
     };
   }  // namespace boolean

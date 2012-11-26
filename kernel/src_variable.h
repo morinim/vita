@@ -32,19 +32,19 @@ namespace vita
       : terminal(name, t, true) {}
 
     ///
-    /// \return the value of the variable (as a \c boost::any).
+    /// \return the value of the variable (as a \c any).
     ///
     /// The argument is not used: the value of a variable is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    boost::any eval(vita::interpreter *) const
+    any eval(vita::interpreter *) const
     {
       switch (val.which())
       {
-      case 0:  return boost::any(boost::get<bool>(val));
-      case 1:  return boost::any(boost::get<int>(val));
-      case 2:  return boost::any(boost::get<double>(val));
-      default: return boost::any(boost::get<std::string>(val));
+      case 0:  return any(boost::get<bool>(val));
+      case 1:  return any(boost::get<int>(val));
+      case 2:  return any(boost::get<double>(val));
+      default: return any(boost::get<std::string>(val));
       }
     }
 

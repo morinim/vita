@@ -17,8 +17,6 @@
 #include <limits>
 #include <string>
 
-#include <boost/any.hpp>
-
 #include "function.h"
 #include "interpreter.h"
 #include "random.h"
@@ -43,7 +41,7 @@ namespace vita
     ///
     /// Just a simple shortcut.
     inline
-    base_t cast(const boost::any &v) { return boost::any_cast<base_t>(v); }
+    base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
     /// Integer ephemeral random constant.
@@ -61,7 +59,7 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      boost::any eval(interpreter *i) const { return integer::cast(i->eval()); }
+      any eval(interpreter *i) const { return any(integer::cast(i->eval())); }
 
     private:  // Private data members.
       const int min, upp;
@@ -74,17 +72,17 @@ namespace vita
       explicit add(category_t t)
         : function("ADD", t, {t, t}, function::default_weight, true) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
-          return std::numeric_limits<base_t>::max();
+          return any(std::numeric_limits<base_t>::max());
         if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<base_t>::min() - v1))
-          return std::numeric_limits<base_t>::min();
+          return any(std::numeric_limits<base_t>::min());
 
-        return v0 + v1;
+        return any(v0 + v1);
       }
     };
 
@@ -94,15 +92,15 @@ namespace vita
     public:
       explicit div(category_t t) : function("DIV", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
 
         if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-          return v0;
+          return any(v0);
         else
-          return v1 / v0;
+          return any(v1 / v0);
       }
     };
 
@@ -112,7 +110,7 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("IFE", t2, {t1, t1, t2, t2}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
@@ -130,7 +128,7 @@ namespace vita
       explicit ifl(category_t t1, category_t t2)
         : function("IFL", t2, {t1, t1, t2, t2}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
@@ -147,7 +145,7 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("IFZ", t, {t, t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
 
@@ -164,15 +162,15 @@ namespace vita
     public:
       explicit mod(category_t t) : function("MOD", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
 
         if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-          return v1;
+          return any(v1);
         else
-          return v0 % v1;
+          return any(v0 % v1);
       }
     };
 
@@ -183,7 +181,7 @@ namespace vita
       explicit mul(category_t t)
         : function("MUL", t, {t, t}, function::default_weight, true) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
@@ -193,29 +191,29 @@ namespace vita
           {
             assert(v0 > 0 && v1 > 0);
             if (v0 > std::numeric_limits<base_t>::max() / v1)
-              return std::numeric_limits<base_t>::max();
+              return any(std::numeric_limits<base_t>::max());
           }
           else  // v1 is non-positive
           {
             assert(v0 > 0 && v1 <= 0);
             if (v1 < std::numeric_limits<base_t>::min() / v0)
-              return std::numeric_limits<base_t>::min();
+              return any(std::numeric_limits<base_t>::min());
           }
         else  // v0 is non-positive
           if (v1 > 0)
           {
             assert(v0 <= 0 && v1 > 0);
             if (v0 < std::numeric_limits<base_t>::min() / v1)
-              return std::numeric_limits<base_t>::min();
+              return any(std::numeric_limits<base_t>::min());
           }
           else  // v1 is non-positive
           {
             assert(v0 <= 0 && v1 <= 0);
             if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
-              return std::numeric_limits<base_t>::max();
+              return any(std::numeric_limits<base_t>::max());
           }
 
-        return v0 * v1;
+        return any(v0 * v1);
       }
     };
 
@@ -225,7 +223,7 @@ namespace vita
     public:
       explicit shl(category_t t) : function("SHL", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
@@ -233,9 +231,9 @@ namespace vita
         if (v0 < 0 || v1 < 0 ||
             v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
             v0 > std::numeric_limits<base_t>::max() >> v1)
-          return v0;
+          return any(v0);
 
-        return v0 << v1;
+        return any(v0 << v1);
       }
     };
 
@@ -245,17 +243,17 @@ namespace vita
     public:
       explicit sub(category_t t) : function("SUB", t, {t, t}) {}
 
-      boost::any eval(interpreter *i) const
+      any eval(interpreter *i) const
       {
         const base_t v0(integer::cast(i->eval(0)));
         const base_t v1(integer::cast(i->eval(1)));
 
         if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
-          return std::numeric_limits<base_t>::min();
+          return any(std::numeric_limits<base_t>::min());
         if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<base_t>::max() + v1))
-          return std::numeric_limits<base_t>::max();
+          return any(std::numeric_limits<base_t>::max());
 
-        return v0 - v1;
+        return any(v0 - v1);
       }
     };
   }  // namespace integer

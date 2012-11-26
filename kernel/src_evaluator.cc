@@ -123,7 +123,7 @@ namespace vita
   {
     load_vars(*t);
 
-    const boost::any res(agent());
+    const any res(agent());
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
@@ -156,7 +156,7 @@ namespace vita
   {
     load_vars(*t);
 
-    const boost::any res(agent());
+    const any res(agent());
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
@@ -190,7 +190,7 @@ namespace vita
   {
     load_vars(*t);
 
-    const boost::any res(agent());
+    const any res(agent());
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
@@ -244,7 +244,7 @@ namespace vita
     load_vars(*t);
 
     interpreter agent(ind);
-    const boost::any res(agent());
+    const any res(agent());
 
     const unsigned n_slots(dat_->classes() * x_slot_);
     const unsigned last_slot(n_slots - 1);
@@ -386,7 +386,7 @@ namespace vita
   {
     eva_->load_vars(instance);
 
-    const boost::any res( (interpreter(ind_))() );
+    const any res( (interpreter(ind_))() );
 
     const unsigned n_slots(slot_class_.size());
     assert(n_slots == eva_->dat_->classes() * eva_->x_slot_);
@@ -432,7 +432,7 @@ namespace vita
     {
       load_vars(*t);
 
-      const boost::any res(agent());
+      const any res(agent());
 
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
       const double cut(10000000);
@@ -541,7 +541,7 @@ namespace vita
   {
     load_vars(example);
 
-    const boost::any res((interpreter(ind))());
+    const any res((interpreter(ind))());
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     assert(dat_->classes() == gauss.size());
@@ -624,13 +624,13 @@ namespace vita
       for (unsigned i(0); i < vars_.size(); ++i)
         vars_[i]->val = t->input[i];
 
-      const boost::any res(agent());
+      const any res(agent());
 
       if (res.empty())
         err += std::pow(100.0,++illegals);
       else
       {
-        const T val(boost::any_cast<T>(res));
+        const T val(any_cast<T>(res));
         if ((t->label() == label && val < 0.0) ||
             (t->label() != label && val >= 0.0))
           err += std::fabs(val);

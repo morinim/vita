@@ -27,7 +27,7 @@ namespace vita
     // C++11 allows constructors to call other peer constructors (known as
     // delegation). This allows constructors to utilize another constructor's
     // behavior with a minimum of added code.
-    //constant(const std::string &name, const boost::any &c, category_t = 0)
+    //constant(const std::string &name, const any &c, category_t = 0)
     //  : terminal(name, t, false, false, default_weight*2), val(c) {}
   public:
     explicit constant(bool c, category_t t = 0)
@@ -44,19 +44,19 @@ namespace vita
         val(c) {}
 
     ///
-    /// \return the value of the constant (as a \c boost::any).
+    /// \return the value of the constant (as a \c any).
     ///
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    boost::any eval(vita::interpreter *) const
+    any eval(vita::interpreter *) const
     {
       switch (val.which())
       {
-      case 0:  return boost::any(boost::get<bool>(val));
-      case 1:  return boost::any(boost::get<int>(val));
-      case 2:  return boost::any(boost::get<double>(val));
-      default: return boost::any(boost::get<std::string>(val));
+      case 0:  return any(boost::get<bool>(val));
+      case 1:  return any(boost::get<int>(val));
+      case 2:  return any(boost::get<double>(val));
+      default: return any(boost::get<std::string>(val));
       }
     }
 

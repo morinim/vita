@@ -72,7 +72,7 @@ namespace vita
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
-    boost::any eval(interpreter *) const;
+    any eval(interpreter *) const;
 
     const individual &get_code() const;
     std::string display() const;
@@ -98,7 +98,7 @@ namespace vita
   public:
     adt(const individual &, unsigned);
 
-    boost::any eval(interpreter *) const;
+    any eval(interpreter *) const;
 
     const individual &get_code() const;
     std::string display() const;

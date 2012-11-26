@@ -3,7 +3,7 @@
  *  \file symbol.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -14,7 +14,6 @@
 #if !defined(SYMBOL_H)
 #define      SYMBOL_H
 
-#include <boost/any.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
@@ -66,7 +65,7 @@ namespace vita
 
     /// Calculates the value of / performs the action associated to the symbol
     /// (it is implementation specific).
-    virtual boost::any eval(interpreter *) const = 0;
+    virtual any eval(interpreter *) const = 0;
 
     bool check() const;
 

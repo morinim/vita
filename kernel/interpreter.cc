@@ -36,7 +36,7 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  boost::any interpreter::operator()(const locus &ip)
+  any interpreter::operator()(const locus &ip)
   {
     std::fill(cache_.data(), cache_.data() + cache_.num_elements(),
               boost::none);
@@ -51,7 +51,7 @@ namespace vita
   /// Calls operator()(unsigned) using the the locus of the individual
   /// (ind_.best).
   ///
-  boost::any interpreter::operator()()
+  any interpreter::operator()()
   {
     return operator()(ind_.best_);
   }
@@ -59,12 +59,12 @@ namespace vita
   ///
   /// \return the output value of the current terminal symbol.
   ///
-  boost::any interpreter::eval()
+  any interpreter::eval()
   {
     const gene &g(ind_[ip_]);
 
     assert(g.sym->parametric());
-    return g.par;
+    return any(g.par);
   }
 
   ///
@@ -80,7 +80,7 @@ namespace vita
   /// \li
   /// [http://en.wikipedia.org/wiki/Memoization]
   ///
-  boost::any interpreter::eval(unsigned i)
+  any interpreter::eval(unsigned i)
   {
     const gene &g(ind_[ip_]);
 
@@ -96,7 +96,7 @@ namespace vita
       const locus backup(ip_);
       ip_ = l;
       assert(ip_[0] > backup[0]);
-      const boost::any ret(ind_[ip_].sym->eval(this));
+      const any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
       cache_(l) = ret;
@@ -107,7 +107,7 @@ namespace vita
       const locus backup(ip_);
       ip_ = l;
       assert(ip_[0] > backup[0]);
-      const boost::any ret(ind_[ip_].sym->eval(this));
+      const any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
       assert(to_string(ret) == to_string(*cache_(l)));
     }
@@ -121,7 +121,7 @@ namespace vita
   /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the curren ADF function.
   ///
-  boost::any interpreter::eval_adf_arg(unsigned i)
+  any interpreter::eval_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
@@ -145,17 +145,17 @@ namespace vita
   /// \return the result of the conversion of \a a in a \c double.
   ///
   /// This function is useful for:
-  /// \li debugging purpose (otherwise comparison of \c boost::any values is
+  /// \li debugging purpose (otherwise comparison of \c any values is
   ///     complex);
   /// \li symbolic regression and classification task (the value returned by
   ///     the interpeter will be used in a "numeric way").
   ///
-  double interpreter::to_double(const boost::any &a)
+  double interpreter::to_double(const any &a)
   {
     return
-      a.type() == typeid(double) ? boost::any_cast<double>(a) :
-      a.type() == typeid(int) ? static_cast<double>(boost::any_cast<int>(a)) :
-      a.type() == typeid(bool) ? static_cast<double>(boost::any_cast<bool>(a)) :
+      a.type() == typeid(double) ? any_cast<double>(a) :
+      a.type() == typeid(int) ? static_cast<double>(any_cast<int>(a)) :
+      a.type() == typeid(bool) ? static_cast<double>(any_cast<bool>(a)) :
       0.0;
   }
 
@@ -164,17 +164,17 @@ namespace vita
   /// \return the result of the conversion of \a a in a string.
   ///
   /// This function is useful for debugging purpose (otherwise comparison /
-  /// printing of \c boost::any values is complex).
+  /// printing of \c any values is complex).
   ///
-  std::string interpreter::to_string(const boost::any &a)
+  std::string interpreter::to_string(const any &a)
   {
     return
       a.type() == typeid(double) ?
-      boost::lexical_cast<std::string>(boost::any_cast<double>(a)) :
+      boost::lexical_cast<std::string>(any_cast<double>(a)) :
       a.type() == typeid(int) ?
-      boost::lexical_cast<std::string>(boost::any_cast<int>(a)) :
+      boost::lexical_cast<std::string>(any_cast<int>(a)) :
       a.type() == typeid(bool) ?
-      boost::lexical_cast<std::string>(boost::any_cast<bool>(a)) :
-      boost::any_cast<std::string>(a);
+      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
+      any_cast<std::string>(a);
   }
 }  // Namespace vita
