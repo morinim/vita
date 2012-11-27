@@ -142,11 +142,11 @@ namespace vita
   private:
     static double normalize_01(double);
 
-    unsigned slot(const individual &, data::const_iterator);
+    size_t slot(const individual &, data::const_iterator);
 
-    typedef std::vector<unsigned> uvect;
+    typedef std::vector<size_t> uvect;
     void fill_slots(const individual &, std::vector<uvect> *, uvect *,
-                    unsigned *);
+                    size_t * = 0);
 
     // How many slots for each class of the problem?
     unsigned x_slot_;
