@@ -233,15 +233,15 @@ namespace vita
 
   ///
   /// \param[in] ind individual used for classification.
-  /// \param[in] t input data for \a ind.
+  /// \param[in] e input data for \a ind.
   /// \return the slot the input instance falls into.
   ///
   size_t dyn_slot_evaluator::slot(const individual &ind,
-                                  data::const_iterator t)
+                                  const data::example &e)
   {
     assert(ind.check());
 
-    load_vars(*t);
+    load_vars(e);
 
     interpreter agent(ind);
     const any res(agent());
@@ -253,7 +253,7 @@ namespace vita
       return last_slot;
 
     const double val(interpreter::to_double(res));
-    const size_t where(static_cast<unsigned>(normalize_01(val) * n_slots));
+    const size_t where(static_cast<size_t>(normalize_01(val) * n_slots));
 
     return (where >= n_slots) ? last_slot : where;
   }
@@ -300,7 +300,7 @@ namespace vita
     {
       ++ds_size;
 
-      const size_t where(slot(ind, t));
+      const size_t where(slot(ind, *t));
 
       ++sm[where][t->label()];
     }
@@ -386,24 +386,7 @@ namespace vita
   std::string dyn_slot_classifier::operator()(
     const data::example &instance) const
   {
-    //eva_->slot(ind_, instance);
-
-    eva_->load_vars(instance);
-
-    const size_t n_slots(slot_class_.size());
-    assert(n_slots == eva_->dat_->classes() * eva_->x_slot_);
-    size_t where(n_slots - 1);
-
-    const any res( (interpreter(ind_))() );
-    if (!res.empty())
-    {
-      const double val(interpreter::to_double(res));
-
-      where = static_cast<size_t>(dyn_slot_evaluator::normalize_01(val) *
-                                  n_slots);
-      if (where >= n_slots)
-        where = n_slots - 1;
-    }
+    const size_t where(eva_->slot(ind_, instance));
 
     return slot_class_[where];
   }

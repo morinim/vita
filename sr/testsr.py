@@ -81,7 +81,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
     cmd = Template("sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "-P $nind -l $cl -r $rs $rnd_switch $arl_switch "\
-                   "$dss_switch $ss $ds")
+                   "--evaluator dynslot $dss_switch $ss $ds")
     s = cmd.substitute(
         elitism_switch = elitism,
         sd = stat_dir,

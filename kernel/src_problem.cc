@@ -54,7 +54,7 @@ namespace vita
   {
     p_symre = k_sae_evaluator;
     p_class = k_gaussian_evaluator;
-    
+
     problem::clear();
     vars_.clear();
     dat_.clear();
