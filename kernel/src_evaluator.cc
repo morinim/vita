@@ -35,7 +35,7 @@ namespace vita
   {
     assert(d.input.size() == var_->size());
 
-    for (unsigned i(0); i < var_->size(); ++i)
+    for (size_t i(0); i < var_->size(); ++i)
       (*var_)[i]->val = d.input[i];
   }
 
@@ -212,7 +212,7 @@ namespace vita
   ///                   Determination algorithm.
   ///
   dyn_slot_evaluator::dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v,
-                                         unsigned x_slot)
+                                         size_t x_slot)
     : src_evaluator(d, v), x_slot_(x_slot)
   {
     assert(d);
@@ -221,14 +221,26 @@ namespace vita
   }
 
   ///
-  /// \param[in] val the numeric value that should be mapped in the [0,1]
-  ///                interval.
+  /// \param[in] x the numeric value that should be mapped in the [0,1]
+  ///              interval.
+  ///
+  /// This is a sigmoid function (it is a bounded real function, "S" shaped,
+  /// with positive derivative everywhere).
   ///
   inline
-  double dyn_slot_evaluator::normalize_01(double val)
+  double dyn_slot_evaluator::normalize_01(double x)
   {
-    return 0.5 + std::atan(val) / 3.1415926535;
-    // return 1.0 / (1 + std::exp(-val));
+    // Algebraic function.
+    // return (1.0 + x + std::fabs(x)) / (2.0 + 2.0 * std::fabs(x));
+
+    // Arctangent.
+    return 0.5 + std::atan(x) / 3.1415926535;
+
+    // Hyperbolic tangent.
+    // return 0.5 + std::tanh(x);
+
+    // Logistic function.
+    // return 1.0 / (1.0 + std::exp(-x));
   }
 
   ///
@@ -376,7 +388,7 @@ namespace vita
     eva_->fill_slots(ind, &slot_matrix, &slot_class);
 
     for (size_t i(0); i < slot_class.size(); ++i)
-      slot_class_.push_back(eva_->dat_->class_name(slot_class[i]));
+      slot_name_.push_back(eva_->dat_->class_name(slot_class[i]));
   }
 
   ///
@@ -388,7 +400,7 @@ namespace vita
   {
     const size_t where(eva_->slot(ind_, instance));
 
-    return slot_class_[where];
+    return slot_name_[where];
   }
 
   ///
@@ -449,8 +461,8 @@ namespace vita
 
     /*
     fitness_t d(0.0);
-    for (unsigned i(0); i < gauss.size(); ++i)
-      for (unsigned j(i+1); j < gauss.size(); ++j)
+    for (size_t i(0); i < gauss.size(); ++i)
+      for (size_t j(i+1); j < gauss.size(); ++j)
       {
         const double mean_i(gauss[i].mean);
         const double mean_j(gauss[j].mean);
@@ -607,7 +619,7 @@ namespace vita
 
     for (data::const_iterator t(dat.begin()); t != dat.end(); ++t)
     {
-      for (unsigned i(0); i < vars_.size(); ++i)
+      for (size_t i(0); i < vars_.size(); ++i)
         vars_[i]->val = t->input[i];
 
       const any res(agent());

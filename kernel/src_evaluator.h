@@ -133,7 +133,7 @@ namespace vita
   class dyn_slot_evaluator : public src_evaluator
   {
   public:
-    dyn_slot_evaluator(data *, std::vector<variable_ptr> *, unsigned = 10);
+    dyn_slot_evaluator(data *, std::vector<variable_ptr> *, size_t = 10);
 
     score_t operator()(const individual &);
 
@@ -160,8 +160,8 @@ namespace vita
     std::string operator()(const data::example &) const;
 
   private:
-    dyn_slot_evaluator             *eva_;
-    std::vector<std::string> slot_class_;
+    dyn_slot_evaluator            *eva_;
+    std::vector<std::string> slot_name_;
   };
 
   ///
