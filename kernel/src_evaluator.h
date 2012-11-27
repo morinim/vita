@@ -142,9 +142,10 @@ namespace vita
   private:
     static double normalize_01(double);
 
+    size_t n_slots() const;
     size_t slot(const individual &, const data::example &);
 
-    typedef std::vector<size_t> uvect;
+    typedef std::vector<unsigned> uvect;
     void fill_slots(const individual &, std::vector<uvect> *, uvect *,
                     size_t * = 0);
 

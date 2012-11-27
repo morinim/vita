@@ -223,24 +223,32 @@ namespace vita
   ///
   /// \param[in] x the numeric value that should be mapped in the [0,1]
   ///              interval.
+  /// \return a double in the [0,1] range.
   ///
   /// This is a sigmoid function (it is a bounded real function, "S" shaped,
   /// with positive derivative everywhere).
   ///
+  /// \see
+  /// <http://en.wikipedia.org/wiki/Sigmoid_function>
+  ///
   inline
   double dyn_slot_evaluator::normalize_01(double x)
   {
-    // Algebraic function.
-    // return (1.0 + x + std::fabs(x)) / (2.0 + 2.0 * std::fabs(x));
+    // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function.
 
-    // Arctangent.
-    return 0.5 + std::atan(x) / 3.1415926535;
+    return 0.5 + std::atan(x) / 3.1415926535;        // Arctangent.
 
-    // Hyperbolic tangent.
-    // return 0.5 + std::tanh(x);
+    // return 0.5 + std::tanh(x);                    // Hyperbolic tangent.
 
-    // Logistic function.
-    // return 1.0 / (1.0 + std::exp(-x));
+    // return 1.0 / (1.0 + std::exp(-x));            // Logistic function.
+  }
+
+  ///
+  /// \return number of slots used for the classification task.
+  ///
+  size_t dyn_slot_evaluator::n_slots() const
+  {
+    return dat_->classes() * x_slot_;
   }
 
   ///
@@ -258,16 +266,16 @@ namespace vita
     interpreter agent(ind);
     const any res(agent());
 
-    const size_t n_slots(dat_->classes() * x_slot_);
-    const size_t last_slot(n_slots - 1);
+    const size_t ns(n_slots());
+    const size_t last_slot(ns - 1);
 
     if (res.empty())
       return last_slot;
 
     const double val(interpreter::to_double(res));
-    const size_t where(static_cast<size_t>(normalize_01(val) * n_slots));
+    const size_t where(static_cast<size_t>(normalize_01(val) * ns));
 
-    return (where >= n_slots) ? last_slot : where;
+    return (where >= ns) ? last_slot : where;
   }
 
   ///
@@ -289,10 +297,10 @@ namespace vita
     assert(slot_class);
 
     std::vector<uvect> &sm(*slot_matrix);  // just for convenience
-    const size_t n_slots(dat_->classes() * x_slot_);
-    assert(sm.size() == n_slots);
+    const size_t ns(n_slots());
+    assert(sm.size() == ns);
 
-    for (size_t i(0); i < n_slots; ++i)
+    for (size_t i(0); i < ns; ++i)
     {
       assert(sm[i].size() == dat_->classes());
 
@@ -322,7 +330,7 @@ namespace vita
     // In the second step the method dynamically determine to which class each
     // slot belongs by simply taking the class with the largest value at the
     // slot...
-    for (size_t i(0); i < n_slots; ++i)
+    for (size_t i(0); i < ns; ++i)
     {
       size_t best_class(0);
 
@@ -351,16 +359,16 @@ namespace vita
     assert(ind.check());
     assert(dat_->classes() >= 2);
 
-    const size_t n_slots(dat_->classes() * x_slot_);
-    std::vector<uvect> slot_matrix(n_slots, uvect(dat_->classes()));
-    uvect slot_class(n_slots);
+    const size_t ns(n_slots());
+    std::vector<uvect> slot_matrix(ns, uvect(dat_->classes()));
+    uvect slot_class(ns);
     size_t count(0);
     fill_slots(ind, &slot_matrix, &slot_class, &count);
 
     assert(count);
 
     fitness_t err(0.0);
-    for (size_t i(0); i < n_slots; ++i)
+    for (size_t i(0); i < ns; ++i)
       for (size_t j(0); j < slot_matrix[i].size(); ++j)
         if (j != slot_class[i])
           err += slot_matrix[i][j];
@@ -375,20 +383,21 @@ namespace vita
   ///
   dyn_slot_classifier::dyn_slot_classifier(const individual &ind,
                                            dyn_slot_evaluator *eva)
-    : classifier(ind), eva_(eva)
+    : classifier(ind), eva_(eva), slot_name_(eva->n_slots())
   {
     assert(ind.check());
     assert(eva);
 
-    const size_t n_slots(eva_->dat_->classes() * eva_->x_slot_);
-    typedef std::vector<size_t> uvect;
+    const size_t ns(eva_->n_slots());
+    typedef std::vector<unsigned> uvect;
 
-    std::vector<uvect> slot_matrix(n_slots, uvect(eva_->dat_->classes()));
-    uvect slot_class(n_slots);
+    std::vector<uvect> slot_matrix(ns, uvect(eva_->dat_->classes()));
+    uvect slot_class(ns);
     eva_->fill_slots(ind, &slot_matrix, &slot_class);
 
-    for (size_t i(0); i < slot_class.size(); ++i)
-      slot_name_.push_back(eva_->dat_->class_name(slot_class[i]));
+    assert(slot_name_.size() == slot_class.size());
+    for (size_t i(0); i < ns; ++i)
+      slot_name_[i] = eva_->dat_->class_name(slot_class[i]);
   }
 
   ///
