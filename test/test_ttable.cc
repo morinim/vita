@@ -3,7 +3,7 @@
  *  \file test_ttable.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, true);
-    const boost::any val( (vita::interpreter(i1))() );
-    vita::fitness_t f(val.empty() ? 0 : any_cast<vita::fitness_t>(val));
+    const vita::any val( (vita::interpreter(i1))() );
+    vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
     vita::score_t s(f, 0.0);
 
     cache.insert(i1, s);
@@ -93,8 +93,8 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::score_t s;
     if (cache.find(vi[i], &s))
     {
-      const boost::any val((vita::interpreter(vi[i]))());
-      vita::fitness_t f(val.empty() ? 0 : any_cast<vita::fitness_t>(val));
+      const vita::any val((vita::interpreter(vi[i]))());
+      vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
 
       BOOST_CHECK_EQUAL(s.fitness, f);
     }

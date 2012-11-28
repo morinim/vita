@@ -28,7 +28,7 @@ class X : public vita::terminal
 public:
   X() : vita::terminal("X", 0, true) {}
 
-  boost::any eval(vita::interpreter *) const { return val; }
+  vita::any eval(vita::interpreter *) const { return vita::any(val); }
 
   static double val;
 };
@@ -38,7 +38,7 @@ class Y : public vita::terminal
 public:
   Y() : vita::terminal("Y", 0, true) {}
 
-  boost::any eval(vita::interpreter *) const { return val; }
+  vita::any eval(vita::interpreter *) const { return vita::any(val); }
 
   static double val;
 };
@@ -48,7 +48,7 @@ class Z : public vita::terminal
 public:
   Z() : vita::terminal("Z", 0, true) {}
 
-  boost::any eval(vita::interpreter *) const { return val; }
+  vita::any eval(vita::interpreter *) const { return vita::any(val); }
 
   static double val;
 };
@@ -72,11 +72,11 @@ class fitness : public vita::evaluator
           Y::val = y;
           Z::val = z;
 
-          const boost::any res(agent());
+          const vita::any res(agent());
 
           if (!res.empty())
           {
-            const double dres(boost::any_cast<double>(res));
+            const double dres(vita::any_cast<double>(res));
             assert(std::isfinite(dres));
             fit += std::exp(-std::fabs(dres - (x*x + y*y - z*z)));
           }

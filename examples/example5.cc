@@ -3,7 +3,7 @@
  *  \file example5.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   std::cout << std::endl;
 
   vita::interpreter agent(ind);
-  const boost::any val(agent());
+  const vita::any val(agent());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else

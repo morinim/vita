@@ -4,7 +4,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
       std::cout << std::endl << "BLOCK at locus " << *i << std::endl;
       blk.list(std::cout);
-      const boost::any val((interpreter(blk))());
+      const any val((interpreter(blk))());
       if (val.empty())
         std::cout << "Incorrect output.";
       else
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         individual blk3(blk.replace(f, positions));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const boost::any val3((interpreter(blk3))());
+        const any val3((interpreter(blk3))());
         if (val3.empty())
           std::cout << "Incorrect output.";
         else
