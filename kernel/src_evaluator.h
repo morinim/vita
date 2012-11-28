@@ -28,7 +28,7 @@ namespace vita
   class src_evaluator : public evaluator
   {
   public:
-    explicit src_evaluator(data *);
+    explicit src_evaluator(data &);
 
   protected:
     data *dat_;
@@ -42,7 +42,7 @@ namespace vita
   class sum_of_errors_evaluator : public src_evaluator
   {
   public:
-    explicit sum_of_errors_evaluator(data *d) : src_evaluator(d) {}
+    explicit sum_of_errors_evaluator(data &d) : src_evaluator(d) {}
 
     score_t operator()(const individual &);
     score_t fast(const individual &);
@@ -69,7 +69,7 @@ namespace vita
   class sae_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit sae_evaluator(data *d) : sum_of_errors_evaluator(d) {}
+    explicit sae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -91,7 +91,7 @@ namespace vita
   class sse_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit sse_evaluator(data *d) : sum_of_errors_evaluator(d) {}
+    explicit sse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -106,7 +106,7 @@ namespace vita
   class count_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit count_evaluator(data *d) : sum_of_errors_evaluator(d) {}
+    explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -129,7 +129,7 @@ namespace vita
   class dyn_slot_evaluator : public src_evaluator
   {
   public:
-    explicit dyn_slot_evaluator(data *, size_t = 10);
+    explicit dyn_slot_evaluator(data &, size_t = 10);
 
     score_t operator()(const individual &);
 
@@ -177,7 +177,7 @@ namespace vita
   class gaussian_evaluator : public src_evaluator
   {
   public:
-    explicit gaussian_evaluator(data *d) : src_evaluator(d)
+    explicit gaussian_evaluator(data &d) : src_evaluator(d)
     { assert(d); }
 
     score_t operator()(const individual &);

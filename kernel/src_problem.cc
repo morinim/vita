@@ -32,19 +32,19 @@ namespace vita
 
     unsigned VARIABLE_IS_NOT_USED i;
 
-    i = add_evaluator(std::make_shared<count_evaluator>(&dat_));
+    i = add_evaluator(std::make_shared<count_evaluator>(dat_));
     assert(i == k_count_evaluator);
 
-    i = add_evaluator(std::make_shared<sae_evaluator>(&dat_));
+    i = add_evaluator(std::make_shared<sae_evaluator>(dat_));
     assert(i == k_sae_evaluator);
 
-    i = add_evaluator(std::make_shared<sse_evaluator>(&dat_));
+    i = add_evaluator(std::make_shared<sse_evaluator>(dat_));
     assert(i == k_sse_evaluator);
 
-    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_));
+    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(dat_));
     assert(i == k_dyn_slot_evaluator);
 
-    i = add_evaluator(std::make_shared<gaussian_evaluator>(&dat_));
+    i = add_evaluator(std::make_shared<gaussian_evaluator>(dat_));
     assert(i == k_gaussian_evaluator);
   }
 

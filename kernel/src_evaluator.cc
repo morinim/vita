@@ -18,12 +18,9 @@
 namespace vita
 {
   ///
-  /// \param[in] d pointer to data that the evaluator will use.
+  /// \param[in] d data that the evaluator will use.
   ///
-  src_evaluator::src_evaluator(data *d) : dat_(d)
-  {
-    assert(d);
-  }
+  src_evaluator::src_evaluator(data &d) : dat_(&d) {}
 
   ///
   /// \param[in] ind program used for fitness evaluation.
@@ -191,7 +188,7 @@ namespace vita
   /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
   ///                   Determination algorithm.
   ///
-  dyn_slot_evaluator::dyn_slot_evaluator(data *d, size_t x_slot)
+  dyn_slot_evaluator::dyn_slot_evaluator(data &d, size_t x_slot)
     : src_evaluator(d), x_slot_(x_slot)
   {
     assert(d);
