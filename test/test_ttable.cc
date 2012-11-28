@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, true);
-    const vita::any val( (vita::interpreter(i1))() );
+    const vita::any val(vita::interpreter(i1).run());
     vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
     vita::score_t s(f, 0.0);
 
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::score_t s;
     if (cache.find(vi[i], &s))
     {
-      const vita::any val((vita::interpreter(vi[i]))());
+      const vita::any val(vita::interpreter(vi[i]).run());
       vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
 
       BOOST_CHECK_EQUAL(s.fitness, f);

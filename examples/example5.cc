@@ -44,8 +44,7 @@ int main(int argc, char *argv[])
   ind.dump(std::cout);
   std::cout << std::endl;
 
-  vita::interpreter agent(ind);
-  const vita::any val(agent());
+  const vita::any val(vita::interpreter(ind).run());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else

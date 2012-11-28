@@ -51,6 +51,8 @@ namespace vita
 
     explicit adf_core(const individual &);
 
+    std::string display(const std::string &) const;
+
     bool check() const;
 
     // Serialization.

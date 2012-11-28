@@ -72,7 +72,7 @@ class fitness : public vita::evaluator
           Y::val = y;
           Z::val = z;
 
-          const vita::any res(agent());
+          const vita::any res(agent.run());
 
           if (!res.empty())
           {

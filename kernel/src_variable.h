@@ -35,8 +35,8 @@ namespace vita
     ///
     /// \return the value of the variable (as a \c any).
     ///
-    /// The argument is not used: the value of a variable is stored within the
-    /// object and we don't need an \c interpreter to discover it.
+    /// \note
+    /// the method requires a src_interpreter to work.
     ///
     any eval(interpreter *i) const
     {

@@ -19,13 +19,17 @@
 
 namespace vita
 {
+  ///
+  /// This class extends vita::interpreter to simply manage input variables.
+  /// For further details see also src_variable.
+  ///
   class src_interpreter : public interpreter
   {
   public:
     explicit src_interpreter(const individual &ind) : interpreter(ind) {}
 
     any run(const data::example &ex)
-    { example_ = &ex; return interpreter::operator()(); }
+    { example_ = &ex; return interpreter::run(); }
 
     any eval_var(unsigned i)
     { return boost::apply_visitor(cast_visitor(), example_->input[i]); }

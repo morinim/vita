@@ -28,6 +28,15 @@ namespace vita
   }
 
   ///
+  /// \param[in] prefix a string identifying adf type.
+  /// \return a string identifying an ADF/ADT.
+  ///
+  std::string adf_core::display(const std::string &prefix) const
+  {
+    return prefix + boost::lexical_cast<std::string>(id);
+  }
+
+  ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
   bool adf_core::check() const
@@ -57,7 +66,7 @@ namespace vita
   ///
   any adf::eval(interpreter *i) const
   {
-    return interpreter(core_.code, i)();
+    return interpreter(core_.code, i).run();
   }
 
   ///
@@ -73,7 +82,7 @@ namespace vita
   ///
   std::string adf::display() const
   {
-    return "ADF_" + boost::lexical_cast<std::string>(core_.id);
+    return core_.display(symbol::display());
   }
 
   ///
@@ -117,7 +126,7 @@ namespace vita
   ///
   any adt::eval(interpreter *) const
   {
-    return interpreter(core_.code)();
+    return interpreter(core_.code).run();
   }
 
   ///
@@ -133,10 +142,7 @@ namespace vita
   ///
   std::string adt::display() const
   {
-    std::ostringstream s;
-    s << "ADT" << '_' << core_.id;
-
-    return s.str();
+    return core_.display(symbol::display());
   }
 
   ///

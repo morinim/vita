@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
       std::cout << std::endl << "BLOCK at locus " << *i << std::endl;
       blk.list(std::cout);
-      const any val((interpreter(blk))());
+      const any val(interpreter(blk).run());
       if (val.empty())
         std::cout << "Incorrect output.";
       else
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
         individual blk3(blk.replace(f, positions));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const any val3((interpreter(blk3))());
+        const any val3(interpreter(blk3).run());
         if (val3.empty())
           std::cout << "Incorrect output.";
         else

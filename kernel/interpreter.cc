@@ -36,7 +36,7 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  any interpreter::operator()(const locus &ip)
+  any interpreter::run(const locus &ip)
   {
     std::fill(cache_.data(), cache_.data() + cache_.num_elements(),
               boost::none);
@@ -48,12 +48,11 @@ namespace vita
   ///
   /// \return the output value of \c this \a individual.
   ///
-  /// Calls operator()(unsigned) using the the locus of the individual
-  /// (ind_.best).
+  /// Calls run()(locus) using the the locus of the individual (\c ind_.best).
   ///
-  any interpreter::operator()()
+  any interpreter::run()
   {
-    return operator()(ind_.best_);
+    return run(ind_.best_);
   }
 
   ///

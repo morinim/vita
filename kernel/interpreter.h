@@ -28,8 +28,8 @@ namespace vita
   public:
     explicit interpreter(const individual &, interpreter *const = 0);
 
-    any operator()();
-    any operator()(const locus &);
+    any run();
+    any run(const locus &);
 
     any eval();
     any eval(unsigned);
