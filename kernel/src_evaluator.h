@@ -18,23 +18,21 @@
 
 #include "classifier.h"
 #include "evaluator.h"
-#include "src_variable.h"
 #include "primitive/factory.h"
 
 namespace vita
 {
   class individual;
+  class src_interpreter;
 
   class src_evaluator : public evaluator
   {
   public:
     src_evaluator(data *, std::vector<variable_ptr> *);
 
-    void load_vars(const data::example &);
-
   protected:
-    data                      *dat_;
-    std::vector<variable_ptr> *var_;
+    data                            *dat_;
+    std::vector<variable_ptr> *variables_;
   };
 
   ///
@@ -52,7 +50,7 @@ namespace vita
     score_t fast(const individual &);
 
   private:
-    virtual double error(interpreter &, data::iterator, int *const,
+    virtual double error(src_interpreter &, data::iterator, int *const,
                          unsigned *const) = 0;
   };
 
@@ -77,7 +75,8 @@ namespace vita
       : sum_of_errors_evaluator(d, v) {}
 
   private:
-    double error(interpreter &, data::iterator, int *const, unsigned *const);
+    double error(src_interpreter &, data::iterator, int *const,
+                 unsigned *const);
   };
 
   ///
@@ -99,7 +98,8 @@ namespace vita
       : sum_of_errors_evaluator(d, v) {}
 
   private:
-    double error(interpreter &, data::iterator, int *const, unsigned *const);
+    double error(src_interpreter &, data::iterator, int *const,
+                 unsigned *const);
   };
 
   ///
@@ -114,7 +114,8 @@ namespace vita
       : sum_of_errors_evaluator(d, v) {}
 
   private:
-    double error(interpreter &, data::iterator, int *const, unsigned *const);
+    double error(src_interpreter &, data::iterator, int *const,
+                 unsigned *const);
   };
 
   ///

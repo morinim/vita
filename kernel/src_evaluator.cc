@@ -13,7 +13,7 @@
 
 #include "src_evaluator.h"
 #include "individual.h"
-#include "interpreter.h"
+#include "src_interpreter.h"
 
 namespace vita
 {
@@ -22,21 +22,10 @@ namespace vita
   /// \param[in] v vector of input variables of the dataset.
   ///
   src_evaluator::src_evaluator(data *d, std::vector<variable_ptr> *v)
-    : dat_(d), var_(v)
+    : dat_(d), variables_(v)
   {
     assert(d);
     assert(v);
-  }
-
-  ///
-  /// \param[in] d values to be stored in the input variables.
-  ///
-  void src_evaluator::load_vars(const data::example &d)
-  {
-    assert(d.input.size() == var_->size());
-
-    for (size_t i(0); i < var_->size(); ++i)
-      (*var_)[i]->val = d.input[i];
   }
 
   ///
@@ -49,7 +38,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    interpreter agent(ind);
+    src_interpreter agent(ind, variables_);
 
     double err(0.0);
     int illegals(0);
@@ -83,7 +72,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    interpreter agent(ind);
+    src_interpreter agent(ind, variables_);
 
     double err(0.0);
     int illegals(0);
@@ -118,12 +107,11 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double sae_evaluator::error(interpreter &agent, data::iterator t,
+  double sae_evaluator::error(src_interpreter &agent, data::iterator t,
                               int *const illegals, unsigned *const ok)
   {
-    load_vars(*t);
+    const any res(agent.run(*t));
 
-    const any res(agent());
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
@@ -151,12 +139,10 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double sse_evaluator::error(interpreter &agent, data::iterator t,
+  double sse_evaluator::error(src_interpreter &agent, data::iterator t,
                               int *const illegals, unsigned *const ok)
   {
-    load_vars(*t);
-
-    const any res(agent());
+    const any res(agent.run(*t));
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
@@ -185,12 +171,10 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double count_evaluator::error(interpreter &agent, data::iterator t,
+  double count_evaluator::error(src_interpreter &agent, data::iterator t,
                                 int *const, unsigned *const ok)
   {
-    load_vars(*t);
-
-    const any res(agent());
+    const any res(agent.run(*t));
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
@@ -261,10 +245,8 @@ namespace vita
   {
     assert(ind.check());
 
-    load_vars(e);
-
-    interpreter agent(ind);
-    const any res(agent());
+    src_interpreter agent(ind, variables_);
+    const any res(agent.run(e));
 
     const size_t ns(n_slots());
     const size_t last_slot(ns - 1);
@@ -310,7 +292,7 @@ namespace vita
 
     assert(ind.check());
 
-    interpreter agent(ind);
+    src_interpreter agent(ind, variables_);
 
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
@@ -427,7 +409,7 @@ namespace vita
     std::vector<distribution<double>> gauss(dat_->classes());
 
     assert(ind.check());
-    interpreter agent(ind);
+    src_interpreter agent(ind, variables_);
 
     // For a set of training data, we assume that the behaviour of a program
     // classifier is modelled using multiple Gaussian distributions, each of
@@ -437,9 +419,7 @@ namespace vita
     // of the program outputs for those training examples for that class.
     for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
     {
-      load_vars(*t);
-
-      const any res(agent());
+      const any res(agent.run(*t));
 
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
       const double cut(10000000);
@@ -546,9 +526,7 @@ namespace vita
     const std::vector<distribution<double>> &gauss,
     double *prob, double *prob_sum)
   {
-    load_vars(example);
-
-    const any res((interpreter(ind))());
+    const any res(src_interpreter(ind, variables_).run(example));
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     assert(dat_->classes() == gauss.size());
@@ -621,7 +599,7 @@ namespace vita
   {
     assert(dat_.classes() == 2);
 
-    interpreter agent(ind);
+    src_interpreter agent(ind, variables_);
 
     fitness_t err(0.0);
     int illegals(0);
@@ -631,7 +609,7 @@ namespace vita
       for (size_t i(0); i < vars_.size(); ++i)
         vars_[i]->val = t->input[i];
 
-      const any res(agent());
+      const any res(agent.run());
 
       if (res.empty())
         err += std::pow(100.0,++illegals);

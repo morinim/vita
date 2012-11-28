@@ -45,7 +45,7 @@ namespace vita
 
     /// Just a shortcur for checking number of classes.
     bool classification() { return classes() > 1; }
-    
+
     size_t categories() const;
     size_t classes() const;
     size_t variables() const;
@@ -55,7 +55,7 @@ namespace vita
   public:  // Public data members.
     // Preferred evaluator for symbolic regression.
     evaluator_id p_symre;
-    
+
     // Preferred evaluator for classification.
     evaluator_id p_class;
 
@@ -67,8 +67,8 @@ namespace vita
     void setup_terminals_from_data();
 
   private:  // Private data members.
-    std::vector<variable_ptr> vars_;
-    vita::data                 dat_;
+    std::vector<variable *> vars_;
+    vita::data               dat_;
   };
 }  // namespace vita
 

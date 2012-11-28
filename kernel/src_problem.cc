@@ -19,6 +19,7 @@
 #include "individual.h"
 #include "src_constant.h"
 #include "src_evaluator.h"
+#include "src_variable.h"
 
 namespace vita
 {
