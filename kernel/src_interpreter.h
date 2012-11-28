@@ -14,25 +14,30 @@
 #if !defined(SRC_INTERPRETER_H)
 #define      SRC_INTERPRETER_H
 
+#include "data.h"
 #include "interpreter.h"
-#include "src_variable.h"
 
 namespace vita
 {
   class src_interpreter : public interpreter
   {
   public:
-    src_interpreter(const individual &ind, std::vector<variable_ptr> *v)
-      : interpreter(ind), variables_(v)
-    {}
+    explicit src_interpreter(const individual &ind) : interpreter(ind) {}
 
     any run(const data::example &ex)
-    { load_vars(ex); return interpreter::operator()(); }
+    { example_ = &ex; return interpreter::operator()(); }
+
+    any eval_var(unsigned i)
+    { return boost::apply_visitor(cast_visitor(), example_->input[i]); }
 
   private:
-    void load_vars(const data::example &);
+    class cast_visitor : public boost::static_visitor<any>
+    {
+    public:
+      template<class T> any operator()(const T &x) const { return any(x); }
+    };
 
-    std::vector<variable_ptr> *variables_;
+    const data::example *example_;
   };
 }  // namespace vita
 

@@ -26,11 +26,6 @@
 
 namespace vita
 {
-  class variable;
-
-  /// Just a shortcut (similar to symbol_ptr).
-  typedef std::shared_ptr<variable> variable_ptr;
-
   ///
   /// Stores the dataset used to evolve vita::population.
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV

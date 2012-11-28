@@ -19,13 +19,10 @@ namespace vita
 {
   ///
   /// \param[in] d pointer to data that the evaluator will use.
-  /// \param[in] v vector of input variables of the dataset.
   ///
-  src_evaluator::src_evaluator(data *d, std::vector<variable_ptr> *v)
-    : dat_(d), variables_(v)
+  src_evaluator::src_evaluator(data *d) : dat_(d)
   {
     assert(d);
-    assert(v);
   }
 
   ///
@@ -38,7 +35,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
 
     double err(0.0);
     int illegals(0);
@@ -72,7 +69,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
 
     double err(0.0);
     int illegals(0);
@@ -191,16 +188,13 @@ namespace vita
 
   ///
   /// \param[in] d training data.
-  /// \param[in] v vector of input variables.
   /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
   ///                   Determination algorithm.
   ///
-  dyn_slot_evaluator::dyn_slot_evaluator(data *d, std::vector<variable_ptr> *v,
-                                         size_t x_slot)
-    : src_evaluator(d, v), x_slot_(x_slot)
+  dyn_slot_evaluator::dyn_slot_evaluator(data *d, size_t x_slot)
+    : src_evaluator(d), x_slot_(x_slot)
   {
     assert(d);
-    assert(v);
     assert(x_slot);
   }
 
@@ -245,7 +239,7 @@ namespace vita
   {
     assert(ind.check());
 
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
     const any res(agent.run(e));
 
     const size_t ns(n_slots());
@@ -292,7 +286,7 @@ namespace vita
 
     assert(ind.check());
 
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
 
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
@@ -409,7 +403,7 @@ namespace vita
     std::vector<distribution<double>> gauss(dat_->classes());
 
     assert(ind.check());
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
 
     // For a set of training data, we assume that the behaviour of a program
     // classifier is modelled using multiple Gaussian distributions, each of
@@ -526,7 +520,7 @@ namespace vita
     const std::vector<distribution<double>> &gauss,
     double *prob, double *prob_sum)
   {
-    const any res(src_interpreter(ind, variables_).run(example));
+    const any res(src_interpreter(ind).run(example));
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     assert(dat_->classes() == gauss.size());
@@ -599,7 +593,7 @@ namespace vita
   {
     assert(dat_.classes() == 2);
 
-    src_interpreter agent(ind, variables_);
+    src_interpreter agent(ind);
 
     fitness_t err(0.0);
     int illegals(0);

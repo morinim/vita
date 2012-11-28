@@ -28,11 +28,10 @@ namespace vita
   class src_evaluator : public evaluator
   {
   public:
-    src_evaluator(data *, std::vector<variable_ptr> *);
+    explicit src_evaluator(data *);
 
   protected:
-    data                            *dat_;
-    std::vector<variable_ptr> *variables_;
+    data *dat_;
   };
 
   ///
@@ -43,8 +42,7 @@ namespace vita
   class sum_of_errors_evaluator : public src_evaluator
   {
   public:
-    sum_of_errors_evaluator(data *d, std::vector<variable_ptr> *v)
-      : src_evaluator(d, v) {}
+    explicit sum_of_errors_evaluator(data *d) : src_evaluator(d) {}
 
     score_t operator()(const individual &);
     score_t fast(const individual &);
@@ -71,8 +69,7 @@ namespace vita
   class sae_evaluator : public sum_of_errors_evaluator
   {
   public:
-    sae_evaluator(data *d, std::vector<variable_ptr> *v)
-      : sum_of_errors_evaluator(d, v) {}
+    explicit sae_evaluator(data *d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -94,8 +91,7 @@ namespace vita
   class sse_evaluator : public sum_of_errors_evaluator
   {
   public:
-    sse_evaluator(data *d, std::vector<variable_ptr> *v)
-      : sum_of_errors_evaluator(d, v) {}
+    explicit sse_evaluator(data *d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -110,8 +106,7 @@ namespace vita
   class count_evaluator : public sum_of_errors_evaluator
   {
   public:
-    count_evaluator(data *d, std::vector<variable_ptr> *v)
-      : sum_of_errors_evaluator(d, v) {}
+    explicit count_evaluator(data *d) : sum_of_errors_evaluator(d) {}
 
   private:
     double error(src_interpreter &, data::iterator, int *const,
@@ -134,7 +129,7 @@ namespace vita
   class dyn_slot_evaluator : public src_evaluator
   {
   public:
-    dyn_slot_evaluator(data *, std::vector<variable_ptr> *, size_t = 10);
+    explicit dyn_slot_evaluator(data *, size_t = 10);
 
     score_t operator()(const individual &);
 
@@ -182,12 +177,8 @@ namespace vita
   class gaussian_evaluator : public src_evaluator
   {
   public:
-    gaussian_evaluator(data *d, std::vector<variable_ptr> *v)
-      : src_evaluator(d, v)
-    {
-      assert(d);
-      assert(v);
-    }
+    explicit gaussian_evaluator(data *d) : src_evaluator(d)
+    { assert(d); }
 
     score_t operator()(const individual &);
 

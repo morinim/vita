@@ -67,8 +67,7 @@ namespace vita
     void setup_terminals_from_data();
 
   private:  // Private data members.
-    std::vector<variable *> vars_;
-    vita::data               dat_;
+    vita::data dat_;
   };
 }  // namespace vita
 

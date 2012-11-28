@@ -17,6 +17,7 @@
 #include <boost/variant.hpp>
 
 #include "data.h"
+#include "src_interpreter.h"
 #include "terminal.h"
 
 namespace vita
@@ -28,8 +29,8 @@ namespace vita
   class variable : public terminal
   {
   public:
-    explicit variable(const std::string &name, category_t t = 0)
-      : terminal(name, t, true) {}
+    variable(const std::string &name, unsigned v, category_t t = 0)
+      : terminal(name, t, true), var_(v) {}
 
     ///
     /// \return the value of the variable (as a \c any).
@@ -37,19 +38,13 @@ namespace vita
     /// The argument is not used: the value of a variable is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    any eval(vita::interpreter *) const
+    any eval(interpreter *i) const
     {
-      switch (val.which())
-      {
-      case 0:  return any(boost::get<bool>(val));
-      case 1:  return any(boost::get<int>(val));
-      case 2:  return any(boost::get<double>(val));
-      default: return any(boost::get<std::string>(val));
-      }
+      return static_cast<src_interpreter *>(i)->eval_var(var_);
     }
 
-  public:  // Data members.
-    data::example::value_t val;
+  private:  // Private data members.
+    unsigned var_;
 
   private: // Serialization.
     friend class boost::serialization::access;
@@ -63,7 +58,7 @@ namespace vita
   void variable::serialize(Archive &ar, unsigned)
   {
     ar & boost::serialization::base_object<terminal>(*this);
-    ar & val;
+    ar & var_;
   }
 }  // namespace vita
 #endif  // SRC_VARIABLE_H

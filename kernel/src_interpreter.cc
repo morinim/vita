@@ -15,14 +15,4 @@
 
 namespace vita
 {
-  ///
-  /// \param[in] ex values to be stored in the input variables.
-  ///
-  void src_interpreter::load_vars(const data::example &ex)
-  {
-    assert(ex.input.size() == variables_->size());
-
-    for (size_t i(0); i < variables_->size(); ++i)
-      (*variables_)[i]->val = ex.input[i];
-  }
 }  // Namespace vita

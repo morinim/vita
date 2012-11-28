@@ -32,19 +32,19 @@ namespace vita
 
     unsigned VARIABLE_IS_NOT_USED i;
 
-    i = add_evaluator(std::make_shared<count_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<count_evaluator>(&dat_));
     assert(i == k_count_evaluator);
 
-    i = add_evaluator(std::make_shared<sae_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<sae_evaluator>(&dat_));
     assert(i == k_sae_evaluator);
 
-    i = add_evaluator(std::make_shared<sse_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<sse_evaluator>(&dat_));
     assert(i == k_sse_evaluator);
 
-    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(&dat_));
     assert(i == k_dyn_slot_evaluator);
 
-    i = add_evaluator(std::make_shared<gaussian_evaluator>(&dat_, &vars_));
+    i = add_evaluator(std::make_shared<gaussian_evaluator>(&dat_));
     assert(i == k_gaussian_evaluator);
   }
 
@@ -57,7 +57,6 @@ namespace vita
     p_class = k_gaussian_evaluator;
 
     problem::clear();
-    vars_.clear();
     dat_.clear();
   }
 
@@ -75,7 +74,6 @@ namespace vita
                                               const std::string &symbols)
   {
     env.sset = vita::symbol_set();
-    vars_.clear();
     dat_.clear();
 
     const size_t n_examples(dat_.open(ds));
@@ -118,7 +116,6 @@ namespace vita
   void src_problem::setup_terminals_from_data()
   {
     env.sset = vita::symbol_set();
-    vars_.clear();
 
     // Sets up the variables (features).
     for (size_t i(1); i < dat_.columns(); ++i)
@@ -128,9 +125,7 @@ namespace vita
         name = "X" + boost::lexical_cast<std::string>(i);
 
       const category_t category(dat_.get_column(i).category_id);
-      const variable_ptr x(std::make_shared<variable>(name, category));
-      vars_.push_back(x);
-      env.insert(x);
+      env.insert(std::make_shared<variable>(name, i - 1, category));
     }
 
     // Sets up the labels for nominal attributes.
@@ -398,20 +393,19 @@ namespace vita
     if (!dat_.check())
       return false;
 
-    if (vars_.size() != dat_.variables())
-      return false;
-
     if (p_symre > k_max_evaluator)
     {
       if (verbose)
-        std::cerr << "Incorrect ID for preferred symbolic regression evaluator." << std::endl;
+        std::cerr << "Incorrect ID for preferred sym.reg. evaluator."
+                  << std::endl;
       return false;
     }
 
     if (p_class > k_max_evaluator)
     {
       if (verbose)
-        std::cerr << "Incorrect ID for preferred classification evaluator." << std::endl;
+        std::cerr << "Incorrect ID for preferred classification evaluator."
+                  << std::endl;
       return false;
     }
 
