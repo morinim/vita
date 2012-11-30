@@ -21,7 +21,8 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
-INCPATH = ./kernel $(BOOST_INCLUDE)
+INCPATH = ./kernel
+SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra
 DEFS = -march=native
@@ -78,7 +79,7 @@ kernel: $(KERNEL_OBJ)
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
-	@$(COMPILE) $(foreach INC,$(INCPATH),-I$(INC)) -MMD -o $@ -c $<
+	@$(COMPILE) $(foreach INC,$(INCPATH),-I$(INC)) $(foreach INC,$(SYSTEMINCPATH),-isystem$(INC)) -MMD -o $@ -c $<
 	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; rm -f $*.d
 
 -include $(ALL_SRC:.cc=.P)
@@ -100,4 +101,4 @@ backup:
 	@echo Making backup...
 	@-if [ ! -e ../backup ]; then mkdir ../backup; fi;
 	@make clean
-	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.tar.xz ../../vita
+	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.txz ../../vita
