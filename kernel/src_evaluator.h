@@ -48,7 +48,7 @@ namespace vita
     score_t fast(const individual &);
 
   private:
-    virtual double error(src_interpreter &, data::iterator, int *const,
+    virtual double error(src_interpreter &, data::example &, int *const,
                          unsigned *const) = 0;
   };
 
@@ -72,7 +72,7 @@ namespace vita
     explicit sae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::iterator, int *const,
+    double error(src_interpreter &, data::example &, int *const,
                  unsigned *const);
   };
 
@@ -94,7 +94,7 @@ namespace vita
     explicit sse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::iterator, int *const,
+    double error(src_interpreter &, data::example &, int *const,
                  unsigned *const);
   };
 
@@ -109,7 +109,7 @@ namespace vita
     explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::iterator, int *const,
+    double error(src_interpreter &, data::example &, int *const,
                  unsigned *const);
   };
 

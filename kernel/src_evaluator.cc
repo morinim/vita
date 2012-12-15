@@ -38,9 +38,9 @@ namespace vita
     int illegals(0);
     unsigned ok(0), total_nr(0);
 
-    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (auto &example : *dat_)
     {
-      err += error(agent, t, &illegals, &ok);
+      err += error(agent, example, &illegals, &ok);
 
       ++total_nr;
     }
@@ -73,10 +73,10 @@ namespace vita
     unsigned ok(0), total_nr(0);
     unsigned counter(0);
 
-    for (data::iterator t(dat_->begin()); t != dat_->end(); ++t)
+    for (auto &example : *dat_)
       if (dat_->size() <= 20 || (counter++ % 5) == 0)
       {
-        err += error(agent, t, &illegals, &ok);
+        err += error(agent, example, &illegals, &ok);
 
         ++total_nr;
       }
@@ -101,20 +101,20 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double sae_evaluator::error(src_interpreter &agent, data::iterator t,
+  double sae_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals, unsigned *const ok)
   {
-    const any res(agent.run(*t));
+    const any res(agent.run(t));
 
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
     else
       err = std::fabs(interpreter::to_double(res) -
-                      data::cast<double>(t->output));
+                      data::cast<double>(t.output));
 
     if (err > 0.1)
-      ++t->difficulty;
+      ++t.difficulty;
     else
       ++(*ok);
 
@@ -133,21 +133,21 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double sse_evaluator::error(src_interpreter &agent, data::iterator t,
+  double sse_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals, unsigned *const ok)
   {
-    const any res(agent.run(*t));
+    const any res(agent.run(t));
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
     else
     {
-      err = interpreter::to_double(res) - data::cast<double>(t->output);
+      err = interpreter::to_double(res) - data::cast<double>(t.output);
       err *= err;
     }
 
     if (err > 0.1)
-      ++t->difficulty;
+      ++t.difficulty;
     else
       ++(*ok);
 
@@ -165,18 +165,17 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double count_evaluator::error(src_interpreter &agent, data::iterator t,
+  double count_evaluator::error(src_interpreter &agent, data::example &t,
                                 int *const, unsigned *const ok)
   {
-    const any res(agent.run(*t));
+    const any res(agent.run(t));
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
-                             data::cast<double>(t->output)) >=
-                   float_epsilon);
+                             data::cast<double>(t.output)) >= float_epsilon);
 
     if (err)
-      ++t->difficulty;
+      ++t.difficulty;
     else
       ++(*ok);
 
@@ -289,13 +288,13 @@ namespace vita
     // value for each training example. Based on the program output value a
     // a bidimentional array is built (slots[slot][class]).
     size_t ds_size(0);
-    for (data::const_iterator t(dat_->cbegin()); t != dat_->end(); ++t)
+    for (auto &example : *dat_)
     {
       ++ds_size;
 
-      const size_t where(slot(ind, *t));
+      const size_t where(slot(ind, example));
 
-      ++sm[where][t->label()];
+      ++sm[where][example.label()];
     }
 
     const size_t unknown(dat_->classes());
@@ -408,9 +407,9 @@ namespace vita
     // determined by evaluating the program on the examples of the class in
     // the training set. This is done by taking the mean and standard deviation
     // of the program outputs for those training examples for that class.
-    for (data::const_iterator t(dat_->cbegin()); t != dat_->cend(); ++t)
+    for (const auto &example : *dat_)
     {
-      const any res(agent.run(*t));
+      const any res(agent.run(example));
 
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
       const double cut(10000000);
@@ -419,7 +418,7 @@ namespace vita
       else if (val < -cut)
         val = -cut;
 
-      gauss[t->label()].add(val);
+      gauss[example.label()].add(val);
     }
 
     dat_->dataset(backup);
@@ -456,10 +455,12 @@ namespace vita
       }
 
     unsigned ok(0), count(0);
-    for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
-      if (class_label(ind, *t, gauss) == t->label())
+    for (const auto &example : *dat_)
+    {
+      ++count;
+      if (class_label(ind, example, gauss) == example->label())
         ++ok;
-
+    }
     assert(count);
 
     d = double(ok) - double(count);
@@ -470,13 +471,13 @@ namespace vita
 
     fitness_t d(0.0);
     unsigned ok(0), count(0);
-    for (auto t(dat_->cbegin()); t != dat_->cend(); ++count, ++t)
+    for (const auto &example : *dat_)
     {
       double max_val, sum;
-      const unsigned probable_class(class_label(ind, *t, gauss, &max_val,
+      const unsigned probable_class(class_label(ind, example, gauss, &max_val,
                                                 &sum));
 
-      if (probable_class == t->label())
+      if (probable_class == example.label())
       {
         ++ok;
 
@@ -497,7 +498,10 @@ namespace vita
         // So -1.0 is like to say that we have a complete failure.
         d -= 1.0;
       }
+
+      ++count;
     }
+    assert(count);
 
     return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
   }
@@ -595,20 +599,20 @@ namespace vita
     fitness_t err(0.0);
     int illegals(0);
 
-    for (data::const_iterator t(dat.begin()); t != dat.end(); ++t)
+    for (auto &example : *dat_)
     {
       for (size_t i(0); i < vars_.size(); ++i)
-        vars_[i]->val = t->input[i];
+        vars_[i]->val = example->input[i];
 
       const any res(agent.run());
 
       if (res.empty())
-        err += std::pow(100.0,++illegals);
+        err += std::pow(100.0, ++illegals);
       else
       {
         const T val(any_cast<T>(res));
-        if ((t->label() == label && val < 0.0) ||
-            (t->label() != label && val >= 0.0))
+        if ((example->label() == label && val < 0.0) ||
+            (example->label() != label && val >= 0.0))
           err += std::fabs(val);
       }
     }

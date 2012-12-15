@@ -122,7 +122,7 @@ namespace vita
   void data::slice(size_t n)
   {
     end_[dataset()] = (n == 0 || n >= size()) ?
-      dataset_[dataset()].end() : std::next(cbegin(), n);
+      dataset_[dataset()].end() : std::next(begin(), n);
   }
 
   ///
@@ -134,7 +134,7 @@ namespace vita
   }
 
   ///
-  /// \return constant reference to the first element of the active dataset.
+  /// \return a constant reference to the first element of the active dataset.
   ///
   data::const_iterator data::cbegin() const
   {
@@ -145,16 +145,7 @@ namespace vita
   /// \return a constant reference to the last+1 (sentry) element of the active
   ///         dataset.
   ///
-  data::const_iterator data::cend() const
-  {
-    return end_[dataset()];
-  }
-
-  ///
-  /// \return reference to the last+1 (sentry) element of the active
-  ///         dataset.
-  ///
-  data::const_iterator data::end() const
+  data::iterator data::end() const
   {
     return end_[dataset()];
   }
@@ -219,7 +210,7 @@ namespace vita
     std::function<bool (const example &, const example &)> f)
   {
     const dataset_t d(dataset());
-    const size_t partition_size(std::distance(dataset_[d].cbegin(), end_[d]));
+    const size_t partition_size(std::distance(dataset_[d].begin(), end_[d]));
 
     dataset_[d].sort(f);
 

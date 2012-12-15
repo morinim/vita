@@ -105,9 +105,9 @@ namespace vita
 
   public:
     /// example *
-    typedef std::list<example>::iterator iterator;
+    typedef typename std::list<example>::iterator iterator;
     /// const example *
-    typedef std::list<example>::const_iterator const_iterator;
+    typedef typename std::list<example>::const_iterator const_iterator;
 
   public:  // Construction, convenience.
     data();
@@ -119,9 +119,9 @@ namespace vita
     void slice(size_t);
 
     iterator begin();
-    const_iterator end() const;
     const_iterator cbegin() const;
-    const_iterator cend() const;
+    iterator end() const;
+    const_iterator cend() const { return end(); }
     size_t size() const;
     size_t size(dataset_t) const;
 
@@ -191,7 +191,7 @@ namespace vita
     std::list<example> dataset_[k_max_dataset + 1];
 
     /// Used to select a subset of the active dataset.
-    data::const_iterator end_[k_max_dataset + 1];
+    data::iterator end_[k_max_dataset + 1];
 
     /// Used to choose the data we want to operate on (training / validation
     /// set).
