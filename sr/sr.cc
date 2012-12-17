@@ -127,18 +127,14 @@ void predict_test_set(const vita::individual &ind)
   if (data->size(vita::data::test))
   {
     const vita::data::dataset_t backup(data->dataset());
-
     data->dataset(vita::data::test);
 
-    vita::gaussian_classifier
-      cl(ind,
-         reinterpret_cast<vita::gaussian_evaluator *>(problem.get_evaluator()));
+    vita::gaussian_lambda_f lambda(ind, *data);
 
-    std::ofstream tf(problem.env.stat_dir + "/" + vita::environment::tst_filename);
+    std::ofstream tf(problem.env.stat_dir + "/" +
+                     vita::environment::tst_filename);
     for (vita::data::iterator t(data->begin()); t != data->end(); ++t)
-    {
-      tf << cl(*t) << std::endl;
-    }
+      tf << lambda(*t) << std::endl;
 
     data->dataset(backup);
   }

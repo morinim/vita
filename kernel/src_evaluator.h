@@ -16,8 +16,8 @@
 
 #include <vector>
 
-#include "classifier.h"
 #include "evaluator.h"
+#include "lambda_f.h"
 #include "primitive/factory.h"
 
 namespace vita
@@ -133,32 +133,11 @@ namespace vita
 
     score_t operator()(const individual &);
 
-    friend class dyn_slot_classifier;
-
   private:
-    static double normalize_01(double);
+    dyn_slot_engine engine_;
 
-    size_t n_slots() const;
-    size_t slot(const individual &, const data::example &);
-
-    typedef std::vector<unsigned> uvect;
-    void fill_slots(const individual &, std::vector<uvect> *, uvect *,
-                    size_t * = 0);
-
-    // How many slots for each class of the problem?
-    unsigned x_slot_;
-  };
-
-  class dyn_slot_classifier : public classifier
-  {
-  public:
-    dyn_slot_classifier(const individual &, dyn_slot_evaluator *);
-
-    std::string operator()(const data::example &) const;
-
-  private:
-    dyn_slot_evaluator            *eva_;
-    std::vector<std::string> slot_name_;
+    /// Number of slots for each class of the training set.
+    size_t x_slot_;
   };
 
   ///
@@ -177,31 +156,12 @@ namespace vita
   class gaussian_evaluator : public src_evaluator
   {
   public:
-    explicit gaussian_evaluator(data &d) : src_evaluator(d)
-    { assert(d); }
+    explicit gaussian_evaluator(data &d) : src_evaluator(d) {}
 
     score_t operator()(const individual &);
 
-    friend class gaussian_classifier;
-
   private:
-    std::vector<distribution<double>> gaussian_distribution(const individual &);
-
-    unsigned class_label(const individual &, const data::example &,
-                         const std::vector<distribution<double>> &,
-                         double *, double *);
-  };
-
-  class gaussian_classifier : public classifier
-  {
-  public:
-    gaussian_classifier(const individual &, gaussian_evaluator *);
-
-    std::string operator()(const data::example &) const;
-
-  private:
-    gaussian_evaluator                 *eva_;
-    std::vector<distribution<double>> gauss_;
+    gaussian_engine engine_;
   };
 }  // namespace vita
 
