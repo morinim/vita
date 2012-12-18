@@ -90,8 +90,8 @@ namespace vita
   private:
     dyn_slot_engine engine_;
 
-    /// slot_name_[i] = "name of the i-th class".
-    std::vector<std::string> slot_name_;
+    /// class_name_[i] = "name of the i-th class".
+    std::vector<std::string> class_name_;
   };
 
   ///

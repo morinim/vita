@@ -60,7 +60,7 @@ namespace vita
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
     // a bidimentional array is built (slot_matrix_[slot][class]).
-    for (auto &example : d)
+    for (const data::example &example : d)
     {
       ++dataset_size;
 
@@ -84,6 +84,20 @@ namespace vita
 
       slot_class[i] = slot_matrix[i][best_class] ? best_class : unknown;
     }
+
+    // Unknown slots can be a problem with new examples (not contained in the training set). So we
+    // assign to them the class of a neighbour slot (if available).
+    // Another interesting strategy could be to assign unknown slots to the biggest class.
+    for (size_t i(0); i < n_slots; ++i)
+      if (slot_class[i] == unknown)
+      {
+        if (i && slot_class[i - 1] != unknown)
+          slot_class[i] = slot_class[i - 1];
+        else if (i + 1 < n_slots && slot_class[i + 1] != unknown)
+          slot_class[i] = slot_class[i + 1];
+        else
+          slot_class[i] = 0;
+      }
 
     d.dataset(backup);
   }
@@ -143,7 +157,7 @@ namespace vita
   ///
   dyn_slot_lambda_f::dyn_slot_lambda_f(const individual &ind, data &d,
                                        size_t x_slot)
-    : lambda_f(ind), engine_(ind, d, x_slot), slot_name_(d.classes() * x_slot)
+    : lambda_f(ind), engine_(ind, d, x_slot), class_name_(d.classes() * x_slot)
   {
     assert(ind.check());
     assert(d.check());
@@ -151,8 +165,8 @@ namespace vita
     assert(x_slot);
 
     assert(slot_name_.size() == engine_.slot_class.size());
-    for (size_t i(0); i < slot_name_.size(); ++i)
-      slot_name_[i] = d.class_name(engine_.slot_class[i]);
+    for (size_t i(0); i < d.classes(); ++i)
+      class_name_[i] = d.class_name(i);
   }
 
   ///
@@ -163,7 +177,7 @@ namespace vita
   {
     const size_t where(engine_.slot(ind_, instance));
 
-    return any(slot_name_[where]);
+    return any(class_name_[engine_.slot_class[where]]);
   }
 
   ///

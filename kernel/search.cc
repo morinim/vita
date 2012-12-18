@@ -363,7 +363,7 @@ namespace vita
     tune_parameters(verbose);
 
     // For std::placeholders and std::bind see:
-    //  http://en.cppreference.com/w/cpp/utility/functional/placeholders
+    //  <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
     std::function<void (unsigned)> shake_data;
     if (env_.dss)
       shake_data = std::bind(&search::dss, this, std::placeholders::_1);
