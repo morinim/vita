@@ -23,6 +23,9 @@
 
 namespace vita
 {
+  class individual;
+  class lambda_f;
+
   class src_problem : public problem
   {
   public:
@@ -40,10 +43,11 @@ namespace vita
     void setup_default_symbols();
 
     vita::data *data() { return &dat_; }
+    std::unique_ptr<lambda_f> lambdify(const individual &);
 
     void clear();
 
-    /// Just a shortcur for checking number of classes.
+    /// Just a shortcut for checking number of classes.
     bool classification() { return classes() > 1; }
 
     size_t categories() const;

@@ -16,7 +16,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "src_problem.h"
-#include "individual.h"
+#include "lambda_f.h"
 #include "src_constant.h"
 #include "src_evaluator.h"
 #include "src_variable.h"
@@ -379,6 +379,36 @@ namespace vita
   size_t src_problem::variables() const
   {
     return dat_.variables();
+  }
+
+  ///
+  /// \param[in] ind individual to be transformed in a lambda function.
+  /// \return the lambda function associated with \a ind (\c nullptr in case of
+  ///         errors).
+  ///
+  /// The lambda function depends on the active evaluator.
+  ///
+  std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
+  {
+    size_t i(0);
+    for (; i < evaluators_.size() && evaluators_[i] != active_eva_; ++i)
+    {}
+
+    switch (i)
+    {
+    case k_count_evaluator:
+    case k_sae_evaluator:
+    case k_sse_evaluator:
+      return std::unique_ptr<lambda_f>(new lambda_f(ind));
+
+    case k_dyn_slot_evaluator:
+      return std::unique_ptr<lambda_f>(new dyn_slot_lambda_f(ind, dat_));
+
+    case k_gaussian_evaluator:
+      return std::unique_ptr<lambda_f>(new gaussian_lambda_f(ind, dat_));
+    }
+
+    return nullptr;
   }
 
   ///

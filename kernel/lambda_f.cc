@@ -17,6 +17,15 @@
 namespace vita
 {
   ///
+  /// \param[in] e input example for the lambda function.
+  /// \return the output value associated with \a e.
+  ///
+  any lambda_f::operator()(const data::example &e) const
+  {
+    return any(src_interpreter(ind_).run(e));
+  }
+
+  ///
   /// \param[in] ind individual used for classification.
   /// \param[in] d the training set.
   /// \param[in] x_slot number of slots for each class of the training set.

@@ -129,12 +129,12 @@ void predict_test_set(const vita::individual &ind)
     const vita::data::dataset_t backup(data->dataset());
     data->dataset(vita::data::test);
 
-    vita::gaussian_lambda_f lambda(ind, *data);
+    std::unique_ptr<vita::lambda_f> lambda(problem.lambdify(ind));
 
     std::ofstream tf(problem.env.stat_dir + "/" +
                      vita::environment::tst_filename);
-    for (vita::data::iterator t(data->begin()); t != data->end(); ++t)
-      tf << lambda(*t) << std::endl;
+    for (const vita::data::example &e : *data)
+      tf << (*lambda)(e) << std::endl;
 
     data->dataset(backup);
   }

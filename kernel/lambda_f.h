@@ -32,7 +32,7 @@ namespace vita
     explicit lambda_f(const individual &ind) : ind_(ind)
     { assert(ind.check()); }
 
-    virtual any operator()(const data::example &) const = 0;
+    virtual any operator()(const data::example &) const;
 
   protected:
     individual ind_;
