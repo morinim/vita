@@ -178,8 +178,8 @@ namespace ui
     problem.env.arl = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Adaptive Representation through Learning is " << v
-                << std::endl;
+      std::cout << "[INFO] Adaptive Representation through Learning is "
+                << problem.env.arl << std::endl;
   }
 
   ///
@@ -280,7 +280,8 @@ namespace ui
     problem.env.dss = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Dynamic Subset Selection is " << v << std::endl;
+      std::cout << "[INFO] Dynamic Subset Selection is " << problem.env.dss
+                << std::endl;
   }
 
   ///
@@ -291,7 +292,7 @@ namespace ui
     problem.env.elitism = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Elitism is " << v << std::endl;
+      std::cout << "[INFO] Elitism is " << problem.env.elitism << std::endl;
   }
 
   ///
@@ -568,7 +569,8 @@ namespace ui
     problem.env.stat_dynamic = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Dynamic evolution logging is " << v << std::endl;
+      std::cout << "[INFO] Dynamic evolution logging is "
+                << problem.env.stat_dynamic << std::endl;
   }
 
   ///
@@ -883,6 +885,7 @@ int parse_command_line(int argc, char *const argv[])
 
 int main(int argc, char *const argv[])
 {
+  std::cout.setf(std::ios::boolalpha);
   std::cout << ui::header << std::endl;
 
   const int ret(parse_command_line(argc, argv));
