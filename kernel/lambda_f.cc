@@ -45,9 +45,6 @@ namespace vita
     const size_t n_slots(d.classes() * x_slot);
     assert(n_slots == slot_matrix.size());
 
-    const data::dataset_t backup(d.dataset());
-    d.dataset(data::training);
-
     // Here starts the slot-filling task.
     for (size_t i(0); i < n_slots; ++i)
     {
@@ -98,8 +95,6 @@ namespace vita
         else
           slot_class[i] = 0;
       }
-
-    d.dataset(backup);
   }
 
   ///
@@ -157,12 +152,18 @@ namespace vita
   ///
   dyn_slot_lambda_f::dyn_slot_lambda_f(const individual &ind, data &d,
                                        size_t x_slot)
-    : lambda_f(ind), engine_(ind, d, x_slot), class_name_(d.classes() * x_slot)
+    : lambda_f(ind), class_name_(d.classes() * x_slot)
   {
     assert(ind.check());
     assert(d.check());
     assert(d.classes() > 1);
     assert(x_slot);
+
+    // Use the training set for lambdification.
+    const data::dataset_t backup(d.dataset());
+    d.dataset(data::training);
+    engine_ = dyn_slot_engine(ind, d, x_slot);
+    d.dataset(backup);
 
     assert(slot_name_.size() == engine_.slot_class.size());
     for (size_t i(0); i < d.classes(); ++i)
@@ -192,9 +193,6 @@ namespace vita
     assert(ind.check());
     assert(d.classes() > 1);
 
-    const data::dataset_t backup(d.dataset());
-    d.dataset(data::training);
-
     src_interpreter agent(ind);
 
     // For a set of training data, we assume that the behaviour of a program
@@ -203,7 +201,7 @@ namespace vita
     // determined by evaluating the program on the examples of the class in
     // the training set. This is done by taking the mean and standard deviation
     // of the program outputs for those training examples for that class.
-    for (const auto &example : d)
+    for (const data::example &example : d)
     {
       const any res(agent.run(example));
 
@@ -216,8 +214,6 @@ namespace vita
 
       gauss_dist[example.label()].add(val);
     }
-
-    d.dataset(backup);
   }
 
   ///
@@ -274,11 +270,17 @@ namespace vita
   /// \param[in] d the training set.
   ///
   gaussian_lambda_f::gaussian_lambda_f(const individual &ind, data &d)
-    : lambda_f(ind), engine_(ind, d), class_name_(d.classes())
+    : lambda_f(ind), class_name_(d.classes())
   {
     assert(ind.check());
     assert(d.check());
     assert(d.classes() > 1);
+
+    // Use the training set for lambdification.
+    const data::dataset_t backup(d.dataset());
+    d.dataset(data::training);
+    engine_ = gaussian_engine(ind, d);
+    d.dataset(backup);
 
     for (size_t i(0); i < d.classes(); ++i)
       class_name_[i] = d.class_name(i);
