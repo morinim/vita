@@ -219,24 +219,27 @@ namespace vita
   ///
   /// \param[in] ind program used for classification.
   /// \param[in] example input value whose class we are interested in.
-  /// \param[out] prob
-  /// \param[out] prob_sum
+  /// \param[out] val confidence level: how sure you can be that \a example
+  ///             is properly classified. The value is in [0;1] range.
+  /// \param[out] sum the sum of all the confidence levels for \a example
+  ///                 (confidence of \a example in class 1 + confidence of
+  ///                 \a example in class 2 + ... + confidence \a example in
+  ///                 class n).
   /// \return the class of \a instance.
   ///
-  size_t gaussian_engine::class_label(
-    const individual &ind,
-    const data::example &example,
-    double *prob, double *prob_sum) const
+  size_t gaussian_engine::class_label(const individual &ind,
+                                      const data::example &example,
+                                      double *val, double *sum) const
   {
     const any res(src_interpreter(ind).run(example));
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
-    double prob_(0.0), prob_sum_(0.0);
+    double val_(0.0), val_sum_(0.0);
     size_t probable_class(0);
 
     for (size_t i(0); i < gauss_dist.size(); ++i)
     {
-      const double distance(std::abs(x - gauss_dist[i].mean));
+      const double distance(std::fabs(x - gauss_dist[i].mean));
       const double variance(gauss_dist[i].variance);
 
       double p(0.0);
@@ -248,19 +251,19 @@ namespace vita
       else                     // This is the standard case
         p = std::exp(-0.5 * distance * distance / variance);
 
-      if (p > prob_)
+      if (p > val_)
       {
-        prob_ = p;
+        val_ = p;
         probable_class = i;
       }
 
-      prob_sum_ += p;
+      val_sum_ += p;
     }
 
-    if (prob)
-      *prob = prob_;
-    if (prob_sum)
-      *prob_sum = prob_sum_;
+    if (val)
+      *val = val_;
+    if (sum)
+      *sum = val_sum_;
 
     return probable_class;
   }

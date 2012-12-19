@@ -235,22 +235,23 @@ namespace vita
     unsigned ok(0), count(0);
     for (const auto &example : *dat_)
     {
-      double max_val, sum;
-      const size_t probable_class(engine_.class_label(ind, example, &max_val,
-                                                      &sum));
+      double confidence, sum;
+      const size_t probable_class(engine_.class_label(ind, example,
+                                                      &confidence, &sum));
 
       if (probable_class == example.label())
       {
         ++ok;
 
         // Note:
-        // * (sum - max_val) is the sum of the errors;
-        // * (max_val - sum) is the opposite (we want a standardized fitness);
-        // * (max_val - sum) / (dat_->classes() - 1) is the opposite of the
+        // * (sum - confidence) is the sum of the errors;
+        // * (confidence - sum) is the opposite (standardized fitness);
+        // * (confidence - sum) / (dat_->classes() - 1) is the opposite of the
         //   average error;
-        // * (max_val - 1.0) is the uncertainty about the right class;
+        // * (1.0 - confidence) is the uncertainty about the right class;
         // * 0.001 is a scaling factor.
-        d += (max_val - sum) / (dat_->classes() - 1) + 0.001 * (max_val - 1.0);
+        d += (confidence - sum) / (dat_->classes() - 1) -
+             0.001 * (1.0 - confidence);
       }
       else
       {
