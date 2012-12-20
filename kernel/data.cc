@@ -15,7 +15,6 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -365,9 +364,9 @@ namespace vita
   ///
   std::string data::class_name(unsigned i) const
   {
-    for (auto p(classes_map_.begin()); p != classes_map_.end(); ++p)
-      if (p->second == i)
-        return p->first;
+    for (const auto &p : classes_map_)
+      if (p.second == i)
+        return p.first;
 
     return "";
   }
@@ -444,7 +443,7 @@ namespace vita
     record.push_back(curstring);
 
     if (trim)
-      for (unsigned i(0); i < record.size(); ++i)
+      for (size_t i(0); i < record.size(); ++i)
         boost::trim(record[i]);
 
     return record;
@@ -559,8 +558,7 @@ namespace vita
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
     // IT THROWS.
-    BOOST_FOREACH(ptree::value_type dha,
-                  pt.get_child("dataset.header.attributes"))
+    for (ptree::value_type dha : pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
       {
         bool output(false);
@@ -614,7 +612,7 @@ namespace vita
           try
           {
             // Store label1... labelN.
-            BOOST_FOREACH(ptree::value_type l, dha.second.get_child("labels"))
+            for (ptree::value_type l : dha.second.get_child("labels"))
               if (l.first == "label")
                 categories_[a.category_id].labels.insert(l.second.data());
           }
@@ -645,7 +643,7 @@ namespace vita
     swap_category(category_t(0), header_[0].category_id);
 
     size_t parsed(0);
-    BOOST_FOREACH(ptree::value_type bi, pt.get_child("dataset.body.instances"))
+    for (ptree::value_type bi : pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
         example instance;

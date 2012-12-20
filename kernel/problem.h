@@ -31,12 +31,12 @@ namespace vita
   public:
     problem();
 
-    unsigned add_evaluator(evaluator_ptr);
+    size_t add_evaluator(const evaluator_ptr &);
     evaluator *get_evaluator();
-    void set_evaluator(unsigned);
+    void set_evaluator(size_t);
 
     /// \return an access point for the dataset.
-    virtual vita::data *data() { return 0; }
+    virtual vita::data *data() { return nullptr; }
 
     virtual void clear();
     virtual bool check(bool) const;
@@ -46,7 +46,7 @@ namespace vita
 
   protected:  // Private data members.
     std::vector<evaluator_ptr> evaluators_;
-    evaluator_ptr              active_eva_;
+    evaluator                 *active_eva_;
   };
 }  // namespace vita
 

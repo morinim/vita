@@ -31,7 +31,7 @@ namespace vita
   void problem::clear()
   {
     env.sset = vita::symbol_set();
-    active_eva_.reset();
+    active_eva_ = nullptr;
     evaluators_.clear();
   }
 
@@ -40,7 +40,7 @@ namespace vita
   ///
   evaluator *problem::get_evaluator()
   {
-    return active_eva_.get();
+    return active_eva_;
   }
 
   ///
@@ -50,12 +50,12 @@ namespace vita
   /// Add a new avaluator to the set. Evaluators are used to score individual's
   /// fitness / accuracy.
   ///
-  unsigned problem::add_evaluator(evaluator_ptr eva)
+  size_t problem::add_evaluator(const evaluator_ptr &eva)
   {
     evaluators_.push_back(eva);
 
     if (!active_eva_)
-      active_eva_ = eva;
+      active_eva_ = eva.get();
 
     return evaluators_.size() - 1;
   }
@@ -63,9 +63,9 @@ namespace vita
   ///
   /// \param[in] i index of the evaluator that should be set as active.
   ///
-  void problem::set_evaluator(unsigned i)
+  void problem::set_evaluator(size_t i)
   {
-    active_eva_ = evaluators_[i];
+    active_eva_ = evaluators_[i].get();
   }
 
   ///

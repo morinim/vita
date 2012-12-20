@@ -11,7 +11,6 @@
  *
  */
 
-#include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -206,7 +205,7 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    BOOST_FOREACH(ptree::value_type s, pt.get_child("symbolset"))
+    for (ptree::value_type s : pt.get_child("symbolset"))
       if (s.first == "symbol")
       {
         const std::string sym_name(s.second.get<std::string>("<xmlattr>.name"));
@@ -215,11 +214,11 @@ namespace vita
 
         if (sym_sig.empty())
         {
-          BOOST_FOREACH(ptree::value_type sig, s.second)
+          for (ptree::value_type sig : s.second)
             if (sig.first == "signature")
             {
               std::vector<std::string> args;
-              BOOST_FOREACH(ptree::value_type arg, sig.second)
+              for (ptree::value_type arg : sig.second)
                 if (arg.first == "arg")
                   args.push_back(arg.second.data());
 
@@ -391,7 +390,7 @@ namespace vita
   std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
   {
     size_t i(0);
-    for (; i < evaluators_.size() && evaluators_[i] != active_eva_; ++i)
+    for (; i < evaluators_.size() && evaluators_[i].get() != active_eva_; ++i)
     {}
 
     switch (i)
