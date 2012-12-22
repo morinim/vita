@@ -55,12 +55,8 @@ namespace vita
   /// \param[in] s statistical \a summary.
   ///
   /// Parameters from the environment:
-  /// <ul>
-  /// <li>
-  ///   elitism is \c true => child replaces a member of the population only if
+  /// * elitism is \c true => child replaces a member of the population only if
   ///   child is better.
-  /// </li>
-  /// </ul>
   ///
   void family_competition_rp::operator()(
     const std::vector<index_t> &parent,
@@ -150,14 +146,14 @@ namespace vita
 
     const score_t score_off(evo_->score(offspring[0]));
 
-    // In old versions of Vita, the individual to be replaced was choosed with
-    // a ad-hoc negative tournament. Something like:
+    // In old versions of Vita, the individual to be replaced was chosen with
+    // an ad-hoc negative tournament. Something like:
     //
     //   const index_t rep_idx(negative_tournament(parent[0]));
     //
     // Now we perform just one tournament for choosing the parents and the
     // individual to be replaced is selected among the worst individuals of
-    // that tournament.
+    // this tournament.
     // The new way is simpler and more general. Note that when tournament_size
     // is greater than 2 we perform a traditional selection / replacement
     // scheme; if it is smaller we perform a family competition replacement

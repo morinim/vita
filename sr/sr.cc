@@ -312,24 +312,22 @@ namespace ui
   ///
   void evaluator(const std::string &v)
   {
-    static bool init(false);
-    static std::vector<std::string> options(vita::src_problem::k_max_evaluator + 1);
+    bool ok(true);
+    if (v == "count")
+      problem.set_evaluator(vita::src_problem::k_count_evaluator);
+    else if (v == "sae")
+      problem.set_evaluator(vita::src_problem::k_sae_evaluator);
+    else if (v == "sse")
+      problem.set_evaluator(vita::src_problem::k_sse_evaluator);
+    else if (v == "dynslot")
+      problem.set_evaluator(vita::src_problem::k_dyn_slot_evaluator);
+    else if (v == "gaussian")
+      problem.set_evaluator(vita::src_problem::k_gaussian_evaluator);
+    else
+      ok = false;
 
-    if (!init)
-    {
-      options[vita::src_problem::k_count_evaluator] = "count";
-      options[vita::src_problem::k_sae_evaluator] = "sae";
-      options[vita::src_problem::k_sse_evaluator] = "sse";
-      options[vita::src_problem::k_dyn_slot_evaluator] = "dynslot";
-      options[vita::src_problem::k_gaussian_evaluator] = "gaussian";
-    }
-
-    const auto i(find(options.begin(), options.end(), v));
-    if (i != options.end())
-    {
-      problem.set_evaluator(std::distance(options.begin(), i));
+    if (ok)
       std::cout << "[INFO] Evaluator is " << v << std::endl;
-    }
     else
       std::cerr << "[ERROR] Wrong argument for evaluator command." << std::endl;
   }

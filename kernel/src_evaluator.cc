@@ -54,6 +54,17 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind individual to be transformed in a lambda function.
+  /// \return the lambda function associated with \a ind (\c nullptr in case of
+  ///         errors).
+  ///
+  std::unique_ptr<lambda_f> sum_of_errors_evaluator::lambdify(
+    const individual &ind) const
+  {
+    return std::unique_ptr<lambda_f>(new lambda_f(ind));
+  }
+
+  ///
   /// \param[in] ind program used for fitness evaluation.
   /// \return the fitness (greater is better, max is 0) and the accuracy
   ///         (percentage).
@@ -217,6 +228,18 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind individual to be transformed in a lambda function.
+  /// \return the lambda function associated with \a ind (\c nullptr in case of
+  ///         errors).
+  ///
+  std::unique_ptr<lambda_f> dyn_slot_evaluator::lambdify(
+    const individual &ind) const
+  {
+    return std::unique_ptr<lambda_f>(new dyn_slot_lambda_f(ind, *dat_,
+                                                           x_slot_));
+  }
+
+  ///
   /// \param[in] ind program used for class recognition.
   /// \return the fitness (greater is better, max is 0).
   ///
@@ -267,6 +290,17 @@ namespace vita
     assert(count);
 
     return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
+  }
+
+  ///
+  /// \param[in] ind individual to be transformed in a lambda function.
+  /// \return the lambda function associated with \a ind (\c nullptr in case of
+  ///         errors).
+  ///
+  std::unique_ptr<lambda_f> gaussian_evaluator::lambdify(
+    const individual &ind) const
+  {
+    return std::unique_ptr<lambda_f>(new gaussian_lambda_f(ind, *dat_));
   }
 
   /*

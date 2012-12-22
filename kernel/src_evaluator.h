@@ -46,6 +46,7 @@ namespace vita
 
     score_t operator()(const individual &);
     score_t fast(const individual &);
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const,
@@ -132,6 +133,7 @@ namespace vita
     explicit dyn_slot_evaluator(data &, size_t = 10);
 
     score_t operator()(const individual &);
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
     dyn_slot_engine engine_;
@@ -159,6 +161,7 @@ namespace vita
     explicit gaussian_evaluator(data &d) : src_evaluator(d) {}
 
     score_t operator()(const individual &);
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
     gaussian_engine engine_;

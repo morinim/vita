@@ -20,6 +20,7 @@
 namespace vita
 {
   class individual;
+  class lambda_f;
 
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
@@ -53,21 +54,20 @@ namespace vita
     virtual score_t operator()(const individual &) = 0;
 
     virtual score_t fast(const individual &i) { return operator()(i); }
+
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
   };
 
   ///
-  /// \a random_evaluator \c class is used for debug purpose.
-  /// NOTE: the output is population independent.
+  /// \a random_evaluator class is used for debug purpose.
+  ///
+  /// \note
+  /// The output is population independent.
   ///
   class random_evaluator : public evaluator
   {
   public:
-    score_t operator()(const individual &)
-    {
-      const double sup(16000);
-      const fitness_t f(random::between<unsigned>(0, sup));
-      return score_t(f, f / (sup - 1));
-    }
+    virtual score_t operator()(const individual &);
   };
 }  // namespace vita
 

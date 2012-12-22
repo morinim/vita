@@ -28,23 +28,6 @@ namespace vita
   src_problem::src_problem()
   {
     clear();
-
-    unsigned VARIABLE_IS_NOT_USED i;
-
-    i = add_evaluator(std::make_shared<count_evaluator>(dat_));
-    assert(i == k_count_evaluator);
-
-    i = add_evaluator(std::make_shared<sae_evaluator>(dat_));
-    assert(i == k_sae_evaluator);
-
-    i = add_evaluator(std::make_shared<sse_evaluator>(dat_));
-    assert(i == k_sse_evaluator);
-
-    i = add_evaluator(std::make_shared<dyn_slot_evaluator>(dat_));
-    assert(i == k_dyn_slot_evaluator);
-
-    i = add_evaluator(std::make_shared<gaussian_evaluator>(dat_));
-    assert(i == k_gaussian_evaluator);
   }
 
   ///
@@ -57,6 +40,35 @@ namespace vita
 
     problem::clear();
     dat_.clear();
+  }
+
+  ///
+  /// \param[in] id numerical id of the evaluator to be activated.
+  ///
+  void src_problem::set_evaluator(evaluator_id id)
+  {
+    switch (id)
+    {
+    case k_count_evaluator:
+      problem::set_evaluator(std::make_shared<count_evaluator>(dat_));
+      break;
+
+    case k_sae_evaluator:
+      problem::set_evaluator(std::make_shared<sae_evaluator>(dat_));
+      break;
+
+    case k_sse_evaluator:
+      problem::set_evaluator(std::make_shared<sse_evaluator>(dat_));
+      break;
+
+    case k_dyn_slot_evaluator:
+      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_));
+      break;
+
+    case k_gaussian_evaluator:
+      problem::set_evaluator(std::make_shared<gaussian_evaluator>(dat_));
+      break;
+    }
   }
 
   ///
@@ -389,10 +401,9 @@ namespace vita
   ///
   std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
   {
-    size_t i(0);
-    for (; i < evaluators_.size() && evaluators_[i].get() != active_eva_; ++i)
-    {}
+    return active_eva_->lambdify(ind);
 
+/*
     switch (i)
     {
     case k_count_evaluator:
@@ -408,6 +419,7 @@ namespace vita
     }
 
     return nullptr;
+*/
   }
 
   ///
