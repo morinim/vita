@@ -23,15 +23,15 @@
 
 namespace vita
 {
-  static_assert(sizeof(index_t) <= sizeof(unsigned),
-                "index_t sizes expected to be <= unsigned");
-  static_assert(sizeof(category_t) <= sizeof(unsigned),
-                "category_t sizes expected to be <= unsigned");
+  static_assert(sizeof(index_t) <= sizeof(size_t),
+                "index_t sizes expected to be <= size_t");
+  static_assert(sizeof(category_t) <= sizeof(size_t),
+                "category_t sizes expected to be <= size_t");
 
   enum {locus_index = 0, locus_category = 1};
 
   /// locus[index in the genome][type of the symbol].
-  typedef std::array<unsigned, 2> locus;
+  typedef std::array<size_t, 2> locus;
 
   ///
   /// \param[in] l1 first locus.
@@ -65,7 +65,7 @@ namespace vita
   ///         \a i (and not changing category component).
   ///
   inline
-  locus operator+(const locus &l, unsigned i)
+  locus operator+(const locus &l, size_t i)
   {
     return locus{{l[locus_index] + i, l[locus_category]}};
   }

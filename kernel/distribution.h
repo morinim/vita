@@ -112,9 +112,9 @@ namespace vita
     const T c(1.0 / std::log(2.0));
 
     T h(0.0);
-    for (auto j(freq_.begin()); j != freq_.end(); ++j)
+    for (const auto &f : freq_)  // f.first: value, f.second: frequency
     {
-      const double p(static_cast<T>(j->second) / static_cast<T>(count));
+      const double p(static_cast<T>(f.second) / static_cast<T>(count));
 
       h -= p * std::log(p) * c;
     }

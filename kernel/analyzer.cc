@@ -99,7 +99,7 @@ namespace vita
   ///
   unsigned analyzer::count(const individual &ind)
   {
-    for (unsigned i(0); i < ind.size(); ++i)
+    for (index_t i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
       {
         const locus l{{i, c}};

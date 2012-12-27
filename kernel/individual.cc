@@ -127,8 +127,8 @@ namespace vita
   {
     unsigned n(0);
 
-    const unsigned sup(size() - 1);
-    const unsigned categories(env_->sset.categories());
+    const index_t sup(size() - 1);
+    const category_t categories(env_->sset.categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
