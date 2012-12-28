@@ -66,7 +66,7 @@ namespace vita
     typedef std::vector<symbol_ptr> s_vector;
 
     void clear();
-    const symbol_ptr &roulette(const s_vector &, boost::uint64_t) const;
+    const symbol_ptr &roulette(const s_vector &, std::uintmax_t) const;
 
     // \a arguments_ is not included in the \a collection struct because
     // an argument isn't bounded to a category (see \c argument constructor for
@@ -84,7 +84,7 @@ namespace vita
       s_vector       adt;
 
       // The sum of the weights of all the symbols in the collection.
-      boost::uint64_t sum;
+      std::uintmax_t sum;
 
       bool check() const;
     } all_;

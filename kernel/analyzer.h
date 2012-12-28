@@ -3,7 +3,7 @@
  *  \file analyzer.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -30,7 +30,7 @@ namespace vita
 
     /// Typical use: \c counter[active] or \c counter[!active] (where \c active
     /// is a boolean).
-    boost::uint64_t counter[2];
+    std::uintmax_t counter[2];
   };
 
   ///
@@ -67,8 +67,8 @@ namespace vita
 
     void clear();
 
-    boost::uint64_t functions(bool) const;
-    boost::uint64_t terminals(bool) const;
+    std::uintmax_t functions(bool) const;
+    std::uintmax_t terminals(bool) const;
 
     const distribution<fitness_t> &fit_dist() const;
     const distribution<double> &length_dist() const;

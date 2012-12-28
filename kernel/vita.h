@@ -37,9 +37,9 @@
 #include <cassert>
 #include <climits>
 #include <cmath>
+#include <cstdint>
 #include <memory>
 
-#include <boost/cstdint.hpp>
 #include <boost/spirit/home/support/detail/hold_any.hpp>
 
 #include "compatibility_patch.h"
@@ -52,7 +52,7 @@ namespace vita
   typedef std::shared_ptr<symbol> symbol_ptr;
 
   /// This is the type used as key for symbol identification.
-  typedef boost::uint16_t opcode_t;
+  typedef std::uint16_t opcode_t;
 
   /// In an environmnet where a symbol such as + may have many different
   /// meanings, it is useful to specify a "domain of computation" to restrict

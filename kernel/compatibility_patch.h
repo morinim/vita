@@ -27,7 +27,7 @@ namespace vita
    /// \return the value corresponding to rotating the bits of \a x \a r-steps
    ///         to the right (r must be between 1 to 31 inclusive).
    ///
-   inline boost::uint64_t rotl64(boost::uint64_t x, boost::uint8_t r)
+   inline std::uint64_t rotl64(std::uint64_t x, std::uint8_t r)
    {
      return (x << r) | (x >> (64 - r));
    }

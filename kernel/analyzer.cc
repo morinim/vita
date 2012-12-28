@@ -59,7 +59,7 @@ namespace vita
   /// \param[in] eff effective / noneffective functions.
   /// \return number of functions in the population.
   ///
-  boost::uint64_t analyzer::functions(bool eff) const
+  std::uintmax_t analyzer::functions(bool eff) const
   {
     return functions_.counter[eff];
   }
@@ -68,7 +68,7 @@ namespace vita
   /// \param[in] eff effective / noneffective terminals.
   /// \return number of terminals in the population.
   ///
-  boost::uint64_t analyzer::terminals(bool eff) const
+  std::uintmax_t analyzer::terminals(bool eff) const
   {
     return terminals_.counter[eff];
   }

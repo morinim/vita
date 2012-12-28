@@ -40,7 +40,7 @@ namespace vita
 
     bool check() const;
 
-    boost::uint64_t count;
+    std::uintmax_t count;
 
     T     mean;
     T variance;

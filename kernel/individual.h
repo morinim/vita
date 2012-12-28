@@ -111,7 +111,7 @@ namespace vita
 
   private:
     hash_t hash() const;
-    void pack(const locus &, std::vector<boost::uint8_t> *const) const;
+    void pack(const locus &, std::vector<std::uint8_t> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
   private:  // Private data members.

@@ -30,7 +30,7 @@ namespace vita
   {
     /// Hash signature is a 128 bit unsigned and is built by two 64 bit
     /// halves.
-    hash_t(boost::uint64_t a = 0, boost::uint64_t b = 0) : p1(a), p2(b) {}
+    hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : p1(a), p2(b) {}
 
     /// Resets the content of hash_t.
     void clear() { p1 = 0; p2 = 0; }
@@ -45,9 +45,9 @@ namespace vita
     bool empty() const { return !p1 && !p2; }
 
     /// First half of the hash signature.
-    boost::uint64_t p1;
+    std::uint_least64_t p1;
     /// Second half of the hash signature.
-    boost::uint64_t p2;
+    std::uint_least64_t p2;
   };
 
   ///
@@ -86,10 +86,10 @@ namespace vita
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.
-    boost::uint64_t probes() const { return probes_; }
+    std::uintmax_t probes() const { return probes_; }
 
     /// \return number of successful searches in the hash table.
-    boost::uint64_t hits() const { return hits_; }
+    std::uintmax_t hits() const { return hits_; }
 
     bool check() const;
 
@@ -101,13 +101,13 @@ namespace vita
       unsigned birthday;
     };
 
-    const boost::uint64_t k_mask;
+    const std::uint_least64_t k_mask;
     slot *const table_;
 
     unsigned period_;
 
-    mutable boost::uint64_t probes_;
-    mutable boost::uint64_t hits_;
+    mutable std::uintmax_t probes_;
+    mutable std::uintmax_t hits_;
   };
 
   /// \example example4.cc

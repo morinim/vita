@@ -35,11 +35,11 @@ namespace vita
 
     void clear();
 
-    boost::uint64_t ttable_probes;
-    boost::uint64_t   ttable_hits;
+    std::uintmax_t ttable_probes;
+    std::uintmax_t   ttable_hits;
 
-    boost::uint64_t  mutations;
-    boost::uint64_t crossovers;
+    std::uintmax_t  mutations;
+    std::uintmax_t crossovers;
 
     double speed;
 
@@ -85,7 +85,7 @@ namespace vita
 
   private:
     double get_speed(double) const;
-    void get_probes(boost::uint64_t *, boost::uint64_t *) const;
+    void get_probes(std::uintmax_t *, std::uintmax_t *) const;
     analyzer get_stats() const;
     void log(unsigned) const;
 

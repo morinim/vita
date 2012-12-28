@@ -80,7 +80,7 @@ namespace vita
   ///
   /// \return number of probes in the transposition table.
   ///
-  boost::uint64_t evaluator_proxy::probes() const
+  std::uintmax_t evaluator_proxy::probes() const
   {
     return cache_.probes();
   }
@@ -88,7 +88,7 @@ namespace vita
   ///
   /// \return number of transposition table hits.
   ///
-  boost::uint64_t evaluator_proxy::hits() const
+  std::uintmax_t evaluator_proxy::hits() const
   {
     return cache_.hits();
   }

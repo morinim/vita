@@ -194,23 +194,23 @@ namespace vita
   /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
   ///
   const symbol_ptr &symbol_set::roulette(const s_vector & symbols,
-                                         boost::uint64_t sum) const
+                                         std::uintmax_t sum) const
   {
-    const boost::uint64_t slot(random::between<boost::uint64_t>(0, sum));
+    const std::uintmax_t slot(random::between<std::uintmax_t>(0, sum));
 
     unsigned i(0);
-    for (boost::uint64_t wedge(symbols[i]->weight);
+    for (std::uintmax_t wedge(symbols[i]->weight);
          wedge <= slot;
          wedge += symbols[++i]->weight)
     {}
 
     // This is a different approach from Eli Bendersky
     // (http://eli.thegreenplace.net):
-    // boost::uint64_t total(0);
+    // std::uintmax_t total(0);
     // for (unsigned i(0), winner(0); i < symbols.size(); ++i)
     // {
     //   total += symbols[i]->weight;
-    //   if (random::between<boost::uint64_t>(0, total+1) < symbols[i]->weight)
+    //   if (random::between<std::uintmax_t>(0, total+1) < symbols[i]->weight)
     //     winner = i;
     //   return winner;
     // }
@@ -363,9 +363,9 @@ namespace vita
   ///
   bool symbol_set::collection::check() const
   {
-    boost::uint64_t check_sum(0);
+    std::uintmax_t check_sum(0);
 
-    for (unsigned j(0); j < symbols.size(); ++j)
+    for (size_t j(0); j < symbols.size(); ++j)
     {
       if (!symbols[j]->check())
         return false;
@@ -379,16 +379,16 @@ namespace vita
       if (symbols[j]->terminal())
       {
         // Terminals must be in the terminals_ vector.
-        for (unsigned i(0); i < terminals.size() && !found; ++i)
+        for (size_t i(0); i < terminals.size() && !found; ++i)
           found = (symbols[j] == terminals[i]);
 
         if (symbols[j]->auto_defined())
-          for (unsigned i(0); i < adt.size() && !found; ++i)
+          for (size_t i(0); i < adt.size() && !found; ++i)
             found = (symbols[j] == adt[i]);
       }
       else  // Function
         if (symbols[j]->auto_defined())
-          for (unsigned i(0); i < adf.size() && !found; ++i)
+          for (size_t i(0); i < adf.size() && !found; ++i)
             found = (symbols[j] == adf[i]);
         else
           found = true;
@@ -414,7 +414,7 @@ namespace vita
   {
     category.clear();
 
-    for (unsigned i(0); i < c.symbols.size(); ++i)
+    for (size_t i(0); i < c.symbols.size(); ++i)
     {
       const category_t cat(c.symbols[i]->category());
       if (cat >= category.size())
@@ -427,16 +427,16 @@ namespace vita
       category[cat].sum += c.symbols[i]->weight;
     }
 
-    for (unsigned i(0); i < c.terminals.size(); ++i)
+    for (size_t i(0); i < c.terminals.size(); ++i)
       category[c.terminals[i]->category()].terminals.push_back(c.terminals[i]);
 
-    for (unsigned i(0); i < c.adf.size(); ++i)
+    for (size_t i(0); i < c.adf.size(); ++i)
       category[c.adf[i]->category()].adf.push_back(c.adf[i]);
 
-    for (unsigned i(0); i < c.adt.size(); ++i)
+    for (size_t i(0); i < c.adt.size(); ++i)
       category[c.adt[i]->category()].adt.push_back(c.adt[i]);
 
-    for (category_t j(0); j < category.size(); ++j)
+    for (size_t j(0); j < category.size(); ++j)
       std::sort(category[j].symbols.begin(), category[j].symbols.end(),
                 [](const symbol_ptr &s1, const symbol_ptr &s2)
                 { return s1->weight > s2->weight; });
@@ -449,9 +449,9 @@ namespace vita
   ///
   bool symbol_set::by_category::check() const
   {
-    for (unsigned t(0); t < category.size(); ++t)
+    for (size_t t(0); t < category.size(); ++t)
     {
-      const unsigned s(category[t].symbols.size());
+      const size_t s(category[t].symbols.size());
       if (s < category[t].terminals.size())
         return false;
       if (s < category[t].adf.size())

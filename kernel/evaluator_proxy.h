@@ -35,8 +35,8 @@ namespace vita
 
     score_t operator()(const individual &);
 
-    boost::uint64_t probes() const;
-    boost::uint64_t hits() const;
+    std::uintmax_t probes() const;
+    std::uintmax_t hits() const;
 
   private:
     /// Access to the real evaluator.

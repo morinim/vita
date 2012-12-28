@@ -85,8 +85,8 @@ namespace vita
   /// \param[out] hits number of hits in the transposition table (hits <=
   ///             probes).
   ///
-  void evolution::get_probes(boost::uint64_t *probes,
-                             boost::uint64_t *hits) const
+  void evolution::get_probes(std::uintmax_t *probes,
+                             std::uintmax_t *hits) const
   {
     *probes = *hits = 0;
 
@@ -130,7 +130,7 @@ namespace vita
           last_run = run_count;
         }
 
-        boost::uint64_t hits(0), probes(0);
+        std::uintmax_t hits(0), probes(0);
         get_probes(&probes, &hits);
 
         dynamic << run_count

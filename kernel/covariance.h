@@ -51,7 +51,7 @@ namespace vita
   private:
     void update(T, T);
 
-    boost::uint64_t count;
+    std::uintmax_t count;
 
     T v1_avg;
     T v2_avg;
