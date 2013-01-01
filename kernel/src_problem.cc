@@ -43,9 +43,10 @@ namespace vita
   }
 
   ///
-  /// \param[in] id numerical id of the evaluator to be activated.
+  /// \param[in] id numerical id of the evaluator to be activated
+  /// \param[in] msg input parameters for the evaluator constructor.
   ///
-  void src_problem::set_evaluator(evaluator_id id)
+  void src_problem::set_evaluator(evaluator_id id, const std::string &msg)
   {
     switch (id)
     {
@@ -62,8 +63,11 @@ namespace vita
       break;
 
     case k_dyn_slot_evaluator:
-      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_));
+    {
+      const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));
+      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_, x_slot));
       break;
+    }
 
     case k_gaussian_evaluator:
       problem::set_evaluator(std::make_shared<gaussian_evaluator>(dat_));

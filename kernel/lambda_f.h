@@ -83,7 +83,7 @@ namespace vita
   class dyn_slot_lambda_f : public lambda_f
   {
   public:
-    dyn_slot_lambda_f(const individual &, data &, size_t = 10);
+    dyn_slot_lambda_f(const individual &, data &, size_t);
 
     virtual any operator()(const data::example &) const;
 

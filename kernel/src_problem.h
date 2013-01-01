@@ -42,7 +42,7 @@ namespace vita
     size_t load_test_set(const std::string &);
     void setup_default_symbols();
 
-    void set_evaluator(evaluator_id);
+    void set_evaluator(evaluator_id, const std::string & = "");
 
     vita::data *data() { return &dat_; }
     std::unique_ptr<lambda_f> lambdify(const individual &);

@@ -312,22 +312,34 @@ namespace ui
   ///
   void evaluator(const std::string &v)
   {
+    const std::string::size_type sep(v.find(':'));
+    const std::string keyword(v.substr(0, sep));
+
+    std::string args;
+    if (sep != std::string::npos && sep + 1 < v.size())
+      args = v.substr(sep + 1);
+
     bool ok(true);
-    if (v == "count")
+    if (keyword == "count")
       problem.set_evaluator(vita::src_problem::k_count_evaluator);
-    else if (v == "sae")
+    else if (keyword == "sae")
       problem.set_evaluator(vita::src_problem::k_sae_evaluator);
-    else if (v == "sse")
+    else if (keyword == "sse")
       problem.set_evaluator(vita::src_problem::k_sse_evaluator);
-    else if (v == "dynslot")
+    else if (keyword == "dynslot")
       problem.set_evaluator(vita::src_problem::k_dyn_slot_evaluator);
-    else if (v == "gaussian")
+    else if (keyword == "gaussian")
       problem.set_evaluator(vita::src_problem::k_gaussian_evaluator);
     else
       ok = false;
 
     if (ok)
-      std::cout << "[INFO] Evaluator is " << v << std::endl;
+    {
+      std::cout << "[INFO] Evaluator is " << keyword;
+      if (!args.empty())
+        std::cout << " (parameters: " << args << ")";
+      std::cout << std::endl;
+    }
     else
       std::cerr << "[ERROR] Wrong argument for evaluator command." << std::endl;
   }
