@@ -72,9 +72,7 @@ namespace vita
               std::function<bool (const summary &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    const summary &run(
-      bool, unsigned,
-      replacement_factory::strategy = replacement_factory::k_tournament);
+    const summary &run(bool, unsigned);
 
     const vita::population &population() const;
     vita::population &population();
@@ -85,9 +83,9 @@ namespace vita
 
     bool check() const;
 
-    selection_strategy::ptr selection;
-    operation_strategy::ptr operation;
-    replacement_factory replacement;
+    selection_strategy::ptr     selection;
+    operation_strategy::ptr     operation;
+    replacement_strategy::ptr replacement;
 
   private:
     double get_speed(double) const;

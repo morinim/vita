@@ -3,7 +3,7 @@
  *  \file evolution_replacement.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -28,37 +28,65 @@ namespace vita
   /// \c class. In the strategy design pattern, this \c class is the strategy
   /// interface and \a evolution is the context.
   ///
+  /// \see
+  /// http://en.wikipedia.org/wiki/Strategy_pattern
+  ///
   class replacement_strategy
   {
   public:
+    typedef std::shared_ptr<replacement_strategy> ptr;
+
     explicit replacement_strategy(evolution *const);
     virtual ~replacement_strategy() {}
 
-    virtual void operator()(const std::vector<index_t> &,
-                            const std::vector<individual> &,
-                            summary *const) = 0;
+    virtual void run(const std::vector<index_t> &,
+                     const std::vector<individual> &,
+                     summary *const) = 0;
 
   protected:
     evolution *const evo_;
   };
 
   ///
-  /// replacement_factory \c class creates a new \a replacement_strategy (the
-  /// strategy) for the \a evolution \c class (the context).
+  /// This is a family competition replacement scheme.
+  /// We assume that the parents would be ones of the members of the population
+  /// closest to the new elements. In this way, children compete with their
+  /// parents to be included in the population. A child replaces the worst
+  /// parent if it has a higher fitness (deterministic crowding and
+  /// elitist recombination); if \c elitism is \c false, the winner of the
+  /// parent-offspring tournament is chosen by using a probability proportional
+  /// to the fitness (probabistic crowding).
   ///
-  class replacement_factory
+  /// \see
+  /// "Replacement Strategies to Preserve Useful Diversity in Steady-State
+  /// Genetic Algorithms" - Lozano, Herrera, Cano - 2003.
+  ///
+  class family_competition_rp : public replacement_strategy
   {
   public:
-    enum strategy {k_crowding = 0, k_tournament = 1};
+    explicit family_competition_rp(evolution *const);
 
-    explicit replacement_factory(evolution *const);
-    ~replacement_factory();
+    virtual void run(const std::vector<index_t> &,
+                     const std::vector<individual> &,
+                     summary *const);
+  };
 
-    replacement_strategy &operator[](unsigned);
-    unsigned add(replacement_strategy *const);
+  ///
+  /// This strategy select an individual for replacement by kill tournament:
+  /// pick a number of parents at random and replace the worst.
+  ///
+  /// \see
+  /// "Replacement Strategies in Steady State Genetic Algorithms: Static
+  /// Environments" - Jim Smith, Frank Vavak.
+  ///
+  class kill_tournament : public replacement_strategy
+  {
+  public:
+    explicit kill_tournament(evolution *const);
 
-  private:
-    std::vector<replacement_strategy *> strategy_;
+    virtual void run(const std::vector<index_t> &,
+                     const std::vector<individual> &,
+                     summary *const);
   };
 }  // namespace vita
 

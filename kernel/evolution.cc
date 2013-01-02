@@ -38,7 +38,7 @@ namespace vita
                        std::function<void (unsigned)> sd)
     : selection(std::make_shared<tournament_selection>(this)),
       operation(std::make_shared<standard_op>(this, &stats_)),
-      replacement(this), pop_(env),
+      replacement(std::make_shared<kill_tournament>(this)), pop_(env),
       eva_(new evaluator_proxy(eva, env.ttable_size)), stop_condition_(sc),
       shake_data_(sd)
   {
@@ -205,7 +205,6 @@ namespace vita
   ///
   /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
-  /// \param[in] rep_id index of the active replacement strategy.
   ///
   /// The genetic programming loop:
   /// * select the individual(s) to participate (default algorithm: tournament
@@ -217,8 +216,7 @@ namespace vita
   /// With any luck, it will produce an individual that solves the problem at
   /// hand.
   ///
-  const summary &evolution::run(bool verbose, unsigned run_count,
-                                replacement_factory::strategy rep_id)
+  const summary &evolution::run(bool verbose, unsigned run_count)
   {
     stats_.clear();
     stats_.best = {pop_[0], score(pop_[0])};
@@ -257,7 +255,7 @@ namespace vita
 
         // --------- REPLACEMENT --------
         const fitness_t before(stats_.best->score.fitness);
-        replacement[rep_id](parents, off, &stats_);
+        replacement->run(parents, off, &stats_);
 
         if (verbose && stats_.best->score.fitness != before)
         {
