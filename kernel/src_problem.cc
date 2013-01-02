@@ -3,7 +3,7 @@
  *  \file src_problem.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -65,7 +65,8 @@ namespace vita
     case k_dyn_slot_evaluator:
     {
       const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));
-      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_, x_slot));
+      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_,
+                                                                  x_slot));
       break;
     }
 

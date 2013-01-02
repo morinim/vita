@@ -3,7 +3,7 @@
  *  \file evolution.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -36,7 +36,8 @@ namespace vita
   evolution::evolution(const environment &env, evaluator *const eva,
                        std::function<bool (const summary &)> sc,
                        std::function<void (unsigned)> sd)
-    : selection(this), operation(this, &stats_), replacement(this), pop_(env),
+    : selection(std::make_shared<tournament_selection>(this)),
+      operation(this, &stats_), replacement(this), pop_(env),
       eva_(new evaluator_proxy(eva, env.ttable_size)), stop_condition_(sc),
       shake_data_(sd)
   {
@@ -203,11 +204,10 @@ namespace vita
   ///
   /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
-  /// \param[in] sel_id index of the active selection strategy.
   /// \param[in] op_id index of the active operation strategy.
   /// \param[in] rep_id index of the active replacement strategy.
   ///
-  /// the genetic programming loop. We begin the loop by choosing a
+  /// The genetic programming loop. We begin the loop by choosing a
   /// genetic operation: reproduction, mutation or crossover. We then select
   /// the individual(s) to participate in the genetic operation using
   /// tournament selection. If we are doing reproduction or mutation, we only
@@ -220,10 +220,9 @@ namespace vita
   /// With any luck, this process will produce an individual that solves the
   /// problem at hand.
   ///
-  const summary &evolution::operator()(bool verbose, unsigned run_count,
-                                       selection_factory::strategy sel_id,
-                                       operation_factory::strategy op_id,
-                                       replacement_factory::strategy rep_id)
+  const summary &evolution::run(bool verbose, unsigned run_count,
+                                operation_factory::strategy op_id,
+                                replacement_factory::strategy rep_id)
   {
     stats_.clear();
     stats_.best = {pop_[0], score(pop_[0])};
@@ -255,7 +254,7 @@ namespace vita
                     << std::flush;
 
         // --------- SELECTION ---------
-        std::vector<index_t> parents(selection[sel_id]());
+        std::vector<index_t> parents(selection->run());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation[op_id](parents));

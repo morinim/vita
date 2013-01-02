@@ -3,7 +3,7 @@
  *  \file search.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -380,10 +380,9 @@ namespace vita
     for (unsigned run(0); run < n; ++run)
     {
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
-      summary s(evo(verbose, run,
-                    selection_factory::k_tournament,
-                    operation_factory::k_crossover_mutation,
-                    replacement_factory::k_tournament));
+      summary s(evo.run(verbose, run,
+                        operation_factory::k_crossover_mutation,
+                        replacement_factory::k_tournament));
 
       // Depending on validation, this can be the training score or the
       // validation score for the current run.

@@ -3,7 +3,7 @@
  *  \file evolution.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -57,16 +57,23 @@ namespace vita
     boost::optional<best_> best;
   };
 
+  ///
+  /// Progressively evolves a population of programs over a series of
+  /// generations.
+  ///
+  /// The evolutionary search uses the Darwinian principle of natural selection
+  /// (survival of the fittest) and analogs of various naturally occurring
+  /// operations, including crossover (sexual recombination), mutation...
+  ///
   class evolution
   {
   public:
     evolution(const environment &, evaluator *const,
-              std::function<bool (const summary &)> = 0,
-              std::function<void (unsigned)> = 0);
+              std::function<bool (const summary &)> = nullptr,
+              std::function<void (unsigned)> = nullptr);
 
-    const summary &operator()(
+    const summary &run(
       bool, unsigned,
-      selection_factory::strategy = selection_factory::k_tournament,
       operation_factory::strategy = operation_factory::k_crossover_mutation,
       replacement_factory::strategy = replacement_factory::k_tournament);
 
@@ -79,7 +86,7 @@ namespace vita
 
     bool check() const;
 
-    selection_factory     selection;
+    selection_strategy::ptr selection;
     operation_factory     operation;
     replacement_factory replacement;
 

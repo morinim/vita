@@ -3,7 +3,7 @@
  *  \file evolution_selection.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -27,35 +27,45 @@ namespace vita
   /// \a evolution \c class. In the strategy design pattern, this \c class is
   /// the strategy interface and \a evolution is the context.
   ///
+  /// \see
+  /// http://en.wikipedia.org/wiki/Strategy_pattern
+  ///
   class selection_strategy
   {
   public:
+    typedef std::shared_ptr<selection_strategy> ptr;
+
     explicit selection_strategy(const evolution *const);
     virtual ~selection_strategy() {}
 
-    virtual std::vector<index_t> operator()() = 0;
+    virtual std::vector<index_t> run() = 0;
 
   protected:
     const evolution *const evo_;
   };
 
   ///
-  /// selection_factory \c class creates a new \a selection_strategy (the
-  /// strategy) for the \a evolution \c class (the context).
+  /// Tournament selection is a method of selecting an individual from a
+  /// population of individuals. It involves running several "tournaments"
+  /// among a few individuals chosen "at random" from the population. The
+  /// winner of each tournament (the one with the best fitness) is selected
+  /// for crossover.
   ///
-  class selection_factory
+  /// Selection pressure is easily adjusted by changing the tournament size.
+  /// If the tournament size is larger, weak individuals have a smaller chance
+  /// to be selected.
+  /// A 1-way tournament selection is equivalent to random selection.
+  ///
+  /// Tournament selection has several benefits: it is efficient to code, works
+  /// on parallel architectures and allows the selection pressure to be easily
+  /// adjusted.
+  ///
+  class tournament_selection : public selection_strategy
   {
   public:
-    enum strategy {k_tournament = 0};
+    explicit tournament_selection(const evolution *const);
 
-    explicit selection_factory(const evolution *const);
-    ~selection_factory();
-
-    selection_strategy &operator[](unsigned);
-    unsigned add(selection_strategy *const);
-
-  private:
-    std::vector<selection_strategy *> strategy_;
+    virtual std::vector<index_t> run();
   };
 }  // namespace vita
 

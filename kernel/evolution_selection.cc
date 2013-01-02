@@ -3,7 +3,7 @@
  *  \file evolution_selection.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -21,14 +21,6 @@ namespace vita
     : evo_(evo)
   {
   }
-
-  class tournament_selection : public selection_strategy
-  {
-  public:
-    explicit tournament_selection(const evolution *const);
-
-    virtual std::vector<index_t> operator()();
-  };
 
   tournament_selection::tournament_selection(const evolution *const evo)
     : selection_strategy(evo)
@@ -72,7 +64,7 @@ namespace vita
   /// \return a vector of indexes to individuals ordered in descending
   ///         fitness score.
   ///
-  std::vector<index_t> tournament_selection::operator()()
+  std::vector<index_t> tournament_selection::run()
   {
     const population &pop(evo_->population());
 
@@ -108,40 +100,5 @@ namespace vita
 #endif
 
     return ret;
-  }
-
-  ///
-  /// \param[in] evo pointer to the evolution class.
-  ///
-  selection_factory::selection_factory(const evolution *const evo)
-  {
-    unsigned VARIABLE_IS_NOT_USED i;
-
-    i = add(new tournament_selection(evo));
-    assert(i - 1 == k_tournament);
-  }
-
-  selection_factory::~selection_factory()
-  {
-    // Only predefined operation strategies should be deleted. User defined
-    // operation aren't under our responsability.
-    delete strategy_[k_tournament];
-  }
-
-  selection_strategy &selection_factory::operator[](unsigned s)
-  {
-    assert(s < strategy_.size());
-    return *strategy_[s];
-  }
-
-  ///
-  /// \param[in] s pointer to a selection_strategy.
-  /// \return number of strategies inserted after (\a s included).
-  ///
-  unsigned selection_factory::add(selection_strategy *const s)
-  {
-    assert(s);
-    strategy_.push_back(s);
-    return strategy_.size();
   }
 }  // namespace vita
