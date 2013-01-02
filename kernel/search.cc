@@ -381,7 +381,6 @@ namespace vita
     {
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
       summary s(evo.run(verbose, run,
-                        operation_factory::k_crossover_mutation,
                         replacement_factory::k_tournament));
 
       // Depending on validation, this can be the training score or the

@@ -3,7 +3,7 @@
  *  \file evolution_operation.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -35,17 +35,21 @@ namespace vita
   /// view of the evolutionary algorithm and every operation is applied to a
   /// well defined list of individuals, without dependencies upon past history.
   ///
+  /// \see
+  /// http://en.wikipedia.org/wiki/Strategy_pattern
+  ///
   class operation_strategy
   {
   public:
+    typedef std::shared_ptr<operation_strategy> ptr;
+
     operation_strategy(const evolution *const, summary *const);
     virtual ~operation_strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized operation
     // encompass recent additions, such as scan mutation, that generates
     // numerous offspring from a single parent.
-    virtual std::vector<individual> operator()(
-      const std::vector<index_t> &) = 0;
+    virtual std::vector<individual> run(const std::vector<index_t> &) = 0;
 
   protected:
     const evolution *const evo_;
@@ -53,22 +57,18 @@ namespace vita
   };
 
   ///
-  /// operation_factory \c class creates a new \a operation_strategy (the
-  /// strategy for the \a evolution \c class (the context).
+  /// This \c class defines the program skeleton of a standard genetic
+  /// programming crossover plus mutation operation. It's a template method
+  /// design pattern: one or more of the algorithm steps can be overriden
+  /// by subclasses to allow differing behaviors while ensuring that the
+  /// overarching algorithm is still followed.
   ///
-  class operation_factory
+  class standard_op : public operation_strategy
   {
   public:
-    enum strategy {k_crossover_mutation = 0};
+    standard_op(const evolution *const, summary *const);
 
-    operation_factory(const evolution *const, summary *const);
-    ~operation_factory();
-
-    operation_strategy &operator[](unsigned) const;
-    unsigned add(operation_strategy *const);
-
-  private:
-    std::vector<operation_strategy *> strategy_;
+    virtual std::vector<individual> run(const std::vector<index_t> &);
   };
 }  // namespace vita
 

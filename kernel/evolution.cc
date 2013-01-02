@@ -37,7 +37,8 @@ namespace vita
                        std::function<bool (const summary &)> sc,
                        std::function<void (unsigned)> sd)
     : selection(std::make_shared<tournament_selection>(this)),
-      operation(this, &stats_), replacement(this), pop_(env),
+      operation(std::make_shared<standard_op>(this, &stats_)),
+      replacement(this), pop_(env),
       eva_(new evaluator_proxy(eva, env.ttable_size)), stop_condition_(sc),
       shake_data_(sd)
   {
@@ -204,24 +205,19 @@ namespace vita
   ///
   /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
-  /// \param[in] op_id index of the active operation strategy.
   /// \param[in] rep_id index of the active replacement strategy.
   ///
-  /// The genetic programming loop. We begin the loop by choosing a
-  /// genetic operation: reproduction, mutation or crossover. We then select
-  /// the individual(s) to participate in the genetic operation using
-  /// tournament selection. If we are doing reproduction or mutation, we only
-  /// select one individual. For crossover, two individuals need to be selected.
-  /// The genetic operation is then performed and a new offspring individual is
-  /// created.
-  /// The offspring is then placed into the original population (steady state)
-  /// replacing a bad individual.
+  /// The genetic programming loop:
+  /// * select the individual(s) to participate (default algorithm: tournament
+  ///   selection) in the genetic operation;
+  /// * perform genetic operation creating a new offspring individual;
+  /// * place the offspring into the original population (steady state)
+  ///   replacing a bad individual.
   /// This whole process repeats until the termination criteria is satisfied.
-  /// With any luck, this process will produce an individual that solves the
-  /// problem at hand.
+  /// With any luck, it will produce an individual that solves the problem at
+  /// hand.
   ///
   const summary &evolution::run(bool verbose, unsigned run_count,
-                                operation_factory::strategy op_id,
                                 replacement_factory::strategy rep_id)
   {
     stats_.clear();
@@ -257,7 +253,7 @@ namespace vita
         std::vector<index_t> parents(selection->run());
 
         // --------- CROSSOVER / MUTATION ---------
-        std::vector<individual> off(operation[op_id](parents));
+        std::vector<individual> off(operation->run(parents));
 
         // --------- REPLACEMENT --------
         const fitness_t before(stats_.best->score.fitness);

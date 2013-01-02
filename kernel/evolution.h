@@ -74,7 +74,6 @@ namespace vita
 
     const summary &run(
       bool, unsigned,
-      operation_factory::strategy = operation_factory::k_crossover_mutation,
       replacement_factory::strategy = replacement_factory::k_tournament);
 
     const vita::population &population() const;
@@ -87,7 +86,7 @@ namespace vita
     bool check() const;
 
     selection_strategy::ptr selection;
-    operation_factory     operation;
+    operation_strategy::ptr operation;
     replacement_factory replacement;
 
   private:
