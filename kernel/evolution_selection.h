@@ -67,6 +67,16 @@ namespace vita
 
     virtual std::vector<index_t> run();
   };
+
+  ///
+  /// Very simple selection strategy: pick a set of random individuals.
+  ///
+  class random_selection : public selection_strategy
+  {
+    explicit random_selection(const evolution *const);
+
+    virtual std::vector<index_t> run();
+  };
 }  // namespace vita
 
 #endif  // EVOLUTION_SELECTION_H

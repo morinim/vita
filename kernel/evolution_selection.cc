@@ -64,6 +64,11 @@ namespace vita
   /// \return a vector of indexes to individuals ordered in descending
   ///         fitness score.
   ///
+  /// Parameters from the environment:
+  /// * mate_zone - to restrict the selection of individuals to a segment of
+  ///   the population;
+  /// * tournament_size - to control selection pressure.
+  ///
   std::vector<index_t> tournament_selection::run()
   {
     const population &pop(evo_->population());
@@ -71,7 +76,7 @@ namespace vita
     const unsigned n(pop.size());
     const unsigned mate_zone(*pop.env().mate_zone);
     const unsigned rounds(*pop.env().tournament_size);
-    const index_t target(random::between<unsigned>(0, n));
+    const index_t target(random::between<index_t>(0, n));
 
     assert(rounds);
     std::vector<index_t> ret(rounds);
@@ -98,6 +103,39 @@ namespace vita
     for (unsigned i(0); i + 1 < rounds; ++i)
       assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
 #endif
+
+    return ret;
+  }
+
+  random_selection::random_selection(const evolution *const evo)
+    : selection_strategy(evo)
+  {
+  }
+
+  ///
+  /// \return a vector of indexes to individuals randomly chosen.
+  ///
+  /// Parameters from the environment:
+  /// * mate_zone - to restrict the selection of individuals to a segment of
+  ///   the population;
+  /// * tournament_size - to control number of selected individuals.
+  ///
+  std::vector<index_t> random_selection::run()
+  {
+    const population &pop(evo_->population());
+
+    const unsigned n(pop.size());
+    const unsigned mate_zone(*pop.env().mate_zone);
+    const unsigned size(*pop.env().tournament_size);
+    const index_t target(random::between<index_t>(0, n));
+
+    assert(size);
+    std::vector<index_t> ret(size);
+
+    ret[0] = target;
+
+    for (unsigned i(1); i < size; ++i)
+      ret[i] = random::ring(target, mate_zone, n);
 
     return ret;
   }
