@@ -91,7 +91,7 @@ namespace vita
   ///
   template<class T> inline T any_cast(const any &a)
   {
-    // We must choose the right \c any_cast (it depends on \c any \c typedef).
+    // We must choose the right any_cast (it depends on any typedef).
     // The alternative is: return boost::any_cast<T>(a);
     return boost::spirit::any_cast<T>(a);
   }
@@ -99,5 +99,7 @@ namespace vita
 
 /// \page page1 VITA Architecture
 /// http://code.google.com/p/vita/wiki/Anatomy
+/// \page page2 Contributor guidelines
+/// http://code.google.com/p/vita/wiki/ContributorGuidelines
 
 #endif  // VITA_H

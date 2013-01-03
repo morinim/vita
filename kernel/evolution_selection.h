@@ -23,9 +23,11 @@ namespace vita
   class evolution;
 
   ///
-  /// The selection strategy (tournament, fitness proportional...) for the
-  /// \a evolution \c class. In the strategy design pattern, this \c class is
-  /// the strategy interface and \a evolution is the context.
+  /// \brief The selection strategy (tournament, fitness proportional...) for
+  ///        the \a evolution class.
+  ///
+  /// In the strategy design pattern, this class is the strategy interface and
+  /// \a evolution is the context.
   ///
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
