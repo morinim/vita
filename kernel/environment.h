@@ -3,7 +3,7 @@
  *  \file environment.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -54,13 +54,26 @@ namespace vita
     /// converge quicker but losing diversity.
     boost::tribool elitism;
 
-    /// Mutation probability. Mutation is one of the principal "search
-    /// operators" used to transform programs in the Genetic Programming
-    /// algorithm. It causes random changes in individuals.
+    /// \brief Mutation probability.
+    ///
+    /// Mutation is one of the principal "search operators" used to transform
+    /// programs in the Genetic Programming algorithm. It causes random
+    /// changes in individuals.
+    ///
+    /// \note
+    /// > p_cross + p_mutation != 1.0
+    /// \a p_mutation is the probability to mutate a gene; it is not the
+    /// probability to choose the the mutation operator (the latter is
+    /// 1.0 - p_cross).
+    ///
+    /// \see
+    /// * individual::mutation;
+    /// * operation_strategy::run.
     boost::optional<double> p_mutation;
 
-    /// Crossover probability.
-    /// \see operation_strategy::operator().
+    /// \brief Crossover probability.
+    ///
+    /// \see operation_strategy::run.
     boost::optional<double> p_cross;
 
     /// This parameter controls the brood recombination/selection level (0 to

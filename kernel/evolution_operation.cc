@@ -38,6 +38,8 @@ namespace vita
   std::vector<individual> standard_op::run(const std::vector<index_t> &parent)
   {
     assert(parent.size() >= 2);
+    assert(env.p_cross);
+    assert(env.p_mutation);
 
     const population &pop(evo_->population());
     const environment &env(pop.env());
@@ -48,14 +50,12 @@ namespace vita
       individual off(pop[r1].crossover(pop[r2]));
       ++stats_->crossovers;
 
-      stats_->mutations += off.mutation();
-/*
-      do
-      {
+      /*
+      while (pop[r1].signature() == off.signature() ||
+             pop[r2].signature() == off.signature())
         stats_->mutations += off.mutation();
-      } while (pop[r1].signature() == off.signature() ||
-               pop[r2].signature() == off.signature());
-*/
+      */
+
       if (*env.brood_recombination > 0)
       {
         fitness_t fit_off(evo_->fast_fitness(off));

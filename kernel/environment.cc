@@ -3,7 +3,7 @@
  *  \file environment.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -47,7 +47,7 @@ namespace vita
       code_length = 100;
       elitism = true;
       p_mutation = 0.1;
-      p_cross = 0.7;
+      p_cross = 0.9;
       brood_recombination = 0;
       dss = true;
       individuals = 100;
