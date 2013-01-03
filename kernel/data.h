@@ -3,7 +3,7 @@
  *  \file data.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -68,7 +68,7 @@ namespace vita
 
     template<class T> static T cast(const example::value_t &);
 
-    /// Informations about a "column" of the dataset.
+    /// \brief Informations about a "column" of the dataset.
     struct column
     {
       std::string       name;

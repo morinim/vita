@@ -24,16 +24,20 @@ namespace vita
   class summary;
 
   ///
-  /// The operation strategy (crossover, recombination, mutation...) for the
-  /// \a evolution \c class. In the strategy design pattern, this \c class is
-  /// the strategy interface and \a evolution is the context.
+  /// \brief The operation strategy (crossover, recombination, mutation...) for
+  ///        the \a evolution class.
+  ///
+  /// In the strategy design pattern, this class is the strategy interface and
+  /// \a evolution is the context.
+  ///
   /// An operation act upon sets of individuals to generate offspring (this
   /// definition generalizes the traditional mutation and crossover operators).
-  /// This is an abstract \c class, introduction of new operators or
-  /// redefinition of existing ones is obtained implementing
-  /// \a operation_strategy. Operator application is atomic from the point of
-  /// view of the evolutionary algorithm and every operation is applied to a
-  /// well defined list of individuals, without dependencies upon past history.
+  /// This is an abstract class: introduction of new operators or redefinition
+  /// of existing ones is obtained implementing \a operation_strategy.
+  ///
+  /// Operator application is atomic from the point of view of the
+  /// evolutionary algorithm and every operation is applied to a well defined
+  /// list of individuals, without dependencies upon past history.
   ///
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
@@ -57,7 +61,7 @@ namespace vita
   };
 
   ///
-  /// This \c class defines the program skeleton of a standard genetic
+  /// This class defines the program skeleton of a standard genetic
   /// programming crossover plus mutation operation. It's a template method
   /// design pattern: one or more of the algorithm steps can be overriden
   /// by subclasses to allow differing behaviors while ensuring that the

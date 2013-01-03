@@ -3,7 +3,7 @@
  *  \file vita.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -95,8 +95,6 @@ namespace vita
     // The alternative is: return boost::any_cast<T>(a);
     return boost::spirit::any_cast<T>(a);
   }
-
-
 }  // namespace vita
 
 /// \page page1 VITA Architecture
