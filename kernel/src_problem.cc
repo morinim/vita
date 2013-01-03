@@ -93,7 +93,7 @@ namespace vita
     dat_.clear();
 
     const size_t n_examples(dat_.open(ds));
-    if (n_examples > 0)
+    if (n_examples > 0 && !get_evaluator())
       set_evaluator(classification() ? p_class : p_symre);
 
     if (!ds.empty())
