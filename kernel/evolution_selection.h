@@ -75,6 +75,7 @@ namespace vita
   ///
   class random_selection : public selection_strategy
   {
+  public:
     explicit random_selection(const evolution *const);
 
     virtual std::vector<index_t> run();
