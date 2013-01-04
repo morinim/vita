@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   env.insert(factory.make("FIFL"));
   env.insert(factory.make("FIFE"));
 
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 5000);
+  const unsigned n(argc > 2 ? atoi(argv[2]) : 4000000);
 
   vita::ttable cache(argc > 3 ? atoi(argv[3]) : 16);
 
