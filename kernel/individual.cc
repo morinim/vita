@@ -128,6 +128,22 @@ namespace vita
     unsigned n(0);
 
     const index_t sup(size() - 1);
+
+    for (const_iterator it(*this); it(); ++it)
+      if (random::boolean(p))
+      {
+        ++n;
+
+        const index_t i(it.l[locus_index]);
+        const category_t c(it.l[locus_category]);
+
+        if (i < sup)
+          set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
+        else
+          set(it.l, gene(env_->sset.roulette_terminal(c)));
+      }
+
+/*
     const category_t categories(env_->sset.categories());
 
     for (index_t i(0); i < sup; ++i)
@@ -146,7 +162,7 @@ namespace vita
 
         set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
-
+*/
     assert(check());
 
     return n;
@@ -192,10 +208,9 @@ namespace vita
   {
     std::list<locus> bl;
 
-    locus l(best_);
-    for (const_iterator i(*this); i(); l = ++i)
-      if (genome_(l).sym->arity())
-        bl.push_back(l);
+    for (const_iterator i(*this); i(); ++i)
+      if (genome_(i.l).sym->arity())
+        bl.push_back(i.l);
 
     return bl;
   }
@@ -276,10 +291,9 @@ namespace vita
     std::vector<locus> terminals;
 
     // Step 1: mark the active terminal symbols.
-    locus l(best_);
-    for (const_iterator i(*this); i(); l = ++i)
-      if (genome_(l).sym->terminal())
-        terminals.push_back(l);
+    for (const_iterator i(*this); i(); ++i)
+      if (genome_(i.l).sym->terminal())
+        terminals.push_back(i.l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
     const unsigned n(std::min(max_args,
@@ -318,7 +332,7 @@ namespace vita
   ///
   category_t individual::category() const
   {
-    return best_[1];
+    return best_[locus_category];
   }
 
   ///
@@ -395,13 +409,32 @@ namespace vita
   /// fast, with excellent distribution, avalanche behavior and overall
   /// collision resistance.
   ///
+  /// \note
+  /// MurmurHash and CityHash are excellent hash functions and are equally
+  /// portable.  In favor of MurmurHash: it's been around for longer and is
+  /// already used in many STL implementations.  In favor of CityHash: it
+  /// performs a bit better than Murmurhash, on average (at least on x86-64
+  /// architectures).
+  ///
+  /// \see
+  /// * http://comments.gmane.org/gmane.comp.compilers.clang.devel/18702
+  /// * http://blog.reverberate.org/2012/01/state-of-hash-functions-2012.html
+  /// * http://code.google.com/p/cityhash/
+  /// * http://code.google.com/p/smhasher/
+  ///
   hash_t individual::hash() const
   {
     // From an individual to a packed byte stream...
-    std::vector<std::uint8_t> packed;
+    static std::vector<std::uint8_t> packed;
+    packed.clear();
+    // In a multithread environment the two lines above must be changed with:
+    //   std::vector<std::uint8_t> packed;
+    //   // static keyword and clear() call deleted.
+
     pack(best_, &packed);
 
     /// ... and from a packed byte stram to a signature...
+
     /// Murmurhash3 follows.
     const unsigned len(packed.size());
     const unsigned n_blocks(len / 16);
@@ -590,13 +623,13 @@ namespace vita
         }
       }
 
-    if (best_[0] >= size())
+    if (best_[locus_index] >= size())
     {
       if (verbose)
         std::cerr << "Incorrect index for first active symbol." << std::endl;
       return false;
     }
-    if (best_[1] >= categories)
+    if (best_[locus_category] >= categories)
     {
       if (verbose)
         std::cerr << "Incorrect category for first active symbol." << std::endl;
@@ -632,16 +665,17 @@ namespace vita
     s << " {";
 
     locus l(best_);
-    for (const_iterator it(*this); it(); l = ++it)
+    for (const_iterator it(*this); it(); ++it)
     {
       const gene &g(*it);
 
-      s << 'g' << l[0] << '_' << l[1] << " [label="
+      s << 'g' << it.l[locus_index] << '_' << it.l[locus_category]
+        << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
         << ", shape=" << (g.sym->arity() ? "box" : "parallelogram") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << l[0] << '_' << l[1] << " -- g"
+        s << 'g' << l[locus_index] << '_' << l[locus_category] << " -- g"
           << g.args[j] << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
@@ -657,12 +691,11 @@ namespace vita
   ///
   void individual::in_line(std::ostream &s) const
   {
-    locus l(best_);
-    for (const_iterator it(*this); it(); l = ++it)
+    for (const_iterator it(*this); it(); ++it)
     {
       const gene &g(*it);
 
-      if (l != best_)
+      if (it.l != best_)
         s << ' ';
       s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
     }
@@ -685,15 +718,14 @@ namespace vita
     const unsigned w2(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
 
-    locus l(best_);
-    for (const_iterator it(*this); it(); l = ++it)
+    for (const_iterator it(*this); it(); ++it)
     {
       const gene &g(*it);
 
-      s << '[' << std::setfill('0') << std::setw(w1) << l[0];
+      s << '[' << std::setfill('0') << std::setw(w1) << it.l[locus_index];
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << l[1];
+        s << ", " << std::setw(w2) << it.l[locus_category];
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
@@ -792,21 +824,21 @@ namespace vita
   /// \param[in] id
   ///
   individual::const_iterator::const_iterator(const individual &id)
-    : ind_(id), l_(id.best_)
+    : l(id.best_), ind_(id)
   {
-    loci_.insert(l_);
+    loci_.insert(l);
   }
 
   ///
   /// \return locus of the next line containing an active symbol.
   ///
-  const locus &individual::const_iterator::operator++()
+  const locus individual::const_iterator::operator++()
   {
     if (!loci_.empty())
     {
       loci_.erase(loci_.begin());
 
-      const gene &g(ind_.genome_(l_));
+      const gene &g(ind_.genome_(l));
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
       {
@@ -815,10 +847,10 @@ namespace vita
         loci_.insert(l);
       }
 
-      l_ = *loci_.begin();
+      l = *loci_.begin();
     }
 
-    return l_;
+    return l;
   }
 
   ///
@@ -846,13 +878,18 @@ namespace vita
     assert(p1.check());
     assert(p2.check());
 
+    individual offspring(p1);
+
+    for (individual::const_iterator it(p1); it(); ++it)
+      if (random::boolean())
+        offspring.set(it.l, p2[it.l]);
+
+/*
     const unsigned cs(p1.size());
     const unsigned categories(p1.env().sset.categories());
 
     assert(cs == p2.size());
     assert(categories == p2.env().sset.categories());
-
-    individual offspring(p1);
 
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -861,7 +898,7 @@ namespace vita
           const locus l{{i,c}};
           offspring.set(l, p2[l]);
         }
-
+*/
     assert(offspring.check(true));
     return offspring;
   }
@@ -886,7 +923,7 @@ namespace vita
     const unsigned cs(p1.size());
     const unsigned categories(p1.env().sset.categories());
 
-    const index_t cut(random::between<unsigned>(1, cs-1));
+    const index_t cut(random::between<index_t>(1, cs - 1));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());

@@ -46,7 +46,7 @@ namespace vita
     {
       code_length = 100;
       elitism = true;
-      p_mutation = 0.1;
+      p_mutation = 0.04;
       p_cross = 0.9;
       brood_recombination = 0;
       dss = true;

@@ -40,21 +40,26 @@ namespace vita
     assert(parent.size() >= 2);
     assert(env.p_cross);
     assert(env.p_mutation);
+    assert(env.brood_recombination);
 
     const population &pop(evo_->population());
     const environment &env(pop.env());
-    const unsigned r1(parent[0]), r2(parent[1]);
+    const index_t r1(parent[0]), r2(parent[1]);
 
     if (random::boolean(*env.p_cross))
     {
       individual off(pop[r1].crossover(pop[r2]));
       ++stats_->crossovers;
 
-      /*
+      // This should be an original contribution of Vita... but it's hard
+      // to be sure.
+      // It remembers of the hereditary repulsion constraint (I guess you could
+      // call it signature repulsion) and seems:
+      // * to maintain diversity during the exploration phase;
+      // * to optimize the exploitation phase.
       while (pop[r1].signature() == off.signature() ||
              pop[r2].signature() == off.signature())
         stats_->mutations += off.mutation();
-      */
 
       if (*env.brood_recombination > 0)
       {
@@ -64,9 +69,11 @@ namespace vita
         do
         {
           individual tmp(pop[r1].crossover(pop[r2]));
-          stats_->mutations += tmp.mutation();
-
           ++stats_->crossovers;
+
+          while (pop[r1].signature() == tmp.signature() ||
+                 pop[r2].signature() == tmp.signature())
+            stats_->mutations += tmp.mutation();
 
           const fitness_t fit_tmp(evo_->fast_fitness(tmp));
           if (fit_tmp > fit_off)

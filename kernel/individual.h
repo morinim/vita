@@ -155,17 +155,17 @@ namespace vita
     /// \return \c false when the iterator reaches the end.
     ///
     bool operator()() const
-    { return l_[0] < ind_.genome_.size() && !loci_.empty(); }
+    { return l[0] < ind_.genome_.size() && !loci_.empty(); }
 
-    const locus &operator++();
+    const locus operator++();
 
     ///
     /// \return reference to the current \a gene of the \a individual.
     ///
     const gene &operator*() const
     {
-      assert(l_[0] < ind_.genome_.size());
-      return ind_.genome_(l_);
+      assert(l[0] < ind_.genome_.size());
+      return ind_.genome_(l);
     }
 
     ///
@@ -173,13 +173,14 @@ namespace vita
     ///
     const gene *operator->() const
     {
-      assert(l_[0] < ind_.genome_.size());
-      return &ind_.genome_(l_);
+      assert(l[0] < ind_.genome_.size());
+      return &ind_.genome_(l);
     }
+
+    locus l;
 
   private:
     const individual &ind_;
-    locus               l_;
     std::set<locus>  loci_;
   };
 
