@@ -225,7 +225,7 @@ namespace vita
   /// \a symbol at locus \a l with a new one ('sym' + 'args').
   ///
   individual individual::replace(const symbol_ptr &sym,
-                                 const std::vector<unsigned> &args,
+                                 const std::vector<index_t> &args,
                                  const locus &l) const
   {
     assert(sym);
@@ -251,7 +251,7 @@ namespace vita
   /// \a symbol at locus \a best_ with a new one ('sym' + 'args').
   ///
   individual individual::replace(const symbol_ptr &sym,
-                                 const std::vector<unsigned> &args) const
+                                 const std::vector<index_t> &args) const
   {
     return replace(sym, args, best_);
   }
@@ -350,12 +350,12 @@ namespace vita
   /// \return a numeric measurement of the difference between \a ind and
   /// \c this (the number of different genes between individuals).
   ///
-  unsigned individual::distance(const individual &ind) const
+  size_t individual::distance(const individual &ind) const
   {
-    const unsigned cs(size());
-    const unsigned categories(env_->sset.categories());
+    const size_t cs(size());
+    const size_t categories(env_->sset.categories());
 
-    unsigned d(0);
+    size_t d(0);
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
       {

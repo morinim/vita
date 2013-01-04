@@ -56,15 +56,15 @@ namespace vita
     std::list<locus> blocks() const;
     individual destroy_block(unsigned) const;
     individual get_block(const locus &) const;
-    individual replace(const symbol_ptr &, const std::vector<unsigned> &) const;
-    individual replace(const symbol_ptr &, const std::vector<unsigned> &,
+    individual replace(const symbol_ptr &, const std::vector<index_t> &) const;
+    individual replace(const symbol_ptr &, const std::vector<index_t> &,
                        const locus &) const;
 
     individual generalize(unsigned, std::vector<locus> *const) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }
-    unsigned distance(const individual &) const;
+    size_t distance(const individual &) const;
 
     hash_t signature() const;
 

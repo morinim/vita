@@ -3,7 +3,7 @@
  *  \file test_individual.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -126,31 +126,32 @@ BOOST_AUTO_TEST_CASE(Mutation)
   vita::individual ind(env, true);
   const vita::individual orig(ind);
 
+  BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   env.p_mutation = 0.0;
 
-  BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < 1000; ++i)
   {
     ind.mutation();
     BOOST_REQUIRE_EQUAL(ind, orig);
   }
 
-  env.p_mutation = 0.5;
-  double dist(0.0);
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
+  env.p_mutation = 0.5;
+  std::uint64_t diff(0), length(0);
+
   const unsigned n(2000);
   for (unsigned i(0); i < n; ++i)
   {
     const vita::individual i1(ind);
 
     ind.mutation();
-    dist += i1.distance(ind);
+    diff += i1.distance(ind);
+    length += i1.eff_size();
   }
 
-  const double perc(100.0 * dist /
-                    (*env.code_length * env.sset.categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  const double perc(100.0 * double(diff) / double(length));
+  BOOST_CHECK_GT(perc, 47.0);
+  BOOST_CHECK_LT(perc, 53.0);
 }
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
@@ -187,17 +188,21 @@ BOOST_AUTO_TEST_CASE(Cross0)
 {
   env.code_length = 100;
 
-  vita::individual i1(env, true), i2(env, true);
+  std::uint64_t diff(0), length(0);
 
   const unsigned n(1000);
-  double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(uniform_crossover(i1, i2));
+  {
+    const vita::individual i1(env, true), i2(env, true);
+    const vita::individual off(uniform_crossover(i1, i2));
 
-  const double perc(100.0 * dist /
-                    (*env.code_length * env.sset.categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
+    diff += off.distance(i1);
+    length += i1.eff_size();
+  }
+
+  const double perc(100.0 * double(diff) / double(length));
+  BOOST_CHECK_GT(perc, 47.0);
+  BOOST_CHECK_LT(perc, 53.0);
 }
 
 BOOST_AUTO_TEST_CASE(Cross1)

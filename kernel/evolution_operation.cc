@@ -38,12 +38,14 @@ namespace vita
   std::vector<individual> standard_op::run(const std::vector<index_t> &parent)
   {
     assert(parent.size() >= 2);
+
+    const population &pop(evo_->population());
+    const environment &env(pop.env());
+
     assert(env.p_cross);
     assert(env.p_mutation);
     assert(env.brood_recombination);
 
-    const population &pop(evo_->population());
-    const environment &env(pop.env());
     const index_t r1(parent[0]), r2(parent[1]);
 
     if (random::boolean(*env.p_cross))

@@ -3,7 +3,7 @@
  *  \file example6.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(new fitness());
 
-  vita::evolution(env, eva.get())(true, 1);
+  vita::evolution(env, eva.get()).run(true, 1);
 
   return EXIT_SUCCESS;
 }

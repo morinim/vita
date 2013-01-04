@@ -3,7 +3,7 @@
  *  \file lambda_f.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -165,7 +165,6 @@ namespace vita
     engine_ = dyn_slot_engine(ind, d, x_slot);
     d.dataset(backup);
 
-    assert(slot_name_.size() == engine_.slot_class.size());
     for (size_t i(0); i < d.classes(); ++i)
       class_name_[i] = d.class_name(i);
   }
