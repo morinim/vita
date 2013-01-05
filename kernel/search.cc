@@ -21,6 +21,7 @@
 #include "search.h"
 #include "adf.h"
 #include "evolution.h"
+#include "lambda_f.h"
 #include "problem.h"
 
 namespace vita
@@ -495,8 +496,7 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      if (env_.stat_summary)
-        log(overall_summary, fd, good_runs, solutions, n);
+      log(overall_summary, fd, good_runs, solutions, n);
     }
 
     return overall_summary.best->ind;
@@ -510,45 +510,69 @@ namespace vita
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
   ///
+  /// Writes end-of-run logs (run summary, results for test...).
+  ///
   void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
                    const std::list<unsigned> &best_runs, unsigned solutions,
-                   unsigned runs) const
+                   unsigned runs)
   {
-    std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best->ind.list(best_list);
-    run_sum.best->ind.tree(best_tree);
-    run_sum.best->ind.graphviz(best_graph);
+    // Summary logging.
+    if (env_.stat_summary)
+    {
+      std::ostringstream best_list, best_tree, best_graph;
+      run_sum.best->ind.list(best_list);
+      run_sum.best->ind.tree(best_tree);
+      run_sum.best->ind.graphviz(best_graph);
 
-    const std::string path("vita.");
-    const std::string summary(path + "summary.");
+      const std::string path("vita.");
+      const std::string summary(path + "summary.");
 
-    boost::property_tree::ptree pt;
-    pt.put(summary+"success_rate", runs ?
-           static_cast<double>(solutions) / static_cast<double>(runs) : 0);
-    pt.put(summary+"speed", run_sum.speed);
-    pt.put(summary+"mean_fitness", fd.mean);
-    pt.put(summary+"standard_deviation", fd.standard_deviation());
-    pt.put(summary+"best.fitness", run_sum.best->score.fitness);
-    pt.put(summary+"best.accuracy", run_sum.best->score.accuracy);
-    pt.put(summary+"best.times_reached", best_runs.size());
-    pt.put(summary+"best.avg_depth_found", solutions
-           ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
-                                   static_cast<double>(solutions))
-           : 0);
-    for (auto p(best_runs.cbegin()); p != best_runs.cend(); ++p)
-      pt.add(summary+"best.runs.run", *p);
-    pt.put(summary+"best.individual.tree", best_tree.str());
-    pt.put(summary+"best.individual.list", best_list.str());
-    pt.put(summary+"best.individual.graph", best_graph.str());
-    pt.put(summary+"ttable.hits", run_sum.ttable_hits);
-    pt.put(summary+"ttable.probes", run_sum.ttable_probes);
+      boost::property_tree::ptree pt;
+      pt.put(summary + "success_rate", runs ?
+             static_cast<double>(solutions) / static_cast<double>(runs) : 0);
+      pt.put(summary + "speed", run_sum.speed);
+      pt.put(summary + "mean_fitness", fd.mean);
+      pt.put(summary + "standard_deviation", fd.standard_deviation());
+      pt.put(summary + "best.fitness", run_sum.best->score.fitness);
+      pt.put(summary + "best.accuracy", run_sum.best->score.accuracy);
+      pt.put(summary + "best.times_reached", best_runs.size());
+      pt.put(summary + "best.avg_depth_found", solutions
+             ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
+                                     static_cast<double>(solutions))
+             : 0);
+      for (const auto &p : best_runs)
+        pt.add(summary + "best.runs.run", p);
+      pt.put(summary + "best.individual.tree", best_tree.str());
+      pt.put(summary + "best.individual.list", best_list.str());
+      pt.put(summary + "best.individual.graph", best_graph.str());
+      pt.put(summary + "ttable.hits", run_sum.ttable_hits);
+      pt.put(summary + "ttable.probes", run_sum.ttable_probes);
 
-    const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
+      const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 
-    env_.log(&pt, path);
+      env_.log(&pt, path);
 
-    using namespace boost::property_tree;
-    write_xml(f_sum, pt, std::locale(), xml_writer_make_settings(' ', 2));
+      using namespace boost::property_tree;
+      write_xml(f_sum, pt, std::locale(), xml_writer_make_settings(' ', 2));
+    }
+
+    // Test set results logging.
+    vita::data *const data = prob_->data();
+    if (data->size(vita::data::test))
+    {
+      const vita::data::dataset_t backup(data->dataset());
+      data->dataset(vita::data::test);
+
+      std::unique_ptr<vita::lambda_f> lambda(prob_->lambdify(
+                                               run_sum.best->ind));
+
+      std::ofstream tf(env_.stat_dir + "/" +
+                       vita::environment::tst_filename);
+      for (const vita::data::example &e : *data)
+        tf << (*lambda)(e) << std::endl;
+
+      data->dataset(backup);
+    }
   }
 
   ///

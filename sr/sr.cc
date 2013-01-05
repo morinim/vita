@@ -35,7 +35,7 @@ const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification v0.9.2"
 );
 const std::string vita_sr_version2(
-  "Copyright 2011-2012 EOS di Manlio Morini (http://www.eosdev.it)"
+  "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
 );
 
 vita::src_problem problem;
@@ -115,29 +115,6 @@ void fix_parameters()
 bool is_true(const std::string &s)
 {
   return s != "0" && !boost::iequals(s, "false");
-}
-
-///
-///
-///
-void predict_test_set(const vita::individual &ind)
-{
-  vita::data *const data = problem.data();
-
-  if (data->size(vita::data::test))
-  {
-    const vita::data::dataset_t backup(data->dataset());
-    data->dataset(vita::data::test);
-
-    std::unique_ptr<vita::lambda_f> lambda(problem.lambdify(ind));
-
-    std::ofstream tf(problem.env.stat_dir + "/" +
-                     vita::environment::tst_filename);
-    for (const vita::data::example &e : *data)
-      tf << (*lambda)(e) << std::endl;
-
-    data->dataset(backup);
-  }
 }
 
 ///
@@ -380,8 +357,6 @@ namespace ui
 
         vita::search s(&problem);
         vita::individual ind(s.run(verbose, runs));
-
-        predict_test_set(ind);
       }
       else
         std::cerr << "[ERROR] Too few terminals." << std::endl;

@@ -3,7 +3,7 @@
  *  \file src_problem.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,9 +23,6 @@
 
 namespace vita
 {
-  class individual;
-  class lambda_f;
-
   class src_problem : public problem
   {
   public:
@@ -45,7 +42,7 @@ namespace vita
     void set_evaluator(evaluator_id, const std::string & = "");
 
     vita::data *data() { return &dat_; }
-    std::unique_ptr<lambda_f> lambdify(const individual &);
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &);
 
     void clear();
 

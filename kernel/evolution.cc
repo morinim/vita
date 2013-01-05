@@ -110,7 +110,7 @@ namespace vita
   /// ...
   /// [BLOCK_x]
   /// where each block is a set of line like this:
-  /// data_1 [space] data_2 [space] ... [space] data_n
+  ///   data_1 [space] data_2 [space] ... [space] data_n
   /// We use this format, instead of XML, because statistics are produced
   /// incrementally and so it's simple and fast to append new data to a
   /// CSV-like file. Note also that data sets are ready to be plotted by

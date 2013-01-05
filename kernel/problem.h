@@ -3,7 +3,7 @@
  *  \file problem.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -22,6 +22,8 @@
 namespace vita
 {
   class evaluator;
+  class individual;
+  class lambda_f;
 
   /// Just a shortcut.
   typedef std::shared_ptr<evaluator> evaluator_ptr;
@@ -38,6 +40,9 @@ namespace vita
     virtual vita::data *data() { return nullptr; }
 
     virtual void clear();
+
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) = 0;
+
     virtual bool check(bool) const;
 
   public:  // Public data members.
