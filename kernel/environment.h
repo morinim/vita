@@ -140,6 +140,10 @@ namespace vita
     /// Should we save a dynamic execution status file?
     bool stat_dynamic;
 
+    /// Should we save a dynamic population status file?
+    /// \warning It can be quite slow!
+    bool stat_population;
+
     /// Should we save a summary of the run?
     bool stat_summary;
 
@@ -159,6 +163,7 @@ namespace vita
 
     static const char arl_filename[];
     static const char dyn_filename[];
+    static const char pop_filename[];
     static const char sum_filename[];
     static const char tst_filename[];
   };

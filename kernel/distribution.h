@@ -3,7 +3,7 @@
  *  \file distribution.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -47,10 +47,10 @@ namespace vita
     T      min;
     T      max;
 
+    std::map<T, std::uintmax_t> freq;
+
   private:
     void update_variance(T);
-
-    std::map<T, unsigned> freq_;
 
     T delta_;
     T    m2_;
@@ -75,7 +75,7 @@ namespace vita
 
     delta_ = m2_ = mean = variance = min = max = 0.0;
 
-    freq_.clear();
+    freq.clear();
   }
 
   ///
@@ -94,7 +94,7 @@ namespace vita
       max = val;
 
     ++count;
-    ++freq_[val];
+    ++freq[val];
 
     update_variance(val);
   }
@@ -112,7 +112,7 @@ namespace vita
     const T c(1.0 / std::log(2.0));
 
     T h(0.0);
-    for (const auto &f : freq_)  // f.first: value, f.second: frequency
+    for (const auto &f : freq)  // f.first: value, f.second: frequency
     {
       const double p(static_cast<T>(f.second) / static_cast<T>(count));
 

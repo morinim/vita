@@ -122,15 +122,13 @@ namespace vita
 
     if (pop_.env().stat_dynamic)
     {
-      const std::string f_dynamic(pop_.env().stat_dir + "/dynamic");
+      const std::string f_dynamic(pop_.env().stat_dir + "/" +
+                                  environment::dyn_filename);
       std::ofstream dynamic(f_dynamic.c_str(), std::ios_base::app);
       if (dynamic.good())
       {
         if (last_run != run_count)
-        {
           dynamic << std::endl << std::endl;
-          last_run = run_count;
-        }
 
         std::uintmax_t hits(0), probes(0);
         get_probes(&probes, &hits);
@@ -173,6 +171,27 @@ namespace vita
         dynamic << '"' << std::endl;
       }
     }
+
+    if (pop_.env().stat_population)
+    {
+      const std::string f_pop(pop_.env().stat_dir + "/" +
+                              environment::pop_filename);
+      std::ofstream pop(f_pop.c_str(), std::ios_base::app);
+      if (pop.good())
+      {
+        if (last_run != run_count)
+          pop << std::endl << std::endl;
+
+        for (const auto &f : stats_.az.fit_dist().freq)
+        {
+          // f.first: value, f.second: frequency
+          pop << run_count << ' ' << f.first << ' ' << f.second << std::endl;
+        }
+      }
+    }
+
+    if (last_run != run_count)
+      last_run = run_count;
   }
 
   ///
