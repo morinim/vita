@@ -559,6 +559,18 @@ namespace ui
   }
 
   ///
+  /// \param[in] v should we save the population status file?
+  ///
+  void stat_population(const std::string &v)
+  {
+    problem.env.stat_population = is_true(v);
+
+    if (verbose)
+      std::cout << "[INFO] Population logging is "
+                << problem.env.stat_population << std::endl;
+  }
+
+  ///
   /// \param[in] v if \c true saves a summary of the runs.
   ///
   void stat_summary(const std::string &v)
@@ -829,9 +841,11 @@ int parse_command_line(int argc, char *const argv[])
        "log statistics in the specified folder/directory")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
+      ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
+       "generates a population status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
        "saves a summary of the runs")
-      ("stat-arl", po::value<std::string>()->notifier(&ui::stat_arl),
+      ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
        "saves the list of active ADFs")
       ("threashold", po::value<std::string>()->notifier(&ui::threashold),
        "sets the success threashold for a run");
