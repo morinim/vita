@@ -3,7 +3,7 @@
  *  \file symbol_set.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -24,13 +24,13 @@ namespace vita
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
   ///
-  symbol_set::symbol_set()
+  symbol_set::symbol_set() : arguments_(gene::k_args)
   {
     clear();
 
     arguments_.clear();
-    for (unsigned i(0); i < gene::k_args; ++i)
-      arguments_.push_back(std::shared_ptr<argument>(new argument(i)));
+    for (size_t i(0); i < gene::k_args; ++i)
+      arguments_[i] = std::make_shared<argument>(i);
 
     assert(check());
   }
@@ -50,7 +50,7 @@ namespace vita
   /// \param[in] n index of an argument symbol.
   /// \return a pointer to the n-th argument symbol.
   ///
-  const symbol_ptr &symbol_set::arg(unsigned n) const
+  const symbol_ptr &symbol_set::arg(size_t n) const
   {
     assert(n < gene::k_args);
     return arguments_[n];
@@ -60,7 +60,7 @@ namespace vita
   /// \param[in] i index of an ADT symbol.
   /// \return a pointer to the i-th ADT symbol.
   ///
-  const symbol_ptr &symbol_set::get_adt(unsigned i) const
+  const symbol_ptr &symbol_set::get_adt(size_t i) const
   {
     assert(i < all_.adt.size());
     return all_.adt[i];
@@ -69,7 +69,7 @@ namespace vita
   ///
   /// \return the number of ADT functions stored.
   ///
-  unsigned symbol_set::adts() const
+  size_t symbol_set::adts() const
   {
     return all_.adt.size();
   }
@@ -109,7 +109,7 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    for (unsigned i(0); i < adts(); ++i)
+    for (size_t i(0); i < adts(); ++i)
     {
       const unsigned w(all_.adt[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
@@ -119,23 +119,23 @@ namespace vita
 
       if (delta && all_.adt[i]->weight == 0)
       {
-        for (unsigned j(0); j < all_.terminals.size(); ++j)
+        for (size_t j(0); j < all_.terminals.size(); ++j)
           if (all_.terminals[j]->opcode() == all_.adt[i]->opcode())
           {
-            all_.terminals.erase(all_.terminals.begin()+j);
+            all_.terminals.erase(all_.terminals.begin() + j);
             break;
           }
 
-        for (unsigned j(0); j < all_.symbols.size(); ++j)
+        for (size_t j(0); j < all_.symbols.size(); ++j)
           if (all_.symbols[j]->opcode() == all_.adt[i]->opcode())
           {
-            all_.symbols.erase(all_.symbols.begin()+j);
+            all_.symbols.erase(all_.symbols.begin() + j);
             break;
           }
       }
     }
 
-    for (unsigned i(0); i < all_.adf.size(); ++i)
+    for (size_t i(0); i < all_.adf.size(); ++i)
     {
       const unsigned w(all_.adf[i]->weight);
       const unsigned delta(w >  1 ? w/2 :
@@ -198,7 +198,7 @@ namespace vita
   {
     const std::uintmax_t slot(random::between<std::uintmax_t>(0, sum));
 
-    unsigned i(0);
+    size_t i(0);
     for (std::uintmax_t wedge(symbols[i]->weight);
          wedge <= slot;
          wedge += symbols[++i]->weight)
@@ -207,7 +207,7 @@ namespace vita
     // This is a different approach from Eli Bendersky
     // (http://eli.thegreenplace.net):
     // std::uintmax_t total(0);
-    // for (unsigned i(0), winner(0); i < symbols.size(); ++i)
+    // for (size_t i(0), winner(0); i < symbols.size(); ++i)
     // {
     //   total += symbols[i]->weight;
     //   if (random::between<std::uintmax_t>(0, total+1) < symbols[i]->weight)
@@ -249,7 +249,7 @@ namespace vita
   {
     assert(dex != "");
 
-    for (unsigned i(0); i < all_.symbols.size(); ++i)
+    for (size_t i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->display() == dex)
         return all_.symbols[i];
 
@@ -261,7 +261,7 @@ namespace vita
   ///
   /// See also \c data::categories().
   ///
-  unsigned symbol_set::categories() const
+  size_t symbol_set::categories() const
   {
     return by_.category.size();
   }
@@ -270,7 +270,7 @@ namespace vita
   /// \param[in] c a category.
   /// \return number of terminals in category \a c.
   ///
-  unsigned symbol_set::terminals(category_t c) const
+  size_t symbol_set::terminals(category_t c) const
   {
     assert(c < by_.category.size());
     return by_.category[c].terminals.size();
@@ -286,8 +286,8 @@ namespace vita
   {
     std::set<category_t> need;
 
-    for (unsigned i(0); i < all_.symbols.size(); ++i)
-      for (unsigned j(0); j < all_.symbols[i]->arity(); ++j)
+    for (size_t i(0); i < all_.symbols.size(); ++i)
+      for (size_t j(0); j < all_.symbols[i]->arity(); ++j)
         need.insert(function::cast(all_.symbols[i])->arg_category(j));
 
     for (auto cat(need.begin()); cat != need.end(); ++cat)
@@ -338,7 +338,7 @@ namespace vita
     if (!all_.check())
       return false;
 
-    for (unsigned i(0); i < by_.category.size(); ++i)
+    for (size_t i(0); i < by_.category.size(); ++i)
       if (!by_.category[i].check())
         return false;
 

@@ -3,7 +3,7 @@
  *  \file symbol_set.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -42,18 +42,18 @@ namespace vita
     const symbol_ptr &roulette(category_t) const;
     const symbol_ptr &roulette_terminal(category_t) const;
 
-    const symbol_ptr &arg(unsigned) const;
+    const symbol_ptr &arg(size_t) const;
 
-    const symbol_ptr &get_adt(unsigned) const;
-    unsigned adts() const;
+    const symbol_ptr &get_adt(size_t) const;
+    size_t adts() const;
 
     void reset_adf_weights();
 
     const symbol_ptr &decode(unsigned) const;
     const symbol_ptr &decode(const std::string &) const;
 
-    unsigned categories() const;
-    unsigned terminals(category_t) const;
+    size_t categories() const;
+    size_t terminals(category_t) const;
 
     bool enough_terminals() const;
     bool check() const;
