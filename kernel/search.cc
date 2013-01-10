@@ -457,15 +457,18 @@ namespace vita
         // threashold criterion, it is at least equal to the best individual so
         // far.
 
+        auto update = [&]()
+        {
+          overall_summary.best->ind = s.best->ind;
+          good_runs.clear();
+        };
+
         if (score.fitness > overall_summary.best->score.fitness + tolerance)
         {  // better fitness
           overall_summary.best->score.fitness = score.fitness;
 
           if (prob_->env.threashold.fitness)
-          {
-            overall_summary.best->ind = s.best->ind;
-            good_runs.clear();
-          }
+            update();
         }
 
         if (score.accuracy > overall_summary.best->score.accuracy)
@@ -473,10 +476,7 @@ namespace vita
           overall_summary.best->score.accuracy = score.accuracy;
 
           if (prob_->env.threashold.accuracy)
-          {
-            overall_summary.best->ind = s.best->ind;
-            good_runs.clear();
-          }
+            update();
         }
 
         good_runs.push_back(run);
@@ -558,17 +558,15 @@ namespace vita
 
     // Test set results logging.
     vita::data *const data = prob_->data();
-    if (data->size(vita::data::test))
+    if (data->size(data::test))
     {
-      const vita::data::dataset_t backup(data->dataset());
-      data->dataset(vita::data::test);
+      const data::dataset_t backup(data->dataset());
+      data->dataset(data::test);
 
-      std::unique_ptr<vita::lambda_f> lambda(prob_->lambdify(
-                                               run_sum.best->ind));
+      std::unique_ptr<lambda_f> lambda(prob_->lambdify(run_sum.best->ind));
 
-      std::ofstream tf(env_.stat_dir + "/" +
-                       vita::environment::tst_filename);
-      for (const vita::data::example &e : *data)
+      std::ofstream tf(env_.stat_dir + "/" + environment::tst_filename);
+      for (const data::example &e : *data)
         tf << (*lambda)(e) << std::endl;
 
       data->dataset(backup);
