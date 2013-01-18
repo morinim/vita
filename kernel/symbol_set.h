@@ -60,14 +60,15 @@ namespace vita
 
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
-  private:
-    static const symbol_ptr empty_ptr;
-
+  private:  // Private support functions.
     typedef std::vector<symbol_ptr> s_vector;
+
+    static const symbol_ptr empty_ptr;
 
     void clear();
     const symbol_ptr &roulette(const s_vector &, std::uintmax_t) const;
 
+  private:  // Private data members.
     // \a arguments_ is not included in the \a collection struct because
     // an argument isn't bounded to a category (see \c argument constructor for
     // more details).
@@ -98,9 +99,24 @@ namespace vita
 
       std::vector<collection> category;
     } by_;
+
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
   };
 
   std::ostream &operator<<(std::ostream &, const symbol_set &);
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void symbol_set::serialize(Archive &ar, unsigned)
+  {
+    ar & arguments_;
+    ar & all_;
+    ar & by_;
+  }
 }  // namespace vita
 
 #endif  // SYMBOL_SET_H

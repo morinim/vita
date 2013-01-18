@@ -40,6 +40,8 @@
 #include <cstdint>
 #include <memory>
 
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
 #include <boost/spirit/home/support/detail/hold_any.hpp>
 
 #include "compatibility_patch.h"

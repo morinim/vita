@@ -110,7 +110,11 @@ namespace vita
     class const_iterator;
     friend class interpreter;
 
-  private:
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
+
+  private:  // Private support functions.
     hash_t hash() const;
     void pack(const locus &, std::vector<std::uint8_t> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
@@ -145,7 +149,21 @@ namespace vita
   individual two_point_crossover(const individual &, const individual &);
   individual uniform_crossover(const individual &, const individual &);
 
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void individual::serialize(Archive &ar, unsigned)
+  {
+    ar & crossover_;
+    ar & best_;
+    ar & env_;
+    ar & genome_;
+  }
 
+  ///
+  /// Iterato to scan the active genes of an \c individual.
+  ///
   class individual::const_iterator
   {
   public:

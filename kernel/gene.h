@@ -3,7 +3,7 @@
  *  \file gene.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -38,13 +38,32 @@ namespace vita
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
+    // Data members.
     symbol_ptr         sym;
     union
     {
       int              par;
       index_t args[k_args];
     };
+
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void gene::serialize(Archive &ar, unsigned)
+  {
+    static_assert(
+      sizeof(par) <= sizeof(args),
+      "sizeof(int) size expected to be <= sizeof(index_t[k_args] for union serialization)");
+
+    ar & sym;
+    ar & args;
+  }
 }  // namespace vita
 
 #endif  // GENE_H

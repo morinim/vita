@@ -36,12 +36,17 @@ namespace vita
   ///
   struct environment
   {
+    // Constructor and support functions.
     explicit environment(bool = false);
 
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
 
     void insert(const symbol_ptr &);
+
+    bool check(bool, bool) const;
+
+    // Data members.
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).
@@ -159,14 +164,45 @@ namespace vita
 
     symbol_set sset;
 
-    bool check(bool, bool) const;
-
     static const char arl_filename[];
     static const char dyn_filename[];
     static const char pop_filename[];
     static const char sum_filename[];
     static const char tst_filename[];
+
+  private:  // Serialization.
+    friend class boost::serialization::access;
+    template<class Archive> void serialize(Archive &, unsigned);
   };
+
+  ///
+  /// \see \c boost::serialization
+  ///
+  template<class Archive>
+  void environment::serialize(Archive &ar, unsigned)
+  {
+    ar & code_length;
+    ar & elitism;
+    ar & p_mutation;
+    ar & p_cross;
+    ar & brood_recombination;
+    ar & dss;
+    ar & individuals;
+    ar & tournament_size;
+    ar & mate_zone;
+    ar & g_since_start;
+    ar & g_without_improvement;
+    ar & validation_ratio;
+    ar & arl;
+    ar & ttable_size;
+    ar & stat_dir;
+    ar & stat_arl;
+    ar & stat_dynamic;
+    ar & stat_population;
+    ar & stat_summary;
+    ar & threashold;
+    ar & sset;
+  }
 }  // namespace vita
 
 #endif  // ENVIRONMENT_H
