@@ -29,12 +29,14 @@ namespace vita
   class evolution;
   class individual;
 
-  struct summary
+  class summary
   {
+  public:  // Constructor and support functions.
     summary();
 
     void clear();
 
+  public:  // Data members.
     std::uintmax_t ttable_probes;
     std::uintmax_t   ttable_hits;
 

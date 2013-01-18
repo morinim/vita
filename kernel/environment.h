@@ -34,9 +34,9 @@ namespace vita
   /// Because using \c boost::optional<bool> can lead to subtle errors due to
   /// the implicit \c bool conversion, we prefer to use \c boost::tribool.
   ///
-  struct environment
+  class environment
   {
-    // Constructor and support functions.
+  public:  // Constructor and support functions.
     explicit environment(bool = false);
 
     void log(boost::property_tree::ptree *const,
@@ -46,7 +46,7 @@ namespace vita
 
     bool check(bool, bool) const;
 
-    // Data members.
+  public:  // Data members.
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).

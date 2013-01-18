@@ -11,6 +11,10 @@ TYPE = release
 BOOST_INCLUDE = ./boost
 BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 
+# Compiler (clang++, g++)
+CXX = clang++
+
+
 
 
 # NO USER SERVICEABLE PARTS BELOW THIS LINE
@@ -37,11 +41,14 @@ ifeq ($(TYPE), profile)
 endif
 
 ifeq ($(TYPE), release)
-  TYPE_PARAM = -s -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
+  ifeq (($TYPE), g++)
+    TYPE_PARAM = -s
+  endif
+
+  TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
 CXXFLAGS = -pipe $(TYPE_PARAM) $(WARN) $(DEFS)
-CXX = g++
 COMPILE = $(CXX) $(CXXFLAGS)
 
 KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
