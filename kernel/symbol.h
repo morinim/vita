@@ -66,10 +66,6 @@ namespace vita
 
     bool check() const;
 
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
   public:  // Public data member.
     /// Weights is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
@@ -150,24 +146,6 @@ namespace vita
   {
     return false;
   }
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void symbol::serialize(Archive &ar, unsigned)
-  {
-    // To ensure that the primitive static members opc_count_ is will be
-    // stored/loaded only once, use BOOST_STRONG_TYPEDEF.
-    ar & opc_count_;
-
-    ar & weight;
-    ar & opcode_;
-    ar & category_;
-    ar & display_;
-  }
-  BOOST_SERIALIZATION_ASSUME_ABSTRACT(symbol)
-
 }  // namespace vita
 
 #endif  // SYMBOL_H

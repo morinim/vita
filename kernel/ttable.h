@@ -3,7 +3,7 @@
  *  \file ttable.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -44,23 +44,12 @@ namespace vita
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !p1 && !p2; }
 
+  public:  // Data members.
     /// First half of the hash signature.
     std::uint_least64_t p1;
     /// Second half of the hash signature.
     std::uint_least64_t p2;
   };
-
-  ///
-  /// \param[out] o output stream.
-  /// \param[in] h hash signature to be printed.
-  ///
-  /// Mainly useful for debugging / testing.
-  ///
-  inline
-  std::ostream &operator<<(std::ostream &o, hash_t h)
-  {
-    return o << h.p1 << h.p2;
-  }
 
 
   ///
@@ -109,6 +98,18 @@ namespace vita
     mutable std::uintmax_t probes_;
     mutable std::uintmax_t hits_;
   };
+
+  ///
+  /// \param[out] o output stream.
+  /// \param[in] h hash signature to be printed.
+  ///
+  /// Mainly useful for debugging / testing.
+  ///
+  inline
+  std::ostream &operator<<(std::ostream &o, hash_t h)
+  {
+    return o << h.p1 << h.p2;
+  }
 
   /// \example example4.cc
   /// Performs a speed test on the transposition table (insert-find cycle).

@@ -45,25 +45,7 @@ namespace vita
       int              par;
       index_t args[k_args];
     };
-
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void gene::serialize(Archive &ar, unsigned)
-  {
-    static_assert(
-      sizeof(par) <= sizeof(args),
-      "sizeof(int) size expected to be <= sizeof(index_t[k_args] for union serialization)");
-
-    ar & sym;
-    ar & args;
-  }
 }  // namespace vita
 
 #endif  // GENE_H

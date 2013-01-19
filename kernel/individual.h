@@ -37,9 +37,6 @@ namespace vita
   class individual
   {
   public:
-    typedef std::function<individual (const individual &, const individual &)>
-    crossover_wrapper;
-
     individual(const environment &, bool);
 
     void dump(std::ostream &) const;
@@ -48,7 +45,6 @@ namespace vita
     void list(std::ostream &) const;
     void tree(std::ostream &) const;
 
-    individual crossover(const individual &) const;
     unsigned mutation()
     { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
     unsigned mutation(double);
@@ -104,15 +100,16 @@ namespace vita
       signature_.clear();
     }
 
-    // Please note that this is one of the very few methods that aren't const.
-    void set_crossover(const crossover_wrapper &);
-
     class const_iterator;
     friend class interpreter;
 
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
+  public:  // Public data members.
+    // Crossover implementation can be changed/selected at runtime by this
+    // polymorhic wrapper for function objects.
+    // std::function can be easily bound to function pointers, member function
+    // pointers, functors or anonymous (lambda) functions.
+    static std::function<individual (const individual &, const individual &)>
+      crossover;
 
   private:  // Private support functions.
     hash_t hash() const;
@@ -120,12 +117,6 @@ namespace vita
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
   private:  // Private data members.
-    // Crossover implementation can be changed/selected at runtime by this
-    // polymorhic wrapper for function objects.
-    // std::function can be easily bound to function pointers, member function
-    // pointers, functors or anonymous (lambda) functions.
-    crossover_wrapper crossover_;
-
     // Starting point of the active code in this individual (the best sequence
     // of genes is starting here).
     locus best_;
@@ -148,18 +139,6 @@ namespace vita
   individual one_point_crossover(const individual &, const individual &);
   individual two_point_crossover(const individual &, const individual &);
   individual uniform_crossover(const individual &, const individual &);
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void individual::serialize(Archive &ar, unsigned)
-  {
-    ar & crossover_;
-    ar & best_;
-    ar & env_;
-    ar & genome_;
-  }
 
   ///
   /// Iterato to scan the active genes of an \c individual.

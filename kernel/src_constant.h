@@ -3,7 +3,7 @@
  *  \file src_constant.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -60,22 +60,8 @@ namespace vita
       }
     }
 
-  private: // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
-  private:  // Data members.
+  private:  // Private data members.
     data::example::value_t val;
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void constant::serialize(Archive &ar, unsigned)
-  {
-    ar & boost::serialization::base_object<terminal>(*this);
-    ar & val;
-  }
 }  // namespace vita
 #endif // SRC_CONSTANT_H

@@ -21,6 +21,9 @@
 
 namespace vita
 {
+  std::function<individual (const individual &, const individual &)>
+  individual::crossover(uniform_crossover);
+
   ///
   /// \param[in] e base environment.
   /// \param[in] gen if \c true generates a random sequence of genes to
@@ -31,7 +34,7 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, bool gen)
-    : crossover_(uniform_crossover), best_(locus{{0, 0}}), env_(&e),
+    : best_(locus{{0, 0}}), env_(&e),
       genome_(boost::extents[*e.code_length][e.sset.categories()]),
       signature_()
   {
@@ -166,35 +169,6 @@ namespace vita
     assert(check());
 
     return n;
-  }
-
-  ///
-  /// \param[in] parent2 the second parent (being \c this the first).
-  /// \return a reference to \c this.
-  ///
-  /// There are some predefined crossover operators: we use the \a cross_
-  /// function wrapper to choose which one to use.
-  ///
-  individual individual::crossover(const individual &parent2) const
-  {
-    assert(check());
-    assert(parent2.check());
-
-    return crossover_(*this, parent2);
-  }
-
-  ///
-  /// \param[in] cw a function pointer / functor / anonymous (lambda) function
-  ///               used for crossover operation.
-  ///
-  /// Crossover implementation can be changed / selected at runtime by this
-  /// method.
-  /// Please note that this is one of the very few individual methods that
-  /// aren't const.
-  ///
-  void individual::set_crossover(const crossover_wrapper &cw)
-  {
-    crossover_ = cw;
   }
 
   ///

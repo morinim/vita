@@ -3,7 +3,7 @@
  *  \file src_variable.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -45,20 +45,6 @@ namespace vita
 
   private:  // Private data members.
     unsigned var_;
-
-  private: // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void variable::serialize(Archive &ar, unsigned)
-  {
-    ar & boost::serialization::base_object<terminal>(*this);
-    ar & var_;
-  }
 }  // namespace vita
 #endif  // SRC_VARIABLE_H

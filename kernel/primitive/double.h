@@ -3,7 +3,7 @@
  *  \file double.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -69,17 +69,6 @@ namespace vita
       any eval(interpreter *i) const
       { return any(static_cast<base_t>(any_cast<int>(i->eval()))); }
 
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      {
-        ar & boost::serialization::base_object<terminal>(*this);
-        ar & min;
-        ar & upp;
-      }
-
     private: // Private data members.
       const int min, upp;
     };
@@ -96,13 +85,6 @@ namespace vita
 
         return any(std::fabs(dbl::cast(ev)));
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class add : public function
@@ -124,13 +106,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class div : public function
@@ -151,13 +126,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class idiv : public function
@@ -178,13 +146,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ifb : public function
@@ -217,13 +178,6 @@ namespace vita
         else
           return i->eval(4);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ife : public function
@@ -247,13 +201,6 @@ namespace vita
         else
           return i->eval(3);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ifl : public function
@@ -275,13 +222,6 @@ namespace vita
         else
           return i->eval(3);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class ifz : public function
@@ -299,13 +239,6 @@ namespace vita
         else
           return i->eval(2);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class length : public function
@@ -321,13 +254,6 @@ namespace vita
 
         return any(static_cast<base_t>(any_cast<std::string>(ev).size()));
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     ///
@@ -354,13 +280,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class mod : public function
@@ -381,13 +300,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class mul : public function
@@ -409,13 +321,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class sin : public function
@@ -430,13 +335,6 @@ namespace vita
 
         return any(std::sin(dbl::cast(ev)));
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
 
     class sub : public function
@@ -457,13 +355,6 @@ namespace vita
 
         return any(ret);
       }
-
-    private: // Serialization.
-      friend class boost::serialization::access;
-
-      /// \see \c boost::serialization
-      template<class Archive> void serialize(Archive &ar, unsigned)
-      { ar & boost::serialization::base_object<function>(*this); }
     };
   }  // namespace dbl
 }  // namespace vita

@@ -99,24 +99,9 @@ namespace vita
 
       std::vector<collection> category;
     } by_;
-
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
   };
 
   std::ostream &operator<<(std::ostream &, const symbol_set &);
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void symbol_set::serialize(Archive &ar, unsigned)
-  {
-    ar & arguments_;
-    ar & all_;
-    ar & by_;
-  }
 }  // namespace vita
 
 #endif  // SYMBOL_SET_H

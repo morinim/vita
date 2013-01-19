@@ -3,7 +3,7 @@
  *  \file terminal.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -57,10 +57,6 @@ namespace vita
 
     bool check() const;
 
-  private: // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
   public:   // Public data members.
     static unsigned default_weight;
 
@@ -68,18 +64,6 @@ namespace vita
     const bool parametric_;
     const bool      input_;
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void terminal::serialize(Archive &ar, unsigned)
-  {
-    ar & boost::serialization::base_object<symbol>(*this);
-    ar & default_weight;
-    ar & parametric_;
-    ar & input_;
-  }
 }  // namespace vita
 
 #endif  // TERMINAL_H

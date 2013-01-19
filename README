@@ -31,7 +31,7 @@ REQUIREMENTS
   * POSIX-standard shell
   * Boost library (<http://www.boost.org>)
   * A C++11-standard-compliant compiler (or, at least, partially compatible:
-    e.g. gcc v4.7.x or newer)
+    e.g. gcc v4.7.x or newer, clang 3.2 or newer)
   * Python v3 (for some functionalities)
 
   ### Windows requirements ###

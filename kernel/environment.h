@@ -16,6 +16,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/logic/tribool.hpp>
+#include <boost/logic/tribool_io.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include <cmath>
@@ -47,7 +48,6 @@ namespace vita
     bool check(bool, bool) const;
 
   public:  // Data members.
-
     /// The number of genes (maximum length of an evolved program in the
     /// population).
     /// Code length have to be chosen before population is created and cannot
@@ -169,40 +169,7 @@ namespace vita
     static const char pop_filename[];
     static const char sum_filename[];
     static const char tst_filename[];
-
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void environment::serialize(Archive &ar, unsigned)
-  {
-    ar & code_length;
-    ar & elitism;
-    ar & p_mutation;
-    ar & p_cross;
-    ar & brood_recombination;
-    ar & dss;
-    ar & individuals;
-    ar & tournament_size;
-    ar & mate_zone;
-    ar & g_since_start;
-    ar & g_without_improvement;
-    ar & validation_ratio;
-    ar & arl;
-    ar & ttable_size;
-    ar & stat_dir;
-    ar & stat_arl;
-    ar & stat_dynamic;
-    ar & stat_population;
-    ar & stat_summary;
-    ar & threashold;
-    ar & sset;
-  }
 }  // namespace vita
 
 #endif  // ENVIRONMENT_H

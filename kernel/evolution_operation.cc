@@ -50,7 +50,7 @@ namespace vita
 
     if (random::boolean(*env.p_cross))
     {
-      individual off(pop[r1].crossover(pop[r2]));
+      individual off(individual::crossover(pop[r1], pop[r2]));
       ++stats_->crossovers;
 
       // This should be an original contribution of Vita... but it's hard
@@ -70,7 +70,7 @@ namespace vita
         unsigned i(0);
         do
         {
-          individual tmp(pop[r1].crossover(pop[r2]));
+          individual tmp(individual::crossover(pop[r1], pop[r2]));
           ++stats_->crossovers;
 
           while (pop[r1].signature() == tmp.signature() ||

@@ -11,8 +11,6 @@
  *
  */
 
-#pragma GCC diagnostic ignored "-Wtype-limits"
-
 #include <cstdlib>
 #include <iostream>
 

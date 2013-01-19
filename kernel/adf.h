@@ -3,7 +3,7 @@
  *  \file adf.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -55,11 +55,7 @@ namespace vita
 
     bool check() const;
 
-    // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
-    // Data members
+  private: // Data members
     const unsigned id;
     individual   code;
 
@@ -83,11 +79,7 @@ namespace vita
 
     bool check() const;
 
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
-  private:  // Data member.
+  private:  // Private data members.
     adf_core core_;
   };
 
@@ -109,44 +101,9 @@ namespace vita
 
     bool check() const;
 
-  private:  // Serialization.
-    friend class boost::serialization::access;
-    template<class Archive> void serialize(Archive &, unsigned);
-
-  private:  // Data member.
+  private:  // Private data members.
     adf_core core_;
   };
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void adf_core::serialize(Archive &ar, unsigned)
-  {
-    ar & adf_count;
-    ar & id;
-    ar & code;
-  }
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void adf::serialize(Archive &ar, unsigned)
-  {
-    ar & boost::serialization::base_object<function>(*this);
-    ar & core_;
-  }
-
-  ///
-  /// \see \c boost::serialization
-  ///
-  template<class Archive>
-  void adt::serialize(Archive &ar, unsigned)
-  {
-    ar & boost::serialization::base_object<terminal>(*this);
-    ar & core_;
-  }
 }  // namespace vita
 
 #endif  // ADF_H
