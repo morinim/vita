@@ -222,7 +222,7 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    for (ptree::value_type s : pt.get_child("symbolset"))
+    for (const ptree::value_type &s : pt.get_child("symbolset"))
       if (s.first == "symbol")
       {
         const std::string sym_name(s.second.get<std::string>("<xmlattr>.name"));
@@ -246,18 +246,18 @@ namespace vita
 
               // ...we choose those compatible with the xml signature of the
               // current symbol.
-              for (auto i(sequences.begin()); i != sequences.end(); ++i)
-                if (compatible(*i, args))
+              for (const auto &seq : sequences)
+                if (compatible(seq, args))
                 {
 #if !defined(NDEBUG)
-                  //const domain_t domain(dat_.get_category(i->back()).domain);
+                  //const domain_t domain(dat_.get_category(i.back()).domain);
                   std::cout << sym_name << '(';
-                  for (size_t j(0); j < i->size(); ++j)
-                    std::cout << dat_.get_category((*i)[j]).name
-                              << (j+1 == i->size() ? ")" : ", ");
+                  for (const auto &j : seq)
+                    std::cout << dat_.get_category(j).name
+                              << (&j == &seq.back() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
-                  env.insert(factory.make(sym_name, *i));
+                  env.insert(factory.make(sym_name, seq));
                 }
             }
         }

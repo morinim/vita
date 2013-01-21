@@ -3,7 +3,7 @@
  *  \file gene.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -30,7 +30,7 @@ namespace vita
       par = sym->init();
   }
 
-  gene::gene(const symbol_ptr &s, unsigned from, unsigned sup) : sym(s)
+  gene::gene(const symbol_ptr &s, index_t from, index_t sup) : sym(s)
   {
     assert(from < sup);
 

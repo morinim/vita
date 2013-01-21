@@ -26,19 +26,20 @@ namespace vita
   /// A gene is a unit of heredity in a living organism. The \c struct \a gene
   /// is the building block for an \a individual.
   ///
-  struct gene
+  class gene
   {
+  public:
     /// Maximum number of arguments for a function.
     enum {k_args = 4};
 
     gene() {}
     explicit gene(const symbol_ptr &);
-    gene(const symbol_ptr &, unsigned, unsigned);
+    gene(const symbol_ptr &, index_t, index_t);
 
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
-    // Data members.
+  public:  // Data members.
     symbol_ptr         sym;
     union
     {

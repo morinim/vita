@@ -52,7 +52,7 @@ namespace vita
       // STANDARD SECTION. Filling the genome with random symbols.
       for (index_t i(0); i < sup; ++i)
         for (category_t c(0); c < categories; ++c)
-          genome_[i][c] = gene(e.sset.roulette(c), i+1, size());
+          genome_[i][c] = gene(e.sset.roulette(c), i + 1, size());
 
       // PATCH SUBSECTION. Placing terminals for satisfying constraints on
       // types.
