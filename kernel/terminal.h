@@ -14,8 +14,6 @@
 #if !defined(TERMINAL_H)
 #define      TERMINAL_H
 
-#include <string>
-
 #include "symbol.h"
 
 namespace vita
@@ -55,14 +53,18 @@ namespace vita
     ///
     unsigned arity() const { return 0; }
 
-    bool check() const;
+    virtual bool check() const;
+
+  public:   // Serialization.
+    virtual bool load(std::istream &);
+    virtual bool save(std::ostream &) const;
 
   public:   // Public data members.
     static unsigned default_weight;
 
   private:  // Private data members.
-    const bool parametric_;
-    const bool      input_;
+    bool parametric_;
+    bool      input_;
   };
 }  // namespace vita
 

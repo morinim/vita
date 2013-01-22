@@ -3,7 +3,7 @@
  *  \file terminal.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -32,6 +32,31 @@ namespace vita
     : symbol(dis, c, w), parametric_(par), input_(in)
   {
     assert(check());
+  }
+
+  ///
+  /// \return \c true if terminal was loaded correctly.
+  ///
+  bool terminal::load(std::istream &in)
+  {
+    const bool ok(symbol::load(in));
+
+    in >> parametric_;
+    in >> input_;
+
+    return ok && in.good();
+  }
+
+  ///
+  /// \return \c true if terminal was saved correctly.
+  ///
+  bool terminal::save(std::ostream &out) const
+  {
+    const bool ok(symbol::save(out));
+
+    out << parametric_ << ' ' << input_ << std::endl;
+
+    return ok && out.good();
   }
 
   ///
