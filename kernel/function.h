@@ -57,9 +57,9 @@ namespace vita
     ///
     /// \return the number of arguments (0 arguments => terminal).
     ///
-    unsigned arity() const { assert(arity_); return arity_; }
+    virtual size_t arity() const { assert(arity_); return arity_; }
 
-    bool check() const;
+    virtual bool check() const;
 
     ///
     /// \param[in] s symbol pointer.
@@ -73,13 +73,17 @@ namespace vita
       return static_cast<function *>(s.get());
     }
 
-  public:   // Public data member.
+  public:   // Serialization.
+    virtual bool load(std::istream &);
+    virtual bool save(std::ostream &) const;
+
+  public:   // Public data members.
     static unsigned default_weight;
 
-  private:  // Private data member.
+  private:  // Private data members.
     category_t argt_[gene::k_args];
-    unsigned                arity_;
-    const bool        associative_;
+    size_t                  arity_;
+    bool              associative_;
   };
 }  // namespace vita
 

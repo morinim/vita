@@ -51,7 +51,7 @@ namespace vita
     ///
     /// \return 0 (0 arguments <=> terminal).
     ///
-    unsigned arity() const { return 0; }
+    virtual size_t arity() const { return 0; }
 
     virtual bool check() const;
 

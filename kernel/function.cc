@@ -3,15 +3,13 @@
  *  \file function.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
  */
-
-#include <iostream>
 
 #include "function.h"
 
@@ -42,10 +40,40 @@ namespace vita
     for (arity_ = 0; arity_ < args.size(); ++arity_)
       argt_[arity_] = args[arity_];
 
-    // for (unsigned i(arity()); i < gene::k_args; ++i)
+    // for (size_t i(arity()); i < gene::k_args; ++i)
     //   argt_[i] = std::numeric_limits<category_t>::max();
 
     assert(check());
+  }
+
+  ///
+  /// \return \c true if function was loaded correctly.
+  ///
+  bool function::load(std::istream &in)
+  {
+    const bool ok(symbol::load(in));
+
+    in >> arity_;
+    for (size_t i(0); i < arity_; ++i)
+      in >> argt_[i];
+    in >> associative_;
+
+    return ok && in.good();
+  }
+
+  ///
+  /// \return \c true if function was saved correctly.
+  ///
+  bool function::save(std::ostream &out) const
+  {
+    const bool ok(symbol::save(out));
+
+    out << arity_;
+    for (size_t i(0); i < arity_; ++i)
+      out << ' ' << argt_[i];
+    out << ' ' << associative_ << std::endl;
+
+    return ok && out.good();
   }
 
   ///
