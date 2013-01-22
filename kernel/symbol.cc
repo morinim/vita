@@ -3,7 +3,7 @@
  *  \file symbol.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -15,7 +15,7 @@
 
 namespace vita
 {
-  unsigned symbol::opc_count_(0);
+  opcode_t symbol::opc_count_(0);
 
   ///
   /// \return the name of the symbol.
@@ -37,9 +37,36 @@ namespace vita
   {
     assert(parametric());
 
-    std::ostringstream s;
-    s << display_ << '_' << v;
-    return s.str();
+    return display() + "_" + std::to_string(v);
+  }
+
+  ///
+  /// \return \c true if symbol was loaded correctly.
+  ///
+  bool symbol::load(std::istream &in)
+  {
+    std::getline(in, display_);
+    in >> display_;
+    in >> opcode_;
+    in >> category_;
+    in >> weight;
+
+    const bool ok(in.good());
+    if (ok && opc_count_ <= opcode_)
+      opc_count_ = opcode_ + 1;
+
+    return ok;
+  }
+
+  ///
+  /// \return \c true if symbol was saved correctly.
+  ///
+  bool symbol::save(std::ostream &out) const
+  {
+    out << display_ << '\n'
+        << opcode_ << ' ' << category_ << ' ' << weight << std::endl;
+
+    return out.good();
   }
 
   ///

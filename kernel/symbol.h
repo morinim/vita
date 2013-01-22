@@ -14,7 +14,7 @@
 #if !defined(SYMBOL_H)
 #define      SYMBOL_H
 
-#include <sstream>
+#include <fstream>
 #include <string>
 
 #include "vita.h"
@@ -64,21 +64,25 @@ namespace vita
     /// (it is implementation specific).
     virtual any eval(interpreter *) const = 0;
 
-    bool check() const;
+    virtual bool check() const;
 
-  public:  // Public data member.
+  public:  // Serialization.
+    virtual bool load(std::istream &);
+    virtual bool save(std::ostream &) const;
+
+  public:  // Public data members.
     /// Weights is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
     unsigned weight;
 
-  private:  // Private data member.
-    static unsigned opc_count_;
+  private:  // Private data members.
+    static opcode_t opc_count_;
 
-    const opcode_t     opcode_;
+    opcode_t     opcode_;
 
-    const category_t category_;
+    category_t category_;
 
-    const std::string display_;
+    std::string display_;
   };
 
   ///
