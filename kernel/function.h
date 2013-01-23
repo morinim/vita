@@ -40,12 +40,12 @@ namespace vita
     /// \return \c true if the function is associative (e.g. sum is associative,
     ///         division isn't).
     ///
-    bool associative() const { return associative_; }
+    virtual bool associative() const { return associative_; }
 
     ///
     /// \return \c false (function are never parametric).
     ///
-    bool parametric() const { return false; }
+    virtual bool parametric() const { return false; }
 
     ///
     /// \param[in] i index of a function argument.

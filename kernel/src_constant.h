@@ -31,13 +31,16 @@ namespace vita
     //  : terminal(name, t, false, false, default_weight*2), val(c) {}
   public:
     explicit constant(bool c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2), val(c) {}
+      : terminal(std::to_string(c), t, false, false, default_weight * 2),
+        val(c) {}
     explicit constant(double c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2), val(c) {}
+      : terminal(std::to_string(c), t, false, false, default_weight * 2),
+        val(c) {}
     explicit constant(int c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
+      : terminal(std::to_string(c), t, false, false, default_weight * 2),
+        val(c) {}
+    explicit constant(const char c[], category_t t = 0)
+      : terminal("\"" + std::string(c) + "\"", t, false, false,
                  default_weight * 2), val(c) {}
     explicit constant(const std::string &c, category_t t = 0)
       : terminal("\"" + c + "\"", t, false, false, default_weight * 2),

@@ -34,7 +34,7 @@ namespace vita
     /// \return \c false (terminals haven't arguments and cannot be
     ///         associative).
     ///
-    bool associative() const { return false; }
+    virtual bool associative() const { return false; }
 
     ///
     /// \return \c true if the terminal is an input variable.
@@ -46,7 +46,7 @@ namespace vita
     ///
     /// \return \c true if the terminal is parametric.
     ///
-    bool parametric() const { return parametric_; }
+    virtual bool parametric() const { return parametric_; }
 
     ///
     /// \return 0 (0 arguments <=> terminal).

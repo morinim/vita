@@ -92,7 +92,7 @@ namespace vita
   ///
   inline
   symbol::symbol(const std::string &dis, category_t c, unsigned w)
-    : weight(w), opcode_(++opc_count_), category_(c), display_(dis)
+    : weight(w), opcode_(opc_count_++), category_(c), display_(dis)
   {
     assert(check());
   }

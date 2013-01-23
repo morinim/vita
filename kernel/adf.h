@@ -56,8 +56,8 @@ namespace vita
     bool check() const;
 
   private: // Data members
-    const unsigned id;
-    individual   code;
+    unsigned     id;
+    individual code;
 
     static unsigned adf_count;
   };
@@ -70,14 +70,14 @@ namespace vita
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
-    any eval(interpreter *) const;
+    virtual any eval(interpreter *) const;
 
     const individual &get_code() const;
     std::string display() const;
 
     bool auto_defined() const;
 
-    bool check() const;
+    virtual bool check() const;
 
   private:  // Private data members.
     adf_core core_;
@@ -92,14 +92,14 @@ namespace vita
   public:
     adt(const individual &, unsigned);
 
-    any eval(interpreter *) const;
+    virtual any eval(interpreter *) const;
 
     const individual &get_code() const;
     std::string display() const;
 
     bool auto_defined() const;
 
-    bool check() const;
+    virtual bool check() const;
 
   private:  // Private data members.
     adf_core core_;

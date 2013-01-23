@@ -46,7 +46,6 @@ namespace vita
   bool symbol::load(std::istream &in)
   {
     std::getline(in, display_);
-    in >> display_;
     in >> opcode_;
     in >> category_;
     in >> weight;
