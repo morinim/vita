@@ -19,14 +19,16 @@
 #include "interpreter.h"
 #include "primitive/factory.h"
 
-#define BOOST_TEST_MODULE Individual
+#if !defined(MASTER_TEST_SET)
+#define BOOST_TEST_MODULE individual
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+#endif
 
-struct F
+struct F_IND
 {
-  F() : env(true)
+  F_IND() : env(true)
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
@@ -58,7 +60,7 @@ struct F
     env.insert(factory.make("IFE", {1, 0}));
   }
 
-  ~F()
+  ~F_IND()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
@@ -66,7 +68,7 @@ struct F
   vita::environment env;
 };
 
-BOOST_FIXTURE_TEST_SUITE(Individual, F)
+BOOST_FIXTURE_TEST_SUITE(individual, F_IND)
 /*
 BOOST_AUTO_TEST_CASE(Compact)
 {

@@ -15,16 +15,18 @@
 
 #include "src_constant.h"
 
-#define BOOST_TEST_MODULE Terminal
+#if !defined(MASTER_TEST_SET)
+#define BOOST_TEST_MODULE terminal
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+#endif
 
-BOOST_AUTO_TEST_SUITE(Base)
+BOOST_AUTO_TEST_SUITE(terminal)
 
 BOOST_AUTO_TEST_CASE(Base)
 {
-  vita::constant t("A TERMINAL");
+  vita::constant<std::string> t("A TERMINAL");
 
   BOOST_CHECK_EQUAL(t.associative(), false);
   BOOST_CHECK_EQUAL(t.arity(), 0);
@@ -34,12 +36,12 @@ BOOST_AUTO_TEST_CASE(Base)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  vita::constant t(1234);
+  vita::constant<int> t("1234");
 
   std::stringstream stream;
   BOOST_REQUIRE(t.save(stream));
 
-  vita::constant t1("DUMMY");
+  vita::constant<int> t1("5678");
   stream.seekg(0, std::ios::beg);
   BOOST_REQUIRE(t1.load(stream));
 

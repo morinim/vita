@@ -3,7 +3,7 @@
  *  \file test_primitive.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -21,13 +21,14 @@
 #include "terminal.h"
 #include "primitive/factory.h"
 
-#define BOOST_TEST_MODULE Primitive
+#if !defined(MASTER_TEST_SET)
+#define BOOST_TEST_MODULE primitive
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
-using namespace vita;
+#endif
 
-struct F
+struct F_PRI
 {
   class Z : public vita::terminal
   {
@@ -39,7 +40,7 @@ struct F
     double val;
   };
 
-  F() : env(true), l0(locus{{0, 0}})
+  F_PRI() : env(true), l0(vita::locus{{0, 0}})
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
@@ -78,7 +79,7 @@ struct F
     env.code_length = 32;
   }
 
-  ~F()
+  ~F_PRI()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
@@ -106,10 +107,11 @@ struct F
   const vita::locus l0;
 };
 
-BOOST_FIXTURE_TEST_SUITE(SymbolicRegressionSymbols, F)
+BOOST_FIXTURE_TEST_SUITE(primitive, F_PRI)
 
 BOOST_AUTO_TEST_CASE(ABS)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   // With a nonconformant C++11 compiler the {1} expression can be changed
@@ -132,6 +134,7 @@ BOOST_AUTO_TEST_CASE(ABS)
 
 BOOST_AUTO_TEST_CASE(ADD)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
@@ -171,6 +174,7 @@ BOOST_AUTO_TEST_CASE(ADD)
 
 BOOST_AUTO_TEST_CASE(DIV)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
@@ -206,6 +210,7 @@ BOOST_AUTO_TEST_CASE(DIV)
 
 BOOST_AUTO_TEST_CASE(IDIV)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,X) == 1");
@@ -248,6 +253,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
 
 BOOST_AUTO_TEST_CASE(MUL)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
@@ -278,6 +284,7 @@ BOOST_AUTO_TEST_CASE(MUL)
 
 BOOST_AUTO_TEST_CASE(SUB)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
@@ -313,6 +320,7 @@ BOOST_AUTO_TEST_CASE(SUB)
 
 BOOST_AUTO_TEST_CASE(LN)
 {
+  using namespace vita;
   vita::individual i(env, true);
 
   BOOST_TEST_CHECKPOINT("LN(1) == 0");

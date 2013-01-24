@@ -3,7 +3,7 @@
  *  \file test_ttable.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -19,14 +19,16 @@
 #include "interpreter.h"
 #include "primitive/factory.h"
 
+#if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE TranspositionTable
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+#endif
 
-struct F
+struct F_TTA
 {
-  F() : env(true), cache(16)
+  F_TTA() : env(true), cache(16)
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
@@ -40,7 +42,7 @@ struct F
     env.insert(factory.make("FIFE", {}));
   }
 
-  ~F()
+  ~F_TTA()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
@@ -50,7 +52,7 @@ struct F
 };
 
 
-BOOST_FIXTURE_TEST_SUITE(TranspositionTable, F)
+BOOST_FIXTURE_TEST_SUITE(ttable, F_TTA)
 
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {

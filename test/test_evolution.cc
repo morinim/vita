@@ -3,7 +3,7 @@
  *  \file test_evolution.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -18,14 +18,16 @@
 #include "evolution.h"
 #include "primitive/factory.h"
 
-#define BOOST_TEST_MODULE Evolution
+#if !defined(MASTER_TEST_SET)
+#define BOOST_TEST_MODULE evolution
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+#endif
 
-struct F
+struct F_EVO
 {
-  F() : env(true)
+  F_EVO() : env(true)
   {
     BOOST_TEST_MESSAGE("Setup fixture");
 
@@ -39,7 +41,7 @@ struct F
     env.insert(factory.make("FIFE", {}));
   }
 
-  ~F()
+  ~F_EVO()
   {
     BOOST_TEST_MESSAGE("Teardown fixture");
   }
@@ -48,7 +50,7 @@ struct F
 };
 
 
-BOOST_FIXTURE_TEST_SUITE(Evolution, F)
+BOOST_FIXTURE_TEST_SUITE(evolution, F_EVO)
 
 BOOST_AUTO_TEST_CASE(Creation)
 {

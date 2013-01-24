@@ -14,6 +14,8 @@
 #if !defined(SRC_CONSTANT_H)
 #define      SRC_CONSTANT_H
 
+#include <boost/lexical_cast.hpp>
+
 #include "terminal.h"
 
 namespace vita
@@ -29,17 +31,51 @@ namespace vita
       : terminal(c, t, false, false, default_weight * 2),
         val_(boost::lexical_cast<T>(c)) {}
 
+    explicit constant(T c, category_t t = 0)
+      : terminal(std::to_string(c), t, false, false, default_weight * 2),
+        val_(c) {}
+
+  public:   // Serialization.
+    virtual bool load(std::istream &);
+    virtual bool save(std::ostream &) const;
+
     ///
     /// \return the value of the constant (as a \c any).
     ///
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    any eval(vita::interpreter *) const { return any(val_); }
+    virtual any eval(vita::interpreter *) const { return any(val_); }
 
   private:  // Private data members.
     T val_;
   };
+
+  ///
+  /// \return \c true if constant was loaded correctly.
+  ///
+  template<class T>
+  bool constant<T>::load(std::istream &in)
+  {
+    const bool ok(symbol::load(in));
+
+    in >> val_;
+
+    return ok && in.good();
+  }
+
+  ///
+  /// \return \c true if constant was saved correctly.
+  ///
+  template<class T>
+  bool constant<T>::save(std::ostream &out) const
+  {
+    const bool ok(symbol::save(out));
+
+    out << val_ << std::endl;
+
+    return ok && out.good();
+  }
 
   template<>
   class constant<std::string> : public terminal
@@ -58,58 +94,38 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    any eval(vita::interpreter *) const { return any(val_); }
+    virtual any eval(vita::interpreter *) const { return any(val_); }
+
+  public:   // Serialization.
+    virtual bool load(std::istream &);
+    virtual bool save(std::ostream &) const;
 
   private:  // Private data members.
     std::string val_;
   };
 
-/*
-  class constant : public terminal
+  ///
+  /// \return \c true if constant<std::string> was loaded correctly.
+  ///
+  inline bool constant<std::string>::load(std::istream &in)
   {
-    //private:
-    // C++11 allows constructors to call other peer constructors (known as
-    // delegation). This allows constructors to utilize another constructor's
-    // behavior with a minimum of added code.
-    //constant(const std::string &name, const any &c, category_t = 0)
-    //  : terminal(name, t, false, false, default_weight*2), val(c) {}
-  public:
-    explicit constant(bool c, category_t t = 0)
-      : terminal(std::to_string(c), t, false, false, default_weight * 2),
-        val(c) {}
-    explicit constant(double c, category_t t = 0)
-      : terminal(std::to_string(c), t, false, false, default_weight * 2),
-        val(c) {}
-    explicit constant(int c, category_t t = 0)
-      : terminal(std::to_string(c), t, false, false, default_weight * 2),
-        val(c) {}
-    explicit constant(const char c[], category_t t = 0)
-      : terminal("\"" + std::string(c) + "\"", t, false, false,
-                 default_weight * 2), val(c) {}
-    explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\"" + c + "\"", t, false, false, default_weight * 2),
-        val(c) {}
+    const bool ok(symbol::load(in));
 
-    ///
-    /// \return the value of the constant (as a \c any).
-    ///
-    /// The argument is not used: the value of a constant is stored within the
-    /// object and we don't need an \c interpreter to discover it.
-    ///
-    any eval(vita::interpreter *) const
-    {
-      switch (val.which())
-      {
-      case 0:  return any(boost::get<bool>(val));
-      case 1:  return any(boost::get<int>(val));
-      case 2:  return any(boost::get<double>(val));
-      default: return any(boost::get<std::string>(val));
-      }
-    }
+    std::getline(in, val_);
 
-  private:  // Private data members.
-    data::example::value_t val;
-  };
-*/
+    return ok && in.good();
+  }
+
+  ///
+  /// \return \c true if constant<std::string> was saved correctly.
+  ///
+  inline bool constant<std::string>::save(std::ostream &out) const
+  {
+    const bool ok(symbol::save(out));
+
+    out << val_ << std::endl;
+
+    return ok && out.good();
+  }
 }  // namespace vita
 #endif // SRC_CONSTANT_H

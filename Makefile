@@ -73,7 +73,10 @@ example%: examples/example%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
 
-tests: test_evolution test_individual test_primitive test_ttable
+tests: test/tests.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
+	@test/$@ --show_progress
 
 test_%: test/test_%.o $(KERNEL_OBJ)
 	@echo Linking $@
