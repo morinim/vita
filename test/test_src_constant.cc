@@ -47,21 +47,4 @@ BOOST_AUTO_TEST_CASE(Base)
   BOOST_CHECK(sc.check());
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
-{
-  vita::constant<int> t("1234");
-
-  std::stringstream stream;
-  BOOST_REQUIRE(t.save(stream));
-
-  vita::constant<int> t1("5678");
-  stream.seekg(0, std::ios::beg);
-  BOOST_REQUIRE(t1.load(stream));
-
-  BOOST_CHECK(t1.check());
-  BOOST_CHECK_EQUAL(t1.display(), t.display());
-  BOOST_CHECK_EQUAL(vita::any_cast<int>(t.eval(0)),
-                    vita::any_cast<int>(t1.eval(0)));
-}
-
 BOOST_AUTO_TEST_SUITE_END()

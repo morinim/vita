@@ -35,10 +35,6 @@ namespace vita
       : terminal(std::to_string(c), t, false, false, default_weight * 2),
         val_(c) {}
 
-  public:   // Serialization.
-    virtual bool load(std::istream &);
-    virtual bool save(std::ostream &) const;
-
     ///
     /// \return the value of the constant (as a \c any).
     ///
@@ -50,32 +46,6 @@ namespace vita
   private:  // Private data members.
     T val_;
   };
-
-  ///
-  /// \return \c true if constant was loaded correctly.
-  ///
-  template<class T>
-  bool constant<T>::load(std::istream &in)
-  {
-    const bool ok(symbol::load(in));
-
-    in >> val_;
-
-    return ok && in.good();
-  }
-
-  ///
-  /// \return \c true if constant was saved correctly.
-  ///
-  template<class T>
-  bool constant<T>::save(std::ostream &out) const
-  {
-    const bool ok(symbol::save(out));
-
-    out << val_ << std::endl;
-
-    return ok && out.good();
-  }
 
   template<>
   class constant<std::string> : public terminal
@@ -96,36 +66,8 @@ namespace vita
     ///
     virtual any eval(vita::interpreter *) const { return any(val_); }
 
-  public:   // Serialization.
-    virtual bool load(std::istream &);
-    virtual bool save(std::ostream &) const;
-
   private:  // Private data members.
     std::string val_;
   };
-
-  ///
-  /// \return \c true if constant<std::string> was loaded correctly.
-  ///
-  inline bool constant<std::string>::load(std::istream &in)
-  {
-    const bool ok(symbol::load(in));
-
-    std::getline(in, val_);
-
-    return ok && in.good();
-  }
-
-  ///
-  /// \return \c true if constant<std::string> was saved correctly.
-  ///
-  inline bool constant<std::string>::save(std::ostream &out) const
-  {
-    const bool ok(symbol::save(out));
-
-    out << val_ << std::endl;
-
-    return ok && out.good();
-  }
 }  // namespace vita
 #endif // SRC_CONSTANT_H
