@@ -39,7 +39,7 @@ namespace vita
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
-  public:  // Data members.
+  public:  // Public data members.
     symbol_ptr         sym;
     union
     {

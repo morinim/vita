@@ -56,8 +56,8 @@ namespace vita
     if (sym->parametric())
       return par == g.par;
 
-    const unsigned n(sym->arity());
-    for (unsigned i(0); i < n; ++i)
+    const size_t n(sym->arity());
+    for (size_t i(0); i < n; ++i)
       if (args[i] != g.args[i])
         return false;
 
