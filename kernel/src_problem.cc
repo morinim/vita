@@ -148,11 +148,9 @@ namespace vita
     for (category_t c(0); c < dat_.categories(); ++c)
     {
       const data::category &cat(dat_.get_category(c));
-      for (auto lp(cat.labels.begin()); lp != cat.labels.end(); ++lp)
-      {
-        const symbol_ptr label(std::make_shared<constant>(*lp, c));
-        env.insert(label);
-      }
+
+      for (const std::string &label : cat.labels)
+        env.insert(std::make_shared<constant<std::string>>(label, c));
     }
   }
 

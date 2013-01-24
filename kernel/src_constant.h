@@ -14,13 +14,57 @@
 #if !defined(SRC_CONSTANT_H)
 #define      SRC_CONSTANT_H
 
-#include <boost/variant.hpp>
-
-#include "data.h"
 #include "terminal.h"
 
 namespace vita
 {
+  ///
+  /// A constant value (bool, int, double, string).
+  ///
+  template<class T>
+  class constant : public terminal
+  {
+  public:
+    explicit constant(const std::string &c, category_t t = 0)
+      : terminal(c, t, false, false, default_weight * 2),
+        val_(boost::lexical_cast<T>(c)) {}
+
+    ///
+    /// \return the value of the constant (as a \c any).
+    ///
+    /// The argument is not used: the value of a constant is stored within the
+    /// object and we don't need an \c interpreter to discover it.
+    ///
+    any eval(vita::interpreter *) const { return any(val_); }
+
+  private:  // Private data members.
+    T val_;
+  };
+
+  template<>
+  class constant<std::string> : public terminal
+  {
+  public:
+    explicit constant(const std::string &c, category_t t = 0)
+      : terminal("\"" + c + "\"", t, false, false, default_weight * 2),
+        val_(c) {}
+    explicit constant(const char c[], category_t t = 0)
+      : terminal("\"" + std::string(c) + "\"", t, false, false,
+                 default_weight * 2), val_(c) {}
+
+    ///
+    /// \return the value of the constant (as a \c any).
+    ///
+    /// The argument is not used: the value of a constant is stored within the
+    /// object and we don't need an \c interpreter to discover it.
+    ///
+    any eval(vita::interpreter *) const { return any(val_); }
+
+  private:  // Private data members.
+    std::string val_;
+  };
+
+/*
   class constant : public terminal
   {
     //private:
@@ -66,5 +110,6 @@ namespace vita
   private:  // Private data members.
     data::example::value_t val;
   };
+*/
 }  // namespace vita
 #endif // SRC_CONSTANT_H

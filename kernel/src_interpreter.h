@@ -3,7 +3,7 @@
  *  \file src_interpreter.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -31,7 +31,7 @@ namespace vita
     any run(const data::example &ex)
     { example_ = &ex; return interpreter::run(); }
 
-    any eval_var(unsigned i)
+    any eval_var(size_t i)
     { return boost::apply_visitor(cast_visitor(), example_->input[i]); }
 
   private:
