@@ -3,7 +3,7 @@
  *  \file lambda_f.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -16,6 +16,7 @@
 
 #include "data.h"
 #include "individual.h"
+#include "matrix.h"
 
 namespace vita
 {
@@ -57,15 +58,13 @@ namespace vita
 
     size_t slot(const individual &, const data::example &) const;
 
-    typedef std::vector<unsigned> uvect;
-
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
     /// 'class' mapped to slot 'slot'".
-    std::vector<uvect> slot_matrix;
+    matrix<unsigned> slot_matrix;
 
     /// slot_class[i] = "label of the predominant class" for the i-th slot.
-    uvect slot_class;
+    std::vector<unsigned> slot_class;
 
     /// Size of the dataset used to construct \a slot_matrix.
     size_t dataset_size;

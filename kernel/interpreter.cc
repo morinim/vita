@@ -3,7 +3,7 @@
  *  \file interpreter.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -11,7 +11,6 @@
  *
  */
 
-#include <boost/lexical_cast.hpp>
 #include <boost/none.hpp>
 
 #include "interpreter.h"
@@ -28,7 +27,7 @@ namespace vita
   ///
   interpreter::interpreter(const individual &ind, interpreter *const ctx)
     : ip_(ind.best_), context_(ctx), ind_(ind),
-      cache_(boost::extents[ind.size()][ind.env_->sset.categories()])
+      cache_(ind.size(), ind.env_->sset.categories())
   {
   }
 
@@ -38,8 +37,7 @@ namespace vita
   ///
   any interpreter::run(const locus &ip)
   {
-    std::fill(cache_.data(), cache_.data() + cache_.num_elements(),
-              boost::none);
+    cache_.fill(boost::none);
 
     ip_ = ip;
     return ind_[ip_].sym->eval(this);
@@ -169,11 +167,11 @@ namespace vita
   {
     return
       a.type() == typeid(double) ?
-      boost::lexical_cast<std::string>(any_cast<double>(a)) :
+      std::to_string(any_cast<double>(a)) :
       a.type() == typeid(int) ?
-      boost::lexical_cast<std::string>(any_cast<int>(a)) :
+      std::to_string(any_cast<int>(a)) :
       a.type() == typeid(bool) ?
-      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
+      std::to_string(any_cast<bool>(a)) :
       any_cast<std::string>(a);
   }
 }  // Namespace vita

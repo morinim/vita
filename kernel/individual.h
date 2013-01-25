@@ -25,6 +25,7 @@
 #include "environment.h"
 #include "gene.h"
 #include "locus.h"
+#include "matrix.h"
 #include "ttable.h"
 
 namespace vita
@@ -81,9 +82,9 @@ namespace vita
     /// time).
     /// \see eff_size
     ///
-    unsigned size() const { return genome_.size(); }
+    size_t size() const { return genome_.rows(); }
 
-    unsigned eff_size() const;
+    size_t eff_size() const;
 
     category_t category() const;
 
@@ -125,7 +126,7 @@ namespace vita
 
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
-    boost::multi_array<gene, 2> genome_;
+    matrix<gene> genome_;
 
     // Note that sintactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
@@ -152,7 +153,7 @@ namespace vita
     /// \return \c false when the iterator reaches the end.
     ///
     bool operator()() const
-    { return l[0] < ind_.genome_.size() && !loci_.empty(); }
+    { return l[0] < ind_.size() && !loci_.empty(); }
 
     const locus operator++();
 
@@ -161,7 +162,7 @@ namespace vita
     ///
     const gene &operator*() const
     {
-      assert(l[0] < ind_.genome_.size());
+      assert(l[0] < ind_.size());
       return ind_.genome_(l);
     }
 
@@ -170,7 +171,7 @@ namespace vita
     ///
     const gene *operator->() const
     {
-      assert(l[0] < ind_.genome_.size());
+      assert(l[0] < ind_.size());
       return &ind_.genome_(l);
     }
 

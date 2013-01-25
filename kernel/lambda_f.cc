@@ -34,7 +34,7 @@ namespace vita
   ///
   dyn_slot_engine::dyn_slot_engine(const individual &ind, data &d,
                                    size_t x_slot)
-    : slot_matrix(d.classes() * x_slot, uvect(d.classes())),
+    : slot_matrix(d.classes() * x_slot, d.classes()),
       slot_class(d.classes() * x_slot), dataset_size(0)
   {
     assert(ind.check());
@@ -43,27 +43,22 @@ namespace vita
     assert(x_slot);
 
     const size_t n_slots(d.classes() * x_slot);
-    assert(n_slots == slot_matrix.size());
+    assert(n_slots == slot_matrix.rows());
+    assert(slot_matrix.cols() == d.classes());
 
     // Here starts the slot-filling task.
-    for (size_t i(0); i < n_slots; ++i)
-    {
-      assert(slot_matrix[i].size() == d.classes());
-
-      for (size_t j(0); j < slot_matrix[i].size(); ++j)
-        slot_matrix[i][j] = 0;
-    }
+    slot_matrix.fill(0);
 
     // In the first step this method evaluates the program to obtain an output
     // value for each training example. Based on the program output value a
-    // a bidimentional array is built (slot_matrix_[slot][class]).
+    // a bidimentional matrix is built (slot_matrix_(slot, class)).
     for (const data::example &example : d)
     {
       ++dataset_size;
 
       const size_t where(slot(ind, example));
 
-      ++slot_matrix[where][example.label()];
+      ++slot_matrix(where, example.label());
     }
 
     const size_t unknown(d.classes());
@@ -75,11 +70,11 @@ namespace vita
     {
       size_t best_class(0);
 
-      for (size_t j(1); j < slot_matrix[i].size(); ++j)
-        if (slot_matrix[i][j] >= slot_matrix[i][best_class])
+      for (size_t j(1); j < slot_matrix.cols(); ++j)
+        if (slot_matrix(i, j) >= slot_matrix(i, best_class))
           best_class = j;
 
-      slot_class[i] = slot_matrix[i][best_class] ? best_class : unknown;
+      slot_class[i] = slot_matrix(i, best_class) ? best_class : unknown;
     }
 
     // Unknown slots can be a problem with new examples (not contained in the training set). So we
@@ -110,7 +105,7 @@ namespace vita
     src_interpreter agent(ind);
     const any res(agent.run(e));
 
-    const size_t ns(slot_matrix.size());
+    const size_t ns(slot_matrix.rows());
     const size_t last_slot(ns - 1);
 
     if (res.empty())

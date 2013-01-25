@@ -3,7 +3,7 @@
  *  \file interpreter.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -14,10 +14,10 @@
 #if !defined(INTERPRETER_H)
 #define      INTERPRETER_H
 
-#include <boost/multi_array.hpp>
 #include <boost/optional.hpp>
 
 #include "locus.h"
+#include "matrix.h"
 
 namespace vita
 {
@@ -48,7 +48,7 @@ namespace vita
 
     const individual &ind_;
 
-    mutable boost::multi_array<boost::optional<any>, 2> cache_;
+    mutable matrix<boost::optional<any>> cache_;
   };
 
   ///

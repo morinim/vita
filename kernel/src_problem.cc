@@ -212,9 +212,9 @@ namespace vita
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
     for (size_t i(0); i < dat_.categories(); ++i)
-      std::cout << "Category " << i << ": " << dat_.get_category(i).name
-                << " (domain " << dat_.get_category(i).domain << ")"
-                << std::endl;
+      std::cout << "[DEBUG] Category " << i << ": "
+                << dat_.get_category(i).name << " (domain "
+                << dat_.get_category(i).domain << ")" << std::endl;
     std::cout << std::endl;
 #endif
 
@@ -249,7 +249,7 @@ namespace vita
                 {
 #if !defined(NDEBUG)
                   //const domain_t domain(dat_.get_category(i.back()).domain);
-                  std::cout << sym_name << '(';
+                  std::cout << "[DEBUG] " << sym_name << '(';
                   for (const auto &j : seq)
                     std::cout << dat_.get_category(j).name
                               << (&j == &seq.back() ? ")" : ", ");

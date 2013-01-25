@@ -35,7 +35,7 @@ namespace vita
   ///
   individual::individual(const environment &e, bool gen)
     : best_(locus{{0, 0}}), env_(&e),
-      genome_(boost::extents[*e.code_length][e.sset.categories()]),
+      genome_(*e.code_length, e.sset.categories()),
       signature_()
   {
     assert(e.check(true, true));
@@ -52,12 +52,12 @@ namespace vita
       // STANDARD SECTION. Filling the genome with random symbols.
       for (index_t i(0); i < sup; ++i)
         for (category_t c(0); c < categories; ++c)
-          genome_[i][c] = gene(e.sset.roulette(c), i + 1, size());
+          genome_(i, c) = gene(e.sset.roulette(c), i + 1, size());
 
       // PATCH SUBSECTION. Placing terminals for satisfying constraints on
       // types.
       for (category_t c(0); c < categories; ++c)
-        genome_[sup][c] = gene(e.sset.roulette_terminal(c));
+        genome_(sup, c) = gene(e.sset.roulette_terminal(c));
 
       assert(check(true));
     }
@@ -67,9 +67,9 @@ namespace vita
   /// \return the effective size of the individual.
   /// \see size
   ///
-  unsigned individual::eff_size() const
+  size_t individual::eff_size() const
   {
-    unsigned ef(0);
+    size_t ef(0);
 
     for (const_iterator it(*this); it(); ++it)
       ++ef;
@@ -573,7 +573,7 @@ namespace vita
       }
 
     for (category_t c(0); c < categories; ++c)
-      if (!genome_[genome_.size() - 1][c].sym->terminal())
+      if (!genome_(genome_.rows() - 1, c).sym->terminal())
       {
         if (verbose)
           std::cerr << "Last symbol of type " << c
@@ -764,7 +764,7 @@ namespace vita
 
       for (category_t c(0); c < categories; ++c)
       {
-        const gene &g(genome_[i][c]);
+        const gene &g(genome_(i, c));
 
         if (categories > 1)
           s << '{';
