@@ -41,10 +41,6 @@ ifeq ($(TYPE), profile)
 endif
 
 ifeq ($(TYPE), release)
-  ifeq (($TYPE), g++)
-    TYPE_PARAM = -s
-  endif
-
   TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
@@ -66,6 +62,9 @@ all: kernel sr
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
+ifeq ($(TYPE), release)
+	@strip sr/$@
+endif
 
 examples: example1 example2 example3 example4 example5 example6 example7 example8
 
@@ -86,6 +85,9 @@ test_%: test/test_%.o $(KERNEL_OBJ)
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a
 	@ar rcs kernel/libvita.a $(KERNEL_OBJ)
+ifeq ($(TYPE), release)
+	@strip kernel/libvita.a
+endif
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
