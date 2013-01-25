@@ -3,7 +3,7 @@
  *  \file population.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -30,21 +30,18 @@ namespace vita
   class population
   {
   public:
-    typedef individual value_type;
-    typedef std::vector<value_type>::size_type size_type;
-
     explicit population(const environment &);
 
-    individual &operator[](size_type);
-    const individual &operator[](size_type) const;
-    size_type size() const;
+    individual &operator[](size_t);
+    const individual &operator[](size_t) const;
+    size_t size() const;
 
     const environment &env() const;
 
     bool check() const;
 
   private:
-    std::vector<value_type> pop_;
+    std::vector<individual> pop_;
   };
 
   std::ostream &operator<<(std::ostream &, const population &);
@@ -54,7 +51,7 @@ namespace vita
   /// \return a reference to the \a individual at index \a i.
   ///
   inline
-  individual &population::operator[](size_type i)
+  individual &population::operator[](size_t i)
   {
     assert(i < pop_.size());
     return pop_[i];
@@ -65,7 +62,7 @@ namespace vita
   /// \return a constant reference to the individual at index \a i.
   ///
   inline
-  const individual &population::operator[](size_type i) const
+  const individual &population::operator[](size_t i) const
   {
     assert(i < pop_.size());
     return pop_[i];
@@ -75,7 +72,7 @@ namespace vita
   /// \return the number of individuals in the population.
   ///
   inline
-  population::size_type population::size() const
+  size_t population::size() const
   {
     return pop_.size();
   }

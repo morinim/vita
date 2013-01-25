@@ -3,7 +3,7 @@
  *  \file population.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -11,12 +11,9 @@
  *
  */
 
-#include <cstdlib>
-#include <ctime>
 #include <fstream>
 
 #include "population.h"
-#include "random.h"
 
 namespace vita
 {
@@ -32,8 +29,8 @@ namespace vita
     pop_.reserve(*e.individuals);
     pop_.clear();
 
-    for (unsigned i(0); i < *e.individuals; ++i)
-      pop_.push_back(individual(e, true));
+    for (size_t i(0); i < *e.individuals; ++i)
+      pop_.emplace_back(e, true);
 
     assert(check());
   }
@@ -43,7 +40,7 @@ namespace vita
   ///
   bool population::check() const
   {
-    for (unsigned i(0); i < size(); ++i)
+    for (size_t i(0); i < size(); ++i)
       if (!pop_[i].check())
         return false;
 
@@ -57,7 +54,7 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &s, const population &pop)
   {
-    for (unsigned i(0); i < pop.size(); ++i)
+    for (size_t i(0); i < pop.size(); ++i)
       s << pop[i] << std::endl;
 
     return s;
