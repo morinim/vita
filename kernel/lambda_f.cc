@@ -77,9 +77,11 @@ namespace vita
       slot_class[i] = slot_matrix(i, best_class) ? best_class : unknown;
     }
 
-    // Unknown slots can be a problem with new examples (not contained in the training set). So we
-    // assign to them the class of a neighbour slot (if available).
-    // Another interesting strategy could be to assign unknown slots to the biggest class.
+    // Unknown slots can be a problem with new examples (not contained in the
+    // training set). We arbitrary assign to them the class of a neighbour
+    // slot (if available).
+    // Another interesting strategy would be to assign unknown slots to the
+    // largest class.
     for (size_t i(0); i < n_slots; ++i)
       if (slot_class[i] == unknown)
       {
@@ -118,8 +120,8 @@ namespace vita
   }
 
   ///
-  /// \param[in] x the numeric value that should be mapped in the [0,1]
-  ///              interval.
+  /// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
+  ///              that should be mapped in the [0,1] interval.
   /// \return a double in the [0,1] range.
   ///
   /// This is a sigmoid function (it is a bounded real function, "S" shaped,

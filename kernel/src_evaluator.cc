@@ -209,6 +209,12 @@ namespace vita
   /// \return the fitness (greater is better, max is 0) and the accuracy
   ///         (percentage).
   ///
+  /// \todo
+  /// To date we haven't an efficient way to calculate DSS example difficulty
+  /// in combination with Dynamic Slot Algorithm. We skip this calculation,
+  /// so DSS isn't working at full full capacity (it considers only example
+  /// "age").
+  ///
   score_t dyn_slot_evaluator::operator()(const individual &ind)
   {
     assert(ind.check());
@@ -256,7 +262,7 @@ namespace vita
 
     fitness_t d(0.0);
     unsigned ok(0), count(0);
-    for (const auto &example : *dat_)
+    for (auto &example : *dat_)
     {
       double confidence, sum;
       const size_t probable_class(engine_.class_label(ind, example,
@@ -283,6 +289,8 @@ namespace vita
         // * the maximum average class error is -1.0 / dat_->classes();
         // So -1.0 is like to say that we have a complete failure.
         d -= 1.0;
+
+        ++example.difficulty;
       }
 
       ++count;
