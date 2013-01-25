@@ -3,7 +3,7 @@
  *  \file src_evaluator.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -73,8 +73,8 @@ namespace vita
     explicit sae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::example &, int *const,
-                 unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const,
+                         unsigned *const);
   };
 
   ///
@@ -95,8 +95,8 @@ namespace vita
     explicit sse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::example &, int *const,
-                 unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const,
+                         unsigned *const);
   };
 
   ///
@@ -110,8 +110,8 @@ namespace vita
     explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    double error(src_interpreter &, data::example &, int *const,
-                 unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const,
+                         unsigned *const);
   };
 
   ///

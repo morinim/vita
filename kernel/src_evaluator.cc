@@ -124,7 +124,7 @@ namespace vita
       err = std::fabs(interpreter::to_double(res) -
                       data::cast<double>(t.output));
 
-    if (err > 0.1)
+    if (err > float_epsilon)
       ++t.difficulty;
     else
       ++(*ok);
@@ -157,7 +157,7 @@ namespace vita
       err *= err;
     }
 
-    if (err > 0.1)
+    if (err > float_epsilon)
       ++t.difficulty;
     else
       ++(*ok);
