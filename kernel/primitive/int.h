@@ -3,7 +3,7 @@
  *  \file int.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -56,8 +56,7 @@ namespace vita
 
       int init() const { return random::between<int>(min, upp); }
 
-      std::string display(int v) const
-      { return boost::lexical_cast<std::string>(v); }
+      std::string display(int v) const { return std::to_string(v); }
 
       any eval(interpreter *i) const { return any(integer::cast(i->eval())); }
 

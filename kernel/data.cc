@@ -3,7 +3,7 @@
  *  \file data.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -762,8 +762,7 @@ namespace vita
 
             std::string s_domain(is_number(record[field])
                                  ? "numeric"
-                                 : "string" +
-                                   boost::lexical_cast<std::string>(field));
+                                 : "string" + std::to_string(field));
             // For classification problems we use discriminant functions, so the
             // actual output type is always numeric.
             if (field == 0 && classification)
