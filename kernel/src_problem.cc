@@ -405,24 +405,6 @@ namespace vita
   std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
   {
     return active_eva_->lambdify(ind);
-
-/*
-    switch (i)
-    {
-    case k_count_evaluator:
-    case k_sae_evaluator:
-    case k_sse_evaluator:
-      return std::unique_ptr<lambda_f>(new lambda_f(ind));
-
-    case k_dyn_slot_evaluator:
-      return std::unique_ptr<lambda_f>(new dyn_slot_lambda_f(ind, dat_));
-
-    case k_gaussian_evaluator:
-      return std::unique_ptr<lambda_f>(new gaussian_lambda_f(ind, dat_));
-    }
-
-    return nullptr;
-*/
   }
 
   ///

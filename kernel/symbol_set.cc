@@ -227,9 +227,9 @@ namespace vita
   /// \return a pointer to the \c vita::symbol identified by 'opcode'
   ///         (\c nullptr if not found).
   ///
-  const symbol_ptr &symbol_set::decode(unsigned opcode) const
+  const symbol_ptr &symbol_set::decode(opcode_t opcode) const
   {
-    for (unsigned i(0); i < all_.symbols.size(); ++i)
+    for (size_t i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->opcode() == opcode)
         return all_.symbols[i];
 

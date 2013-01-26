@@ -828,6 +828,84 @@ namespace vita
   }
 
   ///
+  /// \return \c true if individual was loaded correctly.
+  ///
+  bool individual::load(std::istream &in)
+  {
+/*
+    locus best;
+    in >> best;
+
+    if (!in.good())
+      return false;
+
+    matrix<gene> genome;
+    if (!genome.load(in))
+      return false;
+    size_t rows, cols;
+
+    in >> rows;
+    in >> cols;
+
+    if (!rows || !cols || !in.good())
+      return false;
+
+    std::vector<T> data(rows * cols);
+
+    const size_t sup(rows * cols);
+    for (size_t i(0); i < sup; ++i)
+      if (!data[i].load(in))
+        return false;
+
+    if (in.good())
+    {
+      rows_ = rows;
+      cols_ = cols;
+      data_ = data;
+    }
+
+    return in.good();
+
+
+    hash_t signature;
+    if (!signature.load(in))
+      return false;
+
+    if (best >= genome.size())
+      return false;
+
+    best_ = best;
+    genome_ = genome;
+    signature_ = signature;
+*/
+    return true;
+  }
+
+  ///
+  /// \return \c true if individual was saved correctly.
+  ///
+  bool individual::save(std::ostream &out) const
+  {
+/*
+    out << best_ << std::endl;
+
+    const bool genome_ok(genome_.save(out));
+
+    const bool signature_ok(signature_.save(out));
+    out << rows_ << ' ' << cols_ << std::endl;
+
+    const size_t sup(size());
+    for (size_t i(0); i < sup; ++i)
+      if (!data_[i].save(out))
+        return false;
+
+    return out.good();
+
+    return out.good() && genome_ok && signature_ok;
+*/
+  }
+
+  ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
   /// \return the result of the crossover.
@@ -859,8 +937,8 @@ namespace vita
         offspring.set(it.l, p2[it.l]);
 
 /*
-    const unsigned cs(p1.size());
-    const unsigned categories(p1.env().sset.categories());
+    const index_t cs(p1.size());
+    const category_t categories(p1.env().sset.categories());
 
     assert(cs == p2.size());
     assert(categories == p2.env().sset.categories());

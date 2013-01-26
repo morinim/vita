@@ -41,10 +41,10 @@ namespace vita
 
     void set_evaluator(evaluator_id, const std::string & = "");
 
-    vita::data *data() { return &dat_; }
+    virtual vita::data *data() { return &dat_; }
     virtual std::unique_ptr<lambda_f> lambdify(const individual &);
 
-    void clear();
+    virtual void clear();
 
     /// Just a shortcut for checking number of classes.
     bool classification() { return classes() > 1; }
@@ -53,7 +53,7 @@ namespace vita
     size_t classes() const;
     size_t variables() const;
 
-    bool check(bool) const;
+    virtual bool check(bool) const;
 
   public:  // Public data members.
     // Preferred evaluator for symbolic regression.

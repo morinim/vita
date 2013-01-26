@@ -96,29 +96,32 @@ namespace vita
   /// by - the actual concrete type of the object which was just created.
   /// However, the type of the concrete object is known by the abstract
   /// factory via the \a name and \a c arguments.
-  /// \attention If \a name is not recognized as a preregistered symbol, it is
+  ///
+  /// \attention
+  /// If \a name is not recognized as a preregistered symbol, it is
   /// registered on the fly as a \a constant.
+  ///
   /// \note
-  /// \li The client code has no knowledge whatsoever of the concrete type, not
-  ///     needing to include any header files or class declarations relating to
-  ///     the concrete type. The client code deals only with the abstract type.
-  ///     Objects of a concrete type are indeed created by the factory, but
-  ///     the client code accesses such objects only through their abstract
-  ///     interface.
-  /// \li Adding new concrete types is done by modifying the client code to use
-  ///     a different factory, a modification which is typically one line in
-  ///     one file (the different factory then creates objects of a different
-  ///     concrete type, but still returns a pointer of the same abstract type
-  ///     as before - thus insulating the client code from change). This is
-  ///     significantly easier than modifying the client code to instantiate a
-  ///     new type, which would require changing every location in the code
-  ///     where a new object is created (as well as making sure that all such
-  ///     code locations also have knowledge of the new concrete type, by
-  ///     including for instance a concrete class header file). Since all
-  ///     factory objects are stored globally in a singleton object and all
-  ///     client code goes through the singleton to access the proper factory
-  ///     for object creation, changing factories is as easy as changing the
-  ///     singleton object.
+  /// * The client code has no knowledge whatsoever of the concrete type, not
+  ///   needing to include any header files or class declarations relating to
+  ///   the concrete type. The client code deals only with the abstract type.
+  ///   Objects of a concrete type are indeed created by the factory, but
+  ///   the client code accesses such objects only through their abstract
+  ///   interface.
+  /// * Adding new concrete types is done by modifying the client code to use
+  ///   a different factory, a modification which is typically one line in
+  ///   one file (the different factory then creates objects of a different
+  ///   concrete type, but still returns a pointer of the same abstract type
+  ///   as before - thus insulating the client code from change). This is
+  ///   significantly easier than modifying the client code to instantiate a
+  ///   new type, which would require changing every location in the code
+  ///   where a new object is created (as well as making sure that all such
+  ///   code locations also have knowledge of the new concrete type, by
+  ///   including for instance a concrete class header file). Since all
+  ///   factory objects are stored globally in a singleton object and all
+  ///   client code goes through the singleton to access the proper factory
+  ///   for object creation, changing factories is as easy as changing the
+  ///   singleton object.
   ///
   symbol_ptr symbol_factory::make(const std::string &name,
                                   const std::vector<category_t> &c)

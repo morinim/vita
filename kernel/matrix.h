@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <boost/lexical_cast.hpp>
+
 #include "vita.h"
 
 namespace vita

@@ -49,7 +49,7 @@ namespace vita
 
     void reset_adf_weights();
 
-    const symbol_ptr &decode(unsigned) const;
+    const symbol_ptr &decode(opcode_t) const;
     const symbol_ptr &decode(const std::string &) const;
 
     size_t categories() const;
