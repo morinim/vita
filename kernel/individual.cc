@@ -407,7 +407,7 @@ namespace vita
 
     pack(best_, &packed);
 
-    /// ... and from a packed byte stram to a signature...
+    /// ... and from a packed byte stream to a signature...
 
     /// Murmurhash3 follows.
     const unsigned len(packed.size());
@@ -417,8 +417,8 @@ namespace vita
     std::uint64_t h1(seed);
     std::uint64_t h2(seed);
 
-    std::uint64_t c1(0x87c37b91114253d5);
-    std::uint64_t c2(0x4cf5ad432745937f);
+    const std::uint64_t c1(0x87c37b91114253d5);
+    const std::uint64_t c2(0x4cf5ad432745937f);
 
     const std::uint64_t *const blocks(
       reinterpret_cast<const std::uint64_t *>(&packed[0]));
@@ -482,23 +482,24 @@ namespace vita
              h1 ^= k1;
     }
 
+    // Finalization.
     h1 ^= len;
     h2 ^= len;
 
     h1 += h2;
     h2 += h1;
 
-    h1 ^= h1 >> 16;
-    h1 *= 0x85ebca6b;
-    h1 ^= h1 >> 13;
-    h1 *= 0xc2b2ae35;
-    h1 ^= h1 >> 16;
+    h1 ^= h1 >> 33;
+    h1 *= 0xff51afd7ed558ccd;
+    h1 ^= h1 >> 33;
+    h1 *= 0xc4ceb9fe1a85ec53;
+    h1 ^= h1 >> 33;
 
-    h2 ^= h2 >> 16;
-    h2 *= 0x85ebca6b;
-    h2 ^= h2 >> 13;
-    h2 *= 0xc2b2ae35;
-    h2 ^= h2 >> 16;
+    h2 ^= h2 >> 33;
+    h2 *= 0xff51afd7ed558ccd;
+    h2 ^= h2 >> 33;
+    h2 *= 0xc4ceb9fe1a85ec53;
+    h2 ^= h2 >> 33;
 
     h1 += h2;
     h2 += h1;
