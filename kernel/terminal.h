@@ -55,10 +55,6 @@ namespace vita
 
     virtual bool check() const;
 
-  public:   // Serialization.
-    virtual bool load(std::istream &);
-    virtual bool save(std::ostream &) const;
-
   public:   // Public data members.
     static unsigned default_weight;
 

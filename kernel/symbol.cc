@@ -41,34 +41,6 @@ namespace vita
   }
 
   ///
-  /// \return \c true if symbol was loaded correctly.
-  ///
-  bool symbol::load(std::istream &in)
-  {
-    std::getline(in, display_);
-    in >> opcode_;
-    in >> category_;
-    in >> weight;
-
-    const bool ok(in.good());
-    if (ok && opc_count_ <= opcode_)
-      opc_count_ = opcode_ + 1;
-
-    return ok;
-  }
-
-  ///
-  /// \return \c true if symbol was saved correctly.
-  ///
-  bool symbol::save(std::ostream &out) const
-  {
-    out << display_ << '\n'
-        << opcode_ << ' ' << category_ << ' ' << weight << std::endl;
-
-    return out.good();
-  }
-
-  ///
   /// \return \c true if the object passes the internal consistency check.
   ///
   bool symbol::check() const

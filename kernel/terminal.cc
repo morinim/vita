@@ -35,31 +35,6 @@ namespace vita
   }
 
   ///
-  /// \return \c true if terminal was loaded correctly.
-  ///
-  bool terminal::load(std::istream &in)
-  {
-    const bool ok(symbol::load(in));
-
-    in >> parametric_;
-    in >> input_;
-
-    return ok && in.good();
-  }
-
-  ///
-  /// \return \c true if terminal was saved correctly.
-  ///
-  bool terminal::save(std::ostream &out) const
-  {
-    const bool ok(symbol::save(out));
-
-    out << parametric_ << ' ' << input_ << std::endl;
-
-    return ok && out.good();
-  }
-
-  ///
   /// \return \c true if the object passes the internal consistency check.
   ///
   bool terminal::check() const

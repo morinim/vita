@@ -47,36 +47,6 @@ namespace vita
   }
 
   ///
-  /// \return \c true if function was loaded correctly.
-  ///
-  bool function::load(std::istream &in)
-  {
-    const bool ok(symbol::load(in));
-
-    in >> arity_;
-    for (size_t i(0); i < arity_; ++i)
-      in >> argt_[i];
-    in >> associative_;
-
-    return ok && in.good();
-  }
-
-  ///
-  /// \return \c true if function was saved correctly.
-  ///
-  bool function::save(std::ostream &out) const
-  {
-    const bool ok(symbol::save(out));
-
-    out << arity_;
-    for (size_t i(0); i < arity_; ++i)
-      out << ' ' << argt_[i];
-    out << ' ' << associative_ << std::endl;
-
-    return ok && out.good();
-  }
-
-  ///
   /// \return \c true if the \a function passes the internal consistency check.
   ///
   bool function::check() const

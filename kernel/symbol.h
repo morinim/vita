@@ -66,10 +66,6 @@ namespace vita
 
     virtual bool check() const;
 
-  public:  // Serialization.
-    virtual bool load(std::istream &);
-    virtual bool save(std::ostream &) const;
-
   public:  // Public data members.
     /// Weights is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
