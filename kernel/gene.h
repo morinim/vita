@@ -39,10 +39,6 @@ namespace vita
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
-  public:   // Serialization.
-    virtual bool load(std::istream &, const symbol_set &);
-    virtual bool save(std::ostream &) const;
-
   public:  // Public data members.
     symbol_ptr         sym;
     union

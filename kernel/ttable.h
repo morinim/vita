@@ -44,7 +44,11 @@ namespace vita
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !p1 && !p2; }
 
-  public:  // Data members.
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
+  public:  // Public data members.
     /// First half of the hash signature.
     std::uint_least64_t p1;
     /// Second half of the hash signature.

@@ -3,7 +3,7 @@
  *  \file ttable.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -16,6 +16,33 @@
 
 namespace vita
 {
+  ///
+  /// \param[in] in input stream.
+  /// \return \c true if hash_t loaded correctly.
+  ///
+  bool hash_t::load(std::istream &in)
+  {
+    hash_t tmp;
+
+    if (!(in >> tmp.p1 >> tmp.p2))
+      return false;
+
+    *this = tmp;
+
+    return true;
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return \c true if hash_t was saved correctly.
+  ///
+  bool hash_t::save(std::ostream &out) const
+  {
+    out << p1 << ' ' << p2 << std::endl;
+
+    return out.good();
+  }
+
   ///
   /// \param[in] bits 2^\a bits is the number of elements of the table.
   ///

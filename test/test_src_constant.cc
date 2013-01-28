@@ -11,8 +11,6 @@
  *
  */
 
-#include <sstream>
-
 #include "src_constant.h"
 
 #if !defined(MASTER_TEST_SET)

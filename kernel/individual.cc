@@ -828,81 +828,83 @@ namespace vita
   }
 
   ///
+  /// \param[in] in input stream.
   /// \return \c true if individual was loaded correctly.
   ///
   bool individual::load(std::istream &in)
   {
-/*
     locus best;
-    in >> best;
-
-    if (!in.good())
+    if (!(in >> best[locus_index] >> best[locus_category]))
       return false;
 
-    matrix<gene> genome;
-    if (!genome.load(in))
-      return false;
     size_t rows, cols;
-
-    in >> rows;
-    in >> cols;
-
-    if (!rows || !cols || !in.good())
+    if (!(in >> rows >> cols) || !rows || !cols)
       return false;
 
-    std::vector<T> data(rows * cols);
+    matrix<gene> genome(rows, cols);
+    for (size_t r(0); r < rows; ++r)
+      for (size_t c(0); c < cols; ++c)
+      {
+        opcode_t opcode;
+        if (!(in >> opcode))
+          return false;
 
-    const size_t sup(rows * cols);
-    for (size_t i(0); i < sup; ++i)
-      if (!data[i].load(in))
-        return false;
+        gene g;
+        g.sym = env_->sset.decode(opcode);
+        if (!g.sym)
+          return false;
 
-    if (in.good())
-    {
-      rows_ = rows;
-      cols_ = cols;
-      data_ = data;
-    }
+        if (g.sym->parametric())
+          if (!(in >> g.par))
+            return false;
 
-    return in.good();
+        if (g.sym->arity())
+          for (size_t i(0); i < g.sym->arity(); ++i)
+            if (!(in >> g.args[i]))
+              return false;
 
+        genome(r, c) = g;
+      }
 
     hash_t signature;
     if (!signature.load(in))
       return false;
 
-    if (best >= genome.size())
+    if (best[locus_index] >= genome.rows())
       return false;
 
     best_ = best;
     genome_ = genome;
     signature_ = signature;
-*/
+
     return true;
   }
 
   ///
+  /// \param[out] out output stream.
   /// \return \c true if individual was saved correctly.
   ///
   bool individual::save(std::ostream &out) const
   {
-/*
-    out << best_ << std::endl;
+    out << best_[locus_index] << ' ' << best_[locus_category] << std::endl;
 
-    const bool genome_ok(genome_.save(out));
+    out << genome_.rows() << ' ' << genome_.cols() << std::endl;
+    for (const gene &g : genome_)
+    {
+      out << g.sym->opcode();
+
+      if (g.sym->parametric())
+        out << ' ' << g.par;
+
+      for (size_t i(0); i < g.sym->arity(); ++i)
+        out << ' ' << g.args[i];
+
+      out << std::endl;
+    }
 
     const bool signature_ok(signature_.save(out));
-    out << rows_ << ' ' << cols_ << std::endl;
 
-    const size_t sup(size());
-    for (size_t i(0); i < sup; ++i)
-      if (!data_[i].save(out))
-        return false;
-
-    return out.good();
-
-    return out.good() && genome_ok && signature_ok;
-*/
+    return out.good() && signature_ok;
   }
 
   ///

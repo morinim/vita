@@ -105,8 +105,8 @@ namespace vita
     friend class interpreter;
 
   public:   // Serialization.
-    virtual bool load(std::istream &);
-    virtual bool save(std::ostream &) const;
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
 
   public:  // Public data members.
     // Crossover implementation can be changed/selected at runtime by this

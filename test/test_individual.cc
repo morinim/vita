@@ -12,7 +12,7 @@
  */
 
 #include <cstdlib>
-#include <iostream>
+#include <sstream>
 
 #include "environment.h"
 #include "individual.h"
@@ -237,6 +237,23 @@ BOOST_AUTO_TEST_CASE(Cross2)
                     (*env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
+}
+
+BOOST_AUTO_TEST_CASE(Serialization)
+{
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    std::stringstream ss;
+    vita::individual i1(env, true);
+
+    BOOST_REQUIRE(i1.save(ss));
+
+    vita::individual i2(env, false);
+    BOOST_REQUIRE(i2.load(ss));
+    BOOST_REQUIRE(i2.check());
+
+    BOOST_CHECK_EQUAL(i1, i2);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

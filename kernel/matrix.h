@@ -52,6 +52,10 @@ namespace vita
     size_t rows() const;
     size_t cols() const;
 
+    typename std::vector<T>::iterator begin();
+    typename std::vector<T>::const_iterator begin() const;
+    typename std::vector<T>::const_iterator end() const;
+
   private:  // Private support functions.
     size_t size() const;
     size_t index(size_t, size_t) const;
@@ -207,6 +211,37 @@ namespace vita
     const size_t sup(size());
     for (size_t i(0); i < sup; ++i)
       data_[i] = v;
+  }
+
+  ///
+  /// \return iterator to the first element of the matrix.
+  ///
+  template<class T>
+  inline
+  typename std::vector<T>::iterator matrix<T>::begin()
+  {
+    return data_.begin();
+  }
+
+  ///
+  /// \return constant iterator to the first element of the matrix.
+  ///
+  template<class T>
+  inline
+  typename std::vector<T>::const_iterator matrix<T>::begin() const
+  {
+    return data_.begin();
+  }
+
+  ///
+  /// \return iterator to the end (i.e. the element after the last element) of
+  ///         the matrix.
+  ///
+  template<class T>
+  inline
+  typename std::vector<T>::const_iterator matrix<T>::end() const
+  {
+    return data_.end();
   }
 }  // namespace vita
 

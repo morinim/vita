@@ -45,43 +45,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] in input stream.
-  /// \return \c true if gene was loaded correctly.
-  ///
-  bool gene::load(std::istream &in, const symbol_set &ss)
-  {
-    /*
-    opcode_t opcode;
-    in >> opcode;
-
-    const symbol_ptr s(ss.decode(opcode));
-
-    if (!in.good() || !s)
-      return false;
-    */
-  }
-
-  ///
-  /// \param[out] out output stream.
-  /// \return \c true if gene was saved correctly.
-  ///
-  bool gene::save(std::ostream &out) const
-  {
-/*
-    out << sym->opcode();
-
-    if (sym->parametric())
-      out << ' ' << par;
-
-    for (size_t i(0); i < sym->arity(); ++i)
-      out << ' ' << args;
-
-    out << std::endl;
-*/
-    return out.good();
-  }
-
-  ///
   /// \param[in] g second term of comparison.
   /// \return \c true if \c this == \a g
   ///
