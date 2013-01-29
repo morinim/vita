@@ -24,7 +24,7 @@ namespace vita
   {
     hash_t tmp;
 
-    if (!(in >> tmp.p1 >> tmp.p2))
+    if (!(in >> tmp.data[0] >> tmp.data[1]))
       return false;
 
     *this = tmp;
@@ -38,7 +38,7 @@ namespace vita
   ///
   bool hash_t::save(std::ostream &out) const
   {
-    out << p1 << ' ' << p2 << std::endl;
+    out << data[0] << ' ' << data[1] << std::endl;
 
     return out.good();
   }
@@ -87,7 +87,7 @@ namespace vita
   {
     const hash_t h(ind.signature());
 
-    table_[h.p1 & k_mask].hash = hash_t();
+    table_[h.data[0] & k_mask].hash = hash_t();
   }
 
   ///
@@ -105,7 +105,7 @@ namespace vita
 
     const hash_t h(ind.signature());
 
-    const slot &s(table_[h.p1 & k_mask]);
+    const slot &s(table_[h.data[0] & k_mask]);
 
     const bool ret(period_ == s.birthday && h == s.hash);
 
@@ -131,7 +131,7 @@ namespace vita
     s.score    =           score;
     s.birthday =         period_;
 
-    table_[s.hash.p1 & k_mask] = s;
+    table_[s.hash.data[0] & k_mask] = s;
   }
 
   ///

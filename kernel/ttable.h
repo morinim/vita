@@ -30,30 +30,30 @@ namespace vita
   {
     /// Hash signature is a 128 bit unsigned and is built by two 64 bit
     /// halves.
-    hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : p1(a), p2(b) {}
+    hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
 
     /// Resets the content of hash_t.
-    void clear() { p1 = 0; p2 = 0; }
+    void clear() { data[0] = 0; data[1] = 0; }
 
     /// Standard equality operator for hash signature.
-    bool operator==(hash_t h) const { return p1 == h.p1 && p2 == h.p2; }
+    bool operator==(hash_t h) const
+    { return data[0] == h.data[0] && data[1] == h.data[1]; }
 
     /// Standard inequality operator for hash signature.
-    bool operator!=(hash_t h) const { return p1 != h.p1 || p2 != h.p2; }
+    bool operator!=(hash_t h) const
+    { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
     /// We assume that a string of 128 zero bits means empty.
-    bool empty() const { return !p1 && !p2; }
+    bool empty() const { return !data[0] && !data[1]; }
 
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
   public:  // Public data members.
-    /// First half of the hash signature.
-    std::uint_least64_t p1;
-    /// Second half of the hash signature.
-    std::uint_least64_t p2;
+    std::uint_least64_t data[2];
   };
+
 
 
   ///
@@ -112,7 +112,7 @@ namespace vita
   inline
   std::ostream &operator<<(std::ostream &o, hash_t h)
   {
-    return o << h.p1 << h.p2;
+    return o << h.data[0] << h.data[1];
   }
 
   /// \example example4.cc

@@ -18,6 +18,7 @@
 #include "individual.h"
 #include "interpreter.h"
 #include "primitive/factory.h"
+#include "ttable_hash.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE TranspositionTable
@@ -50,6 +51,52 @@ struct F_TTA
   vita::environment env;
   vita::ttable cache;
 };
+
+
+BOOST_AUTO_TEST_SUITE(hash)
+
+// This should hopefully be a thorough and uambiguous test of whether the hash
+// is correctly implemented.
+BOOST_AUTO_TEST_CASE(MurmurHash)
+{
+  const unsigned hashbytes(128 / 8);
+
+  std::uint8_t *const key(new std::uint8_t[256]);
+  std::uint8_t *const hashes(new std::uint8_t[hashbytes * 256]);
+  std::uint8_t *const final(new std::uint8_t[hashbytes]);
+
+  std::memset(key, 0, 256);
+  std::memset(hashes, 0, hashbytes * 256);
+  std::memset(final, 0, hashbytes);
+
+  // Hash keys of the form {0}, {0,1}, {0,1,2}... up to N=255, using 256-N as
+  // the seed.
+  for (unsigned i(0); i < 256; ++i)
+  {
+    key[i] = static_cast<std::uint8_t>(i);
+
+    vita::hash(key, i, 256 - i, &hashes[i * hashbytes]);
+  }
+
+  // Then hash the result array.
+  vita::hash(hashes, hashbytes * 256, 0, final);
+
+  // The first four bytes of that hash, interpreted as a little-endian integer,
+  // is our verification value.
+  const std::uint32_t verification((final[0] <<  0) | (final[1] <<  8) |
+                                   (final[2] << 16) | (final[3] << 24));
+
+  delete [] key;
+  delete [] hashes;
+  delete [] final;
+
+  //----------
+
+  BOOST_CHECK_EQUAL(0x6384BA69, verification);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
 
 
 BOOST_FIXTURE_TEST_SUITE(ttable, F_TTA)

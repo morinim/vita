@@ -18,6 +18,7 @@
 #include "argument.h"
 #include "environment.h"
 #include "random.h"
+#include "ttable_hash.h"
 
 namespace vita
 {
@@ -350,25 +351,47 @@ namespace vita
   /// individuals to the same byte stream. This is a very interesting
   /// property, useful for individual comparison / information retrieval.
   ///
+  template <class T>
   void individual::pack(const locus &l,
-                        std::vector<std::uint8_t> *const p) const
+                        std::vector<T> *const p) const
   {
     const gene &g(genome_(l));
 
     const opcode_t opcode(g.sym->opcode());
 
-    const std::uint8_t *const s1 = (std::uint8_t *)(&opcode);
-    for (unsigned i(0); i < sizeof(opcode); ++i)
+    const T *const s1 = reinterpret_cast<const T *>(&opcode);
+    for (size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
-      const std::uint8_t *const s2 = (std::uint8_t *)(&g.par);
-      for (unsigned i(0); i < sizeof(g.par); ++i)
+      const T *const s2 = reinterpret_cast<const T *>(&g.par);
+      for (size_t i(0); i < sizeof(g.par); ++i)
         p->push_back(s2[i]);
     }
     else
-      for (unsigned i(0); i < g.sym->arity(); ++i)
+      for (size_t i(0); i < g.sym->arity(); ++i)
+        pack(locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
+             p);
+  }
+
+  ///
+  /// \brief A specialized version of pack for 32bit reading/packaging.
+  ///
+  /// It is slightly simpler (faster?) than pack<T>.
+  ///
+  template <>
+  void individual::pack(const locus &l,
+                        std::vector<std::uint32_t> *const p) const
+  {
+    const gene &g(genome_(l));
+
+    p->push_back(static_cast<std::uint32_t>(g.sym->opcode()));
+
+    if (g.sym->parametric())
+      p->push_back(static_cast<std::uint32_t>(g.par));
+    else
+      for (size_t i(0); i < g.sym->arity(); ++i)
         pack(locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
              p);
   }
@@ -378,133 +401,25 @@ namespace vita
   ///
   /// Converts \c this individual in a packed byte level representation and
   /// performs the MurmurHash3 algorithm on it.
-  /// MurmurHash3 (http://code.google.com/p/smhasher/), by Austin Appleby, is a
-  /// relatively simple non-cryptographic hash algorithm. It is noted for being
-  /// fast, with excellent distribution, avalanche behavior and overall
-  /// collision resistance.
   ///
-  /// \note
-  /// MurmurHash and CityHash are excellent hash functions and are equally
-  /// portable.  In favor of MurmurHash: it's been around for longer and is
-  /// already used in many STL implementations.  In favor of CityHash: it
-  /// performs a bit better than Murmurhash, on average (at least on x86-64
-  /// architectures).
-  ///
-  /// \see
-  /// * http://comments.gmane.org/gmane.comp.compilers.clang.devel/18702
-  /// * http://blog.reverberate.org/2012/01/state-of-hash-functions-2012.html
-  /// * http://code.google.com/p/cityhash/
-  /// * http://code.google.com/p/smhasher/
-  ///
+  template<class T>
   hash_t individual::hash() const
   {
     // From an individual to a packed byte stream...
-    static std::vector<std::uint8_t> packed;
+    static std::vector<T> packed;
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
-    //   std::vector<std::uint8_t> packed;
+    //   std::vector<T> packed;
     //   // static keyword and clear() call deleted.
 
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
+    const unsigned len(packed.size() * sizeof(T));  // Length in bytes
 
-    /// Murmurhash3 follows.
-    const unsigned len(packed.size());
-    const unsigned n_blocks(len / 16);
-
-    const std::uint64_t seed(1973);
-    std::uint64_t h1(seed);
-    std::uint64_t h2(seed);
-
-    const std::uint64_t c1(0x87c37b91114253d5);
-    const std::uint64_t c2(0x4cf5ad432745937f);
-
-    const std::uint64_t *const blocks(
-      reinterpret_cast<const std::uint64_t *>(&packed[0]));
-
-    for (unsigned i(0); i < n_blocks; ++i)
-    {
-      std::uint64_t k1(blocks[i * 2 + 0]);
-      std::uint64_t k2(blocks[i * 2 + 1]);
-
-      k1 *= c1;
-      k1  = ROTL64(k1, 31);
-      k1 *= c2;
-      h1 ^= k1;
-
-      h1 = ROTL64(h1, 27);
-      h1 += h2;
-      h1 = h1*5 + 0x52dce729;
-
-      k2 *= c2;
-      k2  = ROTL64(k2, 33);
-      k2 *= c1;
-      h2 ^= k2;
-
-      h2 = ROTL64(h2, 31);
-      h2 += h1;
-      h2 = h2*5 + 0x38495ab5;
-    }
-
-    const std::uint8_t *const tail(
-      static_cast<const std::uint8_t *>(&packed[0] + n_blocks * 16));
-
-    std::uint64_t k1(0), k2(0);
-
-    switch (len & 15)
-    {
-    case 15: k2 ^= std::uint64_t(tail[14]) << 48;
-    case 14: k2 ^= std::uint64_t(tail[13]) << 40;
-    case 13: k2 ^= std::uint64_t(tail[12]) << 32;
-
-    case 12: k2 ^= std::uint64_t(tail[11]) << 24;
-    case 11: k2 ^= std::uint64_t(tail[10]) << 16;
-    case 10: k2 ^= std::uint64_t(tail[ 9]) << 8;
-    case  9:
-      k2 ^= std::uint64_t(tail[ 8]) << 0;
-      k2 *= c2;
-      k2  = ROTL64(k2, 33);
-      k2 *= c1;
-      h2 ^= k2;
-
-    case  8: k1 ^= std::uint64_t(tail[ 7]) << 56;
-    case  7: k1 ^= std::uint64_t(tail[ 6]) << 48;
-    case  6: k1 ^= std::uint64_t(tail[ 5]) << 40;
-    case  5: k1 ^= std::uint64_t(tail[ 4]) << 32;
-    case  4: k1 ^= std::uint64_t(tail[ 3]) << 24;
-    case  3: k1 ^= std::uint64_t(tail[ 2]) << 16;
-    case  2: k1 ^= std::uint64_t(tail[ 1]) << 8;
-    case  1: k1 ^= std::uint64_t(tail[ 0]) << 0;
-             k1 *= c1;
-             k1  = ROTL64(k1, 31);
-             k1 *= c2;
-             h1 ^= k1;
-    }
-
-    // Finalization.
-    h1 ^= len;
-    h2 ^= len;
-
-    h1 += h2;
-    h2 += h1;
-
-    h1 ^= h1 >> 33;
-    h1 *= 0xff51afd7ed558ccd;
-    h1 ^= h1 >> 33;
-    h1 *= 0xc4ceb9fe1a85ec53;
-    h1 ^= h1 >> 33;
-
-    h2 ^= h2 >> 33;
-    h2 *= 0xff51afd7ed558ccd;
-    h2 ^= h2 >> 33;
-    h2 *= 0xc4ceb9fe1a85ec53;
-    h2 ^= h2 >> 33;
-
-    h1 += h2;
-    h2 += h1;
-
-    return hash_t(h1, h2);
+    hash_t h;
+    vita::hash(packed.data(), len, 1973, h.data);
+    return h;
   }
 
   ///
@@ -583,8 +498,8 @@ namespace vita
       }
 
     // Type checking.
-    for (unsigned i(0); i < size(); ++i)
-      for (unsigned c(0); c < categories; ++c)
+    for (index_t i(0); i < size(); ++i)
+      for (category_t c(0); c < categories; ++c)
       {
         const locus l{{i, c}};
 
@@ -687,7 +602,7 @@ namespace vita
   ///
   void individual::list(std::ostream &s) const
   {
-    const unsigned categories(env_->sset.categories());
+    const size_t categories(env_->sset.categories());
     const unsigned w1(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(size() - 1))));
     const unsigned w2(
@@ -705,7 +620,7 @@ namespace vita
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-      for (unsigned j(0); j < g.sym->arity(); ++j)
+      for (size_t j(0); j < g.sym->arity(); ++j)
         s << ' ' << std::setw(w1) << g.args[j];
 
       s << std::endl;

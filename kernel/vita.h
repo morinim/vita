@@ -52,7 +52,7 @@ namespace vita
   typedef std::shared_ptr<symbol> symbol_ptr;
 
   /// This is the type used as key for symbol identification.
-  typedef std::uint16_t opcode_t;
+  typedef unsigned opcode_t;
 
   /// In an environmnet where a symbol such as + may have many different
   /// meanings, it is useful to specify a "domain of computation" to restrict
