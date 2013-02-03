@@ -63,7 +63,11 @@ sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
 ifeq ($(TYPE), release)
+ifdef MSYSTEM
+	@strip sr/$@.exe
+else
 	@strip sr/$@
+endif
 endif
 
 examples: example1 example2 example3 example4 example5 example6 example7 example8
