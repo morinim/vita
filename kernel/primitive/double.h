@@ -63,7 +63,8 @@ namespace vita
 
       int init() const { return random::between<int>(min, upp); }
 
-      std::string display(int v) const { return std::to_string(v); }
+      std::string display(int v) const
+      { return boost::lexical_cast<std::string>(v); }
 
       any eval(interpreter *i) const
       { return any(static_cast<base_t>(any_cast<int>(i->eval()))); }

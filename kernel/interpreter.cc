@@ -167,11 +167,11 @@ namespace vita
   {
     return
       a.type() == typeid(double) ?
-      std::to_string(any_cast<double>(a)) :
+      boost::lexical_cast<std::string>(any_cast<double>(a)) :
       a.type() == typeid(int) ?
-      std::to_string(any_cast<int>(a)) :
+      boost::lexical_cast<std::string>(any_cast<int>(a)) :
       a.type() == typeid(bool) ?
-      std::to_string(any_cast<bool>(a)) :
+      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
       any_cast<std::string>(a);
   }
 }  // Namespace vita
