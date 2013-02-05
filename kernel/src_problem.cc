@@ -138,7 +138,7 @@ namespace vita
     {
       std::string name(dat_.get_column(i).name);
       if (name.empty())
-        name = "X" + std::to_string(i);
+        name = "X" + boost::lexical_cast<std::string>(i);
 
       const category_t category(dat_.get_column(i).category_id);
       env.insert(std::make_shared<variable>(name, i - 1, category));

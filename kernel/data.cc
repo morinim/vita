@@ -762,7 +762,7 @@ namespace vita
 
             std::string s_domain(is_number(record[field])
                                  ? "numeric"
-                                 : "string" + std::to_string(field));
+                                 : "string" + boost::lexical_cast<std::string>(field));
             // For classification problems we use discriminant functions, so the
             // actual output type is always numeric.
             if (field == 0 && classification)

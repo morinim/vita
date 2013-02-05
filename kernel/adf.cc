@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
+
 #include "adf.h"
 #include "interpreter.h"
 
@@ -31,7 +33,7 @@ namespace vita
   ///
   std::string adf_core::display(const std::string &prefix) const
   {
-    return prefix + std::to_string(id);
+    return prefix + boost::lexical_cast<std::string>(id);
   }
 
   ///

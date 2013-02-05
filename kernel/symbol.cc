@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
+
 #include "symbol.h"
 
 namespace vita
@@ -37,7 +39,7 @@ namespace vita
   {
     assert(parametric());
 
-    return display() + "_" + std::to_string(v);
+    return display() + "_" + boost::lexical_cast<std::string>(v);
   }
 
   ///
