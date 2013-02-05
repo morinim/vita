@@ -123,7 +123,7 @@ namespace vita
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
 
-    assert(context_ && context_->check() && i < gene::k_args &&
+    assert(context_ && context_->debug() && i < gene::k_args &&
            (!context_g.sym->terminal() && context_g.sym->auto_defined()));
 #endif
     return context_->eval(i);
@@ -132,9 +132,9 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool interpreter::check() const
+  bool interpreter::debug() const
   {
-    return ip_[0] < ind_.size() && (!context_ || context_->check());
+    return ip_[0] < ind_.size() && (!context_ || context_->debug());
   }
 
   ///

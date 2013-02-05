@@ -24,7 +24,7 @@ namespace vita
   ///
   population::population(const environment &e) : env_(&e)
   {
-    assert(e.check(true, true));
+    assert(e.debug(true, true));
 
     pop_.reserve(*e.individuals);
     pop_.clear();
@@ -32,16 +32,16 @@ namespace vita
     for (size_t i(0); i < *e.individuals; ++i)
       pop_.emplace_back(e, true);
 
-    assert(check());
+    assert(debug());
   }
 
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool population::check() const
+  bool population::debug() const
   {
     for (size_t i(0); i < size(); ++i)
-      if (!pop_[i].check())
+      if (!pop_[i].debug())
         return false;
 
     return true;

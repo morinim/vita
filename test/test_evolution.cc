@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(Creation)
       }
       */
 
-      BOOST_REQUIRE(evo.check());
+      BOOST_REQUIRE(evo.debug());
     }
 }
 

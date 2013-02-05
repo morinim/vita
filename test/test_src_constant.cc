@@ -27,22 +27,22 @@ BOOST_AUTO_TEST_CASE(Base)
   const bool b(true);
   vita::constant<bool> bc(b);
   BOOST_CHECK_EQUAL(vita::any_cast<bool>(bc.eval(0)), b);
-  BOOST_CHECK(bc.check());
+  BOOST_CHECK(bc.debug());
 
   const int i(1234);
   vita::constant<int> ic(i);
   BOOST_CHECK_EQUAL(vita::any_cast<int>(ic.eval(0)), i);
-  BOOST_CHECK(ic.check());
+  BOOST_CHECK(ic.debug());
 
   const double d(3.14);
   vita::constant<double> dc(d);
   BOOST_CHECK_EQUAL(vita::any_cast<double>(dc.eval(0)), d);
-  BOOST_CHECK(dc.check());
+  BOOST_CHECK(dc.debug());
 
   const std::string s("A STRING CONSTANT");
   vita::constant<std::string> sc(s);
   BOOST_CHECK_EQUAL(vita::any_cast<std::string>(sc.eval(0)), s);
-  BOOST_CHECK(sc.check());
+  BOOST_CHECK(sc.debug());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

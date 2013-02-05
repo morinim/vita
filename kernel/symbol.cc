@@ -45,7 +45,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool symbol::check() const
+  bool symbol::debug() const
   {
     return display_.size() > 0;
   }

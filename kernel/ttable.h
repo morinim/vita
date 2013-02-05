@@ -84,7 +84,7 @@ namespace vita
     /// \return number of successful searches in the hash table.
     std::uintmax_t hits() const { return hits_; }
 
-    bool check() const;
+    bool debug() const;
 
   private:
     struct slot

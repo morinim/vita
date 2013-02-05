@@ -68,7 +68,7 @@ namespace vita
 
     const environment &env() const { return *env_; }
 
-    bool check(bool = true) const;
+    bool debug(bool = true) const;
 
     ///
     /// \param[in] l locus of a \c gene.

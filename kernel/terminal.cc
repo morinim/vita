@@ -31,14 +31,14 @@ namespace vita
                      unsigned w)
     : symbol(dis, c, w), parametric_(par), input_(in)
   {
-    assert(check());
+    assert(debug());
   }
 
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool terminal::check() const
+  bool terminal::debug() const
   {
-    return symbol::check();
+    return symbol::debug();
   }
 }  // Namespace vita

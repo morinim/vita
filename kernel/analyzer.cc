@@ -3,7 +3,7 @@
  *  \file analyzer.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -78,7 +78,7 @@ namespace vita
   ///
   const distribution<fitness_t> &analyzer::fit_dist() const
   {
-    assert(fit_.check());
+    assert(fit_.debug());
 
     return fit_;
   }
@@ -88,7 +88,7 @@ namespace vita
   ///
   const distribution<double> &analyzer::length_dist() const
   {
-    assert(length_.check());
+    assert(length_.debug());
 
     return length_;
   }
@@ -151,12 +151,12 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool analyzer::check() const
+  bool analyzer::debug() const
   {
     for (const_iterator i(begin()); i != end(); ++i)
       if (i->second.counter[true] > i->second.counter[false])
         return false;
 
-    return fit_.check() && length_.check();
+    return fit_.debug() && length_.debug();
   }
 }  // namespace vita

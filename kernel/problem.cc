@@ -3,7 +3,7 @@
  *  \file problem.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -54,8 +54,8 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool problem::check(bool verbose) const
+  bool problem::debug(bool verbose) const
   {
-    return env.check(verbose, false);
+    return env.debug(verbose, false);
   }
 }  // namespace vita

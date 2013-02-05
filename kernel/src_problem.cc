@@ -411,12 +411,12 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool src_problem::check(bool verbose) const
+  bool src_problem::debug(bool verbose) const
   {
-    if (!problem::check(verbose))
+    if (!problem::debug(verbose))
       return false;
 
-    if (!dat_.check())
+    if (!dat_.debug())
       return false;
 
     if (p_symre > k_max_evaluator)

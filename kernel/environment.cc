@@ -27,7 +27,7 @@ namespace vita
   ///
   /// \param[in] initialize if \c true initializes every parameter in such a
   ///                       way as to allow the object to pass
-  ///                       environment::check().
+  ///                       environment::debug().
   ///
   /// Class constructor. Default values are quite standard, but specific
   /// problems need ad-hoc tuning.
@@ -59,10 +59,10 @@ namespace vita
       arl = false;
       validation_ratio = 0.2;
 
-      assert(check(true, true));
+      assert(debug(true, true));
     }
     else
-      assert(check(true, false));
+      assert(debug(true, false));
   }
 
   ///
@@ -117,7 +117,7 @@ namespace vita
   ///                      the test.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool environment::check(bool verbose, bool force_defined) const
+  bool environment::debug(bool verbose, bool force_defined) const
   {
     if (force_defined && !code_length)
     {
@@ -251,6 +251,6 @@ namespace vita
       return false;
     }
 
-    return sset.check();
+    return sset.debug();
   }
 }  // Namespace vita

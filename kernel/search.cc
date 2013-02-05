@@ -31,9 +31,9 @@ namespace vita
   ///
   search::search(problem *const prob) : env_(prob->env), prob_(prob)
   {
-    assert(prob->check(true));
+    assert(prob->debug(true));
 
-    assert(check(true));
+    assert(debug(true));
   }
 
   ///
@@ -338,7 +338,7 @@ namespace vita
     if (boost::indeterminate(constrained.arl))
       env_.arl = dflt.arl;
 
-    assert(env_.check(true, true));
+    assert(env_.debug(true, true));
   }
 
   ///
@@ -577,8 +577,8 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool search::check(bool verbose) const
+  bool search::debug(bool verbose) const
   {
-    return prob_->check(verbose);
+    return prob_->debug(verbose);
   }
 }  // namespace vita

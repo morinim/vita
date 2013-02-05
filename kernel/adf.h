@@ -53,7 +53,7 @@ namespace vita
 
     std::string display(const std::string &) const;
 
-    bool check() const;
+    bool debug() const;
 
   private: // Data members
     unsigned     id;
@@ -77,7 +77,7 @@ namespace vita
 
     bool auto_defined() const;
 
-    virtual bool check() const;
+    virtual bool debug() const;
 
   private:  // Private data members.
     adf_core core_;
@@ -99,7 +99,7 @@ namespace vita
 
     bool auto_defined() const;
 
-    virtual bool check() const;
+    virtual bool debug() const;
 
   private:  // Private data members.
     adf_core core_;

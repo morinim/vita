@@ -43,7 +43,7 @@ namespace vita
 
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) = 0;
 
-    virtual bool check(bool) const;
+    virtual bool debug(bool) const;
 
   public:  // Public data members.
     environment env;

@@ -39,7 +39,7 @@ namespace vita
   ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
-  bool adf_core::check() const
+  bool adf_core::debug() const
   {
     return code.eff_size() >= 2;
   }
@@ -52,9 +52,9 @@ namespace vita
   adf::adf(const individual &ind, const std::vector<category_t> &sv, unsigned w)
     : function("ADF", ind.category(), sv, w), core_(ind)
   {
-    assert(ind.check() && ind.eff_size() >= 2);
+    assert(ind.debug() && ind.eff_size() >= 2);
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -96,14 +96,14 @@ namespace vita
   ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
-  bool adf::check() const
+  bool adf::debug() const
   {
     // No recursive calls.
     for (individual::const_iterator i(core_.code); i(); ++i)
       if (i->sym.get() == this)
         return false;
 
-    return core_.check() && function::check();
+    return core_.debug() && function::debug();
   }
 
   ///
@@ -113,9 +113,9 @@ namespace vita
   adt::adt(const individual &ind, unsigned w)
     : terminal("ADT", ind.category(), false, false, w), core_(ind)
   {
-    assert(ind.check() && ind.eff_size() >= 2);
+    assert(ind.debug() && ind.eff_size() >= 2);
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -156,13 +156,13 @@ namespace vita
   ///
   /// \return \c true if the \a object passes the internal consistency check.
   ///
-  bool adt::check() const
+  bool adt::debug() const
   {
     // No recursive calls.
     for (individual::const_iterator i(core_.code); i(); ++i)
       if (i->sym.get() == this)
         return false;
 
-    return core_.check() && terminal::check();
+    return core_.debug() && terminal::debug();
   }
 }  // Namespace vita

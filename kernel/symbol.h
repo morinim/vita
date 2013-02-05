@@ -64,7 +64,7 @@ namespace vita
     /// (it is implementation specific).
     virtual any eval(interpreter *) const = 0;
 
-    virtual bool check() const;
+    virtual bool debug() const;
 
   public:  // Public data members.
     /// Weights is used by the symbol_set::roulette method to control the
@@ -90,7 +90,7 @@ namespace vita
   symbol::symbol(const std::string &dis, category_t c, unsigned w)
     : weight(w), opcode_(opc_count_++), category_(c), display_(dis)
   {
-    assert(check());
+    assert(debug());
   }
 
   ///

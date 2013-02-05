@@ -52,7 +52,7 @@ namespace vita
   {
     clear();
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -67,7 +67,7 @@ namespace vita
     clear();
     open(filename);
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -89,7 +89,7 @@ namespace vita
 
     active_dataset_ = training;
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -684,7 +684,7 @@ namespace vita
         }
       }
 
-    return check() ? parsed : 0;
+    return debug() ? parsed : 0;
   }
 
   ///
@@ -825,7 +825,7 @@ namespace vita
       }
     }
 
-    return check() ? parsed : 0;
+    return debug() ? parsed : 0;
   }
 
   ///
@@ -872,7 +872,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool data::check() const
+  bool data::debug() const
   {
     const size_t cl_size(classes());
     // If this is a classification problem then there should be at least two

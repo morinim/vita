@@ -31,7 +31,7 @@ namespace vita
   {
   public:
     explicit lambda_f(const individual &ind) : ind_(ind)
-    { assert(ind.check()); }
+    { assert(ind.debug()); }
 
     virtual any operator()(const data::example &) const;
 

@@ -56,7 +56,7 @@ namespace vita
     size_t terminals(category_t) const;
 
     bool enough_terminals() const;
-    bool check() const;
+    bool debug() const;
 
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
@@ -87,7 +87,7 @@ namespace vita
       // The sum of the weights of all the symbols in the collection.
       std::uintmax_t sum;
 
-      bool check() const;
+      bool debug() const;
     } all_;
 
     // This struct contains all the symbols (\a all_) divided by category.
@@ -95,7 +95,7 @@ namespace vita
     {
       explicit by_category(const collection & = collection());
 
-      bool check() const;
+      bool debug() const;
 
       std::vector<collection> category;
     } by_;

@@ -43,14 +43,14 @@ namespace vita
     // for (size_t i(arity()); i < gene::k_args; ++i)
     //   argt_[i] = std::numeric_limits<category_t>::max();
 
-    assert(check());
+    assert(debug());
   }
 
   ///
   /// \return \c true if the \a function passes the internal consistency check.
   ///
-  bool function::check() const
+  bool function::debug() const
   {
-    return arity_ && arity_ <= gene::k_args && symbol::check();
+    return arity_ && arity_ <= gene::k_args && symbol::debug();
   }
 }  // Namespace vita

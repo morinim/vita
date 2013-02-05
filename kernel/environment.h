@@ -45,7 +45,7 @@ namespace vita
 
     void insert(const symbol_ptr &);
 
-    bool check(bool, bool) const;
+    bool debug(bool, bool) const;
 
   public:  // Data members.
     /// The number of genes (maximum length of an evolved program in the

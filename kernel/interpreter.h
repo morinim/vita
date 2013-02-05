@@ -35,7 +35,7 @@ namespace vita
     any eval(size_t);
     any eval_adf_arg(size_t);
 
-    bool check() const;
+    bool debug() const;
 
     static double to_double(const any &);
     static std::string to_string(const any &);

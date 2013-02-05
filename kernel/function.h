@@ -59,7 +59,7 @@ namespace vita
     ///
     virtual size_t arity() const { assert(arity_); return arity_; }
 
-    virtual bool check() const;
+    virtual bool debug() const;
 
     ///
     /// \param[in] s symbol pointer.

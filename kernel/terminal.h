@@ -53,7 +53,7 @@ namespace vita
     ///
     virtual size_t arity() const { return 0; }
 
-    virtual bool check() const;
+    virtual bool debug() const;
 
   public:   // Public data members.
     static unsigned default_weight;

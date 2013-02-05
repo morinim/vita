@@ -86,7 +86,7 @@ namespace vita
         } while (++i < *env.brood_recombination);
       }
 
-      assert(off.check());
+      assert(off.debug());
       return {off};
     }
     else // !crossover
@@ -94,7 +94,7 @@ namespace vita
       individual off(pop[random::boolean() ? r1 : r2]);
       stats_->mutations += off.mutation();
 
-      assert(off.check());
+      assert(off.debug());
       return {off};
     }
   }

@@ -44,7 +44,7 @@ namespace vita
 
     void add(T, T);
 
-    bool check() const;
+    bool ::debug() const;
 
     T cov;
 

@@ -84,7 +84,7 @@ namespace vita
     fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
 
-    bool check() const;
+    bool debug() const;
 
     selection_strategy::ptr     selection;
     operation_strategy::ptr     operation;

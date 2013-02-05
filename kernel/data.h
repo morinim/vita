@@ -144,7 +144,7 @@ namespace vita
 
     std::string class_name(unsigned) const;
 
-    bool check() const;
+    bool debug() const;
 
     static const std::map<const std::string, domain_t> from_weka;
 

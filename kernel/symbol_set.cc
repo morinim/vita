@@ -32,7 +32,7 @@ namespace vita
     for (size_t i(0); i < gene::k_args; ++i)
       arguments_[i] = std::make_shared<argument>(i);
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -83,7 +83,7 @@ namespace vita
   ///
   void symbol_set::insert(const symbol_ptr &i)
   {
-    assert(i && i->weight && i->check());
+    assert(i && i->weight && i->debug());
 
     all_.symbols.push_back(i);
     all_.sum += i->weight;
@@ -332,13 +332,13 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool symbol_set::check() const
+  bool symbol_set::debug() const
   {
-    if (!all_.check())
+    if (!all_.debug())
       return false;
 
     for (size_t i(0); i < by_.category.size(); ++i)
-      if (!by_.category[i].check())
+      if (!by_.category[i].debug())
         return false;
 
     return enough_terminals();
@@ -360,13 +360,13 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool symbol_set::collection::check() const
+  bool symbol_set::collection::debug() const
   {
     std::uintmax_t check_sum(0);
 
     for (size_t j(0); j < symbols.size(); ++j)
     {
-      if (!symbols[j]->check())
+      if (!symbols[j]->debug())
         return false;
 
       check_sum += symbols[j]->weight;
@@ -440,13 +440,13 @@ namespace vita
                 [](const symbol_ptr &s1, const symbol_ptr &s2)
                 { return s1->weight > s2->weight; });
 
-    assert(check());
+    assert(debug());
   }
 
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool symbol_set::by_category::check() const
+  bool symbol_set::by_category::debug() const
   {
     for (size_t t(0); t < category.size(); ++t)
     {
@@ -458,7 +458,7 @@ namespace vita
       if (s < category[t].adt.size())
         return false;
 
-      if (!category[t].check())
+      if (!category[t].debug())
         return false;
     }
 

@@ -38,7 +38,7 @@ namespace vita
     : genome_(*e.code_length, e.sset.categories()),
       signature_(), best_(locus{{0, 0}}), env_(&e)
   {
-    assert(e.check(true, true));
+    assert(e.debug(true, true));
 
     if (gen)  // random generate initial code
     {
@@ -59,7 +59,7 @@ namespace vita
       for (category_t c(0); c < categories; ++c)
         genome_(sup, c) = gene(e.sset.roulette_terminal(c));
 
-      assert(check(true));
+      assert(debug(true));
     }
   }
 
@@ -90,7 +90,7 @@ namespace vita
     ret.best_ = l;
     ret.signature_.clear();
 
-    assert(ret.check());
+    assert(ret.debug());
     return ret;
   }
 
@@ -166,7 +166,7 @@ namespace vita
         set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 */
-    assert(check());
+    assert(debug());
 
     return n;
   }
@@ -212,7 +212,7 @@ namespace vita
 
     ret.signature_.clear();
 
-    assert(ret.check());
+    assert(ret.debug());
     return ret;
   }
 
@@ -244,7 +244,7 @@ namespace vita
     for (category_t c(0); c < categories; ++c)
       ret.set(locus{{index, c}}, gene(env_->sset.roulette_terminal(c)));
 
-    assert(ret.check());
+    assert(ret.debug());
     return ret;
   }
 
@@ -296,7 +296,7 @@ namespace vita
     }
 
     assert(!loci || (loci->size() && loci->size() <= max_args));
-    assert(ret.check());
+    assert(ret.debug());
 
     return ret;
   }
@@ -441,7 +441,7 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the individual passes the internal consistency check.
   ///
-  bool individual::check(bool verbose) const
+  bool individual::debug(bool verbose) const
   {
     const unsigned categories(env_->sset.categories());
 
@@ -534,7 +534,7 @@ namespace vita
     }
 
     return
-      env_->check(verbose, true) &&
+      env_->debug(verbose, true) &&
       (signature_.empty() || signature_ == hash());
   }
 
@@ -848,8 +848,8 @@ namespace vita
   ///
   individual uniform_crossover(const individual &p1, const individual &p2)
   {
-    assert(p1.check());
-    assert(p2.check());
+    assert(p1.debug());
+    assert(p2.debug());
 
     individual offspring(p1);
 
@@ -872,7 +872,7 @@ namespace vita
           offspring.set(l, p2[l]);
         }
 */
-    assert(offspring.check(true));
+    assert(offspring.debug(true));
     return offspring;
   }
 
@@ -889,8 +889,8 @@ namespace vita
   ///
   individual one_point_crossover(const individual &p1, const individual &p2)
   {
-    assert(p1.check());
-    assert(p2.check());
+    assert(p1.debug());
+    assert(p2.debug());
     assert(p1.size() == p2.size());
 
     const unsigned cs(p1.size());
@@ -910,7 +910,7 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    assert(offspring.check());
+    assert(offspring.debug());
     return offspring;
   }
 
@@ -928,8 +928,8 @@ namespace vita
   ///
   individual two_point_crossover(const individual &p1, const individual &p2)
   {
-    assert(p1.check());
-    assert(p2.check());
+    assert(p1.debug());
+    assert(p2.debug());
     assert(p1.size() == p2.size());
 
     const unsigned cs(p1.size());
@@ -950,7 +950,7 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    assert(offspring.check());
+    assert(offspring.debug());
     return offspring;
   }
 }  // Namespace vita

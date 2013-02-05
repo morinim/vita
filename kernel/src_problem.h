@@ -53,7 +53,7 @@ namespace vita
     size_t classes() const;
     size_t variables() const;
 
-    virtual bool check(bool) const;
+    virtual bool debug(bool) const;
 
   public:  // Public data members.
     // Preferred evaluator for symbolic regression.

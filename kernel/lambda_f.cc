@@ -37,8 +37,8 @@ namespace vita
     : slot_matrix(d.classes() * x_slot, d.classes()),
       slot_class(d.classes() * x_slot), dataset_size(0)
   {
-    assert(ind.check());
-    assert(d.check());
+    assert(ind.debug());
+    assert(d.debug());
     assert(d.classes() > 1);
     assert(x_slot);
 
@@ -102,7 +102,7 @@ namespace vita
   size_t dyn_slot_engine::slot(const individual &ind,
                                const data::example &e) const
   {
-    assert(ind.check());
+    assert(ind.debug());
 
     src_interpreter agent(ind);
     const any res(agent.run(e));
@@ -151,8 +151,8 @@ namespace vita
                                        size_t x_slot)
     : lambda_f(ind), class_name_(d.classes() * x_slot)
   {
-    assert(ind.check());
-    assert(d.check());
+    assert(ind.debug());
+    assert(d.debug());
     assert(d.classes() > 1);
     assert(x_slot);
 
@@ -186,7 +186,7 @@ namespace vita
   gaussian_engine::gaussian_engine(const individual &ind, data &d)
     : gauss_dist(d.classes())
   {
-    assert(ind.check());
+    assert(ind.debug());
     assert(d.classes() > 1);
 
     src_interpreter agent(ind);
@@ -271,8 +271,8 @@ namespace vita
   gaussian_lambda_f::gaussian_lambda_f(const individual &ind, data &d)
     : lambda_f(ind), class_name_(d.classes())
   {
-    assert(ind.check());
-    assert(d.check());
+    assert(ind.debug());
+    assert(d.debug());
     assert(d.classes() > 1);
 
     // Use the training set for lambdification.

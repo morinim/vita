@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(Base)
   BOOST_CHECK_EQUAL(t.associative(), false);
   BOOST_CHECK_EQUAL(t.arity(), 0);
   BOOST_CHECK_EQUAL(t.auto_defined(), false);
-  BOOST_CHECK(t.check());
+  BOOST_CHECK(t.debug());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

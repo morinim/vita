@@ -38,7 +38,7 @@ namespace vita
     T standard_deviation() const;
     T entropy() const;
 
-    bool check() const;
+    bool debug() const;
 
     std::uintmax_t count;
 
@@ -157,7 +157,7 @@ namespace vita
   /// \return \c true if the object passes the internal consistency check.
   ///
   template<class T>
-  bool distribution<T>::check() const
+  bool distribution<T>::debug() const
   {
     return
       (!std::isfinite(min) || !std::isfinite(mean) ||

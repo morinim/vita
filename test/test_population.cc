@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(Creation)
   BOOST_REQUIRE_EQUAL(*env.code_length, pop.size());
 
   for (size_t i(0); i < pop.size(); ++i)
-    BOOST_CHECK(pop[i].check());
+    BOOST_CHECK(pop[i].debug());
 }
 
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     vita::population pop2(env);
     BOOST_REQUIRE(pop2.load(ss));
-    BOOST_REQUIRE(pop2.check());
+    BOOST_REQUIRE(pop2.debug());
 
     BOOST_REQUIRE_EQUAL(pop1.size(), pop2.size());
     for (size_t i(0); i < pop1.size(); ++i)

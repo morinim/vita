@@ -53,7 +53,7 @@ namespace vita
                                  s.gen > *pop_.env().g_since_start;
                         };
 
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -327,9 +327,9 @@ namespace vita
   ///
   /// \return true if the object passes the internal consistency check.
   ///
-  bool evolution::check() const
+  bool evolution::debug() const
   {
-    return pop_.check() && eva_ && stop_condition_;
+    return pop_.debug() && eva_ && stop_condition_;
   }
 
   ///

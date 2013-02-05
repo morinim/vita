@@ -55,7 +55,7 @@ namespace vita
     : k_mask((1 << bits) - 1), table_(new slot[1 << bits]), period_(1),
       probes_(0), hits_(0)
   {
-    assert(check());
+    assert(debug());
   }
 
   ///
@@ -140,7 +140,7 @@ namespace vita
   ///
   /// \return \c true if the table passes the internal consistency check.
   ///
-  bool ttable::check() const
+  bool ttable::debug() const
   {
     return probes() >= hits();
   }

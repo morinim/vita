@@ -38,7 +38,7 @@ namespace vita
 
     individual run(bool = true, unsigned = 1);
 
-    bool check(bool) const;
+    bool debug(bool) const;
 
   private:
     void dss(unsigned) const;

@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(Compact)
     const vita::individual i2(i1.compact());
 
     std::cout << i1 << std::endl << i2 << std::endl;
-    BOOST_REQUIRE(i1.check(true));
+    BOOST_REQUIRE(i1.debug(true));
 
     const boost::any v1( (vita::interpreter(i1))() );
     const boost::any v2( (vita::interpreter(i2))() );
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     vita::individual i(env, true);
     // std::cout << i << std::endl;
 
-    BOOST_REQUIRE(i.check());
+    BOOST_REQUIRE(i.debug());
     BOOST_REQUIRE_EQUAL(i.size(), l);
   }
 }
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     vita::individual i2(env, false);
     BOOST_REQUIRE(i2.load(ss));
-    BOOST_REQUIRE(i2.check());
+    BOOST_REQUIRE(i2.debug());
 
     BOOST_CHECK_EQUAL(i1, i2);
   }

@@ -217,7 +217,7 @@ namespace vita
   ///
   score_t dyn_slot_evaluator::operator()(const individual &ind)
   {
-    assert(ind.check());
+    assert(ind.debug());
     assert(dat_->classes() > 1);
 
     engine_ = dyn_slot_engine(ind, *dat_, x_slot_);
@@ -256,7 +256,7 @@ namespace vita
   ///
   score_t gaussian_evaluator::operator()(const individual &ind)
   {
-    assert(ind.check());
+    assert(ind.debug());
     assert(dat_->classes() > 1);
     gaussian_engine engine_(ind, *dat_);
 
