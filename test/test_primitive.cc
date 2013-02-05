@@ -14,100 +14,19 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "environment.h"
 #include "individual.h"
-#include "interpreter.h"
 #include "random.h"
-#include "terminal.h"
-#include "primitive/factory.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE primitive
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+
+#include "factory_fixture3.h"
 #endif
 
-struct F_PRI
-{
-  class Z : public vita::terminal
-  {
-  public:
-    Z() : vita::terminal("Z", 0, true) {}
-
-    vita::any eval(vita::interpreter *) const { return vita::any(val); }
-
-    double val;
-  };
-
-  F_PRI() : env(true), l0(vita::locus{{0, 0}})
-  {
-    BOOST_TEST_MESSAGE("Setup fixture");
-
-    static vita::symbol_factory &factory(vita::symbol_factory::instance());
-
-    c0 = factory.make("0.0", {});
-    c1 = factory.make("1.0", {});
-    c2 = factory.make("2.0", {});
-    c3 = factory.make("3.0", {});
-    x = factory.make("123.0", {});
-    neg_x = factory.make("-123.0", {});
-    y = factory.make("321.0", {});
-    z = std::make_shared<Z>();
-    f_abs = factory.make("FABS", {});
-    f_add = factory.make("FADD", {});
-    f_div = factory.make("FDIV", {});
-    f_idiv = factory.make("FIDIV", {});
-    f_ln = factory.make("FLN", {});
-    f_mul = factory.make("FMUL", {});
-    f_sub = factory.make("FSUB", {});
-
-    env.insert(c0);
-    env.insert(c1);
-    env.insert(c2);
-    env.insert(c3);
-    env.insert(x);
-    env.insert(neg_x);
-    env.insert(y);
-    env.insert(z);
-    env.insert(f_abs);
-    env.insert(f_add);
-    env.insert(f_div);
-    env.insert(f_idiv);
-    env.insert(f_mul);
-    env.insert(f_sub);
-    env.code_length = 32;
-  }
-
-  ~F_PRI()
-  {
-    BOOST_TEST_MESSAGE("Teardown fixture");
-  }
-
-  vita::symbol_ptr c0;
-  vita::symbol_ptr c1;
-  vita::symbol_ptr c2;
-  vita::symbol_ptr c3;
-  vita::symbol_ptr x;
-  vita::symbol_ptr neg_x;
-  vita::symbol_ptr y;
-  vita::symbol_ptr z;
-
-  vita::symbol_ptr f_abs;
-  vita::symbol_ptr f_add;
-  vita::symbol_ptr f_div;
-  vita::symbol_ptr f_idiv;
-  vita::symbol_ptr f_ln;
-  vita::symbol_ptr f_mul;
-  vita::symbol_ptr f_sub;
-
-  vita::environment env;
-  vita::any ret;
-
-  const vita::locus l0;
-};
-
-BOOST_FIXTURE_TEST_SUITE(primitive, F_PRI)
+BOOST_FIXTURE_TEST_SUITE(primitive, F_FACTORY3)
 
 BOOST_AUTO_TEST_CASE(ABS)
 {

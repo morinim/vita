@@ -44,6 +44,9 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
+  private:  // Private support methods.
+    
+
   private:  // Private data members.
     std::vector<individual> pop_;
 

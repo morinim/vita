@@ -14,43 +14,18 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "environment.h"
 #include "evolution.h"
-#include "primitive/factory.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE evolution
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+
+#include "factory_fixture2.h"
 #endif
 
-struct F_EVO
-{
-  F_EVO() : env(true)
-  {
-    BOOST_TEST_MESSAGE("Setup fixture");
-
-    vita::symbol_factory &factory(vita::symbol_factory::instance());
-
-    env.insert(factory.make("REAL", {}));
-    env.insert(factory.make("FADD", {}));
-    env.insert(factory.make("FSUB", {}));
-    env.insert(factory.make("FMUL", {}));
-    env.insert(factory.make("FIFL", {}));
-    env.insert(factory.make("FIFE", {}));
-  }
-
-  ~F_EVO()
-  {
-    BOOST_TEST_MESSAGE("Teardown fixture");
-  }
-
-  vita::environment env;
-};
-
-
-BOOST_FIXTURE_TEST_SUITE(evolution, F_EVO)
+BOOST_FIXTURE_TEST_SUITE(evolution, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(Creation)
 {

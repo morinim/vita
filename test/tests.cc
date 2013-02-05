@@ -18,6 +18,10 @@
 
 using namespace boost;
 
+#include "factory_fixture1.h"
+#include "factory_fixture2.h"
+#include "factory_fixture3.h"
+
 #include "test_evolution.cc"
 #include "test_individual.cc"
 #include "test_population.cc"

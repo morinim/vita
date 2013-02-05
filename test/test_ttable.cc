@@ -25,32 +25,9 @@
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
+
+#include "factory_fixture2.h"
 #endif
-
-struct F_TTA
-{
-  F_TTA() : env(true), cache(16)
-  {
-    BOOST_TEST_MESSAGE("Setup fixture");
-
-    vita::symbol_factory &factory(vita::symbol_factory::instance());
-
-    env.insert(factory.make("REAL", {}));
-    env.insert(factory.make("FADD", {}));
-    env.insert(factory.make("FSUB", {}));
-    env.insert(factory.make("FMUL", {}));
-    env.insert(factory.make("FIFL", {}));
-    env.insert(factory.make("FIFE", {}));
-  }
-
-  ~F_TTA()
-  {
-    BOOST_TEST_MESSAGE("Teardown fixture");
-  }
-
-  vita::environment env;
-  vita::ttable cache;
-};
 
 
 BOOST_AUTO_TEST_SUITE(hash)
@@ -99,10 +76,11 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 
-BOOST_FIXTURE_TEST_SUITE(ttable, F_TTA)
+BOOST_FIXTURE_TEST_SUITE(ttable, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
+  vita::ttable cache(16);
   env.code_length = 64;
 
   const unsigned n(6000);
@@ -121,6 +99,7 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
 BOOST_AUTO_TEST_CASE(CollisionDetection)
 {
+  vita::ttable cache(14);
   env.code_length = 64;
 
   const unsigned n(1000);
