@@ -36,8 +36,9 @@ REQUIREMENTS
 
   ### Windows requirements ###
 
-  * A C++11-standard-compliant compiler (or, at least, partially compatible:
-    e.g. MinGW / Cygwin).
+  * MinGW/MSYS with a C++11-standard-compliant compiler (or, at least,
+    partially compatible: e.g. gcc v4.7.x or newer, clang 3.2 or newer).
+  * Boost library (<http://www.boost.org>)
   * Python v3 (for some functionalities)
 
 GETTING THE SOURCE
@@ -106,11 +107,15 @@ SETTING UP THE BUILD
   * To build all:                             make
   * To build the kernel library (libvita.a):  make kernel
   * To build the sr tool:                     make sr
-  * To build test <n>:                        make test<n>
+  * To build tests:                           make tests
   * To build example <n>:                     make example<n>
 
   If you see errors, try to tweak the contents of Makefile to make them go
   away.
+  The default compiler is clang++, to use gcc/g++ type:
+
+    make CXX=g++
+
   All output files will per default be stored together with the source code.
 
   ### Additional instructions for building Boost on MinGW / MSYS ###
