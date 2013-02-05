@@ -123,12 +123,6 @@ namespace vita
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
   private:  // Private data members.
-    // Starting point of the active code in this individual (the best sequence
-    // of genes is starting here).
-    locus best_;
-
-    const environment *env_;
-
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
     matrix<gene> genome_;
@@ -137,6 +131,12 @@ namespace vita
     // have the same signature. This is a very interesting  property, useful
     // for individual comparison, information retrieval, entropy calculation...
     mutable hash_t signature_;
+
+    // Starting point of the active code in this individual (the best sequence
+    // of genes is starting here).
+    locus best_;
+
+    const environment *env_;
   };  // class individual
 
 

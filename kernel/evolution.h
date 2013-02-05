@@ -37,18 +37,6 @@ namespace vita
     void clear();
 
   public:  // Data members.
-    std::uintmax_t ttable_probes;
-    std::uintmax_t   ttable_hits;
-
-    std::uintmax_t  mutations;
-    std::uintmax_t crossovers;
-
-    double speed;
-
-    unsigned gen;
-    unsigned testset;
-    unsigned last_imp;
-
     analyzer az;
 
     struct best_
@@ -56,7 +44,20 @@ namespace vita
       individual ind;
       score_t  score;
     };
+
     boost::optional<best_> best;
+
+    double speed;
+
+    std::uintmax_t ttable_probes;
+    std::uintmax_t   ttable_hits;
+
+    std::uintmax_t  mutations;
+    std::uintmax_t crossovers;
+
+    unsigned gen;
+    unsigned testset;
+    unsigned last_imp;
   };
 
   ///

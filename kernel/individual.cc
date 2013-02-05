@@ -35,9 +35,8 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, bool gen)
-    : best_(locus{{0, 0}}), env_(&e),
-      genome_(*e.code_length, e.sset.categories()),
-      signature_()
+    : genome_(*e.code_length, e.sset.categories()),
+      signature_(), best_(locus{{0, 0}}), env_(&e)
   {
     assert(e.check(true, true));
 

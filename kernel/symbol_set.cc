@@ -111,9 +111,9 @@ namespace vita
   {
     for (size_t i(0); i < adts(); ++i)
     {
-      const unsigned w(all_.adt[i]->weight);
-      const unsigned delta(w >  1 ? w/2 :
-                           w == 1 ? 1 : 0);
+      const auto w(all_.adt[i]->weight);
+      const auto delta(w >  1 ? w/2 :
+                       w == 1 ?   1 : 0);
       all_.sum -= delta;
       all_.adt[i]->weight -= delta;
 
@@ -137,9 +137,9 @@ namespace vita
 
     for (size_t i(0); i < all_.adf.size(); ++i)
     {
-      const unsigned w(all_.adf[i]->weight);
-      const unsigned delta(w >  1 ? w/2 :
-                           w == 1 ? 1 : 0);
+      const auto w(all_.adf[i]->weight);
+      const auto delta(w >  1 ? w/2 :
+                       w == 1 ?   1 : 0);
       all_.sum -= delta;
       all_.adf[i]->weight -= delta;
     }
@@ -309,25 +309,24 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
-    for (auto i(ss.all_.symbols.begin()); i != ss.all_.symbols.end(); ++i)
+    for (const symbol_ptr &s : ss.all_.symbols)
     {
-      o << (*i)->display();
+      o << s->display();
 
-      const unsigned arity((*i)->arity());
+      const size_t arity(s->arity());
       if (arity)
         o << '(';
-      for (unsigned j(0); j < arity; ++j)
-        o << function::cast(*i)->arg_category(j) << (j+1 == arity ? "" : ", ");
+      for (size_t j(0); j < arity; ++j)
+        o << function::cast(s)->arg_category(j) << (j+1 == arity ? "" : ", ");
       if (arity)
         o << ')';
 
-        o << " -> " << (*i)->category() << " (opcode "
-          << (*i)->opcode() << ", parametric " << (*i)->parametric()
-          << ", weight " << (*i)->weight << ")" << std::endl;
+        o << " -> " << s->category() << " (opcode " << s->opcode()
+          << ", parametric " << s->parametric()
+          << ", weight " << s->weight << ")" << std::endl;
     }
-    o << "Sum: " << ss.all_.sum << std::endl;
 
-    return o;
+    return o << "Sum: " << ss.all_.sum << std::endl;
   }
 
   ///

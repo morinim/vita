@@ -32,8 +32,8 @@ namespace vita
     any run(const locus &);
 
     any eval();
-    any eval(unsigned);
-    any eval_adf_arg(unsigned);
+    any eval(size_t);
+    any eval_adf_arg(size_t);
 
     bool check() const;
 

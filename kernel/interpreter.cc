@@ -77,7 +77,7 @@ namespace vita
   /// \li
   /// [http://en.wikipedia.org/wiki/Memoization]
   ///
-  any interpreter::eval(unsigned i)
+  any interpreter::eval(size_t i)
   {
     const gene &g(ind_[ip_]);
 
@@ -118,7 +118,7 @@ namespace vita
   /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the curren ADF function.
   ///
-  any interpreter::eval_adf_arg(unsigned i)
+  any interpreter::eval_adf_arg(size_t i)
   {
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
