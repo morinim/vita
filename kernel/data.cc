@@ -238,13 +238,13 @@ namespace vita
       // The requested validation examples are selected (the algorithm hint is
       // due to Kyle Cronin)...
       //
-      // "Iterate through and for each element make the probability of
-      //  selection = (number needed)/(number left)
-      //
-      //  So if you had 40 items, the first would have a 5/40 chance of being
-      //  selected. If it is, the next has a 4/39 chance, otherwise it has a
-      //  5/39 chance. By the time you get to the end you will have your 5
-      //  items, and often you'll have all of them before that".
+      // > Iterate through and for each element make the probability of
+      // >  selection = (number needed)/(number left)
+      // >
+      // > So if you had 40 items, the first would have a 5/40 chance of being
+      // > selected. If it is, the next has a 4/39 chance, otherwise it has a
+      // > 5/39 chance. By the time you get to the end you will have your 5
+      // > items, and often you'll have all of them before that".
       size_t available(dataset_[training].size());
 
       const size_t k(available * r);
@@ -454,7 +454,7 @@ namespace vita
   /// \param[in] d what type should \a s be converted in?
   /// \return the converted data.
   ///
-  /// convert("123.1", sym_double) == 123.1f
+  /// convert("123.1", sym_double) == double(123.1)
   ///
   data::example::value_t data::convert(const std::string &s, domain_t d)
   {

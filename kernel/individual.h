@@ -40,6 +40,7 @@ namespace vita
   public:
     individual(const environment &, bool);
 
+    // Visualization/output methods.
     void dump(std::ostream &) const;
     void graphviz(std::ostream &, const std::string & = "") const;
     void in_line(std::ostream &) const;

@@ -40,8 +40,14 @@ namespace vita
 
     bool check() const;
 
-  private:
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
+  private:  // Private data members.
     std::vector<individual> pop_;
+
+    const environment *env_;
   };
 
   std::ostream &operator<<(std::ostream &, const population &);

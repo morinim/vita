@@ -747,6 +747,10 @@ namespace vita
   /// \param[in] in input stream.
   /// \return \c true if individual was loaded correctly.
   ///
+  /// \note
+  /// If the load operation isn't successful the current individual isn't
+  /// changed.
+  ///
   bool individual::load(std::istream &in)
   {
     locus best;

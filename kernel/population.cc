@@ -22,7 +22,7 @@ namespace vita
   ///
   /// Creates a random population.
   ///
-  population::population(const environment &e)
+  population::population(const environment &e) : env_(&e)
   {
     assert(e.check(true, true));
 
@@ -45,6 +45,47 @@ namespace vita
         return false;
 
     return true;
+  }
+
+  ///
+  /// \param[in] in input stream.
+  /// \return \c true if population was loaded correctly.
+  ///
+  /// \note
+  /// If the load operation isn't successful the current population isn't
+  /// changed.
+  ///
+  bool population::load(std::istream &in)
+  {
+    population p(*env_);
+
+    size_t n_elem(0);
+    if (!(in >> n_elem))
+      return false;
+
+    if (n_elem != *env_->individuals)
+      return false;
+
+    for (size_t i(0); i < n_elem; ++i)
+      if (!p[i].load(in))
+        return false;
+
+    *this = p;
+    return true;
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return \c true if population was saved correctly.
+  ///
+  bool population::save(std::ostream &out) const
+  {
+    out << pop_.size() << std::endl;
+
+    for (const individual &i : pop_)
+      i.save(out);
+
+    return out.good();
   }
 
   ///

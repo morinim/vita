@@ -20,6 +20,9 @@ namespace vita
   /// \param[in] in input stream.
   /// \return \c true if hash_t loaded correctly.
   ///
+  /// \note
+  /// If the load operation isn't successful the current hash_t isn't changed.
+  ///
   bool hash_t::load(std::istream &in)
   {
     hash_t tmp;

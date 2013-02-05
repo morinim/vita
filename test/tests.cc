@@ -20,6 +20,7 @@ using namespace boost;
 
 #include "test_evolution.cc"
 #include "test_individual.cc"
+#include "test_population.cc"
 #include "test_primitive.cc"
 #include "test_src_constant.cc"
 #include "test_terminal.cc"
