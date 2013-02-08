@@ -94,8 +94,8 @@ namespace vita
 
     if (typeid(*eva_) == typeid(evaluator_proxy))
     {
-      *probes = static_cast<evaluator_proxy *>(eva_.get())->probes();
-      *hits   = static_cast<evaluator_proxy *>(eva_.get())->hits();
+      *probes = std::static_pointer_cast<evaluator_proxy>(eva_)->probes();
+      *hits   = std::static_pointer_cast<evaluator_proxy>(eva_)->hits();
     }
   }
 
