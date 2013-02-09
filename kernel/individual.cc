@@ -36,7 +36,7 @@ namespace vita
   ///
   individual::individual(const environment &e, bool gen)
     : genome_(*e.code_length, e.sset.categories()),
-      signature_(), best_(locus{{0, 0}}), env_(&e)
+      signature_(), best_({{0, 0}}), env_(&e)
   {
     assert(e.debug(true, true));
 
@@ -105,7 +105,7 @@ namespace vita
       {
         const locus l{{i, c}};
 
-        set(l, genome_(locus{{i+1, c}}));
+        set(l, genome_({{i+1, c}}));
 
         for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
         {
@@ -116,7 +116,7 @@ namespace vita
       }
 
     for (category_t c(0); c < categories; ++c)
-      set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+      set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
   }
   */
 
@@ -157,7 +157,7 @@ namespace vita
         {
           ++n;
 
-          set(locus{{i, c}}, gene(env_->sset.roulette(c), i + 1, size()));
+          set({{i, c}}, gene(env_->sset.roulette(c), i + 1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
@@ -165,7 +165,7 @@ namespace vita
       {
         ++n;
 
-        set(locus{{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+        set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 */
     assert(debug());
@@ -255,7 +255,7 @@ namespace vita
     individual ret(*this);
     const category_t categories(env_->sset.categories());
     for (category_t c(0); c < categories; ++c)
-      ret.set(locus{{index, c}}, gene(env_->sset.roulette_terminal(c)));
+      ret.set({{index, c}}, gene(env_->sset.roulette_terminal(c)));
 
     assert(ret.debug());
     return ret;
@@ -382,8 +382,7 @@ namespace vita
     }
     else
       for (size_t i(0); i < g.sym->arity(); ++i)
-        pack(locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
-             p);
+        pack({{g.args[i], function::cast(g.sym)->arg_category(i)}}, p);
   }
 
   ///
@@ -403,8 +402,7 @@ namespace vita
       p->push_back(static_cast<std::uint32_t>(g.par));
     else
       for (size_t i(0); i < g.sym->arity(); ++i)
-        pack(locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
-             p);
+        pack({{g.args[i], function::cast(g.sym)->arg_category(i)}}, p);
   }
 
   ///
@@ -663,8 +661,8 @@ namespace vita
     const unsigned arity(g.sym->arity());
     if (arity)
       for (unsigned i(0); i < arity; ++i)
-        tree(s, locus{{g.args[i], function::cast(g.sym)->arg_category(i)}},
-             indent, child);
+        tree(s, {{g.args[i], function::cast(g.sym)->arg_category(i)}}, indent,
+             child);
   }
 
   ///
