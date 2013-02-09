@@ -19,8 +19,6 @@
 #include <iomanip>
 #include <list>
 #include <set>
-#include <string>
-#include <vector>
 
 #include "environment.h"
 #include "gene.h"
@@ -52,13 +50,13 @@ namespace vita
     unsigned mutation(double);
 
     std::list<locus> blocks() const;
-    individual destroy_block(unsigned) const;
+    individual destroy_block(index_t) const;
     individual get_block(const locus &) const;
-    individual replace(const symbol_ptr &, const std::vector<index_t> &) const;
-    individual replace(const symbol_ptr &, const std::vector<index_t> &,
-                       const locus &) const;
+    individual replace(const gene &) const;
+    individual replace(const locus &, const gene &) const;
+    individual replace(const std::vector<gene> &) const;
 
-    individual generalize(unsigned, std::vector<locus> *const) const;
+    individual generalize(size_t, std::vector<locus> *const) const;
 
     bool operator==(const individual &) const;
     bool operator!=(const individual &x) const { return !(*this == x); }

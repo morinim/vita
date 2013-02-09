@@ -4,7 +4,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -73,15 +73,15 @@ int main(int argc, char *argv[])
 
       if (blk.eff_size() <= 20)
       {
-        std::vector<locus> loci;
-        individual blk2(blk.generalize(2, &loci));
+        std::vector<locus> replaced;
+        individual blk2(blk.generalize(2, &replaced));
 
-        std::vector<index_t> positions(loci.size());
-        std::vector<category_t> categories(loci.size());
-        for (unsigned j(0); j < loci.size(); ++j)
+        std::vector<index_t> positions(replaced.size());
+        std::vector<category_t> categories(replaced.size());
+        for (size_t j(0); j < replaced.size(); ++j)
         {
-          positions[j]  = loci[j][0];
-          categories[j] = loci[j][1];
+          positions[j]  = replaced[j][locus_index];
+          categories[j] = replaced[j][locus_category];
         }
 
         symbol_ptr f(new adf(blk2, categories, 100));
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
 
-        individual blk3(blk.replace(f, positions));
+        individual blk3(blk.replace({{f, positions}}));
         std::cout << std::endl;
         blk3.list(std::cout);
         const any val3(interpreter(blk3).run());

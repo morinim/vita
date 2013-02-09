@@ -192,57 +192,68 @@ namespace vita
   }
 
   ///
-  /// \param[in] sym symbol used for replacement.
-  /// \param[in] args new arguments.
-  /// \param[in] l locus where replacement take place.
-  /// \return a new \a individual with a gene replaced.
+  /// \param[in] l locus where replacement takes place.
+  /// \param[in] g new gene for replacement.
+  /// \return a new individual with gene at locus \a l replaced by \a g.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
-  /// \a symbol at locus \a l with a new one ('sym' + 'args').
+  /// symbol at locus \a l with \a g.
   ///
-  individual individual::replace(const symbol_ptr &sym,
-                                 const std::vector<index_t> &args,
-                                 const locus &l) const
+  individual individual::replace(const locus &l, const gene &g) const
   {
-    assert(sym);
+    assert(g.debug());
 
     individual ret(*this);
 
-    ret.genome_(l).sym = sym;
-    for (unsigned i(0); i < args.size(); ++i)
-      ret.genome_(l).args[i] = args[i];
-
-    ret.signature_.clear();
+    ret.set(l, g);
 
     assert(ret.debug());
     return ret;
   }
 
   ///
-  /// \param[in] sym symbol used for replacement.
-  /// \param[in] args new arguments.
-  /// \return a new individual with gene at locus \a best_ replaced.
+  /// \param[in] g new gene for replacement.
+  /// \return a new individual with gene at locus \a best_ replaced by \a g.
   ///
   /// Create a new \a individual obtained from \c this replacing the original
-  /// \a symbol at locus \a best_ with a new one ('sym' + 'args').
+  /// symbol at locus \a best_ with \a g.
   ///
-  individual individual::replace(const symbol_ptr &sym,
-                                 const std::vector<index_t> &args) const
+  individual individual::replace(const gene &g) const
   {
-    return replace(sym, args, best_);
+    return replace(best_, g);
   }
+
+  ///
+  /// \param[in] gv vector of genes.
+  /// \return a new individual .
+  ///
+  /// Create a new \a individual obtained from \c this replacing the original
+  /// gene at index \a i with a new one (\a gv[i]).
+  ///
+  individual individual::replace(const std::vector<gene> &gv) const
+  {
+    individual ret(*this);
+
+    index_t i(0);
+    for (const auto &g : gv)
+      ret.set({{i++, g.sym->category()}}, g);
+
+    assert(ret);
+    return ret;
+  }
+
 
   ///
   /// \param[in] index index of a \a symbol in the \a individual.
   /// \return a new individual obtained from \c this inserting a random
   ///         \a terminal at index \a line.
   ///
-  individual individual::destroy_block(unsigned index) const
+  individual individual::destroy_block(index_t index) const
   {
     assert(index < size());
 
     individual ret(*this);
-    const unsigned categories(env_->sset.categories());
+    const category_t categories(env_->sset.categories());
     for (category_t c(0); c < categories; ++c)
       ret.set(locus{{index, c}}, gene(env_->sset.roulette_terminal(c)));
 
@@ -259,7 +270,7 @@ namespace vita
   /// of \c this individual with formal arguments, thus producing the body
   /// for a ADF.
   ///
-  individual individual::generalize(unsigned max_args,
+  individual individual::generalize(size_t max_args,
                                     std::vector<locus> *const loci) const
   {
     assert(max_args && max_args <= gene::k_args);
@@ -272,8 +283,7 @@ namespace vita
         terminals.push_back(i.l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
-    const unsigned n(std::min(max_args,
-                              static_cast<unsigned>(terminals.size())));
+    const size_t n(std::min(max_args, terminals.size()));
     assert(n);
 
     if (n < size())
