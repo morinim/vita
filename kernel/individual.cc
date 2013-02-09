@@ -199,6 +199,10 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// symbol at locus \a l with \a g.
   ///
+  /// \note
+  /// individual::replace method is similar to individual::set but the former
+  /// creates a new individual while the latter modify \a this.
+  ///
   individual individual::replace(const locus &l, const gene &g) const
   {
     assert(g.debug());
@@ -287,18 +291,16 @@ namespace vita
     assert(n);
 
     if (n < size())
-      for (unsigned j(0); j < n; ++j)
+      for (size_t j(0); j < n; ++j)
       {
-        const unsigned r(random::between<unsigned>(j, terminals.size()));
+        const size_t r(random::between<size_t>(j, terminals.size()));
 
-        const locus tmp(terminals[j]);
-        terminals[j] = terminals[r];
-        terminals[r] = tmp;
+        std::swap(terminals[j], terminals[r]);
       }
 
     // Step 3: randomly substitute n terminals with function arguments.
     individual ret(*this);
-    for (unsigned j(0); j < n; ++j)
+    for (size_t j(0); j < n; ++j)
     {
       gene &g(ret.genome_(terminals[j]));
       if (loci)
