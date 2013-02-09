@@ -31,7 +31,7 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : env(true), l0(vita::locus{{0, 0}})
+  F_FACTORY3() : env(true), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
 
@@ -97,7 +97,7 @@ struct F_FACTORY3
   vita::environment env;
   vita::any ret;
 
-  const vita::locus l0;
+  const std::vector<vita::index_t> null;
 };
 
 #endif  // FACTORY_FIXTURE3_H

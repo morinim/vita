@@ -30,6 +30,16 @@ namespace vita
       par = sym->init();
   }
 
+  gene::gene(const std::pair<symbol_ptr, std::vector<index_t>> &g)
+    : sym(g.first)
+  {
+    if (sym->parametric())
+      par = sym->init();
+    else
+      for (size_t i(0); i < sym->arity(); ++i)
+        args[i] = g.second[i];
+  }
+
   gene::gene(const symbol_ptr &s, index_t from, index_t sup) : sym(s)
   {
     assert(from < sup);
@@ -38,8 +48,8 @@ namespace vita
       par = sym->init();
     else
     {
-      const unsigned arity(sym->arity());
-      for (unsigned i(0); i < arity; ++i)
+      const size_t arity(sym->arity());
+      for (size_t i(0); i < arity; ++i)
         args[i] = random::between(from, sup);
     }
   }

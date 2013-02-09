@@ -55,7 +55,7 @@ namespace vita
       std::ofstream log(filename.c_str(), std::ios_base::app);
       if (env_.stat_arl && log.good())
       {
-        for (unsigned i(0); i < env_.sset.adts(); ++i)
+        for (size_t i(0); i < env_.sset.adts(); ++i)
         {
           const symbol *f(env_.sset.get_adt(i).get());
           log << f->display() << ' ' << f->weight << std::endl;
@@ -63,7 +63,7 @@ namespace vita
         log << std::endl;
       }
 
-      const unsigned adf_args(0);
+      const size_t adf_args(0);
       std::list<locus> block_locus(base.blocks());
       for (auto i(block_locus.begin()); i != block_locus.end(); ++i)
       {
@@ -85,7 +85,7 @@ namespace vita
               individual generalized(candidate_block.generalize(adf_args,
                                                                 &loci));
               std::vector<category_t> categories(loci.size());
-              for (unsigned j(0); j < loci.size(); ++j)
+              for (size_t j(0); j < loci.size(); ++j)
                 categories[j] = loci[j][locus_category];
 
               p = std::make_shared<vita::adf>(generalized, categories, 10);

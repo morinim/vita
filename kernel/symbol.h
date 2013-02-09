@@ -35,10 +35,9 @@ namespace vita
     symbol(const std::string &, category_t, unsigned);
 
     opcode_t opcode() const;
-    bool terminal() const;
-
     category_t category() const;
 
+    bool terminal() const;
     virtual bool auto_defined() const;
 
     virtual std::string display() const;
