@@ -53,7 +53,7 @@ namespace vita
       individual off(individual::crossover(pop[r1], pop[r2]));
       ++stats_->crossovers;
 
-      // This should be an original contribution of Vita... but it's hard
+      // This could be an original contribution of Vita... but it's hard
       // to be sure.
       // It remembers of the hereditary repulsion constraint (I guess you could
       // call it signature repulsion) and seems:
@@ -71,7 +71,6 @@ namespace vita
         do
         {
           individual tmp(individual::crossover(pop[r1], pop[r2]));
-          ++stats_->crossovers;
 
           while (pop[r1].signature() == tmp.signature() ||
                  pop[r2].signature() == tmp.signature())
@@ -84,6 +83,8 @@ namespace vita
             fit_off = fit_tmp;
           }
         } while (++i < *env.brood_recombination);
+
+        stats_->crossovers += i;
       }
 
       assert(off.debug());
