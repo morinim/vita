@@ -3,7 +3,7 @@
  *  \file fitness.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -24,7 +24,8 @@ namespace vita
   ///
   typedef double fitness_t;
 
-  inline double distance(fitness_t f1, fitness_t f2) {return std::fabs(f1-f2);}
+  inline double distance(fitness_t f1, fitness_t f2)
+  { return std::fabs(f1 - f2); }
 }  // namespace vita
 
 #endif  // FITNESS_H

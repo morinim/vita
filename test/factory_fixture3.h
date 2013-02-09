@@ -49,6 +49,7 @@ struct F_FACTORY3
     f_add = factory.make("FADD", {});
     f_div = factory.make("FDIV", {});
     f_idiv = factory.make("FIDIV", {});
+    f_ife = factory.make("FIFE", {});
     f_ln = factory.make("FLN", {});
     f_mul = factory.make("FMUL", {});
     f_sub = factory.make("FSUB", {});
@@ -88,6 +89,7 @@ struct F_FACTORY3
   vita::symbol_ptr f_add;
   vita::symbol_ptr f_div;
   vita::symbol_ptr f_idiv;
+  vita::symbol_ptr f_ife;
   vita::symbol_ptr f_ln;
   vita::symbol_ptr f_mul;
   vita::symbol_ptr f_sub;

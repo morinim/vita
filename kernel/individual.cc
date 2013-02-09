@@ -132,6 +132,7 @@ namespace vita
 
     const index_t sup(size() - 1);
 
+    // Here mutation affects only exons.
     for (const_iterator it(*this); it(); ++it)
       if (random::boolean(p))
       {
@@ -147,6 +148,7 @@ namespace vita
       }
 
 /*
+    // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
     const category_t categories(env_->sset.categories());
 
     for (index_t i(0); i < sup; ++i)
@@ -829,7 +831,8 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return the result of the crossover.
+  /// \return the result of the crossover (we only generate a single
+  ///         offspring).
   ///
   /// The i-th locus of the offspring has a 50% probability to be filled with
   /// the i-th gene of \a p1 and 50% with i-th gene of \a p2. Parents must have
@@ -879,13 +882,17 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return the result of the crossover.
+  /// \return the result of the crossover (We only generate a single
+  ///         offspring).
   ///
   /// We randomly select a parent (between \a p1 and \a p2) and a single locus
   /// (common crossover point). The offspring is created with genes from the
   /// choosen parent up to the crossover point and genes from the other parent
-  /// beyond that point. Parents must have the same size.
+  /// beyond that point.
   /// One-point crossover is the oldest homologous crossover in tree-based GP.
+  ///
+  /// \note
+  /// Parents must have the same size.
   ///
   individual one_point_crossover(const individual &p1, const individual &p2)
   {
@@ -917,13 +924,16 @@ namespace vita
   ///
   /// \param[in] p1 the first parent.
   /// \param[in] p2 the second parent.
-  /// \return the result of the crossover.
+  /// \return the result of the crossover (we only generate a single
+  ///         offspring).
   ///
   /// We randomly select a parent (between \a p1 and \a p2) and a two loci
   /// (common crossover points). The offspring is created with genes from the
   /// choosen parent before the first crossover point and after the second
   /// crossover point; genes between crossover points are taken from the other
   /// parent.
+  ///
+  /// \note
   /// Parents must have the same size.
   ///
   individual two_point_crossover(const individual &p1, const individual &p2)

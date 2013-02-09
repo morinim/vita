@@ -66,7 +66,7 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       { return any(static_cast<base_t>(any_cast<int>(i->eval()))); }
 
     private: // Private data members.
@@ -78,7 +78,7 @@ namespace vita
     public:
       explicit abs(category_t t) : function("FABS", t, {t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev(i->eval(0));
         if (ev.empty())  return ev;
@@ -93,7 +93,7 @@ namespace vita
       explicit add(category_t t)
         : function("FADD", t, {t, t}, function::default_weight, true) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -113,7 +113,7 @@ namespace vita
     public:
       explicit div(category_t t) : function("FDIV", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -133,7 +133,7 @@ namespace vita
     public:
       explicit idiv(category_t t) : function("FIDIV", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -155,7 +155,7 @@ namespace vita
         : function("FIFB", t2, {t1, t1, t1, t2, t2})
       { assert(gene::k_args > 4); }
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -186,7 +186,7 @@ namespace vita
       ife(category_t t1, category_t t2)
         : function("FIFE", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -209,7 +209,7 @@ namespace vita
       ifl(category_t t1, category_t t2)
         : function("FIFL", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -229,7 +229,7 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("FIFZ", t, {t, t, t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -247,7 +247,7 @@ namespace vita
       explicit length(category_t t1, category_t t2)
         : function("FLENGTH", t2, {t1}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev(i->eval(0));
         if (ev.empty())  return ev;
@@ -270,7 +270,7 @@ namespace vita
       /// \return the natural logarithm of its argument or an empty \c any
       //          in case of invalid argument / infinite result.
       ///
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -287,7 +287,7 @@ namespace vita
     public:
       explicit mod(category_t t) : function("FMOD", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -308,7 +308,7 @@ namespace vita
       explicit mul(category_t t)
         : function("FMUL", t, {t, t}, function::default_weight, true) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;
@@ -328,7 +328,7 @@ namespace vita
     public:
       explicit sin(category_t t) : function("FSIN", t, {t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev(i->eval(0));
         if (ev.empty())  return ev;
@@ -342,7 +342,7 @@ namespace vita
     public:
       explicit sub(category_t t) : function("FSUB", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      virtual any eval(interpreter *i) const
       {
         const any ev0(i->eval(0));
         if (ev0.empty())  return ev0;

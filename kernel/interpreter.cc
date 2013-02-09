@@ -72,10 +72,10 @@ namespace vita
   /// \a interpreter execution.
   /// This means that side effects are not evaluated to date: WE ASSUME
   /// REFERENTIAL TRANSPARENCY for all the expressions.
-  /// \li
-  /// [http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)]
-  /// \li
-  /// [http://en.wikipedia.org/wiki/Memoization]
+  ///
+  /// \see
+  /// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
+  /// * <http://en.wikipedia.org/wiki/Memoization>
   ///
   any interpreter::eval(size_t i)
   {

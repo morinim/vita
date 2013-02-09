@@ -45,8 +45,6 @@ namespace vita
     virtual std::string display(int) const;
     virtual int init() const;
 
-    virtual unsigned check() const;
-
     /// The associative law of arithmetic: if OP is associative then
     /// a OP (b OP c) = (a OP b) OP c = a OP b OP c
     /// This information can be used for optimization and visualization.
@@ -147,12 +145,6 @@ namespace vita
   bool symbol::auto_defined() const
   {
     return false;
-  }
-
-  ///
-  inline
-  unsigned symbol::check() const
-  {
   }
 }  // namespace vita
 

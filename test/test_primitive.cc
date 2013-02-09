@@ -170,6 +170,39 @@ BOOST_AUTO_TEST_CASE(IDIV)
   BOOST_REQUIRE_MESSAGE(ret.empty(), "\n" << i);
 }
 
+BOOST_AUTO_TEST_CASE(IFE)
+{
+  using namespace vita;
+  vita::individual i(env, true);
+
+  BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
+  i = i.replace(f_ife, {1, 1, 2, 1}, l0 + 0);  // [0] IFE 1,1,2,1
+  i = i.replace(   c0,           {}, l0 + 1);  // [1] 0
+  i = i.replace(   c1,           {}, l0 + 2);  // [2] 1
+  ret = vita::interpreter(i).run();
+  BOOST_REQUIRE_MESSAGE(vita::any_cast<double>(ret) == 1.0,
+                        "\n" << i);
+
+  BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
+  i = i.replace(f_ife, {1, 2, 2, 1}, l0 + 0);  // [0] IFE 1,2,2,1
+  i = i.replace(   c0,           {}, l0 + 1);  // [1] 0
+  i = i.replace(   c1,           {}, l0 + 2);  // [2] 1
+  ret = vita::interpreter(i).run();
+  BOOST_REQUIRE_MESSAGE(vita::any_cast<double>(ret) == 0.0,
+                        "\n" << i);
+
+  BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
+  i = i.replace(f_ife, {1, 2, 3, 4}, l0 + 0);  // [0] IFE Z, X, 1, 0
+  i = i.replace(    z,           {}, l0 + 1);  // [1] Z
+  i = i.replace(    x,           {}, l0 + 2);  // [2] X
+  i = i.replace(   c1,           {}, l0 + 3);  // [2] 1
+  i = i.replace(   c0,           {}, l0 + 4);  // [1] 0
+  static_pointer_cast<Z>(z)->val = 0;
+  ret = vita::interpreter(i).run();
+  BOOST_REQUIRE_MESSAGE(vita::any_cast<double>(ret) == 0.0,
+                        "\n" << i);
+}
+
 BOOST_AUTO_TEST_CASE(MUL)
 {
   using namespace vita;
@@ -233,7 +266,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     BOOST_REQUIRE_MESSAGE(vita::any_cast<double>(ret) ==
                           static_pointer_cast<Z>(z)->val -
                           vita::any_cast<double>(x->eval(0)),
-      "\n" << i);
+                          "\n" << i);
   }
 }
 
