@@ -58,15 +58,15 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
 
     std::list<locus> bl(base.blocks());
-    for (auto i(bl.begin()); i != bl.end(); ++i)
+    for (const locus &l : bl)
     {
-      individual blk(base.get_block(*i));
+      individual blk(base.get_block(l));
 
-      std::cout << std::endl << "BLOCK at locus " << *i << std::endl;
+      std::cout << std::endl << "BLOCK at locus " << l << std::endl;
       blk.list(std::cout);
       const any val(interpreter(blk).run());
       if (val.empty())
-        std::cout << "Incorrect output.";
+        std::cout << "Empty output.";
       else
         std::cout << "Output: " << interpreter::to_string(val);
       std::cout << std::endl;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j][locus_category];
         }
 
-        symbol_ptr f(new adf(blk2, categories, 100));
+        symbol_ptr f(std::make_shared<adf>(blk2, categories, 100));
         env.insert(f);
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
         blk3.list(std::cout);
         const any val3(interpreter(blk3).run());
         if (val3.empty())
-          std::cout << "Incorrect output.";
+          std::cout << "Empty output.";
         else
           std::cout << "Output: " << interpreter::to_string(val3);
         std::cout << std::endl << std::endl;
@@ -103,12 +103,12 @@ int main(int argc, char *argv[])
             (!val.empty() && !val3.empty() &&
              interpreter::to_string(val) != interpreter::to_string(val3)))
         {
-          std::cout << "ADF EVAL ERROR." << std::endl;
+          std::cerr << "ADF EVAL ERROR." << std::endl;
           return EXIT_FAILURE;
         }
       }
       else
-        std::cout << "Skipping block at line " << *i << std::endl;
+        std::cout << "Skipping block at line " << l << std::endl;
     }
   }
 
