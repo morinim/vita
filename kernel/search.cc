@@ -57,41 +57,42 @@ namespace vita
       {
         for (size_t i(0); i < env_.sset.adts(); ++i)
         {
-          const symbol *f(env_.sset.get_adt(i).get());
+          const symbol_ptr f(env_.sset.get_adt(i));
           log << f->display() << ' ' << f->weight << std::endl;
         }
         log << std::endl;
       }
 
       const size_t adf_args(0);
-      std::list<locus> block_locus(base.blocks());
-      for (auto i(block_locus.begin()); i != block_locus.end(); ++i)
+      std::list<locus> blocks(base.blocks());
+      for (const locus &l : blocks)
       {
-        individual candidate_block(base.get_block(*i));
+        individual candidate_block(base.get_block(l));
 
-        // Building blocks should be simple.
+        // Building blocks must be simple.
         if (candidate_block.eff_size() <= 5 + adf_args)
         {
-          const double d_f(base_fit -
-                           evo.fitness(base.destroy_block((*i)[0])));
+          const auto d_f(
+            distance(base_fit,
+                     evo.fitness(base.destroy_block(l[locus_index]))));
 
           // Semantic introns cannot be building blocks.
-          if (std::isfinite(d_f) && std::fabs(base_fit/10.0) < d_f)
+          if (std::isfinite(d_f) && std::fabs(base_fit / 10.0) < d_f)
           {
             symbol_ptr p;
             if (adf_args)
             {
-              std::vector<locus> loci;
+              std::vector<locus> replaced;
               individual generalized(candidate_block.generalize(adf_args,
-                                                                &loci));
-              std::vector<category_t> categories(loci.size());
-              for (size_t j(0); j < loci.size(); ++j)
-                categories[j] = loci[j][locus_category];
+                                                                &replaced));
+              std::vector<category_t> categories(replaced.size());
+              for (size_t j(0); j < replaced.size(); ++j)
+                categories[j] = replaced[j][locus_category];
 
-              p = std::make_shared<vita::adf>(generalized, categories, 10);
+              p = std::make_shared<adf>(generalized, categories, 10);
             }
             else  // !adf_args
-              p = std::make_shared<vita::adt>(candidate_block, 100);
+              p = std::make_shared<adt>(candidate_block, 100);
             env_.insert(p);
 
             if (env_.stat_arl && log.good())
