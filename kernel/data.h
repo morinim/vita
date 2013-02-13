@@ -161,6 +161,7 @@ namespace vita
 
     void swap_category(category_t, category_t);
 
+  private:  // Private data members.
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
