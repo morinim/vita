@@ -86,7 +86,10 @@ namespace vita
 
     bool debug() const;
 
-  private:
+  private:  // Private support methods.
+    size_t index(const hash_t &) const;
+
+  private:  // Private data members.
     struct slot
     {
       hash_t       hash;

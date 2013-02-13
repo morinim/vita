@@ -59,9 +59,21 @@ namespace vita
   }
 
   ///
+  /// Standard destructor.
+  ///
   ttable::~ttable()
   {
     delete [] table_;
+  }
+
+  ///
+  /// \param[in] u the signature of an individual.
+  /// \return an index in the hash table.
+  ///
+  inline
+  size_t ttable::index(const hash_t &h) const
+  {
+    return h.data[0] & k_mask;
   }
 
   ///
@@ -74,10 +86,12 @@ namespace vita
     hits_   = 0;
 
     ++period_;
-    //for (unsigned i(0); i <= k_mask; ++i)
+
+    //for (size_t i(0); i <= k_mask; ++i)
     //{
     //  table_[i].hash = hash_t();
-    //  table_[i].fit  = 0;
+    //  table_[i].score.fitness  = 0.0;
+    //  table_[i].score.accuracy = 0.0;
     //}
   }
 
@@ -90,7 +104,7 @@ namespace vita
   {
     const hash_t h(ind.signature());
 
-    table_[h.data[0] & k_mask].hash = hash_t();
+    table_[index(h)].hash = hash_t();
   }
 
   ///
@@ -108,7 +122,7 @@ namespace vita
 
     const hash_t h(ind.signature());
 
-    const slot &s(table_[h.data[0] & k_mask]);
+    const slot &s(table_[index(h)]);
 
     const bool ret(period_ == s.birthday && h == s.hash);
 
@@ -134,7 +148,7 @@ namespace vita
     s.score    =           score;
     s.birthday =         period_;
 
-    table_[s.hash.data[0] & k_mask] = s;
+    table_[index(s.hash)] = s;
   }
 
   ///
