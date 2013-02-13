@@ -18,23 +18,20 @@
 
 #include "data.h"
 #include "environment.h"
+#include "evaluator.h"
 
 namespace vita
 {
-  class evaluator;
   class individual;
   class lambda_f;
-
-  /// Just a shortcut.
-  typedef std::shared_ptr<evaluator> evaluator_ptr;
 
   class problem
   {
   public:
     problem();
 
-    evaluator_ptr get_evaluator();
-    void set_evaluator(const evaluator_ptr &);
+    evaluator::ptr get_evaluator();
+    void set_evaluator(const evaluator::ptr &);
 
     /// \return an access point for the dataset.
     virtual vita::data *data() { return nullptr; }
@@ -49,7 +46,7 @@ namespace vita
     environment env;
 
   protected:  // Private data members.
-    evaluator_ptr active_eva_;
+    evaluator::ptr active_eva_;
   };
 }  // namespace vita
 

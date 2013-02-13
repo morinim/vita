@@ -381,7 +381,7 @@ namespace vita
 
     for (unsigned run(0); run < n; ++run)
     {
-      evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
+      evolution evo(env_, prob_->get_evaluator(), stop, shake_data);
       summary s(evo.run(verbose, run));
 
       // Depending on validation, this can be the training score or the

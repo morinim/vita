@@ -39,6 +39,8 @@ namespace vita
   class evaluator
   {
   public:
+    typedef std::shared_ptr<evaluator> ptr;
+
     virtual void clear() {}
     virtual void clear(const individual &) {}
 

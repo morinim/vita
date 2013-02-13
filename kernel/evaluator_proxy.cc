@@ -3,7 +3,7 @@
  *  \file evaluator_proxy.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -20,10 +20,11 @@ namespace vita
   /// \param[in] eva pointer that lets the proxy access the real evaluator.
   /// \param[in] ts 2^\a ts is the number of elements of the cache.
   ///
-  evaluator_proxy::evaluator_proxy(evaluator *const eva, unsigned ts)
+  evaluator_proxy::evaluator_proxy(const evaluator::ptr &eva, unsigned ts)
     : eva_(eva), cache_(ts)
   {
-    assert(eva && ts);
+    assert(eva);
+    assert(ts > 6);
   }
 
   ///
@@ -45,16 +46,15 @@ namespace vita
       assert(s == s1);
 #endif
     }
-
-
-    //#if !defined(NDEBUG)
-    //else  // hash collision checking code can slow down the program very much
-    //{
-    //  const score_t s1((*_eva)(ind));
-    //  if (s != s1)
-    //  std::cerr << "********* COLLISION *********" << std::endl;
-    //}
-    //#endif
+#if !defined(NDEBUG)
+    else  // hash collision checking code can slow down the program very much
+    {
+      const score_t s1((*eva_)(ind));
+      if (s != s1)
+        std::cerr << "********* COLLISION ********* (" << s.fitness
+                  << " != " << s1.fitness << ")" << std::endl;
+    }
+#endif
 
     return s;
   }

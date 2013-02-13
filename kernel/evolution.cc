@@ -33,14 +33,13 @@ namespace vita
   ///               set so that evolution would take place in a dynamic
   ///               environment.
   ///
-  evolution::evolution(const environment &env, evaluator *const eva,
+  evolution::evolution(const environment &env, const evaluator::ptr &eva,
                        std::function<bool (const summary &)> sc,
                        std::function<void (unsigned)> sd)
     : selection(std::make_shared<tournament_selection>(this)),
       operation(std::make_shared<standard_op>(this, &stats_)),
       replacement(std::make_shared<kill_tournament>(this)), pop_(env),
-      eva_(new evaluator_proxy(eva, env.ttable_size)), stop_condition_(sc),
-      shake_data_(sd)
+      eva_(eva), stop_condition_(sc), shake_data_(sd)
   {
     assert(eva);
 

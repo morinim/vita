@@ -11,8 +11,8 @@
  *
  */
 
+#include "evaluator_proxy.h"
 #include "problem.h"
-#include "evaluator.h"
 #include "search.h"
 
 namespace vita
@@ -37,7 +37,7 @@ namespace vita
   ///
   /// \return the active evaluator.
   ///
-  evaluator_ptr problem::get_evaluator()
+  evaluator::ptr problem::get_evaluator()
   {
     return active_eva_;
   }
@@ -45,9 +45,12 @@ namespace vita
   ///
   /// \param[in] e the evaluator that should be set as active.
   ///
-  void problem::set_evaluator(const evaluator_ptr &e)
+  void problem::set_evaluator(const evaluator::ptr &e)
   {
-    active_eva_ = e;
+    if (env.ttable_size)
+      active_eva_ = std::make_shared<evaluator_proxy>(e, env.ttable_size);
+    else
+      active_eva_ = e;
   }
 
   ///

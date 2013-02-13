@@ -3,7 +3,7 @@
  *  \file evaluator_proxy.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -28,19 +28,19 @@ namespace vita
   class evaluator_proxy : public evaluator
   {
   public:
-    evaluator_proxy(evaluator *const, unsigned);
+    evaluator_proxy(const evaluator::ptr &, unsigned);
 
-    void clear();
-    void clear(const individual &);
+    virtual void clear();
+    virtual void clear(const individual &);
 
-    score_t operator()(const individual &);
+    virtual score_t operator()(const individual &);
 
     std::uintmax_t probes() const;
     std::uintmax_t hits() const;
 
   private:
     /// Access to the real evaluator.
-    evaluator *const eva_;
+    evaluator::ptr eva_;
 
     /// Transposition table (hash table cache).
     ttable cache_;
