@@ -22,7 +22,7 @@ namespace vita
   /// \param[in] data data stream to be hashed.
   /// \param[in] len length, in bytes, of \a data.
   /// \param[in] seed initialization seed.
-  /// \param[out] out the signature of \a data.
+  /// \return the signature of \a data.
   ///
   /// MurmurHash3 (http://code.google.com/p/smhasher/), by Austin Appleby, is a
   /// relatively simple non-cryptographic hash algorithm. It is noted for being
@@ -43,15 +43,14 @@ namespace vita
   /// * http://code.google.com/p/smhasher/
   ///
   inline
-  void hash(void *const data, unsigned len, const unsigned seed, void *out)
+  hash_t hash(void *const data, unsigned len, const unsigned seed)
   {
     /// Murmurhash3 follows.
-    const unsigned n_blocks(len / 16);              // Block size is 128bit
+    const unsigned n_blocks(len / 16);  // Block size is 128bit
 
     std::uint64_t h1(seed), h2(seed);
 
-    const std::uint64_t c1(0x87c37b91114253d5);
-    const std::uint64_t c2(0x4cf5ad432745937f);
+    const std::uint64_t c1(0x87c37b91114253d5), c2(0x4cf5ad432745937f);
 
     // Body.
     const std::uint64_t *const blocks(
@@ -131,8 +130,7 @@ namespace vita
     h1 += h2;
     h2 += h1;
 
-    static_cast<std::uint64_t *>(out)[0] = h1;
-    static_cast<std::uint64_t *>(out)[1] = h2;
+    return hash_t(h1, h2);
   }
 }  // namespace vita
 

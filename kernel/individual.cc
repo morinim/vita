@@ -205,8 +205,6 @@ namespace vita
   ///
   individual individual::replace(const locus &l, const gene &g) const
   {
-    assert(g.debug());
-
     individual ret(*this);
 
     ret.set(l, g);
@@ -242,7 +240,7 @@ namespace vita
     for (const auto &g : gv)
       ret.set({{i++, g.sym->category()}}, g);
 
-    assert(ret);
+    assert(ret.debug());
     return ret;
   }
 
@@ -370,38 +368,23 @@ namespace vita
   {
     const gene &g(genome_(l));
 
-    const opcode_t opcode(g.sym->opcode());
+    assert(g.sym->opcode() <= std::numeric_limits<std::uint16_t>::max());
+    const std::uint16_t opcode16(g.sym->opcode());
 
-    const T *const s1 = reinterpret_cast<const T *>(&opcode);
-    for (size_t i(0); i < sizeof(opcode); ++i)
+    const T *const s1 = reinterpret_cast<const T *>(&opcode16);
+    for (size_t i(0); i < sizeof(opcode16); ++i)
       p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
-      const T *const s2 = reinterpret_cast<const T *>(&g.par);
-      for (size_t i(0); i < sizeof(g.par); ++i)
+      assert(std::numeric_limits<std::int16_t>::min() <= g.par);
+      assert(g.par <= std::numeric_limits<std::int16_t>::max());
+      const std::int16_t param16(g.par);
+
+      const T *const s2 = reinterpret_cast<const T *>(&param16);
+      for (size_t i(0); i < sizeof(param16); ++i)
         p->push_back(s2[i]);
     }
-    else
-      for (size_t i(0); i < g.sym->arity(); ++i)
-        pack({{g.args[i], function::cast(g.sym)->arg_category(i)}}, p);
-  }
-
-  ///
-  /// \brief A specialized version of pack for 32bit reading/packaging.
-  ///
-  /// It is slightly simpler (faster?) than pack<T>.
-  ///
-  template <>
-  void individual::pack(const locus &l,
-                        std::vector<std::uint32_t> *const p) const
-  {
-    const gene &g(genome_(l));
-
-    p->push_back(static_cast<std::uint32_t>(g.sym->opcode()));
-
-    if (g.sym->parametric())
-      p->push_back(static_cast<std::uint32_t>(g.par));
     else
       for (size_t i(0); i < g.sym->arity(); ++i)
         pack({{g.args[i], function::cast(g.sym)->arg_category(i)}}, p);
@@ -426,11 +409,9 @@ namespace vita
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
-    const unsigned len(packed.size() * sizeof(T));  // Length in bytes
+    const size_t len(packed.size() * sizeof(T));  // Length in bytes
 
-    hash_t h;
-    vita::hash(packed.data(), len, 1973, h.data);
-    return h;
+    return vita::hash(packed.data(), len, 1973);
   }
 
   ///

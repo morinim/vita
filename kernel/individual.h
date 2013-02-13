@@ -116,7 +116,7 @@ namespace vita
       crossover;
 
   private:  // Private support functions.
-    template<class T = std::uint32_t> hash_t hash() const;
+    template<class T = std::uint8_t> hash_t hash() const;
     template<class T> void pack(const locus &, std::vector<T> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 

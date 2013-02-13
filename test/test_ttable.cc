@@ -52,11 +52,15 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
   {
     key[i] = static_cast<std::uint8_t>(i);
 
-    vita::hash(key, i, 256 - i, &hashes[i * hashbytes]);
+    vita::hash_t h(vita::hash(key, i, 256 - i));
+    reinterpret_cast<std::uint64_t *>(&hashes[i * hashbytes])[0] = h.data[0];
+    reinterpret_cast<std::uint64_t *>(&hashes[i * hashbytes])[1] = h.data[1];
   }
 
   // Then hash the result array.
-  vita::hash(hashes, hashbytes * 256, 0, final);
+  vita::hash_t h(vita::hash(hashes, hashbytes * 256, 0));
+  reinterpret_cast<std::uint64_t *>(final)[0] = h.data[0];
+  reinterpret_cast<std::uint64_t *>(final)[1] = h.data[1];
 
   // The first four bytes of that hash, interpreted as a little-endian integer,
   // is our verification value.
