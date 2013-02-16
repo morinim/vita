@@ -161,7 +161,7 @@ namespace vita
       // Ross felt that this might improve performance).
       const size_t target_size(d.size() * 20 / 100);
       data::iterator base(d.begin());
-      size_t count(0);
+      unsigned count(0);
       for (data::iterator i(d.begin()); i != d.end(); ++i)
       {
         const double prob(
@@ -186,7 +186,7 @@ namespace vita
       //    return w1 > w2;
       //  });
 
-      d.slice(std::max(10u, count));
+      d.slice(std::max(count, 10u));
       prob_->get_evaluator()->clear();
 
       // Selected training examples have their difficulties and ages reset.
