@@ -4,7 +4,7 @@
 
 
 
-# Build type: debug, release.
+# Build type: debug, profile, release.
 TYPE = release
 
 # Boost library <-- PLEASE CHECK THE PATHS!
@@ -37,7 +37,7 @@ ifeq ($(TYPE), debug)
 endif
 
 ifeq ($(TYPE), profile)
-  TYPE_PARAM = -pg -DNDEBUG
+  TYPE_PARAM = -pg -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
 ifeq ($(TYPE), release)
