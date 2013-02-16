@@ -156,8 +156,6 @@ namespace vita
     /// classified, resolved...) examples.
     /// Fitness, if defined, is used as comparison term; otherwise
     /// accuracy (they cannot both be set to boost::none).
-    score_t threashold;
-
     struct
     {
       boost::optional<fitness_t> fitness;
