@@ -14,13 +14,11 @@
 #if !defined(ENVIRONMENT_H)
 #define      ENVIRONMENT_H
 
-#include <boost/lexical_cast.hpp>
-#include <boost/logic/tribool.hpp>
-#include <boost/logic/tribool_io.hpp>
-#include <boost/property_tree/ptree.hpp>
-
 #include <cmath>
 #include <string>
+
+#include <boost/logic/tribool.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "fitness.h"
 #include "symbol_set.h"

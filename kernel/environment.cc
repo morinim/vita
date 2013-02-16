@@ -13,6 +13,8 @@
 
 #include <iostream>
 
+#include <boost/logic/tribool_io.hpp>
+
 #include "environment.h"
 #include "terminal.h"
 
