@@ -418,12 +418,8 @@ namespace vita
       }
 
       if (verbose)
-      {
         std::cout << "Score (" << (validation ? "validation" : "training")
-                  << "): " << score;
-
-        std::cout << std::endl << std::endl;
-      }
+                  << "): " << score << std::endl << std::endl;
 
       if (run == 0)
         overall_summary.best = {s.best->ind, score};
@@ -441,7 +437,7 @@ namespace vita
         overall_summary.last_imp += s.last_imp;
       }
 
-      // Good is true when the present individual/solution satisfies (is
+      // 'good' is true when the present individual/solution satisfies (is
       // greater than OR equal to) the current threashold criterion (accuracy
       // OR fitness).
       const bool good(
