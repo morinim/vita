@@ -126,10 +126,10 @@ namespace vita
   ///
   void search::dss(unsigned generation) const
   {
-    data *const d(prob_->data());
-
-    if (d)
+    if (prob_->data())
     {
+      data &d(*prob_->data());
+
       std::function<std::uintmax_t (const data::example &)>
         weight([](const data::example &v) -> std::uintmax_t
                {
@@ -137,9 +137,9 @@ namespace vita
                });
 
       std::uintmax_t weight_sum(0);
-      d->dataset(data::training);
-      d->slice(0);
-      for (auto &i : *d)
+      d.dataset(data::training);
+      d.slice(0);
+      for (auto &i : d)
       {
         if (generation == 0)  // preliminary setup for generation 0
         {
@@ -159,10 +159,10 @@ namespace vita
       // Note that the actual size of the selected subset (count) is not fixed
       // and, in fact, it averages slightly above target_size (Gathercole and
       // Ross felt that this might improve performance).
-      const size_t target_size(d->size() * 20 / 100);
-      data::iterator base(d->begin());
+      const size_t target_size(d.size() * 20 / 100);
+      data::iterator base(d.begin());
       size_t count(0);
-      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      for (data::iterator i(d.begin()); i != d.end(); ++i)
       {
         const double prob(
           std::min(static_cast<double>(weight(*i)) * target_size / weight_sum,
@@ -176,7 +176,7 @@ namespace vita
         }
       }
 
-      //d->sort(
+      //d.sort(
       //  [](const data::example &v1, const data::example &v2) -> bool
       //  {
       //    double w1(v1.difficulty + v1.age * v1.age * v1.age);
@@ -186,11 +186,11 @@ namespace vita
       //    return w1 > w2;
       //  });
 
-      d->slice(std::max(10u, count));
+      d.slice(std::max(10u, count));
       prob_->get_evaluator()->clear();
 
       // Selected training examples have their difficulties and ages reset.
-      for (auto &i : *d)
+      for (auto &i : d)
       {
         i.difficulty = 0;
         i.age        = 1;
