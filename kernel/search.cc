@@ -420,10 +420,7 @@ namespace vita
       if (verbose)
       {
         std::cout << "Score (" << (validation ? "validation" : "training")
-                  << "): " << score.fitness;
-
-        if (score.accuracy >= 0.0)
-          std::cout << " (" << 100.0 * score.accuracy << "%)";
+                  << "): " << score;
 
         std::cout << std::endl << std::endl;
       }

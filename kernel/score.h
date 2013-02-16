@@ -40,6 +40,20 @@ namespace vita
     fitness_t fitness;
     double   accuracy;
   };
+
+  ///
+  /// Standard output operator for score_t struct.
+  ///
+  inline
+  std::ostream &operator<<(std::ostream &o, const score_t &s)
+  {
+    o << '(' << s.fitness;
+
+    if (s.accuracy >= 0.0)
+      o << ", " << 100.0 * s.accuracy << "%";
+
+    return o << ')';
+  }
 }  // namespace vita
 
 #endif  // SCORE_H
