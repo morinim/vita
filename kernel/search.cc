@@ -139,17 +139,17 @@ namespace vita
       std::uintmax_t weight_sum(0);
       d->dataset(data::training);
       d->slice(0);
-      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      for (auto &i : *d)
       {
         if (generation == 0)  // preliminary setup for generation 0
         {
-          i->difficulty = 0;
-          i->age        = 1;
+          i.difficulty = 0;
+          i.age        = 1;
         }
         else
-          ++i->age;
+          ++i.age;
 
-        weight_sum += weight(*i);
+        weight_sum += weight(i);
       }
 
       // Select a subset of the training examples.
@@ -161,7 +161,7 @@ namespace vita
       // Ross felt that this might improve performance).
       const size_t target_size(d->size() * 20 / 100);
       data::iterator base(d->begin());
-      unsigned count(0);
+      size_t count(0);
       for (data::iterator i(d->begin()); i != d->end(); ++i)
       {
         const double prob(
@@ -190,10 +190,10 @@ namespace vita
       prob_->get_evaluator()->clear();
 
       // Selected training examples have their difficulties and ages reset.
-      for (data::iterator i(d->begin()); i != d->end(); ++i)
+      for (auto &i : *d)
       {
-        i->difficulty = 0;
-        i->age        = 1;
+        i.difficulty = 0;
+        i.age        = 1;
       }
     }
   }
