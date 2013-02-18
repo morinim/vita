@@ -121,8 +121,8 @@ namespace vita
   /// a large population size is needed and a very large number of
   /// function-trees evaluation must be carried out. DSS is a subset selection
   /// method which uses the current run to select:
-  /// \li firstly 'difficult' cases;
-  /// \li secondly cases which have not been looked at for several generations.
+  /// * firstly 'difficult' cases;
+  /// * secondly cases which have not been looked at for several generations.
   ///
   void search::dss(unsigned generation) const
   {
@@ -349,7 +349,7 @@ namespace vita
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(prob_->env.threashold.fitness || prob_->env.threashold.accuracy);
+    assert(prob_->env.threashold != score::lowest());
 
     // This is used in comparisons between fitnesses: we considered values
     // distinct only when their distance is greater than tolerance.
@@ -427,9 +427,8 @@ namespace vita
       // We can use accuracy or fitness to identify successful runs (based on
       // prob_->env.threashold).
       const bool solution_found(
-        prob_->env.threashold.fitness ?
-        score.fitness >= *prob_->env.threashold.fitness :
-        score.accuracy >= *prob_->env.threashold.accuracy);
+        score.fitness >= prob_->env.threashold.fitness &&
+        score.accuracy >= prob_->env.threashold.accuracy);
 
       if (solution_found)
       {
@@ -441,7 +440,7 @@ namespace vita
       // greater than OR equal to) the current threashold criterion (accuracy
       // OR fitness).
       const bool good(
-        prob_->env.threashold.fitness ?
+        prob_->env.threashold.accuracy < 0.0 ?
         score.fitness + tolerance >= overall_summary.best->score.fitness :
         score.accuracy >= overall_summary.best->score.accuracy);
 
@@ -461,7 +460,7 @@ namespace vita
         {  // better fitness
           overall_summary.best->score.fitness = score.fitness;
 
-          if (prob_->env.threashold.fitness)
+          if (prob_->env.threashold.accuracy < 0.0)
             update();
         }
 
@@ -469,7 +468,7 @@ namespace vita
         {  // better accuracy
           overall_summary.best->score.accuracy = score.accuracy;
 
-          if (prob_->env.threashold.accuracy)
+          if (prob_->env.threashold.accuracy > 0.0)
             update();
         }
 

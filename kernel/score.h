@@ -14,6 +14,8 @@
 #if !defined(SCORE_H)
 #define      SCORE_H
 
+#include <iostream>
+
 #include "fitness.h"
 
 namespace vita
@@ -31,6 +33,8 @@ namespace vita
       assert(a <= 1.0);  // accuracy could be less than 0.0 (meaning N.A.)
     }
 
+    friend std::ostream &operator<<(std::ostream &, const score_t &);
+
     bool operator==(const score_t &s) const
     { return fitness == s.fitness && accuracy == s.accuracy; }
 
@@ -39,21 +43,19 @@ namespace vita
 
     fitness_t fitness;
     double   accuracy;
+
+    ///
+    /// \warning
+    /// Do not change with a static const variable definition: danger of static
+    /// initialization order fiasco.
+    ///
+    static score_t lowest()
+    {
+      static const score_t l{std::numeric_limits<fitness_t>::lowest(),
+                             std::numeric_limits<double>::lowest()};
+      return l;
+    }
   };
-
-  ///
-  /// Standard output operator for score_t struct.
-  ///
-  inline
-  std::ostream &operator<<(std::ostream &o, const score_t &s)
-  {
-    o << '(' << s.fitness;
-
-    if (s.accuracy >= 0.0)
-      o << ", " << 100.0 * s.accuracy << "%";
-
-    return o << ')';
-  }
 }  // namespace vita
 
 #endif  // SCORE_H
