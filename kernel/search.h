@@ -47,6 +47,8 @@ namespace vita
     bool stop_condition(const summary &) const;
 
   private:  // Private data members.
+    /// This is the environment actually used during the search (\a prob_->env
+    /// is used for compiling \a env_ via the tune_parameters method).
     environment env_;
     problem   *prob_;
   };

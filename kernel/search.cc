@@ -349,7 +349,7 @@ namespace vita
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(prob_->env.threashold != score_t::lowest());
+    assert(env_.threashold != score_t::lowest());
 
     // This is used in comparisons between fitnesses: we considered values
     // distinct only when their distance is greater than tolerance.
@@ -424,11 +424,11 @@ namespace vita
       if (run == 0)
         overall_summary.best = {s.best->ind, score};
 
-      // We can use accuracy or fitness to identify successful runs (based on
-      // prob_->env.threashold).
+      // We use accuracy or fitness (or both) to identify successful runs
+      // (based on env_.threashold).
       const bool solution_found(
-        score.fitness >= prob_->env.threashold.fitness &&
-        score.accuracy >= prob_->env.threashold.accuracy);
+        score.fitness >= env_.threashold.fitness &&
+        score.accuracy >= env_.threashold.accuracy);
 
       if (solution_found)
       {
@@ -440,7 +440,7 @@ namespace vita
       // greater than OR equal to) the current threashold criterion (accuracy
       // OR fitness).
       const bool good(
-        prob_->env.threashold.accuracy < 0.0 ?
+        env_.threashold.accuracy < 0.0 ?
         score.fitness + tolerance >= overall_summary.best->score.fitness :
         score.accuracy >= overall_summary.best->score.accuracy);
 
@@ -460,7 +460,7 @@ namespace vita
         {  // better fitness
           overall_summary.best->score.fitness = score.fitness;
 
-          if (prob_->env.threashold.accuracy < 0.0)
+          if (env_.threashold.accuracy < 0.0)
             update();
         }
 
@@ -468,7 +468,7 @@ namespace vita
         {  // better accuracy
           overall_summary.best->score.accuracy = score.accuracy;
 
-          if (prob_->env.threashold.accuracy > 0.0)
+          if (env_.threashold.accuracy > 0.0)
             update();
         }
 
