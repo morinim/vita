@@ -349,7 +349,7 @@ namespace vita
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(prob_->env.threashold != score::lowest());
+    assert(prob_->env.threashold != score_t::lowest());
 
     // This is used in comparisons between fitnesses: we considered values
     // distinct only when their distance is greater than tolerance.

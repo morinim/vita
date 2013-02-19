@@ -25,7 +25,7 @@ namespace vita
   ///
   /// New empty instance.
   ///
-  src_problem::src_problem()  // : problem()
+  src_problem::src_problem()
   {
     clear();
   }
@@ -38,6 +38,7 @@ namespace vita
     p_symre = k_sae_evaluator;
     p_class = k_gaussian_evaluator;
 
+    problem::clear();
     dat_.clear();
   }
 

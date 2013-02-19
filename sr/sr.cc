@@ -354,7 +354,7 @@ namespace ui
         fix_parameters();
 
         vita::search s(&problem);
-        vita::individual ind(s.run(verbose, runs));
+        s.run(verbose, runs);
       }
       else
         std::cerr << "[ERROR] Too few terminals." << std::endl;
