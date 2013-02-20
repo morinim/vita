@@ -38,24 +38,22 @@ const std::string vita_sr_version2(
   "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
 );
 
-vita::src_problem problem;
-
 ///
 /// Fixes conflicting parameters.
 ///
-void fix_parameters()
+void fix_parameters(vita::src_problem *const problem)
 {
-  vita::environment &env(problem.env);
+  vita::environment &env(problem->env);
 
-  if (env.code_length && *env.code_length <= problem.categories())
+  if (env.code_length && *env.code_length <= problem->categories())
   {
-    const unsigned new_length(2 * problem.categories());
+    const unsigned new_length(2 * problem->categories());
     std::cout << "[WARNING] Adjusting code length (" << *env.code_length
               << " => " << new_length << ')' << std::endl;
     env.code_length = new_length;
   }
 
-  if (env.dss && problem.data()->size() <= 10)
+  if (env.dss && problem->data()->size() <= 10)
   {
     std::cout << "[WARNING] Adjusting DSS (true => false)" << std::endl;
     env.dss = false;
@@ -89,7 +87,7 @@ void fix_parameters()
 
   if (env.threashold == vita::score_t::lowest())
   {
-    if (problem.classification())
+    if (problem->classification())
     {
       env.threashold.accuracy = 0.99;
 
@@ -143,6 +141,9 @@ namespace ui
   /// Verbosity level.
   bool verbose(true);
 
+  /// Reference problem (the problem we will work on).
+  vita::src_problem *problem;
+
   ///
   /// \param[in] v a value for ARL (\see is_true).
   ///
@@ -150,11 +151,11 @@ namespace ui
   ///
   void arl(const std::string &v)
   {
-    problem.env.arl = is_true(v);
+    problem->env.arl = is_true(v);
 
     if (verbose)
       std::cout << "[INFO] Adaptive Representation through Learning is "
-                << problem.env.arl << std::endl;
+                << problem->env.arl << std::endl;
   }
 
   ///
@@ -164,7 +165,7 @@ namespace ui
   ///
   void brood(unsigned size)
   {
-    problem.env.brood_recombination = size;
+    problem->env.brood_recombination = size;
 
     if (verbose)
       std::cout << "[INFO] Brood size for recombination is " << size
@@ -179,7 +180,7 @@ namespace ui
   void code_length(unsigned length)
   {
     assert(length);
-    problem.env.code_length = length;
+    problem->env.code_length = length;
 
     if (verbose)
       std::cout << "[INFO] Code length is " << length << std::endl;
@@ -206,7 +207,7 @@ namespace ui
                 << " => 1.0)" << std::endl;
     }
 
-    problem.env.p_cross = r;
+    problem->env.p_cross = r;
 
     if (verbose)
       std::cout << "[INFO] Crossover rate is " << r << std::endl;
@@ -224,7 +225,7 @@ namespace ui
     unsigned parsed(0);
     try
     {
-      parsed = problem.load(data_file).first;
+      parsed = problem->load(data_file).first;
     }
     catch(...)
     {
@@ -237,9 +238,9 @@ namespace ui
         std::cerr << "data set file format error." << std::endl;
       else
         std::cout << "ok" << std::endl << "  [examples: " << parsed
-                  << ", categories: " << problem.categories()
-                  << ", features: " << problem.variables()
-                  << ", classes: " << problem.classes() << "]" << std::endl;
+                  << ", categories: " << problem->categories()
+                  << ", features: " << problem->variables()
+                  << ", classes: " << problem->classes() << "]" << std::endl;
     }
 
     return parsed;
@@ -252,10 +253,10 @@ namespace ui
   ///
   void dss(const std::string &v)
   {
-    problem.env.dss = is_true(v);
+    problem->env.dss = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Dynamic Subset Selection is " << problem.env.dss
+      std::cout << "[INFO] Dynamic Subset Selection is " << problem->env.dss
                 << std::endl;
   }
 
@@ -264,10 +265,10 @@ namespace ui
   ///
   void elitism(const std::string &v)
   {
-    problem.env.elitism = is_true(v);
+    problem->env.elitism = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Elitism is " << problem.env.elitism << std::endl;
+      std::cout << "[INFO] Elitism is " << problem->env.elitism << std::endl;
   }
 
   ///
@@ -296,15 +297,15 @@ namespace ui
 
     bool ok(true);
     if (keyword == "count")
-      problem.set_evaluator(vita::src_problem::k_count_evaluator);
+      problem->set_evaluator(vita::src_problem::k_count_evaluator);
     else if (keyword == "sae")
-      problem.set_evaluator(vita::src_problem::k_sae_evaluator);
+      problem->set_evaluator(vita::src_problem::k_sae_evaluator);
     else if (keyword == "sse")
-      problem.set_evaluator(vita::src_problem::k_sse_evaluator);
+      problem->set_evaluator(vita::src_problem::k_sse_evaluator);
     else if (keyword == "dynslot")
-      problem.set_evaluator(vita::src_problem::k_dyn_slot_evaluator, args);
+      problem->set_evaluator(vita::src_problem::k_dyn_slot_evaluator, args);
     else if (keyword == "gaussian")
-      problem.set_evaluator(vita::src_problem::k_gaussian_evaluator);
+      problem->set_evaluator(vita::src_problem::k_gaussian_evaluator);
     else
       ok = false;
 
@@ -337,7 +338,7 @@ namespace ui
   ///
   void generations(unsigned g)
   {
-    problem.env.g_since_start = g;
+    problem->env.g_since_start = g;
 
     if (verbose)
       std::cout << "[INFO] Generations is " << g << std::endl;
@@ -348,12 +349,12 @@ namespace ui
   ///
   void go(bool = true)
   {
-    if (problem.data()->size())
-      if (problem.env.sset.enough_terminals())
+    if (problem->data()->size())
+      if (problem->env.sset.enough_terminals())
       {
-        fix_parameters();
+        fix_parameters(problem);
 
-        vita::search s(&problem);
+        vita::search s(problem);
         s.run(verbose, runs);
       }
       else
@@ -369,7 +370,7 @@ namespace ui
   /// Sets the maximum number of generations without improvement in a run.
   void gwi(unsigned g)
   {
-    problem.env.g_without_improvement = g;
+    problem->env.g_without_improvement = g;
 
     if (verbose)
       std::cout << "[INFO] Max number of generations without improvement is "
@@ -391,7 +392,7 @@ namespace ui
   ///
   void mate_zone(unsigned z)
   {
-    problem.env.mate_zone = z;
+    problem->env.mate_zone = z;
 
     if (verbose)
       std::cout << "[INFO] Mate zone is " << z << std::endl;
@@ -418,7 +419,7 @@ namespace ui
                 << " => 1.0)" << std::endl;
     }
 
-    problem.env.p_mutation = r;
+    problem->env.p_mutation = r;
 
     if (verbose)
       std::cout << "[INFO] Mutation rate is " << r << std::endl;
@@ -436,7 +437,7 @@ namespace ui
     unsigned parsed(0);
     try
     {
-      parsed = problem.load_test_set(ts);
+      parsed = problem->load_test_set(ts);
     }
     catch(...)
     {
@@ -449,9 +450,9 @@ namespace ui
         std::cerr << "test set file format error." << std::endl;
       else
         std::cout << "ok" << std::endl << "  [examples: " << parsed
-                  << ", categories: " << problem.categories()
-                  << ", features: " << problem.variables()
-                  << ", classes: " << problem.classes() << "]" << std::endl;
+                  << ", categories: " << problem->categories()
+                  << ", features: " << problem->variables()
+                  << ", classes: " << problem->classes() << "]" << std::endl;
     }
 
     return parsed;
@@ -464,7 +465,7 @@ namespace ui
   ///
   void tournament_size(unsigned n)
   {
-    problem.env.tournament_size = n;
+    problem->env.tournament_size = n;
 
     if (verbose)
       std::cout << "[INFO] Tournament size is " << n << std::endl;
@@ -478,9 +479,9 @@ namespace ui
   void population_size(unsigned size)
   {
     if (size)
-      problem.env.individuals = size;
+      problem->env.individuals = size;
     else
-      problem.env.individuals = boost::none;
+      problem->env.individuals = boost::none;
 
     if (verbose)
     {
@@ -525,7 +526,7 @@ namespace ui
   ///
   void stat_arl(const std::string &v)
   {
-    problem.env.stat_arl = true;
+    problem->env.stat_arl = true;
 
     if (verbose)
       std::cout << "[INFO] ARL is " << v << std::endl;
@@ -538,7 +539,7 @@ namespace ui
   ///
   void stat_dir(const std::string &dir)
   {
-    problem.env.stat_dir = dir;
+    problem->env.stat_dir = dir;
 
     if (verbose)
       std::cout << "[INFO] Logging folder is " << dir << std::endl;
@@ -549,11 +550,11 @@ namespace ui
   ///
   void stat_dynamic(const std::string &v)
   {
-    problem.env.stat_dynamic = is_true(v);
+    problem->env.stat_dynamic = is_true(v);
 
     if (verbose)
       std::cout << "[INFO] Dynamic evolution logging is "
-                << problem.env.stat_dynamic << std::endl;
+                << problem->env.stat_dynamic << std::endl;
   }
 
   ///
@@ -561,11 +562,11 @@ namespace ui
   ///
   void stat_population(const std::string &v)
   {
-    problem.env.stat_population = is_true(v);
+    problem->env.stat_population = is_true(v);
 
     if (verbose)
       std::cout << "[INFO] Population logging is "
-                << problem.env.stat_population << std::endl;
+                << problem->env.stat_population << std::endl;
   }
 
   ///
@@ -573,7 +574,7 @@ namespace ui
   ///
   void stat_summary(const std::string &v)
   {
-    problem.env.stat_summary = true;
+    problem->env.stat_summary = true;
 
     if (verbose)
       std::cout << "[INFO] Summary logging is " << v << std::endl;
@@ -591,7 +592,7 @@ namespace ui
     {
       if (verbose)
         std::cout << "Using default symbol set." << std::endl;
-      problem.setup_default_symbols();
+      problem->setup_default_symbols();
     }
     else
     {
@@ -601,7 +602,7 @@ namespace ui
       unsigned parsed(0);
       try
       {
-        parsed = problem.load_symbols(symbol_file);
+        parsed = problem->load_symbols(symbol_file);
       }
       catch(...)
       {
@@ -619,7 +620,7 @@ namespace ui
                   << std::endl;
     }
 
-    if (!problem.env.sset.enough_terminals())
+    if (!problem->env.sset.enough_terminals())
     {
       std::cerr << "[ERROR] Too few terminals." << std::endl;
       return false;
@@ -637,7 +638,7 @@ namespace ui
   ///
   void threashold(const std::string &v)
   {
-    problem.env.threashold = vita::score_t::lowest();
+    problem->env.threashold = vita::score_t::lowest();
 
     bool set(false);
 
@@ -650,7 +651,7 @@ namespace ui
 
         set = (0.0 < accuracy) && (accuracy <= 1.0);
         if (set)
-          problem.env.threashold.accuracy = accuracy;
+          problem->env.threashold.accuracy = accuracy;
       }
       else
       {
@@ -658,7 +659,7 @@ namespace ui
 
         set = (fitness <= 0.0);
         if (set)
-          problem.env.threashold.fitness = fitness;
+          problem->env.threashold.fitness = fitness;
       }
     }
 
@@ -678,7 +679,7 @@ namespace ui
   void ttable(unsigned bits)
   {
     assert(bits);
-    problem.env.ttable_size = bits;
+    problem->env.ttable_size = bits;
 
     if (verbose)
       std::cout << "[INFO] TTable size is " << bits << " bits" << std::endl;
@@ -704,7 +705,7 @@ namespace ui
 
       set = (0.0 <= ratio) && (ratio <= 0.9);
       if (set)
-        problem.env.validation_ratio = ratio;
+        problem->env.validation_ratio = ratio;
 
     }
 
@@ -884,8 +885,12 @@ int main(int argc, char *const argv[])
   std::cout.setf(std::ios::boolalpha);
   std::cout << ui::header << std::endl;
 
+  vita::src_problem problem;
+
+  ui::problem = &problem;
+
   const int ret(parse_command_line(argc, argv));
-  if (ret < 0)  // help or version options
+  if (ret < 0)  // help or version option
     return EXIT_SUCCESS;
 
   if (ret == 0)  // error
