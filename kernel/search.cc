@@ -351,10 +351,6 @@ namespace vita
   {
     assert(env_.threashold != score_t::lowest());
 
-    // This is used in comparisons between fitnesses: we considered values
-    // distinct only when their distance is greater than tolerance.
-    const fitness_t tolerance(0.0001);
-
     summary overall_summary;
     distribution<fitness_t> fd;
 
@@ -434,45 +430,14 @@ namespace vita
       {
         ++solutions;
         overall_summary.last_imp += s.last_imp;
-      }
-
-      // 'good' is true when the present individual/solution satisfies (is
-      // greater than OR equal to) the current threashold criterion (accuracy
-      // OR fitness).
-      const bool good(
-        env_.threashold.accuracy < 0.0 ?
-        score.fitness + tolerance >= overall_summary.best->score.fitness :
-        score.accuracy >= overall_summary.best->score.accuracy);
-
-      if (good)  // Well, we have found a good individual...
-      {
-        // ...is it a new best? We know that, considering the current
-        // threashold criterion, it is at least equal to the best individual so
-        // far.
-
-        auto update = [&]()
-        {
-          overall_summary.best->ind = s.best->ind;
-          good_runs.clear();
-        };
-
-        if (score.fitness > overall_summary.best->score.fitness + tolerance)
-        {  // better fitness
-          overall_summary.best->score.fitness = score.fitness;
-
-          if (env_.threashold.accuracy < 0.0)
-            update();
-        }
-
-        if (score.accuracy > overall_summary.best->score.accuracy)
-        {  // better accuracy
-          overall_summary.best->score.accuracy = score.accuracy;
-
-          if (env_.threashold.accuracy > 0.0)
-            update();
-        }
 
         good_runs.push_back(run);
+
+        if (score > overall_summary.best->score)
+        {
+          overall_summary.best->score = score;
+          overall_summary.best->ind = s.best->ind;
+        }
       }
 
       if (std::isfinite(score.fitness))

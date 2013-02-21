@@ -41,6 +41,12 @@ namespace vita
     bool operator!=(const score_t &s) const
     { return fitness != s.fitness || accuracy != s.accuracy; }
 
+    bool operator>(const score_t &s) const
+    {
+      return
+        fitness > s.fitness || (fitness == s.fitness && accuracy > s.accuracy);
+    }
+
     fitness_t fitness;
     double   accuracy;
 
