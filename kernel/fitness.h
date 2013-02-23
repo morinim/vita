@@ -21,6 +21,7 @@
 namespace vita
 {
   ///
+  /// \brief
   /// A value assigned to an individual which reflects how well the individual
   /// solves the task.
   ///
@@ -33,24 +34,57 @@ namespace vita
     explicit fitness_t(size_t d) : vect(d) { assert(d); }
     fitness_t(std::initializer_list<base_t> l) : vect(l) {}
 
+    /// Operation is performed by first comparing sizes and, if they match,
+    /// the elements are compared sequentially using algorithm equal, which
+    /// stops at the first mismatch.
     bool operator==(const fitness_t &f) const
     { return vect == f.vect; }
 
+    /// Operation is performed by first comparing sizes and, if they match,
+    /// the elements are compared sequentially using algorithm equal, which
+    /// stops at the first mismatch.
     bool operator!=(const fitness_t &f) const
     { return vect != f.vect; }
 
-    /// Lexicographic ordering.
+    /// Behaves as if using algorithm lexicographical_compare, which compares
+    /// the elements sequentially, stopping at the first mismatch.
+    ///
+    /// \note
+    /// A lexicographical comparison is the kind of comparison generally used
+    /// to sort words alphabetically in dictionaries; it involves comparing
+    /// sequentially the elements that have the same position in both ranges
+    /// against each other until one element is not equivalent to the other.
+    /// The result of comparing these first non-matching elements is the result
+    /// of the lexicographical comparison.
+    /// If both sequences compare equal until one of them ends, the shorter
+    /// sequence is lexicographically less than the longer one.
     bool operator>(const fitness_t &f) const
     {
       assert(vect.size() == f.vect.size());
+      return vect > f.vect;
 
-      const size_t sup(vect.size());
-      for (size_t i(0); i < sup; ++i)
-        if (vect[i] != f.vect[i])
-          return vect[i] > f.vect[i];
-
-      return false;
+      // An alternative implementation:
+      // > const size_t sup(vect.size());
+      // > for (size_t i(0); i < sup; ++i)
+      // >   if (vect[i] != f.vect[i])
+      // >     return vect[i] > f.vect[i];
+      // > return false;
     }
+
+    /// Lexicographic ordering.
+    /// \see fitness_t::operator>
+    bool operator>=(const fitness_t &f) const
+    { assert(vect.size() == f.vect.size()); return vect >= f.vect; }
+
+    /// Lexicographic ordering.
+    /// \see fitness_t::operator>
+    bool operator<(const fitness_t &f) const
+    { assert(vect.size() == f.vect.size()); return vect < f.vect; }
+
+    /// Lexicographic ordering.
+    /// \see fitness_t::operator>
+    bool operator<=(const fitness_t &f) const
+    { assert(vect.size() == f.vect.size()); return vect <= f.vect; }
 
     ///
     /// \param[in] f second term of comparison.
@@ -67,19 +101,6 @@ namespace vita
       for (size_t i(0); i < sup; ++i)
         if (vect[i] < f.vect[i])
           return false;
-
-      return true;
-    }
-
-    /// Lexicographic ordering.
-    bool operator>=(const fitness_t &f) const
-    {
-      assert(vect.size() == f.vect.size());
-
-      const size_t sup(vect.size());
-      for (size_t i(0); i < sup; ++i)
-        if (vect[i] != f.vect[i])
-          return vect[i] > f.vect[i];
 
       return true;
     }
