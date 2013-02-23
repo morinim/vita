@@ -90,8 +90,7 @@ namespace vita
     //for (size_t i(0); i <= k_mask; ++i)
     //{
     //  table_[i].hash = hash_t();
-    //  table_[i].score.fitness  = 0.0;
-    //  table_[i].score.accuracy = 0.0;
+    //  table_[i].fitness = {0.0, 0.0};
     //}
   }
 
@@ -109,14 +108,14 @@ namespace vita
 
   ///
   /// \param[in] ind the individual to look for.
-  /// \param[out] score the fitness and the accuracy of the individual (if
-  ///                   present).
+  /// \param[out] fitness the fitness and the accuracy of the individual (if
+  ///                     present).
   /// \return \c true if \a ind is found in the transposition table, \c false
   ///         otherwise.
   ///
   /// Looks for the fitness of an individual in the transposition table.
   ///
-  bool ttable::find(const individual &ind, score_t *const score) const
+  bool ttable::find(const individual &ind, fitness_t *const fitness) const
   {
     ++probes_;
 
@@ -129,7 +128,7 @@ namespace vita
     if (ret)
     {
       ++hits_;
-      *score = s.score;
+      *fitness = s.fitness;
     }
 
     return ret;
@@ -137,15 +136,15 @@ namespace vita
 
   ///
   /// \param[in] ind a (possibly) new individual to be stored in the table.
-  /// \param[out] score the fitness and the accuracy of the individual.
+  /// \param[out] fitness the fitness and the accuracy of the individual.
   ///
   /// Stores fitness information in the transposition table.
   ///
-  void ttable::insert(const individual &ind, const score_t &score)
+  void ttable::insert(const individual &ind, const fitness_t &fitness)
   {
     slot s;
     s.hash     = ind.signature();
-    s.score    =           score;
+    s.fitness  =         fitness;
     s.birthday =         period_;
 
     table_[index(s.hash)] = s;

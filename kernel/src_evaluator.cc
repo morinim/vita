@@ -27,14 +27,14 @@ namespace vita
   /// \return the fitness (greater is better, max is 0) and the accuracy
   ///         (percentage).
   ///
-  score_t sum_of_errors_evaluator::operator()(const individual &ind)
+  fitness_t sum_of_errors_evaluator::operator()(const individual &ind)
   {
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
     src_interpreter agent(ind);
 
-    double err(0.0);
+    fitness_t::base_t err(0.0);
     int illegals(0);
     unsigned ok(0), total_nr(0);
 
@@ -49,8 +49,8 @@ namespace vita
 
     // Note that we take the average error: this way fast() and operator()
     // outputs can be compared.
-    return score_t(fitness_t(-err / total_nr),
-                   static_cast<double>(ok) / static_cast<double>(total_nr));
+    return {-err / total_nr,
+            static_cast<double>(ok) / static_cast<double>(total_nr)};
   }
 
   ///
@@ -72,14 +72,14 @@ namespace vita
   /// This function is similar to operator()() but will skip 3 out of 4
   /// training instances, so it's faster ;-)
   ///
-  score_t sum_of_errors_evaluator::fast(const individual &ind)
+  fitness_t sum_of_errors_evaluator::fast(const individual &ind)
   {
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
     src_interpreter agent(ind);
 
-    double err(0.0);
+    fitness_t::base_t err(0.0);
     int illegals(0);
     unsigned ok(0), total_nr(0);
     unsigned counter(0);
@@ -96,8 +96,8 @@ namespace vita
 
     // Note that we take the average error: this way fast() and operator()
     // outputs can be compared.
-    return score_t(fitness_t(-err / total_nr),
-                   static_cast<double>(ok) / static_cast<double>(total_nr));
+    return {-err / total_nr,
+            static_cast<double>(ok) / static_cast<double>(total_nr)};
   }
 
   ///
@@ -215,22 +215,24 @@ namespace vita
   /// so DSS isn't working at full full capacity (it considers only example
   /// "age").
   ///
-  score_t dyn_slot_evaluator::operator()(const individual &ind)
+  fitness_t dyn_slot_evaluator::operator()(const individual &ind)
   {
     assert(ind.debug());
     assert(dat_->classes() > 1);
 
     engine_ = dyn_slot_engine(ind, *dat_, x_slot_);
 
-    fitness_t err(0.0);
+    fitness_t::base_t err(0.0);
     for (size_t i(0); i < engine_.slot_matrix.rows(); ++i)
       for (size_t j(0); j < engine_.slot_matrix.cols(); ++j)
         if (j != engine_.slot_class[i])
           err += engine_.slot_matrix(i, j);
 
-    return score_t(fitness_t(-err),
-                   static_cast<double>(engine_.dataset_size - err) /
-                   static_cast<double>(engine_.dataset_size));
+    assert(engine_.dataset_size >= err);
+
+    return {-err,
+            static_cast<double>(engine_.dataset_size - err) /
+            static_cast<double>(engine_.dataset_size)};
   }
 
   ///
@@ -254,13 +256,13 @@ namespace vita
   ///   Programming for Multiclass Object Classification" - Mengjie Zhang, Will
   ///   Smart (december 2005).
   ///
-  score_t gaussian_evaluator::operator()(const individual &ind)
+  fitness_t gaussian_evaluator::operator()(const individual &ind)
   {
     assert(ind.debug());
     assert(dat_->classes() > 1);
     gaussian_engine engine_(ind, *dat_);
 
-    fitness_t d(0.0);
+    fitness_t::base_t d(0.0);
     unsigned ok(0), count(0);
     for (auto &example : *dat_)
     {
@@ -297,7 +299,7 @@ namespace vita
     }
     assert(count);
 
-    return score_t(d, static_cast<double>(ok) / static_cast<double>(count));
+    return {d, static_cast<double>(ok) / static_cast<double>(count)};
   }
 
   ///
@@ -325,7 +327,7 @@ namespace vita
 
     src_interpreter agent(ind);
 
-    fitness_t err(0.0);
+    fitness_t::base_t err(0.0);
     int illegals(0);
 
     for (auto &example : *dat_)

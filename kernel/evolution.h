@@ -41,8 +41,8 @@ namespace vita
 
     struct best_
     {
-      individual ind;
-      score_t  score;
+      individual    ind;
+      fitness_t fitness;
     };
 
     boost::optional<best_> best;
@@ -80,7 +80,6 @@ namespace vita
     const vita::population &population() const;
     vita::population &population();
 
-    score_t score(const individual &) const;
     fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
 

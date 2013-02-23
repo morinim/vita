@@ -62,7 +62,7 @@ namespace vita
 
   ///
   /// \return a vector of indexes to individuals ordered in descending
-  ///         fitness score.
+  ///         fitness.
   ///
   /// Parameters from the environment:
   /// * mate_zone - to restrict the selection of individuals to a segment of
@@ -90,7 +90,7 @@ namespace vita
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
       index_t j(0);
-      while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
+      while (j < i && new_fitness[0] < evo_->fitness(pop[ret[j]])[0])
         ++j;
 
       for (index_t k(j); k < i; ++k)
@@ -101,7 +101,8 @@ namespace vita
 
 #if !defined(NDEBUG)
     for (unsigned i(0); i + 1 < rounds; ++i)
-      assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
+      assert(evo_->fitness(pop[ret[i]])[0] >=
+             evo_->fitness(pop[ret[i + 1]])[0]);
 #endif
 
     return ret;

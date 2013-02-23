@@ -48,7 +48,7 @@ namespace vita
   void search::arl(const individual &base, evolution &evo)
   {
     const fitness_t base_fit(evo.fitness(base));
-    if (std::isfinite(base_fit))
+    if (std::isfinite(base_fit[0]))
     {
       const std::string filename(env_.stat_dir + "/" +
                                  environment::arl_filename);
@@ -73,11 +73,10 @@ namespace vita
         if (candidate_block.eff_size() <= 5 + adf_args)
         {
           const auto d_f(
-            distance(base_fit,
-                     evo.fitness(base.destroy_block(l[locus_index]))));
+            base_fit[0] - evo.fitness(base.destroy_block(l[locus_index]))[0]);
 
           // Semantic introns cannot be building blocks.
-          if (std::isfinite(d_f) && std::fabs(base_fit / 10.0) < d_f)
+          if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
           {
             symbol_ptr p;
             if (adf_args)
@@ -99,8 +98,8 @@ namespace vita
             {
               log << p->display() << " (Base: " << base_fit
                   << "  DF: " << d_f
-                  << "  Weight: " << std::fabs(d_f / base_fit) * 100.0 << "%)"
-                  << std::endl;
+                  << "  Weight: " << std::fabs(d_f / base_fit[0]) * 100.0
+                  << "%)" << std::endl;
               candidate_block.list(log);
               log << std::endl;
             }
@@ -349,10 +348,10 @@ namespace vita
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(env_.threashold != score_t::lowest());
+    assert(!env_.threashold.empty());
 
     summary overall_summary;
-    distribution<fitness_t> fd;
+    distribution<fitness_t::base_t> fd;
 
     unsigned solutions(0);
 
@@ -382,7 +381,7 @@ namespace vita
 
       // Depending on validation, this can be the training score or the
       // validation score for the current run.
-      score_t score;
+      fitness_t fitness;
 
       if (validation)
       {
@@ -391,7 +390,7 @@ namespace vita
         prob_->data()->dataset(data::validation);
         prob_->get_evaluator()->clear(s.best->ind);
 
-        score = (*prob_->get_evaluator())(s.best->ind);
+        fitness = (*prob_->get_evaluator())(s.best->ind);
 
         prob_->data()->dataset(backup);
         prob_->get_evaluator()->clear(s.best->ind);
@@ -400,31 +399,30 @@ namespace vita
       {
         // If shake_data is true, the values calculated during the evolution
         // refer to a subset of the available training set. Since we need an
-        // overall score for comparison, a new calculation has to be performed.
+        // overall fitness for comparison, a new calculation has to be
+        // performed.
         if (shake_data)
         {
           prob_->data()->dataset(data::training);
           prob_->data()->slice(0);
           prob_->get_evaluator()->clear(s.best->ind);
 
-          score = (*prob_->get_evaluator())(s.best->ind);
+          fitness = (*prob_->get_evaluator())(s.best->ind);
         }
         else
-          score = s.best->score;
+          fitness = s.best->fitness;
       }
 
       if (verbose)
-        std::cout << "Score (" << (validation ? "validation" : "training")
-                  << "): " << score << std::endl << std::endl;
+        std::cout << "Fitness (" << (validation ? "validation" : "training")
+                  << "): " << fitness << std::endl << std::endl;
 
       if (run == 0)
-        overall_summary.best = {s.best->ind, score};
+        overall_summary.best = {s.best->ind, fitness};
 
       // We use accuracy or fitness (or both) to identify successful runs
       // (based on env_.threashold).
-      const bool solution_found(
-        score.fitness >= env_.threashold.fitness &&
-        score.accuracy >= env_.threashold.accuracy);
+      const bool solution_found(fitness.dominating(env_.threashold));
 
       if (solution_found)
       {
@@ -433,15 +431,15 @@ namespace vita
 
         good_runs.push_back(run);
 
-        if (score > overall_summary.best->score)
+        if (fitness > overall_summary.best->fitness)
         {
-          overall_summary.best->score = score;
+          overall_summary.best->fitness = fitness;
           overall_summary.best->ind = s.best->ind;
         }
       }
 
-      if (std::isfinite(score.fitness))
-        fd.add(score.fitness);
+      if (std::isfinite(fitness[0]))
+        fd.add(fitness[0]);
 
       overall_summary.ttable_hits += s.ttable_hits;
       overall_summary.ttable_probes += s.ttable_probes;
@@ -470,7 +468,8 @@ namespace vita
   ///
   /// Writes end-of-run logs (run summary, results for test...).
   ///
-  void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
+  void search::log(const summary &run_sum,
+                   const distribution<fitness_t::base_t> &fd,
                    const std::list<unsigned> &best_runs, unsigned solutions,
                    unsigned runs)
   {
@@ -491,8 +490,8 @@ namespace vita
       pt.put(summary + "speed", run_sum.speed);
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
-      pt.put(summary + "best.fitness", run_sum.best->score.fitness);
-      pt.put(summary + "best.accuracy", run_sum.best->score.accuracy);
+      pt.put(summary + "best.fitness", run_sum.best->fitness[0]);
+      pt.put(summary + "best.accuracy", run_sum.best->fitness[1]);
       pt.put(summary + "best.times_reached", best_runs.size());
       pt.put(summary + "best.avg_depth_found", solutions
              ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /

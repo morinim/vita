@@ -44,8 +44,8 @@ namespace vita
   public:
     explicit sum_of_errors_evaluator(data &d) : src_evaluator(d) {}
 
-    score_t operator()(const individual &);
-    score_t fast(const individual &);
+    fitness_t operator()(const individual &);
+    fitness_t fast(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
@@ -132,7 +132,7 @@ namespace vita
   public:
     explicit dyn_slot_evaluator(data &, size_t = 10);
 
-    score_t operator()(const individual &);
+    fitness_t operator()(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
@@ -160,7 +160,7 @@ namespace vita
   public:
     explicit gaussian_evaluator(data &d) : src_evaluator(d) {}
 
-    score_t operator()(const individual &);
+    fitness_t operator()(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:

@@ -43,7 +43,7 @@ namespace vita
       ttable_size(16),
       stat_dir(""),
       stat_arl(false), stat_dynamic(false), stat_population(false),
-      stat_summary(false), threashold(score_t::lowest())
+      stat_summary(false)
   {
     if (initialize)
     {

@@ -31,32 +31,32 @@ namespace vita
   /// \param[in] ind the individual whose fitness we want to know.
   /// \return the fitness and the accuracy of \a ind.
   ///
-  score_t evaluator_proxy::operator()(const individual &ind)
+  fitness_t evaluator_proxy::operator()(const individual &ind)
   {
-    score_t s;
-    if (!cache_.find(ind, &s))
+    fitness_t f;
+    if (!cache_.find(ind, &f))
     {
-      s = (*eva_)(ind);
+      f = (*eva_)(ind);
 
-      cache_.insert(ind, s);
+      cache_.insert(ind, f);
 
 #if !defined(NDEBUG)
-      score_t s1;
-      assert(cache_.find(ind, &s1));
-      assert(s == s1);
+      fitness_t f1;
+      assert(cache_.find(ind, &f1));
+      assert(f == f1);
 #endif
     }
 #if !defined(NDEBUG)
     else  // hash collision checking code can slow down the program very much
     {
-      const score_t s1((*eva_)(ind));
-      if (s != s1)
-        std::cerr << "********* COLLISION ********* (" << s.fitness
-                  << " != " << s1.fitness << ")" << std::endl;
+      const fitness_t f1((*eva_)(ind));
+      if (f != f1)
+        std::cerr << "********* COLLISION ********* [" << f
+                  << " != " << f1 << "]" << std::endl;
     }
 #endif
 
-    return s;
+    return f;
   }
 
   ///

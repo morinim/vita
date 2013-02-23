@@ -33,7 +33,7 @@ namespace vita
     virtual void clear();
     virtual void clear(const individual &);
 
-    virtual score_t operator()(const individual &);
+    virtual fitness_t operator()(const individual &);
 
     std::uintmax_t probes() const;
     std::uintmax_t hits() const;

@@ -42,7 +42,7 @@ namespace vita
 
   private:
     void dss(unsigned) const;
-    void log(const summary &, const distribution<fitness_t> &,
+    void log(const summary &, const distribution<fitness_t::base_t> &,
              const std::list<unsigned> &, unsigned, unsigned);
     bool stop_condition(const summary &) const;
 

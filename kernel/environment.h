@@ -20,7 +20,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "score.h"
+#include "fitness.h"
 #include "symbol_set.h"
 
 namespace vita
@@ -152,7 +152,7 @@ namespace vita
 
     /// \a threashold is used to identify successfully learned (matched,
     /// classified, resolved...) examples.
-    score_t threashold;
+    fitness_t threashold;
 
     symbol_set sset;
 
