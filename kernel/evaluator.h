@@ -44,7 +44,7 @@ namespace vita
     virtual void clear() {}
     virtual void clear(const individual &) {}
 
-    /// \return the fitness and the accuracy (percentage) of the individual.
+    /// \return the fitness of the individual.
     ///
     /// The accuracy of a program refers to the number of training examples
     /// that are correctly scored/classified as a proportion of the total
