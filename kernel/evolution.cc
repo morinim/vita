@@ -82,23 +82,6 @@ namespace vita
   }
 
   ///
-  /// \param[out] probes number of probes in the transposition table.
-  /// \param[out] hits number of hits in the transposition table (hits <=
-  ///             probes).
-  ///
-  void evolution::get_probes(std::uintmax_t *probes,
-                             std::uintmax_t *hits) const
-  {
-    *probes = *hits = 0;
-
-    if (typeid(*eva_) == typeid(evaluator_proxy))
-    {
-      *probes = std::static_pointer_cast<evaluator_proxy>(eva_)->probes();
-      *hits   = std::static_pointer_cast<evaluator_proxy>(eva_)->hits();
-    }
-  }
-
-  ///
   /// \param[in] run_count run number.
   ///
   /// Saves working / statistical informations in a log file.
@@ -129,9 +112,6 @@ namespace vita
         if (last_run != run_count)
           dynamic << std::endl << std::endl;
 
-        std::uintmax_t hits(0), probes(0);
-        get_probes(&probes, &hits);
-
         dynamic << run_count
                 << ' ' << stats_.gen;
 
@@ -153,9 +133,7 @@ namespace vita
                 << ' ' << stats_.az.functions(0)
                 << ' ' << stats_.az.terminals(0)
                 << ' ' << stats_.az.functions(1)
-                << ' ' << stats_.az.terminals(1)
-                << ' ' << hits
-                << ' ' << probes;
+                << ' ' << stats_.az.terminals(1);
 
         for (unsigned active(0); active <= 1; ++active)
           for (analyzer::const_iterator i(stats_.az.begin());
@@ -280,7 +258,6 @@ namespace vita
       }
 
       stats_.speed = get_speed(measure.elapsed());
-      get_probes(&stats_.ttable_probes, &stats_.ttable_hits);
     }
 
     if (verbose)
@@ -329,8 +306,6 @@ namespace vita
   ///
   void summary::clear()
   {
-    ttable_probes = 0;
-    ttable_hits   = 0;
     mutations     = 0;
     crossovers    = 0;
     gen           = 0;

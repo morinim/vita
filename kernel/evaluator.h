@@ -57,6 +57,11 @@ namespace vita
 
     virtual fitness_t fast(const individual &i) { return operator()(i); }
 
+    ///
+    /// \return some info about the status / efficiency of the evaluator.
+    ///
+    virtual std::string info() const { return ""; }
+
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
   };
 

@@ -49,9 +49,6 @@ namespace vita
 
     double speed;
 
-    std::uintmax_t ttable_probes;
-    std::uintmax_t   ttable_hits;
-
     std::uintmax_t  mutations;
     std::uintmax_t crossovers;
 
@@ -91,7 +88,6 @@ namespace vita
 
   private:
     double get_speed(double) const;
-    void get_probes(std::uintmax_t *, std::uintmax_t *) const;
     analyzer get_stats() const;
     void log(unsigned) const;
 

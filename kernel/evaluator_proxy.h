@@ -35,8 +35,7 @@ namespace vita
 
     virtual fitness_t operator()(const individual &);
 
-    std::uintmax_t probes() const;
-    std::uintmax_t hits() const;
+    virtual std::string info() const;
 
   private:
     /// Access to the real evaluator.

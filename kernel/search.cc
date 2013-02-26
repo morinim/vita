@@ -441,8 +441,6 @@ namespace vita
       if (std::isfinite(fitness[0]))
         fd.add(fitness[0]);
 
-      overall_summary.ttable_hits += s.ttable_hits;
-      overall_summary.ttable_probes += s.ttable_probes;
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);
 
@@ -502,8 +500,7 @@ namespace vita
       pt.put(summary + "best.individual.tree", best_tree.str());
       pt.put(summary + "best.individual.list", best_list.str());
       pt.put(summary + "best.individual.graph", best_graph.str());
-      pt.put(summary + "ttable.hits", run_sum.ttable_hits);
-      pt.put(summary + "ttable.probes", run_sum.ttable_probes);
+      pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
 
       const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 

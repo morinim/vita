@@ -78,18 +78,15 @@ namespace vita
   }
 
   ///
-  /// \return number of probes in the transposition table.
+  /// \return number of cache probes / hits.
   ///
-  std::uintmax_t evaluator_proxy::probes() const
+  std::string evaluator_proxy::info() const
   {
-    return cache_.probes();
-  }
-
-  ///
-  /// \return number of transposition table hits.
-  ///
-  std::uintmax_t evaluator_proxy::hits() const
-  {
-    return cache_.hits();
+    return
+      "hits " + boost::lexical_cast<std::string>(cache_.hits()) +
+      ", probes " + boost::lexical_cast<std::string>(cache_.probes()) +
+      " (ratio " +
+      boost::lexical_cast<std::string>(cache_.hits() * 100 / cache_.probes()) +
+      "%)";
   }
 }  // namespace vita
