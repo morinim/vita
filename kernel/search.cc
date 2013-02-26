@@ -430,12 +430,12 @@ namespace vita
         overall_summary.last_imp += s.last_imp;
 
         good_runs.push_back(run);
+      }
 
-        if (fitness > overall_summary.best->fitness)
-        {
-          overall_summary.best->fitness = fitness;
-          overall_summary.best->ind = s.best->ind;
-        }
+      if (fitness > overall_summary.best->fitness)
+      {
+        overall_summary.best->fitness = fitness;
+        overall_summary.best->ind = s.best->ind;
       }
 
       if (std::isfinite(fitness[0]))
