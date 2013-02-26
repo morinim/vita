@@ -488,8 +488,9 @@ namespace vita
       pt.put(summary + "speed", run_sum.speed);
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
-      pt.put(summary + "best.fitness", run_sum.best->fitness[0]);
-      pt.put(summary + "best.accuracy", run_sum.best->fitness[1]);
+      pt.put(summary + "best.fitness", run_sum.best->fitness);
+      pt.put(summary + "best.accuracy",
+             prob_->get_evaluator()->accuracy(run_sum.best->ind));
       pt.put(summary + "best.times_reached", best_runs.size());
       pt.put(summary + "best.avg_depth_found", solutions
              ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /

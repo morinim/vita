@@ -44,13 +44,14 @@ namespace vita
   public:
     explicit sum_of_errors_evaluator(data &d) : src_evaluator(d) {}
 
-    fitness_t operator()(const individual &);
-    fitness_t fast(const individual &);
+    virtual fitness_t operator()(const individual &);
+    virtual fitness_t fast(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
+    virtual double accuracy(const individual &) const;
+
   private:
-    virtual double error(src_interpreter &, data::example &, int *const,
-                         unsigned *const) = 0;
+    virtual double error(src_interpreter &, data::example &, int *const) = 0;
   };
 
   ///
@@ -73,8 +74,7 @@ namespace vita
     explicit sae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const,
-                         unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const);
   };
 
   ///
@@ -95,8 +95,7 @@ namespace vita
     explicit sse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const,
-                         unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const);
   };
 
   ///
@@ -110,8 +109,7 @@ namespace vita
     explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const,
-                         unsigned *const);
+    virtual double error(src_interpreter &, data::example &, int *const);
   };
 
   ///

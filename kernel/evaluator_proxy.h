@@ -35,6 +35,8 @@ namespace vita
 
     virtual fitness_t operator()(const individual &);
 
+    virtual double accuracy(const individual &) const;
+
     virtual std::string info() const;
 
   private:

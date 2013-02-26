@@ -77,6 +77,11 @@ namespace vita
     cache_.clear(ind);
   }
 
+  double evaluator_proxy::accuracy(const individual &ind) const
+  {
+    return eva_->accuracy(ind);
+  }
+
   ///
   /// \return number of cache probes / hits.
   ///

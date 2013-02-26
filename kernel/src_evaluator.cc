@@ -24,8 +24,7 @@ namespace vita
 
   ///
   /// \param[in] ind program used for fitness evaluation.
-  /// \return the fitness (greater is better, max is 0) and the accuracy
-  ///         (percentage).
+  /// \return the fitness (greater is better, max is 0).
   ///
   fitness_t sum_of_errors_evaluator::operator()(const individual &ind)
   {
@@ -36,11 +35,11 @@ namespace vita
 
     fitness_t::base_t err(0.0);
     int illegals(0);
-    unsigned ok(0), total_nr(0);
+    unsigned total_nr(0);
 
     for (auto &example : *dat_)
     {
-      err += error(agent, example, &illegals, &ok);
+      err += error(agent, example, &illegals);
 
       ++total_nr;
     }
@@ -49,8 +48,70 @@ namespace vita
 
     // Note that we take the average error: this way fast() and operator()
     // outputs can be compared.
-    return {-err / total_nr,
-            static_cast<double>(ok) / static_cast<double>(total_nr)};
+    return {-err / total_nr};
+  }
+
+  ///
+  /// \param[in] ind program used for fitness evaluation.
+  /// \return the fitness (greater is better, max is 0).
+  ///
+  /// This function is similar to operator()() but will skip 3 out of 4
+  /// training instances, so it's faster ;-)
+  ///
+  fitness_t sum_of_errors_evaluator::fast(const individual &ind)
+  {
+    assert(!dat_->classes());
+    assert(dat_->cbegin() != dat_->cend());
+
+    src_interpreter agent(ind);
+
+    fitness_t::base_t err(0.0);
+    int illegals(0);
+    unsigned total_nr(0);
+    unsigned counter(0);
+
+    for (auto &example : *dat_)
+      if (dat_->size() <= 20 || (counter++ % 5) == 0)
+      {
+        err += error(agent, example, &illegals);
+
+        ++total_nr;
+      }
+
+    assert(total_nr);
+
+    // Note that we take the average error: this way fast() and operator()
+    // outputs can be compared.
+    return {-err / total_nr};
+  }
+
+  ///
+  /// \param[in] ind program used for scoring accuracy.
+  /// \return the accuracy.
+  ///
+  double sum_of_errors_evaluator::accuracy(const individual &ind) const
+  {
+    assert(!dat_->classes());
+    assert(dat_->cbegin() != dat_->cend());
+
+    std::unique_ptr<lambda_f> f(lambdify(ind));
+
+    std::uintmax_t ok(0), total_nr(0);
+
+    for (const auto &example : *dat_)
+    {
+      const any res((*f)(example));
+      if (!res.empty() &&
+          std::fabs(interpreter::to_double(res) -
+                    data::cast<double>(example.output)) <= float_epsilon)
+        ++ok;
+
+      ++total_nr;
+    }
+
+    assert(total_nr);
+
+    return static_cast<double>(ok) / static_cast<double>(total_nr);
   }
 
   ///
@@ -65,42 +126,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind program used for fitness evaluation.
-  /// \return the fitness (greater is better, max is 0) and the accuracy
-  ///         (percentage).
-  ///
-  /// This function is similar to operator()() but will skip 3 out of 4
-  /// training instances, so it's faster ;-)
-  ///
-  fitness_t sum_of_errors_evaluator::fast(const individual &ind)
-  {
-    assert(!dat_->classes());
-    assert(dat_->cbegin() != dat_->cend());
-
-    src_interpreter agent(ind);
-
-    fitness_t::base_t err(0.0);
-    int illegals(0);
-    unsigned ok(0), total_nr(0);
-    unsigned counter(0);
-
-    for (auto &example : *dat_)
-      if (dat_->size() <= 20 || (counter++ % 5) == 0)
-      {
-        err += error(agent, example, &illegals, &ok);
-
-        ++total_nr;
-      }
-
-    assert(total_nr);
-
-    // Note that we take the average error: this way fast() and operator()
-    // outputs can be compared.
-    return {-err / total_nr,
-            static_cast<double>(ok) / static_cast<double>(total_nr)};
-  }
-
-  ///
   /// \param[in] agent interpreter used for the evaluation of the current
   ///                  individual. Note that this isn't a constant reference
   ///                  because the internal state of agent changes during
@@ -108,12 +133,11 @@ namespace vita
   /// \param[in] t the current training case.
   /// \param[in,out] illegals number of illegals values found evaluating the
   ///                         current individual so far.
-  /// \param[in,out] ok corret answers of the current individual so far.
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
   double sae_evaluator::error(src_interpreter &agent, data::example &t,
-                              int *const illegals, unsigned *const ok)
+                              int *const illegals)
   {
     const any res(agent.run(t));
 
@@ -126,8 +150,6 @@ namespace vita
 
     if (err > float_epsilon)
       ++t.difficulty;
-    else
-      ++(*ok);
 
     return err;
   }
@@ -140,12 +162,11 @@ namespace vita
   /// \param[in] t the current training case.
   /// \param[in,out] illegals number of illegals values found evaluating the
   ///                         current individual so far.
-  /// \param[in,out] ok corret answers of the current individual so far.
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
   double sse_evaluator::error(src_interpreter &agent, data::example &t,
-                              int *const illegals, unsigned *const ok)
+                              int *const illegals)
   {
     const any res(agent.run(t));
     double err;
@@ -159,8 +180,6 @@ namespace vita
 
     if (err > float_epsilon)
       ++t.difficulty;
-    else
-      ++(*ok);
 
     return err;
   }
@@ -171,24 +190,20 @@ namespace vita
   ///                  because the internal state of agent changes during
   ///                  evaluation; anyway this is an input-only parameter.
   /// \param[in] t the current training case.
-  /// \param[in,out]
-  /// \param[in,out] ok corret answers of the current individual so far.
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
   double count_evaluator::error(src_interpreter &agent, data::example &t,
-                                int *const, unsigned *const ok)
+                                int *const)
   {
     const any res(agent.run(t));
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
-                             data::cast<double>(t.output)) >= float_epsilon);
+                             data::cast<double>(t.output)) > float_epsilon);
 
     if (err)
       ++t.difficulty;
-    else
-      ++(*ok);
 
     return err ? 1.0 : 0.0;
   }
