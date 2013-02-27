@@ -61,15 +61,32 @@ namespace vita
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
     /// 'class' mapped to slot 'slot'".
-    matrix<unsigned> slot_matrix;
+    matrix<size_t> slot_matrix;
 
     /// slot_class[i] = "label of the predominant class" for the i-th slot.
-    std::vector<unsigned> slot_class;
+    std::vector<size_t> slot_class;
 
     /// Size of the dataset used to construct \a slot_matrix.
     size_t dataset_size;
 
     static double normalize_01(double);
+  };
+
+  ///
+  /// This class is used to factorize out some code from the lambda functions
+  /// used for classification tasks.
+  ///
+  class class_lambda_f : public lambda_f
+  {
+  public :
+    class_lambda_f(const individual &ind, size_t s)
+      : lambda_f(ind), class_name_(s) {}
+
+    const std::string &name(size_t i) const { return class_name_[i]; }
+
+  protected:
+    /// class_name_[i] = "name of the i-th class of the classification task".
+    std::vector<std::string> class_name_;
   };
 
   ///
@@ -79,7 +96,7 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  class dyn_slot_lambda_f : public lambda_f
+  class dyn_slot_lambda_f : public class_lambda_f
   {
   public:
     dyn_slot_lambda_f(const individual &, data &, size_t);
@@ -88,9 +105,6 @@ namespace vita
 
   private:
     dyn_slot_engine engine_;
-
-    /// class_name_[i] = "name of the i-th class".
-    std::vector<std::string> class_name_;
   };
 
   ///
@@ -124,7 +138,7 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  class gaussian_lambda_f : public lambda_f
+  class gaussian_lambda_f : public class_lambda_f
   {
   public:
     gaussian_lambda_f(const individual &, data &);
@@ -133,9 +147,6 @@ namespace vita
 
   private:
     gaussian_engine engine_;
-
-    /// class_name_[i] = "name of the i-th class of the classification problem".
-    std::vector<std::string> class_name_;
   };
 }  // namespace vita
 

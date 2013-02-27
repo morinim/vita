@@ -116,10 +116,9 @@ namespace vita
                 << ' ' << stats_.gen;
 
         if (stats_.best)
-          dynamic << ' ' << stats_.best->fitness[0]
-                  << ' ' << stats_.best->fitness[1];
+          dynamic << ' ' << stats_.best->fitness;
         else
-          dynamic << " ? ?";
+          dynamic << " ?";
 
         dynamic << ' ' << stats_.az.fit_dist().mean
                 << ' ' << stats_.az.fit_dist().standard_deviation()

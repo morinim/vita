@@ -209,20 +209,46 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind program used for scoring accuracy.
+  /// \return the accuracy.
+  ///
+  double classification_evaluator::accuracy(const individual &ind) const
+  {
+    assert(dat_->classes());
+    assert(dat_->cbegin() != dat_->cend());
+
+    std::unique_ptr<lambda_f> f(lambdify(ind));
+
+    std::uintmax_t ok(0), total_nr(0);
+
+    for (const auto &example : *dat_)
+    {
+      const any res((*f)(example));
+      if (any_cast<size_t>(res) == example.label())
+        ++ok;
+
+      ++total_nr;
+    }
+
+    assert(total_nr);
+
+    return static_cast<double>(ok) / static_cast<double>(total_nr);
+  }
+
+  ///
   /// \param[in] d training data.
   /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
   ///                   Determination algorithm.
   ///
   dyn_slot_evaluator::dyn_slot_evaluator(data &d, size_t x_slot)
-    : src_evaluator(d), x_slot_(x_slot)
+    : classification_evaluator(d), x_slot_(x_slot)
   {
     assert(x_slot);
   }
 
   ///
   /// \param[in] ind program used for class recognition.
-  /// \return the fitness (greater is better, max is 0) and the accuracy
-  ///         (percentage).
+  /// \return the fitness (greater is better, max is 0).
   ///
   /// \todo
   /// To date we haven't an efficient way to calculate DSS example difficulty
@@ -245,9 +271,7 @@ namespace vita
 
     assert(engine_.dataset_size >= err);
 
-    return {-err,
-            static_cast<double>(engine_.dataset_size - err) /
-            static_cast<double>(engine_.dataset_size)};
+    return {-err};
   }
 
   ///
@@ -278,7 +302,6 @@ namespace vita
     gaussian_engine engine_(ind, *dat_);
 
     fitness_t::base_t d(0.0);
-    unsigned ok(0), count(0);
     for (auto &example : *dat_)
     {
       double confidence, sum;
@@ -287,8 +310,6 @@ namespace vita
 
       if (probable_class == example.label())
       {
-        ++ok;
-
         // Note:
         // * (sum - confidence) is the sum of the errors;
         // * (confidence - sum) is the opposite (standardized fitness);
@@ -309,12 +330,9 @@ namespace vita
 
         ++example.difficulty;
       }
-
-      ++count;
     }
-    assert(count);
 
-    return {d, static_cast<double>(ok) / static_cast<double>(count)};
+    return {d};
   }
 
   ///

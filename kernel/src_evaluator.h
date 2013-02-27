@@ -113,7 +113,19 @@ namespace vita
   };
 
   ///
-  /// Slotted Dynamic Class Boundary Determination
+  /// This class is used to factorized out some code of the classification
+  /// evaluators.
+  ///
+  class classification_evaluator : public src_evaluator
+  {
+  public:
+    explicit classification_evaluator(data &d) : src_evaluator(d) {}
+
+    virtual double accuracy(const individual &) const;
+  };
+
+  ///
+  /// \brief Slotted Dynamic Class Boundary Determination
   ///
   /// Rather than using fixed static thresholds as boundaries to distinguish
   /// between different classes, this approach introduces a method of
@@ -125,12 +137,12 @@ namespace vita
   /// - Mengjie Zhang, Will Smart -
   /// <http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html>
   ///
-  class dyn_slot_evaluator : public src_evaluator
+  class dyn_slot_evaluator : public classification_evaluator
   {
   public:
     explicit dyn_slot_evaluator(data &, size_t = 10);
 
-    fitness_t operator()(const individual &);
+    virtual fitness_t operator()(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:
@@ -153,12 +165,12 @@ namespace vita
   /// Programming for Multiclass Object Classification" - CS-TR-05-5 - Mangjie
   /// Zhang, Will Smart.
   ///
-  class gaussian_evaluator : public src_evaluator
+  class gaussian_evaluator : public classification_evaluator
   {
   public:
-    explicit gaussian_evaluator(data &d) : src_evaluator(d) {}
+    explicit gaussian_evaluator(data &d) : classification_evaluator(d) {}
 
-    fitness_t operator()(const individual &);
+    virtual fitness_t operator()(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
   private:

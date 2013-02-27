@@ -108,8 +108,7 @@ namespace vita
 
   ///
   /// \param[in] ind the individual to look for.
-  /// \param[out] fitness the fitness and the accuracy of the individual (if
-  ///                     present).
+  /// \param[out] fitness the fitness of the individual (if present).
   /// \return \c true if \a ind is found in the transposition table, \c false
   ///         otherwise.
   ///
@@ -136,7 +135,7 @@ namespace vita
 
   ///
   /// \param[in] ind a (possibly) new individual to be stored in the table.
-  /// \param[out] fitness the fitness and the accuracy of the individual.
+  /// \param[out] fitness the fitness of the individual.
   ///
   /// Stores fitness information in the transposition table.
   ///

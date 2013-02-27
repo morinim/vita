@@ -342,16 +342,37 @@ namespace vita
   }
 
   ///
+  /// param[in] ind an individual.
+  /// \return the accuracy of \a ind.
+  ///
+  /// \note
+  /// If env_.a_threashold < 0.0 (undefined) then this method will skip
+  /// accuracy calculation and return will return a negative value.
+  ///
+  /// \warning
+  /// This method can be very time consuming.
+  ///
+  double search::accuracy(const individual &ind) const
+  {
+    if (env_.a_threashold < 0.0)
+      return env_.a_threashold;
+
+    return prob_->get_evaluator()->accuracy(ind);
+  }
+
+  ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(!env_.threashold.empty());
+    assert(!env_.f_threashold.empty() || env_.a_threashold >= 0.0);
 
     summary overall_summary;
     distribution<fitness_t::base_t> fd;
+
+    double best_accuracy(-1.0);
 
     unsigned solutions(0);
 
@@ -379,9 +400,13 @@ namespace vita
       evolution evo(env_, prob_->get_evaluator(), stop, shake_data);
       summary s(evo.run(verbose, run));
 
-      // Depending on validation, this can be the training score or the
-      // validation score for the current run.
+      // Depending on validation, this can be the training fitness or the
+      // validation fitness for the current run.
       fitness_t fitness;
+
+      // Depending on validation, this can be the training accuracy or the
+      // validation accuracy for the current run.
+      double this_run_accuracy(-1.0);
 
       if (validation)
       {
@@ -391,6 +416,8 @@ namespace vita
         prob_->get_evaluator()->clear(s.best->ind);
 
         fitness = (*prob_->get_evaluator())(s.best->ind);
+
+        this_run_accuracy = accuracy(s.best->ind);
 
         prob_->data()->dataset(backup);
         prob_->get_evaluator()->clear(s.best->ind);
@@ -411,18 +438,31 @@ namespace vita
         }
         else
           fitness = s.best->fitness;
+
+        this_run_accuracy = accuracy(s.best->ind);
       }
 
       if (verbose)
-        std::cout << "Fitness (" << (validation ? "validation" : "training")
-                  << "): " << fitness << std::endl << std::endl;
+      {
+        const std::string ds(validation ? "Validation" : "Training");
+
+        std::cout << ds << " fitness: " << fitness << std::endl;
+        if (env_.a_threashold < 0.0)
+          std::cout << std::endl;
+        else
+          std::cout << ds << " accuracy: " << 100.0 * this_run_accuracy
+                    << std::endl;
+
+        std::cout << std::endl;
+      }
 
       if (run == 0)
         overall_summary.best = {s.best->ind, fitness};
 
-      // We use accuracy or fitness (or both) to identify successful runs
-      // (based on env_.threashold).
-      const bool solution_found(fitness.dominating(env_.threashold));
+      // We use accuracy or fitness (or both) to identify successful runs.
+      const bool solution_found(
+        fitness.dominating(env_.f_threashold) &&
+        this_run_accuracy >= env_.a_threashold);
 
       if (solution_found)
       {
@@ -436,6 +476,7 @@ namespace vita
       {
         overall_summary.best->fitness = fitness;
         overall_summary.best->ind = s.best->ind;
+        best_accuracy = this_run_accuracy;
       }
 
       if (std::isfinite(fitness[0]))
@@ -450,7 +491,7 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      log(overall_summary, fd, good_runs, solutions, n);
+      log(overall_summary, fd, good_runs, solutions, best_accuracy, n);
     }
 
     return overall_summary.best->ind;
@@ -461,6 +502,7 @@ namespace vita
   /// \param[in] fd statistics about population fitness.
   /// \param[in] solutions number of solutions found.
   /// \param[in] best_runs list of the best runs of the search.
+  /// \param[in] best_accuracy accuracy of the best individual (if available).
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
   ///
@@ -469,7 +511,7 @@ namespace vita
   void search::log(const summary &run_sum,
                    const distribution<fitness_t::base_t> &fd,
                    const std::list<unsigned> &best_runs, unsigned solutions,
-                   unsigned runs)
+                   double best_accuracy, unsigned runs)
   {
     // Summary logging.
     if (env_.stat_summary)
@@ -489,8 +531,7 @@ namespace vita
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
       pt.put(summary + "best.fitness", run_sum.best->fitness);
-      pt.put(summary + "best.accuracy",
-             prob_->get_evaluator()->accuracy(run_sum.best->ind));
+      pt.put(summary + "best.accuracy", best_accuracy);
       pt.put(summary + "best.times_reached", best_runs.size());
       pt.put(summary + "best.avg_depth_found", solutions
              ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /

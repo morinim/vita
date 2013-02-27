@@ -60,11 +60,11 @@ namespace vita
     /// sequence is lexicographically less than the longer one.
     bool operator>(const fitness_t &f) const
     {
-      assert(vect.size() == f.vect.size());
+      assert(size() == f.size());
       return vect > f.vect;
 
       // An alternative implementation:
-      // > const size_t sup(vect.size());
+      // > const size_t sup(size());
       // > for (size_t i(0); i < sup; ++i)
       // >   if (vect[i] != f.vect[i])
       // >     return vect[i] > f.vect[i];
@@ -74,17 +74,17 @@ namespace vita
     /// Lexicographic ordering.
     /// \see fitness_t::operator>
     bool operator>=(const fitness_t &f) const
-    { assert(vect.size() == f.vect.size()); return vect >= f.vect; }
+    { assert(size() == f.size()); return vect >= f.vect; }
 
     /// Lexicographic ordering.
     /// \see fitness_t::operator>
     bool operator<(const fitness_t &f) const
-    { assert(vect.size() == f.vect.size()); return vect < f.vect; }
+    { assert(size() == f.size()); return vect < f.vect; }
 
     /// Lexicographic ordering.
     /// \see fitness_t::operator>
     bool operator<=(const fitness_t &f) const
-    { assert(vect.size() == f.vect.size()); return vect <= f.vect; }
+    { assert(size() == f.size()); return vect <= f.vect; }
 
     ///
     /// \param[in] f second term of comparison.
@@ -95,9 +95,7 @@ namespace vita
     /// \a f.
     bool dominating(const fitness_t &f) const
     {
-      assert(vect.size() == f.vect.size());
-
-      const size_t sup(vect.size());
+      const size_t sup(std::min(size(), f.size()));
       for (size_t i(0); i < sup; ++i)
         if (vect[i] < f.vect[i])
           return false;
@@ -106,10 +104,10 @@ namespace vita
     }
 
     base_t operator[](size_t i) const
-    { assert(i < vect.size()); return vect[i]; }
+    { assert(i < size()); return vect[i]; }
 
     base_t &operator[](size_t i)
-    { assert(i < vect.size()); return vect[i]; }
+    { assert(i < size()); return vect[i]; }
 
     size_t size() const
     { return vect.size(); }

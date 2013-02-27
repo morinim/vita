@@ -150,9 +150,13 @@ namespace vita
     /// Should we save a summary of the run?
     bool stat_summary;
 
-    /// \a threashold is used to identify successfully learned (matched,
-    /// classified, resolved...) examples.
-    fitness_t threashold;
+    /// \a f_threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples by fitness comparison.
+    fitness_t f_threashold;
+
+    /// \a a_threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples by accuracy comparison.
+    double a_threashold;
 
     symbol_set sset;
 

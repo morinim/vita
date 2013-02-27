@@ -85,23 +85,21 @@ void fix_parameters(vita::src_problem *const problem)
     }
   }
 
-  if (env.threashold.empty())
+  if (env.f_threashold.empty() && env.a_threashold < 0.0)
   {
-    env.threashold = vita::fitness_t::lowest(2);
-
     if (problem->classification())
     {
-      env.threashold[1] = 0.99;
+      env.a_threashold = 0.99;
 
       std::cout << "[INFO] Accuracy threashold set to "
-                << env.threashold[1] << std::endl;
+                << env.a_threashold << std::endl;
     }
     else  // symbolic regression
     {
-      env.threashold[0] = -0.0001;
+      env.f_threashold = {-0.0001};
 
       std::cout << "[INFO] Fitness threashold set to "
-                << env.threashold[0] << std::endl;
+                << env.f_threashold << std::endl;
     }
   }
 }
@@ -640,8 +638,6 @@ namespace ui
   ///
   void threashold(const std::string &v)
   {
-    problem->env.threashold = vita::fitness_t::lowest(2);
-
     bool set(false);
 
     if (v.length())
@@ -653,15 +649,16 @@ namespace ui
 
         set = (0.0 < accuracy) && (accuracy <= 1.0);
         if (set)
-          problem->env.threashold[1] = accuracy;
+          problem->env.a_threashold = accuracy;
       }
       else
       {
-        const vita::fitness_t::base_t fitness(boost::lexical_cast<double>(v));
+        const vita::fitness_t::base_t fitness(
+          boost::lexical_cast<vita::fitness_t::base_t>(v));
 
         set = (fitness <= 0.0);
         if (set)
-          problem->env.threashold[0] = fitness;
+          problem->env.f_threashold = {fitness};
       }
     }
 
