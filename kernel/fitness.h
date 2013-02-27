@@ -116,6 +116,7 @@ namespace vita
     bool empty() const
     { return vect.empty(); }
 
+    /// \return \c true if every component of the fitness is finite.
     bool isfinite() const
     {
       for (const auto &i : vect)
@@ -123,6 +124,10 @@ namespace vita
           return false;
       return true;
     }
+
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
 
   private:
     std::vector<base_t> vect;

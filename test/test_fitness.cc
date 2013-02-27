@@ -11,6 +11,8 @@
  *
  */
 
+#include <sstream>
+
 #include "fitness.h"
 
 #if !defined(MASTER_TEST_SET)
@@ -69,6 +71,21 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK(!f2.dominating(f1));
   BOOST_CHECK(f1.dominating(f1));
   BOOST_CHECK(empty.dominating(empty));
+}
+
+BOOST_AUTO_TEST_CASE(Serialization)
+{
+  vita::fitness_t f{1.0, 2.0, 3.0,
+      std::numeric_limits<vita::fitness_t::base_t>::lowest()};
+
+  std::stringstream ss;
+
+  BOOST_REQUIRE(f.save(ss));
+
+  vita::fitness_t f2(4);
+  BOOST_REQUIRE(f2.load(ss));
+
+  BOOST_CHECK_EQUAL(f, f2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
