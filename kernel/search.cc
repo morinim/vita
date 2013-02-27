@@ -257,8 +257,8 @@ namespace vita
 
     const data *const dt = prob_->data();
 
-    if (!constrained.code_length)
-      env_.code_length = *dflt.code_length;
+    if (constrained.code_length == 0)
+      env_.code_length = dflt.code_length;
 
     if (boost::indeterminate(constrained.elitism))
       env_.elitism = dflt.elitism;

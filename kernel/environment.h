@@ -50,7 +50,9 @@ namespace vita
     /// population).
     /// Code length have to be chosen before population is created and cannot
     /// be changed afterwards.
-    boost::optional<unsigned> code_length;
+    /// \note
+    /// A lenth of 0 means undefined.
+    size_t code_length;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will

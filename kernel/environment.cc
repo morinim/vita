@@ -37,7 +37,8 @@ namespace vita
   /// \see search::tune_parameters
   ///
   environment::environment(bool initialize)
-    : elitism(boost::indeterminate),
+    : code_length(0),
+      elitism(boost::indeterminate),
       dss(boost::indeterminate),
       arl(boost::indeterminate),
       ttable_size(16),
@@ -128,7 +129,7 @@ namespace vita
         std::cerr << "Undefined code_length data member." << std::endl;
       return false;
     }
-    if (code_length && *code_length < 1)
+    if (code_length == 1)
     {
       if (verbose)
         std::cerr << "code_length is too short." << std::endl;

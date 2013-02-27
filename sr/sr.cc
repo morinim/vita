@@ -45,10 +45,10 @@ void fix_parameters(vita::src_problem *const problem)
 {
   vita::environment &env(problem->env);
 
-  if (env.code_length && *env.code_length <= problem->categories())
+  if (env.code_length && env.code_length <= problem->categories())
   {
-    const unsigned new_length(2 * problem->categories());
-    std::cout << "[WARNING] Adjusting code length (" << *env.code_length
+    const size_t new_length(2 * problem->categories());
+    std::cout << "[WARNING] Adjusting code length (" << env.code_length
               << " => " << new_length << ')' << std::endl;
     env.code_length = new_length;
   }
