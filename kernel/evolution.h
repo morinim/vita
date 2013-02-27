@@ -68,7 +68,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(const environment &, const evaluator::ptr &,
+    evolution(const environment &, evaluator *,
               std::function<bool (const summary &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
@@ -92,7 +92,7 @@ namespace vita
     void log(unsigned) const;
 
     vita::population pop_;
-    evaluator::ptr   eva_;
+    evaluator       *eva_;
     summary        stats_;
 
     std::function<bool (const summary &)> stop_condition_;

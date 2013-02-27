@@ -3,7 +3,7 @@
  *  \file example4.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -45,10 +45,10 @@ int main(int argc, char *argv[])
   {
     vita::individual i1(env, true);
 
-    vita::score_t s(i, 0.0);
-    cache.insert(i1, s);
+    vita::fitness_t f(i);
+    cache.insert(i1, f);
 
-    cache.find(i1, &s);
+    cache.find(i1, &f);
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;
