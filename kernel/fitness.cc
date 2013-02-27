@@ -75,4 +75,72 @@ namespace vita
 
     return o << ')';
   }
+
+  ///
+  /// \param[in] f a fitness.
+  /// \return the sum of \a this and \a f.
+  ///
+  fitness_t fitness_t::operator+=(const fitness_t &f)
+  {
+    const size_t sup(size());
+
+    for (size_t i(0); i < sup; ++i)
+      vect[i] += f[i];
+
+    return *this;
+  }
+
+  ///
+  /// \param[in] f a fitness.
+  /// \return the difference between \a this and \a f.
+  ///
+  fitness_t fitness_t::operator-(const fitness_t &f) const
+  {
+    const size_t sup(size());
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = vect[i] - f[i];
+
+    return tmp;
+  }
+
+  ///
+  /// \param[in] f a fitness.
+  /// \return the product of \a this and \a f.
+  ///
+  fitness_t fitness_t::operator*(const fitness_t &f) const
+  {
+    const size_t sup(size());
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = vect[i] * f[i];
+
+    return tmp;
+  }
+
+  ///
+  /// \param[in] val a scalar.
+  /// \return a new vector obtained dividing each component of \a this by tha
+  ///         scalar value \a val.
+  ///
+  fitness_t fitness_t::operator/(fitness_t::base_t val) const
+  {
+    const size_t sup(size());
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = vect[i] / val;
+
+    return tmp;
+  }
+
+  ///
+  /// \return \c true if every component of the fitness is finite.
+  ///
+  bool fitness_t::isfinite() const
+  {
+    for (const auto &i : vect)
+      if (!std::isfinite(i))
+        return false;
+    return true;
+  }
 }  // namespace vita

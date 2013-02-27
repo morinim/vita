@@ -116,14 +116,12 @@ namespace vita
     bool empty() const
     { return vect.empty(); }
 
-    /// \return \c true if every component of the fitness is finite.
-    bool isfinite() const
-    {
-      for (const auto &i : vect)
-        if (!std::isfinite(i))
-          return false;
-      return true;
-    }
+    bool isfinite() const;
+
+    fitness_t operator+=(const fitness_t &);
+    fitness_t operator-(const fitness_t &) const;
+    fitness_t operator*(const fitness_t &) const;
+    fitness_t operator/(fitness_t::base_t) const;
 
   public:   // Serialization.
     bool load(std::istream &);

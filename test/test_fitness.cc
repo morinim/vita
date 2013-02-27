@@ -88,4 +88,33 @@ BOOST_AUTO_TEST_CASE(Serialization)
   BOOST_CHECK_EQUAL(f, f2);
 }
 
+BOOST_AUTO_TEST_CASE(Operators)
+{
+  vita::fitness_t x{2.0, 4.0, 8.0};
+  vita::fitness_t f1{2.0, 4.0, 8.0};
+  vita::fitness_t f2{4.0, 8.0, 16.0};
+  vita::fitness_t inf{std::numeric_limits<vita::fitness_t::base_t>::infinity()};
+
+  x += x;
+  BOOST_CHECK_EQUAL(x, f2);
+
+  x = x / 2.0;
+  BOOST_CHECK_EQUAL(x, f1);
+
+  x = x * vita::fitness_t{2.0, 2.0, 2.0};
+  BOOST_CHECK_EQUAL(x, f2);
+
+  x += vita::fitness_t{0.0, 0.0, 0.0};
+  BOOST_CHECK_EQUAL(x, f2);
+
+  x = x / 1.0;
+  BOOST_CHECK_EQUAL(x, f2);
+
+  x = f2 - f1;
+  BOOST_CHECK_EQUAL(x, f1);
+
+  BOOST_CHECK(x.isfinite());
+  BOOST_CHECK(!inf.isfinite());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
