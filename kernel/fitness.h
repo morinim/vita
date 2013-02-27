@@ -116,18 +116,12 @@ namespace vita
     bool empty() const
     { return vect.empty(); }
 
-    ///
-    /// \warning
-    /// Do not change with a static const variable definition: danger of static
-    /// initialization order fiasco.
-    ///
-    static fitness_t lowest(size_t s)
+    bool isfinite() const
     {
-      fitness_t f(s);
-      for (size_t i(0); i < s; ++i)
-        f[i] = std::numeric_limits<base_t>::lowest();
-
-      return f;
+      for (const auto &i : vect)
+        if (!std::isfinite(i))
+          return false;
+      return true;
     }
 
   private:

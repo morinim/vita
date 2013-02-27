@@ -50,15 +50,19 @@ namespace vita
       evo_->fitness(pop[parent[0]]),
       evo_->fitness(pop[parent[1]])
     };
-    const bool id_worst(f_parent[0][0] < f_parent[1][0] ? 0 : 1);
+    const bool id_worst(f_parent[0] < f_parent[1] ? 0 : 1);
 
     if (pop.env().elitism)
     {
-      if (fit_off[0] > f_parent[id_worst][0])
+      if (fit_off > f_parent[id_worst])
         pop[parent[id_worst]] = offspring[0];
     }
     else  // !elitism
     {
+      // THIS CODE IS APPROPRIATE ONLY WHEN FITNESS IS A SCALAR. It will work
+      // when fitness is a vector but the replacement probability should be
+      // calculated in a better way.
+
       //double replace(1.0 / (1.0 + exp(f_parent[id_worst][0] - fit_off[0])));
       double replace(1.0 - (fit_off[0] /
                             (fit_off[0] + f_parent[id_worst][0])));
@@ -76,7 +80,7 @@ namespace vita
       //pop[parent[id_worst]] = offspring[0];
     }
 
-    if (fit_off[0] > s->best->fitness[0])
+    if (fit_off > s->best->fitness)
     {
       summary::best_ b{offspring[0], fit_off};
       s->last_imp = s->gen;
@@ -114,7 +118,7 @@ namespace vita
     //
     //   const index_t rep_idx(kill_tournament(parent[0]));
     //
-    // Now we perform just one tournament for choosing the parents and the
+    // Now we perform just one tournament for choosing the parents; the
     // individual to be replaced is selected among the worst individuals of
     // this tournament.
     // The new way is simpler and more general. Note that when tournament_size
@@ -123,13 +127,13 @@ namespace vita
     // (aka deterministic / probabilistic crowding).
     const index_t rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
-    const bool replace(f_rep_idx[0] < fit_off[0]);
+    const bool replace(f_rep_idx < fit_off);
 
     assert(!boost::indeterminate(pop.env().elitism));
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
-    if (fit_off[0] > s->best->fitness[0])
+    if (fit_off > s->best->fitness)
     {
       s->last_imp =                  s->gen;
       s->best     = {offspring[0], fit_off};

@@ -77,7 +77,7 @@ namespace vita
             stats_->mutations += tmp.mutation();
 
           const fitness_t fit_tmp(evo_->fast_fitness(tmp));
-          if (fit_tmp[0] > fit_off[0])
+          if (fit_tmp > fit_off)
           {
             off     =     tmp;
             fit_off = fit_tmp;

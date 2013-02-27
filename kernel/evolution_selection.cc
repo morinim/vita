@@ -90,7 +90,7 @@ namespace vita
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
       index_t j(0);
-      while (j < i && new_fitness[0] < evo_->fitness(pop[ret[j]])[0])
+      while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
         ++j;
 
       for (index_t k(j); k < i; ++k)
@@ -101,8 +101,7 @@ namespace vita
 
 #if !defined(NDEBUG)
     for (unsigned i(0); i + 1 < rounds; ++i)
-      assert(evo_->fitness(pop[ret[i]])[0] >=
-             evo_->fitness(pop[ret[i + 1]])[0]);
+      assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
 #endif
 
     return ret;
