@@ -175,7 +175,7 @@ BOOST_AUTO_TEST_CASE(Cross1)
     dist += i1.distance(one_point_crossover(i1, i2));
 
   const double perc(100.0 * dist /
-                    (*env.code_length * env.sset.categories() * n));
+                    (env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(Cross2)
     dist += i1.distance(two_point_crossover(i1, i2));
 
   const double perc(100.0 * dist /
-                    (*env.code_length * env.sset.categories() * n));
+                    (env.code_length * env.sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
