@@ -134,6 +134,20 @@ namespace vita
   }
 
   ///
+  /// \return a new vector obtained taking the square root of each component of
+  ///         \a this.
+  ///
+  fitness_t fitness_t::sqrt() const
+  {
+    const size_t sup(size());
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = std::sqrt(vect[i]);
+
+    return tmp;
+  }
+
+  ///
   /// \return \c true if every component of the fitness is finite.
   ///
   bool fitness_t::isfinite() const
@@ -142,5 +156,16 @@ namespace vita
       if (!std::isfinite(i))
         return false;
     return true;
+  }
+
+  ///
+  /// \return \c true if a component of the fitness is NAN.
+  ///
+  bool fitness_t::isnan() const
+  {
+    for (const auto &i : vect)
+      if (std::isnan(i))
+        return true;
+    return false;
   }
 }  // namespace vita

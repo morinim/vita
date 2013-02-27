@@ -113,6 +113,10 @@ BOOST_AUTO_TEST_CASE(Operators)
   x = f2 - f1;
   BOOST_CHECK_EQUAL(x, f1);
 
+  x = x * x;
+  x = x.sqrt();
+  BOOST_CHECK_EQUAL(x, f1);
+
   BOOST_CHECK(x.isfinite());
   BOOST_CHECK(!inf.isfinite());
 }

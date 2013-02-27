@@ -117,11 +117,14 @@ namespace vita
     { return vect.empty(); }
 
     bool isfinite() const;
+    bool isnan() const;
 
     fitness_t operator+=(const fitness_t &);
     fitness_t operator-(const fitness_t &) const;
     fitness_t operator*(const fitness_t &) const;
     fitness_t operator/(fitness_t::base_t) const;
+
+    fitness_t sqrt() const;
 
   public:   // Serialization.
     bool load(std::istream &);
