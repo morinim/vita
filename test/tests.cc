@@ -23,6 +23,7 @@ using namespace boost;
 #include "factory_fixture3.h"
 
 #include "test_evolution.cc"
+#include "test_fitness.cc"
 #include "test_individual.cc"
 #include "test_population.cc"
 #include "test_primitive.cc"

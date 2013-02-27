@@ -159,12 +159,16 @@ namespace vita
   template<class T>
   bool distribution<T>::debug() const
   {
-    return
-      (!std::isfinite(min) || !std::isfinite(mean) ||
-       min <= mean + float_epsilon) &&
-      (!std::isfinite(max) || !std::isfinite(mean) ||
-       mean <= max + float_epsilon) &&
-      (std::isnan(variance) || 0.0 <= variance + float_epsilon);
+    if (std::isfinite(min) && std::isfinite(mean) && min > mean)
+      return false;
+
+    if (std::isfinite(max) && std::isfinite(mean) && max < mean)
+      return false;
+
+    if (std::isnan(variance) || variance < 0.0)
+      return false;
+
+    return true;
   }
 }  // namespace vita
 

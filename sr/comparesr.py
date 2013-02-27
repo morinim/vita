@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+#  Copyright (C) 2011-2013 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -51,7 +51,7 @@ def compare_file(files, scores):
         else:
             avg_depth_found[f] = int(best.find("avg_depth_found").text)
 
-        fn = f if len(f) <= 32 else "..."+f[-29:]
+        fn = f if len(f) <= 32 else "..." + f[-29:]
         if f_mean[f] < -1000000 or f_deviation[f] > 1000000:
             format_str = format_string_row2
         else:
@@ -59,12 +59,6 @@ def compare_file(files, scores):
 
         print(format_str.format(fn, success_rate[f],
                                 avg_depth_found[f], f_mean[f], f_deviation[f]))
-
-    l = len(files)
-    for f in files:
-        opt = decode_opt(f, files)
-        if scores[opt] is None:
-            scores[opt] = Decimal("0.00")
 
     best = [files[0]]
     for f in files[1:]:
@@ -90,24 +84,10 @@ def compare_file(files, scores):
 
 
 def decode_opt(f, files):
-    if len(files) > 2:
-        (fn, ext) = os.path.splitext(os.path.basename(f))
-        (l, s, r) = fn.rpartition("_")
-
-        values = {
-            "00": "(00) DEBUG elitism",
-            "01": "(01) DEBUG",
-            "02": "(02) elitism",
-            "03": "(03)",
-            "04": "(04) DEBUG arl elitism",
-            "05": "(05) DEBUG arl",
-            "06": "(06) arl elitism",
-            "07": "(07) arl",
-            "08": "(08) arl elitism force_input"
-        }
-        return values.get(r,"UNKNOWN")
+    if len(files)==1 or os.path.dirname(files[0]) != os.path.dirname(files[1]):
+        return os.path.dirname(f)
     else:
-        return files.index(f)
+        return f
 
 
 def start_comparison(args):
@@ -116,6 +96,7 @@ def start_comparison(args):
     print(format_string_head.format("FILE", "SUCCESS", "AVG.DEPTH",
                                     "AVG.FIT.", "FIT.ST.DEV."))
 
+    # Case 1. Just list the results contained in a directory.
     if len(args.filepath) == 1 and os.path.isdir(args.filepath[0]):
         groups = dict()
         dir_list = os.listdir(args.filepath[0])
@@ -131,6 +112,7 @@ def start_comparison(args):
         for k in groups.keys():
             compare_file(groups[k], scores)
             print("-" * 79)
+    # Case 2. Comparison between two directories.
     elif os.path.isdir(args.filepath[0]) and os.path.isdir(args.filepath[1]):
         dir_list = os.listdir(args.filepath[0])
         for f in dir_list:
@@ -142,6 +124,7 @@ def start_comparison(args):
                     print("-"*79)
                 else:
                     print("Missing {0} file".format(fn2))
+    # Case 3. Comparison between two files.
     elif os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
         compare_file([args.filepath[0], args.filepath[1]], scores)
 

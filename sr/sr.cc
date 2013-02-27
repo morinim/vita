@@ -45,10 +45,10 @@ void fix_parameters(vita::src_problem *const problem)
 {
   vita::environment &env(problem->env);
 
-  if (env.code_length && *env.code_length <= problem->categories())
+  if (env.code_length && env.code_length <= problem->categories())
   {
-    const unsigned new_length(2 * problem->categories());
-    std::cout << "[WARNING] Adjusting code length (" << *env.code_length
+    const size_t new_length(2 * problem->categories());
+    std::cout << "[WARNING] Adjusting code length (" << env.code_length
               << " => " << new_length << ')' << std::endl;
     env.code_length = new_length;
   }
@@ -85,21 +85,21 @@ void fix_parameters(vita::src_problem *const problem)
     }
   }
 
-  if (env.threashold == vita::score_t::lowest())
+  if (env.f_threashold.empty() && env.a_threashold < 0.0)
   {
     if (problem->classification())
     {
-      env.threashold.accuracy = 0.99;
+      env.a_threashold = 0.99;
 
       std::cout << "[INFO] Accuracy threashold set to "
-                << env.threashold.accuracy << std::endl;
+                << env.a_threashold << std::endl;
     }
     else  // symbolic regression
     {
-      env.threashold.fitness = -0.0001;
+      env.f_threashold = {-0.0001};
 
       std::cout << "[INFO] Fitness threashold set to "
-                << env.threashold.fitness << std::endl;
+                << env.f_threashold << std::endl;
     }
   }
 }
@@ -638,8 +638,6 @@ namespace ui
   ///
   void threashold(const std::string &v)
   {
-    problem->env.threashold = vita::score_t::lowest();
-
     bool set(false);
 
     if (v.length())
@@ -651,15 +649,16 @@ namespace ui
 
         set = (0.0 < accuracy) && (accuracy <= 1.0);
         if (set)
-          problem->env.threashold.accuracy = accuracy;
+          problem->env.a_threashold = accuracy;
       }
       else
       {
-        const vita::fitness_t fitness(boost::lexical_cast<double>(v));
+        const vita::fitness_t::base_t fitness(
+          boost::lexical_cast<vita::fitness_t::base_t>(v));
 
         set = (fitness <= 0.0);
         if (set)
-          problem->env.threashold.fitness = fitness;
+          problem->env.f_threashold = {fitness};
       }
     }
 

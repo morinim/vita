@@ -33,7 +33,7 @@ namespace vita
   ///               set so that evolution would take place in a dynamic
   ///               environment.
   ///
-  evolution::evolution(const environment &env, const evaluator::ptr &eva,
+  evolution::evolution(const environment &env, evaluator *eva,
                        std::function<bool (const summary &)> sc,
                        std::function<void (unsigned)> sd)
     : selection(std::make_shared<tournament_selection>(this)),
@@ -82,23 +82,6 @@ namespace vita
   }
 
   ///
-  /// \param[out] probes number of probes in the transposition table.
-  /// \param[out] hits number of hits in the transposition table (hits <=
-  ///             probes).
-  ///
-  void evolution::get_probes(std::uintmax_t *probes,
-                             std::uintmax_t *hits) const
-  {
-    *probes = *hits = 0;
-
-    if (typeid(*eva_) == typeid(evaluator_proxy))
-    {
-      *probes = std::static_pointer_cast<evaluator_proxy>(eva_)->probes();
-      *hits   = std::static_pointer_cast<evaluator_proxy>(eva_)->hits();
-    }
-  }
-
-  ///
   /// \param[in] run_count run number.
   ///
   /// Saves working / statistical informations in a log file.
@@ -129,17 +112,13 @@ namespace vita
         if (last_run != run_count)
           dynamic << std::endl << std::endl;
 
-        std::uintmax_t hits(0), probes(0);
-        get_probes(&probes, &hits);
-
         dynamic << run_count
                 << ' ' << stats_.gen;
 
         if (stats_.best)
-          dynamic << ' ' << stats_.best->score.fitness
-                  << ' ' << stats_.best->score.accuracy;
+          dynamic << ' ' << stats_.best->fitness;
         else
-          dynamic << " ? ?";
+          dynamic << " ?";
 
         dynamic << ' ' << stats_.az.fit_dist().mean
                 << ' ' << stats_.az.fit_dist().standard_deviation()
@@ -153,9 +132,7 @@ namespace vita
                 << ' ' << stats_.az.functions(0)
                 << ' ' << stats_.az.terminals(0)
                 << ' ' << stats_.az.functions(1)
-                << ' ' << stats_.az.terminals(1)
-                << ' ' << hits
-                << ' ' << probes;
+                << ' ' << stats_.az.terminals(1);
 
         for (unsigned active(0); active <= 1; ++active)
           for (analyzer::const_iterator i(stats_.az.begin());
@@ -196,10 +173,10 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual whose accuracy/fitness we are interested in.
-  /// \return the fitness and the accuracy of \a ind.
+  /// \param[in] ind individual whose fitness we are interested in.
+  /// \return the fitness of \a ind.
   ///
-  score_t evolution::score(const individual &ind) const
+  fitness_t evolution::fitness(const individual &ind) const
   {
     return (*eva_)(ind);
   }
@@ -208,18 +185,9 @@ namespace vita
   /// \param[in] ind individual whose fitness we are interested in.
   /// \return the fitness of \a ind.
   ///
-  fitness_t evolution::fitness(const individual &ind) const
-  {
-    return score(ind).fitness;
-  }
-
-  ///
-  /// \param[in] ind individual whose fitness we are interested in.
-  /// \return the fitness of \a ind.
-  ///
   fitness_t evolution::fast_fitness(const individual &ind) const
   {
-    return eva_->fast(ind).fitness;
+    return eva_->fast(ind);
   }
 
   ///
@@ -239,7 +207,7 @@ namespace vita
   const summary &evolution::run(bool verbose, unsigned run_count)
   {
     stats_.clear();
-    stats_.best = {pop_[0], score(pop_[0])};
+    stats_.best = {pop_[0], fitness(pop_[0])};
 
     eva_->clear();
 
@@ -254,7 +222,7 @@ namespace vita
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
         // training set).
-        stats_.best = {pop_[0], score(pop_[0])};
+        stats_.best = {pop_[0], fitness(pop_[0])};
       }
 
       stats_.az = get_stats();
@@ -274,28 +242,21 @@ namespace vita
         std::vector<individual> off(operation->run(parents));
 
         // --------- REPLACEMENT --------
-        const fitness_t before(stats_.best->score.fitness);
+        const fitness_t before(stats_.best->fitness);
         replacement->run(parents, off, &stats_);
 
-        if (verbose && stats_.best->score.fitness != before)
+        if (verbose && stats_.best->fitness != before)
         {
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << std::setw(16) << stats_.best->score.fitness;
-
-          if (stats_.best->score.accuracy >= 0.0)
-            std::cout << std::setprecision(2) << " (" << std::fixed
-                      << std::setw(6) << 100.0 * stats_.best->score.accuracy
-                      << "%)" << std::setprecision(-1)
-                      << std::resetiosflags(std::ios::fixed);
+                    << stats_.best->fitness;
 
           std::cout << std::endl;
         }
       }
 
       stats_.speed = get_speed(measure.elapsed());
-      get_probes(&stats_.ttable_probes, &stats_.ttable_hits);
     }
 
     if (verbose)
@@ -344,8 +305,6 @@ namespace vita
   ///
   void summary::clear()
   {
-    ttable_probes = 0;
-    ttable_hits   = 0;
     mutations     = 0;
     crossovers    = 0;
     gen           = 0;

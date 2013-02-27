@@ -57,13 +57,13 @@ double X::val;
 double Y::val;
 double Z::val;
 
-class fitness : public vita::evaluator
+class my_evaluator : public vita::evaluator
 {
-  vita::score_t operator()(const vita::individual &ind)
+  vita::fitness_t operator()(const vita::individual &ind)
   {
     vita::interpreter agent(ind);
 
-    vita::fitness_t fit(0.0);
+    vita::fitness_t::base_t fit(0.0);
     for (double x(0); x < 10; ++x)
       for (double y(0); y < 10; ++y)
         for (double z(0); z < 10; ++z)
@@ -82,7 +82,7 @@ class fitness : public vita::evaluator
           }
         }
 
-    return vita::score_t(fit, -1.0);
+    return {fit};
   }
 };
 
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
   env.insert(factory.make("FIFL"));
   env.insert(factory.make("FIFE"));
 
-  std::unique_ptr<vita::evaluator> eva(new fitness());
+  std::unique_ptr<vita::evaluator> eva(new my_evaluator());
 
   vita::evolution(env, eva.get()).run(true, 1);
 

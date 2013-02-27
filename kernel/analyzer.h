@@ -70,7 +70,7 @@ namespace vita
     std::uintmax_t functions(bool) const;
     std::uintmax_t terminals(bool) const;
 
-    const distribution<fitness_t> &fit_dist() const;
+    const distribution<fitness_t::base_t> &fit_dist() const;
     const distribution<double> &length_dist() const;
 
     bool debug() const;
@@ -81,7 +81,7 @@ namespace vita
 
     std::map<const symbol *, stats> info_;
 
-    distribution<fitness_t> fit_;
+    distribution<fitness_t::base_t> fit_;
     distribution<double> length_;
 
     stats functions_;

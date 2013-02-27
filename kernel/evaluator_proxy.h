@@ -33,10 +33,11 @@ namespace vita
     virtual void clear();
     virtual void clear(const individual &);
 
-    virtual score_t operator()(const individual &);
+    virtual fitness_t operator()(const individual &);
 
-    std::uintmax_t probes() const;
-    std::uintmax_t hits() const;
+    virtual double accuracy(const individual &) const;
+
+    virtual std::string info() const;
 
   private:
     /// Access to the real evaluator.

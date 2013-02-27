@@ -59,8 +59,8 @@ namespace vita
       std::uintmax_t  difficulty;
       unsigned               age;
 
-      unsigned label() const
-      { return static_cast<unsigned>(boost::get<int>(output)); }
+      size_t label() const
+      { return static_cast<size_t>(boost::get<int>(output)); }
 
       void clear()
       { input.clear(); output = value_t(); difficulty = 0; age = 0; }

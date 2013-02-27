@@ -149,7 +149,7 @@ namespace vita
   ///
   dyn_slot_lambda_f::dyn_slot_lambda_f(const individual &ind, data &d,
                                        size_t x_slot)
-    : lambda_f(ind), class_name_(d.classes() * x_slot)
+    : class_lambda_f(ind, d.classes() * x_slot)
   {
     assert(ind.debug());
     assert(d.debug());
@@ -174,7 +174,7 @@ namespace vita
   {
     const size_t where(engine_.slot(ind_, instance));
 
-    return any(class_name_[engine_.slot_class[where]]);
+    return any(engine_.slot_class[where]);
   }
 
   ///
@@ -269,7 +269,7 @@ namespace vita
   /// \param[in] d the training set.
   ///
   gaussian_lambda_f::gaussian_lambda_f(const individual &ind, data &d)
-    : lambda_f(ind), class_name_(d.classes())
+    : class_lambda_f(ind, d.classes())
   {
     assert(ind.debug());
     assert(d.debug());
@@ -291,6 +291,6 @@ namespace vita
   ///
   any gaussian_lambda_f::operator()(const data::example &instance) const
   {
-    return any(class_name_[engine_.class_label(ind_, instance)]);
+    return any(engine_.class_label(ind_, instance));
   }
 }  // namespace vita

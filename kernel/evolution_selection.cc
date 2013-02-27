@@ -62,7 +62,7 @@ namespace vita
 
   ///
   /// \return a vector of indexes to individuals ordered in descending
-  ///         fitness score.
+  ///         fitness.
   ///
   /// Parameters from the environment:
   /// * mate_zone - to restrict the selection of individuals to a segment of

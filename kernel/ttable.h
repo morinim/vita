@@ -73,9 +73,9 @@ namespace vita
     void clear();
     void clear(const individual &);
 
-    void insert(const individual &, const score_t &);
+    void insert(const individual &, const fitness_t &);
 
-    bool find(const individual &, score_t *const) const;
+    bool find(const individual &, fitness_t *const) const;
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.
@@ -93,7 +93,7 @@ namespace vita
     struct slot
     {
       hash_t       hash;
-      score_t     score;
+      fitness_t fitness;
       unsigned birthday;
     };
 

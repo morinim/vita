@@ -92,12 +92,12 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, true);
-    vita::score_t s(i, 0.0);
+    vita::fitness_t f({i});
 
-    cache.insert(i1, s);
+    cache.insert(i1, f);
 
-    BOOST_REQUIRE(cache.find(i1, &s));
-    BOOST_REQUIRE_EQUAL(s.fitness, i);
+    BOOST_REQUIRE(cache.find(i1, &f));
+    BOOST_REQUIRE_EQUAL(f, vita::fitness_t{i});
   }
 }
 
@@ -113,22 +113,23 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   {
     vita::individual i1(env, true);
     const vita::any val(vita::interpreter(i1).run());
-    vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
-    vita::score_t s(f, 0.0);
+    vita::fitness_t f(
+      {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
-    cache.insert(i1, s);
+    cache.insert(i1, f);
     vi.push_back(i1);
   }
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::score_t s;
-    if (cache.find(vi[i], &s))
+    vita::fitness_t f;
+    if (cache.find(vi[i], &f))
     {
       const vita::any val(vita::interpreter(vi[i]).run());
-      vita::fitness_t f(val.empty() ? 0 : vita::any_cast<vita::fitness_t>(val));
+      vita::fitness_t f1(
+        {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
-      BOOST_CHECK_EQUAL(s.fitness, f);
+      BOOST_CHECK_EQUAL(f, f1);
     }
   }
 }

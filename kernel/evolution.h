@@ -41,16 +41,13 @@ namespace vita
 
     struct best_
     {
-      individual ind;
-      score_t  score;
+      individual    ind;
+      fitness_t fitness;
     };
 
     boost::optional<best_> best;
 
     double speed;
-
-    std::uintmax_t ttable_probes;
-    std::uintmax_t   ttable_hits;
 
     std::uintmax_t  mutations;
     std::uintmax_t crossovers;
@@ -71,7 +68,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(const environment &, const evaluator::ptr &,
+    evolution(const environment &, evaluator *,
               std::function<bool (const summary &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
@@ -80,7 +77,6 @@ namespace vita
     const vita::population &population() const;
     vita::population &population();
 
-    score_t score(const individual &) const;
     fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
 
@@ -92,12 +88,11 @@ namespace vita
 
   private:
     double get_speed(double) const;
-    void get_probes(std::uintmax_t *, std::uintmax_t *) const;
     analyzer get_stats() const;
     void log(unsigned) const;
 
     vita::population pop_;
-    evaluator::ptr   eva_;
+    evaluator       *eva_;
     summary        stats_;
 
     std::function<bool (const summary &)> stop_condition_;

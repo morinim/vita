@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(Creation)
 
   vita::population pop(env);
 
-  BOOST_REQUIRE_EQUAL(*env.code_length, pop.size());
+  BOOST_REQUIRE_EQUAL(env.code_length, pop.size());
 
   for (size_t i(0); i < pop.size(); ++i)
     BOOST_CHECK(pop[i].debug());

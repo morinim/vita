@@ -20,7 +20,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "score.h"
+#include "fitness.h"
 #include "symbol_set.h"
 
 namespace vita
@@ -50,7 +50,9 @@ namespace vita
     /// population).
     /// Code length have to be chosen before population is created and cannot
     /// be changed afterwards.
-    boost::optional<unsigned> code_length;
+    /// \note
+    /// A lenth of 0 means undefined.
+    size_t code_length;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
@@ -150,9 +152,13 @@ namespace vita
     /// Should we save a summary of the run?
     bool stat_summary;
 
-    /// \a threashold is used to identify successfully learned (matched,
-    /// classified, resolved...) examples.
-    score_t threashold;
+    /// \a f_threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples by fitness comparison.
+    fitness_t f_threashold;
+
+    /// \a a_threashold is used to identify successfully learned (matched,
+    /// classified, resolved...) examples by accuracy comparison.
+    double a_threashold;
 
     symbol_set sset;
 

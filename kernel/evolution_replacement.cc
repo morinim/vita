@@ -43,7 +43,7 @@ namespace vita
     population &pop = evo_->population();
     assert(!boost::indeterminate(pop.env().elitism));
 
-    const score_t score_off(evo_->score(offspring[0]));
+    const fitness_t fit_off(evo_->fitness(offspring[0]));
 
     const fitness_t f_parent[] =
     {
@@ -54,21 +54,24 @@ namespace vita
 
     if (pop.env().elitism)
     {
-      if (score_off.fitness > f_parent[id_worst])
+      if (fit_off > f_parent[id_worst])
         pop[parent[id_worst]] = offspring[0];
     }
     else  // !elitism
     {
-      //double replace(1.0/(1.0 + exp(f_parent[id_worst] - score_off.fitness)));
-      double replace(1.0 - (score_off.fitness /
-                            (score_off.fitness + f_parent[id_worst])));
+      // THIS CODE IS APPROPRIATE ONLY WHEN FITNESS IS A SCALAR. It will work
+      // when fitness is a vector but the replacement probability should be
+      // calculated in a better way.
+
+      //double replace(1.0 / (1.0 + exp(f_parent[id_worst][0] - fit_off[0])));
+      double replace(1.0 - (fit_off[0] /
+                            (fit_off[0] + f_parent[id_worst][0])));
       if (random::boolean(replace))
         pop[parent[id_worst]] = offspring[0];
       else
       {
-        //replace = 1.0 / (1.0 + exp(f_parent[!id_worst] - score_off.fitness));
-        replace = 1.0 - (score_off.fitness /
-                         (score_off.fitness + f_parent[!id_worst]));
+        //replace = 1.0 / (1.0 + exp(f_parent[!id_worst][0] - fit_off[0]));
+        replace = 1.0 - (fit_off[0] / (fit_off[0] + f_parent[!id_worst][0]));
 
         if (random::boolean(replace))
           pop[parent[!id_worst]] = offspring[0];
@@ -77,10 +80,11 @@ namespace vita
       //pop[parent[id_worst]] = offspring[0];
     }
 
-    if (score_off.fitness > s->best->score.fitness)
+    if (fit_off > s->best->fitness)
     {
-      s->last_imp =                    s->gen;
-      s->best     = {offspring[0], score_off};
+      summary::best_ b{offspring[0], fit_off};
+      s->last_imp = s->gen;
+      s->best     =      b;
     }
   }
 
@@ -91,7 +95,7 @@ namespace vita
 
   ///
   /// \param[in] parent indexes of the candidate parents.
-  ///                   The list is sorted in descending fitness score, so the
+  ///                   The list is sorted in descending fitness, so the
   ///                   last element is the index of the worst individual of
   ///                   the tournament.
   /// \param[in] offspring vector of the "children".
@@ -107,14 +111,14 @@ namespace vita
   {
     population &pop = evo_->population();
 
-    const score_t score_off(evo_->score(offspring[0]));
+    const fitness_t fit_off(evo_->fitness(offspring[0]));
 
     // In old versions of Vita, the individual to be replaced was chosen with
     // an ad-hoc kill tournament. Something like:
     //
     //   const index_t rep_idx(kill_tournament(parent[0]));
     //
-    // Now we perform just one tournament for choosing the parents and the
+    // Now we perform just one tournament for choosing the parents; the
     // individual to be replaced is selected among the worst individuals of
     // this tournament.
     // The new way is simpler and more general. Note that when tournament_size
@@ -123,16 +127,16 @@ namespace vita
     // (aka deterministic / probabilistic crowding).
     const index_t rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
-    const bool replace(f_rep_idx < score_off.fitness);
+    const bool replace(f_rep_idx < fit_off);
 
     assert(!boost::indeterminate(pop.env().elitism));
     if (!pop.env().elitism || replace)
       pop[rep_idx] = offspring[0];
 
-    if (score_off.fitness > s->best->score.fitness)
+    if (fit_off > s->best->fitness)
     {
-      s->last_imp =                    s->gen;
-      s->best     = {offspring[0], score_off};
+      s->last_imp =                  s->gen;
+      s->best     = {offspring[0], fit_off};
     }
   }
 }  // namespace vita

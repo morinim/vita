@@ -76,7 +76,7 @@ namespace vita
   ///
   /// \return statistics about the fitness distribution of the individuals.
   ///
-  const distribution<fitness_t> &analyzer::fit_dist() const
+  const distribution<fitness_t::base_t> &analyzer::fit_dist() const
   {
     assert(fit_.debug());
 
@@ -144,8 +144,8 @@ namespace vita
   {
     length_.add(count(ind));
 
-    if (std::isfinite(f))
-      fit_.add(f);
+    if (std::isfinite(f[0]))
+      fit_.add(f[0]);
   }
 
   ///

@@ -48,7 +48,7 @@ namespace vita
   void search::arl(const individual &base, evolution &evo)
   {
     const fitness_t base_fit(evo.fitness(base));
-    if (std::isfinite(base_fit))
+    if (std::isfinite(base_fit[0]))
     {
       const std::string filename(env_.stat_dir + "/" +
                                  environment::arl_filename);
@@ -73,11 +73,10 @@ namespace vita
         if (candidate_block.eff_size() <= 5 + adf_args)
         {
           const auto d_f(
-            distance(base_fit,
-                     evo.fitness(base.destroy_block(l[locus_index]))));
+            base_fit[0] - evo.fitness(base.destroy_block(l[locus_index]))[0]);
 
           // Semantic introns cannot be building blocks.
-          if (std::isfinite(d_f) && std::fabs(base_fit / 10.0) < d_f)
+          if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
           {
             symbol_ptr p;
             if (adf_args)
@@ -99,8 +98,8 @@ namespace vita
             {
               log << p->display() << " (Base: " << base_fit
                   << "  DF: " << d_f
-                  << "  Weight: " << std::fabs(d_f / base_fit) * 100.0 << "%)"
-                  << std::endl;
+                  << "  Weight: " << std::fabs(d_f / base_fit[0]) * 100.0
+                  << "%)" << std::endl;
               candidate_block.list(log);
               log << std::endl;
             }
@@ -258,8 +257,8 @@ namespace vita
 
     const data *const dt = prob_->data();
 
-    if (!constrained.code_length)
-      env_.code_length = *dflt.code_length;
+    if (constrained.code_length == 0)
+      env_.code_length = dflt.code_length;
 
     if (boost::indeterminate(constrained.elitism))
       env_.elitism = dflt.elitism;
@@ -343,16 +342,37 @@ namespace vita
   }
 
   ///
+  /// param[in] ind an individual.
+  /// \return the accuracy of \a ind.
+  ///
+  /// \note
+  /// If env_.a_threashold < 0.0 (undefined) then this method will skip
+  /// accuracy calculation and return will return a negative value.
+  ///
+  /// \warning
+  /// This method can be very time consuming.
+  ///
+  double search::accuracy(const individual &ind) const
+  {
+    if (env_.a_threashold < 0.0)
+      return env_.a_threashold;
+
+    return prob_->get_evaluator()->accuracy(ind);
+  }
+
+  ///
   /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(env_.threashold != score_t::lowest());
+    assert(!env_.f_threashold.empty() || env_.a_threashold >= 0.0);
 
     summary overall_summary;
-    distribution<fitness_t> fd;
+    distribution<fitness_t::base_t> fd;
+
+    double best_accuracy(-1.0);
 
     unsigned solutions(0);
 
@@ -377,12 +397,16 @@ namespace vita
 
     for (unsigned run(0); run < n; ++run)
     {
-      evolution evo(env_, prob_->get_evaluator(), stop, shake_data);
+      evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
       summary s(evo.run(verbose, run));
 
-      // Depending on validation, this can be the training score or the
-      // validation score for the current run.
-      score_t score;
+      // Depending on validation, this can be the training fitness or the
+      // validation fitness for the current run.
+      fitness_t fitness;
+
+      // Depending on validation, this can be the training accuracy or the
+      // validation accuracy for the current run.
+      double this_run_accuracy(-1.0);
 
       if (validation)
       {
@@ -391,7 +415,9 @@ namespace vita
         prob_->data()->dataset(data::validation);
         prob_->get_evaluator()->clear(s.best->ind);
 
-        score = (*prob_->get_evaluator())(s.best->ind);
+        fitness = (*prob_->get_evaluator())(s.best->ind);
+
+        this_run_accuracy = accuracy(s.best->ind);
 
         prob_->data()->dataset(backup);
         prob_->get_evaluator()->clear(s.best->ind);
@@ -400,31 +426,43 @@ namespace vita
       {
         // If shake_data is true, the values calculated during the evolution
         // refer to a subset of the available training set. Since we need an
-        // overall score for comparison, a new calculation has to be performed.
+        // overall fitness for comparison, a new calculation has to be
+        // performed.
         if (shake_data)
         {
           prob_->data()->dataset(data::training);
           prob_->data()->slice(0);
           prob_->get_evaluator()->clear(s.best->ind);
 
-          score = (*prob_->get_evaluator())(s.best->ind);
+          fitness = (*prob_->get_evaluator())(s.best->ind);
         }
         else
-          score = s.best->score;
+          fitness = s.best->fitness;
+
+        this_run_accuracy = accuracy(s.best->ind);
       }
 
       if (verbose)
-        std::cout << "Score (" << (validation ? "validation" : "training")
-                  << "): " << score << std::endl << std::endl;
+      {
+        const std::string ds(validation ? "Validation" : "Training");
+
+        std::cout << ds << " fitness: " << fitness << std::endl;
+        if (env_.a_threashold < 0.0)
+          std::cout << std::endl;
+        else
+          std::cout << ds << " accuracy: " << 100.0 * this_run_accuracy
+                    << std::endl;
+
+        std::cout << std::endl;
+      }
 
       if (run == 0)
-        overall_summary.best = {s.best->ind, score};
+        overall_summary.best = {s.best->ind, fitness};
 
-      // We use accuracy or fitness (or both) to identify successful runs
-      // (based on env_.threashold).
+      // We use accuracy or fitness (or both) to identify successful runs.
       const bool solution_found(
-        score.fitness >= env_.threashold.fitness &&
-        score.accuracy >= env_.threashold.accuracy);
+        fitness.dominating(env_.f_threashold) &&
+        this_run_accuracy >= env_.a_threashold);
 
       if (solution_found)
       {
@@ -432,19 +470,18 @@ namespace vita
         overall_summary.last_imp += s.last_imp;
 
         good_runs.push_back(run);
-
-        if (score > overall_summary.best->score)
-        {
-          overall_summary.best->score = score;
-          overall_summary.best->ind = s.best->ind;
-        }
       }
 
-      if (std::isfinite(score.fitness))
-        fd.add(score.fitness);
+      if (fitness > overall_summary.best->fitness)
+      {
+        overall_summary.best->fitness = fitness;
+        overall_summary.best->ind = s.best->ind;
+        best_accuracy = this_run_accuracy;
+      }
 
-      overall_summary.ttable_hits += s.ttable_hits;
-      overall_summary.ttable_probes += s.ttable_probes;
+      if (std::isfinite(fitness[0]))
+        fd.add(fitness[0]);
+
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);
 
@@ -454,7 +491,7 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      log(overall_summary, fd, good_runs, solutions, n);
+      log(overall_summary, fd, good_runs, solutions, best_accuracy, n);
     }
 
     return overall_summary.best->ind;
@@ -465,14 +502,16 @@ namespace vita
   /// \param[in] fd statistics about population fitness.
   /// \param[in] solutions number of solutions found.
   /// \param[in] best_runs list of the best runs of the search.
+  /// \param[in] best_accuracy accuracy of the best individual (if available).
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
   ///
   /// Writes end-of-run logs (run summary, results for test...).
   ///
-  void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
+  void search::log(const summary &run_sum,
+                   const distribution<fitness_t::base_t> &fd,
                    const std::list<unsigned> &best_runs, unsigned solutions,
-                   unsigned runs)
+                   double best_accuracy, unsigned runs)
   {
     // Summary logging.
     if (env_.stat_summary)
@@ -491,8 +530,8 @@ namespace vita
       pt.put(summary + "speed", run_sum.speed);
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
-      pt.put(summary + "best.fitness", run_sum.best->score.fitness);
-      pt.put(summary + "best.accuracy", run_sum.best->score.accuracy);
+      pt.put(summary + "best.fitness", run_sum.best->fitness);
+      pt.put(summary + "best.accuracy", best_accuracy);
       pt.put(summary + "best.times_reached", best_runs.size());
       pt.put(summary + "best.avg_depth_found", solutions
              ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
@@ -503,8 +542,7 @@ namespace vita
       pt.put(summary + "best.individual.tree", best_tree.str());
       pt.put(summary + "best.individual.list", best_list.str());
       pt.put(summary + "best.individual.graph", best_graph.str());
-      pt.put(summary + "ttable.hits", run_sum.ttable_hits);
-      pt.put(summary + "ttable.probes", run_sum.ttable_probes);
+      pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
 
       const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 
