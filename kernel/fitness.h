@@ -31,7 +31,8 @@ namespace vita
     typedef double base_t;
 
     fitness_t() {}
-    explicit fitness_t(size_t d) : vect(d) { assert(d); }
+    explicit fitness_t(size_t d)
+      : vect(d, std::numeric_limits<base_t>::lowest()) { assert(d); }
     fitness_t(std::initializer_list<base_t> l) : vect(l) {}
 
     /// Operation is performed by first comparing sizes and, if they match,
@@ -100,7 +101,7 @@ namespace vita
         if (vect[i] < f.vect[i])
           return false;
 
-      return true;
+      return size() >= f.size();
     }
 
     base_t operator[](size_t i) const
