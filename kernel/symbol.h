@@ -14,7 +14,6 @@
 #if !defined(SYMBOL_H)
 #define      SYMBOL_H
 
-#include <fstream>
 #include <string>
 
 #include "vita.h"
@@ -32,6 +31,8 @@ namespace vita
   class symbol
   {
   public:
+    typedef std::shared_ptr<symbol> ptr;
+
     symbol(const std::string &, category_t, unsigned);
 
     opcode_t opcode() const;

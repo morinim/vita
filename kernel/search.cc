@@ -57,7 +57,7 @@ namespace vita
       {
         for (size_t i(0); i < env_.sset.adts(); ++i)
         {
-          const symbol_ptr f(env_.sset.get_adt(i));
+          const symbol::ptr f(env_.sset.get_adt(i));
           log << f->display() << ' ' << f->weight << std::endl;
         }
         log << std::endl;
@@ -78,7 +78,7 @@ namespace vita
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
           {
-            symbol_ptr p;
+            symbol::ptr p;
             if (adf_args)
             {
               std::vector<locus> replaced;

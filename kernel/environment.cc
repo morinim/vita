@@ -107,7 +107,7 @@ namespace vita
   ///
   /// This is a shortcut for symbol_set::insert.
   ///
-  void environment::insert(const symbol_ptr &i)
+  void environment::insert(const symbol::ptr &i)
   {
     assert(i);
 

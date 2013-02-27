@@ -15,7 +15,6 @@
 #define      SEARCH_H
 
 #include "environment.h"
-#include "fitness.h"
 
 namespace vita
 {

@@ -76,23 +76,23 @@ struct F_FACTORY3
     BOOST_TEST_MESSAGE("Teardown fixture (FACTORY3)");
   }
 
-  vita::symbol_ptr c0;
-  vita::symbol_ptr c1;
-  vita::symbol_ptr c2;
-  vita::symbol_ptr c3;
-  vita::symbol_ptr x;
-  vita::symbol_ptr neg_x;
-  vita::symbol_ptr y;
-  vita::symbol_ptr z;
+  vita::symbol::ptr c0;
+  vita::symbol::ptr c1;
+  vita::symbol::ptr c2;
+  vita::symbol::ptr c3;
+  vita::symbol::ptr x;
+  vita::symbol::ptr neg_x;
+  vita::symbol::ptr y;
+  vita::symbol::ptr z;
 
-  vita::symbol_ptr f_abs;
-  vita::symbol_ptr f_add;
-  vita::symbol_ptr f_div;
-  vita::symbol_ptr f_idiv;
-  vita::symbol_ptr f_ife;
-  vita::symbol_ptr f_ln;
-  vita::symbol_ptr f_mul;
-  vita::symbol_ptr f_sub;
+  vita::symbol::ptr f_abs;
+  vita::symbol::ptr f_add;
+  vita::symbol::ptr f_div;
+  vita::symbol::ptr f_idiv;
+  vita::symbol::ptr f_ife;
+  vita::symbol::ptr f_ln;
+  vita::symbol::ptr f_mul;
+  vita::symbol::ptr f_sub;
 
   vita::environment env;
   vita::any ret;

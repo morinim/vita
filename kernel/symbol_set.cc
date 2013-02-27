@@ -18,7 +18,7 @@
 
 namespace vita
 {
-  const symbol_ptr symbol_set::empty_ptr;
+  const symbol::ptr symbol_set::empty_ptr;
 
   ///
   /// Sets up the object.
@@ -50,7 +50,7 @@ namespace vita
   /// \param[in] n index of an argument symbol.
   /// \return a pointer to the n-th argument symbol.
   ///
-  const symbol_ptr &symbol_set::arg(size_t n) const
+  const symbol::ptr &symbol_set::arg(size_t n) const
   {
     assert(n < gene::k_args);
     return arguments_[n];
@@ -60,7 +60,7 @@ namespace vita
   /// \param[in] i index of an ADT symbol.
   /// \return a pointer to the i-th ADT symbol.
   ///
-  const symbol_ptr &symbol_set::get_adt(size_t i) const
+  const symbol::ptr &symbol_set::get_adt(size_t i) const
   {
     assert(i < all_.adt.size());
     return all_.adt[i];
@@ -81,7 +81,7 @@ namespace vita
   /// descending order, with respect to the weight, so the selection algorithm
   /// would run faster.
   ///
-  void symbol_set::insert(const symbol_ptr &i)
+  void symbol_set::insert(const symbol::ptr &i)
   {
     assert(i && i->weight && i->debug());
 
@@ -102,7 +102,7 @@ namespace vita
     by_ = by_category(all_);
 
     std::sort(all_.symbols.begin(), all_.symbols.end(),
-              [](const symbol_ptr &s1, const symbol_ptr &s2)
+              [](const symbol::ptr &s1, const symbol::ptr &s2)
               { return s1->weight > s2->weight; });
   }
 
@@ -151,7 +151,7 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random terminal of category \a c.
   ///
-  const symbol_ptr &symbol_set::roulette_terminal(category_t c) const
+  const symbol::ptr &symbol_set::roulette_terminal(category_t c) const
   {
     assert(c < categories());
 
@@ -162,7 +162,7 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random symbol of category \a c.
   ///
-  const symbol_ptr &symbol_set::roulette(category_t c) const
+  const symbol::ptr &symbol_set::roulette(category_t c) const
   {
     return roulette(by_.category[c].symbols, by_.category[c].sum);
   }
@@ -170,7 +170,7 @@ namespace vita
   ///
   /// \return a random symbol from the set of all symbols.
   ///
-  const symbol_ptr &symbol_set::roulette() const
+  const symbol::ptr &symbol_set::roulette() const
   {
     return roulette(all_.symbols, all_.sum);
   }
@@ -193,8 +193,8 @@ namespace vita
   /// be measured).
   /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
   ///
-  const symbol_ptr &symbol_set::roulette(const s_vector & symbols,
-                                         std::uintmax_t sum) const
+  const symbol::ptr &symbol_set::roulette(const s_vector & symbols,
+                                          std::uintmax_t sum) const
   {
     const std::uintmax_t slot(random::between<std::uintmax_t>(0, sum));
 
@@ -227,7 +227,7 @@ namespace vita
   /// \return a pointer to the \c vita::symbol identified by 'opcode'
   ///         (\c nullptr if not found).
   ///
-  const symbol_ptr &symbol_set::decode(opcode_t opcode) const
+  const symbol::ptr &symbol_set::decode(opcode_t opcode) const
   {
     for (size_t i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->opcode() == opcode)
@@ -245,7 +245,7 @@ namespace vita
   /// user, so, if you don't pay attention, different symbols may have the same
   /// name.
   ///
-  const symbol_ptr &symbol_set::decode(const std::string &dex) const
+  const symbol::ptr &symbol_set::decode(const std::string &dex) const
   {
     assert(dex != "");
 
@@ -309,7 +309,7 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
-    for (const symbol_ptr &s : ss.all_.symbols)
+    for (const symbol::ptr &s : ss.all_.symbols)
     {
       o << s->display();
 
@@ -437,7 +437,7 @@ namespace vita
 
     for (size_t j(0); j < category.size(); ++j)
       std::sort(category[j].symbols.begin(), category[j].symbols.end(),
-                [](const symbol_ptr &s1, const symbol_ptr &s2)
+                [](const symbol::ptr &s1, const symbol::ptr &s2)
                 { return s1->weight > s2->weight; });
 
     assert(debug());

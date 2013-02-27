@@ -46,11 +46,6 @@
 
 namespace vita
 {
-  class symbol;
-
-  /// Just a shortcut.
-  typedef std::shared_ptr<symbol> symbol_ptr;
-
   /// This is the type used as key for symbol identification.
   typedef unsigned opcode_t;
 

@@ -41,7 +41,7 @@ namespace vita
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
 
-    void insert(const symbol_ptr &);
+    void insert(const symbol::ptr &);
 
     bool debug(bool, bool) const;
 
