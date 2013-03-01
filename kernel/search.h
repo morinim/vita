@@ -42,7 +42,7 @@ namespace vita
   private:
     double accuracy(const individual &) const;
     void dss(unsigned) const;
-    void log(const summary &, const distribution<fitness_t::base_t> &,
+    void log(const summary &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, double, unsigned);
     bool stop_condition(const summary &) const;
 

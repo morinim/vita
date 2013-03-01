@@ -17,7 +17,7 @@
 #include <cmath>
 #include <map>
 
-#include "vita.h"
+#include "fitness.h"
 
 namespace vita
 {
@@ -25,7 +25,7 @@ namespace vita
   /// \a distribution \c class simplify the calculation of statistics regarding
   /// a sequence (mean, variance, standard deviation, entropy, min and max).
   ///
-  template<class T = double>
+  template<class T = fitness_t>
   class distribution
   {
   public:
@@ -36,7 +36,7 @@ namespace vita
     void add(T);
 
     T standard_deviation() const;
-    T entropy() const;
+    double entropy() const;
 
     bool debug() const;
 
@@ -107,14 +107,15 @@ namespace vita
   /// (http://en.wikipedia.org/wiki/Online_algorithm).
   ///
   template<class T>
-  T distribution<T>::entropy() const
+  double distribution<T>::entropy() const
   {
-    const T c(1.0 / std::log(2.0));
+    const double c(1.0 / std::log(2.0));
 
-    T h(0.0);
-    for (const auto &f : freq)  // f.first: value, f.second: frequency
+    double h(0.0);
+    for (const auto &f : freq)  // f.first: fitness, f.second: frequency
     {
-      const double p(static_cast<T>(f.second) / static_cast<T>(count));
+      const double p(static_cast<double>(f.second) /
+                     static_cast<double>(count));
 
       h -= p * std::log(p) * c;
     }
@@ -170,6 +171,11 @@ namespace vita
 
     return true;
   }
+
+  template<> void distribution<fitness_t>::clear();
+  template<> void distribution<fitness_t>::add(fitness_t);
+  template<> fitness_t distribution<fitness_t>::standard_deviation() const;
+  template<> bool distribution<fitness_t>::debug() const;
 }  // namespace vita
 
 #endif  // DISTRIBUTION_H

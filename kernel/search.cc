@@ -48,7 +48,7 @@ namespace vita
   void search::arl(const individual &base, evolution &evo)
   {
     const fitness_t base_fit(evo.fitness(base));
-    if (std::isfinite(base_fit[0]))
+    if (base_fit.isfinite())
     {
       const std::string filename(env_.stat_dir + "/" +
                                  environment::arl_filename);
@@ -208,13 +208,13 @@ namespace vita
       return true;
 
     // We use an accelerated stop condition when all the individuals have
-    // the same fitness and after gwi/2 generations the situation isn't
-    // changed.
+    // the same fitness and after env_.g_without_improvement generations the
+    // situation isn't changed.
     assert(env_.g_without_improvement);
 
     if (*env_.g_without_improvement &&
         (s.gen - s.last_imp > *env_.g_without_improvement &&
-         s.az.fit_dist().variance <= float_epsilon))
+         s.az.fit_dist().variance.issmall()))
       return true;
 
     return false;
@@ -370,7 +370,7 @@ namespace vita
     assert(!env_.f_threashold.empty() || env_.a_threashold >= 0.0);
 
     summary overall_summary;
-    distribution<fitness_t::base_t> fd;
+    distribution<fitness_t> fd;
 
     double best_accuracy(-1.0);
 
@@ -479,8 +479,8 @@ namespace vita
         best_accuracy = this_run_accuracy;
       }
 
-      if (std::isfinite(fitness[0]))
-        fd.add(fitness[0]);
+      if (fitness.isfinite())
+        fd.add(fitness);
 
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);
@@ -508,8 +508,7 @@ namespace vita
   ///
   /// Writes end-of-run logs (run summary, results for test...).
   ///
-  void search::log(const summary &run_sum,
-                   const distribution<fitness_t::base_t> &fd,
+  void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
                    const std::list<unsigned> &best_runs, unsigned solutions,
                    double best_accuracy, unsigned runs)
   {

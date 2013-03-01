@@ -168,4 +168,16 @@ namespace vita
         return true;
     return false;
   }
+
+  ///
+  /// \return \c true if each component of the fitness is less than or equal to
+  ///         \c float_epsilion.
+  ///
+  bool fitness_t::issmall() const
+  {
+    for (const auto &i : vect)
+      if (i > float_epsilon)
+        return false;
+    return true;
+  }
 }  // namespace vita
