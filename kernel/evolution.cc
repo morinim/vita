@@ -116,14 +116,14 @@ namespace vita
                 << ' ' << stats_.gen;
 
         if (stats_.best)
-          dynamic << ' ' << stats_.best->fitness;
+          dynamic << ' ' << stats_.best->fitness[0];
         else
           dynamic << " ?";
 
-        dynamic << ' ' << stats_.az.fit_dist().mean
-                << ' ' << stats_.az.fit_dist().standard_deviation()
+        dynamic << ' ' << stats_.az.fit_dist().mean[0]
+                << ' ' << stats_.az.fit_dist().standard_deviation()[0]
                 << ' ' << stats_.az.fit_dist().entropy()
-                << ' ' << stats_.az.fit_dist().min
+                << ' ' << stats_.az.fit_dist().min[0]
                 << ' ' << unsigned(stats_.az.length_dist().mean)
                 << ' ' << stats_.az.length_dist().standard_deviation()
                 << ' ' << unsigned(stats_.az.length_dist().max)
