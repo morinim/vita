@@ -202,14 +202,12 @@ namespace vita
   ///
   /// \param[in] f the comparer used for sorting.
   ///
-  /// \note
-  /// Sorting preserves the partition of the dataset
+  /// Sorts the active slice in the current dataset (slice is preserved).
   ///
-  void data::sort(
-    std::function<bool (const example &, const example &)> f)
+  void data::sort(std::function<bool (const example &, const example &)> f)
   {
     const dataset_t d(dataset());
-    const size_t partition_size(std::distance(dataset_[d].begin(), end_[d]));
+    const size_t partition_size(std::distance(begin(), end()));
 
     dataset_[d].sort(f);
 
@@ -217,10 +215,11 @@ namespace vita
   }
 
   ///
-  /// \param[in] r this is the size_of_validation_set / size_of_dataset ratio.
+  /// \param[in] r this is the \a size_of_validation_set / \a size_of_dataset
+  ///              ratio.
   ///
-  /// Splits the dataset in two subset (training set, validation set) according
-  /// to the \a r ratio.
+  /// Splits the dataset in two subsets (training set, validation set)
+  /// according to the \a r ratio.
   ///
   void data::divide(double r)
   {
@@ -413,7 +412,7 @@ namespace vita
     {
       const char c(line[linepos]);
 
-      if (!inquotes && curstring.length() == 0 && c == '"')  // begin quote char
+      if (!inquotes && curstring.length() == 0 && c == '"') // begin quote char
         inquotes = true;
       else if (inquotes && c == '"')
       {
@@ -762,7 +761,8 @@ namespace vita
 
             std::string s_domain(is_number(record[field])
                                  ? "numeric"
-                                 : "string" + boost::lexical_cast<std::string>(field));
+                                 : "string" +
+                                   boost::lexical_cast<std::string>(field));
             // For classification problems we use discriminant functions, so the
             // actual output type is always numeric.
             if (field == 0 && classification)
