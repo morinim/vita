@@ -153,6 +153,9 @@ namespace vita
   /// \param[in] d a dataset (training / validation / test set).
   /// \return the size of the dataset \a d.
   ///
+  /// \note
+  /// Please note that the result is independent of the active slice.
+  ///
   size_t data::size(dataset_t d) const
   {
     return dataset_[d].size();
