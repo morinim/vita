@@ -35,6 +35,10 @@ namespace vita
 
     fitness_t::base_t err(0.0);
     int illegals(0);
+
+    // We don't use data::size() since it gives the size of the active dataset,
+    // *not* the size of the active *slice* in the dataset (so it isn't
+    // appropriate with the DSS algorithm).
     unsigned total_nr(0);
 
     for (auto &example : *dat_)
@@ -67,8 +71,7 @@ namespace vita
 
     fitness_t::base_t err(0.0);
     int illegals(0);
-    unsigned total_nr(0);
-    unsigned counter(0);
+    unsigned total_nr(0), counter(0);
 
     for (auto &example : *dat_)
       if (dat_->size() <= 20 || (counter++ % 5) == 0)
