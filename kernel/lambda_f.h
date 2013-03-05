@@ -35,6 +35,8 @@ namespace vita
 
     virtual any operator()(const data::example &) const;
 
+    virtual std::string name(const any &) const { return std::string(); }
+
   protected:
     individual ind_;
   };
@@ -82,7 +84,10 @@ namespace vita
     class_lambda_f(const individual &ind, size_t s)
       : lambda_f(ind), class_name_(s) {}
 
-    const std::string &name(size_t i) const { return class_name_[i]; }
+    virtual std::string name(const any &a) const
+    {
+      return class_name_[any_cast<size_t>(a)];
+    }
 
   protected:
     /// class_name_[i] = "name of the i-th class of the classification task".

@@ -13,6 +13,7 @@
 
 #include "evaluator_proxy.h"
 #include "individual.h"
+#include "lambda_f.h"
 
 namespace vita
 {
@@ -93,5 +94,15 @@ namespace vita
       " (ratio " +
       boost::lexical_cast<std::string>(cache_.hits() * 100 / cache_.probes()) +
       "%)";
+  }
+
+  ///
+  /// \param[in] ind an individual.
+  /// \return a pointer to the executable version of \a ind.
+  ///
+  std::unique_ptr<lambda_f> evaluator_proxy::lambdify(
+    const individual &ind) const
+  {
+    return eva_->lambdify(ind);
   }
 }  // namespace vita

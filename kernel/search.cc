@@ -552,19 +552,19 @@ namespace vita
     }
 
     // Test set results logging.
-    vita::data *const data = prob_->data();
-    if (data->size(data::test))
+    vita::data &data(*prob_->data());
+    if (data.size(data::test))
     {
-      const data::dataset_t backup(data->dataset());
-      data->dataset(data::test);
+      const data::dataset_t backup(data.dataset());
+      data.dataset(data::test);
 
       std::unique_ptr<lambda_f> lambda(prob_->lambdify(run_sum.best->ind));
 
       std::ofstream tf(env_.stat_dir + "/" + environment::tst_filename);
-      for (const data::example &e : *data)
-        tf << (*lambda)(e) << std::endl;
+      for (const auto &example : data)
+        tf << lambda->name((*lambda)(example)) << std::endl;
 
-      data->dataset(backup);
+      data.dataset(backup);
     }
   }
 

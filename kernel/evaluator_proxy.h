@@ -39,6 +39,8 @@ namespace vita
 
     virtual std::string info() const;
 
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+
   private:
     /// Access to the real evaluator.
     evaluator::ptr eva_;
