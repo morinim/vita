@@ -65,11 +65,11 @@ def compare_file(files, scores):
         else:
             f_deviation[f] = to_tuple(summary.find("standard_deviation").text)
 
-        best = summary.find("best")
-        if best.find("avg_depth_found") is None:
+        solutions = summary.find("solutions")
+        if solutions.find("avg_depth") is None:
             print("Missing solution average depth in file {0}.".format(f))
         else:
-            avg_depth_found[f] = int(best.find("avg_depth_found").text)
+            avg_depth_found[f] = int(solutions.find("avg_depth").text)
 
         fn = f if len(f) <= max_fn_l else "..." + f[-(max_fn_l - 3):]
 

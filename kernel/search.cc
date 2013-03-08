@@ -367,14 +367,13 @@ namespace vita
   ///
   individual search::run(bool verbose, unsigned n)
   {
-    assert(!env_.f_threashold.empty() || env_.a_threashold >= 0.0);
+    assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
 
     summary overall_summary;
     distribution<fitness_t> fd;
 
     double best_accuracy(-1.0);
-
-    unsigned solutions(0);
+    unsigned best_run(0);
 
     std::list<unsigned> good_runs;
 
@@ -447,13 +446,11 @@ namespace vita
         const std::string ds(validation ? "Validation" : "Training");
 
         std::cout << ds << " fitness: " << fitness << std::endl;
-        if (env_.a_threashold < 0.0)
-          std::cout << std::endl;
-        else
+        if (env_.a_threashold >= 0.0)
           std::cout << ds << " accuracy: " << 100.0 * this_run_accuracy
-                    << std::endl;
+                    << '%';
 
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
       }
 
       if (run == 0)
@@ -466,7 +463,6 @@ namespace vita
 
       if (solution_found)
       {
-        ++solutions;
         overall_summary.last_imp += s.last_imp;
 
         good_runs.push_back(run);
@@ -477,6 +473,7 @@ namespace vita
         overall_summary.best->fitness = fitness;
         overall_summary.best->ind = s.best->ind;
         best_accuracy = this_run_accuracy;
+        best_run = run;
       }
 
       if (fitness.isfinite())
@@ -491,7 +488,7 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      log(overall_summary, fd, good_runs, solutions, best_accuracy, n);
+      log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
     }
 
     return overall_summary.best->ind;
@@ -500,8 +497,8 @@ namespace vita
   ///
   /// \param[in] run_sum summary information regarding the search.
   /// \param[in] fd statistics about population fitness.
-  /// \param[in] solutions number of solutions found.
-  /// \param[in] best_runs list of the best runs of the search.
+  /// \param[in] good_runs list of the best runs of the search.
+  /// \param[in] best_run best overall run.
   /// \param[in] best_accuracy accuracy of the best individual (if available).
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
@@ -509,7 +506,7 @@ namespace vita
   /// Writes end-of-run logs (run summary, results for test...).
   ///
   void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
-                   const std::list<unsigned> &best_runs, unsigned solutions,
+                   const std::list<unsigned> &good_runs, unsigned best_run,
                    double best_accuracy, unsigned runs)
   {
     // Summary logging.
@@ -523,24 +520,27 @@ namespace vita
       const std::string path("vita.");
       const std::string summary(path + "summary.");
 
+      const unsigned solutions(good_runs.size());
       boost::property_tree::ptree pt;
       pt.put(summary + "success_rate", runs ?
              static_cast<double>(solutions) / static_cast<double>(runs) : 0);
       pt.put(summary + "speed", run_sum.speed);
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
+
       pt.put(summary + "best.fitness", run_sum.best->fitness);
       pt.put(summary + "best.accuracy", best_accuracy);
-      pt.put(summary + "best.times_reached", best_runs.size());
-      pt.put(summary + "best.avg_depth_found", solutions
-             ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
-                                     static_cast<double>(solutions))
-             : 0);
-      for (const auto &p : best_runs)
-        pt.add(summary + "best.runs.run", p);
+      pt.put(summary + "best.run", best_run);
       pt.put(summary + "best.individual.tree", best_tree.str());
       pt.put(summary + "best.individual.list", best_list.str());
       pt.put(summary + "best.individual.graph", best_graph.str());
+
+      for (const auto &p : good_runs)
+        pt.add(summary + "solutions.runs.run", p);
+      pt.put(summary + "solutions.found", solutions);
+      pt.put(summary + "solutions.avg_depth",
+             solutions ? run_sum.last_imp / solutions : 0);
+
       pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
 
       const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);

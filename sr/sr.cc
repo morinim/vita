@@ -17,7 +17,6 @@
 namespace po = boost::program_options;
 
 #include <algorithm>
-#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
@@ -222,7 +221,8 @@ namespace ui
   bool data(const std::string &data_file)
   {
     if (verbose)
-      std::cout << "Reading data file (" << data_file << ")... ";
+      std::cout << vita::k_s_info << " Reading data file " << data_file
+                << "..." << std::endl;
 
     unsigned parsed(0);
     try
@@ -237,12 +237,13 @@ namespace ui
     if (verbose)
     {
       if (!parsed)
-        std::cerr << "data set file format error." << std::endl;
+        std::cerr << vita::k_s_error << " Dataset file format error"
+                  << std::endl;
       else
-        std::cout << "ok" << std::endl << "  [examples: " << parsed
+        std::cout << vita::k_s_info << " Dataset read. Examples: " << parsed
                   << ", categories: " << problem->categories()
                   << ", features: " << problem->variables()
-                  << ", classes: " << problem->classes() << "]" << std::endl;
+                  << ", classes: " << problem->classes() << std::endl;
     }
 
     return parsed;
@@ -320,7 +321,7 @@ namespace ui
       std::cout << std::endl;
     }
     else
-      std::cerr << vita::k_s_error << " Wrong argument for evaluator command."
+      std::cerr << vita::k_s_error << " Wrong argument for evaluator command"
                 << std::endl;
   }
 
@@ -330,7 +331,7 @@ namespace ui
   void exit(bool)
   {
     if (verbose)
-      std::cout << "Bye." << std::endl;
+      std::cout << "Bye" << std::endl;
 
     std::exit(EXIT_SUCCESS);
   }
@@ -363,9 +364,9 @@ namespace ui
         s.run(verbose, runs);
       }
       else
-        std::cerr << vita::k_s_error << " Too few terminals." << std::endl;
+        std::cerr << vita::k_s_error << " Too few terminals" << std::endl;
     else
-      std::cerr << vita::k_s_error << " Missing data set." << std::endl;
+      std::cerr << vita::k_s_error << " Missing data set" << std::endl;
   }
 
   ///
@@ -438,7 +439,8 @@ namespace ui
   bool testset(const std::string &ts)
   {
     if (verbose)
-      std::cout << "Reading test set file (" << ts << ")... ";
+      std::cout << vita::k_s_info << " Reading test set file " << ts << "..."
+                << std::endl;
 
     unsigned parsed(0);
     try
@@ -453,12 +455,13 @@ namespace ui
     if (verbose)
     {
       if (!parsed)
-        std::cerr << "test set file format error." << std::endl;
+        std::cerr << vita::k_s_error << " Test set file format error"
+                  << std::endl;
       else
-        std::cout << "ok" << std::endl << "  [examples: " << parsed
+        std::cout << vita::k_s_info << " Testset read. Examples: " << parsed
                   << ", categories: " << problem->categories()
                   << ", features: " << problem->variables()
-                  << ", classes: " << problem->classes() << "]" << std::endl;
+                  << ", classes: " << problem->classes() << std::endl;
     }
 
     return parsed;
@@ -597,13 +600,14 @@ namespace ui
     if (symbol_file.empty())
     {
       if (verbose)
-        std::cout << "Using default symbol set." << std::endl;
+        std::cout << vita::k_s_info << "Using default symbol set" << std::endl;
       problem->setup_default_symbols();
     }
     else
     {
-      if (verbose) std::cout << "Reading symbol file (" << symbol_file
-                             << ")... ";
+      if (verbose)
+        std::cout << vita::k_s_info << " Reading symbol file " << symbol_file
+                  << "..." << std::endl;
 
       unsigned parsed(0);
       try
@@ -618,17 +622,18 @@ namespace ui
       if (!parsed)
       {
         if (verbose)
-          std::cerr << "symbol file format error." << std::endl;
+          std::cerr << vita::k_s_error << " Symbol file format error"
+                    << std::endl;
         return false;
       }
       if (verbose)
-        std::cout << "ok" << std::endl << "  [symbols: " << parsed << "]"
+        std::cout << vita::k_s_info << " Symbolset read. Symbols: " << parsed
                   << std::endl;
     }
 
     if (!problem->env.sset.enough_terminals())
     {
-      std::cerr << vita::k_s_error << " Too few terminals." << std::endl;
+      std::cerr << vita::k_s_error << " Too few terminals" << std::endl;
       return false;
     }
 
@@ -673,7 +678,7 @@ namespace ui
       if (set)
         std::cout << vita::k_s_info << " Threashold is " << v << std::endl;
       else
-        std::cerr << vita::k_s_error << " Invalid threashold value."
+        std::cerr << vita::k_s_error << " Invalid threashold value"
                   << std::endl;
     }
   }
@@ -722,7 +727,7 @@ namespace ui
         std::cout << vita::k_s_info << " Validation set ratio is " << v
                   << std::endl;
       else
-        std::cerr << vita::k_s_error << " Invalid validation ratio."
+        std::cerr << vita::k_s_error << " Invalid validation ratio"
                   << std::endl;
     }
   }
