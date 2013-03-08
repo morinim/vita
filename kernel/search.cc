@@ -282,7 +282,7 @@ namespace vita
       env_.dss = dt && dt->size() > 200;
 
       if (verbose)
-        std::cout << "[INFO] DSS set to " << env_.dss << std::endl;
+        std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
     }
 
     // A larger number of training cases requires an increase in the population
@@ -298,8 +298,8 @@ namespace vita
       {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
         if (verbose)
-          std::cout << "[INFO] Population size set to " << env_.individuals
-                    << std::endl;
+          std::cout << k_s_info << " Population size set to "
+                    << env_.individuals << std::endl;
       }
       else
         env_.individuals = *dflt.individuals;
@@ -316,7 +316,7 @@ namespace vita
           env_.validation_ratio = *dflt.validation_ratio;
 
         if (verbose)
-          std::cout << "[INFO] Validation ratio set to "
+          std::cout << k_s_info << " Validation ratio set to "
                     << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
       }
       else

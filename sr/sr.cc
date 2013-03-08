@@ -48,14 +48,15 @@ void fix_parameters(vita::src_problem *const problem)
   if (env.code_length && env.code_length <= problem->categories())
   {
     const size_t new_length(2 * problem->categories());
-    std::cout << "[WARNING] Adjusting code length (" << env.code_length
-              << " => " << new_length << ')' << std::endl;
+    std::cout << vita::k_s_warning << " Adjusting code length ("
+              << env.code_length << " => " << new_length << ')' << std::endl;
     env.code_length = new_length;
   }
 
   if (env.dss && problem->data()->size() <= 10)
   {
-    std::cout << "[WARNING] Adjusting DSS (true => false)" << std::endl;
+    std::cout << vita::k_s_warning << " Adjusting DSS (true => false)"
+              << std::endl;
     env.dss = false;
   }
 
@@ -63,24 +64,24 @@ void fix_parameters(vita::src_problem *const problem)
   {
     if (*env.tournament_size < 2)
     {
-      std::cout << "[WARNING] Adjusting tournament size (=> 2)"
+      std::cout << vita::k_s_warning << " Adjusting tournament size (=> 2)"
                 << std::endl;
       env.tournament_size = 2;
     }
 
     if (env.mate_zone && *env.tournament_size > *env.mate_zone)
     {
-      std::cout << "[WARNING] Adjusting tournament size ("
-                << *env.tournament_size << " => "
-                << *env.mate_zone << ")" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting tournament size ("
+                << *env.tournament_size << " => " << *env.mate_zone << ")"
+                << std::endl;
       env.tournament_size = *env.mate_zone;
     }
 
     if (env.individuals && *env.tournament_size > *env.individuals)
     {
-      std::cout << "[WARNING] Adjusting tournament size ("
-                << *env.tournament_size << " => "
-                << *env.individuals << ")" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting tournament size ("
+                << *env.tournament_size << " => " << *env.individuals << ")"
+                << std::endl;
       env.tournament_size = *env.individuals;
     }
   }
@@ -91,14 +92,14 @@ void fix_parameters(vita::src_problem *const problem)
     {
       env.a_threashold = 0.99;
 
-      std::cout << "[INFO] Accuracy threashold set to "
+      std::cout << vita::k_s_info << " Accuracy threashold set to "
                 << env.a_threashold << std::endl;
     }
     else  // symbolic regression
     {
       env.f_threashold = {-0.0001};
 
-      std::cout << "[INFO] Fitness threashold set to "
+      std::cout << vita::k_s_info << " Fitness threashold set to "
                 << env.f_threashold << std::endl;
     }
   }
@@ -154,7 +155,8 @@ namespace ui
     problem->env.arl = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Adaptive Representation through Learning is "
+      std::cout << vita::k_s_info
+                << " Adaptive Representation through Learning is "
                 << problem->env.arl << std::endl;
   }
 
@@ -168,8 +170,8 @@ namespace ui
     problem->env.brood_recombination = size;
 
     if (verbose)
-      std::cout << "[INFO] Brood size for recombination is " << size
-                << std::endl;
+      std::cout << vita::k_s_info << " Brood size for recombination is "
+                << size << std::endl;
   }
 
   ///
@@ -183,7 +185,7 @@ namespace ui
     problem->env.code_length = length;
 
     if (verbose)
-      std::cout << "[INFO] Code length is " << length << std::endl;
+      std::cout << vita::k_s_info << " Code length is " << length << std::endl;
   }
 
   ///
@@ -197,20 +199,20 @@ namespace ui
     if (r < 0.0)
     {
       r = 0.0;
-      std::cout << "[WARNING] Adjusting crossover probability (" << r
-                << " => 0.0)" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting crossover probability ("
+                << r << " => 0.0)" << std::endl;
     }
     else if (r > 1.0)
     {
       r = 1.0;
-      std::cout << "[WARNING] Adjusting crossover probability (" << r
-                << " => 1.0)" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting crossover probability ("
+                << r << " => 1.0)" << std::endl;
     }
 
     problem->env.p_cross = r;
 
     if (verbose)
-      std::cout << "[INFO] Crossover rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Crossover rate is " << r << std::endl;
   }
 
   ///
@@ -256,8 +258,8 @@ namespace ui
     problem->env.dss = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Dynamic Subset Selection is " << problem->env.dss
-                << std::endl;
+      std::cout << vita::k_s_info << " Dynamic Subset Selection is "
+                << problem->env.dss << std::endl;
   }
 
   ///
@@ -268,7 +270,8 @@ namespace ui
     problem->env.elitism = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Elitism is " << problem->env.elitism << std::endl;
+      std::cout << vita::k_s_info << " Elitism is " << problem->env.elitism
+                << std::endl;
   }
 
   ///
@@ -311,13 +314,14 @@ namespace ui
 
     if (ok)
     {
-      std::cout << "[INFO] Evaluator is " << keyword;
+      std::cout << vita::k_s_info << " Evaluator is " << keyword;
       if (!args.empty())
         std::cout << " (parameters: " << args << ")";
       std::cout << std::endl;
     }
     else
-      std::cerr << "[ERROR] Wrong argument for evaluator command." << std::endl;
+      std::cerr << vita::k_s_error << " Wrong argument for evaluator command."
+                << std::endl;
   }
 
   ///
@@ -341,7 +345,8 @@ namespace ui
     problem->env.g_since_start = g;
 
     if (verbose)
-      std::cout << "[INFO] Generations is " << g << std::endl;
+      std::cout << vita::k_s_info << " Generations is " << g
+                << std::endl;
   }
 
   ///
@@ -358,9 +363,9 @@ namespace ui
         s.run(verbose, runs);
       }
       else
-        std::cerr << "[ERROR] Too few terminals." << std::endl;
+        std::cerr << vita::k_s_error << " Too few terminals." << std::endl;
     else
-      std::cerr << "[ERROR] Missing data set." << std::endl;
+      std::cerr << vita::k_s_error << " Missing data set." << std::endl;
   }
 
   ///
@@ -373,8 +378,9 @@ namespace ui
     problem->env.g_without_improvement = g;
 
     if (verbose)
-      std::cout << "[INFO] Max number of generations without improvement is "
-                << g << std::endl;
+      std::cout << vita::k_s_info
+                << " Max number of generations without improvement is " << g
+                << std::endl;
   }
 
   ///
@@ -395,7 +401,7 @@ namespace ui
     problem->env.mate_zone = z;
 
     if (verbose)
-      std::cout << "[INFO] Mate zone is " << z << std::endl;
+      std::cout << vita::k_s_info << " Mate zone is " << z << std::endl;
   }
 
   ///
@@ -409,20 +415,20 @@ namespace ui
     if (r < 0.0)
     {
       r = 0.0;
-      std::cout << "[WARNING] Adjusting mutation probability (" << r
-                << " => 0.0)" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting mutation probability ("
+                << r << " => 0.0)" << std::endl;
     }
     else if (r > 1.0)
     {
       r = 1.0;
-      std::cout << "[WARNING] Adjusting mutation probability (" << r
-                << " => 1.0)" << std::endl;
+      std::cout << vita::k_s_warning << " Adjusting mutation probability ("
+                << r << " => 1.0)" << std::endl;
     }
 
     problem->env.p_mutation = r;
 
     if (verbose)
-      std::cout << "[INFO] Mutation rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Mutation rate is " << r << std::endl;
   }
 
   ///
@@ -468,7 +474,7 @@ namespace ui
     problem->env.tournament_size = n;
 
     if (verbose)
-      std::cout << "[INFO] Tournament size is " << n << std::endl;
+      std::cout << vita::k_s_info << " Tournament size is " << n << std::endl;
   }
 
   ///
@@ -485,7 +491,7 @@ namespace ui
 
     if (verbose)
     {
-      std::cout << "[INFO] Population size is ";
+      std::cout << vita::k_s_info << " Population size is ";
       if (size)
         std::cout << size;
       else
@@ -504,7 +510,7 @@ namespace ui
     vita::random::seed(seed);
 
     if (verbose)
-      std::cout << "[INFO] Random seed is " << seed << std::endl;
+      std::cout << vita::k_s_info << " Random seed is " << seed << std::endl;
   }
 
   ///
@@ -518,7 +524,7 @@ namespace ui
     runs = r;
 
     if (verbose)
-      std::cout << "[INFO] Number of runs is " << r << std::endl;
+      std::cout << vita::k_s_info << " Number of runs is " << r << std::endl;
   }
 
   ///
@@ -529,7 +535,7 @@ namespace ui
     problem->env.stat_arl = true;
 
     if (verbose)
-      std::cout << "[INFO] ARL is " << v << std::endl;
+      std::cout << vita::k_s_info << " ARL is " << v << std::endl;
   }
 
   ///
@@ -542,7 +548,7 @@ namespace ui
     problem->env.stat_dir = dir;
 
     if (verbose)
-      std::cout << "[INFO] Logging folder is " << dir << std::endl;
+      std::cout << vita::k_s_info << " Logging folder is " << dir << std::endl;
   }
 
   ///
@@ -553,7 +559,7 @@ namespace ui
     problem->env.stat_dynamic = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Dynamic evolution logging is "
+      std::cout << vita::k_s_info << " Dynamic evolution logging is "
                 << problem->env.stat_dynamic << std::endl;
   }
 
@@ -565,7 +571,7 @@ namespace ui
     problem->env.stat_population = is_true(v);
 
     if (verbose)
-      std::cout << "[INFO] Population logging is "
+      std::cout << vita::k_s_info << " Population logging is "
                 << problem->env.stat_population << std::endl;
   }
 
@@ -577,7 +583,7 @@ namespace ui
     problem->env.stat_summary = true;
 
     if (verbose)
-      std::cout << "[INFO] Summary logging is " << v << std::endl;
+      std::cout << vita::k_s_info << " Summary logging is " << v << std::endl;
   }
 
   ///
@@ -622,7 +628,7 @@ namespace ui
 
     if (!problem->env.sset.enough_terminals())
     {
-      std::cerr << "[ERROR] Too few terminals." << std::endl;
+      std::cerr << vita::k_s_error << " Too few terminals." << std::endl;
       return false;
     }
 
@@ -665,9 +671,10 @@ namespace ui
     if (verbose)
     {
       if (set)
-        std::cout << "[INFO] Threashold is " << v << std::endl;
+        std::cout << vita::k_s_info << " Threashold is " << v << std::endl;
       else
-        std::cerr << "[ERROR] Invalid threashold value." << std::endl;
+        std::cerr << vita::k_s_error << " Invalid threashold value."
+                  << std::endl;
     }
   }
 
@@ -681,7 +688,8 @@ namespace ui
     problem->env.ttable_size = bits;
 
     if (verbose)
-      std::cout << "[INFO] TTable size is " << bits << " bits" << std::endl;
+      std::cout << vita::k_s_info << " TTable size is " << bits << " bits"
+                << std::endl;
   }
 
   ///
@@ -711,9 +719,11 @@ namespace ui
     if (verbose)
     {
       if (set)
-        std::cout << "[INFO] Validation set ratio is " << v << std::endl;
+        std::cout << vita::k_s_info << " Validation set ratio is " << v
+                  << std::endl;
       else
-        std::cerr << "[ERROR] Invalid validation ratio." << std::endl;
+        std::cerr << vita::k_s_error << " Invalid validation ratio."
+                  << std::endl;
     }
   }
 
@@ -725,7 +735,7 @@ namespace ui
     verbose = v;
 
     if (verbose)
-      std::cout << "[INFO] Verbosity is " << v << std::endl;
+      std::cout << vita::k_s_info << " Verbosity is " << v << std::endl;
   }
 }  // namespace ui
 
@@ -872,7 +882,7 @@ int parse_command_line(int argc, char *const argv[])
   }
   catch(std::exception &e)
   {
-    std::cerr << "[ERROR] " << e.what() << std::endl;
+    std::cerr << vita::k_s_error << ' ' << e.what() << std::endl;
     return 0;
   }
 

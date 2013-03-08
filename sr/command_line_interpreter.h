@@ -3,7 +3,7 @@
  *  \file command_line_interpreter.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include <boost/program_options.hpp>
+
 
 namespace boost { namespace cli {
 
@@ -143,25 +144,25 @@ private:
     }
     catch (boost::program_options::ambiguous_option &e)
     {
-      std::cerr << "[ERROR] Ambiguous command '"
+      std::cerr << vita::k_s_error << " Ambiguous command '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
                 << "'" << std::endl;
     }
     catch (boost::program_options::invalid_command_line_syntax &e)
     {
-      std::cerr << "[ERROR] The required argument for option '"
+      std::cerr << vita::k_s_error << " The required argument for option '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
                 << "' is missing" << std::endl;
     }
     catch (boost::program_options::unknown_option &e)
     {
-      std::cerr << "[ERROR] Unknown command '"
+      std::cerr << vita::k_s_error << " Unknown command '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
                 << "'" << std::endl;
     }
     catch (boost::program_options::error &e)
     {
-      std::cerr << "[ERROR] " << e.what() << std::endl;
+      std::cerr << vita::k_s_error << ' ' << e.what() << std::endl;
     }
   }
 

@@ -231,7 +231,7 @@ namespace vita
       for (unsigned k(0); k < pop_.size(); ++k)
       {
         if (verbose && k % std::max(pop_.size()/100, static_cast<size_t>(2)))
-          std::cout << "Run " << run_count << '.' << stats_.gen << " ("
+          std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
                     << std::setw(3) << 100 * k / pop_.size() << "%)\r"
                     << std::flush;
 
@@ -246,14 +246,10 @@ namespace vita
         replacement->run(parents, off, &stats_);
 
         if (verbose && stats_.best->fitness != before)
-        {
-          std::cout << "Run " << run_count << '.' << std::setw(6)
+          std::cout << k_s_info << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << stats_.best->fitness;
-
-          std::cout << std::endl;
-        }
+                    << stats_.best->fitness << std::endl;
       }
 
       stats_.speed = get_speed(measure.elapsed());
