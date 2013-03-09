@@ -138,9 +138,6 @@ namespace ui
   /// Number of runs to be tried.
   unsigned runs(1);
 
-  /// Verbosity level.
-  bool verbose(true);
-
   /// Reference problem (the problem we will work on).
   vita::src_problem *problem;
 
@@ -153,7 +150,7 @@ namespace ui
   {
     problem->env.arl = is_true(v);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info
                 << " Adaptive Representation through Learning is "
                 << problem->env.arl << std::endl;
@@ -168,7 +165,7 @@ namespace ui
   {
     problem->env.brood_recombination = size;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Brood size for recombination is "
                 << size << std::endl;
   }
@@ -183,7 +180,7 @@ namespace ui
     assert(length);
     problem->env.code_length = length;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Code length is " << length << std::endl;
   }
 
@@ -210,7 +207,7 @@ namespace ui
 
     problem->env.p_cross = r;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Crossover rate is " << r << std::endl;
   }
 
@@ -220,7 +217,7 @@ namespace ui
   ///
   bool data(const std::string &data_file)
   {
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Reading data file " << data_file
                 << "..." << std::endl;
 
@@ -234,17 +231,14 @@ namespace ui
       parsed = 0;
     }
 
-    if (verbose)
-    {
-      if (!parsed)
-        std::cerr << vita::k_s_error << " Dataset file format error"
-                  << std::endl;
-      else
-        std::cout << vita::k_s_info << " Dataset read. Examples: " << parsed
-                  << ", categories: " << problem->categories()
-                  << ", features: " << problem->variables()
-                  << ", classes: " << problem->classes() << std::endl;
-    }
+    if (!parsed)
+      std::cerr << vita::k_s_error << " Dataset file format error"
+                << std::endl;
+    else if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Dataset read. Examples: " << parsed
+                << ", categories: " << problem->categories()
+                << ", features: " << problem->variables()
+                << ", classes: " << problem->classes() << std::endl;
 
     return parsed;
   }
@@ -258,7 +252,7 @@ namespace ui
   {
     problem->env.dss = is_true(v);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Dynamic Subset Selection is "
                 << problem->env.dss << std::endl;
   }
@@ -270,7 +264,7 @@ namespace ui
   {
     problem->env.elitism = is_true(v);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Elitism is " << problem->env.elitism
                 << std::endl;
   }
@@ -330,7 +324,7 @@ namespace ui
   ///
   void exit(bool)
   {
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << "Bye" << std::endl;
 
     std::exit(EXIT_SUCCESS);
@@ -345,9 +339,8 @@ namespace ui
   {
     problem->env.g_since_start = g;
 
-    if (verbose)
-      std::cout << vita::k_s_info << " Generations is " << g
-                << std::endl;
+    if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Generations is " << g << std::endl;
   }
 
   ///
@@ -361,7 +354,7 @@ namespace ui
         fix_parameters(problem);
 
         vita::search s(problem);
-        s.run(verbose, runs);
+        s.run(runs);
       }
       else
         std::cerr << vita::k_s_error << " Too few terminals" << std::endl;
@@ -378,7 +371,7 @@ namespace ui
   {
     problem->env.g_without_improvement = g;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info
                 << " Max number of generations without improvement is " << g
                 << std::endl;
@@ -401,7 +394,7 @@ namespace ui
   {
     problem->env.mate_zone = z;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Mate zone is " << z << std::endl;
   }
 
@@ -428,7 +421,7 @@ namespace ui
 
     problem->env.p_mutation = r;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Mutation rate is " << r << std::endl;
   }
 
@@ -438,7 +431,7 @@ namespace ui
   ///
   bool testset(const std::string &ts)
   {
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Reading test set file " << ts << "..."
                 << std::endl;
 
@@ -452,17 +445,14 @@ namespace ui
       parsed = 0;
     }
 
-    if (verbose)
-    {
-      if (!parsed)
-        std::cerr << vita::k_s_error << " Test set file format error"
-                  << std::endl;
-      else
-        std::cout << vita::k_s_info << " Testset read. Examples: " << parsed
-                  << ", categories: " << problem->categories()
-                  << ", features: " << problem->variables()
-                  << ", classes: " << problem->classes() << std::endl;
-    }
+    if (!parsed)
+      std::cerr << vita::k_s_error << " Test set file format error"
+                << std::endl;
+    else if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Testset read. Examples: " << parsed
+                << ", categories: " << problem->categories()
+                << ", features: " << problem->variables()
+                << ", classes: " << problem->classes() << std::endl;
 
     return parsed;
   }
@@ -476,7 +466,7 @@ namespace ui
   {
     problem->env.tournament_size = n;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Tournament size is " << n << std::endl;
   }
 
@@ -492,7 +482,7 @@ namespace ui
     else
       problem->env.individuals = boost::none;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
     {
       std::cout << vita::k_s_info << " Population size is ";
       if (size)
@@ -512,7 +502,7 @@ namespace ui
   {
     vita::random::seed(seed);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Random seed is " << seed << std::endl;
   }
 
@@ -526,7 +516,7 @@ namespace ui
     assert(r);
     runs = r;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Number of runs is " << r << std::endl;
   }
 
@@ -537,7 +527,7 @@ namespace ui
   {
     problem->env.stat_arl = true;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " ARL is " << v << std::endl;
   }
 
@@ -550,7 +540,7 @@ namespace ui
   {
     problem->env.stat_dir = dir;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Logging folder is " << dir << std::endl;
   }
 
@@ -561,7 +551,7 @@ namespace ui
   {
     problem->env.stat_dynamic = is_true(v);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Dynamic evolution logging is "
                 << problem->env.stat_dynamic << std::endl;
   }
@@ -573,7 +563,7 @@ namespace ui
   {
     problem->env.stat_population = is_true(v);
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Population logging is "
                 << problem->env.stat_population << std::endl;
   }
@@ -585,7 +575,7 @@ namespace ui
   {
     problem->env.stat_summary = true;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Summary logging is " << v << std::endl;
   }
 
@@ -599,13 +589,13 @@ namespace ui
   {
     if (symbol_file.empty())
     {
-      if (verbose)
+      if (problem->env.verbosity >= 2)
         std::cout << vita::k_s_info << "Using default symbol set" << std::endl;
       problem->setup_default_symbols();
     }
     else
     {
-      if (verbose)
+      if (problem->env.verbosity >= 2)
         std::cout << vita::k_s_info << " Reading symbol file " << symbol_file
                   << "..." << std::endl;
 
@@ -621,12 +611,11 @@ namespace ui
 
       if (!parsed)
       {
-        if (verbose)
-          std::cerr << vita::k_s_error << " Symbol file format error"
-                    << std::endl;
+        std::cerr << vita::k_s_error << " Symbol file format error"
+                  << std::endl;
         return false;
       }
-      if (verbose)
+      if (problem->env.verbosity >= 2)
         std::cout << vita::k_s_info << " Symbolset read. Symbols: " << parsed
                   << std::endl;
     }
@@ -673,7 +662,7 @@ namespace ui
       }
     }
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
     {
       if (set)
         std::cout << vita::k_s_info << " Threashold is " << v << std::endl;
@@ -692,7 +681,7 @@ namespace ui
     assert(bits);
     problem->env.ttable_size = bits;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " TTable size is " << bits << " bits"
                 << std::endl;
   }
@@ -721,7 +710,7 @@ namespace ui
 
     }
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
     {
       if (set)
         std::cout << vita::k_s_info << " Validation set ratio is " << v
@@ -737,9 +726,9 @@ namespace ui
   ///
   void verbosity(bool v)
   {
-    verbose = v;
+    problem->env.verbosity = v;
 
-    if (verbose)
+    if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Verbosity is " << v << std::endl;
   }
 }  // namespace ui

@@ -221,7 +221,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose prints additional informations while running.
+  /// \brief Tries to tune search parameters for the current problem.
   ///
   /// Parameter tuning is a typical approach to algorithm design. Such tuning
   /// is done by experimenting with different values and selecting the ones
@@ -250,7 +250,7 @@ namespace vita
   /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
   ///   Francone).
   ///
-  void search::tune_parameters(bool verbose)
+  void search::tune_parameters()
   {
     const environment dflt(true);
     const environment &constrained(prob_->env);
@@ -281,7 +281,7 @@ namespace vita
     {
       env_.dss = dt && dt->size() > 200;
 
-      if (verbose)
+      if (env_.verbosity >= 2)
         std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
     }
 
@@ -297,7 +297,7 @@ namespace vita
       if (dt)
       {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
-        if (verbose)
+        if (env_.verbosity >= 2)
           std::cout << k_s_info << " Population size set to "
                     << env_.individuals << std::endl;
       }
@@ -315,7 +315,7 @@ namespace vita
         else
           env_.validation_ratio = *dflt.validation_ratio;
 
-        if (verbose)
+        if (env_.verbosity >= 2)
           std::cout << k_s_info << " Validation ratio set to "
                     << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
       }
@@ -361,11 +361,10 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
-  individual search::run(bool verbose, unsigned n)
+  individual search::run(unsigned n)
   {
     assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
 
@@ -377,7 +376,7 @@ namespace vita
 
     std::list<unsigned> good_runs;
 
-    tune_parameters(verbose);
+    tune_parameters();
 
     // For std::placeholders and std::bind see:
     //  <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
@@ -397,7 +396,7 @@ namespace vita
     for (unsigned run(0); run < n; ++run)
     {
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
-      summary s(evo.run(verbose, run));
+      summary s(evo.run(run));
 
       // Depending on validation, this can be the training fitness or the
       // validation fitness for the current run.
@@ -441,14 +440,14 @@ namespace vita
         this_run_accuracy = accuracy(s.best->ind);
       }
 
-      if (verbose)
+      if (env_.verbosity >= 2)
       {
-        const std::string ds(validation ? "Validation" : "Training");
+        const std::string ds(validation ? " Validation" : " Training");
 
-        std::cout << ds << " fitness: " << fitness << std::endl;
+        std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
         if (env_.a_threashold >= 0.0)
-          std::cout << ds << " accuracy: " << 100.0 * this_run_accuracy
-                    << '%';
+          std::cout << k_s_info << ds << " accuracy: "
+                    << 100.0 * this_run_accuracy << '%';
 
         std::cout << std::endl << std::endl;
       }
@@ -488,6 +487,8 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
+      assert(std::find(good_runs.begin(), good_runs.end(), best_run) !=
+             good_runs.end());
       log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
     }
 
@@ -521,6 +522,7 @@ namespace vita
       const std::string summary(path + "summary.");
 
       const unsigned solutions(good_runs.size());
+
       boost::property_tree::ptree pt;
       pt.put(summary + "success_rate", runs ?
              static_cast<double>(solutions) / static_cast<double>(runs) : 0);

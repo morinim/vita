@@ -57,15 +57,16 @@ namespace vita
 
   ///
   /// \param[in] filename nome of the file containing the learning collection.
-  ///
+  /// \param[in] verbosity verbosity level (see environment::verbosity for
+  ///            further details).
   /// New data instance containing the learning collection from \a filename.
   ///
-  data::data(const std::string &filename)
+  data::data(const std::string &filename, unsigned verbosity)
   {
     assert(filename != "");
 
     clear();
-    open(filename);
+    open(filename, verbosity);
 
     assert(debug());
   }
@@ -691,6 +692,8 @@ namespace vita
 
   ///
   /// \param[in] filename the csv file.
+  /// \param[in] verbosity verbosity level (see environment::verbosity for
+  ///            further details).
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// We follow the Google Prediction API convention
@@ -730,7 +733,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::load_csv(const std::string &filename)
+  size_t data::load_csv(const std::string &filename, unsigned verbosity)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -739,7 +742,6 @@ namespace vita
     bool classification(false);
 
     std::string line;
-    size_t parsed(0);
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
@@ -749,7 +751,7 @@ namespace vita
       {
         example instance;
 
-        if (!parsed)
+        if (!dataset_[dataset()].size())  // No line parsed
           classification = !is_number(record[0]);
 
         for (size_t field(0); field < size; ++field)
@@ -757,7 +759,7 @@ namespace vita
           // The first line is (also) used to learn data format.
           if (columns() != size)
           {
-            assert(!parsed);
+            assert(!dataset_[dataset()].size());
 
             column a;
             a.name = "";
@@ -821,18 +823,19 @@ namespace vita
         }
 
         if (instance.input.size() + 1 == columns())
-        {
           dataset_[dataset()].push_back(instance);
-          ++parsed;
-        }
+        else if (verbosity >= 2)
+          std::cout << k_s_warning << " [" << line << "] skipped" << std::endl;
       }
     }
 
-    return debug() ? parsed : 0;
+    return debug() ? dataset_[dataset()].size() : 0;
   }
 
   ///
   /// \param[in] f name of the file containing the data set.
+  /// \param[in] verbosity verbosity level (see environment::verbosity for
+  ///            further details).
   /// \return number of lines parsed (0 in case of errors).
   ///
   /// Loads the content of \a f into the active dataset.
@@ -856,12 +859,12 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::open(const std::string &f)
+  size_t data::open(const std::string &f, unsigned verbosity)
   {
     const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
                     boost::algorithm::iends_with(f, ".xml"));
 
-    return xrff ? load_xrff(f) : load_csv(f);
+    return xrff ? load_xrff(f) : load_csv(f, verbosity);
   }
 
   ///

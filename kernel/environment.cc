@@ -37,7 +37,8 @@ namespace vita
   /// \see search::tune_parameters
   ///
   environment::environment(bool initialize)
-    : code_length(0),
+    : verbosity(2),
+      code_length(0),
       elitism(boost::indeterminate),
       dss(boost::indeterminate),
       arl(boost::indeterminate),

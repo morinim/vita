@@ -46,6 +46,13 @@ namespace vita
     bool debug(bool, bool) const;
 
   public:  // Data members.
+    /// Verbosity level:
+    /// * 0 only fatal errors;
+    /// * 1 search results and errors;
+    /// * 2 search results, informations, warnings and errors;
+    /// * >= 3 everything.
+    unsigned verbosity;
+
     /// The number of genes (maximum length of an evolved program in the
     /// population).
     /// Code length have to be chosen before population is created and cannot

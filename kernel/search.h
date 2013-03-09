@@ -33,9 +33,9 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
-    void tune_parameters(bool);
+    void tune_parameters();
 
-    individual run(bool = true, unsigned = 1);
+    individual run(unsigned = 1);
 
     bool debug(bool) const;
 
