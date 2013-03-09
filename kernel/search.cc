@@ -260,6 +260,9 @@ namespace vita
     if (constrained.code_length == 0)
       env_.code_length = dflt.code_length;
 
+    if (constrained.patch_length == 0)
+      env_.patch_length = dflt.patch_length;
+
     if (boost::indeterminate(constrained.elitism))
       env_.elitism = dflt.elitism;
 

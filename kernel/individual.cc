@@ -43,21 +43,25 @@ namespace vita
     if (gen)  // random generate initial code
     {
       assert(size());
-      const index_t sup(size() - 1);
+      assert(env_->patch_length);
+      assert(size() > env_->patch_length);
+
+      const index_t sup(size()), patch(sup - env_->patch_length);
 
       const category_t categories(e.sset.categories());
       assert(categories);
       assert(categories < sup);
 
       // STANDARD SECTION. Filling the genome with random symbols.
-      for (index_t i(0); i < sup; ++i)
+      for (index_t i(0); i < patch; ++i)
         for (category_t c(0); c < categories; ++c)
           genome_(i, c) = gene(e.sset.roulette(c), i + 1, size());
 
       // PATCH SUBSECTION. Placing terminals for satisfying constraints on
       // types.
-      for (category_t c(0); c < categories; ++c)
-        genome_(sup, c) = gene(e.sset.roulette_terminal(c));
+      for (index_t i(patch); i < sup; ++i)
+        for (category_t c(0); c < categories; ++c)
+          genome_(i, c) = gene(e.sset.roulette_terminal(c));
 
       assert(debug(true));
     }
