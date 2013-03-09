@@ -53,7 +53,6 @@ namespace vita
     std::uintmax_t crossovers;
 
     unsigned gen;
-    unsigned testset;
     unsigned last_imp;
   };
 
