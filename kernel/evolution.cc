@@ -304,7 +304,6 @@ namespace vita
     mutations     = 0;
     crossovers    = 0;
     gen           = 0;
-    testset       = 0;
     last_imp      = 0;
     speed         = 0.0;
 
