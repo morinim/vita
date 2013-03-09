@@ -724,7 +724,7 @@ namespace ui
   ///
   /// \param[in] v verbosity level.
   ///
-  void verbosity(bool v)
+  void verbosity(unsigned v)
   {
     problem->env.verbosity = v;
 
@@ -756,7 +756,7 @@ int parse_command_line(int argc, char *const argv[])
          &ui::verbosity),
        "turn off verbosity")
       ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(1)->notifier(
+       po::value<unsigned>()->zero_tokens()->implicit_value(2)->notifier(
          &ui::verbosity),
        "turn on verbosity");
 
