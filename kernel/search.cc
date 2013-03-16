@@ -455,8 +455,12 @@ namespace vita
         std::cout << std::endl << std::endl;
       }
 
-      if (run == 0)
+      if (run == 0 || fitness > overall_summary.best->fitness)
+      {
         overall_summary.best = {s.best->ind, fitness};
+        best_accuracy = this_run_accuracy;
+        best_run = run;
+      }
 
       // We use accuracy or fitness (or both) to identify successful runs.
       const bool solution_found(
@@ -468,14 +472,6 @@ namespace vita
         overall_summary.last_imp += s.last_imp;
 
         good_runs.push_back(run);
-      }
-
-      if (fitness > overall_summary.best->fitness)
-      {
-        overall_summary.best->fitness = fitness;
-        overall_summary.best->ind = s.best->ind;
-        best_accuracy = this_run_accuracy;
-        best_run = run;
       }
 
       if (fitness.isfinite())
