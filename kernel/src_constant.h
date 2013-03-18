@@ -28,12 +28,12 @@ namespace vita
   {
   public:
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal(c, t, false, false, default_weight * 2),
+      : terminal(c, t, false, false, default_weight),
         val_(boost::lexical_cast<T>(c)) {}
 
     explicit constant(T c, category_t t = 0)
       : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 default_weight * 2),
+                 default_weight),
         val_(c) {}
 
     ///
@@ -53,11 +53,11 @@ namespace vita
   {
   public:
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\"" + c + "\"", t, false, false, default_weight * 2),
+      : terminal("\"" + c + "\"", t, false, false, default_weight),
         val_(c) {}
     explicit constant(const char c[], category_t t = 0)
       : terminal("\"" + std::string(c) + "\"", t, false, false,
-                 default_weight * 2), val_(c) {}
+                 default_weight), val_(c) {}
 
     ///
     /// \return the value of the constant (as a \c any).

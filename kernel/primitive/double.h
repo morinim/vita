@@ -58,7 +58,7 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t, false, true, default_weight * 2), min(m), upp(u)
+        : terminal("REAL", t, false, true, default_weight), min(m), upp(u)
       { assert(m < u); }
 
       int init() const { return random::between<int>(min, upp); }
