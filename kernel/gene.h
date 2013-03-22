@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "vita.h"
+#include "symbol.h"
 
 namespace vita
 {
@@ -33,15 +33,15 @@ namespace vita
     enum {k_args = 4};
 
     gene() {}
-    explicit gene(const symbol_ptr &);
-    gene(const std::pair<symbol_ptr, std::vector<index_t>> &);
-    gene(const symbol_ptr &, index_t, index_t);
+    explicit gene(const symbol::ptr &);
+    gene(const std::pair<symbol::ptr, std::vector<index_t>> &);
+    gene(const symbol::ptr &, index_t, index_t);
 
     bool operator==(const gene &) const;
     bool operator!=(const gene &g) const { return !(*this == g); }
 
   public:  // Public data members.
-    symbol_ptr         sym;
+    symbol::ptr        sym;
     union
     {
       int              par;

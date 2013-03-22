@@ -15,7 +15,6 @@
 #define      SEARCH_H
 
 #include "environment.h"
-#include "fitness.h"
 
 namespace vita
 {
@@ -34,16 +33,16 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const individual &, evolution &);
-    void tune_parameters(bool);
+    void tune_parameters();
 
-    individual run(bool = true, unsigned = 1);
+    individual run(unsigned = 1);
 
     bool debug(bool) const;
 
   private:
     double accuracy(const individual &) const;
     void dss(unsigned) const;
-    void log(const summary &, const distribution<fitness_t::base_t> &,
+    void log(const summary &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, double, unsigned);
     bool stop_condition(const summary &) const;
 

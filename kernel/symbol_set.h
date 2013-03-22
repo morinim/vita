@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "vita.h"
+#include "symbol.h"
 
 namespace vita
 {
@@ -36,21 +36,21 @@ namespace vita
   public:
     symbol_set();
 
-    void insert(const symbol_ptr &);
+    void insert(const symbol::ptr &);
 
-    const symbol_ptr &roulette() const;
-    const symbol_ptr &roulette(category_t) const;
-    const symbol_ptr &roulette_terminal(category_t) const;
+    const symbol::ptr &roulette() const;
+    const symbol::ptr &roulette(category_t) const;
+    const symbol::ptr &roulette_terminal(category_t) const;
 
-    const symbol_ptr &arg(size_t) const;
+    const symbol::ptr &arg(size_t) const;
 
-    const symbol_ptr &get_adt(size_t) const;
+    const symbol::ptr &get_adt(size_t) const;
     size_t adts() const;
 
     void reset_adf_weights();
 
-    const symbol_ptr &decode(opcode_t) const;
-    const symbol_ptr &decode(const std::string &) const;
+    const symbol::ptr &decode(opcode_t) const;
+    const symbol::ptr &decode(const std::string &) const;
 
     size_t categories() const;
     size_t terminals(category_t) const;
@@ -61,12 +61,12 @@ namespace vita
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
   private:  // Private support functions.
-    typedef std::vector<symbol_ptr> s_vector;
+    typedef std::vector<symbol::ptr> s_vector;
 
-    static const symbol_ptr empty_ptr;
+    static const symbol::ptr empty_ptr;
 
     void clear();
-    const symbol_ptr &roulette(const s_vector &, std::uintmax_t) const;
+    const symbol::ptr &roulette(const s_vector &, std::uintmax_t) const;
 
   private:  // Private data members.
     // \a arguments_ is not included in the \a collection struct because

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+#  Copyright (C) 2011-2013 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -19,20 +19,34 @@ verbose = False
 col_run = 1;
 col_gen = 2;
 col_fitness = 3;
-col_accuracy = 4;
+col_mean_fit = 4;
+col_fit_sd = 5;
+col_entropy = 6;
+col_min_fit = 7;
+col_mean_len = 8;
+col_len_sd = 9;
+col_max_len = 10;
+col_mutations = 11;
+col_crossovers = 12;
+col_functions = 13;
+col_terminals = 14;
+col_active_functions = 15;
+col_active_terminals = 16;
 
 def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:{c2} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {c1}:(-4*${c2}+$5 >= 0 ? $5 : NaN):(${c2}+$6 <= 0 ? $6 : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_fitness} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {col_gen}:(-4*${col_fitness}+${col_mean_fit} >= 0 ? ${col_mean_fit} : NaN):(${col_fitness}+${col_fit_sd} <= 0 ? ${col_fit_sd} : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
         to_run = args.to_run,
-        c1 = col_gen,
-        c2 = col_fitness)
+        col_gen = col_gen,
+        col_fitness = col_fitness,
+        col_mean_fit = col_mean_fit,
+        col_fit_sd = col_fit_sd)
 
     if verbose:
         print(cmd)
@@ -43,13 +57,14 @@ def plot2(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'ENTROPY'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:7 title 'Entropy' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_entropy} title 'Entropy' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
         to_run = args.to_run,
-        c1 = col_gen)
+        col_gen = col_gen,
+        col_entropy = col_entropy)
 
     if verbose:
         print(cmd)
@@ -60,13 +75,15 @@ def plot3(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'EFFECTIVE SIZE'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:9:10 title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_mean_len}:{col_len_sd} title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
         to_run = args.to_run,
-        c1 = col_gen)
+        col_gen = col_gen,
+        col_mean_len = col_mean_len,
+        col_len_sd = col_len_sd)
 
     if verbose:
         print(cmd)
@@ -77,13 +94,18 @@ def plot4(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {c1}:14 title 'Functions' with lines, '{data}' index {from_run}:{to_run} using {c1}:15 title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using {c1}:16 title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using {c1}:17 title 'Active terminals' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_functions} title 'Functions' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_terminals} title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_active_functions} title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_active_terminals} title 'Active terminals' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,
         from_run = args.from_run,
         to_run = args.to_run,
-        c1 = col_gen)
+        col_gen = col_gen,
+        col_functions = col_functions,
+        col_terminals = col_terminals,
+        col_active_functions = col_active_functions,
+        col_active_terminals = col_active_terminals
+        )
 
     if verbose:
         print(cmd)

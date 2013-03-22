@@ -123,8 +123,8 @@ namespace vita
   ///   for object creation, changing factories is as easy as changing the
   ///   singleton object.
   ///
-  symbol_ptr symbol_factory::make(const std::string &name,
-                                  const std::vector<category_t> &c)
+  symbol::ptr symbol_factory::make(const std::string &name,
+                                   const std::vector<category_t> &c)
   {
     const map_key k(boost::to_upper_copy(name));
 
@@ -152,7 +152,7 @@ namespace vita
     case d_string:
       return std::make_shared<constant<std::string>>(name, c1);
     default:
-      return symbol_ptr();
+      return symbol::ptr();
     }
   }
 
@@ -165,7 +165,7 @@ namespace vita
   ///
   /// This is an alternative way to build a number.
   ///
-  symbol_ptr symbol_factory::make(domain_t d, int min, int max, category_t c)
+  symbol::ptr symbol_factory::make(domain_t d, int min, int max, category_t c)
   {
     assert(d == d_double || d == d_int);
 
@@ -176,7 +176,7 @@ namespace vita
     case d_int:
       return std::make_shared<integer::number>(c, min, max);
     default:
-      return symbol_ptr();
+      return symbol::ptr();
     }
   }
 

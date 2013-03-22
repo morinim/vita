@@ -41,18 +41,31 @@ namespace vita
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
 
-    void insert(const symbol_ptr &);
+    void insert(const symbol::ptr &);
 
     bool debug(bool, bool) const;
 
   public:  // Data members.
+    /// Verbosity level:
+    /// * 0 only fatal errors;
+    /// * 1 search results and errors;
+    /// * 2 search results, informations, warnings and errors;
+    /// * >= 3 everything.
+    unsigned verbosity;
+
     /// The number of genes (maximum length of an evolved program in the
     /// population).
     /// Code length have to be chosen before population is created and cannot
     /// be changed afterwards.
     /// \note
-    /// A lenth of 0 means undefined.
+    /// A length of 0 means undefined (auto-tune).
     size_t code_length;
+
+    /// The number of symbols in the patch section (a section of the genome
+    /// that contains terminals only).
+    /// \note
+    /// A length of 0 means undefined (auto-tune).
+    size_t patch_length;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will

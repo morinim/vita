@@ -3,7 +3,7 @@
  *  \file factory.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -42,10 +42,10 @@ namespace vita
   public:
     static symbol_factory &instance();
 
-    symbol_ptr make(
+    symbol::ptr make(
       const std::string &,
       const std::vector<category_t> & = std::vector<category_t>());
-    symbol_ptr make(domain_t, int, int, category_t = 0);
+    symbol::ptr make(domain_t, int, int, category_t = 0);
 
     unsigned args(const std::string &) const;
 
@@ -57,13 +57,13 @@ namespace vita
   private:
     symbol_factory();
 
-    typedef symbol_ptr (*make_func1)(category_t);
-    typedef symbol_ptr (*make_func2)(category_t, category_t);
+    typedef symbol::ptr (*make_func1)(category_t);
+    typedef symbol::ptr (*make_func2)(category_t, category_t);
 
-    template<typename T> static symbol_ptr make1(category_t c)
+    template<typename T> static symbol::ptr make1(category_t c)
     { return std::make_shared<T>(c); }
 
-    template<typename T> static symbol_ptr make2(category_t c1, category_t c2)
+    template<typename T> static symbol::ptr make2(category_t c1, category_t c2)
     { return std::make_shared<T>(c1, c2); }
 
   private:  // Data members.

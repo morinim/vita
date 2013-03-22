@@ -28,7 +28,10 @@ namespace vita
     hash_t tmp;
 
     if (!(in >> tmp.data[0] >> tmp.data[1]))
+    {
+      std::cout << tmp.data[0] << ' ' << tmp.data[1] << std::endl;
       return false;
+    }
 
     *this = tmp;
 
@@ -147,6 +150,78 @@ namespace vita
     s.birthday =         period_;
 
     table_[index(s.hash)] = s;
+  }
+
+  ///
+  /// \param[in] in input stream.
+  /// \return \c true if ttable loaded correctly.
+  ///
+  /// \note
+  /// If the load operation isn't successful the current object isn't changed.
+  ///
+  bool ttable::load(std::istream &in)
+  {
+    decltype(period_) t_period;
+    if (!(in >> t_period))
+      return false;
+
+    decltype(probes_) t_probes;
+    if (!(in >> t_probes))
+      return false;
+
+    decltype(hits_) t_hits;
+    if (!(in >> t_hits))
+      return false;
+
+    size_t n;
+    if (!(in >> n))
+      return false;
+
+    period_ = t_period;
+    probes_ = t_probes;
+    hits_ = t_hits;
+
+    for (size_t i(0); i < n; ++i)
+    {
+      slot s;
+
+      if (!s.hash.load(in))
+        return false;
+      if (!s.fitness.load(in))
+        return false;
+      if (!(in >> s.birthday))
+        return false;
+
+      table_[index(s.hash)] = s;
+    }
+
+    return true;
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return \c true if ttable was saved correctly.
+  ///
+  bool ttable::save(std::ostream &out) const
+  {
+    out << period_ << ' ' << probes_ << ' ' << hits_ << std::endl;
+
+    size_t num(0);
+    for (size_t i(0); i <= k_mask; ++i)
+      if (!table_[i].hash.empty())
+        ++num;
+    out << num << std::endl;
+
+    for (size_t i(0); i <= k_mask; ++i)
+      if (!table_[i].hash.empty())
+      {
+        const slot &s(table_[i]);
+        s.hash.save(out);
+        s.fitness.save(out);
+        out << s.birthday << std::endl;
+      }
+
+    return out.good();
   }
 
   ///

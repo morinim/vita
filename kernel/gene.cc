@@ -22,7 +22,7 @@ namespace vita
   ///
   /// A new gene built from terminal \a t.
   ///
-  gene::gene(const symbol_ptr &t) : sym(t)
+  gene::gene(const symbol::ptr &t) : sym(t)
   {
     assert(sym->terminal());
 
@@ -30,7 +30,7 @@ namespace vita
       par = sym->init();
   }
 
-  gene::gene(const std::pair<symbol_ptr, std::vector<index_t>> &g)
+  gene::gene(const std::pair<symbol::ptr, std::vector<index_t>> &g)
     : sym(g.first)
   {
     if (sym->parametric())
@@ -40,7 +40,7 @@ namespace vita
         args[i] = g.second[i];
   }
 
-  gene::gene(const symbol_ptr &s, index_t from, index_t sup) : sym(s)
+  gene::gene(const symbol::ptr &s, index_t from, index_t sup) : sym(s)
   {
     assert(from < sup);
 

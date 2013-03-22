@@ -3,7 +3,7 @@
  *  \file bool.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -42,7 +42,7 @@ namespace vita
     class zero : public terminal
     {
     public:
-      zero() : terminal("0", sym_bool, false, false, default_weight*3) {}
+      zero() : terminal("0", sym_bool, false, false, default_weight) {}
 
       std::string display() const { return "0"; }
 
@@ -52,7 +52,7 @@ namespace vita
     class one : public terminal
     {
     public:
-      one() : terminal("1", sym_bool, false, false, default_weight*3) {}
+      one() : terminal("1", sym_bool, false, false, default_weight) {}
 
       std::string display() const { return "1"; }
 

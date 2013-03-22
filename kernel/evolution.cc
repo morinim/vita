@@ -116,14 +116,14 @@ namespace vita
                 << ' ' << stats_.gen;
 
         if (stats_.best)
-          dynamic << ' ' << stats_.best->fitness;
+          dynamic << ' ' << stats_.best->fitness[0];
         else
           dynamic << " ?";
 
-        dynamic << ' ' << stats_.az.fit_dist().mean
-                << ' ' << stats_.az.fit_dist().standard_deviation()
+        dynamic << ' ' << stats_.az.fit_dist().mean[0]
+                << ' ' << stats_.az.fit_dist().standard_deviation()[0]
                 << ' ' << stats_.az.fit_dist().entropy()
-                << ' ' << stats_.az.fit_dist().min
+                << ' ' << stats_.az.fit_dist().min[0]
                 << ' ' << unsigned(stats_.az.length_dist().mean)
                 << ' ' << stats_.az.length_dist().standard_deviation()
                 << ' ' << unsigned(stats_.az.length_dist().max)
@@ -191,7 +191,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose if \c true prints verbose informations.
   /// \param[in] run_count run number (used for print and log).
   ///
   /// The genetic programming loop:
@@ -204,7 +203,7 @@ namespace vita
   /// With any luck, it will produce an individual that solves the problem at
   /// hand.
   ///
-  const summary &evolution::run(bool verbose, unsigned run_count)
+  const summary &evolution::run(unsigned run_count)
   {
     stats_.clear();
     stats_.best = {pop_[0], fitness(pop_[0])};
@@ -230,8 +229,9 @@ namespace vita
 
       for (unsigned k(0); k < pop_.size(); ++k)
       {
-        if (verbose && k % std::max(pop_.size()/100, static_cast<size_t>(2)))
-          std::cout << "Run " << run_count << '.' << stats_.gen << " ("
+        if (env().verbosity >= 1 &&
+            k % std::max(pop_.size()/100, static_cast<size_t>(2)))
+          std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
                     << std::setw(3) << 100 * k / pop_.size() << "%)\r"
                     << std::flush;
 
@@ -245,21 +245,17 @@ namespace vita
         const fitness_t before(stats_.best->fitness);
         replacement->run(parents, off, &stats_);
 
-        if (verbose && stats_.best->fitness != before)
-        {
+        if (env().verbosity >= 1 && stats_.best->fitness != before)
           std::cout << "Run " << run_count << '.' << std::setw(6)
                     << stats_.gen << " (" << std::setw(3)
                     << 100 * k / pop_.size() << "%): fitness "
-                    << stats_.best->fitness;
-
-          std::cout << std::endl;
-        }
+                    << stats_.best->fitness << std::endl;
       }
 
       stats_.speed = get_speed(measure.elapsed());
     }
 
-    if (verbose)
+    if (env().verbosity >= 2)
     {
       double speed(stats_.speed);
       std::string unit;
@@ -277,8 +273,8 @@ namespace vita
         unit = "cycles/day";
       }
 
-      std::cout << static_cast<unsigned>(speed) << unit << std::string(10, ' ')
-                << std::endl << std::string(40, '-') << std::endl;
+      std::cout << k_s_info << ' ' << static_cast<unsigned>(speed) << unit
+                << std::string(10, ' ') << std::endl;
     }
 
     return stats_;

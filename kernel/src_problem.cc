@@ -92,7 +92,7 @@ namespace vita
     env.sset = vita::symbol_set();
     dat_.clear();
 
-    const size_t n_examples(dat_.open(ds));
+    const size_t n_examples(dat_.open(ds, env.verbosity));
     if (n_examples > 0 && !get_evaluator())
       set_evaluator(classification() ? p_class : p_symre);
 
@@ -119,7 +119,7 @@ namespace vita
     const data::dataset_t backup(dat_.dataset());
     dat_.dataset(data::test);
 
-    const size_t n(dat_.open(ts));
+    const size_t n(dat_.open(ts, env.verbosity));
 
     dat_.dataset(backup);
     return n;

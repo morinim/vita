@@ -31,8 +31,9 @@ namespace vita
     typedef double base_t;
 
     fitness_t() {}
-    explicit fitness_t(size_t d)
-      : vect(d, std::numeric_limits<base_t>::lowest()) { assert(d); }
+    explicit fitness_t(size_t d,
+                       base_t v = std::numeric_limits<base_t>::lowest())
+      : vect(d, v) { assert(d); }
     fitness_t(std::initializer_list<base_t> l) : vect(l) {}
 
     /// Operation is performed by first comparing sizes and, if they match,
@@ -116,13 +117,20 @@ namespace vita
     bool empty() const
     { return vect.empty(); }
 
-    bool isfinite() const
-    {
-      for (const auto &i : vect)
-        if (!std::isfinite(i))
-          return false;
-      return true;
-    }
+    bool isfinite() const;
+    bool isnan() const;
+    bool issmall() const;
+
+    fitness_t operator+=(const fitness_t &);
+    fitness_t operator-(const fitness_t &) const;
+    fitness_t operator*(const fitness_t &) const;
+    fitness_t operator/(fitness_t::base_t) const;
+
+    fitness_t sqrt() const;
+
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
 
   private:
     std::vector<base_t> vect;

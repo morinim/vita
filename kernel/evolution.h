@@ -71,7 +71,7 @@ namespace vita
               std::function<bool (const summary &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    const summary &run(bool, unsigned);
+    const summary &run(unsigned);
 
     const vita::population &population() const;
     vita::population &population();
@@ -86,6 +86,7 @@ namespace vita
     replacement_strategy::ptr replacement;
 
   private:
+    const environment &env() const { return pop_.env(); }
     double get_speed(double) const;
     analyzer get_stats() const;
     void log(unsigned) const;

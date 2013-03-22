@@ -134,4 +134,49 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Serialization)
+{
+  vita::ttable cache(14), cache2(14);
+  env.code_length = 64;
+
+  const unsigned n(1000);
+  std::vector<vita::individual> vi;
+  std::vector<bool> present(n);
+
+  for (unsigned i(0); i < n; ++i)
+  {
+    vita::individual i1(env, true);
+    const vita::any val(vita::interpreter(i1).run());
+    vita::fitness_t f(
+      {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
+
+    cache.insert(i1, f);
+    vi.push_back(i1);
+  }
+
+  for (unsigned i(0); i < n; ++i)
+  {
+    vita::fitness_t f;
+    present[i] = cache.find(vi[i], &f);
+  }
+
+  std::stringstream ss;
+  BOOST_REQUIRE(cache.save(ss));
+
+  BOOST_REQUIRE(cache2.load(ss));
+
+  for (unsigned i(0); i < n; ++i)
+    if (present[i])
+    {
+      const vita::any val(vita::interpreter(vi[i]).run());
+      vita::fitness_t f(
+        {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
+
+      vita::fitness_t f1;
+      BOOST_CHECK(cache2.find(vi[i], &f1));
+
+      BOOST_CHECK_EQUAL(f, f1);
+    }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

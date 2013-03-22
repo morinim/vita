@@ -48,7 +48,7 @@ namespace vita
   void search::arl(const individual &base, evolution &evo)
   {
     const fitness_t base_fit(evo.fitness(base));
-    if (std::isfinite(base_fit[0]))
+    if (base_fit.isfinite())
     {
       const std::string filename(env_.stat_dir + "/" +
                                  environment::arl_filename);
@@ -57,7 +57,7 @@ namespace vita
       {
         for (size_t i(0); i < env_.sset.adts(); ++i)
         {
-          const symbol_ptr f(env_.sset.get_adt(i));
+          const symbol::ptr f(env_.sset.get_adt(i));
           log << f->display() << ' ' << f->weight << std::endl;
         }
         log << std::endl;
@@ -78,7 +78,7 @@ namespace vita
           // Semantic introns cannot be building blocks.
           if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
           {
-            symbol_ptr p;
+            symbol::ptr p;
             if (adf_args)
             {
               std::vector<locus> replaced;
@@ -208,20 +208,20 @@ namespace vita
       return true;
 
     // We use an accelerated stop condition when all the individuals have
-    // the same fitness and after gwi/2 generations the situation isn't
-    // changed.
+    // the same fitness and after env_.g_without_improvement generations the
+    // situation isn't changed.
     assert(env_.g_without_improvement);
 
     if (*env_.g_without_improvement &&
         (s.gen - s.last_imp > *env_.g_without_improvement &&
-         s.az.fit_dist().variance <= float_epsilon))
+         s.az.fit_dist().variance.issmall()))
       return true;
 
     return false;
   }
 
   ///
-  /// \param[in] verbose prints additional informations while running.
+  /// \brief Tries to tune search parameters for the current problem.
   ///
   /// Parameter tuning is a typical approach to algorithm design. Such tuning
   /// is done by experimenting with different values and selecting the ones
@@ -250,7 +250,7 @@ namespace vita
   /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
   ///   Francone).
   ///
-  void search::tune_parameters(bool verbose)
+  void search::tune_parameters()
   {
     const environment dflt(true);
     const environment &constrained(prob_->env);
@@ -259,6 +259,9 @@ namespace vita
 
     if (constrained.code_length == 0)
       env_.code_length = dflt.code_length;
+
+    if (constrained.patch_length == 0)
+      env_.patch_length = 1 + env_.code_length / 3;
 
     if (boost::indeterminate(constrained.elitism))
       env_.elitism = dflt.elitism;
@@ -281,8 +284,8 @@ namespace vita
     {
       env_.dss = dt && dt->size() > 200;
 
-      if (verbose)
-        std::cout << "[INFO] DSS set to " << env_.dss << std::endl;
+      if (env_.verbosity >= 2)
+        std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
     }
 
     // A larger number of training cases requires an increase in the population
@@ -297,9 +300,9 @@ namespace vita
       if (dt)
       {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
-        if (verbose)
-          std::cout << "[INFO] Population size set to " << env_.individuals
-                    << std::endl;
+        if (env_.verbosity >= 2)
+          std::cout << k_s_info << " Population size set to "
+                    << env_.individuals << std::endl;
       }
       else
         env_.individuals = *dflt.individuals;
@@ -315,8 +318,8 @@ namespace vita
         else
           env_.validation_ratio = *dflt.validation_ratio;
 
-        if (verbose)
-          std::cout << "[INFO] Validation ratio set to "
+        if (env_.verbosity >= 2)
+          std::cout << k_s_info << " Validation ratio set to "
                     << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
       }
       else
@@ -361,24 +364,22 @@ namespace vita
   }
 
   ///
-  /// \param[in] verbose prints verbose informations while running.
   /// \param[in] n number of runs.
   /// \return best individual found.
   ///
-  individual search::run(bool verbose, unsigned n)
+  individual search::run(unsigned n)
   {
-    assert(!env_.f_threashold.empty() || env_.a_threashold >= 0.0);
+    assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
 
     summary overall_summary;
-    distribution<fitness_t::base_t> fd;
+    distribution<fitness_t> fd;
 
     double best_accuracy(-1.0);
-
-    unsigned solutions(0);
+    unsigned best_run(0);
 
     std::list<unsigned> good_runs;
 
-    tune_parameters(verbose);
+    tune_parameters();
 
     // For std::placeholders and std::bind see:
     //  <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
@@ -398,7 +399,7 @@ namespace vita
     for (unsigned run(0); run < n; ++run)
     {
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
-      summary s(evo.run(verbose, run));
+      summary s(evo.run(run));
 
       // Depending on validation, this can be the training fitness or the
       // validation fitness for the current run.
@@ -442,22 +443,24 @@ namespace vita
         this_run_accuracy = accuracy(s.best->ind);
       }
 
-      if (verbose)
+      if (env_.verbosity >= 2)
       {
-        const std::string ds(validation ? "Validation" : "Training");
+        const std::string ds(validation ? " Validation" : " Training");
 
-        std::cout << ds << " fitness: " << fitness << std::endl;
-        if (env_.a_threashold < 0.0)
-          std::cout << std::endl;
-        else
-          std::cout << ds << " accuracy: " << 100.0 * this_run_accuracy
-                    << std::endl;
+        std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
+        if (env_.a_threashold >= 0.0)
+          std::cout << k_s_info << ds << " accuracy: "
+                    << 100.0 * this_run_accuracy << '%';
 
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
       }
 
-      if (run == 0)
+      if (run == 0 || fitness > overall_summary.best->fitness)
+      {
         overall_summary.best = {s.best->ind, fitness};
+        best_accuracy = this_run_accuracy;
+        best_run = run;
+      }
 
       // We use accuracy or fitness (or both) to identify successful runs.
       const bool solution_found(
@@ -466,21 +469,13 @@ namespace vita
 
       if (solution_found)
       {
-        ++solutions;
         overall_summary.last_imp += s.last_imp;
 
         good_runs.push_back(run);
       }
 
-      if (fitness > overall_summary.best->fitness)
-      {
-        overall_summary.best->fitness = fitness;
-        overall_summary.best->ind = s.best->ind;
-        best_accuracy = this_run_accuracy;
-      }
-
-      if (std::isfinite(fitness[0]))
-        fd.add(fitness[0]);
+      if (fitness.isfinite())
+        fd.add(fitness);
 
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);
@@ -491,7 +486,9 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      log(overall_summary, fd, good_runs, solutions, best_accuracy, n);
+      assert(std::find(good_runs.begin(), good_runs.end(), best_run) !=
+             good_runs.end());
+      log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
     }
 
     return overall_summary.best->ind;
@@ -500,17 +497,16 @@ namespace vita
   ///
   /// \param[in] run_sum summary information regarding the search.
   /// \param[in] fd statistics about population fitness.
-  /// \param[in] solutions number of solutions found.
-  /// \param[in] best_runs list of the best runs of the search.
+  /// \param[in] good_runs list of the best runs of the search.
+  /// \param[in] best_run best overall run.
   /// \param[in] best_accuracy accuracy of the best individual (if available).
   /// \param[in] runs number of runs performed.
   /// \return \c true if the write operation succeed.
   ///
   /// Writes end-of-run logs (run summary, results for test...).
   ///
-  void search::log(const summary &run_sum,
-                   const distribution<fitness_t::base_t> &fd,
-                   const std::list<unsigned> &best_runs, unsigned solutions,
+  void search::log(const summary &run_sum, const distribution<fitness_t> &fd,
+                   const std::list<unsigned> &good_runs, unsigned best_run,
                    double best_accuracy, unsigned runs)
   {
     // Summary logging.
@@ -524,24 +520,28 @@ namespace vita
       const std::string path("vita.");
       const std::string summary(path + "summary.");
 
+      const unsigned solutions(good_runs.size());
+
       boost::property_tree::ptree pt;
       pt.put(summary + "success_rate", runs ?
              static_cast<double>(solutions) / static_cast<double>(runs) : 0);
       pt.put(summary + "speed", run_sum.speed);
       pt.put(summary + "mean_fitness", fd.mean);
       pt.put(summary + "standard_deviation", fd.standard_deviation());
+
       pt.put(summary + "best.fitness", run_sum.best->fitness);
       pt.put(summary + "best.accuracy", best_accuracy);
-      pt.put(summary + "best.times_reached", best_runs.size());
-      pt.put(summary + "best.avg_depth_found", solutions
-             ? static_cast<unsigned>(static_cast<double>(run_sum.last_imp) /
-                                     static_cast<double>(solutions))
-             : 0);
-      for (const auto &p : best_runs)
-        pt.add(summary + "best.runs.run", p);
+      pt.put(summary + "best.run", best_run);
       pt.put(summary + "best.individual.tree", best_tree.str());
       pt.put(summary + "best.individual.list", best_list.str());
       pt.put(summary + "best.individual.graph", best_graph.str());
+
+      for (const auto &p : good_runs)
+        pt.add(summary + "solutions.runs.run", p);
+      pt.put(summary + "solutions.found", solutions);
+      pt.put(summary + "solutions.avg_depth",
+             solutions ? run_sum.last_imp / solutions : 0);
+
       pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
 
       const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
@@ -553,19 +553,19 @@ namespace vita
     }
 
     // Test set results logging.
-    vita::data *const data = prob_->data();
-    if (data->size(data::test))
+    vita::data &data(*prob_->data());
+    if (data.size(data::test))
     {
-      const data::dataset_t backup(data->dataset());
-      data->dataset(data::test);
+      const data::dataset_t backup(data.dataset());
+      data.dataset(data::test);
 
       std::unique_ptr<lambda_f> lambda(prob_->lambdify(run_sum.best->ind));
 
       std::ofstream tf(env_.stat_dir + "/" + environment::tst_filename);
-      for (const data::example &e : *data)
-        tf << (*lambda)(e) << std::endl;
+      for (const auto &example : data)
+        tf << lambda->name((*lambda)(example)) << std::endl;
 
-      data->dataset(backup);
+      data.dataset(backup);
     }
   }
 

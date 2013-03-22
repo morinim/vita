@@ -46,11 +46,6 @@
 
 namespace vita
 {
-  class symbol;
-
-  /// Just a shortcut.
-  typedef std::shared_ptr<symbol> symbol_ptr;
-
   /// This is the type used as key for symbol identification.
   typedef unsigned opcode_t;
 
@@ -95,6 +90,16 @@ namespace vita
     // The alternative is: return boost::any_cast<T>(a);
     return boost::spirit::any_cast<T>(a);
   }
+
+  /// \brief Prefix for debug messages.
+  const char k_s_debug[] = "[DEBUG]";
+  /// \brief Prefix for error messages.
+  const char k_s_error[] = "[ERROR]";
+  /// \brief Prefix for information messages.
+  /// Information messages regard the status of the program.
+  const char k_s_info[] = "[INFO]";
+  /// \brief Prefix for warning messages.
+  const char k_s_warning[] = "[WARNING]";
 }  // namespace vita
 
 /// \page page1 VITA Architecture

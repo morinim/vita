@@ -15,11 +15,31 @@ from decimal import *
 from xml.etree.ElementTree import ElementTree
 
 
-format_string_head = "\n{:<32} {:>8} {:>9} {:>12} {:>11}"
-format_string_row  = "{:<32} {:>+8.2%} {:>+9.2f} {:>+12.2f} {:>+11.2f}"
-format_string_row2  = "{:<32} {:>+8.2%} {:>+9.2f} {:>+12.6g} {:>+11.5g}"
+max_fn_l = 30
+fn_format = "{:<" + str(max_fn_l) + "} "
+fmt_str_head = "\n" + fn_format + "{:>8} {:>9} {:>14} {:>14}"
+fmt_str_row = fn_format + "{:>+8.2%} {:>+9.2f} {:>14s} {:>14s}"
 
 verbose = False
+
+
+def to_tuple(s):
+    """Returns a tuple constructed converting string s"""
+    if s[0] == "(" and s[-1] == ")":
+        s1 = s[1:-1]
+    else:
+        s1 = s
+
+    return tuple([float(x) for x in s1.split(",")])
+
+def tuple_pp(t):
+    """Pretty print for numerical tuples"""
+    if min(t) < -1000000 or max(t) > 1000000:
+        fs = "{:>+2.0f}"
+    else:
+        fs = "{:>+2.2f}"
+
+    return "(" + ", ".join([fs.format(x) for x in t]) + ")"
 
 
 def compare_file(files, scores):
@@ -39,26 +59,23 @@ def compare_file(files, scores):
         if summary.find("mean_fitness") is None:
             print("Missing mean fitness in file {0}.".format(f))
         else:
-            f_mean[f] = float(summary.find("mean_fitness").text)
+            f_mean[f] = to_tuple(summary.find("mean_fitness").text)
         if summary.find("standard_deviation") is None:
             print("Missing standard deviation in file {0}.".format(f))
         else:
-            f_deviation[f] = float(summary.find("standard_deviation").text)
+            f_deviation[f] = to_tuple(summary.find("standard_deviation").text)
 
-        best = summary.find("best")
-        if best.find("avg_depth_found") is None:
+        solutions = summary.find("solutions")
+        if solutions.find("avg_depth") is None:
             print("Missing solution average depth in file {0}.".format(f))
         else:
-            avg_depth_found[f] = int(best.find("avg_depth_found").text)
+            avg_depth_found[f] = int(solutions.find("avg_depth").text)
 
-        fn = f if len(f) <= 32 else "..." + f[-29:]
-        if f_mean[f] < -1000000 or f_deviation[f] > 1000000:
-            format_str = format_string_row2
-        else:
-            format_str = format_string_row
+        fn = f if len(f) <= max_fn_l else "..." + f[-(max_fn_l - 3):]
 
-        print(format_str.format(fn, success_rate[f],
-                                avg_depth_found[f], f_mean[f], f_deviation[f]))
+        print(fmt_str_row.format(fn, success_rate[f],
+                                 avg_depth_found[f], tuple_pp(f_mean[f]),
+                                 tuple_pp(f_deviation[f])))
 
     best = [files[0]]
     for f in files[1:]:
@@ -73,8 +90,8 @@ def compare_file(files, scores):
     else:
         good = [best[0]]
         for f in best[1:]:
-            mff = round(f_mean[f], 4)
-            mfg = round(f_mean[good[0]], 4)
+            mff = tuple([round(x, 4) for x in f_mean[f]])
+            mfg = tuple([round(x, 4) for x in f_mean[good[0]]])
             if mff > mfg:
                 good = [f]
             elif mff == mfg:
@@ -84,7 +101,8 @@ def compare_file(files, scores):
 
 
 def decode_opt(f, files):
-    if len(files)==1 or os.path.dirname(files[0]) != os.path.dirname(files[1]):
+    if (len(files) == 1 or
+        os.path.dirname(files[0]) != os.path.dirname(files[1])):
         return os.path.dirname(f)
     else:
         return f
@@ -93,8 +111,8 @@ def decode_opt(f, files):
 def start_comparison(args):
     scores = defaultdict(Decimal)
 
-    print(format_string_head.format("FILE", "SUCCESS", "AVG.DEPTH",
-                                    "AVG.FIT.", "FIT.ST.DEV."))
+    print(fmt_str_head.format("FILE", "SUCCESS", "AVG.DEPTH",
+                              "AVG.FIT.", "FIT.ST.DEV."))
 
     # Case 1. Just list the results contained in a directory.
     if len(args.filepath) == 1 and os.path.isdir(args.filepath[0]):
@@ -121,7 +139,7 @@ def start_comparison(args):
                 fn2 = os.path.join(args.filepath[1], os.path.basename(f))
                 if os.path.isfile(fn2):
                     compare_file([fn1, fn2], scores)
-                    print("-"*79)
+                    print("-" * 79)
                 else:
                     print("Missing {0} file".format(fn2))
     # Case 3. Comparison between two files.
@@ -130,7 +148,7 @@ def start_comparison(args):
 
     print("\nOverall testsets comparison")
     for f in sorted(scores.keys()):
-        print("{:<32}".format(f), " --> ", "{:>3.2f}".format(scores[f]))
+        print(fn_format.format(f), " --> ", "{:>3.2f}".format(scores[f]))
 
 
 def get_cmd_line_options():

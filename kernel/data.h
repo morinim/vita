@@ -111,7 +111,7 @@ namespace vita
 
   public:  // Construction, convenience.
     data();
-    explicit data(const std::string &);
+    explicit data(const std::string &, unsigned = 0);
 
     enum dataset_t {training = 0, validation, test, k_max_dataset = test};
     void dataset(dataset_t);
@@ -125,7 +125,7 @@ namespace vita
     size_t size() const;
     size_t size(dataset_t) const;
 
-    size_t open(const std::string &);
+    size_t open(const std::string &, unsigned = 0);
     bool operator!() const;
 
     void clear();
@@ -156,7 +156,7 @@ namespace vita
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
-    size_t load_csv(const std::string &);
+    size_t load_csv(const std::string &, unsigned);
     size_t load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);

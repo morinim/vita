@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j][locus_category];
         }
 
-        symbol_ptr f(std::make_shared<adf>(blk2, categories, 100));
+        symbol::ptr f(std::make_shared<adf>(blk2, categories, 100));
         env.insert(f);
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
