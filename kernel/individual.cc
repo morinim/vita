@@ -749,7 +749,7 @@ namespace vita
   ///
   bool individual::load(std::istream &in)
   {
-    locus best;
+    decltype(best_) best;
     if (!(in >> best[locus_index] >> best[locus_category]))
       return false;
 
@@ -757,7 +757,7 @@ namespace vita
     if (!(in >> rows >> cols) || !rows || !cols)
       return false;
 
-    matrix<gene> genome(rows, cols);
+    decltype(genome_) genome(rows, cols);
     for (size_t r(0); r < rows; ++r)
       for (size_t c(0); c < cols; ++c)
       {
@@ -782,7 +782,7 @@ namespace vita
         genome(r, c) = g;
       }
 
-    hash_t signature;
+    decltype(signature_) signature;
     if (!signature.load(in))
       return false;
 

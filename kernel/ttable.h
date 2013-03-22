@@ -86,6 +86,10 @@ namespace vita
 
     bool debug() const;
 
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
   private:  // Private support methods.
     size_t index(const hash_t &) const;
 

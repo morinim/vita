@@ -27,7 +27,9 @@ namespace vita
   ///
   bool fitness_t::load(std::istream &in)
   {
-    const size_t sup(size());
+    size_t sup;
+    if (!(in >> sup))
+      return false;
 
     fitness_t tmp(sup);
 
@@ -49,6 +51,7 @@ namespace vita
   ///
   bool fitness_t::save(std::ostream &out) const
   {
+    out << size() << ' ';
     for (const auto &i : vect)
       out << std::fixed << std::scientific
           << std::setprecision(std::numeric_limits<double>::digits10 + 1)
