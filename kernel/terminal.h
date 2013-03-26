@@ -28,7 +28,7 @@ namespace vita
   {
   public:
     terminal(const std::string &, category_t, bool = false, bool = false,
-             unsigned = default_weight);
+             unsigned = k_base_weight);
 
     ///
     /// \return \c false (terminals haven't arguments and cannot be
@@ -54,9 +54,6 @@ namespace vita
     virtual size_t arity() const { return 0; }
 
     virtual bool debug() const;
-
-  public:   // Public data members.
-    static unsigned default_weight;
 
   private:  // Private data members.
     bool parametric_;

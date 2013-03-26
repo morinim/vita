@@ -58,7 +58,7 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t, false, true, default_weight), min(m), upp(u)
+        : terminal("REAL", t, false, true, k_base_weight), min(m), upp(u)
       { assert(m < u); }
 
       int init() const { return random::between<int>(min, upp); }
@@ -91,7 +91,7 @@ namespace vita
     {
     public:
       explicit add(category_t t)
-        : function("FADD", t, {t, t}, function::default_weight, true) {}
+        : function("FADD", t, {t, t}, k_base_weight, true) {}
 
       virtual any eval(interpreter *i) const
       {
@@ -262,8 +262,7 @@ namespace vita
     class ln : public function
     {
     public:
-      explicit ln(category_t t)
-        : function("FLN", t, {t}, function::default_weight / 2) {}
+      explicit ln(category_t t) : function("FLN", t, {t}, k_base_weight / 2) {}
 
       ///
       /// \param[in] i pointer to the active interpreter.
@@ -306,7 +305,7 @@ namespace vita
     {
     public:
       explicit mul(category_t t)
-        : function("FMUL", t, {t, t}, function::default_weight, true) {}
+        : function("FMUL", t, {t, t}, k_base_weight, true) {}
 
       virtual any eval(interpreter *i) const
       {

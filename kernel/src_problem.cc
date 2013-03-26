@@ -304,12 +304,12 @@ namespace vita
 
     for (size_t i(0); i < instance.size(); ++i)
     {
-      bool generic(data::from_weka.find(pattern[i]) != data::from_weka.end());
+      bool generic(data::from_weka(pattern[i]) != d_void);
 
       if (generic)  // numeric, string, integer...
       {
         if (dat_.get_category(instance[i]).domain !=
-            data::from_weka.find(pattern[i])->second)
+            data::from_weka(pattern[i]))
           return false;
       }
       else
