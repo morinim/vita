@@ -18,12 +18,10 @@
 
 namespace vita
 {
-  unsigned adf_core::adf_count(0);
-
   ///
   /// \param[in] ind individual whose code is used as ADF.
   ///
-  adf_core::adf_core(const individual &ind) : id(adf_count++), code(ind)
+  adf_core::adf_core(const individual &ind) : id(adf_count()), code(ind)
   {
   }
 

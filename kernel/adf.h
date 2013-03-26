@@ -56,10 +56,14 @@ namespace vita
     bool debug() const;
 
   private: // Data members
-    unsigned     id;
+    opcode_t     id;
     individual code;
 
-    static unsigned adf_count;
+    static opcode_t adf_count()
+    {
+      static opcode_t counter(0);
+      return counter++;
+    }
   };
 
   ///
