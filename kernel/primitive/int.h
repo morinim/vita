@@ -51,7 +51,7 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("INT", t, false, true, default_weight), min(m), upp(u)
+        : terminal("INT", t, false, true, k_base_weight), min(m), upp(u)
       { assert(m < u); }
 
       int init() const { return random::between<int>(min, upp); }
@@ -70,7 +70,7 @@ namespace vita
     {
     public:
       explicit add(category_t t)
-        : function("ADD", t, {t, t}, function::default_weight, true) {}
+        : function("ADD", t, {t, t}, k_base_weight, true) {}
 
       any eval(interpreter *i) const
       {
@@ -179,7 +179,7 @@ namespace vita
     {
     public:
       explicit mul(category_t t)
-        : function("MUL", t, {t, t}, function::default_weight, true) {}
+        : function("MUL", t, {t, t}, k_base_weight, true) {}
 
       any eval(interpreter *i) const
       {

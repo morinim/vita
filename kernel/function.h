@@ -34,7 +34,7 @@ namespace vita
   {
   public:
     function(const std::string &, category_t, const std::vector<category_t> &,
-             unsigned = default_weight, bool = false);
+             unsigned = k_base_weight, bool = false);
 
     ///
     /// \return \c true if the function is associative (e.g. sum is associative,
@@ -72,9 +72,6 @@ namespace vita
       assert(s->arity());
       return static_cast<function *>(s.get());
     }
-
-  public:   // Public data members.
-    static unsigned default_weight;
 
   private:  // Private data members.
     category_t argt_[gene::k_args];
