@@ -547,8 +547,8 @@ namespace vita
 
         column a;
 
-        // Structure ptree does not have a concept of an attribute, so xml
-        // attributes are just sub-elements of a special element <xmlattr>.
+        // In a ptree xml-attributes are just sub-elements of a special element
+        // <xmlattr>.
         // Note that we don't have to provide the template parameter when it is
         // deduced from the default value.
         a.name = dha.second.get("<xmlattr>.name", "");

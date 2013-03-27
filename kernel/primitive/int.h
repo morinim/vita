@@ -100,7 +100,7 @@ namespace vita
         if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v0);
         else
-          return any(v1 / v0);
+          return any(v0 / v1);
       }
     };
 

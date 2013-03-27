@@ -233,8 +233,8 @@ namespace vita
   /// \param[in] gv vector of genes.
   /// \return a new individual .
   ///
-  /// Create a new \a individual obtained from \c this replacing the original
-  /// gene at index \a i with a new one (\a gv[i]).
+  /// Create a new \a individual obtained replacing the first section of
+  /// \c this with genes from \a gv.
   ///
   individual individual::replace(const std::vector<gene> &gv) const
   {
