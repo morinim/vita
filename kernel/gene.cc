@@ -30,6 +30,8 @@ namespace vita
       par = sym->init();
   }
 
+  template<class T> T type_max(T) { return std::numeric_limits<T>::max(); }
+
   gene::gene(const std::pair<symbol::ptr, std::vector<index_t>> &g)
     : sym(g.first)
   {
@@ -37,7 +39,10 @@ namespace vita
       par = sym->init();
     else
       for (size_t i(0); i < sym->arity(); ++i)
+      {
+        assert(g.second[i] <= type_max(args[0]));
         args[i] = g.second[i];
+      }
   }
 
   gene::gene(const symbol::ptr &s, index_t from, index_t sup) : sym(s)
@@ -50,7 +55,10 @@ namespace vita
     {
       const size_t arity(sym->arity());
       for (size_t i(0); i < arity; ++i)
+      {
+        assert(sup <= type_max(args[0]));
         args[i] = random::between(from, sup);
+      }
     }
   }
 

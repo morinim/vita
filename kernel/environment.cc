@@ -240,7 +240,7 @@ namespace vita
                     << std::endl;
         return false;
       }
-    }
+    }  // if (force_defined)
 
     if (code_length == 1)
     {
