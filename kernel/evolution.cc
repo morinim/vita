@@ -135,13 +135,11 @@ namespace vita
                 << ' ' << stats_.az.terminals(1);
 
         for (unsigned active(0); active <= 1; ++active)
-          for (analyzer::const_iterator i(stats_.az.begin());
-               i != stats_.az.end();
-               ++i)
-            dynamic << ' ' << (i->first)->display() << ' '
-                    << i->second.counter[active];
+          for (const auto &symb_stat : stats_.az)
+            dynamic << ' ' << (symb_stat.first)->display()
+                    << ' ' << symb_stat.second.counter[active];
 
-        dynamic << ' ' << '"';
+        dynamic << " \"";
         if (stats_.best)
           stats_.best->ind.in_line(dynamic);
         dynamic << '"' << std::endl;
