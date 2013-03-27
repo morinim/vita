@@ -36,26 +36,21 @@ namespace vita
   ///
   /// Analyzer takes a statistics snapshot of a set of individuals.
   /// Procedute:
-  /// <ol>
-  /// <li>
-  ///   the set should be specified adding (analyzer::add method) one invividual
-  ///   at time;
-  /// </li>
-  /// <li>
-  ///   statistics can be checked executing the desidered methods.
-  /// </li>
-  /// </ol>
+  /// 1. the set should be specified adding (analyzer::add method) one
+  ///    invividual at time;
+  /// 2. statistics can be checked executing the desidered methods.
+  ///
   /// Informations regard:
-  /// \li the set as a whole (analyzer::fit_dist, analyzer::length dist,
-  ///     analyzer::functions>, analyzer::terminals methods);
-  /// \li symbols appearing in the set (accessed by analyzer::begin and
-  ///     analyzer::end methods).
+  /// * the set as a whole (analyzer::fit_dist, analyzer::length dist,
+  ///   analyzer::functions>, analyzer::terminals methods);
+  /// * symbols appearing in the set (accessed by analyzer::begin and
+  ///   analyzer::end methods).
   ///
   class analyzer
   {
   public:
-    // Type returned by \c begin() and \c end() methods to iterate through the
-    // statistics of the various symbols.
+    /// Type returned by \c begin() and \c end() methods to iterate through the
+    /// statistics of the various symbols.
     typedef std::map<const symbol *, stats>::const_iterator const_iterator;
 
     const_iterator begin() const;

@@ -36,7 +36,6 @@
 
 #include <cassert>
 #include <climits>
-#include <cmath>
 #include <cstdint>
 #include <memory>
 

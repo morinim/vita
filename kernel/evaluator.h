@@ -46,7 +46,7 @@ namespace vita
     virtual void clear() {}
 
     /// Some evaluators keep a cache to improve performances. This method
-    /// asks to clear cached information about an individual.
+    /// asks to clear cached informations about an individual.
     virtual void clear(const individual &) {}
 
     /// \return the fitness of the individual.
@@ -63,6 +63,7 @@ namespace vita
     /// the training set. According to this design, the best accuracy is 1.0
     /// (100%), meaning that all the training examples have been correctly
     /// recognized.
+    ///
     /// \note
     /// Accuracy and fitness aren't the same thing.
     /// Accuracy can be used to measure fitness but it sometimes hasn't

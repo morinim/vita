@@ -28,5 +28,6 @@ using namespace boost;
 #include "test_population.cc"
 #include "test_primitive.cc"
 #include "test_src_constant.cc"
+#include "test_summary.cc"
 #include "test_terminal.cc"
 #include "test_ttable.cc"
