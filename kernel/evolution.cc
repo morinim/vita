@@ -135,13 +135,11 @@ namespace vita
                 << ' ' << stats_.az.terminals(1);
 
         for (unsigned active(0); active <= 1; ++active)
-          for (analyzer::const_iterator i(stats_.az.begin());
-               i != stats_.az.end();
-               ++i)
-            dynamic << ' ' << (i->first)->display() << ' '
-                    << i->second.counter[active];
+          for (const auto &symb_stat : stats_.az)
+            dynamic << ' ' << (symb_stat.first)->display()
+                    << ' ' << symb_stat.second.counter[active];
 
-        dynamic << ' ' << '"';
+        dynamic << " \"";
         if (stats_.best)
           stats_.best->ind.in_line(dynamic);
         dynamic << '"' << std::endl;
@@ -301,14 +299,77 @@ namespace vita
   ///
   void summary::clear()
   {
+    az.clear();
+
+    best = boost::none;
+
+    speed         = 0.0;
     mutations     = 0;
     crossovers    = 0;
     gen           = 0;
     last_imp      = 0;
-    speed         = 0.0;
+  }
 
-    az.clear();
+  ///
+  /// \param[in] in input stream.
+  /// \param[in] e an environment (needed to build the best individual).
+  /// \return \c true if hash_t loaded correctly.
+  ///
+  /// \note
+  /// If the load operation isn't successful the current hash_t isn't changed.
+  ///
+  bool summary::load(std::istream &in, const environment &e)
+  {
+    unsigned known_best(false);
+    if (!(in >> known_best))
+      return false;
 
-    best = boost::none;
+    summary tmp_summary;
+    if (known_best)
+    {
+      individual tmp_ind(e, false);
+      if (!tmp_ind.load(in))
+        return false;
+
+      fitness_t tmp_fitness;
+      if (!tmp_fitness.load(in))
+        return false;
+
+      tmp_summary.best = {tmp_ind, tmp_fitness};
+    }
+    else
+      tmp_summary.best = boost::none;
+
+    if (!(in >> tmp_summary.speed >> tmp_summary.mutations
+          >> tmp_summary.crossovers >> tmp_summary.gen
+          >> tmp_summary.last_imp))
+      return false;
+
+    *this = tmp_summary;
+    return true;
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return \c true if summary was saved correctly.
+  ///
+  bool summary::save(std::ostream &out) const
+  {
+    // analyzer az doesn't need to be saved: it'll be recalculated at the
+    // beginning of evolution.
+
+    if (best)
+    {
+      out << '1' << std::endl;
+      best->ind.save(out);
+      best->fitness.save(out);
+    }
+    else
+      out << '0' << std::endl;
+
+    out << speed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
+        << last_imp << std::endl;
+
+    return out.good();
   }
 }  // namespace vita
