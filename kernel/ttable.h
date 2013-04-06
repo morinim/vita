@@ -101,10 +101,10 @@ namespace vita
       unsigned birthday;
     };
 
-    const std::uint_least64_t k_mask;
+    const std::uint64_t k_mask;
     slot *const table_;
 
-    unsigned period_;
+    decltype(slot::birthday) period_;
 
     mutable std::uintmax_t probes_;
     mutable std::uintmax_t hits_;
