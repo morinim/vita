@@ -42,6 +42,7 @@ namespace vita
       patch_length(0),
       individuals(0),
       elitism(boost::indeterminate),
+      tournament_size(0),
       dss(boost::indeterminate),
       arl(boost::indeterminate),
       ttable_size(16),
@@ -279,7 +280,7 @@ namespace vita
       return false;
     }
 
-    if (individuals && tournament_size && *tournament_size > individuals)
+    if (individuals && tournament_size && tournament_size > individuals)
     {
       if (verbose)
         std::cerr << k_s_debug
@@ -288,7 +289,7 @@ namespace vita
       return false;
     }
 
-    if (mate_zone && tournament_size && *tournament_size > *mate_zone)
+    if (mate_zone && tournament_size && tournament_size > *mate_zone)
     {
       if (verbose)
         std::cerr << k_s_debug

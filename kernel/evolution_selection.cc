@@ -43,7 +43,7 @@ namespace vita
 
     const size_t n(pop.size());
     const size_t mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().tournament_size);
+    const unsigned rounds(pop.env().tournament_size);
 
     index_t sel(random::ring(target, mate_zone, n));
     for (unsigned i(1); i < rounds; ++i)
@@ -75,7 +75,7 @@ namespace vita
 
     const size_t n(pop.size());
     const size_t mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().tournament_size);
+    const unsigned rounds(pop.env().tournament_size);
     const index_t target(random::between<index_t>(0, n));
 
     assert(rounds);
@@ -128,7 +128,7 @@ namespace vita
 
     const size_t n(pop.size());
     const size_t mate_zone(*pop.env().mate_zone);
-    const size_t size(*pop.env().tournament_size);
+    const size_t size(pop.env().tournament_size);
     const index_t target(random::between<index_t>(0, n));
 
     assert(size);

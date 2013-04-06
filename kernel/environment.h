@@ -69,7 +69,7 @@ namespace vita
 
     /// Population's size (number of programs/individuals in the population).
     /// \note
-    /// A value of 0 means undefined.
+    /// A value of 0 means undefined (auto-tune).
     size_t individuals;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
@@ -114,16 +114,18 @@ namespace vita
     /// programs" (Walter Alden Tackett - 1995).
     boost::optional<unsigned> brood_recombination;
 
-    /// Switches Dynamic Subset Selection on/off.
-    /// \see search::dss()
-    boost::tribool dss;
-
     /// Size of the tournament to choose the parents from.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
     /// selective pressure. Note that a tournament size of 1 would be
     /// equivalent to selecting individuals at random.
-    boost::optional<unsigned> tournament_size;
+    /// \note
+    /// A length of 0 means undefined (auto-tune).
+    unsigned tournament_size;
+
+    /// Switches Dynamic Subset Selection on/off.
+    /// \see search::dss()
+    boost::tribool dss;
 
     /// This is used for the trivial geography scheme (Spector, Klein 2005).
     /// The population is viewed as having a 1-dimensional spatial structure -

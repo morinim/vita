@@ -327,7 +327,7 @@ namespace vita
     }
 
     if (!constrained.tournament_size)
-      env_.tournament_size = *dflt.tournament_size;
+      env_.tournament_size = dflt.tournament_size;
 
     if (!constrained.mate_zone)
       env_.mate_zone = *dflt.mate_zone;

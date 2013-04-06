@@ -61,25 +61,25 @@ void fix_parameters(vita::src_problem *const problem)
 
   if (env.tournament_size)
   {
-    if (*env.tournament_size < 2)
+    if (env.tournament_size < 2)
     {
       std::cout << vita::k_s_warning << " Adjusting tournament size (=> 2)"
                 << std::endl;
       env.tournament_size = 2;
     }
 
-    if (env.mate_zone && *env.tournament_size > *env.mate_zone)
+    if (env.mate_zone && env.tournament_size > *env.mate_zone)
     {
       std::cout << vita::k_s_warning << " Adjusting tournament size ("
-                << *env.tournament_size << " => " << *env.mate_zone << ")"
+                << env.tournament_size << " => " << *env.mate_zone << ")"
                 << std::endl;
       env.tournament_size = *env.mate_zone;
     }
 
-    if (env.individuals && *env.tournament_size > env.individuals)
+    if (env.individuals && env.tournament_size > env.individuals)
     {
       std::cout << vita::k_s_warning << " Adjusting tournament size ("
-                << *env.tournament_size << " => " << env.individuals << ")"
+                << env.tournament_size << " => " << env.individuals << ")"
                 << std::endl;
       env.tournament_size = env.individuals;
     }
