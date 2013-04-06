@@ -35,7 +35,7 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, bool gen)
-    : genome_(e.code_length, e.sset.categories()),
+    : age(0), genome_(e.code_length, e.sset.categories()),
       signature_(), best_({{0, 0}}), env_(&e)
   {
     assert(e.debug(true, true));
@@ -332,7 +332,8 @@ namespace vita
   ///
   bool individual::operator==(const individual &x) const
   {
-    return genome_ == x.genome_ && best_ == x.best_;
+    return age == x.age && signature_ == x.signature_ &&
+           genome_ == x.genome_ && best_ == x.best_;
   }
 
   ///
@@ -749,6 +750,10 @@ namespace vita
   ///
   bool individual::load(std::istream &in)
   {
+    decltype(age) t_age;
+    if (!(in >> t_age))
+      return false;
+
     decltype(best_) best;
     if (!(in >> best[locus_index] >> best[locus_category]))
       return false;
@@ -789,6 +794,7 @@ namespace vita
     if (best[locus_index] >= genome.rows())
       return false;
 
+    age = t_age;
     best_ = best;
     genome_ = genome;
     signature_ = signature;
@@ -802,7 +808,8 @@ namespace vita
   ///
   bool individual::save(std::ostream &out) const
   {
-    out << best_[locus_index] << ' ' << best_[locus_category] << std::endl;
+    out << age << ' ' << best_[locus_index] << ' ' << best_[locus_category]
+        << std::endl;
 
     out << genome_.rows() << ' ' << genome_.cols() << std::endl;
     for (const gene &g : genome_)

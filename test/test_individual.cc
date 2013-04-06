@@ -204,6 +204,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
     std::stringstream ss;
     vita::individual i1(env, true);
 
+    i1.age = vita::random::between(0, 1000);
+
     BOOST_REQUIRE(i1.save(ss));
 
     vita::individual i2(env, false);
