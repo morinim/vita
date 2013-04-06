@@ -26,10 +26,10 @@ namespace vita
   {
     assert(e.debug(true, true));
 
-    pop_.reserve(*e.individuals);
+    pop_.reserve(e.individuals);
     pop_.clear();
 
-    for (size_t i(0); i < *e.individuals; ++i)
+    for (size_t i(0); i < e.individuals; ++i)
       pop_.emplace_back(e, true);
 
     assert(debug());
@@ -63,7 +63,7 @@ namespace vita
     if (!(in >> n_elem))
       return false;
 
-    if (n_elem != *env_->individuals)
+    if (n_elem != env_->individuals)
       return false;
 
     for (size_t i(0); i < n_elem; ++i)

@@ -76,12 +76,12 @@ void fix_parameters(vita::src_problem *const problem)
       env.tournament_size = *env.mate_zone;
     }
 
-    if (env.individuals && *env.tournament_size > *env.individuals)
+    if (env.individuals && *env.tournament_size > env.individuals)
     {
       std::cout << vita::k_s_warning << " Adjusting tournament size ("
-                << *env.tournament_size << " => " << *env.individuals << ")"
+                << *env.tournament_size << " => " << env.individuals << ")"
                 << std::endl;
-      env.tournament_size = *env.individuals;
+      env.tournament_size = env.individuals;
     }
   }
 
@@ -477,10 +477,7 @@ namespace ui
   ///
   void population_size(unsigned size)
   {
-    if (size)
-      problem->env.individuals = size;
-    else
-      problem->env.individuals = boost::none;
+    problem->env.individuals = size;
 
     if (problem->env.verbosity >= 2)
     {

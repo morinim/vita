@@ -67,6 +67,11 @@ namespace vita
     /// A length of 0 means undefined (auto-tune).
     size_t patch_length;
 
+    /// Population's size (number of programs/individuals in the population).
+    /// \note
+    /// A value of 0 means undefined.
+    size_t individuals;
+
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
     /// converge quicker but losing diversity.
@@ -112,9 +117,6 @@ namespace vita
     /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
     boost::tribool dss;
-
-    /// Population's size (number of programs/individuals in the population).
-    boost::optional<unsigned> individuals;
 
     /// Size of the tournament to choose the parents from.
     /// Tournament sizes tend to be small relative to the population size. The

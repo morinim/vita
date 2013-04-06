@@ -32,8 +32,8 @@ namespace vita
   public:
     explicit population(const environment &);
 
-    individual &operator[](size_t);
-    const individual &operator[](size_t) const;
+    individual &operator[](index_t);
+    const individual &operator[](index_t) const;
     size_t size() const;
 
     const environment &env() const;
@@ -57,7 +57,7 @@ namespace vita
   /// \return a reference to the \a individual at index \a i.
   ///
   inline
-  individual &population::operator[](size_t i)
+  individual &population::operator[](index_t i)
   {
     assert(i < pop_.size());
     return pop_[i];
@@ -68,7 +68,7 @@ namespace vita
   /// \return a constant reference to the individual at index \a i.
   ///
   inline
-  const individual &population::operator[](size_t i) const
+  const individual &population::operator[](index_t i) const
   {
     assert(i < pop_.size());
     return pop_[i];

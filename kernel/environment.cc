@@ -40,6 +40,7 @@ namespace vita
     : verbosity(2),
       code_length(0),
       patch_length(0),
+      individuals(0),
       elitism(boost::indeterminate),
       dss(boost::indeterminate),
       arl(boost::indeterminate),
@@ -271,14 +272,14 @@ namespace vita
       return false;
     }
 
-    if (individuals && *individuals <= 3)
+    if (individuals && individuals <= 3)
     {
       if (verbose)
         std::cerr << k_s_debug << " Too few individuals" << std::endl;
       return false;
     }
 
-    if (individuals && tournament_size && *tournament_size > *individuals)
+    if (individuals && tournament_size && *tournament_size > individuals)
     {
       if (verbose)
         std::cerr << k_s_debug

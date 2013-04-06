@@ -305,7 +305,7 @@ namespace vita
                     << env_.individuals << std::endl;
       }
       else
-        env_.individuals = *dflt.individuals;
+        env_.individuals = dflt.individuals;
     }
 
     // Note that this setting, once set, will not be changed.
