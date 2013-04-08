@@ -42,7 +42,11 @@ namespace vita
 
     virtual std::vector<index_t> run() = 0;
 
-  protected:
+  protected:  // Support methods.
+    index_t pickup() const;
+    index_t pickup(index_t) const;
+
+  protected:  // Data members.
     const evolution *const evo_;
   };
 

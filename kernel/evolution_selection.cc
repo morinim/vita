@@ -17,9 +17,37 @@
 
 namespace vita
 {
+  ///
+  /// \param[in] evo pointer to the evolution strategy.
+  ///
   selection_strategy::selection_strategy(const evolution *const evo)
     : evo_(evo)
   {
+  }
+
+  ///
+  /// \return the index of a random individual.
+  ///
+  inline
+  index_t selection_strategy::pickup() const
+  {
+    return random::between<index_t>(0, evo_->population().size());
+  }
+
+  ///
+  /// \param[in] target the index of a reference individual.
+  /// \return the index of a random individual "near" \a target.
+  ///
+  /// Parameters from the environment:
+  /// * mate_zone - to restrict the selection of individuals to a segment of
+  ///   the population;
+  /// * tournament_size - to control number of selected individuals.
+  ///
+  inline
+  index_t selection_strategy::pickup(index_t target) const
+  {
+    return random::ring(target, *evo_->population().env().mate_zone,
+                        evo_->population().size());
   }
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -40,15 +68,12 @@ namespace vita
   index_t tournament_selection::tournament(index_t target) const
   {
     const population &pop(evo_->population());
-
-    const size_t n(pop.size());
-    const size_t mate_zone(*pop.env().mate_zone);
     const unsigned rounds(pop.env().tournament_size);
 
-    index_t sel(random::ring(target, mate_zone, n));
+    index_t sel(pickup(target));
     for (unsigned i(1); i < rounds; ++i)
     {
-      const index_t j(random::ring(target, mate_zone, n));
+      const index_t j(pickup(target));
 
       const fitness_t fit_j(evo_->fitness(pop[j]));
       const fitness_t fit_sel(evo_->fitness(pop[sel]));
@@ -73,10 +98,8 @@ namespace vita
   {
     const population &pop(evo_->population());
 
-    const size_t n(pop.size());
-    const size_t mate_zone(*pop.env().mate_zone);
     const unsigned rounds(pop.env().tournament_size);
-    const index_t target(random::between<index_t>(0, n));
+    const index_t target(pickup());
 
     assert(rounds);
     std::vector<index_t> ret(rounds);
@@ -86,7 +109,7 @@ namespace vita
     // DO NOT USE std::sort it is way slower.
     for (unsigned i(0); i < rounds; ++i)
     {
-      const index_t new_index(random::ring(target, mate_zone, n));
+      const index_t new_index(pickup(target));
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
       index_t j(0);
@@ -124,20 +147,15 @@ namespace vita
   ///
   std::vector<index_t> random_selection::run()
   {
-    const population &pop(evo_->population());
-
-    const size_t n(pop.size());
-    const size_t mate_zone(*pop.env().mate_zone);
-    const size_t size(pop.env().tournament_size);
-    const index_t target(random::between<index_t>(0, n));
+    const size_t size(evo_->population().env().tournament_size);
 
     assert(size);
     std::vector<index_t> ret(size);
 
-    ret[0] = target;
+    ret[0] = pickup();  // target
 
     for (unsigned i(1); i < size; ++i)
-      ret[i] = random::ring(target, mate_zone, n);
+      ret[i] = pickup(ret[0]);
 
     return ret;
   }
