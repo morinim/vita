@@ -331,9 +331,12 @@ namespace vita
   /// \return \c true if the two individuals are equal (symbol by symbol,
   ///         including introns).
   ///
+  /// \note
+  /// Age is not checked.
+  ///
   bool individual::operator==(const individual &x) const
   {
-    return age == x.age && signature_ == x.signature_ &&
+    return signature_ == x.signature_ &&
            genome_ == x.genome_ && best_ == x.best_;
   }
 
@@ -452,8 +455,8 @@ namespace vita
         if (!genome_(l).sym)
         {
           if (verbose)
-            std::cerr << "Empty symbol pointer at locus " << l << '.'
-                      << std::endl;
+            std::cerr << k_s_debug << " Empty symbol pointer at locus " << l
+                      << '.' << std::endl;
           return false;
         }
 
@@ -461,7 +464,8 @@ namespace vita
         if (genome_(l).sym->arity() > gene::k_args)
         {
           if (verbose)
-            std::cerr << "Function arity exceeds maximum size." << std::endl;
+            std::cerr << k_s_debug << "Function arity exceeds maximum size."
+                      << std::endl;
           return false;
         }
 
@@ -472,7 +476,8 @@ namespace vita
           if (genome_(l).args[j] >= size())
           {
             if (verbose)
-              std::cerr << "Argument is out of range." << std::endl;
+              std::cerr << k_s_debug << " Argument is out of range."
+                        << std::endl;
             return false;
           }
 
@@ -480,7 +485,8 @@ namespace vita
           if (genome_(l).args[j] <= i)
           {
             if (verbose)
-              std::cerr << "Self reference in locus " << l << '.' << std::endl;
+              std::cerr << k_s_debug << " Self reference in locus " << l << '.'
+                        << std::endl;
             return false;
           }
         }
@@ -490,7 +496,7 @@ namespace vita
       if (!genome_(genome_.rows() - 1, c).sym->terminal())
       {
         if (verbose)
-          std::cerr << "Last symbol of type " << c
+          std::cerr << k_s_debug << " Last symbol of type " << c
                     << " in the genome isn't a terminal." << std::endl;
         return false;
       }
@@ -504,9 +510,10 @@ namespace vita
         if (genome_(l).sym->category() != c)
         {
           if (verbose)
-            std::cerr << "Wrong category: " << l << genome_(l).sym->display()
-                      << " -> " << genome_(l).sym->category()
-                      << " should be " << c << std::endl;
+            std::cerr << k_s_debug << " Wrong category: " << l
+                      << genome_(l).sym->display() << " -> "
+                      << genome_(l).sym->category() << " should be " << c
+                      << std::endl;
           return false;
         }
       }
@@ -514,20 +521,24 @@ namespace vita
     if (best_[locus_index] >= size())
     {
       if (verbose)
-        std::cerr << "Incorrect index for first active symbol." << std::endl;
+        std::cerr << k_s_debug << " Incorrect index for first active symbol."
+                  << std::endl;
       return false;
     }
     if (best_[locus_category] >= categories)
     {
       if (verbose)
-        std::cerr << "Incorrect category for first active symbol." << std::endl;
+        std::cerr << k_s_debug
+                  << " Incorrect category for first active symbol."
+                  << std::endl;
       return false;
     }
 
     if (categories == 1 && eff_size() > size())
     {
       if (verbose)
-        std::cerr << "eff_size() cannot be greater than size() in single "\
+        std::cerr << k_s_debug
+                  << "eff_size() cannot be greater than size() in single " \
                      "category individuals." << std::endl;
       return false;
     }

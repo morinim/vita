@@ -29,7 +29,7 @@ namespace vita
     for (size_t l(0); l < e.layers; ++l)
       clear(e, l);
 
-    assert(debug());
+    assert(debug(true));
   }
 
   ///
@@ -122,13 +122,14 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool population::debug() const
+  bool population::debug(bool verbose) const
   {
     for (size_t l(0); l < layers(); ++l)
       for (const individual &i : pop_[l])
-        if (!i.debug())
+        if (!i.debug(verbose))
           return false;
 
     return true;

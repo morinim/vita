@@ -66,7 +66,7 @@ namespace vita
 
     const environment &env() const;
 
-    bool debug() const;
+    bool debug(bool) const;
 
   public:   // Serialization.
     bool load(std::istream &);

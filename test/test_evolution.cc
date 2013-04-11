@@ -32,6 +32,7 @@ BOOST_AUTO_TEST_CASE(Creation)
   for (unsigned n(4); n <= 100; ++n)
     for (unsigned l(env.sset.categories() + 2); l <= 100; l+= (l < 10 ? 1 : 30))
     {
+      env.layers = 1;
       env.individuals = n;
       env.code_length = l;
       env.tournament_size = 3;
@@ -70,7 +71,7 @@ BOOST_AUTO_TEST_CASE(Creation)
       }
       */
 
-      BOOST_REQUIRE(evo.debug());
+      BOOST_REQUIRE(evo.debug(true));
     }
 }
 

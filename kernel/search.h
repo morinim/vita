@@ -14,6 +14,8 @@
 #if !defined(SEARCH_H)
 #define      SEARCH_H
 
+#include <list>
+
 #include "environment.h"
 
 namespace vita

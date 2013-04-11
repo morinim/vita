@@ -70,9 +70,13 @@ else
 endif
 endif
 
-examples: example1 example2 example3 example4 example5 example6 example7 example8
+examples: example1 example2 example3 example4 example5 example6 example7 example8 example9a
 
 example%: examples/example%.o $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
+
+titanic%: examples/titanic%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
 

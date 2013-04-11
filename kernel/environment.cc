@@ -289,7 +289,8 @@ namespace vita
     if (layers && individuals && individuals < 2 * layers)
     {
       if (verbose)
-        std::cerr << k_s_debug << " individuals / layers ratio is too low"
+        std::cerr << k_s_debug << " individuals / layers ratio ("
+                  << individuals << '/' << layers << ") is too low"
                   << std::endl;
       return false;
     }
@@ -306,8 +307,9 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " tournament_size cannot be greater than individuals in"
-                  << " a layer" << std::endl;
+                  << " tournament_size (" << tournament_size
+                  << ") cannot be greater than individuals in a layer ("
+                  << individuals / layers << ')' << std::endl;
       return false;
     }
 
@@ -315,8 +317,9 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " tournament_size cannot be greater than mate_zone"
-                  << std::endl;
+                  << " tournament_size (" << tournament_size
+                  << ") cannot be greater than mate_zone (" << *mate_zone
+                  << ')' << std::endl;
       return false;
     }
 

@@ -154,7 +154,7 @@ namespace vita
     /// equivalent to selecting individuals at random.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    unsigned tournament_size;
+    size_t tournament_size;
 
     /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
@@ -167,7 +167,7 @@ namespace vita
     /// to involve only parents from i's local neightborhood, where the
     /// neightborhood is defined as all individuals within distance
     /// \c mate_zone/2 of i (0 for panmictic).
-    boost::optional<unsigned> mate_zone;
+    boost::optional<size_t> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.
     boost::optional<unsigned> g_since_start;

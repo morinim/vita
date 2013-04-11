@@ -52,7 +52,7 @@ namespace vita
                                  s.gen > *pop_.env().g_since_start;
                         };
 
-    assert(debug());
+    assert(debug(true));
   }
 
   ///
@@ -305,11 +305,32 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return true if object passes the internal consistency check.
   ///
-  bool evolution::debug() const
+  bool evolution::debug(bool verbose) const
   {
-    return pop_.debug() && eva_ && stop_condition_;
+    if (!pop_.debug(verbose))
+      return false;
+
+    if (!eva_)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Empty evaluator pointer." << std::endl;
+
+      return false;
+    }
+
+    if (!stop_condition_)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Empty stop_condition pointer."
+                  << std::endl;
+
+      return false;
+    }
+
+    return true;
   }
 
   ///
