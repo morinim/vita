@@ -20,6 +20,7 @@
 
 namespace vita
 {
+  class coord;
   class evolution;
   class summary;
 
@@ -53,7 +54,7 @@ namespace vita
     // Defining offspring as a set of individuals lets the generalized operation
     // encompass recent additions, such as scan mutation, that generates
     // numerous offspring from a single parent.
-    virtual std::vector<individual> run(const std::vector<index_t> &) = 0;
+    virtual std::vector<individual> run(const std::vector<coord> &) = 0;
 
   protected:
     const evolution *const evo_;
@@ -72,7 +73,7 @@ namespace vita
   public:
     standard_op(const evolution *const, summary *const);
 
-    virtual std::vector<individual> run(const std::vector<index_t> &);
+    virtual std::vector<individual> run(const std::vector<coord> &);
   };
 }  // namespace vita
 

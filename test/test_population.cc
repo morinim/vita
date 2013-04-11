@@ -29,14 +29,23 @@ BOOST_FIXTURE_TEST_SUITE(population, F_FACTORY1)
 
 BOOST_AUTO_TEST_CASE(Creation)
 {
-  env.code_length = 100;
+  env.layers = 4;
+  env.individuals = 100;
 
   vita::population pop(env);
 
-  BOOST_REQUIRE_EQUAL(env.code_length, pop.size());
+  BOOST_REQUIRE_EQUAL(env.layers * env.individuals, pop.individuals());
 
-  for (size_t i(0); i < pop.size(); ++i)
-    BOOST_CHECK(pop[i].debug());
+  for (size_t l(0); l < pop.layers(); ++l)
+  {
+    BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals(l));
+
+    for (size_t i(0); i < pop.individuals(l); ++i)
+    {
+      const vita::coord c(l, i);
+      BOOST_CHECK(pop[c].debug());
+    }
+  }
 }
 
 
@@ -44,6 +53,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
 {
   for (unsigned i(0); i < 100; ++i)
   {
+    env.layers = vita::random::between<size_t>(1, 10);
+    env.individuals = vita::random::between<size_t>(30, 300);
+
     std::stringstream ss;
     vita::population pop1(env);
 
@@ -53,9 +65,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(pop2.load(ss));
     BOOST_REQUIRE(pop2.debug());
 
-    BOOST_REQUIRE_EQUAL(pop1.size(), pop2.size());
-    for (size_t i(0); i < pop1.size(); ++i)
-      BOOST_CHECK_EQUAL(pop1[i], pop2[i]);
+    BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());
+    BOOST_REQUIRE_EQUAL(pop1.individuals(), pop2.individuals());
+    for (size_t l(0); l < pop1.layers(); ++l)
+      for (size_t i(0); i < pop1.individuals(l); ++i)
+      {
+        const vita::coord c(l, i);
+        BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
+      }
   }
 }
 

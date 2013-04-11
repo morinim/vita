@@ -36,7 +36,7 @@ namespace vita
   /// * elitism is \c true => child replaces a member of the population only if
   ///   child is better.
   ///
-  void family_competition_rp::run(const std::vector<index_t> &parent,
+  void family_competition_rp::run(const std::vector<coord> &parent,
                                   const std::vector<individual> &offspring,
                                   summary *const s)
   {
@@ -94,6 +94,42 @@ namespace vita
   }
 
   ///
+  void kill_tournament::try_move_up(const coord &ind)
+  {
+    population &pop = evo_->population();
+    const size_t next_layer(ind.layer + 1);
+
+    if (next_layer < pop.layers())
+    {
+      const unsigned rounds(pop.env().tournament_size);
+      const size_t individuals(pop.individuals(next_layer));
+
+      coord worst{next_layer, random::between<size_t>(0, individuals)};
+      fitness_t fit_worst(evo_->fitness(pop[worst]));
+      for (unsigned i(1); i < rounds; ++i)
+      {
+        const coord candidate{next_layer,
+                              random::between<size_t>(0, individuals)};
+
+        const fitness_t fit_candidate(evo_->fitness(pop[candidate]));
+        if (fit_candidate < fit_worst)
+        {
+          worst = candidate;
+          fit_worst = fit_candidate;
+        }
+      }
+
+      if (evo_->fitness(pop[ind]) > fit_worst ||
+          (pop[worst].age > pop.max_age(next_layer) &&
+           pop[ind].age <= pop.max_age(next_layer)))
+      {
+        try_move_up(worst);
+        pop[worst] = pop[ind];
+      }
+    }
+  }
+
+  ///
   /// \param[in] parent indexes of the candidate parents.
   ///                   The list is sorted in descending fitness, so the
   ///                   last element is the index of the worst individual of
@@ -105,7 +141,7 @@ namespace vita
   /// * elitism is \c true => child replaces a member of the population only if
   ///   child is better.
   ///
-  void kill_tournament::run(const std::vector<index_t> &parent,
+  void kill_tournament::run(const std::vector<coord> &parent,
                             const std::vector<individual> &offspring,
                             summary *const s)
   {
@@ -116,7 +152,7 @@ namespace vita
     // In old versions of Vita, the individual to be replaced was chosen with
     // an ad-hoc kill tournament. Something like:
     //
-    //   const index_t rep_idx(kill_tournament(parent[0]));
+    //   const coord rep_idx(kill_tournament(parent[0]));
     //
     // Now we perform just one tournament for choosing the parents; the
     // individual to be replaced is selected among the worst individuals of
@@ -125,13 +161,16 @@ namespace vita
     // is greater than 2 we perform a traditional selection / replacement
     // scheme; if it is smaller we perform a family competition replacement
     // (aka deterministic / probabilistic crowding).
-    const index_t rep_idx(parent.back());
+    const coord rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < fit_off);
 
     assert(!boost::indeterminate(pop.env().elitism));
     if (!pop.env().elitism || replace)
+    {
+      try_move_up(rep_idx);
       pop[rep_idx] = offspring[0];
+    }
 
     if (fit_off > s->best->fitness)
     {

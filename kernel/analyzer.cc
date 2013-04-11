@@ -28,9 +28,9 @@ namespace vita
   ///
   void analyzer::clear()
   {
-    length_.clear();
-
+    age_.clear();
     fit_.clear();
+    length_.clear();
 
     functions_ = stats();
     terminals_ = stats();
@@ -71,6 +71,15 @@ namespace vita
   std::uintmax_t analyzer::terminals(bool eff) const
   {
     return terminals_.counter[eff];
+  }
+
+  ///
+  /// \param[in] l a layer of the population.
+  /// \return statistics about the age distribution in layer \a l.
+  ///
+  const distribution<unsigned> &analyzer::age_dist(size_t l)
+  {
+    return age_[l];
   }
 
   ///
@@ -137,11 +146,14 @@ namespace vita
   ///
   /// \param[in] ind new individual.
   /// \param[in] f fitness of the new individual.
+  /// \param[in] l the layer of the population the individual is placed in.
   ///
   /// Adds a new individual to the pool used to calculate statistics.
   ///
-  void analyzer::add(const individual &ind, const fitness_t &f)
+  void analyzer::add(const individual &ind, const fitness_t &f, size_t l)
   {
+    age_[l].add(ind.age);
+
     length_.add(count(ind));
 
     if (f.isfinite())
@@ -153,10 +165,17 @@ namespace vita
   ///
   bool analyzer::debug() const
   {
-    for (const_iterator i(begin()); i != end(); ++i)
-      if (i->second.counter[true] > i->second.counter[false])
+    for (const auto &i : info_)
+      if (i.second.counter[true] > i.second.counter[false])
         return false;
 
-    return fit_.debug() && length_.debug();
+    for (const auto &l : age_)
+      if (!l.second.debug())
+        return false;
+
+    if (!fit_.debug())
+      return false;
+
+    return length_.debug();
   }
 }  // namespace vita

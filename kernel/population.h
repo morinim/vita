@@ -23,18 +23,46 @@
 namespace vita
 {
   ///
-  /// A group of individual which may interact together (for example by mating)
-  /// producing offspring. Typical population size in GP range from ten to
-  /// many thousands.
+  /// \brief The coordinates of an individual in the population.
+  ///
+  /// Population can be organized on multiple layers so we need something
+  /// more advanced than a simple index.
+  ///
+  class coord
+  {
+  public:
+    coord() {}
+
+    /// \param[in] l layer.
+    /// \param[in] i index in the layer.
+    coord(size_t l, size_t i) : layer(l), index(i) {}
+
+    std::uint32_t layer;
+    std::uint32_t index;
+  };
+
+  ///
+  /// \brief A group of individual which may interact together (for example by
+  ///        mating) producing offspring.
+  ///
+  /// Typical population size in GP ranges from ten to many thousands.
   ///
   class population
   {
   public:
     explicit population(const environment &);
 
-    individual &operator[](index_t);
-    const individual &operator[](index_t) const;
-    size_t size() const;
+    individual &operator[](const coord &);
+    const individual &operator[](const coord &) const;
+
+    size_t layers() const;
+    size_t individuals(size_t) const;
+    size_t individuals() const;
+
+    void inc_age();
+    unsigned max_age(size_t) const;
+
+    void reset_layer();
 
     const environment &env() const;
 
@@ -44,43 +72,57 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private data members.
-    std::vector<individual> pop_;
+  private:  // Private support methods.
+    void clear(const environment &, size_t);
 
-    const environment *env_;
+  private:  // Private data members.
+    std::vector<std::vector<individual>> pop_;
   };
 
   std::ostream &operator<<(std::ostream &, const population &);
 
   ///
-  /// \param[in] i index of an \a individual (in the [0,population size[ range).
-  /// \return a reference to the \a individual at index \a i.
+  /// \param[in] c coordinates of an \a individual.
+  /// \return a reference to the \a individual at coordinates \a c.
   ///
   inline
-  individual &population::operator[](index_t i)
+  individual &population::operator[](const coord &c)
   {
-    assert(i < pop_.size());
-    return pop_[i];
+    assert(c.layer < layers());
+    assert(c.index < individuals(c.layer));
+    return pop_[c.layer][c.index];
   }
 
   ///
-  /// \param[in] i index of an individual (int the [0,population size[ range).
-  /// \return a constant reference to the individual at index \a i.
+  /// \param[in] c coordinates of an individual.
+  /// \return a constant reference to the individual at coordinates \a c.
   ///
   inline
-  const individual &population::operator[](index_t i) const
+  const individual &population::operator[](const coord &c) const
   {
-    assert(i < pop_.size());
-    return pop_[i];
+    assert(c.layer < layers());
+    assert(c.index < individuals(c.layer));
+    return pop_[c.layer][c.index];
   }
 
   ///
-  /// \return the number of individuals in the population.
+  /// \return number of layers for the population.
   ///
   inline
-  size_t population::size() const
+  size_t population::layers() const
   {
     return pop_.size();
+  }
+
+  ///
+  /// \param l a layer of the population.
+  /// \return the number of individuals in the l-th layer of the population.
+  ///
+  inline
+  size_t population::individuals(size_t l) const
+  {
+    assert(l < layers());
+    return pop_[l].size();
   }
 
   ///
@@ -89,7 +131,7 @@ namespace vita
   inline
   const environment &population::env() const
   {
-    return pop_[0].env();
+    return pop_[0][0].env();
   }
 
   ///

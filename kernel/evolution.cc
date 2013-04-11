@@ -64,7 +64,7 @@ namespace vita
   {
     double speed(0.0);
     if (stats_.gen && elapsed_milli > 0)
-      speed = 1000.0 * (pop_.size() * stats_.gen) / elapsed_milli;
+      speed = 1000.0 * (pop_.individuals() * stats_.gen) / elapsed_milli;
 
     return speed;
   }
@@ -75,8 +75,12 @@ namespace vita
   analyzer evolution::get_stats() const
   {
     analyzer az;
-    for (unsigned i(0); i < pop_.size(); ++i)
-      az.add(pop_[i], fitness(pop_[i]));
+    for (size_t l(0); l < pop_.layers(); ++l)
+      for (size_t i(0); i < pop_.individuals(l); ++i)
+      {
+        const coord c(l, i);
+        az.add(pop_[c], fitness(pop_[c]), l);
+      }
 
     return az;
   }
@@ -189,6 +193,30 @@ namespace vita
   }
 
   ///
+  /// \param[in] k current generation.
+  /// \param[in] run_count total number of runs planned.
+  /// \param[in] resume if \c true print the end-of-generation report.
+  ///
+  /// Print evolution informations (if environment::verbosity > 0).
+  ///
+  void evolution::print_progress(unsigned k, unsigned run_count,
+                                 bool resume) const
+  {
+    if (env().verbosity >= 1)
+    {
+      const unsigned perc(100 * k / pop_.individuals());
+      if (resume)
+        std::cout << "Run " << run_count << '.' << std::setw(6)
+                  << stats_.gen << " (" << std::setw(3)
+                  << perc << "%): fitness " << stats_.best->fitness
+                  << ' ' << pop_.individuals() << std::endl;
+      else
+        std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
+                  << std::setw(3) << perc << "%)\r" << std::flush;
+    }
+  }
+
+  ///
   /// \param[in] run_count run number (used for print and log).
   ///
   /// The genetic programming loop:
@@ -204,7 +232,7 @@ namespace vita
   const summary &evolution::run(unsigned run_count)
   {
     stats_.clear();
-    stats_.best = {pop_[0], fitness(pop_[0])};
+    stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
 
     eva_->clear();
 
@@ -219,22 +247,19 @@ namespace vita
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
         // training set).
-        stats_.best = {pop_[0], fitness(pop_[0])};
+        stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
       }
 
       stats_.az = get_stats();
       log(run_count);
 
-      for (unsigned k(0); k < pop_.size(); ++k)
+      for (unsigned k(0); k < pop_.individuals(); ++k)
       {
-        if (env().verbosity >= 1 &&
-            k % std::max(pop_.size()/100, static_cast<size_t>(2)))
-          std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
-                    << std::setw(3) << 100 * k / pop_.size() << "%)\r"
-                    << std::flush;
+        if (k % std::max<size_t>(pop_.individuals() / 100, 2))
+          print_progress(k, run_count, false);
 
         // --------- SELECTION ---------
-        std::vector<index_t> parents(selection->run());
+        std::vector<coord> parents(selection->run());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation->run(parents));
@@ -243,14 +268,15 @@ namespace vita
         const fitness_t before(stats_.best->fitness);
         replacement->run(parents, off, &stats_);
 
-        if (env().verbosity >= 1 && stats_.best->fitness != before)
-          std::cout << "Run " << run_count << '.' << std::setw(6)
-                    << stats_.gen << " (" << std::setw(3)
-                    << 100 * k / pop_.size() << "%): fitness "
-                    << stats_.best->fitness << std::endl;
+        if (stats_.best->fitness != before)
+          print_progress(k, run_count, true);
       }
 
       stats_.speed = get_speed(measure.elapsed());
+
+      pop_.inc_age();
+      if (env().layers > 1 && stats_.gen && stats_.gen % env().age_gap == 0)
+        pop_.reset_layer();
     }
 
     if (env().verbosity >= 2)
@@ -267,7 +293,7 @@ namespace vita
       }
       else  // speed < 0.1
       {
-        speed *= 3600.0*24.0;
+        speed *= 3600.0 * 24.0;
         unit = "cycles/day";
       }
 
@@ -279,7 +305,7 @@ namespace vita
   }
 
   ///
-  /// \return true if the object passes the internal consistency check.
+  /// \return true if object passes the internal consistency check.
   ///
   bool evolution::debug() const
   {

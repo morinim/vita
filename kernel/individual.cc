@@ -142,8 +142,8 @@ namespace vita
       {
         ++n;
 
-        const index_t i(it.l[locus_index]);
-        const category_t c(it.l[locus_category]);
+        const auto i(it.l[locus_index]);
+        const auto c(it.l[locus_category]);
 
         if (i < sup)
           set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
@@ -172,8 +172,9 @@ namespace vita
         set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 */
-    assert(debug());
+    ++age;
 
+    assert(debug());
     return n;
   }
 
@@ -877,6 +878,8 @@ namespace vita
           offspring.set(l, p2[l]);
         }
 */
+    offspring.age = std::max(p1.age, p2.age) + 1;
+
     assert(offspring.debug(true));
     return offspring;
   }
@@ -918,6 +921,8 @@ namespace vita
         const locus l{{i,c}};
         offspring.set(l, (*parents[!base])[l]);
       }
+
+    offspring.age = std::max(p1.age, p2.age) + 1;
 
     assert(offspring.debug());
     return offspring;
@@ -961,6 +966,8 @@ namespace vita
         const locus l{{i, c}};
         offspring.set(l, (*parents[!base])[l]);
       }
+
+    offspring.age = std::max(p1.age, p2.age) + 1;
 
     assert(offspring.debug());
     return offspring;

@@ -20,6 +20,7 @@
 
 namespace vita
 {
+  class coord;
   class evolution;
 
   ///
@@ -40,11 +41,11 @@ namespace vita
     explicit selection_strategy(const evolution *const);
     virtual ~selection_strategy() {}
 
-    virtual std::vector<index_t> run() = 0;
+    virtual std::vector<coord> run() = 0;
 
   protected:  // Support methods.
-    index_t pickup() const;
-    index_t pickup(index_t) const;
+    coord pickup() const;
+    coord pickup(const coord &) const;
 
   protected:  // Data members.
     const evolution *const evo_;
@@ -71,7 +72,7 @@ namespace vita
   public:
     explicit tournament_selection(const evolution *const);
 
-    virtual std::vector<index_t> run();
+    virtual std::vector<coord> run();
   };
 
   ///
@@ -82,7 +83,7 @@ namespace vita
   public:
     explicit random_selection(const evolution *const);
 
-    virtual std::vector<index_t> run();
+    virtual std::vector<coord> run();
   };
 }  // namespace vita
 

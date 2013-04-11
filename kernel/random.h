@@ -3,7 +3,7 @@
  *  \file random.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -28,7 +28,7 @@ namespace vita
     template<class T> static T between(T, T);
     template<class T> static const T &element(const std::vector<T> &);
 
-    static index_t ring(index_t, unsigned, unsigned);
+    static size_t ring(size_t, size_t, size_t);
 
     static bool boolean(double);
     static bool boolean();
@@ -82,7 +82,7 @@ namespace vita
   {
     assert(min < sup);
 
-    return boost::uniform_int<>(min, sup-1)(rng_);
+    return boost::uniform_int<>(min, sup - 1)(rng_);
   }
 
   ///
@@ -117,7 +117,7 @@ namespace vita
   bool random::boolean()
   {
     return random::between<unsigned>(0, 2) != 0;
-    //return boost::uniform_smallint<unsigned>(0,1)(rng_) != 0;
+    //return boost::uniform_smallint<unsigned>(0, 1)(rng_) != 0;
   }
 }  // namespace vita
 

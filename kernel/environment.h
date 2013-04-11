@@ -67,7 +67,40 @@ namespace vita
     /// A length of 0 means undefined (auto-tune).
     size_t patch_length;
 
-    /// Population's size (number of programs/individuals in the population).
+    /// \brief Number of layers the population will be arranged in.
+    ///
+    /// Layers are used to restrict competition and breeding among individuals,
+    /// somewhat similar to the island model:
+    /// * individuals can only breed with individuals from either their own
+    ///   layer (the original ALPS-scheme use the previous layer also  and it
+    ///   is easier for offspring of individuals to pass from one layer to the
+    ///   next);
+    /// * individuals at layer 0 are replaced with randomly generated
+    ///   individuals every \a age_gap generations;
+    /// * by structuring the population so that individuals only compete
+    ///   against other individuals of similar ages, young individuals
+    ///   are able to explore newly-discovered basins of attraction while being
+    ///   protected from older individuals that have had more time to evolve up
+    ///   their local optima. In addition, by competing against individuals
+    ///   of a similar age, individuals will only cluster about a local optima
+    ///   as long as it has the best finess for similarly-aged individuals
+    ///   and the population will move off  of it as younger individuals
+    ///   discover better local optima.
+    ///
+    /// \see
+    /// "ALPS: The Age-Layered Population Structure for Reducing the Problem of
+    ///  Premature Convergence" - Gregory S. Hornby.
+    ///
+    /// \note
+    /// * A value of 0 means undefined (auto-tune).
+    /// * A value greater than one wille enable ALPS algorithm.
+    size_t layers;
+
+    /// A parameter of the ALPS algorithm.
+    unsigned age_gap;
+
+    /// Number of individuals in the population.
+    ///
     /// \note
     /// A value of 0 means undefined (auto-tune).
     size_t individuals;

@@ -288,6 +288,12 @@ namespace vita
         std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
     }
 
+    if (!constrained.layers)
+      env_.layers = dflt.layers;
+
+    if (!constrained.age_gap)
+      env_.age_gap = dflt.age_gap;
+
     // A larger number of training cases requires an increase in the population
     // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
     // and Francone suggest 10 - 1000 individuals for smaller problems (say,
@@ -297,12 +303,14 @@ namespace vita
     // and population size, but our population size is smaller.
     if (!constrained.individuals)
     {
+      size_t n(0);
+
       if (dt)
       {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
         if (env_.verbosity >= 2)
-          std::cout << k_s_info << " Population size set to "
-                    << env_.individuals << std::endl;
+          std::cout << k_s_info << " Population size set to " << n
+                    << std::endl;
       }
       else
         env_.individuals = dflt.individuals;
@@ -361,6 +369,27 @@ namespace vita
       return env_.a_threashold;
 
     return prob_->get_evaluator()->accuracy(ind);
+  }
+
+  ///
+  /// \param[in] validation is it a validation or training resume?
+  /// \param[in] fitness fitness reached in the current run.
+  /// \param[in] this_run_accuracy accuracy reached in the current run.
+  ///
+  void search::print_resume(bool validation, const fitness_t &fitness,
+                            double accuracy) const
+  {
+    if (env_.verbosity >= 2)
+    {
+      const std::string ds(validation ? " Validation" : " Training");
+
+      std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
+      if (env_.a_threashold >= 0.0)
+        std::cout << k_s_info << ds << " accuracy: " << 100.0 * accuracy
+                  << '%';
+
+      std::cout << std::endl << std::endl;
+    }
   }
 
   ///
@@ -443,17 +472,7 @@ namespace vita
         this_run_accuracy = accuracy(s.best->ind);
       }
 
-      if (env_.verbosity >= 2)
-      {
-        const std::string ds(validation ? " Validation" : " Training");
-
-        std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
-        if (env_.a_threashold >= 0.0)
-          std::cout << k_s_info << ds << " accuracy: "
-                    << 100.0 * this_run_accuracy << '%';
-
-        std::cout << std::endl << std::endl;
-      }
+      print_resume(validation, fitness, this_run_accuracy);
 
       if (run == 0 || fitness > overall_summary.best->fitness)
       {
@@ -486,7 +505,8 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      assert(std::find(good_runs.begin(), good_runs.end(), best_run) !=
+      assert(good_runs.empty() ||
+             std::find(good_runs.begin(), good_runs.end(), best_run) !=
              good_runs.end());
       log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
     }

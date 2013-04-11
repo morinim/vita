@@ -35,7 +35,7 @@ namespace vita
   ///
   /// This is a quite standard crossover + mutation operator.
   ///
-  std::vector<individual> standard_op::run(const std::vector<index_t> &parent)
+  std::vector<individual> standard_op::run(const std::vector<coord> &parent)
   {
     assert(parent.size() >= 2);
 
@@ -46,7 +46,7 @@ namespace vita
     assert(env.p_mutation);
     assert(env.brood_recombination);
 
-    const index_t r1(parent[0]), r2(parent[1]);
+    const auto r1(parent[0]), r2(parent[1]);
 
     if (random::boolean(*env.p_cross))
     {
@@ -56,9 +56,9 @@ namespace vita
       // This could be an original contribution of Vita... but it's hard
       // to be sure.
       // It remembers of the hereditary repulsion constraint (I guess you could
-      // call it signature repulsion) and seems:
-      // * to maintain diversity during the exploration phase;
-      // * to optimize the exploitation phase.
+      // call it signature repulsion) and seems to:
+      // * maintain diversity during the exploration phase;
+      // * optimize the exploitation phase.
       while (pop[r1].signature() == off.signature() ||
              pop[r2].signature() == off.signature())
         stats_->mutations += off.mutation();

@@ -85,16 +85,19 @@ namespace vita
 
     bool debug() const;
 
+  public:  // Public data members.
     selection_strategy::ptr     selection;
     operation_strategy::ptr     operation;
     replacement_strategy::ptr replacement;
 
-  private:
+  private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
     double get_speed(double) const;
     analyzer get_stats() const;
     void log(unsigned) const;
+    void print_progress(unsigned, unsigned, bool) const;
 
+  private:  // Private data members.
     vita::population pop_;
     evaluator       *eva_;
     summary        stats_;

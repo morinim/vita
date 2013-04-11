@@ -37,7 +37,7 @@ def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_fitness} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {col_gen}:(-4*${col_fitness}+${col_mean_fit} >= 0 ? ${col_mean_fit} : NaN):(${col_fitness}+${col_fit_sd} <= 0 ? ${col_fit_sd} : NaN) title 'Population' with yerrorbars linestyle 1\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_fitness} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {col_gen}:{col_mean_fit}:{col_fit_sd} title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.dynfile,

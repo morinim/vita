@@ -58,13 +58,14 @@ namespace vita
 
     analyzer();
 
-    void add(const individual &, const fitness_t &);
+    void add(const individual &, const fitness_t &, size_t);
 
     void clear();
 
     std::uintmax_t functions(bool) const;
     std::uintmax_t terminals(bool) const;
 
+    const distribution<unsigned> &age_dist(size_t);
     const distribution<fitness_t> &fit_dist() const;
     const distribution<double> &length_dist() const;
 
@@ -78,6 +79,8 @@ namespace vita
 
     distribution<fitness_t> fit_;
     distribution<double> length_;
+
+    std::map<size_t, distribution<unsigned>> age_;
 
     stats functions_;
     stats terminals_;
