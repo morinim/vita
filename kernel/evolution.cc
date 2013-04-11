@@ -209,7 +209,7 @@ namespace vita
         std::cout << "Run " << run_count << '.' << std::setw(6)
                   << stats_.gen << " (" << std::setw(3)
                   << perc << "%): fitness " << stats_.best->fitness
-                  << ' ' << pop_.individuals() << std::endl;
+                  << std::endl;
       else
         std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
                   << std::setw(3) << perc << "%)\r" << std::flush;

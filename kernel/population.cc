@@ -33,16 +33,6 @@ namespace vita
   }
 
   ///
-  /// Resets layer 0 of the population.
-  ///
-  void population::reset_layer()
-  {
-    assert(layers());  // we reset a layer only when ALPS is enabled
-
-    clear(env(), 0);
-  }
-
-  ///
   /// \param[in] e the environment used to build individuals.
   /// \param[in] l a layer of the population.
   ///
@@ -59,6 +49,16 @@ namespace vita
 
     for (size_t i(0); i < ind_per_layer; ++i)
       pop_[l].emplace_back(e, true);
+  }
+
+  ///
+  /// Resets layer 0 of the population.
+  ///
+  void population::reset_layer()
+  {
+    assert(layers());  // we reset layer 0 only when ALPS is enabled
+
+    clear(env(), 0);
   }
 
   ///
