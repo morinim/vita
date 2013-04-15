@@ -55,7 +55,7 @@ namespace vita
     if (width > n)
       width = n;
 
-    const unsigned offset(n + base - width/2);
+    const auto offset(n + base - width/2);
 
     return (offset + random::between<size_t>(0, width)) % n;
   }

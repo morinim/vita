@@ -134,7 +134,7 @@ namespace vita
   {
     unsigned n(0);
 
-    const index_t sup(size() - 1);
+    const auto sup(size() - 1);
 
     // Here mutation affects only exons.
     for (const_iterator it(*this); it(); ++it)
@@ -172,7 +172,6 @@ namespace vita
         set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 */
-    ++age;
 
     assert(debug());
     return n;
@@ -889,7 +888,7 @@ namespace vita
           offspring.set(l, p2[l]);
         }
 */
-    offspring.age = std::max(p1.age, p2.age) + 1;
+    offspring.age = std::max(p1.age, p2.age);
 
     assert(offspring.debug(true));
     return offspring;
@@ -933,7 +932,7 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age) + 1;
+    offspring.age = std::max(p1.age, p2.age);
 
     assert(offspring.debug());
     return offspring;
@@ -978,7 +977,7 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age) + 1;
+    offspring.age = std::max(p1.age, p2.age);
 
     assert(offspring.debug());
     return offspring;

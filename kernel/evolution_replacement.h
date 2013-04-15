@@ -93,6 +93,8 @@ namespace vita
                      const std::vector<individual> &, summary *const);
 
   private:
+    bool can_replace(const individual &, const coord &) const;
+    bool can_replace(const coord &, const coord &) const;
     void try_move_up(const coord &);
   };
 }  // namespace vita

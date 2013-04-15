@@ -386,6 +386,19 @@ namespace ui
   }
 
   ///
+  /// \param[in] l number of layers (> 1 to enable ALPS).
+  ///
+  /// See environment::layers.
+  ///
+  void layers(unsigned l)
+  {
+    problem->env.layers = l;
+
+    if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Number of layers is " << l << std::endl;
+  }
+
+  ///
   /// \param[in] z mating zone (0 for panmictic).
   ///
   /// Set mating zone.
@@ -806,6 +819,8 @@ int parse_command_line(int argc, char *const argv[])
       ("population-size,P",
        po::value<unsigned>()->notifier(&ui::population_size),
        "sets the number of programs/individuals in the population")
+      ("layers,L", po::value<unsigned>()->notifier(&ui::layers),
+       "sets the number of population layers.")
       ("elitism", po::value<std::string>()->notifier(&ui::elitism),
        "when elitism is true an individual will never replace a better one")
       ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),

@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/optional.hpp>
+
 #include "evolution_replacement.h"
 #include "environment.h"
 #include "evolution.h"
@@ -88,30 +90,97 @@ namespace vita
     }
   }
 
+  ///
+  /// \param[in] evo pointer to the evolution object that is using the
+  ///                kill_tournament.
+  ///
   kill_tournament::kill_tournament(evolution *const evo)
     : replacement_strategy(evo)
   {
   }
 
   ///
-  void kill_tournament::try_move_up(const coord &ind)
+  /// \param[in] pusher coordinates of a new individual.
+  /// \param[in] pushed coordinates of a "settled" individual.
+  /// \return \c true if \a pusher can replace \a pushed (according to ALPS
+  ///         criterion).
+  ///
+  bool kill_tournament::can_replace(const coord &pusher,
+                                    const coord &pushed) const
   {
-    population &pop = evo_->population();
-    const size_t next_layer(ind.layer + 1);
+    population &pop(evo_->population());
+
+    return can_replace(pop[pusher], pushed);
+  }
+  bool kill_tournament::can_replace(const individual &pusher,
+                                    const coord &pushed) const
+  {
+    population &pop(evo_->population());
+    const auto max_age(pop.max_age(pushed.layer));
+
+    return
+      (pop[pushed].age > max_age && pusher.age <= max_age) ||
+      evo_->fitness(pusher) > evo_->fitness(pop[pushed]);
+  }
+
+  ///
+  /// \param[in] pusher coordinates of an individual that will eventually be
+  ///                   moved to the upper layer.
+  ///
+  /// This is a key function for the ALPS algorithm.
+  /// When an individual, A, is being moved up to a layer \f$L_i\f$, then what
+  /// is done is a check to see if there is an individual in \f$L_i\f$ that has
+  /// worse fitness than A or is too old to be in \f$L_i\f$.
+  /// If it exits (let's call this individual B), we try to move B up to layer
+  /// \f$L_i +  1\f$.
+  ///
+  void kill_tournament::try_move_up(const coord &pusher)
+  {
+    population &pop(evo_->population());
+    const auto next_layer(pusher.layer + 1);
+/*
+    if (next_layer < pop.layers())
+    {
+      const auto individuals(pop.individuals(next_layer));
+      const auto rounds(pop.env().tournament_size);
+
+      const auto pusher_fit(evo_->fitness(pop[pusher]));
+
+      boost::optional<coord> worst;
+      unsigned i(0);
+      do
+      {
+        const coord target{next_layer, random::between<size_t>(0, individuals)};
+        const auto target_fit(evo_->fitness(pop[target]));
+
+        if (can_replace(pusher, target))
+        {
+          if (!worst || evo_->fitness(pop[*worst]) > target_fit)
+            worst = target;
+        }
+      } while (++i < rounds);
+
+      if (worst)
+      {
+        try_move_up(*worst);
+        pop[*worst] = pop[pusher];
+      }
+    }
+*/
 
     if (next_layer < pop.layers())
     {
-      const unsigned rounds(pop.env().tournament_size);
-      const size_t individuals(pop.individuals(next_layer));
+      const auto individuals(pop.individuals(next_layer));
+      const auto rounds(pop.env().tournament_size);
 
       coord worst{next_layer, random::between<size_t>(0, individuals)};
-      fitness_t fit_worst(evo_->fitness(pop[worst]));
+      auto fit_worst(evo_->fitness(pop[worst]));
       for (unsigned i(1); i < rounds; ++i)
       {
         const coord candidate{next_layer,
                               random::between<size_t>(0, individuals)};
 
-        const fitness_t fit_candidate(evo_->fitness(pop[candidate]));
+        const auto fit_candidate(evo_->fitness(pop[candidate]));
         if (fit_candidate < fit_worst)
         {
           worst = candidate;
@@ -119,12 +188,10 @@ namespace vita
         }
       }
 
-      if (evo_->fitness(pop[ind]) > fit_worst ||
-          (pop[worst].age > pop.max_age(next_layer) &&
-           pop[ind].age <= pop.max_age(next_layer)))
+      if (can_replace(pusher, worst))
       {
         try_move_up(worst);
-        pop[worst] = pop[ind];
+        pop[worst] = pop[pusher];
       }
     }
   }
@@ -145,7 +212,7 @@ namespace vita
                             const std::vector<individual> &offspring,
                             summary *const s)
   {
-    population &pop = evo_->population();
+    population &pop(evo_->population());
 
     const fitness_t fit_off(evo_->fitness(offspring[0]));
 

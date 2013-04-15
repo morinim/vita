@@ -74,13 +74,26 @@ namespace vita
     return n;
   }
 
+  bool population::aged(const coord &i) const
+  {
+    return operator[](i).age > max_age(i.layer);
+  }
+
   ///
   /// Increments the age of each individual in the population.
   ///
   void population::inc_age()
   {
+/*
     for (size_t l(0); l < layers(); ++l)
-      for (individual &i : pop_[l])
+      for (size_t i(0); i < individuals(l); ++i)
+        if (aged({l,i}))
+          pop_[l][i] = individual(env(), true);
+        else
+          ++pop_[l][i].age;
+*/
+    for (auto &layer : pop_)
+      for (individual &i : layer)
         ++i.age;
   }
 
@@ -115,10 +128,10 @@ namespace vita
       return l * l * age_gap;
     }
 
-    /*
-      // Linear aging scheme.
-      return age_gap * (l + 1);
-    */
+/*
+    // Linear aging scheme.
+    return age_gap * (l + 1);
+*/
   }
 
   ///

@@ -59,6 +59,7 @@ namespace vita
     size_t individuals(size_t) const;
     size_t individuals() const;
 
+    bool aged(const coord &) const;
     void inc_age();
     unsigned max_age(size_t) const;
 

@@ -170,6 +170,28 @@ namespace vita
       }
     }
 
+    if (true)
+    {
+      const std::string f_ages(pop_.env().stat_dir + "/" + "ages");
+      std::ofstream ages(f_ages.c_str());
+      if (ages.good())
+      {
+        for (size_t l(0); l < pop_.layers(); ++l)
+        {
+          const auto &age_dist(stats_.az.age_dist(l));
+          ages << stats_.gen << ' ' << l << " (" << age_dist.mean << ", "
+               << age_dist.min << '-' << age_dist.max << ", "
+               << age_dist.standard_deviation() << "), " << pop_.max_age(l)
+               << ':';
+
+          for (size_t i(0); i < 5; ++i)
+            ages << ' ' << pop_[{l,i}].age;
+
+          ages << std::endl;
+        }
+      }
+    }
+
     if (last_run != run_count)
       last_run = run_count;
   }

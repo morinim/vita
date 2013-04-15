@@ -65,22 +65,23 @@ namespace vita
     std::uintmax_t functions(bool) const;
     std::uintmax_t terminals(bool) const;
 
-    const distribution<unsigned> &age_dist(size_t);
+    const distribution<double> &age_dist(size_t) const;
     const distribution<fitness_t> &fit_dist() const;
     const distribution<double> &length_dist() const;
 
     bool debug() const;
 
-  private:
-    unsigned count(const individual &);
+  private:  // Private support methods.
+    size_t count(const individual &);
     void count(const symbol *const, bool);
 
+  private:  // Private data members.
     std::map<const symbol *, stats> info_;
 
     distribution<fitness_t> fit_;
     distribution<double> length_;
 
-    std::map<size_t, distribution<unsigned>> age_;
+    std::map<size_t, distribution<double>> age_;
 
     stats functions_;
     stats terminals_;

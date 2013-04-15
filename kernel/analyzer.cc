@@ -77,9 +77,9 @@ namespace vita
   /// \param[in] l a layer of the population.
   /// \return statistics about the age distribution in layer \a l.
   ///
-  const distribution<unsigned> &analyzer::age_dist(size_t l)
+  const distribution<double> &analyzer::age_dist(size_t l) const
   {
-    return age_[l];
+    return age_.at(l);
   }
 
   ///
@@ -106,7 +106,7 @@ namespace vita
   /// \param[in] ind individual to be analyzed.
   /// \return effective length of individual we gathered statistics about.
   ///
-  unsigned analyzer::count(const individual &ind)
+  size_t analyzer::count(const individual &ind)
   {
     for (index_t i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
@@ -115,7 +115,7 @@ namespace vita
         count(ind[l].sym.get(), false);
       }
 
-    unsigned length(0);
+    size_t length(0);
     for (individual::const_iterator it(ind); it(); ++it)
     {
       count(it->sym.get(), true);

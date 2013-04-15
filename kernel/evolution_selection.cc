@@ -33,11 +33,11 @@ namespace vita
     const population &pop(evo_->population());
 
     assert(pop.layers());
-    if (pop.layers() == 1)
-      return coord(0, random::between<size_t>(0, pop.individuals(0)));
 
-    const size_t layer(random::between<size_t>(0, pop.layers()));
-    return coord(layer, random::between<size_t>(0, pop.individuals(layer)));
+    const auto layer(
+      pop.layers() == 1 ? 0 : random::between<size_t>(0, pop.layers()));
+
+    return {layer, random::between<size_t>(0, pop.individuals(layer))};
   }
 
   ///
@@ -53,16 +53,17 @@ namespace vita
   {
     const population &pop(evo_->population());
 
-    return coord(target.layer, random::ring(target.index, *pop.env().mate_zone,
-                                            pop.individuals(target.layer)));
-    /*
-    if (target.layer == 0)
-      return coord(0, random::ring(target.index, *pop.env().mate_zone,
-                                   pop.individuals(0)));
+    return {target.layer, random::ring(target.index, *pop.env().mate_zone,
+                                       pop.individuals(target.layer))};
 
-    const size_t layer(random::between(target.layer - 1, target.layer));
-    return coord(layer, random::between<size_t>(0, pop.individuals(layer)));
-    */
+/*
+    if (target.layer == 0)
+      return {0, random::ring(target.index, *pop.env().mate_zone,
+                              pop.individuals(0))};
+
+    const auto layer(random::between(target.layer - 1, target.layer));
+    return {layer, random::between<size_t>(0, pop.individuals(layer))};
+*/
   }
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -113,7 +114,7 @@ namespace vita
   {
     const population &pop(evo_->population());
 
-    const unsigned rounds(pop.env().tournament_size);
+    const auto rounds(pop.env().tournament_size);
     const coord target(pickup());
 
     assert(rounds);
@@ -128,20 +129,31 @@ namespace vita
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
       size_t j(0);
-      // Where is the insertion point?
-      while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
-        ++j;
 
-      // Shift right elements after the insertion point.
-      for (size_t k(j); k < i; ++k)
-        ret[k + 1] = ret[k];
+      if (pop[new_index].age > pop.max_age(new_index.layer))
+        j = i;
+      else
+      {
+        // Where is the insertion point?
+        while (j < i && pop[ret[j]].age < pop.max_age(ret[j].layer) &&
+               new_fitness < evo_->fitness(pop[ret[j]]))
+          ++j;
+
+        // Shift right elements after the insertion point.
+        for (auto k(j); k < i; ++k)
+          ret[k + 1] = ret[k];
+      }
 
       ret[j] = new_index;
     }
 
 #if !defined(NDEBUG)
     for (size_t i(0); i + 1 < rounds; ++i)
-      assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
+      if (pop[ret[i]].age < pop.max_age(ret[i].layer) &&
+          pop[ret[i + 1]].age < pop.max_age(ret[i + 1].layer))
+        assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
+      else
+        assert(pop[ret[i + 1]].age > pop.max_age(ret[i + 1].layer));
 #endif
 
     return ret;
