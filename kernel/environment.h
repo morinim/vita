@@ -189,7 +189,10 @@ namespace vita
     /// Where shuld we save statistics / status files?
     std::string stat_dir;
 
-    /// Save a list of active ADF?
+    /// Should we save a real time detailed age status file?
+    bool stat_ages;
+
+    /// Should we save a list of active ADF?
     bool stat_arl;
 
     /// Should we save a dynamic execution status file?

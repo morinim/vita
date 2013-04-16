@@ -170,7 +170,7 @@ namespace vita
       }
     }
 
-    if (true)
+    if (pop_.env().stat_ages)
     {
       const std::string f_ages(pop_.env().stat_dir + "/" + "ages");
       std::ofstream ages(f_ages.c_str());
