@@ -40,26 +40,26 @@ namespace vita
     /// \return \c true if the function is associative (e.g. sum is associative,
     ///         division isn't).
     ///
-    virtual bool associative() const { return associative_; }
+    virtual bool associative() const override { return associative_; }
 
     ///
     /// \return \c false (function are never parametric).
     ///
-    virtual bool parametric() const { return false; }
+    virtual bool parametric() const override { return false; }
 
     ///
     /// \param[in] i index of a function argument.
     /// \return category of the i-th function argument.
     ///
-    category_t arg_category(unsigned i) const
+    category_t arg_category(size_t i) const
     { assert(i < gene::k_args); return argt_[i]; }
 
     ///
     /// \return the number of arguments (0 arguments => terminal).
     ///
-    virtual size_t arity() const { assert(arity_); return arity_; }
+    virtual size_t arity() const override { assert(arity_); return arity_; }
 
-    virtual bool debug() const;
+    virtual bool debug() const override;
 
     ///
     /// \param[in] s symbol pointer.

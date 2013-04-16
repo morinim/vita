@@ -42,7 +42,7 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter *) const { return any(val_); }
+    virtual any eval(interpreter *) const override { return any(val_); }
 
   private:  // Private data members.
     T val_;
@@ -64,7 +64,7 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter *) const { return any(val_); }
+    virtual any eval(interpreter *) const override { return any(val_); }
 
   private:  // Private data members.
     std::string val_;

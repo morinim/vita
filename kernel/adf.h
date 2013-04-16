@@ -74,14 +74,14 @@ namespace vita
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
-    virtual any eval(interpreter *) const;
+    virtual any eval(interpreter *) const override;
 
     const individual &get_code() const;
-    std::string display() const;
+    virtual std::string display() const override;
 
-    bool auto_defined() const;
+    virtual bool auto_defined() const override;
 
-    virtual bool debug() const;
+    virtual bool debug() const override;
 
   private:  // Private data members.
     adf_core core_;
@@ -96,14 +96,14 @@ namespace vita
   public:
     adt(const individual &, unsigned);
 
-    virtual any eval(interpreter *) const;
+    virtual any eval(interpreter *) const override;
 
     const individual &get_code() const;
-    std::string display() const;
+    virtual std::string display() const override;
 
-    bool auto_defined() const;
+    virtual bool auto_defined() const override;
 
-    virtual bool debug() const;
+    virtual bool debug() const override;
 
   private:  // Private data members.
     adf_core core_;
