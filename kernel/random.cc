@@ -15,20 +15,30 @@
 
 namespace vita
 {
-  // Magic!!!
-  random::base_gen random::rng_(28071973u);
-
   ///
   /// \param[in] s the seed for the random number generator.
   ///
   /// The seed is used to initalize the random number generator. With the same
   /// seed the numbers produced will be the same every time the program is
-  /// run. One common method to change this is to seed with the current time
-  /// (\c std::time(0) ).
+  /// run.
+  ///
+  /// \note
+  /// One common method to change this is to seed with the current time
+  /// (\c std::time(0)) but the preferred way in Vita is the random::randomize
+  /// method (based on \c std::random_device).
   ///
   void random::seed(unsigned s)
   {
-    rng_.seed(s);
+    engine().seed(s);
+  }
+
+  ///
+  /// Sets the shared engine to an unpredictable state.
+  ///
+  void random::randomize()
+  {
+    static std::random_device rd{};
+    seed(rd());
   }
 
   ///
