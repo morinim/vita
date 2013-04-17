@@ -531,11 +531,23 @@ namespace ui
   }
 
   ///
+  /// \param[in] v if \c true saves a file with age dynamic.
+  ///
+  void stat_age(const std::string &v)
+  {
+    problem->env.stat_ages = is_true(v);
+
+    if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Age logging is "
+                << problem->env.stat_ages << std::endl;
+  }
+
+  ///
   /// \param[in] v if \c true saves the list of active ADFs.
   ///
   void stat_arl(const std::string &v)
   {
-    problem->env.stat_arl = true;
+    problem->env.stat_arl = is_true(v);
 
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " ARL is " << v << std::endl;
@@ -852,14 +864,16 @@ int parse_command_line(int argc, char *const argv[])
     statistics.add_options()
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
        "log statistics in the specified folder/directory")
+      ("stat-age", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_age),
+       "generates an age status file")
+      ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
+       "saves the list of active ADFs")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
       ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
        "generates a population status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
        "saves a summary of the runs")
-      ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
-       "saves the list of active ADFs")
       ("threashold", po::value<std::string>()->notifier(&ui::threashold),
        "sets the success threashold for a run");
 
