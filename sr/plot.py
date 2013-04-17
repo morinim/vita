@@ -16,6 +16,7 @@ import time
 
 verbose = False
 
+# Column meaning / position for dynamic log file.
 col_run = 1;
 col_gen = 2;
 col_fitness = 3;
@@ -33,6 +34,18 @@ col_terminals = 14;
 col_active_functions = 15;
 col_active_terminals = 16;
 
+# Column meaning / position for ages log file.
+col_a_run = 1;
+col_a_gen = 2;
+col_a_layer = 3;
+col_a_max_layer = 4;
+col_a_mean = 5;
+col_a_sd = 6;
+col_a_min = 7;
+col_a_max = 8;
+
+
+
 def plot1(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'FITNESS'\n")
@@ -40,7 +53,7 @@ def plot1(pipe, args):
     cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_fitness} title 'Best' with fsteps linestyle 2, '{data}' index {from_run}:{to_run} using {col_gen}:{col_mean_fit}:{col_fit_sd} title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
-        data = args.dynfile,
+        data = args.logfile,
         from_run = args.from_run,
         to_run = args.to_run,
         col_gen = col_gen,
@@ -60,7 +73,7 @@ def plot2(pipe, args):
     cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_entropy} title 'Entropy' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
-        data = args.dynfile,
+        data = args.logfile,
         from_run = args.from_run,
         to_run = args.to_run,
         col_gen = col_gen,
@@ -78,7 +91,7 @@ def plot3(pipe, args):
     cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_mean_len}:{col_len_sd} title 'Population' with yerrorbars linestyle 1\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
-        data = args.dynfile,
+        data = args.logfile,
         from_run = args.from_run,
         to_run = args.to_run,
         col_gen = col_gen,
@@ -94,10 +107,18 @@ def plot4(pipe, args):
     pipe.write(b"set xlabel 'GENERATION'\n")
     pipe.write(b"set ylabel 'NR. OF SYMBOLS'\n")
 
-    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_gen}:{col_functions} title 'Functions' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_terminals} title 'Terminals' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_active_functions} title 'Active functions' with lines, '{data}' index {from_run}:{to_run} using {col_gen}:{col_active_terminals} title 'Active terminals' with lines\n".format(
+    cmd = "plot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} " \
+          "using {col_gen}:{col_functions} title 'Functions' with lines, " \
+          "'{data}' index {from_run}:{to_run} " \
+          "using {col_gen}:{col_terminals} title 'Terminals' with lines, " \
+          "'{data}' index {from_run}:{to_run} " \
+          "using {col_gen}:{col_active_functions} title 'Active functions' " \
+          "with lines, '{data}' index {from_run}:{to_run} " \
+          "using {col_gen}:{col_active_terminals} title 'Active terminals' " \
+          "with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
-        data = args.dynfile,
+        data = args.logfile,
         from_run = args.from_run,
         to_run = args.to_run,
         col_gen = col_gen,
@@ -112,17 +133,42 @@ def plot4(pipe, args):
     pipe.write(str.encode(cmd))
 
 
+def plot5(pipe, args):
+    pipe.write(b"set xtics 1\n")
+    pipe.write(b"set xlabel 'LAYER'\n")
+    pipe.write(b"set ylabel 'GENERATION'\n")
+    pipe.write(b"set zlabel 'MEAN AGE'\n")
+    pipe.write(b"set dgrid3d\n")
+    pipe.write(b"set hidden3d\n")
+    #pipe.write(b"set contour\n")
+    pipe.write(b"set pm3d\n")
+
+    cmd = "splot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_a_layer}:{col_a_gen}:{col_a_mean} with lines\n".format(
+        from_gen = "" if args.from_gen is None else args.from_gen,
+        to_gen = "" if args.to_gen is None else args.to_gen,
+        data = args.logfile,
+        from_run = args.from_run,
+        to_run = args.to_run,
+        col_a_gen = col_a_gen,
+        col_a_layer = col_a_layer,
+        col_a_mean = col_a_mean)
+
+    if verbose:
+        print(cmd)
+    pipe.write(str.encode(cmd))
+
+
 def plot(args):
-    pipe = subprocess.Popen("gnuplot -persist -noraise", shell=True, bufsize=0,
-                            stdin=subprocess.PIPE).stdin
+    pipe = subprocess.Popen("gnuplot -persist -noraise", shell = True,
+                            bufsize = 0, stdin = subprocess.PIPE).stdin
 
     loop = True
     while loop:
         reparse_args(args)
 
         if (args.image is not None):
-            pipe.write(b"set terminal png"+"\n")
-            pipe.write(b"set output '"+args.image+"'\n")
+            pipe.write(b"set terminal png\n")
+            pipe.write(b"set output '" + args.image + "'\n")
 
         pipe.write(b"set grid\n")
         pipe.write(b"set key bottom right\n")
@@ -144,29 +190,33 @@ def plot(args):
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0,0.5\n")
-        if (args.graph is None or args.graph==1):
+        if (args.graph is None or args.graph == 1):
             plot1(pipe, args)
 
         # Plot the second graph so that it takes a quarter of the screen
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0,0\n")
-        if (args.graph is None or args.graph==2):
+        if (args.graph is None or args.graph == 2):
             plot2(pipe, args)
 
         # Plot the third graph so that it takes a quarter of the screen
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0.5,0.5\n")
-        if (args.graph is None or args.graph==3):
+        if (args.graph is None or args.graph == 3):
             plot3(pipe, args)
 
         # Plot the fourth graph so that it takes a quarter of the screen
         if (args.graph is None):
             pipe.write(b"set size 0.5,0.5\n")
             pipe.write(b"set origin 0.5,0\n")
-        if (args.graph is None or args.graph==4):
+        if (args.graph is None or args.graph == 4):
             plot4(pipe, args)
+
+        # Plot the fifth graph (always full screen)
+        if (args.graph == 5):
+            plot5(pipe, args)
 
         # On some terminals, nothing gets plotted until this command is issued
         if (args.graph is None):
@@ -182,7 +232,17 @@ def plot(args):
             pipe.flush()
 
 
-def get_max_dataset(filename):
+def get_columns(filename):
+    count = 4
+    while count > 0:
+        try:
+            with open(filename, "r") as file:
+                return len(list(file)[0].split(' '))
+        except IOError:
+            time.sleep(1)
+            --count
+
+def get_max_run(filename):
     count = 4
     while count > 0:
         try:
@@ -194,46 +254,48 @@ def get_max_dataset(filename):
 
 
 def get_cmd_line_options():
-    description = "Plot a dynamic execution summary"
+    description = "Plot various graphs based on evolution log files"
     parser = argparse.ArgumentParser(description = description)
 
     parser.add_argument("-g", "--graph", type = int, choices = range(1,5),
-                        help = "Plot only graph nr. GRAPH")
+                        help = "plot only graph nr. GRAPH")
     parser.add_argument("-l", "--loop", type = int,
-                        help = "Refresh the plot reloading data every LOOP seconds.")
+                        help = "refresh the plot reloading data every LOOP " \
+                               "seconds.")
     parser.add_argument("--image",
-                        help = "Save the plot to IMAGE file (png format)")
+                        help = "save the plot to IMAGE file (png format)")
     parser.add_argument("--from_gen", type = int,
-                        help = "Plot statistics starting from FROM_GEN generation")
+                        help = "plot statistics starting from FROM_GEN " \
+                               "generation")
     parser.add_argument("--to_gen", type = int,
-                        help = "Plot statistics up to a TO_GEN generation")
+                        help = "plot statistics up to a TO_GEN generation")
     parser.add_argument("-r", "--run", type = int,
-                        help = "Plot statistics regarding run RUN only")
+                        help = "plot statistics regarding run RUN only")
     parser.add_argument("--from_run", default = 0, type = int,
-                        help = "Plot statistics starting from FROM_RUN run")
+                        help = "plot statistics starting from FROM_RUN run")
     parser.add_argument("--to_run", type = int,
-                        help = "Plot statistics up to TO_RUN run")
+                        help = "plot statistics up to TO_RUN run")
     parser.add_argument("-v", "--verbose", action = "store_true",
                         default  = False, help = "Turn on verbose mode")
-    parser.add_argument("dynfile")
+    parser.add_argument("logfile")
 
     return parser
 
 
 def reparse_args(args):
-    max_dataset = get_max_dataset(args.dynfile)
+    max_run = get_max_run(args.logfile)
 
     if args.run is not None:
         args.from_run = args.run
         args.to_run   = args.run
 
-    if args.to_run is None or args.to_run > max_dataset:
-        args.to_run = max_dataset
+    if args.to_run is None or args.to_run > max_run:
+        args.to_run = max_run
     elif args.to_run <= 0:
-        args.to_run = max_dataset + args.to_run + 1
+        args.to_run = max_run + args.to_run + 1
 
     if args.from_run < 0:
-        args.from_run = max_dataset + args.from_run + 1
+        args.from_run = max_run + args.from_run + 1
 
     if args.from_run > args.to_run:
         args.from_run = args.to_run
@@ -247,8 +309,16 @@ def main():
     global verbose
     verbose = args.verbose
 
-    if os.path.isdir(args.dynfile):
-        args.dynfile = os.path.join(args.dynfile, "dynamic")
+    if os.path.isdir(args.logfile):
+        filenames = ["dynamic", "ages"]
+
+        for f in filenames:
+            if os.path.exists(os.path.join(args.logfile, f)):
+                args.logfile = os.path.join(args.logfile, f)
+                break
+
+    if (get_columns(args.logfile) == 8):  # 8 columns => age file
+        args.graph = 5;                   # so plot only fifth graph
 
     plot(args)
 
