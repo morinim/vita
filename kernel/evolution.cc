@@ -163,7 +163,7 @@ namespace vita
         for (const auto &f : stats_.az.fit_dist().freq)
         {
           // f.first: value, f.second: frequency
-          pop << stats_.gen << ' ' << f.first << ' '
+          pop << run_count << ' ' << stats_.gen << ' ' << f.first << ' '
               << std::setprecision(std::numeric_limits<fitness_t>::digits10 + 2)
               << f.second << std::endl;
         }
@@ -173,21 +173,20 @@ namespace vita
     if (pop_.env().stat_ages)
     {
       const std::string f_ages(pop_.env().stat_dir + "/" + "ages");
-      std::ofstream ages(f_ages.c_str());
+      std::ofstream ages(f_ages.c_str(), std::ios_base::app);
       if (ages.good())
       {
+        if (last_run != run_count)
+          ages << std::endl << std::endl;
+
         for (size_t l(0); l < pop_.layers(); ++l)
         {
           const auto &age_dist(stats_.az.age_dist(l));
-          ages << stats_.gen << ' ' << l << " (" << age_dist.mean << ", "
-               << age_dist.min << '-' << age_dist.max << ", "
-               << age_dist.standard_deviation() << "), " << pop_.max_age(l)
-               << ':';
 
-          for (size_t i(0); i < 5; ++i)
-            ages << ' ' << pop_[{l,i}].age;
-
-          ages << std::endl;
+          ages << run_count << ' ' << stats_.gen << ' ' << l << ' '
+               << pop_.max_age(l) << ' ' << age_dist.mean << ' '
+               << age_dist.standard_deviation() << ' ' << age_dist.min
+               << ' ' << age_dist.max << std::endl;
         }
       }
     }

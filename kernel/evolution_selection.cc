@@ -55,15 +55,14 @@ namespace vita
 
     return {target.layer, random::ring(target.index, *pop.env().mate_zone,
                                        pop.individuals(target.layer))};
-
-/*
+    /*
     if (target.layer == 0)
       return {0, random::ring(target.index, *pop.env().mate_zone,
                               pop.individuals(0))};
 
     const auto layer(random::between(target.layer - 1, target.layer));
     return {layer, random::between<size_t>(0, pop.individuals(layer))};
-*/
+    */
   }
 
   tournament_selection::tournament_selection(const evolution *const evo)
