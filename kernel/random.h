@@ -111,7 +111,7 @@ namespace vita
     static std::uniform_int_distribution<> d{};
     using parm_t = decltype(d)::param_type;
 
-    return d(engine(), parm_t{min, sup - 1});
+    return d(engine(), parm_t(min, sup - 1));
     //return boost::uniform_int<>(min, sup - 1)(engine());
   }
 
