@@ -120,7 +120,8 @@ namespace vita
 
     return
       (pop[pushed].age > max_age && pusher.age <= max_age) ||
-      evo_->fitness(pusher) > evo_->fitness(pop[pushed]);
+      (pop.env().elitism && evo_->fitness(pusher) >
+       evo_->fitness(pop[pushed]));
   }
 
   ///
@@ -138,7 +139,7 @@ namespace vita
   {
     population &pop(evo_->population());
     const auto next_layer(pusher.layer + 1);
-/*
+
     if (next_layer < pop.layers())
     {
       const auto individuals(pop.individuals(next_layer));
@@ -166,8 +167,8 @@ namespace vita
         pop[*worst] = pop[pusher];
       }
     }
-*/
 
+/*
     if (next_layer < pop.layers())
     {
       const auto individuals(pop.individuals(next_layer));
@@ -194,6 +195,7 @@ namespace vita
         pop[worst] = pop[pusher];
       }
     }
+*/
   }
 
   ///
@@ -228,6 +230,18 @@ namespace vita
     // is greater than 2 we perform a traditional selection / replacement
     // scheme; if it is smaller we perform a family competition replacement
     // (aka deterministic / probabilistic crowding).
+    const auto layer(std::max(parent[0].layer, parent[1].layer));
+    auto worst(parent.rbegin());
+    for (; worst != parent.rend() && worst->layer != layer; ++worst)
+    {}
+
+    if (can_replace(offspring[0], *worst))
+    {
+      try_move_up(*worst);
+      pop[*worst] = offspring[0];
+    }
+
+/*
     const coord rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < fit_off);
@@ -238,6 +252,7 @@ namespace vita
       try_move_up(rep_idx);
       pop[rep_idx] = offspring[0];
     }
+*/
 
     if (fit_off > s->best->fitness)
     {
