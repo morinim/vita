@@ -181,12 +181,13 @@ namespace vita
 
         for (size_t l(0); l < pop_.layers(); ++l)
         {
-          const auto &age_dist(stats_.az.age_dist(l));
+          const auto &l_info(stats_.az.layer_info(l));
 
           ages << run_count << ' ' << stats_.gen << ' ' << l << ' '
-               << pop_.max_age(l) << ' ' << age_dist.mean << ' '
-               << age_dist.standard_deviation() << ' ' << age_dist.min
-               << ' ' << age_dist.max << std::endl;
+               << pop_.max_age(l) << ' ' << l_info.age.mean << ' '
+               << l_info.age.standard_deviation() << ' ' << l_info.age.min
+               << ' ' << l_info.age.max << ' ' << l_info.fitness.mean << ' '
+               << l_info.fitness.min << ' ' << l_info.fitness.max << std::endl;
         }
       }
     }

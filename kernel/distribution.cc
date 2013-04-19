@@ -28,21 +28,24 @@ namespace vita
   template<>
   void distribution<fitness_t>::add(fitness_t val)
   {
-    if (!count)
+    if (!val.isnan())
     {
-      min = max = val;
+      if (!count)
+      {
+        min = max = val;
 
-      delta_ = m2_ = mean = variance = fitness_t(val.size(), 0.0);
+        delta_ = m2_ = mean = variance = fitness_t(val.size(), 0.0);
+      }
+      else if (val < min)
+        min = val;
+      else if (val > max)
+        max = val;
+
+      ++count;
+      ++freq[val];
+
+      update_variance(val);
     }
-    else if (val < min)
-      min = val;
-    else if (max < val)
-      max = val;
-
-    ++count;
-    ++freq[val];
-
-    update_variance(val);
   }
 
   template<>

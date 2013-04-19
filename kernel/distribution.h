@@ -86,17 +86,20 @@ namespace vita
   template<class T>
   void distribution<T>::add(T val)
   {
-    if (!count)
-      min = max = val;
-    else if (val < min)
-      min = val;
-    else if (max < val)
-      max = val;
+    if (!isnan(val))
+    {
+      if (!count)
+        min = max = val;
+      else if (val < min)
+        min = val;
+      else if (val > max)
+        max = val;
 
-    ++count;
-    ++freq[val];
+      ++count;
+      ++freq[val];
 
-    update_variance(val);
+      update_variance(val);
+    }
   }
 
   ///

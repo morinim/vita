@@ -28,14 +28,14 @@ namespace vita
   ///
   void analyzer::clear()
   {
-    age_.clear();
+    layer_info_.clear();
     fit_.clear();
     length_.clear();
 
-    functions_ = stats();
-    terminals_ = stats();
+    functions_ = stat_sym_counter();
+    terminals_ = stat_sym_counter();
 
-    info_.clear();
+    sym_counter_.clear();
   }
 
   ///
@@ -44,7 +44,7 @@ namespace vita
   ///
   analyzer::const_iterator analyzer::begin() const
   {
-    return info_.begin();
+    return sym_counter_.begin();
   }
 
   ///
@@ -52,7 +52,7 @@ namespace vita
   ///
   analyzer::const_iterator analyzer::end() const
   {
-    return info_.end();
+    return sym_counter_.end();
   }
 
   ///
@@ -75,11 +75,11 @@ namespace vita
 
   ///
   /// \param[in] l a layer of the population.
-  /// \return statistics about the age distribution in layer \a l.
+  /// \return statistics about the age and fitness distribution in layer \a l.
   ///
-  const distribution<double> &analyzer::age_dist(size_t l) const
+  const stat_layer &analyzer::layer_info(size_t l) const
   {
-    return age_.at(l);
+    return layer_info_.at(l);
   }
 
   ///
@@ -135,7 +135,7 @@ namespace vita
   {
     assert(sym);
 
-    ++info_[sym].counter[active];
+    ++sym_counter_[sym].counter[active];
 
     if (sym->terminal())
       ++terminals_.counter[active];
@@ -152,7 +152,8 @@ namespace vita
   ///
   void analyzer::add(const individual &ind, const fitness_t &f, size_t l)
   {
-    age_[l].add(ind.age);
+    layer_info_[l].age.add(ind.age);
+    layer_info_[l].fitness.add(f);
 
     length_.add(count(ind));
 
@@ -165,13 +166,18 @@ namespace vita
   ///
   bool analyzer::debug() const
   {
-    for (const auto &i : info_)
+    for (const auto &i : sym_counter_)
       if (i.second.counter[true] > i.second.counter[false])
         return false;
 
-    for (const auto &l : age_)
-      if (!l.second.debug())
+    for (const auto &l : layer_info_)
+    {
+      if (!l.second.age.debug())
         return false;
+
+      if (!l.second.fitness.debug())
+        return false;
+    }
 
     if (!fit_.debug())
       return false;
