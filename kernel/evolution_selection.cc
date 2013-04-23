@@ -120,6 +120,7 @@ namespace vita
 
     const auto rounds(pop.env().tournament_size);
     const coord target(pickup());
+    const auto max_age(pop.max_age(target.layer));
 
     assert(rounds);
     std::vector<coord> ret(rounds);
@@ -134,12 +135,12 @@ namespace vita
 
       size_t j(0);
 
-      if (pop[new_index].age > pop.max_age(new_index.layer))
+      if (pop[new_index].age > max_age)
         j = i;
       else
       {
         // Where is the insertion point?
-        while (j < i && pop[ret[j]].age < pop.max_age(ret[j].layer) &&
+        while (j < i && pop[ret[j]].age <= max_age &&
                new_fitness < evo_->fitness(pop[ret[j]]))
           ++j;
 
@@ -153,11 +154,10 @@ namespace vita
 
 #if !defined(NDEBUG)
     for (size_t i(0); i + 1 < rounds; ++i)
-      if (pop[ret[i]].age < pop.max_age(ret[i].layer) &&
-          pop[ret[i + 1]].age < pop.max_age(ret[i + 1].layer))
+      if (pop[ret[i]].age < max_age && pop[ret[i + 1]].age < max_age)
         assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
       else
-        assert(pop[ret[i + 1]].age > pop.max_age(ret[i + 1].layer));
+        assert(pop[ret[i + 1]].age > max_age);
 #endif
 
     return ret;
