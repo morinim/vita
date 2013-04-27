@@ -42,6 +42,9 @@ namespace vita
         max = val;
 
       ++count;
+
+      for (size_t i(0); i < val.size(); ++i)
+        val[i] = round_to(val[i]);
       ++freq[val];
 
       update_variance(val);

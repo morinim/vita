@@ -160,9 +160,11 @@ namespace vita
         for (const auto &f : stats_.az.fit_dist().freq)
         {
           // f.first: value, f.second: frequency
-          pop << run_count << ' ' << stats_.gen << ' ' << f.first << ' '
-              << std::setprecision(std::numeric_limits<fitness_t>::digits10 + 2)
-              << f.second << std::endl;
+          pop << run_count << ' ' << stats_.gen << ' '
+              << std::fixed << std::scientific
+              << std::setprecision(
+                   std::numeric_limits<fitness_t::base_t>::digits10 + 2)
+              << f.first[0] << ' ' << f.second << std::endl;
         }
       }
     }

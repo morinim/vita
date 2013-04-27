@@ -79,6 +79,21 @@ namespace vita
   }
 
   ///
+  /// \param val a value to be rounded.
+  ///
+  /// \brief Rounds \a val to the number of decimals of \c float_epsilon.
+  ///
+  template<class T>
+  T round_to(T val)
+  {
+    val /= float_epsilon;
+    val = std::round(val);
+    val *= float_epsilon;
+
+    return val;
+  }
+
+  ///
   /// \param[in] val new value upon which statistics are recalculated.
   ///
   /// Add a new value to the distribution.
@@ -96,7 +111,7 @@ namespace vita
         max = val;
 
       ++count;
-      ++freq[val];
+      ++freq[round_to(val)];
 
       update_variance(val);
     }
