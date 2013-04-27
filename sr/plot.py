@@ -35,14 +35,10 @@ col_active_functions = 15;
 col_active_terminals = 16;
 
 # Column meaning / position for ages log file.
-col_a_run = 1;
-col_a_gen = 2;
-col_a_layer = 3;
-col_a_max_layer = 4;
-col_a_mean = 5;
-col_a_sd = 6;
-col_a_min = 7;
-col_a_max = 8;
+col_p_run = 1;
+col_p_gen = 2;
+col_p_fit = 3;
+col_p_frq = 4;
 
 
 
@@ -134,24 +130,32 @@ def plot4(pipe, args):
 
 
 def plot5(pipe, args):
-    pipe.write(b"set xtics 1\n")
-    pipe.write(b"set xlabel 'LAYER'\n")
+    pipe.write(b"set zrange [0:*]\n")
+    pipe.write(b"set yrange [0:*]\n")
+    pipe.write(b"set xlabel 'FITNESS'\n")
     pipe.write(b"set ylabel 'GENERATION'\n")
-    pipe.write(b"set zlabel 'MEAN AGE'\n")
-    pipe.write(b"set dgrid3d\n")
-    pipe.write(b"set hidden3d\n")
-    #pipe.write(b"set contour\n")
-    pipe.write(b"set pm3d\n")
+    pipe.write(b"set zlabel 'FREQ.'\n")
 
-    cmd = "splot [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_a_layer}:{col_a_gen}:{col_a_mean} with lines\n".format(
+    pipe.write(b"set dgrid3d\n")
+    #pipe.write(b"set dgrid3d exp\n")
+    #pipe.write(b"set dgrid3d cauchy\n")
+    pipe.write(b"set hidden3d\n")
+
+    #pipe.write(b"set xyplane at -1\n");
+    #pipe.write(b"set pm3d at b\n")
+    pipe.write(b"set pm3d at s hidden3d 1\n")
+
+    pipe.write(b"set view ,150\n")
+
+    cmd = "splot [] [{from_gen}:{to_gen}] '{data}' index {from_run}:{to_run} using {col_p_fit}:{col_p_gen}:{col_p_frq} title '' with lines\n".format(
         from_gen = "" if args.from_gen is None else args.from_gen,
         to_gen = "" if args.to_gen is None else args.to_gen,
         data = args.logfile,
         from_run = args.from_run,
         to_run = args.to_run,
-        col_a_gen = col_a_gen,
-        col_a_layer = col_a_layer,
-        col_a_mean = col_a_mean)
+        col_p_gen = col_p_gen,
+        col_p_fit = col_p_fit,
+        col_p_frq = col_p_frq)
 
     if verbose:
         print(cmd)
@@ -310,15 +314,15 @@ def main():
     verbose = args.verbose
 
     if os.path.isdir(args.logfile):
-        filenames = ["dynamic", "ages"]
+        filenames = ["dynamic", "population"]
 
         for f in filenames:
             if os.path.exists(os.path.join(args.logfile, f)):
                 args.logfile = os.path.join(args.logfile, f)
                 break
 
-    if (get_columns(args.logfile) == 8):  # 8 columns => age file
-        args.graph = 5;                   # so plot only fifth graph
+    if get_columns(args.logfile) == 4:  # 4 columns => population file
+        args.graph = 5;                 # so plot only fifth graph
 
     plot(args)
 
