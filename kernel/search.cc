@@ -186,7 +186,7 @@ namespace vita
       //  });
 
       d.slice(std::max(count, 10u));
-      prob_->get_evaluator()->clear();
+      prob_->get_evaluator()->clear(evaluator::all);
 
       // Selected training examples have their difficulties and ages reset.
       for (auto &i : d)
@@ -287,12 +287,6 @@ namespace vita
       if (env_.verbosity >= 2)
         std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
     }
-
-    if (!constrained.layers)
-      env_.layers = dflt.layers;
-
-    if (!constrained.age_gap)
-      env_.age_gap = dflt.age_gap;
 
     // A larger number of training cases requires an increase in the population
     // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
@@ -427,6 +421,8 @@ namespace vita
 
     for (unsigned run(0); run < n; ++run)
     {
+      prob_->get_evaluator()->clear(evaluator::stats);
+
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
       summary s(evo.run(run));
 

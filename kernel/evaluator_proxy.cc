@@ -61,11 +61,22 @@ namespace vita
   }
 
   ///
-  /// Resets the evaluation cache.
+  /// \param[in] what what should be cleared? (all, cache, stats)
   ///
-  void evaluator_proxy::clear()
+  /// \brief Resets the evaluation cache / clear the statistics.
+  ///
+  void evaluator_proxy::clear(unsigned what)
   {
-    cache_.clear();
+    switch (what)
+    {
+    case all:
+    case cache:
+      cache_.clear();
+      break;
+
+    case stats:
+      cache_.reset_seen();
+    }
   }
 
   ///

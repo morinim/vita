@@ -55,7 +55,7 @@ namespace vita
   /// Creates a new transposition (hash) table.
   ///
   ttable::ttable(unsigned bits)
-    : k_mask((1 << bits) - 1), table_(new slot[1 << bits]), period_(1),
+    : k_mask((1 << bits) - 1), table_(new slot[1 << bits]), seal_(1),
       probes_(0), hits_(0)
   {
     assert(debug());
@@ -88,12 +88,12 @@ namespace vita
     probes_ = 0;
     hits_   = 0;
 
-    ++period_;
+    ++seal_;
 
     //for (size_t i(0); i <= k_mask; ++i)
     //{
     //  table_[i].hash = hash_t();
-    //  table_[i].fitness = {0.0, 0.0};
+    //  table_[i].fitness = {};
     //}
   }
 
@@ -107,15 +107,30 @@ namespace vita
     const hash_t h(ind.signature());
 
     table_[index(h)].hash = hash_t();
+
+    // An alternative to invalidate the slot:
+    //   table_[index(h)].seal = 0;
+    // It works because the first valid seal is 1.
   }
 
+  ///
+  /// Resets the \a seen counter.
+  ///
+  void ttable::reset_seen()
+  {
+    probes_ = hits_ = 0;
+
+    for (size_t i(0); i <= k_mask; ++i)
+      table_[i].seen = 0;
+  }
+
+  ///
+  /// \brief Looks for the fitness of an individual in the transposition table.
   ///
   /// \param[in] ind the individual to look for.
   /// \param[out] fitness the fitness of the individual (if present).
   /// \return \c true if \a ind is found in the transposition table, \c false
   ///         otherwise.
-  ///
-  /// Looks for the fitness of an individual in the transposition table.
   ///
   bool ttable::find(const individual &ind, fitness_t *const fitness) const
   {
@@ -125,10 +140,11 @@ namespace vita
 
     const slot &s(table_[index(h)]);
 
-    const bool ret(period_ == s.birthday && h == s.hash);
+    const bool ret(seal_ == s.seal && h == s.hash);
 
     if (ret)
     {
+      ++s.seen;
       ++hits_;
       *fitness = s.fitness;
     }
@@ -137,17 +153,32 @@ namespace vita
   }
 
   ///
+  /// \param[in] ind the individual to look for.
+  /// \return number of times \a ind has been looked for.
+  ///
+  unsigned ttable::seen(const individual &ind) const
+  {
+    const hash_t h(ind.signature());
+    const slot &s(table_[index(h)]);
+
+    const bool ret(seal_ == s.seal && h == s.hash);
+
+    return ret ? s.seen : 0;
+  }
+
+  ///
   /// \param[in] ind a (possibly) new individual to be stored in the table.
-  /// \param[out] fitness the fitness of the individual.
+  /// \param[in] fitness the fitness of the individual.
   ///
   /// Stores fitness information in the transposition table.
   ///
   void ttable::insert(const individual &ind, const fitness_t &fitness)
   {
     slot s;
-    s.hash     = ind.signature();
-    s.fitness  =         fitness;
-    s.birthday =         period_;
+    s.hash    = ind.signature();
+    s.fitness =         fitness;
+    s.seal    =           seal_;
+    s.seen    =               1;
 
     table_[index(s.hash)] = s;
   }
@@ -161,8 +192,8 @@ namespace vita
   ///
   bool ttable::load(std::istream &in)
   {
-    decltype(period_) t_period;
-    if (!(in >> t_period))
+    decltype(seal_) t_seal;
+    if (!(in >> t_seal))
       return false;
 
     decltype(probes_) t_probes;
@@ -177,7 +208,7 @@ namespace vita
     if (!(in >> n))
       return false;
 
-    period_ = t_period;
+    seal_ = t_seal;
     probes_ = t_probes;
     hits_ = t_hits;
 
@@ -189,7 +220,9 @@ namespace vita
         return false;
       if (!s.fitness.load(in))
         return false;
-      if (!(in >> s.birthday))
+      if (!(in >> s.seal))
+        return false;
+      if (!(in >> s.seen))
         return false;
 
       table_[index(s.hash)] = s;
@@ -204,7 +237,7 @@ namespace vita
   ///
   bool ttable::save(std::ostream &out) const
   {
-    out << period_ << ' ' << probes_ << ' ' << hits_ << std::endl;
+    out << seal_ << ' ' << probes_ << ' ' << hits_ << std::endl;
 
     size_t num(0);
     for (size_t i(0); i <= k_mask; ++i)
@@ -218,7 +251,7 @@ namespace vita
         const slot &s(table_[i]);
         s.hash.save(out);
         s.fitness.save(out);
-        out << s.birthday << std::endl;
+        out << s.seal << ' ' << s.seen << std::endl;
       }
 
     return out.good();

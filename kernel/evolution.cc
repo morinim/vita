@@ -75,12 +75,9 @@ namespace vita
   analyzer evolution::get_stats() const
   {
     analyzer az;
-    for (size_t l(0); l < pop_.layers(); ++l)
-      for (size_t i(0); i < pop_.individuals(l); ++i)
-      {
-        const coord c(l, i);
-        az.add(pop_[c], fitness(pop_[c]), l);
-      }
+
+    for (const auto &i : pop_)
+      az.add(i, fitness(i));
 
     return az;
   }
@@ -170,28 +167,6 @@ namespace vita
       }
     }
 
-    if (pop_.env().stat_ages)
-    {
-      const std::string f_ages(pop_.env().stat_dir + "/" + "ages");
-      std::ofstream ages(f_ages.c_str(), std::ios_base::app);
-      if (ages.good())
-      {
-        if (last_run != run_count)
-          ages << std::endl << std::endl;
-
-        for (size_t l(0); l < pop_.layers(); ++l)
-        {
-          const auto &l_info(stats_.az.layer_info(l));
-
-          ages << run_count << ' ' << stats_.gen << ' ' << l << ' '
-               << pop_.max_age(l) << ' ' << l_info.age.mean << ' '
-               << l_info.age.standard_deviation() << ' ' << l_info.age.min
-               << ' ' << l_info.age.max << ' ' << l_info.fitness.mean << ' '
-               << l_info.fitness.min << ' ' << l_info.fitness.max << std::endl;
-        }
-      }
-    }
-
     if (last_run != run_count)
       last_run = run_count;
   }
@@ -254,9 +229,7 @@ namespace vita
   const summary &evolution::run(unsigned run_count)
   {
     stats_.clear();
-    stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
-
-    eva_->clear();
+    stats_.best = {pop_[0], fitness(pop_[0])};
 
     timer measure;
 
@@ -269,7 +242,7 @@ namespace vita
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
         // training set).
-        stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
+        stats_.best = {pop_[0], fitness(pop_[0])};
       }
 
       stats_.az = get_stats();
@@ -281,7 +254,7 @@ namespace vita
           print_progress(k, run_count, false);
 
         // --------- SELECTION ---------
-        std::vector<coord> parents(selection->run());
+        std::vector<size_t> parents(selection->run());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation->run(parents));
@@ -297,8 +270,6 @@ namespace vita
       stats_.speed = get_speed(measure.elapsed());
 
       pop_.inc_age();
-      if (env().layers > 1 && stats_.gen && stats_.gen % env().age_gap == 0)
-        pop_.reset_layer();
     }
 
     if (env().verbosity >= 2)

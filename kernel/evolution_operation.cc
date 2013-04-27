@@ -31,11 +31,12 @@ namespace vita
   }
 
   ///
+  /// \param[in] parent a vector of ordered parents.
   /// \return the offspring.
   ///
   /// This is a quite standard crossover + mutation operator.
   ///
-  std::vector<individual> standard_op::run(const std::vector<coord> &parent)
+  std::vector<individual> standard_op::run(const std::vector<size_t> &parent)
   {
     assert(parent.size() >= 2);
 
@@ -61,6 +62,9 @@ namespace vita
       // * optimize the exploitation phase.
       while (pop[r1].signature() == off.signature() ||
              pop[r2].signature() == off.signature())
+        stats_->mutations += off.mutation();
+
+      while (evo_->seen(off))
         stats_->mutations += off.mutation();
 
       if (*env.brood_recombination > 0)

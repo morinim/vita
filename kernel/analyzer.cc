@@ -28,7 +28,7 @@ namespace vita
   ///
   void analyzer::clear()
   {
-    layer_info_.clear();
+    age_.clear();
     fit_.clear();
     length_.clear();
 
@@ -74,12 +74,13 @@ namespace vita
   }
 
   ///
-  /// \param[in] l a layer of the population.
-  /// \return statistics about the age and fitness distribution in layer \a l.
+  /// \return statistics about the age distribution of the individuals.
   ///
-  const stat_layer &analyzer::layer_info(size_t l) const
+  const distribution<double> &analyzer::age_dist() const
   {
-    return layer_info_.at(l);
+    assert(age_.debug());
+
+    return age_;
   }
 
   ///
@@ -146,14 +147,12 @@ namespace vita
   ///
   /// \param[in] ind new individual.
   /// \param[in] f fitness of the new individual.
-  /// \param[in] l the layer of the population the individual is placed in.
   ///
   /// Adds a new individual to the pool used to calculate statistics.
   ///
-  void analyzer::add(const individual &ind, const fitness_t &f, size_t l)
+  void analyzer::add(const individual &ind, const fitness_t &f)
   {
-    layer_info_[l].age.add(ind.age);
-    layer_info_[l].fitness.add(f);
+    age_.add(ind.age);
 
     length_.add(count(ind));
 
@@ -170,14 +169,8 @@ namespace vita
       if (i.second.counter[true] > i.second.counter[false])
         return false;
 
-    for (const auto &l : layer_info_)
-    {
-      if (!l.second.age.debug())
-        return false;
-
-      if (!l.second.fitness.debug())
-        return false;
-    }
+    if (!age_.debug())
+      return false;
 
     if (!fit_.debug())
       return false;

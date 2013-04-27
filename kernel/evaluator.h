@@ -39,15 +39,9 @@ namespace vita
   class evaluator
   {
   public:
+    enum {cache = 1, stats = 2, all = cache | stats};
+
     typedef std::shared_ptr<evaluator> ptr;
-
-    /// Some evaluators keep a cache to improve performances. This method
-    /// asks to empty the cache.
-    virtual void clear() {}
-
-    /// Some evaluators keep a cache to improve performances. This method
-    /// asks to clear cached informations about an individual.
-    virtual void clear(const individual &) {}
 
     /// \return the fitness of the individual.
     virtual fitness_t operator()(const individual &) = 0;
@@ -71,6 +65,18 @@ namespace vita
     /// tasks with imbalanced learning data (where at least one class is
     /// under/over represented relative to others).
     virtual double accuracy(const individual &) const { return -1.0; }
+
+    /// Some evaluators keep additional statistics about the individual seen
+    /// so far.
+    virtual unsigned seen(const individual &) const { return 0; }
+
+    /// Some evaluators keep a cache / some statistics to improve performances.
+    /// This method asks to empty the cache / clear the statistics.
+    virtual void clear(unsigned) {}
+
+    /// Some evaluators keep a cache to improve performances. This method
+    /// asks to clear cached informations about an individual.
+    virtual void clear(const individual &) {}
 
     /// \return some info about the status / efficiency of the evaluator.
     virtual std::string info() const { return ""; }

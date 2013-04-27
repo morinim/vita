@@ -82,6 +82,7 @@ namespace vita
 
     fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
+    unsigned seen(const individual &i) const { return eva_->seen(i); }
 
     bool debug(bool) const;
 

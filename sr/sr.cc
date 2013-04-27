@@ -386,19 +386,6 @@ namespace ui
   }
 
   ///
-  /// \param[in] l number of layers (> 1 to enable ALPS).
-  ///
-  /// See environment::layers.
-  ///
-  void layers(unsigned l)
-  {
-    problem->env.layers = l;
-
-    if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Number of layers is " << l << std::endl;
-  }
-
-  ///
   /// \param[in] z mating zone (0 for panmictic).
   ///
   /// Set mating zone.
@@ -528,18 +515,6 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Number of runs is " << r << std::endl;
-  }
-
-  ///
-  /// \param[in] v if \c true saves a file with age dynamic.
-  ///
-  void stat_age(const std::string &v)
-  {
-    problem->env.stat_ages = is_true(v);
-
-    if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Age logging is "
-                << problem->env.stat_ages << std::endl;
   }
 
   ///
@@ -831,8 +806,6 @@ int parse_command_line(int argc, char *const argv[])
       ("population-size,P",
        po::value<unsigned>()->notifier(&ui::population_size),
        "sets the number of programs/individuals in the population")
-      ("layers,L", po::value<unsigned>()->notifier(&ui::layers),
-       "sets the number of population layers.")
       ("elitism", po::value<std::string>()->notifier(&ui::elitism),
        "when elitism is true an individual will never replace a better one")
       ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),
@@ -864,8 +837,6 @@ int parse_command_line(int argc, char *const argv[])
     statistics.add_options()
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
        "log statistics in the specified folder/directory")
-      ("stat-age", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_age),
-       "generates an age status file")
       ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
        "saves the list of active ADFs")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),

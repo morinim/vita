@@ -40,8 +40,6 @@ namespace vita
     : verbosity(2),
       code_length(0),
       patch_length(0),
-      layers(0),
-      age_gap(0),
       individuals(0),
       elitism(boost::indeterminate),
       tournament_size(0),
@@ -49,7 +47,7 @@ namespace vita
       arl(boost::indeterminate),
       ttable_size(16),
       stat_dir(""),
-      stat_ages(false), stat_arl(false), stat_dynamic(false),
+      stat_arl(false), stat_dynamic(false),
       stat_population(false), stat_summary(false),
       a_threashold(-1.0)
   {
@@ -62,8 +60,6 @@ namespace vita
       p_cross = 0.9;
       brood_recombination = 0;
       dss = true;
-      layers = 1;
-      age_gap = 10;
       individuals = 100;
       tournament_size = 5;
       mate_zone = 20;
@@ -90,7 +86,6 @@ namespace vita
     assert(stat_summary);
 
     const std::string env(path + "environment.");
-    pt->put(env + "layers", layers);
     pt->put(env + "individuals", individuals);
     pt->put(env + "code_length", code_length);
     pt->put(env + "patch_length", patch_length);
@@ -192,14 +187,6 @@ namespace vita
         return false;
       }
 
-      if (!layers)
-      {
-        if (verbose)
-          std::cerr << k_s_debug << " Undefined layers data member"
-                    << std::endl;
-        return false;
-      }
-
       if (!individuals)
       {
         if (verbose)
@@ -286,15 +273,6 @@ namespace vita
       return false;
     }
 
-    if (layers && individuals && individuals < 2 * layers)
-    {
-      if (verbose)
-        std::cerr << k_s_debug << " individuals / layers ratio ("
-                  << individuals << '/' << layers << ") is too low"
-                  << std::endl;
-      return false;
-    }
-
     if (individuals && individuals <= 3)
     {
       if (verbose)
@@ -302,14 +280,13 @@ namespace vita
       return false;
     }
 
-    if (individuals && tournament_size && layers &&
-        tournament_size > individuals / layers)
+    if (individuals && tournament_size && tournament_size > individuals)
     {
       if (verbose)
         std::cerr << k_s_debug
                   << " tournament_size (" << tournament_size
-                  << ") cannot be greater than individuals in a layer ("
-                  << individuals / layers << ')' << std::endl;
+                  << ") cannot be greater than population size ("
+                  << individuals << ')' << std::endl;
       return false;
     }
 

@@ -72,10 +72,12 @@ namespace vita
 
     void clear();
     void clear(const individual &);
+    void reset_seen();
 
     void insert(const individual &, const fitness_t &);
 
     bool find(const individual &, fitness_t *const) const;
+    unsigned seen(const individual &) const;
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.
@@ -96,15 +98,20 @@ namespace vita
   private:  // Private data members.
     struct slot
     {
+      /// This is used as primary key for access to the table.
       hash_t       hash;
+      /// The stored fitness of an individual.
       fitness_t fitness;
-      unsigned birthday;
+      /// Valid slots are recognized comparing their seal with the current one.
+      unsigned     seal;
+      /// How many times have we looked for this individual in the current run?
+      mutable unsigned seen;
     };
 
     const std::uint64_t k_mask;
     slot *const table_;
 
-    decltype(slot::birthday) period_;
+    decltype(slot::seal) seal_;
 
     mutable std::uintmax_t probes_;
     mutable std::uintmax_t hits_;

@@ -20,7 +20,6 @@
 
 namespace vita
 {
-  class coord;
   class evolution;
   class summary;
 
@@ -42,7 +41,7 @@ namespace vita
     explicit replacement_strategy(evolution *const);
     virtual ~replacement_strategy() {}
 
-    virtual void run(const std::vector<coord> &,
+    virtual void run(const std::vector<size_t> &,
                      const std::vector<individual> &, summary *const) = 0;
 
   protected:
@@ -70,8 +69,8 @@ namespace vita
   public:
     explicit family_competition_rp(evolution *const);
 
-    virtual void run(const std::vector<coord> &,
-                     const std::vector<individual> &, summary *const);
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) override;
   };
 
   ///
@@ -89,13 +88,8 @@ namespace vita
   public:
     explicit kill_tournament(evolution *const);
 
-    virtual void run(const std::vector<coord> &,
-                     const std::vector<individual> &, summary *const);
-
-  private:
-    bool can_replace(const individual &, const coord &) const;
-    bool can_replace(const coord &, const coord &) const;
-    void try_move_up(const coord &);
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) override;
   };
 }  // namespace vita
 

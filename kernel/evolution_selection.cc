@@ -26,48 +26,28 @@ namespace vita
   }
 
   ///
-  /// \return the coordinates of a random individual.
+  /// \return the index of a random individual.
   ///
-  coord selection_strategy::pickup() const
+  size_t selection_strategy::pickup() const
   {
-    const population &pop(evo_->population());
-
-    assert(pop.layers());
-
-    const auto layer(
-      pop.layers() == 1 ? 0 : random::between<size_t>(0, pop.layers()));
-
-    return {layer, random::between<size_t>(0, pop.individuals(layer))};
+    return random::between<size_t>(0, evo_->population().individuals());
   }
 
   ///
-  /// \param[in] target coordinates of a reference individual.
-  /// \return the coordinates of a random individual "near" \a target.
+  /// \param[in] target index of a reference individual.
+  /// \return the index of a random individual "near" \a target.
   ///
   /// Parameters from the environment:
   /// * mate_zone - to restrict the selection of individuals to a segment of
   ///   the population;
   /// * tournament_size - to control number of selected individuals.
   ///
-  coord selection_strategy::pickup(const coord &target) const
+  size_t selection_strategy::pickup(size_t target) const
   {
     const population &pop(evo_->population());
 
-//    return {target.layer, random::ring(target.index, *pop.env().mate_zone,
-//                                       pop.individuals(target.layer))};
 
-    if (target.layer == 0)
-      return {0, random::ring(target.index, *pop.env().mate_zone,
-                              pop.individuals(0))};
-
-    const auto layer(random::between(target.layer - 1, target.layer + 1));
-
-    if (layer == target.layer)
-      return {layer, random::ring(target.index, *pop.env().mate_zone,
-                                  pop.individuals(layer))};
-
-    return {layer, random::between<size_t>(0, pop.individuals(layer))};
-
+    return random::ring(target, *pop.env().mate_zone, pop.individuals());
   }
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -85,7 +65,7 @@ namespace vita
   /// of those individuals.
   /// Recall that better individuals have highter fitnesses.
   ///
-  coord tournament_selection::tournament(coord target) const
+  size_t tournament_selection::tournament(size_t target) const
   {
     const population &pop(evo_->population());
     const unsigned rounds(pop.env().tournament_size);
@@ -106,7 +86,7 @@ namespace vita
   */
 
   ///
-  /// \return a vector of indexes to individuals ordered in descending
+  /// \return a vector of indexes of individuals ordered in descending
   ///         fitness.
   ///
   /// Parameters from the environment:
@@ -114,50 +94,40 @@ namespace vita
   ///   the population;
   /// * tournament_size - to control selection pressure.
   ///
-  std::vector<coord> tournament_selection::run()
+  std::vector<size_t> tournament_selection::run()
   {
     const population &pop(evo_->population());
 
     const auto rounds(pop.env().tournament_size);
-    const coord target(pickup());
-    const auto max_age(pop.max_age(target.layer));
+    const size_t target(pickup());
 
     assert(rounds);
-    std::vector<coord> ret(rounds);
+    std::vector<size_t> ret(rounds);
 
     // This is the inner loop of an insertion sort algorithm. It is simple,
     // fast (if rounds is small) and doesn't perform too much comparisons.
     // DO NOT USE std::sort it is way slower.
     for (unsigned i(0); i < rounds; ++i)
     {
-      const coord new_index(pickup(target));
+      const size_t new_index(pickup(target));
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
       size_t j(0);
 
-      if (pop[new_index].age > max_age)
-        j = i;
-      else
-      {
-        // Where is the insertion point?
-        while (j < i && pop[ret[j]].age <= max_age &&
-               new_fitness < evo_->fitness(pop[ret[j]]))
-          ++j;
+      // Where is the insertion point?
+      while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
+        ++j;
 
-        // Shift right elements after the insertion point.
-        for (auto k(j); k < i; ++k)
-          ret[k + 1] = ret[k];
-      }
+      // Shift right elements after the insertion point.
+      for (auto k(j); k < i; ++k)
+        ret[k + 1] = ret[k];
 
       ret[j] = new_index;
     }
 
 #if !defined(NDEBUG)
     for (size_t i(0); i + 1 < rounds; ++i)
-      if (pop[ret[i]].age < max_age && pop[ret[i + 1]].age < max_age)
-        assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
-      else
-        assert(pop[ret[i + 1]].age > max_age);
+      assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
 #endif
 
     return ret;
@@ -176,12 +146,12 @@ namespace vita
   ///   the population;
   /// * tournament_size - to control number of selected individuals.
   ///
-  std::vector<coord> random_selection::run()
+  std::vector<size_t> random_selection::run()
   {
     const size_t size(evo_->population().env().tournament_size);
 
     assert(size);
-    std::vector<coord> ret(size);
+    std::vector<size_t> ret(size);
 
     ret[0] = pickup();  // target
 
