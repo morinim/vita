@@ -92,17 +92,28 @@ namespace vita
     /// \param[in] f second term of comparison.
     /// \return \c true if \a this is a Pareto improvement of \a f.
     ///
-    /// \a this dominates \a f (is a Pareto improvement) if each component of
-    /// \a this is not strictly worst (less) than the correspondig component of
-    /// \a f.
+    /// \a this dominates \a f (is a Pareto improvement) if:
+    /// * each component of \a this is not strictly worst (less) than the
+    ///   correspondig component of \a f;
+    /// * there is at least one component in which \a this is better than \a f.
+    ///
+    /// \note
+    /// An interesting property is that if a vector x does not dominate a
+    /// vector y, this does not imply that y dominates x (for example they can
+    /// be both non-dominated).
+    ///
     bool dominating(const fitness_t &f) const
     {
       const size_t sup(std::min(size(), f.size()));
+      bool one_better(false);
+
       for (size_t i(0); i < sup; ++i)
-        if (vect[i] < f.vect[i])
+        if (vect[i] > f.vect[i])
+          one_better = true;
+        else if (vect[i] < f.vect[i])
           return false;
 
-      return size() >= f.size();
+      return one_better;
     }
 
     base_t operator[](size_t i) const
