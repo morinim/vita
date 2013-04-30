@@ -51,7 +51,7 @@ namespace vita
     /// special terminal named "ephemeral random constant" (Koza 1992). For
     /// each ephemeral random constant used in the initial population, a random
     /// number of a special data type in a specified range is generated. Then
-    /// these random constants are moved around from tree to tree by the
+    /// these random constants are moved around from genome to genome by the
     /// crossover operator.
     ///
     class number : public terminal

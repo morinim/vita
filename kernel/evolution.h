@@ -82,19 +82,23 @@ namespace vita
 
     fitness_t fitness(const individual &) const;
     fitness_t fast_fitness(const individual &) const;
+    unsigned seen(const individual &i) const { return eva_->seen(i); }
 
-    bool debug() const;
+    bool debug(bool) const;
 
+  public:  // Public data members.
     selection_strategy::ptr     selection;
     operation_strategy::ptr     operation;
     replacement_strategy::ptr replacement;
 
-  private:
+  private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
     double get_speed(double) const;
     analyzer get_stats() const;
     void log(unsigned) const;
+    void print_progress(unsigned, unsigned, bool) const;
 
+  private:  // Private data members.
     vita::population pop_;
     evaluator       *eva_;
     summary        stats_;

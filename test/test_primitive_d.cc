@@ -26,7 +26,7 @@ using namespace boost;
 #include "factory_fixture3.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(primitive, F_FACTORY3)
+BOOST_FIXTURE_TEST_SUITE(primitive_d, F_FACTORY3)
 
 BOOST_AUTO_TEST_CASE(ABS)
 {
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}}   // [2] X
   });
   ret = interpreter(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
   g =
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   {
     {{f_ife, {1, 1, 2, 1}}},  // [0] IFE 1,1,2,1
     {{   c0,         null}},  // [1] 0
-    {{   c1,         null}}  // [2] 1
+    {{   c1,         null}}   // [2] 1
   });
   ret = interpreter(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);

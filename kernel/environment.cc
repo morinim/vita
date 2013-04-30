@@ -40,13 +40,15 @@ namespace vita
     : verbosity(2),
       code_length(0),
       patch_length(0),
+      individuals(0),
       elitism(boost::indeterminate),
+      tournament_size(0),
       dss(boost::indeterminate),
       arl(boost::indeterminate),
       ttable_size(16),
       stat_dir(""),
-      stat_arl(false), stat_dynamic(false), stat_population(false),
-      stat_summary(false),
+      stat_arl(false), stat_dynamic(false),
+      stat_population(false), stat_summary(false),
       a_threashold(-1.0)
   {
     if (initialize)
@@ -84,7 +86,7 @@ namespace vita
     assert(stat_summary);
 
     const std::string env(path + "environment.");
-    pt->put(env + "population_size", individuals);
+    pt->put(env + "individuals", individuals);
     pt->put(env + "code_length", code_length);
     pt->put(env + "patch_length", patch_length);
     pt->put(env + "elitism", elitism);
@@ -240,7 +242,7 @@ namespace vita
                     << std::endl;
         return false;
       }
-    }
+    }  // if (force_defined)
 
     if (code_length == 1)
     {
@@ -271,28 +273,30 @@ namespace vita
       return false;
     }
 
-    if (individuals && *individuals <= 3)
+    if (individuals && individuals <= 3)
     {
       if (verbose)
         std::cerr << k_s_debug << " Too few individuals" << std::endl;
       return false;
     }
 
-    if (individuals && tournament_size && *tournament_size > *individuals)
+    if (individuals && tournament_size && tournament_size > individuals)
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " tournament_size cannot be greater than individuals"
-                  << std::endl;
+                  << " tournament_size (" << tournament_size
+                  << ") cannot be greater than population size ("
+                  << individuals << ')' << std::endl;
       return false;
     }
 
-    if (mate_zone && tournament_size && *tournament_size > *mate_zone)
+    if (mate_zone && tournament_size && tournament_size > *mate_zone)
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " tournament_size cannot be greater than mate_zone"
-                  << std::endl;
+                  << " tournament_size (" << tournament_size
+                  << ") cannot be greater than mate_zone (" << *mate_zone
+                  << ')' << std::endl;
       return false;
     }
 

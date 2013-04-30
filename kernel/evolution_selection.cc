@@ -17,9 +17,37 @@
 
 namespace vita
 {
+  ///
+  /// \param[in] evo pointer to the evolution strategy.
+  ///
   selection_strategy::selection_strategy(const evolution *const evo)
     : evo_(evo)
   {
+  }
+
+  ///
+  /// \return the index of a random individual.
+  ///
+  size_t selection_strategy::pickup() const
+  {
+    return random::between<size_t>(0, evo_->population().individuals());
+  }
+
+  ///
+  /// \param[in] target index of a reference individual.
+  /// \return the index of a random individual "near" \a target.
+  ///
+  /// Parameters from the environment:
+  /// * mate_zone - to restrict the selection of individuals to a segment of
+  ///   the population;
+  /// * tournament_size - to control number of selected individuals.
+  ///
+  size_t selection_strategy::pickup(size_t target) const
+  {
+    const population &pop(evo_->population());
+
+
+    return random::ring(target, *pop.env().mate_zone, pop.individuals());
   }
 
   tournament_selection::tournament_selection(const evolution *const evo)
@@ -37,18 +65,15 @@ namespace vita
   /// of those individuals.
   /// Recall that better individuals have highter fitnesses.
   ///
-  index_t tournament_selection::tournament(index_t target) const
+  size_t tournament_selection::tournament(size_t target) const
   {
     const population &pop(evo_->population());
+    const unsigned rounds(pop.env().tournament_size);
 
-    const unsigned n(pop.size());
-    const unsigned mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().tournament_size);
-
-    index_t sel(random::ring(target, mate_zone, n));
+    coord sel(pickup(target));
     for (unsigned i(1); i < rounds; ++i)
     {
-      const index_t j(random::ring(target, mate_zone, n));
+      const coord j(pickup(target));
 
       const fitness_t fit_j(evo_->fitness(pop[j]));
       const fitness_t fit_sel(evo_->fitness(pop[sel]));
@@ -61,7 +86,7 @@ namespace vita
   */
 
   ///
-  /// \return a vector of indexes to individuals ordered in descending
+  /// \return a vector of indexes of individuals ordered in descending
   ///         fitness.
   ///
   /// Parameters from the environment:
@@ -69,42 +94,114 @@ namespace vita
   ///   the population;
   /// * tournament_size - to control selection pressure.
   ///
-  std::vector<index_t> tournament_selection::run()
+  std::vector<size_t> tournament_selection::run()
   {
     const population &pop(evo_->population());
 
-    const unsigned n(pop.size());
-    const unsigned mate_zone(*pop.env().mate_zone);
-    const unsigned rounds(*pop.env().tournament_size);
-    const index_t target(random::between<index_t>(0, n));
+    const auto rounds(pop.env().tournament_size);
+    const size_t target(pickup());
 
     assert(rounds);
-    std::vector<index_t> ret(rounds);
+    std::vector<size_t> ret(rounds);
 
     // This is the inner loop of an insertion sort algorithm. It is simple,
     // fast (if rounds is small) and doesn't perform too much comparisons.
     // DO NOT USE std::sort it is way slower.
     for (unsigned i(0); i < rounds; ++i)
     {
-      const index_t new_index(random::ring(target, mate_zone, n));
+      const size_t new_index(pickup(target));
       const fitness_t new_fitness(evo_->fitness(pop[new_index]));
 
-      index_t j(0);
+      size_t j(0);
+
+      // Where is the insertion point?
       while (j < i && new_fitness < evo_->fitness(pop[ret[j]]))
         ++j;
 
-      for (index_t k(j); k < i; ++k)
+      // Shift right elements after the insertion point.
+      for (auto k(j); k < i; ++k)
         ret[k + 1] = ret[k];
 
       ret[j] = new_index;
     }
 
 #if !defined(NDEBUG)
-    for (unsigned i(0); i + 1 < rounds; ++i)
+    for (size_t i(0); i + 1 < rounds; ++i)
       assert(evo_->fitness(pop[ret[i]]) >= evo_->fitness(pop[ret[i + 1]]));
 #endif
 
     return ret;
+  }
+
+  pareto_tourney::pareto_tourney(const evolution *const evo)
+    : selection_strategy(evo)
+  {
+  }
+
+  std::vector<size_t> pareto_tourney::run()
+  {
+    const population &pop(evo_->population());
+    const auto rounds(pop.env().tournament_size);
+
+    std::vector<size_t> pool(rounds);
+    for (unsigned i(0); i < rounds; ++i)
+      pool.push_back(pickup());
+
+    assert(pool.size());
+
+    std::set<size_t> front, dominated;
+    pareto(pool, &front, &dominated);
+
+    assert(front.size());
+
+    std::vector<size_t> ret{random::element(front), random::element(front)};
+
+    if (dominated.size())
+      ret.push_back(random::element(dominated));
+
+    return ret;
+  }
+
+  void pareto_tourney::pareto(const std::vector<size_t> &pool,
+                              std::set<size_t> *front,
+                              std::set<size_t> *dominated) const
+  {
+    const population &pop(evo_->population());
+
+    for (const auto &ind : pool)
+    {
+      if (front->find(ind) != front->end() ||
+          dominated->find(ind) != dominated->end())
+        continue;
+
+      const fitness_t ind_fit(evo_->fitness(pop[ind]));
+
+      bool ind_dominated(false);
+      for (auto f(front->cbegin()); f != front->cend() && !ind_dominated;)
+        // no increment in the for loop
+      {
+        const fitness_t f_fit(evo_->fitness(pop[*f]));
+
+        if (!ind_dominated && ind_fit.dominating(f_fit))
+        {
+          dominated->insert(*f);
+          f = front->erase(f);
+        }
+        else
+        {
+          if (f_fit.dominating(ind_fit))
+          {
+            ind_dominated = true;
+            dominated->insert(ind);
+          }
+
+          ++f;
+        }
+      }
+
+      if (!ind_dominated)
+        front->insert(ind);
+    }
   }
 
   random_selection::random_selection(const evolution *const evo)
@@ -120,22 +217,17 @@ namespace vita
   ///   the population;
   /// * tournament_size - to control number of selected individuals.
   ///
-  std::vector<index_t> random_selection::run()
+  std::vector<size_t> random_selection::run()
   {
-    const population &pop(evo_->population());
-
-    const unsigned n(pop.size());
-    const unsigned mate_zone(*pop.env().mate_zone);
-    const unsigned size(*pop.env().tournament_size);
-    const index_t target(random::between<index_t>(0, n));
+    const size_t size(evo_->population().env().tournament_size);
 
     assert(size);
-    std::vector<index_t> ret(size);
+    std::vector<size_t> ret(size);
 
-    ret[0] = target;
+    ret[0] = pickup();  // target
 
-    for (unsigned i(1); i < size; ++i)
-      ret[i] = random::ring(target, mate_zone, n);
+    for (size_t i(1); i < size; ++i)
+      ret[i] = pickup(ret[0]);
 
     return ret;
   }

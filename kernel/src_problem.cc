@@ -89,6 +89,9 @@ namespace vita
                                               const std::string &ts,
                                               const std::string &symbols)
   {
+    if (ds.empty())
+      return {0, 0};
+
     env.sset = vita::symbol_set();
     dat_.clear();
 
@@ -96,7 +99,7 @@ namespace vita
     if (n_examples > 0 && !get_evaluator())
       set_evaluator(classification() ? p_class : p_symre);
 
-    if (!ds.empty())
+    if (!ts.empty())
       load_test_set(ts);
 
     size_t n_symbols(0);
@@ -105,7 +108,7 @@ namespace vita
     else
       n_symbols = load_symbols(symbols);
 
-    return std::pair<size_t, size_t>(n_examples, n_symbols);
+    return {n_examples, n_symbols};
   }
 
   ///

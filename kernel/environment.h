@@ -67,6 +67,12 @@ namespace vita
     /// A length of 0 means undefined (auto-tune).
     size_t patch_length;
 
+    /// Number of individuals in the population.
+    ///
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    size_t individuals;
+
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
     /// converge quicker but losing diversity.
@@ -109,19 +115,18 @@ namespace vita
     /// programs" (Walter Alden Tackett - 1995).
     boost::optional<unsigned> brood_recombination;
 
-    /// Switches Dynamic Subset Selection on/off.
-    /// \see search::dss()
-    boost::tribool dss;
-
-    /// Population's size (number of programs/individuals in the population).
-    boost::optional<unsigned> individuals;
-
     /// Size of the tournament to choose the parents from.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
     /// selective pressure. Note that a tournament size of 1 would be
     /// equivalent to selecting individuals at random.
-    boost::optional<unsigned> tournament_size;
+    /// \note
+    /// A length of 0 means undefined (auto-tune).
+    size_t tournament_size;
+
+    /// Switches Dynamic Subset Selection on/off.
+    /// \see search::dss()
+    boost::tribool dss;
 
     /// This is used for the trivial geography scheme (Spector, Klein 2005).
     /// The population is viewed as having a 1-dimensional spatial structure -
@@ -130,7 +135,7 @@ namespace vita
     /// to involve only parents from i's local neightborhood, where the
     /// neightborhood is defined as all individuals within distance
     /// \c mate_zone/2 of i (0 for panmictic).
-    boost::optional<unsigned> mate_zone;
+    boost::optional<size_t> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.
     boost::optional<unsigned> g_since_start;
@@ -152,7 +157,7 @@ namespace vita
     /// Where shuld we save statistics / status files?
     std::string stat_dir;
 
-    /// Save a list of active ADF?
+    /// Should we save a list of active ADF?
     bool stat_arl;
 
     /// Should we save a dynamic execution status file?

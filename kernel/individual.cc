@@ -35,7 +35,7 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, bool gen)
-    : genome_(e.code_length, e.sset.categories()),
+    : age(0), genome_(e.code_length, e.sset.categories()),
       signature_(), best_({{0, 0}}), env_(&e)
   {
     assert(e.debug(true, true));
@@ -134,7 +134,7 @@ namespace vita
   {
     unsigned n(0);
 
-    const index_t sup(size() - 1);
+    const auto sup(size() - 1);
 
     // Here mutation affects only exons.
     for (const_iterator it(*this); it(); ++it)
@@ -142,8 +142,8 @@ namespace vita
       {
         ++n;
 
-        const index_t i(it.l[locus_index]);
-        const category_t c(it.l[locus_category]);
+        const auto i(it.l[locus_index]);
+        const auto c(it.l[locus_category]);
 
         if (i < sup)
           set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
@@ -172,8 +172,8 @@ namespace vita
         set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
       }
 */
-    assert(debug());
 
+    assert(debug());
     return n;
   }
 
@@ -233,8 +233,8 @@ namespace vita
   /// \param[in] gv vector of genes.
   /// \return a new individual .
   ///
-  /// Create a new \a individual obtained from \c this replacing the original
-  /// gene at index \a i with a new one (\a gv[i]).
+  /// Create a new \a individual obtained replacing the first section of
+  /// \c this with genes from \a gv.
   ///
   individual individual::replace(const std::vector<gene> &gv) const
   {
@@ -330,9 +330,13 @@ namespace vita
   /// \return \c true if the two individuals are equal (symbol by symbol,
   ///         including introns).
   ///
+  /// \note
+  /// Age is not checked.
+  ///
   bool individual::operator==(const individual &x) const
   {
-    return genome_ == x.genome_ && best_ == x.best_;
+    return signature_ == x.signature_ &&
+           genome_ == x.genome_ && best_ == x.best_;
   }
 
   ///
@@ -450,8 +454,8 @@ namespace vita
         if (!genome_(l).sym)
         {
           if (verbose)
-            std::cerr << "Empty symbol pointer at locus " << l << '.'
-                      << std::endl;
+            std::cerr << k_s_debug << " Empty symbol pointer at locus " << l
+                      << '.' << std::endl;
           return false;
         }
 
@@ -459,7 +463,8 @@ namespace vita
         if (genome_(l).sym->arity() > gene::k_args)
         {
           if (verbose)
-            std::cerr << "Function arity exceeds maximum size." << std::endl;
+            std::cerr << k_s_debug << "Function arity exceeds maximum size."
+                      << std::endl;
           return false;
         }
 
@@ -470,7 +475,8 @@ namespace vita
           if (genome_(l).args[j] >= size())
           {
             if (verbose)
-              std::cerr << "Argument is out of range." << std::endl;
+              std::cerr << k_s_debug << " Argument is out of range."
+                        << std::endl;
             return false;
           }
 
@@ -478,7 +484,8 @@ namespace vita
           if (genome_(l).args[j] <= i)
           {
             if (verbose)
-              std::cerr << "Self reference in locus " << l << '.' << std::endl;
+              std::cerr << k_s_debug << " Self reference in locus " << l << '.'
+                        << std::endl;
             return false;
           }
         }
@@ -488,7 +495,7 @@ namespace vita
       if (!genome_(genome_.rows() - 1, c).sym->terminal())
       {
         if (verbose)
-          std::cerr << "Last symbol of type " << c
+          std::cerr << k_s_debug << " Last symbol of type " << c
                     << " in the genome isn't a terminal." << std::endl;
         return false;
       }
@@ -502,9 +509,10 @@ namespace vita
         if (genome_(l).sym->category() != c)
         {
           if (verbose)
-            std::cerr << "Wrong category: " << l << genome_(l).sym->display()
-                      << " -> " << genome_(l).sym->category()
-                      << " should be " << c << std::endl;
+            std::cerr << k_s_debug << " Wrong category: " << l
+                      << genome_(l).sym->display() << " -> "
+                      << genome_(l).sym->category() << " should be " << c
+                      << std::endl;
           return false;
         }
       }
@@ -512,20 +520,24 @@ namespace vita
     if (best_[locus_index] >= size())
     {
       if (verbose)
-        std::cerr << "Incorrect index for first active symbol." << std::endl;
+        std::cerr << k_s_debug << " Incorrect index for first active symbol."
+                  << std::endl;
       return false;
     }
     if (best_[locus_category] >= categories)
     {
       if (verbose)
-        std::cerr << "Incorrect category for first active symbol." << std::endl;
+        std::cerr << k_s_debug
+                  << " Incorrect category for first active symbol."
+                  << std::endl;
       return false;
     }
 
     if (categories == 1 && eff_size() > size())
     {
       if (verbose)
-        std::cerr << "eff_size() cannot be greater than size() in single "\
+        std::cerr << k_s_debug
+                  << "eff_size() cannot be greater than size() in single " \
                      "category individuals." << std::endl;
       return false;
     }
@@ -749,6 +761,10 @@ namespace vita
   ///
   bool individual::load(std::istream &in)
   {
+    decltype(age) t_age;
+    if (!(in >> t_age))
+      return false;
+
     decltype(best_) best;
     if (!(in >> best[locus_index] >> best[locus_category]))
       return false;
@@ -789,6 +805,7 @@ namespace vita
     if (best[locus_index] >= genome.rows())
       return false;
 
+    age = t_age;
     best_ = best;
     genome_ = genome;
     signature_ = signature;
@@ -802,7 +819,8 @@ namespace vita
   ///
   bool individual::save(std::ostream &out) const
   {
-    out << best_[locus_index] << ' ' << best_[locus_category] << std::endl;
+    out << age << ' ' << best_[locus_index] << ' ' << best_[locus_category]
+        << std::endl;
 
     out << genome_.rows() << ' ' << genome_.cols() << std::endl;
     for (const gene &g : genome_)
@@ -870,6 +888,8 @@ namespace vita
           offspring.set(l, p2[l]);
         }
 */
+    offspring.age = std::max(p1.age, p2.age);
+
     assert(offspring.debug(true));
     return offspring;
   }
@@ -911,6 +931,8 @@ namespace vita
         const locus l{{i,c}};
         offspring.set(l, (*parents[!base])[l]);
       }
+
+    offspring.age = std::max(p1.age, p2.age);
 
     assert(offspring.debug());
     return offspring;
@@ -954,6 +976,8 @@ namespace vita
         const locus l{{i, c}};
         offspring.set(l, (*parents[!base])[l]);
       }
+
+    offspring.age = std::max(p1.age, p2.age);
 
     assert(offspring.debug());
     return offspring;

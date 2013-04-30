@@ -89,12 +89,12 @@ namespace vita
     ///     </attribute>
     ///
     /// is mapped to category:
-    /// \li {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+    /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
     ///
     /// while:
     ///     <attribute type="numeric" category="A" name="Speed" />
     /// is mapped to category:
-    /// \li  {"A", d_double, {}}
+    /// * {"A", d_double, {}}
     ///
     struct category
     {

@@ -186,7 +186,7 @@ namespace vita
       //  });
 
       d.slice(std::max(count, 10u));
-      prob_->get_evaluator()->clear();
+      prob_->get_evaluator()->clear(evaluator::all);
 
       // Selected training examples have their difficulties and ages reset.
       for (auto &i : d)
@@ -297,15 +297,17 @@ namespace vita
     // and population size, but our population size is smaller.
     if (!constrained.individuals)
     {
+      size_t n(0);
+
       if (dt)
       {
         env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
         if (env_.verbosity >= 2)
-          std::cout << k_s_info << " Population size set to "
-                    << env_.individuals << std::endl;
+          std::cout << k_s_info << " Population size set to " << n
+                    << std::endl;
       }
       else
-        env_.individuals = *dflt.individuals;
+        env_.individuals = dflt.individuals;
     }
 
     // Note that this setting, once set, will not be changed.
@@ -327,7 +329,7 @@ namespace vita
     }
 
     if (!constrained.tournament_size)
-      env_.tournament_size = *dflt.tournament_size;
+      env_.tournament_size = dflt.tournament_size;
 
     if (!constrained.mate_zone)
       env_.mate_zone = *dflt.mate_zone;
@@ -361,6 +363,27 @@ namespace vita
       return env_.a_threashold;
 
     return prob_->get_evaluator()->accuracy(ind);
+  }
+
+  ///
+  /// \param[in] validation is it a validation or training resume?
+  /// \param[in] fitness fitness reached in the current run.
+  /// \param[in] this_run_accuracy accuracy reached in the current run.
+  ///
+  void search::print_resume(bool validation, const fitness_t &fitness,
+                            double accuracy) const
+  {
+    if (env_.verbosity >= 2)
+    {
+      const std::string ds(validation ? " Validation" : " Training");
+
+      std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
+      if (env_.a_threashold >= 0.0)
+        std::cout << k_s_info << ds << " accuracy: " << 100.0 * accuracy
+                  << '%';
+
+      std::cout << std::endl << std::endl;
+    }
   }
 
   ///
@@ -398,6 +421,8 @@ namespace vita
 
     for (unsigned run(0); run < n; ++run)
     {
+      prob_->get_evaluator()->clear(evaluator::stats);
+
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
       summary s(evo.run(run));
 
@@ -443,17 +468,7 @@ namespace vita
         this_run_accuracy = accuracy(s.best->ind);
       }
 
-      if (env_.verbosity >= 2)
-      {
-        const std::string ds(validation ? " Validation" : " Training");
-
-        std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
-        if (env_.a_threashold >= 0.0)
-          std::cout << k_s_info << ds << " accuracy: "
-                    << 100.0 * this_run_accuracy << '%';
-
-        std::cout << std::endl << std::endl;
-      }
+      print_resume(validation, fitness, this_run_accuracy);
 
       if (run == 0 || fitness > overall_summary.best->fitness)
       {
@@ -486,7 +501,8 @@ namespace vita
         arl(s.best->ind, evo);
       }
 
-      assert(std::find(good_runs.begin(), good_runs.end(), best_run) !=
+      assert(good_runs.empty() ||
+             std::find(good_runs.begin(), good_runs.end(), best_run) !=
              good_runs.end());
       log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
     }

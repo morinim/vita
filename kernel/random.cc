@@ -3,7 +3,7 @@
  *  \file random.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012 EOS di Manlio Morini.
+ *  Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -15,20 +15,30 @@
 
 namespace vita
 {
-  // Magic!!!
-  random::base_gen random::rng_(28071973u);
-
   ///
   /// \param[in] s the seed for the random number generator.
   ///
   /// The seed is used to initalize the random number generator. With the same
   /// seed the numbers produced will be the same every time the program is
-  /// run. One common method to change this is to seed with the current time
-  /// (\c std::time(0) ).
+  /// run.
+  ///
+  /// \note
+  /// One common method to change this is to seed with the current time
+  /// (\c std::time(0)) but the preferred way in Vita is the random::randomize
+  /// method (based on \c std::random_device).
   ///
   void random::seed(unsigned s)
   {
-    rng_.seed(s);
+    engine().seed(s);
+  }
+
+  ///
+  /// Sets the shared engine to an unpredictable state.
+  ///
+  void random::randomize()
+  {
+    static std::random_device rd{};
+    seed(rd());
   }
 
   ///
@@ -44,19 +54,19 @@ namespace vita
   /// If \c base is greater than \c n we take a random starting position on the
   /// protractor.
   ///
-  index_t random::ring(index_t base, unsigned width, unsigned n)
+  size_t random::ring(size_t base, size_t width, size_t n)
   {
     assert(width);
     assert(n > 1);
 
     if (base >= n)
-      return random::between<unsigned>(0, n);
+      return random::between<size_t>(0, n);
 
     if (width > n)
       width = n;
 
-    const unsigned offset(n + base - width/2);
+    const auto offset(n + base - width/2);
 
-    return (offset + random::between<unsigned>(0, width)) % n;
+    return (offset + random::between<size_t>(0, width)) % n;
   }
 }  // Namespace vita

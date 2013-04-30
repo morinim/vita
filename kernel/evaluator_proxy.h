@@ -30,16 +30,20 @@ namespace vita
   public:
     evaluator_proxy(const evaluator::ptr &, unsigned);
 
-    virtual void clear();
-    virtual void clear(const individual &);
+    virtual void clear(unsigned) override;
+    virtual void clear(const individual &) override;
 
-    virtual fitness_t operator()(const individual &);
+    virtual fitness_t operator()(const individual &) override;
 
-    virtual double accuracy(const individual &) const;
+    virtual double accuracy(const individual &) const override;
 
-    virtual std::string info() const;
+    virtual std::string info() const override;
 
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+    virtual std::unique_ptr<lambda_f>
+    lambdify(const individual &) const override;
+
+    virtual unsigned seen(const individual &i) const override
+    { return cache_.seen(i); }
 
   private:
     /// Access to the real evaluator.

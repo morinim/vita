@@ -14,6 +14,7 @@
 #if !defined(EVOLUTION_SELECTION_H)
 #define      EVOLUTION_SELECTION_H
 
+#include <set>
 #include <vector>
 
 #include "vita.h"
@@ -40,9 +41,13 @@ namespace vita
     explicit selection_strategy(const evolution *const);
     virtual ~selection_strategy() {}
 
-    virtual std::vector<index_t> run() = 0;
+    virtual std::vector<size_t> run() = 0;
 
-  protected:
+  protected:  // Support methods.
+    size_t pickup() const;
+    size_t pickup(size_t) const;
+
+  protected:  // Data members.
     const evolution *const evo_;
   };
 
@@ -67,7 +72,23 @@ namespace vita
   public:
     explicit tournament_selection(const evolution *const);
 
-    virtual std::vector<index_t> run();
+    virtual std::vector<size_t> run() override;
+  };
+
+  ///
+  /// Pareto tournament selection as described in "Pursuing the Pareto
+  /// Paradigm" (Mark Kotanchek, Guido Smits, Ekaterina Vladislavleva).
+  ///
+  class pareto_tourney : public selection_strategy
+  {
+  public:
+    explicit pareto_tourney(const evolution *const);
+
+    virtual std::vector<size_t> run() override;
+
+  private:
+    void pareto(const std::vector<size_t> &, std::set<size_t> *,
+                std::set<size_t> *) const;
   };
 
   ///
@@ -78,7 +99,7 @@ namespace vita
   public:
     explicit random_selection(const evolution *const);
 
-    virtual std::vector<index_t> run();
+    virtual std::vector<size_t> run() override;
   };
 }  // namespace vita
 

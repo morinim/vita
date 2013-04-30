@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   {
     vita::individual i1(env, true);
 
-    vita::fitness_t f(i);
+    vita::fitness_t f({i});
     cache.insert(i1, f);
 
     cache.find(i1, &f);

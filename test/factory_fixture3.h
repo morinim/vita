@@ -66,8 +66,10 @@ struct F_FACTORY3
     env.insert(f_add);
     env.insert(f_div);
     env.insert(f_idiv);
+    env.insert(f_ife);
     env.insert(f_mul);
     env.insert(f_sub);
+
     env.code_length = 32;
   }
 

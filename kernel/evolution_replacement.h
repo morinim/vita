@@ -41,9 +41,8 @@ namespace vita
     explicit replacement_strategy(evolution *const);
     virtual ~replacement_strategy() {}
 
-    virtual void run(const std::vector<index_t> &,
-                     const std::vector<individual> &,
-                     summary *const) = 0;
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) = 0;
 
   protected:
     evolution *const evo_;
@@ -70,9 +69,8 @@ namespace vita
   public:
     explicit family_competition_rp(evolution *const);
 
-    virtual void run(const std::vector<index_t> &,
-                     const std::vector<individual> &,
-                     summary *const);
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) override;
   };
 
   ///
@@ -90,9 +88,8 @@ namespace vita
   public:
     explicit kill_tournament(evolution *const);
 
-    virtual void run(const std::vector<index_t> &,
-                     const std::vector<individual> &,
-                     summary *const);
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) override;
   };
 }  // namespace vita
 

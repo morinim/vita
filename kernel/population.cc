@@ -20,28 +20,38 @@ namespace vita
   ///
   /// \param[in] e base vita::environment.
   ///
-  /// Creates a random population.
+  /// Creates a random population (initial size \a e.individuals).
   ///
-  population::population(const environment &e) : env_(&e)
+  population::population(const environment &e)
   {
     assert(e.debug(true, true));
 
-    pop_.reserve(*e.individuals);
+    pop_.reserve(e.individuals);
     pop_.clear();
 
-    for (size_t i(0); i < *e.individuals; ++i)
+    for (size_t i(0); i < e.individuals; ++i)
       pop_.emplace_back(e, true);
 
-    assert(debug());
+    assert(debug(true));
   }
 
   ///
+  /// Increments the age of each individual in the population.
+  ///
+  void population::inc_age()
+  {
+    for (individual &i : pop_)
+      ++i.age;
+  }
+
+  ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool population::debug() const
+  bool population::debug(bool verbose) const
   {
-    for (size_t i(0); i < size(); ++i)
-      if (!pop_[i].debug())
+    for (const individual &i : pop_)
+      if (!i.debug(verbose))
         return false;
 
     return true;
@@ -57,15 +67,11 @@ namespace vita
   ///
   bool population::load(std::istream &in)
   {
-    population p(*env_);
-
     size_t n_elem(0);
     if (!(in >> n_elem))
       return false;
 
-    if (n_elem != *env_->individuals)
-      return false;
-
+    population p(env());
     for (size_t i(0); i < n_elem; ++i)
       if (!p[i].load(in))
         return false;
@@ -80,9 +86,9 @@ namespace vita
   ///
   bool population::save(std::ostream &out) const
   {
-    out << pop_.size() << std::endl;
+    out << individuals() << std::endl;
 
-    for (const individual &i : pop_)
+    for (const individual &i : *this)
       i.save(out);
 
     return out.good();
@@ -95,8 +101,8 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &s, const population &pop)
   {
-    for (size_t i(0); i < pop.size(); ++i)
-      s << pop[i] << std::endl;
+    for (const individual &i : pop)
+      s << i << std::endl;
 
     return s;
   }

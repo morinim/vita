@@ -52,7 +52,7 @@ namespace vita
                                  s.gen > *pop_.env().g_since_start;
                         };
 
-    assert(debug());
+    assert(debug(true));
   }
 
   ///
@@ -64,7 +64,7 @@ namespace vita
   {
     double speed(0.0);
     if (stats_.gen && elapsed_milli > 0)
-      speed = 1000.0 * (pop_.size() * stats_.gen) / elapsed_milli;
+      speed = 1000.0 * (pop_.individuals() * stats_.gen) / elapsed_milli;
 
     return speed;
   }
@@ -75,8 +75,9 @@ namespace vita
   analyzer evolution::get_stats() const
   {
     analyzer az;
-    for (unsigned i(0); i < pop_.size(); ++i)
-      az.add(pop_[i], fitness(pop_[i]));
+
+    for (const auto &i : pop_)
+      az.add(i, fitness(i));
 
     return az;
   }
@@ -159,9 +160,11 @@ namespace vita
         for (const auto &f : stats_.az.fit_dist().freq)
         {
           // f.first: value, f.second: frequency
-          pop << stats_.gen << ' ' << f.first << ' '
-              << std::setprecision(std::numeric_limits<fitness_t>::digits10 + 2)
-              << f.second << std::endl;
+          pop << run_count << ' ' << stats_.gen << ' '
+              << std::fixed << std::scientific
+              << std::setprecision(
+                   std::numeric_limits<fitness_t::base_t>::digits10 + 2)
+              << f.first[0] << ' ' << f.second << std::endl;
         }
       }
     }
@@ -189,6 +192,30 @@ namespace vita
   }
 
   ///
+  /// \param[in] k current generation.
+  /// \param[in] run_count total number of runs planned.
+  /// \param[in] resume if \c true print the end-of-generation report.
+  ///
+  /// Print evolution informations (if environment::verbosity > 0).
+  ///
+  void evolution::print_progress(unsigned k, unsigned run_count,
+                                 bool resume) const
+  {
+    if (env().verbosity >= 1)
+    {
+      const unsigned perc(100 * k / pop_.individuals());
+      if (resume)
+        std::cout << "Run " << run_count << '.' << std::setw(6)
+                  << stats_.gen << " (" << std::setw(3)
+                  << perc << "%): fitness " << stats_.best->fitness
+                  << std::endl;
+      else
+        std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
+                  << std::setw(3) << perc << "%)\r" << std::flush;
+    }
+  }
+
+  ///
   /// \param[in] run_count run number (used for print and log).
   ///
   /// The genetic programming loop:
@@ -205,8 +232,6 @@ namespace vita
   {
     stats_.clear();
     stats_.best = {pop_[0], fitness(pop_[0])};
-
-    eva_->clear();
 
     timer measure;
 
@@ -225,16 +250,13 @@ namespace vita
       stats_.az = get_stats();
       log(run_count);
 
-      for (unsigned k(0); k < pop_.size(); ++k)
+      for (unsigned k(0); k < pop_.individuals(); ++k)
       {
-        if (env().verbosity >= 1 &&
-            k % std::max(pop_.size()/100, static_cast<size_t>(2)))
-          std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
-                    << std::setw(3) << 100 * k / pop_.size() << "%)\r"
-                    << std::flush;
+        if (k % std::max<size_t>(pop_.individuals() / 100, 2))
+          print_progress(k, run_count, false);
 
         // --------- SELECTION ---------
-        std::vector<index_t> parents(selection->run());
+        std::vector<size_t> parents(selection->run());
 
         // --------- CROSSOVER / MUTATION ---------
         std::vector<individual> off(operation->run(parents));
@@ -243,14 +265,13 @@ namespace vita
         const fitness_t before(stats_.best->fitness);
         replacement->run(parents, off, &stats_);
 
-        if (env().verbosity >= 1 && stats_.best->fitness != before)
-          std::cout << "Run " << run_count << '.' << std::setw(6)
-                    << stats_.gen << " (" << std::setw(3)
-                    << 100 * k / pop_.size() << "%): fitness "
-                    << stats_.best->fitness << std::endl;
+        if (stats_.best->fitness != before)
+          print_progress(k, run_count, true);
       }
 
       stats_.speed = get_speed(measure.elapsed());
+
+      pop_.inc_age();
     }
 
     if (env().verbosity >= 2)
@@ -267,7 +288,7 @@ namespace vita
       }
       else  // speed < 0.1
       {
-        speed *= 3600.0*24.0;
+        speed *= 3600.0 * 24.0;
         unit = "cycles/day";
       }
 
@@ -279,11 +300,32 @@ namespace vita
   }
 
   ///
-  /// \return true if the object passes the internal consistency check.
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
+  /// \return true if object passes the internal consistency check.
   ///
-  bool evolution::debug() const
+  bool evolution::debug(bool verbose) const
   {
-    return pop_.debug() && eva_ && stop_condition_;
+    if (!pop_.debug(verbose))
+      return false;
+
+    if (!eva_)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Empty evaluator pointer." << std::endl;
+
+      return false;
+    }
+
+    if (!stop_condition_)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Empty stop_condition pointer."
+                  << std::endl;
+
+      return false;
+    }
+
+    return true;
   }
 
   ///

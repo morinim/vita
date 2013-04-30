@@ -28,14 +28,14 @@ namespace vita
   ///
   void analyzer::clear()
   {
+    age_.clear();
+    fit_.clear();
     length_.clear();
 
-    fit_.clear();
+    functions_ = stat_sym_counter();
+    terminals_ = stat_sym_counter();
 
-    functions_ = stats();
-    terminals_ = stats();
-
-    info_.clear();
+    sym_counter_.clear();
   }
 
   ///
@@ -44,7 +44,7 @@ namespace vita
   ///
   analyzer::const_iterator analyzer::begin() const
   {
-    return info_.begin();
+    return sym_counter_.begin();
   }
 
   ///
@@ -52,7 +52,7 @@ namespace vita
   ///
   analyzer::const_iterator analyzer::end() const
   {
-    return info_.end();
+    return sym_counter_.end();
   }
 
   ///
@@ -71,6 +71,16 @@ namespace vita
   std::uintmax_t analyzer::terminals(bool eff) const
   {
     return terminals_.counter[eff];
+  }
+
+  ///
+  /// \return statistics about the age distribution of the individuals.
+  ///
+  const distribution<double> &analyzer::age_dist() const
+  {
+    assert(age_.debug());
+
+    return age_;
   }
 
   ///
@@ -97,7 +107,7 @@ namespace vita
   /// \param[in] ind individual to be analyzed.
   /// \return effective length of individual we gathered statistics about.
   ///
-  unsigned analyzer::count(const individual &ind)
+  size_t analyzer::count(const individual &ind)
   {
     for (index_t i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
@@ -106,7 +116,7 @@ namespace vita
         count(ind[l].sym.get(), false);
       }
 
-    unsigned length(0);
+    size_t length(0);
     for (individual::const_iterator it(ind); it(); ++it)
     {
       count(it->sym.get(), true);
@@ -126,7 +136,7 @@ namespace vita
   {
     assert(sym);
 
-    ++info_[sym].counter[active];
+    ++sym_counter_[sym].counter[active];
 
     if (sym->terminal())
       ++terminals_.counter[active];
@@ -142,6 +152,8 @@ namespace vita
   ///
   void analyzer::add(const individual &ind, const fitness_t &f)
   {
+    age_.add(ind.age);
+
     length_.add(count(ind));
 
     if (f.isfinite())
@@ -153,10 +165,16 @@ namespace vita
   ///
   bool analyzer::debug() const
   {
-    for (const_iterator i(begin()); i != end(); ++i)
-      if (i->second.counter[true] > i->second.counter[false])
+    for (const auto &i : sym_counter_)
+      if (i.second.counter[true] > i.second.counter[false])
         return false;
 
-    return fit_.debug() && length_.debug();
+    if (!age_.debug())
+      return false;
+
+    if (!fit_.debug())
+      return false;
+
+    return length_.debug();
   }
 }  // namespace vita

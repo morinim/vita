@@ -23,54 +23,64 @@
 namespace vita
 {
   ///
-  /// A group of individual which may interact together (for example by mating)
-  /// producing offspring. Typical population size in GP range from ten to
-  /// many thousands.
+  /// \brief A group of individual which may interact together (for example by
+  ///        mating) producing offspring.
+  ///
+  /// Typical population size in GP ranges from ten to many thousands.
   ///
   class population
   {
   public:
+    typedef std::vector<individual>::const_iterator const_iterator;
+
     explicit population(const environment &);
 
     individual &operator[](size_t);
     const individual &operator[](size_t) const;
-    size_t size() const;
+
+    const_iterator begin() const;
+    const_iterator end() const;
+
+    size_t individuals() const;
+
+    void inc_age();
 
     const environment &env() const;
 
-    bool debug() const;
+    bool debug(bool) const;
 
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
+  private:  // Private support methods.
+    void clear(const environment &, size_t);
+
   private:  // Private data members.
     std::vector<individual> pop_;
-
-    const environment *env_;
   };
 
   std::ostream &operator<<(std::ostream &, const population &);
 
   ///
-  /// \param[in] i index of an \a individual (in the [0,population size[ range).
+  /// \param[in] i index of an \a individual.
   /// \return a reference to the \a individual at index \a i.
   ///
   inline
   individual &population::operator[](size_t i)
   {
-    assert(i < pop_.size());
+    assert(i < individuals());
     return pop_[i];
   }
 
   ///
-  /// \param[in] i index of an individual (int the [0,population size[ range).
+  /// \param[in] i index of an individual.
   /// \return a constant reference to the individual at index \a i.
   ///
   inline
   const individual &population::operator[](size_t i) const
   {
-    assert(i < pop_.size());
+    assert(i < individuals());
     return pop_[i];
   }
 
@@ -78,7 +88,7 @@ namespace vita
   /// \return the number of individuals in the population.
   ///
   inline
-  size_t population::size() const
+  size_t population::individuals() const
   {
     return pop_.size();
   }
@@ -90,6 +100,18 @@ namespace vita
   const environment &population::env() const
   {
     return pop_[0].env();
+  }
+
+  inline
+  population::const_iterator population::begin() const
+  {
+    return pop_.begin();
+  }
+
+  inline
+  population::const_iterator population::end() const
+  {
+    return pop_.end();
   }
 
   ///

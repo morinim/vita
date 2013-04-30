@@ -35,7 +35,6 @@
 #define      VITA_H
 
 #include <cassert>
-#include <climits>
 #include <cstdint>
 #include <memory>
 
@@ -99,6 +98,7 @@ namespace vita
   const char k_s_info[] = "[INFO]";
   /// \brief Prefix for warning messages.
   const char k_s_warning[] = "[WARNING]";
+
 }  // namespace vita
 
 /// \page page1 VITA Architecture

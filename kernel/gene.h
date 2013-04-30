@@ -44,8 +44,8 @@ namespace vita
     symbol::ptr        sym;
     union
     {
-      int              par;
-      index_t args[k_args];
+      int                    par;
+      std::uint16_t args[k_args];
     };
   };
 }  // namespace vita

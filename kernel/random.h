@@ -3,7 +3,7 @@
  *  \file random.h
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -15,8 +15,8 @@
 #define      RANDOM_H
 
 #include <cstdlib>
-
-#include <boost/random.hpp>
+#include <random>
+#include <set>
 
 #include "vita.h"
 
@@ -25,27 +25,45 @@ namespace vita
   class random
   {
   public:
+    // This engine produces integers in the range [0, 2^32-1] with a good
+    // uniform distribution in up to 623 dimensions.
+    typedef std::mt19937 engine_t;
+
     template<class T> static T between(T, T);
     template<class T> static const T &element(const std::vector<T> &);
+    template<class T> static const T &element(const std::set<T> &);
 
-    static index_t ring(index_t, unsigned, unsigned);
+    static size_t ring(size_t, size_t, size_t);
 
     static bool boolean(double);
     static bool boolean();
 
     static void seed(unsigned);
+    void randomize();
 
   private:
-    // This generator produces integers in the range [0, 2^32-1] with a good
-    // uniform distribution in up to 623 dimensions.
-    typedef boost::mt19937 base_gen;
+    static engine_t &engine();
+  };
 
+  ///
+  /// \return a reference to a single engine shared whereever needed.
+  ///
+  /// This function grants access to a shared engine.
+  ///
+  /// \note
+  /// \c engine() must be enhanced with appropriate synchronization if the
+  /// engine is to be shared among multiple threads.
+  ///
+  inline random::engine_t &random::engine()
+  {
     // We are using a *global* generator object here. This is important because
     // we don't want to create a new pseudo-random number generator at every
     // call.
     // The numbers produced will be the same every time the program is run.
-    static base_gen rng_;
-  };
+    static engine_t e{28071973u};  // Magic!!!
+
+    return e;
+  }
 
   ///
   /// \param[in] min minimum random number.
@@ -56,13 +74,21 @@ namespace vita
   /// template function. The main difference is that here we use
   /// \c uniform_real<> distribution instead of \c uniform_int<>.
   ///
+  /// \see <http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3551.pdf>
+  /// for further details.
+  ///
   template<>
   inline
   double random::between(double min, double sup)
   {
     assert(min < sup);
 
-    return boost::uniform_real<>(min, sup)(rng_);
+    static std::uniform_real_distribution<> d{};
+
+    using parm_t = decltype(d)::param_type;
+    return d(engine(), parm_t{min, sup});
+
+    //return boost::uniform_real<>(min, sup)(engine());
   }
 
   ///
@@ -72,9 +98,11 @@ namespace vita
   ///
   /// Picks up a random integer value uniformly distributed in the set of
   /// integers {min, min+1, ..., sup-1}.
-  /// Please note that contrary to boost usage this function does not take a
-  /// closed range. Instead it takes a half-open range (C++ usage and same
-  /// behaviour of the real number distribution).
+  ///
+  /// \note
+  /// Contrary to boost usage this function does not take a closed range.
+  /// Instead it takes a half-open range (C++ usage and same behaviour of the
+  /// real number distribution).
   ///
   template<class T>
   inline
@@ -82,7 +110,11 @@ namespace vita
   {
     assert(min < sup);
 
-    return boost::uniform_int<>(min, sup-1)(rng_);
+    static std::uniform_int_distribution<> d{};
+    using parm_t = decltype(d)::param_type;
+
+    return d(engine(), parm_t(min, sup - 1));
+    //return boost::uniform_int<>(min, sup - 1)(engine());
   }
 
   ///
@@ -94,7 +126,23 @@ namespace vita
   const T &random::element(const std::vector<T> &vect)
   {
     assert(vect.size());
-    return vect[between<unsigned>(0, vect.size())];
+    return vect[between<size_t>(0, vect.size())];
+  }
+
+  ///
+  /// \param[in] s a set.
+  /// \return a random element of the set \a s.
+  ///
+  template<class T>
+  inline
+  const T &random::element(const std::set<T> &s)
+  {
+    assert(s.size());
+
+    auto it(s.cbegin());
+    std::advance(it, between<size_t>(0, s.size()));
+
+    return *it;
   }
 
   ///
@@ -107,7 +155,7 @@ namespace vita
     assert(0.0 <= p && p <= 1.0);
 
     return random::between<double>(0, 1) < p;
-    //return boost::uniform_01<double>()(rng_) < p;
+    //return boost::uniform_01<double>()(engine()) < p;
   }
 
   ///
@@ -117,7 +165,7 @@ namespace vita
   bool random::boolean()
   {
     return random::between<unsigned>(0, 2) != 0;
-    //return boost::uniform_smallint<unsigned>(0,1)(rng_) != 0;
+    //return boost::uniform_smallint<unsigned>(0, 1)(engine()) != 0;
   }
 }  // namespace vita
 

@@ -24,13 +24,19 @@
 
 namespace vita
 {
-  struct stats
+  struct stat_sym_counter
   {
-    stats() : counter{0, 0} {}
+    stat_sym_counter() : counter{0, 0} {}
 
     /// Typical use: \c counter[active] or \c counter[!active] (where \c active
     /// is a boolean).
     std::uintmax_t counter[2];
+  };
+
+  struct stat_layer
+  {
+    distribution<double> age;
+    distribution<fitness_t> fitness;
   };
 
   ///
@@ -51,7 +57,8 @@ namespace vita
   public:
     /// Type returned by \c begin() and \c end() methods to iterate through the
     /// statistics of the various symbols.
-    typedef std::map<const symbol *, stats>::const_iterator const_iterator;
+    typedef std::map<const symbol *, stat_sym_counter>::const_iterator
+    const_iterator;
 
     const_iterator begin() const;
     const_iterator end() const;
@@ -65,22 +72,25 @@ namespace vita
     std::uintmax_t functions(bool) const;
     std::uintmax_t terminals(bool) const;
 
+    const distribution<double> &age_dist() const;
     const distribution<fitness_t> &fit_dist() const;
     const distribution<double> &length_dist() const;
 
     bool debug() const;
 
-  private:
-    unsigned count(const individual &);
+  private:  // Private support methods.
+    size_t count(const individual &);
     void count(const symbol *const, bool);
 
-    std::map<const symbol *, stats> info_;
+  private:  // Private data members.
+    std::map<const symbol *, stat_sym_counter> sym_counter_;
 
     distribution<fitness_t> fit_;
+    distribution<double> age_;
     distribution<double> length_;
 
-    stats functions_;
-    stats terminals_;
+    stat_sym_counter functions_;
+    stat_sym_counter terminals_;
   };
 }  // namespace vita
 

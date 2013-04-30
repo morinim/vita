@@ -58,8 +58,7 @@ namespace vita
 
     individual generalize(size_t, std::vector<locus> *const) const;
 
-    bool operator==(const individual &) const;
-    bool operator!=(const individual &x) const { return !(*this == x); }
+    bool operator==(const individual &x) const;
     size_t distance(const individual &) const;
 
     hash_t signature() const;
@@ -114,6 +113,18 @@ namespace vita
     // pointers, functors or anonymous (lambda) functions.
     static std::function<individual (const individual &, const individual &)>
       crossover;
+
+    /// This is a measure of how long an individual's family of genotypic
+    /// material has been in the population. Randomly generated individuals,
+    /// such as those that are created when the search algorithm are started,
+    /// start with an age of 0. Each generation that an individual stays in the
+    /// population (such as through elitism) its age is increased by one.
+    /// Individuals that are created through mutation or recombination take the
+    /// age of their oldest parent and add one to it. This differs from
+    /// conventional measures of age, in which individuals created through
+    /// applying some type of variation to an existing individual (e.g.
+    /// mutation or recombination) start with an age of 1.
+    unsigned age;
 
   private:  // Private support functions.
     template<class T = std::uint8_t> hash_t hash() const;

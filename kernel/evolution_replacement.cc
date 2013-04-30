@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/optional.hpp>
+
 #include "evolution_replacement.h"
 #include "environment.h"
 #include "evolution.h"
@@ -36,11 +38,11 @@ namespace vita
   /// * elitism is \c true => child replaces a member of the population only if
   ///   child is better.
   ///
-  void family_competition_rp::run(const std::vector<index_t> &parent,
+  void family_competition_rp::run(const std::vector<size_t> &parent,
                                   const std::vector<individual> &offspring,
                                   summary *const s)
   {
-    population &pop = evo_->population();
+    population &pop(evo_->population());
     assert(!boost::indeterminate(pop.env().elitism));
 
     const fitness_t fit_off(evo_->fitness(offspring[0]));
@@ -88,6 +90,10 @@ namespace vita
     }
   }
 
+  ///
+  /// \param[in] evo pointer to the evolution object that is using the
+  ///                kill_tournament.
+  ///
   kill_tournament::kill_tournament(evolution *const evo)
     : replacement_strategy(evo)
   {
@@ -105,18 +111,18 @@ namespace vita
   /// * elitism is \c true => child replaces a member of the population only if
   ///   child is better.
   ///
-  void kill_tournament::run(const std::vector<index_t> &parent,
+  void kill_tournament::run(const std::vector<size_t> &parent,
                             const std::vector<individual> &offspring,
                             summary *const s)
   {
-    population &pop = evo_->population();
+    population &pop(evo_->population());
 
     const fitness_t fit_off(evo_->fitness(offspring[0]));
 
     // In old versions of Vita, the individual to be replaced was chosen with
     // an ad-hoc kill tournament. Something like:
     //
-    //   const index_t rep_idx(kill_tournament(parent[0]));
+    //   const size_t rep_idx(kill_tournament(parent[0]));
     //
     // Now we perform just one tournament for choosing the parents; the
     // individual to be replaced is selected among the worst individuals of
@@ -125,7 +131,7 @@ namespace vita
     // is greater than 2 we perform a traditional selection / replacement
     // scheme; if it is smaller we perform a family competition replacement
     // (aka deterministic / probabilistic crowding).
-    const index_t rep_idx(parent.back());
+    const size_t rep_idx(parent.back());
     const fitness_t f_rep_idx(evo_->fitness(pop[rep_idx]));
     const bool replace(f_rep_idx < fit_off);
 

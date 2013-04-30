@@ -14,6 +14,8 @@
 #if !defined(SEARCH_H)
 #define      SEARCH_H
 
+#include <list>
+
 #include "environment.h"
 
 namespace vita
@@ -39,11 +41,12 @@ namespace vita
 
     bool debug(bool) const;
 
-  private:
+  private:  // Private support methods.
     double accuracy(const individual &) const;
     void dss(unsigned) const;
     void log(const summary &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, double, unsigned);
+    void print_resume(bool, const fitness_t &, double) const;
     bool stop_condition(const summary &) const;
 
   private:  // Private data members.

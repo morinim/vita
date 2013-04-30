@@ -14,7 +14,6 @@
 #if !defined(SRC_PROBLEM_H)
 #define      SRC_PROBLEM_H
 
-#include <cmath>
 #include <list>
 #include <string>
 #include <vector>
