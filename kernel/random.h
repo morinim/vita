@@ -16,6 +16,7 @@
 
 #include <cstdlib>
 #include <random>
+#include <set>
 
 #include "vita.h"
 
@@ -30,6 +31,7 @@ namespace vita
 
     template<class T> static T between(T, T);
     template<class T> static const T &element(const std::vector<T> &);
+    template<class T> static const T &element(const std::set<T> &);
 
     static size_t ring(size_t, size_t, size_t);
 
@@ -125,6 +127,22 @@ namespace vita
   {
     assert(vect.size());
     return vect[between<size_t>(0, vect.size())];
+  }
+
+  ///
+  /// \param[in] s a set.
+  /// \return a random element of the set \a s.
+  ///
+  template<class T>
+  inline
+  const T &random::element(const std::set<T> &s)
+  {
+    assert(s.size());
+
+    auto it(s.cbegin());
+    std::advance(it, between<size_t>(0, s.size()));
+
+    return *it;
   }
 
   ///
