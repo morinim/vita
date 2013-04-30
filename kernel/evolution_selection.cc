@@ -138,6 +138,14 @@ namespace vita
   {
   }
 
+  ///
+  /// \return a vector of indexes of individuals partially ordered with the
+  ///         pareto-dominance criterion.
+  ///
+  /// Parameters from the environment:
+  /// * tournament_size - to control selection pressure (the number of randomly
+  ///   selected individuals for dominance evaluation).
+  ///
   std::vector<size_t> pareto_tourney::run()
   {
     const population &pop(evo_->population());
@@ -162,6 +170,11 @@ namespace vita
     return ret;
   }
 
+  ///
+  /// \param[in] pool indexes of individuals in the population.
+  /// \param[out] front the set of nondominated individuals of \a pool.
+  /// \param[out] dominated the set of dominated individuals of \a pool.
+  ///
   void pareto_tourney::pareto(const std::vector<size_t> &pool,
                               std::set<size_t> *front,
                               std::set<size_t> *dominated) const
