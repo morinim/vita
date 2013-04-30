@@ -51,9 +51,24 @@ namespace vita
     else  // hash collision checking code can slow down the program very much
     {
       const fitness_t f1((*eva_)(ind));
-      if (f != f1)
+      if (f[0] != f1[0])
         std::cerr << "********* COLLISION ********* [" << f
                   << " != " << f1 << "]" << std::endl;
+
+      // In the above comparison we consider only the first component of the
+      // fitness otherwise we can have false positives.
+      // For example if the fitness is a 2D vector (where the first component
+      // is the "score" on the training set and the second one is the effective
+      // length of the individual), then the following two individuals:
+      //
+      // INDIVIDUAL A              INDIVIDUAL B
+      // ------------------        ------------------
+      // [000] FADD 001 002        [000] FADD 001 001
+      // [001] X1                  [001] X1
+      // [002] X1
+      //
+      // have the same signature, the same stored "score" but distinct
+      // effective size and so distinct fitnesses.
     }
 #endif
 
