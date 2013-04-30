@@ -43,11 +43,11 @@ namespace vita
 
       ++count;
 
+      update_variance(val);
+
       for (size_t i(0); i < val.size(); ++i)
         val[i] = round_to(val[i]);
       ++freq[val];
-
-      update_variance(val);
     }
   }
 
@@ -57,17 +57,36 @@ namespace vita
     return variance.sqrt();
   }
 
+  ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
+  /// \return \c true if the object passes the internal consistency check.
+  ///
   template<>
-  bool distribution<fitness_t>::debug() const
+  bool distribution<fitness_t>::debug(bool verbose) const
   {
     if (min.isfinite() && mean.isfinite() && min > mean)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
+                  << mean << "." << std::endl;
       return false;
+    }
 
     if (max.isfinite() && mean.isfinite() && max < mean)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
+                  << mean << "." << std::endl;
       return false;
+    }
 
     if (variance.isnan() || variance < fitness_t(variance.size(), 0.0))
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: negative variance."
+                  << std::endl;
       return false;
+    }
 
     return true;
   }

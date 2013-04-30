@@ -78,7 +78,7 @@ namespace vita
   ///
   const distribution<double> &analyzer::age_dist() const
   {
-    assert(age_.debug());
+    assert(age_.debug(true));
 
     return age_;
   }
@@ -88,7 +88,7 @@ namespace vita
   ///
   const distribution<fitness_t> &analyzer::fit_dist() const
   {
-    assert(fit_.debug());
+    assert(fit_.debug(true));
 
     return fit_;
   }
@@ -98,7 +98,7 @@ namespace vita
   ///
   const distribution<double> &analyzer::length_dist() const
   {
-    assert(length_.debug());
+    assert(length_.debug(true));
 
     return length_;
   }
@@ -169,12 +169,12 @@ namespace vita
       if (i.second.counter[true] > i.second.counter[false])
         return false;
 
-    if (!age_.debug())
+    if (!age_.debug(true))
       return false;
 
-    if (!fit_.debug())
+    if (!fit_.debug(true))
       return false;
 
-    return length_.debug();
+    return length_.debug(true);
   }
 }  // namespace vita
