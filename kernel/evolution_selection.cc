@@ -133,6 +133,77 @@ namespace vita
     return ret;
   }
 
+  pareto_tourney::pareto_tourney(const evolution *const evo)
+    : selection_strategy(evo)
+  {
+  }
+
+  std::vector<size_t> pareto_tourney::run()
+  {
+    const population &pop(evo_->population());
+    const auto rounds(pop.env().tournament_size);
+
+    std::vector<size_t> pool(rounds);
+    for (unsigned i(0); i < rounds; ++i)
+      pool.push_back(pickup());
+
+    assert(pool.size());
+
+    std::set<size_t> front, dominated;
+    pareto(pool, &front, &dominated);
+
+    assert(front.size());
+
+    std::vector<size_t> ret{random::element(front), random::element(front)};
+
+    if (dominated.size())
+      ret.push_back(random::element(dominated));
+
+    return ret;
+  }
+
+  void pareto_tourney::pareto(const std::vector<size_t> &pool,
+                              std::set<size_t> *front,
+                              std::set<size_t> *dominated) const
+  {
+    const population &pop(evo_->population());
+
+    for (const auto &ind : pool)
+    {
+      if (front->find(ind) != front->end() ||
+          dominated->find(ind) != dominated->end())
+        continue;
+
+      const fitness_t ind_fit(evo_->fitness(pop[ind]));
+
+      bool ind_dominated(false);
+      for (auto f(front->cbegin()); f != front->cend() && !ind_dominated;)
+        // no increment in the for loop
+      {
+        const fitness_t f_fit(evo_->fitness(pop[*f]));
+
+        if (!ind_dominated && ind_fit.dominating(f_fit))
+        {
+          dominated->insert(*f);
+          f = front->erase(f);
+        }
+        else
+        {
+          if (f_fit.dominating(ind_fit))
+          {
+            ind_dominated = true;
+            dominated->insert(ind);
+          }
+
+          ++f;
+        }
+      }
+
+      if (!ind_dominated)
+        front->insert(ind);
+    }
+  }
+
   random_selection::random_selection(const evolution *const evo)
     : selection_strategy(evo)
   {
