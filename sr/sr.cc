@@ -31,7 +31,7 @@ namespace po = boost::program_options;
 #include "command_line_interpreter.h"
 
 const std::string vita_sr_version1(
-  "Vita - Symbolic Regression and classification v0.9.5"
+  "Vita - Symbolic Regression and classification v0.9.6"
 );
 const std::string vita_sr_version2(
   "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
