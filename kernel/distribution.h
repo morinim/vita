@@ -101,7 +101,7 @@ namespace vita
   template<class T>
   void distribution<T>::add(T val)
   {
-    if (!isnan(val))
+    if (!std::isnan(val))
     {
       if (!count)
         min = max = val;
