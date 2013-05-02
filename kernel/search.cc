@@ -479,7 +479,7 @@ namespace vita
 
       // We use accuracy or fitness (or both) to identify successful runs.
       const bool solution_found(
-        fitness.dominating(env_.f_threashold) &&
+        (env_.f_threashold.empty() || fitness.dominating(env_.f_threashold)) &&
         this_run_accuracy >= env_.a_threashold);
 
       if (solution_found)
