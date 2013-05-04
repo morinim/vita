@@ -72,6 +72,11 @@ namespace vita
     }
 #endif
 
+    const double hits(cache_.hits());
+    const double perc(double(cache_.seen(ind)) / hits);
+    if (0.01 < perc && perc < 1.0 && hits > 100.0)
+      f[0] *= 1.0 + perc;
+
     return f;
   }
 

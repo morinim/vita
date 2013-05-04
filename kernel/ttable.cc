@@ -85,8 +85,7 @@ namespace vita
   ///
   void ttable::clear()
   {
-    probes_ = 0;
-    hits_   = 0;
+    probes_ = hits_ = 0;
 
     ++seal_;
 
