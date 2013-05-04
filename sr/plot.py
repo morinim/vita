@@ -134,9 +134,9 @@ def plot5(pipe, args):
     pipe.write(b"set yrange [0:*]\n")
     pipe.write(b"set xlabel 'FITNESS'\n")
     pipe.write(b"set ylabel 'GENERATION'\n")
-    pipe.write(b"set zlabel 'FREQ.'\n")
+    pipe.write(b"set zlabel 'NR.'\n")
 
-    pipe.write(b"set dgrid3d\n")
+    pipe.write(b"set dgrid3d exp\n")
     #pipe.write(b"set dgrid3d exp\n")
     #pipe.write(b"set dgrid3d cauchy\n")
     pipe.write(b"set hidden3d\n")
