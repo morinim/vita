@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   vita::fitness_t empty;
   vita::fitness_t fitness2d(2), fitness3d(3), fitness4d(4);
-  vita::fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0};
+  vita::fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0}, f3{2.0, 0.0, 0.0};
 
   BOOST_CHECK(empty.empty());
   BOOST_CHECK_EQUAL(empty.size(), 0);
@@ -55,22 +55,24 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK_EQUAL(empty, empty);
   BOOST_CHECK_EQUAL(fitness2d, fitness2d);
 
-  BOOST_CHECK(f1.dominating(empty));
+  BOOST_CHECK(!f1.dominating(empty));
   BOOST_CHECK(f1.dominating(fitness2d));
   BOOST_CHECK(f1.dominating(fitness3d));
-  BOOST_CHECK(!f1.dominating(fitness4d));
+  BOOST_CHECK(f1.dominating(fitness4d));
   BOOST_CHECK(!empty.dominating(f1));
   BOOST_CHECK(!fitness2d.dominating(f1));
   BOOST_CHECK(!fitness3d.dominating(f1));
   BOOST_CHECK(!fitness4d.dominating(f1));
-  BOOST_CHECK(fitness3d.dominating(fitness2d));
-  BOOST_CHECK(fitness4d.dominating(fitness3d));
+  BOOST_CHECK(!fitness3d.dominating(fitness2d));
+  BOOST_CHECK(!fitness4d.dominating(fitness3d));
   BOOST_CHECK(!fitness2d.dominating(fitness3d));
   BOOST_CHECK(!fitness3d.dominating(fitness4d));
   BOOST_CHECK(!f1.dominating(f2));
   BOOST_CHECK(!f2.dominating(f1));
-  BOOST_CHECK(f1.dominating(f1));
-  BOOST_CHECK(empty.dominating(empty));
+  BOOST_CHECK(!f1.dominating(f1));
+  BOOST_CHECK(f1.dominating(f3));
+  BOOST_CHECK(f2.dominating(f3));
+  BOOST_CHECK(!empty.dominating(empty));
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
@@ -98,10 +100,11 @@ BOOST_AUTO_TEST_CASE(Operators)
   x += x;
   BOOST_CHECK_EQUAL(x, f2);
 
-  x = x / 2.0;
-  BOOST_CHECK_EQUAL(x, f1);
+  BOOST_CHECK_EQUAL(x / 2.0, f1);
 
-  x = x * vita::fitness_t{2.0, 2.0, 2.0};
+  BOOST_CHECK_EQUAL(f1 * 2.0, f2);
+
+  x = f1 * vita::fitness_t{2.0, 2.0, 2.0};
   BOOST_CHECK_EQUAL(x, f2);
 
   x += vita::fitness_t{0.0, 0.0, 0.0};
@@ -116,6 +119,10 @@ BOOST_AUTO_TEST_CASE(Operators)
   x = x * x;
   x = x.sqrt();
   BOOST_CHECK_EQUAL(x, f1);
+
+  x = x * -1.0;
+  x = x.abs();
+  BOOST_CHECK_EQUAL(f1, x);
 
   BOOST_CHECK(x.isfinite());
   BOOST_CHECK(!inf.isfinite());
