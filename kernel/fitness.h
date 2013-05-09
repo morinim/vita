@@ -132,11 +132,15 @@ namespace vita
     bool isnan() const;
     bool issmall() const;
 
-    fitness_t operator+=(const fitness_t &);
+    fitness_t &operator+=(const fitness_t &);
+    fitness_t &operator-=(const fitness_t &);
     fitness_t operator-(const fitness_t &) const;
     fitness_t operator*(const fitness_t &) const;
-    fitness_t operator/(fitness_t::base_t) const;
 
+    fitness_t operator/(fitness_t::base_t) const;
+    fitness_t operator*(fitness_t::base_t) const;
+
+    fitness_t abs() const;
     fitness_t sqrt() const;
 
   public:   // Serialization.

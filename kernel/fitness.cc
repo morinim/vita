@@ -83,12 +83,26 @@ namespace vita
   /// \param[in] f a fitness.
   /// \return the sum of \a this and \a f.
   ///
-  fitness_t fitness_t::operator+=(const fitness_t &f)
+  fitness_t &fitness_t::operator+=(const fitness_t &f)
   {
     const size_t sup(size());
 
     for (size_t i(0); i < sup; ++i)
       vect[i] += f[i];
+
+    return *this;
+  }
+
+  ///
+  /// \param[in] f a fitness.
+  /// \return the difference of \a this and \a f.
+  ///
+  fitness_t &fitness_t::operator-=(const fitness_t &f)
+  {
+    const size_t sup(size());
+
+    for (size_t i(0); i < sup; ++i)
+      vect[i] -= f[i];
 
     return *this;
   }
@@ -129,9 +143,40 @@ namespace vita
   fitness_t fitness_t::operator/(fitness_t::base_t val) const
   {
     const size_t sup(size());
+
     fitness_t tmp(sup);
     for (size_t i(0); i < sup; ++i)
       tmp[i] = vect[i] / val;
+
+    return tmp;
+  }
+
+  ///
+  /// \param[in] val a scalar.
+  /// \return the product of \a this and \a val.
+  ///
+  fitness_t fitness_t::operator*(fitness_t::base_t val) const
+  {
+    const size_t sup(size());
+
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = vect[i] * val;
+
+    return tmp;
+
+  }
+
+  ///
+  /// \return a new vector obtained taking the absolute value of each component
+  ///         of \a this.
+  ///
+  fitness_t fitness_t::abs() const
+  {
+    const size_t sup(size());
+    fitness_t tmp(sup);
+    for (size_t i(0); i < sup; ++i)
+      tmp[i] = std::fabs(vect[i]);
 
     return tmp;
   }
