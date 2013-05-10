@@ -97,13 +97,14 @@ namespace vita
     analyzer get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
+    bool stop_condition(const summary &) const;
 
   private:  // Private data members.
     vita::population pop_;
     evaluator       *eva_;
     summary        stats_;
 
-    std::function<bool (const summary &)> stop_condition_;
+    std::function<bool (const summary &)> external_stop_condition_;
     std::function<void (unsigned)> shake_data_;
   };
 

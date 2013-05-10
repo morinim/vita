@@ -39,20 +39,33 @@ namespace vita
     : selection(std::make_shared<tournament_selection>(this)),
       operation(std::make_shared<standard_op>(this, &stats_)),
       replacement(std::make_shared<kill_tournament>(this)), pop_(env),
-      eva_(eva), stop_condition_(sc), shake_data_(sd)
+      eva_(eva), external_stop_condition_(sc), shake_data_(sd)
   {
     assert(eva);
 
-    // When we have a stop_condition function we use it; otherwise the stop
-    // criterion is the number of generations.
-    if (!stop_condition_)
-      stop_condition_ = [this](const summary &s) -> bool
-                        {
-                          return *pop_.env().g_since_start > 0 &&
-                                 s.gen > *pop_.env().g_since_start;
-                        };
-
     assert(debug(true));
+  }
+
+  ///
+  /// \param[in] s an up to date evolution summary.
+  /// \return \c true when evolution should be interrupted.
+  ///
+  bool evolution::stop_condition(const summary &s) const
+  {
+    assert(env_.g_since_start);
+
+    // Check the number of generations.
+    if (*pop_.env().g_since_start > 0 && s.gen > *pop_.env().g_since_start)
+      return true;
+
+    if (kbhit() && std::cin.get() == '.')
+      return true;
+
+    // When we have an external_stop_condition_ function we use it
+    if (external_stop_condition_)
+      return external_stop_condition_(s);
+
+    return false;
   }
 
   ///
@@ -235,7 +248,7 @@ namespace vita
 
     timer measure;
 
-    for (stats_.gen = 0; !stop_condition_(stats_); ++stats_.gen)
+    for (stats_.gen = 0; !stop_condition(stats_); ++stats_.gen)
     {
       if (shake_data_)
       {
@@ -312,15 +325,6 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug << " Empty evaluator pointer." << std::endl;
-
-      return false;
-    }
-
-    if (!stop_condition_)
-    {
-      if (verbose)
-        std::cerr << k_s_debug << " Empty stop_condition pointer."
-                  << std::endl;
 
       return false;
     }

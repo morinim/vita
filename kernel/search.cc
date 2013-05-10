@@ -198,7 +198,8 @@ namespace vita
   }
 
   ///
-  /// \return true when a run should be interrupted.
+  /// \param[in] s an up to date run summary.
+  /// \return \c true when a run should be interrupted.
   ///
   bool search::stop_condition(const summary &s) const
   {
