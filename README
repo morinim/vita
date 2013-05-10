@@ -121,7 +121,7 @@ SETTING UP THE BUILD
   ### Additional instructions for building Boost on MinGW / MSYS ###
 
   1. Set up a MinGW/MSYS environment;
-  2. Get bjam (<http://sourceforge.net/projects/boost/files/boost-binaries/1.52.0/boost_1_52_tools.zip/download> or newer version);
+  2. Get bjam (<http://sourceforge.net/projects/boost/files/boost-binaries/1.50.0/boost_1_50_tools.zip/download> or newer version);
   3. Get the latest Boost (<http://www.boost.org>);
   4. Extract them both to the same dir (overlaid);
   5. Open msys and cd to your boost directory;
