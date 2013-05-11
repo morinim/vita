@@ -23,6 +23,22 @@
 
 namespace vita
 {
+  namespace
+  {
+    ///
+    /// \return \c true when the user press the '.' key.
+    ///
+    inline bool interrupt()
+    {
+      const bool stop(kbhit() && std::cin.get() == '.');
+
+      if (stop)
+        std::cout << k_s_info << " Stopping evolution..." << std::endl;
+
+      return stop;
+    }
+  }
+
   ///
   /// \param[in] env environment (mostly used for population initialization).
   /// \param[in] eva evaluator used during the evolution.
@@ -58,7 +74,7 @@ namespace vita
     if (*pop_.env().g_since_start > 0 && s.gen > *pop_.env().g_since_start)
       return true;
 
-    if (kbhit() && std::cin.get() == '.')
+    if (interrupt())
       return true;
 
     // When we have an external_stop_condition_ function we use it
@@ -248,7 +264,10 @@ namespace vita
 
     timer measure;
 
-    for (stats_.gen = 0; !stop_condition(stats_); ++stats_.gen)
+    bool ext_int(false);
+    term_raw_mode(true);
+
+    for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
     {
       if (shake_data_)
       {
@@ -263,10 +282,14 @@ namespace vita
       stats_.az = get_stats();
       log(run_count);
 
-      for (unsigned k(0); k < pop_.individuals(); ++k)
+      for (unsigned k(0); k < pop_.individuals() && !ext_int; ++k)
       {
         if (k % std::max<size_t>(pop_.individuals() / 100, 2))
+        {
           print_progress(k, run_count, false);
+
+          ext_int = interrupt();
+        }
 
         // --------- SELECTION ---------
         std::vector<size_t> parents(selection->run());
@@ -309,6 +332,7 @@ namespace vita
                 << std::string(10, ' ') << std::endl;
     }
 
+    term_raw_mode(false);
     return stats_;
   }
 

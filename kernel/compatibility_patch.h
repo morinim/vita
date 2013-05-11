@@ -20,7 +20,7 @@
 #  include <conio.h>
 #  include <windows.h>
 #else
-#  include <unistd.h>
+#  include <termios.h>
 #endif
 
 namespace vita
@@ -51,6 +51,35 @@ namespace vita
 #endif
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32)
+  ///
+  /// \param[in] enter if \c true sets the terminal raw mode, else restore
+  ///            the default terminal mode.
+  ///
+  /// The raw mode discipline performs no line editing and the control
+  /// sequences for both line editing functions and the various special
+  /// characters ("interrupt", "quit", and flow control) are treated as normal
+  /// character input. Applications programs reading from the terminal receive
+  /// characters immediately and receive the entire character stream unaltered,
+  /// just as it came from the terminal device itself.
+  ///
+  inline void term_raw_mode(bool enter)
+  {
+    static termios oldt, newt;
+
+    if (enter)
+    {
+      tcgetattr(STDIN_FILENO, &oldt);
+      newt = oldt;
+      newt.c_lflag &= ~(ICANON | ECHO);
+      tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    }
+    else
+      tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  }
+
+  ///
+  /// \return \c true if the user press a key (\c false otherwise).
+  ///
   inline bool kbhit()
   {
     // Do not wait at all, not even a microsecond.
@@ -59,41 +88,22 @@ namespace vita
     tv.tv_usec = 0;
 
     fd_set readfd;
-    FD_ZERO(&readfd);    // initialize readfd
-    FD_SET(0, &readfd);  // 0 is the file descriptor for stdin
+    FD_ZERO(&readfd);  // initialize readfd
+    FD_SET(STDIN_FILENO, &readfd);
 
     // The first parameter is the number of the largest file descriptor to
     // check + 1.
-    if (select(1, &readfd, nullptr, nullptr, &tv) == -1)  // an error occured
-      return false;
+    if (select(STDIN_FILENO + 1, &readfd, nullptr, nullptr, &tv) == -1)
+      return false;  // an error occured
 
     // read_fd now holds a bit map of files that are readable. We test the
     // entry for the standard input (file 0).
-    return FD_ISSET(0, &readfd);
-
-/*
-    // An alternative (requires <sys/ioctl.h> and <termios.h> also).
-
-    static const int STDIN(0);
-    static bool initialized(false);
-
-    if (!initialized)
-    {
-      // Use termios to turn off line buffering.
-      termios term;
-      tcgetattr(STDIN, &term);
-      term.c_lflag &= ~ICANON;
-      tcsetattr(STDIN, TCSANOW, &term);
-      setbuf(stdin, nullptr);
-      initialized = true;
-    }
-
-    int bytesWaiting;
-    ioctl(STDIN, FIONREAD, &bytesWaiting);
-    return bytesWaiting;
-*/
+    return FD_ISSET(STDIN_FILENO, &readfd);
   }
+#else
+  inline void term_raw_mode(bool) {}
 #endif
+
 }  // namespace vita
 
 #endif  // COMPATIBILITY_PATCH_H
