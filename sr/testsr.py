@@ -52,6 +52,8 @@ settings = {
 
 def sr(args, data_set, generations, individuals, code_length, rounds,
        symbol_set):
+    sr = "sr_test" if os.path.exists("sr_test") else "sr"
+
     mode = args.mode;
 
     arl = ""
@@ -78,11 +80,12 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         random.seed()
         randomize = "--random-seed " + str(random.randint(0, 1000000000))
 
-    cmd = Template("sr --verbose $elitism_switch --stat-dir $sd "\
+    cmd = Template("$sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "-P $nind -l $cl -r $rs $rnd_switch $arl_switch "\
                    "$dss_switch $ss $ds")
     s = cmd.substitute(
+        sr = sr,
         elitism_switch = elitism,
         sd = stat_dir,
         tt = ttable_bit,
