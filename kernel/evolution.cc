@@ -13,8 +13,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <string>
-#include <vector>
 
 #include "evolution.h"
 #include "environment.h"

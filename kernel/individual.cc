@@ -915,8 +915,8 @@ namespace vita
     assert(p2.debug());
     assert(p1.size() == p2.size());
 
-    const unsigned cs(p1.size());
-    const unsigned categories(p1.env().sset.categories());
+    const auto cs(p1.size());
+    const auto categories(p1.env().sset.categories());
 
     const index_t cut(random::between<index_t>(1, cs - 1));
 
@@ -959,11 +959,11 @@ namespace vita
     assert(p2.debug());
     assert(p1.size() == p2.size());
 
-    const unsigned cs(p1.size());
-    const unsigned categories(p1.env().sset.categories());
+    const auto cs(p1.size());
+    const auto categories(p1.env().sset.categories());
 
-    const index_t cut1(random::between<unsigned>(0, cs-1));
-    const index_t cut2(random::between<unsigned>(cut1+1, cs));
+    const auto cut1(random::between<index_t>(0, cs - 1));
+    const auto cut2(random::between<index_t>(cut1 + 1, cs));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());
