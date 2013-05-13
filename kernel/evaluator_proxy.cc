@@ -35,21 +35,17 @@ namespace vita
   fitness_t evaluator_proxy::operator()(const individual &ind)
   {
     fitness_t f;
-    if (!cache_.find(ind, &f))
+    if (cache_.find(ind, &f))
     {
-      f = (*eva_)(ind);
+/*
+      assert(cache_.hits());
+      const double perc(double(cache_.seen(ind)) / cache_.hits());
 
-      cache_.insert(ind, f);
-
+      if (0.01 < perc && perc < 1.0)
+        f -= (f * perc).abs() * 2.0;
+*/
+      // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
-      fitness_t f1;
-      assert(cache_.find(ind, &f1));
-      assert(f == f1);
-#endif
-    }
-#if !defined(NDEBUG)
-    else  // hash collision checking code can slow down the program very much
-    {
       const fitness_t f1((*eva_)(ind));
       if (f[0] != f1[0])
         std::cerr << "********* COLLISION ********* [" << f
@@ -69,13 +65,20 @@ namespace vita
       //
       // have the same signature, the same stored "score" but distinct
       // effective size and so distinct fitnesses.
-    }
 #endif
+    }
+    else
+    {
+      f = (*eva_)(ind);
 
-    const double hits(cache_.hits());
-    const double perc(double(cache_.seen(ind)) / hits);
-    if (0.01 < perc && perc < 1.0 && hits > 100.0)
-      f[0] *= 1.0 + perc;
+      cache_.insert(ind, f);
+
+#if !defined(NDEBUG)
+      fitness_t f1;
+      assert(cache_.find(ind, &f1));
+      assert(f == f1);
+#endif
+    }
 
     return f;
   }

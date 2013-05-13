@@ -23,7 +23,7 @@
 namespace vita
 {
   std::function<individual (const individual &, const individual &)>
-  individual::crossover(uniform_crossover);
+  individual::crossover(two_point_crossover);
 
   ///
   /// \param[in] e base environment.
