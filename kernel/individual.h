@@ -120,10 +120,10 @@ namespace vita
     /// start with an age of 0. Each generation that an individual stays in the
     /// population (such as through elitism) its age is increased by one.
     /// Individuals that are created through mutation or recombination take the
-    /// age of their oldest parent and add one to it. This differs from
-    /// conventional measures of age, in which individuals created through
-    /// applying some type of variation to an existing individual (e.g.
-    /// mutation or recombination) start with an age of 1.
+    /// age of their oldest parent.
+    /// This differs from conventional measures of age, in which individuals
+    /// created through applying some type of variation to an existing
+    /// individual (e.g. mutation or recombination) start with an age of 0.
     unsigned age;
 
   private:  // Private support functions.
