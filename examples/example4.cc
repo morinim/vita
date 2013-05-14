@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
   const clock_t start(clock());
   for (unsigned i(0); i < n; ++i)
   {
-    vita::individual i1(env, true);
+    const vita::individual i1(env, true);
 
-    vita::fitness_t f({i});
+    vita::fitness_t f({static_cast<vita::fitness_t::base_t>(i)});
     cache.insert(i1, f);
 
     cache.find(i1, &f);
