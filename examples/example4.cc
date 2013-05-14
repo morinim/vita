@@ -14,10 +14,10 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "environment.h"
 #include "individual.h"
 #include "ttable.h"
 #include "primitive/factory.h"
+#include "timer.h"
 
 //
 // Performs a speed test on the transposition table (insert-find cycle).
@@ -36,26 +36,29 @@ int main(int argc, char *argv[])
   env.insert(factory.make("FIFL"));
   env.insert(factory.make("FIFE"));
 
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 4000000);
+  const unsigned n(argc > 2 ? atoi(argv[2]) : 10000000);
 
   vita::ttable cache(argc > 3 ? atoi(argv[3]) : 16);
 
-  const clock_t start(clock());
+  std::vector<vita::individual> pool;
+  for (size_t i(0); i < 1000; ++i)
+    pool.emplace_back(env, true);
+
+  vita::timer t;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::individual i1(env, true);
+    vita::fitness_t f({static_cast<vita::fitness_t::base_t>(i)});
+    const vita::individual &ind(vita::random::element(pool));
 
-    vita::fitness_t f({i});
-    cache.insert(i1, f);
+    cache.insert(ind, f);
 
-    cache.find(i1, &f);
+    cache.find(ind, &f);
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;
   }
-  const clock_t end(clock());
 
-  std::cout << static_cast<double>(n) * CLOCKS_PER_SEC / (end - start)
+  std::cout << static_cast<unsigned>(1000.0 * n / t.elapsed())
             << " store/read sec" << std::endl;
 
   return EXIT_SUCCESS;

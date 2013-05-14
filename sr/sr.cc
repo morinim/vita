@@ -22,7 +22,6 @@ namespace po = boost::program_options;
 #include <string>
 
 #include "environment.h"
-#include "random.h"
 #include "search.h"
 #include "src_evaluator.h"
 #include "src_problem.h"
@@ -30,12 +29,20 @@ namespace po = boost::program_options;
 
 #include "command_line_interpreter.h"
 
-const std::string vita_sr_version1(
-  "Vita - Symbolic Regression and classification v0.9.6"
-);
-const std::string vita_sr_version2(
-  "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
-);
+namespace
+{
+  const std::string vita_sr_version1(
+    "Vita - Symbolic Regression and classification v0.9.6"
+    );
+  const std::string vita_sr_version2(
+    "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
+    );
+  const std::string vita_sr_defs(
+#if defined(CLONE_SCALING)
+    "(clone scaling enabled)"
+#endif
+    );
+}
 
 ///
 /// Fixes conflicting parameters.
@@ -127,7 +134,7 @@ namespace ui
     "    _,-'       " + vita_sr_version1 + "\n" \
     " ,-',' `.`-.   " + vita_sr_version2 + "\n" \
     "(==(     )==)\n"
-    " `-.`. ,',-' \n"
+    " `-.`. ,',-'   " + vita_sr_defs + "\n" \
     "    _,-'\"   \n"
     " ,-',' `.`-. \n"
     "(==(     )==)\n");

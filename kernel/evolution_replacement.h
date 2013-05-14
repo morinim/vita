@@ -91,6 +91,15 @@ namespace vita
     virtual void run(const std::vector<size_t> &,
                      const std::vector<individual> &, summary *const) override;
   };
+
+  class pareto_tournament : public replacement_strategy
+  {
+  public:
+    explicit pareto_tournament(evolution *const);
+
+    virtual void run(const std::vector<size_t> &,
+                     const std::vector<individual> &, summary *const) override;
+  };
 }  // namespace vita
 
 #endif  // EVOLUTION_REPLACEMENT_H

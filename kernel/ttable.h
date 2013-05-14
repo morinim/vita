@@ -72,7 +72,9 @@ namespace vita
 
     void clear();
     void clear(const individual &);
+#if defined(CLONE_SCALING)
     void reset_seen();
+#endif
 
     void insert(const individual &, const fitness_t &);
 
@@ -104,8 +106,10 @@ namespace vita
       fitness_t fitness;
       /// Valid slots are recognized comparing their seal with the current one.
       unsigned     seal;
+#if defined(CLONE_SCALING)
       /// How many times have we looked for this individual in the current run?
       mutable unsigned seen;
+#endif
     };
 
     const std::uint64_t k_mask;

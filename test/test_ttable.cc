@@ -91,13 +91,14 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::individual i1(env, true);
-    vita::fitness_t f({i});
+    const vita::individual i1(env, true);
+    const auto base_f(static_cast<vita::fitness_t::base_t>(i));
+    vita::fitness_t f({base_f});
 
     cache.insert(i1, f);
 
     BOOST_REQUIRE(cache.find(i1, &f));
-    BOOST_REQUIRE_EQUAL(f, vita::fitness_t{i});
+    BOOST_REQUIRE_EQUAL(f, vita::fitness_t{base_f});
   }
 }
 

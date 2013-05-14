@@ -38,7 +38,7 @@ namespace vita
     T standard_deviation() const;
     double entropy() const;
 
-    bool debug() const;
+    bool debug(bool) const;
 
     std::uintmax_t count;
 
@@ -101,7 +101,7 @@ namespace vita
   template<class T>
   void distribution<T>::add(T val)
   {
-    if (!isnan(val))
+    if (!std::isnan(val))
     {
       if (!count)
         min = max = val;
@@ -173,19 +173,35 @@ namespace vita
   }
 
   ///
+  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
   template<class T>
-  bool distribution<T>::debug() const
+  bool distribution<T>::debug(bool verbose) const
   {
     if (std::isfinite(min) && std::isfinite(mean) && min > mean)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
+                  << mean << "." << std::endl;
       return false;
+    }
 
     if (std::isfinite(max) && std::isfinite(mean) && max < mean)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
+                  << mean << "." << std::endl;
       return false;
+    }
 
     if (std::isnan(variance) || variance < 0.0)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Distribution: negative variance."
+                  << std::endl;
       return false;
+    }
 
     return true;
   }
@@ -193,7 +209,7 @@ namespace vita
   template<> void distribution<fitness_t>::clear();
   template<> void distribution<fitness_t>::add(fitness_t);
   template<> fitness_t distribution<fitness_t>::standard_deviation() const;
-  template<> bool distribution<fitness_t>::debug() const;
+  template<> bool distribution<fitness_t>::debug(bool) const;
 }  // namespace vita
 
 #endif  // DISTRIBUTION_H

@@ -64,8 +64,8 @@ namespace vita
              pop[r2].signature() == off.signature())
         stats_->mutations += off.mutation();
 
-      if (evo_->seen(off))
-        stats_->mutations += off.mutation();
+      //if (evo_->seen(off))
+      //  stats_->mutations += off.mutation();
 
       if (*env.brood_recombination > 0)
       {

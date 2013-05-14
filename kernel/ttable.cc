@@ -85,8 +85,7 @@ namespace vita
   ///
   void ttable::clear()
   {
-    probes_ = 0;
-    hits_   = 0;
+    probes_ = hits_ = 0;
 
     ++seal_;
 
@@ -116,6 +115,7 @@ namespace vita
   ///
   /// Resets the \a seen counter.
   ///
+#if defined(CLONE_SCALING)
   void ttable::reset_seen()
   {
     probes_ = hits_ = 0;
@@ -123,6 +123,7 @@ namespace vita
     for (size_t i(0); i <= k_mask; ++i)
       table_[i].seen = 0;
   }
+#endif
 
   ///
   /// \brief Looks for the fitness of an individual in the transposition table.
@@ -144,7 +145,9 @@ namespace vita
 
     if (ret)
     {
+#if defined(CLONE_SCALING)
       ++s.seen;
+#endif
       ++hits_;
       *fitness = s.fitness;
     }
@@ -163,7 +166,11 @@ namespace vita
 
     const bool ret(seal_ == s.seal && h == s.hash);
 
+#if defined(CLONE_SCALING)
     return ret ? s.seen : 0;
+#else
+    return ret;
+#endif
   }
 
   ///
@@ -178,7 +185,9 @@ namespace vita
     s.hash    = ind.signature();
     s.fitness =         fitness;
     s.seal    =           seal_;
+#if defined(CLONE_SCALING)
     s.seen    =               1;
+#endif
 
     table_[index(s.hash)] = s;
   }
@@ -222,8 +231,10 @@ namespace vita
         return false;
       if (!(in >> s.seal))
         return false;
+#if defined(CLONE_SCALING)
       if (!(in >> s.seen))
         return false;
+#endif
 
       table_[index(s.hash)] = s;
     }
@@ -251,7 +262,11 @@ namespace vita
         const slot &s(table_[i]);
         s.hash.save(out);
         s.fitness.save(out);
-        out << s.seal << ' ' << s.seen << std::endl;
+        out << s.seal;
+#if defined(CLONE_SCALING)
+        out << ' ' << s.seen;
+#endif
+        out << std::endl;
       }
 
     return out.good();

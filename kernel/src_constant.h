@@ -32,9 +32,7 @@ namespace vita
         val_(boost::lexical_cast<T>(c)) {}
 
     explicit constant(T c, category_t t = 0)
-      : terminal(boost::lexical_cast<std::string>(c), t, false, false,
-                 k_base_weight),
-        val_(c) {}
+      : constant(boost::lexical_cast<std::string>(c), t) {}
 
     ///
     /// \return the value of the constant (as a \c any).

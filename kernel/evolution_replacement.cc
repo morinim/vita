@@ -145,4 +145,91 @@ namespace vita
       s->best     = {offspring[0], fit_off};
     }
   }
+
+  ///
+  /// \param[in] evo pointer to the evolution object that is using the
+  ///                pareto_tournament.
+  ///
+  pareto_tournament::pareto_tournament(evolution *const evo)
+    : replacement_strategy(evo)
+  {
+  }
+
+  ///
+  /// \param[in] parent indexes of the candidate parents.
+  ///                   The list is sorted in descending pareto-layer
+  ///                   dominance (from pareto non dominated front to
+  ///                   dominated points.
+  /// \param[in] offspring vector of the "children".
+  /// \param[in] s statistical \a summary.
+  ///
+  /// To determine whether a new individual x is to be accepted into the main
+  /// population, we compare it with the \a parent buffer, simply ensuring
+  /// that the new individual is not dominated.
+  ///
+  /// If this is the case, then it is immediately accepted and is inserted
+  /// according to the replacement rules. The only parameter that needs to be
+  /// determined in advance is the tournament size, a parameter that would
+  /// exist in a single objective optimisation anyway.
+  ///
+  /// Parameters from the environment:
+  /// * elitism is \c true => child replaces a member of the population only if
+  ///   child is better.
+  ///
+  /// \see
+  /// "A Robust Evolutionary Technique for Coupled and Multidisciplinary Design
+  /// Optimization problems in Aeronautics" - L.F.Gonzalez, E.J. Whithney,
+  /// K. Srinivas, S. Armfield, J. Periaux.
+  ///
+  void pareto_tournament::run(const std::vector<size_t> &parent,
+                              const std::vector<individual> &offspring,
+                              summary *const s)
+  {
+    population &pop(evo_->population());
+
+    const fitness_t fit_off(evo_->fitness(offspring[0]));
+/*
+    for (auto i(parent.rbegin()); i != parent.rend(); ++i)
+    {
+      const fitness_t fit_i(evo_->fitness(pop[*i]));
+
+      if (fit_off.dominating(fit_i))
+      {
+        pop[*i] = offspring[0];
+
+        if (fit_off[0] > s->best->fitness[0])
+        {
+          s->last_imp =                  s->gen;
+          s->best     = {offspring[0], fit_off};
+        }
+
+        break;
+      }
+    }
+*/
+
+    bool dominated(false);
+    for (const auto &i : parent)
+    {
+      const fitness_t fit_i(evo_->fitness(pop[i]));
+
+      if (fit_i.dominating(fit_off))
+      {
+        dominated = true;
+        break;
+      }
+    }
+
+    assert(!boost::indeterminate(pop.env().elitism));
+
+    if (!pop.env().elitism || !dominated)
+      pop[parent.back()] = offspring[0];
+
+    if (fit_off[0] > s->best->fitness[0])
+    {
+      s->last_imp =                  s->gen;
+      s->best     = {offspring[0], fit_off};
+    }
+  }
+
 }  // namespace vita
