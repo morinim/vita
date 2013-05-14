@@ -66,7 +66,7 @@ namespace vita
   ///
   bool evolution::stop_condition(const summary &s) const
   {
-    assert(env_.g_since_start);
+    assert(pop_.env().g_since_start);
 
     // Check the number of generations.
     if (*pop_.env().g_since_start > 0 && s.gen > *pop_.env().g_since_start)
