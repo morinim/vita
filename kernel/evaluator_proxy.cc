@@ -105,7 +105,10 @@ namespace vita
       break;
 
     case stats:
+#if defined(CLONE_SCALING)
       cache_.reset_seen();
+#endif
+      break;
     }
   }
 

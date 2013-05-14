@@ -425,10 +425,16 @@ namespace vita
   ///
   /// \return the signature of \c this individual.
   ///
-  /// Signature map syntactically distinct (but logically equivalent)
-  /// individuals to the same value. This is a very interesting  property,
-  /// useful for individual comparison, information retrieval, entropy
-  /// calculation...
+  /// Signature maps syntactically distinct (but logically equivalent)
+  /// individuals to the same value.
+  ///
+  /// In other words identical individuals at genotypic level have the same
+  /// signature; different individuals at the genotipic level may be mapped
+  /// to the same signature since the value of terminals is considered and not
+  /// the index.
+  ///
+  /// This is a very interesting  property, useful for individual comparison,
+  /// information retrieval, entropy calculation...
   ///
   hash_t individual::signature() const
   {

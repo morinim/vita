@@ -14,6 +14,7 @@ BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 # Compiler (clang++, g++)
 CXX = clang++
 
+DEFS = -DCLONE_SCALING
 
 
 
@@ -29,7 +30,6 @@ INCPATH = ./kernel
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra
-DEFS = -DCLONE_SCALING
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
