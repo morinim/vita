@@ -29,7 +29,7 @@ INCPATH = ./kernel
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra
-DEFS = -march=native
+DEFS = -DCLONE_SCALING
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
@@ -44,7 +44,7 @@ ifeq ($(TYPE), release)
   TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
-CXXFLAGS = -pipe $(TYPE_PARAM) $(WARN) $(DEFS)
+CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
 COMPILE = $(CXX) $(CXXFLAGS)
 
 KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)

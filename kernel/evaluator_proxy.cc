@@ -37,13 +37,20 @@ namespace vita
     fitness_t f;
     if (cache_.find(ind, &f))
     {
-/*
       assert(cache_.hits());
-      const double perc(double(cache_.seen(ind)) / cache_.hits());
 
+#if defined(CLONE_SCALING)
+      // Before evaluating an individual, we check if identical individuals
+      // (clones) are already present in the population.
+      // When the number of clones is grater than zero, the fitness assigned to
+      // the individual is multiplied by  a clone-scaling factor.
+      // For further details see "Evolving Assembly Programs: How Games Help
+      // Microprocessor Validation" - F.Corno, E.Sanchez, G.Squillero.
+      const double perc(double(cache_.seen(ind)) / cache_.hits());
       if (0.01 < perc && perc < 1.0)
         f -= (f * perc).abs() * 2.0;
-*/
+#endif
+
       // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
       const fitness_t f1((*eva_)(ind));
