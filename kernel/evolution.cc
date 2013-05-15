@@ -12,6 +12,7 @@
  */
 
 #include <algorithm>
+#include <csignal>
 #include <fstream>
 
 #include "evolution.h"
@@ -26,7 +27,7 @@ namespace vita
     ///
     /// \return \c true when the user press the '.' key.
     ///
-    inline bool interrupt()
+    inline bool user_stop()
     {
       const bool stop(kbhit() && std::cin.get() == '.');
 
@@ -34,6 +35,42 @@ namespace vita
         std::cout << k_s_info << " Stopping evolution..." << std::endl;
 
       return stop;
+    }
+
+    ///
+    /// Resets the term and restores the default signal handlers.
+    ///
+    void reset_term()
+    {
+      std::signal(SIGABRT, SIG_DFL);
+      std::signal(SIGINT, SIG_DFL);
+      std::signal(SIGTERM, SIG_DFL);
+
+      term_raw_mode(false);
+    }
+
+    ///
+    /// If the program receives a SIGABRT / SIGINT / SIGTERM, it must handle
+    /// the signal and reset the terminal to the initial state.
+    ///
+    void term_signal_handler(int signum)
+    {
+      reset_term();
+
+      std::raise(signum);
+    }
+
+    ///
+    /// Sets the term in raw mode and handles the interrupt signals.
+    ///
+    void set_term()
+    {
+      // Install our signal handler.
+      std::signal(SIGABRT, term_signal_handler);
+      std::signal(SIGINT, term_signal_handler);
+      std::signal(SIGTERM, term_signal_handler);
+
+      term_raw_mode(true);
     }
   }
 
@@ -72,7 +109,7 @@ namespace vita
     if (*pop_.env().g_since_start > 0 && s.gen > *pop_.env().g_since_start)
       return true;
 
-    if (interrupt())
+    if (user_stop())
       return true;
 
     // When we have an external_stop_condition_ function we use it
@@ -263,7 +300,7 @@ namespace vita
     timer measure;
 
     bool ext_int(false);
-    term_raw_mode(true);
+    set_term();
 
     for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
     {
@@ -286,7 +323,7 @@ namespace vita
         {
           print_progress(k, run_count, false);
 
-          ext_int = interrupt();
+          ext_int = user_stop();
         }
 
         // --------- SELECTION ---------
@@ -330,7 +367,7 @@ namespace vita
                 << std::string(10, ' ') << std::endl;
     }
 
-    term_raw_mode(false);
+    reset_term();
     return stats_;
   }
 
