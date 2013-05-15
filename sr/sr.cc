@@ -40,6 +40,8 @@ namespace
   const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
     "(clone scaling enabled)"
+#else
+    ""
 #endif
     );
 }
