@@ -56,7 +56,7 @@ namespace vita
       std::vector<value_t> input;
       value_t             output;
 
-      std::uintmax_t  difficulty;
+      double          difficulty;
       unsigned               age;
 
       size_t label() const

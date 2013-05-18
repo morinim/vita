@@ -48,7 +48,8 @@ namespace vita
     virtual fitness_t fast(const individual &);
     virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
 
-    virtual double accuracy(const individual &) const;
+    virtual double accuracy(const individual &) const override;
+    virtual void set_difficulty(const individual &) override;
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const) = 0;
@@ -121,7 +122,8 @@ namespace vita
   public:
     explicit classification_evaluator(data &d) : src_evaluator(d) {}
 
-    virtual double accuracy(const individual &) const;
+    virtual double accuracy(const individual &) const override;
+    virtual void set_difficulty(const individual &) override;
   };
 
   ///
