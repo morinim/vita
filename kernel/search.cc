@@ -136,7 +136,7 @@ namespace vita
                   });
 
       d.dataset(data::training);
-      d.slice(0);
+      d.slice(false);
       for (auto &i : d)
       {
         if (generation == 0)  // preliminary setup for generation 0
