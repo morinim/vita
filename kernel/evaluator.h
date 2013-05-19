@@ -66,8 +66,6 @@ namespace vita
     /// under/over represented relative to others).
     virtual double accuracy(const individual &) const { return -1.0; }
 
-    virtual void set_difficulty(const individual &) {}
-
     /// Some evaluators keep additional statistics about the individual seen
     /// so far.
     virtual unsigned seen(const individual &) const { return 0; }

@@ -337,10 +337,7 @@ namespace vita
         replacement->run(parents, off, &stats_);
 
         if (stats_.best->fitness != before)
-        {
           print_progress(k, run_count, true);
-          eva_->set_difficulty(stats_.best->ind);
-        }
       }
 
       stats_.speed = get_speed(measure.elapsed());

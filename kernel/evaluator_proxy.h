@@ -36,7 +36,6 @@ namespace vita
     virtual fitness_t operator()(const individual &) override;
 
     virtual double accuracy(const individual &) const override;
-    virtual void set_difficulty(const individual &) override;
 
     virtual std::string info() const override;
 

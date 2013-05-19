@@ -117,24 +117,6 @@ namespace vita
     return static_cast<double>(ok) / static_cast<double>(total_nr);
   }
 
-  void sum_of_errors_evaluator::set_difficulty(const individual &ind)
-  {
-    assert(!dat_->classes());
-    assert(dat_->cbegin() != dat_->cend());
-
-    std::unique_ptr<lambda_f> f(lambdify(ind));
-
-    for (auto &example : *dat_)
-    {
-      const any res((*f)(example));
-
-      if (res.empty() ||
-          std::fabs(interpreter::to_double(res) -
-                    data::cast<double>(example.output)) > float_epsilon)
-        ++example.difficulty;
-    }
-  }
-
   ///
   /// \param[in] ind individual to be transformed in a lambda function.
   /// \return the lambda function associated with \a ind (\c nullptr in case of
@@ -169,8 +151,8 @@ namespace vita
       err = std::fabs(interpreter::to_double(res) -
                       data::cast<double>(t.output));
 
-    //if (err > float_epsilon)
-    //  ++t.difficulty;
+    if (err > float_epsilon)
+      ++t.difficulty;
 
     return err;
   }
@@ -199,8 +181,8 @@ namespace vita
       err *= err;
     }
 
-    //if (err > float_epsilon)
-    //  ++t.difficulty;
+    if (err > float_epsilon)
+      ++t.difficulty;
 
     return err;
   }
@@ -223,8 +205,8 @@ namespace vita
                    std::fabs(interpreter::to_double(res) -
                              data::cast<double>(t.output)) > float_epsilon);
 
-    //if (err)
-    //  ++t.difficulty;
+    if (err)
+      ++t.difficulty;
 
     return err ? 1.0 : 0.0;
   }
@@ -254,21 +236,6 @@ namespace vita
     assert(total_nr);
 
     return static_cast<double>(ok) / static_cast<double>(total_nr);
-  }
-
-  void classification_evaluator::set_difficulty(const individual &ind)
-  {
-    assert(dat_->classes());
-    assert(dat_->cbegin() != dat_->cend());
-
-    std::unique_ptr<lambda_f> f(lambdify(ind));
-
-    for (auto &example : *dat_)
-    {
-      const any res((*f)(example));
-      if (any_cast<size_t>(res) != example.label())
-        ++example.difficulty;
-    }
   }
 
   ///
@@ -364,7 +331,7 @@ namespace vita
         // So -1.0 is like to say that we have a complete failure.
         d -= 1.0;
 
-        // ++example.difficulty;
+        ++example.difficulty;
       }
     }
 

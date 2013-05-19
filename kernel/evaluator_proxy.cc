@@ -127,11 +127,6 @@ namespace vita
     return eva_->accuracy(ind);
   }
 
-  void evaluator_proxy::set_difficulty(const individual &ind)
-  {
-    eva_->set_difficulty(ind);
-  }
-
   ///
   /// \return number of cache probes / hits.
   ///

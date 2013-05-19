@@ -129,21 +129,21 @@ namespace vita
     {
       data &d(*prob_->data());
 
-      double weight_sum(0.0);
-      auto weight([](const data::example &v) -> decltype(weight_sum)
-                  {
-                    return v.difficulty + v.age / 10;
-                  });
+      std::function<std::uintmax_t (const data::example &)>
+        weight([](const data::example &v) -> std::uintmax_t
+               {
+                 return v.difficulty + v.age * v.age * v.age;
+               });
 
+      std::uintmax_t weight_sum(0);
       d.dataset(data::training);
       d.slice(0);
-
       for (auto &i : d)
       {
         if (generation == 0)  // preliminary setup for generation 0
         {
-          i.difficulty = 0.0;
-          i.age        =   1;
+          i.difficulty = 0;
+          i.age        = 1;
         }
         else
           ++i.age;
@@ -158,13 +158,14 @@ namespace vita
       // Note that the actual size of the selected subset (count) is not fixed
       // and, in fact, it averages slightly above target_size (Gathercole and
       // Ross felt that this might improve performance).
-      const auto target_size(d.size() * 20 / 100);
+      const size_t target_size(d.size() * 20 / 100);
       data::iterator base(d.begin());
       unsigned count(0);
-      for (auto i(d.begin()); i != d.end(); ++i)
+      for (data::iterator i(d.begin()); i != d.end(); ++i)
       {
-        const double prob(std::min(weight(*i) * target_size / weight_sum,
-                                   1.0));
+        const double prob(
+          std::min(static_cast<double>(weight(*i)) * target_size / weight_sum,
+                   1.0));
 
         if (random::boolean(prob))
         {
@@ -173,6 +174,16 @@ namespace vita
           ++count;
         }
       }
+
+      //d.sort(
+      //  [](const data::example &v1, const data::example &v2) -> bool
+      //  {
+      //    double w1(v1.difficulty + v1.age * v1.age * v1.age);
+      //    double w2(v2.difficulty + v2.age * v2.age * v2.age);
+      //    w1 *= random::between<double>(0.9, 1.1);
+      //    w2 *= random::between<double>(0.9, 1.1);
+      //    return w1 > w2;
+      //  });
 
       d.slice(std::max(count, 10u));
       prob_->get_evaluator()->clear(evaluator::all);
