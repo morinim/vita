@@ -61,7 +61,7 @@ void fix_parameters(vita::src_problem *const problem)
     env.code_length = new_length;
   }
 
-  if (env.dss && problem->data()->size() <= 10)
+  if (env.dss && problem->data()->size() <= 30)
   {
     std::cout << vita::k_s_warning << " Adjusting DSS (true => false)"
               << std::endl;

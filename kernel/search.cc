@@ -157,7 +157,11 @@ namespace vita
       // Note that the actual size of the selected subset (count) is not fixed
       // and, in fact, it averages slightly above target_size (Gathercole and
       // Ross felt that this might improve performance).
-      const auto target_size(d.size() * 20 / 100);
+      const double ratio(std::min(0.6, 0.2 + 100.0 / (d.size() + 100.0)));
+      assert(0.2 <= ratio && ratio <= 0.6);
+      const size_t target_size(d.size() * ratio);
+      assert(target_size && target_size <= d.size());
+
       data::iterator base(d.begin());
       unsigned count(0);
       for (auto i(d.begin()); i != d.end(); ++i)
@@ -272,7 +276,7 @@ namespace vita
     // * DSS can help against overfitting.
     if (boost::indeterminate(constrained.dss))
     {
-      env_.dss = dt && dt->size() > 200;
+      env_.dss = dt && dt->size() > 400;
 
       if (env_.verbosity >= 2)
         std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
@@ -358,7 +362,7 @@ namespace vita
   ///
   /// \param[in] validation is it a validation or training resume?
   /// \param[in] fitness fitness reached in the current run.
-  /// \param[in] this_run_accuracy accuracy reached in the current run.
+  /// \param[in] accuracy accuracy reached in the current run.
   ///
   void search::print_resume(bool validation, const fitness_t &fitness,
                             double accuracy) const
@@ -411,18 +415,16 @@ namespace vita
 
     for (unsigned run(0); run < n; ++run)
     {
-      prob_->get_evaluator()->clear(evaluator::stats);
-
       evolution evo(env_, prob_->get_evaluator().get(), stop, shake_data);
       summary s(evo.run(run));
 
       // Depending on validation, this can be the training fitness or the
       // validation fitness for the current run.
-      fitness_t fitness;
+      fitness_t run_fitness;
 
       // Depending on validation, this can be the training accuracy or the
       // validation accuracy for the current run.
-      double this_run_accuracy(-1.0);
+      double run_accuracy(-1.0);
 
       if (validation)
       {
@@ -431,9 +433,8 @@ namespace vita
         prob_->data()->dataset(data::validation);
         prob_->get_evaluator()->clear(s.best->ind);
 
-        fitness = (*prob_->get_evaluator())(s.best->ind);
-
-        this_run_accuracy = accuracy(s.best->ind);
+        run_fitness = (*prob_->get_evaluator())(s.best->ind);
+        run_accuracy = accuracy(s.best->ind);
 
         prob_->data()->dataset(backup);
         prob_->get_evaluator()->clear(s.best->ind);
@@ -447,30 +448,30 @@ namespace vita
         if (shake_data)
         {
           prob_->data()->dataset(data::training);
-          prob_->data()->slice(0);
+          prob_->data()->slice(false);
           prob_->get_evaluator()->clear(s.best->ind);
 
-          fitness = (*prob_->get_evaluator())(s.best->ind);
+          run_fitness = (*prob_->get_evaluator())(s.best->ind);
         }
         else
-          fitness = s.best->fitness;
+          run_fitness = s.best->fitness;
 
-        this_run_accuracy = accuracy(s.best->ind);
+        run_accuracy = accuracy(s.best->ind);
       }
 
-      print_resume(validation, fitness, this_run_accuracy);
+      print_resume(validation, run_fitness, run_accuracy);
 
-      if (run == 0 || fitness > overall_summary.best->fitness)
+      if (run == 0 || run_fitness > overall_summary.best->fitness)
       {
-        overall_summary.best = {s.best->ind, fitness};
-        best_accuracy = this_run_accuracy;
+        overall_summary.best = {s.best->ind, run_fitness};
+        best_accuracy = run_accuracy;
         best_run = run;
       }
 
       // We use accuracy or fitness (or both) to identify successful runs.
-      const bool solution_found(
-        (env_.f_threashold.empty() || fitness.dominating(env_.f_threashold)) &&
-        this_run_accuracy >= env_.a_threashold);
+      const bool solution_found((env_.f_threashold.empty() ||
+                                 run_fitness.dominating(env_.f_threashold)) &&
+                                run_accuracy >= env_.a_threashold);
 
       if (solution_found)
       {
@@ -479,8 +480,8 @@ namespace vita
         good_runs.push_back(run);
       }
 
-      if (fitness.isfinite())
-        fd.add(fitness);
+      if (run_fitness.isfinite())
+        fd.add(run_fitness);
 
       overall_summary.speed = overall_summary.speed +
         (s.speed - overall_summary.speed) / (run + 1);

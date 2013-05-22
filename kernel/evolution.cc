@@ -177,8 +177,7 @@ namespace vita
         if (last_run != run_count)
           dynamic << std::endl << std::endl;
 
-        dynamic << run_count
-                << ' ' << stats_.gen;
+        dynamic << run_count << ' ' << stats_.gen;
 
         if (stats_.best)
           dynamic << ' ' << stats_.best->fitness[0];
@@ -258,17 +257,17 @@ namespace vita
   ///
   /// \param[in] k current generation.
   /// \param[in] run_count total number of runs planned.
-  /// \param[in] resume if \c true print the end-of-generation report.
+  /// \param[in] status if \c true print a run/generation/fitness status line.
   ///
   /// Print evolution informations (if environment::verbosity > 0).
   ///
   void evolution::print_progress(unsigned k, unsigned run_count,
-                                 bool resume) const
+                                 bool status) const
   {
     if (env().verbosity >= 1)
     {
       const unsigned perc(100 * k / pop_.individuals());
-      if (resume)
+      if (status)
         std::cout << "Run " << run_count << '.' << std::setw(6)
                   << stats_.gen << " (" << std::setw(3)
                   << perc << "%): fitness " << stats_.best->fitness
@@ -304,14 +303,20 @@ namespace vita
 
     for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
     {
-      if (shake_data_)
+#if defined(CLONE_SCALING)
+      eva_->clear(evaluator::stats);
+#endif
+
+      if (shake_data_ && stats_.gen % 4 == 0)
       {
         shake_data_(stats_.gen);
 
         // If we 'shake' the data, the statistics picked so far have to be
         // cleared (the best individual and its fitness refer to an old
         // training set).
-        stats_.best = {pop_[0], fitness(pop_[0])};
+        assert(stats_.best);
+        stats_.best->fitness = fitness(stats_.best->ind);
+        print_progress(0, run_count, true);
       }
 
       stats_.az = get_stats();

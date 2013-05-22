@@ -81,7 +81,7 @@ namespace vita
   /// \param[in] ts name of the test set.
   /// \param[in] symbols name of the file containing the symbols. If it is
   ///                    empty, \c src_problem::setup_default_symbols is called.
-  /// \return number of examples (lines) parsed and number of sumbols parsed.
+  /// \return number of examples (lines) parsed and number of symbols parsed.
   ///
   /// Loads \a data into the active dataset.
   ///
