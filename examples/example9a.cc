@@ -14,7 +14,6 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "individual.h"
 #include "search.h"
 #include "src_problem.h"
 
