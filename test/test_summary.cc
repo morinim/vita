@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::summary before;
+    vita::summary<vita::individual> before;
 
     before.speed = vita::random::between(10, 10000);
     before.mutations = vita::random::between(100, 100000);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     std::stringstream ss;
     BOOST_REQUIRE(before.save(ss));
 
-    vita::summary after;
+    vita::summary<vita::individual> after;
     BOOST_REQUIRE(after.load(ss, env));
 
     BOOST_CHECK_EQUAL(before.speed, after.speed);

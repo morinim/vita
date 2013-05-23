@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(new my_evaluator());
 
-  vita::evolution(env, eva.get()).run(1);
+  vita::evolution<vita::individual>(env, eva.get()).run(1);
 
   return EXIT_SUCCESS;
 }
