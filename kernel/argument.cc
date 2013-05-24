@@ -27,7 +27,7 @@ namespace vita
   /// \c i (argument(i)) varies depending on the function being evaluated
   /// (instead, adf functions have a precise, fixed signature).
   ///
-  argument::argument(unsigned n)
+  argument::argument(size_t n)
     : terminal("ARG", category_t(0), false, false, 0), index_(n)
   {
     assert(debug());
@@ -36,7 +36,7 @@ namespace vita
   ///
   /// \return the index of the argument.
   ///
-  unsigned argument::index() const
+  size_t argument::index() const
   {
     return index_;
   }
@@ -46,9 +46,7 @@ namespace vita
   ///
   std::string argument::display() const
   {
-    std::ostringstream s;
-    s << "ARG" << '_' << index_;
-    return s.str();
+    return "ARG_" + boost::lexical_cast<std::string>(index_);
   }
 
   ///
