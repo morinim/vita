@@ -79,6 +79,15 @@ namespace vita
   typedef boost::spirit::hold_any any;
 
   ///
+  /// \tparam T a C++ type.
+  /// \return the maximum value of type \a T.
+  ///
+  template<class T> inline T type_max(T)
+  {
+    return std::numeric_limits<T>::max();
+  }
+
+  ///
   /// \param a an any.
   /// \return the value contained in \a a.
   ///
