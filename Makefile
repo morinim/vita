@@ -14,7 +14,8 @@ BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 # Compiler (clang++, g++)
 CXX = clang++
 
-DEFS = -DCLONE_SCALING
+# -DCLONE_SCALING, -DVITA_NO_LIB
+DEFS =
 
 
 
@@ -29,7 +30,7 @@ DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 INCPATH = ./kernel
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
-WARN = -pedantic --std=c++11 -Wall -Wextra
+WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
@@ -112,6 +113,7 @@ clean:
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.P" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "#*#" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.o" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
 	@rm -f sr/sr kernel/libvita.a

@@ -40,6 +40,8 @@ namespace
   const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
     "(clone scaling enabled)"
+#else
+    ""
 #endif
     );
 }
@@ -59,7 +61,7 @@ void fix_parameters(vita::src_problem *const problem)
     env.code_length = new_length;
   }
 
-  if (env.dss && problem->data()->size() <= 10)
+  if (env.dss && problem->data()->size() <= 30)
   {
     std::cout << vita::k_s_warning << " Adjusting DSS (true => false)"
               << std::endl;
@@ -909,8 +911,11 @@ int main(int argc, char *const argv[])
     ui::go();
   else
   {
-    po::options_description interface("Interface");
-    interface.add_options()
+    // Do not change the name of the variable:
+    //   po::options_description interface("Interface");
+    // don't compile with mingw.
+    po::options_description interf("Interface");
+    interf.add_options()
       ("go", po::value<bool>()->zero_tokens()->notifier(&ui::go),
        "let's go!")
       ("environment",
@@ -918,7 +923,7 @@ int main(int argc, char *const argv[])
        "show the environment")
       ("exit", po::value<bool>()->zero_tokens()->notifier(&ui::exit),
        "quit the program");
-    ui::cmdl_opt.add(interface);
+    ui::cmdl_opt.add(interf);
 
     boost::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
     cli.interpret(std::cin);

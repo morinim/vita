@@ -44,6 +44,12 @@
 
 namespace vita
 {
+#if defined(VITA_NO_LIB)
+#  define VITA_INLINE inline
+#else
+#  define VITA_INLINE
+#endif
+
   /// This is the type used as key for symbol identification.
   typedef unsigned opcode_t;
 
@@ -77,6 +83,15 @@ namespace vita
   /// A shortcut for the any type (usually boost::any or boost::spirit::any).
   ///
   typedef boost::spirit::hold_any any;
+
+  ///
+  /// \tparam T a C++ type.
+  /// \return the maximum value of type \a T.
+  ///
+  template<class T> inline T type_max(T)
+  {
+    return std::numeric_limits<T>::max();
+  }
 
   ///
   /// \param a an any.

@@ -16,9 +16,7 @@
 
 #include <vector>
 
-#include <boost/lexical_cast.hpp>
-
-#include "vita.h"
+#include "locus.h"
 
 namespace vita
 {
@@ -40,8 +38,8 @@ namespace vita
     matrix();
     matrix(size_t, size_t);
 
-    const T &operator()(const std::array<size_t, 2> &) const;
-    T &operator()(const std::array<size_t, 2> &);
+    const T &operator()(const locus &) const;
+    T &operator()(const locus &);
     const T &operator()(size_t, size_t) const;
     T &operator()(size_t, size_t);
 
@@ -110,6 +108,28 @@ namespace vita
   }
 
   ///
+  /// \param[in] l a locus of the genome.
+  /// \return an element of the matrix.
+  ///
+  template<class T>
+  inline
+  const T &matrix<T>::operator()(const locus &l) const
+  {
+    return data_[index(l.index, l.category)];
+  }
+
+  ///
+  /// \param[in] l a locus of the genome.
+  /// \return an element of the matrix.
+  ///
+  template<class T>
+  inline
+  T &matrix<T>::operator()(const locus &l)
+  {
+    return data_[index(l.index, l.category)];
+  }
+
+  ///
   /// \param[in] r row.
   /// \param[in] c column.
   /// \return an element of the matrix.
@@ -130,34 +150,6 @@ namespace vita
   T &matrix<T>::operator()(size_t r, size_t c)
   {
     return data_[index(r, c)];
-  }
-
-  ///
-  /// \param[in] l a bidimensional array.
-  /// \return an element of the matrix.
-  ///
-  /// A shortcut for:
-  /// > operator()(l[0], l[1]);
-  ///
-  template<class T>
-  inline
-  const T &matrix<T>::operator()(const std::array<size_t, 2> &l) const
-  {
-    return data_[index(l[0], l[1])];
-  }
-
-  ///
-  /// \param[in] l a bidimensional array.
-  /// \return an element of the matrix.
-  ///
-  /// A shortcut for:
-  /// > operator()(l[0], l[1]);
-  ///
-  template<class T>
-  inline
-  T &matrix<T>::operator()(const std::array<size_t, 2> &l)
-  {
-    return data_[index(l[0], l[1])];
   }
 
   ///

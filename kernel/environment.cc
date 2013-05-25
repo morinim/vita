@@ -37,19 +37,6 @@ namespace vita
   /// \see search::tune_parameters
   ///
   environment::environment(bool initialize)
-    : verbosity(2),
-      code_length(0),
-      patch_length(0),
-      individuals(0),
-      elitism(boost::indeterminate),
-      tournament_size(0),
-      dss(boost::indeterminate),
-      arl(boost::indeterminate),
-      ttable_size(16),
-      stat_dir(""),
-      stat_arl(false), stat_dynamic(false),
-      stat_population(false), stat_summary(false),
-      a_threashold(-1.0)
   {
     if (initialize)
     {

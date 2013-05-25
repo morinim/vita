@@ -14,11 +14,10 @@
 #if !defined(POPULATION_H)
 #define      POPULATION_H
 
+#include <fstream>
 #include <vector>
 
-#include "analyzer.h"
 #include "environment.h"
-#include "individual.h"
 
 namespace vita
 {
@@ -28,15 +27,16 @@ namespace vita
   ///
   /// Typical population size in GP ranges from ten to many thousands.
   ///
+  template<class T>
   class population
   {
   public:
-    typedef std::vector<individual>::const_iterator const_iterator;
+    typedef typename std::vector<T>::const_iterator const_iterator;
 
     explicit population(const environment &);
 
-    individual &operator[](size_t);
-    const individual &operator[](size_t) const;
+    T &operator[](size_t);
+    const T &operator[](size_t) const;
 
     const_iterator begin() const;
     const_iterator end() const;
@@ -57,62 +57,10 @@ namespace vita
     void clear(const environment &, size_t);
 
   private:  // Private data members.
-    std::vector<individual> pop_;
+    std::vector<T> pop_;
   };
 
-  std::ostream &operator<<(std::ostream &, const population &);
-
-  ///
-  /// \param[in] i index of an \a individual.
-  /// \return a reference to the \a individual at index \a i.
-  ///
-  inline
-  individual &population::operator[](size_t i)
-  {
-    assert(i < individuals());
-    return pop_[i];
-  }
-
-  ///
-  /// \param[in] i index of an individual.
-  /// \return a constant reference to the individual at index \a i.
-  ///
-  inline
-  const individual &population::operator[](size_t i) const
-  {
-    assert(i < individuals());
-    return pop_[i];
-  }
-
-  ///
-  /// \return the number of individuals in the population.
-  ///
-  inline
-  size_t population::individuals() const
-  {
-    return pop_.size();
-  }
-
-  ///
-  /// \return a constant reference to the active environment.
-  ///
-  inline
-  const environment &population::env() const
-  {
-    return pop_[0].env();
-  }
-
-  inline
-  population::const_iterator population::begin() const
-  {
-    return pop_.begin();
-  }
-
-  inline
-  population::const_iterator population::end() const
-  {
-    return pop_.end();
-  }
+#include "population_inl.h"
 
   ///
   /// \example example2.cc

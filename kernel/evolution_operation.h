@@ -16,12 +16,12 @@
 
 #include <vector>
 
-#include "individual.h"
+#include "population.h"
 
 namespace vita
 {
-  class evolution;
-  class summary;
+  template<class T> class evolution;
+  template<class T> class summary;
 
   ///
   /// \brief The operation strategy (crossover, recombination, mutation...) for
@@ -42,22 +42,23 @@ namespace vita
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
   ///
+  template<class T>
   class operation_strategy
   {
   public:
-    typedef std::shared_ptr<operation_strategy> ptr;
+    typedef typename std::shared_ptr<operation_strategy<T>> ptr;
 
-    operation_strategy(const evolution *const, summary *const);
+    operation_strategy(const evolution<T> *const, summary<T> *const);
     virtual ~operation_strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized
     // operation encompass recent additions, such as scan mutation, that
     // generates numerous offspring from a single parent.
-    virtual std::vector<individual> run(const std::vector<size_t> &) = 0;
+    virtual std::vector<T> run(const std::vector<size_t> &) = 0;
 
   protected:
-    const evolution *const evo_;
-    summary *stats_;
+    const evolution<T> *const evo_;
+    summary<T> *stats_;
   };
 
   ///
@@ -67,13 +68,16 @@ namespace vita
   /// by subclasses to allow differing behaviors while ensuring that the
   /// overarching algorithm is still followed.
   ///
-  class standard_op : public operation_strategy
+  template<class T>
+  class standard_op : public operation_strategy<T>
   {
   public:
-    standard_op(const evolution *const, summary *const);
+    standard_op(const evolution<T> *const, summary<T> *const);
 
-    virtual std::vector<individual> run(const std::vector<size_t> &) override;
+    virtual std::vector<T> run(const std::vector<size_t> &) override;
   };
+
+#include "evolution_operation_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_OPERATION_H

@@ -21,7 +21,7 @@
 
 namespace vita
 {
-  class evolution;
+  template<class T> class evolution;
 
   ///
   /// \brief The selection strategy (tournament, fitness proportional...) for
@@ -33,12 +33,13 @@ namespace vita
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
   ///
+  template<class T>
   class selection_strategy
   {
   public:
     typedef std::shared_ptr<selection_strategy> ptr;
 
-    explicit selection_strategy(const evolution *const);
+    explicit selection_strategy(const evolution<T> *const);
     virtual ~selection_strategy() {}
 
     virtual std::vector<size_t> run() = 0;
@@ -48,7 +49,7 @@ namespace vita
     size_t pickup(size_t) const;
 
   protected:  // Data members.
-    const evolution *const evo_;
+    const evolution<T> *const evo_;
   };
 
   ///
@@ -67,10 +68,11 @@ namespace vita
   /// on parallel architectures and allows the selection pressure to be easily
   /// adjusted.
   ///
-  class tournament_selection : public selection_strategy
+  template<class T>
+  class tournament_selection : public selection_strategy<T>
   {
   public:
-    explicit tournament_selection(const evolution *const);
+    explicit tournament_selection(const evolution<T> *const);
 
     virtual std::vector<size_t> run() override;
   };
@@ -79,10 +81,11 @@ namespace vita
   /// Pareto tournament selection as described in "Pursuing the Pareto
   /// Paradigm" (Mark Kotanchek, Guido Smits, Ekaterina Vladislavleva).
   ///
-  class pareto_tourney : public selection_strategy
+  template<class T>
+  class pareto_tourney : public selection_strategy<T>
   {
   public:
-    explicit pareto_tourney(const evolution *const);
+    explicit pareto_tourney(const evolution<T> *const);
 
     virtual std::vector<size_t> run() override;
 
@@ -94,13 +97,16 @@ namespace vita
   ///
   /// Very simple selection strategy: pick a set of random individuals.
   ///
-  class random_selection : public selection_strategy
+  template<class T>
+  class random_selection : public selection_strategy<T>
   {
   public:
-    explicit random_selection(const evolution *const);
+    explicit random_selection(const evolution<T> *const);
 
     virtual std::vector<size_t> run() override;
   };
+
+#include "evolution_selection_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_SELECTION_H

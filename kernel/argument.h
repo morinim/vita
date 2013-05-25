@@ -29,18 +29,18 @@ namespace vita
   class argument : public terminal
   {
   public:
-    explicit argument(unsigned);
+    explicit argument(size_t);
 
     std::string display() const;
 
-    unsigned index() const;
+    size_t index() const;
 
-    any eval(interpreter *) const;
+    virtual any eval(interpreter *) const override;
 
     bool debug() const;
 
   private:
-    const unsigned index_;
+    const size_t index_;
   };
 }  // namespace vita
 

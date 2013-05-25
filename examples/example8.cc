@@ -80,8 +80,8 @@ int main(int argc, char *argv[])
         std::vector<category_t> categories(replaced.size());
         for (size_t j(0); j < replaced.size(); ++j)
         {
-          positions[j]  = replaced[j][locus_index];
-          categories[j] = replaced[j][locus_category];
+          positions[j]  = replaced[j].index;
+          categories[j] = replaced[j].category;
         }
 
         symbol::ptr f(std::make_shared<adf>(blk2, categories, 100));

@@ -16,7 +16,6 @@
 
 #include <boost/optional.hpp>
 
-#include "locus.h"
 #include "matrix.h"
 
 namespace vita

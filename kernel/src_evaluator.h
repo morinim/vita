@@ -44,11 +44,11 @@ namespace vita
   public:
     explicit sum_of_errors_evaluator(data &d) : src_evaluator(d) {}
 
-    virtual fitness_t operator()(const individual &);
-    virtual fitness_t fast(const individual &);
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+    virtual fitness_t operator()(const individual &) override;
+    virtual fitness_t fast(const individual &) override;
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
 
-    virtual double accuracy(const individual &) const;
+    virtual double accuracy(const individual &) const override;
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const) = 0;
@@ -121,7 +121,7 @@ namespace vita
   public:
     explicit classification_evaluator(data &d) : src_evaluator(d) {}
 
-    virtual double accuracy(const individual &) const;
+    virtual double accuracy(const individual &) const override;
   };
 
   ///
@@ -142,8 +142,8 @@ namespace vita
   public:
     explicit dyn_slot_evaluator(data &, size_t = 10);
 
-    virtual fitness_t operator()(const individual &);
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+    virtual fitness_t operator()(const individual &) override;
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
 
   private:
     dyn_slot_engine engine_;
@@ -170,8 +170,8 @@ namespace vita
   public:
     explicit gaussian_evaluator(data &d) : classification_evaluator(d) {}
 
-    virtual fitness_t operator()(const individual &);
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+    virtual fitness_t operator()(const individual &) override;
+    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
 
   private:
     gaussian_engine engine_;

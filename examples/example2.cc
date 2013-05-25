@@ -3,7 +3,7 @@
  *  \file example2.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -39,7 +39,7 @@ int main(int argc, char *const argv[])
   env.insert(factory.make("FIFL"));
   env.insert(factory.make("FIFE"));
 
-  vita::population p(env);
+  vita::population<vita::individual> p(env);
 
   std::cout << p << std::endl;
 

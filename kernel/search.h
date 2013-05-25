@@ -16,38 +16,40 @@
 
 #include <list>
 
-#include "environment.h"
+#include <boost/property_tree/xml_parser.hpp>
+
+#include "adf.h"
+#include "evolution.h"
+#include "lambda_f.h"
+#include "problem.h"
 
 namespace vita
 {
-  template <class T> class distribution;
-  class evolution;
-  class individual;
-  class problem;
-  class summary;
+  template<class T> class distribution;
 
   ///
   /// This \c class drives the evolution.
   ///
-  class search
+  template<class T = individual>
+  class basic_search
   {
   public:
-    explicit search(problem *const);
+    explicit basic_search(problem *const);
 
-    void arl(const individual &, evolution &);
+    void arl(const T &, evolution<T> &);
     void tune_parameters();
 
-    individual run(unsigned = 1);
+    T run(unsigned = 1);
 
     bool debug(bool) const;
 
   private:  // Private support methods.
-    double accuracy(const individual &) const;
+    double accuracy(const T &) const;
     void dss(unsigned) const;
-    void log(const summary &, const distribution<fitness_t> &,
+    void log(const summary<T> &, const distribution<fitness_t> &,
              const std::list<unsigned> &, unsigned, double, unsigned);
     void print_resume(bool, const fitness_t &, double) const;
-    bool stop_condition(const summary &) const;
+    bool stop_condition(const summary<T> &) const;
 
   private:  // Private data members.
     /// This is the environment actually used during the search (\a prob_->env
@@ -55,6 +57,10 @@ namespace vita
     environment env_;
     problem   *prob_;
   };
+
+  typedef basic_search<> search;
+
+#include "search_inl.h"
 }  // namespace vita
 
 #endif  // SEARCH_H

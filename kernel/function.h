@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "gene.h"
-#include "symbol.h"
 
 namespace vita
 {
@@ -79,5 +78,9 @@ namespace vita
     bool              associative_;
   };
 }  // namespace vita
+
+#if defined(VITA_NO_LIB)
+#  include "function.cc"
+#endif
 
 #endif  // FUNCTION_H

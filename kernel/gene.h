@@ -16,6 +16,7 @@
 
 #include <vector>
 
+#include "random.h"
 #include "symbol.h"
 
 namespace vita
@@ -23,31 +24,38 @@ namespace vita
   class symbol_set;
 
   ///
-  /// A gene is a unit of heredity in a living organism. The \c struct \a gene
-  /// is the building block for an \a individual.
+  /// \brief A gene is a unit of heredity in a living organism.
   ///
-  class gene
+  /// \tparam K the maximum number of arguments for a \a function.
+  ///
+  /// The \c class \a gene is the building block for an \a individual.
+  ///
+  template<size_t K = 4>
+  class basic_gene
   {
   public:
-    /// Maximum number of arguments for a function.
-    enum {k_args = 4};
+    enum  {k_args = K};
 
-    gene() {}
-    explicit gene(const symbol::ptr &);
-    gene(const std::pair<symbol::ptr, std::vector<index_t>> &);
-    gene(const symbol::ptr &, index_t, index_t);
+    basic_gene() {}
+    explicit basic_gene(const symbol::ptr &);
+    basic_gene(const std::pair<symbol::ptr, std::vector<index_t>> &);
+    basic_gene(const symbol::ptr &, index_t, index_t);
 
-    bool operator==(const gene &) const;
-    bool operator!=(const gene &g) const { return !(*this == g); }
+    bool operator==(const basic_gene<K> &) const;
+    bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
 
   public:  // Public data members.
-    symbol::ptr        sym;
+    symbol::ptr sym;
     union
     {
-      int                    par;
-      std::uint16_t args[k_args];
+      int               par;
+      std::uint16_t args[K];
     };
   };
+
+  typedef basic_gene<> gene;
+
+#include "gene_inl.h"
 }  // namespace vita
 
 #endif  // GENE_H

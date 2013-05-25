@@ -14,7 +14,8 @@
 #if !defined(EVOLUTION_H)
 #define      EVOLUTION_H
 
-#include <memory>
+#include <algorithm>
+#include <csignal>
 
 #include "analyzer.h"
 #include "evaluator_proxy.h"
@@ -22,13 +23,12 @@
 #include "evolution_replacement.h"
 #include "evolution_selection.h"
 #include "population.h"
+#include "random.h"
+#include "timer.h"
 
 namespace vita
 {
-  class environment;
-  class evolution;
-  class individual;
-
+  template<class T>
   class summary
   {
   public:  // Constructor and support functions.
@@ -45,7 +45,7 @@ namespace vita
 
     struct best_
     {
-      individual    ind;
+      T             ind;
       fitness_t fitness;
     };
 
@@ -53,11 +53,9 @@ namespace vita
 
     double speed;
 
-    std::uintmax_t  mutations;
-    std::uintmax_t crossovers;
+    std::uintmax_t crossovers, mutations;
 
-    unsigned gen;
-    unsigned last_imp;
+    unsigned gen, last_imp;
   };
 
   ///
@@ -68,28 +66,29 @@ namespace vita
   /// (survival of the fittest) and analogs of various naturally occurring
   /// operations, including crossover (sexual recombination), mutation...
   ///
+  template<class T>
   class evolution
   {
   public:
     evolution(const environment &, evaluator *,
-              std::function<bool (const summary &)> = nullptr,
+              std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    const summary &run(unsigned);
+    const summary<T> &run(unsigned);
 
-    const vita::population &population() const;
-    vita::population &population();
+    const vita::population<T> &population() const;
+    vita::population<T> &population();
 
-    fitness_t fitness(const individual &) const;
-    fitness_t fast_fitness(const individual &) const;
-    unsigned seen(const individual &i) const { return eva_->seen(i); }
+    fitness_t fitness(const T &) const;
+    fitness_t fast_fitness(const T &) const;
+    unsigned seen(const T &i) const;
 
     bool debug(bool) const;
 
   public:  // Public data members.
-    selection_strategy::ptr     selection;
-    operation_strategy::ptr     operation;
-    replacement_strategy::ptr replacement;
+    typename selection_strategy<T>::ptr     selection;
+    typename operation_strategy<T>::ptr     operation;
+    typename replacement_strategy<T>::ptr replacement;
 
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
@@ -97,40 +96,23 @@ namespace vita
     analyzer get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
-    bool stop_condition(const summary &) const;
+    bool stop_condition(const summary<T> &) const;
 
   private:  // Private data members.
-    vita::population pop_;
-    evaluator       *eva_;
-    summary        stats_;
+    vita::population<T> pop_;
+    evaluator          *eva_;
+    summary<T>        stats_;
 
-    std::function<bool (const summary &)> external_stop_condition_;
+    std::function<bool (const summary<T> &)> external_stop_condition_;
     std::function<void (unsigned)> shake_data_;
   };
 
-  ///
-  /// \return access to the population being evolved.
-  ///
-  inline
-  vita::population &evolution::population()
-  {
-    return pop_;
-  }
-
-  ///
-  /// \return constant reference to the population being evolved.
-  ///
-  inline
-  const vita::population &evolution::population() const
-  {
-    return pop_;
-  }
+#include "evolution_inl.h"
 
   ///
   /// \example example6.cc
   /// Simple symbolic regression example (\f$x^2+y^2-z^2\f$).
   ///
-
 }  // namespace vita
 
 #endif  // EVOLUTION_H

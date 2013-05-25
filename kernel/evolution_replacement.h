@@ -16,12 +16,11 @@
 
 #include <vector>
 
-#include "individual.h"
+#include "vita.h"
 
 namespace vita
 {
-  class evolution;
-  class summary;
+  template<class T> class evolution;
 
   ///
   /// \brief The replacement strategy (random, elitist...) for the \a evolution
@@ -33,19 +32,20 @@ namespace vita
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
   ///
+  template<class T>
   class replacement_strategy
   {
   public:
-    typedef std::shared_ptr<replacement_strategy> ptr;
+    typedef typename std::shared_ptr<replacement_strategy<T>> ptr;
 
-    explicit replacement_strategy(evolution *const);
+    explicit replacement_strategy(evolution<T> *const);
     virtual ~replacement_strategy() {}
 
-    virtual void run(const std::vector<size_t> &,
-                     const std::vector<individual> &, summary *const) = 0;
+    virtual void run(const std::vector<size_t> &, const std::vector<T> &,
+                     summary<T> *const) = 0;
 
   protected:
-    evolution *const evo_;
+    evolution<T> *const evo_;
   };
 
   ///
@@ -64,13 +64,14 @@ namespace vita
   /// "Replacement Strategies to Preserve Useful Diversity in Steady-State
   /// Genetic Algorithms" - Lozano, Herrera, Cano - 2003.
   ///
-  class family_competition_rp : public replacement_strategy
+  template<class T>
+  class family_competition_rp : public replacement_strategy<T>
   {
   public:
-    explicit family_competition_rp(evolution *const);
+    explicit family_competition_rp(evolution<T> *const);
 
-    virtual void run(const std::vector<size_t> &,
-                     const std::vector<individual> &, summary *const) override;
+    virtual void run(const std::vector<size_t> &, const std::vector<T> &,
+                     summary<T> *const) override;
   };
 
   ///
@@ -83,23 +84,27 @@ namespace vita
   /// "Replacement Strategies in Steady State Genetic Algorithms: Static
   /// Environments" - Jim Smith, Frank Vavak.
   ///
-  class kill_tournament : public replacement_strategy
+  template<class T>
+  class kill_tournament : public replacement_strategy<T>
   {
   public:
-    explicit kill_tournament(evolution *const);
+    explicit kill_tournament(evolution<T> *const);
 
-    virtual void run(const std::vector<size_t> &,
-                     const std::vector<individual> &, summary *const) override;
+    virtual void run(const std::vector<size_t> &, const std::vector<T> &,
+                     summary<T> *const) override;
   };
 
-  class pareto_tournament : public replacement_strategy
+  template<class T>
+  class pareto_tournament : public replacement_strategy<T>
   {
   public:
-    explicit pareto_tournament(evolution *const);
+    explicit pareto_tournament(evolution<T> *const);
 
-    virtual void run(const std::vector<size_t> &,
-                     const std::vector<individual> &, summary *const) override;
+    virtual void run(const std::vector<size_t> &, const std::vector<T> &,
+                     summary<T> *const) override;
   };
+
+#include "evolution_replacement_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_REPLACEMENT_H

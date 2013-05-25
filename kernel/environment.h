@@ -51,7 +51,7 @@ namespace vita
     /// * 1 search results and errors;
     /// * 2 search results, informations, warnings and errors;
     /// * >= 3 everything.
-    unsigned verbosity;
+    unsigned verbosity = 2;
 
     /// The number of genes (maximum length of an evolved program in the
     /// population).
@@ -59,24 +59,24 @@ namespace vita
     /// be changed afterwards.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t code_length;
+    size_t code_length = 0;
 
     /// The number of symbols in the patch section (a section of the genome
     /// that contains terminals only).
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t patch_length;
+    size_t patch_length = 0;
 
     /// Number of individuals in the population.
     ///
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    size_t individuals;
+    size_t individuals = 0;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
     /// converge quicker but losing diversity.
-    boost::tribool elitism;
+    boost::tribool elitism = boost::indeterminate;
 
     /// \brief Mutation probability.
     ///
@@ -122,11 +122,11 @@ namespace vita
     /// equivalent to selecting individuals at random.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t tournament_size;
+    size_t tournament_size = 0;
 
     /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
-    boost::tribool dss;
+    boost::tribool dss = boost::indeterminate;
 
     /// This is used for the trivial geography scheme (Spector, Klein 2005).
     /// The population is viewed as having a 1-dimensional spatial structure -
@@ -149,26 +149,27 @@ namespace vita
     boost::optional<double> validation_ratio;
 
     /// Should we use Adaptive Representation through Learning?
-    boost::tribool arl;
+    boost::tribool arl = boost::indeterminate;
 
-    /// 2^ttable_size is the number of elements of the transposition table.
-    unsigned ttable_size;
+    /// \f$2^ttable_size\f$ is the number of elements of the transposition
+    /// table.
+    unsigned ttable_size = 16;
 
     /// Where shuld we save statistics / status files?
-    std::string stat_dir;
+    std::string stat_dir = "";
 
     /// Should we save a list of active ADF?
-    bool stat_arl;
+    bool stat_arl = false;
 
     /// Should we save a dynamic execution status file?
-    bool stat_dynamic;
+    bool stat_dynamic = false;
 
     /// Should we save a dynamic population status file?
     /// \warning It can be quite slow!
-    bool stat_population;
+    bool stat_population = false;
 
     /// Should we save a summary of the run?
-    bool stat_summary;
+    bool stat_summary = false;
 
     /// \a f_threashold is used to identify successfully learned (matched,
     /// classified, resolved...) examples by fitness comparison.
@@ -176,7 +177,9 @@ namespace vita
 
     /// \a a_threashold is used to identify successfully learned (matched,
     /// classified, resolved...) examples by accuracy comparison.
-    double a_threashold;
+    /// \note
+    /// a negative value means not used (only \a f_threashold is used).
+    double a_threashold = -1.0;
 
     symbol_set sset;
 
