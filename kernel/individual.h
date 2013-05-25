@@ -87,15 +87,15 @@ namespace vita
     category_t category() const;
 
     ///
-    /// \param[in] locus locust of a \c gene.
+    /// \param[in] l locus of a \c gene.
     /// \param[in] g a new gene.
     ///
-    /// Set the \a locus of the genome to \a g. Please note that this is one of
+    /// Set locus \a l of the genome to \a g. Please note that this is one of
     /// the very few methods that aren't const.
     ///
-    void set(const locus &locus, const gene &g)
+    void set(const locus &l, const gene &g)
     {
-      genome_(locus) = g;
+      genome_(l) = g;
       signature_.clear();
     }
 
@@ -167,7 +167,7 @@ namespace vita
     /// \return \c false when the iterator reaches the end.
     ///
     bool operator()() const
-    { return l[0] < ind_.size() && !loci_.empty(); }
+    { return l.index < ind_.size() && !loci_.empty(); }
 
     const locus operator++();
 
@@ -176,7 +176,7 @@ namespace vita
     ///
     const gene &operator*() const
     {
-      assert(l[0] < ind_.size());
+      assert(l.index < ind_.size());
       return ind_.genome_(l);
     }
 
@@ -185,7 +185,7 @@ namespace vita
     ///
     const gene *operator->() const
     {
-      assert(l[0] < ind_.size());
+      assert(l.index < ind_.size());
       return &ind_.genome_(l);
     }
 

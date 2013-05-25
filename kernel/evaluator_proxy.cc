@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
+
 #include "evaluator_proxy.h"
 #include "individual.h"
 #include "lambda_f.h"

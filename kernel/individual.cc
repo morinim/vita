@@ -36,7 +36,7 @@ namespace vita
   ///
   individual::individual(const environment &e, bool gen)
     : age(0), genome_(e.code_length, e.sset.categories()),
-      signature_(), best_({{0, 0}}), env_(&e)
+      signature_(), best_{0, 0}, env_(&e)
   {
     assert(e.debug(true, true));
 
@@ -107,9 +107,9 @@ namespace vita
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
 
-        set(l, genome_({{i+1, c}}));
+        set(l, genome_({i+1, c}));
 
         for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
         {
@@ -120,7 +120,7 @@ namespace vita
       }
 
     for (category_t c(0); c < categories; ++c)
-      set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+      set({sup, c}, gene(env_->sset.roulette_terminal(c)));
   }
   */
 
@@ -142,8 +142,8 @@ namespace vita
       {
         ++n;
 
-        const auto i(it.l[locus_index]);
-        const auto c(it.l[locus_category]);
+        const auto i(it.l.index);
+        const auto c(it.l.category);
 
         if (i < sup)
           set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
@@ -161,7 +161,7 @@ namespace vita
         {
           ++n;
 
-          set({{i, c}}, gene(env_->sset.roulette(c), i + 1, size()));
+          set({i, c}, gene(env_->sset.roulette(c), i + 1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
@@ -169,7 +169,7 @@ namespace vita
       {
         ++n;
 
-        set({{sup, c}}, gene(env_->sset.roulette_terminal(c)));
+        set({sup, c}, gene(env_->sset.roulette_terminal(c)));
       }
 */
 
@@ -242,7 +242,7 @@ namespace vita
 
     index_t i(0);
     for (const auto &g : gv)
-      ret.set({{i++, g.sym->category()}}, g);
+      ret.set({i++, g.sym->category()}, g);
 
     assert(ret.debug());
     return ret;
@@ -261,7 +261,7 @@ namespace vita
     individual ret(*this);
     const category_t categories(env_->sset.categories());
     for (category_t c(0); c < categories; ++c)
-      ret.set({{index, c}}, gene(env_->sset.roulette_terminal(c)));
+      ret.set({index, c}, gene(env_->sset.roulette_terminal(c)));
 
     assert(ret.debug());
     return ret;
@@ -322,7 +322,7 @@ namespace vita
   ///
   category_t individual::category() const
   {
-    return best_[locus_category];
+    return best_.category;
   }
 
   ///
@@ -353,7 +353,7 @@ namespace vita
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
         if (genome_(l) != ind.genome_(l))
           ++d;
       }
@@ -395,7 +395,7 @@ namespace vita
     }
     else
       for (size_t i(0); i < g.sym->arity(); ++i)
-        pack({{g.args[i], function::cast(g.sym)->arg_category(i)}}, p);
+        pack({g.args[i], function::cast(g.sym)->arg_category(i)}, p);
   }
 
   ///
@@ -455,7 +455,7 @@ namespace vita
     for (unsigned i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
 
         if (!genome_(l).sym)
         {
@@ -510,7 +510,7 @@ namespace vita
     for (index_t i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
 
         if (genome_(l).sym->category() != c)
         {
@@ -523,14 +523,14 @@ namespace vita
         }
       }
 
-    if (best_[locus_index] >= size())
+    if (best_.index >= size())
     {
       if (verbose)
         std::cerr << k_s_debug << " Incorrect index for first active symbol."
                   << std::endl;
       return false;
     }
-    if (best_[locus_category] >= categories)
+    if (best_.category >= categories)
     {
       if (verbose)
         std::cerr << k_s_debug
@@ -573,14 +573,13 @@ namespace vita
     {
       const gene &g(*it);
 
-      s << 'g' << it.l[locus_index] << '_' << it.l[locus_category]
-        << " [label="
+      s << 'g' << it.l.index << '_' << it.l.category << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
         << ", shape=" << (g.sym->arity() ? "box" : "parallelogram") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << l[locus_index] << '_' << l[locus_category] << " -- g"
-          << g.args[j] << '_' << function::cast(g.sym)->arg_category(j) << ';';
+        s << 'g' << l.index << '_' << l.category << " -- g" << g.args[j]
+          << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
     s << '}' << std::endl;
@@ -626,10 +625,10 @@ namespace vita
     {
       const gene &g(*it);
 
-      s << '[' << std::setfill('0') << std::setw(w1) << it.l[locus_index];
+      s << '[' << std::setfill('0') << std::setw(w1) << it.l.index;
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << it.l[locus_category];
+        s << ", " << std::setw(w2) << it.l.category;
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
@@ -663,10 +662,10 @@ namespace vita
       indent += 2;
     }
 
-    const unsigned arity(g.sym->arity());
+    const auto arity(g.sym->arity());
     if (arity)
-      for (unsigned i(0); i < arity; ++i)
-        tree(s, {{g.args[i], function::cast(g.sym)->arg_category(i)}}, indent,
+      for (size_t i(0); i < arity; ++i)
+        tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
              child);
   }
 
@@ -744,9 +743,9 @@ namespace vita
 
       const gene &g(ind_.genome_(l));
 
-      for (unsigned j(0); j < g.sym->arity(); ++j)
+      for (size_t j(0); j < g.sym->arity(); ++j)
       {
-        const locus l{{g.args[j], function::cast(g.sym)->arg_category(j)}};
+        const locus l{g.args[j], function::cast(g.sym)->arg_category(j)};
 
         loci_.insert(l);
       }
@@ -772,7 +771,7 @@ namespace vita
       return false;
 
     decltype(best_) best;
-    if (!(in >> best[locus_index] >> best[locus_category]))
+    if (!(in >> best.index >> best.category))
       return false;
 
     size_t rows, cols;
@@ -808,7 +807,7 @@ namespace vita
     if (!signature.load(in))
       return false;
 
-    if (best[locus_index] >= genome.rows())
+    if (best.index >= genome.rows())
       return false;
 
     age = t_age;
@@ -825,11 +824,10 @@ namespace vita
   ///
   bool individual::save(std::ostream &out) const
   {
-    out << age << ' ' << best_[locus_index] << ' ' << best_[locus_category]
-        << std::endl;
+    out << age << ' ' << best_.index << ' ' << best_.category << std::endl;
 
     out << genome_.rows() << ' ' << genome_.cols() << std::endl;
-    for (const gene &g : genome_)
+    for (const auto &g : genome_)
     {
       out << g.sym->opcode();
 
@@ -890,7 +888,7 @@ namespace vita
       for (category_t c(0); c < categories; ++c)
         if (random::boolean())
         {
-          const locus l{{i,c}};
+          const locus l{i,c};
           offspring.set(l, p2[l]);
         }
 */
@@ -924,7 +922,7 @@ namespace vita
     const auto cs(p1.size());
     const auto categories(p1.env().sset.categories());
 
-    const index_t cut(random::between<index_t>(1, cs - 1));
+    const auto cut(random::between<index_t>(1, cs - 1));
 
     const individual *parents[2] = {&p1, &p2};
     const bool base(random::boolean());
@@ -934,7 +932,7 @@ namespace vita
     for (index_t i(cut); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i,c}};
+        const locus l{i,c};
         offspring.set(l, (*parents[!base])[l]);
       }
 
@@ -979,7 +977,7 @@ namespace vita
     for (index_t i(cut1); i < cut2; ++i)
       for (category_t c(0); c < categories; ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
         offspring.set(l, (*parents[!base])[l]);
       }
 

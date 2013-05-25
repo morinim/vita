@@ -112,7 +112,7 @@ namespace vita
     for (index_t i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
       {
-        const locus l{{i, c}};
+        const locus l{i, c};
         count(ind[l].sym.get(), false);
       }
 

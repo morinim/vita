@@ -63,7 +63,7 @@ void search<T>::arl(const T &base, evolution<T> &evo)
       if (candidate_block.eff_size() <= 5 + adf_args)
       {
         const auto d_f(
-          base_fit[0] - evo.fitness(base.destroy_block(l[locus_index]))[0]);
+          base_fit[0] - evo.fitness(base.destroy_block(l.index))[0]);
 
         // Semantic introns cannot be building blocks.
         if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
@@ -75,7 +75,7 @@ void search<T>::arl(const T &base, evolution<T> &evo)
             T generalized(candidate_block.generalize(adf_args, &replaced));
             std::vector<category_t> categories(replaced.size());
             for (size_t j(0); j < replaced.size(); ++j)
-              categories[j] = replaced[j][locus_category];
+              categories[j] = replaced[j].category;
 
             p = std::make_shared<adf>(generalized, categories, 10);
           }

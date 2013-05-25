@@ -14,10 +14,7 @@
 #if !defined(LOCUS_H)
 #define      LOCUS_H
 
-#include <array>
 #include <iostream>
-
-#include "boost/multi_array.hpp"
 
 #include "gene.h"
 
@@ -28,24 +25,60 @@ namespace vita
   static_assert(sizeof(category_t) <= sizeof(size_t),
                 "category_t sizes expected to be <= size_t");
 
-  enum {locus_index = 0, locus_category = 1};
+  struct locus
+  {
+    index_t       index;
+    category_t category;
 
-  /// locus[index in the genome][type of the symbol].
-  typedef std::array<size_t, 2> locus;
+    bool operator==(const locus &) const;
+    bool operator!=(const locus &) const;
+    bool operator<(const locus &) const;
+    locus operator+(ptrdiff_t) const;
+  };
 
   ///
-  /// \param[in] l1 first locus.
   /// \param[in] l2 second locus.
-  /// \return \c true if \a l1 precedes \a l2 in lexicographic order
+  /// \return \c true if \a *this is equal to \a l2.
+  ///
+  inline
+  bool locus::operator==(const locus &l2) const
+  {
+    return index == l2.index && category == l2.category;
+  }
+
+  ///
+  /// \param[in] l2 second locus.
+  /// \return \c true if \a *this is not equal to \a l2.
+  ///
+  inline
+  bool locus::operator!=(const locus &l2) const
+  {
+    return index != l2.index || category != l2.category;
+  }
+
+  ///
+  /// \param[in] l2 second locus.
+  /// \return \c true if \a *this precedes \a l2 in lexicographic order
   ///         (http://en.wikipedia.org/wiki/Lexicographical_order).
   ///
   /// This operator is required by the STL std::map container.
   ///
   inline
-  bool operator<(const locus &l1, const locus &l2)
-  { return l1[locus_index] < l2[locus_index] ||
-           (l1[locus_index] == l2[locus_index] &&
-            l1[locus_category] < l2[locus_category]); }
+  bool locus::operator<(const locus &l2) const
+  {
+    return index < l2.index || (index == l2.index && category < l2.category);
+  }
+
+  ///
+  /// \param[in] i displacement.
+  /// \return a new locus obtained from \a this incrementing index component by
+  ///         \a i (and not changing category component).
+  ///
+  inline
+  locus locus::operator+(ptrdiff_t i) const
+  {
+    return {index + i, category};
+  }
 
   ///
   /// \param[out] s output stream.
@@ -55,19 +88,7 @@ namespace vita
   inline
   std::ostream &operator<<(std::ostream &s, const locus &l)
   {
-    return s << '(' << l[locus_index] << ',' << l[locus_category] << ')';
-  }
-
-  ///
-  /// \param[in] l starting locus.
-  /// \param[in] i displacement.
-  /// \return a new locus obtained from \a l incrementing index component by
-  ///         \a i (and not changing category component).
-  ///
-  inline
-  locus operator+(const locus &l, size_t i)
-  {
-    return {{l[locus_index] + i, l[locus_category]}};
+    return s << '(' << l.index << ',' << l.category << ')';
   }
 }  // namespace vita
 

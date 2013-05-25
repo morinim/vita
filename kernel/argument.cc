@@ -11,6 +11,8 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
+
 #include "argument.h"
 #include "gene.h"
 #include "interpreter.h"

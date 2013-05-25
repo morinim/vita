@@ -11,6 +11,7 @@
  *
  */
 
+#include <boost/lexical_cast.hpp>
 #include <boost/none.hpp>
 
 #include "interpreter.h"
@@ -86,13 +87,13 @@ namespace vita
 
     const function *const f(function::cast(g.sym));
 
-    const locus l{{g.args[i], f->arg_category(i)}};
+    const locus l{g.args[i], f->arg_category(i)};
 
     if (!cache_(l))
     {
       const locus backup(ip_);
       ip_ = l;
-      assert(ip_[0] > backup[0]);
+      assert(ip_.index > backup.index);
       const any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
 
@@ -103,7 +104,7 @@ namespace vita
     {
       const locus backup(ip_);
       ip_ = l;
-      assert(ip_[0] > backup[0]);
+      assert(ip_.index > backup.index);
       const any ret(ind_[ip_].sym->eval(this));
       ip_ = backup;
       assert(to_string(ret) == to_string(*cache_(l)));
@@ -134,7 +135,7 @@ namespace vita
   ///
   bool interpreter::debug() const
   {
-    return ip_[0] < ind_.size() && (!context_ || context_->debug());
+    return ip_.index < ind_.size() && (!context_ || context_->debug());
   }
 
   ///
