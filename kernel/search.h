@@ -31,10 +31,10 @@ namespace vita
   /// This \c class drives the evolution.
   ///
   template<class T = individual>
-  class search
+  class basic_search
   {
   public:
-    explicit search(problem *const);
+    explicit basic_search(problem *const);
 
     void arl(const T &, evolution<T> &);
     void tune_parameters();
@@ -57,6 +57,8 @@ namespace vita
     environment env_;
     problem   *prob_;
   };
+
+  typedef basic_search<> search;
 
 #include "search_inl.h"
 }  // namespace vita

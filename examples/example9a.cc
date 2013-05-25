@@ -23,7 +23,7 @@ int main()
 
   if (problem.load("titanic_train.csv").first)  // reading data file
   {
-    vita::search<> s(&problem);
+    vita::search s(&problem);
     vita::individual best(s.run());             // starting search
 
     std::cout << best << std::endl;             // print result

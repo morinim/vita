@@ -362,7 +362,7 @@ namespace ui
       {
         fix_parameters(problem);
 
-        vita::search<> s(problem);
+        vita::search s(problem);
         s.run(runs);
       }
       else
