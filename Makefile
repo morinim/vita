@@ -14,7 +14,7 @@ BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 # Compiler (clang++, g++)
 CXX = clang++
 
-# -DCLONE_SCALING
+# -DCLONE_SCALING, -DVITA_NO_LIB
 DEFS =
 
 

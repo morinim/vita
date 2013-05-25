@@ -17,7 +17,6 @@
 #include "interpreter.h"
 #include "adf.h"
 #include "individual.h"
-#include "symbol.h"
 
 namespace vita
 {

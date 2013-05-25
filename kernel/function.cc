@@ -11,7 +11,9 @@
  *
  */
 
-#include "function.h"
+#if !defined(VITA_NO_LIB)
+#  include "function.h"
+#endif
 
 namespace vita
 {
@@ -26,9 +28,10 @@ namespace vita
   /// \param[in] asve \c true if the function is associative (e.g. addition is
   ///                 associative, division isn't).
   ///
+  VITA_INLINE
   function::function(const std::string &dis, category_t c,
-                     const std::vector<category_t> &args, unsigned w, bool asve)
-    : symbol(dis, c, w), associative_(asve)
+                     const std::vector<category_t> &args, unsigned w,
+                     bool asve) : symbol(dis, c, w), associative_(asve)
   {
     assert(args.size() <= gene::k_args);
 
@@ -44,6 +47,7 @@ namespace vita
   ///
   /// \return \c true if the \a function passes the internal consistency check.
   ///
+  VITA_INLINE
   bool function::debug() const
   {
     return arity_ && arity_ <= gene::k_args && symbol::debug();
