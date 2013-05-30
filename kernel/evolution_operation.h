@@ -54,7 +54,7 @@ namespace vita
     // Defining offspring as a set of individuals lets the generalized
     // operation encompass recent additions, such as scan mutation, that
     // generates numerous offspring from a single parent.
-    virtual std::vector<T> run(const std::vector<size_t> &) = 0;
+    virtual std::vector<T> run(const std::vector<coord> &) = 0;
 
   protected:
     const evolution<T> *const evo_;
@@ -74,7 +74,7 @@ namespace vita
   public:
     standard_op(const evolution<T> *const, summary<T> *const);
 
-    virtual std::vector<T> run(const std::vector<size_t> &) override;
+    virtual std::vector<T> run(const std::vector<coord> &) override;
   };
 
 #include "evolution_operation_inl.h"

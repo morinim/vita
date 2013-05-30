@@ -15,34 +15,131 @@
 #define      POPULATION_INL_H
 
 ///
-/// \param[in] i index of an \a individual.
-/// \return a reference to the \a individual at index \a i.
+/// \param[in] e base vita::environment.
+///
+/// Creates a random population (initial size \a e.individuals).
 ///
 template<class T>
-T &population<T>::operator[](size_t i)
+population<T>::population(const environment &e) : pop_(1)
 {
-  assert(i < individuals());
-return pop_[i];
+  assert(e.debug(true, true));
+
+  pop_[0].reserve(e.individuals);
+
+  // DO NOT CHANGE WITH A CALL TO INIT_LAYER0: when layer 0 is empty, env() is
+  // undefined!
+  for (unsigned i(0); i < e.individuals; ++i)
+    pop_[0].emplace_back(e, true);
+
+  assert(debug(true));
 }
 
 ///
-/// \param[in] i index of an individual.
-/// \return a constant reference to the individual at index \a i.
+/// Resets layer 0 of the population.
 ///
 template<class T>
-const T &population<T>::operator[](size_t i) const
+void population<T>::init_layer0()
 {
-  assert(i < individuals());
-return pop_[i];
+  const environment &e(env());
+
+  pop_[0].clear();
+
+  for (unsigned i(0); i < e.individuals; ++i)
+    pop_[0].emplace_back(e, true);
+}
+
+///
+/// \return number of active layers.
+///
+/// \note
+/// * The number of active layers is a dynamic value (it is a monotonically
+///   increasing function of the generation number).
+/// * Maximum number of layers (\c env().alps.layers) is a constant value
+///   greater than or equal to \c layers().
+///
+template<class T>
+unsigned population<T>::layers() const
+{
+  assert(pop_.size() <= env().alps.layers);
+
+  return pop_.size();
+}
+
+///
+/// Add a new layer to the population.
+///
+template<class T>
+void population<T>::add_layer()
+{
+  if (layers() < env().alps.layers)
+  {
+    pop_.push_back(std::vector<individual>());
+    pop_.back().reserve(env().individuals);
+
+    // Selection procedures expect not-empty layers, so... a small workaround.
+    pop_.back().emplace_back(env(), true);
+  }
+}
+
+///
+/// \param[in] l index of a layer.
+/// \param[in] i an individual.
+///
+/// Add individual \a i to layer \a l.
+///
+template<class T>
+void population<T>::add_to_layer(unsigned l, const T &i)
+{
+  assert(l < layers());
+  pop_[l].push_back(i);
+}
+
+///
+/// \param[in] c coordinates of an \a individual.
+/// \return a reference to the \a individual at coordinates \a c.
+///
+template<class T>
+T &population<T>::operator[](coord c)
+{
+  assert(c.layer < layers());
+  assert(c.index < individuals(c.layer));
+  return pop_[c.layer][c.index];
+}
+
+///
+/// \param[in] c coordinates of an individual.
+/// \return a constant reference to the individual at coordinates \a c.
+///
+template<class T>
+const T &population<T>::operator[](coord c) const
+{
+  assert(c.layer < layers());
+  assert(c.index < individuals(c.layer));
+  return pop_[c.layer][c.index];
+}
+
+///
+/// \param[in] l a layer.
+/// \return the number of individuals in layer \a l.
+///
+template<class T>
+unsigned population<T>::individuals(unsigned l) const
+{
+  assert(l < layers());
+  return pop_[l].size();
 }
 
 ///
 /// \return the number of individuals in the population.
 ///
 template<class T>
-size_t population<T>::individuals() const
+unsigned population<T>::individuals() const
 {
-  return pop_.size();
+  unsigned n(0);
+  for (unsigned l(0); l < layers(); ++l)
+    n += individuals(l);
+
+  return n;
 }
 
 ///
@@ -51,7 +148,12 @@ size_t population<T>::individuals() const
 template<class T>
 const environment &population<T>::env() const
 {
-  return pop_[0].env();
+  assert(pop_.size());     // DO NOT CHANGE with assert(layers()) => infinite
+                           // loop
+  assert(pop_[0].size());  // DO NOT CHANGE with assert(individuals(0)) =>
+                           // infinite loop
+
+  return pop_[0][0].env();
 }
 
 ///
@@ -64,7 +166,7 @@ typename population<T>::const_iterator population<T>::begin() const
 }
 
 ///
-/// \return an itarator pointing one element past the last individual of the
+/// \return an iterator pointing one element past the last individual of the
 ///         population
 ///
 template<class T>
@@ -74,22 +176,41 @@ typename population<T>::const_iterator population<T>::end() const
 }
 
 ///
-/// \param[in] e base vita::environment.
-///
-/// Creates a random population (initial size \a e.individuals).
+/// \param[in] c the coordinates of an individual.
+/// \return \c true if the individual at coordinates \c is too old for his
+///         layer.
 ///
 template<class T>
-population<T>::population(const environment &e)
+bool population<T>::aged(coord c) const
 {
-  assert(e.debug(true, true));
+  return pop_[c.layer][c.index].age > max_age(c.layer);
+}
 
-  pop_.reserve(e.individuals);
-  pop_.clear();
+///
+/// \param[in] l a layer.
+/// \return the maximum allowed age for an individual in layer \a l.
+///
+template<class T>
+unsigned population<T>::max_age(unsigned l) const
+{
+  if (l + 1 == env().alps.layers)
+    return std::numeric_limits<unsigned>::max();
 
-  for (size_t i(0); i < e.individuals; ++i)
-    pop_.emplace_back(e, true);
+  const auto age_gap(env().alps.age_gap);
 
-  assert(debug(true));
+  // This is a polynomial aging scheme.
+  switch (l)
+  {
+  case 0:
+    return age_gap;
+  case 1:
+    return age_gap + age_gap;
+  default:
+    return l * l * age_gap;
+  }
+
+  // A linear aging scheme.
+  // return age_gap * (l + 1);
 }
 
 ///
@@ -98,8 +219,9 @@ population<T>::population(const environment &e)
 template<class T>
 void population<T>::inc_age()
 {
-  for (auto &i : pop_)
-    ++i.age;
+  for (auto &l : pop_)
+    for (auto &i : l)
+      ++i.age;
 }
 
 ///
@@ -109,9 +231,10 @@ void population<T>::inc_age()
 template<class T>
 bool population<T>::debug(bool verbose) const
 {
-  for (const auto &i : pop_)
-    if (!i.debug(verbose))
-      return false;
+  for (const auto &l : pop_)
+    for (const auto &i : l)
+      if (!i.debug(verbose))
+        return false;
 
   return true;
 }
@@ -127,17 +250,26 @@ bool population<T>::debug(bool verbose) const
 template<class T>
 bool population<T>::load(std::istream &in)
 {
-  size_t n_elem(0);
-  if (!(in >> n_elem))
+  unsigned n_layers(0);
+  if (!(in >> n_layers))
     return false;
 
   population p(env());
-  for (size_t i(0); i < n_elem; ++i)
-    if (!p[i].load(in))
+  p.pop_.reserve(n_layers);
+
+  for (unsigned l(0); l < n_layers; ++l)
+  {
+    unsigned n_elem(0);
+    if (!in >> n_elem)
       return false;
 
+    for (unsigned i(0); i < n_elem; ++i)
+      if (!p[{l, i}].load(in))
+        return false;
+  }
+
   *this = p;
-return true;
+  return true;
 }
 
 ///
@@ -147,10 +279,15 @@ return true;
 template<class T>
 bool population<T>::save(std::ostream &out) const
 {
-  out << individuals() << std::endl;
+  out << layers() << std::endl;
 
-  for (const auto &i : *this)
-    i.save(out);
+  for (const auto &l : pop_)
+  {
+    out << l.size() << std::endl;
+
+    for (const auto &i : l)
+      i.save(out);
+  }
 
   return out.good();
 }
@@ -163,8 +300,18 @@ bool population<T>::save(std::ostream &out) const
 template<class T>
 std::ostream &operator<<(std::ostream &s, const population<T> &pop)
 {
-  for (const auto &i : pop)
-    s << i << std::endl;
+  unsigned n_layer(0);
+
+  for (const auto &l : pop)
+  {
+    s << std::string(70, '-') << std::endl << "Layer " << n_layer
+      << std::string(70, '-') << std::endl;
+
+    for (const auto &i : l)
+      s << i << std::endl;
+
+    ++n_layer;
+  }
 
   return s;
 }

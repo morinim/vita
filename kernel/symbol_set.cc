@@ -196,7 +196,7 @@ namespace vita
   const symbol::ptr &symbol_set::roulette(const s_vector & symbols,
                                           std::uintmax_t sum) const
   {
-    const std::uintmax_t slot(random::between<std::uintmax_t>(0, sum));
+    const auto slot(random::sup(sum));
 
     size_t i(0);
     for (std::uintmax_t wedge(symbols[i]->weight);
@@ -210,7 +210,7 @@ namespace vita
     // for (size_t i(0), winner(0); i < symbols.size(); ++i)
     // {
     //   total += symbols[i]->weight;
-    //   if (random::between<std::uintmax_t>(0, total+1) < symbols[i]->weight)
+    //   if (random::sup(total + 1) < symbols[i]->weight)
     //     winner = i;
     //   return winner;
     // }

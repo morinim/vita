@@ -59,19 +59,19 @@ namespace vita
     /// be changed afterwards.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t code_length = 0;
+    unsigned code_length = 0;
 
     /// The number of symbols in the patch section (a section of the genome
     /// that contains terminals only).
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t patch_length = 0;
+    unsigned patch_length = 0;
 
-    /// Number of individuals in the population.
+    /// Number of individuals in a layer of the population.
     ///
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    size_t individuals = 0;
+    unsigned individuals = 0;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
@@ -122,7 +122,7 @@ namespace vita
     /// equivalent to selecting individuals at random.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t tournament_size = 0;
+    unsigned tournament_size = 0;
 
     /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
@@ -135,7 +135,7 @@ namespace vita
     /// to involve only parents from i's local neightborhood, where the
     /// neightborhood is defined as all individuals within distance
     /// \c mate_zone/2 of i (0 for panmictic).
-    boost::optional<size_t> mate_zone;
+    boost::optional<unsigned> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.
     boost::optional<unsigned> g_since_start;
@@ -180,6 +180,34 @@ namespace vita
     /// \note
     /// a negative value means not used (only \a f_threashold is used).
     double a_threashold = -1.0;
+
+    ///
+    /// \brief Parameters for the Age-Layered Population Structure (ALPS)
+    ///        paradigm.
+    ///
+    /// ALPS is a meta heuristic for overcoming premature convergence by
+    /// running multiple instances of a search algorithm in parallel, with each
+    /// instance in its own age layer and having its own population.
+    ///
+    struct alps_parameters
+    {
+      /// Number of layers for the population.
+      unsigned layers = 1;
+
+      /// The maximum ages for age layers is monotonically increasing and
+      /// different methods can be used for setting these values. Since there
+      /// is generally little need to segregate individuals which are within a
+      /// few "generations" of each other, these values are then multiplied by
+      /// an \a age_gap parameter. In addition, this allows individuals in the
+      /// first age-layer some time to be optimized before them, or their
+      /// offspring, are pushed to the next age layer.
+      /// For instance, with 6 age layers, a linear aging-scheme and an age gap
+      /// of 20, the maximum ages for the layers are: 20, 40, 60, 80, 100, 120.
+      ///
+      /// Also, the \a age_gap parameter sets the frequency of how often the
+      /// first layer is restarted.
+      unsigned age_gap = 20;
+    } alps;
 
     symbol_set sset;
 

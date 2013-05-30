@@ -19,11 +19,8 @@
 
 #include "analyzer.h"
 #include "evaluator_proxy.h"
-#include "evolution_operation.h"
-#include "evolution_replacement.h"
-#include "evolution_selection.h"
+#include "evolution_strategy.h"
 #include "population.h"
-#include "random.h"
 #include "timer.h"
 
 namespace vita
@@ -74,7 +71,7 @@ namespace vita
               std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    const summary<T> &run(unsigned);
+    template<class ES> const summary<T> &run(unsigned);
 
     const vita::population<T> &population() const;
     vita::population<T> &population();
@@ -84,11 +81,6 @@ namespace vita
     unsigned seen(const T &i) const;
 
     bool debug(bool) const;
-
-  public:  // Public data members.
-    typename selection_strategy<T>::ptr     selection;
-    typename operation_strategy<T>::ptr     operation;
-    typename replacement_strategy<T>::ptr replacement;
 
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }

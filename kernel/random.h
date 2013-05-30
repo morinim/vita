@@ -30,10 +30,12 @@ namespace vita
     typedef std::mt19937 engine_t;
 
     template<class T> static T between(T, T);
+    template<class T> static T sup(T);
+
     template<class T> static const T &element(const std::vector<T> &);
     template<class T> static const T &element(const std::set<T> &);
 
-    static size_t ring(size_t, size_t, size_t);
+    static unsigned ring(unsigned, unsigned, unsigned);
 
     static bool boolean(double);
     static bool boolean();
@@ -118,6 +120,20 @@ namespace vita
   }
 
   ///
+  /// \param[in] sup upper bound.
+  /// \return a random number in the [0;sup[ range.
+  ///
+  /// \note
+  /// This is a shortcut for: \c between<T>(0, sup);
+  ///
+  template<class T>
+  inline
+  T random::sup(T sup)
+  {
+    return between<T>(T(0), sup);
+  }
+
+  ///
   /// \param[in] vect a vector.
   /// \return a random element of the vector \a vect.
   ///
@@ -126,7 +142,7 @@ namespace vita
   const T &random::element(const std::vector<T> &vect)
   {
     assert(vect.size());
-    return vect[between<size_t>(0, vect.size())];
+    return vect[between<std::size_t>(0, vect.size())];
   }
 
   ///
@@ -140,7 +156,7 @@ namespace vita
     assert(s.size());
 
     auto it(s.cbegin());
-    std::advance(it, between<size_t>(0, s.size()));
+    std::advance(it, between<std::size_t>(0, s.size()));
 
     return *it;
   }

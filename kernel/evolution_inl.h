@@ -108,10 +108,7 @@ template<class T>
 evolution<T>::evolution(const environment &env, evaluator *eva,
                         std::function<bool (const summary<T> &)> sc,
                         std::function<void (unsigned)> sd)
-  : selection(std::make_shared<tournament_selection<T>>(this)),
-    operation(std::make_shared<standard_op<T>>(this, &stats_)),
-    replacement(std::make_shared<kill_tournament<T>>(this)), pop_(env),
-    eva_(eva), external_stop_condition_(sc), shake_data_(sd)
+  : pop_(env), eva_(eva), external_stop_condition_(sc), shake_data_(sd)
 {
   assert(eva);
 
@@ -164,8 +161,9 @@ analyzer evolution<T>::get_stats() const
 {
   analyzer az;
 
-  for (const auto &i : pop_)
-    az.add(i, fitness(i));
+  for (const auto &layer : pop_)
+    for (const auto &i : layer)
+      az.add(i, fitness(i));
 
   return az;
 }
@@ -290,7 +288,7 @@ fitness_t evolution<T>::fast_fitness(const T &ind) const
 ///
 template<class T>
 void evolution<T>::print_progress(unsigned k, unsigned run_count,
-                                 bool status) const
+                                  bool status) const
 {
   if (env().verbosity >= 1)
   {
@@ -320,10 +318,11 @@ void evolution<T>::print_progress(unsigned k, unsigned run_count,
 /// hand.
 ///
 template<class T>
+template<class ES>
 const summary<T> &evolution<T>::run(unsigned run_count)
 {
   stats_.clear();
-  stats_.best = {pop_[0], fitness(pop_[0])};
+  stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
 
   timer measure;
 
@@ -351,9 +350,16 @@ const summary<T> &evolution<T>::run(unsigned run_count)
     stats_.az = get_stats();
     log(run_count);
 
+    const std::unique_ptr<typename ES::selection> selection(
+      new typename ES::selection(this));
+    const std::unique_ptr<typename ES::recombination> operation(
+      new typename ES::recombination(this, &stats_));
+    const std::unique_ptr<typename ES::replacement> replacement(
+      new typename ES::replacement(this));
+
     for (unsigned k(0); k < pop_.individuals() && !ext_int; ++k)
     {
-      if (k % std::max<size_t>(pop_.individuals() / 100, 2))
+      if (k % std::max(pop_.individuals() / 100, 2u))
       {
         print_progress(k, run_count, false);
 
@@ -361,13 +367,13 @@ const summary<T> &evolution<T>::run(unsigned run_count)
       }
 
       // --------- SELECTION ---------
-      std::vector<size_t> parents(selection->run());
+      std::vector<coord> parents(selection->run());
 
       // --------- CROSSOVER / MUTATION ---------
       std::vector<T> off(operation->run(parents));
 
       // --------- REPLACEMENT --------
-      const fitness_t before(stats_.best->fitness);
+      const auto before(stats_.best->fitness);
       replacement->run(parents, off, &stats_);
 
       if (stats_.best->fitness != before)
@@ -376,7 +382,16 @@ const summary<T> &evolution<T>::run(unsigned run_count)
 
     stats_.speed = get_speed(measure.elapsed());
 
-    pop_.inc_age();
+    if (ES::alps)
+    {
+      pop_.inc_age();
+
+      if (stats_.gen && stats_.gen % env().alps.age_gap == 0)
+      {
+        pop_.init_layer0();
+        pop_.add_layer();
+      }
+    }
   }
 
   if (env().verbosity >= 2)

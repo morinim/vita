@@ -13,8 +13,6 @@
 
 #include <iostream>
 
-#include <boost/logic/tribool_io.hpp>
-
 #include "environment.h"
 #include "terminal.h"
 
@@ -86,6 +84,8 @@ namespace vita
     pt->put(env + "max_gens_since_start", g_since_start);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
+    pt->put(env + "alps.layers", alps.layers);
+    pt->put(env + "alps.age_gap", alps.age_gap);
     pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);

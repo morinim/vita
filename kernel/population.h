@@ -22,6 +22,18 @@
 namespace vita
 {
   ///
+  /// \brief Holds the coordinates of an individual in a population.
+  ///
+  struct coord
+  {
+    unsigned layer;
+    unsigned index;
+
+    bool operator==(coord c) const
+    { return layer == c.layer && index == c.index; }
+  };
+
+  ///
   /// \brief A group of individual which may interact together (for example by
   ///        mating) producing offspring.
   ///
@@ -31,19 +43,27 @@ namespace vita
   class population
   {
   public:
-    typedef typename std::vector<T>::const_iterator const_iterator;
+    typedef typename std::vector<std::vector<T>>::const_iterator
+      const_iterator;
 
     explicit population(const environment &);
 
-    T &operator[](size_t);
-    const T &operator[](size_t) const;
+    T &operator[](coord);
+    const T &operator[](coord) const;
 
     const_iterator begin() const;
     const_iterator end() const;
 
-    size_t individuals() const;
+    unsigned individuals() const;
+    unsigned individuals(unsigned) const;
 
+    void init_layer0();
+    void add_layer();
+    unsigned layers() const;
     void inc_age();
+    unsigned max_age(unsigned) const;
+    bool aged(coord) const;
+    void add_to_layer(unsigned, const T &);
 
     const environment &env() const;
 
@@ -53,11 +73,8 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private support methods.
-    void clear(const environment &, size_t);
-
   private:  // Private data members.
-    std::vector<T> pop_;
+    std::vector<std::vector<T>> pop_;
   };
 
 #include "population_inl.h"

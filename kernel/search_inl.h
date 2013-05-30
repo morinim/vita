@@ -17,8 +17,8 @@
 ///
 /// \param[in] prob a \c problem used for search initialization.
 ///
-template<class T>
-basic_search<T>::basic_search(problem *const prob)
+template<class T, class ES>
+basic_search<T, ES>::basic_search(problem *const prob)
   : env_(prob->env), prob_(prob)
 {
   assert(prob->debug(true));
@@ -35,8 +35,8 @@ basic_search<T>::basic_search(problem *const prob)
 /// process and acquires the necessary structure for solving the problem
 /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
 ///
-template<class T>
-void basic_search<T>::arl(const T &base, evolution<T> &evo)
+template<class T, class ES>
+void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
 {
   const fitness_t base_fit(evo.fitness(base));
   if (base_fit.isfinite())
@@ -113,8 +113,8 @@ void basic_search<T>::arl(const T &base, evolution<T> &evo)
 /// * firstly 'difficult' cases;
 /// * secondly cases which have not been looked at for several generations.
 ///
-template<class T>
-void basic_search<T>::dss(unsigned generation) const
+template<class T, class ES>
+void basic_search<T, ES>::dss(unsigned generation) const
 {
   if (prob_->data())
   {
@@ -185,8 +185,8 @@ void basic_search<T>::dss(unsigned generation) const
 /// \param[in] s an up to date run summary.
 /// \return \c true when a run should be interrupted.
 ///
-template<class T>
-bool basic_search<T>::stop_condition(const summary<T> &s) const
+template<class T, class ES>
+bool basic_search<T, ES>::stop_condition(const summary<T> &s) const
 {
   assert(env_.g_since_start);
 
@@ -236,8 +236,8 @@ bool basic_search<T>::stop_condition(const summary<T> &s) const
 /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
 ///   Francone).
 ///
-template<class T>
-void basic_search<T>::tune_parameters()
+template<class T, class ES>
+void basic_search<T, ES>::tune_parameters()
 {
   const environment dflt(true);
   const environment &constrained(prob_->env);
@@ -344,8 +344,8 @@ void basic_search<T>::tune_parameters()
 /// \warning
 /// This method can be very time consuming.
 ///
-template<class T>
-double basic_search<T>::accuracy(const T &ind) const
+template<class T, class ES>
+double basic_search<T, ES>::accuracy(const T &ind) const
 {
   if (env_.a_threashold < 0.0)
     return env_.a_threashold;
@@ -358,9 +358,10 @@ double basic_search<T>::accuracy(const T &ind) const
 /// \param[in] fitness fitness reached in the current run.
 /// \param[in] accuracy accuracy reached in the current run.
 ///
-template<class T>
-void basic_search<T>::print_resume(bool validation, const fitness_t &fitness,
-                                   double accuracy) const
+template<class T, class ES>
+void basic_search<T, ES>::print_resume(bool validation,
+                                       const fitness_t &fitness,
+                                       double accuracy) const
 {
   if (env_.verbosity >= 2)
   {
@@ -379,8 +380,8 @@ void basic_search<T>::print_resume(bool validation, const fitness_t &fitness,
 /// \param[in] n number of runs.
 /// \return best individual found.
 ///
-template<class T>
-T basic_search<T>::run(unsigned n)
+template<class T, class ES>
+T basic_search<T, ES>::run(unsigned n)
 {
   assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
 
@@ -412,7 +413,7 @@ T basic_search<T>::run(unsigned n)
   for (unsigned run(0); run < n; ++run)
   {
     evolution<T> evo(env_, prob_->get_evaluator().get(), stop, shake_data);
-    summary<T> s(evo.run(run));
+    summary<T> s(evo.template run<ES>(run));
 
     // Depending on validation, this can be the training fitness or the
     // validation fitness for the current run.
@@ -508,12 +509,12 @@ T basic_search<T>::run(unsigned n)
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-template<class T>
-void basic_search<T>::log(const summary<T> &run_sum,
-                          const distribution<fitness_t> &fd,
-                          const std::list<unsigned> &good_runs,
-                          unsigned best_run, double best_accuracy,
-                          unsigned runs)
+template<class T, class ES>
+void basic_search<T, ES>::log(const summary<T> &run_sum,
+                              const distribution<fitness_t> &fd,
+                              const std::list<unsigned> &good_runs,
+                              unsigned best_run, double best_accuracy,
+                              unsigned runs)
 {
   // Summary logging.
   if (env_.stat_summary)
@@ -579,8 +580,8 @@ void basic_search<T>::log(const summary<T> &run_sum,
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the object passes the internal consistency check.
 ///
-template<class T>
-bool basic_search<T>::debug(bool verbose) const
+template<class T, class ES>
+bool basic_search<T, ES>::debug(bool verbose) const
 {
   return prob_->debug(verbose);
 }

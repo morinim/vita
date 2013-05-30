@@ -18,8 +18,7 @@
 /// \param[in] evo pointer to the current evolution object.
 ///
 template<class T>
-selection_strategy<T>::selection_strategy(const evolution<T> *const evo)
-  : evo_(evo)
+strategy<T>::strategy(const evolution<T> *const e) : evo_(e)
 {
 }
 
@@ -27,9 +26,9 @@ selection_strategy<T>::selection_strategy(const evolution<T> *const evo)
 /// \return the index of a random individual.
 ///
 template<class T>
-size_t selection_strategy<T>::pickup() const
+unsigned strategy<T>::pickup() const
 {
-  return random::between<size_t>(0, evo_->population().individuals());
+  return vita::random::sup(evo_->population().individuals(0));
 }
 
 ///
@@ -42,57 +41,29 @@ size_t selection_strategy<T>::pickup() const
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-size_t selection_strategy<T>::pickup(size_t target) const
+unsigned strategy<T>::pickup(unsigned target) const
 {
-  const population<T> &pop(evo_->population());
+  const auto &pop(evo_->population());
 
-
-  return random::ring(target, *pop.env().mate_zone, pop.individuals());
+  return vita::random::ring(target, *pop.env().mate_zone, pop.individuals(0));
 }
 
 ///
 /// \param[in] evo pointer to the current evolution object.
 ///
 template<class T>
-tournament_selection<T>::tournament_selection(const evolution<T> *const evo)
-  : selection_strategy<T>(evo)
+tournament<T>::tournament(const evolution<T> *const e) : strategy<T>(e)
 {
 }
 
-/*
 ///
-/// \param[in] target index of an \a individual in the \a population.
-/// \return index of the best \a individual found.
+/// \return a vector of coordinates of individuals ordered in descending
+///         fitness.
 ///
 /// Tournament selection works by selecting a number of individuals from the
 /// population at random, a tournament, and then choosing only the best
 /// of those individuals.
 /// Recall that better individuals have highter fitnesses.
-///
-template<class T>
-size_t tournament_selection<T>::tournament(size_t target) const
-{
-  const population<T> &pop(this->evo_->population());
-  const unsigned rounds(pop.env().tournament_size);
-
-  coord sel(pickup(target));
-  for (unsigned i(1); i < rounds; ++i)
-  {
-    const coord j(pickup(target));
-
-    const fitness_t fit_j(this->evo_->fitness(pop[j]));
-    const fitness_t fit_sel(this->evo_->fitness(pop[sel]));
-    if (fit_j > fit_sel)
-    sel = j;
-    }
-
-  return sel;
-}
-*/
-
-///
-/// \return a vector of indexes of individuals ordered in descending
-///         fitness.
 ///
 /// Parameters from the environment:
 /// * mate_zone - to restrict the selection of individuals to a segment of
@@ -100,25 +71,25 @@ size_t tournament_selection<T>::tournament(size_t target) const
 /// * tournament_size - to control selection pressure.
 ///
 template<class T>
-std::vector<size_t> tournament_selection<T>::run()
+std::vector<coord> tournament<T>::run()
 {
   const population<T> &pop(this->evo_->population());
 
   const auto rounds(pop.env().tournament_size);
-  const size_t target(this->pickup());
+  const unsigned target(this->pickup());
 
   assert(rounds);
-  std::vector<size_t> ret(rounds);
+  std::vector<coord> ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
   // DO NOT USE std::sort it is way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
-    const size_t new_index(this->pickup(target));
-    const auto new_fitness(this->evo_->fitness(pop[new_index]));
+    const auto new_index(this->pickup(target));
+    const auto new_fitness(this->evo_->fitness(pop[{0, new_index}]));
 
-    size_t j(0);
+    unsigned j(0);
 
     // Where is the insertion point?
     while (j < i && new_fitness < this->evo_->fitness(pop[ret[j]]))
@@ -128,14 +99,107 @@ std::vector<size_t> tournament_selection<T>::run()
     for (auto k(j); k < i; ++k)
       ret[k + 1] = ret[k];
 
-    ret[j] = new_index;
+    ret[j] = {0, new_index};
   }
 
 #if !defined(NDEBUG)
-  for (size_t i(0); i + 1 < rounds; ++i)
-    assert(this->evo_->fitness(pop[ret[i]]) >=
-           this->evo_->fitness(pop[ret[i + 1]]));
+  for (unsigned i(1); i < rounds; ++i)
+    assert(this->evo_->fitness(pop[ret[i - 1]]) >=
+           this->evo_->fitness(pop[ret[i]]));
 #endif
+
+  return ret;
+}
+
+///
+/// \param[in] l a layer.
+/// \param[in] p the probability of extracting an individual in layer \a l
+///              (1 - \a p is the probability of extracting an individual
+///              in layer \a l-1).
+/// \return the coordinates of a random individual in layer \a l.
+///
+template<class T>
+coord alps<T>::pickup(unsigned l, double p) const
+{
+  assert(0.0 <= p && p <= 1.0);
+
+  const auto &pop(this->evo_->population());
+
+  assert(l < pop.layers());
+
+  if (l > 0 && !vita::random::boolean(p))
+    --l;
+
+  return {l, vita::random::sup(pop.individuals(l))};
+}
+
+///
+/// \param[in] evo pointer to the current evolution object.
+///
+template<class T>
+alps<T>::alps(const evolution<T> *const e) : strategy<T>(e)
+{
+}
+
+///
+///
+///
+template<class T>
+std::vector<coord> alps<T>::run()
+{
+  const population<T> &pop(this->evo_->population());
+
+  const auto layer(vita::random::sup(pop.layers()));
+
+  std::vector<coord> ret = {pickup(layer), pickup(layer)};
+
+  typedef std::pair<bool, fitness_t> age_fit_t;
+  age_fit_t age_fit[2] =
+  {
+    {!pop.aged(ret[0]), this->evo_->fitness(pop[ret[0]])},
+    {!pop.aged(ret[1]), this->evo_->fitness(pop[ret[1]])}
+  };
+
+  if (age_fit[0] < age_fit[1])
+  {
+    std::swap(ret[0], ret[1]);
+    std::swap(age_fit[0], age_fit[1]);
+  }
+
+  assert(age_fit[0] >= age_fit[1]);
+
+  auto rounds(pop.env().tournament_size);
+
+  while (rounds--)
+  {
+    const auto tmp(pickup(layer, .5));
+    const age_fit_t tmp_age_fit{!pop.aged(tmp), this->evo_->fitness(pop[tmp])};
+
+    if (age_fit[0] < tmp_age_fit)
+    {
+      ret[1] = ret[0];
+      age_fit[1] = age_fit[0];
+
+      ret[0] = tmp;
+      age_fit[0] = tmp_age_fit;
+    }
+    else if (age_fit[1] < tmp_age_fit)
+    {
+      ret[1] = tmp;
+      age_fit[1] = tmp_age_fit;
+    }
+
+    assert(age_fit[0].first == !pop.aged(ret[0]));
+    assert(age_fit[1].first == !pop.aged(ret[1]));
+    assert(age_fit[0].second == this->evo_->fitness(pop[ret[0]]));
+    assert(age_fit[1].second == this->evo_->fitness(pop[ret[1]]));
+    assert(age_fit[0] >= age_fit[1]);
+    assert(!pop.aged(ret[0]) || pop.aged(ret[1]));
+    assert(layer <= ret[0].layer + 1);
+    assert(layer <= ret[1].layer + 1);
+    assert(ret[0].layer <= layer);
+    assert(ret[1].layer <= layer);
+  }
 
   return ret;
 }
@@ -144,13 +208,12 @@ std::vector<size_t> tournament_selection<T>::run()
 /// \param[in] evo pointer to the current evolution object.
 ///
 template<class T>
-pareto_tourney<T>::pareto_tourney(const evolution<T> *const evo)
-  : selection_strategy<T>(evo)
+pareto<T>::pareto(const evolution<T> *const e) : strategy<T>(e)
 {
 }
 
 ///
-/// \return a vector of indexes of individuals partially ordered with the
+/// \return a vector of coordinates of individuals partially ordered with the
 ///         pareto-dominance criterion.
 ///
 /// Parameters from the environment:
@@ -158,26 +221,28 @@ pareto_tourney<T>::pareto_tourney(const evolution<T> *const evo)
 ///   selected individuals for dominance evaluation).
 ///
 template<class T>
-std::vector<size_t> pareto_tourney<T>::run()
+std::vector<coord> pareto<T>::run()
 {
-  const population<T> &pop(selection_strategy<T>::evo_->population());
+  const population<T> &pop(this->evo_->population());
   const auto rounds(pop.env().tournament_size);
 
-  std::vector<size_t> pool(rounds);
+  std::vector<unsigned> pool(rounds);
   for (unsigned i(0); i < rounds; ++i)
-    pool.push_back(selection_strategy<T>::pickup());
+    pool.push_back(this->pickup());
 
   assert(pool.size());
 
-  std::set<size_t> front, dominated;
-  pareto(pool, &front, &dominated);
+  std::set<unsigned> front, dominated;
+  this->front(pool, &front, &dominated);
 
   assert(front.size());
 
-  std::vector<size_t> ret{random::element(front), random::element(front)};
+  std::vector<coord> ret{
+    {0, vita::random::element(front)},
+    {0, vita::random::element(front)}};
 
   if (dominated.size())
-    ret.push_back(random::element(dominated));
+    ret.push_back({0, vita::random::element(dominated)});
 
   return ret;
 }
@@ -188,9 +253,9 @@ std::vector<size_t> pareto_tourney<T>::run()
 /// \param[out] dominated the set of dominated individuals of \a pool.
 ///
 template<class T>
-void pareto_tourney<T>::pareto(const std::vector<size_t> &pool,
-                               std::set<size_t> *front,
-                               std::set<size_t> *dominated) const
+void pareto<T>::front(const std::vector<unsigned> &pool,
+                      std::set<unsigned> *front,
+                      std::set<unsigned> *dominated) const
 {
   const population<T> &pop(this->evo_->population());
 
@@ -200,13 +265,13 @@ void pareto_tourney<T>::pareto(const std::vector<size_t> &pool,
         dominated->find(ind) != dominated->end())
       continue;
 
-    const auto ind_fit(this->evo_->fitness(pop[ind]));
+    const auto ind_fit(this->evo_->fitness(pop[{0, ind}]));
 
     bool ind_dominated(false);
     for (auto f(front->cbegin()); f != front->cend() && !ind_dominated;)
       // no increment in the for loop
     {
-      const auto f_fit(this->evo_->fitness(pop[*f]));
+      const auto f_fit(this->evo_->fitness(pop[{0, *f}]));
 
       if (!ind_dominated && ind_fit.dominating(f_fit))
       {
@@ -234,13 +299,12 @@ void pareto_tourney<T>::pareto(const std::vector<size_t> &pool,
 /// \param[in] evo pointer to the current evolution object.
 ///
 template<class T>
-random_selection<T>::random_selection(const evolution<T> *const evo)
-  : selection_strategy<T>(evo)
+random<T>::random(const evolution<T> *const e) : strategy<T>(e)
 {
 }
 
 ///
-/// \return a vector of indexes to individuals randomly chosen.
+/// \return a vector of coordinates of randomly chosen individuals.
 ///
 /// Parameters from the environment:
 /// * mate_zone - to restrict the selection of individuals to a segment of
@@ -248,17 +312,17 @@ random_selection<T>::random_selection(const evolution<T> *const evo)
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-std::vector<size_t> random_selection<T>::run()
+std::vector<coord> random<T>::run()
 {
-  const size_t size(this->evo_->population().env().tournament_size);
+  const auto size(this->evo_->population().env().tournament_size);
 
   assert(size);
-  std::vector<size_t> ret(size);
+  std::vector<coord> ret(size);
 
-  ret[0] = this->pickup();  // target
+  ret[0] = {0, this->pickup()};  // target
 
-  for (size_t i(1); i < size; ++i)
-    ret[i] = this->pickup(ret[0]);
+  for (unsigned i(1); i < size; ++i)
+    ret[i] = {0, this->pickup(ret[0])};
 
   return ret;
 }

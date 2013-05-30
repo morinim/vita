@@ -44,11 +44,11 @@ standard_op<T>::standard_op(const evolution<T> *const evo, summary<T> *const s)
 /// This is a quite standard crossover + mutation operator.
 ///
 template<class T>
-std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
+std::vector<T> standard_op<T>::run(const std::vector<coord> &parent)
 {
   assert(parent.size() >= 2);
 
-  const population<T> &pop(operation_strategy<T>::evo_->population());
+  const population<T> &pop(this->evo_->population());
   const environment &env(pop.env());
 
   assert(env.p_cross);
@@ -60,7 +60,7 @@ std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
   if (random::boolean(*env.p_cross))
   {
     T off(T::crossover(pop[r1], pop[r2]));
-    ++operation_strategy<T>::stats_->crossovers;
+    ++this->stats_->crossovers;
 
     // This could be an original contribution of Vita... but it's hard
     // to be sure.
@@ -70,14 +70,14 @@ std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
     // * optimize the exploitation phase.
     while (pop[r1].signature() == off.signature() ||
            pop[r2].signature() == off.signature())
-      operation_strategy<T>::stats_->mutations += off.mutation();
+      this->stats_->mutations += off.mutation();
 
     //if (evo_->seen(off))
     //  stats_->mutations += off.mutation();
 
     if (*env.brood_recombination > 0)
     {
-      fitness_t fit_off(operation_strategy<T>::evo_->fast_fitness(off));
+      fitness_t fit_off(this->evo_->fast_fitness(off));
 
       unsigned i(0);
       do
@@ -86,9 +86,9 @@ std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
 
         while (pop[r1].signature() == tmp.signature() ||
                pop[r2].signature() == tmp.signature())
-          operation_strategy<T>::stats_->mutations += tmp.mutation();
+          this->stats_->mutations += tmp.mutation();
 
-        const auto fit_tmp(operation_strategy<T>::evo_->fast_fitness(tmp));
+        const auto fit_tmp(this->evo_->fast_fitness(tmp));
         if (fit_tmp > fit_off)
         {
           off     =     tmp;
@@ -96,7 +96,7 @@ std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
         }
       } while (++i < *env.brood_recombination);
 
-      operation_strategy<T>::stats_->crossovers += i;
+      this->stats_->crossovers += i;
     }
 
     assert(off.debug());
@@ -105,7 +105,7 @@ std::vector<T> standard_op<T>::run(const std::vector<size_t> &parent)
   else // !crossover
   {
     T off(pop[random::boolean() ? r1 : r2]);
-    operation_strategy<T>::stats_->mutations += off.mutation();
+    this->stats_->mutations += off.mutation();
 
     assert(off.debug());
     return {off};
