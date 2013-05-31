@@ -59,9 +59,18 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(pop2.load(ss));
     BOOST_REQUIRE(pop2.debug(true));
 
+    BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());
     BOOST_REQUIRE_EQUAL(pop1.individuals(), pop2.individuals());
-    for (size_t i(0); i < pop1.individuals(); ++i)
-      BOOST_CHECK_EQUAL(pop1[i], pop2[i]);
+    for (unsigned l(0); l < pop1.layers(); ++l)
+    {
+      BOOST_REQUIRE_EQUAL(pop1.individuals(l), pop2.individuals(l));
+
+      for (unsigned i(0); i < pop1.individuals(); ++i)
+      {
+        const vita::coord c{l, i};
+        BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
+      }
+    }
   }
 }
 

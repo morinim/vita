@@ -75,14 +75,11 @@ unsigned population<T>::layers() const
 template<class T>
 void population<T>::add_layer()
 {
-  if (layers() < env().alps.layers)
-  {
-    pop_.push_back(std::vector<individual>());
-    pop_.back().reserve(env().individuals);
+  pop_.push_back(std::vector<individual>());
+  pop_.back().reserve(env().individuals);
 
-    // Selection procedures expect not-empty layers, so... a small workaround.
-    pop_.back().emplace_back(env(), true);
-  }
+  // Selection procedures expect not-empty layers, so... a small workaround.
+  pop_.back().emplace_back(env(), true);
 }
 
 ///
@@ -264,7 +261,7 @@ bool population<T>::load(std::istream &in)
   for (unsigned l(0); l < n_layers; ++l)
   {
     unsigned n_elem(0);
-    if (!in >> n_elem)
+    if (!(in >> n_elem))
       return false;
 
     for (unsigned i(0); i < n_elem; ++i)
