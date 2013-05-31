@@ -30,7 +30,7 @@ namespace vita
   ///
   /// This \c class drives the evolution.
   ///
-  template<class T = individual, class ES = alps_es<T>>
+  template<class T = individual, class ES = basic_alps_es<T>>
   class basic_search
   {
   public:

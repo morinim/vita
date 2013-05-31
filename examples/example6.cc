@@ -76,7 +76,7 @@ class my_evaluator : public vita::evaluator
 
           if (!res.empty())
           {
-            const double dres(vita::any_cast<double>(res));
+            const auto dres(vita::any_cast<double>(res));
             assert(std::isfinite(dres));
             fit += std::exp(-std::fabs(dres - (x*x + y*y - z*z)));
           }
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(new my_evaluator());
 
-  vita::evolution<vita::individual>(env, eva.get()).run(1);
+  vita::evolution<vita::individual>(env, eva.get()).run<vita::std_es>(1);
 
   return EXIT_SUCCESS;
 }

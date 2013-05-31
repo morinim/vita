@@ -28,27 +28,31 @@ namespace vita
   /// \tparam CS class containing the recombination strategy
   /// \tparam RS class containing the replacement strategy
   ///
-  ///
   /// Selection, recombination and replacement are the main steps of evolution.
   /// In the literature are described a lot of different algorithms for each of
   /// these steps and many of them are implemented in Vita (but not every
   /// combination is meaningful).
   ///
   /// The user can choose, at compile time, how the evolution class should
-  /// work via the evolution strategy class (or one of its specialized alias).
+  /// work via the evolution strategy class (or one of its specialization).
   ///
   /// In other words the template method design pattern is used to "inject"
   /// selection, recombination and replacement methods specified by the
   /// evolution_strategy object into an evolution object.
   ///
-  template<class T, class SS, class CS, class RS, class BK>
+  template<class T, class SS, class CS, class RS>
   class evolution_strategy
   {
   public:
     using selection = SS;
     using recombination = CS;
     using replacement = RS;
-    using bookkeeping = BK;
+
+    /// Initial setup before evolution starts.
+    static void pre_bookkeeping(evolution<T> *const) {}
+
+    /// Work to be done at the end of an evolution run.
+    static void post_bookkeeping(const summary<T> &, evolution<T> *const) {}
 
     //enum {
     //  alps =
@@ -57,11 +61,17 @@ namespace vita
     //};
   };
 
+  ///
+  ///
+  ///
   template<class T>
-  class alps_bk
+  class basic_alps_es : public evolution_strategy<T,
+                                                  selection::alps<T>,
+                                                  standard_op<T>,
+                                                  replacement::alps<T>>
   {
   public:
-    static void run(const summary<T> &s, evolution<T> *const e)
+    static void post_bookkeeping(const summary<T> &s, evolution<T> *const e)
     {
       population<T> &pop(e->population());
 
@@ -77,24 +87,17 @@ namespace vita
     }
   };
 
-  template<class T>
-  using alps_es = evolution_strategy<T, selection::alps<T>, standard_op<T>,
-                                     replacement::alps<T>, alps_bk<T>>;
-
+  using alps_es = basic_alps_es<vita::individual>;
 
   template<class T>
-  class empty_bk
+  class basic_std_es : public evolution_strategy<T,
+                                                 selection::tournament<T>,
+                                                 standard_op<T>,
+                                                 replacement::tournament<T>>
   {
-  public:
-    static void run(const summary<T> &, evolution<T> *const)
-    {
-    }
   };
 
-  template<class T>
-  using std_es = evolution_strategy<T, selection::tournament<T>,
-                                    standard_op<T>,
-                                    replacement::tournament<T>, empty_bk<T>>;
+  using std_es = basic_std_es<vita::individual>;
 }  // namespace vita
 
 #endif  // EVOLUTION_STRATEGY_H

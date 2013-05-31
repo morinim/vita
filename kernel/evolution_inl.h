@@ -382,12 +382,7 @@ const summary<T> &evolution<T>::run(unsigned run_count)
 
     stats_.speed = get_speed(measure.elapsed());
 
-    /*const std::unique_ptr<typename ES::bookkeeping> bookkeeping(
-      new typename ES::bookkeeping());
-
-    bookkeeping->operator()(stats_, this);
-    */
-    ES::bookkeeping::run(stats_, this);
+    ES::post_bookkeeping(stats_, this);
   }
 
   if (env().verbosity >= 2)
