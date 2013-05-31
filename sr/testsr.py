@@ -30,7 +30,7 @@ testcases = {
     "adult":      [     "adult.csv",  50, 300, 100,  10,       "class.xml"],
     "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80,  "arithmetic.xml"],
     "iris":       [     "iris.xrff", 100, 180, 100,  80,       "class.xml"],
-    "mep":        [       "mep.csv", 100, 200, 500, 100],
+    "mep":        [       "mep.csv", 100,  75, 500, 100],
     "petalrose":  ["petalrose.xrff", 100, 180, 200,  80, "iarithmetic.xml"],
     "petalrose3": ["petalrose3.csv", 100, 500, 200,  80,  "arithmetic.xml"],
     "petalrose2": ["petalrose2.csv", 100, 180, 200,  80,  "arithmetic.xml"],

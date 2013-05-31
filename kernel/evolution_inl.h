@@ -382,16 +382,12 @@ const summary<T> &evolution<T>::run(unsigned run_count)
 
     stats_.speed = get_speed(measure.elapsed());
 
-    if (ES::alps)
-    {
-      pop_.inc_age();
+    /*const std::unique_ptr<typename ES::bookkeeping> bookkeeping(
+      new typename ES::bookkeeping());
 
-      if (stats_.gen && stats_.gen % env().alps.age_gap == 0)
-      {
-        pop_.init_layer0();
-        pop_.add_layer();
-      }
-    }
+    bookkeeping->operator()(stats_, this);
+    */
+    ES::bookkeeping::run(stats_, this);
   }
 
   if (env().verbosity >= 2)

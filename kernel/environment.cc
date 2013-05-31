@@ -14,7 +14,6 @@
 #include <iostream>
 
 #include "environment.h"
-#include "terminal.h"
 
 namespace vita
 {

@@ -41,29 +41,58 @@ namespace vita
   /// selection, recombination and replacement methods specified by the
   /// evolution_strategy object into an evolution object.
   ///
-  template<class T, class SS, class CS, class RS>
+  template<class T, class SS, class CS, class RS, class BK>
   class evolution_strategy
   {
   public:
     using selection = SS;
     using recombination = CS;
     using replacement = RS;
+    using bookkeeping = BK;
 
-    enum {
-      alps =
-        std::is_same<SS, typename vita::selection::alps<T>>::value &&
-        std::is_same<RS, typename vita::replacement::alps<T>>::value
-    };
+    //enum {
+    //  alps =
+    //    std::is_same<SS, typename vita::selection::alps<T>>::value &&
+    //    std::is_same<RS, typename vita::replacement::alps<T>>::value
+    //};
+  };
+
+  template<class T>
+  class alps_bk
+  {
+  public:
+    static void run(const summary<T> &s, evolution<T> *const e)
+    {
+      population<T> &pop(e->population());
+
+      pop.inc_age();
+
+      if (s.gen && s.gen % pop.env().alps.age_gap == 0)
+      {
+        pop.init_layer0();
+        pop.add_layer();
+      }
+    }
   };
 
   template<class T>
   using alps_es = evolution_strategy<T, selection::alps<T>, standard_op<T>,
-                                     replacement::alps<T>>;
+                                     replacement::alps<T>, alps_bk<T>>;
+
 
   template<class T>
-  using standard_es = evolution_strategy<T, selection::tournament<T>,
-                                         standard_op<T>,
-                                         replacement::tournament<T>>;
+  class empty_bk
+  {
+  public:
+    static void run(const summary<T> &, evolution<T> *const)
+    {
+    }
+  };
+
+  template<class T>
+  using std_es = evolution_strategy<T, selection::tournament<T>,
+                                    standard_op<T>,
+                                    replacement::tournament<T>, empty_bk<T>>;
 }  // namespace vita
 
 #endif  // EVOLUTION_STRATEGY_H

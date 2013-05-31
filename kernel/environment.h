@@ -192,7 +192,7 @@ namespace vita
     struct alps_parameters
     {
       /// Number of layers for the population.
-      unsigned layers = 1;
+      unsigned layers = 4;
 
       /// The maximum ages for age layers is monotonically increasing and
       /// different methods can be used for setting these values. Since there
