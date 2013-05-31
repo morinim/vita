@@ -26,8 +26,8 @@ population<T>::population(const environment &e) : pop_(1)
 
   pop_[0].reserve(e.individuals);
 
-  // DO NOT CHANGE WITH A CALL TO INIT_LAYER0: when layer 0 is empty, env() is
-  // undefined!
+  // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, env()
+  // is undefined!
   for (unsigned i(0); i < e.individuals; ++i)
     pop_[0].emplace_back(e, true);
 
@@ -35,17 +35,21 @@ population<T>::population(const environment &e) : pop_(1)
 }
 
 ///
-/// Resets layer 0 of the population.
+/// \param[in] l a layer of the population.
+///
+/// Resets layer \l of the population.
 ///
 template<class T>
-void population<T>::init_layer0()
+void population<T>::init_layer(unsigned l)
 {
+  assert(l < layers());
+
   const environment &e(env());
 
-  pop_[0].clear();
+  pop_[l].clear();
 
   for (unsigned i(0); i < e.individuals; ++i)
-    pop_[0].emplace_back(e, true);
+    pop_[l].emplace_back(e, true);
 }
 
 ///

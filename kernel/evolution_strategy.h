@@ -69,7 +69,7 @@ namespace vita
 
       if (s.gen && s.gen % pop.env().alps.age_gap == 0)
       {
-        pop.init_layer0();
+        pop.init_layer(0);
         pop.add_layer();
       }
     }

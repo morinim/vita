@@ -57,7 +57,7 @@ namespace vita
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
-    void init_layer0();
+    void init_layer(unsigned = 0);
     void add_layer();
     unsigned layers() const;
     void inc_age();
