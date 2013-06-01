@@ -34,10 +34,14 @@ namespace vita
   };
 
   ///
-  /// \brief A group of individual which may interact together (for example by
+  /// \brief A group of individuals which may interact together (for example by
   ///        mating) producing offspring.
   ///
-  /// Typical population size in GP ranges from ten to many thousands.
+  /// \tparam T the type of the an individual.
+  ///
+  /// Typical population size in GP ranges from ten to many thousands. The
+  /// population is organized in one or more layers that can interact in
+  /// many ways (depending on the evolution strategy).
   ///
   template<class T>
   class population

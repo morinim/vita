@@ -118,7 +118,7 @@ namespace vita
       {
         pop.init_layer(0);
 
-        if (pop.layers() < pop.env().alps.layers)
+        if (pop.layers() < pop.env().layers)
           pop.add_layer();
       }
     }

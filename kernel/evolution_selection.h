@@ -28,6 +28,8 @@ namespace selection {
   /// \brief The strategy (tournament, fitness proportional...) for the
   /// \a evolution class.
   ///
+  /// \tparam T the type of the an individual.
+  ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.
   ///
@@ -46,8 +48,9 @@ namespace selection {
     virtual std::vector<coord> run() = 0;
 
   protected:  // Support methods.
-    unsigned pickup() const;
-    unsigned pickup(unsigned) const;
+    coord pickup() const;
+    coord pickup(coord) const;
+    coord pickup(unsigned, double = 1.0) const;
 
   protected:  // Data members.
     const evolution<T> *const evo_;
@@ -79,7 +82,9 @@ namespace selection {
   };
 
   ///
-  ///
+  /// Alps selection as described in
+  /// <http://idesign.ucsc.edu/projects/alps.html> (see also
+  /// vita::basic_alps_es for further details).
   ///
   template<class T>
   class alps : public strategy<T>
@@ -88,9 +93,6 @@ namespace selection {
     explicit alps(const evolution<T> *const);
 
     virtual std::vector<coord> run() override;
-
-  private:
-    coord pickup(unsigned, double = 1.0) const;
   };
 
   ///
@@ -111,7 +113,11 @@ namespace selection {
   };
 
   ///
-  /// Very simple selection strategy: pick a set of random individuals.
+  /// \brief Pick a set of random individuals.
+  ///
+  /// Very simple selection strategy: pick a set of random individuals. The
+  /// environment::tournamnet_size property controls the cardinality of the
+  /// set.
   ///
   template<class T>
   class random : public strategy<T>

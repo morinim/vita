@@ -194,7 +194,9 @@ bool population<T>::aged(coord c) const
 template<class T>
 unsigned population<T>::max_age(unsigned l) const
 {
-  if (l + 1 == env().alps.layers)
+  assert(l < layers());
+
+  if (l + 1 == env().layers)
     return std::numeric_limits<unsigned>::max();
 
   const auto age_gap(env().alps.age_gap);
@@ -202,16 +204,46 @@ unsigned population<T>::max_age(unsigned l) const
   // This is a polynomial aging scheme.
   switch (l)
   {
-  case 0:
-    return age_gap;
-  case 1:
-    return age_gap + age_gap;
-  default:
-    return l * l * age_gap;
+  case 0:   return age_gap;
+  case 1:   return age_gap + age_gap;
+  default:  return l * l * age_gap;
   }
 
   // A linear aging scheme.
   // return age_gap * (l + 1);
+
+  // An exponential aging scheme.
+  // switch (l)
+  // {
+  // case 0:  return age_gap;
+  // case 1:  return age_gap + age_gap;
+  // default:
+  // {
+  //   auto k(4);
+  //   for (unsigned i(2); i < layer; ++i)
+  //     k *= 2;
+  //   return k * age_gap;
+  // }
+
+  // Fibonacci aging scheme.
+  // auto num1(age_gap), num2(age_gap);
+  // while (num2 <= 2)
+  // {
+  //   auto num3(num2);
+  //   num2 += num1;
+  //   num1 = num3;
+  // }
+  //
+  // if (l == 1)
+  //   return num1 + num2 - 1;
+  //
+  // for (unsigned i(1); i <= l; ++i)
+  // {
+  //   auto num3(num2);
+  //   num2 += num1 -1;
+  //   num1 = num3;
+  // }
+  // return num2;
 }
 
 ///

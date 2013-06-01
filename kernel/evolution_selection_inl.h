@@ -15,7 +15,7 @@
 #define      EVOLUTION_SELECTION_INL_H
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 strategy<T>::strategy(const evolution<T> *const e) : evo_(e)
@@ -26,30 +26,58 @@ strategy<T>::strategy(const evolution<T> *const e) : evo_(e)
 /// \return the index of a random individual.
 ///
 template<class T>
-unsigned strategy<T>::pickup() const
+coord strategy<T>::pickup() const
 {
-  return vita::random::sup(evo_->population().individuals(0));
+  const auto &pop(evo_->population());
+
+  if (pop.layers() == 1)
+    return {0, vita::random::sup(evo_->population().individuals(0))};
+
+  const auto layer(vita::random::sup(pop.layers()));
+  return {layer, vita::random::sup(evo_->population().individuals(layer))};
 }
 
 ///
-/// \param[in] target index of a reference individual.
-/// \return the index of a random individual "near" \a target.
+/// \param[in] target coordinates of a reference individual.
+/// \return the coordinates of a random individual "near" \a target.
 ///
 /// Parameters from the environment:
 /// * mate_zone - to restrict the selection of individuals to a segment of
 ///   the population;
-/// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-unsigned strategy<T>::pickup(unsigned target) const
+coord strategy<T>::pickup(coord target) const
 {
   const auto &pop(evo_->population());
 
-  return vita::random::ring(target, *pop.env().mate_zone, pop.individuals(0));
+  return {target.layer, vita::random::ring(target.index, *pop.env().mate_zone,
+                                           pop.individuals(target.layer))};
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] l a layer.
+/// \param[in] p the probability of extracting an individual in layer \a l
+///              (1 - \a p is the probability of extracting an individual
+///              in layer \a l-1).
+/// \return the coordinates of a random individual in layer \a l.
+///
+template<class T>
+coord strategy<T>::pickup(unsigned l, double p) const
+{
+  assert(0.0 <= p && p <= 1.0);
+
+  const auto &pop(this->evo_->population());
+
+  assert(l < pop.layers());
+
+  if (l > 0 && !vita::random::boolean(p))
+    --l;
+
+  return {l, vita::random::sup(pop.individuals(l))};
+}
+
+///
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 tournament<T>::tournament(const evolution<T> *const e) : strategy<T>(e)
@@ -76,7 +104,7 @@ std::vector<coord> tournament<T>::run()
   const population<T> &pop(this->evo_->population());
 
   const auto rounds(pop.env().tournament_size);
-  const unsigned target(this->pickup());
+  const auto target(this->pickup());
 
   assert(rounds);
   std::vector<coord> ret(rounds);
@@ -86,8 +114,8 @@ std::vector<coord> tournament<T>::run()
   // DO NOT USE std::sort it is way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
-    const auto new_index(this->pickup(target));
-    const auto new_fitness(this->evo_->fitness(pop[{0, new_index}]));
+    const auto new_coord(this->pickup(target));
+    const auto new_fitness(this->evo_->fitness(pop[new_coord]));
 
     unsigned j(0);
 
@@ -99,7 +127,7 @@ std::vector<coord> tournament<T>::run()
     for (auto k(j); k < i; ++k)
       ret[k + 1] = ret[k];
 
-    ret[j] = {0, new_index};
+    ret[j] = new_coord;
   }
 
 #if !defined(NDEBUG)
@@ -112,29 +140,7 @@ std::vector<coord> tournament<T>::run()
 }
 
 ///
-/// \param[in] l a layer.
-/// \param[in] p the probability of extracting an individual in layer \a l
-///              (1 - \a p is the probability of extracting an individual
-///              in layer \a l-1).
-/// \return the coordinates of a random individual in layer \a l.
-///
-template<class T>
-coord alps<T>::pickup(unsigned l, double p) const
-{
-  assert(0.0 <= p && p <= 1.0);
-
-  const auto &pop(this->evo_->population());
-
-  assert(l < pop.layers());
-
-  if (l > 0 && !vita::random::boolean(p))
-    --l;
-
-  return {l, vita::random::sup(pop.individuals(l))};
-}
-
-///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 alps<T>::alps(const evolution<T> *const e) : strategy<T>(e)
@@ -151,7 +157,7 @@ std::vector<coord> alps<T>::run()
 
   const auto layer(vita::random::sup(pop.layers()));
 
-  std::vector<coord> ret = {pickup(layer), pickup(layer)};
+  std::vector<coord> ret = {this->pickup(layer), this->pickup(layer)};
 
   typedef std::pair<bool, fitness_t> age_fit_t;
   age_fit_t age_fit[2] =
@@ -168,11 +174,12 @@ std::vector<coord> alps<T>::run()
 
   assert(age_fit[0] >= age_fit[1]);
 
+  const auto same_layer_p(pop.env().alps.p_same_layer);
   auto rounds(pop.env().tournament_size);
 
   while (rounds--)
   {
-    const auto tmp(pickup(layer, .5));
+    const auto tmp(this->pickup(layer, same_layer_p));
     const age_fit_t tmp_age_fit{!pop.aged(tmp), this->evo_->fitness(pop[tmp])};
 
     if (age_fit[0] < tmp_age_fit)
@@ -205,7 +212,7 @@ std::vector<coord> alps<T>::run()
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 pareto<T>::pareto(const evolution<T> *const e) : strategy<T>(e)
@@ -296,7 +303,7 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 random<T>::random(const evolution<T> *const e) : strategy<T>(e)
