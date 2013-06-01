@@ -70,6 +70,7 @@ namespace vita
     assert(stat_summary);
 
     const std::string env(path + "environment.");
+    pt->put(env + "layers", layers);
     pt->put(env + "individuals", individuals);
     pt->put(env + "code_length", code_length);
     pt->put(env + "patch_length", patch_length);
@@ -83,8 +84,8 @@ namespace vita
     pt->put(env + "max_gens_since_start", g_since_start);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
-    pt->put(env + "alps.layers", alps.layers);
     pt->put(env + "alps.age_gap", alps.age_gap);
+    pt->put(env + "alps.p_same_layer", alps.p_same_layer);
     pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
@@ -173,6 +174,13 @@ namespace vita
         return false;
       }
 
+      if (!layers)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined layer data member" << std::endl;
+        return false;
+      }
+
       if (!individuals)
       {
         if (verbose)
@@ -228,6 +236,13 @@ namespace vita
                     << std::endl;
         return false;
       }
+
+      if (!alps.age_gap)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined age_gap parameter" << std::endl;
+        return false;
+      }
     }  // if (force_defined)
 
     if (code_length == 1)
@@ -256,6 +271,14 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug << " p_cross out of range" << std::endl;
+      return false;
+    }
+
+    if (alps.p_same_layer != -1.0 &&
+        (alps.p_same_layer < 0.0 || alps.p_same_layer > 1.0))
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " p_same_layer out of range" << std::endl;
       return false;
     }
 

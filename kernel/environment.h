@@ -67,6 +67,17 @@ namespace vita
     /// A length of 0 means undefined (auto-tune).
     unsigned patch_length = 0;
 
+    /// Number of layers for the population.
+    /// \warning
+    /// When the evolution strategy is vita::basic_std_es, using a \a n-layer
+    /// population is like running \a n evolutions "in parallel" (the
+    /// sub-populations of each layer don't interact).
+    /// A value greater than one is usually choosen for vita::basic_alps_es or
+    /// with other strategies that allow migrants.
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    unsigned layers = 4;
+
     /// Number of individuals in a layer of the population.
     ///
     /// \note
@@ -191,9 +202,6 @@ namespace vita
     ///
     struct alps_parameters
     {
-      /// Number of layers for the population.
-      unsigned layers = 4;
-
       /// The maximum ages for age layers is monotonically increasing and
       /// different methods can be used for setting these values. Since there
       /// is generally little need to segregate individuals which are within a
@@ -206,7 +214,17 @@ namespace vita
       ///
       /// Also, the \a age_gap parameter sets the frequency of how often the
       /// first layer is restarted.
+      ///
+      /// \note
+      /// A value of 0 means undefined (auto-tune).
       unsigned age_gap = 20;
+
+      /// We already have a parent (individual) from a layer, which is the
+      /// probability that the second parent will be extracted from the same
+      /// layer? (with ALPS it could be taken from the previous layer).
+      /// \note
+      /// A probability of -1.0 means undefined (auto-tune).
+      double p_same_layer = 0.75;
     } alps;
 
     symbol_set sset;
