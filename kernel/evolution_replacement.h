@@ -24,8 +24,8 @@ namespace vita {
 namespace replacement {
 
   ///
-  /// \brief The replacement strategy (random, elitist...) for the \a evolution
-  ///        class.
+  /// \brief The replacement strategy (random, tournament...) for the
+  ///        vita::evolution_strategy class.
   ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.

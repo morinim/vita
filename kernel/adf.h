@@ -26,6 +26,8 @@ namespace vita
   class interpreter;
 
   ///
+  /// \brief The core of vita::adt and vita::adf
+  ///
   /// Human programmers organize sequences of repeated steps into reusable
   /// components such as subroutines, functions and classes. They then
   /// repeatedly invoke these components, typically with different inputs.
@@ -36,9 +38,10 @@ namespace vita
   /// programmers typically organise these components into hierarchies in which
   /// top level components call lower level ones, which call still lower levels.
   ///
-  /// \c adf_core is the core of \c adt and \c adf classes (they are in a HAS-A
-  /// relationship with it).
+  /// adf_core is the core of vita::adt and vita::adf classes (they are in a
+  /// HAS-A relationship with it).
   ///
+  /// \note
   /// Although the acronym ADF is from Koza's automatically defined functions,
   /// in Vita subroutines are created using the ARL scheme described in
   /// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.
@@ -67,7 +70,7 @@ namespace vita
   };
 
   ///
-  /// Subroutine with arguments.
+  /// \brief Subroutine with arguments
   ///
   class adf : public function
   {
@@ -88,8 +91,11 @@ namespace vita
   };
 
   ///
-  /// Subroutines WITHOUT arguments (see "An Analysis of Automatic Subroutine
-  /// Discovery in Genetic Programming" - A.Dessi', A.Giani, A.Starita>).
+  /// \brief Subroutines WITHOUT arguments
+  ///
+  /// \see
+  /// "An Analysis of Automatic Subroutine Discovery in Genetic Programming" -
+  /// A.Dessi', A.Giani, A.Starita.
   ///
   class adt : public terminal
   {

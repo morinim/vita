@@ -68,7 +68,7 @@ namespace vita
 
     template<class T> static T cast(const example::value_t &);
 
-    /// \brief Informations about a "column" of the dataset.
+    /// \brief Informations about a "column" (feature) of the dataset.
     struct column
     {
       std::string       name;
@@ -76,7 +76,7 @@ namespace vita
     };
 
     ///
-    /// \brief Information about a category of the dataset.
+    /// \brief Informations about a category of the dataset.
     ///
     /// For example:
     ///
