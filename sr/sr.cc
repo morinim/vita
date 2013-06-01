@@ -480,9 +480,29 @@ namespace ui
   }
 
   ///
-  /// \param[in] size number of programs/individuals in the population.
+  /// \param[in] l number of layers of the population
   ///
-  /// Sets the number of programs/individuals in the population.
+  /// Sets the number of layers of the population.
+  ///
+  void layers(unsigned l)
+  {
+    problem->env.layers = l;
+
+    if (problem->env.verbosity >= 2)
+    {
+      std::cout << vita::k_s_info << " Number of layers is ";
+      if (l)
+        std::cout << l;
+      else
+        std::cout << "automatic";
+      std::cout << std::endl;
+    }
+  }
+
+  ///
+  /// \param[in] size number of individuals in a layer of the population.
+  ///
+  /// Sets the number of individuals in a layer of the population.
   ///
   void population_size(unsigned size)
   {
@@ -789,8 +809,13 @@ int parse_command_line(int argc, char *const argv[])
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
-    po::options_description individual("Individual");
+    po::options_description individual("Population/Individual");
     individual.add_options()
+      ("population-size,P",
+       po::value<unsigned>()->notifier(&ui::population_size),
+       "sets the number of individuals in a layer of the population")
+      ("layers,L", po::value<unsigned>()->notifier(&ui::layers),
+       "sets the number of layers of the population")
       ("code-length,l", po::value<unsigned>()->notifier(&ui::code_length),
        "sets the code/genome length of an individual");
 
@@ -812,9 +837,6 @@ int parse_command_line(int argc, char *const argv[])
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      ("population-size,P",
-       po::value<unsigned>()->notifier(&ui::population_size),
-       "sets the number of programs/individuals in the population")
       ("elitism", po::value<std::string>()->notifier(&ui::elitism),
        "when elitism is true an individual will never replace a better one")
       ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),
