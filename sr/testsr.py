@@ -27,17 +27,17 @@ ttable_bit = 20
 
 # Key: [dataset file, generations, individuals, code_length, runs, symbolset]
 testcases = {
-    "adult":      [     "adult.csv",  50, 300, 100,  10,       "class.xml"],
-    "fibonacci":  [ "fibonacci.csv", 120, 500, 200,  80,  "arithmetic.xml"],
+    "adult":      [     "adult.csv",  50, 100, 100,  10,       "class.xml"],
+    "fibonacci":  [ "fibonacci.csv", 120, 180, 200,  80,  "arithmetic.xml"],
     "iris":       [     "iris.xrff", 100, 180, 100,  80,       "class.xml"],
     "mep":        [       "mep.csv", 100,  75, 500, 100],
     "petalrose":  ["petalrose.xrff", 100, 180, 200,  80, "iarithmetic.xml"],
-    "petalrose3": ["petalrose3.csv", 100, 500, 200,  80,  "arithmetic.xml"],
+    "petalrose3": ["petalrose3.csv", 100, 180, 200,  80,  "arithmetic.xml"],
     "petalrose2": ["petalrose2.csv", 100, 180, 200,  80,  "arithmetic.xml"],
-    "petalrosec": ["petalrosec.csv", 100, 500, 200,  30,      "class3.xml"],
-    "spambase":   [  "spambase.csv", 100, 999, 100,  50,       "class.xml"],
+    "petalrosec": ["petalrosec.csv", 100, 180, 200,  30,      "class3.xml"],
+    "spambase":   [  "spambase.csv", 100, 260, 100,  50,       "class.xml"],
     "wine":       [      "wine.csv", 120, 170, 100,  80,       "class.xml"],
-    "x2y2z2":     [   "x2y2_z2.csv", 100, 200, 500,  80,        "math.xml"],
+    "x2y2z2":     [   "x2y2_z2.csv", 100,  75, 500,  80,        "math.xml"],
     "x2y2z2bias": [   "x2y2_z2.csv", 100,  75, 100,  80,  "arithmetic.xml"]
     }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
