@@ -242,7 +242,7 @@ void basic_search<T, ES>::tune_parameters()
   const environment dflt(true);
   const environment &constrained(prob_->env);
 
-  const data *const dt = prob_->data();
+  const data *const dt(prob_->data());
 
   if (constrained.code_length == 0)
     env_.code_length = dflt.code_length;
@@ -275,26 +275,41 @@ void basic_search<T, ES>::tune_parameters()
       std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
   }
 
+  if (!constrained.layers)
+  {
+    if (dt && dt->size() > 8)
+      env_.layers = std::log(dt->size());
+    else
+      env_.layers = dflt.layers;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Number of layers set to " << env_.layers
+                << std::endl;
+  }
+
   // A larger number of training cases requires an increase in the population
-  // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
-  // and Francone suggest 10 - 1000 individuals for smaller problems (say,
-  // less than 10 fitness cases); between 1000 and 10000 individuals for
-  // complex problem (more than 200 fitness cases).
-  // We choosed a strictly increasing function to map training set size
-  // and population size, but our population size is smaller.
+  // size (e.g. in "Genetic Programming - An Introduction" Banzhaf, Nordin,
+  // Keller and Francone suggest 10 - 1000 individuals for smaller problems;
+  // between 1000 and 10000 individuals for complex problem (more than 200
+  // fitness cases).
+  //
+  // We choosed a strictly increasing function to link training set size
+  // and population size.
   if (!constrained.individuals)
   {
-    size_t n(0);
-
-    if (dt)
+    if (dt && dt->size() > 8)
     {
-      env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
-      if (env_.verbosity >= 2)
-        std::cout << k_s_info << " Population size set to " << n
-                  << std::endl;
+      env_.individuals = 2 * std::pow((std::log2(dt->size())), 3) / env_.layers;
+
+      if (env_.individuals < 4)
+        env_.individuals = 4;
     }
     else
       env_.individuals = dflt.individuals;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Population size set to " << env_.individuals
+                << std::endl;
   }
 
   // Note that this setting, once set, will not be changed.
@@ -306,13 +321,13 @@ void basic_search<T, ES>::tune_parameters()
         env_.validation_ratio = 0.0;
       else
         env_.validation_ratio = *dflt.validation_ratio;
-
-      if (env_.verbosity >= 2)
-        std::cout << k_s_info << " Validation ratio set to "
-                  << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
     }
     else
       env_.validation_ratio = *dflt.validation_ratio;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Validation ratio set to "
+                << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
   }
 
   if (!constrained.tournament_size)
