@@ -175,7 +175,7 @@ namespace ui
     problem->env.brood_recombination = size;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Brood size for recombination is "
+      std::cout << vita::k_s_info << " Brood size for recombination set to "
                 << size << std::endl;
   }
 
@@ -190,7 +190,8 @@ namespace ui
     problem->env.code_length = length;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Code length is " << length << std::endl;
+      std::cout << vita::k_s_info << " Code length set to "
+                << length << std::endl;
   }
 
   ///
@@ -217,7 +218,8 @@ namespace ui
     problem->env.p_cross = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Crossover rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Crossover rate set to " << r
+                << std::endl;
   }
 
   ///
@@ -349,7 +351,7 @@ namespace ui
     problem->env.g_since_start = g;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Generations is " << g << std::endl;
+      std::cout << vita::k_s_info << " Generations set to " << g << std::endl;
   }
 
   ///
@@ -382,8 +384,8 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info
-                << " Max number of generations without improvement is " << g
-                << std::endl;
+                << " Max number of generations without improvement set to "
+                << g << std::endl;
   }
 
   ///
@@ -404,7 +406,7 @@ namespace ui
     problem->env.mate_zone = z;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Mate zone is " << z << std::endl;
+      std::cout << vita::k_s_info << " Mate zone set to " << z << std::endl;
   }
 
   ///
@@ -431,7 +433,8 @@ namespace ui
     problem->env.p_mutation = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Mutation rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Mutation rate set to " << r
+                << std::endl;
   }
 
   ///
@@ -476,7 +479,8 @@ namespace ui
     problem->env.tournament_size = n;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Tournament size is " << n << std::endl;
+      std::cout << vita::k_s_info << " Tournament size set to " << n
+                << std::endl;
   }
 
   ///
@@ -490,7 +494,7 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
     {
-      std::cout << vita::k_s_info << " Number of layers is ";
+      std::cout << vita::k_s_info << " Number of layers set to ";
       if (l)
         std::cout << l;
       else
@@ -510,7 +514,7 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
     {
-      std::cout << vita::k_s_info << " Population size is ";
+      std::cout << vita::k_s_info << " Population size set to ";
       if (size)
         std::cout << size;
       else
@@ -543,7 +547,8 @@ namespace ui
     runs = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Number of runs is " << r << std::endl;
+      std::cout << vita::k_s_info << " Number of runs set to " << r
+                << std::endl;
   }
 
   ///

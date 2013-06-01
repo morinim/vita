@@ -76,7 +76,7 @@ namespace vita
     /// with other strategies that allow migrants.
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    unsigned layers = 4;
+    unsigned layers = 0;
 
     /// Number of individuals in a layer of the population.
     ///

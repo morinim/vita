@@ -67,7 +67,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
     # Default values are for a fast evaluation. Profiling requires bigger
     # numbers...
     if "deeptest" in settings[mode] and settings[mode]["deeptest"]:
-        rounds *= 2
+        rounds *= 3
         generations = (generations * 3) // 2
 
     dss = ""
@@ -82,8 +82,8 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
 
     cmd = Template("$sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
-                   "-P $nind -l $cl -r $rs $rnd_switch $arl_switch "\
-                   "$dss_switch $ss $ds")
+                   "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
+                   "$arl_switch $dss_switch $ss $ds")
     s = cmd.substitute(
         sr = sr,
         elitism_switch = elitism,
