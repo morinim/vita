@@ -17,44 +17,14 @@
 #include <algorithm>
 #include <csignal>
 
-#include "analyzer.h"
 #include "evaluator_proxy.h"
 #include "evolution_strategy.h"
+#include "evolution_summary.h"
 #include "population.h"
 #include "timer.h"
 
 namespace vita
 {
-  template<class T>
-  class summary
-  {
-  public:  // Constructor and support functions.
-    summary();
-
-    void clear();
-
-  public:   // Serialization.
-    bool load(std::istream &, const environment &);
-    bool save(std::ostream &) const;
-
-  public:  // Public data members.
-    analyzer az;
-
-    struct best_
-    {
-      T             ind;
-      fitness_t fitness;
-    };
-
-    boost::optional<best_> best;
-
-    double speed;
-
-    std::uintmax_t crossovers, mutations;
-
-    unsigned gen, last_imp;
-  };
-
   ///
   /// Progressively evolves a population of programs over a series of
   /// generations.
