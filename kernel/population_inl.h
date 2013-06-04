@@ -35,21 +35,28 @@ population<T>::population(const environment &e) : pop_(1)
 }
 
 ///
+/// \param[in] e an environment for individuals initialization.
 /// \param[in] l a layer of the population.
 ///
 /// Resets layer \l of the population.
 ///
+/// \warning
+/// If layer 0 is empty then \c env() is undefined! So do not call
+/// \c init_layer() when \c individuals(0) == 0 (call \c init_layer(env)).
+///
 template<class T>
-void population<T>::init_layer(unsigned l)
+void population<T>::init_layer(const environment *e, unsigned l)
 {
-  assert(l < layers());
+  assert(l < pop_.size());
+  assert(e || (pop_.size() && pop_[0].size()));
 
-  const environment &e(env());
+  if (!e)
+    e = &env();
 
   pop_[l].clear();
 
-  for (unsigned i(0); i < e.individuals; ++i)
-    pop_[l].emplace_back(e, true);
+  for (unsigned i(0); i < e->individuals; ++i)
+    pop_[l].emplace_back(*e, true);
 }
 
 ///
@@ -72,14 +79,19 @@ unsigned population<T>::layers() const
 ///
 /// Add a new layer to the population.
 ///
+/// The new layer is inserted as the lower layer and randomly initialized.
+///
 template<class T>
 void population<T>::add_layer()
 {
-  pop_.push_back(std::vector<individual>());
-  pop_.back().reserve(env().individuals);
+  assert(pop_.size() && pop_[0].size());
 
-  // Selection procedures expect not-empty layers, so... a small workaround.
-  pop_.back().emplace_back(env(), true);
+  const auto &e(env());
+
+  pop_.insert(pop_.begin(), std::vector<individual>());
+  pop_.front().reserve(e.individuals);
+
+  init_layer(&e, 0);
 }
 
 ///

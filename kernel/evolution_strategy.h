@@ -116,10 +116,10 @@ namespace vita
 
       if (s.gen && s.gen % pop.env().alps.age_gap == 0)
       {
-        pop.init_layer(0);
-
         if (pop.layers() < pop.env().layers)
           pop.add_layer();
+        else
+          pop.init_layer(0);
       }
     }
   };
