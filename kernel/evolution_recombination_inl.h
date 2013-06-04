@@ -1,6 +1,6 @@
 /**
  *
- *  \file evolution_operation_inl.h
+ *  \file evolution_recombination_inl.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2013 EOS di Manlio Morini.
@@ -11,16 +11,15 @@
  *
  */
 
-#if !defined(EVOLUTION_OPERATION_INL_H)
-#define      EVOLUTION_OPERATION_INL_H
+#if !defined(EVOLUTION_RECOMBINATION_INL_H)
+#define      EVOLUTION_RECOMBINATION_INL_H
 
 ///
 /// \param[in] evo pointer to the current evolution object.
 /// \param[in] stats pointer to the current set of statistics.
 ///
 template<class T>
-operation_strategy<T>::operation_strategy(const evolution<T> *const evo,
-                                          summary<T> *const stats)
+strategy<T>::strategy(const evolution<T> *const evo, summary<T> *const stats)
   : evo_(evo), stats_(stats)
 {
   assert(evo);
@@ -32,8 +31,8 @@ operation_strategy<T>::operation_strategy(const evolution<T> *const evo,
 /// \param[in] stats pointer to the current set of statistics.
 ///
 template<class T>
-standard_op<T>::standard_op(const evolution<T> *const evo, summary<T> *const s)
-  : operation_strategy<T>(evo, s)
+base<T>::base(const evolution<T> *const evo, summary<T> *const s)
+  : strategy<T>(evo, s)
 {
 }
 
@@ -44,12 +43,12 @@ standard_op<T>::standard_op(const evolution<T> *const evo, summary<T> *const s)
 /// This is a quite standard crossover + mutation operator.
 ///
 template<class T>
-std::vector<T> standard_op<T>::run(const std::vector<coord> &parent)
+std::vector<T> base<T>::run(const std::vector<coord> &parent)
 {
   assert(parent.size() >= 2);
 
-  const population<T> &pop(this->evo_->population());
-  const environment &env(pop.env());
+  const auto &pop(this->evo_->population());
+  const auto &env(pop.env());
 
   assert(env.p_cross);
   assert(env.p_mutation);
@@ -57,7 +56,7 @@ std::vector<T> standard_op<T>::run(const std::vector<coord> &parent)
 
   const auto r1(parent[0]), r2(parent[1]);
 
-  if (random::boolean(*env.p_cross))
+  if (vita::random::boolean(*env.p_cross))
   {
     T off(T::crossover(pop[r1], pop[r2]));
     ++this->stats_->crossovers;
@@ -111,4 +110,4 @@ std::vector<T> standard_op<T>::run(const std::vector<coord> &parent)
     return {off};
   }
 }
-#endif  // EVOLUTION_OPERATION_INL_H
+#endif  // EVOLUTION_RECOMBINATION_INL_H

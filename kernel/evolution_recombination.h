@@ -1,6 +1,6 @@
 /**
  *
- *  \file evolution_operation.h
+ *  \file evolution_recombination.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.
@@ -11,18 +11,18 @@
  *
  */
 
-#if !defined(EVOLUTION_OPERATION_H)
-#define      EVOLUTION_OPERATION_H
+#if !defined(EVOLUTION_RECOMBINATION_H)
+#define      EVOLUTION_RECOMBINATION_H
 
 #include <vector>
 
 #include "population.h"
 
-namespace vita
-{
+namespace vita {
   template<class T> class evolution;
   template<class T> class summary;
 
+namespace recombination {
   ///
   /// \brief The operation strategy (crossover, recombination, mutation...) for
   ///        the \a evolution class.
@@ -30,29 +30,29 @@ namespace vita
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.
   ///
-  /// An operation act upon sets of individuals to generate offspring (this
+  /// A recombination act upon sets of individuals to generate offspring (this
   /// definition generalizes the traditional mutation and crossover operators).
   /// This is an abstract class: introduction of new operators or redefinition
-  /// of existing ones is obtained implementing \a operation_strategy.
+  /// of existing ones is obtained implementing \a recombination::strategy.
   ///
   /// Operator application is atomic from the point of view of the
-  /// evolutionary algorithm and every operation is applied to a well defined
-  /// list of individuals, without dependencies upon past history.
+  /// evolutionary algorithm and every recombination is applied to a well
+  /// defined list of individuals, without dependencies upon past history.
   ///
   /// \see
   /// http://en.wikipedia.org/wiki/Strategy_pattern
   ///
   template<class T>
-  class operation_strategy
+  class strategy
   {
   public:
-    typedef typename std::shared_ptr<operation_strategy<T>> ptr;
+    typedef typename std::shared_ptr<strategy<T>> ptr;
 
-    operation_strategy(const evolution<T> *const, summary<T> *const);
-    virtual ~operation_strategy() {}
+    strategy(const evolution<T> *const, summary<T> *const);
+    virtual ~strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized
-    // operation encompass recent additions, such as scan mutation, that
+    // recombination encompass recent additions, such as scan mutation, that
     // generates numerous offspring from a single parent.
     virtual std::vector<T> run(const std::vector<coord> &) = 0;
 
@@ -69,15 +69,15 @@ namespace vita
   /// overarching algorithm is still followed.
   ///
   template<class T>
-  class standard_op : public operation_strategy<T>
+  class base : public strategy<T>
   {
   public:
-    standard_op(const evolution<T> *const, summary<T> *const);
+    base(const evolution<T> *const, summary<T> *const);
 
     virtual std::vector<T> run(const std::vector<coord> &) override;
   };
 
-#include "evolution_operation_inl.h"
-}  // namespace vita
+#include "evolution_recombination_inl.h"
+} }  // namespace vita::recombination
 
-#endif  // EVOLUTION_OPERATION_H
+#endif  // EVOLUTION_RECOMBINATION_H

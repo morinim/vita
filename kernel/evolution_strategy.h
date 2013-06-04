@@ -14,7 +14,7 @@
 #if !defined(EVOLUTION_STRATEGY_H)
 #define      EVOLUTION_STRATEGY_H
 
-#include "evolution_operation.h"
+#include "evolution_recombination.h"
 #include "evolution_replacement.h"
 #include "evolution_selection.h"
 
@@ -104,7 +104,7 @@ namespace vita
   template<class T>
   class basic_alps_es : public evolution_strategy<T,
                                                   selection::alps<T>,
-                                                  standard_op<T>,
+                                                  recombination::base<T>,
                                                   replacement::alps<T>>
   {
   public:
@@ -129,7 +129,7 @@ namespace vita
   template<class T>
   class basic_std_es : public evolution_strategy<T,
                                                  selection::tournament<T>,
-                                                 standard_op<T>,
+                                                 recombination::base<T>,
                                                  replacement::tournament<T>>
   {
   };
