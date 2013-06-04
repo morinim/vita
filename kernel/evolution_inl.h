@@ -161,9 +161,12 @@ analyzer evolution<T>::get_stats() const
 {
   analyzer az;
 
-  for (const auto &layer : pop_)
-    for (const auto &i : layer)
-      az.add(i, fitness(i));
+  for (unsigned l(0); l < pop_.layers(); ++l)
+    for (unsigned i(0); i < pop_.individuals(l); ++i)
+    {
+      const individual &ind(pop_[{l, i}]);
+      az.add(ind, fitness(ind), l);
+    }
 
   return az;
 }
@@ -190,68 +193,88 @@ void evolution<T>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
-  if (pop_.env().stat_dynamic)
+  const environment &env(pop_.env());
+
+  if (env.stat_dynamic)
   {
-    const std::string f_dynamic(pop_.env().stat_dir + "/" +
-                                  environment::dyn_filename);
-    std::ofstream dynamic(f_dynamic.c_str(), std::ios_base::app);
-    if (dynamic.good())
+    const std::string n_dyn(env.stat_dir + "/" + environment::dyn_filename);
+    std::ofstream f_dyn(n_dyn.c_str(), std::ios_base::app);
+    if (f_dyn.good())
     {
       if (last_run != run_count)
-        dynamic << std::endl << std::endl;
+        f_dyn << std::endl << std::endl;
 
-      dynamic << run_count << ' ' << stats_.gen;
+      f_dyn << run_count << ' ' << stats_.gen;
 
       if (stats_.best)
-        dynamic << ' ' << stats_.best->fitness[0];
+        f_dyn << ' ' << stats_.best->fitness[0];
       else
-        dynamic << " ?";
+        f_dyn << " ?";
 
-      dynamic << ' ' << stats_.az.fit_dist().mean[0]
-              << ' ' << stats_.az.fit_dist().standard_deviation()[0]
-              << ' ' << stats_.az.fit_dist().entropy()
-              << ' ' << stats_.az.fit_dist().min[0]
-              << ' ' << unsigned(stats_.az.length_dist().mean)
-              << ' ' << stats_.az.length_dist().standard_deviation()
-              << ' ' << unsigned(stats_.az.length_dist().max)
-              << ' ' << stats_.mutations
-              << ' ' << stats_.crossovers
-              << ' ' << stats_.az.functions(0)
-              << ' ' << stats_.az.terminals(0)
-              << ' ' << stats_.az.functions(1)
-              << ' ' << stats_.az.terminals(1);
+      f_dyn << ' ' << stats_.az.fit_dist().mean[0]
+            << ' ' << stats_.az.fit_dist().standard_deviation()[0]
+            << ' ' << stats_.az.fit_dist().entropy()
+            << ' ' << stats_.az.fit_dist().min[0]
+            << ' ' << static_cast<unsigned>(stats_.az.length_dist().mean)
+            << ' ' << stats_.az.length_dist().standard_deviation()
+            << ' ' << static_cast<unsigned>(stats_.az.length_dist().max)
+            << ' ' << stats_.mutations
+            << ' ' << stats_.crossovers
+            << ' ' << stats_.az.functions(0)
+            << ' ' << stats_.az.terminals(0)
+            << ' ' << stats_.az.functions(1)
+            << ' ' << stats_.az.terminals(1);
 
       for (unsigned active(0); active <= 1; ++active)
         for (const auto &symb_stat : stats_.az)
-          dynamic << ' ' << (symb_stat.first)->display()
-                  << ' ' << symb_stat.second.counter[active];
+          f_dyn << ' ' << (symb_stat.first)->display()
+                << ' ' << symb_stat.second.counter[active];
 
-      dynamic << " \"";
+      f_dyn << " \"";
       if (stats_.best)
-        stats_.best->ind.in_line(dynamic);
-      dynamic << '"' << std::endl;
+        stats_.best->ind.in_line(f_dyn);
+      f_dyn << '"' << std::endl;
     }
   }
 
-  if (pop_.env().stat_population)
+  if (env.stat_layers)
   {
-    const std::string f_pop(pop_.env().stat_dir + "/" +
-                            environment::pop_filename);
-    std::ofstream pop(f_pop.c_str(), std::ios_base::app);
-    if (pop.good())
+    const std::string n_lys(env.stat_dir + "/" + environment::lys_filename);
+    std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
+    if (f_lys.good())
     {
       if (last_run != run_count)
-        pop << std::endl << std::endl;
+        f_lys << std::endl << std::endl;
+
+      for (unsigned l(0); l < pop_.layers(); ++l)
+        f_lys << run_count << ' ' << stats_.gen << ' ' << l
+              << ' ' << stats_.az.age_dist(l).mean
+              << ' ' << stats_.az.age_dist(l).standard_deviation()
+              << ' ' << static_cast<unsigned>(stats_.az.age_dist(l).min)
+              << ' ' << static_cast<unsigned>(stats_.az.age_dist(l).max)
+              << ' ' << stats_.az.fit_dist(l).mean
+              << ' ' << stats_.az.fit_dist(l).standard_deviation()
+              << ' ' << stats_.az.fit_dist(l).min
+              << ' ' << stats_.az.fit_dist(l).max << std::endl;
+    }
+  }
+
+  if (env.stat_population)
+  {
+    const std::string n_pop(env.stat_dir + "/" + environment::pop_filename);
+    std::ofstream f_pop(n_pop.c_str(), std::ios_base::app);
+    if (f_pop.good())
+    {
+      if (last_run != run_count)
+        f_pop << std::endl << std::endl;
 
       for (const auto &f : stats_.az.fit_dist().freq)
-      {
         // f.first: value, f.second: frequency
-        pop << run_count << ' ' << stats_.gen << ' '
-            << std::fixed << std::scientific
-            << std::setprecision(
-                 std::numeric_limits<fitness_t::base_t>::digits10 + 2)
-            << f.first[0] << ' ' << f.second << std::endl;
-      }
+        f_pop << run_count << ' ' << stats_.gen << ' '
+              << std::fixed << std::scientific
+              << std::setprecision(
+                   std::numeric_limits<fitness_t::base_t>::digits10 + 2)
+              << f.first[0] << ' ' << f.second << std::endl;
     }
   }
 

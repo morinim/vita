@@ -32,10 +32,11 @@ namespace vita
     fit_.clear();
     length_.clear();
 
-    functions_ = stat_sym_counter();
-    terminals_ = stat_sym_counter();
+    functions_ = sym_counter();
+    terminals_ = sym_counter();
 
     sym_counter_.clear();
+    layer_stat_.clear();
   }
 
   ///
@@ -84,6 +85,19 @@ namespace vita
   }
 
   ///
+  /// \param[in] l a layer.
+  /// \return statistics about the age distribution of individuals in layer
+  ///         \a l.
+  ///
+  const distribution<double> &analyzer::age_dist(unsigned l) const
+  {
+    assert(layer_stat_.find(l) != layer_stat_.end());
+    assert(layer_stat_.find(l)->second.age.debug(true));
+
+    return layer_stat_.find(l)->second.age;
+  }
+
+  ///
   /// \return statistics about the fitness distribution of the individuals.
   ///
   const distribution<fitness_t> &analyzer::fit_dist() const
@@ -91,6 +105,19 @@ namespace vita
     assert(fit_.debug(true));
 
     return fit_;
+  }
+
+  ///
+  /// \param[in] l a layer.
+  /// \return statistics about the fitness distribution of individuals in layer
+  ///         \a l.
+  ///
+  const distribution<fitness_t> &analyzer::fit_dist(unsigned l) const
+  {
+    assert(layer_stat_.find(l) != layer_stat_.end());
+    assert(layer_stat_.find(l)->second.fitness.debug(true));
+
+    return layer_stat_.find(l)->second.fitness;
   }
 
   ///
@@ -107,7 +134,7 @@ namespace vita
   /// \param[in] ind individual to be analyzed.
   /// \return effective length of individual we gathered statistics about.
   ///
-  size_t analyzer::count(const individual &ind)
+  unsigned analyzer::count(const individual &ind)
   {
     for (index_t i(0); i < ind.size(); ++i)
       for (category_t c(0); c < ind.env().sset.categories(); ++c)
@@ -116,7 +143,7 @@ namespace vita
         count(ind[l].sym.get(), false);
       }
 
-    size_t length(0);
+    unsigned length(0);
     for (individual::const_iterator it(ind); it(); ++it)
     {
       count(it->sym.get(), true);
@@ -150,14 +177,18 @@ namespace vita
   ///
   /// Adds a new individual to the pool used to calculate statistics.
   ///
-  void analyzer::add(const individual &ind, const fitness_t &f)
+  void analyzer::add(const individual &ind, const fitness_t &f, unsigned l)
   {
     age_.add(ind.age);
+    layer_stat_[l].age.add(ind.age);
 
     length_.add(count(ind));
 
     if (f.isfinite())
+    {
       fit_.add(f);
+      layer_stat_[l].fitness.add(f);
+    }
   }
 
   ///

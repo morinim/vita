@@ -19,6 +19,7 @@ namespace vita
 {
   const char environment::arl_filename[] =        "arl";
   const char environment::dyn_filename[] =    "dynamic";
+  const char environment::lys_filename[] =     "layers";
   const char environment::pop_filename[] = "population";
   const char environment::sum_filename[] =    "summary";
   const char environment::tst_filename[] =       "test";
@@ -91,6 +92,7 @@ namespace vita
     pt->put(env + "statistics.directory", stat_dir);
     pt->put(env + "statistics.save_arl", stat_arl);
     pt->put(env + "statistics.save_dynamics", stat_dynamic);
+    pt->put(env + "statistics.save_layers", stat_layers);
     pt->put(env + "statistics.save_population", stat_population);
     pt->put(env + "statistics.save_summary", stat_summary);
   }

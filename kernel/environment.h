@@ -175,6 +175,9 @@ namespace vita
     /// Should we save a dynamic execution status file?
     bool stat_dynamic = false;
 
+    /// Should we save dynamic statistics about layers status?
+    bool stat_layers = false;
+
     /// Should we save a dynamic population status file?
     /// \warning It can be quite slow!
     bool stat_population = false;
@@ -231,6 +234,7 @@ namespace vita
 
     static const char arl_filename[];
     static const char dyn_filename[];
+    static const char lys_filename[];
     static const char pop_filename[];
     static const char sum_filename[];
     static const char tst_filename[];

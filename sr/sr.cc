@@ -588,6 +588,18 @@ namespace ui
   }
 
   ///
+  /// \param[in] v should we save the layers status file?
+  ///
+  void stat_layers(const std::string &v)
+  {
+    problem->env.stat_layers = is_true(v);
+
+    if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Layers logging is "
+                << problem->env.stat_layers << std::endl;
+  }
+
+  ///
   /// \param[in] v should we save the population status file?
   ///
   void stat_population(const std::string &v)
@@ -877,6 +889,8 @@ int parse_command_line(int argc, char *const argv[])
        "saves the list of active ADFs")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
+      ("stat-layers", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_layers),
+       "generates a layers status file")
       ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
        "generates a population status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
