@@ -15,7 +15,7 @@
 #define      EVOLUTION_REPLACEMENT_INL_H
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 strategy<T>::strategy(evolution<T> *const e) : evo_(e)
@@ -23,7 +23,7 @@ strategy<T>::strategy(evolution<T> *const e) : evo_(e)
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
 family_competition<T>::family_competition(evolution<T> *const e)
@@ -93,8 +93,8 @@ void family_competition<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] evo pointer to the evolution object that is using the
-///                kill_tournament.
+/// \param[in] e pointer to the evolution object that is using the
+///              (kill) tournament.
 ///
 template<class T>
 tournament<T>::tournament(evolution<T> *const e) : strategy<T>(e)
@@ -150,8 +150,8 @@ void tournament<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] evo pointer to the evolution object that is using the
-///                alps_tournament.
+/// \param[in] e pointer to the evolution object that is using the
+///              alps replacement.
 ///
 template<class T>
 alps<T>::alps(evolution<T> *const e) : strategy<T>(e)
@@ -159,7 +159,13 @@ alps<T>::alps(evolution<T> *const e) : strategy<T>(e)
 }
 
 ///
-/// \param[in]
+/// \param[in] layer a layer
+/// \param[in] incoming an individual
+///
+/// We would like to add \a incoming in layer \a layer. The insertion will take
+/// place if:
+/// * \a layer is not full or...
+/// *
 ///
 template<class T>
 void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
@@ -168,7 +174,7 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
   assert(layer < p.layers());
 
   if (p.individuals(layer) < p.env().individuals)
-    p.add_to_layer(layer, incoming);
+    p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
   else
   {
     coord c_worst{layer, random::sup(p.individuals(layer))};
@@ -229,8 +235,8 @@ void alps<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] evo pointer to the evolution object that is using the
-///                pareto_tournament.
+/// \param[in] e pointer to the evolution object that is using the
+///              pareto tournament.
 ///
 template<class T>
 pareto<T>::pareto(evolution<T> *const e) : strategy<T>(e)
