@@ -64,7 +64,7 @@ void population<T>::init_layer(unsigned l)
 template<class T>
 unsigned population<T>::layers() const
 {
-  assert(pop_.size() <= env().alps.layers);
+  assert(pop_.size() <= env().layers);
 
   return pop_.size();
 }

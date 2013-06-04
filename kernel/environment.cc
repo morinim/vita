@@ -45,6 +45,7 @@ namespace vita
       p_cross = 0.9;
       brood_recombination = 0;
       dss = true;
+      layers = 4;
       individuals = 100;
       tournament_size = 5;
       mate_zone = 20;
