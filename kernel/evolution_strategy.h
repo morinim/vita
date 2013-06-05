@@ -43,21 +43,33 @@ namespace vita
   class evolution_strategy
   {
   public:
-    using selection = SS;
-    using recombination = CS;
-    using replacement = RS;
+    evolution_strategy(evolution<T> *const e, summary<T> *const s)
+      : selection(e), recombination(e, s), replacement(e), evo_(e), sum_(s)
+    {
+      assert(e);
+      assert(s);
+    }
 
     /// Initial setup before evolution starts.
-    static void pre_bookkeeping(evolution<T> *const) {}
+    virtual void pre_bookkeeping() {}
 
     /// Work to be done at the end of an evolution run.
-    static void post_bookkeeping(const summary<T> &, evolution<T> *const) {}
+    virtual void post_bookkeeping() {}
 
     //enum {
     //  alps =
     //    std::is_same<SS, typename vita::selection::alps<T>>::value &&
     //    std::is_same<RS, typename vita::replacement::alps<T>>::value
     //};
+
+  public:  // Public data members.
+    SS selection;
+    CS recombination;
+    RS replacement;
+
+  protected:  // Protected data members.
+    evolution<T> *evo_;
+    summary<T> *sum_;
   };
 
   ///
@@ -108,18 +120,24 @@ namespace vita
                                                   replacement::alps<T>>
   {
   public:
-    static void post_bookkeeping(const summary<T> &s, evolution<T> *const e)
+    basic_alps_es(evolution<T> *const e, summary<T> *const s) :
+      evolution_strategy<T, selection::alps<T>, recombination::base<T>,
+                         replacement::alps<T>>(e, s)
+    {}
+
+    virtual void post_bookkeeping() override
     {
-      population<T> &pop(e->population());
+      auto &pop(this->evo_->population());
 
       pop.inc_age();
 
-      if (s.gen && s.gen % pop.env().alps.age_gap == 0)
+      if (this->sum_->gen && this->sum_->gen % pop.env().alps.age_gap == 0)
       {
         if (pop.layers() < pop.env().layers)
           pop.add_layer();
         else
         {
+          this->replacement.try_move_up_layer(0);
           pop.init_layer(0);
         }
       }
@@ -134,6 +152,10 @@ namespace vita
                                                  recombination::base<T>,
                                                  replacement::tournament<T>>
   {
+    basic_std_es(evolution<T> *const e, summary<T> *const s) :
+      evolution_strategy<T, selection::alps<T>, recombination::base<T>,
+                         replacement::alps<T>>(e, s)
+    {}
   };
 
   using std_es = basic_std_es<vita::individual>;

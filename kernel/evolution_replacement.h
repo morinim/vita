@@ -104,6 +104,8 @@ namespace replacement {
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
 
+    void try_move_up_layer(unsigned);
+
   private:  // Private support methods.
     void try_add_to_layer(unsigned, const T &);
   };

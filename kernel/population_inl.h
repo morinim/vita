@@ -208,7 +208,7 @@ unsigned population<T>::max_age(unsigned l) const
 {
   assert(l < layers());
 
-  if (l + 1 == env().layers)
+  if (l + 1 == layers())
     return std::numeric_limits<unsigned>::max();
 
   const auto age_gap(env().alps.age_gap);

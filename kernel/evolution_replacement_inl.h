@@ -158,6 +158,16 @@ alps<T>::alps(evolution<T> *const e) : strategy<T>(e)
 {
 }
 
+template<class T>
+void alps<T>::try_move_up_layer(unsigned l)
+{
+  auto &p(this->evo_->population());
+
+  if (l + 1 < p.layers())
+    for (unsigned i(0); i < p.individuals(l); ++i)
+      try_add_to_layer(l + 1, p[{l, i}]);
+}
+
 ///
 /// \param[in] layer a layer
 /// \param[in] incoming an individual
@@ -177,26 +187,29 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
     p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
   else
   {
+    const auto max_age(p.max_age(layer));
+
     coord c_worst{layer, random::sup(p.individuals(layer))};
     fitness_t f_worst(this->evo_->fitness(p[c_worst]));
 
     auto rounds(p.env().tournament_size);
     while (rounds--)
     {
-      const coord c_candidate{layer, random::sup(p.individuals(layer))};
-      const fitness_t f_candidate(this->evo_->fitness(p[c_candidate]));
+      const coord c_x{layer, random::sup(p.individuals(layer))};
+      const fitness_t f_x(this->evo_->fitness(p[c_x]));
 
-      if (p[c_worst].age < p[c_candidate].age ||
-          (p[c_worst].age == p[c_candidate].age && f_worst > f_candidate))
+      if ((p[c_x].age > p[c_worst].age && p[c_x].age > max_age) ||
+          (p[c_worst].age <= max_age && p[c_x].age <= max_age &&
+           f_x < f_worst))
       {
-        c_worst = c_candidate;
-        f_worst = f_candidate;
+        c_worst = c_x;
+        f_worst = f_x;
       }
     }
 
-    const auto max_age(p.max_age(layer));
-    if ((p[c_worst].age > max_age && incoming.age <= max_age) ||
-        this->evo_->fitness(incoming) >= f_worst)
+    if ((incoming.age <= max_age && p[c_worst].age > max_age) ||
+        ((incoming.age <= max_age || p[c_worst].age > max_age) &&
+         this->evo_->fitness(incoming) >= f_worst))
     {
       if (layer + 1 < p.layers())
         try_add_to_layer(layer + 1, p[c_worst]);

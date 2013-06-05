@@ -247,15 +247,23 @@ void evolution<T>::log(unsigned run_count) const
         f_lys << std::endl << std::endl;
 
       for (unsigned l(0); l < pop_.layers(); ++l)
-        f_lys << run_count << ' ' << stats_.gen << ' ' << l
-              << ' ' << stats_.az.age_dist(l).mean
+      {
+        f_lys << run_count << ' ' << stats_.gen << ' ' << l << " <";
+
+        if (pop_.max_age(l) + 1 == 0)
+          f_lys << "inf";
+        else
+          f_lys << pop_.max_age(l) + 1;
+
+        f_lys << ' ' << stats_.az.age_dist(l).mean
               << ' ' << stats_.az.age_dist(l).standard_deviation()
               << ' ' << static_cast<unsigned>(stats_.az.age_dist(l).min)
-              << ' ' << static_cast<unsigned>(stats_.az.age_dist(l).max)
+              << '-' << static_cast<unsigned>(stats_.az.age_dist(l).max)
               << ' ' << stats_.az.fit_dist(l).mean
               << ' ' << stats_.az.fit_dist(l).standard_deviation()
               << ' ' << stats_.az.fit_dist(l).min
-              << ' ' << stats_.az.fit_dist(l).max << std::endl;
+              << '-' << stats_.az.fit_dist(l).max << std::endl;
+      }
     }
   }
 
@@ -373,12 +381,7 @@ const summary<T> &evolution<T>::run(unsigned run_count)
     stats_.az = get_stats();
     log(run_count);
 
-    const std::unique_ptr<typename ES::selection> selection(
-      new typename ES::selection(this));
-    const std::unique_ptr<typename ES::recombination> operation(
-      new typename ES::recombination(this, &stats_));
-    const std::unique_ptr<typename ES::replacement> replacement(
-      new typename ES::replacement(this));
+    ES es(this, &stats_);
 
     for (unsigned k(0); k < pop_.individuals() && !ext_int; ++k)
     {
@@ -390,14 +393,14 @@ const summary<T> &evolution<T>::run(unsigned run_count)
       }
 
       // --------- SELECTION ---------
-      std::vector<coord> parents(selection->run());
+      std::vector<coord> parents(es.selection.run());
 
       // --------- CROSSOVER / MUTATION ---------
-      std::vector<T> off(operation->run(parents));
+      std::vector<T> off(es.recombination.run(parents));
 
       // --------- REPLACEMENT --------
       const auto before(stats_.best->fitness);
-      replacement->run(parents, off, &stats_);
+      es.replacement.run(parents, off, &stats_);
 
       if (stats_.best->fitness != before)
         print_progress(k, run_count, true);
@@ -405,7 +408,7 @@ const summary<T> &evolution<T>::run(unsigned run_count)
 
     stats_.speed = get_speed(measure.elapsed());
 
-    ES::post_bookkeeping(stats_, this);
+    es.post_bookkeeping();
   }
 
   if (env().verbosity >= 2)
