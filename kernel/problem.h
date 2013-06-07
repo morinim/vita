@@ -30,8 +30,8 @@ namespace vita
   public:
     problem();
 
-    evaluator::ptr get_evaluator();
-    void set_evaluator(const evaluator::ptr &);
+    evaluator *get_evaluator();
+    void set_evaluator(std::unique_ptr<evaluator>);
 
     /// \return an access point for the dataset.
     virtual vita::data *data() { return nullptr; }
@@ -46,7 +46,7 @@ namespace vita
     environment env;
 
   protected:  // Private data members.
-    evaluator::ptr active_eva_;
+    std::unique_ptr<evaluator> active_eva_;
   };
 }  // namespace vita
 

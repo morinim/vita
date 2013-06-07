@@ -427,7 +427,7 @@ T basic_search<T, ES>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<T> evo(env_, prob_->get_evaluator().get(), stop, shake_data);
+    evolution<T> evo(env_, prob_->get_evaluator(), stop, shake_data);
     summary<T> s(evo.template run<ES>(run));
 
     // Depending on validation, this can be the training fitness or the

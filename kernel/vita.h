@@ -104,6 +104,16 @@ namespace vita
     return boost::spirit::any_cast<T>(a);
   }
 
+  ///
+  /// An implementation of make_unique() as proposed by Herb Sutter in
+  /// GotW #102.
+  ///
+  template<typename T, typename ...Args>
+  std::unique_ptr<T> make_unique(Args&& ...args)
+  {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+
   /// \brief Prefix for debug messages.
   const char k_s_debug[] = "[DEBUG]";
   /// \brief Prefix for error messages.

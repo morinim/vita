@@ -37,20 +37,21 @@ namespace vita
   ///
   /// \return the active evaluator.
   ///
-  evaluator::ptr problem::get_evaluator()
+  evaluator *problem::get_evaluator()
   {
-    return active_eva_;
+    return active_eva_.get();
   }
 
   ///
   /// \param[in] e the evaluator that should be set as active.
   ///
-  void problem::set_evaluator(const evaluator::ptr &e)
+  void problem::set_evaluator(std::unique_ptr<evaluator> e)
   {
     if (env.ttable_size)
-      active_eva_ = std::make_shared<evaluator_proxy>(e, env.ttable_size);
+      active_eva_ = make_unique<evaluator_proxy>(std::move(e),
+                                                 env.ttable_size);
     else
-      active_eva_ = e;
+      active_eva_ = std::move(e);
   }
 
   ///

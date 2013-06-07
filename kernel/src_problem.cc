@@ -51,27 +51,26 @@ namespace vita
     switch (id)
     {
     case k_count_evaluator:
-      problem::set_evaluator(std::make_shared<count_evaluator>(dat_));
+      problem::set_evaluator(make_unique<count_evaluator>(dat_));
       break;
 
     case k_sae_evaluator:
-      problem::set_evaluator(std::make_shared<sae_evaluator>(dat_));
+      problem::set_evaluator(make_unique<sae_evaluator>(dat_));
       break;
 
     case k_sse_evaluator:
-      problem::set_evaluator(std::make_shared<sse_evaluator>(dat_));
+      problem::set_evaluator(make_unique<sse_evaluator>(dat_));
       break;
 
     case k_dyn_slot_evaluator:
     {
       const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));
-      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_,
-                                                                  x_slot));
+      problem::set_evaluator(make_unique<dyn_slot_evaluator>(dat_, x_slot));
       break;
     }
 
     case k_gaussian_evaluator:
-      problem::set_evaluator(std::make_shared<gaussian_evaluator>(dat_));
+      problem::set_evaluator(make_unique<gaussian_evaluator>(dat_));
       break;
     }
   }

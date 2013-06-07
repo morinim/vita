@@ -23,8 +23,8 @@ namespace vita
   /// \param[in] eva pointer that lets the proxy access the real evaluator.
   /// \param[in] ts 2^\a ts is the number of elements of the cache.
   ///
-  evaluator_proxy::evaluator_proxy(const evaluator::ptr &eva, unsigned ts)
-    : eva_(eva), cache_(ts)
+  evaluator_proxy::evaluator_proxy(std::unique_ptr<evaluator> eva, unsigned ts)
+    : eva_(std::move(eva)), cache_(ts)
   {
     assert(eva);
     assert(ts > 6);

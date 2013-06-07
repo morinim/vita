@@ -41,8 +41,6 @@ namespace vita
   public:
     enum {cache = 1, stats = 2, all = cache | stats};
 
-    typedef std::shared_ptr<evaluator> ptr;
-
     /// \return the fitness of the individual.
     virtual fitness_t operator()(const individual &) = 0;
 

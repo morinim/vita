@@ -28,7 +28,7 @@ namespace vita
   class evaluator_proxy : public evaluator
   {
   public:
-    evaluator_proxy(const evaluator::ptr &, unsigned);
+    evaluator_proxy(std::unique_ptr<evaluator>, unsigned);
 
     virtual void clear(unsigned) override;
     virtual void clear(const individual &) override;
@@ -47,7 +47,7 @@ namespace vita
 
   private:
     /// Access to the real evaluator.
-    evaluator::ptr eva_;
+    std::unique_ptr<evaluator> eva_;
 
     /// Transposition table (hash table cache).
     ttable cache_;
