@@ -31,10 +31,10 @@ coord strategy<T>::pickup() const
   const auto &pop(evo_->population());
 
   if (pop.layers() == 1)
-    return {0, vita::random::sup(evo_->population().individuals(0))};
+    return {0, vita::random::sup(pop.individuals(0))};
 
   const auto layer(vita::random::sup(pop.layers()));
-  return {layer, vita::random::sup(evo_->population().individuals(layer))};
+  return {layer, vita::random::sup(pop.individuals(layer))};
 }
 
 ///
@@ -66,7 +66,7 @@ coord strategy<T>::pickup(unsigned l, double p) const
 {
   assert(0.0 <= p && p <= 1.0);
 
-  const auto &pop(this->evo_->population());
+  const auto &pop(evo_->population());
 
   assert(l < pop.layers());
 
