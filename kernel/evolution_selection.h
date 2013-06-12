@@ -40,8 +40,6 @@ namespace selection {
   class strategy
   {
   public:
-    typedef std::shared_ptr<strategy> ptr;
-
     explicit strategy(const evolution<T> *const);
     virtual ~strategy() {}
 

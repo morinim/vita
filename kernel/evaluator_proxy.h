@@ -34,13 +34,15 @@ namespace vita
     virtual void clear(const individual &) override;
 
     virtual fitness_t operator()(const individual &) override;
+    virtual fitness_t fast(const individual &i) override
+    { return eva_->fast(i); }
 
     virtual double accuracy(const individual &) const override;
 
     virtual std::string info() const override;
 
-    virtual std::unique_ptr<lambda_f>
-    lambdify(const individual &) const override;
+    virtual std::unique_ptr<lambda_f> lambdify(
+      const individual &) const override;
 
     virtual unsigned seen(const individual &i) const override
     { return cache_.seen(i); }

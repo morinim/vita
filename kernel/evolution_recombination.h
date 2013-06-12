@@ -46,8 +46,6 @@ namespace recombination {
   class strategy
   {
   public:
-    typedef typename std::shared_ptr<strategy<T>> ptr;
-
     strategy(const evolution<T> *const, summary<T> *const);
     virtual ~strategy() {}
 

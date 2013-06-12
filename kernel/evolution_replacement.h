@@ -37,8 +37,6 @@ namespace replacement {
   class strategy
   {
   public:
-    typedef typename std::shared_ptr<strategy<T>> ptr;
-
     explicit strategy(evolution<T> *const);
     virtual ~strategy() {}
 

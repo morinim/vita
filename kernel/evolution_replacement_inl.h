@@ -158,14 +158,20 @@ alps<T>::alps(evolution<T> *const e) : strategy<T>(e)
 {
 }
 
+///
+/// \param[in] l a layer.
+///
+/// Try to move individuals in layer \a l in the upper layer (calling
+/// try_add_to_layer for each individual).
+///
 template<class T>
 void alps<T>::try_move_up_layer(unsigned l)
 {
-  auto &p(this->evo_->population());
+  auto &pop(this->evo_->population());
 
-  if (l + 1 < p.layers())
-    for (unsigned i(0); i < p.individuals(l); ++i)
-      try_add_to_layer(l + 1, p[{l, i}]);
+  if (l + 1 < pop.layers())
+    for (unsigned i(0); i < pop.individuals(l); ++i)
+      try_add_to_layer(l + 1, pop[{l, i}]);
 }
 
 ///
@@ -175,7 +181,10 @@ void alps<T>::try_move_up_layer(unsigned l)
 /// We would like to add \a incoming in layer \a layer. The insertion will take
 /// place if:
 /// * \a layer is not full or...
-/// *
+/// * after a "kill tournament" selection, the worst individual found is
+///   too old for \a layer while the incoming one is within the limits or...
+/// * the worst individual has a lower fitness than the incoming one and
+///   both are simultaneously within/outside the time frame of \a layer.
 ///
 template<class T>
 void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
@@ -232,14 +241,27 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 ///
 template<class T>
 void alps<T>::run(const std::vector<coord> &parent,
-                  const std::vector<T> &offspring,
-                  summary<T> *const s)
+                  const std::vector<T> &offspring, summary<T> *const s)
 {
   const auto layer(std::max(parent[0].layer, parent[1].layer));
-
-  try_add_to_layer(layer, offspring[0]);
-
   const fitness_t f_off(this->evo_->fitness(offspring[0]));
+
+#if defined(MUTUAL_IMPROVEMENT)
+  const auto &pop(this->evo_->population());
+
+  // To protect the algorithm from the potential deleterious effect of intense
+  // exploratory dynamics, we can use a constraint which mandate that an
+  // individual must be better than bith its parents before insertion into
+  // the population.
+  // See "Exploiting The Path of Least Resistance In Evolution" (Gearoid Murphy
+  // and Conor Ryan).
+  if (f_off > this->evo_->fitness(pop[parent[0]]) &&
+      f_off > this->evo_->fitness(pop[parent[1]]))
+#endif
+  {
+    try_add_to_layer(layer, offspring[0]);
+  }
+
   if (f_off > s->best->fitness)
   {
     s->last_imp =                s->gen;

@@ -43,7 +43,7 @@ namespace vita
       elitism = true;
       p_mutation = 0.04;
       p_cross = 0.9;
-      brood_recombination = 0;
+      brood_recombination = 8;
       dss = true;
       layers = 4;
       individuals = 100;

@@ -46,7 +46,8 @@ namespace vita
 
     virtual fitness_t operator()(const individual &) override;
     virtual fitness_t fast(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
+    virtual std::unique_ptr<lambda_f> lambdify(
+      const individual &) const override;
 
     virtual double accuracy(const individual &) const override;
 
