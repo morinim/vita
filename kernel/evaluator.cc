@@ -33,9 +33,9 @@ namespace vita
   {
     const double sup(16000.0);
 
-    fitness_t f(dim);
-    for (size_t i(0); i < f.size(); ++i)
-      f[i] = random::between<unsigned>(0, sup);
+    fitness_t f;
+    for (size_t i(0); i < fitness_t::size; ++i)
+      f[i] = random::sup(sup);
 
     return f;
   }

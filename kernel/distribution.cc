@@ -34,7 +34,7 @@ namespace vita
       {
         min = max = val;
 
-        delta_ = m2_ = mean = variance = fitness_t(val.size(), 0.0);
+        delta_ = m2_ = mean = variance = fitness_t(0.0);
       }
       else if (val < min)
         min = val;
@@ -45,7 +45,7 @@ namespace vita
 
       update_variance(val);
 
-      for (size_t i(0); i < val.size(); ++i)
+      for (size_t i(0); i < fitness_t::size; ++i)
         val[i] = round_to(val[i]);
       ++freq[val];
     }
@@ -80,7 +80,7 @@ namespace vita
       return false;
     }
 
-    if (variance.isnan() || variance < fitness_t(variance.size(), 0.0))
+    if (variance.isnan() || variance < fitness_t(0.0))
     {
       if (verbose)
         std::cerr << k_s_debug << " Distribution: negative variance."

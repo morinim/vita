@@ -481,8 +481,7 @@ T basic_search<T, ES>::run(unsigned n)
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found((env_.f_threashold.empty() ||
-                               run_fitness.dominating(env_.f_threashold)) &&
+    const bool solution_found(run_fitness.dominating(env_.f_threashold) &&
                               run_accuracy >= env_.a_threashold);
 
     if (solution_found)

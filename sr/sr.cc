@@ -94,7 +94,7 @@ void fix_parameters(vita::src_problem *const problem)
     }
   }
 
-  if (env.f_threashold.empty() && env.a_threashold < 0.0)
+  if (env.f_threashold == vita::fitness_t() && env.a_threashold < 0.0)
   {
     if (problem->classification())
     {
@@ -105,7 +105,7 @@ void fix_parameters(vita::src_problem *const problem)
     }
     else  // symbolic regression
     {
-      env.f_threashold = {-0.0001};
+      env.f_threashold = vita::fitness_t(-0.0001);
 
       std::cout << vita::k_s_info << " Fitness threashold set to "
                 << env.f_threashold << std::endl;
@@ -701,7 +701,7 @@ namespace ui
 
         set = (fitness <= 0.0);
         if (set)
-          problem->env.f_threashold = {fitness};
+          problem->env.f_threashold = vita::fitness_t(fitness);
       }
     }
 
@@ -936,7 +936,6 @@ int main(int argc, char *const argv[])
   std::cout << ui::header << std::endl;
 
   vita::src_problem problem;
-
   ui::problem = &problem;
 
   const int ret(parse_command_line(argc, argv));

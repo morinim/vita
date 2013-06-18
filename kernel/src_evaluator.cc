@@ -52,7 +52,7 @@ namespace vita
 
     // Note that we take the average error: this way fast() and operator()
     // outputs can be compared.
-    return {-err / total_nr};
+    return fitness_t(-err / total_nr);
   }
 
   ///
@@ -85,7 +85,7 @@ namespace vita
 
     // Note that we take the average error: this way fast() and operator()
     // outputs can be compared.
-    return {-err / total_nr};
+    return fitness_t(-err / total_nr);
   }
 
   ///
@@ -274,7 +274,7 @@ namespace vita
 
     assert(engine_.dataset_size >= err);
 
-    return {-err};
+    return fitness_t(-err);
   }
 
   ///
@@ -335,7 +335,7 @@ namespace vita
       }
     }
 
-    return {d};
+    return fitness_t(d);
   }
 
   ///
