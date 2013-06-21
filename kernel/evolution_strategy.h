@@ -56,11 +56,12 @@ namespace vita
     /// Work to be done at the end of an evolution run.
     virtual void post_bookkeeping() {}
 
-    //enum {
-    //  alps =
-    //    std::is_same<SS, typename vita::selection::alps<T>>::value &&
-    //    std::is_same<RS, typename vita::replacement::alps<T>>::value
-    //};
+    enum
+    {
+      alps =
+        std::is_same<SS, typename vita::selection::alps<T>>::value &&
+        std::is_same<RS, typename vita::replacement::alps<T>>::value
+    };
 
   public:  // Public data members.
     SS selection;

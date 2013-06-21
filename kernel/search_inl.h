@@ -416,7 +416,7 @@ T basic_search<T, ES>::run(unsigned n)
   if (env_.dss)
     shake_data = std::bind(&search::dss, this, std::placeholders::_1);
 
-  std::function<bool (const summary<T> &s)> stop;
+  std::function<bool (const summary<T> &)> stop;
   if (*env_.g_without_improvement > 0)
     stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
 
