@@ -398,7 +398,7 @@ void basic_search<T, ES>::print_resume(bool validation,
 template<class T, class ES>
 T basic_search<T, ES>::run(unsigned n)
 {
-  assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
+  assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
 
   summary<T> overall_summary;
   distribution<fitness_t> fd;

@@ -45,7 +45,7 @@ basic_fitness_t<T, N>::basic_fitness_t(const std::initializer_list<base_t> &l)
 ///
 template<class T, unsigned N>
 template<class ...Args>
-basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{T(args)...}
+basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
 {
   static_assert(N, "basic_fitness_t cannot have zero length");
   static_assert(sizeof...(Args) == N, "Wrong number of arguments");

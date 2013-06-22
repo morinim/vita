@@ -20,7 +20,7 @@ namespace vita
   {
     count = 0;
 
-    delta_ = m2_ = mean = variance = min = max = {};
+    delta_ = m2_ = mean = variance = min = max = fitness_t();
 
     freq.clear();
   }
