@@ -3,7 +3,7 @@
  *  \file example3.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -27,15 +27,17 @@ int main(int argc, char *argv[])
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 10;
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make(vita::d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
+  vita::symbol_set sset;
 
-  vita::individual i1(env, true), i2(env, true);
+  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  sset.insert(factory.make(vita::d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
+
+  vita::individual i1(env, sset), i2(env, sset);
 
   std::cout << "PARENTS" << std::endl << std::string(40, '-') << std::endl;
   i1.dump(std::cout);

@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::individual i1(env, true);
+    const vita::individual i1(env, sset);
     const auto base_f(static_cast<vita::fitness_t::base_t>(i));
     vita::fitness_t f({base_f});
 
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   std::vector<vita::individual> vi;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::individual i1(env, true);
+    vita::individual i1(env, sset);
     const vita::any val(vita::interpreter(i1).run());
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::individual i1(env, true);
+    vita::individual i1(env, sset);
     const vita::any val(vita::interpreter(i1).run());
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});

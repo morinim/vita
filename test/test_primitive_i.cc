@@ -31,7 +31,7 @@ BOOST_FIXTURE_TEST_SUITE(primitive_i, F_FACTORY4)
 BOOST_AUTO_TEST_CASE(ADD)
 {
   using namespace vita;
-  vita::individual i(env, true);
+  vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
   std::vector<gene> g(
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(ADD)
 BOOST_AUTO_TEST_CASE(DIV)
 {
   using namespace vita;
-  vita::individual i(env, true);
+  vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
   std::vector<gene> g(
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(DIV)
 BOOST_AUTO_TEST_CASE(IFE)
 {
   using namespace vita;
-  vita::individual i(env, true);
+  vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
   std::vector<gene> g(
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c1,         null}},  // [2] 1
     {{   c0,         null}}   // [1] 0
   };
-  static_pointer_cast<Z>(z)->val = 0;
+  static_cast<Z *>(z)->val = 0;
   ret = interpreter(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 }
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(IFE)
 BOOST_AUTO_TEST_CASE(MUL)
 {
   using namespace vita;
-  vita::individual i(env, true);
+  vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
   std::vector<gene> g(
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(MUL)
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;
-  vita::individual i(env, true);
+  vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
   std::vector<gene> g(
@@ -239,11 +239,10 @@ BOOST_AUTO_TEST_CASE(SUB)
   };
   for (unsigned j(0); j < 1000; ++j)
   {
-    static_pointer_cast<Z>(z)->val = vita::random::between<double>(-1000,
-                                                                   1000);
+    static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
     ret = interpreter(i.replace(g)).run();
     BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) ==
-                          static_pointer_cast<Z>(z)->val -
+                          static_cast<Z *>(z)->val -
                           any_cast<int>(x->eval(0)), "\n" << i);
   }
 }

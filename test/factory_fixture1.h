@@ -15,6 +15,7 @@
 #define      FACTORY_FIXTURE1_H
 
 #include "environment.h"
+#include "symbol_set.h"
 #include "primitive/factory.h"
 
 struct F_FACTORY1
@@ -25,30 +26,30 @@ struct F_FACTORY1
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("REAL", {0}));
-    env.insert(factory.make("FADD", {0}));
-    env.insert(factory.make("FSUB", {0}));
-    env.insert(factory.make("FMUL", {0}));
-    env.insert(factory.make("FDIV", {0}));
-    env.insert(factory.make("FLN", {0}));
-    env.insert(factory.make("FIFL", {0}));
-    env.insert(factory.make("FIFZ", {0}));
-    env.insert(factory.make("FIFE", {0, 0}));
-    env.insert(factory.make("FSIN", {0}));
-    env.insert(factory.make("FABS", {0}));
-    env.insert(factory.make("FLENGTH", {1, 0}));
+    sset.insert(factory.make("REAL", {0}));
+    sset.insert(factory.make("FADD", {0}));
+    sset.insert(factory.make("FSUB", {0}));
+    sset.insert(factory.make("FMUL", {0}));
+    sset.insert(factory.make("FDIV", {0}));
+    sset.insert(factory.make("FLN", {0}));
+    sset.insert(factory.make("FIFL", {0}));
+    sset.insert(factory.make("FIFZ", {0}));
+    sset.insert(factory.make("FIFE", {0, 0}));
+    sset.insert(factory.make("FSIN", {0}));
+    sset.insert(factory.make("FABS", {0}));
+    sset.insert(factory.make("FLENGTH", {1, 0}));
 
-    env.insert(factory.make("apple", {1}));
-    env.insert(factory.make("pear", {1}));
-    env.insert(factory.make("grapefruit", {1}));
-    env.insert(factory.make("orange", {1}));
-    env.insert(factory.make("blueberry", {1}));
-    env.insert(factory.make("blackberry", {1}));
-    env.insert(factory.make("passion fruit", {1}));
-    env.insert(factory.make("plum", {1}));
-    env.insert(factory.make("date", {1}));
-    env.insert(factory.make("peach", {1}));
-    env.insert(factory.make("IFE", {1, 0}));
+    sset.insert(factory.make("apple", {1}));
+    sset.insert(factory.make("pear", {1}));
+    sset.insert(factory.make("grapefruit", {1}));
+    sset.insert(factory.make("orange", {1}));
+    sset.insert(factory.make("blueberry", {1}));
+    sset.insert(factory.make("blackberry", {1}));
+    sset.insert(factory.make("passion fruit", {1}));
+    sset.insert(factory.make("plum", {1}));
+    sset.insert(factory.make("date", {1}));
+    sset.insert(factory.make("peach", {1}));
+    sset.insert(factory.make("IFE", {1, 0}));
   }
 
   ~F_FACTORY1()
@@ -57,6 +58,7 @@ struct F_FACTORY1
   }
 
   vita::environment env;
+  vita::symbol_set sset;
 };
 
 #endif  // FACTORY_FIXTURE1_H

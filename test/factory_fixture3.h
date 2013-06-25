@@ -37,38 +37,22 @@ struct F_FACTORY3
 
     static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    c0 = factory.make("0.0", {});
-    c1 = factory.make("1.0", {});
-    c2 = factory.make("2.0", {});
-    c3 = factory.make("3.0", {});
-    x = factory.make("123.0", {});
-    neg_x = factory.make("-123.0", {});
-    y = factory.make("321.0", {});
-    z = std::make_shared<Z>();
-    f_abs = factory.make("FABS", {});
-    f_add = factory.make("FADD", {});
-    f_div = factory.make("FDIV", {});
-    f_idiv = factory.make("FIDIV", {});
-    f_ife = factory.make("FIFE", {});
-    f_ln = factory.make("FLN", {});
-    f_mul = factory.make("FMUL", {});
-    f_sub = factory.make("FSUB", {});
-
-    env.insert(c0);
-    env.insert(c1);
-    env.insert(c2);
-    env.insert(c3);
-    env.insert(x);
-    env.insert(neg_x);
-    env.insert(y);
-    env.insert(z);
-    env.insert(f_abs);
-    env.insert(f_add);
-    env.insert(f_div);
-    env.insert(f_idiv);
-    env.insert(f_ife);
-    env.insert(f_mul);
-    env.insert(f_sub);
+    c0 = sset.insert(factory.make("0.0", {}));
+    c1 = sset.insert(factory.make("1.0", {}));
+    c2 = sset.insert(factory.make("2.0", {}));
+    c3 = sset.insert(factory.make("3.0", {}));
+    x = sset.insert(factory.make("123.0", {}));
+    neg_x = sset.insert(factory.make("-123.0", {}));
+    y = sset.insert(factory.make("321.0", {}));
+    z = sset.insert(vita::make_unique<Z>());
+    f_abs = sset.insert(factory.make("FABS", {}));
+    f_add = sset.insert(factory.make("FADD", {}));
+    f_div = sset.insert(factory.make("FDIV", {}));
+    f_idiv = sset.insert(factory.make("FIDIV", {}));
+    f_ife = sset.insert(factory.make("FIFE", {}));
+    f_ln = sset.insert(factory.make("FLN", {}));
+    f_mul = sset.insert(factory.make("FMUL", {}));
+    f_sub = sset.insert(factory.make("FSUB", {}));
 
     env.code_length = 32;
   }
@@ -78,25 +62,26 @@ struct F_FACTORY3
     BOOST_TEST_MESSAGE("Teardown fixture (FACTORY3)");
   }
 
-  vita::symbol::ptr c0;
-  vita::symbol::ptr c1;
-  vita::symbol::ptr c2;
-  vita::symbol::ptr c3;
-  vita::symbol::ptr x;
-  vita::symbol::ptr neg_x;
-  vita::symbol::ptr y;
-  vita::symbol::ptr z;
+  vita::symbol *c0;
+  vita::symbol *c1;
+  vita::symbol *c2;
+  vita::symbol *c3;
+  vita::symbol *x;
+  vita::symbol *neg_x;
+  vita::symbol *y;
+  vita::symbol *z;
 
-  vita::symbol::ptr f_abs;
-  vita::symbol::ptr f_add;
-  vita::symbol::ptr f_div;
-  vita::symbol::ptr f_idiv;
-  vita::symbol::ptr f_ife;
-  vita::symbol::ptr f_ln;
-  vita::symbol::ptr f_mul;
-  vita::symbol::ptr f_sub;
+  vita::symbol *f_abs;
+  vita::symbol *f_add;
+  vita::symbol *f_div;
+  vita::symbol *f_idiv;
+  vita::symbol *f_ife;
+  vita::symbol *f_ln;
+  vita::symbol *f_mul;
+  vita::symbol *f_sub;
 
   vita::environment env;
+  vita::symbol_set sset;
   vita::any ret;
 
   const std::vector<vita::index_t> null;

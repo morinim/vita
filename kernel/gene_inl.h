@@ -65,8 +65,7 @@ basic_gene<K>::basic_gene(
 /// This is usually called for filling the standard section of an individual.
 ///
 template<size_t K>
-basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup)
-  : sym(s)
+basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
 {
   assert(from < sup);
 

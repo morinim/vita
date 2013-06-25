@@ -73,7 +73,7 @@ namespace vita
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
   ///
-  symbol_set::symbol_set()
+  symbol_set::symbol_set() : arguments_(gene::k_args)
   {
     clear();
 
@@ -125,12 +125,14 @@ namespace vita
 
   ///
   /// \param[in] i symbol to be added.
+  /// \return a raw pointer to the symbol just added (or nullptr in case of
+  ///         error).
   ///
   /// Adds a new \a symbol to the set. We manage to sort the symbols in
   /// descending order, with respect to the weight, so the selection algorithm
   /// would run faster.
   ///
-  void symbol_set::insert(std::unique_ptr<symbol> i)
+  symbol *symbol_set::insert(std::unique_ptr<symbol> i)
   {
     assert(i);
     assert(i->weight);
@@ -159,6 +161,8 @@ namespace vita
     std::sort(all_.symbols.begin(), all_.symbols.end(),
               [](const symbol *s1, const symbol *s2)
               { return s1->weight > s2->weight; });
+
+    return raw;
   }
 
   ///

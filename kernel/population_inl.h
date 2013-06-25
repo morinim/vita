@@ -52,14 +52,16 @@ void population<T>::init_layer(unsigned l, const environment *e,
   assert(l < pop_.size());
   assert(pop_[l].size() || (e && s));
 
-  const environment &env_(e ? *e : pop_[l][0].env());
-  const symbol_set &sset_(s ? *s : pop_[l][0].sset());
+  if (!e)
+    e = &pop_[l][0].env();
+  if (!s)
+    s = &pop_[l][0].sset();
 
   pop_[l].clear();
 
-  const auto n(env_.individuals);
+  const auto n(e->individuals);
   for (unsigned i(0); i < n; ++i)
-    pop_[l].emplace_back(env_, sset_);
+    pop_[l].emplace_back(*e, *s);
 }
 
 ///
@@ -304,7 +306,7 @@ bool population<T>::load(std::istream &in)
   if (!(in >> n_layers))
     return false;
 
-  population p(env());
+  population p(env(), pop_[0][0].sset());
   p.pop_.reserve(n_layers);
 
   for (unsigned l(0); l < n_layers; ++l)

@@ -58,7 +58,7 @@ namespace vita
 
     enum
     {
-      alps =
+      is_alps =
         std::is_same<SS, typename vita::selection::alps<T>>::value &&
         std::is_same<RS, typename vita::replacement::alps<T>>::value
     };
@@ -153,9 +153,10 @@ namespace vita
                                                  recombination::base<T>,
                                                  replacement::tournament<T>>
   {
+  public:
     basic_std_es(evolution<T> *const e, summary<T> *const s) :
-      evolution_strategy<T, selection::alps<T>, recombination::base<T>,
-                         replacement::alps<T>>(e, s)
+      evolution_strategy<T, selection::tournament<T>, recombination::base<T>,
+                         replacement::tournament<T>>(e, s)
     {}
   };
 

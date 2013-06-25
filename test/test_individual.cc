@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::individual ind(env, true);
+  vita::individual ind(env, sset);
   const vita::individual orig(ind);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
@@ -115,10 +115,10 @@ BOOST_AUTO_TEST_CASE(Mutation)
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(env.sset.categories() + 2); l < 100; ++l)
+  for (unsigned l(sset.categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
-    vita::individual i(env, true);
+    vita::individual i(env, sset);
     // std::cout << i << std::endl;
 
     BOOST_REQUIRE(i.debug());
@@ -130,13 +130,13 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::individual a(env, true);
+    vita::individual a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
 
     vita::individual b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
-    vita::individual c(env, true);
+    vita::individual c(env, sset);
     if (!(a.signature() == c.signature()))
       BOOST_REQUIRE_NE(a, c);
   }
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(Cross0)
   const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
   {
-    const vita::individual i1(env, true), i2(env, true);
+    const vita::individual i1(env, sset), i2(env, sset);
     const vita::individual off(uniform_crossover(i1, i2));
 
     diff += off.distance(i1);
@@ -167,15 +167,14 @@ BOOST_AUTO_TEST_CASE(Cross1)
 {
   env.code_length = 100;
 
-  vita::individual i1(env, true), i2(env, true);
+  vita::individual i1(env, sset), i2(env, sset);
 
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(one_point_crossover(i1, i2));
 
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -184,15 +183,14 @@ BOOST_AUTO_TEST_CASE(Cross2)
 {
   env.code_length = 100;
 
-  vita::individual i1(env, true), i2(env, true);
+  vita::individual i1(env, sset), i2(env, sset);
 
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(two_point_crossover(i1, i2));
 
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -202,13 +200,13 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 1000; ++i)
   {
     std::stringstream ss;
-    vita::individual i1(env, true);
+    vita::individual i1(env, sset);
 
     i1.age = vita::random::between(0, 1000);
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::individual i2(env, false);
+    vita::individual i2(env, sset);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 

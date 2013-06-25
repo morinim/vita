@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     if (vita::random::boolean(0.8))
       before.best = {
-        vita::individual(env, true),
+        vita::individual(env, sset),
         vita::random::between<double>(0, 1000)
       };
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(before.save(ss));
 
     vita::summary<vita::individual> after;
-    BOOST_REQUIRE(after.load(ss, env));
+    BOOST_REQUIRE(after.load(ss, env, sset));
 
     BOOST_CHECK_EQUAL(before.speed, after.speed);
     BOOST_CHECK_EQUAL(before.mutations, after.mutations);

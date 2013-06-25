@@ -28,13 +28,15 @@ int main(int argc, char *argv[])
 
   env.code_length = argc > 1 ? atoi(argv[1]) : 50;
 
+  vita::symbol_set sset;
+
   vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make(vita::d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
+  sset.insert(factory.make(vita::d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
 
   const unsigned n(argc > 2 ? atoi(argv[2]) : 10000000);
 
@@ -42,7 +44,7 @@ int main(int argc, char *argv[])
 
   std::vector<vita::individual> pool;
   for (size_t i(0); i < 1000; ++i)
-    pool.emplace_back(env, true);
+    pool.emplace_back(env, sset);
 
   vita::timer t;
   for (unsigned i(0); i < n; ++i)

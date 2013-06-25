@@ -37,7 +37,7 @@ namespace vita
   class individual
   {
   public:
-    individual();
+    //individual();
     individual(const environment &, const symbol_set &);
 
     // Visualization/output methods.

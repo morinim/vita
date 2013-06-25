@@ -28,12 +28,12 @@ namespace vita
   ///
   /// An uninitialized individual.
   ///
-  individual::individual()
+/*  individual::individual()
     : age(0), genome_(0, 0), signature_(), best_{0, 0}, env_(nullptr),
       sset_(nullptr)
   {
   }
-
+*/
   ///
   /// \param[in] e base environment.
   /// \param[in] sset a symbol set.
@@ -107,7 +107,7 @@ namespace vita
   void individual::hoist()
   {
     const unsigned sup(size() - 1);
-    const unsigned categories(sset().categories());
+    const unsigned categories(sset_->categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -351,8 +351,8 @@ namespace vita
   ///
   size_t individual::distance(const individual &ind) const
   {
-    const size_t cs(size());
-    const size_t categories(sset_->categories());
+    const index_t cs(size());
+    const category_t categories(sset_->categories());
 
     size_t d(0);
     for (index_t i(0); i < cs; ++i)

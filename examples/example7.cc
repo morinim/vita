@@ -4,7 +4,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -29,25 +29,27 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
+  vita::symbol_set sset;
+
   symbol_factory &factory(symbol_factory::instance());
-  env.insert(factory.make(d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
-  env.insert(factory.make("FABS"));
-  env.insert(factory.make("FLN"));
+  sset.insert(factory.make(d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
+  sset.insert(factory.make("FABS"));
+  sset.insert(factory.make("FLN"));
 
   distribution<double> individuals, blocks_len, blocks_n, arguments;
 
   for (unsigned k(0); k < n; ++k)
   {
-    individual base(env, true);
+    individual base(env, sset);
     unsigned base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = individual(env, true);
+      base = individual(env, sset);
       base_es = base.eff_size();
     }
 

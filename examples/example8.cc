@@ -31,25 +31,27 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 5;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
+  vita::symbol_set sset;
+
   symbol_factory &factory(symbol_factory::instance());
-  env.insert(factory.make(d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
-  env.insert(factory.make("FABS"));
-  env.insert(factory.make("FLN"));
+  sset.insert(factory.make(d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
+  sset.insert(factory.make("FABS"));
+  sset.insert(factory.make("FLN"));
 
   for (unsigned k(0); k < n; ++k)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    individual base(env, true);
+    individual base(env, sset);
     size_t base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = individual(env, true);
+      base = individual(env, sset);
       base_es = base.eff_size();
     }
 
@@ -84,8 +86,8 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j].category;
         }
 
-        symbol::ptr f(std::make_shared<adf>(blk2, categories, 100));
-        env.insert(f);
+        symbol *const f(sset.insert(vita::make_unique<adf>(blk2, categories,
+                                                           100)));
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
 

@@ -49,8 +49,8 @@ namespace vita
 
     unsigned args(const std::string &) const;
 
-    template<typename T> bool register_symbol1(const std::string &);
-    template<typename T> bool register_symbol2(const std::string &);
+    template<class T> bool register_symbol1(const std::string &);
+    template<class T> bool register_symbol2(const std::string &);
 
     bool unregister_symbol(const std::string &);
 
@@ -60,11 +60,11 @@ namespace vita
     typedef std::unique_ptr<symbol> (*make_func1)(category_t);
     typedef std::unique_ptr<symbol> (*make_func2)(category_t, category_t);
 
-    template<typename T> static std::unique_ptr<symbol> make1(category_t c)
+    template<class T> static std::unique_ptr<symbol> make1(category_t c)
     { return make_unique<T>(c); }
 
-    template<typename T> static std::unique_ptr<symbol> make2(category_t c1,
-                                                              category_t c2)
+    template<class T> static std::unique_ptr<symbol> make2(category_t c1,
+                                                           category_t c2)
     { return make_unique<T>(c1, c2); }
 
   private:  // Data members.
@@ -78,7 +78,7 @@ namespace vita
   /// \param[in] name name of the symbol to be registered (UPPERCASE!).
   /// \return \c true if the symbol \a T has been added to the factory.
   ///
-  template<typename T>
+  template<class T>
   bool symbol_factory::register_symbol1(const std::string &name)
   {
     const map_key k(boost::to_upper_copy(name));
@@ -91,7 +91,7 @@ namespace vita
     return missing;
   }
 
-  template<typename T>
+  template<class T>
   bool symbol_factory::register_symbol2(const std::string &name)
   {
     const map_key k(boost::to_upper_copy(name));

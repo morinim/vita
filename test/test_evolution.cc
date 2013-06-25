@@ -30,14 +30,14 @@ BOOST_FIXTURE_TEST_SUITE(evolution, F_FACTORY2)
 BOOST_AUTO_TEST_CASE(Creation)
 {
   for (unsigned n(4); n <= 100; ++n)
-    for (unsigned l(env.sset.categories() + 2); l <= 100; l+= (l < 10 ? 1 : 30))
+    for (unsigned l(sset.categories() + 2); l <= 100; l+= (l < 10 ? 1 : 30))
     {
       env.individuals = n;
       env.code_length = l;
       env.tournament_size = 3;
 
       std::unique_ptr<vita::evaluator> eva(new vita::random_evaluator());
-      vita::evolution<vita::individual> evo(env, eva.get());
+      vita::evolution<vita::individual> evo(env, sset, eva.get());
 
       /*
       if (unit_test::runtime_config::log_level() <= unit_test::log_messages)

@@ -21,6 +21,9 @@
 
 namespace vita
 {
+  class individual;
+  class symbol_set;
+
   ///
   /// \brief Holds the coordinates of an individual in a population.
   ///
@@ -61,7 +64,8 @@ namespace vita
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
-    void init_layer(unsigned, const environment * = 0, const symbol_set * = 0);
+    void init_layer(unsigned, const environment * = nullptr,
+                    const symbol_set * = nullptr);
     void add_layer();
     unsigned layers() const;
     void inc_age();

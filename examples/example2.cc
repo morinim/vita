@@ -16,7 +16,8 @@
 #include <memory>
 
 #include "environment.h"
-#include "evolution.h"
+#include "individual.h"
+#include "population.h"
 #include "primitive/factory.h"
 
 //
@@ -31,15 +32,17 @@ int main(int argc, char *const argv[])
   // Size of an individual.
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(factory.make(vita::d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
+  vita::symbol_set sset;
 
-  vita::population<vita::individual> p(env);
+  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  sset.insert(factory.make(vita::d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
+
+  vita::population<vita::individual> p(env, sset);
 
   std::cout << p << std::endl;
 

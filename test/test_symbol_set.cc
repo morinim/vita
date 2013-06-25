@@ -30,12 +30,10 @@ BOOST_FIXTURE_TEST_SUITE(symbol_set, F_FACTORY3)
 
 BOOST_AUTO_TEST_CASE(Speed)
 {
-  const vita::symbol_set &ss(env.sset);
-
   const unsigned n(10000000);
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
-    ss.roulette();
+    sset.roulette();
 
   BOOST_TEST_MESSAGE(static_cast<unsigned>(1000.0 * n / t.elapsed())
                      << " extractions/sec");

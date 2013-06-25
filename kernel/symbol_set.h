@@ -36,7 +36,7 @@ namespace vita
   public:
     symbol_set();
 
-    void insert(std::unique_ptr<symbol>);
+    symbol *insert(std::unique_ptr<symbol>);
 
     symbol *roulette() const;
     symbol *roulette(category_t) const;

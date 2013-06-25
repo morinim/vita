@@ -82,7 +82,7 @@ class my_evaluator : public vita::evaluator
           }
         }
 
-    return {fit};
+    return vita::fitness_t(fit);
   }
 };
 
@@ -94,19 +94,23 @@ int main(int argc, char *argv[])
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
   env.g_since_start = argc > 3 ? atoi(argv[3]) : 100;
 
+  vita::symbol_set sset;
+
   vita::symbol_factory &factory(vita::symbol_factory::instance());
-  env.insert(std::make_shared<X>());
-  env.insert(std::make_shared<Y>());
-  env.insert(std::make_shared<Z>());
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
+  sset.insert(vita::make_unique<X>());
+  sset.insert(vita::make_unique<Y>());
+  sset.insert(vita::make_unique<Z>());
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
 
-  std::unique_ptr<vita::evaluator> eva(new my_evaluator());
+  std::unique_ptr<vita::evaluator> eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::individual>(env, eva.get()).run<vita::std_es>(1);
+  vita::evolution<vita::individual> evo(env, sset, eva.get());
+
+  evo.run<vita::std_es>(1);
 
   return EXIT_SUCCESS;
 }

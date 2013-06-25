@@ -27,7 +27,7 @@ namespace vita
     void clear();
 
   public:   // Serialization.
-    bool load(std::istream &, const environment &);
+    bool load(std::istream &, const environment &, const symbol_set &);
     bool save(std::ostream &) const;
 
   public:  // Public data members.
@@ -47,6 +47,8 @@ namespace vita
 
     unsigned gen, last_imp;
   };
+
+#include "evolution_summary_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_SUMMARY_H
