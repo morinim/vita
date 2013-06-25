@@ -50,7 +50,7 @@ namespace vita
     typedef typename std::vector<std::vector<T>>::const_iterator
       const_iterator;
 
-    explicit population(const environment &);
+    explicit population(const environment &, const symbol_set &);
 
     T &operator[](coord);
     const T &operator[](coord) const;
@@ -61,7 +61,7 @@ namespace vita
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
-    void init_layer(const environment * = nullptr, unsigned = 0);
+    void init_layer(unsigned, const environment * = 0, const symbol_set * = 0);
     void add_layer();
     unsigned layers() const;
     void inc_age();

@@ -19,6 +19,7 @@
 #include "data.h"
 #include "environment.h"
 #include "evaluator.h"
+#include "symbol_set.h"
 
 namespace vita
 {
@@ -44,6 +45,8 @@ namespace vita
 
   public:  // Public data members.
     environment env;
+
+    symbol_set sset;
 
   protected:  // Private data members.
     std::unique_ptr<evaluator> active_eva_;

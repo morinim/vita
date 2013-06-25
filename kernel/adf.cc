@@ -98,7 +98,7 @@ namespace vita
   {
     // No recursive calls.
     for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym.get() == this)
+      if (i->sym == this)
         return false;
 
     return core_.debug() && function::debug();
@@ -158,7 +158,7 @@ namespace vita
   {
     // No recursive calls.
     for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym.get() == this)
+      if (i->sym == this)
         return false;
 
     return core_.debug() && terminal::debug();

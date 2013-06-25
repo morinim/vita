@@ -137,16 +137,16 @@ namespace vita
   unsigned analyzer::count(const individual &ind)
   {
     for (index_t i(0); i < ind.size(); ++i)
-      for (category_t c(0); c < ind.env().sset.categories(); ++c)
+      for (category_t c(0); c < ind.sset().categories(); ++c)
       {
         const locus l{i, c};
-        count(ind[l].sym.get(), false);
+        count(ind[l].sym, false);
       }
 
     unsigned length(0);
     for (individual::const_iterator it(ind); it(); ++it)
     {
-      count(it->sym.get(), true);
+      count(it->sym, true);
       ++length;
     }
 

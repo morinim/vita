@@ -91,7 +91,7 @@ namespace vita
     if (ds.empty())
       return {0, 0};
 
-    env.sset = vita::symbol_set();
+    sset = vita::symbol_set();
     dat_.clear();
 
     const size_t n_examples(dat_.open(ds, env.verbosity));
@@ -133,7 +133,7 @@ namespace vita
   ///
   void src_problem::setup_terminals_from_data()
   {
-    env.sset = vita::symbol_set();
+    sset = vita::symbol_set();
 
     // Sets up the variables (features).
     for (size_t i(1); i < dat_.columns(); ++i)
@@ -143,7 +143,7 @@ namespace vita
         name = "X" + boost::lexical_cast<std::string>(i);
 
       const category_t category(dat_.get_column(i).category_id);
-      env.insert(std::make_shared<variable>(name, i - 1, category));
+      sset.insert(make_unique<variable>(name, i - 1, category));
     }
 
     // Sets up the labels for nominal attributes.
@@ -152,7 +152,7 @@ namespace vita
       const data::category &cat(dat_.get_category(c));
 
       for (const std::string &label : cat.labels)
-        env.insert(std::make_shared<constant<std::string>>(label, c));
+        sset.insert(make_unique<constant<std::string>>(label, c));
     }
   }
 
@@ -169,22 +169,22 @@ namespace vita
     for (category_t category(0); category < dat_.categories(); ++category)
       if (compatible({category}, {"numeric"}))
       {
-        env.insert(factory.make("1.0", {category}));
-        env.insert(factory.make("2.0", {category}));
-        env.insert(factory.make("3.0", {category}));
-        env.insert(factory.make("4.0", {category}));
-        env.insert(factory.make("5.0", {category}));
-        env.insert(factory.make("6.0", {category}));
-        env.insert(factory.make("7.0", {category}));
-        env.insert(factory.make("8.0", {category}));
-        env.insert(factory.make("9.0", {category}));
-        env.insert(factory.make("FABS", {category}));
-        env.insert(factory.make("FADD", {category}));
-        env.insert(factory.make("FDIV", {category}));
-        env.insert(factory.make("FLN",  {category}));
-        env.insert(factory.make("FMUL", {category}));
-        env.insert(factory.make("FMOD", {category}));
-        env.insert(factory.make("FSUB", {category}));
+        sset.insert(factory.make("1.0", {category}));
+        sset.insert(factory.make("2.0", {category}));
+        sset.insert(factory.make("3.0", {category}));
+        sset.insert(factory.make("4.0", {category}));
+        sset.insert(factory.make("5.0", {category}));
+        sset.insert(factory.make("6.0", {category}));
+        sset.insert(factory.make("7.0", {category}));
+        sset.insert(factory.make("8.0", {category}));
+        sset.insert(factory.make("9.0", {category}));
+        sset.insert(factory.make("FABS", {category}));
+        sset.insert(factory.make("FADD", {category}));
+        sset.insert(factory.make("FDIV", {category}));
+        sset.insert(factory.make("FLN",  {category}));
+        sset.insert(factory.make("FMUL", {category}));
+        sset.insert(factory.make("FMOD", {category}));
+        sset.insert(factory.make("FSUB", {category}));
       }
   }
 
@@ -257,7 +257,7 @@ namespace vita
                               << (&j == &seq.back() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
-                  env.insert(factory.make(sym_name, seq));
+                  sset.insert(factory.make(sym_name, seq));
                 }
             }
         }
@@ -275,7 +275,7 @@ namespace vita
                           << (j + 1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
-              env.insert(factory.make(sym_name, cvect(n_args, category)));
+              sset.insert(factory.make(sym_name, cvect(n_args, category)));
             }
         }
 

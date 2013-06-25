@@ -21,8 +21,6 @@
 
 namespace vita
 {
-  class symbol_set;
-
   ///
   /// \brief A gene is a unit of heredity in a living organism.
   ///
@@ -37,15 +35,15 @@ namespace vita
     enum  {k_args = K};
 
     basic_gene() {}
-    explicit basic_gene(const symbol::ptr &);
-    basic_gene(const std::pair<symbol::ptr, std::vector<index_t>> &);
-    basic_gene(const symbol::ptr &, index_t, index_t);
+    explicit basic_gene(symbol *);
+    basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
+    basic_gene(symbol *, index_t, index_t);
 
     bool operator==(const basic_gene<K> &) const;
     bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
 
   public:  // Public data members.
-    symbol::ptr sym;
+    symbol *sym;
     union
     {
       int               par;

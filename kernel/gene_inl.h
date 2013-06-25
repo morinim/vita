@@ -23,7 +23,7 @@
 /// This is usually called for filling the patch section of an individual.
 ///
 template<size_t K>
-basic_gene<K>::basic_gene(const symbol::ptr &t) : sym(t)
+basic_gene<K>::basic_gene(symbol *t) : sym(t)
 {
   assert(sym->terminal());
 
@@ -44,7 +44,7 @@ basic_gene<K>::basic_gene(const symbol::ptr &t) : sym(t)
 ///
 template<size_t K>
 basic_gene<K>::basic_gene(
-  const std::pair<symbol::ptr, std::vector<index_t>> &g) : sym(g.first)
+  const std::pair<symbol *, std::vector<index_t>> &g) : sym(g.first)
 {
   if (sym->parametric())
     par = sym->init();
@@ -65,7 +65,7 @@ basic_gene<K>::basic_gene(
 /// This is usually called for filling the standard section of an individual.
 ///
 template<size_t K>
-basic_gene<K>::basic_gene(const symbol::ptr &s, index_t from, index_t sup)
+basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup)
   : sym(s)
 {
   assert(from < sup);

@@ -18,19 +18,67 @@
 
 namespace vita
 {
-  const symbol::ptr symbol_set::empty_ptr;
+  namespace
+  {
+    ///
+    /// \param[in] symbols set of symbols.
+    /// \param[in] sum sum of the weights of the elements contained in
+    ///                \a symbols.
+    /// \return a random symbol from \a symbols.
+    ///
+    /// Probably the fastest way to produce a realization of a random variable
+    /// X in a computer is to create a big table where each outcome \a i is
+    /// inserterted a number of times proportional to P(X=i).
+    ///
+    /// Two fast methods are described in "Fast Generation of Discrete Random
+    /// Variables" (Marsaglia, Tsang, Wang).
+    /// Also boost::random::discrete_distribution seems quite fast.
+    ///
+    /// Anyway we choose the "roulette algorithm" because it's very simple and
+    /// allows changing weights dynamically (performance differences can hardly
+    /// be measured).
+    /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
+    ///
+    symbol *roulette_(const std::vector<symbol *> &symbols,
+                      std::uintmax_t sum)
+    {
+      const auto slot(random::sup(sum));
+
+      size_t i(0);
+      for (std::uintmax_t wedge(symbols[i]->weight);
+           wedge <= slot;
+           wedge += symbols[++i]->weight)
+      {}
+
+      // This is a different approach from Eli Bendersky
+      // (http://eli.thegreenplace.net):
+      // std::uintmax_t total(0);
+      // for (size_t i(0), winner(0); i < symbols.size(); ++i)
+      // {
+      //   total += symbols[i]->weight;
+      //   if (random::sup(total + 1) < symbols[i]->weight)
+      //     winner = i;
+      //   return winner;
+      // }
+      // The interesting property of this algorithm is that you don't need to
+      // know the sum of weights in advance in order to use it. The method is
+      // cool, but slower than the standard roulette.
+
+      assert(i < symbols.size());
+      return symbols[i];
+    }
+  }  // anonymous namespace
 
   ///
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
   ///
-  symbol_set::symbol_set() : arguments_(gene::k_args)
+  symbol_set::symbol_set()
   {
     clear();
 
-    arguments_.clear();
-    for (size_t i(0); i < gene::k_args; ++i)
-      arguments_[i] = std::make_shared<argument>(i);
+    for (unsigned i(0); i < gene::k_args; ++i)
+      arguments_.push_back(make_unique<argument>(i));
 
     assert(debug());
   }
@@ -41,6 +89,7 @@ namespace vita
   void symbol_set::clear()
   {
     arguments_.clear();
+    symbols_.clear();
 
     all_ = collection();
     by_ = by_category();
@@ -50,17 +99,17 @@ namespace vita
   /// \param[in] n index of an argument symbol.
   /// \return a pointer to the n-th argument symbol.
   ///
-  const symbol::ptr &symbol_set::arg(size_t n) const
+  symbol *symbol_set::arg(unsigned n) const
   {
     assert(n < gene::k_args);
-    return arguments_[n];
+    return arguments_[n].get();
   }
 
   ///
   /// \param[in] i index of an ADT symbol.
   /// \return a pointer to the i-th ADT symbol.
   ///
-  const symbol::ptr &symbol_set::get_adt(size_t i) const
+  symbol *symbol_set::get_adt(unsigned i) const
   {
     assert(i < all_.adt.size());
     return all_.adt[i];
@@ -69,7 +118,7 @@ namespace vita
   ///
   /// \return the number of ADT functions stored.
   ///
-  size_t symbol_set::adts() const
+  unsigned symbol_set::adts() const
   {
     return all_.adt.size();
   }
@@ -81,28 +130,34 @@ namespace vita
   /// descending order, with respect to the weight, so the selection algorithm
   /// would run faster.
   ///
-  void symbol_set::insert(const symbol::ptr &i)
+  void symbol_set::insert(std::unique_ptr<symbol> i)
   {
-    assert(i && i->weight && i->debug());
+    assert(i);
+    assert(i->weight);
+    assert(i->debug());
 
-    all_.symbols.push_back(i);
-    all_.sum += i->weight;
+    const auto raw(i.get());
 
-    if (i->terminal())
+    symbols_.push_back(std::move(i));
+
+    all_.symbols.push_back(raw);
+    all_.sum += raw->weight;
+
+    if (raw->terminal())
     {
-      all_.terminals.push_back(i);
+      all_.terminals.push_back(raw);
 
-      if (i->auto_defined())
-        all_.adt.push_back(i);
+      if (raw->auto_defined())
+        all_.adt.push_back(raw);
     }
     else  // not a terminal
-      if (i->auto_defined())
-        all_.adf.push_back(i);
+      if (raw->auto_defined())
+        all_.adf.push_back(raw);
 
     by_ = by_category(all_);
 
     std::sort(all_.symbols.begin(), all_.symbols.end(),
-              [](const symbol::ptr &s1, const symbol::ptr &s2)
+              [](const symbol *s1, const symbol *s2)
               { return s1->weight > s2->weight; });
   }
 
@@ -151,7 +206,7 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random terminal of category \a c.
   ///
-  const symbol::ptr &symbol_set::roulette_terminal(category_t c) const
+  symbol *symbol_set::roulette_terminal(category_t c) const
   {
     assert(c < categories());
 
@@ -162,64 +217,17 @@ namespace vita
   /// \param[in] c a category.
   /// \return a random symbol of category \a c.
   ///
-  const symbol::ptr &symbol_set::roulette(category_t c) const
+  symbol *symbol_set::roulette(category_t c) const
   {
-    return roulette(by_.category[c].symbols, by_.category[c].sum);
+    return roulette_(by_.category[c].symbols, by_.category[c].sum);
   }
 
   ///
   /// \return a random symbol from the set of all symbols.
   ///
-  const symbol::ptr &symbol_set::roulette() const
+  symbol *symbol_set::roulette() const
   {
-    return roulette(all_.symbols, all_.sum);
-  }
-
-  ///
-  /// \param[in] symbols set of symbols.
-  /// \param[in] sum sum of the weights of the elements contained in \a symbols.
-  /// \return a random symbol from \a symbols.
-  ///
-  /// Probably the fastest way to produce a realization of a random variable X
-  /// in a computer is to create a big table where each outcome \a i is
-  /// inserterted a number of times proportional to P(X=i).
-  ///
-  /// Two fast methods are described in "Fast Generation of Discrete Random
-  /// Variables" (Marsaglia, Tsang, Wang).
-  /// Also boost::random::discrete_distribution seems quite fast.
-  ///
-  /// Anyway we choose the "roulette algorithm" because it's very simple and
-  /// allows changing weights dynamically (performance differences can hardly
-  /// be measured).
-  /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
-  ///
-  const symbol::ptr &symbol_set::roulette(const s_vector & symbols,
-                                          std::uintmax_t sum) const
-  {
-    const auto slot(random::sup(sum));
-
-    size_t i(0);
-    for (std::uintmax_t wedge(symbols[i]->weight);
-         wedge <= slot;
-         wedge += symbols[++i]->weight)
-    {}
-
-    // This is a different approach from Eli Bendersky
-    // (http://eli.thegreenplace.net):
-    // std::uintmax_t total(0);
-    // for (size_t i(0), winner(0); i < symbols.size(); ++i)
-    // {
-    //   total += symbols[i]->weight;
-    //   if (random::sup(total + 1) < symbols[i]->weight)
-    //     winner = i;
-    //   return winner;
-    // }
-    // The interesting property of this algorithm is that you don't need to
-    // know the sum of weights in advance in order to use it. The method is
-    // cool, but slower than the standard roulette.
-
-    assert(i < symbols.size());
-    return symbols[i];
+    return roulette_(all_.symbols, all_.sum);
   }
 
   ///
@@ -227,13 +235,13 @@ namespace vita
   /// \return a pointer to the \c vita::symbol identified by 'opcode'
   ///         (\c nullptr if not found).
   ///
-  const symbol::ptr &symbol_set::decode(opcode_t opcode) const
+  symbol *symbol_set::decode(opcode_t opcode) const
   {
     for (size_t i(0); i < all_.symbols.size(); ++i)
       if (all_.symbols[i]->opcode() == opcode)
         return all_.symbols[i];
 
-    return empty_ptr;
+    return nullptr;
   }
 
   ///
@@ -245,7 +253,7 @@ namespace vita
   /// user, so, if you don't pay attention, different symbols may have the same
   /// name.
   ///
-  const symbol::ptr &symbol_set::decode(const std::string &dex) const
+  symbol *symbol_set::decode(const std::string &dex) const
   {
     assert(dex != "");
 
@@ -253,7 +261,7 @@ namespace vita
       if (all_.symbols[i]->display() == dex)
         return all_.symbols[i];
 
-    return empty_ptr;
+    return nullptr;
   }
 
   ///
@@ -261,7 +269,7 @@ namespace vita
   ///
   /// See also \c data::categories().
   ///
-  size_t symbol_set::categories() const
+  unsigned symbol_set::categories() const
   {
     return by_.category.size();
   }
@@ -270,7 +278,7 @@ namespace vita
   /// \param[in] c a category.
   /// \return number of terminals in category \a c.
   ///
-  size_t symbol_set::terminals(category_t c) const
+  unsigned symbol_set::terminals(category_t c) const
   {
     assert(c < by_.category.size());
     return by_.category[c].terminals.size();
@@ -290,11 +298,11 @@ namespace vita
       for (size_t j(0); j < all_.symbols[i]->arity(); ++j)
         need.insert(function::cast(all_.symbols[i])->arg_category(j));
 
-    for (auto cat(need.begin()); cat != need.end(); ++cat)
+    for (const auto &cat : need)
     {
-      const collection &cc(by_.category[*cat]);
+      const collection &cc(by_.category[cat]);
 
-      if (*cat >= categories() || !cc.terminals.size())
+      if (cat >= categories() || !cc.terminals.size())
         return false;
     }
     return true;
@@ -309,15 +317,16 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
-    for (const symbol::ptr &s : ss.all_.symbols)
+    for (const symbol *s : ss.all_.symbols)
     {
       o << s->display();
 
-      const size_t arity(s->arity());
+      const auto arity(s->arity());
       if (arity)
         o << '(';
       for (size_t j(0); j < arity; ++j)
-        o << function::cast(s)->arg_category(j) << (j+1 == arity ? "" : ", ");
+        o << function::cast(s)->arg_category(j)
+          << (j+1 == arity ? "" : ", ");
       if (arity)
         o << ')';
 
@@ -437,7 +446,7 @@ namespace vita
 
     for (size_t j(0); j < category.size(); ++j)
       std::sort(category[j].symbols.begin(), category[j].symbols.end(),
-                [](const symbol::ptr &s1, const symbol::ptr &s2)
+                [](const symbol *s1, const symbol *s2)
                 { return s1->weight > s2->weight; });
 
     assert(debug());

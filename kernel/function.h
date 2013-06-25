@@ -66,10 +66,10 @@ namespace vita
     ///
     /// This is a short cut function.
     ///
-    static const function *cast(const symbol::ptr &s)
+    static const function *cast(const symbol *s)
     {
       assert(s->arity());
-      return static_cast<function *>(s.get());
+      return static_cast<const function *>(s);
     }
 
   private:  // Private data members.

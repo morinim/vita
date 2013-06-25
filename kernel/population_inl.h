@@ -20,43 +20,46 @@
 /// Creates a random population (initial size \a e.individuals).
 ///
 template<class T>
-population<T>::population(const environment &e) : pop_(1)
+population<T>::population(const environment &e, const symbol_set &sset)
+  : pop_(1)
 {
   assert(e.debug(true, true));
 
   pop_[0].reserve(e.individuals);
 
-  // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, env()
-  // is undefined!
+  // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
+  // isn't a well defined environment and reinit_layer doesn't work.
   for (unsigned i(0); i < e.individuals; ++i)
-    pop_[0].emplace_back(e, true);
+    pop_[0].emplace_back(e, sset);
 
   assert(debug(true));
 }
 
 ///
-/// \param[in] e an environment for individuals initialization.
 /// \param[in] l a layer of the population.
+/// \param[in] e an environmnet (used for individual generation).
+/// \param[in] s a symbol_set (used for individual generation).
 ///
 /// Resets layer \l of the population.
 ///
 /// \warning
-/// If layer 0 is empty then \c env() is undefined! So do not call
-/// \c init_layer() when \c individuals(0) == 0 (call \c init_layer(env)).
+/// If layer \a l is nonexistent/empty the method doesn't work!
 ///
 template<class T>
-void population<T>::init_layer(const environment *e, unsigned l)
+void population<T>::init_layer(unsigned l, const environment *e,
+                               const symbol_set *s)
 {
   assert(l < pop_.size());
-  assert(e || (pop_.size() && pop_[0].size()));
+  assert(pop_[l].size() || (e && s));
 
-  if (!e)
-    e = &env();
+  const environment &env_(e ? *e : pop_[l][0].env());
+  const symbol_set &sset_(s ? *s : pop_[l][0].sset());
 
   pop_[l].clear();
 
-  for (unsigned i(0); i < e->individuals; ++i)
-    pop_[l].emplace_back(*e, true);
+  const auto n(env_.individuals);
+  for (unsigned i(0); i < n; ++i)
+    pop_[l].emplace_back(env_, sset_);
 }
 
 ///
@@ -84,14 +87,16 @@ unsigned population<T>::layers() const
 template<class T>
 void population<T>::add_layer()
 {
-  assert(pop_.size() && pop_[0].size());
+  assert(pop_.size());
+  assert(pop_[0].size());
 
-  const auto &e(env());
+  const auto *const e(&pop_[0][0].env());
+  const auto *const s(&pop_[0][0].sset());
 
   pop_.insert(pop_.begin(), std::vector<individual>());
-  pop_.front().reserve(e.individuals);
+  pop_.front().reserve(e->individuals);
 
-  init_layer(&e, 0);
+  init_layer(0, e, s);
 }
 
 ///

@@ -123,8 +123,8 @@ namespace vita
   ///   for object creation, changing factories is as easy as changing the
   ///   singleton object.
   ///
-  symbol::ptr symbol_factory::make(const std::string &name,
-                                   const std::vector<category_t> &c)
+  std::unique_ptr<symbol> symbol_factory::make(
+    const std::string &name, const std::vector<category_t> &c)
   {
     const map_key k(boost::to_upper_copy(name));
 
@@ -144,15 +144,15 @@ namespace vita
     switch (find_domain(k))
     {
     case d_bool:
-      return std::make_shared<constant<bool>>(k, c1);
+      return make_unique<constant<bool>>(k, c1);
     case d_double:
-      return std::make_shared<constant<double>>(k, c1);
+      return make_unique<constant<double>>(k, c1);
     case d_int:
-      return std::make_shared<constant<int>>(k, c1);
+      return make_unique<constant<int>>(k, c1);
     case d_string:
-      return std::make_shared<constant<std::string>>(name, c1);
+      return make_unique<constant<std::string>>(name, c1);
     default:
-      return symbol::ptr();
+      return nullptr;
     }
   }
 
@@ -165,18 +165,19 @@ namespace vita
   ///
   /// This is an alternative way to build a number.
   ///
-  symbol::ptr symbol_factory::make(domain_t d, int min, int max, category_t c)
+  std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
+                                               category_t c)
   {
     assert(d == d_double || d == d_int);
 
     switch (d)
     {
     case d_double:
-      return std::make_shared<dbl::number>(c, min, max);
+      return make_unique<dbl::number>(c, min, max);
     case d_int:
-      return std::make_shared<integer::number>(c, min, max);
+      return make_unique<integer::number>(c, min, max);
     default:
-      return symbol::ptr();
+      return nullptr;
     }
   }
 

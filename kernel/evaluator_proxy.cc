@@ -26,7 +26,7 @@ namespace vita
   evaluator_proxy::evaluator_proxy(std::unique_ptr<evaluator> eva, unsigned ts)
     : eva_(std::move(eva)), cache_(ts)
   {
-    assert(eva);
+    assert(eva_);
     assert(ts > 6);
   }
 

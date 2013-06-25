@@ -60,6 +60,9 @@ namespace vita
   ///
   bool problem::debug(bool verbose) const
   {
-    return env.debug(verbose, false);
+    if (!env.debug(verbose, false))
+      return false;
+
+    return sset.debug();
   }
 }  // namespace vita

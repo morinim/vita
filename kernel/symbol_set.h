@@ -36,24 +36,24 @@ namespace vita
   public:
     symbol_set();
 
-    void insert(const symbol::ptr &);
+    void insert(std::unique_ptr<symbol>);
 
-    const symbol::ptr &roulette() const;
-    const symbol::ptr &roulette(category_t) const;
-    const symbol::ptr &roulette_terminal(category_t) const;
+    symbol *roulette() const;
+    symbol *roulette(category_t) const;
+    symbol *roulette_terminal(category_t) const;
 
-    const symbol::ptr &arg(size_t) const;
+    symbol *arg(unsigned) const;
 
-    const symbol::ptr &get_adt(size_t) const;
-    size_t adts() const;
+    symbol *get_adt(unsigned) const;
+    unsigned adts() const;
 
     void reset_adf_weights();
 
-    const symbol::ptr &decode(opcode_t) const;
-    const symbol::ptr &decode(const std::string &) const;
+    symbol *decode(opcode_t) const;
+    symbol *decode(const std::string &) const;
 
-    size_t categories() const;
-    size_t terminals(category_t) const;
+    unsigned categories() const;
+    unsigned terminals(category_t) const;
 
     bool enough_terminals() const;
     bool debug() const;
@@ -61,28 +61,28 @@ namespace vita
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
   private:  // Private support functions.
-    typedef std::vector<symbol::ptr> s_vector;
-
-    static const symbol::ptr empty_ptr;
-
     void clear();
-    const symbol::ptr &roulette(const s_vector &, std::uintmax_t) const;
 
   private:  // Private data members.
-    // \a arguments_ is not included in the \a collection struct because
-    // an argument isn't bounded to a category (see \c argument constructor for
-    // more details).
-    s_vector arguments_;
+    // arguments_ data member:
+    // * is not present in the \a collection struct because an argument isn't
+    //   bounded to a category (see \c argument constructor for more details);
+    // * is not a subset of symbols_ (the intersection of arguments_ and
+    //   symbol_ is an empty set) because arguments aren't returned by the
+    //   roulette functions .
+    std::vector<std::unique_ptr<symbol>> arguments_;
+
+    std::vector<std::unique_ptr<symbol>>   symbols_;
 
     // Symbols of every category are inserted in this collection.
     struct collection
     {
       collection();
 
-      s_vector   symbols;
-      s_vector terminals;
-      s_vector       adf;
-      s_vector       adt;
+      std::vector<symbol *>   symbols;
+      std::vector<symbol *> terminals;
+      std::vector<symbol *>       adf;
+      std::vector<symbol *>       adt;
 
       // The sum of the weights of all the symbols in the collection.
       std::uintmax_t sum;

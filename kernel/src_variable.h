@@ -29,8 +29,8 @@ namespace vita
   class variable : public terminal
   {
   public:
-    variable(const std::string &name, size_t v, category_t t = 0)
-      : terminal(name, t, true), var_(v) {}
+    variable(const std::string &name, unsigned var_id, category_t t = 0)
+      : terminal(name, t, true), var_(var_id) {}
 
     ///
     /// \return the value of the variable (as a \c any).
@@ -44,7 +44,7 @@ namespace vita
     }
 
   private:  // Private data members.
-    size_t var_;
+    unsigned var_;
   };
 }  // namespace vita
 #endif  // SRC_VARIABLE_H

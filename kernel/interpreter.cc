@@ -27,7 +27,7 @@ namespace vita
   ///
   interpreter::interpreter(const individual &ind, interpreter *const ctx)
     : ip_(ind.best_), context_(ctx), ind_(ind),
-      cache_(ind.size(), ind.env_->sset.categories())
+      cache_(ind.size(), ind.sset().categories())
   {
   }
 

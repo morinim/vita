@@ -31,7 +31,7 @@ namespace vita
     any run(const data::example &ex)
     { example_ = &ex; return interpreter::run(); }
 
-    any eval_var(size_t i)
+    any eval_var(unsigned i)
     { return boost::apply_visitor(cast_visitor(), example_->input[i]); }
 
   private:

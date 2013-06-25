@@ -24,6 +24,7 @@
 #include "gene.h"
 #include "locus.h"
 #include "matrix.h"
+#include "symbol_set.h"
 #include "ttable.h"
 
 namespace vita
@@ -36,7 +37,8 @@ namespace vita
   class individual
   {
   public:
-    individual(const environment &, bool);
+    individual();
+    individual(const environment &, const symbol_set &);
 
     // Visualization/output methods.
     void dump(std::ostream &) const;
@@ -64,6 +66,7 @@ namespace vita
     hash_t signature() const;
 
     const environment &env() const { return *env_; }
+    const symbol_set &sset() const { return *sset_; }
 
     bool debug(bool = true) const;
 
@@ -145,7 +148,8 @@ namespace vita
     // of genes is starting here).
     locus best_;
 
-    const environment *env_;
+    const environment  *env_;
+    const symbol_set  *sset_;
   };  // class individual
 
 

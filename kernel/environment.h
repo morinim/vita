@@ -21,7 +21,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "fitness.h"
-#include "symbol_set.h"
 
 namespace vita
 {
@@ -40,8 +39,6 @@ namespace vita
 
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
-
-    void insert(const symbol::ptr &);
 
     bool debug(bool, bool) const;
 
@@ -229,8 +226,6 @@ namespace vita
       /// A probability of -1.0 means undefined (auto-tune).
       double p_same_layer = 0.75;
     } alps;
-
-    symbol_set sset;
 
     static const char arl_filename[];
     static const char dyn_filename[];

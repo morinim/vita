@@ -37,7 +37,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(const environment &, evaluator *,
+    evolution(const environment &, const symbol_set &, evaluator *,
               std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 

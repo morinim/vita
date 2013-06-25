@@ -42,10 +42,10 @@ namespace vita
   public:
     static symbol_factory &instance();
 
-    symbol::ptr make(
+    std::unique_ptr<symbol> make(
       const std::string &,
       const std::vector<category_t> & = std::vector<category_t>());
-    symbol::ptr make(domain_t, int, int, category_t = 0);
+    std::unique_ptr<symbol> make(domain_t, int, int, category_t = 0);
 
     unsigned args(const std::string &) const;
 
@@ -57,14 +57,15 @@ namespace vita
   private:
     symbol_factory();
 
-    typedef symbol::ptr (*make_func1)(category_t);
-    typedef symbol::ptr (*make_func2)(category_t, category_t);
+    typedef std::unique_ptr<symbol> (*make_func1)(category_t);
+    typedef std::unique_ptr<symbol> (*make_func2)(category_t, category_t);
 
-    template<typename T> static symbol::ptr make1(category_t c)
-    { return std::make_shared<T>(c); }
+    template<typename T> static std::unique_ptr<symbol> make1(category_t c)
+    { return make_unique<T>(c); }
 
-    template<typename T> static symbol::ptr make2(category_t c1, category_t c2)
-    { return std::make_shared<T>(c1, c2); }
+    template<typename T> static std::unique_ptr<symbol> make2(category_t c1,
+                                                              category_t c2)
+    { return make_unique<T>(c1, c2); }
 
   private:  // Data members.
     typedef std::string map_key;

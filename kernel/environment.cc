@@ -99,18 +99,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] i pointer to a new symbol for the symbol set.
-  ///
-  /// This is a shortcut for symbol_set::insert.
-  ///
-  void environment::insert(const symbol::ptr &i)
-  {
-    assert(i);
-
-    sset.insert(i);
-  }
-
-  ///
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \param force_defined all the optional parameter have to be in a
   ///                      'well defined' state for the function to pass
@@ -312,6 +300,6 @@ namespace vita
       return false;
     }
 
-    return sset.debug();
+    return true;
   }
 }  // Namespace vita

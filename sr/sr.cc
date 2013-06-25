@@ -360,7 +360,7 @@ namespace ui
   void go(bool = true)
   {
     if (problem->data()->size())
-      if (problem->env.sset.enough_terminals())
+      if (problem->sset.enough_terminals())
       {
         fix_parameters(problem);
 
@@ -663,7 +663,7 @@ namespace ui
                   << std::endl;
     }
 
-    if (!problem->env.sset.enough_terminals())
+    if (!problem->sset.enough_terminals())
     {
       std::cerr << vita::k_s_error << " Too few terminals" << std::endl;
       return false;

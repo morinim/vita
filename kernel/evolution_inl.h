@@ -14,34 +14,6 @@
 #if !defined(EVOLUTION_INL_H)
 #define      EVOLUTION_INL_H
 
-///
-/// \return access to the population being evolved.
-///
-template<class T>
-population<T> &evolution<T>::population()
-{
-  return pop_;
-}
-
-///
-/// \return constant reference to the population being evolved.
-///
-template<class T>
-const population<T> &evolution<T>::population() const
-{
-  return pop_;
-}
-
-///
-/// \param[in] i individual we are looking for.
-/// \return how many times we have looked for \a i.
-///
-template<class T>
-unsigned evolution<T>::seen(const T &i) const
-{
-  return eva_->seen(i);
-}
-
 namespace term
 {
   ///
@@ -92,10 +64,11 @@ namespace term
 
     term_raw_mode(true);
   }
-}
+}  // namespace term
 
 ///
 /// \param[in] env environment (mostly used for population initialization).
+/// \param[in] sset environment (mostly used for polulation initialization).
 /// \param[in] eva evaluator used during the evolution.
 /// \param[in] sc function used to identify a stop condition (i.e. it's
 ///               most improbable that evolution will discover better
@@ -105,14 +78,43 @@ namespace term
 ///               environment.
 ///
 template<class T>
-evolution<T>::evolution(const environment &env, evaluator *eva,
+evolution<T>::evolution(const environment &env, const symbol_set &sset,
+                        evaluator *eva,
                         std::function<bool (const summary<T> &)> sc,
                         std::function<void (unsigned)> sd)
-  : pop_(env), eva_(eva), external_stop_condition_(sc), shake_data_(sd)
+  : pop_(env, sset), eva_(eva), external_stop_condition_(sc), shake_data_(sd)
 {
   assert(eva);
 
   assert(debug(true));
+}
+
+///
+/// \return access to the population being evolved.
+///
+template<class T>
+population<T> &evolution<T>::population()
+{
+  return pop_;
+}
+
+///
+/// \return constant reference to the population being evolved.
+///
+template<class T>
+const population<T> &evolution<T>::population() const
+{
+  return pop_;
+}
+
+///
+/// \param[in] i individual we are looking for.
+/// \return how many times we have looked for \a i.
+///
+template<class T>
+unsigned evolution<T>::seen(const T &i) const
+{
+  return eva_->seen(i);
 }
 
 ///

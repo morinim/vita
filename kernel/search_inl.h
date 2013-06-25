@@ -46,9 +46,9 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
     std::ofstream log(filename.c_str(), std::ios_base::app);
     if (env_.stat_arl && log.good())
     {
-      for (size_t i(0); i < env_.sset.adts(); ++i)
+      for (size_t i(0); i < prob_->sset.adts(); ++i)
       {
-        const symbol::ptr f(env_.sset.get_adt(i));
+        const symbol *const f(prob_->sset.get_adt(i));
         log << f->display() << ' ' << f->weight << std::endl;
       }
       log << std::endl;
@@ -69,7 +69,7 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
         // Semantic introns cannot be building blocks.
         if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
         {
-          symbol::ptr p;
+          std::unique_ptr<symbol> p;
           if (adf_args)
           {
             std::vector<locus> replaced;
@@ -78,11 +78,11 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
             for (size_t j(0); j < replaced.size(); ++j)
               categories[j] = replaced[j].category;
 
-            p = std::make_shared<adf>(generalized, categories, 10);
+            p = make_unique<adf>(generalized, categories, 10);
           }
           else  // !adf_args
-            p = std::make_shared<adt>(candidate_block, 100);
-          env_.insert(p);
+            p = make_unique<adt>(candidate_block, 100);
+          prob_->sset.insert(std::move(p));
 
           if (env_.stat_arl && log.good())
           {
@@ -427,7 +427,8 @@ T basic_search<T, ES>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<T> evo(env_, prob_->get_evaluator(), stop, shake_data);
+    evolution<T> evo(env_, prob_->sset, prob_->get_evaluator(), stop,
+                     shake_data);
     summary<T> s(evo.template run<ES>(run));
 
     // Depending on validation, this can be the training fitness or the
@@ -499,7 +500,7 @@ T basic_search<T, ES>::run(unsigned n)
 
     if (env_.arl && good_runs.front() == run)
     {
-      env_.sset.reset_adf_weights();
+      prob_->sset.reset_adf_weights();
       arl(s.best->ind, evo);
     }
 

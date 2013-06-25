@@ -26,45 +26,50 @@ namespace vita
   individual::crossover(two_point_crossover);
 
   ///
+  /// An uninitialized individual.
+  ///
+  individual::individual()
+    : age(0), genome_(0, 0), signature_(), best_{0, 0}, env_(nullptr),
+      sset_(nullptr)
+  {
+  }
+
+  ///
   /// \param[in] e base environment.
-  /// \param[in] gen if \c true generates a random sequence of genes to
-  ///                initialize the individual.
+  /// \param[in] sset a symbol set.
   ///
   /// The process that generates the initial, random expressions have to be
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///
-  individual::individual(const environment &e, bool gen)
-    : age(0), genome_(e.code_length, e.sset.categories()),
-      signature_(), best_{0, 0}, env_(&e)
+  individual::individual(const environment &e, const symbol_set &sset)
+    : age(0), genome_(e.code_length, sset.categories()),
+      signature_(), best_{0, 0}, env_(&e), sset_(&sset)
   {
     assert(e.debug(true, true));
 
-    if (gen)  // random generate initial code
-    {
-      assert(size());
-      assert(env_->patch_length);
-      assert(size() > env_->patch_length);
+    assert(size());
+    assert(env_->patch_length);
+    assert(size() > env_->patch_length);
 
-      const index_t sup(size()), patch(sup - env_->patch_length);
+    const index_t sup(size()), patch(sup - env_->patch_length);
 
-      const category_t categories(e.sset.categories());
-      assert(categories);
-      assert(categories < sup);
+    const category_t categories(sset.categories());
+    assert(categories);
+    assert(categories < sup);
 
-      // STANDARD SECTION. Filling the genome with random symbols.
-      for (index_t i(0); i < patch; ++i)
-        for (category_t c(0); c < categories; ++c)
-          genome_(i, c) = gene(e.sset.roulette(c), i + 1, size());
+    // STANDARD SECTION. Filling the genome with random symbols.
+    for (index_t i(0); i < patch; ++i)
+      for (category_t c(0); c < categories; ++c)
+        genome_(i, c) = gene(sset.roulette(c), i + 1, size());
 
-      // PATCH SUBSECTION. Placing terminals for satisfying constraints on
-      // types.
-      for (index_t i(patch); i < sup; ++i)
-        for (category_t c(0); c < categories; ++c)
-          genome_(i, c) = gene(e.sset.roulette_terminal(c));
+    // PATCH SUBSECTION. Placing terminals for satisfying constraints on
+    // types.
+    for (index_t i(patch); i < sup; ++i)
+      for (category_t c(0); c < categories; ++c)
+        genome_(i, c) = gene(sset.roulette_terminal(c));
 
-      assert(debug(true));
-    }
+    assert(debug(true));
   }
 
   ///
@@ -102,7 +107,7 @@ namespace vita
   void individual::hoist()
   {
     const unsigned sup(size() - 1);
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset().categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -120,7 +125,7 @@ namespace vita
       }
 
     for (category_t c(0); c < categories; ++c)
-      set({sup, c}, gene(env_->sset.roulette_terminal(c)));
+      set({sup, c}, gene(sset_->roulette_terminal(c)));
   }
   */
 
@@ -146,14 +151,14 @@ namespace vita
         const auto c(it.l.category);
 
         if (i < sup)
-          set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
+          set(it.l, gene(sset_->roulette(c), i + 1, size()));
         else
-          set(it.l, gene(env_->sset.roulette_terminal(c)));
+          set(it.l, gene(sset_->roulette_terminal(c)));
       }
 
 /*
     // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-    const category_t categories(env_->sset.categories());
+    const category_t categories(sset_->categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -161,7 +166,7 @@ namespace vita
         {
           ++n;
 
-          set({i, c}, gene(env_->sset.roulette(c), i + 1, size()));
+          set({i, c}, gene(sset_->roulette(c), i + 1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
@@ -169,7 +174,7 @@ namespace vita
       {
         ++n;
 
-        set({sup, c}, gene(env_->sset.roulette_terminal(c)));
+        set({sup, c}, gene(sset_->roulette_terminal(c)));
       }
 */
 
@@ -259,9 +264,9 @@ namespace vita
     assert(index < size());
 
     individual ret(*this);
-    const category_t categories(env_->sset.categories());
+    const category_t categories(sset_->categories());
     for (category_t c(0); c < categories; ++c)
-      ret.set({index, c}, gene(env_->sset.roulette_terminal(c)));
+      ret.set({index, c}, gene(sset_->roulette_terminal(c)));
 
     assert(ret.debug());
     return ret;
@@ -307,7 +312,7 @@ namespace vita
       gene &g(ret.genome_(terminals[j]));
       if (loci)
         loci->push_back(terminals[j]);
-      g.sym = env_->sset.arg(j);
+      g.sym = sset_->arg(j);
       ret.signature_.clear();
     }
 
@@ -347,7 +352,7 @@ namespace vita
   size_t individual::distance(const individual &ind) const
   {
     const size_t cs(size());
-    const size_t categories(env_->sset.categories());
+    const size_t categories(sset_->categories());
 
     size_t d(0);
     for (index_t i(0); i < cs; ++i)
@@ -450,7 +455,7 @@ namespace vita
   ///
   bool individual::debug(bool verbose) const
   {
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset_->categories());
 
     for (unsigned i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
@@ -615,7 +620,7 @@ namespace vita
   ///
   void individual::list(std::ostream &s) const
   {
-    const size_t categories(env_->sset.categories());
+    const size_t categories(sset_->categories());
     const unsigned w1(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(size() - 1))));
     const unsigned w2(
@@ -684,7 +689,7 @@ namespace vita
   ///
   void individual::dump(std::ostream &s) const
   {
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset_->categories());
     const unsigned width(1 + std::log10(size() - 1));
 
     for (unsigned i(0); i < size(); ++i)
@@ -787,7 +792,7 @@ namespace vita
           return false;
 
         gene g;
-        g.sym = env_->sset.decode(opcode);
+        g.sym = sset_->decode(opcode);
         if (!g.sym)
           return false;
 
@@ -879,10 +884,10 @@ namespace vita
 
 /*
     const index_t cs(p1.size());
-    const category_t categories(p1.env().sset.categories());
+    const category_t categories(p1.sset_->categories());
 
     assert(cs == p2.size());
-    assert(categories == p2.env().sset.categories());
+    assert(categories == p2.sset_->categories());
 
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -920,7 +925,7 @@ namespace vita
     assert(p1.size() == p2.size());
 
     const auto cs(p1.size());
-    const auto categories(p1.env().sset.categories());
+    const auto categories(p1.sset().categories());
 
     const auto cut(random::between<index_t>(1, cs - 1));
 
@@ -964,7 +969,7 @@ namespace vita
     assert(p1.size() == p2.size());
 
     const auto cs(p1.size());
-    const auto categories(p1.env().sset.categories());
+    const auto categories(p1.sset().categories());
 
     const auto cut1(random::sup(cs - 1));
     const auto cut2(random::between(cut1 + 1, cs));
