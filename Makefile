@@ -27,7 +27,7 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
-INCPATH = ../ ./
+INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
