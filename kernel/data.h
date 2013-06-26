@@ -22,7 +22,7 @@
 
 #include <boost/variant.hpp>
 
-#include "distribution.h"
+#include "kernel/distribution.h"
 
 namespace vita
 {

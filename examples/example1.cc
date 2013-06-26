@@ -14,9 +14,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "environment.h"
-#include "individual.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/individual.h"
+#include "kernel/src/primitive/factory.h"
 
 int main(int argc, char *argv[])
 {

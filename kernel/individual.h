@@ -20,12 +20,12 @@
 #include <list>
 #include <set>
 
-#include "environment.h"
-#include "gene.h"
-#include "locus.h"
-#include "matrix.h"
-#include "symbol_set.h"
-#include "ttable.h"
+#include "kernel/environment.h"
+#include "kernel/gene.h"
+#include "kernel/locus.h"
+#include "kernel/matrix.h"
+#include "kernel/symbol_set.h"
+#include "kernel/ttable.h"
 
 namespace vita
 {
@@ -37,7 +37,6 @@ namespace vita
   class individual
   {
   public:
-    //individual();
     individual(const environment &, const symbol_set &);
 
     // Visualization/output methods.

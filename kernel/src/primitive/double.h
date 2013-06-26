@@ -16,10 +16,10 @@
 
 #include <string>
 
-#include "function.h"
-#include "interpreter.h"
-#include "random.h"
-#include "terminal.h"
+#include "kernel/function.h"
+#include "kernel/interpreter.h"
+#include "kernel/random.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {

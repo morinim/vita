@@ -14,9 +14,9 @@
 #if !defined(LAMBDA_F_H)
 #define      LAMBDA_F_H
 
-#include "data.h"
-#include "individual.h"
-#include "matrix.h"
+#include "kernel/data.h"
+#include "kernel/individual.h"
+#include "kernel/matrix.h"
 
 namespace vita
 {

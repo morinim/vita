@@ -14,10 +14,10 @@
 #if !defined FACTORY_FIXTURE3_H
 #define      FACTORY_FIXTURE3_H
 
-#include "environment.h"
-#include "interpreter.h"
-#include "primitive/factory.h"
-#include "terminal.h"
+#include "kernel/environment.h"
+#include "kernel/interpreter.h"
+#include "kernel/src/primitive/factory.h"
+#include "kernel/terminal.h"
 
 struct F_FACTORY3
 {

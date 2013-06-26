@@ -16,8 +16,8 @@
 
 #include <vector>
 
-#include "random.h"
-#include "symbol.h"
+#include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
@@ -53,7 +53,7 @@ namespace vita
 
   typedef basic_gene<> gene;
 
-#include "gene_inl.h"
+#include "kernel/gene_inl.h"
 }  // namespace vita
 
 #endif  // GENE_H

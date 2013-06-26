@@ -14,8 +14,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "individual.h"
-#include "random.h"
+#include "kernel/individual.h"
+#include "kernel/random.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE primitive

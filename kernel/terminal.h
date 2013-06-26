@@ -14,7 +14,7 @@
 #if !defined(TERMINAL_H)
 #define      TERMINAL_H
 
-#include "symbol.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {

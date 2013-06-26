@@ -11,8 +11,8 @@
  *
  */
 
-#include "lambda_f.h"
-#include "src_interpreter.h"
+#include "kernel/lambda_f.h"
+#include "kernel/src/interpreter.h"
 
 namespace vita
 {

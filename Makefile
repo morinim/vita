@@ -27,7 +27,7 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
-INCPATH = ./kernel
+INCPATH = ../ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
@@ -48,7 +48,7 @@ endif
 CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
 COMPILE = $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
+KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC = $(wildcard examples/*.cc)
 SR_SRC = $(wildcard sr/*.cc)

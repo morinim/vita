@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_interpreter.h
+ *  \file src/interpreter.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2012-2013 EOS di Manlio Morini.
@@ -14,8 +14,8 @@
 #if !defined(SRC_INTERPRETER_H)
 #define      SRC_INTERPRETER_H
 
-#include "data.h"
-#include "interpreter.h"
+#include "kernel/data.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {

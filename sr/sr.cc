@@ -21,11 +21,11 @@ namespace po = boost::program_options;
 #include <iterator>
 #include <string>
 
-#include "environment.h"
-#include "search.h"
-#include "src_evaluator.h"
-#include "src_problem.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/search.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/src/problem.h"
+#include "kernel/src/primitive/factory.h"
 
 #include "command_line_interpreter.h"
 

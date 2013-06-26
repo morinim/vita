@@ -13,7 +13,7 @@
 
 #include <sstream>
 
-#include "fitness.h"
+#include "kernel/fitness.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE fitness_t

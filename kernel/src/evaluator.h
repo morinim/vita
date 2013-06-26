@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_evaluator.h
+ *  \file src/evaluator.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.
@@ -16,9 +16,9 @@
 
 #include <vector>
 
-#include "evaluator.h"
-#include "lambda_f.h"
-#include "primitive/factory.h"
+#include "kernel/evaluator.h"
+#include "kernel/lambda_f.h"
+#include "kernel/src/primitive/factory.h"
 
 namespace vita
 {

@@ -11,8 +11,8 @@
  *
  */
 
-#include "evaluator.h"
-#include "lambda_f.h"
+#include "kernel/evaluator.h"
+#include "kernel/lambda_f.h"
 
 namespace vita
 {

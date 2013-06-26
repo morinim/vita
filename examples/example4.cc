@@ -14,10 +14,10 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "individual.h"
-#include "ttable.h"
-#include "primitive/factory.h"
-#include "timer.h"
+#include "kernel/individual.h"
+#include "kernel/ttable.h"
+#include "kernel/src/primitive/factory.h"
+#include "kernel/timer.h"
 
 //
 // Performs a speed test on the transposition table (insert-find cycle).

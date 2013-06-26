@@ -20,7 +20,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "fitness.h"
+#include "kernel/fitness.h"
 
 namespace vita
 {

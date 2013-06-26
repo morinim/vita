@@ -14,7 +14,7 @@
 #if !defined(EVOLUTION_SUMMARY_H)
 #define      EVOLUTION_SUMMARY_H
 
-#include "analyzer.h"
+#include "kernel/analyzer.h"
 
 namespace vita
 {
@@ -48,7 +48,7 @@ namespace vita
     unsigned gen, last_imp;
   };
 
-#include "evolution_summary_inl.h"
+#include "kernel/evolution_summary_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_SUMMARY_H

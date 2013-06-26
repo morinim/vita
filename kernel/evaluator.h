@@ -14,8 +14,8 @@
 #if !defined(EVALUATOR_H)
 #define      EVALUATOR_H
 
-#include "fitness.h"
-#include "random.h"
+#include "kernel/fitness.h"
+#include "kernel/random.h"
 
 namespace vita
 {

@@ -18,10 +18,10 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "adf.h"
-#include "evolution.h"
-#include "lambda_f.h"
-#include "problem.h"
+#include "kernel/adf.h"
+#include "kernel/evolution.h"
+#include "kernel/lambda_f.h"
+#include "kernel/problem.h"
 
 namespace vita
 {
@@ -60,7 +60,7 @@ namespace vita
 
   typedef basic_search<> search;
 
-#include "search_inl.h"
+#include "kernel/search_inl.h"
 }  // namespace vita
 
 #endif  // SEARCH_H

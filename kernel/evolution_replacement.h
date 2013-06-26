@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita {
   template<class T> class evolution;
@@ -118,7 +118,7 @@ namespace replacement {
                      summary<T> *const) override;
   };
 
-#include "evolution_replacement_inl.h"
+#include "kernel/evolution_replacement_inl.h"
 } }  // namespace vita::replacement
 
 #endif  // EVOLUTION_REPLACEMENT_H

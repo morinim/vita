@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_evaluator.cc
+ *  \file src/evaluator.cc
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.
@@ -11,9 +11,9 @@
  *
  */
 
-#include "src_evaluator.h"
-#include "individual.h"
-#include "src_interpreter.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/individual.h"
+#include "kernel/src/interpreter.h"
 
 namespace vita
 {

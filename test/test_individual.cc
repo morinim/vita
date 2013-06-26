@@ -14,8 +14,8 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "individual.h"
-#include "interpreter.h"
+#include "kernel/individual.h"
+#include "kernel/interpreter.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE individual

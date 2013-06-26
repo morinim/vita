@@ -40,7 +40,7 @@
 
 #include <boost/spirit/home/support/detail/hold_any.hpp>
 
-#include "compatibility_patch.h"
+#include "kernel/compatibility_patch.h"
 
 namespace vita
 {

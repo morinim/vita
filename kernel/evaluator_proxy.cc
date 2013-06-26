@@ -13,9 +13,9 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "evaluator_proxy.h"
-#include "individual.h"
-#include "lambda_f.h"
+#include "kernel/evaluator_proxy.h"
+#include "kernel/individual.h"
+#include "kernel/lambda_f.h"
 
 namespace vita
 {

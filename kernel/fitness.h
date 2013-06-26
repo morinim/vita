@@ -18,7 +18,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
@@ -76,7 +76,7 @@ namespace vita
 
   using fitness_t = basic_fitness_t<double, 1>;
 
-#include "fitness_inl.h"
+#include "kernel/fitness_inl.h"
 }  // namespace vita
 
 #endif  // FITNESS_H

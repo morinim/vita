@@ -13,27 +13,18 @@
 
 #include <algorithm>
 
-#include "individual.h"
-#include "adf.h"
-#include "argument.h"
-#include "environment.h"
-#include "random.h"
-#include "ttable_hash.h"
+#include "kernel/individual.h"
+#include "kernel/adf.h"
+#include "kernel/argument.h"
+#include "kernel/environment.h"
+#include "kernel/random.h"
+#include "kernel/ttable_hash.h"
 
 namespace vita
 {
   std::function<individual (const individual &, const individual &)>
   individual::crossover(two_point_crossover);
 
-  ///
-  /// An uninitialized individual.
-  ///
-/*  individual::individual()
-    : age(0), genome_(0, 0), signature_(), best_{0, 0}, env_(nullptr),
-      sset_(nullptr)
-  {
-  }
-*/
   ///
   /// \param[in] e base environment.
   /// \param[in] sset a symbol set.

@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "symbol.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {

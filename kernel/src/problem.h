@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_problem.h
+ *  \file src/problem.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.
@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "problem.h"
+#include "kernel/problem.h"
 
 namespace vita
 {

@@ -28,7 +28,7 @@ population<T>::population(const environment &e, const symbol_set &sset)
   pop_[0].reserve(e.individuals);
 
   // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
-  // isn't a well defined environment and reinit_layer doesn't work.
+  // isn't a well defined environment and init_layer doesn't work.
   for (unsigned i(0); i < e.individuals; ++i)
     pop_[0].emplace_back(e, sset);
 

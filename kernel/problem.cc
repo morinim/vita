@@ -11,9 +11,9 @@
  *
  */
 
-#include "evaluator_proxy.h"
-#include "problem.h"
-#include "search.h"
+#include "kernel/evaluator_proxy.h"
+#include "kernel/problem.h"
+#include "kernel/search.h"
 
 namespace vita
 {

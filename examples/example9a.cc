@@ -14,8 +14,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "search.h"
-#include "src_problem.h"
+#include "kernel/search.h"
+#include "kernel/src/problem.h"
 
 int main()
 {

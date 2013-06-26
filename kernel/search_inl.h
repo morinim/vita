@@ -41,15 +41,14 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
   const fitness_t base_fit(evo.fitness(base));
   if (base_fit.isfinite())
   {
-    const std::string filename(env_.stat_dir + "/" +
-                               environment::arl_filename);
+    const auto filename(env_.stat_dir + "/" + environment::arl_filename);
     std::ofstream log(filename.c_str(), std::ios_base::app);
     if (env_.stat_arl && log.good())
     {
-      for (size_t i(0); i < prob_->sset.adts(); ++i)
+      for (unsigned i(0); i < prob_->sset.adts(); ++i)
       {
-        const symbol *const f(prob_->sset.get_adt(i));
-        log << f->display() << ' ' << f->weight << std::endl;
+        const symbol &f(*prob_->sset.get_adt(i));
+        log << f.display() << ' ' << f.weight << std::endl;
       }
       log << std::endl;
     }
@@ -75,14 +74,13 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
             std::vector<locus> replaced;
             T generalized(candidate_block.generalize(adf_args, &replaced));
             std::vector<category_t> categories(replaced.size());
-            for (size_t j(0); j < replaced.size(); ++j)
+            for (unsigned j(0); j < replaced.size(); ++j)
               categories[j] = replaced[j].category;
 
             p = make_unique<adf>(generalized, categories, 10);
           }
           else  // !adf_args
             p = make_unique<adt>(candidate_block, 100);
-          prob_->sset.insert(std::move(p));
 
           if (env_.stat_arl && log.good())
           {
@@ -93,6 +91,8 @@ void basic_search<T, ES>::arl(const T &base, evolution<T> &evo)
             candidate_block.list(log);
             log << std::endl;
           }
+
+          prob_->sset.insert(std::move(p));
         }
       }
     }

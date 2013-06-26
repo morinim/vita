@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-#include "environment.h"
+#include "kernel/environment.h"
 
 namespace vita
 {

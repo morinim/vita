@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "evolution.h"
+#include "kernel/evolution.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE evolution

@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_problem.cc
+ *  \file src/problem.cc
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.
@@ -14,11 +14,11 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "src_problem.h"
-#include "lambda_f.h"
-#include "src_constant.h"
-#include "src_evaluator.h"
-#include "src_variable.h"
+#include "kernel/src/problem.h"
+#include "kernel/lambda_f.h"
+#include "kernel/src/constant.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/src/variable.h"
 
 namespace vita
 {

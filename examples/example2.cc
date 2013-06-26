@@ -15,10 +15,10 @@
 #include <iostream>
 #include <memory>
 
-#include "environment.h"
-#include "individual.h"
-#include "population.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/individual.h"
+#include "kernel/population.h"
+#include "kernel/src/primitive/factory.h"
 
 //
 // Creates a random population and prints it out.

@@ -11,10 +11,10 @@
  *
  */
 
-#include "symbol_set.h"
-#include "adf.h"
-#include "argument.h"
-#include "random.h"
+#include "kernel/symbol_set.h"
+#include "kernel/adf.h"
+#include "kernel/argument.h"
+#include "kernel/random.h"
 
 namespace vita
 {
@@ -78,7 +78,7 @@ namespace vita
     clear();
 
     for (unsigned i(0); i < gene::k_args; ++i)
-      arguments_.push_back(make_unique<argument>(i));
+      arguments_[i] = make_unique<argument>(i);
 
     assert(debug());
   }

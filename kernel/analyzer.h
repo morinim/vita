@@ -18,9 +18,9 @@
 #include <map>
 #include <set>
 
-#include "distribution.h"
-#include "individual.h"
-#include "symbol.h"
+#include "kernel/distribution.h"
+#include "kernel/individual.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {

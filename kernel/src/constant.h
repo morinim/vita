@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_constant.h
+ *  \file src/constant.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2012-2013 EOS di Manlio Morini.
@@ -16,7 +16,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "terminal.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {

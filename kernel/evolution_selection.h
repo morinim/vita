@@ -17,7 +17,7 @@
 #include <set>
 #include <vector>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita {
   template<class T> class evolution;
@@ -126,7 +126,7 @@ namespace selection {
     virtual std::vector<coord> run() override;
   };
 
-#include "evolution_selection_inl.h"
+#include "kernel/evolution_selection_inl.h"
 } } // namespace vita :: selection
 
 #endif  // EVOLUTION_SELECTION_H

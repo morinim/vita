@@ -1,6 +1,6 @@
 /**
  *
- *  \file src_variable.h
+ *  \file src/variable.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2012-2013 EOS di Manlio Morini.
@@ -16,9 +16,9 @@
 
 #include <boost/variant.hpp>
 
-#include "data.h"
-#include "src_interpreter.h"
-#include "terminal.h"
+#include "kernel/data.h"
+#include "kernel/src/interpreter.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {

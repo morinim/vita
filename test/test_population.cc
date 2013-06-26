@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "population.h"
+#include "kernel/population.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE population

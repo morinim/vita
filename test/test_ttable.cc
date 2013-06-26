@@ -14,11 +14,11 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "environment.h"
-#include "individual.h"
-#include "interpreter.h"
-#include "primitive/factory.h"
-#include "ttable_hash.h"
+#include "kernel/environment.h"
+#include "kernel/individual.h"
+#include "kernel/interpreter.h"
+#include "kernel/src/primitive/factory.h"
+#include "kernel/ttable_hash.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE TranspositionTable

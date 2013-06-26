@@ -14,9 +14,9 @@
 #if !defined FACTORY_FIXTURE1_H
 #define      FACTORY_FIXTURE1_H
 
-#include "environment.h"
-#include "symbol_set.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/symbol_set.h"
+#include "kernel/src/primitive/factory.h"
 
 struct F_FACTORY1
 {

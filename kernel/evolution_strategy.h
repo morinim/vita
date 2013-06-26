@@ -14,9 +14,9 @@
 #if !defined(EVOLUTION_STRATEGY_H)
 #define      EVOLUTION_STRATEGY_H
 
-#include "evolution_recombination.h"
-#include "evolution_replacement.h"
-#include "evolution_selection.h"
+#include "kernel/evolution_recombination.h"
+#include "kernel/evolution_replacement.h"
+#include "kernel/evolution_selection.h"
 
 namespace vita
 {

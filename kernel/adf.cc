@@ -13,8 +13,8 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "adf.h"
-#include "interpreter.h"
+#include "kernel/adf.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {

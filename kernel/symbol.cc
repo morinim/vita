@@ -13,7 +13,7 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "symbol.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {

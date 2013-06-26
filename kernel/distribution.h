@@ -17,7 +17,7 @@
 #include <cmath>
 #include <map>
 
-#include "fitness.h"
+#include "kernel/fitness.h"
 
 namespace vita
 {

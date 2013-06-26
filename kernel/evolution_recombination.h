@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "population.h"
+#include "kernel/population.h"
 
 namespace vita {
   template<class T> class evolution;
@@ -75,7 +75,7 @@ namespace recombination {
     virtual std::vector<T> run(const std::vector<coord> &) override;
   };
 
-#include "evolution_recombination_inl.h"
+#include "kernel/evolution_recombination_inl.h"
 } }  // namespace vita::recombination
 
 #endif  // EVOLUTION_RECOMBINATION_H

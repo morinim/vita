@@ -16,7 +16,7 @@
 
 #include <boost/optional.hpp>
 
-#include "matrix.h"
+#include "kernel/matrix.h"
 
 namespace vita
 {

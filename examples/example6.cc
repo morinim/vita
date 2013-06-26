@@ -16,11 +16,11 @@
 #include <fstream>
 #include <memory>
 
-#include "environment.h"
-#include "evolution.h"
-#include "interpreter.h"
-#include "terminal.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/evolution.h"
+#include "kernel/interpreter.h"
+#include "kernel/terminal.h"
+#include "kernel/src/primitive/factory.h"
 
 // This class models the first input.
 class X : public vita::terminal

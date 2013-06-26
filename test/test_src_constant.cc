@@ -11,7 +11,7 @@
  *
  */
 
-#include "src_constant.h"
+#include "kernel/src/constant.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE src_constant

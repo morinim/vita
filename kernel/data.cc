@@ -18,9 +18,9 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "data.h"
-#include "random.h"
-#include "symbol.h"
+#include "kernel/data.h"
+#include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {

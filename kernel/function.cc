@@ -12,7 +12,7 @@
  */
 
 #if !defined(VITA_NO_LIB)
-#  include "function.h"
+#  include "kernel/function.h"
 #endif
 
 namespace vita

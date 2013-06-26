@@ -17,7 +17,7 @@
 #include <fstream>
 #include <vector>
 
-#include "environment.h"
+#include "kernel/environment.h"
 
 namespace vita
 {
@@ -85,7 +85,7 @@ namespace vita
     std::vector<std::vector<T>> pop_;
   };
 
-#include "population_inl.h"
+#include "kernel/population_inl.h"
 
   ///
   /// \example example2.cc

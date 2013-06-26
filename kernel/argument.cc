@@ -13,9 +13,9 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "argument.h"
-#include "gene.h"
-#include "interpreter.h"
+#include "kernel/argument.h"
+#include "kernel/gene.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {

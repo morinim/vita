@@ -16,10 +16,10 @@
 
 #include <vector>
 
-#include "data.h"
-#include "environment.h"
-#include "evaluator.h"
-#include "symbol_set.h"
+#include "kernel/data.h"
+#include "kernel/environment.h"
+#include "kernel/evaluator.h"
+#include "kernel/symbol_set.h"
 
 namespace vita
 {

@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#include "gene.h"
+#include "kernel/gene.h"
 
 namespace vita
 {

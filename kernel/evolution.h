@@ -17,11 +17,11 @@
 #include <algorithm>
 #include <csignal>
 
-#include "evaluator_proxy.h"
-#include "evolution_strategy.h"
-#include "evolution_summary.h"
-#include "population.h"
-#include "timer.h"
+#include "kernel/evaluator_proxy.h"
+#include "kernel/evolution_strategy.h"
+#include "kernel/evolution_summary.h"
+#include "kernel/population.h"
+#include "kernel/timer.h"
 
 namespace vita
 {
@@ -69,7 +69,7 @@ namespace vita
     std::function<void (unsigned)> shake_data_;
   };
 
-#include "evolution_inl.h"
+#include "kernel/evolution_inl.h"
 
   ///
   /// \example example6.cc

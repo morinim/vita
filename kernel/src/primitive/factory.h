@@ -20,7 +20,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/noncopyable.hpp>
 
-#include "symbol.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
