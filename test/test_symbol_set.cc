@@ -13,6 +13,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <map>
 
 #include "kernel/random.h"
 #include "kernel/timer.h"
@@ -37,6 +38,30 @@ BOOST_AUTO_TEST_CASE(Speed)
 
   BOOST_TEST_MESSAGE(static_cast<unsigned>(1000.0 * n / t.elapsed())
                      << " extractions/sec");
+}
+
+BOOST_AUTO_TEST_CASE(Distribution)
+{
+  std::map<const vita::symbol *, unsigned> hist, weight;
+
+  const unsigned n(1000000);
+  for (unsigned i(0); i < n; ++i)
+  {
+    const vita::symbol *s(sset.roulette());
+    ++hist[s];
+    weight[s] = s->weight;
+  }
+
+  double sum(0);
+  for (const auto &i : weight)
+    sum += i.second;
+
+  for (const auto &i : hist)
+  {
+    const double p(static_cast<double>(weight[i.first]) / sum);
+    const double actual(static_cast<double>(i.second) / n);
+    BOOST_CHECK_CLOSE(p, actual, 1.0);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

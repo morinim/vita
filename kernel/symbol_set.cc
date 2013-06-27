@@ -39,27 +39,30 @@ namespace vita
     /// be measured).
     /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
     ///
-    symbol *roulette_(const std::vector<symbol *> &symbols,
-                      std::uintmax_t sum)
+    symbol *roulette_(const std::vector<symbol *> &symbols, unsigned sum)
     {
       const auto slot(random::sup(sum));
 
       size_t i(0);
-      for (std::uintmax_t wedge(symbols[i]->weight);
+      for (auto wedge(symbols[i]->weight);
            wedge <= slot;
            wedge += symbols[++i]->weight)
       {}
 
       // This is a different approach from Eli Bendersky
       // (http://eli.thegreenplace.net):
-      // std::uintmax_t total(0);
-      // for (size_t i(0), winner(0); i < symbols.size(); ++i)
-      // {
-      //   total += symbols[i]->weight;
-      //   if (random::sup(total + 1) < symbols[i]->weight)
-      //     winner = i;
-      //   return winner;
-      // }
+      //
+      //     unsigned total(0);
+      //     size_t winner(0);
+      //
+      //     for (size_t i(0); i < symbols.size(); ++i)
+      //     {
+      //       total += symbols[i]->weight;
+      //       if (random::sup(total + 1) < symbols[i]->weight)
+      //         winner = i;
+      //     }
+      //     return winner;
+      //
       // The interesting property of this algorithm is that you don't need to
       // know the sum of weights in advance in order to use it. The method is
       // cool, but slower than the standard roulette.

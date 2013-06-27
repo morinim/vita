@@ -16,8 +16,9 @@
 
 #include "kernel/environment.h"
 #include "kernel/interpreter.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/symbol_set.h"
 #include "kernel/terminal.h"
+#include "kernel/src/primitive/factory.h"
 
 struct F_FACTORY4
 {
