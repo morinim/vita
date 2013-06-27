@@ -25,10 +25,6 @@ namespace vita
   class random
   {
   public:
-    // This engine produces integers in the range [0, 2^32-1] with a good
-    // uniform distribution in up to 623 dimensions.
-    typedef std::mt19937 engine_t;
-
     template<class T> static T between(T, T);
     template<class T> static T sup(T);
 
@@ -44,6 +40,10 @@ namespace vita
     void randomize();
 
   private:
+    // This engine produces integers in the range [0, 2^32-1] with a good
+    // uniform distribution in up to 623 dimensions.
+    typedef std::mt19937 engine_t;
+
     static engine_t &engine();
   };
 
@@ -89,8 +89,6 @@ namespace vita
 
     using parm_t = decltype(d)::param_type;
     return d(engine(), parm_t{min, sup});
-
-    //return boost::uniform_real<>(min, sup)(engine());
   }
 
   ///
@@ -116,7 +114,6 @@ namespace vita
     using parm_t = decltype(d)::param_type;
 
     return d(engine(), parm_t(min, sup - 1));
-    //return boost::uniform_int<>(min, sup - 1)(engine());
   }
 
   ///
@@ -165,13 +162,19 @@ namespace vita
   /// \param[in] p a probability ([0;1] range).
   /// \return \c true \a p% times.
   ///
+  /// bool values are produced according to the Bernoulli distribution.
+  ///
   inline
   bool random::boolean(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
-    return random::between<double>(0, 1) < p;
-    //return boost::uniform_01<double>()(engine()) < p;
+    static std::bernoulli_distribution d{};
+
+    using parm_t = decltype(d)::param_type;
+    return d(engine(), parm_t{p});
+
+    //return random::between<double>(0, 1) < p;
   }
 
   ///
@@ -180,8 +183,8 @@ namespace vita
   inline
   bool random::boolean()
   {
-    return random::between<unsigned>(0, 2) != 0;
-    //return boost::uniform_smallint<unsigned>(0, 1)(engine()) != 0;
+    return boolean(0.5);
+    //return random::between<unsigned>(0, 2) != 0;
   }
 }  // namespace vita
 
