@@ -27,6 +27,9 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
+# This should work in POSIX compliant environment (see "The Open Group Base
+# Specifications Issue 7" and
+# http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html)
 INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 

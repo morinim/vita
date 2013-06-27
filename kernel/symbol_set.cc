@@ -75,24 +75,10 @@ namespace vita
   ///
   symbol_set::symbol_set() : arguments_(gene::k_args)
   {
-    clear();
-
     for (unsigned i(0); i < gene::k_args; ++i)
       arguments_[i] = make_unique<argument>(i);
 
     assert(debug());
-  }
-
-  ///
-  /// Utility function used to help the constructor in the clean up process.
-  ///
-  void symbol_set::clear()
-  {
-    arguments_.clear();
-    symbols_.clear();
-
-    all_ = collection();
-    by_ = by_category();
   }
 
   ///

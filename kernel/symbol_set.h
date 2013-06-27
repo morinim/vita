@@ -60,9 +60,6 @@ namespace vita
 
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
-  private:  // Private support functions.
-    void clear();
-
   private:  // Private data members.
     // arguments_ data member:
     // * is not present in the \a collection struct because an argument isn't
