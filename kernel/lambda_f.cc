@@ -27,6 +27,20 @@ namespace vita
 
   ///
   /// \param[in] ind individual used for classification.
+  /// \param[in] the training set.
+  ///
+  class_lambda_f::class_lambda_f(const individual &ind, const data &d)
+    : lambda_f(ind), class_name_(d.classes())
+  {
+    assert(ind.debug());
+    assert(d.classes() > 1);
+
+    for (size_t i(0); i < d.classes(); ++i)
+      class_name_[i] = d.class_name(i);
+  }
+
+  ///
+  /// \param[in] ind individual used for classification.
   /// \param[in] d the training set.
   /// \param[in] x_slot number of slots for each class of the training set.
   ///
@@ -149,7 +163,7 @@ namespace vita
   ///
   dyn_slot_lambda_f::dyn_slot_lambda_f(const individual &ind, data &d,
                                        size_t x_slot)
-    : class_lambda_f(ind, d.classes() * x_slot)
+    : class_lambda_f(ind, d)
   {
     assert(ind.debug());
     assert(d.debug());
@@ -161,9 +175,6 @@ namespace vita
     d.dataset(data::training);
     engine_ = dyn_slot_engine(ind, d, x_slot);
     d.dataset(backup);
-
-    for (size_t i(0); i < d.classes(); ++i)
-      class_name_[i] = d.class_name(i);
   }
 
   ///
@@ -202,7 +213,7 @@ namespace vita
       const any res(agent.run(example));
 
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
-      const double cut(10000000);
+      const double cut(10000000.0);
       if (val > cut)
         val = cut;
       else if (val < -cut)
@@ -221,7 +232,7 @@ namespace vita
   ///                 (confidence of \a example in class 1 + confidence of
   ///                 \a example in class 2 + ... + confidence \a example in
   ///                 class n).
-  /// \return the class of \a instance.
+  /// \return the class of \a instance (numerical id).
   ///
   size_t gaussian_engine::class_label(const individual &ind,
                                       const data::example &example,
@@ -269,7 +280,7 @@ namespace vita
   /// \param[in] d the training set.
   ///
   gaussian_lambda_f::gaussian_lambda_f(const individual &ind, data &d)
-    : class_lambda_f(ind, d.classes())
+    : class_lambda_f(ind, d)
   {
     assert(ind.debug());
     assert(d.debug());
@@ -280,9 +291,6 @@ namespace vita
     d.dataset(data::training);
     engine_ = gaussian_engine(ind, d);
     d.dataset(backup);
-
-    for (size_t i(0); i < d.classes(); ++i)
-      class_name_[i] = d.class_name(i);
   }
 
   ///
@@ -292,5 +300,17 @@ namespace vita
   any gaussian_lambda_f::operator()(const data::example &instance) const
   {
     return any(engine_.class_label(ind_, instance));
+  }
+
+  ///
+  /// \param[in] ind individual "to be transformed" into a lambda function.
+  /// \param[in] d the training set.
+  ///
+  binary_lambda_f::binary_lambda_f(const individual &ind, data &d)
+    : class_lambda_f(ind, d)
+  {
+    assert(ind.debug());
+    assert(d.debug());
+    assert(d.classes() == 2);
   }
 }  // namespace vita

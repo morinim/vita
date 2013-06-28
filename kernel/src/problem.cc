@@ -66,6 +66,10 @@ namespace vita
       problem::set_evaluator(make_unique<mse_evaluator>(dat_));
       break;
 
+    case k_bin_evaluator:
+      problem::set_evaluator(make_unique<binary_evaluator>(dat_));
+      break;
+
     case k_dyn_slot_evaluator:
     {
       const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));

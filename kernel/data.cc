@@ -341,8 +341,9 @@ namespace vita
   /// \return the name of the class encoded with the \c unsigned \a i (or an
   ///         empty string if such class cannot be find).
   ///
-  /// \note Boost Bimap could be used to speed up the search in \a classes_map_,
-  /// but to date speed isn't an issue.
+  /// \note
+  /// Boost Bimap could be used to speed up the search in \a classes_map_, but
+  /// to date speed isn't an issue.
   ///
   std::string data::class_name(unsigned i) const
   {

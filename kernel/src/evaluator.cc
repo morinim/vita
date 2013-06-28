@@ -394,42 +394,43 @@ namespace vita
     return make_unique<gaussian_lambda_f>(ind, *dat_);
   }
 
-  /*
   ///
   /// \param[in] ind an individual.
-  /// \param[in] label
   /// \return the fitness of individual \a ind (greater is better, max is 0).
   ///
-  template<class T>
-  fitness_t problem::binary_fitness(const vita::individual &ind,
-                                    unsigned label) const
+  fitness_t binary_evaluator::operator()(const individual &ind)
   {
-    assert(dat_.classes() == 2);
+    assert(dat_->classes() == 2);
 
     src_interpreter agent(ind);
-
     fitness_t::base_t err(0.0);
-    int illegals(0);
 
     for (auto &example : *dat_)
     {
-      for (size_t i(0); i < vars_.size(); ++i)
-        vars_[i]->val = example->input[i];
+      const any res(agent.run(example));
+      const double val(res.empty() ? -1.0 : interpreter::to_double(res));
 
-      const any res(agent.run());
-
-      if (res.empty())
-        err += std::pow(100.0, ++illegals);
-      else
+      if ((example.label() == 1 && val <= 0.0) ||
+          (example.label() == 0 && val > 0.0))
       {
-        const T val(any_cast<T>(res));
-        if ((example->label() == label && val < 0.0) ||
-            (example->label() != label && val >= 0.0))
-          err += std::fabs(val);
+        ++example.difficulty;
+        ++err;
+
+        // err += std::fabs(val);
       }
     }
 
     return -err;
   }
-  */
+
+  ///
+  /// \param[in] ind individual to be transformed in a lambda function.
+  /// \return the lambda function associated with \a ind (\c nullptr in case of
+  ///         errors).
+  ///
+  std::unique_ptr<lambda_f> binary_evaluator::lambdify(
+    const individual &ind) const
+  {
+    return make_unique<binary_lambda_f>(ind, *dat_);
+  }
 }  // namespace vita

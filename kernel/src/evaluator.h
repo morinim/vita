@@ -185,7 +185,8 @@ namespace vita
     explicit dyn_slot_evaluator(data &, size_t = 10);
 
     virtual fitness_t operator()(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
+    virtual std::unique_ptr<lambda_f> lambdify(
+      const individual &) const override;
 
   private:
     dyn_slot_engine engine_;
@@ -218,6 +219,19 @@ namespace vita
 
   private:
     gaussian_engine engine_;
+  };
+
+  ///
+  /// Single class evaluator for classification problems
+  ///
+  class binary_evaluator : public classification_evaluator
+  {
+  public:
+    explicit binary_evaluator(data &d) : classification_evaluator(d) {}
+
+    virtual fitness_t operator()(const individual &) override;
+    virtual std::unique_ptr<lambda_f> lambdify(
+      const individual &) const override;
   };
 }  // namespace vita
 

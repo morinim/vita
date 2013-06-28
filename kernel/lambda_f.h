@@ -81,10 +81,9 @@ namespace vita
   class class_lambda_f : public lambda_f
   {
   public :
-    class_lambda_f(const individual &ind, size_t s)
-      : lambda_f(ind), class_name_(s) {}
+    class_lambda_f(const individual &, const data &);
 
-    virtual std::string name(const any &a) const
+    virtual std::string name(const any &a) const final
     {
       return class_name_[any_cast<size_t>(a)];
     }
@@ -106,7 +105,7 @@ namespace vita
   public:
     dyn_slot_lambda_f(const individual &, data &, size_t);
 
-    virtual any operator()(const data::example &) const;
+    virtual any operator()(const data::example &) const override;
 
   private:
     dyn_slot_engine engine_;
@@ -148,10 +147,20 @@ namespace vita
   public:
     gaussian_lambda_f(const individual &, data &);
 
-    virtual any operator()(const data::example &) const;
+    virtual any operator()(const data::example &) const override;
 
   private:
     gaussian_engine engine_;
+  };
+
+  ///
+  /// This class transforms vita individuals to lambda functions which can
+  /// be used for sinlge-class classification tasks.
+  ///
+  class binary_lambda_f : public class_lambda_f
+  {
+  public:
+    binary_lambda_f(const individual &, data &);
   };
 }  // namespace vita
 
