@@ -139,7 +139,7 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t. The value returned is in the [0;+inf[ range.
   ///
-  double sae_evaluator::error(src_interpreter &agent, data::example &t,
+  double mae_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals)
   {
     const any res(agent.run(t));
@@ -167,7 +167,7 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t. The value returned is in the [0;200] range.
   ///
-  double srae_evaluator::error(src_interpreter &agent, data::example &t,
+  double mrae_evaluator::error(src_interpreter &agent, data::example &t,
                                int *const)
   {
     const any res(agent.run(t));
@@ -214,7 +214,7 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double sse_evaluator::error(src_interpreter &agent, data::example &t,
+  double mse_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals)
   {
     const any res(agent.run(t));

@@ -25,8 +25,8 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    enum evaluator_id {k_count_evaluator = 0, k_sae_evaluator,
-                       k_srae_evaluator, k_sse_evaluator, k_dyn_slot_evaluator,
+    enum evaluator_id {k_count_evaluator = 0, k_mae_evaluator,
+                       k_mrae_evaluator, k_mse_evaluator, k_dyn_slot_evaluator,
                        k_gaussian_evaluator,
                        k_max_evaluator = k_gaussian_evaluator};
 

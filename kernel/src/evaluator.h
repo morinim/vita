@@ -35,9 +35,11 @@ namespace vita
   };
 
   ///
+  /// \brief An evaluator to minimize the sum of some sort of error.
+  ///
   /// This class models the evaluators that will drive the evolution towards
   /// the minimum sum of some sort of error.
-  /// \see sse_evaluator, sae_evaluator, srae_evaluator.
+  /// \see mse_evaluator, mae_evaluator, mrae_evaluator.
   ///
   class sum_of_errors_evaluator : public src_evaluator
   {
@@ -56,44 +58,40 @@ namespace vita
   };
 
   ///
-  /// \brief Evaluator based on the sum of absolute errors
+  /// \brief Evaluator based on the mean absolute error
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
-  /// absolute errors(\f$\sum_{i=1}^n |target_i - actual_i|\f$).
+  /// absolute errors(\f$\frac{1}{n} \sum_{i=1}^n |target_i - actual_i|\f$).
   ///
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
   ///
   /// \note
-  /// It is interesting to note that the sum of absolute errors is also
-  /// minimized in the least absolute deviations (LAD) approach to regression.
-  /// LAD is a robust estimation technique in that it is less sensitive to the
-  /// presence of outliers than OLS (Ordinary Least Squares), but is less
-  /// efficient than OLS when no outliers are present.
+  /// When the dataset contains outliers, the mse_evaluator will heavily
+  /// weight each of them (this is the result of squaring the outliers).
+  /// mae_evaluator is less sensitive to the presence of outliers (a
+  /// desiderable property in many application).
   ///
-  /// It is equivalent to maximum likelihood estimation under a Laplace
-  /// distribution model for \f$epsilon\f$ (sampling error).
+  /// \see \ref mse_evaluator.
   ///
-  /// \see \ref sse_evaluator.
-  ///
-  class sae_evaluator : public sum_of_errors_evaluator
+  class mae_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit sae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit mae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const);
   };
 
   ///
-  /// \brief Evaluator based on the sum of relative differences
+  /// \brief Evaluator based on the mean of relative differences
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
   /// relative differences between target values and actual ones:
   ///
-  /// \f[\sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
+  /// \f[\frac{1}{n} \sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
   ///
-  /// This is similar to sae_evaluator but here we sum the _relative_ errors.
+  /// This is similar to mae_evaluator but here we sum the _relative_ errors.
   /// The idea is that the absolute difference of 1 between 6 and 5 is more
   /// significant than the same absolute difference between 1000001 and
   /// 1000000.
@@ -104,10 +102,10 @@ namespace vita
   /// * <http://realityisvirtual.com/book2/?p=81>
   /// * <http://en.wikipedia.org/wiki/Relative_difference>
   ///
-  class srae_evaluator : public sum_of_errors_evaluator
+  class mrae_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit srae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit mrae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const);
@@ -115,10 +113,10 @@ namespace vita
 
 
   ///
-  /// \brief Evaluator based on the sum of squared errors
+  /// \brief Evaluator based on the mean squared error
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
-  /// squared errors (\f$\sum_{i=1}^n (target_i - actual_i)^2\f$).
+  /// squared errors (\f$\frac{1}{n} \sum_{i=1}^n (target_i - actual_i)^2\f$).
   ///
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
@@ -130,12 +128,12 @@ namespace vita
   /// most likely to find the "correct" underlying model if you seek to
   /// minimize the sum of squared errors.
   ///
-  /// \see \ref sae_evaluator.
+  /// \see mae_evaluator.
   ///
-  class sse_evaluator : public sum_of_errors_evaluator
+  class mse_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit sse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit mse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const);
@@ -216,7 +214,8 @@ namespace vita
     explicit gaussian_evaluator(data &d) : classification_evaluator(d) {}
 
     virtual fitness_t operator()(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const override;
+    virtual std::unique_ptr<lambda_f> lambdify(
+      const individual &) const override;
 
   private:
     gaussian_engine engine_;

@@ -35,7 +35,7 @@ namespace vita
   ///
   void src_problem::clear()
   {
-    p_symre = k_srae_evaluator;
+    p_symre = k_mrae_evaluator;
     p_class = k_gaussian_evaluator;
 
     problem::clear();
@@ -54,16 +54,16 @@ namespace vita
       problem::set_evaluator(make_unique<count_evaluator>(dat_));
       break;
 
-    case k_sae_evaluator:
-      problem::set_evaluator(make_unique<sae_evaluator>(dat_));
+    case k_mae_evaluator:
+      problem::set_evaluator(make_unique<mae_evaluator>(dat_));
       break;
 
-    case k_srae_evaluator:
-      problem::set_evaluator(make_unique<srae_evaluator>(dat_));
+    case k_mrae_evaluator:
+      problem::set_evaluator(make_unique<mrae_evaluator>(dat_));
       break;
 
-    case k_sse_evaluator:
-      problem::set_evaluator(make_unique<sse_evaluator>(dat_));
+    case k_mse_evaluator:
+      problem::set_evaluator(make_unique<mse_evaluator>(dat_));
       break;
 
     case k_dyn_slot_evaluator:
