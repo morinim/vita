@@ -354,4 +354,50 @@ bool basic_fitness_t<T, N>::issmall() const
       return false;
   return true;
 }
+
+  ///
+  /// \param[in] v1 a floating point number.
+  /// \param[in] v2 a floating point number.
+  /// \param[in] epsilon max relative error. If we want 99.999% accuracy then
+  ///                    we should pass a \a epsilon of 0.00001.
+  /// \return \c true if the difference between \a v1 and \a v2 is "small"
+  ///         compared to their magnitude.
+  ///
+  /// \note
+  /// Code from Bruce Dawson:
+  /// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
+  ///
+  template<class T>
+  bool almost_equal(T v1, T v2, T epsilon)
+  {
+    const T diff(std::abs(v1 - v2));
+
+    // Check if the numbers are really close -- needed
+    // when comparing numbers near zero.
+    if (diff <= 10.0 * std::numeric_limits<T>::min())
+      return true;
+
+    v1 = std::abs(v1);
+    v2 = std::abs(v2);
+
+    // In order to get consistent results, we should always compare the
+    // difference to the larger of the two numbers.
+    const T largest(std::max(v1, v2));
+
+    return diff <= largest * epsilon;
+  }
+
+///
+/// See vita::almost_equal function for scalar types.
+///
+template<class T, unsigned N>
+bool basic_fitness_t<T, N>::almost_equal(const basic_fitness_t<T, N> &n,
+                                         T epsilon) const
+{
+  for (size_t i(0); i < N; ++i)
+    if (!almost_equal(vect[i], n[i], epsilon))
+      return false;
+
+  return true;
+}
 #endif  // FITNESS_INL_H
