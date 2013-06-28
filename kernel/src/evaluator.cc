@@ -125,7 +125,7 @@ namespace vita
   std::unique_ptr<lambda_f> sum_of_errors_evaluator::lambdify(
     const individual &ind) const
   {
-    return std::unique_ptr<lambda_f>(new lambda_f(ind));
+    return make_unique<lambda_f>(ind);
   }
 
   ///
@@ -331,8 +331,7 @@ namespace vita
   std::unique_ptr<lambda_f> dyn_slot_evaluator::lambdify(
     const individual &ind) const
   {
-    return std::unique_ptr<lambda_f>(new dyn_slot_lambda_f(ind, *dat_,
-                                                           x_slot_));
+    return make_unique<dyn_slot_lambda_f>(ind, *dat_, x_slot_);
   }
 
   ///
@@ -392,7 +391,7 @@ namespace vita
   std::unique_ptr<lambda_f> gaussian_evaluator::lambdify(
     const individual &ind) const
   {
-    return std::unique_ptr<lambda_f>(new gaussian_lambda_f(ind, *dat_));
+    return make_unique<gaussian_lambda_f>(ind, *dat_);
   }
 
   /*

@@ -37,7 +37,7 @@ namespace vita
   ///
   /// This class models the evaluators that will drive the evolution towards
   /// the minimum sum of some sort of error.
-  /// \see \ref sse_evaluator and \ref sae_evaluator.
+  /// \see sse_evaluator, sae_evaluator, srae_evaluator.
   ///
   class sum_of_errors_evaluator : public src_evaluator
   {
@@ -56,10 +56,10 @@ namespace vita
   };
 
   ///
-  /// \brief Evaluator based on the sum of absolute errors.
+  /// \brief Evaluator based on the sum of absolute errors
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
-  /// absolute errors(\f$\sum_{i=1}^n abs(\frac{target_i - actual_i}{})\f$).
+  /// absolute errors(\f$\sum_{i=1}^n |target_i - actual_i|\f$).
   ///
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
@@ -86,17 +86,19 @@ namespace vita
   };
 
   ///
-  /// \brief Evaluator based on the sum of relative differences.
+  /// \brief Evaluator based on the sum of relative differences
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
   /// relative differences between target values and actual ones:
   ///
   /// \f[\sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
   ///
-  /// This is similar to sae_evaluator but here we sum the relative errors.
+  /// This is similar to sae_evaluator but here we sum the _relative_ errors.
   /// The idea is that the absolute difference of 1 between 6 and 5 is more
   /// significant than the same absolute difference between 1000001 and
   /// 1000000.
+  /// The mathematically precise way to express this notion is to
+  /// calculate the relative difference.
   ///
   /// \see
   /// * <http://realityisvirtual.com/book2/?p=81>
@@ -113,15 +115,21 @@ namespace vita
 
 
   ///
+  /// \brief Evaluator based on the sum of squared errors
+  ///
   /// This evaluator will drive the evolution towards the minimum sum of
   /// squared errors (\f$\sum_{i=1}^n (target_i - actual_i)^2\f$).
+  ///
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
-  /// \note Real data always have noise (sampling/measurement errors) and noise
+  ///
+  /// \note
+  /// Real data always have noise (sampling/measurement errors) and noise
   /// tends to follow a Gaussian distribution. It can be shown that when we
   /// have a bunch of data with errors drawn from such a distribution you are
   /// most likely to find the "correct" underlying model if you seek to
   /// minimize the sum of squared errors.
+  ///
   /// \see \ref sae_evaluator.
   ///
   class sse_evaluator : public sum_of_errors_evaluator
@@ -133,6 +141,8 @@ namespace vita
     virtual double error(src_interpreter &, data::example &, int *const);
   };
 
+  ///
+  /// \brief Evaluator based on the number of matches
   ///
   /// This evaluator will drive the evolution towards the maximum sum of
   /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).

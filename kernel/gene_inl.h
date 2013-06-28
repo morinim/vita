@@ -57,9 +57,11 @@ basic_gene<K>::basic_gene(
 }
 
 ///
-/// \param[in] t a terminal.
+/// \param[in] s a symbol.
+/// \param[in] from a starting locus in the genome.
+/// \param[in] sup an upper limit in the genome.
 ///
-/// A new gene built from terminal \a t.
+/// A new gene built from symbol \a s with argument in the [from;sup[ range.
 ///
 /// \note
 /// This is usually called for filling the standard section of an individual.
@@ -73,7 +75,7 @@ basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
     par = sym->init();
   else
   {
-    const size_t arity(sym->arity());
+    const auto arity(sym->arity());
     for (size_t i(0); i < arity; ++i)
     {
       assert(sup <= type_max(args[0]));
