@@ -137,7 +137,7 @@ namespace vita
   /// \param[in,out] illegals number of illegals values found evaluating the
   ///                         current individual so far.
   /// \return a measurement of the error of the current individual on the
-  ///         training case \a t.
+  ///         training case \a t. The value returned is in the [0;+inf[ range.
   ///
   double sae_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals)
@@ -145,6 +145,7 @@ namespace vita
     const any res(agent.run(t));
 
     double err;
+
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
     else
@@ -152,6 +153,51 @@ namespace vita
                       data::cast<double>(t.output));
 
     if (err > float_epsilon)
+      ++t.difficulty;
+
+    return err;
+  }
+
+  ///
+  /// \param[in] agent interpreter used for the evaluation of the current
+  ///                  individual. Note that this isn't a constant reference
+  ///                  because the internal state of agent changes during
+  ///                  evaluation; anyway this is an input-only parameter.
+  /// \param[in] t the current training case.
+  /// \return a measurement of the error of the current individual on the
+  ///         training case \a t. The value returned is in the [0;200] range.
+  ///
+  double srae_evaluator::error(src_interpreter &agent, data::example &t,
+                               int *const)
+  {
+    const any res(agent.run(t));
+
+    double err;
+
+    if (res.empty())
+      err = 200.0;
+    else
+    {
+      const double approx(interpreter::to_double(res));
+      const double target(data::cast<double>(t.output));
+
+      const double delta(std::fabs(target - approx));
+
+      // Check if the numbers are really close. Needed when comparing numbers
+      // near zero.
+      if (delta <= 10.0 * std::numeric_limits<double>::min())
+        err = 0.0;
+      else
+        err = 200.0 * delta / (std::fabs(approx) + std::fabs(target));
+        // Some alternatives for the error:
+        // * delta / std::max(approx, target)
+        // * delta / std::fabs(target)
+        //
+        // The chosen formula seems numerically more stable and gives a result
+        // in a limited range of values.
+    }
+
+    if (err > 0.0)
       ++t.difficulty;
 
     return err;

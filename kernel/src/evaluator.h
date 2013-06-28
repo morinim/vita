@@ -56,17 +56,24 @@ namespace vita
   };
 
   ///
+  /// \brief Evaluator based on the sum of absolute errors.
+  ///
   /// This evaluator will drive the evolution towards the minimum sum of
-  /// absolute errors (\f$\sum_{i=1}^n abs(target_i - actual_i)\f$).
+  /// absolute errors(\f$\sum_{i=1}^n abs(\frac{target_i - actual_i}{})\f$).
+  ///
   /// There is also a penality for illegal values (it is a function of the
   /// number of illegal values).
+  ///
+  /// \note
   /// It is interesting to note that the sum of absolute errors is also
   /// minimized in the least absolute deviations (LAD) approach to regression.
   /// LAD is a robust estimation technique in that it is less sensitive to the
   /// presence of outliers than OLS (Ordinary Least Squares), but is less
-  /// efficient than OLS when no outliers are present. It is equivalent to
-  /// maximum likelihood estimation under a Laplace distribution model for
-  /// \f$epsilon\f$ (sampling error).
+  /// efficient than OLS when no outliers are present.
+  ///
+  /// It is equivalent to maximum likelihood estimation under a Laplace
+  /// distribution model for \f$epsilon\f$ (sampling error).
+  ///
   /// \see \ref sse_evaluator.
   ///
   class sae_evaluator : public sum_of_errors_evaluator
@@ -77,6 +84,33 @@ namespace vita
   private:
     virtual double error(src_interpreter &, data::example &, int *const);
   };
+
+  ///
+  /// \brief Evaluator based on the sum of relative differences.
+  ///
+  /// This evaluator will drive the evolution towards the minimum sum of
+  /// relative differences between target values and actual ones:
+  ///
+  /// \f[\sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
+  ///
+  /// This is similar to sae_evaluator but here we sum the relative errors.
+  /// The idea is that the absolute difference of 1 between 6 and 5 is more
+  /// significant than the same absolute difference between 1000001 and
+  /// 1000000.
+  ///
+  /// \see
+  /// * <http://realityisvirtual.com/book2/?p=81>
+  /// * <http://en.wikipedia.org/wiki/Relative_difference>
+  ///
+  class srae_evaluator : public sum_of_errors_evaluator
+  {
+  public:
+    explicit srae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+
+  private:
+    virtual double error(src_interpreter &, data::example &, int *const);
+  };
+
 
   ///
   /// This evaluator will drive the evolution towards the minimum sum of
