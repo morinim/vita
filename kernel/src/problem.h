@@ -26,7 +26,7 @@ namespace vita
   {
   public:
     enum evaluator_id {k_count_evaluator = 0, k_mae_evaluator,
-                       k_mrae_evaluator, k_mse_evaluator, k_dyn_slot_evaluator,
+                       k_rmae_evaluator, k_mse_evaluator, k_dyn_slot_evaluator,
                        k_gaussian_evaluator,
                        k_max_evaluator = k_gaussian_evaluator};
 

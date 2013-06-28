@@ -39,7 +39,7 @@ namespace vita
   ///
   /// This class models the evaluators that will drive the evolution towards
   /// the minimum sum of some sort of error.
-  /// \see mse_evaluator, mae_evaluator, mrae_evaluator.
+  /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
   ///
   class sum_of_errors_evaluator : public src_evaluator
   {
@@ -102,15 +102,14 @@ namespace vita
   /// * <http://realityisvirtual.com/book2/?p=81>
   /// * <http://en.wikipedia.org/wiki/Relative_difference>
   ///
-  class mrae_evaluator : public sum_of_errors_evaluator
+  class rmae_evaluator : public sum_of_errors_evaluator
   {
   public:
-    explicit mrae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit rmae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
     virtual double error(src_interpreter &, data::example &, int *const);
   };
-
 
   ///
   /// \brief Evaluator based on the mean squared error

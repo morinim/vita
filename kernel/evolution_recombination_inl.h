@@ -28,7 +28,7 @@ strategy<T>::strategy(const evolution<T> *const evo, summary<T> *const stats)
 
 ///
 /// \param[in] evo pointer to the current evolution object.
-/// \param[in] stats pointer to the current set of statistics.
+/// \param[in] s pointer to the current set of statistics.
 ///
 template<class T>
 base<T>::base(const evolution<T> *const evo, summary<T> *const s)

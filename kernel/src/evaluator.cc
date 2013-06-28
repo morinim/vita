@@ -167,7 +167,7 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t. The value returned is in the [0;200] range.
   ///
-  double mrae_evaluator::error(src_interpreter &agent, data::example &t,
+  double rmae_evaluator::error(src_interpreter &agent, data::example &t,
                                int *const)
   {
     const any res(agent.run(t));

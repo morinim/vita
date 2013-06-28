@@ -16,6 +16,7 @@
 
 ///
 /// \param[in] e base vita::environment.
+/// \param[in] sset base vita::symbol_set.
 ///
 /// Creates a random population (initial size \a e.individuals).
 ///
@@ -40,7 +41,7 @@ population<T>::population(const environment &e, const symbol_set &sset)
 /// \param[in] e an environmnet (used for individual generation).
 /// \param[in] s a symbol_set (used for individual generation).
 ///
-/// Resets layer \l of the population.
+/// Resets layer \a l of the population.
 ///
 /// \warning
 /// If layer \a l is nonexistent/empty the method doesn't work!

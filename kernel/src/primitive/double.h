@@ -45,6 +45,8 @@ namespace vita
     base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
+    /// \brief Ephemeral random constant
+    ///
     /// It is assumed that the creation of floating-point constants is
     /// necessary to do symbolic regression in evolutionary computation.
     /// Genetic programming solves the problem of constant creation by using a
@@ -73,6 +75,9 @@ namespace vita
       const int min, upp;
     };
 
+    ///
+    /// \brief The absolute value of a real number
+    ///
     class abs : public function
     {
     public:
@@ -87,6 +92,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Sum of two real numbers
+    ///
     class add : public function
     {
     public:
@@ -108,6 +116,9 @@ namespace vita
       }
     };
 
+    ///
+    /// Division between two real numbers
+    ///
     class div : public function
     {
     public:
@@ -128,6 +139,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Quotient of the division between two real numbers
+    ///
     class idiv : public function
     {
     public:
@@ -148,6 +162,11 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief "If between" operator
+    ///
+    /// \note Requires five input arguments.
+    ///
     class ifb : public function
     {
     public:
@@ -166,12 +185,12 @@ namespace vita
         const any ev2(i->eval(2));
         if (ev2.empty())  return ev2;
 
-        const base_t v0(dbl::cast(ev0));
-        const base_t v1(dbl::cast(ev1));
-        const base_t v2(dbl::cast(ev2));
+        const auto v0(dbl::cast(ev0));
+        const auto v1(dbl::cast(ev1));
+        const auto v2(dbl::cast(ev2));
 
-        const base_t min(std::fmin(v1, v2));
-        const base_t max(std::fmax(v1, v2));
+        const auto min(std::fmin(v1, v2));
+        const auto max(std::fmax(v1, v2));
 
         if (min <= v0 && v0 <= max)
           return i->eval(3);
@@ -180,6 +199,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief "If equal" operator
+    ///
     class ife : public function
     {
     public:
@@ -194,7 +216,7 @@ namespace vita
         const any ev1(i->eval(1));
         if (ev1.empty())  return ev1;
 
-        const base_t cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
+        const auto cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
 
         if (cmp < float_epsilon)
           return i->eval(2);
@@ -203,6 +225,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief "If less then" operator
+    ///
     class ifl : public function
     {
     public:
@@ -224,6 +249,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief "If zero" operator
+    ///
     class ifz : public function
     {
     public:
@@ -241,6 +269,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Length of a string
+    ///
     class length : public function
     {
     public:
@@ -257,7 +288,7 @@ namespace vita
     };
 
     ///
-    /// Simply the natural logarithm of a real number.
+    /// \brief Natural logarithm of a real number.
     ///
     class ln : public function
     {
@@ -281,6 +312,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Remainder of the division between real numbers
+    ///
     class mod : public function
     {
     public:
@@ -301,6 +335,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Product of real numbers
+    ///
     class mul : public function
     {
     public:
@@ -322,6 +359,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief sin() of a real number
+    ///
     class sin : public function
     {
     public:
@@ -336,6 +376,9 @@ namespace vita
       }
     };
 
+    ///
+    /// \brief Subtraction between real numbers
+    ///
     class sub : public function
     {
     public:

@@ -74,6 +74,8 @@ namespace vita
   };
 
   ///
+  /// \brief ALPS evolution strategy
+  ///
   /// With ALPS, several instances of a search algorithm are run in parallel,
   /// each in its own age-layer, and the age of solutions is kept track of. The
   /// key properties of ALPS are:
@@ -147,6 +149,9 @@ namespace vita
 
   using alps_es = basic_alps_es<vita::individual>;
 
+  ///
+  /// \brief Standard evolution strategy
+  ///
   template<class T>
   class basic_std_es : public evolution_strategy<T,
                                                  selection::tournament<T>,

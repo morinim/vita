@@ -1,6 +1,6 @@
 /**
  *
- *  \file problem.h
+ *  \file kernel/problem.h
  *  \remark This file is part of VITA.
  *
  *  Copyright (C) 2011-2013 EOS di Manlio Morini.

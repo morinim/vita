@@ -309,8 +309,8 @@ namespace ui
       problem->set_evaluator(vita::src_problem::k_count_evaluator);
     else if (keyword == "mae")
       problem->set_evaluator(vita::src_problem::k_mae_evaluator);
-    else if (keyword == "mrae")
-      problem->set_evaluator(vita::src_problem::k_mrae_evaluator);
+    else if (keyword == "rmae")
+      problem->set_evaluator(vita::src_problem::k_rmae_evaluator);
     else if (keyword == "mse")
       problem->set_evaluator(vita::src_problem::k_mse_evaluator);
     else if (keyword == "dynslot")
@@ -819,7 +819,7 @@ int parse_command_line(int argc, char *const argv[])
     po::options_description config("Config");
     config.add_options()
       ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
-       "sets preferred evaluator (count, mae, mrae, mse, dynslot, gaussian)")
+       "sets preferred evaluator (count, mae, rmae, mse, dynslot, gaussian)")
       ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
        "sets the seed for the pseudo-random number generator. "\
        "Pseudo-random sequences are repeatable by using the same seed value")
