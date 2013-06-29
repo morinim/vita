@@ -188,9 +188,9 @@ void basic_search<T, ES>::dss(unsigned generation) const
 template<class T, class ES>
 bool basic_search<T, ES>::stop_condition(const summary<T> &s) const
 {
-  assert(env_.g_since_start);
+  assert(env_.generations);
 
-  if (*env_.g_since_start > 0 && s.gen > *env_.g_since_start)
+  if (s.gen > env_.generations)
     return true;
 
   // We use an accelerated stop condition when all the individuals have
@@ -336,8 +336,8 @@ void basic_search<T, ES>::tune_parameters()
   if (!constrained.mate_zone)
     env_.mate_zone = *dflt.mate_zone;
 
-  if (!constrained.g_since_start)
-    env_.g_since_start = *dflt.g_since_start;
+  if (!constrained.generations)
+    env_.generations = dflt.generations;
 
   if (!constrained.g_without_improvement)
     env_.g_without_improvement = *dflt.g_without_improvement;

@@ -146,7 +146,10 @@ namespace vita
     boost::optional<unsigned> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.
-    boost::optional<unsigned> g_since_start;
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    unsigned generations;
+
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
     boost::optional<unsigned> g_without_improvement;

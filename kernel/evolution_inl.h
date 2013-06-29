@@ -124,10 +124,10 @@ unsigned evolution<T>::seen(const T &i) const
 template<class T>
 bool evolution<T>::stop_condition(const summary<T> &s) const
 {
-  assert(pop_.env().g_since_start);
+  assert(pop_.env().generations);
 
   // Check the number of generations.
-  if (*pop_.env().g_since_start > 0 && s.gen > *pop_.env().g_since_start)
+  if (s.gen > pop_.env().generations)
     return true;
 
   if (term::user_stop())

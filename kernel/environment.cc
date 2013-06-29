@@ -49,7 +49,7 @@ namespace vita
       individuals = 100;
       tournament_size = 5;
       mate_zone = 20;
-      g_since_start = 100;
+      generations = 100;
       g_without_improvement = 0;
       arl = false;
       validation_ratio = 0.2;
@@ -83,7 +83,7 @@ namespace vita
     pt->put(env + "dss", dss);
     pt->put(env + "tournament_size", tournament_size);
     pt->put(env + "mating_zone", mate_zone);
-    pt->put(env + "max_gens_since_start", g_since_start);
+    pt->put(env + "max_generations", generations);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
     pt->put(env + "alps.age_gap", alps.age_gap);
@@ -196,10 +196,10 @@ namespace vita
         return false;
       }
 
-      if (!g_since_start)
+      if (!generations)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Undefined g_since_start data member"
+          std::cerr << k_s_debug << " Undefined generations data member"
                     << std::endl;
         return false;
       }

@@ -352,7 +352,7 @@ namespace ui
   ///
   void generations(unsigned g)
   {
-    problem->env.g_since_start = g;
+    problem->env.generations = g;
 
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Generations set to " << g << std::endl;
