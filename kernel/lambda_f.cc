@@ -35,7 +35,7 @@ namespace vita
     assert(ind.debug());
     assert(d.classes() > 1);
 
-    for (size_t i(0); i < d.classes(); ++i)
+    for (unsigned i(0); i < d.classes(); ++i)
       class_name_[i] = d.class_name(i);
   }
 
@@ -47,7 +47,7 @@ namespace vita
   /// Sets up the data structures needed by the 'dyn_slot' algorithm.
   ///
   dyn_slot_engine::dyn_slot_engine(const individual &ind, data &d,
-                                   size_t x_slot)
+                                   unsigned x_slot)
     : slot_matrix(d.classes() * x_slot, d.classes()),
       slot_class(d.classes() * x_slot), dataset_size(0)
   {
@@ -56,7 +56,7 @@ namespace vita
     assert(d.classes() > 1);
     assert(x_slot);
 
-    const size_t n_slots(d.classes() * x_slot);
+    const auto n_slots(d.classes() * x_slot);
     assert(n_slots == slot_matrix.rows());
     assert(slot_matrix.cols() == d.classes());
 
@@ -70,21 +70,21 @@ namespace vita
     {
       ++dataset_size;
 
-      const size_t where(slot(ind, example));
+      const auto where(slot(ind, example));
 
       ++slot_matrix(where, example.label());
     }
 
-    const size_t unknown(d.classes());
+    const auto unknown(d.classes());
 
     // In the second step the method dynamically determine to which class each
     // slot belongs by simply taking the class with the largest value at the
     // slot...
-    for (size_t i(0); i < n_slots; ++i)
+    for (unsigned i(0); i < n_slots; ++i)
     {
-      size_t best_class(0);
+      unsigned best_class(0);
 
-      for (size_t j(1); j < slot_matrix.cols(); ++j)
+      for (unsigned j(1); j < slot_matrix.cols(); ++j)
         if (slot_matrix(i, j) >= slot_matrix(i, best_class))
           best_class = j;
 
@@ -96,7 +96,7 @@ namespace vita
     // slot (if available).
     // Another interesting strategy would be to assign unknown slots to the
     // largest class.
-    for (size_t i(0); i < n_slots; ++i)
+    for (unsigned i(0); i < n_slots; ++i)
       if (slot_class[i] == unknown)
       {
         if (i && slot_class[i - 1] != unknown)
@@ -113,22 +113,22 @@ namespace vita
   /// \param[in] e input data for \a ind.
   /// \return the slot the example \a e falls into.
   ///
-  size_t dyn_slot_engine::slot(const individual &ind,
-                               const data::example &e) const
+  unsigned dyn_slot_engine::slot(const individual &ind,
+                                 const data::example &e) const
   {
     assert(ind.debug());
 
     src_interpreter agent(ind);
     const any res(agent.run(e));
 
-    const size_t ns(slot_matrix.rows());
-    const size_t last_slot(ns - 1);
+    const auto ns(slot_matrix.rows());
+    const auto last_slot(ns - 1);
 
     if (res.empty())
       return last_slot;
 
     const double val(interpreter::to_double(res));
-    const size_t where(static_cast<size_t>(normalize_01(val) * ns));
+    const auto where(static_cast<unsigned>(normalize_01(val) * ns));
 
     return (where >= ns) ? last_slot : where;
   }
@@ -162,7 +162,7 @@ namespace vita
   /// \param[in] x_slot number of slots for each class of the training set.
   ///
   dyn_slot_lambda_f::dyn_slot_lambda_f(const individual &ind, data &d,
-                                       size_t x_slot)
+                                       unsigned x_slot)
     : class_lambda_f(ind, d)
   {
     assert(ind.debug());
@@ -183,7 +183,7 @@ namespace vita
   ///
   any dyn_slot_lambda_f::operator()(const data::example &instance) const
   {
-    const size_t where(engine_.slot(ind_, instance));
+    const auto where(engine_.slot(ind_, instance));
 
     return any(engine_.slot_class[where]);
   }
@@ -234,17 +234,17 @@ namespace vita
   ///                 class n).
   /// \return the class of \a instance (numerical id).
   ///
-  size_t gaussian_engine::class_label(const individual &ind,
-                                      const data::example &example,
-                                      double *val, double *sum) const
+  unsigned gaussian_engine::class_label(const individual &ind,
+                                        const data::example &example,
+                                        double *val, double *sum) const
   {
     const any res(src_interpreter(ind).run(example));
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     double val_(0.0), val_sum_(0.0);
-    size_t probable_class(0);
+    unsigned probable_class(0);
 
-    for (size_t i(0); i < gauss_dist.size(); ++i)
+    for (unsigned i(0); i < gauss_dist.size(); ++i)
     {
       const double distance(std::fabs(x - gauss_dist[i].mean));
       const double variance(gauss_dist[i].variance);
@@ -312,5 +312,17 @@ namespace vita
     assert(ind.debug());
     assert(d.debug());
     assert(d.classes() == 2);
+  }
+
+  ///
+  /// \param[in] e input example for the lambda function.
+  /// \return the output value associated with \a e.
+  ///
+  any binary_lambda_f::operator()(const data::example &e) const
+  {
+    const any res(src_interpreter(ind_).run(e));
+    const double val(res.empty() ? -1.0 : interpreter::to_double(res));
+
+    return any(val > 0.0 ? 1u : 0u);
   }
 }  // namespace vita

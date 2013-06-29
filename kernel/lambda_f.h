@@ -56,20 +56,20 @@ namespace vita
     friend class dyn_slot_evaluator;
 
     dyn_slot_engine() {}
-    dyn_slot_engine(const individual &, data &, size_t);
+    dyn_slot_engine(const individual &, data &, unsigned);
 
-    size_t slot(const individual &, const data::example &) const;
+    unsigned slot(const individual &, const data::example &) const;
 
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
     /// 'class' mapped to slot 'slot'".
-    matrix<size_t> slot_matrix;
+    matrix<unsigned> slot_matrix;
 
     /// slot_class[i] = "label of the predominant class" for the i-th slot.
-    std::vector<size_t> slot_class;
+    std::vector<unsigned> slot_class;
 
     /// Size of the dataset used to construct \a slot_matrix.
-    size_t dataset_size;
+    unsigned dataset_size;
 
     static double normalize_01(double);
   };
@@ -85,7 +85,7 @@ namespace vita
 
     virtual std::string name(const any &a) const final
     {
-      return class_name_[any_cast<size_t>(a)];
+      return class_name_[any_cast<unsigned>(a)];
     }
 
   protected:
@@ -103,7 +103,7 @@ namespace vita
   class dyn_slot_lambda_f : public class_lambda_f
   {
   public:
-    dyn_slot_lambda_f(const individual &, data &, size_t);
+    dyn_slot_lambda_f(const individual &, data &, unsigned);
 
     virtual any operator()(const data::example &) const override;
 
@@ -127,8 +127,8 @@ namespace vita
     gaussian_engine() {}
     gaussian_engine(const individual &, data &);
 
-    size_t class_label(const individual &, const data::example &, double * = 0,
-                       double * = 0) const;
+    unsigned class_label(const individual &, const data::example &,
+                         double * = 0, double * = 0) const;
 
     /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
     /// classification problem".
@@ -161,6 +161,8 @@ namespace vita
   {
   public:
     binary_lambda_f(const individual &, data &);
+
+    virtual any operator()(const data::example &) const override;
   };
 }  // namespace vita
 

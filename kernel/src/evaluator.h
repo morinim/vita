@@ -182,7 +182,7 @@ namespace vita
   class dyn_slot_evaluator : public classification_evaluator
   {
   public:
-    explicit dyn_slot_evaluator(data &, size_t = 10);
+    explicit dyn_slot_evaluator(data &, unsigned = 10);
 
     virtual fitness_t operator()(const individual &) override;
     virtual std::unique_ptr<lambda_f> lambdify(
@@ -192,7 +192,7 @@ namespace vita
     dyn_slot_engine engine_;
 
     /// Number of slots for each class of the training set.
-    size_t x_slot_;
+    unsigned x_slot_;
   };
 
   ///

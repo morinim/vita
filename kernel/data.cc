@@ -98,7 +98,7 @@ namespace vita
   /// data::end() will refer to the active slice (a subset of the dataset).
   /// To reset the slice call data::slice with argument 0.
   ///
-  void data::slice(size_t n)
+  void data::slice(unsigned n)
   {
     end_[dataset()] = (n == 0 || n >= size()) ?
       dataset_[dataset()].end() : std::next(begin(), n);
@@ -136,7 +136,7 @@ namespace vita
   /// \note
   /// Please note that the result is independent of the active slice.
   ///
-  size_t data::size(dataset_t d) const
+  unsigned data::size(dataset_t d) const
   {
     return dataset_[d].size();
   }
@@ -144,7 +144,7 @@ namespace vita
   ///
   /// \return the size of the active dataset.
   ///
-  size_t data::size() const
+  unsigned data::size() const
   {
     return size(dataset());
   }
@@ -190,7 +190,7 @@ namespace vita
   void data::sort(std::function<bool (const example &, const example &)> f)
   {
     const dataset_t d(dataset());
-    const size_t partition_size(std::distance(begin(), end()));
+    const unsigned partition_size(std::distance(begin(), end()));
 
     dataset_[d].sort(f);
 
@@ -227,12 +227,12 @@ namespace vita
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
       // > items, and often you'll have all of them before that".
-      size_t available(dataset_[training].size());
+      unsigned available(dataset_[training].size());
 
-      const size_t k(available * r);
+      const unsigned k(available * r);
       assert(k <= available);
 
-      size_t needed(k);
+      auto needed(k);
 
       auto iter(dataset_[training].begin());
       while (dataset_[validation].size() < k)
@@ -277,7 +277,7 @@ namespace vita
   /// we use (based on a discriminant function) doesn't manipulate (skips) the
   /// output category (it only uses the number of output classes).
   ///
-  size_t data::categories() const
+  unsigned data::categories() const
   {
     return categories_.size();
   }
@@ -288,7 +288,7 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty: \code variables() + 1 == columns() \endcode.
   ///
-  size_t data::columns() const
+  unsigned data::columns() const
   {
     assert(dataset_[dataset()].empty() || variables() + 1 == header_.size());
 
@@ -299,7 +299,7 @@ namespace vita
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
-  size_t data::classes() const
+  unsigned data::classes() const
   {
     return classes_map_.size();
   }
@@ -310,9 +310,9 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty, \code variables() + 1 == columns() \endcode.
   ///
-  size_t data::variables() const
+  unsigned data::variables() const
   {
-    const size_t n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
+    const unsigned n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
 
     assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
@@ -329,7 +329,7 @@ namespace vita
   {
     if (map->find(label) == map->end())
     {
-      const size_t n(map->size());
+      const unsigned n(map->size());
       (*map)[label] = n;
     }
 
@@ -525,7 +525,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::load_xrff(const std::string &filename)
+  unsigned data::load_xrff(const std::string &filename)
   {
     assert(dataset() == training);
 
@@ -534,7 +534,7 @@ namespace vita
     ptree pt;
     read_xml(filename, pt);
 
-    size_t n_output(0);
+    unsigned n_output(0);
     bool classification(false);
 
     // Iterate over dataset.header.attributes selection and store all found
@@ -624,7 +624,7 @@ namespace vita
     // Category 0 is the output category.
     swap_category(category_t(0), header_[0].category_id);
 
-    size_t parsed(0);
+    unsigned parsed(0);
     for (ptree::value_type bi : pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
@@ -712,7 +712,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::load_csv(const std::string &filename, unsigned verbosity)
+  unsigned data::load_csv(const std::string &filename, unsigned verbosity)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -724,7 +724,7 @@ namespace vita
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
-      const size_t size(columns() ? columns() : record.size());
+      const unsigned size(columns() ? columns() : record.size());
 
       if (record.size() == size)
       {
@@ -733,7 +733,7 @@ namespace vita
         if (!dataset_[dataset()].size())  // No line parsed
           classification = !is_number(record[0]);
 
-        for (size_t field(0); field < size; ++field)
+        for (unsigned field(0); field < size; ++field)
         {
           // The first line is (also) used to learn data format.
           if (columns() != size)
@@ -838,7 +838,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::open(const std::string &f, unsigned verbosity)
+  unsigned data::open(const std::string &f, unsigned verbosity)
   {
     const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
                     boost::algorithm::iends_with(f, ".xml"));
@@ -859,7 +859,7 @@ namespace vita
   ///
   bool data::debug() const
   {
-    const size_t cl_size(classes());
+    const unsigned cl_size(classes());
     // If this is a classification problem then there should be at least two
     // classes.
     if (cl_size == 1)
@@ -868,7 +868,7 @@ namespace vita
     for (const auto &d : dataset_)
       if (!d.empty() && &d != &dataset_[test])
       {
-        const size_t in_size(d.begin()->input.size());
+        const unsigned in_size(d.begin()->input.size());
 
         for (const auto &e : d)
         {

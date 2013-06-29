@@ -273,7 +273,7 @@ namespace vita
     for (const auto &example : *dat_)
     {
       const any res((*f)(example));
-      if (any_cast<size_t>(res) == example.label())
+      if (any_cast<unsigned>(res) == example.label())
         ++ok;
 
       ++total_nr;
@@ -289,7 +289,7 @@ namespace vita
   /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
   ///                   Determination algorithm.
   ///
-  dyn_slot_evaluator::dyn_slot_evaluator(data &d, size_t x_slot)
+  dyn_slot_evaluator::dyn_slot_evaluator(data &d, unsigned x_slot)
     : classification_evaluator(d), x_slot_(x_slot)
   {
     assert(x_slot);
@@ -313,8 +313,8 @@ namespace vita
     engine_ = dyn_slot_engine(ind, *dat_, x_slot_);
 
     fitness_t::base_t err(0.0);
-    for (size_t i(0); i < engine_.slot_matrix.rows(); ++i)
-      for (size_t j(0); j < engine_.slot_matrix.cols(); ++j)
+    for (unsigned i(0); i < engine_.slot_matrix.rows(); ++i)
+      for (unsigned j(0); j < engine_.slot_matrix.cols(); ++j)
         if (j != engine_.slot_class[i])
           err += engine_.slot_matrix(i, j);
 
@@ -353,8 +353,8 @@ namespace vita
     for (auto &example : *dat_)
     {
       double confidence, sum;
-      const size_t probable_class(engine_.class_label(ind, example,
-                                                      &confidence, &sum));
+      const unsigned probable_class(engine_.class_label(ind, example,
+                                                        &confidence, &sum));
 
       if (probable_class == example.label())
       {

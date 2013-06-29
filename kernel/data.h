@@ -59,8 +59,8 @@ namespace vita
       std::uintmax_t  difficulty;
       unsigned               age;
 
-      size_t label() const
-      { return static_cast<size_t>(boost::get<int>(output)); }
+      unsigned label() const
+      { return static_cast<unsigned>(boost::get<int>(output)); }
 
       void clear()
       { input.clear(); output = value_t(); difficulty = 0; age = 0; }
@@ -116,16 +116,16 @@ namespace vita
     enum dataset_t {training = 0, validation, test, k_max_dataset = test};
     void dataset(dataset_t);
     dataset_t dataset() const;
-    void slice(size_t);
+    void slice(unsigned);
 
     iterator begin();
     const_iterator cbegin() const;
     iterator end() const;
     const_iterator cend() const { return end(); }
-    size_t size() const;
-    size_t size(dataset_t) const;
+    unsigned size() const;
+    unsigned size(dataset_t) const;
 
-    size_t open(const std::string &, unsigned = 0);
+    unsigned open(const std::string &, unsigned = 0);
     bool operator!() const;
 
     void clear();
@@ -137,10 +137,10 @@ namespace vita
     const category &get_category(category_t) const;
     const column &get_column(unsigned) const;
 
-    size_t categories() const;
-    size_t classes() const;
-    size_t columns() const;
-    size_t variables() const;
+    unsigned categories() const;
+    unsigned classes() const;
+    unsigned columns() const;
+    unsigned variables() const;
 
     std::string class_name(unsigned) const;
 
@@ -181,8 +181,8 @@ namespace vita
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
-    size_t load_csv(const std::string &, unsigned);
-    size_t load_xrff(const std::string &);
+    unsigned load_csv(const std::string &, unsigned);
+    unsigned load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);
 
