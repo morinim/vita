@@ -22,7 +22,7 @@
 namespace vita
 {
   ///
-  /// A symbol used in GP. A \a function label the internal (non-leaf) points
+  /// A symbol used in GP. A \a function labels the internal (non-leaf) points
   /// of the parse trees that represent the programs in the \a population. An
   /// example function set might be {+,-,*}.
   /// Each function should be able to handle gracefully all values it might
