@@ -60,6 +60,7 @@ namespace vita
     vita::population<individual_t> pop_;
     evaluator                     *eva_;
     summary<individual_t>        stats_;
+    ES                              es_;
 
     std::function<bool (const summary<individual_t> &)>
     external_stop_condition_;

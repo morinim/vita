@@ -82,7 +82,8 @@ evolution<ES>::evolution(const environment &env, const symbol_set &sset,
                          evaluator *eva,
                          std::function<bool (const summary<individual_t> &)> sc,
                          std::function<void (unsigned)> sd)
-  : pop_(env, sset), eva_(eva), external_stop_condition_(sc), shake_data_(sd)
+  : pop_(env, sset), eva_(eva), es_(pop_, *eva, &stats_),
+    external_stop_condition_(sc), shake_data_(sd)
 {
   assert(eva);
 
@@ -209,36 +210,6 @@ void evolution<ES>::log(unsigned run_count) const
     }
   }
 
-  if (env().stat_layers)
-  {
-    const std::string n_lys(env().stat_dir + "/" + environment::lys_filename);
-    std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
-    if (f_lys.good())
-    {
-      if (last_run != run_count)
-        f_lys << std::endl << std::endl;
-
-      for (unsigned l(0); l < pop_.layers(); ++l)
-      {
-        f_lys << run_count << ' ' << stats_.gen << ' ' << l << " <";
-
-        if (pop_.max_age(l) + 1 == 0)
-          f_lys << "inf";
-        else
-          f_lys << pop_.max_age(l) + 1;
-
-        f_lys << ' ' << stats_.az.age_dist(l).mean
-              << ' ' << stats_.az.age_dist(l).standard_deviation()
-              << ' ' << static_cast<unsigned>(stats_.az.age_dist(l).min)
-              << '-' << static_cast<unsigned>(stats_.az.age_dist(l).max)
-              << ' ' << stats_.az.fit_dist(l).mean
-              << ' ' << stats_.az.fit_dist(l).standard_deviation()
-              << ' ' << stats_.az.fit_dist(l).min
-              << '-' << stats_.az.fit_dist(l).max << std::endl;
-      }
-    }
-  }
-
   if (env().stat_population)
   {
     const std::string n_pop(env().stat_dir + "/" + environment::pop_filename);
@@ -257,6 +228,8 @@ void evolution<ES>::log(unsigned run_count) const
               << f.first[0] << ' ' << f.second << std::endl;
     }
   }
+
+  es_.log(last_run, run_count);
 
   if (last_run != run_count)
     last_run = run_count;
@@ -343,8 +316,6 @@ evolution<ES>::run(unsigned run_count)
     stats_.az = get_stats();
     log(run_count);
 
-    ES es(pop_, *eva_, &stats_);
-
     for (unsigned k(0); k < pop_.individuals() && !ext_int; ++k)
     {
       if (k % std::max(pop_.individuals() / 100, 2u))
@@ -355,14 +326,14 @@ evolution<ES>::run(unsigned run_count)
       }
 
       // --------- SELECTION ---------
-      auto parents(es.selection.run());
+      auto parents(es_.selection.run());
 
       // --------- CROSSOVER / MUTATION ---------
-      auto off(es.recombination.run(parents));
+      auto off(es_.recombination.run(parents));
 
       // --------- REPLACEMENT --------
       const auto before(stats_.best->fitness);
-      es.replacement.run(parents, off, &stats_);
+      es_.replacement.run(parents, off, &stats_);
 
       if (stats_.best->fitness != before)
         print_progress(k, run_count, true);
@@ -370,7 +341,7 @@ evolution<ES>::run(unsigned run_count)
 
     stats_.speed = get_speed(measure.elapsed());
 
-    es.post_bookkeeping();
+    es_.post_bookkeeping();
   }
 
   if (env().verbosity >= 2)

@@ -53,6 +53,10 @@ namespace vita
       assert(s);
     }
 
+    /// Evolution strategy specific log function (it's called by the
+    /// evolution::log method).
+    virtual void log(unsigned, unsigned) const {}
+
     /// Initial setup before evolution starts.
     virtual void pre_bookkeeping() {}
 
@@ -130,23 +134,8 @@ namespace vita
                          replacement::alps<T>>(pop, eva, s)
     {}
 
-    virtual void post_bookkeeping() override
-    {
-      auto &pop(this->pop_);
-
-      pop.inc_age();
-
-      if (this->sum_->gen && this->sum_->gen % pop.env().alps.age_gap == 0)
-      {
-        if (pop.layers() < pop.env().layers)
-          pop.add_layer();
-        else
-        {
-          this->replacement.try_move_up_layer(0);
-          pop.init_layer(0);
-        }
-      }
-    }
+    virtual void log(unsigned, unsigned) const override;
+    virtual void post_bookkeeping() override;
   };
 
   using alps_es = basic_alps_es<vita::individual>;
@@ -167,6 +156,8 @@ namespace vita
   };
 
   using std_es = basic_std_es<vita::individual>;
+
+#include "evolution_strategy_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_STRATEGY_H
