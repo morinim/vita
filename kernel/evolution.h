@@ -45,9 +45,6 @@ namespace vita
 
     const summary<individual_t> &run(unsigned);
 
-    const vita::population<individual_t> &population() const;
-    vita::population<individual_t> &population();
-
     bool debug(bool) const;
 
   private:  // Private support methods.

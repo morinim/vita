@@ -111,12 +111,12 @@ std::vector<coord> tournament<T>::run()
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(this->pickup(target));
-    const auto new_fitness(this->eva_.fitness(pop[new_coord]));
+    const auto new_fitness(this->eva_(pop[new_coord]));
 
     unsigned j(0);
 
     // Where is the insertion point?
-    while (j < i && new_fitness < this->eva_.fitness(pop[ret[j]]))
+    while (j < i && new_fitness < this->eva_(pop[ret[j]]))
       ++j;
 
     // Shift right elements after the insertion point.
@@ -128,8 +128,7 @@ std::vector<coord> tournament<T>::run()
 
 #if !defined(NDEBUG)
   for (unsigned i(1); i < rounds; ++i)
-    assert(this->eva_.fitness(pop[ret[i - 1]]) >=
-           this->eva_.fitness(pop[ret[i]]));
+    assert(this->eva_(pop[ret[i - 1]]) >= this->eva_(pop[ret[i]]));
 #endif
 
   return ret;

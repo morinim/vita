@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
   env.individuals = argc > 1 ? atoi(argv[1]) : 100;
   env.code_length = argc > 2 ? atoi(argv[2]) : 100;
-  env.g_since_start = argc > 3 ? atoi(argv[3]) : 100;
+  env.generations = argc > 3 ? atoi(argv[3]) : 100;
 
   vita::symbol_set sset;
 
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::individual> evo(env, sset, eva.get());
+  vita::evolution<vita::std_es> evo(env, sset, eva.get());
 
-  evo.run<vita::std_es>(1);
+  evo.run(1);
 
   return EXIT_SUCCESS;
 }

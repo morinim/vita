@@ -18,10 +18,7 @@
 
 #include "kernel/vita.h"
 
-namespace vita {
-  template<class T> class evolution;
-
-namespace replacement {
+namespace vita {  namespace replacement {
 
   ///
   /// \brief The replacement strategy (random, tournament...) for the

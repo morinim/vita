@@ -19,10 +19,7 @@
 
 #include "kernel/vita.h"
 
-namespace vita {
-  template<class T> class evolution;
-
-namespace selection {
+namespace vita {  namespace selection {
 
   ///
   /// \brief The strategy (tournament, fitness proportional...) for the

@@ -90,35 +90,16 @@ evolution<ES>::evolution(const environment &env, const symbol_set &sset,
 }
 
 ///
-/// \return access to the population being evolved.
-///
-template<class ES>
-population<typename evolution<ES>::individual_t> &evolution<ES>::population()
-{
-  return pop_;
-}
-
-///
-/// \return constant reference to the population being evolved.
-///
-template<class ES>
-const population<typename evolution<ES>::individual_t> &
-evolution<ES>::population() const
-{
-  return pop_;
-}
-
-///
 /// \param[in] s an up to date evolution summary.
 /// \return \c true when evolution should be interrupted.
 ///
 template<class ES>
 bool evolution<ES>::stop_condition(const summary<individual_t> &s) const
 {
-  assert(pop_.env().generations);
+  assert(env().generations);
 
   // Check the number of generations.
-  if (s.gen > pop_.env().generations)
+  if (s.gen > env().generations)
     return true;
 
   if (term::user_stop())
@@ -186,11 +167,9 @@ void evolution<ES>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
-  const environment &env(pop_.env());
-
-  if (env.stat_dynamic)
+  if (env().stat_dynamic)
   {
-    const std::string n_dyn(env.stat_dir + "/" + environment::dyn_filename);
+    const std::string n_dyn(env().stat_dir + "/" + environment::dyn_filename);
     std::ofstream f_dyn(n_dyn.c_str(), std::ios_base::app);
     if (f_dyn.good())
     {
@@ -230,9 +209,9 @@ void evolution<ES>::log(unsigned run_count) const
     }
   }
 
-  if (env.stat_layers)
+  if (env().stat_layers)
   {
-    const std::string n_lys(env.stat_dir + "/" + environment::lys_filename);
+    const std::string n_lys(env().stat_dir + "/" + environment::lys_filename);
     std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
     if (f_lys.good())
     {
@@ -260,9 +239,9 @@ void evolution<ES>::log(unsigned run_count) const
     }
   }
 
-  if (env.stat_population)
+  if (env().stat_population)
   {
-    const std::string n_pop(env.stat_dir + "/" + environment::pop_filename);
+    const std::string n_pop(env().stat_dir + "/" + environment::pop_filename);
     std::ofstream f_pop(n_pop.c_str(), std::ios_base::app);
     if (f_pop.good())
     {
