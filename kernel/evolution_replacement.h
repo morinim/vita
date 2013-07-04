@@ -37,14 +37,17 @@ namespace replacement {
   class strategy
   {
   public:
-    explicit strategy(evolution<T> *const);
+    typedef T individual_t;
+
+    strategy(population<T> &, evaluator &);
     virtual ~strategy() {}
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) = 0;
 
   protected:
-    evolution<T> *const evo_;
+    population<T> &pop_;
+    evaluator     &eva_;
   };
 
   ///
@@ -67,7 +70,7 @@ namespace replacement {
   class family_competition : public strategy<T>
   {
   public:
-    explicit family_competition(evolution<T> *const);
+    family_competition(population<T> &, evaluator &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -87,7 +90,7 @@ namespace replacement {
   class tournament : public strategy<T>
   {
   public:
-    explicit tournament(evolution<T> *const);
+    tournament(population<T> &, evaluator &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -97,7 +100,7 @@ namespace replacement {
   class alps : public strategy<T>
   {
   public:
-    explicit alps(evolution<T> *const);
+    alps(population<T> &, evaluator &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -112,7 +115,7 @@ namespace replacement {
   class pareto : public strategy<T>
   {
   public:
-    explicit pareto(evolution<T> *const);
+    pareto(population<T> &, evaluator &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;

@@ -19,7 +19,6 @@
 #include "kernel/population.h"
 
 namespace vita {
-  template<class T> class evolution;
   template<class T> class summary;
 
 namespace recombination {
@@ -46,7 +45,7 @@ namespace recombination {
   class strategy
   {
   public:
-    strategy(const evolution<T> *const, summary<T> *const);
+    strategy(const population<T> &, evaluator &, summary<T> *const);
     virtual ~strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized
@@ -55,7 +54,8 @@ namespace recombination {
     virtual std::vector<T> run(const std::vector<coord> &) = 0;
 
   protected:
-    const evolution<T> *const evo_;
+    const population<T> &pop_;
+    evaluator &eva_;
     summary<T> *stats_;
   };
 
@@ -70,7 +70,7 @@ namespace recombination {
   class base : public strategy<T>
   {
   public:
-    base(const evolution<T> *const, summary<T> *const);
+    base(const population<T> &, evaluator &, summary<T> *const);
 
     virtual std::vector<T> run(const std::vector<coord> &) override;
   };

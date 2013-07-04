@@ -18,7 +18,8 @@
 /// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
-strategy<T>::strategy(const evolution<T> *const e) : evo_(e)
+strategy<T>::strategy(const population<T> &pop, evaluator &eva)
+  : pop_(pop), eva_(eva)
 {
 }
 
@@ -28,13 +29,11 @@ strategy<T>::strategy(const evolution<T> *const e) : evo_(e)
 template<class T>
 coord strategy<T>::pickup() const
 {
-  const auto &pop(evo_->population());
+  if (pop_.layers() == 1)
+    return {0, vita::random::sup(pop_.individuals(0))};
 
-  if (pop.layers() == 1)
-    return {0, vita::random::sup(pop.individuals(0))};
-
-  const auto layer(vita::random::sup(pop.layers()));
-  return {layer, vita::random::sup(pop.individuals(layer))};
+  const auto layer(vita::random::sup(pop_.layers()));
+  return {layer, vita::random::sup(pop_.individuals(layer))};
 }
 
 ///
@@ -48,10 +47,8 @@ coord strategy<T>::pickup() const
 template<class T>
 coord strategy<T>::pickup(coord target) const
 {
-  const auto &pop(evo_->population());
-
-  return {target.layer, vita::random::ring(target.index, *pop.env().mate_zone,
-                                           pop.individuals(target.layer))};
+  return {target.layer, vita::random::ring(target.index, *pop_.env().mate_zone,
+                                           pop_.individuals(target.layer))};
 }
 
 ///
@@ -66,21 +63,20 @@ coord strategy<T>::pickup(unsigned l, double p) const
 {
   assert(0.0 <= p && p <= 1.0);
 
-  const auto &pop(evo_->population());
-
-  assert(l < pop.layers());
+  assert(l < pop_.layers());
 
   if (l > 0 && !vita::random::boolean(p))
     --l;
 
-  return {l, vita::random::sup(pop.individuals(l))};
+  return {l, vita::random::sup(pop_.individuals(l))};
 }
 
 ///
 /// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
-tournament<T>::tournament(const evolution<T> *const e) : strategy<T>(e)
+tournament<T>::tournament(const population<T> &pop, evaluator &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
@@ -101,7 +97,7 @@ tournament<T>::tournament(const evolution<T> *const e) : strategy<T>(e)
 template<class T>
 std::vector<coord> tournament<T>::run()
 {
-  const population<T> &pop(this->evo_->population());
+  const auto &pop(this->pop_);
 
   const auto rounds(pop.env().tournament_size);
   const auto target(this->pickup());
@@ -115,12 +111,12 @@ std::vector<coord> tournament<T>::run()
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(this->pickup(target));
-    const auto new_fitness(this->evo_->fitness(pop[new_coord]));
+    const auto new_fitness(this->eva_.fitness(pop[new_coord]));
 
     unsigned j(0);
 
     // Where is the insertion point?
-    while (j < i && new_fitness < this->evo_->fitness(pop[ret[j]]))
+    while (j < i && new_fitness < this->eva_.fitness(pop[ret[j]]))
       ++j;
 
     // Shift right elements after the insertion point.
@@ -132,8 +128,8 @@ std::vector<coord> tournament<T>::run()
 
 #if !defined(NDEBUG)
   for (unsigned i(1); i < rounds; ++i)
-    assert(this->evo_->fitness(pop[ret[i - 1]]) >=
-           this->evo_->fitness(pop[ret[i]]));
+    assert(this->eva_.fitness(pop[ret[i - 1]]) >=
+           this->eva_.fitness(pop[ret[i]]));
 #endif
 
   return ret;
@@ -143,7 +139,7 @@ std::vector<coord> tournament<T>::run()
 /// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
-alps<T>::alps(const evolution<T> *const e) : strategy<T>(e)
+alps<T>::alps(const population<T> &pop, evaluator &eva) : strategy<T>(pop, eva)
 {
 }
 
@@ -153,7 +149,7 @@ alps<T>::alps(const evolution<T> *const e) : strategy<T>(e)
 template<class T>
 std::vector<coord> alps<T>::run()
 {
-  const population<T> &pop(this->evo_->population());
+  const auto &pop(this->pop_);
 
   const auto layer(vita::random::sup(pop.layers()));
 
@@ -162,8 +158,8 @@ std::vector<coord> alps<T>::run()
   typedef std::pair<bool, fitness_t> age_fit_t;
   age_fit_t age_fit[2] =
   {
-    {!pop.aged(ret[0]), this->evo_->fitness(pop[ret[0]])},
-    {!pop.aged(ret[1]), this->evo_->fitness(pop[ret[1]])}
+    {!pop.aged(ret[0]), this->eva_(pop[ret[0]])},
+    {!pop.aged(ret[1]), this->eva_(pop[ret[1]])}
   };
 
   if (age_fit[0] < age_fit[1])
@@ -180,7 +176,7 @@ std::vector<coord> alps<T>::run()
   while (rounds--)
   {
     const auto tmp(this->pickup(layer, same_layer_p));
-    const age_fit_t tmp_age_fit{!pop.aged(tmp), this->evo_->fitness(pop[tmp])};
+    const age_fit_t tmp_age_fit{!pop.aged(tmp), this->eva_(pop[tmp])};
 
     if (age_fit[0] < tmp_age_fit)
     {
@@ -198,8 +194,8 @@ std::vector<coord> alps<T>::run()
 
     assert(age_fit[0].first == !pop.aged(ret[0]));
     assert(age_fit[1].first == !pop.aged(ret[1]));
-    assert(age_fit[0].second == this->evo_->fitness(pop[ret[0]]));
-    assert(age_fit[1].second == this->evo_->fitness(pop[ret[1]]));
+    assert(age_fit[0].second == this->eva_(pop[ret[0]]));
+    assert(age_fit[1].second == this->eva_(pop[ret[1]]));
     assert(age_fit[0] >= age_fit[1]);
     assert(!pop.aged(ret[0]) || pop.aged(ret[1]));
     assert(layer <= ret[0].layer + 1);
@@ -215,7 +211,8 @@ std::vector<coord> alps<T>::run()
 /// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
-pareto<T>::pareto(const evolution<T> *const e) : strategy<T>(e)
+pareto<T>::pareto(const population<T> &pop, evaluator &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
@@ -230,7 +227,7 @@ pareto<T>::pareto(const evolution<T> *const e) : strategy<T>(e)
 template<class T>
 std::vector<coord> pareto<T>::run()
 {
-  const population<T> &pop(this->evo_->population());
+  const auto &pop(this->pop_);
   const auto rounds(pop.env().tournament_size);
 
   std::vector<unsigned> pool(rounds);
@@ -264,7 +261,7 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
                       std::set<unsigned> *front,
                       std::set<unsigned> *dominated) const
 {
-  const population<T> &pop(this->evo_->population());
+  const auto &pop(this->pop_);
 
   for (const auto &ind : pool)
   {
@@ -272,13 +269,13 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
         dominated->find(ind) != dominated->end())
       continue;
 
-    const auto ind_fit(this->evo_->fitness(pop[{0, ind}]));
+    const auto ind_fit(this->eva_(pop[{0, ind}]));
 
     bool ind_dominated(false);
     for (auto f(front->cbegin()); f != front->cend() && !ind_dominated;)
       // no increment in the for loop
     {
-      const auto f_fit(this->evo_->fitness(pop[{0, *f}]));
+      const auto f_fit(this->eva_(pop[{0, *f}]));
 
       if (!ind_dominated && ind_fit.dominating(f_fit))
       {
@@ -306,7 +303,8 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 /// \param[in] e pointer to the current evolution object.
 ///
 template<class T>
-random<T>::random(const evolution<T> *const e) : strategy<T>(e)
+random<T>::random(const population<T> &pop, evaluator &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
@@ -321,7 +319,7 @@ random<T>::random(const evolution<T> *const e) : strategy<T>(e)
 template<class T>
 std::vector<coord> random<T>::run()
 {
-  const auto size(this->evo_->population().env().tournament_size);
+  const auto size(this->pop_.env().tournament_size);
 
   assert(size);
   std::vector<coord> ret(size);

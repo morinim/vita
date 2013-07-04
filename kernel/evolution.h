@@ -33,39 +33,40 @@ namespace vita
   /// (survival of the fittest) and analogs of various naturally occurring
   /// operations, including crossover (sexual recombination), mutation...
   ///
-  template<class T>
+  template<class ES>
   class evolution
   {
   public:
+    typedef typename ES::individual_t individual_t;
+
     evolution(const environment &, const symbol_set &, evaluator *,
-              std::function<bool (const summary<T> &)> = nullptr,
+              std::function<bool (const summary<individual_t> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    template<class ES> const summary<T> &run(unsigned);
+    const summary<individual_t> &run(unsigned);
 
-    const vita::population<T> &population() const;
-    vita::population<T> &population();
-
-    fitness_t fitness(const T &) const;
-    fitness_t fast_fitness(const T &) const;
-    unsigned seen(const T &i) const;
+    const vita::population<individual_t> &population() const;
+    vita::population<individual_t> &population();
 
     bool debug(bool) const;
 
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
+    fitness_t fitness(const individual_t &) const;
     double get_speed(double) const;
     analyzer get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
-    bool stop_condition(const summary<T> &) const;
+    bool stop_condition(const summary<individual_t> &) const;
 
   private:  // Private data members.
-    vita::population<T> pop_;
-    evaluator          *eva_;
-    summary<T>        stats_;
+    vita::population<individual_t> pop_;
+    evaluator                     *eva_;
+    summary<individual_t>        stats_;
 
-    std::function<bool (const summary<T> &)> external_stop_condition_;
+    std::function<bool (const summary<individual_t> &)>
+    external_stop_condition_;
+
     std::function<void (unsigned)> shake_data_;
   };
 

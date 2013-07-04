@@ -15,24 +15,26 @@
 #define      EVOLUTION_RECOMBINATION_INL_H
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] pop the current population.
+/// \param[in] eva the current evaluator.
 /// \param[in] stats pointer to the current set of statistics.
 ///
 template<class T>
-strategy<T>::strategy(const evolution<T> *const evo, summary<T> *const stats)
-  : evo_(evo), stats_(stats)
+strategy<T>::strategy(const population<T> &pop, evaluator &eva,
+                      summary<T> *const stats)
+  : pop_(pop), eva_(eva), stats_(stats)
 {
-  assert(evo);
   assert(stats);
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] pop the current population.
+/// \param[in] eva the current evaluator.
 /// \param[in] s pointer to the current set of statistics.
 ///
 template<class T>
-base<T>::base(const evolution<T> *const evo, summary<T> *const s)
-  : strategy<T>(evo, s)
+base<T>::base(const population<T> &pop, evaluator &eva, summary<T> *const s)
+  : strategy<T>(pop, eva, s)
 {
 }
 
@@ -47,7 +49,7 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
 {
   assert(parent.size() >= 2);
 
-  const auto &pop(this->evo_->population());
+  const auto &pop(this->pop_);
   const auto &env(pop.env());
 
   assert(env.p_cross);
@@ -71,12 +73,12 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
            pop[r2].signature() == off.signature())
       this->stats_->mutations += off.mutation();
 
-    //if (evo_->seen(off))
+    //if (eva_.seen(off))
     //  stats_->mutations += off.mutation();
 
     if (*env.brood_recombination > 0)
     {
-      fitness_t fit_off(this->evo_->fast_fitness(off));
+      fitness_t fit_off(this->eva_.fast(off));
 
       unsigned i(0);
       do
@@ -87,7 +89,7 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
                pop[r2].signature() == tmp.signature())
           this->stats_->mutations += tmp.mutation();
 
-        const auto fit_tmp(this->evo_->fast_fitness(tmp));
+        const auto fit_tmp(this->eva_.fast(tmp));
         if (fit_tmp > fit_off)
         {
           off     =     tmp;

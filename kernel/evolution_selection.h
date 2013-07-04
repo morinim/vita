@@ -40,7 +40,9 @@ namespace selection {
   class strategy
   {
   public:
-    explicit strategy(const evolution<T> *const);
+    typedef T individual_t;
+
+    strategy(const population<T> &, evaluator &);
     virtual ~strategy() {}
 
     virtual std::vector<coord> run() = 0;
@@ -51,7 +53,8 @@ namespace selection {
     coord pickup(unsigned, double = 1.0) const;
 
   protected:  // Data members.
-    const evolution<T> *const evo_;
+    const population<T> &pop_;
+    evaluator           &eva_;
   };
 
   ///
@@ -74,7 +77,7 @@ namespace selection {
   class tournament : public strategy<T>
   {
   public:
-    explicit tournament(const evolution<T> *const);
+    tournament(const population<T> &, evaluator &);
 
     virtual std::vector<coord> run() override;
   };
@@ -88,7 +91,7 @@ namespace selection {
   class alps : public strategy<T>
   {
   public:
-    explicit alps(const evolution<T> *const);
+    alps(const population<T> &, evaluator &);
 
     virtual std::vector<coord> run() override;
   };
@@ -101,7 +104,7 @@ namespace selection {
   class pareto : public strategy<T>
   {
   public:
-    explicit pareto(const evolution<T> *const);
+    pareto(const population<T> &, evaluator &);
 
     virtual std::vector<coord> run() override;
 
@@ -121,7 +124,7 @@ namespace selection {
   class random : public strategy<T>
   {
   public:
-    explicit random(const evolution<T> *const);
+    random(const population<T> &, evaluator &);
 
     virtual std::vector<coord> run() override;
   };
