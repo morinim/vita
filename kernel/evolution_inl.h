@@ -79,14 +79,12 @@ namespace term
 ///
 template<class ES>
 evolution<ES>::evolution(const environment &env, const symbol_set &sset,
-                         evaluator *eva,
+                         evaluator &eva,
                          std::function<bool (const summary<individual_t> &)> sc,
                          std::function<void (unsigned)> sd)
-  : pop_(env, sset), eva_(eva), es_(pop_, *eva, &stats_),
+  : pop_(env, sset), eva_(eva), es_(pop_, eva, &stats_),
     external_stop_condition_(sc), shake_data_(sd)
 {
-  assert(eva);
-
   assert(debug(true));
 }
 
@@ -140,7 +138,7 @@ analyzer evolution<ES>::get_stats() const
     for (unsigned i(0); i < pop_.individuals(l); ++i)
     {
       const individual &ind(pop_[{l, i}]);
-      az.add(ind, fitness(ind), l);
+      az.add(ind, eva_(ind), l);
     }
 
   return az;
@@ -236,16 +234,6 @@ void evolution<ES>::log(unsigned run_count) const
 }
 
 ///
-/// \param[in] ind individual whose fitness we are interested in.
-/// \return the fitness of \a ind.
-///
-template<class ES>
-fitness_t evolution<ES>::fitness(const individual_t &ind) const
-{
-  return (*eva_)(ind);
-}
-
-///
 /// \param[in] k current generation.
 /// \param[in] run_count total number of runs planned.
 /// \param[in] status if \c true print a run/generation/fitness status line.
@@ -288,7 +276,7 @@ const summary<typename evolution<ES>::individual_t> &
 evolution<ES>::run(unsigned run_count)
 {
   stats_.clear();
-  stats_.best = {pop_[{0, 0}], fitness(pop_[{0, 0}])};
+  stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}])};
 
   timer measure;
 
@@ -298,7 +286,7 @@ evolution<ES>::run(unsigned run_count)
   for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
   {
 #if defined(CLONE_SCALING)
-    eva_->clear(evaluator::stats);
+    eva_.clear(evaluator::stats);
 #endif
 
     if (shake_data_ && stats_.gen % 4 == 0)
@@ -309,7 +297,7 @@ evolution<ES>::run(unsigned run_count)
       // cleared (the best individual and its fitness refer to an old
       // training set).
       assert(stats_.best);
-      stats_.best->fitness = fitness(stats_.best->ind);
+      stats_.best->fitness = eva_(stats_.best->ind);
       print_progress(0, run_count, true);
     }
 
@@ -379,14 +367,6 @@ bool evolution<ES>::debug(bool verbose) const
 {
   if (!pop_.debug(verbose))
     return false;
-
-  if (!eva_)
-  {
-    if (verbose)
-      std::cerr << k_s_debug << " Empty evaluator pointer." << std::endl;
-
-    return false;
-  }
 
   return true;
 }

@@ -39,7 +39,7 @@ namespace vita
   public:
     typedef typename ES::individual_t individual_t;
 
-    evolution(const environment &, const symbol_set &, evaluator *,
+    evolution(const environment &, const symbol_set &, evaluator &,
               std::function<bool (const summary<individual_t> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
@@ -49,7 +49,6 @@ namespace vita
 
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
-    fitness_t fitness(const individual_t &) const;
     double get_speed(double) const;
     analyzer get_stats() const;
     void log(unsigned) const;
@@ -58,7 +57,7 @@ namespace vita
 
   private:  // Private data members.
     vita::population<individual_t> pop_;
-    evaluator                     *eva_;
+    evaluator                     &eva_;
     summary<individual_t>        stats_;
     ES                              es_;
 

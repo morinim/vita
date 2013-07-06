@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<vita::evaluator> eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::std_es> evo(env, sset, eva.get());
+  vita::evolution<vita::std_es> evo(env, sset, *eva.get());
 
   evo.run(1);
 

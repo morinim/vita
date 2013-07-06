@@ -38,10 +38,10 @@ BOOST_AUTO_TEST_CASE(Creation)
 
       std::unique_ptr<vita::evaluator> eva(new vita::random_evaluator());
 
-      vita::evolution<vita::alps_es> evo1(env, sset, eva.get());
+      vita::evolution<vita::alps_es> evo1(env, sset, *eva.get());
       BOOST_REQUIRE(evo1.debug(true));
 
-      vita::evolution<vita::std_es> evo2(env, sset, eva.get());
+      vita::evolution<vita::std_es> evo2(env, sset, *eva.get());
       BOOST_REQUIRE(evo2.debug(true));
     }
 }

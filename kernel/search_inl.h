@@ -432,7 +432,7 @@ typename basic_search<ES>::individual_t basic_search<ES>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<ES> evo(env_, prob_->sset, prob_->get_evaluator(), stop,
+    evolution<ES> evo(env_, prob_->sset, *prob_->get_evaluator(), stop,
                       shake_data);
     summary<individual_t> s(evo.run(run));
 
