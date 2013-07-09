@@ -30,9 +30,9 @@ namespace vita
     any run();
     any run(const locus &);
 
-    any eval();
-    any eval(size_t);
-    any eval_adf_arg(size_t);
+    any get_const();
+    any get_arg(unsigned);
+    any get_adf_arg(unsigned);
 
     bool debug() const;
 

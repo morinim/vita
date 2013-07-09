@@ -56,7 +56,7 @@ namespace vita
   ///
   /// \return the output value of the current terminal symbol.
   ///
-  any interpreter::eval()
+  any interpreter::get_const()
   {
     const gene &g(ind_[ip_]);
 
@@ -77,7 +77,7 @@ namespace vita
   /// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
   /// * <http://en.wikipedia.org/wiki/Memoization>
   ///
-  any interpreter::eval(size_t i)
+  any interpreter::get_arg(unsigned i)
   {
     const gene &g(ind_[ip_]);
 
@@ -118,7 +118,7 @@ namespace vita
   /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the curren ADF function.
   ///
-  any interpreter::eval_adf_arg(size_t i)
+  any interpreter::get_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
@@ -126,7 +126,7 @@ namespace vita
     assert(context_ && context_->debug() && i < gene::k_args &&
            (!context_g.sym->terminal() && context_g.sym->auto_defined()));
 #endif
-    return context_->eval(i);
+    return context_->get_arg(i);
   }
 
   ///

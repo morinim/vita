@@ -69,7 +69,7 @@ namespace vita
       { return boost::lexical_cast<std::string>(v); }
 
       virtual any eval(interpreter *i) const
-      { return any(static_cast<base_t>(any_cast<int>(i->eval()))); }
+      { return any(static_cast<base_t>(any_cast<int>(i->get_const()))); }
 
     private: // Private data members.
       const int min, upp;
@@ -85,7 +85,7 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->eval(0));
+        const any ev(i->get_arg(0));
         if (ev.empty())  return ev;
 
         return any(std::fabs(dbl::cast(ev)));
@@ -103,10 +103,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) + dbl::cast(ev1));
@@ -126,10 +126,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) / dbl::cast(ev1));
@@ -149,10 +149,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(std::floor(dbl::cast(ev0) / dbl::cast(ev1)));
@@ -176,13 +176,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
-        const any ev2(i->eval(2));
+        const any ev2(i->get_arg(2));
         if (ev2.empty())  return ev2;
 
         const auto v0(dbl::cast(ev0));
@@ -193,9 +193,9 @@ namespace vita
         const auto max(std::fmax(v1, v2));
 
         if (min <= v0 && v0 <= max)
-          return i->eval(3);
+          return i->get_arg(3);
         else
-          return i->eval(4);
+          return i->get_arg(4);
       }
     };
 
@@ -210,18 +210,18 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const auto cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
 
         if (cmp < float_epsilon)
-          return i->eval(2);
+          return i->get_arg(2);
         else
-          return i->eval(3);
+          return i->get_arg(3);
       }
     };
 
@@ -236,16 +236,16 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         if (dbl::cast(ev0) < dbl::cast(ev1))
-          return i->eval(2);
+          return i->get_arg(2);
         else
-          return i->eval(3);
+          return i->get_arg(3);
       }
     };
 
@@ -259,13 +259,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
         if (std::fabs(dbl::cast(ev0)) < float_epsilon)
-          return i->eval(1);
+          return i->get_arg(1);
         else
-          return i->eval(2);
+          return i->get_arg(2);
       }
     };
 
@@ -280,7 +280,7 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->eval(0));
+        const any ev(i->get_arg(0));
         if (ev.empty())  return ev;
 
         return any(static_cast<base_t>(any_cast<std::string>(ev).size()));
@@ -302,7 +302,7 @@ namespace vita
       ///
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
         const base_t ret(std::log(dbl::cast(ev0)));
@@ -322,10 +322,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(std::fmod(dbl::cast(ev0), dbl::cast(ev1)));
@@ -346,10 +346,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) * dbl::cast(ev1));
@@ -369,7 +369,7 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->eval(0));
+        const any ev(i->get_arg(0));
         if (ev.empty())  return ev;
 
         return any(std::sin(dbl::cast(ev)));
@@ -386,10 +386,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->eval(0));
+        const any ev0(i->get_arg(0));
         if (ev0.empty())  return ev0;
 
-        const any ev1(i->eval(1));
+        const any ev1(i->get_arg(1));
         if (ev1.empty())  return ev1;
 
         const base_t ret(dbl::cast(ev0) - dbl::cast(ev1));

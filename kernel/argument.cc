@@ -57,7 +57,7 @@ namespace vita
   ///
   any argument::eval(interpreter *agent) const
   {
-    return agent->eval_adf_arg(index_);
+    return agent->get_adf_arg(index_);
   }
 
   ///
