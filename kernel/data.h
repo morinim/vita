@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/variant.hpp>
-
 #include "kernel/distribution.h"
 
 namespace vita
@@ -49,24 +47,27 @@ namespace vita
     ///
     struct example
     {
-      typedef boost::variant<bool, int, double, std::string> value_t;
-
       example() { clear(); }
 
-      std::vector<value_t> input;
-      value_t             output;
+      std::vector<any> input;
+      any             output;
+      domain_t      d_output;
 
       std::uintmax_t  difficulty;
       unsigned               age;
 
-      unsigned label() const
-      { return static_cast<unsigned>(boost::get<int>(output)); }
-
+      unsigned label() const { return any_cast<unsigned>(output); }
+      template<class T> T cast_output() const;
+    
       void clear()
-      { input.clear(); output = value_t(); difficulty = 0; age = 0; }
+      {
+        input.clear();
+        output = any();
+        d_output = d_void;
+        difficulty = 0;
+        age = 0;
+      }
     };
-
-    template<class T> static T cast(const example::value_t &);
 
     /// \brief Informations about a "column" (feature) of the dataset.
     struct column
@@ -172,9 +173,8 @@ namespace vita
       const auto &i(map.find(n));
       return i == map.end() ? d_void : i->second;
     }
-
+    
   private:
-    static example::value_t convert(const std::string &, domain_t);
     static unsigned encode(const std::string &,
                            std::map<std::string, unsigned> *);
     static bool is_number(const std::string &);
@@ -226,14 +226,14 @@ namespace vita
   };
 
   template<class T>
-  T data::cast(const example::value_t &e)
+  T data::example::cast_output() const
   {
-    switch (e.which())
+    switch (d_output)
     {
-    case 0:  return static_cast<T>(boost::get<bool>(e));
-    case 1:  return static_cast<T>(boost::get<int>(e));
-    case 2:  return static_cast<T>(boost::get<double>(e));
-    default: return static_cast<T>(0.0);
+    case d_bool:    return static_cast<T>(any_cast<bool>(output));
+    case d_int:     return static_cast<T>(any_cast<int>(output));
+    case d_double:  return static_cast<T>(any_cast<double>(output));
+    default:        return static_cast<T>(0.0);
     }
   }
 }  // namespace vita

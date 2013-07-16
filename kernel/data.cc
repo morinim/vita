@@ -24,6 +24,28 @@
 
 namespace vita
 {
+  namespace
+  {
+    ///
+    /// \param[in] s the string to be converted.
+    /// \param[in] d what type should \a s be converted in?
+    /// \return the converted data.
+    ///
+    ///     convert("123.1", sym_double) == any(123.1f)
+    ///
+    any convert(const std::string &s, domain_t d)
+    {
+      switch (d)
+      {
+      case d_bool:  return   any(boost::lexical_cast<bool>(s));
+      case d_int:   return    any(boost::lexical_cast<int>(s));
+      case d_double:return any(boost::lexical_cast<double>(s));
+      case d_string:return                              any(s);
+      default: throw boost::bad_lexical_cast();
+      }
+    }  
+  }
+  
   ///
   /// New empty data instance.
   ///
@@ -433,25 +455,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] s the string to be converted.
-  /// \param[in] d what type should \a s be converted in?
-  /// \return the converted data.
-  ///
-  /// convert("123.1", sym_double) == double(123.1)
-  ///
-  data::example::value_t data::convert(const std::string &s, domain_t d)
-  {
-    switch (d)
-    {
-    case d_bool:  return   data::example::value_t(boost::lexical_cast<bool>(s));
-    case d_int:   return    data::example::value_t(boost::lexical_cast<int>(s));
-    case d_double:return data::example::value_t(boost::lexical_cast<double>(s));
-    case d_string:return                              data::example::value_t(s);
-    default: throw boost::bad_lexical_cast();
-    }
-  }
-
-  ///
   /// \param[in] s the string to be tested.
   /// \return \c true if \a s contains a number.
   ///
@@ -645,10 +648,12 @@ namespace vita
                 // Strings could be used as label for classes, but integers
                 // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
-                  instance.output = static_cast<int>(encode(value,
-                                                            &classes_map_));
+                  instance.output = encode(value, &classes_map_);
                 else
+                {
                   instance.output = convert(value, domain);
+                  instance.d_output = domain;
+                }
               }
               else  // input value
                 instance.input.push_back(convert(value, domain));
@@ -781,10 +786,12 @@ namespace vita
               else
               {
                 if (classification)
-                  instance.output = static_cast<int>(encode(value,
-                                                            &classes_map_));
+                  instance.output = encode(value, &classes_map_);
                 else
+                {
                   instance.output = convert(value, categories_[c].domain);
+                  instance.d_output = categories_[c].domain;
+                }
               }
             }
             else  // input value

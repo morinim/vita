@@ -106,7 +106,7 @@ namespace vita
       const any res((*f)(example));
       if (!res.empty() &&
           std::fabs(interpreter::to_double(res) -
-                    data::cast<double>(example.output)) <= float_epsilon)
+                    example.cast_output<double>()) <= float_epsilon)
         ++ok;
 
       ++total_nr;
@@ -142,7 +142,7 @@ namespace vita
   double mae_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals)
   {
-    const any res(agent.run(t));
+    const any res(agent.run(t.input));
 
     double err;
 
@@ -150,7 +150,7 @@ namespace vita
       err = std::pow(100.0, ++(*illegals));
     else
       err = std::fabs(interpreter::to_double(res) -
-                      data::cast<double>(t.output));
+                      t.cast_output<double>());
 
     if (err > float_epsilon)
       ++t.difficulty;
@@ -170,7 +170,7 @@ namespace vita
   double rmae_evaluator::error(src_interpreter &agent, data::example &t,
                                int *const)
   {
-    const any res(agent.run(t));
+    const any res(agent.run(t.input));
 
     double err;
 
@@ -179,7 +179,7 @@ namespace vita
     else
     {
       const double approx(interpreter::to_double(res));
-      const double target(data::cast<double>(t.output));
+      const double target(t.cast_output<double>());
 
       const double delta(std::fabs(target - approx));
 
@@ -217,13 +217,13 @@ namespace vita
   double mse_evaluator::error(src_interpreter &agent, data::example &t,
                               int *const illegals)
   {
-    const any res(agent.run(t));
+    const any res(agent.run(t.input));
     double err;
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
     else
     {
-      err = interpreter::to_double(res) - data::cast<double>(t.output);
+      err = interpreter::to_double(res) - t.cast_output<double>();
       err *= err;
     }
 
@@ -245,11 +245,11 @@ namespace vita
   double count_evaluator::error(src_interpreter &agent, data::example &t,
                                 int *const)
   {
-    const any res(agent.run(t));
+    const any res(agent.run(t.input));
 
     const bool err(res.empty() ||
                    std::fabs(interpreter::to_double(res) -
-                             data::cast<double>(t.output)) > float_epsilon);
+                             t.cast_output<double>()) > float_epsilon);
 
     if (err)
       ++t.difficulty;
@@ -407,7 +407,7 @@ namespace vita
 
     for (auto &example : *dat_)
     {
-      const any res(agent.run(example));
+      const any res(agent.run(example.input));
       const double val(res.empty() ? -1.0 : interpreter::to_double(res));
 
       if ((example.label() == 1 && val <= 0.0) ||

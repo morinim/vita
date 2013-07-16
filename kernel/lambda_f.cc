@@ -22,7 +22,7 @@ namespace vita
   ///
   any lambda_f::operator()(const data::example &e) const
   {
-    return any(src_interpreter(ind_).run(e));
+    return any(src_interpreter(ind_).run(e.input));
   }
 
   ///
@@ -119,7 +119,7 @@ namespace vita
     assert(ind.debug());
 
     src_interpreter agent(ind);
-    const any res(agent.run(e));
+    const any res(agent.run(e.input));
 
     const auto ns(slot_matrix.rows());
     const auto last_slot(ns - 1);
@@ -210,7 +210,7 @@ namespace vita
     // of the program outputs for those training examples for that class.
     for (const data::example &example : d)
     {
-      const any res(agent.run(example));
+      const any res(agent.run(example.input));
 
       double val(res.empty() ? 0.0 : interpreter::to_double(res));
       const double cut(10000000.0);
@@ -238,7 +238,7 @@ namespace vita
                                         const data::example &example,
                                         double *val, double *sum) const
   {
-    const any res(src_interpreter(ind).run(example));
+    const any res(src_interpreter(ind).run(example.input));
     const double x(res.empty() ? 0.0 : interpreter::to_double(res));
 
     double val_(0.0), val_sum_(0.0);
@@ -320,7 +320,7 @@ namespace vita
   ///
   any binary_lambda_f::operator()(const data::example &e) const
   {
-    const any res(src_interpreter(ind_).run(e));
+    const any res(src_interpreter(ind_).run(e.input));
     const double val(res.empty() ? -1.0 : interpreter::to_double(res));
 
     return any(val > 0.0 ? 1u : 0u);
