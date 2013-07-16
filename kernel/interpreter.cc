@@ -56,7 +56,7 @@ namespace vita
   ///
   /// \return the output value of the current terminal symbol.
   ///
-  any interpreter::get_const()
+  any interpreter::fetch_param()
   {
     const gene &g(ind_[ip_]);
 
@@ -77,7 +77,7 @@ namespace vita
   /// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
   /// * <http://en.wikipedia.org/wiki/Memoization>
   ///
-  any interpreter::get_arg(unsigned i)
+  any interpreter::fetch_arg(unsigned i)
   {
     const gene &g(ind_[ip_]);
 
@@ -93,10 +93,8 @@ namespace vita
       const locus backup(ip_);
       ip_ = l;
       assert(ip_.index > backup.index);
-      const any ret(ind_[ip_].sym->eval(this));
+      cache_(l) = ind_[ip_].sym->eval(this);
       ip_ = backup;
-
-      cache_(l) = ret;
     }
 #if !defined(NDEBUG)
     else // Cache not empty... checking if the cached value is right.
@@ -116,9 +114,9 @@ namespace vita
 
   ///
   /// \param[in] i i-th argument of the current ADF.
-  /// \return the value of the i-th argument of the curren ADF function.
+  /// \return the value of the i-th argument of the current ADF function.
   ///
-  any interpreter::get_adf_arg(unsigned i)
+  any interpreter::fetch_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
@@ -126,7 +124,7 @@ namespace vita
     assert(context_ && context_->debug() && i < gene::k_args &&
            (!context_g.sym->terminal() && context_g.sym->auto_defined()));
 #endif
-    return context_->get_arg(i);
+    return context_->fetch_arg(i);
   }
 
   ///

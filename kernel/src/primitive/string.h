@@ -37,16 +37,16 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const any v0(i->get_arg(0));
+        const any v0(i->fetch_arg(0));
         if (v0.empty())  return v0;
 
-        const any v1(i->get_arg(1));
+        const any v1(i->fetch_arg(1));
         if (v1.empty())  return v1;
 
         if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
-          return i->get_arg(2);
+          return i->fetch_arg(2);
         else
-          return i->get_arg(3);
+          return i->fetch_arg(3);
       }
     };
   }  // namespace str

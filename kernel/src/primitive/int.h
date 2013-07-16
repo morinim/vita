@@ -60,7 +60,7 @@ namespace vita
       { return boost::lexical_cast<std::string>(v); }
 
       any eval(interpreter *i) const
-      { return any(integer::cast(i->get_const())); }
+      { return any(integer::cast(i->fetch_param())); }
 
     private:  // Private data members.
       const int min, upp;
@@ -75,8 +75,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
           return any(std::numeric_limits<base_t>::max());
@@ -95,8 +95,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v0);
@@ -113,13 +113,13 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 == v1)
-          return i->get_arg(2);
+          return i->fetch_arg(2);
         else
-          return i->get_arg(3);
+          return i->fetch_arg(3);
       }
     };
 
@@ -131,13 +131,13 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < v1)
-          return i->get_arg(2);
+          return i->fetch_arg(2);
         else
-          return i->get_arg(3);
+          return i->fetch_arg(3);
       }
     };
 
@@ -148,12 +148,12 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
 
         if (v0 == 0)
-          return i->get_arg(1);
+          return i->fetch_arg(1);
         else
-          return i->get_arg(2);
+          return i->fetch_arg(2);
       }
     };
 
@@ -165,8 +165,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v1);
@@ -184,8 +184,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 > 0)
           if (v1 > 0)
@@ -226,8 +226,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 || v1 < 0 ||
             v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
@@ -246,8 +246,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->get_arg(0)));
-        const base_t v1(integer::cast(i->get_arg(1)));
+        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const base_t v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
           return any(std::numeric_limits<base_t>::min());

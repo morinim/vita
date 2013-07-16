@@ -40,7 +40,7 @@ namespace vita
     ///
     any eval(interpreter *i) const
     {
-      return static_cast<src_interpreter *>(i)->eval_var(var_);
+      return static_cast<src_interpreter *>(i)->fetch_var(var_);
     }
 
   private:  // Private data members.

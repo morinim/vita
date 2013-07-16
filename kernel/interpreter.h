@@ -28,17 +28,19 @@ namespace vita
     explicit interpreter(const individual &, interpreter *const = 0);
 
     any run();
-    any run(const locus &);
 
-    any get_const();
-    any get_arg(unsigned);
-    any get_adf_arg(unsigned);
+    any fetch_param();
+    any fetch_arg(unsigned);
+    any fetch_adf_arg(unsigned);
 
     bool debug() const;
 
     static double to_double(const any &);
     static std::string to_string(const any &);
 
+  private:  // Private methods.
+    any run(const locus &);
+  
   private:
     // Instruction pointer.
     locus ip_;
