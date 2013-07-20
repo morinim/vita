@@ -91,13 +91,13 @@ void population<T>::add_layer()
   assert(pop_.size());
   assert(pop_[0].size());
 
-  const auto *const e(&pop_[0][0].env());
-  const auto *const s(&pop_[0][0].sset());
+  const auto &e(pop_[0][0].env());
+  const auto &s(pop_[0][0].sset());
 
-  pop_.insert(pop_.begin(), std::vector<individual>());
-  pop_.front().reserve(e->individuals);
+  pop_.insert(pop_.begin(), layer_t());
+  pop_.front().reserve(e.individuals);
 
-  init_layer(0, e, s);
+  init_layer(0, &e, &s);
 }
 
 ///

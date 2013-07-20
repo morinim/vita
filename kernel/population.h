@@ -21,7 +21,6 @@
 
 namespace vita
 {
-  class individual;
   class symbol_set;
 
   ///
@@ -50,8 +49,8 @@ namespace vita
   class population
   {
   public:
-    typedef typename std::vector<std::vector<T>>::const_iterator
-      const_iterator;
+    typedef std::vector<T> layer_t;
+    typedef typename std::vector<layer_t>::const_iterator const_iterator;
 
     explicit population(const environment &, const symbol_set &);
 
@@ -82,7 +81,7 @@ namespace vita
     bool save(std::ostream &) const;
 
   private:  // Private data members.
-    std::vector<std::vector<T>> pop_;
+    std::vector<layer_t> pop_;
   };
 
 #include "kernel/population_inl.h"
