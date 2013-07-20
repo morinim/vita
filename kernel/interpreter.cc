@@ -15,7 +15,7 @@
 #include <boost/none.hpp>
 
 #include "kernel/interpreter.h"
-#include "kernel/adf.h"
+#include "kernel/function.h"
 #include "kernel/individual.h"
 
 namespace vita
@@ -25,7 +25,7 @@ namespace vita
   /// \param[in] ctx context in which we calculate the output value (used for
   ///                the evaluation of ADF).
   ///
-  interpreter::interpreter(const individual &ind, interpreter *const ctx)
+  interpreter::interpreter(const individual &ind, interpreter *ctx)
     : ip_(ind.best_), context_(ctx), ind_(ind),
       cache_(ind.size(), ind.sset().categories())
   {
@@ -74,8 +74,8 @@ namespace vita
   /// REFERENTIAL TRANSPARENCY for all the expressions.
   ///
   /// \see
-  /// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
-  /// * <http://en.wikipedia.org/wiki/Memoization>
+  /// * http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)
+  /// * http://en.wikipedia.org/wiki/Memoization
   ///
   any interpreter::fetch_arg(unsigned i)
   {
@@ -84,9 +84,9 @@ namespace vita
     assert(g.sym->arity());
     assert(i < g.sym->arity());
 
-    const function *const f(function::cast(g.sym));
+    const function &f(*function::cast(g.sym));
 
-    const locus l{g.args[i], f->arg_category(i)};
+    const locus l{g.args[i], f.arg_category(i)};
 
     if (!cache_(l))
     {

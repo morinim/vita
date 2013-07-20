@@ -25,7 +25,7 @@ namespace vita
   class interpreter
   {
   public:
-    explicit interpreter(const individual &, interpreter *const = 0);
+    explicit interpreter(const individual &, interpreter * = nullptr);
 
     any run();
 
