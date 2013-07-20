@@ -28,7 +28,7 @@ namespace vita
   ///
   /// The \c class \a gene is the building block for an \a individual.
   ///
-  template<size_t K = 4>
+  template<size_t K>
   class basic_gene
   {
   public:
@@ -51,7 +51,7 @@ namespace vita
     };
   };
 
-  typedef basic_gene<> gene;
+  using gene = basic_gene<4>;
 
 #include "kernel/gene_inl.h"
 }  // namespace vita

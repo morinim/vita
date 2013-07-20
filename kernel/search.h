@@ -28,9 +28,11 @@ namespace vita
   template<class T> class distribution;
 
   ///
+  /// \tparam ES the adopted evolution strategy.
+  ///
   /// This \c class drives the evolution.
   ///
-  template<class ES = basic_alps_es<individual>>
+  template<class ES>
   class basic_search
   {
   public:
@@ -61,7 +63,7 @@ namespace vita
     problem   *prob_;
   };
 
-  typedef basic_search<> search;
+  using search = basic_search<basic_alps_es<individual>>;
 
 #include "kernel/search_inl.h"
 }  // namespace vita

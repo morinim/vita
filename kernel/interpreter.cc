@@ -140,10 +140,10 @@ namespace vita
   /// \return the result of the conversion of \a a in a \c double.
   ///
   /// This function is useful for:
-  /// \li debugging purpose (otherwise comparison of \c any values is
-  ///     complex);
-  /// \li symbolic regression and classification task (the value returned by
-  ///     the interpeter will be used in a "numeric way").
+  /// * debugging purpose (otherwise comparison of \c any values is
+  ///   complex);
+  /// * symbolic regression and classification task (the value returned by
+  ///   the interpeter will be used in a "numeric way").
   ///
   double interpreter::to_double(const any &a)
   {
