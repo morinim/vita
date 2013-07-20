@@ -59,7 +59,7 @@ void basic_search<ES>::arl(const individual_t &base)
     }
 
     const size_t adf_args(0);
-    std::list<locus> blocks(base.blocks());
+    auto blocks(base.blocks());
     for (const locus &l : blocks)
     {
       individual_t candidate_block(base.get_block(l));

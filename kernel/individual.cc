@@ -180,9 +180,9 @@ namespace vita
   /// that are subsets of the active code. Indexes can be used by the
   /// individual::get_block function.
   ///
-  std::list<locus> individual::blocks() const
+  std::vector<locus> individual::blocks() const
   {
-    std::list<locus> bl;
+    std::vector<locus> bl;
 
     for (const_iterator i(*this); i(); ++i)
       if (genome_(i.l).sym->arity())

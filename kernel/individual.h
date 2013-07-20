@@ -17,7 +17,6 @@
 #include <cmath>
 #include <functional>
 #include <iomanip>
-#include <list>
 #include <set>
 
 #include "kernel/environment.h"
@@ -50,7 +49,7 @@ namespace vita
     { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
     unsigned mutation(double);
 
-    std::list<locus> blocks() const;
+    std::vector<locus> blocks() const;
     individual destroy_block(index_t) const;
     individual get_block(const locus &) const;
     individual replace(const gene &) const;
@@ -159,7 +158,7 @@ namespace vita
   individual uniform_crossover(const individual &, const individual &);
 
   ///
-  /// Iterato to scan the active genes of an \c individual.
+  /// Iterator to scan the active genes of an \c individual.
   ///
   class individual::const_iterator
   {
