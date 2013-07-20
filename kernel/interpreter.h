@@ -40,7 +40,7 @@ namespace vita
 
   private:  // Private methods.
     any run(const locus &);
-  
+
   private:
     // Instruction pointer.
     locus ip_;
