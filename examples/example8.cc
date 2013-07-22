@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<locus> bl(base.blocks());
+    auto bl(base.blocks());
     for (const locus &l : bl)
     {
       individual blk(base.get_block(l));
