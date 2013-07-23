@@ -32,5 +32,6 @@ using namespace boost;
 #include "test_src_constant.cc"
 #include "test_summary.cc"
 #include "test_symbol_set.cc"
+#include "test_team.cc"
 #include "test_terminal.cc"
 #include "test_ttable.cc"

@@ -88,6 +88,7 @@ namespace vita
     pt->put(env + "arl", arl);
     pt->put(env + "alps.age_gap", alps.age_gap);
     pt->put(env + "alps.p_same_layer", alps.p_same_layer);
+    pt->put(env + "team.size", team.size);
     pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
@@ -231,7 +232,17 @@ namespace vita
       if (!alps.age_gap)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Undefined age_gap parameter" << std::endl;
+          std::cerr << k_s_debug << " Undefined age_gap parameter"
+                    << std::endl;
+        return false;
+      }
+
+      if (!team.size)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined team size parameter"
+                    << std::endl;
+
         return false;
       }
     }  // if (force_defined)

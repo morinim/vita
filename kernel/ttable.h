@@ -43,6 +43,10 @@ namespace vita
     bool operator!=(hash_t h) const
     { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
+    /// Used to combine multiple hashes.
+    hash_t operator^=(hash_t h)
+    { data[0] ^= h.data[0]; data[1] ^= h.data[1]; return *this; }
+
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !data[0] && !data[1]; }
 

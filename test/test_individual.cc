@@ -142,28 +142,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
   }
 }
 
-BOOST_AUTO_TEST_CASE(Cross0)
-{
-  env.code_length = 100;
-
-  std::uint64_t diff(0), length(0);
-
-  const unsigned n(1000);
-  for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual i1(env, sset), i2(env, sset);
-    const vita::individual off(uniform_crossover(i1, i2));
-
-    diff += off.distance(i1);
-    length += i1.eff_size();
-  }
-
-  const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross1)
+BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
@@ -172,23 +151,7 @@ BOOST_AUTO_TEST_CASE(Cross1)
   const unsigned n(1000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(one_point_crossover(i1, i2));
-
-  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross2)
-{
-  env.code_length = 100;
-
-  vita::individual i1(env, sset), i2(env, sset);
-
-  const unsigned n(1000);
-  double dist(0.0);
-  for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(two_point_crossover(i1, i2));
+    dist += i1.distance(i1.crossover(i2));
 
   const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
@@ -202,7 +165,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
     std::stringstream ss;
     vita::individual i1(env, sset);
 
-    i1.age = vita::random::between(0, 1000);
+    const auto sup(vita::random::between(0u, 100u));
+    for (unsigned j(0); j < sup; ++j)
+      i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 

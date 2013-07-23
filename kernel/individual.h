@@ -60,7 +60,7 @@ namespace vita
 
     individual generalize(size_t, std::vector<locus> *const) const;
 
-    bool operator==(const individual &x) const;
+    bool operator==(const individual &) const;
     size_t distance(const individual &) const;
 
     hash_t signature() const;
@@ -122,7 +122,7 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private support functions.
+  private:  // Private support methods.
     template<class T = std::uint8_t> hash_t hash() const;
     template<class T> void pack(const locus &, std::vector<T> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
@@ -147,12 +147,7 @@ namespace vita
     const symbol_set  *sset_;
   };  // class individual
 
-
   std::ostream &operator<<(std::ostream &, const individual &);
-
-  individual one_point_crossover(const individual &, const individual &);
-  individual two_point_crossover(const individual &, const individual &);
-  individual uniform_crossover(const individual &, const individual &);
 
   ///
   /// Iterator to scan the active genes of an \c individual.
