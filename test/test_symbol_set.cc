@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(Distribution)
 {
   std::map<const vita::symbol *, unsigned> hist, weight;
 
-  const unsigned n(2000000);
+  const unsigned n(2e000000);
   for (unsigned i(0); i < n; ++i)
   {
     const vita::symbol *s(sset.roulette());
