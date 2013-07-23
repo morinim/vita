@@ -202,7 +202,7 @@ typename population<T>::const_iterator population<T>::end() const
 template<class T>
 bool population<T>::aged(coord c) const
 {
-  return pop_[c.layer][c.index].age > max_age(c.layer);
+  return pop_[c.layer][c.index].age() > max_age(c.layer);
 }
 
 ///
@@ -272,7 +272,7 @@ void population<T>::inc_age()
 {
   for (auto &l : pop_)
     for (auto &i : l)
-      ++i.age;
+      i.inc_age();
 }
 
 ///

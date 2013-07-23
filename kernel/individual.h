@@ -49,6 +49,8 @@ namespace vita
     { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
     unsigned mutation(double);
 
+    individual crossover(const individual &) const;
+
     std::vector<locus> blocks() const;
     individual destroy_block(index_t) const;
     individual get_block(const locus &) const;
@@ -62,6 +64,19 @@ namespace vita
     size_t distance(const individual &) const;
 
     hash_t signature() const;
+
+    /// This is a measure of how long an individual's family of genotypic
+    /// material has been in the population. Randomly generated individuals,
+    /// such as those that are created when the search algorithm are started,
+    /// start with an age of 0. Each generation that an individual stays in the
+    /// population (such as through elitism) its age is increased by one.
+    /// Individuals that are created through mutation or recombination take the
+    /// age of their oldest parent.
+    /// This differs from conventional measures of age, in which individuals
+    /// created through applying some type of variation to an existing
+    /// individual (e.g. mutation or recombination) start with an age of 0.
+    unsigned age() const { return age_; }
+    void inc_age() { ++age_; }
 
     const environment &env() const { return *env_; }
     const symbol_set &sset() const { return *sset_; }
@@ -107,26 +122,6 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  public:  // Public data members.
-    // Crossover implementation can be changed/selected at runtime by this
-    // polymorhic wrapper for function objects.
-    // std::function can be easily bound to function pointers, member function
-    // pointers, functors or anonymous (lambda) functions.
-    static std::function<individual (const individual &, const individual &)>
-      crossover;
-
-    /// This is a measure of how long an individual's family of genotypic
-    /// material has been in the population. Randomly generated individuals,
-    /// such as those that are created when the search algorithm are started,
-    /// start with an age of 0. Each generation that an individual stays in the
-    /// population (such as through elitism) its age is increased by one.
-    /// Individuals that are created through mutation or recombination take the
-    /// age of their oldest parent.
-    /// This differs from conventional measures of age, in which individuals
-    /// created through applying some type of variation to an existing
-    /// individual (e.g. mutation or recombination) start with an age of 0.
-    unsigned age;
-
   private:  // Private support functions.
     template<class T = std::uint8_t> hash_t hash() const;
     template<class T> void pack(const locus &, std::vector<T> *const) const;
@@ -145,6 +140,8 @@ namespace vita
     // Starting point of the active code in this individual (the best sequence
     // of genes is starting here).
     locus best_;
+
+    unsigned age_;
 
     const environment  *env_;
     const symbol_set  *sset_;
@@ -196,7 +193,7 @@ namespace vita
   private:
     const individual &ind_;
     std::set<locus>  loci_;
-  };
+  };  // class individual::const_iterator
 
   ///
   /// \example example1.cc

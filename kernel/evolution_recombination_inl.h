@@ -60,7 +60,7 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
 
   if (vita::random::boolean(*env.p_cross))
   {
-    T off(T::crossover(pop[r1], pop[r2]));
+    T off(pop[r1].crossover(pop[r2]));
     ++this->stats_->crossovers;
 
     // This could be an original contribution of Vita... but it's hard
@@ -83,7 +83,7 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
       unsigned i(0);
       do
       {
-        T tmp(T::crossover(pop[r1], pop[r2]));
+        T tmp(pop[r1].crossover(pop[r2]));
 
         while (pop[r1].signature() == tmp.signature() ||
                pop[r2].signature() == tmp.signature())

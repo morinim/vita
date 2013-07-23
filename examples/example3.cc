@@ -45,21 +45,11 @@ int main(int argc, char *argv[])
   i2.dump(std::cout);
   std::cout << std::endl;
 
-  std::cout << "OFFSPRING (UNIFORM CROSSOVER)" << std::endl
+  std::cout << "OFFSPRING" << std::endl
             << std::string(40, '-') << std::endl;
 
-  uniform_crossover(i1, i2).dump(std::cout);
+  i1.crossover(i2).dump(std::cout);
   std::cout << std::endl;
 
-  std::cout << "OFFSPRING (ONE POINT CROSSOVER)" << std::endl
-            << std::string(40, '-') << std::endl;
-
-  one_point_crossover(i1, i2).dump(std::cout);
-  std::cout << std::endl;
-
-  std::cout << "OFFSPRING (TWO POINTS CROSSOVER)" << std::endl
-            << std::string(40, '-') << std::endl;
-
-  two_point_crossover(i1, i2).dump(std::cout);
   return EXIT_SUCCESS;
 }

@@ -209,8 +209,8 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
       const coord c_x{layer, random::sup(p.individuals(layer))};
       const fitness_t f_x(this->eva_(p[c_x]));
 
-      if ((p[c_x].age > p[c_worst].age && p[c_x].age > max_age) ||
-          (p[c_worst].age <= max_age && p[c_x].age <= max_age &&
+      if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > max_age) ||
+          (p[c_worst].age() <= max_age && p[c_x].age() <= max_age &&
            f_x < f_worst))
       {
         c_worst = c_x;
@@ -218,8 +218,8 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
       }
     }
 
-    if ((incoming.age <= max_age && p[c_worst].age > max_age) ||
-        ((incoming.age <= max_age || p[c_worst].age > max_age) &&
+    if ((incoming.age() <= max_age && p[c_worst].age() > max_age) ||
+        ((incoming.age() <= max_age || p[c_worst].age() > max_age) &&
          this->eva_(incoming) >= f_worst))
     {
       if (layer + 1 < p.layers())

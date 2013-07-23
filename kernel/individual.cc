@@ -22,9 +22,6 @@
 
 namespace vita
 {
-  std::function<individual (const individual &, const individual &)>
-  individual::crossover(two_point_crossover);
-
   ///
   /// \param[in] e base environment.
   /// \param[in] sset a symbol set.
@@ -34,8 +31,8 @@ namespace vita
   /// constraints.
   ///
   individual::individual(const environment &e, const symbol_set &sset)
-    : age(0), genome_(e.code_length, sset.categories()),
-      signature_(), best_{0, 0}, env_(&e), sset_(&sset)
+    : genome_(e.code_length, sset.categories()),
+      signature_(), best_{0, 0}, age_(0), env_(&e), sset_(&sset)
   {
     assert(e.debug(true, true));
 
@@ -544,9 +541,10 @@ namespace vita
       return false;
     }
 
-    return
-      env_->debug(verbose, true) &&
-      (signature_.empty() || signature_ == hash());
+    if (!signature_.empty() && signature_ != hash())
+      return false;
+
+    return env_->debug(verbose, true);
   }
 
   ///
@@ -762,7 +760,7 @@ namespace vita
   ///
   bool individual::load(std::istream &in)
   {
-    decltype(age) t_age;
+    decltype(age_) t_age;
     if (!(in >> t_age))
       return false;
 
@@ -806,7 +804,7 @@ namespace vita
     if (best.index >= genome.rows())
       return false;
 
-    age = t_age;
+    age_ = t_age;
     best_ = best;
     genome_ = genome;
     signature_ = signature;
@@ -820,7 +818,7 @@ namespace vita
   ///
   bool individual::save(std::ostream &out) const
   {
-    out << age << ' ' << best_.index << ' ' << best_.category << std::endl;
+    out << age() << ' ' << best_.index << ' ' << best_.category << std::endl;
 
     out << genome_.rows() << ' ' << genome_.cols() << std::endl;
     for (const auto &g : genome_)
@@ -841,15 +839,15 @@ namespace vita
     return out.good() && signature_ok;
   }
 
+#if defined(UNIFORM_CROSSOVER)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
+  /// \param[in] p the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
   /// The i-th locus of the offspring has a 50% probability to be filled with
-  /// the i-th gene of \a p1 and 50% with i-th gene of \a p2. Parents must have
-  /// the same size.
+  /// the i-th gene of \a this and 50% with i-th gene of \a p. Parents must
+  /// have the same size.
   /// Uniform crossover, as the name suggests, is a GP operator inspired by the
   /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
   /// algorithms - Proceedings of the Third International Conference on Genetic
@@ -862,45 +860,43 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual uniform_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
+    assert(p.debug());
 
-    individual offspring(p1);
+    individual offspring(*this);
 
-    for (individual::const_iterator it(p1); it(); ++it)
+    for (individual::const_iterator it(*this); it(); ++it)
       if (random::boolean())
-        offspring.set(it.l, p2[it.l]);
+        offspring.set(it.l, p[it.l]);
 
 /*
-    const index_t cs(p1.size());
-    const category_t categories(p1.sset_->categories());
+    const index_t cs(size());
+    const category_t categories(sset()->categories());
 
-    assert(cs == p2.size());
-    assert(categories == p2.sset_->categories());
+    assert(cs == p.size());
+    assert(categories == p.sset()->categories());
 
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
         if (random::boolean())
         {
           const locus l{i,c};
-          offspring.set(l, p2[l]);
+          offspring.set(l, p[l]);
         }
 */
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug(true));
     return offspring;
   }
-
+#elif defined(ONE_POINT_CROSSOVER)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
+  /// \param[in] p the second parent.
   /// \return the result of the crossover (We only generate a single
   ///         offspring).
   ///
-  /// We randomly select a parent (between \a p1 and \a p2) and a single locus
+  /// We randomly select a parent (between \a this and \a p) and a single locus
   /// (common crossover point). The offspring is created with genes from the
   /// choosen parent up to the crossover point and genes from the other parent
   /// beyond that point.
@@ -909,18 +905,17 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual one_point_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
-    assert(p1.size() == p2.size());
+    assert(p.debug());
+    assert(size() == p.size());
 
-    const auto cs(p1.size());
-    const auto categories(p1.sset().categories());
+    const auto cs(size());
+    const auto categories(sset().categories());
 
     const auto cut(random::between<index_t>(1, cs - 1));
 
-    const individual *parents[2] = {&p1, &p2};
+    const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
     individual offspring(*parents[base]);
@@ -932,19 +927,18 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug());
     return offspring;
   }
-
+#else  // TWO_POINT_CROSSOVER (default)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
+  /// \param[in] p the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
-  /// We randomly select a parent (between \a p1 and \a p2) and a two loci
+  /// We randomly select a parent (between \a this and \a p2) and a two loci
   /// (common crossover points). The offspring is created with genes from the
   /// choosen parent before the first crossover point and after the second
   /// crossover point; genes between crossover points are taken from the other
@@ -953,19 +947,18 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual two_point_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
-    assert(p1.size() == p2.size());
+    assert(p.debug());
+    assert(size() == p.size());
 
-    const auto cs(p1.size());
-    const auto categories(p1.sset().categories());
+    const auto cs(size());
+    const auto categories(sset().categories());
 
     const auto cut1(random::sup(cs - 1));
     const auto cut2(random::between(cut1 + 1, cs));
 
-    const individual *parents[2] = {&p1, &p2};
+    const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
     individual offspring(*parents[base]);
@@ -977,9 +970,10 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug());
     return offspring;
   }
+#endif
 }  // Namespace vita

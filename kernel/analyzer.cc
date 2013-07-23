@@ -179,8 +179,8 @@ namespace vita
   ///
   void analyzer::add(const individual &ind, const fitness_t &f, unsigned l)
   {
-    age_.add(ind.age);
-    layer_stat_[l].age.add(ind.age);
+    age_.add(ind.age());
+    layer_stat_[l].age.add(ind.age());
 
     length_.add(count(ind));
 
