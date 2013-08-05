@@ -62,11 +62,11 @@ namespace vita
 
   ///
   /// \return the effective size of the individual.
-  /// \see size
+  /// \see size()
   ///
-  size_t individual::eff_size() const
+  unsigned individual::eff_size() const
   {
-    size_t ef(0);
+    unsigned ef(0);
 
     for (const_iterator it(*this); it(); ++it)
       ++ef;
@@ -337,12 +337,12 @@ namespace vita
   /// \return a numeric measurement of the difference between \a ind and
   /// \c this (the number of different genes between individuals).
   ///
-  size_t individual::distance(const individual &ind) const
+  unsigned individual::distance(const individual &ind) const
   {
     const index_t cs(size());
     const category_t categories(sset_->categories());
 
-    size_t d(0);
+    unsigned d(0);
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
       {

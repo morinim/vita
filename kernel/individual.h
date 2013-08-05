@@ -61,7 +61,7 @@ namespace vita
     individual generalize(size_t, std::vector<locus> *const) const;
 
     bool operator==(const individual &) const;
-    size_t distance(const individual &) const;
+    unsigned distance(const individual &) const;
 
     hash_t signature() const;
 
@@ -94,11 +94,11 @@ namespace vita
     ///
     /// The size is constant for any individual (it's choosen at initialization
     /// time).
-    /// \see eff_size
+    /// \see eff_size()
     ///
-    size_t size() const { return genome_.rows(); }
+    unsigned size() const { return genome_.rows(); }
 
-    size_t eff_size() const;
+    unsigned eff_size() const;
 
     category_t category() const;
 

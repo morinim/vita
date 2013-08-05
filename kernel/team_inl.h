@@ -27,7 +27,7 @@ team<T>::team(const environment &e, const symbol_set &sset) : signature_()
   assert(e.team.size);
 
   individuals_.reserve(e.team.size);
-  for (unsigned i(0); i < e.team.size; ++i)
+  for (decltype(e.team.size) i(0); i < e.team.size; ++i)
     individuals_.emplace_back(e, sset);
 
   assert(debug());
@@ -93,6 +93,39 @@ const T &team<T>::operator[](unsigned i) const
 }
 
 ///
+/// \return the total size of the team (effective size + introns).
+///
+/// The size is constant for any team (it's choosen at initialization time).
+/// \see eff_size()
+///
+template<class T>
+unsigned team<T>::size() const
+{
+  unsigned s(0);
+
+  for (const auto &i : individuals_)
+    s += i.size();
+
+  return s;
+}
+
+///
+/// \return the effective size of the team.
+/// \see size()
+///
+template<class T>
+unsigned team<T>::eff_size() const
+{
+  unsigned ef(0);
+
+  for (const auto &ind : individuals_)
+    for (typename T::const_iterator it(ind); it(); ++it)
+      ++ef;
+
+  return ef;
+}
+
+///
 /// \return the signature of \c this team.
 ///
 /// Signature maps syntactically distinct (but logically equivalent)
@@ -140,12 +173,40 @@ hash_t team<T>::hash() const
 template<class T>
 bool team<T>::operator==(const team<T> &x) const
 {
-  const unsigned sup(individuals_.size());
+  const auto sup(individuals_.size());
   for (unsigned i(0); i < sup; ++i)
     if (!(individuals_[i] == x[i]))
       return false;
 
   return true;
+}
+
+///
+/// \param[in] x a team to compare with \c this.
+/// \return a numeric measurement of the difference between \a x and \c this
+/// (the number of different genes between teams).
+///
+template<class T>
+unsigned team<T>::distance(const team<T> &x) const
+{
+  unsigned d(0);
+
+  const auto sup(individuals_.size());
+  for (unsigned i(0); i < sup; ++i)
+  {
+    const index_t cs(individuals_[i].size());
+    const category_t categories(sset().categories());
+
+    for (index_t j(0); j < cs; ++j)
+      for (category_t c(0); c < categories; ++c)
+      {
+        const locus l{j, c};
+        if (individuals_[i][l] != x[i][l])
+          ++d;
+      }
+  }
+
+  return d;
 }
 
 ///

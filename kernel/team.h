@@ -36,9 +36,13 @@ namespace vita
     const_iterator end() const;
     const T &operator[](unsigned) const;
 
+    unsigned size() const;
+    unsigned eff_size() const;
+
     hash_t signature() const;
 
     bool operator==(const team<T> &) const;
+    unsigned distance(const team<T> &) const;
 
     unsigned age() const;
 
