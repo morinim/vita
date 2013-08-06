@@ -233,9 +233,8 @@ namespace vita
     struct team_parameters
     {
       /// 0 is auto-tune;
-      /// 1 is for classic single-individual search;
       /// > 1 means team mode.
-      unsigned size = 1;
+      unsigned individuals = 4;
     } team;
 
     static const char arl_filename[];

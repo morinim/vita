@@ -29,6 +29,7 @@ namespace vita
     template<class T> static T sup(T);
 
     template<class T> static const T &element(const std::vector<T> &);
+    template<class T> static T &element(std::vector<T> &);
     template<class T> static const T &element(const std::set<T> &);
 
     static unsigned ring(unsigned, unsigned, unsigned);
@@ -137,6 +138,14 @@ namespace vita
   template<class T>
   inline
   const T &random::element(const std::vector<T> &vect)
+  {
+    assert(vect.size());
+    return vect[between<std::size_t>(0, vect.size())];
+  }
+
+  template<class T>
+  inline
+  T &random::element(std::vector<T> &vect)
   {
     assert(vect.size());
     return vect[between<std::size_t>(0, vect.size())];

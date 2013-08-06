@@ -88,7 +88,7 @@ namespace vita
     pt->put(env + "arl", arl);
     pt->put(env + "alps.age_gap", alps.age_gap);
     pt->put(env + "alps.p_same_layer", alps.p_same_layer);
-    pt->put(env + "team.size", team.size);
+    pt->put(env + "team.individuals", team.individuals);
     pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
@@ -237,7 +237,7 @@ namespace vita
         return false;
       }
 
-      if (!team.size)
+      if (!team.individuals)
       {
         if (verbose)
           std::cerr << k_s_debug << " Undefined team size parameter"

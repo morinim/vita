@@ -26,64 +26,15 @@ using namespace boost;
 #endif
 
 BOOST_FIXTURE_TEST_SUITE(team, F_FACTORY1)
-/*
-BOOST_AUTO_TEST_CASE(Compact)
-{
-  env.code_length = 100;
-
-  std::cout << env.sset << std::endl;
-
-  BOOST_TEST_CHECKPOINT("Functional equivalence.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::individual i1(env, true);
-    const vita::individual i2(i1.compact());
-
-    std::cout << i1 << std::endl << i2 << std::endl;
-    BOOST_REQUIRE(i1.debug(true));
-
-    const boost::any v1( (vita::interpreter(i1))() );
-    const boost::any v2( (vita::interpreter(i2))() );
-
-    BOOST_REQUIRE_EQUAL(v1.empty(), v2.empty());
-    if (!v1.empty() && !v2.empty())
-      BOOST_REQUIRE_EQUAL(vita::interpreter::to_string(v1),
-                          vita::interpreter::to_string(v2));
-  }
-
-  BOOST_TEST_CHECKPOINT("Not interleaved active symbols.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::individual ind(vita::individual(env, true).compact());
-
-    unsigned line(0), old_line(0);
-    for (vita::individual::const_iterator it(ind); it(); line = ++it)
-      if (line)
-      {
-        BOOST_REQUIRE_EQUAL(old_line, line-1);
-        ++old_line;
-      }
-  }
-
-  BOOST_TEST_CHECKPOINT("Same signature.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::individual i1(env, true);
-    const vita::individual i2(i1.compact());
-
-    BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
-  }
-}
-*/
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::team<vita::individual> t(env, sset);
-  const vita::team<vita::individual> orig(t);
+  vita::basic_team<vita::individual> t(env, sset);
+  const vita::basic_team<vita::individual> orig(t);
 
-  const unsigned n(2000);
+  const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   env.p_mutation = 0.0;
@@ -95,99 +46,62 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
   env.p_mutation = 0.5;
-  unsigned diff(0), length(0);
+  double diff(0.0), avg_length(0.0);
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::team<vita::individual> t1(t);
+    const vita::basic_team<vita::individual> t1(t);
 
     t.mutation();
     diff += t1.distance(t);
-    length += t1.eff_size();
+    avg_length += static_cast<double>(t1.eff_size()) / t1.individuals();
   }
 
-  const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  const double perc(100.0 * static_cast<double>(diff) / avg_length);
+  BOOST_CHECK_GT(perc, 48.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
-/*
+
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
   for (unsigned l(sset.categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
-    vita::individual i(env, sset);
+    vita::basic_team<vita::individual> i(env, sset);
     // std::cout << i << std::endl;
 
     BOOST_REQUIRE(i.debug());
-    BOOST_REQUIRE_EQUAL(i.size(), l);
+    BOOST_REQUIRE_EQUAL(i.size(), l * i.individuals());
   }
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
-    vita::individual a(env, sset);
+    vita::basic_team<vita::individual> a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
 
-    vita::individual b(a);
+    vita::basic_team<vita::individual> b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
-    vita::individual c(env, sset);
-    if (!(a.signature() == c.signature()))
+    vita::basic_team<vita::individual> c(env, sset);
+    if (a.signature() != c.signature())
       BOOST_REQUIRE_NE(a, c);
   }
 }
 
-BOOST_AUTO_TEST_CASE(Cross0)
+BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  std::uint64_t diff(0), length(0);
+  vita::basic_team<vita::individual> i1(env, sset), i2(env, sset);
 
-  const unsigned n(1000);
-  for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual i1(env, sset), i2(env, sset);
-    const vita::individual off(uniform_crossover(i1, i2));
-
-    diff += off.distance(i1);
-    length += i1.eff_size();
-  }
-
-  const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross1)
-{
-  env.code_length = 100;
-
-  vita::individual i1(env, sset), i2(env, sset);
-
-  const unsigned n(1000);
+  const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(one_point_crossover(i1, i2));
-
-  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross2)
-{
-  env.code_length = 100;
-
-  vita::individual i1(env, sset), i2(env, sset);
-
-  const unsigned n(1000);
-  double dist(0.0);
-  for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(two_point_crossover(i1, i2));
+    dist += i1.distance(i1.crossover(i2));
 
   const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
@@ -196,21 +110,23 @@ BOOST_AUTO_TEST_CASE(Cross2)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::individual i1(env, sset);
+    vita::basic_team<vita::individual> t1(env, sset);
 
-    i1.age = vita::random::between(0, 1000);
+    const auto sup(vita::random::between(0u, 100u));
+    for (unsigned j(0); j < sup; ++j)
+      t1.inc_age();
 
-    BOOST_REQUIRE(i1.save(ss));
+    BOOST_REQUIRE(t1.save(ss));
 
-    vita::individual i2(env, sset);
-    BOOST_REQUIRE(i2.load(ss));
-    BOOST_REQUIRE(i2.debug());
+    vita::basic_team<vita::individual> t2(env, sset);
+    BOOST_REQUIRE(t2.load(ss));
+    BOOST_REQUIRE(t2.debug());
 
-    BOOST_CHECK_EQUAL(i1, i2);
-    }
-}*/
+    BOOST_CHECK_EQUAL(t1, t2);
+  }
+}
 
 BOOST_AUTO_TEST_SUITE_END()

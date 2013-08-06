@@ -23,33 +23,40 @@ namespace vita
   ///        \a population.
   ///
   template<class T>
-  class team
+  class basic_team
   {
   public:
-    team(const environment &, const symbol_set &);
+    basic_team(const environment &, const symbol_set &);
 
     unsigned mutation();
     unsigned mutation(double);
+    basic_team<T> crossover(const basic_team<T> &) const;
 
     typedef typename std::vector<T>::const_iterator const_iterator;
     const_iterator begin() const;
     const_iterator end() const;
     const T &operator[](unsigned) const;
 
+    unsigned individuals() const;
     unsigned size() const;
     unsigned eff_size() const;
 
     hash_t signature() const;
 
-    bool operator==(const team<T> &) const;
-    unsigned distance(const team<T> &) const;
+    bool operator==(const basic_team<T> &) const;
+    unsigned distance(const basic_team<T> &) const;
 
     unsigned age() const;
+    void inc_age();
 
     const environment &env() const;
     const symbol_set &sset() const;
 
     bool debug(bool = true) const;
+
+  public:   // Serialization.
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
 
   private:  // Private support methods.
     hash_t hash() const;
@@ -60,7 +67,8 @@ namespace vita
     mutable hash_t signature_;
   };
 
-  template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
+  template<class T> std::ostream &operator<<(std::ostream &,
+                                             const basic_team<T> &);
 
 #include "team_inl.h"
 }  // namespace vita

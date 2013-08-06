@@ -64,6 +64,16 @@ namespace vita
   /// \return the effective size of the individual.
   /// \see size()
   ///
+  /// \note
+  /// eff_size() can be greater than size() when category() > 1. For instance
+  /// consider the following individual:
+  ///   [0, 1] FIFL 1 2 2 3
+  ///   [1, 0] "car"
+  ///   [2, 0] "plane"
+  ///   [2, 1] 10
+  ///   [3, 1] 20
+  /// size() == 4 but eff_size() == 5.
+  ///
   unsigned individual::eff_size() const
   {
     unsigned ef(0);
@@ -404,13 +414,13 @@ namespace vita
     static std::vector<T> packed;
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
-    //   std::vector<T> packed;
-    //   // static keyword and clear() call deleted.
+    //     std::vector<T> packed;
+    //     // static keyword and clear() call deleted.
 
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
-    const size_t len(packed.size() * sizeof(T));  // Length in bytes
+    const auto len(packed.size() * sizeof(T));  // Length in bytes
 
     return vita::hash(packed.data(), len, 1973);
   }
@@ -756,7 +766,7 @@ namespace vita
   ///
   /// \note
   /// If the load operation isn't successful the current individual isn't
-  /// changed.
+  /// modified.
   ///
   bool individual::load(std::istream &in)
   {
@@ -797,17 +807,16 @@ namespace vita
         genome(r, c) = g;
       }
 
-    decltype(signature_) signature;
-    if (!signature.load(in))
-      return false;
-
     if (best.index >= genome.rows())
       return false;
 
     age_ = t_age;
     best_ = best;
     genome_ = genome;
-    signature_ = signature;
+
+    // We don't save/load signature: it can be easily calculated on the fly.
+    signature_.clear();
+    // signature_ = hash();
 
     return true;
   }
@@ -834,9 +843,7 @@ namespace vita
       out << std::endl;
     }
 
-    const bool signature_ok(signature_.save(out));
-
-    return out.good() && signature_ok;
+    return out.good();
   }
 
 #if defined(UNIFORM_CROSSOVER)
@@ -864,7 +871,7 @@ namespace vita
   {
     assert(p.debug());
 
-    individual offspring(*this);
+    auto offspring(*this);
 
     for (individual::const_iterator it(*this); it(); ++it)
       if (random::boolean())
@@ -893,7 +900,7 @@ namespace vita
 #elif defined(ONE_POINT_CROSSOVER)
   ///
   /// \param[in] p the second parent.
-  /// \return the result of the crossover (We only generate a single
+  /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
   /// We randomly select a parent (between \a this and \a p) and a single locus
@@ -918,7 +925,7 @@ namespace vita
     const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
-    individual offspring(*parents[base]);
+    auto offspring(*parents[base]);
 
     for (index_t i(cut); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -961,7 +968,7 @@ namespace vita
     const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
-    individual offspring(*parents[base]);
+    auto offspring(*parents[base]);
 
     for (index_t i(cut1); i < cut2; ++i)
       for (category_t c(0); c < categories; ++c)

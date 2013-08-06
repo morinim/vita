@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   vita::individual ind(env, sset);
   const vita::individual orig(ind);
 
-  const unsigned n(2000);
+  const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   env.p_mutation = 0.0;
@@ -108,8 +108,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  BOOST_CHECK_GT(perc, 48.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
     vita::individual a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
     vita::individual c(env, sset);
-    if (!(a.signature() == c.signature()))
+    if (a.signature() != c.signature())
       BOOST_REQUIRE_NE(a, c);
   }
 }
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 
   vita::individual i1(env, sset), i2(env, sset);
 
-  const unsigned n(1000);
+  const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
     dist += i1.distance(i1.crossover(i2));
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
     vita::individual i1(env, sset);
