@@ -359,4 +359,22 @@ std::ostream &operator<<(std::ostream &s, const basic_team<T> &t)
     s << i << std::endl;
   return s;
 }
+
+///
+/// \param[out] s output stream.
+///
+/// The output stream contains a graph, described in dot language
+/// (http://www.graphviz.org), of \c this team.
+///
+template<class T>
+void basic_team<T>::graphviz(std::ostream &s) const
+{
+  s << "graph {";
+  for (unsigned i(0); i < individuals_.size(); ++i)
+    individuals_[i].graphviz(s,
+                             std::string("Individual ") +
+                             boost::lexical_cast<std::string>(i));
+
+    s << '}' << std::endl;
+}
 #endif  // TEAM_INL_H

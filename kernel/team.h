@@ -28,6 +28,8 @@ namespace vita
   public:
     basic_team(const environment &, const symbol_set &);
 
+    void graphviz(std::ostream &) const;
+
     unsigned mutation();
     unsigned mutation(double);
     basic_team<T> crossover(const basic_team<T> &) const;

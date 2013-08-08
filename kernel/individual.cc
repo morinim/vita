@@ -572,17 +572,16 @@ namespace vita
       s << "subgraph " << id;
     s << " {";
 
-    locus l(best_);
     for (const_iterator it(*this); it(); ++it)
     {
       const gene &g(*it);
 
       s << 'g' << it.l.index << '_' << it.l.category << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-        << ", shape=" << (g.sym->arity() ? "box" : "parallelogram") << "];";
+        << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << l.index << '_' << l.category << " -- g" << g.args[j]
+        s << 'g' << it.l.index << '_' << it.l.category << " -- g" << g.args[j]
           << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
