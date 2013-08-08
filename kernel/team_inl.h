@@ -377,4 +377,50 @@ void basic_team<T>::graphviz(std::ostream &s) const
 
     s << '}' << std::endl;
 }
+
+///
+/// \param[out] s output stream
+///
+/// The \a team is printed on a single line with symbols separated by
+/// spaces and individuals between curly braces.
+/// Not at all human readable, but a compact representation for import/export.
+///
+template<class T>
+void basic_team<T>::in_line(std::ostream &s) const
+{
+  for (const auto &i : individuals_)
+    s << '{' << i.in_line(s) << '}';
+}
+
+///
+/// \param[out] s output stream
+///
+/// Do you remember C=64 list? :-)
+///
+/// 10 PRINT "HOME"
+/// 20 PRINT "SWEET"
+/// 30 GOTO 10
+///
+template<class T>
+void basic_team<T>::list(std::ostream &s) const
+{
+  for (const auto &i : individuals_)
+  {
+    i.lists(s);
+    s << std::endl;
+  }
+}
+
+///
+/// \param[out] s output stream.
+///
+template<class T>
+void basic_team<T>::tree(std::ostream &s) const
+{
+  for (const auto &i : individuals_)
+  {
+    i.tree(s);
+    s << std::endl;
+  }
+}
 #endif  // TEAM_INL_H

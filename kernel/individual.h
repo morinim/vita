@@ -45,10 +45,10 @@ namespace vita
     void list(std::ostream &) const;
     void tree(std::ostream &) const;
 
+    // Recombination operators.
     unsigned mutation()
     { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
     unsigned mutation(double);
-
     individual crossover(const individual &) const;
 
     std::vector<locus> blocks() const;
