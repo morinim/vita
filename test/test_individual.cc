@@ -23,10 +23,10 @@
 
 using namespace boost;
 
-#include "factory_fixture1.h"
+#include "factory_fixture3.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(individual, F_FACTORY1)
+BOOST_FIXTURE_TEST_SUITE(individual, F_FACTORY3)
 /*
 BOOST_AUTO_TEST_CASE(Compact)
 {
@@ -165,8 +165,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     std::stringstream ss;
     vita::individual i1(env, sset);
 
-    const auto sup(vita::random::between(0u, 100u));
-    for (unsigned j(0); j < sup; ++j)
+    for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
@@ -179,4 +178,42 @@ BOOST_AUTO_TEST_CASE(Serialization)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Output)
+{
+  std::vector<vita::gene> g(
+  {
+    {{f_sub, {1, 2}}},  // [0] SUB 1,2
+    {{f_add, {3, 4}}},  // [1] ADD 3,4
+    {{f_add, {4, 3}}},  // [2] ADD 4,3
+    {{    x,   null}},  // [3] X
+    {{    y,   null}}   // [4] Y
+  });
+
+  vita::individual i(env, sset);
+  i.replace(g);
+
+  std::stringstream ss;
+
+  BOOST_TEST_CHECKPOINT("Inline output");
+  i.in_line(ss);
+  BOOST_CHECK_EQUAL(ss.str(), "FABS FSUB 3.0 -123.0");
+
+  BOOST_TEST_CHECKPOINT("Graphviz output");
+  // Typically to 'reset' a stringstream you need to both reset the underlying
+  // sequence to an empty string with str and to clear any fail and eof flags
+  // with clear.
+  ss.clear();
+  ss.str(std::string());
+
+  i.graphviz(ss);
+  BOOST_CHECK_EQUAL(ss.str(),
+                    "graph {" \
+                    "g0_0 [label=FABS, shape=box];" \
+                    "g0_0 -- g2_0;" \
+                    "g2_0 [label=FSUB, shape=box];" \
+                    "g2_0 -- g23_0;" \
+                    "g2_0 -- g15_0;" \
+                    "g15_0 [label=3.0, shape=circle];" \
+                    "g23_0 [label=-123.0, shape=circle];}");
+}
 BOOST_AUTO_TEST_SUITE_END()

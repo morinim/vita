@@ -115,8 +115,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     std::stringstream ss;
     vita::basic_team<vita::individual> t1(env, sset);
 
-    const auto sup(vita::random::between(0u, 100u));
-    for (unsigned j(0); j < sup; ++j)
+    for (auto j(vita::random::between(0u, 100u)); j; --j)
       t1.inc_age();
 
     BOOST_REQUIRE(t1.save(ss));
@@ -128,5 +127,4 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_CHECK_EQUAL(t1, t2);
   }
 }
-
 BOOST_AUTO_TEST_SUITE_END()

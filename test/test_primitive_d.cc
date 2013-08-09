@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{f_add, {3, 4}}},  // [1] ADD 3,4
     {{f_add, {4, 3}}},  // [2] ADD 4,3
     {{    x,   null}},  // [3] X
-    {{    y,   null}},  // [4] Y
+    {{    y,   null}}   // [4] Y
   };
   ret = interpreter(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);

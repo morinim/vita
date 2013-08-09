@@ -585,7 +585,7 @@ namespace vita
           << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
-    s << '}' << std::endl;
+    s << '}';
   }
 
   ///
