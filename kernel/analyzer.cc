@@ -144,9 +144,9 @@ namespace vita
       }
 
     unsigned length(0);
-    for (individual::const_iterator it(ind); it(); ++it)
+    for (const auto &l : ind)
     {
-      count(it->sym, true);
+      count(ind[l].sym, true);
       ++length;
     }
 

@@ -78,7 +78,7 @@ namespace vita
   {
     unsigned ef(0);
 
-    for (const_iterator it(*this); it(); ++it)
+    for (VARIABLE_IS_NOT_USED const auto &l : *this)
       ++ef;
 
     return ef;
@@ -140,18 +140,18 @@ namespace vita
     const auto sup(size() - 1);
 
     // Here mutation affects only exons.
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
       if (random::boolean(p))
       {
         ++n;
 
-        const auto i(it.l.index);
-        const auto c(it.l.category);
+        const auto i(l.index);
+        const auto c(l.category);
 
         if (i < sup)
-          set(it.l, gene(sset_->roulette(c), i + 1, size()));
+          set(l, gene(sset_->roulette(c), i + 1, size()));
         else
-          set(it.l, gene(sset_->roulette_terminal(c)));
+          set(l, gene(sset_->roulette_terminal(c)));
       }
 
 /*
@@ -191,9 +191,9 @@ namespace vita
   {
     std::vector<locus> bl;
 
-    for (const_iterator i(*this); i(); ++i)
-      if (genome_(i.l).sym->arity())
-        bl.push_back(i.l);
+    for (const auto &l : *this)
+      if (genome_(l).sym->arity())
+        bl.push_back(l);
 
     return bl;
   }
@@ -287,9 +287,9 @@ namespace vita
     std::vector<locus> terminals;
 
     // Step 1: mark the active terminal symbols.
-    for (const_iterator i(*this); i(); ++i)
-      if (genome_(i.l).sym->terminal())
-        terminals.push_back(i.l);
+    for (const auto &l : *this)
+      if (genome_(l).sym->terminal())
+        terminals.push_back(l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
     const size_t n(std::min(max_args, terminals.size()));
@@ -572,16 +572,16 @@ namespace vita
       s << "subgraph " << id;
     s << " {";
 
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
     {
-      const gene &g(*it);
+      const gene &g(genome_(l));
 
-      s << 'g' << it.l.index << '_' << it.l.category << " [label="
+      s << 'g' << l.index << '_' << l.category << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
         << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
-        s << 'g' << it.l.index << '_' << it.l.category << " -- g" << g.args[j]
+        s << 'g' << l.index << '_' << l.category << " -- g" << g.args[j]
           << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
@@ -597,11 +597,11 @@ namespace vita
   ///
   void individual::in_line(std::ostream &s) const
   {
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
     {
-      const gene &g(*it);
+      const gene &g(genome_(l));
 
-      if (it.l != best_)
+      if (l != best_)
         s << ' ';
       s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
     }
@@ -624,14 +624,14 @@ namespace vita
     const unsigned w2(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
 
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
     {
-      const gene &g(*it);
+      const gene &g(genome_(l));
 
-      s << '[' << std::setfill('0') << std::setw(w1) << it.l.index;
+      s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << it.l.category;
+        s << ", " << std::setw(w2) << l.category;
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
@@ -724,39 +724,6 @@ namespace vita
     ind.list(s);
 
     return s;
-  }
-
-  ///
-  /// \param[in] id
-  ///
-  individual::const_iterator::const_iterator(const individual &id)
-    : l(id.best_), ind_(id)
-  {
-    loci_.insert(l);
-  }
-
-  ///
-  /// \return locus of the next line containing an active symbol.
-  ///
-  const locus individual::const_iterator::operator++()
-  {
-    if (!loci_.empty())
-    {
-      loci_.erase(loci_.begin());
-
-      const gene &g(ind_.genome_(l));
-
-      for (size_t j(0); j < g.sym->arity(); ++j)
-      {
-        const locus l{g.args[j], function::cast(g.sym)->arg_category(j)};
-
-        loci_.insert(l);
-      }
-
-      l = *loci_.begin();
-    }
-
-    return l;
   }
 
   ///
@@ -980,6 +947,33 @@ namespace vita
 
     assert(offspring.debug());
     return offspring;
+  }
+
+  ///
+  /// \param[in] id an individual.
+  ///
+  individual::const_iterator::const_iterator(const individual &id) : ind_(&id)
+  {
+    loci_.insert(id.best_);
+  }
+
+  ///
+  /// \return locus of the next active symbol.
+  ///
+  std::set<locus>::iterator individual::const_iterator::operator++()
+  {
+    if (!loci_.empty())
+    {
+      const gene &g((*ind_)[*loci_.cbegin()]);
+
+      const auto arity(g.sym->arity());
+      for (unsigned j(0); j < arity; ++j)
+        loci_.insert({g.args[j], function::cast(g.sym)->arg_category(j)});
+
+      loci_.erase(loci_.begin());
+    }
+
+    return loci_.begin();
   }
 #endif
 }  // Namespace vita

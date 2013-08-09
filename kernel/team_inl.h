@@ -147,7 +147,7 @@ unsigned basic_team<T>::eff_size() const
   unsigned ef(0);
 
   for (const auto &ind : individuals_)
-    for (typename T::const_iterator it(ind); it(); ++it)
+    for (VARIABLE_IS_NOT_USED const auto &l : ind)
       ++ef;
 
   return ef;

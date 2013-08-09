@@ -97,8 +97,8 @@ namespace vita
   bool adf::debug() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym == this)
+    for (const auto &l : core_.code)
+      if (core_.code[l].sym == this)
         return false;
 
     return core_.debug() && function::debug();
@@ -157,8 +157,8 @@ namespace vita
   bool adt::debug() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym == this)
+    for (const auto &l : core_.code)
+      if (core_.code[l].sym == this)
         return false;
 
     return core_.debug() && terminal::debug();

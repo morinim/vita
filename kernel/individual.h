@@ -89,6 +89,10 @@ namespace vita
     ///
     const gene &operator[](const locus &l) const { return genome_(l); }
 
+    class const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
+
     ///
     /// \return the total size of the individual (effective size + introns).
     ///
@@ -115,7 +119,6 @@ namespace vita
       signature_.clear();
     }
 
-    class const_iterator;
     friend class interpreter;
 
   public:   // Serialization.
@@ -150,45 +153,75 @@ namespace vita
   std::ostream &operator<<(std::ostream &, const individual &);
 
   ///
-  /// Iterator to scan the active genes of an \c individual.
+  /// \brief Iterator to scan the active genes of an \c individual.
   ///
   class individual::const_iterator
   {
   public:
+    ///
+    /// \brief Builds an empty iterator.
+    ///
+    /// Empty iterator is used as sentry (it is the value returned by
+    /// individual::end()).
+    ///
+    const_iterator() : ind_(nullptr) {}
     explicit const_iterator(const individual &);
 
-    ///
-    /// \return \c false when the iterator reaches the end.
-    ///
-    bool operator()() const
-    { return l.index < ind_.size() && !loci_.empty(); }
-
-    const locus operator++();
+    std::set<locus>::iterator operator++();
 
     ///
-    /// \return reference to the current \a gene of the \a individual.
+    /// \param[in] i2 second term of comparison.
     ///
-    const gene &operator*() const
+    /// Returns \c true if iterators point to the same locus or they are both
+    /// empty.
+    ///
+    bool operator==(const const_iterator &i2) const
     {
-      assert(l.index < ind_.size());
-      return ind_.genome_(l);
+      return (loci_.begin() == loci_.end() &&
+              i2.loci_.begin() == i2.loci_.end()) ||
+             loci_.begin() == i2.loci_.begin();
+    }
+
+    bool operator!=(const const_iterator &i2) const
+    {
+      return !(*this == i2);
     }
 
     ///
-    /// \return pointer to the current \c gene of the \c individual.
+    /// \return reference to the current \a locus of the \a individual.
     ///
-    const gene *operator->() const
+    const locus &operator*() const
     {
-      assert(l.index < ind_.size());
-      return &ind_.genome_(l);
+      return *loci_.cbegin();
     }
 
-    locus l;
+    ///
+    /// \return pointer to the current \c locus of the \c individual.
+    ///
+    const locus *operator->() const
+    {
+      return &(*loci_.cbegin());
+    }
 
   private:
-    const individual &ind_;
+    // A partial set of active loci to be explored.
     std::set<locus>  loci_;
+
+    // A pointer to the individual we are iterating on.
+    const individual *const ind_;
   };  // class individual::const_iterator
+
+  ///
+  /// \return an iterator to the first active locus of the individual.
+  ///
+  inline individual::const_iterator individual::begin() const
+  { return individual::const_iterator(*this); }
+
+  ///
+  /// \return an iterator used as sentry value to stop a cycle.
+  ///
+  inline individual::const_iterator individual::end() const
+  { return individual::const_iterator(); }
 
   ///
   /// \example example1.cc
