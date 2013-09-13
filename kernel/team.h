@@ -14,6 +14,8 @@
 #if !defined(TEAM_H)
 #define      TEAM_H
 
+#include <boost/lexical_cast.hpp>
+
 #include "kernel/vita.h"
 
 namespace vita

@@ -205,7 +205,7 @@ namespace vita
 
   private:
     // A partial set of active loci to be explored.
-    std::set<locus>  loci_;
+    std::set<locus> loci_;
 
     // A pointer to the individual we are iterating on.
     const individual *const ind_;

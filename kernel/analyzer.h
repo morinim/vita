@@ -21,24 +21,28 @@
 #include "kernel/distribution.h"
 #include "kernel/individual.h"
 #include "kernel/symbol.h"
+#include "kernel/team.h"
 
 namespace vita
 {
   ///
-  /// \brief Analyzer takes a statistics snapshot of a set of individuals
+  /// \brief Analyzer takes a statistics snapshot of a population
+  ///
+  /// \tparam T type of the elements of the population (individuals).
   ///
   /// Procedure:
-  /// 1. the the set should be loaded adding (analyzer::add method) one
-  ///    invividual at time;
+  /// 1. the population set should be loaded adding (basic_analyzer::add
+  ///    method) one invividual at time;
   /// 2. statistics can be checked executing the desidered methods.
   ///
   /// Informations regard:
   /// * the set as a whole (analyzer::fit_dist, analyzer::length dist,
   ///   analyzer::functions, analyzer::terminals methods);
-  /// * symbols appearing in the set (accessed by analyzer::begin and
-  ///   analyzer::end methods).
+  /// * symbols appearing in the set (accessed via basic_analyzer::begin and
+  ///   basic_analyzer::end methods).
   ///
-  class analyzer
+  template<class T>
+  class basic_analyzer
   {
   public:
     struct sym_counter
@@ -52,15 +56,15 @@ namespace vita
 
     /// Type returned by \c begin() and \c end() methods to iterate through the
     /// statistics of the various symbols.
-    typedef std::map<const symbol *, sym_counter>::const_iterator
-    const_iterator;
+    typedef typename std::map<const symbol *, sym_counter>::const_iterator
+      const_iterator;
 
     const_iterator begin() const;
     const_iterator end() const;
 
-    analyzer();
+    basic_analyzer();
 
-    void add(const individual &, const fitness_t &, unsigned);
+    void add(const T &, const fitness_t &, unsigned);
 
     void clear();
 
@@ -77,7 +81,7 @@ namespace vita
     bool debug() const;
 
   private:  // Private support methods.
-    unsigned count(const individual &);
+    unsigned count(const T &);
     void count(const symbol *const, bool);
 
   private:  // Private data members.
@@ -96,7 +100,11 @@ namespace vita
 
     sym_counter functions_;
     sym_counter terminals_;
-  };  // class analyzer
+  };  // class basic_analyzer
+
+  using analyzer = basic_analyzer<individual>;
+
+#include "analyzer_inl.h"
 }  // namespace vita
 
 #endif  // ANALYZER_H
