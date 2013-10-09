@@ -259,8 +259,8 @@ void basic_search<ES>::tune_parameters()
   if (boost::indeterminate(constrained.elitism))
     env_.elitism = dflt.elitism;
 
-  if (!constrained.p_mutation)
-    env_.p_mutation = *dflt.p_mutation;
+  if (constrained.p_mutation >= 0.0)
+    env_.p_mutation = dflt.p_mutation;
 
   if (!constrained.p_cross)
     env_.p_cross = *dflt.p_cross;

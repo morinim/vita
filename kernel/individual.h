@@ -47,7 +47,7 @@ namespace vita
 
     // Recombination operators.
     unsigned mutation()
-    { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
+    { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
     individual crossover(const individual &) const;
 

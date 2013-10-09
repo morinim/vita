@@ -134,7 +134,7 @@ namespace vita
         return false;
       }
 
-      if (!p_mutation)
+      if (p_mutation < 0.0)
       {
         if (verbose)
           std::cerr << k_s_debug << " Undefined p_mutation data member"
@@ -262,7 +262,7 @@ namespace vita
       return false;
     }
 
-    if (p_mutation && (*p_mutation < 0.0 || *p_mutation > 1.0))
+    if (p_mutation > 1.0)
     {
       if (verbose)
         std::cerr << k_s_debug << " p_mutation out of range" << std::endl;

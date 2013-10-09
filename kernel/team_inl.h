@@ -45,8 +45,9 @@ basic_team<T>::basic_team(const environment &e, const symbol_set &sset)
 template<class T>
 unsigned basic_team<T>::mutation()
 {
-  assert(env().p_mutation);
-  return mutation(*env().p_mutation);
+  const auto p_mutation(env().p_mutation);
+  assert(p_mutation >= 0.0);
+  return mutation(p_mutation);
 }
 
 ///

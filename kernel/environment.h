@@ -92,16 +92,18 @@ namespace vita
     /// programs in the Genetic Programming algorithm. It causes random
     /// changes in individuals.
     ///
-    /// \note
+    /// \warning
     /// > p_cross + p_mutation != 1.0
     /// \a p_mutation is the probability to mutate a gene; it is not the
     /// probability to choose the the mutation operator (the latter is
     /// 1.0 - p_cross).
     ///
+    /// \note
+    /// A negative value means means undefined (auto-tune).
     /// \see
     /// * individual::mutation;
     /// * operation_strategy::run.
-    boost::optional<double> p_mutation;
+    double p_mutation;
 
     /// \brief Crossover probability.
     ///
