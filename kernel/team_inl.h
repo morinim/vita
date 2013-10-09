@@ -30,7 +30,7 @@ basic_team<T>::basic_team(const environment &e, const symbol_set &sset)
   const auto n(e.team.individuals);
   individuals_.reserve(n);
 
-  for (decltype(e.team.individuals) i(0); i < n; ++i)
+  for (auto i(decltype(n){0}); i < n; ++i)
     individuals_.emplace_back(e, sset);
 
   assert(debug());
@@ -369,13 +369,15 @@ std::ostream &operator<<(std::ostream &s, const basic_team<T> &t)
 template<class T>
 void basic_team<T>::graphviz(std::ostream &s) const
 {
+  const auto size(individuals_.size());
+
   s << "graph {";
-  for (unsigned i(0); i < individuals_.size(); ++i)
+  for (auto i(decltype(size){0}); i < size; ++i)
     individuals_[i].graphviz(s,
                              std::string("Individual ") +
                              boost::lexical_cast<std::string>(i));
 
-    s << '}' << std::endl;
+  s << '}' << std::endl;
 }
 
 ///
