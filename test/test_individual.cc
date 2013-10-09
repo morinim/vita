@@ -77,6 +77,21 @@ BOOST_AUTO_TEST_CASE(Compact)
 }
 */
 
+BOOST_AUTO_TEST_CASE(RandomCreation)
+{
+  BOOST_TEST_CHECKPOINT("Variable length random creation.");
+  for (unsigned l(sset.categories() + 2); l < 100; ++l)
+  {
+    env.code_length = l;
+    vita::individual i(env, sset);
+    // std::cout << i << std::endl;
+
+    BOOST_REQUIRE(i.debug());
+    BOOST_REQUIRE_EQUAL(i.size(), l);
+    BOOST_REQUIRE_EQUAL(i.age(), 0);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
@@ -110,20 +125,6 @@ BOOST_AUTO_TEST_CASE(Mutation)
   const double perc(100.0 * double(diff) / double(length));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
-}
-
-BOOST_AUTO_TEST_CASE(RandomCreation)
-{
-  BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(sset.categories() + 2); l < 100; ++l)
-  {
-    env.code_length = l;
-    vita::individual i(env, sset);
-    // std::cout << i << std::endl;
-
-    BOOST_REQUIRE(i.debug());
-    BOOST_REQUIRE_EQUAL(i.size(), l);
-  }
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
@@ -185,18 +186,17 @@ BOOST_AUTO_TEST_CASE(Output)
     {{f_sub, {1, 2}}},  // [0] SUB 1,2
     {{f_add, {3, 4}}},  // [1] ADD 3,4
     {{f_add, {4, 3}}},  // [2] ADD 4,3
-    {{    x,   null}},  // [3] X
-    {{    y,   null}}   // [4] Y
+    {{   c2,   null}},  // [3] 2.0
+    {{   c3,   null}}   // [4] 3.0
   });
 
-  vita::individual i(env, sset);
-  i.replace(g);
+  vita::individual i(vita::individual(env, sset).replace(g));
 
   std::stringstream ss;
 
   BOOST_TEST_CHECKPOINT("Inline output");
   i.in_line(ss);
-  BOOST_CHECK_EQUAL(ss.str(), "FABS FSUB 3.0 -123.0");
+  BOOST_CHECK_EQUAL(ss.str(), "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
 
   BOOST_TEST_CHECKPOINT("Graphviz output");
   // Typically to 'reset' a stringstream you need to both reset the underlying
@@ -208,12 +208,16 @@ BOOST_AUTO_TEST_CASE(Output)
   i.graphviz(ss);
   BOOST_CHECK_EQUAL(ss.str(),
                     "graph {" \
-                    "g0_0 [label=FABS, shape=box];" \
+                    "g0_0 [label=FSUB, shape=box];" \
+                    "g0_0 -- g1_0;" \
                     "g0_0 -- g2_0;" \
-                    "g2_0 [label=FSUB, shape=box];" \
-                    "g2_0 -- g23_0;" \
-                    "g2_0 -- g15_0;" \
-                    "g15_0 [label=3.0, shape=circle];" \
-                    "g23_0 [label=-123.0, shape=circle];}");
+                    "g1_0 [label=FADD, shape=box];" \
+                    "g1_0 -- g3_0;" \
+                    "g1_0 -- g4_0;" \
+                    "g2_0 [label=FADD, shape=box];" \
+                    "g2_0 -- g4_0;" \
+                    "g2_0 -- g3_0;" \
+                    "g3_0 [label=2.0, shape=circle];" \
+                    "g4_0 [label=3.0, shape=circle];}");
 }
 BOOST_AUTO_TEST_SUITE_END()

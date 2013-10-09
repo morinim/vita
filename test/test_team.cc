@@ -27,6 +27,21 @@ using namespace boost;
 
 BOOST_FIXTURE_TEST_SUITE(team, F_FACTORY1)
 
+BOOST_AUTO_TEST_CASE(RandomCreation)
+{
+  BOOST_TEST_CHECKPOINT("Variable length random creation.");
+  for (unsigned l(sset.categories() + 2); l < 100; ++l)
+  {
+    env.code_length = l;
+    vita::basic_team<vita::individual> t(env, sset);
+    // std::cout << t << std::endl;
+
+    BOOST_REQUIRE(t.debug());
+    BOOST_REQUIRE_EQUAL(t.size(), l * t.individuals());
+    BOOST_REQUIRE_EQUAL(t.age(), 0);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
@@ -62,20 +77,6 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_CHECK_LT(perc, 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(RandomCreation)
-{
-  BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(sset.categories() + 2); l < 100; ++l)
-  {
-    env.code_length = l;
-    vita::basic_team<vita::individual> i(env, sset);
-    // std::cout << i << std::endl;
-
-    BOOST_REQUIRE(i.debug());
-    BOOST_REQUIRE_EQUAL(i.size(), l * i.individuals());
-  }
-}
-
 BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
@@ -96,12 +97,12 @@ BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  vita::basic_team<vita::individual> i1(env, sset), i2(env, sset);
+  vita::basic_team<vita::individual> t1(env, sset), t2(env, sset);
 
   const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(i1.crossover(i2));
+    dist += t1.distance(t1.crossover(t2));
 
   const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);

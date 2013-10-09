@@ -590,6 +590,24 @@ namespace vita
 
   ///
   /// \param[out] s output stream
+  /// \param[in] l current locus
+  ///
+  /// Prints active genes of the individual visiting the genome in pre-order.
+  ///
+  void individual::in_line(std::ostream &s, const locus &l) const
+  {
+    const gene &g(genome_(l));
+
+    if (l != best_)
+      s << ' ';
+    s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+
+    for (unsigned i(0); i < g.sym->arity(); ++i)
+      in_line(s, {g.args[i], function::cast(g.sym)->arg_category(i)});
+  }
+
+  ///
+  /// \param[out] s output stream
   ///
   /// The \a individual is printed on a single line with symbols separated by
   /// spaces. Not at all human readable, but a compact representation for
@@ -597,14 +615,7 @@ namespace vita
   ///
   void individual::in_line(std::ostream &s) const
   {
-    for (const auto &l : *this)
-    {
-      const gene &g(genome_(l));
-
-      if (l != best_)
-        s << ' ';
-      s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
-    }
+    in_line(s, best_);
   }
 
   ///

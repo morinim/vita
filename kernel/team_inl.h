@@ -59,6 +59,7 @@ unsigned basic_team<T>::mutation()
 template<class T>
 unsigned basic_team<T>::mutation(double p)
 {
+  assert(p >= 0.0);
   return random::element(individuals_).mutation(p);
 }
 
@@ -203,7 +204,7 @@ template<class T>
 bool basic_team<T>::operator==(const basic_team<T> &x) const
 {
   const auto sup(individuals());
-  for (unsigned i(0); i < sup; ++i)
+  for (auto i(decltype(sup){0}); i < sup; ++i)
     if (!(individuals_[i] == x[i]))
       return false;
 
@@ -221,7 +222,7 @@ unsigned basic_team<T>::distance(const basic_team<T> &x) const
   unsigned d(0);
 
   const auto sup(individuals());
-  for (unsigned i(0); i < sup; ++i)
+  for (auto i(decltype(sup){0}); i < sup; ++i)
   {
     const index_t cs(individuals_[i].size());
     const category_t categories(sset().categories());
