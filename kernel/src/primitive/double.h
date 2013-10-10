@@ -408,6 +408,7 @@ namespace vita
     ///
     class sqrt : public function
     {
+    public:
       explicit sqrt(category_t t) : function("FSQRT", t, {t}) {}
 
       virtual any eval(interpreter *i) const

@@ -288,6 +288,44 @@ BOOST_AUTO_TEST_CASE(MUL)
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
 }
 
+BOOST_AUTO_TEST_CASE(SQRT)
+{
+  using namespace vita;
+  vita::individual i(env, sset);
+
+  BOOST_TEST_CHECKPOINT("SQRT(1) == 1");
+  std::vector<gene> g(
+  {
+    {{f_sqrt,  {1}}},  // [0] SQRT 1
+    {{    c1, null}}   // [1] 1
+  });
+  ret = interpreter(i.replace(g)).run();
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
+
+  BOOST_TEST_CHECKPOINT("SQRT(-X) == nan");
+  g =
+  {
+    {{f_sqrt,  {1}}},  // [0] SQRT 1
+    {{neg_x,  null}}   // [1] -X
+  };
+  ret = interpreter(i.replace(g)).run();
+  BOOST_REQUIRE_MESSAGE(ret.empty(), "\n" << i);
+
+  BOOST_TEST_CHECKPOINT("SQRT(Z) = std::sqrt(Z)");
+  g =
+  {
+    {{f_sqrt,  {1}}},  // [0] LN 1
+    {{     z, null}}   // [1] Z
+  };
+  for (unsigned j(0); j < 1000; ++j)
+  {
+    static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
+    ret = interpreter(i.replace(g)).run();
+    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
+                          std::sqrt(static_cast<Z *>(z)->val), "\n" << i);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;

@@ -53,6 +53,7 @@ struct F_FACTORY3
     f_ife = sset.insert(factory.make("FIFE", {}));
     f_ln = sset.insert(factory.make("FLN", {}));
     f_mul = sset.insert(factory.make("FMUL", {}));
+    f_sqrt = sset.insert(factory.make("FSQRT", {}));
     f_sub = sset.insert(factory.make("FSUB", {}));
 
     env.code_length = 32;
@@ -79,6 +80,7 @@ struct F_FACTORY3
   vita::symbol *f_ife;
   vita::symbol *f_ln;
   vita::symbol *f_mul;
+  vita::symbol *f_sqrt;
   vita::symbol *f_sub;
 
   vita::environment env;

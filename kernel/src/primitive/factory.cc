@@ -49,6 +49,7 @@ namespace vita
     register_symbol1<dbl::mul>   ("FMUL");
     register_symbol1<dbl::number>("REAL");
     register_symbol1<dbl::sin>   ("FSIN");
+    register_symbol1<dbl::sqrt>  ("FSQRT");
     register_symbol1<dbl::sub>   ("FSUB");
 
     register_symbol1<integer::add>   ("ADD");
