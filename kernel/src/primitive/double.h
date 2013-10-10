@@ -322,6 +322,7 @@ namespace vita
     ///
     class max : public function
     {
+    public:
       explicit max(category_t t) : function("FMAX", t, {t, t}) {}
 
       virtual any eval(interpreter *i) const

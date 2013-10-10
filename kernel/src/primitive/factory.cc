@@ -45,6 +45,7 @@ namespace vita
     register_symbol1<dbl::ifz>   ("FIFZ");
     register_symbol2<dbl::length>("FLENGTH");
     register_symbol1<dbl::ln>    ("FLN");
+    register_symbol1<dbl::max>   ("FMAX");
     register_symbol1<dbl::mod>   ("FMOD");
     register_symbol1<dbl::mul>   ("FMUL");
     register_symbol1<dbl::number>("REAL");

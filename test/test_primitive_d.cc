@@ -249,6 +249,32 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
 }
 
+BOOST_AUTO_TEST_CASE(MAX)
+{
+  using namespace vita;
+  vita::individual i(env, sset);
+
+  BOOST_TEST_CHECKPOINT("MAX(0,0) == 0");
+  std::vector<gene> g(
+  {
+    {{f_max, {1, 2}}},  // [0] MAX 1, 2
+    {{   c0,   null}},  // [1] 0
+    {{   c0,   null}}   // [2] 0
+  });
+  ret = interpreter(i.replace(g)).run();
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+
+  BOOST_TEST_CHECKPOINT("MAX(0,1) == 1");
+  g =
+  {
+    {{f_max, {1, 2}}},  // [0] MAX 1, 2
+    {{   c0,   null}},  // [1] 0
+    {{   c1,   null}}   // [2] 1
+  };
+  ret = interpreter(i.replace(g)).run();
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);
+}
+
 BOOST_AUTO_TEST_CASE(MUL)
 {
   using namespace vita;
