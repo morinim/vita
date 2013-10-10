@@ -54,6 +54,7 @@ namespace vita
     std::vector<locus> blocks() const;
     individual destroy_block(index_t) const;
     individual get_block(const locus &) const;
+
     individual replace(const gene &) const;
     individual replace(const locus &, const gene &) const;
     individual replace(const std::vector<gene> &) const;

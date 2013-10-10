@@ -211,8 +211,9 @@ template<class T>
 unsigned basic_analyzer<T>::count(const T &t)
 {
   unsigned length(0);
-  for (unsigned i(0); i < t.individuals(); ++i)
-    length += count(t[i]);
+
+  while (auto i{t.individuals()})
+    length += count(t[--i]);
 
   return length;
 }
