@@ -75,8 +75,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
           return any(std::numeric_limits<base_t>::max());
@@ -95,10 +95,11 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+        if (v1 == 0 ||
+            (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v0);
         else
           return any(v0 / v1);
@@ -113,8 +114,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 == v1)
           return i->fetch_arg(2);
@@ -131,8 +132,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < v1)
           return i->fetch_arg(2);
@@ -148,7 +149,7 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
 
         if (v0 == 0)
           return i->fetch_arg(1);
@@ -165,10 +166,11 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+        if (v1 == 0 ||
+            (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v1);
         else
           return any(v0 % v1);
@@ -184,9 +186,24 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        static_assert(sizeof(long long) >= 2 * sizeof(base_t),
+                      "Unable to detect overflow after multiplication");
 
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
+
+        long long tmp(v0 * v1);
+        if (tmp > std::numeric_limits<base_t>::max())
+          return any(std::numeric_limits<base_t>::max());
+        if (tmp < std::numeric_limits<base_t>::min())
+          return any(std::numeric_limits<base_t>::min());
+
+        return any(static_cast<base_t>(tmp));
+
+        /*
+        // On systems where the above relationship does not hold, the following
+        // compliant solution may be used to ensure signed overflow does not
+        // occur.
         if (v0 > 0)
           if (v1 > 0)
           {
@@ -194,7 +211,7 @@ namespace vita
             if (v0 > std::numeric_limits<base_t>::max() / v1)
               return any(std::numeric_limits<base_t>::max());
           }
-          else  // v1 is non-positive
+          else  // v0 is positive, v1 is non-positive
           {
             assert(v0 > 0 && v1 <= 0);
             if (v1 < std::numeric_limits<base_t>::min() / v0)
@@ -207,7 +224,7 @@ namespace vita
             if (v0 < std::numeric_limits<base_t>::min() / v1)
               return any(std::numeric_limits<base_t>::min());
           }
-          else  // v1 is non-positive
+          else  // v0 is non-positive, v1 is non-positive
           {
             assert(v0 <= 0 && v1 <= 0);
             if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
@@ -215,6 +232,7 @@ namespace vita
           }
 
         return any(v0 * v1);
+        */
       }
     };
 
@@ -226,8 +244,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 || v1 < 0 ||
             v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
@@ -246,8 +264,8 @@ namespace vita
 
       any eval(interpreter *i) const
       {
-        const base_t v0(integer::cast(i->fetch_arg(0)));
-        const base_t v1(integer::cast(i->fetch_arg(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
           return any(std::numeric_limits<base_t>::min());
