@@ -85,10 +85,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->fetch_arg(0));
-        if (ev.empty())  return ev;
+        const any a(i->fetch_arg(0));
+        if (a.empty())  return a;
 
-        return any(std::fabs(dbl::cast(ev)));
+        return any(std::fabs(dbl::cast(a)));
       }
     };
 
@@ -103,13 +103,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(dbl::cast(ev0) + dbl::cast(ev1));
+        const base_t ret(dbl::cast(a0) + dbl::cast(a1));
         if (std::isinf(ret))  return any();
 
         return any(ret);
@@ -126,13 +126,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(dbl::cast(ev0) / dbl::cast(ev1));
+        const base_t ret(dbl::cast(a0) / dbl::cast(a1));
         if (!std::isfinite(ret))  return any();
 
         return any(ret);
@@ -149,13 +149,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(std::floor(dbl::cast(ev0) / dbl::cast(ev1)));
+        const base_t ret(std::floor(dbl::cast(a0) / dbl::cast(a1)));
         if (!std::isfinite(ret))  return any();
 
         return any(ret);
@@ -176,18 +176,18 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const any ev2(i->fetch_arg(2));
-        if (ev2.empty())  return ev2;
+        const any a2(i->fetch_arg(2));
+        if (a2.empty())  return a2;
 
-        const auto v0(dbl::cast(ev0));
-        const auto v1(dbl::cast(ev1));
-        const auto v2(dbl::cast(ev2));
+        const auto v0(dbl::cast(a0));
+        const auto v1(dbl::cast(a1));
+        const auto v2(dbl::cast(a2));
 
         const auto min(std::fmin(v1, v2));
         const auto max(std::fmax(v1, v2));
@@ -210,13 +210,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const auto cmp(std::fabs(dbl::cast(ev0) - dbl::cast(ev1)));
+        const auto cmp(std::fabs(dbl::cast(a0) - dbl::cast(a1)));
 
         if (cmp < float_epsilon)
           return i->fetch_arg(2);
@@ -236,13 +236,14 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        if (dbl::cast(ev0) < dbl::cast(ev1))
+        const auto v0(dbl::cast(a0)), v1(dbl::cast(a1));
+        if (std::isless(v0, v1))
           return i->fetch_arg(2);
         else
           return i->fetch_arg(3);
@@ -259,10 +260,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        if (std::fabs(dbl::cast(ev0)) < float_epsilon)
+        if (std::fabs(dbl::cast(a0)) < float_epsilon)
           return i->fetch_arg(1);
         else
           return i->fetch_arg(2);
@@ -280,10 +281,10 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->fetch_arg(0));
-        if (ev.empty())  return ev;
+        const any a(i->fetch_arg(0));
+        if (a.empty())  return a;
 
-        return any(static_cast<base_t>(any_cast<std::string>(ev).size()));
+        return any(static_cast<base_t>(any_cast<std::string>(a).size()));
       }
     };
 
@@ -302,10 +303,10 @@ namespace vita
       ///
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const base_t ret(std::log(dbl::cast(ev0)));
+        const base_t ret(std::log(dbl::cast(a0)));
         if (!std::isfinite(ret))  return any();
 
         return any(ret);
@@ -322,13 +323,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(std::fmod(dbl::cast(ev0), dbl::cast(ev1)));
+        const base_t ret(std::fmod(dbl::cast(a0), dbl::cast(a1)));
         if (!std::isfinite(ret))  return any();
 
         return any(ret);
@@ -346,13 +347,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(dbl::cast(ev0) * dbl::cast(ev1));
+        const base_t ret(dbl::cast(a0) * dbl::cast(a1));
         if (std::isinf(ret))  return any();
 
         return any(ret);
@@ -369,10 +370,30 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev(i->fetch_arg(0));
-        if (ev.empty())  return ev;
+        const any a(i->fetch_arg(0));
+        if (a.empty())  return a;
 
-        return any(std::sin(dbl::cast(ev)));
+        return any(std::sin(dbl::cast(a)));
+      }
+    };
+
+    ///
+    /// \brief square root of a real number
+    ///
+    class sqrt : public function
+    {
+      explicit sqrt(category_t t) : function("SQRT", t, {t}) {}
+
+      virtual any eval(interpreter *i) const
+      {
+        const any a(i->fetch_arg(0));
+        if (a.empty())  return a;
+
+        const auto v(dbl::cast(a));
+        if (std::isless(v, 0.0))
+          return any();
+
+        return any(std::sqrt(v));
       }
     };
 
@@ -386,13 +407,13 @@ namespace vita
 
       virtual any eval(interpreter *i) const
       {
-        const any ev0(i->fetch_arg(0));
-        if (ev0.empty())  return ev0;
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
 
-        const any ev1(i->fetch_arg(1));
-        if (ev1.empty())  return ev1;
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
 
-        const base_t ret(dbl::cast(ev0) - dbl::cast(ev1));
+        const base_t ret(dbl::cast(a0) - dbl::cast(a1));
         if (std::isinf(ret))  return any();
 
         return any(ret);
