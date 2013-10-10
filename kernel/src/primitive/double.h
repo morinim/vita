@@ -247,6 +247,10 @@ namespace vita
           return i->fetch_arg(2);
         else
           return i->fetch_arg(3);
+
+        // If one or both arguments of isless are Nan, the function returns
+        // false, but no FE_INVALID exception is raised (note that the
+        // expression v0 < v1 may rais an exception in this case).
       }
     };
 
@@ -307,6 +311,28 @@ namespace vita
         if (a0.empty())  return a0;
 
         const base_t ret(std::log(dbl::cast(a0)));
+        if (!std::isfinite(ret))  return any();
+
+        return any(ret);
+      }
+    };
+
+    ///
+    /// \brief The larger of two floating point values
+    ///
+    class max : public function
+    {
+      explicit max(category_t t) : function("FMAX", t, {t, t}) {}
+
+      virtual any eval(interpreter *i) const
+      {
+        const any a0(i->fetch_arg(0));
+        if (a0.empty())  return a0;
+
+        const any a1(i->fetch_arg(1));
+        if (a1.empty())  return a1;
+
+        const base_t ret(std::fmax(dbl::cast(a0), dbl::cast(a1)));
         if (!std::isfinite(ret))  return any();
 
         return any(ret);
@@ -382,7 +408,7 @@ namespace vita
     ///
     class sqrt : public function
     {
-      explicit sqrt(category_t t) : function("SQRT", t, {t}) {}
+      explicit sqrt(category_t t) : function("FSQRT", t, {t}) {}
 
       virtual any eval(interpreter *i) const
       {
