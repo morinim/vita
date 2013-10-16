@@ -33,7 +33,7 @@ fitness_t basic_search<ES>::fitness(const individual_t &ind)
 }
 
 ///
-/// \param[in] base \a individual in which we are looking for building blocks.
+/// \param[in] base \a individual we are examining to extract building blocks.
 ///
 /// Adaptive Representation through Learning (ARL). The algorithm extract
 /// common knowledge (building blocks) emerging during the evolutionary
@@ -44,41 +44,48 @@ template<class ES>
 void basic_search<ES>::arl(const individual_t &base)
 {
   const auto base_fit(fitness(base));
-  if (base_fit.isfinite())
+  if (!base_fit.isfinite())
+    return;  // We need a finite fitness to search for an improvement
+
+  // Logs ADFs
+  const auto filename(env_.stat_dir + "/" + environment::arl_filename);
+  std::ofstream log(filename.c_str(), std::ios_base::app);
+  if (env_.stat_arl && log.good())
   {
-    const auto filename(env_.stat_dir + "/" + environment::arl_filename);
-    std::ofstream log(filename.c_str(), std::ios_base::app);
-    if (env_.stat_arl && log.good())
+    for (unsigned i(0); i < prob_->sset.adts(); ++i)
     {
-      for (unsigned i(0); i < prob_->sset.adts(); ++i)
-      {
-        const symbol &f(*prob_->sset.get_adt(i));
-        log << f.display() << ' ' << f.weight << std::endl;
-      }
-      log << std::endl;
+      const symbol &f(*prob_->sset.get_adt(i));
+      log << f.display() << ' ' << f.weight << std::endl;
     }
+    log << std::endl;
+  }
 
-    const size_t adf_args(0);
-    auto blocks(base.blocks());
-    for (const locus &l : blocks)
+  const unsigned adf_args(0);
+  auto blk_idx(base.blocks());
+  for (const locus &l : blk_idx)
+  {
+    individual_t candidate_block(base.get_block(l));
+
+    // Building blocks must be simple.
+    if (candidate_block.eff_size() <= 5 + adf_args)
     {
-      individual_t candidate_block(base.get_block(l));
+      // This is an approximation of the fitness due to the current block.
+      // The idea is to see how the individual (base) would perform without
+      // (base.destroy_block) the current block.
+      // Useful blocks have delta values greater than 0.
+      const auto delta(base_fit[0] -
+                       fitness(base.destroy_block(l.index))[0]);
 
-      // Building blocks must be simple.
-      if (candidate_block.eff_size() <= 5 + adf_args)
+      // Semantic introns cannot be building blocks...
+      // When delta is greater than 10% of the base fitness we have a
+      // building block.
+      if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
       {
-        const auto d_f(
-          base_fit[0] - fitness(base.destroy_block(l.index))[0]);
-
-        // Semantic introns cannot be building blocks.
-        if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
-        {
           std::unique_ptr<symbol> p;
           if (adf_args)
           {
             std::vector<locus> replaced;
-            individual_t generalized(
-              candidate_block.generalize(adf_args, &replaced));
+            auto generalized(candidate_block.generalize(adf_args, &replaced));
             std::vector<category_t> categories(replaced.size());
             for (unsigned j(0); j < replaced.size(); ++j)
               categories[j] = replaced[j].category;
@@ -91,8 +98,8 @@ void basic_search<ES>::arl(const individual_t &base)
           if (env_.stat_arl && log.good())
           {
             log << p->display() << " (Base: " << base_fit
-                << "  DF: " << d_f
-                << "  Weight: " << std::fabs(d_f / base_fit[0]) * 100.0
+                << "  DF: " << delta
+                << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
                 << "%)" << std::endl;
             candidate_block.list(log);
             log << std::endl;
@@ -102,7 +109,6 @@ void basic_search<ES>::arl(const individual_t &base)
         }
       }
     }
-  }
 }
 
 ///

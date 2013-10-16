@@ -204,6 +204,7 @@ BOOST_AUTO_TEST_CASE(Blocks)
       auto blk(base.get_block(l));
 
       BOOST_REQUIRE_GT(blk.eff_size(), 1);
+      BOOST_REQUIRE_GT(blk[l].sym->arity(), 0);
     }
   }
 }
