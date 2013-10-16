@@ -54,12 +54,13 @@ unsigned basic_team<T>::mutation()
 /// \param[in] p probability of gene mutation.
 /// \return number of mutations performed.
 ///
-/// A new team is created mutating \c this.
+/// Mutates a random individual in \c this team and returns the resulting new
+/// team.
 ///
 template<class T>
 unsigned basic_team<T>::mutation(double p)
 {
-  assert(p >= 0.0);
+  assert(0.0 <= p && p <= 1.0);
   return random::element(individuals_).mutation(p);
 }
 

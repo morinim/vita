@@ -49,6 +49,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
   vita::basic_team<vita::individual> t(env, sset);
   const vita::basic_team<vita::individual> orig(t);
 
+  BOOST_REQUIRE_GT(t.individuals(), 0);
+
   const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
@@ -68,13 +70,22 @@ BOOST_AUTO_TEST_CASE(Mutation)
     const vita::basic_team<vita::individual> t1(t);
 
     t.mutation();
+
+    unsigned j(0);
+    while (j < t1.individuals() && t[j] == t1[j])
+      ++j;
+    if (j == t1.individuals())
+      j = vita:: random::between(0u, j);
+
+    BOOST_REQUIRE_EQUAL(t1[j].distance(t[j]), t1.distance(t));
+
     diff += t1.distance(t);
     avg_length += static_cast<double>(t1.eff_size()) / t1.individuals();
   }
 
-  const double perc(100.0 * static_cast<double>(diff) / avg_length);
+  const double perc(100.0 * diff / avg_length);
   BOOST_CHECK_GT(perc, 48.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  BOOST_CHECK_LT(perc, 51.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
