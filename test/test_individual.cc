@@ -179,6 +179,35 @@ BOOST_AUTO_TEST_CASE(Serialization)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Blocks)
+{
+  const unsigned n(1000);
+
+  for (unsigned k(0); k < n; ++k)
+  {
+    // We build, by repeated trials, an individual with an effective size
+    // greater than 4.
+    vita::individual base(env, sset);
+    auto base_es(base.eff_size());
+    while (base_es < 5)
+    {
+      base = vita::individual(env, sset);
+      base_es = base.eff_size();
+    }
+
+    auto blk_idx(base.blocks());
+
+    BOOST_REQUIRE_GT(blk_idx.size(), 0);
+
+    for (const auto &l : blk_idx)
+    {
+      auto blk(base.get_block(l));
+
+      BOOST_REQUIRE_GT(blk.eff_size(), 1);
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Output)
 {
   std::vector<vita::gene> g(

@@ -183,9 +183,13 @@ namespace vita
   ///
   /// \return a list of loci referring to active symbols.
   ///
-  /// The function extract from the individual a list of indexes to blocks
-  /// that are subsets of the active code. Indexes can be used by the
-  /// individual::get_block function.
+  /// The function calculates a set of indexes to blocks contained in \c this
+  /// individual.
+  ///
+  /// Indexes can be used by the individual::get_block function.
+  ///
+  /// \note
+  /// A block is a subset of the active code composed of, at least, a function.
   ///
   std::vector<locus> individual::blocks() const
   {

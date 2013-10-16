@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
     individual base(env, sset);
-    size_t base_es(base.eff_size());
+    auto base_es(base.eff_size());
     while (base_es < 5)
     {
       base = individual(env, sset);

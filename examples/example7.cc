@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   for (unsigned k(0); k < n; ++k)
   {
     individual base(env, sset);
-    unsigned base_es(base.eff_size());
+    auto base_es(base.eff_size());
     while (base_es < 5)
     {
       base = individual(env, sset);
