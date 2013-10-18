@@ -117,7 +117,8 @@ void basic_search<T, ES>::arl(const T &base)
 /// Reapeatedly calls arl(const T &) for each member of the team.
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::arl(const basic_team<T> &base)
+template<class U>
+void basic_search<T, ES>::arl(const basic_team<U> &base)
 {
   for (const auto &ind : base)
     arl(ind);

@@ -36,7 +36,8 @@ BOOST_AUTO_TEST_CASE(Creation)
       env.code_length = l;
       env.tournament_size = 3;
 
-      std::unique_ptr<vita::evaluator> eva(new vita::random_evaluator());
+      const std::unique_ptr<vita::evaluator> eva(
+        vita::make_unique<vita::random_evaluator>());
 
       vita::evolution<vita::alps_es> evo1(env, sset, *eva.get());
       BOOST_REQUIRE(evo1.debug(true));
