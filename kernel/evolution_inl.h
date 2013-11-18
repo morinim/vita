@@ -77,11 +77,11 @@ namespace term
 ///               set so that evolution would take place in a dynamic
 ///               environment.
 ///
-template<class ES>
-evolution<ES>::evolution(const environment &env, const symbol_set &sset,
-                         evaluator &eva,
-                         std::function<bool (const summary<individual_t> &)> sc,
-                         std::function<void (unsigned)> sd)
+template<class T, template<class> class ES>
+evolution<T, ES>::evolution(const environment &env, const symbol_set &sset,
+                            evaluator &eva,
+                            std::function<bool (const summary<T> &)> sc,
+                            std::function<void (unsigned)> sd)
   : pop_(env, sset), eva_(eva), es_(pop_, eva, &stats_),
     external_stop_condition_(sc), shake_data_(sd)
 {
@@ -92,8 +92,8 @@ evolution<ES>::evolution(const environment &env, const symbol_set &sset,
 /// \param[in] s an up to date evolution summary.
 /// \return \c true when evolution should be interrupted.
 ///
-template<class ES>
-bool evolution<ES>::stop_condition(const summary<individual_t> &s) const
+template<class T, template<class> class ES>
+bool evolution<T, ES>::stop_condition(const summary<T> &s) const
 {
   assert(env().generations);
 
@@ -116,8 +116,8 @@ bool evolution<ES>::stop_condition(const summary<individual_t> &s) const
 ///                          of evolution.
 /// \return speed of execution (cycles / s).
 ///
-template<class ES>
-double evolution<ES>::get_speed(double elapsed_milli) const
+template<class T, template<class> class ES>
+double evolution<T, ES>::get_speed(double elapsed_milli) const
 {
   double speed(0.0);
   if (stats_.gen && elapsed_milli > 0)
@@ -129,15 +129,15 @@ double evolution<ES>::get_speed(double elapsed_milli) const
 ///
 /// \return statistical informations about the elements of the population.
 ///
-template<class ES>
-analyzer evolution<ES>::get_stats() const
+template<class T, template<class> class ES>
+analyzer evolution<T, ES>::get_stats() const
 {
   analyzer az;
 
   for (unsigned l(0); l < pop_.layers(); ++l)
     for (unsigned i(0); i < pop_.individuals(l); ++i)
     {
-      const individual &ind(pop_[{l, i}]);
+      const T &ind(pop_[{l, i}]);
       az.add(ind, eva_(ind), l);
     }
 
@@ -161,8 +161,8 @@ analyzer evolution<ES>::get_stats() const
 /// CSV-like file. Note also that data sets are ready to be plotted by
 /// GNUPlot.
 ///
-template<class ES>
-void evolution<ES>::log(unsigned run_count) const
+template<class T, template<class> class ES>
+void evolution<T, ES>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
@@ -240,9 +240,9 @@ void evolution<ES>::log(unsigned run_count) const
 ///
 /// Print evolution informations (if environment::verbosity > 0).
 ///
-template<class ES>
-void evolution<ES>::print_progress(unsigned k, unsigned run_count,
-                                   bool status) const
+template<class T, template<class> class ES>
+void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
+                                      bool status) const
 {
   if (env().verbosity >= 1)
   {
@@ -271,9 +271,9 @@ void evolution<ES>::print_progress(unsigned k, unsigned run_count,
 /// With any luck, it will produce an individual that solves the problem at
 /// hand.
 ///
-template<class ES>
-const summary<typename evolution<ES>::individual_t> &
-evolution<ES>::run(unsigned run_count)
+template<class T, template<class> class ES>
+const summary<T> &
+evolution<T, ES>::run(unsigned run_count)
 {
   stats_.clear();
   stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}])};
@@ -362,8 +362,8 @@ evolution<ES>::run(unsigned run_count)
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return true if object passes the internal consistency check.
 ///
-template<class ES>
-bool evolution<ES>::debug(bool verbose) const
+template<class T, template<class> class ES>
+bool evolution<T, ES>::debug(bool verbose) const
 {
   if (!pop_.debug(verbose))
     return false;

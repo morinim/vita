@@ -33,17 +33,15 @@ namespace vita
   /// (survival of the fittest) and analogs of various naturally occurring
   /// operations, including crossover (sexual recombination), mutation...
   ///
-  template<class ES>
+  template<class T, template<class> class ES>
   class evolution
   {
   public:
-    typedef typename ES::individual_t individual_t;
-
     evolution(const environment &, const symbol_set &, evaluator &,
-              std::function<bool (const summary<individual_t> &)> = nullptr,
+              std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
-    const summary<individual_t> &run(unsigned);
+    const summary<T> &run(unsigned);
 
     bool debug(bool) const;
 
@@ -53,15 +51,15 @@ namespace vita
     analyzer get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
-    bool stop_condition(const summary<individual_t> &) const;
+    bool stop_condition(const summary<T> &) const;
 
   private:  // Private data members.
-    vita::population<individual_t> pop_;
-    evaluator                     &eva_;
-    summary<individual_t>        stats_;
-    ES                              es_;
+    vita::population<T> pop_;
+    evaluator          &eva_;
+    summary<T>        stats_;
+    ES<T>                es_;
 
-    std::function<bool (const summary<individual_t> &)>
+    std::function<bool (const summary<T> &)>
     external_stop_condition_;
 
     std::function<void (unsigned)> shake_data_;

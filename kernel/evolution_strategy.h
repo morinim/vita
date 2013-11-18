@@ -39,14 +39,14 @@ namespace vita
   /// selection, recombination and replacement methods specified by the
   /// evolution_strategy object into an evolution object.
   ///
-  template<class SS, class CS, class RS>
+  template<class T,
+           template<class> class SS,
+           template<class> class CS,
+           template<class> class RS>
   class evolution_strategy
   {
   public:
-    typedef typename SS::individual_t individual_t;
-
-    evolution_strategy(population<individual_t> &pop, evaluator &eva,
-                       summary<individual_t> *s)
+    evolution_strategy(population<T> &pop, evaluator &eva, summary<T> *s)
       : selection(pop, eva), recombination(pop, eva, s), replacement(pop, eva),
         pop_(pop), sum_(s)
     {
@@ -66,18 +66,18 @@ namespace vita
     enum
     {
       is_alps =
-        std::is_same<SS, typename vita::selection::alps<individual_t>>::value &&
-        std::is_same<RS, typename vita::replacement::alps<individual_t>>::value
+        std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
+        std::is_same<RS<T>, typename vita::replacement::alps<T>>::value
     };
 
   public:  // Public data members.
-    SS selection;
-    CS recombination;
-    RS replacement;
+    SS<T> selection;
+    CS<T> recombination;
+    RS<T> replacement;
 
   protected:  // Protected data members.
-    population<individual_t> &pop_;
-    summary<individual_t> *sum_;
+    population<T> &pop_;
+    summary<T>    *sum_;
   };
 
   ///
@@ -124,14 +124,15 @@ namespace vita
   /// \see <http://idesign.ucsc.edu/projects/alps.html>
   ///
   template<class T>
-  class basic_alps_es : public evolution_strategy<selection::alps<T>,
-                                                  recombination::base<T>,
-                                                  replacement::alps<T>>
+  class basic_alps_es : public evolution_strategy<T,
+                                                  selection::alps,
+                                                  recombination::base,
+                                                  replacement::alps>
   {
   public:
     basic_alps_es(population<T> &pop, evaluator &eva, summary<T> *s) :
-      evolution_strategy<selection::alps<T>, recombination::base<T>,
-                         replacement::alps<T>>(pop, eva, s)
+      evolution_strategy<T, selection::alps, recombination::base,
+                         replacement::alps>(pop, eva, s)
     {}
 
     virtual void log(unsigned, unsigned) const override;
@@ -144,14 +145,15 @@ namespace vita
   /// \brief Standard evolution strategy
   ///
   template<class T>
-  class basic_std_es : public evolution_strategy<selection::tournament<T>,
-                                                 recombination::base<T>,
-                                                 replacement::tournament<T>>
+  class basic_std_es : public evolution_strategy<T,
+                                                 selection::tournament,
+                                                 recombination::base,
+                                                 replacement::tournament>
   {
   public:
     basic_std_es(population<T> &pop, evaluator &eva, summary<T> *s) :
-      evolution_strategy<selection::tournament<T>, recombination::base<T>,
-                         replacement::tournament<T>>(pop, eva, s)
+      evolution_strategy<T, selection::tournament, recombination::base,
+                         replacement::tournament>(pop, eva, s)
     {}
   };
 

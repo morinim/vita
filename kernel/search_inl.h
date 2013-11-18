@@ -452,7 +452,7 @@ T basic_search<T, ES>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<ES<T>> evo(env_, prob_->sset, *prob_->get_evaluator(), stop,
+    evolution<T, ES> evo(env_, prob_->sset, *prob_->get_evaluator(), stop,
                          shake_data);
     summary<T> s(evo.run(run));
 
