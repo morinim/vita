@@ -34,8 +34,6 @@ namespace vita {  namespace replacement {
   class strategy
   {
   public:
-    typedef T individual_t;
-
     strategy(population<T> &, evaluator &);
     virtual ~strategy() {}
 

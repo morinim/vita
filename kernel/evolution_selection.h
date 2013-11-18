@@ -37,8 +37,6 @@ namespace vita {  namespace selection {
   class strategy
   {
   public:
-    typedef T individual_t;
-
     strategy(const population<T> &, evaluator &);
     virtual ~strategy() {}
 
