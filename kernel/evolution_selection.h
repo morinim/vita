@@ -25,7 +25,7 @@ namespace vita {  namespace selection {
   /// \brief The strategy (tournament, fitness proportional...) for the
   /// \a evolution class.
   ///
-  /// \tparam T the type of the an individual.
+  /// \tparam T the type of individual.
   ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.

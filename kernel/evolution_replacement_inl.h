@@ -253,7 +253,7 @@ void alps<T>::run(const std::vector<coord> &parent,
 
   // To protect the algorithm from the potential deleterious effect of intense
   // exploratory dynamics, we can use a constraint which mandate that an
-  // individual must be better than bith its parents before insertion into
+  // individual must be better than both its parents before insertion into
   // the population.
   // See "Exploiting The Path of Least Resistance In Evolution" (Gearoid Murphy
   // and Conor Ryan).
