@@ -15,7 +15,8 @@
 #define      EVOLUTION_REPLACEMENT_INL_H
 
 ///
-/// \param[in] e pointer to the current evolution object.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
 strategy<T>::strategy(population<T> &pop, evaluator &eva)
@@ -24,7 +25,8 @@ strategy<T>::strategy(population<T> &pop, evaluator &eva)
 }
 
 ///
-/// \param[in] e pointer to the current evolution object.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
 family_competition<T>::family_competition(population<T> &pop, evaluator &eva)
@@ -94,8 +96,8 @@ void family_competition<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] e pointer to the evolution object that is using the
-///              (kill) tournament.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
 tournament<T>::tournament(population<T> &pop, evaluator &eva)
@@ -152,8 +154,8 @@ void tournament<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] e pointer to the evolution object that is using the
-///              alps replacement.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
 alps<T>::alps(population<T> &pop, evaluator &eva) : strategy<T>(pop, eva)
@@ -271,8 +273,8 @@ void alps<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] e pointer to the evolution object that is using the
-///              pareto tournament.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
 pareto<T>::pareto(population<T> &pop, evaluator &eva) : strategy<T>(pop, eva)
