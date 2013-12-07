@@ -322,7 +322,7 @@ void pareto<T>::run(const std::vector<coord> &parent,
 
     if (fit_off.dominating(fit_i))
     {
-      pop[*i] = offspring[0];
+      pop[i] = offspring[0];
 
       if (fit_off[0] > s->best.fitness[0])
       {
