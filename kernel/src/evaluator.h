@@ -23,7 +23,7 @@
 namespace vita
 {
   class individual;
-  class src_interpreter;
+  template<class T> class src_interpreter;
 
   class src_evaluator : public evaluator
   {
@@ -54,7 +54,8 @@ namespace vita
     virtual double accuracy(const individual &) const override;
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const) = 0;
+    virtual double error(src_interpreter<individual> &, data::example &,
+                         int *const) = 0;
   };
 
   ///
@@ -80,7 +81,8 @@ namespace vita
     explicit mae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const);
+    virtual double error(src_interpreter<individual> &,
+                         data::example &, int *const);
   };
 
   ///
@@ -108,7 +110,8 @@ namespace vita
     explicit rmae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const);
+    virtual double error(src_interpreter<individual> &, data::example &,
+                         int *const);
   };
 
   ///
@@ -135,7 +138,8 @@ namespace vita
     explicit mse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const);
+    virtual double error(src_interpreter<individual> &, data::example &,
+                         int *const);
   };
 
   ///
@@ -151,7 +155,8 @@ namespace vita
     explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
 
   private:
-    virtual double error(src_interpreter &, data::example &, int *const);
+    virtual double error(src_interpreter<individual> &, data::example &,
+                         int *const);
   };
 
   ///

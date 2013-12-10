@@ -23,7 +23,7 @@
 
 namespace vita
 {
-  class interpreter;
+  template<class T> class interpreter;
 
   ///
   /// \brief The core of vita::adt and vita::adf
@@ -77,7 +77,7 @@ namespace vita
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     const individual &get_code() const;
     virtual std::string display() const override;
@@ -102,7 +102,7 @@ namespace vita
   public:
     adt(const individual &, unsigned);
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     const individual &get_code() const;
     virtual std::string display() const override;

@@ -20,7 +20,8 @@
 
 namespace vita
 {
-  class interpreter;
+  class individual;
+  template<class T> class interpreter;
 
   ///
   /// GP assembles variable length program structures from basic units called
@@ -60,7 +61,7 @@ namespace vita
 
     /// Calculates the value of / performs the action associated to the symbol
     /// (it is implementation specific).
-    virtual any eval(interpreter *) const = 0;
+    virtual any eval(interpreter<individual> *) const = 0;
 
     virtual bool debug() const;
 

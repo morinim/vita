@@ -21,11 +21,14 @@
 namespace vita
 {
   class individual;
+  template<class T> class interpreter;
 
-  class interpreter
+  template<>
+  class interpreter<individual>
   {
   public:
-    explicit interpreter(const individual &, interpreter * = nullptr);
+    explicit interpreter(const individual &,
+                         interpreter<individual> * = nullptr);
 
     any run();
 
@@ -45,7 +48,7 @@ namespace vita
     // Instruction pointer.
     locus ip_;
 
-    interpreter *const context_;
+    interpreter<individual> *const context_;
 
     const individual &ind_;
 

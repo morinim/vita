@@ -31,7 +31,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    src_interpreter agent(ind);
+    src_interpreter<individual> agent(ind);
 
     fitness_t::base_t err(0.0);
     int illegals(0);
@@ -67,7 +67,7 @@ namespace vita
     assert(!dat_->classes());
     assert(dat_->cbegin() != dat_->cend());
 
-    src_interpreter agent(ind);
+    src_interpreter<individual> agent(ind);
 
     fitness_t::base_t err(0.0);
     int illegals(0);
@@ -105,7 +105,7 @@ namespace vita
     {
       const any res((*f)(example));
       if (!res.empty() &&
-          std::fabs(interpreter::to_double(res) -
+          std::fabs(interpreter<individual>::to_double(res) -
                     example.cast_output<double>()) <= float_epsilon)
         ++ok;
 
@@ -139,8 +139,8 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t. The value returned is in the [0;+inf[ range.
   ///
-  double mae_evaluator::error(src_interpreter &agent, data::example &t,
-                              int *const illegals)
+  double mae_evaluator::error(src_interpreter<individual> &agent,
+                              data::example &t, int *const illegals)
   {
     const any res(agent.run(t.input));
 
@@ -149,7 +149,7 @@ namespace vita
     if (res.empty())
       err = std::pow(100.0, ++(*illegals));
     else
-      err = std::fabs(interpreter::to_double(res) -
+      err = std::fabs(interpreter<individual>::to_double(res) -
                       t.cast_output<double>());
 
     if (err > float_epsilon)
@@ -167,8 +167,8 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t. The value returned is in the [0;200] range.
   ///
-  double rmae_evaluator::error(src_interpreter &agent, data::example &t,
-                               int *const)
+  double rmae_evaluator::error(src_interpreter<individual> &agent,
+                               data::example &t, int *const)
   {
     const any res(agent.run(t.input));
 
@@ -178,7 +178,7 @@ namespace vita
       err = 200.0;
     else
     {
-      const double approx(interpreter::to_double(res));
+      const double approx(interpreter<individual>::to_double(res));
       const double target(t.cast_output<double>());
 
       const double delta(std::fabs(target - approx));
@@ -214,8 +214,8 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double mse_evaluator::error(src_interpreter &agent, data::example &t,
-                              int *const illegals)
+  double mse_evaluator::error(src_interpreter<individual> &agent,
+                              data::example &t, int *const illegals)
   {
     const any res(agent.run(t.input));
     double err;
@@ -223,7 +223,7 @@ namespace vita
       err = std::pow(100.0, ++(*illegals));
     else
     {
-      err = interpreter::to_double(res) - t.cast_output<double>();
+      err = interpreter<individual>::to_double(res) - t.cast_output<double>();
       err *= err;
     }
 
@@ -242,13 +242,13 @@ namespace vita
   /// \return a measurement of the error of the current individual on the
   ///         training case \a t.
   ///
-  double count_evaluator::error(src_interpreter &agent, data::example &t,
-                                int *const)
+  double count_evaluator::error(src_interpreter<individual> &agent,
+                                data::example &t, int *const)
   {
     const any res(agent.run(t.input));
 
     const bool err(res.empty() ||
-                   std::fabs(interpreter::to_double(res) -
+                   std::fabs(interpreter<individual>::to_double(res) -
                              t.cast_output<double>()) > float_epsilon);
 
     if (err)
@@ -402,13 +402,14 @@ namespace vita
   {
     assert(dat_->classes() == 2);
 
-    src_interpreter agent(ind);
+    src_interpreter<individual> agent(ind);
     fitness_t::base_t err(0.0);
 
     for (auto &example : *dat_)
     {
       const any res(agent.run(example.input));
-      const double val(res.empty() ? -1.0 : interpreter::to_double(res));
+      const double val(res.empty() ? -1.0
+                                   : interpreter<individual>::to_double(res));
 
       if ((example.label() == 1 && val <= 0.0) ||
           (example.label() == 0 && val > 0.0))

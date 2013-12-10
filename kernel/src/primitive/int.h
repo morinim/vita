@@ -59,7 +59,7 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       { return any(integer::cast(i->fetch_param())); }
 
     private:  // Private data members.
@@ -73,7 +73,7 @@ namespace vita
       explicit add(category_t t)
         : function("ADD", t, {t, t}, k_base_weight, true) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -93,7 +93,7 @@ namespace vita
     public:
       explicit div(category_t t) : function("DIV", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -112,7 +112,7 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("IFE", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -130,7 +130,7 @@ namespace vita
       explicit ifl(category_t t1, category_t t2)
         : function("IFL", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -147,7 +147,7 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("IFZ", t, {t, t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
 
@@ -164,7 +164,7 @@ namespace vita
     public:
       explicit mod(category_t t) : function("MOD", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -184,7 +184,7 @@ namespace vita
       explicit mul(category_t t)
         : function("MUL", t, {t, t}, k_base_weight, true) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                       "Unable to detect overflow after multiplication");
@@ -242,7 +242,7 @@ namespace vita
     public:
       explicit shl(category_t t) : function("SHL", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
@@ -262,7 +262,7 @@ namespace vita
     public:
       explicit sub(category_t t) : function("SUB", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));

@@ -25,7 +25,8 @@ namespace vita
   /// \param[in] ctx context in which we calculate the output value (used for
   ///                the evaluation of ADF).
   ///
-  interpreter::interpreter(const individual &ind, interpreter *ctx)
+  interpreter<individual>::interpreter(const individual &ind,
+                                       interpreter<individual> *ctx)
     : ip_(ind.best_), context_(ctx), ind_(ind),
       cache_(ind.size(), ind.sset().categories())
   {
@@ -35,7 +36,7 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  any interpreter::run(const locus &ip)
+  any interpreter<individual>::run(const locus &ip)
   {
     cache_.fill(boost::none);
 
@@ -48,7 +49,7 @@ namespace vita
   ///
   /// Calls run()(locus) using the the locus of the individual (\c ind_.best).
   ///
-  any interpreter::run()
+  any interpreter<individual>::run()
   {
     return run(ind_.best_);
   }
@@ -56,7 +57,7 @@ namespace vita
   ///
   /// \return the output value of the current terminal symbol.
   ///
-  any interpreter::fetch_param()
+  any interpreter<individual>::fetch_param()
   {
     const gene &g(ind_[ip_]);
 
@@ -77,7 +78,7 @@ namespace vita
   /// * http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)
   /// * http://en.wikipedia.org/wiki/Memoization
   ///
-  any interpreter::fetch_arg(unsigned i)
+  any interpreter<individual>::fetch_arg(unsigned i)
   {
     const gene &g(ind_[ip_]);
 
@@ -116,7 +117,7 @@ namespace vita
   /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the current ADF function.
   ///
-  any interpreter::fetch_adf_arg(unsigned i)
+  any interpreter<individual>::fetch_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
     const gene context_g(context_->ind_[context_->ip_]);
@@ -130,7 +131,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool interpreter::debug() const
+  bool interpreter<individual>::debug() const
   {
     return ip_.index < ind_.size() && (!context_ || context_->debug());
   }
@@ -145,7 +146,7 @@ namespace vita
   /// * symbolic regression and classification task (the value returned by
   ///   the interpeter will be used in a "numeric way").
   ///
-  double interpreter::to_double(const any &a)
+  double interpreter<individual>::to_double(const any &a)
   {
     return
       a.type() == typeid(double) ? any_cast<double>(a) :
@@ -161,7 +162,7 @@ namespace vita
   /// This function is useful for debugging purpose (otherwise comparison /
   /// printing of \c any values is complex).
   ///
-  std::string interpreter::to_string(const any &a)
+  std::string interpreter<individual>::to_string(const any &a)
   {
     return
       a.type() == typeid(double) ?

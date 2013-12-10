@@ -38,9 +38,9 @@ namespace vita
     /// \note
     /// the method requires a src_interpreter to work.
     ///
-    any eval(interpreter *i) const
+    any eval(interpreter<individual> *i) const
     {
-      return static_cast<src_interpreter *>(i)->fetch_var(var_);
+      return static_cast<src_interpreter<individual> *>(i)->fetch_var(var_);
     }
 
   private:  // Private data members.

@@ -20,7 +20,7 @@
 
 namespace vita
 {
-  class interpreter;
+  template<class T> class interpreter;
 
   ///
   /// \a argument is a special \a terminal used by \a adf functions for
@@ -35,7 +35,7 @@ namespace vita
 
     size_t index() const;
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     bool debug() const;
 

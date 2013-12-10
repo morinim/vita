@@ -55,7 +55,7 @@ namespace vita
   /// \param[in] agent current interpreter
   /// \return the value of the argument.
   ///
-  any argument::eval(interpreter *agent) const
+  any argument::eval(interpreter<individual> *agent) const
   {
     return agent->fetch_adf_arg(index_);
   }

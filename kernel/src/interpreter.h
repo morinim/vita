@@ -18,11 +18,14 @@
 
 namespace vita
 {
+  template<class T> class src_interpreter;
+
   ///
   /// This class extends vita::interpreter to simply manage input variables.
   /// For further details see also src_variable.
   ///
-  class src_interpreter : public interpreter
+  template<>
+  class src_interpreter<individual> : public interpreter<individual>
   {
   public:
     explicit src_interpreter(const individual &ind) : interpreter(ind) {}

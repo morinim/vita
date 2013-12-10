@@ -22,7 +22,7 @@ namespace vita
   ///
   any lambda_f::operator()(const data::example &e) const
   {
-    return any(src_interpreter(ind_).run(e.input));
+    return any(src_interpreter<individual>(ind_).run(e.input));
   }
 
   ///
@@ -118,7 +118,7 @@ namespace vita
   {
     assert(ind.debug());
 
-    src_interpreter agent(ind);
+    src_interpreter<individual> agent(ind);
     const any res(agent.run(e.input));
 
     const auto ns(slot_matrix.rows());
@@ -127,7 +127,7 @@ namespace vita
     if (res.empty())
       return last_slot;
 
-    const double val(interpreter::to_double(res));
+    const double val(interpreter<individual>::to_double(res));
     const auto where(static_cast<unsigned>(normalize_01(val) * ns));
 
     return (where >= ns) ? last_slot : where;
@@ -200,7 +200,7 @@ namespace vita
     assert(ind.debug());
     assert(d.classes() > 1);
 
-    src_interpreter agent(ind);
+    src_interpreter<individual> agent(ind);
 
     // For a set of training data, we assume that the behaviour of a program
     // classifier is modelled using multiple Gaussian distributions, each of
@@ -212,7 +212,7 @@ namespace vita
     {
       const any res(agent.run(example.input));
 
-      double val(res.empty() ? 0.0 : interpreter::to_double(res));
+      double val(res.empty() ? 0.0 : interpreter<individual>::to_double(res));
       const double cut(10000000.0);
       if (val > cut)
         val = cut;
@@ -238,8 +238,8 @@ namespace vita
                                         const data::example &example,
                                         double *val, double *sum) const
   {
-    const any res(src_interpreter(ind).run(example.input));
-    const double x(res.empty() ? 0.0 : interpreter::to_double(res));
+    const any res(src_interpreter<individual>(ind).run(example.input));
+    const double x(res.empty() ? 0.0 : interpreter<individual>::to_double(res));
 
     double val_(0.0), val_sum_(0.0);
     unsigned probable_class(0);
@@ -320,8 +320,8 @@ namespace vita
   ///
   any binary_lambda_f::operator()(const data::example &e) const
   {
-    const any res(src_interpreter(ind_).run(e.input));
-    const double val(res.empty() ? -1.0 : interpreter::to_double(res));
+    const any res(src_interpreter<individual>(ind_).run(e.input));
+    const double val(res.empty() ? -1.0 : interpreter<individual>::to_double(res));
 
     return any(val > 0.0 ? 1u : 0u);
   }

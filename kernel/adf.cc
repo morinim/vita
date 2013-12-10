@@ -62,9 +62,9 @@ namespace vita
   /// Adf functions need input parameters from the a context (contrary to
   /// adt::eval).
   ///
-  any adf::eval(interpreter *i) const
+  any adf::eval(interpreter<individual> *i) const
   {
-    return interpreter(core_.code, i).run();
+    return interpreter<individual>(core_.code, i).run();
   }
 
   ///
@@ -122,9 +122,9 @@ namespace vita
   /// Adt hasn't input parameters so the context is ignored (contrary to
   /// adf::eval).
   ///
-  any adt::eval(interpreter *) const
+  any adt::eval(interpreter<individual> *) const
   {
-    return interpreter(core_.code).run();
+    return interpreter<individual>(core_.code).run();
   }
 
   ///

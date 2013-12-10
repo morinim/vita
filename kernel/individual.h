@@ -28,6 +28,8 @@
 
 namespace vita
 {
+  template<class T> class interpreter;
+
   ///
   /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
@@ -120,7 +122,7 @@ namespace vita
       signature_.clear();
     }
 
-    friend class interpreter;
+    friend class interpreter<individual>;
 
   public:   // Serialization.
     bool load(std::istream &);

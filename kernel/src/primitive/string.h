@@ -35,7 +35,7 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("SIFE", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
         const any v0(i->fetch_arg(0));
         if (v0.empty())  return v0;
