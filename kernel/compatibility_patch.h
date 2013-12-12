@@ -21,6 +21,7 @@
 #  include <windows.h>
 #else
 #  include <termios.h>
+#  include <unistd.h>
 #endif
 
 namespace vita

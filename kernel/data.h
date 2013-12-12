@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 
+#include "kernel/any.h"
 #include "kernel/distribution.h"
 
 namespace vita

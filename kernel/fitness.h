@@ -15,6 +15,7 @@
 #define      FITNESS_H
 
 #include <array>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 

@@ -127,7 +127,7 @@ namespace vita
     if (res.empty())
       return last_slot;
 
-    const double val(interpreter<individual>::to_double(res));
+    const double val(to<double>(res));
     const auto where(static_cast<unsigned>(normalize_01(val) * ns));
 
     return (where >= ns) ? last_slot : where;
@@ -212,7 +212,7 @@ namespace vita
     {
       const any res(agent.run(example.input));
 
-      double val(res.empty() ? 0.0 : interpreter<individual>::to_double(res));
+      double val(res.empty() ? 0.0 : to<double>(res));
       const double cut(10000000.0);
       if (val > cut)
         val = cut;
@@ -239,7 +239,7 @@ namespace vita
                                         double *val, double *sum) const
   {
     const any res(src_interpreter<individual>(ind).run(example.input));
-    const double x(res.empty() ? 0.0 : interpreter<individual>::to_double(res));
+    const double x(res.empty() ? 0.0 : to<double>(res));
 
     double val_(0.0), val_sum_(0.0);
     unsigned probable_class(0);
@@ -321,7 +321,7 @@ namespace vita
   any binary_lambda_f::operator()(const data::example &e) const
   {
     const any res(src_interpreter<individual>(ind_).run(e.input));
-    const double val(res.empty() ? -1.0 : interpreter<individual>::to_double(res));
+    const double val(res.empty() ? -1.0 : to<double>(res));
 
     return any(val > 0.0 ? 1u : 0u);
   }

@@ -11,7 +11,6 @@
  *
  */
 
-#include <boost/lexical_cast.hpp>
 #include <boost/none.hpp>
 
 #include "kernel/interpreter.h"
@@ -27,7 +26,7 @@ namespace vita
   ///
   interpreter<individual>::interpreter(const individual &ind,
                                        interpreter<individual> *ctx)
-    : ip_(ind.best_), context_(ctx), ind_(ind),
+    : basic_interpreter(ind, ctx), ip_(ind.best_),
       cache_(ind.size(), ind.sset().categories())
   {
   }
@@ -36,22 +35,22 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  any interpreter<individual>::run(const locus &ip)
+  any interpreter<individual>::run_locus(const locus &ip)
   {
     cache_.fill(boost::none);
 
     ip_ = ip;
-    return ind_[ip_].sym->eval(this);
+    return prg_[ip_].sym->eval(this);
   }
 
   ///
   /// \return the output value of \c this \a individual.
   ///
-  /// Calls run()(locus) using the the locus of the individual (\c ind_.best).
+  /// Calls run()(locus) using the the locus of the individual (\c prg_.best).
   ///
   any interpreter<individual>::run()
   {
-    return run(ind_.best_);
+    return run_locus(prg_.best_);
   }
 
   ///
@@ -59,7 +58,7 @@ namespace vita
   ///
   any interpreter<individual>::fetch_param()
   {
-    const gene &g(ind_[ip_]);
+    const gene &g(prg_[ip_]);
 
     assert(g.sym->parametric());
     return any(g.par);
@@ -80,7 +79,7 @@ namespace vita
   ///
   any interpreter<individual>::fetch_arg(unsigned i)
   {
-    const gene &g(ind_[ip_]);
+    const gene &g(prg_[ip_]);
 
     assert(g.sym->arity());
     assert(i < g.sym->arity());
@@ -94,7 +93,7 @@ namespace vita
       const locus backup(ip_);
       ip_ = l;
       assert(ip_.index > backup.index);
-      cache_(l) = ind_[ip_].sym->eval(this);
+      cache_(l) = prg_[ip_].sym->eval(this);
       ip_ = backup;
     }
 #if !defined(NDEBUG)
@@ -103,7 +102,7 @@ namespace vita
       const locus backup(ip_);
       ip_ = l;
       assert(ip_.index > backup.index);
-      const any ret(ind_[ip_].sym->eval(this));
+      const any ret(prg_[ip_].sym->eval(this));
       ip_ = backup;
       assert(to_string(ret) == to_string(*cache_(l)));
     }
@@ -120,12 +119,14 @@ namespace vita
   any interpreter<individual>::fetch_adf_arg(unsigned i)
   {
 #if !defined(NDEBUG)
-    const gene context_g(context_->ind_[context_->ip_]);
+    assert(context_);
+    assert(context_->debug());
+    assert(i < gene::k_args);
 
-    assert(context_ && context_->debug() && i < gene::k_args &&
-           (!context_g.sym->terminal() && context_g.sym->auto_defined()));
+    const gene context_g(context_->prg_[context_->ip_]);
+    assert(!context_g.sym->terminal() && context_g.sym->auto_defined()));
 #endif
-    return context_->fetch_arg(i);
+    return static_cast<interpreter<individual> *>(context_)->fetch_arg(i);
   }
 
   ///
@@ -133,44 +134,6 @@ namespace vita
   ///
   bool interpreter<individual>::debug() const
   {
-    return ip_.index < ind_.size() && (!context_ || context_->debug());
-  }
-
-  ///
-  /// \param[in] a value that should be converted to \c double.
-  /// \return the result of the conversion of \a a in a \c double.
-  ///
-  /// This function is useful for:
-  /// * debugging purpose (otherwise comparison of \c any values is
-  ///   complex);
-  /// * symbolic regression and classification task (the value returned by
-  ///   the interpeter will be used in a "numeric way").
-  ///
-  double interpreter<individual>::to_double(const any &a)
-  {
-    return
-      a.type() == typeid(double) ? any_cast<double>(a) :
-      a.type() == typeid(int) ? static_cast<double>(any_cast<int>(a)) :
-      a.type() == typeid(bool) ? static_cast<double>(any_cast<bool>(a)) :
-      0.0;
-  }
-
-  ///
-  /// \param[in] a value that should be converted to \c std::string.
-  /// \return the result of the conversion of \a a in a string.
-  ///
-  /// This function is useful for debugging purpose (otherwise comparison /
-  /// printing of \c any values is complex).
-  ///
-  std::string interpreter<individual>::to_string(const any &a)
-  {
-    return
-      a.type() == typeid(double) ?
-      boost::lexical_cast<std::string>(any_cast<double>(a)) :
-      a.type() == typeid(int) ?
-      boost::lexical_cast<std::string>(any_cast<int>(a)) :
-      a.type() == typeid(bool) ?
-      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
-      any_cast<std::string>(a);
+    return ip_.index < prg_.size() && (!context_ || context_->debug());
   }
 }  // Namespace vita

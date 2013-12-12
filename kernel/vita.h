@@ -36,9 +36,8 @@
 
 #include <cassert>
 #include <cstdint>
+#include <limits>
 #include <memory>
-
-#include <boost/spirit/home/support/detail/hold_any.hpp>
 
 #include "kernel/compatibility_patch.h"
 
@@ -80,28 +79,12 @@ namespace vita
   const double float_epsilon(0.0001);
 
   ///
-  /// A shortcut for the any type (usually boost::any or boost::spirit::any).
-  ///
-  typedef boost::spirit::hold_any any;
-
-  ///
   /// \tparam T a C++ type.
   /// \return the maximum value of type \a T.
   ///
   template<class T> inline T type_max(T)
   {
     return std::numeric_limits<T>::max();
-  }
-
-  ///
-  /// \param a an any.
-  /// \return the value contained in \a a.
-  ///
-  template<class T> inline T any_cast(const any &a)
-  {
-    // We must choose the right any_cast (it depends on any typedef).
-    // The alternative is: return boost::any_cast<T>(a);
-    return boost::spirit::any_cast<T>(a);
   }
 
   ///
