@@ -37,7 +37,7 @@ namespace vita {  namespace selection {
   class strategy
   {
   public:
-    strategy(const population<T> &, evaluator &);
+    strategy(const population<T> &, evaluator<T> &);
     virtual ~strategy() {}
 
     virtual std::vector<coord> run() = 0;
@@ -49,7 +49,7 @@ namespace vita {  namespace selection {
 
   protected:  // Data members.
     const population<T> &pop_;
-    evaluator           &eva_;
+    evaluator<T>        &eva_;
   };
 
   ///
@@ -72,7 +72,7 @@ namespace vita {  namespace selection {
   class tournament : public strategy<T>
   {
   public:
-    tournament(const population<T> &, evaluator &);
+    tournament(const population<T> &, evaluator<T> &);
 
     virtual std::vector<coord> run() override;
   };
@@ -86,7 +86,7 @@ namespace vita {  namespace selection {
   class alps : public strategy<T>
   {
   public:
-    alps(const population<T> &, evaluator &);
+    alps(const population<T> &, evaluator<T> &);
 
     virtual std::vector<coord> run() override;
   };
@@ -99,7 +99,7 @@ namespace vita {  namespace selection {
   class pareto : public strategy<T>
   {
   public:
-    pareto(const population<T> &, evaluator &);
+    pareto(const population<T> &, evaluator<T> &);
 
     virtual std::vector<coord> run() override;
 
@@ -119,7 +119,7 @@ namespace vita {  namespace selection {
   class random : public strategy<T>
   {
   public:
-    random(const population<T> &, evaluator &);
+    random(const population<T> &, evaluator<T> &);
 
     virtual std::vector<coord> run() override;
   };

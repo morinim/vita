@@ -15,87 +15,62 @@
 #define      EVALUATOR_H
 
 #include "kernel/fitness.h"
+#include "kernel/lambda_f.h"
 #include "kernel/random.h"
 
 namespace vita
 {
-  class individual;
-  class lambda_f;
-
+  ///
+  /// \tparam T the type of individual used.
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
-  /// he is). It maps vita::individual (its genome) to a fitness_t value.
+  /// he is).
   /// This is an abstract class because the fitness is domain dependent
   /// (symbolic regression, data classification, automation...).
-  /// Note: this class shouldn't be confused with the vita::interpreter
-  /// class (that calculates the output of an individual given an input
-  /// vector).
   ///
+  /// \note
   /// Our convention is to convert raw fitness to standardized fitness. The
   /// requirements for standardized fitness are:
-  /// \li bigger values represent better choices;
-  /// \li optimal value is 0.
+  /// * bigger values represent better choices;
+  /// * optimal value is 0.
   ///
+  /// \warning
+  /// This class shouldn't be confused with the vita::interpreter class (that
+  /// calculates the output of an individual given an input vector).
+  ///
+  template<class T>
   class evaluator
   {
   public:
     enum {cache = 1, stats = 2, all = cache | stats};
 
     /// \return the fitness of the individual.
-    virtual fitness_t operator()(const individual &) = 0;
+    virtual fitness_t operator()(const T &) = 0;
 
-    /// Some evaluators have a a faster but approximated version of the
-    /// standard fitness evaluation method.
-    virtual fitness_t fast(const individual &i) { return operator()(i); }
-
-    /// \return the accuracy of a program. A negative value means accuracy
-    ///         isn't available.
-    /// Accuracy refers to the number of training examples that are correctly
-    /// scored/classified as a proportion of the total number of examples in
-    /// the training set. According to this design, the best accuracy is 1.0
-    /// (100%), meaning that all the training examples have been correctly
-    /// recognized.
-    ///
-    /// \note
-    /// Accuracy and fitness aren't the same thing.
-    /// Accuracy can be used to measure fitness but it sometimes hasn't
-    /// enough "granularity"; also it isn't appropriated for classification
-    /// tasks with imbalanced learning data (where at least one class is
-    /// under/over represented relative to others).
-    virtual double accuracy(const individual &) const { return -1.0; }
-
-    /// Some evaluators keep additional statistics about the individual seen
-    /// so far.
-    virtual unsigned seen(const individual &) const { return 0; }
-
-    /// Some evaluators keep a cache / some statistics to improve performances.
-    /// This method asks to empty the cache / clear the statistics.
-    virtual void clear(unsigned) {}
-
-    /// Some evaluators keep a cache to improve performances. This method
-    /// asks to clear cached informations about an individual.
-    virtual void clear(const individual &) {}
-
-    /// \return some info about the status / efficiency of the evaluator.
-    virtual std::string info() const { return ""; }
-
-    /// \return the 'executable' form of an individual.
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) const;
+    /// The following methods have a default implementation (usually empty).
+    virtual fitness_t fast(const T &);
+    virtual double accuracy(const T &) const;
+    virtual unsigned seen(const T &) const;
+    virtual void clear(unsigned);
+    virtual void clear(const T &);
+    virtual std::string info() const;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
   };
 
   ///
-  /// \a random_evaluator class is used for debug purpose.
+  /// random_evaluator class is used for debug purpose.
   ///
   /// \note
   /// The output is population independent.
   ///
-  class random_evaluator : public evaluator
+  template<class T>
+  class random_evaluator : public evaluator<T>
   {
   public:
-    static size_t dim;
-
-    virtual fitness_t operator()(const individual &);
+    virtual fitness_t operator()(const T &);
   };
+
+#include "kernel/evaluator_inl.h"
 }  // namespace vita
 
 #endif  // EVALUATOR_H

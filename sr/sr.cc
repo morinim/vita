@@ -22,10 +22,10 @@ namespace po = boost::program_options;
 #include <string>
 
 #include "kernel/environment.h"
-#include "kernel/search.h"
 #include "kernel/src/evaluator.h"
 #include "kernel/src/problem.h"
 #include "kernel/src/primitive/factory.h"
+#include "kernel/src/search.h"
 
 #include "command_line_interpreter.h"
 
@@ -146,6 +146,10 @@ namespace ui
 
   /// Number of runs to be tried.
   unsigned runs(1);
+
+  // Active evaluator.
+  vita::evaluator_id eva(vita::k_sup_evaluator);
+  std::string eva_args;
 
   /// Reference problem (the problem we will work on).
   vita::src_problem *problem;
@@ -297,36 +301,36 @@ namespace ui
   ///
   void evaluator(const std::string &v)
   {
-    const std::string::size_type sep(v.find(':'));
+    const auto sep(v.find(':'));
     const std::string keyword(v.substr(0, sep));
 
-    std::string args;
+    eva_args = "";
     if (sep != std::string::npos && sep + 1 < v.size())
-      args = v.substr(sep + 1);
+      eva_args = v.substr(sep + 1);
 
     bool ok(true);
     if (keyword == "count")
-      problem->set_evaluator(vita::src_problem::k_count_evaluator);
+      eva = vita::k_count_evaluator;
     else if (keyword == "mae")
-      problem->set_evaluator(vita::src_problem::k_mae_evaluator);
+      eva = vita::k_mae_evaluator;
     else if (keyword == "rmae")
-      problem->set_evaluator(vita::src_problem::k_rmae_evaluator);
+      eva = vita::k_rmae_evaluator;
     else if (keyword == "mse")
-      problem->set_evaluator(vita::src_problem::k_mse_evaluator);
+      eva = vita::k_mse_evaluator;
     else if (keyword == "binary")
-      problem->set_evaluator(vita::src_problem::k_bin_evaluator);
+      eva = vita::k_bin_evaluator;
     else if (keyword == "dynslot")
-      problem->set_evaluator(vita::src_problem::k_dyn_slot_evaluator, args);
+      eva = vita::k_dyn_slot_evaluator;
     else if (keyword == "gaussian")
-      problem->set_evaluator(vita::src_problem::k_gaussian_evaluator);
+      eva = vita::k_gaussian_evaluator;
     else
       ok = false;
 
     if (ok)
     {
       std::cout << vita::k_s_info << " Evaluator is " << keyword;
-      if (!args.empty())
-        std::cout << " (parameters: " << args << ")";
+      if (!eva_args.empty())
+        std::cout << " (parameters: " << eva_args << ")";
       std::cout << std::endl;
     }
     else
@@ -368,7 +372,11 @@ namespace ui
       {
         fix_parameters(problem);
 
-        vita::search s(problem);
+        vita::src_search<vita::individual, vita::basic_alps_es> s(problem);
+
+        if (eva < vita::k_sup_evaluator)
+          s.set_evaluator(eva, eva_args);
+
         s.run(runs);
       }
       else

@@ -14,32 +14,21 @@
 #if !defined(PROBLEM_H)
 #define      PROBLEM_H
 
-#include <vector>
-
 #include "kernel/data.h"
 #include "kernel/environment.h"
-#include "kernel/evaluator.h"
 #include "kernel/symbol_set.h"
 
 namespace vita
 {
-  class individual;
-  class lambda_f;
-
   class problem
   {
   public:
     problem();
 
-    evaluator *get_evaluator();
-    void set_evaluator(std::unique_ptr<evaluator>);
-
     /// \return an access point for the dataset.
     virtual vita::data *data() { return nullptr; }
 
     virtual void clear();
-
-    virtual std::unique_ptr<lambda_f> lambdify(const individual &) = 0;
 
     virtual bool debug(bool) const;
 
@@ -47,9 +36,6 @@ namespace vita
     environment env;
 
     symbol_set sset;
-
-  protected:  // Private data members.
-    std::unique_ptr<evaluator> active_eva_;
   };
 }  // namespace vita
 

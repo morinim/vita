@@ -45,7 +45,7 @@ namespace recombination {
   class strategy
   {
   public:
-    strategy(const population<T> &, evaluator &, summary<T> *const);
+    strategy(const population<T> &, evaluator<T> &, summary<T> *const);
     virtual ~strategy() {}
 
     // Defining offspring as a set of individuals lets the generalized
@@ -55,7 +55,7 @@ namespace recombination {
 
   protected:
     const population<T> &pop_;
-    evaluator &eva_;
+    evaluator<T> &eva_;
     summary<T> *stats_;
   };
 
@@ -70,7 +70,7 @@ namespace recombination {
   class base : public strategy<T>
   {
   public:
-    base(const population<T> &, evaluator &, summary<T> *const);
+    base(const population<T> &, evaluator<T> &, summary<T> *const);
 
     virtual std::vector<T> run(const std::vector<coord> &) override;
   };

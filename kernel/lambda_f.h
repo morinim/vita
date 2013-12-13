@@ -15,22 +15,29 @@
 #define      LAMBDA_F_H
 
 #include "kernel/data.h"
-#include "kernel/individual.h"
 #include "kernel/matrix.h"
+#include "kernel/src/interpreter.h"
 
 namespace vita
 {
+  template<class T> class dyn_slot_lambda_f;
+  template<class T> class dyn_slot_evaluator;
+  template<class T> class gaussian_lambda_f;
+  template<class T> class gaussian_evaluator;
+
   ///
-  /// This class transforms vita individuals to lambda functions which can
-  /// be used to calculate the answers for symbolic regression problems.
+  /// This class transforms individuals to lambda functions which can be used
+  /// to calculate the answers for symbolic regression problems.
   ///
+  /// \note
   /// For classification problems there are other classes derived from
   /// \c lambda_f.
   ///
+  template<class T>
   class lambda_f
   {
   public:
-    explicit lambda_f(const individual &ind) : ind_(ind)
+    explicit lambda_f(const T &ind) : ind_(ind)
     { assert(ind.debug()); }
 
     virtual any operator()(const data::example &) const;
@@ -38,7 +45,7 @@ namespace vita
     virtual std::string name(const any &) const { return std::string(); }
 
   protected:
-    individual ind_;
+    T ind_;
   };
 
   ///
@@ -50,15 +57,16 @@ namespace vita
   /// vita::dyn_slot_lambda_f and dyn_slot_evaluator (they have a HAS-A
   /// 'friendly' relationship with dyn_slot_engine).
   ///
+  template<class T>
   class dyn_slot_engine
   {
-    friend class dyn_slot_lambda_f;
-    friend class dyn_slot_evaluator;
+    friend class dyn_slot_lambda_f<T>;
+    friend class dyn_slot_evaluator<T>;
 
     dyn_slot_engine() {}
-    dyn_slot_engine(const individual &, data &, unsigned);
+    dyn_slot_engine(const T &, data &, unsigned);
 
-    unsigned slot(const individual &, const data::example &) const;
+    unsigned slot(const T &, const data::example &) const;
 
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
@@ -78,10 +86,11 @@ namespace vita
   /// This class is used to factorize out some code from the lambda functions
   /// used for classification tasks.
   ///
-  class class_lambda_f : public lambda_f
+  template<class T>
+  class class_lambda_f : public lambda_f<T>
   {
-  public :
-    class_lambda_f(const individual &, const data &);
+  public:
+    class_lambda_f(const T &, const data &);
 
     virtual std::string name(const any &a) const final
     {
@@ -94,21 +103,22 @@ namespace vita
   };
 
   ///
-  /// This class transforms vita individuals to lambda functions which can
-  /// be used for classification tasks.
+  /// This class transforms individuals to lambda functions which can be used
+  /// for classification tasks.
   ///
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  class dyn_slot_lambda_f : public class_lambda_f
+  template<class T>
+  class dyn_slot_lambda_f : public class_lambda_f<T>
   {
   public:
-    dyn_slot_lambda_f(const individual &, data &, unsigned);
+    dyn_slot_lambda_f(const T &, data &, unsigned);
 
     virtual any operator()(const data::example &) const override;
 
   private:
-    dyn_slot_engine engine_;
+    dyn_slot_engine<T> engine_;
   };
 
   ///
@@ -119,16 +129,17 @@ namespace vita
   /// vita::gaussian_lambda_f and gaussian_evaluator (they have a HAS-A
   /// 'friendly' relationship with gaussian_engine).
   ///
+  template<class T>
   class gaussian_engine
   {
-    friend class gaussian_lambda_f;
-    friend class gaussian_evaluator;
+    friend class gaussian_lambda_f<T>;
+    friend class gaussian_evaluator<T>;
 
     gaussian_engine() {}
-    gaussian_engine(const individual &, data &);
+    gaussian_engine(const T &, data &);
 
-    unsigned class_label(const individual &, const data::example &,
-                         double * = 0, double * = 0) const;
+    unsigned class_label(const T &, const data::example &,
+                         double * = nullptr, double * = nullptr) const;
 
     /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
     /// classification problem".
@@ -136,34 +147,38 @@ namespace vita
   };
 
   ///
-  /// This class transforms vita individuals to lambda functions which can
-  /// be used for classification tasks.
+  /// This class transforms individuals to lambda functions which can be used
+  /// for classification tasks.
   ///
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  class gaussian_lambda_f : public class_lambda_f
+  template<class T>
+  class gaussian_lambda_f : public class_lambda_f<T>
   {
   public:
-    gaussian_lambda_f(const individual &, data &);
+    gaussian_lambda_f(const T &, data &);
 
     virtual any operator()(const data::example &) const override;
 
   private:
-    gaussian_engine engine_;
+    gaussian_engine<T> engine_;
   };
 
   ///
-  /// This class transforms vita individuals to lambda functions which can
-  /// be used for sinlge-class classification tasks.
+  /// This class transforms individuals to lambda functions which can be used
+  /// for single-class classification tasks.
   ///
-  class binary_lambda_f : public class_lambda_f
+  template<class T>
+  class binary_lambda_f : public class_lambda_f<T>
   {
   public:
-    binary_lambda_f(const individual &, data &);
+    binary_lambda_f(const T &, data &);
 
     virtual any operator()(const data::example &) const override;
   };
+
+#include "kernel/lambda_f_inl.h"
 }  // namespace vita
 
 #endif  // LAMBDA_F_H

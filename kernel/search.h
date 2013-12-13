@@ -29,7 +29,7 @@ namespace vita
   template<class T> class distribution;
 
   ///
-  /// \tparam T the type of individuals used.
+  /// \tparam T the type of individual used.
   /// \tparam ES the adopted evolution strategy.
   ///
   /// This \c class drives the evolution.
@@ -37,26 +37,29 @@ namespace vita
   /// \note
   /// The class uses a template template parameter.
   /// This approach allows coordination between T and ES to be handled by the
-  /// basic_search class, rather than in all the various code that specializes
-  /// basic_search.
+  /// search class, rather than in all the various code that specializes
+  /// search.
   /// A very interesting description of this technique can be found in
   /// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
   /// (<http://www.informit.com/articles/article.aspx?p=376878>).
   ///
   template<class T, template<class> class ES>
-  class basic_search
+  class search
   {
   public:
-    explicit basic_search(problem *const);
+    explicit search(problem *const);
 
     void arl(const T &);
     template<class U> void arl(const basic_team<U> &);
 
     void tune_parameters();
 
+    void set_evaluator(std::unique_ptr<evaluator<T>>);
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &);
+
     T run(unsigned = 1);
 
-    bool debug(bool) const;
+    virtual bool debug(bool) const;
 
   private:  // Private support methods.
     double accuracy(const T &) const;
@@ -67,14 +70,15 @@ namespace vita
     void print_resume(bool, const fitness_t &, double) const;
     bool stop_condition(const summary<T> &) const;
 
-  private:  // Private data members.
+  protected:  // Protected data members.
+    std::unique_ptr<evaluator<T>> active_eva_;
+
     /// This is the environment actually used during the search (\a prob_->env
     /// is used for compiling \a env_ via the tune_parameters method).
     environment env_;
-    problem   *prob_;
-  };
 
-  using search = basic_search<individual, basic_alps_es>;
+    problem *prob_;
+  };
 
 #include "kernel/search_inl.h"
 }  // namespace vita

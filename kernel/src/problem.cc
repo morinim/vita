@@ -35,52 +35,8 @@ namespace vita
   ///
   void src_problem::clear()
   {
-    p_symre = k_rmae_evaluator;
-    p_class = k_gaussian_evaluator;
-
     problem::clear();
     dat_.clear();
-  }
-
-  ///
-  /// \param[in] id numerical id of the evaluator to be activated
-  /// \param[in] msg input parameters for the evaluator constructor.
-  ///
-  void src_problem::set_evaluator(evaluator_id id, const std::string &msg)
-  {
-    switch (id)
-    {
-    case k_count_evaluator:
-      problem::set_evaluator(make_unique<count_evaluator>(dat_));
-      break;
-
-    case k_mae_evaluator:
-      problem::set_evaluator(make_unique<mae_evaluator>(dat_));
-      break;
-
-    case k_rmae_evaluator:
-      problem::set_evaluator(make_unique<rmae_evaluator>(dat_));
-      break;
-
-    case k_mse_evaluator:
-      problem::set_evaluator(make_unique<mse_evaluator>(dat_));
-      break;
-
-    case k_bin_evaluator:
-      problem::set_evaluator(make_unique<binary_evaluator>(dat_));
-      break;
-
-    case k_dyn_slot_evaluator:
-    {
-      const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));
-      problem::set_evaluator(make_unique<dyn_slot_evaluator>(dat_, x_slot));
-      break;
-    }
-
-    case k_gaussian_evaluator:
-      problem::set_evaluator(make_unique<gaussian_evaluator>(dat_));
-      break;
-    }
   }
 
   ///
@@ -102,9 +58,7 @@ namespace vita
     sset = vita::symbol_set();
     dat_.clear();
 
-    const size_t n_examples(dat_.open(ds, env.verbosity));
-    if (n_examples > 0 && !get_evaluator())
-      set_evaluator(classification() ? p_class : p_symre);
+    const auto n_examples(dat_.open(ds, env.verbosity));
 
     if (!ts.empty())
       load_test_set(ts);
@@ -406,18 +360,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual to be transformed in a lambda function.
-  /// \return the lambda function associated with \a ind (\c nullptr in case of
-  ///         errors).
-  ///
-  /// The lambda function depends on the active evaluator.
-  ///
-  std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
-  {
-    return active_eva_->lambdify(ind);
-  }
-
-  ///
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
@@ -428,22 +370,6 @@ namespace vita
 
     if (!dat_.debug())
       return false;
-
-    if (p_symre > k_max_evaluator)
-    {
-      if (verbose)
-        std::cerr << "Incorrect ID for preferred sym.reg. evaluator."
-                  << std::endl;
-      return false;
-    }
-
-    if (p_class > k_max_evaluator)
-    {
-      if (verbose)
-        std::cerr << "Incorrect ID for preferred classification evaluator."
-                  << std::endl;
-      return false;
-    }
 
     return true;
   }

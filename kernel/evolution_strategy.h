@@ -46,7 +46,7 @@ namespace vita
   class evolution_strategy
   {
   public:
-    evolution_strategy(population<T> &pop, evaluator &eva, summary<T> *s)
+    evolution_strategy(population<T> &pop, evaluator<T> &eva, summary<T> *s)
       : selection(pop, eva), recombination(pop, eva, s), replacement(pop, eva),
         pop_(pop), sum_(s)
     {
@@ -130,7 +130,7 @@ namespace vita
                                                   replacement::alps>
   {
   public:
-    basic_alps_es(population<T> &pop, evaluator &eva, summary<T> *s) :
+    basic_alps_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
       evolution_strategy<T, selection::alps, recombination::base,
                          replacement::alps>(pop, eva, s)
     {}
@@ -151,7 +151,7 @@ namespace vita
                                                  replacement::tournament>
   {
   public:
-    basic_std_es(population<T> &pop, evaluator &eva, summary<T> *s) :
+    basic_std_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
       evolution_strategy<T, selection::tournament, recombination::base,
                          replacement::tournament>(pop, eva, s)
     {}

@@ -79,7 +79,7 @@ namespace term
 ///
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const environment &env, const symbol_set &sset,
-                            evaluator &eva,
+                            evaluator<T> &eva,
                             std::function<bool (const summary<T> &)> sc,
                             std::function<void (unsigned)> sd)
   : pop_(env, sset), eva_(eva), es_(pop_, eva, &stats_),
@@ -286,7 +286,7 @@ evolution<T, ES>::run(unsigned run_count)
   for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
   {
 #if defined(CLONE_SCALING)
-    eva_.clear(evaluator::stats);
+    eva_.clear(evaluator<T>::stats);
 #endif
 
     if (shake_data_ && stats_.gen % 4 == 0)

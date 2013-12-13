@@ -18,8 +18,9 @@
 /// \param[in] prob a \c problem used for search initialization.
 ///
 template<class T, template<class> class ES>
-basic_search<T, ES>::basic_search(problem *const prob) : env_(prob->env),
-                                                         prob_(prob)
+search<T, ES>::search(problem *const prob) : active_eva_(nullptr),
+                                             env_(prob->env), prob_(prob)
+
 {
   assert(prob->debug(true));
 
@@ -27,9 +28,9 @@ basic_search<T, ES>::basic_search(problem *const prob) : env_(prob->env),
 }
 
 template<class T, template<class> class ES>
-fitness_t basic_search<T, ES>::fitness(const T &ind)
+fitness_t search<T, ES>::fitness(const T &ind)
 {
-  return (*prob_->get_evaluator())(ind);
+  return (*active_eva_)(ind);
 }
 
 ///
@@ -41,7 +42,7 @@ fitness_t basic_search<T, ES>::fitness(const T &ind)
 /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::arl(const T &base)
+void search<T, ES>::arl(const T &base)
 {
   const auto base_fit(fitness(base));
   if (!base_fit.isfinite())
@@ -118,7 +119,7 @@ void basic_search<T, ES>::arl(const T &base)
 ///
 template<class T, template<class> class ES>
 template<class U>
-void basic_search<T, ES>::arl(const basic_team<U> &base)
+void search<T, ES>::arl(const basic_team<U> &base)
 {
   for (const auto &ind : base)
     arl(ind);
@@ -139,7 +140,7 @@ void basic_search<T, ES>::arl(const basic_team<U> &base)
 /// * secondly cases which have not been looked at for several generations.
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::dss(unsigned generation) const
+void search<T, ES>::dss(unsigned generation) const
 {
   if (prob_->data())
   {
@@ -195,7 +196,7 @@ void basic_search<T, ES>::dss(unsigned generation) const
     }
 
     d.slice(std::max(count, 10u));
-    prob_->get_evaluator()->clear(evaluator::all);
+    active_eva_->clear(evaluator<T>::all);
 
     // Selected training examples have their difficulties and ages reset.
     for (auto &i : d)
@@ -211,7 +212,7 @@ void basic_search<T, ES>::dss(unsigned generation) const
 /// \return \c true when a run should be interrupted.
 ///
 template<class T, template<class> class ES>
-bool basic_search<T, ES>::stop_condition(const summary<T> &s) const
+bool search<T, ES>::stop_condition(const summary<T> &s) const
 {
   assert(env_.generations);
 
@@ -262,7 +263,7 @@ bool basic_search<T, ES>::stop_condition(const summary<T> &s) const
 ///   Francone).
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::tune_parameters()
+void search<T, ES>::tune_parameters()
 {
   const environment dflt(true);
   const environment &constrained(prob_->env);
@@ -385,12 +386,12 @@ void basic_search<T, ES>::tune_parameters()
 /// This method can be very time consuming.
 ///
 template<class T, template<class> class ES>
-double basic_search<T, ES>::accuracy(const T &ind) const
+double search<T, ES>::accuracy(const T &ind) const
 {
   if (env_.a_threashold < 0.0)
     return env_.a_threashold;
 
-  return prob_->get_evaluator()->accuracy(ind);
+  return active_eva_->accuracy(ind);
 }
 
 ///
@@ -399,9 +400,8 @@ double basic_search<T, ES>::accuracy(const T &ind) const
 /// \param[in] accuracy accuracy reached in the current run.
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::print_resume(bool validation,
-                                       const fitness_t &fitness,
-                                       double accuracy) const
+void search<T, ES>::print_resume(bool validation, const fitness_t &fitness,
+                                 double accuracy) const
 {
   if (env_.verbosity >= 2)
   {
@@ -421,7 +421,7 @@ void basic_search<T, ES>::print_resume(bool validation,
 /// \return best individual found.
 ///
 template<class T, template<class> class ES>
-T basic_search<T, ES>::run(unsigned n)
+T search<T, ES>::run(unsigned n)
 {
   assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
 
@@ -452,8 +452,7 @@ T basic_search<T, ES>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<T, ES> evo(env_, prob_->sset, *prob_->get_evaluator(), stop,
-                         shake_data);
+    evolution<T, ES> evo(env_, prob_->sset, *active_eva_, stop, shake_data);
     summary<T> s(evo.run(run));
 
     // Depending on validation, this can be the training fitness or the
@@ -469,13 +468,13 @@ T basic_search<T, ES>::run(unsigned n)
       const data::dataset_t backup(prob_->data()->dataset());
 
       prob_->data()->dataset(data::validation);
-      prob_->get_evaluator()->clear(s.best->ind);
+      active_eva_->clear(s.best->ind);
 
       run_fitness = fitness(s.best->ind);
       run_accuracy = accuracy(s.best->ind);
 
       prob_->data()->dataset(backup);
-      prob_->get_evaluator()->clear(s.best->ind);
+      active_eva_->clear(s.best->ind);
     }
     else  // not using a validation set
     {
@@ -487,7 +486,7 @@ T basic_search<T, ES>::run(unsigned n)
       {
         prob_->data()->dataset(data::training);
         prob_->data()->slice(false);
-        prob_->get_evaluator()->clear(s.best->ind);
+        active_eva_->clear(s.best->ind);
 
         run_fitness = fitness(s.best->ind);
       }
@@ -550,11 +549,10 @@ T basic_search<T, ES>::run(unsigned n)
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES>
-void basic_search<T, ES>::log(const summary<T> &run_sum,
-                              const distribution<fitness_t> &fd,
-                              const std::list<unsigned> &good_runs,
-                              unsigned best_run, double best_accuracy,
-                              unsigned runs)
+void search<T, ES>::log(const summary<T> &run_sum,
+                        const distribution<fitness_t> &fd,
+                        const std::list<unsigned> &good_runs,
+                        unsigned best_run, double best_accuracy, unsigned runs)
 {
   // Summary logging.
   if (env_.stat_summary)
@@ -589,7 +587,7 @@ void basic_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "solutions.avg_depth",
            solutions ? run_sum.last_imp / solutions : 0);
 
-    pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
+    pt.put(summary + "other.evaluator", active_eva_->info());
 
     const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 
@@ -606,7 +604,7 @@ void basic_search<T, ES>::log(const summary<T> &run_sum,
     const data::dataset_t backup(data.dataset());
     data.dataset(data::test);
 
-    std::unique_ptr<lambda_f> lambda(prob_->lambdify(run_sum.best->ind));
+    std::unique_ptr<lambda_f<T>> lambda(lambdify(run_sum.best->ind));
 
     std::ofstream tf(env_.stat_dir + "/" + environment::tst_filename);
     for (const auto &example : data)
@@ -617,11 +615,37 @@ void basic_search<T, ES>::log(const summary<T> &run_sum,
 }
 
 ///
+/// \param[in] ind individual to be transformed in a lambda function.
+/// \return the lambda function associated with \a ind (\c nullptr in case of
+///         errors).
+///
+/// The lambda function depends on the active evaluator.
+///
+template<class T, template<class> class ES>
+std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind)
+{
+  return active_eva_->lambdify(ind);
+}
+
+///
+/// \param[in] e the evaluator that should be set as active.
+///
+template<class T, template<class> class ES>
+void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
+{
+  if (env_.ttable_size)
+    active_eva_ = make_unique<evaluator_proxy<T>>(std::move(e),
+                                                  env_.ttable_size);
+  else
+    active_eva_ = std::move(e);
+}
+
+///
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool basic_search<T, ES>::debug(bool verbose) const
+bool search<T, ES>::debug(bool verbose) const
 {
   return prob_->debug(verbose);
 }

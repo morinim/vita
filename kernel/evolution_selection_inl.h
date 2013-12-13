@@ -19,7 +19,7 @@
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-strategy<T>::strategy(const population<T> &pop, evaluator &eva)
+strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva)
   : pop_(pop), eva_(eva)
 {
 }
@@ -77,7 +77,7 @@ coord strategy<T>::pickup(unsigned l, double p) const
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-tournament<T>::tournament(const population<T> &pop, evaluator &eva)
+tournament<T>::tournament(const population<T> &pop, evaluator<T> &eva)
   : strategy<T>(pop, eva)
 {
 }
@@ -141,7 +141,8 @@ std::vector<coord> tournament<T>::run()
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-alps<T>::alps(const population<T> &pop, evaluator &eva) : strategy<T>(pop, eva)
+alps<T>::alps(const population<T> &pop, evaluator<T> &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
@@ -212,7 +213,7 @@ std::vector<coord> alps<T>::run()
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-pareto<T>::pareto(const population<T> &pop, evaluator &eva)
+pareto<T>::pareto(const population<T> &pop, evaluator<T> &eva)
   : strategy<T>(pop, eva)
 {
 }
@@ -305,7 +306,7 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-random<T>::random(const population<T> &pop, evaluator &eva)
+random<T>::random(const population<T> &pop, evaluator<T> &eva)
   : strategy<T>(pop, eva)
 {
 }

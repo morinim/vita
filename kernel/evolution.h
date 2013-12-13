@@ -37,7 +37,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(const environment &, const symbol_set &, evaluator &,
+    evolution(const environment &, const symbol_set &, evaluator<T> &,
               std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 
@@ -55,7 +55,7 @@ namespace vita
 
   private:  // Private data members.
     vita::population<T> pop_;
-    evaluator          &eva_;
+    evaluator<T>       &eva_;
     summary<T>        stats_;
     ES<T>                es_;
 

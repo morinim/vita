@@ -17,15 +17,14 @@
 #include <vector>
 
 #include "kernel/evaluator.h"
-#include "kernel/lambda_f.h"
 #include "kernel/src/primitive/factory.h"
 
 namespace vita
 {
-  class individual;
   template<class T> class src_interpreter;
 
-  class src_evaluator : public evaluator
+  template<class T>
+  class src_evaluator : public evaluator<T>
   {
   public:
     explicit src_evaluator(data &);
@@ -41,21 +40,20 @@ namespace vita
   /// the minimum sum of some sort of error.
   /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
   ///
-  class sum_of_errors_evaluator : public src_evaluator
+  template<class T>
+  class sum_of_errors_evaluator : public src_evaluator<T>
   {
   public:
-    explicit sum_of_errors_evaluator(data &d) : src_evaluator(d) {}
+    explicit sum_of_errors_evaluator(data &d) : src_evaluator<T>(d) {}
 
-    virtual fitness_t operator()(const individual &) override;
-    virtual fitness_t fast(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(
-      const individual &) const override;
+    virtual fitness_t operator()(const T &) override;
+    virtual fitness_t fast(const T &) override;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
-    virtual double accuracy(const individual &) const override;
+    virtual double accuracy(const T &) const override;
 
   private:
-    virtual double error(src_interpreter<individual> &, data::example &,
-                         int *const) = 0;
+    virtual double error(src_interpreter<T> &, data::example &, int *const) = 0;
   };
 
   ///
@@ -75,14 +73,14 @@ namespace vita
   ///
   /// \see \ref mse_evaluator.
   ///
-  class mae_evaluator : public sum_of_errors_evaluator
+  template<class T>
+  class mae_evaluator : public sum_of_errors_evaluator<T>
   {
   public:
-    explicit mae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit mae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<individual> &,
-                         data::example &, int *const);
+    virtual double error(src_interpreter<T> &, data::example &, int *const);
   };
 
   ///
@@ -104,14 +102,14 @@ namespace vita
   /// * <http://realityisvirtual.com/book2/?p=81>
   /// * <http://en.wikipedia.org/wiki/Relative_difference>
   ///
-  class rmae_evaluator : public sum_of_errors_evaluator
+  template<class T>
+  class rmae_evaluator : public sum_of_errors_evaluator<T>
   {
   public:
-    explicit rmae_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit rmae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<individual> &, data::example &,
-                         int *const);
+    virtual double error(src_interpreter<T> &, data::example &, int *const);
   };
 
   ///
@@ -132,14 +130,14 @@ namespace vita
   ///
   /// \see mae_evaluator.
   ///
-  class mse_evaluator : public sum_of_errors_evaluator
+  template<class T>
+  class mse_evaluator : public sum_of_errors_evaluator<T>
   {
   public:
-    explicit mse_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit mse_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<individual> &, data::example &,
-                         int *const);
+    virtual double error(src_interpreter<T> &, data::example &, int *const);
   };
 
   ///
@@ -149,26 +147,27 @@ namespace vita
   /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
   /// All incorrect answers receive the same fitness penality.
   ///
-  class count_evaluator : public sum_of_errors_evaluator
+  template<class T>
+  class count_evaluator : public sum_of_errors_evaluator<T>
   {
   public:
-    explicit count_evaluator(data &d) : sum_of_errors_evaluator(d) {}
+    explicit count_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<individual> &, data::example &,
-                         int *const);
+    virtual double error(src_interpreter<T> &, data::example &, int *const);
   };
 
   ///
   /// This class is used to factorized out some code of the classification
   /// evaluators.
   ///
-  class classification_evaluator : public src_evaluator
+  template<class T>
+  class classification_evaluator : public src_evaluator<T>
   {
   public:
-    explicit classification_evaluator(data &d) : src_evaluator(d) {}
+    explicit classification_evaluator(data &d) : src_evaluator<T>(d) {}
 
-    virtual double accuracy(const individual &) const override;
+    virtual double accuracy(const T &) const override;
   };
 
   ///
@@ -184,17 +183,17 @@ namespace vita
   /// - Mengjie Zhang, Will Smart -
   /// <http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html>
   ///
-  class dyn_slot_evaluator : public classification_evaluator
+  template<class T>
+  class dyn_slot_evaluator : public classification_evaluator<T>
   {
   public:
     explicit dyn_slot_evaluator(data &, unsigned = 10);
 
-    virtual fitness_t operator()(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(
-      const individual &) const override;
+    virtual fitness_t operator()(const T &) override;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
   private:
-    dyn_slot_engine engine_;
+    dyn_slot_engine<T> engine_;
 
     /// Number of slots for each class of the training set.
     unsigned x_slot_;
@@ -213,31 +212,33 @@ namespace vita
   /// Programming for Multiclass Object Classification" - CS-TR-05-5 - Mangjie
   /// Zhang, Will Smart.
   ///
-  class gaussian_evaluator : public classification_evaluator
+  template<class T>
+  class gaussian_evaluator : public classification_evaluator<T>
   {
   public:
-    explicit gaussian_evaluator(data &d) : classification_evaluator(d) {}
+    explicit gaussian_evaluator(data &d) : classification_evaluator<T>(d) {}
 
-    virtual fitness_t operator()(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(
-      const individual &) const override;
+    virtual fitness_t operator()(const T &) override;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
   private:
-    gaussian_engine engine_;
+    gaussian_engine<T> engine_;
   };
 
   ///
   /// Single class evaluator for classification problems
   ///
-  class binary_evaluator : public classification_evaluator
+  template<class T>
+  class binary_evaluator : public classification_evaluator<T>
   {
   public:
-    explicit binary_evaluator(data &d) : classification_evaluator(d) {}
+    explicit binary_evaluator(data &d) : classification_evaluator<T>(d) {}
 
-    virtual fitness_t operator()(const individual &) override;
-    virtual std::unique_ptr<lambda_f> lambdify(
-      const individual &) const override;
+    virtual fitness_t operator()(const T &) override;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
   };
+
+#include "kernel/src/evaluator_inl.h"
 }  // namespace vita
 
 #endif  // SRC_EVALUATOR_H

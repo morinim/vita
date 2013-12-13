@@ -20,7 +20,7 @@
 /// \param[in] stats pointer to the current set of statistics.
 ///
 template<class T>
-strategy<T>::strategy(const population<T> &pop, evaluator &eva,
+strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
                       summary<T> *const stats)
   : pop_(pop), eva_(eva), stats_(stats)
 {
@@ -33,7 +33,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator &eva,
 /// \param[in] s pointer to the current set of statistics.
 ///
 template<class T>
-base<T>::base(const population<T> &pop, evaluator &eva, summary<T> *const s)
+base<T>::base(const population<T> &pop, evaluator<T> &eva, summary<T> *const s)
   : strategy<T>(pop, eva, s)
 {
 }

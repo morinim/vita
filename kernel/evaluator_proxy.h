@@ -14,46 +14,49 @@
 #if !defined(EVALUATOR_PROXY_H)
 #define      EVALUATOR_PROXY_H
 
+#include <boost/lexical_cast.hpp>
+
 #include "kernel/evaluator.h"
 #include "kernel/ttable.h"
 
 namespace vita
 {
   ///
-  /// Provide a surrogate for an \a evaluator to control access to it. The
-  /// reason for controlling access is to cache fitness scores of individuals.
-  /// \c evaluator_proxy uses an ad-hoc internal hash table
-  /// (\a ttable).
+  /// \tparam T the type of individual used.
   ///
-  class evaluator_proxy : public evaluator
+  /// Provides a surrogate for an \a evaluator to control access to it. The
+  /// reason for controlling access is to cache fitness scores of individuals.
+  /// \c evaluator_proxy uses an ad-hoc internal hash table (\a ttable).
+  ///
+  template<class T>
+  class evaluator_proxy : public evaluator<T>
   {
   public:
-    evaluator_proxy(std::unique_ptr<evaluator>, unsigned);
+    evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
 
     virtual void clear(unsigned) override;
-    virtual void clear(const individual &) override;
+    virtual void clear(const T &) override;
 
-    virtual fitness_t operator()(const individual &) override;
-    virtual fitness_t fast(const individual &i) override
-    { return eva_->fast(i); }
+    virtual fitness_t operator()(const T &) override;
+    virtual fitness_t fast(const T &) override;
 
-    virtual double accuracy(const individual &) const override;
+    virtual double accuracy(const T &) const override;
 
     virtual std::string info() const override;
 
-    virtual std::unique_ptr<lambda_f> lambdify(
-      const individual &) const override;
+    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
-    virtual unsigned seen(const individual &i) const override
-    { return cache_.seen(i); }
+    virtual unsigned seen(const T &) const override;
 
   private:
     /// Access to the real evaluator.
-    std::unique_ptr<evaluator> eva_;
+    std::unique_ptr<evaluator<T>> eva_;
 
     /// Transposition table (hash table cache).
     ttable cache_;
   };
+
+#include "kernel/evaluator_proxy_inl.h"
 }  // namespace vita
 
 #endif  // EVALUATOR_PROXY_H

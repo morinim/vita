@@ -31,27 +31,6 @@ namespace vita
   void problem::clear()
   {
     env = environment(false);
-    active_eva_ = nullptr;
-  }
-
-  ///
-  /// \return the active evaluator.
-  ///
-  evaluator *problem::get_evaluator()
-  {
-    return active_eva_.get();
-  }
-
-  ///
-  /// \param[in] e the evaluator that should be set as active.
-  ///
-  void problem::set_evaluator(std::unique_ptr<evaluator> e)
-  {
-    if (env.ttable_size)
-      active_eva_ = make_unique<evaluator_proxy>(std::move(e),
-                                                 env.ttable_size);
-    else
-      active_eva_ = std::move(e);
   }
 
   ///

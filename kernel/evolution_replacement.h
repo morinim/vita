@@ -34,7 +34,7 @@ namespace vita {  namespace replacement {
   class strategy
   {
   public:
-    strategy(population<T> &, evaluator &);
+    strategy(population<T> &, evaluator<T> &);
     virtual ~strategy() {}
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
@@ -42,7 +42,7 @@ namespace vita {  namespace replacement {
 
   protected:
     population<T> &pop_;
-    evaluator     &eva_;
+    evaluator<T>  &eva_;
   };
 
   ///
@@ -65,7 +65,7 @@ namespace vita {  namespace replacement {
   class family_competition : public strategy<T>
   {
   public:
-    family_competition(population<T> &, evaluator &);
+    family_competition(population<T> &, evaluator<T> &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -85,7 +85,7 @@ namespace vita {  namespace replacement {
   class tournament : public strategy<T>
   {
   public:
-    tournament(population<T> &, evaluator &);
+    tournament(population<T> &, evaluator<T> &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -95,7 +95,7 @@ namespace vita {  namespace replacement {
   class alps : public strategy<T>
   {
   public:
-    alps(population<T> &, evaluator &);
+    alps(population<T> &, evaluator<T> &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -110,7 +110,7 @@ namespace vita {  namespace replacement {
   class pareto : public strategy<T>
   {
   public:
-    pareto(population<T> &, evaluator &);
+    pareto(population<T> &, evaluator<T> &);
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
