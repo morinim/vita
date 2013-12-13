@@ -14,14 +14,10 @@
 #if !defined(ANALYZER_H)
 #define      ANALYZER_H
 
-#include <list>
 #include <map>
-#include <set>
 
 #include "kernel/distribution.h"
-#include "kernel/individual.h"
 #include "kernel/symbol.h"
-#include "kernel/team.h"
 
 namespace vita
 {
@@ -31,18 +27,18 @@ namespace vita
   /// \tparam T type of the elements of the population (individuals).
   ///
   /// Procedure:
-  /// 1. the population set should be loaded adding (basic_analyzer::add
-  ///    method) one invividual at time;
+  /// 1. the population set should be loaded adding (analyzer::add method) one
+  ///    invividual at time;
   /// 2. statistics can be checked executing the desidered methods.
   ///
   /// Informations regard:
   /// * the set as a whole (analyzer::fit_dist, analyzer::length dist,
   ///   analyzer::functions, analyzer::terminals methods);
-  /// * symbols appearing in the set (accessed via basic_analyzer::begin and
-  ///   basic_analyzer::end methods).
+  /// * symbols appearing in the set (accessed via analyzer::begin and
+  ///   analyzer::end methods).
   ///
   template<class T>
-  class basic_analyzer
+  class analyzer
   {
   public:
     struct sym_counter
@@ -54,7 +50,7 @@ namespace vita
       std::uintmax_t counter[2];
     };
 
-    /// Type returned by \c begin() and \c end() methods to iterate through the
+    /// Type returned by begin() and end() methods to iterate through the
     /// statistics of the various symbols.
     typedef typename std::map<const symbol *, sym_counter>::const_iterator
       const_iterator;
@@ -62,7 +58,7 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
-    basic_analyzer();
+    analyzer();
 
     void add(const T &, const fitness_t &, unsigned);
 
@@ -100,11 +96,9 @@ namespace vita
 
     sym_counter functions_;
     sym_counter terminals_;
-  };  // class basic_analyzer
+  };  // class analyzer
 
-  using analyzer = basic_analyzer<individual>;
-
-#include "analyzer_inl.h"
+#include "kernel/analyzer_inl.h"
 }  // namespace vita
 
 #endif  // ANALYZER_H

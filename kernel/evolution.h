@@ -48,7 +48,7 @@ namespace vita
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
     double get_speed(double) const;
-    analyzer get_stats() const;
+    analyzer<T> get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
     bool stop_condition(const summary<T> &) const;

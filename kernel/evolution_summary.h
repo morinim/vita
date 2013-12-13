@@ -31,7 +31,7 @@ namespace vita
     bool save(std::ostream &) const;
 
   public:  // Public data members.
-    analyzer az;
+    analyzer<T> az;
 
     struct best_
     {

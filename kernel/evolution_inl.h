@@ -130,9 +130,9 @@ double evolution<T, ES>::get_speed(double elapsed_milli) const
 /// \return statistical informations about the elements of the population.
 ///
 template<class T, template<class> class ES>
-analyzer evolution<T, ES>::get_stats() const
+analyzer<T> evolution<T, ES>::get_stats() const
 {
-  analyzer az;
+  analyzer<T> az;
 
   for (unsigned l(0); l < pop_.layers(); ++l)
     for (unsigned i(0); i < pop_.individuals(l); ++i)
