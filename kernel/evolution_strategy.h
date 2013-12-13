@@ -98,7 +98,7 @@ namespace vita
   /// * at regular intervals, the search algorithm in the first age-layer is
   ///   restarted.
   ///
-  /// Age (individual::age) is a measure of how long an individual's family of
+  /// Age is a measure of how long an individual's family of
   /// genotypic material has been in the population. Randomly generated
   /// individuals, such as those that are created when the search algorithm are
   /// started, start with an age of 0. Each generation that an individual stays
@@ -124,13 +124,13 @@ namespace vita
   /// \see <http://idesign.ucsc.edu/projects/alps.html>
   ///
   template<class T>
-  class basic_alps_es : public evolution_strategy<T,
-                                                  selection::alps,
-                                                  recombination::base,
-                                                  replacement::alps>
+  class alps_es : public evolution_strategy<T,
+                                            selection::alps,
+                                            recombination::base,
+                                            replacement::alps>
   {
   public:
-    basic_alps_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
+    alps_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
       evolution_strategy<T, selection::alps, recombination::base,
                          replacement::alps>(pop, eva, s)
     {}
@@ -139,27 +139,23 @@ namespace vita
     virtual void post_bookkeeping() override;
   };
 
-  using alps_es = basic_alps_es<vita::individual>;
-
   ///
   /// \brief Standard evolution strategy
   ///
   template<class T>
-  class basic_std_es : public evolution_strategy<T,
-                                                 selection::tournament,
-                                                 recombination::base,
-                                                 replacement::tournament>
+  class std_es : public evolution_strategy<T,
+                                           selection::tournament,
+                                           recombination::base,
+                                           replacement::tournament>
   {
   public:
-    basic_std_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
+    std_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
       evolution_strategy<T, selection::tournament, recombination::base,
                          replacement::tournament>(pop, eva, s)
     {}
   };
 
-  using std_es = basic_std_es<vita::individual>;
-
-#include "evolution_strategy_inl.h"
+#include "kernel/evolution_strategy_inl.h"
 }  // namespace vita
 
 #endif  // EVOLUTION_STRATEGY_H

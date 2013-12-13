@@ -20,7 +20,7 @@
 /// \return the maximum allowed age for an individual in layer \a l.
 ///
 template<class T>
-unsigned basic_alps_es<T>::max_age(unsigned l) const
+unsigned alps_es<T>::max_age(unsigned l) const
 {
   assert(l < this->pop_.layers());
 
@@ -80,7 +80,7 @@ unsigned basic_alps_es<T>::max_age(unsigned l) const
 ///         layer.
 ///
 template<class T>
-bool basic_alps_es<T>::aged(coord c) const
+bool alps_es<T>::aged(coord c) const
 {
   return this->pop_[c.layer][c.index].age > max_age(c.layer);
 }
@@ -90,7 +90,7 @@ bool basic_alps_es<T>::aged(coord c) const
 /// Increments population's age and checks if it's time to add a new layer.
 ///
 template<class T>
-void basic_alps_es<T>::post_bookkeeping()
+void alps_es<T>::post_bookkeeping()
 {
   auto &pop(this->pop_);
 
@@ -118,7 +118,7 @@ void basic_alps_es<T>::post_bookkeeping()
 /// * env.stat_layers if \c false the method will not write any data.
 ///
 template<class T>
-void basic_alps_es<T>::log(unsigned last_run, unsigned current_run) const
+void alps_es<T>::log(unsigned last_run, unsigned current_run) const
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
