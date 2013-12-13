@@ -28,7 +28,7 @@ namespace vita
   ///
   /// The \c class \a gene is the building block for an \a individual.
   ///
-  template<size_t K>
+  template<unsigned K>
   class basic_gene
   {
   public:
