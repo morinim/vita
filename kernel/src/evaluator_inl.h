@@ -66,8 +66,8 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &ind)
 template<class T>
 fitness_t sum_of_errors_evaluator<T>::fast(const T &ind)
 {
-  assert(!dat_->classes());
-  assert(dat_->cbegin() != dat_->cend());
+  assert(!this->dat_->classes());
+  assert(this->dat_->cbegin() != this->dat_->cend());
 
   src_interpreter<T> agent(ind);
 
@@ -97,8 +97,8 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &ind)
 template<class T>
 double sum_of_errors_evaluator<T>::accuracy(const T &ind) const
 {
-  assert(!dat_->classes());
-  assert(dat_->cbegin() != dat_->cend());
+  assert(!this->dat_->classes());
+  assert(this->dat_->cbegin() != this->dat_->cend());
 
   std::unique_ptr<lambda_f<T>> f(lambdify(ind));
 
@@ -271,8 +271,8 @@ double count_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
 template<class T>
 double classification_evaluator<T>::accuracy(const T &ind) const
 {
-  assert(dat_->classes());
-  assert(dat_->cbegin() != dat_->cend());
+  assert(this->dat_->classes());
+  assert(this->dat_->cbegin() != this->dat_->cend());
 
   std::unique_ptr<lambda_f<T>> f(this->lambdify(ind));
 
@@ -318,7 +318,7 @@ template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
   assert(ind.debug());
-  assert(dat_->classes() > 1);
+  assert(this->dat_->classes() > 1);
 
   engine_ = dyn_slot_engine<T>(ind, *this->dat_, x_slot_);
 
@@ -358,7 +358,7 @@ template<class T>
 fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 {
   assert(ind.debug());
-  assert(dat_->classes() > 1);
+  assert(this->dat_->classes() > 1);
   gaussian_engine<T> engine_(ind, *this->dat_);
 
   fitness_t::base_t d(0.0);

@@ -104,7 +104,7 @@ namespace vita
       assert(ip_.index > backup.index);
       const any ret(prg_[ip_].sym->eval(this));
       ip_ = backup;
-      assert(to_string(ret) == to_string(*cache_(l)));
+      assert(to<std::string>(ret) == to<std::string>(*cache_(l)));
     }
 #endif
 
@@ -118,15 +118,17 @@ namespace vita
   ///
   any interpreter<individual>::fetch_adf_arg(unsigned i)
   {
+    interpreter<individual> *ctx(static_cast<interpreter<individual> *>(
+                                   context_));
 #if !defined(NDEBUG)
-    assert(context_);
-    assert(context_->debug());
+    assert(ctx);
+    assert(ctx->debug());
     assert(i < gene::k_args);
 
-    const gene context_g(context_->prg_[context_->ip_]);
-    assert(!context_g.sym->terminal() && context_g.sym->auto_defined()));
+    const gene ctx_g(ctx->prg_[ctx->ip_]);
+    assert(!ctx_g.sym->terminal() && ctx_g.sym->auto_defined());
 #endif
-    return static_cast<interpreter<individual> *>(context_)->fetch_arg(i);
+    return ctx->fetch_arg(i);
   }
 
   ///
