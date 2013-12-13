@@ -21,7 +21,7 @@
 namespace vita
 {
   class individual;
-  template<class T> class basic_team;
+  template<class T> class team;
 
   ///
   /// \tparam T the type of individual used.
@@ -83,11 +83,10 @@ namespace vita
   /// This class executes a team of individuals of type \a T.
   ///
   template<class T>
-  class interpreter<basic_team<T>> : public basic_interpreter<basic_team<T>>
+  class interpreter<team<T>> : public basic_interpreter<team<T>>
   {
   public:
-    explicit interpreter(const basic_team<T> &,
-                         interpreter<basic_team<T>> * = nullptr);
+    explicit interpreter(const team<T> &, interpreter<team<T>> * = nullptr);
 
     virtual any run() override;
 

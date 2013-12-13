@@ -119,7 +119,7 @@ void search<T, ES>::arl(const T &base)
 ///
 template<class T, template<class> class ES>
 template<class U>
-void search<T, ES>::arl(const basic_team<U> &base)
+void search<T, ES>::arl(const team<U> &base)
 {
   for (const auto &ind : base)
     arl(ind);

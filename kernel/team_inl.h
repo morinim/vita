@@ -21,7 +21,7 @@
 /// Creates a team of individuals that will cooperate to solve a task.
 ///
 template<class T>
-basic_team<T>::basic_team(const environment &e, const symbol_set &sset)
+team<T>::team(const environment &e, const symbol_set &sset)
   : signature_()
 {
   assert(e.debug(true, true));
@@ -43,7 +43,7 @@ basic_team<T>::basic_team(const environment &e, const symbol_set &sset)
 /// the environment.
 ///
 template<class T>
-unsigned basic_team<T>::mutation()
+unsigned team<T>::mutation()
 {
   const auto p_mutation(env().p_mutation);
   assert(p_mutation >= 0.0);
@@ -58,7 +58,7 @@ unsigned basic_team<T>::mutation()
 /// team.
 ///
 template<class T>
-unsigned basic_team<T>::mutation(double p)
+unsigned team<T>::mutation(double p)
 {
   assert(0.0 <= p && p <= 1.0);
   return random::element(individuals_).mutation(p);
@@ -72,14 +72,14 @@ unsigned basic_team<T>::mutation(double p)
 /// \see individual::crossover for further details
 ///
 template<class T>
-basic_team<T> basic_team<T>::crossover(const basic_team<T> &p) const
+team<T> team<T>::crossover(const team<T> &p) const
 {
   assert(p.debug());
   assert(size() == p.size());
 
   const auto j(random::sup(individuals()));
 
-  basic_team<T> offspring(*this);
+  team<T> offspring(*this);
   offspring.individuals_[j] = offspring[j].crossover(p[j]);
 
   return offspring;
@@ -89,7 +89,7 @@ basic_team<T> basic_team<T>::crossover(const basic_team<T> &p) const
 /// \return an iterator pointing to the first individual of the team.
 ///
 template<class T>
-typename basic_team<T>::const_iterator basic_team<T>::begin() const
+typename team<T>::const_iterator team<T>::begin() const
 {
   return individuals_.begin();
 }
@@ -98,7 +98,7 @@ typename basic_team<T>::const_iterator basic_team<T>::begin() const
 /// \return an iterator pointing to a end-of-team sentry.
 ///
 template<class T>
-typename basic_team<T>::const_iterator basic_team<T>::end() const
+typename team<T>::const_iterator team<T>::end() const
 {
   return individuals_.end();
 }
@@ -108,7 +108,7 @@ typename basic_team<T>::const_iterator basic_team<T>::end() const
 /// \return the l-th \c gene of \a this \c individual.
 ///
 template<class T>
-const T &basic_team<T>::operator[](unsigned i) const
+const T &team<T>::operator[](unsigned i) const
 {
   assert(i < individuals());
   return individuals_[i];
@@ -118,7 +118,7 @@ const T &basic_team<T>::operator[](unsigned i) const
 /// \return number of individuals of the team.
 ///
 template<class T>
-unsigned basic_team<T>::individuals() const
+unsigned team<T>::individuals() const
 {
   return individuals_.size();
 }
@@ -130,7 +130,7 @@ unsigned basic_team<T>::individuals() const
 /// \see eff_size()
 ///
 template<class T>
-unsigned basic_team<T>::size() const
+unsigned team<T>::size() const
 {
   unsigned s(0);
 
@@ -145,7 +145,7 @@ unsigned basic_team<T>::size() const
 /// \see size()
 ///
 template<class T>
-unsigned basic_team<T>::eff_size() const
+unsigned team<T>::eff_size() const
 {
   unsigned ef(0);
 
@@ -171,7 +171,7 @@ unsigned basic_team<T>::eff_size() const
 /// retrieval, entropy calculation...
 ///
 template<class T>
-hash_t basic_team<T>::signature() const
+hash_t team<T>::signature() const
 {
   if (signature_.empty())
     signature_ = hash();
@@ -184,7 +184,7 @@ hash_t basic_team<T>::signature() const
 ///
 ///
 template<class T>
-hash_t basic_team<T>::hash() const
+hash_t team<T>::hash() const
 {
   hash_t ret;
 
@@ -202,7 +202,7 @@ hash_t basic_team<T>::hash() const
 /// Age is not checked.
 ///
 template<class T>
-bool basic_team<T>::operator==(const basic_team<T> &x) const
+bool team<T>::operator==(const team<T> &x) const
 {
   const auto sup(individuals());
   for (auto i(decltype(sup){0}); i < sup; ++i)
@@ -218,7 +218,7 @@ bool basic_team<T>::operator==(const basic_team<T> &x) const
 /// (the number of different genes between teams).
 ///
 template<class T>
-unsigned basic_team<T>::distance(const basic_team<T> &x) const
+unsigned team<T>::distance(const team<T> &x) const
 {
   unsigned d(0);
 
@@ -244,7 +244,7 @@ unsigned basic_team<T>::distance(const basic_team<T> &x) const
 /// \return the age of the team (average age of the team members).
 ///
 template<class T>
-unsigned basic_team<T>::age() const
+unsigned team<T>::age() const
 {
   unsigned age(0);
   for (const auto &i : individuals_)
@@ -257,7 +257,7 @@ unsigned basic_team<T>::age() const
 /// Increments the age of every element of the team.
 ///
 template<class T>
-void basic_team<T>::inc_age()
+void team<T>::inc_age()
 {
   for (auto &i : individuals_)
     i.inc_age();
@@ -267,7 +267,7 @@ void basic_team<T>::inc_age()
 /// \return the environment of the team.
 ///
 template<class T>
-const environment &basic_team<T>::env() const
+const environment &team<T>::env() const
 {
   return individuals_[0].env();
 }
@@ -276,7 +276,7 @@ const environment &basic_team<T>::env() const
 /// \return the symbol_set of the team.
 ///
 template<class T>
-const symbol_set &basic_team<T>::sset() const
+const symbol_set &team<T>::sset() const
 {
   return individuals_[0].sset();
 }
@@ -286,7 +286,7 @@ const symbol_set &basic_team<T>::sset() const
 /// \return \c true if the team passes the internal consistency check.
 ///
 template<class T>
-bool basic_team<T>::debug(bool verbose) const
+bool team<T>::debug(bool verbose) const
 {
   for (const auto &i : individuals_)
     if (!i.debug(verbose))
@@ -306,7 +306,7 @@ bool basic_team<T>::debug(bool verbose) const
 /// If the load operation isn't successful the current team isn't modified.
 ///
 template<class T>
-bool basic_team<T>::load(std::istream &in)
+bool team<T>::load(std::istream &in)
 {
   unsigned n;
   if (!(in >> n))
@@ -337,7 +337,7 @@ bool basic_team<T>::load(std::istream &in)
 /// \return \c true if team was saved correctly.
 ///
 template<class T>
-bool basic_team<T>::save(std::ostream &out) const
+bool team<T>::save(std::ostream &out) const
 {
   out << individuals() << std::endl;
   if (!out.good())
@@ -356,7 +356,7 @@ bool basic_team<T>::save(std::ostream &out) const
 /// \return output stream including \a ind.
 ///
 template<class T>
-std::ostream &operator<<(std::ostream &s, const basic_team<T> &t)
+std::ostream &operator<<(std::ostream &s, const team<T> &t)
 {
   for (const auto &i : t)
     s << i << std::endl;
@@ -370,7 +370,7 @@ std::ostream &operator<<(std::ostream &s, const basic_team<T> &t)
 /// (http://www.graphviz.org), of \c this team.
 ///
 template<class T>
-void basic_team<T>::graphviz(std::ostream &s) const
+void team<T>::graphviz(std::ostream &s) const
 {
   const auto size(individuals_.size());
 
@@ -391,7 +391,7 @@ void basic_team<T>::graphviz(std::ostream &s) const
 /// Not at all human readable, but a compact representation for import/export.
 ///
 template<class T>
-void basic_team<T>::in_line(std::ostream &s) const
+void team<T>::in_line(std::ostream &s) const
 {
   for (const auto &i : individuals_)
     s << '{' << i.in_line(s) << '}';
@@ -407,7 +407,7 @@ void basic_team<T>::in_line(std::ostream &s) const
 /// 30 GOTO 10
 ///
 template<class T>
-void basic_team<T>::list(std::ostream &s) const
+void team<T>::list(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
@@ -420,7 +420,7 @@ void basic_team<T>::list(std::ostream &s) const
 /// \param[out] s output stream.
 ///
 template<class T>
-void basic_team<T>::tree(std::ostream &s) const
+void team<T>::tree(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {

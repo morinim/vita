@@ -25,10 +25,10 @@ namespace vita
   ///        \a population.
   ///
   template<class T>
-  class basic_team
+  class team
   {
   public:
-    basic_team(const environment &, const symbol_set &);
+    team(const environment &, const symbol_set &);
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;
@@ -39,7 +39,7 @@ namespace vita
     // Recombination operators.
     unsigned mutation();
     unsigned mutation(double);
-    basic_team<T> crossover(const basic_team<T> &) const;
+    team<T> crossover(const team<T> &) const;
 
     typedef typename std::vector<T>::const_iterator const_iterator;
     const_iterator begin() const;
@@ -52,8 +52,8 @@ namespace vita
 
     hash_t signature() const;
 
-    bool operator==(const basic_team<T> &) const;
-    unsigned distance(const basic_team<T> &) const;
+    bool operator==(const team<T> &) const;
+    unsigned distance(const team<T> &) const;
 
     unsigned age() const;
     void inc_age();
@@ -76,10 +76,9 @@ namespace vita
     mutable hash_t signature_;
   };
 
-  template<class T> std::ostream &operator<<(std::ostream &,
-                                             const basic_team<T> &);
+  template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
-#include "team_inl.h"
+#include "kernel/team_inl.h"
 }  // namespace vita
 
 #endif  // TEAM_H

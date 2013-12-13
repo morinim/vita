@@ -31,8 +31,7 @@ basic_interpreter<T>::basic_interpreter(const T &p, basic_interpreter<T> *ctx)
 ///                for the evaluation of ADF).
 ///
 template<class T>
-interpreter<basic_team<T>>::interpreter(const basic_team<T> &t,
-                                        interpreter<basic_team<T>> *ctx)
+interpreter<team<T>>::interpreter(const team<T> &t, interpreter<team<T>> *ctx)
   : basic_interpreter<T>(t, ctx)
 {
 }
@@ -41,7 +40,7 @@ interpreter<basic_team<T>>::interpreter(const basic_team<T> &t,
 /// \return the output of the team.
 ///
 template<class T>
-any interpreter<basic_team<T>>::run()
+any interpreter<team<T>>::run()
 {
   const auto size(this->prg_.size());
   std::vector<any> result(size);
@@ -59,7 +58,7 @@ any interpreter<basic_team<T>>::run()
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T>
-bool interpreter<basic_team<T>>::debug() const
+bool interpreter<team<T>>::debug() const
 {
   for (const auto &i : this->prg_)
     if (!i.debug())

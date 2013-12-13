@@ -50,7 +50,7 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const T &);
-    template<class U> void arl(const basic_team<U> &);
+    template<class U> void arl(const team<U> &);
 
     void tune_parameters();
 
