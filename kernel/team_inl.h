@@ -103,8 +103,8 @@ typename team<T>::const_iterator team<T>::end() const
 }
 
 ///
-/// \param[in] l locus of a \c gene.
-/// \return the l-th \c gene of \a this \c individual.
+/// \param[in] i index of a member of the team.
+/// \return the i-th member of the team.
 ///
 template<class T>
 const T &team<T>::operator[](unsigned i) const

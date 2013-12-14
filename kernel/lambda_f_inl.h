@@ -1,14 +1,13 @@
 /**
- *
- *  \file lambda_f_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(LAMBDA_F_INL_H)
@@ -26,7 +25,7 @@ any lambda_f<T>::operator()(const data::example &e) const
 
 ///
 /// \param[in] ind individual used for classification.
-/// \param[in] the training set.
+/// \param[in] d the training set.
 ///
 template<class T>
 class_lambda_f<T>::class_lambda_f(const T &ind, const data &d)

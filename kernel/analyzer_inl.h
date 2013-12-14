@@ -202,6 +202,7 @@ unsigned analyzer<T>::count(const T &t)
 ///
 /// \param[in] ind new individual.
 /// \param[in] f fitness of the new individual.
+/// \param[in] l a layer of the population.
 ///
 /// Adds a new individual to the pool used to calculate statistics.
 ///
