@@ -21,8 +21,11 @@
 namespace vita
 {
   ///
-  /// \brief A collection of cooperating individuals used as a member of a
-  ///        \a population.
+  /// \brief A collection of cooperating individuals used as a member of
+  ///        vita::population.
+  ///
+  /// \tparam T type of the elements of the team (individuals).
+  ///
   ///
   template<class T>
   class team

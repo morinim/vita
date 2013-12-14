@@ -29,10 +29,10 @@ namespace vita
   template<class> class distribution;
 
   ///
+  /// \brief This \c class drives the evolution.
+  ///
   /// \tparam T the type of individual used.
   /// \tparam ES the adopted evolution strategy.
-  ///
-  /// This \c class drives the evolution.
   ///
   /// \note
   /// The class uses a template template parameter.
@@ -68,6 +68,9 @@ namespace vita
              const std::list<unsigned> &, unsigned, double, unsigned);
     void print_resume(bool, const fitness_t &, double) const;
     bool stop_condition(const summary<T> &) const;
+
+    void specialized_arl(const individual &);
+    template<class U> void specialized_arl(const team<U> &);
 
   protected:  // Protected data members.
     std::unique_ptr<evaluator<T>> active_eva_;
