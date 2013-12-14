@@ -1,32 +1,17 @@
 /**
- *
- *  \file search_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(SEARCH_INL_H)
 #define      SEARCH_INL_H
-
-namespace impl
-{
-  class individual;
-  template<class> class team;
-
-  template<class T> void arl(const T &, const environment &, evaluator<T> &,
-                             problem *);
-
-  // We have to forward declae the specialization or the compiler will use the
-  // standard method.
-  template<> void arl(const individual &, const environment &,
-                      evaluator<individual> &, problem *);
-}  // namespace impl
 
 ///
 /// \param[in] prob a \c problem used for search initialization.

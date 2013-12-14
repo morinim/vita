@@ -1,14 +1,13 @@
 /**
- *
- *  \file team_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(TEAM_INL_H)
@@ -352,8 +351,8 @@ bool team<T>::save(std::ostream &out) const
 
 ///
 /// \param[out] s output stream.
-/// \param[in] ind individual to print.
-/// \return output stream including \a ind.
+/// \param[in] t team to print.
+/// \return output stream including \a t.
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
