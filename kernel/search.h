@@ -26,7 +26,7 @@
 
 namespace vita
 {
-  template<class T> class distribution;
+  template<class> class distribution;
 
   ///
   /// \tparam T the type of individual used.
@@ -50,7 +50,6 @@ namespace vita
     explicit search(problem *const);
 
     void arl(const T &);
-    template<class U> void arl(const team<U> &);
 
     void tune_parameters();
 

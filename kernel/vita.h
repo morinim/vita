@@ -9,26 +9,6 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *
- *  \mainpage VITA v0.9.8
- *
- *  \section Introduction
- *  Welcome to the Vita project.
- *
- *  This is the reference guide for the Vita APIs.
- *
- *  \section note_sec Notes
- *  New versions of this program will be available at
- *  http://code.google.com/p/vita/
- *
- *  Please reports any suggestions and/or bugs to:
- *  <dl>
- *    <dt>Forum</dt>
- *    <dd>http://groups.google.com/group/vita-prj</dd>
- *    <dt>Issue tracking system</dt>
- *    <dd>http://code.google.com/p/vita/issues/list</dd>
- *  </dl>
- *
  */
 
 #if !defined(VITA_H)
