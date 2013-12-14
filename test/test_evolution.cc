@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include "kernel/evolution.h"
+#include "kernel/individual.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE evolution
@@ -29,6 +30,8 @@ BOOST_FIXTURE_TEST_SUITE(evolution, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(Creation)
 {
+  using namespace vita;
+
   for (unsigned n(4); n <= 100; ++n)
     for (unsigned l(sset.categories() + 2); l <= 100; l+= (l < 10 ? 1 : 30))
     {
@@ -36,13 +39,13 @@ BOOST_AUTO_TEST_CASE(Creation)
       env.code_length = l;
       env.tournament_size = 3;
 
-      const std::unique_ptr<vita::evaluator> eva(
-        vita::make_unique<vita::random_evaluator>());
+      const std::unique_ptr<evaluator<individual>> eva(
+        make_unique<vita::random_evaluator<individual>>());
 
-      vita::evolution<vita::alps_es> evo1(env, sset, *eva.get());
+      vita::evolution<individual, alps_es> evo1(env, sset, *eva.get());
       BOOST_REQUIRE(evo1.debug(true));
 
-      vita::evolution<vita::std_es> evo2(env, sset, *eva.get());
+      vita::evolution<individual, std_es> evo2(env, sset, *eva.get());
       BOOST_REQUIRE(evo2.debug(true));
     }
 }

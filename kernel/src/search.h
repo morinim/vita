@@ -15,6 +15,8 @@
 #define      SRC_SEARCH_H
 
 #include "kernel/search.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/src/problem.h"
 
 namespace vita
 {

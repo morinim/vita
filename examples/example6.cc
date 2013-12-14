@@ -16,11 +16,12 @@
 #include <fstream>
 #include <memory>
 
-#include "kernel/environment.h"
 #include "kernel/evolution.h"
-#include "kernel/interpreter.h"
+#include "kernel/individual.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
+
+using i_interp = vita::interpreter<vita::individual>;
 
 // This class models the first input.
 class X : public vita::terminal
@@ -28,7 +29,8 @@ class X : public vita::terminal
 public:
   X() : vita::terminal("X", 0, true) {}
 
-  vita::any eval(vita::interpreter *) const { return vita::any(val); }
+  vita::any eval(i_interp *) const
+  { return vita::any(val); }
 
   static double val;
 };
@@ -38,7 +40,8 @@ class Y : public vita::terminal
 public:
   Y() : vita::terminal("Y", 0, true) {}
 
-  vita::any eval(vita::interpreter *) const { return vita::any(val); }
+  vita::any eval(i_interp *) const
+  { return vita::any(val); }
 
   static double val;
 };
@@ -48,7 +51,7 @@ class Z : public vita::terminal
 public:
   Z() : vita::terminal("Z", 0, true) {}
 
-  vita::any eval(vita::interpreter *) const { return vita::any(val); }
+  vita::any eval(i_interp *) const { return vita::any(val); }
 
   static double val;
 };
@@ -57,11 +60,11 @@ double X::val;
 double Y::val;
 double Z::val;
 
-class my_evaluator : public vita::evaluator
+class my_evaluator : public vita::evaluator<vita::individual>
 {
   vita::fitness_t operator()(const vita::individual &ind)
   {
-    vita::interpreter agent(ind);
+    i_interp agent(ind);
 
     vita::fitness_t::base_t fit(0.0);
     for (double x(0); x < 10; ++x)
@@ -106,9 +109,9 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  std::unique_ptr<vita::evaluator> eva(vita::make_unique<my_evaluator>());
+  auto eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::std_es> evo(env, sset, *eva.get());
+  vita::evolution<vita::individual, vita::std_es> evo(env, sset, *eva.get());
 
   evo.run(1);
 

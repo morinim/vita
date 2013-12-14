@@ -31,6 +31,7 @@ BOOST_FIXTURE_TEST_SUITE(primitive_i, F_FACTORY4)
 BOOST_AUTO_TEST_CASE(ADD)
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::individual>;
   vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
@@ -40,7 +41,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{   c0,   null}},  // [1] 0
     {{    x,   null}}   // [2] X
   });
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
                         "\n" << i);
 
@@ -51,7 +52,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    y,   null}},  // [1] Y
     {{    x,   null}}   // [2] X
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(y->eval(0)) +
                         any_cast<int>(x->eval(0)), "\n" << i);
 
@@ -62,7 +63,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}},  // [1] X
     {{neg_x,   null}}   // [2] -X
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
@@ -74,13 +75,14 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}},  // [3] X
     {{    y,   null}},  // [4] Y
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 }
 
 BOOST_AUTO_TEST_CASE(DIV)
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::individual>;
   vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
@@ -90,7 +92,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}},  // [1] X
     {{    x,   null}}   // [2] X
   });
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
@@ -100,7 +102,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}},  // [1] X
     {{   c1,   null}}   // [2] 1
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
                         "\n" << i);
 
@@ -111,7 +113,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{neg_x,   null}},  // [1] -X
     {{    x,   null}}   // [2] X
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == -1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(X,0) == X");
@@ -121,7 +123,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}},  // [1] X
     {{   c0,   null}}   // [2] 0
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
                         "\n" << i);
 }
@@ -129,6 +131,7 @@ BOOST_AUTO_TEST_CASE(DIV)
 BOOST_AUTO_TEST_CASE(IFE)
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::individual>;
   vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
@@ -138,7 +141,7 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c0,         null}},  // [1] 0
     {{   c1,         null}}   // [2] 1
   });
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
@@ -148,7 +151,7 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c0,         null}},  // [1] 0
     {{   c1,         null}}   // [2] 1
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
@@ -161,13 +164,14 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c0,         null}}   // [1] 0
   };
   static_cast<Z *>(z)->val = 0;
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 }
 
 BOOST_AUTO_TEST_CASE(MUL)
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::individual>;
   vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
@@ -177,7 +181,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{    x,   null}},  // [1] X
     {{   c0,   null}}   // [2] 0
   });
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
@@ -187,7 +191,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{    x,   null}},  // [1] X
     {{   c1,   null}}   // [2] 1
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
                         "\n" << i);
 
@@ -200,13 +204,14 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{    x,   null}},  // [3] X
     {{   c2,   null}}   // [4] 2
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 }
 
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::individual>;
   vita::individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
@@ -216,7 +221,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{    x,   null}},  // [1] X
     {{    x,   null}}   // [2] X
   });
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i);
 
   BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
@@ -226,7 +231,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{    x,   null}},  // [1] X
     {{   c0,   null}}   // [2] 0
   };
-  ret = interpreter(i.replace(g)).run();
+  ret = i_interp(i.replace(g)).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
                         "\n" << i);
 
@@ -240,7 +245,7 @@ BOOST_AUTO_TEST_CASE(SUB)
   for (unsigned j(0); j < 1000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
-    ret = interpreter(i.replace(g)).run();
+    ret = i_interp(i.replace(g)).run();
     BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) ==
                           static_cast<Z *>(z)->val -
                           any_cast<int>(x->eval(0)), "\n" << i);

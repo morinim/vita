@@ -66,11 +66,11 @@ int main(int argc, char *argv[])
 
       std::cout << std::endl << "BLOCK at locus " << l << std::endl;
       blk.list(std::cout);
-      const any val(interpreter(blk).run());
+      const any val(interpreter<individual>(blk).run());
       if (val.empty())
         std::cout << "Empty output.";
       else
-        std::cout << "Output: " << interpreter::to_string(val);
+        std::cout << "Output: " << to<std::string>(val);
       std::cout << std::endl;
 
       if (blk.eff_size() <= 20)
@@ -94,16 +94,16 @@ int main(int argc, char *argv[])
         individual blk3(blk.replace({{f, positions}}));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const any val3(interpreter(blk3).run());
+        const any val3(interpreter<individual>(blk3).run());
         if (val3.empty())
           std::cout << "Empty output.";
         else
-          std::cout << "Output: " << interpreter::to_string(val3);
+          std::cout << "Output: " << to<std::string>(val3);
         std::cout << std::endl << std::endl;
 
         if (val.empty() != val3.empty() ||
             (!val.empty() && !val3.empty() &&
-             interpreter::to_string(val) != interpreter::to_string(val3)))
+             to<std::string>(val) != to<std::string>(val3)))
         {
           std::cerr << "ADF EVAL ERROR." << std::endl;
           return EXIT_FAILURE;

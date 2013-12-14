@@ -46,11 +46,11 @@ int main(int argc, char *argv[])
   ind.dump(std::cout);
   std::cout << std::endl;
 
-  const vita::any val(vita::interpreter(ind).run());
+  const vita::any val(vita::interpreter<vita::individual>(ind).run());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else
-    std::cout << "Output: " << vita::interpreter::to_string(val) << std::endl;
+    std::cout << "Output: " << vita::to<std::string>(val) << std::endl;
 
   return EXIT_SUCCESS;
 }

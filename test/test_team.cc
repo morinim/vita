@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   for (unsigned l(sset.categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
-    vita::basic_team<vita::individual> t(env, sset);
+    vita::team<vita::individual> t(env, sset);
     // std::cout << t << std::endl;
 
     BOOST_REQUIRE(t.debug());
@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::basic_team<vita::individual> t(env, sset);
-  const vita::basic_team<vita::individual> orig(t);
+  vita::team<vita::individual> t(env, sset);
+  const vita::team<vita::individual> orig(t);
 
   BOOST_REQUIRE_GT(t.individuals(), 0);
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::basic_team<vita::individual> t1(t);
+    const vita::team<vita::individual> t1(t);
 
     t.mutation();
 
@@ -92,13 +92,13 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::basic_team<vita::individual> a(env, sset);
+    vita::team<vita::individual> a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
 
-    vita::basic_team<vita::individual> b(a);
+    vita::team<vita::individual> b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
-    vita::basic_team<vita::individual> c(env, sset);
+    vita::team<vita::individual> c(env, sset);
     if (a.signature() != c.signature())
       BOOST_REQUIRE_NE(a, c);
   }
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  vita::basic_team<vita::individual> t1(env, sset), t2(env, sset);
+  vita::team<vita::individual> t1(env, sset), t2(env, sset);
 
   const unsigned n(2000);
   double dist(0.0);
@@ -125,14 +125,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::basic_team<vita::individual> t1(env, sset);
+    vita::team<vita::individual> t1(env, sset);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       t1.inc_age();
 
     BOOST_REQUIRE(t1.save(ss));
 
-    vita::basic_team<vita::individual> t2(env, sset);
+    vita::team<vita::individual> t2(env, sset);
     BOOST_REQUIRE(t2.load(ss));
     BOOST_REQUIRE(t2.debug());
 

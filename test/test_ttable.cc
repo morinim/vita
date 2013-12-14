@@ -104,6 +104,7 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
 BOOST_AUTO_TEST_CASE(CollisionDetection)
 {
+  using i_interp = vita::interpreter<vita::individual>;
   vita::ttable cache(14);
   env.code_length = 64;
 
@@ -113,7 +114,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, sset);
-    const vita::any val(vita::interpreter(i1).run());
+    const vita::any val(i_interp(i1).run());
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
@@ -126,7 +127,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::fitness_t f;
     if (cache.find(vi[i], &f))
     {
-      const vita::any val(vita::interpreter(vi[i]).run());
+      const vita::any val(i_interp(vi[i]).run());
       vita::fitness_t f1(
         {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
@@ -137,6 +138,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
+  using i_interp = vita::interpreter<vita::individual>;
   vita::ttable cache(14), cache2(14);
   env.code_length = 64;
 
@@ -147,7 +149,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < n; ++i)
   {
     vita::individual i1(env, sset);
-    const vita::any val(vita::interpreter(i1).run());
+    const vita::any val(i_interp(i1).run());
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
@@ -169,7 +171,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < n; ++i)
     if (present[i])
     {
-      const vita::any val(vita::interpreter(vi[i]).run());
+      const vita::any val(i_interp(vi[i]).run());
       vita::fitness_t f(
         {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
