@@ -25,6 +25,30 @@ namespace vita
   ///
   /// \tparam T type of the elements of the team (individuals).
   ///
+  /// In generals teams of individuals can be implemented in different ways.
+  /// * Firstly, a certain number of individuals can be selected randomly from
+  ///   the population and evaluated in combination as a team (but we have a
+  ///   credit assignment problem).
+  /// * Secondly, team members can be evolved in separate subpopulations which
+  ///   provide a more specialized development.
+  /// * We can use an explicit team representation that is considered as one
+  ///   individual by the evolutionary algorithm. The population is subdivided
+  ///   into fixed, equal-sized groups of individuals. Each program is
+  ///   assigned a fixed position index in its team (program vector). The
+  ///   members of a team undergo a coevolutionary process because they are
+  ///   always selected, evaluated and varied simultaneously. This eliminates
+  ///   the credit assignment problem and renders the composition of teams an
+  ///   an object of evolution.
+  ///
+  /// \note
+  /// The team size has to be large enough to cause an improved prediction
+  /// compared to the traditional approach, i.e. team size one (but the
+  /// complexity of the search space and the training time, respectively,
+  /// grow exponentially with the number of coevolved programs).
+  ///
+  /// \see
+  /// "Evolving Teams of Predictors with Linear Genetic Programming"
+  /// (Markus Braimer, Wolfgang Banzhaf).  
   ///
   template<class T>
   class team

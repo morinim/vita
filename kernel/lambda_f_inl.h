@@ -65,13 +65,13 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
   slot_matrix.fill(0);
 
   // In the first step this method evaluates the program to obtain an output
-  // value for each training example. Based on the program output value a
-  // a bidimentional matrix is built (slot_matrix_(slot, class)).
+  // value for each training example. Based on the program output a
+  // bi-dimensional matrix is built (slot_matrix_(slot, class)).
   for (const auto &example : d)
   {
     ++dataset_size;
 
-    const auto where(slot(ind, example));
+    const auto where(slot(ind, example));  // Insertion slot
 
     ++slot_matrix(where, example.label());
   }
@@ -130,7 +130,7 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
     return last_slot;
 
   const double val(to<double>(res));
-  const auto where(static_cast<unsigned>(normalize_01(val) * ns));
+  const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 
   return (where >= ns) ? last_slot : where;
 }
