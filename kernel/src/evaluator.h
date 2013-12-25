@@ -61,14 +61,14 @@ namespace vita
   /// This evaluator will drive the evolution towards the minimum sum of
   /// absolute errors(\f$\frac{1}{n} \sum_{i=1}^n |target_i - actual_i|\f$).
   ///
-  /// There is also a penality for illegal values (it is a function of the
+  /// There is also a penalty for illegal values (it is a function of the
   /// number of illegal values).
   ///
   /// \note
   /// When the dataset contains outliers, the mse_evaluator will heavily
   /// weight each of them (this is the result of squaring the outliers).
   /// mae_evaluator is less sensitive to the presence of outliers (a
-  /// desiderable property in many application).
+  /// desirable property in many application).
   ///
   /// \see \ref mse_evaluator.
   ///
@@ -117,7 +117,7 @@ namespace vita
   /// This evaluator will drive the evolution towards the minimum sum of
   /// squared errors (\f$\frac{1}{n} \sum_{i=1}^n (target_i - actual_i)^2\f$).
   ///
-  /// There is also a penality for illegal values (it is a function of the
+  /// There is also a penalty for illegal values (it is a function of the
   /// number of illegal values).
   ///
   /// \note
@@ -144,7 +144,7 @@ namespace vita
   ///
   /// This evaluator will drive the evolution towards the maximum sum of
   /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
-  /// All incorrect answers receive the same fitness penality.
+  /// All incorrect answers receive the same fitness penalty.
   ///
   template<class T>
   class count_evaluator : public sum_of_errors_evaluator<T>
@@ -225,7 +225,7 @@ namespace vita
   };
 
   ///
-  /// Single class evaluator for classification problems
+  /// \brief Single class evaluator for classification problems
   ///
   template<class T>
   class binary_evaluator : public classification_evaluator<T>
