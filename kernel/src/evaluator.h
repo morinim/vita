@@ -22,6 +22,16 @@ namespace vita
 {
   template<class T> class src_interpreter;
 
+  ///
+  /// \brief An evaluator specialized for symbolic regression / classification
+  ///        problems
+  ///
+  /// \tparam T type of individual.
+  ///
+  /// This specialization of the evaluator class is "dataset-aware". It is
+  /// useful to group common factors of more specialized symbolic regression
+  /// or classification classes.  
+  ///
   template<class T>
   class src_evaluator : public evaluator<T>
   {
@@ -33,7 +43,7 @@ namespace vita
   };
 
   ///
-  /// \brief An evaluator to minimize the sum of some sort of error.
+  /// \brief An evaluator to minimize the sum of some sort of error
   ///
   /// This class models the evaluators that will drive the evolution towards
   /// the minimum sum of some sort of error.

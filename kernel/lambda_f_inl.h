@@ -14,13 +14,43 @@
 #define      LAMBDA_F_INL_H
 
 ///
+/// \param[in] ind the individual to be lambdified.
+///
+template<class T>
+lambda_f<T>::lambda_f(const T &ind) : ind_(ind)
+{
+  assert(ind_.debug());
+}
+
+///
+/// \return An empty string.
+///
+/// Specialized classes can map values to names by this method.
+///
+template<class T>
+std::string lambda_f<T>::name(const any &) const
+{
+  return std::string();
+}
+
+///
+/// \param[in] ind the individual to be lambdified.
+///
+template<class T>
+reg_lambda_f<T>::reg_lambda_f(const T &ind)
+  : lambda_f<T>(ind), int_(this->ind_)
+{
+  assert(int_.debug());
+}    
+
+///
 /// \param[in] e input example for the lambda function.
 /// \return the output value associated with \a e.
 ///
 template<class T>
-any lambda_f<T>::operator()(const data::example &e) const
+any reg_lambda_f<T>::operator()(const data::example &e) const
 {
-  return any(src_interpreter<T>(ind_).run(e.input));
+  return any(int_.run(e.input));
 }
 
 ///

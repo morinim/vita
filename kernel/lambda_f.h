@@ -25,26 +25,41 @@ namespace vita
   template<class T> class gaussian_evaluator;
 
   ///
-  /// This class transforms individuals to lambda functions which can be used
-  /// to calculate the answers for symbolic regression problems.
+  /// \brief Transforms individuals into lambda functions
   ///
-  /// \note
-  /// For classification problems there are other classes derived from
-  /// \c lambda_f.
+  /// \tparam T type of individual.
+  ///
+  /// This class transforms individuals into lambda functions which can be
+  /// used to calculate the answers for symbolic regression /
+  /// classification problems.
   ///
   template<class T>
   class lambda_f
   {
   public:
-    explicit lambda_f(const T &ind) : ind_(ind)
-    { assert(ind.debug()); }
+    explicit lambda_f(const T &);
 
-    virtual any operator()(const data::example &) const;
-
-    virtual std::string name(const any &) const { return std::string(); }
+    virtual any operator()(const data::example &) const = 0;
+    
+    virtual std::string name(const any &) const;
 
   protected:
     T ind_;
+  };
+  
+  ///
+  /// \brief Transforms individual to a lambda function for regression.
+  ///
+  template<class T>
+  class reg_lambda_f : public lambda_f<T>
+  {
+  public:
+    explicit reg_lambda_f(const T &);
+
+    virtual any operator()(const data::example &) const final;
+  
+  protected:
+    mutable src_interpreter<T> int_;
   };
 
   ///

@@ -128,7 +128,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<lambda_f<T>>(ind);
+  return make_unique<reg_lambda_f<T>>(ind);
 }
 
 ///

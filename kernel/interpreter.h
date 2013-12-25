@@ -1,8 +1,10 @@
 /**
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
@@ -21,9 +23,9 @@ namespace vita
   template<class T> class team;
 
   ///
-  /// \tparam T the type of individual used.
+  /// \brief Minimum interface of an interpreter
   ///
-  /// This class specifies the minimum interface of an interpreter.
+  /// \tparam T the type of individual used.
   ///
   template<class T>
   class basic_interpreter
@@ -41,6 +43,8 @@ namespace vita
     basic_interpreter<T> *const context_;
   };
 
+  ///
+  /// \brief "Run" the individual
   ///
   /// \tparam T the type of individual used.
   ///

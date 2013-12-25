@@ -27,11 +27,11 @@ namespace vita
   ///
   /// Procedure:
   /// 1. the population set should be loaded adding (analyzer::add method) one
-  ///    invividual at time;
+  ///    individual at time;
   /// 2. statistics can be checked executing the desidered methods.
   ///
   /// Informations regard:
-  /// * the set as a whole (analyzer::fit_dist, analyzer::length dist,
+  /// * the set as a whole (analyzer::fit_dist, analyzer::length_dist,
   ///   analyzer::functions, analyzer::terminals methods);
   /// * symbols appearing in the set (accessed via analyzer::begin and
   ///   analyzer::end methods).
