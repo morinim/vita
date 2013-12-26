@@ -20,8 +20,6 @@
 
 namespace vita
 {
-  template<class T> class src_interpreter;
-
   ///
   /// \brief An evaluator specialized for symbolic regression / classification
   ///        problems

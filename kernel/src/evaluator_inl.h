@@ -414,13 +414,12 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 {
   assert(this->dat_->classes() == 2);
 
-  src_interpreter<T> agent(ind);
+  binary_lambda_f<T> agent(ind, *this->dat_);
   fitness_t::base_t err(0.0);
 
   for (auto &example : *this->dat_)
   {
-    const any res(agent.run(example.input));
-    const double val(res.empty() ? -1.0 : to<double>(res));
+    const double val(to<double>(agent(example)));
 
     if ((example.label() == 1 && val <= 0.0) ||
         (example.label() == 0 && val > 0.0))
