@@ -1,14 +1,13 @@
 /**
- *
- *  \file evolution_recombination.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_RECOMBINATION_H)
@@ -24,15 +23,19 @@ namespace vita {
 namespace recombination {
   ///
   /// \brief The operation strategy (crossover, recombination, mutation...) for
-  ///        the \a evolution class.
+  ///        the \a evolution class
+  ///
+  /// \tparam T type of individual.
   ///
   /// In the strategy design pattern, this class is the strategy interface and
-  /// \a evolution is the context.
+  /// vita::evolution is the context.
   ///
-  /// A recombination act upon sets of individuals to generate offspring (this
-  /// definition generalizes the traditional mutation and crossover operators).
-  /// This is an abstract class: introduction of new operators or redefinition
-  /// of existing ones is obtained implementing \a recombination::strategy.
+  /// A recombination acts upon sets of individuals to generate offspring
+  /// (this definition generalizes the traditional mutation and crossover
+  /// operators).
+  /// This is an abstract class: introduction of new operators or
+  /// redefinition of existing ones is obtained implementing
+  /// recombination::strategy.
   ///
   /// Operator application is atomic from the point of view of the
   /// evolutionary algorithm and every recombination is applied to a well
@@ -63,7 +66,7 @@ namespace recombination {
   /// This class defines the program skeleton of a standard genetic
   /// programming crossover plus mutation operation. It's a template method
   /// design pattern: one or more of the algorithm steps can be overriden
-  /// by subclasses to allow differing behaviors while ensuring that the
+  /// by subclasses to allow differing behaviours while ensuring that the
   /// overarching algorithm is still followed.
   ///
   template<class T>

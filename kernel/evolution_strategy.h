@@ -1,14 +1,13 @@
 /**
- *
- *  \file evolution_strategy.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_STRATEGY_H)
@@ -21,9 +20,9 @@
 namespace vita
 {
   ///
-  /// \brief A class to specify the evolution steps.
+  /// \brief A class to specify the evolution steps
   ///
-  /// \tparam T type of the elements of the population (individuals).
+  /// \tparam T type of individual
   /// \tparam SS class containing the selection strategy
   /// \tparam CS class containing the recombination strategy
   /// \tparam RS class containing the replacement strategy
@@ -106,7 +105,7 @@ namespace vita
   /// created through mutation or recombination take the age of their oldest
   /// parent and add one to it. This differs from conventional measures of age,
   /// in which individuals created through applying some type of variation to
-  /// an existing individual (eg mutation or recombination) start with an age
+  /// an existing individual (e.g. mutation or recombination) start with an age
   /// of 0.
   ///
   /// The search algorithm in a given layer acts somewhat independently of the

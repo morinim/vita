@@ -48,7 +48,9 @@ namespace vita
   };
   
   ///
-  /// \brief Transforms individual to a lambda function for regression.
+  /// \brief Transforms individual to a lambda function for regression
+  ///
+  /// \tparam T type of individual.  
   ///
   template<class T>
   class reg_lambda_f : public lambda_f<T>
@@ -62,6 +64,8 @@ namespace vita
     mutable src_interpreter<T> int_;
   };
 
+  ///
+  /// \tparam T type of individual.
   ///
   /// This class encapsulates the engine of the Slotted Dynamic Class
   /// Boundary Determination algorithm (see vita::dyn_slot_evaluator for
@@ -97,6 +101,8 @@ namespace vita
   };
 
   ///
+  /// \tparam T type of individual.
+  ///
   /// This class is used to factorize out some code from the lambda functions
   /// used for classification tasks.
   ///
@@ -117,6 +123,8 @@ namespace vita
   };
 
   ///
+  /// \tparam T type of individual.
+  ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
   ///
@@ -135,6 +143,8 @@ namespace vita
     dyn_slot_engine<T> engine_;
   };
 
+  ///
+  /// \tparam T type of individual.
   ///
   /// This class encapsulates the engine of the Gaussian classification
   /// algorithm (see vita::gaussian_evaluator for further details).
@@ -161,6 +171,8 @@ namespace vita
   };
 
   ///
+  /// \tparam T type of individual.
+  ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
   ///
@@ -179,6 +191,8 @@ namespace vita
     gaussian_engine<T> engine_;
   };
 
+  ///
+  /// \tparam T type of individual.
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for single-class classification tasks.
