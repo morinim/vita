@@ -14,7 +14,7 @@
 #define      SRC_EVALUATOR_INL_H
 
 ///
-/// \param[in] d data that the evaluator will use.
+/// \param[in] d dataset that the evaluator will use.
 ///
 template<class T>
 src_evaluator<T>::src_evaluator(data &d) : dat_(&d)
@@ -31,7 +31,7 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &ind)
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  src_interpreter<T> agent(ind);
+  reg_lambda_f<T> agent(ind);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -68,7 +68,7 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &ind)
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  src_interpreter<T> agent(ind);
+  reg_lambda_f<T> agent(ind);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -132,7 +132,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 }
 
 ///
-/// \param[in] agent interpreter used for the evaluation of the current
+/// \param[in] agent lambda function used for the evaluation of the current
 ///                  individual. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
@@ -143,10 +143,10 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 ///         training case \a t. The value returned is in the [0;+inf[ range.
 ///
 template<class T>
-double mae_evaluator<T>::error(src_interpreter<T> &agent,
+double mae_evaluator<T>::error(reg_lambda_f<T> &agent,
                                data::example &t, int *const illegals)
 {
-  const any res(agent.run(t.input));
+  const any res(agent(t));
 
   double err;
 
@@ -162,7 +162,7 @@ double mae_evaluator<T>::error(src_interpreter<T> &agent,
 }
 
 ///
-/// \param[in] agent interpreter used for the evaluation of the current
+/// \param[in] agent lambda function used for the evaluation of the current
 ///                  individual. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
@@ -171,10 +171,10 @@ double mae_evaluator<T>::error(src_interpreter<T> &agent,
 ///         training case \a t. The value returned is in the [0;200] range.
 ///
 template<class T>
-double rmae_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
+double rmae_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
                                 int *const)
 {
-  const any res(agent.run(t.input));
+  const any res(agent(t));
 
   double err;
 
@@ -208,7 +208,7 @@ double rmae_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
 }
 
 ///
-/// \param[in] agent interpreter used for the evaluation of the current
+/// \param[in] agent lambda function used for the evaluation of the current
 ///                  individual. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
@@ -219,10 +219,10 @@ double rmae_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
 ///         training case \a t.
 ///
 template<class T>
-double mse_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
+double mse_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
                                int *const illegals)
 {
-  const any res(agent.run(t.input));
+  const any res(agent(t));
   double err;
   if (res.empty())
     err = std::pow(100.0, ++(*illegals));
@@ -239,7 +239,7 @@ double mse_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
 }
 
 ///
-/// \param[in] agent interpreter used for the evaluation of the current
+/// \param[in] agent lambda function used for the evaluation of the current
 ///                  individual. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
@@ -248,10 +248,10 @@ double mse_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
 ///         training case \a t.
 ///
 template<class T>
-double count_evaluator<T>::error(src_interpreter<T> &agent, data::example &t,
+double count_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
                                  int *const)
 {
-  const any res(agent.run(t.input));
+  const any res(agent(t));
 
   const bool err(res.empty() ||
                  std::fabs(to<double>(res) -

@@ -20,6 +20,8 @@
 namespace vita
 {
   ///
+  /// \brief Calculates the fitness of an individual
+  ///
   /// \tparam T the type of individual used.
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
@@ -57,7 +59,7 @@ namespace vita
   };
 
   ///
-  /// random_evaluator class is used for debug purpose.
+  /// \brief random_evaluator class is used for debug purpose.
   ///
   /// \note
   /// The output is population independent.

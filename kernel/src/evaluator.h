@@ -62,7 +62,7 @@ namespace vita
     virtual double accuracy(const T &) const override;
 
   private:
-    virtual double error(src_interpreter<T> &, data::example &, int *const) = 0;
+    virtual double error(reg_lambda_f<T> &, data::example &, int *const) = 0;
   };
 
   ///
@@ -89,7 +89,8 @@ namespace vita
     explicit mae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<T> &, data::example &, int *const);
+    virtual double error(reg_lambda_f<T> &, data::example &,
+                         int *const) override;
   };
 
   ///
@@ -118,7 +119,8 @@ namespace vita
     explicit rmae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<T> &, data::example &, int *const);
+    virtual double error(reg_lambda_f<T> &, data::example &,
+                         int *const) override;
   };
 
   ///
@@ -146,7 +148,8 @@ namespace vita
     explicit mse_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<T> &, data::example &, int *const);
+    virtual double error(reg_lambda_f<T> &, data::example &,
+                         int *const) override;
   };
 
   ///
@@ -163,7 +166,8 @@ namespace vita
     explicit count_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
 
   private:
-    virtual double error(src_interpreter<T> &, data::example &, int *const);
+    virtual double error(reg_lambda_f<T> &, data::example &,
+                         int *const) override;
   };
 
   ///
