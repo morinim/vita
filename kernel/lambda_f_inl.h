@@ -14,12 +14,12 @@
 #define      LAMBDA_F_INL_H
 
 ///
-/// \param[in] ind the individual to be lambdified.
+/// \param[in] prg the program (individual / team) to be lambdified.
 ///
 template<class T>
-lambda_f<T>::lambda_f(const T &ind) : ind_(ind)
+lambda_f<T>::lambda_f(const T &prg) : prg_(prg)
 {
-  assert(ind_.debug());
+  assert(prg_.debug());
 }
 
 ///
@@ -34,14 +34,30 @@ std::string lambda_f<T>::name(const any &) const
 }
 
 ///
-/// \param[in] ind the individual to be lambdified.
+/// \param[in] ind individual to be lambdified.
 ///
 template<class T>
 reg_lambda_f<T>::reg_lambda_f(const T &ind)
-  : lambda_f<T>(ind), int_(this->ind_)
+  : lambda_f<T>(ind), int_(this->prg_)
 {
   assert(int_.debug());
-}    
+}
+
+///
+/// \param[in] t team to be lambdified.
+///
+template<>
+template<class T>
+reg_lambda_f<team<T>>::reg_lambda_f(const team<T> &t) : lambda_f<team<T>>(t)
+{
+  const auto size(t.size());
+
+  int_.reserve(size);
+  for (const auto &i : t)
+    int_.push_back(src_interpreter<T>(i));
+
+  assert(int_.debug());
+}
 
 ///
 /// \param[in] e input example for the lambda function.
@@ -51,6 +67,28 @@ template<class T>
 any reg_lambda_f<T>::operator()(const data::example &e) const
 {
   return any(int_.run(e.input));
+}
+
+///
+/// \param[in] e input example for the lambda function.
+/// \return the output value associated with \a e.
+///
+template<>
+template<class T>
+any reg_lambda_f<team<T>>::operator()(const data::example &e) const
+{
+  base_t avg(0), count(0);
+
+  // Calculate the running average.
+  for (auto &i : int_)
+  {
+    const auto res(i.run(e.input));
+
+    if (!res.empty())
+      avg += (to<base_t>(res) - avg) / ++count;
+  }
+
+  return count > 0 ? any(avg) : any();
 }
 
 ///
@@ -216,7 +254,7 @@ dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
 template<class T>
 any dyn_slot_lambda_f<T>::operator()(const data::example &instance) const
 {
-  const auto where(engine_.slot(this->ind_, instance));
+  const auto where(engine_.slot(this->prg_, instance));
 
   return any(engine_.slot_class[where]);
 }
@@ -337,7 +375,7 @@ gaussian_lambda_f<T>::gaussian_lambda_f(const T &ind, data &d)
 template<class T>
 any gaussian_lambda_f<T>::operator()(const data::example &instance) const
 {
-  return any(engine_.class_label(this->ind_, instance));
+  return any(engine_.class_label(this->prg_, instance));
 }
 
 ///
@@ -360,7 +398,7 @@ binary_lambda_f<T>::binary_lambda_f(const T &ind, data &d)
 template<class T>
 any binary_lambda_f<T>::operator()(const data::example &e) const
 {
-  const any res(src_interpreter<T>(this->ind_).run(e.input));
+  const any res(src_interpreter<T>(this->prg_).run(e.input));
   const double val(res.empty() ? -1.0 : to<double>(res));
 
   return any(val > 0.0 ? 1u : 0u);

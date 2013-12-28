@@ -23,7 +23,7 @@ namespace vita
   ///
   /// \brief Analyzer takes a statistics snapshot of a population
   ///
-  /// \tparam T type of the elements of the population (individuals).
+  /// \tparam T type of individual.
   ///
   /// Procedure:
   /// 1. the population set should be loaded adding (analyzer::add method) one

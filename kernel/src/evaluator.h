@@ -28,7 +28,7 @@ namespace vita
   ///
   /// This specialization of the evaluator class is "dataset-aware". It is
   /// useful to group common factors of more specialized symbolic regression
-  /// or classification classes.  
+  /// or classification classes.
   ///
   template<class T>
   class src_evaluator : public evaluator<T>

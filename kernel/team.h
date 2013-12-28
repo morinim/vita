@@ -48,7 +48,7 @@ namespace vita
   ///
   /// \see
   /// "Evolving Teams of Predictors with Linear Genetic Programming"
-  /// (Markus Braimer, Wolfgang Banzhaf).  
+  /// (Markus Braimer, Wolfgang Banzhaf).
   ///
   template<class T>
   class team

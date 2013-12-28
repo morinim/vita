@@ -24,6 +24,8 @@ namespace vita
   template<class T> class gaussian_lambda_f;
   template<class T> class gaussian_evaluator;
 
+  typedef double base_t;
+
   ///
   /// \brief Transforms individuals into lambda functions
   ///
@@ -40,17 +42,17 @@ namespace vita
     explicit lambda_f(const T &);
 
     virtual any operator()(const data::example &) const = 0;
-    
+
     virtual std::string name(const any &) const;
 
   protected:
-    T ind_;
+    T prg_;
   };
-  
+
   ///
   /// \brief Transforms individual to a lambda function for regression
   ///
-  /// \tparam T type of individual.  
+  /// \tparam T type of individual.
   ///
   template<class T>
   class reg_lambda_f : public lambda_f<T>
@@ -59,9 +61,22 @@ namespace vita
     explicit reg_lambda_f(const T &);
 
     virtual any operator()(const data::example &) const final;
-  
+
   protected:
     mutable src_interpreter<T> int_;
+  };
+
+  template<>
+  template<class T>
+  class reg_lambda_f<team<T>> : public lambda_f<team<T>>
+  {
+  public:
+    explicit reg_lambda_f(const team<T> &);
+
+    virtual any operator()(const data::example &) const final;
+
+  protected:
+    mutable std::vector<src_interpreter<T>> int_;
   };
 
   ///
