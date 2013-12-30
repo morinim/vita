@@ -1,8 +1,10 @@
 /**
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
@@ -35,6 +37,8 @@ interpreter<team<T>>::interpreter(const team<T> &t, interpreter<team<T>> *ctx)
 
 ///
 /// \return the output of the team.
+///
+/// The output is a vector containing the outputs of the team's components.
 ///
 template<class T>
 any interpreter<team<T>>::run()

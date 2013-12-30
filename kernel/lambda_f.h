@@ -24,8 +24,6 @@ namespace vita
   template<class T> class gaussian_lambda_f;
   template<class T> class gaussian_evaluator;
 
-  typedef double base_t;
-
   ///
   /// \brief Transforms individuals into lambda functions
   ///
@@ -112,7 +110,7 @@ namespace vita
     /// Size of the dataset used to construct \a slot_matrix.
     unsigned dataset_size;
 
-    static double normalize_01(double);
+    static number normalize_01(number);
   };
 
   ///
@@ -178,11 +176,11 @@ namespace vita
     gaussian_engine(const T &, data &);
 
     unsigned class_label(const T &, const data::example &,
-                         double * = nullptr, double * = nullptr) const;
+                         number * = nullptr, number * = nullptr) const;
 
     /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
     /// classification problem".
-    std::vector<distribution<double>> gauss_dist;
+    std::vector<distribution<number>> gauss_dist;
   };
 
   ///

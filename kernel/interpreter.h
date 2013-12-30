@@ -53,6 +53,15 @@ namespace vita
   ///
   template<class T> class interpreter;
 
+  ///
+  /// \brief A template specialization for interpreter<T> class
+  ///
+  /// \note
+  /// We don't have a generic interpreter<T> implementation (e.g. see the
+  /// lambda_f source code) because interpreter and individual are strongly
+  /// coupled: the interpreter must be build around the peculiarities of
+  /// the specific individual class.
+  ///
   template<>
   class interpreter<individual> : public basic_interpreter<individual>
   {
@@ -83,6 +92,7 @@ namespace vita
   ///
   /// This class executes a team of individuals of type \a T.
   ///
+  template<>
   template<class T>
   class interpreter<team<T>> : public basic_interpreter<team<T>>
   {

@@ -77,7 +77,7 @@ template<>
 template<class T>
 any reg_lambda_f<team<T>>::operator()(const data::example &e) const
 {
-  base_t avg(0), count(0);
+  number avg(0), count(0);
 
   // Calculate the running average.
   for (auto &i : int_)
@@ -85,7 +85,7 @@ any reg_lambda_f<team<T>>::operator()(const data::example &e) const
     const auto res(i.run(e.input));
 
     if (!res.empty())
-      avg += (to<base_t>(res) - avg) / ++count;
+      avg += (to<number>(res) - avg) / ++count;
   }
 
   return count > 0 ? any(avg) : any();
@@ -197,7 +197,7 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
   if (res.empty())
     return last_slot;
 
-  const double val(to<double>(res));
+  const number val(to<number>(res));
   const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 
   return (where >= ns) ? last_slot : where;
@@ -206,7 +206,7 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
 ///
 /// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
 ///              that should be mapped in the [0,1] interval.
-/// \return a double in the [0,1] range.
+/// \return a number in the [0,1] range.
 ///
 /// This is a sigmoid function (it is a bounded real function, "S" shaped,
 /// with positive derivative everywhere).
@@ -215,7 +215,7 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
 /// <http://en.wikipedia.org/wiki/Sigmoid_function>
 ///
 template<class T>
-double dyn_slot_engine<T>::normalize_01(double x)
+number dyn_slot_engine<T>::normalize_01(number x)
 {
   // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function.
 
@@ -280,12 +280,12 @@ gaussian_engine<T>::gaussian_engine(const T &ind, data &d)
   // determined by evaluating the program on the examples of the class in
   // the training set. This is done by taking the mean and standard deviation
   // of the program outputs for those training examples for that class.
-  for (const data::example &example : d)
+  for (const auto &example : d)
   {
     const any res(agent.run(example.input));
 
-    double val(res.empty() ? 0.0 : to<double>(res));
-    const double cut(10000000.0);
+    number val(res.empty() ? 0.0 : to<number>(res));
+    const number cut(10000000.0);
     if (val > cut)
       val = cut;
     else if (val < -cut)
@@ -309,21 +309,21 @@ gaussian_engine<T>::gaussian_engine(const T &ind, data &d)
 template<class T>
 unsigned gaussian_engine<T>::class_label(const T &ind,
                                          const data::example &example,
-                                         double *val, double *sum) const
+                                         number *val, number *sum) const
 {
   const any res(src_interpreter<T>(ind).run(example.input));
-  const double x(res.empty() ? 0.0 : to<double>(res));
+  const number x(res.empty() ? 0.0 : to<number>(res));
 
-  double val_(0.0), val_sum_(0.0);
+  number val_(0.0), val_sum_(0.0);
   unsigned probable_class(0);
 
   const auto size(gauss_dist.size());
   for (auto i(decltype(size){0}); i < size; ++i)
   {
-    const double distance(std::fabs(x - gauss_dist[i].mean));
-    const double variance(gauss_dist[i].variance);
+    const number distance(std::fabs(x - gauss_dist[i].mean));
+    const number variance(gauss_dist[i].variance);
 
-    double p(0.0);
+    number p(0.0);
     if (variance == 0.0)     // These are borderline cases
       if (distance == 0.0)   // These are borderline cases
         p = 1.0;
@@ -399,7 +399,7 @@ template<class T>
 any binary_lambda_f<T>::operator()(const data::example &e) const
 {
   const any res(src_interpreter<T>(this->prg_).run(e.input));
-  const double val(res.empty() ? -1.0 : to<double>(res));
+  const number val(res.empty() ? -1.0 : to<number>(res));
 
   return any(val > 0.0 ? 1u : 0u);
 }
