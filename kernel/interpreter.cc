@@ -138,4 +138,4 @@ namespace vita
   {
     return ip_.index < prg_.size() && (!context_ || context_->debug());
   }
-}  // Namespace vita
+}  // namespace vita
