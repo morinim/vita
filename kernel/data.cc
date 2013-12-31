@@ -56,7 +56,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] filename nome of the file containing the learning collection.
+  /// \param[in] filename name of the file containing the learning collection.
   /// \param[in] verbosity verbosity level (see environment::verbosity for
   ///            further details).
   /// New data instance containing the learning collection from \a filename.
@@ -399,7 +399,7 @@ namespace vita
   /// CSV files do not have a \n in the middle of the field, so it is usually
   /// not worth worrying about.
   /// This is a slightly modified version of the function at
-  /// http://www.zedwood.com/article/112/cpp-csv-parser.
+  /// <http://www.zedwood.com/article/112/cpp-csv-parser>.
   /// Escaped List Separator class from Boost C++ libraries is also very nice
   /// and efficient for parsing, but it is not as easily applied.
   ///
@@ -475,7 +475,7 @@ namespace vita
   /// \param[in] c1 a category.
   /// \param[in] c2 a category.
   ///
-  /// Swap catagories \a c1 and \a c2, updating the \a header_ and
+  /// Swap categories \a c1 and \a c2, updating the \a header_ and
   /// \a categories_ vector.
   ///
   void data::swap_category(category_t c1, category_t c2)
@@ -780,7 +780,7 @@ namespace vita
               {
                 assert(dataset() == test);
                 // For test set the output class/value could be missing (e.g.
-                // for Kaggle.com competition test set).
+                // for kaggle.com competition test set).
               }
               else
               {

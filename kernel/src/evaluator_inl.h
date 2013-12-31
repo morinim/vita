@@ -22,16 +22,16 @@ src_evaluator<T>::src_evaluator(data &d) : dat_(&d)
 }
 
 ///
-/// \param[in] ind program used for fitness evaluation.
+/// \param[in] prg program (individual/team) used for fitness evaluation.
 /// \return the fitness (greater is better, max is 0).
 ///
 template<class T>
-fitness_t sum_of_errors_evaluator<T>::operator()(const T &ind)
+fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 {
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  reg_lambda_f<T> agent(ind);
+  reg_lambda_f<T> agent(prg);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -56,19 +56,19 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &ind)
 }
 
 ///
-/// \param[in] ind program used for fitness evaluation.
+/// \param[in] prg program (individual/team) used for fitness evaluation.
 /// \return the fitness (greater is better, max is 0).
 ///
 /// This function is similar to operator()() but will skip 3 out of 4
 /// training instances, so it's faster ;-)
 ///
 template<class T>
-fitness_t sum_of_errors_evaluator<T>::fast(const T &ind)
+fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 {
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  reg_lambda_f<T> agent(ind);
+  reg_lambda_f<T> agent(prg);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -90,16 +90,16 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &ind)
 }
 
 ///
-/// \param[in] ind program used for scoring accuracy.
+/// \param[in] prg program (individual/team) used for scoring accuracy.
 /// \return the accuracy.
 ///
 template<class T>
-double sum_of_errors_evaluator<T>::accuracy(const T &ind) const
+double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 {
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(lambdify(ind));
+  std::unique_ptr<lambda_f<T>> f(lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -107,8 +107,8 @@ double sum_of_errors_evaluator<T>::accuracy(const T &ind) const
   {
     const any res((*f)(example));
     if (!res.empty() &&
-        std::fabs(to<double>(res) -
-                  example.template cast_output<double>()) <= float_epsilon)
+        std::fabs(to<number>(res) -
+                  example.template cast_output<number>()) <= float_epsilon)
       ++ok;
 
     ++total_nr;
@@ -120,15 +120,15 @@ double sum_of_errors_evaluator<T>::accuracy(const T &ind) const
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \param[in] prg program(individual/team) to be transformed in a lambda function.
+/// \return the lambda function associated with \a prg (\c nullptr in case of
 ///         errors).
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
-  const T &ind) const
+  const T &prg) const
 {
-  return make_unique<reg_lambda_f<T>>(ind);
+  return make_unique<reg_lambda_f<T>>(prg);
 }
 
 ///
@@ -148,12 +148,12 @@ double mae_evaluator<T>::error(reg_lambda_f<T> &agent,
 {
   const any res(agent(t));
 
-  double err;
+  number err;
 
   if (res.empty())
     err = std::pow(100.0, ++(*illegals));
   else
-    err = std::fabs(to<double>(res) - t.cast_output<double>());
+    err = std::fabs(to<number>(res) - t.cast_output<number>());
 
   if (err > float_epsilon)
     ++t.difficulty;
@@ -176,20 +176,20 @@ double rmae_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 {
   const any res(agent(t));
 
-  double err;
+  number err;
 
   if (res.empty())
     err = 200.0;
   else
   {
-    const double approx(to<double>(res));
-    const double target(t.cast_output<double>());
+    const auto approx(to<number>(res));
+    const auto target(t.cast_output<number>());
 
-    const double delta(std::fabs(target - approx));
+    const auto delta(std::fabs(target - approx));
 
     // Check if the numbers are really close. Needed when comparing numbers
     // near zero.
-    if (delta <= 10.0 * std::numeric_limits<double>::min())
+    if (delta <= 10.0 * std::numeric_limits<number>::min())
       err = 0.0;
     else
       err = 200.0 * delta / (std::fabs(approx) + std::fabs(target));
@@ -223,12 +223,12 @@ double mse_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
                                int *const illegals)
 {
   const any res(agent(t));
-  double err;
+  number err;
   if (res.empty())
     err = std::pow(100.0, ++(*illegals));
   else
   {
-    err = to<double>(res) - t.cast_output<double>();
+    err = to<number>(res) - t.cast_output<number>();
     err *= err;
   }
 
@@ -254,8 +254,8 @@ double count_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
   const any res(agent(t));
 
   const bool err(res.empty() ||
-                 std::fabs(to<double>(res) -
-                           t.cast_output<double>()) > float_epsilon);
+                 std::fabs(to<number>(res) -
+                           t.cast_output<number>()) > float_epsilon);
 
   if (err)
     ++t.difficulty;
@@ -310,7 +310,7 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 /// \todo
 /// To date we haven't an efficient way to calculate DSS example difficulty
 /// in combination with Dynamic Slot Algorithm. We skip this calculation,
-/// so DSS isn't working at full full capacity (it considers only example
+/// so DSS isn't working at full capacity (it considers only example
 /// "age").
 ///
 template<class T>

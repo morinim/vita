@@ -95,6 +95,28 @@ namespace vita
   ///
   /// \tparam T type of individual.
   ///
+  /// This class is used to factorize out some code from the lambda functions
+  /// used for classification tasks.
+  ///
+  template<class T>
+  class class_lambda_f : public lambda_f<T>
+  {
+  public:
+    class_lambda_f(const T &, const data &);
+
+    virtual std::string name(const any &a) const final
+    {
+      return class_name_[any_cast<unsigned>(a)];
+    }
+
+  protected:
+    /// class_name_[i] = "name of the i-th class of the classification task".
+    std::vector<std::string> class_name_;
+  };
+  
+  ///
+  /// \tparam T type of individual.
+  ///
   /// This class encapsulates the engine of the Slotted Dynamic Class
   /// Boundary Determination algorithm (see vita::dyn_slot_evaluator for
   /// further details about the algorithm).
@@ -126,28 +148,6 @@ namespace vita
     unsigned dataset_size;
 
     static number normalize_01(number);
-  };
-
-  ///
-  /// \tparam T type of individual.
-  ///
-  /// This class is used to factorize out some code from the lambda functions
-  /// used for classification tasks.
-  ///
-  template<class T>
-  class class_lambda_f : public lambda_f<T>
-  {
-  public:
-    class_lambda_f(const T &, const data &);
-
-    virtual std::string name(const any &a) const final
-    {
-      return class_name_[any_cast<unsigned>(a)];
-    }
-
-  protected:
-    /// class_name_[i] = "name of the i-th class of the classification task".
-    std::vector<std::string> class_name_;
   };
 
   ///

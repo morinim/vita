@@ -54,7 +54,7 @@ reg_lambda_f<team<T>>::reg_lambda_f(const team<T> &t) : lambda_f<team<T>>(t)
 
   int_.reserve(size);
   for (const auto &i : t)
-    int_.push_back(src_interpreter<T>(i));
+    int_.emplace_back(i);
 
   assert(int_.debug());
 }
@@ -113,7 +113,7 @@ class_lambda_f<T>::class_lambda_f(const T &ind, const data &d)
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
-/// Sets up the data structures needed by the 'dyn_slot' algorithm.
+/// Sets up the data structures needed by the 'dynamic slot' algorithm.
 ///
 template<class T>
 dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
@@ -180,7 +180,7 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
 
 ///
 /// \param[in] ind individual used for classification.
-/// \param[in] e input data for \a ind.
+/// \param[in] e input data for \a prg.
 /// \return the slot the example \a e falls into.
 ///
 template<class T>
@@ -192,11 +192,10 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
   const any res(agent.run(e.input));
 
   const auto ns(slot_matrix.rows());
-  const auto last_slot(ns - 1);
-
+  const auto last_slot(ns - 1);   
   if (res.empty())
     return last_slot;
-
+  
   const number val(to<number>(res));
   const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 
