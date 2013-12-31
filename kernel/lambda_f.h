@@ -33,6 +33,21 @@ namespace vita
   /// used to calculate the answers for symbolic regression /
   /// classification problems.
   ///
+  /// \note
+  /// Depending on the task (regression, classification...) lambda_f and
+  /// interpreter outputs can be similar or distinct.
+  /// E.g. for *regression problems* lambda_f and interpreter are identical:
+  /// they calculate the same number.
+  /// lambda_f always calculates a meaningful value for the end-user (the
+  /// class of the example, an approximation...) while interpreter can output
+  /// a value that is just a building block for lambda_f (e.g. classification
+  /// tasks with discriminant functions).
+  /// The typical use chain is: evaluator uses lambda_f, lambda_f uses
+  /// interpreter.
+  ///
+  /// Another interesting function of lambda_f is that it extends the
+  /// functionalities of interpreter to teams.
+  ///
   template<class T>
   class lambda_f
   {

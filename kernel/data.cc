@@ -36,11 +36,11 @@ namespace vita
     {
       switch (d)
       {
-      case d_bool:  return   any(boost::lexical_cast<bool>(s));
-      case d_int:   return    any(boost::lexical_cast<int>(s));
-      case d_double:return any(boost::lexical_cast<double>(s));
-      case d_string:return                              any(s);
-      default: throw boost::bad_lexical_cast();
+      case d_bool:   return   any(boost::lexical_cast<bool>(s));
+      case d_int:    return    any(boost::lexical_cast<int>(s));
+      case d_double: return any(boost::lexical_cast<double>(s));
+      case d_string: return                              any(s);
+      default:                  throw boost::bad_lexical_cast();
       }
     }  
   }
@@ -63,7 +63,7 @@ namespace vita
   ///
   data::data(const std::string &filename, unsigned verbosity)
   {
-    assert(filename != "");
+    assert(!filename.empty());
 
     clear();
     open(filename, verbosity);
@@ -363,7 +363,7 @@ namespace vita
   ///         empty string if such class cannot be find).
   ///
   /// \note
-  /// Boost Bimap could be used to speed up the search in \a classes_map_, but
+  /// Boost Bitmap could be used to speed up the search in \a classes_map_, but
   /// to date speed isn't an issue.
   ///
   std::string data::class_name(unsigned i) const
@@ -512,16 +512,16 @@ namespace vita
   /// Programming).
   ///
   /// \post
-  /// \li \a header_[0] is the output column (it contains informations about
-  ///     problem's output);
-  /// \li \a category(0) is the output category (for symbolic regresssion
-  ///     problems it is the output type of the xrff file, for classification
-  ///     problems it is the \a numeric type).
+  /// * \a header_[0] is the output column (it contains informations about
+  ///   problem's output);
+  /// * \a category(0) is the output category (for symbolic regression
+  ///   problems it is the output type of the xrff file, for classification
+  ///   problems it is the \a numeric type).
   ///
   /// \warning
   /// To date:
   /// * we don't support compressed XRFF files;
-  /// * XRFF files cannot be uset to load test set (problems with missing
+  /// * XRFF files cannot be used to load test set (problems with missing
   ///   output column and possible column category redefinition).
   ///
   /// \note

@@ -25,7 +25,8 @@
 namespace vita
 {
   ///
-  /// Stores the dataset used to evolve vita::population.
+  /// \\brief Stores the dataset used to evolve vita::population
+  ///
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
   /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
   /// files.
@@ -34,7 +35,7 @@ namespace vita
   {
   public:  // Structures.
     ///
-    /// \a example stores a single element of the data set. The
+    /// vita::example stores a single element of the data set. The
     /// \c struct consists of an input vector (\a input) and an answer value
     /// (\a output). Depending on the kind of problem, \a output stores:
     /// * a numeric value (symbolic regression problem);
@@ -69,7 +70,7 @@ namespace vita
       }
     };
 
-    /// \brief Informations about a "column" (feature) of the dataset.
+    /// \brief Informations about a "column" (feature) of the dataset
     struct column
     {
       std::string       name;
@@ -77,7 +78,7 @@ namespace vita
     };
 
     ///
-    /// \brief Informations about a category of the dataset.
+    /// \brief Informations about a category of the dataset
     ///
     /// For example:
     ///
@@ -92,7 +93,7 @@ namespace vita
     /// is mapped to category:
     /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
     ///
-    /// while:
+    /// while
     ///     <attribute type="numeric" category="A" name="Speed" />
     /// is mapped to category:
     /// * {"A", d_double, {}}
@@ -156,7 +157,7 @@ namespace vita
 
         {"integer", domain_t::d_int},
 
-        // Real and numeric are treated as double precisione number (d_double).
+        // Real and numeric are treated as double precision number (d_double).
         {"numeric", domain_t::d_double},
         {"real", domain_t::d_double},
 
