@@ -92,14 +92,14 @@ any reg_lambda_f<team<T>>::operator()(const data::example &e) const
 }
 
 ///
-/// \param[in] ind individual used for classification.
+/// \param[in] prg program (individual/team) used for classification.
 /// \param[in] d the training set.
 ///
 template<class T>
-class_lambda_f<T>::class_lambda_f(const T &ind, const data &d)
-  : lambda_f<T>(ind), class_name_(d.classes())
+class_lambda_f<T>::class_lambda_f(const T &prg, const data &d)
+  : lambda_f<T>(prg), class_name_(d.classes())
 {
-  assert(ind.debug());
+  assert(prg.debug());
 
   const auto classes(d.classes());
   assert(d.classes() > 1);
@@ -109,18 +109,28 @@ class_lambda_f<T>::class_lambda_f(const T &ind, const data &d)
 }
 
 ///
-/// \param[in] ind individual used for classification.
+/// \param[in] a id of a class.
+/// \return the name f class \a a.
+///
+template<class T>
+std::string class_lambda_f<T>::name(const any &a) const
+{
+  return class_name_[any_cast<unsigned>(a)];
+}
+
+///
+/// \param[in] prg program (individual/team) used for classification.
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
 /// Sets up the data structures needed by the 'dynamic slot' algorithm.
 ///
 template<class T>
-dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
+dyn_slot_engine<T>::dyn_slot_engine(const T &prg, data &d, unsigned x_slot)
   : slot_matrix(d.classes() * x_slot, d.classes()),
     slot_class(d.classes() * x_slot), dataset_size(0)
 {
-  assert(ind.debug());
+  assert(prg.debug());
   assert(d.debug());
   assert(d.classes() > 1);
   assert(x_slot);
@@ -135,25 +145,19 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
   // In the first step this method evaluates the program to obtain an output
   // value for each training example. Based on the program output a
   // bi-dimensional matrix is built (slot_matrix_(slot, class)).
-  for (const auto &example : d)
-  {
-    ++dataset_size;
-
-    const auto where(slot(ind, example));  // Insertion slot
-
-    ++slot_matrix(where, example.label());
-  }
+  fill_matrix(prg, d);
 
   const auto unknown(d.classes());
 
-  // In the second step the method dynamically determine to which class each
-  // slot belongs by simply taking the class with the largest value at the
+  // In the second step the method dynamically determine which class each
+  // slot belongs to by simply taking the class with the largest value at the
   // slot...
   for (auto i(decltype(n_slots){0}); i < n_slots; ++i)
   {
     const auto cols(slot_matrix.cols());
-    auto best_class(decltype(cols){0});
+    auto best_class(decltype(cols){0});  // Initially assuming class 0 as best
 
+    // ...then looking for a better class among the remaining ones.
     for (auto j(decltype(cols){1}); j < cols; ++j)
       if (slot_matrix(i, j) >= slot_matrix(i, best_class))
         best_class = j;
@@ -179,9 +183,47 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &ind, data &d, unsigned x_slot)
 }
 
 ///
+/// \param[in] ind individual used to build the matrix.
+/// \param[in] d dataset.
+///
+/// This support method evaluates the individual to obtain an output
+/// value for each training example. Based on the individual output a
+/// bi-dimensional matrix is built (slot_matrix_(slot, class)).
+///
+template<class T>
+template<class U>
+void dyn_slot_engine<T>::fill_matrix(const U &ind, data &d)
+{
+  for (const auto &example : d)
+  {
+    ++dataset_size;
+
+    const auto where(slot(ind, example));  // Insertion slot
+
+    ++slot_matrix(where, example.label());
+  }
+}
+
+///
+/// \param[in] t t used to build the matrix.
+/// \param[in] d dataset.
+///
+/// A specialization of fill_matrix for teams.
+///
+template<class T>
+template<class U>
+void dyn_slot_engine<T>::fill_matrix(const team<U> &t, data &d)
+{
+  for (const auto &i : t)
+    fill_matrix(i, d);
+    
+  dataset_size /= t.size();
+}
+
+///
 /// \param[in] ind individual used for classification.
-/// \param[in] e input data for \a prg.
-/// \return the slot the example \a e falls into.
+/// \param[in] e input data for \a ind.
+/// \return the slot example \a e falls into.
 ///
 template<class T>
 unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const

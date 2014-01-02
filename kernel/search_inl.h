@@ -57,7 +57,7 @@ void search<T, ES>::arl(const T &base)
 ///
 /// \param[in] base a team we are examining to extract building blocks.
 ///
-/// Reapeatedly calls specialized_arl(const individual &) for each member of
+/// Repeatedly calls specialized_arl(const individual &) for each member of
 /// the team.
 ///
 template<class T, template<class> class ES>

@@ -104,10 +104,7 @@ namespace vita
   public:
     class_lambda_f(const T &, const data &);
 
-    virtual std::string name(const any &a) const final
-    {
-      return class_name_[any_cast<unsigned>(a)];
-    }
+    virtual std::string name(const any &) const final;
 
   protected:
     /// class_name_[i] = "name of the i-th class of the classification task".
@@ -128,12 +125,13 @@ namespace vita
   template<class T>
   class dyn_slot_engine
   {
+  protected:
     friend class dyn_slot_lambda_f<T>;
     friend class dyn_slot_evaluator<T>;
 
     dyn_slot_engine() {}
     dyn_slot_engine(const T &, data &, unsigned);
-
+    
     unsigned slot(const T &, const data::example &) const;
 
     /// The main matrix of the dynamic slot algorithm.
@@ -148,6 +146,10 @@ namespace vita
     unsigned dataset_size;
 
     static number normalize_01(number);
+
+  private:  // Private support method
+    template<class U> void fill_matrix(const U &, data &);
+    template<class U> void fill_matrix(const team<U> &, data &);
   };
 
   ///
