@@ -1,14 +1,13 @@
 /**
- *
- *  \file individual.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <algorithm>
@@ -277,14 +276,15 @@ namespace vita
   ///
   /// \param[in] max_args maximum number of arguments for the ADF.
   /// \param[out] loci the ADF arguments are here.
-  /// \return the generalized individual.
+  /// \return the generalized individual and a set of loci (ADF arguments
+  ///         positions).
   ///
   /// Changes up to \a max_args terminals (exactly \a max_args when available)
   /// of \c this individual with formal arguments, thus producing the body
   /// for a ADF.
   ///
-  individual individual::generalize(size_t max_args,
-                                    std::vector<locus> *const loci) const
+  std::pair<individual, std::vector<locus>> individual::generalize(
+    unsigned max_args) const
   {
     assert(max_args && max_args <= gene::k_args);
 
@@ -296,32 +296,26 @@ namespace vita
         terminals.push_back(l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
-    const size_t n(std::min(max_args, terminals.size()));
+    const auto n(std::min<unsigned>(max_args, terminals.size()));
     assert(n);
 
     if (n < size())
-      for (size_t j(0); j < n; ++j)
+      for (auto j(decltype(n){0}); j < n; ++j)
       {
-        const size_t r(random::between<size_t>(j, terminals.size()));
+        const auto r(random::between<decltype(j)>(j, terminals.size()));
 
         std::swap(terminals[j], terminals[r]);
       }
 
     // Step 3: randomly substitute n terminals with function arguments.
     individual ret(*this);
-    for (size_t j(0); j < n; ++j)
-    {
-      gene &g(ret.genome_(terminals[j]));
-      if (loci)
-        loci->push_back(terminals[j]);
-      g.sym = sset_->arg(j);
-      ret.signature_.clear();
-    }
+    for (auto j(decltype(n){0}); j < n; ++j)
+      ret.genome_(terminals[j]).sym = sset_->arg(j);
+    ret.signature_.clear();
 
-    assert(!loci || (loci->size() && loci->size() <= max_args));
     assert(ret.debug());
 
-    return ret;
+    return {ret, std::vector<locus>(terminals.begin(), terminals.begin() + n)};
   }
 
   ///

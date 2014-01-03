@@ -1,14 +1,13 @@
 /**
- *
- *  \file individual.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(INDIVIDUAL_H)
@@ -61,7 +60,7 @@ namespace vita
     individual replace(const locus &, const gene &) const;
     individual replace(const std::vector<gene> &) const;
 
-    individual generalize(size_t, std::vector<locus> *const) const;
+    std::pair<individual, std::vector<locus>> generalize(unsigned) const;
 
     bool operator==(const individual &) const;
     unsigned distance(const individual &) const;

@@ -61,7 +61,8 @@ void search<T, ES>::arl(const U &base)
   std::ofstream log(filename.c_str(), std::ios_base::app);
   if (env_.stat_arl && log.good())
   {
-    for (unsigned i(0); i < prob_->sset.adts(); ++i)
+    const auto adts(prob_->sset.adts());
+    for (auto i(decltype(adts){0}); i < adts; ++i)
     {
       const symbol &f(*prob_->sset.get_adt(i));
       log << f.display() << ' ' << f.weight << std::endl;
@@ -93,13 +94,13 @@ void search<T, ES>::arl(const U &base)
         std::unique_ptr<symbol> p;
         if (adf_args)
         {
-          std::vector<locus> replaced;
-          auto generalized(candidate_block.generalize(adf_args, &replaced));
-          std::vector<category_t> categories(replaced.size());
-          for (unsigned j(0); j < replaced.size(); ++j)
-            categories[j] = replaced[j].category;
+          auto generalized(candidate_block.generalize(adf_args));
+          std::vector<category_t> categories(generalized.second.size());
 
-          p = make_unique<adf>(generalized, categories, 10);
+          for (const auto &replaced : generalized.second)
+            categories.push_back(replaced.category);
+
+          p = make_unique<adf>(generalized.first, categories, 10);
         }
         else  // !adf_args
           p = make_unique<adt>(candidate_block, 100);

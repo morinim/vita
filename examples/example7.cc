@@ -1,15 +1,14 @@
 /**
- *
- *  \file example7.cc
+ *  \file
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -64,22 +63,21 @@ int main(int argc, char *argv[])
     {
       individual ib(base.get_block(*i));
 
-      std::vector<locus> arg_loc;
-      individual generalized(ib.generalize(2, &arg_loc));
+      auto generalized(ib.generalize(2));
 
       std::cout << std::endl;
       ib.list(std::cout);
 
       std::cout << "GENERALIZED" << std::endl;
-      generalized.list(std::cout);
+      generalized.first.list(std::cout);
 
       std::cout << std::endl << "Arguments: [";
-      for (unsigned j(0); j < arg_loc.size(); ++j)
-        std::cout << ' ' << arg_loc[j];
+      for (const auto &l : generalized.second)
+        std::cout << ' ' << l;
       std::cout << " ]" << std::endl;
 
       blocks_len.add(ib.eff_size());
-      arguments.add(arg_loc.size());
+      arguments.add(generalized.second.size());
     }
   }
 

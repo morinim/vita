@@ -1,15 +1,14 @@
 /**
- *
- *  \file example8.cc
+ *  \file
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -75,12 +74,14 @@ int main(int argc, char *argv[])
 
       if (blk.eff_size() <= 20)
       {
-        std::vector<locus> replaced;
-        individual blk2(blk.generalize(2, &replaced));
+        auto generalized (blk.generalize(2));
+
+        const auto &blk2(generalized.first);
+        const auto &replaced(generalized.second);
 
         std::vector<index_t> positions(replaced.size());
         std::vector<category_t> categories(replaced.size());
-        for (size_t j(0); j < replaced.size(); ++j)
+        for (unsigned j(0); j < replaced.size(); ++j)
         {
           positions[j]  = replaced[j].index;
           categories[j] = replaced[j].category;
