@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -49,35 +49,8 @@ fitness_t search<T, ES>::fitness(const T &ind)
 /// variables, functions...).
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::arl(const T &base)
-{
-  specialized_arl(base);
-}
-
-///
-/// \param[in] base a team we are examining to extract building blocks.
-///
-/// Repeatedly calls specialized_arl(const individual &) for each member of
-/// the team.
-///
-template<class T, template<class> class ES>
 template<class U>
-void search<T, ES>::specialized_arl(const team<U> &base)
-{
-  for (const auto &ind : base)
-    specialized_arl(ind);
-}
-
-///
-/// \param[in] base \a individual we are examining to extract building blocks.
-///
-/// Adaptive Representation through Learning (ARL). The algorithm extract
-/// common knowledge (building blocks) emerging during the evolutionary
-/// process and acquires the necessary structure for solving the problem
-/// (see ARL - Justinian P. Rosca and Dana H. Ballard).
-///
-template<class T, template<class> class ES>
-void search<T, ES>::specialized_arl(const individual &base)
+void search<T, ES>::arl(const U &base)
 {
   const auto base_fit(fitness(base));
   if (!base_fit.isfinite())
@@ -145,6 +118,19 @@ void search<T, ES>::specialized_arl(const individual &base)
       }
     }
   }
+}
+
+///
+/// \param[in] base a team we are examining to extract building blocks.
+///
+/// Repeatedly calls arl(const U &) for each member of the team.
+///
+template<class T, template<class> class ES>
+template<class U>
+void search<T, ES>::arl(const team<U> &base)
+{
+  for (const auto &ind : base)
+    arl(ind);
 }
 
 ///

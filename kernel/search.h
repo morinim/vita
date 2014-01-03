@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,7 +48,8 @@ namespace vita
   public:
     explicit search(problem *const);
 
-    void arl(const T &);
+    template<class U> void arl(const U &);
+    template<class U> void arl(const team<U> &);
 
     void tune_parameters();
 
@@ -67,9 +68,6 @@ namespace vita
              const std::list<unsigned> &, unsigned, double, unsigned);
     void print_resume(bool, const fitness_t &, double) const;
     bool stop_condition(const summary<T> &) const;
-
-    void specialized_arl(const individual &);
-    template<class U> void specialized_arl(const team<U> &);
 
   protected:  // Protected data members.
     std::unique_ptr<evaluator<T>> active_eva_;
