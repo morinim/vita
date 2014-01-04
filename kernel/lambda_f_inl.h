@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -216,7 +216,7 @@ void dyn_slot_engine<T>::fill_matrix(const team<U> &t, data &d)
 {
   for (const auto &i : t)
     fill_matrix(i, d);
-    
+
   dataset_size /= t.size();
 }
 
@@ -234,10 +234,10 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
   const any res(agent.run(e.input));
 
   const auto ns(slot_matrix.rows());
-  const auto last_slot(ns - 1);   
+  const auto last_slot(ns - 1);
   if (res.empty())
     return last_slot;
-  
+
   const number val(to<number>(res));
   const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 

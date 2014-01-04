@@ -302,7 +302,7 @@ namespace vita
     if (n < size())
       for (auto j(decltype(n){0}); j < n; ++j)
       {
-        const auto r(random::between<decltype(j)>(j, terminals.size()));
+        const auto r(random::between<unsigned>(j, terminals.size()));
 
         std::swap(terminals[j], terminals[r]);
       }

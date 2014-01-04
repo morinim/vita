@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -322,8 +322,8 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
   engine_ = dyn_slot_engine<T>(ind, *this->dat_, x_slot_);
 
   fitness_t::base_t err(0.0);
-  for (unsigned i(0); i < engine_.slot_matrix.rows(); ++i)
-    for (unsigned j(0); j < engine_.slot_matrix.cols(); ++j)
+  for (unsigned i(0); i < engine_.slot_matrix.rows(); ++i)    // slot index
+    for (unsigned j(0); j < engine_.slot_matrix.cols(); ++j)  // class index
       if (j != engine_.slot_class[i])
         err += engine_.slot_matrix(i, j);
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -110,7 +110,7 @@ namespace vita
     /// class_name_[i] = "name of the i-th class of the classification task".
     std::vector<std::string> class_name_;
   };
-  
+
   ///
   /// \tparam T type of individual.
   ///
@@ -131,7 +131,7 @@ namespace vita
 
     dyn_slot_engine() {}
     dyn_slot_engine(const T &, data &, unsigned);
-    
+
     unsigned slot(const T &, const data::example &) const;
 
     /// The main matrix of the dynamic slot algorithm.

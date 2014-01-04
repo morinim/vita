@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,9 +42,9 @@ namespace vita
       case d_string: return                              any(s);
       default:                  throw boost::bad_lexical_cast();
       }
-    }  
+    }
   }
-  
+
   ///
   /// New empty data instance.
   ///

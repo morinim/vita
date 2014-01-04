@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,8 +20,7 @@
 /// Creates a team of individuals that will cooperate to solve a task.
 ///
 template<class T>
-team<T>::team(const environment &e, const symbol_set &sset)
-  : signature_()
+team<T>::team(const environment &e, const symbol_set &sset) : signature_()
 {
   assert(e.debug(true, true));
   assert(e.team.individuals);
@@ -31,6 +30,19 @@ team<T>::team(const environment &e, const symbol_set &sset)
 
   for (auto i(decltype(n){0}); i < n; ++i)
     individuals_.emplace_back(e, sset);
+
+  assert(debug());
+}
+
+///
+/// \param v a vector of individuals
+///
+/// Builds a team containing the individuals of vector \a v.
+///
+template<class T>
+team<T>::team(const std::vector<T> &v) : signature_()
+{
+  individuals_ = v;
 
   assert(debug());
 }

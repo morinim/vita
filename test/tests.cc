@@ -1,14 +1,13 @@
 /**
- *
- *  \file tests.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
- *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  \license
+ * This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #define MASTER_TEST_SET
@@ -26,6 +25,7 @@ using namespace boost;
 #include "test_evolution.cc"
 #include "test_fitness.cc"
 #include "test_individual.cc"
+#include "test_lambda.cc"
 #include "test_population.cc"
 #include "test_primitive_d.cc"
 #include "test_primitive_i.cc"
