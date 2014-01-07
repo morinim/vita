@@ -316,20 +316,9 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
-  assert(ind.debug());
-  assert(this->dat_->classes() > 1);
-
   engine_ = dyn_slot_engine<T>(ind, *this->dat_, x_slot_);
 
-  fitness_t::base_t err(0.0);
-  for (unsigned i(0); i < engine_.slot_matrix.rows(); ++i)    // slot index
-    for (unsigned j(0); j < engine_.slot_matrix.cols(); ++j)  // class index
-      if (j != engine_.slot_class[i])
-        err += engine_.slot_matrix(i, j);
-
-  assert(engine_.dataset_size >= err);
-
-  return fitness_t(-err);
+  return fitness_t(100.0 * (engine_.training_accuracy() - 1.0));
 }
 
 ///

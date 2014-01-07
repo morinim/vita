@@ -145,6 +145,8 @@ namespace vita
     /// Size of the dataset used to construct \a slot_matrix.
     unsigned dataset_size;
 
+    double training_accuracy() const;
+
     static number normalize_01(number);
 
   private:  // Private support method

@@ -245,6 +245,27 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
 }
 
 ///
+/// \return the accuracy of the lambda function on the training set.
+///
+template<class T>
+double dyn_slot_engine<T>::training_accuracy() const
+{
+  double err(0.0);
+
+  const auto slots(slot_matrix.rows());
+  const auto classes(slot_matrix.cols());
+
+  for (auto i(decltype(slots){0}); i < slots; ++i)        // slot index
+    for (auto j(decltype(classes){0}); j < classes; ++j)  // class index
+      if (j != slot_class[i])
+        err += slot_matrix(i, j);
+
+  assert(dataset_size >= err);
+
+  return static_cast<double>(dataset_size - err) / dataset_size;
+}
+
+///
 /// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
 ///              that should be mapped in the [0,1] interval.
 /// \return a number in the [0,1] range.
