@@ -250,19 +250,16 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
 template<class T>
 double dyn_slot_engine<T>::training_accuracy() const
 {
-  double err(0.0);
+  double ok(0.0);
 
   const auto slots(slot_matrix.rows());
-  const auto classes(slot_matrix.cols());
 
-  for (auto i(decltype(slots){0}); i < slots; ++i)        // slot index
-    for (auto j(decltype(classes){0}); j < classes; ++j)  // class index
-      if (j != slot_class[i])
-        err += slot_matrix(i, j);
+  for (auto i(decltype(slots){0}); i < slots; ++i)
+    ok += slot_matrix(i, slot_class[i]);
 
-  assert(dataset_size >= err);
+  assert(dataset_size >= ok);
 
-  return static_cast<double>(dataset_size - err) / dataset_size;
+  return static_cast<double>(ok) / dataset_size;
 }
 
 ///

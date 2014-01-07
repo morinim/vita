@@ -120,7 +120,8 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 }
 
 ///
-/// \param[in] prg program(individual/team) to be transformed in a lambda function.
+/// \param[in] prg program(individual/team) to be transformed in a lambda
+////               function.
 /// \return the lambda function associated with \a prg (\c nullptr in case of
 ///         errors).
 ///
