@@ -19,9 +19,6 @@
 
 namespace vita
 {
-  template<class T> class gaussian_lambda_f;
-  template<class T> class gaussian_evaluator;
-
   ///
   /// \brief Transforms individuals into lambda functions
   ///
@@ -104,6 +101,8 @@ namespace vita
   public:
     class_lambda_f(const T &, const data &);
 
+    virtual unsigned tag(const data::example &) const = 0;
+
     virtual std::string name(const any &) const final;
 
   protected:
@@ -126,6 +125,7 @@ namespace vita
   public:
     dyn_slot_lambda_f(const T &, data &, unsigned);
 
+    virtual unsigned tag(const data::example &) const override;
     virtual any operator()(const data::example &) const override;
 
     double training_accuracy() const;
@@ -142,13 +142,13 @@ namespace vita
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
     /// 'class' mapped to slot 'slot'".
-    matrix<unsigned> slot_matrix;
+    matrix<unsigned> slot_matrix_;
 
     /// slot_class[i] = "label of the predominant class" for the i-th slot.
-    std::vector<unsigned> slot_class;
+    std::vector<unsigned> slot_class_;
 
     /// Size of the dataset used to construct \a slot_matrix.
-    std::uintmax_t dataset_size;
+    std::uintmax_t dataset_size_;
   };
 
   ///
@@ -161,39 +161,13 @@ namespace vita
   public:
     dyn_slot_lambda_f(const team<T> &, data &, unsigned);
 
+    virtual unsigned tag(const data::example &) const override;
     virtual any operator()(const data::example &) const override;
 
     double training_accuracy() const;
 
   private:
     std::vector<dyn_slot_lambda_f<T>> team_;
-  };
-
-  ///
-  /// \tparam T type of individual.
-  ///
-  /// This class encapsulates the engine of the Gaussian classification
-  /// algorithm (see vita::gaussian_evaluator for further details).
-  ///
-  /// Methods and properties of gaussian_engine can only be accessed from
-  /// vita::gaussian_lambda_f and gaussian_evaluator (they have a HAS-A
-  /// 'friendly' relationship with gaussian_engine).
-  ///
-  template<class T>
-  class gaussian_engine
-  {
-    friend class gaussian_lambda_f<T>;
-    friend class gaussian_evaluator<T>;
-
-    gaussian_engine() {}
-    gaussian_engine(const T &, data &);
-
-    unsigned class_label(const T &, const data::example &,
-                         number * = nullptr, number * = nullptr) const;
-
-    /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
-    /// classification problem".
-    std::vector<distribution<number>> gauss_dist;
   };
 
   ///
@@ -211,10 +185,18 @@ namespace vita
   public:
     gaussian_lambda_f(const T &, data &);
 
+    virtual unsigned tag(const data::example &) const override;
     virtual any operator()(const data::example &) const override;
 
-  private:
-    gaussian_engine<T> engine_;
+    unsigned tag(const data::example &, number *, number *) const;
+
+  private:  // Private support methods
+    void fill_vector(data &);
+
+  private:  // Private data members
+    /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
+    /// classification problem".
+    std::vector<distribution<number>> gauss_dist_;
   };
 
   ///
@@ -229,6 +211,7 @@ namespace vita
   public:
     binary_lambda_f(const T &, data &);
 
+    virtual unsigned tag(const data::example &) const override;
     virtual any operator()(const data::example &) const override;
   };
 

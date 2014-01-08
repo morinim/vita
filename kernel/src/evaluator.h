@@ -229,9 +229,6 @@ namespace vita
 
     virtual fitness_t operator()(const T &) override;
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
-
-  private:
-    gaussian_engine<T> engine_;
   };
 
   ///

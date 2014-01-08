@@ -317,7 +317,7 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
-  dyn_slot_lambda_f<T> lambda(dyn_slot_lambda_f<T>(ind, *this->dat_, x_slot_));
+  dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
 
   return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
 }
@@ -348,14 +348,14 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 {
   assert(ind.debug());
   assert(this->dat_->classes() > 1);
-  gaussian_engine<T> engine_(ind, *this->dat_);
+
+  gaussian_lambda_f<T> lambda(ind, *this->dat_);
 
   fitness_t::base_t d(0.0);
   for (auto &example : *this->dat_)
   {
     double confidence, sum;
-    const unsigned probable_class(engine_.class_label(ind, example,
-                                                      &confidence, &sum));
+    const unsigned probable_class(lambda.tag(example, &confidence, &sum));
 
     if (probable_class == example.template label())
     {
