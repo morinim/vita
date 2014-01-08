@@ -402,24 +402,21 @@ std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(const T &ind) const
 template<class T>
 fitness_t binary_evaluator<T>::operator()(const T &ind)
 {
-  assert(this->dat_->classes() == 2);
+  auto &dataset(*this->dat_);
 
-  binary_lambda_f<T> agent(ind, *this->dat_);
+  assert(dataset.classes() == 2);
+
+  binary_lambda_f<T> agent(ind, dataset);
   fitness_t::base_t err(0.0);
 
-  for (auto &example : *this->dat_)
-  {
-    const double val(to<double>(agent(example)));
-
-    if ((example.tag() == 1 && val <= 0.0) ||
-        (example.tag() == 0 && val > 0.0))
+  for (auto &example : dataset)
+    if (example.tag() != agent.tag(example))
     {
       ++example.difficulty;
       ++err;
 
       // err += std::fabs(val);
     }
-  }
 
   return -err;
 }
