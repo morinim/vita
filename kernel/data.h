@@ -57,7 +57,7 @@ namespace vita
       std::uintmax_t  difficulty;
       unsigned               age;
 
-      unsigned label() const { return any_cast<unsigned>(output); }
+      unsigned tag() const { return any_cast<unsigned>(output); }
       template<class T> T cast_output() const;
 
       void clear()

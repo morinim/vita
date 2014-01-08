@@ -202,7 +202,7 @@ void dyn_slot_lambda_f<T>::fill_matrix(data &d, unsigned x_slot)
   {
     ++dataset_size_;
 
-    ++slot_matrix_(slot(example), example.label());
+    ++slot_matrix_(slot(example), example.tag());
   }
 
   const auto unknown(d.classes());
@@ -385,7 +385,7 @@ void gaussian_lambda_f<T>::fill_vector(data &d)
     else if (val < -cut)
       val = -cut;
 
-    gauss_dist_[example.label()].add(val);
+    gauss_dist_[example.tag()].add(val);
   }
 }
 

@@ -281,7 +281,7 @@ double classification_evaluator<T>::accuracy(const T &ind) const
   for (const auto &example : *this->dat_)
   {
     const any res((*f)(example));
-    if (any_cast<unsigned>(res) == example.template label())
+    if (any_cast<unsigned>(res) == example.template tag())
       ++ok;
 
     ++total_nr;
@@ -357,7 +357,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
     double confidence, sum;
     const unsigned probable_class(lambda.tag(example, &confidence, &sum));
 
-    if (probable_class == example.template label())
+    if (probable_class == example.template tag())
     {
       // Note:
       // * (sum - confidence) is the sum of the errors;
@@ -411,8 +411,8 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   {
     const double val(to<double>(agent(example)));
 
-    if ((example.label() == 1 && val <= 0.0) ||
-        (example.label() == 0 && val > 0.0))
+    if ((example.tag() == 1 && val <= 0.0) ||
+        (example.tag() == 0 && val > 0.0))
     {
       ++example.difficulty;
       ++err;

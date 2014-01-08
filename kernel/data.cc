@@ -881,7 +881,7 @@ namespace vita
           if (e.input.size() != in_size)
             return false;
 
-          if (cl_size && e.label() >= cl_size)
+          if (cl_size && e.tag() >= cl_size)
             return false;
         }
       }
