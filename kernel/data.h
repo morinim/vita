@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -174,7 +174,7 @@ namespace vita
       const auto &i(map.find(n));
       return i == map.end() ? d_void : i->second;
     }
-    
+
   private:
     static unsigned encode(const std::string &,
                            std::map<std::string, unsigned> *);

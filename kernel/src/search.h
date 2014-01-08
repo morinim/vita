@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,7 @@ namespace vita
   public:
     explicit src_search(src_problem *const);
 
-    void set_evaluator(evaluator_id, const std::string & = "");
+    bool set_evaluator(evaluator_id, const std::string & = "");
 
     virtual bool debug(bool) const override;
 

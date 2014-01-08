@@ -65,7 +65,7 @@ reg_lambda_f<team<T>>::reg_lambda_f(const team<T> &t) : lambda_f<team<T>>(t)
 template<class T>
 any reg_lambda_f<T>::operator()(const data::example &e) const
 {
-  return any(int_.run(e.input));
+  return int_.run(e.input);
 }
 
 ///
@@ -364,7 +364,6 @@ gaussian_lambda_f<T>::gaussian_lambda_f(const T &ind, data &d)
 template<class T>
 void gaussian_lambda_f<T>::fill_vector(data &d)
 {
-  assert(ind.debug());
   assert(d.classes() > 1);
 
   src_interpreter<T> agent(this->prg_);

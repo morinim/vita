@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,54 +23,66 @@ src_search<T, ES>::src_search(src_problem *const p)
 }
 
 ///
-/// \param[in] id numerical id of the evaluator to be activated
+/// \param[in] id numerical id of the evaluator to be activated.
 /// \param[in] msg input parameters for the evaluator constructor.
+/// \return \c true if the active evaluator has been changed.
+///
+/// \note
+/// If the evaluator \a id is not compatible with the problem type the
+/// function return \c false and the active evaluator stays the same.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
+bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 {
-  switch (id)
+  auto &data(*this->prob_->data());
+
+  if (data.classes() > 1)
   {
-  case k_count_evaluator:
-    search<T, ES>::set_evaluator(
-      make_unique<count_evaluator<T>>(*this->prob_->data()));
-    break;
+    switch (id)
+    {
+    case k_bin_evaluator:
+      search<T, ES>::set_evaluator(make_unique<binary_evaluator<T>>(data));
+      return true;
 
-  case k_mae_evaluator:
-    search<T, ES>::set_evaluator(
-      make_unique<mae_evaluator<T>>(*this->prob_->data()));
-    break;
+    case k_dyn_slot_evaluator:
+      {
+        auto x_slot(msg.empty() ? 10u : boost::lexical_cast<unsigned>(msg));
+        search<T, ES>::set_evaluator(
+          make_unique<dyn_slot_evaluator<T>>(data, x_slot));
+      }
+      return true;
 
-  case k_rmae_evaluator:
-    search<T, ES>::set_evaluator(
-      make_unique<rmae_evaluator<T>>(*this->prob_->data()));
-    break;
+    case k_gaussian_evaluator:
+      search<T, ES>::set_evaluator(make_unique<gaussian_evaluator<T>>(data));
+      return true;
 
-  case k_mse_evaluator:
-    search<T, ES>::set_evaluator(
-    make_unique<mse_evaluator<T>>(*this->prob_->data()));
-    break;
-
-  case k_bin_evaluator:
-    search<T, ES>::set_evaluator(
-      make_unique<binary_evaluator<T>>(*this->prob_->data()));
-    break;
-
-  case k_dyn_slot_evaluator:
-  {
-    const auto x_slot(msg.empty() ? 10u : boost::lexical_cast<unsigned>(msg));
-    search<T, ES>::set_evaluator(
-      make_unique<dyn_slot_evaluator<T>>(*this->prob_->data(), x_slot));
-    break;
+    default:
+      return false;
+    }
   }
+  else // Symbolic regression
+  {
+    switch (id)
+    {
+    case k_count_evaluator:
+      search<T, ES>::set_evaluator(make_unique<count_evaluator<T>>(data));
+      return true;
 
-  case k_gaussian_evaluator:
-    search<T, ES>::set_evaluator(
-      make_unique<gaussian_evaluator<T>>(*this->prob_->data()));
-    break;
+    case k_mae_evaluator:
+      search<T, ES>::set_evaluator(make_unique<mae_evaluator<T>>(data));
+      return true;
 
-  default:
-    break;
+    case k_rmae_evaluator:
+      search<T, ES>::set_evaluator(make_unique<rmae_evaluator<T>>(data));
+      return true;
+
+    case k_mse_evaluator:
+      search<T, ES>::set_evaluator(make_unique<mse_evaluator<T>>(data));
+      return true;
+
+    default:
+      return false;
+    }
   }
 }
 
