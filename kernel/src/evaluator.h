@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -204,8 +204,6 @@ namespace vita
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
   private:
-    dyn_slot_engine<T> engine_;
-
     /// Number of slots for each class of the training set.
     unsigned x_slot_;
   };

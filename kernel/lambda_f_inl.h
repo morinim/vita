@@ -46,7 +46,6 @@ reg_lambda_f<T>::reg_lambda_f(const T &ind)
 ///
 /// \param[in] t team to be lambdified.
 ///
-template<>
 template<class T>
 reg_lambda_f<team<T>>::reg_lambda_f(const team<T> &t) : lambda_f<team<T>>(t)
 {
@@ -73,7 +72,6 @@ any reg_lambda_f<T>::operator()(const data::example &e) const
 /// \param[in] e input example for the lambda function.
 /// \return the output value associated with \a e.
 ///
-template<>
 template<class T>
 any reg_lambda_f<team<T>>::operator()(const data::example &e) const
 {
@@ -119,18 +117,73 @@ std::string class_lambda_f<T>::name(const any &a) const
 }
 
 ///
-/// \param[in] prg program (individual/team) used for classification.
+/// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
+///              that should be mapped in the [0,1] interval.
+/// \return a number in the [0,1] range.
+///
+/// This is a sigmoid function (it is a bounded real function, "S" shaped,
+/// with positive derivative everywhere).
+///
+/// \see
+/// <http://en.wikipedia.org/wiki/Sigmoid_function>
+///
+template<class T>
+number dyn_slot_lambda_f<T>::normalize_01(number x)
+{
+  // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function
+
+  return 0.5 + std::atan(x) / 3.1415926535;        // Arctangent
+
+  // return 0.5 + std::tanh(x);                    // Hyperbolic tangent
+
+  // return 1.0 / (1.0 + std::exp(-x));            // Logistic function
+}
+
+///
+/// \param[in] ind individual "to be transformed" into a lambda function.
+/// \param[in] d the training set.
+/// \param[in] x_slot number of slots for each class of the training set.
+///
+template<class T>
+dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
+  : class_lambda_f<T>(ind, d), slot_matrix(d.classes() * x_slot, d.classes()),
+    slot_class(d.classes() * x_slot), dataset_size(0)
+{
+  assert(ind.debug());
+  assert(d.debug());
+  assert(d.classes() > 1);
+  assert(x_slot);
+
+  // Use the training set for lambdification.
+  const data::dataset_t backup(d.dataset());
+  d.dataset(data::training);
+  fill_matrix(d, x_slot);
+  d.dataset(backup);
+}
+
+///
+/// \param[in] t team "to be transformed" into a lambda function.
+/// \param[in] d the training set.
+/// \param[in] x_slot number of slots for each class of the training set.
+///
+template<class T>
+dyn_slot_lambda_f<team<T>>::dyn_slot_lambda_f(const team<T> &t, data &d,
+                                              unsigned x_slot)
+  : class_lambda_f<T>(t, d), team_(t.size())
+{
+  for (const auto &ind : t)
+    team_.emplace_back(ind, d, x_slot);
+}
+
+///
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
 /// Sets up the data structures needed by the 'dynamic slot' algorithm.
 ///
 template<class T>
-dyn_slot_engine<T>::dyn_slot_engine(const T &prg, data &d, unsigned x_slot)
-  : slot_matrix(d.classes() * x_slot, d.classes()),
-    slot_class(d.classes() * x_slot), dataset_size(0)
+void dyn_slot_lambda_f<T>::fill_matrix(data &d, unsigned x_slot)
 {
-  assert(prg.debug());
   assert(d.debug());
   assert(d.classes() > 1);
   assert(x_slot);
@@ -145,7 +198,12 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &prg, data &d, unsigned x_slot)
   // In the first step this method evaluates the program to obtain an output
   // value for each training example. Based on the program output a
   // bi-dimensional matrix is built (slot_matrix_(slot, class)).
-  fill_matrix(prg, d);
+  for (const auto &example : d)
+  {
+    ++dataset_size;
+
+    ++slot_matrix(slot(example), example.label());
+  }
 
   const auto unknown(d.classes());
 
@@ -183,54 +241,13 @@ dyn_slot_engine<T>::dyn_slot_engine(const T &prg, data &d, unsigned x_slot)
 }
 
 ///
-/// \param[in] ind individual used to build the matrix.
-/// \param[in] d dataset.
-///
-/// This support method evaluates the individual to obtain an output
-/// value for each training example. Based on the individual output a
-/// bi-dimensional matrix is built (slot_matrix_(slot, class)).
-///
-template<class T>
-template<class U>
-void dyn_slot_engine<T>::fill_matrix(const U &ind, data &d)
-{
-  for (const auto &example : d)
-  {
-    ++dataset_size;
-
-    const auto where(slot(ind, example));  // Insertion slot
-
-    ++slot_matrix(where, example.label());
-  }
-}
-
-///
-/// \param[in] t t used to build the matrix.
-/// \param[in] d dataset.
-///
-/// A specialization of fill_matrix for teams.
-///
-template<class T>
-template<class U>
-void dyn_slot_engine<T>::fill_matrix(const team<U> &t, data &d)
-{
-  for (const auto &i : t)
-    fill_matrix(i, d);
-
-  dataset_size /= t.size();
-}
-
-///
-/// \param[in] ind individual used for classification.
 /// \param[in] e input data for \a ind.
 /// \return the slot example \a e falls into.
 ///
 template<class T>
-unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
+unsigned dyn_slot_lambda_f<T>::slot(const data::example &e) const
 {
-  assert(ind.debug());
-
-  src_interpreter<T> agent(ind);
+  src_interpreter<T> agent(this->prg_);
   const any res(agent.run(e.input));
 
   const auto ns(slot_matrix.rows());
@@ -248,7 +265,7 @@ unsigned dyn_slot_engine<T>::slot(const T &ind, const data::example &e) const
 /// \return the accuracy of the lambda function on the training set.
 ///
 template<class T>
-double dyn_slot_engine<T>::training_accuracy() const
+double dyn_slot_lambda_f<T>::training_accuracy() const
 {
   double ok(0.0);
 
@@ -263,47 +280,14 @@ double dyn_slot_engine<T>::training_accuracy() const
 }
 
 ///
-/// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
-///              that should be mapped in the [0,1] interval.
-/// \return a number in the [0,1] range.
+/// \return the accuracy of the lambda function on the training set.
 ///
-/// This is a sigmoid function (it is a bounded real function, "S" shaped,
-/// with positive derivative everywhere).
-///
-/// \see
-/// <http://en.wikipedia.org/wiki/Sigmoid_function>
+/// \note Specialized method for teams.
 ///
 template<class T>
-number dyn_slot_engine<T>::normalize_01(number x)
+double dyn_slot_lambda_f<team<T>>::training_accuracy() const
 {
-  // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function.
-
-  return 0.5 + std::atan(x) / 3.1415926535;        // Arctangent.
-
-  // return 0.5 + std::tanh(x);                    // Hyperbolic tangent.
-
-  // return 1.0 / (1.0 + std::exp(-x));            // Logistic function.
-}
-
-///
-/// \param[in] ind individual "to be transformed" into a lambda function.
-/// \param[in] d the training set.
-/// \param[in] x_slot number of slots for each class of the training set.
-///
-template<class T>
-dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
-  : class_lambda_f<T>(ind, d)
-{
-  assert(ind.debug());
-  assert(d.debug());
-  assert(d.classes() > 1);
-  assert(x_slot);
-
-  // Use the training set for lambdification.
-  const data::dataset_t backup(d.dataset());
-  d.dataset(data::training);
-  engine_ = dyn_slot_engine<T>(ind, d, x_slot);
-  d.dataset(backup);
+  return 0.0;
 }
 
 ///
@@ -313,9 +297,36 @@ dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
 template<class T>
 any dyn_slot_lambda_f<T>::operator()(const data::example &instance) const
 {
-  const auto where(engine_.slot(this->prg_, instance));
+  const auto where(slot(instance));
 
-  return any(engine_.slot_class[where]);
+  return any(slot_class[where]);
+}
+
+///
+/// \param[in] instance data to be classified.
+/// \return the name of the class that includes \a instance.
+///
+/// Specialized method for teams: this is a simple majority voting scheme.
+///
+template<class T>
+any dyn_slot_lambda_f<team<T>>::operator()(const data::example &instance) const
+{
+  const auto classes(team_[0].slot_matrix.cols());
+
+  std::vector<unsigned> votes(classes);
+
+  for (const auto &lambda : team_)
+  {
+    const auto where(lambda.slot(instance));
+    ++votes[lambda.slot_class[where]];
+  }
+
+  auto max(decltype(classes){0});
+  for (auto i(max + 1); i < classes; ++i)
+    if (votes[i] > votes[max])
+      max = i;
+
+  return any(max);
 }
 
 ///

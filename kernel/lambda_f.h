@@ -19,8 +19,6 @@
 
 namespace vita
 {
-  template<class T> class dyn_slot_lambda_f;
-  template<class T> class dyn_slot_evaluator;
   template<class T> class gaussian_lambda_f;
   template<class T> class gaussian_evaluator;
 
@@ -79,7 +77,9 @@ namespace vita
     mutable src_interpreter<T> int_;
   };
 
-  template<>
+  ///
+  /// \brief Regression lambda function specialization for teams
+  ///
   template<class T>
   class reg_lambda_f<team<T>> : public lambda_f<team<T>>
   {
@@ -114,49 +114,6 @@ namespace vita
   ///
   /// \tparam T type of individual.
   ///
-  /// This class encapsulates the engine of the Slotted Dynamic Class
-  /// Boundary Determination algorithm (see vita::dyn_slot_evaluator for
-  /// further details about the algorithm).
-  ///
-  /// Methods and properties of dyn_slot_engine can only be accessed from
-  /// vita::dyn_slot_lambda_f and dyn_slot_evaluator (they have a HAS-A
-  /// 'friendly' relationship with dyn_slot_engine).
-  ///
-  template<class T>
-  class dyn_slot_engine
-  {
-  protected:
-    friend class dyn_slot_lambda_f<T>;
-    friend class dyn_slot_evaluator<T>;
-
-    dyn_slot_engine() {}
-    dyn_slot_engine(const T &, data &, unsigned);
-
-    unsigned slot(const T &, const data::example &) const;
-
-    /// The main matrix of the dynamic slot algorithm.
-    /// slot_matrix[slot][class] = "number of training examples of class
-    /// 'class' mapped to slot 'slot'".
-    matrix<unsigned> slot_matrix;
-
-    /// slot_class[i] = "label of the predominant class" for the i-th slot.
-    std::vector<unsigned> slot_class;
-
-    /// Size of the dataset used to construct \a slot_matrix.
-    unsigned dataset_size;
-
-    double training_accuracy() const;
-
-    static number normalize_01(number);
-
-  private:  // Private support method
-    template<class U> void fill_matrix(const U &, data &);
-    template<class U> void fill_matrix(const team<U> &, data &);
-  };
-
-  ///
-  /// \tparam T type of individual.
-  ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
   ///
@@ -171,8 +128,45 @@ namespace vita
 
     virtual any operator()(const data::example &) const override;
 
+    double training_accuracy() const;
+
+  private:  // Private support methods
+    template<class U> friend  class dyn_slot_lambda_f;
+
+    static number normalize_01(number);
+
+    void fill_matrix(data &, unsigned);
+    unsigned slot(const data::example &) const;
+
+  private:  // Private data members
+    /// The main matrix of the dynamic slot algorithm.
+    /// slot_matrix[slot][class] = "number of training examples of class
+    /// 'class' mapped to slot 'slot'".
+    matrix<unsigned> slot_matrix;
+
+    /// slot_class[i] = "label of the predominant class" for the i-th slot.
+    std::vector<unsigned> slot_class;
+
+    /// Size of the dataset used to construct \a slot_matrix.
+    std::uintmax_t dataset_size;
+  };
+
+  ///
+  /// \brief Slotted Dynamic Class Boundary Determination specialization for
+  ///        teams
+  ///
+  template<class T>
+  class dyn_slot_lambda_f<team<T>> : public class_lambda_f<team<T>>
+  {
+  public:
+    dyn_slot_lambda_f(const team<T> &, data &, unsigned);
+
+    virtual any operator()(const data::example &) const override;
+
+    double training_accuracy() const;
+
   private:
-    dyn_slot_engine<T> engine_;
+    std::vector<dyn_slot_lambda_f<T>> team_;
   };
 
   ///

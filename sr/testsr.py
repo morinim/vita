@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2013 EOS di Manlio Morini.
+#  Copyright (C) 2011-2014 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
 #  You can obtain one at http://mozilla.org/MPL/2.0/
 #
-#  This is just a command line utility to simplify debugging and profiling.
+#  A command line utility to simplify debugging and profiling.
 #
 
 import argparse
@@ -80,7 +80,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         random.seed()
         randomize = "--random-seed " + str(random.randint(0, 1000000000))
 
-    cmd = Template("$sr --verbose $elitism_switch --stat-dir $sd "\
+    cmd = Template("$sr --evaluator dynslot --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
                    "$arl_switch $dss_switch $ss $ds")
