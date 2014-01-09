@@ -12,7 +12,7 @@ BOOST_INCLUDE = ./boost
 BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 
 # Compiler (clang++, g++)
-CXX = clang++
+CXX = g++
 
 # -DCLONE_SCALING
 # -DMUTUAL_IMPROVEMENT
