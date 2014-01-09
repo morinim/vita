@@ -210,10 +210,9 @@ namespace vita
   ///
   void data::sort(std::function<bool (const example &, const example &)> f)
   {
-    const dataset_t d(dataset());
-    const unsigned partition_size(std::distance(begin(), end()));
+    const auto partition_size(std::distance(begin(), end()));
 
-    dataset_[d].sort(f);
+    dataset_[dataset()].sort(f);
 
     slice(partition_size);
   }
@@ -248,9 +247,9 @@ namespace vita
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
       // > items, and often you'll have all of them before that".
-      unsigned available(dataset_[training].size());
+      auto available(dataset_[training].size());
 
-      const unsigned k(available * r);
+      const decltype(available) k(available * r);
       assert(k <= available);
 
       auto needed(k);
@@ -343,14 +342,14 @@ namespace vita
   ///
   /// \param[in] label name of a class of the learning collection.
   /// \param[in,out] map map used to encode the \a label.
-  /// \return a positive integer used as primary key for the class \a label.
+  /// \return a positive integer used as primary key \a label.
   ///
-  unsigned data::encode(const std::string &label,
-                        std::map<std::string, unsigned> *map)
+  template<class T>
+  T data::encode(const std::string &label, std::map<std::string, T> *map)
   {
     if (map->find(label) == map->end())
     {
-      const unsigned n(map->size());
+      const auto n(map->size());
       (*map)[label] = n;
     }
 
@@ -366,7 +365,7 @@ namespace vita
   /// Boost Bitmap could be used to speed up the search in \a classes_map_, but
   /// to date speed isn't an issue.
   ///
-  std::string data::class_name(unsigned i) const
+  std::string data::class_name(class_tag_t i) const
   {
     for (const auto &p : classes_map_)
       if (p.second == i)
@@ -409,7 +408,7 @@ namespace vita
   {
     std::vector<std::string> record;
 
-    const unsigned linemax(line.length());
+    const auto linemax(line.length());
     bool inquotes(false);
     unsigned linepos(0);
     std::string curstring;
@@ -447,8 +446,11 @@ namespace vita
     record.push_back(curstring);
 
     if (trim)
-      for (size_t i(0); i < record.size(); ++i)
+    {
+      const auto size(record.size());
+      for (auto i(decltype(size){0}); i < size; ++i)
         boost::trim(record[i]);
+    }
 
     return record;
   }
@@ -485,7 +487,7 @@ namespace vita
 
     std::swap(categories_[c1], categories_[c2]);
 
-    for (size_t i(0); i < columns(); ++i)
+    for (unsigned i(0); i < columns(); ++i)
       if (header_[i].category_id == c1)
         header_[i].category_id = c2;
       else if (header_[i].category_id == c2)
@@ -737,7 +739,7 @@ namespace vita
         if (!dataset_[dataset()].size())  // No line parsed
           classification = !is_number(record[0]);
 
-        for (unsigned field(0); field < size; ++field)
+        for (auto field(decltype(size){0}); field < size; ++field)
         {
           // The first line is (also) used to learn data format.
           if (columns() != size)
@@ -865,7 +867,7 @@ namespace vita
   ///
   bool data::debug() const
   {
-    const unsigned cl_size(classes());
+    const auto cl_size(classes());
     // If this is a classification problem then there should be at least two
     // classes.
     if (cl_size == 1)
@@ -874,7 +876,7 @@ namespace vita
     for (const auto &d : dataset_)
       if (!d.empty() && &d != &dataset_[test])
       {
-        const unsigned in_size(d.begin()->input.size());
+        const auto in_size(d.begin()->input.size());
 
         for (const auto &e : d)
         {

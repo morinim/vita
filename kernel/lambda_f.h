@@ -101,7 +101,7 @@ namespace vita
   public:
     class_lambda_f(const T &, const data &);
 
-    virtual unsigned tag(const data::example &) const = 0;
+    virtual class_tag_t tag(const data::example &) const = 0;
     virtual any operator()(const data::example &) const override;
 
     virtual std::string name(const any &) const final;
@@ -126,7 +126,7 @@ namespace vita
   public:
     dyn_slot_lambda_f(const T &, data &, unsigned);
 
-    virtual unsigned tag(const data::example &) const override;
+    virtual class_tag_t tag(const data::example &) const override;
 
     double training_accuracy() const;
 
@@ -161,7 +161,7 @@ namespace vita
   public:
     dyn_slot_lambda_f(const team<T> &, data &, unsigned);
 
-    virtual unsigned tag(const data::example &) const override;
+    virtual class_tag_t tag(const data::example &) const override;
 
     double training_accuracy() const;
 
@@ -184,9 +184,9 @@ namespace vita
   public:
     gaussian_lambda_f(const T &, data &);
 
-    virtual unsigned tag(const data::example &) const override;
+    virtual class_tag_t tag(const data::example &) const override;
 
-    unsigned tag(const data::example &, number *, number *) const;
+    class_tag_t tag(const data::example &, number *, number *) const;
 
   private:  // Private support methods
     void fill_vector(data &);
@@ -209,7 +209,7 @@ namespace vita
   public:
     binary_lambda_f(const T &, data &);
 
-    virtual unsigned tag(const data::example &) const override;
+    virtual class_tag_t tag(const data::example &) const override;
   };
 
 #include "kernel/lambda_f_inl.h"

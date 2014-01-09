@@ -124,7 +124,7 @@ any class_lambda_f<T>::operator()(const data::example &e) const
 template<class T>
 std::string class_lambda_f<T>::name(const any &a) const
 {
-  return class_name_[any_cast<unsigned>(a)];
+  return class_name_[any_cast<class_tag_t>(a)];
 }
 
 ///
@@ -306,7 +306,7 @@ double dyn_slot_lambda_f<team<T>>::training_accuracy() const
 /// \return the label of the class that includes \a instance.
 ///
 template<class T>
-unsigned dyn_slot_lambda_f<T>::tag(const data::example &instance) const
+class_tag_t dyn_slot_lambda_f<T>::tag(const data::example &instance) const
 {
   return slot_class_[slot(instance)];
 }
@@ -318,7 +318,8 @@ unsigned dyn_slot_lambda_f<T>::tag(const data::example &instance) const
 /// Specialized method for teams: this is a simple majority voting scheme.
 ///
 template<class T>
-unsigned dyn_slot_lambda_f<team<T>>::tag(const data::example &instance) const
+class_tag_t dyn_slot_lambda_f<team<T>>::tag(
+  const data::example &instance) const
 {
   const auto classes(team_[0].slot_matrix_.cols());
 
@@ -401,8 +402,8 @@ void gaussian_lambda_f<T>::fill_vector(data &d)
 /// \return the class of \a instance (numerical id).
 ///
 template<class T>
-unsigned gaussian_lambda_f<T>::tag(const data::example &example, number *val,
-                                   number *sum) const
+class_tag_t gaussian_lambda_f<T>::tag(const data::example &example,
+                                      number *val, number *sum) const
 {
   const any res(src_interpreter<T>(this->prg_).run(example.input));
   const number x(res.empty() ? 0.0 : to<number>(res));
@@ -447,7 +448,7 @@ unsigned gaussian_lambda_f<T>::tag(const data::example &example, number *val,
 /// \return the tag of the class that includes \a instance.
 ///
 template<class T>
-unsigned gaussian_lambda_f<T>::tag(const data::example &instance) const
+class_tag_t gaussian_lambda_f<T>::tag(const data::example &instance) const
 {
   return tag(instance, nullptr, nullptr);
 }
@@ -470,7 +471,7 @@ binary_lambda_f<T>::binary_lambda_f(const T &ind, data &d)
 /// \return the class label associated with \a e.
 ///
 template<class T>
-unsigned binary_lambda_f<T>::tag(const data::example &e) const
+class_tag_t binary_lambda_f<T>::tag(const data::example &e) const
 {
   const any res(src_interpreter<T>(this->prg_).run(e.input));
   const number val(res.empty() ? -1.0 : to<number>(res));

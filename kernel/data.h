@@ -25,7 +25,12 @@
 namespace vita
 {
   ///
-  /// \\brief Stores the dataset used to evolve vita::population
+  /// \brief The type used as class id in classification tasks
+  ///
+  typedef unsigned class_tag_t;
+
+  ///
+  /// \brief Stores the dataset used to evolve vita::population
   ///
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
   /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
@@ -76,15 +81,15 @@ namespace vita
     unsigned columns() const;
     unsigned variables() const;
 
-    std::string class_name(unsigned) const;
+    std::string class_name(class_tag_t) const;
 
     bool debug() const;
 
     static domain_t from_weka(const std::string &);
 
   private: // Private support methods
-    static unsigned encode(const std::string &,
-                           std::map<std::string, unsigned> *);
+    template<class T> static T encode(const std::string &,
+                                      std::map<std::string, T> *);
     static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
@@ -98,8 +103,8 @@ namespace vita
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
-    std::map<std::string, unsigned> categories_map_;
-    std::map<std::string, unsigned> classes_map_;
+    std::map<std::string, category_t> categories_map_;
+    std::map<std::string, class_tag_t>   classes_map_;
 
     /// How is the dataset organized? Sometimes we have a dataset header (XRFF
     /// file format), other times it has to be implicitly derived (e.g. CSV).
@@ -157,7 +162,7 @@ namespace vita
     std::uintmax_t  difficulty;
     unsigned               age;
 
-    unsigned tag() const { return any_cast<unsigned>(output); }
+    class_tag_t tag() const { return any_cast<class_tag_t>(output); }
     template<class T> T cast_output() const;
 
     void clear()
