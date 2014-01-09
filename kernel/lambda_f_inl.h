@@ -180,8 +180,9 @@ dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
 template<class T>
 dyn_slot_lambda_f<team<T>>::dyn_slot_lambda_f(const team<T> &t, data &d,
                                               unsigned x_slot)
-  : class_lambda_f<T>(t, d), team_(t.size())
+  : class_lambda_f<team<T>>(t, d)
 {
+  team_.reserve(t.size());
   for (const auto &ind : t)
     team_.emplace_back(ind, d, x_slot);
 }

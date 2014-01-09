@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -79,12 +79,11 @@ namespace vita
   ///
   size_t src_problem::load_test_set(const std::string &ts)
   {
-    const data::dataset_t backup(dat_.dataset());
+    const auto backup(dat_.dataset());
     dat_.dataset(data::test);
-
-    const size_t n(dat_.open(ts, env.verbosity));
-
+    const auto n(dat_.open(ts, env.verbosity));
     dat_.dataset(backup);
+
     return n;
   }
 
@@ -97,7 +96,8 @@ namespace vita
     sset = vita::symbol_set();
 
     // Sets up the variables (features).
-    for (size_t i(1); i < dat_.columns(); ++i)
+    const auto columns(dat_.columns());
+    for (auto i(decltype(columns){1}); i < columns; ++i)
     {
       std::string name(dat_.get_column(i).name);
       if (name.empty())
@@ -227,11 +227,11 @@ namespace vita
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
             {
-              const size_t n_args(factory.args(sym_name));
+              const auto n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
               std::cout << sym_name << '(';
-              for (size_t j(0); j < n_args; ++j)
+              for (auto j(decltype(n_args){0}); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
                           << (j + 1 == n_args ? ")" : ", ");
               std::cout << std::endl;
@@ -292,12 +292,13 @@ namespace vita
   ///         elements taken from the given set (\a categories).
   ///
   std::list<src_problem::cvect> src_problem::seq_with_rep(
-    const cvect &categories,
-    size_t args)
+    const cvect &categories, size_t args)
   {
     assert(categories.size());
     assert(args);
 
+    // When I wrote this, only God and I understood what I was doing.
+    // Now, God only knows.
     class swr
     {
     public:

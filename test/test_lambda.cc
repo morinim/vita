@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     }
   }
 }
-/*
+
 BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 {
   using namespace vita;
@@ -103,7 +103,10 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   for (unsigned i(0); i < 100; ++i)
   {
     std::vector<individual> ind =
-      {individual(env, sset), individual(env, sset), individual(env, sset)};
+    {
+      individual(pr.env, pr.sset), individual(pr.env, pr.sset),
+      individual(pr.env, pr.sset)
+    };
 
     std::vector<dyn_slot_lambda_f<individual>> li =
     {
@@ -137,7 +140,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
         }
 
         std::string s_best;
-        unsigned c_best;
+        unsigned c_best(0);
 
         for (auto &i : votes)
           if (i.second > c_best)
@@ -148,5 +151,5 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
     }
   }
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()
