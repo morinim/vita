@@ -33,85 +33,17 @@ namespace vita
   ///
   class data
   {
-  public:  // Structures.
-    ///
-    /// vita::example stores a single element of the data set. The
-    /// \c struct consists of an input vector (\a input) and an answer value
-    /// (\a output). Depending on the kind of problem, \a output stores:
-    /// * a numeric value (symbolic regression problem);
-    /// * a label (classification problem).
-    ///
-    /// \a difficulty and \a age are parameters used by the Dynamic Subset
-    /// Selection algorithm (see "Dynamic Training Subset Selection for
-    /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
-    /// Ross).
-    ///
-    struct example
-    {
-      example() { clear(); }
+  public:  // Structures and typedef
+    struct example;
+    struct column;
+    struct category;
 
-      std::vector<any> input;
-      any             output;
-      domain_t      d_output;
-
-      std::uintmax_t  difficulty;
-      unsigned               age;
-
-      unsigned tag() const { return any_cast<unsigned>(output); }
-      template<class T> T cast_output() const;
-
-      void clear()
-      {
-        input.clear();
-        output = any();
-        d_output = d_void;
-        difficulty = 0;
-        age = 0;
-      }
-    };
-
-    /// \brief Informations about a "column" (feature) of the dataset
-    struct column
-    {
-      std::string       name;
-      category_t category_id;
-    };
-
-    ///
-    /// \brief Informations about a category of the dataset
-    ///
-    /// For example:
-    ///
-    ///     <attribute type="nominal">
-    ///       <labels>
-    ///         <label>Iris-setosa</label>
-    ///         <label>Iris-versicolor</label>
-    ///         <label>Iris-virginica</label>
-    ///       </labels>
-    ///     </attribute>
-    ///
-    /// is mapped to category:
-    /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
-    ///
-    /// while
-    ///     <attribute type="numeric" category="A" name="Speed" />
-    /// is mapped to category:
-    /// * {"A", d_double, {}}
-    ///
-    struct category
-    {
-      std::string             name;
-      domain_t              domain;
-      std::set<std::string> labels;
-    };
-
-  public:
     /// example *
     typedef typename std::list<example>::iterator iterator;
     /// const example *
     typedef typename std::list<example>::const_iterator const_iterator;
 
-  public:  // Construction, convenience.
+  public:  // Construction, convenience
     data();
     explicit data(const std::string &, unsigned = 0);
 
@@ -148,34 +80,9 @@ namespace vita
 
     bool debug() const;
 
-    static domain_t from_weka(const std::string &n)
-    {
-      static const std::map<const std::string, domain_t> map(
-      {
-        // This type is vita-specific (not standard).
-        {"boolean", domain_t::d_bool},
+    static domain_t from_weka(const std::string &);
 
-        {"integer", domain_t::d_int},
-
-        // Real and numeric are treated as double precision number (d_double).
-        {"numeric", domain_t::d_double},
-        {"real", domain_t::d_double},
-
-        // Nominal values are defined by providing a list of possible values.
-        {"nominal", domain_t::d_string},
-
-        // String attributes allow us to create attributes containing arbitrary
-        // textual values. This is very useful in text-mining applications.
-        {"string", domain_t::d_string}
-
-        // {"date", ?}, {"relational", ?}
-      });
-
-      const auto &i(map.find(n));
-      return i == map.end() ? d_void : i->second;
-    }
-
-  private:
+  private: // Private support methods
     static unsigned encode(const std::string &,
                            std::map<std::string, unsigned> *);
     static bool is_number(const std::string &);
@@ -187,7 +94,7 @@ namespace vita
 
     void swap_category(category_t, category_t);
 
-  private:  // Private data members.
+  private:  // Private data members
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
@@ -226,6 +133,43 @@ namespace vita
     dataset_t active_dataset_;
   };
 
+  ///
+  /// \brief Stores a single element of the data set.
+  ///
+  /// The \c struct consists of an input vector (\a input) and an answer value
+  /// (\a output). Depending on the kind of problem, \a output stores:
+  /// * a numeric value (symbolic regression problem);
+  /// * a label (classification problem).
+  ///
+  /// \a difficulty and \a age are parameters used by the Dynamic Subset
+  /// Selection algorithm (see "Dynamic Training Subset Selection for
+  /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
+  /// Ross).
+  ///
+  struct data::example
+  {
+    example() { clear(); }
+
+    std::vector<any> input;
+    any             output;
+    domain_t      d_output;
+
+    std::uintmax_t  difficulty;
+    unsigned               age;
+
+    unsigned tag() const { return any_cast<unsigned>(output); }
+    template<class T> T cast_output() const;
+
+    void clear()
+    {
+      input.clear();
+      output = any();
+      d_output = d_void;
+      difficulty = 0;
+      age = 0;
+    }
+  };
+
   template<class T>
   T data::example::cast_output() const
   {
@@ -237,6 +181,43 @@ namespace vita
     default:        return static_cast<T>(0.0);
     }
   }
+
+  ///
+  /// \brief Informations about a "column" (feature) of the dataset
+  ///
+  struct data::column
+  {
+    std::string       name;
+    category_t category_id;
+  };
+
+  ///
+  /// \brief Informations about a category of the dataset
+  ///
+  /// For example:
+  ///
+  ///     <attribute type="nominal">
+  ///       <labels>
+  ///         <label>Iris-setosa</label>
+  ///         <label>Iris-versicolor</label>
+  ///         <label>Iris-virginica</label>
+  ///       </labels>
+  ///     </attribute>
+  ///
+  /// is mapped to category:
+  /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+  ///
+  /// while
+  ///     <attribute type="numeric" category="A" name="Speed" />
+  /// is mapped to category:
+  /// * {"A", d_double, {}}
+  ///
+  struct data::category
+  {
+    std::string             name;
+    domain_t              domain;
+    std::set<std::string> labels;
+  };
 }  // namespace vita
 
 #endif  // DATA_H

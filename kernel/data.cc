@@ -888,4 +888,36 @@ namespace vita
 
     return true;
   }
+
+  ///
+  /// \param[in] n the name of a weka domain.
+  /// \return the internel id of the weka-domain \a n (\c d_void if it's
+  ///         unknown or not managed).
+  ///
+  domain_t data::from_weka(const std::string &n)
+  {
+    static const std::map<const std::string, domain_t> map(
+    {
+      // This type is vita-specific (not standard).
+      {"boolean", domain_t::d_bool},
+
+      {"integer", domain_t::d_int},
+
+      // Real and numeric are treated as double precision number (d_double).
+      {"numeric", domain_t::d_double},
+      {"real", domain_t::d_double},
+
+      // Nominal values are defined by providing a list of possible values.
+      {"nominal", domain_t::d_string},
+
+      // String attributes allow us to create attributes containing arbitrary
+      // textual values. This is very useful in text-mining applications.
+      {"string", domain_t::d_string}
+
+      // {"date", ?}, {"relational", ?}
+    });
+
+    const auto &i(map.find(n));
+    return i == map.end() ? d_void : i->second;
+  }
 }  // Namespace vita
