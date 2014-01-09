@@ -107,6 +107,17 @@ class_lambda_f<T>::class_lambda_f(const T &prg, const data &d)
 }
 
 ///
+/// \param[in] instance data to be classified.
+/// \return the label of the class that includes \a instance (wrapped in class
+///         any).
+///
+template<class T>
+any class_lambda_f<T>::operator()(const data::example &e) const
+{
+  return any(tag(e));
+}
+
+///
 /// \param[in] a id of a class.
 /// \return the name f class \a a.
 ///
@@ -155,7 +166,7 @@ dyn_slot_lambda_f<T>::dyn_slot_lambda_f(const T &ind, data &d, unsigned x_slot)
   assert(x_slot);
 
   // Use the training set for lambdification.
-  const data::dataset_t backup(d.dataset());
+  const auto backup(d.dataset());
   d.dataset(data::training);
   fill_matrix(d, x_slot);
   d.dataset(backup);
@@ -255,7 +266,7 @@ unsigned dyn_slot_lambda_f<T>::slot(const data::example &e) const
   if (res.empty())
     return last_slot;
 
-  const number val(to<number>(res));
+  const auto val(to<number>(res));
   const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 
   return (where >= ns) ? last_slot : where;
@@ -287,7 +298,7 @@ double dyn_slot_lambda_f<T>::training_accuracy() const
 template<class T>
 double dyn_slot_lambda_f<team<T>>::training_accuracy() const
 {
-  return 0.0;
+  return -1.0;
 }
 
 ///
@@ -302,22 +313,12 @@ unsigned dyn_slot_lambda_f<T>::tag(const data::example &instance) const
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the class that includes \a instance.
-///
-template<class T>
-any dyn_slot_lambda_f<T>::operator()(const data::example &instance) const
-{
-  return any(tag(instance));
-}
-
-///
-/// \param[in] instance data to be classified.
-/// \return the name of the class that includes \a instance.
+/// \return the label of the class that includes \a instance.
 ///
 /// Specialized method for teams: this is a simple majority voting scheme.
 ///
 template<class T>
-any dyn_slot_lambda_f<team<T>>::operator()(const data::example &instance) const
+unsigned dyn_slot_lambda_f<team<T>>::tag(const data::example &instance) const
 {
   const auto classes(team_[0].slot_matrix_.cols());
 
@@ -334,7 +335,7 @@ any dyn_slot_lambda_f<team<T>>::operator()(const data::example &instance) const
     if (votes[i] > votes[max])
       max = i;
 
-  return any(max);
+  return max;
 }
 
 ///
@@ -452,16 +453,6 @@ unsigned gaussian_lambda_f<T>::tag(const data::example &instance) const
 }
 
 ///
-/// \param[in] instance data to be classified.
-/// \return the name of the class that includes \a instance.
-///
-template<class T>
-any gaussian_lambda_f<T>::operator()(const data::example &instance) const
-{
-  return any(tag(instance));
-}
-
-///
 /// \param[in] ind individual "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 ///
@@ -485,16 +476,6 @@ unsigned binary_lambda_f<T>::tag(const data::example &e) const
   const number val(res.empty() ? -1.0 : to<number>(res));
 
   return val > 0.0 ? 1u : 0u;
-}
-
-///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
-///
-template<class T>
-any binary_lambda_f<T>::operator()(const data::example &e) const
-{
-  return any(tag(e));
 }
 
 #endif  // LAMBDA_F_INL_H

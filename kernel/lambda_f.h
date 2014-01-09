@@ -102,6 +102,7 @@ namespace vita
     class_lambda_f(const T &, const data &);
 
     virtual unsigned tag(const data::example &) const = 0;
+    virtual any operator()(const data::example &) const override;
 
     virtual std::string name(const any &) const final;
 
@@ -126,7 +127,6 @@ namespace vita
     dyn_slot_lambda_f(const T &, data &, unsigned);
 
     virtual unsigned tag(const data::example &) const override;
-    virtual any operator()(const data::example &) const override;
 
     double training_accuracy() const;
 
@@ -162,7 +162,6 @@ namespace vita
     dyn_slot_lambda_f(const team<T> &, data &, unsigned);
 
     virtual unsigned tag(const data::example &) const override;
-    virtual any operator()(const data::example &) const override;
 
     double training_accuracy() const;
 
@@ -186,7 +185,6 @@ namespace vita
     gaussian_lambda_f(const T &, data &);
 
     virtual unsigned tag(const data::example &) const override;
-    virtual any operator()(const data::example &) const override;
 
     unsigned tag(const data::example &, number *, number *) const;
 
@@ -212,7 +210,6 @@ namespace vita
     binary_lambda_f(const T &, data &);
 
     virtual unsigned tag(const data::example &) const override;
-    virtual any operator()(const data::example &) const override;
   };
 
 #include "kernel/lambda_f_inl.h"

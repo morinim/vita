@@ -134,13 +134,13 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  individual. Note that this isn't a constant reference
+///                  program. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
-///                         current individual so far.
-/// \return a measurement of the error of the current individual on the
+///                         current program so far.
+/// \return a measurement of the error of the current program on the
 ///         training case \a t. The value returned is in the [0;+inf[ range.
 ///
 template<class T>
@@ -164,11 +164,11 @@ double mae_evaluator<T>::error(reg_lambda_f<T> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  individual. Note that this isn't a constant reference
+///                  program. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
 /// \param[in] t the current training case.
-/// \return a measurement of the error of the current individual on the
+/// \return a measurement of the error of the current program on the
 ///         training case \a t. The value returned is in the [0;200] range.
 ///
 template<class T>
@@ -210,13 +210,13 @@ double rmae_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  individual. Note that this isn't a constant reference
+///                  program. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
-///                         current individual so far.
-/// \return a measurement of the error of the current individual on the
+///                         current program so far.
+/// \return a measurement of the error of the current program on the
 ///         training case \a t.
 ///
 template<class T>
@@ -241,11 +241,11 @@ double mse_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  individual. Note that this isn't a constant reference
+///                  program. Note that this isn't a constant reference
 ///                  because the internal state of agent changes during
 ///                  evaluation; anyway this is an input-only parameter.
 /// \param[in] t the current training case.
-/// \return a measurement of the error of the current individual on the
+/// \return a measurement of the error of the current program on the
 ///         training case \a t.
 ///
 template<class T>
@@ -265,23 +265,23 @@ double count_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 }
 
 ///
-/// \param[in] ind program used for scoring accuracy.
+/// \param[in] prg program (individual/team) used for scoring accuracy.
 /// \return the accuracy.
 ///
 template<class T>
-double classification_evaluator<T>::accuracy(const T &ind) const
+double classification_evaluator<T>::accuracy(const T &prg) const
 {
   assert(this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(this->lambdify(ind));
+  std::unique_ptr<lambda_f<T>> f(this->lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
   for (const auto &example : *this->dat_)
   {
-    const any res((*f)(example));
-    if (any_cast<unsigned>(res) == example.template tag())
+    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example) ==
+        example.template tag())
       ++ok;
 
     ++total_nr;
@@ -318,8 +318,25 @@ template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
   dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
-
   return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
+
+  /*
+  dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
+
+  fitness_t::base_t err(0.0);
+  for (auto &example : *this->dat_)
+  {
+    const auto probable_class(lambda.tag(example));
+
+    if (probable_class != example.template tag())
+    {
+      ++err;
+      ++example.template difficulty;
+    }
+  }
+
+  return fitness_t(-err);
+  */
 }
 
 ///
@@ -355,7 +372,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   for (auto &example : *this->dat_)
   {
     double confidence, sum;
-    const unsigned probable_class(lambda.tag(example, &confidence, &sum));
+    const auto probable_class(lambda.tag(example, &confidence, &sum));
 
     if (probable_class == example.template tag())
     {
