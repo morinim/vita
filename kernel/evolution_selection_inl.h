@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -326,10 +326,10 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  ret[0] = {0, this->pickup()};  // target
+  ret[0] = this->pickup();  // target
 
   for (unsigned i(1); i < size; ++i)
-    ret[i] = {0, this->pickup(ret[0])};
+    ret[i] = this->pickup(ret[0]);
 
   return ret;
 }
