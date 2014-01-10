@@ -80,7 +80,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         random.seed()
         randomize = "--random-seed " + str(random.randint(0, 1000000000))
 
-    cmd = Template("$sr --evaluator dynslot --verbose $elitism_switch --stat-dir $sd "\
+    cmd = Template("$sr --verbose $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
                    "$arl_switch $dss_switch $ss $ds")
