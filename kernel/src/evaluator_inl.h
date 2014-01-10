@@ -308,19 +308,9 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 /// \param[in] ind program used for class recognition.
 /// \return the fitness (greater is better, max is 0).
 ///
-/// \todo
-/// To date we haven't an efficient way to calculate DSS example difficulty
-/// in combination with Dynamic Slot Algorithm. We skip this calculation,
-/// so DSS isn't working at full capacity (it considers only example
-/// "age").
-///
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
-  dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
-  return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
-
-  /*
   dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
 
   fitness_t::base_t err(0.0);
@@ -336,7 +326,11 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
   }
 
   return fitness_t(-err);
-  */
+
+  // The following code is faster but doesn't work for teams and doesn't
+  // "cooperate" with DSS.
+  //dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
+  //return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
 }
 
 ///
