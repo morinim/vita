@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -129,10 +129,7 @@ namespace vita
                                             replacement::alps>
   {
   public:
-    alps_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
-      evolution_strategy<T, selection::alps, recombination::base,
-                         replacement::alps>(pop, eva, s)
-    {}
+    using alps_es::evolution_strategy::evolution_strategy;
 
     virtual void log(unsigned, unsigned) const override;
     virtual void post_bookkeeping() override;
@@ -148,10 +145,7 @@ namespace vita
                                            replacement::tournament>
   {
   public:
-    std_es(population<T> &pop, evaluator<T> &eva, summary<T> *s) :
-      evolution_strategy<T, selection::tournament, recombination::base,
-                         replacement::tournament>(pop, eva, s)
-    {}
+    using std_es::evolution_strategy::evolution_strategy;
   };
 
 #include "kernel/evolution_strategy_inl.h"
