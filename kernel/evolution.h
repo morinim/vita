@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,8 +25,11 @@
 namespace vita
 {
   ///
-  /// Progressively evolves a population of programs over a series of
-  /// generations.
+  /// \brief Progressively evolves a population of programs over a series of
+  ///        generations
+  ///
+  /// \tparam T type of individual.
+  /// \tparam ES evolution strategy in use.
   ///
   /// The evolutionary search uses the Darwinian principle of natural selection
   /// (survival of the fittest) and analogs of various naturally occurring
@@ -46,7 +49,6 @@ namespace vita
 
   private:  // Private support methods.
     const environment &env() const { return pop_.env(); }
-    double get_speed(double) const;
     analyzer<T> get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;

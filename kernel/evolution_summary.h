@@ -1,14 +1,13 @@
 /**
- *
- *  \file evolution_summary.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_SUMMARY_H)
@@ -18,6 +17,11 @@
 
 namespace vita
 {
+  ///
+  /// \brief A summary of evolution (results, statistics...)
+  ///
+  /// \tparam T type of individual.
+  ///
   template<class T>
   class summary
   {
@@ -41,7 +45,8 @@ namespace vita
 
     boost::optional<best_> best;
 
-    double speed;
+    /// Time (in milliseconds) elapsed from evolution beginning.
+    double elapsed;
 
     std::uintmax_t crossovers, mutations;
 

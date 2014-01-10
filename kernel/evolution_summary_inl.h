@@ -1,14 +1,13 @@
 /**
- *
- *  \file evolution_summary_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_SUMMARY_INL_H)
@@ -33,11 +32,11 @@ void summary<T>::clear()
 
   best = boost::none;
 
-  speed         = 0.0;
-  mutations     = 0;
-  crossovers    = 0;
-  gen           = 0;
-  last_imp      = 0;
+  elapsed    = 0.0;
+  mutations  = 0;
+  crossovers = 0;
+  gen        = 0;
+  last_imp   = 0;
 }
 
 ///
@@ -73,7 +72,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
   else
     tmp_summary.best = boost::none;
 
-  if (!(in >> tmp_summary.speed >> tmp_summary.mutations
+  if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
            >> tmp_summary.crossovers >> tmp_summary.gen
            >> tmp_summary.last_imp))
     return false;
@@ -101,7 +100,7 @@ bool summary<T>::save(std::ostream &out) const
   else
     out << '0' << std::endl;
 
-  out << speed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
+  out << elapsed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
       << last_imp << std::endl;
 
   return out.good();

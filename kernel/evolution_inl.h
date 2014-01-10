@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -108,21 +108,6 @@ bool evolution<T, ES>::stop_condition(const summary<T> &s) const
     return external_stop_condition_(s);
 
   return false;
-}
-
-///
-/// \param[in] elapsed_milli time, in milliseconds, elapsed from the start
-///                          of evolution.
-/// \return speed of execution (cycles / s).
-///
-template<class T, template<class> class ES>
-double evolution<T, ES>::get_speed(double elapsed_milli) const
-{
-  double speed(0.0);
-  if (stats_.gen && elapsed_milli > 0)
-    speed = 1000.0 * (pop_.individuals() * stats_.gen) / elapsed_milli;
-
-  return speed;
 }
 
 ///
@@ -326,32 +311,14 @@ evolution<T, ES>::run(unsigned run_count)
         print_progress(k, run_count, true);
     }
 
-    stats_.speed = get_speed(measure.elapsed());
+    stats_.elapsed = measure.elapsed();
 
     es_.post_bookkeeping();
   }
 
   if (env().verbosity >= 2)
-  {
-    double speed(stats_.speed);
-    std::string unit;
-
-    if (speed >= 1.0)
-      unit = "cycles/s";
-    else if (speed >= 0.1)
-    {
-      speed *= 3600.0;
-      unit = "cycles/h";
-    }
-    else  // speed < 0.1
-    {
-      speed *= 3600.0 * 24.0;
-      unit = "cycles/day";
-    }
-
-    std::cout << k_s_info << ' ' << static_cast<unsigned>(speed) << unit
-              << std::string(10, ' ') << std::endl;
-  }
+    std::cout << k_s_info << ' ' << std::fixed << stats_.elapsed / 1000.0
+              << "s" << std::string(10, ' ') << std::endl;
 
   term::reset();
   return stats_;

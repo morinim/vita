@@ -401,7 +401,8 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 ///         errors).
 ///
 template<class T>
-std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(const T &ind) const
+std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
+  const T &ind) const
 {
   return make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
 }

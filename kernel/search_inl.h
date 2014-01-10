@@ -528,8 +528,7 @@ T search<T, ES>::run(unsigned n)
     if (run_fitness.isfinite())
       fd.add(run_fitness);
 
-    overall_summary.speed = overall_summary.speed +
-      (s.speed - overall_summary.speed) / (run + 1);
+    overall_summary.elapsed += s.elapsed;
 
     if (env_.arl && good_runs.front() == run)
     {
@@ -579,7 +578,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
     boost::property_tree::ptree pt;
     pt.put(summary + "success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
-    pt.put(summary + "speed", run_sum.speed);
+    pt.put(summary + "elapsed_time", run_sum.elapsed);
     pt.put(summary + "mean_fitness", fd.mean);
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
