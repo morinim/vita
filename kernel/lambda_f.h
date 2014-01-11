@@ -131,7 +131,9 @@ namespace vita
     double training_accuracy() const;
 
   private:  // Private support methods
-    template<class U> friend  class dyn_slot_lambda_f;
+    // dyn_slot_lambda_f<team<X>> must have free access to
+    // dyn_slot_lambda_f<X> private members.
+    template<class U> friend class dyn_slot_lambda_f;
 
     static number normalize_01(number);
 
@@ -162,8 +164,6 @@ namespace vita
     dyn_slot_lambda_f(const team<T> &, data &, unsigned);
 
     virtual class_tag_t tag(const data::example &) const override;
-
-    double training_accuracy() const;
 
   private:
     std::vector<dyn_slot_lambda_f<T>> team_;

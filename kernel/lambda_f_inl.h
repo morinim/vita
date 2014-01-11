@@ -292,17 +292,6 @@ double dyn_slot_lambda_f<T>::training_accuracy() const
 }
 
 ///
-/// \return the accuracy of the lambda function on the training set.
-///
-/// \note Specialized method for teams.
-///
-template<class T>
-double dyn_slot_lambda_f<team<T>>::training_accuracy() const
-{
-  return -1.0;
-}
-
-///
 /// \param[in] instance data to be classified.
 /// \return the label of the class that includes \a instance.
 ///
