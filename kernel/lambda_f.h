@@ -13,6 +13,10 @@
 #if !defined(LAMBDA_F_H)
 #define      LAMBDA_F_H
 
+#include <type_traits>
+
+#include <boost/lexical_cast.hpp>
+
 #include "kernel/data.h"
 #include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"
@@ -20,9 +24,33 @@
 namespace vita
 {
   ///
+  /// \brief This is the minimum interface of a lambda function
+  ///
+  /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  ///           Sometimes we need an autonomous lambda function that stores
+  ///           everything it needs inside (slow but will survive the death of
+  ///           the the program it's constructed on); sometimes we need speed,
+  ///           not persistence.
+  ///
+  template<class T, bool S>
+  class basic_lambda_f
+  {
+  public:
+    virtual any operator()(const data::example &) const = 0;
+
+    virtual std::string name(const any &) const = 0;
+  };
+
+  ///
   /// \brief Transforms individuals into lambda functions
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  ///           Sometimes we need an autonomous lambda function that stores
+  ///           everything it needs inside (slow but will survive the death of
+  ///           the the program it's constructed on); sometimes we need speed,
+  ///           not persistence.
   ///
   /// This class transforms individuals into lambda functions which can be
   /// used to calculate the answers for symbolic regression /
@@ -43,60 +71,74 @@ namespace vita
   /// Another interesting function of lambda_f is that it extends the
   /// functionalities of interpreter to teams.
   ///
-  template<class T>
-  class lambda_f
+  template<class T, bool S = true>
+  class lambda_f : public basic_lambda_f<T, S>
   {
   public:
     explicit lambda_f(const T &);
 
-    virtual any operator()(const data::example &) const = 0;
-
-    virtual std::string name(const any &) const;
+    virtual bool debug() const;
 
   protected:
-    T prg_;
+    typename std::conditional<S, const T, const T &>::type ind_;
+    mutable src_interpreter<T>                             int_;
+  };
+
+  ///
+  /// \brief A specialization of lambda_f for teams
+  ///
+  template<class T, bool S>
+  class lambda_f<team<T>, S> : public basic_lambda_f<team<T>, S>
+  {
+  public:
+    explicit lambda_f(const team<T> &);
+
+    virtual bool debug() const;
+
+  protected:
+    std::vector<lambda_f<T, S>> team_;
   };
 
   ///
   /// \brief Transforms individual to a lambda function for regression
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
   ///
-  template<class T>
-  class reg_lambda_f : public lambda_f<T>
+  template<class T, bool S>
+  class reg_lambda_f : public lambda_f<T, S>
   {
   public:
-    explicit reg_lambda_f(const T &);
+    using reg_lambda_f::lambda_f::lambda_f;
 
-    virtual any operator()(const data::example &) const final;
+    virtual std::string name(const any &) const override final;
 
-  protected:
-    mutable src_interpreter<T> int_;
+    virtual any operator()(const data::example &) const override final;
   };
 
   ///
   /// \brief Regression lambda function specialization for teams
   ///
-  template<class T>
-  class reg_lambda_f<team<T>> : public lambda_f<team<T>>
+  template<class T, bool S>
+  class reg_lambda_f<team<T>, S> : public lambda_f<team<T>, S>
   {
   public:
-    explicit reg_lambda_f(const team<T> &);
+    using reg_lambda_f::lambda_f::lambda_f;
 
-    virtual any operator()(const data::example &) const final;
+    virtual std::string name(const any &) const override final;
 
-  protected:
-    mutable std::vector<src_interpreter<T>> int_;
+    virtual any operator()(const data::example &) const override final;
   };
 
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
   ///
   /// This class is used to factorize out some code from the lambda functions
   /// used for classification tasks.
   ///
-  template<class T>
-  class class_lambda_f : public lambda_f<T>
+  template<class T, bool S>
+  class class_lambda_f : public lambda_f<T, S>
   {
   public:
     class_lambda_f(const T &, const data &);
@@ -104,7 +146,7 @@ namespace vita
     virtual class_tag_t tag(const data::example &) const = 0;
     virtual any operator()(const data::example &) const override;
 
-    virtual std::string name(const any &) const final;
+    virtual std::string name(const any &) const override final;
 
   protected:
     /// class_name_[i] = "name of the i-th class of the classification task".
@@ -113,6 +155,7 @@ namespace vita
 
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
@@ -120,8 +163,8 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  template<class T>
-  class dyn_slot_lambda_f : public class_lambda_f<T>
+  template<class T, bool S>
+  class dyn_slot_lambda_f : public class_lambda_f<T, S>
   {
   public:
     dyn_slot_lambda_f(const T &, data &, unsigned);
@@ -131,9 +174,9 @@ namespace vita
     double training_accuracy() const;
 
   private:  // Private support methods
-    // dyn_slot_lambda_f<team<X>> must have free access to
-    // dyn_slot_lambda_f<X> private members.
-    template<class U> friend class dyn_slot_lambda_f;
+    // dyn_slot_lambda_f<team<X>, Y> must have free access to
+    // dyn_slot_lambda_f<X, Y> private members.
+    template<class U, bool W> friend class dyn_slot_lambda_f;
 
     static number normalize_01(number);
 
@@ -157,8 +200,8 @@ namespace vita
   /// \brief Slotted Dynamic Class Boundary Determination specialization for
   ///        teams
   ///
-  template<class T>
-  class dyn_slot_lambda_f<team<T>> : public class_lambda_f<team<T>>
+  template<class T, bool S>
+  class dyn_slot_lambda_f<team<T>, S> : public class_lambda_f<team<T>, S>
   {
   public:
     dyn_slot_lambda_f(const team<T> &, data &, unsigned);
@@ -166,7 +209,7 @@ namespace vita
     virtual class_tag_t tag(const data::example &) const override;
 
   private:
-    std::vector<dyn_slot_lambda_f<T>> team_;
+    std::vector<dyn_slot_lambda_f<T, S>> team_;
   };
 
   ///
@@ -178,8 +221,8 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  template<class T>
-  class gaussian_lambda_f : public class_lambda_f<T>
+  template<class T, bool S>
+  class gaussian_lambda_f : public class_lambda_f<T, S>
   {
   public:
     gaussian_lambda_f(const T &, data &);
@@ -203,8 +246,8 @@ namespace vita
   /// This class transforms individuals to lambda functions which can be used
   /// for single-class classification tasks.
   ///
-  template<class T>
-  class binary_lambda_f : public class_lambda_f<T>
+  template<class T, bool S>
+  class binary_lambda_f : public class_lambda_f<T, S>
   {
   public:
     binary_lambda_f(const T &, data &);

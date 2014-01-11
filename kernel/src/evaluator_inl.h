@@ -31,7 +31,7 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  reg_lambda_f<T> agent(prg);
+  reg_lambda_f<T, false> agent(prg);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -68,7 +68,7 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  reg_lambda_f<T> agent(prg);
+  reg_lambda_f<T, false> agent(prg);
 
   fitness_t::base_t err(0.0);
   int illegals(0);
@@ -129,7 +129,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
   const T &prg) const
 {
-  return make_unique<reg_lambda_f<T>>(prg);
+  return make_unique<reg_lambda_f<T, true>>(prg);
 }
 
 ///
@@ -144,7 +144,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 ///         training case \a t. The value returned is in the [0;+inf[ range.
 ///
 template<class T>
-double mae_evaluator<T>::error(reg_lambda_f<T> &agent,
+double mae_evaluator<T>::error(reg_lambda_f<T, false> &agent,
                                data::example &t, int *const illegals)
 {
   const any res(agent(t));
@@ -172,8 +172,8 @@ double mae_evaluator<T>::error(reg_lambda_f<T> &agent,
 ///         training case \a t. The value returned is in the [0;200] range.
 ///
 template<class T>
-double rmae_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
-                                int *const)
+double rmae_evaluator<T>::error(reg_lambda_f<T, false> &agent,
+                                data::example &t, int *const)
 {
   const any res(agent(t));
 
@@ -220,7 +220,7 @@ double rmae_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 ///         training case \a t.
 ///
 template<class T>
-double mse_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
+double mse_evaluator<T>::error(reg_lambda_f<T, false> &agent, data::example &t,
                                int *const illegals)
 {
   const any res(agent(t));
@@ -249,8 +249,8 @@ double mse_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
 ///         training case \a t.
 ///
 template<class T>
-double count_evaluator<T>::error(reg_lambda_f<T> &agent, data::example &t,
-                                 int *const)
+double count_evaluator<T>::error(reg_lambda_f<T, false> &agent,
+                                 data::example &t, int *const)
 {
   const any res(agent(t));
 
@@ -280,7 +280,7 @@ double classification_evaluator<T>::accuracy(const T &prg) const
 
   for (const auto &example : *this->dat_)
   {
-    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example) ==
+    if (static_cast<class_lambda_f<T, true> *>(f.get())->tag(example) ==
         example.template tag())
       ++ok;
 
@@ -311,7 +311,7 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
-  dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
+  dyn_slot_lambda_f<T, false> lambda(ind, *this->dat_, x_slot_);
 
   fitness_t::base_t err(0.0);
   for (auto &example : *this->dat_)
@@ -329,7 +329,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
   // The following code is faster but doesn't work for teams and doesn't
   // "cooperate" with DSS.
-  //dyn_slot_lambda_f<T> lambda(ind, *this->dat_, x_slot_);
+  //dyn_slot_lambda_f<T, false> lambda(ind, *this->dat_, x_slot_);
   //return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
 }
 
@@ -342,7 +342,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> dyn_slot_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<dyn_slot_lambda_f<T>>(ind, *this->dat_, x_slot_);
+  return make_unique<dyn_slot_lambda_f<T, true>>(ind, *this->dat_, x_slot_);
 }
 
 ///
@@ -360,7 +360,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   assert(ind.debug());
   assert(this->dat_->classes() > 1);
 
-  gaussian_lambda_f<T> lambda(ind, *this->dat_);
+  gaussian_lambda_f<T, false> lambda(ind, *this->dat_);
 
   fitness_t::base_t d(0.0);
   for (auto &example : *this->dat_)
@@ -404,7 +404,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
+  return make_unique<gaussian_lambda_f<T, true>>(ind, *this->dat_);
 }
 
 ///
@@ -418,7 +418,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 
   assert(dataset.classes() == 2);
 
-  binary_lambda_f<T> agent(ind, dataset);
+  binary_lambda_f<T, false> agent(ind, dataset);
   fitness_t::base_t err(0.0);
 
   for (auto &example : dataset)
@@ -441,7 +441,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 template<class T>
 std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const
 {
-  return make_unique<binary_lambda_f<T>>(ind, *this->dat_);
+  return make_unique<binary_lambda_f<T, true>>(ind, *this->dat_);
 }
 
 #endif  // SRC_EVALUATOR_INL_H
