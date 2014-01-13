@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 
   src_problem pr(true);
   auto res(pr.load("iris.csv"));
-  BOOST_REQUIRE_GT(res.first, 151);
+  BOOST_REQUIRE_EQUAL(res.first, 150);
 
   for (unsigned i(0); i < 100; ++i)
   {
