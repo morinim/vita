@@ -1,14 +1,13 @@
 /**
- *
- *  \file kernel/problem.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include "kernel/evaluator_proxy.h"
@@ -18,19 +17,25 @@
 namespace vita
 {
   ///
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
+  ///
   /// New empty instance.
   ///
-  problem::problem()
+  problem::problem(bool initialize)
   {
-    clear();
+    clear(initialize);
   }
 
   ///
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
+  ///
   /// Resets the object.
   ///
-  void problem::clear()
+  void problem::clear(bool initialize)
   {
-    env = environment(false);
+    env = environment(initialize);
   }
 
   ///

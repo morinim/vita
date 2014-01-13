@@ -22,12 +22,12 @@ namespace vita
   class problem
   {
   public:
-    problem();
+    explicit problem(bool = false);
 
     /// \return an access point for the dataset.
     virtual vita::data *data() { return nullptr; }
 
-    virtual void clear();
+    virtual void clear(bool);
 
     virtual bool debug(bool) const;
 

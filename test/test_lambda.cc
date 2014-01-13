@@ -31,8 +31,9 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 {
   using namespace vita;
 
-  src_problem pr;
+  src_problem pr(true);
   auto res(pr.load("mep.csv"));
+  BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
   for (unsigned i(0); i < 1000; ++i)
   {
@@ -55,37 +56,35 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    std::vector<individual> ind =
-    {
-      individual(pr.env, pr.sset),
-      individual(pr.env, pr.sset),
-      individual(pr.env, pr.sset),
-      individual(pr.env, pr.sset)
-    };
+    const individual i1(pr.env, pr.sset);
+    const individual i2(pr.env, pr.sset);
+    const individual i3(pr.env, pr.sset);
+    const individual i4(pr.env, pr.sset);
 
-    std::vector<reg_lambda_f<individual>> li =
-    {
-      reg_lambda_f<individual>(ind[0]),
-      reg_lambda_f<individual>(ind[1]),
-      reg_lambda_f<individual>(ind[2]),
-      reg_lambda_f<individual>(ind[3])
-    };
+    const reg_lambda_f<individual> lambda1(i1);
+    const reg_lambda_f<individual> lambda2(i2);
+    const reg_lambda_f<individual> lambda3(i3);
+    const reg_lambda_f<individual> lambda4(i4);
 
-    team<individual> t(ind);
-    reg_lambda_f<team<individual>> lt(t);
+    team<individual> t{{i1, i2, i3, i4}};
+    reg_lambda_f<team<individual>> lambda_team(t);
 
     for (const auto &e : *pr.data())
     {
-      const std::vector<vita::any> ai{li[0](e), li[1](e), li[2](e), li[3](e)};
-      const auto at(lt(e));
+      const auto out1(lambda1(e));
+      const auto out2(lambda1(e));
+      const auto out3(lambda1(e));
+      const auto out4(lambda1(e));
 
-      if (ai[0].empty() || ai[1].empty() || ai[2].empty() || ai[3].empty())
-        BOOST_REQUIRE(at.empty());
+      const auto out_t(lambda_team(e));
+
+      if (out1.empty() || out2.empty() || out3.empty() || out4.empty())
+        BOOST_REQUIRE(out_t.empty());
       else
       {
-        const number n(to<number>(ai[0]) + to<number>(ai[1]) +
-                       to<number>(ai[2]) + to<number>(ai[3]));
-        BOOST_REQUIRE_CLOSE(n / 4.0, to<number>(at), 0.0001);
+        const number n(to<number>(out1) / 4.0 + to<number>(out2) / 4.0 +
+                       to<number>(out3) / 4.0 + to<number>(out4) / 4.0);
+        BOOST_REQUIRE_CLOSE(n, to<number>(out_t), 0.0001);
       }
     }
   }
@@ -97,8 +96,9 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 
   const unsigned slots(10);
 
-  src_problem pr;
+  src_problem pr(true);
   auto res(pr.load("iris.csv"));
+  BOOST_REQUIRE_GT(res.first, 151);
 
   for (unsigned i(0); i < 100; ++i)
   {

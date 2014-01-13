@@ -24,7 +24,7 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    src_problem();
+    explicit src_problem(bool);
 
     std::pair<size_t, size_t> load(const std::string &,
                                    const std::string & = "",
@@ -35,7 +35,7 @@ namespace vita
 
     virtual vita::data *data() { return &dat_; }
 
-    virtual void clear();
+    virtual void clear(bool) override;
 
     /// Just a shortcut for checking number of classes.
     bool classification() { return classes() > 1; }

@@ -317,7 +317,7 @@ evolution<T, ES>::run(unsigned run_count)
   }
 
   if (env().verbosity >= 2)
-    std::cout << k_s_info << ' ' << std::fixed << std::scientific
+    std::cout << k_s_info << "Elapsed time: "
               << stats_.elapsed / 1000.0 << "s" << std::string(10, ' ')
               << std::endl;
 

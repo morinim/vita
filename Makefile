@@ -90,12 +90,12 @@ titanic%: examples/titanic%.o $(KERNEL_OBJ)
 tests: test/tests.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	@test/$@ --show_progress
+	@cd test; $@ --show_progress
 
 test_%: test/test_%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	@test/$@ --show_progress
+	@cd test; $@ --show_progress
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a

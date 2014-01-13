@@ -17,7 +17,8 @@
 /// \param[in] int the individual to be lambdified.
 ///
 template<class T, bool S>
-lambda_f<T, S>::lambda_f(const T &ind) : ind_(ind), int_(ind_)
+basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &ind) : ind_(ind),
+                                                             int_(ind_)
 {
   assert(debug());
 }
@@ -26,7 +27,7 @@ lambda_f<T, S>::lambda_f(const T &ind) : ind_(ind), int_(ind_)
 /// \param[in] t the team to be lambdified.
 ///
 template<class T, bool S>
-lambda_f<team<T>, S>::lambda_f(const team<T> &t)
+basic_reg_lambda_f<team<T>, S>::basic_reg_lambda_f(const team<T> &t)
 {
   team_.reserve(t.size());
   for (const auto &ind : t)
@@ -36,10 +37,61 @@ lambda_f<team<T>, S>::lambda_f(const team<T> &t)
 }
 
 ///
+/// \param[in] e input example for the lambda function.
+/// \return the output value associated with \a e.
+///
+template<class T, bool S>
+any basic_reg_lambda_f<T, S>::operator()(const data::example &e) const
+{
+  return int_.run(e.input);
+}
+
+///
+/// \param[in] e input example for the lambda function.
+/// \return the output value associated with \a e.
+///
+template<class T, bool S>
+any basic_reg_lambda_f<team<T>, S>::operator()(const data::example &e) const
+{
+  number avg(0), count(0);
+
+  // Calculate the running average.
+  for (const auto &lambda : team_)
+  {
+    const auto res(lambda(e));
+
+    if (!res.empty())
+      avg += (to<number>(res) - avg) / ++count;
+  }
+
+  return count > 0.0 ? any(avg) : any();
+}
+
+///
+/// \param[in] a a value produced by lambda_f::operator().
+/// \return the string version of \a a.
+///
+template<class T, bool S>
+std::string basic_reg_lambda_f<T, S>::name(const any &a) const
+{
+  return boost::lexical_cast<std::string>(to<number>(a));
+}
+
+///
+/// \param[in] a a value produced by lambda_f::operator().
+/// \return the string version of \a a.
+///
+template<class T, bool S>
+std::string basic_reg_lambda_f<team<T>, S>::name(const any &a) const
+{
+  return boost::lexical_cast<std::string>(to<number>(a));
+}
+
+///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S>
-bool lambda_f<T, S>::debug() const
+bool basic_reg_lambda_f<T, S>::debug() const
 {
   if (!int_.debug())
     return false;
@@ -51,7 +103,7 @@ bool lambda_f<T, S>::debug() const
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S>
-bool lambda_f<team<T>, S>::debug() const
+bool basic_reg_lambda_f<team<T>, S>::debug() const
 {
   for (const auto &lambda : team_)
     if (!lambda.debug())
@@ -61,67 +113,11 @@ bool lambda_f<team<T>, S>::debug() const
 }
 
 ///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
-///
-template<class T, bool S>
-any reg_lambda_f<T, S>::operator()(const data::example &e) const
-{
-  return this->int_.run(e.input);
-}
-
-///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
-///
-template<class T, bool S>
-any reg_lambda_f<team<T>, S>::operator()(const data::example &e) const
-{
-  number avg(0), count(0);
-
-  // Calculate the running average.
-  for (const auto &lambda : this->team_)
-  {
-    const auto res(lambda(e.input));
-
-    if (!res.empty())
-      avg += (to<number>(res) - avg) / ++count;
-  }
-
-  return count > 0.0 ? any(avg) : any();
-}
-
-
-///
-/// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of \a a.
-///
-template<class T, bool S>
-std::string reg_lambda_f<T, S>::name(const any &a) const
-{
-  return boost::lexical_cast<std::string>(to<number>(a));
-}
-
-///
-/// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of \a a.
-///
-template<class T, bool S>
-std::string reg_lambda_f<team<T>, S>::name(const any &a) const
-{
-  return boost::lexical_cast<std::string>(to<number>(a));
-}
-
-///
-/// \param[in] prg program (individual/team) used for classification.
 /// \param[in] d the training set.
 ///
-template<class T, bool S>
-class_lambda_f<T, S>::class_lambda_f(const T &prg, const data &d)
-  : lambda_f<T, S>(prg), class_name_(d.classes())
+template<class T>
+class_lambda_f<T>::class_lambda_f(const data &d) : class_name_(d.classes())
 {
-  assert(prg.debug());
-
   const auto classes(d.classes());
   assert(d.classes() > 1);
 
@@ -134,8 +130,8 @@ class_lambda_f<T, S>::class_lambda_f(const T &prg, const data &d)
 /// \return the label of the class that includes \a instance (wrapped in class
 ///         any).
 ///
-template<class T, bool S>
-any class_lambda_f<T, S>::operator()(const data::example &e) const
+template<class T>
+any class_lambda_f<T>::operator()(const data::example &e) const
 {
   return any(tag(e));
 }
@@ -144,8 +140,8 @@ any class_lambda_f<T, S>::operator()(const data::example &e) const
 /// \param[in] a id of a class.
 /// \return the name f class \a a.
 ///
-template<class T, bool S>
-std::string class_lambda_f<T, S>::name(const any &a) const
+template<class T>
+std::string class_lambda_f<T>::name(const any &a) const
 {
   return class_name_[any_cast<class_tag_t>(a)];
 }
@@ -162,7 +158,7 @@ std::string class_lambda_f<T, S>::name(const any &a) const
 /// <http://en.wikipedia.org/wiki/Sigmoid_function>
 ///
 template<class T, bool S>
-number dyn_slot_lambda_f<T, S>::normalize_01(number x)
+number basic_dyn_slot_lambda_f<T, S>::normalize_01(number x)
 {
   // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function
 
@@ -179,9 +175,9 @@ number dyn_slot_lambda_f<T, S>::normalize_01(number x)
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
 template<class T, bool S>
-dyn_slot_lambda_f<T, S>::dyn_slot_lambda_f(const T &ind, data &d,
-                                           unsigned x_slot)
-  : class_lambda_f<T, S>(ind, d),
+basic_dyn_slot_lambda_f<T, S>::basic_dyn_slot_lambda_f(const T &ind, data &d,
+                                                       unsigned x_slot)
+  : class_lambda_f<T>(d), lambda_(ind),
     slot_matrix_(d.classes() * x_slot, d.classes()),
     slot_class_(d.classes() * x_slot), dataset_size_(0)
 {
@@ -203,9 +199,10 @@ dyn_slot_lambda_f<T, S>::dyn_slot_lambda_f(const T &ind, data &d,
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
 template<class T, bool S>
-dyn_slot_lambda_f<team<T>, S>::dyn_slot_lambda_f(const team<T> &t, data &d,
-                                                 unsigned x_slot)
-  : class_lambda_f<team<T>, S>(t, d)
+basic_dyn_slot_lambda_f<team<T>, S>::basic_dyn_slot_lambda_f(const team<T> &t,
+                                                             data &d,
+                                                             unsigned x_slot)
+  : class_lambda_f<team<T>>(d), classes_(d.classes())
 {
   team_.reserve(t.size());
   for (const auto &ind : t)
@@ -219,7 +216,7 @@ dyn_slot_lambda_f<team<T>, S>::dyn_slot_lambda_f(const team<T> &t, data &d,
 /// Sets up the data structures needed by the 'dynamic slot' algorithm.
 ///
 template<class T, bool S>
-void dyn_slot_lambda_f<T, S>::fill_matrix(data &d, unsigned x_slot)
+void basic_dyn_slot_lambda_f<T, S>::fill_matrix(data &d, unsigned x_slot)
 {
   assert(d.debug());
   assert(d.classes() > 1);
@@ -282,9 +279,9 @@ void dyn_slot_lambda_f<T, S>::fill_matrix(data &d, unsigned x_slot)
 /// \return the slot example \a e falls into.
 ///
 template<class T, bool S>
-unsigned dyn_slot_lambda_f<T, S>::slot(const data::example &e) const
+unsigned basic_dyn_slot_lambda_f<T, S>::slot(const data::example &e) const
 {
-  const any res(this->int_.run(e.input));
+  const any res(lambda_(e));
 
   const auto ns(slot_matrix_.rows());
   const auto last_slot(ns - 1);
@@ -301,7 +298,7 @@ unsigned dyn_slot_lambda_f<T, S>::slot(const data::example &e) const
 /// \return the accuracy of the lambda function on the training set.
 ///
 template<class T, bool S>
-double dyn_slot_lambda_f<T, S>::training_accuracy() const
+double basic_dyn_slot_lambda_f<T, S>::training_accuracy() const
 {
   double ok(0.0);
 
@@ -320,7 +317,8 @@ double dyn_slot_lambda_f<T, S>::training_accuracy() const
 /// \return the label of the class that includes \a instance.
 ///
 template<class T, bool S>
-class_tag_t dyn_slot_lambda_f<T, S>::tag(const data::example &instance) const
+class_tag_t basic_dyn_slot_lambda_f<T, S>::tag(
+  const data::example &instance) const
 {
   return slot_class_[slot(instance)];
 }
@@ -332,22 +330,48 @@ class_tag_t dyn_slot_lambda_f<T, S>::tag(const data::example &instance) const
 /// Specialized method for teams: this is a simple majority voting scheme.
 ///
 template<class T, bool S>
-class_tag_t dyn_slot_lambda_f<team<T>, S>::tag(
+class_tag_t basic_dyn_slot_lambda_f<team<T>, S>::tag(
   const data::example &instance) const
 {
-  const auto classes(team_[0].slot_matrix_.cols());
-
-  std::vector<unsigned> votes(classes);
+  std::vector<unsigned> votes(classes_);
 
   for (const auto &lambda : team_)
     ++votes[lambda.tag(instance)];
 
-  auto max(decltype(classes){0});
-  for (auto i(max + 1); i < classes; ++i)
+  auto max(decltype(classes_){0});
+  for (auto i(max + 1); i < classes_; ++i)
     if (votes[i] > votes[max])
       max = i;
 
   return max;
+}
+
+///
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, bool S>
+bool basic_dyn_slot_lambda_f<T, S>::debug() const
+{
+  if (slot_matrix_.cols() <= 1)  // Too few classes
+    return false;
+
+  if (slot_matrix_.rows() != slot_class_.size())
+    return false;
+
+  return lambda_.debug();
+}
+
+///
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, bool S>
+bool basic_dyn_slot_lambda_f<team<T>, S>::debug() const
+{
+  for (const auto &l : team_)
+    if (!l.debug())
+      return false;
+
+  return classes_ > 1;
 }
 
 ///
@@ -356,14 +380,14 @@ class_tag_t dyn_slot_lambda_f<team<T>, S>::tag(
 ///
 template<class T, bool S>
 gaussian_lambda_f<T, S>::gaussian_lambda_f(const T &ind, data &d)
-  : class_lambda_f<T, S>(ind, d), gauss_dist_(d.classes())
+  : class_lambda_f<T>(d), lambda_(ind), gauss_dist_(d.classes())
 {
   assert(ind.debug());
   assert(d.debug());
   assert(d.classes() > 1);
 
   // Use the training set for lambdification.
-  const data::dataset_t backup(d.dataset());
+  const auto backup(d.dataset());
   d.dataset(data::training);
   fill_vector(d);
   d.dataset(backup);
@@ -387,7 +411,7 @@ void gaussian_lambda_f<T, S>::fill_vector(data &d)
   // of the program outputs for those training examples for that class.
   for (const auto &example : d)
   {
-    const any res(this->int_.run(example.input));
+    const any res(lambda_(example));
 
     number val(res.empty() ? 0.0 : to<number>(res));
     const number cut(10000000.0);
@@ -414,7 +438,7 @@ template<class T, bool S>
 class_tag_t gaussian_lambda_f<T, S>::tag(const data::example &example,
                                          number *val, number *sum) const
 {
-  const any res(this->int_.run(example.input));
+  const any res(lambda_(example));
   const number x(res.empty() ? 0.0 : to<number>(res));
 
   number val_(0.0), val_sum_(0.0);
@@ -463,12 +487,21 @@ class_tag_t gaussian_lambda_f<T, S>::tag(const data::example &instance) const
 }
 
 ///
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, bool S>
+bool gaussian_lambda_f<T, S>::debug() const
+{
+  return lambda_.debug();
+}
+
+///
 /// \param[in] ind individual "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 ///
 template<class T, bool S>
 binary_lambda_f<T, S>::binary_lambda_f(const T &ind, data &d)
-  : class_lambda_f<T, S>(ind, d)
+  : class_lambda_f<T>(d), lambda_(ind)
 {
   assert(ind.debug());
   assert(d.debug());
@@ -482,10 +515,19 @@ binary_lambda_f<T, S>::binary_lambda_f(const T &ind, data &d)
 template<class T, bool S>
 class_tag_t binary_lambda_f<T, S>::tag(const data::example &e) const
 {
-  const any res(this->int_.run(e.input));
+  const any res(lambda_(e));
   const number val(res.empty() ? -1.0 : to<number>(res));
 
   return val > 0.0 ? 1u : 0u;
+}
+
+///
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, bool S>
+bool binary_lambda_f<T, S>::debug() const
+{
+  return lambda_.debug();
 }
 
 #endif  // LAMBDA_F_INL_H

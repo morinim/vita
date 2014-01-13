@@ -22,19 +22,24 @@
 namespace vita
 {
   ///
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
   /// New empty instance.
   ///
-  src_problem::src_problem()
+  src_problem::src_problem(bool initialize)
   {
-    clear();
+    clear(initialize);
   }
 
   ///
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
+  ///
   /// Resets the object.
   ///
-  void src_problem::clear()
+  void src_problem::clear(bool initialize)
   {
-    problem::clear();
+    problem::clear(initialize);
     dat_.clear();
   }
 
