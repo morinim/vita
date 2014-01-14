@@ -72,20 +72,33 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     for (const auto &e : *pr.data())
     {
       const auto out1(lambda1(e));
-      const auto out2(lambda1(e));
-      const auto out3(lambda1(e));
-      const auto out4(lambda1(e));
+      const auto out2(lambda2(e));
+      const auto out3(lambda3(e));
+      const auto out4(lambda4(e));
 
-      const auto out_t(lambda_team(e));
-
-      if (out1.empty() || out2.empty() || out3.empty() || out4.empty())
-        BOOST_REQUIRE(out_t.empty());
-      else
+      number sum(0.0), n(0.0);
+      if (!out1.empty())
       {
-        const number n(to<number>(out1) / 4.0 + to<number>(out2) / 4.0 +
-                       to<number>(out3) / 4.0 + to<number>(out4) / 4.0);
-        BOOST_REQUIRE_CLOSE(n, to<number>(out_t), 0.0001);
+        sum += to<number>(out1);
+        ++n;
       }
+      if (!out2.empty())
+      {
+        sum += to<number>(out2);
+        ++n;
+      }
+      if (!out3.empty())
+      {
+        sum += to<number>(out3);
+        ++n;
+      }
+      if (!out4.empty())
+      {
+        sum += to<number>(out4);
+        ++n;
+      }
+
+      BOOST_REQUIRE_CLOSE(sum / n, to<number>(lambda_team(e)), 0.0001);
     }
   }
 }
@@ -100,54 +113,51 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
-  for (unsigned i(0); i < 100; ++i)
+  for (unsigned i(0); i < 1000; ++i)
   {
-    std::vector<individual> ind =
-    {
-      individual(pr.env, pr.sset), individual(pr.env, pr.sset),
-      individual(pr.env, pr.sset)
-    };
+    const individual ind1(pr.env, pr.sset);
+    const individual ind2(pr.env, pr.sset);
+    const individual ind3(pr.env, pr.sset);
 
-    std::vector<dyn_slot_lambda_f<individual>> li =
-    {
-      dyn_slot_lambda_f<individual>(ind[0], *pr.data(), slots),
-      dyn_slot_lambda_f<individual>(ind[1], *pr.data(), slots),
-      dyn_slot_lambda_f<individual>(ind[2], *pr.data(), slots)
-    };
+    const dyn_slot_lambda_f<individual> lambda1(ind1, *pr.data(), slots);
+    const dyn_slot_lambda_f<individual> lambda2(ind2, *pr.data(), slots);
+    const dyn_slot_lambda_f<individual> lambda3(ind3, *pr.data(), slots);
 
-    team<individual> t(ind);
-    dyn_slot_lambda_f<team<individual>> lt(t, *pr.data(), slots);
+    team<individual> t{{ind1, ind2, ind3}};
+    dyn_slot_lambda_f<team<individual>> lambda_t(t, *pr.data(), slots);
 
     for (const auto &example : *pr.data())
     {
-      const std::vector<vita::any> ai =
-        {li[0](example), li[1](example), li[2](example)};
-      const vita::any at(lt(example));
-
-      if (ai[0].empty() || ai[1].empty() || ai[2].empty())
-        continue;
-      else
+      const std::vector<vita::any> out =
       {
-        std::map<std::string, unsigned> votes;
+        lambda1(example), lambda2(example), lambda3(example)
+      };
+      const std::vector<std::string> names =
+      {
+        lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
+      };
 
-        for (unsigned i(0); i < ai.size(); ++i)
+      std::map<std::string, unsigned> votes;
+
+      for (unsigned i(0); i < out.size(); ++i)
+      {
+        if (votes.find(names[i]) == votes.end())
+          votes[names[i]] = 1;
+        else
+          ++votes[names[i]];
+      }
+
+      std::string s_best;
+      unsigned c_best(0);
+
+      for (auto &i : votes)
+        if (i.second > c_best)
         {
-          const std::string name(li[i].name(ai[i]));
-          if (votes.find(name) == votes.end())
-            votes[name] = 1;
-          else
-            ++votes[name];
+          s_best = i.first;
+          c_best = i.second;
         }
 
-        std::string s_best;
-        unsigned c_best(0);
-
-        for (auto &i : votes)
-          if (i.second > c_best)
-            s_best = i.first;
-
-        BOOST_REQUIRE_EQUAL(s_best, lt.name(at));
-      }
+      BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
     }
   }
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -147,8 +147,10 @@ namespace vita
   /// algorithm used is due to Knuth (Donald E. Knuth - The Art of Computer
   /// Programming, volume 2: Seminumerical Algorithms, 3rd edn., p. 232.
   /// Addison-Wesley).
-  /// This is an online algorithm
-  /// (http://en.wikipedia.org/wiki/Online_algorithm).
+  ///
+  /// \see
+  /// * <http://en.wikipedia.org/wiki/Online_algorithm>
+  /// * <http://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average>
   ///
   template<class T>
   void distribution<T>::update_variance(T val)
