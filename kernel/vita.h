@@ -1,14 +1,13 @@
 /**
- *
- *  \file vita.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(VITA_H)
@@ -77,16 +76,15 @@ namespace vita
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
   }
 
-  /// \brief Prefix for debug messages.
+  /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";
-  /// \brief Prefix for error messages.
+  /// \brief Prefix for error messages
   const char k_s_error[] = "[ERROR]";
-  /// \brief Prefix for information messages.
+  /// \brief Prefix for information messages
   /// Information messages regard the status of the program.
   const char k_s_info[] = "[INFO]";
-  /// \brief Prefix for warning messages.
+  /// \brief Prefix for warning messages
   const char k_s_warning[] = "[WARNING]";
-
 }  // namespace vita
 
 /// \page page1 VITA Architecture

@@ -26,9 +26,9 @@ namespace vita
   ///                       values.
   /// New empty instance.
   ///
-  src_problem::src_problem(bool initialize)
+  src_problem::src_problem(bool initialize) : problem(initialize)
   {
-    clear(initialize);
+    dat_.clear();
   }
 
   ///

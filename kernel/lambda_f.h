@@ -106,31 +106,52 @@ namespace vita
 
   template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
 
-  ///
-  /// \tparam T type of individual.
-  ///
-  /// This class is used to factorize out some code from the lambda functions
-  /// used for classification tasks.
-  ///
   template<class T>
-  class class_lambda_f : public lambda_f<T>
+  class core_class_lambda_f : public lambda_f<T>
   {
   public:
-    class_lambda_f(const data &);
-
     virtual class_tag_t tag(const data::example &) const = 0;
     virtual any operator()(const data::example &) const override;
-
-    virtual std::string name(const any &) const override final;
-
-  protected:
-    /// class_name_[i] = "name of the i-th class of the classification task".
-    std::vector<std::string> class_name_;
   };
 
   ///
   /// \tparam T type of individual.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
+  ///
+  /// This class is used to factorize out some code from the lambda functions
+  /// used for classification tasks.
+  ///
+  template<class T, bool N> class basic_class_lambda_f;
+
+  template<class T>
+  class basic_class_lambda_f<T, true> : public core_class_lambda_f<T>
+  {
+  public:
+    explicit basic_class_lambda_f(const data &);
+
+    virtual std::string name(const any &) const override final;
+
+  protected:
+    /// names_[i] = "name of the i-th class of the classification task".
+    std::vector<std::string> names_;
+  };
+
+  template<class T>
+  class basic_class_lambda_f<T, false> : public core_class_lambda_f<T>
+  {
+  public:
+    explicit basic_class_lambda_f(const data &) {}
+
+    virtual std::string name(const any &) const override final
+    { return std::string(); }
+  };
+
+  template<class T> using class_lambda_f = basic_class_lambda_f<T, true>;
+
+  ///
+  /// \tparam T type of individual.
   /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
@@ -138,8 +159,8 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  template<class T, bool S>
-  class basic_dyn_slot_lambda_f : public class_lambda_f<T>
+  template<class T, bool S, bool N>
+  class basic_dyn_slot_lambda_f : public basic_class_lambda_f<T, N>
   {
   public:
     basic_dyn_slot_lambda_f(const T &, data &, unsigned);
@@ -176,8 +197,8 @@ namespace vita
   /// \brief Slotted Dynamic Class Boundary Determination specialization for
   ///        teams
   ///
-  template<class T, bool S>
-  class basic_dyn_slot_lambda_f<team<T>, S> : public class_lambda_f<team<T>>
+  template<class T, bool S, bool N>
+  class basic_dyn_slot_lambda_f<team<T>, S, N> : public class_lambda_f<team<T>>
   {
   public:
     basic_dyn_slot_lambda_f(const team<T> &, data &, unsigned);
@@ -187,15 +208,18 @@ namespace vita
     virtual bool debug() const override;
 
   private:
-    std::vector<basic_dyn_slot_lambda_f<T, S>> team_;
+    std::vector<basic_dyn_slot_lambda_f<T, S, false>> team_;
 
     const unsigned classes_;
   };
 
-  template<class T> using dyn_slot_lambda_f = basic_dyn_slot_lambda_f<T, true>;
+  template<class T> using dyn_slot_lambda_f =
+    basic_dyn_slot_lambda_f<T, true, true>;
 
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
@@ -203,11 +227,11 @@ namespace vita
   /// The algorithm used for classification is Slotted Dynamic Class
   /// Boundary Determination (see vita::dyn_slot_evaluator for further details).
   ///
-  template<class T, bool S>
-  class gaussian_lambda_f : public class_lambda_f<T>
+  template<class T, bool S, bool N>
+  class basic_gaussian_lambda_f : public basic_class_lambda_f<T, N>
   {
   public:
-    gaussian_lambda_f(const T &, data &);
+    basic_gaussian_lambda_f(const T &, data &);
 
     virtual class_tag_t tag(const data::example &) const override;
 
@@ -226,17 +250,22 @@ namespace vita
     std::vector<distribution<number>> gauss_dist_;
   };
 
+  template<class T> using gaussian_lambda_f =
+    basic_gaussian_lambda_f<T, true, true>;
+
   ///
   /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for single-class classification tasks.
   ///
-  template<class T, bool S>
-  class binary_lambda_f : public class_lambda_f<T>
+  template<class T, bool S, bool N>
+  class basic_binary_lambda_f : public basic_class_lambda_f<T, N>
   {
   public:
-    binary_lambda_f(const T &, data &);
+    basic_binary_lambda_f(const T &, data &);
 
     virtual class_tag_t tag(const data::example &) const override;
 
@@ -245,6 +274,9 @@ namespace vita
   private:
     const basic_reg_lambda_f<T, S> lambda_;
   };
+
+  template<class T> using binary_lambda_f =
+    basic_binary_lambda_f<T, true, true>;
 
 #include "kernel/lambda_f_inl.h"
 }  // namespace vita

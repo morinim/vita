@@ -24,7 +24,7 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    explicit src_problem(bool);
+    explicit src_problem(bool = false);
 
     std::pair<size_t, size_t> load(const std::string &,
                                    const std::string & = "",

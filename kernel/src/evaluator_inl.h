@@ -311,7 +311,7 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(data &d, unsigned x_slot)
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
-  basic_dyn_slot_lambda_f<T, false> lambda(ind, *this->dat_, x_slot_);
+  basic_dyn_slot_lambda_f<T, false, false> lambda(ind, *this->dat_, x_slot_);
 
   fitness_t::base_t err(0.0);
   for (auto &example : *this->dat_)
@@ -329,7 +329,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
   // The following code is faster but doesn't work for teams and doesn't
   // "cooperate" with DSS.
-  //basic_dyn_slot_lambda_f<T, false> lambda(ind, *this->dat_, x_slot_);
+  //basic_dyn_slot_lambda_f<T, false, false> lambda(ind, *this->dat_, x_slot_);
   //return fitness_t(100.0 * (lambda.training_accuracy() - 1.0));
 }
 
@@ -360,7 +360,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   assert(ind.debug());
   assert(this->dat_->classes() > 1);
 
-  gaussian_lambda_f<T, false> lambda(ind, *this->dat_);
+  basic_gaussian_lambda_f<T, false, false> lambda(ind, *this->dat_);
 
   fitness_t::base_t d(0.0);
   for (auto &example : *this->dat_)
@@ -404,7 +404,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<gaussian_lambda_f<T, true>>(ind, *this->dat_);
+  return make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
 }
 
 ///
@@ -418,7 +418,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 
   assert(dataset.classes() == 2);
 
-  binary_lambda_f<T, false> agent(ind, dataset);
+  basic_binary_lambda_f<T, false, false> agent(ind, dataset);
   fitness_t::base_t err(0.0);
 
   for (auto &example : dataset)
@@ -441,7 +441,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 template<class T>
 std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const
 {
-  return make_unique<binary_lambda_f<T, true>>(ind, *this->dat_);
+  return make_unique<binary_lambda_f<T>>(ind, *this->dat_);
 }
 
 #endif  // SRC_EVALUATOR_INL_H
