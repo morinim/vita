@@ -1,14 +1,13 @@
 /**
- *
- *  \file function.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(FUNCTION_H)
@@ -22,12 +21,17 @@
 namespace vita
 {
   ///
-  /// A symbol used in GP. A \a function labels the internal (non-leaf) points
-  /// of the parse trees that represent the programs in the \a population. An
-  /// example function set might be {+,-,*}.
+  /// \brief A symbol used in GP
+  ///
+  /// A \a function labels the internal (non-leaf) points of the parse trees
+  /// that represent the programs in the \a population. An example function set
+  /// might be {+,-,*}.
   /// Each function should be able to handle gracefully all values it might
-  /// receive as input (this is called closure property). Remember: if there is
-  /// a way to crash the system, the GP system will certainly hit upon hit.
+  /// receive as input (this is called closure property).
+  ///
+  /// \warning
+  /// If there is a way to crash the system, the GP system will certainly hit
+  /// upon hit.
   ///
   class function : public symbol
   {
@@ -50,13 +54,13 @@ namespace vita
     /// \param[in] i index of a function argument.
     /// \return category of the i-th function argument.
     ///
-    category_t arg_category(size_t i) const
+    category_t arg_category(unsigned i) const
     { assert(i < gene::k_args); return argt_[i]; }
 
     ///
     /// \return the number of arguments (0 arguments => terminal).
     ///
-    virtual size_t arity() const override { assert(arity_); return arity_; }
+    virtual unsigned arity() const override { assert(arity_); return arity_; }
 
     virtual bool debug() const override;
 
@@ -74,8 +78,8 @@ namespace vita
 
   private:  // Private data members.
     category_t argt_[gene::k_args];
-    size_t                  arity_;
-    bool              associative_;
+    const unsigned          arity_;
+    const bool        associative_;
   };
 }  // namespace vita
 

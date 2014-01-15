@@ -50,7 +50,7 @@ namespace vita
     ///
     /// \return 0 (0 arguments <=> terminal).
     ///
-    virtual size_t arity() const override { return 0; }
+    virtual unsigned arity() const override { return 0; }
 
     virtual bool debug() const override;
 
