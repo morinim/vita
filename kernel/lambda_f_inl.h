@@ -148,6 +148,17 @@ std::string basic_class_lambda_f<T, true>::name(const any &a) const
 }
 
 ///
+/// \param[in] a id of a class.
+/// \return the name f class \a a.
+///
+template<class T>
+std::string basic_class_lambda_f<T, false>::name(const any &a) const
+{
+  return boost::lexical_cast<std::string>(any_cast<class_tag_t>(a));
+}
+
+
+///
 /// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
 ///              that should be mapped in the [0,1] interval.
 /// \return a number in the [0,1] range.
@@ -206,11 +217,11 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<team<T>, S, N>::basic_dyn_slot_lambda_f(
   const team<T> &t, data &d, unsigned x_slot)
-  : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
+  : team_class_lambda_f<T, S, N, basic_dyn_slot_lambda_f>(d)
 {
-  team_.reserve(t.size());
+  this->team_.reserve(t.size());
   for (const auto &ind : t)
-    team_.emplace_back(ind, d, x_slot);
+    this->team_.emplace_back(ind, d, x_slot);
 }
 
 ///
@@ -328,29 +339,6 @@ class_tag_t basic_dyn_slot_lambda_f<T, S, N>::tag(
 }
 
 ///
-/// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance.
-///
-/// Specialized method for teams: this is a simple majority voting scheme.
-///
-template<class T, bool S, bool N>
-class_tag_t basic_dyn_slot_lambda_f<team<T>, S, N>::tag(
-  const data::example &instance) const
-{
-  std::vector<unsigned> votes(classes_);
-
-  for (const auto &lambda : team_)
-    ++votes[lambda.tag(instance)];
-
-  auto max(decltype(classes_){0});
-  for (auto i(max + 1); i < classes_; ++i)
-    if (votes[i] > votes[max])
-      max = i;
-
-  return max;
-}
-
-///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N>
@@ -363,19 +351,6 @@ bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
     return false;
 
   return lambda_.debug();
-}
-
-///
-/// \return \c true if the object passes the internal consistency check.
-///
-template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<team<T>, S, N>::debug() const
-{
-  for (const auto &l : team_)
-    if (!l.debug())
-      return false;
-
-  return classes_ > 1;
 }
 
 ///
@@ -535,6 +510,65 @@ template<class T, bool S, bool N>
 bool basic_binary_lambda_f<T, S, N>::debug() const
 {
   return lambda_.debug();
+}
+
+///
+/// \param[in] d the training set.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L>
+team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const data &d)
+  : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
+{
+}
+
+///
+/// \param[in] t team "to be transformed" into a lambda function.
+/// \param[in] d the training set.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L>
+team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
+                                                     const data &d)
+  : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
+{
+  team_.reserve(t.size());
+  for (const auto &ind : t)
+    team_.emplace_back(ind, d);
+}
+
+///
+/// \param[in] instance data to be classified.
+/// \return the label of the class that includes \a instance.
+///
+/// Specialized method for teams: this is a simple majority voting scheme.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L>
+class_tag_t team_class_lambda_f<T, S, N, L>::tag(
+  const data::example &instance) const
+{
+  std::vector<unsigned> votes(classes_);
+
+  for (const auto &lambda : team_)
+    ++votes[lambda.tag(instance)];
+
+  class_tag_t max(0);
+  for (auto i(max + 1); i < classes_; ++i)
+    if (votes[i] > votes[max])
+      max = i;
+
+  return max;
+}
+
+///
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L>
+bool team_class_lambda_f<T, S, N, L>::debug() const
+{
+  for (const auto &l : team_)
+    if (!l.debug())
+      return false;
+
+  return classes_ > 1;
 }
 
 #endif  // LAMBDA_F_INL_H

@@ -154,11 +154,29 @@ namespace vita
   public:
     explicit basic_class_lambda_f(const data &) {}
 
-    virtual std::string name(const any &) const override final
-    { return std::string(); }
+    virtual std::string name(const any &) const override final;
   };
 
   template<class T> using class_lambda_f = basic_class_lambda_f<T, true>;
+
+  template<class T, bool S, bool N, template<class, bool, bool> class L>
+  class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
+  {
+  public:
+    explicit team_class_lambda_f(const data &);
+    team_class_lambda_f(const team<T> &, const data &);
+
+    virtual class_tag_t tag(const data::example &) const override;
+
+    virtual bool debug() const override;
+
+  protected:
+    // The components of the team never store the names of the classes. If we
+    // need the names, the master class will memorize them.
+    std::vector<L<T, S, false>> team_;
+
+    const unsigned classes_;
+  };
 
   ///
   /// \tparam T type of individual.
@@ -211,21 +229,10 @@ namespace vita
   ///
   template<class T, bool S, bool N>
   class basic_dyn_slot_lambda_f<team<T>, S, N>
-    : public basic_class_lambda_f<team<T>, N>
+    : public team_class_lambda_f<T, S, N, basic_dyn_slot_lambda_f>
   {
   public:
     basic_dyn_slot_lambda_f(const team<T> &, data &, unsigned);
-
-    virtual class_tag_t tag(const data::example &) const override;
-
-    virtual bool debug() const override;
-
-  private:
-    // The components of the team never store the names of the classes. If we
-    // need the names, the master class will memorize them.
-    std::vector<basic_dyn_slot_lambda_f<T, S, false>> team_;
-
-    const unsigned classes_;
   };
 
   template<class T> using dyn_slot_lambda_f =
