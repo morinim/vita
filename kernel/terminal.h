@@ -18,10 +18,10 @@
 namespace vita
 {
   ///
-  /// A terminal (leaf) node in the parse trees representing the programs in the
-  /// population. A terminal might be a variable (input to the program), a
-  /// constant value or a function taking no arguments (e.g. move-north).
-  /// Terminals are symbols with an arity of zero.
+  /// \brief A symbol with zero-arity
+  ///
+  /// A terminal might be a variable (input to the program), a constant value
+  /// or a function taking no arguments (e.g. move-north).
   ///
   class terminal : public symbol
   {
@@ -55,8 +55,8 @@ namespace vita
     virtual bool debug() const override;
 
   private:  // Private data members.
-    bool parametric_;
-    bool      input_;
+    const bool parametric_;
+    const bool      input_;
   };
 }  // namespace vita
 
