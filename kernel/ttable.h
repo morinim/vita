@@ -1,22 +1,19 @@
 /**
- *
- *  \file ttable.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(TTABLE_H)
 #define      TTABLE_H
 
-#include <vector>
-
-#include "kernel/evaluator.h"
+#include "kernel/environment.h"
 
 namespace vita
 {

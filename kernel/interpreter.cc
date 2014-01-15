@@ -1,14 +1,13 @@
 /**
- *
- *  \file interpreter.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/none.hpp>
@@ -26,7 +25,7 @@ namespace vita
   ///
   interpreter<individual>::interpreter(const individual &ind,
                                        interpreter<individual> *ctx)
-    : basic_interpreter(ind, ctx), ip_(ind.best_),
+    : core_interpreter(ind, ctx), ip_(ind.best_),
       cache_(ind.size(), ind.sset().categories())
   {
   }
@@ -136,6 +135,9 @@ namespace vita
   ///
   bool interpreter<individual>::debug() const
   {
-    return ip_.index < prg_.size() && (!context_ || context_->debug());
+    if (!core_interpreter<individual>::debug())
+      return false;
+
+    return ip_.index < prg_.size();
   }
 }  // namespace vita

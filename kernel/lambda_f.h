@@ -20,6 +20,7 @@
 #include "kernel/data.h"
 #include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"
+#include "kernel/team.h"
 
 namespace vita
 {

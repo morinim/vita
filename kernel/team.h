@@ -15,7 +15,8 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "kernel/vita.h"
+#include "kernel/symbol_set.h"
+#include "kernel/ttable.h"
 
 namespace vita
 {

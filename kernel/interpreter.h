@@ -20,7 +20,6 @@
 namespace vita
 {
   class individual;
-  template<class T> class team;
 
   ///
   /// \brief Minimum interface of an interpreter
@@ -28,19 +27,19 @@ namespace vita
   /// \tparam T the type of individual used.
   ///
   template<class T>
-  class basic_interpreter
+  class core_interpreter
   {
   public:
-    explicit basic_interpreter(const T &, basic_interpreter<T> * = nullptr);
+    explicit core_interpreter(const T &, core_interpreter<T> * = nullptr);
 
     virtual any run() = 0;
 
-    virtual bool debug() const { return true; }
+    virtual bool debug() const;
 
   protected:
     const T &prg_;
 
-    basic_interpreter<T> *const context_;
+    core_interpreter<T> *const context_;
   };
 
   ///
@@ -63,7 +62,7 @@ namespace vita
   /// the specific individual class.
   ///
   template<>
-  class interpreter<individual> : public basic_interpreter<individual>
+  class interpreter<individual> : public core_interpreter<individual>
   {
   public:
     explicit interpreter(const individual &,
@@ -85,22 +84,6 @@ namespace vita
     locus ip_;
 
     mutable matrix<boost::optional<any>> cache_;
-  };
-
-  ///
-  /// \tparam T the type of individual used.
-  ///
-  /// This class executes a team of individuals of type \a T.
-  ///
-  template<class T>
-  class interpreter<team<T>> : public basic_interpreter<team<T>>
-  {
-  public:
-    explicit interpreter(const team<T> &, interpreter<team<T>> * = nullptr);
-
-    virtual any run() override;
-
-    virtual bool debug() const override;
   };
 
   ///

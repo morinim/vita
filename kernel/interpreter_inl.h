@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013, 2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,53 +19,21 @@
 ///                for the evaluation of ADF).
 ///
 template<class T>
-basic_interpreter<T>::basic_interpreter(const T &p, basic_interpreter<T> *ctx)
+core_interpreter<T>::core_interpreter(const T &p, core_interpreter<T> *ctx)
   : prg_(p), context_(ctx)
 {
-}
-
-///
-/// \param[in] t a team to be evaluated.
-/// \param[in] ctx context in which we calculate the output value of \a t (used
-///                for the evaluation of ADF).
-///
-template<class T>
-interpreter<team<T>>::interpreter(const team<T> &t, interpreter<team<T>> *ctx)
-  : basic_interpreter<T>(t, ctx)
-{
-}
-
-///
-/// \return the output of the team.
-///
-/// The output is a vector containing the outputs of the team's components.
-///
-template<class T>
-any interpreter<team<T>>::run()
-{
-  const auto size(this->prg_.size());
-  std::vector<any> result(size);
-
-  for (auto j(decltype(size){0}); j < size; ++j)
-  {
-    interpreter<T> i(this->prj_[j], &this->context_[j]);
-    result.push_back(i.run());
-  }
-
-  return any(result);
 }
 
 ///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T>
-bool interpreter<team<T>>::debug() const
+bool core_interpreter<T>::debug() const
 {
-  for (const auto &i : this->prg_)
-    if (!i.debug())
-      return false;
+  if (context_ && !context_->debug())
+    return false;
 
-  return true;
+  return prg_.debug();
 }
 
 #endif  // INTERPRETER_INL_H
