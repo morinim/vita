@@ -107,17 +107,26 @@ namespace vita
 
   template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
 
-  ///
-  /// \brief Minimum interface of a classification lambda function
-  ///
-  /// \tparam T type of individual.
-  ///
-  template<class T>
-  class core_class_lambda_f : public lambda_f<T>
+  template<bool N>
+  class class_names
   {
-  public:
-    virtual class_tag_t tag(const data::example &) const = 0;
-    virtual any operator()(const data::example &) const override;
+  protected:
+    /// Without names... there isn't anything to do.
+    explicit class_names(const data &) {}
+
+    std::string string(const any &) const;
+  };
+
+  template<>
+  class class_names<true>
+  {
+  protected:
+    explicit class_names(const data &);
+
+    std::string string(const any &) const;
+
+  private:
+    std::vector<std::string> names_;
   };
 
   ///
@@ -127,32 +136,14 @@ namespace vita
   /// This class is used to factorize out some code from lambda functions used
   /// for classification tasks.
   ///
-  template<class T, bool N> class basic_class_lambda_f;
-
-  ///
-  /// \brief A basic_class_lambda_f that manages class names.
-  ///
-  template<class T>
-  class basic_class_lambda_f<T, true> : public core_class_lambda_f<T>
+  template<class T, bool N>
+  class basic_class_lambda_f : public lambda_f<T>, public class_names<N>
   {
   public:
     explicit basic_class_lambda_f(const data &);
 
-    virtual std::string name(const any &) const override final;
-
-  protected:
-    /// names_[i] = "name of the i-th class of the classification task".
-    std::vector<std::string> names_;
-  };
-
-  ///
-  /// \brief A basic_class_lambda_f that doesn't manage class names.
-  ///
-  template<class T>
-  class basic_class_lambda_f<T, false> : public core_class_lambda_f<T>
-  {
-  public:
-    explicit basic_class_lambda_f(const data &) {}
+    virtual class_tag_t tag(const data::example &) const = 0;
+    virtual any operator()(const data::example &) const override;
 
     virtual std::string name(const any &) const override final;
   };

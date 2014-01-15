@@ -113,22 +113,9 @@ bool basic_reg_lambda_f<team<T>, S>::debug() const
 }
 
 ///
-/// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance (wrapped in class
-///         any).
-///
-template<class T>
-any core_class_lambda_f<T>::operator()(const data::example &e) const
-{
-  return any(tag(e));
-}
-
-///
 /// \param[in] d the training set.
 ///
-template<class T>
-basic_class_lambda_f<T, true>::basic_class_lambda_f(const data &d)
-  : names_(d.classes())
+inline class_names<true>::class_names(const data &d) : names_(d.classes())
 {
   const auto classes(d.classes());
   assert(classes > 1);
@@ -139,24 +126,57 @@ basic_class_lambda_f<T, true>::basic_class_lambda_f(const data &d)
 
 ///
 /// \param[in] a id of a class.
-/// \return the name f class \a a.
+/// \return the name of class \a a.
 ///
-template<class T>
-std::string basic_class_lambda_f<T, true>::name(const any &a) const
-{
-  return names_[any_cast<class_tag_t>(a)];
-}
-
-///
-/// \param[in] a id of a class.
-/// \return the name f class \a a.
-///
-template<class T>
-std::string basic_class_lambda_f<T, false>::name(const any &a) const
+template<bool N>
+std::string class_names<N>::string(const any &a) const
 {
   return boost::lexical_cast<std::string>(any_cast<class_tag_t>(a));
 }
 
+///
+/// \param[in] a id of a class.
+/// \return the name of class \a a.
+///
+inline std::string class_names<true>::string(const any &a) const
+{
+  // Specialized class templates result in a normal class with a funny name and
+  // not a template. When we specialize class_names<true>, it is no longer a
+  // template and the implementation of its class members are not template
+  // specializations. So we haven't to put template<> at the beginning.
+
+  return names_[any_cast<class_tag_t>(a)];
+}
+
+///
+/// \param[in] d the training set.
+///
+template<class T, bool N>
+basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
+  : class_names<N>(d)
+{
+}
+
+///
+/// \param[in] instance data to be classified.
+/// \return the label of the class that includes \a instance (wrapped in class
+///         any).
+///
+template<class T, bool N>
+any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
+{
+  return any(tag(e));
+}
+
+///
+/// \param[in] a id of a class.
+/// \return the name of class \a a.
+///
+template<class T, bool N>
+std::string basic_class_lambda_f<T, N>::name(const any &a) const
+{
+  return class_names<N>::string(a);
+}
 
 ///
 /// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
@@ -214,10 +234,15 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
+/// \warning
+/// Some compilers haven't fully implemented the C++11 inject-class-name rule
+/// so we neet to qualify the enclosing namespace of a template template
+/// parameter (vita::basic_dyn_slot_lambda_f).
+///
 template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<team<T>, S, N>::basic_dyn_slot_lambda_f(
   const team<T> &t, data &d, unsigned x_slot)
-  : team_class_lambda_f<T, S, N, basic_dyn_slot_lambda_f>(d)
+  : team_class_lambda_f<T, S, N, vita::basic_dyn_slot_lambda_f>(d)
 {
   this->team_.reserve(t.size());
   for (const auto &ind : t)
