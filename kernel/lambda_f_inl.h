@@ -154,9 +154,12 @@ std::string basic_class_lambda_f<T, true>::name(const any &a) const
 ///
 /// This is a sigmoid function (it is a bounded real function, "S" shaped,
 /// with positive derivative everywhere).
+/// Among the various uses there is continuous value discretization when we
+/// don't know an upper/lower bound for the continuos value.
 ///
 /// \see
-/// <http://en.wikipedia.org/wiki/Sigmoid_function>
+/// * <http://en.wikipedia.org/wiki/Sigmoid_function>
+/// * <http://en.wikipedia.org/wiki/Generalised_logistic_function>
 ///
 template<class T, bool S, bool N>
 number basic_dyn_slot_lambda_f<T, S, N>::normalize_01(number x)
@@ -165,7 +168,7 @@ number basic_dyn_slot_lambda_f<T, S, N>::normalize_01(number x)
 
   return 0.5 + std::atan(x) / 3.1415926535;        // Arctangent
 
-  // return 0.5 + std::tanh(x);                    // Hyperbolic tangent
+  // return 0.5 + std::tanh(x) / 2.0;              // Hyperbolic tangent
 
   // return 1.0 / (1.0 + std::exp(-x));            // Logistic function
 }

@@ -107,6 +107,11 @@ namespace vita
 
   template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
 
+  ///
+  /// \brief Minimum interface of a classification lambda function
+  ///
+  /// \tparam T type of individual.
+  ///
   template<class T>
   class core_class_lambda_f : public lambda_f<T>
   {
@@ -119,11 +124,14 @@ namespace vita
   /// \tparam T type of individual.
   /// \tparam N stores the name of the classes vs doesn't store the names.
   ///
-  /// This class is used to factorize out some code from the lambda functions
-  /// used for classification tasks.
+  /// This class is used to factorize out some code from lambda functions used
+  /// for classification tasks.
   ///
   template<class T, bool N> class basic_class_lambda_f;
 
+  ///
+  /// \brief A basic_class_lambda_f that manages class names.
+  ///
   template<class T>
   class basic_class_lambda_f<T, true> : public core_class_lambda_f<T>
   {
@@ -137,6 +145,9 @@ namespace vita
     std::vector<std::string> names_;
   };
 
+  ///
+  /// \brief A basic_class_lambda_f that doesn't manage class names.
+  ///
   template<class T>
   class basic_class_lambda_f<T, false> : public core_class_lambda_f<T>
   {
@@ -199,7 +210,8 @@ namespace vita
   ///        teams
   ///
   template<class T, bool S, bool N>
-  class basic_dyn_slot_lambda_f<team<T>, S, N> : public class_lambda_f<team<T>>
+  class basic_dyn_slot_lambda_f<team<T>, S, N>
+    : public basic_class_lambda_f<team<T>, N>
   {
   public:
     basic_dyn_slot_lambda_f(const team<T> &, data &, unsigned);
@@ -209,6 +221,8 @@ namespace vita
     virtual bool debug() const override;
 
   private:
+    // The components of the team never store the names of the classes. If we
+    // need the names, the master class will memorize them.
     std::vector<basic_dyn_slot_lambda_f<T, S, false>> team_;
 
     const unsigned classes_;
