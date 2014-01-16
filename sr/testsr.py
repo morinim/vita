@@ -25,20 +25,22 @@ summary_filename = "summary"
 symbol_set_dir = "symbolset/"
 ttable_bit = 20
 
-# Key: [dataset file, generations, individuals, code_length, runs, symbolset]
+# Key: [dataset file, generations, individuals, code_length, runs, symbolset,
+#       evaluator]
 testcases = {
-    "adult":      [     "adult.csv",  50, 100, 100,  10,       "class.xml"],
-    "fibonacci":  [ "fibonacci.csv", 120, 180, 200,  80,  "arithmetic.xml"],
-    "iris":       [     "iris.xrff", 100, 180, 100,  80,       "class.xml"],
+    "adult":      [     "adult.csv",  50, 100, 100,  10, "class.xml"],
+    "fibonacci":  [ "fibonacci.csv", 120, 180, 200,  80, "arithmetic.xml"],
+    "ionosphere": ["ionosphere.csv", 100, 180, 100,  80, "class.xml", "binary"],
+    "iris":       [     "iris.xrff", 100, 180, 100,  80, "class.xml"],
     "mep":        [       "mep.csv", 100,  75, 500, 100],
     "petalrose":  ["petalrose.xrff", 100, 180, 200,  80, "iarithmetic.xml"],
-    "petalrose3": ["petalrose3.csv", 100, 180, 200,  80,  "arithmetic.xml"],
-    "petalrose2": ["petalrose2.csv", 100, 180, 200,  80,  "arithmetic.xml"],
-    "petalrosec": ["petalrosec.csv", 100, 180, 200,  30,      "class3.xml"],
-    "spambase":   [  "spambase.csv", 100, 260, 100,  50,       "class.xml"],
-    "wine":       [      "wine.csv", 120, 170, 100,  80,       "class.xml"],
-    "x2y2z2":     [   "x2y2_z2.csv", 100,  75, 500,  80,        "math.xml"],
-    "x2y2z2bias": [   "x2y2_z2.csv", 100,  75, 100,  80,  "arithmetic.xml"]
+    "petalrose3": ["petalrose3.csv", 100, 180, 200,  80, "arithmetic.xml"],
+    "petalrose2": ["petalrose2.csv", 100, 180, 200,  80, "arithmetic.xml"],
+    "petalrosec": ["petalrosec.csv", 100, 180, 200,  30, "class3.xml"],
+    "spambase":   [  "spambase.csv", 100, 260, 100,  50, "class.xml"],
+    "wine":       [      "wine.csv", 120, 170, 100,  80, "class.xml"],
+    "x2y2z2":     [   "x2y2_z2.csv", 100,  75, 500,  80, "math.xml"],
+    "x2y2z2bias": [   "x2y2_z2.csv", 100,  75, 100,  80, "arithmetic.xml"]
     }
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
@@ -51,7 +53,7 @@ settings = {
 
 
 def sr(args, data_set, generations, individuals, code_length, rounds,
-       symbol_set):
+       symbol_set, evaluator):
     sr = "sr_test" if os.path.exists("sr_test") else "sr"
 
     mode = args.mode;
@@ -80,7 +82,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         random.seed()
         randomize = "--random-seed " + str(random.randint(0, 1000000000))
 
-    cmd = Template("$sr --evaluator dynslot --verbose $elitism_switch --stat-dir $sd "\
+    cmd = Template("$sr --verbose $eva $elitism_switch --stat-dir $sd "\
                    "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
                    "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
                    "$arl_switch $dss_switch $ss $ds")
@@ -96,6 +98,7 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         rnd_switch = randomize,
         arl_switch = arl,
         dss_switch = dss,
+        eva = "--evaluator " + evaluator if evaluator != "" else "",
         ss = "-s " + os.path.join(symbol_set_dir, symbol_set)
              if symbol_set != "" else "",
         ds = os.path.join(data_set_dir, data_set))
@@ -123,10 +126,10 @@ def save_results(args, name, data_set):
 
 
 def test_dataset(args, name, data_set, generations, individuals, code_length,
-                 rounds, symbol_set = ""):
+                 rounds, symbol_set = "", evaluator = ""):
     print("Testing " + name + " [" + str(args) + "]")
     sr(args, data_set, generations, individuals, code_length, rounds,
-       symbol_set)
+       symbol_set, evaluator)
     save_results(args, name, data_set)
 
 
