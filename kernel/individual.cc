@@ -1,81 +1,83 @@
 /**
- *
- *  \file individual.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <algorithm>
 
-#include "individual.h"
-#include "adf.h"
-#include "argument.h"
-#include "environment.h"
-#include "random.h"
-#include "ttable_hash.h"
+#include "kernel/individual.h"
+#include "kernel/adf.h"
+#include "kernel/argument.h"
+#include "kernel/environment.h"
+#include "kernel/random.h"
+#include "kernel/ttable_hash.h"
 
 namespace vita
 {
-  std::function<individual (const individual &, const individual &)>
-  individual::crossover(two_point_crossover);
-
   ///
   /// \param[in] e base environment.
-  /// \param[in] gen if \c true generates a random sequence of genes to
-  ///                initialize the individual.
+  /// \param[in] sset a symbol set.
   ///
   /// The process that generates the initial, random expressions have to be
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///
-  individual::individual(const environment &e, bool gen)
-    : age(0), genome_(e.code_length, e.sset.categories()),
-      signature_(), best_{0, 0}, env_(&e)
+  individual::individual(const environment &e, const symbol_set &sset)
+    : genome_(e.code_length, sset.categories()),
+      signature_(), best_{0, 0}, age_(0), env_(&e), sset_(&sset)
   {
     assert(e.debug(true, true));
 
-    if (gen)  // random generate initial code
-    {
-      assert(size());
-      assert(env_->patch_length);
-      assert(size() > env_->patch_length);
+    assert(size());
+    assert(env_->patch_length);
+    assert(size() > env_->patch_length);
 
-      const index_t sup(size()), patch(sup - env_->patch_length);
+    const index_t sup(size()), patch(sup - env_->patch_length);
 
-      const category_t categories(e.sset.categories());
-      assert(categories);
-      assert(categories < sup);
+    const category_t categories(sset.categories());
+    assert(categories);
+    assert(categories < sup);
 
-      // STANDARD SECTION. Filling the genome with random symbols.
-      for (index_t i(0); i < patch; ++i)
-        for (category_t c(0); c < categories; ++c)
-          genome_(i, c) = gene(e.sset.roulette(c), i + 1, size());
+    // STANDARD SECTION. Filling the genome with random symbols.
+    for (index_t i(0); i < patch; ++i)
+      for (category_t c(0); c < categories; ++c)
+        genome_(i, c) = gene(sset.roulette(c), i + 1, size());
 
-      // PATCH SUBSECTION. Placing terminals for satisfying constraints on
-      // types.
-      for (index_t i(patch); i < sup; ++i)
-        for (category_t c(0); c < categories; ++c)
-          genome_(i, c) = gene(e.sset.roulette_terminal(c));
+    // PATCH SUBSECTION. Placing terminals for satisfying constraints on
+    // types.
+    for (index_t i(patch); i < sup; ++i)
+      for (category_t c(0); c < categories; ++c)
+        genome_(i, c) = gene(sset.roulette_terminal(c));
 
-      assert(debug(true));
-    }
+    assert(debug(true));
   }
 
   ///
   /// \return the effective size of the individual.
-  /// \see size
+  /// \see size()
   ///
-  size_t individual::eff_size() const
+  /// \note
+  /// eff_size() can be greater than size() when category() > 1. For instance
+  /// consider the following individual:
+  ///   [0, 1] FIFL 1 2 2 3
+  ///   [1, 0] "car"
+  ///   [2, 0] "plane"
+  ///   [2, 1] 10
+  ///   [3, 1] 20
+  /// size() == 4 but eff_size() == 5.
+  ///
+  unsigned individual::eff_size() const
   {
-    size_t ef(0);
+    unsigned ef(0);
 
-    for (const_iterator it(*this); it(); ++it)
+    for (VARIABLE_IS_NOT_USED const auto &l : *this)
       ++ef;
 
     return ef;
@@ -102,7 +104,7 @@ namespace vita
   void individual::hoist()
   {
     const unsigned sup(size() - 1);
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset_->categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -120,7 +122,7 @@ namespace vita
       }
 
     for (category_t c(0); c < categories; ++c)
-      set({sup, c}, gene(env_->sset.roulette_terminal(c)));
+      set({sup, c}, gene(sset_->roulette_terminal(c)));
   }
   */
 
@@ -137,23 +139,23 @@ namespace vita
     const auto sup(size() - 1);
 
     // Here mutation affects only exons.
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
       if (random::boolean(p))
       {
         ++n;
 
-        const auto i(it.l.index);
-        const auto c(it.l.category);
+        const auto i(l.index);
+        const auto c(l.category);
 
         if (i < sup)
-          set(it.l, gene(env_->sset.roulette(c), i + 1, size()));
+          set(l, gene(sset_->roulette(c), i + 1, size()));
         else
-          set(it.l, gene(env_->sset.roulette_terminal(c)));
+          set(l, gene(sset_->roulette_terminal(c)));
       }
 
 /*
     // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-    const category_t categories(env_->sset.categories());
+    const category_t categories(sset_->categories());
 
     for (index_t i(0); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -161,7 +163,7 @@ namespace vita
         {
           ++n;
 
-          set({i, c}, gene(env_->sset.roulette(c), i + 1, size()));
+          set({i, c}, gene(sset_->roulette(c), i + 1, size()));
         }
 
     for (category_t c(0); c < categories; ++c)
@@ -169,7 +171,7 @@ namespace vita
       {
         ++n;
 
-        set({sup, c}, gene(env_->sset.roulette_terminal(c)));
+        set({sup, c}, gene(sset_->roulette_terminal(c)));
       }
 */
 
@@ -180,17 +182,21 @@ namespace vita
   ///
   /// \return a list of loci referring to active symbols.
   ///
-  /// The function extract from the individual a list of indexes to blocks
-  /// that are subsets of the active code. Indexes can be used by the
-  /// individual::get_block function.
+  /// The function calculates a set of indexes to blocks contained in \c this
+  /// individual.
   ///
-  std::list<locus> individual::blocks() const
+  /// Indexes can be used by the individual::get_block function.
+  ///
+  /// \note
+  /// A block is a subset of the active code composed of, at least, a function.
+  ///
+  std::vector<locus> individual::blocks() const
   {
-    std::list<locus> bl;
+    std::vector<locus> bl;
 
-    for (const_iterator i(*this); i(); ++i)
-      if (genome_(i.l).sym->arity())
-        bl.push_back(i.l);
+    for (const auto &l : *this)
+      if (genome_(l).sym->arity())
+        bl.push_back(l);
 
     return bl;
   }
@@ -259,9 +265,9 @@ namespace vita
     assert(index < size());
 
     individual ret(*this);
-    const category_t categories(env_->sset.categories());
+    const category_t categories(sset_->categories());
     for (category_t c(0); c < categories; ++c)
-      ret.set({index, c}, gene(env_->sset.roulette_terminal(c)));
+      ret.set({index, c}, gene(sset_->roulette_terminal(c)));
 
     assert(ret.debug());
     return ret;
@@ -270,51 +276,46 @@ namespace vita
   ///
   /// \param[in] max_args maximum number of arguments for the ADF.
   /// \param[out] loci the ADF arguments are here.
-  /// \return the generalized individual.
+  /// \return the generalized individual and a set of loci (ADF arguments
+  ///         positions).
   ///
   /// Changes up to \a max_args terminals (exactly \a max_args when available)
   /// of \c this individual with formal arguments, thus producing the body
   /// for a ADF.
   ///
-  individual individual::generalize(size_t max_args,
-                                    std::vector<locus> *const loci) const
+  std::pair<individual, std::vector<locus>> individual::generalize(
+    unsigned max_args) const
   {
     assert(max_args && max_args <= gene::k_args);
 
     std::vector<locus> terminals;
 
     // Step 1: mark the active terminal symbols.
-    for (const_iterator i(*this); i(); ++i)
-      if (genome_(i.l).sym->terminal())
-        terminals.push_back(i.l);
+    for (const auto &l : *this)
+      if (genome_(l).sym->terminal())
+        terminals.push_back(l);
 
     // Step 2: shuffle the terminals and pick elements 0..n-1.
-    const size_t n(std::min(max_args, terminals.size()));
+    const auto n(std::min<unsigned>(max_args, terminals.size()));
     assert(n);
 
     if (n < size())
-      for (size_t j(0); j < n; ++j)
+      for (auto j(decltype(n){0}); j < n; ++j)
       {
-        const size_t r(random::between<size_t>(j, terminals.size()));
+        const auto r(random::between<unsigned>(j, terminals.size()));
 
         std::swap(terminals[j], terminals[r]);
       }
 
     // Step 3: randomly substitute n terminals with function arguments.
     individual ret(*this);
-    for (size_t j(0); j < n; ++j)
-    {
-      gene &g(ret.genome_(terminals[j]));
-      if (loci)
-        loci->push_back(terminals[j]);
-      g.sym = env_->sset.arg(j);
-      ret.signature_.clear();
-    }
+    for (auto j(decltype(n){0}); j < n; ++j)
+      ret.genome_(terminals[j]).sym = sset_->arg(j);
+    ret.signature_.clear();
 
-    assert(!loci || (loci->size() && loci->size() <= max_args));
     assert(ret.debug());
 
-    return ret;
+    return {ret, std::vector<locus>(terminals.begin(), terminals.begin() + n)};
   }
 
   ///
@@ -344,12 +345,12 @@ namespace vita
   /// \return a numeric measurement of the difference between \a ind and
   /// \c this (the number of different genes between individuals).
   ///
-  size_t individual::distance(const individual &ind) const
+  unsigned individual::distance(const individual &ind) const
   {
-    const size_t cs(size());
-    const size_t categories(env_->sset.categories());
+    const index_t cs(size());
+    const category_t categories(sset_->categories());
 
-    size_t d(0);
+    unsigned d(0);
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
       {
@@ -411,13 +412,13 @@ namespace vita
     static std::vector<T> packed;
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
-    //   std::vector<T> packed;
-    //   // static keyword and clear() call deleted.
+    //     std::vector<T> packed;
+    //     // static keyword and clear() call deleted.
 
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
-    const size_t len(packed.size() * sizeof(T));  // Length in bytes
+    const auto len(packed.size() * sizeof(T));  // Length in bytes
 
     return vita::hash(packed.data(), len, 1973);
   }
@@ -450,7 +451,7 @@ namespace vita
   ///
   bool individual::debug(bool verbose) const
   {
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset_->categories());
 
     for (unsigned i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
@@ -548,9 +549,10 @@ namespace vita
       return false;
     }
 
-    return
-      env_->debug(verbose, true) &&
-      (signature_.empty() || signature_ == hash());
+    if (!signature_.empty() && signature_ != hash())
+      return false;
+
+    return env_->debug(verbose, true);
   }
 
   ///
@@ -568,21 +570,38 @@ namespace vita
       s << "subgraph " << id;
     s << " {";
 
-    locus l(best_);
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
     {
-      const gene &g(*it);
+      const gene &g(genome_(l));
 
-      s << 'g' << it.l.index << '_' << it.l.category << " [label="
+      s << 'g' << l.index << '_' << l.category << " [label="
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-        << ", shape=" << (g.sym->arity() ? "box" : "parallelogram") << "];";
+        << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
         s << 'g' << l.index << '_' << l.category << " -- g" << g.args[j]
           << '_' << function::cast(g.sym)->arg_category(j) << ';';
     }
 
-    s << '}' << std::endl;
+    s << '}';
+  }
+
+  ///
+  /// \param[out] s output stream
+  /// \param[in] l current locus
+  ///
+  /// Prints active genes of the individual visiting the genome in pre-order.
+  ///
+  void individual::in_line(std::ostream &s, const locus &l) const
+  {
+    const gene &g(genome_(l));
+
+    if (l != best_)
+      s << ' ';
+    s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+
+    for (unsigned i(0); i < g.sym->arity(); ++i)
+      in_line(s, {g.args[i], function::cast(g.sym)->arg_category(i)});
   }
 
   ///
@@ -594,14 +613,7 @@ namespace vita
   ///
   void individual::in_line(std::ostream &s) const
   {
-    for (const_iterator it(*this); it(); ++it)
-    {
-      const gene &g(*it);
-
-      if (it.l != best_)
-        s << ' ';
-      s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
-    }
+    in_line(s, best_);
   }
 
   ///
@@ -615,20 +627,20 @@ namespace vita
   ///
   void individual::list(std::ostream &s) const
   {
-    const size_t categories(env_->sset.categories());
+    const size_t categories(sset_->categories());
     const unsigned w1(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(size() - 1))));
     const unsigned w2(
       1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
 
-    for (const_iterator it(*this); it(); ++it)
+    for (const auto &l : *this)
     {
-      const gene &g(*it);
+      const gene &g(genome_(l));
 
-      s << '[' << std::setfill('0') << std::setw(w1) << it.l.index;
+      s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << it.l.category;
+        s << ", " << std::setw(w2) << l.category;
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
@@ -684,7 +696,7 @@ namespace vita
   ///
   void individual::dump(std::ostream &s) const
   {
-    const unsigned categories(env_->sset.categories());
+    const unsigned categories(sset_->categories());
     const unsigned width(1 + std::log10(size() - 1));
 
     for (unsigned i(0); i < size(); ++i)
@@ -724,49 +736,16 @@ namespace vita
   }
 
   ///
-  /// \param[in] id
-  ///
-  individual::const_iterator::const_iterator(const individual &id)
-    : l(id.best_), ind_(id)
-  {
-    loci_.insert(l);
-  }
-
-  ///
-  /// \return locus of the next line containing an active symbol.
-  ///
-  const locus individual::const_iterator::operator++()
-  {
-    if (!loci_.empty())
-    {
-      loci_.erase(loci_.begin());
-
-      const gene &g(ind_.genome_(l));
-
-      for (size_t j(0); j < g.sym->arity(); ++j)
-      {
-        const locus l{g.args[j], function::cast(g.sym)->arg_category(j)};
-
-        loci_.insert(l);
-      }
-
-      l = *loci_.begin();
-    }
-
-    return l;
-  }
-
-  ///
   /// \param[in] in input stream.
   /// \return \c true if individual was loaded correctly.
   ///
   /// \note
   /// If the load operation isn't successful the current individual isn't
-  /// changed.
+  /// modified.
   ///
   bool individual::load(std::istream &in)
   {
-    decltype(age) t_age;
+    decltype(age_) t_age;
     if (!(in >> t_age))
       return false;
 
@@ -787,7 +766,7 @@ namespace vita
           return false;
 
         gene g;
-        g.sym = env_->sset.decode(opcode);
+        g.sym = sset_->decode(opcode);
         if (!g.sym)
           return false;
 
@@ -803,17 +782,16 @@ namespace vita
         genome(r, c) = g;
       }
 
-    decltype(signature_) signature;
-    if (!signature.load(in))
-      return false;
-
     if (best.index >= genome.rows())
       return false;
 
-    age = t_age;
+    age_ = t_age;
     best_ = best;
     genome_ = genome;
-    signature_ = signature;
+
+    // We don't save/load signature: it can be easily calculated on the fly.
+    signature_.clear();
+    // signature_ = hash();
 
     return true;
   }
@@ -824,7 +802,7 @@ namespace vita
   ///
   bool individual::save(std::ostream &out) const
   {
-    out << age << ' ' << best_.index << ' ' << best_.category << std::endl;
+    out << age() << ' ' << best_.index << ' ' << best_.category << std::endl;
 
     out << genome_.rows() << ' ' << genome_.cols() << std::endl;
     for (const auto &g : genome_)
@@ -840,20 +818,18 @@ namespace vita
       out << std::endl;
     }
 
-    const bool signature_ok(signature_.save(out));
-
-    return out.good() && signature_ok;
+    return out.good();
   }
 
+#if defined(UNIFORM_CROSSOVER)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
+  /// \param[in] p the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
   /// The i-th locus of the offspring has a 50% probability to be filled with
-  /// the i-th gene of \a p1 and 50% with i-th gene of \a p2. Parents must have
-  /// the same size.
+  /// the i-th gene of \a this and 50% with i-th gene of \a p. Parents must
+  /// have the same size.
   /// Uniform crossover, as the name suggests, is a GP operator inspired by the
   /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
   /// algorithms - Proceedings of the Third International Conference on Genetic
@@ -866,45 +842,43 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual uniform_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
+    assert(p.debug());
 
-    individual offspring(p1);
+    auto offspring(*this);
 
-    for (individual::const_iterator it(p1); it(); ++it)
+    for (individual::const_iterator it(*this); it(); ++it)
       if (random::boolean())
-        offspring.set(it.l, p2[it.l]);
+        offspring.set(it.l, p[it.l]);
 
 /*
-    const index_t cs(p1.size());
-    const category_t categories(p1.env().sset.categories());
+    const index_t cs(size());
+    const category_t categories(sset()->categories());
 
-    assert(cs == p2.size());
-    assert(categories == p2.env().sset.categories());
+    assert(cs == p.size());
+    assert(categories == p.sset()->categories());
 
     for (index_t i(0); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
         if (random::boolean())
         {
           const locus l{i,c};
-          offspring.set(l, p2[l]);
+          offspring.set(l, p[l]);
         }
 */
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug(true));
     return offspring;
   }
-
+#elif defined(ONE_POINT_CROSSOVER)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
-  /// \return the result of the crossover (We only generate a single
+  /// \param[in] p the second parent.
+  /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
-  /// We randomly select a parent (between \a p1 and \a p2) and a single locus
+  /// We randomly select a parent (between \a this and \a p) and a single locus
   /// (common crossover point). The offspring is created with genes from the
   /// choosen parent up to the crossover point and genes from the other parent
   /// beyond that point.
@@ -913,21 +887,20 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual one_point_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
-    assert(p1.size() == p2.size());
+    assert(p.debug());
+    assert(size() == p.size());
 
-    const auto cs(p1.size());
-    const auto categories(p1.env().sset.categories());
+    const auto cs(size());
+    const auto categories(sset().categories());
 
     const auto cut(random::between<index_t>(1, cs - 1));
 
-    const individual *parents[2] = {&p1, &p2};
+    const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
-    individual offspring(*parents[base]);
+    auto offspring(*parents[base]);
 
     for (index_t i(cut); i < cs; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -936,19 +909,18 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug());
     return offspring;
   }
-
+#else  // TWO_POINT_CROSSOVER (default)
   ///
-  /// \param[in] p1 the first parent.
-  /// \param[in] p2 the second parent.
+  /// \param[in] p the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
-  /// We randomly select a parent (between \a p1 and \a p2) and a two loci
+  /// We randomly select a parent (between \a this and \a p2) and a two loci
   /// (common crossover points). The offspring is created with genes from the
   /// choosen parent before the first crossover point and after the second
   /// crossover point; genes between crossover points are taken from the other
@@ -957,22 +929,21 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual two_point_crossover(const individual &p1, const individual &p2)
+  individual individual::crossover(const individual &p) const
   {
-    assert(p1.debug());
-    assert(p2.debug());
-    assert(p1.size() == p2.size());
+    assert(p.debug());
+    assert(size() == p.size());
 
-    const auto cs(p1.size());
-    const auto categories(p1.env().sset.categories());
+    const auto cs(size());
+    const auto categories(sset().categories());
 
-    const auto cut1(random::between<index_t>(0, cs - 1));
-    const auto cut2(random::between<index_t>(cut1 + 1, cs));
+    const auto cut1(random::sup(cs - 1));
+    const auto cut2(random::between(cut1 + 1, cs));
 
-    const individual *parents[2] = {&p1, &p2};
+    const individual *parents[2] = {this, &p};
     const bool base(random::boolean());
 
-    individual offspring(*parents[base]);
+    auto offspring(*parents[base]);
 
     for (index_t i(cut1); i < cut2; ++i)
       for (category_t c(0); c < categories; ++c)
@@ -981,9 +952,37 @@ namespace vita
         offspring.set(l, (*parents[!base])[l]);
       }
 
-    offspring.age = std::max(p1.age, p2.age);
+    offspring.age_ = std::max(age(), p.age());
 
     assert(offspring.debug());
     return offspring;
   }
+
+  ///
+  /// \param[in] id an individual.
+  ///
+  individual::const_iterator::const_iterator(const individual &id) : ind_(&id)
+  {
+    loci_.insert(id.best_);
+  }
+
+  ///
+  /// \return locus of the next active symbol.
+  ///
+  std::set<locus>::iterator individual::const_iterator::operator++()
+  {
+    if (!loci_.empty())
+    {
+      const gene &g((*ind_)[*loci_.cbegin()]);
+
+      const auto arity(g.sym->arity());
+      for (unsigned j(0); j < arity; ++j)
+        loci_.insert({g.args[j], function::cast(g.sym)->arg_category(j)});
+
+      loci_.erase(loci_.begin());
+    }
+
+    return loci_.begin();
+  }
+#endif
 }  // Namespace vita

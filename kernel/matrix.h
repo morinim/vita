@@ -16,7 +16,7 @@
 
 #include <vector>
 
-#include "locus.h"
+#include "kernel/locus.h"
 
 namespace vita
 {

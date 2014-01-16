@@ -1,79 +1,46 @@
 /**
- *
- *  \file src_problem.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "src_problem.h"
-#include "lambda_f.h"
-#include "src_constant.h"
-#include "src_evaluator.h"
-#include "src_variable.h"
+#include "kernel/src/problem.h"
+#include "kernel/lambda_f.h"
+#include "kernel/src/constant.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/src/variable.h"
 
 namespace vita
 {
   ///
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
   /// New empty instance.
   ///
-  src_problem::src_problem()
+  src_problem::src_problem(bool initialize) : problem(initialize)
   {
-    clear();
-  }
-
-  ///
-  /// Resets the object.
-  ///
-  void src_problem::clear()
-  {
-    p_symre = k_sae_evaluator;
-    p_class = k_gaussian_evaluator;
-
-    problem::clear();
     dat_.clear();
   }
 
   ///
-  /// \param[in] id numerical id of the evaluator to be activated
-  /// \param[in] msg input parameters for the evaluator constructor.
+  /// \param[in] initialize if \c true initialize the environment with default
+  ///                       values.
   ///
-  void src_problem::set_evaluator(evaluator_id id, const std::string &msg)
+  /// Resets the object.
+  ///
+  void src_problem::clear(bool initialize)
   {
-    switch (id)
-    {
-    case k_count_evaluator:
-      problem::set_evaluator(std::make_shared<count_evaluator>(dat_));
-      break;
-
-    case k_sae_evaluator:
-      problem::set_evaluator(std::make_shared<sae_evaluator>(dat_));
-      break;
-
-    case k_sse_evaluator:
-      problem::set_evaluator(std::make_shared<sse_evaluator>(dat_));
-      break;
-
-    case k_dyn_slot_evaluator:
-    {
-      const size_t x_slot(msg.empty() ? 10 : boost::lexical_cast<size_t>(msg));
-      problem::set_evaluator(std::make_shared<dyn_slot_evaluator>(dat_,
-                                                                  x_slot));
-      break;
-    }
-
-    case k_gaussian_evaluator:
-      problem::set_evaluator(std::make_shared<gaussian_evaluator>(dat_));
-      break;
-    }
+    problem::clear(initialize);
+    dat_.clear();
   }
 
   ///
@@ -92,12 +59,10 @@ namespace vita
     if (ds.empty())
       return {0, 0};
 
-    env.sset = vita::symbol_set();
+    sset = vita::symbol_set();
     dat_.clear();
 
-    const size_t n_examples(dat_.open(ds, env.verbosity));
-    if (n_examples > 0 && !get_evaluator())
-      set_evaluator(classification() ? p_class : p_symre);
+    const auto n_examples(dat_.open(ds, env.verbosity));
 
     if (!ts.empty())
       load_test_set(ts);
@@ -119,12 +84,11 @@ namespace vita
   ///
   size_t src_problem::load_test_set(const std::string &ts)
   {
-    const data::dataset_t backup(dat_.dataset());
+    const auto backup(dat_.dataset());
     dat_.dataset(data::test);
-
-    const size_t n(dat_.open(ts, env.verbosity));
-
+    const auto n(dat_.open(ts, env.verbosity));
     dat_.dataset(backup);
+
     return n;
   }
 
@@ -134,17 +98,18 @@ namespace vita
   ///
   void src_problem::setup_terminals_from_data()
   {
-    env.sset = vita::symbol_set();
+    sset = vita::symbol_set();
 
     // Sets up the variables (features).
-    for (size_t i(1); i < dat_.columns(); ++i)
+    const auto columns(dat_.columns());
+    for (auto i(decltype(columns){1}); i < columns; ++i)
     {
       std::string name(dat_.get_column(i).name);
       if (name.empty())
         name = "X" + boost::lexical_cast<std::string>(i);
 
       const category_t category(dat_.get_column(i).category_id);
-      env.insert(std::make_shared<variable>(name, i - 1, category));
+      sset.insert(make_unique<variable>(name, i - 1, category));
     }
 
     // Sets up the labels for nominal attributes.
@@ -153,7 +118,7 @@ namespace vita
       const data::category &cat(dat_.get_category(c));
 
       for (const std::string &label : cat.labels)
-        env.insert(std::make_shared<constant<std::string>>(label, c));
+        sset.insert(make_unique<constant<std::string>>(label, c));
     }
   }
 
@@ -170,22 +135,22 @@ namespace vita
     for (category_t category(0); category < dat_.categories(); ++category)
       if (compatible({category}, {"numeric"}))
       {
-        env.insert(factory.make("1.0", {category}));
-        env.insert(factory.make("2.0", {category}));
-        env.insert(factory.make("3.0", {category}));
-        env.insert(factory.make("4.0", {category}));
-        env.insert(factory.make("5.0", {category}));
-        env.insert(factory.make("6.0", {category}));
-        env.insert(factory.make("7.0", {category}));
-        env.insert(factory.make("8.0", {category}));
-        env.insert(factory.make("9.0", {category}));
-        env.insert(factory.make("FABS", {category}));
-        env.insert(factory.make("FADD", {category}));
-        env.insert(factory.make("FDIV", {category}));
-        env.insert(factory.make("FLN",  {category}));
-        env.insert(factory.make("FMUL", {category}));
-        env.insert(factory.make("FMOD", {category}));
-        env.insert(factory.make("FSUB", {category}));
+        sset.insert(factory.make("1.0", {category}));
+        sset.insert(factory.make("2.0", {category}));
+        sset.insert(factory.make("3.0", {category}));
+        sset.insert(factory.make("4.0", {category}));
+        sset.insert(factory.make("5.0", {category}));
+        sset.insert(factory.make("6.0", {category}));
+        sset.insert(factory.make("7.0", {category}));
+        sset.insert(factory.make("8.0", {category}));
+        sset.insert(factory.make("9.0", {category}));
+        sset.insert(factory.make("FABS", {category}));
+        sset.insert(factory.make("FADD", {category}));
+        sset.insert(factory.make("FDIV", {category}));
+        sset.insert(factory.make("FLN",  {category}));
+        sset.insert(factory.make("FMUL", {category}));
+        sset.insert(factory.make("FMOD", {category}));
+        sset.insert(factory.make("FSUB", {category}));
       }
   }
 
@@ -258,7 +223,7 @@ namespace vita
                               << (&j == &seq.back() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
-                  env.insert(factory.make(sym_name, seq));
+                  sset.insert(factory.make(sym_name, seq));
                 }
             }
         }
@@ -267,16 +232,16 @@ namespace vita
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
             {
-              const size_t n_args(factory.args(sym_name));
+              const auto n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
               std::cout << sym_name << '(';
-              for (size_t j(0); j < n_args; ++j)
+              for (auto j(decltype(n_args){0}); j < n_args; ++j)
                 std::cout << dat_.get_category(category).name
                           << (j + 1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
-              env.insert(factory.make(sym_name, cvect(n_args, category)));
+              sset.insert(factory.make(sym_name, cvect(n_args, category)));
             }
         }
 
@@ -332,12 +297,13 @@ namespace vita
   ///         elements taken from the given set (\a categories).
   ///
   std::list<src_problem::cvect> src_problem::seq_with_rep(
-    const cvect &categories,
-    size_t args)
+    const cvect &categories, size_t args)
   {
     assert(categories.size());
     assert(args);
 
+    // When I wrote this, only God and I understood what I was doing.
+    // Now, God only knows.
     class swr
     {
     public:
@@ -399,18 +365,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual to be transformed in a lambda function.
-  /// \return the lambda function associated with \a ind (\c nullptr in case of
-  ///         errors).
-  ///
-  /// The lambda function depends on the active evaluator.
-  ///
-  std::unique_ptr<lambda_f> src_problem::lambdify(const individual &ind)
-  {
-    return active_eva_->lambdify(ind);
-  }
-
-  ///
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.
   ///
@@ -421,22 +375,6 @@ namespace vita
 
     if (!dat_.debug())
       return false;
-
-    if (p_symre > k_max_evaluator)
-    {
-      if (verbose)
-        std::cerr << "Incorrect ID for preferred sym.reg. evaluator."
-                  << std::endl;
-      return false;
-    }
-
-    if (p_class > k_max_evaluator)
-    {
-      if (verbose)
-        std::cerr << "Incorrect ID for preferred classification evaluator."
-                  << std::endl;
-      return false;
-    }
 
     return true;
   }

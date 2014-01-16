@@ -1,25 +1,24 @@
 /**
- *
- *  \file example7.cc
+ *  \file
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  Copyright (C) 2011 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 
-#include "adf.h"
-#include "distribution.h"
-#include "environment.h"
-#include "primitive/factory.h"
+#include "kernel/adf.h"
+#include "kernel/distribution.h"
+#include "kernel/environment.h"
+#include "kernel/src/primitive/factory.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,25 +28,27 @@ int main(int argc, char *argv[])
   env.code_length = argc > 1 ? atoi(argv[1]) : 100;
   const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
 
+  vita::symbol_set sset;
+
   symbol_factory &factory(symbol_factory::instance());
-  env.insert(factory.make(d_double, -200, 200));
-  env.insert(factory.make("FADD"));
-  env.insert(factory.make("FSUB"));
-  env.insert(factory.make("FMUL"));
-  env.insert(factory.make("FIFL"));
-  env.insert(factory.make("FIFE"));
-  env.insert(factory.make("FABS"));
-  env.insert(factory.make("FLN"));
+  sset.insert(factory.make(d_double, -200, 200));
+  sset.insert(factory.make("FADD"));
+  sset.insert(factory.make("FSUB"));
+  sset.insert(factory.make("FMUL"));
+  sset.insert(factory.make("FIFL"));
+  sset.insert(factory.make("FIFE"));
+  sset.insert(factory.make("FABS"));
+  sset.insert(factory.make("FLN"));
 
   distribution<double> individuals, blocks_len, blocks_n, arguments;
 
   for (unsigned k(0); k < n; ++k)
   {
-    individual base(env, true);
-    unsigned base_es(base.eff_size());
+    individual base(env, sset);
+    auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = individual(env, true);
+      base = individual(env, sset);
       base_es = base.eff_size();
     }
 
@@ -57,27 +58,26 @@ int main(int argc, char *argv[])
     base.list(std::cout);
     std::cout << std::endl;
 
-    std::list<locus> bl(base.blocks());
+    auto bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       individual ib(base.get_block(*i));
 
-      std::vector<locus> arg_loc;
-      individual generalized(ib.generalize(2, &arg_loc));
+      auto generalized(ib.generalize(2));
 
       std::cout << std::endl;
       ib.list(std::cout);
 
       std::cout << "GENERALIZED" << std::endl;
-      generalized.list(std::cout);
+      generalized.first.list(std::cout);
 
       std::cout << std::endl << "Arguments: [";
-      for (unsigned j(0); j < arg_loc.size(); ++j)
-        std::cout << ' ' << arg_loc[j];
+      for (const auto &l : generalized.second)
+        std::cout << ' ' << l;
       std::cout << " ]" << std::endl;
 
       blocks_len.add(ib.eff_size());
-      arguments.add(arg_loc.size());
+      arguments.add(generalized.second.size());
     }
   }
 

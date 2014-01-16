@@ -12,9 +12,12 @@ BOOST_INCLUDE = ./boost
 BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
 
 # Compiler (clang++, g++)
-CXX = clang++
+CXX = g++
 
-# -DCLONE_SCALING, -DVITA_NO_LIB
+# -DCLONE_SCALING
+# -DMUTUAL_IMPROVEMENT
+# -DVITA_NO_LIB
+# -DUNIFORM_CROSSOVER / -DONE_POINT_CROSSOVER / -DTWO_POINT_CROSSOVER (default)
 DEFS =
 
 
@@ -27,7 +30,10 @@ LIB = $(BOOST_LIB)/libboost_program_options.a
 DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 
 # Add directories to the include path.
-INCPATH = ./kernel
+# This should work in POSIX compliant environment (see "The Open Group Base
+# Specifications Issue 7" and
+# http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html)
+INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
@@ -48,7 +54,7 @@ endif
 CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
 COMPILE = $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/primitive/*.cc)
+KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC = $(wildcard examples/*.cc)
 SR_SRC = $(wildcard sr/*.cc)
@@ -84,12 +90,12 @@ titanic%: examples/titanic%.o $(KERNEL_OBJ)
 tests: test/tests.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	@test/$@ --show_progress
+	@cd test; $@ --show_progress
 
 test_%: test/test_%.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	@test/$@ --show_progress
+	@cd test; $@ --show_progress
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a

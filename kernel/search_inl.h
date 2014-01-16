@@ -1,14 +1,13 @@
 /**
- *
- *  \file search_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(SEARCH_INL_H)
@@ -17,86 +16,122 @@
 ///
 /// \param[in] prob a \c problem used for search initialization.
 ///
-template<class T>
-basic_search<T>::basic_search(problem *const prob)
-  : env_(prob->env), prob_(prob)
+template<class T, template<class> class ES>
+search<T, ES>::search(problem *const prob) : active_eva_(nullptr),
+                                             env_(prob->env), prob_(prob)
+
 {
   assert(prob->debug(true));
 
   assert(debug(true));
 }
 
+template<class T, template<class> class ES>
+fitness_t search<T, ES>::fitness(const T &ind)
+{
+  return (*active_eva_)(ind);
+}
+
 ///
-/// \param[in] base \a individual in which we are looking for building blocks.
-/// \param[in] evo evolution up to now.
+/// \param[in] base \a individual we are examining to extract building blocks.
 ///
 /// Adaptive Representation through Learning (ARL). The algorithm extract
 /// common knowledge (building blocks) emerging during the evolutionary
 /// process and acquires the necessary structure for solving the problem
 /// (see ARL - Justinian P. Rosca and Dana H. Ballard).
 ///
-template<class T>
-void basic_search<T>::arl(const T &base, evolution<T> &evo)
+/// \note
+/// No partial specialization for member functions of class templates is
+/// allowed but we need it for this method (we need partial specialization on
+/// T).
+/// The tipical work around is to introduce overloaded functions inside the
+/// class (this has the benefit that they have the same access to member
+/// variables, functions...).
+///
+template<class T, template<class> class ES>
+template<class U>
+void search<T, ES>::arl(const U &base)
 {
-  const fitness_t base_fit(evo.fitness(base));
-  if (base_fit.isfinite())
+  const auto base_fit(fitness(base));
+  if (!base_fit.isfinite())
+    return;  // We need a finite fitness to search for an improvement
+
+  // Logs ADFs
+  const auto filename(env_.stat_dir + "/" + environment::arl_filename);
+  std::ofstream log(filename.c_str(), std::ios_base::app);
+  if (env_.stat_arl && log.good())
   {
-    const std::string filename(env_.stat_dir + "/" +
-                               environment::arl_filename);
-    std::ofstream log(filename.c_str(), std::ios_base::app);
-    if (env_.stat_arl && log.good())
+    const auto adts(prob_->sset.adts());
+    for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      for (size_t i(0); i < env_.sset.adts(); ++i)
-      {
-        const symbol::ptr f(env_.sset.get_adt(i));
-        log << f->display() << ' ' << f->weight << std::endl;
-      }
-      log << std::endl;
+      const symbol &f(*prob_->sset.get_adt(i));
+      log << f.display() << ' ' << f.weight << std::endl;
     }
+    log << std::endl;
+  }
 
-    const size_t adf_args(0);
-    std::list<locus> blocks(base.blocks());
-    for (const locus &l : blocks)
+  const unsigned adf_args(0);
+  auto blk_idx(base.blocks());
+  for (const locus &l : blk_idx)
+  {
+    auto candidate_block(base.get_block(l));
+
+    // Building blocks must be simple.
+    if (candidate_block.eff_size() <= 5 + adf_args)
     {
-      T candidate_block(base.get_block(l));
+      // This is an approximation of the fitness due to the current block.
+      // The idea is to see how the individual (base) would perform without
+      // (base.destroy_block) the current block.
+      // Useful blocks have delta values greater than 0.
+      const auto delta(base_fit[0] -
+                       fitness(base.destroy_block(l.index))[0]);
 
-      // Building blocks must be simple.
-      if (candidate_block.eff_size() <= 5 + adf_args)
+      // Semantic introns cannot be building blocks...
+      // When delta is greater than 10% of the base fitness we have a
+      // building block.
+      if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
       {
-        const auto d_f(
-          base_fit[0] - evo.fitness(base.destroy_block(l.index))[0]);
-
-        // Semantic introns cannot be building blocks.
-        if (std::isfinite(d_f) && std::fabs(base_fit[0] / 10.0) < d_f)
+        std::unique_ptr<symbol> p;
+        if (adf_args)
         {
-          symbol::ptr p;
-          if (adf_args)
-          {
-            std::vector<locus> replaced;
-            T generalized(candidate_block.generalize(adf_args, &replaced));
-            std::vector<category_t> categories(replaced.size());
-            for (size_t j(0); j < replaced.size(); ++j)
-              categories[j] = replaced[j].category;
+          auto generalized(candidate_block.generalize(adf_args));
+          std::vector<category_t> categories(generalized.second.size());
 
-            p = std::make_shared<adf>(generalized, categories, 10);
-          }
-          else  // !adf_args
-            p = std::make_shared<adt>(candidate_block, 100);
-          env_.insert(p);
+          for (const auto &replaced : generalized.second)
+            categories.push_back(replaced.category);
 
-          if (env_.stat_arl && log.good())
-          {
-            log << p->display() << " (Base: " << base_fit
-                << "  DF: " << d_f
-                << "  Weight: " << std::fabs(d_f / base_fit[0]) * 100.0
-                << "%)" << std::endl;
-            candidate_block.list(log);
-            log << std::endl;
-          }
+          p = make_unique<adf>(generalized.first, categories, 10);
         }
+        else  // !adf_args
+          p = make_unique<adt>(candidate_block, 100);
+
+        if (env_.stat_arl && log.good())
+        {
+          log << p->display() << " (Base: " << base_fit
+              << "  DF: " << delta
+              << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
+              << "%)" << std::endl;
+          candidate_block.list(log);
+          log << std::endl;
+        }
+
+        prob_->sset.insert(std::move(p));
       }
     }
   }
+}
+
+///
+/// \param[in] base a team we are examining to extract building blocks.
+///
+/// Repeatedly calls arl(const U &) for each member of the team.
+///
+template<class T, template<class> class ES>
+template<class U>
+void search<T, ES>::arl(const team<U> &base)
+{
+  for (const auto &ind : base)
+    arl(ind);
 }
 
 ///
@@ -113,8 +148,8 @@ void basic_search<T>::arl(const T &base, evolution<T> &evo)
 /// * firstly 'difficult' cases;
 /// * secondly cases which have not been looked at for several generations.
 ///
-template<class T>
-void basic_search<T>::dss(unsigned generation) const
+template<class T, template<class> class ES>
+void search<T, ES>::dss(unsigned generation) const
 {
   if (prob_->data())
   {
@@ -170,7 +205,7 @@ void basic_search<T>::dss(unsigned generation) const
     }
 
     d.slice(std::max(count, 10u));
-    prob_->get_evaluator()->clear(evaluator::all);
+    active_eva_->clear(evaluator<T>::all);
 
     // Selected training examples have their difficulties and ages reset.
     for (auto &i : d)
@@ -185,12 +220,12 @@ void basic_search<T>::dss(unsigned generation) const
 /// \param[in] s an up to date run summary.
 /// \return \c true when a run should be interrupted.
 ///
-template<class T>
-bool basic_search<T>::stop_condition(const summary<T> &s) const
+template<class T, template<class> class ES>
+bool search<T, ES>::stop_condition(const summary<T> &s) const
 {
-  assert(env_.g_since_start);
+  assert(env_.generations);
 
-  if (*env_.g_since_start > 0 && s.gen > *env_.g_since_start)
+  if (s.gen > env_.generations)
     return true;
 
   // We use an accelerated stop condition when all the individuals have
@@ -236,13 +271,13 @@ bool basic_search<T>::stop_condition(const summary<T> &s) const
 /// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
 ///   Francone).
 ///
-template<class T>
-void basic_search<T>::tune_parameters()
+template<class T, template<class> class ES>
+void search<T, ES>::tune_parameters()
 {
   const environment dflt(true);
   const environment &constrained(prob_->env);
 
-  const data *const dt = prob_->data();
+  const data *const dt(prob_->data());
 
   if (constrained.code_length == 0)
     env_.code_length = dflt.code_length;
@@ -253,8 +288,8 @@ void basic_search<T>::tune_parameters()
   if (boost::indeterminate(constrained.elitism))
     env_.elitism = dflt.elitism;
 
-  if (!constrained.p_mutation)
-    env_.p_mutation = *dflt.p_mutation;
+  if (constrained.p_mutation >= 0.0)
+    env_.p_mutation = dflt.p_mutation;
 
   if (!constrained.p_cross)
     env_.p_cross = *dflt.p_cross;
@@ -275,26 +310,41 @@ void basic_search<T>::tune_parameters()
       std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
   }
 
+  if (!constrained.layers)
+  {
+    if (dt && dt->size() > 8)
+      env_.layers = std::log(dt->size());
+    else
+      env_.layers = dflt.layers;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Number of layers set to " << env_.layers
+                << std::endl;
+  }
+
   // A larger number of training cases requires an increase in the population
-  // size. In "Genetic Programming - An Introduction" Banzhaf, Nordin, Keller
-  // and Francone suggest 10 - 1000 individuals for smaller problems (say,
-  // less than 10 fitness cases); between 1000 and 10000 individuals for
-  // complex problem (more than 200 fitness cases).
-  // We choosed a strictly increasing function to map training set size
-  // and population size, but our population size is smaller.
+  // size (e.g. in "Genetic Programming - An Introduction" Banzhaf, Nordin,
+  // Keller and Francone suggest 10 - 1000 individuals for smaller problems;
+  // between 1000 and 10000 individuals for complex problem (more than 200
+  // fitness cases).
+  //
+  // We choosed a strictly increasing function to link training set size
+  // and population size.
   if (!constrained.individuals)
   {
-    size_t n(0);
-
-    if (dt)
+    if (dt && dt->size() > 8)
     {
-      env_.individuals = 2.0 * std::pow((std::log2(dt->size())), 3);
-      if (env_.verbosity >= 2)
-        std::cout << k_s_info << " Population size set to " << n
-                  << std::endl;
+      env_.individuals = 2 * std::pow((std::log2(dt->size())), 3) / env_.layers;
+
+      if (env_.individuals < 4)
+        env_.individuals = 4;
     }
     else
       env_.individuals = dflt.individuals;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Population size set to " << env_.individuals
+                << std::endl;
   }
 
   // Note that this setting, once set, will not be changed.
@@ -306,13 +356,13 @@ void basic_search<T>::tune_parameters()
         env_.validation_ratio = 0.0;
       else
         env_.validation_ratio = *dflt.validation_ratio;
-
-      if (env_.verbosity >= 2)
-        std::cout << k_s_info << " Validation ratio set to "
-                  << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
     }
     else
       env_.validation_ratio = *dflt.validation_ratio;
+
+    if (env_.verbosity >= 2)
+      std::cout << k_s_info << " Validation ratio set to "
+                << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
   }
 
   if (!constrained.tournament_size)
@@ -321,8 +371,8 @@ void basic_search<T>::tune_parameters()
   if (!constrained.mate_zone)
     env_.mate_zone = *dflt.mate_zone;
 
-  if (!constrained.g_since_start)
-    env_.g_since_start = *dflt.g_since_start;
+  if (!constrained.generations)
+    env_.generations = dflt.generations;
 
   if (!constrained.g_without_improvement)
     env_.g_without_improvement = *dflt.g_without_improvement;
@@ -344,13 +394,13 @@ void basic_search<T>::tune_parameters()
 /// \warning
 /// This method can be very time consuming.
 ///
-template<class T>
-double basic_search<T>::accuracy(const T &ind) const
+template<class T, template<class> class ES>
+double search<T, ES>::accuracy(const T &ind) const
 {
   if (env_.a_threashold < 0.0)
     return env_.a_threashold;
 
-  return prob_->get_evaluator()->accuracy(ind);
+  return active_eva_->accuracy(ind);
 }
 
 ///
@@ -358,9 +408,9 @@ double basic_search<T>::accuracy(const T &ind) const
 /// \param[in] fitness fitness reached in the current run.
 /// \param[in] accuracy accuracy reached in the current run.
 ///
-template<class T>
-void basic_search<T>::print_resume(bool validation, const fitness_t &fitness,
-                                   double accuracy) const
+template<class T, template<class> class ES>
+void search<T, ES>::print_resume(bool validation, const fitness_t &fitness,
+                                 double accuracy) const
 {
   if (env_.verbosity >= 2)
   {
@@ -379,10 +429,10 @@ void basic_search<T>::print_resume(bool validation, const fitness_t &fitness,
 /// \param[in] n number of runs.
 /// \return best individual found.
 ///
-template<class T>
-T basic_search<T>::run(unsigned n)
+template<class T, template<class> class ES>
+T search<T, ES>::run(unsigned n)
 {
-  assert(!env_.f_threashold.empty() || env_.a_threashold > 0.0);
+  assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
 
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -400,7 +450,7 @@ T basic_search<T>::run(unsigned n)
   if (env_.dss)
     shake_data = std::bind(&search::dss, this, std::placeholders::_1);
 
-  std::function<bool (const summary<T> &s)> stop;
+  std::function<bool (const summary<T> &)> stop;
   if (*env_.g_without_improvement > 0)
     stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
 
@@ -411,7 +461,7 @@ T basic_search<T>::run(unsigned n)
 
   for (unsigned run(0); run < n; ++run)
   {
-    evolution<T> evo(env_, prob_->get_evaluator().get(), stop, shake_data);
+    evolution<T, ES> evo(env_, prob_->sset, *active_eva_, stop, shake_data);
     summary<T> s(evo.run(run));
 
     // Depending on validation, this can be the training fitness or the
@@ -427,13 +477,13 @@ T basic_search<T>::run(unsigned n)
       const data::dataset_t backup(prob_->data()->dataset());
 
       prob_->data()->dataset(data::validation);
-      prob_->get_evaluator()->clear(s.best->ind);
+      active_eva_->clear(s.best->ind);
 
-      run_fitness = (*prob_->get_evaluator())(s.best->ind);
+      run_fitness = fitness(s.best->ind);
       run_accuracy = accuracy(s.best->ind);
 
       prob_->data()->dataset(backup);
-      prob_->get_evaluator()->clear(s.best->ind);
+      active_eva_->clear(s.best->ind);
     }
     else  // not using a validation set
     {
@@ -445,9 +495,9 @@ T basic_search<T>::run(unsigned n)
       {
         prob_->data()->dataset(data::training);
         prob_->data()->slice(false);
-        prob_->get_evaluator()->clear(s.best->ind);
+        active_eva_->clear(s.best->ind);
 
-        run_fitness = (*prob_->get_evaluator())(s.best->ind);
+        run_fitness = fitness(s.best->ind);
       }
       else
         run_fitness = s.best->fitness;
@@ -465,8 +515,7 @@ T basic_search<T>::run(unsigned n)
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found((env_.f_threashold.empty() ||
-                               run_fitness.dominating(env_.f_threashold)) &&
+    const bool solution_found(run_fitness.dominating(env_.f_threashold) &&
                               run_accuracy >= env_.a_threashold);
 
     if (solution_found)
@@ -479,13 +528,12 @@ T basic_search<T>::run(unsigned n)
     if (run_fitness.isfinite())
       fd.add(run_fitness);
 
-    overall_summary.speed = overall_summary.speed +
-      (s.speed - overall_summary.speed) / (run + 1);
+    overall_summary.elapsed += s.elapsed;
 
     if (env_.arl && good_runs.front() == run)
     {
-      env_.sset.reset_adf_weights();
-      arl(s.best->ind, evo);
+      prob_->sset.reset_adf_weights();
+      arl(s.best->ind);
     }
 
     assert(good_runs.empty() ||
@@ -508,12 +556,11 @@ T basic_search<T>::run(unsigned n)
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-template<class T>
-void basic_search<T>::log(const summary<T> &run_sum,
-                          const distribution<fitness_t> &fd,
-                          const std::list<unsigned> &good_runs,
-                          unsigned best_run, double best_accuracy,
-                          unsigned runs)
+template<class T, template<class> class ES>
+void search<T, ES>::log(const summary<T> &run_sum,
+                        const distribution<fitness_t> &fd,
+                        const std::list<unsigned> &good_runs,
+                        unsigned best_run, double best_accuracy, unsigned runs)
 {
   // Summary logging.
   if (env_.stat_summary)
@@ -531,7 +578,7 @@ void basic_search<T>::log(const summary<T> &run_sum,
     boost::property_tree::ptree pt;
     pt.put(summary + "success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
-    pt.put(summary + "speed", run_sum.speed);
+    pt.put(summary + "elapsed_time", run_sum.elapsed);
     pt.put(summary + "mean_fitness", fd.mean);
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
@@ -548,7 +595,7 @@ void basic_search<T>::log(const summary<T> &run_sum,
     pt.put(summary + "solutions.avg_depth",
            solutions ? run_sum.last_imp / solutions : 0);
 
-    pt.put(summary + "other.evaluator", prob_->get_evaluator()->info());
+    pt.put(summary + "other.evaluator", active_eva_->info());
 
     const std::string f_sum(env_.stat_dir + "/" + environment::sum_filename);
 
@@ -565,7 +612,7 @@ void basic_search<T>::log(const summary<T> &run_sum,
     const data::dataset_t backup(data.dataset());
     data.dataset(data::test);
 
-    std::unique_ptr<lambda_f> lambda(prob_->lambdify(run_sum.best->ind));
+    std::unique_ptr<lambda_f<T>> lambda(lambdify(run_sum.best->ind));
 
     std::ofstream tf(env_.stat_dir + "/" + environment::tst_filename);
     for (const auto &example : data)
@@ -576,11 +623,37 @@ void basic_search<T>::log(const summary<T> &run_sum,
 }
 
 ///
+/// \param[in] ind individual to be transformed in a lambda function.
+/// \return the lambda function associated with \a ind (\c nullptr in case of
+///         errors).
+///
+/// The lambda function depends on the active evaluator.
+///
+template<class T, template<class> class ES>
+std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind)
+{
+  return active_eva_->lambdify(ind);
+}
+
+///
+/// \param[in] e the evaluator that should be set as active.
+///
+template<class T, template<class> class ES>
+void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
+{
+  if (env_.ttable_size)
+    active_eva_ = make_unique<evaluator_proxy<T>>(std::move(e),
+                                                  env_.ttable_size);
+  else
+    active_eva_ = std::move(e);
+}
+
+///
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the object passes the internal consistency check.
 ///
-template<class T>
-bool basic_search<T>::debug(bool verbose) const
+template<class T, template<class> class ES>
+bool search<T, ES>::debug(bool verbose) const
 {
   return prob_->debug(verbose);
 }

@@ -1,34 +1,13 @@
 /**
- *
- *  \file vita.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
- *
- *  \mainpage VITA v0.9.8
- *
- *  \section Introduction
- *  Welcome to the Vita project.
- *
- *  This is the reference guide for the Vita APIs.
- *
- *  \section note_sec Notes
- *  New versions of this program will be available at
- *  http://code.google.com/p/vita/
- *
- *  Please reports any suggestions and/or bugs to:
- *  <dl>
- *    <dt>Forum</dt>
- *    <dd>http://groups.google.com/group/vita-prj</dd>
- *    <dt>Issue tracking system</dt>
- *    <dd>http://code.google.com/p/vita/issues/list</dd>
- *  </dl>
- *
  */
 
 #if !defined(VITA_H)
@@ -36,11 +15,10 @@
 
 #include <cassert>
 #include <cstdint>
+#include <limits>
 #include <memory>
 
-#include <boost/spirit/home/support/detail/hold_any.hpp>
-
-#include "compatibility_patch.h"
+#include "kernel/compatibility_patch.h"
 
 namespace vita
 {
@@ -80,11 +58,6 @@ namespace vita
   const double float_epsilon(0.0001);
 
   ///
-  /// A shortcut for the any type (usually boost::any or boost::spirit::any).
-  ///
-  typedef boost::spirit::hold_any any;
-
-  ///
   /// \tparam T a C++ type.
   /// \return the maximum value of type \a T.
   ///
@@ -94,26 +67,24 @@ namespace vita
   }
 
   ///
-  /// \param a an any.
-  /// \return the value contained in \a a.
+  /// An implementation of make_unique() as proposed by Herb Sutter in
+  /// GotW #102.
   ///
-  template<class T> inline T any_cast(const any &a)
+  template<typename T, typename ...Args>
+  std::unique_ptr<T> make_unique(Args&& ...args)
   {
-    // We must choose the right any_cast (it depends on any typedef).
-    // The alternative is: return boost::any_cast<T>(a);
-    return boost::spirit::any_cast<T>(a);
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
   }
 
-  /// \brief Prefix for debug messages.
+  /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";
-  /// \brief Prefix for error messages.
+  /// \brief Prefix for error messages
   const char k_s_error[] = "[ERROR]";
-  /// \brief Prefix for information messages.
+  /// \brief Prefix for information messages
   /// Information messages regard the status of the program.
   const char k_s_info[] = "[INFO]";
-  /// \brief Prefix for warning messages.
+  /// \brief Prefix for warning messages
   const char k_s_warning[] = "[WARNING]";
-
 }  // namespace vita
 
 /// \page page1 VITA Architecture

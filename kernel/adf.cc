@@ -1,20 +1,19 @@
 /**
- *
- *  \file adf.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/lexical_cast.hpp>
 
-#include "adf.h"
-#include "interpreter.h"
+#include "kernel/adf.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {
@@ -62,9 +61,9 @@ namespace vita
   /// Adf functions need input parameters from the a context (contrary to
   /// adt::eval).
   ///
-  any adf::eval(interpreter *i) const
+  any adf::eval(interpreter<individual> *i) const
   {
-    return interpreter(core_.code, i).run();
+    return interpreter<individual>(core_.code, i).run();
   }
 
   ///
@@ -97,8 +96,8 @@ namespace vita
   bool adf::debug() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym.get() == this)
+    for (const auto &l : core_.code)
+      if (core_.code[l].sym == this)
         return false;
 
     return core_.debug() && function::debug();
@@ -122,9 +121,9 @@ namespace vita
   /// Adt hasn't input parameters so the context is ignored (contrary to
   /// adf::eval).
   ///
-  any adt::eval(interpreter *) const
+  any adt::eval(interpreter<individual> *) const
   {
-    return interpreter(core_.code).run();
+    return interpreter<individual>(core_.code).run();
   }
 
   ///
@@ -157,8 +156,8 @@ namespace vita
   bool adt::debug() const
   {
     // No recursive calls.
-    for (individual::const_iterator i(core_.code); i(); ++i)
-      if (i->sym.get() == this)
+    for (const auto &l : core_.code)
+      if (core_.code[l].sym == this)
         return false;
 
     return core_.debug() && terminal::debug();

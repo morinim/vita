@@ -1,14 +1,13 @@
 /**
- *
- *  \file compatibility_patch.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 //#pragma GCC diagnostic ignored "-Wformat"
@@ -21,6 +20,7 @@
 #  include <windows.h>
 #else
 #  include <termios.h>
+#  include <unistd.h>
 #endif
 
 namespace vita
@@ -41,9 +41,9 @@ namespace vita
 #  define ROTL64(x, y)  rotl64(x, y)
 #endif
 
-  // A way to hide warnings about variables only used in compile time asserts.
-  // There are GCC compiler flags that control unused warnings, but I want a
-  // selective behaviour (generally it is useful to check for dead code).
+  /// A way to hide warnings about variables only used in compile time asserts.
+  /// There are GCC compiler flags that control unused warnings, but I want a
+  /// selective behaviour (generally it is useful to check for dead code).
 #if defined(__GNUC__)
 #  define VARIABLE_IS_NOT_USED __attribute__ ((unused))
 #else

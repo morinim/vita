@@ -1,21 +1,20 @@
 /**
- *
- *  \file argument.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/lexical_cast.hpp>
 
-#include "argument.h"
-#include "gene.h"
-#include "interpreter.h"
+#include "kernel/argument.h"
+#include "kernel/gene.h"
+#include "kernel/interpreter.h"
 
 namespace vita
 {
@@ -29,7 +28,7 @@ namespace vita
   /// \c i (argument(i)) varies depending on the function being evaluated
   /// (instead, adf functions have a precise, fixed signature).
   ///
-  argument::argument(size_t n)
+  argument::argument(unsigned n)
     : terminal("ARG", category_t(0), false, false, 0), index_(n)
   {
     assert(debug());
@@ -38,7 +37,7 @@ namespace vita
   ///
   /// \return the index of the argument.
   ///
-  size_t argument::index() const
+  unsigned argument::index() const
   {
     return index_;
   }
@@ -55,9 +54,9 @@ namespace vita
   /// \param[in] agent current interpreter
   /// \return the value of the argument.
   ///
-  any argument::eval(interpreter *agent) const
+  any argument::eval(interpreter<individual> *agent) const
   {
-    return agent->eval_adf_arg(index_);
+    return agent->fetch_adf_arg(index_);
   }
 
   ///

@@ -1,14 +1,13 @@
 /**
- *
- *  \file environment.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(ENVIRONMENT_H)
@@ -20,8 +19,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-#include "fitness.h"
-#include "symbol_set.h"
+#include "kernel/fitness.h"
 
 namespace vita
 {
@@ -41,8 +39,6 @@ namespace vita
     void log(boost::property_tree::ptree *const,
              const std::string & = "") const;
 
-    void insert(const symbol::ptr &);
-
     bool debug(bool, bool) const;
 
   public:  // Data members.
@@ -59,19 +55,30 @@ namespace vita
     /// be changed afterwards.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t code_length = 0;
+    unsigned code_length = 0;
 
     /// The number of symbols in the patch section (a section of the genome
     /// that contains terminals only).
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t patch_length = 0;
+    unsigned patch_length = 0;
 
-    /// Number of individuals in the population.
+    /// Number of layers for the population.
+    /// \warning
+    /// When the evolution strategy is vita::basic_std_es, using a \a n-layer
+    /// population is like running \a n evolutions "in parallel" (the
+    /// sub-populations of each layer don't interact).
+    /// A value greater than one is usually choosen for vita::basic_alps_es or
+    /// with other strategies that allow migrants.
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    unsigned layers = 0;
+
+    /// Number of individuals in a layer of the population.
     ///
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    size_t individuals = 0;
+    unsigned individuals = 0;
 
     /// An elitist algorithm is one that ALWAYS retains in the population the
     /// best individual found so far. With higher elitism the population will
@@ -84,16 +91,18 @@ namespace vita
     /// programs in the Genetic Programming algorithm. It causes random
     /// changes in individuals.
     ///
-    /// \note
+    /// \warning
     /// > p_cross + p_mutation != 1.0
     /// \a p_mutation is the probability to mutate a gene; it is not the
     /// probability to choose the the mutation operator (the latter is
     /// 1.0 - p_cross).
     ///
+    /// \note
+    /// A negative value means means undefined (auto-tune).
     /// \see
     /// * individual::mutation;
     /// * operation_strategy::run.
-    boost::optional<double> p_mutation;
+    double p_mutation;
 
     /// \brief Crossover probability.
     ///
@@ -122,7 +131,7 @@ namespace vita
     /// equivalent to selecting individuals at random.
     /// \note
     /// A length of 0 means undefined (auto-tune).
-    size_t tournament_size = 0;
+    unsigned tournament_size = 0;
 
     /// Switches Dynamic Subset Selection on/off.
     /// \see search::dss()
@@ -135,10 +144,13 @@ namespace vita
     /// to involve only parents from i's local neightborhood, where the
     /// neightborhood is defined as all individuals within distance
     /// \c mate_zone/2 of i (0 for panmictic).
-    boost::optional<size_t> mate_zone;
+    boost::optional<unsigned> mate_zone;
 
     /// Maximun number of generations allowed before terminate a run.
-    boost::optional<unsigned> g_since_start;
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    unsigned generations;
+
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
     boost::optional<unsigned> g_without_improvement;
@@ -164,6 +176,9 @@ namespace vita
     /// Should we save a dynamic execution status file?
     bool stat_dynamic = false;
 
+    /// Should we save dynamic statistics about layers status?
+    bool stat_layers = false;
+
     /// Should we save a dynamic population status file?
     /// \warning It can be quite slow!
     bool stat_population = false;
@@ -181,10 +196,51 @@ namespace vita
     /// a negative value means not used (only \a f_threashold is used).
     double a_threashold = -1.0;
 
-    symbol_set sset;
+    ///
+    /// \brief Parameters for the Age-Layered Population Structure (ALPS)
+    ///        paradigm.
+    ///
+    /// ALPS is a meta heuristic for overcoming premature convergence by
+    /// running multiple instances of a search algorithm in parallel, with each
+    /// instance in its own age layer and having its own population.
+    ///
+    struct alps_parameters
+    {
+      /// The maximum ages for age layers is monotonically increasing and
+      /// different methods can be used for setting these values. Since there
+      /// is generally little need to segregate individuals which are within a
+      /// few "generations" of each other, these values are then multiplied by
+      /// an \a age_gap parameter. In addition, this allows individuals in the
+      /// first age-layer some time to be optimized before them, or their
+      /// offspring, are pushed to the next age layer.
+      /// For instance, with 6 age layers, a linear aging-scheme and an age gap
+      /// of 20, the maximum ages for the layers are: 20, 40, 60, 80, 100, 120.
+      ///
+      /// Also, the \a age_gap parameter sets the frequency of how often the
+      /// first layer is restarted.
+      ///
+      /// \note
+      /// A value of 0 means undefined (auto-tune).
+      unsigned age_gap = 20;
+
+      /// We already have a parent (individual) from a layer, which is the
+      /// probability that the second parent will be extracted from the same
+      /// layer? (with ALPS it could be taken from the previous layer).
+      /// \note
+      /// A probability of -1.0 means undefined (auto-tune).
+      double p_same_layer = 0.75;
+    } alps;
+
+    struct team_parameters
+    {
+      /// 0 is auto-tune;
+      /// > 1 means team mode.
+      unsigned individuals = 4;
+    } team;
 
     static const char arl_filename[];
     static const char dyn_filename[];
+    static const char lys_filename[];
     static const char pop_filename[];
     static const char sum_filename[];
     static const char tst_filename[];

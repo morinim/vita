@@ -22,8 +22,8 @@
 /// \note
 /// This is usually called for filling the patch section of an individual.
 ///
-template<size_t K>
-basic_gene<K>::basic_gene(const symbol::ptr &t) : sym(t)
+template<unsigned K>
+basic_gene<K>::basic_gene(symbol *t) : sym(t)
 {
   assert(sym->terminal());
 
@@ -42,31 +42,35 @@ basic_gene<K>::basic_gene(const symbol::ptr &t) : sym(t)
 ///       {{    x,   null}}   // [2] X
 ///     };
 ///
-template<size_t K>
+template<unsigned K>
 basic_gene<K>::basic_gene(
-  const std::pair<symbol::ptr, std::vector<index_t>> &g) : sym(g.first)
+  const std::pair<symbol *, std::vector<index_t>> &g) : sym(g.first)
 {
   if (sym->parametric())
     par = sym->init();
   else
-    for (size_t i(0); i < sym->arity(); ++i)
+  {
+    const auto arity(sym->arity());
+    for (auto i(decltype(arity){0}); i < arity; ++i)
     {
       assert(g.second[i] <= type_max(args[0]));
       args[i] = g.second[i];
     }
+  }
 }
 
 ///
-/// \param[in] t a terminal.
+/// \param[in] s a symbol.
+/// \param[in] from a starting locus in the genome.
+/// \param[in] sup an upper limit in the genome.
 ///
-/// A new gene built from terminal \a t.
+/// A new gene built from symbol \a s with argument in the [from;sup[ range.
 ///
 /// \note
 /// This is usually called for filling the standard section of an individual.
 ///
-template<size_t K>
-basic_gene<K>::basic_gene(const symbol::ptr &s, index_t from, index_t sup)
-  : sym(s)
+template<unsigned K>
+basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
 {
   assert(from < sup);
 
@@ -74,8 +78,8 @@ basic_gene<K>::basic_gene(const symbol::ptr &s, index_t from, index_t sup)
     par = sym->init();
   else
   {
-    const size_t arity(sym->arity());
-    for (size_t i(0); i < arity; ++i)
+    const auto arity(sym->arity());
+    for (auto i(decltype(arity){0}); i < arity; ++i)
     {
       assert(sup <= type_max(args[0]));
       args[i] = random::between(from, sup);
@@ -87,7 +91,7 @@ basic_gene<K>::basic_gene(const symbol::ptr &s, index_t from, index_t sup)
 /// \param[in] g second term of comparison.
 /// \return \c true if \c this == \a g
 ///
-template<size_t K>
+template<unsigned K>
 bool basic_gene<K>::operator==(const basic_gene<K> &g) const
 {
   if (sym != g.sym)
@@ -96,8 +100,8 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
   if (sym->parametric())
     return par == g.par;
 
-  const size_t n(sym->arity());
-  for (size_t i(0); i < n; ++i)
+  const auto arity(sym->arity());
+  for (auto i(decltype(arity){0}); i < arity; ++i)
     if (args[i] != g.args[i])
       return false;
 

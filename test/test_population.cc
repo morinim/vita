@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "population.h"
+#include "kernel/population.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE population
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Creation)
     env.individuals = vita::random::between(30, 200);
     env.tournament_size = vita::random::between<size_t>(1, *env.mate_zone);
 
-    vita::population<vita::individual> pop(env);
+    vita::population<vita::individual> pop(env, sset);
 
     BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals());
 
@@ -51,17 +51,26 @@ BOOST_AUTO_TEST_CASE(Serialization)
     env.tournament_size = vita::random::between<size_t>(1, *env.mate_zone);
 
     std::stringstream ss;
-    vita::population<vita::individual> pop1(env);
+    vita::population<vita::individual> pop1(env, sset);
 
     BOOST_REQUIRE(pop1.save(ss));
 
-    vita::population<vita::individual> pop2(env);
+    vita::population<vita::individual> pop2(env, sset);
     BOOST_REQUIRE(pop2.load(ss));
     BOOST_REQUIRE(pop2.debug(true));
 
+    BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());
     BOOST_REQUIRE_EQUAL(pop1.individuals(), pop2.individuals());
-    for (size_t i(0); i < pop1.individuals(); ++i)
-      BOOST_CHECK_EQUAL(pop1[i], pop2[i]);
+    for (unsigned l(0); l < pop1.layers(); ++l)
+    {
+      BOOST_REQUIRE_EQUAL(pop1.individuals(l), pop2.individuals(l));
+
+      for (unsigned i(0); i < pop1.individuals(); ++i)
+      {
+        const vita::coord c{l, i};
+        BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
+      }
+    }
   }
 }
 

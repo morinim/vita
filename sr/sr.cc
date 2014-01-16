@@ -1,14 +1,13 @@
 /**
- *
- *  \file sr.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/algorithm/string.hpp>
@@ -21,21 +20,21 @@ namespace po = boost::program_options;
 #include <iterator>
 #include <string>
 
-#include "environment.h"
-#include "search.h"
-#include "src_evaluator.h"
-#include "src_problem.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/src/evaluator.h"
+#include "kernel/src/problem.h"
+#include "kernel/src/primitive/factory.h"
+#include "kernel/src/search.h"
 
 #include "command_line_interpreter.h"
 
 namespace
 {
   const std::string vita_sr_version1(
-    "Vita - Symbolic Regression and classification v0.9.8"
+    "Vita - Symbolic Regression and classification v0.9.9"
     );
   const std::string vita_sr_version2(
-    "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
+    "Copyright 2011-2014 EOS di Manlio Morini (http://www.eosdev.it)"
     );
   const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
@@ -94,7 +93,7 @@ void fix_parameters(vita::src_problem *const problem)
     }
   }
 
-  if (env.f_threashold.empty() && env.a_threashold < 0.0)
+  if (env.f_threashold == vita::fitness_t() && env.a_threashold < 0.0)
   {
     if (problem->classification())
     {
@@ -105,7 +104,7 @@ void fix_parameters(vita::src_problem *const problem)
     }
     else  // symbolic regression
     {
-      env.f_threashold = {-0.0001};
+      env.f_threashold = vita::fitness_t(-0.0001);
 
       std::cout << vita::k_s_info << " Fitness threashold set to "
                 << env.f_threashold << std::endl;
@@ -147,6 +146,10 @@ namespace ui
   /// Number of runs to be tried.
   unsigned runs(1);
 
+  // Active evaluator.
+  vita::evaluator_id eva(vita::k_sup_evaluator);
+  std::string eva_args;
+
   /// Reference problem (the problem we will work on).
   vita::src_problem *problem;
 
@@ -175,7 +178,7 @@ namespace ui
     problem->env.brood_recombination = size;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Brood size for recombination is "
+      std::cout << vita::k_s_info << " Brood size for recombination set to "
                 << size << std::endl;
   }
 
@@ -190,7 +193,8 @@ namespace ui
     problem->env.code_length = length;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Code length is " << length << std::endl;
+      std::cout << vita::k_s_info << " Code length set to "
+                << length << std::endl;
   }
 
   ///
@@ -217,7 +221,8 @@ namespace ui
     problem->env.p_cross = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Crossover rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Crossover rate set to " << r
+                << std::endl;
   }
 
   ///
@@ -295,32 +300,36 @@ namespace ui
   ///
   void evaluator(const std::string &v)
   {
-    const std::string::size_type sep(v.find(':'));
+    const auto sep(v.find(':'));
     const std::string keyword(v.substr(0, sep));
 
-    std::string args;
+    eva_args = "";
     if (sep != std::string::npos && sep + 1 < v.size())
-      args = v.substr(sep + 1);
+      eva_args = v.substr(sep + 1);
 
     bool ok(true);
     if (keyword == "count")
-      problem->set_evaluator(vita::src_problem::k_count_evaluator);
-    else if (keyword == "sae")
-      problem->set_evaluator(vita::src_problem::k_sae_evaluator);
-    else if (keyword == "sse")
-      problem->set_evaluator(vita::src_problem::k_sse_evaluator);
+      eva = vita::k_count_evaluator;
+    else if (keyword == "mae")
+      eva = vita::k_mae_evaluator;
+    else if (keyword == "rmae")
+      eva = vita::k_rmae_evaluator;
+    else if (keyword == "mse")
+      eva = vita::k_mse_evaluator;
+    else if (keyword == "binary")
+      eva = vita::k_bin_evaluator;
     else if (keyword == "dynslot")
-      problem->set_evaluator(vita::src_problem::k_dyn_slot_evaluator, args);
+      eva = vita::k_dyn_slot_evaluator;
     else if (keyword == "gaussian")
-      problem->set_evaluator(vita::src_problem::k_gaussian_evaluator);
+      eva = vita::k_gaussian_evaluator;
     else
       ok = false;
 
     if (ok)
     {
       std::cout << vita::k_s_info << " Evaluator is " << keyword;
-      if (!args.empty())
-        std::cout << " (parameters: " << args << ")";
+      if (!eva_args.empty())
+        std::cout << " (parameters: " << eva_args << ")";
       std::cout << std::endl;
     }
     else
@@ -346,10 +355,10 @@ namespace ui
   ///
   void generations(unsigned g)
   {
-    problem->env.g_since_start = g;
+    problem->env.generations = g;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Generations is " << g << std::endl;
+      std::cout << vita::k_s_info << " Generations set to " << g << std::endl;
   }
 
   ///
@@ -358,11 +367,15 @@ namespace ui
   void go(bool = true)
   {
     if (problem->data()->size())
-      if (problem->env.sset.enough_terminals())
+      if (problem->sset.enough_terminals())
       {
         fix_parameters(problem);
 
-        vita::search s(problem);
+        vita::src_search<vita::individual, vita::alps_es> s(problem);
+
+        if (eva < vita::k_sup_evaluator)
+          s.set_evaluator(eva, eva_args);
+
         s.run(runs);
       }
       else
@@ -382,8 +395,8 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info
-                << " Max number of generations without improvement is " << g
-                << std::endl;
+                << " Max number of generations without improvement set to "
+                << g << std::endl;
   }
 
   ///
@@ -404,7 +417,7 @@ namespace ui
     problem->env.mate_zone = z;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Mate zone is " << z << std::endl;
+      std::cout << vita::k_s_info << " Mate zone set to " << z << std::endl;
   }
 
   ///
@@ -431,7 +444,8 @@ namespace ui
     problem->env.p_mutation = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Mutation rate is " << r << std::endl;
+      std::cout << vita::k_s_info << " Mutation rate set to " << r
+                << std::endl;
   }
 
   ///
@@ -476,13 +490,34 @@ namespace ui
     problem->env.tournament_size = n;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Tournament size is " << n << std::endl;
+      std::cout << vita::k_s_info << " Tournament size set to " << n
+                << std::endl;
   }
 
   ///
-  /// \param[in] size number of programs/individuals in the population.
+  /// \param[in] l number of layers of the population
   ///
-  /// Sets the number of programs/individuals in the population.
+  /// Sets the number of layers of the population.
+  ///
+  void layers(unsigned l)
+  {
+    problem->env.layers = l;
+
+    if (problem->env.verbosity >= 2)
+    {
+      std::cout << vita::k_s_info << " Number of layers set to ";
+      if (l)
+        std::cout << l;
+      else
+        std::cout << "automatic";
+      std::cout << std::endl;
+    }
+  }
+
+  ///
+  /// \param[in] size number of individuals in a layer of the population.
+  ///
+  /// Sets the number of individuals in a layer of the population.
   ///
   void population_size(unsigned size)
   {
@@ -490,7 +525,7 @@ namespace ui
 
     if (problem->env.verbosity >= 2)
     {
-      std::cout << vita::k_s_info << " Population size is ";
+      std::cout << vita::k_s_info << " Population size set to ";
       if (size)
         std::cout << size;
       else
@@ -523,7 +558,8 @@ namespace ui
     runs = r;
 
     if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Number of runs is " << r << std::endl;
+      std::cout << vita::k_s_info << " Number of runs set to " << r
+                << std::endl;
   }
 
   ///
@@ -560,6 +596,18 @@ namespace ui
     if (problem->env.verbosity >= 2)
       std::cout << vita::k_s_info << " Dynamic evolution logging is "
                 << problem->env.stat_dynamic << std::endl;
+  }
+
+  ///
+  /// \param[in] v should we save the layers status file?
+  ///
+  void stat_layers(const std::string &v)
+  {
+    problem->env.stat_layers = is_true(v);
+
+    if (problem->env.verbosity >= 2)
+      std::cout << vita::k_s_info << " Layers logging is "
+                << problem->env.stat_layers << std::endl;
   }
 
   ///
@@ -626,7 +674,7 @@ namespace ui
                   << std::endl;
     }
 
-    if (!problem->env.sset.enough_terminals())
+    if (!problem->sset.enough_terminals())
     {
       std::cerr << vita::k_s_error << " Too few terminals" << std::endl;
       return false;
@@ -664,7 +712,7 @@ namespace ui
 
         set = (fitness <= 0.0);
         if (set)
-          problem->env.f_threashold = {fitness};
+          problem->env.f_threashold = vita::fitness_t(fitness);
       }
     }
 
@@ -780,7 +828,7 @@ int parse_command_line(int argc, char *const argv[])
     po::options_description config("Config");
     config.add_options()
       ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
-       "sets the preferred evaluator (count, sae, sse, dynslot, gaussian)")
+       "sets preferred evaluator (count, mae, rmae, mse, binary, dynslot, gaussian)")
       ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
        "sets the seed for the pseudo-random number generator. "\
        "Pseudo-random sequences are repeatable by using the same seed value")
@@ -789,8 +837,13 @@ int parse_command_line(int argc, char *const argv[])
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.
-    po::options_description individual("Individual");
+    po::options_description individual("Population/Individual");
     individual.add_options()
+      ("population-size,P",
+       po::value<unsigned>()->notifier(&ui::population_size),
+       "sets the number of individuals in a layer of the population")
+      ("layers,L", po::value<unsigned>()->notifier(&ui::layers),
+       "sets the number of layers of the population")
       ("code-length,l", po::value<unsigned>()->notifier(&ui::code_length),
        "sets the code/genome length of an individual");
 
@@ -812,9 +865,6 @@ int parse_command_line(int argc, char *const argv[])
     // and in config file.
     po::options_description evolution("Evolution");
     evolution.add_options()
-      ("population-size,P",
-       po::value<unsigned>()->notifier(&ui::population_size),
-       "sets the number of programs/individuals in the population")
       ("elitism", po::value<std::string>()->notifier(&ui::elitism),
        "when elitism is true an individual will never replace a better one")
       ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),
@@ -850,6 +900,8 @@ int parse_command_line(int argc, char *const argv[])
        "saves the list of active ADFs")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
+      ("stat-layers", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_layers),
+       "generates a layers status file")
       ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
        "generates a population status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
@@ -895,7 +947,6 @@ int main(int argc, char *const argv[])
   std::cout << ui::header << std::endl;
 
   vita::src_problem problem;
-
   ui::problem = &problem;
 
   const int ret(parse_command_line(argc, argv));

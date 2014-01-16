@@ -14,8 +14,8 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "search.h"
-#include "src_problem.h"
+#include "kernel/src/search.h"
+#include "kernel/src/problem.h"
 
 int main()
 {
@@ -23,7 +23,7 @@ int main()
 
   if (problem.load("titanic_train.csv").first)  // reading data file
   {
-    vita::search s(&problem);
+    vita::src_search<vita::individual, vita::std_es> s(&problem);
     vita::individual best(s.run());             // starting search
 
     std::cout << best << std::endl;             // print result

@@ -1,14 +1,13 @@
 /**
- *
- *  \file interpreter.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(INTERPRETER_H)
@@ -16,36 +15,73 @@
 
 #include <boost/optional.hpp>
 
-#include "matrix.h"
+#include "kernel/matrix.h"
 
 namespace vita
 {
   class individual;
 
-  class interpreter
+  ///
+  /// \brief Minimum interface of an interpreter
+  ///
+  /// \tparam T the type of individual used.
+  ///
+  template<class T>
+  class core_interpreter
   {
   public:
-    explicit interpreter(const individual &, interpreter *const = 0);
+    explicit core_interpreter(const T &, core_interpreter<T> * = nullptr);
 
-    any run();
-    any run(const locus &);
+    virtual any run() = 0;
 
-    any eval();
-    any eval(size_t);
-    any eval_adf_arg(size_t);
+    virtual bool debug() const;
 
-    bool debug() const;
+  protected:
+    const T &prg_;
 
-    static double to_double(const any &);
-    static std::string to_string(const any &);
+    core_interpreter<T> *const context_;
+  };
+
+  ///
+  /// \brief "Run" the individual
+  ///
+  /// \tparam T the type of individual used.
+  ///
+  /// The interpreter class "executes" an individual (a program) in its
+  /// environment.
+  ///
+  template<class T> class interpreter;
+
+  ///
+  /// \brief A template specialization for interpreter<T> class
+  ///
+  /// \note
+  /// We don't have a generic interpreter<T> implementation (e.g. see the
+  /// lambda_f source code) because interpreter and individual are strongly
+  /// coupled: the interpreter must be build around the peculiarities of
+  /// the specific individual class.
+  ///
+  template<>
+  class interpreter<individual> : public core_interpreter<individual>
+  {
+  public:
+    explicit interpreter(const individual &,
+                         interpreter<individual> * = nullptr);
+
+    virtual any run() override;
+
+    any fetch_param();
+    any fetch_arg(unsigned);
+    any fetch_adf_arg(unsigned);
+
+    virtual bool debug() const override;
+
+  private:  // Private methods.
+    any run_locus(const locus &);
 
   private:
     // Instruction pointer.
     locus ip_;
-
-    interpreter *const context_;
-
-    const individual &ind_;
 
     mutable matrix<boost::optional<any>> cache_;
   };
@@ -54,6 +90,8 @@ namespace vita
   /// \example example5.cc
   /// Output value calculation for an individual.
   ///
+
+#include "kernel/interpreter_inl.h"
 }  // namespace vita
 
 #endif  // INTERPRETER_H

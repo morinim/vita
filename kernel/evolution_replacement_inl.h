@@ -1,39 +1,40 @@
 /**
- *
- *  \file evolution_replacement_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_REPLACEMENT_INL_H)
 #define      EVOLUTION_REPLACEMENT_INL_H
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
-replacement_strategy<T>::replacement_strategy(evolution<T> *const evo)
-  : evo_(evo)
+strategy<T>::strategy(population<T> &pop, evaluator<T> &eva)
+  : pop_(pop), eva_(eva)
 {
 }
 
 ///
-/// \param[in] evo pointer to the current evolution object.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
-family_competition_rp<T>::family_competition_rp(evolution<T> *const evo)
-  : replacement_strategy<T>(evo)
+family_competition<T>::family_competition(population<T> &pop, evaluator<T> &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
 ///
-/// \param[in] parent indexes of the parents (in the population).
+/// \param[in] parent coordinates of the parents (in the population).
 /// \param[in] offspring vector of the "children".
 /// \param[in] s statistical \a summary.
 ///
@@ -42,19 +43,18 @@ family_competition_rp<T>::family_competition_rp(evolution<T> *const evo)
 ///   child is better.
 ///
 template<class T>
-void family_competition_rp<T>::run(const std::vector<size_t> &parent,
-                                   const std::vector<T> &offspring,
-                                   summary<T> *const s)
+void family_competition<T>::run(const std::vector<coord> &parent,
+                                const std::vector<T> &offspring,
+                                summary<T> *const s)
 {
-  population<T> &pop(replacement_strategy<T>::evo_->population());
+  auto &pop(this->pop_);
   assert(!boost::indeterminate(pop.env().elitism));
 
-  const fitness_t fit_off(replacement_strategy<T>::evo_->fitness(offspring[0]));
+  const fitness_t fit_off(this->eva_(offspring[0]));
 
   const fitness_t f_parent[] =
   {
-    replacement_strategy<T>::evo_->fitness(pop[parent[0]]),
-    replacement_strategy<T>::evo_->fitness(pop[parent[1]])
+    this->eva_(pop[parent[0]]), this->eva_(pop[parent[1]])
   };
   const bool id_worst(f_parent[0] < f_parent[1] ? 0 : 1);
 
@@ -95,20 +95,20 @@ void family_competition_rp<T>::run(const std::vector<size_t> &parent,
 }
 
 ///
-/// \param[in] evo pointer to the evolution object that is using the
-///                kill_tournament.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
-kill_tournament<T>::kill_tournament(evolution<T> *const evo)
-  : replacement_strategy<T>(evo)
+tournament<T>::tournament(population<T> &pop, evaluator<T> &eva)
+  : strategy<T>(pop, eva)
 {
 }
 
 ///
-/// \param[in] parent indexes of the candidate parents.
+/// \param[in] parent coordinates of the candidate parents.
 ///                   The list is sorted in descending fitness, so the
-///                   last element is the index of the worst individual of
-///                   the tournament.
+///                   last element is the coordinates of the worst individual
+///                   of the tournament.
 /// \param[in] offspring vector of the "children".
 /// \param[in] s statistical \a summary.
 ///
@@ -117,18 +117,18 @@ kill_tournament<T>::kill_tournament(evolution<T> *const evo)
 ///   child is better.
 ///
 template<class T>
-void kill_tournament<T>::run(const std::vector<size_t> &parent,
-                             const std::vector<T> &offspring,
-                             summary<T> *const s)
+void tournament<T>::run(const std::vector<coord> &parent,
+                        const std::vector<T> &offspring,
+                        summary<T> *const s)
 {
-  population<T> &pop(replacement_strategy<T>::evo_->population());
+  auto &pop(this->pop_);
 
-  const auto fit_off(replacement_strategy<T>::evo_->fitness(offspring[0]));
+  const auto fit_off(this->eva_(offspring[0]));
 
   // In old versions of Vita, the individual to be replaced was chosen with
   // an ad-hoc kill tournament. Something like:
   //
-  //   const size_t rep_idx(kill_tournament(parent[0]));
+  //   const coord rep_idx(kill_tournament(parent[0]));
   //
   // Now we perform just one tournament for choosing the parents; the
   // individual to be replaced is selected among the worst individuals of
@@ -137,8 +137,8 @@ void kill_tournament<T>::run(const std::vector<size_t> &parent,
   // is greater than 2 we perform a traditional selection / replacement
   // scheme; if it is smaller we perform a family competition replacement
   // (aka deterministic / probabilistic crowding).
-  const size_t rep_idx(parent.back());
-  const auto f_rep_idx(replacement_strategy<T>::evo_->fitness(pop[rep_idx]));
+  const coord rep_idx(parent.back());
+  const auto f_rep_idx(this->eva_(pop[rep_idx]));
   const bool replace(f_rep_idx < fit_off);
 
   assert(!boost::indeterminate(pop.env().elitism));
@@ -153,17 +153,135 @@ void kill_tournament<T>::run(const std::vector<size_t> &parent,
 }
 
 ///
-/// \param[in] evo pointer to the evolution object that is using the
-///                pareto_tournament.
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
 ///
 template<class T>
-pareto_tournament<T>::pareto_tournament(evolution<T> *const evo)
-  : replacement_strategy<T>(evo)
+alps<T>::alps(population<T> &pop, evaluator<T> &eva) : strategy<T>(pop, eva)
 {
 }
 
 ///
-/// \param[in] parent indexes of the candidate parents.
+/// \param[in] l a layer.
+///
+/// Try to move individuals in layer \a l in the upper layer (calling
+/// try_add_to_layer for each individual).
+///
+template<class T>
+void alps<T>::try_move_up_layer(unsigned l)
+{
+  auto &pop(this->pop_);
+
+  if (l + 1 < pop.layers())
+    for (unsigned i(0); i < pop.individuals(l); ++i)
+      try_add_to_layer(l + 1, pop[{l, i}]);
+}
+
+///
+/// \param[in] layer a layer
+/// \param[in] incoming an individual
+///
+/// We would like to add \a incoming in layer \a layer. The insertion will take
+/// place if:
+/// * \a layer is not full or...
+/// * after a "kill tournament" selection, the worst individual found is
+///   too old for \a layer while the incoming one is within the limits or...
+/// * the worst individual has a lower fitness than the incoming one and
+///   both are simultaneously within/outside the time frame of \a layer.
+///
+template<class T>
+void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
+{
+  auto &p(this->pop_);
+  assert(layer < p.layers());
+
+  if (p.individuals(layer) < p.env().individuals)
+    p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
+  else
+  {
+    const auto max_age(p.max_age(layer));
+
+    coord c_worst{layer, random::sup(p.individuals(layer))};
+    fitness_t f_worst(this->eva_(p[c_worst]));
+
+    auto rounds(p.env().tournament_size);
+    while (rounds--)
+    {
+      const coord c_x{layer, random::sup(p.individuals(layer))};
+      const fitness_t f_x(this->eva_(p[c_x]));
+
+      if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > max_age) ||
+          (p[c_worst].age() <= max_age && p[c_x].age() <= max_age &&
+           f_x < f_worst))
+      {
+        c_worst = c_x;
+        f_worst = f_x;
+      }
+    }
+
+    if ((incoming.age() <= max_age && p[c_worst].age() > max_age) ||
+        ((incoming.age() <= max_age || p[c_worst].age() > max_age) &&
+         this->eva_(incoming) >= f_worst))
+    {
+      if (layer + 1 < p.layers())
+        try_add_to_layer(layer + 1, p[c_worst]);
+      p[c_worst] = incoming;
+    }
+  }
+}
+
+///
+/// \param[in] parent coordinates of the candidate parents.
+///                   The list is sorted in descending fitness, so the
+///                   last element is the coordinates of the worst individual
+///                   of the tournament.
+/// \param[in] offspring vector of the "children".
+/// \param[in] s statistical \a summary.
+///
+/// Parameters from the environment:
+/// * elitism is \c true => child replaces a member of the population only if
+///   child is better.
+///
+template<class T>
+void alps<T>::run(const std::vector<coord> &parent,
+                  const std::vector<T> &offspring, summary<T> *const s)
+{
+  const auto layer(std::max(parent[0].layer, parent[1].layer));
+  const fitness_t f_off(this->eva_(offspring[0]));
+
+#if defined(MUTUAL_IMPROVEMENT)
+  const auto &pop(this->pop_);
+
+  // To protect the algorithm from the potential deleterious effect of intense
+  // exploratory dynamics, we can use a constraint which mandate that an
+  // individual must be better than both its parents before insertion into
+  // the population.
+  // See "Exploiting The Path of Least Resistance In Evolution" (Gearoid Murphy
+  // and Conor Ryan).
+  if (f_off > this->eva_(pop[parent[0]]) && f_off > this->eva_(pop[parent[1]]))
+#endif
+  {
+    try_add_to_layer(layer, offspring[0]);
+  }
+
+  if (f_off > s->best->fitness)
+  {
+    s->last_imp =                s->gen;
+    s->best     = {offspring[0], f_off};
+  }
+}
+
+///
+/// \param[in] pop current population.
+/// \param[in] eva current evaluator.
+///
+template<class T>
+pareto<T>::pareto(population<T> &pop, evaluator<T> &eva) : strategy<T>(pop, eva)
+{
+}
+
+///
+/// \param[in] parent coordinates of the candidate parents.
 ///                   The list is sorted in descending pareto-layer
 ///                   dominance (from pareto non dominated front to
 ///                   dominated points.
@@ -189,23 +307,23 @@ pareto_tournament<T>::pareto_tournament(evolution<T> *const evo)
 /// K. Srinivas, S. Armfield, J. Periaux.
 ///
 template<class T>
-void pareto_tournament<T>::run(const std::vector<size_t> &parent,
-                               const std::vector<T> &offspring,
-                               summary<T> *const s)
+void pareto<T>::run(const std::vector<coord> &parent,
+                    const std::vector<T> &offspring,
+                    summary<T> *const s)
 {
-  population<T> &pop(replacement_strategy<T>::evo_->population());
+  auto &pop(this->pop_);
 
-  const auto fit_off(replacement_strategy<T>::evo_->fitness(offspring[0]));
+  const auto fit_off(this->eva_(offspring[0]));
 /*
   for (auto i(parent.rbegin()); i != parent.rend(); ++i)
   {
-    const auto fit_i(replacement_strategy<T>::evo_->fitness(pop[*i]));
+    const auto fit_i(this->eva_(pop[*i]));
 
     if (fit_off.dominating(fit_i))
     {
-      pop[*i] = offspring[0];
+      pop[i] = offspring[0];
 
-      if (fit_off[0] > s->best->fitness[0])
+      if (fit_off[0] > s->best.fitness[0])
       {
         s->last_imp =                  s->gen;
         s->best     = {offspring[0], fit_off};
@@ -219,7 +337,7 @@ void pareto_tournament<T>::run(const std::vector<size_t> &parent,
   bool dominated(false);
   for (const auto &i : parent)
   {
-    const auto fit_i(replacement_strategy<T>::evo_->fitness(pop[i]));
+    const auto fit_i(this->eva_(pop[i]));
 
     if (fit_i.dominating(fit_off))
     {

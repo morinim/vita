@@ -1,22 +1,24 @@
 /**
- *
- *  \file fitness.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(FITNESS_H)
 #define      FITNESS_H
 
+#include <array>
+#include <cmath>
+#include <iomanip>
 #include <iostream>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
@@ -25,133 +27,57 @@ namespace vita
   /// A value assigned to an individual which reflects how well the individual
   /// solves the task.
   ///
-  class fitness_t
+  /// \tparam N dimension of the fitness vector
+  ///
+  template<class T, unsigned N>
+  class basic_fitness_t
   {
   public:
-    typedef double base_t;
+    typedef T base_t;
+    enum {size = N};
 
-    fitness_t() {}
-    explicit fitness_t(size_t d,
-                       base_t v = std::numeric_limits<base_t>::lowest())
-      : vect(d, v) { assert(d); }
-    fitness_t(std::initializer_list<base_t> l) : vect(l) {}
+    explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());
+    template<class... Args> basic_fitness_t(Args...);
 
-    /// Operation is performed by first comparing sizes and, if they match,
-    /// the elements are compared sequentially using algorithm equal, which
-    /// stops at the first mismatch.
-    bool operator==(const fitness_t &f) const
-    { return vect == f.vect; }
+    bool operator==(const basic_fitness_t<T, N> &) const;
+    bool operator!=(const basic_fitness_t<T, N> &) const;
+    bool operator>(const basic_fitness_t<T, N> &) const;
+    bool operator>=(const basic_fitness_t<T, N> &) const;
+    bool operator<(const basic_fitness_t<T, N> &) const;
+    bool operator<=(const basic_fitness_t<T, N> &) const;
+    bool dominating(const basic_fitness_t<T, N> &) const;
+    bool almost_equal(const basic_fitness_t<T, N> &, T) const;
 
-    /// Operation is performed by first comparing sizes and, if they match,
-    /// the elements are compared sequentially using algorithm equal, which
-    /// stops at the first mismatch.
-    bool operator!=(const fitness_t &f) const
-    { return vect != f.vect; }
+    T operator[](unsigned i) const { assert(i < N); return vect[i]; }
 
-    /// Behaves as if using algorithm lexicographical_compare, which compares
-    /// the elements sequentially, stopping at the first mismatch.
-    ///
-    /// \note
-    /// A lexicographical comparison is the kind of comparison generally used
-    /// to sort words alphabetically in dictionaries; it involves comparing
-    /// sequentially the elements that have the same position in both ranges
-    /// against each other until one element is not equivalent to the other.
-    /// The result of comparing these first non-matching elements is the result
-    /// of the lexicographical comparison.
-    /// If both sequences compare equal until one of them ends, the shorter
-    /// sequence is lexicographically less than the longer one.
-    bool operator>(const fitness_t &f) const
-    {
-      assert(size() == f.size());
-      return vect > f.vect;
-
-      // An alternative implementation:
-      // > const size_t sup(size());
-      // > for (size_t i(0); i < sup; ++i)
-      // >   if (vect[i] != f.vect[i])
-      // >     return vect[i] > f.vect[i];
-      // > return false;
-    }
-
-    /// Lexicographic ordering.
-    /// \see fitness_t::operator>
-    bool operator>=(const fitness_t &f) const
-    { assert(size() == f.size()); return vect >= f.vect; }
-
-    /// Lexicographic ordering.
-    /// \see fitness_t::operator>
-    bool operator<(const fitness_t &f) const
-    { assert(size() == f.size()); return vect < f.vect; }
-
-    /// Lexicographic ordering.
-    /// \see fitness_t::operator>
-    bool operator<=(const fitness_t &f) const
-    { assert(size() == f.size()); return vect <= f.vect; }
-
-    ///
-    /// \param[in] f second term of comparison.
-    /// \return \c true if \a this is a Pareto improvement of \a f.
-    ///
-    /// \a this dominates \a f (is a Pareto improvement) if:
-    /// * each component of \a this is not strictly worst (less) than the
-    ///   correspondig component of \a f;
-    /// * there is at least one component in which \a this is better than \a f.
-    ///
-    /// \note
-    /// An interesting property is that if a vector x does not dominate a
-    /// vector y, this does not imply that y dominates x (for example they can
-    /// be both non-dominated).
-    ///
-    bool dominating(const fitness_t &f) const
-    {
-      const size_t sup(std::min(size(), f.size()));
-      bool one_better(false);
-
-      for (size_t i(0); i < sup; ++i)
-        if (vect[i] > f.vect[i])
-          one_better = true;
-        else if (vect[i] < f.vect[i])
-          return false;
-
-      return one_better;
-    }
-
-    base_t operator[](size_t i) const
-    { assert(i < size()); return vect[i]; }
-
-    base_t &operator[](size_t i)
-    { assert(i < size()); return vect[i]; }
-
-    size_t size() const
-    { return vect.size(); }
-
-    bool empty() const
-    { return vect.empty(); }
+    T &operator[](unsigned i) { assert(i < N); return vect[i]; }
 
     bool isfinite() const;
     bool isnan() const;
     bool issmall() const;
 
-    fitness_t &operator+=(const fitness_t &);
-    fitness_t &operator-=(const fitness_t &);
-    fitness_t operator-(const fitness_t &) const;
-    fitness_t operator*(const fitness_t &) const;
+    basic_fitness_t &operator+=(const basic_fitness_t &);
+    basic_fitness_t &operator-=(const basic_fitness_t &);
+    basic_fitness_t operator-(const basic_fitness_t &) const;
+    basic_fitness_t operator*(const basic_fitness_t &) const;
 
-    fitness_t operator/(fitness_t::base_t) const;
-    fitness_t operator*(fitness_t::base_t) const;
+    basic_fitness_t operator/(T) const;
+    basic_fitness_t operator*(T) const;
 
-    fitness_t abs() const;
-    fitness_t sqrt() const;
+    basic_fitness_t abs() const;
+    basic_fitness_t sqrt() const;
 
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
   private:
-    std::vector<base_t> vect;
+    std::array<T, N> vect;
   };
 
-  std::ostream &operator<<(std::ostream &, const fitness_t &);
+  using fitness_t = basic_fitness_t<double, 1>;
+
+#include "kernel/fitness_inl.h"
 }  // namespace vita
 
 #endif  // FITNESS_H

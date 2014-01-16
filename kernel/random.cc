@@ -11,7 +11,7 @@
  *
  */
 
-#include "random.h"
+#include "kernel/random.h"
 
 namespace vita
 {
@@ -54,19 +54,19 @@ namespace vita
   /// If \c base is greater than \c n we take a random starting position on the
   /// protractor.
   ///
-  size_t random::ring(size_t base, size_t width, size_t n)
+  unsigned random::ring(unsigned base, unsigned width, unsigned n)
   {
     assert(width);
     assert(n > 1);
 
     if (base >= n)
-      return random::between<size_t>(0, n);
+      return random::between<unsigned>(0, n);
 
     if (width > n)
       width = n;
 
-    const auto offset(n + base - width/2);
+    const auto offset(n + base - width / 2);
 
-    return (offset + random::between<size_t>(0, width)) % n;
+    return (offset + random::between<unsigned>(0, width)) % n;
   }
 }  // Namespace vita

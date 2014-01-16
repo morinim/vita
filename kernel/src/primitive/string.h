@@ -20,10 +20,10 @@
 #include <sstream>
 #include <string>
 
-#include "function.h"
-#include "interpreter.h"
-#include "random.h"
-#include "terminal.h"
+#include "kernel/function.h"
+#include "kernel/interpreter.h"
+#include "kernel/random.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
@@ -35,18 +35,18 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("SIFE", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const any v0(i->eval(0));
+        const any v0(i->fetch_arg(0));
         if (v0.empty())  return v0;
 
-        const any v1(i->eval(1));
+        const any v1(i->fetch_arg(1));
         if (v1.empty())  return v1;
 
         if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
-          return i->eval(2);
+          return i->fetch_arg(2);
         else
-          return i->eval(3);
+          return i->fetch_arg(3);
       }
     };
   }  // namespace str

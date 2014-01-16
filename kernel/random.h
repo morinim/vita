@@ -18,22 +18,21 @@
 #include <random>
 #include <set>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
   class random
   {
   public:
-    // This engine produces integers in the range [0, 2^32-1] with a good
-    // uniform distribution in up to 623 dimensions.
-    typedef std::mt19937 engine_t;
-
     template<class T> static T between(T, T);
+    template<class T> static T sup(T);
+
     template<class T> static const T &element(const std::vector<T> &);
+    template<class T> static T &element(std::vector<T> &);
     template<class T> static const T &element(const std::set<T> &);
 
-    static size_t ring(size_t, size_t, size_t);
+    static unsigned ring(unsigned, unsigned, unsigned);
 
     static bool boolean(double);
     static bool boolean();
@@ -42,6 +41,10 @@ namespace vita
     void randomize();
 
   private:
+    // This engine produces integers in the range [0, 2^32-1] with a good
+    // uniform distribution in up to 623 dimensions.
+    typedef std::mt19937 engine_t;
+
     static engine_t &engine();
   };
 
@@ -87,8 +90,6 @@ namespace vita
 
     using parm_t = decltype(d)::param_type;
     return d(engine(), parm_t{min, sup});
-
-    //return boost::uniform_real<>(min, sup)(engine());
   }
 
   ///
@@ -114,7 +115,20 @@ namespace vita
     using parm_t = decltype(d)::param_type;
 
     return d(engine(), parm_t(min, sup - 1));
-    //return boost::uniform_int<>(min, sup - 1)(engine());
+  }
+
+  ///
+  /// \param[in] sup upper bound.
+  /// \return a random number in the [0;sup[ range.
+  ///
+  /// \note
+  /// This is a shortcut for: \c between<T>(0, sup);
+  ///
+  template<class T>
+  inline
+  T random::sup(T sup)
+  {
+    return between<T>(T(0), sup);
   }
 
   ///
@@ -126,7 +140,15 @@ namespace vita
   const T &random::element(const std::vector<T> &vect)
   {
     assert(vect.size());
-    return vect[between<size_t>(0, vect.size())];
+    return vect[between<std::size_t>(0, vect.size())];
+  }
+
+  template<class T>
+  inline
+  T &random::element(std::vector<T> &vect)
+  {
+    assert(vect.size());
+    return vect[between<std::size_t>(0, vect.size())];
   }
 
   ///
@@ -140,7 +162,7 @@ namespace vita
     assert(s.size());
 
     auto it(s.cbegin());
-    std::advance(it, between<size_t>(0, s.size()));
+    std::advance(it, between<std::size_t>(0, s.size()));
 
     return *it;
   }
@@ -149,13 +171,19 @@ namespace vita
   /// \param[in] p a probability ([0;1] range).
   /// \return \c true \a p% times.
   ///
+  /// bool values are produced according to the Bernoulli distribution.
+  ///
   inline
   bool random::boolean(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
-    return random::between<double>(0, 1) < p;
-    //return boost::uniform_01<double>()(engine()) < p;
+    static std::bernoulli_distribution d{};
+
+    using parm_t = decltype(d)::param_type;
+    return d(engine(), parm_t{p});
+
+    //return random::between<double>(0, 1) < p;
   }
 
   ///
@@ -164,8 +192,8 @@ namespace vita
   inline
   bool random::boolean()
   {
-    return random::between<unsigned>(0, 2) != 0;
-    //return boost::uniform_smallint<unsigned>(0, 1)(engine()) != 0;
+    return boolean(0.5);
+    //return random::between<unsigned>(0, 2) != 0;
   }
 }  // namespace vita
 

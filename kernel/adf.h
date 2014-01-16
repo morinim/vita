@@ -1,14 +1,13 @@
 /**
- *
- *  \file adf.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(ADF_H)
@@ -17,14 +16,16 @@
 #include <string>
 #include <vector>
 
-#include "function.h"
-#include "individual.h"
-#include "terminal.h"
+#include "kernel/function.h"
+#include "kernel/individual.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
-  class interpreter;
+  template<class T> class interpreter;
 
+  ///
+  /// \brief The core of vita::adt and vita::adf
   ///
   /// Human programmers organize sequences of repeated steps into reusable
   /// components such as subroutines, functions and classes. They then
@@ -36,9 +37,10 @@ namespace vita
   /// programmers typically organise these components into hierarchies in which
   /// top level components call lower level ones, which call still lower levels.
   ///
-  /// \c adf_core is the core of \c adt and \c adf classes (they are in a HAS-A
-  /// relationship with it).
+  /// adf_core is the core of vita::adt and vita::adf classes (they are in a
+  /// HAS-A relationship with it).
   ///
+  /// \note
   /// Although the acronym ADF is from Koza's automatically defined functions,
   /// in Vita subroutines are created using the ARL scheme described in
   /// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.
@@ -67,14 +69,14 @@ namespace vita
   };
 
   ///
-  /// Subroutine with arguments.
+  /// \brief Subroutine with arguments
   ///
   class adf : public function
   {
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     const individual &get_code() const;
     virtual std::string display() const override;
@@ -88,15 +90,18 @@ namespace vita
   };
 
   ///
-  /// Subroutines WITHOUT arguments (see "An Analysis of Automatic Subroutine
-  /// Discovery in Genetic Programming" - A.Dessi', A.Giani, A.Starita>).
+  /// \brief Subroutines WITHOUT arguments
+  ///
+  /// \see
+  /// "An Analysis of Automatic Subroutine Discovery in Genetic Programming" -
+  /// A.Dessi', A.Giani, A.Starita.
   ///
   class adt : public terminal
   {
   public:
     adt(const individual &, unsigned);
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     const individual &get_code() const;
     virtual std::string display() const override;

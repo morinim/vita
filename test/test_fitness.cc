@@ -13,7 +13,7 @@
 
 #include <sstream>
 
-#include "fitness.h"
+#include "kernel/fitness.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE fitness_t
@@ -26,19 +26,21 @@ BOOST_AUTO_TEST_SUITE(fitness_t)
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  vita::fitness_t empty;
-  vita::fitness_t fitness2d(2), fitness3d(3), fitness4d(4);
-  vita::fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0}, f3{2.0, 0.0, 0.0};
+  using fitness2_t = vita::basic_fitness_t<double, 2>;
+  using fitness3_t = vita::basic_fitness_t<double, 3>;
+  using fitness4_t = vita::basic_fitness_t<double, 4>;
 
-  BOOST_CHECK(empty.empty());
-  BOOST_CHECK_EQUAL(empty.size(), 0);
-  BOOST_CHECK(!fitness2d.empty());
-  BOOST_CHECK_EQUAL(fitness2d.size(), 2);
-  BOOST_CHECK_EQUAL(fitness3d.size(), 3);
-  BOOST_CHECK_EQUAL(fitness4d.size(), 4);
+  fitness2_t fitness2d;
+  fitness3_t fitness3d;
+  fitness4_t fitness4d;
 
-  BOOST_CHECK_EQUAL(fitness2d.size(), 2);
-  for (size_t i(0); i < fitness2d.size(); ++i)
+  fitness3_t f1(3.0, 0.0, 0.0), f2(2.0, 1.0, 0.0), f3(2.0, 0.0, 0.0);
+
+  BOOST_CHECK_EQUAL(fitness2_t::size, 2);
+  BOOST_CHECK_EQUAL(fitness3_t::size, 3);
+  BOOST_CHECK_EQUAL(fitness4_t::size, 4);
+
+  for (size_t i(0); i < fitness2_t::size; ++i)
     BOOST_CHECK_EQUAL(fitness2d[i],
                       std::numeric_limits<vita::fitness_t::base_t>::lowest());
 
@@ -52,39 +54,29 @@ BOOST_AUTO_TEST_CASE(Comparison)
 
   BOOST_CHECK_EQUAL(f1, f1);
   BOOST_CHECK_EQUAL(f2, f2);
-  BOOST_CHECK_EQUAL(empty, empty);
   BOOST_CHECK_EQUAL(fitness2d, fitness2d);
 
-  BOOST_CHECK(!f1.dominating(empty));
-  BOOST_CHECK(f1.dominating(fitness2d));
   BOOST_CHECK(f1.dominating(fitness3d));
-  BOOST_CHECK(f1.dominating(fitness4d));
-  BOOST_CHECK(!empty.dominating(f1));
-  BOOST_CHECK(!fitness2d.dominating(f1));
   BOOST_CHECK(!fitness3d.dominating(f1));
-  BOOST_CHECK(!fitness4d.dominating(f1));
-  BOOST_CHECK(!fitness3d.dominating(fitness2d));
-  BOOST_CHECK(!fitness4d.dominating(fitness3d));
-  BOOST_CHECK(!fitness2d.dominating(fitness3d));
-  BOOST_CHECK(!fitness3d.dominating(fitness4d));
   BOOST_CHECK(!f1.dominating(f2));
   BOOST_CHECK(!f2.dominating(f1));
   BOOST_CHECK(!f1.dominating(f1));
   BOOST_CHECK(f1.dominating(f3));
   BOOST_CHECK(f2.dominating(f3));
-  BOOST_CHECK(!empty.dominating(empty));
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  vita::fitness_t f{1.0, 2.0, 3.0,
-      std::numeric_limits<vita::fitness_t::base_t>::lowest()};
+  using fitness4_t = vita::basic_fitness_t<double, 4>;
+
+  fitness4_t f(1.0, 2.0, 3.0,
+               std::numeric_limits<vita::fitness_t::base_t>::lowest());
 
   std::stringstream ss;
 
   BOOST_REQUIRE(f.save(ss));
 
-  vita::fitness_t f2(4);
+  fitness4_t f2;
   BOOST_REQUIRE(f2.load(ss));
 
   BOOST_CHECK_EQUAL(f, f2);
@@ -92,10 +84,12 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
 BOOST_AUTO_TEST_CASE(Operators)
 {
-  vita::fitness_t x{2.0, 4.0, 8.0};
-  vita::fitness_t f1{2.0, 4.0, 8.0};
-  vita::fitness_t f2{4.0, 8.0, 16.0};
-  vita::fitness_t inf{std::numeric_limits<vita::fitness_t::base_t>::infinity()};
+  using fitness3_t = vita::basic_fitness_t<double, 3>;
+
+  fitness3_t x(2.0, 4.0, 8.0);
+  fitness3_t f1(2.0, 4.0, 8.0);
+  fitness3_t f2(4.0, 8.0, 16.0);
+  fitness3_t inf(std::numeric_limits<vita::fitness_t::base_t>::infinity());
 
   x += x;
   BOOST_CHECK_EQUAL(x, f2);
@@ -104,10 +98,10 @@ BOOST_AUTO_TEST_CASE(Operators)
 
   BOOST_CHECK_EQUAL(f1 * 2.0, f2);
 
-  x = f1 * vita::fitness_t{2.0, 2.0, 2.0};
+  x = f1 * fitness3_t(2.0, 2.0, 2.0);
   BOOST_CHECK_EQUAL(x, f2);
 
-  x += vita::fitness_t{0.0, 0.0, 0.0};
+  x += fitness3_t(0.0, 0.0, 0.0);
   BOOST_CHECK_EQUAL(x, f2);
 
   x = x / 1.0;

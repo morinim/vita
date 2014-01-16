@@ -1,14 +1,13 @@
 /**
- *
- *  \file src_constant.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(SRC_CONSTANT_H)
@@ -16,12 +15,12 @@
 
 #include <boost/lexical_cast.hpp>
 
-#include "terminal.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
   ///
-  /// A constant value (bool, int, double, string).
+  /// \brief A constant value (bool, int, double, string)
   ///
   template<class T>
   class constant : public terminal
@@ -40,7 +39,8 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter *) const override { return any(val_); }
+    virtual any eval(interpreter<individual> *) const override
+    { return any(val_); }
 
   private:  // Private data members.
     T val_;
@@ -62,7 +62,8 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter *) const override { return any(val_); }
+    virtual any eval(interpreter<individual> *) const override
+    { return any(val_); }
 
   private:  // Private data members.
     std::string val_;

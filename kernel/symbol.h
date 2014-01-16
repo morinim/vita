@@ -1,14 +1,13 @@
 /**
- *
- *  \file symbol.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(SYMBOL_H)
@@ -16,11 +15,12 @@
 
 #include <string>
 
-#include "vita.h"
+#include "kernel/any.h"
 
 namespace vita
 {
-  class interpreter;
+  class individual;
+  template<class T> class interpreter;
 
   ///
   /// GP assembles variable length program structures from basic units called
@@ -31,8 +31,6 @@ namespace vita
   class symbol
   {
   public:
-    typedef std::shared_ptr<symbol> ptr;
-
     symbol(const std::string &, category_t, unsigned);
 
     opcode_t opcode() const;
@@ -58,11 +56,11 @@ namespace vita
 
     /// The arity of a function is the number of inputs to or arguments of that
     /// funtion.
-    virtual size_t arity() const = 0;
+    virtual unsigned arity() const = 0;
 
     /// Calculates the value of / performs the action associated to the symbol
     /// (it is implementation specific).
-    virtual any eval(interpreter *) const = 0;
+    virtual any eval(interpreter<individual> *) const = 0;
 
     virtual bool debug() const;
 

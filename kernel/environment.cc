@@ -1,27 +1,24 @@
 /**
- *
- *  \file environment.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <iostream>
 
-#include <boost/logic/tribool_io.hpp>
-
-#include "environment.h"
-#include "terminal.h"
+#include "kernel/environment.h"
 
 namespace vita
 {
   const char environment::arl_filename[] =        "arl";
   const char environment::dyn_filename[] =    "dynamic";
+  const char environment::lys_filename[] =     "layers";
   const char environment::pop_filename[] = "population";
   const char environment::sum_filename[] =    "summary";
   const char environment::tst_filename[] =       "test";
@@ -47,10 +44,11 @@ namespace vita
       p_cross = 0.9;
       brood_recombination = 0;
       dss = true;
+      layers = 4;
       individuals = 100;
       tournament_size = 5;
       mate_zone = 20;
-      g_since_start = 100;
+      generations = 100;
       g_without_improvement = 0;
       arl = false;
       validation_ratio = 0.2;
@@ -73,6 +71,7 @@ namespace vita
     assert(stat_summary);
 
     const std::string env(path + "environment.");
+    pt->put(env + "layers", layers);
     pt->put(env + "individuals", individuals);
     pt->put(env + "code_length", code_length);
     pt->put(env + "patch_length", patch_length);
@@ -83,28 +82,20 @@ namespace vita
     pt->put(env + "dss", dss);
     pt->put(env + "tournament_size", tournament_size);
     pt->put(env + "mating_zone", mate_zone);
-    pt->put(env + "max_gens_since_start", g_since_start);
+    pt->put(env + "max_generations", generations);
     pt->put(env + "max_gens_wo_imp", g_without_improvement);
     pt->put(env + "arl", arl);
+    pt->put(env + "alps.age_gap", alps.age_gap);
+    pt->put(env + "alps.p_same_layer", alps.p_same_layer);
+    pt->put(env + "team.individuals", team.individuals);
     pt->put(env + "validation_ratio", validation_ratio);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
     pt->put(env + "statistics.save_arl", stat_arl);
     pt->put(env + "statistics.save_dynamics", stat_dynamic);
+    pt->put(env + "statistics.save_layers", stat_layers);
     pt->put(env + "statistics.save_population", stat_population);
     pt->put(env + "statistics.save_summary", stat_summary);
-  }
-
-  ///
-  /// \param[in] i pointer to a new symbol for the symbol set.
-  ///
-  /// This is a shortcut for symbol_set::insert.
-  ///
-  void environment::insert(const symbol::ptr &i)
-  {
-    assert(i);
-
-    sset.insert(i);
   }
 
   ///
@@ -142,7 +133,7 @@ namespace vita
         return false;
       }
 
-      if (!p_mutation)
+      if (p_mutation < 0.0)
       {
         if (verbose)
           std::cerr << k_s_debug << " Undefined p_mutation data member"
@@ -174,6 +165,13 @@ namespace vita
         return false;
       }
 
+      if (!layers)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined layer data member" << std::endl;
+        return false;
+      }
+
       if (!individuals)
       {
         if (verbose)
@@ -198,10 +196,10 @@ namespace vita
         return false;
       }
 
-      if (!g_since_start)
+      if (!generations)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Undefined g_since_start data member"
+          std::cerr << k_s_debug << " Undefined generations data member"
                     << std::endl;
         return false;
       }
@@ -229,6 +227,23 @@ namespace vita
                     << std::endl;
         return false;
       }
+
+      if (!alps.age_gap)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined age_gap parameter"
+                    << std::endl;
+        return false;
+      }
+
+      if (!team.individuals)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined team size parameter"
+                    << std::endl;
+
+        return false;
+      }
     }  // if (force_defined)
 
     if (code_length == 1)
@@ -246,7 +261,7 @@ namespace vita
       return false;
     }
 
-    if (p_mutation && (*p_mutation < 0.0 || *p_mutation > 1.0))
+    if (p_mutation > 1.0)
     {
       if (verbose)
         std::cerr << k_s_debug << " p_mutation out of range" << std::endl;
@@ -257,6 +272,14 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug << " p_cross out of range" << std::endl;
+      return false;
+    }
+
+    if (alps.p_same_layer != -1.0 &&
+        (alps.p_same_layer < 0.0 || alps.p_same_layer > 1.0))
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " p_same_layer out of range" << std::endl;
       return false;
     }
 
@@ -287,6 +310,6 @@ namespace vita
       return false;
     }
 
-    return sset.debug();
+    return true;
   }
 }  // Namespace vita

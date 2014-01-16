@@ -14,8 +14,9 @@
 #if !defined FACTORY_FIXTURE2_H
 #define      FACTORY_FIXTURE2_H
 
-#include "environment.h"
-#include "primitive/factory.h"
+#include "kernel/environment.h"
+#include "kernel/symbol_set.h"
+#include "kernel/src/primitive/factory.h"
 
 struct F_FACTORY2
 {
@@ -25,12 +26,12 @@ struct F_FACTORY2
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    env.insert(factory.make("REAL", {}));
-    env.insert(factory.make("FADD", {}));
-    env.insert(factory.make("FSUB", {}));
-    env.insert(factory.make("FMUL", {}));
-    env.insert(factory.make("FIFL", {}));
-    env.insert(factory.make("FIFE", {}));
+    sset.insert(factory.make("REAL", {}));
+    sset.insert(factory.make("FADD", {}));
+    sset.insert(factory.make("FSUB", {}));
+    sset.insert(factory.make("FMUL", {}));
+    sset.insert(factory.make("FIFL", {}));
+    sset.insert(factory.make("FIFE", {}));
   }
 
   ~F_FACTORY2()
@@ -39,6 +40,7 @@ struct F_FACTORY2
   }
 
   vita::environment env;
+  vita::symbol_set sset;
 };
 
 #endif  // FACTORY_FIXTURE2_H

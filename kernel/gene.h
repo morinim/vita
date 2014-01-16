@@ -16,13 +16,11 @@
 
 #include <vector>
 
-#include "random.h"
-#include "symbol.h"
+#include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
-  class symbol_set;
-
   ///
   /// \brief A gene is a unit of heredity in a living organism.
   ///
@@ -30,22 +28,22 @@ namespace vita
   ///
   /// The \c class \a gene is the building block for an \a individual.
   ///
-  template<size_t K = 4>
+  template<unsigned K>
   class basic_gene
   {
   public:
     enum  {k_args = K};
 
     basic_gene() {}
-    explicit basic_gene(const symbol::ptr &);
-    basic_gene(const std::pair<symbol::ptr, std::vector<index_t>> &);
-    basic_gene(const symbol::ptr &, index_t, index_t);
+    explicit basic_gene(symbol *);
+    basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
+    basic_gene(symbol *, index_t, index_t);
 
     bool operator==(const basic_gene<K> &) const;
     bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
 
   public:  // Public data members.
-    symbol::ptr sym;
+    symbol *sym;
     union
     {
       int               par;
@@ -53,9 +51,9 @@ namespace vita
     };
   };
 
-  typedef basic_gene<> gene;
+  using gene = basic_gene<4>;
 
-#include "gene_inl.h"
+#include "kernel/gene_inl.h"
 }  // namespace vita
 
 #endif  // GENE_H

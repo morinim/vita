@@ -17,10 +17,10 @@
 #include <limits>
 #include <string>
 
-#include "function.h"
-#include "interpreter.h"
-#include "random.h"
-#include "terminal.h"
+#include "kernel/function.h"
+#include "kernel/interpreter.h"
+#include "kernel/random.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
@@ -59,7 +59,8 @@ namespace vita
       std::string display(int v) const
       { return boost::lexical_cast<std::string>(v); }
 
-      any eval(interpreter *i) const { return any(integer::cast(i->eval())); }
+      any eval(interpreter<individual> *i) const
+      { return any(integer::cast(i->fetch_param())); }
 
     private:  // Private data members.
       const int min, upp;
@@ -72,10 +73,10 @@ namespace vita
       explicit add(category_t t)
         : function("ADD", t, {t, t}, k_base_weight, true) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
           return any(std::numeric_limits<base_t>::max());
@@ -92,12 +93,13 @@ namespace vita
     public:
       explicit div(category_t t) : function("DIV", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+        if (v1 == 0 ||
+            (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v0);
         else
           return any(v0 / v1);
@@ -110,15 +112,15 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("IFE", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 == v1)
-          return i->eval(2);
+          return i->fetch_arg(2);
         else
-          return i->eval(3);
+          return i->fetch_arg(3);
       }
     };
 
@@ -128,15 +130,15 @@ namespace vita
       explicit ifl(category_t t1, category_t t2)
         : function("IFL", t2, {t1, t1, t2, t2}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < v1)
-          return i->eval(2);
+          return i->fetch_arg(2);
         else
-          return i->eval(3);
+          return i->fetch_arg(3);
       }
     };
 
@@ -145,14 +147,14 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("IFZ", t, {t, t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
 
         if (v0 == 0)
-          return i->eval(1);
+          return i->fetch_arg(1);
         else
-          return i->eval(2);
+          return i->fetch_arg(2);
       }
     };
 
@@ -162,12 +164,13 @@ namespace vita
     public:
       explicit mod(category_t t) : function("MOD", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
-        if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+        if (v1 == 0 ||
+            (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
           return any(v1);
         else
           return any(v0 % v1);
@@ -181,11 +184,26 @@ namespace vita
       explicit mul(category_t t)
         : function("MUL", t, {t, t}, k_base_weight, true) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        static_assert(sizeof(long long) >= 2 * sizeof(base_t),
+                      "Unable to detect overflow after multiplication");
 
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
+
+        long long tmp(v0 * v1);
+        if (tmp > std::numeric_limits<base_t>::max())
+          return any(std::numeric_limits<base_t>::max());
+        if (tmp < std::numeric_limits<base_t>::min())
+          return any(std::numeric_limits<base_t>::min());
+
+        return any(static_cast<base_t>(tmp));
+
+        /*
+        // On systems where the above relationship does not hold, the following
+        // compliant solution may be used to ensure signed overflow does not
+        // occur.
         if (v0 > 0)
           if (v1 > 0)
           {
@@ -193,7 +211,7 @@ namespace vita
             if (v0 > std::numeric_limits<base_t>::max() / v1)
               return any(std::numeric_limits<base_t>::max());
           }
-          else  // v1 is non-positive
+          else  // v0 is positive, v1 is non-positive
           {
             assert(v0 > 0 && v1 <= 0);
             if (v1 < std::numeric_limits<base_t>::min() / v0)
@@ -206,7 +224,7 @@ namespace vita
             if (v0 < std::numeric_limits<base_t>::min() / v1)
               return any(std::numeric_limits<base_t>::min());
           }
-          else  // v1 is non-positive
+          else  // v0 is non-positive, v1 is non-positive
           {
             assert(v0 <= 0 && v1 <= 0);
             if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
@@ -214,6 +232,7 @@ namespace vita
           }
 
         return any(v0 * v1);
+        */
       }
     };
 
@@ -223,10 +242,10 @@ namespace vita
     public:
       explicit shl(category_t t) : function("SHL", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 || v1 < 0 ||
             v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
@@ -243,10 +262,10 @@ namespace vita
     public:
       explicit sub(category_t t) : function("SUB", t, {t, t}) {}
 
-      any eval(interpreter *i) const
+      any eval(interpreter<individual> *i) const
       {
-        const base_t v0(integer::cast(i->eval(0)));
-        const base_t v1(integer::cast(i->eval(1)));
+        const auto v0(integer::cast(i->fetch_arg(0)));
+        const auto v1(integer::cast(i->fetch_arg(1)));
 
         if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
           return any(std::numeric_limits<base_t>::min());

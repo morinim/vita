@@ -14,7 +14,7 @@
 #if !defined(TTABLE_HASH_H)
 #define      TTABLE_HASH_H
 
-#include "vita.h"
+#include "kernel/vita.h"
 
 namespace vita
 {

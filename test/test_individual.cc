@@ -1,32 +1,31 @@
 /**
- *
- *  \file test_individual.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
 #include <sstream>
 
-#include "individual.h"
-#include "interpreter.h"
+#include "kernel/individual.h"
+#include "kernel/interpreter.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE individual
+#define BOOST_TEST_MODULE t_individual
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
 
-#include "factory_fixture1.h"
+#include "factory_fixture3.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(individual, F_FACTORY1)
+BOOST_FIXTURE_TEST_SUITE(t_individual, F_FACTORY3)
 /*
 BOOST_AUTO_TEST_CASE(Compact)
 {
@@ -77,17 +76,33 @@ BOOST_AUTO_TEST_CASE(Compact)
 }
 */
 
+BOOST_AUTO_TEST_CASE(RandomCreation)
+{
+  BOOST_TEST_CHECKPOINT("Variable length random creation.");
+  for (unsigned l(sset.categories() + 2); l < 100; ++l)
+  {
+    env.code_length = l;
+    vita::individual i(env, sset);
+    // std::cout << i << std::endl;
+
+    BOOST_REQUIRE(i.debug());
+    BOOST_REQUIRE_EQUAL(i.size(), l);
+    BOOST_REQUIRE_EQUAL(i.age(), 0);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::individual ind(env, true);
+  vita::individual ind(env, sset);
   const vita::individual orig(ind);
+
+  const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   env.p_mutation = 0.0;
-
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < n; ++i)
   {
     ind.mutation();
     BOOST_REQUIRE_EQUAL(ind, orig);
@@ -95,9 +110,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
   env.p_mutation = 0.5;
-  std::uint64_t diff(0), length(0);
+  unsigned diff(0), length(0);
 
-  const unsigned n(2000);
   for (unsigned i(0); i < n; ++i)
   {
     const vita::individual i1(ind);
@@ -109,106 +123,54 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   const double perc(100.0 * double(diff) / double(length));
   BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
-}
-
-BOOST_AUTO_TEST_CASE(RandomCreation)
-{
-  BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(env.sset.categories() + 2); l < 100; ++l)
-  {
-    env.code_length = l;
-    vita::individual i(env, true);
-    // std::cout << i << std::endl;
-
-    BOOST_REQUIRE(i.debug());
-    BOOST_REQUIRE_EQUAL(i.size(), l);
-  }
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
-    vita::individual a(env, true);
+    vita::individual a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
 
     vita::individual b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
-    vita::individual c(env, true);
-    if (!(a.signature() == c.signature()))
+    vita::individual c(env, sset);
+    if (a.signature() != c.signature())
       BOOST_REQUIRE_NE(a, c);
   }
 }
 
-BOOST_AUTO_TEST_CASE(Cross0)
+BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  std::uint64_t diff(0), length(0);
+  vita::individual i1(env, sset), i2(env, sset);
 
-  const unsigned n(1000);
-  for (unsigned j(0); j < n; ++j)
-  {
-    const vita::individual i1(env, true), i2(env, true);
-    const vita::individual off(uniform_crossover(i1, i2));
-
-    diff += off.distance(i1);
-    length += i1.eff_size();
-  }
-
-  const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross1)
-{
-  env.code_length = 100;
-
-  vita::individual i1(env, true), i2(env, true);
-
-  const unsigned n(1000);
+  const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(one_point_crossover(i1, i2));
+    dist += i1.distance(i1.crossover(i2));
 
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
-}
-
-BOOST_AUTO_TEST_CASE(Cross2)
-{
-  env.code_length = 100;
-
-  vita::individual i1(env, true), i2(env, true);
-
-  const unsigned n(1000);
-  double dist(0.0);
-  for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(two_point_crossover(i1, i2));
-
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset.categories() * n));
+  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  for (unsigned i(0); i < 1000; ++i)
+  for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::individual i1(env, true);
+    vita::individual i1(env, sset);
 
-    i1.age = vita::random::between(0, 1000);
+    for (auto j(vita::random::between(0u, 100u)); j; --j)
+      i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::individual i2(env, false);
+    vita::individual i2(env, sset);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 
@@ -216,4 +178,75 @@ BOOST_AUTO_TEST_CASE(Serialization)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Blocks)
+{
+  const unsigned n(1000);
+
+  for (unsigned k(0); k < n; ++k)
+  {
+    // We build, by repeated trials, an individual with an effective size
+    // greater than 4.
+    vita::individual base(env, sset);
+    auto base_es(base.eff_size());
+    while (base_es < 5)
+    {
+      base = vita::individual(env, sset);
+      base_es = base.eff_size();
+    }
+
+    auto blk_idx(base.blocks());
+
+    BOOST_REQUIRE_GT(blk_idx.size(), 0);
+
+    for (const auto &l : blk_idx)
+    {
+      auto blk(base.get_block(l));
+
+      BOOST_REQUIRE_GT(blk.eff_size(), 1);
+      BOOST_REQUIRE_GT(blk[l].sym->arity(), 0);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(Output)
+{
+  std::vector<vita::gene> g(
+  {
+    {{f_sub, {1, 2}}},  // [0] SUB 1,2
+    {{f_add, {3, 4}}},  // [1] ADD 3,4
+    {{f_add, {4, 3}}},  // [2] ADD 4,3
+    {{   c2,   null}},  // [3] 2.0
+    {{   c3,   null}}   // [4] 3.0
+  });
+
+  vita::individual i(vita::individual(env, sset).replace(g));
+
+  std::stringstream ss;
+
+  BOOST_TEST_CHECKPOINT("Inline output");
+  i.in_line(ss);
+  BOOST_CHECK_EQUAL(ss.str(), "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
+
+  BOOST_TEST_CHECKPOINT("Graphviz output");
+  // Typically to 'reset' a stringstream you need to both reset the underlying
+  // sequence to an empty string with str and to clear any fail and eof flags
+  // with clear.
+  ss.clear();
+  ss.str(std::string());
+
+  i.graphviz(ss);
+  BOOST_CHECK_EQUAL(ss.str(),
+                    "graph {" \
+                    "g0_0 [label=FSUB, shape=box];" \
+                    "g0_0 -- g1_0;" \
+                    "g0_0 -- g2_0;" \
+                    "g1_0 [label=FADD, shape=box];" \
+                    "g1_0 -- g3_0;" \
+                    "g1_0 -- g4_0;" \
+                    "g2_0 [label=FADD, shape=box];" \
+                    "g2_0 -- g4_0;" \
+                    "g2_0 -- g3_0;" \
+                    "g3_0 [label=2.0, shape=circle];" \
+                    "g4_0 [label=3.0, shape=circle];}");
+}
 BOOST_AUTO_TEST_SUITE_END()

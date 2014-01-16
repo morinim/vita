@@ -16,7 +16,7 @@
 
 #include <iostream>
 
-#include "gene.h"
+#include "kernel/gene.h"
 
 namespace vita
 {

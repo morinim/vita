@@ -112,9 +112,9 @@ SETTING UP THE BUILD
 
   If you see errors, try to tweak the contents of Makefile to make them go
   away.
-  The default compiler is clang++, to use gcc/g++ type:
+  The default compiler is g++, to use clang++ type:
 
-    make CXX=g++
+    make CXX=clang++
 
   All output files will per default be stored together with the source code.
 

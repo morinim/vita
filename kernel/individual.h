@@ -1,14 +1,13 @@
 /**
- *
- *  \file individual.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(INDIVIDUAL_H)
@@ -17,17 +16,19 @@
 #include <cmath>
 #include <functional>
 #include <iomanip>
-#include <list>
 #include <set>
 
-#include "environment.h"
-#include "gene.h"
-#include "locus.h"
-#include "matrix.h"
-#include "ttable.h"
+#include "kernel/environment.h"
+#include "kernel/gene.h"
+#include "kernel/locus.h"
+#include "kernel/matrix.h"
+#include "kernel/symbol_set.h"
+#include "kernel/ttable.h"
 
 namespace vita
 {
+  template<class T> class interpreter;
+
   ///
   /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
@@ -36,7 +37,7 @@ namespace vita
   class individual
   {
   public:
-    individual(const environment &, bool);
+    individual(const environment &, const symbol_set &);
 
     // Visualization/output methods.
     void dump(std::ostream &) const;
@@ -45,25 +46,42 @@ namespace vita
     void list(std::ostream &) const;
     void tree(std::ostream &) const;
 
+    // Recombination operators.
     unsigned mutation()
-    { assert(env_->p_mutation); return mutation(*env_->p_mutation); }
+    { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
+    individual crossover(const individual &) const;
 
-    std::list<locus> blocks() const;
+    std::vector<locus> blocks() const;
     individual destroy_block(index_t) const;
     individual get_block(const locus &) const;
+
     individual replace(const gene &) const;
     individual replace(const locus &, const gene &) const;
     individual replace(const std::vector<gene> &) const;
 
-    individual generalize(size_t, std::vector<locus> *const) const;
+    std::pair<individual, std::vector<locus>> generalize(unsigned) const;
 
-    bool operator==(const individual &x) const;
-    size_t distance(const individual &) const;
+    bool operator==(const individual &) const;
+    unsigned distance(const individual &) const;
 
     hash_t signature() const;
 
+    /// This is a measure of how long an individual's family of genotypic
+    /// material has been in the population. Randomly generated individuals,
+    /// such as those that are created when the search algorithm are started,
+    /// start with an age of 0. Each generation that an individual stays in the
+    /// population (such as through elitism) its age is increased by one.
+    /// Individuals that are created through mutation or recombination take the
+    /// age of their oldest parent.
+    /// This differs from conventional measures of age, in which individuals
+    /// created through applying some type of variation to an existing
+    /// individual (e.g. mutation or recombination) start with an age of 0.
+    unsigned age() const { return age_; }
+    void inc_age() { ++age_; }
+
     const environment &env() const { return *env_; }
+    const symbol_set &sset() const { return *sset_; }
 
     bool debug(bool = true) const;
 
@@ -73,16 +91,20 @@ namespace vita
     ///
     const gene &operator[](const locus &l) const { return genome_(l); }
 
+    class const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
+
     ///
     /// \return the total size of the individual (effective size + introns).
     ///
     /// The size is constant for any individual (it's choosen at initialization
     /// time).
-    /// \see eff_size
+    /// \see eff_size()
     ///
-    size_t size() const { return genome_.rows(); }
+    unsigned size() const { return genome_.rows(); }
 
-    size_t eff_size() const;
+    unsigned eff_size() const;
 
     category_t category() const;
 
@@ -99,35 +121,15 @@ namespace vita
       signature_.clear();
     }
 
-    class const_iterator;
-    friend class interpreter;
+    friend class interpreter<individual>;
 
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  public:  // Public data members.
-    // Crossover implementation can be changed/selected at runtime by this
-    // polymorhic wrapper for function objects.
-    // std::function can be easily bound to function pointers, member function
-    // pointers, functors or anonymous (lambda) functions.
-    static std::function<individual (const individual &, const individual &)>
-      crossover;
-
-    /// This is a measure of how long an individual's family of genotypic
-    /// material has been in the population. Randomly generated individuals,
-    /// such as those that are created when the search algorithm are started,
-    /// start with an age of 0. Each generation that an individual stays in the
-    /// population (such as through elitism) its age is increased by one.
-    /// Individuals that are created through mutation or recombination take the
-    /// age of their oldest parent.
-    /// This differs from conventional measures of age, in which individuals
-    /// created through applying some type of variation to an existing
-    /// individual (e.g. mutation or recombination) start with an age of 0.
-    unsigned age;
-
-  private:  // Private support functions.
+  private:  // Private support methods.
     template<class T = std::uint8_t> hash_t hash() const;
+    void in_line(std::ostream &, const locus &) const;
     template<class T> void pack(const locus &, std::vector<T> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
@@ -145,56 +147,84 @@ namespace vita
     // of genes is starting here).
     locus best_;
 
-    const environment *env_;
-  };  // class individual
+    unsigned age_;
 
+    const environment  *env_;
+    const symbol_set  *sset_;
+  };  // class individual
 
   std::ostream &operator<<(std::ostream &, const individual &);
 
-  individual one_point_crossover(const individual &, const individual &);
-  individual two_point_crossover(const individual &, const individual &);
-  individual uniform_crossover(const individual &, const individual &);
-
   ///
-  /// Iterato to scan the active genes of an \c individual.
+  /// \brief Iterator to scan the active genes of an \c individual.
   ///
   class individual::const_iterator
   {
   public:
+    ///
+    /// \brief Builds an empty iterator.
+    ///
+    /// Empty iterator is used as sentry (it is the value returned by
+    /// individual::end()).
+    ///
+    const_iterator() : ind_(nullptr) {}
     explicit const_iterator(const individual &);
 
-    ///
-    /// \return \c false when the iterator reaches the end.
-    ///
-    bool operator()() const
-    { return l.index < ind_.size() && !loci_.empty(); }
-
-    const locus operator++();
+    std::set<locus>::iterator operator++();
 
     ///
-    /// \return reference to the current \a gene of the \a individual.
+    /// \param[in] i2 second term of comparison.
     ///
-    const gene &operator*() const
+    /// Returns \c true if iterators point to the same locus or they are both
+    /// empty.
+    ///
+    bool operator==(const const_iterator &i2) const
     {
-      assert(l.index < ind_.size());
-      return ind_.genome_(l);
+      return (loci_.begin() == loci_.end() &&
+              i2.loci_.begin() == i2.loci_.end()) ||
+             loci_.begin() == i2.loci_.begin();
+    }
+
+    bool operator!=(const const_iterator &i2) const
+    {
+      return !(*this == i2);
     }
 
     ///
-    /// \return pointer to the current \c gene of the \c individual.
+    /// \return reference to the current \a locus of the \a individual.
     ///
-    const gene *operator->() const
+    const locus &operator*() const
     {
-      assert(l.index < ind_.size());
-      return &ind_.genome_(l);
+      return *loci_.cbegin();
     }
 
-    locus l;
+    ///
+    /// \return pointer to the current \c locus of the \c individual.
+    ///
+    const locus *operator->() const
+    {
+      return &(*loci_.cbegin());
+    }
 
   private:
-    const individual &ind_;
-    std::set<locus>  loci_;
-  };
+    // A partial set of active loci to be explored.
+    std::set<locus> loci_;
+
+    // A pointer to the individual we are iterating on.
+    const individual *const ind_;
+  };  // class individual::const_iterator
+
+  ///
+  /// \return an iterator to the first active locus of the individual.
+  ///
+  inline individual::const_iterator individual::begin() const
+  { return individual::const_iterator(*this); }
+
+  ///
+  /// \return an iterator used as sentry value to stop a cycle.
+  ///
+  inline individual::const_iterator individual::end() const
+  { return individual::const_iterator(); }
 
   ///
   /// \example example1.cc

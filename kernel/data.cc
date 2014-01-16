@@ -1,14 +1,13 @@
 /**
- *
- *  \file data.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <algorithm>
@@ -18,12 +17,34 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include "data.h"
-#include "random.h"
-#include "symbol.h"
+#include "kernel/data.h"
+#include "kernel/random.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
+  namespace
+  {
+    ///
+    /// \param[in] s the string to be converted.
+    /// \param[in] d what type should \a s be converted in?
+    /// \return the converted data.
+    ///
+    ///     convert("123.1", sym_double) == any(123.1f)
+    ///
+    any convert(const std::string &s, domain_t d)
+    {
+      switch (d)
+      {
+      case d_bool:   return   any(boost::lexical_cast<bool>(s));
+      case d_int:    return    any(boost::lexical_cast<int>(s));
+      case d_double: return any(boost::lexical_cast<double>(s));
+      case d_string: return                              any(s);
+      default:                  throw boost::bad_lexical_cast();
+      }
+    }
+  }
+
   ///
   /// New empty data instance.
   ///
@@ -35,14 +56,14 @@ namespace vita
   }
 
   ///
-  /// \param[in] filename nome of the file containing the learning collection.
+  /// \param[in] filename name of the file containing the learning collection.
   /// \param[in] verbosity verbosity level (see environment::verbosity for
   ///            further details).
   /// New data instance containing the learning collection from \a filename.
   ///
   data::data(const std::string &filename, unsigned verbosity)
   {
-    assert(filename != "");
+    assert(!filename.empty());
 
     clear();
     open(filename, verbosity);
@@ -98,7 +119,7 @@ namespace vita
   /// data::end() will refer to the active slice (a subset of the dataset).
   /// To reset the slice call data::slice with argument 0.
   ///
-  void data::slice(size_t n)
+  void data::slice(unsigned n)
   {
     end_[dataset()] = (n == 0 || n >= size()) ?
       dataset_[dataset()].end() : std::next(begin(), n);
@@ -136,7 +157,7 @@ namespace vita
   /// \note
   /// Please note that the result is independent of the active slice.
   ///
-  size_t data::size(dataset_t d) const
+  unsigned data::size(dataset_t d) const
   {
     return dataset_[d].size();
   }
@@ -144,7 +165,7 @@ namespace vita
   ///
   /// \return the size of the active dataset.
   ///
-  size_t data::size() const
+  unsigned data::size() const
   {
     return size(dataset());
   }
@@ -189,10 +210,9 @@ namespace vita
   ///
   void data::sort(std::function<bool (const example &, const example &)> f)
   {
-    const dataset_t d(dataset());
-    const size_t partition_size(std::distance(begin(), end()));
+    const auto partition_size(std::distance(begin(), end()));
 
-    dataset_[d].sort(f);
+    dataset_[dataset()].sort(f);
 
     slice(partition_size);
   }
@@ -227,12 +247,12 @@ namespace vita
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
       // > items, and often you'll have all of them before that".
-      size_t available(dataset_[training].size());
+      auto available(dataset_[training].size());
 
-      const size_t k(available * r);
+      const decltype(available) k(available * r);
       assert(k <= available);
 
-      size_t needed(k);
+      auto needed(k);
 
       auto iter(dataset_[training].begin());
       while (dataset_[validation].size() < k)
@@ -277,7 +297,7 @@ namespace vita
   /// we use (based on a discriminant function) doesn't manipulate (skips) the
   /// output category (it only uses the number of output classes).
   ///
-  size_t data::categories() const
+  unsigned data::categories() const
   {
     return categories_.size();
   }
@@ -288,7 +308,7 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty: \code variables() + 1 == columns() \endcode.
   ///
-  size_t data::columns() const
+  unsigned data::columns() const
   {
     assert(dataset_[dataset()].empty() || variables() + 1 == header_.size());
 
@@ -299,7 +319,7 @@ namespace vita
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
-  size_t data::classes() const
+  unsigned data::classes() const
   {
     return classes_map_.size();
   }
@@ -310,9 +330,9 @@ namespace vita
   /// \note data class supports just one output for every instance, so, if
   /// the dataset is not empty, \code variables() + 1 == columns() \endcode.
   ///
-  size_t data::variables() const
+  unsigned data::variables() const
   {
-    const size_t n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
+    const unsigned n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
 
     assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
@@ -322,14 +342,14 @@ namespace vita
   ///
   /// \param[in] label name of a class of the learning collection.
   /// \param[in,out] map map used to encode the \a label.
-  /// \return a positive integer used as primary key for the class \a label.
+  /// \return a positive integer used as primary key \a label.
   ///
-  unsigned data::encode(const std::string &label,
-                        std::map<std::string, unsigned> *map)
+  template<class T>
+  T data::encode(const std::string &label, std::map<std::string, T> *map)
   {
     if (map->find(label) == map->end())
     {
-      const size_t n(map->size());
+      const auto n(map->size());
       (*map)[label] = n;
     }
 
@@ -341,10 +361,11 @@ namespace vita
   /// \return the name of the class encoded with the \c unsigned \a i (or an
   ///         empty string if such class cannot be find).
   ///
-  /// \note Boost Bimap could be used to speed up the search in \a classes_map_,
-  /// but to date speed isn't an issue.
+  /// \note
+  /// Boost Bitmap could be used to speed up the search in \a classes_map_, but
+  /// to date speed isn't an issue.
   ///
-  std::string data::class_name(unsigned i) const
+  std::string data::class_name(class_tag_t i) const
   {
     for (const auto &p : classes_map_)
       if (p.second == i)
@@ -377,7 +398,7 @@ namespace vita
   /// CSV files do not have a \n in the middle of the field, so it is usually
   /// not worth worrying about.
   /// This is a slightly modified version of the function at
-  /// http://www.zedwood.com/article/112/cpp-csv-parser.
+  /// <http://www.zedwood.com/article/112/cpp-csv-parser>.
   /// Escaped List Separator class from Boost C++ libraries is also very nice
   /// and efficient for parsing, but it is not as easily applied.
   ///
@@ -387,7 +408,7 @@ namespace vita
   {
     std::vector<std::string> record;
 
-    const unsigned linemax(line.length());
+    const auto linemax(line.length());
     bool inquotes(false);
     unsigned linepos(0);
     std::string curstring;
@@ -425,29 +446,13 @@ namespace vita
     record.push_back(curstring);
 
     if (trim)
-      for (size_t i(0); i < record.size(); ++i)
+    {
+      const auto size(record.size());
+      for (auto i(decltype(size){0}); i < size; ++i)
         boost::trim(record[i]);
+    }
 
     return record;
-  }
-
-  ///
-  /// \param[in] s the string to be converted.
-  /// \param[in] d what type should \a s be converted in?
-  /// \return the converted data.
-  ///
-  /// convert("123.1", sym_double) == double(123.1)
-  ///
-  data::example::value_t data::convert(const std::string &s, domain_t d)
-  {
-    switch (d)
-    {
-    case d_bool:  return   data::example::value_t(boost::lexical_cast<bool>(s));
-    case d_int:   return    data::example::value_t(boost::lexical_cast<int>(s));
-    case d_double:return data::example::value_t(boost::lexical_cast<double>(s));
-    case d_string:return                              data::example::value_t(s);
-    default: throw boost::bad_lexical_cast();
-    }
   }
 
   ///
@@ -472,7 +477,7 @@ namespace vita
   /// \param[in] c1 a category.
   /// \param[in] c2 a category.
   ///
-  /// Swap catagories \a c1 and \a c2, updating the \a header_ and
+  /// Swap categories \a c1 and \a c2, updating the \a header_ and
   /// \a categories_ vector.
   ///
   void data::swap_category(category_t c1, category_t c2)
@@ -482,7 +487,7 @@ namespace vita
 
     std::swap(categories_[c1], categories_[c2]);
 
-    for (size_t i(0); i < columns(); ++i)
+    for (unsigned i(0); i < columns(); ++i)
       if (header_[i].category_id == c1)
         header_[i].category_id = c2;
       else if (header_[i].category_id == c2)
@@ -509,22 +514,22 @@ namespace vita
   /// Programming).
   ///
   /// \post
-  /// \li \a header_[0] is the output column (it contains informations about
-  ///     problem's output);
-  /// \li \a category(0) is the output category (for symbolic regresssion
-  ///     problems it is the output type of the xrff file, for classification
-  ///     problems it is the \a numeric type).
+  /// * \a header_[0] is the output column (it contains informations about
+  ///   problem's output);
+  /// * \a category(0) is the output category (for symbolic regression
+  ///   problems it is the output type of the xrff file, for classification
+  ///   problems it is the \a numeric type).
   ///
   /// \warning
   /// To date:
   /// * we don't support compressed XRFF files;
-  /// * XRFF files cannot be uset to load test set (problems with missing
+  /// * XRFF files cannot be used to load test set (problems with missing
   ///   output column and possible column category redefinition).
   ///
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::load_xrff(const std::string &filename)
+  unsigned data::load_xrff(const std::string &filename)
   {
     assert(dataset() == training);
 
@@ -533,7 +538,7 @@ namespace vita
     ptree pt;
     read_xml(filename, pt);
 
-    size_t n_output(0);
+    unsigned n_output(0);
     bool classification(false);
 
     // Iterate over dataset.header.attributes selection and store all found
@@ -623,7 +628,7 @@ namespace vita
     // Category 0 is the output category.
     swap_category(category_t(0), header_[0].category_id);
 
-    size_t parsed(0);
+    unsigned parsed(0);
     for (ptree::value_type bi : pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
@@ -644,10 +649,12 @@ namespace vita
                 // Strings could be used as label for classes, but integers
                 // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
-                  instance.output = static_cast<int>(encode(value,
-                                                            &classes_map_));
+                  instance.output = encode(value, &classes_map_);
                 else
+                {
                   instance.output = convert(value, domain);
+                  instance.d_output = domain;
+                }
               }
               else  // input value
                 instance.input.push_back(convert(value, domain));
@@ -711,7 +718,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::load_csv(const std::string &filename, unsigned verbosity)
+  unsigned data::load_csv(const std::string &filename, unsigned verbosity)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -723,7 +730,7 @@ namespace vita
     while (std::getline(from, line))
     {
       const std::vector<std::string> record(csvline(line));
-      const size_t size(columns() ? columns() : record.size());
+      const unsigned size(columns() ? columns() : record.size());
 
       if (record.size() == size)
       {
@@ -732,7 +739,7 @@ namespace vita
         if (!dataset_[dataset()].size())  // No line parsed
           classification = !is_number(record[0]);
 
-        for (size_t field(0); field < size; ++field)
+        for (auto field(decltype(size){0}); field < size; ++field)
         {
           // The first line is (also) used to learn data format.
           if (columns() != size)
@@ -775,15 +782,17 @@ namespace vita
               {
                 assert(dataset() == test);
                 // For test set the output class/value could be missing (e.g.
-                // for Kaggle.com competition test set).
+                // for kaggle.com competition test set).
               }
               else
               {
                 if (classification)
-                  instance.output = static_cast<int>(encode(value,
-                                                            &classes_map_));
+                  instance.output = encode(value, &classes_map_);
                 else
+                {
                   instance.output = convert(value, categories_[c].domain);
+                  instance.d_output = categories_[c].domain;
+                }
               }
             }
             else  // input value
@@ -837,7 +846,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  size_t data::open(const std::string &f, unsigned verbosity)
+  unsigned data::open(const std::string &f, unsigned verbosity)
   {
     const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
                     boost::algorithm::iends_with(f, ".xml"));
@@ -858,7 +867,7 @@ namespace vita
   ///
   bool data::debug() const
   {
-    const size_t cl_size(classes());
+    const auto cl_size(classes());
     // If this is a classification problem then there should be at least two
     // classes.
     if (cl_size == 1)
@@ -867,18 +876,50 @@ namespace vita
     for (const auto &d : dataset_)
       if (!d.empty() && &d != &dataset_[test])
       {
-        const size_t in_size(d.begin()->input.size());
+        const auto in_size(d.begin()->input.size());
 
         for (const auto &e : d)
         {
           if (e.input.size() != in_size)
             return false;
 
-          if (cl_size && e.label() >= cl_size)
+          if (cl_size && e.tag() >= cl_size)
             return false;
         }
       }
 
     return true;
+  }
+
+  ///
+  /// \param[in] n the name of a weka domain.
+  /// \return the internel id of the weka-domain \a n (\c d_void if it's
+  ///         unknown or not managed).
+  ///
+  domain_t data::from_weka(const std::string &n)
+  {
+    static const std::map<const std::string, domain_t> map(
+    {
+      // This type is vita-specific (not standard).
+      {"boolean", domain_t::d_bool},
+
+      {"integer", domain_t::d_int},
+
+      // Real and numeric are treated as double precision number (d_double).
+      {"numeric", domain_t::d_double},
+      {"real", domain_t::d_double},
+
+      // Nominal values are defined by providing a list of possible values.
+      {"nominal", domain_t::d_string},
+
+      // String attributes allow us to create attributes containing arbitrary
+      // textual values. This is very useful in text-mining applications.
+      {"string", domain_t::d_string}
+
+      // {"date", ?}, {"relational", ?}
+    });
+
+    const auto &i(map.find(n));
+    return i == map.end() ? d_void : i->second;
   }
 }  // Namespace vita

@@ -1,18 +1,17 @@
 /**
- *
- *  \file function.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(VITA_NO_LIB)
-#  include "function.h"
+#  include "kernel/function.h"
 #endif
 
 namespace vita
@@ -31,14 +30,15 @@ namespace vita
   VITA_INLINE
   function::function(const std::string &dis, category_t c,
                      const std::vector<category_t> &args, unsigned w,
-                     bool asve) : symbol(dis, c, w), associative_(asve)
+                     bool asve)
+    : symbol(dis, c, w), arity_(args.size()), associative_(asve)
   {
     assert(args.size() <= gene::k_args);
 
-    for (arity_ = 0; arity_ < args.size(); ++arity_)
-      argt_[arity_] = args[arity_];
+    for (auto i(decltype(arity_){0}); i < arity_; ++i)
+      argt_[i] = args[i];
 
-    // for (size_t i(arity()); i < gene::k_args; ++i)
+    // for (auto i(arity()); i < gene::k_args; ++i)
     //   argt_[i] = std::numeric_limits<category_t>::max();
 
     assert(debug());
@@ -50,6 +50,12 @@ namespace vita
   VITA_INLINE
   bool function::debug() const
   {
-    return arity_ && arity_ <= gene::k_args && symbol::debug();
+    if (!arity_)  // This is a function, we want some argument...
+      return false;
+
+    if (arity_ > gene::k_args)  // ... but not to much!
+      return false;
+
+    return symbol::debug();
   }
 }  // Namespace vita

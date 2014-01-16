@@ -1,14 +1,13 @@
 /**
- *
- *  \file evolution_selection.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(EVOLUTION_SELECTION_H)
@@ -17,15 +16,15 @@
 #include <set>
 #include <vector>
 
-#include "vita.h"
+#include "kernel/vita.h"
 
-namespace vita
-{
-  template<class T> class evolution;
+namespace vita {  namespace selection {
 
   ///
-  /// \brief The selection strategy (tournament, fitness proportional...) for
-  ///        the \a evolution class.
+  /// \brief The strategy (tournament, fitness proportional...) for the
+  /// \a evolution class.
+  ///
+  /// \tparam T the type of individual.
   ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.
@@ -34,22 +33,22 @@ namespace vita
   /// http://en.wikipedia.org/wiki/Strategy_pattern
   ///
   template<class T>
-  class selection_strategy
+  class strategy
   {
   public:
-    typedef std::shared_ptr<selection_strategy> ptr;
+    strategy(const population<T> &, evaluator<T> &);
+    virtual ~strategy() {}
 
-    explicit selection_strategy(const evolution<T> *const);
-    virtual ~selection_strategy() {}
-
-    virtual std::vector<size_t> run() = 0;
+    virtual std::vector<coord> run() = 0;
 
   protected:  // Support methods.
-    size_t pickup() const;
-    size_t pickup(size_t) const;
+    coord pickup() const;
+    coord pickup(coord) const;
+    coord pickup(unsigned, double = 1.0) const;
 
   protected:  // Data members.
-    const evolution<T> *const evo_;
+    const population<T> &pop_;
+    evaluator<T>        &eva_;
   };
 
   ///
@@ -69,12 +68,26 @@ namespace vita
   /// adjusted.
   ///
   template<class T>
-  class tournament_selection : public selection_strategy<T>
+  class tournament : public strategy<T>
   {
   public:
-    explicit tournament_selection(const evolution<T> *const);
+    tournament(const population<T> &, evaluator<T> &);
 
-    virtual std::vector<size_t> run() override;
+    virtual std::vector<coord> run() override;
+  };
+
+  ///
+  /// Alps selection as described in
+  /// <http://idesign.ucsc.edu/projects/alps.html> (see also
+  /// vita::basic_alps_es for further details).
+  ///
+  template<class T>
+  class alps : public strategy<T>
+  {
+  public:
+    alps(const population<T> &, evaluator<T> &);
+
+    virtual std::vector<coord> run() override;
   };
 
   ///
@@ -82,31 +95,35 @@ namespace vita
   /// Paradigm" (Mark Kotanchek, Guido Smits, Ekaterina Vladislavleva).
   ///
   template<class T>
-  class pareto_tourney : public selection_strategy<T>
+  class pareto : public strategy<T>
   {
   public:
-    explicit pareto_tourney(const evolution<T> *const);
+    pareto(const population<T> &, evaluator<T> &);
 
-    virtual std::vector<size_t> run() override;
+    virtual std::vector<coord> run() override;
 
   private:
-    void pareto(const std::vector<size_t> &, std::set<size_t> *,
-                std::set<size_t> *) const;
+    void front(const std::vector<unsigned> &, std::set<unsigned> *,
+               std::set<unsigned> *) const;
   };
 
   ///
-  /// Very simple selection strategy: pick a set of random individuals.
+  /// \brief Pick a set of random individuals.
+  ///
+  /// Very simple selection strategy: pick a set of random individuals. The
+  /// environment::tournamnet_size property controls the cardinality of the
+  /// set.
   ///
   template<class T>
-  class random_selection : public selection_strategy<T>
+  class random : public strategy<T>
   {
   public:
-    explicit random_selection(const evolution<T> *const);
+    random(const population<T> &, evaluator<T> &);
 
-    virtual std::vector<size_t> run() override;
+    virtual std::vector<coord> run() override;
   };
 
-#include "evolution_selection_inl.h"
-}  // namespace vita
+#include "kernel/evolution_selection_inl.h"
+} } // namespace vita :: selection
 
 #endif  // EVOLUTION_SELECTION_H

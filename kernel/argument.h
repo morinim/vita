@@ -1,14 +1,13 @@
 /**
- *
- *  \file argument.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(ARGUMENT_H)
@@ -16,11 +15,11 @@
 
 #include <string>
 
-#include "terminal.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
-  class interpreter;
+  template<class T> class interpreter;
 
   ///
   /// \a argument is a special \a terminal used by \a adf functions for
@@ -29,18 +28,18 @@ namespace vita
   class argument : public terminal
   {
   public:
-    explicit argument(size_t);
+    explicit argument(unsigned);
 
     std::string display() const;
 
-    size_t index() const;
+    unsigned index() const;
 
-    virtual any eval(interpreter *) const override;
+    virtual any eval(interpreter<individual> *) const override;
 
     bool debug() const;
 
   private:
-    const size_t index_;
+    const unsigned index_;
   };
 }  // namespace vita
 

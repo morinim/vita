@@ -1,14 +1,13 @@
 /**
- *
- *  \file data.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined(DATA_H)
@@ -20,112 +19,52 @@
 #include <string>
 #include <vector>
 
-#include <boost/variant.hpp>
-
-#include "distribution.h"
+#include "kernel/any.h"
+#include "kernel/distribution.h"
 
 namespace vita
 {
   ///
-  /// Stores the dataset used to evolve vita::population.
+  /// \brief The type used as class id in classification tasks
+  ///
+  typedef unsigned class_tag_t;
+
+  ///
+  /// \brief Stores the dataset used to evolve vita::population
+  ///
   /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
   /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
   /// files.
   ///
   class data
   {
-  public:  // Structures.
-    ///
-    /// \a example stores a single element of the data set. The
-    /// \c struct consists of an input vector (\a input) and an answer value
-    /// (\a output). Depending on the kind of problem, \a output stores:
-    /// * a numeric value (symbolic regression problem);
-    /// * a label (classification problem).
-    ///
-    /// \a difficulty and \a age are parameters used by the Dynamic Subset
-    /// Selection algorithm (see "Dynamic Training Subset Selection for
-    /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
-    /// Ross).
-    ///
-    struct example
-    {
-      typedef boost::variant<bool, int, double, std::string> value_t;
+  public:  // Structures and typedef
+    struct example;
+    struct column;
+    struct category;
 
-      example() { clear(); }
-
-      std::vector<value_t> input;
-      value_t             output;
-
-      std::uintmax_t  difficulty;
-      unsigned               age;
-
-      size_t label() const
-      { return static_cast<size_t>(boost::get<int>(output)); }
-
-      void clear()
-      { input.clear(); output = value_t(); difficulty = 0; age = 0; }
-    };
-
-    template<class T> static T cast(const example::value_t &);
-
-    /// \brief Informations about a "column" of the dataset.
-    struct column
-    {
-      std::string       name;
-      category_t category_id;
-    };
-
-    ///
-    /// \brief Information about a category of the dataset.
-    ///
-    /// For example:
-    ///
-    ///     <attribute type="nominal">
-    ///       <labels>
-    ///         <label>Iris-setosa</label>
-    ///         <label>Iris-versicolor</label>
-    ///         <label>Iris-virginica</label>
-    ///       </labels>
-    ///     </attribute>
-    ///
-    /// is mapped to category:
-    /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
-    ///
-    /// while:
-    ///     <attribute type="numeric" category="A" name="Speed" />
-    /// is mapped to category:
-    /// * {"A", d_double, {}}
-    ///
-    struct category
-    {
-      std::string             name;
-      domain_t              domain;
-      std::set<std::string> labels;
-    };
-
-  public:
     /// example *
     typedef typename std::list<example>::iterator iterator;
     /// const example *
     typedef typename std::list<example>::const_iterator const_iterator;
 
-  public:  // Construction, convenience.
+  public:  // Construction, convenience
     data();
     explicit data(const std::string &, unsigned = 0);
 
     enum dataset_t {training = 0, validation, test, k_max_dataset = test};
     void dataset(dataset_t);
     dataset_t dataset() const;
-    void slice(size_t);
+    void slice(unsigned);
 
     iterator begin();
     const_iterator cbegin() const;
     iterator end() const;
     const_iterator cend() const { return end(); }
-    size_t size() const;
-    size_t size(dataset_t) const;
+    unsigned size() const;
+    unsigned size(dataset_t) const;
 
-    size_t open(const std::string &, unsigned = 0);
+    unsigned open(const std::string &, unsigned = 0);
     bool operator!() const;
 
     void clear();
@@ -137,61 +76,35 @@ namespace vita
     const category &get_category(category_t) const;
     const column &get_column(unsigned) const;
 
-    size_t categories() const;
-    size_t classes() const;
-    size_t columns() const;
-    size_t variables() const;
+    unsigned categories() const;
+    unsigned classes() const;
+    unsigned columns() const;
+    unsigned variables() const;
 
-    std::string class_name(unsigned) const;
+    std::string class_name(class_tag_t) const;
 
     bool debug() const;
 
-    static domain_t from_weka(const std::string &n)
-    {
-      static const std::map<const std::string, domain_t> map(
-      {
-        // This type is vita-specific (not standard).
-        {"boolean", domain_t::d_bool},
+    static domain_t from_weka(const std::string &);
 
-        {"integer", domain_t::d_int},
-
-        // Real and numeric are treated as double precisione number (d_double).
-        {"numeric", domain_t::d_double},
-        {"real", domain_t::d_double},
-
-        // Nominal values are defined by providing a list of possible values.
-        {"nominal", domain_t::d_string},
-
-        // String attributes allow us to create attributes containing arbitrary
-        // textual values. This is very useful in text-mining applications.
-        {"string", domain_t::d_string}
-
-        // {"date", ?}, {"relational", ?}
-      });
-
-      const auto &i(map.find(n));
-      return i == map.end() ? d_void : i->second;
-    }
-
-  private:
-    static example::value_t convert(const std::string &, domain_t);
-    static unsigned encode(const std::string &,
-                           std::map<std::string, unsigned> *);
+  private: // Private support methods
+    template<class T> static T encode(const std::string &,
+                                      std::map<std::string, T> *);
     static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
-    size_t load_csv(const std::string &, unsigned);
-    size_t load_xrff(const std::string &);
+    unsigned load_csv(const std::string &, unsigned);
+    unsigned load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);
 
-  private:  // Private data members.
+  private:  // Private data members
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
-    std::map<std::string, unsigned> categories_map_;
-    std::map<std::string, unsigned> classes_map_;
+    std::map<std::string, category_t> categories_map_;
+    std::map<std::string, class_tag_t>   classes_map_;
 
     /// How is the dataset organized? Sometimes we have a dataset header (XRFF
     /// file format), other times it has to be implicitly derived (e.g. CSV).
@@ -225,17 +138,91 @@ namespace vita
     dataset_t active_dataset_;
   };
 
-  template<class T>
-  T data::cast(const example::value_t &e)
+  ///
+  /// \brief Stores a single element of the data set.
+  ///
+  /// The \c struct consists of an input vector (\a input) and an answer value
+  /// (\a output). Depending on the kind of problem, \a output stores:
+  /// * a numeric value (symbolic regression problem);
+  /// * a label (classification problem).
+  ///
+  /// \a difficulty and \a age are parameters used by the Dynamic Subset
+  /// Selection algorithm (see "Dynamic Training Subset Selection for
+  /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
+  /// Ross).
+  ///
+  struct data::example
   {
-    switch (e.which())
+    example() { clear(); }
+
+    std::vector<any> input;
+    any             output;
+    domain_t      d_output;
+
+    std::uintmax_t  difficulty;
+    unsigned               age;
+
+    class_tag_t tag() const { return any_cast<class_tag_t>(output); }
+    template<class T> T cast_output() const;
+
+    void clear()
     {
-    case 0:  return static_cast<T>(boost::get<bool>(e));
-    case 1:  return static_cast<T>(boost::get<int>(e));
-    case 2:  return static_cast<T>(boost::get<double>(e));
-    default: return static_cast<T>(0.0);
+      input.clear();
+      output = any();
+      d_output = d_void;
+      difficulty = 0;
+      age = 0;
+    }
+  };
+
+  template<class T>
+  T data::example::cast_output() const
+  {
+    switch (d_output)
+    {
+    case d_bool:    return static_cast<T>(any_cast<bool>(output));
+    case d_int:     return static_cast<T>(any_cast<int>(output));
+    case d_double:  return static_cast<T>(any_cast<double>(output));
+    default:        return static_cast<T>(0.0);
     }
   }
+
+  ///
+  /// \brief Informations about a "column" (feature) of the dataset
+  ///
+  struct data::column
+  {
+    std::string       name;
+    category_t category_id;
+  };
+
+  ///
+  /// \brief Informations about a category of the dataset
+  ///
+  /// For example:
+  ///
+  ///     <attribute type="nominal">
+  ///       <labels>
+  ///         <label>Iris-setosa</label>
+  ///         <label>Iris-versicolor</label>
+  ///         <label>Iris-virginica</label>
+  ///       </labels>
+  ///     </attribute>
+  ///
+  /// is mapped to category:
+  /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+  ///
+  /// while
+  ///     <attribute type="numeric" category="A" name="Speed" />
+  /// is mapped to category:
+  /// * {"A", d_double, {}}
+  ///
+  struct data::category
+  {
+    std::string             name;
+    domain_t              domain;
+    std::set<std::string> labels;
+  };
 }  // namespace vita
 
 #endif  // DATA_H
