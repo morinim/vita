@@ -219,4 +219,61 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   }
 }
 
+BOOST_AUTO_TEST_CASE(binary_lambda)
+{
+  using namespace vita;
+
+  src_problem pr(true);
+  auto res(pr.load("ionosphere.csv"));
+  BOOST_REQUIRE_EQUAL(res.first, 351);
+
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    const individual ind1(pr.env, pr.sset);
+    const individual ind2(pr.env, pr.sset);
+    const individual ind3(pr.env, pr.sset);
+
+    const binary_lambda_f<individual> lambda1(ind1, *pr.data());
+    const binary_lambda_f<individual> lambda2(ind2, *pr.data());
+    const binary_lambda_f<individual> lambda3(ind3, *pr.data());
+
+    team<individual> t{{ind1, ind2, ind3}};
+    binary_lambda_f<team<individual>> lambda_t(t, *pr.data());
+
+    for (const auto &example : *pr.data())
+    {
+      const std::vector<vita::any> out =
+      {
+        lambda1(example), lambda2(example), lambda3(example)
+      };
+      const std::vector<std::string> names =
+      {
+        lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
+      };
+
+      std::map<std::string, unsigned> votes;
+
+      for (unsigned i(0); i < out.size(); ++i)
+      {
+        if (votes.find(names[i]) == votes.end())
+          votes[names[i]] = 1;
+        else
+          ++votes[names[i]];
+      }
+
+      std::string s_best;
+      unsigned c_best(0);
+
+      for (auto &i : votes)
+        if (i.second > c_best)
+        {
+          s_best = i.first;
+          c_best = i.second;
+        }
+
+      BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
+    }
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -276,6 +276,10 @@ namespace vita
   /// \brief Slotted Dynamic Class Boundary Determination specialization for
   ///        teams
   ///
+  /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
+  ///
   template<class T, bool S, bool N>
   class basic_dyn_slot_lambda_f<team<T>, S, N>
     : public team_class_lambda_f<T, S, N, basic_dyn_slot_lambda_f>
@@ -287,12 +291,34 @@ namespace vita
   ///
   /// \brief Gaussian Distribution Classification specialization for teams
   ///
+  /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
+  ///
   template<class T, bool S, bool N>
   class basic_gaussian_lambda_f<team<T>, S, N>
     : public team_class_lambda_f<T, S, N, basic_gaussian_lambda_f>
   {
   public:
     using basic_gaussian_lambda_f::team_class_lambda_f::team_class_lambda_f;
+  };
+
+  ///
+  /// \brief Binary Classification specialization for teams
+  ///
+  /// \tparam T type of individual.
+  /// \tparam S stores the individual inside vs keep a reference only.
+  /// \tparam N stores the name of the classes vs doesn't store the names.
+  ///
+  /// This class transforms individuals to lambda functions which can be used
+  /// for single-class classification tasks.
+  ///
+  template<class T, bool S, bool N>
+  class basic_binary_lambda_f<team<T>, S, N>
+    : public team_class_lambda_f<T, S, N, basic_binary_lambda_f>
+  {
+  public:
+    using basic_binary_lambda_f::team_class_lambda_f::team_class_lambda_f;
   };
 
   // A list of template aliases to simplify the syntax and help the end user.

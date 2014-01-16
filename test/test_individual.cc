@@ -122,8 +122,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * double(diff) / double(length));
-  BOOST_CHECK_GT(perc, 48.0);
-  BOOST_CHECK_LT(perc, 51.0);
+  BOOST_CHECK_GT(perc, 47.0);
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
