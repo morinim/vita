@@ -210,8 +210,8 @@ namespace vita
   };
 
   ///
-  /// This evaluator uses Gaussian distribution for multiclass object
-  /// classification.
+  /// \brief Gaussian distribution for multiclass object classification.
+  ///
   /// Instead of using predefined multiple thresholds to form different regions
   /// in the program output space for different classes, this approach uses
   /// probabilities of different classes, derived from Gaussian distributions,

@@ -115,45 +115,9 @@ bool basic_reg_lambda_f<team<T>, S>::debug() const
 ///
 /// \param[in] d the training set.
 ///
-inline class_names<true>::class_names(const data &d) : names_(d.classes())
-{
-  const auto classes(d.classes());
-  assert(classes > 1);
-
-  for (auto i(decltype(classes){0}); i < classes; ++i)
-    names_[i] = d.class_name(i);
-}
-
-///
-/// \param[in] a id of a class.
-/// \return the name of class \a a.
-///
-template<bool N>
-std::string class_names<N>::string(const any &a) const
-{
-  return boost::lexical_cast<std::string>(any_cast<class_tag_t>(a));
-}
-
-///
-/// \param[in] a id of a class.
-/// \return the name of class \a a.
-///
-inline std::string class_names<true>::string(const any &a) const
-{
-  // Specialized class templates result in a normal class with a funny name and
-  // not a template. When we specialize class_names<true>, it is no longer a
-  // template and the implementation of its class members are not template
-  // specializations. So we haven't to put template<> at the beginning.
-
-  return names_[any_cast<class_tag_t>(a)];
-}
-
-///
-/// \param[in] d the training set.
-///
 template<class T, bool N>
 basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
-  : class_names<N>(d)
+  : detail::class_names<N>(d)
 {
 }
 
@@ -175,7 +139,7 @@ any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
 template<class T, bool N>
 std::string basic_class_lambda_f<T, N>::name(const any &a) const
 {
-  return class_names<N>::string(a);
+  return detail::class_names<N>::string(a);
 }
 
 ///
