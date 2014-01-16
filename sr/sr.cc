@@ -1,14 +1,13 @@
 /**
- *
- *  \file sr.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/algorithm/string.hpp>
@@ -32,10 +31,10 @@ namespace po = boost::program_options;
 namespace
 {
   const std::string vita_sr_version1(
-    "Vita - Symbolic Regression and classification v0.9.8"
+    "Vita - Symbolic Regression and classification v0.9.9"
     );
   const std::string vita_sr_version2(
-    "Copyright 2011-2013 EOS di Manlio Morini (http://www.eosdev.it)"
+    "Copyright 2011-2014 EOS di Manlio Morini (http://www.eosdev.it)"
     );
   const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
