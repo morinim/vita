@@ -254,14 +254,17 @@ namespace vita
   class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
   {
   public:
-    explicit team_class_lambda_f(const data &);
-    team_class_lambda_f(const team<T> &, const data &);
+    team_class_lambda_f(const team<T> &, data &);
 
     virtual class_tag_t tag(const data::example &) const override;
 
     virtual bool debug() const override;
 
   protected:
+    // This constructor initializes only some data members, so it must not be
+    // available to the end user.
+    explicit team_class_lambda_f(data &);
+
     // The components of the team never store the names of the classes. If we
     // need the names, the master class will memorize them.
     std::vector<L<T, S, false>> team_;
@@ -281,7 +284,18 @@ namespace vita
     basic_dyn_slot_lambda_f(const team<T> &, data &, unsigned);
   };
 
-  // A list of template aliases to simplify the syntax for the end user.
+  ///
+  /// \brief Gaussian Distribution Classification specialization for teams
+  ///
+  template<class T, bool S, bool N>
+  class basic_gaussian_lambda_f<team<T>, S, N>
+    : public team_class_lambda_f<T, S, N, basic_gaussian_lambda_f>
+  {
+  public:
+    using basic_gaussian_lambda_f::team_class_lambda_f::team_class_lambda_f;
+  };
+
+  // A list of template aliases to simplify the syntax and help the end user.
   template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
   template<class T> using class_lambda_f = basic_class_lambda_f<T, true>;
   template<class T> using dyn_slot_lambda_f =

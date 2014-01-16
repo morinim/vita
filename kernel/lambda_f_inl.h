@@ -505,7 +505,7 @@ bool basic_binary_lambda_f<T, S, N>::debug() const
 /// \param[in] d the training set.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L>
-team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const data &d)
+team_class_lambda_f<T, S, N, L>::team_class_lambda_f(data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
 }
@@ -516,7 +516,7 @@ team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const data &d)
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L>
 team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
-                                                     const data &d)
+                                                     data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
   team_.reserve(t.size());
