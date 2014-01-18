@@ -14,25 +14,12 @@
 #define      LAMBDA_F_INL_H
 
 ///
-/// \param[in] int the individual to be lambdified.
+/// \param[in] prg the program (individual/team) to be lambdified.
 ///
 template<class T, bool S>
-basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &ind) : ind_(ind),
-                                                             int_(ind_)
+basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
+  : detail::core_reg_lambda_f<T, S>(prg)
 {
-  assert(debug());
-}
-
-///
-/// \param[in] t the team to be lambdified.
-///
-template<class T, bool S>
-basic_reg_lambda_f<team<T>, S>::basic_reg_lambda_f(const team<T> &t)
-{
-  team_.reserve(t.size());
-  for (const auto &ind : t)
-    team_.emplace_back(ind);
-
   assert(debug());
 }
 
@@ -43,22 +30,32 @@ basic_reg_lambda_f<team<T>, S>::basic_reg_lambda_f(const team<T> &t)
 template<class T, bool S>
 any basic_reg_lambda_f<T, S>::operator()(const data::example &e) const
 {
-  return int_.run(e.input);
+  // We use tag dispatching (i.e. to delegate to an implementation function
+  // that receives standard arguments plus a dummy argument based on a
+  // compile-time condition). Usually this is much easier to debug and get
+  // right that the std::enable_if solution.
+  // Moreover this is almost guaranteed to be optimized away by a decent
+  // compiler.
+  return eval(e, is_team<T>());
 }
 
-///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
-///
 template<class T, bool S>
-any basic_reg_lambda_f<team<T>, S>::operator()(const data::example &e) const
+any basic_reg_lambda_f<T, S>::eval(const data::example &e,
+                                   std::false_type) const
+{
+  return this->int_.run(e.input);
+}
+
+template<class T, bool S>
+any basic_reg_lambda_f<T, S>::eval(const data::example &e,
+                                   std::true_type) const
 {
   number avg(0), count(0);
 
   // Calculate the running average.
-  for (const auto &lambda : team_)
+  for (const auto &core : this->team_)
   {
-    const auto res(lambda(e));
+    const auto res(core.int_.run(e.input));
 
     if (!res.empty())
       avg += (to<number>(res) - avg) / ++count;
@@ -78,38 +75,12 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 }
 
 ///
-/// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of \a a.
-///
-template<class T, bool S>
-std::string basic_reg_lambda_f<team<T>, S>::name(const any &a) const
-{
-  return boost::lexical_cast<std::string>(to<number>(a));
-}
-
-///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::debug() const
 {
-  if (!int_.debug())
-    return false;
-
-  return ind_.debug();
-}
-
-///
-/// \return \c true if the object passes the internal consistency check.
-///
-template<class T, bool S>
-bool basic_reg_lambda_f<team<T>, S>::debug() const
-{
-  for (const auto &lambda : team_)
-    if (!lambda.debug())
-      return false;
-
-  return true;
+  return detail::core_reg_lambda_f<T, S>::debug();
 }
 
 ///

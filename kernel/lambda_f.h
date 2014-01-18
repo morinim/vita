@@ -72,7 +72,8 @@ namespace vita
   ///           not persistence.
   ///
   template<class T, bool S>
-  class basic_reg_lambda_f : public lambda_f<T>
+  class basic_reg_lambda_f : public lambda_f<T>,
+                             private detail::core_reg_lambda_f<T, S>
   {
   public:
     basic_reg_lambda_f(const T &);
@@ -83,28 +84,9 @@ namespace vita
 
     virtual bool debug() const override;
 
-  protected:
-    typename std::conditional<S, const T, const T &>::type ind_;
-    mutable src_interpreter<T>                             int_;
-  };
-
-  ///
-  /// \brief Regression lambda function specialization for teams
-  ///
-  template<class T, bool S>
-  class basic_reg_lambda_f<team<T>, S> : public lambda_f<team<T>>
-  {
-  public:
-    basic_reg_lambda_f(const team<T> &);
-
-    virtual any operator()(const data::example &) const override final;
-
-    virtual std::string name(const any &) const override final;
-
-    virtual bool debug() const override;
-
-  protected:
-    std::vector<basic_reg_lambda_f<T, S>> team_;
+  private:
+    any eval(const data::example &, std::false_type) const;
+    any eval(const data::example &, std::true_type) const;
   };
 
   ///

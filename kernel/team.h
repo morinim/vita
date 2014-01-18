@@ -106,6 +106,13 @@ namespace vita
 
   template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
+  // The SFINAE way of recognize a team.
+  template<class T> struct is_team : std::false_type {};
+  template<class T> struct is_team<team<T>> : std::true_type {};
+
+  template<class T> struct not_team : std::true_type {};
+  template<class T> struct not_team<team<T>> : std::false_type {};
+
 #include "kernel/team_inl.h"
 }  // namespace vita
 
