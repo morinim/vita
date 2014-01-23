@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVALUATOR_PROXY_INL_H)
-#define      EVALUATOR_PROXY_INL_H
+#if !defined(VITA_EVALUATOR_PROXY_INL_H)
+#define      VITA_EVALUATOR_PROXY_INL_H
 
 ///
 /// \param[in] eva pointer that lets the proxy access the real evaluator.
@@ -27,32 +27,32 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
 }
 
 ///
-/// \param[in] ind the individual whose fitness we want to know.
+/// \param[in] prg the program (individual/team) whose fitness we want to know.
 /// \return the fitness of \a ind.
 ///
 template<class T>
-fitness_t evaluator_proxy<T>::operator()(const T &ind)
+fitness_t evaluator_proxy<T>::operator()(const T &prg)
 {
   fitness_t f;
-  if (cache_.find(ind, &f))
+  if (cache_.find(prg.signature(), &f))
   {
     assert(cache_.hits());
 
 #if defined(CLONE_SCALING)
-    // Before evaluating an individual, we check if identical individuals
+    // Before evaluating a program, we check if identical programs
     // (clones) are already present in the population.
     // When the number of clones is grater than zero, the fitness assigned to
-    // the individual is multiplied by a clone-scaling factor.
+    // the program is multiplied by a clone-scaling factor.
     // For further details see "Evolving Assembly Programs: How Games Help
     // Microprocessor Validation" - F.Corno, E.Sanchez, G.Squillero.
-    const double perc(double(cache_.seen(ind)) / cache_.hits());
+    const double perc(double(cache_.seen(prg.signature())) / cache_.hits());
     if (0.01 < perc && perc < 1.0)
       f -= (f * perc).abs() * 2.0;
 #endif
 
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
-    const fitness_t f1((*eva_)(ind));
+    const fitness_t f1((*eva_)(prg.signature()));
     if (f[0] != f1[0])
       std::cerr << "********* COLLISION ********* [" << f << " != " << f1
                 << "]" << std::endl;
@@ -61,9 +61,9 @@ fitness_t evaluator_proxy<T>::operator()(const T &ind)
     // fitness otherwise we can have false positives.
     // For example if the fitness is a 2D vector (where the first component
     // is the "score" on the training set and the second one is the effective
-    // length of the individual), then the following two individuals:
+    // length of the program), then the following two programs:
     //
-    // INDIVIDUAL A              INDIVIDUAL B
+    // PROGRAM A                 PROGRAM B
     // ------------------        ------------------
     // [000] FADD 001 002        [000] FADD 001 001
     // [001] X1                  [001] X1
@@ -75,13 +75,13 @@ fitness_t evaluator_proxy<T>::operator()(const T &ind)
   }
   else
   {
-    f = (*eva_)(ind);
+    f = (*eva_)(prg);
 
-    cache_.insert(ind, f);
+    cache_.insert(prg.signature(), f);
 
 #if !defined(NDEBUG)
     fitness_t f1;
-    assert(cache_.find(ind, &f1));
+    assert(cache_.find(prg.signature(), &f1));
     assert(f == f1);
 #endif
   }
@@ -90,13 +90,13 @@ fitness_t evaluator_proxy<T>::operator()(const T &ind)
 }
 
 ///
-/// \param[in] i the individual whose fitness we want to know.
+/// \param[in] prg the program (individual/team) whose fitness we want to know.
 /// \return the an approximation of the fitness of \a i.
 ///
 template<class T>
-fitness_t evaluator_proxy<T>::fast(const T &i)
+fitness_t evaluator_proxy<T>::fast(const T &prg)
 {
-  return eva_->fast(i);
+  return eva_->fast(prg);
 }
 
 ///
@@ -123,35 +123,35 @@ void evaluator_proxy<T>::clear(unsigned what)
 }
 
 ///
-/// \param[in] ind an individual.
+/// \param[in] prg a program (individual/team).
 ///
-/// Clears the cached informations for individual \a ind.
+/// Clears the cached informations for program \a prg.
 ///
 template<class T>
-void evaluator_proxy<T>::clear(const T &ind)
+void evaluator_proxy<T>::clear(const T &prg)
 {
-  cache_.clear(ind);
+  cache_.clear(prg.signature());
 }
 
 ///
-/// \return the accuracy of \a ind.
+/// \return the accuracy of \a prg.
 ///
 template<class T>
-double evaluator_proxy<T>::accuracy(const T &ind) const
+double evaluator_proxy<T>::accuracy(const T &prg) const
 {
-  return eva_->accuracy(ind);
+  return eva_->accuracy(prg);
 }
 
 ///
-/// \param[in] i an individual.
-/// \return how many times we have seen the individual \a i from during the
+/// \param[in] i a program (individual/team).
+/// \return how many times we have seen the program \a prg from during the
 ///         current run of the evolution / the last call of the clear
 ///         function.
 ///
 template<class T>
-unsigned evaluator_proxy<T>::seen(const T &i) const
+unsigned evaluator_proxy<T>::seen(const T &prg) const
 {
-  return cache_.seen(i);
+  return cache_.seen(prg.signature());
 }
 
 ///
@@ -169,13 +169,13 @@ std::string evaluator_proxy<T>::info() const
 }
 
 ///
-/// \param[in] ind an individual.
-/// \return a pointer to the executable version of \a ind.
+/// \param[in] prg a program (individual/team).
+/// \return a pointer to the executable version of \a prg.
 ///
 template<class T>
-std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &ind) const
+std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
 {
-  return eva_->lambdify(ind);
+  return eva_->lambdify(prg);
 }
 
 #endif  // EVALUATOR_PROXY_INL_H

@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVALUATOR_PROXY_H)
-#define      EVALUATOR_PROXY_H
+#if !defined(VITA_EVALUATOR_PROXY_H)
+#define      VITA_EVALUATOR_PROXY_H
 
 #include <boost/lexical_cast.hpp>
 
@@ -58,4 +58,4 @@ namespace vita
 #include "kernel/evaluator_proxy_inl.h"
 }  // namespace vita
 
-#endif  // EVALUATOR_PROXY_H
+#endif  // include guard

@@ -17,8 +17,6 @@
 
 namespace vita
 {
-  class individual;
-
   ///
   /// This is a 128bit stream used as individual signature / hash table
   /// look up key.
@@ -58,9 +56,9 @@ namespace vita
 
 
   ///
-  /// \a ttable \c class implements a hash table that links individuals to
-  /// fitness (it's used by the \a evaluator_proxy \c class).
-  /// The key used for table lookup is the individual's signature.
+  /// \a ttable \c class implements a hash table that links individuals'
+  /// signature to fitness (it's used by the \a evaluator_proxy \c class).
+  ///
   /// During the evolution semantically equivalent (but syntactically distinct)
   /// individuals are often generated and \a ttable could give a significant
   /// speed improvement avoiding the recalculation of shared information.
@@ -72,15 +70,15 @@ namespace vita
     ~ttable();
 
     void clear();
-    void clear(const individual &);
+    void clear(const hash_t &);
 #if defined(CLONE_SCALING)
     void reset_seen();
 #endif
 
-    void insert(const individual &, const fitness_t &);
+    void insert(const hash_t &, const fitness_t &);
 
-    bool find(const individual &, fitness_t *const) const;
-    unsigned seen(const individual &) const;
+    bool find(const hash_t &, fitness_t *const) const;
+    unsigned seen(const hash_t &) const;
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.

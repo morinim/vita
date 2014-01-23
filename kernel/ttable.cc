@@ -1,18 +1,16 @@
 /**
- *
- *  \file ttable.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include "kernel/ttable.h"
-#include "kernel/individual.h"
 
 namespace vita
 {
@@ -97,14 +95,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind individual whose informations we have to clear.
+  /// \param[in] h individual's signature whose informations we have to clear.
   ///
   /// Clears the cached information for individual \a ind.
   ///
-  void ttable::clear(const individual &ind)
+  void ttable::clear(const hash_t &h)
   {
-    const hash_t h(ind.signature());
-
     table_[index(h)].hash = hash_t();
 
     // An alternative to invalidate the slot:
@@ -128,16 +124,14 @@ namespace vita
   ///
   /// \brief Looks for the fitness of an individual in the transposition table.
   ///
-  /// \param[in] ind the individual to look for.
+  /// \param[in] h individual's signature to look for.
   /// \param[out] fitness the fitness of the individual (if present).
   /// \return \c true if \a ind is found in the transposition table, \c false
   ///         otherwise.
   ///
-  bool ttable::find(const individual &ind, fitness_t *const fitness) const
+  bool ttable::find(const hash_t &h, fitness_t *const fitness) const
   {
     ++probes_;
-
-    const hash_t h(ind.signature());
 
     const slot &s(table_[index(h)]);
 
@@ -156,12 +150,11 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind the individual to look for.
+  /// \param[in] h individual's signature to look for.
   /// \return number of times \a ind has been looked for.
   ///
-  unsigned ttable::seen(const individual &ind) const
+  unsigned ttable::seen(const hash_t &h) const
   {
-    const hash_t h(ind.signature());
     const slot &s(table_[index(h)]);
 
     const bool ret(seal_ == s.seal && h == s.hash);
@@ -174,19 +167,20 @@ namespace vita
   }
 
   ///
-  /// \param[in] ind a (possibly) new individual to be stored in the table.
+  /// \param[in] h a (possibly) new individual's signature to be stored in the
+  ///              table.
   /// \param[in] fitness the fitness of the individual.
   ///
   /// Stores fitness information in the transposition table.
   ///
-  void ttable::insert(const individual &ind, const fitness_t &fitness)
+  void ttable::insert(const hash_t &h, const fitness_t &fitness)
   {
     slot s;
-    s.hash    = ind.signature();
-    s.fitness =         fitness;
-    s.seal    =           seal_;
+    s.hash    =       h;
+    s.fitness = fitness;
+    s.seal    =   seal_;
 #if defined(CLONE_SCALING)
-    s.seen    =               1;
+    s.seen    =       1;
 #endif
 
     table_[index(s.hash)] = s;
