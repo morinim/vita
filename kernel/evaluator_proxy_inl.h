@@ -52,7 +52,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
-    const fitness_t f1((*eva_)(prg.signature()));
+    const fitness_t f1((*eva_)(prg));
     if (f[0] != f1[0])
       std::cerr << "********* COLLISION ********* [" << f << " != " << f1
                 << "]" << std::endl;
