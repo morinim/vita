@@ -10,15 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/algorithm/string.hpp>
-#include <boost/program_options.hpp>
-
-namespace po = boost::program_options;
-
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <string>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
 
 #include "kernel/environment.h"
 #include "kernel/src/evaluator.h"
@@ -27,6 +25,8 @@ namespace po = boost::program_options;
 #include "kernel/src/search.h"
 
 #include "command_line_interpreter.h"
+
+namespace po = boost::program_options;
 
 namespace
 {

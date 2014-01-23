@@ -84,7 +84,7 @@ namespace vita
 
     virtual bool debug() const override;
 
-  private:
+  private:  // Private support methods
     any eval(const data::example &, std::false_type) const;
     any eval(const data::example &, std::true_type) const;
   };

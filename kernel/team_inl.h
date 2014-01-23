@@ -138,7 +138,7 @@ unsigned team<T>::individuals() const
 /// \return the total size of the team (effective size + introns).
 ///
 /// The size is constant for any team (it's choosen at initialization time).
-/// \see eff_size()
+/// \see team::eff_size()
 ///
 template<class T>
 unsigned team<T>::size() const
@@ -153,18 +153,17 @@ unsigned team<T>::size() const
 
 ///
 /// \return the effective size of the team.
-/// \see size()
+/// \see team::size()
 ///
 template<class T>
 unsigned team<T>::eff_size() const
 {
-  unsigned ef(0);
+  unsigned es(0);
 
   for (const auto &ind : individuals_)
-    for (VARIABLE_IS_NOT_USED const auto &l : ind)
-      ++ef;
+    es+= ind.eff_size();
 
-  return ef;
+  return es;
 }
 
 ///

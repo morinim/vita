@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,16 +13,11 @@
 #if !defined(ANALYZER_INL_H)
 #define      ANALYZER_INL_H
 
-// We have to forward declaring the specialization or the compiler will use
-// the standard method.
-class individual;
-template<> unsigned analyzer<individual>::count(const individual &);
-
 ///
-/// New empty analyzer.
+/// New empty core_analyzer.
 ///
 template<class T>
-analyzer<T>::analyzer()
+core_analyzer<T>::core_analyzer()
 {
   clear();
 }
@@ -31,7 +26,7 @@ analyzer<T>::analyzer()
 /// Resets gathered statics.
 ///
 template<class T>
-void analyzer<T>::clear()
+void core_analyzer<T>::clear()
 {
   age_.clear();
   fit_.clear();
@@ -49,7 +44,7 @@ void analyzer<T>::clear()
 ///         informations about.
 ///
 template<class T>
-typename analyzer<T>::const_iterator analyzer<T>::begin() const
+typename core_analyzer<T>::const_iterator core_analyzer<T>::begin() const
 {
   return sym_counter_.begin();
 }
@@ -58,7 +53,7 @@ typename analyzer<T>::const_iterator analyzer<T>::begin() const
 /// \return a constant reference (sentry) used for loops.
 ///
 template<class T>
-typename analyzer<T>::const_iterator analyzer<T>::end() const
+typename core_analyzer<T>::const_iterator core_analyzer<T>::end() const
 {
   return sym_counter_.end();
 }
@@ -68,7 +63,7 @@ typename analyzer<T>::const_iterator analyzer<T>::end() const
 /// \return number of functions in the population.
 ///
 template<class T>
-std::uintmax_t analyzer<T>::functions(bool eff) const
+std::uintmax_t core_analyzer<T>::functions(bool eff) const
 {
   return functions_.counter[eff];
 }
@@ -78,7 +73,7 @@ std::uintmax_t analyzer<T>::functions(bool eff) const
 /// \return number of terminals in the population.
 ///
 template<class T>
-std::uintmax_t analyzer<T>::terminals(bool eff) const
+std::uintmax_t core_analyzer<T>::terminals(bool eff) const
 {
   return terminals_.counter[eff];
 }
@@ -87,7 +82,7 @@ std::uintmax_t analyzer<T>::terminals(bool eff) const
 /// \return statistics about the age distribution of the individuals.
 ///
 template<class T>
-const distribution<double> &analyzer<T>::age_dist() const
+const distribution<double> &core_analyzer<T>::age_dist() const
 {
   assert(age_.debug(true));
 
@@ -100,7 +95,7 @@ const distribution<double> &analyzer<T>::age_dist() const
 ///         \a l.
 ///
 template<class T>
-const distribution<double> &analyzer<T>::age_dist(unsigned l) const
+const distribution<double> &core_analyzer<T>::age_dist(unsigned l) const
 {
   assert(layer_stat_.find(l) != layer_stat_.end());
   assert(layer_stat_.find(l)->second.age.debug(true));
@@ -112,7 +107,7 @@ const distribution<double> &analyzer<T>::age_dist(unsigned l) const
 /// \return statistics about the fitness distribution of the individuals.
 ///
 template<class T>
-const distribution<fitness_t> &analyzer<T>::fit_dist() const
+const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
 {
   assert(fit_.debug(true));
 
@@ -125,7 +120,7 @@ const distribution<fitness_t> &analyzer<T>::fit_dist() const
 ///         \a l.
 ///
 template<class T>
-const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned l) const
+const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned l) const
 {
   assert(layer_stat_.find(l) != layer_stat_.end());
   assert(layer_stat_.find(l)->second.fitness.debug(true));
@@ -137,7 +132,7 @@ const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned l) const
 /// \return statistic about the length distribution of the individuals.
 ///
 template<class T>
-const distribution<double> &analyzer<T>::length_dist() const
+const distribution<double> &core_analyzer<T>::length_dist() const
 {
   assert(length_.debug(true));
 
@@ -148,10 +143,10 @@ const distribution<double> &analyzer<T>::length_dist() const
 /// \param[in] sym symbol we are gathering statistics about.
 /// \param[in] active is this an active gene?
 ///
-/// Used by analyzer<T>::count(const T &)
+/// Used by core_analyzer<T>::count(const T &)
 ///
 template<class T>
-void analyzer<T>::count(const symbol *const sym, bool active)
+void core_analyzer<T>::count(const symbol *const sym, bool active)
 {
   assert(sym);
 
@@ -167,7 +162,7 @@ void analyzer<T>::count(const symbol *const sym, bool active)
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T>
-bool analyzer<T>::debug() const
+bool core_analyzer<T>::debug() const
 {
   for (const auto &i : sym_counter_)
     if (i.second.counter[true] > i.second.counter[false])
@@ -183,23 +178,6 @@ bool analyzer<T>::debug() const
 }
 
 ///
-/// \tparam T type of individual.
-///
-/// \param[in] ind individual to be analyzed.
-/// \return effective length of individual we gathered statistics about.
-///
-template<class T>
-unsigned analyzer<T>::count(const T &t)
-{
-  unsigned length(0);
-
-  while (auto i{t.individuals()})
-    length += count(t[--i]);
-
-  return length;
-}
-
-///
 /// \param[in] ind new individual.
 /// \param[in] f fitness of the new individual.
 /// \param[in] l a layer of the population.
@@ -207,7 +185,7 @@ unsigned analyzer<T>::count(const T &t)
 /// Adds a new individual to the pool used to calculate statistics.
 ///
 template<class T>
-void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned l)
+void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned l)
 {
   age_.add(ind.age());
   layer_stat_[l].age.add(ind.age());
@@ -220,4 +198,55 @@ void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned l)
     layer_stat_[l].fitness.add(f);
   }
 }
+
+///
+/// \tparam T type of individual.
+///
+/// \param[in] ind individual to be analyzed.
+/// \return effective length of individual we gathered statistics about.
+///
+template<class T>
+unsigned analyzer<T>::count(const T &ind)
+{
+  for (index_t i(0); i < ind.size(); ++i)
+    for (category_t c(0); c < ind.sset().categories(); ++c)
+      core_analyzer<T>::count(ind[{i, c}].sym, false);
+
+  unsigned length(0);
+  for (const auto &l : ind)
+  {
+    core_analyzer<T>::count(ind[l].sym, true);
+    ++length;
+  }
+
+  return length;
+}
+
+///
+/// \tparam T type of individual.
+///
+/// \param[in] t team to be analyzed.
+/// \return effective length of the team we gathered statistics about.
+///
+template<class T>
+unsigned analyzer<team<T>>::count(const team<T> &t)
+{
+  unsigned length(0);
+
+  for (const auto &ind : t)
+  {
+    for (index_t i(0); i < ind.size(); ++i)
+      for (category_t c(0); c < ind.sset().categories(); ++c)
+        core_analyzer<team<T>>::count(ind[{i, c}].sym, false);
+
+    for (const auto &l : ind)
+    {
+      core_analyzer<team<T>>::count(ind[l].sym, true);
+      ++length;
+    }
+  }
+
+  return length;
+}
+
 #endif  // ANALYZER_INL_H

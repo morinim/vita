@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(ANALYZER_H)
-#define      ANALYZER_H
+#if !defined(VITA_ANALYZER_H)
+#define      VITA_ANALYZER_H
 
 #include <map>
 
@@ -20,24 +20,8 @@
 
 namespace vita
 {
-  ///
-  /// \brief Analyzer takes a statistics snapshot of a population
-  ///
-  /// \tparam T type of individual.
-  ///
-  /// Procedure:
-  /// 1. the population set should be loaded adding (analyzer::add method) one
-  ///    individual at time;
-  /// 2. statistics can be checked executing the desidered methods.
-  ///
-  /// Informations regard:
-  /// * the set as a whole (analyzer::fit_dist, analyzer::length_dist,
-  ///   analyzer::functions, analyzer::terminals methods);
-  /// * symbols appearing in the set (accessed via analyzer::begin and
-  ///   analyzer::end methods).
-  ///
   template<class T>
-  class analyzer
+  class core_analyzer
   {
   public:
     struct sym_counter
@@ -57,7 +41,7 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
-    analyzer();
+    core_analyzer();
 
     void add(const T &, const fitness_t &, unsigned);
 
@@ -75,11 +59,11 @@ namespace vita
 
     bool debug() const;
 
-  private:  // Private support methods.
-    unsigned count(const T &);
+  protected:  // Protected support methods
+    virtual unsigned count(const T &) = 0;  // <-- VIRTUAL
     void count(const symbol *const, bool);
 
-  private:  // Private data members.
+  private:  // Private data members
     struct layer_stat
     {
       distribution<double> age;
@@ -95,9 +79,50 @@ namespace vita
 
     sym_counter functions_;
     sym_counter terminals_;
-  };  // class analyzer
+  };  // core_analyzer
+
+  ///
+  /// \brief Analyzer takes a statistics snapshot of a population
+  ///
+  /// \tparam T type of individual
+  ///
+  /// Procedure:
+  /// 1. the population set should be loaded adding (analyzer::add method) one
+  ///    individual at time;
+  /// 2. statistics can be checked executing the desidered methods.
+  ///
+  /// Informations regard:
+  /// * the set as a whole (analyzer::fit_dist, analyzer::length_dist,
+  ///   analyzer::functions, analyzer::terminals methods);
+  /// * symbols appearing in the set (accessed via analyzer::begin and
+  ///   analyzer::end methods).
+  ///
+  template<class T>
+  class analyzer : public core_analyzer<T>
+  {
+  public:
+    using analyzer::core_analyzer::core_analyzer;
+
+  private:  // Private support methods
+    virtual unsigned count(const T &) override;
+  };
+
+  ///
+  /// \brief Analyzer specialization for populations of teams.
+  ///
+  /// \tparam T type of individual
+  ///
+  template<class T>
+  class analyzer<team<T>> : public core_analyzer<team<T>>
+  {
+  public:
+    using analyzer::core_analyzer::core_analyzer;
+
+  private:  // Private support methods
+    virtual unsigned count(const team<T> &) override;
+  };
 
 #include "kernel/analyzer_inl.h"
 }  // namespace vita
 
-#endif  // ANALYZER_H
+#endif  // include guard
