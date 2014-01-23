@@ -405,7 +405,11 @@ template<class T>
 void team<T>::in_line(std::ostream &s) const
 {
   for (const auto &i : individuals_)
-    s << '{' << i.in_line(s) << '}';
+  {
+    s << '{';
+    i.in_line(s);
+    s << '}';
+  }
 }
 
 ///
