@@ -1,14 +1,13 @@
 /**
- *
- *  \file example4.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -52,9 +51,9 @@ int main(int argc, char *argv[])
     vita::fitness_t f({static_cast<vita::fitness_t::base_t>(i)});
     const vita::individual &ind(vita::random::element(pool));
 
-    cache.insert(ind, f);
+    cache.insert(ind.signature(), f);
 
-    cache.find(ind, &f);
+    cache.find(ind.signature(), &f);
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;

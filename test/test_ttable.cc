@@ -1,14 +1,13 @@
 /**
- *
- *  \file test_ttable.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -95,9 +94,9 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
     const auto base_f(static_cast<vita::fitness_t::base_t>(i));
     vita::fitness_t f({base_f});
 
-    cache.insert(i1, f);
+    cache.insert(i1.signature(), f);
 
-    BOOST_REQUIRE(cache.find(i1, &f));
+    BOOST_REQUIRE(cache.find(i1.signature(), &f));
     BOOST_REQUIRE_EQUAL(f, vita::fitness_t{base_f});
   }
 }
@@ -118,14 +117,14 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
-    cache.insert(i1, f);
+    cache.insert(i1.signature(), f);
     vi.push_back(i1);
   }
 
   for (unsigned i(0); i < n; ++i)
   {
     vita::fitness_t f;
-    if (cache.find(vi[i], &f))
+    if (cache.find(vi[i].signature(), &f))
     {
       const vita::any val(i_interp(vi[i]).run());
       vita::fitness_t f1(
@@ -153,14 +152,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
     vita::fitness_t f(
       {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
-    cache.insert(i1, f);
+    cache.insert(i1.signature(), f);
     vi.push_back(i1);
   }
 
   for (unsigned i(0); i < n; ++i)
   {
     vita::fitness_t f;
-    present[i] = cache.find(vi[i], &f);
+    present[i] = cache.find(vi[i].signature(), &f);
   }
 
   std::stringstream ss;
@@ -176,7 +175,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
         {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::base_t>(val)});
 
       vita::fitness_t f1;
-      BOOST_CHECK(cache2.find(vi[i], &f1));
+      BOOST_CHECK(cache2.find(vi[i].signature(), &f1));
 
       BOOST_CHECK_EQUAL(f, f1);
     }
