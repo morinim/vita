@@ -422,7 +422,7 @@ void team<T>::list(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
-    i.lists(s);
+    i.list(s);
     s << std::endl;
   }
 }
