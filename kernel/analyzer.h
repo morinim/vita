@@ -64,13 +64,23 @@ namespace vita
     void count(const symbol *const, bool);
 
   private:  // Private data members
+    /// This comparator is useful for debugging purpose: when we insert a
+    /// symbol pointer in an ordered container, it induces a well defined
+    /// order. Without this the default comparison for pointers has a
+    /// unspecified (and not necessarily stable & consistent) behaviour.
+    /// Well defined order means a simple way of debug statistics.
+    struct cmp_symbol_ptr
+    {
+      bool operator()(const symbol *a, const symbol *b) const
+      { return a->opcode() < b->opcode(); }
+    };
+    std::map<const symbol *, sym_counter, cmp_symbol_ptr> sym_counter_;
+
     struct layer_stat
     {
       distribution<double> age;
       distribution<fitness_t> fitness;
     };
-
-    std::map<const symbol *, sym_counter> sym_counter_;
     std::map<unsigned, layer_stat> layer_stat_;
 
     distribution<fitness_t> fit_;

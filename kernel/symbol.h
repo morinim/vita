@@ -20,7 +20,7 @@
 namespace vita
 {
   class individual;
-  template<class T> class interpreter;
+  template<class> class interpreter;
 
   ///
   /// GP assembles variable length program structures from basic units called
@@ -70,7 +70,7 @@ namespace vita
     enum {k_base_weight = 100};
 
   public:  // Public data members.
-    /// Weights is used by the symbol_set::roulette method to control the
+    /// Weight is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
     unsigned weight;
 
