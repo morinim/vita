@@ -280,7 +280,7 @@ double classification_evaluator<T>::accuracy(const T &prg) const
 
   for (const auto &example : *this->dat_)
   {
-    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example) ==
+    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example).first ==
         example.template tag())
       ++ok;
 
@@ -316,7 +316,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t err(0.0);
   for (auto &example : *this->dat_)
   {
-    const auto probable_class(lambda.tag(example));
+    const auto probable_class(lambda.tag(example).first);
 
     if (probable_class != example.template tag())
     {
@@ -365,20 +365,18 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t d(0.0);
   for (auto &example : *this->dat_)
   {
-    double confidence, sum;
-    const auto probable_class(lambda.tag(example, &confidence, &sum));
+    const auto res(lambda.tag(example));
 
-    if (probable_class == example.template tag())
+    if (res.first == example.template tag())
     {
       // Note:
-      // * (sum - confidence) is the sum of the errors;
-      // * (confidence - sum) is the opposite (standardized fitness);
-      // * (confidence - sum) / (dat_->classes() - 1) is the opposite of the
+      // * (1.0 - confidence) is the sum of the errors;
+      // * (confidence - 1.0) is the opposite (standardized fitness);
+      // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
       //   average error;
       // * (1.0 - confidence) is the uncertainty about the right class;
       // * 0.001 is a scaling factor.
-      d += (confidence - sum) / (this->dat_->classes() - 1) -
-           0.001 * (1.0 - confidence);
+      d += (res.second - 1.0) / (this->dat_->classes() - 1);
     }
     else
     {
@@ -422,7 +420,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t err(0.0);
 
   for (auto &example : dataset)
-    if (example.tag() != agent.tag(example))
+    if (example.tag() != agent.tag(example).first)
     {
       ++example.difficulty;
       ++err;

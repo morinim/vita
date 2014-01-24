@@ -100,7 +100,7 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
 template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
 {
-  return any(tag(e));
+  return any(tag(e).first);
 }
 
 ///
@@ -289,13 +289,25 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_dyn_slot_lambda_f<T, S, N>::tag(
+std::pair<class_tag_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
   const data::example &instance) const
 {
-  return slot_class_[slot(instance)];
+  const auto s(slot(instance));
+  const auto classes(slot_matrix_.cols());
+
+  unsigned total(0);
+  for (auto j(decltype(classes){0}); j < classes; ++j)
+    total += slot_matrix_(s, j);
+
+  const auto ok(slot_matrix_(s, slot_class_[s]));
+
+  const double confidence(!total ? 0.5 : static_cast<double>(ok) / total);
+
+  return {slot_class_[s], confidence};
 }
 
 ///
@@ -367,26 +379,23 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 ///
 /// \param[in] example input value whose class we are interested in.
 /// \param[out] val confidence level: how sure you can be that \a example
-///             is properly classified. The value is in [0;1] range.
-/// \param[out] sum the sum of all the confidence levels for \a example
-///                 (confidence of \a example in class 1 + confidence of
-///                 \a example in class 2 + ... + confidence \a example in
-///                 class n).
-/// \return the class of \a instance (numerical id).
+///                 is properly classified. The value is in [0;1] range and the
+///                 sum of the confidence level of each class is 1.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(const data::example &example,
-                                                  number *val,
-                                                  number *sum) const
+std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
+  const data::example &example) const
 {
   const any res(lambda_(example));
   const number x(res.empty() ? 0.0 : to<number>(res));
 
-  number val_(0.0), val_sum_(0.0);
-  unsigned probable_class(0);
+  number val_(0.0), sum_(0.0);
+  class_tag_t probable_class(0);
 
-  const auto size(gauss_dist_.size());
-  for (auto i(decltype(size){0}); i < size; ++i)
+  const auto classes(gauss_dist_.size());
+  for (auto i(decltype(classes){0}); i < classes; ++i)
   {
     const number distance(std::fabs(x - gauss_dist_[i].mean));
     const number variance(gauss_dist_[i].variance);
@@ -398,7 +407,7 @@ class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(const data::example &example,
       else
         p = 0.0;
     else                     // This is the standard case
-      p = std::exp(-0.5 * distance * distance / variance);
+      p = std::exp(-distance * distance / variance);
 
     if (p > val_)
     {
@@ -406,26 +415,13 @@ class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(const data::example &example,
       probable_class = i;
     }
 
-    val_sum_ += p;
+    sum_ += p;
   }
 
-  if (val)
-    *val = val_;
-  if (sum)
-    *sum = val_sum_;
+  // Normalized confidence value.
+  const double confidence(sum_ ? val_ / sum_ : 0.0);
 
-  return probable_class;
-}
-
-///
-/// \param[in] instance data to be classified.
-/// \return the tag of the class that includes \a instance.
-///
-template<class T, bool S, bool N>
-class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(
-  const data::example &instance) const
-{
-  return tag(instance, nullptr, nullptr);
+  return {probable_class, confidence};
 }
 
 ///
@@ -452,15 +448,17 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind, data &d)
 
 ///
 /// \param[in] e input example for the lambda function.
-/// \return the class label associated with \a e.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_binary_lambda_f<T, S, N>::tag(const data::example &e) const
+std::pair<class_tag_t, double> basic_binary_lambda_f<T, S, N>::tag(
+  const data::example &e) const
 {
   const any res(lambda_(e));
   const number val(res.empty() ? -1.0 : to<number>(res));
 
-  return val > 0.0 ? 1u : 0u;
+  return {val > 0.0 ? 1u : 0u, 0.5};
 }
 
 ///
@@ -497,12 +495,13 @@ team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 /// Specialized method for teams: this is a simple majority voting scheme.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L>
-class_tag_t team_class_lambda_f<T, S, N, L>::tag(
+std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L>::tag(
   const data::example &instance) const
 {
   std::vector<unsigned> votes(classes_);
@@ -515,7 +514,7 @@ class_tag_t team_class_lambda_f<T, S, N, L>::tag(
     if (votes[i] > votes[max])
       max = i;
 
-  return max;
+  return {max, static_cast<double>(votes[max]) / team_.size()};
 }
 
 ///
