@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(TTABLE_H)
-#define      TTABLE_H
+#if !defined(VITA_TTABLE_H)
+#define      VITA_TTABLE_H
 
 #include "kernel/environment.h"
 
@@ -38,9 +38,16 @@ namespace vita
     bool operator!=(hash_t h) const
     { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
-    /// Used to combine multiple hashes.
-    hash_t operator^=(hash_t h)
-    { data[0] ^= h.data[0]; data[1] ^= h.data[1]; return *this; }
+    /// \brief Used to combine multiple hashes
+    ///
+    /// \note
+    /// In spite of its handy bit-mixing properties, XOR is not a good way to
+    /// combine hashes due to its commutativity.
+    void combine(hash_t h)
+    {
+      data[0] += 11 * h.data[0];
+      data[1] += 13 * h.data[1];
+    }
 
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !data[0] && !data[1]; }
@@ -136,4 +143,4 @@ namespace vita
   /// Performs a speed test on the transposition table (insert-find cycle).
 }  // namespace vita
 
-#endif  // TTABLE_H
+#endif  // Include guard
