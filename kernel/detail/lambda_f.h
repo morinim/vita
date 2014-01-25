@@ -72,6 +72,16 @@ namespace vita { namespace detail
   ///
   /// \tparam N if \c true stores the names otherwise keeps the memory free.
   ///
+  /// This class is used for optimize the storage of vita::class_lambda_f. The
+  /// strategy used is the so called 'Empty Base Class Optimization': the
+  /// compiler is allowed to flatten the inheritance hierarchy in a way that
+  /// the empty base class does not consume space (this is not true for empty
+  /// class data members because C++ requires data member to have non-zero size
+  /// to ensure object identity).
+  ///
+  /// \see
+  /// http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Empty_Base_Optimization
+  ///
   template<bool N>
   class class_names
   {
