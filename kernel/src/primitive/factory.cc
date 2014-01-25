@@ -170,7 +170,7 @@ namespace vita
   std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
                                                category_t c)
   {
-    assert(d == d_double || d == d_int);
+    assert(d == domain_t::d_double || d == domain_t::d_int);
 
     switch (d)
     {

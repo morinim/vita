@@ -134,6 +134,8 @@ namespace vita
   ///
   unsigned individual::mutation(double p)
   {
+    assert(0.0 <= p && p <= 1.0);
+
     unsigned n(0);
 
     const auto sup(size() - 1);
