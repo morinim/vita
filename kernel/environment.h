@@ -235,7 +235,7 @@ namespace vita
     {
       /// 0 is auto-tune;
       /// > 1 means team mode.
-      unsigned individuals = 4;
+      unsigned individuals = 3;
     } team;
 
     static const char arl_filename[];

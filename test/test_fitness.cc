@@ -1,14 +1,13 @@
 /**
- *
- *  \file test_fitness.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <sstream>
@@ -16,13 +15,13 @@
 #include "kernel/fitness.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE fitness_t
+#define BOOST_TEST_MODULE fitness
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
 #endif
 
-BOOST_AUTO_TEST_SUITE(fitness_t)
+BOOST_AUTO_TEST_SUITE(fitness)
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {

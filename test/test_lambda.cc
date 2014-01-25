@@ -35,6 +35,27 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   auto res(pr.load("mep.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
+  BOOST_TEST_CHECKPOINT("REGRESSION TEAM WITH ONE INDIVIDUAL");
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    individual ind(pr.env, pr.sset);
+    reg_lambda_f<individual> li(ind);
+
+    team<individual> t{{ind}};
+    reg_lambda_f<team<individual>> lt(t);
+
+    for (const auto &e : *pr.data())
+    {
+      const auto ai(li(e)), at(lt(e));
+
+      if (ai.empty())
+        BOOST_REQUIRE(at.empty());
+      else
+        BOOST_REQUIRE_CLOSE(to<number>(ai), to<number>(at), 0.0001);
+    }
+  }
+
+  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     individual ind(pr.env, pr.sset);
@@ -54,6 +75,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     }
   }
 
+  BOOST_TEST_CHECKPOINT("REGRESSION / TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual i1(pr.env, pr.sset);
