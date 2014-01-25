@@ -179,10 +179,10 @@ namespace vita
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
-    for (size_t i(0); i < dat_.categories(); ++i)
+    const auto cs(dat_.categories());
+    for (auto i(decltype(cs){0}); i < cs; ++i)
       std::cout << "[DEBUG] Category " << i << ": "
-                << dat_.get_category(i).name << " (domain "
-                << dat_.get_category(i).domain << ")" << std::endl;
+                << dat_.get_category(i) << std::endl;
     std::cout << std::endl;
 #endif
 
