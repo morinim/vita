@@ -103,7 +103,7 @@ template<class T>
 team<T> team<T>::crossover(const team<T> &t) const
 {
   assert(t.debug());
-  assert(size() == t.size());
+  assert(individuals() == t.individuals());
 
 /*
   const auto j(random::sup(individuals()));
