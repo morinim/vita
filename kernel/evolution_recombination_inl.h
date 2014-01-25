@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_RECOMBINATION_INL_H)
-#define      EVOLUTION_RECOMBINATION_INL_H
+#if !defined(VITA_EVOLUTION_RECOMBINATION_INL_H)
+#define      VITA_EVOLUTION_RECOMBINATION_INL_H
 
 ///
 /// \param[in] pop the current population.
@@ -111,4 +111,4 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
     return {off};
   }
 }
-#endif  // EVOLUTION_RECOMBINATION_INL_H
+#endif  // Include guard
