@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 
 BOOST_AUTO_TEST_CASE(Crossover)
 {
-/*  env.code_length = 100;
+  env.code_length = 100;
 
   vita::team<vita::individual> t1(env, sset), t2(env, sset);
 
@@ -106,9 +106,10 @@ BOOST_AUTO_TEST_CASE(Crossover)
   for (unsigned j(0); j < n; ++j)
     dist += t1.distance(t1.crossover(t2));
 
-  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
+  const double perc(100.0 * dist /
+                    (env.code_length * sset.categories() * n * t1.individuals()));
   BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);*/
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
