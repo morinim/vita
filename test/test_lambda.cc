@@ -38,11 +38,11 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM WITH ONE INDIVIDUAL");
   for (unsigned i(0); i < 1000; ++i)
   {
-    individual ind(pr.env, pr.sset);
-    reg_lambda_f<individual> li(ind);
+    const individual ind(pr.env, pr.sset);
+    const reg_lambda_f<individual> li(ind);
 
-    team<individual> t{{ind}};
-    reg_lambda_f<team<individual>> lt(t);
+    const team<individual> t{{ind}};
+    const reg_lambda_f<team<individual>> lt(t);
 
     for (const auto &e : *pr.data())
     {
@@ -58,11 +58,11 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    individual ind(pr.env, pr.sset);
-    reg_lambda_f<individual> li(ind);
+    const individual ind(pr.env, pr.sset);
+    const reg_lambda_f<individual> li(ind);
 
-    team<individual> t{{ind, ind, ind, ind}};
-    reg_lambda_f<team<individual>> lt(t);
+    const team<individual> t{{ind, ind, ind, ind}};
+    const reg_lambda_f<team<individual>> lt(t);
 
     for (const auto &e : *pr.data())
     {
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     }
   }
 
-  BOOST_TEST_CHECKPOINT("REGRESSION / TEAM OF RANDOM INDIVIDUALS");
+  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual i1(pr.env, pr.sset);
@@ -88,8 +88,8 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     const reg_lambda_f<individual> lambda3(i3);
     const reg_lambda_f<individual> lambda4(i4);
 
-    team<individual> t{{i1, i2, i3, i4}};
-    reg_lambda_f<team<individual>> lambda_team(t);
+    const team<individual> t{{i1, i2, i3, i4}};
+    const reg_lambda_f<team<individual>> lambda_team(t);
 
     for (const auto &e : *pr.data())
     {
@@ -145,8 +145,8 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
     const dyn_slot_lambda_f<individual> lambda2(ind2, *pr.data(), slots);
     const dyn_slot_lambda_f<individual> lambda3(ind3, *pr.data(), slots);
 
-    team<individual> t{{ind1, ind2, ind3}};
-    dyn_slot_lambda_f<team<individual>> lambda_t(t, *pr.data(), slots);
+    const team<individual> t{{ind1, ind2, ind3}};
+    const dyn_slot_lambda_f<team<individual>> lambda_t(t, *pr.data(), slots);
 
     for (const auto &example : *pr.data())
     {
@@ -192,6 +192,27 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
+  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM WITH ONE INDIVIDUAL");
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    const individual ind(pr.env, pr.sset);
+    const gaussian_lambda_f<individual> li(ind, *pr.data());
+
+    const team<individual> t{{ind}};
+    const gaussian_lambda_f<team<individual>> lt(t, *pr.data());
+
+    for (const auto &e : *pr.data())
+    {
+      const auto ai(li(e)), at(lt(e));
+
+      if (ai.empty())
+        BOOST_REQUIRE(at.empty());
+      else
+        BOOST_REQUIRE_EQUAL(li.name(ai), lt.name(at));
+    }
+  }
+
+  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM WITH RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind1(pr.env, pr.sset);
@@ -202,8 +223,8 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
     const gaussian_lambda_f<individual> lambda2(ind2, *pr.data());
     const gaussian_lambda_f<individual> lambda3(ind3, *pr.data());
 
-    team<individual> t{{ind1, ind2, ind3}};
-    gaussian_lambda_f<team<individual>> lambda_t(t, *pr.data());
+    const team<individual> t{{ind1, ind2, ind3}};
+    const gaussian_lambda_f<team<individual>> lambda_t(t, *pr.data());
 
     for (const auto &example : *pr.data())
     {
@@ -259,8 +280,8 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
     const binary_lambda_f<individual> lambda2(ind2, *pr.data());
     const binary_lambda_f<individual> lambda3(ind3, *pr.data());
 
-    team<individual> t{{ind1, ind2, ind3}};
-    binary_lambda_f<team<individual>> lambda_t(t, *pr.data());
+    const team<individual> t{{ind1, ind2, ind3}};
+    const binary_lambda_f<team<individual>> lambda_t(t, *pr.data());
 
     for (const auto &example : *pr.data())
     {
