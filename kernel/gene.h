@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(GENE_H)
-#define      GENE_H
+#if !defined(VITA_GENE_H)
+#define      VITA_GENE_H
 
 #include <vector>
 
@@ -55,4 +55,4 @@ namespace vita
 #include "kernel/gene_inl.h"
 }  // namespace vita
 
-#endif  // GENE_H
+#endif  // Include guard

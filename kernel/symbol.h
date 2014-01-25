@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SYMBOL_H)
-#define      SYMBOL_H
+#if !defined(VITA_SYMBOL_H)
+#define      VITA_SYMBOL_H
 
 #include <string>
 
@@ -151,4 +151,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // SYMBOL_H
+#endif  // Include guard
