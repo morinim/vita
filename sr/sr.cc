@@ -371,7 +371,7 @@ namespace ui
       {
         fix_parameters(problem);
 
-        vita::src_search<vita::individual, vita::alps_es> s(problem);
+        vita::src_search<vita::team<vita::individual>, vita::alps_es> s(problem);
 
         if (eva < vita::k_sup_evaluator)
           s.set_evaluator(eva, eva_args);

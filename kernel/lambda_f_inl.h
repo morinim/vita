@@ -507,7 +507,7 @@ std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L>::tag(
   std::vector<unsigned> votes(classes_);
 
   for (const auto &lambda : team_)
-    ++votes[lambda.tag(instance)];
+    ++votes[lambda.tag(instance).first];
 
   class_tag_t max(0);
   for (auto i(max + 1); i < classes_; ++i)
