@@ -1,18 +1,17 @@
 /**
- *
- *  \file random.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(RANDOM_H)
-#define      RANDOM_H
+#if !defined(VITA_RANDOM_H)
+#define      VITA_RANDOM_H
 
 #include <cstdlib>
 #include <random>
@@ -132,23 +131,25 @@ namespace vita
   }
 
   ///
-  /// \param[in] vect a vector.
-  /// \return a random element of the vector \a vect.
+  /// \param[in] v a vector.
+  /// \return a random element of vector \a v.
   ///
   template<class T>
   inline
-  const T &random::element(const std::vector<T> &vect)
+  const T &random::element(const std::vector<T> &v)
   {
-    assert(vect.size());
-    return vect[between<std::size_t>(0, vect.size())];
+    const auto size(v.size());
+    assert(size);
+    return v[between<decltype(size)>(0, size)];
   }
 
   template<class T>
   inline
-  T &random::element(std::vector<T> &vect)
+  T &random::element(std::vector<T> &v)
   {
-    assert(vect.size());
-    return vect[between<std::size_t>(0, vect.size())];
+    const auto size(v.size());
+    assert(size);
+    return v[between<decltype(size)>(0, size)];
   }
 
   ///
@@ -159,10 +160,11 @@ namespace vita
   inline
   const T &random::element(const std::set<T> &s)
   {
-    assert(s.size());
+    const auto size(s.size());
+    assert(size);
 
     auto it(s.cbegin());
-    std::advance(it, between<std::size_t>(0, s.size()));
+    std::advance(it, between<decltype(size)>(0, size));
 
     return *it;
   }
@@ -197,4 +199,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // RANDOM_H
+#endif  // Include guard
