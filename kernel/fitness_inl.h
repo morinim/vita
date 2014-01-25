@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(FITNESS_INL_H)
-#define      FITNESS_INL_H
+#if !defined(VITA_FITNESS_INL_H)
+#define      VITA_FITNESS_INL_H
 
 ///
 ///
@@ -88,7 +88,7 @@ bool basic_fitness_t<T, N>::operator>(const basic_fitness_t<T, N> &f) const
   return vect > f.vect;
 
   // An alternative implementation:
-  // > for (size_t i(0); i < N; ++i)
+  // > for (decltype(N) i(0); i < N; ++i)
   // >   if (vect[i] != f.vect[i])
   // >     return vect[i] > f.vect[i];
   // > return false;
@@ -137,7 +137,7 @@ bool basic_fitness_t<T, N>::dominating(const basic_fitness_t<T, N> &f) const
 {
   bool one_better(false);
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     if (vect[i] > f.vect[i])
       one_better = true;
     else if (vect[i] < f.vect[i])
@@ -159,7 +159,7 @@ bool basic_fitness_t<T, N>::load(std::istream &in)
 {
   basic_fitness_t<T, N> tmp;
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     if (!(in
           >> std::fixed >> std::scientific
           >> std::setprecision(std::numeric_limits<double>::digits10 + 1)
@@ -196,7 +196,7 @@ std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
 {
   o << '(';
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
   {
     o << f[i];
     if (i + 1 < N)
@@ -211,9 +211,10 @@ std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
 /// \return the sum of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(const basic_fitness_t<T, N> &f)
+basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(
+  const basic_fitness_t<T, N> &f)
 {
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     vect[i] += f[i];
 
   return *this;
@@ -224,9 +225,10 @@ basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(const basic_fitness_t<T
 /// \return the difference of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(const basic_fitness_t<T, N> &f)
+basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(
+  const basic_fitness_t<T, N> &f)
 {
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     vect[i] -= f[i];
 
   return *this;
@@ -237,10 +239,11 @@ basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(const basic_fitness_t<T
 /// \return the difference between \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(const basic_fitness_t<T, N> &f) const
+basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(
+  const basic_fitness_t<T, N> &f) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] - f[i];
 
   return tmp;
@@ -251,10 +254,11 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(const basic_fitness_t<T, 
 /// \return the product of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(const basic_fitness_t<T, N> &f) const
+basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(
+  const basic_fitness_t<T, N> &f) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] * f[i];
 
   return tmp;
@@ -269,7 +273,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator/(T val) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] / val;
 
   return tmp;
@@ -283,7 +287,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(T val) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] * val;
 
   return tmp;
@@ -297,7 +301,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
 {
   basic_fitness_t<T, N> tmp;
-  for (unsigned i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = std::fabs(vect[i]);
 
   return tmp;
@@ -311,7 +315,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::sqrt() const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = std::sqrt(vect[i]);
 
   return tmp;
@@ -393,10 +397,10 @@ template<class T, unsigned N>
 bool basic_fitness_t<T, N>::almost_equal(const basic_fitness_t<T, N> &n,
                                          T epsilon) const
 {
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     if (!almost_equal(vect[i], n[i], epsilon))
       return false;
 
   return true;
 }
-#endif  // FITNESS_INL_H
+#endif  // Include guard

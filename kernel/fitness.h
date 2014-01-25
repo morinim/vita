@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(FITNESS_H)
-#define      FITNESS_H
+#if !defined(VITA_FITNESS_H)
+#define      VITA_FITNESS_H
 
 #include <array>
 #include <cmath>
@@ -80,4 +80,4 @@ namespace vita
 #include "kernel/fitness_inl.h"
 }  // namespace vita
 
-#endif  // FITNESS_H
+#endif  // Include guard
