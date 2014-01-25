@@ -923,4 +923,29 @@ namespace vita
     const auto &i(map.find(n));
     return i == map.end() ? domain_t::d_void : i->second;
   }
+
+  ///
+  /// \param[out] s output stream.
+  /// \param[in] c category to print.
+  /// \return output stream including \a c.
+  ///
+  /// Utility function used for debugging purpose.
+  ///
+  std::ostream &operator<<(std::ostream &s, const data::category &c)
+  {
+    s << c.name << " (domain "
+      << static_cast<std::underlying_type<domain_t>::type>(c.domain);
+
+    if (!c.labels.empty())
+    {
+      s << ", [";
+
+      std::copy(c.labels.begin(), c.labels.end(),
+                std::ostream_iterator<std::string>(s, " "));
+
+      s << "])";
+    }
+
+    return s;
+  }
 }  // Namespace vita

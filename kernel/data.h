@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(DATA_H)
-#define      DATA_H
+#if !defined(VITA_DATA_H)
+#define      VITA_DATA_H
 
 #include <list>
 #include <map>
@@ -223,6 +223,8 @@ namespace vita
     domain_t              domain;
     std::set<std::string> labels;
   };
+
+  std::ostream &operator<<(std::ostream &, const data::category &);
 }  // namespace vita
 
-#endif  // DATA_H
+#endif  // Include guard
