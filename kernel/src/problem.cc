@@ -272,7 +272,7 @@ namespace vita
 
     for (size_t i(0); i < instance.size(); ++i)
     {
-      bool generic(data::from_weka(pattern[i]) != d_void);
+      bool generic(data::from_weka(pattern[i]) != domain_t::d_void);
 
       if (generic)  // numeric, string, integer...
       {

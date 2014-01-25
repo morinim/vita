@@ -37,7 +37,7 @@ namespace vita
   /// string domain: "a" + "b" = "ab").
   /// The operations of a domain are defined in files named after the domain
   /// and grouped in the \c primitive/ folder.
-  enum domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
+  enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 
   /// A category provide operations which supplement or supersede those of the
   /// domain but which are restricted to values lying in the (sub)domain by

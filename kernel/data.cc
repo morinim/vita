@@ -36,11 +36,11 @@ namespace vita
     {
       switch (d)
       {
-      case d_bool:   return   any(boost::lexical_cast<bool>(s));
-      case d_int:    return    any(boost::lexical_cast<int>(s));
-      case d_double: return any(boost::lexical_cast<double>(s));
-      case d_string: return                              any(s);
-      default:                  throw boost::bad_lexical_cast();
+      case domain_t::d_bool:   return   any(boost::lexical_cast<bool>(s));
+      case domain_t::d_int:    return    any(boost::lexical_cast<int>(s));
+      case domain_t::d_double: return any(boost::lexical_cast<double>(s));
+      case domain_t::d_string: return                              any(s);
+      default:                            throw boost::bad_lexical_cast();
       }
     }
   }
@@ -758,7 +758,8 @@ namespace vita
             if (field == 0 && classification)
               s_domain = "numeric";
 
-            const domain_t domain(s_domain == "numeric" ? d_double : d_string);
+            const domain_t domain(s_domain == "numeric" ? domain_t::d_double
+                                                        : domain_t::d_string);
 
             a.category_id = encode(s_domain, &categories_map_);
             if (a.category_id >= categories_.size())
@@ -798,7 +799,7 @@ namespace vita
             else  // input value
             {
               instance.input.push_back(convert(value, categories_[c].domain));
-              if (categories_[c].domain == d_string)
+              if (categories_[c].domain == domain_t::d_string)
                 categories_[c].labels.insert(value);
             }
           }
@@ -920,6 +921,6 @@ namespace vita
     });
 
     const auto &i(map.find(n));
-    return i == map.end() ? d_void : i->second;
+    return i == map.end() ? domain_t::d_void : i->second;
   }
 }  // Namespace vita

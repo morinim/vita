@@ -169,7 +169,7 @@ namespace vita
     {
       input.clear();
       output = any();
-      d_output = d_void;
+      d_output = domain_t::d_void;
       difficulty = 0;
       age = 0;
     }
@@ -180,10 +180,10 @@ namespace vita
   {
     switch (d_output)
     {
-    case d_bool:    return static_cast<T>(any_cast<bool>(output));
-    case d_int:     return static_cast<T>(any_cast<int>(output));
-    case d_double:  return static_cast<T>(any_cast<double>(output));
-    default:        return static_cast<T>(0.0);
+    case domain_t::d_bool:    return static_cast<T>(any_cast<bool>(output));
+    case domain_t::d_int:     return static_cast<T>(any_cast<int>(output));
+    case domain_t::d_double:  return static_cast<T>(any_cast<double>(output));
+    default:                  return static_cast<T>(0.0);
     }
   }
 
