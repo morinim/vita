@@ -40,7 +40,7 @@ WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
-  TYPE_PARAM = -g
+  TYPE_PARAM = -g -Og
 endif
 
 ifeq ($(TYPE), profile)
