@@ -64,15 +64,15 @@ namespace vita
 
     virtual bool debug() const;
 
-    /// This is the default weight. Weights are used by the
-    /// symbol_set::roulette method to control the probability of extraction of
-    /// the symbols.
-    enum {k_base_weight = 100};
-
   public:  // Public data members.
     /// Weight is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
     unsigned weight;
+
+    /// This is the default weight. Weights are used by the
+    /// symbol_set::roulette method to control the probability of extraction of
+    /// the symbols.
+    static decltype(weight) constexpr k_base_weight{100};
 
   private:  // Private data members.
     static opcode_t opc_count_;
