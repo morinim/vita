@@ -67,11 +67,8 @@ namespace vita
     if (!ts.empty())
       load_test_set(ts);
 
-    size_t n_symbols(0);
-    if (symbols.empty())
-      setup_default_symbols();
-    else
-      n_symbols = load_symbols(symbols);
+    const unsigned n_symbols(symbols.empty() ? setup_default_symbols(), 0
+                                             : load_symbols(symbols));
 
     return {n_examples, n_symbols};
   }
@@ -93,32 +90,36 @@ namespace vita
   }
 
   ///
+  /// param[in] skip features in this set will be ignored.
+  ///
   /// Inserts into the symbol_set variables and labels for nominal
   /// attributes.
   ///
-  void src_problem::setup_terminals_from_data()
+  void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
   {
     sset = vita::symbol_set();
 
     // Sets up the variables (features).
     const auto columns(dat_.columns());
     for (auto i(decltype(columns){1}); i < columns; ++i)
-    {
-      std::string name(dat_.get_column(i).name);
-      if (name.empty())
-        name = "X" + boost::lexical_cast<std::string>(i);
+      if (skip.find(i) == skip.end())
+      {
+        std::string name(dat_.get_column(i).name);
+        if (name.empty())
+          name = "X" + boost::lexical_cast<std::string>(i);
 
-      const category_t category(dat_.get_column(i).category_id);
-      sset.insert(make_unique<variable>(name, i - 1, category));
-    }
+        const category_t category(dat_.get_column(i).category_id);
+        sset.insert(make_unique<variable>(name, i - 1, category));
+      }
 
     // Sets up the labels for nominal attributes.
-    for (category_t c(0); c < dat_.categories(); ++c)
+    const auto categories(dat_.categories());
+    for (category_t i(0); i < categories; ++i)
     {
-      const data::category &cat(dat_.get_category(c));
+      const auto &category(dat_.get_category(i));
 
-      for (const std::string &label : cat.labels)
-        sset.insert(make_unique<constant<std::string>>(label, c));
+      for (const std::string &label : category.labels)
+        sset.insert(make_unique<constant<std::string>>(label, i));
     }
   }
 
@@ -169,7 +170,8 @@ namespace vita
     size_t parsed(0);
 
     cvect categories(dat_.categories());
-    for (size_t i(0); i < categories.size(); ++i)
+    const auto c_size(categories.size());
+    for (auto i(decltype(c_size){0}); i < c_size; ++i)
       categories[i] = i;
 
     // Load the XML file (sf) into the property tree (pt).
@@ -179,8 +181,7 @@ namespace vita
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
-    const auto cs(dat_.categories());
-    for (auto i(decltype(cs){0}); i < cs; ++i)
+    for (auto i(decltype(c_size){0}); i < c_ssize; ++i)
       std::cout << "[DEBUG] Category " << i << ": "
                 << dat_.get_category(i) << std::endl;
     std::cout << std::endl;
@@ -188,12 +189,12 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    for (const ptree::value_type &s : pt.get_child("symbolset"))
+    for (const auto &s : pt.get_child("symbolset"))
       if (s.first == "symbol")
       {
-        const std::string sym_name(s.second.get<std::string>("<xmlattr>.name"));
-        const std::string sym_sig(s.second.get<std::string>(
-                                    "<xmlattr>.signature", ""));
+        const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
+        const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature",
+                                                     ""));
 
         if (sym_sig.empty())
         {
