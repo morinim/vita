@@ -456,9 +456,9 @@ std::pair<class_tag_t, double> basic_binary_lambda_f<T, S, N>::tag(
   const data::example &e) const
 {
   const any res(lambda_(e));
-  const number val(res.empty() ? -1.0 : to<number>(res));
+  const number val(res.empty() ? 0.0 : to<number>(res));
 
-  return {val > 0.0 ? 1u : 0u, 0.5};
+  return {val > 0.0 ? 1u : 0u, std::fabs(val)};
 }
 
 ///
