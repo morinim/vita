@@ -473,8 +473,9 @@ bool basic_binary_lambda_f<T, S, N>::debug() const
 ///
 /// \param[in] d the training set.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-team_class_lambda_f<T, S, N, L>::team_class_lambda_f(data &d)
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
 }
@@ -483,9 +484,10 @@ team_class_lambda_f<T, S, N, L>::team_class_lambda_f(data &d)
 /// \param[in] t team "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
-                                                     data &d)
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
+                                                        data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
   team_.reserve(t.size());
@@ -498,30 +500,59 @@ team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
 /// \return the class of \a instance (numerical id) and the confidence level
 ///         (in the range [0,1]).
 ///
-/// Specialized method for teams: this is a simple majority voting scheme.
+/// Specialized method for teams.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L>::tag(
+/// * \c team_composition::mv the class which most of the individuals predict
+///   for a given example is selected as team output.
+/// * \c team_composition::wta the winner is the individual with the highest
+///   confidence in its decision. Specialization may emerge if different
+///   members of the team win this contest for different fitness cases (of
+///   curse, it is not a feasible alternative to select the member with the
+///   best fitness. Then a decision on unknown data is only possible if the
+///   right outputs are known in advance and is not made by the team itself).
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
   const data::example &instance) const
 {
-  std::vector<unsigned> votes(classes_);
+  if (C == team_composition::wta)
+  {
+    const auto size(team_.size());
+    auto best(team_[0].tag(instance));
 
-  for (const auto &lambda : team_)
-    ++votes[lambda.tag(instance).first];
+    for (auto i(decltype(size){1}); i < size; ++i)
+    {
+      const auto res(team_[i].tag(instance));
 
-  class_tag_t max(0);
-  for (auto i(max + 1); i < classes_; ++i)
-    if (votes[i] > votes[max])
-      max = i;
+      if (res.second > best.second)
+        best = res;
+    }
 
-  return {max, static_cast<double>(votes[max]) / team_.size()};
+    return best;
+  }
+  else if (C == team_composition::mv)
+  {
+    std::vector<unsigned> votes(classes_);
+
+    for (const auto &lambda : team_)
+      ++votes[lambda.tag(instance).first];
+
+    class_tag_t max(0);
+    for (auto i(max + 1); i < classes_; ++i)
+      if (votes[i] > votes[max])
+        max = i;
+
+    return {max, static_cast<double>(votes[max]) / team_.size()};
+  }
 }
 
 ///
 /// \return \c true if the object passes the internal consistency check.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-bool team_class_lambda_f<T, S, N, L>::debug() const
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+bool team_class_lambda_f<T, S, N, L, C>::debug() const
 {
   for (const auto &l : team_)
     if (!l.debug())

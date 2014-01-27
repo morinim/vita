@@ -61,6 +61,10 @@ namespace vita
     virtual bool debug() const = 0;
   };
 
+  // ***********************************************************************
+  // * Symbolic regression                                                 *
+  // ***********************************************************************
+
   ///
   /// \brief Transforms individual to a lambda function for regression
   ///
@@ -88,6 +92,10 @@ namespace vita
     any eval(const data::example &, std::false_type) const;
     any eval(const data::example &, std::true_type) const;
   };
+
+  // ***********************************************************************
+  // * Classification                                                      *
+  // ***********************************************************************
 
   ///
   /// \brief The basic interface of a classification lambda class
@@ -221,6 +229,25 @@ namespace vita
     const basic_reg_lambda_f<T, S> lambda_;
   };
 
+  // ***********************************************************************
+  // * Estension to support teams                                          *
+  // ***********************************************************************
+
+  ///
+  /// For classification problems there exist two major possibilities to
+  /// combine the outputs of multiple predictors: either the raw output values
+  /// or the classification decisions can be aggregated (in the latter case
+  /// the team members act as full pre-classificators themselves). We decided
+  /// for the latter and combined classification decisions (thanks to the
+  /// confidence parameter we don't have a reduction in the information
+  /// content that each individual can contribute to the common team decision).
+  ///
+  enum class team_composition
+  {
+    mv,  // majority voting
+    wta  // winner takes all
+  };
+
   ///
   /// \brief Helper class to build extends classification scheme for working
   ///        with teams
@@ -233,8 +260,10 @@ namespace vita
   ///           not persistence.
   /// \tparam N stores the name of the classes vs doesn't store the names.
   /// \tparam L the basic classificator that must be extended.
+  /// \tparam C composition method for team's member responses.
   ///
-  template<class T, bool S, bool N, template<class, bool, bool> class L>
+  template<class T, bool S, bool N, template<class, bool, bool> class L,
+           team_composition C = team_composition::wta>
   class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
   {
   public:
@@ -306,7 +335,9 @@ namespace vita
     using basic_binary_lambda_f::team_class_lambda_f::team_class_lambda_f;
   };
 
-  // A list of template aliases to simplify the syntax and help the end user.
+  // ***********************************************************************
+  // *  Template aliases to simplify the syntax and help the end user      *
+  // ***********************************************************************
   template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
   template<class T> using class_lambda_f = basic_class_lambda_f<T, true>;
   template<class T> using dyn_slot_lambda_f =
@@ -319,4 +350,4 @@ namespace vita
 #include "kernel/lambda_f_inl.h"
 }  // namespace vita
 
-#endif  // include guard
+#endif  // Include guard
