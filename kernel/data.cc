@@ -43,6 +43,24 @@ namespace vita
       default:                            throw boost::bad_lexical_cast();
       }
     }
+
+    ///
+    /// \param[in] s the string to be tested.
+    /// \return \c true if \a s contains a number.
+    ///
+    bool is_number(const std::string &s)
+    {
+      try
+      {
+        boost::lexical_cast<double>(s);
+      }
+      catch(boost::bad_lexical_cast &)
+      {
+        return false;
+      }
+
+      return true;
+    }
   }
 
   ///
@@ -456,24 +474,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] s the string to be tested.
-  /// \return \c true if \a s contains a number.
-  ///
-  bool data::is_number(const std::string &s)
-  {
-    try
-    {
-      boost::lexical_cast<double>(s);
-    }
-    catch(boost::bad_lexical_cast &)
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  ///
   /// \param[in] c1 a category.
   /// \param[in] c2 a category.
   ///
@@ -724,58 +724,62 @@ namespace vita
     if (!from)
       return 0;
 
-    bool classification(false);
+    bool classification(false), format(columns());
 
     std::string line;
     while (std::getline(from, line))
     {
-      const std::vector<std::string> record(csvline(line));
-      const unsigned size(columns() ? columns() : record.size());
+      const auto record(csvline(line));
+      const auto fields(record.size());
 
-      if (record.size() == size)
+      // If we don't know the dataset format, the first line will be used to
+      // learn it.
+      if (!format)
+      {
+        classification = !is_number(record[0]);
+
+        header_.reserve(fields);
+
+        for (auto field(decltype(fields){0}); field < fields; ++field)
+        {
+          assert(!size());  // If we have data then data format must be known
+
+          std::string s_domain(is_number(record[field])
+                               ? "numeric"
+                               : "string" +
+                                 boost::lexical_cast<std::string>(field));
+
+          // For classification problems we use discriminant functions, so the
+          // actual output type is always numeric.
+          if (field == 0 && classification)
+            s_domain = "numeric";
+
+          const domain_t domain(s_domain == "numeric" ? domain_t::d_double
+                                                      : domain_t::d_string);
+
+          const column a{"", encode(s_domain, &categories_map_)};
+          if (a.category_id >= categories_.size())
+          {
+            assert(a.category_id == categories_.size());
+            categories_.push_back(category{s_domain, domain, {}});
+          }
+
+          header_.push_back(a);
+        }
+
+        format = true;
+      }
+
+      if (fields == columns())
       {
         example instance;
 
-        if (!dataset_[dataset()].size())  // No line parsed
-          classification = !is_number(record[0]);
-
-        for (auto field(decltype(size){0}); field < size; ++field)
-        {
-          // The first line is (also) used to learn data format.
-          if (columns() != size)
-          {
-            assert(!dataset_[dataset()].size());
-
-            column a;
-            a.name = "";
-
-            std::string s_domain(is_number(record[field])
-                                 ? "numeric"
-                                 : "string" +
-                                   boost::lexical_cast<std::string>(field));
-            // For classification problems we use discriminant functions, so the
-            // actual output type is always numeric.
-            if (field == 0 && classification)
-              s_domain = "numeric";
-
-            const domain_t domain(s_domain == "numeric" ? domain_t::d_double
-                                                        : domain_t::d_string);
-
-            a.category_id = encode(s_domain, &categories_map_);
-            if (a.category_id >= categories_.size())
-            {
-              assert(a.category_id == categories_.size());
-              categories_.push_back(category{s_domain, domain, {}});
-            }
-
-            header_.push_back(a);
-          }
-
+        for (auto field(decltype(fields){0}); field < fields; ++field)
           try
           {
             const category_t c(header_[field].category_id);
 
-            const std::string value(record[field]);
+            const auto value(record[field]);
 
             if (field == 0)  // output value
             {
@@ -808,7 +812,6 @@ namespace vita
             instance.clear();
             continue;
           }
-        }
 
         if (instance.input.size() + 1 == columns())
           dataset_[dataset()].push_back(instance);
@@ -817,7 +820,7 @@ namespace vita
       }
     }
 
-    return debug() ? dataset_[dataset()].size() : 0;
+    return debug() ? size() : 0;
   }
 
   ///

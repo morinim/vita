@@ -48,11 +48,12 @@ namespace vita
     /// const example *
     typedef typename std::list<example>::const_iterator const_iterator;
 
+    enum dataset_t {training = 0, validation, test, k_max_dataset = test};
+
   public:  // Construction, convenience
     data();
     explicit data(const std::string &, unsigned = 0);
 
-    enum dataset_t {training = 0, validation, test, k_max_dataset = test};
     void dataset(dataset_t);
     dataset_t dataset() const;
     void slice(unsigned);
@@ -90,7 +91,6 @@ namespace vita
   private: // Private support methods
     template<class T> static T encode(const std::string &,
                                       std::map<std::string, T> *);
-    static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
