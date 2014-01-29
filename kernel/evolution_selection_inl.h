@@ -10,16 +10,18 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SELECTION_INL_H)
-#define      EVOLUTION_SELECTION_INL_H
+#if !defined(VITA_EVOLUTION_SELECTION_INL_H)
+#define      VITA_EVOLUTION_SELECTION_INL_H
 
 ///
 /// \param[in] pop current population.
 /// \param[in] eva current evaluator.
+/// \param[in] sum up to date summary of the evolution.
 ///
 template<class T>
-strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva)
-  : pop_(pop), eva_(eva)
+strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
+                      const summary<T> &sum)
+  : pop_(pop), eva_(eva), sum_(sum)
 {
 }
 
@@ -69,16 +71,6 @@ coord strategy<T>::pickup(unsigned l, double p) const
     --l;
 
   return {l, vita::random::sup(pop_.individuals(l))};
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-tournament<T>::tournament(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
 }
 
 ///
@@ -133,16 +125,6 @@ std::vector<coord> tournament<T>::run()
 #endif
 
   return ret;
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-alps<T>::alps(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
 }
 
 ///
@@ -208,13 +190,56 @@ std::vector<coord> alps<T>::run()
 }
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
+///
 ///
 template<class T>
-pareto<T>::pareto(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
+std::vector<coord> fuss<T>::run()
 {
+  const auto &pop(this->pop_);
+
+  const auto rounds(pop.env().tournament_size);
+  assert(rounds);
+
+  const auto min(this->sum_.az.fit_dist().min[0] - 0.5);
+  const auto max(this->sum_.az.fit_dist().max[0] + 0.5);
+  assert(min <= max);
+
+  const auto level(vita::random::between(min, max));
+
+  std::vector<coord> ret(rounds);
+
+  // This is the inner loop of an insertion sort algorithm. It is simple,
+  // fast (if rounds is small) and doesn't perform too much comparisons.
+  // DO NOT USE std::sort it is way slower.
+  for (unsigned i(0); i < rounds; ++i)
+  {
+    const auto new_coord(this->pickup());
+    const auto new_fit(this->eva_(pop[new_coord]));
+
+    unsigned j(0);
+
+    // Where is the insertion point?
+    while (j < i &&
+           std::fabs(level - new_fit[0]) >
+           std::fabs(level - this->eva_(pop[ret[j]])[0]))
+      ++j;
+
+    // Shift right elements after the insertion point.
+    for (auto k(j); k < i; ++k)
+      ret[k + 1] = ret[k];
+
+    ret[j] = new_coord;
+  }
+
+#if !defined(NDEBUG)
+/*
+  for (unsigned i(1); i < rounds; ++i)
+    assert(level.distance(this->eva_(pop[ret[i - 1]])) <=
+           level.distance(this->eva_(pop[ret[i]])));
+*/
+#endif
+
+  return ret;
 }
 
 ///
@@ -301,16 +326,6 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 }
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-random<T>::random(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
-}
-
-///
 /// \return a vector of coordinates of randomly chosen individuals.
 ///
 /// Parameters from the environment:
@@ -333,4 +348,4 @@ std::vector<coord> random<T>::run()
 
   return ret;
 }
-#endif  // EVOLUTION_SELECTION_INL_H
+#endif  // Include guard

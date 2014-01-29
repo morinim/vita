@@ -46,7 +46,7 @@ namespace vita
   {
   public:
     evolution_strategy(population<T> &pop, evaluator<T> &eva, summary<T> *s)
-      : selection(pop, eva), recombination(pop, eva, s), replacement(pop, eva),
+      : selection(pop, eva, *s), recombination(pop, eva, s), replacement(pop, eva),
         pop_(pop), sum_(s)
     {
       assert(s);
@@ -145,6 +145,16 @@ namespace vita
   {
   public:
     using std_es::evolution_strategy::evolution_strategy;
+  };
+
+  template<class T>
+  class fuss_es : public evolution_strategy<T,
+                                           selection::fuss,
+                                           recombination::base,
+                                           replacement::fuds>
+  {
+  public:
+    using fuss_es::evolution_strategy::evolution_strategy;
   };
 
 #include "kernel/evolution_strategy_inl.h"
