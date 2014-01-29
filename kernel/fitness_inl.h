@@ -405,4 +405,16 @@ bool basic_fitness_t<T, N>::almost_equal(const basic_fitness_t<T, N> &n,
 
   return true;
 }
+
+template<class T, unsigned N>
+double basic_fitness_t<T, N>::distance(const basic_fitness_t<T, N> &f) const
+{
+  double d(0.0);
+
+  for (decltype(N) i(0); i < N; ++i)
+    d += std::fabs(vect[i] - f[i]);
+
+  return d;
+}
+
 #endif  // Include guard

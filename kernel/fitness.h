@@ -67,6 +67,8 @@ namespace vita
     basic_fitness_t abs() const;
     basic_fitness_t sqrt() const;
 
+    double distance(const basic_fitness_t &) const;
+
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
