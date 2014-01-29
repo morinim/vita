@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_REPLACEMENT_H)
-#define      EVOLUTION_REPLACEMENT_H
+#if !defined(VITA_EVOLUTION_REPLACEMENT_H)
+#define      VITA_EVOLUTION_REPLACEMENT_H
 
 #include <vector>
 
@@ -141,4 +141,4 @@ namespace vita {  namespace replacement {
 #include "kernel/evolution_replacement_inl.h"
 } }  // namespace vita::replacement
 
-#endif  // EVOLUTION_REPLACEMENT_H
+#endif  // Include guard

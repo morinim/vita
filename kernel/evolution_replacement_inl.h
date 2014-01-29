@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_REPLACEMENT_INL_H)
-#define      EVOLUTION_REPLACEMENT_INL_H
+#if !defined(VITA_EVOLUTION_REPLACEMENT_INL_H)
+#define      VITA_EVOLUTION_REPLACEMENT_INL_H
 
 ///
 /// \param[in] pop current population.
@@ -317,4 +317,4 @@ void pareto<T>::run(const std::vector<coord> &parent,
     s->best     = {offspring[0], fit_off};
   }
 }
-#endif  // EVOLUTION_REPLACEMENT_INL_H
+#endif  // Include guard

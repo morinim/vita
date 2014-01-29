@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SELECTION_H)
-#define      EVOLUTION_SELECTION_H
+#if !defined(VITA_EVOLUTION_SELECTION_H)
+#define      VITA_EVOLUTION_SELECTION_H
 
 #include <set>
 #include <vector>
@@ -136,4 +136,4 @@ namespace vita {  namespace selection {
 #include "kernel/evolution_selection_inl.h"
 } } // namespace vita :: selection
 
-#endif  // EVOLUTION_SELECTION_H
+#endif  // Include guard
