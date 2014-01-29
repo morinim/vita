@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ namespace vita {  namespace replacement {
   /// \brief A family competition replacement scheme
   ///
   /// \tparam T type of individual.
-  ///  
+  ///
   /// We assume that the parents would be ones of the members of the population
   /// closest to the new elements. In this way, children compete with their
   /// parents to be included in the population.
@@ -68,7 +68,7 @@ namespace vita {  namespace replacement {
   class family_competition : public strategy<T>
   {
   public:
-    family_competition(population<T> &, evaluator<T> &);
+    using family_competition::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -90,7 +90,7 @@ namespace vita {  namespace replacement {
   class tournament : public strategy<T>
   {
   public:
-    tournament(population<T> &, evaluator<T> &);
+    using tournament::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -117,7 +117,7 @@ namespace vita {  namespace replacement {
   class alps : public strategy<T>
   {
   public:
-    alps(population<T> &, evaluator<T> &);
+    using alps::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -132,7 +132,7 @@ namespace vita {  namespace replacement {
   class pareto : public strategy<T>
   {
   public:
-    pareto(population<T> &, evaluator<T> &);
+    using pareto::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;

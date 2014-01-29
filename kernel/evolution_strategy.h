@@ -147,16 +147,6 @@ namespace vita
     using std_es::evolution_strategy::evolution_strategy;
   };
 
-  template<class T>
-  class fuss_es : public evolution_strategy<T,
-                                           selection::fuss,
-                                           recombination::base,
-                                           replacement::fuds>
-  {
-  public:
-    using fuss_es::evolution_strategy::evolution_strategy;
-  };
-
 #include "kernel/evolution_strategy_inl.h"
 }  // namespace vita
 

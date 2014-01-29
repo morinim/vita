@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,16 +20,6 @@
 template<class T>
 strategy<T>::strategy(population<T> &pop, evaluator<T> &eva)
   : pop_(pop), eva_(eva)
-{
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-family_competition<T>::family_competition(population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
 {
 }
 
@@ -82,8 +72,6 @@ void family_competition<T>::run(const std::vector<coord> &parent,
       if (random::boolean(replace))
         pop[parent[!id_worst]] = offspring[0];
     }
-
-    //pop[parent[id_worst]] = offspring[0];
   }
 
   if (fit_off > s->best->fitness)
@@ -92,16 +80,6 @@ void family_competition<T>::run(const std::vector<coord> &parent,
     s->last_imp = s->gen;
     s->best     =      b;
   }
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-tournament<T>::tournament(population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
 }
 
 ///
@@ -150,15 +128,6 @@ void tournament<T>::run(const std::vector<coord> &parent,
     s->last_imp =                  s->gen;
     s->best     = {offspring[0], fit_off};
   }
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-alps<T>::alps(population<T> &pop, evaluator<T> &eva) : strategy<T>(pop, eva)
-{
 }
 
 ///
@@ -269,15 +238,6 @@ void alps<T>::run(const std::vector<coord> &parent,
     s->last_imp =                s->gen;
     s->best     = {offspring[0], f_off};
   }
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-pareto<T>::pareto(population<T> &pop, evaluator<T> &eva) : strategy<T>(pop, eva)
-{
 }
 
 ///
