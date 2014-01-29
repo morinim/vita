@@ -25,16 +25,16 @@ namespace vita
   template<class T>
   class summary
   {
-  public:  // Constructor and support functions.
+  public:  // Constructor and support functions
     summary();
 
     void clear();
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &, const environment &, const symbol_set &);
     bool save(std::ostream &) const;
 
-  public:  // Public data members.
+  public:  // Public data members
     analyzer<T> az;
 
     struct best_
