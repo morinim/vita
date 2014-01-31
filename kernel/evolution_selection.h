@@ -91,6 +91,17 @@ namespace vita {  namespace selection {
     virtual std::vector<coord> run() override;
   };
 
+  ///
+  /// The idea behind FUSS is that we should focus the selection pressure
+  /// towards fitness levels which have relatively few individuals rather than
+  /// on the highest fitness levels. In this way fitness levels which are
+  /// difficult to reach are throughly explored and on no fitness level does the
+  /// population size decrease towards extiction.
+  ///
+  /// \see
+  /// * "Tournament versus fitness uniform selection" - Shane Legg, Marcus
+  /// Hutter, Akshat Kumar (Technical Report IDSIA-04-04 March 2004).
+  ///
   template<class T>
   class fuss : public strategy<T>
   {

@@ -190,7 +190,17 @@ std::vector<coord> alps<T>::run()
 }
 
 ///
+/// \return a vector of coordinates of individuals with fitness nearest to a
+///         random fitness value.
 ///
+/// A random fitness value is chosen in the interval \f$[f_min, f_max]\f$,
+/// where \f$f_max\f$ and \f$f_min\f$ are the maximum and minimum fitness value
+/// in the current population.
+/// Then we round a tournament to find the individuals with fitness neares to
+/// this random value.
+/// While the probability of selection each fitness level is equal,
+/// the probability of then selecting a given individual within a fitness level
+/// depends on the population of that level.
 ///
 template<class T>
 std::vector<coord> fuss<T>::run()
