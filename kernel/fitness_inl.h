@@ -26,23 +26,8 @@ basic_fitness_t<T, N>::basic_fitness_t(T v)
   vect.fill(v);
 }
 
-/*
-/// This constructor is slower than the following one (based on variadic
-/// templates).
-/// The problem is the copy at runtime.
-template<class T, unsigned N>
-basic_fitness_t<T, N>::basic_fitness_t(const std::initializer_list<base_t> &l)
-{
-  static_assert(N, "basic_fitness_t cannot have zero length");
-
-  unsigned i(0);
-  for (auto p : l)
-    vect[i++] = p;
-}
-*/
-
 ///
-///
+/// Builds a fitness from a list of values.
 ///
 template<class T, unsigned N>
 template<class ...Args>
@@ -50,6 +35,20 @@ basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
 {
   static_assert(N, "basic_fitness_t cannot have zero length");
   static_assert(sizeof...(Args) == N, "Wrong number of arguments");
+
+  // Do not change with something like:
+  //
+  // template<class T, unsigned N>
+  // basic_fitness_t(const std::initializer_list<base_t> &l)
+  // {
+  //   static_assert(N, "basic_fitness_t cannot have zero length");
+  //
+  //   unsigned i(0);
+  //   for (auto p : l)
+  //     vect[i++] = p;
+  // }
+  //
+  // This is slower because of the runtime copy.
 }
 
 ///

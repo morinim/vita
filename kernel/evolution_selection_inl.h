@@ -210,11 +210,20 @@ std::vector<coord> fuss<T>::run()
   const auto rounds(pop.env().tournament_size);
   assert(rounds);
 
-  const auto min(this->sum_.az.fit_dist().min[0] - 0.5);
-  const auto max(this->sum_.az.fit_dist().max[0] + 0.5);
-  assert(min <= max);
+  const auto min(this->sum_.az.fit_dist().min);
+  const auto max(this->sum_.az.fit_dist().max);
+  auto level(max - min);
 
-  const auto level(vita::random::between(min, max));
+  for (unsigned i(0); i < decltype(level)::size; ++i)
+  {
+    const auto base(std::min(min[i], max[i]));
+    const auto delta(std::fabs(level[i]));
+
+    level[i] = base + vita::random::between<decltype(base)>(-0.5, delta + 0.5);
+
+    assert(std::min(min[i], max[i]) - 0.5 <= level[i]);
+    assert(level[i] <= std::max(min[i], max[i]) + 0.5);
+  }
 
   std::vector<coord> ret(rounds);
 
@@ -230,8 +239,7 @@ std::vector<coord> fuss<T>::run()
 
     // Where is the insertion point?
     while (j < i &&
-           std::fabs(level - new_fit[0]) >
-           std::fabs(level - this->eva_(pop[ret[j]])[0]))
+           level.distance(new_fit) > level.distance(this->eva_(pop[ret[j]])))
       ++j;
 
     // Shift right elements after the insertion point.
@@ -242,11 +250,10 @@ std::vector<coord> fuss<T>::run()
   }
 
 #if !defined(NDEBUG)
-/*
-  for (unsigned i(1); i < rounds; ++i)
+  const auto size(ret.size());
+  for (auto i(decltype(size){1}); i < size; ++i)
     assert(level.distance(this->eva_(pop[ret[i - 1]])) <=
            level.distance(this->eva_(pop[ret[i]])));
-*/
 #endif
 
   return ret;
