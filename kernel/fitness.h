@@ -39,14 +39,14 @@ namespace vita
     explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());
     template<class... Args> basic_fitness_t(Args...);
 
-    bool operator==(const basic_fitness_t<T, N> &) const;
-    bool operator!=(const basic_fitness_t<T, N> &) const;
-    bool operator>(const basic_fitness_t<T, N> &) const;
-    bool operator>=(const basic_fitness_t<T, N> &) const;
-    bool operator<(const basic_fitness_t<T, N> &) const;
-    bool operator<=(const basic_fitness_t<T, N> &) const;
-    bool dominating(const basic_fitness_t<T, N> &) const;
-    bool almost_equal(const basic_fitness_t<T, N> &, T) const;
+    bool operator==(const basic_fitness_t &) const;
+    bool operator!=(const basic_fitness_t &) const;
+    bool operator>(const basic_fitness_t &) const;
+    bool operator>=(const basic_fitness_t &) const;
+    bool operator<(const basic_fitness_t &) const;
+    bool operator<=(const basic_fitness_t &) const;
+    bool dominating(const basic_fitness_t &) const;
+    bool almost_equal(const basic_fitness_t &, T) const;
 
     T operator[](unsigned i) const { assert(i < N); return vect[i]; }
 
