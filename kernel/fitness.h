@@ -46,7 +46,7 @@ namespace vita
     bool operator<(const basic_fitness_t &) const;
     bool operator<=(const basic_fitness_t &) const;
     bool dominating(const basic_fitness_t &) const;
-    bool almost_equal(const basic_fitness_t &, T) const;
+    bool almost_equal(const basic_fitness_t &, T = 0.00001) const;
 
     T operator[](unsigned i) const { assert(i < N); return vect[i]; }
 

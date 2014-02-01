@@ -372,7 +372,7 @@ bool basic_fitness_t<T, N>::issmall() const
   /// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
   ///
   template<class T>
-  bool almost_equal(T v1, T v2, T epsilon)
+  bool almost_equal(T v1, T v2, T epsilon = 0.00001)
   {
     const T diff(std::abs(v1 - v2));
 
