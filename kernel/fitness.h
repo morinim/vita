@@ -46,7 +46,6 @@ namespace vita
     bool operator<(const basic_fitness_t &) const;
     bool operator<=(const basic_fitness_t &) const;
     bool dominating(const basic_fitness_t &) const;
-    bool almost_equal(const basic_fitness_t &, T = 0.00001) const;
 
     T operator[](unsigned i) const { assert(i < N); return vect[i]; }
 
@@ -76,6 +75,10 @@ namespace vita
   private:
     std::array<T, N> vect;
   };
+
+  template<class T> bool almost_equal(T, T, T = 0.00001);
+  template<class T, unsigned N> bool almost_equal(
+    const basic_fitness_t<T, N> &, const basic_fitness_t<T, N> &, T = 0.00001);
 
   using fitness_t = basic_fitness_t<double, 1>;
 

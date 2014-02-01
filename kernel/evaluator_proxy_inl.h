@@ -51,7 +51,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
     //if (0.01 < perc && perc < 1.0)
     //  f -= (f * perc).abs() * 2.0;
 
-    f -= static_cast<double>(cache_.seen(prg.signature())) / 10.0;
+    f -= static_cast<double>(cache_.seen(prg.signature())) / 2.0;
 #endif
 
     // Hash collision checking code can slow down the program very much.

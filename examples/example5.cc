@@ -1,14 +1,13 @@
 /**
- *
- *  \file example5.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -28,7 +27,7 @@ int main(int argc, char *argv[])
   vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
-  sset.insert(factory.make(vita::d_double, -200, 200));
+  sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FIFE"));
   sset.insert(factory.make("FIFL"));
