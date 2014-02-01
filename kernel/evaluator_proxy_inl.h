@@ -41,19 +41,23 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 #if defined(CLONE_SCALING)
     // Before evaluating a program, we check if identical programs
     // (clones) are already present in the population.
-    // When the number of clones is grater than zero, the fitness assigned to
+    // When the number of clones is greater than zero, the fitness assigned to
     // the program is multiplied by a clone-scaling factor.
     // For further details see "Evolving Assembly Programs: How Games Help
     // Microprocessor Validation" - F.Corno, E.Sanchez, G.Squillero.
-    const double perc(double(cache_.seen(prg.signature())) / cache_.hits());
-    if (0.01 < perc && perc < 1.0)
-      f -= (f * perc).abs() * 2.0;
+
+    //const auto perc(static_cast<double>(cache_.seen(prg.signature())) /
+    //                cache_.hits());
+    //if (0.01 < perc && perc < 1.0)
+    //  f -= (f * perc).abs() * 2.0;
+
+    f -= static_cast<double>(cache_.seen(prg.signature())) / 10.0;
 #endif
 
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
     const fitness_t f1((*eva_)(prg));
-    if (!almost_equal(f[0], f1[0], 0.00001))
+    if (!almost_equal(f[0], f1[0]))
       std::cerr << "********* COLLISION ********* [" << f << " != " << f1
                 << "]" << std::endl;
 
@@ -82,7 +86,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 #if !defined(NDEBUG)
     fitness_t f1;
     assert(cache_.find(prg.signature(), &f1));
-    assert(f == f1);
+    assert(almost_equal(f, f1));
 #endif
   }
 
@@ -178,4 +182,4 @@ std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
   return eva_->lambdify(prg);
 }
 
-#endif  // EVALUATOR_PROXY_INL_H
+#endif  // Include guard
