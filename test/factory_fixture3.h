@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined FACTORY_FIXTURE3_H
-#define      FACTORY_FIXTURE3_H
+#if !defined(VITA_FACTORY_FIXTURE3_H)
+#define      VITA_FACTORY_FIXTURE3_H
 
 #include "kernel/environment.h"
 #include "kernel/interpreter.h"
@@ -26,7 +26,7 @@ struct F_FACTORY3
   public:
     Z() : vita::terminal("Z", 0, true) {}
 
-    vita::any eval(vita::interpreter<vita::individual> *) const
+    virtual vita::any eval(vita::interpreter<vita::individual> *) const override
     { return vita::any(val); }
 
     double val;
@@ -92,4 +92,4 @@ struct F_FACTORY3
   const std::vector<vita::index_t> null;
 };
 
-#endif  // FACTORY_FIXTURE3_H
+#endif  // Include guard

@@ -20,10 +20,13 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE lambda
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
+
 #endif
+
+#define TEST_WTA
 
 BOOST_AUTO_TEST_SUITE(lambda)
 
@@ -35,7 +38,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   auto res(pr.load("mep.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
-  BOOST_TEST_CHECKPOINT("REGRESSION TEAM WITH ONE INDIVIDUAL");
+  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF ONE INDIVIDUAL");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind(pr.env, pr.sset);
@@ -46,12 +49,12 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 
     for (const auto &e : *pr.data())
     {
-      const auto ai(li(e)), at(lt(e));
+      const auto out_i(li(e)), out_t(lt(e));
 
-      if (ai.empty())
-        BOOST_REQUIRE(at.empty());
+      if (out_i.empty())
+        BOOST_REQUIRE(out_t.empty());
       else
-        BOOST_REQUIRE_CLOSE(to<number>(ai), to<number>(at), 0.0001);
+        BOOST_REQUIRE_CLOSE(to<number>(out_i), to<number>(out_t), 0.0001);
     }
   }
 
@@ -66,12 +69,12 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 
     for (const auto &e : *pr.data())
     {
-      const auto ai(li(e)), at(lt(e));
+      const auto out_i(li(e)), out_t(lt(e));
 
-      if (ai.empty())
-        BOOST_REQUIRE(at.empty());
+      if (out_i.empty())
+        BOOST_REQUIRE(out_t.empty());
       else
-        BOOST_REQUIRE_CLOSE(to<number>(ai), to<number>(at), 0.0001);
+        BOOST_REQUIRE_CLOSE(to<number>(out_i), to<number>(out_t), 0.0001);
     }
   }
 
@@ -120,7 +123,15 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
         ++n;
       }
 
-      BOOST_REQUIRE_CLOSE(sum / n, to<number>(lambda_team(e)), 0.0001);
+      if (n > 0.0)
+      {
+        const auto out_t(lambda_team(e));
+
+        if (std::fabs(sum / n) < 0.000001)
+          BOOST_REQUIRE_SMALL(to<number>(out_t), 0.000001);
+        else
+          BOOST_REQUIRE_CLOSE(sum / n, to<number>(out_t), 0.0001);
+      }
     }
   }
 }
@@ -135,6 +146,27 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
+  BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL");
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    const individual ind(pr.env, pr.sset);
+    const dyn_slot_lambda_f<individual> li(ind, *pr.data(), slots);
+
+    const team<individual> t{{ind}};
+    const dyn_slot_lambda_f<team<individual>> lt(t, *pr.data(), slots);
+
+    for (const auto &e : *pr.data())
+    {
+      const auto out_i(li(e)), out_t(lt(e));
+
+      if (out_i.empty())
+        BOOST_REQUIRE(out_t.empty());
+      else
+        BOOST_REQUIRE_EQUAL(li.name(out_i), lt.name(out_t));
+    }
+  }
+
+  BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind1(pr.env, pr.sset);
@@ -146,6 +178,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
     const dyn_slot_lambda_f<individual> lambda3(ind3, *pr.data(), slots);
 
     const team<individual> t{{ind1, ind2, ind3}};
+    const auto ts(t.individuals());
     const dyn_slot_lambda_f<team<individual>> lambda_t(t, *pr.data(), slots);
 
     for (const auto &example : *pr.data())
@@ -158,26 +191,45 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
       {
         lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
       };
+      const std::vector<std::pair<class_tag_t, double>> tags =
+      {
+        lambda1.tag(example), lambda2.tag(example), lambda3.tag(example)
+      };
 
+      for (auto j(decltype(ts){0}); j < ts; ++j)
+        BOOST_REQUIRE_EQUAL(any_cast<class_tag_t>(out[j]), tags[j].first);
+
+      std::string s_best(names[0]);
+
+#if defined(TEST_MV)
       std::map<std::string, unsigned> votes;
 
-      for (unsigned i(0); i < out.size(); ++i)
+      for (auto j(decltype(ts){0}); j < ts; ++j)
       {
-        if (votes.find(names[i]) == votes.end())
-          votes[names[i]] = 1;
+        if (votes.find(names[j]) == votes.end())
+          votes[names[j]] = 1;
         else
-          ++votes[names[i]];
+          ++votes[names[j]];
       }
 
-      std::string s_best;
-      unsigned c_best(0);
+      unsigned v_best(0);
 
-      for (auto &i : votes)
-        if (i.second > c_best)
+      for (auto &v : votes)
+        if (v.second > v_best)
         {
-          s_best = i.first;
-          c_best = i.second;
+          s_best = v.first;
+          v_best = v.second;
         }
+#elif defined(TEST_WTA)
+      class_tag_t c_best(0);
+
+      for (auto j(decltype(ts){1}); j < ts; ++j)
+        if (tags[j].second > tags[c_best].second)
+        {
+          s_best = names[j];
+          c_best = j;
+        }
+#endif
 
       BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
     }
@@ -192,7 +244,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM WITH ONE INDIVIDUAL");
+  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind(pr.env, pr.sset);
@@ -203,16 +255,16 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
 
     for (const auto &e : *pr.data())
     {
-      const auto ai(li(e)), at(lt(e));
+      const auto out_i(li(e)), out_t(lt(e));
 
-      if (ai.empty())
-        BOOST_REQUIRE(at.empty());
+      if (out_i.empty())
+        BOOST_REQUIRE(out_t.empty());
       else
-        BOOST_REQUIRE_EQUAL(li.name(ai), lt.name(at));
+        BOOST_REQUIRE_EQUAL(li.name(out_i), lt.name(out_t));
     }
   }
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM WITH RANDOM INDIVIDUALS");
+  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind1(pr.env, pr.sset);
@@ -224,6 +276,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
     const gaussian_lambda_f<individual> lambda3(ind3, *pr.data());
 
     const team<individual> t{{ind1, ind2, ind3}};
+    const auto ts(t.individuals());
     const gaussian_lambda_f<team<individual>> lambda_t(t, *pr.data());
 
     for (const auto &example : *pr.data())
@@ -236,26 +289,45 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
       {
         lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
       };
+      const std::vector<std::pair<class_tag_t, double>> tags =
+      {
+        lambda1.tag(example), lambda2.tag(example), lambda3.tag(example)
+      };
 
+      for (auto j(decltype(ts){0}); j < ts; ++j)
+        BOOST_REQUIRE_EQUAL(any_cast<class_tag_t>(out[j]), tags[j].first);
+
+      std::string s_best(names[0]);
+
+#if defined(TEST_MV)
       std::map<std::string, unsigned> votes;
 
-      for (unsigned i(0); i < out.size(); ++i)
+      for (auto j(decltype(ts){0}); j < ts; ++j)
       {
-        if (votes.find(names[i]) == votes.end())
-          votes[names[i]] = 1;
+        if (votes.find(names[j]) == votes.end())
+          votes[names[j]] = 1;
         else
-          ++votes[names[i]];
+          ++votes[names[j]];
       }
 
-      std::string s_best;
-      unsigned c_best(0);
+      unsigned v_best(0);
 
-      for (auto &i : votes)
-        if (i.second > c_best)
+      for (auto &v : votes)
+        if (v.second > v_best)
         {
-          s_best = i.first;
-          c_best = i.second;
+          s_best = v.first;
+          v_best = v.second;
         }
+#elif defined(TEST_WTA)
+      class_tag_t c_best(0);
+
+      for (auto j(decltype(ts){1}); j < ts; ++j)
+        if (tags[j].second > tags[c_best].second)
+        {
+          s_best = names[j];
+          c_best = j;
+        }
+#endif
 
       BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
     }
@@ -270,6 +342,27 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
   auto res(pr.load("ionosphere.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 351);
 
+  BOOST_TEST_CHECKPOINT("BINARY LAMBDA TEAM OF ONE INDIVIDUAL");
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    const individual ind(pr.env, pr.sset);
+    const binary_lambda_f<individual> li(ind, *pr.data());
+
+    const team<individual> t{{ind}};
+    const binary_lambda_f<team<individual>> lt(t, *pr.data());
+
+    for (const auto &e : *pr.data())
+    {
+      const auto out_i(li(e)), out_t(lt(e));
+
+      if (out_i.empty())
+        BOOST_REQUIRE(out_t.empty());
+      else
+        BOOST_REQUIRE_EQUAL(li.name(out_i), lt.name(out_t));
+    }
+  }
+
+  BOOST_TEST_CHECKPOINT("BINARY LAMBDA TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const individual ind1(pr.env, pr.sset);
@@ -281,6 +374,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
     const binary_lambda_f<individual> lambda3(ind3, *pr.data());
 
     const team<individual> t{{ind1, ind2, ind3}};
+    const auto ts(t.individuals());
     const binary_lambda_f<team<individual>> lambda_t(t, *pr.data());
 
     for (const auto &example : *pr.data())
@@ -293,26 +387,45 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
       {
         lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
       };
+      const std::vector<std::pair<class_tag_t, double>> tags =
+      {
+        lambda1.tag(example), lambda2.tag(example), lambda3.tag(example)
+      };
 
+      for (auto j(decltype(ts){0}); j < ts; ++j)
+        BOOST_REQUIRE_EQUAL(any_cast<class_tag_t>(out[j]), tags[j].first);
+
+      std::string s_best(names[0]);
+
+#if defined(TEST_MV)
       std::map<std::string, unsigned> votes;
 
-      for (unsigned i(0); i < out.size(); ++i)
+      for (auto j(decltype(ts){0}); j < ts; ++j)
       {
-        if (votes.find(names[i]) == votes.end())
-          votes[names[i]] = 1;
+        if (votes.find(names[j]) == votes.end())
+          votes[names[j]] = 1;
         else
-          ++votes[names[i]];
+          ++votes[names[j]];
       }
 
-      std::string s_best;
-      unsigned c_best(0);
+      unsigned v_best(0);
 
-      for (auto &i : votes)
-        if (i.second > c_best)
+      for (auto &v : votes)
+        if (v.second > v_best)
         {
-          s_best = i.first;
-          c_best = i.second;
+          s_best = v.first;
+          v_best = v.second;
         }
+#elif defined(TEST_WTA)
+      class_tag_t c_best(0);
+
+      for (auto j(decltype(ts){1}); j < ts; ++j)
+        if (tags[j].second > tags[c_best].second)
+        {
+          s_best = names[j];
+          c_best = j;
+        }
+#endif
 
       BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
     }
