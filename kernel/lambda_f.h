@@ -245,7 +245,9 @@ namespace vita
   enum class team_composition
   {
     mv,  // majority voting
-    wta  // winner takes all
+    wta, // winner takes all
+
+    standard = wta
   };
 
   ///
@@ -263,7 +265,7 @@ namespace vita
   /// \tparam C composition method for team's member responses.
   ///
   template<class T, bool S, bool N, template<class, bool, bool> class L,
-           team_composition C = team_composition::wta>
+           team_composition C = team_composition::standard>
   class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
   {
   public:
