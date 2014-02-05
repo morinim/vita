@@ -38,7 +38,7 @@ namespace vita
   /// top level components call lower level ones, which call still lower levels.
   ///
   /// adf_core is the core of vita::adt and vita::adf classes (they are in a
-  /// HAS-A relationship with it).
+  /// is-implemented-in-term-of relationship with it).
   ///
   /// \note
   /// Although the acronym ADF is from Koza's automatically defined functions,
@@ -48,18 +48,18 @@ namespace vita
   ///
   class adf_core
   {
-    friend class adf;
-    friend class adt;
-
+  protected:
     explicit adf_core(const individual &);
+
+    const individual &get_code() const;
 
     std::string display(const std::string &) const;
 
     bool debug() const;
 
-  private: // Data members
-    opcode_t     id;
-    individual code;
+  protected:  // Data members
+    individual code_;
+    opcode_t     id_;
 
     static opcode_t adf_count()
     {
@@ -71,22 +71,20 @@ namespace vita
   ///
   /// \brief Subroutine with arguments
   ///
-  class adf : public function
+  class adf : public function, private adf_core
   {
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
 
     virtual any eval(interpreter<individual> *) const override;
 
-    const individual &get_code() const;
     virtual std::string display() const override;
 
     virtual bool auto_defined() const override;
 
     virtual bool debug() const override;
 
-  private:  // Private data members.
-    adf_core core_;
+    using adf::adf_core::get_code;
   };
 
   ///
@@ -96,22 +94,20 @@ namespace vita
   /// "An Analysis of Automatic Subroutine Discovery in Genetic Programming" -
   /// A.Dessi', A.Giani, A.Starita.
   ///
-  class adt : public terminal
+  class adt : public terminal, private adf_core
   {
   public:
     adt(const individual &, unsigned);
 
     virtual any eval(interpreter<individual> *) const override;
 
-    const individual &get_code() const;
     virtual std::string display() const override;
 
     virtual bool auto_defined() const override;
 
     virtual bool debug() const override;
 
-  private:  // Private data members.
-    adf_core core_;
+    using adt::adf_core::get_code;
   };
 }  // namespace vita
 

@@ -1,20 +1,19 @@
 /**
- *
- *  \file command_line_interpreter.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
  *  Original idea of Jean Daniel Michaud (http://code.google.com/p/clipo/).
- *
  */
 
-#if !defined(BOOST_COMMAND_LINE_INTERPRETER)
-#define      BOOST_COMMAND_LINE_INTERPRETER
+#if !defined(VITA_BOOST_COMMAND_LINE_INTERPRETER)
+#define      VITA_BOOST_COMMAND_LINE_INTERPRETER
 
 #include <vector>
 #include <string>
@@ -22,6 +21,7 @@
 
 #include <boost/program_options.hpp>
 
+#include "kernel/vita.h"
 
 namespace boost { namespace cli {
 
@@ -34,10 +34,10 @@ static std::vector<std::string> split_command_line(const std::string &input)
 {
   std::vector<std::string> result;
 
-  std::string::const_iterator i(input.begin());
-  const std::string::const_iterator e(input.end());
-  for (; i != e && isspace(*i); ++i)
-  {}
+  std::string::const_iterator i(input.cbegin());
+  const std::string::const_iterator e(input.cend());
+  while (i != e && std::isspace(*i))
+    ++i;
 
   if (i != e)
   {
@@ -46,7 +46,6 @@ static std::vector<std::string> split_command_line(const std::string &input)
     unsigned backslash_count(0);
 
     for (; i != e; ++i)
-    {
       if (*i == '"')
       {
         // '"' preceded by even number (n) of backslashes generates
@@ -91,7 +90,6 @@ static std::vector<std::string> split_command_line(const std::string &input)
         else
           current += *i;
       }
-    }
 
     // If we have trailing backslashes, add them
     if (backslash_count)
@@ -171,7 +169,6 @@ private:
   std::string               prompt_;
 };
 
-} // !namespace cli
-} // !namespace boost
+} }  // namespace boost::cli
 
-#endif // !BOOST_COMMAND_LINE_INTERPRETER
+#endif // Include guard
