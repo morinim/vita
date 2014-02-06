@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "kernel/individual.h"
 #include "kernel/team.h"
 
 #if !defined(MASTER_TEST_SET)

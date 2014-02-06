@@ -1,20 +1,20 @@
 /**
- *
- *  \file test_primitive.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
 #include <iostream>
 #include <map>
 
+#include "kernel/individual.h"
 #include "kernel/random.h"
 #include "kernel/timer.h"
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(Distribution)
 {
   std::map<const vita::symbol *, unsigned> hist, weight;
 
-  const unsigned n(2e000000);
+  const unsigned n(20000000);
   for (unsigned i(0); i < n; ++i)
   {
     const vita::symbol *s(sset.roulette());
@@ -52,14 +52,14 @@ BOOST_AUTO_TEST_CASE(Distribution)
     weight[s] = s->weight;
   }
 
-  double sum(0);
+  double sum(0.0);
   for (const auto &i : weight)
     sum += i.second;
 
   for (const auto &i : hist)
   {
-    const double p(static_cast<double>(weight[i.first]) / sum);
-    const double actual(static_cast<double>(i.second) / n);
+    const auto p(static_cast<double>(weight[i.first]) / sum);
+    const auto actual(static_cast<double>(i.second) / n);
     BOOST_CHECK_CLOSE(p, actual, 1.0);
   }
 }

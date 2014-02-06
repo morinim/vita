@@ -25,16 +25,16 @@ using namespace boost;
 #include "factory_fixture3.h"
 #endif
 
+constexpr double epsilon(0.00001);
+
 BOOST_FIXTURE_TEST_SUITE(primitive_d, F_FACTORY3)
 
 BOOST_AUTO_TEST_CASE(ABS)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = interpreter<individual>;
+  individual i(env, sset);
 
-  // With a nonconformant C++11 compiler the {1} expression can be changed
-  // with boost::assign::list_of(1).
   BOOST_TEST_CHECKPOINT("ABS(-X) == X");
   std::vector<gene> g(
   {
@@ -42,8 +42,7 @@ BOOST_AUTO_TEST_CASE(ABS)
     {{neg_x, null}}   // [1] -X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(to<std::string>(ret) == to<std::string>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ABS(X) == X");
   g =
@@ -52,7 +51,7 @@ BOOST_AUTO_TEST_CASE(ABS)
     {{    x, null}}   // [1] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 }
 
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
@@ -81,8 +80,8 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(y->eval(0)) +
-                        any_cast<double>(x->eval(0)), "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(y->eval(nullptr)) +
+                        any_cast<double>(x->eval(nullptr)), "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   g =
@@ -131,7 +130,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
@@ -179,7 +178,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
     {{    c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
@@ -304,7 +303,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
@@ -350,20 +349,20 @@ BOOST_AUTO_TEST_CASE(SQRT)
     {{f_sqrt,  {1}}},  // [0] LN 1
     {{     z, null}}   // [1] Z
   };
+  i = i.replace(g);
   for (unsigned j(0); j < 1000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
-    ret = i_interp(i.replace(g)).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
-                          std::sqrt(static_cast<Z *>(z)->val), "\n" << i);
+    ret = i_interp(i).run();
+    BOOST_CHECK_CLOSE(any_cast<double>(ret), std::sqrt(static_cast<Z *>(z)->val), 0.0001);
   }
 }
 
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = interpreter<individual>;
+  individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
   std::vector<gene> g(
@@ -383,7 +382,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{   c0,   null}}   // [2] 0
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
@@ -393,13 +392,15 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{    z,   null}},  // [1] Z
     {{    x,   null}}   // [2] X
   };
-  for (unsigned j(0); j < 1000; ++j)
+
+  for (unsigned j(0); j < 10000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000.0, 1000.0);
     ret = i_interp(i.replace(g)).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
-                          static_cast<Z *>(z)->val -
-                          any_cast<double>(x->eval(0)), "\n" << i);
+    
+	const auto v1(any_cast<double>(ret));
+	const auto v2(static_cast<Z *>(z)->val - any_cast<double>(x->eval(nullptr)));
+	BOOST_CHECK_CLOSE(v1, v2, epsilon);
   }
 }
 

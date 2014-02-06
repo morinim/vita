@@ -1,19 +1,19 @@
 /**
- *
- *  \file test_population.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
 #include <sstream>
 
+#include "kernel/individual.h"
 #include "kernel/population.h"
 
 #if !defined(MASTER_TEST_SET)
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(Creation)
   for (unsigned i(0); i < 100; ++i)
   {
     env.individuals = vita::random::between(30, 200);
-    env.tournament_size = vita::random::between<size_t>(1, *env.mate_zone);
+    env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     vita::population<vita::individual> pop(env, sset);
 
@@ -42,13 +42,12 @@ BOOST_AUTO_TEST_CASE(Creation)
   }
 }
 
-
 BOOST_AUTO_TEST_CASE(Serialization)
 {
   for (unsigned i(0); i < 100; ++i)
   {
     env.individuals = vita::random::between(30, 300);
-    env.tournament_size = vita::random::between<size_t>(1, *env.mate_zone);
+    env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     std::stringstream ss;
     vita::population<vita::individual> pop1(env, sset);
