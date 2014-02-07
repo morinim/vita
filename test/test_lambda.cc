@@ -24,6 +24,7 @@
 
 using namespace boost;
 
+constexpr double epsilon(0.00001);
 #endif
 
 #define TEST_WTA
@@ -77,7 +78,12 @@ void test_team_of_one(vita::src_problem &pr)
       if (out_i.empty())
         BOOST_REQUIRE(out_t.empty());
       else
-        BOOST_REQUIRE_CLOSE(to<number>(out_i), to<number>(out_t), 0.0001);
+	  {
+        const auto v1(to<number>(out_i));
+		const auto v2(to<number>(out_t));
+		
+		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+      }
     }
   }
 }
@@ -109,7 +115,12 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
       if (out_i.empty())
         BOOST_REQUIRE(out_t.empty());
       else
-        BOOST_REQUIRE_CLOSE(to<number>(out_i), to<number>(out_t), 0.0001);
+	  {
+        const auto v1(to<number>(out_i));
+		const auto v2(to<number>(out_t));
+		
+		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+	  }
     }
   }
 

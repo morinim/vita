@@ -1,14 +1,13 @@
 /**
- *
- *  \file test_evolution.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -19,7 +18,7 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE evolution
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
 
@@ -33,14 +32,13 @@ BOOST_AUTO_TEST_CASE(Creation)
   using namespace vita;
 
   for (unsigned n(4); n <= 100; ++n)
-    for (unsigned l(sset.categories() + 2); l <= 100; l+= (l < 10 ? 1 : 30))
+    for (auto l(sset.categories() + 2); l <= 100; l += (l < 10 ? 1 : 30))
     {
       env.individuals = n;
       env.code_length = l;
       env.tournament_size = 3;
 
-      const std::unique_ptr<evaluator<individual>> eva(
-        make_unique<vita::random_evaluator<individual>>());
+      const auto eva(make_unique<vita::random_evaluator<individual>>());
 
       vita::evolution<individual, alps_es> evo1(env, sset, *eva.get());
       BOOST_REQUIRE(evo1.debug(true));

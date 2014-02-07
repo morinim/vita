@@ -18,14 +18,14 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE primitive
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
 
+constexpr double epsilon(0.00001);
+
 #include "factory_fixture3.h"
 #endif
-
-constexpr double epsilon(0.00001);
 
 BOOST_FIXTURE_TEST_SUITE(primitive_d, F_FACTORY3)
 

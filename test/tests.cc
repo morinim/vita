@@ -15,6 +15,8 @@
 #define BOOST_TEST_MODULE Master Test Suite
 #include <boost/test/unit_test.hpp>
 
+constexpr double epsilon(0.00001);
+
 using namespace boost;
 
 #include "factory_fixture1.h"
