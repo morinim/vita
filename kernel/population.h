@@ -67,8 +67,6 @@ namespace vita
     void add_layer();
     unsigned layers() const;
     void inc_age();
-    unsigned max_age(unsigned) const;
-    bool aged(coord) const;
     void add_to_layer(unsigned, const T &);
 
     const environment &env() const;

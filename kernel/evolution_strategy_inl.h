@@ -13,78 +13,6 @@
 #if !defined(VITA_EVOLUTION_STRATEGY_INL_H)
 #define      VITA_EVOLUTION_STRATEGY_INL_H
 
-/*
-///
-/// \param[in] l a layer.
-/// \return the maximum allowed age for an individual in layer \a l.
-///
-template<class T>
-unsigned alps_es<T>::max_age(unsigned l) const
-{
-  assert(l < this->pop_.layers());
-
-  if (l + 1 == this->pop_.layers())
-    return std::numeric_limits<unsigned>::max();
-
-  const auto age_gap(this->pop_.env().alps.age_gap);
-
-  // This is a polynomial aging scheme.
-  switch (l)
-  {
-  case 0:   return age_gap;
-  case 1:   return age_gap + age_gap;
-  default:  return l * l * age_gap;
-  }
-
-  // A linear aging scheme.
-  // return age_gap * (l + 1);
-
-  // An exponential aging scheme.
-  // switch (l)
-  // {
-  // case 0:  return age_gap;
-  // case 1:  return age_gap + age_gap;
-  // default:
-  // {
-  //   auto k(4);
-  //   for (unsigned i(2); i < layer; ++i)
-  //     k *= 2;
-  //   return k * age_gap;
-  // }
-
-  // Fibonacci aging scheme.
-  // auto num1(age_gap), num2(age_gap);
-  // while (num2 <= 2)
-  // {
-  //   auto num3(num2);
-  //   num2 += num1;
-  //   num1 = num3;
-  // }
-  //
-  // if (l == 1)
-  //   return num1 + num2 - 1;
-  //
-  // for (unsigned i(1); i <= l; ++i)
-  // {
-  //   auto num3(num2);
-  //   num2 += num1 -1;
-  //   num1 = num3;
-  // }
-  // return num2;
-}
-
-///
-/// \param[in] c the coordinates of an individual.
-/// \return \c true if the individual at coordinates \c is too old for his
-///         layer.
-///
-template<class T>
-bool alps_es<T>::aged(coord c) const
-{
-  return this->pop_[c.layer][c.index].age > max_age(c.layer);
-}
-*/
-
 ///
 /// Increments population's age and checks if it's time to add a new layer.
 ///
@@ -136,11 +64,11 @@ void alps_es<T>::log(unsigned last_run, unsigned current_run) const
       {
         f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
 
-        if (pop.max_age(l) ==
-            std::numeric_limits<decltype(pop.max_age(l))>::max())
+        const auto ma(alps::max_age(l, layers, env.alps.age_gap));
+        if (ma == std::numeric_limits<decltype(ma)>::max())
           f_lys << "inf";
         else
-          f_lys << pop.max_age(l) + 1;
+          f_lys << ma + 1;
 
         f_lys << ' ' << this->sum_->az.age_dist(l).mean
               << ' ' << this->sum_->az.age_dist(l).standard_deviation()

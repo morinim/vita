@@ -16,7 +16,7 @@
 #include <set>
 #include <vector>
 
-#include "kernel/vita.h"
+#include "kernel/alps.h"
 
 namespace vita {  namespace selection {
 
@@ -89,6 +89,9 @@ namespace vita {  namespace selection {
     using alps::strategy::strategy;
 
     virtual std::vector<coord> run() override;
+
+  private:
+    bool aged(coord) const;
   };
 
   ///

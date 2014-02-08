@@ -132,6 +132,19 @@ void tournament<T>::run(const std::vector<coord> &parent,
 
 ///
 /// \param[in] l a layer.
+/// \return the maximum allowed age for an individual in layer \a l.
+///
+/// This is just a convenience method to save some keystroke.
+///
+template<class T>
+unsigned alps<T>::max_age(unsigned l) const
+{
+  return vita::alps::max_age(l, this->pop_.layers(),
+                             this->pop_.env().alps.age_gap);
+}
+
+///
+/// \param[in] l a layer.
 ///
 /// Try to move individuals in layer \a l in the upper layer (calling
 /// try_add_to_layer for each individual).
@@ -168,7 +181,7 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
     p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
   else
   {
-    const auto max_age(p.max_age(layer));
+    const auto m_age(max_age(layer));
 
     coord c_worst{layer, random::sup(p.individuals(layer))};
     auto f_worst(this->eva_(p[c_worst]));
@@ -179,8 +192,8 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
       const coord c_x{layer, random::sup(p.individuals(layer))};
       const auto f_x(this->eva_(p[c_x]));
 
-      if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > max_age) ||
-          (p[c_worst].age() <= max_age && p[c_x].age() <= max_age &&
+      if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > m_age) ||
+          (p[c_worst].age() <= m_age && p[c_x].age() <= m_age &&
            f_x < f_worst))
       {
         c_worst = c_x;
@@ -188,8 +201,8 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
       }
     }
 
-    if ((incoming.age() <= max_age && p[c_worst].age() > max_age) ||
-        ((incoming.age() <= max_age || p[c_worst].age() > max_age) &&
+    if ((incoming.age() <= m_age && p[c_worst].age() > m_age) ||
+        ((incoming.age() <= m_age || p[c_worst].age() > m_age) &&
          this->eva_(incoming) >= f_worst))
     {
       if (layer + 1 < p.layers())

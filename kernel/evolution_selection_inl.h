@@ -141,6 +141,21 @@ std::vector<coord> tournament<T>::run()
 }
 
 ///
+/// \param[in] c the coordinates of an individual.
+/// \return \c true if the individual at coordinates \c is too old for his
+///         layer.
+///
+/// This is just a convenience method to save some keystroke.
+///
+template<class T>
+bool alps<T>::aged(coord c) const
+{
+  return this->pop_[c].age() >
+         vita::alps::max_age(c.layer, this->pop_.layers(),
+                             this->pop_.env().alps.age_gap);
+}
+
+///
 ///
 ///
 template<class T>
@@ -154,8 +169,8 @@ std::vector<coord> alps<T>::run()
   auto c1(this->pickup(layer));
 
   typedef std::pair<bool, fitness_t> age_fit_t;
-  age_fit_t age_fit0{!pop.aged(c0), this->eva_(pop[c0])};
-  age_fit_t age_fit1{!pop.aged(c1), this->eva_(pop[c1])};
+  age_fit_t age_fit0{!aged(c0), this->eva_(pop[c0])};
+  age_fit_t age_fit1{!aged(c1), this->eva_(pop[c1])};
 
   if (age_fit0 < age_fit1)
   {
@@ -171,7 +186,7 @@ std::vector<coord> alps<T>::run()
   while (rounds--)
   {
     const auto tmp(this->pickup(layer, same_layer_p));
-    const age_fit_t tmp_age_fit{!pop.aged(tmp), this->eva_(pop[tmp])};
+    const age_fit_t tmp_age_fit{!aged(tmp), this->eva_(pop[tmp])};
 
     if (age_fit0 < tmp_age_fit)
     {
@@ -187,12 +202,12 @@ std::vector<coord> alps<T>::run()
       age_fit1 = tmp_age_fit;
     }
 
-    assert(age_fit0.first == !pop.aged(c0));
-    assert(age_fit1.first == !pop.aged(c1));
+    assert(age_fit0.first == !aged(c0));
+    assert(age_fit1.first == !aged(c1));
     assert(age_fit0.second == this->eva_(pop[c0]));
     assert(age_fit1.second == this->eva_(pop[c1]));
     assert(age_fit0 >= age_fit1);
-    assert(!pop.aged(c0) || pop.aged(c1));
+    assert(!aged(c0) || aged(c1));
     assert(layer <= c0.layer + 1);
     assert(layer <= c1.layer + 1);
     assert(c0.layer <= layer);

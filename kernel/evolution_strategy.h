@@ -68,12 +68,12 @@ namespace vita
       std::is_same<RS<T>, typename vita::replacement::alps<T>>::value
     };
 
-  public:  // Public data members.
+  public:  // Public data members
     SS<T> selection;
     CS<T> recombination;
     RS<T> replacement;
 
-  protected:  // Protected data members.
+  protected:  // Protected data members
     population<T> &pop_;
     summary<T>    *sum_;
   };

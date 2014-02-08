@@ -15,7 +15,7 @@
 
 #include <vector>
 
-#include "kernel/vita.h"
+#include "kernel/alps.h"
 
 namespace vita {  namespace replacement {
 
@@ -125,6 +125,7 @@ namespace vita {  namespace replacement {
     void try_move_up_layer(unsigned);
 
   private:  // Private support methods.
+    unsigned max_age(unsigned) const;
     void try_add_to_layer(unsigned, const T &);
   };
 
