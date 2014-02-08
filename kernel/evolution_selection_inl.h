@@ -36,7 +36,18 @@ coord strategy<T>::pickup() const
   if (n_layers == 1)
     return {0, vita::random::sup(pop_.individuals(0))};
 
-  const auto l(vita::random::sup(n_layers));
+  // If we have multiple layers we cannot be sure that every layer has the
+  // same number of individuals. So the simple (and faster) solution:
+  //
+  //   const auto l(vita::random::sup(n_layers));
+  //
+  // would not be appropriate.
+  std::vector<unsigned> s(n_layers);
+  for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
+    s[l] = pop_[l].individuals();
+
+  std::discrete_distribution<> dd(s);
+  const auto l(dd(vita::random::engine()));
   return {l, vita::random::sup(pop_.individuals(l))};
 }
 

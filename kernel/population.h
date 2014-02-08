@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(POPULATION_H)
-#define      POPULATION_H
+#if !defined(VITA_POPULATION_H)
+#define      VITA_POPULATION_H
 
 #include <fstream>
 #include <vector>
@@ -91,4 +91,4 @@ namespace vita
   ///
 }  // namespace vita
 
-#endif  // POPULATION_H
+#endif  // Include guard

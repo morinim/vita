@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(POPULATION_INL_H)
-#define      POPULATION_INL_H
+#if !defined(VITA_POPULATION_INL_H)
+#define      VITA_POPULATION_INL_H
 
 ///
 /// \param[in] e base vita::environment.
@@ -25,11 +25,12 @@ population<T>::population(const environment &e, const symbol_set &sset)
 {
   assert(e.debug(true, true));
 
-  pop_[0].reserve(e.individuals);
+  const auto n(e.individuals);
+  pop_[0].reserve(n);
 
   // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
   // isn't a well defined environment and init_layer doesn't work.
-  for (unsigned i(0); i < e.individuals; ++i)
+  for (auto i(decltype(n){0}); i < n; ++i)
     pop_[0].emplace_back(e, sset);
 
   assert(debug(true));
@@ -60,7 +61,7 @@ void population<T>::init_layer(unsigned l, const environment *e,
   pop_[l].clear();
 
   const auto n(e->individuals);
-  for (unsigned i(0); i < n; ++i)
+  for (auto i(decltype(n){0}); i < n; ++i)
     pop_[l].emplace_back(*e, *s);
 }
 
@@ -154,8 +155,8 @@ template<class T>
 unsigned population<T>::individuals() const
 {
   unsigned n(0);
-  for (unsigned l(0); l < layers(); ++l)
-    n += individuals(l);
+  for (const auto &layer : pop_)
+    n += layer.size();
 
   return n;
 }
@@ -307,13 +308,13 @@ bool population<T>::load(std::istream &in)
   population p(env(), pop_[0][0].sset());
   p.pop_.reserve(n_layers);
 
-  for (unsigned l(0); l < n_layers; ++l)
+  for (decltype(n_layers) l(0); l < n_layers; ++l)
   {
     unsigned n_elem(0);
     if (!(in >> n_elem))
       return false;
 
-    for (unsigned i(0); i < n_elem; ++i)
+    for (decltype(n_elem) i(0); i < n_elem; ++i)
       if (!p[{l, i}].load(in))
         return false;
   }
@@ -365,4 +366,4 @@ std::ostream &operator<<(std::ostream &s, const population<T> &pop)
 
   return s;
 }
-#endif  // POPULATION_INL_H
+#endif  // Include guard

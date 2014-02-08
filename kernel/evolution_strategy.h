@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_STRATEGY_H)
-#define      EVOLUTION_STRATEGY_H
+#if !defined(VITA_EVOLUTION_STRATEGY_H)
+#define      VITA_EVOLUTION_STRATEGY_H
 
 #include "kernel/evolution_recombination.h"
 #include "kernel/evolution_replacement.h"
@@ -46,8 +46,8 @@ namespace vita
   {
   public:
     evolution_strategy(population<T> &pop, evaluator<T> &eva, summary<T> *s)
-      : selection(pop, eva, *s), recombination(pop, eva, s), replacement(pop, eva),
-        pop_(pop), sum_(s)
+      : selection(pop, eva, *s), recombination(pop, eva, s),
+        replacement(pop, eva), pop_(pop), sum_(s)
     {
       assert(s);
     }
@@ -148,6 +148,7 @@ namespace vita
   };
 
 #include "kernel/evolution_strategy_inl.h"
+
 }  // namespace vita
 
-#endif  // EVOLUTION_STRATEGY_H
+#endif  // Include guard

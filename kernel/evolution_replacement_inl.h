@@ -171,13 +171,13 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
     const auto max_age(p.max_age(layer));
 
     coord c_worst{layer, random::sup(p.individuals(layer))};
-    fitness_t f_worst(this->eva_(p[c_worst]));
+    auto f_worst(this->eva_(p[c_worst]));
 
     auto rounds(p.env().tournament_size);
     while (rounds--)
     {
       const coord c_x{layer, random::sup(p.individuals(layer))};
-      const fitness_t f_x(this->eva_(p[c_x]));
+      const auto f_x(this->eva_(p[c_x]));
 
       if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > max_age) ||
           (p[c_worst].age() <= max_age && p[c_x].age() <= max_age &&
@@ -216,7 +216,7 @@ void alps<T>::run(const std::vector<coord> &parent,
                   const std::vector<T> &offspring, summary<T> *const s)
 {
   const auto layer(std::max(parent[0].layer, parent[1].layer));
-  const fitness_t f_off(this->eva_(offspring[0]));
+  const auto f_off(this->eva_(offspring[0]));
 
 #if defined(MUTUAL_IMPROVEMENT)
   const auto &pop(this->pop_);
@@ -283,7 +283,7 @@ void pareto<T>::run(const std::vector<coord> &parent,
     {
       pop[i] = offspring[0];
 
-      if (fit_off[0] > s->best.fitness[0])
+      if (fit_off > s->best.fitness)
       {
         s->last_imp =                  s->gen;
         s->best     = {offspring[0], fit_off};
@@ -311,7 +311,7 @@ void pareto<T>::run(const std::vector<coord> &parent,
   if (!pop.env().elitism || !dominated)
     pop[parent.back()] = offspring[0];
 
-  if (fit_off[0] > s->best->fitness[0])
+  if (fit_off > s->best->fitness)
   {
     s->last_imp =                  s->gen;
     s->best     = {offspring[0], fit_off};

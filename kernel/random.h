@@ -39,7 +39,6 @@ namespace vita
     static void seed(unsigned);
     void randomize();
 
-  private:
     // This engine produces integers in the range [0, 2^32-1] with a good
     // uniform distribution in up to 623 dimensions.
     typedef std::mt19937 engine_t;

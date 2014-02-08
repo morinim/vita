@@ -41,12 +41,12 @@ namespace vita {  namespace selection {
 
     virtual std::vector<coord> run() = 0;
 
-  protected:  // Support methods.
+  protected:  // Support methods
     coord pickup() const;
     coord pickup(coord) const;
     coord pickup(unsigned, double = 1.0) const;
 
-  protected:  // Data members.
+  protected:  // Data members
     const population<T> &pop_;
     evaluator<T>        &eva_;
     const summary<T>    &sum_;

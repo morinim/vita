@@ -139,6 +139,7 @@ namespace vita {  namespace replacement {
   };
 
 #include "kernel/evolution_replacement_inl.h"
+
 } }  // namespace vita::replacement
 
 #endif  // Include guard
