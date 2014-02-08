@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_STRATEGY_INL_H)
-#define      EVOLUTION_STRATEGY_INL_H
+#if !defined(VITA_EVOLUTION_STRATEGY_INL_H)
+#define      VITA_EVOLUTION_STRATEGY_INL_H
 
 /*
 ///
@@ -131,11 +131,13 @@ void alps_es<T>::log(unsigned last_run, unsigned current_run) const
       if (last_run != current_run)
         f_lys << std::endl << std::endl;
 
-      for (unsigned l(0); l < pop.layers(); ++l)
+      const auto layers(pop.layers());
+      for (auto l(decltype(layers){0}); l < layers; ++l)
       {
         f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
 
-        if (pop.max_age(l) == std::numeric_limits<unsigned>::max())
+        if (pop.max_age(l) ==
+            std::numeric_limits<decltype(pop.max_age(l))>::max())
           f_lys << "inf";
         else
           f_lys << pop.max_age(l) + 1;
@@ -152,4 +154,4 @@ void alps_es<T>::log(unsigned last_run, unsigned current_run) const
     }
   }
 }
-#endif  // EVOLUTION_STRATEGY_INL_H
+#endif  // Include guard
