@@ -179,7 +179,7 @@ basic_dyn_slot_lambda_f<team<T>, S, N>::basic_dyn_slot_lambda_f(
   const team<T> &t, data &d, unsigned x_slot)
   : team_class_lambda_f<T, S, N, vita::basic_dyn_slot_lambda_f>(d)
 {
-  this->team_.reserve(t.size());
+  this->team_.reserve(t.individuals());
   for (const auto &ind : t)
     this->team_.emplace_back(ind, d, x_slot);
 }
@@ -490,7 +490,7 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
                                                         data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
-  team_.reserve(t.size());
+  team_.reserve(t.individuals());
   for (const auto &ind : t)
     team_.emplace_back(ind, d);
 }

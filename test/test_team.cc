@@ -18,7 +18,7 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE team
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
 
@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     // std::cout << t << std::endl;
 
     BOOST_REQUIRE(t.debug());
-    BOOST_REQUIRE_EQUAL(t.size(), l * t.individuals());
     BOOST_REQUIRE_EQUAL(t.age(), 0);
   }
 }

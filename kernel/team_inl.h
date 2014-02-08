@@ -164,23 +164,6 @@ unsigned team<T>::individuals() const
 }
 
 ///
-/// \return the total size of the team (effective size + introns).
-///
-/// The size is constant for any team (it's choosen at initialization time).
-/// \see team::eff_size()
-///
-template<class T>
-unsigned team<T>::size() const
-{
-  unsigned s(0);
-
-  for (const auto &i : individuals_)
-    s += i.size();
-
-  return s;
-}
-
-///
 /// \return the effective size of the team.
 /// \see team::size()
 ///

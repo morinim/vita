@@ -48,7 +48,7 @@ namespace vita { namespace detail
   public:
     core_reg_lambda_f(const team<T> &t)
     {
-      team_.reserve(t.size());
+      team_.reserve(t.individuals());
       for (const auto &ind : t)
         team_.emplace_back(ind);
 

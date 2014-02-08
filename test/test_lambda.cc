@@ -81,7 +81,7 @@ void test_team_of_one(vita::src_problem &pr)
 	  {
         const auto v1(to<number>(out_i));
 		const auto v2(to<number>(out_t));
-		
+
 		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
       }
     }
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 	  {
         const auto v1(to<number>(out_i));
 		const auto v2(to<number>(out_t));
-		
+
 		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
 	  }
     }

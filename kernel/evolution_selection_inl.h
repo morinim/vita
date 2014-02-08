@@ -31,11 +31,13 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 template<class T>
 coord strategy<T>::pickup() const
 {
-  if (pop_.layers() == 1)
+  const auto n_layers(pop_.layers());
+
+  if (n_layers == 1)
     return {0, vita::random::sup(pop_.individuals(0))};
 
-  const auto layer(vita::random::sup(pop_.layers()));
-  return {layer, vita::random::sup(pop_.individuals(layer))};
+  const auto l(vita::random::sup(n_layers));
+  return {l, vita::random::sup(pop_.individuals(l))};
 }
 
 ///
