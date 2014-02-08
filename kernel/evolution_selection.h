@@ -145,6 +145,7 @@ namespace vita {  namespace selection {
   };
 
 #include "kernel/evolution_selection_inl.h"
+
 } } // namespace vita :: selection
 
 #endif  // Include guard
