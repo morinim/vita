@@ -44,9 +44,9 @@ coord strategy<T>::pickup() const
   // would not be appropriate.
   std::vector<unsigned> s(n_layers);
   for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
-    s[l] = pop_[l].individuals();
+    s[l] = pop_.individuals(l);
 
-  std::discrete_distribution<> dd(s);
+  std::discrete_distribution<unsigned> dd(s.begin(), s.end());
   const auto l(dd(vita::random::engine()));
   return {l, vita::random::sup(pop_.individuals(l))};
 }
