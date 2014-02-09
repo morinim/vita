@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_EVALUATOR_INL_H)
-#define      SRC_EVALUATOR_INL_H
+#if !defined(VITA_SRC_EVALUATOR_INL_H)
+#define      VITA_SRC_EVALUATOR_INL_H
 
 ///
 /// \param[in] d dataset that the evaluator will use.
@@ -99,7 +99,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(lambdify(prg));
+  const auto f(lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -121,7 +121,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 
 ///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
-////               function.
+///                function.
 /// \return the lambda function associated with \a prg (\c nullptr in case of
 ///         errors).
 ///
@@ -134,9 +134,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
@@ -164,9 +162,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
 ///         training case \a t. The value returned is in the [0;200] range.
@@ -210,9 +206,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
@@ -241,9 +235,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
 ///         training case \a t.
@@ -274,7 +266,7 @@ double classification_evaluator<T>::accuracy(const T &prg) const
   assert(this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(this->lambdify(prg));
+  const auto f(this->lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -442,4 +434,4 @@ std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const
   return make_unique<binary_lambda_f<T>>(ind, *this->dat_);
 }
 
-#endif  // SRC_EVALUATOR_INL_H
+#endif  // Include guard

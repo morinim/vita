@@ -21,7 +21,7 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE TranspositionTable
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
 

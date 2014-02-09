@@ -131,6 +131,6 @@ SETTING UP THE BUILD
   6. Execute
        bootstrap.bat mingw
 	 and
-	   b2 link=static runtime-link=static threading=multi toolset=gcc variant=release --build-type=minimal --layout=system
+       b2 link=static runtime-link=static threading=multi toolset=gcc variant=release --build-type=minimal --layout=system
   7. Go and make yourself *several* cups of green tea;
   8. The stage subdir now contains libs.
