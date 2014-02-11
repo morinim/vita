@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(ANALYZER_INL_H)
-#define      ANALYZER_INL_H
+#if !defined(VITA_ANALYZER_INL_H)
+#define      VITA_ANALYZER_INL_H
 
 ///
 /// New empty core_analyzer.
@@ -249,4 +249,4 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
   return length;
 }
 
-#endif  // ANALYZER_INL_H
+#endif  // Include guard

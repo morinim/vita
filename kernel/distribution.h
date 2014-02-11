@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(DISTRIBUTION_H)
-#define      DISTRIBUTION_H
+#if !defined(VITA_DISTRIBUTION_H)
+#define      VITA_DISTRIBUTION_H
 
 #include <cmath>
 #include <map>
@@ -213,4 +213,4 @@ namespace vita
   template<> bool distribution<fitness_t>::debug(bool) const;
 }  // namespace vita
 
-#endif  // DISTRIBUTION_H
+#endif  // Include guard

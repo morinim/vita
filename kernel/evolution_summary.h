@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SUMMARY_H)
-#define      EVOLUTION_SUMMARY_H
+#if !defined(VITA_EVOLUTION_SUMMARY_H)
+#define      VITA_EVOLUTION_SUMMARY_H
 
 #include "kernel/analyzer.h"
 
@@ -54,6 +54,7 @@ namespace vita
   };
 
 #include "kernel/evolution_summary_inl.h"
+
 }  // namespace vita
 
-#endif  // EVOLUTION_SUMMARY_H
+#endif  // Include guard
