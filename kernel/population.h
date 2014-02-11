@@ -68,6 +68,7 @@ namespace vita
     unsigned layers() const;
     void inc_age();
     void add_to_layer(unsigned, const T &);
+    void pop_from_layer(unsigned);
 
     const environment &env() const;
 

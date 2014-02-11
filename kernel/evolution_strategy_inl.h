@@ -20,12 +20,26 @@ template<class T>
 void alps_es<T>::post_bookkeeping()
 {
   auto &pop(this->pop_);
+  const auto &sum(this->sum_);
 
   pop.inc_age();
 
-  if (this->sum_->gen && this->sum_->gen % pop.env().alps.age_gap == 0)
+  const auto layers(pop.layers());
+/*  for (auto l(decltype(layers){1}); l < layers; ++l)
   {
-    if (pop.layers() < pop.env().layers)
+    if (sum->az.fit_dist(l).standard_deviation().issmall() &&
+        pop.individuals(l) > pop.env().individuals / 2)
+    {
+      const auto n(pop.individuals(l) / 2);
+
+      for (unsigned i(0); i < n; ++i)
+        pop.pop_from_layer(l);
+    }
+    }*/
+
+  if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
+  {
+    if (layers < pop.env().layers)
       pop.add_layer();
     else
     {
@@ -77,7 +91,8 @@ void alps_es<T>::log(unsigned last_run, unsigned current_run) const
               << ' ' << this->sum_->az.fit_dist(l).mean
               << ' ' << this->sum_->az.fit_dist(l).standard_deviation()
               << ' ' << this->sum_->az.fit_dist(l).min
-              << '-' << this->sum_->az.fit_dist(l).max << std::endl;
+              << '-' << this->sum_->az.fit_dist(l).max
+              << ' ' << pop.individuals(l) << std::endl;
       }
     }
   }

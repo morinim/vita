@@ -126,7 +126,7 @@ namespace vita {  namespace replacement {
 
   private:  // Private support methods.
     unsigned max_age(unsigned) const;
-    void try_add_to_layer(unsigned, const T &);
+    bool try_add_to_layer(unsigned, const T &);
   };
 
   template<class T>

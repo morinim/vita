@@ -114,6 +114,19 @@ void population<T>::add_to_layer(unsigned l, const T &i)
 }
 
 ///
+/// \param[in] l index of a layer.
+///
+/// Remove the last individual of layer \a l.
+///
+template<class T>
+void population<T>::pop_from_layer(unsigned l)
+{
+  assert(l < layers());
+  pop_[l].pop_back();
+}
+
+
+///
 /// \param[in] c coordinates of an \a individual.
 /// \return a reference to the \a individual at coordinates \a c.
 ///

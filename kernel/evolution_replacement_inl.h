@@ -155,8 +155,12 @@ void alps<T>::try_move_up_layer(unsigned l)
   auto &pop(this->pop_);
 
   if (l + 1 < pop.layers())
-    for (unsigned i(0); i < pop.individuals(l); ++i)
+  {
+    const auto n(pop.individuals(l));
+
+    for (auto i(decltype(n){0}); i < n; ++i)
       try_add_to_layer(l + 1, pop[{l, i}]);
+  }
 }
 
 ///
@@ -172,44 +176,52 @@ void alps<T>::try_move_up_layer(unsigned l)
 ///   both are simultaneously within/outside the time frame of \a layer.
 ///
 template<class T>
-void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
+bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 {
   auto &p(this->pop_);
   assert(layer < p.layers());
 
   if (p.individuals(layer) < p.env().individuals)
-    p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
-  else
   {
-    const auto m_age(max_age(layer));
+    p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
+    return true;
+  }
 
-    coord c_worst{layer, random::sup(p.individuals(layer))};
-    auto f_worst(this->eva_(p[c_worst]));
+  // Layer is full, can we replace an existing individual?
+  const auto m_age(max_age(layer));
 
-    auto rounds(p.env().tournament_size);
-    while (rounds--)
+  // Well, let's see if the worst individual we can find with a tournament...
+  coord c_worst{layer, random::sup(p.individuals(layer))};
+  auto f_worst(this->eva_(p[c_worst]));
+
+  auto rounds(p.env().tournament_size);
+  while (rounds--)
+  {
+    const coord c_x{layer, random::sup(p.individuals(layer))};
+    const auto f_x(this->eva_(p[c_x]));
+
+    if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > m_age) ||
+        (p[c_worst].age() <= m_age && p[c_x].age() <= m_age &&
+         f_x < f_worst))
     {
-      const coord c_x{layer, random::sup(p.individuals(layer))};
-      const auto f_x(this->eva_(p[c_x]));
-
-      if ((p[c_x].age() > p[c_worst].age() && p[c_x].age() > m_age) ||
-          (p[c_worst].age() <= m_age && p[c_x].age() <= m_age &&
-           f_x < f_worst))
-      {
-        c_worst = c_x;
-        f_worst = f_x;
-      }
-    }
-
-    if ((incoming.age() <= m_age && p[c_worst].age() > m_age) ||
-        ((incoming.age() <= m_age || p[c_worst].age() > m_age) &&
-         this->eva_(incoming) >= f_worst))
-    {
-      if (layer + 1 < p.layers())
-        try_add_to_layer(layer + 1, p[c_worst]);
-      p[c_worst] = incoming;
+      c_worst = c_x;
+      f_worst = f_x;
     }
   }
+
+  // ... is worse than the incoming individual.
+  if ((incoming.age() <= m_age && p[c_worst].age() > m_age) ||
+      ((incoming.age() <= m_age || p[c_worst].age() > m_age) &&
+       this->eva_(incoming) >= f_worst))
+  {
+    if (layer + 1 < p.layers())
+      try_add_to_layer(layer + 1, p[c_worst]);
+    p[c_worst] = incoming;
+
+    return true;
+  }
+
+  return false;
 }
 
 ///
@@ -221,19 +233,21 @@ void alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 /// \param[in] s statistical \a summary.
 ///
 /// Parameters from the environment:
-/// * elitism is \c true => child replaces a member of the population only if
-///   child is better.
+/// * elitism is \c true => a new best individual is always inserted into the
+///   population.
 ///
 template<class T>
 void alps<T>::run(const std::vector<coord> &parent,
                   const std::vector<T> &offspring, summary<T> *const s)
 {
+  assert(!boost::indeterminate(pop.env().elitism));
+
   const auto layer(std::max(parent[0].layer, parent[1].layer));
   const auto f_off(this->eva_(offspring[0]));
-
-#if defined(MUTUAL_IMPROVEMENT)
   const auto &pop(this->pop_);
 
+  bool ins;
+#if defined(MUTUAL_IMPROVEMENT)
   // To protect the algorithm from the potential deleterious effect of intense
   // exploratory dynamics, we can use a constraint which mandate that an
   // individual must be better than both its parents before insertion into
@@ -243,11 +257,21 @@ void alps<T>::run(const std::vector<coord> &parent,
   if (f_off > this->eva_(pop[parent[0]]) && f_off > this->eva_(pop[parent[1]]))
 #endif
   {
-    try_add_to_layer(layer, offspring[0]);
+    ins = try_add_to_layer(layer, offspring[0]);
   }
 
   if (f_off > s->best->fitness)
   {
+    // Sometimes a new best individual is discovered in a lower layer but he is
+    // too old for its layer and the random tournament may choose only "not
+    // aged" individuals (i.e. individuals within the age limit of their layer).
+    // When this happen the new best individual would be lost without the
+    // command below.
+    // There isn't an age limit for the last layer so try_add_to_layer will
+    // always succeed.
+    if (!ins && pop.env().elitism)
+      try_add_to_layer(pop.layers() - 1, offspring[0]);
+
     s->last_imp =                s->gen;
     s->best     = {offspring[0], f_off};
   }
