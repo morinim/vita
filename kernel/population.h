@@ -32,6 +32,7 @@ namespace vita
 
     bool operator==(coord c) const
     { return layer == c.layer && index == c.index; }
+    bool operator!=(coord c) const { return !(*this == c); }
   };
 
   ///
