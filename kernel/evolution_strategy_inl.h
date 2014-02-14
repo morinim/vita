@@ -19,23 +19,20 @@
 template<class T>
 void alps_es<T>::post_bookkeeping()
 {
-  auto &pop(this->pop_);
   const auto &sum(this->sum_);
+  auto &pop(this->pop_);
 
   pop.inc_age();
 
   const auto layers(pop.layers());
-/*  for (auto l(decltype(layers){1}); l < layers; ++l)
-  {
-    if (sum->az.fit_dist(l).standard_deviation().issmall() &&
-        pop.individuals(l) > pop.env().individuals / 2)
+  for (auto l(decltype(layers){1}); l < layers; ++l)
+    if (sum->az.fit_dist(l).standard_deviation().issmall())
     {
-      const auto n(pop.individuals(l) / 2);
-
-      for (unsigned i(0); i < n; ++i)
-        pop.pop_from_layer(l);
+      if (pop.individuals(l) / 2 > pop.env().individuals / 10)
+        pop.set_allowed(l, pop.individuals(l) / 2);
     }
-    }*/
+    else
+      pop.set_allowed(l, pop.env().individuals);
 
   if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
   {

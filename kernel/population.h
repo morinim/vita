@@ -60,6 +60,7 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
+    unsigned allowed(unsigned) const;
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
@@ -70,6 +71,7 @@ namespace vita
     void inc_age();
     void add_to_layer(unsigned, const T &);
     void pop_from_layer(unsigned);
+    void set_allowed(unsigned, unsigned);
 
     const environment &env() const;
 
@@ -81,6 +83,7 @@ namespace vita
 
   private:  // Private data members.
     std::vector<layer_t> pop_;
+    std::vector<unsigned> allowed_;
   };
 
 #include "kernel/population_inl.h"

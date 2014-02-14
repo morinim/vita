@@ -21,12 +21,13 @@
 ///
 template<class T>
 population<T>::population(const environment &e, const symbol_set &sset)
-  : pop_(1)
+  : pop_(1), allowed_(1)
 {
   assert(e.debug(true, true));
 
   const auto n(e.individuals);
   pop_[0].reserve(n);
+  allowed_[0] = n;
 
   // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
   // isn't a well defined environment and init_layer doesn't work.
@@ -51,7 +52,7 @@ void population<T>::init_layer(unsigned l, const environment *e,
                                const symbol_set *s)
 {
   assert(l < layers());
-  assert(pop_[l].size() || (e && s));
+  assert(individuals(l) || (e && s));
 
   if (!e)
     e = &pop_[l][0].env();
@@ -60,7 +61,7 @@ void population<T>::init_layer(unsigned l, const environment *e,
 
   pop_[l].clear();
 
-  const auto n(e->individuals);
+  const auto n(allowed(l));
   for (auto i(decltype(n){0}); i < n; ++i)
     pop_[l].emplace_back(*e, *s);
 }
@@ -95,7 +96,9 @@ void population<T>::add_layer()
   const auto &s(pop_[0][0].sset());
 
   pop_.insert(pop_.begin(), layer_t());
-  pop_.front().reserve(e.individuals);
+  pop_[0].reserve(e.individuals);
+
+  allowed_.insert(allowed_.begin(), e.individuals);
 
   init_layer(0, &e, &s);
 }
@@ -110,7 +113,9 @@ template<class T>
 void population<T>::add_to_layer(unsigned l, const T &i)
 {
   assert(l < layers());
-  pop_[l].push_back(i);
+
+  if (individuals(l) < allowed(l))
+    pop_[l].push_back(i);
 }
 
 ///
@@ -148,6 +153,50 @@ const T &population<T>::operator[](coord c) const
   assert(c.layer < layers());
   assert(c.index < individuals(c.layer));
   return pop_[c.layer][c.index];
+}
+
+///
+/// \param[in] l a layer.
+/// \return the number of individuals allowed in layer \a l.
+///
+/// \note
+/// for each l: individuals(l) < allowed(l)
+///
+template<class T>
+unsigned population<T>::allowed(unsigned l) const
+{
+  assert(l < layers());
+  return allowed_[l];
+}
+
+///
+/// \param[in] l a layer.
+/// \param[in] n number of programs allowed in layer \a l.
+///
+/// Sets the number of programs allowed in layer \a l. If layer \a l contains
+/// more programs than the allowed, the excedence will be deleted.
+///
+template<class T>
+void population<T>::set_allowed(unsigned l, unsigned n)
+{
+  assert(l < layers());
+  assert(n <= pop_[l].capacity());
+
+  if (individuals(l) > n)
+  {
+    unsigned delta(individuals(l) - n);
+
+    while (delta)
+    {
+      pop_[l].pop_back();
+      --delta;
+    }
+  }
+
+  assert(individuals(l) == n);
+  allowed_[l] = n;
+
+  assert(debug(true));
 }
 
 ///
@@ -237,6 +286,19 @@ bool population<T>::debug(bool verbose) const
       if (!i.debug(verbose))
         return false;
 
+  if (layers() != allowed_.size())
+    return false;
+
+  const auto n(layers());
+  for (auto l(decltype(n){0}); l < n; ++l)
+  {
+    if (individuals(l) <= allowed(l))
+      return false;
+
+    if (allowed(l) <= pop_[l].capacity())
+      return false;
+  }
+
   return true;
 }
 
@@ -260,6 +322,9 @@ bool population<T>::load(std::istream &in)
 
   for (decltype(n_layers) l(0); l < n_layers; ++l)
   {
+    if (!(in >> p.allowed[l]))
+      return false;
+
     unsigned n_elem(0);
     if (!(in >> n_elem))
       return false;
@@ -280,14 +345,16 @@ bool population<T>::load(std::istream &in)
 template<class T>
 bool population<T>::save(std::ostream &out) const
 {
-  out << layers() << std::endl;
+  const auto n(layers());
 
-  for (const auto &l : pop_)
+  out << n << std::endl;
+
+  for (auto l(decltype(n){0}); l < n; ++l)
   {
-    out << l.size() << std::endl;
+    out << allowed(l) << ' ' << individuals(l) << std::endl;
 
-    for (const auto &i : l)
-      i.save(out);
+    for (const auto &prg : pop_[l])
+      pop_.save(out);
   }
 
   return out.good();

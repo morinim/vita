@@ -181,7 +181,7 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
   auto &p(this->pop_);
   assert(layer < p.layers());
 
-  if (p.individuals(layer) < p.env().individuals)
+  if (p.individuals(layer) < p.allowed(layer))
   {
     p.add_to_layer(layer, incoming);  // layer not full... inserting incoming
     return true;
