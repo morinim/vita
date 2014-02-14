@@ -240,11 +240,11 @@ template<class T>
 void alps<T>::run(const std::vector<coord> &parent,
                   const std::vector<T> &offspring, summary<T> *const s)
 {
-  assert(!boost::indeterminate(pop.env().elitism));
-
   const auto layer(std::max(parent[0].layer, parent[1].layer));
   const auto f_off(this->eva_(offspring[0]));
   const auto &pop(this->pop_);
+
+  assert(!boost::indeterminate(pop.env().elitism));
 
   bool ins;
 #if defined(MUTUAL_IMPROVEMENT)

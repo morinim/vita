@@ -52,7 +52,7 @@ namespace vita
     typedef std::vector<T> layer_t;
     typedef typename std::vector<layer_t>::const_iterator const_iterator;
 
-    explicit population(const environment &, const symbol_set &);
+    population(const environment &, const symbol_set &);
 
     T &operator[](coord);
     const T &operator[](coord) const;

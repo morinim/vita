@@ -50,7 +50,7 @@ template<class T>
 void population<T>::init_layer(unsigned l, const environment *e,
                                const symbol_set *s)
 {
-  assert(l < pop_.size());
+  assert(l < layers());
   assert(pop_[l].size() || (e && s));
 
   if (!e)
@@ -88,10 +88,10 @@ unsigned population<T>::layers() const
 template<class T>
 void population<T>::add_layer()
 {
-  assert(pop_.size());
-  assert(pop_[0].size());
+  assert(layers());
+  assert(individuals(0));
 
-  const auto &e(pop_[0][0].env());
+  const auto &e(env());
   const auto &s(pop_[0][0].sset());
 
   pop_.insert(pop_.begin(), layer_t());
@@ -180,16 +180,23 @@ unsigned population<T>::individuals() const
 template<class T>
 const environment &population<T>::env() const
 {
-  assert(pop_.size());     // DO NOT CHANGE with assert(layers()) => infinite
-                           // loop
-  assert(pop_[0].size());  // DO NOT CHANGE with assert(individuals(0)) =>
-                           // infinite loop
+  assert(layers());
+  assert(individuals(0));
 
   return pop_[0][0].env();
 }
 
 ///
-/// \return an iterator pointing to the first individual of the population.
+/// \return a const_iterator pointing to the first layer of the population.
+///
+/// \note
+/// There isn't a non const version of this method. This is a precise choice:
+/// begin() can sometimes be a fast method to access the population (i.e. when
+/// we work a layer at time) but it cannot be a way of changing elements of the
+/// population without breaking class encapsulation.
+///
+/// \warning
+/// Pointer to the first LAYER *NOT* to the first PROGRAM.
 ///
 template<class T>
 typename population<T>::const_iterator population<T>::begin() const
