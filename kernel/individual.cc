@@ -59,6 +59,8 @@ namespace vita
     assert(debug(true));
   }
 
+  template<class T> void unused(const T &) {}
+
   ///
   /// \return the effective size of the individual.
   /// \see size()
@@ -75,12 +77,7 @@ namespace vita
   ///
   unsigned individual::eff_size() const
   {
-    unsigned ef(0);
-
-    for (VARIABLE_IS_NOT_USED const auto &l : *this)
-      ++ef;
-
-    return ef;
+    return std::distance(begin(), end());
   }
 
   ///

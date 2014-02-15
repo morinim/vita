@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(INDIVIDUAL_H)
-#define      INDIVIDUAL_H
+#if !defined(VITA_INDIVIDUAL_H)
+#define      VITA_INDIVIDUAL_H
 
 #include <cmath>
 #include <functional>
@@ -161,6 +161,12 @@ namespace vita
   class individual::const_iterator
   {
   public:
+    typedef std::forward_iterator_tag iterator_category;
+    typedef ptrdiff_t difference_type;
+    typedef individual value_type;
+    typedef const individual * pointer;
+    typedef const individual & reference;
+
     ///
     /// \brief Builds an empty iterator.
     ///
@@ -235,4 +241,4 @@ namespace vita
   ///
 }  // namespace vita
 
-#endif  // INDIVIDUAL_H
+#endif  // Include guard
