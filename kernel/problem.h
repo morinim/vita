@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(PROBLEM_H)
-#define      PROBLEM_H
+#if !defined(VITA_PROBLEM_H)
+#define      VITA_PROBLEM_H
 
 #include "kernel/data.h"
 #include "kernel/environment.h"
@@ -38,4 +38,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // PROBLEM_H
+#endif  // Include guard

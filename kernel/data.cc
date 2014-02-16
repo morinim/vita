@@ -439,7 +439,7 @@ namespace vita
       else if (inquotes && c == '"')
       {
         // Quote char.
-        if (linepos+1 < linemax && line[linepos+1] == '"')
+        if (linepos + 1 < linemax && line[linepos + 1] == '"')
         {
           // Encountered 2 double quotes in a row (resolves to 1 double quote).
           curstring.push_back(c);
@@ -482,12 +482,14 @@ namespace vita
   ///
   void data::swap_category(category_t c1, category_t c2)
   {
-    assert(c1 < columns());
-    assert(c2 < columns());
+    const auto n_col(columns());
+    
+    assert(c1 < n_col);
+    assert(c2 < n_col);
 
     std::swap(categories_[c1], categories_[c2]);
 
-    for (unsigned i(0); i < columns(); ++i)
+    for (auto i(decltype(n_col){0}); i < n_col; ++i)
       if (header_[i].category_id == c1)
         header_[i].category_id = c2;
       else if (header_[i].category_id == c2)

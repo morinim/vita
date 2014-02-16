@@ -39,7 +39,7 @@ population<T>::population(const environment &e, const symbol_set &sset)
 
 ///
 /// \param[in] l a layer of the population.
-/// \param[in] e an environmnet (used for individual generation).
+/// \param[in] e an environment (used for individual generation).
 /// \param[in] s a symbol_set (used for individual generation).
 ///
 /// Resets layer \a l of the population.
@@ -287,15 +287,21 @@ bool population<T>::debug(bool verbose) const
         return false;
 
   if (layers() != allowed_.size())
+  {
+    if (verbose)
+      std::cerr << k_s_debug
+                << "Number of layers doesn't match allowed array size."
+                << std::endl;
     return false;
+  }
 
   const auto n(layers());
   for (auto l(decltype(n){0}); l < n; ++l)
   {
-    if (individuals(l) <= allowed(l))
+    if (allowed(l) < individuals(l))
       return false;
 
-    if (allowed(l) <= pop_[l].capacity())
+    if (pop_[l].capacity() < allowed(l))
       return false;
   }
 
@@ -319,10 +325,11 @@ bool population<T>::load(std::istream &in)
 
   population p(env(), pop_[0][0].sset());
   p.pop_.reserve(n_layers);
+  p.allowed_.reserve(n_layers);
 
   for (decltype(n_layers) l(0); l < n_layers; ++l)
   {
-    if (!(in >> p.allowed[l]))
+    if (!(in >> p.allowed_[l]))
       return false;
 
     unsigned n_elem(0);
@@ -354,7 +361,7 @@ bool population<T>::save(std::ostream &out) const
     out << allowed(l) << ' ' << individuals(l) << std::endl;
 
     for (const auto &prg : pop_[l])
-      pop_.save(out);
+      prg.save(out);
   }
 
   return out.good();

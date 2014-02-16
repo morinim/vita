@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_PROBLEM_H)
-#define      SRC_PROBLEM_H
+#if !defined(VITA_SRC_PROBLEM_H)
+#define      VITA_SRC_PROBLEM_H
 
 #include <list>
 #include <string>
@@ -58,4 +58,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // SRC_PROBLEM_H
+#endif  // Include guard
