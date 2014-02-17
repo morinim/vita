@@ -19,13 +19,20 @@
 
 namespace vita
 {
+  ///
+  /// \brief The interface of a typical genetic programming problem
+  ///
+  /// \note
+  /// What a horror! Public data members... please read the coding style
+  /// document for project Vita
+  /// (<http://code.google.com/p/vita/wiki/CodingStyle>).
   class problem
   {
   public:
     explicit problem(bool);
 
     /// \return an access point for the dataset.
-    virtual vita::data *data() { return nullptr; }
+    virtual vita::data *data() = 0;
 
     virtual void clear(bool);
 

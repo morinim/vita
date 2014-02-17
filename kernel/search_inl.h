@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SEARCH_INL_H)
-#define      SEARCH_INL_H
+#if !defined(VITA_SEARCH_INL_H)
+#define      VITA_SEARCH_INL_H
 
 ///
 /// \param[in] prob a \c problem used for search initialization.
@@ -656,4 +656,4 @@ bool search<T, ES>::debug(bool verbose) const
 {
   return prob_->debug(verbose);
 }
-#endif  // SEARCH_INL_H
+#endif  // Include guard

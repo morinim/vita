@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SYMBOL_SET_H)
-#define      SYMBOL_SET_H
+#if !defined(VITA_SYMBOL_SET_H)
+#define      VITA_SYMBOL_SET_H
 
 #include <string>
 #include <vector>
@@ -100,4 +100,4 @@ namespace vita
   std::ostream &operator<<(std::ostream &, const symbol_set &);
 }  // namespace vita
 
-#endif  // SYMBOL_SET_H
+#endif  // Include guard

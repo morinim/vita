@@ -22,9 +22,8 @@ namespace vita
   ///
   /// New empty instance.
   ///
-  problem::problem(bool initialize)
+  problem::problem(bool initialize) : env(initialize)
   {
-    clear(initialize);
   }
 
   ///
@@ -36,6 +35,7 @@ namespace vita
   void problem::clear(bool initialize)
   {
     env = environment(initialize);
+    sset = symbol_set();
   }
 
   ///

@@ -26,9 +26,15 @@ namespace vita
   ///                       values.
   /// New empty instance.
   ///
+  /// \note
+  /// Usually the environment isn't initialized so that the search class would
+  /// choose the best values for the specific problem before starting the
+  /// run.
+  /// Anyway, for debug purpose, we can force a default environment via the
+  /// \a initialize parameter.
+  ///
   src_problem::src_problem(bool initialize) : problem(initialize)
   {
-    dat_.clear();
   }
 
   ///

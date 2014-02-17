@@ -44,7 +44,7 @@ namespace vita
     size_t classes() const;
     size_t variables() const;
 
-    virtual bool debug(bool) const;
+    virtual bool debug(bool) const override;
 
   private:  // Private support methods
     typedef std::vector<category_t> cvect;

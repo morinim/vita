@@ -44,7 +44,16 @@ namespace vita
   /// selective behaviour (generally it is useful to check for dead code).
   ///
   /// Another solution could be:
-  /// template<class T> void unused(const T &) {}
+  ///
+  ///     template<class T> void unused(const T &) {}
+  ///     #define UNUSED(x) unused(x); struct x;
+  ///
+  /// With struct x the name x refers to an incomplete type, so the use of the
+  /// variable \a x is invalid and causes a compilation error. As a practical
+  /// measure it works nicely. Some unnatural statements such as
+  ///     x *y;
+  /// might still slip through the net but nothing's perfect (this is a mix
+  /// of two ideas from Herb Sutter and Cheers-and-hth-alf/Stackoverflow).
 #if defined(__GNUC__)
 #  define UNUSED __attribute__ ((unused))
 #elif defined(_MSC_VER)
