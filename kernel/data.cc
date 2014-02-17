@@ -483,7 +483,7 @@ namespace vita
   void data::swap_category(category_t c1, category_t c2)
   {
     const auto n_col(columns());
-    
+
     assert(c1 < n_col);
     assert(c2 < n_col);
 
@@ -547,7 +547,7 @@ namespace vita
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
     // IT THROWS.
-    for (ptree::value_type dha : pt.get_child("dataset.header.attributes"))
+    for (auto dha : pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
       {
         bool output(false);
@@ -564,10 +564,8 @@ namespace vita
         // class="yes" attribute in the attribute specification in the header.
         output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
-        std::string xml_type(dha.second.get("<xmlattr>.type", ""));
-
-        std::string category_name(dha.second.get("<xmlattr>.category",
-                                                 xml_type));
+        auto xml_type(dha.second.get("<xmlattr>.type", ""));
+        auto category_name(dha.second.get("<xmlattr>.category", xml_type));
 
         if (output)
         {
@@ -600,7 +598,7 @@ namespace vita
           try
           {
             // Store label1... labelN.
-            for (ptree::value_type l : dha.second.get_child("labels"))
+            for (auto l : dha.second.get_child("labels"))
               if (l.first == "label")
                 categories_[a.category_id].labels.insert(l.second.data());
           }
@@ -631,7 +629,7 @@ namespace vita
     swap_category(category_t(0), header_[0].category_id);
 
     unsigned parsed(0);
-    for (ptree::value_type bi : pt.get_child("dataset.body.instances"))
+    for (auto bi : pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
         example instance;
