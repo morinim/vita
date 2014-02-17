@@ -25,7 +25,10 @@ namespace vita
   {
   public:
     explicit src_problem(bool = false);
+    src_problem(const std::string &, const std::string & = "",
+                const std::string & = "");
 
+    bool operator!() const;
     std::pair<size_t, size_t> load(const std::string &,
                                    const std::string & = "",
                                    const std::string & = "");
@@ -33,7 +36,7 @@ namespace vita
     size_t load_test_set(const std::string &);
     void setup_default_symbols();
 
-    virtual vita::data *data() { return &dat_; }
+    virtual vita::data *data() override { return &dat_; }
 
     virtual void clear(bool) override;
 

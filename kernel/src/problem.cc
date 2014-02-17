@@ -38,6 +38,30 @@ namespace vita
   }
 
   ///
+  /// \param[in] ds name of the dataset file (training/validation set).
+  /// \param[in] ts name of the test set.
+  /// \param[in] symbols name of the file containing the symbols. If it is
+  ///                    empty, \c src_problem::setup_default_symbols is called.
+  ///
+  /// Initializa the problem with data from the input files.
+  ///
+  src_problem::src_problem(const std::string &ds, const std::string &ts,
+                           const std::string &symbols) : problem(false)
+  {
+    load(ds, ts, symbols);
+  }
+
+  ///
+  /// \return \c false if the current problem isn't ready for a run.
+  ///
+  bool src_problem::operator!() const
+  {
+    std::cout << dat_.size(data::training) << sset.enough_terminals()
+              << std::endl;
+    return !dat_.size(data::training) || !sset.enough_terminals();
+  }
+
+  ///
   /// \param[in] initialize if \c true initialize the environment with default
   ///                       values.
   ///
