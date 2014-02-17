@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_CONSTANT_H)
-#define      SRC_CONSTANT_H
+#if !defined(VITA_SRC_CONSTANT_H)
+#define      VITA_SRC_CONSTANT_H
 
 #include <boost/lexical_cast.hpp>
 
@@ -69,4 +69,4 @@ namespace vita
     std::string val_;
   };
 }  // namespace vita
-#endif // SRC_CONSTANT_H
+#endif // Include guard
