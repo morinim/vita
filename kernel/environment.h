@@ -149,7 +149,7 @@ namespace vita
     /// Maximun number of generations allowed before terminate a run.
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    unsigned generations;
+    unsigned generations = 0;
 
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.

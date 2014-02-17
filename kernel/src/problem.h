@@ -24,9 +24,9 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    explicit src_problem(bool = false);
-    src_problem(const std::string &, const std::string & = "",
-                const std::string & = "");
+    src_problem();
+    explicit src_problem(const std::string &, const std::string & = "",
+                         const std::string & = "");
 
     bool operator!() const;
     std::pair<size_t, size_t> load(const std::string &,

@@ -431,7 +431,7 @@ void search<T, ES>::print_resume(bool validation, const fitness_t &fitness,
 template<class T, template<class> class ES>
 T search<T, ES>::run(unsigned n)
 {
-  assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
+  //assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
 
   summary<T> overall_summary;
   distribution<fitness_t> fd;

@@ -18,17 +18,15 @@
 
 int main()
 {
-  vita::src_problem problem;
+  vita::src_problem problem("titanic_train.csv");
 
-  if (problem.load("titanic_train.csv").first)  // reading data file
-  {
-    vita::src_search<vita::individual, vita::std_es> s(&problem);
-    vita::individual best(s.run());             // starting search
+  if (!problem)
+    return EXIT_FAILURE;
 
-    std::cout << best << std::endl;             // print result
+  vita::src_search<vita::individual, vita::std_es> s(&problem);
+  vita::individual best(s.run());             // starting search
 
-    return EXIT_SUCCESS;
-  }
+  std::cout << best << std::endl;             // print result
 
-  return EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }

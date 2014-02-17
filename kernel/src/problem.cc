@@ -27,13 +27,15 @@ namespace vita
   /// New empty instance.
   ///
   /// \note
-  /// Usually the environment isn't initialized so that the search class would
+  /// Usually (the environment isn't initialized so that the search class would
   /// choose the best values for the specific problem before starting the
-  /// run.
-  /// Anyway, for debug purpose, we can force a default environment via the
-  /// \a initialize parameter.
+  /// run (this is how the constructor works).
+  /// Anyway, for debug purpose, we can set up a default environment in a
+  /// second step:
+  ///    src_problem p;
+  ///    p.env = environment(true);
   ///
-  src_problem::src_problem(bool initialize) : problem(initialize)
+  src_problem::src_problem() : problem()
   {
   }
 
@@ -46,7 +48,7 @@ namespace vita
   /// Initializa the problem with data from the input files.
   ///
   src_problem::src_problem(const std::string &ds, const std::string &ts,
-                           const std::string &symbols) : problem(false)
+                           const std::string &symbols) : problem()
   {
     load(ds, ts, symbols);
   }
@@ -56,8 +58,6 @@ namespace vita
   ///
   bool src_problem::operator!() const
   {
-    std::cout << dat_.size(data::training) << sset.enough_terminals()
-              << std::endl;
     return !dat_.size(data::training) || !sset.enough_terminals();
   }
 

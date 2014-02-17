@@ -20,16 +20,6 @@ namespace vita
   /// \param[in] initialize if \c true initialize the environment with default
   ///                       values.
   ///
-  /// New empty instance.
-  ///
-  problem::problem(bool initialize) : env(initialize)
-  {
-  }
-
-  ///
-  /// \param[in] initialize if \c true initialize the environment with default
-  ///                       values.
-  ///
   /// Resets the object.
   ///
   void problem::clear(bool initialize)

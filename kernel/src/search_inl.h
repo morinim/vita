@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_SEARCH_INL_H)
-#define      SRC_SEARCH_INL_H
+#if !defined(VITA_SRC_SEARCH_INL_H)
+#define      VITA_SRC_SEARCH_INL_H
 
 template<class T, template<class> class ES>
 src_search<T, ES>::src_search(src_problem *const p)
@@ -112,4 +112,4 @@ bool src_search<T, ES>::debug(bool verbose) const
   return search<T, ES>::debug(verbose);
 }
 
-#endif  // SRC_SEARCH_INL_H
+#endif  // Include guard

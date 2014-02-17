@@ -92,7 +92,9 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr;
+  pr.env = environment(true);
+
   auto res(pr.load("mep.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
@@ -262,7 +264,9 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 
   constexpr unsigned slots(10);
 
-  src_problem pr(true);
+  src_problem pr;
+  pr.env = environment(true);
+
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
@@ -277,7 +281,9 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr;
+  pr.env = environment(true);
+
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
 
@@ -292,7 +298,9 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr;
+  pr.env = environment(true);
+
   auto res(pr.load("ionosphere.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 351);
 

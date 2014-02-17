@@ -768,7 +768,7 @@ namespace vita
         }
 
         format = true;
-      }
+      }  // if (!format)
 
       if (fields == columns())
       {

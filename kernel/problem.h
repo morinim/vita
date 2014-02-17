@@ -29,8 +29,6 @@ namespace vita
   class problem
   {
   public:
-    explicit problem(bool);
-
     /// \return an access point for the dataset.
     virtual vita::data *data() = 0;
 
