@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -286,15 +286,18 @@ namespace vita
   {
     std::set<category_t> need;
 
-    for (size_t i(0); i < all_.symbols.size(); ++i)
-      for (size_t j(0); j < all_.symbols[i]->arity(); ++j)
-        need.insert(function::cast(all_.symbols[i])->arg_category(j));
-
-    for (const auto &cat : need)
+    for (const auto &sym : all_.symbols)
     {
-      const collection &cc(by_.category[cat]);
+      const auto arity(sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
+        need.insert(function::cast(sym)->arg_category(i));
+    }
 
-      if (cat >= categories() || !cc.terminals.size())
+    for (const auto &i : need)
+    {
+      const collection &cc(by_.category[i]);
+
+      if (i >= categories() || !cc.terminals.size())
         return false;
     }
     return true;
