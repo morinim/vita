@@ -16,7 +16,7 @@
 template<class T, template<class> class ES>
 src_search<T, ES>::src_search(src_problem *const p)
   : search<T, ES>(p),
-    p_symre(k_rmae_evaluator), p_class(k_gaussian_evaluator)
+    p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian)
 {
   if (p->data()->size() && !this->active_eva_)
     set_evaluator(p->classification() ? p_class : p_symre);
@@ -40,11 +40,11 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
   {
     switch (id)
     {
-    case k_bin_evaluator:
+    case evaluator_id::bin:
       search<T, ES>::set_evaluator(make_unique<binary_evaluator<T>>(data));
       return true;
 
-    case k_dyn_slot_evaluator:
+    case evaluator_id::dyn_slot:
       {
         auto x_slot(msg.empty() ? 10u : boost::lexical_cast<unsigned>(msg));
         search<T, ES>::set_evaluator(
@@ -52,7 +52,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
       }
       return true;
 
-    case k_gaussian_evaluator:
+    case evaluator_id::gaussian:
       search<T, ES>::set_evaluator(make_unique<gaussian_evaluator<T>>(data));
       return true;
 
@@ -64,19 +64,19 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
   {
     switch (id)
     {
-    case k_count_evaluator:
+    case evaluator_id::count:
       search<T, ES>::set_evaluator(make_unique<count_evaluator<T>>(data));
       return true;
 
-    case k_mae_evaluator:
+    case evaluator_id::mae:
       search<T, ES>::set_evaluator(make_unique<mae_evaluator<T>>(data));
       return true;
 
-    case k_rmae_evaluator:
+    case evaluator_id::rmae:
       search<T, ES>::set_evaluator(make_unique<rmae_evaluator<T>>(data));
       return true;
 
-    case k_mse_evaluator:
+    case evaluator_id::mse:
       search<T, ES>::set_evaluator(make_unique<mse_evaluator<T>>(data));
       return true;
 
@@ -93,18 +93,18 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 template<class T, template<class> class ES>
 bool src_search<T, ES>::debug(bool verbose) const
 {
-  if (p_symre >= k_sup_evaluator)
+  if (p_symre == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Incorrect ID for preferred sym.reg. evaluator."
+      std::cerr << "Undefined ID for preferred sym.reg. evaluator."
                 << std::endl;
     return false;
   }
 
-  if (p_class >= k_sup_evaluator)
+  if (p_class == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Incorrect ID for preferred classification evaluator."
+      std::cerr << "Undefined ID for preferred classification evaluator."
                 << std::endl;
     return false;
   }

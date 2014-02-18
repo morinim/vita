@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_SEARCH_H)
-#define      SRC_SEARCH_H
+#if !defined(VITA_SRC_SEARCH_H)
+#define      VITA_SRC_SEARCH_H
 
 #include "kernel/search.h"
 #include "kernel/src/evaluator.h"
@@ -19,10 +19,10 @@
 
 namespace vita
 {
-  enum evaluator_id {k_count_evaluator = 0, k_mae_evaluator,
-                     k_rmae_evaluator, k_mse_evaluator, k_bin_evaluator,
-                     k_dyn_slot_evaluator, k_gaussian_evaluator,
-                     k_sup_evaluator};
+  enum class evaluator_id
+  {
+    count = 0, mae, rmae, mse, bin, dyn_slot, gaussian, undefined
+  };
 
   ///
   /// \tparam T the type of individual used.
@@ -52,4 +52,4 @@ namespace vita
 #include "kernel/src/search_inl.h"
 }  // namespace vita
 
-#endif  // SRC_SEARCH_H
+#endif  // Include guard
