@@ -11,10 +11,8 @@
  */
 
 #include <cstdlib>
-#include <iostream>
 
 #include "kernel/src/search.h"
-#include "kernel/src/problem.h"
 
 int main()
 {
@@ -23,8 +21,8 @@ int main()
   if (!problem)
     return EXIT_FAILURE;
 
-  vita::src_search<vita::individual, vita::std_es> s(&problem);
-  vita::individual best(s.run());                  // starting search
+  vita::src_search<> s(&problem);
+  const auto best(s.run());                        // starting search
 
   std::cout << best << std::endl;                  // print result
 

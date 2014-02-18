@@ -16,6 +16,7 @@
 #include "kernel/search.h"
 #include "kernel/src/evaluator.h"
 #include "kernel/src/problem.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
@@ -31,7 +32,7 @@ namespace vita
   /// This class extends vita::search to simply manage evaluators for
   /// symbolic regression and classification.
   ///
-  template<class T, template<class> class ES>
+  template<class T = individual, template<class> class ES = std_es>
   class src_search : public search<T, ES>
   {
   public:
