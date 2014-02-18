@@ -1,18 +1,17 @@
 /**
- *
- *  \file timer.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(TIMER_H)
-#define      TIMER_H
+#if !defined(VITA_TIMER_H)
+#define      VITA_TIMER_H
 
 #include <chrono>
 
@@ -78,4 +77,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // TIMER_H
+#endif  // Include guard

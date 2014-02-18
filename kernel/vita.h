@@ -92,4 +92,4 @@ namespace vita
 /// \page page2 Contributor guidelines
 /// http://code.google.com/p/vita/wiki/ContributorGuidelines
 
-#endif  // VITA_H
+#endif  // Include guard

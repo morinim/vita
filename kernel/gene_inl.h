@@ -1,18 +1,17 @@
 /**
- *
- *  \file gene_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(GENE_INL_H)
-#define      GENE_INL_H
+#if !defined(VITA_GENE_INL_H)
+#define      VITA_GENE_INL_H
 
 ///
 /// \param[in] t a terminal.
@@ -107,4 +106,4 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
 
   return true;
 }
-#endif  // GENE_INL_H
+#endif  // Include guard

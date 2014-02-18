@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVALUATOR_INL_H)
-#define      EVALUATOR_INL_H
+#if !defined(VITA_EVALUATOR_INL_H)
+#define      VITA_EVALUATOR_INL_H
 
 ///
 /// \param[in] i an individual to be evaluated.
@@ -122,4 +122,4 @@ fitness_t random_evaluator<T>::operator()(const T &)
   return f;
 }
 
-#endif  // EVALUATOR_INL_H
+#endif  // Include guard

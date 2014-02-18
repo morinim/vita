@@ -1,18 +1,17 @@
 /**
- *
- *  \file int.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(INT_PRIMITIVE_H)
-#define      INT_PRIMITIVE_H
+#if !defined(VITA_INT_PRIMITIVE_H)
+#define      VITA_INT_PRIMITIVE_H
 
 #include <limits>
 #include <string>
@@ -278,4 +277,4 @@ namespace vita
   }  // namespace integer
 }  // namespace vita
 
-#endif  // INT_PRIMITIVE_H
+#endif  // Include guard

@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(LAMBDA_F_INL_H)
-#define      LAMBDA_F_INL_H
+#if !defined(VITA_LAMBDA_F_INL_H)
+#define      VITA_LAMBDA_F_INL_H
 
 ///
 /// \param[in] prg the program (individual/team) to be lambdified.
@@ -561,4 +561,4 @@ bool team_class_lambda_f<T, S, N, L, C>::debug() const
   return classes_ > 1;
 }
 
-#endif  // LAMBDA_F_INL_H
+#endif  // Include guard

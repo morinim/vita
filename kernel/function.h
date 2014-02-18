@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(FUNCTION_H)
-#define      FUNCTION_H
+#if !defined(VITA_FUNCTION_H)
+#define      VITA_FUNCTION_H
 
 #include <string>
 #include <vector>
@@ -87,4 +87,4 @@ namespace vita
 #  include "function.cc"
 #endif
 
-#endif  // FUNCTION_H
+#endif  // Include guard

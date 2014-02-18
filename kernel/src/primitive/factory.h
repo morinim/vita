@@ -1,18 +1,17 @@
 /**
- *
- *  \file factory.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(PRIMITIVE_FACTORY_H)
-#define      PRIMITIVE_FACTORY_H
+#if !defined(VITA_PRIMITIVE_FACTORY_H)
+#define      VITA_PRIMITIVE_FACTORY_H
 
 #include <map>
 
@@ -105,4 +104,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // PRIMITIVE_FACTORY_H
+#endif  // Include guard

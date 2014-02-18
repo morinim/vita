@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(ANY_H)
-#define      ANY_H
+#if !defined(VITA_ANY_H)
+#define      VITA_ANY_H
 
 #include <boost/spirit/home/support/detail/hold_any.hpp>
 
@@ -38,4 +38,4 @@ namespace vita
   template<class T> T to(const any &);
 }  // namespace vita
 
-#endif  // ANY_H
+#endif  // Include guard
