@@ -22,9 +22,7 @@
 namespace vita
 {
   ///
-  /// \param[in] initialize if \c true initialize the environment with default
-  ///                       values.
-  /// New empty instance.
+  /// New empty instance of src_problem.
   ///
   /// \note
   /// Usually (the environment isn't initialized so that the search class would

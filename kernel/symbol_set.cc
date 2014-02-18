@@ -312,7 +312,7 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
-    for (const symbol *s : ss.all_.symbols)
+    for (const auto *s : ss.all_.symbols)
     {
       o << s->display();
 

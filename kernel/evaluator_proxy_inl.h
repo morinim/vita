@@ -147,7 +147,7 @@ double evaluator_proxy<T>::accuracy(const T &prg) const
 }
 
 ///
-/// \param[in] i a program (individual/team).
+/// \param[in] prg a program (individual/team).
 /// \return how many times we have seen the program \a prg from during the
 ///         current run of the evolution / the last call of the clear
 ///         function.

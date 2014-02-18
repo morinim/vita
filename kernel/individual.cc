@@ -274,7 +274,6 @@ namespace vita
 
   ///
   /// \param[in] max_args maximum number of arguments for the ADF.
-  /// \param[out] loci the ADF arguments are here.
   /// \return the generalized individual and a set of loci (ADF arguments
   ///         positions).
   ///

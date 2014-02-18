@@ -93,7 +93,7 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
 }
 
 ///
-/// \param[in] instance data to be classified.
+/// \param[in] e data to be classified.
 /// \return the label of the class that includes \a instance (wrapped in class
 ///         any).
 ///
