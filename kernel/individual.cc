@@ -580,7 +580,8 @@ namespace vita
       s << ' ';
     s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-    for (unsigned i(0); i < g.sym->arity(); ++i)
+    const auto arity(g.sym->arity());
+    for (auto i(decltype(arity){0}); i < arity; ++i)
       in_line(s, {g.args[i], function::cast(g.sym)->arg_category(i)});
   }
 
@@ -607,11 +608,9 @@ namespace vita
   ///
   void individual::list(std::ostream &s) const
   {
-    const size_t categories(sset_->categories());
-    const unsigned w1(
-      1 + static_cast<unsigned>(std::log10(static_cast<double>(size() - 1))));
-    const unsigned w2(
-      1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
+    const auto categories(sset_->categories());
+    const auto w1(1 + static_cast<unsigned>(std::log10(size() - 1)));
+    const auto w2(1 + static_cast<unsigned>(std::log10(categories)));
 
     for (const auto &l : *this)
     {
@@ -620,13 +619,22 @@ namespace vita
       s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << l.category;
+        s << ',' << std::setw(w2) << l.category;
 
       s << "] "
         << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-      for (size_t j(0); j < g.sym->arity(); ++j)
-        s << ' ' << std::setw(w1) << g.args[j];
+      const auto arity(g.sym->arity());
+      for (auto j(decltype(arity){0}); j < arity; ++j)
+      {
+        s << ' ';
+        if (categories > 1)
+          s << '(';
+        s << std::setw(w1) << g.args[j];
+        if (categories > 1)
+          s << ',' << std::setw(w2) << function::cast(g.sym)->arg_category(j)
+            << ')';
+      }
 
       s << std::endl;
     }
@@ -643,9 +651,9 @@ namespace vita
   {
     const gene &g(genome_(child));
 
-    if (child == parent
-        || !genome_(parent).sym->associative()
-        || genome_(parent).sym != g.sym)
+    if (child == parent ||
+        !genome_(parent).sym->associative() ||
+        genome_(parent).sym != g.sym)
     {
       std::string spaces(indent, ' ');
       s << spaces
@@ -655,10 +663,9 @@ namespace vita
     }
 
     const auto arity(g.sym->arity());
-    if (arity)
-      for (size_t i(0); i < arity; ++i)
-        tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
-             child);
+    for (auto i(decltype(arity){0}); i < arity; ++i)
+      tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
+           child);
   }
 
   ///
@@ -692,7 +699,8 @@ namespace vita
 
         s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 
-        for (unsigned j(0); j < g.sym->arity(); ++j)
+        const auto arity(g.sym->arity());
+        for (auto j(decltype(arity){0}); j < arity; ++j)
           s << ' ' << std::setw(width) << g.args[j];
 
         if (categories > 1)

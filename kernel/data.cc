@@ -951,4 +951,4 @@ namespace vita
 
     return s;
   }
-}  // Namespace vita
+}  // namespace vita
