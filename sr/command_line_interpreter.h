@@ -9,7 +9,8 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  Original idea of Jean Daniel Michaud (http://code.google.com/p/clipo/).
+ *  Original idea by Jean Daniel Michaud (http://code.google.com/p/clipo/).
+ *  Code used under MPL2 licence with author's permission.
  */
 
 #if !defined(VITA_BOOST_COMMAND_LINE_INTERPRETER)
@@ -23,7 +24,7 @@
 
 #include "kernel/vita.h"
 
-namespace boost { namespace cli {
+namespace vita { namespace cli {
 
 typedef boost::program_options::options_description commands_description;
 
@@ -169,6 +170,6 @@ private:
   std::string               prompt_;
 };
 
-} }  // namespace boost::cli
+} }  // namespace vita::cli
 
 #endif // Include guard

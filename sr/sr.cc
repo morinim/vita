@@ -976,7 +976,7 @@ int main(int argc, char *const argv[])
        "quit the program");
     ui::cmdl_opt.add(interf);
 
-    boost::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
+    vita::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
     cli.interpret(std::cin);
   }
 
