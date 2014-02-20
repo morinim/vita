@@ -97,32 +97,6 @@ namespace vita
     return ret;
   }
 
-  /*
-  void individual::hoist()
-  {
-    const unsigned sup(size() - 1);
-    const unsigned categories(sset_->categories());
-
-    for (index_t i(0); i < sup; ++i)
-      for (category_t c(0); c < categories; ++c)
-      {
-        const locus l{i, c};
-
-        set(l, genome_({i+1, c}));
-
-        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
-        {
-          --genome_(l).args[j];
-
-          assert(genome_(l).args[j] > i);
-        }
-      }
-
-    for (category_t c(0); c < categories; ++c)
-      set({sup, c}, gene(sset_->roulette_terminal(c)));
-  }
-  */
-
   ///
   /// \param[in] p probability of gene mutation.
   /// \return number of mutations performed.
@@ -373,23 +347,30 @@ namespace vita
   void individual::pack(const locus &l,
                         std::vector<T> *const p) const
   {
+    // Although 16 bit are enough to contain opcodes and parameters, they are
+    // stored in unsigned variables (i.e. 32 or 64 bit) for performance
+    // reasons.
+    // The buffer is used to cut the 0-filled part of these codes off before
+    // they are hashed.
+    typedef std::uint16_t buffer;
+
     const gene &g(genome_(l));
 
-    assert(g.sym->opcode() <= std::numeric_limits<std::uint16_t>::max());
-    const std::uint16_t opcode16(g.sym->opcode());
+    assert(g.sym->opcode() <= std::numeric_limits<buffer>::max());
+    const buffer opcode(g.sym->opcode());
 
-    const T *const s1 = reinterpret_cast<const T *>(&opcode16);
-    for (size_t i(0); i < sizeof(opcode16); ++i)
+    const T *const s1 = reinterpret_cast<const T *>(&opcode);
+    for (size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
-      assert(std::numeric_limits<std::int16_t>::min() <= g.par);
-      assert(g.par <= std::numeric_limits<std::int16_t>::max());
-      const std::int16_t param16(g.par);
+      assert(std::numeric_limits<buffer>::min() <= g.par);
+      assert(g.par <= std::numeric_limits<buffer>::max());
+      const buffer param(g.par);
 
-      const T *const s2 = reinterpret_cast<const T *>(&param16);
-      for (size_t i(0); i < sizeof(param16); ++i)
+      const T *const s2 = reinterpret_cast<const T *>(&param);
+      for (size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
     else
@@ -411,7 +392,7 @@ namespace vita
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
     //     std::vector<T> packed;
-    //     // static keyword and clear() call deleted.
+    // (static keyword and packed.clear() call deleted).
 
     pack(best_, &packed);
 
@@ -449,9 +430,9 @@ namespace vita
   ///
   bool individual::debug(bool verbose) const
   {
-    const unsigned categories(sset_->categories());
+    const auto categories(sset_->categories());
 
-    for (unsigned i(0); i < size(); ++i)
+    for (index_t i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
       {
         const locus l{i, c};
@@ -465,7 +446,8 @@ namespace vita
         }
 
         // Maximum number of function arguments is gene::k_args.
-        if (genome_(l).sym->arity() > gene::k_args)
+        const auto arity(genome_(l).sym->arity());
+        if (arity > gene::k_args)
         {
           if (verbose)
             std::cerr << k_s_debug << "Function arity exceeds maximum size."
@@ -474,7 +456,7 @@ namespace vita
         }
 
         // Checking arguments' addresses.
-        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
+        for (auto j(decltype(arity){0}); j < arity; ++j)
         {
           // Arguments' addresses must be smaller than the size of the genome.
           if (genome_(l).args[j] >= size())
@@ -983,4 +965,4 @@ namespace vita
     return loci_.begin();
   }
 #endif
-}  // Namespace vita
+}  // namespace vita
