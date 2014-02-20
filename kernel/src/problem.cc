@@ -161,7 +161,8 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    for (category_t category(0); category < dat_.categories(); ++category)
+    const auto sup(dat_.categories());
+    for (category_t category(0); category < sup; ++category)
       if (compatible({category}, {"numeric"}))
       {
         sset.insert(factory.make("1.0", {category}));
@@ -180,6 +181,13 @@ namespace vita
         sset.insert(factory.make("FMUL", {category}));
         sset.insert(factory.make("FMOD", {category}));
         sset.insert(factory.make("FSUB", {category}));
+      }
+      else if (compatible({category}, {"string"}))
+      {
+        //for (decltype(category) j(0); j < sup; ++j)
+        // if (j != category)
+        //   sset.insert(factory.make("SIFE", {category, j}));
+        sset.insert(factory.make("SIFE", {category, 0}));
       }
   }
 
@@ -299,9 +307,10 @@ namespace vita
   {
     assert(instance.size() == pattern.size());
 
-    for (size_t i(0); i < instance.size(); ++i)
+    const auto sup(instance.size());
+    for (auto i(decltype(sup){0}); i < sup; ++i)
     {
-      bool generic(data::from_weka(pattern[i]) != domain_t::d_void);
+      const bool generic(data::from_weka(pattern[i]) != domain_t::d_void);
 
       if (generic)  // numeric, string, integer...
       {
