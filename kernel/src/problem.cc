@@ -244,8 +244,7 @@ namespace vita
 
               // From the list of all the sequences with repetition of
               // args.size() elements (categories)...
-              const std::list<cvect> sequences(seq_with_rep(categories,
-                                                            args.size()));
+              const auto sequences(seq_with_rep(categories, args.size()));
 
               // ...we choose those compatible with the xml signature of the
               // current symbol.
@@ -253,7 +252,6 @@ namespace vita
                 if (compatible(seq, args))
                 {
 #if !defined(NDEBUG)
-                  //const domain_t domain(dat_.get_category(i.back()).domain);
                   std::cout << "[DEBUG] " << sym_name << '(';
                   for (const auto &j : seq)
                     std::cout << dat_.get_category(j).name
@@ -310,17 +308,17 @@ namespace vita
     const auto sup(instance.size());
     for (auto i(decltype(sup){0}); i < sup; ++i)
     {
-      const bool generic(data::from_weka(pattern[i]) != domain_t::d_void);
+      const auto p_i(pattern[i]);
+      const bool generic(data::from_weka(p_i) != domain_t::d_void);
 
       if (generic)  // numeric, string, integer...
       {
-        if (dat_.get_category(instance[i]).domain !=
-            data::from_weka(pattern[i]))
+        if (dat_.get_category(instance[i]).domain != data::from_weka(p_i))
           return false;
       }
       else
       {
-        if (instance[i] != dat_.get_category(pattern[i]))
+        if (instance[i] != dat_.get_category(p_i))
           return false;
       }
     }

@@ -100,7 +100,7 @@ namespace vita
     header_.clear();
     categories_.clear();
 
-    for (size_t i(0); i <= k_max_dataset; ++i)
+    for (unsigned i(0); i <= k_max_dataset; ++i)
     {
       dataset_[i].clear();
       end_[i] = dataset_[i].end();
@@ -190,7 +190,7 @@ namespace vita
 
   ///
   /// \param[in] name name of a category.
-  /// \return the index of the \a name category (0 if it doesn't exist ).
+  /// \return the index of the \a name category (0 if it doesn't exist).
   ///
   category_t data::get_category(const std::string &name) const
   {
