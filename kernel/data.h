@@ -153,7 +153,8 @@ namespace vita
   ///
   struct data::example
   {
-    example() { clear(); }
+    example() : input(), output(any()), d_output(domain_t::d_void),
+                difficulty(0), age(0) {}
 
     std::vector<any> input;
     any             output;
@@ -165,14 +166,7 @@ namespace vita
     class_tag_t tag() const { return any_cast<class_tag_t>(output); }
     template<class T> T cast_output() const;
 
-    void clear()
-    {
-      input.clear();
-      output = any();
-      d_output = domain_t::d_void;
-      difficulty = 0;
-      age = 0;
-    }
+    void clear() { *this = example(); }
   };
 
   template<class T>
