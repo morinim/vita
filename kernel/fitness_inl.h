@@ -13,8 +13,6 @@
 #if !defined(VITA_FITNESS_INL_H)
 #define      VITA_FITNESS_INL_H
 
-template<class T, unsigned N> constexpr T basic_fitness_t<T, N>::size;
-
 ///
 ///
 ///
