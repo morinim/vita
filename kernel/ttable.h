@@ -74,6 +74,7 @@ namespace vita
   {
   public:
     explicit ttable(unsigned);
+
     ~ttable();
 
     void clear();
@@ -95,6 +96,11 @@ namespace vita
     std::uintmax_t hits() const { return hits_; }
 
     bool debug() const;
+
+    // Class has pointer data members so disabling the copu constructor /
+    // \c operator=() is a good idea (see "Effective C++").
+    ttable(const ttable&) = delete;
+    ttable &operator=(const ttable &) = delete;
 
   public:   // Serialization.
     bool load(std::istream &);
