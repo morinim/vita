@@ -76,6 +76,24 @@ namespace vita
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
   }
 
+  ///
+  /// \return an std::array filled with value \a v.
+  ///
+  /// This function is used to initialize array in member initialization list
+  /// of a constructor (so to be compliant with Effective C++).
+  /// To be efficient the compiler need to perform the RVO optimization / copy
+  /// elision.
+  ///
+  /// \see
+  /// <http://stackoverflow.com/questions/21993780/fill-stdarray-in-the-member-initialization-list>
+  ///
+  template<class T, unsigned N> std::array<T, N> make_array(T v)
+  {
+    std::array<T, N> temp;
+    temp.fill(v);
+    return temp;
+  }
+
   /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";
   /// \brief Prefix for error messages

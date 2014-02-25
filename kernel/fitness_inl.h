@@ -17,11 +17,9 @@
 ///
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N>::basic_fitness_t(T v)
+basic_fitness_t<T, N>::basic_fitness_t(T v) : vect(make_array<T, N>(v))
 {
   static_assert(N, "basic_fitness_t cannot have zero length");
-
-  vect.fill(v);
 }
 
 ///
