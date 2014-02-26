@@ -36,7 +36,7 @@ DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
-WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch -Weffc++
+WARN = -pedantic --std=c++11 -Wall -Wextra -Winvalid-pch
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
