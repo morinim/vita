@@ -55,13 +55,15 @@ namespace vita
   template<>
   std::string to<std::string>(const any &a)
   {
-    return
-      a.type() == typeid(double) ?
-      boost::lexical_cast<std::string>(any_cast<double>(a)) :
-      a.type() == typeid(int) ?
-      boost::lexical_cast<std::string>(any_cast<int>(a)) :
-      a.type() == typeid(bool) ?
-      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
-      any_cast<std::string>(a);
+    if (auto *p = any_cast<double>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    if (auto *p = any_cast<int>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    if (auto *p = any_cast<bool>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    return any_cast<std::string>(a);
   }
 }  // namespace vita
