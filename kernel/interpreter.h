@@ -23,7 +23,7 @@ namespace vita
   ///
   /// \brief Minimum interface of an interpreter
   ///
-  /// \tparam T the type of individual used.
+  /// \tparam T the type of individual used
   ///
   template<class T>
   class core_interpreter
