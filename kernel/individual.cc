@@ -957,7 +957,7 @@ namespace vita
   ///
   /// \return locus of the next active symbol.
   ///
-  std::set<locus>::iterator individual::const_iterator::operator++()
+  individual::const_iterator &individual::const_iterator::operator++()
   {
     if (!loci_.empty())
     {
@@ -970,7 +970,7 @@ namespace vita
       loci_.erase(loci_.begin());
     }
 
-    return loci_.begin();
+    return *this;;
   }
 #endif
 }  // namespace vita

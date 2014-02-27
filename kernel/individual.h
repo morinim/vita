@@ -24,11 +24,10 @@
 #include "kernel/matrix.h"
 #include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  template<class T> class interpreter;
-
   ///
   /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
@@ -173,16 +172,16 @@ namespace vita
     /// Empty iterator is used as sentry (it is the value returned by
     /// individual::end()).
     ///
-    const_iterator() : ind_(nullptr) {}
+    const_iterator() : loci_(), ind_(nullptr) {}
     explicit const_iterator(const individual &);
 
-    std::set<locus>::iterator operator++();
+    const_iterator &operator++();
 
     ///
     /// \param[in] i2 second term of comparison.
     ///
     /// Returns \c true if iterators point to the same locus or they are both
-    /// empty.
+    /// to the end.
     ///
     bool operator==(const const_iterator &i2) const
     {
@@ -212,7 +211,7 @@ namespace vita
       return &(*loci_.cbegin());
     }
 
-  private:
+  private:  // Private data members
     // A partial set of active loci to be explored.
     std::set<locus> loci_;
 

@@ -75,7 +75,8 @@ namespace vita
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
   ///
-  symbol_set::symbol_set() : arguments_(gene::k_args)
+  symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(),
+                             by_()
   {
     for (unsigned i(0); i < gene::k_args; ++i)
       arguments_[i] = make_unique<argument>(i);
@@ -351,14 +352,9 @@ namespace vita
   ///
   /// New empty collection.
   ///
-  symbol_set::collection::collection()
+  symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
+                                         sum(0)
   {
-    symbols.clear();
-    terminals.clear();
-    adf.clear();
-    adt.clear();
-
-    sum = 0;
   }
 
   ///
@@ -413,10 +409,8 @@ namespace vita
   /// Initialize the struct using collection \a c as input parameter (\a c
   /// should be a collection containing more than one category).
   ///
-  symbol_set::by_category::by_category(const collection &c)
+  symbol_set::by_category::by_category(const collection &c) : category()
   {
-    category.clear();
-
     for (size_t i(0); i < c.symbols.size(); ++i)
     {
       const category_t cat(c.symbols[i]->category());

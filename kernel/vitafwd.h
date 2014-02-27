@@ -18,6 +18,8 @@ namespace vita
   class individual;
   template<class T> class team;
 
+  template<class T> class interpreter;
+
   template<class T,
            template<class> class SS,
            template<class> class CS,
