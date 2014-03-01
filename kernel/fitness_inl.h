@@ -345,14 +345,13 @@ bool basic_fitness_t<T, N>::isnan() const
 }
 
 ///
-/// \return \c true if each component of the fitness is less than or equal to
-///         \c float_epsilion.
+/// \return \c true if each component of the fitness vector is small.
 ///
 template<class T, unsigned N>
 bool basic_fitness_t<T, N>::issmall() const
 {
   for (const auto &i : vect)
-    if (i > float_epsilon)
+    if (!vita::issmall(i))
       return false;
   return true;
 }

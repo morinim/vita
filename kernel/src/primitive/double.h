@@ -19,6 +19,7 @@
 #include "kernel/interpreter.h"
 #include "kernel/random.h"
 #include "kernel/terminal.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
@@ -215,9 +216,7 @@ namespace vita
         const any a1(i->fetch_arg(1));
         if (a1.empty())  return a1;
 
-        const auto cmp(std::fabs(dbl::cast(a0) - dbl::cast(a1)));
-
-        if (cmp < float_epsilon)
+        if (issmall(dbl::cast(a0) - dbl::cast(a1)))
           return i->fetch_arg(2);
         else
           return i->fetch_arg(3);
@@ -266,7 +265,7 @@ namespace vita
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
-        if (std::fabs(dbl::cast(a0)) < float_epsilon)
+        if (issmall(dbl::cast(a0)))
           return i->fetch_arg(1);
         else
           return i->fetch_arg(2);

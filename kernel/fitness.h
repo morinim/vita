@@ -18,7 +18,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include "kernel/vita.h"
+#include "kernel/utility.h"
 
 namespace vita
 {

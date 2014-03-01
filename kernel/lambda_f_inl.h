@@ -401,8 +401,8 @@ std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
     const number variance(gauss_dist_[i].variance);
 
     number p(0.0);
-    if (variance == 0.0)     // These are borderline cases
-      if (distance == 0.0)   // These are borderline cases
+    if (issmall(variance))     // These are borderline cases
+      if (issmall(distance))   // These are borderline cases
         p = 1.0;
       else
         p = 0.0;

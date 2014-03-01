@@ -85,6 +85,8 @@ namespace vita
   template<class T>
   T round_to(T val)
   {
+    constexpr T float_epsilon(0.0001);
+
     val /= float_epsilon;
     val = std::round(val);
     val *= float_epsilon;

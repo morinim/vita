@@ -20,6 +20,7 @@
 #include <boost/noncopyable.hpp>
 
 #include "kernel/symbol.h"
+#include "kernel/utility.h"
 
 namespace vita
 {

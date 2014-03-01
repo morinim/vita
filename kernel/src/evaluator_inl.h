@@ -107,8 +107,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
   {
     const any res((*f)(example));
     if (!res.empty() &&
-        std::fabs(to<number>(res) -
-                  example.template cast_output<number>()) <= float_epsilon)
+        issmall(to<number>(res) - example.template cast_output<number>()))
       ++ok;
 
     ++total_nr;
@@ -154,7 +153,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   else
     err = std::fabs(to<number>(res) - t.cast_output<number>());
 
-  if (err > float_epsilon)
+  if (!issmall(err))
     ++t.difficulty;
 
   return err;
@@ -227,7 +226,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
     err *= err;
   }
 
-  if (err > float_epsilon)
+  if (!issmall(err))
     ++t.difficulty;
 
   return err;
@@ -247,8 +246,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   const any res(agent(t));
 
   const bool err(res.empty() ||
-                 std::fabs(to<number>(res) -
-                           t.cast_output<number>()) > float_epsilon);
+                 !issmall(to<number>(res) - t.cast_output<number>()));
 
   if (err)
     ++t.difficulty;
