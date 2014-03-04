@@ -13,10 +13,11 @@
 #if !defined(VITA_FITNESS_INL_H)
 #define      VITA_FITNESS_INL_H
 
-template<class T, unsigned N> constexpr unsigned basic_fitness_t<T, N>::size;
+template<class T, unsigned N>
+constexpr decltype(basic_fitness_t<T, N>::size) basic_fitness_t<T, N>::size;
 
 ///
-///
+/// Fills the fitness with value \a v.
 ///
 template<class T, unsigned N>
 basic_fitness_t<T, N>::basic_fitness_t(T v) : vect(make_array<T, N>(v))
