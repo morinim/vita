@@ -347,17 +347,15 @@ namespace vita
   void individual::pack(const locus &l,
                         std::vector<T> *const p) const
   {
-    // Although 16 bit are enough to contain opcodes and parameters, they are
-    // stored in unsigned variables (i.e. 32 or 64 bit) for performance
-    // reasons.
-    // The buffer is used to cut the 0-filled part of these codes off before
-    // they are hashed.
-    typedef std::uint16_t buffer;
-
     const gene &g(genome_(l));
 
-    assert(g.sym->opcode() <= std::numeric_limits<buffer>::max());
-    const buffer opcode(g.sym->opcode());
+    // Although 16 bit are enough to contain opcodes and parameters, they are
+    // usually stored in unsigned variables (i.e. 32 or 64 bit) for performance
+    // reasons.
+    // Anyway before hashing opcodes/parameters we convert them to 16 bit types
+    // to avoid hashing more than necessary.
+    const std::uint16_t opcode(g.sym->opcode());
+    assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
 
     const T *const s1 = reinterpret_cast<const T *>(&opcode);
     for (size_t i(0); i < sizeof(opcode); ++i)
@@ -365,9 +363,9 @@ namespace vita
 
     if (g.sym->parametric())
     {
-      assert(std::numeric_limits<buffer>::min() <= g.par);
-      assert(g.par <= std::numeric_limits<buffer>::max());
-      const buffer param(g.par);
+      const std::int16_t param(g.par);
+      assert(std::numeric_limits<decltype(param)>::min() <= g.par);
+      assert(g.par <= std::numeric_limits<decltype(param)>::max());
 
       const T *const s2 = reinterpret_cast<const T *>(&param);
       for (size_t i(0); i < sizeof(param); ++i)
