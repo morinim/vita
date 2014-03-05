@@ -18,7 +18,7 @@
 namespace vita
 {
   ///
-  /// \param[in] ind individual whose code is used as ADF.
+  /// \param[in] ind individual whose code is used as ADF/ADT.
   ///
   adf_core::adf_core(const individual &ind) : code_(ind), id_(adf_count())
   {
@@ -34,9 +34,9 @@ namespace vita
   }
 
   ///
-  /// \return the code (program) of the ADF.
+  /// \return the code (program) of the ADF/ADT.
   ///
-  const individual &adf_core::get_code() const
+  const individual &adf_core::code() const
   {
     return code_;
   }
@@ -56,9 +56,10 @@ namespace vita
   ///
   adf::adf(const individual &ind, const std::vector<category_t> &sv,
            unsigned w)
-    : function("ADF", ind.category(), sv, w), adf_core(ind)
+    : function("ADF", ind.category(), sv, w), core_(ind)
   {
-    assert(ind.debug() && ind.eff_size() >= 2);
+    assert(ind.debug());
+    assert(ind.eff_size() >= 2);
 
     assert(debug());
   }
@@ -72,7 +73,7 @@ namespace vita
   ///
   any adf::eval(interpreter<individual> *i) const
   {
-    return interpreter<individual>(code_, i).run();
+    return interpreter<individual>(code(), i).run();
   }
 
   ///
@@ -80,7 +81,7 @@ namespace vita
   ///
   std::string adf::display() const
   {
-    return adf_core::display(symbol::display());
+    return core_.display(symbol::display());
   }
 
   ///
@@ -96,15 +97,24 @@ namespace vita
   ///
   bool adf::debug() const
   {
+    const auto cod(code());
     // No recursive calls.
-    for (const auto &l : code_)
-      if (code_[l].sym == this)
+    for (const auto &l : cod)
+      if (cod[l].sym == this)
         return false;
 
-    if (!adf_core::debug())
+    if (!core_.debug())
       return false;
 
     return function::debug();
+  }
+
+  ///
+  /// \return the code (program) of the ADF.
+  ///
+  const individual &adf::code() const
+  {
+    return core_.code();
   }
 
   ///
@@ -112,7 +122,7 @@ namespace vita
   /// \param[in] w the weight of the ADT.
   ///
   adt::adt(const individual &ind, unsigned w)
-    : terminal("ADT", ind.category(), false, false, w), adf_core(ind)
+    : terminal("ADT", ind.category(), false, false, w), core_(ind)
   {
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
@@ -128,7 +138,7 @@ namespace vita
   ///
   any adt::eval(interpreter<individual> *) const
   {
-    return interpreter<individual>(code_).run();
+    return interpreter<individual>(code()).run();
   }
 
   ///
@@ -136,7 +146,7 @@ namespace vita
   ///
   std::string adt::display() const
   {
-    return adf_core::display(symbol::display());
+    return core_.display(symbol::display());
   }
 
   ///
@@ -152,14 +162,23 @@ namespace vita
   ///
   bool adt::debug() const
   {
+    const auto cod(code());
     // No recursive calls.
-    for (const auto &l : code_)
-      if (code_[l].sym == this)
+    for (const auto &l : cod)
+      if (cod[l].sym == this)
         return false;
 
-    if (!adf_core::debug())
+    if (!core_.debug())
       return false;
 
     return terminal::debug();
+  }
+
+  ///
+  /// \return the code (program) of the ADT.
+  ///
+  const individual &adt::code() const
+  {
+    return core_.code();
   }
 }  // namespace vita

@@ -38,7 +38,7 @@ namespace vita
   /// top level components call lower level ones, which call still lower levels.
   ///
   /// adf_core is the core of vita::adt and vita::adf classes (they are in a
-  /// is-implemented-in-term-of relationship with it).
+  /// has-a relationship with it).
   ///
   /// \note
   /// Although the acronym ADF is from Koza's automatically defined functions,
@@ -48,16 +48,16 @@ namespace vita
   ///
   class adf_core
   {
-  protected:
+  public:
     explicit adf_core(const individual &);
 
-    const individual &get_code() const;
+    const individual &code() const;
 
     std::string display(const std::string &) const;
 
     bool debug() const;
 
-  protected:  // Data members
+  private:  // Private data members
     individual code_;
     opcode_t     id_;
 
@@ -71,7 +71,7 @@ namespace vita
   ///
   /// \brief Subroutine with arguments
   ///
-  class adf : public function, private adf_core
+  class adf : public function
   {
   public:
     adf(const individual &, const std::vector<category_t> &, unsigned);
@@ -84,7 +84,10 @@ namespace vita
 
     virtual bool debug() const override;
 
-    using adf::adf_core::get_code;
+    const individual &code() const;
+
+  private:
+    adf_core core_;
   };
 
   ///
@@ -94,7 +97,7 @@ namespace vita
   /// "An Analysis of Automatic Subroutine Discovery in Genetic Programming" -
   /// A.Dessi', A.Giani, A.Starita.
   ///
-  class adt : public terminal, private adf_core
+  class adt : public terminal
   {
   public:
     adt(const individual &, unsigned);
@@ -107,7 +110,10 @@ namespace vita
 
     virtual bool debug() const override;
 
-    using adt::adf_core::get_code;
+    const individual &code() const;
+
+  private:
+    adf_core core_;
   };
 }  // namespace vita
 
