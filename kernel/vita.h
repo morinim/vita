@@ -60,6 +60,15 @@ namespace vita
   const char k_s_info[] = "[INFO]";
   /// \brief Prefix for warning messages
   const char k_s_warning[] = "[WARNING]";
+
+  /// A macro to disallow the copy constructor and operator= functions.
+  /// An good alternative is boost::noncopyable but that gives some false
+  /// positive with 'g++ -Weffc++' so, for now, we keep the macro.
+  /// \see
+  /// <http://stackoverflow.com/questions/7823990/what-are-the-advantages-of-boostnoncopyable>
+#define DISALLOW_COPY_AND_ASSIGN(Class) \
+  Class(const Class &) = delete;     \
+  Class &operator=(const Class &) = delete
 }  // namespace vita
 
 /// \page page1 VITA Architecture

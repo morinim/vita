@@ -97,10 +97,9 @@ namespace vita
 
     bool debug() const;
 
-    // Class has pointer data members so disabling the copu constructor /
+    // Class has pointer data members so disabling the copy constructor /
     // \c operator=() is a good idea (see "Effective C++").
-    ttable(const ttable&) = delete;
-    ttable &operator=(const ttable &) = delete;
+    DISALLOW_COPY_AND_ASSIGN(ttable);
 
   public:   // Serialization.
     bool load(std::istream &);
