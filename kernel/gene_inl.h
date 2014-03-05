@@ -52,7 +52,11 @@ basic_gene<K>::basic_gene(
     const auto arity(sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
-      assert(g.second[i] <= type_max(args[0]));
+#if !defined(NDEBUG)
+      typedef typename std::remove_reference<decltype(args[0])>::type
+        ARRAY_ELEM_TYPE;
+      assert(g.second[i] <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+#endif
       args[i] = g.second[i];
     }
   }
