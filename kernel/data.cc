@@ -61,14 +61,17 @@ namespace vita
 
       return true;
     }
-  }
+  }  // namespace
 
   ///
   /// New empty data instance.
   ///
-  data::data()
+  data::data() : categories_map_(), classes_map_(), header_(), categories_(),
+                 dataset_(k_sup_dataset), end_(k_sup_dataset),
+                 active_dataset_(training)
   {
-    clear();
+    for (unsigned i(0); i < k_sup_dataset; ++i)
+      end_[i] = dataset_[i].end();
 
     assert(debug());
   }
@@ -77,13 +80,13 @@ namespace vita
   /// \param[in] filename name of the file containing the learning collection.
   /// \param[in] verbosity verbosity level (see environment::verbosity for
   ///            further details).
+  ///
   /// New data instance containing the learning collection from \a filename.
   ///
-  data::data(const std::string &filename, unsigned verbosity)
+  data::data(const std::string &filename, unsigned verbosity) : data()
   {
     assert(!filename.empty());
 
-    clear();
     open(filename, verbosity);
 
     assert(debug());
@@ -94,21 +97,7 @@ namespace vita
   ///
   void data::clear()
   {
-    categories_map_.clear();
-    classes_map_.clear();
-
-    header_.clear();
-    categories_.clear();
-
-    for (unsigned i(0); i <= k_max_dataset; ++i)
-    {
-      dataset_[i].clear();
-      end_[i] = dataset_[i].end();
-    }
-
-    active_dataset_ = training;
-
-    assert(debug());
+    *this = data();
   }
 
   ///

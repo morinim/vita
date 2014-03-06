@@ -48,7 +48,7 @@ namespace vita
     /// const example *
     typedef typename std::list<example>::const_iterator const_iterator;
 
-    enum dataset_t {training = 0, validation, test, k_max_dataset = test};
+    enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
   public:  // Construction, convenience
     data();
@@ -127,10 +127,10 @@ namespace vita
     /// The user provides a dataset and (optionally) a test set. Training set
     /// and validation set are automatically created from the dataset
     /// (see environment::validation_ratio).
-    std::list<example> dataset_[k_max_dataset + 1];
+    std::vector<std::list<example>> dataset_;
 
     /// Used to select a subset of the active dataset.
-    data::iterator end_[k_max_dataset + 1];
+    std::vector<data::iterator> end_;
 
     /// Used to choose the data we want to operate on (training / validation
     /// set).
