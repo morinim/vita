@@ -14,7 +14,7 @@
 #define      VITA_FITNESS_INL_H
 
 template<class T, unsigned N>
-constexpr decltype(basic_fitness_t<T, N>::size) basic_fitness_t<T, N>::size;
+constexpr unsigned basic_fitness_t<T, N>::size;
 
 ///
 /// Fills the fitness with value \a v.
