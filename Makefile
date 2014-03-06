@@ -36,7 +36,7 @@ DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
-WARN = --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2
+WARN = --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion
 endif
@@ -57,9 +57,9 @@ endif
 ifeq ($(TYPE), release)
   TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 
-ifeq ($(CXX), g++)
-  TYPE_PARAM += -flto
-endif
+#ifeq ($(CXX), g++)
+#  TYPE_PARAM += -flto
+#endif
 endif
 
 CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)

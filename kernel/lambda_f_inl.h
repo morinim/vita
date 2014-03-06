@@ -419,7 +419,7 @@ std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   }
 
   // Normalized confidence value.
-  const double confidence(sum_ ? val_ / sum_ : 0.0);
+  const double confidence(issmall(sum_) ? 0.0 : val_ / sum_);
 
   return {probable_class, confidence};
 }

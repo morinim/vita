@@ -21,6 +21,7 @@
 #include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"
 #include "kernel/team.h"
+#include "kernel/utility.h"
 
 #include "kernel/detail/lambda_f.h"
 
