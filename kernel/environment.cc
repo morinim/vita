@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -236,6 +236,14 @@ namespace vita
         return false;
       }
 
+      if (alps.p_same_layer < 0.0)
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Undefined p_same_layer parameter"
+                    << std::endl;
+        return false;
+      }
+
       if (!team.individuals)
       {
         if (verbose)
@@ -275,8 +283,7 @@ namespace vita
       return false;
     }
 
-    if (alps.p_same_layer != -1.0 &&
-        (alps.p_same_layer < 0.0 || alps.p_same_layer > 1.0))
+    if (alps.p_same_layer > 1.0)
     {
       if (verbose)
         std::cerr << k_s_debug << " p_same_layer out of range" << std::endl;

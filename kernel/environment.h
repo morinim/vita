@@ -227,7 +227,7 @@ namespace vita
       /// probability that the second parent will be extracted from the same
       /// layer? (with ALPS it could be taken from the previous layer).
       /// \note
-      /// A probability of -1.0 means undefined (auto-tune).
+      /// A negative value means undefined (auto-tune).
       double p_same_layer = 0.75;
     } alps;
 
