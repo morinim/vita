@@ -35,33 +35,33 @@ namespace vita
   {
   public:
     matrix();
-    matrix(size_t, size_t);
+    matrix(unsigned, unsigned);
 
     const T &operator()(const locus &) const;
     T &operator()(const locus &);
-    const T &operator()(size_t, size_t) const;
-    T &operator()(size_t, size_t);
+    const T &operator()(unsigned, unsigned) const;
+    T &operator()(unsigned, unsigned);
 
     void fill(const T &);
 
     bool operator==(const matrix<T> &) const;
 
-    size_t rows() const;
-    size_t cols() const;
+    unsigned rows() const;
+    unsigned cols() const;
 
     typename std::vector<T>::iterator begin();
     typename std::vector<T>::const_iterator begin() const;
     typename std::vector<T>::const_iterator end() const;
 
   private:  // Private support functions.
-    size_t size() const;
-    size_t index(size_t, size_t) const;
+    unsigned size() const;
+    unsigned index(unsigned, unsigned) const;
 
   private:  // Private data members.
     std::vector<T> data_;
 
-    size_t rows_;
-    size_t cols_;
+    unsigned rows_;
+    unsigned cols_;
   };
 
   ///
@@ -84,7 +84,7 @@ namespace vita
   /// \brief Standard \a rows x \a cols matrix. Entries aren't initialized.
   ///
   template<class T>
-  matrix<T>::matrix(size_t rows, size_t cols) :
+  matrix<T>::matrix(unsigned rows, unsigned cols) :
     data_(rows * cols), rows_(rows), cols_(cols)
   {
   }
@@ -98,7 +98,7 @@ namespace vita
   ///
   template<class T>
   inline
-  size_t matrix<T>::index(size_t r, size_t c) const
+  unsigned matrix<T>::index(unsigned r, unsigned c) const
   {
     assert(r < rows_);
     assert(c < cols_);
@@ -135,7 +135,7 @@ namespace vita
   ///
   template<class T>
   inline
-  const T &matrix<T>::operator()(size_t r, size_t c) const
+  const T &matrix<T>::operator()(unsigned r, unsigned c) const
   {
     return data_[index(r, c)];
   }
@@ -146,7 +146,7 @@ namespace vita
   /// \return an element of the matrix.
   ///
   template<class T>
-  T &matrix<T>::operator()(size_t r, size_t c)
+  T &matrix<T>::operator()(unsigned r, unsigned c)
   {
     return data_[index(r, c)];
   }
@@ -156,7 +156,7 @@ namespace vita
   ///
   template<class T>
   inline
-  size_t matrix<T>::size() const
+  unsigned matrix<T>::size() const
   {
     return rows_ * cols_;
   }
@@ -166,7 +166,7 @@ namespace vita
   ///
   template<class T>
   inline
-  size_t matrix<T>::rows() const
+  unsigned matrix<T>::rows() const
   {
     return rows_;
   }
@@ -176,7 +176,7 @@ namespace vita
   ///
   template<class T>
   inline
-  size_t matrix<T>::cols() const
+  unsigned matrix<T>::cols() const
   {
     return cols_;
   }
@@ -199,8 +199,8 @@ namespace vita
   template<class T>
   void matrix<T>::fill(const T &v)
   {
-    const size_t sup(size());
-    for (size_t i(0); i < sup; ++i)
+    const auto sup(size());
+    for (auto i(decltype(sup){0}); i < sup; ++i)
       data_[i] = v;
   }
 

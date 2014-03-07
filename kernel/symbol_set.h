@@ -81,7 +81,7 @@ namespace vita
       std::vector<symbol *>       adt;
 
       // The sum of the weights of all the symbols in the collection.
-      std::uintmax_t sum;
+      unsigned sum;
 
       bool debug() const;
     } all_;

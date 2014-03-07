@@ -36,6 +36,8 @@ DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
+# -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
+# switches to try from time to time (they gives many false positives).
 WARN = --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion

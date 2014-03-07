@@ -32,7 +32,7 @@ namespace vita
     bool operator==(const locus &) const;
     bool operator!=(const locus &) const;
     bool operator<(const locus &) const;
-    locus operator+(ptrdiff_t) const;
+    locus operator+(int) const;
   };
 
   ///
@@ -74,7 +74,7 @@ namespace vita
   ///         \a i (and not changing category component).
   ///
   inline
-  locus locus::operator+(ptrdiff_t i) const
+  locus locus::operator+(int i) const
   {
     return {index + i, category};
   }

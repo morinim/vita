@@ -68,8 +68,9 @@ namespace vita
     ///
     double elapsed() const
     {
-      return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start_).count();
+      return static_cast<double>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now() - start_).count());
     }
 
   private:

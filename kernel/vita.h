@@ -46,10 +46,10 @@ namespace vita
   /// two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
   /// category "kg").
   /// Categories are the way strong typing GP is implemented in Vita.
-  typedef size_t category_t;
+  typedef unsigned category_t;
 
   /// Index in the genome. Locus is uniquely identified by a couple of indexes.
-  typedef size_t index_t;
+  typedef unsigned index_t;
 
   /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";

@@ -320,7 +320,7 @@ namespace vita
       const auto arity(s->arity());
       if (arity)
         o << '(';
-      for (size_t j(0); j < arity; ++j)
+      for (auto j(decltype(arity){0}); j < arity; ++j)
         o << function::cast(s)->arg_category(j)
           << (j+1 == arity ? "" : ", ");
       if (arity)
