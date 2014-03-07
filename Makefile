@@ -38,7 +38,7 @@ SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 # -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN = --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal
+WARN = --std=c++1y -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion
 endif
@@ -122,7 +122,7 @@ endif
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
 	@$(COMPILE) $(foreach INC,$(INCPATH),-I$(INC)) $(foreach INC,$(SYSTEMINCPATH),-isystem$(INC)) -MMD -o $@ -c $<
-	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; rm -f $*.d
+	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; $(RM) $*.d
 
 -include $(ALL_SRC:.cc=.P)
 
@@ -137,7 +137,7 @@ clean:
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
-	@rm -f sr/sr kernel/libvita.a
+	@$(RM) sr/sr kernel/libvita.a
 
 .phony:	backup
 backup:
