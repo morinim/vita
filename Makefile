@@ -59,9 +59,12 @@ endif
 ifeq ($(TYPE), release)
   TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
 
-#ifeq ($(CXX), g++)
-#  TYPE_PARAM += -flto
-#endif
+  # Link time optimization has some issues with MinGW
+  ifeq ($(CXX), g++)
+    ifneq ($(OS),Windows_NT)
+      TYPE_PARAM += -flto
+    endif
+  endif
 endif
 
 CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
