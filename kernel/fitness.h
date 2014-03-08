@@ -34,7 +34,7 @@ namespace vita
   {
   public:
     typedef T base_t;
-    static constexpr unsigned size = N;
+    static constexpr decltype(N) size = N;
 
     explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());
     template<class... Args> basic_fitness_t(Args...);

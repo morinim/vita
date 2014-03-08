@@ -13,6 +13,9 @@
 #if !defined(VITA_GENE_INL_H)
 #define      VITA_GENE_INL_H
 
+template<unsigned K>
+constexpr decltype(K) basic_gene<K>::k_args;
+
 ///
 /// \param[in] t a terminal.
 ///

@@ -14,7 +14,7 @@
 #define      VITA_FITNESS_INL_H
 
 template<class T, unsigned N>
-constexpr unsigned basic_fitness_t<T, N>::size;
+constexpr decltype(N) basic_fitness_t<T, N>::size;
 
 ///
 /// Fills the fitness with value \a v.
@@ -40,8 +40,6 @@ basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
   // template<class T, unsigned N>
   // basic_fitness_t(const std::initializer_list<base_t> &l)
   // {
-  //   static_assert(N, "basic_fitness_t cannot have zero length");
-  //
   //   unsigned i(0);
   //   for (auto p : l)
   //     vect[i++] = p;
