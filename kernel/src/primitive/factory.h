@@ -17,7 +17,6 @@
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
 
 #include "kernel/symbol.h"
 #include "kernel/utility.h"
@@ -25,8 +24,8 @@
 namespace vita
 {
   ///
-  /// \a symbol_factory is an abstract factory (the essence of the pattern is to
-  /// provide an interface for creating families of related or dependent
+  /// \a symbol_factory is an abstract factory (the essence of the pattern is
+  /// to provide an interface for creating families of related or dependent
   /// objects, i.e. symbols, without specifying ther concrete classes, e.g.
   /// numbers, functions...).
   /// The factory determines the actual concrete type of the symbol to be
@@ -37,7 +36,7 @@ namespace vita
   /// factory object to create an object of the desired abstract type and to
   /// return an abstract pointer to the object.
   ///
-  class symbol_factory : boost::noncopyable
+  class symbol_factory
   {
   public:
     static symbol_factory &instance();
@@ -55,6 +54,7 @@ namespace vita
     bool unregister_symbol(const std::string &);
 
   private:
+    DISALLOW_COPY_AND_ASSIGN(symbol_factory);
     symbol_factory();
 
     typedef std::unique_ptr<symbol> (*make_func1)(category_t);
@@ -67,7 +67,7 @@ namespace vita
                                                            category_t c2)
     { return make_unique<T>(c1, c2); }
 
-  private:  // Data members.
+  private:  // Private data members.
     typedef std::string map_key;
 
     std::map<map_key, make_func1> factory1_;
