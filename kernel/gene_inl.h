@@ -113,4 +113,16 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
 
   return true;
 }
+
+///
+/// \param[out] s output stream.
+/// \param[in] g gene to print.
+/// \return output stream including \a g.
+///
+template<unsigned K>
+std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
+{
+  return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+}
+
 #endif  // Include guard

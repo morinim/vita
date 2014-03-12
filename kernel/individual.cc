@@ -552,8 +552,7 @@ namespace vita
     {
       const gene &g(genome_(l));
 
-      s << 'g' << l.index << '_' << l.category << " [label="
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
+      s << 'g' << l.index << '_' << l.category << " [label=" << g
         << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
@@ -576,7 +575,7 @@ namespace vita
 
     if (l != best_)
       s << ' ';
-    s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+    s << g;
 
     const auto arity(g.sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
@@ -619,8 +618,7 @@ namespace vita
       if (categories > 1)
         s << ',' << std::setw(w2) << l.category;
 
-      s << "] "
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+      s << "] " << g;
 
       const auto arity(g.sym->arity());
       for (auto j(decltype(arity){0}); j < arity; ++j)
@@ -654,9 +652,7 @@ namespace vita
         genome_(parent).sym != g.sym)
     {
       std::string spaces(indent, ' ');
-      s << spaces
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-        << std::endl;
+      s << spaces << g << std::endl;
       indent += 2;
     }
 
@@ -695,7 +691,7 @@ namespace vita
         if (categories > 1)
           s << '{';
 
-        s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+        s << g;
 
         const auto arity(g.sym->arity());
         for (auto j(decltype(arity){0}); j < arity; ++j)

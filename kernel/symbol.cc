@@ -27,7 +27,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] v
+  /// \param[in] v additional informations regarding parametric symbols.
   /// \return a string representing the symbol.
   ///
   /// This function is called for parametric symbols only. The \a v argument is
