@@ -16,12 +16,10 @@
 #include <string>
 
 #include "kernel/any.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  class individual;
-  template<class> class interpreter;
-
   ///
   /// GP assembles variable length program structures from basic units called
   /// functions and terminals. Functions perform operations on their inputs,

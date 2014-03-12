@@ -30,7 +30,7 @@ namespace vita
   /// \param[in] v
   /// \return a string representing the symbol.
   ///
-  /// This function is called by parametric symbols only. The \a v argument is
+  /// This function is called for parametric symbols only. The \a v argument is
   /// used to build a more meaningful name for the symbol (i.e. for a numeric
   /// terminal it's better to print 123 than "NUMBER").
   ///
@@ -46,6 +46,6 @@ namespace vita
   ///
   bool symbol::debug() const
   {
-    return display_.size() > 0;
+    return display().size() > 0;
   }
 }  // namespace vita
