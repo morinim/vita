@@ -233,11 +233,11 @@ namespace vita
 
         if (sym_sig.empty())
         {
-          for (auto sig : s.second)
+          for (const auto &sig : s.second)
             if (sig.first == "signature")
             {
               std::vector<std::string> args;
-              for (auto arg : sig.second)
+              for (const auto &arg : sig.second)
                 if (arg.first == "arg")
                   args.push_back(arg.second.data());
 
@@ -261,7 +261,7 @@ namespace vita
                 }
             }
         }
-        else  // !sym_sig.empty() => one category, uniform symbol initialization
+        else  // !sym_sig.empty() => single category, uniform initialization
         {
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))

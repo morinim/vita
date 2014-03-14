@@ -167,19 +167,14 @@ namespace vita
 
       if (delta && all_.adt[i]->weight == 0)
       {
-        for (size_t j(0); j < all_.terminals.size(); ++j)
-          if (all_.terminals[j]->opcode() == all_.adt[i]->opcode())
-          {
-            all_.terminals.erase(all_.terminals.begin() + j);
-            break;
-          }
+        const auto opcode(all_.adt[i]->opcode());
+        const auto adf_opcode([opcode](const symbol *s)
+                               {
+                                 return s->opcode() == opcode;
+                               });
 
-        for (size_t j(0); j < all_.symbols.size(); ++j)
-          if (all_.symbols[j]->opcode() == all_.adt[i]->opcode())
-          {
-            all_.symbols.erase(all_.symbols.begin() + j);
-            break;
-          }
+        erase_if(all_.terminals, adf_opcode);
+        erase_if(all_.symbols, adf_opcode);
       }
     }
 

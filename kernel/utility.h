@@ -13,6 +13,8 @@
 #if !defined(VITA_UTILITY_H)
 #define      VITA_UTILITY_H
 
+#include <algorithm>
+
 #include "kernel/vita.h"
 
 namespace vita
@@ -67,6 +69,20 @@ namespace vita
     static constexpr auto epsilon(std::numeric_limits<T>::epsilon());
 
     return std::abs(v) < 2.0 * epsilon;
+  }
+
+  ///
+  /// \param[in] container a STL container.
+  /// \param[in] pred a unary predicate.
+  ///
+  /// A shortcut for the well known C++ erase-remove idiom.
+  ///
+  template<class T, class Pred> void erase_if(T &container, Pred pred)
+  {
+    container.erase(std::remove_if(container.begin(),
+                                   container.end(),
+                                   pred),
+                    container.end());
   }
 }  // namespace vita
 

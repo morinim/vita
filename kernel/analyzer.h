@@ -68,7 +68,7 @@ namespace vita
     /// symbol pointer in an ordered container, it induces a well defined
     /// order. Without this the default comparison for pointers has a
     /// unspecified (and not necessarily stable & consistent) behaviour.
-    /// Well defined order means a simple way of debug statistics.
+    /// Well defined order means a simple way of debugging statistics.
     struct cmp_symbol_ptr
     {
       bool operator()(const symbol *a, const symbol *b) const
