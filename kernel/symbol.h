@@ -24,7 +24,7 @@ namespace vita
   /// GP assembles variable length program structures from basic units called
   /// functions and terminals. Functions perform operations on their inputs,
   /// which are either terminals or output from other functions.
-  /// Together functions and terminals are referred to as symbols (or nodes).
+  /// Together functions and terminals are referred to as symbols.
   ///
   class symbol
   {

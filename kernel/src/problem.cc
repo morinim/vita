@@ -211,8 +211,7 @@ namespace vita
       categories[i] = i;
 
     // Load the XML file (sf) into the property tree (pt).
-    using namespace boost::property_tree;
-    ptree pt;
+    boost::property_tree::ptree pt;
     read_xml(sf, pt);
 
 #if !defined(NDEBUG)
@@ -234,11 +233,11 @@ namespace vita
 
         if (sym_sig.empty())
         {
-          for (ptree::value_type sig : s.second)
+          for (auto sig : s.second)
             if (sig.first == "signature")
             {
               std::vector<std::string> args;
-              for (ptree::value_type arg : sig.second)
+              for (auto arg : sig.second)
                 if (arg.first == "arg")
                   args.push_back(arg.second.data());
 
