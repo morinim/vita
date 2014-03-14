@@ -79,17 +79,17 @@ namespace vita
 
     category_t category_;
 
-    std::string display_;
+    std::string name_;
   };
 
   ///
-  /// \param[in] dis string used for printing.
+  /// \param[in] name name of the symbol (must be unique).
   /// \param[in] c category of the symbol.
   /// \param[in] w weight (used for random selection).
   ///
   inline
-  symbol::symbol(const std::string &dis, category_t c, unsigned w)
-    : weight(w), opcode_(opc_count_++), category_(c), display_(dis)
+  symbol::symbol(const std::string &name, category_t c, unsigned w)
+    : weight(w), opcode_(opc_count_++), category_(c), name_(name)
   {
     assert(debug());
   }
@@ -130,7 +130,13 @@ namespace vita
   }
 
   ///
-  /// \return the opcode of the symbol (used as primary key).
+  /// \return the opcode of the symbol.
+  ///
+  /// The opcode is a fast way to uniquely identify a symbol and is primarily
+  /// used for hashing.
+  /// The other way to identify a symbol is by its name (std::string). The name
+  /// is often a better way since the opcode of a symbol can vary between
+  /// executions.
   ///
   inline
   opcode_t symbol::opcode() const

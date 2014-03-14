@@ -114,10 +114,10 @@ namespace vita
 
   ///
   /// \param[in] i symbol to be added.
-  /// \return a raw pointer to the symbol just added (or nullptr in case of
+  /// \return a raw pointer to the symbol just added (or \c nullptr in case of
   ///         error).
   ///
-  /// Adds a new \a symbol to the set. We manage to sort the symbols in
+  /// Adds a new symbol to the set. We manage to sort the symbols in
   /// descending order, with respect to the weight, so the selection algorithm
   /// would run faster.
   ///

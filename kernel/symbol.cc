@@ -23,7 +23,7 @@ namespace vita
   ///
   std::string symbol::display() const
   {
-    return display_;
+    return name_;
   }
 
   ///
