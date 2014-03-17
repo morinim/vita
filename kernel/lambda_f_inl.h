@@ -406,7 +406,7 @@ std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
         p = 1.0;
       else
         p = 0.0;
-    else                     // This is the standard case
+    else                       // This is the standard case
       p = std::exp(-distance * distance / variance);
 
     if (p > val_)
@@ -419,7 +419,12 @@ std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   }
 
   // Normalized confidence value.
-  const double confidence(issmall(sum_) ? 0.0 : val_ / sum_);
+  // Do not change sum_ > 0.0 with
+  // - issmall(sum_) => when sum_ is small, val_ is smaller and the division
+  //                    works well.
+  // - sum_ => it's the same thing but will produce a warning with
+  //           -Wfloat-equal
+  const double confidence(sum_ > 0.0 ? val_ / sum_ : 0.0);
 
   return {probable_class, confidence};
 }
