@@ -25,7 +25,7 @@ namespace vita
   /// New empty instance of src_problem.
   ///
   /// \note
-  /// Usually (the environment isn't initialized so that the search class would
+  /// Usually the environment isn't initialized so that the search class would
   /// choose the best values for the specific problem before starting the
   /// run (this is how the constructor works).
   /// Anyway, for debug purpose, we can set up a default environment in a
@@ -43,7 +43,7 @@ namespace vita
   /// \param[in] symbols name of the file containing the symbols. If it is
   ///                    empty, \c src_problem::setup_default_symbols is called.
   ///
-  /// Initializa the problem with data from the input files.
+  /// Initialize the problem with data from the input files.
   ///
   src_problem::src_problem(const std::string &ds, const std::string &ts,
                            const std::string &symbols) : problem()
@@ -67,8 +67,9 @@ namespace vita
   ///
   void src_problem::clear(bool initialize)
   {
-    problem::clear(initialize);
-    dat_.clear();
+    *this = src_problem();
+    if (initialize)
+      env = environment(true);
   }
 
   ///
@@ -80,9 +81,9 @@ namespace vita
   ///
   /// Loads \a data into the active dataset.
   ///
-  std::pair<size_t, size_t> src_problem::load(const std::string &ds,
-                                              const std::string &ts,
-                                              const std::string &symbols)
+  std::pair<unsigned, unsigned> src_problem::load(const std::string &ds,
+                                                  const std::string &ts,
+                                                  const std::string &symbols)
   {
     if (ds.empty())
       return {0, 0};
@@ -90,7 +91,7 @@ namespace vita
     sset = vita::symbol_set();
     dat_.clear();
 
-    const auto n_examples(dat_.open(ds, env.verbosity));
+    const unsigned n_examples(dat_.open(ds, env.verbosity));
 
     if (!ts.empty())
       load_test_set(ts);

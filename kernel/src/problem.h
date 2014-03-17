@@ -29,9 +29,9 @@ namespace vita
                          const std::string & = "");
 
     bool operator!() const;
-    std::pair<size_t, size_t> load(const std::string &,
-                                   const std::string & = "",
-                                   const std::string & = "");
+    std::pair<unsigned, unsigned> load(const std::string &,
+                                       const std::string & = "",
+                                       const std::string & = "");
     size_t load_symbols(const std::string &);
     size_t load_test_set(const std::string &);
     void setup_default_symbols();
