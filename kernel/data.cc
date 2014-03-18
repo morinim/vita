@@ -70,8 +70,7 @@ namespace vita
                  dataset_(k_sup_dataset), end_(k_sup_dataset),
                  active_dataset_(training)
   {
-    for (unsigned i(0); i < k_sup_dataset; ++i)
-      end_[i] = dataset_[i].end();
+    sync_end();
 
     assert(debug());
   }
@@ -98,6 +97,15 @@ namespace vita
   void data::clear()
   {
     *this = data();
+  }
+
+  ///
+  /// Updates the \a end_ vector.
+  ///
+  void data::sync_end()
+  {
+    for (unsigned i(0); i < k_sup_dataset; ++i)
+      end_[i] = dataset_[i].end();
   }
 
   ///
@@ -219,6 +227,8 @@ namespace vita
   {
     const auto partition_size(std::distance(begin(), end()));
 
+    //auto &d(dataset_[dataset()]);
+    //std::sort(d.begin(), d.end(), f);
     dataset_[dataset()].sort(f);
 
     slice(partition_size);
@@ -236,16 +246,16 @@ namespace vita
     assert(0.0 <= r && r <= 1.0);
 
     // Validation set items are moved to the training set.
-    while (!dataset_[validation].empty())
-    {
-      dataset_[training].push_back(dataset_[validation].front());
-      dataset_[validation].pop_front();
-    }
+    std::move(dataset_[validation].begin(), dataset_[validation].end(),
+              std::back_inserter(dataset_[training]));
+    dataset_[validation].erase(dataset_[validation].begin(),
+                               dataset_[validation].end());
+    sync_end();
 
     if (r > 0.0)
     {
       // The requested validation examples are selected (the algorithm hint is
-      // due to Kyle Cronin)...
+      // due to Kyle Cronin):
       //
       // > Iterate through and for each element make the probability of
       // >  selection = (number needed)/(number left)
@@ -253,7 +263,7 @@ namespace vita
       // > So if you had 40 items, the first would have a 5/40 chance of being
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
-      // > items, and often you'll have all of them before that".
+      // > items, and often you'll have all of them before that.
       auto available(dataset_[training].size());
 
       const decltype(available) k(available * r);
@@ -278,6 +288,8 @@ namespace vita
 
       assert(!needed);
     }
+
+    sync_end();
   }
 
   ///

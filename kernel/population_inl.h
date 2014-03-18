@@ -186,6 +186,8 @@ void population<T>::set_allowed(unsigned l, unsigned n)
   {
     const auto delta(individuals(l) - n);
 
+    // We should consider the remove-erase idiom for deleting delta random
+    // elements.
     if (delta)
       pop_[l].erase(pop_[l].end() - delta, pop_[l].end());
   }

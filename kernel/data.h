@@ -98,6 +98,7 @@ namespace vita
     unsigned load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);
+    void sync_end();
 
   private:  // Private data members
     /// Integer are simpler to manage than textual data, so, when appropriate,
