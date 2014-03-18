@@ -191,9 +191,10 @@ void population<T>::set_allowed(unsigned l, unsigned n)
       pop_[l].pop_back();
       --delta;
     }
+
+    assert(individuals(l) == n);
   }
 
-  assert(individuals(l) == n);
   allowed_[l] = n;
 
   assert(debug(true));
