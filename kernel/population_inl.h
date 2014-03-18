@@ -184,15 +184,10 @@ void population<T>::set_allowed(unsigned l, unsigned n)
 
   if (individuals(l) > n)
   {
-    unsigned delta(individuals(l) - n);
+    const auto delta(individuals(l) - n);
 
-    while (delta)
-    {
-      pop_[l].pop_back();
-      --delta;
-    }
-
-    assert(individuals(l) == n);
+    if (delta)
+      pop_[l].erase(pop_[l].end() - delta, pop_[l].end());
   }
 
   allowed_[l] = n;
