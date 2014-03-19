@@ -13,7 +13,6 @@
 #if !defined(VITA_DATA_H)
 #define      VITA_DATA_H
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>
@@ -44,9 +43,9 @@ namespace vita
     struct category;
 
     /// example *
-    typedef typename std::list<example>::iterator iterator;
+    typedef typename std::vector<example>::iterator iterator;
     /// const example *
-    typedef typename std::list<example>::const_iterator const_iterator;
+    typedef typename std::vector<example>::const_iterator const_iterator;
 
     enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
@@ -59,9 +58,9 @@ namespace vita
     void slice(unsigned);
 
     iterator begin();
-    const_iterator cbegin() const;
-    iterator end() const;
-    const_iterator cend() const { return end(); }
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
     unsigned size() const;
     unsigned size(dataset_t) const;
 
@@ -98,7 +97,6 @@ namespace vita
     unsigned load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);
-    void sync_end();
 
   private:  // Private data members
     /// Integer are simpler to manage than textual data, so, when appropriate,
@@ -128,10 +126,10 @@ namespace vita
     /// The user provides a dataset and (optionally) a test set. Training set
     /// and validation set are automatically created from the dataset
     /// (see environment::validation_ratio).
-    std::vector<std::list<example>> dataset_;
+    std::vector<std::vector<example>> dataset_;
 
-    /// Used to select a subset of the active dataset.
-    std::vector<data::iterator> end_;
+    /// Used to keep track of subset of the dataset.
+    std::vector<unsigned> slice_;
 
     /// Used to choose the data we want to operate on (training / validation
     /// set).

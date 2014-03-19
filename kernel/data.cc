@@ -67,11 +67,9 @@ namespace vita
   /// New empty data instance.
   ///
   data::data() : categories_map_(), classes_map_(), header_(), categories_(),
-                 dataset_(k_sup_dataset), end_(k_sup_dataset),
+                 dataset_(k_sup_dataset), slice_(k_sup_dataset, 0),
                  active_dataset_(training)
   {
-    sync_end();
-
     assert(debug());
   }
 
@@ -97,15 +95,6 @@ namespace vita
   void data::clear()
   {
     *this = data();
-  }
-
-  ///
-  /// Updates the \a end_ vector.
-  ///
-  void data::sync_end()
-  {
-    for (unsigned i(0); i < k_sup_dataset; ++i)
-      end_[i] = dataset_[i].end();
   }
 
   ///
@@ -136,8 +125,7 @@ namespace vita
   ///
   void data::slice(unsigned n)
   {
-    end_[dataset()] = (n == 0 || n >= size()) ?
-      dataset_[dataset()].end() : std::next(begin(), n);
+    slice_[dataset()] = n;
   }
 
   ///
@@ -151,18 +139,37 @@ namespace vita
   ///
   /// \return a constant reference to the first element of the active dataset.
   ///
-  data::const_iterator data::cbegin() const
+  data::const_iterator data::begin() const
   {
     return dataset_[dataset()].cbegin();
+  }
+
+  ///
+  /// \return a reference to the last+1 (sentry) element of the active
+  ///         dataset.
+  ///
+  data::iterator data::end()
+  {
+    const auto n(slice_[dataset()]);
+
+    if (n == 0 || n > size())
+      return dataset_[dataset()].end();
+
+    return std::next(dataset_[dataset()].begin(), n);
   }
 
   ///
   /// \return a constant reference to the last+1 (sentry) element of the active
   ///         dataset.
   ///
-  data::iterator data::end() const
+  data::const_iterator data::end() const
   {
-    return end_[dataset()];
+    const auto n(slice_[dataset()]);
+
+    if (n == 0 || n > size())
+      return dataset_[dataset()].end();
+
+    return std::next(dataset_[dataset()].begin(), n);
   }
 
   ///
@@ -227,9 +234,9 @@ namespace vita
   {
     const auto partition_size(std::distance(begin(), end()));
 
-    //auto &d(dataset_[dataset()]);
-    //std::sort(d.begin(), d.end(), f);
-    dataset_[dataset()].sort(f);
+    auto &d(dataset_[dataset()]);
+    std::sort(d.begin(), d.end(), f);
+    //dataset_[dataset()].sort(f);
 
     slice(partition_size);
   }
@@ -250,7 +257,6 @@ namespace vita
               std::back_inserter(dataset_[training]));
     dataset_[validation].erase(dataset_[validation].begin(),
                                dataset_[validation].end());
-    sync_end();
 
     if (r > 0.0)
     {
@@ -288,8 +294,6 @@ namespace vita
 
       assert(!needed);
     }
-
-    sync_end();
   }
 
   ///
@@ -351,7 +355,7 @@ namespace vita
   ///
   unsigned data::variables() const
   {
-    const unsigned n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
+    const unsigned n(dataset_[dataset()].empty() ? 0 : begin()->input.size());
 
     assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
