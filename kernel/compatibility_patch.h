@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,10 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-//#pragma GCC diagnostic ignored "-Wformat"
-
-#if !defined(COMPATIBILITY_PATCH_H)
-#define      COMPATIBILITY_PATCH_H
+#if !defined(VITA_COMPATIBILITY_PATCH_H)
+#define      VITA_COMPATIBILITY_PATCH_H
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
 #  include <conio.h>
@@ -44,10 +42,24 @@ namespace vita
   /// A way to hide warnings about variables only used in compile time asserts.
   /// There are GCC compiler flags that control unused warnings, but I want a
   /// selective behaviour (generally it is useful to check for dead code).
+  ///
+  /// Another solution could be:
+  ///
+  ///     template<class T> void unused(const T &) {}
+  ///     #define UNUSED(x) unused(x); struct x;
+  ///
+  /// With struct x the name x refers to an incomplete type, so the use of the
+  /// variable \a x is invalid and causes a compilation error. As a practical
+  /// measure it works nicely. Some unnatural statements such as
+  ///     x *y;
+  /// might still slip through the net but nothing's perfect (this is a mix
+  /// of two ideas from Herb Sutter and Cheers-and-hth-alf/Stackoverflow).
 #if defined(__GNUC__)
-#  define VARIABLE_IS_NOT_USED __attribute__ ((unused))
+#  define UNUSED __attribute__ ((unused))
+#elif defined(_MSC_VER)
+#  define UNUSED __pragma(warning(suppress:4100))
 #else
-#  define VARIABLE_IS_NOT_USED
+#  define UNUSED
 #endif
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32)
@@ -106,4 +118,4 @@ namespace vita
 
 }  // namespace vita
 
-#endif  // COMPATIBILITY_PATCH_H
+#endif  // Include guard

@@ -15,10 +15,72 @@
 
 namespace vita { namespace detail
 {
+  template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
+
+  template<class T>
+  class core_reg_lambda_f<T, true, false>
+  {
+  public:
+    core_reg_lambda_f(const T &ind) : ind_(ind), int_(ind_)
+    { assert(debug()); }
+
+    bool debug() const { return ind_.debug() && int_.debug(); }
+
+    const T ind_;
+    mutable src_interpreter<T> int_;
+  };
+
+  template<class T>
+  class core_reg_lambda_f<T, false, false>
+  {
+  public:
+    core_reg_lambda_f(const T &ind) : int_(ind)
+    { assert(debug()); }
+
+    bool debug() const { return int_.debug(); }
+
+    mutable src_interpreter<T> int_;
+  };
+
+  template<class T, bool S>
+  class core_reg_lambda_f<team<T>, S, true>
+  {
+  public:
+    core_reg_lambda_f(const team<T> &t)
+    {
+      team_.reserve(t.individuals());
+      for (const auto &ind : t)
+        team_.emplace_back(ind);
+
+      assert(debug());
+    }
+
+    bool debug() const
+    {
+      for (const auto &lambda : team_)
+        if (!lambda.debug())
+          return false;
+
+      return true;
+    }
+
+    std::vector<core_reg_lambda_f<T, S>> team_;
+  };
+
   ///
   /// \brief A class to (optionally) store a vector of names
   ///
   /// \tparam N if \c true stores the names otherwise keeps the memory free.
+  ///
+  /// This class is used for optimize the storage of vita::class_lambda_f. The
+  /// strategy used is the so called 'Empty Base Class Optimization': the
+  /// compiler is allowed to flatten the inheritance hierarchy in a way that
+  /// the empty base class does not consume space (this is not true for empty
+  /// class data members because C++ requires data member to have non-zero size
+  /// to ensure object identity).
+  ///
+  /// \see
+  /// http://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Empty_Base_Optimization
   ///
   template<bool N>
   class class_names

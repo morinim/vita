@@ -10,15 +10,15 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(FITNESS_H)
-#define      FITNESS_H
+#if !defined(VITA_FITNESS_H)
+#define      VITA_FITNESS_H
 
 #include <array>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 
-#include "kernel/vita.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
@@ -34,19 +34,18 @@ namespace vita
   {
   public:
     typedef T base_t;
-    enum {size = N};
+    static constexpr decltype(N) size = N;
 
     explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());
     template<class... Args> basic_fitness_t(Args...);
 
-    bool operator==(const basic_fitness_t<T, N> &) const;
-    bool operator!=(const basic_fitness_t<T, N> &) const;
-    bool operator>(const basic_fitness_t<T, N> &) const;
-    bool operator>=(const basic_fitness_t<T, N> &) const;
-    bool operator<(const basic_fitness_t<T, N> &) const;
-    bool operator<=(const basic_fitness_t<T, N> &) const;
-    bool dominating(const basic_fitness_t<T, N> &) const;
-    bool almost_equal(const basic_fitness_t<T, N> &, T) const;
+    bool operator==(const basic_fitness_t &) const;
+    bool operator!=(const basic_fitness_t &) const;
+    bool operator>(const basic_fitness_t &) const;
+    bool operator>=(const basic_fitness_t &) const;
+    bool operator<(const basic_fitness_t &) const;
+    bool operator<=(const basic_fitness_t &) const;
+    bool dominating(const basic_fitness_t &) const;
 
     T operator[](unsigned i) const { assert(i < N); return vect[i]; }
 
@@ -67,6 +66,8 @@ namespace vita
     basic_fitness_t abs() const;
     basic_fitness_t sqrt() const;
 
+    double distance(const basic_fitness_t &) const;
+
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
@@ -75,9 +76,13 @@ namespace vita
     std::array<T, N> vect;
   };
 
+  template<class T> bool almost_equal(T, T, T = 0.00001);
+  template<class T, unsigned N> bool almost_equal(
+    const basic_fitness_t<T, N> &, const basic_fitness_t<T, N> &, T = 0.00001);
+
   using fitness_t = basic_fitness_t<double, 1>;
 
 #include "kernel/fitness_inl.h"
 }  // namespace vita
 
-#endif  // FITNESS_H
+#endif  // Include guard

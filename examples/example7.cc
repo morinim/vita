@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   vita::symbol_set sset;
 
   symbol_factory &factory(symbol_factory::instance());
-  sset.insert(factory.make(d_double, -200, 200));
+  sset.insert(factory.make(domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FSUB"));
   sset.insert(factory.make("FMUL"));

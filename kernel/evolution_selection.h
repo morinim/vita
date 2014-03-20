@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SELECTION_H)
-#define      EVOLUTION_SELECTION_H
+#if !defined(VITA_EVOLUTION_SELECTION_H)
+#define      VITA_EVOLUTION_SELECTION_H
 
 #include <set>
 #include <vector>
 
-#include "kernel/vita.h"
+#include "kernel/alps.h"
 
 namespace vita {  namespace selection {
 
@@ -36,19 +36,20 @@ namespace vita {  namespace selection {
   class strategy
   {
   public:
-    strategy(const population<T> &, evaluator<T> &);
+    strategy(const population<T> &, evaluator<T> &, const summary<T> &);
     virtual ~strategy() {}
 
     virtual std::vector<coord> run() = 0;
 
-  protected:  // Support methods.
+  protected:  // Support methods
     coord pickup() const;
     coord pickup(coord) const;
     coord pickup(unsigned, double = 1.0) const;
 
-  protected:  // Data members.
+  protected:  // Data members
     const population<T> &pop_;
     evaluator<T>        &eva_;
+    const summary<T>    &sum_;
   };
 
   ///
@@ -71,7 +72,7 @@ namespace vita {  namespace selection {
   class tournament : public strategy<T>
   {
   public:
-    tournament(const population<T> &, evaluator<T> &);
+    using tournament::strategy::strategy;
 
     virtual std::vector<coord> run() override;
   };
@@ -85,7 +86,30 @@ namespace vita {  namespace selection {
   class alps : public strategy<T>
   {
   public:
-    alps(const population<T> &, evaluator<T> &);
+    using alps::strategy::strategy;
+
+    virtual std::vector<coord> run() override;
+
+  private:
+    bool aged(coord) const;
+  };
+
+  ///
+  /// The idea behind FUSS is that we should focus the selection pressure
+  /// towards fitness levels which have relatively few individuals rather than
+  /// on the highest fitness levels. In this way fitness levels which are
+  /// difficult to reach are throughly explored and on no fitness level does the
+  /// population size decrease towards extiction.
+  ///
+  /// \see
+  /// * "Tournament versus fitness uniform selection" - Shane Legg, Marcus
+  /// Hutter, Akshat Kumar (Technical Report IDSIA-04-04 March 2004).
+  ///
+  template<class T>
+  class fuss : public strategy<T>
+  {
+  public:
+    using fuss::strategy::strategy;
 
     virtual std::vector<coord> run() override;
   };
@@ -98,7 +122,7 @@ namespace vita {  namespace selection {
   class pareto : public strategy<T>
   {
   public:
-    pareto(const population<T> &, evaluator<T> &);
+    using pareto::strategy::strategy;
 
     virtual std::vector<coord> run() override;
 
@@ -118,12 +142,13 @@ namespace vita {  namespace selection {
   class random : public strategy<T>
   {
   public:
-    random(const population<T> &, evaluator<T> &);
+    using random::strategy::strategy;
 
     virtual std::vector<coord> run() override;
   };
 
 #include "kernel/evolution_selection_inl.h"
+
 } } // namespace vita :: selection
 
-#endif  // EVOLUTION_SELECTION_H
+#endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(ENVIRONMENT_H)
-#define      ENVIRONMENT_H
+#if !defined(VITA_ENVIRONMENT_H)
+#define      VITA_ENVIRONMENT_H
 
 #include <cmath>
 #include <string>
@@ -149,7 +149,7 @@ namespace vita
     /// Maximun number of generations allowed before terminate a run.
     /// \note
     /// A value of 0 means undefined (auto-tune).
-    unsigned generations;
+    unsigned generations = 0;
 
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
@@ -227,7 +227,7 @@ namespace vita
       /// probability that the second parent will be extracted from the same
       /// layer? (with ALPS it could be taken from the previous layer).
       /// \note
-      /// A probability of -1.0 means undefined (auto-tune).
+      /// A negative value means undefined (auto-tune).
       double p_same_layer = 0.75;
     } alps;
 
@@ -235,7 +235,7 @@ namespace vita
     {
       /// 0 is auto-tune;
       /// > 1 means team mode.
-      unsigned individuals = 4;
+      unsigned individuals = 3;
     } team;
 
     static const char arl_filename[];
@@ -247,4 +247,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // ENVIRONMENT_H
+#endif  // Include guard.

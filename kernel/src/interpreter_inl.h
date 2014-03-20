@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_INTERPRETER_INL_H)
-#define      SRC_INTERPRETER_INL_H
+#if !defined(VITA_SRC_INTERPRETER_INL_H)
+#define      VITA_SRC_INTERPRETER_INL_H
 
 ///
 /// \param[in] ex a vector of values for the problem's variables.
@@ -41,4 +41,4 @@ any src_interpreter<T>::fetch_var(unsigned i)
   return (*example_)[i];
 }
 
-#endif  // SRC_INTERPRETER_INL_H
+#endif  // Include guard

@@ -10,37 +10,23 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(FITNESS_INL_H)
-#define      FITNESS_INL_H
+#if !defined(VITA_FITNESS_INL_H)
+#define      VITA_FITNESS_INL_H
+
+template<class T, unsigned N>
+constexpr decltype(N) basic_fitness_t<T, N>::size;
 
 ///
-///
+/// Fills the fitness with value \a v.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N>::basic_fitness_t(T v)
+basic_fitness_t<T, N>::basic_fitness_t(T v) : vect(make_array<T, N>(v))
 {
   static_assert(N, "basic_fitness_t cannot have zero length");
-
-  vect.fill(v);
 }
 
-/*
-/// This constructor is slower than the following one (based on variadic
-/// templates).
-/// The problem is the copy at runtime.
-template<class T, unsigned N>
-basic_fitness_t<T, N>::basic_fitness_t(const std::initializer_list<base_t> &l)
-{
-  static_assert(N, "basic_fitness_t cannot have zero length");
-
-  unsigned i(0);
-  for (auto p : l)
-    vect[i++] = p;
-}
-*/
-
 ///
-///
+/// Builds a fitness from a list of values.
 ///
 template<class T, unsigned N>
 template<class ...Args>
@@ -48,6 +34,18 @@ basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
 {
   static_assert(N, "basic_fitness_t cannot have zero length");
   static_assert(sizeof...(Args) == N, "Wrong number of arguments");
+
+  // Do not change with something like:
+  //
+  // template<class T, unsigned N>
+  // basic_fitness_t(const std::initializer_list<base_t> &l)
+  // {
+  //   unsigned i(0);
+  //   for (auto p : l)
+  //     vect[i++] = p;
+  // }
+  //
+  // This is slower because of the runtime copy.
 }
 
 ///
@@ -88,7 +86,7 @@ bool basic_fitness_t<T, N>::operator>(const basic_fitness_t<T, N> &f) const
   return vect > f.vect;
 
   // An alternative implementation:
-  // > for (size_t i(0); i < N; ++i)
+  // > for (decltype(N) i(0); i < N; ++i)
   // >   if (vect[i] != f.vect[i])
   // >     return vect[i] > f.vect[i];
   // > return false;
@@ -137,7 +135,7 @@ bool basic_fitness_t<T, N>::dominating(const basic_fitness_t<T, N> &f) const
 {
   bool one_better(false);
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     if (vect[i] > f.vect[i])
       one_better = true;
     else if (vect[i] < f.vect[i])
@@ -159,7 +157,7 @@ bool basic_fitness_t<T, N>::load(std::istream &in)
 {
   basic_fitness_t<T, N> tmp;
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     if (!(in
           >> std::fixed >> std::scientific
           >> std::setprecision(std::numeric_limits<double>::digits10 + 1)
@@ -196,7 +194,7 @@ std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
 {
   o << '(';
 
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
   {
     o << f[i];
     if (i + 1 < N)
@@ -211,9 +209,10 @@ std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
 /// \return the sum of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(const basic_fitness_t<T, N> &f)
+basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(
+  const basic_fitness_t<T, N> &f)
 {
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     vect[i] += f[i];
 
   return *this;
@@ -224,9 +223,10 @@ basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator+=(const basic_fitness_t<T
 /// \return the difference of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(const basic_fitness_t<T, N> &f)
+basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(
+  const basic_fitness_t<T, N> &f)
 {
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     vect[i] -= f[i];
 
   return *this;
@@ -237,10 +237,11 @@ basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(const basic_fitness_t<T
 /// \return the difference between \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(const basic_fitness_t<T, N> &f) const
+basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(
+  const basic_fitness_t<T, N> &f) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] - f[i];
 
   return tmp;
@@ -251,10 +252,11 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(const basic_fitness_t<T, 
 /// \return the product of \a this and \a f.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(const basic_fitness_t<T, N> &f) const
+basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(
+  const basic_fitness_t<T, N> &f) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] * f[i];
 
   return tmp;
@@ -269,7 +271,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator/(T val) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] / val;
 
   return tmp;
@@ -283,7 +285,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(T val) const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = vect[i] * val;
 
   return tmp;
@@ -297,7 +299,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
 {
   basic_fitness_t<T, N> tmp;
-  for (unsigned i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = std::fabs(vect[i]);
 
   return tmp;
@@ -311,7 +313,7 @@ template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::sqrt() const
 {
   basic_fitness_t<T, N> tmp;
-  for (size_t i(0); i < N; ++i)
+  for (decltype(N) i(0); i < N; ++i)
     tmp[i] = std::sqrt(vect[i]);
 
   return tmp;
@@ -342,61 +344,72 @@ bool basic_fitness_t<T, N>::isnan() const
 }
 
 ///
-/// \return \c true if each component of the fitness is less than or equal to
-///         \c float_epsilion.
+/// \return \c true if each component of the fitness vector is small.
 ///
 template<class T, unsigned N>
 bool basic_fitness_t<T, N>::issmall() const
 {
   for (const auto &i : vect)
-    if (i > float_epsilon)
+    if (!vita::issmall(i))
       return false;
   return true;
 }
 
-  ///
-  /// \param[in] v1 a floating point number.
-  /// \param[in] v2 a floating point number.
-  /// \param[in] epsilon max relative error. If we want 99.999% accuracy then
-  ///                    we should pass a \a epsilon of 0.00001.
-  /// \return \c true if the difference between \a v1 and \a v2 is "small"
-  ///         compared to their magnitude.
-  ///
-  /// \note
-  /// Code from Bruce Dawson:
-  /// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
-  ///
-  template<class T>
-  bool almost_equal(T v1, T v2, T epsilon)
-  {
-    const T diff(std::abs(v1 - v2));
+///
+/// \param[in] v1 a floating point number.
+/// \param[in] v2 a floating point number.
+/// \param[in] epsilon max relative error. If we want 99.999% accuracy then
+///                    we should pass a \a epsilon of 0.00001.
+/// \return \c true if the difference between \a v1 and \a v2 is "small"
+///         compared to their magnitude.
+///
+/// \note
+/// Code from Bruce Dawson:
+/// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
+///
+template<class T>
+bool almost_equal(T v1, T v2, T epsilon)
+{
+  const T diff(std::abs(v1 - v2));
 
-    // Check if the numbers are really close -- needed
-    // when comparing numbers near zero.
-    if (diff <= 10.0 * std::numeric_limits<T>::min())
-      return true;
+  // Check if the numbers are really close -- needed
+  // when comparing numbers near zero.
+  if (diff <= 10.0 * std::numeric_limits<T>::min())
+    return true;
 
-    v1 = std::abs(v1);
-    v2 = std::abs(v2);
+  v1 = std::abs(v1);
+  v2 = std::abs(v2);
 
-    // In order to get consistent results, we should always compare the
-    // difference to the larger of the two numbers.
-    const T largest(std::max(v1, v2));
+  // In order to get consistent results, we should always compare the
+  // difference to the larger of the two numbers.
+  const T largest(std::max(v1, v2));
 
-    return diff <= largest * epsilon;
-  }
+  return diff <= largest * epsilon;
+}
 
 ///
 /// See vita::almost_equal function for scalar types.
 ///
 template<class T, unsigned N>
-bool basic_fitness_t<T, N>::almost_equal(const basic_fitness_t<T, N> &n,
-                                         T epsilon) const
+bool almost_equal(const basic_fitness_t<T, N> &f1,
+                  const basic_fitness_t<T, N> &f2, T epsilon)
 {
-  for (size_t i(0); i < N; ++i)
-    if (!almost_equal(vect[i], n[i], epsilon))
+  for (decltype(N) i(0); i < N; ++i)
+    if (!almost_equal(f1[i], f2[i], epsilon))
       return false;
 
   return true;
 }
-#endif  // FITNESS_INL_H
+
+template<class T, unsigned N>
+double basic_fitness_t<T, N>::distance(const basic_fitness_t<T, N> &f) const
+{
+  double d(0.0);
+
+  for (decltype(N) i(0); i < N; ++i)
+    d += std::fabs(vect[i] - f[i]);
+
+  return d;
+}
+
+#endif  // Include guard

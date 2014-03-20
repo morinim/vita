@@ -1,18 +1,17 @@
 /**
- *
- *  \file gene.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(GENE_H)
-#define      GENE_H
+#if !defined(VITA_GENE_H)
+#define      VITA_GENE_H
 
 #include <vector>
 
@@ -32,7 +31,7 @@ namespace vita
   class basic_gene
   {
   public:
-    enum  {k_args = K};
+    static constexpr decltype(K) k_args{K};
 
     basic_gene() {}
     explicit basic_gene(symbol *);
@@ -51,9 +50,12 @@ namespace vita
     };
   };
 
+  template<unsigned K>
+  std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
+
   using gene = basic_gene<4>;
 
 #include "kernel/gene_inl.h"
 }  // namespace vita
 
-#endif  // GENE_H
+#endif  // Include guard

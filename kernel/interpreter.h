@@ -10,21 +10,20 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(INTERPRETER_H)
-#define      INTERPRETER_H
+#if !defined(VITA_INTERPRETER_H)
+#define      VITA_INTERPRETER_H
 
 #include <boost/optional.hpp>
 
 #include "kernel/matrix.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  class individual;
-
   ///
   /// \brief Minimum interface of an interpreter
   ///
-  /// \tparam T the type of individual used.
+  /// \tparam T the type of individual used
   ///
   template<class T>
   class core_interpreter
@@ -94,4 +93,4 @@ namespace vita
 #include "kernel/interpreter_inl.h"
 }  // namespace vita
 
-#endif  // INTERPRETER_H
+#endif  // Include guard

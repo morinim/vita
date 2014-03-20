@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(ADF_H)
-#define      ADF_H
+#if !defined(VITA_ADF_H)
+#define      VITA_ADF_H
 
 #include <string>
 #include <vector>
@@ -38,7 +38,7 @@ namespace vita
   /// top level components call lower level ones, which call still lower levels.
   ///
   /// adf_core is the core of vita::adt and vita::adf classes (they are in a
-  /// HAS-A relationship with it).
+  /// has-a relationship with it).
   ///
   /// \note
   /// Although the acronym ADF is from Koza's automatically defined functions,
@@ -48,18 +48,18 @@ namespace vita
   ///
   class adf_core
   {
-    friend class adf;
-    friend class adt;
-
+  public:
     explicit adf_core(const individual &);
+
+    const individual &code() const;
 
     std::string display(const std::string &) const;
 
     bool debug() const;
 
-  private: // Data members
-    opcode_t     id;
-    individual code;
+  private:  // Private data members
+    individual code_;
+    opcode_t     id_;
 
     static opcode_t adf_count()
     {
@@ -78,14 +78,15 @@ namespace vita
 
     virtual any eval(interpreter<individual> *) const override;
 
-    const individual &get_code() const;
     virtual std::string display() const override;
 
     virtual bool auto_defined() const override;
 
     virtual bool debug() const override;
 
-  private:  // Private data members.
+    const individual &code() const;
+
+  private:
     adf_core core_;
   };
 
@@ -103,16 +104,17 @@ namespace vita
 
     virtual any eval(interpreter<individual> *) const override;
 
-    const individual &get_code() const;
     virtual std::string display() const override;
 
     virtual bool auto_defined() const override;
 
     virtual bool debug() const override;
 
-  private:  // Private data members.
+    const individual &code() const;
+
+  private:
     adf_core core_;
   };
 }  // namespace vita
 
-#endif  // ADF_H
+#endif  // Include guard

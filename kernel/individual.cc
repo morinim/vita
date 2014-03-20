@@ -59,6 +59,8 @@ namespace vita
     assert(debug(true));
   }
 
+  template<class T> void unused(const T &) {}
+
   ///
   /// \return the effective size of the individual.
   /// \see size()
@@ -75,12 +77,7 @@ namespace vita
   ///
   unsigned individual::eff_size() const
   {
-    unsigned ef(0);
-
-    for (VARIABLE_IS_NOT_USED const auto &l : *this)
-      ++ef;
-
-    return ef;
+    return std::distance(begin(), end());
   }
 
   ///
@@ -100,32 +97,6 @@ namespace vita
     return ret;
   }
 
-  /*
-  void individual::hoist()
-  {
-    const unsigned sup(size() - 1);
-    const unsigned categories(sset_->categories());
-
-    for (index_t i(0); i < sup; ++i)
-      for (category_t c(0); c < categories; ++c)
-      {
-        const locus l{i, c};
-
-        set(l, genome_({i+1, c}));
-
-        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
-        {
-          --genome_(l).args[j];
-
-          assert(genome_(l).args[j] > i);
-        }
-      }
-
-    for (category_t c(0); c < categories; ++c)
-      set({sup, c}, gene(sset_->roulette_terminal(c)));
-  }
-  */
-
   ///
   /// \param[in] p probability of gene mutation.
   /// \return number of mutations performed.
@@ -134,6 +105,8 @@ namespace vita
   ///
   unsigned individual::mutation(double p)
   {
+    assert(0.0 <= p && p <= 1.0);
+
     unsigned n(0);
 
     const auto sup(size() - 1);
@@ -275,7 +248,6 @@ namespace vita
 
   ///
   /// \param[in] max_args maximum number of arguments for the ADF.
-  /// \param[out] loci the ADF arguments are here.
   /// \return the generalized individual and a set of loci (ADF arguments
   ///         positions).
   ///
@@ -377,21 +349,26 @@ namespace vita
   {
     const gene &g(genome_(l));
 
-    assert(g.sym->opcode() <= std::numeric_limits<std::uint16_t>::max());
-    const std::uint16_t opcode16(g.sym->opcode());
+    // Although 16 bit are enough to contain opcodes and parameters, they are
+    // usually stored in unsigned variables (i.e. 32 or 64 bit) for performance
+    // reasons.
+    // Anyway before hashing opcodes/parameters we convert them to 16 bit types
+    // to avoid hashing more than necessary.
+    const std::uint16_t opcode(g.sym->opcode());
+    assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
 
-    const T *const s1 = reinterpret_cast<const T *>(&opcode16);
-    for (size_t i(0); i < sizeof(opcode16); ++i)
+    const T *const s1 = reinterpret_cast<const T *>(&opcode);
+    for (size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
-      assert(std::numeric_limits<std::int16_t>::min() <= g.par);
-      assert(g.par <= std::numeric_limits<std::int16_t>::max());
-      const std::int16_t param16(g.par);
+      const std::int16_t param(g.par);
+      assert(std::numeric_limits<decltype(param)>::min() <= g.par);
+      assert(g.par <= std::numeric_limits<decltype(param)>::max());
 
-      const T *const s2 = reinterpret_cast<const T *>(&param16);
-      for (size_t i(0); i < sizeof(param16); ++i)
+      const T *const s2 = reinterpret_cast<const T *>(&param);
+      for (size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
     else
@@ -413,7 +390,7 @@ namespace vita
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
     //     std::vector<T> packed;
-    //     // static keyword and clear() call deleted.
+    // (static keyword and packed.clear() call deleted).
 
     pack(best_, &packed);
 
@@ -451,9 +428,9 @@ namespace vita
   ///
   bool individual::debug(bool verbose) const
   {
-    const unsigned categories(sset_->categories());
+    const auto categories(sset_->categories());
 
-    for (unsigned i(0); i < size(); ++i)
+    for (index_t i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)
       {
         const locus l{i, c};
@@ -467,7 +444,8 @@ namespace vita
         }
 
         // Maximum number of function arguments is gene::k_args.
-        if (genome_(l).sym->arity() > gene::k_args)
+        const auto arity(genome_(l).sym->arity());
+        if (arity > gene::k_args)
         {
           if (verbose)
             std::cerr << k_s_debug << "Function arity exceeds maximum size."
@@ -476,7 +454,7 @@ namespace vita
         }
 
         // Checking arguments' addresses.
-        for (unsigned j(0); j < genome_(l).sym->arity(); ++j)
+        for (auto j(decltype(arity){0}); j < arity; ++j)
         {
           // Arguments' addresses must be smaller than the size of the genome.
           if (genome_(l).args[j] >= size())
@@ -574,8 +552,7 @@ namespace vita
     {
       const gene &g(genome_(l));
 
-      s << 'g' << l.index << '_' << l.category << " [label="
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
+      s << 'g' << l.index << '_' << l.category << " [label=" << g
         << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
 
       for (unsigned j(0); j < g.sym->arity(); ++j)
@@ -598,9 +575,10 @@ namespace vita
 
     if (l != best_)
       s << ' ';
-    s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+    s << g;
 
-    for (unsigned i(0); i < g.sym->arity(); ++i)
+    const auto arity(g.sym->arity());
+    for (auto i(decltype(arity){0}); i < arity; ++i)
       in_line(s, {g.args[i], function::cast(g.sym)->arg_category(i)});
   }
 
@@ -627,11 +605,9 @@ namespace vita
   ///
   void individual::list(std::ostream &s) const
   {
-    const size_t categories(sset_->categories());
-    const unsigned w1(
-      1 + static_cast<unsigned>(std::log10(static_cast<double>(size() - 1))));
-    const unsigned w2(
-      1 + static_cast<unsigned>(std::log10(static_cast<double>(categories))));
+    const auto categories(sset_->categories());
+    const auto w1(1 + static_cast<unsigned>(std::log10(size() - 1)));
+    const auto w2(1 + static_cast<unsigned>(std::log10(categories)));
 
     for (const auto &l : *this)
     {
@@ -640,13 +616,21 @@ namespace vita
       s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
       if (categories > 1)
-        s << ", " << std::setw(w2) << l.category;
+        s << ',' << std::setw(w2) << l.category;
 
-      s << "] "
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+      s << "] " << g;
 
-      for (size_t j(0); j < g.sym->arity(); ++j)
-        s << ' ' << std::setw(w1) << g.args[j];
+      const auto arity(g.sym->arity());
+      for (auto j(decltype(arity){0}); j < arity; ++j)
+      {
+        s << ' ';
+        if (categories > 1)
+          s << '(';
+        s << std::setw(w1) << g.args[j];
+        if (categories > 1)
+          s << ',' << std::setw(w2) << function::cast(g.sym)->arg_category(j)
+            << ')';
+      }
 
       s << std::endl;
     }
@@ -663,22 +647,19 @@ namespace vita
   {
     const gene &g(genome_(child));
 
-    if (child == parent
-        || !genome_(parent).sym->associative()
-        || genome_(parent).sym != g.sym)
+    if (child == parent ||
+        !genome_(parent).sym->associative() ||
+        genome_(parent).sym != g.sym)
     {
       std::string spaces(indent, ' ');
-      s << spaces
-        << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display())
-        << std::endl;
+      s << spaces << g << std::endl;
       indent += 2;
     }
 
     const auto arity(g.sym->arity());
-    if (arity)
-      for (size_t i(0); i < arity; ++i)
-        tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
-             child);
+    for (auto i(decltype(arity){0}); i < arity; ++i)
+      tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
+           child);
   }
 
   ///
@@ -710,9 +691,10 @@ namespace vita
         if (categories > 1)
           s << '{';
 
-        s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+        s << g;
 
-        for (unsigned j(0); j < g.sym->arity(); ++j)
+        const auto arity(g.sym->arity());
+        for (auto j(decltype(arity){0}); j < arity; ++j)
           s << ' ' << std::setw(width) << g.args[j];
 
         if (categories > 1)
@@ -969,7 +951,7 @@ namespace vita
   ///
   /// \return locus of the next active symbol.
   ///
-  std::set<locus>::iterator individual::const_iterator::operator++()
+  individual::const_iterator &individual::const_iterator::operator++()
   {
     if (!loci_.empty())
     {
@@ -982,7 +964,7 @@ namespace vita
       loci_.erase(loci_.begin());
     }
 
-    return loci_.begin();
+    return *this;;
   }
 #endif
-}  // Namespace vita
+}  // namespace vita

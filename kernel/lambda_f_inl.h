@@ -10,29 +10,16 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(LAMBDA_F_INL_H)
-#define      LAMBDA_F_INL_H
+#if !defined(VITA_LAMBDA_F_INL_H)
+#define      VITA_LAMBDA_F_INL_H
 
 ///
-/// \param[in] int the individual to be lambdified.
+/// \param[in] prg the program (individual/team) to be lambdified.
 ///
 template<class T, bool S>
-basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &ind) : ind_(ind),
-                                                             int_(ind_)
+basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
+  : detail::core_reg_lambda_f<T, S>(prg)
 {
-  assert(debug());
-}
-
-///
-/// \param[in] t the team to be lambdified.
-///
-template<class T, bool S>
-basic_reg_lambda_f<team<T>, S>::basic_reg_lambda_f(const team<T> &t)
-{
-  team_.reserve(t.size());
-  for (const auto &ind : t)
-    team_.emplace_back(ind);
-
   assert(debug());
 }
 
@@ -43,22 +30,32 @@ basic_reg_lambda_f<team<T>, S>::basic_reg_lambda_f(const team<T> &t)
 template<class T, bool S>
 any basic_reg_lambda_f<T, S>::operator()(const data::example &e) const
 {
-  return int_.run(e.input);
+  // We use tag dispatching (i.e. to delegate to an implementation function
+  // that receives standard arguments plus a dummy argument based on a
+  // compile-time condition). Usually this is much easier to debug and get
+  // right that the std::enable_if solution.
+  // Moreover this is almost guaranteed to be optimized away by a decent
+  // compiler.
+  return eval(e, is_team<T>());
 }
 
-///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
-///
 template<class T, bool S>
-any basic_reg_lambda_f<team<T>, S>::operator()(const data::example &e) const
+any basic_reg_lambda_f<T, S>::eval(const data::example &e,
+                                   std::false_type) const
+{
+  return this->int_.run(e.input);
+}
+
+template<class T, bool S>
+any basic_reg_lambda_f<T, S>::eval(const data::example &e,
+                                   std::true_type) const
 {
   number avg(0), count(0);
 
   // Calculate the running average.
-  for (const auto &lambda : team_)
+  for (const auto &core : this->team_)
   {
-    const auto res(lambda(e));
+    const auto res(core.int_.run(e.input));
 
     if (!res.empty())
       avg += (to<number>(res) - avg) / ++count;
@@ -78,38 +75,12 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 }
 
 ///
-/// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of \a a.
-///
-template<class T, bool S>
-std::string basic_reg_lambda_f<team<T>, S>::name(const any &a) const
-{
-  return boost::lexical_cast<std::string>(to<number>(a));
-}
-
-///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::debug() const
 {
-  if (!int_.debug())
-    return false;
-
-  return ind_.debug();
-}
-
-///
-/// \return \c true if the object passes the internal consistency check.
-///
-template<class T, bool S>
-bool basic_reg_lambda_f<team<T>, S>::debug() const
-{
-  for (const auto &lambda : team_)
-    if (!lambda.debug())
-      return false;
-
-  return true;
+  return detail::core_reg_lambda_f<T, S>::debug();
 }
 
 ///
@@ -122,14 +93,14 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
 }
 
 ///
-/// \param[in] instance data to be classified.
+/// \param[in] e data to be classified.
 /// \return the label of the class that includes \a instance (wrapped in class
 ///         any).
 ///
 template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
 {
-  return any(tag(e));
+  return any(tag(e).first);
 }
 
 ///
@@ -208,7 +179,7 @@ basic_dyn_slot_lambda_f<team<T>, S, N>::basic_dyn_slot_lambda_f(
   const team<T> &t, data &d, unsigned x_slot)
   : team_class_lambda_f<T, S, N, vita::basic_dyn_slot_lambda_f>(d)
 {
-  this->team_.reserve(t.size());
+  this->team_.reserve(t.individuals());
   for (const auto &ind : t)
     this->team_.emplace_back(ind, d, x_slot);
 }
@@ -318,13 +289,25 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_dyn_slot_lambda_f<T, S, N>::tag(
+std::pair<class_tag_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
   const data::example &instance) const
 {
-  return slot_class_[slot(instance)];
+  const auto s(slot(instance));
+  const auto classes(slot_matrix_.cols());
+
+  unsigned total(0);
+  for (auto j(decltype(classes){0}); j < classes; ++j)
+    total += slot_matrix_(s, j);
+
+  const auto ok(slot_matrix_(s, slot_class_[s]));
+
+  const double confidence(!total ? 0.5 : static_cast<double>(ok) / total);
+
+  return {slot_class_[s], confidence};
 }
 
 ///
@@ -396,38 +379,35 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 ///
 /// \param[in] example input value whose class we are interested in.
 /// \param[out] val confidence level: how sure you can be that \a example
-///             is properly classified. The value is in [0;1] range.
-/// \param[out] sum the sum of all the confidence levels for \a example
-///                 (confidence of \a example in class 1 + confidence of
-///                 \a example in class 2 + ... + confidence \a example in
-///                 class n).
-/// \return the class of \a instance (numerical id).
+///                 is properly classified. The value is in [0;1] range and the
+///                 sum of the confidence level of each class is 1.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(const data::example &example,
-                                                  number *val,
-                                                  number *sum) const
+std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
+  const data::example &example) const
 {
   const any res(lambda_(example));
   const number x(res.empty() ? 0.0 : to<number>(res));
 
-  number val_(0.0), val_sum_(0.0);
-  unsigned probable_class(0);
+  number val_(0.0), sum_(0.0);
+  class_tag_t probable_class(0);
 
-  const auto size(gauss_dist_.size());
-  for (auto i(decltype(size){0}); i < size; ++i)
+  const auto classes(gauss_dist_.size());
+  for (auto i(decltype(classes){0}); i < classes; ++i)
   {
     const number distance(std::fabs(x - gauss_dist_[i].mean));
     const number variance(gauss_dist_[i].variance);
 
     number p(0.0);
-    if (variance == 0.0)     // These are borderline cases
-      if (distance == 0.0)   // These are borderline cases
+    if (issmall(variance))     // These are borderline cases
+      if (issmall(distance))   // These are borderline cases
         p = 1.0;
       else
         p = 0.0;
-    else                     // This is the standard case
-      p = std::exp(-0.5 * distance * distance / variance);
+    else                       // This is the standard case
+      p = std::exp(-distance * distance / variance);
 
     if (p > val_)
     {
@@ -435,26 +415,18 @@ class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(const data::example &example,
       probable_class = i;
     }
 
-    val_sum_ += p;
+    sum_ += p;
   }
 
-  if (val)
-    *val = val_;
-  if (sum)
-    *sum = val_sum_;
+  // Normalized confidence value.
+  // Do not change sum_ > 0.0 with
+  // - issmall(sum_) => when sum_ is small, val_ is smaller and the division
+  //                    works well.
+  // - sum_ => it's the same thing but will produce a warning with
+  //           -Wfloat-equal
+  const double confidence(sum_ > 0.0 ? val_ / sum_ : 0.0);
 
-  return probable_class;
-}
-
-///
-/// \param[in] instance data to be classified.
-/// \return the tag of the class that includes \a instance.
-///
-template<class T, bool S, bool N>
-class_tag_t basic_gaussian_lambda_f<T, S, N>::tag(
-  const data::example &instance) const
-{
-  return tag(instance, nullptr, nullptr);
+  return {probable_class, confidence};
 }
 
 ///
@@ -481,15 +453,17 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind, data &d)
 
 ///
 /// \param[in] e input example for the lambda function.
-/// \return the class label associated with \a e.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-class_tag_t basic_binary_lambda_f<T, S, N>::tag(const data::example &e) const
+std::pair<class_tag_t, double> basic_binary_lambda_f<T, S, N>::tag(
+  const data::example &e) const
 {
   const any res(lambda_(e));
-  const number val(res.empty() ? -1.0 : to<number>(res));
+  const number val(res.empty() ? 0.0 : to<number>(res));
 
-  return val > 0.0 ? 1u : 0u;
+  return {val > 0.0 ? 1u : 0u, std::fabs(val)};
 }
 
 ///
@@ -504,8 +478,9 @@ bool basic_binary_lambda_f<T, S, N>::debug() const
 ///
 /// \param[in] d the training set.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-team_class_lambda_f<T, S, N, L>::team_class_lambda_f(data &d)
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
 }
@@ -514,44 +489,75 @@ team_class_lambda_f<T, S, N, L>::team_class_lambda_f(data &d)
 /// \param[in] t team "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-team_class_lambda_f<T, S, N, L>::team_class_lambda_f(const team<T> &t,
-                                                     data &d)
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
+                                                        data &d)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
-  team_.reserve(t.size());
+  team_.reserve(t.individuals());
   for (const auto &ind : t)
     team_.emplace_back(ind, d);
 }
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the label of the class that includes \a instance.
+/// \return the class of \a instance (numerical id) and the confidence level
+///         (in the range [0,1]).
 ///
-/// Specialized method for teams: this is a simple majority voting scheme.
+/// Specialized method for teams.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-class_tag_t team_class_lambda_f<T, S, N, L>::tag(
+/// * \c team_composition::mv the class which most of the individuals predict
+///   for a given example is selected as team output.
+/// * \c team_composition::wta the winner is the individual with the highest
+///   confidence in its decision. Specialization may emerge if different
+///   members of the team win this contest for different fitness cases (of
+///   curse, it is not a feasible alternative to select the member with the
+///   best fitness. Then a decision on unknown data is only possible if the
+///   right outputs are known in advance and is not made by the team itself).
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
   const data::example &instance) const
 {
-  std::vector<unsigned> votes(classes_);
+  if (C == team_composition::wta)
+  {
+    const auto size(team_.size());
+    auto best(team_[0].tag(instance));
 
-  for (const auto &lambda : team_)
-    ++votes[lambda.tag(instance)];
+    for (auto i(decltype(size){1}); i < size; ++i)
+    {
+      const auto res(team_[i].tag(instance));
 
-  class_tag_t max(0);
-  for (auto i(max + 1); i < classes_; ++i)
-    if (votes[i] > votes[max])
-      max = i;
+      if (res.second > best.second)
+        best = res;
+    }
 
-  return max;
+    return best;
+  }
+  else if (C == team_composition::mv)
+  {
+    std::vector<unsigned> votes(classes_);
+
+    for (const auto &lambda : team_)
+      ++votes[lambda.tag(instance).first];
+
+    class_tag_t max(0);
+    for (auto i(max + 1); i < classes_; ++i)
+      if (votes[i] > votes[max])
+        max = i;
+
+    return {max, static_cast<double>(votes[max]) / team_.size()};
+  }
 }
 
 ///
 /// \return \c true if the object passes the internal consistency check.
 ///
-template<class T, bool S, bool N, template<class, bool, bool> class L>
-bool team_class_lambda_f<T, S, N, L>::debug() const
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+bool team_class_lambda_f<T, S, N, L, C>::debug() const
 {
   for (const auto &l : team_)
     if (!l.debug())
@@ -560,4 +566,4 @@ bool team_class_lambda_f<T, S, N, L>::debug() const
   return classes_ > 1;
 }
 
-#endif  // LAMBDA_F_INL_H
+#endif  // Include guard

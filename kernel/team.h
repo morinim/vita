@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(TEAM_H)
-#define      TEAM_H
+#if !defined(VITA_TEAM_H)
+#define      VITA_TEAM_H
 
 #include <boost/lexical_cast.hpp>
 
@@ -75,7 +75,6 @@ namespace vita
     const T &operator[](unsigned) const;
 
     unsigned individuals() const;
-    unsigned size() const;
     unsigned eff_size() const;
 
     hash_t signature() const;
@@ -106,7 +105,15 @@ namespace vita
 
   template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
+  // The SFINAE way of recognize a team.
+  template<class T> struct is_team : std::false_type {};
+  template<class T> struct is_team<team<T>> : std::true_type {};
+
+  template<class T> struct not_team : std::true_type {};
+  template<class T> struct not_team<team<T>> : std::false_type {};
+
 #include "kernel/team_inl.h"
+
 }  // namespace vita
 
-#endif  // TEAM_H
+#endif  // Include guard

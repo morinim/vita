@@ -36,22 +36,40 @@ namespace vita
     {
       switch (d)
       {
-      case d_bool:   return   any(boost::lexical_cast<bool>(s));
-      case d_int:    return    any(boost::lexical_cast<int>(s));
-      case d_double: return any(boost::lexical_cast<double>(s));
-      case d_string: return                              any(s);
-      default:                  throw boost::bad_lexical_cast();
+      case domain_t::d_bool:   return   any(boost::lexical_cast<bool>(s));
+      case domain_t::d_int:    return    any(boost::lexical_cast<int>(s));
+      case domain_t::d_double: return any(boost::lexical_cast<double>(s));
+      case domain_t::d_string: return                              any(s);
+      default:                            throw boost::bad_lexical_cast();
       }
     }
-  }
+
+    ///
+    /// \param[in] s the string to be tested.
+    /// \return \c true if \a s contains a number.
+    ///
+    bool is_number(const std::string &s)
+    {
+      try
+      {
+        boost::lexical_cast<double>(s);
+      }
+      catch(boost::bad_lexical_cast &)
+      {
+        return false;
+      }
+
+      return true;
+    }
+  }  // namespace
 
   ///
   /// New empty data instance.
   ///
-  data::data()
+  data::data() : categories_map_(), classes_map_(), header_(), categories_(),
+                 dataset_(k_sup_dataset), slice_(k_sup_dataset, 0),
+                 active_dataset_(training)
   {
-    clear();
-
     assert(debug());
   }
 
@@ -59,13 +77,13 @@ namespace vita
   /// \param[in] filename name of the file containing the learning collection.
   /// \param[in] verbosity verbosity level (see environment::verbosity for
   ///            further details).
+  ///
   /// New data instance containing the learning collection from \a filename.
   ///
-  data::data(const std::string &filename, unsigned verbosity)
+  data::data(const std::string &filename, unsigned verbosity) : data()
   {
     assert(!filename.empty());
 
-    clear();
     open(filename, verbosity);
 
     assert(debug());
@@ -76,21 +94,7 @@ namespace vita
   ///
   void data::clear()
   {
-    categories_map_.clear();
-    classes_map_.clear();
-
-    header_.clear();
-    categories_.clear();
-
-    for (size_t i(0); i <= k_max_dataset; ++i)
-    {
-      dataset_[i].clear();
-      end_[i] = dataset_[i].end();
-    }
-
-    active_dataset_ = training;
-
-    assert(debug());
+    *this = data();
   }
 
   ///
@@ -121,8 +125,7 @@ namespace vita
   ///
   void data::slice(unsigned n)
   {
-    end_[dataset()] = (n == 0 || n >= size()) ?
-      dataset_[dataset()].end() : std::next(begin(), n);
+    slice_[dataset()] = n;
   }
 
   ///
@@ -136,18 +139,37 @@ namespace vita
   ///
   /// \return a constant reference to the first element of the active dataset.
   ///
-  data::const_iterator data::cbegin() const
+  data::const_iterator data::begin() const
   {
     return dataset_[dataset()].cbegin();
+  }
+
+  ///
+  /// \return a reference to the last+1 (sentry) element of the active
+  ///         dataset.
+  ///
+  data::iterator data::end()
+  {
+    const auto n(slice_[dataset()]);
+
+    if (n == 0 || n > size())
+      return dataset_[dataset()].end();
+
+    return std::next(dataset_[dataset()].begin(), n);
   }
 
   ///
   /// \return a constant reference to the last+1 (sentry) element of the active
   ///         dataset.
   ///
-  data::iterator data::end() const
+  data::const_iterator data::end() const
   {
-    return end_[dataset()];
+    const auto n(slice_[dataset()]);
+
+    if (n == 0 || n > size())
+      return dataset_[dataset()].end();
+
+    return std::next(dataset_[dataset()].begin(), n);
   }
 
   ///
@@ -172,7 +194,7 @@ namespace vita
 
   ///
   /// \param[in] name name of a category.
-  /// \return the index of the \a name category (0 if it doesn't exist ).
+  /// \return the index of the \a name category (0 if it doesn't exist).
   ///
   category_t data::get_category(const std::string &name) const
   {
@@ -212,7 +234,9 @@ namespace vita
   {
     const auto partition_size(std::distance(begin(), end()));
 
-    dataset_[dataset()].sort(f);
+    auto &d(dataset_[dataset()]);
+    std::sort(d.begin(), d.end(), f);
+    //dataset_[dataset()].sort(f);
 
     slice(partition_size);
   }
@@ -229,16 +253,15 @@ namespace vita
     assert(0.0 <= r && r <= 1.0);
 
     // Validation set items are moved to the training set.
-    while (!dataset_[validation].empty())
-    {
-      dataset_[training].push_back(dataset_[validation].front());
-      dataset_[validation].pop_front();
-    }
+    std::move(dataset_[validation].begin(), dataset_[validation].end(),
+              std::back_inserter(dataset_[training]));
+    dataset_[validation].erase(dataset_[validation].begin(),
+                               dataset_[validation].end());
 
     if (r > 0.0)
     {
       // The requested validation examples are selected (the algorithm hint is
-      // due to Kyle Cronin)...
+      // due to Kyle Cronin):
       //
       // > Iterate through and for each element make the probability of
       // >  selection = (number needed)/(number left)
@@ -246,7 +269,7 @@ namespace vita
       // > So if you had 40 items, the first would have a 5/40 chance of being
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
-      // > items, and often you'll have all of them before that".
+      // > items, and often you'll have all of them before that.
       auto available(dataset_[training].size());
 
       const decltype(available) k(available * r);
@@ -332,7 +355,7 @@ namespace vita
   ///
   unsigned data::variables() const
   {
-    const unsigned n(dataset_[dataset()].empty() ? 0 : cbegin()->input.size());
+    const unsigned n(dataset_[dataset()].empty() ? 0 : begin()->input.size());
 
     assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
@@ -421,7 +444,7 @@ namespace vita
       else if (inquotes && c == '"')
       {
         // Quote char.
-        if (linepos+1 < linemax && line[linepos+1] == '"')
+        if (linepos + 1 < linemax && line[linepos + 1] == '"')
         {
           // Encountered 2 double quotes in a row (resolves to 1 double quote).
           curstring.push_back(c);
@@ -456,24 +479,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] s the string to be tested.
-  /// \return \c true if \a s contains a number.
-  ///
-  bool data::is_number(const std::string &s)
-  {
-    try
-    {
-      boost::lexical_cast<double>(s);
-    }
-    catch(boost::bad_lexical_cast &)
-    {
-      return false;
-    }
-
-    return true;
-  }
-
-  ///
   /// \param[in] c1 a category.
   /// \param[in] c2 a category.
   ///
@@ -482,12 +487,14 @@ namespace vita
   ///
   void data::swap_category(category_t c1, category_t c2)
   {
-    assert(c1 < columns());
-    assert(c2 < columns());
+    const auto n_col(columns());
+
+    assert(c1 < n_col);
+    assert(c2 < n_col);
 
     std::swap(categories_[c1], categories_[c2]);
 
-    for (unsigned i(0); i < columns(); ++i)
+    for (auto i(decltype(n_col){0}); i < n_col; ++i)
       if (header_[i].category_id == c1)
         header_[i].category_id = c2;
       else if (header_[i].category_id == c2)
@@ -545,7 +552,7 @@ namespace vita
     // attributes in the header vector. The get_child() function returns a
     // reference to the child at the specified path; if there is no such child
     // IT THROWS.
-    for (ptree::value_type dha : pt.get_child("dataset.header.attributes"))
+    for (auto dha : pt.get_child("dataset.header.attributes"))
       if (dha.first == "attribute")
       {
         bool output(false);
@@ -562,10 +569,8 @@ namespace vita
         // class="yes" attribute in the attribute specification in the header.
         output = dha.second.get("<xmlattr>.class", "no") == "yes";
 
-        std::string xml_type(dha.second.get("<xmlattr>.type", ""));
-
-        std::string category_name(dha.second.get("<xmlattr>.category",
-                                                 xml_type));
+        auto xml_type(dha.second.get("<xmlattr>.type", ""));
+        auto category_name(dha.second.get("<xmlattr>.category", xml_type));
 
         if (output)
         {
@@ -598,7 +603,7 @@ namespace vita
           try
           {
             // Store label1... labelN.
-            for (ptree::value_type l : dha.second.get_child("labels"))
+            for (auto l : dha.second.get_child("labels"))
               if (l.first == "label")
                 categories_[a.category_id].labels.insert(l.second.data());
           }
@@ -629,7 +634,7 @@ namespace vita
     swap_category(category_t(0), header_[0].category_id);
 
     unsigned parsed(0);
-    for (ptree::value_type bi : pt.get_child("dataset.body.instances"))
+    for (auto bi : pt.get_child("dataset.body.instances"))
       if (bi.first == "instance")
       {
         example instance;
@@ -724,57 +729,62 @@ namespace vita
     if (!from)
       return 0;
 
-    bool classification(false);
+    bool classification(false), format(columns());
 
     std::string line;
     while (std::getline(from, line))
     {
-      const std::vector<std::string> record(csvline(line));
-      const unsigned size(columns() ? columns() : record.size());
+      const auto record(csvline(line));
+      const auto fields(record.size());
 
-      if (record.size() == size)
+      // If we don't know the dataset format, the first line will be used to
+      // learn it.
+      if (!format)
+      {
+        classification = !is_number(record[0]);
+
+        header_.reserve(fields);
+
+        for (auto field(decltype(fields){0}); field < fields; ++field)
+        {
+          assert(!size());  // If we have data then data format must be known
+
+          std::string s_domain(is_number(record[field])
+                               ? "numeric"
+                               : "string" +
+                                 boost::lexical_cast<std::string>(field));
+
+          // For classification problems we use discriminant functions, so the
+          // actual output type is always numeric.
+          if (field == 0 && classification)
+            s_domain = "numeric";
+
+          const domain_t domain(s_domain == "numeric" ? domain_t::d_double
+                                                      : domain_t::d_string);
+
+          const column a{"", encode(s_domain, &categories_map_)};
+          if (a.category_id >= categories_.size())
+          {
+            assert(a.category_id == categories_.size());
+            categories_.push_back(category{s_domain, domain, {}});
+          }
+
+          header_.push_back(a);
+        }
+
+        format = true;
+      }  // if (!format)
+
+      if (fields == columns())
       {
         example instance;
 
-        if (!dataset_[dataset()].size())  // No line parsed
-          classification = !is_number(record[0]);
-
-        for (auto field(decltype(size){0}); field < size; ++field)
-        {
-          // The first line is (also) used to learn data format.
-          if (columns() != size)
-          {
-            assert(!dataset_[dataset()].size());
-
-            column a;
-            a.name = "";
-
-            std::string s_domain(is_number(record[field])
-                                 ? "numeric"
-                                 : "string" +
-                                   boost::lexical_cast<std::string>(field));
-            // For classification problems we use discriminant functions, so the
-            // actual output type is always numeric.
-            if (field == 0 && classification)
-              s_domain = "numeric";
-
-            const domain_t domain(s_domain == "numeric" ? d_double : d_string);
-
-            a.category_id = encode(s_domain, &categories_map_);
-            if (a.category_id >= categories_.size())
-            {
-              assert(a.category_id == categories_.size());
-              categories_.push_back(category{s_domain, domain, {}});
-            }
-
-            header_.push_back(a);
-          }
-
+        for (auto field(decltype(fields){0}); field < fields; ++field)
           try
           {
             const category_t c(header_[field].category_id);
 
-            const std::string value(record[field]);
+            const auto value(record[field]);
 
             if (field == 0)  // output value
             {
@@ -798,7 +808,7 @@ namespace vita
             else  // input value
             {
               instance.input.push_back(convert(value, categories_[c].domain));
-              if (categories_[c].domain == d_string)
+              if (categories_[c].domain == domain_t::d_string)
                 categories_[c].labels.insert(value);
             }
           }
@@ -807,7 +817,6 @@ namespace vita
             instance.clear();
             continue;
           }
-        }
 
         if (instance.input.size() + 1 == columns())
           dataset_[dataset()].push_back(instance);
@@ -816,7 +825,7 @@ namespace vita
       }
     }
 
-    return debug() ? dataset_[dataset()].size() : 0;
+    return debug() ? size() : 0;
   }
 
   ///
@@ -920,6 +929,31 @@ namespace vita
     });
 
     const auto &i(map.find(n));
-    return i == map.end() ? d_void : i->second;
+    return i == map.end() ? domain_t::d_void : i->second;
   }
-}  // Namespace vita
+
+  ///
+  /// \param[out] s output stream.
+  /// \param[in] c category to print.
+  /// \return output stream including \a c.
+  ///
+  /// Utility function used for debugging purpose.
+  ///
+  std::ostream &operator<<(std::ostream &s, const data::category &c)
+  {
+    s << c.name << " (domain "
+      << static_cast<std::underlying_type<domain_t>::type>(c.domain);
+
+    if (!c.labels.empty())
+    {
+      s << ", [";
+
+      std::copy(c.labels.begin(), c.labels.end(),
+                std::ostream_iterator<std::string>(s, " "));
+
+      s << "])";
+    }
+
+    return s;
+  }
+}  // namespace vita

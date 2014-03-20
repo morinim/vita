@@ -1,14 +1,13 @@
 /**
- *
- *  \file test_primitive.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011, 2012, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -19,9 +18,11 @@
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE primitive
-#include "boost/test/unit_test.hpp"
+#include <boost/test/unit_test.hpp>
 
 using namespace boost;
+
+constexpr double epsilon(0.00001);
 
 #include "factory_fixture3.h"
 #endif
@@ -31,11 +32,9 @@ BOOST_FIXTURE_TEST_SUITE(primitive_d, F_FACTORY3)
 BOOST_AUTO_TEST_CASE(ABS)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = interpreter<individual>;
+  individual i(env, sset);
 
-  // With a nonconformant C++11 compiler the {1} expression can be changed
-  // with boost::assign::list_of(1).
   BOOST_TEST_CHECKPOINT("ABS(-X) == X");
   std::vector<gene> g(
   {
@@ -43,8 +42,8 @@ BOOST_AUTO_TEST_CASE(ABS)
     {{neg_x, null}}   // [1] -X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(to<std::string>(ret) == to<std::string>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ABS(X) == X");
   g =
@@ -53,8 +52,8 @@ BOOST_AUTO_TEST_CASE(ABS)
     {{    x, null}}   // [1] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 }
 
 BOOST_AUTO_TEST_CASE(ADD)
@@ -71,8 +70,8 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
   g =
@@ -82,8 +81,9 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(y->eval(0)) +
-                        any_cast<double>(x->eval(0)), "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(y->eval(nullptr)) +
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   g =
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{neg_x,   null}}   // [2] -X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
   g =
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    y,   null}}   // [4] Y
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 }
 
 BOOST_AUTO_TEST_CASE(DIV)
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
   g =
@@ -132,8 +132,8 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
   g =
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{    x,   null}}   // [2] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == -1, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), -1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(X,0) == nan");
   g =
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
     {{     x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,1) == X");
   g =
@@ -180,8 +180,8 @@ BOOST_AUTO_TEST_CASE(IDIV)
     {{    c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
   g =
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
     {{     x,   null}}   // [2] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == -1, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), -1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(3,2) == 1");
   g =
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
     {{    c2,   null}}   // [2] 2
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,0) == nan");
   g =
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c1,         null}}   // [2] 1
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
   g =
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE(IFE)
     {{   c1,         null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
   g =
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   };
   static_cast<Z *>(z)->val = 0;
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 }
 
 BOOST_AUTO_TEST_CASE(MAX)
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(MAX)
     {{   c0,   null}}   // [2] 0
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("MAX(0,1) == 1");
   g =
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE(MAX)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1.0, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 }
 
 BOOST_AUTO_TEST_CASE(MUL)
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{   c0,   null}}   // [2] 0
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
   g =
@@ -305,8 +305,8 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
   g =
@@ -318,7 +318,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{   c2,   null}}   // [4] 2
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0.0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 }
 
 BOOST_AUTO_TEST_CASE(SQRT)
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE(SQRT)
     {{    c1, null}}   // [1] 1
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 1, "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("SQRT(-X) == nan");
   g =
@@ -351,20 +351,21 @@ BOOST_AUTO_TEST_CASE(SQRT)
     {{f_sqrt,  {1}}},  // [0] LN 1
     {{     z, null}}   // [1] Z
   };
+  i = i.replace(g);
   for (unsigned j(0); j < 1000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
-    ret = i_interp(i.replace(g)).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
-                          std::sqrt(static_cast<Z *>(z)->val), "\n" << i);
+    ret = i_interp(i).run();
+    BOOST_CHECK_CLOSE(any_cast<double>(ret),
+                      std::sqrt(static_cast<Z *>(z)->val), epsilon);
   }
 }
 
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = interpreter<individual>;
+  individual i(env, sset);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
   std::vector<gene> g(
@@ -374,7 +375,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{    x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
   g =
@@ -384,8 +385,8 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{   c0,   null}}   // [2] 0
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == any_cast<double>(x->eval(0)),
-                        "\n" << i);
+  BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                      any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
   g =
@@ -394,13 +395,16 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{    z,   null}},  // [1] Z
     {{    x,   null}}   // [2] X
   };
-  for (unsigned j(0); j < 1000; ++j)
+
+  for (unsigned j(0); j < 10000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000.0, 1000.0);
     ret = i_interp(i.replace(g)).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
-                          static_cast<Z *>(z)->val -
-                          any_cast<double>(x->eval(0)), "\n" << i);
+
+    const auto v1(any_cast<double>(ret));
+    const auto v2(static_cast<Z *>(z)->val -
+                  any_cast<double>(x->eval(nullptr)));
+    BOOST_CHECK_CLOSE(v1, v2, epsilon);
   }
 }
 
@@ -417,7 +421,7 @@ BOOST_AUTO_TEST_CASE(LN)
     {{  c1, null}}   // [1] 1
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) == 0, "\n" << i);
+  BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("LN(0) == nan");
   g =
@@ -438,8 +442,8 @@ BOOST_AUTO_TEST_CASE(LN)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.1, 1000000.0);
     ret = i_interp(i.replace(g)).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<double>(ret) ==
-                          std::log(static_cast<Z *>(z)->val), "\n" << i);
+    BOOST_REQUIRE_CLOSE(any_cast<double>(ret),
+                        std::log(static_cast<Z *>(z)->val), epsilon);
   }
 }
 

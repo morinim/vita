@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -44,7 +44,7 @@ namespace vita
 
       update_variance(val);
 
-      for (size_t i(0); i < fitness_t::size; ++i)
+      for (unsigned i(0); i < fitness_t::size; ++i)
         val[i] = round_to(val[i]);
       ++freq[val];
     }

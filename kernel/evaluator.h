@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVALUATOR_H)
-#define      EVALUATOR_H
+#if !defined(VITA_EVALUATOR_H)
+#define      VITA_EVALUATOR_H
 
 #include "kernel/fitness.h"
 #include "kernel/lambda_f.h"
@@ -68,10 +68,11 @@ namespace vita
   class random_evaluator : public evaluator<T>
   {
   public:
-    virtual fitness_t operator()(const T &);
+    virtual fitness_t operator()(const T &) override;
   };
 
 #include "kernel/evaluator_inl.h"
+
 }  // namespace vita
 
-#endif  // EVALUATOR_H
+#endif  // Include guard

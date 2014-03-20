@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_STRATEGY_H)
-#define      EVOLUTION_STRATEGY_H
+#if !defined(VITA_EVOLUTION_STRATEGY_H)
+#define      VITA_EVOLUTION_STRATEGY_H
 
 #include "kernel/evolution_recombination.h"
 #include "kernel/evolution_replacement.h"
@@ -46,8 +46,8 @@ namespace vita
   {
   public:
     evolution_strategy(population<T> &pop, evaluator<T> &eva, summary<T> *s)
-      : selection(pop, eva), recombination(pop, eva, s), replacement(pop, eva),
-        pop_(pop), sum_(s)
+      : selection(pop, eva, *s), recombination(pop, eva, s),
+        replacement(pop, eva), pop_(pop), sum_(s)
     {
       assert(s);
     }
@@ -62,19 +62,18 @@ namespace vita
     /// Work to be done at the end of an evolution run.
     virtual void post_bookkeeping() {}
 
-    enum
+    static constexpr bool is_alps
     {
-      is_alps =
-        std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
-        std::is_same<RS<T>, typename vita::replacement::alps<T>>::value
+      std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
+      std::is_same<RS<T>, typename vita::replacement::alps<T>>::value
     };
 
-  public:  // Public data members.
+  public:  // Public data members
     SS<T> selection;
     CS<T> recombination;
     RS<T> replacement;
 
-  protected:  // Protected data members.
+  protected:  // Protected data members
     population<T> &pop_;
     summary<T>    *sum_;
   };
@@ -149,6 +148,7 @@ namespace vita
   };
 
 #include "kernel/evolution_strategy_inl.h"
+
 }  // namespace vita
 
-#endif  // EVOLUTION_STRATEGY_H
+#endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_CONSTANT_H)
-#define      SRC_CONSTANT_H
+#if !defined(VITA_SRC_CONSTANT_H)
+#define      VITA_SRC_CONSTANT_H
 
 #include <boost/lexical_cast.hpp>
 
@@ -42,7 +42,7 @@ namespace vita
     virtual any eval(interpreter<individual> *) const override
     { return any(val_); }
 
-  private:  // Private data members.
+  private:  // Private data members
     T val_;
   };
 
@@ -53,8 +53,7 @@ namespace vita
     explicit constant(const std::string &c, category_t t = 0)
       : terminal("\"" + c + "\"", t, false, false, k_base_weight), val_(c) {}
     explicit constant(const char c[], category_t t = 0)
-      : terminal("\"" + std::string(c) + "\"", t, false, false, k_base_weight),
-        val_(c) {}
+      : constant(std::string(c), t) {}
 
     ///
     /// \return the value of the constant (as a \c any).
@@ -69,4 +68,4 @@ namespace vita
     std::string val_;
   };
 }  // namespace vita
-#endif // SRC_CONSTANT_H
+#endif // Include guard

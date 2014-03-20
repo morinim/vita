@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_EVALUATOR_H)
-#define      SRC_EVALUATOR_H
+#if !defined(VITA_SRC_EVALUATOR_H)
+#define      VITA_SRC_EVALUATOR_H
 
 #include <vector>
 
@@ -248,4 +248,4 @@ namespace vita
 #include "kernel/src/evaluator_inl.h"
 }  // namespace vita
 
-#endif  // SRC_EVALUATOR_H
+#endif  // Include guard

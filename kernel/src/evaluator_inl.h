@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_EVALUATOR_INL_H)
-#define      SRC_EVALUATOR_INL_H
+#if !defined(VITA_SRC_EVALUATOR_INL_H)
+#define      VITA_SRC_EVALUATOR_INL_H
 
 ///
 /// \param[in] d dataset that the evaluator will use.
@@ -99,7 +99,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
   assert(!this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(lambdify(prg));
+  const auto f(lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -107,8 +107,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
   {
     const any res((*f)(example));
     if (!res.empty() &&
-        std::fabs(to<number>(res) -
-                  example.template cast_output<number>()) <= float_epsilon)
+        issmall(to<number>(res) - example.template cast_output<number>()))
       ++ok;
 
     ++total_nr;
@@ -121,7 +120,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 
 ///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
-////               function.
+///                function.
 /// \return the lambda function associated with \a prg (\c nullptr in case of
 ///         errors).
 ///
@@ -134,9 +133,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
@@ -156,7 +153,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   else
     err = std::fabs(to<number>(res) - t.cast_output<number>());
 
-  if (err > float_epsilon)
+  if (!issmall(err))
     ++t.difficulty;
 
   return err;
@@ -164,9 +161,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
 ///         training case \a t. The value returned is in the [0;200] range.
@@ -210,9 +205,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
@@ -233,7 +226,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
     err *= err;
   }
 
-  if (err > float_epsilon)
+  if (!issmall(err))
     ++t.difficulty;
 
   return err;
@@ -241,9 +234,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program. Note that this isn't a constant reference
-///                  because the internal state of agent changes during
-///                  evaluation; anyway this is an input-only parameter.
+///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
 ///         training case \a t.
@@ -255,8 +246,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   const any res(agent(t));
 
   const bool err(res.empty() ||
-                 std::fabs(to<number>(res) -
-                           t.cast_output<number>()) > float_epsilon);
+                 !issmall(to<number>(res) - t.cast_output<number>()));
 
   if (err)
     ++t.difficulty;
@@ -274,13 +264,13 @@ double classification_evaluator<T>::accuracy(const T &prg) const
   assert(this->dat_->classes());
   assert(this->dat_->cbegin() != this->dat_->cend());
 
-  std::unique_ptr<lambda_f<T>> f(this->lambdify(prg));
+  const auto f(this->lambdify(prg));
 
   std::uintmax_t ok(0), total_nr(0);
 
   for (const auto &example : *this->dat_)
   {
-    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example) ==
+    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example).first ==
         example.template tag())
       ++ok;
 
@@ -316,7 +306,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t err(0.0);
   for (auto &example : *this->dat_)
   {
-    const auto probable_class(lambda.tag(example));
+    const auto probable_class(lambda.tag(example).first);
 
     if (probable_class != example.template tag())
     {
@@ -365,20 +355,18 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t d(0.0);
   for (auto &example : *this->dat_)
   {
-    double confidence, sum;
-    const auto probable_class(lambda.tag(example, &confidence, &sum));
+    const auto res(lambda.tag(example));
 
-    if (probable_class == example.template tag())
+    if (res.first == example.template tag())
     {
       // Note:
-      // * (sum - confidence) is the sum of the errors;
-      // * (confidence - sum) is the opposite (standardized fitness);
-      // * (confidence - sum) / (dat_->classes() - 1) is the opposite of the
+      // * (1.0 - confidence) is the sum of the errors;
+      // * (confidence - 1.0) is the opposite (standardized fitness);
+      // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
       //   average error;
       // * (1.0 - confidence) is the uncertainty about the right class;
       // * 0.001 is a scaling factor.
-      d += (confidence - sum) / (this->dat_->classes() - 1) -
-           0.001 * (1.0 - confidence);
+      d += (res.second - 1.0) / (this->dat_->classes() - 1);
     }
     else
     {
@@ -422,7 +410,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   fitness_t::base_t err(0.0);
 
   for (auto &example : dataset)
-    if (example.tag() != agent.tag(example))
+    if (example.tag() != agent.tag(example).first)
     {
       ++example.difficulty;
       ++err;
@@ -444,4 +432,4 @@ std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const
   return make_unique<binary_lambda_f<T>>(ind, *this->dat_);
 }
 
-#endif  // SRC_EVALUATOR_INL_H
+#endif  // Include guard

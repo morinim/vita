@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_PROBLEM_H)
-#define      SRC_PROBLEM_H
+#if !defined(VITA_SRC_PROBLEM_H)
+#define      VITA_SRC_PROBLEM_H
 
 #include <list>
 #include <string>
@@ -24,16 +24,19 @@ namespace vita
   class src_problem : public problem
   {
   public:
-    explicit src_problem(bool = false);
+    src_problem();
+    explicit src_problem(const std::string &, const std::string & = "",
+                         const std::string & = "");
 
-    std::pair<size_t, size_t> load(const std::string &,
-                                   const std::string & = "",
-                                   const std::string & = "");
+    bool operator!() const;
+    std::pair<unsigned, unsigned> load(const std::string &,
+                                       const std::string & = "",
+                                       const std::string & = "");
     size_t load_symbols(const std::string &);
     size_t load_test_set(const std::string &);
     void setup_default_symbols();
 
-    virtual vita::data *data() { return &dat_; }
+    virtual vita::data *data() override { return &dat_; }
 
     virtual void clear(bool) override;
 
@@ -44,18 +47,18 @@ namespace vita
     size_t classes() const;
     size_t variables() const;
 
-    virtual bool debug(bool) const;
+    virtual bool debug(bool) const override;
 
   private:  // Private support methods
     typedef std::vector<category_t> cvect;
 
     std::list<cvect> seq_with_rep(const cvect &, size_t);
     bool compatible(const cvect &, const std::vector<std::string> &) const;
-    void setup_terminals_from_data();
+    void setup_terminals_from_data(const std::set<unsigned> & = {});
 
   private:  // Private data members
     vita::data dat_;
   };
 }  // namespace vita
 
-#endif  // SRC_PROBLEM_H
+#endif  // Include guard

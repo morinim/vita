@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_INL_H)
-#define      EVOLUTION_INL_H
+#if !defined(VITA_EVOLUTION_INL_H)
+#define      VITA_EVOLUTION_INL_H
 
 namespace term
 {
@@ -267,12 +267,12 @@ evolution<T, ES>::run(unsigned run_count)
   bool ext_int(false);
   term::set();
 
-  for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
-  {
 #if defined(CLONE_SCALING)
-    eva_.clear(evaluator<T>::stats);
+  eva_.clear(evaluator<T>::stats);
 #endif
 
+  for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
+  {
     if (shake_data_ && stats_.gen % 4 == 0)
     {
       shake_data_(stats_.gen);
@@ -337,5 +337,4 @@ bool evolution<T, ES>::debug(bool verbose) const
 
   return true;
 }
-#endif  // EVOLUTION_INL_H
-
+#endif  // Include guard

@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(TEAM_INL_H)
-#define      TEAM_INL_H
+#if !defined(VITA_TEAM_INL_H)
+#define      VITA_TEAM_INL_H
 
 ///
 /// \param[in] e base environment.
@@ -56,9 +56,10 @@ team<T>::team(const std::vector<T> &v) : signature_()
 template<class T>
 unsigned team<T>::mutation()
 {
-  const auto p_mutation(env().p_mutation);
-  assert(p_mutation >= 0.0);
-  return mutation(p_mutation);
+  const auto p(env().p_mutation);
+  assert(0 <= p && p <= 1.0);
+
+  return mutation(p);
 }
 
 ///
@@ -72,26 +73,54 @@ template<class T>
 unsigned team<T>::mutation(double p)
 {
   assert(0.0 <= p && p <= 1.0);
-  return random::element(individuals_).mutation(p);
+
+  /*
+  const auto nm(random::element(individuals_).mutation(p));
+  if (nm)
+    signature_.clear();
+
+  return nm;
+  */
+
+  unsigned nm(0);
+  for (auto &i : individuals_)
+    nm += i.mutation(p);
+
+  if (nm)
+    signature_.clear();
+
+  return nm;
 }
 
 ///
-/// \param[in] p the second parent.
+/// \param[in] t the second parent.
 /// \return the result of the crossover (we only generate a single
 ///         offspring).
 ///
 /// \see individual::crossover for further details
 ///
 template<class T>
-team<T> team<T>::crossover(const team<T> &p) const
+team<T> team<T>::crossover(const team<T> &t) const
 {
-  assert(p.debug());
-  assert(size() == p.size());
+  assert(t.debug());
+  assert(individuals() == t.individuals());
 
+/*
   const auto j(random::sup(individuals()));
 
   team<T> offspring(*this);
-  offspring.individuals_[j] = offspring[j].crossover(p[j]);
+  offspring.signature_.clear();
+
+  offspring.individuals_[j] = offspring[j].crossover(t[j]);
+*/
+
+  const auto sup(individuals());
+
+  team<T> offspring(*this);
+  offspring.signature_.clear();
+
+  for (auto i(decltype(sup){0}); i < sup; ++i)
+    offspring.individuals_[i] = offspring[i].crossover(t[i]);
 
   return offspring;
 }
@@ -135,36 +164,18 @@ unsigned team<T>::individuals() const
 }
 
 ///
-/// \return the total size of the team (effective size + introns).
-///
-/// The size is constant for any team (it's choosen at initialization time).
-/// \see eff_size()
-///
-template<class T>
-unsigned team<T>::size() const
-{
-  unsigned s(0);
-
-  for (const auto &i : individuals_)
-    s += i.size();
-
-  return s;
-}
-
-///
 /// \return the effective size of the team.
-/// \see size()
+/// \see team::size()
 ///
 template<class T>
 unsigned team<T>::eff_size() const
 {
-  unsigned ef(0);
+  unsigned es(0);
 
   for (const auto &ind : individuals_)
-    for (VARIABLE_IS_NOT_USED const auto &l : ind)
-      ++ef;
+    es += ind.eff_size();
 
-  return ef;
+  return es;
 }
 
 ///
@@ -200,7 +211,7 @@ hash_t team<T>::hash() const
   hash_t ret;
 
   for (const auto &i : individuals_)
-    ret ^= i.signature();
+    ret.combine(i.signature());
 
   return ret;
 }
@@ -338,7 +349,6 @@ bool team<T>::load(std::istream &in)
 
   // We don't save/load signature: it can be easily calculated on the fly.
   signature_.clear();
-  // signature_ = hash();
 
   return true;
 }
@@ -405,7 +415,11 @@ template<class T>
 void team<T>::in_line(std::ostream &s) const
 {
   for (const auto &i : individuals_)
-    s << '{' << i.in_line(s) << '}';
+  {
+    s << '{';
+    i.in_line(s);
+    s << '}';
+  }
 }
 
 ///
@@ -422,7 +436,7 @@ void team<T>::list(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
-    i.lists(s);
+    i.list(s);
     s << std::endl;
   }
 }
@@ -439,4 +453,4 @@ void team<T>::tree(std::ostream &s) const
     s << std::endl;
   }
 }
-#endif  // TEAM_INL_H
+#endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,11 +29,20 @@ namespace vita
   template<>
   double to<double>(const any &a)
   {
-    return
-      a.type() == typeid(double) ? any_cast<double>(a) :
-      a.type() == typeid(int) ? static_cast<double>(any_cast<int>(a)) :
-      a.type() == typeid(bool) ? static_cast<double>(any_cast<bool>(a)) :
-      0.0;
+    // The pointer form of any_cast uses the nullability of pointers (will
+    // return a null pointer rather than throw if the cast fails).
+    // The alternatives are a.type() == typeid(double)... or try/catch and
+    // both seems inferior.
+    if (auto *p = any_cast<double>(&a))
+      return *p;
+
+    if (auto *p = any_cast<int>(&a))
+      return static_cast<double>(*p);
+
+    if (auto *p = any_cast<bool>(&a))
+      return static_cast<double>(*p);
+
+    return 0.0;
   }
 
   ///
@@ -46,13 +55,15 @@ namespace vita
   template<>
   std::string to<std::string>(const any &a)
   {
-    return
-      a.type() == typeid(double) ?
-      boost::lexical_cast<std::string>(any_cast<double>(a)) :
-      a.type() == typeid(int) ?
-      boost::lexical_cast<std::string>(any_cast<int>(a)) :
-      a.type() == typeid(bool) ?
-      boost::lexical_cast<std::string>(any_cast<bool>(a)) :
-      any_cast<std::string>(a);
+    if (auto *p = any_cast<double>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    if (auto *p = any_cast<int>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    if (auto *p = any_cast<bool>(&a))
+      return boost::lexical_cast<std::string>(*p);
+
+    return any_cast<std::string>(a);
   }
 }  // namespace vita

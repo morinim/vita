@@ -1,18 +1,17 @@
 /**
- *
- *  \file ttable_hash.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(TTABLE_HASH_H)
-#define      TTABLE_HASH_H
+#if !defined(VITA_TTABLE_HASH_H)
+#define      VITA_TTABLE_HASH_H
 
 #include "kernel/vita.h"
 
@@ -134,4 +133,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // TTABLE_HASH_H
+#endif  // Include guard

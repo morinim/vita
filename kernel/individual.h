@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(INDIVIDUAL_H)
-#define      INDIVIDUAL_H
+#if !defined(VITA_INDIVIDUAL_H)
+#define      VITA_INDIVIDUAL_H
 
 #include <cmath>
 #include <functional>
@@ -24,11 +24,10 @@
 #include "kernel/matrix.h"
 #include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  template<class T> class interpreter;
-
   ///
   /// A single member of a \a population. Each individual contains a genome
   /// which represents a possible solution to the task being tackled (i.e. a
@@ -161,22 +160,28 @@ namespace vita
   class individual::const_iterator
   {
   public:
+    typedef std::forward_iterator_tag iterator_category;
+    typedef ptrdiff_t difference_type;
+    typedef individual value_type;
+    typedef const individual * pointer;
+    typedef const individual & reference;
+
     ///
     /// \brief Builds an empty iterator.
     ///
     /// Empty iterator is used as sentry (it is the value returned by
     /// individual::end()).
     ///
-    const_iterator() : ind_(nullptr) {}
+    const_iterator() : loci_(), ind_(nullptr) {}
     explicit const_iterator(const individual &);
 
-    std::set<locus>::iterator operator++();
+    const_iterator &operator++();
 
     ///
     /// \param[in] i2 second term of comparison.
     ///
     /// Returns \c true if iterators point to the same locus or they are both
-    /// empty.
+    /// to the end.
     ///
     bool operator==(const const_iterator &i2) const
     {
@@ -206,7 +211,7 @@ namespace vita
       return &(*loci_.cbegin());
     }
 
-  private:
+  private:  // Private data members
     // A partial set of active loci to be explored.
     std::set<locus> loci_;
 
@@ -235,4 +240,4 @@ namespace vita
   ///
 }  // namespace vita
 
-#endif  // INDIVIDUAL_H
+#endif  // Include guard

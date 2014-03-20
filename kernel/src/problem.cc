@@ -22,13 +22,41 @@
 namespace vita
 {
   ///
-  /// \param[in] initialize if \c true initialize the environment with default
-  ///                       values.
-  /// New empty instance.
+  /// New empty instance of src_problem.
   ///
-  src_problem::src_problem(bool initialize) : problem(initialize)
+  /// \note
+  /// Usually the environment isn't initialized so that the search class would
+  /// choose the best values for the specific problem before starting the
+  /// run (this is how the constructor works).
+  /// Anyway, for debug purpose, we can set up a default environment in a
+  /// second step:
+  ///    src_problem p;
+  ///    p.env = environment(true);
+  ///
+  src_problem::src_problem() : problem()
   {
-    dat_.clear();
+  }
+
+  ///
+  /// \param[in] ds name of the dataset file (training/validation set).
+  /// \param[in] ts name of the test set.
+  /// \param[in] symbols name of the file containing the symbols. If it is
+  ///                    empty, \c src_problem::setup_default_symbols is called.
+  ///
+  /// Initialize the problem with data from the input files.
+  ///
+  src_problem::src_problem(const std::string &ds, const std::string &ts,
+                           const std::string &symbols) : problem()
+  {
+    load(ds, ts, symbols);
+  }
+
+  ///
+  /// \return \c false if the current problem isn't ready for a run.
+  ///
+  bool src_problem::operator!() const
+  {
+    return !dat_.size(data::training) || !sset.enough_terminals();
   }
 
   ///
@@ -39,8 +67,9 @@ namespace vita
   ///
   void src_problem::clear(bool initialize)
   {
-    problem::clear(initialize);
-    dat_.clear();
+    *this = src_problem();
+    if (initialize)
+      env = environment(true);
   }
 
   ///
@@ -52,9 +81,9 @@ namespace vita
   ///
   /// Loads \a data into the active dataset.
   ///
-  std::pair<size_t, size_t> src_problem::load(const std::string &ds,
-                                              const std::string &ts,
-                                              const std::string &symbols)
+  std::pair<unsigned, unsigned> src_problem::load(const std::string &ds,
+                                                  const std::string &ts,
+                                                  const std::string &symbols)
   {
     if (ds.empty())
       return {0, 0};
@@ -62,16 +91,13 @@ namespace vita
     sset = vita::symbol_set();
     dat_.clear();
 
-    const auto n_examples(dat_.open(ds, env.verbosity));
+    const unsigned n_examples(dat_.open(ds, env.verbosity));
 
     if (!ts.empty())
       load_test_set(ts);
 
-    size_t n_symbols(0);
-    if (symbols.empty())
-      setup_default_symbols();
-    else
-      n_symbols = load_symbols(symbols);
+    const unsigned n_symbols(symbols.empty() ? setup_default_symbols(), 0
+                                             : load_symbols(symbols));
 
     return {n_examples, n_symbols};
   }
@@ -93,32 +119,36 @@ namespace vita
   }
 
   ///
+  /// param[in] skip features in this set will be ignored.
+  ///
   /// Inserts into the symbol_set variables and labels for nominal
   /// attributes.
   ///
-  void src_problem::setup_terminals_from_data()
+  void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
   {
     sset = vita::symbol_set();
 
     // Sets up the variables (features).
     const auto columns(dat_.columns());
     for (auto i(decltype(columns){1}); i < columns; ++i)
-    {
-      std::string name(dat_.get_column(i).name);
-      if (name.empty())
-        name = "X" + boost::lexical_cast<std::string>(i);
+      if (skip.find(i) == skip.end())
+      {
+        std::string name(dat_.get_column(i).name);
+        if (name.empty())
+          name = "X" + boost::lexical_cast<std::string>(i);
 
-      const category_t category(dat_.get_column(i).category_id);
-      sset.insert(make_unique<variable>(name, i - 1, category));
-    }
+        const category_t category(dat_.get_column(i).category_id);
+        sset.insert(make_unique<variable>(name, i - 1, category));
+      }
 
     // Sets up the labels for nominal attributes.
-    for (category_t c(0); c < dat_.categories(); ++c)
+    const auto categories(dat_.categories());
+    for (category_t i(0); i < categories; ++i)
     {
-      const data::category &cat(dat_.get_category(c));
+      const auto &category(dat_.get_category(i));
 
-      for (const std::string &label : cat.labels)
-        sset.insert(make_unique<constant<std::string>>(label, c));
+      for (const std::string &label : category.labels)
+        sset.insert(make_unique<constant<std::string>>(label, i));
     }
   }
 
@@ -132,7 +162,8 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    for (category_t category(0); category < dat_.categories(); ++category)
+    const auto sup(dat_.categories());
+    for (category_t category(0); category < sup; ++category)
       if (compatible({category}, {"numeric"}))
       {
         sset.insert(factory.make("1.0", {category}));
@@ -152,6 +183,13 @@ namespace vita
         sset.insert(factory.make("FMOD", {category}));
         sset.insert(factory.make("FSUB", {category}));
       }
+      else if (compatible({category}, {"string"}))
+      {
+        //for (decltype(category) j(0); j < sup; ++j)
+        // if (j != category)
+        //   sset.insert(factory.make("SIFE", {category, j}));
+        sset.insert(factory.make("SIFE", {category, 0}));
+      }
   }
 
   ///
@@ -169,46 +207,44 @@ namespace vita
     size_t parsed(0);
 
     cvect categories(dat_.categories());
-    for (size_t i(0); i < categories.size(); ++i)
+    const auto c_size(categories.size());
+    for (auto i(decltype(c_size){0}); i < c_size; ++i)
       categories[i] = i;
 
     // Load the XML file (sf) into the property tree (pt).
-    using namespace boost::property_tree;
-    ptree pt;
+    boost::property_tree::ptree pt;
     read_xml(sf, pt);
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
-    for (size_t i(0); i < dat_.categories(); ++i)
+    for (auto i(decltype(c_size){0}); i < c_size; ++i)
       std::cout << "[DEBUG] Category " << i << ": "
-                << dat_.get_category(i).name << " (domain "
-                << dat_.get_category(i).domain << ")" << std::endl;
+                << dat_.get_category(i) << std::endl;
     std::cout << std::endl;
 #endif
 
     symbol_factory &factory(symbol_factory::instance());
 
-    for (const ptree::value_type &s : pt.get_child("symbolset"))
+    for (const auto &s : pt.get_child("symbolset"))
       if (s.first == "symbol")
       {
-        const std::string sym_name(s.second.get<std::string>("<xmlattr>.name"));
-        const std::string sym_sig(s.second.get<std::string>(
-                                    "<xmlattr>.signature", ""));
+        const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
+        const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature",
+                                                     ""));
 
         if (sym_sig.empty())
         {
-          for (ptree::value_type sig : s.second)
+          for (const auto &sig : s.second)
             if (sig.first == "signature")
             {
               std::vector<std::string> args;
-              for (ptree::value_type arg : sig.second)
+              for (const auto &arg : sig.second)
                 if (arg.first == "arg")
                   args.push_back(arg.second.data());
 
               // From the list of all the sequences with repetition of
               // args.size() elements (categories)...
-              const std::list<cvect> sequences(seq_with_rep(categories,
-                                                            args.size()));
+              const auto sequences(seq_with_rep(categories, args.size()));
 
               // ...we choose those compatible with the xml signature of the
               // current symbol.
@@ -216,7 +252,6 @@ namespace vita
                 if (compatible(seq, args))
                 {
 #if !defined(NDEBUG)
-                  //const domain_t domain(dat_.get_category(i.back()).domain);
                   std::cout << "[DEBUG] " << sym_name << '(';
                   for (const auto &j : seq)
                     std::cout << dat_.get_category(j).name
@@ -227,7 +262,7 @@ namespace vita
                 }
             }
         }
-        else  // !sym_sig.empty() => one category, uniform symbol initialization
+        else  // !sym_sig.empty() => single category, uniform initialization
         {
           for (category_t category(0); category < dat_.categories(); ++category)
             if (compatible({category}, {sym_sig}))
@@ -270,19 +305,20 @@ namespace vita
   {
     assert(instance.size() == pattern.size());
 
-    for (size_t i(0); i < instance.size(); ++i)
+    const auto sup(instance.size());
+    for (auto i(decltype(sup){0}); i < sup; ++i)
     {
-      bool generic(data::from_weka(pattern[i]) != d_void);
+      const auto p_i(pattern[i]);
+      const bool generic(data::from_weka(p_i) != domain_t::d_void);
 
       if (generic)  // numeric, string, integer...
       {
-        if (dat_.get_category(instance[i]).domain !=
-            data::from_weka(pattern[i]))
+        if (dat_.get_category(instance[i]).domain != data::from_weka(p_i))
           return false;
       }
       else
       {
-        if (instance[i] != dat_.get_category(pattern[i]))
+        if (instance[i] != dat_.get_category(p_i))
           return false;
       }
     }

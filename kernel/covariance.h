@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(COVARIANCE_H)
-#define      COVARIANCE_H
+#if !defined(VITA_COVARIANCE_H)
+#define      VITA_COVARIANCE_H
 
 #include <cmath>
 
@@ -23,10 +23,10 @@ namespace vita
   /// The \a covariance is a measure of how much two random variables change
   /// together. If the greater values of one variable mainly correspond with
   /// the greater values of the other variable, and the same holds for the
-  /// smaller values, i.e. the variables tend to show similar behavior, the
+  /// smaller values, i.e. the variables tend to show similar behaviour, the
   /// covariance is a positive number. In the opposite case, when the greater
   /// values of one variable mainly correspond to the smaller values of the
-  /// other, i.e. the variables tend to show opposite behavior, the covariance
+  /// other, i.e. the variables tend to show opposite behaviour, the covariance
   /// is negative. The sign of the covariance therefore shows the tendency in
   /// the linear relationship between the variables. The magnitude of the
   /// covariance is not that easy to interpret (the normalized version of the
@@ -108,4 +108,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // COVARIANCE_H
+#endif  // Include guard

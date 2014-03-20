@@ -1,14 +1,13 @@
 /**
- *
- *  \file symbol.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <boost/lexical_cast.hpp>
@@ -24,14 +23,14 @@ namespace vita
   ///
   std::string symbol::display() const
   {
-    return display_;
+    return name_;
   }
 
   ///
-  /// \param[in] v
+  /// \param[in] v additional informations regarding parametric symbols.
   /// \return a string representing the symbol.
   ///
-  /// This function is called by parametric symbols only. The \a v argument is
+  /// This function is called for parametric symbols only. The \a v argument is
   /// used to build a more meaningful name for the symbol (i.e. for a numeric
   /// terminal it's better to print 123 than "NUMBER").
   ///
@@ -47,6 +46,6 @@ namespace vita
   ///
   bool symbol::debug() const
   {
-    return display_.size() > 0;
+    return display().size() > 0;
   }
-}  // Namespace vita
+}  // namespace vita

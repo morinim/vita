@@ -1,18 +1,17 @@
 /**
- *
- *  \file individual.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(LOCUS_H)
-#define      LOCUS_H
+#if !defined(VITA_LOCUS_H)
+#define      VITA_LOCUS_H
 
 #include <iostream>
 
@@ -33,7 +32,7 @@ namespace vita
     bool operator==(const locus &) const;
     bool operator!=(const locus &) const;
     bool operator<(const locus &) const;
-    locus operator+(ptrdiff_t) const;
+    locus operator+(int) const;
   };
 
   ///
@@ -75,7 +74,7 @@ namespace vita
   ///         \a i (and not changing category component).
   ///
   inline
-  locus locus::operator+(ptrdiff_t i) const
+  locus locus::operator+(int i) const
   {
     return {index + i, category};
   }
@@ -92,4 +91,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // LOCUS_H
+#endif  // Include guard

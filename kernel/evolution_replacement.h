@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,12 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_REPLACEMENT_H)
-#define      EVOLUTION_REPLACEMENT_H
+#if !defined(VITA_EVOLUTION_REPLACEMENT_H)
+#define      VITA_EVOLUTION_REPLACEMENT_H
 
 #include <vector>
 
-#include "kernel/vita.h"
+#include "kernel/alps.h"
 
 namespace vita {  namespace replacement {
 
@@ -50,7 +50,7 @@ namespace vita {  namespace replacement {
   /// \brief A family competition replacement scheme
   ///
   /// \tparam T type of individual.
-  ///  
+  ///
   /// We assume that the parents would be ones of the members of the population
   /// closest to the new elements. In this way, children compete with their
   /// parents to be included in the population.
@@ -68,7 +68,7 @@ namespace vita {  namespace replacement {
   class family_competition : public strategy<T>
   {
   public:
-    family_competition(population<T> &, evaluator<T> &);
+    using family_competition::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -90,7 +90,7 @@ namespace vita {  namespace replacement {
   class tournament : public strategy<T>
   {
   public:
-    tournament(population<T> &, evaluator<T> &);
+    using tournament::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -117,7 +117,7 @@ namespace vita {  namespace replacement {
   class alps : public strategy<T>
   {
   public:
-    alps(population<T> &, evaluator<T> &);
+    using alps::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
@@ -125,20 +125,22 @@ namespace vita {  namespace replacement {
     void try_move_up_layer(unsigned);
 
   private:  // Private support methods.
-    void try_add_to_layer(unsigned, const T &);
+    unsigned max_age(unsigned) const;
+    bool try_add_to_layer(unsigned, const T &);
   };
 
   template<class T>
   class pareto : public strategy<T>
   {
   public:
-    pareto(population<T> &, evaluator<T> &);
+    using pareto::strategy::strategy;
 
     virtual void run(const std::vector<coord> &, const std::vector<T> &,
                      summary<T> *const) override;
   };
 
 #include "kernel/evolution_replacement_inl.h"
+
 } }  // namespace vita::replacement
 
-#endif  // EVOLUTION_REPLACEMENT_H
+#endif  // Include guard

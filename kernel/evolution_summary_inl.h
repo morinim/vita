@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SUMMARY_INL_H)
-#define      EVOLUTION_SUMMARY_INL_H
+#if !defined(VITA_EVOLUTION_SUMMARY_INL_H)
+#define      VITA_EVOLUTION_SUMMARY_INL_H
 
 ///
 /// Default constructor just call the summary::clear method.
@@ -106,4 +106,4 @@ bool summary<T>::save(std::ostream &out) const
   return out.good();
 }
 
-#endif  // EVOLUTION_SUMMARY_INL
+#endif  // Include guard

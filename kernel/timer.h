@@ -1,18 +1,17 @@
 /**
- *
- *  \file timer.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(TIMER_H)
-#define      TIMER_H
+#if !defined(VITA_TIMER_H)
+#define      VITA_TIMER_H
 
 #include <chrono>
 
@@ -69,8 +68,9 @@ namespace vita
     ///
     double elapsed() const
     {
-      return std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start_).count();
+      return static_cast<double>(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now() - start_).count());
     }
 
   private:
@@ -78,4 +78,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // TIMER_H
+#endif  // Include guard

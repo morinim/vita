@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SEARCH_H)
-#define      SEARCH_H
+#if !defined(VITA_SEARCH_H)
+#define      VITA_SEARCH_H
 
 #include <list>
 
@@ -82,4 +82,4 @@ namespace vita
 #include "kernel/search_inl.h"
 }  // namespace vita
 
-#endif  // SEARCH_H
+#endif  // Include guard

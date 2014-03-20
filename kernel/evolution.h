@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_H)
-#define      EVOLUTION_H
+#if !defined(VITA_EVOLUTION_H)
+#define      VITA_EVOLUTION_H
 
 #include <algorithm>
 #include <csignal>
@@ -47,14 +47,14 @@ namespace vita
 
     bool debug(bool) const;
 
-  private:  // Private support methods.
+  private:  // Private support methods
     const environment &env() const { return pop_.env(); }
     analyzer<T> get_stats() const;
     void log(unsigned) const;
     void print_progress(unsigned, unsigned, bool) const;
     bool stop_condition(const summary<T> &) const;
 
-  private:  // Private data members.
+  private:  // Private data members
     vita::population<T> pop_;
     evaluator<T>       &eva_;
     summary<T>        stats_;
@@ -74,4 +74,4 @@ namespace vita
   ///
 }  // namespace vita
 
-#endif  // EVOLUTION_H
+#endif  // Include guard

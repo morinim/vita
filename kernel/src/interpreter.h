@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SRC_INTERPRETER_H)
-#define      SRC_INTERPRETER_H
+#if !defined(VITA_SRC_INTERPRETER_H)
+#define      VITA_SRC_INTERPRETER_H
 
 #include "kernel/interpreter.h"
 
@@ -36,6 +36,11 @@ namespace vita
       : interpreter<T>(prg, ctx)
     {}
 
+    any run(const std::vector<any> &);
+
+    any fetch_var(unsigned);
+
+  private:  // Private support methods
     // Tells the compiler we want both the run function from interpreter and
     // src_interpreter.
     // Without this statement there will be no any run() function in the scope
@@ -45,15 +50,12 @@ namespace vita
     // different arguments).
     using interpreter<T>::run;
 
-    any run(const std::vector<any> &);
-
-    any fetch_var(unsigned);
-
-  private:
+  private:  // Private data members
     const std::vector<any> *example_;
   };
 
 #include "kernel/src/interpreter_inl.h"
+
 }  // namespace vita
 
-#endif  // SRC_INTERPRETER_H
+#endif  // Include guard

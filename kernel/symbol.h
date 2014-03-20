@@ -10,23 +10,21 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SYMBOL_H)
-#define      SYMBOL_H
+#if !defined(VITA_SYMBOL_H)
+#define      VITA_SYMBOL_H
 
 #include <string>
 
 #include "kernel/any.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  class individual;
-  template<class T> class interpreter;
-
   ///
   /// GP assembles variable length program structures from basic units called
   /// functions and terminals. Functions perform operations on their inputs,
   /// which are either terminals or output from other functions.
-  /// Together functions and terminals are referred to as symbols (or nodes).
+  /// Together functions and terminals are referred to as symbols.
   ///
   class symbol
   {
@@ -64,15 +62,15 @@ namespace vita
 
     virtual bool debug() const;
 
+  public:  // Public data members.
+    /// Weight is used by the symbol_set::roulette method to control the
+    /// probability of extraction of the symbol.
+    unsigned weight;
+
     /// This is the default weight. Weights are used by the
     /// symbol_set::roulette method to control the probability of extraction of
     /// the symbols.
-    enum {k_base_weight = 100};
-
-  public:  // Public data members.
-    /// Weights is used by the symbol_set::roulette method to control the
-    /// probability of extraction of the symbol.
-    unsigned weight;
+    static decltype(weight) constexpr k_base_weight{100};
 
   private:  // Private data members.
     static opcode_t opc_count_;
@@ -81,17 +79,17 @@ namespace vita
 
     category_t category_;
 
-    std::string display_;
+    std::string name_;
   };
 
   ///
-  /// \param[in] dis string used for printing.
+  /// \param[in] name name of the symbol (must be unique).
   /// \param[in] c category of the symbol.
   /// \param[in] w weight (used for random selection).
   ///
   inline
-  symbol::symbol(const std::string &dis, category_t c, unsigned w)
-    : weight(w), opcode_(opc_count_++), category_(c), display_(dis)
+  symbol::symbol(const std::string &name, category_t c, unsigned w)
+    : weight(w), opcode_(opc_count_++), category_(c), name_(name)
   {
     assert(debug());
   }
@@ -132,7 +130,13 @@ namespace vita
   }
 
   ///
-  /// \return the opcode of the symbol (used as primary key).
+  /// \return the opcode of the symbol.
+  ///
+  /// The opcode is a fast way to uniquely identify a symbol and is primarily
+  /// used for hashing.
+  /// The other way to identify a symbol is by its name (std::string). The name
+  /// is often a better way since the opcode of a symbol can vary between
+  /// executions.
   ///
   inline
   opcode_t symbol::opcode() const
@@ -151,4 +155,4 @@ namespace vita
   }
 }  // namespace vita
 
-#endif  // SYMBOL_H
+#endif  // Include guard

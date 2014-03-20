@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013, 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(INTERPRETER_INL_H)
-#define      INTERPRETER_INL_H
+#if !defined(VITA_INTERPRETER_INL_H)
+#define      VITA_INTERPRETER_INL_H
 
 ///
 /// \param[in] p a program to be evaluated.
@@ -36,4 +36,4 @@ bool core_interpreter<T>::debug() const
   return prg_.debug();
 }
 
-#endif  // INTERPRETER_INL_H
+#endif  // Include guard

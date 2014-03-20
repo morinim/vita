@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,7 +75,8 @@ namespace vita
   /// Sets up the object.
   /// The constructor allocates memory for up to \a k_args argument.
   ///
-  symbol_set::symbol_set() : arguments_(gene::k_args)
+  symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(),
+                             by_()
   {
     for (unsigned i(0); i < gene::k_args; ++i)
       arguments_[i] = make_unique<argument>(i);
@@ -113,10 +114,10 @@ namespace vita
 
   ///
   /// \param[in] i symbol to be added.
-  /// \return a raw pointer to the symbol just added (or nullptr in case of
+  /// \return a raw pointer to the symbol just added (or \c nullptr in case of
   ///         error).
   ///
-  /// Adds a new \a symbol to the set. We manage to sort the symbols in
+  /// Adds a new symbol to the set. We manage to sort the symbols in
   /// descending order, with respect to the weight, so the selection algorithm
   /// would run faster.
   ///
@@ -166,19 +167,14 @@ namespace vita
 
       if (delta && all_.adt[i]->weight == 0)
       {
-        for (size_t j(0); j < all_.terminals.size(); ++j)
-          if (all_.terminals[j]->opcode() == all_.adt[i]->opcode())
-          {
-            all_.terminals.erase(all_.terminals.begin() + j);
-            break;
-          }
+        const auto opcode(all_.adt[i]->opcode());
+        const auto adf_opcode([opcode](const symbol *s)
+                               {
+                                 return s->opcode() == opcode;
+                               });
 
-        for (size_t j(0); j < all_.symbols.size(); ++j)
-          if (all_.symbols[j]->opcode() == all_.adt[i]->opcode())
-          {
-            all_.symbols.erase(all_.symbols.begin() + j);
-            break;
-          }
+        erase_if(all_.terminals, adf_opcode);
+        erase_if(all_.symbols, adf_opcode);
       }
     }
 
@@ -286,15 +282,18 @@ namespace vita
   {
     std::set<category_t> need;
 
-    for (size_t i(0); i < all_.symbols.size(); ++i)
-      for (size_t j(0); j < all_.symbols[i]->arity(); ++j)
-        need.insert(function::cast(all_.symbols[i])->arg_category(j));
-
-    for (const auto &cat : need)
+    for (const auto &sym : all_.symbols)
     {
-      const collection &cc(by_.category[cat]);
+      const auto arity(sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
+        need.insert(function::cast(sym)->arg_category(i));
+    }
 
-      if (cat >= categories() || !cc.terminals.size())
+    for (const auto &i : need)
+    {
+      const collection &cc(by_.category[i]);
+
+      if (i >= categories() || !cc.terminals.size())
         return false;
     }
     return true;
@@ -309,14 +308,14 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
-    for (const symbol *s : ss.all_.symbols)
+    for (const auto *s : ss.all_.symbols)
     {
       o << s->display();
 
       const auto arity(s->arity());
       if (arity)
         o << '(';
-      for (size_t j(0); j < arity; ++j)
+      for (auto j(decltype(arity){0}); j < arity; ++j)
         o << function::cast(s)->arg_category(j)
           << (j+1 == arity ? "" : ", ");
       if (arity)
@@ -348,14 +347,9 @@ namespace vita
   ///
   /// New empty collection.
   ///
-  symbol_set::collection::collection()
+  symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
+                                         sum(0)
   {
-    symbols.clear();
-    terminals.clear();
-    adf.clear();
-    adt.clear();
-
-    sum = 0;
   }
 
   ///
@@ -410,10 +404,8 @@ namespace vita
   /// Initialize the struct using collection \a c as input parameter (\a c
   /// should be a collection containing more than one category).
   ///
-  symbol_set::by_category::by_category(const collection &c)
+  symbol_set::by_category::by_category(const collection &c) : category()
   {
-    category.clear();
-
     for (size_t i(0); i < c.symbols.size(); ++i)
     {
       const category_t cat(c.symbols[i]->category());

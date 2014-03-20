@@ -10,16 +10,18 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(EVOLUTION_SELECTION_INL_H)
-#define      EVOLUTION_SELECTION_INL_H
+#if !defined(VITA_EVOLUTION_SELECTION_INL_H)
+#define      VITA_EVOLUTION_SELECTION_INL_H
 
 ///
 /// \param[in] pop current population.
 /// \param[in] eva current evaluator.
+/// \param[in] sum up to date summary of the evolution.
 ///
 template<class T>
-strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva)
-  : pop_(pop), eva_(eva)
+strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
+                      const summary<T> &sum)
+  : pop_(pop), eva_(eva), sum_(sum)
 {
 }
 
@@ -29,11 +31,24 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva)
 template<class T>
 coord strategy<T>::pickup() const
 {
-  if (pop_.layers() == 1)
+  const auto n_layers(pop_.layers());
+
+  if (n_layers == 1)
     return {0, vita::random::sup(pop_.individuals(0))};
 
-  const auto layer(vita::random::sup(pop_.layers()));
-  return {layer, vita::random::sup(pop_.individuals(layer))};
+  // If we have multiple layers we cannot be sure that every layer has the
+  // same number of individuals. So the simple (and faster) solution:
+  //
+  //   const auto l(vita::random::sup(n_layers));
+  //
+  // would not be appropriate.
+  std::vector<unsigned> s(n_layers);
+  for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
+    s[l] = pop_.individuals(l);
+
+  std::discrete_distribution<unsigned> dd(s.begin(), s.end());
+  const auto l(dd(vita::random::engine()));
+  return {l, vita::random::sup(pop_.individuals(l))};
 }
 
 ///
@@ -69,16 +84,6 @@ coord strategy<T>::pickup(unsigned l, double p) const
     --l;
 
   return {l, vita::random::sup(pop_.individuals(l))};
-}
-
-///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-tournament<T>::tournament(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
 }
 
 ///
@@ -136,13 +141,18 @@ std::vector<coord> tournament<T>::run()
 }
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
+/// \param[in] c the coordinates of an individual.
+/// \return \c true if the individual at coordinates \c is too old for his
+///         layer.
+///
+/// This is just a convenience method to save some keystroke.
 ///
 template<class T>
-alps<T>::alps(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
+bool alps<T>::aged(coord c) const
 {
+  return this->pop_[c].age() >
+         vita::alps::max_age(c.layer, this->pop_.layers(),
+                             this->pop_.env().alps.age_gap);
 }
 
 ///
@@ -159,8 +169,8 @@ std::vector<coord> alps<T>::run()
   auto c1(this->pickup(layer));
 
   typedef std::pair<bool, fitness_t> age_fit_t;
-  age_fit_t age_fit0{!pop.aged(c0), this->eva_(pop[c0])};
-  age_fit_t age_fit1{!pop.aged(c1), this->eva_(pop[c1])};
+  age_fit_t age_fit0{!aged(c0), this->eva_(pop[c0])};
+  age_fit_t age_fit1{!aged(c1), this->eva_(pop[c1])};
 
   if (age_fit0 < age_fit1)
   {
@@ -176,7 +186,7 @@ std::vector<coord> alps<T>::run()
   while (rounds--)
   {
     const auto tmp(this->pickup(layer, same_layer_p));
-    const age_fit_t tmp_age_fit{!pop.aged(tmp), this->eva_(pop[tmp])};
+    const age_fit_t tmp_age_fit{!aged(tmp), this->eva_(pop[tmp])};
 
     if (age_fit0 < tmp_age_fit)
     {
@@ -192,12 +202,12 @@ std::vector<coord> alps<T>::run()
       age_fit1 = tmp_age_fit;
     }
 
-    assert(age_fit0.first == !pop.aged(c0));
-    assert(age_fit1.first == !pop.aged(c1));
+    assert(age_fit0.first == !aged(c0));
+    assert(age_fit1.first == !aged(c1));
     assert(age_fit0.second == this->eva_(pop[c0]));
     assert(age_fit1.second == this->eva_(pop[c1]));
     assert(age_fit0 >= age_fit1);
-    assert(!pop.aged(c0) || pop.aged(c1));
+    assert(!aged(c0) || aged(c1));
     assert(layer <= c0.layer + 1);
     assert(layer <= c1.layer + 1);
     assert(c0.layer <= layer);
@@ -208,13 +218,73 @@ std::vector<coord> alps<T>::run()
 }
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
+/// \return a vector of coordinates of individuals with fitness nearest to a
+///         random fitness value.
+///
+/// A random fitness value is chosen in the interval \f$[f_min, f_max]\f$,
+/// where \f$f_max\f$ and \f$f_min\f$ are the maximum and minimum fitness value
+/// in the current population.
+/// Then we round a tournament to find the individuals with fitness neares to
+/// this random value.
+/// While the probability of selection each fitness level is equal,
+/// the probability of then selecting a given individual within a fitness level
+/// depends on the population of that level.
 ///
 template<class T>
-pareto<T>::pareto(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
+std::vector<coord> fuss<T>::run()
 {
+  const auto &pop(this->pop_);
+
+  const auto rounds(pop.env().tournament_size);
+  assert(rounds);
+
+  const auto min(this->sum_.az.fit_dist().min);
+  const auto max(this->sum_.az.fit_dist().max);
+  auto level(max - min);
+
+  for (unsigned i(0); i < decltype(level)::size; ++i)
+  {
+    const auto base(std::min(min[i], max[i]));
+    const auto delta(std::fabs(level[i]));
+
+    level[i] = base + vita::random::between<decltype(base)>(-0.5, delta + 0.5);
+
+    assert(std::min(min[i], max[i]) - 0.5 <= level[i]);
+    assert(level[i] <= std::max(min[i], max[i]) + 0.5);
+  }
+
+  std::vector<coord> ret(rounds);
+
+  // This is the inner loop of an insertion sort algorithm. It is simple,
+  // fast (if rounds is small) and doesn't perform too much comparisons.
+  // DO NOT USE std::sort it is way slower.
+  for (unsigned i(0); i < rounds; ++i)
+  {
+    const auto new_coord(this->pickup());
+    const auto new_fit(this->eva_(pop[new_coord]));
+
+    unsigned j(0);
+
+    // Where is the insertion point?
+    while (j < i &&
+           level.distance(new_fit) > level.distance(this->eva_(pop[ret[j]])))
+      ++j;
+
+    // Shift right elements after the insertion point.
+    for (auto k(j); k < i; ++k)
+      ret[k + 1] = ret[k];
+
+    ret[j] = new_coord;
+  }
+
+#if !defined(NDEBUG)
+  const auto size(ret.size());
+  for (auto i(decltype(size){1}); i < size; ++i)
+    assert(level.distance(this->eva_(pop[ret[i - 1]])) <=
+           level.distance(this->eva_(pop[ret[i]])));
+#endif
+
+  return ret;
 }
 
 ///
@@ -301,16 +371,6 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 }
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-///
-template<class T>
-random<T>::random(const population<T> &pop, evaluator<T> &eva)
-  : strategy<T>(pop, eva)
-{
-}
-
-///
 /// \return a vector of coordinates of randomly chosen individuals.
 ///
 /// Parameters from the environment:
@@ -333,4 +393,4 @@ std::vector<coord> random<T>::run()
 
   return ret;
 }
-#endif  // EVOLUTION_SELECTION_INL_H
+#endif  // Include guard

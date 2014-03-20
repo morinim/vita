@@ -10,15 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(TTABLE_H)
-#define      TTABLE_H
+#if !defined(VITA_TTABLE_H)
+#define      VITA_TTABLE_H
 
 #include "kernel/environment.h"
 
 namespace vita
 {
-  class individual;
-
   ///
   /// This is a 128bit stream used as individual signature / hash table
   /// look up key.
@@ -40,9 +38,16 @@ namespace vita
     bool operator!=(hash_t h) const
     { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
-    /// Used to combine multiple hashes.
-    hash_t operator^=(hash_t h)
-    { data[0] ^= h.data[0]; data[1] ^= h.data[1]; return *this; }
+    /// \brief Used to combine multiple hashes
+    ///
+    /// \note
+    /// In spite of its handy bit-mixing properties, XOR is not a good way to
+    /// combine hashes due to its commutativity.
+    void combine(hash_t h)
+    {
+      data[0] += 11 * h.data[0];
+      data[1] += 13 * h.data[1];
+    }
 
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !data[0] && !data[1]; }
@@ -58,9 +63,9 @@ namespace vita
 
 
   ///
-  /// \a ttable \c class implements a hash table that links individuals to
-  /// fitness (it's used by the \a evaluator_proxy \c class).
-  /// The key used for table lookup is the individual's signature.
+  /// \a ttable \c class implements a hash table that links individuals'
+  /// signature to fitness (it's used by the \a evaluator_proxy \c class).
+  ///
   /// During the evolution semantically equivalent (but syntactically distinct)
   /// individuals are often generated and \a ttable could give a significant
   /// speed improvement avoiding the recalculation of shared information.
@@ -69,18 +74,19 @@ namespace vita
   {
   public:
     explicit ttable(unsigned);
+
     ~ttable();
 
     void clear();
-    void clear(const individual &);
+    void clear(const hash_t &);
 #if defined(CLONE_SCALING)
     void reset_seen();
 #endif
 
-    void insert(const individual &, const fitness_t &);
+    void insert(const hash_t &, const fitness_t &);
 
-    bool find(const individual &, fitness_t *const) const;
-    unsigned seen(const individual &) const;
+    bool find(const hash_t &, fitness_t *const) const;
+    unsigned seen(const hash_t &) const;
 
     /// \return number of searches in the hash table
     /// Every call to the \c find method increment the counter.
@@ -90,6 +96,10 @@ namespace vita
     std::uintmax_t hits() const { return hits_; }
 
     bool debug() const;
+
+    // Class has pointer data members so disabling the copy constructor /
+    // \c operator=() is a good idea (see "Effective C++").
+    DISALLOW_COPY_AND_ASSIGN(ttable);
 
   public:   // Serialization.
     bool load(std::istream &);
@@ -138,4 +148,4 @@ namespace vita
   /// Performs a speed test on the transposition table (insert-find cycle).
 }  // namespace vita
 
-#endif  // TTABLE_H
+#endif  // Include guard

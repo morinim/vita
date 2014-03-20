@@ -10,15 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/algorithm/string.hpp>
-#include <boost/program_options.hpp>
-
-namespace po = boost::program_options;
-
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <string>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
 
 #include "kernel/environment.h"
 #include "kernel/src/evaluator.h"
@@ -27,6 +25,8 @@ namespace po = boost::program_options;
 #include "kernel/src/search.h"
 
 #include "command_line_interpreter.h"
+
+namespace po = boost::program_options;
 
 namespace
 {
@@ -147,7 +147,7 @@ namespace ui
   unsigned runs(1);
 
   // Active evaluator.
-  vita::evaluator_id eva(vita::k_sup_evaluator);
+  vita::evaluator_id eva(vita::evaluator_id::undefined);
   std::string eva_args;
 
   /// Reference problem (the problem we will work on).
@@ -309,19 +309,19 @@ namespace ui
 
     bool ok(true);
     if (keyword == "count")
-      eva = vita::k_count_evaluator;
+      eva = vita::evaluator_id::count;
     else if (keyword == "mae")
-      eva = vita::k_mae_evaluator;
+      eva = vita::evaluator_id::mae;
     else if (keyword == "rmae")
-      eva = vita::k_rmae_evaluator;
+      eva = vita::evaluator_id::rmae;
     else if (keyword == "mse")
-      eva = vita::k_mse_evaluator;
+      eva = vita::evaluator_id::mse;
     else if (keyword == "binary")
-      eva = vita::k_bin_evaluator;
+      eva = vita::evaluator_id::bin;
     else if (keyword == "dynslot")
-      eva = vita::k_dyn_slot_evaluator;
+      eva = vita::evaluator_id::dyn_slot;
     else if (keyword == "gaussian")
-      eva = vita::k_gaussian_evaluator;
+      eva = vita::evaluator_id::gaussian;
     else
       ok = false;
 
@@ -373,7 +373,7 @@ namespace ui
 
         vita::src_search<vita::individual, vita::alps_es> s(problem);
 
-        if (eva < vita::k_sup_evaluator)
+        if (eva != vita::evaluator_id::undefined)
           s.set_evaluator(eva, eva_args);
 
         s.run(runs);
@@ -976,7 +976,7 @@ int main(int argc, char *const argv[])
        "quit the program");
     ui::cmdl_opt.add(interf);
 
-    boost::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
+    vita::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
     cli.interpret(std::cin);
   }
 

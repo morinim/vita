@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(TERMINAL_H)
-#define      TERMINAL_H
+#if !defined(VITA_TERMINAL_H)
+#define      VITA_TERMINAL_H
 
 #include "kernel/symbol.h"
 
@@ -54,10 +54,10 @@ namespace vita
 
     virtual bool debug() const override;
 
-  private:  // Private data members.
+  private:  // Private data members
     const bool parametric_;
     const bool      input_;
   };
 }  // namespace vita
 
-#endif  // TERMINAL_H
+#endif  // Include guard

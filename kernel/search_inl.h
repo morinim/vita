@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(SEARCH_INL_H)
-#define      SEARCH_INL_H
+#if !defined(VITA_SEARCH_INL_H)
+#define      VITA_SEARCH_INL_H
 
 ///
 /// \param[in] prob a \c problem used for search initialization.
@@ -128,10 +128,9 @@ void search<T, ES>::arl(const U &base)
 ///
 template<class T, template<class> class ES>
 template<class U>
-void search<T, ES>::arl(const team<U> &base)
+void search<T, ES>::arl(const team<U> &)
 {
-  for (const auto &ind : base)
-    arl(ind);
+
 }
 
 ///
@@ -432,7 +431,7 @@ void search<T, ES>::print_resume(bool validation, const fitness_t &fitness,
 template<class T, template<class> class ES>
 T search<T, ES>::run(unsigned n)
 {
-  assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
+  //assert(env_.f_threashold != vita::fitness_t() || env_.a_threashold > 0.0);
 
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -657,4 +656,4 @@ bool search<T, ES>::debug(bool verbose) const
 {
   return prob_->debug(verbose);
 }
-#endif  // SEARCH_INL_H
+#endif  // Include guard

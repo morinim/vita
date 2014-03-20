@@ -1,18 +1,20 @@
 /**
- *
- *  \file gene_inl.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
-#if !defined(GENE_INL_H)
-#define      GENE_INL_H
+#if !defined(VITA_GENE_INL_H)
+#define      VITA_GENE_INL_H
+
+template<unsigned K>
+constexpr decltype(K) basic_gene<K>::k_args;
 
 ///
 /// \param[in] t a terminal.
@@ -53,7 +55,11 @@ basic_gene<K>::basic_gene(
     const auto arity(sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
-      assert(g.second[i] <= type_max(args[0]));
+#if !defined(NDEBUG)
+      typedef typename std::remove_reference<decltype(args[0])>::type
+        ARRAY_ELEM_TYPE;
+      assert(g.second[i] <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+#endif
       args[i] = g.second[i];
     }
   }
@@ -107,4 +113,16 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
 
   return true;
 }
-#endif  // GENE_INL_H
+
+///
+/// \param[out] s output stream.
+/// \param[in] g gene to print.
+/// \return output stream including \a g.
+///
+template<unsigned K>
+std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
+{
+  return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+}
+
+#endif  // Include guard

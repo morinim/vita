@@ -1,14 +1,13 @@
 /**
- *
- *  \file factory.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include "kernel/src/primitive/factory.h"
@@ -80,12 +79,13 @@ namespace vita
     catch(boost::bad_lexical_cast &)  // not a number
     {
       if (s == "{TRUE}" || s == "{FALSE}")
-        return d_bool;
+        return domain_t::d_bool;
 
-      return d_string;
+      return domain_t::d_string;
     }
 
-    return s.find('.') == std::string::npos ? d_int : d_double;
+    return s.find('.') == std::string::npos ? domain_t::d_int
+                                            : domain_t::d_double;
   }
 
   ///
@@ -145,13 +145,13 @@ namespace vita
 
     switch (find_domain(k))
     {
-    case d_bool:
+    case domain_t::d_bool:
       return make_unique<constant<bool>>(k, c1);
-    case d_double:
+    case domain_t::d_double:
       return make_unique<constant<double>>(k, c1);
-    case d_int:
+    case domain_t::d_int:
       return make_unique<constant<int>>(k, c1);
-    case d_string:
+    case domain_t::d_string:
       return make_unique<constant<std::string>>(name, c1);
     default:
       return nullptr;
@@ -170,13 +170,13 @@ namespace vita
   std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
                                                category_t c)
   {
-    assert(d == d_double || d == d_int);
+    assert(d == domain_t::d_double || d == domain_t::d_int);
 
     switch (d)
     {
-    case d_double:
+    case domain_t::d_double:
       return make_unique<dbl::number>(c, min, max);
-    case d_int:
+    case domain_t::d_int:
       return make_unique<integer::number>(c, min, max);
     default:
       return nullptr;

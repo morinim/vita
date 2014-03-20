@@ -10,10 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(DATA_H)
-#define      DATA_H
+#if !defined(VITA_DATA_H)
+#define      VITA_DATA_H
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>
@@ -44,23 +43,24 @@ namespace vita
     struct category;
 
     /// example *
-    typedef typename std::list<example>::iterator iterator;
+    typedef typename std::vector<example>::iterator iterator;
     /// const example *
-    typedef typename std::list<example>::const_iterator const_iterator;
+    typedef typename std::vector<example>::const_iterator const_iterator;
+
+    enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
   public:  // Construction, convenience
     data();
     explicit data(const std::string &, unsigned = 0);
 
-    enum dataset_t {training = 0, validation, test, k_max_dataset = test};
     void dataset(dataset_t);
     dataset_t dataset() const;
     void slice(unsigned);
 
     iterator begin();
-    const_iterator cbegin() const;
-    iterator end() const;
-    const_iterator cend() const { return end(); }
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
     unsigned size() const;
     unsigned size(dataset_t) const;
 
@@ -90,7 +90,6 @@ namespace vita
   private: // Private support methods
     template<class T> static T encode(const std::string &,
                                       std::map<std::string, T> *);
-    static bool is_number(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
@@ -127,10 +126,10 @@ namespace vita
     /// The user provides a dataset and (optionally) a test set. Training set
     /// and validation set are automatically created from the dataset
     /// (see environment::validation_ratio).
-    std::list<example> dataset_[k_max_dataset + 1];
+    std::vector<std::vector<example>> dataset_;
 
-    /// Used to select a subset of the active dataset.
-    data::iterator end_[k_max_dataset + 1];
+    /// Used to keep track of subset of the dataset.
+    std::vector<unsigned> slice_;
 
     /// Used to choose the data we want to operate on (training / validation
     /// set).
@@ -153,7 +152,8 @@ namespace vita
   ///
   struct data::example
   {
-    example() { clear(); }
+    example() : input(), output(any()), d_output(domain_t::d_void),
+                difficulty(0), age(0) {}
 
     std::vector<any> input;
     any             output;
@@ -165,14 +165,7 @@ namespace vita
     class_tag_t tag() const { return any_cast<class_tag_t>(output); }
     template<class T> T cast_output() const;
 
-    void clear()
-    {
-      input.clear();
-      output = any();
-      d_output = d_void;
-      difficulty = 0;
-      age = 0;
-    }
+    void clear() { *this = example(); }
   };
 
   template<class T>
@@ -180,10 +173,10 @@ namespace vita
   {
     switch (d_output)
     {
-    case d_bool:    return static_cast<T>(any_cast<bool>(output));
-    case d_int:     return static_cast<T>(any_cast<int>(output));
-    case d_double:  return static_cast<T>(any_cast<double>(output));
-    default:        return static_cast<T>(0.0);
+    case domain_t::d_bool:    return static_cast<T>(any_cast<bool>(output));
+    case domain_t::d_int:     return static_cast<T>(any_cast<int>(output));
+    case domain_t::d_double:  return static_cast<T>(any_cast<double>(output));
+    default:                  return static_cast<T>(0.0);
     }
   }
 
@@ -223,6 +216,8 @@ namespace vita
     domain_t              domain;
     std::set<std::string> labels;
   };
+
+  std::ostream &operator<<(std::ostream &, const data::category &);
 }  // namespace vita
 
-#endif  // DATA_H
+#endif  // Include guard

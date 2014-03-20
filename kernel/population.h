@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011, 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(POPULATION_H)
-#define      POPULATION_H
+#if !defined(VITA_POPULATION_H)
+#define      VITA_POPULATION_H
 
 #include <fstream>
 #include <vector>
@@ -32,6 +32,7 @@ namespace vita
 
     bool operator==(coord c) const
     { return layer == c.layer && index == c.index; }
+    bool operator!=(coord c) const { return !(*this == c); }
   };
 
   ///
@@ -51,7 +52,7 @@ namespace vita
     typedef std::vector<T> layer_t;
     typedef typename std::vector<layer_t>::const_iterator const_iterator;
 
-    explicit population(const environment &, const symbol_set &);
+    population(const environment &, const symbol_set &);
 
     T &operator[](coord);
     const T &operator[](coord) const;
@@ -59,6 +60,7 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
+    unsigned allowed(unsigned) const;
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
@@ -67,9 +69,9 @@ namespace vita
     void add_layer();
     unsigned layers() const;
     void inc_age();
-    unsigned max_age(unsigned) const;
-    bool aged(coord) const;
     void add_to_layer(unsigned, const T &);
+    void pop_from_layer(unsigned);
+    void set_allowed(unsigned, unsigned);
 
     const environment &env() const;
 
@@ -81,6 +83,7 @@ namespace vita
 
   private:  // Private data members.
     std::vector<layer_t> pop_;
+    std::vector<unsigned> allowed_;
   };
 
 #include "kernel/population_inl.h"
@@ -91,4 +94,4 @@ namespace vita
   ///
 }  // namespace vita
 
-#endif  // POPULATION_H
+#endif  // Include guard
