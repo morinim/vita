@@ -33,8 +33,7 @@ namespace vita
 
     static unsigned ring(unsigned, unsigned, unsigned);
 
-    static bool boolean(double);
-    static bool boolean();
+    static bool boolean(double = 0.5);
 
     static void seed(unsigned);
     void randomize();
@@ -185,16 +184,6 @@ namespace vita
     return d(engine(), parm_t{p});
 
     //return random::between<double>(0, 1) < p;
-  }
-
-  ///
-  /// \return \c true 50% times.
-  ///
-  inline
-  bool random::boolean()
-  {
-    return boolean(0.5);
-    //return random::between<unsigned>(0, 2) != 0;
   }
 }  // namespace vita
 
