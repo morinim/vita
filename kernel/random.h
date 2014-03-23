@@ -39,10 +39,19 @@ namespace vita
     static void seed(unsigned);
     void randomize();
 
-    // This engine produces integers in the range [0, 2^32-1] with a good
-    // uniform distribution in up to 623 dimensions.
+    // The Mersenne Twister engine produces integers with a good
+    // uniform distribution.
+    // std::mt19937 and std::mt19937_64 are similar. There aren't
+    // memory consumption differences and speed is almost equal.
+    // Warning: checking for sizeof(int) <= 4 is perhaps not a very
+    // portable way since on a 64-bit Windows machine, GCC (MinGW)
+    // x64 compiler gives sizeof(int) = sizeof(long) = 4. So we use
+    // void *.
+    // typedef std::conditional<sizeof(void *) <= 4,
+    //                          std::mt19937,
+    //                          std::mt19937_64>::type engine_t;
     typedef std::mt19937 engine_t;
-
+    
     static engine_t &engine();
   };
 
