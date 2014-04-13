@@ -155,13 +155,13 @@ namespace vita
   std::ostream &operator<<(std::ostream &, const individual &);
 
   ///
-  /// \brief Iterator to scan the active genes of an \c individual.
+  /// \brief Iterator to scan the active genes of an \c individual
   ///
   class individual::const_iterator
   {
   public:
     typedef std::forward_iterator_tag iterator_category;
-    typedef ptrdiff_t difference_type;
+    typedef std::ptrdiff_t difference_type;
     typedef individual value_type;
     typedef const individual * pointer;
     typedef const individual & reference;

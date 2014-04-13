@@ -14,11 +14,11 @@
 #define      VITA_DATA_H
 
 #include <map>
-#include <set>
 #include <string>
 #include <vector>
 
 #include "kernel/any.h"
+#include "kernel/category_set.h"
 #include "kernel/distribution.h"
 
 namespace vita
@@ -40,7 +40,6 @@ namespace vita
   public:  // Structures and typedef
     struct example;
     struct column;
-    struct category;
 
     /// example *
     typedef typename std::vector<example>::iterator iterator;
@@ -72,11 +71,10 @@ namespace vita
     void divide(double);
     void sort(std::function<bool (const example &, const example &)>);
 
-    category_t get_category(const std::string &) const;
-    const category &get_category(category_t) const;
+    const category_set &categories() const;
+
     const column &get_column(unsigned) const;
 
-    unsigned categories() const;
     unsigned classes() const;
     unsigned columns() const;
     unsigned variables() const;
@@ -102,15 +100,14 @@ namespace vita
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
-    std::map<std::string, category_t> categories_map_;
-    std::map<std::string, class_tag_t>   classes_map_;
+    std::map<std::string, class_tag_t> classes_map_;
 
     /// How is the dataset organized? Sometimes we have a dataset header (XRFF
     /// file format), other times it has to be implicitly derived (e.g. CSV).
     std::vector<column> header_;
 
     /// What are the categories we are dealing with?
-    std::vector<category> categories_;
+    category_set categories_;
 
     /// Data are stored in three datasets:
     /// * a training set used directly for learning;
@@ -188,36 +185,6 @@ namespace vita
     std::string       name;
     category_t category_id;
   };
-
-  ///
-  /// \brief Informations about a category of the dataset
-  ///
-  /// For example:
-  ///
-  ///     <attribute type="nominal">
-  ///       <labels>
-  ///         <label>Iris-setosa</label>
-  ///         <label>Iris-versicolor</label>
-  ///         <label>Iris-virginica</label>
-  ///       </labels>
-  ///     </attribute>
-  ///
-  /// is mapped to category:
-  /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
-  ///
-  /// while
-  ///     <attribute type="numeric" category="A" name="Speed" />
-  /// is mapped to category:
-  /// * {"A", d_double, {}}
-  ///
-  struct data::category
-  {
-    std::string             name;
-    domain_t              domain;
-    std::set<std::string> labels;
-  };
-
-  std::ostream &operator<<(std::ostream &, const data::category &);
 }  // namespace vita
 
 #endif  // Include guard

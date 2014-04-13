@@ -10,8 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <algorithm>
-
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -66,7 +64,7 @@ namespace vita
   ///
   /// New empty data instance.
   ///
-  data::data() : categories_map_(), classes_map_(), header_(), categories_(),
+  data::data() : classes_map_(), header_(), categories_(),
                  dataset_(k_sup_dataset), slice_(k_sup_dataset, 0),
                  active_dataset_(training)
   {
@@ -193,26 +191,12 @@ namespace vita
   }
 
   ///
-  /// \param[in] name name of a category.
-  /// \return the index of the \a name category (0 if it doesn't exist).
+  /// \return a const reference to the set of categories associated with the
+  ///         dataset.
   ///
-  category_t data::get_category(const std::string &name) const
+  const category_set &data::categories() const
   {
-    const auto cat(categories_map_.find(name));
-
-    assert(cat == categories_map_.end() || cat->second < categories_.size());
-
-    return cat == categories_map_.end() ? 0 : cat->second;
-  }
-
-  ///
-  /// \param[in] i index of a category.
-  /// \return a const reference to the i-th category.
-  ///
-  const data::category &data::get_category(category_t i) const
-  {
-    assert(i < categories_.size());
-    return categories_[i];
+    return categories_;
   }
 
   ///
@@ -294,35 +278,6 @@ namespace vita
 
       assert(!needed);
     }
-  }
-
-  ///
-  /// \return number of categories of the problem (>= 1).
-  ///
-  /// \attention
-  /// please note that the value categories() returns may differ from the
-  /// intuitive number of categories of the dataset (it can be 1 unit smaller).
-  /// For instance consider the simple Iris classification problem:
-  ///
-  ///     ...
-  ///     <attribute class="yes" name="class" type="nominal">
-  ///       <labels>
-  ///         <label>Iris-setosa</label> ... <label>Iris-virginica</label>
-  ///       </labels>
-  ///     </attribute>
-  ///     <attribute name="sepallength" type="numeric" />
-  ///     ...
-  /// It has a nominal attribute to describe output classes and four numeric
-  /// attributes as inputs. So there are two distinct attribute types
-  /// (nominal and numeric), i.e. two categories.
-  /// But... categories() would return 1.
-  /// This happens because the genetic programming algorithm for classification
-  /// we use (based on a discriminant function) doesn't manipulate (skips) the
-  /// output category (it only uses the number of output classes).
-  ///
-  unsigned data::categories() const
-  {
-    return categories_.size();
   }
 
   ///
@@ -492,7 +447,7 @@ namespace vita
     assert(c1 < n_col);
     assert(c2 < n_col);
 
-    std::swap(categories_[c1], categories_[c2]);
+    categories_.swap(c1, c2);
 
     for (auto i(decltype(n_col){0}); i < n_col; ++i)
       if (header_[i].category_id == c1)
@@ -590,14 +545,8 @@ namespace vita
           }
         }
 
-        a.category_id = encode(category_name, &categories_map_);
-
-        if (a.category_id >= categories_.size())
-        {
-          assert(a.category_id == categories_.size());
-          categories_.push_back(category{category_name, from_weka(xml_type),
-                                         {}});
-        }
+        a.category_id = categories_.insert({category_name, from_weka(xml_type),
+                                            {}});
 
         if (xml_type == "nominal")
           try
@@ -605,7 +554,7 @@ namespace vita
             // Store label1... labelN.
             for (auto l : dha.second.get_child("labels"))
               if (l.first == "label")
-                categories_[a.category_id].labels.insert(l.second.data());
+                categories_.add_label(a.category_id, l.second.data());
           }
           catch(...)
           {
@@ -644,8 +593,8 @@ namespace vita
           if (v->first == "value")
             try
             {
-              const domain_t domain(
-                categories_[header_[index].category_id].domain);
+              const auto domain(
+                categories_.find(header_[index].category_id).domain);
 
               const std::string value(v->second.data());
 
@@ -762,14 +711,9 @@ namespace vita
           const domain_t domain(s_domain == "numeric" ? domain_t::d_double
                                                       : domain_t::d_string);
 
-          const column a{"", encode(s_domain, &categories_map_)};
-          if (a.category_id >= categories_.size())
-          {
-            assert(a.category_id == categories_.size());
-            categories_.push_back(category{s_domain, domain, {}});
-          }
+          const category_t tag(categories_.insert({s_domain, domain, {}}));
 
-          header_.push_back(a);
+          header_.push_back({"", tag});
         }
 
         format = true;
@@ -783,6 +727,7 @@ namespace vita
           try
           {
             const category_t c(header_[field].category_id);
+            const domain_t d(categories_.find(c).domain);
 
             const auto value(record[field]);
 
@@ -800,16 +745,16 @@ namespace vita
                   instance.output = encode(value, &classes_map_);
                 else
                 {
-                  instance.output = convert(value, categories_[c].domain);
-                  instance.d_output = categories_[c].domain;
+                  instance.output = convert(value, d);
+                  instance.d_output = d;
                 }
               }
             }
             else  // input value
             {
-              instance.input.push_back(convert(value, categories_[c].domain));
-              if (categories_[c].domain == domain_t::d_string)
-                categories_[c].labels.insert(value);
+              instance.input.push_back(convert(value, d));
+              if (d == domain_t::d_string)
+                categories_.add_label(c, value);
             }
           }
           catch(boost::bad_lexical_cast &)
@@ -930,30 +875,5 @@ namespace vita
 
     const auto &i(map.find(n));
     return i == map.end() ? domain_t::d_void : i->second;
-  }
-
-  ///
-  /// \param[out] s output stream.
-  /// \param[in] c category to print.
-  /// \return output stream including \a c.
-  ///
-  /// Utility function used for debugging purpose.
-  ///
-  std::ostream &operator<<(std::ostream &s, const data::category &c)
-  {
-    s << c.name << " (domain "
-      << static_cast<std::underlying_type<domain_t>::type>(c.domain);
-
-    if (!c.labels.empty())
-    {
-      s << ", [";
-
-      std::copy(c.labels.begin(), c.labels.end(),
-                std::ostream_iterator<std::string>(s, " "));
-
-      s << "])";
-    }
-
-    return s;
   }
 }  // namespace vita

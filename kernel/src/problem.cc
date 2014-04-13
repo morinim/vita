@@ -142,14 +142,9 @@ namespace vita
       }
 
     // Sets up the labels for nominal attributes.
-    const auto categories(dat_.categories());
-    for (category_t i(0); i < categories; ++i)
-    {
-      const auto &category(dat_.get_category(i));
-
-      for (const std::string &label : category.labels)
-        sset.insert(make_unique<constant<std::string>>(label, i));
-    }
+    for (const category &c : dat_.categories())
+      for (const std::string &l : c.labels)
+        sset.insert(make_unique<constant<std::string>>(l, c.tag));
   }
 
   ///
@@ -162,33 +157,33 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
-    const auto sup(dat_.categories());
-    for (category_t category(0); category < sup; ++category)
-      if (compatible({category}, {"numeric"}))
+    const auto sup(dat_.categories().size());
+    for (category_t tag(0); tag < sup; ++tag)
+      if (compatible({tag}, {"numeric"}))
       {
-        sset.insert(factory.make("1.0", {category}));
-        sset.insert(factory.make("2.0", {category}));
-        sset.insert(factory.make("3.0", {category}));
-        sset.insert(factory.make("4.0", {category}));
-        sset.insert(factory.make("5.0", {category}));
-        sset.insert(factory.make("6.0", {category}));
-        sset.insert(factory.make("7.0", {category}));
-        sset.insert(factory.make("8.0", {category}));
-        sset.insert(factory.make("9.0", {category}));
-        sset.insert(factory.make("FABS", {category}));
-        sset.insert(factory.make("FADD", {category}));
-        sset.insert(factory.make("FDIV", {category}));
-        sset.insert(factory.make("FLN",  {category}));
-        sset.insert(factory.make("FMUL", {category}));
-        sset.insert(factory.make("FMOD", {category}));
-        sset.insert(factory.make("FSUB", {category}));
+        sset.insert(factory.make("1.0", {tag}));
+        sset.insert(factory.make("2.0", {tag}));
+        sset.insert(factory.make("3.0", {tag}));
+        sset.insert(factory.make("4.0", {tag}));
+        sset.insert(factory.make("5.0", {tag}));
+        sset.insert(factory.make("6.0", {tag}));
+        sset.insert(factory.make("7.0", {tag}));
+        sset.insert(factory.make("8.0", {tag}));
+        sset.insert(factory.make("9.0", {tag}));
+        sset.insert(factory.make("FABS", {tag}));
+        sset.insert(factory.make("FADD", {tag}));
+        sset.insert(factory.make("FDIV", {tag}));
+        sset.insert(factory.make("FLN",  {tag}));
+        sset.insert(factory.make("FMUL", {tag}));
+        sset.insert(factory.make("FMOD", {tag}));
+        sset.insert(factory.make("FSUB", {tag}));
       }
-      else if (compatible({category}, {"string"}))
+      else if (compatible({tag}, {"string"}))
       {
-        //for (decltype(category) j(0); j < sup; ++j)
-        // if (j != category)
-        //   sset.insert(factory.make("SIFE", {category, j}));
-        sset.insert(factory.make("SIFE", {category, 0}));
+        //for (decltype(tag) j(0); j < sup; ++j)
+        // if (j != tag)
+        //   sset.insert(factory.make("SIFE", {tag, j}));
+        sset.insert(factory.make("SIFE", {tag, 0}));
       }
   }
 
@@ -206,8 +201,8 @@ namespace vita
 
     size_t parsed(0);
 
-    cvect categories(dat_.categories());
-    const auto c_size(categories.size());
+    const auto c_size(dat_.categories().size());
+    cvect categories(c_size);
     for (auto i(decltype(c_size){0}); i < c_size; ++i)
       categories[i] = i;
 
@@ -217,9 +212,9 @@ namespace vita
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
-    for (auto i(decltype(c_size){0}); i < c_size; ++i)
-      std::cout << "[DEBUG] Category " << i << ": "
-                << dat_.get_category(i) << std::endl;
+
+    for (const category &c : dat_.categories())
+      std::cout << k_s_debug << ' ' << c << std::endl;
     std::cout << std::endl;
 #endif
 
@@ -254,7 +249,7 @@ namespace vita
 #if !defined(NDEBUG)
                   std::cout << "[DEBUG] " << sym_name << '(';
                   for (const auto &j : seq)
-                    std::cout << dat_.get_category(j).name
+                    std::cout << dat_.categories().find(j).name
                               << (&j == &seq.back() ? ")" : ", ");
                   std::cout << std::endl;
 #endif
@@ -264,19 +259,19 @@ namespace vita
         }
         else  // !sym_sig.empty() => single category, uniform initialization
         {
-          for (category_t category(0); category < dat_.categories(); ++category)
-            if (compatible({category}, {sym_sig}))
+          for (category_t tag(0); tag < c_size; ++tag)
+            if (compatible({tag}, {sym_sig}))
             {
               const auto n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
               std::cout << sym_name << '(';
               for (auto j(decltype(n_args){0}); j < n_args; ++j)
-                std::cout << dat_.get_category(category).name
+                std::cout << dat_.categories().find(tag).name
                           << (j + 1 == n_args ? ")" : ", ");
               std::cout << std::endl;
 #endif
-              sset.insert(factory.make(sym_name, cvect(n_args, category)));
+              sset.insert(factory.make(sym_name, cvect(n_args, tag)));
             }
         }
 
@@ -308,17 +303,17 @@ namespace vita
     const auto sup(instance.size());
     for (auto i(decltype(sup){0}); i < sup; ++i)
     {
-      const auto p_i(pattern[i]);
+      const std::string p_i(pattern[i]);
       const bool generic(data::from_weka(p_i) != domain_t::d_void);
 
       if (generic)  // numeric, string, integer...
       {
-        if (dat_.get_category(instance[i]).domain != data::from_weka(p_i))
+        if (dat_.categories().find(instance[i]).domain != data::from_weka(p_i))
           return false;
       }
       else
       {
-        if (instance[i] != dat_.get_category(p_i))
+        if (instance[i] != dat_.categories().find(p_i).tag)
           return false;
       }
     }
@@ -377,7 +372,7 @@ namespace vita
   ///
   size_t src_problem::categories() const
   {
-    return dat_.categories();
+    return dat_.categories().size();
   }
 
   ///
