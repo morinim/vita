@@ -29,7 +29,7 @@ template<class T>
 fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 {
   assert(!this->dat_->classes());
-  assert(this->dat_->cbegin() != this->dat_->cend());
+  assert(this->dat_->begin() != this->dat_->end());
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
@@ -66,7 +66,7 @@ template<class T>
 fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 {
   assert(!this->dat_->classes());
-  assert(this->dat_->cbegin() != this->dat_->cend());
+  assert(this->dat_->begin() != this->dat_->end());
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
@@ -97,7 +97,7 @@ template<class T>
 double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 {
   assert(!this->dat_->classes());
-  assert(this->dat_->cbegin() != this->dat_->cend());
+  assert(this->dat_->begin() != this->dat_->end());
 
   const auto f(lambdify(prg));
 
@@ -262,7 +262,7 @@ template<class T>
 double classification_evaluator<T>::accuracy(const T &prg) const
 {
   assert(this->dat_->classes());
-  assert(this->dat_->cbegin() != this->dat_->cend());
+  assert(this->dat_->begin() != this->dat_->end());
 
   const auto f(this->lambdify(prg));
 
