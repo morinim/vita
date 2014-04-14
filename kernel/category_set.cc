@@ -119,7 +119,7 @@ namespace vita
   category_t category_set::insert(const untagged_category &c)
   {
     assert(!c.name.empty());
-    
+
     category c1(find(c.name));
 
     if (!c1)

@@ -67,7 +67,9 @@ namespace vita
 
     /// A special value used for missing answers.
     static const category null;
-  };
+  };  // struct category
+
+  std::ostream &operator<<(std::ostream &, const category &);
 
   ///
   /// \brief The set of categories used in a specific problem
@@ -93,7 +95,11 @@ namespace vita
 
   private:
     std::vector<untagged_category> categories_;
-  };
+
+    // Initially we had a std::map from category name to category tag used
+    // to speed up the find(std::string) method.
+    // Now the implementation is a bit slower but simpler and more robust.
+  };  // class category_set
 
   ///
   /// \brief Forward iterator to read the elements of a category_set
@@ -123,7 +129,5 @@ namespace vita
     bool operator!=(const const_iterator &rhs) const
     { return ptr_ != rhs.ptr_; }
   };  // class category_set::const_iterator
-
-  std::ostream &operator<<(std::ostream &, const category &);
 }  // namespace vita
 #endif  // Include guard

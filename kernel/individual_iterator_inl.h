@@ -51,9 +51,8 @@ public:
   ///
   bool operator==(const const_iterator &rhs) const
   {
-    return (loci_.begin() == loci_.end() &&
-            rhs.loci_.begin() == rhs.loci_.end()) ||
-           loci_.begin() == rhs.loci_.begin();
+    return (loci_.empty() && rhs.loci_.empty()) ||
+           loci_.cbegin() == rhs.loci_.cbegin();
   }
 
   bool operator!=(const const_iterator &i2) const
