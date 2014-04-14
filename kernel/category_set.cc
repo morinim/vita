@@ -171,15 +171,13 @@ namespace vita
     s << c.name << " (category " << c.tag << ", domain "
       << static_cast<std::underlying_type<domain_t>::type>(c.domain);
 
-    if (!c.labels.empty())
-    {
-      s << ", [";
+    s << ", [";
 
+    if (!c.labels.empty())
       std::copy(c.labels.begin(), c.labels.end(),
                 std::ostream_iterator<std::string>(s, " "));
 
-      s << "])";
-    }
+    s << "])";
 
     return s;
   }

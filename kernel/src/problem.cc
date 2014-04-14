@@ -247,7 +247,7 @@ namespace vita
                 if (compatible(seq, args))
                 {
 #if !defined(NDEBUG)
-                  std::cout << "[DEBUG] " << sym_name << '(';
+                  std::cout << k_s_debug << ' ' << sym_name << '(';
                   for (const auto &j : seq)
                     std::cout << dat_.categories().find(j).name
                               << (&j == &seq.back() ? ")" : ", ");
