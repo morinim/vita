@@ -941,14 +941,6 @@ namespace vita
   }
 
   ///
-  /// \param[in] id an individual.
-  ///
-  individual::const_iterator::const_iterator(const individual &id) : ind_(&id)
-  {
-    loci_.insert(id.best_);
-  }
-
-  ///
   /// \return locus of the next active symbol.
   ///
   individual::const_iterator &individual::const_iterator::operator++()

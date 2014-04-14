@@ -154,70 +154,7 @@ namespace vita
 
   std::ostream &operator<<(std::ostream &, const individual &);
 
-  ///
-  /// \brief Iterator to scan the active genes of an \c individual
-  ///
-  class individual::const_iterator
-  {
-  public:
-    typedef std::forward_iterator_tag iterator_category;
-    typedef std::ptrdiff_t difference_type;
-    typedef individual value_type;
-    typedef const individual * pointer;
-    typedef const individual & reference;
-
-    ///
-    /// \brief Builds an empty iterator.
-    ///
-    /// Empty iterator is used as sentry (it is the value returned by
-    /// individual::end()).
-    ///
-    const_iterator() : loci_(), ind_(nullptr) {}
-    explicit const_iterator(const individual &);
-
-    const_iterator &operator++();
-
-    ///
-    /// \param[in] i2 second term of comparison.
-    ///
-    /// Returns \c true if iterators point to the same locus or they are both
-    /// to the end.
-    ///
-    bool operator==(const const_iterator &i2) const
-    {
-      return (loci_.begin() == loci_.end() &&
-              i2.loci_.begin() == i2.loci_.end()) ||
-             loci_.begin() == i2.loci_.begin();
-    }
-
-    bool operator!=(const const_iterator &i2) const
-    {
-      return !(*this == i2);
-    }
-
-    ///
-    /// \return reference to the current \a locus of the \a individual.
-    ///
-    const locus &operator*() const
-    {
-      return *loci_.cbegin();
-    }
-
-    ///
-    /// \return pointer to the current \c locus of the \c individual.
-    ///
-    const locus *operator->() const
-    {
-      return &(*loci_.cbegin());
-    }
-
-  private:  // Private data members
-    // A partial set of active loci to be explored.
-    std::set<locus> loci_;
-
-    // A pointer to the individual we are iterating on.
-    const individual *const ind_;
-  };  // class individual::const_iterator
+#include "kernel/individual_iterator_inl.h"
 
   ///
   /// \return an iterator to the first active locus of the individual.

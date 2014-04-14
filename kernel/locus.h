@@ -39,8 +39,7 @@ namespace vita
   /// \param[in] l2 second locus.
   /// \return \c true if \a *this is equal to \a l2.
   ///
-  inline
-  bool locus::operator==(const locus &l2) const
+  inline bool locus::operator==(const locus &l2) const
   {
     return index == l2.index && category == l2.category;
   }
@@ -49,8 +48,7 @@ namespace vita
   /// \param[in] l2 second locus.
   /// \return \c true if \a *this is not equal to \a l2.
   ///
-  inline
-  bool locus::operator!=(const locus &l2) const
+  inline bool locus::operator!=(const locus &l2) const
   {
     return index != l2.index || category != l2.category;
   }
@@ -62,8 +60,7 @@ namespace vita
   ///
   /// This operator is required by the STL std::map container.
   ///
-  inline
-  bool locus::operator<(const locus &l2) const
+  inline bool locus::operator<(const locus &l2) const
   {
     return index < l2.index || (index == l2.index && category < l2.category);
   }
@@ -73,8 +70,7 @@ namespace vita
   /// \return a new locus obtained from \a this incrementing index component by
   ///         \a i (and not changing category component).
   ///
-  inline
-  locus locus::operator+(int i) const
+  inline locus locus::operator+(int i) const
   {
     return {index + i, category};
   }
@@ -84,8 +80,7 @@ namespace vita
   /// \param[in] l locus to print.
   /// \return output stream including \a l.
   ///
-  inline
-  std::ostream &operator<<(std::ostream &s, const locus &l)
+  inline std::ostream &operator<<(std::ostream &s, const locus &l)
   {
     return s << '(' << l.index << ',' << l.category << ')';
   }

@@ -106,7 +106,7 @@ namespace vita
     const_iter begin_;
     const_iter ptr_;
 
-    public:
+  public:
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = category;
