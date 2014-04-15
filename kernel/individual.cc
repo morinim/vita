@@ -805,7 +805,7 @@ namespace vita
 
 #if defined(UNIFORM_CROSSOVER)
   ///
-  /// \param[in] p the second parent.
+  /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
@@ -824,39 +824,23 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual individual::crossover(const individual &p) const
+  individual individual::crossover(individual rhs) const
   {
-    assert(p.debug());
+    assert(rhs.debug());
+    assert(size() == rhs.size());
 
-    auto offspring(*this);
-
-    for (individual::const_iterator it(*this); it(); ++it)
+    for (auto &l : rhs)
       if (random::boolean())
-        offspring.set(it.l, p[it.l]);
+        rhs.set(l, operator[](l));
 
-/*
-    const index_t cs(size());
-    const category_t categories(sset()->categories());
+    rhs.age_ = std::max(age(), rhs.age());
 
-    assert(cs == p.size());
-    assert(categories == p.sset()->categories());
-
-    for (index_t i(0); i < cs; ++i)
-      for (category_t c(0); c < categories; ++c)
-        if (random::boolean())
-        {
-          const locus l{i,c};
-          offspring.set(l, p[l]);
-        }
-*/
-    offspring.age_ = std::max(age(), p.age());
-
-    assert(offspring.debug(true));
-    return offspring;
+    assert(rhs.debug(true));
+    return rhs;
   }
 #elif defined(ONE_POINT_CROSSOVER)
   ///
-  /// \param[in] p the second parent.
+  /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
@@ -869,36 +853,39 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual individual::crossover(const individual &p) const
+  individual individual::crossover(individual rhs) const
   {
-    assert(p.debug());
-    assert(size() == p.size());
+    assert(rhs.debug());
+    assert(size() == rhs.size());
 
     const auto cs(size());
     const auto categories(sset().categories());
 
     const auto cut(random::between<index_t>(1, cs - 1));
 
-    const individual *parents[2] = {this, &p};
-    const bool base(random::boolean());
+    if (random::boolean())
+      for (index_t i(cut); i < cs; ++i)
+        for (category_t c(0); c < categories; ++c)
+        {
+          const locus l{i,c};
+          rhs.set(l, operator[](l));
+        }
+    else
+      for (index_t i(0); i < cut; ++i)
+        for (category_t c(0); c < categories; ++c)
+        {
+          const locus l{i,c};
+          rhs.set(l, operator[](l));
+        }
 
-    auto offspring(*parents[base]);
+    rhs.age_ = std::max(age(), rhs.age());
 
-    for (index_t i(cut); i < cs; ++i)
-      for (category_t c(0); c < categories; ++c)
-      {
-        const locus l{i,c};
-        offspring.set(l, (*parents[!base])[l]);
-      }
-
-    offspring.age_ = std::max(age(), p.age());
-
-    assert(offspring.debug());
-    return offspring;
+    assert(rhs.debug());
+    return rhs;
   }
 #else  // TWO_POINT_CROSSOVER (default)
   ///
-  /// \param[in] p the second parent.
+  /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
@@ -911,10 +898,10 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual individual::crossover(const individual &p) const
+  individual individual::crossover(individual rhs) const
   {
-    assert(p.debug());
-    assert(size() == p.size());
+    assert(rhs.debug());
+    assert(size() == rhs.size());
 
     const auto cs(size());
     const auto categories(sset().categories());
@@ -922,22 +909,36 @@ namespace vita
     const auto cut1(random::sup(cs - 1));
     const auto cut2(random::between(cut1 + 1, cs));
 
-    const individual *parents[2] = {this, &p};
-    const bool base(random::boolean());
+    if (random::boolean())
+    {
+      for (index_t i(cut1); i < cut2; ++i)
+        for (category_t c(0); c < categories; ++c)
+        {
+          const locus l{i, c};
+          rhs.set(l, operator[](l));
+        }
+    }
+    else
+    {
+      for (index_t i(0); i < cut1; ++i)
+        for (category_t c(0); c < categories; ++c)
+        {
+          const locus l{i, c};
+          rhs.set(l, operator[](l));
+        }
 
-    auto offspring(*parents[base]);
+      for (index_t i(cut2); i < cs; ++i)
+        for (category_t c(0); c < categories; ++c)
+        {
+          const locus l{i, c};
+          rhs.set(l, operator[](l));
+        }
+    }
 
-    for (index_t i(cut1); i < cut2; ++i)
-      for (category_t c(0); c < categories; ++c)
-      {
-        const locus l{i, c};
-        offspring.set(l, (*parents[!base])[l]);
-      }
+    rhs.age_ = std::max(age(), rhs.age());
 
-    offspring.age_ = std::max(age(), p.age());
-
-    assert(offspring.debug());
-    return offspring;
+    assert(rhs.debug());
+    return rhs;
   }
 
   ///

@@ -49,7 +49,7 @@ namespace vita
     unsigned mutation()
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
-    individual crossover(const individual &) const;
+    individual crossover(individual) const;
 
     std::vector<locus> blocks() const;
     individual destroy_block(index_t) const;
