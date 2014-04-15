@@ -343,7 +343,7 @@ namespace vita
   /// Boost Bitmap could be used to speed up the search in \a classes_map_, but
   /// to date speed isn't an issue.
   ///
-  std::string data::class_name(class_tag_t i) const
+  std::string data::class_name(class_t i) const
   {
     for (const auto &p : classes_map_)
       if (p.second == i)

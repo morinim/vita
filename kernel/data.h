@@ -26,7 +26,7 @@ namespace vita
   ///
   /// \brief The type used as class id in classification tasks
   ///
-  typedef unsigned class_tag_t;
+  typedef unsigned class_t;
 
   ///
   /// \brief Stores the dataset used to evolve vita::population
@@ -79,7 +79,7 @@ namespace vita
     unsigned columns() const;
     unsigned variables() const;
 
-    std::string class_name(class_tag_t) const;
+    std::string class_name(class_t) const;
 
     bool debug() const;
 
@@ -100,7 +100,7 @@ namespace vita
     /// Integer are simpler to manage than textual data, so, when appropriate,
     /// input strings are converted into integers by these maps (and the encode
     /// static function).
-    std::map<std::string, class_tag_t> classes_map_;
+    std::map<std::string, class_t> classes_map_;
 
     /// How is the dataset organized? Sometimes we have a dataset header (XRFF
     /// file format), other times it has to be implicitly derived (e.g. CSV).
@@ -159,7 +159,7 @@ namespace vita
     std::uintmax_t  difficulty;
     unsigned               age;
 
-    class_tag_t tag() const { return any_cast<class_tag_t>(output); }
+    class_t tag() const { return any_cast<class_t>(output); }
     template<class T> T cast_output() const;
 
     void clear() { *this = example(); }

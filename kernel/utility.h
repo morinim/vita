@@ -66,9 +66,9 @@ namespace vita
   ///
   template<class T> inline bool issmall(T v)
   {
-    static constexpr auto epsilon(std::numeric_limits<T>::epsilon());
+    static constexpr auto e(std::numeric_limits<T>::epsilon());
 
-    return std::abs(v) < 2.0 * epsilon;
+    return std::abs(v) < 2.0 * e;
   }
 
   ///

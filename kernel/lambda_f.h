@@ -117,8 +117,7 @@ namespace vita
   public:
     explicit basic_class_lambda_f(const data &);
 
-    virtual std::pair<class_tag_t, double> tag(
-      const data::example &) const = 0;
+    virtual std::pair<class_t, double> tag(const data::example &) const = 0;
     virtual any operator()(const data::example &) const override;
 
     virtual std::string name(const any &) const override final;
@@ -142,7 +141,7 @@ namespace vita
   public:
     basic_dyn_slot_lambda_f(const T &, data &, unsigned);
 
-    virtual std::pair<class_tag_t, double> tag(
+    virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;
@@ -189,7 +188,7 @@ namespace vita
   public:
     basic_gaussian_lambda_f(const T &, data &);
 
-    virtual std::pair<class_tag_t, double> tag(
+    virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;
@@ -221,7 +220,7 @@ namespace vita
   public:
     basic_binary_lambda_f(const T &, data &);
 
-    virtual std::pair<class_tag_t, double> tag(
+    virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;
@@ -272,7 +271,7 @@ namespace vita
   public:
     team_class_lambda_f(const team<T> &, data &);
 
-    virtual std::pair<class_tag_t, double> tag(
+    virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;

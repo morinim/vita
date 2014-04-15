@@ -293,7 +293,7 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 ///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-std::pair<class_tag_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
+std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
   const data::example &instance) const
 {
   const auto s(slot(instance));
@@ -385,14 +385,14 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 ///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-std::pair<class_tag_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
+std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   const data::example &example) const
 {
   const any res(lambda_(example));
   const number x(res.empty() ? 0.0 : to<number>(res));
 
   number val_(0.0), sum_(0.0);
-  class_tag_t probable_class(0);
+  class_t probable_class(0);
 
   const auto classes(gauss_dist_.size());
   for (auto i(decltype(classes){0}); i < classes; ++i)
@@ -457,7 +457,7 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind, data &d)
 ///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
-std::pair<class_tag_t, double> basic_binary_lambda_f<T, S, N>::tag(
+std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
   const data::example &e) const
 {
   const any res(lambda_(e));
@@ -518,7 +518,7 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
-std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
+std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
   const data::example &instance) const
 {
   if (C == team_composition::wta)
@@ -543,7 +543,7 @@ std::pair<class_tag_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
     for (const auto &lambda : team_)
       ++votes[lambda.tag(instance).first];
 
-    class_tag_t max(0);
+    class_t max(0);
     for (auto i(max + 1); i < classes_; ++i)
       if (votes[i] > votes[max])
         max = i;

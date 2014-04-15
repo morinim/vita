@@ -64,9 +64,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
     {
       BOOST_REQUIRE_EQUAL(pop1.individuals(l), pop2.individuals(l));
 
-      for (unsigned i(0); i < pop1.individuals(); ++i)
+      for (unsigned j(0); j < pop1.individuals(); ++j)
       {
-        const vita::coord c{l, i};
+        const vita::coord c{l, j};
         BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
       }
     }

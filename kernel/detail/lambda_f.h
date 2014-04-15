@@ -123,7 +123,7 @@ namespace vita { namespace detail
   template<bool N>
   std::string class_names<N>::string(const any &a) const
   {
-    return boost::lexical_cast<std::string>(any_cast<class_tag_t>(a));
+    return boost::lexical_cast<std::string>(any_cast<class_t>(a));
   }
 
   ///
@@ -138,7 +138,7 @@ namespace vita { namespace detail
     // template specializations. So we haven't to put template<> at the
     // beginning.
 
-    return names_[any_cast<class_tag_t>(a)];
+    return names_[any_cast<class_t>(a)];
   }
 }}  // namespace vita::detail
 
