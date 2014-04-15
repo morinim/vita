@@ -56,8 +56,8 @@ basic_gene<K>::basic_gene(
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
 #if !defined(NDEBUG)
-      typedef typename std::remove_reference<decltype(args[0])>::type
-        ARRAY_ELEM_TYPE;
+      using ARRAY_ELEM_TYPE =
+        typename std::remove_reference<decltype(args[0])>::type;
       assert(g.second[i] <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
 #endif
       args[i] = g.second[i];

@@ -46,11 +46,11 @@ namespace vita
     // portable way since on a 64-bit Windows machine, GCC (MinGW)
     // x64 compiler gives sizeof(int) = sizeof(long) = 4. So we use
     // void *.
-    // typedef std::conditional<sizeof(void *) <= 4,
-    //                          std::mt19937,
-    //                          std::mt19937_64>::type engine_t;
-    typedef std::mt19937 engine_t;
-    
+    // using engine_t = std::conditional<sizeof(void *) <= 4,
+    //                                   std::mt19937,
+    //                                   std::mt19937_64>::type;
+    using engine_t = std::mt19937;
+
     static engine_t &engine();
   };
 

@@ -168,7 +168,7 @@ std::vector<coord> alps<T>::run()
   auto c0(this->pickup(layer));
   auto c1(this->pickup(layer));
 
-  typedef std::pair<bool, fitness_t> age_fit_t;
+  using age_fit_t = std::pair<bool, fitness_t>;
   age_fit_t age_fit0{!aged(c0), this->eva_(pop[c0])};
   age_fit_t age_fit1{!aged(c1), this->eva_(pop[c1])};
 

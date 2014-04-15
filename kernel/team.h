@@ -69,7 +69,7 @@ namespace vita
     unsigned mutation(double);
     team<T> crossover(const team<T> &) const;
 
-    typedef typename std::vector<T>::const_iterator const_iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
     const_iterator begin() const;
     const_iterator end() const;
     const T &operator[](unsigned) const;

@@ -49,7 +49,7 @@ namespace vita
     virtual bool debug(bool) const override;
 
   private:  // Private support methods
-    typedef std::vector<category_t> cvect;
+    using cvect = std::vector<category_t>;
 
     bool compatible(const cvect &, const std::vector<std::string> &) const;
     void setup_terminals_from_data(const std::set<unsigned> & = {});

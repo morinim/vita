@@ -49,8 +49,8 @@ namespace vita
   class population
   {
   public:
-    typedef std::vector<T> layer_t;
-    typedef typename std::vector<layer_t>::const_iterator const_iterator;
+    using layer_t = std::vector<T>;
+    using const_iterator = typename std::vector<layer_t>::const_iterator;
 
     population(const environment &, const symbol_set &);
 

@@ -35,8 +35,8 @@ namespace vita
 
     /// Type returned by begin() and end() methods to iterate through the
     /// statistics of the various symbols.
-    typedef typename std::map<const symbol *, sym_counter>::const_iterator
-      const_iterator;
+    using const_iterator =
+      typename std::map<const symbol *, sym_counter>::const_iterator;
 
     const_iterator begin() const;
     const_iterator end() const;

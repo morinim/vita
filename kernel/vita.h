@@ -29,7 +29,7 @@ namespace vita
 #endif
 
   /// This is the type used as key for symbol identification.
-  typedef unsigned opcode_t;
+  using opcode_t = unsigned;
 
   /// In an environmnet where a symbol such as + may have many different
   /// meanings, it is useful to specify a "domain of computation" to restrict
@@ -46,10 +46,10 @@ namespace vita
   /// two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
   /// category "kg").
   /// Categories are the way strong typing GP is implemented in Vita.
-  typedef unsigned category_t;
+  using category_t = unsigned;
 
   /// Index in the genome. Locus is uniquely identified by a couple of indexes.
-  typedef unsigned index_t;
+  using index_t = unsigned;
 
   /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";

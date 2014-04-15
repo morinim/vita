@@ -22,7 +22,7 @@ namespace vita
   ///
   /// A shortcut for the any type (usually boost::any or boost::spirit::any).
   ///
-  typedef boost::spirit::hold_any any;
+  using any = boost::spirit::hold_any;
 
   ///
   /// \param a an any.
@@ -30,7 +30,7 @@ namespace vita
   ///
   template<class T> inline T any_cast(const any &a)
   {
-    // We must choose the right any_cast (it depends on any typedef).
+    // We must choose the right any_cast (it depends on any type alias).
     // The alternative is: return boost::any_cast<T>(a);
     return boost::spirit::any_cast<T>(a);
   }

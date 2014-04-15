@@ -26,7 +26,7 @@ namespace vita
   ///
   /// \brief The type used as class id in classification tasks
   ///
-  typedef unsigned class_t;
+  using class_t = unsigned;
 
   ///
   /// \brief Stores the dataset used to evolve vita::population
@@ -37,14 +37,14 @@ namespace vita
   ///
   class data
   {
-  public:  // Structures and typedef
+  public:  // Structures and type alias
     struct example;
     struct column;
 
     /// example *
-    typedef typename std::vector<example>::iterator iterator;
+    using iterator = typename std::vector<example>::iterator;
     /// const example *
-    typedef typename std::vector<example>::const_iterator const_iterator;
+    using const_iterator = typename std::vector<example>::const_iterator;
 
     enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
