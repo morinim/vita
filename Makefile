@@ -38,7 +38,7 @@ SYSTEMINCPATH = $(BOOST_INCLUDE)
 
 # -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN = --std=c++1y -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal
+WARN = --std=c++1y -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion
 endif

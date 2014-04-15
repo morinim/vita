@@ -23,15 +23,15 @@ namespace vita
 {
   ///
   /// \param[in] e base environment.
-  /// \param[in] sset a symbol set.
+  /// \param[in] ss a symbol set.
   ///
   /// The process that generates the initial, random expressions have to be
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///
-  individual::individual(const environment &e, const symbol_set &sset)
-    : genome_(e.code_length, sset.categories()),
-      signature_(), best_{0, 0}, age_(0), env_(&e), sset_(&sset)
+  individual::individual(const environment &e, const symbol_set &ss)
+    : genome_(e.code_length, ss.categories()), signature_(), best_{0, 0},
+      age_(0), env_(&e), sset_(&ss)
   {
     assert(e.debug(true, true));
 
@@ -41,20 +41,20 @@ namespace vita
 
     const index_t sup(size()), patch(sup - env_->patch_length);
 
-    const category_t categories(sset.categories());
+    const category_t categories(ss.categories());
     assert(categories);
     assert(categories < sup);
 
     // STANDARD SECTION. Filling the genome with random symbols.
     for (index_t i(0); i < patch; ++i)
       for (category_t c(0); c < categories; ++c)
-        genome_(i, c) = gene(sset.roulette(c), i + 1, size());
+        genome_(i, c) = gene(ss.roulette(c), i + 1, size());
 
     // PATCH SUBSECTION. Placing terminals for satisfying constraints on
     // types.
     for (index_t i(patch); i < sup; ++i)
       for (category_t c(0); c < categories; ++c)
-        genome_(i, c) = gene(sset.roulette_terminal(c));
+        genome_(i, c) = gene(ss.roulette_terminal(c));
 
     assert(debug(true));
   }

@@ -78,14 +78,14 @@ namespace vita
   }
 
   ///
-  /// \param[in] rows number of rows.
-  /// \param[in] cols number of columns.
+  /// \param[in] rs number of rows.
+  /// \param[in] cs number of columns.
   ///
   /// \brief Standard \a rows x \a cols matrix. Entries aren't initialized.
   ///
   template<class T>
-  matrix<T>::matrix(unsigned rows, unsigned cols) :
-    data_(rows * cols), rows_(rows), cols_(cols)
+  matrix<T>::matrix(unsigned rs, unsigned cs) :
+    data_(rs * cs), rows_(rs), cols_(cs)
   {
   }
 

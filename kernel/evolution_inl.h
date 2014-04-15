@@ -66,7 +66,7 @@ namespace term
 }  // namespace term
 
 ///
-/// \param[in] env environment (mostly used for population initialization).
+/// \param[in] e environment (mostly used for population initialization).
 /// \param[in] sset environment (mostly used for polulation initialization).
 /// \param[in] eva evaluator used during the evolution.
 /// \param[in] sc function used to identify a stop condition (i.e. it's
@@ -77,11 +77,11 @@ namespace term
 ///               environment.
 ///
 template<class T, template<class> class ES>
-evolution<T, ES>::evolution(const environment &env, const symbol_set &sset,
+evolution<T, ES>::evolution(const environment &e, const symbol_set &sset,
                             evaluator<T> &eva,
                             std::function<bool (const summary<T> &)> sc,
                             std::function<void (unsigned)> sd)
-  : pop_(env, sset), eva_(eva), es_(pop_, eva, &stats_),
+  : pop_(e, sset), eva_(eva), es_(pop_, eva, &stats_),
     external_stop_condition_(sc), shake_data_(sd)
 {
   assert(debug(true));

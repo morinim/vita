@@ -15,12 +15,12 @@
 
 ///
 /// \param[in] e base environment.
-/// \param[in] sset a symbol set.
+/// \param[in] ss a symbol set.
 ///
 /// Creates a team of individuals that will cooperate to solve a task.
 ///
 template<class T>
-team<T>::team(const environment &e, const symbol_set &sset) : signature_()
+team<T>::team(const environment &e, const symbol_set &ss) : signature_()
 {
   assert(e.debug(true, true));
   assert(e.team.individuals);
@@ -29,7 +29,7 @@ team<T>::team(const environment &e, const symbol_set &sset) : signature_()
   individuals_.reserve(n);
 
   for (auto i(decltype(n){0}); i < n; ++i)
-    individuals_.emplace_back(e, sset);
+    individuals_.emplace_back(e, ss);
 
   assert(debug());
 }
@@ -268,11 +268,11 @@ unsigned team<T>::distance(const team<T> &x) const
 template<class T>
 unsigned team<T>::age() const
 {
-  unsigned age(0);
+  unsigned age_sum(0);
   for (const auto &i : individuals_)
-    age += i.age();
+    age_sum += i.age();
 
-  return age / individuals();
+  return age_sum / individuals();
 }
 
 ///

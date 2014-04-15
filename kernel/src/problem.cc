@@ -188,27 +188,29 @@ namespace vita
   }
 
   ///
-  /// \param[in] sf name of the file containing the symbols.
+  /// \param[in] s_file name of the file containing the symbols.
   /// \return number of parsed symbols.
   ///
+  /// \note
   /// Data should be loaded before symbols: if we haven't data we don't know,
-  /// among other things, how many features the dataset has.
-  /// This function is used to change the symbols mantaining the same dataset.
+  /// among other things, what features the dataset has.
   ///
-  size_t src_problem::load_symbols(const std::string &sf)
+  size_t src_problem::load_symbols(const std::string &s_file)
   {
     setup_terminals_from_data();
 
     size_t parsed(0);
 
     const auto c_size(dat_.categories().size());
-    cvect categories(c_size);
-    for (auto i(decltype(c_size){0}); i < c_size; ++i)
-      categories[i] = i;
+
+    cvect used_categories(c_size);
+    category_t n(0);
+    std::generate(used_categories.begin(), used_categories.end(),
+                  [&]{ return n++; });
 
     // Load the XML file (sf) into the property tree (pt).
     boost::property_tree::ptree pt;
-    read_xml(sf, pt);
+    read_xml(s_file, pt);
 
 #if !defined(NDEBUG)
     std::cout << std::endl << std::endl;
@@ -239,7 +241,7 @@ namespace vita
 
               // From the list of all the sequences with repetition of
               // args.size() elements (categories)...
-              const auto sequences(seq_with_rep(categories, args.size()));
+              const auto sequences(seq_with_rep(used_categories, args.size()));
 
               // ...we choose those compatible with the xml signature of the
               // current symbol.
@@ -322,15 +324,15 @@ namespace vita
   }
 
   ///
-  /// \param[in] categories this is the "dictionary" for the sequence.
+  /// \param[in] used_categories this is the "dictionary" for the sequence.
   /// \param[in] args size of the sequence.
   /// \return a list of sequences with repetition of fixed length (\a args) of
   ///         elements taken from the given set (\a categories).
   ///
   std::list<src_problem::cvect> src_problem::seq_with_rep(
-    const cvect &categories, size_t args)
+    const cvect &used_categories, size_t args)
   {
-    assert(categories.size());
+    assert(used_categories.size());
     assert(args);
 
     // When I wrote this, only God and I understood what I was doing.
@@ -338,8 +340,8 @@ namespace vita
     class swr
     {
     public:
-      swr(const cvect &categories, size_t args)
-        : categories_(categories), args_(args)
+      swr(const cvect &used_categories, size_t args)
+        : categories_(used_categories), args_(args)
       {
       }
 
@@ -363,7 +365,7 @@ namespace vita
     };
 
     std::list<cvect> out;
-    swr(categories, args)(0, {}, &out);
+    swr(used_categories, args)(0, {}, &out);
     return out;
   }
 

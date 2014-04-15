@@ -307,17 +307,17 @@ std::vector<coord> pareto<T>::run()
 
   assert(pool.size());
 
-  std::set<unsigned> front, dominated;
-  this->front(pool, &front, &dominated);
+  std::set<unsigned> front_set, dominated_set;
+  this->front(pool, &front_set, &dominated_set);
 
-  assert(front.size());
+  assert(front_set.size());
 
   std::vector<coord> ret{
-    {0, vita::random::element(front)},
-    {0, vita::random::element(front)}};
+    {0, vita::random::element(front_set)},
+    {0, vita::random::element(front_set)}};
 
-  if (dominated.size())
-    ret.push_back({0, vita::random::element(dominated)});
+  if (dominated_set.size())
+    ret.push_back({0, vita::random::element(dominated_set)});
 
   return ret;
 }
@@ -329,36 +329,34 @@ std::vector<coord> pareto<T>::run()
 ///
 template<class T>
 void pareto<T>::front(const std::vector<unsigned> &pool,
-                      std::set<unsigned> *front,
-                      std::set<unsigned> *dominated) const
+                      std::set<unsigned> *fs, std::set<unsigned> *ds) const
 {
   const auto &pop(this->pop_);
 
   for (const auto &ind : pool)
   {
-    if (front->find(ind) != front->end() ||
-        dominated->find(ind) != dominated->end())
+    if (fs->find(ind) != fs->end() || ds->find(ind) != ds->end())
       continue;
 
     const auto ind_fit(this->eva_(pop[{0, ind}]));
 
     bool ind_dominated(false);
-    for (auto f(front->cbegin()); f != front->cend() && !ind_dominated;)
+    for (auto f(fs->cbegin()); f != fs->cend() && !ind_dominated;)
       // no increment in the for loop
     {
       const auto f_fit(this->eva_(pop[{0, *f}]));
 
       if (!ind_dominated && ind_fit.dominating(f_fit))
       {
-        dominated->insert(*f);
-        f = front->erase(f);
+        ds->insert(*f);
+        f = fs->erase(f);
       }
       else
       {
         if (f_fit.dominating(ind_fit))
         {
           ind_dominated = true;
-          dominated->insert(ind);
+          ds->insert(ind);
         }
 
         ++f;
@@ -366,7 +364,7 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
     }
 
     if (!ind_dominated)
-      front->insert(ind);
+      fs->insert(ind);
   }
 }
 

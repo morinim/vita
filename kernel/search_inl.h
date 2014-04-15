@@ -58,16 +58,16 @@ void search<T, ES>::arl(const U &base)
 
   // Logs ADFs
   const auto filename(env_.stat_dir + "/" + environment::arl_filename);
-  std::ofstream log(filename.c_str(), std::ios_base::app);
-  if (env_.stat_arl && log.good())
+  std::ofstream adf_log(filename.c_str(), std::ios_base::app);
+  if (env_.stat_arl && adf_log.good())
   {
     const auto adts(prob_->sset.adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
       const symbol &f(*prob_->sset.get_adt(i));
-      log << f.display() << ' ' << f.weight << std::endl;
+      adf_log << f.display() << ' ' << f.weight << std::endl;
     }
-    log << std::endl;
+    adf_log << std::endl;
   }
 
   const unsigned adf_args(0);
@@ -105,14 +105,14 @@ void search<T, ES>::arl(const U &base)
         else  // !adf_args
           p = make_unique<adt>(candidate_block, 100);
 
-        if (env_.stat_arl && log.good())
+        if (env_.stat_arl && adf_log.good())
         {
-          log << p->display() << " (Base: " << base_fit
-              << "  DF: " << delta
-              << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-              << "%)" << std::endl;
-          candidate_block.list(log);
-          log << std::endl;
+          adf_log << p->display() << " (Base: " << base_fit
+                  << "  DF: " << delta
+                  << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
+                  << "%)" << std::endl;
+          candidate_block.list(adf_log);
+          adf_log << std::endl;
         }
 
         prob_->sset.insert(std::move(p));
@@ -404,21 +404,20 @@ double search<T, ES>::accuracy(const T &ind) const
 
 ///
 /// \param[in] validation is it a validation or training resume?
-/// \param[in] fitness fitness reached in the current run.
-/// \param[in] accuracy accuracy reached in the current run.
+/// \param[in] fit fitness reached in the current run.
+/// \param[in] acc accuracy reached in the current run.
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::print_resume(bool validation, const fitness_t &fitness,
-                                 double accuracy) const
+void search<T, ES>::print_resume(bool validation, const fitness_t &fit,
+                                 double acc) const
 {
   if (env_.verbosity >= 2)
   {
     const std::string ds(validation ? " Validation" : " Training");
 
-    std::cout << k_s_info << ds << " fitness: " << fitness << std::endl;
+    std::cout << k_s_info << ds << " fitness: " << fit << std::endl;
     if (env_.a_threashold >= 0.0)
-      std::cout << k_s_info << ds << " accuracy: " << 100.0 * accuracy
-                << '%';
+      std::cout << k_s_info << ds << " accuracy: " << 100.0 * acc << '%';
 
     std::cout << std::endl << std::endl;
   }
@@ -458,10 +457,10 @@ T search<T, ES>::run(unsigned n)
   if (validation)
     prob_->data()->divide(*env_.validation_ratio);
 
-  for (unsigned run(0); run < n; ++run)
+  for (unsigned r(0); r < n; ++r)
   {
     evolution<T, ES> evo(env_, prob_->sset, *active_eva_, stop, shake_data);
-    summary<T> s(evo.run(run));
+    summary<T> s(evo.run(r));
 
     // Depending on validation, this can be the training fitness or the
     // validation fitness for the current run.
@@ -506,11 +505,11 @@ T search<T, ES>::run(unsigned n)
 
     print_resume(validation, run_fitness, run_accuracy);
 
-    if (run == 0 || run_fitness > overall_summary.best->fitness)
+    if (r == 0 || run_fitness > overall_summary.best->fitness)
     {
       overall_summary.best = {s.best->ind, run_fitness};
       best_accuracy = run_accuracy;
-      best_run = run;
+      best_run = r;
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
@@ -521,7 +520,7 @@ T search<T, ES>::run(unsigned n)
     {
       overall_summary.last_imp += s.last_imp;
 
-      good_runs.push_back(run);
+      good_runs.push_back(r);
     }
 
     if (run_fitness.isfinite())
@@ -529,7 +528,7 @@ T search<T, ES>::run(unsigned n)
 
     overall_summary.elapsed += s.elapsed;
 
-    if (env_.arl && good_runs.front() == run)
+    if (env_.arl && good_runs.front() == r)
     {
       prob_->sset.reset_adf_weights();
       arl(s.best->ind);
