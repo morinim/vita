@@ -204,9 +204,7 @@ namespace vita
     const auto c_size(dat_.categories().size());
 
     cvect used_categories(c_size);
-    category_t n(0);
-    std::generate(used_categories.begin(), used_categories.end(),
-                  [&]{ return n++; });
+    std::iota(used_categories.begin(), used_categories.end(), 0);
 
     // Load the XML file (sf) into the property tree (pt).
     boost::property_tree::ptree pt;
@@ -337,6 +335,7 @@ namespace vita
 
     // When I wrote this, only God and I understood what I was doing.
     // Now, God only knows.
+    
     class swr
     {
     public:
