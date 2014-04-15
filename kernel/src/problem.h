@@ -13,7 +13,6 @@
 #if !defined(VITA_SRC_PROBLEM_H)
 #define      VITA_SRC_PROBLEM_H
 
-#include <list>
 #include <string>
 #include <vector>
 
@@ -52,7 +51,6 @@ namespace vita
   private:  // Private support methods
     typedef std::vector<category_t> cvect;
 
-    std::list<cvect> seq_with_rep(const cvect &, size_t);
     bool compatible(const cvect &, const std::vector<std::string> &) const;
     void setup_terminals_from_data(const std::set<unsigned> & = {});
 

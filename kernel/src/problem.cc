@@ -19,6 +19,41 @@
 #include "kernel/src/evaluator.h"
 #include "kernel/src/variable.h"
 
+namespace
+{
+  ///
+  /// \param[in] used this is the "dictionary" for the sequence.
+  /// \param[in] size size of the output sequence.
+  /// \return a vector of sequences with repetition of fixed length (\a size)
+  ///         of elements taken from the given set (\a used).
+  ///
+  template<class C>
+  std::vector<C> seq_with_rep(const C &used, size_t size)
+  {
+    assert(used.size());
+    assert(size);
+
+    std::function<void (unsigned, const C &, std::vector<C> *)> swr(
+      [&](unsigned level, const C &base, std::vector<C> *out)
+      {
+        for (auto tag : used)
+        {
+          C current(base);
+          current.push_back(tag);
+
+          if (level + 1 < size)
+            swr(level + 1, current, out);
+          else
+            out->push_back(current);
+        }
+      });
+
+    std::vector<C> out;
+    swr(0, {}, &out);
+    return out;
+  }
+}  // namespace
+
 namespace vita
 {
   ///
@@ -220,6 +255,8 @@ namespace vita
 
     symbol_factory &factory(symbol_factory::instance());
 
+    // When I wrote this, only God and I understood what I was doing.
+    // Now, God only knows.
     for (const auto &s : pt.get_child("symbolset"))
       if (s.first == "symbol")
       {
@@ -319,53 +356,6 @@ namespace vita
     }
 
     return true;
-  }
-
-  ///
-  /// \param[in] used_categories this is the "dictionary" for the sequence.
-  /// \param[in] args size of the sequence.
-  /// \return a list of sequences with repetition of fixed length (\a args) of
-  ///         elements taken from the given set (\a categories).
-  ///
-  std::list<src_problem::cvect> src_problem::seq_with_rep(
-    const cvect &used_categories, size_t args)
-  {
-    assert(used_categories.size());
-    assert(args);
-
-    // When I wrote this, only God and I understood what I was doing.
-    // Now, God only knows.
-    
-    class swr
-    {
-    public:
-      swr(const cvect &used_categories, size_t args)
-        : categories_(used_categories), args_(args)
-      {
-      }
-
-      void operator()(unsigned level, const cvect &base, std::list<cvect> *out)
-      {
-        for (size_t i(0); i < categories_.size(); ++i)
-        {
-          cvect current(base);
-          current.push_back(categories_[i]);
-
-          if (level + 1 < args_)
-            operator()(level + 1, current, out);
-          else
-            out->push_back(current);
-        }
-      }
-
-    private:
-      const cvect &categories_;
-      const size_t args_;
-    };
-
-    std::list<cvect> out;
-    swr(used_categories, args)(0, {}, &out);
-    return out;
   }
 
   ///
