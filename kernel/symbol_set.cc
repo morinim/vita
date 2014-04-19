@@ -42,7 +42,7 @@ namespace vita
     {
       const auto slot(random::sup(sum));
 
-      size_t i(0);
+      std::size_t i(0);
       for (auto wedge(symbols[i]->weight);
            wedge <= slot;
            wedge += symbols[++i]->weight)
@@ -157,7 +157,8 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    for (size_t i(0); i < adts(); ++i)
+    const auto n(adts());
+    for (auto i(decltype(n){0}); i < n; ++i)
     {
       const auto w(all_.adt[i]->weight);
       const auto delta(w >  1 ? w/2 :
