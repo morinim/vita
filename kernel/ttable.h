@@ -13,6 +13,8 @@
 #if !defined(VITA_TTABLE_H)
 #define      VITA_TTABLE_H
 
+#include <vector>
+
 #include "kernel/environment.h"
 
 namespace vita
@@ -25,10 +27,10 @@ namespace vita
   {
     /// Hash signature is a 128 bit unsigned and is built by two 64 bit
     /// halves.
-    hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
+    explicit hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
 
     /// Resets the content of hash_t.
-    void clear() { data[0] = 0; data[1] = 0; }
+    void clear() { data[0] = data[1] = 0; }
 
     /// Standard equality operator for hash signature.
     bool operator==(hash_t h) const
@@ -52,11 +54,11 @@ namespace vita
     /// We assume that a string of 128 zero bits means empty.
     bool empty() const { return !data[0] && !data[1]; }
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  public:  // Public data members.
+  public:  // Public data members
     std::uint_least64_t data[2];
   };
 
@@ -74,8 +76,6 @@ namespace vita
   {
   public:
     explicit ttable(unsigned);
-
-    ~ttable();
 
     void clear();
     void clear(const hash_t &);
@@ -101,14 +101,14 @@ namespace vita
     // \c operator=() is a good idea (see "Effective C++").
     DISALLOW_COPY_AND_ASSIGN(ttable);
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private support methods.
-    size_t index(const hash_t &) const;
+  private:  // Private support methods
+    std::size_t index(const hash_t &) const;
 
-  private:  // Private data members.
+  private:  // Private data members
     struct slot
     {
       /// This is used as primary key for access to the table.
@@ -124,25 +124,13 @@ namespace vita
     };
 
     const std::uint64_t k_mask;
-    slot *const table_;
+    std::vector<slot> table_;
 
     decltype(slot::seal) seal_;
 
     mutable std::uintmax_t probes_;
     mutable std::uintmax_t hits_;
   };
-
-  ///
-  /// \param[out] o output stream.
-  /// \param[in] h hash signature to be printed.
-  ///
-  /// Mainly useful for debugging / testing.
-  ///
-  inline
-  std::ostream &operator<<(std::ostream &o, hash_t h)
-  {
-    return o << h.data[0] << h.data[1];
-  }
 
   /// \example example4.cc
   /// Performs a speed test on the transposition table (insert-find cycle).

@@ -53,26 +53,17 @@ namespace vita
   /// Creates a new transposition (hash) table.
   ///
   ttable::ttable(unsigned bits)
-    : k_mask((1 << bits) - 1), table_(new slot[1 << bits]), seal_(1),
-      probes_(0), hits_(0)
+    : k_mask((1 << bits) - 1), table_(1 << bits), seal_(1), probes_(0),
+      hits_(0)
   {
     assert(debug());
-  }
-
-  ///
-  /// Standard destructor.
-  ///
-  ttable::~ttable()
-  {
-    delete [] table_;
   }
 
   ///
   /// \param[in] u the signature of an individual.
   /// \return an index in the hash table.
   ///
-  inline
-  size_t ttable::index(const hash_t &h) const
+  inline std::size_t ttable::index(const hash_t &h) const
   {
     return h.data[0] & k_mask;
   }
@@ -87,10 +78,10 @@ namespace vita
 
     ++seal_;
 
-    //for (size_t i(0); i <= k_mask; ++i)
+    //for (auto &s : table_)
     //{
-    //  table_[i].hash = hash_t();
-    //  table_[i].fitness = {};
+    //  s.hash = hash_t();
+    //  s.fitness = {};
     //}
   }
 
@@ -116,8 +107,8 @@ namespace vita
   {
     probes_ = hits_ = 0;
 
-    for (size_t i(0); i <= k_mask; ++i)
-      table_[i].seen = 0;
+    for (auto &s : table_)
+      s.seen = 0;
   }
 #endif
 
@@ -207,7 +198,7 @@ namespace vita
     if (!(in >> t_hits))
       return false;
 
-    size_t n;
+    std::size_t n;
     if (!(in >> n))
       return false;
 
@@ -215,7 +206,7 @@ namespace vita
     probes_ = t_probes;
     hits_ = t_hits;
 
-    for (size_t i(0); i < n; ++i)
+    for (decltype(n) i(0); i < n; ++i)
     {
       slot s;
 
@@ -244,16 +235,15 @@ namespace vita
   {
     out << seal_ << ' ' << probes_ << ' ' << hits_ << std::endl;
 
-    size_t num(0);
-    for (size_t i(0); i <= k_mask; ++i)
-      if (!table_[i].hash.empty())
+    std::size_t num(0);
+    for (const auto &s : table_)
+      if (s.hash.empty())
         ++num;
     out << num << std::endl;
 
-    for (size_t i(0); i <= k_mask; ++i)
-      if (!table_[i].hash.empty())
+    for (const auto &s : table_)
+      if (!s.hash.empty())
       {
-        const slot &s(table_[i]);
         s.hash.save(out);
         s.fitness.save(out);
         out << s.seal;
@@ -272,5 +262,16 @@ namespace vita
   bool ttable::debug() const
   {
     return probes() >= hits();
+  }
+
+  ///
+  /// \param[out] o output stream.
+  /// \param[in] h hash signature to be printed.
+  ///
+  /// Mainly useful for debugging / testing.
+  ///
+  std::ostream &operator<<(std::ostream &o, hash_t h)
+  {
+    return o << h.data[0] << h.data[1];
   }
 }  // namespace vita
