@@ -13,8 +13,6 @@
 #if !defined(VITA_TEAM_H)
 #define      VITA_TEAM_H
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
 

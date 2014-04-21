@@ -399,7 +399,7 @@ void team<T>::graphviz(std::ostream &s) const
   for (auto i(decltype(size){0}); i < size; ++i)
     individuals_[i].graphviz(s,
                              std::string("Individual ") +
-                             boost::lexical_cast<std::string>(i));
+                             std::to_string(i));
 
   s << '}' << std::endl;
 }

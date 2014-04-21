@@ -123,7 +123,7 @@ namespace vita { namespace detail
   template<bool N>
   std::string class_names<N>::string(const any &a) const
   {
-    return boost::lexical_cast<std::string>(any_cast<class_t>(a));
+    return std::to_string(any_cast<class_t>(a));
   }
 
   ///
