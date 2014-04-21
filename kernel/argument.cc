@@ -10,8 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/argument.h"
 #include "kernel/gene.h"
 #include "kernel/interpreter.h"
@@ -47,7 +45,7 @@ namespace vita
   ///
   std::string argument::display() const
   {
-    return "ARG_" + boost::lexical_cast<std::string>(index_);
+    return "ARG_" + std::to_string(index_);
   }
 
   ///
