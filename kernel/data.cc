@@ -12,7 +12,6 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/lexical_cast.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/data.h"
@@ -30,15 +29,18 @@ namespace vita
     ///
     ///     convert("123.1", sym_double) == any(123.1f)
     ///
+    /// \exception std::invalid_argument
+    /// if no conversion could be performed.
+    ///
     any convert(const std::string &s, domain_t d)
     {
       switch (d)
       {
-      case domain_t::d_bool:   return   any(boost::lexical_cast<bool>(s));
-      case domain_t::d_int:    return    any(boost::lexical_cast<int>(s));
-      case domain_t::d_double: return any(boost::lexical_cast<double>(s));
-      case domain_t::d_string: return                              any(s);
-      default:                            throw boost::bad_lexical_cast();
+      case domain_t::d_bool:   return any(std::stoi(s));
+      case domain_t::d_int:    return any(std::stoi(s));
+      case domain_t::d_double: return any(std::stod(s));
+      case domain_t::d_string: return            any(s);
+      default:                 return             any();
       }
     }
 
@@ -50,9 +52,9 @@ namespace vita
     {
       try
       {
-        boost::lexical_cast<double>(s);
+        std::stod(s);
       }
-      catch(boost::bad_lexical_cast &)
+      catch(std::invalid_argument &)
       {
         return false;
       }
@@ -613,7 +615,7 @@ namespace vita
               else  // input value
                 instance.input.push_back(convert(value, domain));
             }
-            catch(boost::bad_lexical_cast &)
+            catch(std::invalid_argument &)
             {
               instance.clear();
               continue;
@@ -700,8 +702,7 @@ namespace vita
 
           std::string s_domain(is_number(record[field])
                                ? "numeric"
-                               : "string" +
-                                 boost::lexical_cast<std::string>(field));
+                               : "string" + std::to_string(field));
 
           // For classification problems we use discriminant functions, so the
           // actual output type is always numeric.
@@ -757,7 +758,7 @@ namespace vita
                 categories_.add_label(c, value);
             }
           }
-          catch(boost::bad_lexical_cast &)
+          catch(std::invalid_argument &)
           {
             instance.clear();
             continue;
