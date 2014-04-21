@@ -170,7 +170,7 @@ namespace vita
       {
         std::string name(dat_.get_column(i).name);
         if (name.empty())
-          name = "X" + boost::lexical_cast<std::string>(i);
+          name = "X" + std::to_string(i);
 
         const category_t category(dat_.get_column(i).category_id);
         sset.insert(make_unique<variable>(name, i - 1, category));
