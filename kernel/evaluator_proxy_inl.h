@@ -165,11 +165,9 @@ template<class T>
 std::string evaluator_proxy<T>::info() const
 {
   return
-    "hits " + boost::lexical_cast<std::string>(cache_.hits()) +
-    ", probes " + boost::lexical_cast<std::string>(cache_.probes()) +
-    " (ratio " +
-    boost::lexical_cast<std::string>(cache_.hits() * 100 / cache_.probes()) +
-    "%)";
+    "hits " + std::to_string(cache_.hits()) +
+    ", probes " + std::to_string(cache_.probes()) +
+    " (ratio " + std::to_string(cache_.hits() * 100 / cache_.probes()) + "%)";
 }
 
 ///

@@ -13,8 +13,6 @@
 #if !defined(VITA_EVALUATOR_PROXY_H)
 #define      VITA_EVALUATOR_PROXY_H
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/evaluator.h"
 #include "kernel/ttable.h"
 
