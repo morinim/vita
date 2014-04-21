@@ -10,8 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/symbol.h"
 
 namespace vita
@@ -38,7 +36,7 @@ namespace vita
   {
     assert(parametric());
 
-    return display() + "_" + boost::lexical_cast<std::string>(v);
+    return display() + "_" + std::to_string(v);
   }
 
   ///
