@@ -10,8 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/adf.h"
 #include "kernel/interpreter.h"
 
@@ -30,7 +28,7 @@ namespace vita
   ///
   std::string adf_core::display(const std::string &prefix) const
   {
-    return prefix + boost::lexical_cast<std::string>(id_);
+    return prefix + std::to_string(id_);
   }
 
   ///
