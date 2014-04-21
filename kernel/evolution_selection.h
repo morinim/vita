@@ -68,6 +68,11 @@ namespace vita {  namespace selection {
   /// on parallel architectures and allows the selection pressure to be easily
   /// adjusted.
   ///
+  /// The tournament selection algorithm we implemented was modified so that 
+  /// instead of having only one winner (parent) in each tournament, we select
+  /// n winners from each tournament based on the top n fitness values in the
+  /// tournament.
+  ///
   template<class T>
   class tournament : public strategy<T>
   {

@@ -10,8 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/any.h"
 
 namespace vita
@@ -56,13 +54,13 @@ namespace vita
   std::string to<std::string>(const any &a)
   {
     if (auto *p = any_cast<double>(&a))
-      return boost::lexical_cast<std::string>(*p);
+      return std::to_string(*p);
 
     if (auto *p = any_cast<int>(&a))
-      return boost::lexical_cast<std::string>(*p);
+      return std::to_string(*p);
 
     if (auto *p = any_cast<bool>(&a))
-      return boost::lexical_cast<std::string>(*p);
+      return std::to_string(*p);
 
     return any_cast<std::string>(a);
   }
