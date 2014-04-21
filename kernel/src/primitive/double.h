@@ -67,7 +67,7 @@ namespace vita
       { return random::between<int>(min, upp); }
 
       virtual std::string display(int v) const override
-      { return boost::lexical_cast<std::string>(v); }
+      { return std::to_string(v); }
 
       virtual any eval(interpreter<individual> *i) const override
       { return any(static_cast<base_t>(any_cast<int>(i->fetch_param()))); }
