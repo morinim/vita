@@ -15,8 +15,6 @@
 
 #include <type_traits>
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/data.h"
 #include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"

@@ -71,7 +71,7 @@ any basic_reg_lambda_f<T, S>::eval(const data::example &e,
 template<class T, bool S>
 std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 {
-  return boost::lexical_cast<std::string>(to<number>(a));
+  return std::to_string(to<number>(a));
 }
 
 ///
