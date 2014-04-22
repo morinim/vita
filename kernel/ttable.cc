@@ -26,10 +26,7 @@ namespace vita
     hash_t tmp;
 
     if (!(in >> tmp.data[0] >> tmp.data[1]))
-    {
-      std::cout << tmp.data[0] << ' ' << tmp.data[1] << std::endl;
       return false;
-    }
 
     *this = tmp;
 
@@ -202,10 +199,6 @@ namespace vita
     if (!(in >> n))
       return false;
 
-    seal_ = t_seal;
-    probes_ = t_probes;
-    hits_ = t_hits;
-
     for (decltype(n) i(0); i < n; ++i)
     {
       slot s;
@@ -224,6 +217,10 @@ namespace vita
       table_[index(s.hash)] = s;
     }
 
+    seal_ = t_seal;
+    probes_ = t_probes;
+    hits_ = t_hits;
+
     return true;
   }
 
@@ -237,7 +234,7 @@ namespace vita
 
     std::size_t num(0);
     for (const auto &s : table_)
-      if (s.hash.empty())
+      if (!s.hash.empty())
         ++num;
     out << num << std::endl;
 

@@ -3,7 +3,7 @@
  *  \file test_primitive_i.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   });
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
@@ -53,8 +53,8 @@ BOOST_AUTO_TEST_CASE(ADD)
     {{    x,   null}}   // [2] X
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(y->eval(0)) +
-                        any_cast<int>(x->eval(0)), "\n" << i);
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(y->eval(nullptr)) +
+                        any_cast<int>(x->eval(nullptr)), "\n" << i);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
   g =
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(DIV)
     {{   c0,   null}}   // [2] 0
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i);
 }
 
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(MUL)
     {{   c1,   null}}   // [2] 1
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     {{   c0,   null}}   // [2] 0
   };
   ret = i_interp(i.replace(g)).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(0)),
+  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i);
 
   BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE(SUB)
     ret = i_interp(i.replace(g)).run();
     BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) ==
                           static_cast<Z *>(z)->val -
-                          any_cast<int>(x->eval(0)), "\n" << i);
+                          any_cast<int>(x->eval(nullptr)), "\n" << i);
   }
 }
 

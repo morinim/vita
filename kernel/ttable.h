@@ -62,7 +62,7 @@ namespace vita
     std::uint_least64_t data[2];
   };
 
-
+  std::ostream &operator<<(std::ostream &, hash_t);
 
   ///
   /// \a ttable \c class implements a hash table that links individuals'
