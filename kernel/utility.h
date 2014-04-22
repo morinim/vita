@@ -84,6 +84,19 @@ namespace vita
                                    pred),
                     container.end());
   }
+
+  ///
+  /// \param[in] s a string
+  /// \return the content of string \a s converted in an object of type \a T.
+  ///
+  /// Reduced version of boost::lexical_cast.
+  ///
+  template<class T> T lexical_cast(const std::string &s)
+  { return std::stoi(s); }
+  template<> inline double lexical_cast(const std::string &s)
+  { return std::stod(s); }
+  template<> inline std::string lexical_cast(const std::string &s)
+  { return s; }
 }  // namespace vita
 
 #endif  // Include guard

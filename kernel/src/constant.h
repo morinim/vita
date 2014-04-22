@@ -13,8 +13,6 @@
 #if !defined(VITA_SRC_CONSTANT_H)
 #define      VITA_SRC_CONSTANT_H
 
-#include <boost/lexical_cast.hpp>
-
 #include "kernel/terminal.h"
 
 namespace vita
@@ -28,8 +26,7 @@ namespace vita
   public:
     explicit constant(const std::string &c, category_t t = 0)
       : terminal(c, t, false, false, k_base_weight),
-        val_(boost::lexical_cast<T>(c)) {}
-
+        val_(lexical_cast<T>(c)) {}
     explicit constant(T c, category_t t = 0)
       : constant(std::to_string(c), t) {}
 
