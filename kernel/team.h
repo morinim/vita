@@ -65,7 +65,7 @@ namespace vita
     // Recombination operators.
     unsigned mutation();
     unsigned mutation(double);
-    team<T> crossover(const team<T> &) const;
+    team<T> crossover(team<T>) const;
 
     using const_iterator = typename std::vector<T>::const_iterator;
     const_iterator begin() const;

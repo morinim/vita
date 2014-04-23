@@ -100,7 +100,7 @@ unsigned team<T>::mutation(double p)
 /// \see individual::crossover for further details
 ///
 template<class T>
-team<T> team<T>::crossover(const team<T> &t) const
+team<T> team<T>::crossover(team<T> t) const
 {
   assert(t.debug());
   assert(individuals() == t.individuals());
@@ -108,21 +108,16 @@ team<T> team<T>::crossover(const team<T> &t) const
 /*
   const auto j(random::sup(individuals()));
 
-  team<T> offspring(*this);
-  offspring.signature_.clear();
-
-  offspring.individuals_[j] = offspring[j].crossover(t[j]);
+  t.individuals_[j] = operator[](j).crossover(t[j])
+  t.signature_.clear();
 */
 
   const auto sup(individuals());
-
-  team<T> offspring(*this);
-  offspring.signature_.clear();
-
   for (auto i(decltype(sup){0}); i < sup; ++i)
-    offspring.individuals_[i] = offspring[i].crossover(t[i]);
+    t.individuals_[i] = operator[](i).crossover(t[i]);
 
-  return offspring;
+  t.signature_.clear();
+  return t;
 }
 
 ///

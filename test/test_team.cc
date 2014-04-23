@@ -104,10 +104,16 @@ BOOST_AUTO_TEST_CASE(Crossover)
   const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += t1.distance(t1.crossover(t2));
+  {
+    const auto tc(t1.crossover(t2));
+    BOOST_CHECK(tc.debug(true));
+
+    dist += t1.distance(tc);
+  }
 
   const double perc(100.0 * dist /
-                    (env.code_length * sset.categories() * n * t1.individuals()));
+                    (env.code_length * sset.categories() * n *
+                     t1.individuals()));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
