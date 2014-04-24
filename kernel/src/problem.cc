@@ -28,7 +28,7 @@ namespace
   ///         of elements taken from the given set (\a used).
   ///
   template<class C>
-  std::vector<C> seq_with_rep(const C &used, size_t size)
+  std::vector<C> seq_with_rep(const C &used, std::size_t size)
   {
     assert(used.size());
     assert(size);
@@ -142,7 +142,7 @@ namespace vita
   ///
   /// Load the test set.
   ///
-  size_t src_problem::load_test_set(const std::string &ts)
+  std::size_t src_problem::load_test_set(const std::string &ts)
   {
     const auto backup(dat_.dataset());
     dat_.dataset(data::test);

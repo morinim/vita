@@ -355,8 +355,8 @@ namespace vita
     // reasons.
     // Anyway before hashing opcodes/parameters we convert them to 16 bit types
     // to avoid hashing more than necessary.
-    assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
     const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
+    assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
 
     // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
     // std::uint8_t has the exact same size and representation as
@@ -803,7 +803,8 @@ namespace vita
       if (g.sym->parametric())
         out << ' ' << g.par;
 
-      for (size_t i(0); i < g.sym->arity(); ++i)
+      const auto arity(g.sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
         out << ' ' << g.args[i];
 
       out << std::endl;

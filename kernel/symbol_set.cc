@@ -49,12 +49,12 @@ namespace vita
       {}
 
       // This is a different approach from Eli Bendersky
-      // (http://eli.thegreenplace.net):
+      // (http://eli.thegreenplace.net/):
       //
       //     unsigned total(0);
-      //     size_t winner(0);
+      //     std::size_t winner(0);
       //
-      //     for (size_t i(0); i < symbols.size(); ++i)
+      //     for (std::size_t i(0); i < symbols.size(); ++i)
       //     {
       //       total += symbols[i]->weight;
       //       if (random::sup(total + 1) < symbols[i]->weight)
@@ -157,35 +157,34 @@ namespace vita
   ///
   void symbol_set::reset_adf_weights()
   {
-    const auto n(adts());
-    for (auto i(decltype(n){0}); i < n; ++i)
+    for (auto adt : all_.adt)
     {
-      const auto w(all_.adt[i]->weight);
+      const auto w(adt->weight);
       const auto delta(w >  1 ? w/2 :
                        w == 1 ?   1 : 0);
       all_.sum -= delta;
-      all_.adt[i]->weight -= delta;
+      adt->weight -= delta;
 
-      if (delta && all_.adt[i]->weight == 0)
+      if (delta && adt->weight == 0)
       {
-        const auto opcode(all_.adt[i]->opcode());
-        const auto adf_opcode([opcode](const symbol *s)
+        const auto opcode(adt->opcode());
+        const auto adt_opcode([opcode](const symbol *s)
                                {
                                  return s->opcode() == opcode;
                                });
 
-        erase_if(all_.terminals, adf_opcode);
-        erase_if(all_.symbols, adf_opcode);
+        erase_if(all_.terminals, adt_opcode);
+        erase_if(all_.symbols, adt_opcode);
       }
     }
 
-    for (size_t i(0); i < all_.adf.size(); ++i)
+    for (auto adf : all_.adf)
     {
-      const auto w(all_.adf[i]->weight);
+      const auto w(adf->weight);
       const auto delta(w >  1 ? w/2 :
                        w == 1 ?   1 : 0);
       all_.sum -= delta;
-      all_.adf[i]->weight -= delta;
+      adf->weight -= delta;
     }
 
     by_ = by_category(all_);
@@ -226,9 +225,9 @@ namespace vita
   ///
   symbol *symbol_set::decode(opcode_t opcode) const
   {
-    for (size_t i(0); i < all_.symbols.size(); ++i)
-      if (all_.symbols[i]->opcode() == opcode)
-        return all_.symbols[i];
+    for (auto s : all_.symbols)
+      if (s->opcode() == opcode)
+        return s;
 
     return nullptr;
   }
@@ -246,9 +245,9 @@ namespace vita
   {
     assert(dex != "");
 
-    for (size_t i(0); i < all_.symbols.size(); ++i)
-      if (all_.symbols[i]->display() == dex)
-        return all_.symbols[i];
+    for (auto s : all_.symbols)
+      if (s->display() == dex)
+        return s;
 
     return nullptr;
   }
@@ -338,8 +337,8 @@ namespace vita
     if (!all_.debug())
       return false;
 
-    for (size_t i(0); i < by_.category.size(); ++i)
-      if (!by_.category[i].debug())
+    for (const collection &c : by_.category)
+      if (!c.debug())
         return false;
 
     return enough_terminals();
@@ -360,36 +359,38 @@ namespace vita
   {
     std::uintmax_t check_sum(0);
 
-    for (size_t j(0); j < symbols.size(); ++j)
+    for (auto s : symbols)
     {
-      if (!symbols[j]->debug())
+      if (!s->debug())
         return false;
 
-      check_sum += symbols[j]->weight;
+      check_sum += s->weight;
 
-      if (symbols[j]->weight == 0)
+      if (s->weight == 0)
         return false;
 
-      bool found(false);
-      if (symbols[j]->terminal())
+      if (s->terminal())
       {
-        // Terminals must be in the terminals_ vector.
-        for (size_t i(0); i < terminals.size() && !found; ++i)
-          found = (symbols[j] == terminals[i]);
+        // Terminals must be in the terminals' vector.
+        if (std::find(terminals.begin(), terminals.end(), s) ==
+            terminals.end())
+          return false;
 
-        if (symbols[j]->auto_defined())
-          for (size_t i(0); i < adt.size() && !found; ++i)
-            found = (symbols[j] == adt[i]);
+        if (s->auto_defined() &&
+            std::find(adt.begin(), adt.end(), s) == adt.end())
+          return false;
       }
       else  // Function
-        if (symbols[j]->auto_defined())
-          for (size_t i(0); i < adf.size() && !found; ++i)
-            found = (symbols[j] == adf[i]);
-        else
-          found = true;
+      {
+        // Function must not be in the terminals' vector.
+        if (std::find(terminals.begin(), terminals.end(), s) !=
+            terminals.end())
+          return false;
 
-      if (!found)
-        return false;
+        if (s->auto_defined() &&
+            std::find(adf.begin(), adf.end(), s) == adf.end())
+          return false;
+      }
     }
 
     if (check_sum != sum)
@@ -407,30 +408,30 @@ namespace vita
   ///
   symbol_set::by_category::by_category(const collection &c) : category()
   {
-    for (size_t i(0); i < c.symbols.size(); ++i)
+    for (auto s : c.symbols)
     {
-      const category_t cat(c.symbols[i]->category());
+      const category_t cat(s->category());
       if (cat >= category.size())
       {
         category.resize(cat + 1);
         category[cat] = collection();
       }
 
-      category[cat].symbols.push_back(c.symbols[i]);
-      category[cat].sum += c.symbols[i]->weight;
+      category[cat].symbols.push_back(s);
+      category[cat].sum += s->weight;
     }
 
-    for (size_t i(0); i < c.terminals.size(); ++i)
-      category[c.terminals[i]->category()].terminals.push_back(c.terminals[i]);
+    for (auto t : c.terminals)
+      category[t->category()].terminals.push_back(t);
 
-    for (size_t i(0); i < c.adf.size(); ++i)
-      category[c.adf[i]->category()].adf.push_back(c.adf[i]);
+    for (auto adf : c.adf)
+      category[adf->category()].adf.push_back(adf);
 
-    for (size_t i(0); i < c.adt.size(); ++i)
-      category[c.adt[i]->category()].adt.push_back(c.adt[i]);
+    for (auto adt : c.adt)
+      category[adt->category()].adt.push_back(adt);
 
-    for (size_t j(0); j < category.size(); ++j)
-      std::sort(category[j].symbols.begin(), category[j].symbols.end(),
+    for (collection &coll : category)
+      std::sort(coll.symbols.begin(), coll.symbols.end(),
                 [](const symbol *s1, const symbol *s2)
                 { return s1->weight > s2->weight; });
 
@@ -442,17 +443,17 @@ namespace vita
   ///
   bool symbol_set::by_category::debug() const
   {
-    for (size_t t(0); t < category.size(); ++t)
+    for (const collection &coll : category)
     {
-      const size_t s(category[t].symbols.size());
-      if (s < category[t].terminals.size())
+      const std::size_t s(coll.symbols.size());
+      if (s < coll.terminals.size())
         return false;
-      if (s < category[t].adf.size())
+      if (s < coll.adf.size())
         return false;
-      if (s < category[t].adt.size())
+      if (s < coll.adt.size())
         return false;
 
-      if (!category[t].debug())
+      if (!coll.debug())
         return false;
     }
 

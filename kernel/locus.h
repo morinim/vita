@@ -19,10 +19,10 @@
 
 namespace vita
 {
-  static_assert(sizeof(index_t) <= sizeof(size_t),
-                "index_t sizes expected to be <= size_t");
-  static_assert(sizeof(category_t) <= sizeof(size_t),
-                "category_t sizes expected to be <= size_t");
+  static_assert(sizeof(index_t) <= sizeof(std::size_t),
+                "index_t sizes expected to be <= std::size_t");
+  static_assert(sizeof(category_t) <= sizeof(std::size_t),
+                "category_t sizes expected to be <= std::size_t");
 
   struct locus
   {
