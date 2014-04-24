@@ -127,9 +127,9 @@ namespace vita
     bool save(std::ostream &) const;
 
   private:  // Private support methods.
-    template<class T = std::uint8_t> hash_t hash() const;
+    hash_t hash() const;
     void in_line(std::ostream &, const locus &) const;
-    template<class T> void pack(const locus &, std::vector<T> *const) const;
+    void pack(const locus &, std::vector<unsigned char> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
   private:  // Private data members.

@@ -345,9 +345,8 @@ namespace vita
   /// individuals to the same byte stream. This is a very interesting
   /// property, useful for individual comparison / information retrieval.
   ///
-  template <class T>
   void individual::pack(const locus &l,
-                        std::vector<T> *const p) const
+                        std::vector<unsigned char> *const p) const
   {
     const gene &g(genome_(l));
 
@@ -356,10 +355,15 @@ namespace vita
     // reasons.
     // Anyway before hashing opcodes/parameters we convert them to 16 bit types
     // to avoid hashing more than necessary.
-    const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
     assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
+    const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
 
-    const T *const s1 = reinterpret_cast<const T *>(&opcode);
+    // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
+    // std::uint8_t has the exact same size and representation as
+    // unsigned char, if the implementation made it a distinct, non-character
+    // type, the aliasing rules would not apply to it
+    // (see http://stackoverflow.com/q/16138237/3235496)
+    const auto *const s1 = reinterpret_cast<const unsigned char *>(&opcode);
     for (std::size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
@@ -369,7 +373,7 @@ namespace vita
       assert(std::numeric_limits<decltype(param)>::min() <= g.par);
       assert(g.par <= std::numeric_limits<decltype(param)>::max());
 
-      const T *const s2 = reinterpret_cast<const T *>(&param);
+      const auto *const s2 = reinterpret_cast<const unsigned char *>(&param);
       for (std::size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
@@ -387,21 +391,20 @@ namespace vita
   /// Converts \c this individual in a packed byte level representation and
   /// performs the MurmurHash3 algorithm on it.
   ///
-  template<class T>
   hash_t individual::hash() const
   {
     // From an individual to a packed byte stream...
-    static std::vector<T> packed;
+    static std::vector<unsigned char> packed;
     packed.clear();
     // In a multithread environment the two lines above must be changed with:
-    //     std::vector<T> packed;
+    //     std::vector<unsigned char> packed;
     // (static keyword and packed.clear() call deleted).
 
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
-    const auto len(static_cast<unsigned>(packed.size() *
-                                         sizeof(T)));  // Length in bytes
+    const auto len(static_cast<unsigned>(
+                     packed.size() * sizeof(packed[0])));  // Length in bytes
 
     return vita::hash(packed.data(), len, 1973);
   }
