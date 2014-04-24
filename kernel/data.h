@@ -86,8 +86,7 @@ namespace vita
     static domain_t from_weka(const std::string &);
 
   private: // Private support methods
-    template<class T> static T encode(const std::string &,
-                                      std::map<std::string, T> *);
+    class_t encode(const std::string &);
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 

@@ -324,19 +324,17 @@ namespace vita
 
   ///
   /// \param[in] label name of a class of the learning collection.
-  /// \param[in,out] map map used to encode the \a label.
-  /// \return a positive integer used as primary key \a label.
+  /// \return the (numerical) tag associated with class \a label.
   ///
-  template<class T>
-  T data::encode(const std::string &label, std::map<std::string, T> *map)
+  class_t data::encode(const std::string &label)
   {
-    if (map->find(label) == map->end())
+    if (classes_map_.find(label) == classes_map_.end())
     {
-      const auto n(map->size());
-      (*map)[label] = static_cast<category_t>(n);
+      const auto n(static_cast<category_t>(classes_map_.size()));
+      classes_map_[label] = n;
     }
 
-    return (*map)[label];
+    return classes_map_[label];
   }
 
   ///
@@ -608,7 +606,7 @@ namespace vita
                 // Strings could be used as label for classes, but integers
                 // are simpler and faster to manage (arrays instead of maps).
                 if (classification)
-                  instance.output = encode(value, &classes_map_);
+                  instance.output = encode(value);
                 else
                 {
                   instance.output = convert(value, domain);
@@ -746,7 +744,7 @@ namespace vita
               else
               {
                 if (classification)
-                  instance.output = encode(value, &classes_map_);
+                  instance.output = encode(value);
                 else
                 {
                   instance.output = convert(value, d);
