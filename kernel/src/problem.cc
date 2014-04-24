@@ -116,9 +116,8 @@ namespace vita
   ///
   /// Loads \a data into the active dataset.
   ///
-  std::pair<unsigned, unsigned> src_problem::load(const std::string &ds,
-                                                  const std::string &ts,
-                                                  const std::string &symbols)
+  std::pair<std::size_t, unsigned> src_problem::load(
+    const std::string &ds, const std::string &ts, const std::string &symbols)
   {
     if (ds.empty())
       return {0, 0};
@@ -126,7 +125,7 @@ namespace vita
     sset = vita::symbol_set();
     dat_.clear();
 
-    const unsigned n_examples(dat_.open(ds, env.verbosity));
+    const auto n_examples(dat_.open(ds, env.verbosity));
 
     if (!ts.empty())
       load_test_set(ts);
@@ -230,11 +229,11 @@ namespace vita
   /// Data should be loaded before symbols: if we haven't data we don't know,
   /// among other things, what features the dataset has.
   ///
-  size_t src_problem::load_symbols(const std::string &s_file)
+  unsigned src_problem::load_symbols(const std::string &s_file)
   {
     setup_terminals_from_data();
 
-    size_t parsed(0);
+    unsigned parsed(0);
 
     const auto c_size(dat_.categories().size());
 
@@ -361,7 +360,7 @@ namespace vita
   ///
   /// \return number of categories of the problem (>= 1).
   ///
-  size_t src_problem::categories() const
+  unsigned src_problem::categories() const
   {
     return dat_.categories().size();
   }
@@ -370,7 +369,7 @@ namespace vita
   /// \return number of classes of the problem (== 0 for a symbolic regression
   ///         problem, > 1 for a classification problem).
   ///
-  size_t src_problem::classes() const
+  unsigned src_problem::classes() const
   {
     assert(dat_.classes() != 1);
 
@@ -381,7 +380,7 @@ namespace vita
   /// \return dimension of the input vectors (i.e. the number of variable of
   ///         the problem).
   ///
-  size_t src_problem::variables() const
+  unsigned src_problem::variables() const
   {
     return dat_.variables();
   }

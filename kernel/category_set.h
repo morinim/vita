@@ -83,7 +83,7 @@ namespace vita
 
     const_iterator begin() const;
     const_iterator end() const;
-    size_t size() const;
+    unsigned size() const;
 
     category find(const std::string &) const;
     category find(category_t) const;
@@ -122,7 +122,8 @@ namespace vita
     const_iterator(const_iter b, const_iter c) : begin_(b), ptr_(c) {}
 
     const_iterator operator++() { ++ptr_; return *this; }
-    value_type operator*() { return category(ptr_ - begin_, *ptr_); }
+    value_type operator*()
+    { return category(static_cast<category_t>(ptr_ - begin_), *ptr_); }
 
     bool operator==(const const_iterator &rhs) const
     { return ptr_ == rhs.ptr_; }

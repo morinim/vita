@@ -28,11 +28,11 @@ namespace vita
                          const std::string & = "");
 
     bool operator!() const;
-    std::pair<unsigned, unsigned> load(const std::string &,
-                                       const std::string & = "",
-                                       const std::string & = "");
-    size_t load_symbols(const std::string &);
-    size_t load_test_set(const std::string &);
+    std::pair<std::size_t, unsigned> load(const std::string &,
+                                          const std::string & = "",
+                                          const std::string & = "");
+    unsigned load_symbols(const std::string &);
+    std::size_t load_test_set(const std::string &);
     void setup_default_symbols();
 
     virtual vita::data *data() override { return &dat_; }
@@ -42,9 +42,9 @@ namespace vita
     /// Just a shortcut for checking number of classes.
     bool classification() { return classes() > 1; }
 
-    size_t categories() const;
-    size_t classes() const;
-    size_t variables() const;
+    unsigned categories() const;
+    unsigned classes() const;
+    unsigned variables() const;
 
     virtual bool debug(bool) const override;
 

@@ -394,7 +394,7 @@ std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   number val_(0.0), sum_(0.0);
   class_t probable_class(0);
 
-  const auto classes(gauss_dist_.size());
+  const auto classes(static_cast<unsigned>(gauss_dist_.size()));
   for (auto i(decltype(classes){0}); i < classes; ++i)
   {
     const number distance(std::fabs(x - gauss_dist_[i].mean));

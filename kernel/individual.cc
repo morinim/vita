@@ -77,7 +77,7 @@ namespace vita
   ///
   unsigned individual::eff_size() const
   {
-    return std::distance(begin(), end());
+    return static_cast<unsigned>(std::distance(begin(), end()));
   }
 
   ///
@@ -267,14 +267,16 @@ namespace vita
       if (genome_(l).sym->terminal())
         terminals.push_back(l);
 
+    const auto t_size(static_cast<unsigned>(terminals.size()));
+
     // Step 2: shuffle the terminals and pick elements 0..n-1.
-    const auto n(std::min<unsigned>(max_args, terminals.size()));
+    const auto n(std::min<unsigned>(max_args, t_size));
     assert(n);
 
     if (n < size())
       for (auto j(decltype(n){0}); j < n; ++j)
       {
-        const auto r(random::between<unsigned>(j, terminals.size()));
+        const auto r(random::between<unsigned>(j, t_size));
 
         std::swap(terminals[j], terminals[r]);
       }
@@ -354,26 +356,29 @@ namespace vita
     // reasons.
     // Anyway before hashing opcodes/parameters we convert them to 16 bit types
     // to avoid hashing more than necessary.
-    const std::uint16_t opcode(g.sym->opcode());
+    const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
     assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
 
     const T *const s1 = reinterpret_cast<const T *>(&opcode);
-    for (size_t i(0); i < sizeof(opcode); ++i)
+    for (std::size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
     if (g.sym->parametric())
     {
-      const std::int16_t param(g.par);
+      const auto param(static_cast<std::int16_t>(g.par));
       assert(std::numeric_limits<decltype(param)>::min() <= g.par);
       assert(g.par <= std::numeric_limits<decltype(param)>::max());
 
       const T *const s2 = reinterpret_cast<const T *>(&param);
-      for (size_t i(0); i < sizeof(param); ++i)
+      for (std::size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
     else
-      for (size_t i(0); i < g.sym->arity(); ++i)
+    {
+      const auto arity(g.sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
         pack({g.args[i], function::cast(g.sym)->arg_category(i)}, p);
+    }
   }
 
   ///
@@ -395,7 +400,8 @@ namespace vita
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...
-    const auto len(packed.size() * sizeof(T));  // Length in bytes
+    const auto len(static_cast<unsigned>(packed.size() *
+                                         sizeof(T)));  // Length in bytes
 
     return vita::hash(packed.data(), len, 1973);
   }
@@ -677,8 +683,8 @@ namespace vita
   ///
   void individual::dump(std::ostream &s) const
   {
-    const unsigned categories(sset_->categories());
-    const unsigned width(1 + std::log10(size() - 1));
+    const auto categories(sset_->categories());
+    const unsigned width(1 + static_cast<unsigned>(std::log10(size() - 1)));
 
     for (unsigned i(0); i < size(); ++i)
     {
@@ -735,13 +741,13 @@ namespace vita
     if (!(in >> best.index >> best.category))
       return false;
 
-    size_t rows, cols;
+    unsigned rows, cols;
     if (!(in >> rows >> cols) || !rows || !cols)
       return false;
 
     decltype(genome_) genome(rows, cols);
-    for (size_t r(0); r < rows; ++r)
-      for (size_t c(0); c < cols; ++c)
+    for (decltype(rows) r(0); r < rows; ++r)
+      for (decltype(cols) c(0); c < cols; ++c)
       {
         opcode_t opcode;
         if (!(in >> opcode))
@@ -757,7 +763,7 @@ namespace vita
             return false;
 
         if (g.sym->arity())
-          for (size_t i(0); i < g.sym->arity(); ++i)
+          for (unsigned i(0); i < g.sym->arity(); ++i)
             if (!(in >> g.args[i]))
               return false;
 

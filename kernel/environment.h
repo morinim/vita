@@ -156,9 +156,10 @@ namespace vita
     boost::optional<unsigned> g_without_improvement;
 
     /// How much data should be reserved for the validation set?
-    /// validation_ratio is the fraction of the original data that goes into
-    /// the validation set.
-    boost::optional<double> validation_ratio;
+    /// \a validation_percentage is the fraction of the original data that
+    /// goes into the validation set.
+    /// A value greater than 100 means undefined (auto-tune).
+    unsigned validation_percentage = 101;
 
     /// Should we use Adaptive Representation through Learning?
     boost::tribool arl = boost::indeterminate;

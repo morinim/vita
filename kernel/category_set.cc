@@ -77,9 +77,9 @@ namespace vita
   /// we use (based on a discriminant function) doesn't manipulate (skips) the
   /// output category (it only uses the number of output classes).
   ///
-  size_t category_set::size() const
+  unsigned category_set::size() const
   {
-    return categories_.size();
+    return static_cast<unsigned>(categories_.size());
   }
 
   ///
@@ -98,7 +98,8 @@ namespace vita
     if (uc == categories_.end())
       return category::null;
 
-    const auto tag(std::distance(categories_.begin(), uc));
+    const auto tag(
+      static_cast<category_t>(std::distance(categories_.begin(), uc)));
     return category(tag, categories_[tag]);
   }
 
@@ -124,7 +125,7 @@ namespace vita
 
     if (!c1)
     {
-      c1.tag = size();
+      c1.tag = static_cast<decltype(c1.tag)>(size());
       categories_.push_back(c);
     }
 

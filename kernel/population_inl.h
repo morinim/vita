@@ -78,7 +78,7 @@ void population<T>::init_layer(unsigned l, const environment *e,
 template<class T>
 unsigned population<T>::layers() const
 {
-  return pop_.size();
+  return static_cast<unsigned>(pop_.size());
 }
 
 ///
@@ -205,7 +205,7 @@ template<class T>
 unsigned population<T>::individuals(unsigned l) const
 {
   assert(l < layers());
-  return pop_[l].size();
+  return static_cast<unsigned>(pop_[l].size());
 }
 
 ///
@@ -216,7 +216,7 @@ unsigned population<T>::individuals() const
 {
   unsigned n(0);
   for (const auto &layer : pop_)
-    n += layer.size();
+    n += static_cast<unsigned>(layer.size());
 
   return n;
 }

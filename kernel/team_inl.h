@@ -155,7 +155,7 @@ const T &team<T>::operator[](unsigned i) const
 template<class T>
 unsigned team<T>::individuals() const
 {
-  return individuals_.size();
+  return static_cast<unsigned>(individuals_.size());
 }
 
 ///

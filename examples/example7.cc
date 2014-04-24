@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
       std::cout << " ]" << std::endl;
 
       blocks_len.add(ib.eff_size());
-      arguments.add(generalized.second.size());
+      arguments.add(static_cast<double>(generalized.second.size()));
     }
   }
 

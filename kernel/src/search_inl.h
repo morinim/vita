@@ -46,7 +46,8 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 
     case evaluator_id::dyn_slot:
       {
-        auto x_slot(msg.empty() ? 10ul : std::stoul(msg));
+        auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
+                                                      : std::stoul(msg)));
         search<T, ES>::set_evaluator(
           make_unique<dyn_slot_evaluator<T>>(data, x_slot));
       }

@@ -31,7 +31,8 @@ namespace vita
   function::function(const std::string &dis, category_t c,
                      const std::vector<category_t> &args, unsigned w,
                      bool asve)
-    : symbol(dis, c, w), arity_(args.size()), associative_(asve)
+    : symbol(dis, c, w), arity_(static_cast<decltype(arity_)>(args.size())),
+      associative_(asve)
   {
     assert(args.size() <= gene::k_args);
 

@@ -51,7 +51,7 @@ namespace vita
       generations = 100;
       g_without_improvement = 0;
       arl = false;
-      validation_ratio = 0.2;
+      validation_percentage = 20;
 
       assert(debug(true, true));
     }
@@ -88,7 +88,7 @@ namespace vita
     pt->put(env + "alps.age_gap", alps.age_gap);
     pt->put(env + "alps.p_same_layer", alps.p_same_layer);
     pt->put(env + "team.individuals", team.individuals);
-    pt->put(env + "validation_ratio", validation_ratio);
+    pt->put(env + "validation_percentage", validation_percentage);
     pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
     pt->put(env + "statistics.directory", stat_dir);
     pt->put(env + "statistics.save_arl", stat_arl);
@@ -220,10 +220,11 @@ namespace vita
         return false;
       }
 
-      if (!validation_ratio)
+      if (validation_percentage > 100)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Undefined validation_ratio data member"
+          std::cerr << k_s_debug
+                    << " Undefined validation_percentage data member"
                     << std::endl;
         return false;
       }

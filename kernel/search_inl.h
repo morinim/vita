@@ -184,7 +184,7 @@ void search<T, ES>::dss(unsigned generation) const
     // Ross felt that this might improve performance).
     const double ratio(std::min(0.6, 0.2 + 100.0 / (d.size() + 100.0)));
     assert(0.2 <= ratio && ratio <= 0.6);
-    const size_t target_size(d.size() * ratio);
+    const auto target_size(static_cast<std::size_t>(d.size() * ratio));
     assert(target_size && target_size <= d.size());
 
     data::iterator base(d.begin());
@@ -277,6 +277,7 @@ void search<T, ES>::tune_parameters()
   const environment &constrained(prob_->env);
 
   const data *const dt(prob_->data());
+  const auto d_size(dt ? dt->size() : 0);
 
   if (constrained.code_length == 0)
     env_.code_length = dflt.code_length;
@@ -303,7 +304,7 @@ void search<T, ES>::tune_parameters()
   // * DSS can help against overfitting.
   if (boost::indeterminate(constrained.dss))
   {
-    env_.dss = dt && dt->size() > 400;
+    env_.dss = d_size > 400;
 
     if (env_.verbosity >= 2)
       std::cout << k_s_info << " DSS set to " << env_.dss << std::endl;
@@ -311,8 +312,8 @@ void search<T, ES>::tune_parameters()
 
   if (!constrained.layers)
   {
-    if (dt && dt->size() > 8)
-      env_.layers = std::log(dt->size());
+    if (d_size > 8)
+      env_.layers = static_cast<unsigned>(std::log(d_size));
     else
       env_.layers = dflt.layers;
 
@@ -331,9 +332,10 @@ void search<T, ES>::tune_parameters()
   // and population size.
   if (!constrained.individuals)
   {
-    if (dt && dt->size() > 8)
+    if (d_size > 8)
     {
-      env_.individuals = 2 * std::pow((std::log2(dt->size())), 3) / env_.layers;
+      env_.individuals = 2 *
+        static_cast<unsigned>(std::pow((std::log2(d_size)), 3)) / env_.layers;
 
       if (env_.individuals < 4)
         env_.individuals = 4;
@@ -347,21 +349,22 @@ void search<T, ES>::tune_parameters()
   }
 
   // Note that this setting, once set, will not be changed.
-  if (!constrained.validation_ratio && !env_.validation_ratio)
+  if (constrained.validation_percentage > 100 &&
+      env_.validation_percentage > 100)
   {
     if (dt)
     {
-      if (dt->size() * (*dflt.validation_ratio) < 100.0)
-        env_.validation_ratio = 0.0;
+      if (d_size * dflt.validation_percentage < 10000)
+        env_.validation_percentage = 0;
       else
-        env_.validation_ratio = *dflt.validation_ratio;
+        env_.validation_percentage = dflt.validation_percentage;
     }
     else
-      env_.validation_ratio = *dflt.validation_ratio;
+      env_.validation_percentage = dflt.validation_percentage;
 
     if (env_.verbosity >= 2)
-      std::cout << k_s_info << " Validation ratio set to "
-                << 100.0 * (*env_.validation_ratio) << '%' << std::endl;
+      std::cout << k_s_info << " Validation percentage set to "
+                << env_.validation_percentage << '%' << std::endl;
   }
 
   if (!constrained.tournament_size)
@@ -452,10 +455,10 @@ T search<T, ES>::run(unsigned n)
   if (*env_.g_without_improvement > 0)
     stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
 
-  const bool validation(env_.validation_ratio &&
-                        *env_.validation_ratio > 0.0);
+  const bool validation(0 < env_.validation_percentage &&
+                        env_.validation_percentage <= 100);
   if (validation)
-    prob_->data()->divide(*env_.validation_ratio);
+    prob_->data()->divide(env_.validation_percentage);
 
   for (unsigned r(0); r < n; ++r)
   {
@@ -571,7 +574,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
     const std::string path("vita.");
     const std::string summary(path + "summary.");
 
-    const unsigned solutions(good_runs.size());
+    const auto solutions(static_cast<unsigned>(good_runs.size()));
 
     boost::property_tree::ptree pt;
     pt.put(summary + "success_rate", runs ?

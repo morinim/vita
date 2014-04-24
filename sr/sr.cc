@@ -54,7 +54,7 @@ void fix_parameters(vita::src_problem *const problem)
 
   if (env.code_length && env.code_length <= problem->categories())
   {
-    const size_t new_length(2 * problem->categories());
+    const decltype(env.code_length) new_length(2 * problem->categories());
     std::cout << vita::k_s_warning << " Adjusting code length ("
               << env.code_length << " => " << new_length << ')' << std::endl;
     env.code_length = new_length;
@@ -235,7 +235,7 @@ namespace ui
       std::cout << vita::k_s_info << " Reading data file " << data_file
                 << "..." << std::endl;
 
-    unsigned parsed(0);
+    std::size_t parsed(0);
     try
     {
       parsed = problem->load(data_file).first;
@@ -458,7 +458,7 @@ namespace ui
       std::cout << vita::k_s_info << " Reading test set file " << ts << "..."
                 << std::endl;
 
-    unsigned parsed(0);
+    std::size_t parsed(0);
     try
     {
       parsed = problem->load_test_set(ts);
@@ -751,26 +751,25 @@ namespace ui
 
     if (v.length())
     {
-      double ratio;
+      unsigned percentage;
       if (v.back() == '%')
-        ratio = boost::lexical_cast<double>(v.substr(0, v.length() - 1)) /
-                100.0;
+        percentage =
+          static_cast<unsigned>(std::stoul(v.substr(0, v.length() - 1)));
       else
-        ratio = boost::lexical_cast<double>(v);
+        percentage = static_cast<unsigned>(std::stod(v) * 100.0);
 
-      set = (0.0 <= ratio) && (ratio <= 0.9);
+      set = (percentage <= 90);
       if (set)
-        problem->env.validation_ratio = ratio;
-
+        problem->env.validation_percentage = percentage;
     }
 
     if (problem->env.verbosity >= 2)
     {
       if (set)
-        std::cout << vita::k_s_info << " Validation set ratio is " << v
+        std::cout << vita::k_s_info << " Validation set percentage is " << v
                   << std::endl;
       else
-        std::cerr << vita::k_s_error << " Invalid validation ratio"
+        std::cerr << vita::k_s_error << " Invalid validation percentage"
                   << std::endl;
     }
   }

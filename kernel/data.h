@@ -54,21 +54,21 @@ namespace vita
 
     void dataset(dataset_t);
     dataset_t dataset() const;
-    void slice(unsigned);
+    void slice(std::size_t);
 
     iterator begin();
     const_iterator begin() const;
     iterator end();
     const_iterator end() const;
-    unsigned size() const;
-    unsigned size(dataset_t) const;
+    std::size_t size() const;
+    std::size_t size(dataset_t) const;
 
-    unsigned open(const std::string &, unsigned = 0);
+    std::size_t open(const std::string &, unsigned = 0);
     bool operator!() const;
 
     void clear();
 
-    void divide(double);
+    void divide(unsigned);
     void sort(std::function<bool (const example &, const example &)>);
 
     const category_set &categories() const;
@@ -91,8 +91,8 @@ namespace vita
     static std::vector<std::string> csvline(const std::string &, char = ',',
                                             bool = false);
 
-    unsigned load_csv(const std::string &, unsigned);
-    unsigned load_xrff(const std::string &);
+    std::size_t load_csv(const std::string &, unsigned);
+    std::size_t load_xrff(const std::string &);
 
     void swap_category(category_t, category_t);
 
@@ -126,7 +126,7 @@ namespace vita
     std::vector<std::vector<example>> dataset_;
 
     /// Used to keep track of subset of the dataset.
-    std::vector<unsigned> slice_;
+    std::vector<std::size_t> slice_;
 
     /// Used to choose the data we want to operate on (training / validation
     /// set).

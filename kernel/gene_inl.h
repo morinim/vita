@@ -55,12 +55,11 @@ basic_gene<K>::basic_gene(
     const auto arity(sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
-#if !defined(NDEBUG)
       using ARRAY_ELEM_TYPE =
         typename std::remove_reference<decltype(args[0])>::type;
+
       assert(g.second[i] <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
-#endif
-      args[i] = g.second[i];
+      args[i] = static_cast<ARRAY_ELEM_TYPE>(g.second[i]);
     }
   }
 }
@@ -87,8 +86,10 @@ basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
     const auto arity(sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
-      assert(sup <= type_max(args[0]));
-      args[i] = random::between(from, sup);
+      using ARRAY_ELEM_TYPE =
+        typename std::remove_reference<decltype(args[0])>::type;
+      assert(sup <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+      args[i] = static_cast<ARRAY_ELEM_TYPE>(random::between(from, sup));
     }
   }
 }

@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK_EQUAL(fitness3_t::size, 3);
   BOOST_CHECK_EQUAL(fitness4_t::size, 4);
 
-  for (size_t i(0); i < fitness2_t::size; ++i)
+  for (unsigned i(0); i < fitness2_t::size; ++i)
     BOOST_CHECK_EQUAL(fitness2d[i],
                       std::numeric_limits<vita::fitness_t::base_t>::lowest());
 

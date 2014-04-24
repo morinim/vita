@@ -123,7 +123,7 @@ namespace vita
   /// data::end() will refer to the active slice (a subset of the dataset).
   /// To reset the slice call data::slice with argument 0.
   ///
-  void data::slice(unsigned n)
+  void data::slice(std::size_t n)
   {
     slice_[dataset()] = n;
   }
@@ -179,7 +179,7 @@ namespace vita
   /// \note
   /// Please note that the result is independent of the active slice.
   ///
-  unsigned data::size(dataset_t d) const
+  std::size_t data::size(dataset_t d) const
   {
     return dataset_[d].size();
   }
@@ -187,7 +187,7 @@ namespace vita
   ///
   /// \return the size of the active dataset.
   ///
-  unsigned data::size() const
+  std::size_t data::size() const
   {
     return size(dataset());
   }
@@ -218,7 +218,8 @@ namespace vita
   ///
   void data::sort(std::function<bool (const example &, const example &)> f)
   {
-    const auto partition_size(std::distance(begin(), end()));
+    const auto partition_size(static_cast<std::size_t>(
+                                std::distance(begin(), end())));
 
     auto &d(dataset_[dataset()]);
     std::sort(d.begin(), d.end(), f);
@@ -228,15 +229,15 @@ namespace vita
   }
 
   ///
-  /// \param[in] r this is the \a size_of_validation_set / \a size_of_dataset
-  ///              ratio.
+  /// \param[in] percentage \a size_of_validation_set / \a size_of_dataset
+  ///                       ratio.
   ///
   /// Splits the dataset in two subsets (training set, validation set)
   /// according to the \a r ratio.
   ///
-  void data::divide(double r)
+  void data::divide(unsigned percentage)
   {
-    assert(0.0 <= r && r <= 1.0);
+    assert(percentage < 100);
 
     // Validation set items are moved to the training set.
     std::move(dataset_[validation].begin(), dataset_[validation].end(),
@@ -244,7 +245,7 @@ namespace vita
     dataset_[validation].erase(dataset_[validation].begin(),
                                dataset_[validation].end());
 
-    if (r > 0.0)
+    if (percentage)
     {
       // The requested validation examples are selected (the algorithm hint is
       // due to Kyle Cronin):
@@ -258,7 +259,7 @@ namespace vita
       // > items, and often you'll have all of them before that.
       auto available(dataset_[training].size());
 
-      const decltype(available) k(available * r);
+      const decltype(available) k(available * percentage / 100);
       assert(k <= available);
 
       auto needed(k);
@@ -266,7 +267,8 @@ namespace vita
       auto iter(dataset_[training].begin());
       while (dataset_[validation].size() < k)
       {
-        if (random::boolean(static_cast<double>(needed) / available))
+        if (random::boolean(static_cast<double>(needed) /
+                            static_cast<double>(available)))
         {   // selected
           dataset_[validation].push_back(*iter);
           iter = dataset_[training].erase(iter);
@@ -292,7 +294,7 @@ namespace vita
   {
     assert(dataset_[dataset()].empty() || variables() + 1 == header_.size());
 
-    return header_.size();
+    return static_cast<unsigned>(header_.size());
   }
 
   ///
@@ -301,7 +303,7 @@ namespace vita
   ///
   unsigned data::classes() const
   {
-    return classes_map_.size();
+    return static_cast<unsigned>(classes_map_.size());
   }
 
   ///
@@ -312,7 +314,8 @@ namespace vita
   ///
   unsigned data::variables() const
   {
-    const unsigned n(dataset_[dataset()].empty() ? 0 : begin()->input.size());
+    const auto n(dataset_[dataset()].empty()
+                   ? 0u : static_cast<unsigned>(begin()->input.size()));
 
     assert(dataset_[dataset()].empty() || n + 1 == header_.size());
 
@@ -330,7 +333,7 @@ namespace vita
     if (map->find(label) == map->end())
     {
       const auto n(map->size());
-      (*map)[label] = n;
+      (*map)[label] = static_cast<category_t>(n);
     }
 
     return (*map)[label];
@@ -493,7 +496,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  unsigned data::load_xrff(const std::string &filename)
+  std::size_t data::load_xrff(const std::string &filename)
   {
     assert(dataset() == training);
 
@@ -674,7 +677,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  unsigned data::load_csv(const std::string &filename, unsigned verbosity)
+  std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
   {
     std::ifstream from(filename.c_str());
     if (!from)
@@ -771,7 +774,7 @@ namespace vita
       }
     }
 
-    return debug() ? size() : 0;
+    return debug() ? size() : static_cast<std::size_t>(0);
   }
 
   ///
@@ -801,7 +804,7 @@ namespace vita
   /// \note
   /// Test set can have an empty output value.
   ///
-  unsigned data::open(const std::string &f, unsigned verbosity)
+  std::size_t data::open(const std::string &f, unsigned verbosity)
   {
     const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
                     boost::algorithm::iends_with(f, ".xml"));

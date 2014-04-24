@@ -109,7 +109,7 @@ namespace vita
   ///
   unsigned symbol_set::adts() const
   {
-    return all_.adt.size();
+    return static_cast<unsigned>(all_.adt.size());
   }
 
   ///
@@ -260,7 +260,7 @@ namespace vita
   ///
   unsigned symbol_set::categories() const
   {
-    return by_.category.size();
+    return static_cast<unsigned>(by_.category.size());
   }
 
   ///
@@ -270,7 +270,7 @@ namespace vita
   unsigned symbol_set::terminals(category_t c) const
   {
     assert(c < by_.category.size());
-    return by_.category[c].terminals.size();
+    return static_cast<unsigned>(by_.category[c].terminals.size());
   }
 
   ///
