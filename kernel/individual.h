@@ -38,14 +38,14 @@ namespace vita
   public:
     individual(const environment &, const symbol_set &);
 
-    // Visualization/output methods.
+    // Visualization/output methods
     void dump(std::ostream &) const;
     void graphviz(std::ostream &, const std::string & = "") const;
     void in_line(std::ostream &) const;
     void list(std::ostream &) const;
     void tree(std::ostream &) const;
 
-    // Recombination operators.
+    // Recombination operators
     unsigned mutation()
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
@@ -97,7 +97,7 @@ namespace vita
     ///
     /// \return the total size of the individual (effective size + introns).
     ///
-    /// The size is constant for any individual (it's choosen at initialization
+    /// The size is constant for any individual (it's chosen at initialization
     /// time).
     /// \see eff_size()
     ///
@@ -122,17 +122,17 @@ namespace vita
 
     friend class interpreter<individual>;
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private support methods.
+  private:  // Private support methods
     hash_t hash() const;
     void in_line(std::ostream &, const locus &) const;
     void pack(const locus &, std::vector<unsigned char> *const) const;
     void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
-  private:  // Private data members.
+  private:  // Private data members
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
     matrix<gene> genome_;

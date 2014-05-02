@@ -58,6 +58,10 @@ namespace vita
     virtual std::string name(const any &) const = 0;
 
     virtual bool debug() const = 0;
+
+  public:   // Serialization
+    virtual bool load(std::istream &) { return false; }
+    virtual bool save(std::ostream &) const { return false; }
   };
 
   // ***********************************************************************
@@ -81,12 +85,16 @@ namespace vita
   public:
     basic_reg_lambda_f(const T &);
 
-    virtual any operator()(const data::example &) const override final;
+    virtual any operator()(const data::example &) const override;
 
-    virtual std::string name(const any &) const override final;
+    virtual std::string name(const any &) const override;
 
     virtual bool debug() const override;
 
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
+    
   private:  // Private support methods
     any eval(const data::example &, std::false_type) const;
     any eval(const data::example &, std::true_type) const;

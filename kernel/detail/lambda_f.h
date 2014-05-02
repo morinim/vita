@@ -26,8 +26,15 @@ namespace vita { namespace detail
 
     bool debug() const { return ind_.debug() && int_.debug(); }
 
-    const T ind_;
+  private:   // Private data members
+    T ind_;
+
+  public:    // Public data members
     mutable src_interpreter<T> int_;
+
+  public:   // Serialization
+    bool load(std::istream &i) { return ind_.load(i); }
+    bool save(std::ostream &o) const { return ind_.save(o); }
   };
 
   template<class T>
@@ -39,7 +46,12 @@ namespace vita { namespace detail
 
     bool debug() const { return int_.debug(); }
 
+  public:   // Public data members
     mutable src_interpreter<T> int_;
+
+  public:   // Serialization
+    bool load(std::istream &) { return false; }
+    bool save(std::ostream &) const { return false; }
   };
 
   template<class T, bool S>
@@ -64,7 +76,12 @@ namespace vita { namespace detail
       return true;
     }
 
+  public:   // Public data members
     std::vector<core_reg_lambda_f<T, S>> team_;
+
+  public:   // Serialization
+    bool load(std::istream &i) { return team_.load(i); }
+    bool save(std::ostream &o) const { return team_.save(o); }
   };
 
   ///

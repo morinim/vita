@@ -84,6 +84,30 @@ bool basic_reg_lambda_f<T, S>::debug() const
 }
 
 ///
+/// \param[in] in input stream.
+/// \return \c true if the lambda has been loaded correctly.
+///
+/// \note
+/// If the load operation isn't successful the current lambda isn't
+/// modified.
+///
+template<class T, bool S>
+bool basic_reg_lambda_f<T, S>::load(std::istream &in)
+{
+  return detail::core_reg_lambda_f<T, S>::load(in);
+}
+
+///
+/// \param[out] out output stream.
+/// \return \c true if lambda was saved correctly.
+///
+template<class T, bool S>
+bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
+{
+  return detail::core_reg_lambda_f<T, S>::save(out);
+}
+
+///
 /// \param[in] d the training set.
 ///
 template<class T, bool N>
