@@ -117,7 +117,7 @@ namespace vita
     /// We don't validate on the training data because that would overfit the
     /// model. We don't stop at the validation step because we've iteratively
     /// been adjusting things to get a winner in the validation step. So we need
-    /// an indipendent test to have an idea of how well we'll do outside the
+    /// an independent test to have an idea of how well we'll do outside the
     /// current arena.
     /// The user provides a dataset and (optionally) a test set. Training set
     /// and validation set are automatically created from the dataset

@@ -31,10 +31,10 @@ namespace vita
   /// This is the type used as key for symbol identification.
   using opcode_t = unsigned;
 
-  /// In an environmnet where a symbol such as + may have many different
-  /// meanings, it is useful to specify a "domain of computation" to restrict
-  /// attention to specific meanings of interest (e.g. double domain: 1 + 1 = 2;
-  /// string domain: "a" + "b" = "ab").
+  /// In an environment where a symbol such as '+' may have many different
+  /// meanings, it's useful to specify a "domain of computation" to restrict
+  /// attention to specific meanings of interest (e.g. double domain:
+  /// 1 + 1 = 2; string domain: "a" + "b" = "ab").
   /// The operations of a domain are defined in files named after the domain
   /// and grouped in the \c primitive/ folder.
   enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
@@ -42,8 +42,8 @@ namespace vita
   /// A category provide operations which supplement or supersede those of the
   /// domain but which are restricted to values lying in the (sub)domain by
   /// which is parametrized.
-  /// For instance the number 4.0 (in the domain \c d_double) may be present in
-  /// two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
+  /// For instance the number 4.0 (in the domain \c d_double) may be present
+  /// in two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
   /// category "kg").
   /// Categories are the way strong typing GP is implemented in Vita.
   using category_t = unsigned;
@@ -62,7 +62,7 @@ namespace vita
   const char k_s_warning[] = "[WARNING]";
 
   /// A macro to disallow the copy constructor and operator= functions.
-  /// An good alternative is boost::noncopyable but that gives some false
+  /// A good alternative is boost::noncopyable but that gives some false
   /// positive with 'g++ -Weffc++' so, for now, we keep the macro.
   /// \see
   /// <http://stackoverflow.com/questions/7823990/what-are-the-advantages-of-boostnoncopyable>
