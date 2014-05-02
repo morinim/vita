@@ -22,9 +22,9 @@ int main()
     return EXIT_FAILURE;
 
   vita::src_search<> s(&problem);
-  const auto best(s.run());                        // starting search
-
-  std::cout << best << std::endl;                  // print result
+  const auto best(s.run());                        // starting search and
+                                                   // getting best individual
+  std::cout << best << std::endl;
 
   return EXIT_SUCCESS;
 }

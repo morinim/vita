@@ -20,15 +20,6 @@
 namespace vita
 {
   ///
-  /// \tparam T a C++ type.
-  /// \return the maximum value of type \a T.
-  ///
-  template<class T> constexpr T type_max(T)
-  {
-    return std::numeric_limits<T>::max();
-  }
-
-  ///
   /// An implementation of make_unique() as proposed by Herb Sutter in
   /// GotW #102.
   ///
