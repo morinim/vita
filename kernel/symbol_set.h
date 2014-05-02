@@ -25,9 +25,9 @@ namespace vita
   ///
   /// This is a container for the symbol set. Symbols are stored to be quickly
   /// recalled by category and randomly extracted.
-  /// The function and terminals used should be powerful enough to be able to
+  /// The functions and terminals used should be powerful enough to be able to
   /// represent a solution to the problem. On the other hand, it is better not
-  /// to use too large a symbol set (this enalarges the search space and can
+  /// to use a symbol set too large (this enlarges the search space and can
   /// sometimes make the search for a solution harder).
   ///
   class symbol_set
@@ -45,7 +45,6 @@ namespace vita
 
     symbol *get_adt(unsigned) const;
     unsigned adts() const;
-
     void reset_adf_weights();
 
     symbol *decode(opcode_t) const;
@@ -68,9 +67,12 @@ namespace vita
     //   roulette functions .
     std::vector<std::unique_ptr<symbol>> arguments_;
 
-    std::vector<std::unique_ptr<symbol>>   symbols_;
+    // This is the real, unordered repository of symbols (it owns the
+    // pointers).
+    std::vector<std::unique_ptr<symbol>> symbols_;
 
-    // Symbols of every category are inserted in this collection.
+    // A collection is a structured-view on symbols_ (the all_ variable) or on
+    // a subset of symbols_ (e.g. only on symbol of a specific category).
     struct collection
     {
       collection();

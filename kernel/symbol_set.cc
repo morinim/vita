@@ -27,7 +27,7 @@ namespace vita
     ///
     /// Probably the fastest way to produce a realization of a random variable
     /// X in a computer is to create a big table where each outcome \a i is
-    /// inserterted a number of times proportional to P(X=i).
+    /// inserted a number of times proportional to P(X=i).
     ///
     /// Two fast methods are described in "Fast Generation of Discrete Random
     /// Variables" (Marsaglia, Tsang, Wang).
@@ -49,7 +49,7 @@ namespace vita
       {}
 
       // This is a different approach from Eli Bendersky
-      // (http://eli.thegreenplace.net/):
+      // (<http://eli.thegreenplace.net/>):
       //
       //     unsigned total(0);
       //     std::size_t winner(0);
@@ -237,7 +237,7 @@ namespace vita
   /// \return a pointer to the \c symbol identified by 'dex' (0 if not found).
   ///
   /// \attention Please note that opcodes (automatically assigned) are primary
-  /// keys for symbols. Conversely the name of a symbol is choosen by the
+  /// keys for symbols. Conversely the name of a symbol is chosen by the
   /// user, so, if you don't pay attention, different symbols may have the same
   /// name.
   ///
@@ -304,7 +304,7 @@ namespace vita
   /// \param[in] ss symbol set to be printed.
   /// \return output stream including \a ss.
   ///
-  /// Useful for debugging purpouse.
+  /// Useful for debugging purpose.
   ///
   std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
   {
