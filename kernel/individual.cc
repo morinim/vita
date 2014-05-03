@@ -41,7 +41,7 @@ namespace vita
 
     const index_t sup(size()), patch(sup - env_->patch_length);
 
-    const category_t categories(ss.categories());
+    const auto categories(ss.categories());
     assert(categories);
     assert(categories < sup);
 

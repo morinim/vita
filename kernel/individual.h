@@ -137,7 +137,7 @@ namespace vita
     // organism's hereditary information).
     matrix<gene> genome_;
 
-    // Note that sintactically distinct (but logically equivalent) individuals
+    // Note that syntactically distinct (but logically equivalent) individuals
     // have the same signature. This is a very interesting  property, useful
     // for individual comparison, information retrieval, entropy calculation...
     mutable hash_t signature_;

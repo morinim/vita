@@ -78,11 +78,11 @@ void test_team_of_one(vita::src_problem &pr)
       if (out_i.empty())
         BOOST_REQUIRE(out_t.empty());
       else
-	  {
+	    {
         const auto v1(to<number>(out_i));
-		const auto v2(to<number>(out_t));
+        const auto v2(to<number>(out_t));
 
-		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+        BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
       }
     }
   }
@@ -117,12 +117,12 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
       if (out_i.empty())
         BOOST_REQUIRE(out_t.empty());
       else
-	  {
+      {
         const auto v1(to<number>(out_i));
-		const auto v2(to<number>(out_t));
+        const auto v2(to<number>(out_t));
 
-		BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
-	  }
+        BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+      }
     }
   }
 
@@ -178,8 +178,42 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
         if (std::fabs(sum / n) < 0.000001)
           BOOST_REQUIRE_SMALL(to<number>(out_t), 0.000001);
         else
-          BOOST_REQUIRE_CLOSE(sum / n, to<number>(out_t), 0.0001);
+          BOOST_REQUIRE_CLOSE(sum / n, to<number>(out_t), epsilon);
       }
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
+{
+  using namespace vita;
+
+  src_problem pr;
+  pr.env = environment(true);
+  pr.load("mep.csv");
+
+  for (unsigned k(0); k < 1000; ++k)
+  {
+    const individual ind(pr.env, pr.sset);
+    const reg_lambda_f<individual> lambda1(ind);
+
+    std::stringstream ss;
+
+    BOOST_REQUIRE(lambda1.save(ss));
+    const individual ind2(pr.env, pr.sset);
+    reg_lambda_f<individual> lambda2(ind2);
+    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.debug());
+
+    for (const auto &e : *pr.data())
+    {
+      const auto out1(lambda1(e));
+      const auto out2(lambda2(e));
+
+      if (out1.empty())
+        BOOST_REQUIRE(out2.empty());
+      else
+        BOOST_CHECK_CLOSE(to<number>(out1), to<number>(out2), epsilon);
     }
   }
 }

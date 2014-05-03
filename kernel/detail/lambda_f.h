@@ -15,8 +15,12 @@
 
 namespace vita { namespace detail
 {
+  // This is the general template. The last parameter is used for
+  // disambiguation since we need three specializations that would
+  // overlapped without the third parameter (see below).
   template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
 
+  // First specialization
   template<class T>
   class core_reg_lambda_f<T, true, false>
   {
@@ -33,10 +37,23 @@ namespace vita { namespace detail
     mutable src_interpreter<T> int_;
 
   public:   // Serialization
-    bool load(std::istream &i) { return ind_.load(i); }
-    bool save(std::ostream &o) const { return ind_.save(o); }
+    bool load(std::istream &in)
+    {
+      unsigned n;
+      if (!(in >> n) || n != 1)
+        return false;
+
+        return ind_.load(in);
+    }
+
+    bool save(std::ostream &out) const
+    {
+      out << 1 << std::endl;
+      return ind_.save(out);
+    }
   };
 
+  // Second specialization
   template<class T>
   class core_reg_lambda_f<T, false, false>
   {
@@ -50,10 +67,11 @@ namespace vita { namespace detail
     mutable src_interpreter<T> int_;
 
   public:   // Serialization
-    bool load(std::istream &) { return false; }
-    bool save(std::ostream &) const { return false; }
+    constexpr bool load(std::istream &) { return false; }
+    constexpr bool save(std::ostream &) const { return false; }
   };
 
+  // Third specialization (teams)
   template<class T, bool S>
   class core_reg_lambda_f<team<T>, S, true>
   {
@@ -80,8 +98,31 @@ namespace vita { namespace detail
     std::vector<core_reg_lambda_f<T, S>> team_;
 
   public:   // Serialization
-    bool load(std::istream &i) { return team_.load(i); }
-    bool save(std::ostream &o) const { return team_.save(o); }
+    bool load(std::istream &i)
+    {
+      unsigned n;
+      if (!(i >> n) || team_.size() != n)
+        return false;
+
+      for (unsigned j(0); j < n; ++j)
+        if (!team_[j].load(i))
+          return false;
+
+      return true;
+    }
+
+    bool save(std::ostream &o) const
+    {
+      o << team_.size() << std::endl;
+      if (!o.good())
+        return false;
+
+      for (const auto &l : team_)
+        if (!l.save(o))
+          return false;
+
+      return o.good();
+    }
   };
 
   ///

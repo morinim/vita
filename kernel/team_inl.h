@@ -326,7 +326,7 @@ template<class T>
 bool team<T>::load(std::istream &in)
 {
   unsigned n;
-  if (!(in >> n))
+  if (!(in >> n) || !n)
     return false;
 
   decltype(individuals_) v;
@@ -363,7 +363,7 @@ bool team<T>::save(std::ostream &out) const
     if (!i.save(out))
       return false;
 
-  return true;
+  return out.good();
 }
 
 ///
