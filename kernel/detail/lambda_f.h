@@ -16,24 +16,22 @@
 namespace vita { namespace detail
 {
   // This is the general template. The last parameter is used for
-  // disambiguation since we need three specializations that would
-  // overlapped without the third parameter (see below).
+  // disambiguation since we need three specializations that, without
+  // the third parameter are, overlap (see below).
   template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
 
-  // First specialization
+  // ********* First specialization (individual stored inside) *********
   template<class T>
   class core_reg_lambda_f<T, true, false>
   {
   public:
-    core_reg_lambda_f(const T &ind) : ind_(ind), int_(ind_)
+    explicit core_reg_lambda_f(const T &ind) : ind_(ind), int_(ind_)
     { assert(debug()); }
 
     bool debug() const { return ind_.debug() && int_.debug(); }
 
-  private:   // Private data members
-    T ind_;
-
   public:    // Public data members
+    T ind_;
     mutable src_interpreter<T> int_;
 
   public:   // Serialization
@@ -43,7 +41,7 @@ namespace vita { namespace detail
       if (!(in >> n) || n != 1)
         return false;
 
-        return ind_.load(in);
+      return ind_.load(in);
     }
 
     bool save(std::ostream &out) const
@@ -53,12 +51,12 @@ namespace vita { namespace detail
     }
   };
 
-  // Second specialization
+  // ********* Second specialization (individual not stored) *********
   template<class T>
   class core_reg_lambda_f<T, false, false>
   {
   public:
-    core_reg_lambda_f(const T &ind) : int_(ind)
+    explicit core_reg_lambda_f(const T &ind) : int_(ind)
     { assert(debug()); }
 
     bool debug() const { return int_.debug(); }
@@ -71,12 +69,12 @@ namespace vita { namespace detail
     constexpr bool save(std::ostream &) const { return false; }
   };
 
-  // Third specialization (teams)
+  // ********* Third specialization (teams) *********
   template<class T, bool S>
   class core_reg_lambda_f<team<T>, S, true>
   {
   public:
-    core_reg_lambda_f(const team<T> &t)
+    explicit core_reg_lambda_f(const team<T> &t)
     {
       team_.reserve(t.individuals());
       for (const auto &ind : t)
@@ -101,13 +99,24 @@ namespace vita { namespace detail
     bool load(std::istream &i)
     {
       unsigned n;
-      if (!(i >> n) || team_.size() != n)
+      if (!(i >> n) || !n)
         return false;
 
-      for (unsigned j(0); j < n; ++j)
-        if (!team_[j].load(i))
-          return false;
+      decltype(team_) v;
+      v.reserve(n);
 
+      const environment &env(team_[0].ind_.env());
+      const symbol_set &sset(team_[0].ind_.sset());
+
+      for (unsigned j(0); j < n; ++j)
+      {
+        v.emplace_back(T(env, sset));
+
+        if (!v[j].load(i))
+          return false;
+      }
+
+      team_ = std::move(v);
       return true;
     }
 
