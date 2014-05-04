@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
         const auto out_t(lambda_team(e));
 
         if (std::fabs(sum / n) < 0.000001)
-          BOOST_REQUIRE_SMALL(to<number>(out_t), 0.000001);
+          BOOST_REQUIRE_SMALL(to<number>(out_t), epsilon);
         else
           BOOST_REQUIRE_CLOSE(sum / n, to<number>(out_t), epsilon);
       }

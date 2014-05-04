@@ -15,9 +15,9 @@
 
 namespace vita { namespace detail
 {
-  // This is the general template. The last parameter is used for
-  // disambiguation since we need three specializations that, without
-  // the third parameter are, overlap (see below).
+  /// This is the general template. The last parameter is used for
+  /// disambiguation since we need three specializations that, without
+  /// the third parameter are, overlap (see below).
   template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
 
   // ********* First specialization (individual stored inside) *********
@@ -30,7 +30,7 @@ namespace vita { namespace detail
 
     bool debug() const { return ind_.debug() && int_.debug(); }
 
-  public:    // Public data members
+  public:   // Public data members
     T ind_;
     mutable src_interpreter<T> int_;
 
@@ -96,6 +96,9 @@ namespace vita { namespace detail
     std::vector<core_reg_lambda_f<T, S>> team_;
 
   public:   // Serialization
+    /// Load is atomic: if it doesn't succeed this object isn't modified; if
+    /// it succeeds the team if replaced with a new team (eventually with a
+    /// different size) loaded from the input stream.
     bool load(std::istream &i)
     {
       unsigned n;
@@ -105,6 +108,7 @@ namespace vita { namespace detail
       decltype(team_) v;
       v.reserve(n);
 
+      assert(team_.size());
       const environment &env(team_[0].ind_.env());
       const symbol_set &sset(team_[0].ind_.sset());
 
@@ -152,6 +156,10 @@ namespace vita { namespace detail
   template<bool N>
   class class_names
   {
+  public:   // Serialization
+    constexpr bool load(std::istream &) { return false; }
+    constexpr bool save(std::ostream &) const { return false; }
+
   protected:
     /// Without names... there isn't anything to do.
     explicit class_names(const data &) {}
@@ -162,6 +170,10 @@ namespace vita { namespace detail
   template<>
   class class_names<true>
   {
+  public:   // Serialization
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
   protected:
     explicit class_names(const data &);
 
@@ -181,6 +193,58 @@ namespace vita { namespace detail
 
     for (auto i(decltype(classes){0}); i < classes; ++i)
       names_[i] = d.class_name(i);
+  }
+
+  ///
+  /// \param[in] in input stream.
+  /// \return true on success.
+  ///
+  /// Loads the names from input stream \a in.
+  ///
+  inline bool class_names<true>::load(std::istream &in)
+  {
+    unsigned n;
+    if (!(in >> n) || !n)
+      return false;
+
+    decltype(names_) v;
+    v.reserve(n);
+
+    // When used immediately after whitespace-delimited input, e.g. after
+    //     int n; std::cin >> n;
+    // getline consumes the endline character left on the input stream by
+    // operator>>, and returns immediately. A common solution, before
+    // switching to line-oriented input, is to ignore all leftover
+    // characters on the line of input with:
+    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    for (unsigned j(0); j < n && !in.fail(); ++j)
+      getline(in, v[j]);
+
+    return !in.fail();
+  }
+
+  ///
+  /// \param[in] o output stream.
+  /// \return true on success.
+  ///
+  /// Saves the names (one per line, end of line character is '\n'). The first
+  /// line contains the number of names.
+  ///
+  inline bool class_names<true>::save(std::ostream &o) const
+  {
+    o << names_.size() << std::endl;
+    if (!o.good())
+      return false;
+
+    for (const auto &n : names_)
+    {
+      o << n << '\n';
+      if (!o.good())
+        return false;
+    }
+
+    return o.good();
   }
 
   ///
