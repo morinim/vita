@@ -14,6 +14,7 @@
 #define      VITA_SRC_CONSTANT_H
 
 #include "kernel/terminal.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
