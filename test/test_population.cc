@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(Creation)
 {
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = vita::random::between(30, 200);
+    env.individuals = vita::random::between(30u, 200u);
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     vita::population<vita::individual> pop(env, sset);
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 {
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = vita::random::between(30, 300);
+    env.individuals = vita::random::between(30u, 300u);
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     std::stringstream ss;

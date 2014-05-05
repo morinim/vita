@@ -34,16 +34,16 @@ BOOST_AUTO_TEST_CASE(Serialization)
   {
     vita::summary<vita::individual> before;
 
-    before.elapsed = vita::random::between(10, 10000);
-    before.mutations = vita::random::between(100, 100000);
-    before.crossovers = vita::random::between(100, 100000);
-    before.gen = vita::random::between(0, 1000);
-    before.last_imp = vita::random::between(0, 1000);
+    before.elapsed = vita::random::between(10u, 10000u);
+    before.mutations = vita::random::between(100u, 100000u);
+    before.crossovers = vita::random::between(100u, 100000u);
+    before.gen = vita::random::between(0u, 1000u);
+    before.last_imp = vita::random::between(0u, 1000u);
 
     if (vita::random::boolean(0.8))
       before.best = {
         vita::individual(env, sset),
-        vita::random::between<double>(0, 1000)
+        vita::random::between<double>(0.0, 1000.0)
       };
 
     std::stringstream ss;

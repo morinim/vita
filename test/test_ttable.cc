@@ -37,9 +37,11 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
 {
   const unsigned hashbytes(128 / 8);
 
-  std::uint8_t *const key(new std::uint8_t[256]);
-  std::uint8_t *const hashes(new std::uint8_t[hashbytes * 256]);
-  std::uint8_t *const final(new std::uint8_t[hashbytes]);
+  using byte = unsigned char;
+
+  byte *const key(new byte[256]);
+  byte *const hashes(new byte[hashbytes * 256]);
+  byte *const final(new byte[hashbytes]);
 
   std::memset(key, 0, 256);
   std::memset(hashes, 0, hashbytes * 256);
@@ -49,7 +51,7 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
   // the seed.
   for (unsigned i(0); i < 256; ++i)
   {
-    key[i] = static_cast<std::uint8_t>(i);
+    key[i] = static_cast<byte>(i);
 
     vita::hash_t h(vita::hash(key, i, 256 - i));
     reinterpret_cast<std::uint64_t *>(&hashes[i * hashbytes])[0] = h.data[0];
@@ -63,8 +65,10 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
 
   // The first four bytes of that hash, interpreted as a little-endian integer,
   // is our verification value.
-  const std::uint32_t verification((final[0] <<  0) | (final[1] <<  8) |
-                                   (final[2] << 16) | (final[3] << 24));
+  const auto verification((static_cast<std::uint32_t>(final[0]) <<  0u) |
+                          (static_cast<std::uint32_t>(final[1]) <<  8u) |
+                          (static_cast<std::uint32_t>(final[2]) << 16u) |
+                          (static_cast<std::uint32_t>(final[3]) << 24u));
 
   delete [] key;
   delete [] hashes;

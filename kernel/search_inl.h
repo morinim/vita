@@ -100,10 +100,10 @@ void search<T, ES>::arl(const U &base)
           for (const auto &replaced : generalized.second)
             categories.push_back(replaced.category);
 
-          p = make_unique<adf>(generalized.first, categories, 10);
+          p = make_unique<adf>(generalized.first, categories, 10u);
         }
         else  // !adf_args
-          p = make_unique<adt>(candidate_block, 100);
+          p = make_unique<adt>(candidate_block, 100u);
 
         if (env_.stat_arl && adf_log.good())
         {

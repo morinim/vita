@@ -102,9 +102,11 @@ namespace vita
   ///
   void src_problem::clear(bool initialize)
   {
-    *this = src_problem();
-    if (initialize)
-      env = environment(true);
+    env = environment(initialize);
+
+    sset = symbol_set();
+
+    dat_.clear();
   }
 
   ///
