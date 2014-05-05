@@ -32,7 +32,7 @@ namespace vita
     bool operator==(const locus &) const;
     bool operator!=(const locus &) const;
     bool operator<(const locus &) const;
-    locus operator+(int) const;
+    locus operator+(index_t) const;
   };
 
   ///
@@ -70,7 +70,7 @@ namespace vita
   /// \return a new locus obtained from \a this incrementing index component by
   ///         \a i (and not changing category component).
   ///
-  inline locus locus::operator+(int i) const
+  inline locus locus::operator+(index_t i) const
   {
     return {index + i, category};
   }

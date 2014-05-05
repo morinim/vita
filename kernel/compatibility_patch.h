@@ -82,7 +82,7 @@ namespace vita
     {
       tcgetattr(STDIN_FILENO, &oldt);
       newt = oldt;
-      newt.c_lflag &= ~(ICANON | ECHO);
+      newt.c_lflag &= ~static_cast<unsigned>(ICANON | ECHO);
       tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     }
     else

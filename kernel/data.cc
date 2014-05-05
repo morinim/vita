@@ -155,7 +155,8 @@ namespace vita
     if (n == 0 || n > size())
       return dataset_[dataset()].end();
 
-    return std::next(dataset_[dataset()].begin(), n);
+    return std::next(dataset_[dataset()].begin(),
+                     static_cast<decltype(dataset_)::difference_type>(n));
   }
 
   ///
@@ -169,7 +170,8 @@ namespace vita
     if (n == 0 || n > size())
       return dataset_[dataset()].end();
 
-    return std::next(dataset_[dataset()].begin(), n);
+    return std::next(dataset_[dataset()].begin(),
+                     static_cast<decltype(dataset_)::difference_type>(n));
   }
 
   ///

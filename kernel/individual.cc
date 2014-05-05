@@ -615,8 +615,8 @@ namespace vita
   void individual::list(std::ostream &s) const
   {
     const auto categories(sset_->categories());
-    const auto w1(1 + static_cast<unsigned>(std::log10(size() - 1)));
-    const auto w2(1 + static_cast<unsigned>(std::log10(categories)));
+    const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
+    const auto w2(1 + static_cast<int>(std::log10(categories)));
 
     for (const auto &l : *this)
     {
@@ -687,7 +687,7 @@ namespace vita
   void individual::dump(std::ostream &s) const
   {
     const auto categories(sset_->categories());
-    const unsigned width(1 + static_cast<unsigned>(std::log10(size() - 1)));
+    const auto width(1 + static_cast<int>(std::log10(size() - 1)));
 
     for (unsigned i(0); i < size(); ++i)
     {
