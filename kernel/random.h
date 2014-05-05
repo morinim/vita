@@ -115,12 +115,16 @@ namespace vita
   inline
   T random::between(T min, T sup)
   {
+    static_assert(std::is_integral<T>::value,
+                  "Template random::between needs an integral parameter");
+
     assert(min < sup);
 
-    static std::uniform_int_distribution<> d{};
-    using parm_t = decltype(d)::param_type;
+    std::uniform_int_distribution<T> d(min, sup - 1);
+    //using parm_t = decltype(d)::param_type;
+    //using result_t = decltype(d)::result_type;
 
-    return d(engine(), parm_t(min, sup - 1));
+    return d(engine());
   }
 
   ///
