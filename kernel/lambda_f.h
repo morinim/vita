@@ -94,7 +94,7 @@ namespace vita
   public:   // Serialization
     virtual bool load(std::istream &) override;
     virtual bool save(std::ostream &) const override;
-    
+
   private:  // Private support methods
     any eval(const data::example &, std::false_type) const;
     any eval(const data::example &, std::true_type) const;
@@ -153,6 +153,10 @@ namespace vita
     virtual bool debug() const override;
 
     double training_accuracy() const;
+
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
 
   private:  // Private support methods
     static number normalize_01(number);

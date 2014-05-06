@@ -53,11 +53,15 @@ namespace vita
     typename std::vector<T>::const_iterator begin() const;
     typename std::vector<T>::const_iterator end() const;
 
-  private:  // Private support functions.
+  public:   // Serialization
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
+  private:  // Private support functions
     unsigned size() const;
     unsigned index(unsigned, unsigned) const;
 
-  private:  // Private data members.
+  private:  // Private data members
     std::vector<T> data_;
 
     unsigned rows_;
@@ -69,11 +73,7 @@ namespace vita
   ///        for performance.
   ///
   template<class T>
-  inline
-  matrix<T>::matrix()
-#if !defined(NDEBUG)
-    : rows_(0), cols_(0)
-#endif
+  matrix<T>::matrix() : rows_(0), cols_(0)
   {
   }
 
@@ -84,8 +84,8 @@ namespace vita
   /// \brief Standard \a rows x \a cols matrix. Entries aren't initialized.
   ///
   template<class T>
-  matrix<T>::matrix(unsigned rs, unsigned cs) :
-    data_(rs * cs), rows_(rs), cols_(cs)
+  matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), rows_(rs),
+                                                cols_(cs)
   {
   }
 
@@ -97,7 +97,6 @@ namespace vita
   /// \brief From (c, r) to an index in \a data_ vector.
   ///
   template<class T>
-  inline
   unsigned matrix<T>::index(unsigned r, unsigned c) const
   {
     assert(r < rows_);
@@ -111,7 +110,6 @@ namespace vita
   /// \return an element of the matrix.
   ///
   template<class T>
-  inline
   const T &matrix<T>::operator()(const locus &l) const
   {
     return data_[index(l.index, l.category)];
@@ -122,7 +120,6 @@ namespace vita
   /// \return an element of the matrix.
   ///
   template<class T>
-  inline
   T &matrix<T>::operator()(const locus &l)
   {
     return data_[index(l.index, l.category)];
@@ -134,7 +131,6 @@ namespace vita
   /// \return an element of the matrix.
   ///
   template<class T>
-  inline
   const T &matrix<T>::operator()(unsigned r, unsigned c) const
   {
     return data_[index(r, c)];
@@ -155,7 +151,6 @@ namespace vita
   /// \return number of elements of the matrix.
   ///
   template<class T>
-  inline
   unsigned matrix<T>::size() const
   {
     return rows_ * cols_;
@@ -165,7 +160,6 @@ namespace vita
   /// \return number of rows of the matrix.
   ///
   template<class T>
-  inline
   unsigned matrix<T>::rows() const
   {
     return rows_;
@@ -175,7 +169,6 @@ namespace vita
   /// \return number of columns of the matrix.
   ///
   template<class T>
-  inline
   unsigned matrix<T>::cols() const
   {
     return cols_;
@@ -208,7 +201,6 @@ namespace vita
   /// \return iterator to the first element of the matrix.
   ///
   template<class T>
-  inline
   typename std::vector<T>::iterator matrix<T>::begin()
   {
     return data_.begin();
@@ -218,7 +210,6 @@ namespace vita
   /// \return constant iterator to the first element of the matrix.
   ///
   template<class T>
-  inline
   typename std::vector<T>::const_iterator matrix<T>::begin() const
   {
     return data_.begin();
@@ -229,10 +220,61 @@ namespace vita
   ///         the matrix.
   ///
   template<class T>
-  inline
   typename std::vector<T>::const_iterator matrix<T>::end() const
   {
     return data_.end();
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return true on success.
+  ///
+  /// Saves the matrix on persistent storage.
+  ///
+  template<class T>
+  bool matrix<T>::save(std::ostream &out) const
+  {
+    out << cols() << ' ' << rows() << std::endl;
+
+    for (const auto &e : data_)
+      out << e << std::endl;
+
+    return out.good();
+  }
+
+  ///
+  /// \param[in] in input stream.
+  /// \return true on success.
+  ///
+  /// Loads the matrix from persistent storage.
+  ///
+  /// \note
+  /// If the operation fails the object isn't modified.
+  ///
+  template<class T>
+  bool matrix<T>::load(std::istream &in)
+  {
+    decltype(cols_) cs;
+    if (!(in >> cs) || !cs)
+      return false;
+
+    decltype(rows_) rs;
+    if (!(in >> rs) || !rs)
+      return false;
+
+    const auto sup(cs * rs);
+    decltype(data_) v;
+    v.reserve(sup);
+
+    for (auto j(decltype(size){0}); j < sup; ++j)
+      if (!(in >> v[j]))
+        return false;
+
+    cols_ = cs;
+    rows_ = rs;
+    data_ = v;
+
+    return true;
   }
 }  // namespace vita
 

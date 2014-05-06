@@ -17,7 +17,7 @@ namespace vita { namespace detail
 {
   /// This is the general template. The last parameter is used for
   /// disambiguation since we need three specializations that, without
-  /// the third parameter are, overlap (see below).
+  /// the third parameter, overlap (see below).
   template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
 
   // ********* First specialization (individual stored inside) *********
@@ -225,7 +225,7 @@ namespace vita { namespace detail
   }
 
   ///
-  /// \param[in] o output stream.
+  /// \param[out] o output stream.
   /// \return true on success.
   ///
   /// Saves the names (one per line, end of line character is '\n'). The first

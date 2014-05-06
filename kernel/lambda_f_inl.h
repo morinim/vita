@@ -335,6 +335,48 @@ std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
 }
 
 ///
+/// \param[out] out output stream.
+/// \return true on success.
+///
+/// Saves the lambda on persistent storage.
+///
+template<class T, bool S, bool N>
+bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
+{
+  if (!detail::class_names<N>::save(out))
+    return false;
+
+  if (!lambda_.save(out))
+    return false;
+
+  slot_matrix_.save(out);
+
+  // Don't need to save slot_class_.size() since it's equal to
+  // slot_matrix_.rows()
+  for (const auto s : slot_class_)
+    out << s << std::endl;
+
+  out << dataset_size_ << std::endl;
+
+  return out.good();
+}
+
+///
+/// \param[in] in input stream.
+/// \return true on success.
+///
+/// Loads the lambda from persistent storage.
+///
+/// \note
+/// If the operation fails the object isn't modified.
+///
+template<class T, bool S, bool N>
+bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &)
+{
+  return false;
+}
+
+///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N>
