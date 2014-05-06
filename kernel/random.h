@@ -27,9 +27,8 @@ namespace vita
     template<class T> static T between(T, T);
     template<class T> static T sup(T);
 
-    template<class T> static const T &element(const std::vector<T> &);
-    template<class T> static T &element(std::vector<T> &);
-    template<class T> static const T &element(const std::set<T> &);
+    template<class C> static const typename C::value_type &element(const C &);
+    template<class C> static typename C::value_type &element(C &);
 
     static unsigned ring(unsigned, unsigned, unsigned);
 
@@ -92,10 +91,9 @@ namespace vita
   {
     assert(min < sup);
 
-    static std::uniform_real_distribution<> d{};
+    static std::uniform_real_distribution<double> d(min, sup);
 
-    using parm_t = decltype(d)::param_type;
-    return d(engine(), parm_t{min, sup});
+    return d(engine());
   }
 
   ///
@@ -112,17 +110,14 @@ namespace vita
   /// real number distribution).
   ///
   template<class T>
-  inline
   T random::between(T min, T sup)
   {
     static_assert(std::is_integral<T>::value,
-                  "Template random::between needs an integral parameter");
+                  "random::between needs a template-parameter of integer type");
 
     assert(min < sup);
 
     std::uniform_int_distribution<T> d(min, sup - 1);
-    //using parm_t = decltype(d)::param_type;
-    //using result_t = decltype(d)::result_type;
 
     return d(engine());
   }
@@ -135,49 +130,35 @@ namespace vita
   /// This is a shortcut for: \c between<T>(0, sup);
   ///
   template<class T>
-  inline
   T random::sup(T sup)
   {
-    return between<T>(T(0), sup);
+    return between<T>(0, sup);
   }
 
   ///
-  /// \param[in] v a vector.
-  /// \return a random element of vector \a v.
+  /// \param[in] c a STL container.
+  /// \return a random element of container \a c.
   ///
-  template<class T>
-  inline
-  const T &random::element(const std::vector<T> &v)
+  template<class C>
+  const typename C::value_type &random::element(const C &c)
   {
-    const auto size(v.size());
+    const auto size(c.size());
     assert(size);
-    return v[between<decltype(size)>(0, size)];
-  }
 
-  template<class T>
-  inline
-  T &random::element(std::vector<T> &v)
-  {
-    const auto size(v.size());
-    assert(size);
-    return v[between<decltype(size)>(0, size)];
+    return *std::next(c.begin(), between<decltype(size)>(0, size));
   }
 
   ///
-  /// \param[in] s a set.
-  /// \return a random element of the set \a s.
+  /// \param[in] c a STL container.
+  /// \return a random element of container \a c.
   ///
-  template<class T>
-  inline
-  const T &random::element(const std::set<T> &s)
+  template<class C>
+  typename C::value_type &random::element(C &c)
   {
-    const auto size(s.size());
+    const auto size(c.size());
     assert(size);
 
-    auto it(s.cbegin());
-    std::advance(it, between<decltype(size)>(0, size));
-
-    return *it;
+    return *std::next(c.begin(), between<decltype(size)>(0, size));
   }
 
   ///
