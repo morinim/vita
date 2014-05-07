@@ -28,7 +28,9 @@ namespace vita
   ///   oversized for our needs;
   ///
   /// The idea is to use a vector and translate the 2 dimensions to one
-  /// dimension (matrix::index() method).
+  /// dimension (matrix::index() method). This way the whole thing is stored in
+  /// a single memory block instead of in several fragmented blocks for each
+  /// row.
   ///
   template<class T>
   class matrix
@@ -52,6 +54,7 @@ namespace vita
     typename std::vector<T>::iterator begin();
     typename std::vector<T>::const_iterator begin() const;
     typename std::vector<T>::const_iterator end() const;
+    typename std::vector<T>::iterator end();
 
   public:   // Serialization
     bool load(std::istream &);
@@ -73,7 +76,7 @@ namespace vita
   ///        for performance.
   ///
   template<class T>
-  matrix<T>::matrix() : rows_(0), cols_(0)
+  matrix<T>::matrix() : data_(), rows_(0), cols_(0)
   {
   }
 
@@ -226,6 +229,16 @@ namespace vita
   }
 
   ///
+  /// \return iterator to the end (i.e. the element after the last element) of
+  ///         the matrix.
+  ///
+  template<class T>
+  typename std::vector<T>::iterator matrix<T>::end()
+  {
+    return data_.end();
+  }
+
+  ///
   /// \param[out] out output stream.
   /// \return true on success.
   ///
@@ -262,12 +275,10 @@ namespace vita
     if (!(in >> rs) || !rs)
       return false;
 
-    const auto sup(cs * rs);
-    decltype(data_) v;
-    v.reserve(sup);
+    decltype(data_) v(cs * rs);
 
-    for (auto j(decltype(size){0}); j < sup; ++j)
-      if (!(in >> v[j]))
+    for (auto &e : v)
+      if (!(in >> e))
         return false;
 
     cols_ = cs;
@@ -275,6 +286,30 @@ namespace vita
     data_ = v;
 
     return true;
+  }
+
+  ///
+  /// \param[out] o output stream
+  /// \param[in] m a matrix
+  ///
+  /// Prints \a m on the output stream. This is mainly used for debug purpose
+  /// (boost test needs the operator to report errors).
+  ///
+  template<class T>
+  std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
+  {
+    unsigned i(0);
+
+    for (const auto &e : m)
+    {
+      o << e;
+      if (i && (i % m.cols()) == 0)
+        o << std::endl;
+      else
+        o << ' ';
+    }
+
+    return o;
   }
 }  // namespace vita
 
