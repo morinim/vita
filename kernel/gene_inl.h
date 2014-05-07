@@ -13,8 +13,7 @@
 #if !defined(VITA_GENE_INL_H)
 #define      VITA_GENE_INL_H
 
-template<unsigned K>
-constexpr decltype(K) basic_gene<K>::k_args;
+template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 
 ///
 /// \param[in] t a terminal.
@@ -40,8 +39,8 @@ basic_gene<K>::basic_gene(symbol *t) : sym(t)
 ///     std::vector<gene> g(
 ///     {
 ///       {{f_add, {1, 2}}},  // [0] ADD 1,2
-///       {{    y,   null}},  // [1] Y
-///       {{    x,   null}}   // [2] X
+///       {{    y,     {}}},  // [1] Y
+///       {{    x,     {}}}   // [2] X
 ///     };
 ///
 template<unsigned K>

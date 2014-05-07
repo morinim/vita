@@ -240,9 +240,15 @@ namespace vita
   ///
   /// Saves the matrix on persistent storage.
   ///
+  /// \note
+  /// The method is based on operator<< so it works for basic \a T only.
+  ///
   template<class T>
   bool matrix<T>::save(std::ostream &out) const
   {
+    static_assert(std::is_integral<T>::value,
+                  "matrix::save doesn't support non-integral types");
+
     out << cols() << ' ' << rows() << std::endl;
 
     for (const auto &e : data_)
@@ -258,11 +264,15 @@ namespace vita
   /// Loads the matrix from persistent storage.
   ///
   /// \note
-  /// If the operation fails the object isn't modified.
+  /// * If the operation fails the object isn't modified.
+  /// * The method is based on operator>> so it works for basic \a T only.
   ///
   template<class T>
   bool matrix<T>::load(std::istream &in)
   {
+    static_assert(std::is_integral<T>::value,
+                  "matrix::load doesn't support non-integral types");
+
     decltype(cols_) cs;
     if (!(in >> cs) || !cs)
       return false;

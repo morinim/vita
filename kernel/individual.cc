@@ -748,30 +748,33 @@ namespace vita
     if (!(in >> rows >> cols) || !rows || !cols)
       return false;
 
+    // The matrix class has a basic support for serialization but we cannot
+    // take advantage of it here: the gene class needs a special management
+    // (among other things it needs access to the symbol_set to decode the
+    // symbols).
     decltype(genome_) genome(rows, cols);
-    for (decltype(rows) r(0); r < rows; ++r)
-      for (decltype(cols) c(0); c < cols; ++c)
-      {
-        opcode_t opcode;
-        if (!(in >> opcode))
+    for (auto &e : genome)
+    {
+      opcode_t opcode;
+      if (!(in >> opcode))
+        return false;
+
+      gene g;
+      g.sym = sset_->decode(opcode);
+      if (!g.sym)
+        return false;
+
+      if (g.sym->parametric())
+        if (!(in >> g.par))
           return false;
 
-        gene g;
-        g.sym = sset_->decode(opcode);
-        if (!g.sym)
-          return false;
-
-        if (g.sym->parametric())
-          if (!(in >> g.par))
+      if (g.sym->arity())
+        for (unsigned i(0); i < g.sym->arity(); ++i)
+          if (!(in >> g.args[i]))
             return false;
 
-        if (g.sym->arity())
-          for (unsigned i(0); i < g.sym->arity(); ++i)
-            if (!(in >> g.args[i]))
-              return false;
-
-        genome(r, c) = g;
-      }
+      e = g;
+    }
 
     if (best.index >= genome.rows())
       return false;
