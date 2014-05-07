@@ -28,6 +28,7 @@ using namespace boost;
 #include "test_fitness.cc"
 #include "test_individual.cc"
 #include "test_lambda.cc"
+#include "test_matrix.cc"
 #include "test_population.cc"
 #include "test_primitive_d.cc"
 #include "test_primitive_i.cc"
