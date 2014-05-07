@@ -67,7 +67,6 @@ namespace vita
   private:  // Private data members
     std::vector<T> data_;
 
-    unsigned rows_;
     unsigned cols_;
   };
 
@@ -76,7 +75,7 @@ namespace vita
   ///        for performance.
   ///
   template<class T>
-  matrix<T>::matrix() : data_(), rows_(0), cols_(0)
+  matrix<T>::matrix() : data_(), cols_(0)
   {
   }
 
@@ -87,8 +86,7 @@ namespace vita
   /// \brief Standard \a rows x \a cols matrix. Entries aren't initialized.
   ///
   template<class T>
-  matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), rows_(rs),
-                                                cols_(cs)
+  matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
   {
   }
 
@@ -156,7 +154,7 @@ namespace vita
   template<class T>
   unsigned matrix<T>::size() const
   {
-    return rows_ * cols_;
+    return static_cast<unsigned>(data_.size());
   }
 
   ///
@@ -165,7 +163,7 @@ namespace vita
   template<class T>
   unsigned matrix<T>::rows() const
   {
-    return rows_;
+    return static_cast<unsigned>(data_.size() / cols_);
   }
 
   ///
@@ -184,7 +182,7 @@ namespace vita
   template<class T>
   bool matrix<T>::operator==(const matrix<T> &m) const
   {
-    return cols() == m.cols() && rows() == m.rows() && data_ == m.data_;
+    return cols() == m.cols() && data_ == m.data_;
   }
 
   ///
@@ -195,9 +193,7 @@ namespace vita
   template<class T>
   void matrix<T>::fill(const T &v)
   {
-    const auto sup(size());
-    for (auto i(decltype(sup){0}); i < sup; ++i)
-      data_[i] = v;
+    std::fill(data_.begin(), data_.end(), v);
   }
 
   ///
@@ -271,7 +267,7 @@ namespace vita
     if (!(in >> cs) || !cs)
       return false;
 
-    decltype(rows_) rs;
+    decltype(cols_) rs;
     if (!(in >> rs) || !rs)
       return false;
 
@@ -282,7 +278,6 @@ namespace vita
         return false;
 
     cols_ = cs;
-    rows_ = rs;
     data_ = v;
 
     return true;
