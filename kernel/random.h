@@ -145,7 +145,9 @@ namespace vita
     const auto size(c.size());
     assert(size);
 
-    return *std::next(c.begin(), between<decltype(size)>(0, size));
+    return *std::next(c.begin(),
+                      static_cast<typename C::difference_type>(
+                        between<decltype(size)>(0, size)));
   }
 
   ///
@@ -158,7 +160,9 @@ namespace vita
     const auto size(c.size());
     assert(size);
 
-    return *std::next(c.begin(), between<decltype(size)>(0, size));
+    return *std::next(c.begin(),
+                      static_cast<typename C::difference_type>(
+                        between<decltype(size)>(0, size)));
   }
 
   ///
