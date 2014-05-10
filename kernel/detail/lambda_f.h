@@ -15,6 +15,9 @@
 
 namespace vita { namespace detail
 {
+  template<bool S> struct is_true : std::false_type {};
+  template<> struct is_true<true> : std::true_type {};
+
   // ***********************************************************************
   // *  core_reg_lambda_f                                                  *
   // ***********************************************************************
@@ -76,8 +79,6 @@ namespace vita { namespace detail
   public:
     explicit core_reg_lambda_f(const T &ind) : int_(ind)
     { assert(debug()); }
-
-    void operator=(const core_reg_lambda_f<T, false, false> &) { throw 0; }
 
     bool debug() const { return int_.debug(); }
 

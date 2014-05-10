@@ -395,10 +395,16 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 /// Loads the lambda from persistent storage.
 ///
 /// \note
-/// If the load operation isn't successful the current lambda isn't modified
+/// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in)
+{
+  return load_(in, detail::is_true<S>());
+}
+
+template<class T, bool S, bool N>
+bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
 {
   decltype(lambda_) l(lambda_);
   if (!l.load(in))
@@ -426,6 +432,12 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in)
   dataset_size_ = d;
 
   return true;
+}
+
+template<class T, bool S, bool N>
+bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
+{
+  return false;
 }
 
 ///

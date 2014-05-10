@@ -164,6 +164,8 @@ namespace vita
 
   private:  // Private support methods
     static number normalize_01(number);
+    bool load_(std::istream &, std::true_type);
+    bool load_(std::istream &, std::false_type);
 
     void fill_matrix(data &, unsigned);
     unsigned slot(const data::example &) const;
