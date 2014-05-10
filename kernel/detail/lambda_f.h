@@ -15,6 +15,10 @@
 
 namespace vita { namespace detail
 {
+  // ***********************************************************************
+  // *  core_reg_lambda_f                                                  *
+  // ***********************************************************************
+
   /// This is the general template. The last parameter is used for
   /// disambiguation since we need three specializations that, without
   /// the third parameter, overlap (see below).
@@ -138,6 +142,10 @@ namespace vita { namespace detail
     }
   };
 
+  // ***********************************************************************
+  // *  class_names                                                        *
+  // ***********************************************************************
+
   ///
   /// \brief A class to (optionally) store a vector of names
   ///
@@ -207,8 +215,7 @@ namespace vita { namespace detail
     if (!(in >> n) || !n)
       return false;
 
-    decltype(names_) v;
-    v.reserve(n);
+    decltype(names_) v(n);
 
     // When used immediately after whitespace-delimited input, e.g. after
     //     int n; std::cin >> n;
@@ -218,10 +225,17 @@ namespace vita { namespace detail
     // characters on the line of input with:
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    for (unsigned j(0); j < n && !in.fail(); ++j)
-      getline(in, v[j]);
+    for (auto &line : v)
+    {
+      getline(in, line);
 
-    return !in.fail();
+      if (in.fail())
+        return false;
+    }
+
+    names_ = v;
+
+    return true;
   }
 
   ///
