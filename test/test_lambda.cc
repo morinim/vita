@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
 
   src_problem pr;
   pr.env = environment(true);
-  pr.load("mep.csv");
+  BOOST_REQUIRE_GT(pr.load("mep.csv").first, 0);
 
   for (unsigned k(0); k < 1000; ++k)
   {
@@ -309,6 +309,41 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 
   BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF RANDOM INDIVIDUALS");
   test_team<dyn_slot_lambda_f, slots>(pr);
+}
+
+BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
+{
+  using namespace vita;
+
+  constexpr unsigned slots(10);
+
+  src_problem pr;
+  pr.env = environment(true);
+  BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
+
+  for (unsigned k(0); k < 1000; ++k)
+  {
+    const individual ind(pr.env, pr.sset);
+    const auto lambda1(build<dyn_slot_lambda_f, individual, slots>()(
+                         ind, pr.data()));
+
+    std::stringstream ss;
+
+    BOOST_REQUIRE(lambda1.save(ss));
+    const individual ind2(pr.env, pr.sset);
+    auto lambda2(build<dyn_slot_lambda_f, individual, slots>()(ind2,
+                                                               pr.data()));
+    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.debug());
+
+    for (const auto &e : *pr.data())
+    {
+      const auto out1(lambda1.name(lambda1(e)));
+      const auto out2(lambda2.name(lambda2(e)));
+
+      BOOST_CHECK_EQUAL(out1, out2);
+    }
+  }
 }
 
 BOOST_AUTO_TEST_CASE(gaussian_lambda)

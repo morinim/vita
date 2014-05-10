@@ -34,6 +34,20 @@ namespace vita { namespace detail
 
     bool debug() const { return ind_.debug() && int_.debug(); }
 
+    // Without this copy assignment operator the object cannot by copied since
+    // the default assignment is deleted due to the non-copyable int_
+    // data member.
+    // We just need to copy the ind_ data member, the int_ interpreter only
+    // contains a reference to ind_.
+    core_reg_lambda_f<T, true, false> &operator=(
+      const core_reg_lambda_f<T, true, false> &other)
+    {
+      if (this != &other)
+        ind_ = other.ind_;
+
+      return *this;
+    }
+
   public:   // Public data members
     T ind_;
     mutable src_interpreter<T> int_;
@@ -62,6 +76,8 @@ namespace vita { namespace detail
   public:
     explicit core_reg_lambda_f(const T &ind) : int_(ind)
     { assert(debug()); }
+
+    void operator=(const core_reg_lambda_f<T, false, false> &) { throw 0; }
 
     bool debug() const { return int_.debug(); }
 
@@ -120,11 +136,11 @@ namespace vita { namespace detail
       {
         v.emplace_back(T(env, sset));
 
-        if (!v[j].load(i))
+        if (!v.back().load(i))
           return false;
       }
 
-      team_ = std::move(v);
+      team_ = v;
       return true;
     }
 

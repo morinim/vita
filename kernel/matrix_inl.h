@@ -43,7 +43,6 @@ matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
 template<class T>
 unsigned matrix<T>::index(unsigned r, unsigned c) const
 {
-  assert(r < rows_);
   assert(c < cols_);
 
   return r * cols_ + c;

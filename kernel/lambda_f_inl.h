@@ -88,8 +88,7 @@ bool basic_reg_lambda_f<T, S>::debug() const
 /// \return \c true if the lambda has been loaded correctly.
 ///
 /// \note
-/// If the load operation isn't successful the current lambda isn't
-/// modified.
+/// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::load(std::istream &in)
@@ -125,6 +124,33 @@ template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
 {
   return any(tag(e).first);
+}
+
+///
+/// \param[out] out output stream.
+/// \return true on success.
+///
+/// Saves the lambda on persistent storage.
+///
+template<class T, bool N>
+bool basic_class_lambda_f<T, N>::save(std::ostream &out) const
+{
+  return detail::class_names<N>::save(out);
+}
+
+///
+/// \param[in] in input stream.
+/// \return true on success.
+///
+/// Loads the lambda from persistent storage.
+///
+/// \note
+/// If the operation fails the object isn't modified.
+///
+template<class T, bool N>
+bool basic_class_lambda_f<T, N>::load(std::istream &in)
+{
+  return detail::class_names<N>::load(in);
 }
 
 ///
@@ -343,13 +369,11 @@ std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 {
-  if (!detail::class_names<N>::save(out))
-    return false;
-
   if (!lambda_.save(out))
     return false;
 
-  slot_matrix_.save(out);
+  if (!slot_matrix_.save(out))
+    return false;
 
   // Don't need to save slot_class_.size() since it's equal to
   // slot_matrix_.rows()
@@ -357,6 +381,9 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
     out << s << std::endl;
 
   out << dataset_size_ << std::endl;
+
+  if (!basic_class_lambda_f<T, N>::save(out))
+    return false;
 
   return out.good();
 }
@@ -368,12 +395,37 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 /// Loads the lambda from persistent storage.
 ///
 /// \note
-/// If the operation fails the object isn't modified.
+/// If the load operation isn't successful the current lambda isn't modified
 ///
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &)
+bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in)
 {
-  return false;
+  decltype(lambda_) l(lambda_);
+  if (!l.load(in))
+    return false;
+
+  decltype(slot_matrix_) m;
+  if (!m.load(in))
+    return false;
+
+  decltype(slot_class_) s(slot_matrix_.rows());
+  for (auto &e : s)
+    if (!(in >> e))
+      return false;
+
+  decltype(dataset_size_) d;
+  if (!(in >> d))
+    return false;
+
+  if (!basic_class_lambda_f<T, N>::load(in))
+    return false;
+
+  lambda_ = l;
+  slot_matrix_ = m;
+  slot_class_ = s;
+  dataset_size_ = d;
+
+  return true;
 }
 
 ///

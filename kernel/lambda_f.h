@@ -80,7 +80,7 @@ namespace vita
   ///
   template<class T, bool S>
   class basic_reg_lambda_f : public lambda_f<T>,
-                             private detail::core_reg_lambda_f<T, S>
+                             public detail::core_reg_lambda_f<T, S>
   {
   public:
     basic_reg_lambda_f(const T &);
@@ -127,6 +127,10 @@ namespace vita
     virtual any operator()(const data::example &) const override;
 
     virtual std::string name(const any &) const override final;
+
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
   };
 
   ///
@@ -166,7 +170,7 @@ namespace vita
 
   private:  // Private data members
     /// Mainly used by the slot private method.
-    const basic_reg_lambda_f<T, S> lambda_;
+    basic_reg_lambda_f<T, S> lambda_;
 
     /// The main matrix of the dynamic slot algorithm.
     /// slot_matrix[slot][class] = "number of training examples of class
