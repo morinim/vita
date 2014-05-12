@@ -209,14 +209,20 @@ namespace vita
 
     virtual bool debug() const override;
 
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
+
   private:  // Private support methods
     void fill_vector(data &);
+    bool load_(std::istream &, std::true_type);
+    bool load_(std::istream &, std::false_type);
 
   private:  // Private data members
-    const basic_reg_lambda_f<T, S> lambda_;
+    basic_reg_lambda_f<T, S> lambda_;
 
-    /// gauss_dist[i] = "the gaussian distribution of the i-th class if the
-    /// classification problem".
+    // gauss_dist[i] = "the gaussian distribution of the i-th class if the
+    // classification problem".
     std::vector<distribution<number>> gauss_dist_;
   };
 

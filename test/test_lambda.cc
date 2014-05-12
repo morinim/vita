@@ -59,6 +59,34 @@ struct build<vita::reg_lambda_f, T, 0>
 };
 
 template<template<class> class L, unsigned P = 0>
+void test_serialization(vita::src_problem &pr)
+{
+  using namespace vita;
+
+  for (unsigned k(0); k < 1000; ++k)
+  {
+    const individual ind(pr.env, pr.sset);
+    const auto lambda1(build<L, individual, P>()(ind, pr.data()));
+
+    std::stringstream ss;
+
+    BOOST_REQUIRE(lambda1.save(ss));
+    const individual ind2(pr.env, pr.sset);
+    auto lambda2(build<L, individual, P>()(ind2, pr.data()));
+    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.debug());
+
+    for (const auto &e : *pr.data())
+    {
+      const auto out1(lambda1.name(lambda1(e)));
+      const auto out2(lambda2.name(lambda2(e)));
+
+      BOOST_CHECK_EQUAL(out1, out2);
+    }
+  }
+}
+
+template<template<class> class L, unsigned P = 0>
 void test_team_of_one(vita::src_problem &pr)
 {
   using namespace vita;
@@ -321,29 +349,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   pr.env = environment(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
-  for (unsigned k(0); k < 1000; ++k)
-  {
-    const individual ind(pr.env, pr.sset);
-    const auto lambda1(build<dyn_slot_lambda_f, individual, slots>()(
-                         ind, pr.data()));
-
-    std::stringstream ss;
-
-    BOOST_REQUIRE(lambda1.save(ss));
-    const individual ind2(pr.env, pr.sset);
-    auto lambda2(build<dyn_slot_lambda_f, individual, slots>()(ind2,
-                                                               pr.data()));
-    BOOST_REQUIRE(lambda2.load(ss));
-    BOOST_REQUIRE(lambda2.debug());
-
-    for (const auto &e : *pr.data())
-    {
-      const auto out1(lambda1.name(lambda1(e)));
-      const auto out2(lambda2.name(lambda2(e)));
-
-      BOOST_CHECK_EQUAL(out1, out2);
-    }
-  }
+  test_serialization<dyn_slot_lambda_f, slots>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(gaussian_lambda)
@@ -361,6 +367,17 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF RANDOM INDIVIDUALS");
   test_team<gaussian_lambda_f>(pr);
+}
+
+BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
+{
+  using namespace vita;
+
+  src_problem pr;
+  pr.env = environment(true);
+  BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
+
+  test_serialization<gaussian_lambda_f>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(binary_lambda)

@@ -39,6 +39,11 @@ namespace vita
 
     bool debug(bool) const;
 
+  public:   // Serialization
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
+  public:  // Public data members
     std::uintmax_t count;
 
     T     mean;
@@ -173,6 +178,97 @@ namespace vita
   T distribution<T>::standard_deviation() const
   {
     return std::sqrt(variance);
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return true on success.
+  ///
+  /// Saves the distribution on persistent storage.
+  ///
+  template<class T>
+  bool distribution<T>::save(std::ostream &out) const
+  {
+    out << count << std::endl
+        << mean << std::endl
+        << variance  << std::endl
+        << min  << std::endl
+        << max  << std::endl
+        << delta_ << std::endl
+        << m2_ << std::endl;
+
+    out << freq.size() << std::endl;
+    for (const auto &elem : freq)
+      out << elem.first << ' ' << elem.second << std::endl;
+
+    return out.good();
+  }
+
+  ///
+  /// \param[in] in input stream.
+  /// \return true on success.
+  ///
+  /// Loads the distribution from persistent storage.
+  ///
+  /// \note
+  /// If the load operation isn't successful the current object isn't modified.
+  ///
+  template<class T>
+  bool distribution<T>::load(std::istream &in)
+  {
+    decltype(count) count_;
+    if (!(in >> count_))
+      return false;
+
+    decltype(mean) mean_;
+    if (!(in >> mean_))
+      return false;
+
+    decltype(variance) variance_;
+    if (!(in >> variance_))
+      return false;
+
+    decltype(min) min_;
+    if (!(in >> min_))
+      return false;
+
+    decltype(max) max_;
+    if (!(in >> max_))
+      return false;
+
+    decltype(delta_) delta__;
+    if (!(in >> delta__))
+      return false;
+
+    decltype(m2_) m2__;
+    if (!(in >> m2__))
+      return false;
+
+    typename decltype(freq)::size_type n;
+    if (!(in >> n))
+      return false;
+
+    decltype(freq) freq_;
+    for (decltype(n) i(0); i < n; ++i)
+    {
+      typename decltype(freq)::key_type key;
+      typename decltype(freq)::mapped_type val;
+      if (!(in >> key >> val))
+        return false;
+
+      freq_[key] = val;
+    }
+
+    count = count_;
+    mean = mean_;
+    variance = variance_;
+    min = min_;
+    max = max_;
+    delta_ = delta__;
+    m2_ = m2__;
+    freq = freq_;
+
+    return true;
   }
 
   ///

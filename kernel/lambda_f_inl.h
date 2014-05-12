@@ -400,9 +400,20 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in)
 {
+  // Tag dispatching to select the appropriate method.
+  // Note that there is an implementation of operator= only for S==true.
+  // Without tag dispatching the compiler would need a complete implementation
+  // (but we haven't a reasonable/general solution for the S==false case).
   return load_(in, detail::is_true<S>());
 }
 
+///
+/// \param[in] in input stream.
+/// \return true on success.
+///
+/// This is part of the tag dispatching method used by the
+/// basic_dyn_slot_lambda_f::load method.
+///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
 {
@@ -557,6 +568,79 @@ std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   const double confidence(sum_ > 0.0 ? val_ / sum_ : 0.0);
 
   return {probable_class, confidence};
+}
+
+///
+/// \param[out] out output stream.
+/// \return true on success.
+///
+/// Saves the lambda on persistent storage.
+///
+template<class T, bool S, bool N>
+bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
+{
+  if (!lambda_.save(out))
+    return false;
+
+  out << gauss_dist_.size() << std::endl;
+  for (const auto g : gauss_dist_)
+    if (!g.save(out))
+      return false;
+
+  if (!basic_class_lambda_f<T, N>::save(out))
+    return false;
+
+  return out.good();
+}
+
+///
+/// \param[in] in input stream.
+/// \return true on success.
+///
+/// Loads the lambda from persistent storage.
+///
+/// \note
+/// If the load operation isn't successful the current lambda isn't modified.
+///
+template<class T, bool S, bool N>
+bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in)
+{
+  // Tag dispatching to select the appropriate method.
+  // Note that there is an implementation of operator= only for S==true.
+  // Without tag dispatching the compiler would need a complete implementation
+  // (but we haven't a reasonable/general solution for the S==false case).
+  return load_(in, detail::is_true<S>());
+}
+
+template<class T, bool S, bool N>
+bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
+{
+  decltype(lambda_) l(lambda_);
+  if (!l.load(in))
+    return false;
+
+  typename decltype(gauss_dist_)::size_type n;
+  if (!(in >> n))
+    return false;
+
+  decltype(gauss_dist_) g(n);
+  for (auto &d : g)
+    if (!d.load(in))
+      return false;
+
+  if (!basic_class_lambda_f<T, N>::load(in))
+    return false;
+
+  lambda_ = l;
+  gauss_dist_ = g;
+
+  return true;
+}
+
+template<class T, bool S, bool N>
+bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
+{
+  return false;
 }
 
 ///
