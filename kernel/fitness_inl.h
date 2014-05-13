@@ -386,12 +386,13 @@ bool isnan(const basic_fitness_t<T, N> &f)
 }
 
 ///
+/// \param[in] f fitness to check.
 /// \return \c true if each component of the fitness vector is small.
 ///
 template<class T, unsigned N>
-bool basic_fitness_t<T, N>::issmall() const
+bool issmall(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : vect)
+  for (const auto &i : f)
     if (!vita::issmall(i))
       return false;
   return true;
