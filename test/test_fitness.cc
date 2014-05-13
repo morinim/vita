@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(Operators)
   BOOST_CHECK_EQUAL(x, f1);
 
   x = x * -1.0;
-  x = x.abs();
+  x = abs(x);
   BOOST_CHECK_EQUAL(f1, x);
 
   BOOST_CHECK(isfinite(x));

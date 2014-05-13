@@ -332,13 +332,12 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(T val) const
 ///         of \a this.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
+basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 {
-  basic_fitness_t<T, N> tmp;
-  for (decltype(N) i(0); i < N; ++i)
-    tmp[i] = std::fabs(vect[i]);
+  std::transform(f.begin(), f.end(), f.begin(),
+                 static_cast<T (*)(T)>(std::abs));
 
-  return tmp;
+  return f;
 }
 
 ///

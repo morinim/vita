@@ -59,8 +59,6 @@ namespace vita
     basic_fitness_t operator/(T) const;
     basic_fitness_t operator*(T) const;
 
-    basic_fitness_t abs() const;
-
     double distance(const basic_fitness_t &) const;
 
   public:  // Iterators
@@ -84,6 +82,8 @@ namespace vita
   template<class T, unsigned N> bool isnan(const basic_fitness_t<T, N> &);
   template<class T, unsigned N> bool issmall(const basic_fitness_t<T, N> &);
 
+  template<class T, unsigned N>
+  basic_fitness_t<T, N> abs(basic_fitness_t<T, N>);
   template<class T, unsigned N>
   basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
 
