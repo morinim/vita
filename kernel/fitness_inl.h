@@ -237,12 +237,7 @@ std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
 {
   o << '(';
 
-  for (decltype(N) i(0); i < N; ++i)
-  {
-    o << f[i];
-    if (i + 1 < N)
-      o << ", ";
-  }
+  std::copy(f.begin(), f.end(), infix_iterator<T>(o, ", "));
 
   return o << ')';
 }
