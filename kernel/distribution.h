@@ -189,7 +189,11 @@ namespace vita
   template<class T>
   bool distribution<T>::save(std::ostream &out) const
   {
+    SAVE_FLAGS(out);
+
     out << count << std::endl
+        << std::fixed << std::scientific
+        << std::setprecision(std::numeric_limits<T>::digits10 + 1)
         << mean << std::endl
         << variance  << std::endl
         << min  << std::endl
@@ -216,9 +220,14 @@ namespace vita
   template<class T>
   bool distribution<T>::load(std::istream &in)
   {
+    SAVE_FLAGS(in);
+
     decltype(count) count_;
     if (!(in >> count_))
       return false;
+
+    in >> std::fixed >> std::scientific
+       >> std::setprecision(std::numeric_limits<T>::digits10 + 1);
 
     decltype(mean) mean_;
     if (!(in >> mean_))
