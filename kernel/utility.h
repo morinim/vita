@@ -88,6 +88,46 @@ namespace vita
   { return std::stod(s); }
   template<> inline std::string lexical_cast(const std::string &s)
   { return s; }
+
+  ///
+  /// \brief A RAII class to restore the state of a stream to its original
+  ///        state
+  ///
+  /// \a iomanip manipulators are "sticky" (except \c setw which only affects
+  /// the next insertion). Often we need a way to apply an arbitrary number of
+  /// manipulators to a stream and revert the state to whatever it was
+  /// before.
+  ///
+  /// \note
+  /// An alternative approach, which is also exception-safe, is to shuffle
+  /// everything into a temporary \a stringstream and finally put that on
+  /// the real stream (which has never changed its flags at all).
+  /// Of course this is a little less performant.
+  ///
+  class ios_flag_saver
+  {
+  public:
+    explicit ios_flag_saver(std::ios &s)
+      : s_(s), flags_(s.flags()), precision_(s.precision()), width_(s.width())
+    {}
+
+    ~ios_flag_saver()
+    {
+      s_.flags(flags_);
+      s_.precision(precision_);
+      s_.width(width_);
+    }
+
+    DISALLOW_COPY_AND_ASSIGN(ios_flag_saver);
+
+  private:
+    std::ios &s_;
+    std::ios::fmtflags flags_;
+    std::streamsize precision_;
+    std::streamsize width_;
+  };
+#define SAVE_FLAGS(s) ios_flag_saver save ## __LINE__(s)
+
 }  // namespace vita
 
 #endif  // Include guard
