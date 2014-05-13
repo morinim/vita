@@ -234,7 +234,7 @@ bool search<T, ES>::stop_condition(const summary<T> &s) const
 
   if (*env_.g_without_improvement &&
       (s.gen - s.last_imp > *env_.g_without_improvement &&
-       s.az.fit_dist().variance.issmall()))
+       issmall(s.az.fit_dist().variance)))
     return true;
 
   return false;
