@@ -10,21 +10,14 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#if !defined(VITA_NO_LIB)
 #include "kernel/distribution.h"
+#endif
 
 namespace vita
 {
   template<>
-  void distribution<fitness_t>::clear()
-  {
-    count = 0;
-
-    delta_ = m2_ = mean = variance = min = max = fitness_t();
-
-    freq.clear();
-  }
-
-  template<>
+  VITA_INLINE
   void distribution<fitness_t>::add(fitness_t val)
   {
     if (!val.isnan())
@@ -51,6 +44,7 @@ namespace vita
   }
 
   template<>
+  VITA_INLINE
   fitness_t distribution<fitness_t>::standard_deviation() const
   {
     return variance.sqrt();
@@ -61,6 +55,7 @@ namespace vita
   /// \return \c true if the object passes the internal consistency check.
   ///
   template<>
+  VITA_INLINE
   bool distribution<fitness_t>::debug(bool verbose) const
   {
     if (min.isfinite() && mean.isfinite() && min > mean)
