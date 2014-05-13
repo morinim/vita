@@ -47,7 +47,7 @@ namespace vita
   VITA_INLINE
   fitness_t distribution<fitness_t>::standard_deviation() const
   {
-    return variance.sqrt();
+    return sqrt(variance);
   }
 
   ///

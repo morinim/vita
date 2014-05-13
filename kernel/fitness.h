@@ -64,7 +64,6 @@ namespace vita
     basic_fitness_t operator*(T) const;
 
     basic_fitness_t abs() const;
-    basic_fitness_t sqrt() const;
 
     double distance(const basic_fitness_t &) const;
 
@@ -75,6 +74,9 @@ namespace vita
   private:
     std::array<T, N> vect;
   };
+
+  template<class T, unsigned N>
+  basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
 
   template<class T> bool almost_equal(T, T, T = 0.00001);
   template<class T, unsigned N> bool almost_equal(

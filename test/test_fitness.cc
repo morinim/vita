@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(Operators)
   BOOST_CHECK_EQUAL(x, f1);
 
   x = x * x;
-  x = x.sqrt();
+  x = sqrt(x);
   BOOST_CHECK_EQUAL(x, f1);
 
   x = x * -1.0;

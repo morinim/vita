@@ -310,13 +310,12 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
 ///         \a this.
 ///
 template<class T, unsigned N>
-basic_fitness_t<T, N> basic_fitness_t<T, N>::sqrt() const
+basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 {
-  basic_fitness_t<T, N> tmp;
   for (decltype(N) i(0); i < N; ++i)
-    tmp[i] = std::sqrt(vect[i]);
+    f[i] = std::sqrt(f[i]);
 
-  return tmp;
+  return f;
 }
 
 ///
