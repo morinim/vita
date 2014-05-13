@@ -128,6 +128,49 @@ namespace vita
   };
 #define SAVE_FLAGS(s) ios_flag_saver save ## __LINE__(s)
 
+  ///
+  /// A single-pass output iterator that writes successive objects of type T
+  /// into the std::basic_ostream object for which it was constructed, using
+  /// operator<<. Optional delimiter string is written to the output stream
+  /// after the SECOND write operation.
+  ///
+  /// Same interface as an std::ostream_iterator.
+  ///
+  /// Lifted from Jerry Coffin's prefix_ostream_iterator.
+  ///
+  template <class T, class C = char, class traits = std::char_traits<C>>
+  class infix_iterator : public std::iterator<std::output_iterator_tag, void,
+                                              void, void, void>
+  {
+  public:
+    using char_type = C;
+    using traits_type = traits;
+    using ostream_type = std::basic_ostream<C, traits>;
+
+    explicit infix_iterator(ostream_type &s, C const *d = nullptr)
+      : os_(&s), delimiter_(d), first_elem_(true)
+    {}
+
+    infix_iterator<T, C, traits> &operator=(const T &item)
+    {
+      // Here's the only real change from ostream_iterator:
+      // normally, the '*os << item;' would come before the 'if'.
+      if (!first_elem_ && delimiter_)
+        *os_ << delimiter_;
+      *os_ << item;
+      first_elem_ = false;
+      return *this;
+    }
+
+    infix_iterator<T, C, traits> &operator*() { return *this; }
+    infix_iterator<T, C, traits> &operator++() { return *this; }
+    infix_iterator<T, C, traits> &operator++(int) { return *this; }
+
+  private:
+    std::basic_ostream<C, traits> *os_;
+    C const *delimiter_;
+    bool first_elem_;
+  };
 }  // namespace vita
 
 #endif  // Include guard
