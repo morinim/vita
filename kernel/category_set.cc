@@ -14,6 +14,7 @@
 #include <iterator>
 
 #include "kernel/category_set.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
@@ -176,7 +177,7 @@ namespace vita
 
     if (!c.labels.empty())
       std::copy(c.labels.begin(), c.labels.end(),
-                std::ostream_iterator<std::string>(s, " "));
+                infix_iterator<std::string>(s, " "));
 
     s << "])";
 
