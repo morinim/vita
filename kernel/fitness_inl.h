@@ -117,6 +117,46 @@ bool basic_fitness_t<T, N>::operator<=(const basic_fitness_t<T, N> &f) const
 }
 
 ///
+/// \return iterator to the first element of the fitness.
+///
+template<class T, unsigned N>
+typename basic_fitness_t<T, N>::iterator basic_fitness_t<T, N>::begin()
+{
+  return vect.begin();
+}
+
+///
+/// \return constant iterator to the first element of the fitness.
+///
+template<class T, unsigned N>
+typename basic_fitness_t<T, N>::const_iterator
+basic_fitness_t<T, N>::begin() const
+{
+  return vect.begin();
+}
+
+///
+/// \return iterator to the end (i.e. the element after the last element) of
+///         the fitness.
+///
+template<class T, unsigned N>
+typename basic_fitness_t<T, N>::iterator basic_fitness_t<T, N>::end()
+{
+  return vect.end();
+}
+
+///
+/// \return iterator to the end (i.e. the element after the last element) of
+///         the fitness.
+///
+template<class T, unsigned N>
+typename basic_fitness_t<T, N>::const_iterator
+basic_fitness_t<T, N>::end() const
+{
+  return vect.end();
+}
+
+///
 /// \param[in] f second term of comparison.
 /// \return \c true if \a this is a Pareto improvement of \a f.
 ///
@@ -306,6 +346,7 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
 }
 
 ///
+/// \param[in] f a fitness.
 /// \return a new vector obtained taking the square root of each component of
 ///         \a this.
 ///
@@ -319,12 +360,13 @@ basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 }
 
 ///
+/// \param[in] f fitness to check.
 /// \return \c true if every component of the fitness is finite.
 ///
 template<class T, unsigned N>
-bool basic_fitness_t<T, N>::isfinite() const
+bool isfinite(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : vect)
+  for (const auto &i : f)
     if (!std::isfinite(i))
       return false;
   return true;

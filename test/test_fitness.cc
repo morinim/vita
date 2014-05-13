@@ -117,8 +117,8 @@ BOOST_AUTO_TEST_CASE(Operators)
   x = x.abs();
   BOOST_CHECK_EQUAL(f1, x);
 
-  BOOST_CHECK(x.isfinite());
-  BOOST_CHECK(!inf.isfinite());
+  BOOST_CHECK(isfinite(x));
+  BOOST_CHECK(!isfinite(inf));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

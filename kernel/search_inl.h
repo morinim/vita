@@ -53,7 +53,7 @@ template<class U>
 void search<T, ES>::arl(const U &base)
 {
   const auto base_fit(fitness(base));
-  if (!base_fit.isfinite())
+  if (!isfinite(base_fit))
     return;  // We need a finite fitness to search for an improvement
 
   // Logs ADFs
@@ -526,7 +526,7 @@ T search<T, ES>::run(unsigned n)
       good_runs.push_back(r);
     }
 
-    if (run_fitness.isfinite())
+    if (isfinite(run_fitness))
       fd.add(run_fitness);
 
     overall_summary.elapsed += s.elapsed;

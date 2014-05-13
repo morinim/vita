@@ -51,7 +51,7 @@ namespace vita
   VITA_INLINE
   bool distribution<fitness_t>::debug(bool verbose) const
   {
-    if (min.isfinite() && mean.isfinite() && min > mean)
+    if (isfinite(min) && isfinite(mean) && min > mean)
     {
       if (verbose)
         std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
@@ -59,7 +59,7 @@ namespace vita
       return false;
     }
 
-    if (max.isfinite() && mean.isfinite() && max < mean)
+    if (isfinite(max) && isfinite(mean) && max < mean)
     {
       if (verbose)
         std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="

@@ -192,7 +192,7 @@ void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned l)
 
   length_.add(count(ind));
 
-  if (f.isfinite())
+  if (isfinite(f))
   {
     fit_.add(f);
     layer_stat_[l].fitness.add(f);

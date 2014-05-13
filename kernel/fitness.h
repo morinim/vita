@@ -51,7 +51,6 @@ namespace vita
 
     T &operator[](unsigned i) { assert(i < N); return vect[i]; }
 
-    bool isfinite() const;
     bool isnan() const;
     bool issmall() const;
 
@@ -67,6 +66,15 @@ namespace vita
 
     double distance(const basic_fitness_t &) const;
 
+  public:  // Iterators
+    using iterator = typename std::array<T, N>::iterator;
+    using const_iterator = typename std::array<T, N>::const_iterator;
+
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator end() const;
+    iterator end();
+
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;
@@ -74,6 +82,8 @@ namespace vita
   private:
     std::array<T, N> vect;
   };
+
+  template<class T, unsigned N> bool isfinite(const basic_fitness_t<T, N> &);
 
   template<class T, unsigned N>
   basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
