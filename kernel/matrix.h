@@ -51,10 +51,14 @@ namespace vita
     unsigned rows() const;
     unsigned cols() const;
 
-    typename std::vector<T>::iterator begin();
-    typename std::vector<T>::const_iterator begin() const;
-    typename std::vector<T>::const_iterator end() const;
-    typename std::vector<T>::iterator end();
+  public:  // Iterators
+    using iterator = typename std::vector<T>::iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
+
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator end() const;
+    iterator end();
 
   public:   // Serialization
     bool load(std::istream &);

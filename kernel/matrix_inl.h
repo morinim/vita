@@ -130,19 +130,19 @@ bool matrix<T>::operator==(const matrix<T> &m) const
 ///
 /// \param[in] v a value.
 ///
-/// \brief Sets the elements of the matrix to \a v.
+/// Sets the elements of the matrix to \a v.
 ///
 template<class T>
 void matrix<T>::fill(const T &v)
 {
-  std::fill(data_.begin(), data_.end(), v);
+  std::fill(begin(), end(), v);
 }
 
 ///
 /// \return iterator to the first element of the matrix.
 ///
 template<class T>
-typename std::vector<T>::iterator matrix<T>::begin()
+typename matrix<T>::iterator matrix<T>::begin()
 {
   return data_.begin();
 }
@@ -151,7 +151,7 @@ typename std::vector<T>::iterator matrix<T>::begin()
 /// \return constant iterator to the first element of the matrix.
 ///
 template<class T>
-typename std::vector<T>::const_iterator matrix<T>::begin() const
+typename matrix<T>::const_iterator matrix<T>::begin() const
 {
   return data_.begin();
 }
@@ -161,7 +161,7 @@ typename std::vector<T>::const_iterator matrix<T>::begin() const
 ///         the matrix.
 ///
 template<class T>
-typename std::vector<T>::const_iterator matrix<T>::end() const
+typename matrix<T>::const_iterator matrix<T>::end() const
 {
   return data_.end();
 }
@@ -171,7 +171,7 @@ typename std::vector<T>::const_iterator matrix<T>::end() const
 ///         the matrix.
 ///
 template<class T>
-typename std::vector<T>::iterator matrix<T>::end()
+typename matrix<T>::iterator matrix<T>::end()
 {
   return data_.end();
 }
