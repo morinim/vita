@@ -53,8 +53,8 @@ namespace vita
 
     basic_fitness_t &operator+=(const basic_fitness_t &);
     basic_fitness_t &operator-=(const basic_fitness_t &);
-    basic_fitness_t operator-(const basic_fitness_t &) const;
-    basic_fitness_t operator*(const basic_fitness_t &) const;
+    basic_fitness_t operator-(basic_fitness_t) const;
+    basic_fitness_t operator*(basic_fitness_t) const;
 
     basic_fitness_t operator/(T) const;
     basic_fitness_t operator*(T) const;

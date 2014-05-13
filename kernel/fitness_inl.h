@@ -276,13 +276,12 @@ basic_fitness_t<T, N> &basic_fitness_t<T, N>::operator-=(
 ///
 template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(
-  const basic_fitness_t<T, N> &f) const
+  basic_fitness_t<T, N> f) const
 {
-  basic_fitness_t<T, N> tmp;
   for (decltype(N) i(0); i < N; ++i)
-    tmp[i] = vect[i] - f[i];
+    f[i] = vect[i] - f[i];
 
-  return tmp;
+  return f;
 }
 
 ///
@@ -291,13 +290,12 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::operator-(
 ///
 template<class T, unsigned N>
 basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(
-  const basic_fitness_t<T, N> &f) const
+  basic_fitness_t<T, N> f) const
 {
-  basic_fitness_t<T, N> tmp;
   for (decltype(N) i(0); i < N; ++i)
-    tmp[i] = vect[i] * f[i];
+    f[i] *= vect[i];
 
-  return tmp;
+  return f;
 }
 
 ///
