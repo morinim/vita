@@ -373,12 +373,13 @@ bool isfinite(const basic_fitness_t<T, N> &f)
 }
 
 ///
+/// \param[in] f fitness to check.
 /// \return \c true if a component of the fitness is NAN.
 ///
 template<class T, unsigned N>
-bool basic_fitness_t<T, N>::isnan() const
+bool isnan(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : vect)
+  for (const auto &i : f)
     if (std::isnan(i))
       return true;
   return false;

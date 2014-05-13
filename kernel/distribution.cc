@@ -20,7 +20,7 @@ namespace vita
   VITA_INLINE
   void distribution<fitness_t>::add(fitness_t val)
   {
-    if (!val.isnan())
+    if (!isnan(val))
     {
       if (!count)
       {
@@ -67,7 +67,7 @@ namespace vita
       return false;
     }
 
-    if (variance.isnan() || variance < fitness_t(0.0))
+    if (isnan(variance) || variance < fitness_t(0.0))
     {
       if (verbose)
         std::cerr << k_s_debug << " Distribution: negative variance."
