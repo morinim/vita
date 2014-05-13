@@ -195,13 +195,14 @@ bool basic_fitness_t<T, N>::dominating(const basic_fitness_t<T, N> &f) const
 template<class T, unsigned N>
 bool basic_fitness_t<T, N>::load(std::istream &in)
 {
+  SAVE_FLAGS(in);
+
   basic_fitness_t<T, N> tmp;
 
-  for (decltype(N) i(0); i < N; ++i)
-    if (!(in
-          >> std::fixed >> std::scientific
-          >> std::setprecision(std::numeric_limits<double>::digits10 + 1)
-          >> tmp.vect[i]))
+  for (auto &e : tmp)
+    if (!(in >> std::fixed >> std::scientific
+             >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
+             >> e))
       return false;
 
   *this = tmp;
@@ -216,9 +217,11 @@ bool basic_fitness_t<T, N>::load(std::istream &in)
 template<class T, unsigned N>
 bool basic_fitness_t<T, N>::save(std::ostream &out) const
 {
+  SAVE_FLAGS(out);
+
   for (const auto &i : vect)
     out << std::fixed << std::scientific
-        << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+        << std::setprecision(std::numeric_limits<T>::digits10 + 1)
         << i << ' ';
 
   out << std::endl;
