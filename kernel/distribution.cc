@@ -43,13 +43,6 @@ namespace vita
     }
   }
 
-  template<>
-  VITA_INLINE
-  fitness_t distribution<fitness_t>::standard_deviation() const
-  {
-    return sqrt(variance);
-  }
-
   ///
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the object passes the internal consistency check.

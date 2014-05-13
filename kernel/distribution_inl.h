@@ -129,7 +129,12 @@ void distribution<T>::update_variance(T val)
 template<class T>
 T distribution<T>::standard_deviation() const
 {
-  return std::sqrt(variance);
+  // This way, for "regular" types it will use std::sqrt ("taken in" by the
+  // using statement), while for our types the overload will prevail due to
+  // Koenig lookup (<http://www.gotw.ca/gotw/030.htm>).
+  using std::sqrt;
+
+  return sqrt(variance);
 }
 
 ///
