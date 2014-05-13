@@ -353,8 +353,8 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::abs() const
 template<class T, unsigned N>
 basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 {
-  for (decltype(N) i(0); i < N; ++i)
-    f[i] = std::sqrt(f[i]);
+  std::transform(f.begin(), f.end(), f.begin(),
+                 static_cast<T (*)(T)>(std::sqrt));
 
   return f;
 }
@@ -366,10 +366,8 @@ basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 template<class T, unsigned N>
 bool isfinite(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : f)
-    if (!std::isfinite(i))
-      return false;
-  return true;
+  return std::all_of(f.begin(), f.end(),
+                     static_cast<bool (*)(T)>(std::isfinite));
 }
 
 ///
@@ -379,10 +377,7 @@ bool isfinite(const basic_fitness_t<T, N> &f)
 template<class T, unsigned N>
 bool isnan(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : f)
-    if (std::isnan(i))
-      return true;
-  return false;
+  return std::any_of(f.begin(), f.end(), static_cast<bool (*)(T)>(std::isnan));
 }
 
 ///
@@ -392,10 +387,8 @@ bool isnan(const basic_fitness_t<T, N> &f)
 template<class T, unsigned N>
 bool issmall(const basic_fitness_t<T, N> &f)
 {
-  for (const auto &i : f)
-    if (!vita::issmall(i))
-      return false;
-  return true;
+  return std::all_of(f.begin(), f.end(),
+                     static_cast<bool (*)(T)>(vita::issmall));
 }
 
 ///
