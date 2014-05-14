@@ -42,39 +42,4 @@ namespace vita
       ++freq[val];
     }
   }
-
-  ///
-  /// \param[in] verbose if \c true prints error messages to \c std::cerr.
-  /// \return \c true if the object passes the internal consistency check.
-  ///
-  template<>
-  VITA_INLINE
-  bool distribution<fitness_t>::debug(bool verbose) const
-  {
-    if (isfinite(min) && isfinite(mean) && min > mean)
-    {
-      if (verbose)
-        std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
-                  << mean << "." << std::endl;
-      return false;
-    }
-
-    if (isfinite(max) && isfinite(mean) && max < mean)
-    {
-      if (verbose)
-        std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
-                  << mean << "." << std::endl;
-      return false;
-    }
-
-    if (isnan(variance) || variance < fitness_t(0.0))
-    {
-      if (verbose)
-        std::cerr << k_s_debug << " Distribution: negative variance."
-                  << std::endl;
-      return false;
-    }
-
-    return true;
-  }
 }  // namespace vita

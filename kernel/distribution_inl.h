@@ -244,7 +244,10 @@ bool distribution<T>::load(std::istream &in)
 template<class T>
 bool distribution<T>::debug(bool verbose) const
 {
-  if (std::isfinite(min) && std::isfinite(mean) && min > mean)
+  using std::isfinite;
+  using std::isnan;
+
+  if (isfinite(min) && isfinite(mean) && min > mean)
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
@@ -252,7 +255,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (std::isfinite(max) && std::isfinite(mean) && max < mean)
+  if (isfinite(max) && isfinite(mean) && max < mean)
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
@@ -260,7 +263,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (std::isnan(variance) || variance < 0.0)
+  if (isnan(variance) || variance < T(0.0))
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: negative variance."
