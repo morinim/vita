@@ -129,7 +129,7 @@ void distribution<T>::update_variance(T val)
 template<class T>
 T distribution<T>::standard_deviation() const
 {
-  // This way, for "regular" types it will use std::sqrt ("taken in" by the
+  // This way, for "regular" types we'll use std::sqrt ("taken in" by the
   // using statement), while for our types the overload will prevail due to
   // Koenig lookup (<http://www.gotw.ca/gotw/030.htm>).
   using std::sqrt;
@@ -244,6 +244,9 @@ bool distribution<T>::load(std::istream &in)
 template<class T>
 bool distribution<T>::debug(bool verbose) const
 {
+  // This way, for "regular" types we'll use std::infinite / std::isnan
+  // ("taken in" by the using statement), while for our types the overload
+  // will prevail due to Koenig lookup (<http://www.gotw.ca/gotw/030.htm>).
   using std::isfinite;
   using std::isnan;
 

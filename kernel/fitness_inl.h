@@ -49,6 +49,34 @@ basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
 }
 
 ///
+/// \param[in] i index of an element
+/// \return the i-th element of the fitness vector.
+///
+template<class T, unsigned N>
+T basic_fitness_t<T, N>::operator[](unsigned i) const
+{
+  // This assert is a bit to strict: taking the address of one past the last
+  // element of vect could be allowed, e.g.
+  //     std::copy(&f[0], &f[N], &dest);
+  // but the assertion will signal this use case. The workaround is:
+  //     std::copy(&f[0], &f[0] + N, &dest);
+  assert(i < N);
+
+  return vect[i];
+}
+
+///
+/// \param[in] i index of an element
+/// \return a reference to the i-th element of the fitness vector.
+///
+template<class T, unsigned N>
+T &basic_fitness_t<T, N>::operator[](unsigned i)
+{
+  assert(i < N);
+  return vect[i];
+}
+
+///
 /// Operation is performed by first comparing sizes and, if they match,
 /// the elements are compared sequentially using algorithm equal, which
 /// stops at the first mismatch.
