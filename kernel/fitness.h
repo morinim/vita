@@ -61,15 +61,6 @@ namespace vita
 
     double distance(const basic_fitness_t &) const;
 
-  public:  // Iterators
-    using iterator = typename std::array<T, N>::iterator;
-    using const_iterator = typename std::array<T, N>::const_iterator;
-
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator end() const;
-    iterator end();
-
   public:   // Serialization.
     bool load(std::istream &);
     bool save(std::ostream &) const;

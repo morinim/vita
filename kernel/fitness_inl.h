@@ -117,46 +117,6 @@ bool basic_fitness_t<T, N>::operator<=(const basic_fitness_t<T, N> &f) const
 }
 
 ///
-/// \return iterator to the first element of the fitness.
-///
-template<class T, unsigned N>
-typename basic_fitness_t<T, N>::iterator basic_fitness_t<T, N>::begin()
-{
-  return vect.begin();
-}
-
-///
-/// \return constant iterator to the first element of the fitness.
-///
-template<class T, unsigned N>
-typename basic_fitness_t<T, N>::const_iterator
-basic_fitness_t<T, N>::begin() const
-{
-  return vect.begin();
-}
-
-///
-/// \return iterator to the end (i.e. the element after the last element) of
-///         the fitness.
-///
-template<class T, unsigned N>
-typename basic_fitness_t<T, N>::iterator basic_fitness_t<T, N>::end()
-{
-  return vect.end();
-}
-
-///
-/// \return iterator to the end (i.e. the element after the last element) of
-///         the fitness.
-///
-template<class T, unsigned N>
-typename basic_fitness_t<T, N>::const_iterator
-basic_fitness_t<T, N>::end() const
-{
-  return vect.end();
-}
-
-///
 /// \param[in] f second term of comparison.
 /// \return \c true if \a this is a Pareto improvement of \a f.
 ///
@@ -199,7 +159,7 @@ bool basic_fitness_t<T, N>::load(std::istream &in)
 
   basic_fitness_t<T, N> tmp;
 
-  for (auto &e : tmp)
+  for (auto &e : tmp.vect)
     if (!(in >> std::fixed >> std::scientific
              >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
              >> e))
@@ -233,11 +193,11 @@ bool basic_fitness_t<T, N>::save(std::ostream &out) const
 /// Standard output operator for basic_fitness_t.
 ///
 template<class T, unsigned N>
-std::ostream &operator<<(std::ostream &o, const basic_fitness_t<T, N> &f)
+std::ostream &operator<<(std::ostream &o, basic_fitness_t<T, N> f)
 {
   o << '(';
 
-  std::copy(f.begin(), f.end(), infix_iterator<T>(o, ", "));
+  std::copy(&f[0], &f[N], infix_iterator<T>(o, ", "));
 
   return o << ')';
 }
@@ -334,10 +294,14 @@ basic_fitness_t<T, N> basic_fitness_t<T, N>::operator*(T val) const
 template<class T, unsigned N>
 basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 {
-  std::transform(f.begin(), f.end(), f.begin(),
-                 static_cast<T (*)(T)>(std::abs));
+  for (decltype(N) i(0); i < N; ++i)
+    f[i] = std::abs(f[i]);
 
   return f;
+
+  // This is more "idiomatic" but the compiler won't do a good job for
+  // N == 1:
+  // std::transform(&f[0], &f[N], &f[0], static_cast<T (*)(T)>(std::abs));
 }
 
 ///
@@ -348,10 +312,14 @@ basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 template<class T, unsigned N>
 basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 {
-  std::transform(f.begin(), f.end(), f.begin(),
-                 static_cast<T (*)(T)>(std::sqrt));
+  for (decltype(N) i(0); i < N; ++i)
+    f[i] = std::sqrt(f[i]);
 
   return f;
+
+  // This is more "idiomatic" but the compiler won't do a good job for
+  // N == 1:
+  // std::transform(&f[0], &f[N], &f[0], static_cast<T (*)(T)>(std::sqrt));
 }
 
 ///
@@ -361,8 +329,15 @@ basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 template<class T, unsigned N>
 bool isfinite(const basic_fitness_t<T, N> &f)
 {
-  return std::all_of(f.begin(), f.end(),
-                     static_cast<bool (*)(T)>(std::isfinite));
+  for (decltype(N) i(0); i < N; ++i)
+    if (!std::isfinite(f[i]))
+      return false;
+  return true;
+
+  // This is more "idiomatic" but the compiler won't do a good job for
+  // N == 1:
+  // return std::all_of(f.begin(), f.end(),
+  //                    static_cast<bool (*)(T)>(std::isfinite));
 }
 
 ///
@@ -372,7 +347,15 @@ bool isfinite(const basic_fitness_t<T, N> &f)
 template<class T, unsigned N>
 bool isnan(const basic_fitness_t<T, N> &f)
 {
-  return std::any_of(f.begin(), f.end(), static_cast<bool (*)(T)>(std::isnan));
+  for (decltype(N) i(0); i < N; ++i)
+    if (std::isnan(f[i]))
+      return true;
+  return false;
+
+  // This is more "idiomatic" but the compiler won't do a good job for
+  // N == 1:
+  // return std::any_of(f.begin(), f.end(),
+  //                    static_cast<bool (*)(T)>(std::isnan));
 }
 
 ///
@@ -382,8 +365,15 @@ bool isnan(const basic_fitness_t<T, N> &f)
 template<class T, unsigned N>
 bool issmall(const basic_fitness_t<T, N> &f)
 {
-  return std::all_of(f.begin(), f.end(),
-                     static_cast<bool (*)(T)>(vita::issmall));
+  for (decltype(N) i(0); i < N; ++i)
+    if (!issmall(f[i]))
+      return false;
+  return true;
+
+  // This is more "idiomatic" but the compiler won't do a good job for
+  // N == 1:
+  // return std::all_of(f.begin(), f.end(),
+  //                    static_cast<bool (*)(T)>(vita::issmall));
 }
 
 ///
@@ -438,7 +428,7 @@ double basic_fitness_t<T, N>::distance(const basic_fitness_t<T, N> &f) const
   double d(0.0);
 
   for (decltype(N) i(0); i < N; ++i)
-    d += std::fabs(vect[i] - f[i]);
+    d += std::abs(vect[i] - f[i]);
 
   return d;
 }
