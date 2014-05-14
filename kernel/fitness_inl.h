@@ -197,7 +197,7 @@ std::ostream &operator<<(std::ostream &o, basic_fitness_t<T, N> f)
 {
   o << '(';
 
-  std::copy(&f[0], &f[N], infix_iterator<T>(o, ", "));
+  std::copy(&f[0], &f[0] + N, infix_iterator<T>(o, ", "));
 
   return o << ')';
 }
@@ -301,7 +301,7 @@ basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 
   // This is more "idiomatic" but the compiler won't do a good job for
   // N == 1:
-  // std::transform(&f[0], &f[N], &f[0], static_cast<T (*)(T)>(std::abs));
+  // std::transform(&f[0], &f[0] + N, &f[0], static_cast<T (*)(T)>(std::abs));
 }
 
 ///
@@ -319,7 +319,7 @@ basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N> f)
 
   // This is more "idiomatic" but the compiler won't do a good job for
   // N == 1:
-  // std::transform(&f[0], &f[N], &f[0], static_cast<T (*)(T)>(std::sqrt));
+  // std::transform(&f[0], &f[0] + N, &f[0], static_cast<T (*)(T)>(std::sqrt));
 }
 
 ///
@@ -393,16 +393,17 @@ bool almost_equal(T v1, T v2, T epsilon)
 {
   const T diff(std::abs(v1 - v2));
 
-  // Check if the numbers are really close -- needed
-  // when comparing numbers near zero.
-  if (diff <= 10.0 * std::numeric_limits<T>::min())
+  // Check if the numbers are really close -- needed when comparing numbers
+  // near zero.
+  if (issmall(diff))
+    //if (diff <= 10.0 * std::numeric_limits<T>::min())
     return true;
 
   v1 = std::abs(v1);
   v2 = std::abs(v2);
 
-  // In order to get consistent results, we should always compare the
-  // difference to the larger of the two numbers.
+  // In order to get consistent results, we always compare the difference to
+  // the largest of the two numbers.
   const T largest(std::max(v1, v2));
 
   return diff <= largest * epsilon;
