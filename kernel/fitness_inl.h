@@ -334,6 +334,19 @@ basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 
 ///
 /// \param[in] f a fitness.
+/// \return a new vector obtained "rounding" each component of \a this.
+///
+template<class T, unsigned N>
+basic_fitness_t<T, N> round_to(basic_fitness_t<T, N> f)
+{
+  for (decltype(N) i(0); i < N; ++i)
+    f[i] = round_to(f[i]);
+
+  return f;
+}
+
+///
+/// \param[in] f a fitness.
 /// \return a new vector obtained taking the square root of each component of
 ///         \a this.
 ///

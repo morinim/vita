@@ -75,6 +75,8 @@ namespace vita
   template<class T, unsigned N>
   basic_fitness_t<T, N> abs(basic_fitness_t<T, N>);
   template<class T, unsigned N>
+  basic_fitness_t<T, N> round_to(basic_fitness_t<T, N>);
+  template<class T, unsigned N>
   basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
 
   template<class T> bool almost_equal(T, T, T = 0.00001);
