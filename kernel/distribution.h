@@ -61,7 +61,6 @@ namespace vita
   };
 
   template<> void distribution<fitness_t>::add(fitness_t);
-  template<> bool distribution<fitness_t>::debug(bool) const;
 
 #include "kernel/distribution_inl.h"
 }  // namespace vita
