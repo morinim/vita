@@ -32,23 +32,6 @@ void distribution<T>::clear()
 }
 
 ///
-/// \param val a value to be rounded.
-///
-/// \brief Rounds \a val to the number of decimals of \c float_epsilon.
-///
-template<class T>
-T round_to(T val)
-{
-  constexpr T float_epsilon(0.0001);
-
-  val /= float_epsilon;
-  val = std::round(val);
-  val *= float_epsilon;
-
-  return val;
-}
-
-///
 /// \param[in] val new value upon which statistics are recalculated.
 ///
 /// Add a new value to the distribution.
@@ -56,7 +39,9 @@ T round_to(T val)
 template<class T>
 void distribution<T>::add(T val)
 {
-  if (!std::isnan(val))
+  using std::isnan;
+
+  if (!isnan(val))
   {
     if (!count)
       min = max = val;

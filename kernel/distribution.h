@@ -16,7 +16,7 @@
 #include <cmath>
 #include <map>
 
-#include "kernel/fitness.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
@@ -24,7 +24,7 @@ namespace vita
   /// \brief Simplifies the calculation of statistics regarding a sequence
   ///        (mean, variance, standard deviation, entropy, min and max)
   ///
-  template<class T = fitness_t>
+  template<class T>
   class distribution
   {
   public:
@@ -60,13 +60,7 @@ namespace vita
     T    m2_;
   };
 
-  template<> void distribution<fitness_t>::add(fitness_t);
-
 #include "kernel/distribution_inl.h"
 }  // namespace vita
-
-#if defined(VITA_NO_LIB)
-#  include "distribution.cc"
-#endif
 
 #endif  // Include guard
