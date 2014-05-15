@@ -317,8 +317,8 @@ bool population<T>::debug(bool verbose) const
 template<class T>
 bool population<T>::load(std::istream &in)
 {
-  unsigned n_layers(0);
-  if (!(in >> n_layers))
+  unsigned n_layers;
+  if (!(in >> n_layers) || !n_layers)
     return false;
 
   population p(env(), pop_[0][0].sset());

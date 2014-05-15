@@ -63,7 +63,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
     if (!tmp_ind.load(in))
       return false;
 
-    fitness_t tmp_fitness;
+    decltype(best->fitness) tmp_fitness;
     if (!tmp_fitness.load(in))
       return false;
 
