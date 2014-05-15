@@ -17,9 +17,9 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution()
+distribution<T>::distribution() : count(0), mean(0.0), variance(0.0), min(0.0),
+                                  max(0.0), freq(), delta_(0.0), m2_(0.0)
 {
-  clear();
 }
 
 ///
@@ -28,11 +28,7 @@ distribution<T>::distribution()
 template<class T>
 void distribution<T>::clear()
 {
-  count = 0;
-
-  delta_ = m2_ = mean = variance = min = max = T();
-
-  freq.clear();
+  *this = distribution();
 }
 
 ///
