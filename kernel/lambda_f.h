@@ -247,12 +247,20 @@ namespace vita
 
     virtual bool debug() const override;
 
-  private:
-    const basic_reg_lambda_f<T, S> lambda_;
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
+
+  private:  // Private support methods
+    bool load_(std::istream &, std::true_type);
+    bool load_(std::istream &, std::false_type);
+
+  private:  // Private data members
+    basic_reg_lambda_f<T, S> lambda_;
   };
 
   // ***********************************************************************
-  // * Estension to support teams                                          *
+  // * Extension to support teams                                          *
   // ***********************************************************************
 
   ///

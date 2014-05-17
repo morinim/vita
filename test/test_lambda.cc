@@ -397,4 +397,15 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
   test_team<binary_lambda_f>(pr);
 }
 
+BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
+{
+  using namespace vita;
+
+  src_problem pr;
+  pr.env = environment(true);
+  BOOST_REQUIRE_GT(pr.load("ionosphere.csv").first, 0);
+
+  test_serialization<binary_lambda_f>(pr);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
