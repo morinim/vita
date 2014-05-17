@@ -281,8 +281,7 @@ namespace vita
   };
 
   ///
-  /// \brief Helper class to build extends classification scheme for working
-  ///        with teams
+  /// \brief An helper class for extending classification schemes to teams
   ///
   /// \tparam T type of individual.
   /// \tparam S stores the individual inside vs keep a reference only.
