@@ -240,7 +240,7 @@ namespace vita { namespace detail
     // operator>>, and returns immediately. A common solution, before
     // switching to line-oriented input, is to ignore all leftover
     // characters on the line of input with:
-    in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::ws(in);
 
     for (auto &line : v)
     {
@@ -270,7 +270,7 @@ namespace vita { namespace detail
 
     for (const auto &n : names_)
     {
-      o << n << '\n';
+      o << n << std::endl;
       if (!o.good())
         return false;
     }
