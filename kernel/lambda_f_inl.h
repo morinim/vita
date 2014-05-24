@@ -215,26 +215,6 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 }
 
 ///
-/// \param[in] t team "to be transformed" into a lambda function.
-/// \param[in] d the training set.
-/// \param[in] x_slot number of slots for each class of the training set.
-///
-/// \warning
-/// Some compilers haven't fully implemented the C++11 inject-class-name rule
-/// so we neet to qualify the enclosing namespace of a template template
-/// parameter (vita::basic_dyn_slot_lambda_f).
-///
-template<class T, bool S, bool N>
-basic_dyn_slot_lambda_f<team<T>, S, N>::basic_dyn_slot_lambda_f(
-  const team<T> &t, data &d, unsigned x_slot)
-  : team_class_lambda_f<T, S, N, vita::basic_dyn_slot_lambda_f>(d)
-{
-  this->team_.reserve(t.individuals());
-  for (const auto &ind : t)
-    this->team_.emplace_back(ind, d, x_slot);
-}
-
-///
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
 ///
@@ -748,28 +728,20 @@ bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
 }
 
 ///
-/// \param[in] d the training set.
-///
-template<class T, bool S, bool N, template<class, bool, bool> class L,
-         team_composition C>
-team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(data &d)
-  : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
-{
-}
-
-///
 /// \param[in] t team "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
+template<class... Args>
 team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
-                                                        data &d)
+                                                        data &d,
+                                                        Args... args)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
   team_.reserve(t.individuals());
   for (const auto &ind : t)
-    team_.emplace_back(ind, d);
+    team_.emplace_back(ind, d, args...);
 }
 
 ///

@@ -298,18 +298,20 @@ namespace vita
   class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
   {
   public:
-    team_class_lambda_f(const team<T> &, data &);
+    template<class... Args> team_class_lambda_f(const team<T> &, data &,
+                                                Args...);
 
     virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;
 
+/*
+  public:   // Serialization
+    virtual bool load(std::istream &) override;
+    virtual bool save(std::ostream &) const override;
+*/
   protected:
-    // This constructor initializes only some data members, so it must not be
-    // available to the end user.
-    explicit team_class_lambda_f(data &);
-
     // The components of the team never store the names of the classes. If we
     // need the names, the master class will memorize them.
     std::vector<L<T, S, false>> team_;
@@ -330,7 +332,7 @@ namespace vita
     : public team_class_lambda_f<T, S, N, basic_dyn_slot_lambda_f>
   {
   public:
-    basic_dyn_slot_lambda_f(const team<T> &, data &, unsigned);
+    using basic_dyn_slot_lambda_f::team_class_lambda_f::team_class_lambda_f;
   };
 
   ///
