@@ -315,7 +315,7 @@ namespace vita
     // need the names, the master class will memorize them.
     std::vector<L<T, S, false>> team_;
 
-    const unsigned classes_;
+    unsigned classes_;
   };
 
   ///

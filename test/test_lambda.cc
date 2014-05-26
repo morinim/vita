@@ -58,21 +58,21 @@ struct build<vita::reg_lambda_f, T, 0>
   }
 };
 
-template<template<class> class L, unsigned P = 0>
+template<template<class> class L, class T, unsigned P = 0>
 void test_serialization(vita::src_problem &pr)
 {
   using namespace vita;
 
-  for (unsigned k(0); k < 1000; ++k)
+  for (unsigned k(0); k < 256; ++k)
   {
-    const individual ind(pr.env, pr.sset);
-    const auto lambda1(build<L, individual, P>()(ind, pr.data()));
+    const T ind(pr.env, pr.sset);
+    const auto lambda1(build<L, T, P>()(ind, pr.data()));
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const individual ind2(pr.env, pr.sset);
-    auto lambda2(build<L, individual, P>()(ind2, pr.data()));
+    const T ind2(pr.env, pr.sset);
+    auto lambda2(build<L, T, P>()(ind2, pr.data()));
     BOOST_REQUIRE(lambda2.load(ss));
     BOOST_REQUIRE(lambda2.debug());
 
@@ -349,7 +349,11 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   pr.env = environment(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
-  test_serialization<dyn_slot_lambda_f, slots>(pr);
+  BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  test_serialization<dyn_slot_lambda_f, individual, slots>(pr);
+
+  BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - TEAM");
+  test_serialization<dyn_slot_lambda_f, team<individual>, slots>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(gaussian_lambda)
@@ -377,7 +381,11 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
   pr.env = environment(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
-  test_serialization<gaussian_lambda_f>(pr);
+  BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  test_serialization<gaussian_lambda_f, individual>(pr);
+
+  BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - TEAM");
+  test_serialization<gaussian_lambda_f, team<individual>>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(binary_lambda)
@@ -405,7 +413,12 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
   pr.env = environment(true);
   BOOST_REQUIRE_GT(pr.load("ionosphere.csv").first, 0);
 
-  test_serialization<binary_lambda_f>(pr);
+
+  BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  test_serialization<binary_lambda_f, individual>(pr);
+
+  BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - TEAM");
+  test_serialization<binary_lambda_f, team<individual>>(pr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
