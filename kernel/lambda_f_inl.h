@@ -736,12 +736,12 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
 template<class... Args>
 team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
                                                         data &d,
-                                                        Args... args)
+                                                        Args&&... args)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
   team_.reserve(t.individuals());
   for (const auto &ind : t)
-    team_.emplace_back(ind, d, args...);
+    team_.emplace_back(ind, d, std::forward<Args>(args)...);
 }
 
 ///

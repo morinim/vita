@@ -299,18 +299,17 @@ namespace vita
   {
   public:
     template<class... Args> team_class_lambda_f(const team<T> &, data &,
-                                                Args...);
+                                                Args&&...);
 
     virtual std::pair<class_t, double> tag(
       const data::example &) const override;
 
     virtual bool debug() const override;
 
-/*
   public:   // Serialization
     virtual bool load(std::istream &) override;
     virtual bool save(std::ostream &) const override;
-*/
+
   protected:
     // The components of the team never store the names of the classes. If we
     // need the names, the master class will memorize them.
