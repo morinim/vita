@@ -797,6 +797,68 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
 }
 
 ///
+/// \param[out] out output stream.
+/// \return true on success.
+///
+/// Saves the lambda team on persistent storage.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
+{
+  out << classes_ << std::endl;
+
+  out << team_.size() << std::endl;
+  for (const auto &i : team_)
+    if (!i.save(out))
+      return false;
+
+  if (!basic_class_lambda_f<team<T>, N>::save(out))
+    return false;
+
+  return out.good();
+}
+
+///
+/// \param[in] in input stream.
+/// \return true on success.
+///
+/// Loads the lambda team from persistent storage.
+///
+/// \note
+/// If the load operation isn't successful the current lambda isn't modified.
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in)
+{
+  decltype(classes_) cl;
+  if (!(in >> cl))
+    return false;
+
+  typename decltype(team_)::size_type s;
+  if (!(in >> s))
+    return false;
+
+  decltype(team_) t;
+  for (unsigned i(0); i < s; ++i)
+  {
+    typename decltype(team_)::value_type lambda(team_[0]);
+    if (!lambda.load(in))
+      return false;
+    t.push_back(lambda);
+  }
+
+  if (!basic_class_lambda_f<team<T>, N>::load(in))
+    return false;
+
+  team_ = t;
+  classes_ = cl;
+
+  return true;
+}
+
+///
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,

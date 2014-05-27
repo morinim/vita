@@ -15,7 +15,7 @@
 
 namespace vita { namespace detail
 {
-  template<bool S> struct is_true : std::false_type {};
+  template<bool> struct is_true : std::false_type {};
   template<> struct is_true<true> : std::true_type {};
 
   // ***********************************************************************
@@ -182,8 +182,8 @@ namespace vita { namespace detail
   class class_names
   {
   public:   // Serialization
-    constexpr bool load(std::istream &) { return false; }
-    constexpr bool save(std::ostream &) const { return false; }
+    constexpr bool load(std::istream &) { return true; }
+    constexpr bool save(std::ostream &) const { return true; }
 
   protected:
     /// Without names... there isn't anything to do.

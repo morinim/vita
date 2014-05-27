@@ -72,7 +72,7 @@ LDFLAGS = $(CXXFLAGS)
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc)
+KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/individual/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC = $(wildcard examples/*.cc)
 SR_SRC = $(wildcard sr/*.cc)

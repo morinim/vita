@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
 
   environment env(true);
 
-  env.code_length = argc > 1 ? atoi(argv[1]) : 5;
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
+  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 5);
+  const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
   vita::symbol_set sset;
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
         }
 
         symbol *const f(sset.insert(vita::make_unique<adf>(blk2, categories,
-                                                           100)));
+                                                           100u)));
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
 

@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
 #include "kernel/environment.h"

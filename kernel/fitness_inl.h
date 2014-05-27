@@ -333,23 +333,6 @@ basic_fitness_t<T, N> abs(basic_fitness_t<T, N> f)
 }
 
 ///
-/// \param val a value to be rounded.
-///
-/// \brief Rounds \a val to the number of decimals of \c float_epsilon.
-///
-template<class T>
-T round_to(T val)
-{
-  constexpr T float_epsilon(0.0001);
-
-  val /= float_epsilon;
-  val = std::round(val);
-  val *= float_epsilon;
-
-  return val;
-}
-
-///
 /// \param[in] f a fitness.
 /// \return a new vector obtained "rounding" each component of \a this.
 ///

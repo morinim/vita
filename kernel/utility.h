@@ -171,6 +171,23 @@ namespace vita
     C const *delimiter_;
     bool first_elem_;
   };
+
+  ///
+  /// \param val a value to be rounded.
+  ///
+  /// \brief Rounds \a val to the number of decimals of \c float_epsilon.
+  ///
+  template<class T>
+  T round_to(T val)
+  {
+    constexpr T float_epsilon(0.0001);
+
+    val /= float_epsilon;
+    val = std::round(val);
+    val *= float_epsilon;
+
+    return val;
+  }
 }  // namespace vita
 
 #endif  // Include guard

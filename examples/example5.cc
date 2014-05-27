@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include "kernel/environment.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/interpreter.h"
 #include "kernel/src/primitive/factory.h"
 
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 {
   vita::environment env(true);
 
-  env.code_length = argc > 1 ? atoi(argv[1]) : 14;
+  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 14);
 
   vita::symbol_set sset;
 

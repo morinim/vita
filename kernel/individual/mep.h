@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INDIVIDUAL_H)
-#define      VITA_INDIVIDUAL_H
+#if !defined(VITA_INDIVIDUAL_MEP_H)
+#define      VITA_INDIVIDUAL_MEP_H
 
 #include <cmath>
 #include <functional>
@@ -154,7 +154,7 @@ namespace vita
 
   std::ostream &operator<<(std::ostream &, const individual &);
 
-#include "kernel/individual_iterator_inl.h"
+#include "kernel/individual/mep_iterator_inl.h"
 
   ///
   /// \return an iterator to the first active locus of the individual.

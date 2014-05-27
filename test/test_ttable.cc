@@ -14,7 +14,7 @@
 #include <sstream>
 
 #include "kernel/environment.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/interpreter.h"
 #include "kernel/src/primitive/factory.h"
 #include "kernel/ttable_hash.h"

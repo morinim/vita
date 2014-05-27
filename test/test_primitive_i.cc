@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/random.h"
 
 #if !defined(MASTER_TEST_SET)

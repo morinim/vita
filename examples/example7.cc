@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
   using namespace vita;
   environment env(true);
 
-  env.code_length = argc > 1 ? atoi(argv[1]) : 100;
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 1);
+  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
+  const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
   vita::symbol_set sset;
 

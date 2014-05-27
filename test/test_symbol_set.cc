@@ -14,7 +14,7 @@
 #include <iostream>
 #include <map>
 
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/random.h"
 #include "kernel/timer.h"
 

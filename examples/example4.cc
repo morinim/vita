@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/ttable.h"
 #include "kernel/src/primitive/factory.h"
 #include "kernel/timer.h"
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 {
   vita::environment env(true);
 
-  env.code_length = argc > 1 ? atoi(argv[1]) : 50;
+  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 50);
 
   vita::symbol_set sset;
 
@@ -37,9 +37,9 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  const unsigned n(argc > 2 ? atoi(argv[2]) : 10000000);
+  const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 10000000));
 
-  vita::ttable cache(argc > 3 ? atoi(argv[3]) : 16);
+  vita::ttable cache(static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 16));
 
   std::vector<vita::individual> pool;
   for (size_t i(0); i < 1000; ++i)

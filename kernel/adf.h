@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "kernel/function.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/terminal.h"
 
 namespace vita

@@ -16,7 +16,7 @@
 #include <memory>
 
 #include "kernel/evolution.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
 {
   vita::environment env(true);
 
-  env.individuals = argc > 1 ? atoi(argv[1]) : 100;
-  env.code_length = argc > 2 ? atoi(argv[2]) : 100;
-  env.generations = argc > 3 ? atoi(argv[3]) : 100;
+  env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
+  env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
+  env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
 
   vita::symbol_set sset;
 

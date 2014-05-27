@@ -14,6 +14,7 @@
 #define      VITA_DISTRIBUTION_H
 
 #include <cmath>
+#include <iomanip>
 #include <map>
 
 #include "kernel/utility.h"

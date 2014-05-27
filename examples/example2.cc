@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "kernel/environment.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/population.h"
 #include "kernel/src/primitive/factory.h"
 
@@ -27,9 +27,9 @@ int main(int argc, char *const argv[])
   vita::environment env(true);
 
   // Size of the population.
-  env.individuals = argc > 1 ? atoi(argv[1]) : 100;
+  env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   // Size of an individual.
-  env.code_length = argc > 2 ? atoi(argv[2]) : 100;
+  env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
 
   vita::symbol_set sset;
 

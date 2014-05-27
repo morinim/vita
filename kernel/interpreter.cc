@@ -14,7 +14,7 @@
 
 #include "kernel/interpreter.h"
 #include "kernel/function.h"
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 
 namespace vita
 {

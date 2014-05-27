@@ -13,11 +13,11 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/individual.h"
+#include "kernel/individual/mep.h"
 #include "kernel/interpreter.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_individual
+#define BOOST_TEST_MODULE t_individual_mep
 #include "boost/test/unit_test.hpp"
 
 using namespace boost;
@@ -25,7 +25,7 @@ using namespace boost;
 #include "factory_fixture3.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(t_individual, F_FACTORY3)
+BOOST_FIXTURE_TEST_SUITE(t_individual_mep, F_FACTORY3)
 /*
 BOOST_AUTO_TEST_CASE(Compact)
 {
