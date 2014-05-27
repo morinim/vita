@@ -49,17 +49,17 @@ namespace vita
   class adf_core
   {
   public:
-    explicit adf_core(const individual &);
+    explicit adf_core(const i_mep &);
 
-    const individual &code() const;
+    const i_mep &code() const;
 
     std::string display(const std::string &) const;
 
     bool debug() const;
 
   private:  // Private data members
-    individual code_;
-    opcode_t     id_;
+    i_mep    code_;
+    opcode_t   id_;
 
     static opcode_t adf_count()
     {
@@ -74,9 +74,9 @@ namespace vita
   class adf : public function
   {
   public:
-    adf(const individual &, const std::vector<category_t> &, unsigned);
+    adf(const i_mep &, const std::vector<category_t> &, unsigned);
 
-    virtual any eval(interpreter<individual> *) const override;
+    virtual any eval(interpreter<i_mep> *) const override;
 
     virtual std::string display() const override;
 
@@ -84,7 +84,7 @@ namespace vita
 
     virtual bool debug() const override;
 
-    const individual &code() const;
+    const i_mep &code() const;
 
   private:
     adf_core core_;
@@ -100,9 +100,9 @@ namespace vita
   class adt : public terminal
   {
   public:
-    adt(const individual &, unsigned);
+    adt(const i_mep &, unsigned);
 
-    virtual any eval(interpreter<individual> *) const override;
+    virtual any eval(interpreter<i_mep> *) const override;
 
     virtual std::string display() const override;
 
@@ -110,7 +110,7 @@ namespace vita
 
     virtual bool debug() const override;
 
-    const individual &code() const;
+    const i_mep &code() const;
 
   private:
     adf_core core_;

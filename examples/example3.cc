@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::individual i1(env, sset), i2(env, sset);
+  vita::i_mep i1(env, sset), i2(env, sset);
 
   std::cout << "PARENTS" << std::endl << std::string(40, '-') << std::endl;
   i1.dump(std::cout);

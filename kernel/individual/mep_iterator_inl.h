@@ -10,13 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INDIVIDUAL_ITERATOR_H)
-#define      VITA_INDIVIDUAL_ITERATOR_H
+#if !defined(VITA_INDIVIDUAL_MEP_ITERATOR_H)
+#define      VITA_INDIVIDUAL_MEP_ITERATOR_H
 
 ///
 /// \brief Iterator to scan the active genes of an \c individual
 ///
-class individual::const_iterator
+class i_mep::const_iterator
 {
 public:
   using iterator_category = std::forward_iterator_tag;
@@ -29,14 +29,14 @@ public:
   /// \brief Builds an empty iterator.
   ///
   /// Empty iterator is used as sentry (it is the value returned by
-  /// individual::end()).
+  /// i_mep::end()).
   ///
   const_iterator() : loci_(), ind_(nullptr) {}
 
   ///
   /// \param[in] id an individual.
   ///
-  explicit const_iterator(const individual &id) : ind_(&id)
+  explicit const_iterator(const i_mep &id) : ind_(&id)
   {
     loci_.insert(id.best_);
   }
@@ -81,6 +81,6 @@ private:  // Private data members
   std::set<value_type> loci_;
 
   // A pointer to the individual we are iterating on.
-  const individual *const ind_;
-};  // class individual::const_iterator
+  const i_mep *const ind_;
+};  // class i_mep::const_iterator
 #endif  // Include guard

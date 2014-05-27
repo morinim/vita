@@ -58,7 +58,7 @@ namespace vita
 
     /// Calculates the value of / performs the action associated to the symbol
     /// (it is implementation specific).
-    virtual any eval(interpreter<individual> *) const = 0;
+    virtual any eval(interpreter<i_mep> *) const = 0;
 
     virtual bool debug() const;
 

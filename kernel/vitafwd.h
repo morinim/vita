@@ -15,7 +15,7 @@
 
 namespace vita
 {
-  class individual;
+  class i_mep;
   template<class T> class team;
 
   template<class T> class interpreter;

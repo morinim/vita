@@ -20,7 +20,7 @@
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
-using i_interp = vita::interpreter<vita::individual>;
+using i_interp = vita::interpreter<vita::i_mep>;
 
 // This class models the first input.
 class X : public vita::terminal
@@ -59,9 +59,9 @@ double X::val;
 double Y::val;
 double Z::val;
 
-class my_evaluator : public vita::evaluator<vita::individual>
+class my_evaluator : public vita::evaluator<vita::i_mep>
 {
-  vita::fitness_t operator()(const vita::individual &ind)
+  vita::fitness_t operator()(const vita::i_mep &ind)
   {
     i_interp agent(ind);
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 
   auto eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::individual, vita::std_es> evo(env, sset, *eva.get());
+  vita::evolution<vita::i_mep, vita::std_es> evo(env, sset, *eva.get());
 
   evo.run(1);
 

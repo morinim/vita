@@ -38,12 +38,12 @@ BOOST_AUTO_TEST_CASE(Creation)
       env.code_length = l;
       env.tournament_size = 3;
 
-      const auto eva(make_unique<vita::random_evaluator<individual>>());
+      const auto eva(make_unique<vita::random_evaluator<i_mep>>());
 
-      vita::evolution<individual, alps_es> evo1(env, sset, *eva.get());
+      vita::evolution<i_mep, alps_es> evo1(env, sset, *eva.get());
       BOOST_REQUIRE(evo1.debug(true));
 
-      vita::evolution<individual, std_es> evo2(env, sset, *eva.get());
+      vita::evolution<i_mep, std_es> evo2(env, sset, *eva.get());
       BOOST_REQUIRE(evo2.debug(true));
     }
 }

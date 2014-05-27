@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE(Compact)
   BOOST_TEST_CHECKPOINT("Functional equivalence.");
   for (unsigned n(0); n < 1000; ++n)
   {
-    const vita::individual i1(env, true);
-    const vita::individual i2(i1.compact());
+    const vita::i_mep i1(env, true);
+    const vita::i_mep i2(i1.compact());
 
     std::cout << i1 << std::endl << i2 << std::endl;
     BOOST_REQUIRE(i1.debug(true));
@@ -54,10 +54,10 @@ BOOST_AUTO_TEST_CASE(Compact)
   BOOST_TEST_CHECKPOINT("Not interleaved active symbols.");
   for (unsigned n(0); n < 1000; ++n)
   {
-    const vita::individual ind(vita::individual(env, true).compact());
+    const vita::i_mep ind(vita::i_mep(env, true).compact());
 
     unsigned line(0), old_line(0);
-    for (vita::individual::const_iterator it(ind); it(); line = ++it)
+    for (vita::i_mep::const_iterator it(ind); it(); line = ++it)
       if (line)
       {
         BOOST_REQUIRE_EQUAL(old_line, line-1);
@@ -68,8 +68,8 @@ BOOST_AUTO_TEST_CASE(Compact)
   BOOST_TEST_CHECKPOINT("Same signature.");
   for (unsigned n(0); n < 1000; ++n)
   {
-    const vita::individual i1(env, true);
-    const vita::individual i2(i1.compact());
+    const vita::i_mep i1(env, true);
+    const vita::i_mep i2(i1.compact());
 
     BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
   }
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   for (unsigned l(sset.categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
-    vita::individual i(env, sset);
+    vita::i_mep i(env, sset);
     // std::cout << i << std::endl;
 
     BOOST_REQUIRE(i.debug());
@@ -95,8 +95,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::individual ind(env, sset);
-  const vita::individual orig(ind);
+  vita::i_mep ind(env, sset);
+  const vita::i_mep orig(ind);
 
   const unsigned n(4000);
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::individual i1(ind);
+    const vita::i_mep i1(ind);
 
     ind.mutation();
     diff += i1.distance(ind);
@@ -130,13 +130,13 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::individual a(env, sset);
+    vita::i_mep a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
 
-    vita::individual b(a);
+    vita::i_mep b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
 
-    vita::individual c(env, sset);
+    vita::i_mep c(env, sset);
     if (a.signature() != c.signature())
       BOOST_REQUIRE_NE(a, c);
   }
@@ -146,7 +146,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  vita::individual i1(env, sset), i2(env, sset);
+  vita::i_mep i1(env, sset), i2(env, sset);
 
   const unsigned n(2000);
   double dist(0.0);
@@ -163,14 +163,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::individual i1(env, sset);
+    vita::i_mep i1(env, sset);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::individual i2(env, sset);
+    vita::i_mep i2(env, sset);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 
@@ -186,11 +186,11 @@ BOOST_AUTO_TEST_CASE(Blocks)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    vita::individual base(env, sset);
+    vita::i_mep base(env, sset);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = vita::individual(env, sset);
+      base = vita::i_mep(env, sset);
       base_es = base.eff_size();
     }
 
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE(Output)
     {{   c3,   null}}   // [4] 3.0
   });
 
-  vita::individual i(vita::individual(env, sset).replace(g));
+  vita::i_mep i(vita::i_mep(env, sset).replace(g));
 
   std::stringstream ss;
 

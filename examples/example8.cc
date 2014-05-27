@@ -46,11 +46,11 @@ int main(int argc, char *argv[])
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    individual base(env, sset);
+    i_mep base(env, sset);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = individual(env, sset);
+      base = i_mep(env, sset);
       base_es = base.eff_size();
     }
 
@@ -61,11 +61,11 @@ int main(int argc, char *argv[])
     auto bl(base.blocks());
     for (const locus &l : bl)
     {
-      individual blk(base.get_block(l));
+      i_mep blk(base.get_block(l));
 
       std::cout << std::endl << "BLOCK at locus " << l << std::endl;
       blk.list(std::cout);
-      const any val(interpreter<individual>(blk).run());
+      const any val(interpreter<i_mep>(blk).run());
       if (val.empty())
         std::cout << "Empty output.";
       else
@@ -92,10 +92,10 @@ int main(int argc, char *argv[])
         std::cout << std::endl << f->display() << std::endl;
         blk2.list(std::cout);
 
-        individual blk3(blk.replace({{f, positions}}));
+        i_mep blk3(blk.replace({{f, positions}}));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const any val3(interpreter<individual>(blk3).run());
+        const any val3(interpreter<i_mep>(blk3).run());
         if (val3.empty())
           std::cout << "Empty output.";
         else

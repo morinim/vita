@@ -31,8 +31,8 @@ BOOST_FIXTURE_TEST_SUITE(primitive_i, F_FACTORY4)
 BOOST_AUTO_TEST_CASE(ADD)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = vita::interpreter<vita::i_mep>;
+  vita::i_mep i(env, sset);
 
   BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
   std::vector<gene> g(
@@ -82,8 +82,8 @@ BOOST_AUTO_TEST_CASE(ADD)
 BOOST_AUTO_TEST_CASE(DIV)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = vita::interpreter<vita::i_mep>;
+  vita::i_mep i(env, sset);
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
   std::vector<gene> g(
@@ -131,8 +131,8 @@ BOOST_AUTO_TEST_CASE(DIV)
 BOOST_AUTO_TEST_CASE(IFE)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = vita::interpreter<vita::i_mep>;
+  vita::i_mep i(env, sset);
 
   BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
   std::vector<gene> g(
@@ -171,8 +171,8 @@ BOOST_AUTO_TEST_CASE(IFE)
 BOOST_AUTO_TEST_CASE(MUL)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = vita::interpreter<vita::i_mep>;
+  vita::i_mep i(env, sset);
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
   std::vector<gene> g(
@@ -211,8 +211,8 @@ BOOST_AUTO_TEST_CASE(MUL)
 BOOST_AUTO_TEST_CASE(SUB)
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::individual>;
-  vita::individual i(env, sset);
+  using i_interp = vita::interpreter<vita::i_mep>;
+  vita::i_mep i(env, sset);
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
   std::vector<gene> g(

@@ -26,7 +26,7 @@ struct F_FACTORY4
   public:
     Z() : vita::terminal("Z", 0, true) {}
 
-    vita::any eval(vita::interpreter<vita::individual> *) const
+    vita::any eval(vita::interpreter<vita::i_mep> *) const
     { return vita::any(val); }
 
     int val;

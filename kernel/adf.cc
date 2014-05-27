@@ -18,7 +18,7 @@ namespace vita
   ///
   /// \param[in] ind individual whose code is used as ADF/ADT.
   ///
-  adf_core::adf_core(const individual &ind) : code_(ind), id_(adf_count())
+  adf_core::adf_core(const i_mep &ind) : code_(ind), id_(adf_count())
   {
   }
 
@@ -34,7 +34,7 @@ namespace vita
   ///
   /// \return the code (program) of the ADF/ADT.
   ///
-  const individual &adf_core::code() const
+  const i_mep &adf_core::code() const
   {
     return code_;
   }
@@ -52,8 +52,7 @@ namespace vita
   /// \param[in] sv categories of the function arguments.
   /// \param[in] w the weight of the ADF.
   ///
-  adf::adf(const individual &ind, const std::vector<category_t> &sv,
-           unsigned w)
+  adf::adf(const i_mep &ind, const std::vector<category_t> &sv, unsigned w)
     : function("ADF", ind.category(), sv, w), core_(ind)
   {
     assert(ind.debug());
@@ -69,9 +68,9 @@ namespace vita
   /// Adf functions need input parameters from the a context (contrary to
   /// adt::eval).
   ///
-  any adf::eval(interpreter<individual> *i) const
+  any adf::eval(interpreter<i_mep> *i) const
   {
-    return interpreter<individual>(code(), i).run();
+    return interpreter<i_mep>(code(), i).run();
   }
 
   ///
@@ -110,7 +109,7 @@ namespace vita
   ///
   /// \return the code (program) of the ADF.
   ///
-  const individual &adf::code() const
+  const i_mep &adf::code() const
   {
     return core_.code();
   }
@@ -119,7 +118,7 @@ namespace vita
   /// \param[in] ind the code for the ADT.
   /// \param[in] w the weight of the ADT.
   ///
-  adt::adt(const individual &ind, unsigned w)
+  adt::adt(const i_mep &ind, unsigned w)
     : terminal("ADT", ind.category(), false, false, w), core_(ind)
   {
     assert(ind.debug());
@@ -134,9 +133,9 @@ namespace vita
   /// Adt hasn't input parameters so the context is ignored (contrary to
   /// adf::eval).
   ///
-  any adt::eval(interpreter<individual> *) const
+  any adt::eval(interpreter<i_mep> *) const
   {
-    return interpreter<individual>(code()).run();
+    return interpreter<i_mep>(code()).run();
   }
 
   ///
@@ -175,7 +174,7 @@ namespace vita
   ///
   /// \return the code (program) of the ADT.
   ///
-  const individual &adt::code() const
+  const i_mep &adt::code() const
   {
     return core_.code();
   }

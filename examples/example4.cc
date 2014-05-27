@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
   vita::ttable cache(static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 16));
 
-  std::vector<vita::individual> pool;
+  std::vector<vita::i_mep> pool;
   for (size_t i(0); i < 1000; ++i)
     pool.emplace_back(env, sset);
 
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
   for (unsigned i(0); i < n; ++i)
   {
     vita::fitness_t f({static_cast<vita::fitness_t::base_t>(i)});
-    const vita::individual &ind(vita::random::element(pool));
+    const vita::i_mep &ind(vita::random::element(pool));
 
     cache.insert(ind.signature(), f);
 

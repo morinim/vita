@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ namespace vita
       explicit ife(category_t t1, category_t t2)
         : function("SIFE", t2, {t1, t1, t2, t2}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any v0(i->fetch_arg(0));
         if (v0.empty())  return v0;

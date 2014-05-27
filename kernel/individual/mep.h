@@ -33,10 +33,10 @@ namespace vita
   /// which represents a possible solution to the task being tackled (i.e. a
   /// point in the search space).
   ///
-  class individual
+  class i_mep
   {
   public:
-    individual(const environment &, const symbol_set &);
+    i_mep(const environment &, const symbol_set &);
 
     // Visualization/output methods
     void dump(std::ostream &) const;
@@ -49,20 +49,20 @@ namespace vita
     unsigned mutation()
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
-    individual crossover(individual) const;
+    i_mep crossover(i_mep) const;
 
     std::vector<locus> blocks() const;
-    individual destroy_block(index_t) const;
-    individual get_block(const locus &) const;
+    i_mep destroy_block(index_t) const;
+    i_mep get_block(const locus &) const;
 
-    individual replace(const gene &) const;
-    individual replace(const locus &, const gene &) const;
-    individual replace(const std::vector<gene> &) const;
+    i_mep replace(const gene &) const;
+    i_mep replace(const locus &, const gene &) const;
+    i_mep replace(const std::vector<gene> &) const;
 
-    std::pair<individual, std::vector<locus>> generalize(unsigned) const;
+    std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
 
-    bool operator==(const individual &) const;
-    unsigned distance(const individual &) const;
+    bool operator==(const i_mep &) const;
+    unsigned distance(const i_mep &) const;
 
     hash_t signature() const;
 
@@ -120,7 +120,7 @@ namespace vita
       signature_.clear();
     }
 
-    friend class interpreter<individual>;
+    friend class interpreter<i_mep>;
 
   public:   // Serialization
     bool load(std::istream &);
@@ -150,23 +150,23 @@ namespace vita
 
     const environment  *env_;
     const symbol_set  *sset_;
-  };  // class individual
+  };  // class i_mep
 
-  std::ostream &operator<<(std::ostream &, const individual &);
+  std::ostream &operator<<(std::ostream &, const i_mep &);
 
 #include "kernel/individual/mep_iterator_inl.h"
 
   ///
   /// \return an iterator to the first active locus of the individual.
   ///
-  inline individual::const_iterator individual::begin() const
-  { return individual::const_iterator(*this); }
+  inline i_mep::const_iterator i_mep::begin() const
+  { return i_mep::const_iterator(*this); }
 
   ///
   /// \return an iterator used as sentry value to stop a cycle.
   ///
-  inline individual::const_iterator individual::end() const
-  { return individual::const_iterator(); }
+  inline i_mep::const_iterator i_mep::end() const
+  { return i_mep::const_iterator(); }
 
   ///
   /// \example example1.cc

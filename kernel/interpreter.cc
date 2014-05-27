@@ -23,8 +23,7 @@ namespace vita
   /// \param[in] ctx context in which we calculate the output value (used for
   ///                the evaluation of ADF).
   ///
-  interpreter<individual>::interpreter(const individual &ind,
-                                       interpreter<individual> *ctx)
+  interpreter<i_mep>::interpreter(const i_mep &ind, interpreter<i_mep> *ctx)
     : core_interpreter(ind, ctx), ip_(ind.best_),
       cache_(ind.size(), ind.sset().categories())
   {
@@ -34,7 +33,7 @@ namespace vita
   /// \param[in] ip locus of the genome we are starting evaluation from.
   /// \return the output value of \c this \a individual.
   ///
-  any interpreter<individual>::run_locus(const locus &ip)
+  any interpreter<i_mep>::run_locus(const locus &ip)
   {
     cache_.fill(boost::none);
 
@@ -47,7 +46,7 @@ namespace vita
   ///
   /// Calls run()(locus) using the the locus of the individual (\c prg_.best).
   ///
-  any interpreter<individual>::run()
+  any interpreter<i_mep>::run()
   {
     return run_locus(prg_.best_);
   }
@@ -55,7 +54,7 @@ namespace vita
   ///
   /// \return the output value of the current terminal symbol.
   ///
-  any interpreter<individual>::fetch_param()
+  any interpreter<i_mep>::fetch_param()
   {
     const gene &g(prg_[ip_]);
 
@@ -76,7 +75,7 @@ namespace vita
   /// * http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)
   /// * http://en.wikipedia.org/wiki/Memoization
   ///
-  any interpreter<individual>::fetch_arg(unsigned i)
+  any interpreter<i_mep>::fetch_arg(unsigned i)
   {
     const gene &g(prg_[ip_]);
 
@@ -115,10 +114,9 @@ namespace vita
   /// \param[in] i i-th argument of the current ADF.
   /// \return the value of the i-th argument of the current ADF function.
   ///
-  any interpreter<individual>::fetch_adf_arg(unsigned i)
+  any interpreter<i_mep>::fetch_adf_arg(unsigned i)
   {
-    interpreter<individual> *ctx(static_cast<interpreter<individual> *>(
-                                   context_));
+    interpreter<i_mep> *ctx(static_cast<interpreter<i_mep> *>(context_));
 #if !defined(NDEBUG)
     assert(ctx);
     assert(ctx->debug());
@@ -133,9 +131,9 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool interpreter<individual>::debug() const
+  bool interpreter<i_mep>::debug() const
   {
-    if (!core_interpreter<individual>::debug())
+    if (!core_interpreter<i_mep>::debug())
       return false;
 
     return ip_.index < prg_.size();

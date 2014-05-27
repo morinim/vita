@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::individual i(env, sset);
+  vita::i_mep i(env, sset);
 
   i.dump(std::cout);
   std::cout << std::endl;

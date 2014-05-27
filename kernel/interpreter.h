@@ -61,11 +61,10 @@ namespace vita
   /// the specific individual class.
   ///
   template<>
-  class interpreter<individual> : public core_interpreter<individual>
+  class interpreter<i_mep> : public core_interpreter<i_mep>
   {
   public:
-    explicit interpreter(const individual &,
-                         interpreter<individual> * = nullptr);
+    explicit interpreter(const i_mep &, interpreter<i_mep> * = nullptr);
 
     virtual any run() override;
 

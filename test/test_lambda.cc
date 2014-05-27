@@ -93,11 +93,11 @@ void test_team_of_one(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const individual ind(pr.env, pr.sset);
-    const auto li(build<L, individual, P>()(ind, pr.data()));
+    const i_mep ind(pr.env, pr.sset);
+    const auto li(build<L, i_mep, P>()(ind, pr.data()));
 
-    const team<individual> t{{ind}};
-    const auto lt(build<L, team<individual>, P>()(t, pr.data()));
+    const team<i_mep> t{{ind}};
+    const auto lt(build<L, team<i_mep>, P>()(t, pr.data()));
 
     for (const auto &e : *pr.data())
     {
@@ -132,11 +132,11 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const individual ind(pr.env, pr.sset);
-    const reg_lambda_f<individual> li(ind);
+    const i_mep ind(pr.env, pr.sset);
+    const reg_lambda_f<i_mep> li(ind);
 
-    const team<individual> t{{ind, ind, ind, ind}};
-    const reg_lambda_f<team<individual>> lt(t);
+    const team<i_mep> t{{ind, ind, ind, ind}};
+    const reg_lambda_f<team<i_mep>> lt(t);
 
     for (const auto &e : *pr.data())
     {
@@ -157,18 +157,18 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const individual i1(pr.env, pr.sset);
-    const individual i2(pr.env, pr.sset);
-    const individual i3(pr.env, pr.sset);
-    const individual i4(pr.env, pr.sset);
+    const i_mep i1(pr.env, pr.sset);
+    const i_mep i2(pr.env, pr.sset);
+    const i_mep i3(pr.env, pr.sset);
+    const i_mep i4(pr.env, pr.sset);
 
-    const reg_lambda_f<individual> lambda1(i1);
-    const reg_lambda_f<individual> lambda2(i2);
-    const reg_lambda_f<individual> lambda3(i3);
-    const reg_lambda_f<individual> lambda4(i4);
+    const reg_lambda_f<i_mep> lambda1(i1);
+    const reg_lambda_f<i_mep> lambda2(i2);
+    const reg_lambda_f<i_mep> lambda3(i3);
+    const reg_lambda_f<i_mep> lambda4(i4);
 
-    const team<individual> t{{i1, i2, i3, i4}};
-    const reg_lambda_f<team<individual>> lambda_team(t);
+    const team<i_mep> t{{i1, i2, i3, i4}};
+    const reg_lambda_f<team<i_mep>> lambda_team(t);
 
     for (const auto &e : *pr.data())
     {
@@ -222,14 +222,14 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
 
   for (unsigned k(0); k < 1000; ++k)
   {
-    const individual ind(pr.env, pr.sset);
-    const reg_lambda_f<individual> lambda1(ind);
+    const i_mep ind(pr.env, pr.sset);
+    const reg_lambda_f<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const individual ind2(pr.env, pr.sset);
-    reg_lambda_f<individual> lambda2(ind2);
+    const i_mep ind2(pr.env, pr.sset);
+    reg_lambda_f<i_mep> lambda2(ind2);
     BOOST_REQUIRE(lambda2.load(ss));
     BOOST_REQUIRE(lambda2.debug());
 
@@ -253,17 +253,17 @@ void test_team(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const individual ind1(pr.env, pr.sset);
-    const individual ind2(pr.env, pr.sset);
-    const individual ind3(pr.env, pr.sset);
+    const i_mep ind1(pr.env, pr.sset);
+    const i_mep ind2(pr.env, pr.sset);
+    const i_mep ind3(pr.env, pr.sset);
 
-    const auto lambda1(build<L, individual, P>()(ind1, pr.data()));
-    const auto lambda2(build<L, individual, P>()(ind2, pr.data()));
-    const auto lambda3(build<L, individual, P>()(ind3, pr.data()));
+    const auto lambda1(build<L, i_mep, P>()(ind1, pr.data()));
+    const auto lambda2(build<L, i_mep, P>()(ind2, pr.data()));
+    const auto lambda3(build<L, i_mep, P>()(ind3, pr.data()));
 
-    const team<individual> t{{ind1, ind2, ind3}};
+    const team<i_mep> t{{ind1, ind2, ind3}};
     const auto ts(t.individuals());
-    const auto lambda_t(build<L, team<individual>, P>()(t, pr.data()));
+    const auto lambda_t(build<L, team<i_mep>, P>()(t, pr.data()));
 
     for (const auto &example : *pr.data())
     {
@@ -350,10 +350,10 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
-  test_serialization<dyn_slot_lambda_f, individual, slots>(pr);
+  test_serialization<dyn_slot_lambda_f, i_mep, slots>(pr);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - TEAM");
-  test_serialization<dyn_slot_lambda_f, team<individual>, slots>(pr);
+  test_serialization<dyn_slot_lambda_f, team<i_mep>, slots>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(gaussian_lambda)
@@ -382,10 +382,10 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
-  test_serialization<gaussian_lambda_f, individual>(pr);
+  test_serialization<gaussian_lambda_f, i_mep>(pr);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - TEAM");
-  test_serialization<gaussian_lambda_f, team<individual>>(pr);
+  test_serialization<gaussian_lambda_f, team<i_mep>>(pr);
 }
 
 BOOST_AUTO_TEST_CASE(binary_lambda)
@@ -415,10 +415,10 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
 
 
   BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL");
-  test_serialization<binary_lambda_f, individual>(pr);
+  test_serialization<binary_lambda_f, i_mep>(pr);
 
   BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - TEAM");
-  test_serialization<binary_lambda_f, team<individual>>(pr);
+  test_serialization<binary_lambda_f, team<i_mep>>(pr);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

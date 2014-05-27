@@ -32,7 +32,7 @@ namespace vita
   /// This class extends vita::search to simply manage evaluators for
   /// symbolic regression and classification.
   ///
-  template<class T = individual, template<class> class ES = std_es>
+  template<class T = i_mep, template<class> class ES = std_es>
   class src_search : public search<T, ES>
   {
   public:

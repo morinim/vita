@@ -34,7 +34,7 @@ namespace vita
 
     unsigned index() const;
 
-    virtual any eval(interpreter<individual> *) const override;
+    virtual any eval(interpreter<i_mep> *) const override;
 
     bool debug() const;
 

@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Creation)
     env.individuals = vita::random::between(30u, 200u);
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
-    vita::population<vita::individual> pop(env, sset);
+    vita::population<vita::i_mep> pop(env, sset);
 
     BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals());
 
@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE(Serialization)
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     std::stringstream ss;
-    vita::population<vita::individual> pop1(env, sset);
+    vita::population<vita::i_mep> pop1(env, sset);
 
     BOOST_REQUIRE(pop1.save(ss));
 
-    vita::population<vita::individual> pop2(env, sset);
+    vita::population<vita::i_mep> pop2(env, sset);
     BOOST_REQUIRE(pop2.load(ss));
     BOOST_REQUIRE(pop2.debug(true));
 

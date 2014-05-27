@@ -44,11 +44,11 @@ int main(int argc, char *argv[])
 
   for (unsigned k(0); k < n; ++k)
   {
-    individual base(env, sset);
+    i_mep base(env, sset);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = individual(env, sset);
+      base = i_mep(env, sset);
       base_es = base.eff_size();
     }
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     auto bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
-      individual ib(base.get_block(*i));
+      i_mep ib(base.get_block(*i));
 
       auto generalized(ib.generalize(2));
 

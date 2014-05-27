@@ -37,7 +37,7 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter<individual> *) const override
+    virtual any eval(interpreter<i_mep> *) const override
     { return any(val_); }
 
   private:  // Private data members
@@ -59,7 +59,7 @@ namespace vita
     /// The argument is not used: the value of a constant is stored within the
     /// object and we don't need an \c interpreter to discover it.
     ///
-    virtual any eval(interpreter<individual> *) const override
+    virtual any eval(interpreter<i_mep> *) const override
     { return any(val_); }
 
   private:  // Private data members.

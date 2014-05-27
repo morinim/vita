@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,7 +52,7 @@ namespace vita
   /// \param[in] agent current interpreter
   /// \return the value of the argument.
   ///
-  any argument::eval(interpreter<individual> *agent) const
+  any argument::eval(interpreter<i_mep> *agent) const
   {
     return agent->fetch_adf_arg(index_);
   }

@@ -69,7 +69,7 @@ namespace vita
       virtual std::string display(int v) const override
       { return std::to_string(v); }
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       { return any(static_cast<base_t>(any_cast<int>(i->fetch_param()))); }
 
     private: // Private data members.
@@ -84,7 +84,7 @@ namespace vita
     public:
       explicit abs(category_t t) : function("FABS", t, {t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a(i->fetch_arg(0));
 
@@ -101,7 +101,7 @@ namespace vita
       explicit add(category_t t)
         : function("FADD", t, {t, t}, k_base_weight, true) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -124,7 +124,7 @@ namespace vita
     public:
       explicit div(category_t t) : function("FDIV", t, {t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -147,7 +147,7 @@ namespace vita
     public:
       explicit idiv(category_t t) : function("FIDIV", t, {t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -174,7 +174,7 @@ namespace vita
         : function("FIFB", t2, {t1, t1, t1, t2, t2})
       { assert(gene::k_args > 4); }
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -208,7 +208,7 @@ namespace vita
       ife(category_t t1, category_t t2)
         : function("FIFE", t2, {t1, t1, t2, t2}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -232,7 +232,7 @@ namespace vita
       ifl(category_t t1, category_t t2)
         : function("FIFL", t2, {t1, t1, t2, t2}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -260,7 +260,7 @@ namespace vita
     public:
       explicit ifz(category_t t) : function("FIFZ", t, {t, t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -281,7 +281,7 @@ namespace vita
       explicit length(category_t t1, category_t t2)
         : function("FLENGTH", t2, {t1}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a(i->fetch_arg(0));
         if (a.empty())  return a;
@@ -303,7 +303,7 @@ namespace vita
       /// \return the natural logarithm of its argument or an empty \c any
       //          in case of invalid argument / infinite result.
       ///
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -323,7 +323,7 @@ namespace vita
     public:
       explicit max(category_t t) : function("FMAX", t, {t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -346,7 +346,7 @@ namespace vita
     public:
       explicit mod(category_t t) : function("FMOD", t, {t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -370,7 +370,7 @@ namespace vita
       explicit mul(category_t t)
         : function("FMUL", t, {t, t}, k_base_weight, true) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
@@ -393,7 +393,7 @@ namespace vita
     public:
       explicit sin(category_t t) : function("FSIN", t, {t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a(i->fetch_arg(0));
         if (a.empty())  return a;
@@ -410,7 +410,7 @@ namespace vita
     public:
       explicit sqrt(category_t t) : function("FSQRT", t, {t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a(i->fetch_arg(0));
         if (a.empty())  return a;
@@ -431,7 +431,7 @@ namespace vita
     public:
       explicit sub(category_t t) : function("FSUB", t, {t, t}) {}
 
-      virtual any eval(interpreter<individual> *i) const override
+      virtual any eval(interpreter<i_mep> *i) const override
       {
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;

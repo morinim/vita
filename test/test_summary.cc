@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::summary<vita::individual> before;
+    vita::summary<vita::i_mep> before;
 
     before.elapsed = vita::random::between(10u, 10000u);
     before.mutations = vita::random::between(100u, 100000u);
@@ -42,14 +42,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     if (vita::random::boolean(0.8))
       before.best = {
-        vita::individual(env, sset),
+        vita::i_mep(env, sset),
         vita::random::between<double>(0.0, 1000.0)
       };
 
     std::stringstream ss;
     BOOST_REQUIRE(before.save(ss));
 
-    vita::summary<vita::individual> after;
+    vita::summary<vita::i_mep> after;
     BOOST_REQUIRE(after.load(ss, env, sset));
 
     BOOST_CHECK_EQUAL(before.elapsed, after.elapsed);

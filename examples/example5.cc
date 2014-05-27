@@ -40,12 +40,12 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("grapefruit", {1}));
   sset.insert(factory.make("orange", {1}));
 
-  vita::individual ind(env, sset);
+  vita::i_mep ind(env, sset);
 
   ind.dump(std::cout);
   std::cout << std::endl;
 
-  const vita::any val(vita::interpreter<vita::individual>(ind).run());
+  const vita::any val(vita::interpreter<vita::i_mep>(ind).run());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else

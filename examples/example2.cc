@@ -41,7 +41,7 @@ int main(int argc, char *const argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::population<vita::individual> p(env, sset);
+  vita::population<vita::i_mep> p(env, sset);
 
   std::cout << p << std::endl;
 

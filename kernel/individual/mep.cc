@@ -29,7 +29,7 @@ namespace vita
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///
-  individual::individual(const environment &e, const symbol_set &ss)
+  i_mep::i_mep(const environment &e, const symbol_set &ss)
     : genome_(e.code_length, ss.categories()), signature_(), best_{0, 0},
       age_(0), env_(&e), sset_(&ss)
   {
@@ -75,7 +75,7 @@ namespace vita
   ///   [3, 1] 20
   /// size() == 4 but eff_size() == 5.
   ///
-  unsigned individual::eff_size() const
+  unsigned i_mep::eff_size() const
   {
     return static_cast<unsigned>(std::distance(begin(), end()));
   }
@@ -87,9 +87,9 @@ namespace vita
   ///
   /// This function is often used along with the \ref blocks function.
   ///
-  individual individual::get_block(const locus &l) const
+  i_mep i_mep::get_block(const locus &l) const
   {
-    individual ret(*this);
+    i_mep ret(*this);
     ret.best_ = l;
     ret.signature_.clear();
 
@@ -103,7 +103,7 @@ namespace vita
   ///
   /// A new individual is created mutating \c this.
   ///
-  unsigned individual::mutation(double p)
+  unsigned i_mep::mutation(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
@@ -158,12 +158,12 @@ namespace vita
   /// The function calculates a set of indexes to blocks contained in \c this
   /// individual.
   ///
-  /// Indexes can be used by the individual::get_block function.
+  /// Indexes can be used by the i_mep::get_block function.
   ///
   /// \note
   /// A block is a subset of the active code composed of, at least, a function.
   ///
-  std::vector<locus> individual::blocks() const
+  std::vector<locus> i_mep::blocks() const
   {
     std::vector<locus> bl;
 
@@ -183,12 +183,12 @@ namespace vita
   /// symbol at locus \a l with \a g.
   ///
   /// \note
-  /// individual::replace method is similar to individual::set but the former
+  /// i_mep::replace method is similar to i_mep::set but the former
   /// creates a new individual while the latter modify \a this.
   ///
-  individual individual::replace(const locus &l, const gene &g) const
+  i_mep i_mep::replace(const locus &l, const gene &g) const
   {
-    individual ret(*this);
+    i_mep ret(*this);
 
     ret.set(l, g);
 
@@ -203,7 +203,7 @@ namespace vita
   /// Create a new \a individual obtained from \c this replacing the original
   /// symbol at locus \a best_ with \a g.
   ///
-  individual individual::replace(const gene &g) const
+  i_mep i_mep::replace(const gene &g) const
   {
     return replace(best_, g);
   }
@@ -215,9 +215,9 @@ namespace vita
   /// Create a new \a individual obtained replacing the first section of
   /// \c this with genes from \a gv.
   ///
-  individual individual::replace(const std::vector<gene> &gv) const
+  i_mep i_mep::replace(const std::vector<gene> &gv) const
   {
-    individual ret(*this);
+    i_mep ret(*this);
 
     index_t i(0);
     for (const auto &g : gv)
@@ -233,11 +233,11 @@ namespace vita
   /// \return a new individual obtained from \c this inserting a random
   ///         \a terminal at index \a line.
   ///
-  individual individual::destroy_block(index_t index) const
+  i_mep i_mep::destroy_block(index_t index) const
   {
     assert(index < size());
 
-    individual ret(*this);
+    i_mep ret(*this);
     const category_t categories(sset_->categories());
     for (category_t c(0); c < categories; ++c)
       ret.set({index, c}, gene(sset_->roulette_terminal(c)));
@@ -255,7 +255,7 @@ namespace vita
   /// of \c this individual with formal arguments, thus producing the body
   /// for a ADF.
   ///
-  std::pair<individual, std::vector<locus>> individual::generalize(
+  std::pair<i_mep, std::vector<locus>> i_mep::generalize(
     unsigned max_args) const
   {
     assert(max_args && max_args <= gene::k_args);
@@ -282,7 +282,7 @@ namespace vita
       }
 
     // Step 3: randomly substitute n terminals with function arguments.
-    individual ret(*this);
+    i_mep ret(*this);
     for (auto j(decltype(n){0}); j < n; ++j)
       ret.genome_(terminals[j]).sym = sset_->arg(j);
     ret.signature_.clear();
@@ -295,7 +295,7 @@ namespace vita
   ///
   /// \return the category of the individual.
   ///
-  category_t individual::category() const
+  category_t i_mep::category() const
   {
     return best_.category;
   }
@@ -308,7 +308,7 @@ namespace vita
   /// \note
   /// Age is not checked.
   ///
-  bool individual::operator==(const individual &x) const
+  bool i_mep::operator==(const i_mep &x) const
   {
     return signature_ == x.signature_ &&
            genome_ == x.genome_ && best_ == x.best_;
@@ -319,7 +319,7 @@ namespace vita
   /// \return a numeric measurement of the difference between \a ind and
   /// \c this (the number of different genes between individuals).
   ///
-  unsigned individual::distance(const individual &ind) const
+  unsigned i_mep::distance(const i_mep &ind) const
   {
     const index_t cs(size());
     const category_t categories(sset_->categories());
@@ -345,7 +345,7 @@ namespace vita
   /// individuals to the same byte stream. This is a very interesting
   /// property, useful for individual comparison / information retrieval.
   ///
-  void individual::pack(const locus &l,
+  void i_mep::pack(const locus &l,
                         std::vector<unsigned char> *const p) const
   {
     const gene &g(genome_(l));
@@ -391,7 +391,7 @@ namespace vita
   /// Converts \c this individual in a packed byte level representation and
   /// performs the MurmurHash3 algorithm on it.
   ///
-  hash_t individual::hash() const
+  hash_t i_mep::hash() const
   {
     // From an individual to a packed byte stream...
     static std::vector<unsigned char> packed;
@@ -423,7 +423,7 @@ namespace vita
   /// This is a very interesting  property, useful for individual comparison,
   /// information retrieval, entropy calculation...
   ///
-  hash_t individual::signature() const
+  hash_t i_mep::signature() const
   {
     if (signature_.empty())
       signature_ = hash();
@@ -435,7 +435,7 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the individual passes the internal consistency check.
   ///
-  bool individual::debug(bool verbose) const
+  bool i_mep::debug(bool verbose) const
   {
     const auto categories(sset_->categories());
 
@@ -549,7 +549,7 @@ namespace vita
   /// The output stream contains a graph, described in dot language
   /// (http://www.graphviz.org), of \c this individual.
   ///
-  void individual::graphviz(std::ostream &s, const std::string &id) const
+  void i_mep::graphviz(std::ostream &s, const std::string &id) const
   {
     if (id.empty())
       s << "graph";
@@ -578,7 +578,7 @@ namespace vita
   ///
   /// Prints active genes of the individual visiting the genome in pre-order.
   ///
-  void individual::in_line(std::ostream &s, const locus &l) const
+  void i_mep::in_line(std::ostream &s, const locus &l) const
   {
     const gene &g(genome_(l));
 
@@ -598,7 +598,7 @@ namespace vita
   /// spaces. Not at all human readable, but a compact representation for
   /// import / export.
   ///
-  void individual::in_line(std::ostream &s) const
+  void i_mep::in_line(std::ostream &s) const
   {
     in_line(s, best_);
   }
@@ -612,7 +612,7 @@ namespace vita
   /// 20 PRINT "SWEET"
   /// 30 GOTO 10
   ///
-  void individual::list(std::ostream &s) const
+  void i_mep::list(std::ostream &s) const
   {
     const auto categories(sset_->categories());
     const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
@@ -651,7 +651,7 @@ namespace vita
   /// \param[in] indent indentation level.
   /// \param[in] parent parent of \a child.
   ///
-  void individual::tree(std::ostream &s, const locus &child, unsigned indent,
+  void i_mep::tree(std::ostream &s, const locus &child, unsigned indent,
                         const locus &parent) const
   {
     const gene &g(genome_(child));
@@ -674,7 +674,7 @@ namespace vita
   ///
   /// \param[out] s output stream.
   ///
-  void individual::tree(std::ostream &s) const
+  void i_mep::tree(std::ostream &s) const
   {
     tree(s, best_, 0, best_);
   }
@@ -684,7 +684,7 @@ namespace vita
   ///
   /// Print the complete content of this individual.
   ///
-  void individual::dump(std::ostream &s) const
+  void i_mep::dump(std::ostream &s) const
   {
     const auto categories(sset_->categories());
     const auto width(1 + static_cast<int>(std::log10(size() - 1)));
@@ -719,7 +719,7 @@ namespace vita
   /// \param[in] ind individual to print.
   /// \return output stream including \a ind.
   ///
-  std::ostream &operator<<(std::ostream &s, const individual &ind)
+  std::ostream &operator<<(std::ostream &s, const i_mep &ind)
   {
     ind.list(s);
 
@@ -734,7 +734,7 @@ namespace vita
   /// If the load operation isn't successful the current individual isn't
   /// modified.
   ///
-  bool individual::load(std::istream &in)
+  bool i_mep::load(std::istream &in)
   {
     decltype(age_) t_age;
     if (!(in >> t_age))
@@ -794,7 +794,7 @@ namespace vita
   /// \param[out] out output stream.
   /// \return \c true if individual was saved correctly.
   ///
-  bool individual::save(std::ostream &out) const
+  bool i_mep::save(std::ostream &out) const
   {
     out << age() << ' ' << best_.index << ' ' << best_.category << std::endl;
 
@@ -837,7 +837,7 @@ namespace vita
   /// and the same length. GP uniform crossover begins with the observation that
   /// many parse trees are at least partially structurally similar.
   ///
-  individual individual::crossover(individual rhs) const
+  i_mep i_mep::crossover(i_mep rhs) const
   {
     assert(rhs.debug());
     assert(size() == rhs.size());
@@ -866,7 +866,7 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual individual::crossover(individual rhs) const
+  i_mep i_mep::crossover(i_mep rhs) const
   {
     assert(rhs.debug());
     assert(size() == rhs.size());
@@ -911,7 +911,7 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  individual individual::crossover(individual rhs) const
+  i_mep i_mep::crossover(i_mep rhs) const
   {
     assert(rhs.debug());
     assert(size() == rhs.size());
@@ -957,7 +957,7 @@ namespace vita
   ///
   /// \return locus of the next active symbol.
   ///
-  individual::const_iterator &individual::const_iterator::operator++()
+  i_mep::const_iterator &i_mep::const_iterator::operator++()
   {
     if (!loci_.empty())
     {
