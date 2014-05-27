@@ -46,19 +46,20 @@ namespace vita
   /// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.
   /// Ballard.
   ///
+  template<class T>
   class adf_core
   {
   public:
-    explicit adf_core(const i_mep &);
+    explicit adf_core(const T &);
 
-    const i_mep &code() const;
+    const T &code() const;
 
     std::string display(const std::string &) const;
 
     bool debug() const;
 
   private:  // Private data members
-    i_mep    code_;
+    T        code_;
     opcode_t   id_;
 
     static opcode_t adf_count()
@@ -87,7 +88,7 @@ namespace vita
     const i_mep &code() const;
 
   private:
-    adf_core core_;
+    adf_core<i_mep> core_;
   };
 
   ///
@@ -113,8 +114,10 @@ namespace vita
     const i_mep &code() const;
 
   private:
-    adf_core core_;
+    adf_core<i_mep> core_;
   };
+
+#include "kernel/adf_inl.h"
 }  // namespace vita
 
 #endif  // Include guard

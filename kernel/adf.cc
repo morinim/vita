@@ -16,38 +16,6 @@
 namespace vita
 {
   ///
-  /// \param[in] ind individual whose code is used as ADF/ADT.
-  ///
-  adf_core::adf_core(const i_mep &ind) : code_(ind), id_(adf_count())
-  {
-  }
-
-  ///
-  /// \param[in] prefix a string identifying adf type.
-  /// \return a string identifying an ADF/ADT.
-  ///
-  std::string adf_core::display(const std::string &prefix) const
-  {
-    return prefix + std::to_string(id_);
-  }
-
-  ///
-  /// \return the code (program) of the ADF/ADT.
-  ///
-  const i_mep &adf_core::code() const
-  {
-    return code_;
-  }
-
-  ///
-  /// \return \c true if the \a object passes the internal consistency check.
-  ///
-  bool adf_core::debug() const
-  {
-    return code_.eff_size() >= 2;
-  }
-
-  ///
   /// \param[in] ind the code for the ADF.
   /// \param[in] sv categories of the function arguments.
   /// \param[in] w the weight of the ADF.
