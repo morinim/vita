@@ -75,7 +75,7 @@ namespace vita
   private:  // Private data members.
     static opcode_t opc_count_;
 
-    opcode_t     opcode_;
+    opcode_t opcode_;
 
     category_t category_;
 

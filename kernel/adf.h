@@ -75,7 +75,7 @@ namespace vita
   class adf : public function
   {
   public:
-    adf(const i_mep &, const std::vector<category_t> &, unsigned);
+    adf(const i_mep &, std::vector<category_t>, unsigned);
 
     virtual any eval(interpreter<i_mep> *) const override;
 

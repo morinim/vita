@@ -59,8 +59,6 @@ namespace vita
     assert(debug(true));
   }
 
-  template<class T> void unused(const T &) {}
-
   ///
   /// \return the effective size of the individual.
   /// \see size()

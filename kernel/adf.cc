@@ -20,8 +20,8 @@ namespace vita
   /// \param[in] sv categories of the function arguments.
   /// \param[in] w the weight of the ADF.
   ///
-  adf::adf(const i_mep &ind, const std::vector<category_t> &sv, unsigned w)
-    : function("ADF", ind.category(), sv, w), core_(ind)
+  adf::adf(const i_mep &ind, std::vector<category_t> sv, unsigned w)
+    : function("ADF", ind.category(), std::move(sv), w), core_(ind)
   {
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
