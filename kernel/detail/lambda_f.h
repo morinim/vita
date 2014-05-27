@@ -25,6 +25,7 @@ namespace vita { namespace detail
   /// This is the general template. The last parameter is used for
   /// disambiguation since we need three specializations that, without
   /// the third parameter, overlap (see below).
+  /// This technique is called tag dispatching by type (Barend Gehrels).
   template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
 
   // ********* First specialization (individual stored inside) *********

@@ -30,8 +30,8 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
 template<class T, bool S>
 any basic_reg_lambda_f<T, S>::operator()(const data::example &e) const
 {
-  // We use tag dispatching (i.e. to delegate to an implementation function
-  // that receives standard arguments plus a dummy argument based on a
+  // We use tag dispatching by instance (i.e. to delegate to an implementation
+  // function that receives standard arguments plus a dummy argument based on a
   // compile-time condition). Usually this is much easier to debug and get
   // right that the std::enable_if solution.
   // Moreover this is almost guaranteed to be optimized away by a decent
