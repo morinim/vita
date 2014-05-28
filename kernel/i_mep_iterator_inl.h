@@ -41,7 +41,24 @@ public:
     loci_.insert(id.best_);
   }
 
-  const_iterator &operator++();
+  ///
+  /// \return locus of the next active symbol.
+  ///
+  const_iterator &operator++()
+  {
+    if (!loci_.empty())
+    {
+      const gene &g((*ind_)[*loci_.cbegin()]);
+
+      const auto arity(g.sym->arity());
+      for (auto j(decltype(arity){0}); j < arity; ++j)
+        loci_.insert({g.args[j], function::cast(g.sym)->arg_category(j)});
+
+      loci_.erase(loci_.begin());
+    }
+
+    return *this;;
+  }
 
   ///
   /// \param[in] rhs second term of comparison.
@@ -83,4 +100,5 @@ private:  // Private data members
   // A pointer to the individual we are iterating on.
   const i_mep *const ind_;
 };  // class i_mep::const_iterator
+
 #endif  // Include guard

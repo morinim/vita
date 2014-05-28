@@ -15,7 +15,6 @@
 #include "kernel/i_mep.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
-#include "kernel/environment.h"
 #include "kernel/random.h"
 #include "kernel/ttable_hash.h"
 
@@ -950,25 +949,6 @@ namespace vita
 
     assert(rhs.debug());
     return rhs;
-  }
-
-  ///
-  /// \return locus of the next active symbol.
-  ///
-  i_mep::const_iterator &i_mep::const_iterator::operator++()
-  {
-    if (!loci_.empty())
-    {
-      const gene &g((*ind_)[*loci_.cbegin()]);
-
-      const auto arity(g.sym->arity());
-      for (unsigned j(0); j < arity; ++j)
-        loci_.insert({g.args[j], function::cast(g.sym)->arg_category(j)});
-
-      loci_.erase(loci_.begin());
-    }
-
-    return *this;;
   }
 #endif
 }  // namespace vita

@@ -18,7 +18,7 @@
 #include <iomanip>
 #include <set>
 
-#include "kernel/environment.h"
+#include "kernel/function.h"
 #include "kernel/gene.h"
 #include "kernel/locus.h"
 #include "kernel/matrix.h"
