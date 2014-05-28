@@ -359,7 +359,7 @@ namespace vita
     // unsigned char, if the implementation made it a distinct, non-character
     // type, the aliasing rules would not apply to it
     // (see http://stackoverflow.com/q/16138237/3235496)
-    const auto *const s1 = reinterpret_cast<const unsigned char *>(&opcode);
+    auto s1 = reinterpret_cast<const unsigned char *>(&opcode);
     for (std::size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
@@ -369,7 +369,7 @@ namespace vita
       assert(std::numeric_limits<decltype(param)>::min() <= g.par);
       assert(g.par <= std::numeric_limits<decltype(param)>::max());
 
-      const auto *const s2 = reinterpret_cast<const unsigned char *>(&param);
+      auto s2 = reinterpret_cast<const unsigned char *>(&param);
       for (std::size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
@@ -390,12 +390,9 @@ namespace vita
   hash_t i_mep::hash() const
   {
     // From an individual to a packed byte stream...
-    static std::vector<unsigned char> packed;
-    packed.clear();
-    // In a multithread environment the two lines above must be changed with:
-    //     std::vector<unsigned char> packed;
-    // (static keyword and packed.clear() call deleted).
+    thread_local std::vector<unsigned char> packed;
 
+    packed.clear();
     pack(best_, &packed);
 
     /// ... and from a packed byte stream to a signature...

@@ -19,7 +19,6 @@
 #include <set>
 
 #include "kernel/function.h"
-#include "kernel/gene.h"
 #include "kernel/locus.h"
 #include "kernel/matrix.h"
 #include "kernel/symbol_set.h"
