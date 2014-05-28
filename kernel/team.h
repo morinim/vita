@@ -54,7 +54,7 @@ namespace vita
   {
   public:
     team(const environment &, const symbol_set &);
-    explicit team(const std::vector<T> &);
+    explicit team(std::vector<T>);
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;

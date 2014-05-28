@@ -40,10 +40,8 @@ team<T>::team(const environment &e, const symbol_set &ss) : signature_()
 /// Builds a team containing the individuals of vector \a v.
 ///
 template<class T>
-team<T>::team(const std::vector<T> &v) : signature_()
+team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 {
-  individuals_ = v;
-
   assert(debug());
 }
 

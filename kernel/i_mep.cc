@@ -811,6 +811,7 @@ namespace vita
 
 #if defined(UNIFORM_CROSSOVER)
   ///
+  /// \brief Uniform Crossover
   /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
@@ -846,6 +847,7 @@ namespace vita
   }
 #elif defined(ONE_POINT_CROSSOVER)
   ///
+  /// \brief One Point Crossover
   /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
@@ -891,6 +893,7 @@ namespace vita
   }
 #else  // TWO_POINT_CROSSOVER (default)
   ///
+  /// \brief Two Point Crossover
   /// \param[in] rhs the second parent.
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
