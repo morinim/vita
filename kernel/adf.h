@@ -17,13 +17,12 @@
 #include <vector>
 
 #include "kernel/function.h"
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/terminal.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  template<class T> class interpreter;
-
   ///
   /// \brief The core of vita::adt and vita::adf
   ///

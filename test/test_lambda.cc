@@ -13,7 +13,7 @@
 #include <cstdlib>
 
 #include "kernel/data.h"
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/lambda_f.h"
 #include "kernel/team.h"
 #include "kernel/src/problem.h"

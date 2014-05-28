@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
 #include "kernel/environment.h"
@@ -25,7 +25,7 @@ namespace vita
   /// \param[in] e base environment.
   /// \param[in] ss a symbol set.
   ///
-  /// The process that generates the initial, random expressions have to be
+  /// The process that generates the initial, random expressions has to be
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///

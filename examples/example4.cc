@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/ttable.h"
 #include "kernel/src/primitive/factory.h"
 #include "kernel/timer.h"

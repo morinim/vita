@@ -65,7 +65,7 @@ basic_gene<K>::basic_gene(
 
 ///
 /// \param[in] s a symbol.
-/// \param[in] from a starting locus in the genome.
+/// \param[in] from a starting index in the genome.
 /// \param[in] sup an upper limit in the genome.
 ///
 /// A new gene built from symbol \a s with argument in the [from;sup[ range.

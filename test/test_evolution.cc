@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include "kernel/evolution.h"
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE evolution

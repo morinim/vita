@@ -16,7 +16,7 @@
 #include <memory>
 
 #include "kernel/evolution.h"
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 

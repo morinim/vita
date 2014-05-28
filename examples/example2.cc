@@ -15,7 +15,7 @@
 #include <memory>
 
 #include "kernel/environment.h"
-#include "kernel/individual/mep.h"
+#include "kernel/i_mep.h"
 #include "kernel/population.h"
 #include "kernel/src/primitive/factory.h"
 
