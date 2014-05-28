@@ -12,7 +12,7 @@
 
 #include "kernel/random.h"
 
-namespace vita
+namespace vita { namespace random
 {
   ///
   /// \param[in] s the seed for the random number generator.
@@ -26,7 +26,7 @@ namespace vita
   /// (\c std::time(0)) but the preferred way in Vita is the random::randomize
   /// method (based on \c std::random_device).
   ///
-  void random::seed(unsigned s)
+  void seed(unsigned s)
   {
     engine().seed(s);
   }
@@ -34,9 +34,9 @@ namespace vita
   ///
   /// Sets the shared engine to an unpredictable state.
   ///
-  void random::randomize()
+  void randomize()
   {
-    static std::random_device rd{};
+    std::random_device rd;
     seed(rd());
   }
 
@@ -53,7 +53,7 @@ namespace vita
   /// If \c base is greater than \c n we take a random starting position on the
   /// protractor.
   ///
-  unsigned random::ring(unsigned base, unsigned width, unsigned n)
+  unsigned ring(unsigned base, unsigned width, unsigned n)
   {
     assert(width);
     assert(n > 1);
@@ -68,4 +68,4 @@ namespace vita
 
     return (offset + random::between<unsigned>(0, width)) % n;
   }
-}  // namespace vita
+}}  // namespace vita::random

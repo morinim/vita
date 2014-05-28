@@ -342,8 +342,7 @@ namespace vita
   /// individuals to the same byte stream. This is a very interesting
   /// property, useful for individual comparison / information retrieval.
   ///
-  void i_mep::pack(const locus &l,
-                        std::vector<unsigned char> *const p) const
+  void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
   {
     const gene &g(genome_(l));
 

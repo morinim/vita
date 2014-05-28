@@ -19,39 +19,33 @@
 
 #include "kernel/vita.h"
 
-namespace vita
+namespace vita { namespace random
 {
-  class random
-  {
-  public:
-    template<class T> static T between(T, T);
-    template<class T> static T sup(T);
+  template<class T> T between(T, T);
+  template<class T> T sup(T);
 
-    template<class C> static const typename C::value_type &element(const C &);
-    template<class C> static typename C::value_type &element(C &);
+  template<class C> const typename C::value_type &element(const C &);
+  template<class C> typename C::value_type &element(C &);
 
-    static unsigned ring(unsigned, unsigned, unsigned);
+  unsigned ring(unsigned, unsigned, unsigned);
 
-    static bool boolean(double = 0.5);
+  bool boolean(double = 0.5);
 
-    static void seed(unsigned);
-    void randomize();
+  void seed(unsigned);
+  void randomize();
 
-    // The Mersenne Twister engine produces integers with a good
-    // uniform distribution.
-    // std::mt19937 and std::mt19937_64 are similar. There aren't
-    // memory consumption differences and speed is almost equal.
-    // Warning: checking for sizeof(int) <= 4 is perhaps not a very
-    // portable way since on a 64-bit Windows machine, GCC (MinGW)
-    // x64 compiler gives sizeof(int) = sizeof(long) = 4. So we use
-    // void *.
-    // using engine_t = std::conditional<sizeof(void *) <= 4,
-    //                                   std::mt19937,
-    //                                   std::mt19937_64>::type;
-    using engine_t = std::mt19937;
-
-    static engine_t &engine();
-  };
+  // The Mersenne Twister engine produces integers with a good
+  // uniform distribution.
+  // std::mt19937 and std::mt19937_64 are similar. There aren't
+  // memory consumption differences and speed is almost equal.
+  // Warning: checking for sizeof(int) <= 4 is perhaps not a very
+  // portable way since on a 64-bit Windows machine, GCC (MinGW)
+  // x64 compiler gives sizeof(int) = sizeof(long) = 4. So we use
+  // void *.
+  // using engine_t = std::conditional<sizeof(void *) <= 4,
+  //                                   std::mt19937,
+  //                                   std::mt19937_64>::type;
+  using engine_t = std::mt19937;
 
   ///
   /// \return a reference to a single engine shared whereever needed.
@@ -59,16 +53,15 @@ namespace vita
   /// This function grants access to a shared engine.
   ///
   /// \note
-  /// \c engine() must be enhanced with appropriate synchronization if the
-  /// engine is to be shared among multiple threads.
+  /// \c the engine can be shared among multiple threads.
   ///
-  inline random::engine_t &random::engine()
+  inline engine_t &engine()
   {
     // We are using a *global* generator object here. This is important because
     // we don't want to create a new pseudo-random number generator at every
     // call.
     // The numbers produced will be the same every time the program is run.
-    static engine_t e{28071973u};  // Magic!!!
+    thread_local engine_t e{28071973u};  // Magic!!!
 
     return e;
   }
@@ -87,11 +80,11 @@ namespace vita
   ///
   template<>
   inline
-  double random::between(double min, double sup)
+  double between(double min, double sup)
   {
     assert(min < sup);
 
-    static std::uniform_real_distribution<double> d(min, sup);
+    std::uniform_real_distribution<double> d(min, sup);
 
     return d(engine());
   }
@@ -110,7 +103,7 @@ namespace vita
   /// real number distribution).
   ///
   template<class T>
-  T random::between(T min, T sup)
+  T between(T min, T sup)
   {
     static_assert(std::is_integral<T>::value,
                   "random::between needs a template-parameter of integer type");
@@ -130,7 +123,7 @@ namespace vita
   /// This is a shortcut for: \c between<T>(0, sup);
   ///
   template<class T>
-  T random::sup(T sup)
+  T sup(T sup)
   {
     return between<T>(0, sup);
   }
@@ -140,7 +133,7 @@ namespace vita
   /// \return a random element of container \a c.
   ///
   template<class C>
-  const typename C::value_type &random::element(const C &c)
+  const typename C::value_type &element(const C &c)
   {
     const auto size(c.size());
     assert(size);
@@ -155,7 +148,7 @@ namespace vita
   /// \return a random element of container \a c.
   ///
   template<class C>
-  typename C::value_type &random::element(C &c)
+  typename C::value_type &element(C &c)
   {
     const auto size(c.size());
     assert(size);
@@ -172,17 +165,15 @@ namespace vita
   /// bool values are produced according to the Bernoulli distribution.
   ///
   inline
-  bool random::boolean(double p)
+  bool boolean(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
-    static std::bernoulli_distribution d{};
+    std::bernoulli_distribution d(p);
+    return d(engine());
 
-    using parm_t = decltype(d)::param_type;
-    return d(engine(), parm_t{p});
-
-    //return random::between<double>(0, 1) < p;
+    //return between<double>(0, 1) < p;
   }
-}  // namespace vita
+}}  // namespace vita::random
 
 #endif  // Include guard
