@@ -60,7 +60,8 @@ namespace vita
       { return boost::lexical_cast<std::string>(v); }
 
       virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(any_cast<double>(i->fetch_param()))); }
+      { return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
     private:  // Private data members.
       const int min, upp;

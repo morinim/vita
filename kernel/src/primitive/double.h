@@ -70,7 +70,8 @@ namespace vita
       { return std::to_string(static_cast<int>(v)); }
 
       virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(any_cast<double>(i->fetch_param()))); }
+      { return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
     private: // Private data members.
       const int min, upp;
