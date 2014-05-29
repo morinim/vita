@@ -405,7 +405,7 @@ void team<T>::graphviz(std::ostream &s) const
 /// Not at all human readable, but a compact representation for import/export.
 ///
 template<class T>
-void team<T>::in_line(std::ostream &s) const
+std::ostream &team<T>::in_line(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
@@ -413,6 +413,8 @@ void team<T>::in_line(std::ostream &s) const
     i.in_line(s);
     s << '}';
   }
+
+  return s;
 }
 
 ///
@@ -425,25 +427,29 @@ void team<T>::in_line(std::ostream &s) const
 /// 30 GOTO 10
 ///
 template<class T>
-void team<T>::list(std::ostream &s) const
+std::ostream &team<T>::list(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
     i.list(s);
     s << std::endl;
   }
+
+  return s;
 }
 
 ///
 /// \param[out] s output stream.
 ///
 template<class T>
-void team<T>::tree(std::ostream &s) const
+std::ostream &team<T>::tree(std::ostream &s) const
 {
   for (const auto &i : individuals_)
   {
     i.tree(s);
     s << std::endl;
   }
+
+  return s;
 }
 #endif  // Include guard

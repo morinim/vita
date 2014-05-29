@@ -58,9 +58,9 @@ namespace vita
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;
-    void in_line(std::ostream &) const;
-    void list(std::ostream &) const;
-    void tree(std::ostream &) const;
+    std::ostream &in_line(std::ostream &) const;
+    std::ostream &list(std::ostream &) const;
+    std::ostream &tree(std::ostream &) const;
 
     // Recombination operators.
     unsigned mutation();
