@@ -38,8 +38,8 @@ namespace vita
     virtual bool auto_defined() const;
 
     virtual std::string display() const;
-    virtual std::string display(int) const;
-    virtual int init() const;
+    virtual std::string display(double) const;
+    virtual double init() const;
 
     /// The associative law of arithmetic: if OP is associative then
     /// a OP (b OP c) = (a OP b) OP c = a OP b OP c
@@ -102,9 +102,9 @@ namespace vita
   /// meaningful way.
   ///
   inline
-  int symbol::init() const
+  double symbol::init() const
   {
-    return 0;
+    return 0.0;
   }
 
   ///

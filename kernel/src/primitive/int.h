@@ -53,13 +53,14 @@ namespace vita
         : terminal("INT", t, false, true, k_base_weight), min(m), upp(u)
       { assert(m < u); }
 
-      int init() const { return random::between<int>(min, upp); }
+      virtual double init() const override
+      { return random::between<int>(min, upp); }
 
-      std::string display(int v) const
+      virtual std::string display(double v) const override
       { return boost::lexical_cast<std::string>(v); }
 
-      any eval(interpreter<i_mep> *i) const
-      { return any(integer::cast(i->fetch_param())); }
+      virtual any eval(interpreter<i_mep> *i) const override
+      { return any(static_cast<base_t>(any_cast<double>(i->fetch_param()))); }
 
     private:  // Private data members.
       const int min, upp;

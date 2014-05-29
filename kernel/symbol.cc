@@ -32,7 +32,7 @@ namespace vita
   /// used to build a more meaningful name for the symbol (i.e. for a numeric
   /// terminal it's better to print 123 than "NUMBER").
   ///
-  std::string symbol::display(int v) const
+  std::string symbol::display(double v) const
   {
     assert(parametric());
 

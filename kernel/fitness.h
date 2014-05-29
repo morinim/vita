@@ -79,7 +79,6 @@ namespace vita
   template<class T, unsigned N>
   basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
 
-  template<class T> bool almost_equal(T, T, T = 0.00001);
   template<class T, unsigned N> bool almost_equal(
     const basic_fitness_t<T, N> &, const basic_fitness_t<T, N> &, T = 0.00001);
 

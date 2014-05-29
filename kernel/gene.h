@@ -17,6 +17,7 @@
 
 #include "kernel/random.h"
 #include "kernel/symbol.h"
+#include "kernel/utility.h"
 
 namespace vita
 {
@@ -45,7 +46,7 @@ namespace vita
     symbol *sym;
     union
     {
-      int               par;
+      double            par;
       std::uint16_t args[K];
     };
   };

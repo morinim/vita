@@ -104,7 +104,7 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
     return false;
 
   if (sym->parametric())
-    return par == g.par;
+    return almost_equal(par, g.par);
 
   const auto arity(sym->arity());
   for (auto i(decltype(arity){0}); i < arity; ++i)
