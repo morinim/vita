@@ -38,11 +38,11 @@ namespace vita
     i_mep(const environment &, const symbol_set &);
 
     // Visualization/output methods
-    void dump(std::ostream &) const;
+    std::ostream &dump(std::ostream &) const;
     void graphviz(std::ostream &, const std::string & = "") const;
-    void in_line(std::ostream &) const;
-    void list(std::ostream &) const;
-    void tree(std::ostream &) const;
+    std::ostream &in_line(std::ostream &) const;
+    std::ostream &list(std::ostream &) const;
+    std::ostream &tree(std::ostream &) const;
 
     // Recombination operators
     unsigned mutation()

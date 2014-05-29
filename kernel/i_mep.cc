@@ -591,9 +591,10 @@ namespace vita
   /// spaces. Not at all human readable, but a compact representation for
   /// import / export.
   ///
-  void i_mep::in_line(std::ostream &s) const
+  std::ostream &i_mep::in_line(std::ostream &s) const
   {
     in_line(s, best_);
+    return s;
   }
 
   ///
@@ -605,8 +606,10 @@ namespace vita
   /// 20 PRINT "SWEET"
   /// 30 GOTO 10
   ///
-  void i_mep::list(std::ostream &s) const
+  std::ostream &i_mep::list(std::ostream &s) const
   {
+    SAVE_FLAGS(s);
+
     const auto categories(sset_->categories());
     const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
     const auto w2(1 + static_cast<int>(std::log10(categories)));
@@ -636,6 +639,8 @@ namespace vita
 
       s << std::endl;
     }
+
+    return s;
   }
 
   ///
@@ -645,7 +650,7 @@ namespace vita
   /// \param[in] parent parent of \a child.
   ///
   void i_mep::tree(std::ostream &s, const locus &child, unsigned indent,
-                        const locus &parent) const
+                   const locus &parent) const
   {
     const gene &g(genome_(child));
 
@@ -667,9 +672,10 @@ namespace vita
   ///
   /// \param[out] s output stream.
   ///
-  void i_mep::tree(std::ostream &s) const
+  std::ostream &i_mep::tree(std::ostream &s) const
   {
     tree(s, best_, 0, best_);
+    return s;
   }
 
   ///
@@ -677,8 +683,10 @@ namespace vita
   ///
   /// Print the complete content of this individual.
   ///
-  void i_mep::dump(std::ostream &s) const
+  std::ostream &i_mep::dump(std::ostream &s) const
   {
+    SAVE_FLAGS(s);
+
     const auto categories(sset_->categories());
     const auto width(1 + static_cast<int>(std::log10(size() - 1)));
 
@@ -705,6 +713,8 @@ namespace vita
 
       s << std::endl;
     }
+
+    return s;
   }
 
   ///
@@ -714,9 +724,7 @@ namespace vita
   ///
   std::ostream &operator<<(std::ostream &s, const i_mep &ind)
   {
-    ind.list(s);
-
-    return s;
+    return ind.list(s);
   }
 
   ///
