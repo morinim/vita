@@ -21,6 +21,14 @@ namespace vita
   /// \param[in] c category of the symbol.
   /// \param[in] w weight (used for random selection).
   ///
+  /// \note
+  /// By default a symbol:
+  /// - has arity 0;
+  /// - is NOT associative;
+  /// - is NOT auto defined;
+  /// - is NOT an input;
+  /// - is NOT parametric.
+  ///
   /// \warning
   /// The name of the symbol must be unique: it's used for serialization.
   /// Of course even the opcode is unique, but it can vary between executions.
