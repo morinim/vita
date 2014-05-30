@@ -30,12 +30,4 @@ namespace vita
 
     assert(debug());
   }
-
-  ///
-  /// \return \c true if the object passes the internal consistency check.
-  ///
-  bool terminal::debug() const
-  {
-    return symbol::debug();
-  }
 }  // Namespace vita

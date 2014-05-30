@@ -30,13 +30,13 @@ namespace vita
   public:
     explicit argument(unsigned);
 
-    std::string display() const;
+    virtual std::string display() const override;
 
     unsigned index() const;
 
     virtual any eval(interpreter<i_mep> *) const override;
 
-    bool debug() const;
+    virtual bool debug() const override;
 
   private:
     const unsigned index_;

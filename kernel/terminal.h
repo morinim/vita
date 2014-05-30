@@ -28,8 +28,6 @@ namespace vita
   public:
     terminal(const std::string &, category_t, bool = false, bool = false,
              unsigned = k_base_weight);
-
-    virtual bool debug() const override;
   };
 }  // namespace vita
 
