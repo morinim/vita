@@ -64,7 +64,7 @@ namespace vita
       { assert(m < u); }
 
       virtual double init() const override
-      { return static_cast<double>(random::between<int>(min, upp)); }
+      { return random::between<int>(min, upp); }
 
       virtual std::string display(double v) const override
       { return std::to_string(static_cast<int>(v)); }

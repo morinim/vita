@@ -31,30 +31,18 @@ namespace vita
   public:
     symbol(const std::string &, category_t, unsigned);
 
-    opcode_t opcode() const;
+    unsigned arity() const;
+    bool associative() const;
+    bool auto_defined() const;
     category_t category() const;
-
+    bool input() const;
+    opcode_t opcode() const;
+    bool parametric() const;
     bool terminal() const;
-    virtual bool auto_defined() const;
 
     virtual std::string display() const;
     virtual std::string display(double) const;
     virtual double init() const;
-
-    /// The associative law of arithmetic: if OP is associative then
-    /// a OP (b OP c) = (a OP b) OP c = a OP b OP c
-    /// This information can be used for optimization and visualization.
-    virtual bool associative() const = 0;
-
-    /// A parametric symbol needs an additional argument to be evaluated.
-    /// A value for this argument is stored in every gene where the parametric
-    /// symbol is used and it's fetched at run-time.
-    /// Functions are never parametric; terminals can be parametric.
-    virtual bool parametric() const = 0;
-
-    /// The arity of a function is the number of inputs to or arguments of that
-    /// funtion.
-    virtual unsigned arity() const = 0;
 
     /// Calculates the value of / performs the action associated to the symbol
     /// (it is implementation specific).
@@ -62,7 +50,7 @@ namespace vita
 
     virtual bool debug() const;
 
-  public:  // Public data members.
+  public:  // Public data members
     /// Weight is used by the symbol_set::roulette method to control the
     /// probability of extraction of the symbol.
     unsigned weight;
@@ -72,7 +60,14 @@ namespace vita
     /// the symbols.
     static decltype(weight) constexpr k_base_weight{100};
 
-  private:  // Private data members.
+  protected:  // Protected data members
+    unsigned arity_;
+    bool associative_;
+    bool auto_defined_;
+    bool input_;
+    bool parametric_;
+
+  private:  // Private data members
     static opcode_t opc_count_;
 
     opcode_t opcode_;
@@ -83,37 +78,51 @@ namespace vita
   };
 
   ///
-  /// \param[in] name name of the symbol (must be unique).
-  /// \param[in] c category of the symbol.
-  /// \param[in] w weight (used for random selection).
-  ///
-  inline
-  symbol::symbol(const std::string &name, category_t c, unsigned w)
-    : weight(w), opcode_(opc_count_++), category_(c), name_(name)
-  {
-    assert(debug());
-  }
-
-  ///
   /// \return \c 0.
   ///
   /// This function is used to initialize the symbol's internal parameter.
   /// Derived classes should redefine the init member function in a
   /// meaningful way.
   ///
-  inline
-  double symbol::init() const
+  inline double symbol::init() const
   {
     return 0.0;
   }
 
   ///
-  /// \return \c true if this symbol is a \c terminal.
+  /// \return the number of inputs to or arguments of a funtion.
   ///
-  inline
-  bool symbol::terminal() const
+  /// \note
+  /// 0 arguments <=> terminal.
+  ///
+  inline unsigned symbol::arity() const
   {
-    return arity() == 0;
+    return arity_;
+  }
+
+  ///
+  /// \return true if the function is associative.
+  ///
+  /// The associative law of arithmetic: if OP is associative then
+  /// > a OP (b OP c) = (a OP b) OP c = a OP b OP c
+  ///
+  /// This information can be used for optimization and visualization.
+  ///
+  /// \note
+  /// Terminals haven't arguments and cannot be associative.
+  ///
+  inline bool symbol::associative() const
+  {
+    return associative_;
+  }
+
+  ///
+  /// \return \c true if the \a symbol has been automatically defined (e.g.
+  ///         ADF / ADT), \c false otherwise (this is the default value).
+  ///
+  inline bool symbol::auto_defined() const
+  {
+    return auto_defined_;
   }
 
   ///
@@ -123,10 +132,20 @@ namespace vita
   /// function has types for each of its arguments and a type for its return
   /// value.
   ///
-  inline
-  category_t symbol::category() const
+  inline category_t symbol::category() const
   {
     return category_;
+  }
+
+  ///
+  /// \return \c true if the symbol is an input variable.
+  ///
+  /// An input variable is a feature from the learning domain. Only terminal
+  /// can be input variable.
+  ///
+  inline bool symbol::input() const
+  {
+    return input_;
   }
 
   ///
@@ -138,20 +157,33 @@ namespace vita
   /// is often a better way since the opcode of a symbol can vary between
   /// executions.
   ///
-  inline
-  opcode_t symbol::opcode() const
+  inline opcode_t symbol::opcode() const
   {
     return opcode_;
   }
 
   ///
-  /// \return \c true if the \a symbol has been automatically defined (e.g.
-  ///         ADF / ADT), \c false otherwise (this is the default value).
+  /// \return true for parametric symbols.
   ///
-  inline
-  bool symbol::auto_defined() const
+  /// A parametric symbol needs an additional argument to be evaluated.
+  ///
+  /// A value for this argument is stored in every gene where the parametric
+  /// symbol is used and it's fetched at run-time.
+  ///
+  /// \note
+  /// Functions are never parametric, terminals can be.
+  ///
+  inline bool symbol::parametric() const
   {
-    return false;
+    return parametric_;
+  }
+
+  ///
+  /// \return \c true if this symbol is a \c terminal.
+  ///
+  inline bool symbol::terminal() const
+  {
+    return arity() == 0;
   }
 }  // namespace vita
 

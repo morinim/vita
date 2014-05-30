@@ -17,6 +17,22 @@ namespace vita
   opcode_t symbol::opc_count_(0);
 
   ///
+  /// \param[in] name name of the symbol.
+  /// \param[in] c category of the symbol.
+  /// \param[in] w weight (used for random selection).
+  ///
+  /// \warning
+  /// The name of the symbol must be unique: it's used for serialization.
+  /// Of course even the opcode is unique, but it can vary between executions.
+  ///
+  symbol::symbol(const std::string &name, category_t c, unsigned w)
+    : weight(w), arity_(0), associative_(false), input_(false),
+      parametric_(false), opcode_(opc_count_++), category_(c), name_(name)
+  {
+    assert(debug());
+  }
+
+  ///
   /// \return the name of the symbol.
   ///
   std::string symbol::display() const

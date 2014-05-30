@@ -23,8 +23,11 @@ namespace vita
   ///
   terminal::terminal(const std::string &dis, category_t c, bool in, bool par,
                      unsigned w)
-    : symbol(dis, c, w), parametric_(par), input_(in)
+    : symbol(dis, c, w)
   {
+    input_ = in;
+    parametric_ = par;
+
     assert(debug());
   }
 

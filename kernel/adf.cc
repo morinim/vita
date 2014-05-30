@@ -26,6 +26,8 @@ namespace vita
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
 
+    auto_defined_ = true;
+
     assert(debug());
   }
 
@@ -47,14 +49,6 @@ namespace vita
   std::string adf::display() const
   {
     return core_.display(symbol::display());
-  }
-
-  ///
-  /// \return \c true.
-  ///
-  bool adf::auto_defined() const
-  {
-    return true;
   }
 
   ///
@@ -92,6 +86,8 @@ namespace vita
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
 
+    auto_defined_ = true;
+
     assert(debug());
   }
 
@@ -112,14 +108,6 @@ namespace vita
   std::string adt::display() const
   {
     return core_.display(symbol::display());
-  }
-
-  ///
-  /// \return \c true.
-  ///
-  bool adt::auto_defined() const
-  {
-    return true;
   }
 
   ///

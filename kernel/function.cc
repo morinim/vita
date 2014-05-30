@@ -31,10 +31,12 @@ namespace vita
   function::function(const std::string &dis, category_t c,
                      const std::vector<category_t> &args, unsigned w,
                      bool asve)
-    : symbol(dis, c, w), arity_(static_cast<decltype(arity_)>(args.size())),
-      associative_(asve)
+    : symbol(dis, c, w)
   {
     assert(args.size() <= gene::k_args);
+
+    arity_ = static_cast<decltype(arity_)>(args.size());
+    associative_ = asve;
 
     for (auto i(decltype(arity_){0}); i < arity_; ++i)
       argt_[i] = args[i];

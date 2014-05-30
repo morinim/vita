@@ -80,8 +80,6 @@ namespace vita
 
     virtual std::string display() const override;
 
-    virtual bool auto_defined() const override;
-
     virtual bool debug() const override;
 
     const i_mep &code() const;
@@ -105,8 +103,6 @@ namespace vita
     virtual any eval(interpreter<i_mep> *) const override;
 
     virtual std::string display() const override;
-
-    virtual bool auto_defined() const override;
 
     virtual bool debug() const override;
 
