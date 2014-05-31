@@ -32,12 +32,17 @@ BOOST_FIXTURE_TEST_SUITE(symbol_set, F_FACTORY3)
 BOOST_AUTO_TEST_CASE(Speed)
 {
   const unsigned n(10000000);
+
+  // Because of s the compiler have to perform the entire for loop (see below).
+  vita::symbol *s(sset.roulette());
+
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
-    sset.roulette();
+    if (vita::random::boolean())
+      s = sset.roulette();
 
   BOOST_TEST_MESSAGE(static_cast<unsigned>(1000.0 * n / t.elapsed())
-                     << " extractions/sec");
+                     << " extractions/sec - symbol: " << s->display());
 }
 
 BOOST_AUTO_TEST_CASE(Distribution)

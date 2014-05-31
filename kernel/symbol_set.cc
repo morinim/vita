@@ -36,7 +36,6 @@ namespace vita
     /// Anyway we choose the "roulette algorithm" because it's very simple and
     /// allows changing weights dynamically (performance differences can hardly
     /// be measured).
-    /// \see http://en.wikipedia.org/wiki/Fitness_proportionate_selection
     ///
     symbol *roulette_(const std::vector<symbol *> &symbols, unsigned sum)
     {
@@ -47,6 +46,21 @@ namespace vita
            wedge <= slot;
            wedge += symbols[++i]->weight)
       {}
+
+      assert(i < symbols.size());
+      return symbols[i];
+
+      // The so called roulette-wheel selection via stochastic acceptance:
+      //
+      // for (;;)
+      // {
+      //   const symbol *s(random::element(symbols));
+      //
+      //   if (random::sup(max) < s->weight)
+      //     return s;
+      // }
+      //
+      // Internal tests have proved this is slower for Vita.
 
       // This is a different approach from Eli Bendersky
       // (<http://eli.thegreenplace.net/>):
@@ -65,9 +79,6 @@ namespace vita
       // The interesting property of this algorithm is that you don't need to
       // know the sum of weights in advance in order to use it. The method is
       // cool, but slower than the standard roulette.
-
-      assert(i < symbols.size());
-      return symbols[i];
     }
   }  // anonymous namespace
 
