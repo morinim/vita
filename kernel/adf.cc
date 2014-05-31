@@ -21,11 +21,12 @@ namespace vita
   /// \param[in] w the weight of the ADF.
   ///
   adf::adf(const i_mep &ind, std::vector<category_t> sv, unsigned w)
-    : function("ADF", ind.category(), std::move(sv), w), core_(ind)
+    : function("ADF", ind.category(), std::move(sv)), core_(ind)
   {
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
 
+    weight = w;
     auto_defined_ = true;
 
     assert(debug());
@@ -80,12 +81,13 @@ namespace vita
   /// \param[in] ind the code for the ADT.
   /// \param[in] w the weight of the ADT.
   ///
-  adt::adt(const i_mep &ind, unsigned w) : terminal("ADT", ind.category(), w),
+  adt::adt(const i_mep &ind, unsigned w) : terminal("ADT", ind.category()),
                                            core_(ind)
   {
     assert(ind.debug());
     assert(ind.eff_size() >= 2);
 
+    weight = w;
     auto_defined_ = true;
 
     assert(debug());

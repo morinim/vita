@@ -23,12 +23,11 @@ namespace vita
   ///              value).
   /// \param[in] args input parameters (type and number) of the function (in
   ///                 C++ they are called the "function signature").
-  /// \param[in] w the weight of the function (used for random initialization).
   ///
   VITA_INLINE
   function::function(const std::string &dis, category_t c,
-                     const std::vector<category_t> &args, unsigned w)
-    : symbol(dis, c, w)
+                     const std::vector<category_t> &args)
+    : symbol(dis, c)
   {
     assert(args.size() <= gene::k_args);
 

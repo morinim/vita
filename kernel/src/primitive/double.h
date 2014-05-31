@@ -60,7 +60,7 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t, k_base_weight), min(m), upp(u)
+        : terminal("REAL", t), min(m), upp(u)
       { assert(m < u); parametric_ = true; }
 
       virtual double init() const override
@@ -99,8 +99,8 @@ namespace vita
     class add : public function
     {
     public:
-      explicit add(category_t t)
-        : function("FADD", t, {t, t}, k_base_weight) { associative_ = true; }
+      explicit add(category_t t) : function("FADD", t, {t, t})
+      { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -297,7 +297,8 @@ namespace vita
     class ln : public function
     {
     public:
-      explicit ln(category_t t) : function("FLN", t, {t}, k_base_weight / 2) {}
+      explicit ln(category_t t) : function("FLN", t, {t})
+      { weight = k_base_weight / 2; }
 
       ///
       /// \param[in] i pointer to the active interpreter.
@@ -368,8 +369,8 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(category_t t)
-        : function("FMUL", t, {t, t}, k_base_weight) { associative_ = true; }
+      explicit mul(category_t t) : function("FMUL", t, {t, t})
+      { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {

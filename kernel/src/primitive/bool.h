@@ -28,7 +28,7 @@ namespace vita { namespace boolean
   class zero : public terminal
   {
   public:
-    explicit zero(category_t t) : terminal("0", t, default_weight) {}
+    explicit zero(category_t t) : terminal("0", t) {}
 
     virtual std::string display() const override { return "0"; }
 
@@ -38,7 +38,7 @@ namespace vita { namespace boolean
   class one : public terminal
   {
   public:
-    explicit one(category_t t) : terminal("1", t, default_weight) {}
+    explicit one(category_t t) : terminal("1", t) {}
 
     virtual std::string display() const override { return "1"; }
 

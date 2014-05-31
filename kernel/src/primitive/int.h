@@ -50,7 +50,7 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("INT", t, k_base_weight), min(m), upp(u)
+        : terminal("INT", t), min(m), upp(u)
       { assert(m < u); parametric_ = true; }
 
       virtual double init() const override
@@ -71,8 +71,8 @@ namespace vita
     class add : public function
     {
     public:
-      explicit add(category_t t)
-        : function("ADD", t, {t, t}, k_base_weight) { associative_ = true; }
+      explicit add(category_t t) : function("ADD", t, {t, t})
+      { associative_ = true; }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -182,8 +182,8 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(category_t t)
-        : function("MUL", t, {t, t}, k_base_weight) { associative_ = true; }
+      explicit mul(category_t t) : function("MUL", t, {t, t})
+      { associative_ = true; }
 
       any eval(interpreter<i_mep> *i) const
       {

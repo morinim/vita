@@ -26,7 +26,7 @@ namespace vita
   class terminal : public symbol
   {
   public:
-    terminal(const std::string &, category_t, unsigned = k_base_weight);
+    using symbol::symbol;
 
     virtual bool debug() const override;
   };

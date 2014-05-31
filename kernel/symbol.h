@@ -29,7 +29,7 @@ namespace vita
   class symbol
   {
   public:
-    symbol(const std::string &, category_t, unsigned);
+    symbol(const std::string &, category_t);
 
     unsigned arity() const;
     bool associative() const;

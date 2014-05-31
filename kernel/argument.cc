@@ -26,8 +26,10 @@ namespace vita
   /// \c i (argument(i)) varies depending on the function being evaluated
   /// (instead, adf functions have a precise, fixed signature).
   ///
-  argument::argument(unsigned n) : terminal("ARG", category_t(0), 0), index_(n)
+  argument::argument(unsigned n) : terminal("ARG", category_t(0)), index_(n)
   {
+    weight = 0;
+
     assert(debug());
   }
 

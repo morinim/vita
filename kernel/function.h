@@ -36,8 +36,7 @@ namespace vita
   class function : public symbol
   {
   public:
-    function(const std::string &, category_t, const std::vector<category_t> &,
-             unsigned = k_base_weight);
+    function(const std::string &, category_t, const std::vector<category_t> &);
 
     category_t arg_category(unsigned) const;
 

@@ -17,18 +17,6 @@
 namespace vita
 {
   ///
-  /// \param[in] dis string printed to identify the terminal.
-  /// \param[in] c category of the terminal.
-  /// \param[in] w weight used for symbol frequency control.
-  ///
-  VITA_INLINE
-  terminal::terminal(const std::string &dis, category_t c, unsigned w)
-    : symbol(dis, c, w)
-  {
-    assert(debug());
-  }
-
-  ///
   /// \return \c true if the \a function passes the internal consistency check.
   ///
   VITA_INLINE
