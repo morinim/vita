@@ -80,8 +80,8 @@ namespace vita
   /// \param[in] ind the code for the ADT.
   /// \param[in] w the weight of the ADT.
   ///
-  adt::adt(const i_mep &ind, unsigned w)
-    : terminal("ADT", ind.category(), false, false, w), core_(ind)
+  adt::adt(const i_mep &ind, unsigned w) : terminal("ADT", ind.category(), w),
+                                           core_(ind)
   {
     assert(ind.debug());
     assert(ind.eff_size() >= 2);

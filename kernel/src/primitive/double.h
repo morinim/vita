@@ -60,8 +60,8 @@ namespace vita
     {
     public:
       explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t, false, true, k_base_weight), min(m), upp(u)
-      { assert(m < u); }
+        : terminal("REAL", t, k_base_weight), min(m), upp(u)
+      { assert(m < u); parametric_ = true; }
 
       virtual double init() const override
       { return random::between<int>(min, upp); }

@@ -26,8 +26,7 @@ namespace vita
   class terminal : public symbol
   {
   public:
-    terminal(const std::string &, category_t, bool = false, bool = false,
-             unsigned = k_base_weight);
+    terminal(const std::string &, category_t, unsigned = k_base_weight);
   };
 }  // namespace vita
 

@@ -17,17 +17,11 @@ namespace vita
   ///
   /// \param[in] dis string printed to identify the terminal.
   /// \param[in] c category of the terminal.
-  /// \param[in] par true if the terminal is parametric.
-  /// \param[in] in true if the terminal is an input value.
   /// \param[in] w weight used for symbol frequency control.
   ///
-  terminal::terminal(const std::string &dis, category_t c, bool in, bool par,
-                     unsigned w)
+  terminal::terminal(const std::string &dis, category_t c, unsigned w)
     : symbol(dis, c, w)
   {
-    input_ = in;
-    parametric_ = par;
-
     assert(debug());
   }
 }  // Namespace vita

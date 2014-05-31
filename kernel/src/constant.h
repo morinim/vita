@@ -26,8 +26,7 @@ namespace vita
   {
   public:
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal(c, t, false, false, k_base_weight),
-        val_(lexical_cast<T>(c)) {}
+      : terminal(c, t, k_base_weight), val_(lexical_cast<T>(c)) {}
     explicit constant(T c, category_t t = 0)
       : constant(std::to_string(c), t) {}
 
@@ -49,7 +48,7 @@ namespace vita
   {
   public:
     explicit constant(const std::string &c, category_t t = 0)
-      : terminal("\"" + c + "\"", t, false, false, k_base_weight), val_(c) {}
+      : terminal("\"" + c + "\"", t, k_base_weight), val_(c) {}
     explicit constant(const char c[], category_t t = 0)
       : constant(std::string(c), t) {}
 

@@ -27,8 +27,8 @@ namespace vita
   {
   public:
     variable(const std::string &name, unsigned var_id, category_t t = 0)
-      : terminal(name, t, true), var_(var_id)
-    {}
+      : terminal(name, t), var_(var_id)
+    { input_ = true; }
 
     ///
     /// \return the value of the variable (as a \c any).
