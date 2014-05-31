@@ -57,4 +57,4 @@ namespace vita
 
     return symbol::debug();
   }
-}  // Namespace vita
+}  // namespace vita

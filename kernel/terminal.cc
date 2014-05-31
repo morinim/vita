@@ -10,7 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/terminal.h"
+#if !defined(VITA_NO_LIB)
+#  include "kernel/terminal.h"
+#endif
 
 namespace vita
 {
@@ -19,9 +21,25 @@ namespace vita
   /// \param[in] c category of the terminal.
   /// \param[in] w weight used for symbol frequency control.
   ///
+  VITA_INLINE
   terminal::terminal(const std::string &dis, category_t c, unsigned w)
     : symbol(dis, c, w)
   {
     assert(debug());
   }
-}  // Namespace vita
+
+  ///
+  /// \return \c true if the \a function passes the internal consistency check.
+  ///
+  VITA_INLINE
+  bool terminal::debug() const
+  {
+    if (arity_)  // This is a terminal, so there shouldn't be arguments
+      return false;
+
+    if (associative_)
+      return false;
+
+    return symbol::debug();
+  }
+}  // namespace vita

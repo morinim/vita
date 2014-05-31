@@ -27,7 +27,14 @@ namespace vita
   {
   public:
     terminal(const std::string &, category_t, unsigned = k_base_weight);
+
+    virtual bool debug() const override;
   };
+
+#if defined(VITA_NO_LIB)
+#  include "terminal.cc"
+#endif
+
 }  // namespace vita
 
 #endif  // Include guard

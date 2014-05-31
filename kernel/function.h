@@ -39,30 +39,37 @@ namespace vita
     function(const std::string &, category_t, const std::vector<category_t> &,
              unsigned = k_base_weight);
 
-    ///
-    /// \param[in] i index of a function argument.
-    /// \return category of the i-th function argument.
-    ///
-    category_t arg_category(unsigned i) const
-    { assert(i < gene::k_args); return argt_[i]; }
+    category_t arg_category(unsigned) const;
 
     virtual bool debug() const override;
 
-    ///
-    /// \param[in] s symbol pointer.
-    /// \return \a s casted to a vita::function pointer.
-    ///
-    /// This is a short cut function.
-    ///
-    static const function *cast(const symbol *s)
-    {
-      assert(s->arity());
-      return static_cast<const function *>(s);
-    }
+    static const function *cast(const symbol *);
 
   private:  // Private data members.
     category_t argt_[gene::k_args];
   };
+
+  ///
+  /// \param[in] i index of a function argument.
+  /// \return category of the i-th function argument.
+  ///
+  inline category_t function::arg_category(unsigned i) const
+  {
+    assert(i < gene::k_args);
+    return argt_[i];
+  }
+
+  ///
+  /// \param[in] s symbol pointer.
+  /// \return \a s casted to a vita::function pointer.
+  ///
+  /// This is a short cut function.
+  ///
+  inline const function *function::cast(const symbol *s)
+  {
+    assert(s->arity());
+    return static_cast<const function *>(s);
+  }
 }  // namespace vita
 
 #if defined(VITA_NO_LIB)
