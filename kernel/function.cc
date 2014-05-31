@@ -26,18 +26,10 @@ namespace vita
   ///
   VITA_INLINE
   function::function(const std::string &dis, category_t c,
-                     const std::vector<category_t> &args)
-    : symbol(dis, c)
+                     std::vector<category_t> args)
+    : symbol(dis, c), argt_(std::move(args))
   {
-    assert(args.size() <= gene::k_args);
-
-    arity_ = static_cast<decltype(arity_)>(args.size());
-
-    for (auto i(decltype(arity_){0}); i < arity_; ++i)
-      argt_[i] = args[i];
-
-    // for (auto i(arity()); i < gene::k_args; ++i)
-    //   argt_[i] = std::numeric_limits<category_t>::max();
+    arity_ = static_cast<decltype(arity_)>(argt_.size());
 
     assert(debug());
   }
@@ -48,10 +40,7 @@ namespace vita
   VITA_INLINE
   bool function::debug() const
   {
-    if (!arity_)  // This is a function, we want some argument...
-      return false;
-
-    if (arity_ > gene::k_args)  // ... but not to much!
+    if (arity() == 0)  // This is a function, we want some argument...
       return false;
 
     return symbol::debug();

@@ -14,13 +14,10 @@
 #define      VITA_BOOL_PRIMITIVE_H
 
 #include <cstdlib>
-#include <limits>
-#include <sstream>
 #include <string>
 
 #include "kernel/function.h"
 #include "kernel/interpreter.h"
-#include "kernel/random.h"
 #include "kernel/terminal.h"
 
 namespace vita { namespace boolean

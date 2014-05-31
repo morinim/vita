@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "kernel/gene.h"
+#include "kernel/symbol.h"
 
 namespace vita
 {
@@ -36,7 +36,7 @@ namespace vita
   class function : public symbol
   {
   public:
-    function(const std::string &, category_t, const std::vector<category_t> &);
+    function(const std::string &, category_t, std::vector<category_t>);
 
     category_t arg_category(unsigned) const;
 
@@ -44,8 +44,8 @@ namespace vita
 
     static const function *cast(const symbol *);
 
-  private:  // Private data members.
-    category_t argt_[gene::k_args];
+  private:  // Private data members
+    std::vector<category_t> argt_;
   };
 
   ///
@@ -54,7 +54,7 @@ namespace vita
   ///
   inline category_t function::arg_category(unsigned i) const
   {
-    assert(i < gene::k_args);
+    assert(i < arity());
     return argt_[i];
   }
 
