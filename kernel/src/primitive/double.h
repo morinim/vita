@@ -100,7 +100,7 @@ namespace vita
     {
     public:
       explicit add(category_t t)
-        : function("FADD", t, {t, t}, k_base_weight, true) {}
+        : function("FADD", t, {t, t}, k_base_weight) { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -369,7 +369,7 @@ namespace vita
     {
     public:
       explicit mul(category_t t)
-        : function("FMUL", t, {t, t}, k_base_weight, true) {}
+        : function("FMUL", t, {t, t}, k_base_weight) { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {

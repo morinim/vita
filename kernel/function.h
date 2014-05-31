@@ -21,15 +21,15 @@
 namespace vita
 {
   ///
-  /// \brief A symbol used in GP
+  /// \brief A symbol (arity > 0) used in GP
   ///
   /// A \a function labels the internal (non-leaf) points of the parse trees
-  /// that represent the programs in the \a population. An example function set
-  /// might be {+,-,*}.
-  /// Each function should be able to handle gracefully all values it might
-  /// receive as input (this is called closure property).
+  /// that represent the programs in the population. An example function set
+  /// might be {+, -, *}.
   ///
   /// \warning
+  /// Each function should be able to handle gracefully all values it might
+  /// receive as input (this is called closure property).
   /// If there is a way to crash the system, the GP system will certainly hit
   /// upon hit.
   ///
@@ -37,7 +37,7 @@ namespace vita
   {
   public:
     function(const std::string &, category_t, const std::vector<category_t> &,
-             unsigned = k_base_weight, bool = false);
+             unsigned = k_base_weight);
 
     ///
     /// \param[in] i index of a function argument.

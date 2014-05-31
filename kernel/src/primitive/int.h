@@ -72,7 +72,7 @@ namespace vita
     {
     public:
       explicit add(category_t t)
-        : function("ADD", t, {t, t}, k_base_weight, true) {}
+        : function("ADD", t, {t, t}, k_base_weight) { associative_ = true; }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -183,7 +183,7 @@ namespace vita
     {
     public:
       explicit mul(category_t t)
-        : function("MUL", t, {t, t}, k_base_weight, true) {}
+        : function("MUL", t, {t, t}, k_base_weight) { associative_ = true; }
 
       any eval(interpreter<i_mep> *i) const
       {

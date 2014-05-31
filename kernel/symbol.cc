@@ -28,6 +28,7 @@ namespace vita
   /// - is NOT auto defined;
   /// - is NOT an input;
   /// - is NOT parametric.
+  /// These are safe values for derived classes.
   ///
   /// \warning
   /// The name of the symbol must be unique: it's used for serialization.

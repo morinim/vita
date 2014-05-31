@@ -24,19 +24,15 @@ namespace vita
   /// \param[in] args input parameters (type and number) of the function (in
   ///                 C++ they are called the "function signature").
   /// \param[in] w the weight of the function (used for random initialization).
-  /// \param[in] asve \c true if the function is associative (e.g. addition is
-  ///                 associative, division isn't).
   ///
   VITA_INLINE
   function::function(const std::string &dis, category_t c,
-                     const std::vector<category_t> &args, unsigned w,
-                     bool asve)
+                     const std::vector<category_t> &args, unsigned w)
     : symbol(dis, c, w)
   {
     assert(args.size() <= gene::k_args);
 
     arity_ = static_cast<decltype(arity_)>(args.size());
-    associative_ = asve;
 
     for (auto i(decltype(arity_){0}); i < arity_; ++i)
       argt_[i] = args[i];

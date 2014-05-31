@@ -28,29 +28,30 @@ namespace vita { namespace boolean
   class zero : public terminal
   {
   public:
-    zero() : terminal("0", sym_bool, false, false, default_weight) {}
+    explicit zero(category_t t) : terminal("0", t, default_weight) {}
 
     virtual std::string display() const override { return "0"; }
 
-    virtual any eval(interpreter<individual> *) const override { return false; }
+    virtual any eval(interpreter<i_mep> *) const override { return false; }
   };
 
   class one : public terminal
   {
   public:
-    one() : terminal("1", sym_bool, false, false, default_weight) {}
+    explicit one(category_t t) : terminal("1", t, default_weight) {}
 
     virtual std::string display() const override { return "1"; }
 
-    virtual any eval(interpreter<individual> *) const override { return true; }
+    virtual any eval(interpreter<i_mep> *) const override { return true; }
   };
 
   class and : public function
   {
   public:
-    and() : function("AND", sym_bool, 2, function::default_weight, true) {}
+    explicit and(category_t t) : function("AND", t, {t, t})
+    { associative_ = true; }
 
-    virtual any eval(interpreter<individual> *i) const override
+    virtual any eval(interpreter<i_mep> *i) const override
     {
       return any_cast<bool>(i->eval(0)) && any_cast<bool>(i->eval(1));
     }
@@ -59,18 +60,19 @@ namespace vita { namespace boolean
   class not : public function
   {
   public:
-    not() : function("NOT", sym_bool, 1) {}
+    explicit not(category_t t) : function("NOT", t, {t}) {}
 
-    virtual any eval(interpreter<individual> *i) const override
+    virtual any eval(interpreter<i_mep> *i) const override
     { return !any_cast<bool>(i->eval(0)); }
   };
 
   class or : public function
   {
   public:
-    or() : function("OR", sym_bool, 2, function::default_weight, true) {}
+    explicit or(category_t t) : function("OR", t, {t, t})
+    { associative_ = true; }
 
-    virtual any eval(interpreter<individual> *i) const override
+    virtual any eval(interpreter<i_mep> *i) const override
     {
       return any_cast<bool>(i->eval(0)) || any_cast<bool>(i->eval(1));
     }
