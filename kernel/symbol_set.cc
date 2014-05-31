@@ -368,7 +368,7 @@ namespace vita
   ///
   bool symbol_set::collection::debug() const
   {
-    std::uintmax_t check_sum(0);
+    decltype(sum) check_sum(0);
 
     for (auto s : symbols)
     {
