@@ -26,7 +26,7 @@ using i_interp = vita::interpreter<vita::i_mep>;
 class X : public vita::terminal
 {
 public:
-  X() : vita::terminal("X", 0, true) {}
+  X() : vita::terminal("X", 0) { input_ = true; }
 
   vita::any eval(i_interp *) const
   { return vita::any(val); }
@@ -37,7 +37,7 @@ public:
 class Y : public vita::terminal
 {
 public:
-  Y() : vita::terminal("Y", 0, true) {}
+  Y() : vita::terminal("Y", 0) { input_ = true; }
 
   vita::any eval(i_interp *) const
   { return vita::any(val); }
@@ -48,7 +48,7 @@ public:
 class Z : public vita::terminal
 {
 public:
-  Z() : vita::terminal("Z", 0, true) {}
+  Z() : vita::terminal("Z", 0) { input_ = true; }
 
   vita::any eval(i_interp *) const { return vita::any(val); }
 
