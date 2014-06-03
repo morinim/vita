@@ -39,8 +39,7 @@ namespace vita
     /// \param[in] v the value that must be casted to base type (\c base_t).
     ///
     /// Just a simple shortcut.
-    inline
-    base_t cast(const any &v) { return any_cast<base_t>(v); }
+    inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
     /// Integer ephemeral random constant.
@@ -49,9 +48,13 @@ namespace vita
     class number : public terminal
     {
     public:
-      explicit number(category_t t, int m = -128, int u = 127)
-        : terminal("INT", t), min(m), upp(u)
-      { assert(m < u); parametric_ = true; }
+      explicit number(const cvect &c, int m = -128, int u = 127)
+        : terminal("INT", c[0]), min(m), upp(u)
+      {
+        assert(c.size() == 1);
+        assert(m < u);
+        parametric_ = true;
+      }
 
       virtual double init() const override
       { return random::between<int>(min, upp); }
@@ -71,8 +74,11 @@ namespace vita
     class add : public function
     {
     public:
-      explicit add(category_t t) : function("ADD", t, {t, t})
-      { associative_ = true; }
+      explicit add(const cvect &c) : function("ADD", c[0], {c[0], c[0]})
+      {
+        assert(c.size() == 1);
+        associative_ = true;
+      }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -92,7 +98,8 @@ namespace vita
     class div : public function
     {
     public:
-      explicit div(category_t t) : function("DIV", t, {t, t}) {}
+      explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -110,8 +117,9 @@ namespace vita
     class ife : public function
     {
     public:
-      explicit ife(category_t t1, category_t t2)
-        : function("IFE", t2, {t1, t1, t2, t2}) {}
+      explicit ife(const cvect &c)
+        : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -128,8 +136,9 @@ namespace vita
     class ifl : public function
     {
     public:
-      explicit ifl(category_t t1, category_t t2)
-        : function("IFL", t2, {t1, t1, t2, t2}) {}
+      explicit ifl(const cvect &c)
+        : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -146,7 +155,8 @@ namespace vita
     class ifz : public function
     {
     public:
-      explicit ifz(category_t t) : function("IFZ", t, {t, t, t}) {}
+      explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
+      { assert(c.size() == 1); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -163,7 +173,8 @@ namespace vita
     class mod : public function
     {
     public:
-      explicit mod(category_t t) : function("MOD", t, {t, t}) {}
+      explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -182,7 +193,7 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(category_t t) : function("MUL", t, {t, t})
+      explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]})
       { associative_ = true; }
 
       any eval(interpreter<i_mep> *i) const
@@ -241,7 +252,8 @@ namespace vita
     class shl : public function
     {
     public:
-      explicit shl(category_t t) : function("SHL", t, {t, t}) {}
+      explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       any eval(interpreter<i_mep> *i) const
       {
@@ -261,7 +273,8 @@ namespace vita
     class sub : public function
     {
     public:
-      explicit sub(category_t t) : function("SUB", t, {t, t}) {}
+      explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       any eval(interpreter<i_mep> *i) const
       {

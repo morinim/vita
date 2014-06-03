@@ -35,35 +35,35 @@ namespace vita
   ///
   symbol_factory::symbol_factory()
   {
-    register_symbol1<dbl::abs>    ("FABS");
-    register_symbol1<dbl::add>    ("FADD");
-    register_symbol1<dbl::div>    ("FDIV");
-    register_symbol1<dbl::idiv>   ("FIDIV");
-    register_symbol2<dbl::ife>    ("FIFE");
-    register_symbol2<dbl::ifl>    ("FIFL");
-    register_symbol1<dbl::ifz>    ("FIFZ");
-    register_symbol2<dbl::length> ("FLENGTH");
-    register_symbol1<dbl::ln>     ("FLN");
-    register_symbol1<dbl::max>    ("FMAX");
-    register_symbol1<dbl::mod>    ("FMOD");
-    register_symbol1<dbl::mul>    ("FMUL");
-    register_symbol1<dbl::integer>("REAL");
-    register_symbol1<dbl::sin>    ("FSIN");
-    register_symbol1<dbl::sqrt>   ("FSQRT");
-    register_symbol1<dbl::sub>    ("FSUB");
+    register_symbol<dbl::abs>    ("FABS", 1);
+    register_symbol<dbl::add>    ("FADD", 1);
+    register_symbol<dbl::div>    ("FDIV", 1);
+    register_symbol<dbl::idiv>   ("FIDIV", 1);
+    register_symbol<dbl::ife>    ("FIFE", 2);
+    register_symbol<dbl::ifl>    ("FIFL", 2);
+    register_symbol<dbl::ifz>    ("FIFZ", 1);
+    register_symbol<dbl::length> ("FLENGTH", 2);
+    register_symbol<dbl::ln>     ("FLN", 1);
+    register_symbol<dbl::max>    ("FMAX", 1);
+    register_symbol<dbl::mod>    ("FMOD", 1);
+    register_symbol<dbl::mul>    ("FMUL", 1);
+    register_symbol<dbl::integer>("REAL", 1);
+    register_symbol<dbl::sin>    ("FSIN", 1);
+    register_symbol<dbl::sqrt>   ("FSQRT", 1);
+    register_symbol<dbl::sub>    ("FSUB", 1);
 
-    register_symbol1<integer::add>   ("ADD");
-    register_symbol1<integer::div>   ("DIV");
-    register_symbol2<integer::ife>   ("IFE");
-    register_symbol2<integer::ifl>   ("IFL");
-    register_symbol1<integer::ifz>   ("IFZ");
-    register_symbol1<integer::mod>   ("MOD");
-    register_symbol1<integer::mul>   ("MUL");
-    register_symbol1<integer::number>("INT");
-    register_symbol1<integer::shl>   ("SHL");
-    register_symbol1<integer::sub>   ("SUB");
+    register_symbol<integer::add>   ("ADD", 1);
+    register_symbol<integer::div>   ("DIV", 1);
+    register_symbol<integer::ife>   ("IFE", 2);
+    register_symbol<integer::ifl>   ("IFL", 2);
+    register_symbol<integer::ifz>   ("IFZ", 1);
+    register_symbol<integer::mod>   ("MOD", 1);
+    register_symbol<integer::mul>   ("MUL", 1);
+    register_symbol<integer::number>("INT", 1);
+    register_symbol<integer::shl>   ("SHL", 1);
+    register_symbol<integer::sub>   ("SUB", 1);
 
-    register_symbol2<str::ife>("SIFE");
+    register_symbol<str::ife>("SIFE", 2);
   }
 
   ///
@@ -125,34 +125,33 @@ namespace vita
   ///   for object creation, changing factories is as easy as changing the
   ///   singleton object.
   ///
-  std::unique_ptr<symbol> symbol_factory::make(
-    const std::string &name, const std::vector<category_t> &c)
+  std::unique_ptr<symbol> symbol_factory::make(const std::string &name,
+                                               cvect c)
   {
+    assert(!name.empty());
+    assert(!c.empty());
+
     const map_key k(boost::to_upper_copy(name));
 
-    const category_t c1(c.size() > 0 ? c[0] : 0);
-    const category_t c2(c.size() > 1 ? c[1] : 0);
-
-    const auto it1(factory1_.find(k));
-    if (it1 != factory1_.end())
-      return (it1->second)(c1);
-    else
+    const auto it(factory_.find(k));
+    if (it != factory_.end())
     {
-      const auto it2(factory2_.find(k));
-      if (it2 != factory2_.end())
-        return (it2->second)(c1, c2);
+      while (c.size() < it->second.n)
+        c.push_back(category_t(0));
+
+      return (it->second.f)(c);
     }
 
     switch (find_domain(k))
     {
     case domain_t::d_bool:
-      return make_unique<constant<bool>>(k, c1);
+      return make_unique<constant<bool>>(k, c[0]);
     case domain_t::d_double:
-      return make_unique<constant<double>>(k, c1);
+      return make_unique<constant<double>>(k, c[0]);
     case domain_t::d_int:
-      return make_unique<constant<int>>(k, c1);
+      return make_unique<constant<int>>(k, c[0]);
     case domain_t::d_string:
-      return make_unique<constant<std::string>>(name, c1);
+      return make_unique<constant<std::string>>(name, c[0]);
     default:
       return nullptr;
     }
@@ -175,9 +174,9 @@ namespace vita
     switch (d)
     {
     case domain_t::d_double:
-      return make_unique<dbl::integer>(c, min, max);
+      return make_unique<dbl::integer>(cvect{c}, min, max);
     case domain_t::d_int:
-      return make_unique<integer::number>(c, min, max);
+      return make_unique<integer::number>(cvect{c}, min, max);
     default:
       return nullptr;
     }
@@ -190,8 +189,9 @@ namespace vita
   unsigned symbol_factory::args(const std::string &name) const
   {
     const map_key k(boost::to_upper_copy(name));
+    const auto it(factory_.find(k));
 
-    return factory2_.find(k) == factory2_.end() ? 1 : 2;
+    return it == factory_.end() ? 1 : it->second.n;
   }
 
   ///
@@ -206,6 +206,6 @@ namespace vita
   {
     const map_key k(boost::to_upper_copy(name));
 
-    return factory1_.erase(k) == 1 || factory2_.erase(k) == 1;
+    return factory_.erase(k) == 1;
   }
 }  // namespace vita

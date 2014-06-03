@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <vector>
 
 #include "kernel/compatibility_patch.h"
 
@@ -47,6 +48,11 @@ namespace vita
   /// category "kg").
   /// Categories are the way strong typing GP is implemented in Vita.
   using category_t = unsigned;
+
+  ///
+  /// A useful shortcut for a group of categories.
+  ///
+  using cvect = std::vector<category_t>;
 
   /// Index in the genome. Locus is uniquely identified by a couple of indexes.
   using index_t = unsigned;

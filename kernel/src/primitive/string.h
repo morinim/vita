@@ -31,8 +31,9 @@ namespace vita
     class ife : public function
     {
     public:
-      explicit ife(category_t t1, category_t t2)
-        : function("SIFE", t2, {t1, t1, t2, t2}) {}
+      explicit ife(const cvect &c)
+        : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {

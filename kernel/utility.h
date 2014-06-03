@@ -193,8 +193,8 @@ namespace vita
   ///
   /// \param[in] v1 a floating point number.
   /// \param[in] v2 a floating point number.
-  /// \param[in] epsilon max relative error. If we want 99.999% accuracy then
-  ///                    we should pass a \a epsilon of 0.00001.
+  /// \param[in] e max relative error. If we want 99.999% accuracy then we
+  ///              should pass a \a e of 0.00001.
   /// \return \c true if the difference between \a v1 and \a v2 is "small"
   ///         compared to their magnitude.
   ///
@@ -203,7 +203,7 @@ namespace vita
   /// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
   ///
   template<class T>
-  bool almost_equal(T v1, T v2, T epsilon = 0.00001)
+  bool almost_equal(T v1, T v2, T e = 0.00001)
   {
     const T diff(std::abs(v1 - v2));
 
@@ -220,7 +220,7 @@ namespace vita
     // the largest of the two numbers.
     const T largest(std::max(v1, v2));
 
-    return diff <= largest * epsilon;
+    return diff <= largest * e;
   }
 }  // namespace vita
 

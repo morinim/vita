@@ -38,24 +38,24 @@ struct F_FACTORY3
 
     static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    c0 = sset.insert(factory.make("0.0", {}));
-    c1 = sset.insert(factory.make("1.0", {}));
-    c2 = sset.insert(factory.make("2.0", {}));
-    c3 = sset.insert(factory.make("3.0", {}));
-    x = sset.insert(factory.make("123.0", {}));
-    neg_x = sset.insert(factory.make("-123.0", {}));
-    y = sset.insert(factory.make("321.0", {}));
+    c0 = sset.insert(factory.make("0.0"));
+    c1 = sset.insert(factory.make("1.0"));
+    c2 = sset.insert(factory.make("2.0"));
+    c3 = sset.insert(factory.make("3.0"));
+    x = sset.insert(factory.make("123.0"));
+    neg_x = sset.insert(factory.make("-123.0"));
+    y = sset.insert(factory.make("321.0"));
     z = sset.insert(vita::make_unique<Z>());
-    f_abs = sset.insert(factory.make("FABS", {}));
-    f_add = sset.insert(factory.make("FADD", {}));
-    f_div = sset.insert(factory.make("FDIV", {}));
-    f_idiv = sset.insert(factory.make("FIDIV", {}));
-    f_ife = sset.insert(factory.make("FIFE", {}));
-    f_ln = sset.insert(factory.make("FLN", {}));
-    f_max = sset.insert(factory.make("FMAX", {}));
-    f_mul = sset.insert(factory.make("FMUL", {}));
-    f_sqrt = sset.insert(factory.make("FSQRT", {}));
-    f_sub = sset.insert(factory.make("FSUB", {}));
+    f_abs = sset.insert(factory.make("FABS"));
+    f_add = sset.insert(factory.make("FADD"));
+    f_div = sset.insert(factory.make("FDIV"));
+    f_idiv = sset.insert(factory.make("FIDIV"));
+    f_ife = sset.insert(factory.make("FIFE"));
+    f_ln = sset.insert(factory.make("FLN"));
+    f_max = sset.insert(factory.make("FMAX"));
+    f_mul = sset.insert(factory.make("FMUL"));
+    f_sqrt = sset.insert(factory.make("FSQRT"));
+    f_sub = sset.insert(factory.make("FSUB"));
 
     env.code_length = 32;
   }

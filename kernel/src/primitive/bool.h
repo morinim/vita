@@ -25,7 +25,8 @@ namespace vita { namespace boolean
   class zero : public terminal
   {
   public:
-    explicit zero(category_t t) : terminal("0", t) {}
+    explicit zero(const cvect &c) : terminal("0", c[0])
+    { assert(c.size() == 1); }
 
     virtual std::string display() const override { return "0"; }
 
@@ -35,7 +36,8 @@ namespace vita { namespace boolean
   class one : public terminal
   {
   public:
-    explicit one(category_t t) : terminal("1", t) {}
+    explicit one(const cvect &c) : terminal("1", c[0])
+    { assert(c.size() == 1); }
 
     virtual std::string display() const override { return "1"; }
 
@@ -45,8 +47,11 @@ namespace vita { namespace boolean
   class and : public function
   {
   public:
-    explicit and(category_t t) : function("AND", t, {t, t})
-    { associative_ = true; }
+    explicit and(const cvect &c) : function("AND", c[0], {c[0], c[0]})
+    {
+      assert(c.size() == 1);
+      associative_ = true;
+    }
 
     virtual any eval(interpreter<i_mep> *i) const override
     {
@@ -57,7 +62,8 @@ namespace vita { namespace boolean
   class not : public function
   {
   public:
-    explicit not(category_t t) : function("NOT", t, {t}) {}
+    explicit not(const cvect &c) : function("NOT", c[0], {c[0]})
+    { assert(c.size() == 1); }
 
     virtual any eval(interpreter<i_mep> *i) const override
     { return !any_cast<bool>(i->eval(0)); }
@@ -66,8 +72,11 @@ namespace vita { namespace boolean
   class or : public function
   {
   public:
-    explicit or(category_t t) : function("OR", t, {t, t})
-    { associative_ = true; }
+    explicit or(const cvect &c) : function("OR", c[0], {c[0], c[0]})
+    {
+      assert(c.size() == 1);
+      associative_ = true;
+    }
 
     virtual any eval(interpreter<i_mep> *i) const override
     {

@@ -83,10 +83,10 @@ namespace vita { namespace random
   {
     switch (d)
     {
-    case uniform:
+    case distribution::uniform:
       return between(p1, p2);
 
-    case normal:
+    case distribution::normal:
       return std::normal_distribution<T>(p1, p2)(engine());
     }
   }

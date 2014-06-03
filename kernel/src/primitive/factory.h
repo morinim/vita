@@ -41,37 +41,33 @@ namespace vita
   public:
     static symbol_factory &instance();
 
-    std::unique_ptr<symbol> make(
-      const std::string &,
-      const std::vector<category_t> & = std::vector<category_t>());
+    std::unique_ptr<symbol> make(const std::string &, cvect = cvect{0});
     std::unique_ptr<symbol> make(domain_t, int, int, category_t = 0);
 
     unsigned args(const std::string &) const;
 
-    template<class T> bool register_symbol1(const std::string &);
-    template<class T> bool register_symbol2(const std::string &);
-
+    template<class> bool register_symbol(const std::string &, unsigned);
     bool unregister_symbol(const std::string &);
 
-  private:
-    DISALLOW_COPY_AND_ASSIGN(symbol_factory);
+  private:  // Private support methods
     symbol_factory();
+    DISALLOW_COPY_AND_ASSIGN(symbol_factory);
 
-    typedef std::unique_ptr<symbol> (*make_func1)(category_t);
-    typedef std::unique_ptr<symbol> (*make_func2)(category_t, category_t);
+    using build_func = std::unique_ptr<symbol> (*)(const cvect &);
 
-    template<class T> static std::unique_ptr<symbol> make1(category_t c)
+    template<class T> static std::unique_ptr<symbol> build(const cvect &c)
     { return make_unique<T>(c); }
 
-    template<class T> static std::unique_ptr<symbol> make2(category_t c1,
-                                                           category_t c2)
-    { return make_unique<T>(c1, c2); }
+  private:  // Private data members
+    using map_key = std::string;
 
-  private:  // Private data members.
-    typedef std::string map_key;
+    struct build_info
+    {
+      build_func f;
+      unsigned   n;
+    };
 
-    std::map<map_key, make_func1> factory1_;
-    std::map<map_key, make_func2> factory2_;
+    std::map<map_key, build_info> factory_;
   };
 
   ///
@@ -79,27 +75,14 @@ namespace vita
   /// \return \c true if the symbol \a T has been added to the factory.
   ///
   template<class T>
-  bool symbol_factory::register_symbol1(const std::string &name)
+  bool symbol_factory::register_symbol(const std::string &name, unsigned n)
   {
     const map_key k(boost::to_upper_copy(name));
 
-    const bool missing(factory1_.find(k) == factory1_.end());
+    const bool missing(factory_.find(k) == factory_.end());
 
     if (missing)
-      factory1_[k] = &make1<T>;
-
-    return missing;
-  }
-
-  template<class T>
-  bool symbol_factory::register_symbol2(const std::string &name)
-  {
-    const map_key k(boost::to_upper_copy(name));
-
-    const bool missing(factory2_.find(k) == factory2_.end());
-
-    if (missing)
-      factory2_[k] = &make2<T>;
+      factory_[k] = {&build<T>, n};
 
     return missing;
   }

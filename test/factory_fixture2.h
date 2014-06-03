@@ -1,14 +1,13 @@
 /**
- *
- *  \file factory_fixture2.h
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
  *
+ *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #if !defined FACTORY_FIXTURE2_H
@@ -26,12 +25,12 @@ struct F_FACTORY2
 
     vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    sset.insert(factory.make("REAL", {}));
-    sset.insert(factory.make("FADD", {}));
-    sset.insert(factory.make("FSUB", {}));
-    sset.insert(factory.make("FMUL", {}));
-    sset.insert(factory.make("FIFL", {}));
-    sset.insert(factory.make("FIFE", {}));
+    sset.insert(factory.make("REAL"));
+    sset.insert(factory.make("FADD"));
+    sset.insert(factory.make("FSUB"));
+    sset.insert(factory.make("FMUL"));
+    sset.insert(factory.make("FIFL"));
+    sset.insert(factory.make("FIFE"));
   }
 
   ~F_FACTORY2()

@@ -59,9 +59,13 @@ namespace vita
     class real : public terminal
     {
     public:
-      explicit real(category_t t, base_t m = -1000.0, base_t u = 1000.0)
-        : terminal("REAL", t), min(m), upp(u)
-      { assert(m < u); parametric_ = true; }
+      explicit real(const cvect &c, base_t m = -1000.0, base_t u = 1000.0)
+        : terminal("REAL", c[0]), min(m), upp(u)
+      {
+        assert(c.size() == 1);
+        assert(m < u);
+        parametric_ = true;
+      }
 
       virtual double init() const override
       { return random::between<base_t>(min, upp); }
@@ -85,9 +89,13 @@ namespace vita
     class integer : public terminal
     {
     public:
-      explicit integer(category_t t, int m = -128, int u = 127)
-        : terminal("REAL", t), min(m), upp(u)
-      { assert(m < u); parametric_ = true; }
+      explicit integer(const cvect &c, int m = -128, int u = 127)
+        : terminal("REAL", c[0]), min(m), upp(u)
+      {
+        assert(c.size() == 1);
+        assert(m < u);
+        parametric_ = true;
+      }
 
       virtual double init() const override
       { return random::between<int>(min, upp); }
@@ -109,7 +117,8 @@ namespace vita
     class abs : public function
     {
     public:
-      explicit abs(category_t t) : function("FABS", t, {t}) {}
+      explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -125,7 +134,7 @@ namespace vita
     class add : public function
     {
     public:
-      explicit add(category_t t) : function("FADD", t, {t, t})
+      explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]})
       { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
@@ -149,7 +158,8 @@ namespace vita
     class div : public function
     {
     public:
-      explicit div(category_t t) : function("FDIV", t, {t, t}) {}
+      explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -172,7 +182,8 @@ namespace vita
     class idiv : public function
     {
     public:
-      explicit idiv(category_t t) : function("FIDIV", t, {t, t}) {}
+      explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -197,9 +208,9 @@ namespace vita
     class ifb : public function
     {
     public:
-      ifb(category_t t1, category_t t2)
-        : function("FIFB", t2, {t1, t1, t1, t2, t2})
-      { assert(gene::k_args > 4); }
+      explicit ifb(const cvect &c)
+        : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -232,8 +243,9 @@ namespace vita
     class ife : public function
     {
     public:
-      ife(category_t t1, category_t t2)
-        : function("FIFE", t2, {t1, t1, t2, t2}) {}
+      explicit ife(const cvect &c)
+        : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -256,8 +268,9 @@ namespace vita
     class ifl : public function
     {
     public:
-      ifl(category_t t1, category_t t2)
-        : function("FIFL", t2, {t1, t1, t2, t2}) {}
+      explicit ifl(const cvect &c)
+        : function("FIFL", c[1], {c[0], c[0], c[1], c[1]})
+      { assert(c.size() == 2); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -285,7 +298,8 @@ namespace vita
     class ifz : public function
     {
     public:
-      explicit ifz(category_t t) : function("FIFZ", t, {t, t, t}) {}
+      explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -305,8 +319,8 @@ namespace vita
     class length : public function
     {
     public:
-      explicit length(category_t t1, category_t t2)
-        : function("FLENGTH", t2, {t1}) {}
+      explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
+      { assert(c.size() == 2); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -323,7 +337,7 @@ namespace vita
     class ln : public function
     {
     public:
-      explicit ln(category_t t) : function("FLN", t, {t})
+      explicit ln(const cvect &c) : function("FLN", c[0], {c[0]})
       { weight = k_base_weight / 2; }
 
       ///
@@ -349,7 +363,8 @@ namespace vita
     class max : public function
     {
     public:
-      explicit max(category_t t) : function("FMAX", t, {t, t}) {}
+      explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -372,7 +387,8 @@ namespace vita
     class mod : public function
     {
     public:
-      explicit mod(category_t t) : function("FMOD", t, {t, t}) {}
+      explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -395,7 +411,7 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(category_t t) : function("FMUL", t, {t, t})
+      explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]})
       { associative_ = true; }
 
       virtual any eval(interpreter<i_mep> *i) const override
@@ -419,7 +435,8 @@ namespace vita
     class sin : public function
     {
     public:
-      explicit sin(category_t t) : function("FSIN", t, {t}) {}
+      explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -436,7 +453,8 @@ namespace vita
     class sqrt : public function
     {
     public:
-      explicit sqrt(category_t t) : function("FSQRT", t, {t}) {}
+      explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {
@@ -457,7 +475,8 @@ namespace vita
     class sub : public function
     {
     public:
-      explicit sub(category_t t) : function("FSUB", t, {t, t}) {}
+      explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
+      { assert(c.size() == 1); }
 
       virtual any eval(interpreter<i_mep> *i) const override
       {

@@ -38,19 +38,19 @@ struct F_FACTORY4
 
     static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
-    c0 = sset.insert(factory.make("0", {}));
-    c1 = sset.insert(factory.make("1", {}));
-    c2 = sset.insert(factory.make("2", {}));
-    c3 = sset.insert(factory.make("3", {}));
-    x = sset.insert(factory.make("123", {}));
-    neg_x = sset.insert(factory.make("-123", {}));
-    y = sset.insert(factory.make("321", {}));
+    c0 = sset.insert(factory.make("0"));
+    c1 = sset.insert(factory.make("1"));
+    c2 = sset.insert(factory.make("2"));
+    c3 = sset.insert(factory.make("3"));
+    x = sset.insert(factory.make("123"));
+    neg_x = sset.insert(factory.make("-123"));
+    y = sset.insert(factory.make("321"));
     z = sset.insert(vita::make_unique<Z>());
-    i_add = sset.insert(factory.make("ADD", {}));
-    i_div = sset.insert(factory.make("DIV", {}));
-    i_ife = sset.insert(factory.make("IFE", {}));
-    i_mul = sset.insert(factory.make("MUL", {}));
-    i_sub = sset.insert(factory.make("SUB", {}));
+    i_add = sset.insert(factory.make("ADD"));
+    i_div = sset.insert(factory.make("DIV"));
+    i_ife = sset.insert(factory.make("IFE"));
+    i_mul = sset.insert(factory.make("MUL"));
+    i_sub = sset.insert(factory.make("SUB"));
 
     env.code_length = 32;
   }
