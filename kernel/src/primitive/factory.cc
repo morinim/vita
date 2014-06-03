@@ -35,22 +35,22 @@ namespace vita
   ///
   symbol_factory::symbol_factory()
   {
-    register_symbol1<dbl::abs>   ("FABS");
-    register_symbol1<dbl::add>   ("FADD");
-    register_symbol1<dbl::div>   ("FDIV");
-    register_symbol1<dbl::idiv>  ("FIDIV");
-    register_symbol2<dbl::ife>   ("FIFE");
-    register_symbol2<dbl::ifl>   ("FIFL");
-    register_symbol1<dbl::ifz>   ("FIFZ");
-    register_symbol2<dbl::length>("FLENGTH");
-    register_symbol1<dbl::ln>    ("FLN");
-    register_symbol1<dbl::max>   ("FMAX");
-    register_symbol1<dbl::mod>   ("FMOD");
-    register_symbol1<dbl::mul>   ("FMUL");
-    register_symbol1<dbl::real>  ("REAL");
-    register_symbol1<dbl::sin>   ("FSIN");
-    register_symbol1<dbl::sqrt>  ("FSQRT");
-    register_symbol1<dbl::sub>   ("FSUB");
+    register_symbol1<dbl::abs>    ("FABS");
+    register_symbol1<dbl::add>    ("FADD");
+    register_symbol1<dbl::div>    ("FDIV");
+    register_symbol1<dbl::idiv>   ("FIDIV");
+    register_symbol2<dbl::ife>    ("FIFE");
+    register_symbol2<dbl::ifl>    ("FIFL");
+    register_symbol1<dbl::ifz>    ("FIFZ");
+    register_symbol2<dbl::length> ("FLENGTH");
+    register_symbol1<dbl::ln>     ("FLN");
+    register_symbol1<dbl::max>    ("FMAX");
+    register_symbol1<dbl::mod>    ("FMOD");
+    register_symbol1<dbl::mul>    ("FMUL");
+    register_symbol1<dbl::integer>("REAL");
+    register_symbol1<dbl::sin>    ("FSIN");
+    register_symbol1<dbl::sqrt>   ("FSQRT");
+    register_symbol1<dbl::sub>    ("FSUB");
 
     register_symbol1<integer::add>   ("ADD");
     register_symbol1<integer::div>   ("DIV");
@@ -175,7 +175,7 @@ namespace vita
     switch (d)
     {
     case domain_t::d_double:
-      return make_unique<dbl::real>(c, min, max);
+      return make_unique<dbl::integer>(c, min, max);
     case domain_t::d_int:
       return make_unique<integer::number>(c, min, max);
     default:

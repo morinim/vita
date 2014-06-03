@@ -59,7 +59,33 @@ namespace vita
     class real : public terminal
     {
     public:
-      explicit real(category_t t, int m = -128, int u = 127)
+      explicit real(category_t t, base_t m = -1000, base_t u = 1000)
+        : terminal("REAL", t), min(m), upp(u)
+      { assert(m < u); parametric_ = true; }
+
+      virtual double init() const override
+      { return random::between<base_t>(min, upp); }
+
+      virtual std::string display(double v) const override
+      { return std::to_string(v); }
+
+      virtual any eval(interpreter<i_mep> *i) const override
+      { return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+
+    private: // Private data members.
+      const base_t min, upp;
+    };
+
+    ///
+    /// \brief Ephemeral random integer constant
+    ///
+    /// This is like dbl::real but restricted to integer numbers.
+    ///
+    class integer : public terminal
+    {
+    public:
+      explicit integer(category_t t, int m = -128, int u = 127)
         : terminal("REAL", t), min(m), upp(u)
       { assert(m < u); parametric_ = true; }
 
