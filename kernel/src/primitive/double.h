@@ -59,7 +59,7 @@ namespace vita
     class real : public terminal
     {
     public:
-      explicit real(category_t t, base_t m = -1000, base_t u = 1000)
+      explicit real(category_t t, base_t m = -1000.0, base_t u = 1000.0)
         : terminal("REAL", t), min(m), upp(u)
       { assert(m < u); parametric_ = true; }
 
@@ -73,7 +73,7 @@ namespace vita
       { return any(static_cast<base_t>(
                      any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
-    private: // Private data members.
+    private: // Private data members
       const base_t min, upp;
     };
 
@@ -99,7 +99,7 @@ namespace vita
       { return any(static_cast<base_t>(
                      any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
-    private: // Private data members.
+    private: // Private data members
       const int min, upp;
     };
 

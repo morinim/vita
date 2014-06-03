@@ -21,6 +21,8 @@
 
 namespace vita { namespace random
 {
+  enum class distribution {uniform, normal};
+
   template<class T> T between(T, T);
   template<class T> T sup(T);
 
@@ -67,6 +69,29 @@ namespace vita { namespace random
   }
 
   ///
+  /// \param[in] d type of distribution.
+  /// \param[in] p1 minimum for uniform distribution, mean for normal
+  ///               distribution.
+  /// \param[in] p2 maximum for uniform distribution, standard deviation for
+  ///               normal distribution.
+  /// \return a random number distributed according to \a d distribution.
+  ///
+  /// This is used for ephemeral random constant generation.
+  ///
+  template<class T>
+  T ephemeral(distribution d, T p1, T p2)
+  {
+    switch (d)
+    {
+    case uniform:
+      return between(p1, p2);
+
+    case normal:
+      return std::normal_distribution<T>(p1, p2)(engine());
+    }
+  }
+
+  ///
   /// \param[in] min minimum random number.
   /// \param[in] sup upper bound.
   /// \return a random \c double in the [min;sup[ range.
@@ -79,8 +104,7 @@ namespace vita { namespace random
   /// for further details.
   ///
   template<>
-  inline
-  double between(double min, double sup)
+  inline double between(double min, double sup)
   {
     assert(min < sup);
 
@@ -164,8 +188,7 @@ namespace vita { namespace random
   ///
   /// bool values are produced according to the Bernoulli distribution.
   ///
-  inline
-  bool boolean(double p)
+  inline bool boolean(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
