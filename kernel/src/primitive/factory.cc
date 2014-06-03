@@ -47,7 +47,7 @@ namespace vita
     register_symbol1<dbl::max>   ("FMAX");
     register_symbol1<dbl::mod>   ("FMOD");
     register_symbol1<dbl::mul>   ("FMUL");
-    register_symbol1<dbl::number>("REAL");
+    register_symbol1<dbl::real>  ("REAL");
     register_symbol1<dbl::sin>   ("FSIN");
     register_symbol1<dbl::sqrt>  ("FSQRT");
     register_symbol1<dbl::sub>   ("FSUB");
@@ -175,7 +175,7 @@ namespace vita
     switch (d)
     {
     case domain_t::d_double:
-      return make_unique<dbl::number>(c, min, max);
+      return make_unique<dbl::real>(c, min, max);
     case domain_t::d_int:
       return make_unique<integer::number>(c, min, max);
     default:

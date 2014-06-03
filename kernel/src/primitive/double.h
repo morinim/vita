@@ -56,10 +56,10 @@ namespace vita
     /// these random constants are moved around from genome to genome by the
     /// crossover operator.
     ///
-    class number : public terminal
+    class real : public terminal
     {
     public:
-      explicit number(category_t t, int m = -128, int u = 127)
+      explicit real(category_t t, int m = -128, int u = 127)
         : terminal("REAL", t), min(m), upp(u)
       { assert(m < u); parametric_ = true; }
 
