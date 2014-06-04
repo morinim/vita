@@ -31,13 +31,13 @@ namespace vita
     // return a null pointer rather than throw if the cast fails).
     // The alternatives are a.type() == typeid(double)... or try/catch and
     // both seems inferior.
-    if (auto *p = any_cast<double>(&a))
+    if (auto *p = anycast<double>(&a))
       return *p;
 
-    if (auto *p = any_cast<int>(&a))
+    if (auto *p = anycast<int>(&a))
       return static_cast<double>(*p);
 
-    if (auto *p = any_cast<bool>(&a))
+    if (auto *p = anycast<bool>(&a))
       return static_cast<double>(*p);
 
     return 0.0;
@@ -53,15 +53,15 @@ namespace vita
   template<>
   std::string to<std::string>(const any &a)
   {
-    if (auto *p = any_cast<double>(&a))
+    if (auto *p = anycast<double>(&a))
       return std::to_string(*p);
 
-    if (auto *p = any_cast<int>(&a))
+    if (auto *p = anycast<int>(&a))
       return std::to_string(*p);
 
-    if (auto *p = any_cast<bool>(&a))
+    if (auto *p = anycast<bool>(&a))
       return std::to_string(*p);
 
-    return any_cast<std::string>(a);
+    return anycast<std::string>(a);
   }
 }  // namespace vita

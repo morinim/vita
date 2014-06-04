@@ -87,7 +87,7 @@ namespace vita { namespace detail
     mutable src_interpreter<T> int_;
 
   public:   // Serialization
-    constexpr bool load(std::istream &) { return false; }
+    constexpr bool load(std::istream &) const { return false; }
     constexpr bool save(std::ostream &) const { return false; }
   };
 
@@ -183,7 +183,7 @@ namespace vita { namespace detail
   class class_names
   {
   public:   // Serialization
-    constexpr bool load(std::istream &) { return true; }
+    constexpr bool load(std::istream &) const { return true; }
     constexpr bool save(std::ostream &) const { return true; }
 
   protected:
@@ -286,7 +286,7 @@ namespace vita { namespace detail
   template<bool N>
   std::string class_names<N>::string(const any &a) const
   {
-    return std::to_string(any_cast<class_t>(a));
+    return std::to_string(anycast<class_t>(a));
   }
 
   ///
@@ -301,7 +301,7 @@ namespace vita { namespace detail
     // template specializations. So we haven't to put template<> at the
     // beginning.
 
-    return names_[any_cast<class_t>(a)];
+    return names_[anycast<class_t>(a)];
   }
 }}  // namespace vita::detail
 

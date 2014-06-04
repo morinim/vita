@@ -39,7 +39,7 @@ namespace vita
     /// \param[in] v the value that must be casted to base type (\c base_t).
     ///
     /// Just a simple shortcut.
-    inline base_t cast(const any &v) { return any_cast<base_t>(v); }
+    inline base_t cast(const any &v) { return anycast<base_t>(v); }
 
     ///
     /// Integer ephemeral random constant.
@@ -64,7 +64,7 @@ namespace vita
 
       virtual any eval(interpreter<i_mep> *i) const override
       { return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+                     anycast<decltype(gene::par)>(i->fetch_param()))); }
 
     private:  // Private data members.
       const int min, upp;

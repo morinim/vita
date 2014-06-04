@@ -43,7 +43,7 @@ namespace vita
         const any v1(i->fetch_arg(1));
         if (v1.empty())  return v1;
 
-        if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
+        if (anycast<std::string>(v0) == anycast<std::string>(v1))
           return i->fetch_arg(2);
         else
           return i->fetch_arg(3);
