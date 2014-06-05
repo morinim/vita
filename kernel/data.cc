@@ -141,7 +141,7 @@ namespace vita
   ///
   data::const_iterator data::begin() const
   {
-    return dataset_[dataset()].cbegin();
+    return dataset_[dataset()].begin();
   }
 
   ///
@@ -225,7 +225,6 @@ namespace vita
 
     auto &d(dataset_[dataset()]);
     std::sort(d.begin(), d.end(), f);
-    //dataset_[dataset()].sort(f);
 
     slice(partition_size);
   }
@@ -237,17 +236,23 @@ namespace vita
   /// Splits the dataset in two subsets (training set, validation set)
   /// according to the \a r ratio.
   ///
+  /// \attention
+  /// The procedure resets active slices.
+  ///
   void data::divide(unsigned percentage)
   {
     assert(percentage < 100);
 
+    if (!percentage)
+      return;
+
     // Validation set items are moved to the training set.
     std::move(dataset_[validation].begin(), dataset_[validation].end(),
               std::back_inserter(dataset_[training]));
-    dataset_[validation].erase(dataset_[validation].begin(),
-                               dataset_[validation].end());
+    dataset_[validation].clear();
 
-    if (percentage)
+    auto available(dataset_[training].size());
+    if (available)
     {
       // The requested validation examples are selected (the algorithm hint is
       // due to Kyle Cronin):
@@ -259,30 +264,47 @@ namespace vita
       // > selected. If it is, the next has a 4/39 chance, otherwise it has a
       // > 5/39 chance. By the time you get to the end you will have your 5
       // > items, and often you'll have all of them before that.
-      auto available(dataset_[training].size());
 
-      const decltype(available) k(available * percentage / 100);
-      assert(k <= available);
+      auto needed(available * percentage / 100);
+      assert(needed < available);
+/*
+      std::random_shuffle(dataset_[training].begin(),
+                          dataset_[training].end());
 
-      auto needed(k);
+      std::move(std::prev(dataset_[training].end(), needed),
+                dataset_[training].end(),
+                std::back_inserter(dataset_[validation]));
 
+      dataset_[training].erase(std::prev(dataset_[training].end(), needed),
+                               dataset_[training].end());
+
+*/
       auto iter(dataset_[training].begin());
-      while (dataset_[validation].size() < k)
+      while (needed)
       {
-        if (random::boolean(static_cast<double>(needed) /
+        assert(available);
+
+        if (needed == available ||
+            random::boolean(static_cast<double>(needed) /
                             static_cast<double>(available)))
         {   // selected
           dataset_[validation].push_back(*iter);
           iter = dataset_[training].erase(iter);
+
           --needed;
         }
         else  // not selected
           ++iter;
 
+        assert(dataset_[training].begin() <= iter);
+        assert(iter < dataset_[training].end());
+
         --available;
       }
 
       assert(!needed);
+
+      std::fill(slice_.begin(), slice_.end(), 0);
     }
   }
 
