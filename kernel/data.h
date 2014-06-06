@@ -158,7 +158,7 @@ namespace vita
     std::uintmax_t  difficulty;
     unsigned               age;
 
-    class_t tag() const { return anycast<class_t>(output); }
+    class_t tag() const { return any_cast<class_t>(output); }
     template<class T> T cast_output() const;
 
     void clear() { *this = example(); }
@@ -169,9 +169,9 @@ namespace vita
   {
     switch (d_output)
     {
-    case domain_t::d_bool:    return static_cast<T>(anycast<bool>(output));
-    case domain_t::d_int:     return static_cast<T>(anycast<int>(output));
-    case domain_t::d_double:  return static_cast<T>(anycast<double>(output));
+    case domain_t::d_bool:    return static_cast<T>(any_cast<bool>(output));
+    case domain_t::d_int:     return static_cast<T>(any_cast<int>(output));
+    case domain_t::d_double:  return static_cast<T>(any_cast<double>(output));
     default:                  return static_cast<T>(0.0);
     }
   }

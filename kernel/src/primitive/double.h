@@ -42,7 +42,7 @@ namespace vita
     ///
     /// Just a simple shortcut.
     inline
-    base_t cast(const any &v) { return anycast<base_t>(v); }
+    base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
     /// \brief Ephemeral random constant
@@ -75,7 +75,7 @@ namespace vita
 
       virtual any eval(interpreter<i_mep> *i) const override
       { return any(static_cast<base_t>(
-                     anycast<decltype(gene::par)>(i->fetch_param()))); }
+                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
     private: // Private data members
       const base_t min, upp;
@@ -105,7 +105,7 @@ namespace vita
 
       virtual any eval(interpreter<i_mep> *i) const override
       { return any(static_cast<base_t>(
-                     anycast<decltype(gene::par)>(i->fetch_param()))); }
+                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
     private: // Private data members
       const int min, upp;
@@ -327,7 +327,7 @@ namespace vita
         const any a(i->fetch_arg(0));
         if (a.empty())  return a;
 
-        return any(static_cast<base_t>(anycast<std::string>(a).size()));
+        return any(static_cast<base_t>(any_cast<std::string>(a).size()));
       }
     };
 

@@ -286,7 +286,7 @@ namespace vita { namespace detail
   template<bool N>
   std::string class_names<N>::string(const any &a) const
   {
-    return std::to_string(anycast<class_t>(a));
+    return std::to_string(any_cast<class_t>(a));
   }
 
   ///
@@ -301,7 +301,7 @@ namespace vita { namespace detail
     // template specializations. So we haven't to put template<> at the
     // beginning.
 
-    return names_[anycast<class_t>(a)];
+    return names_[any_cast<class_t>(a)];
   }
 }}  // namespace vita::detail
 
