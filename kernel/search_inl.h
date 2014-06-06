@@ -95,7 +95,7 @@ void search<T, ES>::arl(const U &base)
         if (adf_args)
         {
           auto generalized(candidate_block.generalize(adf_args));
-          std::vector<category_t> categories(generalized.second.size());
+          cvect categories(generalized.second.size());
 
           for (const auto &replaced : generalized.second)
             categories.push_back(replaced.category);

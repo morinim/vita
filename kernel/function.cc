@@ -25,8 +25,7 @@ namespace vita
   ///                 C++ they are called the "function signature").
   ///
   VITA_INLINE
-  function::function(const std::string &dis, category_t c,
-                     std::vector<category_t> args)
+  function::function(const std::string &dis, category_t c, cvect args)
     : symbol(dis, c), argt_(std::move(args))
   {
     arity_ = static_cast<decltype(arity_)>(argt_.size());

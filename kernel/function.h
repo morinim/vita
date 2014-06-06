@@ -36,7 +36,7 @@ namespace vita
   class function : public symbol
   {
   public:
-    function(const std::string &, category_t, std::vector<category_t>);
+    function(const std::string &, category_t, cvect);
 
     category_t arg_category(unsigned) const;
 
@@ -45,7 +45,7 @@ namespace vita
     static const function *cast(const symbol *);
 
   private:  // Private data members
-    std::vector<category_t> argt_;
+    cvect argt_;
   };
 
   ///

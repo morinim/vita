@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         const auto &replaced(generalized.second);
 
         std::vector<index_t> positions(replaced.size());
-        std::vector<category_t> categories(replaced.size());
+        cvect categories(replaced.size());
         for (unsigned j(0); j < replaced.size(); ++j)
         {
           positions[j]  = replaced[j].index;
