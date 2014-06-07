@@ -239,7 +239,7 @@ namespace vita
   /// \attention
   /// The procedure resets active slices.
   ///
-  void data::divide(unsigned percentage)
+  void data::partition(unsigned percentage)
   {
     assert(percentage < 100);
 
@@ -252,24 +252,13 @@ namespace vita
     dataset_[validation].clear();
 
     auto available(dataset_[training].size());
-    if (available)
+    if (available && percentage)
     {
-      // The requested validation examples are selected (the algorithm hint is
-      // due to Kyle Cronin):
-      //
-      // > Iterate through and for each element make the probability of
-      // >  selection = (number needed)/(number left)
-      // >
-      // > So if you had 40 items, the first would have a 5/40 chance of being
-      // > selected. If it is, the next has a 4/39 chance, otherwise it has a
-      // > 5/39 chance. By the time you get to the end you will have your 5
-      // > items, and often you'll have all of them before that.
+      using diff_t = decltype(dataset_)::difference_type;
+      const auto needed(static_cast<diff_t>(available * percentage / 100));
 
-      auto needed(available * percentage / 100);
-      assert(needed < available);
-/*
-      std::random_shuffle(dataset_[training].begin(),
-                          dataset_[training].end());
+      std::shuffle(dataset_[training].begin(), dataset_[training].end(),
+                   random::engine());
 
       std::move(std::prev(dataset_[training].end(), needed),
                 dataset_[training].end(),
@@ -278,7 +267,16 @@ namespace vita
       dataset_[training].erase(std::prev(dataset_[training].end(), needed),
                                dataset_[training].end());
 
-*/
+      /*
+      // This algorithm hint is due to Kyle Cronin:
+      //
+      // > Iterate through and for each element make the probability of
+      // >  selection = (number needed)/(number left)
+      // >
+      // > So if you had 40 items, the first would have a 5/40 chance of being
+      // > selected. If it is, the next has a 4/39 chance, otherwise it has a
+      // > 5/39 chance. By the time you get to the end you will have your 5
+      // > items, and often you'll have all of them before that.
       auto iter(dataset_[training].begin());
       while (needed)
       {
@@ -303,6 +301,7 @@ namespace vita
       }
 
       assert(!needed);
+      */
 
       std::fill(slice_.begin(), slice_.end(), 0);
     }

@@ -67,7 +67,7 @@ namespace vita
 
     void clear();
 
-    void divide(unsigned);
+    void partition(unsigned);
     void sort(std::function<bool (const example &, const example &)>);
 
     const category_set &categories() const;

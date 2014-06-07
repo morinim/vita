@@ -456,9 +456,9 @@ T search<T, ES>::run(unsigned n)
     stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
 
   const bool validation(0 < env_.validation_percentage &&
-                        env_.validation_percentage <= 100);
+                        env_.validation_percentage < 100);
   if (validation)
-    prob_->data()->divide(env_.validation_percentage);
+    prob_->data()->partition(env_.validation_percentage);
 
   for (unsigned r(0); r < n; ++r)
   {
