@@ -11,6 +11,7 @@
  */
 
 #include "kernel/ga/i_num_ga.h"
+#include "kernel/ttable_hash.h"
 
 namespace vita
 {
@@ -40,21 +41,16 @@ namespace vita
 
   ///
   /// \param[out] s output stream.
-  /// \param[in] id used for subgraph plot (usually this is an empty string).
   ///
   /// The output stream contains a graph, described in dot language
   /// (http://www.graphviz.org), of \c this individual.
   ///
-  void i_num_ga::graphviz(std::ostream &s, const std::string &id) const
+  void i_num_ga::graphviz(std::ostream &s) const
   {
-    if (id.empty())
-      s << "graph";
-    else
-      s << "subgraph " << id;
-    s << " {";
+    s << "graph {";
 
     for (const auto &g : genome_)
-      s << 'g' << << " [label=" << g << ", shape=circle];";
+      s << "g [label=" << g << ", shape=circle];";
 
     s << '}';
   }
@@ -100,7 +96,7 @@ namespace vita
   ///
   /// \param[out] s output stream.
   ///
-  std::ostream &i_mep::tree(std::ostream &s) const
+  std::ostream &i_num_ga::tree(std::ostream &s) const
   {
     return in_line(s);
   }
@@ -117,12 +113,13 @@ namespace vita
 
     unsigned n(0);
 
-    for (auto &g : genome_)
+    const auto cs(size());
+    for (category_t c(0); c < cs; ++c)
       if (random::boolean(p))
       {
         ++n;
 
-        g = gene(sset_->roulette_terminal(c));
+        genome_[c] = gene(sset_->roulette_terminal(c));
       }
 
     assert(debug());
@@ -144,11 +141,11 @@ namespace vita
   /// \note
   /// Parents must have the same size.
   ///
-  i_num_ga i_mep::crossover(i_num_ga rhs) const
+  i_num_ga i_num_ga::crossover(i_num_ga rhs) const
   {
     assert(rhs.debug());
 
-    const auto cs(size);
+    const auto cs(size());
     assert(cs == rhs.size());
 
     const auto cut1(random::sup(cs - 1));
@@ -291,7 +288,7 @@ namespace vita
 
     for (auto c(decltype(cs){0}); c < cs; ++c)
     {
-      if (!genome[c].sym)
+      if (!genome_[c].sym)
       {
         if (verbose)
           std::cerr << k_s_debug << " Empty symbol pointer at position " << c
@@ -299,7 +296,7 @@ namespace vita
         return false;
       }
 
-      if (!genome[c].terminal())
+      if (!genome_[c].sym->terminal())
       {
         if (verbose)
           std::cerr << k_s_debug << " Not-terminal symbol at position "
@@ -308,7 +305,7 @@ namespace vita
         return false;
       }
 
-      if (genome_[l].sym->category() != c)
+      if (genome_[c].sym->category() != c)
       {
         if (verbose)
           std::cerr << k_s_debug << " Wrong category: " << c

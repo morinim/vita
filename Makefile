@@ -33,7 +33,7 @@ DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
 # Add directories to the include path.
 # This should work in POSIX compliant environment (see "The Open Group Base
 # Specifications Issue 7" and
-# http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html)
+# <http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html>)
 INCPATH = ../vita/ ./
 SYSTEMINCPATH = $(BOOST_INCLUDE)
 
@@ -73,7 +73,7 @@ LDFLAGS = $(CXXFLAGS)
 
 COMPILE = $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc)
+KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
 KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC = $(wildcard examples/*.cc)
 SR_SRC = $(wildcard sr/*.cc)
