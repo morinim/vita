@@ -39,10 +39,11 @@ namespace vita
 
     ///
     /// \param[in] v the value that must be casted to base type (\c base_t).
+    /// \return the content of \a v.
     ///
     /// Just a simple shortcut.
-    inline
-    base_t cast(const any &v) { return any_cast<base_t>(v); }
+    ///
+    inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
     ///
     /// \brief Ephemeral random constant
@@ -77,7 +78,7 @@ namespace vita
       { return any(static_cast<base_t>(
                      any_cast<decltype(gene::par)>(i->fetch_param()))); }
 
-    private: // Private data members
+    private:  // Private data members
       const base_t min, upp;
     };
 

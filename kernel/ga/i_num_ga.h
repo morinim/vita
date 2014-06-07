@@ -13,6 +13,7 @@
 #if !defined(VITA_GA_I_NUM_GA_H)
 #define      VITA_GA_I_NUM_GA_H
 
+#include "kernel/gene.h"
 #include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
 
@@ -31,7 +32,7 @@ namespace vita
     std::ostream &tree(std::ostream &) const;
 
     // Recombination operators
-    unsigned mutation();
+    unsigned mutation()
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
     i_num_ga crossover(i_num_ga) const;
@@ -45,7 +46,7 @@ namespace vita
     /// \return the l-th \c gene of \a this \c individual.
     ///
     const gene &operator[](unsigned i) const
-    { assert(i < size(); return genome_[i]; }
+    { assert(i < size()); return genome_[i]; }
 
     ///
     /// \return the size of the individual.
@@ -53,12 +54,12 @@ namespace vita
     /// The size is constant for any individual (it's chosen at initialization
     /// time).
     ///
-    unsigned size() const { return genome_.size(); }
+    unsigned size() const { return static_cast<unsigned>(genome_.size()); }
 
     hash_t signature() const;
 
-    bool operator==(const team<T> &) const;
-    unsigned distance(const team<T> &) const;
+    bool operator==(const i_num_ga &) const;
+    unsigned distance(const i_num_ga &) const;
 
     /// This is a measure of how long an individual's family of genotypic
     /// material has been in the population. Randomly generated individuals,
