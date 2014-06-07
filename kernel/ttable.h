@@ -13,8 +13,6 @@
 #if !defined(VITA_TTABLE_H)
 #define      VITA_TTABLE_H
 
-#include <vector>
-
 #include "kernel/environment.h"
 
 namespace vita

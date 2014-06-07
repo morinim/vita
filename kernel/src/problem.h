@@ -14,7 +14,6 @@
 #define      VITA_SRC_PROBLEM_H
 
 #include <string>
-#include <vector>
 
 #include "kernel/problem.h"
 

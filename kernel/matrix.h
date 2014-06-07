@@ -13,8 +13,6 @@
 #if !defined(VITA_MATRIX_H)
 #define      VITA_MATRIX_H
 
-#include <vector>
-
 #include "kernel/locus.h"
 
 namespace vita

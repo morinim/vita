@@ -14,7 +14,6 @@
 #define      VITA_ADF_H
 
 #include <string>
-#include <vector>
 
 #include "kernel/function.h"
 #include "kernel/i_mep.h"

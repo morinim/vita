@@ -13,8 +13,6 @@
 #if !defined(VITA_EVOLUTION_RECOMBINATION_H)
 #define      VITA_EVOLUTION_RECOMBINATION_H
 
-#include <vector>
-
 #include "kernel/population.h"
 
 namespace vita {

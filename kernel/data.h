@@ -15,7 +15,6 @@
 
 #include <map>
 #include <string>
-#include <vector>
 
 #include "kernel/any.h"
 #include "kernel/category_set.h"

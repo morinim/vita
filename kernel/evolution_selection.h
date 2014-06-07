@@ -14,7 +14,6 @@
 #define      VITA_EVOLUTION_SELECTION_H
 
 #include <set>
-#include <vector>
 
 #include "kernel/alps.h"
 

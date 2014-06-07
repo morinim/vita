@@ -13,8 +13,6 @@
 #if !defined(VITA_EVOLUTION_REPLACEMENT_H)
 #define      VITA_EVOLUTION_REPLACEMENT_H
 
-#include <vector>
-
 #include "kernel/alps.h"
 
 namespace vita {  namespace replacement {

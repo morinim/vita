@@ -13,8 +13,6 @@
 #if !defined(VITA_GENE_H)
 #define      VITA_GENE_H
 
-#include <vector>
-
 #include "kernel/random.h"
 #include "kernel/symbol.h"
 #include "kernel/utility.h"

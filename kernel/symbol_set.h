@@ -14,7 +14,6 @@
 #define      VITA_SYMBOL_SET_H
 
 #include <string>
-#include <vector>
 
 #include "kernel/symbol.h"
 

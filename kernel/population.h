@@ -14,7 +14,6 @@
 #define      VITA_POPULATION_H
 
 #include <fstream>
-#include <vector>
 
 #include "kernel/environment.h"
 

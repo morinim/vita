@@ -15,7 +15,6 @@
 
 #include <iostream>
 #include <set>
-#include <vector>
 
 #include "kernel/vita.h"
 

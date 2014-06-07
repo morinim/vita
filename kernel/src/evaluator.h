@@ -13,8 +13,6 @@
 #if !defined(VITA_SRC_EVALUATOR_H)
 #define      VITA_SRC_EVALUATOR_H
 
-#include <vector>
-
 #include "kernel/evaluator.h"
 #include "kernel/src/primitive/factory.h"
 
