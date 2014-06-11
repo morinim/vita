@@ -23,22 +23,12 @@ namespace vita
   ///
   /// \brief Minimum interface of an interpreter
   ///
-  /// \tparam T the type of individual used
-  ///
-  template<class T>
   class core_interpreter
   {
   public:
-    explicit core_interpreter(const T &, core_interpreter<T> * = nullptr);
-
     virtual any run() = 0;
 
-    virtual bool debug() const;
-
-  protected:
-    const T &prg_;
-
-    core_interpreter<T> *const context_;
+    virtual bool debug() const = 0;
   };
 
   ///
@@ -61,7 +51,7 @@ namespace vita
   /// the specific individual class.
   ///
   template<>
-  class interpreter<i_mep> : public core_interpreter<i_mep>
+  class interpreter<i_mep> : public core_interpreter
   {
   public:
     explicit interpreter(const i_mep &, interpreter<i_mep> * = nullptr);
@@ -78,18 +68,20 @@ namespace vita
     any run_locus(const locus &);
 
   private:
+    const i_mep &prg_;
+
+    mutable matrix<boost::optional<any>> cache_;
+
     // Instruction pointer.
     locus ip_;
 
-    mutable matrix<boost::optional<any>> cache_;
+    interpreter<i_mep> *const context_;
   };
 
   ///
   /// \example example5.cc
   /// Output value calculation for an individual.
   ///
-
-#include "kernel/interpreter_inl.h"
 }  // namespace vita
 
 #endif  // Include guard

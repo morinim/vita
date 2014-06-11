@@ -28,7 +28,7 @@ BOOST_FIXTURE_TEST_SUITE(num_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
-  BOOST_TEST_CHECKPOINT("Variable length random creation");
+  BOOST_TEST_CHECKPOINT("Random creation");
   for (unsigned i(1); i < 1000; ++i)
   {
     vita::i_num_ga ind(env, sset);

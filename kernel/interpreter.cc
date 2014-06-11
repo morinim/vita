@@ -24,8 +24,9 @@ namespace vita
   ///                the evaluation of ADF).
   ///
   interpreter<i_mep>::interpreter(const i_mep &ind, interpreter<i_mep> *ctx)
-    : core_interpreter(ind, ctx), ip_(ind.best_),
-      cache_(ind.size(), ind.sset().categories())
+    : core_interpreter(), prg_(ind),
+      cache_(ind.size(), ind.sset().categories()), ip_(ind.best_),
+      context_(ctx)
   {
   }
 
@@ -116,16 +117,15 @@ namespace vita
   ///
   any interpreter<i_mep>::fetch_adf_arg(unsigned i)
   {
-    interpreter<i_mep> *ctx(static_cast<interpreter<i_mep> *>(context_));
 #if !defined(NDEBUG)
-    assert(ctx);
-    assert(ctx->debug());
+    assert(context_);
+    assert(context_->debug());
     assert(i < gene::k_args);
 
-    const gene ctx_g(ctx->prg_[ctx->ip_]);
+    const gene ctx_g(context_->prg_[context_->ip_]);
     assert(!ctx_g.sym->terminal() && ctx_g.sym->auto_defined());
 #endif
-    return ctx->fetch_arg(i);
+    return context_->fetch_arg(i);
   }
 
   ///
@@ -133,7 +133,10 @@ namespace vita
   ///
   bool interpreter<i_mep>::debug() const
   {
-    if (!core_interpreter<i_mep>::debug())
+    if (context_ && !context_->debug())
+      return false;
+
+    if (!prg_.debug())
       return false;
 
     return ip_.index < prg_.size();
