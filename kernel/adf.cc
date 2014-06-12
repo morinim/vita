@@ -39,9 +39,12 @@ namespace vita
   /// Adf functions need input parameters from the a context (contrary to
   /// adt::eval).
   ///
-  any adf::eval(interpreter<i_mep> *i) const
+  any adf::eval(core_interpreter *i) const
   {
-    return interpreter<i_mep>(code(), i).run();
+    assert(typeid(*i) == typeid(interpreter<i_mep>));
+
+    return interpreter<i_mep>(code(),
+                              static_cast<interpreter<i_mep> *>(i)).run();
   }
 
   ///
@@ -99,7 +102,7 @@ namespace vita
   /// Adt hasn't input parameters so the context is ignored (contrary to
   /// adf::eval).
   ///
-  any adt::eval(interpreter<i_mep> *) const
+  any adt::eval(core_interpreter *) const
   {
     return interpreter<i_mep>(code()).run();
   }

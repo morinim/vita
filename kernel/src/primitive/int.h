@@ -62,9 +62,12 @@ namespace vita
       virtual std::string display(double v) const override
       { return boost::lexical_cast<std::string>(v); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+      virtual any eval(core_interpreter *i) const override
+      {
+        return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(
+                       static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+      }
 
     private:  // Private data members.
       const int min, upp;
@@ -80,8 +83,9 @@ namespace vita
         associative_ = true;
       }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -101,8 +105,9 @@ namespace vita
       explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -121,8 +126,9 @@ namespace vita
         : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -140,8 +146,9 @@ namespace vita
         : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -158,8 +165,9 @@ namespace vita
       explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
       { assert(c.size() == 1); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
 
         if (v0 == 0)
@@ -176,8 +184,9 @@ namespace vita
       explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -196,11 +205,12 @@ namespace vita
       explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]})
       { associative_ = true; }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const
       {
         static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                       "Unable to detect overflow after multiplication");
 
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -255,8 +265,9 @@ namespace vita
       explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -276,8 +287,9 @@ namespace vita
       explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      any eval(interpreter<i_mep> *i) const
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
         const auto v0(integer::cast(i->fetch_arg(0)));
         const auto v1(integer::cast(i->fetch_arg(1)));
 

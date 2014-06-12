@@ -26,7 +26,7 @@ struct F_FACTORY3
   public:
     Z() : vita::terminal("Z", 0) { input_ = true; }
 
-    virtual vita::any eval(vita::interpreter<vita::i_mep> *) const override
+    virtual vita::any eval(vita::core_interpreter *) const override
     { return vita::any(val); }
 
     double val;

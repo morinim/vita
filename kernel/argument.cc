@@ -53,9 +53,11 @@ namespace vita
   /// \param[in] agent current interpreter
   /// \return the value of the argument.
   ///
-  any argument::eval(interpreter<i_mep> *agent) const
+  any argument::eval(core_interpreter *agent) const
   {
-    return agent->fetch_adf_arg(index_);
+    assert(typeid(*agent) == typeid(interpreter<i_mep>));
+
+    return static_cast<interpreter<i_mep> *>(agent)->fetch_adf_arg(index_);
   }
 
   ///

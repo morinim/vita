@@ -75,7 +75,7 @@ namespace vita
   public:
     adf(const i_mep &, std::vector<category_t>, unsigned);
 
-    virtual any eval(interpreter<i_mep> *) const override;
+    virtual any eval(core_interpreter *) const override;
 
     virtual std::string display() const override;
 
@@ -99,7 +99,7 @@ namespace vita
   public:
     adt(const i_mep &, unsigned);
 
-    virtual any eval(interpreter<i_mep> *) const override;
+    virtual any eval(core_interpreter *) const override;
 
     virtual std::string display() const override;
 

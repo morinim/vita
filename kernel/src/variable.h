@@ -36,12 +36,12 @@ namespace vita
     /// \note
     /// the method requires a src_interpreter to work.
     ///
-    any eval(interpreter<i_mep> *i) const
+    virtual any eval(core_interpreter *i) const override
     {
       return static_cast<src_interpreter<i_mep> *>(i)->fetch_var(var_);
     }
 
-  private:  // Private data members.
+  private:  // Private data members
     unsigned var_;
   };
 }  // namespace vita

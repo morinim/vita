@@ -18,6 +18,7 @@ namespace vita
   class i_mep;
   template<class T> class team;
 
+  class core_interpreter;
   template<class T> class interpreter;
 
   template<class T,

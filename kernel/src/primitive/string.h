@@ -35,8 +35,10 @@ namespace vita
         : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any v0(i->fetch_arg(0));
         if (v0.empty())  return v0;
 

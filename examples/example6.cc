@@ -20,7 +20,7 @@
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
-using i_interp = vita::interpreter<vita::i_mep>;
+using i_interp = vita::core_interpreter;
 
 // This class models the first input.
 class X : public vita::terminal
@@ -28,8 +28,7 @@ class X : public vita::terminal
 public:
   X() : vita::terminal("X", 0) { input_ = true; }
 
-  vita::any eval(i_interp *) const
-  { return vita::any(val); }
+  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -39,8 +38,7 @@ class Y : public vita::terminal
 public:
   Y() : vita::terminal("Y", 0) { input_ = true; }
 
-  vita::any eval(i_interp *) const
-  { return vita::any(val); }
+  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -50,7 +48,7 @@ class Z : public vita::terminal
 public:
   Z() : vita::terminal("Z", 0) { input_ = true; }
 
-  vita::any eval(i_interp *) const { return vita::any(val); }
+  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -63,7 +61,7 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 {
   vita::fitness_t operator()(const vita::i_mep &ind)
   {
-    i_interp agent(ind);
+    vita::interpreter<vita::i_mep> agent(ind);
 
     vita::fitness_t::base_t fit(0.0);
     for (double x(0); x < 10; ++x)

@@ -74,9 +74,12 @@ namespace vita
       virtual std::string display(double v) const override
       { return std::to_string(v); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+      virtual any eval(core_interpreter *i) const override
+      {
+        return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(
+                       static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+      }
 
     private:  // Private data members
       const base_t min, upp;
@@ -104,9 +107,12 @@ namespace vita
       virtual std::string display(double v) const override
       { return std::to_string(static_cast<int>(v)); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+      virtual any eval(core_interpreter *i) const override
+      {
+        return any(static_cast<base_t>(
+                     any_cast<decltype(gene::par)>(
+                       static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+      }
 
     private: // Private data members
       const int min, upp;
@@ -121,9 +127,9 @@ namespace vita
       explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *i) const override
       {
-        const any a(i->fetch_arg(0));
+        const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
 
         return a.empty() ? a : any(std::fabs(dbl::cast(a)));
       }
@@ -138,8 +144,10 @@ namespace vita
       explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]})
       { associative_ = true; }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -162,8 +170,10 @@ namespace vita
       explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -186,8 +196,10 @@ namespace vita
       explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -213,8 +225,10 @@ namespace vita
         : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -248,8 +262,10 @@ namespace vita
         : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -273,8 +289,10 @@ namespace vita
         : function("FIFL", c[1], {c[0], c[0], c[1], c[1]})
       { assert(c.size() == 2); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -302,8 +320,10 @@ namespace vita
       explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -323,9 +343,9 @@ namespace vita
       explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
       { assert(c.size() == 2); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *i) const override
       {
-        const any a(i->fetch_arg(0));
+        const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
         if (a.empty())  return a;
 
         return any(static_cast<base_t>(any_cast<std::string>(a).size()));
@@ -346,9 +366,9 @@ namespace vita
       /// \return the natural logarithm of its argument or an empty \c any
       //          in case of invalid argument / infinite result.
       ///
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *i) const override
       {
-        const any a0(i->fetch_arg(0));
+        const any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
         if (a0.empty())  return a0;
 
         const base_t ret(std::log(dbl::cast(a0)));
@@ -367,8 +387,10 @@ namespace vita
       explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -391,8 +413,10 @@ namespace vita
       explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -415,8 +439,10 @@ namespace vita
       explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]})
       { associative_ = true; }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 
@@ -439,9 +465,9 @@ namespace vita
       explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *i) const override
       {
-        const any a(i->fetch_arg(0));
+        const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
         if (a.empty())  return a;
 
         return any(std::sin(dbl::cast(a)));
@@ -457,9 +483,9 @@ namespace vita
       explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *i) const override
       {
-        const any a(i->fetch_arg(0));
+        const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
         if (a.empty())  return a;
 
         const auto v(dbl::cast(a));
@@ -479,8 +505,10 @@ namespace vita
       explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
       { assert(c.size() == 1); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
+      virtual any eval(core_interpreter *ci) const override
       {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
         const any a0(i->fetch_arg(0));
         if (a0.empty())  return a0;
 

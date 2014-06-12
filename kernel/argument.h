@@ -16,11 +16,10 @@
 #include <string>
 
 #include "kernel/terminal.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
-  template<class T> class interpreter;
-
   ///
   /// \a argument is a special \a terminal used by \a adf functions for
   /// input parameters passing.
@@ -34,7 +33,7 @@ namespace vita
 
     unsigned index() const;
 
-    virtual any eval(interpreter<i_mep> *) const override;
+    virtual any eval(core_interpreter *) const override;
 
     virtual bool debug() const override;
 
