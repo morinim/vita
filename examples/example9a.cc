@@ -16,12 +16,12 @@
 
 int main()
 {
-  vita::src_problem problem("titanic_train.csv");  // reading training set
+  vita::src_problem titanic("titanic_train.csv");  // reading training set
 
-  if (!problem)
+  if (!titanic)
     return EXIT_FAILURE;
 
-  vita::src_search<> s(&problem);
+  vita::src_search<> s(&titanic);
   const auto best(s.run());                        // starting search and
                                                    // getting best individual
   std::cout << best << std::endl;
