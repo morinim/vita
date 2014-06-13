@@ -85,13 +85,19 @@ BOOST_AUTO_TEST_CASE(Comparison)
   {
     vita::team<vita::i_mep> a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
+    BOOST_REQUIRE_EQUAL(a.distance(a), 0);
 
     vita::team<vita::i_mep> b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
+    BOOST_REQUIRE_EQUAL(a, b);
+    BOOST_REQUIRE_EQUAL(a.distance(b), 0);
 
     vita::team<vita::i_mep> c(env, sset);
     if (a.signature() != c.signature())
+    {
       BOOST_REQUIRE_NE(a, c);
+      BOOST_REQUIRE_GT(a.distance(c), 0);
+    }
   }
 }
 

@@ -95,6 +95,8 @@ namespace vita
     const environment  *env_;
     const symbol_set  *sset_;
   };  // class i_num_ga
+
+  std::ostream &operator<<(std::ostream &, const i_num_ga &);
 }  // namespace vita
 
 #endif  // Include guard

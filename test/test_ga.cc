@@ -57,23 +57,29 @@ BOOST_AUTO_TEST_CASE(Mutation)
     BOOST_REQUIRE_EQUAL(t, orig);
   }
 }
-
+*/
 BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::team<vita::i_mep> a(env, sset);
+    vita::i_num_ga a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
+    BOOST_REQUIRE_EQUAL(a.distance(a), 0);
 
-    vita::team<vita::i_mep> b(a);
+    vita::i_num_ga b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
+    BOOST_REQUIRE_EQUAL(a, b);
+    BOOST_REQUIRE_EQUAL(a.distance(b), 0);
 
-    vita::team<vita::i_mep> c(env, sset);
+    vita::i_num_ga c(env, sset);
     if (a.signature() != c.signature())
+    {
       BOOST_REQUIRE_NE(a, c);
+      BOOST_REQUIRE_GT(a.distance(c), 0);
+    }
   }
 }
-
+/*
 BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;

@@ -16,7 +16,7 @@
 #include <string>
 
 #include "kernel/function.h"
-#include "kernel/interpreter.h"
+#include "kernel/ga/interpreter.h"
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "kernel/utility.h"
@@ -35,7 +35,7 @@ namespace vita
   /// an empty \c any()).
   namespace ga
   {
-    typedef double base_t;
+    typedef decltype(gene::par) base_t;
 
     ///
     /// \param[in] v the value that must be casted to base type (\c base_t).
@@ -62,9 +62,12 @@ namespace vita
       virtual std::string display(double v) const override
       { return std::to_string(v); }
 
-      virtual any eval(interpreter<i_mep> *i) const override
-      { return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(i->fetch_param()))); }
+      virtual any eval(core_interpreter *i) const override
+      {
+        return any(any_cast<base_t>(
+                     static_cast<interpreter<i_num_ga> *>(i)->fetch_param(
+                       category())));
+      }
 
     private:  // Private data members
       const base_t min, upp;

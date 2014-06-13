@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,10 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_MEP_INTERPRETER_H)
-#define      VITA_MEP_INTERPRETER_H
-
-#include <boost/optional.hpp>
+#if !defined(VITA_GA_INTERPRETER_H)
+#define      VITA_GA_INTERPRETER_H
 
 #include "kernel/core_interpreter.h"
-#include "kernel/matrix.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
@@ -31,37 +28,23 @@ namespace vita
   /// the specific individual class.
   ///
   template<>
-  class interpreter<i_mep> : public core_interpreter
+  class interpreter<i_num_ga> : public core_interpreter
   {
   public:
-    explicit interpreter(const i_mep &, interpreter<i_mep> * = nullptr);
+    using function = std::function<double (const std::vector<double> &)>;
+
+    interpreter(const i_num_ga &, const function &);
 
     virtual any run() override;
 
-    any fetch_param();
-    any fetch_arg(unsigned);
-    any fetch_adf_arg(unsigned);
+    any fetch_param(unsigned);
 
     virtual bool debug() const override;
 
-  private:  // Private methods
-    any run_locus(const locus &);
-
-  private:  // Private data members
-    const i_mep &prg_;
-
-    mutable matrix<boost::optional<any>> cache_;
-
-    // Instruction pointer.
-    locus ip_;
-
-    interpreter<i_mep> *const context_;
+  private:
+    const i_num_ga &ind_;
+    const function &f_;
   };
-
-  ///
-  /// \example example5.cc
-  /// Output value calculation for an individual.
-  ///
 }  // namespace vita
 
 #endif  // Include guard
