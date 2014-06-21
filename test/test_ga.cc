@@ -70,18 +70,17 @@ BOOST_AUTO_TEST_CASE(Comparison)
     {
       BOOST_REQUIRE_NE(a, c);
       BOOST_REQUIRE_GT(a.distance(c), 0);
+      BOOST_REQUIRE_EQUAL(a.distance(c), c.distance(a));
     }
   }
 }
-/*
+
 BOOST_AUTO_TEST_CASE(Crossover)
 {
-  env.code_length = 100;
+  vita::i_num_ga t1(env, sset), t2(env, sset);
 
-  vita::team<vita::i_mep> t1(env, sset), t2(env, sset);
-
-  const unsigned n(2000);
   double dist(0.0);
+  const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(t1.crossover(t2));
@@ -90,13 +89,12 @@ BOOST_AUTO_TEST_CASE(Crossover)
     dist += t1.distance(tc);
   }
 
-  const double perc(100.0 * dist /
-                    (env.code_length * sset.categories() * n *
-                     t1.individuals()));
-  BOOST_CHECK_GT(perc, 45.0);
+  // +1 since we have at least one gene involved in crossover.
+  const double perc(100.0 * dist / ((sset.categories() + 1) * n));
+  BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
-
+/*
 BOOST_AUTO_TEST_CASE(Serialization)
 {
   for (unsigned i(0); i < 2000; ++i)

@@ -144,7 +144,10 @@ namespace vita
   /// parent.
   ///
   /// \note
-  /// Parents must have the same size.
+  /// - Parents must have the same size.
+  /// - This function is included for compatibility with GP recombination
+  ///   strategies. Typical differential evolution GA algorithm won't use
+  ///   this method.
   ///
   i_num_ga i_num_ga::crossover(i_num_ga rhs) const
   {
