@@ -107,6 +107,11 @@ namespace vita
   ///
   /// A new individual is created mutating \c this.
   ///
+  /// \note
+  /// This function is included for compatibility with GP recombination
+  /// strategies. Typical differential evolution GA algorithm won't use
+  /// this method.
+  ///
   unsigned i_num_ga::mutation(double p)
   {
     assert(0.0 <= p && p <= 1.0);

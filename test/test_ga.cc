@@ -37,27 +37,21 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     BOOST_REQUIRE_EQUAL(ind.age(), 0);
   }
 }
-/*
+
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  env.code_length = 100;
-
-  vita::team<vita::i_mep> t(env, sset);
-  const vita::team<vita::i_mep> orig(t);
-
-  BOOST_REQUIRE_GT(t.individuals(), 0);
-
-  const unsigned n(4000);
+  vita::i_num_ga t(env, sset);
+  const vita::i_num_ga orig(t);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation");
   env.p_mutation = 0.0;
-  for (unsigned i(0); i < n; ++i)
+  for (unsigned i(0); i < 1000; ++i)
   {
     t.mutation();
     BOOST_REQUIRE_EQUAL(t, orig);
   }
 }
-*/
+
 BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
