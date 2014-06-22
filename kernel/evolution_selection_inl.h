@@ -41,14 +41,14 @@ coord strategy<T>::pickup() const
   //
   //   const auto l(vita::random::sup(n_layers));
   //
-  // would not be appropriate.
+  // isn't appropriate.
   std::vector<unsigned> s(n_layers);
   for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
     s[l] = pop_.individuals(l);
 
   std::discrete_distribution<unsigned> dd(s.begin(), s.end());
   const auto l(dd(vita::random::engine()));
-  return {l, vita::random::sup(pop_.individuals(l))};
+  return {l, vita::random::sup(s[l])};
 }
 
 ///
@@ -71,13 +71,13 @@ coord strategy<T>::pickup(coord target) const
 /// \param[in] p the probability of extracting an individual in layer \a l
 ///              (1 - \a p is the probability of extracting an individual
 ///              in layer \a l-1).
-/// \return the coordinates of a random individual in layer \a l.
+/// \return the coordinates of a random individual in layer \a l or \a l-1.
 ///
 template<class T>
 coord strategy<T>::pickup(unsigned l, double p) const
 {
-  assert(0.0 <= p && p <= 1.0);
-
+  assert(0.0 <= p);
+  assert(p <= 1.0);
   assert(l < pop_.layers());
 
   if (l > 0 && !vita::random::boolean(p))
@@ -113,7 +113,7 @@ std::vector<coord> tournament<T>::run()
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
-  // DO NOT USE std::sort it is way slower.
+  // DO NOT USE std::sort it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(this->pickup(target));
@@ -156,7 +156,12 @@ bool alps<T>::aged(coord c) const
 }
 
 ///
+/// \return a vector of coordinates of chosen individuals.
 ///
+/// Parameters from the environment:
+/// * mate_zone - to restrict the selection of individuals to a segment of
+///   the population;
+/// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
 std::vector<coord> alps<T>::run()
