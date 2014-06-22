@@ -27,17 +27,6 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 }
 
 ///
-/// \param[in] pop the current population.
-/// \param[in] eva the current evaluator.
-/// \param[in] s pointer to the current set of statistics.
-///
-template<class T>
-base<T>::base(const population<T> &pop, evaluator<T> &eva, summary<T> *const s)
-  : strategy<T>(pop, eva, s)
-{
-}
-
-///
 /// \param[in] parent a vector of ordered parents.
 /// \return the offspring.
 ///
@@ -46,7 +35,7 @@ base<T>::base(const population<T> &pop, evaluator<T> &eva, summary<T> *const s)
 template<class T>
 std::vector<T> base<T>::run(const std::vector<coord> &parent)
 {
-  assert(parent.size() >= 2);
+  assert(parent.size() == 2);
 
   const auto &pop(this->pop_);
   const auto &env(pop.env());
@@ -110,5 +99,22 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
     assert(off.debug());
     return {off};
   }
+}
+
+///
+/// \param[in] parent a vector of ordered parents.
+/// \return the offspring.
+///
+template<class T>
+std::vector<T> de<T>::run(const std::vector<coord> &parent)
+{
+  assert(parent.size() == 3);
+
+  const auto &pop(this->pop_);
+  const auto &env(pop.env());
+
+  assert(env.p_cross);
+
+  return {pop[parent[0]].crossover(pop[parent[1]], pop[parent[2]])};
 }
 #endif  // Include guard

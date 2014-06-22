@@ -389,10 +389,9 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  ret[0] = this->pickup();  // target
-
-  for (unsigned i(1); i < size; ++i)
-    ret[i] = this->pickup(ret[0]);
+  std::generate_n(ret, size, this->pickup);
+  //for (auto i(decltype(size){0}); i < size; ++i)
+  //  ret[i] = this->pickup();
 
   return ret;
 }

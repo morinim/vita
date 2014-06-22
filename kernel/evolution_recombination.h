@@ -71,7 +71,19 @@ namespace recombination {
   class base : public strategy<T>
   {
   public:
-    base(const population<T> &, evaluator<T> &, summary<T> *const);
+    using base::strategy::strategy;
+
+    virtual std::vector<T> run(const std::vector<coord> &) override;
+  };
+
+  ///
+  ///
+  ///
+  template<class T>
+  class de : public strategy<T>
+  {
+  public:
+    using de::strategy::strategy;
 
     virtual std::vector<T> run(const std::vector<coord> &) override;
   };

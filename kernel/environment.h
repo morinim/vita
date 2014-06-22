@@ -232,6 +232,11 @@ namespace vita
       double p_same_layer = 0.75;
     } alps;
 
+    struct de_parameters
+    {
+      double diff_weight = 0.8;
+    } de;
+
     struct team_parameters
     {
       /// 0 is auto-tune;

@@ -137,11 +137,10 @@ namespace vita
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
-  /// We randomly select a parent (between \a this and \a p2) and a two loci
-  /// (common crossover points). The offspring is created with genes from the
-  /// choosen parent before the first crossover point and after the second
-  /// crossover point; genes between crossover points are taken from the other
-  /// parent.
+  /// We randomly select two loci (common crossover points). The offspring is
+  /// created with genes from the \a rhs parent before the first crossover
+  /// point and after the second crossover point; genes between crossover
+  /// points are taken from the other \c *this parent.
   ///
   /// \note
   /// - Parents must have the same size.
@@ -166,6 +165,36 @@ namespace vita
 
     assert(rhs.debug());
     return rhs;
+  }
+
+  ///
+  /// \brief Differential evolution crossover
+  /// \param[in] a first parent.
+  /// \param[in] b second parent.
+  /// \return the result of the crossover (we only generate a single
+  ///         offspring).
+  ///
+  i_num_ga i_num_ga::crossover(i_num_ga a, i_num_ga b) const
+  {
+    assert(a.debug());
+    assert(b.debug());
+
+    const auto cs(size());
+    assert(cs == a.size());
+    assert(cs == b.size());
+
+    const auto p_cross(*env_->p_cross);
+    const auto f(env_->de.diff_weight);
+
+    for (auto i(decltype(cs){0}); i < cs; ++i)
+      if (random::boolean(p_cross))
+        a.genome_[i].par += genome_[i].par + f * (a.genome_[i].par -
+                                                  b.genome_[i].par);
+
+    a.age_ = std::max({age(), a.age(), b.age()});
+
+    assert(a.debug());
+    return a;
   }
 
   ///
