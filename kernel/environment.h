@@ -99,15 +99,19 @@ namespace vita
     ///
     /// \note
     /// A negative value means means undefined (auto-tune).
+    ///
     /// \see
     /// * individual::mutation;
     /// * operation_strategy::run.
-    double p_mutation;
+    double p_mutation = -1.0;
 
     /// \brief Crossover probability.
     ///
+    /// \note
+    /// A negative value means means undefined (auto-tune).
+    ///
     /// \see operation_strategy::run.
-    boost::optional<double> p_cross;
+    double p_cross = -1.0;
 
     /// This parameter controls the brood recombination/selection level (0 to
     /// turn it off).

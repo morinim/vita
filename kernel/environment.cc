@@ -141,7 +141,7 @@ namespace vita
         return false;
       }
 
-      if (!p_cross)
+      if (p_cross < 0.0)
       {
         if (verbose)
           std::cerr << k_s_debug << " Undefined p_cross data member"
@@ -277,7 +277,7 @@ namespace vita
       return false;
     }
 
-    if (p_cross && (*p_cross < 0.0 || *p_cross > 1.0))
+    if (p_cross > 1.0)
     {
       if (verbose)
         std::cerr << k_s_debug << " p_cross out of range" << std::endl;

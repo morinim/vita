@@ -183,7 +183,9 @@ namespace vita
     assert(cs == a.size());
     assert(cs == b.size());
 
-    const auto p_cross(*env_->p_cross);
+    const auto p_cross(env_->p_cross);
+    assert(p_cross >= 0.0);
+
     const auto f(env_->de.diff_weight);
 
     for (auto i(decltype(cs){0}); i < cs; ++i)

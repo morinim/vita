@@ -291,8 +291,8 @@ void search<T, ES>::tune_parameters()
   if (constrained.p_mutation >= 0.0)
     env_.p_mutation = dflt.p_mutation;
 
-  if (!constrained.p_cross)
-    env_.p_cross = *dflt.p_cross;
+  if (constrained.p_cross >= 0.0)
+    env_.p_cross = dflt.p_cross;
 
   if (!constrained.brood_recombination)
     env_.brood_recombination = *dflt.brood_recombination;

@@ -40,13 +40,13 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  assert(env.p_cross);
-  assert(env.p_mutation);
+  assert(env.p_cross >= 0.0);
+  assert(env.p_mutation >= 0.0);
   assert(env.brood_recombination);
 
   const auto r1(parent[0]), r2(parent[1]);
 
-  if (vita::random::boolean(*env.p_cross))
+  if (vita::random::boolean(env.p_cross))
   {
     T off(pop[r1].crossover(pop[r2]));
     ++this->stats_->crossovers;
@@ -113,7 +113,7 @@ std::vector<T> de<T>::run(const std::vector<coord> &parent)
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  assert(env.p_cross);
+  assert(env.p_cross >= 0.0);
 
   return {pop[parent[0]].crossover(pop[parent[1]], pop[parent[2]])};
 }

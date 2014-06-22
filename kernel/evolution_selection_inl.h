@@ -377,8 +377,6 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 /// \return a vector of coordinates of randomly chosen individuals.
 ///
 /// Parameters from the environment:
-/// * mate_zone - to restrict the selection of individuals to a segment of
-///   the population;
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
@@ -389,9 +387,8 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  std::generate_n(ret, size, this->pickup);
-  //for (auto i(decltype(size){0}); i < size; ++i)
-  //  ret[i] = this->pickup();
+  for (auto i(decltype(size){0}); i < size; ++i)
+    ret[i] = this->pickup();
 
   return ret;
 }
