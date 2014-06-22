@@ -83,7 +83,6 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   {
     env.code_length = l;
     vita::i_mep i(env, sset);
-    // std::cout << i << std::endl;
 
     BOOST_REQUIRE(i.debug());
     BOOST_REQUIRE_EQUAL(i.size(), l);
@@ -144,6 +143,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     {
       BOOST_REQUIRE_NE(a, c);
       BOOST_REQUIRE_GT(a.distance(c), 0);
+      BOOST_REQUIRE_EQUAL(a.distance(c), c.distance(a));
     }
   }
 }
