@@ -147,6 +147,19 @@ namespace vita
     using std_es::evolution_strategy::evolution_strategy;
   };
 
+  ///
+  /// \brief Differential evolution strategy
+  ///
+  template<class T>
+  class de_es : public evolution_strategy<T,
+                                           selection::random,
+                                           recombination::de,
+                                           replacement::tournament>
+  {
+  public:
+    using de_es::evolution_strategy::evolution_strategy;
+  };
+
 #include "kernel/evolution_strategy_inl.h"
 
 }  // namespace vita

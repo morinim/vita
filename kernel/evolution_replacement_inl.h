@@ -18,8 +18,8 @@
 /// \param[in] eva current evaluator.
 ///
 template<class T>
-strategy<T>::strategy(population<T> &pop, evaluator<T> &eva)
-  : pop_(pop), eva_(eva)
+strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
+                                                               eva_(eva)
 {
 }
 
