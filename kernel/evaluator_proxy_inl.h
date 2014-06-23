@@ -109,16 +109,16 @@ fitness_t evaluator_proxy<T>::fast(const T &prg)
 /// \brief Resets the evaluation cache / clear the statistics.
 ///
 template<class T>
-void evaluator_proxy<T>::clear(unsigned what)
+void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
 {
   switch (what)
   {
-  case evaluator_proxy<T>::all:
-  case evaluator_proxy<T>::cache:
+  case evaluator<T>::all:
+  case evaluator<T>::cache:
     cache_.clear();
     break;
 
-  case evaluator_proxy<T>::stats:
+  case evaluator<T>::stats:
 #if defined(CLONE_SCALING)
     cache_.reset_seen();
 #endif

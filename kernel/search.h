@@ -60,7 +60,7 @@ namespace vita
 
     virtual bool debug(bool) const;
 
-  private:  // Private support methods.
+  private:  // Private support methods
     double accuracy(const T &) const;
     void dss(unsigned) const;
     fitness_t fitness(const T &);
@@ -69,7 +69,7 @@ namespace vita
     void print_resume(bool, const fitness_t &, double) const;
     bool stop_condition(const summary<T> &) const;
 
-  protected:  // Protected data members.
+  protected:  // Protected data members
     std::unique_ptr<evaluator<T>> active_eva_;
 
     /// This is the environment actually used during the search (\a prob_->env

@@ -43,7 +43,7 @@ namespace vita
   class evaluator
   {
   public:
-    enum {cache = 1, stats = 2, all = cache | stats};
+    enum clear_flag {cache = 1, stats = 2, all = cache | stats};
 
     /// \return the fitness of the individual.
     virtual fitness_t operator()(const T &) = 0;
@@ -52,7 +52,7 @@ namespace vita
     virtual fitness_t fast(const T &);
     virtual double accuracy(const T &) const;
     virtual unsigned seen(const T &) const;
-    virtual void clear(unsigned);
+    virtual void clear(clear_flag);
     virtual void clear(const T &);
     virtual std::string info() const;
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const;

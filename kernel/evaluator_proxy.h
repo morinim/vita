@@ -31,7 +31,7 @@ namespace vita
   public:
     evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
 
-    virtual void clear(unsigned) override;
+    virtual void clear(typename evaluator<T>::clear_flag) override;
     virtual void clear(const T &) override;
 
     virtual fitness_t operator()(const T &) override;

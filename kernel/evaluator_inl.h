@@ -70,7 +70,7 @@ unsigned evaluator<T>::seen(const T &) const
 /// The default implementation is empty.
 ///
 template<class T>
-void evaluator<T>::clear(unsigned)
+void evaluator<T>::clear(clear_flag)
 {
 }
 
