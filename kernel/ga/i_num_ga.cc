@@ -318,6 +318,20 @@ namespace vita
   }
 
   ///
+  /// \param[in] v input vector (a point in a multidimensional space)
+  ///
+  /// Sets the individuals with values from \a v.
+  ///
+  void i_num_ga::set(const std::vector<decltype(gene::par)> &v)
+  {
+    const auto sz(size());
+    assert(v.size() == sz);
+
+    for (auto i(decltype(sz){0}); i < sz; ++i)
+      genome_[i].par = v[i];
+  }
+
+  ///
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the individual passes the internal consistency check.
   ///

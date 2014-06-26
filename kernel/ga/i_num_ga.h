@@ -49,6 +49,10 @@ namespace vita
     const gene &operator[](unsigned i) const
     { assert(i < size()); return genome_[i]; }
 
+    void set(unsigned i, decltype(gene::par) v)
+    { assert(i < size()); genome_[i].par = v; }
+    void set(const std::vector<decltype(gene::par)> &);
+
     ///
     /// \return the size of the individual.
     ///
