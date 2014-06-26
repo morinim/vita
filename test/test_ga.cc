@@ -56,5 +56,16 @@ BOOST_AUTO_TEST_CASE(Interpreter)
   ind.set({-1.0, -2.0, -3.0, -4.0});
   ret = intr.run();
   BOOST_REQUIRE_CLOSE(vita::to<vita::ga::base_t>(ret), -10.0, epsilon);
+
+  vita::interpreter<vita::i_num_ga>::function f2 =
+    [](const std::vector<double> &v)
+    { return v[0] / v[1]; };
+
+  vita::interpreter<vita::i_num_ga> intr2(ind, f2);
+  BOOST_REQUIRE(intr2.debug());
+
+  ind.set({1.0, 0.0, 0.0, 0.0});
+  ret = intr2.run();
+  BOOST_REQUIRE(ret.empty());
 }
 BOOST_AUTO_TEST_SUITE_END()

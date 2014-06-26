@@ -25,9 +25,11 @@ namespace vita
   }
 
   ///
-  /// \return the output value of \c this \a individual.
+  /// \return the output value of function \a f_ with arguments from \c this
+  ///         \a individual.
   ///
-  /// The output value is a vector of real numbers.
+  /// The output value is empty in case of infinite / NAN numbers (for
+  /// uniformity with GP interpreters).
   ///
   any interpreter<i_num_ga>::run()
   {
@@ -37,7 +39,8 @@ namespace vita
     for (auto i(decltype(sz){0}); i < sz; ++i)
       v[i] = ind_[i].par;
 
-    return any(f_(v));
+    const auto f_v(f_(v));
+    return std::isfinite(f_v) ? any(f_v) : any();
   }
 
   ///
