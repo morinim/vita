@@ -23,10 +23,12 @@ using namespace boost;
 #include "factory_fixture2.h"
 #include "factory_fixture3.h"
 #include "factory_fixture4.h"
+#include "factory_fixture5.h"
 
 #include "test_evolution.cc"
 #include "test_fitness.cc"
-#include "test_individual.cc"
+#include "test_i_mep.cc"
+#include "test_i_num_ga.cc"
 #include "test_lambda.cc"
 #include "test_matrix.cc"
 #include "test_population.cc"

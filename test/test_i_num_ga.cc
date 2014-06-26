@@ -16,7 +16,7 @@
 #include "kernel/ga/i_num_ga.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE num_ga
+#define BOOST_TEST_MODULE t_i_num_ga
 #include <boost/test/unit_test.hpp>
 
 using namespace boost;
@@ -24,7 +24,7 @@ using namespace boost;
 #include "factory_fixture5.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(num_ga, F_FACTORY5)
+BOOST_FIXTURE_TEST_SUITE(t_i_num_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
