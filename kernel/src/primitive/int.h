@@ -65,7 +65,7 @@ namespace vita
       virtual any eval(core_interpreter *i) const override
       {
         return any(static_cast<base_t>(
-                     any_cast<decltype(gene::par)>(
+                     any_cast<gene::param_type>(
                        static_cast<interpreter<i_mep> *>(i)->fetch_param())));
       }
 

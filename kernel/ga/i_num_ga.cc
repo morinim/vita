@@ -263,7 +263,7 @@ namespace vita
       // Anyway before hashing opcodes/parameters we convert them to 16 bit
       // types to avoid hashing more than necessary.
       const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
-      assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
+      assert(g.sym->opcode() <= std::numeric_limits<opcode_t>::max());
 
       // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
       // std::uint8_t has the exact same size and representation as
@@ -322,7 +322,7 @@ namespace vita
   ///
   /// Sets the individuals with values from \a v.
   ///
-  void i_num_ga::set(const std::vector<decltype(gene::par)> &v)
+  void i_num_ga::set(const std::vector<gene::param_type> &v)
   {
     const auto sz(size());
     assert(v.size() == sz);

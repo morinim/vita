@@ -30,8 +30,6 @@ namespace vita
   class basic_gene
   {
   public:
-    static constexpr decltype(K) k_args{K};
-
     basic_gene() {}
     explicit basic_gene(symbol *);
     basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
@@ -47,6 +45,10 @@ namespace vita
       double            par;
       std::uint16_t args[K];
     };
+
+  public:  // Types and constants
+    using param_type = decltype(par);
+    static constexpr decltype(K) k_args{K};
   };
 
   template<unsigned K>
