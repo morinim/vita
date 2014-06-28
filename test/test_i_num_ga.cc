@@ -120,12 +120,25 @@ BOOST_AUTO_TEST_CASE(Crossover)
   for (unsigned j(0); j < n; ++j)
   {
     const vita::i_num_ga base(env, sset);
+    vita::i_num_ga i1(env, sset), i2(env, sset);
 
-    t1 = t2;
-    auto off(base.crossover(t1, t2));
+    auto off(base.crossover(i1, i1));
 
     for (unsigned i(0); i < base.size(); ++i)
       BOOST_CHECK_CLOSE(off(i), base(i), epsilon);
+
+    for (unsigned i(0); i < base.size(); ++i)
+    {
+      const auto delta(env.de.weight[1] * std::abs(i1(i) - i2(i)));
+
+      if (std::abs(off(i) - base(i)) > epsilon)
+      {
+        BOOST_CHECK_GT(off(i), base(i) - delta);
+        BOOST_CHECK_LT(off(i), base(i) + delta);
+      }
+      else
+        BOOST_CHECK_CLOSE(base(i), off(i), epsilon);
+    }
   }
 }
 

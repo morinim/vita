@@ -238,7 +238,7 @@ namespace vita
 
     struct de_parameters
     {
-      /// \brief Weighting factor range
+      /// \brief Weighting factor range (aka differential factor range)
       ///
       /// It has been found recently that selecting the weight from the
       /// interval [0.5, 1.0] randomly for each generation or for each
