@@ -21,6 +21,8 @@
 
 using namespace boost;
 
+constexpr double epsilon(0.00001);
+
 #include "factory_fixture5.h"
 #endif
 
@@ -98,6 +100,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 {
   vita::i_num_ga t1(env, sset), t2(env, sset);
 
+  BOOST_TEST_CHECKPOINT("Standard crossover");
   double dist(0.0);
   const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
@@ -112,6 +115,18 @@ BOOST_AUTO_TEST_CASE(Crossover)
   const double perc(100.0 * dist / ((sset.categories() + 1) * n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
+
+  BOOST_TEST_CHECKPOINT("DE crossover");
+  for (unsigned j(0); j < n; ++j)
+  {
+    const vita::i_num_ga base(env, sset);
+
+    t1 = t2;
+    auto off(base.crossover(t1, t2));
+
+    for (unsigned i(0); i < base.size(); ++i)
+      BOOST_CHECK_CLOSE(off(i), base(i), epsilon);
+  }
 }
 
 /*

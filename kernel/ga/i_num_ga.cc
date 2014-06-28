@@ -179,7 +179,7 @@ namespace vita
   /// separate probability distribution has to be used which makes the scheme
   /// completely self-organizing.
   ///
-  i_num_ga i_num_ga::crossover(i_num_ga a, i_num_ga b) const
+  i_num_ga i_num_ga::crossover(const i_num_ga &a, const i_num_ga &b) const
   {
     assert(a.debug());
     assert(b.debug());
@@ -191,17 +191,17 @@ namespace vita
     const auto p_cross(env_->p_cross);
     assert(p_cross >= 0.0);
 
-    const auto f(env_->de.diff_weight);
+    const auto &f(env_->de.weight);
 
+    i_num_ga off(*this);
     for (auto i(decltype(cs){0}); i < cs; ++i)
       if (random::boolean(p_cross))
-        a.genome_[i].par += genome_[i].par + f * (a.genome_[i].par -
-                                                  b.genome_[i].par);
+        off(i) += random::between(f[0], f[1]) * (a(i) - b(i));
 
-    a.age_ = std::max({age(), a.age(), b.age()});
+    off.age_ = std::max({age(), a.age(), b.age()});
 
-    assert(a.debug());
-    return a;
+    assert(off.debug());
+    return off;
   }
 
   ///

@@ -44,7 +44,7 @@ namespace vita
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
     i_num_ga crossover(i_num_ga) const;
-    i_num_ga crossover(i_num_ga, i_num_ga) const;
+    i_num_ga crossover(const i_num_ga &, const i_num_ga &) const;
 
     using const_iterator = typename std::vector<gene>::const_iterator;
     const_iterator begin() const;
@@ -57,8 +57,11 @@ namespace vita
     const gene &operator[](unsigned i) const
     { assert(i < size()); return genome_[i]; }
 
-    void set(unsigned i, gene::param_type v)
-    { assert(i < size()); genome_[i].par = v; }
+    double operator()(unsigned i) const
+    { assert(i < size()); return genome_[i].par; }
+
+    double &operator()(unsigned i)
+    { assert(i < size()); return genome_[i].par; }
 
     i_num_ga &operator=(const std::vector<gene::param_type> &);
 

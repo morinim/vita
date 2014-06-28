@@ -238,7 +238,13 @@ namespace vita
 
     struct de_parameters
     {
-      double diff_weight = 0.8;
+      /// \brief Weighting factor range
+      ///
+      /// It has been found recently that selecting the weight from the
+      /// interval [0.5, 1.0] randomly for each generation or for each
+      /// difference vector, a technique called dither, improves convergence
+      /// behaviour significantly, especially for noisy objective functions.
+      double weight[2] = {0.5, 1.0};
     } de;
 
     struct team_parameters
