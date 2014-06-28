@@ -174,6 +174,11 @@ namespace vita
   /// \return the result of the crossover (we only generate a single
   ///         offspring).
   ///
+  /// The offspring is produced adding the weighted difference between \a a and
+  /// \a b to \a *this vector (but just for some random loci). This way no
+  /// separate probability distribution has to be used which makes the scheme
+  /// completely self-organizing.
+  ///
   i_num_ga i_num_ga::crossover(i_num_ga a, i_num_ga b) const
   {
     assert(a.debug());
@@ -318,17 +323,20 @@ namespace vita
   }
 
   ///
-  /// \param[in] v input vector (a point in a multidimensional space)
+  /// \param[in] v input vector (a point in a multidimensional space).
+  /// \return a reference to \a *this.
   ///
   /// Sets the individuals with values from \a v.
   ///
-  void i_num_ga::set(const std::vector<gene::param_type> &v)
+  i_num_ga &i_num_ga::operator=(const std::vector<gene::param_type> &v)
   {
     const auto sz(size());
     assert(v.size() == sz);
 
     for (auto i(decltype(sz){0}); i < sz; ++i)
       genome_[i].par = v[i];
+
+    return *this;
   }
 
   ///

@@ -20,6 +20,14 @@
 namespace vita
 {
   ///
+  /// \brief An individual optimized for differential evolution method
+  ///
+  /// This essentially is a real value vector.
+  ///
+  /// The class is compatible with many GP algorithms (having the same
+  /// interface of \a i_mep class). \a i_num_ga adds the special three terms
+  /// crossover operator which is the crucial idea behind DE.
+  ///
   class i_num_ga
   {
   public:
@@ -51,7 +59,8 @@ namespace vita
 
     void set(unsigned i, gene::param_type v)
     { assert(i < size()); genome_[i].par = v; }
-    void set(const std::vector<gene::param_type> &);
+
+    i_num_ga &operator=(const std::vector<gene::param_type> &);
 
     ///
     /// \return the size of the individual.
