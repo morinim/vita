@@ -385,6 +385,66 @@ namespace vita
   }
 
   ///
+  /// \param[in] in input stream.
+  /// \return \c true if individual was loaded correctly.
+  ///
+  /// \note
+  /// If the load operation isn't successful the current individual isn't
+  /// modified.
+  ///
+  bool i_num_ga::load(std::istream &in)
+  {
+    decltype(age_) t_age;
+    if (!(in >> t_age))
+      return false;
+
+    decltype(genome_)::size_type sz;
+    if (!(in >> sz) || !sz)
+      return false;
+
+    decltype(genome_) v(sz);
+    for (auto &e : v)
+    {
+      opcode_t opcode;
+      if (!(in >> opcode))
+        return false;
+
+      gene g;
+      g.sym = sset_->decode(opcode);
+      if (!g.sym)
+        return false;
+
+      if (!(in >> g.par))
+        return false;
+
+      e = g;
+    }
+
+    age_ = t_age;
+    genome_ = v;
+
+    // We don't save/load signature: it can be easily calculated on the fly.
+    signature_.clear();
+
+    return true;
+  }
+
+  ///
+  /// \param[out] out output stream.
+  /// \return \c true if individual was saved correctly.
+  ///
+  bool i_num_ga::save(std::ostream &out) const
+  {
+    out << age() << std::endl;
+
+    out << size() << std::endl;
+    for (const auto &g : genome_)
+      out << g.sym->opcode() << ' ' << g.par << std::endl;
+
+    return out.good();
+  }
+
+  ///
   /// \param[out] s output stream.
   /// \param[in] ind individual to print.
   /// \return output stream including \a ind.

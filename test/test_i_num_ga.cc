@@ -96,28 +96,29 @@ BOOST_AUTO_TEST_CASE(Comparison)
   }
 }
 
-BOOST_AUTO_TEST_CASE(Crossover)
+BOOST_AUTO_TEST_CASE(StandardCrossover)
 {
-  vita::i_num_ga t1(env, sset), t2(env, sset);
+  vita::i_num_ga i1(env, sset), i2(env, sset);
 
-  BOOST_TEST_CHECKPOINT("Standard crossover");
   double dist(0.0);
   const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
   {
-    const auto tc(t1.crossover(t2));
-    BOOST_CHECK(tc.debug(true));
+    const auto ic(i1.crossover(i2));
+    BOOST_CHECK(ic.debug(true));
 
-    dist += t1.distance(tc);
+    dist += i1.distance(ic);
   }
 
   // +1 since we have at least one gene involved in crossover.
   const double perc(100.0 * dist / ((sset.categories() + 1) * n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
+}
 
-  BOOST_TEST_CHECKPOINT("DE crossover");
-  for (unsigned j(0); j < n; ++j)
+BOOST_AUTO_TEST_CASE(DeCrossover)
+{
+  for (unsigned j(0); j < 1000; ++j)
   {
     const vita::i_num_ga base(env, sset);
     vita::i_num_ga i1(env, sset), i2(env, sset);
@@ -142,24 +143,23 @@ BOOST_AUTO_TEST_CASE(Crossover)
   }
 }
 
-/*
 BOOST_AUTO_TEST_CASE(Serialization)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::team<vita::i_mep> t1(env, sset);
+    vita::i_num_ga i1(env, sset);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
-      t1.inc_age();
+      i1.inc_age();
 
-    BOOST_REQUIRE(t1.save(ss));
+    BOOST_REQUIRE(i1.save(ss));
 
-    vita::team<vita::i_mep> t2(env, sset);
-    BOOST_REQUIRE(t2.load(ss));
-    BOOST_REQUIRE(t2.debug());
+    vita::i_num_ga i2(env, sset);
+    BOOST_REQUIRE(i2.load(ss));
+    BOOST_REQUIRE(i2.debug());
 
-    BOOST_CHECK_EQUAL(t1, t2);
+    BOOST_CHECK_EQUAL(i1, i2);
   }
-}*/
+}
 BOOST_AUTO_TEST_SUITE_END()

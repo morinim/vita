@@ -96,6 +96,10 @@ namespace vita
 
     bool debug(bool = true) const;
 
+  public:   // Serialization
+    bool load(std::istream &);
+    bool save(std::ostream &) const;
+
   private:  // Private support methods
     hash_t hash() const;
     void pack(std::vector<unsigned char> *const) const;
