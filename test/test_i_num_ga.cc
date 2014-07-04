@@ -96,6 +96,21 @@ BOOST_AUTO_TEST_CASE(Comparison)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Iterators)
+{
+  for (unsigned j(0); j < 1000; ++j)
+  {
+    vita::i_num_ga ind(env, sset);
+
+    unsigned i(0);
+    for (const auto &g : ind)
+    {
+      BOOST_CHECK_EQUAL(g, ind[i]);
+      ++i;
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE(StandardCrossover)
 {
   vita::i_num_ga i1(env, sset), i2(env, sset);
