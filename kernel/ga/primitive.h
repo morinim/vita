@@ -35,7 +35,7 @@ namespace vita
   /// an empty \c any()).
   namespace ga
   {
-    typedef decltype(gene::par) base_t;
+    using base_t = g_parameter;
 
     ///
     /// \param[in] v the value that must be casted to base type (\c base_t).

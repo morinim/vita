@@ -57,6 +57,8 @@ namespace vita
   /// Index in the genome. Locus is uniquely identified by a couple of indexes.
   using index_t = unsigned;
 
+  using g_parameter = double;
+
   /// \brief Prefix for debug messages
   const char k_s_debug[] = "[DEBUG]";
   /// \brief Prefix for error messages

@@ -42,7 +42,7 @@ namespace vita
     symbol *sym;
     union
     {
-      double            par;
+      g_parameter       par;
       std::uint16_t args[K];
     };
 

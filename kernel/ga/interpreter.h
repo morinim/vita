@@ -18,6 +18,9 @@
 
 namespace vita
 {
+  /// Pointer to multivariable real function.
+using ga_function = double (*)(const std::vector<double> &);
+
   ///
   /// \brief A template specialization for interpreter<T> class
   ///
@@ -31,9 +34,11 @@ namespace vita
   class interpreter<i_num_ga> : public core_interpreter
   {
   public:
-    using function = std::function<double (const std::vector<double> &)>;
+    /// A multivariable real function.
+    static ga_function function;
 
-    interpreter(const i_num_ga &, const function &);
+  public:
+    explicit interpreter(const i_num_ga &);
 
     virtual any run() override;
 
@@ -43,7 +48,6 @@ namespace vita
 
   private:
     const i_num_ga &ind_;
-    const function &f_;
   };
 }  // namespace vita
 

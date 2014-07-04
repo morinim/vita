@@ -22,6 +22,8 @@ namespace vita
   class core_interpreter;
   template<class T> class interpreter;
 
+  template<class T> class evaluator;
+
   template<class T,
            template<class> class SS,
            template<class> class CS,

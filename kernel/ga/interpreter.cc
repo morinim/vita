@@ -15,17 +15,18 @@
 
 namespace vita
 {
+  ga_function interpreter<i_num_ga>::function = nullptr;
+
   ///
   /// \param[in] ind individual whose value we are interested in.
-  /// \param[in] f a multivariable real function.
   ///
-  interpreter<i_num_ga>::interpreter(const i_num_ga &ind, const function &f)
-    : core_interpreter(), ind_(ind), f_(f)
+  interpreter<i_num_ga>::interpreter(const i_num_ga &ind) : core_interpreter(),
+                                                            ind_(ind)
   {
   }
 
   ///
-  /// \return the output value of function \a f_ with arguments from \c this
+  /// \return the output value of \a function with arguments from \c this
   ///         \a individual.
   ///
   /// The output value is empty in case of infinite / NAN numbers (for
@@ -33,13 +34,15 @@ namespace vita
   ///
   any interpreter<i_num_ga>::run()
   {
+    assert(function);
+
     const auto sz(ind_.size());
     std::vector<decltype(gene::par)> v(sz);
 
     for (auto i(decltype(sz){0}); i < sz; ++i)
       v[i] = ind_[i].par;
 
-    const auto f_v(f_(v));
+    const auto f_v(function(v));
     return std::isfinite(f_v) ? any(f_v) : any();
   }
 
