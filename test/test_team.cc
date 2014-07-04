@@ -101,6 +101,21 @@ BOOST_AUTO_TEST_CASE(Comparison)
   }
 }
 
+BOOST_AUTO_TEST_CASE(Iterators)
+{
+  for (unsigned j(0); j < 1000; ++j)
+  {
+    vita::team<vita::i_mep> t(env, sset);
+
+    unsigned i(0);
+    for (const auto &ind : t)
+    {
+      BOOST_CHECK_EQUAL(ind, t[i]);
+      ++i;
+    }
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
