@@ -93,11 +93,10 @@ BOOST_AUTO_TEST_CASE(Evaluator)
     BOOST_REQUIRE(intr.debug());
 
     vita::evaluator<vita::i_num_ga> eva;
-    const vita::fitness_t eva_ret(eva(ind));
+    const auto eva_ret(eva(ind));
     BOOST_REQUIRE_LE(eva_ret, 0.0);
 
-    const vita::any intr_ret(intr.run());
-    std::cout << eva_ret << "  " << intr_ret << std::endl;
+    const auto intr_ret(intr.run());
 
     if (!intr_prev.empty())
     {
