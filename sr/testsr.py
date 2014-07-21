@@ -54,7 +54,7 @@ settings = {
 
 def sr(args, data_set, generations, individuals, code_length, rounds,
        symbol_set, evaluator):
-    sr = "sr_test" if os.path.exists("sr_test") else "sr"
+    sr = "./sr_test" if os.path.exists("sr_test") else "sr"
 
     mode = args.mode;
 
