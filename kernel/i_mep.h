@@ -19,10 +19,9 @@
 #include <set>
 
 #include "kernel/function.h"
+#include "kernel/individual.h"
 #include "kernel/locus.h"
 #include "kernel/matrix.h"
-#include "kernel/symbol_set.h"
-#include "kernel/ttable.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
@@ -32,7 +31,7 @@ namespace vita
   /// which represents a possible solution to the task being tackled (i.e. a
   /// point in the search space).
   ///
-  class i_mep
+  class i_mep : public individual
   {
   public:
     i_mep(const environment &, const symbol_set &);
@@ -64,22 +63,6 @@ namespace vita
     unsigned distance(const i_mep &) const;
 
     hash_t signature() const;
-
-    /// This is a measure of how long an individual's family of genotypic
-    /// material has been in the population. Randomly generated individuals,
-    /// such as those that are created when the search algorithm are started,
-    /// start with an age of 0. Each generation that an individual stays in the
-    /// population (such as through elitism) its age is increased by one.
-    /// Individuals that are created through mutation or recombination take the
-    /// age of their oldest parent.
-    /// This differs from conventional measures of age, in which individuals
-    /// created through applying some type of variation to an existing
-    /// individual (e.g. mutation or recombination) start with an age of 0.
-    unsigned age() const { return age_; }
-    void inc_age() { ++age_; }
-
-    const environment &env() const { return *env_; }
-    const symbol_set &sset() const { return *sset_; }
 
     bool debug(bool = true) const;
 
@@ -136,19 +119,9 @@ namespace vita
     // organism's hereditary information).
     matrix<gene> genome_;
 
-    // Note that syntactically distinct (but logically equivalent) individuals
-    // have the same signature. This is a very interesting  property, useful
-    // for individual comparison, information retrieval, entropy calculation...
-    mutable hash_t signature_;
-
     // Starting point of the active code in this individual (the best sequence
     // of genes is starting here).
     locus best_;
-
-    unsigned age_;
-
-    const environment  *env_;
-    const symbol_set  *sset_;
   };  // class i_mep
 
   std::ostream &operator<<(std::ostream &, const i_mep &);

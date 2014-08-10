@@ -29,16 +29,13 @@ namespace vita
   /// constraints.
   ///
   i_mep::i_mep(const environment &e, const symbol_set &ss)
-    : genome_(e.code_length, ss.categories()), signature_(), best_{0, 0},
-      age_(0), env_(&e), sset_(&ss)
+    : individual(e, ss), genome_(e.code_length, ss.categories()), best_{0, 0}
   {
-    assert(e.debug(true, true));
-
     assert(size());
-    assert(env_->patch_length);
-    assert(size() > env_->patch_length);
+    assert(e.patch_length);
+    assert(size() > e.patch_length);
 
-    const index_t sup(size()), patch(sup - env_->patch_length);
+    const index_t sup(size()), patch(sup - e.patch_length);
 
     const auto categories(ss.categories());
     assert(categories);

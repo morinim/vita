@@ -14,8 +14,7 @@
 #define      VITA_GA_I_NUM_GA_H
 
 #include "kernel/gene.h"
-#include "kernel/symbol_set.h"
-#include "kernel/ttable.h"
+#include "kernel/individual.h"
 
 namespace vita
 {
@@ -36,7 +35,7 @@ namespace vita
   /// interface of \a i_mep class). \a i_num_ga adds the special three terms
   /// crossover operator which is the crucial idea behind DE.
   ///
-  class i_num_ga
+  class i_num_ga : public individual
   {
   public:
     explicit i_num_ga(const environment &, const symbol_set &);
@@ -86,22 +85,6 @@ namespace vita
     bool operator==(const i_num_ga &) const;
     unsigned distance(const i_num_ga &) const;
 
-    /// This is a measure of how long an individual's family of genotypic
-    /// material has been in the population. Randomly generated individuals,
-    /// such as those that are created when the search algorithm are started,
-    /// start with an age of 0. Each generation that an individual stays in the
-    /// population (such as through elitism) its age is increased by one.
-    /// Individuals that are created through mutation or recombination take the
-    /// age of their oldest parent.
-    /// This differs from conventional measures of age, in which individuals
-    /// created through applying some type of variation to an existing
-    /// individual (e.g. mutation or recombination) start with an age of 0.
-    unsigned age() const { return age_; }
-    void inc_age() { ++age_; }
-
-    const environment &env() const { return *env_; }
-    const symbol_set &sset() const { return *sset_; }
-
     bool debug(bool = true) const;
 
   public:   // Serialization
@@ -116,13 +99,6 @@ namespace vita
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
     std::vector<gene> genome_;
-
-    mutable hash_t signature_;
-
-    unsigned age_;
-
-    const environment  *env_;
-    const symbol_set  *sset_;
   };  // class i_num_ga
 
   std::ostream &operator<<(std::ostream &, const i_num_ga &);

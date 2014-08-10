@@ -24,7 +24,7 @@ namespace vita
   /// constraints.
   ///
   i_num_ga::i_num_ga(const environment &e, const symbol_set &ss)
-    : genome_(ss.categories()), signature_(), age_(0), env_(&e), sset_(&ss)
+    : individual(e, ss), genome_(ss.categories())
   {
     assert(e.debug(true, true));
 
