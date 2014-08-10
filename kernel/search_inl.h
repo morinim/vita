@@ -603,7 +603,8 @@ void search<T, ES>::log(const summary<T> &run_sum,
     env_.log(&pt, path);
 
     using namespace boost::property_tree;
-    write_xml(f_sum, pt, std::locale(), xml_writer_make_settings(' ', 2));
+    write_xml(f_sum, pt, std::locale(),
+              xml_writer_make_settings<std::string>(' ', 2));
   }
 
   // Test set results logging.
