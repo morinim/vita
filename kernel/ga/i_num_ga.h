@@ -22,7 +22,15 @@ namespace vita
   ///
   /// \brief An individual optimized for differential evolution method
   ///
-  /// This essentially is a real value vector.
+  /// This is essentially a real value vector.
+  ///
+  /// While many genetic algorithms use integers to approximate continuous
+  /// parameters, this choice limits the resolution with which an optimum can
+  /// be located. Floating point not only uses computer resources efficently,
+  /// it also makes input and output transparent for the user. Parameters can
+  /// be input, manipulated and output as ordinary floating-point numbers
+  /// without ever being reformatted as genes with a different binary
+  /// representation.
   ///
   /// The class is compatible with many GP algorithms (having the same
   /// interface of \a i_mep class). \a i_num_ga adds the special three terms
