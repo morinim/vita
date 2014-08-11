@@ -603,8 +603,13 @@ void search<T, ES>::log(const summary<T> &run_sum,
     env_.log(&pt, path);
 
     using namespace boost::property_tree;
+#if BOOST_VERSION >= 105600
     write_xml(f_sum, pt, std::locale(),
               xml_writer_make_settings<std::string>(' ', 2));
+#else
+    write_xml(f_sum, pt, std::locale(),
+              xml_writer_make_settings(' ', 2));
+#endif
   }
 
   // Test set results logging.
