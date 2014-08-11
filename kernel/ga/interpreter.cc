@@ -37,10 +37,10 @@ namespace vita
     assert(function);
 
     const auto sz(ind_.size());
-    std::vector<decltype(gene::par)> v(sz);
+    std::vector<gene::param_type> v(sz);
 
     for (auto i(decltype(sz){0}); i < sz; ++i)
-      v[i] = ind_[i].par;
+      v[i] = ind_[i];
 
     const auto f_v(function(v));
     return std::isfinite(f_v) ? any(f_v) : any();
@@ -50,12 +50,9 @@ namespace vita
   /// \param[in] i the index of the parameter we are interested in.
   /// \return the output value of the current terminal symbol.
   ///
-  any interpreter<i_num_ga>::fetch_param(unsigned i)
+  gene::param_type interpreter<i_num_ga>::fetch_param(unsigned i)
   {
-    const gene &g(ind_[i]);
-
-    assert(g.sym->parametric());
-    return any(g.par);
+    return ind_[i];
   }
 
   ///

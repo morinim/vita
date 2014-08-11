@@ -57,17 +57,10 @@ namespace vita
     const_iterator begin() const;
     const_iterator end() const;
 
-    ///
-    /// \param[in] l locus of a \c gene.
-    /// \return the l-th \c gene of \a this \c individual.
-    ///
-    const gene &operator[](unsigned i) const
-    { assert(i < size()); return genome_[i]; }
-
-    double operator()(unsigned i) const
+    double operator[](unsigned i) const
     { assert(i < size()); return genome_[i].par; }
 
-    double &operator()(unsigned i)
+    double &operator[](unsigned i)
     { assert(i < size()); return genome_[i].par; }
 
     i_num_ga &operator=(const std::vector<gene::param_type> &);

@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &g : ind)
     {
-      BOOST_CHECK_EQUAL(g, ind[i]);
+      BOOST_CHECK_EQUAL(g.par, ind[i]);
       ++i;
     }
   }
@@ -141,19 +141,19 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     auto off(base.crossover(i1, i1));
 
     for (unsigned i(0); i < base.size(); ++i)
-      BOOST_CHECK_CLOSE(off(i), base(i), epsilon);
+      BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
 
     for (unsigned i(0); i < base.size(); ++i)
     {
-      const auto delta(env.de.weight[1] * std::abs(i1(i) - i2(i)));
+      const auto delta(env.de.weight[1] * std::abs(i1[i] - i2[i]));
 
-      if (std::abs(off(i) - base(i)) > epsilon)
+      if (std::abs(off[i] - base[i]) > epsilon)
       {
-        BOOST_CHECK_GT(off(i), base(i) - delta);
-        BOOST_CHECK_LT(off(i), base(i) + delta);
+        BOOST_CHECK_GT(off[i], base[i] - delta);
+        BOOST_CHECK_LT(off[i], base[i] + delta);
       }
       else
-        BOOST_CHECK_CLOSE(base(i), off(i), epsilon);
+        BOOST_CHECK_CLOSE(base[i], off[i], epsilon);
     }
   }
 }

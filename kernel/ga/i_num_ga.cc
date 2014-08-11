@@ -196,7 +196,7 @@ namespace vita
     i_num_ga off(*this);
     for (auto i(decltype(cs){0}); i < cs; ++i)
       if (random::boolean(p_cross))
-        off(i) += random::between(f[0], f[1]) * (a(i) - b(i));
+        off[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
 
     off.age_ = std::max({age(), a.age(), b.age()});
 

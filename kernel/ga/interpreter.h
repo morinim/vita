@@ -14,6 +14,7 @@
 #define      VITA_GA_INTERPRETER_H
 
 #include "kernel/core_interpreter.h"
+#include "kernel/gene.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
@@ -42,7 +43,7 @@ using ga_function = double (*)(const std::vector<double> &);
 
     virtual any run() override;
 
-    any fetch_param(unsigned);
+    gene::param_type fetch_param(unsigned);
 
     virtual bool debug() const override;
 

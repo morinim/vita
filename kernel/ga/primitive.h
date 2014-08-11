@@ -35,7 +35,7 @@ namespace vita
   /// an empty \c any()).
   namespace ga
   {
-    using base_t = g_parameter;
+    using base_t = gene::param_type;
 
     ///
     /// \param[in] v the value that must be casted to base type (\c base_t).
@@ -64,9 +64,8 @@ namespace vita
 
       virtual any eval(core_interpreter *i) const override
       {
-        return any(any_cast<base_t>(
-                     static_cast<interpreter<i_num_ga> *>(i)->fetch_param(
-                       category())));
+        return any(static_cast<interpreter<i_num_ga> *>(i)->fetch_param(
+                       category()));
       }
 
     private:  // Private data members
