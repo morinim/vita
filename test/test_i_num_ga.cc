@@ -133,12 +133,14 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
 
 BOOST_AUTO_TEST_CASE(DeCrossover)
 {
+  double diff(0), length(0);
+
   for (unsigned j(0); j < 1000; ++j)
   {
     const vita::i_num_ga base(env, sset);
     vita::i_num_ga i1(env, sset), i2(env, sset);
 
-    auto off(base.crossover(i1, i1));
+    const auto off(base.crossover(i1, i1));
 
     for (unsigned i(0); i < base.size(); ++i)
       BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
@@ -154,8 +156,16 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
       }
       else
         BOOST_CHECK_CLOSE(base[i], off[i], epsilon);
+
+      if (!vita::almost_equal(base[i], off[i]))
+        ++diff;
     }
+
+    length += base.size();
   }
+
+  BOOST_CHECK_LT(diff / length, env.p_cross + 2.0);
+  BOOST_CHECK_GT(diff / length, env.p_cross - 2.0);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)

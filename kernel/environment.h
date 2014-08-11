@@ -85,7 +85,7 @@ namespace vita
     /// converge quicker but losing diversity.
     boost::tribool elitism = boost::indeterminate;
 
-    /// \brief Mutation probability.
+    /// \brief Mutation probability
     ///
     /// Mutation is one of the principal "search operators" used to transform
     /// programs in the Genetic Programming algorithm. It causes random
@@ -105,7 +105,7 @@ namespace vita
     /// * operation_strategy::run.
     double p_mutation = -1.0;
 
-    /// \brief Crossover probability.
+    /// \brief Crossover probability
     ///
     /// \note
     /// A negative value means means undefined (auto-tune).
@@ -203,7 +203,7 @@ namespace vita
 
     ///
     /// \brief Parameters for the Age-Layered Population Structure (ALPS)
-    ///        paradigm.
+    ///        paradigm
     ///
     /// ALPS is a meta heuristic for overcoming premature convergence by
     /// running multiple instances of a search algorithm in parallel, with each
