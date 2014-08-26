@@ -157,7 +157,18 @@ BOOST_AUTO_TEST_CASE(Crossover)
   const unsigned n(2000);
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
-    dist += i1.distance(i1.crossover(i2));
+  {
+    if (vita::random::boolean())
+      i1.inc_age();
+    if (vita::random::boolean())
+      i2.inc_age();
+
+    const auto ic(i1.crossover(i2));
+    BOOST_CHECK(ic.debug(true));
+    BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
+
+    dist += i1.distance(ic);
+  }
 
   const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
   BOOST_CHECK_GT(perc, 45.0);

@@ -119,8 +119,14 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
   const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
   {
+    if (vita::random::boolean())
+      i1.inc_age();
+    if (vita::random::boolean())
+      i2.inc_age();
+
     const auto ic(i1.crossover(i2));
     BOOST_CHECK(ic.debug(true));
+    BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
 
     dist += i1.distance(ic);
   }
@@ -140,22 +146,29 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     const vita::i_num_ga base(env, sset);
     vita::i_num_ga i1(env, sset), i2(env, sset);
 
-    const auto off(base.crossover(i1, i1));
+    const auto a1(vita::random::between<unsigned>(0, 100));
+    for (unsigned k(0); k < a1; ++k)
+      i1.inc_age();
+    const auto a2(vita::random::between<unsigned>(0, 100));
+    for (unsigned k(0); k < a2; ++k)
+      i2.inc_age();
+
+    auto off(base.crossover(i1, i1));
+    BOOST_CHECK(off.debug(true));
 
     for (unsigned i(0); i < base.size(); ++i)
       BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
+
+    off = base.crossover(i1, i2);
+    BOOST_CHECK(off.debug(true));
+    BOOST_REQUIRE_EQUAL(off.age(), std::max({base.age(), i1.age(), i2.age()}));
 
     for (unsigned i(0); i < base.size(); ++i)
     {
       const auto delta(env.de.weight[1] * std::abs(i1[i] - i2[i]));
 
-      if (std::abs(off[i] - base[i]) > epsilon)
-      {
-        BOOST_CHECK_GT(off[i], base[i] - delta);
-        BOOST_CHECK_LT(off[i], base[i] + delta);
-      }
-      else
-        BOOST_CHECK_CLOSE(base[i], off[i], epsilon);
+      BOOST_CHECK_GT(off[i], base[i] - delta);
+      BOOST_CHECK_LT(off[i], base[i] + delta);
 
       if (!vita::almost_equal(base[i], off[i]))
         ++diff;
