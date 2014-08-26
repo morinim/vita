@@ -29,40 +29,41 @@ namespace vita
     index_t       index;
     category_t category;
 
-    bool operator==(const locus &) const;
-    bool operator!=(const locus &) const;
-    bool operator<(const locus &) const;
     locus operator+(index_t) const;
   };
 
   ///
+  /// \param[in] l1 first locus.
   /// \param[in] l2 second locus.
   /// \return \c true if \a *this is equal to \a l2.
   ///
-  inline bool locus::operator==(const locus &l2) const
+  inline bool operator==(const locus &l1, const locus &l2)
   {
-    return index == l2.index && category == l2.category;
+    return l1.index == l2.index && l1.category == l2.category;
   }
 
   ///
+  /// \param[in] l1 first locus.
   /// \param[in] l2 second locus.
   /// \return \c true if \a *this is not equal to \a l2.
   ///
-  inline bool locus::operator!=(const locus &l2) const
+  inline bool operator!=(const locus &l1, const locus &l2)
   {
-    return index != l2.index || category != l2.category;
+    return l1.index != l2.index || l1.category != l2.category;
   }
 
   ///
+  /// \param[in] l1 first locus.
   /// \param[in] l2 second locus.
   /// \return \c true if \a *this precedes \a l2 in lexicographic order
   ///         (http://en.wikipedia.org/wiki/Lexicographical_order).
   ///
   /// This operator is required by the STL std::map container.
   ///
-  inline bool locus::operator<(const locus &l2) const
+  inline bool operator<(const locus &l1, const locus &l2)
   {
-    return index < l2.index || (index == l2.index && category < l2.category);
+    return l1.index < l2.index ||
+           (l1.index == l2.index && l1.category < l2.category);
   }
 
   ///
