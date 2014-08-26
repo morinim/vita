@@ -16,6 +16,7 @@
 #include <list>
 
 #include <boost/property_tree/xml_parser.hpp>
+#include <boost/version.hpp>
 
 #include "kernel/adf.h"
 #include "kernel/evolution.h"
