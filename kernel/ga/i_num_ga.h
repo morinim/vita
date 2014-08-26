@@ -32,8 +32,13 @@ namespace vita
   /// representation.
   ///
   /// The class is compatible with many GP algorithms (having the same
-  /// interface of \a i_mep class). \a i_num_ga adds the special three terms
+  /// interface of \a i_mep class).
+  ///
+  /// \a i_num_ga adds the special three terms
   /// crossover operator which is the crucial idea behind DE.
+  ///
+  /// \see
+  /// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264).
   ///
   class i_num_ga : public individual
   {
@@ -42,7 +47,7 @@ namespace vita
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;
-    std::ostream &in_line(std::ostream &) const;
+    virtual std::ostream &in_line(std::ostream &) const override;
     std::ostream &list(std::ostream &) const;
     std::ostream &tree(std::ostream &) const;
 

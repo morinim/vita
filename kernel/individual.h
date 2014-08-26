@@ -29,7 +29,7 @@ namespace vita
   /// which represents a possible solution to the task being tackled (i.e. a
   /// point in the search space).
   ///
-  /// This class is the base class of every type of individual. The class
+  /// This class is the base class of every type of individual. The class:
   /// * factorizes out common code;
   /// * defines a minimum common interface.
   ///
@@ -53,6 +53,9 @@ namespace vita
 
     const environment &env() const { return *env_; }
     const symbol_set &sset() const { return *sset_; }
+
+    // Visualization/output methods
+    virtual std::ostream &in_line(std::ostream &) const = 0;
 
   protected:  // Protected data members
     // Note that syntactically distinct (but logically equivalent) individuals

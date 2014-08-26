@@ -39,7 +39,7 @@ namespace vita
     // Visualization/output methods
     std::ostream &dump(std::ostream &) const;
     void graphviz(std::ostream &, const std::string & = "") const;
-    std::ostream &in_line(std::ostream &) const;
+    virtual std::ostream &in_line(std::ostream &) const override;
     std::ostream &list(std::ostream &) const;
     std::ostream &tree(std::ostream &) const;
 
