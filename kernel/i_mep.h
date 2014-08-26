@@ -49,6 +49,7 @@ namespace vita
     unsigned mutation(double);
     i_mep crossover(i_mep) const;
 
+    // Working with blocks / genome
     std::vector<locus> blocks() const;
     i_mep destroy_block(index_t) const;
     i_mep get_block(const locus &) const;
@@ -59,48 +60,27 @@ namespace vita
 
     std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
 
+    void set(const locus &l, const gene &g);
+
+    // Comparison
     bool operator==(const i_mep &) const;
     unsigned distance(const i_mep &) const;
 
     hash_t signature() const;
 
-    bool debug(bool = true) const;
+    const gene &operator[](const locus &l) const;
 
-    ///
-    /// \param[in] l locus of a \c gene.
-    /// \return the l-th \c gene of \a this \c individual.
-    ///
-    const gene &operator[](const locus &l) const { return genome_(l); }
-
-    class const_iterator;
-    const_iterator begin() const;
-    const_iterator end() const;
-
-    ///
-    /// \return the total size of the individual (effective size + introns).
-    ///
-    /// The size is constant for any individual (it's chosen at initialization
-    /// time).
-    /// \see eff_size()
-    ///
-    unsigned size() const { return genome_.rows(); }
+    unsigned size() const;
 
     unsigned eff_size() const;
 
     category_t category() const;
 
-    ///
-    /// \param[in] l locus of a \c gene.
-    /// \param[in] g a new gene.
-    ///
-    /// Set locus \a l of the genome to \a g. Please note that this is one of
-    /// the very few methods that aren't const.
-    ///
-    void set(const locus &l, const gene &g)
-    {
-      genome_(l) = g;
-      signature_.clear();
-    }
+    bool debug(bool = true) const;
+
+    class const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
 
     friend class interpreter<i_mep>;
 
@@ -123,6 +103,40 @@ namespace vita
     // of genes is starting here).
     locus best_;
   };  // class i_mep
+
+  ///
+  /// \param[in] l locus of a \c gene.
+  /// \return the l-th \c gene of \a this \c individual.
+  ///
+  inline const gene &i_mep::operator[](const locus &l) const
+  {
+    return genome_(l);
+  }
+
+  ///
+  /// \return the total size of the individual (effective size + introns).
+  ///
+  /// The size is constant for any individual (it's chosen at initialization
+  /// time).
+  /// \see eff_size()
+  ///
+  inline unsigned i_mep::size() const
+  {
+    return genome_.rows();
+  }
+
+  ///
+  /// \param[in] l locus of a \c gene.
+  /// \param[in] g a new gene.
+  ///
+  /// Set locus \a l of the genome to \a g. Please note that this is one of
+  /// the very few methods that aren't const.
+  ///
+  inline void i_mep::set(const locus &l, const gene &g)
+  {
+    genome_(l) = g;
+    signature_.clear();
+  }
 
   std::ostream &operator<<(std::ostream &, const i_mep &);
 
