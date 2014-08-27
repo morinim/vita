@@ -203,7 +203,7 @@ namespace vita
 
     off.age_ = std::max({age(), a.age(), b.age()});
 
-    off.signature_ = hash();
+    off.signature_ = off.hash();
     assert(off.debug());
     return off;
   }
@@ -285,7 +285,12 @@ namespace vita
   ///
   bool i_num_ga::operator==(const i_num_ga &x) const
   {
-    return signature_ == x.signature_ && genome_ == x.genome_;
+    const bool eq(genome_ == x.genome_);
+
+    assert(signature_.empty() != x.signature_.empty() ||
+           (signature_ == x.signature_) == eq);
+
+    return eq;
   }
 
   ///
