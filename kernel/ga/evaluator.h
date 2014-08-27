@@ -64,8 +64,8 @@ namespace vita
     if (x.empty())
       return fitness_t();
 
-    //return 1000.0 * (std::atan(vita::to<ga::base_t>(x)) / 3.1415926535 - 0.5);
-    return -std::exp(-vita::to<ga::base_t>(x) / 1000.0);
+    return 1000.0 * (std::atan(vita::to<ga::base_t>(x)) / 3.1415926535 - 0.5);
+    //return -std::exp(-vita::to<ga::base_t>(x) / 1000.0);
   }
 }  // namespace vita
 

@@ -122,11 +122,11 @@ BOOST_AUTO_TEST_CASE(Evolution)
   env.individuals = 1000;
   vita::evaluator<vita::i_num_ga> eva;
 
-  vita::evolution<vita::i_num_ga, vita::alps_es> evo1(env, sset, eva);
-  BOOST_REQUIRE(evo1.debug(true));
+  //vita::evolution<vita::i_num_ga, vita::alps_es> evo1(env, sset, eva);
+  //BOOST_REQUIRE(evo1.debug(true));
 
-  //vita::evolution<vita::i_num_ga, vita::std_es> evo2(env, sset, eva);
-  //BOOST_REQUIRE(evo2.debug(true));
+  vita::evolution<vita::i_num_ga, vita::std_es> evo1(env, sset, eva);
+  BOOST_REQUIRE(evo1.debug(true));
 
   const auto s(evo1.run(1));
   std::ostringstream best;

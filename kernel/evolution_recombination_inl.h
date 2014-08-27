@@ -35,8 +35,6 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 template<class T>
 std::vector<T> base<T>::run(const std::vector<coord> &parent)
 {
-  assert(parent.size() == 2);
-
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 

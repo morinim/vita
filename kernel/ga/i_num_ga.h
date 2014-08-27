@@ -83,14 +83,14 @@ namespace vita
     i_num_ga &operator=(const std::vector<gene::param_type> &);
 
     ///
-    /// \return 0.
+    /// \return 1.
     ///
     /// This is for compatibility for GP algorithm, but isn't significative
     /// for differential evolution.
     ///
     /// \see i_num_ga::parameters()
     ///
-    unsigned size() const { return 0; }
+    unsigned size() const { return 1; }
 
     ///
     /// \return the number of parameters stored in the individual.
