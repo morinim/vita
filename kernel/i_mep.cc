@@ -304,8 +304,14 @@ namespace vita
   ///
   bool i_mep::operator==(const i_mep &x) const
   {
-    return signature_ == x.signature_ &&
-           genome_ == x.genome_ && best_ == x.best_;
+    const bool eq(genome_ == x.genome_);
+
+    assert(!eq ||
+           signature_.empty() != x.signature_.empty() ||
+           signature_ == x.signature_);
+
+    return eq;
+
   }
 
   ///
