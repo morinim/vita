@@ -48,18 +48,18 @@ namespace vita
     /// \return the fitness of the individual.
     virtual fitness_t operator()(const T &) = 0;
 
-    /// The following methods have a default implementation (usually empty).
-    virtual fitness_t fast(const T &);
+    // The following methods have a default implementation (usually empty).
     virtual double accuracy(const T &) const;
-    virtual unsigned seen(const T &) const;
     virtual void clear(clear_flag);
     virtual void clear(const T &);
+    virtual fitness_t fast(const T &);
     virtual std::string info() const;
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
+    virtual unsigned seen(const T &) const;
   };
 
   ///
-  /// \brief random_evaluator class is used for debug purpose.
+  /// \brief random_evaluator class is used for debug purpose
   ///
   /// \note
   /// The output is population independent.

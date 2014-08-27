@@ -13,8 +13,8 @@
 #if !defined(VITA_GA_EVALUATOR_H)
 #define      VITA_GA_EVALUATOR_H
 
+#include "kernel/evaluator.h"
 #include "kernel/vitafwd.h"
-#include "kernel/ga/i_num_ga.h"
 #include "kernel/ga/interpreter.h"
 #include "kernel/ga/primitive.h"
 
@@ -29,36 +29,20 @@ namespace vita
   /// * bigger values represent better choices;
   /// * optimal value is 0.
   ///
-  template<>
-  class evaluator<i_num_ga>
+  template<class T>
+  class ga_evaluator : public evaluator<T>
   {
   public:
-    enum clear_flag {cache = 1, stats = 2, all = cache | stats};
-
-    /// \return the fitness of the individual.
-    fitness_t operator()(const i_num_ga &);
-
-    /// There isn't a faster but approximated version of the evaluator, so the
-    /// implementation calls the standard fitness function.
-    fitness_t fast(const i_num_ga &i) { return operator()(i); }
-
-    /// NOT USED: there isn't a training set for differential evolution.
-    double accuracy(const i_num_ga &) const { return -1.0; }
-
-    virtual void clear(clear_flag) {}
-    virtual void clear(const i_num_ga &) {}
-    virtual std::string info() const { return std::string(); }
-
-    // std::unique_ptr<lambda_f<i_num_ga>> lambdify(const i_num_ga &) const
-    // { return nullptr; }
+    virtual fitness_t operator()(const T &) override;
   };
 
   ///
   /// \return the fitness of the individual (range [-1000;0]).
   ///
-  inline fitness_t evaluator<i_num_ga>::operator()(const i_num_ga &i)
+  template<class T>
+  fitness_t ga_evaluator<T>::operator()(const T &i)
   {
-    interpreter<i_num_ga> it(i);
+    interpreter<T> it(i);
     const any x(it.run());
 
     if (x.empty())

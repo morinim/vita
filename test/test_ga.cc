@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(Evaluator)
     vita::interpreter<vita::i_num_ga> intr(ind);
     BOOST_REQUIRE(intr.debug());
 
-    vita::evaluator<vita::i_num_ga> eva;
+    vita::ga_evaluator<vita::i_num_ga> eva;
     const auto eva_ret(eva(ind));
     BOOST_REQUIRE_LE(eva_ret, 0.0);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   vita::interpreter<vita::i_num_ga>::function = f;
 
   env.individuals = 1000;
-  vita::evaluator<vita::i_num_ga> eva;
+  vita::ga_evaluator<vita::i_num_ga> eva;
 
   //vita::evolution<vita::i_num_ga, vita::alps_es> evo1(env, sset, eva);
   //BOOST_REQUIRE(evo1.debug(true));
