@@ -58,25 +58,45 @@ namespace vita
     i_num_ga crossover(i_num_ga) const;
     i_num_ga crossover(const i_num_ga &, const i_num_ga &) const;
 
-    using const_iterator = typename std::vector<gene>::const_iterator;
+    //using const_iterator = typename std::vector<gene>::const_iterator;
+    class const_iterator;
     const_iterator begin() const;
     const_iterator end() const;
 
+    const gene &operator[](const locus &l) const
+    {
+      assert(l.index == 0);
+      assert(l.category < parameters());
+      return genome_[l.category];
+    }
+
     double operator[](unsigned i) const
-    { assert(i < size()); return genome_[i].par; }
+    { assert(i < parameters()); return genome_[i].par; }
 
     double &operator[](unsigned i)
-    { assert(i < size()); return genome_[i].par; }
+    {
+      assert(i < parameters());
+      signature_.clear();
+      return genome_[i].par;
+    }
 
     i_num_ga &operator=(const std::vector<gene::param_type> &);
 
     ///
-    /// \return the size of the individual.
+    /// \return 0.
     ///
-    /// The size is constant for any individual (it's chosen at initialization
-    /// time).
+    /// This is for compatibility for GP algorithm, but isn't significative
+    /// for differential evolution.
     ///
-    unsigned size() const { return static_cast<unsigned>(genome_.size()); }
+    /// \see i_num_ga::parameters()
+    ///
+    unsigned size() const { return 0; }
+
+    ///
+    /// \return the number of parameters stored in the individual.
+    ///
+    unsigned parameters() const
+    { return static_cast<unsigned>(genome_.size()); }
 
     hash_t signature() const;
 
@@ -100,6 +120,24 @@ namespace vita
   };  // class i_num_ga
 
   std::ostream &operator<<(std::ostream &, const i_num_ga &);
+
+#include "kernel/ga/i_num_ga_iterator_inl.h"
+
+  ///
+  /// \return an iterator pointing to the first individual of the team.
+  ///
+  inline i_num_ga::const_iterator i_num_ga::begin() const
+  {
+    return i_num_ga::const_iterator(*this);
+  }
+
+  ///
+  /// \return an iterator pointing to a end-of-team sentry.
+  ///
+  inline i_num_ga::const_iterator i_num_ga::end() const
+  {
+    return i_num_ga::const_iterator();
+  }
 }  // namespace vita
 
 #endif  // Include guard

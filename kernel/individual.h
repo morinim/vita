@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <set>
 
+#include "kernel/locus.h"
 #include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
 #include "kernel/vitafwd.h"

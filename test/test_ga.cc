@@ -16,6 +16,7 @@
 #include "kernel/ga/i_num_ga.h"
 #include "kernel/ga/evaluator.h"
 #include "kernel/ga/interpreter.h"
+#include "kernel/evolution.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE t_ga
@@ -111,4 +112,26 @@ BOOST_AUTO_TEST_CASE(Evaluator)
     eva_prev = eva_ret;
   }
 }
+
+BOOST_AUTO_TEST_CASE(Evolution)
+{
+  auto f = [](const std::vector<double> &v)
+    { return std::accumulate(v.begin(), v.end(), 0.0); };
+  vita::interpreter<vita::i_num_ga>::function = f;
+
+  env.individuals = 1000;
+  vita::evaluator<vita::i_num_ga> eva;
+
+  vita::evolution<vita::i_num_ga, vita::alps_es> evo1(env, sset, eva);
+  BOOST_REQUIRE(evo1.debug(true));
+
+  //vita::evolution<vita::i_num_ga, vita::std_es> evo2(env, sset, eva);
+  //BOOST_REQUIRE(evo2.debug(true));
+
+  const auto s(evo1.run(1));
+  std::ostringstream best;
+  s.best->ind.list(best);
+  std::cout << best.str() << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

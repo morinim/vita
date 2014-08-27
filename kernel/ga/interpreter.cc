@@ -36,10 +36,10 @@ namespace vita
   {
     assert(function);
 
-    const auto sz(ind_.size());
-    std::vector<gene::param_type> v(sz);
+    const auto ps(ind_.parameters());
+    std::vector<gene::param_type> v(ps);
 
-    for (auto i(decltype(sz){0}); i < sz; ++i)
+    for (auto i(decltype(ps){0}); i < ps; ++i)
       v[i] = ind_[i];
 
     const auto f_v(function(v));

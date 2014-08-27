@@ -25,11 +25,12 @@ using ga_function = double (*)(const std::vector<double> &);
   ///
   /// \brief A template specialization for interpreter<T> class
   ///
-  /// \note
-  /// We don't have a generic interpreter<T> implementation (e.g. see the
-  /// lambda_f source code) because interpreter and individual are strongly
-  /// coupled: the interpreter must be build around the peculiarities of
-  /// the specific individual class.
+  /// It's similar to a GP interpreter, but this also stores a pointer to
+  /// a multivariable real function.
+  ///
+  /// When the interpreter is executed, the parameters inside the current
+  /// individual are passed as arguments of the function and the output value
+  /// is the result.
   ///
   template<>
   class interpreter<i_num_ga> : public core_interpreter

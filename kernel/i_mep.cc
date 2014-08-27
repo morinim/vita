@@ -362,9 +362,6 @@ namespace vita
 
     if (g.sym->parametric())
     {
-      //const auto param(static_cast<std::int16_t>(g.par));
-      //assert(std::numeric_limits<decltype(param)>::min() <= g.par);
-      //assert(g.par <= std::numeric_limits<decltype(param)>::max());
       const auto param(g.par);
 
       auto s2 = reinterpret_cast<const unsigned char *>(&param);

@@ -28,7 +28,7 @@ namespace vita
   {
     assert(e.debug(true, true));
 
-    assert(size());
+    assert(parameters());
 
     const auto cs(ss.categories());
     assert(cs);
@@ -118,14 +118,16 @@ namespace vita
 
     unsigned n(0);
 
-    const auto cs(size());
-    for (category_t c(0); c < cs; ++c)
+    const auto ps(parameters());
+    for (category_t c(0); c < ps; ++c)
       if (random::boolean(p))
       {
         ++n;
 
         genome_[c] = gene(sset_->roulette_terminal(c));
       }
+
+    signature_ = hash();
 
     assert(debug());
     return n;
@@ -152,17 +154,18 @@ namespace vita
   {
     assert(rhs.debug());
 
-    const auto cs(size());
-    assert(cs == rhs.size());
+    const auto ps(parameters());
+    assert(ps == rhs.parameters());
 
-    const auto cut1(random::sup(cs - 1));
-    const auto cut2(random::between(cut1 + 1, cs));
+    const auto cut1(random::sup(ps - 1));
+    const auto cut2(random::between(cut1 + 1, ps));
 
     for (auto i(cut1); i < cut2; ++i)
       rhs.genome_[i] = genome_[i];
 
     rhs.age_ = std::max(age(), rhs.age());
 
+    rhs.signature_ = rhs.hash();
     assert(rhs.debug());
     return rhs;
   }
@@ -184,9 +187,9 @@ namespace vita
     assert(a.debug());
     assert(b.debug());
 
-    const auto cs(size());
-    assert(cs == a.size());
-    assert(cs == b.size());
+    const auto ps(parameters());
+    assert(ps == a.parameters());
+    assert(ps == b.parameters());
 
     const auto p_cross(env_->p_cross);
     assert(p_cross >= 0.0);
@@ -194,32 +197,16 @@ namespace vita
     const auto &f(env_->de.weight);
 
     i_num_ga off(*this);
-    for (auto i(decltype(cs){0}); i < cs; ++i)
+    for (auto i(decltype(ps){0}); i < ps; ++i)
       if (random::boolean(p_cross))
         off[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
 
     off.age_ = std::max({age(), a.age(), b.age()});
 
+    off.signature_ = hash();
     assert(off.debug());
     return off;
   }
-
-  ///
-  /// \return an iterator pointing to the first individual of the team.
-  ///
-  i_num_ga::const_iterator i_num_ga::begin() const
-  {
-    return genome_.begin();
-  }
-
-  ///
-  /// \return an iterator pointing to a end-of-team sentry.
-  ///
-  i_num_ga::const_iterator i_num_ga::end() const
-  {
-    return genome_.end();
-  }
-
 
   ///
   /// \return the signature of \c this individual.
@@ -279,16 +266,12 @@ namespace vita
       for (std::size_t i(0); i < sizeof(opcode); ++i)
         p->push_back(s1[i]);
 
-      if (g.sym->parametric())
-      {
-        const auto param(static_cast<std::int16_t>(g.par));
-        assert(std::numeric_limits<decltype(param)>::min() <= g.par);
-        assert(g.par <= std::numeric_limits<decltype(param)>::max());
+      assert(g.sym->parametric());
+      const auto param(g.par);
 
-        const auto *const s2 = reinterpret_cast<const unsigned char *>(&param);
-        for (std::size_t i(0); i < sizeof(param); ++i)
-          p->push_back(s2[i]);
-      }
+      auto s2 = reinterpret_cast<const unsigned char *>(&param);
+      for (std::size_t i(0); i < sizeof(param); ++i)
+        p->push_back(s2[i]);
     }
   }
 
@@ -330,11 +313,11 @@ namespace vita
   ///
   i_num_ga &i_num_ga::operator=(const std::vector<gene::param_type> &v)
   {
-    const auto sz(size());
-    assert(v.size() == sz);
+    const auto ps(parameters());
+    assert(v.size() == ps);
 
-    for (auto i(decltype(sz){0}); i < sz; ++i)
-      genome_[i].par = v[i];
+    for (auto i(decltype(ps){0}); i < ps; ++i)
+      operator[](i) = v[i];
 
     return *this;
   }
@@ -345,33 +328,33 @@ namespace vita
   ///
   bool i_num_ga::debug(bool verbose) const
   {
-    const auto cs(sset_->categories());
+    const auto ps(parameters());
 
-    for (auto c(decltype(cs){0}); c < cs; ++c)
+    for (auto i(decltype(ps){0}); i < ps; ++i)
     {
-      if (!genome_[c].sym)
+      if (!genome_[i].sym)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Empty symbol pointer at position " << c
+          std::cerr << k_s_debug << " Empty symbol pointer at position " << i
                     << '.' << std::endl;
         return false;
       }
 
-      if (!genome_[c].sym->terminal())
+      if (!genome_[i].sym->terminal())
       {
         if (verbose)
           std::cerr << k_s_debug << " Not-terminal symbol at position "
-                    << c << '.' << std::endl;
+                    << i << '.' << std::endl;
 
         return false;
       }
 
-      if (genome_[c].sym->category() != c)
+      if (genome_[i].sym->category() != i)
       {
         if (verbose)
-          std::cerr << k_s_debug << " Wrong category: " << c
-                    << genome_[c].sym->display() << " -> "
-                    << genome_[c].sym->category() << " should be " << c
+          std::cerr << k_s_debug << " Wrong category: " << i
+                    << genome_[i].sym->display() << " -> "
+                    << genome_[i].sym->category() << " should be " << i
                     << std::endl;
         return false;
       }
@@ -379,7 +362,12 @@ namespace vita
     }
 
     if (!signature_.empty() && signature_ != hash())
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Wrong signature: " << signature_
+                  << " should be " << hash() << std::endl;
       return false;
+    }
 
     return env_->debug(verbose, true);
   }
@@ -437,7 +425,7 @@ namespace vita
   {
     out << age() << std::endl;
 
-    out << size() << std::endl;
+    out << parameters() << std::endl;
     for (const auto &g : genome_)
       out << g.sym->opcode() << ' ' << g.par << std::endl;
 

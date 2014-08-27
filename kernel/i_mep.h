@@ -20,9 +20,7 @@
 
 #include "kernel/function.h"
 #include "kernel/individual.h"
-#include "kernel/locus.h"
 #include "kernel/matrix.h"
-#include "kernel/vitafwd.h"
 
 namespace vita
 {

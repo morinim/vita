@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     vita::i_num_ga ind(env, sset);
 
     BOOST_REQUIRE(ind.debug());
-    BOOST_REQUIRE_EQUAL(ind.size(), sset.categories());
+    BOOST_REQUIRE_EQUAL(ind.parameters(), sset.categories());
     BOOST_REQUIRE_EQUAL(ind.age(), 0);
   }
 }
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
     diff += orig.distance(i1);
   }
 
-  const double perc(100.0 * double(diff) / double(orig.size() * n));
+  const double perc(100.0 * double(diff) / double(orig.parameters() * n));
   BOOST_CHECK_GT(perc, 47.0);
   BOOST_CHECK_LT(perc, 53.0);
 }
@@ -103,9 +103,9 @@ BOOST_AUTO_TEST_CASE(Iterators)
     vita::i_num_ga ind(env, sset);
 
     unsigned i(0);
-    for (const auto &g : ind)
+    for (const auto &l : ind)
     {
-      BOOST_CHECK_EQUAL(g.par, ind[i]);
+      BOOST_CHECK_EQUAL(ind[l].par, ind[i]);
       ++i;
     }
   }
@@ -156,14 +156,14 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     auto off(base.crossover(i1, i1));
     BOOST_CHECK(off.debug(true));
 
-    for (unsigned i(0); i < base.size(); ++i)
+    for (unsigned i(0); i < base.parameters(); ++i)
       BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
 
     off = base.crossover(i1, i2);
     BOOST_CHECK(off.debug(true));
     BOOST_REQUIRE_EQUAL(off.age(), std::max({base.age(), i1.age(), i2.age()}));
 
-    for (unsigned i(0); i < base.size(); ++i)
+    for (unsigned i(0); i < base.parameters(); ++i)
     {
       const auto delta(env.de.weight[1] * std::abs(i1[i] - i2[i]));
 
@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
         ++diff;
     }
 
-    length += base.size();
+    length += base.parameters();
   }
 
   BOOST_CHECK_LT(diff / length, env.p_cross + 2.0);
