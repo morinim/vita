@@ -23,7 +23,7 @@ namespace recombination {
   /// \brief The operation strategy (crossover, recombination, mutation...) for
   ///        the \a evolution class
   ///
-  /// \tparam T type of individual.
+  /// \tparam T type of individual
   ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// vita::evolution is the context.
@@ -77,7 +77,7 @@ namespace recombination {
   };
 
   ///
-  ///
+  /// This is based on the differential evolution four members crossover.
   ///
   template<class T>
   class de : public strategy<T>

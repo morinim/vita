@@ -215,7 +215,7 @@ std::vector<coord> alps<T>::run()
 /// A random fitness value is chosen in the interval \f$[f_min, f_max]\f$,
 /// where \f$f_max\f$ and \f$f_min\f$ are the maximum and minimum fitness value
 /// in the current population.
-/// Then we round a tournament to find the individuals with fitness neares to
+/// Then we round a tournament to find the individuals with fitness nearest to
 /// this random value.
 /// While the probability of selection each fitness level is equal,
 /// the probability of then selecting a given individual within a fitness level
@@ -373,8 +373,9 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  for (auto i(decltype(size){0}); i < size; ++i)
-    ret[i] = this->pickup();
+  //for (auto i(decltype(size){0}); i < size; ++i)
+  //  ret[i] = this->pickup();
+  std::generate_n(ret.begin(), size, std::mem_fn(this->pickup));
 
   return ret;
 }
