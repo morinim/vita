@@ -13,7 +13,7 @@
 #if !defined(VITA_ALPS_H)
 #define      VITA_ALPS_H
 
-#include "kernel/vita.h"
+#include "kernel/population.h"
 
 namespace vita
 {
@@ -23,6 +23,19 @@ namespace vita
   namespace alps
   {
     unsigned max_age(unsigned, unsigned, unsigned);
+
+    ///
+    /// \param[in] p the population.
+    /// \param[in] c the coordinates of an individual.
+    /// \return \c true if the individual at coordinates \c is too old for his
+    ///         layer.
+    ///
+    /// This is just a convenience method to save some keystroke.
+    ///
+    template<class T> bool aged(const population<T> &p, coord c)
+    {
+      return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
+    }
   }  // namespace alps
 }  // namespace vita
 

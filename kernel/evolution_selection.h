@@ -21,15 +21,15 @@ namespace vita {  namespace selection {
 
   ///
   /// \brief The strategy (tournament, fitness proportional...) for the
-  /// \a evolution class.
+  ///        \a evolution class
   ///
-  /// \tparam T the type of individual.
+  /// \tparam T the type of individual
   ///
   /// In the strategy design pattern, this class is the strategy interface and
   /// \a evolution is the context.
   ///
   /// \see
-  /// http://en.wikipedia.org/wiki/Strategy_pattern
+  /// * <http://en.wikipedia.org/wiki/Strategy_pattern>
   ///
   template<class T>
   class strategy
@@ -67,7 +67,7 @@ namespace vita {  namespace selection {
   /// on parallel architectures and allows the selection pressure to be easily
   /// adjusted.
   ///
-  /// The tournament selection algorithm we implemented was modified so that 
+  /// The tournament selection algorithm we implemented was modified so that
   /// instead of having only one winner (parent) in each tournament, we select
   /// n winners from each tournament based on the top n fitness values in the
   /// tournament.
@@ -93,9 +93,6 @@ namespace vita {  namespace selection {
     using alps::strategy::strategy;
 
     virtual std::vector<coord> run() override;
-
-  private:
-    bool aged(coord) const;
   };
 
   ///

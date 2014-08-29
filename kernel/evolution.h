@@ -28,8 +28,8 @@ namespace vita
   /// \brief Progressively evolves a population of programs over a series of
   ///        generations
   ///
-  /// \tparam T type of individual.
-  /// \tparam ES evolution strategy in use.
+  /// \tparam T type of individual
+  /// \tparam ES evolution strategy in use
   ///
   /// The evolutionary search uses the Darwinian principle of natural selection
   /// (survival of the fittest) and analogs of various naturally occurring

@@ -152,9 +152,9 @@ namespace vita
   ///
   template<class T>
   class de_es : public evolution_strategy<T,
-                                           selection::random,
-                                           recombination::de,
-                                           replacement::tournament>
+                                          selection::random,
+                                          recombination::de,
+                                          replacement::tournament>
   {
   public:
     using de_es::evolution_strategy::evolution_strategy;
