@@ -10,13 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INDIVIDUAL_NUM_GA_ITERATOR_H)
-#define      VITA_INDIVIDUAL_NUM_GA_ITERATOR_H
+#if !defined(VITA_INDIVIDUAL_GA_ITERATOR_H)
+#define      VITA_INDIVIDUAL_GA_ITERATOR_H
 
 ///
 /// \brief Iterator to scan the active genes of an \c individual
 ///
-class i_num_ga::const_iterator
+class i_ga::const_iterator
 {
 public:
   using iterator_category = std::forward_iterator_tag;
@@ -29,14 +29,14 @@ public:
   /// \brief Builds an empty iterator.
   ///
   /// Empty iterator is used as sentry (it is the value returned by
-  /// i_num_ga::end()).
+  /// i_ga::end()).
   ///
   const_iterator() : sup_(0), i_(std::numeric_limits<category_t>::max()) {}
 
   ///
   /// \param[in] id an individual.
   ///
-  explicit const_iterator(const i_num_ga &id) : sup_(id.parameters()), i_(0)
+  explicit const_iterator(const i_ga &id) : sup_(id.parameters()), i_(0)
   {
   }
 
@@ -79,6 +79,6 @@ public:
 private:  // Private data members
   const category_t sup_;
   category_t i_;
-};  // class i_num_ga::const_iterator
+};  // class i_ga::const_iterator
 
 #endif  // Include guard

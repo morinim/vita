@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/ga/i_num_ga.h"
+#include "kernel/ga/i_ga.h"
 #include "kernel/ga/evaluator.h"
 #include "kernel/ga/interpreter.h"
 #include "kernel/evolution.h"
@@ -33,15 +33,15 @@ BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Interpreter)
 {
-  vita::i_num_ga ind(env, sset);
+  vita::i_ga ind(env, sset);
   BOOST_REQUIRE(ind.debug());
 
   BOOST_TEST_CHECKPOINT("First function");
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
 
-  vita::interpreter<vita::i_num_ga>::function = f;
-  vita::interpreter<vita::i_num_ga> intr(ind);
+  vita::interpreter<vita::i_ga>::function = f;
+  vita::interpreter<vita::i_ga> intr(ind);
   BOOST_REQUIRE(intr.debug());
 
   ind = {0.0, 0.0, 0.0, 0.0} ;
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(Interpreter)
   BOOST_TEST_CHECKPOINT("Second function");
   auto f2 = [](const std::vector<double> &v) { return v[0] / v[1]; };
 
-  vita::interpreter<vita::i_num_ga>::function = f2;
-  vita::interpreter<vita::i_num_ga> intr2(ind);
+  vita::interpreter<vita::i_ga>::function = f2;
+  vita::interpreter<vita::i_ga> intr2(ind);
   BOOST_REQUIRE(intr2.debug());
 
   ind = {1.0, 0.0, 0.0, 0.0};
@@ -80,20 +80,20 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 {
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
-  vita::interpreter<vita::i_num_ga>::function = f;
+  vita::interpreter<vita::i_ga>::function = f;
 
   vita::any intr_prev;
   vita::fitness_t eva_prev;
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_num_ga ind(env, sset);
+    vita::i_ga ind(env, sset);
     BOOST_REQUIRE(ind.debug());
 
-    vita::interpreter<vita::i_num_ga> intr(ind);
+    vita::interpreter<vita::i_ga> intr(ind);
     BOOST_REQUIRE(intr.debug());
 
-    vita::ga_evaluator<vita::i_num_ga> eva;
+    vita::ga_evaluator<vita::i_ga> eva;
     const auto eva_ret(eva(ind));
     BOOST_REQUIRE_LE(eva_ret, 0.0);
 
@@ -117,15 +117,15 @@ BOOST_AUTO_TEST_CASE(Evolution)
 {
   auto f = [](const std::vector<double> &v)
     { return std::accumulate(v.begin(), v.end(), 0.0); };
-  vita::interpreter<vita::i_num_ga>::function = f;
+  vita::interpreter<vita::i_ga>::function = f;
 
   env.individuals = 1000;
-  vita::ga_evaluator<vita::i_num_ga> eva;
+  vita::ga_evaluator<vita::i_ga> eva;
 
-  //vita::evolution<vita::i_num_ga, vita::alps_es> evo1(env, sset, eva);
+  //vita::evolution<vita::i_ga, vita::alps_es> evo1(env, sset, eva);
   //BOOST_REQUIRE(evo1.debug(true));
 
-  vita::evolution<vita::i_num_ga, vita::std_es> evo1(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::std_es> evo1(env, sset, eva);
   BOOST_REQUIRE(evo1.debug(true));
 
   const auto s(evo1.run(1));

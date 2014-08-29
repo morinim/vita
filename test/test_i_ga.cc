@@ -13,10 +13,10 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/ga/i_num_ga.h"
+#include "kernel/ga/i_ga.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_i_num_ga
+#define BOOST_TEST_MODULE t_i_ga
 #include <boost/test/unit_test.hpp>
 
 using namespace boost;
@@ -26,14 +26,14 @@ constexpr double epsilon(0.00001);
 #include "factory_fixture5.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(t_i_num_ga, F_FACTORY5)
+BOOST_FIXTURE_TEST_SUITE(t_i_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Random creation");
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_num_ga ind(env, sset);
+    vita::i_ga ind(env, sset);
 
     BOOST_REQUIRE(ind.debug());
     BOOST_REQUIRE_EQUAL(ind.parameters(), sset.categories());
@@ -43,8 +43,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  vita::i_num_ga t(env, sset);
-  const vita::i_num_ga orig(t);
+  vita::i_ga t(env, sset);
+  const vita::i_ga orig(t);
 
   const unsigned n(1000);
 
@@ -77,16 +77,16 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_num_ga a(env, sset);
+    vita::i_ga a(env, sset);
     BOOST_REQUIRE_EQUAL(a, a);
     BOOST_REQUIRE_EQUAL(a.distance(a), 0);
 
-    vita::i_num_ga b(a);
+    vita::i_ga b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
     BOOST_REQUIRE_EQUAL(a, b);
     BOOST_REQUIRE_EQUAL(a.distance(b), 0);
 
-    vita::i_num_ga c(env, sset);
+    vita::i_ga c(env, sset);
     if (a.signature() != c.signature())
     {
       BOOST_REQUIRE_NE(a, c);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 {
   for (unsigned j(0); j < 1000; ++j)
   {
-    vita::i_num_ga ind(env, sset);
+    vita::i_ga ind(env, sset);
 
     unsigned i(0);
     for (const auto &l : ind)
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 
 BOOST_AUTO_TEST_CASE(StandardCrossover)
 {
-  vita::i_num_ga i1(env, sset), i2(env, sset);
+  vita::i_ga i1(env, sset), i2(env, sset);
 
   double dist(0.0);
   const unsigned n(1000);
@@ -143,8 +143,8 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
   for (unsigned j(0); j < 1000; ++j)
   {
-    const vita::i_num_ga base(env, sset);
-    vita::i_num_ga i1(env, sset), i2(env, sset);
+    const vita::i_ga base(env, sset);
+    vita::i_ga i1(env, sset), i2(env, sset);
 
     const auto a1(vita::random::between<unsigned>(0, 100));
     for (unsigned k(0); k < a1; ++k)
@@ -186,14 +186,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_num_ga i1(env, sset);
+    vita::i_ga i1(env, sset);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::i_num_ga i2(env, sset);
+    vita::i_ga i2(env, sset);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 

@@ -16,7 +16,7 @@
 namespace vita
 {
   class i_mep;
-  class i_num_ga;
+  class i_ga;
   template<class T> class team;
 
   class core_interpreter;

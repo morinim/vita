@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_GA_I_NUM_GA_H)
-#define      VITA_GA_I_NUM_GA_H
+#if !defined(VITA_GA_I_GA_H)
+#define      VITA_GA_I_GA_H
 
 #include "kernel/gene.h"
 #include "kernel/individual.h"
@@ -33,18 +33,14 @@ namespace vita
   /// The class also adds a special three term crossover operator and other
   /// methods to support differential evolution.
   ///
-
-  ///
-  /// \a i_num_ga adds the special three terms
-  /// crossover operator which is the crucial idea behind DE.
-  ///
   /// \see
-  /// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264).
+  /// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264 april
+  /// 1997).
   ///
-  class i_num_ga : public individual
+  class i_ga : public individual
   {
   public:
-    explicit i_num_ga(const environment &, const symbol_set &);
+    explicit i_ga(const environment &, const symbol_set &);
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;
@@ -56,8 +52,8 @@ namespace vita
     unsigned mutation()
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
-    i_num_ga crossover(i_num_ga) const;
-    i_num_ga crossover(const i_num_ga &, const i_num_ga &) const;
+    i_ga crossover(i_ga) const;
+    i_ga crossover(const i_ga &, const i_ga &) const;
 
     //using const_iterator = typename std::vector<gene>::const_iterator;
     class const_iterator;
@@ -81,7 +77,7 @@ namespace vita
       return genome_[i].par;
     }
 
-    i_num_ga &operator=(const std::vector<gene::param_type> &);
+    i_ga &operator=(const std::vector<gene::param_type> &);
 
     ///
     /// \return 1.
@@ -89,7 +85,7 @@ namespace vita
     /// This is for compatibility for GP algorithm, but isn't significative
     /// for differential evolution.
     ///
-    /// \see i_num_ga::parameters()
+    /// \see i_ga::parameters()
     ///
     unsigned size() const { return 1; }
 
@@ -101,8 +97,8 @@ namespace vita
 
     hash_t signature() const;
 
-    bool operator==(const i_num_ga &) const;
-    unsigned distance(const i_num_ga &) const;
+    bool operator==(const i_ga &) const;
+    unsigned distance(const i_ga &) const;
 
     bool debug(bool = true) const;
 
@@ -118,26 +114,26 @@ namespace vita
     // This is the genome: the entire collection of genes (the entirety of an
     // organism's hereditary information).
     std::vector<gene> genome_;
-  };  // class i_num_ga
+  };  // class i_ga
 
-  std::ostream &operator<<(std::ostream &, const i_num_ga &);
+  std::ostream &operator<<(std::ostream &, const i_ga &);
 
-#include "kernel/ga/i_num_ga_iterator_inl.h"
+#include "kernel/ga/i_ga_iterator_inl.h"
 
   ///
   /// \return an iterator pointing to the first individual of the team.
   ///
-  inline i_num_ga::const_iterator i_num_ga::begin() const
+  inline i_ga::const_iterator i_ga::begin() const
   {
-    return i_num_ga::const_iterator(*this);
+    return i_ga::const_iterator(*this);
   }
 
   ///
   /// \return an iterator pointing to a end-of-team sentry.
   ///
-  inline i_num_ga::const_iterator i_num_ga::end() const
+  inline i_ga::const_iterator i_ga::end() const
   {
-    return i_num_ga::const_iterator();
+    return i_ga::const_iterator();
   }
 }  // namespace vita
 

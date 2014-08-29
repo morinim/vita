@@ -21,7 +21,7 @@
 namespace vita
 {
   ///
-  /// \brief Calculates the fitness of a i_num_ga individual
+  /// \brief Calculates the fitness of a i_ga individual
   ///
   /// \note
   /// Our convention is to convert raw fitness to standardized fitness. The

@@ -76,8 +76,8 @@ namespace vita
 
       virtual any eval(core_interpreter *i) const override
       {
-        return any(static_cast<interpreter<i_num_ga> *>(i)->fetch_param(
-                       category()));
+        return any(static_cast<interpreter<i_ga> *>(i)->fetch_param(
+                     category()));
       }
 
     private:  // Private data members

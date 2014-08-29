@@ -33,14 +33,14 @@ using ga_function = double (*)(const std::vector<double> &);
   /// is the result.
   ///
   template<>
-  class interpreter<i_num_ga> : public core_interpreter
+  class interpreter<i_ga> : public core_interpreter
   {
   public:
     /// A multivariable real function.
     static ga_function function;
 
   public:
-    explicit interpreter(const i_num_ga &);
+    explicit interpreter(const i_ga &);
 
     virtual any run() override;
 
@@ -49,7 +49,7 @@ using ga_function = double (*)(const std::vector<double> &);
     virtual bool debug() const override;
 
   private:
-    const i_num_ga &ind_;
+    const i_ga &ind_;
   };
 }  // namespace vita
 

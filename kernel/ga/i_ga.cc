@@ -10,7 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/ga/i_num_ga.h"
+#include "kernel/ga/i_ga.h"
 #include "kernel/ttable_hash.h"
 
 namespace vita
@@ -23,7 +23,7 @@ namespace vita
   /// implemented so as to ensure that they do not violate the type system's
   /// constraints.
   ///
-  i_num_ga::i_num_ga(const environment &e, const symbol_set &ss)
+  i_ga::i_ga(const environment &e, const symbol_set &ss)
     : individual(e, ss), genome_(ss.categories())
   {
     assert(e.debug(true, true));
@@ -45,7 +45,7 @@ namespace vita
   /// The output stream contains a graph, described in dot language
   /// (http://www.graphviz.org), of \c this individual.
   ///
-  void i_num_ga::graphviz(std::ostream &s) const
+  void i_ga::graphviz(std::ostream &s) const
   {
     s << "graph {";
 
@@ -60,7 +60,7 @@ namespace vita
   ///
   /// Prints genes of the individual.
   ///
-  std::ostream &i_num_ga::in_line(std::ostream &s) const
+  std::ostream &i_ga::in_line(std::ostream &s) const
   {
     std::copy(genome_.begin(), genome_.end(), infix_iterator<gene>(s, " "));
     return s;
@@ -76,7 +76,7 @@ namespace vita
   /// 03 99.99
   /// ...
   ///
-  std::ostream &i_num_ga::list(std::ostream &s) const
+  std::ostream &i_ga::list(std::ostream &s) const
   {
     const auto cs(sset_->categories());
     const auto w(1 + static_cast<int>(std::log10(cs)));
@@ -96,7 +96,7 @@ namespace vita
   ///
   /// \param[out] s output stream.
   ///
-  std::ostream &i_num_ga::tree(std::ostream &s) const
+  std::ostream &i_ga::tree(std::ostream &s) const
   {
     return in_line(s);
   }
@@ -112,7 +112,7 @@ namespace vita
   /// strategies. Typical differential evolution GA algorithm won't use
   /// this method.
   ///
-  unsigned i_num_ga::mutation(double p)
+  unsigned i_ga::mutation(double p)
   {
     assert(0.0 <= p && p <= 1.0);
 
@@ -150,7 +150,7 @@ namespace vita
   ///   strategies. Typical differential evolution GA algorithm won't use
   ///   this method.
   ///
-  i_num_ga i_num_ga::crossover(i_num_ga rhs) const
+  i_ga i_ga::crossover(i_ga rhs) const
   {
     assert(rhs.debug());
 
@@ -182,7 +182,7 @@ namespace vita
   /// separate probability distribution has to be used which makes the scheme
   /// completely self-organizing.
   ///
-  i_num_ga i_num_ga::crossover(const i_num_ga &a, const i_num_ga &b) const
+  i_ga i_ga::crossover(const i_ga &a, const i_ga &b) const
   {
     assert(a.debug());
     assert(b.debug());
@@ -196,7 +196,7 @@ namespace vita
 
     const auto &f(env_->de.weight);
 
-    i_num_ga off(*this);
+    i_ga off(*this);
     for (auto i(decltype(ps){0}); i < ps; ++i)
       if (random::boolean(p_cross))
         off[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
@@ -213,7 +213,7 @@ namespace vita
   ///
   /// Identical individuals at genotypic level have the same signature
   ///
-  hash_t i_num_ga::signature() const
+  hash_t i_ga::signature() const
   {
     if (signature_.empty())
       signature_ = hash();
@@ -227,7 +227,7 @@ namespace vita
   /// Converts \c this individual in a packed byte level representation and
   /// performs the MurmurHash3 algorithm on it.
   ///
-  hash_t i_num_ga::hash() const
+  hash_t i_ga::hash() const
   {
     // From an individual to a packed byte stream...
     thread_local std::vector<unsigned char> packed;
@@ -245,7 +245,7 @@ namespace vita
   ///
   /// \param[out] p byte stream compacted version of the gene sequence.
   ///
-  void i_num_ga::pack(std::vector<unsigned char> *const p) const
+  void i_ga::pack(std::vector<unsigned char> *const p) const
   {
     for (const auto &g : genome_)
     {
@@ -283,7 +283,7 @@ namespace vita
   /// \note
   /// Age is not checked.
   ///
-  bool i_num_ga::operator==(const i_num_ga &x) const
+  bool i_ga::operator==(const i_ga &x) const
   {
     const bool eq(genome_ == x.genome_);
 
@@ -298,7 +298,7 @@ namespace vita
   /// \return a numeric measurement of the difference between \a ind and
   /// \c this (the number of different genes between individuals).
   ///
-  unsigned i_num_ga::distance(const i_num_ga &ind) const
+  unsigned i_ga::distance(const i_ga &ind) const
   {
     const auto cs(sset_->categories());
 
@@ -316,7 +316,7 @@ namespace vita
   ///
   /// Sets the individuals with values from \a v.
   ///
-  i_num_ga &i_num_ga::operator=(const std::vector<gene::param_type> &v)
+  i_ga &i_ga::operator=(const std::vector<gene::param_type> &v)
   {
     const auto ps(parameters());
     assert(v.size() == ps);
@@ -331,7 +331,7 @@ namespace vita
   /// \param[in] verbose if \c true prints error messages to \c std::cerr.
   /// \return \c true if the individual passes the internal consistency check.
   ///
-  bool i_num_ga::debug(bool verbose) const
+  bool i_ga::debug(bool verbose) const
   {
     const auto ps(parameters());
 
@@ -385,7 +385,7 @@ namespace vita
   /// If the load operation isn't successful the current individual isn't
   /// modified.
   ///
-  bool i_num_ga::load(std::istream &in)
+  bool i_ga::load(std::istream &in)
   {
     decltype(age_) t_age;
     if (!(in >> t_age))
@@ -426,7 +426,7 @@ namespace vita
   /// \param[out] out output stream.
   /// \return \c true if individual was saved correctly.
   ///
-  bool i_num_ga::save(std::ostream &out) const
+  bool i_ga::save(std::ostream &out) const
   {
     out << age() << std::endl;
 
@@ -442,7 +442,7 @@ namespace vita
   /// \param[in] ind individual to print.
   /// \return output stream including \a ind.
   ///
-  std::ostream &operator<<(std::ostream &s, const i_num_ga &ind)
+  std::ostream &operator<<(std::ostream &s, const i_ga &ind)
   {
     return ind.in_line(s);
   }

@@ -29,7 +29,7 @@ using namespace boost;
 #include "test_fitness.cc"
 #include "test_ga.cc"
 #include "test_i_mep.cc"
-#include "test_i_num_ga.cc"
+#include "test_i_ga.cc"
 #include "test_lambda.cc"
 #include "test_matrix.cc"
 #include "test_population.cc"

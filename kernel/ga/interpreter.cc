@@ -11,17 +11,17 @@
  */
 
 #include "kernel/ga/interpreter.h"
-#include "kernel/ga/i_num_ga.h"
+#include "kernel/ga/i_ga.h"
 
 namespace vita
 {
-  ga_function interpreter<i_num_ga>::function = nullptr;
+  ga_function interpreter<i_ga>::function = nullptr;
 
   ///
   /// \param[in] ind individual whose value we are interested in.
   ///
-  interpreter<i_num_ga>::interpreter(const i_num_ga &ind) : core_interpreter(),
-                                                            ind_(ind)
+  interpreter<i_ga>::interpreter(const i_ga &ind) : core_interpreter(),
+                                                    ind_(ind)
   {
   }
 
@@ -32,7 +32,7 @@ namespace vita
   /// The output value is empty in case of infinite / NAN numbers (for
   /// uniformity with GP interpreters).
   ///
-  any interpreter<i_num_ga>::run()
+  any interpreter<i_ga>::run()
   {
     assert(function);
 
@@ -50,7 +50,7 @@ namespace vita
   /// \param[in] i the index of the parameter we are interested in.
   /// \return the output value of the current terminal symbol.
   ///
-  gene::param_type interpreter<i_num_ga>::fetch_param(unsigned i)
+  gene::param_type interpreter<i_ga>::fetch_param(unsigned i)
   {
     return ind_[i];
   }
@@ -58,7 +58,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool interpreter<i_num_ga>::debug() const
+  bool interpreter<i_ga>::debug() const
   {
     return ind_.debug();
   }
