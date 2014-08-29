@@ -19,20 +19,21 @@
 namespace vita
 {
   ///
-  /// \brief An individual optimized for differential evolution method
+  /// \brief An individual optimized for genetic algorithms
   ///
-  /// This is essentially a real value vector.
+  /// This is a special case of a GP individual. Logically it seems a GP
+  /// individual with as many categories as parameters to be optimized and
+  /// index dimension equal to 1 (of course internal representation is
+  /// different).
   ///
-  /// While many genetic algorithms use integers to approximate continuous
-  /// parameters, this choice limits the resolution with which an optimum can
-  /// be located. Floating point not only uses computer resources efficently,
-  /// it also makes input and output transparent for the user. Parameters can
-  /// be input, manipulated and output as ordinary floating-point numbers
-  /// without ever being reformatted as genes with a different binary
-  /// representation.
+  /// This way, having the same interface of \a i_mep, this class is compatible
+  /// with many GP algorithms (and is directly suitable for combinatorial
+  /// optimization).
   ///
-  /// The class is compatible with many GP algorithms (having the same
-  /// interface of \a i_mep class).
+  /// The class also adds a special three term crossover operator and other
+  /// methods to support differential evolution.
+  ///
+
   ///
   /// \a i_num_ga adds the special three terms
   /// crossover operator which is the crucial idea behind DE.

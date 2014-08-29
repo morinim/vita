@@ -45,6 +45,18 @@ namespace vita
     ///
     inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
+    ///
+    /// This is mainly used for differential evolution (e.g. DDJ #264 april
+    /// 1997).
+    ///
+    /// While many genetic algorithms use integers to approximate continuous
+    /// parameters, the choice limits the resolution with which an optimum can
+    /// be located. Floating point not only uses computer resources efficently,
+    /// it also makes input and output transparent for the user. Parameters can
+    /// be input, manipulated and output as ordinary floating-point numbers
+    /// without ever being reformatted as genes with a different binary
+    /// representation.
+    ///
     class real : public terminal
     {
     public:
