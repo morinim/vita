@@ -29,10 +29,10 @@ namespace vita
   template<class> class distribution;
 
   ///
-  /// \brief This \c class drives the evolution.
+  /// \brief This \c class drives the evolution
   ///
-  /// \tparam T the type of individual used.
-  /// \tparam ES the adopted evolution strategy.
+  /// \tparam T the type of individual used
+  /// \tparam ES the adopted evolution strategy
   ///
   /// \note
   /// The class uses a template template parameter.

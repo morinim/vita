@@ -119,19 +119,28 @@ BOOST_AUTO_TEST_CASE(Evolution)
     { return std::accumulate(v.begin(), v.end(), 0.0); };
   vita::interpreter<vita::i_ga>::function = f;
 
-  env.individuals = 1000;
+  env.individuals = 100;
+  env.verbosity = 0;
   vita::ga_evaluator<vita::i_ga> eva;
 
-  //vita::evolution<vita::i_ga, vita::alps_es> evo1(env, sset, eva);
-  //BOOST_REQUIRE(evo1.debug(true));
-
-  vita::evolution<vita::i_ga, vita::std_es> evo1(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, sset, eva);
   BOOST_REQUIRE(evo1.debug(true));
 
-  const auto s(evo1.run(1));
-  std::ostringstream best;
-  s.best->ind.list(best);
-  std::cout << best.str() << std::endl;
-}
+  const auto s1(evo1.run(1));
 
+  BOOST_CHECK_GT(s1.best->ind[0], 8.0);
+  BOOST_CHECK_GT(s1.best->ind[1], 95.0);
+  BOOST_CHECK_GT(s1.best->ind[2], 990.0);
+  BOOST_CHECK_GT(s1.best->ind[3], 9980.0);
+
+  vita::evolution<vita::i_ga, vita::std_es> evo2(env, sset, eva);
+  BOOST_REQUIRE(evo2.debug(true));
+
+  const auto s2(evo2.run(1));
+
+  BOOST_CHECK_GT(s2.best->ind[0], 8.0);
+  BOOST_CHECK_GT(s2.best->ind[1], 95.0);
+  BOOST_CHECK_GT(s2.best->ind[2], 980.0);
+  BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
+}
 BOOST_AUTO_TEST_SUITE_END()
