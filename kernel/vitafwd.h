@@ -15,6 +15,8 @@
 
 namespace vita
 {
+  class data;
+
   class i_mep;
   class i_ga;
   template<class T> class team;

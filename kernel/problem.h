@@ -13,9 +13,9 @@
 #if !defined(VITA_PROBLEM_H)
 #define      VITA_PROBLEM_H
 
-#include "kernel/data.h"
 #include "kernel/environment.h"
 #include "kernel/symbol_set.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {
@@ -29,14 +29,13 @@ namespace vita
   class problem
   {
   public:
-    /// \return an access point for the dataset.
-    virtual vita::data *data() = 0;
+    virtual vita::data *data();
 
     virtual void clear(bool);
 
     virtual bool debug(bool) const;
 
-  public:  // Public data members.
+  public:  // Public data members
     environment env;
 
     symbol_set sset;

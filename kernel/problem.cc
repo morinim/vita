@@ -10,9 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/evaluator_proxy.h"
 #include "kernel/problem.h"
-#include "kernel/search.h"
+#include "kernel/data.h"
 
 namespace vita
 {
@@ -26,6 +25,16 @@ namespace vita
   {
     env = environment(initialize);
     sset = symbol_set();
+  }
+
+  ///
+  /// \return an access point for the dataset.
+  ///
+  /// The default value is \c nullptr. Not every problem is dataset-based.
+  ///
+  vita::data *problem::data()
+  {
+    return nullptr;
   }
 
   ///

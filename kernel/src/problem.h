@@ -14,7 +14,9 @@
 #define      VITA_SRC_PROBLEM_H
 
 #include <string>
+#include <set>
 
+#include "kernel/data.h"
 #include "kernel/problem.h"
 
 namespace vita
