@@ -49,7 +49,8 @@ namespace vita
       tournament_size = 5;
       mate_zone = 20;
       generations = 100;
-      g_without_improvement = 0;
+      g_without_improvement =
+        std::numeric_limits<decltype(g_without_improvement)>::max();
       arl = false;
       validation_percentage = 20;
 

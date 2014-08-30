@@ -222,26 +222,20 @@ void search<T, ES>::dss(unsigned generation) const
 template<class T, template<class> class ES>
 bool search<T, ES>::stop_condition(const summary<T> &s) const
 {
-  assert(env_.generations);
-
-  if (s.gen > env_.generations)
-    return true;
-
-  // We use an accelerated stop condition when all the individuals have
-  // the same fitness and after env_.g_without_improvement generations the
-  // situation isn't changed.
+  // We use an accelerated stop condition when
+  // * all the individuals have the same fitness
+  // * after env_.g_without_improvement generations the situation doesn't
+  //   change.
   assert(env_.g_without_improvement);
-
-  if (*env_.g_without_improvement &&
-      (s.gen - s.last_imp > *env_.g_without_improvement &&
-       issmall(s.az.fit_dist().variance)))
+  if (s.gen - s.last_imp > env_.g_without_improvement &&
+      issmall(s.az.fit_dist().variance))
     return true;
 
   return false;
 }
 
 ///
-/// \brief Tries to tune search parameters for the current problem.
+/// \brief Tries to tune search parameters for the current problem
 ///
 /// Parameter tuning is a typical approach to algorithm design. Such tuning
 /// is done by experimenting with different values and selecting the ones
@@ -377,7 +371,7 @@ void search<T, ES>::tune_parameters()
     env_.generations = dflt.generations;
 
   if (!constrained.g_without_improvement)
-    env_.g_without_improvement = *dflt.g_without_improvement;
+    env_.g_without_improvement = dflt.g_without_improvement;
 
   if (boost::indeterminate(constrained.arl))
     env_.arl = dflt.arl;
@@ -451,9 +445,8 @@ T search<T, ES>::run(unsigned n)
   if (env_.dss)
     shake_data = std::bind(&search::dss, this, std::placeholders::_1);
 
-  std::function<bool (const summary<T> &)> stop;
-  if (*env_.g_without_improvement > 0)
-    stop = std::bind(&search::stop_condition, this, std::placeholders::_1);
+  const auto stop(std::bind(&search::stop_condition, this,
+                            std::placeholders::_1));
 
   const bool validation(0 < env_.validation_percentage &&
                         env_.validation_percentage < 100);

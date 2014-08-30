@@ -157,7 +157,9 @@ namespace vita
 
     /// Stop a run when we cannot see improvements within g_without_improvement
     /// generations.
-    boost::optional<unsigned> g_without_improvement;
+    /// \note
+    /// A value of 0 means undefined (auto-tune).
+    unsigned g_without_improvement;
 
     /// How much data should be reserved for the validation set?
     /// \a validation_percentage is the fraction of the original data that
