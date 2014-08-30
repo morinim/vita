@@ -182,6 +182,8 @@ namespace vita
   /// This way no separate probability distribution has to be used which makes
   /// the scheme completely self-organizing.
   ///
+  /// \a a and \a b are used for mutation, \a this and \a c for crossover.
+  ///
   i_ga i_ga::crossover(const i_ga &a, const i_ga &b, i_ga c) const
   {
     assert(a.debug());

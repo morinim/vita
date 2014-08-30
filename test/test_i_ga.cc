@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
   for (unsigned j(0); j < 1000; ++j)
   {
-    const vita::i_ga base(env, sset);
+    const vita::i_ga p(env, sset);
     vita::i_ga a(env, sset), b(env, sset), c(env, sset);
 
     const auto n_a(vita::random::between<unsigned>(0, 100));
@@ -156,28 +156,46 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     for (unsigned k(0); k < n_c; ++k)
       c.inc_age();
 
-    auto off(base.crossover(a, a, base));
+    BOOST_TEST_CHECKPOINT("DE self-crossover without mutation");
+    auto off(p.crossover(a, a, p));
     BOOST_CHECK(off.debug(true));
 
-    for (unsigned i(0); i < base.parameters(); ++i)
-      BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
+    for (unsigned i(0); i < p.parameters(); ++i)
+      BOOST_CHECK_CLOSE(off[i], p[i], epsilon);
 
-    off = base.crossover(a, b, base);
+    BOOST_TEST_CHECKPOINT("DE self-crossover with mutation");
+    off = p.crossover(a, b, p);
     BOOST_CHECK(off.debug(true));
-    BOOST_REQUIRE_EQUAL(off.age(), std::max({base.age(), a.age(), b.age()}));
+    BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age()}));
 
-    for (unsigned i(0); i < base.parameters(); ++i)
+    for (unsigned i(0); i < p.parameters(); ++i)
     {
       const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
 
-      BOOST_CHECK_GT(off[i], base[i] - delta);
-      BOOST_CHECK_LT(off[i], base[i] + delta);
+      BOOST_CHECK_GT(off[i], p[i] - delta);
+      BOOST_CHECK_LT(off[i], p[i] + delta);
 
-      if (!vita::almost_equal(base[i], off[i]))
+      if (!vita::almost_equal(p[i], off[i]))
         ++diff;
     }
 
-    length += base.parameters();
+    BOOST_TEST_CHECKPOINT("DE crossover without mutation");
+    off = p.crossover(a, b, c);
+    BOOST_CHECK(off.debug(true));
+    BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age(),
+                                             c.age()}));
+    for (unsigned i(0); i < p.parameters(); ++i)
+    {
+      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
+
+      if (!vita::almost_equal(p[i], off[i]))
+      {
+        BOOST_CHECK_GT(off[i], c[i] - delta);
+        BOOST_CHECK_LT(off[i], c[i] + delta);
+      }
+    }
+
+    length += p.parameters();
   }
 
   BOOST_CHECK_LT(diff / length, env.p_cross + 2.0);

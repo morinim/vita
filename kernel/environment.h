@@ -94,8 +94,8 @@ namespace vita
     /// \warning
     /// > p_cross + p_mutation != 1.0
     /// \a p_mutation is the probability to mutate a gene; it is not the
-    /// probability to choose the the mutation operator (the latter is
-    /// 1.0 - p_cross).
+    /// probability to choose the mutation operator (which depends depends on
+    /// the recombination algorithm).
     ///
     /// \note
     /// A negative value means undefined (auto-tune).
