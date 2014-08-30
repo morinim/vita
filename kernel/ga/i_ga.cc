@@ -174,38 +174,42 @@ namespace vita
   /// \brief Differential evolution crossover
   /// \param[in] a first parent.
   /// \param[in] b second parent.
-  /// \return the result of the crossover (we only generate a single
-  ///         offspring).
+  /// \param[in] c third parent.
+  /// \return the offspring.
   ///
-  /// The offspring is produced adding the weighted difference between \a a and
-  /// \a b to \a *this vector (but just for some random loci). This way no
-  /// separate probability distribution has to be used which makes the scheme
-  /// completely self-organizing.
+  /// offspring = crossover(this, c + F * (a - b)).
   ///
-  i_ga i_ga::crossover(const i_ga &a, const i_ga &b) const
+  /// This way no separate probability distribution has to be used which makes
+  /// the scheme completely self-organizing.
+  ///
+  i_ga i_ga::crossover(const i_ga &a, const i_ga &b, i_ga c) const
   {
     assert(a.debug());
     assert(b.debug());
+    assert(c.debug());
 
     const auto ps(parameters());
     assert(ps == a.parameters());
     assert(ps == b.parameters());
+    assert(ps == c.parameters());
 
     const auto p_cross(env_->p_cross);
     assert(p_cross >= 0.0);
+    assert(p_cross <= 1.0);
 
-    const auto &f(env_->de.weight);
+    const auto &f(env_->de.weight);  // scaling factor range
 
-    i_ga off(*this);
     for (auto i(decltype(ps){0}); i < ps; ++i)
       if (random::boolean(p_cross))
-        off[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
+        c[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
+      else
+        c[i] = operator[](i);
 
-    off.age_ = std::max({age(), a.age(), b.age()});
+    c.age_ = std::max({age(), a.age(), b.age(), c.age()});
 
-    off.signature_ = off.hash();
-    assert(off.debug());
-    return off;
+    c.signature_.clear();
+    assert(c.debug());
+    return c;
   }
 
   ///

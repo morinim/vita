@@ -144,28 +144,31 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
   for (unsigned j(0); j < 1000; ++j)
   {
     const vita::i_ga base(env, sset);
-    vita::i_ga i1(env, sset), i2(env, sset);
+    vita::i_ga a(env, sset), b(env, sset), c(env, sset);
 
-    const auto a1(vita::random::between<unsigned>(0, 100));
-    for (unsigned k(0); k < a1; ++k)
-      i1.inc_age();
-    const auto a2(vita::random::between<unsigned>(0, 100));
-    for (unsigned k(0); k < a2; ++k)
-      i2.inc_age();
+    const auto n_a(vita::random::between<unsigned>(0, 100));
+    for (unsigned k(0); k < n_a; ++k)
+      a.inc_age();
+    const auto n_b(vita::random::between<unsigned>(0, 100));
+    for (unsigned k(0); k < n_b; ++k)
+      b.inc_age();
+    const auto n_c(vita::random::between<unsigned>(0, 100));
+    for (unsigned k(0); k < n_c; ++k)
+      c.inc_age();
 
-    auto off(base.crossover(i1, i1));
+    auto off(base.crossover(a, a, base));
     BOOST_CHECK(off.debug(true));
 
     for (unsigned i(0); i < base.parameters(); ++i)
       BOOST_CHECK_CLOSE(off[i], base[i], epsilon);
 
-    off = base.crossover(i1, i2);
+    off = base.crossover(a, b, base);
     BOOST_CHECK(off.debug(true));
-    BOOST_REQUIRE_EQUAL(off.age(), std::max({base.age(), i1.age(), i2.age()}));
+    BOOST_REQUIRE_EQUAL(off.age(), std::max({base.age(), a.age(), b.age()}));
 
     for (unsigned i(0); i < base.parameters(); ++i)
     {
-      const auto delta(env.de.weight[1] * std::abs(i1[i] - i2[i]));
+      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
 
       BOOST_CHECK_GT(off[i], base[i] - delta);
       BOOST_CHECK_LT(off[i], base[i] + delta);

@@ -55,7 +55,8 @@ template<class T>
 unsigned team<T>::mutation()
 {
   const auto p(env().p_mutation);
-  assert(0 <= p && p <= 1.0);
+  assert(0.0 <= p);
+  assert(p <= 1.0);
 
   return mutation(p);
 }
@@ -64,13 +65,14 @@ unsigned team<T>::mutation()
 /// \param[in] p probability of gene mutation.
 /// \return number of mutations performed.
 ///
-/// Mutates a random individual in \c this team and returns the resulting new
-/// team.
+/// Mutates the individuals in \c this team and returns the number of mutations
+/// performed.
 ///
 template<class T>
 unsigned team<T>::mutation(double p)
 {
-  assert(0.0 <= p && p <= 1.0);
+  assert(0.0 <= p);
+  assert(p <= 1.0);
 
   /*
   const auto nm(random::element(individuals_).mutation(p));

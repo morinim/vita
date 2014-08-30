@@ -33,7 +33,7 @@ namespace vita
   ///
   class environment
   {
-  public:  // Constructor and support functions.
+  public:  // Constructor and support functions
     explicit environment(bool = false);
 
     void log(boost::property_tree::ptree *const,
@@ -41,7 +41,7 @@ namespace vita
 
     bool debug(bool, bool) const;
 
-  public:  // Data members.
+  public:  // Data members
     /// Verbosity level:
     /// * 0 only fatal errors;
     /// * 1 search results and errors;
@@ -85,7 +85,7 @@ namespace vita
     /// converge quicker but losing diversity.
     boost::tribool elitism = boost::indeterminate;
 
-    /// \brief Mutation probability
+    /// \brief Mutation rate probability
     ///
     /// Mutation is one of the principal "search operators" used to transform
     /// programs in the Genetic Programming algorithm. It causes random
@@ -98,7 +98,7 @@ namespace vita
     /// 1.0 - p_cross).
     ///
     /// \note
-    /// A negative value means means undefined (auto-tune).
+    /// A negative value means undefined (auto-tune).
     ///
     /// \see
     /// * individual::mutation;

@@ -53,7 +53,7 @@ namespace vita
     { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
     unsigned mutation(double);
     i_ga crossover(i_ga) const;
-    i_ga crossover(const i_ga &, const i_ga &) const;
+    i_ga crossover(const i_ga &, const i_ga &, i_ga) const;
 
     //using const_iterator = typename std::vector<gene>::const_iterator;
     class const_iterator;
