@@ -49,9 +49,8 @@ namespace vita
 
     bool set_evaluator(evaluator_id, const std::string & = "");
 
-    virtual bool debug(bool) const override;
-
   private:  // NVI template methods
+    virtual bool debug_nvi(bool) const override;
     virtual T run_nvi(unsigned) override;
     virtual void tune_parameters_nvi() override;
 

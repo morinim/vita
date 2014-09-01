@@ -27,7 +27,7 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
   if (p.data()->size() && !this->active_eva_)
     set_evaluator(p.classification() ? p_class : p_symre);
 
-  assert(debug(true));
+  assert(this->debug(true));
 }
 
 ///
@@ -677,7 +677,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::debug(bool verbose) const
+bool src_search<T, ES>::debug_nvi(bool verbose) const
 {
   if (p_symre == evaluator_id::undefined)
   {
@@ -695,7 +695,7 @@ bool src_search<T, ES>::debug(bool verbose) const
     return false;
   }
 
-  return search<T, ES>::debug(verbose);
+  return true;
 }
 
 #endif  // Include guard

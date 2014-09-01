@@ -91,6 +91,9 @@ void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 template<class T, template<class> class ES>
 bool search<T, ES>::debug(bool verbose) const
 {
-  return env_.debug(verbose, false);
+  if (!env_.debug(verbose, false))
+    return false;
+
+  return debug_nvi(verbose);
 }
 #endif  // Include guard

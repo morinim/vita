@@ -28,6 +28,10 @@ namespace vita
   /// \tparam T the type of individual used
   /// \tparam ES the adopted evolution strategy
   ///
+  /// This is an interface for specific search strategies. The design adheres
+  /// to the NVI pattern ("Virtuality" in C/C++ Users Journal September
+  /// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
+  ///
   /// \note
   /// The class uses a template template parameter.
   /// This approach allows coordination between T and ES to be handled by the
@@ -44,13 +48,14 @@ namespace vita
     explicit search(problem &);
 
     void set_evaluator(std::unique_ptr<evaluator<T>>);
-    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &);
+    std::unique_ptr<lambda_f<T>> lambdify(const T &);
 
     T run(unsigned = 1);
 
-    virtual bool debug(bool) const;
+    bool debug(bool) const;
 
   private:  // NVI template methods
+    virtual bool debug_nvi(bool) const { return true; };
     virtual T run_nvi(unsigned) = 0;
     virtual void tune_parameters_nvi() = 0;
 
