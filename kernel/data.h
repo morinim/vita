@@ -154,8 +154,8 @@ namespace vita
     any             output;
     domain_t      d_output;
 
-    std::uintmax_t  difficulty;
-    unsigned               age;
+    std::uintmax_t difficulty;
+    unsigned              age;
 
     class_t tag() const { return any_cast<class_t>(output); }
     template<class T> T cast_output() const;

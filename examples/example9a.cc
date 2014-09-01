@@ -21,7 +21,7 @@ int main()
   if (!titanic)
     return EXIT_FAILURE;
 
-  vita::src_search<> s(&titanic);
+  vita::src_search<> s(titanic);
   const auto best(s.run());                        // starting search and
                                                    // getting best individual
   std::cout << best << std::endl;

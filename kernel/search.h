@@ -13,21 +13,15 @@
 #if !defined(VITA_SEARCH_H)
 #define      VITA_SEARCH_H
 
-#include <list>
-
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
-#include "kernel/adf.h"
 #include "kernel/evolution.h"
 #include "kernel/lambda_f.h"
 #include "kernel/problem.h"
-#include "kernel/team.h"
 
 namespace vita
 {
-  template<class> class distribution;
-
   ///
   /// \brief This \c class drives the evolution
   ///
@@ -47,12 +41,7 @@ namespace vita
   class search
   {
   public:
-    explicit search(problem *const);
-
-    template<class U> void arl(const U &);
-    template<class U> void arl(const team<U> &);
-
-    void tune_parameters();
+    explicit search(problem &);
 
     void set_evaluator(std::unique_ptr<evaluator<T>>);
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &);
@@ -61,14 +50,13 @@ namespace vita
 
     virtual bool debug(bool) const;
 
-  private:  // Private support methods
-    double accuracy(const T &) const;
-    void dss(unsigned) const;
+  private:  // NVI template methods
+    virtual T run_nvi(unsigned) = 0;
+    virtual void tune_parameters_nvi() = 0;
+
+  protected: // Protected support methods
     fitness_t fitness(const T &);
-    void log(const summary<T> &, const distribution<fitness_t> &,
-             const std::list<unsigned> &, unsigned, double, unsigned);
-    void print_resume(bool, const fitness_t &, double) const;
-    bool stop_condition(const summary<T> &) const;
+    virtual bool stop_condition(const summary<T> &) const;
 
   protected:  // Protected data members
     std::unique_ptr<evaluator<T>> active_eva_;
@@ -77,7 +65,8 @@ namespace vita
     /// is used for compiling \a env_ via the tune_parameters method).
     environment env_;
 
-    problem *prob_;
+    // Problem we're working on.
+    problem &prob_;
   };
 
 #include "kernel/search_inl.h"
