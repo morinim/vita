@@ -20,7 +20,7 @@
 namespace vita
 {
   /// Pointer to multivariable real function.
-  using ga_function = double (*)(const std::vector<double> &);
+  using ga_function = std::function<double(const std::vector<double> &)>;
 
   ///
   /// \brief A template specialization for interpreter<T> class

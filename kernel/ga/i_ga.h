@@ -55,10 +55,11 @@ namespace vita
     i_ga crossover(i_ga) const;
     i_ga crossover(const i_ga &, const i_ga &, i_ga) const;
 
-    //using const_iterator = typename std::vector<gene>::const_iterator;
     class const_iterator;
     const_iterator begin() const;
     const_iterator end() const;
+
+    operator std::vector<double>() const;
 
     const gene &operator[](const locus &l) const
     {

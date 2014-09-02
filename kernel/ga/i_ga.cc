@@ -452,4 +452,21 @@ namespace vita
   {
     return ind.in_line(s);
   }
+
+  ///
+  /// \return a vector of real values.
+  ///
+  /// This is sweet "syntactic sugar" to manage i_ga individuals as real value
+  /// vectors.
+  ///
+  i_ga::operator std::vector<double>() const
+  {
+    const auto ps(parameters());
+    std::vector<double> v(ps);
+
+    for (auto i(decltype(ps){0}); i < ps; ++i)
+      v[i] = operator[](i);
+
+    return v;
+  }
 }  // namespace vita

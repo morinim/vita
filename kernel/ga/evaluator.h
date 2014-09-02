@@ -15,7 +15,6 @@
 
 #include "kernel/evaluator.h"
 #include "kernel/vitafwd.h"
-#include "kernel/ga/interpreter.h"
 #include "kernel/ga/primitive.h"
 
 namespace vita
@@ -29,28 +28,21 @@ namespace vita
   /// * bigger values represent better choices;
   /// * optimal value is 0.
   ///
-  template<class T>
+  template<class T, class F>
   class ga_evaluator : public evaluator<T>
   {
   public:
+    explicit ga_evaluator(F);
+
     virtual fitness_t operator()(const T &) override;
+
+  private:  // Private data members
+    F f_;
   };
 
-  ///
-  /// \return the fitness of the individual (range [-1000;0]).
-  ///
-  template<class T>
-  fitness_t ga_evaluator<T>::operator()(const T &i)
-  {
-    interpreter<T> it(i);
-    const any x(it.run());
+  template<class T, class F> ga_evaluator<T, F> make_evaluator(F);
 
-    if (x.empty())
-      return fitness_t();
-
-    return 1000.0 * (std::atan(vita::to<ga::base_t>(x)) / 3.1415926535 - 0.5);
-    //return -std::exp(-vita::to<ga::base_t>(x) / 1000.0);
-  }
+#include "kernel/ga/evaluator_inl.h"
 }  // namespace vita
 
 #endif  // Include guard
