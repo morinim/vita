@@ -16,7 +16,6 @@
 #include <string>
 
 #include "kernel/function.h"
-#include "kernel/ga/interpreter.h"
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "kernel/utility.h"
@@ -74,10 +73,16 @@ namespace vita
       virtual std::string display(double v) const override
       { return std::to_string(v); }
 
-      virtual any eval(core_interpreter *i) const override
+      /// DO NOTHING. SHOULD NOT BE CALLED.
+      /// This method is meaningful only for GP symbols: GA algorithms don't
+      /// need an interpreter to access terminals' values.
+      virtual any eval(core_interpreter *) const override
       {
-        return any(static_cast<interpreter<i_ga> *>(i)->fetch_param(
-                     category()));
+        assert(false);
+        return any();
+
+        //return any(static_cast<interpreter<i_ga> *>(i)->fetch_param(
+        //             category()));
       }
 
     private:  // Private data members
