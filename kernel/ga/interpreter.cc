@@ -36,13 +36,7 @@ namespace vita
   {
     assert(function);
 
-    const auto ps(ind_.parameters());
-    std::vector<gene::param_type> v(ps);
-
-    for (auto i(decltype(ps){0}); i < ps; ++i)
-      v[i] = ind_[i];
-
-    const auto f_v(function(v));
+    const auto f_v(function(ind_));
     return std::isfinite(f_v) ? any(f_v) : any();
   }
 

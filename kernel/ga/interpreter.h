@@ -32,6 +32,11 @@ namespace vita
   /// individual are passed as arguments of the function and the output value
   /// is the result.
   ///
+  /// \warning
+  /// To date this class is only used by the real::eval method and that method
+  /// isn't called anywhere (since GA individuals have direct access to
+  /// their values).
+  ///
   template<>
   class interpreter<i_ga> : public core_interpreter
   {

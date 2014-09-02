@@ -31,7 +31,7 @@ namespace vita
   ///
   /// \brief "Run" the individual
   ///
-  /// \tparam T the type of individual used.
+  /// \tparam T the type of individual used
   ///
   /// The interpreter class "executes" an individual (a program) in its
   /// environment.

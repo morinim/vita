@@ -84,6 +84,14 @@ namespace vita
       const base_t min, upp;
     };
 
+    ///
+    /// \param[in] i this will be the i-th arguments.
+    /// \param[in] m minimum value of the argument.
+    /// \param[in] u upper limit for the argument.
+    /// \return a pointer to the created parameter.
+    ///
+    /// A convenient shortcut to build the symbol set of a GA problem.
+    ///
     inline std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
                                              base_t u = 1000.0)
     {
