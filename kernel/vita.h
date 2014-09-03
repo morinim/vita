@@ -78,8 +78,10 @@ namespace vita
 }  // namespace vita
 
 /// \page page1 VITA Architecture
-/// http://code.google.com/p/vita/wiki/Anatomy
+/// * http://code.google.com/p/vita/wiki/DevTutorial
+/// * http://code.google.com/p/vita/wiki/Anatomy
 /// \page page2 Contributor guidelines
-/// http://code.google.com/p/vita/wiki/ContributorGuidelines
+/// * http://code.google.com/p/vita/wiki/CodingStyle
+/// * http://code.google.com/p/vita/wiki/DevelopmentCycle
 
 #endif  // Include guard
