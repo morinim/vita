@@ -15,7 +15,9 @@
 
 #include "kernel/ga/i_ga.h"
 #include "kernel/ga/ga_evaluator.h"
+#include "kernel/ga/ga_search.h"
 #include "kernel/evolution.h"
+#include "kernel/problem.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE t_ga
@@ -90,4 +92,41 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s2.best->ind[2], 980.0);
   BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
 }
+
+BOOST_AUTO_TEST_CASE(Search)
+{
+  env.individuals = 100;
+  //env.verbosity = 0;
+
+  vita::problem prob;
+  prob.env = env;
+  prob.sset = std::move(sset);
+
+  auto eva(vita::make_evaluator<vita::i_ga>(
+    [](const std::vector<double> &v)
+    { return std::accumulate(v.begin(), v.end(), 0.0); }));
+
+  vita::ga_search<vita::i_mep, vita::alps_es> s(prob);
+  BOOST_REQUIRE(s.debug(true));
+
+  s.set_evaluator(eva);
+
+  const auto res(s.run());
+/*
+  BOOST_CHECK_GT(s1.best->ind[0], 8.0);
+  BOOST_CHECK_GT(s1.best->ind[1], 95.0);
+  BOOST_CHECK_GT(s1.best->ind[2], 990.0);
+  BOOST_CHECK_GT(s1.best->ind[3], 9980.0);
+
+  vita::evolution<vita::i_ga, vita::std_es> evo2(env, sset, eva);
+  BOOST_REQUIRE(evo2.debug(true));
+
+  const auto s2(evo2.run(1));
+
+  BOOST_CHECK_GT(s2.best->ind[0], 8.0);
+  BOOST_CHECK_GT(s2.best->ind[1], 95.0);
+  BOOST_CHECK_GT(s2.best->ind[2], 980.0);
+  BOOST_CHECK_GT(s2.best->ind[3], 9980.0);*/
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,7 +14,7 @@
 #define      VITA_GA_SEARCH_INL_H
 
 template<class T, template<class> class ES>
-ga_search<T, ES>::ga_search(ga_problem &p) : search<T, ES>(p)
+ga_search<T, ES>::ga_search(problem &p) : search<T, ES>(p)
 {
 }
 
@@ -24,10 +24,10 @@ ga_search<T, ES>::ga_search(ga_problem &p) : search<T, ES>(p)
 /// \see src_search::tune_parameters_nvi comments for further details
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::tune_parameters_nvi()
+void ga_search<T, ES>::tune_parameters_nvi()
 {
   const environment dflt(true);
-  const environment &constrained(this->prob_->env);
+  const environment &constrained(this->prob_.env);
 
   if (constrained.p_mutation >= 0.0)
     this->env_.p_mutation = dflt.p_mutation;
@@ -55,7 +55,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 /// \return best individual found.
 ///
 template<class T, template<class> class ES>
-T src_search<T, ES>::run_nvi(unsigned n)
+T ga_search<T, ES>::run_nvi(unsigned n)
 {
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -66,15 +66,10 @@ T src_search<T, ES>::run_nvi(unsigned n)
 
   tune_parameters_nvi();
 
-  const auto stop(std::bind(&src_search::stop_condition_nvi, this,
-                            std::placeholders::_1));
-
-  auto &data(*this->prob_->data());
-
   for (unsigned r(0); r < n; ++r)
   {
     auto &eval(*this->active_eva_);
-    evolution<T, ES> evo(this->env_, this->prob_->sset, eval, stop, nullptr);
+    evolution<T, ES> evo(this->env_, this->prob_.sset, eval, nullptr, nullptr);
     summary<T> s(evo.run(r));
 
     // The training fitness for the current run.
@@ -104,12 +99,6 @@ T src_search<T, ES>::run_nvi(unsigned n)
       fd.add(run_fitness);
 
     overall_summary.elapsed += s.elapsed;
-
-    if (this->env_.arl && good_runs.front() == r)
-    {
-      this->prob_->sset.reset_adf_weights();
-      arl(s.best->ind);
-    }
 
     assert(good_runs.empty() ||
            std::find(good_runs.begin(), good_runs.end(), best_run) !=
@@ -144,10 +133,10 @@ void ga_search<T, ES>::print_resume(const fitness_t &fit) const
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::log(const summary<T> &run_sum,
-                            const distribution<fitness_t> &fd,
-                            const std::list<unsigned> &good_runs,
-                            unsigned best_run, unsigned runs)
+void ga_search<T, ES>::log(const summary<T> &run_sum,
+                           const distribution<fitness_t> &fd,
+                           const std::list<unsigned> &good_runs,
+                           unsigned best_run, unsigned runs)
 {
   // Summary logging.
   if (this->env_.stat_summary)
@@ -193,5 +182,15 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
               xml_writer_make_settings(' ', 2));
 #endif
   }
+}
+
+///
+/// \param[in] verbose if \c true prints error messages to \c std::cerr.
+/// \return \c true if the object passes the internal consistency check.
+///
+template<class T, template<class> class ES>
+bool ga_search<T, ES>::debug_nvi(bool) const
+{
+  return true;
 }
 #endif  // Include guard
