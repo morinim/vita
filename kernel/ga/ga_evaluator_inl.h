@@ -45,6 +45,12 @@ ga_evaluator<T, F> make_evaluator(F f)
   return ga_evaluator<T, F>(f);
 }
 
+template<class T, class F>
+std::unique_ptr<evaluator<T>> make_unique_evaluator(F f)
+{
+  return make_unique<ga_evaluator<T, F>>(f);
+}
+
 ///
 /// \return the fitness of the individual (range [-1000;0]).
 ///
