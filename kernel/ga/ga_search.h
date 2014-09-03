@@ -19,8 +19,7 @@
 #include <boost/version.hpp>
 
 #include "kernel/evolution.h"
-#include "kernel/lambda_f.h"
-#include "kernel/problem.h"
+#include "kernel/ga/problem.h"
 
 namespace vita
 {

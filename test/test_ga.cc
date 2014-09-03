@@ -14,7 +14,7 @@
 #include <sstream>
 
 #include "kernel/ga/i_ga.h"
-#include "kernel/ga/evaluator.h"
+#include "kernel/ga/ga_evaluator.h"
 #include "kernel/evolution.h"
 
 #if !defined(MASTER_TEST_SET)

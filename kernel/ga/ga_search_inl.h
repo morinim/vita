@@ -124,8 +124,7 @@ T src_search<T, ES>::run_nvi(unsigned n)
 /// \param[in] fit fitness reached in the current run.
 ///
 template<class T, template<class> class ES>
-void ga_search<T, ES>::print_resume(const fitness_t &fit,
-                                     double acc) const
+void ga_search<T, ES>::print_resume(const fitness_t &fit) const
 {
   if (this->env_.verbosity >= 2)
   {

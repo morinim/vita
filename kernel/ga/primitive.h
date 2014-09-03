@@ -15,7 +15,6 @@
 
 #include <string>
 
-#include "kernel/function.h"
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "kernel/utility.h"

@@ -42,7 +42,7 @@ namespace vita
 
   template<class T, class F> ga_evaluator<T, F> make_evaluator(F);
 
-#include "kernel/ga/evaluator_inl.h"
+#include "kernel/ga/ga_evaluator_inl.h"
 }  // namespace vita
 
 #endif  // Include guard
