@@ -20,7 +20,6 @@ namespace vita
   ///
   /// \param[in] name name of the symbol.
   /// \param[in] c category of the symbol.
-  /// \param[in] w weight (used for random selection).
   ///
   /// \note
   /// By default a symbol:

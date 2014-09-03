@@ -72,6 +72,7 @@ namespace vita
 
   ///
   /// \param[in] name name of the symbol to be registered (UPPERCASE!).
+  /// \param[in] n number of argument for the constructor of the symbol.
   /// \return \c true if the symbol \a T has been added to the factory.
   ///
   template<class T>

@@ -115,7 +115,7 @@ namespace vita
   }
 
   ///
-  /// \param[in] a new untagged_category for the set.
+  /// \param[in] c a new untagged_category for the set.
   /// \return the tag associated with \a c.
   ///
   category_t category_set::insert(const untagged_category &c)

@@ -34,10 +34,10 @@ namespace vita
   ///     </attribute>
   ///
   /// is mapped to:
-  /// * {"", d_string, {"Iris-setosa", "Iris-versicolor",
-  ///   "Iris-virginica"}}
+  /// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
   ///
   /// while
+  ///
   ///     <attribute type="numeric" category="A" name="Speed" />
   ///
   /// is mapped to:

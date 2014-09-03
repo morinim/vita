@@ -45,6 +45,11 @@ ga_evaluator<T, F> make_evaluator(F f)
   return ga_evaluator<T, F>(f);
 }
 
+///
+/// \param[in] f objective function.
+/// \return a unique_ptr referencing an evaluator based on \a f.
+/// \see make_evaluator for further details.
+///
 template<class T, class F>
 std::unique_ptr<evaluator<T>> make_unique_evaluator(F f)
 {

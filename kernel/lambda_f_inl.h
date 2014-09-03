@@ -499,11 +499,10 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 
 ///
 /// \param[in] example input value whose class we are interested in.
-/// \param[out] val confidence level: how sure you can be that \a example
-///                 is properly classified. The value is in [0;1] range and the
-///                 sum of the confidence level of each class is 1.
 /// \return the class of \a instance (numerical id) and the confidence level
-///         (in the range [0,1]).
+///         (how sure you can be that \a example is properly classified. The
+///         value is in [0;1] range and the sum of all the confidence levels of
+///         each class is 1).
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
@@ -730,6 +729,7 @@ bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
 ///
 /// \param[in] t team "to be transformed" into a lambda function.
 /// \param[in] d the training set.
+/// \param[in] args auxiliary parameters for the specific lambda function.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>

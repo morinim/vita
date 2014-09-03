@@ -88,14 +88,14 @@ namespace vita
 
     bool debug(bool = true) const;
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private support methods.
+  private:  // Private support methods
     hash_t hash() const;
 
-  private:  // Private data members.
+  private:  // Private data members
     std::vector<T> individuals_;
 
     mutable hash_t signature_;
