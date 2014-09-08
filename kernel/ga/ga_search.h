@@ -25,8 +25,8 @@ namespace vita
   ///
   /// \brief search for GA
   ///
-  /// \tparam T the type of individual used.
-  /// \tparam ES the adopted evolution strategy.
+  /// \tparam T the type of individual used
+  /// \tparam ES the adopted evolution strategy
   ///
   /// This class implements vita::search for GA optimization tasks.
   ///

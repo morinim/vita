@@ -14,33 +14,35 @@
 #define      VITA_EVOLUTION_RECOMBINATION_H
 
 #include "kernel/population.h"
+#include "kernel/vitafwd.h"
 
-namespace vita {
-  template<class T> class summary;
-
-namespace recombination {
+namespace vita { namespace recombination {
   ///
   /// \brief The operation strategy (crossover, recombination, mutation...) for
   ///        the \a evolution class
   ///
   /// \tparam T type of individual
   ///
-  /// In the strategy design pattern, this class is the strategy interface and
-  /// vita::evolution is the context.
-  ///
   /// A recombination acts upon sets of individuals to generate offspring
   /// (this definition generalizes the traditional mutation and crossover
   /// operators).
-  /// This is an abstract class: introduction of new operators or
-  /// redefinition of existing ones is obtained implementing
-  /// recombination::strategy.
   ///
   /// Operator application is atomic from the point of view of the
   /// evolutionary algorithm and every recombination is applied to a well
   /// defined list of individuals, without dependencies upon past history.
   ///
+  /// In the strategy design pattern, this class is the strategy interface and
+  /// vita::evolution is the context.
+  ///
+  /// This is an abstract class: introduction of new operators or redefinition
+  /// of existing ones is obtained implementing recombination::strategy.
+  ///
+  /// The design adheres to the NVI pattern ("Virtuality" in C/C++ Users
+  /// Journal September 2001).
+  ///
   /// \see
-  /// http://en.wikipedia.org/wiki/Strategy_pattern
+  /// * <http://en.wikipedia.org/wiki/Strategy_pattern>
+  /// * <http://www.gotw.ca/publications/mill18.htm>
   ///
   template<class T>
   class strategy
@@ -49,10 +51,10 @@ namespace recombination {
     strategy(const population<T> &, evaluator<T> &, summary<T> *const);
     virtual ~strategy() {}
 
-    // Defining offspring as a set of individuals lets the generalized
-    // recombination encompass recent additions, such as scan mutation, that
-    // generates numerous offspring from a single parent.
-    virtual std::vector<T> run(const std::vector<coord> &) = 0;
+    std::vector<T> run(const std::vector<coord> &);
+
+  private:  // NVI template methods
+    virtual std::vector<T> run_nvi(const std::vector<coord> &) = 0;
 
   protected:
     const population<T> &pop_;
@@ -73,7 +75,8 @@ namespace recombination {
   public:
     using base::strategy::strategy;
 
-    virtual std::vector<T> run(const std::vector<coord> &) override;
+  private:  // NVI template methods
+    virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
   };
 
   ///
@@ -85,7 +88,8 @@ namespace recombination {
   public:
     using de::strategy::strategy;
 
-    virtual std::vector<T> run(const std::vector<coord> &) override;
+  private:  // NVI template methods
+    virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
   };
 
 #include "kernel/evolution_recombination_inl.h"

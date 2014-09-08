@@ -62,11 +62,12 @@ namespace vita
     /// Work to be done at the end of an evolution run.
     virtual void post_bookkeeping() {}
 
-    static constexpr bool is_alps
-    {
+    static constexpr bool is_alps =
       std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
-      std::is_same<RS<T>, typename vita::replacement::alps<T>>::value
-    };
+      std::is_same<RS<T>, typename vita::replacement::alps<T>>::value;
+
+    static constexpr bool is_de =
+      std::is_same<CS<T>, typename vita::recombination::de<T>>::value;
 
   public:  // Public data members
     SS<T> selection;

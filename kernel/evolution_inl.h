@@ -271,6 +271,8 @@ evolution<T, ES>::run(unsigned run_count)
   eva_.clear(evaluator<T>::stats);
 #endif
 
+  es_.pre_bookkeeping();
+
   for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
   {
     if (shake_data_ && stats_.gen % 4 == 0)

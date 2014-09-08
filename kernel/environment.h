@@ -131,10 +131,12 @@ namespace vita
     /// Size of the tournament to choose the parents from.
     /// Tournament sizes tend to be small relative to the population size. The
     /// ratio of tournament size to population size can be used as a measure of
-    /// selective pressure. Note that a tournament size of 1 would be
-    /// equivalent to selecting individuals at random.
+    /// selective pressure.
+    ///
     /// \note
-    /// A length of 0 means undefined (auto-tune).
+    /// * A tournament size of 1 would be equivalent to selecting individuals
+    ///   at random.
+    /// * A length of 0 means undefined (auto-tune).
     unsigned tournament_size = 0;
 
     /// Switches Dynamic Subset Selection on/off.

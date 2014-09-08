@@ -373,9 +373,8 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  //for (auto i(decltype(size){0}); i < size; ++i)
-  //  ret[i] = this->pickup();
-  std::generate_n(ret.begin(), size, std::mem_fn(this->pickup));
+  for (auto i(decltype(size){0}); i < size; ++i)
+    ret[i] = this->pickup();
 
   return ret;
 }

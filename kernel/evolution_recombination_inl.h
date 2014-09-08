@@ -27,13 +27,27 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 }
 
 ///
+/// \param[in] parent a vector of ordered (decreasing fitness) parents.
+/// \return the offspring.
+///
+/// Defining offspring as a set of individuals lets the generalized
+/// recombination encompass recent additions, such as scan mutation, that
+/// generates numerous offspring from a single parent.
+///
+template<class T>
+std::vector<T> strategy<T>::run(const std::vector<coord> &parent)
+{
+  return run_nvi(parent);
+}
+
+///
 /// \param[in] parent a vector of ordered parents.
 /// \return the offspring.
 ///
 /// This is a quite standard crossover + mutation operator.
 ///
 template<class T>
-std::vector<T> base<T>::run(const std::vector<coord> &parent)
+std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
@@ -104,15 +118,15 @@ std::vector<T> base<T>::run(const std::vector<coord> &parent)
 /// \return the offspring.
 ///
 template<class T>
-std::vector<T> de<T>::run(const std::vector<coord> &parent)
+std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 {
-  assert(parent.size() == 3);
+  assert(parent.size() >= 4);
 
   const auto &pop(this->pop_);
-  const auto &env(pop.env());
 
-  assert(env.p_cross >= 0.0);
+  assert(pop.env().p_cross > 0.0);
 
-  return {pop[parent[0]].crossover(pop[parent[1]], pop[parent[2]])};
+  return {pop[parent[0]].crossover(pop[parent[1]], pop[parent[2]],
+                                   pop[parent[3]])};
 }
 #endif  // Include guard

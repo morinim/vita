@@ -96,13 +96,13 @@ BOOST_AUTO_TEST_CASE(Evolution)
 BOOST_AUTO_TEST_CASE(Search)
 {
   env.individuals = 100;
-  env.verbosity = 0;
+  //env.verbosity = 0;
 
   vita::problem prob;
   prob.env = env;
   prob.sset = std::move(sset);
 
-  vita::ga_search<vita::i_ga, vita::std_es> s(prob);
+  vita::ga_search<vita::i_ga, vita::de_es> s(prob);
   BOOST_REQUIRE(s.debug(true));
 
   s.set_evaluator(vita::make_unique_evaluator<vita::i_ga>(

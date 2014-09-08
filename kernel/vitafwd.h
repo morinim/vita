@@ -34,6 +34,8 @@ namespace vita
   template<class T> class std_es;
 
   template<class T, template<class> class ES> class src_search;
+
+  template<class T> class summary;
 }  // namespace vita
 
 #endif  // Include guard

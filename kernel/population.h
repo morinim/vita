@@ -76,11 +76,11 @@ namespace vita
 
     bool debug(bool) const;
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:  // Private data members.
+  private:  // Private data members
     std::vector<layer_t> pop_;
     std::vector<unsigned> allowed_;
   };
