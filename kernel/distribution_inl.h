@@ -32,9 +32,8 @@ void distribution<T>::clear()
 }
 
 ///
+/// \brief Add a new value to the distribution
 /// \param[in] val new value upon which statistics are recalculated.
-///
-/// Add a new value to the distribution.
 ///
 template<class T>
 void distribution<T>::add(T val)

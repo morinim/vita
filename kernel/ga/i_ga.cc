@@ -177,7 +177,18 @@ namespace vita
   /// \param[in] c third parent.
   /// \return the offspring.
   ///
-  /// offspring = crossover(this, c + F * (a - b)).
+  ///     offspring = crossover(this, c + F * (a - b))
+  ///
+  /// The offspring, also called trial vector, is generated as follows:
+  /// first the search direction is defined by calculating a
+  /// <em>difference vector</em> between the pair of vectors \a a and \a b
+  /// (usually choosen at random from the population). This difference vector
+  /// is scaled by using the <em>scale factor</em> \a f. This scaled difference
+  /// vector is then added to a third vector \a c, called the
+  /// <em>base vector</em>. As a result a new vector is obtained, known as the
+  /// <em>mutant vector</em>. The mutant vector is recombined, based on a used
+  /// defined parameter, called <em>crossover probability</em>, with the target
+  /// vector \c this (also called <em>parent vector</em>).
   ///
   /// This way no separate probability distribution has to be used which makes
   /// the scheme completely self-organizing.

@@ -117,6 +117,8 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
 /// \param[in] parent a vector of ordered parents.
 /// \return the offspring.
 ///
+/// This strictly is based on the DE crossover operator.
+///
 template<class T>
 std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 {
