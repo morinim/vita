@@ -32,7 +32,8 @@ namespace vita
   /// These are safe values for derived classes.
   ///
   /// \warning
-  /// The name of the symbol must be unique: it's used for serialization.
+  /// Since the name of the symbol is used for serialization, it must be
+  /// unique.
   /// Of course even the opcode is unique, but it can vary between executions.
   ///
   symbol::symbol(const std::string &name, category_t c)

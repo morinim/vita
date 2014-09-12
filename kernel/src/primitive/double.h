@@ -35,7 +35,7 @@ namespace vita
   /// an empty \c any()).
   namespace dbl
   {
-    typedef double base_t;
+    using base_t = double;
 
     ///
     /// \param[in] v the value that must be casted to base type (\c base_t).
