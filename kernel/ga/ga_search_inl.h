@@ -14,7 +14,7 @@
 #define      VITA_GA_SEARCH_INL_H
 
 template<class T, template<class> class ES>
-ga_search<T, ES>::ga_search(problem &p) : search<T, ES>(p)
+ga_search<T, ES>::ga_search(problem<> &p) : search<T, ES>(p)
 {
 }
 

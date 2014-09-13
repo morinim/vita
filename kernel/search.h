@@ -45,7 +45,7 @@ namespace vita
   class search
   {
   public:
-    explicit search(problem &);
+    explicit search(problem<> &);
 
     void set_evaluator(std::unique_ptr<evaluator<T>>);
     std::unique_ptr<lambda_f<T>> lambdify(const T &);
@@ -71,7 +71,7 @@ namespace vita
     environment env_;
 
     // Problem we're working on.
-    problem &prob_;
+    problem<> &prob_;
   };
 
 #include "kernel/search_inl.h"

@@ -68,7 +68,7 @@ namespace vita
   ///    src_problem p;
   ///    p.env = environment(true);
   ///
-  src_problem::src_problem() : problem()
+  src_problem::src_problem() : problem<>(std::false_type{})
   {
   }
 
@@ -81,7 +81,8 @@ namespace vita
   /// Initialize the problem with data from the input files.
   ///
   src_problem::src_problem(const std::string &ds, const std::string &ts,
-                           const std::string &symbols) : problem()
+                           const std::string &symbols)
+    : problem<>(std::false_type{})
   {
     load(ds, ts, symbols);
   }

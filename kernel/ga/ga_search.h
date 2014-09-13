@@ -34,7 +34,7 @@ namespace vita
   class ga_search : public search<T, ES>
   {
   public:
-    explicit ga_search(problem &);
+    explicit ga_search(problem<> &);
 
   private:  // NVI template methods
     virtual bool debug_nvi(bool) const override;

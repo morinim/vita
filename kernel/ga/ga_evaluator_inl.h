@@ -28,7 +28,7 @@ ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
 /// \param[in] f objective function.
 /// \return an evaluator based on \a f.
 ///
-/// This is a so called named constructor. Here it's used because C++11
+/// This is the so called object generator idiom. Here it's used because C++11
 /// standard doesn't allow for template argument deduction from the parameters
 /// passed to the constructor.
 ///
