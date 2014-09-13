@@ -44,7 +44,7 @@ namespace vita
     virtual std::string display(double) const;
     virtual double init() const;
 
-    /// Calculates the value of / performs the action associated to the symbol
+    /// Calculates the value of / performs the action associated with the symbol
     /// (it is implementation specific).
     virtual any eval(core_interpreter *) const = 0;
 
