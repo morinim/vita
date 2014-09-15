@@ -23,9 +23,12 @@ namespace vita
   class core_interpreter
   {
   public:
-    virtual any run() = 0;
+    any run() { return run_nvi(); }
+    bool debug() const { return debug_nvi(); }
 
-    virtual bool debug() const = 0;
+  private:
+    virtual any run_nvi() = 0;
+    virtual bool debug_nvi() const = 0;
   };
 
   ///

@@ -47,7 +47,7 @@ namespace vita
   ///
   /// Calls run()(locus) using the the locus of the individual (\c prg_.best).
   ///
-  any interpreter<i_mep>::run()
+  any interpreter<i_mep>::run_nvi()
   {
     return run_locus(prg_.best_);
   }
@@ -68,7 +68,7 @@ namespace vita
   /// \return the value of the i-th argument of the current function.
   ///
   /// We use a cache to avoid recalculating the same value during the same
-  /// \a interpreter execution.
+  /// \c interpreter execution.
   /// This means that side effects are not evaluated to date: WE ASSUME
   /// REFERENTIAL TRANSPARENCY for all the expressions.
   ///
@@ -131,7 +131,7 @@ namespace vita
   ///
   /// \return \c true if the object passes the internal consistency check.
   ///
-  bool interpreter<i_mep>::debug() const
+  bool interpreter<i_mep>::debug_nvi() const
   {
     if (context_ && !context_->debug())
       return false;

@@ -36,15 +36,15 @@ namespace vita
   public:
     explicit interpreter(const i_mep &, interpreter<i_mep> * = nullptr);
 
-    virtual any run() override;
-
     any fetch_param();
     any fetch_arg(unsigned);
     any fetch_adf_arg(unsigned);
 
-    virtual bool debug() const override;
+  private:  // Methods of the non-virtual interface
+    virtual any run_nvi() override;
+    virtual bool debug_nvi() const override;
 
-  private:  // Private methods
+  private:  // Private support methods
     any run_locus(const locus &);
 
   private:  // Private data members
