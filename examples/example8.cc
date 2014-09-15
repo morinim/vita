@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
       std::cout << std::endl << "BLOCK at locus " << l << std::endl;
       blk.list(std::cout);
-      const any val(interpreter<i_mep>(blk).run());
+      const any val(interpreter<i_mep>(&blk).run());
       if (val.empty())
         std::cout << "Empty output.";
       else
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
         i_mep blk3(blk.replace({{f, positions}}));
         std::cout << std::endl;
         blk3.list(std::cout);
-        const any val3(interpreter<i_mep>(blk3).run());
+        const any val3(interpreter<i_mep>(&blk3).run());
         if (val3.empty())
           std::cout << "Empty output.";
         else

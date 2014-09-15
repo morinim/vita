@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   ind.dump(std::cout);
   std::cout << std::endl;
 
-  const vita::any val(vita::interpreter<vita::i_mep>(ind).run());
+  const vita::any val(vita::interpreter<vita::i_mep>(&ind).run());
   if (val.empty())
     std::cout << "Incorrect program." << std::endl;
   else
