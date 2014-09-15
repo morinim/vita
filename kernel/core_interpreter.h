@@ -30,15 +30,5 @@ namespace vita
     virtual any run_nvi() = 0;
     virtual bool debug_nvi() const = 0;
   };
-
-  ///
-  /// \brief "Run" the individual
-  ///
-  /// \tparam T the type of individual used
-  ///
-  /// The interpreter class "executes" an individual (a program) in its
-  /// environment.
-  ///
-  template<class T> class interpreter;
 }  // namespace vita
 #endif  // Include guard

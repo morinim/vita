@@ -12,6 +12,7 @@
 
 #include "kernel/argument.h"
 #include "kernel/gene.h"
+#include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
 
 namespace vita

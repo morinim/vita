@@ -14,21 +14,27 @@
 #define      VITA_MEP_INTERPRETER_H
 
 #include <boost/optional.hpp>
+#include <boost/none.hpp>
 
 #include "kernel/core_interpreter.h"
+#include "kernel/function.h"
 #include "kernel/matrix.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
 {
   ///
-  /// \brief A template specialization for interpreter<T> class
+  /// \brief A template specialization for core_interpreter class
+  ///
+  /// The interpreter class "executes" an individual (a program) in its
+  /// environment.
   ///
   /// \note
-  /// We don't have a generic interpreter<T> implementation (e.g. see the
-  /// lambda_f source code) because interpreter and individual are strongly
-  /// coupled: the interpreter must be build around the peculiarities of
-  /// the specific individual class.
+  /// This class would like to be a generic \c interpreter<T> implementation,
+  /// but interpreter and individual are strongly coupled objects: the
+  /// interpreter must be build around the peculiarities of the specific
+  /// individual class. So don't expect to use this template for \a T different
+  /// from \c i_mep without some modifications.
   ///
   /// \note
   /// This is an example of dependency injection via constructor injection: the
@@ -45,11 +51,11 @@ namespace vita
   /// * <http://stackoverflow.com/q/12387239/3235496>
   /// * <http://stackoverflow.com/q/1974682/3235496>
   ///
-  template<>
-  class interpreter<i_mep> : public core_interpreter
+  template<class T>
+  class interpreter : public core_interpreter
   {
   public:
-    explicit interpreter(const i_mep *, interpreter<i_mep> * = nullptr);
+    explicit interpreter(const T *, interpreter<T> * = nullptr);
 
     any fetch_param();
     any fetch_arg(unsigned);
@@ -66,17 +72,18 @@ namespace vita
     // There are different opinions about the use of references as data member:
     // many prefer pointers. Here we prefer a reference since prg_ cannot be
     // null and assignment between interpreters is a rare scenario.
-    const i_mep &prg_;
+    const T &prg_;
 
     mutable matrix<boost::optional<any>> cache_;
 
     // Instruction pointer.
     locus ip_;
 
-    // Of course this is a pointer since we need to describe a one-or-zero
-    // relationship.
-    interpreter<i_mep> *const context_;
+    // This is a pointer since we need to describe a one-or-zero relationship.
+    interpreter<T> *const context_;
   };
+
+#include "kernel/interpreter_inl.h"
 
   ///
   /// \example example5.cc

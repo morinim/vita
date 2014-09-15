@@ -15,6 +15,7 @@
 #include "kernel/src/primitive/double.h"
 #include "kernel/src/primitive/string.h"
 #include "kernel/src/constant.h"
+#include "kernel/i_mep.h"
 
 namespace vita
 {
