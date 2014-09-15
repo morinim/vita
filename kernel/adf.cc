@@ -43,7 +43,7 @@ namespace vita
   {
     assert(typeid(*i) == typeid(interpreter<i_mep>));
 
-    return interpreter<i_mep>(code(),
+    return interpreter<i_mep>(&code(),
                               static_cast<interpreter<i_mep> *>(i)).run();
   }
 
@@ -104,7 +104,7 @@ namespace vita
   ///
   any adt::eval(core_interpreter *) const
   {
-    return interpreter<i_mep>(code()).run();
+    return interpreter<i_mep>(&code()).run();
   }
 
   ///

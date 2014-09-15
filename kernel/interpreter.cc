@@ -19,15 +19,19 @@
 namespace vita
 {
   ///
-  /// \param[in] ind individual whose value we are interested in,
+  /// \param[in] ind individual whose value we are interested in. The lifetime
+  ///                of \a ind must extend beyond that of the interpreter.
   /// \param[in] ctx context in which we calculate the output value (used for
-  ///                the evaluation of ADF).
+  ///                the evaluation of ADF). It can be empty (\c nullptr).
+  ///                The lifetime of \a ctx must extend beyon that of the
+  ///                interpreter.
   ///
-  interpreter<i_mep>::interpreter(const i_mep &ind, interpreter<i_mep> *ctx)
-    : core_interpreter(), prg_(ind),
-      cache_(ind.size(), ind.sset().categories()), ip_(ind.best_),
+  interpreter<i_mep>::interpreter(const i_mep *ind, interpreter<i_mep> *ctx)
+    : core_interpreter(), prg_(*ind),
+      cache_(ind->size(), ind->sset().categories()), ip_(ind->best_),
       context_(ctx)
   {
+    assert(ind);
   }
 
   ///

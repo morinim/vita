@@ -56,6 +56,25 @@ namespace vita
   }
 
   ///
+  /// \param[in] e base environment.
+  /// \param[in] ss a symbol set.
+  /// \param[in] gv vector of genes.
+  ///
+  /// Create a new \a individual obtained containing the genes of \a gv.
+  /// This is useful for debugging purpouse (i.e. setup ad-hoc individuals).
+  ///
+  i_mep::i_mep(const environment &e, const symbol_set &ss,
+               const std::vector<gene> &gv) : i_mep(e, ss)
+  {
+    index_t i(0);
+    for (const auto &g : gv)
+      set({i++, g.sym->category()}, g);
+
+    assert(debug());
+  }
+
+
+  ///
   /// \return the effective size of the individual.
   /// \see size()
   ///
@@ -201,26 +220,6 @@ namespace vita
   {
     return replace(best_, g);
   }
-
-  ///
-  /// \param[in] gv vector of genes.
-  /// \return a new individual .
-  ///
-  /// Create a new \a individual obtained replacing the first section of
-  /// \c this with genes from \a gv.
-  ///
-  i_mep i_mep::replace(const std::vector<gene> &gv) const
-  {
-    i_mep ret(*this);
-
-    index_t i(0);
-    for (const auto &g : gv)
-      ret.set({i++, g.sym->category()}, g);
-
-    assert(ret.debug());
-    return ret;
-  }
-
 
   ///
   /// \param[in] index index of a \a symbol in the \a individual.

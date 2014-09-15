@@ -227,16 +227,14 @@ BOOST_AUTO_TEST_CASE(Blocks)
 
 BOOST_AUTO_TEST_CASE(Output)
 {
-  std::vector<vita::gene> g(
-  {
-    {{f_sub, {1, 2}}},  // [0] SUB 1,2
-    {{f_add, {3, 4}}},  // [1] ADD 3,4
-    {{f_add, {4, 3}}},  // [2] ADD 4,3
-    {{   c2,   null}},  // [3] 2.0
-    {{   c3,   null}}   // [4] 3.0
-  });
-
-  vita::i_mep i(vita::i_mep(env, sset).replace(g));
+  vita::i_mep i(env, sset,
+                {
+                  {{f_sub, {1, 2}}},  // [0] SUB 1,2
+                  {{f_add, {3, 4}}},  // [1] ADD 3,4
+                  {{f_add, {4, 3}}},  // [2] ADD 4,3
+                  {{   c2,   null}},  // [3] 2.0
+                  {{   c3,   null}}   // [4] 3.0
+                });
 
   std::stringstream ss;
 

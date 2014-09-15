@@ -32,7 +32,7 @@ namespace vita
   class src_interpreter : public interpreter<T>
   {
   public:
-    explicit src_interpreter(const T &prg, interpreter<T> *ctx = nullptr)
+    explicit src_interpreter(const T *prg, interpreter<T> *ctx = nullptr)
       : interpreter<T>(prg, ctx)
     {}
 

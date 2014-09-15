@@ -33,6 +33,7 @@ namespace vita
   {
   public:
     i_mep(const environment &, const symbol_set &);
+    i_mep(const environment &, const symbol_set &, const std::vector<gene> &);
 
     // Visualization/output methods
     std::ostream &dump(std::ostream &) const;
@@ -54,7 +55,6 @@ namespace vita
 
     i_mep replace(const gene &) const;
     i_mep replace(const locus &, const gene &) const;
-    i_mep replace(const std::vector<gene> &) const;
 
     std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
 

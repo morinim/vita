@@ -33,7 +33,7 @@ namespace vita { namespace detail
   class core_reg_lambda_f<T, true, false>
   {
   public:
-    explicit core_reg_lambda_f(const T &ind) : ind_(ind), int_(ind_)
+    explicit core_reg_lambda_f(const T &ind) : ind_(ind), int_(&ind_)
     { assert(debug()); }
 
     bool debug() const { return ind_.debug() && int_.debug(); }
@@ -78,7 +78,7 @@ namespace vita { namespace detail
   class core_reg_lambda_f<T, false, false>
   {
   public:
-    explicit core_reg_lambda_f(const T &ind) : int_(ind)
+    explicit core_reg_lambda_f(const T &ind) : int_(&ind)
     { assert(debug()); }
 
     bool debug() const { return int_.debug(); }
