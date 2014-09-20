@@ -36,10 +36,10 @@ namespace vita
   /// architectures).
   ///
   /// \see
-  /// * http://comments.gmane.org/gmane.comp.compilers.clang.devel/18702
-  /// * http://blog.reverberate.org/2012/01/state-of-hash-functions-2012.html
-  /// * http://code.google.com/p/cityhash/
-  /// * http://code.google.com/p/smhasher/
+  /// * <http://comments.gmane.org/gmane.comp.compilers.clang.devel/18702>
+  /// * <http://blog.reverberate.org/2012/01/state-of-hash-functions-2012.html>
+  /// * <http://code.google.com/p/cityhash/>
+  /// * <http://code.google.com/p/smhasher/>
   ///
   inline
   hash_t hash(void *const data, unsigned len, const unsigned seed)

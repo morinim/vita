@@ -25,7 +25,7 @@ namespace vita
   ///
   /// \tparam P a function object (function, lambda, functor) used as penalty
   ///           function for constrained problems.
-  ///           For unconstrained problems \a P should be std::false_type.
+  ///           For unconstrained problems \a P should be \c std::false_type.
   ///
   /// \note
   /// What a horror! Public data members... please read the coding style

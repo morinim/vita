@@ -84,6 +84,11 @@ namespace vita
         //             category()));
       }
 
+      virtual unsigned unfeasible(base_t v) const
+      {
+        return v < min || v >= upp;
+      }
+
     private:  // Private data members
       const base_t min, upp;
     };
