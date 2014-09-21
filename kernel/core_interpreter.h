@@ -24,10 +24,12 @@ namespace vita
   {
   public:
     any run() { return run_nvi(); }
+    unsigned penalty() { return penalty_nvi(); }
     bool debug() const { return debug_nvi(); }
 
   private:
     virtual any run_nvi() = 0;
+    virtual unsigned penalty_nvi() = 0;
     virtual bool debug_nvi() const = 0;
   };
 }  // namespace vita

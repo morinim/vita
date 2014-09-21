@@ -46,7 +46,7 @@ any interpreter<T>::run_locus(const locus &ip)
 ///
 /// \return the output value of \c this \a individual.
 ///
-/// Calls run()(locus) using the the locus of the individual (\c prg_.best).
+/// Calls run_locus() using the default starting locus.
 ///
 template<class T>
 any interpreter<T>::run_nvi()
@@ -76,8 +76,8 @@ any interpreter<T>::fetch_param()
 /// REFERENTIAL TRANSPARENCY for all the expressions.
 ///
 /// \see
-/// * http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)
-/// * http://en.wikipedia.org/wiki/Memoization
+/// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
+/// * <http://en.wikipedia.org/wiki/Memoization>
 ///
 template<class T>
 any interpreter<T>::fetch_arg(unsigned i)
@@ -131,6 +131,28 @@ any interpreter<T>::fetch_adf_arg(unsigned i)
   assert(!ctx_g.sym->terminal() && ctx_g.sym->auto_defined());
 #endif
   return context_->fetch_arg(i);
+}
+
+///
+/// \param[in] ip locus of the genome we are starting evaluation from.
+/// \return the penalty value for \c this \a individual.
+/// \warning NOT IMPLEMENTED YET
+///
+template<class T>
+unsigned interpreter<T>::penalty_locus(const locus &)
+{
+  return 0;
+}
+
+///
+/// \return the penalty for \c this \a individual.
+///
+/// Calls penalty_locus() using the default starting locus.
+//
+template<class T>
+unsigned interpreter<T>::penalty_nvi()
+{
+  return penalty_locus(prg_.best_);
 }
 
 ///
