@@ -162,6 +162,26 @@ BOOST_AUTO_TEST_CASE(IFE)
   static_cast<Z *>(z)->val = 0;
   ret = i_interp(&i3).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i3);
+
+  BOOST_TEST_CHECKPOINT("IFE SAME COMPARISON-TERM PENALTY");
+  auto penalty(i_interp(&i1).penalty());
+  BOOST_REQUIRE_GT(penalty, 0);
+
+  BOOST_TEST_CHECKPOINT("IFE NO PENALTY");
+  penalty = i_interp(&i2).penalty();
+  BOOST_REQUIRE_EQUAL(penalty, 0);
+  penalty = i_interp(&i3).penalty();
+  BOOST_REQUIRE_EQUAL(penalty, 0);
+
+  BOOST_TEST_CHECKPOINT("IFE SAME RESULT PENALTY");
+  const i_mep i4(env, sset,
+                 {
+                   {{i_ife, {1, 2, 2, 2}}},  // [0] IFE 1,2,2,2
+                   {{   c0,         null}},  // [1] 0
+                   {{   c1,         null}}   // [2] 1
+                 });
+  penalty = i_interp(&i4).penalty();
+  BOOST_REQUIRE_GT(penalty, 0);
 }
 
 BOOST_AUTO_TEST_CASE(MUL)
