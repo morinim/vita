@@ -48,6 +48,8 @@ namespace vita
     /// (it is implementation specific).
     virtual any eval(core_interpreter *) const = 0;
 
+    virtual unsigned penalty(core_interpreter *) const;
+
     virtual bool debug() const;
 
   public:  // Public data members

@@ -216,7 +216,7 @@ namespace vita
     ///
     /// \brief "If between" operator
     ///
-    /// \note Requires five input arguments.
+    /// \warning Requires five input arguments.
     ///
     class ifb : public function
     {
@@ -276,6 +276,16 @@ namespace vita
           return i->fetch_arg(2);
         else
           return i->fetch_arg(3);
+      }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+
+        const auto id0(i->fetch_index(0));
+        const auto id1(i->fetch_index(1));
+
+        return id0 == id1;
       }
     };
 

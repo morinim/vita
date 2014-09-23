@@ -60,6 +60,7 @@ namespace vita
     any fetch_param();
     any fetch_arg(unsigned);
     any fetch_adf_arg(unsigned);
+    index_t fetch_index(unsigned) const;
 
   private:  // Methods of the non-virtual interface
     virtual any run_nvi() override;

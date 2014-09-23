@@ -134,6 +134,21 @@ any interpreter<T>::fetch_adf_arg(unsigned i)
 }
 
 ///
+/// \param[in] i i-th argument of the current function.
+/// \return the index referenced by the i-th argument of the current function.
+///
+template<class T>
+index_t interpreter<T>::fetch_index(unsigned i) const
+{
+  const gene &g(prg_[ip_]);
+
+  assert(g.sym->arity());
+  assert(i < g.sym->arity());
+
+  return g.args[i];
+}
+
+///
 /// \param[in] ip locus of the genome we are starting evaluation from.
 /// \return the penalty value for \c this \a individual.
 /// \warning NOT IMPLEMENTED YET

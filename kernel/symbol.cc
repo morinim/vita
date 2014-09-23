@@ -68,6 +68,18 @@ namespace vita
   }
 
   ///
+  /// \return 0
+  ///
+  /// Specializations of this function return a penalty based on
+  /// symbol-specific broken constraints. 0 states that no constraint penalty
+  /// is applied, larger values specify larger penalties.
+  ///
+  unsigned symbol::penalty(core_interpreter *) const
+  {
+    return 0;
+  }
+
+  ///
   /// \return \c true if the object passes the internal consistency check.
   ///
   bool symbol::debug() const
