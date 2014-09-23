@@ -46,6 +46,7 @@ namespace vita
   /// The typical use chain is: evaluator uses lambda_f, lambda_f uses
   /// interpreter.
   ///
+  /// \note
   /// Another interesting function of lambda_f is that it extends the
   /// functionalities of interpreter to teams.
   ///
@@ -107,8 +108,8 @@ namespace vita
   ///
   /// \brief The basic interface of a classification lambda class
   ///
-  /// \tparam T type of individual.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   /// This class:
   /// * extends the interface of class lambda_f to handle typical requirements
@@ -136,9 +137,9 @@ namespace vita
   ///
   /// \brief Lambda class for Slotted Dynamic Class Boundary Determination
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
@@ -189,9 +190,9 @@ namespace vita
   ///
   /// \brief Lambda class for the Gaussian Distribution Classification
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for classification tasks.
@@ -229,9 +230,9 @@ namespace vita
   ///
   /// \brief Lambda class for Binary Classification
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for single-class classification tasks.
@@ -283,15 +284,15 @@ namespace vita
   ///
   /// \brief An helper class for extending classification schemes to teams
   ///
-  /// \tparam T type of individual.
+  /// \tparam T type of individual
   /// \tparam S stores the individual inside vs keep a reference only.
   ///           Sometimes we need an autonomous lambda function that stores
   ///           everything it needs inside (slow but will survive the death of
   ///           the the program it's constructed on); sometimes we need speed,
-  ///           not persistence.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
-  /// \tparam L the basic classificator that must be extended.
-  /// \tparam C composition method for team's member responses.
+  ///           not persistence
+  /// \tparam N stores the name of the classes vs doesn't store the names
+  /// \tparam L the basic classificator that must be extended
+  /// \tparam C composition method for team's member responses
   ///
   template<class T, bool S, bool N, template<class, bool, bool> class L,
            team_composition C = team_composition::standard>
@@ -322,9 +323,9 @@ namespace vita
   /// \brief Slotted Dynamic Class Boundary Determination specialization for
   ///        teams
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   template<class T, bool S, bool N>
   class basic_dyn_slot_lambda_f<team<T>, S, N>
@@ -337,9 +338,9 @@ namespace vita
   ///
   /// \brief Gaussian Distribution Classification specialization for teams
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   template<class T, bool S, bool N>
   class basic_gaussian_lambda_f<team<T>, S, N>
@@ -352,9 +353,9 @@ namespace vita
   ///
   /// \brief Binary Classification specialization for teams
   ///
-  /// \tparam T type of individual.
-  /// \tparam S stores the individual inside vs keep a reference only.
-  /// \tparam N stores the name of the classes vs doesn't store the names.
+  /// \tparam T type of individual
+  /// \tparam S stores the individual inside vs keep a reference only
+  /// \tparam N stores the name of the classes vs doesn't store the names
   ///
   /// This class transforms individuals to lambda functions which can be used
   /// for single-class classification tasks.
