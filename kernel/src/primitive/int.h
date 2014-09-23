@@ -20,6 +20,7 @@
 #include "kernel/interpreter.h"
 #include "kernel/random.h"
 #include "kernel/terminal.h"
+#include "kernel/src/primitive/comp_penalty.h"
 
 namespace vita
 {
@@ -137,6 +138,11 @@ namespace vita
         else
           return i->fetch_arg(3);
       }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        return comparison_function_penalty(ci);
+      }
     };
 
     class ifl : public function
@@ -157,6 +163,11 @@ namespace vita
         else
           return i->fetch_arg(3);
       }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        return comparison_function_penalty(ci);
+      }
     };
 
     class ifz : public function
@@ -174,6 +185,11 @@ namespace vita
           return i->fetch_arg(1);
         else
           return i->fetch_arg(2);
+      }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        return comparison_function_penalty(ci);
       }
     };
 

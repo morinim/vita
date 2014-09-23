@@ -151,12 +151,12 @@ index_t interpreter<T>::fetch_index(unsigned i) const
 ///
 /// \param[in] ip locus of the genome we are starting evaluation from.
 /// \return the penalty value for \c this \a individual.
-/// \warning NOT IMPLEMENTED YET
 ///
 template<class T>
-unsigned interpreter<T>::penalty_locus(const locus &)
+unsigned interpreter<T>::penalty_locus(const locus &ip)
 {
-  return 0;
+  ip_ = ip;
+  return prg_[ip_].sym->penalty(this);
 }
 
 ///

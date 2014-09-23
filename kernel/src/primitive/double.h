@@ -280,12 +280,7 @@ namespace vita
 
       virtual unsigned penalty(core_interpreter *ci) const override
       {
-        auto *const i(static_cast<interpreter<i_mep> *>(ci));
-
-        const auto id0(i->fetch_index(0));
-        const auto id1(i->fetch_index(1));
-
-        return id0 == id1;
+        return comparison_function_penalty(ci);
       }
     };
 
@@ -317,7 +312,12 @@ namespace vita
 
         // If one or both arguments of isless are Nan, the function returns
         // false, but no FE_INVALID exception is raised (note that the
-        // expression v0 < v1 may rais an exception in this case).
+        // expression v0 < v1 may raise an exception in this case).
+      }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        return comparison_function_penalty(ci);
       }
     };
 
@@ -341,6 +341,11 @@ namespace vita
           return i->fetch_arg(1);
         else
           return i->fetch_arg(2);
+      }
+
+      virtual unsigned penalty(core_interpreter *ci) const override
+      {
+        return comparison_function_penalty(ci);
       }
     };
 
