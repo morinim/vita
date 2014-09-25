@@ -14,6 +14,7 @@
 #include <sstream>
 
 #include "kernel/ga/i_ga.h"
+#include "kernel/ga/interpreter.h"
 #include "kernel/ga/ga_evaluator.h"
 #include "kernel/ga/ga_search.h"
 #include "kernel/evolution.h"
@@ -29,6 +30,11 @@ using namespace boost;
 #endif
 
 BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
+
+BOOST_AUTO_TEST_CASE(Penalty)
+{
+  
+}
 
 BOOST_AUTO_TEST_CASE(Evaluator)
 {

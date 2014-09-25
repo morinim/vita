@@ -20,6 +20,12 @@ namespace vita
   ///
   /// \brief Minimum interface of an interpreter
   ///
+  /// The class "executes" an individual (a program) in its environment. The
+  /// program can produce an output or perform some action.
+  ///
+  /// The class can also check if an individual breaks some constraints
+  /// assigning a penalty to unfeasible individuals.
+  ///
   class core_interpreter
   {
   public:

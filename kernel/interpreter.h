@@ -24,10 +24,7 @@
 namespace vita
 {
   ///
-  /// \brief A template specialization for core_interpreter class
-  ///
-  /// The interpreter class "executes" an individual (a program) in its
-  /// environment.
+  /// \brief A template specialization of the core_interpreter class
   ///
   /// \note
   /// This class would like to be a generic \c interpreter<T> implementation,
