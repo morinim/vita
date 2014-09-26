@@ -33,7 +33,24 @@ BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Penalty)
 {
-  
+  vita::i_ga ind(env, sset);
+  BOOST_REQUIRE(ind.debug());
+
+  vita::interpreter<vita::i_ga> intr(&ind);
+
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 0);
+
+  ind[0] = 20;
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 1);
+
+  ind[1] = 200;
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 2);
+
+  ind[2] = 2000;
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 3);
+
+  ind[3] = 20000;
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(Evaluator)
@@ -98,7 +115,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s2.best->ind[2], 980.0);
   BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
 }
-
+/*
 BOOST_AUTO_TEST_CASE(Search)
 {
   env.individuals = 100;
@@ -122,5 +139,5 @@ BOOST_AUTO_TEST_CASE(Search)
   BOOST_CHECK_GT(res[2], 990.0);
   BOOST_CHECK_GT(res[3], 9980.0);
 }
-
+*/
 BOOST_AUTO_TEST_SUITE_END()
