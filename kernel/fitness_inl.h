@@ -32,7 +32,7 @@ template<class T, unsigned N>
 template<class ...Args>
 basic_fitness_t<T, N>::basic_fitness_t(Args ...args) : vect{{T(args)...}}
 {
-  static_assert(N, "basic_fitness_t cannot have zero length");
+  static_assert(N > 1, "basic_fitness_t cannot have zero length");
   static_assert(sizeof...(Args) == N, "Wrong number of arguments");
 
   // Do not change with something like:

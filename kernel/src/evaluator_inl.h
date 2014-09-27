@@ -418,7 +418,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
       // err += std::fabs(val);
     }
 
-  return -err;
+  return fitness_t(-err);
 }
 
 ///
