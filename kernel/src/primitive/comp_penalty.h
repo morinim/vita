@@ -36,7 +36,7 @@ namespace vita
     const auto id3(i->fetch_index(3));
 
     return (id0 == id1) + (id2 == id3);
-  };
+  }
 }  // namespace vita
 
 #endif  // Include guard
