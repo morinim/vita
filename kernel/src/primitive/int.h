@@ -139,7 +139,7 @@ namespace vita
           return i->fetch_arg(3);
       }
 
-      virtual unsigned penalty(core_interpreter *ci) const override
+      virtual int penalty(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }
@@ -164,7 +164,7 @@ namespace vita
           return i->fetch_arg(3);
       }
 
-      virtual unsigned penalty(core_interpreter *ci) const override
+      virtual int penalty(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }
@@ -187,7 +187,7 @@ namespace vita
           return i->fetch_arg(2);
       }
 
-      virtual unsigned penalty(core_interpreter *ci) const override
+      virtual int penalty(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }

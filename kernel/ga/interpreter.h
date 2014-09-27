@@ -37,7 +37,7 @@ namespace vita
 
   private:  // Methods of the non-virtual interface
     virtual any run_nvi() override;
-    virtual unsigned penalty_nvi() override;
+    virtual int penalty_nvi() override;
     virtual bool debug_nvi() const override;
 
   private:  // Private data members

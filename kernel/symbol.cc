@@ -74,7 +74,7 @@ namespace vita
   /// symbol-specific broken constraints. 0 states that no constraint penalty
   /// is applied, larger values specify larger penalties.
   ///
-  unsigned symbol::penalty(core_interpreter *) const
+  int symbol::penalty(core_interpreter *) const
   {
     return 0;
   }

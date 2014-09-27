@@ -82,7 +82,7 @@ namespace vita
           static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
       }
 
-      virtual unsigned penalty(core_interpreter *i) const override
+      virtual int penalty(core_interpreter *i) const override
       {
         const auto v(
           static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
