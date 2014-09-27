@@ -33,7 +33,7 @@ namespace vita
   class basic_fitness_t
   {
   public:
-    typedef T base_t;
+    using value_type = T;
     static constexpr decltype(N) size = N;
 
     explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());

@@ -33,7 +33,7 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
-  fitness_t::base_t err(0.0);
+  fitness_t::value_type err(0.0);
   int illegals(0);
 
   // We don't use data::size() since it gives the size of the active dataset,
@@ -70,7 +70,7 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
-  fitness_t::base_t err(0.0);
+  fitness_t::value_type err(0.0);
   int illegals(0);
   unsigned total_nr(0), counter(0);
 
@@ -303,7 +303,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 {
   basic_dyn_slot_lambda_f<T, false, false> lambda(ind, *this->dat_, x_slot_);
 
-  fitness_t::base_t err(0.0);
+  fitness_t::value_type err(0.0);
   for (auto &example : *this->dat_)
   {
     const auto probable_class(lambda.tag(example).first);
@@ -352,7 +352,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 
   basic_gaussian_lambda_f<T, false, false> lambda(ind, *this->dat_);
 
-  fitness_t::base_t d(0.0);
+  fitness_t::value_type d(0.0);
   for (auto &example : *this->dat_)
   {
     const auto res(lambda.tag(example));
@@ -407,7 +407,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   assert(dataset.classes() == 2);
 
   basic_binary_lambda_f<T, false, false> agent(ind, dataset);
-  fitness_t::base_t err(0.0);
+  fitness_t::value_type err(0.0);
 
   for (auto &example : dataset)
     if (example.tag() != agent.tag(example).first)

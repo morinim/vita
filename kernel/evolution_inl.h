@@ -206,7 +206,7 @@ void evolution<T, ES>::log(unsigned run_count) const
         f_pop << run_count << ' ' << stats_.gen << ' '
               << std::fixed << std::scientific
               << std::setprecision(
-                   std::numeric_limits<fitness_t::base_t>::digits10 + 2)
+                   std::numeric_limits<fitness_t::value_type>::digits10 + 2)
               << f.first[0] << ' ' << f.second << std::endl;
     }
   }

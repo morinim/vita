@@ -40,8 +40,9 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK_EQUAL(fitness4_t::size, 4);
 
   for (unsigned i(0); i < fitness2_t::size; ++i)
-    BOOST_CHECK_EQUAL(fitness2d[i],
-                      std::numeric_limits<vita::fitness_t::base_t>::lowest());
+    BOOST_CHECK_EQUAL(
+      fitness2d[i],
+      std::numeric_limits<vita::fitness_t::value_type>::lowest());
 
   BOOST_CHECK_GT(f1, f2);
   BOOST_CHECK_GE(f1, f2);
@@ -69,7 +70,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   using fitness4_t = vita::basic_fitness_t<double, 4>;
 
   fitness4_t f(1.0, 2.0, 3.0,
-               std::numeric_limits<vita::fitness_t::base_t>::lowest());
+               std::numeric_limits<vita::fitness_t::value_type>::lowest());
 
   std::stringstream ss;
 
@@ -88,7 +89,7 @@ BOOST_AUTO_TEST_CASE(Operators)
   fitness3_t x(2.0, 4.0, 8.0);
   fitness3_t f1(2.0, 4.0, 8.0);
   fitness3_t f2(4.0, 8.0, 16.0);
-  fitness3_t inf(std::numeric_limits<vita::fitness_t::base_t>::infinity());
+  fitness3_t inf(std::numeric_limits<vita::fitness_t::value_type>::infinity());
 
   x += x;
   BOOST_CHECK_EQUAL(x, f2);

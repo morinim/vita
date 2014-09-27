@@ -63,7 +63,7 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
   {
     vita::interpreter<vita::i_mep> agent(&ind);
 
-    vita::fitness_t::base_t fit(0.0);
+    vita::fitness_t::value_type fit(0.0);
     for (double x(0); x < 10; ++x)
       for (double y(0); y < 10; ++y)
         for (double z(0); z < 10; ++z)

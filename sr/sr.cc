@@ -706,7 +706,7 @@ namespace ui
       }
       else
       {
-        const vita::fitness_t::base_t fitness(std::stod(v));
+        const vita::fitness_t::value_type fitness(std::stod(v));
 
         set = (fitness <= 0.0);
         if (set)
