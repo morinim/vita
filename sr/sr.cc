@@ -698,8 +698,7 @@ namespace ui
     {
       if (v.back() == '%')
       {
-        const double accuracy(boost::lexical_cast<double>(
-                                v.substr(0, v.length() - 1)) / 100.0);
+        const auto accuracy(std::stod(v.substr(0, v.length() - 1)) / 100.0);
 
         set = (0.0 < accuracy) && (accuracy <= 1.0);
         if (set)
@@ -707,8 +706,7 @@ namespace ui
       }
       else
       {
-        const vita::fitness_t::base_t fitness(
-          boost::lexical_cast<vita::fitness_t::base_t>(v));
+        const vita::fitness_t::base_t fitness(std::stod(v));
 
         set = (fitness <= 0.0);
         if (set)
