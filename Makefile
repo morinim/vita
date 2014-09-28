@@ -7,10 +7,6 @@
 # Build type: debug, profile, release.
 TYPE = release
 
-# Boost library <-- PLEASE CHECK THE PATHS!
-BOOST_INCLUDE = ./boost
-BOOST_LIB = $(BOOST_INCLUDE)/stage/lib
-
 # Compiler (clang++, g++)
 CXX = g++
 
@@ -26,9 +22,18 @@ DEFS =
 # NO USER SERVICEABLE PARTS BELOW THIS LINE
 # -------------------------------------------------------------------------
 
-# Which libraries are linked
-LIB = $(BOOST_LIB)/libboost_program_options.a
-DEBUG_LIB = $(BOOST_LIB)/libboost_unit_test_framework.a
+# Boost library
+ifneq ($(wildcard ./boost/.),)
+  $(info Using custom Boost directory)
+  BOOST_INCLUDE = ./boost
+  BOOST_LIB_PATH = $(BOOST_INCLUDE)/stage/lib
+  LIB = -L$(BOOST_LIB_PATH) -lboost_program_options
+  DEBUG_LIB = -L$(BOOST_LIB_PATH) -lboost_unit_test_framework
+else
+  $(info Using default Boost directory)
+  LIB = -lboost_program_options
+  DEBUG_LIB = -lboost_unit_test_framework
+endif
 
 # Add directories to the include path.
 # This should work in POSIX compliant environment (see "The Open Group Base
