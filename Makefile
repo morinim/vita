@@ -5,17 +5,19 @@
 
 
 # Build type: debug, profile, release.
-TYPE = release
+TYPE := release
+$(info Building: $(TYPE))
 
 # Compiler (clang++, g++)
-CXX = g++
+CXX := g++
+$(info Using: $(CXX))
 
 # -DCLONE_SCALING
 # -DMUTUAL_IMPROVEMENT
 # -DVITA_NO_LIB
 # -DUNIFORM_CROSSOVER / -DONE_POINT_CROSSOVER / -DTWO_POINT_CROSSOVER (default)
 # -DUSE_BOOST_ANY
-DEFS =
+DEFS :=
 
 
 
@@ -24,34 +26,34 @@ DEFS =
 
 # Boost library
 ifneq ($(wildcard ./boost/.),)
-  $(info Using custom Boost directory)
-  BOOST_INCLUDE = ./boost
-  BOOST_LIB_PATH = $(BOOST_INCLUDE)/stage/lib
-  LIB = -L$(BOOST_LIB_PATH) -lboost_program_options
-  DEBUG_LIB = -L$(BOOST_LIB_PATH) -lboost_unit_test_framework
+  $(info Boost directory: custom)
+  BOOST_INCLUDE := ./boost
+  BOOST_LIB_PATH := $(BOOST_INCLUDE)/stage/lib
+  LIB := -L$(BOOST_LIB_PATH) -lboost_program_options
+  DEBUG_LIB := -L$(BOOST_LIB_PATH) -lboost_unit_test_framework
 else
-  $(info Using default Boost directory)
-  LIB = -lboost_program_options
-  DEBUG_LIB = -lboost_unit_test_framework
+  $(info Boost directory: system)
+  LIB := -lboost_program_options
+  DEBUG_LIB := -lboost_unit_test_framework
 endif
 
 # Add directories to the include path.
 # This should work in POSIX compliant environment (see "The Open Group Base
 # Specifications Issue 7" and
 # <http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html>)
-INCPATH = ../vita/ ./
-SYSTEMINCPATH = $(BOOST_INCLUDE)
+INCPATH := ../vita/ ./
+SYSTEMINCPATH := $(BOOST_INCLUDE)
 
 # -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN = --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
+WARN := --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion -Wzero-as-null-pointer-constant
 endif
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
-  TYPE_PARAM = -g
+  TYPE_PARAM := -g
 
 #ifeq ($(CXX), g++)
 #  TYPE_PARAM += -Og
@@ -59,11 +61,11 @@ ifeq ($(TYPE), debug)
 endif
 
 ifeq ($(TYPE), profile)
-  TYPE_PARAM = -pg -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
+  TYPE_PARAM := -pg -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
 endif
 
 ifeq ($(TYPE), release)
-  TYPE_PARAM += -O3 -fomit-frame-pointer -DNDEBUG -DBOOST_DISABLE_ASSERTS
+  TYPE_PARAM += -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
 
   # Link time optimization has some issues with MinGW
   ifeq ($(CXX), g++)
@@ -73,18 +75,18 @@ ifeq ($(TYPE), release)
   endif
 endif
 
-CXXFLAGS = -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
-LDFLAGS = $(CXXFLAGS)
+CXXFLAGS := -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
+LDFLAGS := $(CXXFLAGS)
 
-COMPILE = $(CXX) $(CXXFLAGS)
+COMPILE := $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC = $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
-KERNEL_OBJ = $(KERNEL_SRC:.cc=.o)
-EXAMPLES_SRC = $(wildcard examples/*.cc)
-SR_SRC = $(wildcard sr/*.cc)
-TESTS_SRC = $(wildcard test/*.cc)
+KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
+KERNEL_OBJ := $(KERNEL_SRC:.cc=.o)
+EXAMPLES_SRC := $(wildcard examples/*.cc)
+SR_SRC := $(wildcard sr/*.cc)
+TESTS_SRC := $(wildcard test/*.cc)
 
-ALL_SRC = $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
+ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
 
 .PRECIOUS: %.o
 
