@@ -94,13 +94,14 @@ double distribution<T>::entropy() const
 template<class T>
 void distribution<T>::update_variance(T val)
 {
+  const auto c1(static_cast<double>(count));
   delta_ = val - mean;
-  mean += delta_ / count;
+  mean += delta_ / c1;
 
   // This expression uses the new value of mean.
   m2_ += delta_ * (val - mean);
 
-  variance = m2_ / count;
+  variance = m2_ / c1;
 }
 
 ///

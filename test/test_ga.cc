@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(Evaluator)
   auto eva(vita::make_evaluator<vita::i_ga>(f));
 
   vita::fitness_t eva_prev;
-  double v_prev;
+  double v_prev(0.0);
 
   for (unsigned i(0); i < 1000; ++i)
   {

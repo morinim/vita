@@ -345,18 +345,19 @@ void src_search<T, ES>::dss(unsigned generation) const
     // Note that the actual size of the selected subset (count) is not fixed
     // and, in fact, it averages slightly above target_size (Gathercole and
     // Ross felt that this might improve performance).
-    const double ratio(std::min(0.6, 0.2 + 100.0 / (d.size() + 100.0)));
+    const auto s(static_cast<double>(d.size()));
+    const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
     assert(0.2 <= ratio && ratio <= 0.6);
-    const auto target_size(static_cast<std::size_t>(d.size() * ratio));
-    assert(target_size && target_size <= d.size());
+    const auto target_size(s * ratio);
+    assert(target_size && target_size <= s);
 
     data::iterator base(d.begin());
     unsigned count(0);
     for (auto i(d.begin()); i != d.end(); ++i)
     {
-      const auto prob(
-        std::min(static_cast<double>(weight(*i)) * target_size / weight_sum,
-                 1.0));
+      const auto p1(static_cast<double>(weight(*i)) * target_size /
+                    static_cast<double>(weight_sum));
+      const auto prob(std::min(p1, 1.0));
 
       if (random::boolean(prob))
       {
