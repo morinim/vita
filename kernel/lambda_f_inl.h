@@ -792,7 +792,8 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
       if (votes[i] > votes[max])
         max = i;
 
-    return {max, static_cast<double>(votes[max]) / team_.size()};
+    return {max, static_cast<double>(votes[max]) /
+            static_cast<double>(team_.size())};
   }
 }
 

@@ -54,10 +54,10 @@ GETTING THE SOURCE
 
   Vita is released in versioned source packages which can be downloaded from
   the download page [1]. Several different archive formats are provided, but
-  the only difference is the tools used to manipulate them, and the size of the
+  the only difference is the tools used to manipulate them and the size of the
   resulting file. Download whichever you are most comfortable with.
 
-  [1] https://googledrive.com/host/0B76jq5j4UQEAQWUyb3VPZ3JPOUE
+  [1] http://code.google.com/p/vita/wiki/Downloads
 
   Once the package is downloaded, expand it using whichever tools you prefer
   for that type. This will result in a new directory with the name
@@ -80,6 +80,7 @@ THE VITA DISTRIBUTION
 
   vita/
     AUTHORS
+    copyright
     LICENSE
     Makefile
     README
@@ -95,8 +96,8 @@ SETTING UP THE BUILD
 
   * BOOST (<http://www.boost.org/>)
 
-  Kernel can be built with a header-only Boost library; other programs may
-  need boost separately-compiled library binaries (e.g. SR utility needs
+  Kernel library can be built with a header-only Boost library; other programs
+  may need boost separately-compiled library binaries (e.g. SR utility needs
   Program Options Library to compile). To build Boost library under MinGW
   see below.
 
