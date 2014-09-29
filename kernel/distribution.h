@@ -57,8 +57,7 @@ namespace vita
   private:
     void update_variance(T);
 
-    T delta_;
-    T    m2_;
+    T m2_;
   };
 
 #include "kernel/distribution_inl.h"

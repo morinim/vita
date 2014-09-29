@@ -17,8 +17,8 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : count(0), mean(0.0), variance(0.0), min(0.0),
-                                  max(0.0), freq(), delta_(0.0), m2_(0.0)
+distribution<T>::distribution() : count(0), mean(), variance(), min(), max(),
+                                  freq(), m2_()
 {
 }
 
@@ -95,11 +95,22 @@ template<class T>
 void distribution<T>::update_variance(T val)
 {
   const auto c1(static_cast<double>(count));
-  delta_ = val - mean;
-  mean += delta_ / c1;
 
-  // This expression uses the new value of mean.
-  m2_ += delta_ * (val - mean);
+  T delta(val);
+
+  if (count)
+  {
+    delta -= mean;
+    mean += delta / c1;
+
+    // This expression uses the new value of mean.
+    m2_ += delta * (val - mean);
+  }
+  else
+  {
+    mean = delta / c1;
+    m2_ = delta * (val - mean);
+  }
 
   variance = m2_ / c1;
 }
@@ -136,7 +147,6 @@ bool distribution<T>::save(std::ostream &out) const
       << variance  << std::endl
       << min  << std::endl
       << max  << std::endl
-      << delta_ << std::endl
       << m2_ << std::endl;
 
   out << freq.size() << std::endl;
@@ -183,10 +193,6 @@ bool distribution<T>::load(std::istream &in)
   if (!(in >> max_))
     return false;
 
-  decltype(delta_) delta__;
-  if (!(in >> delta__))
-    return false;
-
   decltype(m2_) m2__;
   if (!(in >> m2__))
     return false;
@@ -211,7 +217,6 @@ bool distribution<T>::load(std::istream &in)
   variance = variance_;
   min = min_;
   max = max_;
-  delta_ = delta__;
   m2_ = m2__;
   freq = freq_;
 
