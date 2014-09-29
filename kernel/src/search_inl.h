@@ -349,7 +349,7 @@ void src_search<T, ES>::dss(unsigned generation) const
     const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
     assert(0.2 <= ratio && ratio <= 0.6);
     const auto target_size(s * ratio);
-    assert(target_size && target_size <= s);
+    assert(0.0 <= target_size && target_size <= s);
 
     data::iterator base(d.begin());
     unsigned count(0);

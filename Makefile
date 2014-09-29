@@ -6,11 +6,9 @@
 
 # Build type: debug, profile, release.
 TYPE := release
-$(info Building: $(TYPE))
 
 # Compiler (clang++, g++)
 CXX := g++
-$(info Using: $(CXX))
 
 # -DCLONE_SCALING
 # -DMUTUAL_IMPROVEMENT
@@ -23,18 +21,21 @@ DEFS :=
 
 # NO USER SERVICEABLE PARTS BELOW THIS LINE
 # -------------------------------------------------------------------------
+$(info Building: $(TYPE))
+$(info Using: $(CXX))
 
 # Boost library
+LIB := -static -lboost_program_options
+DEBUG_LIB := -static -lboost_unit_test_framework
+
 ifneq ($(wildcard ./boost/.),)
   $(info Boost directory: custom)
   BOOST_INCLUDE := ./boost
   BOOST_LIB_PATH := $(BOOST_INCLUDE)/stage/lib
-  LIB := -L$(BOOST_LIB_PATH) -lboost_program_options
-  DEBUG_LIB := -L$(BOOST_LIB_PATH) -lboost_unit_test_framework
-else
-  $(info Boost directory: system)
-  LIB := -lboost_program_options
-  DEBUG_LIB := -lboost_unit_test_framework
+  LIB := -L$(BOOST_LIB_PATH) $(LIB)
+  DEBUG_LIB := -L$(BOOST_LIB_PATH) $(DEBUG_LIB)
+  #LIB := -l:$(BOOST_LIB_PATH)/libboost_program_options.a
+  #DEBUG_LIB := -l:$(BOOST_LIB_PATH)/libboost_unit_test_framework.a
 endif
 
 # Add directories to the include path.
