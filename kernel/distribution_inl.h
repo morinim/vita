@@ -52,13 +52,12 @@ void distribution<T>::add(T val)
   if (!isnan(val))
   {
     if (!count())
-      min = max = val;
+      min = max = mean = val;
     else if (val < min)
       min = val;
     else if (val > max)
       max = val;
 
-    mean = val;
     ++count_;
 
     ++freq[round_to(val)];
