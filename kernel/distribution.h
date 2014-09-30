@@ -40,13 +40,13 @@ namespace vita
 
     bool debug(bool) const;
 
+    std::uintmax_t count() const;
+
   public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
   public:  // Public data members
-    std::uintmax_t count;
-
     T     mean;
     T variance;
     T      min;
@@ -57,6 +57,7 @@ namespace vita
   private:
     void update_variance(T);
 
+    std::uintmax_t count_;
     T m2_;
   };
 

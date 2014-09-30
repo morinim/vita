@@ -17,8 +17,8 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : count(0), mean(), variance(), min(), max(),
-                                  freq(), m2_()
+distribution<T>::distribution() : mean(), variance(), min(), max(), freq(),
+                                  count_(0), m2_()
 {
 }
 
@@ -32,6 +32,15 @@ void distribution<T>::clear()
 }
 
 ///
+/// \return Number of elements of the distribution.
+///
+template<class T>
+std::uintmax_t distribution<T>::count() const
+{
+  return count_;
+}
+
+///
 /// \brief Add a new value to the distribution
 /// \param[in] val new value upon which statistics are recalculated.
 ///
@@ -42,14 +51,16 @@ void distribution<T>::add(T val)
 
   if (!isnan(val))
   {
-    if (!count)
+    if (!count())
       min = max = val;
     else if (val < min)
       min = val;
     else if (val > max)
       max = val;
 
-    ++count;
+    mean = val;
+    ++count_;
+
     ++freq[round_to(val)];
 
     update_variance(val);
@@ -71,7 +82,7 @@ double distribution<T>::entropy() const
   double h(0.0);
   for (const auto &f : freq)  // f.first: fitness, f.second: frequency
   {
-    const double p(static_cast<double>(f.second) / static_cast<double>(count));
+    const auto p(static_cast<double>(f.second) / static_cast<double>(count()));
 
     h -= p * std::log(p) * c;
   }
@@ -94,23 +105,18 @@ double distribution<T>::entropy() const
 template<class T>
 void distribution<T>::update_variance(T val)
 {
-  const auto c1(static_cast<double>(count));
+  assert(count());
 
-  T delta(val);
+  const auto c1(static_cast<double>(count()));
 
-  if (count)
-  {
-    delta -= mean;
-    mean += delta / c1;
+  const T delta(val - mean);
+  mean += delta / c1;
 
-    // This expression uses the new value of mean.
+  // This expression uses the new value of mean.
+  if (count() > 1)
     m2_ += delta * (val - mean);
-  }
   else
-  {
-    mean = delta / c1;
-    m2_ = delta * (val - mean);
-  }
+    m2_ =  delta * (val - mean);
 
   variance = m2_ / c1;
 }
@@ -140,7 +146,7 @@ bool distribution<T>::save(std::ostream &out) const
 {
   SAVE_FLAGS(out);
 
-  out << count << std::endl
+  out << count() << std::endl
       << std::fixed << std::scientific
       << std::setprecision(std::numeric_limits<T>::digits10 + 1)
       << mean << std::endl
@@ -170,8 +176,8 @@ bool distribution<T>::load(std::istream &in)
 {
   SAVE_FLAGS(in);
 
-  decltype(count) count_;
-  if (!(in >> count_))
+  decltype(count_) c;
+  if (!(in >> c))
     return false;
 
   in >> std::fixed >> std::scientific
@@ -212,7 +218,7 @@ bool distribution<T>::load(std::istream &in)
     freq_[key] = val;
   }
 
-  count = count_;
+  count_ = c;
   mean = mean_;
   variance = variance_;
   min = min_;
@@ -236,7 +242,7 @@ bool distribution<T>::debug(bool verbose) const
   using std::isfinite;
   using std::isnan;
 
-  if (isfinite(min) && isfinite(mean) && min > mean)
+  if (count() && isfinite(min) && isfinite(mean) && min > mean)
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
@@ -244,7 +250,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (isfinite(max) && isfinite(mean) && max < mean)
+  if (count() && isfinite(max) && isfinite(mean) && max < mean)
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
@@ -252,7 +258,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (isnan(variance) || variance < T(0.0))
+  if (count() && (isnan(variance) || variance < T(0.0)))
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: negative variance."
