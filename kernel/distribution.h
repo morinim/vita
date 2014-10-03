@@ -40,6 +40,7 @@ namespace vita
     T max() const;
     T mean() const;
     T min() const;
+    const std::map<T, std::uintmax_t> &seen() const;
     T standard_deviation() const;
     T variance() const;
 
@@ -49,13 +50,12 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  public:  // Public data members
-    std::map<T, std::uintmax_t> freq;
-
   private:  // Private methods
     void update_variance(T);
 
   private:  // Private data members
+    std::map<T, std::uintmax_t> seen_;
+
     T m2_;
     T max_;
     T mean_;

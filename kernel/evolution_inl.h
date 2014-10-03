@@ -201,7 +201,7 @@ void evolution<T, ES>::log(unsigned run_count) const
       if (last_run != run_count)
         f_pop << std::endl << std::endl;
 
-      for (const auto &f : stats_.az.fit_dist().freq)
+      for (const auto &f : stats_.az.fit_dist().seen())
         // f.first: value, f.second: frequency
         f_pop << run_count << ' ' << stats_.gen << ' '
               << std::fixed << std::scientific

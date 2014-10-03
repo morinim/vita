@@ -17,7 +17,7 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : freq(), m2_(), max_(), mean_(), min_(),
+distribution<T>::distribution() : seen_(), m2_(), max_(), mean_(), min_(),
                                   count_(0)
 {
 }
@@ -100,10 +100,16 @@ void distribution<T>::add(T val)
 
     ++count_;
 
-    ++freq[round_to(val)];
+    ++seen_[round_to(val)];
 
     update_variance(val);
   }
+}
+
+template<class T>
+const std::map<T, std::uintmax_t> &distribution<T>::seen() const
+{
+  return seen_;
 }
 
 ///
@@ -119,7 +125,7 @@ double distribution<T>::entropy() const
   const double c(1.0 / std::log(2.0));
 
   double h(0.0);
-  for (const auto &f : freq)  // f.first: fitness, f.second: frequency
+  for (const auto &f : seen())  // f.first: fitness, f.second: sightings
   {
     const auto p(static_cast<double>(f.second) / static_cast<double>(count()));
 
@@ -191,8 +197,8 @@ bool distribution<T>::save(std::ostream &out) const
       << max()  << std::endl
       << m2_ << std::endl;
 
-  out << freq.size() << std::endl;
-  for (const auto &elem : freq)
+  out << seen().size() << std::endl;
+  for (const auto &elem : seen())
     out << elem.first << ' ' << elem.second << std::endl;
 
   return out.good();
@@ -235,19 +241,19 @@ bool distribution<T>::load(std::istream &in)
   if (!(in >> m2__))
     return false;
 
-  typename decltype(freq)::size_type n;
+  typename decltype(seen_)::size_type n;
   if (!(in >> n))
     return false;
 
-  decltype(freq) freq_;
+  decltype(seen_) s;
   for (decltype(n) i(0); i < n; ++i)
   {
-    typename decltype(freq)::key_type key;
-    typename decltype(freq)::mapped_type val;
+    typename decltype(seen_)::key_type key;
+    typename decltype(seen_)::mapped_type val;
     if (!(in >> key >> val))
       return false;
 
-    freq_[key] = val;
+    s[key] = val;
   }
 
   count_ = c;
@@ -255,7 +261,7 @@ bool distribution<T>::load(std::istream &in)
   min_ = mn;
   max_ = mx;
   m2_ = m2__;
-  freq = freq_;
+  seen_ = s;
 
   return true;
 }
