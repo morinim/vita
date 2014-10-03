@@ -17,7 +17,7 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : min(), max(), freq(), m2_(), mean_(),
+distribution<T>::distribution() : freq(), m2_(), max_(), mean_(), min_(),
                                   count_(0)
 {
 }
@@ -38,6 +38,26 @@ template<class T>
 std::uintmax_t distribution<T>::count() const
 {
   return count_;
+}
+
+///
+/// \return The maximum value of the distribution
+///
+template<class T>
+T distribution<T>::max() const
+{
+  assert(count());
+  return max_;
+}
+
+///
+/// \return The minimum value of the distribution
+///
+template<class T>
+T distribution<T>::min() const
+{
+  assert(count());
+  return min_;
 }
 
 ///
@@ -72,11 +92,11 @@ void distribution<T>::add(T val)
   if (!isnan(val))
   {
     if (!count())
-      min = max = mean_ = val;
-    else if (val < min)
-      min = val;
-    else if (val > max)
-      max = val;
+      min_ = max_ = mean_ = val;
+    else if (val < min())
+      min_ = val;
+    else if (val > max())
+      max_ = val;
 
     ++count_;
 
@@ -167,8 +187,8 @@ bool distribution<T>::save(std::ostream &out) const
       << std::fixed << std::scientific
       << std::setprecision(std::numeric_limits<T>::digits10 + 1)
       << mean() << std::endl
-      << min  << std::endl
-      << max  << std::endl
+      << min()  << std::endl
+      << max()  << std::endl
       << m2_ << std::endl;
 
   out << freq.size() << std::endl;
@@ -203,12 +223,12 @@ bool distribution<T>::load(std::istream &in)
   if (!(in >> m))
     return false;
 
-  decltype(min) min_;
-  if (!(in >> min_))
+  decltype(min_) mn;
+  if (!(in >> mn))
     return false;
 
-  decltype(max) max_;
-  if (!(in >> max_))
+  decltype(max_) mx;
+  if (!(in >> mx))
     return false;
 
   decltype(m2_) m2__;
@@ -232,8 +252,8 @@ bool distribution<T>::load(std::istream &in)
 
   count_ = c;
   mean_ = m;
-  min = min_;
-  max = max_;
+  min_ = mn;
+  max_ = mx;
   m2_ = m2__;
   freq = freq_;
 
@@ -253,18 +273,18 @@ bool distribution<T>::debug(bool verbose) const
   using std::isfinite;
   using std::isnan;
 
-  if (count() && isfinite(min) && isfinite(mean()) && min > mean())
+  if (count() && isfinite(min()) && isfinite(mean()) && min() > mean())
   {
     if (verbose)
-      std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
+      std::cerr << k_s_debug << " Distribution: min=" << min() << " > mean="
                 << mean() << "." << std::endl;
     return false;
   }
 
-  if (count() && isfinite(max) && isfinite(mean()) && max < mean())
+  if (count() && isfinite(max()) && isfinite(mean()) && max() < mean())
   {
     if (verbose)
-      std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
+      std::cerr << k_s_debug << " Distribution: max=" << max() << " < mean="
                 << mean() << "." << std::endl;
     return false;
   }

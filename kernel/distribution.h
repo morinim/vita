@@ -37,7 +37,9 @@ namespace vita
 
     std::uintmax_t count() const;
     double entropy() const;
+    T max() const;
     T mean() const;
+    T min() const;
     T standard_deviation() const;
     T variance() const;
 
@@ -48,18 +50,16 @@ namespace vita
     bool save(std::ostream &) const;
 
   public:  // Public data members
-    T      min;
-    T      max;
-
     std::map<T, std::uintmax_t> freq;
 
   private:  // Private methods
     void update_variance(T);
 
-
   private:  // Private data members
     T m2_;
+    T max_;
     T mean_;
+    T min_;
 
     std::uintmax_t count_;
   };
