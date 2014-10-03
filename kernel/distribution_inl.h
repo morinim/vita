@@ -295,7 +295,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (count() && (isnan(variance()) || variance() < T(0.0)))
+  if (count() && (isnan(variance()) || !isnonnegative(variance())))
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: negative variance."

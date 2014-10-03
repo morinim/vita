@@ -70,6 +70,8 @@ namespace vita
 
   template<class T, unsigned N> bool isfinite(const basic_fitness_t<T, N> &);
   template<class T, unsigned N> bool isnan(const basic_fitness_t<T, N> &);
+  template<class T, unsigned N> bool isnonnegative(
+    const basic_fitness_t<T, N> &);
   template<class T, unsigned N> bool issmall(const basic_fitness_t<T, N> &);
 
   template<class T, unsigned N>

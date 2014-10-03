@@ -418,6 +418,19 @@ bool issmall(const basic_fitness_t<T, N> &f)
 }
 
 ///
+/// \param[in] f a fitness to check.
+/// \return true if every element of \a f is nonnegative.
+///
+template<class T, unsigned N> bool isnonnegative(
+  const basic_fitness_t<T, N> &f)
+{
+  for (decltype(N) i(0); i < N; ++i)
+    if (!isnonnegative(f[i]))
+      return false;
+  return true;
+}
+
+///
 /// See vita::almost_equal function for scalar types.
 ///
 template<class T, unsigned N>

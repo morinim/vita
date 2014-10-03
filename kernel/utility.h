@@ -49,6 +49,7 @@ namespace vita
   }
 
   ///
+  /// \param[in] v value to check.
   /// \return \c true if v is less than epsilon-tolerance.
   ///
   /// \note
@@ -56,11 +57,20 @@ namespace vita
   /// getting \c 1.0 back. Note that this is a much larger value than
   /// \c DBL_MIN.
   ///
-  template<class T> inline bool issmall(T v)
+  template<class T> bool issmall(T v)
   {
     static constexpr auto e(std::numeric_limits<T>::epsilon());
 
     return std::abs(v) < 2.0 * e;
+  }
+
+  ///
+  /// \param[in] v value to check.
+  /// \return \c true if v is nonnegative.
+  ///
+  template<class T> bool isnonnegative(T v)
+  {
+    return v >= static_cast<T>(0.0);
   }
 
   ///
