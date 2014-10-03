@@ -81,11 +81,11 @@ void alps_es<T>::log(unsigned last_run, unsigned current_run) const
         else
           f_lys << ma + 1;
 
-        f_lys << ' ' << this->sum_->az.age_dist(l).mean
+        f_lys << ' ' << this->sum_->az.age_dist(l).mean()
               << ' ' << this->sum_->az.age_dist(l).standard_deviation()
               << ' ' << static_cast<unsigned>(this->sum_->az.age_dist(l).min)
               << '-' << static_cast<unsigned>(this->sum_->az.age_dist(l).max)
-              << ' ' << this->sum_->az.fit_dist(l).mean
+              << ' ' << this->sum_->az.fit_dist(l).mean()
               << ' ' << this->sum_->az.fit_dist(l).standard_deviation()
               << ' ' << this->sum_->az.fit_dist(l).min
               << '-' << this->sum_->az.fit_dist(l).max

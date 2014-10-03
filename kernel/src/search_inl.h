@@ -558,7 +558,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "success_rate", runs ?
            static_cast<double>(solutions) / static_cast<double>(runs) : 0);
     pt.put(summary + "elapsed_time", run_sum.elapsed);
-    pt.put(summary + "mean_fitness", fd.mean);
+    pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
     pt.put(summary + "best.fitness", run_sum.best->fitness);

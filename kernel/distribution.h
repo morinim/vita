@@ -35,30 +35,33 @@ namespace vita
 
     void add(T);
 
-    T standard_deviation() const;
+    std::uintmax_t count() const;
     double entropy() const;
+    T mean() const;
+    T standard_deviation() const;
 
     bool debug(bool) const;
-
-    std::uintmax_t count() const;
 
   public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
   public:  // Public data members
-    T     mean;
     T variance;
     T      min;
     T      max;
 
     std::map<T, std::uintmax_t> freq;
 
-  private:
+  private:  // Private methods
     void update_variance(T);
 
-    std::uintmax_t count_;
+
+  private:  // Private data members
     T m2_;
+    T mean_;
+
+    std::uintmax_t count_;
   };
 
 #include "kernel/distribution_inl.h"

@@ -17,8 +17,8 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : mean(), variance(), min(), max(), freq(),
-                                  count_(0), m2_()
+distribution<T>::distribution() : variance(), min(), max(), freq(),
+                                  m2_(), mean_(), count_(0)
 {
 }
 
@@ -41,6 +41,15 @@ std::uintmax_t distribution<T>::count() const
 }
 
 ///
+/// \return The mean value of the distribution
+///
+template<class T>
+T distribution<T>::mean() const
+{
+  return mean_;
+}
+
+///
 /// \brief Add a new value to the distribution
 /// \param[in] val new value upon which statistics are recalculated.
 ///
@@ -52,7 +61,7 @@ void distribution<T>::add(T val)
   if (!isnan(val))
   {
     if (!count())
-      min = max = mean = val;
+      min = max = mean_ = val;
     else if (val < min)
       min = val;
     else if (val > max)
@@ -108,14 +117,14 @@ void distribution<T>::update_variance(T val)
 
   const auto c1(static_cast<double>(count()));
 
-  const T delta(val - mean);
-  mean += delta / c1;
+  const T delta(val - mean());
+  mean_ += delta / c1;
 
   // This expression uses the new value of mean.
   if (count() > 1)
-    m2_ += delta * (val - mean);
+    m2_ += delta * (val - mean());
   else
-    m2_ =  delta * (val - mean);
+    m2_ =  delta * (val - mean());
 
   variance = m2_ / c1;
 }
@@ -148,7 +157,7 @@ bool distribution<T>::save(std::ostream &out) const
   out << count() << std::endl
       << std::fixed << std::scientific
       << std::setprecision(std::numeric_limits<T>::digits10 + 1)
-      << mean << std::endl
+      << mean() << std::endl
       << variance  << std::endl
       << min  << std::endl
       << max  << std::endl
@@ -182,8 +191,8 @@ bool distribution<T>::load(std::istream &in)
   in >> std::fixed >> std::scientific
      >> std::setprecision(std::numeric_limits<T>::digits10 + 1);
 
-  decltype(mean) mean_;
-  if (!(in >> mean_))
+  decltype(mean_) m;
+  if (!(in >> m))
     return false;
 
   decltype(variance) variance_;
@@ -218,7 +227,7 @@ bool distribution<T>::load(std::istream &in)
   }
 
   count_ = c;
-  mean = mean_;
+  mean_ = m;
   variance = variance_;
   min = min_;
   max = max_;
@@ -241,19 +250,19 @@ bool distribution<T>::debug(bool verbose) const
   using std::isfinite;
   using std::isnan;
 
-  if (count() && isfinite(min) && isfinite(mean) && min > mean)
+  if (count() && isfinite(min) && isfinite(mean()) && min > mean())
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: min=" << min << " > mean="
-                << mean << "." << std::endl;
+                << mean() << "." << std::endl;
     return false;
   }
 
-  if (count() && isfinite(max) && isfinite(mean) && max < mean)
+  if (count() && isfinite(max) && isfinite(mean()) && max < mean())
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: max=" << max << " < mean="
-                << mean << "." << std::endl;
+                << mean() << "." << std::endl;
     return false;
   }
 

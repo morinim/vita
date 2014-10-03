@@ -166,11 +166,11 @@ void evolution<T, ES>::log(unsigned run_count) const
       else
         f_dyn << " ?";
 
-      f_dyn << ' ' << stats_.az.fit_dist().mean[0]
+      f_dyn << ' ' << stats_.az.fit_dist().mean()[0]
             << ' ' << stats_.az.fit_dist().standard_deviation()[0]
             << ' ' << stats_.az.fit_dist().entropy()
             << ' ' << stats_.az.fit_dist().min[0]
-            << ' ' << static_cast<unsigned>(stats_.az.length_dist().mean)
+            << ' ' << static_cast<unsigned>(stats_.az.length_dist().mean())
             << ' ' << stats_.az.length_dist().standard_deviation()
             << ' ' << static_cast<unsigned>(stats_.az.length_dist().max)
             << ' ' << stats_.mutations

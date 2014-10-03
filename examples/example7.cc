@@ -83,15 +83,15 @@ int main(int argc, char *argv[])
 
   std::cout << std::string(40, '-') << std::endl
             << "Individuals effective lengths." << std::endl
-            << "Min: " << individuals.min << "  Mean: " << individuals.mean
+            << "Min: " << individuals.min << "  Mean: " << individuals.mean()
             << "  StdDev: " << std::sqrt(individuals.variance)
             << "  Max: " << individuals.max << std::endl
             << "Blocks effective lengths." << std::endl
-            << "Min: " << blocks_len.min << "  Mean: " << blocks_len.mean
+            << "Min: " << blocks_len.min << "  Mean: " << blocks_len.mean()
             << "  StdDev: " << std::sqrt(blocks_len.variance)
             << "  Max: " << blocks_len.max << std::endl
             << "Number of arguments." << std::endl
-            << "Min: " << arguments.min << "  Mean: " << arguments.mean
+            << "Min: " << arguments.min << "  Mean: " << arguments.mean()
             << "  StdDev: " << std::sqrt(arguments.variance)
             << "  Max: " << arguments.max << std::endl;
 

@@ -9,6 +9,12 @@ TYPE := release
 
 # Compiler (clang++, g++)
 CXX := g++
+#CLANG = $(shell which clang++ >/dev/null; echo $$?)
+#ifeq ($(CLANG), 0)
+#  CXX := clang++
+#else
+#  CXX := g++
+#endif
 
 # -DCLONE_SCALING
 # -DMUTUAL_IMPROVEMENT
