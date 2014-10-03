@@ -518,7 +518,7 @@ std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   for (auto i(decltype(classes){0}); i < classes; ++i)
   {
     const number distance(std::fabs(x - gauss_dist_[i].mean()));
-    const number variance(gauss_dist_[i].variance);
+    const number variance(gauss_dist_[i].variance());
 
     number p(0.0);
     if (issmall(variance))     // These are borderline cases

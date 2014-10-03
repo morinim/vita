@@ -17,8 +17,8 @@
 /// Just the initial setup.
 ///
 template<class T>
-distribution<T>::distribution() : variance(), min(), max(), freq(),
-                                  m2_(), mean_(), count_(0)
+distribution<T>::distribution() : min(), max(), freq(), m2_(), mean_(),
+                                  count_(0)
 {
 }
 
@@ -46,7 +46,18 @@ std::uintmax_t distribution<T>::count() const
 template<class T>
 T distribution<T>::mean() const
 {
+  assert(count());
   return mean_;
+}
+
+///
+/// \return The variance of the distribution
+///
+template<class T>
+T distribution<T>::variance() const
+{
+  assert(count());
+  return m2_ / static_cast<double>(count());
 }
 
 ///
@@ -125,8 +136,6 @@ void distribution<T>::update_variance(T val)
     m2_ += delta * (val - mean());
   else
     m2_ =  delta * (val - mean());
-
-  variance = m2_ / c1;
 }
 
 ///
@@ -140,7 +149,7 @@ T distribution<T>::standard_deviation() const
   // Koenig lookup (<http://www.gotw.ca/gotw/030.htm>).
   using std::sqrt;
 
-  return sqrt(variance);
+  return sqrt(variance());
 }
 
 ///
@@ -158,7 +167,6 @@ bool distribution<T>::save(std::ostream &out) const
       << std::fixed << std::scientific
       << std::setprecision(std::numeric_limits<T>::digits10 + 1)
       << mean() << std::endl
-      << variance  << std::endl
       << min  << std::endl
       << max  << std::endl
       << m2_ << std::endl;
@@ -195,10 +203,6 @@ bool distribution<T>::load(std::istream &in)
   if (!(in >> m))
     return false;
 
-  decltype(variance) variance_;
-  if (!(in >> variance_))
-    return false;
-
   decltype(min) min_;
   if (!(in >> min_))
     return false;
@@ -228,7 +232,6 @@ bool distribution<T>::load(std::istream &in)
 
   count_ = c;
   mean_ = m;
-  variance = variance_;
   min = min_;
   max = max_;
   m2_ = m2__;
@@ -266,7 +269,7 @@ bool distribution<T>::debug(bool verbose) const
     return false;
   }
 
-  if (count() && (isnan(variance) || variance < T(0.0)))
+  if (count() && (isnan(variance()) || variance() < T(0.0)))
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: negative variance."

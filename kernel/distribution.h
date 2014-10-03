@@ -39,6 +39,7 @@ namespace vita
     double entropy() const;
     T mean() const;
     T standard_deviation() const;
+    T variance() const;
 
     bool debug(bool) const;
 
@@ -47,7 +48,6 @@ namespace vita
     bool save(std::ostream &) const;
 
   public:  // Public data members
-    T variance;
     T      min;
     T      max;
 
