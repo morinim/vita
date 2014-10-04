@@ -13,31 +13,28 @@
 #if !defined(VITA_FITNESS_H)
 #define      VITA_FITNESS_H
 
-#include <array>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <vector>
 
 #include "kernel/utility.h"
 
 namespace vita
 {
   ///
-  /// \brief
-  /// A value assigned to an individual which reflects how well the individual
-  /// solves the task.
+  /// \brief A value assigned to an individual which reflects how well the
+  ///        individual solves the task
   ///
-  /// \tparam N dimension of the fitness vector
-  ///
-  template<class T, unsigned N>
+  template<class T>
   class basic_fitness_t
   {
   public:
     using value_type = T;
-    static constexpr decltype(N) size = N;
 
-    explicit basic_fitness_t(T = std::numeric_limits<T>::lowest());
-    template<class... Args> basic_fitness_t(Args...);
+    explicit basic_fitness_t(unsigned = 1,
+                             T = std::numeric_limits<T>::lowest());
+    template<class... Args> explicit basic_fitness_t(Args...);
 
     bool operator==(const basic_fitness_t &) const;
     bool operator!=(const basic_fitness_t &) const;
@@ -47,6 +44,7 @@ namespace vita
     bool operator<=(const basic_fitness_t &) const;
     bool dominating(const basic_fitness_t &) const;
 
+    unsigned size() const;
     T operator[](unsigned) const;
     T &operator[](unsigned);
 
@@ -60,31 +58,27 @@ namespace vita
 
     double distance(const basic_fitness_t &) const;
 
-  public:   // Serialization.
+  public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
   private:
-    std::array<T, N> vect;
+    std::vector<T> vect_;
   };
 
-  template<class T, unsigned N> bool isfinite(const basic_fitness_t<T, N> &);
-  template<class T, unsigned N> bool isnan(const basic_fitness_t<T, N> &);
-  template<class T, unsigned N> bool isnonnegative(
-    const basic_fitness_t<T, N> &);
-  template<class T, unsigned N> bool issmall(const basic_fitness_t<T, N> &);
+  template<class T> bool isfinite(const basic_fitness_t<T> &);
+  template<class T> bool isnan(const basic_fitness_t<T> &);
+  template<class T> bool isnonnegative(const basic_fitness_t<T> &);
+  template<class T> bool issmall(const basic_fitness_t<T> &);
 
-  template<class T, unsigned N>
-  basic_fitness_t<T, N> abs(basic_fitness_t<T, N>);
-  template<class T, unsigned N>
-  basic_fitness_t<T, N> round_to(basic_fitness_t<T, N>);
-  template<class T, unsigned N>
-  basic_fitness_t<T, N> sqrt(basic_fitness_t<T, N>);
+  template<class T> basic_fitness_t<T> abs(basic_fitness_t<T>);
+  template<class T> basic_fitness_t<T> round_to(basic_fitness_t<T>);
+  template<class T> basic_fitness_t<T> sqrt(basic_fitness_t<T>);
 
-  template<class T, unsigned N> bool almost_equal(
-    const basic_fitness_t<T, N> &, const basic_fitness_t<T, N> &, T = 0.00001);
+  template<class T> bool almost_equal(const basic_fitness_t<T> &,
+                                      const basic_fitness_t<T> &, T = 0.00001);
 
-  using fitness_t = basic_fitness_t<double, 1>;
+  using fitness_t = basic_fitness_t<double>;
 
 #include "kernel/fitness_inl.h"
 }  // namespace vita

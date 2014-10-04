@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(Evaluator)
     BOOST_REQUIRE(ind.debug());
 
     const auto eva_ret(eva(ind));
-    BOOST_REQUIRE_LE(eva_ret, vita::fitness_t(0.0));
+    BOOST_REQUIRE_LE(eva_ret, vita::fitness_t(1, 0.0));
 
     const auto v(f(ind));
 

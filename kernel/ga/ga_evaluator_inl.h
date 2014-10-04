@@ -65,7 +65,8 @@ fitness_t ga_evaluator<T, F>::operator()(const T &ind)
   const auto f_v(f_(ind));
 
   if (std::isfinite(f_v))
-    return fitness_t(1000.0 * (std::atan(f_v) / 3.14159265358979323846 - 0.5));
+    return fitness_t(1,
+                     1000.0 * (std::atan(f_v) / 3.14159265358979323846 - 0.5));
     //return -std::exp(-f_v / 1000.0);
 
   return fitness_t();

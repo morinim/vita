@@ -96,12 +96,12 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
   {
     const vita::i_mep i1(env, sset);
     const auto base_f(static_cast<vita::fitness_t::value_type>(i));
-    vita::fitness_t f({base_f});
+    vita::fitness_t f(1, base_f);
 
     cache.insert(i1.signature(), f);
 
     BOOST_REQUIRE(cache.find(i1.signature(), &f));
-    BOOST_REQUIRE_EQUAL(f, vita::fitness_t{base_f});
+    BOOST_REQUIRE_EQUAL(f, vita::fitness_t(1, base_f));
   }
 }
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     vita::i_mep i1(env, sset);
     const vita::any val(i_interp(&i1).run());
     vita::fitness_t f(
-      {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val)});
+      1, val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -132,8 +132,8 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     {
       const vita::any val(i_interp(&vi[i]).run());
       vita::fitness_t f1(
-        {val.empty() ? 0.0
-                     : vita::any_cast<vita::fitness_t::value_type>(val)});
+        1,
+        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
 
       BOOST_CHECK_EQUAL(f, f1);
     }
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     vita::i_mep i1(env, sset);
     const vita::any val(i_interp(&i1).run());
     vita::fitness_t f(
-      {val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val)});
+      1, val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -177,10 +177,10 @@ BOOST_AUTO_TEST_CASE(Serialization)
     {
       const vita::any val(i_interp(&vi[i]).run());
       vita::fitness_t f(
-        {val.empty() ? 0.0
-                     : vita::any_cast<vita::fitness_t::value_type>(val)});
+        1,
+        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
 
-      vita::fitness_t f1;
+      vita::fitness_t f1(f.size());
       BOOST_CHECK(cache2.find(vi[i].signature(), &f1));
 
       BOOST_CHECK_EQUAL(f, f1);

@@ -116,7 +116,7 @@ fitness_t random_evaluator<T>::operator()(const T &)
   const double sup(16000.0);
 
   fitness_t f;
-  for (unsigned i(0); i < fitness_t::size; ++i)
+  for (unsigned i(0); i < f.size(); ++i)
     f[i] = random::sup(sup);
 
   return f;

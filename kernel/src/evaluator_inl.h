@@ -52,7 +52,7 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return fitness_t(-err / total_nr);
+  return fitness_t(1, -err / total_nr);
 }
 
 ///
@@ -86,7 +86,7 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return fitness_t(-err / total_nr);
+  return fitness_t(1, -err / total_nr);
 }
 
 ///
@@ -315,7 +315,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
     }
   }
 
-  return fitness_t(-err);
+  return fitness_t(1, -err);
 
   // The following code is faster but doesn't work for teams and doesn't
   // "cooperate" with DSS.
@@ -380,7 +380,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
     }
   }
 
-  return fitness_t(d);
+  return fitness_t(1, d);
 }
 
 ///
@@ -418,7 +418,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
       // err += std::fabs(val);
     }
 
-  return fitness_t(-err);
+  return fitness_t(1, -err);
 }
 
 ///
