@@ -31,6 +31,8 @@ namespace vita
   {
   public:
     using value_type = T;
+    using iterator = typename std::vector<T>::iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
 
     explicit basic_fitness_t(unsigned = 1,
                              T = std::numeric_limits<T>::lowest());
@@ -47,6 +49,11 @@ namespace vita
     unsigned size() const;
     T operator[](unsigned) const;
     T &operator[](unsigned);
+
+    iterator begin();
+    const_iterator begin() const;
+    iterator end();
+    const_iterator end() const;
 
     basic_fitness_t &operator+=(const basic_fitness_t &);
     basic_fitness_t &operator-=(const basic_fitness_t &);

@@ -28,7 +28,6 @@ basic_fitness_t<T>::basic_fitness_t(unsigned n, T v) : vect_(n, v)
 template<class T>
 basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
 {
-  assert(l.size() > 1);
 }
 
 ///
@@ -66,6 +65,48 @@ T &basic_fitness_t<T>::operator[](unsigned i)
 {
   assert(i < size());
   return vect_[i];
+}
+
+///
+/// \return returns an iterator to the first element of the container. If the
+///         container is empty, the returned iterator will be equal to end().
+///
+template<class T>
+typename basic_fitness_t<T>::iterator basic_fitness_t<T>::begin()
+{
+  return vect_.begin();
+}
+
+///
+/// \return returns an iterator to the first element of the container. If the
+///         container is empty, the returned iterator will be equal to end().
+///
+template<class T>
+typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::begin() const
+{
+  return vect_.cbegin();
+}
+
+///
+/// \return returns an iterator to the element following the last element of
+///         the container. This element acts as a placeholder; attempting to
+//          access it results in undefined behavior.
+///
+template<class T>
+typename basic_fitness_t<T>::iterator basic_fitness_t<T>::end()
+{
+  return vect_.end();
+}
+
+///
+/// \return returns an iterator to the element following the last element of
+///         the container. This element acts as a placeholder; attempting to
+//          access it results in undefined behavior.
+///
+template<class T>
+typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::end() const
+{
+  return vect_.cend();
 }
 
 ///
@@ -107,8 +148,8 @@ bool basic_fitness_t<T>::operator>(const basic_fitness_t<T> &f) const
 
   // An alternative implementation:
   // > for (unsigned i(0); i < size(); ++i)
-  // >   if (vect_[i] != f.vect_[i])
-  // >     return vect_[i] > f.vect_[i];
+  // >   if (operator[](i) != f[i])
+  // >     return operator[](i) > f[i];
   // > return false;
 }
 
@@ -157,9 +198,9 @@ bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
 
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    if (vect_[i] > f.vect_[i])
+    if (operator[](i) > f[i])
       one_better = true;
-    else if (vect_[i] < f.vect_[i])
+    else if (operator[](i) < f[i])
       return false;
 
   return one_better;
@@ -238,7 +279,7 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    vect_[i] += f[i];
+    operator[](i) += f[i];
 
   return *this;
 }
@@ -252,7 +293,7 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    vect_[i] -= f[i];
+    operator[](i) -= f[i];
 
   return *this;
 }
@@ -266,7 +307,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator-(basic_fitness_t<T> f) const
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    f[i] = vect_[i] - f[i];
+    f[i] = operator[](i) - f[i];
 
   return f;
 }
@@ -280,7 +321,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator*(basic_fitness_t<T> f) const
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    f[i] *= vect_[i];
+    f[i] *= operator[](i);
 
   return f;
 }
@@ -297,7 +338,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
   basic_fitness_t<T> tmp(n);
 
   for (unsigned i(0); i < n; ++i)
-    tmp[i] = vect_[i] / val;
+    tmp[i] = operator[](i) / val;
 
   return tmp;
 }
@@ -313,7 +354,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
   basic_fitness_t<T> tmp(n);
 
   for (unsigned i(0); i < n; ++i)
-    tmp[i] = vect_[i] * val;
+    tmp[i] = operator[](i) * val;
 
   return tmp;
 }
@@ -325,15 +366,14 @@ basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
 template<class T>
 basic_fitness_t<T> abs(basic_fitness_t<T> f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    f[i] = std::abs(f[i]);
+  for (auto &v : f)
+    v = std::abs(v);
 
   return f;
 
-  // This is more "idiomatic" but the compiler won't do a good job for
-  // n == 1:
-  // std::transform(&f[0], &f[0] + n, &f[0], static_cast<T (*)(T)>(std::abs));
+  // An alternative is:
+  // > std::transform(&f[0], &f[0]+n, &f[0], static_cast<T (*)(T)>(std::abs));
+  // but the compiler won't do a good job for n == 1
 }
 
 ///
@@ -343,9 +383,8 @@ basic_fitness_t<T> abs(basic_fitness_t<T> f)
 template<class T>
 basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    f[i] = round_to(f[i]);
+  for (auto &v : f)
+    v = round_to(v);
 
   return f;
 }
@@ -358,15 +397,10 @@ basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 template<class T>
 basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    f[i] = std::sqrt(f[i]);
+  for (auto &v : f)
+    v = std::sqrt(v);
 
   return f;
-
-  // This is more "idiomatic" but the compiler won't do a good job for
-  // n == 1:
-  // std::transform(&f[0], &f[0] + n, &f[0], static_cast<T (*)(T)>(std::sqrt));
 }
 
 ///
@@ -376,16 +410,8 @@ basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
 template<class T>
 bool isfinite(const basic_fitness_t<T> &f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    if (!std::isfinite(f[i]))
-      return false;
-  return true;
-
-  // This is more "idiomatic" but the compiler won't do a good job for
-  // n == 1:
-  // return std::all_of(f.begin(), f.end(),
-  //                    static_cast<bool (*)(T)>(std::isfinite));
+  return std::all_of(f.begin(), f.end(),
+                     static_cast<bool (*)(T)>(std::isfinite));
 }
 
 ///
@@ -395,16 +421,7 @@ bool isfinite(const basic_fitness_t<T> &f)
 template<class T>
 bool isnan(const basic_fitness_t<T> &f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    if (std::isnan(f[i]))
-      return true;
-  return false;
-
-  // This is more "idiomatic" but the compiler won't do a good job for
-  //  == 1:
-  // return std::any_of(f.begin(), f.end(),
-  //                    static_cast<bool (*)(T)>(std::isnan));
+  return std::any_of(f.begin(), f.end(), static_cast<bool (*)(T)>(std::isnan));
 }
 
 ///
@@ -414,16 +431,8 @@ bool isnan(const basic_fitness_t<T> &f)
 template<class T>
 bool issmall(const basic_fitness_t<T> &f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    if (!issmall(f[i]))
-      return false;
-  return true;
-
-  // This is more "idiomatic" but the compiler won't do a good job for
-  // n == 1:
-  // return std::all_of(f.begin(), f.end(),
-  //                    static_cast<bool (*)(T)>(vita::issmall));
+  return std::all_of(f.begin(), f.end(),
+                     static_cast<bool (*)(T)>(vita::issmall));
 }
 
 ///
@@ -432,11 +441,8 @@ bool issmall(const basic_fitness_t<T> &f)
 ///
 template<class T> bool isnonnegative(const basic_fitness_t<T> &f)
 {
-  const auto n(f.size());
-  for (unsigned i(0); i < n; ++i)
-    if (!isnonnegative(f[i]))
-      return false;
-  return true;
+  return std::all_of(f.begin(), f.end(),
+                     static_cast<bool (*)(T)>(vita::isnonnegative));
 }
 
 ///
@@ -463,7 +469,7 @@ double basic_fitness_t<T>::distance(const basic_fitness_t<T> &f) const
 
   const auto n(f.size());
   for (unsigned i(0); i < n; ++i)
-    d += std::abs(vect_[i] - f[i]);
+    d += std::abs(operator[](i) - f[i]);
 
   return d;
 }
