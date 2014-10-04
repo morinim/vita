@@ -26,22 +26,9 @@ basic_fitness_t<T>::basic_fitness_t(unsigned n, T v) : vect_(n, v)
 /// Builds a fitness from a list of values.
 ///
 template<class T>
-template<class ...Args>
-basic_fitness_t<T>::basic_fitness_t(Args ...args) : vect_{T(args)...}
+basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
 {
-  static_assert(sizeof...(Args) > 1, "Wrong number of arguments");
-
-  // Do not change with something like:
-  //
-  // template<class T>
-  // basic_fitness_t(const std::initializer_list<base_t> &l)
-  // {
-  //   unsigned i(0);
-  //   for (auto p : l)
-  //     vect_[i++] = p;
-  // }
-  //
-  // This is slower because of the runtime copy.
+  assert(l.size() > 1);
 }
 
 ///

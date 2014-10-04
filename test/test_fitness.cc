@@ -25,11 +25,11 @@ BOOST_AUTO_TEST_SUITE(fitness)
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  vita::fitness_t fitness2d(2u);
-  vita::fitness_t fitness3d(3u);
-  vita::fitness_t fitness4d(4u);
+  vita::fitness_t fitness2d(2);
+  vita::fitness_t fitness3d(3);
+  vita::fitness_t fitness4d(4);
 
-  vita::fitness_t f1(3.0, 0.0, 0.0), f2(2.0, 1.0, 0.0), f3(2.0, 0.0, 0.0);
+  vita::fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0}, f3{2.0, 0.0, 0.0};
 
   BOOST_CHECK_EQUAL(fitness2d.size(), 2);
   BOOST_CHECK_EQUAL(fitness3d.size(), 3);
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(Comparison)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  vita::fitness_t f(
-    1.0, 2.0, 3.0, std::numeric_limits<vita::fitness_t::value_type>::lowest());
+  vita::fitness_t f{
+    1.0, 2.0, 3.0, std::numeric_limits<vita::fitness_t::value_type>::lowest()};
 
   std::stringstream ss;
 
@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
 BOOST_AUTO_TEST_CASE(Operators)
 {
-  vita::fitness_t x(2.0, 4.0, 8.0);
-  vita::fitness_t f1(2.0, 4.0, 8.0);
-  vita::fitness_t f2(4.0, 8.0, 16.0);
+  vita::fitness_t x{2.0, 4.0, 8.0};
+  vita::fitness_t f1{2.0, 4.0, 8.0};
+  vita::fitness_t f2{4.0, 8.0, 16.0};
   vita::fitness_t inf(
     3, std::numeric_limits<vita::fitness_t::value_type>::infinity());
 
@@ -91,10 +91,10 @@ BOOST_AUTO_TEST_CASE(Operators)
 
   BOOST_CHECK_EQUAL(f1 * 2.0, f2);
 
-  x = f1 * vita::fitness_t(2.0, 2.0, 2.0);
+  x = f1 * vita::fitness_t{2.0, 2.0, 2.0};
   BOOST_CHECK_EQUAL(x, f2);
 
-  x += vita::fitness_t(0.0, 0.0, 0.0);
+  x += vita::fitness_t{0.0, 0.0, 0.0};
   BOOST_CHECK_EQUAL(x, f2);
 
   x = x / 1.0;

@@ -34,7 +34,7 @@ namespace vita
 
     explicit basic_fitness_t(unsigned = 1,
                              T = std::numeric_limits<T>::lowest());
-    template<class... Args> explicit basic_fitness_t(Args...);
+    basic_fitness_t(std::initializer_list<T>);
 
     bool operator==(const basic_fitness_t &) const;
     bool operator!=(const basic_fitness_t &) const;
