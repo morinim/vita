@@ -83,10 +83,12 @@ void family_competition<T>::run(const std::vector<coord> &parent,
 }
 
 ///
-/// \param[in] parent coordinates of the candidate parents.
-///                   The list is sorted in descending fitness, so the
-///                   last element is the coordinates of the worst individual
-///                   of the tournament.
+/// \param[in] parent coordinates of the candidate parents. Many selection
+///                   algorithms sort the vector in descending fitness (with
+///                   some exceptions, e.g. selection::random).
+///                   Anyway here we assume that the last element contains the
+///                   coordinates of the worst individual of the selection
+///                   phase.
 /// \param[in] offspring vector of the "children".
 /// \param[in] s statistical \a summary.
 ///
@@ -104,16 +106,13 @@ void tournament<T>::run(const std::vector<coord> &parent,
   const auto fit_off(this->eva_(offspring[0]));
 
   // In old versions of Vita, the individual to be replaced was chosen with
-  // an ad-hoc kill tournament. Something like:
-  //
-  //   const coord rep_idx(kill_tournament(parent[0]));
-  //
+  // an ad-hoc kill tournament.
   // Now we perform just one tournament for choosing the parents; the
   // individual to be replaced is selected among the worst individuals of
   // this tournament.
   // The new way is simpler and more general. Note that when tournament_size
   // is greater than 2 we perform a traditional selection / replacement
-  // scheme; if it is smaller we perform a family competition replacement
+  // scheme; if it's smaller we perform a family competition replacement
   // (aka deterministic / probabilistic crowding).
   const coord rep_idx(parent.back());
   const auto f_rep_idx(this->eva_(pop[rep_idx]));

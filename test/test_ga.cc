@@ -122,6 +122,7 @@ BOOST_AUTO_TEST_CASE(Search)
   //env.verbosity = 0;
 
   vita::problem<> prob;
+  //auto prob(vita::make_problem(vita::base_penalty));
   prob.env = env;
   prob.sset = std::move(sset);
 

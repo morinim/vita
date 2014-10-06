@@ -117,7 +117,7 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
 /// \param[in] parent a vector of ordered parents.
 /// \return the offspring.
 ///
-/// This strictly is based on the DE crossover operator.
+/// This is strictly based on the DE crossover operator.
 ///
 template<class T>
 std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
@@ -128,7 +128,7 @@ std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 
   assert(pop.env().p_cross > 0.0);
 
-  return {pop[parent[0]].crossover(pop[parent[1]], pop[parent[2]],
-                                   pop[parent[3]])};
+  return {pop[parent[3]].crossover(pop[parent[0]], pop[parent[1]],
+                                   pop[parent[2]])};
 }
 #endif  // Include guard

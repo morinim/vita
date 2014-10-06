@@ -34,10 +34,35 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   for (unsigned i(0); i < 1000; ++i)
   {
     vita::i_ga ind(env, sset);
+    vita::interpreter<vita::i_ga> check(&ind);
 
     BOOST_REQUIRE(ind.debug());
     BOOST_REQUIRE_EQUAL(ind.parameters(), sset.categories());
     BOOST_REQUIRE_EQUAL(ind.age(), 0);
+    BOOST_REQUIRE_EQUAL(check.penalty(), 0);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(Penalty)
+{
+  for (unsigned i(0); i < 100; ++i)
+  {
+    vita::i_ga ind(env, sset);
+    vita::interpreter<vita::i_ga> check(&ind);
+
+    BOOST_REQUIRE_EQUAL(check.penalty(), 0);
+    ind[0] = -20.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 1);
+    ind[0] = 20.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 1);
+    ind[1] = -200.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 2);
+    ind[1] = 200.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 2);
+    ind[2] = -2000.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 3);
+    ind[2] = 2000.0;
+    BOOST_REQUIRE_EQUAL(check.penalty(), 3);
   }
 }
 

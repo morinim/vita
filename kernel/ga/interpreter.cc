@@ -23,7 +23,7 @@ namespace vita
   }
 
   ///
-  /// \return an empty any.
+  /// \return an empty \c any.
   ///
   any interpreter<i_ga>::run_nvi()
   {

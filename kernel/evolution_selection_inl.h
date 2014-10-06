@@ -158,6 +158,8 @@ std::vector<coord> alps<T>::run()
   auto c0(this->pickup(layer));
   auto c1(this->pickup(layer));
 
+  // This type is mainly used because of the lexicographic comparison
+  // capabilities of std::pair.
   using age_fit_t = std::pair<bool, fitness_t>;
   age_fit_t age_fit0{!vita::alps::aged(pop, c0), this->eva_(pop[c0])};
   age_fit_t age_fit1{!vita::alps::aged(pop, c1), this->eva_(pop[c1])};
@@ -373,8 +375,8 @@ std::vector<coord> random<T>::run()
   assert(size);
   std::vector<coord> ret(size);
 
-  for (auto i(decltype(size){0}); i < size; ++i)
-    ret[i] = this->pickup();
+  for (auto &v : ret)
+    v = this->pickup();
 
   return ret;
 }

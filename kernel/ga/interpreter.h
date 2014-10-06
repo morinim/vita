@@ -43,6 +43,14 @@ namespace vita
   private:  // Private data members
     const i_ga &p_;
   };
+
+  ///
+  /// Just a shortcut for interpreter<i_ga>::penalty()
+  ///
+  inline int base_penalty(const i_ga &ind)
+  {
+    return interpreter<i_ga>(&ind).penalty();
+  }
 }  // namespace vita
 
 #endif  // Include guard
