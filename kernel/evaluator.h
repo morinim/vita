@@ -22,7 +22,7 @@ namespace vita
   ///
   /// \brief Calculates the fitness of an individual
   ///
-  /// \tparam T the type of individual used.
+  /// \tparam T the type of individual used
   ///
   /// \a evaluator class calculates the fitness of an individual (how good
   /// he is).

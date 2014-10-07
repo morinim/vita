@@ -19,7 +19,7 @@
 namespace vita
 {
   ///
-  /// \tparam T the type of individual used.
+  /// \tparam T the type of individual used
   ///
   /// Provides a surrogate for an \a evaluator to control access to it. The
   /// reason for controlling access is to cache fitness scores of individuals.
@@ -46,10 +46,10 @@ namespace vita
     virtual unsigned seen(const T &) const override;
 
   private:
-    /// Access to the real evaluator.
+    // Access to the real evaluator.
     std::unique_ptr<evaluator<T>> eva_;
 
-    /// Transposition table (hash table cache).
+    // Transposition table (hash table cache).
     ttable cache_;
   };
 

@@ -48,6 +48,7 @@ namespace vita
     explicit search(problem<> &);
 
     void set_evaluator(std::unique_ptr<evaluator<T>>);
+
     std::unique_ptr<lambda_f<T>> lambdify(const T &);
 
     T run(unsigned = 1);
@@ -55,7 +56,7 @@ namespace vita
     bool debug(bool) const;
 
   private:  // NVI template methods
-    virtual bool debug_nvi(bool) const { return true; };
+    virtual bool debug_nvi(bool) const { return true; }
     virtual T run_nvi(unsigned) = 0;
     virtual void tune_parameters_nvi() = 0;
 
