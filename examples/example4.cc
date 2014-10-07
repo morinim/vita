@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::fitness_t f(static_cast<vita::fitness_t::value_type>(i));
+    vita::fitness_t f{static_cast<vita::fitness_t::value_type>(i)};
     const vita::i_mep &ind(vita::random::element(pool));
 
     cache.insert(ind.signature(), f);

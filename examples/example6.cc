@@ -82,7 +82,7 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
           }
         }
 
-    return vita::fitness_t(fit);
+    return {fit};
   }
 };
 
