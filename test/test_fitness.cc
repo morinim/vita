@@ -18,6 +18,8 @@
 #define BOOST_TEST_MODULE fitness
 #include "boost/test/unit_test.hpp"
 
+constexpr double epsilon(0.00001);
+
 using namespace boost;
 #endif
 
@@ -51,6 +53,10 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK_EQUAL(f1, f1);
   BOOST_CHECK_EQUAL(f2, f2);
   BOOST_CHECK_EQUAL(fitness2d, fitness2d);
+
+  BOOST_CHECK_SMALL(distance(f1, f1), epsilon);
+  BOOST_CHECK_SMALL(distance(f2, f2), epsilon);
+  BOOST_CHECK_SMALL(distance(fitness2d, fitness2d), epsilon);
 
   BOOST_CHECK(f1.dominating(fitness3d));
   BOOST_CHECK(!fitness3d.dominating(f1));
@@ -113,6 +119,15 @@ BOOST_AUTO_TEST_CASE(Operators)
 
   BOOST_CHECK(isfinite(x));
   BOOST_CHECK(!isfinite(inf));
+}
+
+BOOST_AUTO_TEST_CASE(Joining)
+{
+  const vita::fitness_t f1{1.0, 2.0, 3.0}, f2{4.0, 5.0, 6.0};
+
+  const vita::fitness_t f3(combine(f1, f2));
+  const vita::fitness_t f4{1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
+  BOOST_CHECK_EQUAL(f3, f4);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
