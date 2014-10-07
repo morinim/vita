@@ -37,6 +37,7 @@ namespace vita
     explicit basic_fitness_t(unsigned = 1,
                              T = std::numeric_limits<T>::lowest());
     basic_fitness_t(std::initializer_list<T>);
+    basic_fitness_t(std::vector<T>);
 
     bool operator==(const basic_fitness_t &) const;
     bool operator!=(const basic_fitness_t &) const;
@@ -63,8 +64,6 @@ namespace vita
     basic_fitness_t operator/(T) const;
     basic_fitness_t operator*(T) const;
 
-    double distance(const basic_fitness_t &) const;
-
   public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
@@ -84,6 +83,10 @@ namespace vita
 
   template<class T> bool almost_equal(const basic_fitness_t<T> &,
                                       const basic_fitness_t<T> &, T = 0.00001);
+  template<class T> basic_fitness_t<T> combine(const basic_fitness_t<T> &,
+                                               const basic_fitness_t<T> &);
+  template<class T> double distance(const basic_fitness_t<T> &,
+                                    const basic_fitness_t<T> &);
 
   using fitness_t = basic_fitness_t<double>;
 

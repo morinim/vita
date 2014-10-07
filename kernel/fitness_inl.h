@@ -31,6 +31,14 @@ basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
 }
 
 ///
+/// Builds a fitness from a vector of values.
+///
+template<class T>
+basic_fitness_t<T>::basic_fitness_t(std::vector<T> v) : vect_(std::move(v))
+{
+}
+
+///
 /// \return the size of the fitness vector.
 ///
 template<class T>
@@ -462,16 +470,42 @@ bool almost_equal(const basic_fitness_t<T> &f1,
   return true;
 }
 
+///
+/// \param[in] f1 first fitness value
+/// \param[in] f2 second fitness value
+/// \return the distance between \a f1 and \a f2.
+///
 template<class T>
-double basic_fitness_t<T>::distance(const basic_fitness_t<T> &f) const
+double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 {
   double d(0.0);
 
-  const auto n(f.size());
+  const auto n(f1.size());
+  assert(f2.size() == n);
+
   for (unsigned i(0); i < n; ++i)
-    d += std::abs(operator[](i) - f[i]);
+    d += std::abs(f1[i] - f2[i]);
 
   return d;
+}
+
+
+///
+/// \param[in] f1 first fitness value
+/// \param[in] f2 second fitness value
+/// \return the fitness vector obtained joining \a f1 and \a f2.
+///
+template<class T>
+basic_fitness_t<T> combine(const basic_fitness_t<T> &f1,
+                           const basic_fitness_t<T> &f2)
+{
+  std::vector<T> ret;
+  ret.reserve(f1.size() + f2.size());
+
+  ret.insert(ret.end(), f1.begin(), f1.end());
+  ret.insert(ret.end(), f2.begin(), f2.end());
+
+  return ret;
 }
 
 #endif  // Include guard
