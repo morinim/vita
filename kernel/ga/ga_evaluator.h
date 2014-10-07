@@ -13,7 +13,7 @@
 #if !defined(VITA_GA_EVALUATOR_H)
 #define      VITA_GA_EVALUATOR_H
 
-#include "kernel/evaluator.h"
+#include "kernel/constrained_evaluator.h"
 #include "kernel/vitafwd.h"
 #include "kernel/ga/primitive.h"
 
@@ -40,9 +40,11 @@ namespace vita
     F f_;
   };
 
-  template<class T, class F> ga_evaluator<T, F> make_evaluator(F);
+  template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);
   template<class T, class F>
-  std::unique_ptr<evaluator<T>> make_unique_evaluator(F);
+  std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F);
+  template<class T, class F, class P>
+  std::unique_ptr<evaluator<T>> make_unique_constrained_ga_evaluator(F, P);
 
 #include "kernel/ga/ga_evaluator_inl.h"
 }  // namespace vita

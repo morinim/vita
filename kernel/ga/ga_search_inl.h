@@ -14,7 +14,7 @@
 #define      VITA_GA_SEARCH_INL_H
 
 template<class T, template<class> class ES>
-ga_search<T, ES>::ga_search(problem<> &p) : search<T, ES>(p)
+ga_search<T, ES>::ga_search(problem &p) : search<T, ES>(p)
 {
 }
 
@@ -73,7 +73,7 @@ T ga_search<T, ES>::run_nvi(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto &eval(*this->active_eva_);
+    auto &eval(*this->active_eva_);  // just a short-cut
     evolution<T, ES> evo(this->env_, this->prob_.sset, eval, nullptr, nullptr);
     summary<T> s(evo.run(r));
 

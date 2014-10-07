@@ -21,22 +21,16 @@
 namespace vita
 {
   ///
-  /// \brief The interface of a typical genetic programming problem
-  ///
-  /// \tparam P a function object (function, lambda, functor) used as penalty
-  ///           function for constrained problems.
-  ///           For unconstrained problems \a P should be \c std::false_type.
+  /// \brief The interface of a evolutionary program's problem
   ///
   /// \note
   /// What a horror! Public data members... please read the coding style
   /// document for project Vita
   /// (<http://code.google.com/p/vita/wiki/CodingStyle>).
-  template<class P = std::false_type>
   class problem
   {
   public:
     problem();
-    explicit problem(P);
 
     virtual vita::data *data();
 
@@ -48,24 +42,7 @@ namespace vita
     environment env;
 
     symbol_set sset;
-
-    /// A parameterless penalty function as described in "An Efficient
-    /// Constraint Handling Method for Genetic Algorithms" - Kalyanmoy Deb.
-    ///
-    /// Problems without constraints don't need a penalty function, so before
-    /// calling \a penalty it's a good idea to check:
-    ///
-    ///     if (prob.penalty)
-    ///       // use penalty(...)
-    ///
-    /// This works since, for unconstrained problems, \a P is
-    /// \c std::false_type.
-    P penalty;
   };
-
-  template<class P> problem<P> make_problem(P);
-
-#include "kernel/problem_inl.h"
 }  // namespace vita
 
 #endif  // Include guard

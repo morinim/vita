@@ -18,8 +18,7 @@
 ///              the lifetime of \c this class.
 ///
 template<class T, template<class> class ES>
-search<T, ES>::search(problem<> &p) : active_eva_(nullptr), env_(p.env),
-                                      prob_(p)
+search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
 {
   assert(debug(true));
 }

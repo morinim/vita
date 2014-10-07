@@ -19,14 +19,9 @@
 
 struct F_FACTORY5
 {
-  F_FACTORY5() : env(true)
+  F_FACTORY5() : env(true), sset()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY5)");
-
-    sset.insert(vita::ga::parameter(0,    -10.0,    10.0));
-    sset.insert(vita::ga::parameter(1,   -100.0,   100.0));
-    sset.insert(vita::ga::parameter(2,  -1000.0,  1000.0));
-    sset.insert(vita::ga::parameter(3, -10000.0, 10000.0));
   }
 
   ~F_FACTORY5()

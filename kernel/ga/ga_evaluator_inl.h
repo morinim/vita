@@ -40,7 +40,7 @@ ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
 /// * <http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3602.html>
 ///
 template<class T, class F>
-ga_evaluator<T, F> make_evaluator(F f)
+ga_evaluator<T, F> make_ga_evaluator(F f)
 {
   return ga_evaluator<T, F>(f);
 }
@@ -51,9 +51,17 @@ ga_evaluator<T, F> make_evaluator(F f)
 /// \see make_evaluator for further details.
 ///
 template<class T, class F>
-std::unique_ptr<evaluator<T>> make_unique_evaluator(F f)
+std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F f)
 {
   return make_unique<ga_evaluator<T, F>>(f);
+}
+
+template<class T, class F, class P>
+std::unique_ptr<evaluator<T>> make_unique_constrained_ga_evaluator(F f, P p)
+{
+  auto eva(make_unique<ga_evaluator<T, F>>(f));
+
+  return make_unique<constrained_evaluator<T>>(std::move(eva), p);
 }
 
 ///

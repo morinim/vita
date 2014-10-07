@@ -68,7 +68,7 @@ namespace vita
   ///    src_problem p;
   ///    p.env = environment(true);
   ///
-  src_problem::src_problem() : problem<>(std::false_type{})
+  src_problem::src_problem() : problem()
   {
   }
 
@@ -82,7 +82,7 @@ namespace vita
   ///
   src_problem::src_problem(const std::string &ds, const std::string &ts,
                            const std::string &symbols)
-    : problem<>(std::false_type{})
+    : problem()
   {
     load(ds, ts, symbols);
   }

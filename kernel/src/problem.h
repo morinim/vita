@@ -21,7 +21,7 @@
 
 namespace vita
 {
-  class src_problem : public problem<>
+  class src_problem : public problem
   {
   public:
     src_problem();

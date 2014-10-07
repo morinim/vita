@@ -24,6 +24,8 @@
 #define BOOST_TEST_MODULE t_ga
 #include <boost/test/unit_test.hpp>
 
+constexpr double epsilon(0.00001);
+
 using namespace boost;
 
 #include "factory_fixture5.h"
@@ -31,8 +33,21 @@ using namespace boost;
 
 BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
 
+void setup_symbol_set(vita::symbol_set *sset, unsigned n)
+{
+  double v(10.0);
+
+  for (unsigned i(0); i < n; ++i)
+  {
+    sset->insert(vita::ga::parameter(i, -v, +v));
+    v *= 10.0;
+  }
+}
+
 BOOST_AUTO_TEST_CASE(Penalty)
 {
+  setup_symbol_set(&sset, 4);
+
   vita::i_ga ind(env, sset);
   BOOST_REQUIRE(ind.debug());
 
@@ -55,10 +70,12 @@ BOOST_AUTO_TEST_CASE(Penalty)
 
 BOOST_AUTO_TEST_CASE(Evaluator)
 {
+  setup_symbol_set(&sset, 4);
+
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
 
-  auto eva(vita::make_evaluator<vita::i_ga>(f));
+  auto eva(vita::make_ga_evaluator<vita::i_ga>(f));
 
   vita::fitness_t eva_prev;
   double v_prev(0.0);
@@ -88,10 +105,12 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 
 BOOST_AUTO_TEST_CASE(Evolution)
 {
+  setup_symbol_set(&sset, 4);
+
   env.individuals = 100;
   env.verbosity = 0;
 
-  auto eva(vita::make_evaluator<vita::i_ga>(
+  auto eva(vita::make_ga_evaluator<vita::i_ga>(
     [](const std::vector<double> &v)
     { return std::accumulate(v.begin(), v.end(), 0.0); }));
 
@@ -115,30 +134,72 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s2.best->ind[2], 980.0);
   BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
 }
-/*
-BOOST_AUTO_TEST_CASE(Search)
+
+// Test 1 Problem from "An Efficient Constraint Handling Method for Genetic
+// Algorithms"
+BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 {
   env.individuals = 100;
-  //env.verbosity = 0;
+  env.f_threashold = {0, 0};
+  env.verbosity = 0;
 
-  vita::problem<> prob;
-  //auto prob(vita::make_problem(vita::base_penalty));
+  vita::problem prob;
   prob.env = env;
-  prob.sset = std::move(sset);
+  prob.sset.insert(vita::ga::parameter(0, 0.0, 6.0));
+  prob.sset.insert(vita::ga::parameter(1, 0.0, 6.0));
 
   vita::ga_search<vita::i_ga, vita::de_es> s(prob);
   BOOST_REQUIRE(s.debug(true));
 
-  s.set_evaluator(vita::make_unique_evaluator<vita::i_ga>(
-                    [](const std::vector<double> &v)
-                    { return std::accumulate(v.begin(), v.end(), 0.0); }));
+  // The unconstrained objective function f(x1, x2) has a maximum solution at
+  // (3, 2) with a function value equal to zero.
+  auto f = [](const std::vector<double> &x)
+           {
+             return
+             -std::pow(x[0]*x[0] + x[1] - 11, 2.0) -
+             std::pow(x[0] + x[1] * x[1] - 7, 2.0);
+           };
 
+  auto eva(vita::make_unique_ga_evaluator<vita::i_ga>(f));
+
+  s.set_evaluator(std::move(eva));
   const auto res(s.run());
 
-  BOOST_CHECK_GT(res[0], 8.0);
-  BOOST_CHECK_GT(res[1], 95.0);
-  BOOST_CHECK_GT(res[2], 990.0);
-  BOOST_CHECK_GT(res[3], 9980.0);
+  BOOST_CHECK_SMALL(f(res), epsilon);
+  BOOST_CHECK_CLOSE(res[0], 3.0, epsilon);
+  BOOST_CHECK_CLOSE(res[1], 2.0, epsilon);
+
+  // Due to the presence of constraints, the previous solution is no more
+  // feasible and the constrained optimum solution is (2.246826, 2.381865) with
+  // a function value equal to 13.59085. The feasible region is a narrow
+  // crescent-shaped region, with the optimum solution lying on the first
+  // constraint.
+  auto p = [](const vita::i_ga &prg)
+    {
+      auto g1 = [](const std::vector<double> &x)
+      {
+        return 4.84 - std::pow(x[0] - 0.05, 2.0) - std::pow(x[1] - 2.5, 2.0);
+      };
+      auto g2 = [](const std::vector<double> &x)
+      {
+        return x[0] * x[0] + std::pow(x[1] - 2.5, 2.0) - 4.84;
+      };
+
+      int p1(g1(prg) >= 0.0 ? 0 : 1);
+      int p2(g2(prg) >= 0.0 ? 0 : 1);
+      int p3(0.0 <= prg[0] && prg[0] <= 6.0 ? 0 : 1);
+      int p4(0.0 <= prg[1] && prg[1] <= 6.0 ? 0 : 1);
+
+      return p1 + p2 + p3 + p4;
+    };
+  auto c_eva(vita::make_unique_constrained_ga_evaluator<vita::i_ga>(f, p));
+
+  s.set_evaluator(std::move(c_eva));
+  const auto res2(s.run());
+
+  BOOST_CHECK_CLOSE(-f(res2), 13.59086, 0.001);
+  BOOST_CHECK_CLOSE(res2[0], 2.246826, 0.01);
+  BOOST_CHECK_CLOSE(res2[1], 2.381865, 0.01);
 }
-*/
+
 BOOST_AUTO_TEST_SUITE_END()

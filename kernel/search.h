@@ -45,7 +45,7 @@ namespace vita
   class search
   {
   public:
-    explicit search(problem<> &);
+    explicit search(problem &);
 
     void set_evaluator(std::unique_ptr<evaluator<T>>);
 
@@ -55,11 +55,6 @@ namespace vita
 
     bool debug(bool) const;
 
-  private:  // NVI template methods
-    virtual bool debug_nvi(bool) const { return true; }
-    virtual T run_nvi(unsigned) = 0;
-    virtual void tune_parameters_nvi() = 0;
-
   protected: // Protected support methods
     fitness_t fitness(const T &);
     virtual bool stop_condition(const summary<T> &) const;
@@ -67,12 +62,17 @@ namespace vita
   protected:  // Protected data members
     std::unique_ptr<evaluator<T>> active_eva_;
 
-    /// This is the environment actually used during the search (\a prob_->env
-    /// is used for compiling \a env_ via the tune_parameters method).
+    // This is the environment actually used during the search (\a prob_->env
+    // is used for compiling \a env_ via the tune_parameters method).
     environment env_;
 
     // Problem we're working on.
-    problem<> &prob_;
+    problem &prob_;
+
+  private:  // NVI template methods
+    virtual bool debug_nvi(bool) const { return true; }
+    virtual T run_nvi(unsigned) = 0;
+    virtual void tune_parameters_nvi() = 0;
   };
 
 #include "kernel/search_inl.h"
