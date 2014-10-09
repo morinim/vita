@@ -18,6 +18,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
+#include "kernel/ga/ga_evaluator.h"
 #include "kernel/search.h"
 
 namespace vita
@@ -30,11 +31,11 @@ namespace vita
   ///
   /// This class implements vita::search for GA optimization tasks.
   ///
-  template<class T, template<class> class ES>
+  template<class T, template<class> class ES, class F>
   class ga_search : public search<T, ES>
   {
   public:
-    explicit ga_search(problem &);
+    ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
   private:  // NVI template methods
     virtual bool debug_nvi(bool) const override;

@@ -13,9 +13,19 @@
 #if !defined(VITA_GA_SEARCH_INL_H)
 #define      VITA_GA_SEARCH_INL_H
 
-template<class T, template<class> class ES>
-ga_search<T, ES>::ga_search(problem &p) : search<T, ES>(p)
+template<class T, template<class> class ES, class F>
+ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
+  : search<T, ES>(pr)
 {
+  auto base_eva(make_unique<ga_evaluator<T, F>>(f));
+
+  if (pf)
+  {
+    auto eva(make_unique<constrained_evaluator<T>>(std::move(base_eva), pf));
+    search<T, ES>::set_evaluator(std::move(eva));
+  }
+  else
+    search<T, ES>::set_evaluator(std::move(base_eva));
 }
 
 ///
@@ -23,8 +33,8 @@ ga_search<T, ES>::ga_search(problem &p) : search<T, ES>(p)
 ///
 /// \see src_search::tune_parameters_nvi comments for further details
 ///
-template<class T, template<class> class ES>
-void ga_search<T, ES>::tune_parameters_nvi()
+template<class T, template<class> class ES, class F>
+void ga_search<T, ES, F>::tune_parameters_nvi()
 {
   const environment dflt(true);
   const environment &constrained(this->prob_.env);
@@ -59,8 +69,8 @@ void ga_search<T, ES>::tune_parameters_nvi()
 /// \param[in] n number of runs.
 /// \return best individual found.
 ///
-template<class T, template<class> class ES>
-T ga_search<T, ES>::run_nvi(unsigned n)
+template<class T, template<class> class ES, class F>
+T ga_search<T, ES, F>::run_nvi(unsigned n)
 {
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -117,8 +127,8 @@ T ga_search<T, ES>::run_nvi(unsigned n)
 ///
 /// \param[in] fit fitness reached in the current run.
 ///
-template<class T, template<class> class ES>
-void ga_search<T, ES>::print_resume(const fitness_t &fit) const
+template<class T, template<class> class ES, class F>
+void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 {
   if (this->env_.verbosity >= 2)
   {
@@ -137,11 +147,11 @@ void ga_search<T, ES>::print_resume(const fitness_t &fit) const
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-template<class T, template<class> class ES>
-void ga_search<T, ES>::log(const summary<T> &run_sum,
-                           const distribution<fitness_t> &fd,
-                           const std::list<unsigned> &good_runs,
-                           unsigned best_run, unsigned runs)
+template<class T, template<class> class ES, class F>
+void ga_search<T, ES, F>::log(const summary<T> &run_sum,
+                              const distribution<fitness_t> &fd,
+                              const std::list<unsigned> &good_runs,
+                              unsigned best_run, unsigned runs)
 {
   // Summary logging.
   if (this->env_.stat_summary)
@@ -193,8 +203,8 @@ void ga_search<T, ES>::log(const summary<T> &run_sum,
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the object passes the internal consistency check.
 ///
-template<class T, template<class> class ES>
-bool ga_search<T, ES>::debug_nvi(bool) const
+template<class T, template<class> class ES, class F>
+bool ga_search<T, ES, F>::debug_nvi(bool) const
 {
   return true;
 }

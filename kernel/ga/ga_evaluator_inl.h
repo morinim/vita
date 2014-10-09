@@ -46,30 +46,6 @@ ga_evaluator<T, F> make_ga_evaluator(F f)
 }
 
 ///
-/// \param[in] f objective function.
-/// \return a unique_ptr referencing an evaluator based on \a f.
-/// \see make_evaluator for further details.
-///
-template<class T, class F>
-std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F f)
-{
-  return make_unique<ga_evaluator<T, F>>(f);
-}
-
-///
-/// \param[in] f objective function.
-/// \return a unique_ptr referencing an evaluator based on \a f.
-/// \see make_evaluator for further details.
-///
-template<class T, class F, class P>
-std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F f, P p)
-{
-  auto eva(make_unique_ga_evaluator<T>(f));
-
-  return make_unique<constrained_evaluator<T>>(std::move(eva), p);
-}
-
-///
 /// \return the fitness of the individual (range [-1000;0]).
 ///
 template<class T, class F>

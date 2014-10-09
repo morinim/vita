@@ -21,7 +21,7 @@
 ///
 template<class T>
 constrained_evaluator<T>::constrained_evaluator(
-  std::unique_ptr<evaluator<T>> e, constrained_evaluator<T>::penalty_func_t p)
+  std::unique_ptr<evaluator<T>> e, penalty_func_t<T> p)
   : eva_(std::move(e)), penalty_(p)
 {
   assert(eva_);

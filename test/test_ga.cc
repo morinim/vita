@@ -135,21 +135,17 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   prob.sset.insert(vita::ga::parameter(0, 0.0, 6.0));
   prob.sset.insert(vita::ga::parameter(1, 0.0, 6.0));
 
-  vita::ga_search<vita::i_ga, vita::de_es> s(prob);
-  BOOST_REQUIRE(s.debug(true));
-
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
   auto f = [](const std::vector<double> &x)
            {
-             return
-             -std::pow(x[0]*x[0] + x[1] - 11, 2.0) -
-             std::pow(x[0] + x[1] * x[1] - 7, 2.0);
+             return -(std::pow(x[0]*x[0] + x[1] - 11, 2.0) +
+                      std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
 
-  auto eva(vita::make_unique_ga_evaluator<vita::i_ga>(f));
+  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
+  BOOST_REQUIRE(s.debug(true));
 
-  s.set_evaluator(std::move(eva));
   const auto res(s.run());
 
   BOOST_CHECK_SMALL(f(res), epsilon);
@@ -180,10 +176,10 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
       return p1 + p2 + p3 + p4;
     };
 
-  auto c_eva(vita::make_unique_ga_evaluator<vita::i_ga>(f, p));
+  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s2(prob, f, p);
+  BOOST_REQUIRE(s2.debug(true));
 
-  s.set_evaluator(std::move(c_eva));
-  const auto res2(s.run());
+  const auto res2(s2.run());
 
   BOOST_CHECK_CLOSE(-f(res2), 13.59086, 1.0);
   BOOST_CHECK_CLOSE(res2[0], 2.246826, 1.0);

@@ -17,6 +17,8 @@
 
 namespace vita
 {
+  template<class T> using penalty_func_t = std::function<double (const T &)>;
+
   ///
   /// \tparam T the type of individual used
   /// \tparam P penalty function
@@ -28,10 +30,8 @@ namespace vita
   class constrained_evaluator : public evaluator<T>
   {
   public:
-    using penalty_func_t = std::function<double (const T &)>;
-
     constrained_evaluator(std::unique_ptr<evaluator<T>>,
-                          penalty_func_t);
+                          penalty_func_t<T>);
 
     virtual fitness_t operator()(const T &) override;
     virtual fitness_t fast(const T &) override;
@@ -45,7 +45,7 @@ namespace vita
     std::unique_ptr<evaluator<T>> eva_;
 
     // Penalty function.
-    penalty_func_t penalty_;
+    penalty_func_t<T> penalty_;
   };
 
 #include "kernel/constrained_evaluator_inl.h"

@@ -46,8 +46,6 @@ namespace vita
   public:
     explicit search(problem &);
 
-    void set_evaluator(std::unique_ptr<evaluator<T>>);
-
     std::unique_ptr<lambda_f<T>> lambdify(const T &);
 
     T run(unsigned = 1);
@@ -56,6 +54,7 @@ namespace vita
 
   protected: // Protected support methods
     fitness_t fitness(const T &);
+    void set_evaluator(std::unique_ptr<evaluator<T>>);
     virtual bool stop_condition(const summary<T> &) const;
 
   protected:  // Protected data members
