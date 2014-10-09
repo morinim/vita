@@ -82,12 +82,12 @@ namespace vita
           static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
       }
 
-      virtual int penalty(core_interpreter *i) const override
+      virtual double penalty_nvi(core_interpreter *i) const override
       {
         const auto v(
           static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
 
-        return v < min || v >= upp;
+        return std::isnan(v) || v < min || v >= upp;
       }
 
     private:  // Private data members

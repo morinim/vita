@@ -37,7 +37,7 @@ namespace vita
 
   private:  // Methods of the non-virtual interface
     virtual any run_nvi() override;
-    virtual int penalty_nvi() override;
+    virtual double penalty_nvi() override;
     virtual bool debug_nvi() const override;
 
   private:  // Private data members
@@ -47,7 +47,7 @@ namespace vita
   ///
   /// Just a shortcut for interpreter<i_ga>::penalty()
   ///
-  inline int base_penalty(const i_ga &ind)
+  inline double base_penalty(const i_ga &ind)
   {
     return interpreter<i_ga>(&ind).penalty();
   }

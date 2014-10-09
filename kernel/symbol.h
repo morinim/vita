@@ -48,7 +48,7 @@ namespace vita
     /// (it is implementation specific).
     virtual any eval(core_interpreter *) const = 0;
 
-    virtual int penalty(core_interpreter *) const;
+    double penalty(core_interpreter *) const;
 
     virtual bool debug() const;
 
@@ -69,6 +69,9 @@ namespace vita
     bool input_;
     bool parametric_;
 
+  private:  // NVI template methods
+    virtual double penalty_nvi(core_interpreter *) const;
+
   private:  // Private data members
     static opcode_t opc_count_;
 
@@ -78,6 +81,19 @@ namespace vita
 
     std::string name_;
   };
+
+  ///
+  /// \param[in] ci interpreter used for symbol's constraints evaluation.
+  /// \return 0
+  ///
+  /// Return a penalty based on symbol-specific broken constraints:
+  /// - 0 states that no constraint penalty is applied;
+  /// - larger values specify larger penalties.
+  ///
+  inline double symbol::penalty(core_interpreter *ci) const
+  {
+    return penalty_nvi(ci);
+  }
 
   ///
   /// \return \c 0.

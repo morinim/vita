@@ -28,7 +28,7 @@ namespace vita
   class constrained_evaluator : public evaluator<T>
   {
   public:
-    using penalty_func_t = std::function<int (const T &)>;
+    using penalty_func_t = std::function<double (const T &)>;
 
     constrained_evaluator(std::unique_ptr<evaluator<T>>,
                           penalty_func_t);

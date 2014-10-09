@@ -278,7 +278,7 @@ namespace vita
           return i->fetch_arg(3);
       }
 
-      virtual int penalty(core_interpreter *ci) const override
+      virtual double penalty_nvi(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }
@@ -315,7 +315,7 @@ namespace vita
         // expression v0 < v1 may raise an exception in this case).
       }
 
-      virtual int penalty(core_interpreter *ci) const override
+      virtual double penalty_nvi(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }
@@ -343,7 +343,7 @@ namespace vita
           return i->fetch_arg(2);
       }
 
-      virtual int penalty(core_interpreter *ci) const override
+      virtual double penalty_nvi(core_interpreter *ci) const override
       {
         return comparison_function_penalty(ci);
       }

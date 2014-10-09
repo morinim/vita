@@ -26,7 +26,7 @@ namespace vita
   /// Maximum penalty for
   ///     if ("apple" == "apple") then "orange" else "orange"
   ///
-  int comparison_function_penalty(core_interpreter *ci)
+  double comparison_function_penalty(core_interpreter *ci)
   {
     auto *const i(static_cast<interpreter<i_mep> *>(ci));
 

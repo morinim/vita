@@ -153,7 +153,7 @@ index_t interpreter<T>::fetch_index(unsigned i) const
 /// \return the penalty value for \c this \a individual.
 ///
 template<class T>
-int interpreter<T>::penalty_locus(const locus &ip)
+double interpreter<T>::penalty_locus(const locus &ip)
 {
   ip_ = ip;
   return prg_[ip_].sym->penalty(this);
@@ -165,7 +165,7 @@ int interpreter<T>::penalty_locus(const locus &ip)
 /// Calls penalty_locus() using the default starting locus.
 //
 template<class T>
-int interpreter<T>::penalty_nvi()
+double interpreter<T>::penalty_nvi()
 {
   return penalty_locus(prg_.best_);
 }

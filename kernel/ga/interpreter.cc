@@ -43,9 +43,9 @@ namespace vita
   ///
   /// Calls penalty_locus() using the default starting locus.
   ///
-  int interpreter<i_ga>::penalty_nvi()
+  double interpreter<i_ga>::penalty_nvi()
   {
-    int n(0);
+    double n(0);
 
     for (const auto &l : p_)
       n += p_[l].sym->penalty(this);

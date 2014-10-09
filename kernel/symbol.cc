@@ -70,11 +70,7 @@ namespace vita
   ///
   /// \return 0
   ///
-  /// Specializations of this function return a penalty based on
-  /// symbol-specific broken constraints. 0 states that no constraint penalty
-  /// is applied, larger values specify larger penalties.
-  ///
-  int symbol::penalty(core_interpreter *) const
+  double symbol::penalty_nvi(core_interpreter *) const
   {
     return 0;
   }
