@@ -56,10 +56,15 @@ std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F f)
   return make_unique<ga_evaluator<T, F>>(f);
 }
 
+///
+/// \param[in] f objective function.
+/// \return a unique_ptr referencing an evaluator based on \a f.
+/// \see make_evaluator for further details.
+///
 template<class T, class F, class P>
-std::unique_ptr<evaluator<T>> make_unique_constrained_ga_evaluator(F f, P p)
+std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F f, P p)
 {
-  auto eva(make_unique<ga_evaluator<T, F>>(f));
+  auto eva(make_unique_ga_evaluator<T>(f));
 
   return make_unique<constrained_evaluator<T>>(std::move(eva), p);
 }

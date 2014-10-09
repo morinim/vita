@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s2.best->ind[2], 980.0);
   BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
 }
-
+/*
 // Test problem 1 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
       return p1 + p2 + p3 + p4;
     };
 
-  auto c_eva(vita::make_unique_constrained_ga_evaluator<vita::i_ga>(f, p));
+  auto c_eva(vita::make_unique_ga_evaluator<vita::i_ga>(f, p));
 
   s.set_evaluator(std::move(c_eva));
   const auto res2(s.run());
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   BOOST_CHECK_CLOSE(res2[0], 2.246826, 0.01);
   BOOST_CHECK_CLOSE(res2[1], 2.381865, 0.01);
 }
-/*
+*/
 // Test problem 2 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem2)
@@ -223,8 +223,6 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem2)
   vita::ga_search<vita::i_ga, vita::de_es> s(prob);
   BOOST_REQUIRE(s.debug(true));
 
-  // The unconstrained objective function f(x1, x2) has a maximum solution at
-  // (3, 2) with a function value equal to zero.
   auto f = [](const std::vector<double> &x)
     {
       return
@@ -295,7 +293,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem2)
       return r;
     };
 
-  auto c_eva(vita::make_unique_constrained_ga_evaluator<vita::i_ga>(f, p));
+  auto c_eva(vita::make_unique_ga_evaluator<vita::i_ga>(f, p));
 
   s.set_evaluator(std::move(c_eva));
   const auto res(s.run());
@@ -317,7 +315,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem2)
   BOOST_CHECK_CLOSE(res[11], 3.0, 1);
   BOOST_CHECK_CLOSE(res[12], 1.0, 1);
 }
-*/
+
 /*
 // Test problem 7 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"

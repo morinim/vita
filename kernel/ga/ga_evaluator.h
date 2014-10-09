@@ -44,7 +44,7 @@ namespace vita
   template<class T, class F>
   std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F);
   template<class T, class F, class P>
-  std::unique_ptr<evaluator<T>> make_unique_constrained_ga_evaluator(F, P);
+  std::unique_ptr<evaluator<T>> make_unique_ga_evaluator(F, P);
 
 #include "kernel/ga/ga_evaluator_inl.h"
 }  // namespace vita

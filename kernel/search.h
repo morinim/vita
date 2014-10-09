@@ -23,20 +23,19 @@
 namespace vita
 {
   ///
-  /// \brief This \c class drives the evolution
+  /// \brief Search drives the evolution
   ///
   /// \tparam T the type of individual used
   /// \tparam ES the adopted evolution strategy
   ///
-  /// This is an interface for specific search strategies. The design adheres
-  /// to the NVI pattern ("Virtuality" in C/C++ Users Journal September
+  /// The class is an interface for specific search strategies. The design
+  /// adheres to the NVI pattern ("Virtuality" in C/C++ Users Journal September
   /// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
   ///
   /// \note
-  /// The class uses a template template parameter.
-  /// This approach allows coordination between T and ES to be handled by the
-  /// search class, rather than in all the various code that specializes
-  /// search.
+  /// The "template template parameter" approach allows coordination between T
+  /// and ES to be handled by the search class, rather than in all the various
+  /// code that specializes search.
   /// A very interesting description of this technique can be found in
   /// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
   /// (<http://www.informit.com/articles/article.aspx?p=376878>).
