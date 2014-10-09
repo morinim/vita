@@ -24,30 +24,17 @@
 #define BOOST_TEST_MODULE t_ga
 #include <boost/test/unit_test.hpp>
 
-constexpr double epsilon(0.00001);
-
 using namespace boost;
+
+constexpr double epsilon(0.00001);
 
 #include "factory_fixture5.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
-
-void setup_symbol_set(vita::symbol_set *sset, unsigned n)
-{
-  double v(10.0);
-
-  for (unsigned i(0); i < n; ++i)
-  {
-    sset->insert(vita::ga::parameter(i, -v, +v));
-    v *= 10.0;
-  }
-}
+BOOST_FIXTURE_TEST_SUITE(t_ga1, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Penalty)
 {
-  setup_symbol_set(&sset, 4);
-
   vita::i_ga ind(env, sset);
   BOOST_REQUIRE(ind.debug());
 
@@ -70,8 +57,6 @@ BOOST_AUTO_TEST_CASE(Penalty)
 
 BOOST_AUTO_TEST_CASE(Evaluator)
 {
-  setup_symbol_set(&sset, 4);
-
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
 
@@ -105,8 +90,6 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 
 BOOST_AUTO_TEST_CASE(Evolution)
 {
-  setup_symbol_set(&sset, 4);
-
   env.individuals = 100;
   env.verbosity = 0;
 
@@ -134,7 +117,11 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s2.best->ind[2], 980.0);
   BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
 }
-/*
+BOOST_AUTO_TEST_SUITE_END()
+
+
+
+BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
 // Test problem 1 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
@@ -198,11 +185,13 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   s.set_evaluator(std::move(c_eva));
   const auto res2(s.run());
 
-  BOOST_CHECK_CLOSE(-f(res2), 13.59086, 0.001);
-  BOOST_CHECK_CLOSE(res2[0], 2.246826, 0.01);
-  BOOST_CHECK_CLOSE(res2[1], 2.381865, 0.01);
+  BOOST_CHECK_CLOSE(-f(res2), 13.59086, 1.0);
+  BOOST_CHECK_CLOSE(res2[0], 2.246826, 1.0);
+  BOOST_CHECK_CLOSE(res2[1], 2.381865, 1.0);
 }
-*/
+
+
+/*
 // Test problem 2 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem2)
@@ -315,6 +304,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem2)
   BOOST_CHECK_CLOSE(res[11], 3.0, 1);
   BOOST_CHECK_CLOSE(res[12], 1.0, 1);
 }
+*/
 
 /*
 // Test problem 7 from "An Efficient Constraint Handling Method for Genetic

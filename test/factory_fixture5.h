@@ -19,9 +19,17 @@
 
 struct F_FACTORY5
 {
-  F_FACTORY5() : env(true), sset()
+  F_FACTORY5(unsigned n = 4) : env(true), sset()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY5)");
+
+    double v(10.0);
+
+    for (unsigned i(0); i < n; ++i)
+    {
+      sset.insert(vita::ga::parameter(i, -v, +v));
+      v *= 10.0;
+    }
   }
 
   ~F_FACTORY5()
@@ -31,6 +39,11 @@ struct F_FACTORY5
 
   vita::environment env;
   vita::symbol_set sset;
+};
+
+struct F_FACTORY5_NO_INIT : F_FACTORY5
+{
+  F_FACTORY5_NO_INIT() : F_FACTORY5(0) {}
 };
 
 #endif  // Include guard
