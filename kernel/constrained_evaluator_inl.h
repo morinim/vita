@@ -14,60 +14,56 @@
 #define      VITA_CONSTRAINED_EVALUATOR_INL_H
 
 ///
-/// \param[in] e pointer to the base evaluator.
-/// \param[in] p pointer to a penalty function (as described in "An Efficient
-///              Constraint Handling Method for Genetic Algorithms" - Kalyanmoy
-///              Deb)
+/// \param[in] e the base evaluator.
+/// \param[in] p the penalty function (as described in "An Efficient Constraint
+///              Handling Method for Genetic Algorithms" - Kalyanmoy Deb)
 ///
-template<class T>
-constrained_evaluator<T>::constrained_evaluator(
-  std::unique_ptr<evaluator<T>> e, penalty_func_t<T> p)
-  : eva_(std::move(e)), penalty_(p)
+template<class T, class E, class P>
+constrained_evaluator<T, E, P>::constrained_evaluator(E e, P p)
+  : eva_(std::move(e)), penalty_(std::move(p))
 {
-  assert(eva_);
-  assert(penalty_);
 }
 
 ///
 /// \param[in] prg the program (individual/team) whose fitness we want to know.
 /// \return the fitness of \a ind.
 ///
-template<class T>
-fitness_t constrained_evaluator<T>::operator()(const T &prg)
+template<class T, class E, class P>
+fitness_t constrained_evaluator<T, E, P>::operator()(const T &prg)
 {
   return combine(fitness_t{static_cast<fitness_t::value_type>(-penalty_(prg))},
-                 (*eva_)(prg));
+                 eva_(prg));
 }
 
 ///
 /// \param[in] prg the program (individual/team) whose fitness we want to know.
 /// \return the an approximation of the fitness of \a i.
 ///
-template<class T>
-fitness_t constrained_evaluator<T>::fast(const T &prg)
+template<class T, class E, class P>
+fitness_t constrained_evaluator<T, E, P>::fast(const T &prg)
 {
   return combine(fitness_t{static_cast<fitness_t::value_type>(-penalty_(prg))},
-                 eva_->fast(prg));
+                 eva_.fast(prg));
 }
 
 ///
 /// \return the accuracy of \a prg.
 ///
-template<class T>
-double constrained_evaluator<T>::accuracy(const T &prg) const
+template<class T, class E, class P>
+double constrained_evaluator<T, E, P>::accuracy(const T &prg) const
 {
-  return eva_->accuracy(prg);
+  return eva_.accuracy(prg);
 }
 
 ///
 /// \param[in] prg a program (individual/team).
 /// \return a pointer to the executable version of \a prg.
 ///
-template<class T>
-std::unique_ptr<lambda_f<T>> constrained_evaluator<T>::lambdify(
+template<class T, class E, class P>
+std::unique_ptr<lambda_f<T>> constrained_evaluator<T, E, P>::lambdify(
   const T &prg) const
 {
-  return eva_->lambdify(prg);
+  return eva_.lambdify(prg);
 }
 
 #endif  // Include guard

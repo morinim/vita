@@ -21,17 +21,20 @@ namespace vita
 
   ///
   /// \tparam T the type of individual used
-  /// \tparam P penalty function
+  /// \tparam E the basic evaluator
+  /// \tparam P the penalty function
   ///
-  /// The class merges an evaluator with a penalty function into a new combined
-  /// evaluator.
+  /// The class merges a basic evaluator and a penalty function into a new
+  /// combined evaluator.
   ///
-  template<class T>
+  /// The new evaluator calculates a augmented fitness of this form:
+  ///     (-penalty, base fitness)
+  ///
+  template<class T, class E, class P>
   class constrained_evaluator : public evaluator<T>
   {
   public:
-    constrained_evaluator(std::unique_ptr<evaluator<T>>,
-                          penalty_func_t<T>);
+    constrained_evaluator(E, P);
 
     virtual fitness_t operator()(const T &) override;
     virtual fitness_t fast(const T &) override;
@@ -42,10 +45,10 @@ namespace vita
 
   private:
     // Base evaluator.
-    std::unique_ptr<evaluator<T>> eva_;
+    E eva_;
 
     // Penalty function.
-    penalty_func_t<T> penalty_;
+    P penalty_;
   };
 
 #include "kernel/constrained_evaluator_inl.h"

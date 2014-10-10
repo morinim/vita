@@ -21,7 +21,8 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 
   if (pf)
   {
-    auto eva(make_unique<constrained_evaluator<T>>(std::move(base_eva), pf));
+    auto eva(make_unique<constrained_evaluator<T, ga_evaluator<T, F>,
+             penalty_func_t<T>>>(*base_eva, pf));
     search<T, ES>::set_evaluator(std::move(eva));
   }
   else
