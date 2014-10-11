@@ -148,7 +148,7 @@ namespace vita {  namespace selection {
     virtual std::vector<coord> run() override;
   };
 
-#include "kernel/evolution_selection_inl.h"
+#include "kernel/evolution_selection.tcc"
 
 } } // namespace vita :: selection
 

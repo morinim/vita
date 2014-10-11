@@ -92,7 +92,7 @@ namespace vita { namespace recombination {
     virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
   };
 
-#include "kernel/evolution_recombination_inl.h"
+#include "kernel/evolution_recombination.tcc"
 } }  // namespace vita::recombination
 
 #endif  // Include guard

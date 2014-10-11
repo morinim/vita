@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_FITNESS_INL_H)
-#define      VITA_FITNESS_INL_H
+#if !defined(VITA_FITNESS_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_FITNESS_TCC)
+#define      VITA_FITNESS_TCC
 
 ///
 /// Fills the fitness with value \a v.

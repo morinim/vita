@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_DISTRIBUTION_INL_H)
-#define      VITA_DISTRIBUTION_INL_H
+#if !defined(VITA_DISTRIBUTION_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_DISTRIBUTION_TCC)
+#define      VITA_DISTRIBUTION_TCC
 
 ///
 /// Just the initial setup.

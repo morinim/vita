@@ -71,7 +71,7 @@ namespace vita
     virtual fitness_t operator()(const T &) override;
   };
 
-#include "kernel/evaluator_inl.h"
+#include "kernel/evaluator.tcc"
 
 }  // namespace vita
 

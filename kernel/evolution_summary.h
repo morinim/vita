@@ -53,7 +53,7 @@ namespace vita
     unsigned gen, last_imp;
   };
 
-#include "kernel/evolution_summary_inl.h"
+#include "kernel/evolution_summary.tcc"
 
 }  // namespace vita
 

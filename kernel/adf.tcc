@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_ADF_INL_H)
-#define      VITA_ADF_INL_H
+#if !defined(VITA_ADF_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_ADF_TCC)
+#define      VITA_ADF_TCC
 
 ///
 /// \param[in] ind individual whose code is used as ADF/ADT.

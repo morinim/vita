@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_CONSTRAINED_EVALUATOR_INL_H)
-#define      VITA_CONSTRAINED_EVALUATOR_INL_H
+#if !defined(VITA_CONSTRAINED_EVALUATOR_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_CONSTRAINED_EVALUATOR_TCC)
+#define      VITA_CONSTRAINED_EVALUATOR_TCC
 
 ///
 /// \param[in] e the base evaluator.

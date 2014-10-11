@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_GENE_INL_H)
-#define      VITA_GENE_INL_H
+#if !defined(VITA_GENE_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_GENE_TCC)
+#define      VITA_GENE_TCC
 
 template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 

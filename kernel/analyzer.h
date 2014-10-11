@@ -132,7 +132,7 @@ namespace vita
     virtual unsigned count(const team<T> &) override;
   };
 
-#include "kernel/analyzer_inl.h"
+#include "kernel/analyzer.tcc"
 }  // namespace vita
 
 #endif  // include guard

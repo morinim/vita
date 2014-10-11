@@ -56,7 +56,7 @@ namespace vita
 
   using gene = basic_gene<4>;
 
-#include "kernel/gene_inl.h"
+#include "kernel/gene.tcc"
 }  // namespace vita
 
 #endif  // Include guard

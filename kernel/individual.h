@@ -70,8 +70,11 @@ namespace vita
     const symbol_set  *sset_;
   };  // class individual
 
-#include "kernel/individual_inl.h"
-
+  inline individual::individual(const environment &e, const symbol_set &ss)
+    : signature_(), age_(0), env_(&e), sset_(&ss)
+  {
+    assert(e.debug(true, true));
+  }
 }  // namespace vita
 
 #endif  // Include guard

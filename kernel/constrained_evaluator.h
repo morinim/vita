@@ -51,7 +51,7 @@ namespace vita
     P penalty_;
   };
 
-#include "kernel/constrained_evaluator_inl.h"
+#include "kernel/constrained_evaluator.tcc"
 }  // namespace vita
 
 #endif  // include guard

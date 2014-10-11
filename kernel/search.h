@@ -73,7 +73,7 @@ namespace vita
     virtual void tune_parameters_nvi() = 0;
   };
 
-#include "kernel/search_inl.h"
+#include "kernel/search.tcc"
 }  // namespace vita
 
 #endif  // Include guard

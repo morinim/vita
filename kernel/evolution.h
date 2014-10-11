@@ -66,7 +66,7 @@ namespace vita
     std::function<void (unsigned)> shake_data_;
   };
 
-#include "kernel/evolution_inl.h"
+#include "kernel/evolution.tcc"
 
   ///
   /// \example example6.cc

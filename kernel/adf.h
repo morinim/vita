@@ -111,7 +111,7 @@ namespace vita
     adf_core<i_mep> core_;
   };
 
-#include "kernel/adf_inl.h"
+#include "kernel/adf.tcc"
 }  // namespace vita
 
 #endif  // Include guard

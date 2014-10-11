@@ -380,7 +380,7 @@ namespace vita
   template<class T> using binary_lambda_f =
     basic_binary_lambda_f<T, true, true>;
 
-#include "kernel/lambda_f_inl.h"
+#include "kernel/lambda_f.tcc"
 }  // namespace vita
 
 #endif  // Include guard

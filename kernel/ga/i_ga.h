@@ -119,7 +119,7 @@ namespace vita
 
   std::ostream &operator<<(std::ostream &, const i_ga &);
 
-#include "kernel/ga/i_ga_iterator_inl.h"
+#include "kernel/ga/i_ga_iterator.tcc"
 
   ///
   /// \return an iterator pointing to the first individual of the team.

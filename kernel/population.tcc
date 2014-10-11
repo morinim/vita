@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_POPULATION_INL_H)
-#define      VITA_POPULATION_INL_H
+#if !defined(VITA_POPULATION_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_POPULATION_TCC)
+#define      VITA_POPULATION_TCC
 
 ///
 /// \param[in] e base vita::environment.

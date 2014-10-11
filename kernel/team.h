@@ -110,7 +110,7 @@ namespace vita
   template<class T> struct not_team : std::true_type {};
   template<class T> struct not_team<team<T>> : std::false_type {};
 
-#include "kernel/team_inl.h"
+#include "kernel/team.tcc"
 
 }  // namespace vita
 

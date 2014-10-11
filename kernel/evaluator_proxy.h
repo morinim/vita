@@ -53,7 +53,7 @@ namespace vita
     ttable cache_;
   };
 
-#include "kernel/evaluator_proxy_inl.h"
+#include "kernel/evaluator_proxy.tcc"
 }  // namespace vita
 
 #endif  // include guard

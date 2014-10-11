@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_EVOLUTION_SUMMARY_INL_H)
-#define      VITA_EVOLUTION_SUMMARY_INL_H
+#if !defined(VITA_EVOLUTION_SUMMARY_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_EVOLUTION_SUMMARY_TCC)
+#define      VITA_EVOLUTION_SUMMARY_TCC
 
 ///
 /// Default constructor just call the summary::clear method.

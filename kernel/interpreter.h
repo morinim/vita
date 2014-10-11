@@ -83,7 +83,7 @@ namespace vita
     interpreter<T> *const context_;
   };
 
-#include "kernel/interpreter_inl.h"
+#include "kernel/interpreter.tcc"
 
   ///
   /// \example example5.cc

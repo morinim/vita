@@ -182,7 +182,7 @@ namespace vita
 
   template<class T> T to(const any &);
 
-#include "kernel/any_inl.h"
+#include "kernel/any.tcc"
 
 }  // namespace vita
 

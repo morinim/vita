@@ -90,7 +90,7 @@ namespace vita
 
   using fitness_t = basic_fitness_t<double>;
 
-#include "kernel/fitness_inl.h"
+#include "kernel/fitness.tcc"
 }  // namespace vita
 
 #endif  // Include guard

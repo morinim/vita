@@ -72,7 +72,7 @@ namespace vita
     unsigned cols_;
   };
 
-#include "kernel/matrix_inl.h"
+#include "kernel/matrix.tcc"
 }  // namespace vita
 
 #endif  // Include guard

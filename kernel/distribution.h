@@ -64,7 +64,7 @@ namespace vita
     std::uintmax_t count_;
   };
 
-#include "kernel/distribution_inl.h"
+#include "kernel/distribution.tcc"
 }  // namespace vita
 
 #endif  // Include guard

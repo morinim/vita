@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_SRC_SEARCH_INL_H)
-#define      VITA_SRC_SEARCH_INL_H
+#if !defined(VITA_SRC_SEARCH_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_SRC_SEARCH_TCC)
+#define      VITA_SRC_SEARCH_TCC
 
 ///
 /// \param[in] p the problem we're working on. The lifetime of \a p must exceed

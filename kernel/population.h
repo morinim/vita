@@ -85,7 +85,7 @@ namespace vita
     std::vector<unsigned> allowed_;
   };
 
-#include "kernel/population_inl.h"
+#include "kernel/population.tcc"
 
   ///
   /// \example example2.cc

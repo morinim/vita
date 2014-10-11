@@ -10,8 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INDIVIDUAL_GA_ITERATOR_H)
-#define      VITA_INDIVIDUAL_GA_ITERATOR_H
+#if !defined(VITA_GA_I_GA_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_INDIVIDUAL_GA_ITERATOR_TCC)
+#define      VITA_INDIVIDUAL_GA_ITERATOR_TCC
 
 ///
 /// \brief Iterator to scan the active genes of an \c individual

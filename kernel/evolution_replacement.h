@@ -137,7 +137,7 @@ namespace vita {  namespace replacement {
                      summary<T> *const) override;
   };
 
-#include "kernel/evolution_replacement_inl.h"
+#include "kernel/evolution_replacement.tcc"
 
 } }  // namespace vita::replacement
 

@@ -69,7 +69,7 @@ namespace vita
     evaluator_id p_class;
   };
 
-#include "kernel/src/search_inl.h"
+#include "kernel/src/search.tcc"
 }  // namespace vita
 
 #endif  // Include guard

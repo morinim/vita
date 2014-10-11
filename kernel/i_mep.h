@@ -138,7 +138,7 @@ namespace vita
 
   std::ostream &operator<<(std::ostream &, const i_mep &);
 
-#include "kernel/i_mep_iterator_inl.h"
+#include "kernel/i_mep_iterator.tcc"
 
   ///
   /// \return an iterator to the first active locus of the individual.

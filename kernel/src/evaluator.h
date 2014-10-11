@@ -243,7 +243,7 @@ namespace vita
     virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
   };
 
-#include "kernel/src/evaluator_inl.h"
+#include "kernel/src/evaluator.tcc"
 }  // namespace vita
 
 #endif  // Include guard

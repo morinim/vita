@@ -161,7 +161,7 @@ namespace vita
     using de_es::evolution_strategy::evolution_strategy;
   };
 
-#include "kernel/evolution_strategy_inl.h"
+#include "kernel/evolution_strategy.tcc"
 
 }  // namespace vita
 
