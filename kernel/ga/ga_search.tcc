@@ -55,11 +55,6 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
   if (!constrained.tournament_size)
     this->env_.tournament_size = dflt.tournament_size;
 
-  // This is a quick fix for DE evolution strategy: we cannot use DE-crossover
-  // operator with less than four individuals.
-  if (ES<T>::is_de && this->env_.tournament_size < 4)
-    this->env_.tournament_size = 4;
-
   if (!constrained.mate_zone)
     this->env_.mate_zone = *dflt.mate_zone;
 
