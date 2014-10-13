@@ -16,6 +16,7 @@
 #include <fstream>
 
 #include "kernel/environment.h"
+#include "kernel/random.h"
 
 namespace vita
 {
@@ -36,9 +37,9 @@ namespace vita
 
   ///
   /// \brief A group of individuals which may interact together (for example by
-  ///        mating) producing offspring.
+  ///        mating) producing offspring
   ///
-  /// \tparam T the type of the an individual.
+  /// \tparam T the type of the an individual
   ///
   /// Typical population size in GP ranges from ten to many thousands. The
   /// population is organized in one or more layers that can interact in

@@ -42,7 +42,6 @@ namespace vita {  namespace selection {
 
   protected:  // Support methods
     coord pickup() const;
-    coord pickup(coord) const;
     coord pickup(unsigned, double = 1.0) const;
 
   protected:  // Data members

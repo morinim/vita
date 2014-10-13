@@ -56,21 +56,6 @@ coord strategy<T>::pickup() const
 }
 
 ///
-/// \param[in] target coordinates of a reference individual.
-/// \return the coordinates of a random individual "near" \a target.
-///
-/// Parameters from the environment:
-/// * mate_zone - to restrict the selection of individuals to a segment of
-///   the population;
-///
-template<class T>
-coord strategy<T>::pickup(coord target) const
-{
-  return {target.layer, vita::random::ring(target.index, *pop_.env().mate_zone,
-                                           pop_.individuals(target.layer))};
-}
-
-///
 /// \param[in] l a layer.
 /// \param[in] p the probability of extracting an individual in layer \a l
 ///              (1 - \a p is the probability of extracting an individual
@@ -120,7 +105,7 @@ std::vector<coord> tournament<T>::run()
   // DO NOT USE std::sort it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
-    const auto new_coord(this->pickup(target));
+    const auto new_coord(pickup(pop, target));
     const auto new_fitness(this->eva_(pop[new_coord]));
 
     unsigned j(0);

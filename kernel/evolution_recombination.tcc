@@ -59,6 +59,7 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
   assert(env.p_cross >= 0.0);
   assert(env.p_mutation >= 0.0);
   assert(env.brood_recombination);
+  assert(parent.size() >= 2);
 
   const auto r1(parent[0]), r2(parent[1]);
 
@@ -126,7 +127,7 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
 template<class T>
 std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 {
-  assert(parent.size() >= 4);
+  assert(parent.size() >= 2);
 
   const auto &pop(this->pop_);
 

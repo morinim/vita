@@ -370,6 +370,23 @@ bool population<T>::save(std::ostream &out) const
 }
 
 ///
+/// \param[in] p the population (we extract the coordinates of an individual
+///              of \a p).
+/// \param[in] target coordinates of a reference individual.
+/// \return the coordinates of a random individual "near" \a target.
+///
+/// Other parameters from the environment:
+/// * mate_zone - to restrict the selection of individuals to a segment of
+///   the population.
+///
+template<class T>
+coord pickup(const population<T> &p, coord target)
+{
+  return {target.layer, random::ring(target.index, *p.env().mate_zone,
+                                     p.individuals(target.layer))};
+}
+
+///
 /// \param[in,out] s output \c stream.
 /// \param[in] pop population to be listed.
 /// \return the output \c stream.
