@@ -133,7 +133,9 @@ std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 
   assert(pop.env().p_cross > 0.0);
 
-  return {pop[parent[3]].crossover(pop[parent[0]], pop[parent[1]],
-                                   pop[parent[2]])};
+  const auto a(pickup(pop, parent[0]));
+  const auto b(pickup(pop, parent[0]));
+
+  return {pop[parent[0]].crossover(pop[parent[1]], pop[a], pop[b])};
 }
 #endif  // Include guard
