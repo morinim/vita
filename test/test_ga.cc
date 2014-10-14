@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   env.individuals = 130;
   env.generations = 1000;
   env.f_threashold = {0, 0};
-  env.verbosity = 1;
+  env.verbosity = 0;
 
   vita::problem prob;
   prob.env = env;
@@ -206,9 +206,9 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   auto f = [](const std::vector<double> &x)
     {
       return
-      -5 * (x[0] + x[1] + x[2] + x[3]) +
-      5 * (x[0]*x[0] + x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) +
-      std::accumulate(std::next(x.begin(), 4), x.end(), 0.0);
+      -(5.0 * (x[0] + x[1] + x[2] + x[3]) -
+        5.0 * (x[0]*x[0] + x[1]*x[1] + x[2]*x[2] + x[3]*x[3]) -
+        std::accumulate(std::next(x.begin(), 4), x.end(), 0.0));
     };
 
   auto p = [](const vita::i_ga &prg)
@@ -331,12 +331,14 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 BOOST_AUTO_TEST_CASE(Search_TestProblem7)
 {
   env.individuals = 100;
-  env.generations = 7000;
+  env.generations = 10000;
   env.f_threashold = {0, 0};
   env.verbosity = 1;
 
   vita::problem prob;
   prob.env = env;
+  prob.env.stat_dir = ".";
+  prob.env.stat_layers = true;
   prob.sset.insert(vita::ga::parameter(0, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(1, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(2, -3.2, 3.2));
@@ -352,35 +354,49 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7)
     {
       auto h1 = [](const std::vector<double> &x)
       {
-        return x[0]*x[0] + x[1]*x[1] + x[2]*x[2] + x[3]*x[3] + x[4]*x[4];
+        return x[0]*x[0] + x[1]*x[1] + x[2]*x[2] + x[3]*x[3] + x[4]*x[4] -10.0;
       };
       auto h2 = [](const std::vector<double> &x)
       {
-        return x[1] * x[2] - 5 * x[3] * x[4];
+        return x[1] * x[2] - 5.0 * x[3] * x[4];
       };
       auto h3 = [](const std::vector<double> &x)
       {
-        return x[0]*x[0]*x[0] + x[1]*x[1]*x[1];
+        return x[0] * x[0] * x[0] + x[1] * x[1] * x[1] + 1.0;
       };
 
       const double delta(0.01);
-      int p1(std::abs(h1(prg) - 10.0) <= delta ? 0 : 1);
-      int p2(std::abs(h2(prg)) <= delta ? 0 : 1);
-      int p3(std::abs(h3(prg) + 1.0) <= delta ? 0 : 1);
-      int p4(-2.3 <= prg[0] && prg[0] <= 2.3 ? 0 : 1);
-      int p5(-2.3 <= prg[1] && prg[1] <= 2.3 ? 0 : 1);
-      int p6(-3.2 <= prg[2] && prg[2] <= 3.2 ? 0 : 1);
-      int p7(-3.2 <= prg[3] && prg[3] <= 3.2 ? 0 : 1);
-      int p8(-3.2 <= prg[4] && prg[4] <= 3.2 ? 0 : 1);
 
-      return p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8;
+      double r(0.0);
+
+      const auto c1(std::abs(h1(prg)));
+      if (c1 > delta)
+        r += c1;
+
+      const auto c2(std::abs(h2(prg)));
+      if (c2 > delta)
+        r += c2;
+
+      const auto c3(std::abs(h3(prg)));
+      if (c3 > delta)
+        r += c3;
+
+      for (unsigned i(0); i < 5; ++i)
+      {
+        if (prg[i] < -2.3)
+          r += -2.3 - prg[i];
+        else if (prg[i] > 3.2)
+          r += prg[i] - 3.2;
+      }
+
+      return r;
     };
 
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
   BOOST_REQUIRE(s.debug(true));
-  const auto res(s.run(100));
+  const auto res(s.run(10));
 
-  BOOST_CHECK_CLOSE(-f(res), 0.053950, 1.0);
+  BOOST_CHECK_CLOSE(-f(res), 0.053950, 2.0);
   BOOST_CHECK_CLOSE(res[0], -1.717143, 1.0);
   BOOST_CHECK_CLOSE(res[1], 1.595709, 1.0);
   BOOST_CHECK_CLOSE(res[2], 1.827247, 1.0);

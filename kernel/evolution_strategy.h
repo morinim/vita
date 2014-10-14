@@ -122,18 +122,23 @@ namespace vita
   ///
   /// \see <http://idesign.ucsc.edu/projects/alps.html>
   ///
-  template<class T>
-  class alps_es : public evolution_strategy<T,
-                                            selection::alps,
-                                            recombination::base,
-                                            replacement::alps>
+  template<class T,
+           template<class> class SS,
+           template<class> class CS,
+           template<class> class RS>
+  class basic_alps_es : public evolution_strategy<T, SS, CS, RS>
   {
   public:
-    using alps_es::evolution_strategy::evolution_strategy;
+    using basic_alps_es::evolution_strategy::evolution_strategy;
 
     virtual void log(unsigned, unsigned) const override;
     virtual void post_bookkeeping() override;
   };
+
+  template<class T> using alps_es = basic_alps_es<T,
+                                                  selection::alps,
+                                                  recombination::base,
+                                                  replacement::alps>;
 
   ///
   /// \brief Standard evolution strategy
@@ -156,9 +161,14 @@ namespace vita
                                           selection::random,
                                           recombination::de,
                                           replacement::tournament>
+  //class de_es : public basic_alps_es<T,
+  //                                   selection::alps,
+  //                                   recombination::de,
+  //                                   replacement::alps>
   {
   public:
     using de_es::evolution_strategy::evolution_strategy;
+    //using de_es::basic_alps_es::basic_alps_es;
   };
 
 #include "kernel/evolution_strategy.tcc"

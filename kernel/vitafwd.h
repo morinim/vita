@@ -30,7 +30,10 @@ namespace vita
            template<class> class SS,
            template<class> class CS,
            template<class> class RS> class evolution_strategy;
-  template<class T> class alps_es;
+  template<class T,
+           template<class> class SS,
+           template<class> class CS,
+           template<class> class RS> class basic_alps_es;
   template<class T> class std_es;
 
   template<class T, template<class> class ES> class src_search;

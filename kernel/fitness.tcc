@@ -462,13 +462,13 @@ template<class T> bool isnonnegative(const basic_fitness_t<T> &f)
 ///
 template<class T>
 bool almost_equal(const basic_fitness_t<T> &f1,
-                  const basic_fitness_t<T> &f2, T epsilon)
+                  const basic_fitness_t<T> &f2, T ae_epsilon)
 {
   const auto n(f1.size());
   assert(f2.size() == n);
 
   for (unsigned i(0); i < n; ++i)
-    if (!almost_equal(f1[i], f2[i], epsilon))
+    if (!almost_equal(f1[i], f2[i], ae_epsilon))
       return false;
 
   return true;
