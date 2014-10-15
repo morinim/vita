@@ -144,6 +144,17 @@ endif
 
 -include $(ALL_SRC:.cc=.P)
 
+.phony:	check
+check: check_cppcheck check_cpplint
+
+.phony:	check_cppcheck
+check_cppcheck:
+	@command -v ./tools/cppcheck/cppcheck >/dev/null && ./tools/cppcheck/cppcheck --enable=all --std=c++11 kernel/ 2> cppcheck.txt || { echo >&2 "cppcheck not installed."; }
+
+.phony:	check_cpplint
+check_cpplint:
+	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-build/header_guard kernel/*.cc 2> cpplint.txt
+
 .phony:	clean
 clean:
 	@echo Making clean...
@@ -155,7 +166,7 @@ clean:
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
-	@$(RM) sr/sr kernel/libvita.a
+	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt
 
 .phony:	backup
 backup:
