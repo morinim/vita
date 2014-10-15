@@ -410,26 +410,28 @@ namespace vita
                                          char delimiter,
                                          bool trim)
   {
-    std::vector<std::string> record;
+    std::vector<std::string> record;  // the return value
 
-    const auto linemax(line.length());
+    const char quote('"');
+
     bool inquotes(false);
-    unsigned linepos(0);
     std::string curstring;
-    while (line[linepos] != 0 && linepos < linemax)
-    {
-      const char c(line[linepos]);
 
-      if (!inquotes && curstring.length() == 0 && c == '"') // begin quote char
+    for (auto length(line.length()), pos(decltype(length){0});
+         pos < length && line[pos];)
+    {
+      const char c(line[pos]);
+
+      if (!inquotes && !curstring.length() && c == quote)  // begin quote char
         inquotes = true;
-      else if (inquotes && c == '"')
+      else if (inquotes && c == quote)
       {
         // Quote char.
-        if (linepos + 1 < linemax && line[linepos + 1] == '"')
+        if (pos + 1 < length && line[pos + 1] == quote)
         {
           // Encountered 2 double quotes in a row (resolves to 1 double quote).
           curstring.push_back(c);
-          ++linepos;
+          ++pos;
         }
         else  // end quote char
           inquotes = false;
@@ -444,17 +446,16 @@ namespace vita
       else
         curstring.push_back(c);
 
-      ++linepos;
+      ++pos;
     }
+
+    assert(!inquotes);
 
     record.push_back(curstring);
 
     if (trim)
-    {
-      const auto size(record.size());
-      for (auto i(decltype(size){0}); i < size; ++i)
+      for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
         boost::trim(record[i]);
-    }
 
     return record;
   }
