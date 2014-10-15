@@ -33,7 +33,7 @@ namespace vita
   {
   public:
     explicit src_interpreter(const T *prg, interpreter<T> *ctx = nullptr)
-      : interpreter<T>(prg, ctx)
+      : interpreter<T>(prg, ctx), example_(nullptr)
     {}
 
     any run(const std::vector<any> &);
