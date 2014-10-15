@@ -1,6 +1,9 @@
 # Further details / ideas:
 # * http://gpwiki.org/index.php/Makefile
 # * http://mad-scientist.net/make/autodep.html
+# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
+# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
+# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
 
 
 
@@ -9,7 +12,7 @@ TYPE := release
 
 # Compiler (clang++, g++)
 CXX := g++
-#CLANG = $(shell which clang++ >/dev/null; echo $$?)
+#CLANG := $(shell command -v clang++ >/dev/null; echo $$?)
 #ifeq ($(CLANG), 0)
 #  CXX := clang++
 #else
@@ -153,7 +156,7 @@ check_cppcheck:
 
 .phony:	check_cpplint
 check_cpplint:
-	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-build/header_guard kernel/*.cc 2> cpplint.txt
+	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-build/header_guard,-readability/streams kernel/*.cc 2> cpplint.txt
 
 .phony:	clean
 clean:

@@ -68,4 +68,4 @@ namespace vita
   {
     return index_ < gene::k_args && terminal::debug();
   }
-}  // Namespace vita
+}  // namespace vita

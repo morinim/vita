@@ -10,9 +10,12 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#include <limits>
+
 #include "kernel/alps.h"
 
-namespace vita { namespace alps {
+namespace vita {
+namespace alps {
   ///
   /// \param[in] l a layer.
   /// \param[in] n total number of layers for the current population.
@@ -70,4 +73,5 @@ namespace vita { namespace alps {
     // }
     // return num2;
   }
-} }  // namespace vita::alps
+}  // namespace alps
+}  // namespace vita
