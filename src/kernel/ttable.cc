@@ -75,11 +75,11 @@ namespace vita
 
     ++seal_;
 
-    //for (auto &s : table_)
-    //{
-    //  s.hash = hash_t();
-    //  s.fitness = {};
-    //}
+    // for (auto &s : table_)
+    // {
+    //   s.hash = hash_t();
+    //   s.fitness = {};
+    // }
   }
 
   ///

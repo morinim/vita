@@ -470,4 +470,4 @@ namespace vita
 
     return true;
   }
-}  // Namespace vita
+}  // namespace vita

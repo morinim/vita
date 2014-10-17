@@ -310,7 +310,6 @@ namespace vita
            signature_ == x.signature_);
 
     return eq;
-
   }
 
   ///
@@ -883,14 +882,14 @@ namespace vita
       for (index_t i(cut); i < cs; ++i)
         for (category_t c(0); c < categories; ++c)
         {
-          const locus l{i,c};
+          const locus l{i, c};
           rhs.set(l, operator[](l));
         }
     else
       for (index_t i(0); i < cut; ++i)
         for (category_t c(0); c < categories; ++c)
         {
-          const locus l{i,c};
+          const locus l{i, c};
           rhs.set(l, operator[](l));
         }
 
