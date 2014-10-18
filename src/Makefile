@@ -156,7 +156,7 @@ check_cppcheck:
 
 .phony:	check_cpplint
 check_cpplint:
-	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-build/header_guard,-readability/streams kernel/*.cc 2> cpplint.txt
+	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-whitespace/newline,-build/header_guard,-readability/streams kernel/*.cc 2> cpplint.txt
 
 .phony:	clean
 clean:
