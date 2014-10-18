@@ -97,15 +97,15 @@ bool summary<T>::save(std::ostream &out) const
 
   if (best)
   {
-    out << '1' << std::endl;
+    out << "1\n";
     best->ind.save(out);
     best->fitness.save(out);
   }
   else
-    out << '0' << std::endl;
+    out << "0\n";
 
   out << elapsed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
-      << last_imp << std::endl;
+      << last_imp << '\n';
 
   return out.good();
 }

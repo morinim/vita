@@ -333,10 +333,10 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 
     o << " -> " << s->category() << " (opcode " << s->opcode()
       << ", parametric " << s->parametric()
-      << ", weight " << s->weight << ")" << std::endl;
+      << ", weight " << s->weight << ")\n";
   }
 
-  return o << "Sum: " << ss.all_.sum << std::endl;
+  return o << "Sum: " << ss.all_.sum << '\n';
 }
 
 ///

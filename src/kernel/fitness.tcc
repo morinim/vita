@@ -257,14 +257,14 @@ bool basic_fitness_t<T>::save(std::ostream &out) const
 {
   SAVE_FLAGS(out);
 
-  out << size() << std::endl;
+  out << size() << '\n';
 
   for (const auto &i : vect_)
     out << std::fixed << std::scientific
         << std::setprecision(std::numeric_limits<T>::digits10 + 1)
         << i << ' ';
 
-  out << std::endl;
+  out << '\n';
 
   return out.good();
 }

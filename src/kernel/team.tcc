@@ -359,7 +359,7 @@ bool team<T>::load(std::istream &in)
 template<class T>
 bool team<T>::save(std::ostream &out) const
 {
-  out << individuals() << std::endl;
+  out << individuals() << '\n';
   if (!out.good())
     return false;
 
@@ -379,7 +379,7 @@ template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
 {
   for (const auto &i : t)
-    s << i << std::endl;
+    s << i << '\n';
   return s;
 }
 
@@ -400,7 +400,7 @@ void team<T>::graphviz(std::ostream &s) const
                              std::string("Individual ") +
                              std::to_string(i));
 
-  s << '}' << std::endl;
+  s << "}\n";
 }
 
 ///
@@ -438,7 +438,7 @@ std::ostream &team<T>::list(std::ostream &s) const
   for (const auto &i : individuals_)
   {
     i.list(s);
-    s << std::endl;
+    s << '\n';
   }
 
   return s;
@@ -453,7 +453,7 @@ std::ostream &team<T>::tree(std::ostream &s) const
   for (const auto &i : individuals_)
   {
     i.tree(s);
-    s << std::endl;
+    s << '\n';
   }
 
   return s;

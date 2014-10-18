@@ -39,7 +39,7 @@ namespace vita
   ///       for (long i(0); i < 100000000; ++i)
   ///         std::sqrt(123.456L); // burn some time
   ///
-  ///       std::cout << "Elapsed (milliseconds): " << t.elapsed() << std::endl
+  ///       std::cout << "Elapsed (milliseconds): " << t.elapsed() << '\n'
   ///
   ///       return 0;
   ///     }

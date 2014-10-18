@@ -114,40 +114,35 @@ bool environment::debug(bool verbose, bool force_defined) const
     if (!code_length)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined code_length data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined code_length data member\n";
       return false;
     }
 
     if (!patch_length)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined patch_length data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined patch_length data member\n";
       return false;
     }
 
     if (boost::indeterminate(elitism))
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined elitism data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined elitism data member\n";
       return false;
     }
 
     if (p_mutation < 0.0)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined p_mutation data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined p_mutation data member\n";
       return false;
     }
 
     if (p_cross < 0.0)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined p_cross data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined p_cross data member\n";
       return false;
     }
 
@@ -155,53 +150,49 @@ bool environment::debug(bool verbose, bool force_defined) const
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " Undefined brood_recombination data member" << std::endl;
+                  << " Undefined brood_recombination data member\n";
       return false;
     }
 
     if (boost::indeterminate(dss))
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined dss data member" << std::endl;
+        std::cerr << k_s_debug << " Undefined dss data member\n";
       return false;
     }
 
     if (!layers)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined layer data member" << std::endl;
+        std::cerr << k_s_debug << " Undefined layer data member\n";
       return false;
     }
 
     if (!individuals)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined individuals data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined individuals data member\n";
       return false;
     }
 
     if (!tournament_size)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined tournament_size data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined tournament_size data member\n";
       return false;
     }
 
     if (!mate_zone)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined mate_zone data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined mate_zone data member\n";
       return false;
     }
 
     if (!generations)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined generations data member"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined generations data member\n";
       return false;
     }
 
@@ -209,15 +200,14 @@ bool environment::debug(bool verbose, bool force_defined) const
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " Undefined g_without_improvement data member"
-                  << std::endl;
+                  << " Undefined g_without_improvement data member\n";
       return false;
     }
 
     if (boost::indeterminate(arl))
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined arl data member" << std::endl;
+        std::cerr << k_s_debug << " Undefined arl data member\n";
       return false;
     }
 
@@ -225,32 +215,28 @@ bool environment::debug(bool verbose, bool force_defined) const
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " Undefined validation_percentage data member"
-                  << std::endl;
+                  << " Undefined validation_percentage data member\n";
       return false;
     }
 
     if (!alps.age_gap)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined age_gap parameter"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined age_gap parameter\n";
       return false;
     }
 
     if (alps.p_same_layer < 0.0)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined p_same_layer parameter"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined p_same_layer parameter\n";
       return false;
     }
 
     if (!team.individuals)
     {
       if (verbose)
-        std::cerr << k_s_debug << " Undefined team size parameter"
-                  << std::endl;
+        std::cerr << k_s_debug << " Undefined team size parameter\n";
 
       return false;
     }
@@ -259,63 +245,60 @@ bool environment::debug(bool verbose, bool force_defined) const
   if (code_length == 1)
   {
     if (verbose)
-      std::cerr << k_s_debug << " code_length is too short" << std::endl;
+      std::cerr << k_s_debug << " code_length is too short\n";
     return false;
   }
 
   if (code_length && patch_length && patch_length >= code_length)
   {
     std::cerr << k_s_debug
-              << " patch_length must be shorter than code_length"
-              << std::endl;
+              << " patch_length must be shorter than code_length\n";
     return false;
   }
 
   if (p_mutation > 1.0)
   {
     if (verbose)
-      std::cerr << k_s_debug << " p_mutation out of range" << std::endl;
+      std::cerr << k_s_debug << " p_mutation out of range\n";
     return false;
   }
 
   if (p_cross > 1.0)
   {
     if (verbose)
-      std::cerr << k_s_debug << " p_cross out of range" << std::endl;
+      std::cerr << k_s_debug << " p_cross out of range\n";
     return false;
   }
 
   if (alps.p_same_layer > 1.0)
   {
     if (verbose)
-      std::cerr << k_s_debug << " p_same_layer out of range" << std::endl;
+      std::cerr << k_s_debug << " p_same_layer out of range\n";
     return false;
   }
 
   if (individuals && individuals <= 3)
   {
     if (verbose)
-      std::cerr << k_s_debug << " Too few individuals" << std::endl;
+      std::cerr << k_s_debug << " Too few individuals\n";
     return false;
   }
 
   if (individuals && tournament_size && tournament_size > individuals)
   {
     if (verbose)
-      std::cerr << k_s_debug
-                << " tournament_size (" << tournament_size
+      std::cerr << k_s_debug << " tournament_size (" << tournament_size
                 << ") cannot be greater than population size ("
-                << individuals << ')' << std::endl;
+                << individuals << ")\n";
     return false;
   }
 
   if (mate_zone && tournament_size && tournament_size > *mate_zone)
   {
     if (verbose)
-      std::cerr << k_s_debug
-                << " tournament_size (" << tournament_size
+      std::cerr << k_s_debug << " tournament_size (" << tournament_size
                 << ") cannot be greater than mate_zone (" << *mate_zone
-                << ')' << std::endl;
+                << ")\n";
     return false;
   }
 

@@ -795,7 +795,7 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
       if (instance.input.size() + 1 == columns())
         dataset_[dataset()].push_back(instance);
       else if (verbosity >= 2)
-        std::cout << k_s_warning << " [" << line << "] skipped" << std::endl;
+        std::cout << k_s_warning << " [" << line << "] skipped\n";
     }
   }
 

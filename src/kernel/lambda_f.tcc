@@ -362,9 +362,9 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
   // Don't need to save slot_class_.size() since it's equal to
   // slot_matrix_.rows()
   for (const auto s : slot_class_)
-    out << s << std::endl;
+    out << s << '\n';
 
-  out << dataset_size_ << std::endl;
+  out << dataset_size_ << '\n';
 
   if (!basic_class_lambda_f<T, N>::save(out))
     return false;
@@ -565,7 +565,7 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
   if (!lambda_.save(out))
     return false;
 
-  out << gauss_dist_.size() << std::endl;
+  out << gauss_dist_.size() << '\n';
   for (const auto g : gauss_dist_)
     if (!g.save(out))
       return false;
@@ -811,9 +811,9 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 {
-  out << classes_ << std::endl;
+  out << classes_ << '\n';
 
-  out << team_.size() << std::endl;
+  out << team_.size() << '\n';
   for (const auto &i : team_)
     if (!i.save(out))
       return false;

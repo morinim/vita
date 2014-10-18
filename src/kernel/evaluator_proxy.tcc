@@ -63,7 +63,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
     const fitness_t f1((*eva_)(prg));
     if (!almost_equal(f[0], f1[0]))
       std::cerr << "********* COLLISION ********* [" << f << " != " << f1
-                << "]" << std::endl;
+                << "]\n";
 
     // In the above comparison we consider only the first component of the
     // fitness otherwise we can have false positives.

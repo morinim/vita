@@ -193,17 +193,17 @@ bool distribution<T>::save(std::ostream &out) const
 {
   SAVE_FLAGS(out);
 
-  out << count() << std::endl
+  out << count() << '\n'
       << std::fixed << std::scientific
       << std::setprecision(std::numeric_limits<T>::digits10 + 1)
-      << mean() << std::endl
-      << min()  << std::endl
-      << max()  << std::endl
-      << m2_ << std::endl;
+      << mean() << '\n'
+      << min()  << '\n'
+      << max()  << '\n'
+      << m2_ << '\n';
 
-  out << seen().size() << std::endl;
+  out << seen().size() << '\n';
   for (const auto &elem : seen())
-    out << elem.first << ' ' << elem.second << std::endl;
+    out << elem.first << ' ' << elem.second << '\n';
 
   return out.good();
 }
@@ -287,7 +287,7 @@ bool distribution<T>::debug(bool verbose) const
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: min=" << min() << " > mean="
-                << mean() << "." << std::endl;
+                << mean() << ".\n";
     return false;
   }
 
@@ -295,15 +295,14 @@ bool distribution<T>::debug(bool verbose) const
   {
     if (verbose)
       std::cerr << k_s_debug << " Distribution: max=" << max() << " < mean="
-                << mean() << "." << std::endl;
+                << mean() << ".\n";
     return false;
   }
 
   if (count() && (isnan(variance()) || !isnonnegative(variance())))
   {
     if (verbose)
-      std::cerr << k_s_debug << " Distribution: negative variance."
-                << std::endl;
+      std::cerr << k_s_debug << " Distribution: negative variance.\n";
     return false;
   }
 

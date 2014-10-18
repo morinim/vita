@@ -79,7 +79,7 @@ void basic_alps_es<T, SS, CS, RS>::log(unsigned last_run,
     if (f_lys.good())
     {
       if (last_run != current_run)
-        f_lys << std::endl << std::endl;
+        f_lys << "\n\n";
 
       const auto layers(pop.layers());
       for (auto l(decltype(layers){0}); l < layers; ++l)
@@ -100,7 +100,7 @@ void basic_alps_es<T, SS, CS, RS>::log(unsigned last_run,
               << ' ' << this->sum_->az.fit_dist(l).standard_deviation()
               << ' ' << this->sum_->az.fit_dist(l).min()
               << '-' << this->sum_->az.fit_dist(l).max()
-              << ' ' << pop.individuals(l) << std::endl;
+              << ' ' << pop.individuals(l) << '\n';
       }
     }
   }

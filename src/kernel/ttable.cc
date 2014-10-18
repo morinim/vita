@@ -39,7 +39,7 @@ namespace vita
   ///
   bool hash_t::save(std::ostream &out) const
   {
-    out << data[0] << ' ' << data[1] << std::endl;
+    out << data[0] << ' ' << data[1] << '\n';
 
     return out.good();
   }
@@ -230,13 +230,13 @@ namespace vita
   ///
   bool ttable::save(std::ostream &out) const
   {
-    out << seal_ << ' ' << probes_ << ' ' << hits_ << std::endl;
+    out << seal_ << ' ' << probes_ << ' ' << hits_ << '\n';
 
     std::size_t num(0);
     for (const auto &s : table_)
       if (!s.hash.empty())
         ++num;
-    out << num << std::endl;
+    out << num << '\n';
 
     for (const auto &s : table_)
       if (!s.hash.empty())
@@ -247,7 +247,7 @@ namespace vita
 #if defined(CLONE_SCALING)
         out << ' ' << s.seen;
 #endif
-        out << std::endl;
+        out << '\n';
       }
 
     return out.good();

@@ -87,9 +87,9 @@ void src_search<T, ES>::arl(const U &base)
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
       const symbol &f(*this->prob_.sset.get_adt(i));
-      adf_log << f.display() << ' ' << f.weight << std::endl;
+      adf_log << f.display() << ' ' << f.weight << '\n';
     }
-    adf_log << std::endl;
+    adf_log << '\n';
   }
 
   const unsigned adf_args(0);
@@ -132,9 +132,9 @@ void src_search<T, ES>::arl(const U &base)
           adf_log << p->display() << " (Base: " << base_fit
                   << "  DF: " << delta
                   << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-                  << "%)" << std::endl;
+                  << "%)\n";
           candidate_block.list(adf_log);
-          adf_log << std::endl;
+          adf_log << '\n';
         }
 
         this->prob_.sset.insert(std::move(p));
@@ -221,7 +221,7 @@ void src_search<T, ES>::tune_parameters_nvi()
     this->env_.dss = d_size > 400;
 
     if (this->env_.verbosity >= 2)
-      std::cout << k_s_info << " DSS set to " << this->env_.dss << std::endl;
+      std::cout << k_s_info << " DSS set to " << this->env_.dss << '\n';
   }
 
   if (!constrained.layers)
@@ -233,7 +233,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 
     if (this->env_.verbosity >= 2)
       std::cout << k_s_info << " Number of layers set to " << this->env_.layers
-                << std::endl;
+                << '\n';
   }
 
   // A larger number of training cases requires an increase in the population
@@ -260,7 +260,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 
     if (this->env_.verbosity >= 2)
       std::cout << k_s_info << " Population size set to "
-                << this->env_.individuals << std::endl;
+                << this->env_.individuals << '\n';
   }
 
   // Note that this setting, once set, will not be changed.
@@ -279,7 +279,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 
     if (this->env_.verbosity >= 2)
       std::cout << k_s_info << " Validation percentage set to "
-                << this->env_.validation_percentage << '%' << std::endl;
+                << this->env_.validation_percentage << "%\n";
   }
 
   if (!constrained.tournament_size)
@@ -519,11 +519,11 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
   {
     const std::string ds(validation ? " Validation" : " Training");
 
-    std::cout << k_s_info << ds << " fitness: " << fit << std::endl;
+    std::cout << k_s_info << ds << " fitness: " << fit << '\n';
     if (this->env_.a_threashold >= 0.0)
       std::cout << k_s_info << ds << " accuracy: " << 100.0 * acc << '%';
 
-    std::cout << std::endl << std::endl;
+    std::cout << "\n\n";
   }
 }
 
@@ -606,7 +606,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 
     std::ofstream tf(this->env_.stat_dir + "/" + environment::tst_filename);
     for (const auto &example : data)
-      tf << lambda->name((*lambda)(example)) << std::endl;
+      tf << lambda->name((*lambda)(example)) << '\n';
 
     data.dataset(backup);
   }
@@ -687,16 +687,14 @@ bool src_search<T, ES>::debug_nvi(bool verbose) const
   if (p_symre == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred sym.reg. evaluator."
-                << std::endl;
+      std::cerr << "Undefined ID for preferred sym.reg. evaluator.\n";
     return false;
   }
 
   if (p_class == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred classification evaluator."
-                << std::endl;
+      std::cerr << "Undefined ID for preferred classification evaluator.\n";
     return false;
   }
 

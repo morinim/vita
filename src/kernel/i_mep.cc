@@ -440,7 +440,7 @@ namespace vita
         {
           if (verbose)
             std::cerr << k_s_debug << " Empty symbol pointer at locus " << l
-                      << '.' << std::endl;
+                      << ".\n";
           return false;
         }
 
@@ -449,8 +449,7 @@ namespace vita
         if (arity > gene::k_args)
         {
           if (verbose)
-            std::cerr << k_s_debug << "Function arity exceeds maximum size."
-                      << std::endl;
+            std::cerr << k_s_debug << "Function arity exceeds maximum size.\n";
           return false;
         }
 
@@ -461,8 +460,7 @@ namespace vita
           if (genome_(l).args[j] >= size())
           {
             if (verbose)
-              std::cerr << k_s_debug << " Argument is out of range."
-                        << std::endl;
+              std::cerr << k_s_debug << " Argument is out of range.\n";
             return false;
           }
 
@@ -470,8 +468,8 @@ namespace vita
           if (genome_(l).args[j] <= i)
           {
             if (verbose)
-              std::cerr << k_s_debug << " Self reference in locus " << l << '.'
-                        << std::endl;
+              std::cerr << k_s_debug << " Self reference in locus " << l
+                        << ".\n";
             return false;
           }
         }
@@ -482,7 +480,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << k_s_debug << " Last symbol of type " << c
-                    << " in the genome isn't a terminal." << std::endl;
+                    << " in the genome isn't a terminal.\n";
         return false;
       }
 
@@ -498,7 +496,7 @@ namespace vita
             std::cerr << k_s_debug << " Wrong category: " << l
                       << genome_(l).sym->display() << " -> "
                       << genome_(l).sym->category() << " should be " << c
-                      << std::endl;
+                      << '\n';
           return false;
         }
       }
@@ -506,16 +504,15 @@ namespace vita
     if (best_.index >= size())
     {
       if (verbose)
-        std::cerr << k_s_debug << " Incorrect index for first active symbol."
-                  << std::endl;
+        std::cerr << k_s_debug
+                  << " Incorrect index for first active symbol.\n";
       return false;
     }
     if (best_.category >= categories)
     {
       if (verbose)
         std::cerr << k_s_debug
-                  << " Incorrect category for first active symbol."
-                  << std::endl;
+                  << " Incorrect category for first active symbol.\n";
       return false;
     }
 
@@ -524,7 +521,7 @@ namespace vita
       if (verbose)
         std::cerr << k_s_debug
                   << "eff_size() cannot be greater than size() in single " \
-                     "category individuals." << std::endl;
+                     "category individuals.\n";
       return false;
     }
 
@@ -636,7 +633,7 @@ namespace vita
             << ')';
       }
 
-      s << std::endl;
+      s << '\n';
     }
 
     return s;
@@ -658,7 +655,7 @@ namespace vita
         genome_(parent).sym != g.sym)
     {
       std::string spaces(indent, ' ');
-      s << spaces << g << std::endl;
+      s << spaces << g << '\n';
       indent += 2;
     }
 
@@ -710,7 +707,7 @@ namespace vita
           s << '}';
       }
 
-      s << std::endl;
+      s << '\n';
     }
 
     return s;
@@ -796,9 +793,9 @@ namespace vita
   ///
   bool i_mep::save(std::ostream &out) const
   {
-    out << age() << ' ' << best_.index << ' ' << best_.category << std::endl;
+    out << age() << ' ' << best_.index << ' ' << best_.category << '\n';
 
-    out << genome_.rows() << ' ' << genome_.cols() << std::endl;
+    out << genome_.rows() << ' ' << genome_.cols() << '\n';
     for (const auto &g : genome_)
     {
       out << g.sym->opcode();
@@ -810,7 +807,7 @@ namespace vita
       for (auto i(decltype(arity){0}); i < arity; ++i)
         out << ' ' << g.args[i];
 
-      out << std::endl;
+      out << '\n';
     }
 
     return out.good();

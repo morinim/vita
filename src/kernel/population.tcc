@@ -292,8 +292,7 @@ bool population<T>::debug(bool verbose) const
   {
     if (verbose)
       std::cerr << k_s_debug
-                << "Number of layers doesn't match allowed array size."
-                << std::endl;
+                << "Number of layers doesn't match allowed array size.\n";
     return false;
   }
 
@@ -356,11 +355,11 @@ bool population<T>::save(std::ostream &out) const
 {
   const auto n(layers());
 
-  out << n << std::endl;
+  out << n << '\n';
 
   for (auto l(decltype(n){0}); l < n; ++l)
   {
-    out << allowed(l) << ' ' << individuals(l) << std::endl;
+    out << allowed(l) << ' ' << individuals(l) << '\n';
 
     for (const auto &prg : pop_[l])
       prg.save(out);
@@ -398,11 +397,11 @@ std::ostream &operator<<(std::ostream &s, const population<T> &pop)
 
   for (const auto &l : pop)
   {
-    s << std::string(70, '-') << std::endl << "Layer " << n_layer
-      << std::string(70, '-') << std::endl;
+    s << std::string(70, '-') << "\nLayer " << n_layer
+      << std::string(70, '-') << '\n';
 
     for (const auto &i : l)
-      s << i << std::endl;
+      s << i << '\n';
 
     ++n_layer;
   }

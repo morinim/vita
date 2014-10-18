@@ -195,10 +195,10 @@ bool matrix<T>::save(std::ostream &out) const
   static_assert(std::is_integral<T>::value,
                 "matrix::save doesn't support non-integral types");
 
-  out << cols() << ' ' << rows() << std::endl;
+  out << cols() << ' ' << rows() << '\n';
 
   for (const auto &e : data_)
-    out << e << std::endl;
+    out << e << '\n';
 
   return out.good();
 }
@@ -253,11 +253,9 @@ std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
 
   for (const auto &e : m)
   {
-    o << e;
-    if (i && (i % m.cols()) == 0)
-      o << std::endl;
-    else
-      o << ' ';
+    o << e << (i && (i % m.cols()) == 0 ? '\n' : ' ');
+
+    ++i;
   }
 
   return o;

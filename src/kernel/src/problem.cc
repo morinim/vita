@@ -248,11 +248,11 @@ namespace vita
     read_xml(s_file, pt);
 
 #if !defined(NDEBUG)
-    std::cout << std::endl << std::endl;
+    std::cout << "\n\n";
 
     for (const category &c : dat_.categories())
-      std::cout << k_s_debug << ' ' << c << std::endl;
-    std::cout << std::endl;
+      std::cout << k_s_debug << ' ' << c << '\n';
+    std::cout << '\n';
 #endif
 
     symbol_factory &factory(symbol_factory::instance());
@@ -290,7 +290,7 @@ namespace vita
                   for (const auto &j : seq)
                     std::cout << dat_.categories().find(j).name
                               << (&j == &seq.back() ? ")" : ", ");
-                  std::cout << std::endl;
+                  std::cout << '\n';
 #endif
                   sset.insert(factory.make(sym_name, seq));
                 }
@@ -308,7 +308,7 @@ namespace vita
               for (auto j(decltype(n_args){0}); j < n_args; ++j)
                 std::cout << dat_.categories().find(tag).name
                           << (j + 1 == n_args ? ")" : ", ");
-              std::cout << std::endl;
+              std::cout << '\n';
 #endif
               sset.insert(factory.make(sym_name, cvect(n_args, tag)));
             }

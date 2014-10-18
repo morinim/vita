@@ -27,7 +27,7 @@ namespace term
     const bool stop(kbhit() && std::cin.get() == '.');
 
     if (stop)
-      std::cout << k_s_info << " Stopping evolution..." << std::endl;
+      std::cout << k_s_info << " Stopping evolution...\n";
 
     return stop;
   }
@@ -161,7 +161,7 @@ void evolution<T, ES>::log(unsigned run_count) const
     if (f_dyn.good())
     {
       if (last_run != run_count)
-        f_dyn << std::endl << std::endl;
+        f_dyn << "\n\n";
 
       f_dyn << run_count << ' ' << stats_.gen;
 
@@ -192,7 +192,7 @@ void evolution<T, ES>::log(unsigned run_count) const
       f_dyn << " \"";
       if (stats_.best)
         stats_.best->ind.in_line(f_dyn);
-      f_dyn << '"' << std::endl;
+      f_dyn << "\"\n";
     }
   }
 
@@ -203,7 +203,7 @@ void evolution<T, ES>::log(unsigned run_count) const
     if (f_pop.good())
     {
       if (last_run != run_count)
-        f_pop << std::endl << std::endl;
+        f_pop << "\n\n";
 
       for (const auto &f : stats_.az.fit_dist().seen())
         // f.first: value, f.second: frequency
@@ -211,7 +211,7 @@ void evolution<T, ES>::log(unsigned run_count) const
               << std::fixed << std::scientific
               << std::setprecision(
                    std::numeric_limits<fitness_t::value_type>::digits10 + 2)
-              << f.first[0] << ' ' << f.second << std::endl;
+              << f.first[0] << ' ' << f.second << '\n';
     }
   }
 
@@ -239,7 +239,7 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
       std::cout << "Run " << run_count << '.' << std::setw(6)
                 << stats_.gen << " (" << std::setw(3)
                 << perc << "%): fitness " << stats_.best->fitness
-                << std::endl;
+                << '\n';
     else
       std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
                 << std::setw(3) << perc << "%)\r" << std::flush;
@@ -325,7 +325,7 @@ evolution<T, ES>::run(unsigned run_count)
   if (env().verbosity >= 2)
     std::cout << k_s_info << " Elapsed time: "
               << stats_.elapsed / 1000.0 << "s" << std::string(10, ' ')
-              << std::endl;
+              << '\n';
 
   term::reset();
   return stats_;

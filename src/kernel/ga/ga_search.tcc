@@ -135,7 +135,7 @@ void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
   if (this->env_.verbosity >= 2)
   {
     std::cout << k_s_info << " Fitness: " << fit
-              << std::endl << std::endl << std::endl;
+              << "\n\n\n";
   }
 }
 

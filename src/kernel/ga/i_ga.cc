@@ -87,7 +87,7 @@ namespace vita
       assert(i == g.sym->category());
 
       s << '[' << std::setfill('0') << std::setw(w) << i++ << "] " << g
-        << std::endl;
+        << '\n';
     }
 
     return s;
@@ -358,7 +358,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << k_s_debug << " Empty symbol pointer at position " << i
-                    << '.' << std::endl;
+                    << ".\n";
         return false;
       }
 
@@ -366,7 +366,7 @@ namespace vita
       {
         if (verbose)
           std::cerr << k_s_debug << " Not-terminal symbol at position "
-                    << i << '.' << std::endl;
+                    << i << ".\n";
 
         return false;
       }
@@ -377,7 +377,7 @@ namespace vita
           std::cerr << k_s_debug << " Wrong category: " << i
                     << genome_[i].sym->display() << " -> "
                     << genome_[i].sym->category() << " should be " << i
-                    << std::endl;
+                    << '\n';
         return false;
       }
 
@@ -387,7 +387,7 @@ namespace vita
     {
       if (verbose)
         std::cerr << k_s_debug << " Wrong signature: " << signature_
-                  << " should be " << hash() << std::endl;
+                  << " should be " << hash() << '\n';
       return false;
     }
 
@@ -445,11 +445,11 @@ namespace vita
   ///
   bool i_ga::save(std::ostream &out) const
   {
-    out << age() << std::endl;
+    out << age() << '\n';
 
-    out << parameters() << std::endl;
+    out << parameters() << '\n';
     for (const auto &g : genome_)
-      out << g.sym->opcode() << ' ' << g.par << std::endl;
+      out << g.sym->opcode() << ' ' << g.par << '\n';
 
     return out.good();
   }
