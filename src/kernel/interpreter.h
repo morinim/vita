@@ -13,9 +13,6 @@
 #if !defined(VITA_MEP_INTERPRETER_H)
 #define      VITA_MEP_INTERPRETER_H
 
-#include <boost/optional.hpp>
-#include <boost/none.hpp>
-
 #include "kernel/core_interpreter.h"
 #include "kernel/function.h"
 #include "kernel/matrix.h"
@@ -74,7 +71,8 @@ namespace vita
     // null and assignment between interpreters is a rare scenario.
     const T &prg_;
 
-    mutable matrix<boost::optional<any>> cache_;
+    struct elem_ {bool valid; any value;};
+    mutable matrix<elem_> cache_;
 
     // Instruction pointer.
     locus ip_;

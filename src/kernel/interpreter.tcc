@@ -41,7 +41,8 @@ interpreter<T>::interpreter(const T *ind, interpreter<T> *ctx)
 template<class T>
 any interpreter<T>::run_locus(const locus &ip)
 {
-  cache_.fill(boost::none);
+  for (auto &e : cache_)
+    e.valid = false;
 
   ip_ = ip;
   return prg_[ip_].sym->eval(this);
@@ -92,31 +93,34 @@ any interpreter<T>::fetch_arg(unsigned i)
   assert(i < g.sym->arity());
 
   const function &f(*function::cast(g.sym));
-
   const locus l{g.args[i], f.arg_category(i)};
 
-  if (!cache_(l))
+  const auto get_val([&]()
+                     {
+                       const locus backup(ip_);
+                       ip_ = l;
+                       assert(ip_.index > backup.index);
+                       const auto ret(prg_[ip_].sym->eval(this));
+                       ip_ = backup;
+                       return ret;
+                     });
+
+  auto &elem(cache_(l));
+
+  if (!elem.valid)
   {
-    const locus backup(ip_);
-    ip_ = l;
-    assert(ip_.index > backup.index);
-    cache_(l) = prg_[ip_].sym->eval(this);
-    ip_ = backup;
+    elem.value = get_val();
+    elem.valid = true;
   }
 #if !defined(NDEBUG)
   else // Cache not empty... checking if the cached value is right.
   {
-    const locus backup(ip_);
-    ip_ = l;
-    assert(ip_.index > backup.index);
-    const any ret(prg_[ip_].sym->eval(this));
-    ip_ = backup;
-    assert(to<std::string>(ret) == to<std::string>(*cache_(l)));
+    assert(to<std::string>(get_val()) == to<std::string>(elem.value));
   }
 #endif
 
-  assert(cache_(l));
-  return *cache_(l);
+  assert(elem.valid);
+  return elem.value;
 }
 
 ///
