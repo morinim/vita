@@ -17,30 +17,40 @@
 
 namespace vita
 {
-  ///
-  /// \brief A bidimensional array.
-  ///
-  /// There are a lot of alternatives but this is *slim* and *fast*:
-  /// * std::vector<std::vector<T>> is slow;
-  /// * boost uBLAS and boost.MultiArray are good, general solutions but a bit
-  ///   oversized for our needs;
-  ///
-  /// The idea is to use a vector and translate the 2 dimensions to one
-  /// dimension (matrix::index() method). This way the whole thing is stored in
-  /// a single memory block instead of in several fragmented blocks for each
-  /// row.
-  ///
+///
+/// \brief A bidimensional array.
+///
+/// There are a lot of alternatives but this is *slim* and *fast*:
+/// * std::vector<std::vector<T>> is slow;
+/// * boost uBLAS and boost.MultiArray are good, general solutions but a bit
+///   oversized for our needs;
+///
+/// The idea is to use a vector and translate the 2 dimensions to one
+/// dimension (matrix::index() method). This way the whole thing is stored in
+/// a single memory block instead of in several fragmented blocks for each
+/// row.
+///
+/// \note
+/// This class is based on \c std::vector. So although \c matrix<bool> will
+/// work, you could prefer \c matrix<char> for performance reasons
+/// (\c std::vector<bool> is a "peculiar" specialization).
+///
   template<class T>
   class matrix
   {
+  public:  // Member types
+    using value_type = T;
+    using reference = typename std::vector<T>::reference;
+    using const_reference = typename std::vector<T>::const_reference;
+
   public:
     matrix();
     matrix(unsigned, unsigned);
 
-    const T &operator()(const locus &) const;
-    T &operator()(const locus &);
-    const T &operator()(unsigned, unsigned) const;
-    T &operator()(unsigned, unsigned);
+    const_reference operator()(const locus &) const;
+    reference operator()(const locus &);
+    const_reference operator()(unsigned, unsigned) const;
+    reference operator()(unsigned, unsigned);
 
     void fill(const T &);
 

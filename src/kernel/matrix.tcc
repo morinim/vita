@@ -57,7 +57,7 @@ unsigned matrix<T>::index(unsigned r, unsigned c) const
 /// \return an element of the matrix.
 ///
 template<class T>
-const T &matrix<T>::operator()(const locus &l) const
+typename matrix<T>::const_reference matrix<T>::operator()(const locus &l) const
 {
   return data_[index(l.index, l.category)];
 }
@@ -67,8 +67,9 @@ const T &matrix<T>::operator()(const locus &l) const
 /// \return an element of the matrix.
 ///
 template<class T>
-T &matrix<T>::operator()(const locus &l)
+typename matrix<T>::reference matrix<T>::operator()(const locus &l)
 {
+  // DO NOT CHANGE THE RETURN TYPE WITH T (the method won't work for T == bool)
   return data_[index(l.index, l.category)];
 }
 
@@ -78,7 +79,8 @@ T &matrix<T>::operator()(const locus &l)
 /// \return an element of the matrix.
 ///
 template<class T>
-const T &matrix<T>::operator()(unsigned r, unsigned c) const
+typename matrix<T>::const_reference matrix<T>::operator()(unsigned r,
+                                                          unsigned c) const
 {
   return data_[index(r, c)];
 }
@@ -89,8 +91,9 @@ const T &matrix<T>::operator()(unsigned r, unsigned c) const
 /// \return an element of the matrix.
 ///
 template<class T>
-T &matrix<T>::operator()(unsigned r, unsigned c)
+typename matrix<T>::reference matrix<T>::operator()(unsigned r, unsigned c)
 {
+  // DO NOT CHANGE THE RETURN TYPE WITH T (the method won't work for T == bool)
   return data_[index(r, c)];
 }
 
