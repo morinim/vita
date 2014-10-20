@@ -51,7 +51,7 @@ endif
 # This should work in POSIX compliant environment (see "The Open Group Base
 # Specifications Issue 7" and
 # <http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html>)
-INCPATH := ../vita/ ./
+INCPATH := ../src/ ./
 SYSTEMINCPATH := $(BOOST_INCLUDE)
 
 # -Wsign-conversion -Weffc++ are other interesting warning
