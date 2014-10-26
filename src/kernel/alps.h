@@ -17,25 +17,26 @@
 
 namespace vita
 {
-  ///
-  /// alps namespace contains some support functions for the ALPS algorithm
-  ///
-  namespace alps
-  {
-    unsigned max_age(unsigned, unsigned, unsigned);
+///
+/// alps namespace contains some support functions for the ALPS algorithm
+///
+namespace alps
+{
+  unsigned max_age(unsigned, unsigned, unsigned);
 
-    ///
-    /// \param[in] p the population.
-    /// \param[in] c the coordinates of an individual.
-    /// \return \c true if the individual at coordinates \c is too old for his
-    ///         layer.
-    ///
-    /// This is just a convenience method to save some keystroke.
-    ///
-    template<class T> bool aged(const population<T> &p, coord c)
-    {
-      return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
-    }
+  ///
+  /// \param[in] p the population.
+  /// \param[in] c the coordinates of an individual.
+  /// \return \c true if the individual at coordinates \c is too old for his
+  ///         layer.
+  ///
+  /// This is just a convenience method to save some keystroke.
+  ///
+  template<class T> bool aged(const population<T> &p, coord c)
+  {
+    return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
+  }
+
   }  // namespace alps
 }  // namespace vita
 
