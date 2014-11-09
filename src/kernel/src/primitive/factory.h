@@ -56,7 +56,7 @@ namespace vita
     using build_func = std::unique_ptr<symbol> (*)(const cvect &);
 
     template<class T> static std::unique_ptr<symbol> build(const cvect &c)
-    { return make_unique<T>(c); }
+    { return vita::make_unique<T>(c); }
 
   private:  // Private data members
     using map_key = std::string;

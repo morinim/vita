@@ -82,8 +82,8 @@ template<class T, template<class> class ES>
 void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 {
   if (env_.ttable_size)
-    active_eva_ = make_unique<evaluator_proxy<T>>(std::move(e),
-                                                  env_.ttable_size);
+    active_eva_ = vita::make_unique<evaluator_proxy<T>>(std::move(e),
+                                                        env_.ttable_size);
   else
     active_eva_ = std::move(e);
 }

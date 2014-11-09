@@ -122,10 +122,10 @@ void src_search<T, ES>::arl(const U &base)
           for (const auto &replaced : generalized.second)
             categories.push_back(replaced.category);
 
-          p = make_unique<adf>(generalized.first, categories, 10u);
+          p = vita::make_unique<adf>(generalized.first, categories, 10u);
         }
         else  // !adf_args
-          p = make_unique<adt>(candidate_block, 100u);
+          p = vita::make_unique<adt>(candidate_block, 100u);
 
         if (this->env_.stat_arl && adf_log.good())
         {
@@ -631,7 +631,8 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::bin:
-      search<T, ES>::set_evaluator(make_unique<binary_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<binary_evaluator<T>>(data));
       return true;
 
     case evaluator_id::dyn_slot:
@@ -639,12 +640,13 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
         search<T, ES>::set_evaluator(
-          make_unique<dyn_slot_evaluator<T>>(data, x_slot));
+          vita::make_unique<dyn_slot_evaluator<T>>(data, x_slot));
       }
       return true;
 
     case evaluator_id::gaussian:
-      search<T, ES>::set_evaluator(make_unique<gaussian_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<gaussian_evaluator<T>>(data));
       return true;
 
     default:
@@ -656,19 +658,23 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::count:
-      search<T, ES>::set_evaluator(make_unique<count_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<count_evaluator<T>>(data));
       return true;
 
     case evaluator_id::mae:
-      search<T, ES>::set_evaluator(make_unique<mae_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<mae_evaluator<T>>(data));
       return true;
 
     case evaluator_id::rmae:
-      search<T, ES>::set_evaluator(make_unique<rmae_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<rmae_evaluator<T>>(data));
       return true;
 
     case evaluator_id::mse:
-      search<T, ES>::set_evaluator(make_unique<mse_evaluator<T>>(data));
+      search<T, ES>::set_evaluator(
+	    vita::make_unique<mse_evaluator<T>>(data));
       return true;
 
     default:

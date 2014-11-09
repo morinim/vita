@@ -146,13 +146,13 @@ namespace vita
     switch (find_domain(k))
     {
     case domain_t::d_bool:
-      return make_unique<constant<bool>>(k, c[0]);
+      return vita::make_unique<constant<bool>>(k, c[0]);
     case domain_t::d_double:
-      return make_unique<constant<double>>(k, c[0]);
+      return vita::make_unique<constant<double>>(k, c[0]);
     case domain_t::d_int:
-      return make_unique<constant<int>>(k, c[0]);
+      return vita::make_unique<constant<int>>(k, c[0]);
     case domain_t::d_string:
-      return make_unique<constant<std::string>>(name, c[0]);
+      return vita::make_unique<constant<std::string>>(name, c[0]);
     default:
       return nullptr;
     }
@@ -175,9 +175,9 @@ namespace vita
     switch (d)
     {
     case domain_t::d_double:
-      return make_unique<dbl::integer>(cvect{c}, min, max);
+      return vita::make_unique<dbl::integer>(cvect{c}, min, max);
     case domain_t::d_int:
-      return make_unique<integer::number>(cvect{c}, min, max);
+      return vita::make_unique<integer::number>(cvect{c}, min, max);
     default:
       return nullptr;
     }

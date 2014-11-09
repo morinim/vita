@@ -105,7 +105,7 @@ namespace vita
     inline std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
                                              base_t u = 1000.0)
     {
-      return make_unique<real>(cvect{i}, m, u);
+      return vita::make_unique<real>(cvect{i}, m, u);
     }
   }  // namespace ga
 }  // namespace vita
