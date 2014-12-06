@@ -29,10 +29,13 @@ namespace vita
   template<class T>
   class basic_fitness_t
   {
-  public:
+  private:
+    using values_t = std::vector<T>;
+
+  public:  // Type alias and iterators
     using value_type = T;
-    using iterator = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    using iterator = typename values_t::iterator;
+    using const_iterator = typename values_t::const_iterator;
 
     explicit basic_fitness_t(unsigned = 1,
                              T = std::numeric_limits<T>::lowest());
@@ -68,8 +71,8 @@ namespace vita
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
-  private:
-    std::vector<T> vect_;
+  private:  // Private data members
+    values_t vect_;
   };
 
   template<class T> bool isfinite(const basic_fitness_t<T> &);
