@@ -49,16 +49,10 @@ namespace vita
   class population
   {
   public:
-    using layer_t = std::vector<T>;
-    using const_iterator = typename std::vector<layer_t>::const_iterator;
-
     population(const environment &, const symbol_set &);
 
     T &operator[](coord);
     const T &operator[](coord) const;
-
-    const_iterator begin() const;
-    const_iterator end() const;
 
     unsigned allowed(unsigned) const;
     unsigned individuals() const;
@@ -76,6 +70,13 @@ namespace vita
     const environment &env() const;
 
     bool debug(bool) const;
+
+  public:  // Iterators
+    using layer_t = std::vector<T>;
+    using const_iterator = typename std::vector<layer_t>::const_iterator;
+
+    const_iterator begin() const;
+    const_iterator end() const;
 
   public:   // Serialization
     bool load(std::istream &);
