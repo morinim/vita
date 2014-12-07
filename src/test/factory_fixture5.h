@@ -27,7 +27,7 @@ struct F_FACTORY5
 
     for (unsigned i(0); i < n; ++i)
     {
-      sset.insert(vita::ga::parameter(i, -v, +v));
+      sset.insert(vita::ga::parameter<>(i, -v, +v));
       v *= 10.0;
     }
   }

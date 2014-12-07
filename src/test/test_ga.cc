@@ -130,8 +130,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 
   vita::problem prob;
   prob.env = env;
-  prob.sset.insert(vita::ga::parameter(0, 0.0, 6.0));
-  prob.sset.insert(vita::ga::parameter(1, 0.0, 6.0));
+  prob.sset.insert(vita::ga::parameter<>(0, 0.0, 6.0));
+  prob.sset.insert(vita::ga::parameter<>(1, 0.0, 6.0));
 
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
