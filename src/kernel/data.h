@@ -36,14 +36,18 @@ namespace vita
   ///
   class data
   {
-  public:  // Structures and type alias
+  public:  // Structures
     struct example;
     struct column;
 
+  private:
+    using examples_t = std::vector<example>;
+
+  public:  // Iterators
     /// example *
-    using iterator = typename std::vector<example>::iterator;
+    using iterator = typename examples_t::iterator;
     /// const example *
-    using const_iterator = typename std::vector<example>::const_iterator;
+    using const_iterator = typename examples_t::const_iterator;
 
     enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
@@ -121,7 +125,7 @@ namespace vita
     /// The user provides a dataset and (optionally) a test set. Training set
     /// and validation set are automatically created from the dataset
     /// (see environment::validation_ratio).
-    std::vector<std::vector<example>> dataset_;
+    std::vector<examples_t> dataset_;
 
     /// Used to keep track of subset of the dataset.
     std::vector<std::size_t> slice_;

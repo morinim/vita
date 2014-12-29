@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief A bidimensional array.
+/// \brief A bidimensional array
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
 /// * std::vector<std::vector<T>> is slow;
@@ -38,10 +38,13 @@ namespace vita
   template<class T>
   class matrix
   {
-  public:  // Member types
+  private:
+    using values_t = std::vector<T>;
+
+  public:  // Type alias
     using value_type = T;
-    using reference = typename std::vector<T>::reference;
-    using const_reference = typename std::vector<T>::const_reference;
+    using reference = typename values_t::reference;
+    using const_reference = typename values_t::const_reference;
 
   public:
     matrix();
@@ -60,8 +63,8 @@ namespace vita
     unsigned cols() const;
 
   public:  // Iterators
-    using iterator = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    using iterator = typename values_t::iterator;
+    using const_iterator = typename values_t::const_iterator;
 
     iterator begin();
     const_iterator begin() const;
@@ -77,7 +80,7 @@ namespace vita
     unsigned index(unsigned, unsigned) const;
 
   private:  // Private data members
-    std::vector<T> data_;
+    values_t data_;
 
     unsigned cols_;
   };

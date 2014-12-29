@@ -32,7 +32,8 @@ def check_commit_message(ui, repo, **kwargs):
     """
     hg_commit_message = repo['tip'].description()
     if check_message(hg_commit_message) == True:
-        ui.warn("Commit message:[" + hg_commit_message + "] doesn't adhere to commit message rules\n")
+        ui.warn("Commit message:[" + hg_commit_message +
+                "] doesn't adhere to commit message rules\n")
         # print_usage(ui)
         return True
     else:
@@ -48,7 +49,8 @@ def check_all_commit_message(ui, repo, node, **kwargs):
     for rev in xrange(repo[node].rev(), len(repo)):
         message = repo[rev].description()
         if check_message(message) == True:
-            ui.warn("Revision " + str(rev) + " commit message:[" + message + "] doesn't adhere to commit message rules\n")
+            ui.warn("Revision " + str(rev) + " commit message:[" +
+                    message + "] doesn't adhere to commit message rules\n")
             # print_usage(ui)
             return True
     return False
@@ -56,18 +58,18 @@ def check_all_commit_message(ui, repo, node, **kwargs):
 def check_message(msg):
     """
     Check a single commit message for adherence to Vita message rules.
-    
+
     Every commit summary must start with one (or more) of the following
     tags. This should help others to easily classify the commits into
-    meaningful categories: 
+    meaningful categories:
     * [FIX] bug fix
     * [ADD] new feature or extended functionality
-    * [DOC] for all kinds of documentation-only related commits 
-    * [REF] refactoring that doesn't include any changes in features 
+    * [DOC] for all kinds of documentation-only related commits
+    * [REF] refactoring that doesn't include any changes in features
     * [FMT] formatting only (spacing...)
-    * [TEST] related to test code only 
+    * [TEST] related to test code only
     These tags are always the first thing in the commit message and are
     followed by a brief description and/or the issue-id from the issue
-    tracking system, if it exists. 
+    tracking system, if it exists.
     """
     return re.match(r"\[(ADD|DOC|FIX|FMT|REF|TEST)\] ", msg) is None

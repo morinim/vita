@@ -20,9 +20,9 @@ namespace vita
 {
   ///
   /// \brief A collection of cooperating individuals used as a member of
-  ///        vita::population.
+  ///        vita::population
   ///
-  /// \tparam T type of the elements of the team (individuals).
+  /// \tparam T type of the elements of the team (individuals)
   ///
   /// In generals teams of individuals can be implemented in different ways.
   /// * Firstly, a certain number of individuals can be selected randomly from
@@ -67,9 +67,6 @@ namespace vita
     unsigned mutation(double);
     team<T> crossover(team<T>) const;
 
-    using const_iterator = typename std::vector<T>::const_iterator;
-    const_iterator begin() const;
-    const_iterator end() const;
     const T &operator[](unsigned) const;
 
     unsigned individuals() const;
@@ -88,6 +85,14 @@ namespace vita
 
     bool debug(bool = true) const;
 
+  private:
+    using members_t = std::vector<T>;
+
+  public:  // Iterators
+    using const_iterator = typename members_t::const_iterator;
+    const_iterator begin() const;
+    const_iterator end() const;
+
   public:   // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
@@ -96,7 +101,7 @@ namespace vita
     hash_t hash() const;
 
   private:  // Private data members
-    std::vector<T> individuals_;
+    members_t individuals_;
 
     mutable hash_t signature_;
   };
