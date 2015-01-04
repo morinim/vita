@@ -20,11 +20,8 @@
 ///
 /// Increments population's age and checks if it's time to add a new layer.
 ///
-template<class T,
-         template<class> class SS,
-         template<class> class CS,
-         template<class> class RS>
-void basic_alps_es<T, SS, CS, RS>::post_bookkeeping()
+template<class T, template<class> class CS>
+void basic_alps_es<T, CS>::post_bookkeeping()
 {
   const auto &sum(this->sum_);
   auto &pop(this->pop_);
@@ -65,12 +62,8 @@ void basic_alps_es<T, SS, CS, RS>::post_bookkeeping()
 /// Parameters from the environment:
 /// * env.stat_layers if \c false the method will not write any data.
 ///
-template<class T,
-         template<class> class SS,
-         template<class> class CS,
-         template<class> class RS>
-void basic_alps_es<T, SS, CS, RS>::log(unsigned last_run,
-                                       unsigned current_run) const
+template<class T, template<class> class CS>
+void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());

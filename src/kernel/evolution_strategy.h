@@ -122,11 +122,11 @@ public:  // Public data members
 ///
 /// \see <http://idesign.ucsc.edu/projects/alps.html>
 ///
-template<class T,
-         template<class> class SS,
-         template<class> class CS,
-         template<class> class RS>
-class basic_alps_es : public evolution_strategy<T, SS, CS, RS>
+template<class T, template<class> class CS>
+class basic_alps_es : public evolution_strategy<T,
+                                                selection::alps,
+                                                CS,
+                                                replacement::alps>
 {
 public:
   using basic_alps_es::evolution_strategy::evolution_strategy;
@@ -135,12 +135,9 @@ public:
   virtual void post_bookkeeping() override;
 };
 
-template<class T> using alps_es = basic_alps_es<T,
-                                                selection::alps,
-                                                recombination::base,
-                                                replacement::alps>;
+template<class T> using alps_es = basic_alps_es<T, recombination::base>;
 
-                                                ///
+///
 /// \brief Standard evolution strategy
 ///
 template<class T>
@@ -173,10 +170,7 @@ public:
 /// long/hard searches.
 ///
 template<class T>
-class de_alps_es : public basic_alps_es<T,
-                                     selection::alps,
-                                     recombination::de,
-                                     replacement::alps>
+class de_alps_es : public basic_alps_es<T, recombination::de>
 {
 public:
   using de_alps_es::basic_alps_es::basic_alps_es;
