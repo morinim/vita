@@ -17,41 +17,41 @@
 
 namespace vita
 {
-  ///
-  /// \brief A summary of evolution (results, statistics...)
-  ///
-  /// \tparam T type of individual.
-  ///
-  template<class T>
-  class summary
+///
+/// \brief A summary of evolution (results, statistics...)
+///
+/// \tparam T type of individual
+///
+template<class T>
+class summary
+{
+public:  // Constructor and support functions
+  summary();
+
+  void clear();
+
+public:   // Serialization
+  bool load(std::istream &, const environment &, const symbol_set &);
+  bool save(std::ostream &) const;
+
+public:  // Public data members
+  analyzer<T> az;
+
+  struct best_
   {
-  public:  // Constructor and support functions
-    summary();
-
-    void clear();
-
-  public:   // Serialization
-    bool load(std::istream &, const environment &, const symbol_set &);
-    bool save(std::ostream &) const;
-
-  public:  // Public data members
-    analyzer<T> az;
-
-    struct best_
-    {
-      T             ind;
-      fitness_t fitness;
-    };
-
-    boost::optional<best_> best;
-
-    /// Time (in milliseconds) elapsed from evolution beginning.
-    double elapsed;
-
-    std::uintmax_t crossovers, mutations;
-
-    unsigned gen, last_imp;
+    T             ind;
+    fitness_t fitness;
   };
+
+  boost::optional<best_> best;
+
+  /// Time (in milliseconds) elapsed from evolution beginning.
+  double elapsed;
+
+  std::uintmax_t crossovers, mutations;
+
+  unsigned gen, last_imp;
+};
 
 #include "kernel/evolution_summary.tcc"
 

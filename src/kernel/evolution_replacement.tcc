@@ -170,8 +170,8 @@ void alps<T>::try_move_up_layer(unsigned l)
 /// \param[in] layer a layer
 /// \param[in] incoming an individual
 ///
-/// We would like to add \a incoming in layer \a layer. The insertion will take
-/// place if:
+/// We would like to add \a incoming in layer \a layer. The insertion will
+/// take place if:
 /// * \a layer is not full or...
 /// * after a "kill tournament" selection, the worst individual found is
 ///   too old for \a layer while the incoming one is within the limits or...
