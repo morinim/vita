@@ -28,6 +28,7 @@ using namespace boost;
 #include "test_evolution.cc"
 #include "test_fitness.cc"
 #include "test_ga.cc"
+//#include "test_ga_perf.cc"
 #include "test_i_mep.cc"
 #include "test_i_ga.cc"
 #include "test_lambda.cc"
