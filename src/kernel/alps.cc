@@ -18,17 +18,11 @@ namespace vita {
 namespace alps {
 ///
 /// \param[in] l a layer.
-/// \param[in] n total number of layers for the current population.
 /// \param[in] age_gap see environment::age_gap data member.
 /// \return the maximum allowed age for an individual in layer \a l.
 ///
-unsigned max_age(unsigned l, unsigned n, unsigned age_gap)
+unsigned max_age(unsigned l, unsigned age_gap)
 {
-  assert(l < n);
-
-  if (l + 1 == n)
-    return std::numeric_limits<unsigned>::max();
-
   // This is a polynomial aging scheme.
   switch (l)
   {
@@ -72,6 +66,23 @@ unsigned max_age(unsigned l, unsigned n, unsigned age_gap)
   //   num1 = num3;
   // }
   // return num2;
+}
+
+///
+/// \param[in] l a layer.
+/// \param[in] n total number of layers for the current population.
+/// \param[in] age_gap see environment::age_gap data member.
+/// \return the maximum allowed age for an individual in layer \a l. For
+///         individuals in the last layer there isn't a age limit.
+///
+unsigned max_age(unsigned l, unsigned n, unsigned age_gap)
+{
+  assert(l < n);
+
+  if (l + 1 == n)
+    return std::numeric_limits<unsigned>::max();
+
+  return max_age(l, age_gap);
 }
 
 }  // namespace alps
