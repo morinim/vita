@@ -1,16 +1,7 @@
-# Further details / ideas:
-# * http://gpwiki.org/index.php/Makefile
-# * http://mad-scientist.net/make/autodep.html
-# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
-# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
-# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
-
-
-
-# Build type: debug, profile, release.
+# Build type: debug, profile, release
 TYPE := release
 
-# Compiler (clang++, g++)
+# Compiler: clang++, g++
 CXX := g++
 #CLANG := $(shell command -v clang++ >/dev/null; echo $$?)
 #ifeq ($(CLANG), 0)
@@ -177,3 +168,11 @@ backup:
 	@-if [ ! -e ../backup ]; then mkdir ../backup; fi;
 	@make clean
 	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.txz ../../vita
+
+
+# Further details / ideas:
+# * http://gpwiki.org/index.php/Makefile
+# * http://mad-scientist.net/make/autodep.html
+# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
+# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
+# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
