@@ -24,13 +24,13 @@ namespace vita
 {
 
 // Implementation details, user shouldn't import this.
-namespace detail
+namespace detail { namespace variant_
 {
 /// 0-based position of \a T in \a Ts.
 template<class T, class... Ts> struct position;
 template<int, class...> struct storage_ops;
 template<class...> struct type_info;
-} // namespace detail
+}} // namespace detail::variant_
 
 ///
 /// \brief A variant library (like boost::variant) using C++11 variadic
@@ -53,10 +53,10 @@ template<class...> struct type_info;
 template<class... Ts>
 class variant
 {
-  static_assert(detail::type_info<Ts...>::no_reference_types,
+  static_assert(detail::variant_::type_info<Ts...>::no_reference_types,
                 "Reference types are not permitted in variant");
 
-  static_assert(detail::type_info<Ts...>::no_duplicates,
+  static_assert(detail::variant_::type_info<Ts...>::no_duplicates,
                 "variant type arguments contain duplicate types");
 
 public:
@@ -78,7 +78,7 @@ private:
   template<class X>
   void init(const X &x)
   {
-    tag_ = detail::position<X, Ts...>::pos;
+    tag_ = detail::variant_::position<X, Ts...>::pos;
     new(storage_) X(x);
   }
 
@@ -90,8 +90,8 @@ private:
   //
   // We could use std::aligned_union<0, Ts...>::type for the storage, but it
   // isn't well supported yet.
-  alignas(detail::type_info<Ts...>::alignment + 0)
-  char storage_[detail::type_info<Ts...>::size];
+  alignas(detail::variant_::type_info<Ts...>::alignment + 0)
+  char storage_[detail::variant_::type_info<Ts...>::size];
 };
 
 #include "variant.tcc"

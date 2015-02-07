@@ -44,39 +44,44 @@ BOOST_AUTO_TEST_SUITE(variant)
 BOOST_AUTO_TEST_CASE(type_info)
 {
   BOOST_TEST_CHECKPOINT("TYPE_INFO SIZE");
-  auto size(vita::detail::type_info<char>::size);
+  auto size(vita::detail::variant_::type_info<char>::size);
   BOOST_CHECK_EQUAL(size, sizeof(char));
-  size = vita::detail::type_info<int>::size;
+  size = vita::detail::variant_::type_info<int>::size;
   BOOST_CHECK_EQUAL(size, sizeof(int));
 
-  size = vita::detail::type_info<char, int, double, std::string>::size;
+  size = vita::detail::variant_::type_info<char, int, double,
+                                           std::string>::size;
   BOOST_CHECK_EQUAL(size, std::max({sizeof(char), sizeof(int), sizeof(double),
                                     sizeof(std::string)}));
 
   BOOST_TEST_CHECKPOINT("TYPE_INFO DUPLICATES");
   bool no_duplicates(
-    vita::detail::type_info<bool, int, std::string>::no_duplicates);
+    vita::detail::variant_::type_info<bool, int, std::string>::no_duplicates);
   BOOST_CHECK(no_duplicates);
 
-  no_duplicates = vita::detail::type_info<int, bool, int>::no_duplicates;
+  no_duplicates = vita::detail::variant_::type_info<int, bool,
+                                                    int>::no_duplicates;
   BOOST_CHECK_EQUAL(no_duplicates, false);
 
-  no_duplicates = vita::detail::type_info<bool, int, int>::no_duplicates;
+  no_duplicates = vita::detail::variant_::type_info<bool, int,
+                                                    int>::no_duplicates;
   BOOST_CHECK_EQUAL(no_duplicates, false);
 
-  no_duplicates = vita::detail::type_info<int, int, bool>::no_duplicates;
+  no_duplicates = vita::detail::variant_::type_info<int, int,
+                                                    bool>::no_duplicates;
   BOOST_CHECK_EQUAL(no_duplicates, false);
 
-  no_duplicates = vita::detail::type_info<int, int &>::no_duplicates;
+  no_duplicates = vita::detail::variant_::type_info<int, int &>::no_duplicates;
   BOOST_CHECK(no_duplicates);
 
-  no_duplicates = vita::detail::type_info<int, const int>::no_duplicates;
+  no_duplicates = vita::detail::variant_::type_info<int,
+                                                    const int>::no_duplicates;
   BOOST_CHECK(no_duplicates);
 
   BOOST_TEST_CHECKPOINT("TYPE_INFO ALIGNMENT");
-  auto alignment(vita::detail::type_info<char>::alignment);
+  auto alignment(vita::detail::variant_::type_info<char>::alignment);
   BOOST_CHECK_EQUAL(alignment, alignof(char));
-  alignment = vita::detail::type_info<double>::alignment;
+  alignment = vita::detail::variant_::type_info<double>::alignment;
   BOOST_CHECK_EQUAL(alignment, alignof(double));
 }
 

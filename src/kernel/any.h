@@ -29,14 +29,13 @@ using boost::any_cast<T>;
 
 #else
 
-namespace detail { namespace any_ {
-
+namespace detail { namespace any_
+{
 struct empty;
 struct fxn_ptr_table;
 template<bool> struct fxns;
 template<class> struct get_table;
-
-}}
+}}  // namespace detail::any_
 
 ///
 /// \brief The exception thrown in the event of a failed any_cast of an any

@@ -22,7 +22,7 @@
 #define      VITA_VARIANT_TCC
 
 // Implementation details, user shouldn't import this.
-namespace detail
+namespace detail { namespace variant_
 {
 ///////////////////////////////////////////////////////////////////////////////
 template<int N, class T, class... Ts>
@@ -116,27 +116,29 @@ struct type_info<>
   static constexpr std::size_t size = 0;
   static constexpr std::size_t alignment = 0;
 };
-}  // namespace detail
+}}  // namespace detail::variant_
 
 template<class... Ts>
 template<class X>
 variant<Ts...>::variant(const X &v)
 {
-  static_assert(detail::position<X, Ts...>::pos != -1, "Type not in variant");
+  static_assert(detail::variant_::position<X, Ts...>::pos != -1,
+                "Type not in variant");
   init(v);
 }
 
 template<class... Ts>
 variant<Ts...>::~variant()
 {
-  detail::storage_ops<0, Ts...>::del(tag_, storage_);
+  detail::variant_::storage_ops<0, Ts...>::del(tag_, storage_);
 }
 
 template<class... Ts>
 template<class X>
 void variant<Ts...>::operator=(const X &v)
 {
-  static_assert(detail::position<X, Ts...>::pos != -1, "Type not in variant");
+  static_assert(detail::variant_::position<X, Ts...>::pos != -1,
+                "Type not in variant");
   this->~variant();
   init(v);
 }
@@ -150,11 +152,12 @@ template<class... Ts>
 template<class X>
 X &variant<Ts...>::get()
 {
-  static_assert(detail::position<X, Ts...>::pos != -1, "Type not in variant");
+  static_assert(detail::variant_::position<X, Ts...>::pos != -1,
+                "Type not in variant");
 
   // Dereferencing the pointer is well defined:
   // http://stackoverflow.com/questions/28381338/reinterpret-cast-static-cast-and-undefined-behavior
-  if (tag_ == detail::position<X, Ts...>::pos)
+  if (tag_ == detail::variant_::position<X, Ts...>::pos)
     return *reinterpret_cast<X *>(storage_);
 
   throw std::runtime_error("variant doesn't contain requested type (allowed " +
@@ -170,11 +173,11 @@ template<class... Ts>
 template<class X>
 const X &variant<Ts...>::get() const
 {
-  static_assert(detail::position<X, Ts...>::pos != -1, "Type not in variant");
+  static_assert(detail::variant_::position<X, Ts...>::pos != -1,
+                "Type not in variant");
 
-  if (tag_ == detail::position<X, Ts...>::pos)
-    return *static_cast<const X *>(static_cast<const void *>(storage_));
-    //return *reinterpret_cast<const X *>(storage_);
+  if (tag_ == detail::variant_::position<X, Ts...>::pos)
+    return *reinterpret_cast<const X *>(storage_);
 
   throw std::runtime_error("variant doesn't contain requested type (allowed" +
                            std::to_string(tag_) + ")");
@@ -184,7 +187,7 @@ template<class... Ts>
 template<class visitor>
 typename visitor::result_type variant<Ts...>::visit(visitor &v)
 {
-  return detail::storage_ops<0, Ts...>::apply(tag_, storage_, v);
+  return detail::variant_::storage_ops<0, Ts...>::apply(tag_, storage_, v);
 }
 
 template<class... Ts>
