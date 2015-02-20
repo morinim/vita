@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -207,7 +207,7 @@ namespace vita
     assert(ps == c.parameters());
 
     const auto p_cross(env_->p_cross);
-    assert(p_cross >= 0.0);
+    assert(0.0 <= p_cross);
     assert(p_cross <= 1.0);
 
     const auto &f(env_->de.weight);  // scaling factor range

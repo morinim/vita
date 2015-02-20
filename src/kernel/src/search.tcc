@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -202,10 +202,10 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (boost::indeterminate(constrained.elitism))
     this->env_.elitism = dflt.elitism;
 
-  if (constrained.p_mutation >= 0.0)
+  if (constrained.p_mutation < 0.0)
     this->env_.p_mutation = dflt.p_mutation;
 
-  if (constrained.p_cross >= 0.0)
+  if (constrained.p_cross < 0.0)
     this->env_.p_cross = dflt.p_cross;
 
   if (!constrained.brood_recombination)

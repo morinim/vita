@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,10 +45,10 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
   const environment dflt(true);
   const environment &constrained(this->prob_.env);
 
-  if (constrained.p_mutation >= 0.0)
+  if (constrained.p_mutation < 0.0)
     this->env_.p_mutation = dflt.p_mutation;
 
-  if (constrained.p_cross >= 0.0)
+  if (constrained.p_cross < 0.0)
     this->env_.p_cross = dflt.p_cross;
 
   if (!constrained.tournament_size)
