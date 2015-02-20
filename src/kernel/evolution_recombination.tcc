@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,8 +56,10 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  assert(env.p_cross >= 0.0);
-  assert(env.p_mutation >= 0.0);
+  assert(0.0 <= env.p_cross);
+  assert(env.p_cross <= 1.0);
+  assert(0.0 <= env.p_mutation);
+  assert(env.p_mutation <= 1.0);
   assert(env.brood_recombination);
   assert(parent.size() >= 2);
 
@@ -131,7 +133,8 @@ std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
 
   const auto &pop(this->pop_);
 
-  assert(pop.env().p_cross > 0.0);
+  assert(0.0 < pop.env().p_cross);
+  assert(pop.env().p_cross <= 1.0);
 
   const auto a(pickup(pop, parent[0]));
   const auto b(pickup(pop, parent[0]));
