@@ -198,9 +198,10 @@ typename C::value_type &element(C &c)
 ///
 inline bool boolean(double p)
 {
-  assert(0.0 <= p && p <= 1.0);
+  assert(0.0 <= p);
+  assert(p <= 1.0);
 
-  thread_local std::bernoulli_distribution d(p);
+  std::bernoulli_distribution d(p);
   return d(engine());
 
   //return between<double>(0, 1) < p;
