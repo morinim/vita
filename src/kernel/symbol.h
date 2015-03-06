@@ -116,7 +116,7 @@ inline double symbol::penalty(core_interpreter *ci) const
 }
 
 ///
-/// \return \c 0.
+/// \return `0`.
 ///
 /// This function is used to initialize the symbol's internal parameter.
 /// Derived classes should redefine the init member function in a
@@ -144,8 +144,8 @@ inline bool symbol::associative() const
 }
 
 ///
-/// \return \c true if the \a symbol has been automatically defined (e.g.
-///         ADF / ADT), \c false otherwise (this is the default value).
+/// \return `true` if the symbol has been automatically defined (e.g.
+///         ADF / ADT), `false` otherwise (this is the default value).
 ///
 inline bool symbol::auto_defined() const
 {
@@ -153,7 +153,7 @@ inline bool symbol::auto_defined() const
 }
 
 ///
-/// \return the category of the \a symbol.
+/// \return the category of the symbol.
 ///
 /// In strongly typed GP, every terminal has a type (i.e. category) and every
 /// function has types for each of its arguments and a type for its return
@@ -165,7 +165,7 @@ inline category_t symbol::category() const
 }
 
 ///
-/// \return \c true if the symbol is an input variable.
+/// \return `true` if the symbol is an input variable.
 ///
 /// An input variable is a feature from the learning domain. Only terminal
 /// can be input variable.
@@ -206,7 +206,7 @@ inline bool symbol::parametric() const
 }
 
 ///
-/// \return \c true if this symbol is a \c terminal.
+/// \return `true` if this symbol is a `terminal`.
 ///
 inline bool symbol::terminal() const
 {
