@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,17 +38,19 @@ namespace vita
     bool operator==(const basic_gene<K> &) const;
     bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
 
+  public:  // Types and constants
+    using param_type = double;
+    using arg_pack   = std::array<std::uint16_t, K>;
+
+    static constexpr decltype(K) k_args{K};
+
   public:  // Public data members
     symbol *sym;
     union
     {
-      double            par;
-      std::uint16_t args[K];
+      param_type  par;
+      arg_pack   args;
     };
-
-  public:  // Types and constants
-    using param_type = decltype(par);
-    static constexpr decltype(K) k_args{K};
   };
 
   template<unsigned K>
