@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,7 +28,7 @@ unsigned max_age(unsigned, unsigned, unsigned);
 ///
 /// \param[in] p the population.
 /// \param[in] c the coordinates of an individual.
-/// \return \c true if the individual at coordinates \c is too old for his
+/// \return `true` if the individual at coordinates `c` is too old for his
 ///         layer.
 ///
 /// This is just a convenience method to save some keystroke.

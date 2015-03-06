@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,8 +28,8 @@ namespace vita
     {
       sym_counter() : counter{0, 0} {}
 
-      /// Typical use: \c counter[active] or \c counter[!active] (where
-      /// \c active is a boolean).
+      /// Typical use: `counter[active]` or `counter[!active]` (where
+      /// `active` is a boolean).
       std::uintmax_t counter[2];
     };
 

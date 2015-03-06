@@ -20,11 +20,11 @@
 namespace vita
 {
   ///
-  /// \brief A gene is a unit of heredity in a living organism.
+  /// \brief A gene is a unit of heredity in a living organism
   ///
-  /// \tparam K the maximum number of arguments for a \a function.
+  /// \tparam K the maximum number of arguments for a \a function
   ///
-  /// The \c class \a gene is the building block for an \a individual.
+  /// The `class` \a gene is the building block for an \a individual.
   ///
   template<unsigned K>
   class basic_gene

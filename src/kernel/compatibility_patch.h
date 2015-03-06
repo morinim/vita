@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,8 +64,8 @@ namespace vita
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32)
   ///
-  /// \param[in] enter if \c true sets the terminal raw mode, else restore
-  ///            the default terminal mode.
+  /// \param[in] enter if `true` sets the terminal raw mode, else restore the
+  ///            default terminal mode.
   ///
   /// The raw mode discipline performs no line editing and the control
   /// sequences for both line editing functions and the various special
@@ -90,7 +90,7 @@ namespace vita
   }
 
   ///
-  /// \return \c true if the user press a key (\c false otherwise).
+  /// \return `true` if the user press a key (`false` otherwise).
   ///
   inline bool kbhit()
   {

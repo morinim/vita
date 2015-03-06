@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@ namespace vita
   const category category::null(0, {"", domain_t::d_void, {}});
 
   ///
-  /// \return \c true if *this != category::null.
+  /// \return `true` if `*this != category::null`.
   ///
   category::operator bool() const
   {

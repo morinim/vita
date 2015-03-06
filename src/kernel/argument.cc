@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,10 +21,10 @@ namespace vita
   /// \param[in] n argument index.
   ///
   /// An adf function may have up to \a k_args arguments. Arguments' category is
-  /// special (here it is initialized with \c 0 but we could say they haven't a
+  /// special (here it is initialized with `0` but we could say they haven't a
   /// type) because arguments are communication channels among adf functions
   /// and their calling environments. So the type that is travelling on channel
-  /// \c i (argument(i)) varies depending on the function being evaluated
+  /// `i` (`argument(i)`) varies depending on the function being evaluated
   /// (instead, adf functions have a precise, fixed signature).
   ///
   argument::argument(unsigned n) : terminal("ARG", category_t(0)), index_(n)

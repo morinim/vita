@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ any convert(const std::string &s, domain_t d)
 
 ///
 /// \param[in] s the string to be tested.
-/// \return \c true if \a s contains a number.
+/// \return `true` if \a s contains a number.
 ///
 bool is_number(const std::string &s)
 {
@@ -366,7 +366,7 @@ class_t data::encode(const std::string &label)
 
 ///
 /// \param[in] i the encoded (data::encode()) value of a class.
-/// \return the name of the class encoded with the \c unsigned \a i (or an
+/// \return the name of the class encoded with the `unsigned` \a i (or an
 ///         empty string if such class cannot be find).
 ///
 /// \note
@@ -385,7 +385,7 @@ std::string data::class_name(class_t i) const
 ///
 /// \param[in] line line to be parsed.
 /// \param[in] delimiter separator character for fields.
-/// \param[in] trim if \c true trims leading and trailing spaces adjacent to
+/// \param[in] trim if `true` trims leading and trailing spaces adjacent to
 ///                 commas (this practice is contentious and in fact is
 ///                 specifically prohibited by RFC 4180, which states,
 ///                 "Spaces are considered part of a field and should not be
@@ -838,7 +838,7 @@ std::size_t data::open(const std::string &f, unsigned verbosity)
 }
 
 ///
-/// \return \c true if the current dataset is empty.
+/// \return `true` if the current dataset is empty.
 ///
 bool data::operator!() const
 {
@@ -846,7 +846,7 @@ bool data::operator!() const
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool data::debug() const
 {
@@ -876,7 +876,7 @@ bool data::debug() const
 
 ///
 /// \param[in] n the name of a weka domain.
-/// \return the internel id of the weka-domain \a n (\c d_void if it's
+/// \return the internel id of the weka-domain \a n (`d_void` if it's
 ///         unknown or not managed).
 ///
 domain_t data::from_weka(const std::string &n)
