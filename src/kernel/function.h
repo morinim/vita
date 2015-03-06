@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -39,6 +39,8 @@ namespace vita
 
     category_t arg_category(unsigned) const;
 
+    virtual unsigned arity() const override;
+
     virtual bool debug() const override;
 
     static const function *cast(const symbol *);
@@ -46,6 +48,15 @@ namespace vita
   private:  // Private data members
     cvect argt_;
   };
+
+  ///
+  /// \return the number arguments of a funtion.
+  ///
+  inline unsigned function::arity() const
+  {
+    assert(argt_.size());
+    return static_cast<unsigned>(argt_.size());
+  }
 
   ///
   /// \param[in] i index of a function argument.

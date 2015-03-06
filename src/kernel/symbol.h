@@ -31,7 +31,7 @@ class symbol
 public:
   symbol(const std::string &, category_t);
 
-  unsigned arity() const;
+  virtual unsigned arity() const = 0;
   bool associative() const;
   bool auto_defined() const;
   category_t category() const;
@@ -60,10 +60,9 @@ public:  // Public data members
   /// This is the default weight. Weights are used by the
   /// symbol_set::roulette method to control the probability of extraction of
   /// the symbols.
-  static decltype(weight) constexpr k_base_weight{100};
+  static constexpr decltype(weight) k_base_weight{100};
 
 protected:  // Protected data members
-  unsigned arity_;
   bool associative_;
   bool auto_defined_;
   bool input_;
@@ -105,17 +104,6 @@ inline double symbol::penalty(core_interpreter *ci) const
 inline double symbol::init() const
 {
   return 0.0;
-}
-
-///
-/// \return the number of inputs to or arguments of a funtion.
-///
-/// \note
-/// 0 arguments <=> terminal.
-///
-inline unsigned symbol::arity() const
-{
-  return arity_;
 }
 
 ///

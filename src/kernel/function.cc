@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,8 +28,6 @@ namespace vita
   function::function(const std::string &dis, category_t c, cvect args)
     : symbol(dis, c), argt_(std::move(args))
   {
-    arity_ = static_cast<decltype(arity_)>(argt_.size());
-
     assert(debug());
   }
 
