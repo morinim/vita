@@ -19,44 +19,44 @@
 
 namespace vita
 {
-  ///
-  /// \brief A gene is a unit of heredity in a living organism
-  ///
-  /// \tparam K the maximum number of arguments for a \a function
-  ///
-  /// The `class` \a gene is the building block for an \a individual.
-  ///
-  template<unsigned K>
-  class basic_gene
+///
+/// \brief A gene is a unit of heredity in a living organism
+///
+/// \tparam K the maximum number of arguments for a \a function
+///
+/// The `class` \a gene is the building block for an \a individual.
+///
+template<unsigned K>
+class basic_gene
+{
+public:
+  basic_gene() {}
+  explicit basic_gene(symbol *);
+  basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
+  basic_gene(symbol *, index_t, index_t);
+
+  bool operator==(const basic_gene<K> &) const;
+  bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
+
+public:  // Types and constants
+  using param_type = double;
+  using arg_pack   = std::array<std::uint16_t, K>;
+
+  static constexpr decltype(K) k_args{K};
+
+public:  // Public data members
+  symbol *sym;
+  union
   {
-  public:
-    basic_gene() {}
-    explicit basic_gene(symbol *);
-    basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
-    basic_gene(symbol *, index_t, index_t);
-
-    bool operator==(const basic_gene<K> &) const;
-    bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
-
-  public:  // Types and constants
-    using param_type = double;
-    using arg_pack   = std::array<std::uint16_t, K>;
-
-    static constexpr decltype(K) k_args{K};
-
-  public:  // Public data members
-    symbol *sym;
-    union
-    {
-      param_type  par;
-      arg_pack   args;
-    };
+    param_type  par;
+    arg_pack   args;
   };
+};
 
-  template<unsigned K>
-  std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
+template<unsigned K>
+std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
 
-  using gene = basic_gene<4>;
+using gene = basic_gene<4>;
 
 #include "kernel/gene.tcc"
 }  // namespace vita
