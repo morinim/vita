@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_MEP_INTERPRETER_H)
-#define      VITA_MEP_INTERPRETER_H
+#if !defined(VITA_INTERPRETER_H)
+#define      VITA_INTERPRETER_H
 
 #include "kernel/core_interpreter.h"
 #include "kernel/function.h"
