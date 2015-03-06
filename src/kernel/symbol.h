@@ -81,6 +81,27 @@ private:  // Private data members
   std::string name_;
 };
 
+// This class has many methods like arity() that could be changed from
+//
+//     virtual unsigned arity() const = 0
+//
+// to
+//
+//     unsigned arity() const { return arity_; }
+//
+// (`arity_` would be a private variable added to the `symbol` class).
+//
+// In theory the current approach should be:
+// - slower (virtual methods) but we cannot measure performance differences;
+// - more memory efficient but this isn't important considering that we only
+//   manage a few symbols.
+//
+// So the key point in favour of the virtual interface is that it enforces
+// correctness.
+//
+// For some insight about the virtual interface choice (arity()...) see
+// http://stackoverflow.com/q/24562060/3235496
+
 ///
 /// \param[in] ci interpreter used for symbol's constraints evaluation.
 /// \return 0
