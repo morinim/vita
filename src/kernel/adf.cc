@@ -27,9 +27,16 @@ namespace vita
     assert(ind.eff_size() >= 2);
 
     weight = w;
-    auto_defined_ = true;
 
     assert(debug());
+  }
+
+  ///
+  /// \return `true`.
+  ///
+  bool adf::auto_defined() const
+  {
+    return true;
   }
 
   ///
@@ -91,9 +98,16 @@ namespace vita
     assert(ind.eff_size() >= 2);
 
     weight = w;
-    auto_defined_ = true;
 
     assert(debug());
+  }
+
+  ///
+  /// \return `true`.
+  ///
+  bool adt::auto_defined() const
+  {
+    return true;
   }
 
   ///

@@ -37,9 +37,8 @@ namespace vita
   /// Of course even the opcode is unique, but it can vary between executions.
   ///
   symbol::symbol(const std::string &name, category_t c)
-    : weight(k_base_weight), associative_(false), auto_defined_(false),
-      input_(false), parametric_(false), opcode_(opc_count_++), category_(c),
-      name_(name)
+    : weight(k_base_weight), associative_(false), input_(false),
+      parametric_(false), opcode_(opc_count_++), category_(c), name_(name)
   {
     assert(debug());
   }

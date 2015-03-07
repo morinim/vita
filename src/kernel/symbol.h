@@ -33,7 +33,7 @@ public:
 
   virtual unsigned arity() const = 0;
   bool associative() const;
-  bool auto_defined() const;
+  virtual bool auto_defined() const;
   category_t category() const;
   bool input() const;
   opcode_t opcode() const;
@@ -64,7 +64,6 @@ public:  // Public data members
 
 protected:  // Protected data members
   bool associative_;
-  bool auto_defined_;
   bool input_;
   bool parametric_;
 
@@ -128,7 +127,7 @@ inline bool symbol::associative() const
 ///
 inline bool symbol::auto_defined() const
 {
-  return auto_defined_;
+  return false;
 }
 
 ///

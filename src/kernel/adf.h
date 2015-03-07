@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,6 +75,8 @@ namespace vita
   public:
     adf(const i_mep &, std::vector<category_t>, unsigned);
 
+    virtual bool auto_defined() const override;
+
     virtual any eval(core_interpreter *) const override;
 
     virtual std::string display() const override;
@@ -98,6 +100,8 @@ namespace vita
   {
   public:
     adt(const i_mep &, unsigned);
+
+    virtual bool auto_defined() const override;
 
     virtual any eval(core_interpreter *) const override;
 
