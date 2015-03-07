@@ -43,7 +43,7 @@ inline unsigned terminal::arity() const
 }  // namespace vita
 
 #if defined(VITA_NO_LIB)
-#  include "terminal.cc"
+#  include "kernel/terminal.cc"
 #endif
 
 #endif  // Include guard

@@ -22,9 +22,9 @@ namespace vita
 ///
 /// \brief A symbol (arity > 0) used in GP
 ///
-/// A \a function labels the internal (non-leaf) points of the parse trees
-/// that represent the programs in the population. An example function set
-/// might be {+, -, *}.
+/// A function labels the internal (non-leaf) points of the parse trees that
+/// represent the programs in the population. An example function set might be
+/// {+, -, *}.
 ///
 /// \warning
 /// Each function should be able to handle gracefully all values it might
@@ -70,7 +70,7 @@ inline category_t function::arg_category(unsigned i) const
 
 ///
 /// \param[in] s symbol pointer.
-/// \return \a s casted to a vita::function pointer.
+/// \return `s` casted to a vita::function pointer.
 ///
 /// This is a short cut function.
 ///
