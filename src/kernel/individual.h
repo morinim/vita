@@ -34,6 +34,8 @@ namespace vita
 /// * factorizes out common code;
 /// * defines a minimum common interface.
 ///
+/// \note AKA chromosome
+///
 class individual
 {
 public:
