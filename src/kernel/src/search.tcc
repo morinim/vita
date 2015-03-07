@@ -18,8 +18,8 @@
 #define      VITA_SRC_SEARCH_TCC
 
 ///
-/// \param[in] p the problem we're working on. The lifetime of \a p must exceed
-///              the lifetime of \c this class.
+/// \param[in] p the problem we're working on. The lifetime of `p` must exceed
+///              the lifetime of `this` class.
 ///
 template<class T, template<class> class ES>
 src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
@@ -36,11 +36,12 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 
 ///
 /// param[in] ind an individual.
-/// \return the accuracy of \a ind.
+/// \return the accuracy of `ind`.
 ///
 /// \note
-/// If env_.a_threashold < 0.0 (undefined) then this method will skip
-/// accuracy calculation and return will return a negative value.
+/// If the accuracy threashold is undefined (`env_.a_threashold < 0.0`) then
+/// this method will skip accuracy calculation and return will return a
+/// negative value.
 ///
 /// \warning
 /// This method can be very time consuming.
@@ -55,7 +56,7 @@ double src_search<T, ES>::accuracy(const T &ind) const
 }
 
 ///
-/// \param[in] base \a individual we are examining to extract building blocks.
+/// \param[in] base individual we are examining to extract building blocks.
 ///
 /// Adaptive Representation through Learning (ARL). The algorithm extract
 /// common knowledge (building blocks) emerging during the evolutionary
@@ -534,7 +535,7 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
 /// \param[in] best_run best overall run.
 /// \param[in] best_accuracy accuracy of the best individual (if available).
 /// \param[in] runs number of runs performed.
-/// \return \c true if the write operation succeed.
+/// \return `true` if the write operation succeed.
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
@@ -615,11 +616,11 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 ///
 /// \param[in] id numerical id of the evaluator to be activated.
 /// \param[in] msg input parameters for the evaluator constructor.
-/// \return \c true if the active evaluator has been changed.
+/// \return `true` if the active evaluator has been changed.
 ///
 /// \note
-/// If the evaluator \a id is not compatible with the problem type the
-/// function return \c false and the active evaluator stays the same.
+/// If the evaluator `id` is not compatible with the problem type the
+/// function return `false` and the active evaluator stays the same.
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
@@ -684,8 +685,8 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::debug_nvi(bool verbose) const

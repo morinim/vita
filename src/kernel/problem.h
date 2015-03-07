@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,29 +20,30 @@
 
 namespace vita
 {
-  ///
-  /// \brief The interface of a evolutionary program's problem
-  ///
-  /// \note
-  /// What a horror! Public data members... please read the coding style
-  /// document for project Vita
-  /// (<http://code.google.com/p/vita/wiki/CodingStyle>).
-  class problem
-  {
-  public:
-    problem();
+///
+/// \brief The interface of a evolutionary program's problem
+///
+/// \note
+/// What a horror! Public data members... please read the coding style
+/// document for project Vita.
+///
+class problem
+{
+public:
+  problem();
 
-    virtual vita::data *data();
+  virtual vita::data *data();
 
-    virtual void clear(bool);
+  virtual void clear(bool);
 
-    virtual bool debug(bool) const;
+  virtual bool debug(bool) const;
 
-  public:  // Public data members
-    environment env;
+public:  // Public data members
+  environment env;
 
-    symbol_set sset;
-  };
+  symbol_set sset;
+};
+
 }  // namespace vita
 
 #endif  // Include guard
