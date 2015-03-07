@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,7 +28,9 @@ namespace vita
   public:
     variable(const std::string &name, unsigned var_id, category_t t = 0)
       : terminal(name, t), var_(var_id)
-    { input_ = true; }
+    {}
+
+    virtual bool input() const override { return true; }
 
     ///
     /// \return the value of the variable (as a \c any).

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,9 @@ struct F_FACTORY3
   class Z : public vita::terminal
   {
   public:
-    Z() : vita::terminal("Z", 0) { input_ = true; }
+    Z() : vita::terminal("Z", 0) {}
+
+    virtual bool input() const override { return true; }
 
     virtual vita::any eval(vita::core_interpreter *) const override
     { return vita::any(val); }

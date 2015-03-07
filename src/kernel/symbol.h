@@ -35,7 +35,7 @@ public:
   virtual bool associative() const;
   virtual bool auto_defined() const;
   category_t category() const;
-  bool input() const;
+  virtual bool input() const;
   opcode_t opcode() const;
   bool parametric() const;
   bool terminal() const;
@@ -63,7 +63,6 @@ public:  // Public data members
   static constexpr decltype(weight) k_base_weight{100};
 
 protected:  // Protected data members
-  bool input_;
   bool parametric_;
 
 private:  // NVI template methods
@@ -149,9 +148,11 @@ inline category_t symbol::category() const
 /// An input variable is a feature from the learning domain. Only terminal
 /// can be input variable.
 ///
+/// Default (safe) value is `false`.
+///
 inline bool symbol::input() const
 {
-  return input_;
+  return false;
 }
 
 ///
