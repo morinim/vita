@@ -106,10 +106,11 @@ inline double symbol::init() const
 }
 
 ///
-/// \return true if the function is associative.
+/// \return `true` if the function is associative.
 ///
 /// The associative law of arithmetic: if OP is associative then
-/// > a OP (b OP c) = (a OP b) OP c = a OP b OP c
+///
+///     a OP (b OP c) = (a OP b) OP c = a OP b OP c
 ///
 /// This information can be used for optimization and visualization.
 ///
@@ -168,7 +169,7 @@ inline opcode_t symbol::opcode() const
 }
 
 ///
-/// \return true for parametric symbols.
+/// \return `true` for parametric symbols.
 ///
 /// A parametric symbol needs an additional argument to be evaluated.
 ///
