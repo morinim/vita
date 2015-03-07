@@ -16,15 +16,15 @@
 
 namespace vita
 {
-  ///
-  /// \return \c true if the \a function passes the internal consistency check.
-  ///
-  VITA_INLINE
-  bool terminal::debug() const
-  {
-    if (associative())
-      return false;
+///
+/// \return `true` if the function passes the internal consistency check.
+///
+VITA_INLINE
+bool terminal::debug() const
+{
+  if (associative())
+    return false;
 
-    return symbol::debug();
-  }
+  return symbol::debug();
+}
 }  // namespace vita
