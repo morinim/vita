@@ -37,7 +37,7 @@ namespace vita
   VITA_INLINE
   bool function::debug() const
   {
-    if (arity() == 0)  // This is a function, we want some argument...
+    if (!arity())  // This is a function, we want some argument...
       return false;
 
     return symbol::debug();

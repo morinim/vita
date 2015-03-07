@@ -80,7 +80,6 @@ private:  // Private data members
 
   std::string name_;
 };
-
 // This class has many methods like arity() that could be changed from
 //
 //     virtual unsigned arity() const = 0

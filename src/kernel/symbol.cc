@@ -80,9 +80,6 @@ namespace vita
   ///
   bool symbol::debug() const
   {
-    if (arity() > gene::k_args)
-      return false;
-
     return display().size() > 0;
   }
 }  // namespace vita

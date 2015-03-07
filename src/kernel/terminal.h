@@ -28,13 +28,13 @@ class terminal : public symbol
 public:
   using symbol::symbol;
 
-  virtual unsigned arity() const;
+  virtual unsigned arity() const override;
 
   virtual bool debug() const override;
 };
 
 ///
-/// \return 0 (well... this is a terminal!)
+/// \return 0 (this is a terminal!)
 ///
 inline unsigned terminal::arity() const
 {
