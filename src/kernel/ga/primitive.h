@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -49,14 +49,15 @@ namespace vita
     {
     public:
       using value_t = T;
-      
+
       explicit number(const std::string &name, category_t c,
                       T m = T(-1000), T u = T(1000))
         : terminal(name, c), min(m), upp(u)
       {
         assert(m < u);
-        parametric_ = true;
       }
+
+      virtual bool parametric() const override { return true; }
 
       virtual double init() const override
       { return static_cast<double>(random::between<T>(min, upp)); }

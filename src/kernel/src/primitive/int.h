@@ -54,8 +54,9 @@ namespace vita
       {
         assert(c.size() == 1);
         assert(m < u);
-        parametric_ = true;
       }
+
+      virtual bool parametric() const override { return true; }
 
       virtual double init() const override
       { return random::between<int>(min, upp); }

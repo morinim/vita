@@ -34,10 +34,11 @@ public:
   virtual unsigned arity() const = 0;
   virtual bool associative() const;
   virtual bool auto_defined() const;
-  category_t category() const;
   virtual bool input() const;
+  virtual bool parametric() const;
+
+  category_t category() const;
   opcode_t opcode() const;
-  bool parametric() const;
   bool terminal() const;
 
   virtual std::string display() const;
@@ -61,9 +62,6 @@ public:  // Public data members
   /// symbol_set::roulette method to control the probability of extraction of
   /// the symbols.
   static constexpr decltype(weight) k_base_weight{100};
-
-protected:  // Protected data members
-  bool parametric_;
 
 private:  // NVI template methods
   virtual double penalty_nvi(core_interpreter *) const;
@@ -182,7 +180,7 @@ inline opcode_t symbol::opcode() const
 ///
 inline bool symbol::parametric() const
 {
-  return parametric_;
+  return false;
 }
 
 ///
