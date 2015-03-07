@@ -32,7 +32,7 @@ public:
   symbol(const std::string &, category_t);
 
   virtual unsigned arity() const = 0;
-  bool associative() const;
+  virtual bool associative() const;
   virtual bool auto_defined() const;
   category_t category() const;
   bool input() const;
@@ -63,7 +63,6 @@ public:  // Public data members
   static constexpr decltype(weight) k_base_weight{100};
 
 protected:  // Protected data members
-  bool associative_;
   bool input_;
   bool parametric_;
 
@@ -115,11 +114,12 @@ inline double symbol::init() const
 /// This information can be used for optimization and visualization.
 ///
 /// \note
-/// Terminals haven't arguments and cannot be associative.
+/// * Terminals haven't arguments and cannot be associative.
+/// * Default (safe) value is `false`.
 ///
 inline bool symbol::associative() const
 {
-  return associative_;
+  return false;
 }
 
 ///

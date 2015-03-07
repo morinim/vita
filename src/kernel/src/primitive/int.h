@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -81,8 +81,9 @@ namespace vita
       explicit add(const cvect &c) : function("ADD", c[0], {c[0], c[0]})
       {
         assert(c.size() == 1);
-        associative_ = true;
       }
+
+      virtual bool associative() const override { return true; }
 
       virtual any eval(core_interpreter *ci) const override
       {
@@ -218,8 +219,9 @@ namespace vita
     class mul : public function
     {
     public:
-      explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]})
-      { associative_ = true; }
+      explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]}) {}
+
+      virtual bool associative() const override { return true; }
 
       virtual any eval(core_interpreter *ci) const
       {

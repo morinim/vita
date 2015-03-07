@@ -141,8 +141,9 @@ public:
 class add : public function
 {
 public:
-  explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]})
-  { associative_ = true; }
+  explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]}) {}
+
+  virtual bool associative() const override { return true; }
 
   virtual any eval(core_interpreter *ci) const override
   {
@@ -451,8 +452,7 @@ public:
 class mul : public function
 {
 public:
-  explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]})
-  { associative_ = true; }
+  explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]}) {}
 
   virtual any eval(core_interpreter *ci) const override
   {

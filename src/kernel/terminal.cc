@@ -22,7 +22,7 @@ namespace vita
   VITA_INLINE
   bool terminal::debug() const
   {
-    if (associative_)
+    if (associative())
       return false;
 
     return symbol::debug();
