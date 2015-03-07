@@ -82,10 +82,10 @@ private:  // Private data members
 
 ///
 /// \param[in] ci interpreter used for symbol's constraints evaluation.
-/// \return 0
+/// \return a penalty based on symbol specific broken constraints.
 ///
-/// Return a penalty based on symbol-specific broken constraints:
-/// - 0 states that no constraint penalty is applied;
+/// Return value:
+/// - `0.0` states that no constraint penalty is applied;
 /// - larger values specify larger penalties.
 ///
 inline double symbol::penalty(core_interpreter *ci) const
