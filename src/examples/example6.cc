@@ -26,7 +26,9 @@ using i_interp = vita::core_interpreter;
 class X : public vita::terminal
 {
 public:
-  X() : vita::terminal("X", 0) { input_ = true; }
+  X() : vita::terminal("X", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
@@ -36,7 +38,9 @@ public:
 class Y : public vita::terminal
 {
 public:
-  Y() : vita::terminal("Y", 0) { input_ = true; }
+  Y() : vita::terminal("Y", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
@@ -46,7 +50,9 @@ public:
 class Z : public vita::terminal
 {
 public:
-  Z() : vita::terminal("Z", 0) { input_ = true; }
+  Z() : vita::terminal("Z", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
