@@ -13,9 +13,9 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "kernel/ga/evaluator.h"
 #include "kernel/ga/i_ga.h"
 #include "kernel/ga/interpreter.h"
-#include "kernel/ga/ga_evaluator.h"
 #include "kernel/ga/search.h"
 #include "kernel/evolution.h"
 #include "kernel/problem.h"

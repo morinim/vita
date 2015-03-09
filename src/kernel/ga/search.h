@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
-#include "kernel/ga/ga_evaluator.h"
+#include "kernel/ga/evaluator.h"
 #include "kernel/search.h"
 
 namespace vita
