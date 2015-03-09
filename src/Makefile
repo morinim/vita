@@ -70,7 +70,7 @@ ifeq ($(TYPE), release)
 
   # Link time optimization has some issues with MinGW
   ifeq ($(CXX), g++)
-    ifneq ($(OS),Windows_NT)
+    ifneq ($(OS), Windows_NT)
       TYPE_PARAM += -flto
     endif
   endif
@@ -104,15 +104,12 @@ else
 endif
 endif
 
-examples: example1 example2 example3 example4 example5 example6 example7 example8 example9a
+examples: $(EXAMPLES_SRC:.cc=)
+	@echo $(notdir $^) successfully built
 
-example%: examples/example%.o $(KERNEL_OBJ)
+examples/%: examples/%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
-
-titanic%: examples/titanic%.o $(KERNEL_OBJ)
-	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
+	@$(COMPILE) $< $(KERNEL_OBJ) -o $@
 
 tests: test/tests.o $(KERNEL_OBJ)
 	@echo Linking $@
