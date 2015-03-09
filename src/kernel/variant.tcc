@@ -156,7 +156,7 @@ X &variant<Ts...>::get()
                 "Type not in variant");
 
   // Dereferencing the pointer is well defined:
-  // http://stackoverflow.com/questions/28381338/reinterpret-cast-static-cast-and-undefined-behavior
+  // <http://stackoverflow.com/q/28381338/3235496>
   if (tag_ == detail::variant_::position<X, Ts...>::pos)
     return *reinterpret_cast<X *>(storage_);
 

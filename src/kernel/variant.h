@@ -26,7 +26,7 @@ namespace vita
 // Implementation details, user shouldn't import this.
 namespace detail { namespace variant_
 {
-/// 0-based position of \a T in \a Ts.
+/// 0-based position of `T` in `Ts`.
 template<class T, class... Ts> struct position;
 template<int, class...> struct storage_ops;
 template<class...> struct type_info;
@@ -47,7 +47,7 @@ template<class...> struct type_info;
 /// similar features.
 ///
 /// \warning
-/// All \a Ts... shall be object types and shall satisfy the requirements of
+/// All `Ts...` shall be object types and shall satisfy the requirements of
 /// 'Destructible'.
 ///
 template<class... Ts>

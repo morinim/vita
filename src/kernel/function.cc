@@ -16,30 +16,31 @@
 
 namespace vita
 {
-  ///
-  /// \param[in] dis string representation of the function (e.g. for the plus
-  ///                \a function it could by "ADD" or "+").
-  /// \param[in] c category of the function (i.e. the category of the output
-  ///              value).
-  /// \param[in] args input parameters (type and number) of the function (in
-  ///                 C++ they are called the "function signature").
-  ///
-  VITA_INLINE
-  function::function(const std::string &dis, category_t c, cvect args)
-    : symbol(dis, c), argt_(std::move(args))
-  {
-    assert(debug());
-  }
+///
+/// \param[in] dis string representation of the function (e.g. for the plus
+///                function it could by "ADD" or "+").
+/// \param[in] c category of the function (i.e. the category of the output
+///              value).
+/// \param[in] args input parameters (type and number) of the function (in
+///                 C++ they are called the "function signature").
+///
+VITA_INLINE
+function::function(const std::string &dis, category_t c, cvect args)
+  : symbol(dis, c), argt_(std::move(args))
+{
+  assert(debug());
+}
 
-  ///
-  /// \return \c true if the \a function passes the internal consistency check.
-  ///
-  VITA_INLINE
-  bool function::debug() const
-  {
-    if (!arity())  // This is a function, we want some argument...
-      return false;
+///
+/// \return `true` if the object passes the internal consistency check.
+///
+VITA_INLINE
+bool function::debug() const
+{
+  if (!arity())  // This is a function, we want some argument...
+    return false;
 
-    return symbol::debug();
-  }
+  return symbol::debug();
+}
+
 }  // namespace vita
