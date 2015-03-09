@@ -104,6 +104,8 @@ The default compiler is g++, to use clang++ type `make CXX=clang++`.
 
 All output files will, per default, be stored together with the source code.
 
+With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
+
 ### Additional instructions for building Boost on MinGW / MSYS ###
 
 Our standard Windows test environment is [Nuwen](http://nuwen.net/mingw.html): it's simple and ready to use.
