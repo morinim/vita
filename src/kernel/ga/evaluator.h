@@ -19,28 +19,28 @@
 
 namespace vita
 {
-  ///
-  /// \brief Calculates the fitness of a i_ga individual
-  ///
-  /// \note
-  /// Our convention is to convert raw fitness to standardized fitness. The
-  /// requirements for standardized fitness are:
-  /// * bigger values represent better choices;
-  /// * optimal value is 0.
-  ///
-  template<class T, class F>
-  class ga_evaluator : public evaluator<T>
-  {
-  public:
-    explicit ga_evaluator(F);
+///
+/// \brief Calculates the fitness of a i_ga individual
+///
+/// \note
+/// Our convention is to convert raw fitness to standardized fitness. The
+/// requirements for standardized fitness are:
+/// * bigger values represent better choices;
+/// * optimal value is 0.
+///
+template<class T, class F>
+class ga_evaluator : public evaluator<T>
+{
+public:
+  explicit ga_evaluator(F);
 
-    virtual fitness_t operator()(const T &) override;
+  virtual fitness_t operator()(const T &) override;
 
-  private:  // Private data members
-    F f_;
-  };
+private:  // Private data members
+  F f_;
+};
 
-  template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);
+template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);
 
 #include "kernel/ga/evaluator.tcc"
 }  // namespace vita
