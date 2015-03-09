@@ -96,7 +96,7 @@ Kernel library can be built with a header-only Boost library; other programs may
 * To build the kernel library (libvita.a): `make kernel`
 * To build the sr tool: `make sr`
 * To build tests: `make tests`
-* To build example <n>: `make example<n>`
+* To build example ABC: `make examples/ABC`
 
 If you see errors, try to tweak the contents of Makefile to make them go away.
 
