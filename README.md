@@ -10,11 +10,11 @@ It's suitable for classification, symbolic regression, content base image retrie
 * easy integration with other systems
 * simple addition of features and modules
 * fast experimentation with detailed run-log
-* modern, standard ISO C++11 source code
+* modern, standard ISO C++11/C++14 source code
 
 It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org/MPL/2.0/) (see the accompanying LICENSE file for more details).
 
-This software was originally developed by [EOS](http://www.eosdev.it/) without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
+This software was originally developed by [EOS][1] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
 Although the core development team is still anchored at EOS (the project is maintained by Manlio Morini), Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
 
@@ -28,14 +28,14 @@ However, since core members of the Vita project have no access to these platform
 
 * GNU-compatible make
 * POSIX-standard shell
-* [Boost library](http://www.boost.org/)
+* [Boost library][2]
 * A C++11-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v4.8.x or newer, clang 3.3 or newer)
 * Python v3 (for some functions)
 
 ### Windows requirements ###
 
 * MinGW/MSYS with a C++11-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v4.8.x or newer, clang 3.3 or newer)
-* [Boost library](http://www.boost.org/)
+* [Boost library][2]
 * Python v3 (for some functions)
 
 ## Getting the source ##
@@ -84,7 +84,7 @@ vita/
 
 If they are not already installed, you need the following libraries:
 
-* [BOOST](http://www.boost.org/)
+* [BOOST][2]
 
 Kernel library can be built with a header-only Boost library; other programs may need Boost separately-compiled library binaries (e.g. SR utility needs Program Options Library to compile). To build Boost library under MinGW see below.
 
@@ -120,3 +120,6 @@ If you choose other distributions, you'd need to build Boost:
     `b2 link=static runtime-link=static threading=multi toolset=gcc variant=release --build-type=minimal --layout=system`
 6. Go and make yourself *several* cups of sencha green tea.
 7. The stage subdir now contains libs.
+
+[1]: http://www.eosdev.it/
+[2]: http://www.boost.org/

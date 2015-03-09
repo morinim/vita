@@ -13,6 +13,7 @@
 #if !defined(VITA_ADF_H)
 #define      VITA_ADF_H
 
+#include <atomic>
 #include <string>
 
 #include "kernel/function.h"
@@ -62,7 +63,7 @@ private:  // Private data members
 
   static opcode_t adf_count()
   {
-    static opcode_t counter(0);
+    static std::atomic<opcode_t> counter(0);
     return counter++;
   }
 };

@@ -48,7 +48,7 @@ namespace vita
     void print_resume(const fitness_t &) const;
   };
 
-#include "kernel/ga/ga_search.tcc"
+#include "kernel/ga/search.tcc"
 }  // namespace vita
 
 #endif  // Include guard
