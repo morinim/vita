@@ -34,13 +34,13 @@ namespace vita
 /// raw fitness is error) or larger (as when raw fitness is food eaten, benefit
 /// achieved...).
 ///
-/// This is the **STANDARDIZED FITNESS**:
-/// * a greater numerical value is always a better value;
-/// * the best value of standardized fitness is 0.
+/// We use a **STANDARDIZED FITNESS**: a greater numerical value is **always**
+/// a better value (often the optimal value is 0, but this isn't strictly
+/// necessary).
 ///
 /// If, for a particular problem, a greater value of raw fitness is better,
 /// standardized fitness equals the raw fitness for that problem (otherwise
-/// standardized fitness must be computed from raw fitness). I.e.
+/// standardized fitness must be computed from raw fitness).
 ///
 /// \warning
 /// The definition of standardized fitness given here is different from that
