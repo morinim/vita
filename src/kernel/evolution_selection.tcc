@@ -147,7 +147,7 @@ std::vector<coord> alps<T>::run()
   auto c0(this->pickup(layer));
   auto c1(this->pickup(layer));
 
-  // This type is mainly used because of the lexicographic comparison
+  // This type is used to take advantage of the lexicographic comparison
   // capabilities of std::pair.
   using age_fit_t = std::pair<bool, fitness_t>;
   age_fit_t age_fit0{!vita::alps::aged(pop, c0), this->eva_(pop[c0])};

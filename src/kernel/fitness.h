@@ -26,6 +26,38 @@ namespace vita
 /// \brief A value assigned to an individual which reflects how well the
 ///        individual solves the task
 ///
+/// \tparam T a numerical type used as a building block for the fitness
+///           (e.g. `double`).
+///
+/// This is **NOT THE RAW FITNESS**. Raw fitness is stated in the natural
+/// terminology of the problem: the better value may be either smaller (as when
+/// raw fitness is error) or larger (as when raw fitness is food eaten, benefit
+/// achieved...).
+///
+/// This is the **STANDARDIZED FITNESS**:
+/// * a greater numerical value is always a better value;
+/// * the best value of standardized fitness is 0.
+///
+/// If, for a particular problem, a greater value of raw fitness is better,
+/// standardized fitness equals the raw fitness for that problem (otherwise
+/// standardized fitness must be computed from raw fitness). I.e.
+///
+/// \warning
+/// The definition of standardized fitness given here is different from that
+/// used in Koza's "Genetic Programming: On the Programming of Computers by
+/// Means of Natural Selection". In the book a **LOWER** numerical value is
+//  always a better one.
+/// The main difference is that Vita attempts to maximize the fitness (while
+/// other softwares try to minimize it).
+/// We chose this convention since it seemed more natural (a greater fitness
+/// is a better fitness; achieving a better fitness means to maximize the
+/// fitness). The downside is that we have to manage negative numbers, but for
+/// out purposes it's not so bad.
+/// Anyway maximization and minimization problems are basically the same: the
+/// solution of `max(f(x))` is the same as `-min(-f(x))`. This is usually
+/// all you have to remember when dealing with examples/problems expressed
+/// in the other notation.
+///
 template<class T>
 class basic_fitness_t
 {
@@ -33,7 +65,7 @@ private:
   using values_t = std::vector<T>;
 
 public:  // Type alias and iterators
-  using value_type = T;
+  using value_type = typename values_t::value_type;
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
 
