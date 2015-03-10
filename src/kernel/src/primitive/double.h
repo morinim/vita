@@ -37,6 +37,9 @@ namespace dbl
 {
 using base_t = double;
 
+static_assert(std::numeric_limits<base_t>::is_iec559,
+              "Vita requires IEC 559/IEEE 754 floating-point types");
+
 ///
 /// \param[in] v the value that must be casted to base type (`base_t`).
 /// \return the content of `v`.
