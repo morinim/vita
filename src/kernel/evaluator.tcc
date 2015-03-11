@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 
 ///
 /// \param[in] i an individual to be evaluated.
-/// \return the fitness (usually an approximation of) \a i.
+/// \return the fitness (usually an approximation of) `i`.
 ///
 /// Some evaluators have a faster but approximated version of the standard
 /// fitness evaluation method.
@@ -34,10 +34,10 @@ fitness_t evaluator<T>::fast(const T &i)
 
 ///
 /// \return the accuracy of a program. A negative value means that accuracy
-///         isn't available (\c -1.0 is the default value returned).
+///         isn't available (`-1.0` is the default value returned).
 ///
 /// Accuracy refers to the number of training examples that are correctly
-/// scored/classified as a proportion of the total number of examples in
+/// valued/classified as a proportion of the total number of examples in
 /// the training set. According to this design, the best accuracy is 1.0
 /// (100%), meaning that all the training examples have been correctly
 /// recognized.
@@ -56,7 +56,7 @@ double evaluator<T>::accuracy(const T &) const
 }
 
 ///
-/// \return \c 0.
+/// \return `0`.
 ///
 /// Some evaluators keep additional statistics about the individual seen
 /// so far.
@@ -99,7 +99,7 @@ std::string evaluator<T>::info() const
 }
 
 ///
-/// \return \c nullptr.
+/// \return `nullptr`.
 ///
 /// Derived methods create the 'executable' form of an individual.
 ///
