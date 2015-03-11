@@ -163,7 +163,7 @@ namespace vita
     for (auto i(cut1); i < cut2; ++i)
       rhs.genome_[i] = genome_[i];
 
-    rhs.age_ = std::max(age(), rhs.age());
+    rhs.set_older_age(age());
 
     rhs.signature_ = rhs.hash();
     assert(rhs.debug());
@@ -218,7 +218,7 @@ namespace vita
       else
         c[i] = operator[](i);
 
-    c.age_ = std::max({age(), a.age(), b.age(), c.age()});
+    c.set_older_age(std::max({age(), a.age(), b.age()}));
 
     c.signature_.clear();
     assert(c.debug());
@@ -402,12 +402,8 @@ namespace vita
   /// If the load operation isn't successful the current individual isn't
   /// modified.
   ///
-  bool i_ga::load(std::istream &in)
+  bool i_ga::load_nvi(std::istream &in)
   {
-    decltype(age_) t_age;
-    if (!(in >> t_age))
-      return false;
-
     decltype(genome_)::size_type sz;
     if (!(in >> sz) || !sz)
       return false;
@@ -430,11 +426,7 @@ namespace vita
       e = g;
     }
 
-    age_ = t_age;
     genome_ = v;
-
-    // We don't save/load signature: it can be easily calculated on the fly.
-    signature_.clear();
 
     return true;
   }
@@ -443,10 +435,8 @@ namespace vita
   /// \param[out] out output stream.
   /// \return \c true if individual was saved correctly.
   ///
-  bool i_ga::save(std::ostream &out) const
+  bool i_ga::save_nvi(std::ostream &out) const
   {
-    out << age() << '\n';
-
     out << parameters() << '\n';
     for (const auto &g : genome_)
       out << g.sym->opcode() << ' ' << g.par << '\n';

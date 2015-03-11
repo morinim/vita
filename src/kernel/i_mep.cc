@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -731,12 +731,8 @@ namespace vita
   /// If the load operation isn't successful the current individual isn't
   /// modified.
   ///
-  bool i_mep::load(std::istream &in)
+  bool i_mep::load_nvi(std::istream &in)
   {
-    decltype(age_) t_age;
-    if (!(in >> t_age))
-      return false;
-
     decltype(best_) best;
     if (!(in >> best.index >> best.category))
       return false;
@@ -776,13 +772,8 @@ namespace vita
     if (best.index >= genome.rows())
       return false;
 
-    age_ = t_age;
     best_ = best;
     genome_ = genome;
-
-    // We don't save/load signature: it can be easily calculated on the fly.
-    signature_.clear();
-    // signature_ = hash();
 
     return true;
   }
@@ -791,9 +782,9 @@ namespace vita
   /// \param[out] out output stream.
   /// \return \c true if individual was saved correctly.
   ///
-  bool i_mep::save(std::ostream &out) const
+  bool i_mep::save_nvi(std::ostream &out) const
   {
-    out << age() << ' ' << best_.index << ' ' << best_.category << '\n';
+    out << best_.index << ' ' << best_.category << '\n';
 
     out << genome_.rows() << ' ' << genome_.cols() << '\n';
     for (const auto &g : genome_)
@@ -844,7 +835,7 @@ namespace vita
       if (random::boolean())
         rhs.set(l, operator[](l));
 
-    rhs.age_ = std::max(age(), rhs.age());
+    rhs.set_older_age(age());
 
     assert(rhs.debug(true));
     return rhs;
@@ -890,7 +881,7 @@ namespace vita
           rhs.set(l, operator[](l));
         }
 
-    rhs.age_ = std::max(age(), rhs.age());
+    rhs.set_older_age(age());
 
     assert(rhs.debug());
     return rhs;
@@ -948,7 +939,7 @@ namespace vita
         }
     }
 
-    rhs.age_ = std::max(age(), rhs.age());
+    rhs.set_older_age(age());
 
     assert(rhs.debug());
     return rhs;

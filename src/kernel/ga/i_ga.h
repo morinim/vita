@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -103,9 +103,9 @@ namespace vita
 
     bool debug(bool = true) const;
 
-  public:   // Serialization
-    bool load(std::istream &);
-    bool save(std::ostream &) const;
+  private:   // NVI implementation (serialization)
+    virtual bool load_nvi(std::istream &) override;
+    virtual bool save_nvi(std::ostream &) const override;
 
   private:  // Private support methods
     hash_t hash() const;

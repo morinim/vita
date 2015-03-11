@@ -82,9 +82,9 @@ public:
 
   friend class interpreter<i_mep>;
 
-public:   // Serialization
-  bool load(std::istream &);
-  bool save(std::ostream &) const;
+private:   // NVI implementation (serialization)
+  virtual bool load_nvi(std::istream &) override;
+  virtual bool save_nvi(std::ostream &) const override;
 
 private:  // Private support methods
   hash_t hash() const;

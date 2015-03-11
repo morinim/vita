@@ -60,20 +60,32 @@ public:
   // Visualization/output methods.
   virtual std::ostream &in_line(std::ostream &) const = 0;
 
+public:   // Serialization
+  bool load(std::istream &);
+  bool save(std::ostream &) const;
+
+protected:  // Protected support methods
+  void set_older_age(unsigned);
+
 protected:  // Protected data members
   // Note that syntactically distinct (but logically equivalent) individuals
   // have the same signature. This is a very interesting  property, useful
   // for individual comparison, information retrieval, entropy calculation...
   mutable hash_t signature_;
 
-  unsigned age_;
-
   const environment *env_;
   const symbol_set *sset_;
+
+private:  // Non-virtual interface members
+  virtual bool load_nvi(std::istream &) = 0;
+  virtual bool save_nvi(std::ostream &) const = 0;
+
+private:
+  unsigned age_;
 };  // class individual
 
 inline individual::individual(const environment &e, const symbol_set &ss)
-  : signature_(), age_(0), env_(&e), sset_(&ss)
+  : signature_(), env_(&e), sset_(&ss), age_(0)
 {
   assert(e.debug(true, true));
 }
