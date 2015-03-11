@@ -39,7 +39,7 @@ public:
 
 private:  // NVI template methods
   virtual bool debug_nvi(bool) const override;
-  virtual T run_nvi(unsigned) override;
+  virtual summary<T> run_nvi(unsigned) override;
   virtual void tune_parameters_nvi() override;
 
 private:  // Private support methods

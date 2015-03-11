@@ -68,10 +68,10 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES, class F>
-T ga_search<T, ES, F>::run_nvi(unsigned n)
+summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 {
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -122,7 +122,7 @@ T ga_search<T, ES, F>::run_nvi(unsigned n)
     log(overall_summary, fd, good_runs, best_run, n);
   }
 
-  return overall_summary.best->ind;
+  return overall_summary;
 }
 
 ///

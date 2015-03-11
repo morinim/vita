@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run());
+  const auto res(s.run().best->ind);
 
   BOOST_CHECK_SMALL(f(res), 1.0);
   BOOST_CHECK_CLOSE(res[0], 3.0, 1.0);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s2(prob, f, p);
   BOOST_REQUIRE(s2.debug(true));
 
-  const auto res2(s2.run());
+  const auto res2(s2.run().best->ind);
 
   BOOST_CHECK_CLOSE(-f(res2), 13.59086, 1.0);
   BOOST_CHECK_CLOSE(res2[0], 2.246826, 1.0);
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run());
+  const auto res(s.run().best->ind);
 
   BOOST_REQUIRE_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
 

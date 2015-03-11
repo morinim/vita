@@ -386,10 +386,10 @@ void src_search<T, ES>::dss(unsigned generation) const
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES>
-T src_search<T, ES>::run_nvi(unsigned n)
+summary<T> src_search<T, ES>::run_nvi(unsigned n)
 {
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -504,7 +504,7 @@ T src_search<T, ES>::run_nvi(unsigned n)
     log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
   }
 
-  return overall_summary.best->ind;
+  return overall_summary;
 }
 
 ///

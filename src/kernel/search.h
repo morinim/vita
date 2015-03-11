@@ -48,7 +48,7 @@ public:
 
   std::unique_ptr<lambda_f<T>> lambdify(const T &);
 
-  T run(unsigned = 1);
+  summary<T> run(unsigned = 1);
 
   bool debug(bool) const;
 
@@ -69,7 +69,7 @@ protected:  // Protected data members
 
 private:  // NVI template methods
   virtual bool debug_nvi(bool) const { return true; }
-  virtual T run_nvi(unsigned) = 0;
+  virtual summary<T> run_nvi(unsigned) = 0;
   virtual void tune_parameters_nvi() = 0;
 };
 

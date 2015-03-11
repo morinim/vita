@@ -35,10 +35,10 @@ fitness_t search<T, ES>::fitness(const T &ind)
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES>
-T search<T, ES>::run(unsigned n)
+summary<T> search<T, ES>::run(unsigned n)
 {
   return run_nvi(n);
 }

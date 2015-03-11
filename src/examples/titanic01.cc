@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,9 +22,9 @@ int main()
     return EXIT_FAILURE;
 
   vita::src_search<> s(titanic);
-  const auto best(s.run());                        // starting search and
-                                                   // getting best individual
-  std::cout << best << std::endl;
+  const auto summary(s.run());                     // starting search and
+                                                   // getting a summary
+  std::cout << summary.best->ind << std::endl;
 
   return EXIT_SUCCESS;
 }
