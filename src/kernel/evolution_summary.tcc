@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,10 +47,10 @@ void summary<T>::clear()
 /// \param[in] in input stream.
 /// \param[in] e an environment (needed to build the best individual).
 /// \param[in] s a symbol_set (needed to build the best individual).
-/// \return \c true if hash_t loaded correctly.
+/// \return `true` if the object loaded correctly.
 ///
 /// \note
-/// If the load operation isn't successful the current hash_t isn't changed.
+/// If the load operation isn't successful the current object isn't changed.
 ///
 template<class T>
 bool summary<T>::load(std::istream &in, const environment &e,
@@ -87,7 +87,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if summary was saved correctly.
+/// \return `true` if summary was saved correctly.
 ///
 template<class T>
 bool summary<T>::save(std::ostream &out) const

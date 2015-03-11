@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,56 +22,56 @@
 
 namespace vita
 {
-  ///
-  /// \brief Search drives the evolution
-  ///
-  /// \tparam T the type of individual used
-  /// \tparam ES the adopted evolution strategy
-  ///
-  /// The class is an interface for specific search strategies. The design
-  /// adheres to the NVI pattern ("Virtuality" in C/C++ Users Journal September
-  /// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
-  ///
-  /// \note
-  /// The "template template parameter" approach allows coordination between T
-  /// and ES to be handled by the search class, rather than in all the various
-  /// code that specializes search.
-  /// A very interesting description of this technique can be found in
-  /// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
-  /// (<http://www.informit.com/articles/article.aspx?p=376878>).
-  ///
-  template<class T, template<class> class ES>
-  class search
-  {
-  public:
-    explicit search(problem &);
+///
+/// \brief Search drives the evolution
+///
+/// \tparam T the type of individual used
+/// \tparam ES the adopted evolution strategy
+///
+/// The class is an interface for specific search strategies. The design
+/// adheres to the NVI pattern ("Virtuality" in C/C++ Users Journal September
+/// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
+///
+/// \note
+/// The "template template parameter" approach allows coordination between T
+/// and ES to be handled by the search class, rather than in all the various
+/// code that specializes search.
+/// A very interesting description of this technique can be found in
+/// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
+/// (<http://www.informit.com/articles/article.aspx?p=376878>).
+///
+template<class T, template<class> class ES>
+class search
+{
+public:
+  explicit search(problem &);
 
-    std::unique_ptr<lambda_f<T>> lambdify(const T &);
+  std::unique_ptr<lambda_f<T>> lambdify(const T &);
 
-    T run(unsigned = 1);
+  T run(unsigned = 1);
 
-    bool debug(bool) const;
+  bool debug(bool) const;
 
-  protected: // Protected support methods
-    fitness_t fitness(const T &);
-    void set_evaluator(std::unique_ptr<evaluator<T>>);
-    virtual bool stop_condition(const summary<T> &) const;
+protected: // Protected support methods
+  fitness_t fitness(const T &);
+  void set_evaluator(std::unique_ptr<evaluator<T>>);
+  virtual bool stop_condition(const summary<T> &) const;
 
-  protected:  // Protected data members
-    std::unique_ptr<evaluator<T>> active_eva_;
+protected:  // Protected data members
+  std::unique_ptr<evaluator<T>> active_eva_;
 
-    // This is the environment actually used during the search (\a prob_->env
-    // is used for compiling \a env_ via the tune_parameters method).
-    environment env_;
+  // This is the environment actually used during the search (\a prob_->env
+  // is used for compiling \a env_ via the tune_parameters method).
+  environment env_;
 
-    // Problem we're working on.
-    problem &prob_;
+  // Problem we're working on.
+  problem &prob_;
 
-  private:  // NVI template methods
-    virtual bool debug_nvi(bool) const { return true; }
-    virtual T run_nvi(unsigned) = 0;
-    virtual void tune_parameters_nvi() = 0;
-  };
+private:  // NVI template methods
+  virtual bool debug_nvi(bool) const { return true; }
+  virtual T run_nvi(unsigned) = 0;
+  virtual void tune_parameters_nvi() = 0;
+};
 
 #include "kernel/search.tcc"
 }  // namespace vita
