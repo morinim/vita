@@ -49,9 +49,9 @@ matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
 template<class T>
 unsigned matrix<T>::index(unsigned r, unsigned c) const
 {
-  assert(c < cols_);
+  assert(c < cols());
 
-  return r * cols_ + c;
+  return r * cols() + c;
 }
 
 ///
@@ -123,9 +123,7 @@ unsigned matrix<T>::size() const
 template<class T>
 unsigned matrix<T>::rows() const
 {
-  assert(cols());
-
-  return static_cast<unsigned>(data_.size() / cols_);
+  return cols() ? static_cast<unsigned>(data_.size() / cols()) : 0;
 }
 
 ///
@@ -236,11 +234,11 @@ bool matrix<T>::load(std::istream &in)
                 "matrix::load doesn't support non-integral types");
 
   decltype(cols_) cs;
-  if (!(in >> cs) || !cs)
+  if (!(in >> cs))
     return false;
 
   decltype(cols_) rs;
-  if (!(in >> rs) || !rs)
+  if (!(in >> rs))
     return false;
 
   decltype(data_) v(cs * rs);
@@ -252,6 +250,7 @@ bool matrix<T>::load(std::istream &in)
   cols_ = cs;
   data_ = v;
 
+  assert(!empty() || (cols() == 0 && size() == 0));
   return true;
 }
 

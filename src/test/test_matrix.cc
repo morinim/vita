@@ -29,16 +29,19 @@ BOOST_AUTO_TEST_SUITE(matrix)
 
 BOOST_AUTO_TEST_CASE(EmptyMatrix)
 {
-  vita::matrix<double> m;
+  vita::matrix<int> m;
 
   BOOST_REQUIRE(m.empty());
   BOOST_REQUIRE_EQUAL(m.cols(), 0);
 
-  vita::matrix<double> m1(3, 3);
+  decltype(m) m1(3, 3);
   BOOST_REQUIRE(!m1.empty());
 
-  m = m1;
-  BOOST_REQUIRE(!m.empty());
+  std::stringstream ss;
+  BOOST_REQUIRE(m.save(ss));
+
+  BOOST_REQUIRE(m1.load(ss));
+  BOOST_REQUIRE_EQUAL(m, m1);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
