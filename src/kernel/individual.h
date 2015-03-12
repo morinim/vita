@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,10 +13,7 @@
 #if !defined(VITA_INDIVIDUAL_H)
 #define      VITA_INDIVIDUAL_H
 
-#include <cmath>
-#include <functional>
-#include <iomanip>
-#include <set>
+#include <fstream>
 
 #include "kernel/locus.h"
 #include "kernel/symbol_set.h"
