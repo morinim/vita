@@ -350,8 +350,17 @@ namespace vita
   ///
   bool i_ga::debug(bool verbose) const
   {
-    if (genome_.empty())
+    if (empty())
     {
+      if (!genome_.empty())
+      {
+        if (verbose)
+          std::cerr << k_s_debug
+                    << " Inconsistent internal status for empty individual.\n";
+
+        return false;
+      }
+
       if (!signature_.empty())
       {
         if (verbose)
@@ -394,7 +403,6 @@ namespace vita
                     << '\n';
         return false;
       }
-
     }
 
     if (!signature_.empty() && signature_ != hash())

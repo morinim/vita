@@ -429,8 +429,17 @@ namespace vita
   ///
   bool i_mep::debug(bool verbose) const
   {
-    if (genome_.empty())
+    if (empty())
     {
+      if (!genome_.empty())
+      {
+        if (verbose)
+          std::cerr << k_s_debug
+                    << " Inconsistent internal status for empty individual.\n";
+
+        return false;
+      }
+
       if (best_ != locus::npos())
       {
         if (verbose)
@@ -559,7 +568,7 @@ namespace vita
   /// \param[in] id used for subgraph plot (usually this is an empty string).
   ///
   /// The output stream contains a graph, described in dot language
-  /// (http://www.graphviz.org), of \c this individual.
+  /// (http://www.graphviz.org/), of \c this individual.
   ///
   void i_mep::graphviz(std::ostream &s, const std::string &id) const
   {
