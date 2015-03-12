@@ -400,8 +400,8 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
   tune_parameters_nvi();
 
-  // For std::placeholders and std::bind see:
-  //  <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
+  // For `std::placeholders` and `std::bind` see:
+  // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
   std::function<void (unsigned)> shake;
   if (this->env_.dss)
     shake = std::bind(&src_search::dss, this, std::placeholders::_1);
