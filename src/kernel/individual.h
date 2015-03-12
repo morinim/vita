@@ -53,6 +53,8 @@ public:
   unsigned age() const { return age_; }
   void inc_age() { ++age_; }
 
+  bool empty() const { return !env_; }
+
   const environment &env() const { return *env_; }
   const symbol_set &sset() const { return *sset_; }
 
