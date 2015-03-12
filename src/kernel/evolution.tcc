@@ -165,7 +165,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       f_dyn << run_count << ' ' << stats_.gen;
 
-      if (stats_.best.ind.empty())
+      if (stats_.best.solution.empty())
         f_dyn << " ?";
       else
         f_dyn << ' ' << stats_.best.fitness[0];
@@ -190,8 +190,8 @@ void evolution<T, ES>::log(unsigned run_count) const
                 << ' ' << symb_stat.second.counter[active];
 
       f_dyn << " \"";
-      if (!stats_.best.ind.empty())
-        stats_.best.ind.in_line(f_dyn);
+      if (!stats_.best.solution.empty())
+        stats_.best.solution.in_line(f_dyn);
       f_dyn << "\"\n";
     }
   }
@@ -286,8 +286,8 @@ evolution<T, ES>::run(unsigned run_count)
       // If we 'shake' the data, the statistics picked so far have to be
       // cleared (the best individual and its fitness refer to an old
       // training set).
-      assert(!stats_.best.ind.empty());
-      stats_.best.fitness = eva_(stats_.best.ind);
+      assert(!stats_.best.solution.empty());
+      stats_.best.fitness = eva_(stats_.best.solution);
       print_progress(0, run_count, true);
     }
 

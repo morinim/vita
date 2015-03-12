@@ -39,8 +39,8 @@ public:  // Public data members
 
   struct
   {
-    T             ind;
-    fitness_t fitness;
+    T         solution;
+    fitness_t  fitness;
   } best;
 
   /// Time (in milliseconds) elapsed from evolution beginning.

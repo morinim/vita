@@ -100,20 +100,20 @@ BOOST_AUTO_TEST_CASE(Evolution)
 
   const auto s1(evo1.run(1));
 
-  BOOST_CHECK_GT(s1.best.ind[0], 8.0);
-  BOOST_CHECK_GT(s1.best.ind[1], 95.0);
-  BOOST_CHECK_GT(s1.best.ind[2], 990.0);
-  BOOST_CHECK_GT(s1.best.ind[3], 9980.0);
+  BOOST_CHECK_GT(s1.best.solution[0], 8.0);
+  BOOST_CHECK_GT(s1.best.solution[1], 95.0);
+  BOOST_CHECK_GT(s1.best.solution[2], 990.0);
+  BOOST_CHECK_GT(s1.best.solution[3], 9980.0);
 
   vita::evolution<vita::i_ga, vita::std_es> evo2(env, sset, eva);
   BOOST_REQUIRE(evo2.debug(true));
 
   const auto s2(evo2.run(1));
 
-  BOOST_CHECK_GT(s2.best.ind[0], 8.0);
-  BOOST_CHECK_GT(s2.best.ind[1], 95.0);
-  BOOST_CHECK_GT(s2.best.ind[2], 980.0);
-  BOOST_CHECK_GT(s2.best.ind[3], 9980.0);
+  BOOST_CHECK_GT(s2.best.solution[0], 8.0);
+  BOOST_CHECK_GT(s2.best.solution[1], 95.0);
+  BOOST_CHECK_GT(s2.best.solution[2], 980.0);
+  BOOST_CHECK_GT(s2.best.solution[3], 9980.0);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run().best.ind);
+  const auto res(s.run().best.solution);
 
   BOOST_CHECK_SMALL(f(res), 1.0);
   BOOST_CHECK_CLOSE(res[0], 3.0, 1.0);
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s2(prob, f, p);
   BOOST_REQUIRE(s2.debug(true));
 
-  const auto res2(s2.run().best.ind);
+  const auto res2(s2.run().best.solution);
 
   BOOST_CHECK_CLOSE(-f(res2), 13.59086, 1.0);
   BOOST_CHECK_CLOSE(res2[0], 2.246826, 1.0);
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run().best.ind);
+  const auto res(s.run().best.solution);
 
   BOOST_REQUIRE_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
 

@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_CHECK_EQUAL(before.gen, after.gen);
     BOOST_CHECK_EQUAL(before.last_imp, after.last_imp);
 
-    BOOST_CHECK_EQUAL(before.best.ind, after.best.ind);
+    BOOST_CHECK_EQUAL(before.best.solution, after.best.solution);
     BOOST_CHECK_EQUAL(before.best.fitness, after.best.fitness);
   }
 }

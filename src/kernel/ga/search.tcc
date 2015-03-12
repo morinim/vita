@@ -97,7 +97,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 
     if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
-      overall_summary.best = {s.best.ind, run_fitness};
+      overall_summary.best = {s.best.solution, run_fitness};
       best_run = r;
     }
 
@@ -158,7 +158,7 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
   if (this->env_.stat_summary)
   {
     std::ostringstream best_list;
-    run_sum.best.ind.list(best_list);
+    run_sum.best.solution.list(best_list);
 
     const std::string path("vita.");
     const std::string summary(path + "summary.");
@@ -174,7 +174,7 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
 
     pt.put(summary + "best.fitness", run_sum.best.fitness);
     pt.put(summary + "best.run", best_run);
-    pt.put(summary + "best.individual.list", best_list.str());
+    pt.put(summary + "best.solution.list", best_list.str());
 
     for (const auto &p : good_runs)
       pt.add(summary + "solutions.runs.run", p);

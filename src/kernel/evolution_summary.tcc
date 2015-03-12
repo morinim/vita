@@ -34,7 +34,7 @@ void summary<T>::clear()
 {
   az.clear();
 
-  best.ind = T();
+  best.solution = T();
   best.fitness = fitness_t();
 
   elapsed    = 0.0;
@@ -76,7 +76,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
   }
   else
   {
-    tmp_summary.best.ind = T();
+    tmp_summary.best.solution = T();
     tmp_summary.best.fitness = fitness_t();
   }
 
@@ -99,12 +99,12 @@ bool summary<T>::save(std::ostream &out) const
   // analyzer az doesn't need to be saved: it'll be recalculated at the
   // beginning of evolution.
 
-  if (best.ind.empty())
+  if (best.solution.empty())
     out << "0\n";
   else
   {
     out << "1\n";
-    best.ind.save(out);
+    best.solution.save(out);
     best.fitness.save(out);
   }
 
