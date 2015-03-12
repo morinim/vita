@@ -49,6 +49,8 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
   vita::i_ga ind;
 
   BOOST_REQUIRE(ind.debug());
+  BOOST_REQUIRE(ind.empty());
+  BOOST_REQUIRE(!ind.size());
 }
 
 BOOST_AUTO_TEST_CASE(Penalty)
@@ -237,6 +239,7 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
+  BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
@@ -253,5 +256,18 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     BOOST_CHECK_EQUAL(i1, i2);
   }
+
+  BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
+  std::stringstream ss;
+  vita::i_ga empty;
+  BOOST_REQUIRE(empty.save(ss));
+
+  vita::i_ga empty1(env, sset);
+  BOOST_REQUIRE(empty1.load(ss));
+  BOOST_REQUIRE(empty1.debug());
+  BOOST_REQUIRE(empty1.empty());
+
+  BOOST_REQUIRE_EQUAL(empty, empty1);
+
 }
 BOOST_AUTO_TEST_SUITE_END()

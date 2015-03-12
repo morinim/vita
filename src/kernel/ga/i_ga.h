@@ -83,14 +83,14 @@ public:
   i_ga &operator=(const std::vector<gene::param_type> &);
 
   ///
-  /// \return `1`.
+  /// \return `1` if the individual is not empty, `0` otherwise.
   ///
   /// This is for compatibility for GP algorithm, but isn't significative
   /// for differential evolution.
   ///
   /// \see i_ga::parameters()
   ///
-  unsigned size() const { return 1; }
+  unsigned size() const { return !empty(); }
 
   ///
   /// \return the number of parameters stored in the individual.

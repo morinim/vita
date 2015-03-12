@@ -426,8 +426,8 @@ bool i_ga::debug(bool verbose) const
 ///
 bool i_ga::load_nvi(std::istream &in)
 {
-  decltype(genome_)::size_type sz;
-  if (!(in >> sz) || !sz)
+  decltype(parameters()) sz;
+  if (!(in >> sz))
     return false;
 
   decltype(genome_) v(sz);
