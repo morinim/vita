@@ -21,9 +21,9 @@
 /// Default constructor just call the summary::clear method.
 ///
 template<class T>
-summary<T>::summary()
+summary<T>::summary() : az(), best(), elapsed(0.0), crossovers(0),
+                        mutations(0), gen(0), last_imp(0)
 {
-  clear();
 }
 
 ///
@@ -32,16 +32,7 @@ summary<T>::summary()
 template<class T>
 void summary<T>::clear()
 {
-  az.clear();
-
-  best.solution = T();
-  best.fitness = fitness_t();
-
-  elapsed    = 0.0;
-  mutations  = 0;
-  crossovers = 0;
-  gen        = 0;
-  last_imp   = 0;
+  *this = summary<T>();
 }
 
 ///
