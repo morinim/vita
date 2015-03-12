@@ -40,7 +40,9 @@ namespace vita
   class i_ga : public individual
   {
   public:
-    explicit i_ga(const environment &, const symbol_set &);
+    i_ga() : individual(), genome_() {}
+
+    i_ga(const environment &, const symbol_set &);
 
     // Visualization/output methods
     void graphviz(std::ostream &) const;

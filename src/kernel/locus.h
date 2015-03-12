@@ -14,8 +14,9 @@
 #define      VITA_LOCUS_H
 
 #include <iostream>
+#include <limits>
 
-#include "kernel/gene.h"
+#include "kernel/vita.h"
 
 namespace vita
 {
@@ -30,6 +31,12 @@ struct locus
   category_t category;
 
   locus operator+(index_t) const;
+
+  static constexpr locus npos()
+  {
+    return {std::numeric_limits<index_t>::max(),
+            std::numeric_limits<category_t>::max()};
+  }
 };
 
 ///

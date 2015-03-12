@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,6 +35,8 @@ matrix<T>::matrix() : data_(), cols_(0)
 template<class T>
 matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
 {
+  assert(rs);
+  assert(cs);
 }
 
 ///
@@ -98,6 +100,15 @@ typename matrix<T>::reference matrix<T>::operator()(unsigned r, unsigned c)
 }
 
 ///
+/// \return `true` if the matrix is empty (`cols() == 0`).
+///
+template<class T>
+bool matrix<T>::empty() const
+{
+  return size() == 0;
+}
+
+///
 /// \return number of elements of the matrix.
 ///
 template<class T>
@@ -112,6 +123,8 @@ unsigned matrix<T>::size() const
 template<class T>
 unsigned matrix<T>::rows() const
 {
+  assert(cols());
+
   return static_cast<unsigned>(data_.size() / cols_);
 }
 

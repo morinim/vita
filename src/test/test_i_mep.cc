@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -88,6 +88,13 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     BOOST_REQUIRE_EQUAL(i.size(), l);
     BOOST_REQUIRE_EQUAL(i.age(), 0);
   }
+}
+
+BOOST_AUTO_TEST_CASE(EmptyIndividual)
+{
+  vita::i_mep i;
+
+  BOOST_REQUIRE(i.debug());
 }
 
 BOOST_AUTO_TEST_CASE(Mutation)

@@ -36,6 +36,8 @@ namespace vita
 class individual
 {
 public:
+  individual() : signature_(), env_(nullptr), sset_(nullptr), age_() {}
+
   individual(const environment &, const symbol_set &);
 
   /// This is a measure of how long an individual's family of genotypic

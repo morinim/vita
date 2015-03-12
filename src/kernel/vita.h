@@ -48,12 +48,11 @@ enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 /// Categories are the way strong typing GP is implemented in Vita.
 using category_t = unsigned;
 
-///
 /// A useful shortcut for a group of categories.
-///
 using cvect = std::vector<category_t>;
 
-/// Index in the genome. Locus is uniquely identified by a couple of indexes.
+/// Index in the genome. Locus is uniquely identified by an index and a
+/// category.
 using index_t = unsigned;
 
 /// \brief Prefix for debug messages

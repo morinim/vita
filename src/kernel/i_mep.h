@@ -19,6 +19,7 @@
 #include <set>
 
 #include "kernel/function.h"
+#include "kernel/gene.h"
 #include "kernel/individual.h"
 #include "kernel/matrix.h"
 
@@ -32,6 +33,8 @@ namespace vita
 class i_mep : public individual
 {
 public:
+  i_mep() : individual(), genome_(), best_(locus::npos()) {}
+
   i_mep(const environment &, const symbol_set &);
   i_mep(const environment &, const symbol_set &, const std::vector<gene> &);
 

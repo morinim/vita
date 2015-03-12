@@ -350,6 +350,20 @@ namespace vita
   ///
   bool i_ga::debug(bool verbose) const
   {
+    if (genome_.empty())
+    {
+      if (!signature_.empty())
+      {
+        if (verbose)
+          std::cerr << k_s_debug
+                    << " Empty individual must empty signature.\n";
+
+        return false;
+      }
+
+      return true;
+    }
+
     const auto ps(parameters());
 
     for (auto i(decltype(ps){0}); i < ps; ++i)

@@ -15,6 +15,7 @@
 
 #include "kernel/core_interpreter.h"
 #include "kernel/function.h"
+#include "kernel/gene.h"
 #include "kernel/matrix.h"
 #include "kernel/vitafwd.h"
 

@@ -429,7 +429,30 @@ namespace vita
   ///
   bool i_mep::debug(bool verbose) const
   {
-    const auto categories(sset_->categories());
+    if (genome_.empty())
+    {
+      if (best_ != locus::npos())
+      {
+        if (verbose)
+          std::cerr << k_s_debug
+                    << " Empty individual must have undefined best locus.\n";
+
+        return false;
+      }
+
+      if (!signature_.empty())
+      {
+        if (verbose)
+          std::cerr << k_s_debug
+                    << " Empty individual must empty signature.\n";
+
+        return false;
+      }
+
+      return true;
+    }
+
+    const auto categories(sset().categories());
 
     for (index_t i(0); i < size(); ++i)
       for (category_t c(0); c < categories; ++c)

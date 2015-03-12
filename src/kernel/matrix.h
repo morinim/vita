@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,7 +42,7 @@ namespace vita
     using values_t = std::vector<T>;
 
   public:  // Type alias
-    using value_type = T;
+    using value_type = typename values_t::value_type;
     using reference = typename values_t::reference;
     using const_reference = typename values_t::const_reference;
 
@@ -59,6 +59,7 @@ namespace vita
 
     bool operator==(const matrix<T> &) const;
 
+    bool empty() const;
     unsigned rows() const;
     unsigned cols() const;
 
