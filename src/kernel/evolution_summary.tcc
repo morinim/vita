@@ -66,10 +66,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
     tmp_summary.best = {tmp_ind, tmp_fitness};
   }
   else
-  {
-    tmp_summary.best.solution = T();
-    tmp_summary.best.fitness = fitness_t();
-  }
+    tmp_summary.best = {T(), fitness_t()};
 
   if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
            >> tmp_summary.crossovers >> tmp_summary.gen

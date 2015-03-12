@@ -95,6 +95,11 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
   vita::i_mep i;
 
   BOOST_REQUIRE(i.debug());
+  BOOST_REQUIRE(i.empty());
+  BOOST_REQUIRE_EQUAL(i.size(), 0);
+
+  i = vita::i_mep(env, sset);
+  BOOST_REQUIRE(!i.empty());
 }
 
 BOOST_AUTO_TEST_CASE(Mutation)
@@ -184,6 +189,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
+  BOOST_TEST_CHECKPOINT("Non-empty i_mep serialization");
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
@@ -200,6 +206,18 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     BOOST_CHECK_EQUAL(i1, i2);
   }
+
+  BOOST_TEST_CHECKPOINT("Empty i_mep serialization");
+  std::stringstream ss;
+  vita::i_mep empty;
+  BOOST_REQUIRE(empty.save(ss));
+
+  vita::i_mep empty1(env, sset);
+  BOOST_REQUIRE(empty1.load(ss));
+  BOOST_REQUIRE(empty1.debug());
+  BOOST_REQUIRE(empty1.empty());
+
+  BOOST_REQUIRE_EQUAL(empty, empty1);
 }
 
 BOOST_AUTO_TEST_CASE(Blocks)

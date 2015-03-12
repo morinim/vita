@@ -765,12 +765,8 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 ///
 bool i_mep::load_nvi(std::istream &in)
 {
-  decltype(best_) best;
-  if (!(in >> best.index >> best.category))
-    return false;
-
   unsigned rows, cols;
-  if (!(in >> rows >> cols) || !rows || !cols)
+  if (!(in >> rows >> cols))
     return false;
 
   // The matrix class has a basic support for serialization but we cannot
@@ -801,8 +797,16 @@ bool i_mep::load_nvi(std::istream &in)
     e = g;
   }
 
-  if (best.index >= genome.rows())
-    return false;
+  decltype(best_) best(locus::npos());
+
+  if (cols)
+  {
+    if (!(in >> best.index >> best.category))
+      return false;
+
+    if (best.index >= genome.rows())
+      return false;
+  }
 
   best_ = best;
   genome_ = genome;
@@ -816,8 +820,6 @@ bool i_mep::load_nvi(std::istream &in)
 ///
 bool i_mep::save_nvi(std::ostream &out) const
 {
-  out << best_.index << ' ' << best_.category << '\n';
-
   out << genome_.rows() << ' ' << genome_.cols() << '\n';
   for (const auto &g : genome_)
   {
@@ -832,6 +834,9 @@ bool i_mep::save_nvi(std::ostream &out) const
 
     out << '\n';
   }
+
+  if (!empty())
+    out << best_.index << ' ' << best_.category << '\n';
 
   return out.good();
 }

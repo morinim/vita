@@ -24,7 +24,7 @@ int main()
   vita::src_search<> s(titanic);
   const auto summary(s.run());                     // starting search and
                                                    // getting a summary
-  std::cout << summary.best.solution << std::endl;
+  std::cout << summary.best.solution << '\n';
 
   return EXIT_SUCCESS;
 }

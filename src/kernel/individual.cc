@@ -23,12 +23,22 @@ namespace vita
 ///
 bool individual::load(std::istream &in)
 {
+  bool t_empty;
+  if (!(in >> t_empty))
+    return false;
+
   decltype(age()) t_age;
   if (!(in >> t_age))
     return false;
 
   if (!load_nvi(in))
     return false;
+
+  if (t_empty)
+  {
+    env_ = nullptr;
+    sset_ = nullptr;
+  }
 
   age_ = t_age;
 
@@ -45,7 +55,7 @@ bool individual::load(std::istream &in)
 ///
 bool individual::save(std::ostream &out) const
 {
-  out << age() << '\n';
+  out << empty() << ' ' << age() << '\n';
 
   return save_nvi(out);
 }
