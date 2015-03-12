@@ -41,9 +41,11 @@ BOOST_AUTO_TEST_CASE(Serialization)
     before.last_imp = vita::random::between(0u, 1000u);
 
     if (vita::random::boolean(0.8))
-      before.best = {
+      before.best =
+      {
         vita::i_mep(env, sset),
-        vita::fitness_t(1, vita::random::between<double>(0.0, 1000.0))
+        vita::fitness_t(1, vita::random::between<double>(0.0, 1000.0)),
+        vita::random::between<double>(0.0, 1.0)
       };
 
     std::stringstream ss;
@@ -60,6 +62,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     BOOST_CHECK_EQUAL(before.best.solution, after.best.solution);
     BOOST_CHECK_EQUAL(before.best.fitness, after.best.fitness);
+    BOOST_CHECK_EQUAL(before.best.accuracy, after.best.accuracy);
   }
 }
 

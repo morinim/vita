@@ -41,6 +41,7 @@ public:  // Public data members
   {
     T         solution;
     fitness_t  fitness;
+    double    accuracy;
   } best;
 
   /// Time (in milliseconds) elapsed from evolution beginning.

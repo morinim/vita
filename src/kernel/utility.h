@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,8 @@
 #define      VITA_UTILITY_H
 
 #include <algorithm>
-#include <ios>
+#include <iomanip>
+#include <iostream>
 
 #include "kernel/vita.h"
 
@@ -39,7 +40,7 @@ namespace vita
   /// elision.
   ///
   /// \see
-  /// <http://stackoverflow.com/questions/21993780/fill-stdarray-in-the-member-initialization-list>
+  /// <http://stackoverflow.com/q/21993780/3235496>
   ///
   template<class T, unsigned N> std::array<T, N> make_array(T v)
   {
@@ -110,10 +111,10 @@ namespace vita
   /// before.
   ///
   /// \note
-  /// An alternative approach, which is also exception-safe, is to shuffle
-  /// everything into a temporary \a stringstream and finally put that on
-  /// the real stream (which has never changed its flags at all).
-  /// Of course this is a little less performant.
+  /// An alternative is to shuffle everything into a temporary \a stringstream
+  /// and finally put that on the real stream (which has never changed its
+  /// flags at all).
+  /// This approach is exception-safe but a little less performant.
   ///
   class ios_flag_saver
   {
@@ -231,6 +232,38 @@ namespace vita
     const T largest(std::max(v1, v2));
 
     return diff <= largest * e;
+  }
+
+  ///
+  /// \param[out] out the output stream.
+  /// \param[in] i the floating-point value to be saved.
+  /// \return a reference to the output stream.
+  ///
+  template<class T>
+  std::ostream &save_float_to_stream(std::ostream &out, T i)
+  {
+    SAVE_FLAGS(out);
+
+    out << std::fixed << std::scientific
+        << std::setprecision(std::numeric_limits<T>::digits10 + 1)
+        << i;
+
+    return out;
+  }
+
+  ///
+  /// \param[in] in the input stream.
+  /// \param[out] i the floating-point value to be loaded.
+  /// \return `true` if the operation is successful.
+  ///
+  template<class T>
+  bool load_float_from_stream(std::istream &in, T *i)
+  {
+    SAVE_FLAGS(in);
+
+    return in >> std::fixed >> std::scientific
+              >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
+              >> *i;
   }
 }  // namespace vita
 

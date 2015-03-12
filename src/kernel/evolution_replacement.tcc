@@ -127,8 +127,8 @@ void tournament<T>::run(const std::vector<coord> &parent,
 
   if (fit_off > s->best.fitness)
   {
-    s->last_imp =                  s->gen;
-    s->best     = {offspring[0], fit_off};
+    s->last_imp =                        s->gen;
+    s->best     = {offspring[0], fit_off, -1.0};
   }
 }
 
@@ -274,8 +274,8 @@ void alps<T>::run(const std::vector<coord> &parent,
     if (!ins && pop.env().elitism)
       try_add_to_layer(pop.layers() - 1, offspring[0]);
 
-    s->last_imp =                s->gen;
-    s->best     = {offspring[0], f_off};
+    s->last_imp =                      s->gen;
+    s->best     = {offspring[0], f_off, -1.0};
   }
 }
 
@@ -324,8 +324,8 @@ void pareto<T>::run(const std::vector<coord> &parent,
 
       if (fit_off > s->best.fitness)
       {
-        s->last_imp =                  s->gen;
-        s->best     = {offspring[0], fit_off};
+        s->last_imp =                        s->gen;
+        s->best     = {offspring[0], fit_off, -1.0};
       }
 
       break;
@@ -352,8 +352,8 @@ void pareto<T>::run(const std::vector<coord> &parent,
 
   if (fit_off > s->best.fitness)
   {
-    s->last_imp =                  s->gen;
-    s->best     = {offspring[0], fit_off};
+    s->last_imp =                        s->gen;
+    s->best     = {offspring[0], fit_off, -1.0};
   }
 }
 #endif  // Include guard

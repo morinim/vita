@@ -264,7 +264,7 @@ const summary<T> &
 evolution<T, ES>::run(unsigned run_count)
 {
   stats_.clear();
-  stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}])};
+  stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}]), -1.0};
 
   timer measure;
 

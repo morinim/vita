@@ -97,7 +97,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 
     if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
-      overall_summary.best = {s.best.solution, run_fitness};
+      overall_summary.best = {s.best.solution, run_fitness, -1.0};
       best_run = r;
     }
 

@@ -394,10 +394,9 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
-  double best_accuracy(-1.0);
   unsigned best_run(0);
 
-  std::list<unsigned> good_runs;
+  std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
 
@@ -470,8 +469,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
-      overall_summary.best = {s.best.solution, run_fitness};
-      best_accuracy = run_accuracy;
+      overall_summary.best = {s.best.solution, run_fitness, run_accuracy};
       best_run = r;
     }
 
@@ -501,7 +499,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
     assert(good_runs.empty() ||
            std::find(good_runs.begin(), good_runs.end(), best_run) !=
            good_runs.end());
-    log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
+    log(overall_summary, fd, good_runs, best_run, n);
   }
 
   return overall_summary;
@@ -533,7 +531,6 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
 /// \param[in] fd statistics about population fitness.
 /// \param[in] good_runs list of the best runs of the search.
 /// \param[in] best_run best overall run.
-/// \param[in] best_accuracy accuracy of the best individual (if available).
 /// \param[in] runs number of runs performed.
 /// \return `true` if the write operation succeed.
 ///
@@ -542,9 +539,8 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
 template<class T, template<class> class ES>
 void src_search<T, ES>::log(const summary<T> &run_sum,
                             const distribution<fitness_t> &fd,
-                            const std::list<unsigned> &good_runs,
-                            unsigned best_run, double best_accuracy,
-                            unsigned runs)
+                            const std::vector<unsigned> &good_runs,
+                            unsigned best_run, unsigned runs)
 {
   // Summary logging.
   if (this->env_.stat_summary)
@@ -567,7 +563,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
     pt.put(summary + "best.fitness", run_sum.best.fitness);
-    pt.put(summary + "best.accuracy", best_accuracy);
+    pt.put(summary + "best.accuracy", run_sum.best.accuracy);
     pt.put(summary + "best.run", best_run);
     pt.put(summary + "best.solution.tree", best_tree.str());
     pt.put(summary + "best.solution.list", best_list.str());

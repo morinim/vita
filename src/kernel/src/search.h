@@ -13,8 +13,6 @@
 #if !defined(VITA_SRC_SEARCH_H)
 #define      VITA_SRC_SEARCH_H
 
-#include <list>
-
 #include "kernel/adf.h"
 #include "kernel/search.h"
 #include "kernel/src/evaluator.h"
@@ -58,7 +56,7 @@ private:  // Private support methods
   double accuracy(const T &) const;
   void dss(unsigned) const;
   void log(const summary<T> &, const distribution<fitness_t> &,
-           const std::list<unsigned> &, unsigned, double, unsigned);
+           const std::vector<unsigned> &, unsigned, unsigned);
   void print_resume(bool, const fitness_t &, double) const;
 
 private:  // Private data members

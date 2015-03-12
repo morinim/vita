@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -229,8 +229,6 @@ bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
 template<class T>
 bool basic_fitness_t<T>::load(std::istream &in)
 {
-  SAVE_FLAGS(in);
-
   unsigned s;
   if (!(in >> s))
     return false;
@@ -238,9 +236,7 @@ bool basic_fitness_t<T>::load(std::istream &in)
   basic_fitness_t<T> tmp(s);
 
   for (auto &e : tmp.vect_)
-    if (!(in >> std::fixed >> std::scientific
-             >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
-             >> e))
+    if (!load_float_from_stream(in, &e))
       return false;
 
   *this = tmp;
@@ -255,14 +251,13 @@ bool basic_fitness_t<T>::load(std::istream &in)
 template<class T>
 bool basic_fitness_t<T>::save(std::ostream &out) const
 {
-  SAVE_FLAGS(out);
-
   out << size() << '\n';
 
   for (const auto &i : vect_)
-    out << std::fixed << std::scientific
-        << std::setprecision(std::numeric_limits<T>::digits10 + 1)
-        << i << ' ';
+  {
+    save_float_to_stream(out, i);
+    out << ' ';
+  }
 
   out << '\n';
 
