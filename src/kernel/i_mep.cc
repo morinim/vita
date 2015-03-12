@@ -79,14 +79,16 @@ i_mep::i_mep(const environment &e, const symbol_set &ss,
 /// \see size()
 ///
 /// \note
-/// eff_size() can be greater than size() when category() > 1. For instance
+/// eff_size() can be greater than size() when `category() > 1`. For instance
 /// consider the following individual:
-///   [0, 1] FIFL 1 2 2 3
-///   [1, 0] "car"
-///   [2, 0] "plane"
-///   [2, 1] 10
-///   [3, 1] 20
-/// size() == 4 but eff_size() == 5.
+///
+///     [0, 1] FIFL 1 2 2 3
+///     [1, 0] "car"
+///     [2, 0] "plane"
+///     [2, 1] 10
+///     [3, 1] 20
+///
+/// `size() == 4` but `eff_size() == 5`.
 ///
 unsigned i_mep::eff_size() const
 {
