@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -165,10 +165,10 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       f_dyn << run_count << ' ' << stats_.gen;
 
-      if (stats_.best)
-        f_dyn << ' ' << stats_.best->fitness[0];
-      else
+      if (stats_.best.ind.empty())
         f_dyn << " ?";
+      else
+        f_dyn << ' ' << stats_.best.fitness[0];
 
       f_dyn << ' ' << stats_.az.fit_dist().mean()[0]
             << ' ' << stats_.az.fit_dist().standard_deviation()[0]
@@ -190,8 +190,8 @@ void evolution<T, ES>::log(unsigned run_count) const
                 << ' ' << symb_stat.second.counter[active];
 
       f_dyn << " \"";
-      if (stats_.best)
-        stats_.best->ind.in_line(f_dyn);
+      if (!stats_.best.ind.empty())
+        stats_.best.ind.in_line(f_dyn);
       f_dyn << "\"\n";
     }
   }
@@ -238,7 +238,7 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
     if (status)
       std::cout << "Run " << run_count << '.' << std::setw(6)
                 << stats_.gen << " (" << std::setw(3)
-                << perc << "%): fitness " << stats_.best->fitness
+                << perc << "%): fitness " << stats_.best.fitness
                 << '\n';
     else
       std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
@@ -286,8 +286,8 @@ evolution<T, ES>::run(unsigned run_count)
       // If we 'shake' the data, the statistics picked so far have to be
       // cleared (the best individual and its fitness refer to an old
       // training set).
-      assert(stats_.best);
-      stats_.best->fitness = eva_(stats_.best->ind);
+      assert(!stats_.best.ind.empty());
+      stats_.best.fitness = eva_(stats_.best.ind);
       print_progress(0, run_count, true);
     }
 
@@ -310,10 +310,10 @@ evolution<T, ES>::run(unsigned run_count)
       auto off(es_.recombination.run(parents));
 
       // --------- REPLACEMENT --------
-      const auto before(stats_.best->fitness);
+      const auto before(stats_.best.fitness);
       es_.replacement.run(parents, off, &stats_);
 
-      if (stats_.best->fitness != before)
+      if (stats_.best.fitness != before)
         print_progress(k, run_count, true);
     }
 

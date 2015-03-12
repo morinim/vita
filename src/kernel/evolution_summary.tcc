@@ -34,7 +34,8 @@ void summary<T>::clear()
 {
   az.clear();
 
-  best = boost::none;
+  best.ind = T();
+  best.fitness = fitness_t();
 
   elapsed    = 0.0;
   mutations  = 0;
@@ -67,14 +68,17 @@ bool summary<T>::load(std::istream &in, const environment &e,
     if (!tmp_ind.load(in))
       return false;
 
-    decltype(best->fitness) tmp_fitness;
+    decltype(best.fitness) tmp_fitness;
     if (!tmp_fitness.load(in))
       return false;
 
     tmp_summary.best = {tmp_ind, tmp_fitness};
   }
   else
-    tmp_summary.best = boost::none;
+  {
+    tmp_summary.best.ind = T();
+    tmp_summary.best.fitness = fitness_t();
+  }
 
   if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
            >> tmp_summary.crossovers >> tmp_summary.gen
@@ -95,14 +99,14 @@ bool summary<T>::save(std::ostream &out) const
   // analyzer az doesn't need to be saved: it'll be recalculated at the
   // beginning of evolution.
 
-  if (best)
+  if (best.ind.empty())
+    out << "0\n";
+  else
   {
     out << "1\n";
-    best->ind.save(out);
-    best->fitness.save(out);
+    best.ind.save(out);
+    best.fitness.save(out);
   }
-  else
-    out << "0\n";
 
   out << elapsed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
       << last_imp << '\n';

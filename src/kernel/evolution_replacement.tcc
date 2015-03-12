@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -78,11 +78,10 @@ void family_competition<T>::run(const std::vector<coord> &parent,
     }
   }
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.fitness)
   {
-    typename summary<T>::best_ b{offspring[0], fit_off};
     s->last_imp = s->gen;
-    s->best     =      b;
+    s->best     = {offspring[0], fit_off};
   }
 }
 
@@ -126,7 +125,7 @@ void tournament<T>::run(const std::vector<coord> &parent,
   if (!pop.env().elitism || replace)
     pop[rep_idx] = offspring[0];
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.fitness)
   {
     s->last_imp =                  s->gen;
     s->best     = {offspring[0], fit_off};
@@ -263,7 +262,7 @@ void alps<T>::run(const std::vector<coord> &parent,
     ins = try_add_to_layer(layer, offspring[0]);
   }
 
-  if (f_off > s->best->fitness)
+  if (f_off > s->best.fitness)
   {
     // Sometimes a new best individual is discovered in a lower layer but he is
     // too old for its layer and the random tournament may choose only "not
@@ -351,7 +350,7 @@ void pareto<T>::run(const std::vector<coord> &parent,
   if (!pop.env().elitism || !dominated)
     pop[parent.back()] = offspring[0];
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.fitness)
   {
     s->last_imp =                  s->gen;
     s->best     = {offspring[0], fit_off};

@@ -438,13 +438,13 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       const data::dataset_t backup(data.dataset());
 
       data.dataset(data::validation);
-      eval.clear(s.best->ind);
+      eval.clear(s.best.ind);
 
-      run_fitness = this->fitness(s.best->ind);
-      run_accuracy = accuracy(s.best->ind);
+      run_fitness = this->fitness(s.best.ind);
+      run_accuracy = accuracy(s.best.ind);
 
       data.dataset(backup);
-      eval.clear(s.best->ind);
+      eval.clear(s.best.ind);
     }
     else  // not using a validation set
     {
@@ -456,21 +456,21 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       {
         data.dataset(data::training);
         data.slice(false);
-        eval.clear(s.best->ind);
+        eval.clear(s.best.ind);
 
-        run_fitness = this->fitness(s.best->ind);
+        run_fitness = this->fitness(s.best.ind);
       }
       else
-        run_fitness = s.best->fitness;
+        run_fitness = s.best.fitness;
 
-      run_accuracy = accuracy(s.best->ind);
+      run_accuracy = accuracy(s.best.ind);
     }
 
     print_resume(validation, run_fitness, run_accuracy);
 
-    if (r == 0 || run_fitness > overall_summary.best->fitness)
+    if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
-      overall_summary.best = {s.best->ind, run_fitness};
+      overall_summary.best = {s.best.ind, run_fitness};
       best_accuracy = run_accuracy;
       best_run = r;
     }
@@ -495,7 +495,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
     if (this->env_.arl && good_runs.front() == r)
     {
       this->prob_.sset.reset_adf_weights();
-      arl(s.best->ind);
+      arl(s.best.ind);
     }
 
     assert(good_runs.empty() ||
@@ -550,9 +550,9 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
   if (this->env_.stat_summary)
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best->ind.list(best_list);
-    run_sum.best->ind.tree(best_tree);
-    run_sum.best->ind.graphviz(best_graph);
+    run_sum.best.ind.list(best_list);
+    run_sum.best.ind.tree(best_tree);
+    run_sum.best.ind.graphviz(best_graph);
 
     const std::string path("vita.");
     const std::string summary(path + "summary.");
@@ -566,7 +566,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best->fitness);
+    pt.put(summary + "best.fitness", run_sum.best.fitness);
     pt.put(summary + "best.accuracy", best_accuracy);
     pt.put(summary + "best.run", best_run);
     pt.put(summary + "best.individual.tree", best_tree.str());
@@ -603,7 +603,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     const data::dataset_t backup(data.dataset());
     data.dataset(data::test);
 
-    const auto lambda(this->lambdify(run_sum.best->ind));
+    const auto lambda(this->lambdify(run_sum.best.ind));
 
     std::ofstream tf(this->env_.stat_dir + "/" + environment::tst_filename);
     for (const auto &example : data)

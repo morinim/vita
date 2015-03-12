@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -58,13 +58,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_CHECK_EQUAL(before.gen, after.gen);
     BOOST_CHECK_EQUAL(before.last_imp, after.last_imp);
 
-    if (before.best)
-    {
-      BOOST_CHECK_EQUAL(before.best->ind, after.best->ind);
-      BOOST_CHECK_EQUAL(before.best->fitness, after.best->fitness);
-    }
-    else
-      BOOST_CHECK(!after.best);
+    BOOST_CHECK_EQUAL(before.best.ind, after.best.ind);
+    BOOST_CHECK_EQUAL(before.best.fitness, after.best.fitness);
   }
 }
 

@@ -37,13 +37,11 @@ public:   // Serialization
 public:  // Public data members
   analyzer<T> az;
 
-  struct best_
+  struct
   {
     T             ind;
     fitness_t fitness;
-  };
-
-  boost::optional<best_> best;
+  } best;
 
   /// Time (in milliseconds) elapsed from evolution beginning.
   double elapsed;
