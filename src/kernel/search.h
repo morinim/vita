@@ -60,8 +60,8 @@ protected: // Protected support methods
 protected:  // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
 
-  // This is the environment actually used during the search (\a prob_->env
-  // is used for compiling \a env_ via the tune_parameters method).
+  // This is the environment actually used during the search (`prob_->env`
+  // is used for compiling `env_` via the `tune_parameters` method).
   environment env_;
 
   // Problem we're working on.

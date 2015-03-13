@@ -60,7 +60,7 @@ public:
 };
 
 ///
-/// \brief random_evaluator class is used for debug purpose
+/// \brief A random fitness function used for debug purpose
 ///
 /// \note
 /// The output is population independent.

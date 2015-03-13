@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -125,7 +125,7 @@ double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
 ///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
 ///                function.
-/// \return the lambda function associated with \a prg (\c nullptr in case of
+/// \return the lambda function associated with `prg` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
@@ -142,7 +142,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
 /// \return a measurement of the error of the current program on the
-///         training case \a t. The value returned is in the [0;+inf[ range.
+///         training case `t`. The value returned is in the [0;+inf[ range.
 ///
 template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -168,7 +168,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
-///         training case \a t. The value returned is in the [0;200] range.
+///         training case `t`. The value returned is in the [0;200] range.
 ///
 template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -214,7 +214,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
 /// \return a measurement of the error of the current program on the
-///         training case \a t.
+///         training case `t`.
 ///
 template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -241,7 +241,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
-///         training case \a t.
+///         training case `t`.
 ///
 template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -329,7 +329,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
@@ -389,7 +389,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
@@ -401,7 +401,7 @@ std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
 
 ///
 /// \param[in] ind an individual.
-/// \return the fitness of individual \a ind (greater is better, max is 0).
+/// \return the fitness of individual `ind` (greater is better, max is 0).
 ///
 template<class T>
 fitness_t binary_evaluator<T>::operator()(const T &ind)
@@ -427,7 +427,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
