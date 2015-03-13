@@ -39,8 +39,9 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 /// \return the accuracy of `ind`.
 ///
 /// \note
-/// If the accuracy threashold is undefined (`env_.a_threashold < 0.0`) then
-/// this method will skip accuracy calculation and returning a negative value.
+/// If the accuracy threshold is undefined (`env_.threshold.accuracy < 0.0`)
+/// then this method will skip accuracy calculation and returning a negative
+/// value.
 ///
 /// \warning
 /// This method can be very time consuming.
@@ -48,8 +49,8 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 template<class T, template<class> class ES>
 double src_search<T, ES>::accuracy(const T &ind) const
 {
-  if (this->env_.a_threashold < 0.0)
-    return this->env_.a_threashold;
+  if (this->env_.threshold.accuracy < 0.0)
+    return this->env_.threshold.accuracy;
 
   return this->active_eva_->accuracy(ind);
 }
@@ -474,8 +475,8 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(
-      run_fitness.dominating(this->env_.f_threashold) &&
-      run_accuracy >= this->env_.a_threashold);
+      run_fitness.dominating(this->env_.threshold.fitness) &&
+      run_accuracy >= this->env_.threshold.accuracy);
 
     if (solution_found)
     {
@@ -518,7 +519,7 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
     const std::string ds(validation ? " Validation" : " Training");
 
     std::cout << k_s_info << ds << " fitness: " << fit << '\n';
-    if (this->env_.a_threashold >= 0.0)
+    if (this->env_.threshold.accuracy >= 0.0)
       std::cout << k_s_info << ds << " accuracy: " << 100.0 * acc << '%';
 
     std::cout << "\n\n";

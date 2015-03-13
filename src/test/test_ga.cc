@@ -126,7 +126,7 @@ BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 {
   env.individuals = 100;
-  env.f_threashold = {0, 0};
+  env.threshold.fitness = {0, 0};
   env.verbosity = 0;
 
   vita::problem prob;
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 {
   env.individuals = 130;
   env.generations = 1000;
-  env.f_threashold = {0, 0};
+  env.threshold.fitness = {0, 0};
   env.verbosity = 0;
 
   vita::problem prob;

@@ -194,15 +194,18 @@ public:  // Data members
   /// Should we save a summary of the run?
   bool stat_summary = false;
 
-  /// `f_threashold` is used to identify successfully learned (matched,
-  /// classified, resolved...) examples by fitness comparison.
-  fitness_t f_threashold;
+  struct
+  {
+    /// `fitness` is used to identify successfully learned (matched, classified
+    /// resolved...) examples by fitness comparison.
+    fitness_t fitness;
 
-  /// `a_threashold` is used to identify successfully learned (matched,
-  /// classified, resolved...) examples by accuracy comparison.
-  /// \note
-  /// a negative value means not used (only `f_threashold` is used).
-  double a_threashold = -1.0;
+    /// `accuracy` is used to identify successfully learned (matched,
+    /// classified, resolved...) examples by accuracy comparison.
+    /// \note
+    /// a negative value means not used (only `fitness` is used).
+    double accuracy = -1.0;
+  } threshold;
 
   ///
   /// \brief Parameters for the Age-Layered Population Structure (ALPS)

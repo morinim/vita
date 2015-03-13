@@ -89,21 +89,22 @@ void fix_parameters(vita::src_problem *const problem)
     }
   }
 
-  if (env.f_threashold == vita::fitness_t() && env.a_threashold < 0.0)
+  if (env.threshold.fitness == vita::fitness_t() &&
+      env.threshold.accuracy < 0.0)
   {
     if (problem->classification())
     {
-      env.a_threashold = 0.99;
+      env.threshold.accuracy = 0.99;
 
-      std::cout << vita::k_s_info << " Accuracy threashold set to "
-                << env.a_threashold << '\n';
+      std::cout << vita::k_s_info << " Accuracy threshold set to "
+                << env.threshold.accuracy << '\n';
     }
     else  // symbolic regression
     {
-      env.f_threashold = vita::fitness_t(1, -0.0001);
+      env.threshold.fitness = vita::fitness_t(1, -0.0001);
 
-      std::cout << vita::k_s_info << " Fitness threashold set to "
-                << env.f_threashold << '\n';
+      std::cout << vita::k_s_info << " Fitness threshold set to "
+                << env.threshold.fitness << '\n';
     }
   }
 }
@@ -672,13 +673,13 @@ bool symbols(const std::string &symbol_file)
 }
 
 ///
-/// \param[in] v the threashold value
+/// \param[in] v the threshold value
 ///
 /// If the output value of a run is greater than `v` it's scored as a success.
 /// The output value considered is the fitness when `v` is a simple number or
 /// the accuracy when `v` is a percentage.
 ///
-void threashold(const std::string &v)
+void threshold(const std::string &v)
 {
   bool set(false);
 
@@ -690,7 +691,7 @@ void threashold(const std::string &v)
 
       set = (0.0 < accuracy) && (accuracy <= 1.0);
       if (set)
-        problem->env.a_threashold = accuracy;
+        problem->env.threshold.accuracy = accuracy;
     }
     else
     {
@@ -698,16 +699,16 @@ void threashold(const std::string &v)
 
       set = (fitness <= 0.0);
       if (set)
-        problem->env.f_threashold = vita::fitness_t(1, fitness);
+        problem->env.threshold.fitness = vita::fitness_t(1, fitness);
     }
   }
 
   if (problem->env.verbosity >= 2)
   {
     if (set)
-      std::cout << vita::k_s_info << " Threashold is " << v << '\n';
+      std::cout << vita::k_s_info << " Threshold is " << v << '\n';
     else
-      std::cerr << vita::k_s_error << " Invalid threashold value\n";
+      std::cerr << vita::k_s_error << " Invalid threshold value\n";
   }
 }
 
@@ -889,8 +890,8 @@ int parse_command_line(int argc, char *const argv[])
        "generates a population status file")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
        "saves a summary of the runs")
-      ("threashold", po::value<std::string>()->notifier(&ui::threashold),
-       "sets the success threashold for a run");
+      ("threshold", po::value<std::string>()->notifier(&ui::threshold),
+       "sets the success threshold for a run");
 
     ui::cmdl_opt.add(generic).add(data).add(config).add(evolution).
       add(individual).add(statistics);
