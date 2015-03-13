@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,7 +25,7 @@ const char environment::sum_filename[] =    "summary";
 const char environment::tst_filename[] =       "test";
 
 ///
-/// \param[in] initialize if \c true initializes every parameter in such a
+/// \param[in] initialize if `true` initializes every parameter in such a
 ///                       way as to allow the object to pass
 ///                       environment::debug().
 ///
@@ -63,9 +63,9 @@ environment::environment(bool initialize)
 
 ///
 /// \param[out] pt output tree.
-/// \param[in] path \a path where to store the environment data file.
+/// \param[in] path where to store the environment data file.
 ///
-/// Saves the environment using the \a pt boost property tree.
+/// Saves the environment using the `pt` boost property tree.
 ///
 void environment::log(boost::property_tree::ptree *const pt,
                       const std::string &path) const
@@ -101,11 +101,11 @@ void environment::log(boost::property_tree::ptree *const pt,
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \param force_defined all the optional parameter have to be in a
 ///                      'well defined' state for the function to pass
 ///                      the test.
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool environment::debug(bool verbose, bool force_defined) const
 {

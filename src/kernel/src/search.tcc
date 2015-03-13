@@ -40,8 +40,7 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 ///
 /// \note
 /// If the accuracy threashold is undefined (`env_.a_threashold < 0.0`) then
-/// this method will skip accuracy calculation and return will return a
-/// negative value.
+/// this method will skip accuracy calculation and returning a negative value.
 ///
 /// \warning
 /// This method can be very time consuming.
