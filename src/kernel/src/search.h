@@ -27,10 +27,10 @@ enum class evaluator_id
   count = 0, mae, rmae, mse, bin, dyn_slot, gaussian, undefined
 };
 
-enum class metric : unsigned
+namespace metric
 {
-  accuracy = 1
-};
+constexpr unsigned accuracy = 1;
+}
 
 ///
 /// \brief search for GP

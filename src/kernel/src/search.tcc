@@ -27,7 +27,7 @@ template<class T, template<class> class ES>
 src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
   : search<T, ES>(p),
     p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian),
-    m_accuracy(metrics & static_cast<unsigned>(metric::accuracy))
+    m_accuracy(metrics & metric::accuracy)
 {
   assert(p.debug(true));
 
