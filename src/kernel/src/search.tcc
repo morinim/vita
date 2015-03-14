@@ -498,7 +498,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     overall_summary.elapsed += s.elapsed;
 
-    if (this->env_.arl && good_runs.front() == r)
+    if (this->env_.arl)
     {
       this->prob_.sset.reset_adf_weights();
       arl(s.best.solution);
