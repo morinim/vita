@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,7 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
 
 ///
 /// \param[in] e input example for the lambda function.
-/// \return the output value associated with \a e.
+/// \return the output value associated with `e`.
 ///
 template<class T, bool S>
 any basic_reg_lambda_f<T, S>::operator()(const data::example &e) const
@@ -70,7 +70,7 @@ any basic_reg_lambda_f<T, S>::eval(const data::example &e,
 
 ///
 /// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of \a a.
+/// \return the string version of `a`.
 ///
 template<class T, bool S>
 std::string basic_reg_lambda_f<T, S>::name(const any &a) const
@@ -79,7 +79,7 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::debug() const
@@ -89,7 +89,7 @@ bool basic_reg_lambda_f<T, S>::debug() const
 
 ///
 /// \param[in] in input stream.
-/// \return \c true if the lambda has been loaded correctly.
+/// \return `true` if the lambda has been loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
@@ -102,7 +102,7 @@ bool basic_reg_lambda_f<T, S>::load(std::istream &in)
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if lambda was saved correctly.
+/// \return `true` if lambda was saved correctly.
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
@@ -121,8 +121,7 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
 
 ///
 /// \param[in] e data to be classified.
-/// \return the label of the class that includes \a instance (wrapped in class
-///         any).
+/// \return the label of the class that includes `e` (wrapped in class any).
 ///
 template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
@@ -159,7 +158,7 @@ bool basic_class_lambda_f<T, N>::load(std::istream &in)
 
 ///
 /// \param[in] a id of a class.
-/// \return the name of class \a a.
+/// \return the name of class `a`.
 ///
 template<class T, bool N>
 std::string basic_class_lambda_f<T, N>::name(const any &a) const
@@ -284,8 +283,8 @@ void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(data &d, unsigned x_slot)
 }
 
 ///
-/// \param[in] e input data for \a ind.
-/// \return the slot example \a e falls into.
+/// \param[in] e input data.
+/// \return the slot example `e` falls into.
 ///
 template<class T, bool S, bool N>
 unsigned basic_dyn_slot_lambda_f<T, S, N>::slot(const data::example &e) const
@@ -323,7 +322,7 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the class of \a instance (numerical id) and the confidence level
+/// \return the class of `instance` (numerical id) and the confidence level
 ///         (in the range [0,1]).
 ///
 template<class T, bool S, bool N>
@@ -436,7 +435,7 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
@@ -503,8 +502,8 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 
 ///
 /// \param[in] example input value whose class we are interested in.
-/// \return the class of \a instance (numerical id) and the confidence level
-///         (how sure you can be that \a example is properly classified. The
+/// \return the class of `example` (numerical id) and the confidence level
+///         (how sure you can be that `example` is properly classified. The
 ///         value is in [0;1] range and the sum of all the confidence levels of
 ///         each class is 1).
 ///
@@ -627,7 +626,7 @@ bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N>
 bool basic_gaussian_lambda_f<T, S, N>::debug() const
@@ -650,8 +649,8 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind, data &d)
 
 ///
 /// \param[in] e input example for the lambda function.
-/// \return the class of \a instance (numerical id) and the confidence level
-///         (in the range [0,1]).
+/// \return the class of `e` (numerical id) and the confidence level (in the
+///         range [0,1]).
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
@@ -664,7 +663,7 @@ std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N>
 bool basic_binary_lambda_f<T, S, N>::debug() const
@@ -750,14 +749,14 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
 
 ///
 /// \param[in] instance data to be classified.
-/// \return the class of \a instance (numerical id) and the confidence level
+/// \return the class of `instance` (numerical id) and the confidence level
 ///         (in the range [0,1]).
 ///
 /// Specialized method for teams.
 ///
-/// * \c team_composition::mv the class which most of the individuals predict
+/// * `team_composition::mv` the class which most of the individuals predict
 ///   for a given example is selected as team output.
-/// * \c team_composition::wta the winner is the individual with the highest
+/// * `team_composition::wta` the winner is the individual with the highest
 ///   confidence in its decision. Specialization may emerge if different
 ///   members of the team win this contest for different fitness cases (of
 ///   curse, it is not a feasible alternative to select the member with the
@@ -864,7 +863,7 @@ bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in)
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>

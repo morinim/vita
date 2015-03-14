@@ -323,8 +323,9 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
   // The following code is faster but doesn't work for teams and doesn't
   // "cooperate" with DSS.
-  //basic_dyn_slot_lambda_f<T, false, false> lambda(ind, *this->dat_, x_slot_);
-  //return {100.0 * (lambda.training_accuracy() - 1.0)};
+  //
+  // basic_dyn_slot_lambda_f<T,false,false> lambda(ind, *this->dat_, x_slot_);
+  // return {100.0 * (lambda.training_accuracy() - 1.0)};
 }
 
 ///
@@ -359,7 +360,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   fitness_t::value_type d(0.0);
   for (auto &example : *this->dat_)
   {
-    const auto res(lambda.tag(example));
+    const auto res(lambda.tag(example));  // confidence in classification
 
     if (res.first == example.template tag())
     {
@@ -367,16 +368,14 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
       // * (1.0 - confidence) is the sum of the errors;
       // * (confidence - 1.0) is the opposite (standardized fitness);
       // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
-      //   average error;
-      // * (1.0 - confidence) is the uncertainty about the right class;
-      // * 0.001 is a scaling factor.
+      //   average error.
       d += (res.second - 1.0) / (this->dat_->classes() - 1);
     }
     else
     {
       // Note:
-      // * the maximum single class error is -1.0;
-      // * the maximum average class error is -1.0 / dat_->classes();
+      // * the maximum single class error is 1.0;
+      // * the maximum average class error is `1.0 / dat_->classes()`;
       // So -1.0 is like to say that we have a complete failure.
       d -= 1.0;
 
