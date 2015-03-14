@@ -13,8 +13,6 @@
 #if !defined(VITA_GA_SEARCH_H)
 #define      VITA_GA_SEARCH_H
 
-#include <list>
-
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
@@ -44,7 +42,7 @@ private:  // NVI template methods
 
 private:  // Private support methods
   void log(const summary<T> &, const distribution<fitness_t> &,
-           const std::list<unsigned> &, unsigned, unsigned);
+           const std::vector<unsigned> &, unsigned, unsigned);
   void print_resume(const fitness_t &) const;
 };
 

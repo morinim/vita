@@ -78,7 +78,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 
   unsigned best_run(0);
 
-  std::list<unsigned> good_runs;
+  std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
 
@@ -152,7 +152,7 @@ void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::log(const summary<T> &run_sum,
                               const distribution<fitness_t> &fd,
-                              const std::list<unsigned> &good_runs,
+                              const std::vector<unsigned> &good_runs,
                               unsigned best_run, unsigned runs)
 {
   // Summary logging.
