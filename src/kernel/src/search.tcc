@@ -20,11 +20,14 @@
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
 ///              the lifetime of `this` class.
+/// \param[in] metrics a bit field used to store a set of flags regarding the
+///                    performance metrics calculated during the search.
 ///
 template<class T, template<class> class ES>
-src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
-                                                p_symre(evaluator_id::rmae),
-                                                p_class(evaluator_id::gaussian)
+src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
+  : search<T, ES>(p),
+    p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian),
+    m_accuracy(metrics & static_cast<unsigned>(metric::accuracy))
 {
   assert(p.debug(true));
 
@@ -38,21 +41,26 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 /// param[in] ind an individual.
 /// \return the accuracy of `ind`.
 ///
-/// \note
-/// If the accuracy threshold is undefined (`env_.threshold.accuracy < 0.0`)
-/// then this method will skip accuracy calculation and returning a negative
+/// Accuracy calculation is performed if AT LEAST ONE of the following
+/// conditions is satisfied:
+///
+/// * the accuracy threshold is defined (`env_.threshold.accuracy > 0.0`);
+/// * we explicitly asked for accuracy calculation (see the `src_search`
+///   constructor).
+///
+/// otherwise the function will skip accuracy calculation, returning a negative
 /// value.
 ///
 /// \warning
-/// This method can be very time consuming.
+/// Could be very time consuming.
 ///
 template<class T, template<class> class ES>
 double src_search<T, ES>::accuracy(const T &ind) const
 {
-  if (this->env_.threshold.accuracy < 0.0)
-    return this->env_.threshold.accuracy;
+  if (m_accuracy || this->env_.threshold.accuracy > 0.0)
+    return this->active_eva_->accuracy(ind);
 
-  return this->active_eva_->accuracy(ind);
+  return this->env_.threshold.accuracy;
 }
 
 ///

@@ -27,20 +27,25 @@ enum class evaluator_id
   count = 0, mae, rmae, mse, bin, dyn_slot, gaussian, undefined
 };
 
+enum class metric : unsigned
+{
+  accuracy = 1
+};
+
 ///
 /// \brief search for GP
 ///
 /// \tparam T the type of individual used
 /// \tparam ES the adopted evolution strategy
 ///
-/// This class implements vita::search for GP symbolic regression /
+/// This class implements vita::search for GP symbolic regression
 /// classification tasks.
 ///
 template<class T = i_mep, template<class> class ES = std_es>
 class src_search : public search<T, ES>
 {
 public:
-  explicit src_search(src_problem &);
+  explicit src_search(src_problem &, unsigned = 0);
 
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);
@@ -65,6 +70,9 @@ private:  // Private data members
 
   // Preferred evaluator for classification.
   evaluator_id p_class;
+
+  // Should we perform accuracy calculation during the search?
+  bool m_accuracy;
 };
 
 #include "kernel/src/search.tcc"
