@@ -886,7 +886,7 @@ i_mep i_mep::crossover(i_mep rhs) const
 ///
 /// We randomly select a parent (between `this` and `rhs`) and a single locus
 /// (common crossover point). The offspring is created with genes from the
-/// choosen parent up to the crossover point and genes from the other parent
+/// chosen parent up to the crossover point and genes from the other parent
 /// beyond that point.
 /// One-point crossover is the oldest homologous crossover in tree-based GP.
 ///
@@ -932,7 +932,7 @@ i_mep i_mep::crossover(i_mep rhs) const
 ///
 /// We randomly select a parent (between `this` and `rhs`) and a two loci
 /// (common crossover points). The offspring is created with genes from the
-/// choosen parent before the first crossover point and after the second
+/// chosen parent before the first crossover point and after the second
 /// crossover point; genes between crossover points are taken from the other
 /// parent.
 ///
