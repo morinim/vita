@@ -52,7 +52,7 @@ public:
 
   // Recombination operators
   unsigned mutation()
-  { assert(env_->p_mutation >= 0.0); return mutation(env_->p_mutation); }
+  { assert(env().p_mutation >= 0.0); return mutation(env().p_mutation); }
   unsigned mutation(double);
   i_ga crossover(i_ga) const;
   i_ga crossover(const i_ga &, const i_ga &, i_ga) const;

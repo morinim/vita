@@ -560,7 +560,7 @@ bool i_mep::debug(bool verbose) const
   if (!signature_.empty() && signature_ != hash())
     return false;
 
-  return env_->debug(verbose, true);
+  return env().debug(verbose, true);
 }
 
 ///

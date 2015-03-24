@@ -206,11 +206,11 @@ i_ga i_ga::crossover(const i_ga &a, const i_ga &b, i_ga c) const
   assert(ps == b.parameters());
   assert(ps == c.parameters());
 
-  const auto p_cross(env_->p_cross);
+  const auto p_cross(env().p_cross);
   assert(0.0 <= p_cross);
   assert(p_cross <= 1.0);
 
-  const auto &f(env_->de.weight);  // scaling factor range
+  const auto &f(env().de.weight);  // scaling factor range
 
   for (auto i(decltype(ps){0}); i < ps; ++i)
     if (random::boolean(p_cross))
@@ -413,7 +413,7 @@ bool i_ga::debug(bool verbose) const
     return false;
   }
 
-  return env_->debug(verbose, true);
+  return env().debug(verbose, true);
 }
 
 ///
