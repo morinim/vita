@@ -36,7 +36,7 @@ namespace vita
 class individual
 {
 public:
-  individual() : signature_(), sset_(nullptr), env_(nullptr), age_() {}
+  individual() : signature_(), env_(nullptr), sset_(nullptr), age_() {}
 
   individual(const environment &, const symbol_set &);
 
@@ -55,8 +55,8 @@ public:
 
   bool empty() const { return !env_; }
 
-  const environment &env() const { return *env_; }
-  const symbol_set &sset() const { return *sset_; }
+  const environment &env() const {  assert(env_); return *env_; }
+  const symbol_set &sset() const { assert(sset_); return *sset_; }
 
   // Visualization/output methods.
   virtual std::ostream &in_line(std::ostream &) const = 0;
@@ -74,19 +74,18 @@ protected:  // Protected data members
   // for individual comparison, information retrieval, entropy calculation...
   mutable hash_t signature_;
 
-  const symbol_set *sset_;
-
 private:  // Non-virtual interface members
   virtual bool load_nvi(std::istream &) = 0;
   virtual bool save_nvi(std::ostream &) const = 0;
 
 private:
   const environment *env_;
+  const symbol_set *sset_;
   unsigned age_;
 };  // class individual
 
 inline individual::individual(const environment &e, const symbol_set &ss)
-  : signature_(), sset_(&ss), env_(&e), age_(0)
+  : signature_(), env_(&e), sset_(&ss), age_(0)
 {
   assert(e.debug(true, true));
 }

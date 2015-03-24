@@ -78,7 +78,7 @@ std::ostream &i_ga::in_line(std::ostream &s) const
 ///
 std::ostream &i_ga::list(std::ostream &s) const
 {
-  const auto cs(sset_->categories());
+  const auto cs(sset().categories());
   const auto w(1 + static_cast<int>(std::log10(cs)));
 
   unsigned i(0);
@@ -125,7 +125,7 @@ unsigned i_ga::mutation(double p)
     {
       ++n;
 
-      genome_[c] = gene(sset_->roulette_terminal(c));
+      genome_[c] = gene(sset().roulette_terminal(c));
     }
 
   signature_ = hash();
@@ -318,7 +318,7 @@ bool i_ga::operator==(const i_ga &x) const
 ///
 unsigned i_ga::distance(const i_ga &ind) const
 {
-  const auto cs(sset_->categories());
+  const auto cs(sset().categories());
 
   unsigned d(0);
   for (auto i(decltype(cs){0}); i < cs; ++i)
@@ -438,7 +438,7 @@ bool i_ga::load_nvi(std::istream &in)
       return false;
 
     gene g;
-    g.sym = sset_->decode(opcode);
+    g.sym = sset().decode(opcode);
     if (!g.sym)
       return false;
 

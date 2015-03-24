@@ -136,14 +136,14 @@ unsigned i_mep::mutation(double p)
       const auto c(l.category);
 
       if (i < sup)
-        set(l, gene(sset_->roulette(c), i + 1, size()));
+        set(l, gene(sset().roulette(c), i + 1, size()));
       else
-        set(l, gene(sset_->roulette_terminal(c)));
+        set(l, gene(sset().roulette_terminal(c)));
     }
 
 /*
   // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-  const category_t categories(sset_->categories());
+  const category_t categories(sset().categories());
 
   for (index_t i(0); i < sup; ++i)
     for (category_t c(0); c < categories; ++c)
@@ -151,7 +151,7 @@ unsigned i_mep::mutation(double p)
       {
         ++n;
 
-        set({i, c}, gene(sset_->roulette(c), i + 1, size()));
+        set({i, c}, gene(sset().roulette(c), i + 1, size()));
       }
 
   for (category_t c(0); c < categories; ++c)
@@ -159,7 +159,7 @@ unsigned i_mep::mutation(double p)
     {
       ++n;
 
-      set({sup, c}, gene(sset_->roulette_terminal(c)));
+      set({sup, c}, gene(sset().roulette_terminal(c)));
     }
 */
 
@@ -233,9 +233,9 @@ i_mep i_mep::destroy_block(index_t index) const
   assert(index < size());
 
   i_mep ret(*this);
-  const category_t categories(sset_->categories());
+  const category_t categories(sset().categories());
   for (category_t c(0); c < categories; ++c)
-    ret.set({index, c}, gene(sset_->roulette_terminal(c)));
+    ret.set({index, c}, gene(sset().roulette_terminal(c)));
 
   assert(ret.debug());
   return ret;
@@ -279,7 +279,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   // Step 3: randomly substitute n terminals with function arguments.
   i_mep ret(*this);
   for (auto j(decltype(n){0}); j < n; ++j)
-    ret.genome_(terminals[j]).sym = sset_->arg(j);
+    ret.genome_(terminals[j]).sym = sset().arg(j);
   ret.signature_.clear();
 
   assert(ret.debug());
@@ -322,7 +322,7 @@ bool i_mep::operator==(const i_mep &x) const
 unsigned i_mep::distance(const i_mep &ind) const
 {
   const index_t cs(size());
-  const category_t categories(sset_->categories());
+  const category_t categories(sset().categories());
 
   unsigned d(0);
   for (index_t i(0); i < cs; ++i)
@@ -638,7 +638,7 @@ std::ostream &i_mep::list(std::ostream &s) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(sset_->categories());
+  const auto categories(sset().categories());
   const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
   const auto w2(1 + static_cast<int>(std::log10(categories)));
 
@@ -715,7 +715,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(sset_->categories());
+  const auto categories(sset().categories());
   const auto width(1 + static_cast<int>(std::log10(size() - 1)));
 
   for (unsigned i(0); i < size(); ++i)
@@ -781,7 +781,7 @@ bool i_mep::load_nvi(std::istream &in)
       return false;
 
     gene g;
-    g.sym = sset_->decode(opcode);
+    g.sym = sset().decode(opcode);
     if (!g.sym)
       return false;
 
