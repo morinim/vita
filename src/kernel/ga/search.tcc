@@ -102,8 +102,8 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
     }
 
     // We use fitness to identify successful runs.
-    const bool solution_found(run_fitness.dominating(
-                                this->env_.threshold.fitness));
+    const bool solution_found(dominating(run_fitness,
+                                         this->env_.threshold.fitness));
 
     if (solution_found)
     {

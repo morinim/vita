@@ -483,7 +483,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(
-      run_fitness.dominating(this->env_.threshold.fitness) &&
+      dominating(run_fitness, this->env_.threshold.fitness) &&
       run_accuracy >= this->env_.threshold.accuracy);
 
     if (solution_found)

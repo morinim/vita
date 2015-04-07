@@ -79,7 +79,6 @@ public:
   bool operator>=(const basic_fitness_t &) const;
   bool operator<(const basic_fitness_t &) const;
   bool operator<=(const basic_fitness_t &) const;
-  bool dominating(const basic_fitness_t &) const;
 
   unsigned size() const;
   T operator[](unsigned) const;
@@ -129,6 +128,8 @@ template<class T> bool almost_equal(const basic_fitness_t<T> &,
 template<class T> basic_fitness_t<T> combine(const basic_fitness_t<T> &,
                                              const basic_fitness_t<T> &);
 template<class T> double distance(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+template<class T> bool dominating(const basic_fitness_t<T> &,
                                   const basic_fitness_t<T> &);
 
 using fitness_t = basic_fitness_t<double>;

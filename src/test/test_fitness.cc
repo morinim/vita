@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -58,13 +58,13 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_CHECK_SMALL(distance(f2, f2), epsilon);
   BOOST_CHECK_SMALL(distance(fitness2d, fitness2d), epsilon);
 
-  BOOST_CHECK(f1.dominating(fitness3d));
-  BOOST_CHECK(!fitness3d.dominating(f1));
-  BOOST_CHECK(!f1.dominating(f2));
-  BOOST_CHECK(!f2.dominating(f1));
-  BOOST_CHECK(!f1.dominating(f1));
-  BOOST_CHECK(f1.dominating(f3));
-  BOOST_CHECK(f2.dominating(f3));
+  BOOST_CHECK(dominating(f1, fitness3d));
+  BOOST_CHECK(!dominating(fitness3d, f1));
+  BOOST_CHECK(!dominating(f1, f2));
+  BOOST_CHECK(!dominating(f2, f1));
+  BOOST_CHECK(!dominating(f1, f1));
+  BOOST_CHECK(dominating(f1, f3));
+  BOOST_CHECK(dominating(f2, f3));
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)

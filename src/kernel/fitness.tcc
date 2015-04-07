@@ -190,29 +190,30 @@ bool basic_fitness_t<T>::operator<=(const basic_fitness_t<T> &f) const
 }
 
 ///
-/// \param[in] f second term of comparison.
-/// \return \c true if \a this is a Pareto improvement of \a f.
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if `lhs` is a Pareto improvement of `rhs`.
 ///
-/// \a this dominates \a f (is a Pareto improvement) if:
-/// * each component of \a this is not strictly worst (less) than the
-///   correspondig component of \a f;
-/// * there is at least one component in which \a this is better than \a f.
+/// `lhs` dominates `rhs` (is a Pareto improvement) if:
+/// - each component of `lhs` is not strictly worst (less) than the
+///   correspondig component of `rhs`;
+/// - there is at least one component in which `lhs` is better than `rhs`.
 ///
 /// \note
-/// An interesting property is that if a vector x does not dominate a
-/// vector y, this does not imply that y dominates x (for example they can
-/// be both non-dominated).
+/// An interesting property is that if a vector `x` does not dominate a
+/// vector `y`, this does not imply that `y` dominates `x` (they can be both
+/// non-dominated).
 ///
 template<class T>
-bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
+bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
   bool one_better(false);
 
-  const auto n(size());
+  const auto n(lhs.size());
   for (unsigned i(0); i < n; ++i)
-    if (operator[](i) > f[i])
+    if (lhs[i] > rhs[i])
       one_better = true;
-    else if (operator[](i) < f[i])
+    else if (lhs[i] < rhs[i])
       return false;
 
   return one_better;
