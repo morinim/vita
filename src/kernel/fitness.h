@@ -92,7 +92,7 @@ public:
 
   basic_fitness_t &operator+=(const basic_fitness_t &);
   basic_fitness_t &operator-=(const basic_fitness_t &);
-  basic_fitness_t operator*(basic_fitness_t) const;
+  basic_fitness_t &operator*=(const basic_fitness_t &);
 
   basic_fitness_t operator/(T) const;
   basic_fitness_t operator*(T) const;
@@ -105,8 +105,15 @@ private:  // Private data members
   values_t vect_;
 };
 
+// ***********************************************************************
+// *  Arithmetic operators                                               *
+// ***********************************************************************
+template<class T>
+basic_fitness_t<T> operator+(basic_fitness_t<T>, const basic_fitness_t<T> &);
 template<class T>
 basic_fitness_t<T> operator-(basic_fitness_t<T>, const basic_fitness_t<T> &);
+template<class T>
+basic_fitness_t<T> operator*(basic_fitness_t<T>, const basic_fitness_t<T> &);
 
 template<class T> bool isfinite(const basic_fitness_t<T> &);
 template<class T> bool isnan(const basic_fitness_t<T> &);

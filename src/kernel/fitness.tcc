@@ -292,6 +292,25 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
 }
 
 ///
+/// \param[in] lhs first addend.
+/// \param[in] rhs second addend.
+/// \return the sum of `lhs` and `rhs`.
+///
+template<class T>
+basic_fitness_t<T> operator+(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T> &rhs)
+{
+  // operator+ shouldn't be a member function otherwise it won't work as
+  // naturally as user may expect (i.e. asymmetry in implicit conversion from
+  // other types.
+  // Implementing `+` in terms of `+=` makes the code simpler and guarantees
+  // consistent semantics as the two functions are less likely to diverge
+  // during maintenance.
+  return lhs += rhs;
+}
+
+
+///
 /// \param[in] f a fitness.
 /// \return the difference of \a this and \a f.
 ///
@@ -322,13 +341,25 @@ basic_fitness_t<T> operator-(basic_fitness_t<T> lhs,
 /// \return the product of \a this and \a f.
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator*(basic_fitness_t<T> f) const
+basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    f[i] *= operator[](i);
+    operator[](i) *= f[i];
 
-  return f;
+  return *this;
+}
+
+///
+/// \param[in] lhs first factor.
+/// \param[in] rhs second factor.
+/// \return the product of `lhs` and `rhs`.
+///
+template<class T>
+basic_fitness_t<T> operator*(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T>&rhs)
+{
+  return lhs *= rhs;
 }
 
 ///
