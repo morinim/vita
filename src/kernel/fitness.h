@@ -22,6 +22,11 @@
 
 namespace vita
 {
+struct copies_of_t {};
+constexpr copies_of_t copies_of{};
+struct components_t {};
+constexpr components_t components{};
+
 ///
 /// \brief A value assigned to an individual which reflects how well the
 ///        individual solves the task
@@ -68,8 +73,13 @@ public:  // Type alias and iterators
   using const_iterator = typename values_t::const_iterator;
 
 public:
-  explicit basic_fitness_t(unsigned = 1,
-                           T = std::numeric_limits<T>::lowest());
+  basic_fitness_t(unsigned, copies_of_t, T);
+
+  basic_fitness_t(unsigned n, components_t)
+    : basic_fitness_t(n, copies_of, std::numeric_limits<T>::lowest()) {}
+
+  basic_fitness_t() : basic_fitness_t(1, components) {}
+
   basic_fitness_t(std::initializer_list<T>);
   basic_fitness_t(std::vector<T>);
 

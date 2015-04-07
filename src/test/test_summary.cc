@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
       before.best =
       {
         vita::i_mep(env, sset),
-        vita::fitness_t(1, vita::random::between<double>(0.0, 1000.0)),
-        vita::random::between<double>(0.0, 1.0)
+        vita::fitness_t{vita::random::between(0.0, 1000.0)},
+        vita::random::between(0.0, 1.0)
       };
 
     std::stringstream ss;
