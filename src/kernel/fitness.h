@@ -27,7 +27,7 @@ namespace vita
 ///        individual solves the task
 ///
 /// \tparam T a numerical type used as a building block for the fitness
-///           (e.g. `double`).
+///           (e.g. `double`)
 ///
 /// This is **NOT THE RAW FITNESS**. Raw fitness is stated in the natural
 /// terminology of the problem: the better value may be either smaller (as when
@@ -61,14 +61,13 @@ namespace vita
 template<class T>
 class basic_fitness_t
 {
-private:
-  using values_t = std::vector<T>;
-
 public:  // Type alias and iterators
+  using values_t = std::vector<T>;
   using value_type = typename values_t::value_type;
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
 
+public:
   explicit basic_fitness_t(unsigned = 1,
                            T = std::numeric_limits<T>::lowest());
   basic_fitness_t(std::initializer_list<T>);
@@ -93,7 +92,6 @@ public:  // Type alias and iterators
 
   basic_fitness_t &operator+=(const basic_fitness_t &);
   basic_fitness_t &operator-=(const basic_fitness_t &);
-  basic_fitness_t operator-(basic_fitness_t) const;
   basic_fitness_t operator*(basic_fitness_t) const;
 
   basic_fitness_t operator/(T) const;
@@ -106,6 +104,9 @@ public:   // Serialization
 private:  // Private data members
   values_t vect_;
 };
+
+template<class T>
+basic_fitness_t<T> operator-(basic_fitness_t<T>, const basic_fitness_t<T> &);
 
 template<class T> bool isfinite(const basic_fitness_t<T> &);
 template<class T> bool isnan(const basic_fitness_t<T> &);

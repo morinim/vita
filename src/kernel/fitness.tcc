@@ -306,17 +306,15 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
 }
 
 ///
-/// \param[in] f a fitness.
-/// \return the difference between \a this and \a f.
+/// \param[in] lhs the minuend.
+/// \param[in] rhs the subtrahend.
+/// \return the difference between `lhs` and `rhs`.
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator-(basic_fitness_t<T> f) const
+basic_fitness_t<T> operator-(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T> &rhs)
 {
-  const auto n(size());
-  for (unsigned i(0); i < n; ++i)
-    f[i] = operator[](i) - f[i];
-
-  return f;
+  return lhs -= rhs;
 }
 
 ///
