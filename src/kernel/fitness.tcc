@@ -131,25 +131,39 @@ typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::end() const
 }
 
 ///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
 /// Operation is performed by first comparing sizes and, if they match,
 /// the elements are compared sequentially using algorithm equal, which
 /// stops at the first mismatch.
 ///
 template<class T>
-bool basic_fitness_t<T>::operator==(const basic_fitness_t<T> &f) const
+bool operator==(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ == f.vect_;
+  return lhs.size() == rhs.size() &&
+         std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
 /// Operation is performed by first comparing sizes and, if they match,
 /// the elements are compared sequentially using algorithm equal, which
 /// stops at the first mismatch.
 template<class T>
-bool basic_fitness_t<T>::operator!=(const basic_fitness_t<T> &f) const
+bool operator!=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ != f.vect_;
+  return !operator==(lhs, rhs);
 }
 
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
 /// Behaves as if using algorithm lexicographical_compare, which compares
 /// the elements sequentially, stopping at the first mismatch.
 ///
@@ -162,10 +176,12 @@ bool basic_fitness_t<T>::operator!=(const basic_fitness_t<T> &f) const
 /// of the lexicographical comparison.
 /// If both sequences compare equal until one of them ends, the shorter
 /// sequence is lexicographically less than the longer one.
+///
 template<class T>
-bool basic_fitness_t<T>::operator>(const basic_fitness_t<T> &f) const
+bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ > f.vect_;
+  return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                      rhs.begin(), rhs.end());
 
   // An alternative implementation:
   // > for (unsigned i(0); i < size(); ++i)
@@ -174,28 +190,47 @@ bool basic_fitness_t<T>::operator>(const basic_fitness_t<T> &f) const
   // > return false;
 }
 
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
+
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
+/// \see basic_fitness_t::operator<
+///
 template<class T>
-bool basic_fitness_t<T>::operator>=(const basic_fitness_t<T> &f) const
+bool operator>(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ >= f.vect_;
+  return operator<(rhs, lhs);
 }
 
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
+/// \see basic_fitness_t::operator<
+///
 template<class T>
-bool basic_fitness_t<T>::operator<(const basic_fitness_t<T> &f) const
+bool operator>=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ < f.vect_;
+  return !operator<(lhs, rhs);
 }
 
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
+/// \see basic_fitness_t::operator<
+///
 template<class T>
-bool basic_fitness_t<T>::operator<=(const basic_fitness_t<T> &f) const
+bool operator<=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ <= f.vect_;
+  return !operator>(lhs, rhs);
 }
 
 ///

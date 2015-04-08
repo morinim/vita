@@ -80,13 +80,6 @@ public:
   basic_fitness_t(std::initializer_list<T>);
   basic_fitness_t(std::vector<T>);
 
-  bool operator==(const basic_fitness_t &) const;
-  bool operator!=(const basic_fitness_t &) const;
-  bool operator>(const basic_fitness_t &) const;
-  bool operator>=(const basic_fitness_t &) const;
-  bool operator<(const basic_fitness_t &) const;
-  bool operator<=(const basic_fitness_t &) const;
-
   unsigned size() const;
   T operator[](unsigned) const;
   T &operator[](unsigned);
@@ -121,23 +114,42 @@ basic_fitness_t<T> operator-(basic_fitness_t<T>, const basic_fitness_t<T> &);
 template<class T>
 basic_fitness_t<T> operator*(basic_fitness_t<T>, const basic_fitness_t<T> &);
 
+// ***********************************************************************
+// *  Comparison operators                                               *
+// ***********************************************************************
+template<class T> bool operator==(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+template<class T> bool operator!=(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+template<class T> bool operator>(const basic_fitness_t<T> &,
+                                 const basic_fitness_t<T> &);
+template<class T> bool operator<(const basic_fitness_t<T> &,
+                                 const basic_fitness_t<T> &);
+template<class T> bool operator>=(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+template<class T> bool operator<=(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+
+template<class T> bool almost_equal(const basic_fitness_t<T> &,
+                                    const basic_fitness_t<T> &, T = 0.00001);
+template<class T> bool dominating(const basic_fitness_t<T> &,
+                                  const basic_fitness_t<T> &);
+
+// ***********************************************************************
+// *  Other functions                                                    *
+// ***********************************************************************
 template<class T> bool isfinite(const basic_fitness_t<T> &);
 template<class T> bool isnan(const basic_fitness_t<T> &);
 template<class T> bool isnonnegative(const basic_fitness_t<T> &);
 template<class T> bool issmall(const basic_fitness_t<T> &);
 
 template<class T> basic_fitness_t<T> abs(basic_fitness_t<T>);
-template<class T> basic_fitness_t<T> round_to(basic_fitness_t<T>);
-template<class T> basic_fitness_t<T> sqrt(basic_fitness_t<T>);
-
-template<class T> bool almost_equal(const basic_fitness_t<T> &,
-                                    const basic_fitness_t<T> &, T = 0.00001);
 template<class T> basic_fitness_t<T> combine(const basic_fitness_t<T> &,
                                              const basic_fitness_t<T> &);
 template<class T> double distance(const basic_fitness_t<T> &,
                                   const basic_fitness_t<T> &);
-template<class T> bool dominating(const basic_fitness_t<T> &,
-                                  const basic_fitness_t<T> &);
+template<class T> basic_fitness_t<T> round_to(basic_fitness_t<T>);
+template<class T> basic_fitness_t<T> sqrt(basic_fitness_t<T>);
 
 using fitness_t = basic_fitness_t<double>;
 
