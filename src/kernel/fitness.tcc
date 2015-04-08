@@ -18,10 +18,19 @@
 #define      VITA_FITNESS_TCC
 
 ///
-/// Fills the fitness with value `v`.
+/// \brief Fills the fitness with `n` copy of value `v`
+///
+/// \param[in] n number of components of the fitness.
+/// \param[in] v default value.
+///
+/// Both Herb Sutter and Scott Meyers recommend to avoid class designs where
+/// a `initializer_list` constructor overload can cause ambiguities to the
+/// programmer. We use tags on the constructor to avoid such situations.
+///
+/// The tag also helps to clarify the meaning of the other arguments.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(unsigned n, copies_of_t, T v) : vect_(n, v)
+basic_fitness_t<T>::basic_fitness_t(unsigned n, fit_tag, T v) : vect_(n, v)
 {
   assert(n);
 }
@@ -234,7 +243,7 @@ bool basic_fitness_t<T>::load(std::istream &in)
   if (!(in >> s))
     return false;
 
-  basic_fitness_t<T> tmp(s, components);
+  basic_fitness_t<T> tmp(s, fit_tag::components);
 
   for (auto &e : tmp.vect_)
     if (!load_float_from_stream(in, &e))
@@ -372,7 +381,7 @@ template<class T>
 basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
 {
   const auto n(size());
-  basic_fitness_t<T> tmp(n, components);
+  basic_fitness_t<T> tmp(n, fit_tag::components);
 
   for (unsigned i(0); i < n; ++i)
     tmp[i] = operator[](i) / val;
@@ -388,7 +397,7 @@ template<class T>
 basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
 {
   const auto n(size());
-  basic_fitness_t<T> tmp(n, components);
+  basic_fitness_t<T> tmp(n, fit_tag::components);
 
   for (unsigned i(0); i < n; ++i)
     tmp[i] = operator[](i) * val;

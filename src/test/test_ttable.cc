@@ -29,7 +29,7 @@ using namespace boost;
 #endif
 
 
-BOOST_AUTO_TEST_SUITE(hash)
+BOOST_AUTO_TEST_SUITE(test_hash)
 
 // This should hopefully be a thorough and uambiguous test of whether the hash
 // is correctly implemented.
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 
-BOOST_FIXTURE_TEST_SUITE(ttable, F_FACTORY2)
+BOOST_FIXTURE_TEST_SUITE(test_ttable, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
@@ -141,20 +141,21 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  using i_interp = vita::interpreter<vita::i_mep>;
-  vita::ttable cache(14), cache2(14);
+  using namespace vita;
+
+  using i_interp = interpreter<i_mep>;
+  ttable cache(14), cache2(14);
   env.code_length = 64;
 
   const unsigned n(1000);
-  std::vector<vita::i_mep> vi;
+  std::vector<i_mep> vi;
   std::vector<bool> present(n);
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::i_mep i1(env, sset);
+    i_mep i1(env, sset);
     const vita::any val(i_interp(&i1).run());
-    vita::fitness_t f{val.empty() ?
-        0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
+    fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -162,7 +163,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::fitness_t f;
+    fitness_t f;
     present[i] = cache.find(vi[i].signature(), &f);
   }
 
@@ -175,10 +176,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
     if (present[i])
     {
       const vita::any val(i_interp(&vi[i]).run());
-      vita::fitness_t f{val.empty() ?
-          0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
+      fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
 
-      vita::fitness_t f1(f.size(), vita::components);
+      fitness_t f1(f.size(), fit_tag::components);
       BOOST_CHECK(cache2.find(vi[i].signature(), &f1));
 
       BOOST_CHECK_EQUAL(f, f1);

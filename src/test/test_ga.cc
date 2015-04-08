@@ -55,21 +55,23 @@ BOOST_AUTO_TEST_CASE(Penalty)
 
 BOOST_AUTO_TEST_CASE(Evaluator)
 {
+  using namespace vita;
+
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
 
-  auto eva(vita::make_ga_evaluator<vita::i_ga>(f));
+  auto eva(make_ga_evaluator<i_ga>(f));
 
-  vita::fitness_t eva_prev;
+  fitness_t eva_prev;
   double v_prev(0.0);
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_ga ind(env, sset);
+    i_ga ind(env, sset);
     BOOST_REQUIRE(ind.debug());
 
     const auto eva_ret(eva(ind));
-    BOOST_REQUIRE_LE(eva_ret, vita::fitness_t(1, vita::copies_of, 0.0));
+    BOOST_REQUIRE_LE(eva_ret, fitness_t{0.0});
 
     const auto v(f(ind));
 
