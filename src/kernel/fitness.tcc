@@ -230,7 +230,7 @@ bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 
 ///
 /// \param[in] in input stream.
-/// \return \c true if basic_fitness_t loaded correctly.
+/// \return `true` if the object has been loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current basic_fitness_t isn't
@@ -256,7 +256,7 @@ bool basic_fitness_t<T>::load(std::istream &in)
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if basic_fitness_t was saved correctly.
+/// \return `true` if object has been saved correctly.
 ///
 template<class T>
 bool basic_fitness_t<T>::save(std::ostream &out) const
@@ -289,7 +289,7 @@ std::ostream &operator<<(std::ostream &o, basic_fitness_t<T> f)
 
 ///
 /// \param[in] f a fitness.
-/// \return the sum of \a this and \a f.
+/// \return the sum of `this` and `f`.
 ///
 template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
@@ -322,7 +322,7 @@ basic_fitness_t<T> operator+(basic_fitness_t<T> lhs,
 
 ///
 /// \param[in] f a fitness.
-/// \return the difference of \a this and \a f.
+/// \return the difference of `this` and `f`.
 ///
 template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
@@ -348,7 +348,7 @@ basic_fitness_t<T> operator-(basic_fitness_t<T> lhs,
 
 ///
 /// \param[in] f a fitness.
-/// \return the product of \a this and \a f.
+/// \return the product of `this` and `f`.
 ///
 template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t<T> &f)
@@ -374,8 +374,8 @@ basic_fitness_t<T> operator*(basic_fitness_t<T> lhs,
 
 ///
 /// \param[in] val a scalar.
-/// \return a new vector obtained dividing each component of \a this by tha
-///         scalar value \a val.
+/// \return a new vector obtained dividing each component of `this` by tha
+///         scalar value `val`.
 ///
 template<class T>
 basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
@@ -391,7 +391,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
 
 ///
 /// \param[in] val a scalar.
-/// \return the product of \a this and \a val.
+/// \return the product of `this` and `val`.
 ///
 template<class T>
 basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
@@ -407,7 +407,7 @@ basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
 
 ///
 /// \return a new vector obtained taking the absolute value of each component
-///         of \a this.
+///         of `this`.
 ///
 template<class T>
 basic_fitness_t<T> abs(basic_fitness_t<T> f)
@@ -424,7 +424,7 @@ basic_fitness_t<T> abs(basic_fitness_t<T> f)
 
 ///
 /// \param[in] f a fitness.
-/// \return a new vector obtained "rounding" each component of \a this.
+/// \return a new vector obtained "rounding" each component of `this`.
 ///
 template<class T>
 basic_fitness_t<T> round_to(basic_fitness_t<T> f)
@@ -438,7 +438,7 @@ basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 ///
 /// \param[in] f a fitness.
 /// \return a new vector obtained taking the square root of each component of
-///         \a this.
+///         `this`.
 ///
 template<class T>
 basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
@@ -451,7 +451,7 @@ basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if every component of the fitness is finite.
+/// \return `true` if every component of the fitness is finite.
 ///
 template<class T>
 bool isfinite(const basic_fitness_t<T> &f)
@@ -462,7 +462,7 @@ bool isfinite(const basic_fitness_t<T> &f)
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if a component of the fitness is NAN.
+/// \return `true` if a component of the fitness is `NAN`.
 ///
 template<class T>
 bool isnan(const basic_fitness_t<T> &f)
@@ -472,7 +472,7 @@ bool isnan(const basic_fitness_t<T> &f)
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if each component of the fitness vector is small.
+/// \return `true` if each component of the fitness vector is small.
 ///
 template<class T>
 bool issmall(const basic_fitness_t<T> &f)
@@ -483,7 +483,7 @@ bool issmall(const basic_fitness_t<T> &f)
 
 ///
 /// \param[in] f a fitness to check.
-/// \return true if every element of \a f is nonnegative.
+/// \return true if every element of `f` is nonnegative.
 ///
 template<class T> bool isnonnegative(const basic_fitness_t<T> &f)
 {
@@ -511,7 +511,7 @@ bool almost_equal(const basic_fitness_t<T> &f1,
 ///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
-/// \return the distance between \a f1 and \a f2.
+/// \return the distance between `f1` and `f2`.
 ///
 template<class T>
 double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
@@ -531,7 +531,7 @@ double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 ///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
-/// \return the fitness vector obtained joining \a f1 and \a f2.
+/// \return the fitness vector obtained joining `f1` and `f2`.
 ///
 template<class T>
 basic_fitness_t<T> combine(const basic_fitness_t<T> &f1,
