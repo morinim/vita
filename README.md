@@ -1,4 +1,4 @@
-# [VITA](https://bitbucket.org/morinim/vita) #
+# [VITA][1] #
 
 ## Overview ##
 
@@ -40,16 +40,24 @@ However, since core members of the Vita project have no access to these platform
 
 ## Getting the source ##
 
-There are two primary ways of getting Vita's source code: you can download a stable source release in your preferred archive format or directly check out the source from the Mercurial (HG) repository.
+There are two ways of getting Vita's source code: you can download a stable source release in your preferred archive format or directly clone the source from a repository.
 
-The HG checkout requires a few extra steps and some extra software packages on your system, but lets you track the latest development and make patches much more easily, so we highly encourage it.
+Cloning a repository requires a few extra steps and some extra software packages on your system, but lets you track the latest development and make patches much more easily, so we highly encourage it.
 
-### HG Checkout ###
+### HG Clone ###
 
-Run the following Mercurial command:
+Run the following command:
 ```
-hg clone https://morinim@bitbucket.org/morinim/vita
+hg clone https://bitbucket.org/morinim/vita
 ```
+
+### Git Clone ###
+
+```
+git clone https://github.com/morinim/vita.git
+```
+
+Please consider that the [primary repository][3] is Mercurial-based (HG) and hosted on Bitbucket. The repository on Github is a mirror kept for Git users' convenience.
 
 ### Source Package ###
 
@@ -125,3 +133,4 @@ If you choose other distributions, you'd need to build Boost:
 
 [1]: http://www.eosdev.it/
 [2]: http://www.boost.org/
+[3]: https://bitbucket.org/morinim/vita
