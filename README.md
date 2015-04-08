@@ -1,4 +1,4 @@
-# [VITA][1] #
+# [VITA][3] #
 
 ## Overview ##
 
@@ -64,6 +64,7 @@ Please consider that the [primary repository][3] is Mercurial-based (HG) and hos
 Vita is released in versioned source packages which can be downloaded from the project's [download page](https://bitbucket.org/morinim/vita/downloads). Several different archive formats are provided, but the only difference is the tools used to manipulate them and the size of the resulting file. Download whichever you are most comfortable with.
 
 Once the package is downloaded, expand it using whichever tools you prefer for that type. This will result in a new directory with the name "vita-X.Y.Z" which contains all of the source code. Here are some examples on Linux:
+
 ```
 $ tar -xvJf vita-X.Y.Z.txz
 $ tar -xvjf vita-X.Y.Z.tar.bz2
