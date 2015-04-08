@@ -408,64 +408,62 @@ basic_fitness_t<T> operator*(basic_fitness_t<T> lhs,
 }
 
 ///
-/// \param[in] val a scalar.
-/// \return a new vector obtained dividing each component of `this` by tha
-///         scalar value `val`.
+/// \param[in] f a fitness value.
+/// \param[in] v a scalar.
+/// \return a new vector obtained dividing each component of `f` by the scalar
+///         value `v`.
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
+basic_fitness_t<T> operator/(basic_fitness_t<T> f, T v)
 {
-  const auto n(size());
-  basic_fitness_t<T> tmp(n, fit_tag::components);
+  for (auto &f_i : f)
+    f_i /= v;
 
-  for (unsigned i(0); i < n; ++i)
-    tmp[i] = operator[](i) / val;
-
-  return tmp;
+  return f;
 }
 
 ///
-/// \param[in] val a scalar.
-/// \return the product of `this` and `val`.
+/// \param[in] f a fitness value.
+/// \param[in] v a scalar.
+/// \return a new vector obtained multiplying each component of `f` by the
+///         scalar value `v`.
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
+basic_fitness_t<T> operator*(basic_fitness_t<T> f, T v)
 {
-  const auto n(size());
-  basic_fitness_t<T> tmp(n, fit_tag::components);
+  for (auto &f_i : f)
+    f_i *= v;
 
-  for (unsigned i(0); i < n; ++i)
-    tmp[i] = operator[](i) * val;
-
-  return tmp;
+  return f;
 }
 
 ///
+/// \param[in] f a fitness value.
 /// \return a new vector obtained taking the absolute value of each component
-///         of `this`.
+///         of `f`.
 ///
 template<class T>
 basic_fitness_t<T> abs(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = std::abs(v);
+  for (auto &f_i : f)
+    f_i = std::abs(f_i);
 
   return f;
 
   // An alternative is:
-  // > std::transform(&f[0], &f[0]+n, &f[0], static_cast<T (*)(T)>(std::abs));
-  // but the compiler won't do a good job for n == 1
+  //     std::transform(f.begin(), f.end(), f.begin(),
+  //                    static_cast<T (*)(T)>(std::abs));
 }
 
 ///
 /// \param[in] f a fitness.
-/// \return a new vector obtained "rounding" each component of `this`.
+/// \return a new vector obtained "rounding" each component of `f`.
 ///
 template<class T>
 basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = round_to(v);
+  for (auto &f_i : f)
+    f_i = round_to(f_i);
 
   return f;
 }
@@ -473,13 +471,13 @@ basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 ///
 /// \param[in] f a fitness.
 /// \return a new vector obtained taking the square root of each component of
-///         `this`.
+///         `f`.
 ///
 template<class T>
 basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = std::sqrt(v);
+  for (auto &f_i : f)
+    f_i = std::sqrt(f_i);
 
   return f;
 }

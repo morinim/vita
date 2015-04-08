@@ -93,9 +93,6 @@ public:
   basic_fitness_t &operator-=(const basic_fitness_t &);
   basic_fitness_t &operator*=(const basic_fitness_t &);
 
-  basic_fitness_t operator/(T) const;
-  basic_fitness_t operator*(T) const;
-
 public:   // Serialization
   bool load(std::istream &);
   bool save(std::ostream &) const;
@@ -107,12 +104,14 @@ private:  // Private data members
 // ***********************************************************************
 // *  Arithmetic operators                                               *
 // ***********************************************************************
-template<class T>
-basic_fitness_t<T> operator+(basic_fitness_t<T>, const basic_fitness_t<T> &);
-template<class T>
-basic_fitness_t<T> operator-(basic_fitness_t<T>, const basic_fitness_t<T> &);
-template<class T>
-basic_fitness_t<T> operator*(basic_fitness_t<T>, const basic_fitness_t<T> &);
+template<class T> basic_fitness_t<T> operator+(basic_fitness_t<T>,
+                                               const basic_fitness_t<T> &);
+template<class T> basic_fitness_t<T> operator-(basic_fitness_t<T>,
+                                               const basic_fitness_t<T> &);
+template<class T> basic_fitness_t<T> operator*(basic_fitness_t<T>,
+                                               const basic_fitness_t<T> &);
+template<class T> basic_fitness_t<T> operator/(basic_fitness_t<T>, T);
+template<class T> basic_fitness_t<T> operator*(basic_fitness_t<T>, T);
 
 // ***********************************************************************
 // *  Comparison operators                                               *
