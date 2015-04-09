@@ -24,8 +24,11 @@
 namespace vita
 {
 ///
-/// This is a container for Vita's parameters. Included values are used
-/// as parameters for object initializations and runtime execution control.
+/// A context object (as defined in the Context Object Pattern) aggregating
+/// multiple related parameters into one structure, so there needs to be only
+/// one common parameter passed amongst functions and classes.
+/// Included values are used as parameters for object initializations and
+/// runtime execution control.
 ///
 /// \note
 /// Because using `boost::optional<bool>` can lead to subtle errors due to
