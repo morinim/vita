@@ -93,7 +93,7 @@ ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
 
 .PRECIOUS: %.o
 
-all: version kernel sr
+all: kernel sr
 
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
@@ -159,7 +159,7 @@ clean:
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
-	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt sr/version.h
+	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt
 
 .phony:	backup
 backup:
