@@ -50,60 +50,61 @@ const std::string vita_sr_defs(
 ///
 void fix_parameters(vita::src_problem *const problem)
 {
-  vita::environment &env(problem->env);
+  using namespace vita;
+
+  environment &env(problem->env);
 
   if (env.code_length && env.code_length <= problem->categories())
   {
     const decltype(env.code_length) new_length(2 * problem->categories());
-    std::cout << vita::k_s_warning << " Adjusting code length ("
+    std::cout << k_s_warning << " Adjusting code length ("
               << env.code_length << " => " << new_length << ")\n";
     env.code_length = new_length;
   }
 
-  if (env.dss && problem->data()->size() <= 30)
+  if (env.dss != trilean::no && problem->data()->size() <= 30)
   {
-    std::cout << vita::k_s_warning << " Adjusting DSS (true => false)\n";
-    env.dss = false;
+    std::cout << k_s_warning << " Adjusting DSS (=> false)\n";
+    env.dss = trilean::no;
   }
 
   if (env.tournament_size)
   {
     if (env.tournament_size < 2)
     {
-      std::cout << vita::k_s_warning << " Adjusting tournament size (=> 2)\n";
+      std::cout << k_s_warning << " Adjusting tournament size (=> 2)\n";
       env.tournament_size = 2;
     }
 
     if (env.mate_zone && env.tournament_size > *env.mate_zone)
     {
-      std::cout << vita::k_s_warning << " Adjusting tournament size ("
+      std::cout << k_s_warning << " Adjusting tournament size ("
                 << env.tournament_size << " => " << *env.mate_zone << ")\n";
       env.tournament_size = *env.mate_zone;
     }
 
     if (env.individuals && env.tournament_size > env.individuals)
     {
-      std::cout << vita::k_s_warning << " Adjusting tournament size ("
+      std::cout << k_s_warning << " Adjusting tournament size ("
                 << env.tournament_size << " => " << env.individuals << ")\n";
       env.tournament_size = env.individuals;
     }
   }
 
-  if (env.threshold.fitness == vita::fitness_t() &&
-      env.threshold.accuracy < 0.0)
+  if (env.threshold.fitness == fitness_t() && env.threshold.accuracy < 0.0)
   {
     if (problem->classification())
     {
       env.threshold.accuracy = 0.99;
 
-      std::cout << vita::k_s_info << " Accuracy threshold set to "
+      std::cout << k_s_info << " Accuracy threshold set to "
                 << env.threshold.accuracy << '\n';
     }
     else  // symbolic regression
     {
       env.threshold.fitness = {-0.0001};
 
-      std::cout << vita::k_s_info << " Fitness threshold set to "
+      std::cout << k_s_info << " Fitness threshold set to "
                 << env.threshold.fitness << '\n';
     }
   }
@@ -258,7 +259,7 @@ bool data(const std::string &data_file)
   ///
 void dss(const std::string &v)
 {
-  problem->env.dss = is_true(v);
+  assign(problem->env.dss, is_true(v));
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Dynamic Subset Selection is "

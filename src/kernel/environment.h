@@ -31,10 +31,6 @@ namespace vita
 /// Included values are used as parameters for object initializations and
 /// runtime execution control.
 ///
-/// \note
-/// Because using `boost::optional<bool>` can lead to subtle errors due to
-/// the implicit `bool` conversion, we prefer to use `boost::tribool`.
-///
 class environment
 {
 public:  // Constructor and support functions
@@ -46,10 +42,10 @@ public:  // Constructor and support functions
 
 public:  // Data members
   /// Verbosity level:
-  /// * 0 only fatal errors;
-  /// * 1 search results and errors;
-  /// * 2 search results, informations, warnings and errors;
-  /// * >= 3 everything.
+  /// - 0 only fatal errors;
+  /// - 1 search results and errors;
+  /// - 2 search results, informations, warnings and errors;
+  /// - >= 3 everything.
   unsigned verbosity = 2;
 
   /// The number of genes (maximum length of an evolved program in the
@@ -144,7 +140,7 @@ public:  // Data members
 
   /// Switches Dynamic Subset Selection on/off.
   /// \see search::dss()
-  boost::tribool dss = boost::indeterminate;
+  trilean dss = trilean::unknown;
 
   /// This is used for the trivial geography scheme (Spector, Klein 2005).
   /// The population is viewed as having a 1-dimensional spatial structure -

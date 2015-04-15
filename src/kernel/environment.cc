@@ -44,7 +44,7 @@ environment::environment(bool initialize)
     p_mutation = 0.04;
     p_cross = 0.9;
     brood_recombination = 0;
-    dss = true;
+    dss = trilean::yes;
     layers = 4;
     individuals = 100;
     tournament_size = 5;
@@ -154,7 +154,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(dss))
+    if (dss == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined dss data member\n";

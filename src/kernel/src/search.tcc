@@ -225,9 +225,9 @@ void src_search<T, ES>::tune_parameters_nvi()
   // * DSS speed up isn't so sensible;
   // BUT
   // * DSS can help against overfitting.
-  if (boost::indeterminate(constrained.dss))
+  if (constrained.dss == trilean::unknown)
   {
-    this->env_.dss = d_size > 400;
+    this->env_.dss = d_size > 400 ? trilean::yes : trilean::no;
 
     if (this->env_.verbosity >= 2)
       std::cout << k_s_info << " DSS set to " << this->env_.dss << '\n';
@@ -411,7 +411,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   // For `std::placeholders` and `std::bind` see:
   // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
   std::function<void (unsigned)> shake;
-  if (this->env_.dss)
+  if (this->env_.dss == trilean::yes)
     shake = std::bind(&src_search::dss, this, std::placeholders::_1);
 
   const auto stop(std::bind(&src_search::stop_condition, this,
