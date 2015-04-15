@@ -34,7 +34,7 @@ const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification v0.9.10"
   );
 const std::string vita_sr_version2(
-  "Copyright 2011-2014 EOS di Manlio Morini (http://www.eosdev.it)"
+  "Copyright 2011-2015 EOS di Manlio Morini (http://www.eosdev.it/)"
   );
 const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
