@@ -24,6 +24,8 @@ DEFS :=
 $(info Building: $(TYPE))
 $(info Using: $(CXX))
 
+#VERSION := $(shell hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}')
+
 # Boost library
 LIB := -static -lboost_program_options
 DEBUG_LIB := -static -lboost_unit_test_framework
@@ -91,7 +93,7 @@ ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
 
 .PRECIOUS: %.o
 
-all: kernel sr
+all: version kernel sr
 
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
@@ -157,7 +159,7 @@ clean:
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
-	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt
+	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt sr/version.h
 
 .phony:	backup
 backup:
