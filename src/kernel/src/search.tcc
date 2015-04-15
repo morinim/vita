@@ -208,7 +208,7 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (constrained.patch_length == 0)
     this->env_.patch_length = 1 + this->env_.code_length / 3;
 
-  if (boost::indeterminate(constrained.elitism))
+  if (constrained.elitism == trilean::unknown)
     this->env_.elitism = dflt.elitism;
 
   if (constrained.p_mutation < 0.0)

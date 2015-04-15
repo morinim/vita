@@ -40,7 +40,7 @@ environment::environment(bool initialize)
   {
     code_length = 100;
     patch_length = 1;
-    elitism = true;
+    elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
     brood_recombination = 0;
@@ -125,7 +125,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(elitism))
+    if (elitism == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined elitism data member\n";

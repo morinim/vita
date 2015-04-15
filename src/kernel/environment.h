@@ -20,6 +20,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "kernel/fitness.h"
+#include "kernel/trilean.h"
 
 namespace vita
 {
@@ -85,7 +86,7 @@ public:  // Data members
   /// An elitist algorithm is one that ALWAYS retains in the population the
   /// best individual found so far. With higher elitism the population will
   /// converge quicker but losing diversity.
-  boost::tribool elitism = boost::indeterminate;
+  trilean elitism = trilean::unknown;
 
   /// \brief Mutation rate probability
   ///

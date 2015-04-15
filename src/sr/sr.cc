@@ -270,7 +270,7 @@ void dss(const std::string &v)
 ///
 void elitism(const std::string &v)
 {
-  problem->env.elitism = is_true(v);
+  assign(problem->env.elitism, is_true(v));
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Elitism is " << problem->env.elitism
