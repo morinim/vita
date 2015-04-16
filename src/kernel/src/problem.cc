@@ -25,35 +25,36 @@ namespace vita
 namespace detail
 {
 ///
-/// \param[in] available the "dictionary" for the sequence.
+/// \param[in] availables the "dictionary" for the sequence.
 /// \param[in] size size of the output sequence.
 /// \return a vector of sequences with repetition with elements taken from a
-///         given set (`available`) and fixed length (`size`).
+///         given set (`availables`) and fixed length (`size`).
 ///
 template<class C>
-std::vector<C> seq_with_rep(const C &available, std::size_t size)
+std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 {
-  assert(available.size());
+  assert(availables.size());
   assert(size);
 
-  std::function<void (unsigned, const C &, std::vector<C> *)> swr(
-    [&](unsigned level, const C &base, std::vector<C> *out)
+  std::vector<C> ret;
+
+  std::function<void (unsigned, const C &)> swr(
+    [&](unsigned length, const C &base)
     {
-      for (auto tag : available)
+      for (auto elem : availables)
       {
         C current(base);
-        current.push_back(tag);
+        current.push_back(elem);
 
-        if (level + 1 < size)
-          swr(level + 1, current, out);
+        if (length + 1 < size)
+          swr(length + 1, current);
         else
-          out->push_back(current);
+          ret.push_back(current);
       }
     });
 
-  std::vector<C> out;
-  swr(0, {}, &out);
-  return out;
+  swr(0, {});
+  return ret;
 }
 }  // namespace detail
 
