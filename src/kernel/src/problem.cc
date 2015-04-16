@@ -19,24 +19,27 @@
 #include "kernel/src/evaluator.h"
 #include "kernel/src/variable.h"
 
-namespace
+namespace vita
+{
+
+namespace detail
 {
 ///
-/// \param[in] used this is the "dictionary" for the sequence.
+/// \param[in] available the "dictionary" for the sequence.
 /// \param[in] size size of the output sequence.
-/// \return a vector of sequences with repetition of fixed length (`size`)
-///         of elements taken from the given set (`used`).
+/// \return a vector of sequences with repetition with elements taken from a
+///         given set (`available`) and fixed length (`size`).
 ///
 template<class C>
-std::vector<C> seq_with_rep(const C &used, std::size_t size)
+std::vector<C> seq_with_rep(const C &available, std::size_t size)
 {
-  assert(used.size());
+  assert(available.size());
   assert(size);
 
   std::function<void (unsigned, const C &, std::vector<C> *)> swr(
     [&](unsigned level, const C &base, std::vector<C> *out)
     {
-      for (auto tag : used)
+      for (auto tag : available)
       {
         C current(base);
         current.push_back(tag);
@@ -52,10 +55,8 @@ std::vector<C> seq_with_rep(const C &used, std::size_t size)
   swr(0, {}, &out);
   return out;
 }
-}  // namespace
+}  // namespace detail
 
-namespace vita
-{
 ///
 /// \brief New empty instance of src_problem
 ///
@@ -278,7 +279,8 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 
             // From the list of all the sequences with repetition of
             // args.size() elements (categories)...
-            const auto sequences(seq_with_rep(used_categories, args.size()));
+            const auto sequences(detail::seq_with_rep(used_categories,
+                                                      args.size()));
 
             // ...we choose those compatible with the xml signature of the
             // current symbol.
