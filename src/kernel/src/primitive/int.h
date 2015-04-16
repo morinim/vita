@@ -13,6 +13,7 @@
 #if !defined(VITA_INT_PRIMITIVE_H)
 #define      VITA_INT_PRIMITIVE_H
 
+#include <climits>
 #include <limits>
 #include <string>
 
@@ -62,7 +63,7 @@ namespace integer
     { return random::between<int>(min, upp); }
 
     virtual std::string display(double v) const override
-    { return boost::lexical_cast<std::string>(v); }
+    { return std::to_string(v); }
 
     virtual any eval(core_interpreter *i) const override
     {

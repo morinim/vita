@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,14 +75,12 @@ namespace vita
   {
     try
     {
-      boost::lexical_cast<double>(s);
+      stod(s);
     }
-    catch(boost::bad_lexical_cast &)  // not a number
+    catch(std::invalid_argument)  // not a number
     {
-      if (s == "{TRUE}" || s == "{FALSE}")
-        return domain_t::d_bool;
-
-      return domain_t::d_string;
+      return (s == "{TRUE}" || s == "{FALSE}") ?
+        domain_t::d_bool : domain_t::d_string;
     }
 
     return s.find('.') == std::string::npos ? domain_t::d_int

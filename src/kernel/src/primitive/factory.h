@@ -16,7 +16,6 @@
 #include <map>
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "kernel/symbol.h"
 #include "kernel/utility.h"
