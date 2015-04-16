@@ -35,292 +35,292 @@ namespace vita
 /// integers do no result in signed overflow
 namespace integer
 {
-  using base_t = int;
+using base_t = int;
 
-  ///
-  /// \param[in] v the value that must be casted to base type (`base_t`).
-  ///
-  /// Just a simple shortcut.
-  inline base_t cast(const any &v) { return any_cast<base_t>(v); }
+///
+/// \param[in] v the value that must be casted to base type (`base_t`).
+///
+/// Just a simple shortcut.
+inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
-  ///
-  /// Integer ephemeral random constant.
-  /// \see dbl::number
-  ///
-  class number : public terminal
+///
+/// Integer ephemeral random constant.
+/// \see dbl::number
+///
+class number : public terminal
+{
+public:
+  explicit number(const cvect &c, int m = -128, int u = 127)
+    : terminal("INT", c[0]), min(m), upp(u)
   {
-  public:
-    explicit number(const cvect &c, int m = -128, int u = 127)
-      : terminal("INT", c[0]), min(m), upp(u)
-    {
-      assert(c.size() == 1);
-      assert(m < u);
-    }
+    assert(c.size() == 1);
+    assert(m < u);
+  }
 
-    virtual bool parametric() const override { return true; }
+  virtual bool parametric() const override { return true; }
 
-    virtual double init() const override
-    { return random::between<int>(min, upp); }
+  virtual double init() const override
+  { return random::between<int>(min, upp); }
 
-    virtual std::string display(double v) const override
-    { return std::to_string(v); }
+  virtual std::string display(double v) const override
+  { return std::to_string(v); }
 
-    virtual any eval(core_interpreter *i) const override
-    {
-      return any(static_cast<base_t>(
-                   any_cast<gene::param_type>(
-                     static_cast<interpreter<i_mep> *>(i)->fetch_param())));
-    }
-
-  private:  // Private data members.
-    const int min, upp;
-  };
-
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Addition
-  class add : public function
+  virtual any eval(core_interpreter *i) const override
   {
-  public:
-    explicit add(const cvect &c) : function("ADD", c[0], {c[0], c[0]})
-    {
-      assert(c.size() == 1);
-    }
+    return any(static_cast<base_t>(
+                 any_cast<gene::param_type>(
+                   static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+  }
 
-    virtual bool associative() const override { return true; }
+private:  // Private data members
+  const int min, upp;
+};
 
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Addition
+class add : public function
+{
+public:
+  explicit add(const cvect &c) : function("ADD", c[0], {c[0], c[0]})
+  {
+    assert(c.size() == 1);
+  }
 
-      if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
+  virtual bool associative() const override { return true; }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
+      return any(std::numeric_limits<base_t>::max());
+    if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<base_t>::min() - v1))
+      return any(std::numeric_limits<base_t>::min());
+
+    return any(v0 + v1);
+  }
+};
+
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Division
+class div : public function
+{
+public:
+  explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
+  { assert(c.size() == 1); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+      return any(v0);
+
+    return any(v0 / v1);
+  }
+};
+
+
+class ife : public function
+{
+public:
+  explicit ife(const cvect &c)
+    : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    if (v0 == v1)
+      return i->fetch_arg(2);
+
+    return i->fetch_arg(3);
+  }
+
+  virtual double penalty_nvi(core_interpreter *ci) const override
+  {
+    return comparison_function_penalty(ci);
+  }
+};
+
+class ifl : public function
+{
+public:
+  explicit ifl(const cvect &c)
+    : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    if (v0 < v1)
+      return i->fetch_arg(2);
+
+    return i->fetch_arg(3);
+  }
+
+  virtual double penalty_nvi(core_interpreter *ci) const override
+  {
+    return comparison_function_penalty(ci);
+  }
+};
+
+class ifz : public function
+{
+public:
+  explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
+  { assert(c.size() == 1); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+
+    if (v0 == 0)
+      return i->fetch_arg(1);
+
+    return i->fetch_arg(2);
+  }
+
+  virtual double penalty_nvi(core_interpreter *ci) const override
+  {
+    return comparison_function_penalty(ci);
+  }
+};
+
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Modulo
+class mod : public function
+{
+public:
+  explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
+  { assert(c.size() == 1); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
+      return any(v1);
+
+    return any(v0 % v1);
+  }
+};
+
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Multiplication
+class mul : public function
+{
+public:
+  explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]}) {}
+
+  virtual bool associative() const override { return true; }
+
+  virtual any eval(core_interpreter *ci) const
+  {
+    static_assert(sizeof(long long) >= 2 * sizeof(base_t),
+                  "Unable to detect overflow after multiplication");
+
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
+
+    long long tmp(v0 * v1);
+    if (tmp > std::numeric_limits<base_t>::max())
+      return any(std::numeric_limits<base_t>::max());
+    if (tmp < std::numeric_limits<base_t>::min())
+      return any(std::numeric_limits<base_t>::min());
+
+    return any(static_cast<base_t>(tmp));
+
+    /*
+    // On systems where the above relationship does not hold, the following
+    // compliant solution may be used to ensure signed overflow does not
+    // occur.
+    if (v0 > 0)
+      if (v1 > 0)
+      {
+        assert(v0 > 0 && v1 > 0);
+        if (v0 > std::numeric_limits<base_t>::max() / v1)
         return any(std::numeric_limits<base_t>::max());
-      if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<base_t>::min() - v1))
-        return any(std::numeric_limits<base_t>::min());
+      }
+      else  // v0 is positive, v1 is non-positive
+      {
+        assert(v0 > 0 && v1 <= 0);
+        if (v1 < std::numeric_limits<base_t>::min() / v0)
+          return any(std::numeric_limits<base_t>::min());
+      }
+    else  // v0 is non-positive
+      if (v1 > 0)
+      {
+        assert(v0 <= 0 && v1 > 0);
+        if (v0 < std::numeric_limits<base_t>::min() / v1)
+          return any(std::numeric_limits<base_t>::min());
+      }
+      else  // v0 is non-positive, v1 is non-positive
+      {
+        assert(v0 <= 0 && v1 <= 0);
+        if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
+          return any(std::numeric_limits<base_t>::max());
+      }
 
-      return any(v0 + v1);
-    }
-  };
+    return any(v0 * v1);
+    */
+  }
+};
 
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Division
-  class div : public function
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-LeftShiftOperator
+class shl : public function
+{
+public:
+  explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
+  { assert(c.size() == 1); }
+
+  virtual any eval(core_interpreter *ci) const override
   {
-  public:
-    explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
-    { assert(c.size() == 1); }
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
 
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
+    if (v0 < 0 || v1 < 0 ||
+        v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
+        v0 > std::numeric_limits<base_t>::max() >> v1)
+      return any(v0);
 
-      if (v1 == 0 ||
-          (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-        return any(v0);
-      else
-        return any(v0 / v1);
-    }
-  };
+    return any(v0 << v1);
+  }
+};
 
-  class ife : public function
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Subtraction
+class sub : public function
+{
+public:
+  explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
+  { assert(c.size() == 1); }
+
+  virtual any eval(core_interpreter *ci) const override
   {
-  public:
-    explicit ife(const cvect &c)
-      : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
-    { assert(c.size() == 2); }
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v1(integer::cast(i->fetch_arg(1)));
 
-    virtual any eval(core_interpreter *ci) const
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
+    if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
+      return any(std::numeric_limits<base_t>::min());
+    if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<base_t>::max() + v1))
+      return any(std::numeric_limits<base_t>::max());
 
-      if (v0 == v1)
-        return i->fetch_arg(2);
-      else
-        return i->fetch_arg(3);
-    }
+    return any(v0 - v1);
+  }
+};
 
-    virtual double penalty_nvi(core_interpreter *ci) const override
-    {
-      return comparison_function_penalty(ci);
-    }
-  };
-
-  class ifl : public function
-  {
-  public:
-    explicit ifl(const cvect &c)
-      : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
-    { assert(c.size() == 2); }
-
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
-
-      if (v0 < v1)
-        return i->fetch_arg(2);
-      else
-        return i->fetch_arg(3);
-    }
-
-    virtual double penalty_nvi(core_interpreter *ci) const override
-    {
-      return comparison_function_penalty(ci);
-    }
-  };
-
-  class ifz : public function
-  {
-  public:
-    explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
-    { assert(c.size() == 1); }
-
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-
-      if (v0 == 0)
-        return i->fetch_arg(1);
-      else
-        return i->fetch_arg(2);
-    }
-
-    virtual double penalty_nvi(core_interpreter *ci) const override
-    {
-      return comparison_function_penalty(ci);
-    }
-  };
-
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Modulo
-  class mod : public function
-  {
-  public:
-    explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
-    { assert(c.size() == 1); }
-
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
-
-      if (v1 == 0 ||
-          (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-        return any(v1);
-      else
-        return any(v0 % v1);
-    }
-  };
-
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Multiplication
-  class mul : public function
-  {
-  public:
-    explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]}) {}
-
-    virtual bool associative() const override { return true; }
-
-    virtual any eval(core_interpreter *ci) const
-    {
-      static_assert(sizeof(long long) >= 2 * sizeof(base_t),
-                    "Unable to detect overflow after multiplication");
-
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
-
-      long long tmp(v0 * v1);
-      if (tmp > std::numeric_limits<base_t>::max())
-        return any(std::numeric_limits<base_t>::max());
-      if (tmp < std::numeric_limits<base_t>::min())
-        return any(std::numeric_limits<base_t>::min());
-
-      return any(static_cast<base_t>(tmp));
-
-      /*
-      // On systems where the above relationship does not hold, the following
-      // compliant solution may be used to ensure signed overflow does not
-      // occur.
-      if (v0 > 0)
-        if (v1 > 0)
-        {
-          assert(v0 > 0 && v1 > 0);
-          if (v0 > std::numeric_limits<base_t>::max() / v1)
-            return any(std::numeric_limits<base_t>::max());
-        }
-        else  // v0 is positive, v1 is non-positive
-        {
-          assert(v0 > 0 && v1 <= 0);
-          if (v1 < std::numeric_limits<base_t>::min() / v0)
-            return any(std::numeric_limits<base_t>::min());
-        }
-      else  // v0 is non-positive
-        if (v1 > 0)
-        {
-          assert(v0 <= 0 && v1 > 0);
-          if (v0 < std::numeric_limits<base_t>::min() / v1)
-            return any(std::numeric_limits<base_t>::min());
-        }
-        else  // v0 is non-positive, v1 is non-positive
-        {
-          assert(v0 <= 0 && v1 <= 0);
-          if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
-            return any(std::numeric_limits<base_t>::max());
-        }
-
-      return any(v0 * v1);
-      */
-    }
-  };
-
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-LeftShiftOperator
-  class shl : public function
-  {
-  public:
-    explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
-    { assert(c.size() == 1); }
-
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
-
-      if (v0 < 0 || v1 < 0 ||
-          v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
-          v0 > std::numeric_limits<base_t>::max() >> v1)
-        return any(v0);
-
-      return any(v0 << v1);
-    }
-  };
-
-  /// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Subtraction
-  class sub : public function
-  {
-  public:
-    explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
-    { assert(c.size() == 1); }
-
-    virtual any eval(core_interpreter *ci) const override
-    {
-      auto *const i(static_cast<interpreter<i_mep> *>(ci));
-      const auto v0(integer::cast(i->fetch_arg(0)));
-      const auto v1(integer::cast(i->fetch_arg(1)));
-
-      if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
-        return any(std::numeric_limits<base_t>::min());
-      if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<base_t>::max() + v1))
-        return any(std::numeric_limits<base_t>::max());
-
-      return any(v0 - v1);
-    }
-  };
 }  // namespace integer
 }  // namespace vita
 

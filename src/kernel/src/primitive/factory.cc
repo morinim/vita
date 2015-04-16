@@ -69,7 +69,7 @@ namespace vita
 
   ///
   /// \param[in] s the string to be tested.
-  /// \return \c the domain \a s is element of.
+  /// \return the domain `s` is element of.
   ///
   domain_t find_domain(const std::string &s)
   {
@@ -96,11 +96,11 @@ namespace vita
   /// requests the object from the factory) does not know - and is not burdened
   /// by - the actual concrete type of the object which was just created.
   /// However, the type of the concrete object is known by the abstract
-  /// factory via the \a name and \a c arguments.
+  /// factory via the `name` and `c` arguments.
   ///
   /// \attention
-  /// If \a name is not recognized as a preregistered symbol, it is
-  /// registered on the fly as a \a constant.
+  /// If `name` is not recognized as a preregistered symbol, it is
+  /// registered on the fly as a constant.
   ///
   /// \note
   /// * The client code has no knowledge whatsoever of the concrete type, not
@@ -195,7 +195,7 @@ namespace vita
 
   ///
   /// \param[in] name name of the symbol.
-  /// \return \c true if the symbol has been unregistered.
+  /// \return `true` if the symbol has been unregistered.
   ///
   /// Unregister the symbol from the factory.
   /// \note constants and variable aren't registered in the factory, so they
