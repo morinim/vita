@@ -52,7 +52,7 @@ environment::environment(bool initialize)
     generations = 100;
     g_without_improvement =
       std::numeric_limits<decltype(g_without_improvement)>::max();
-    arl = false;
+    arl = trilean::no;
     validation_percentage = 20;
 
     assert(debug(true, true));
@@ -204,7 +204,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(arl))
+    if (arl == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined arl data member\n";

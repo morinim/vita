@@ -158,7 +158,7 @@ vita::src_problem *problem;
 ///
 void arl(const std::string &v)
 {
-  problem->env.arl = is_true(v);
+  assign(problem->env.arl, is_true(v));
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info

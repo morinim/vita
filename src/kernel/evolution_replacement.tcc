@@ -42,7 +42,7 @@ void family_competition<T>::run(const std::vector<coord> &parent,
                                 summary<T> *const s)
 {
   auto &pop(this->pop_);
-  assert(!boost::indeterminate(pop.env().elitism));
+  assert(pop.env().elitism != trilean::unknown);
 
   const fitness_t fit_off(this->eva_(offspring[0]));
 

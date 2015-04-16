@@ -303,7 +303,7 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (!constrained.g_without_improvement)
     this->env_.g_without_improvement = dflt.g_without_improvement;
 
-  if (boost::indeterminate(constrained.arl))
+  if (constrained.arl == trilean::unknown)
     this->env_.arl = dflt.arl;
 
   assert(this->env_.debug(true, true));
@@ -498,7 +498,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     overall_summary.elapsed += s.elapsed;
 
-    if (this->env_.arl)
+    if (this->env_.arl == trilean::yes)
     {
       this->prob_.sset.reset_adf_weights();
       arl(s.best.solution);

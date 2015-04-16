@@ -16,7 +16,6 @@
 #include <cmath>
 #include <string>
 
-#include <boost/logic/tribool.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 #include "kernel/fitness.h"
@@ -169,7 +168,7 @@ public:  // Data members
   unsigned validation_percentage = 101;
 
   /// Should we use Adaptive Representation through Learning?
-  boost::tribool arl = boost::indeterminate;
+  trilean arl = trilean::unknown;
 
   /// \f$2^ttable_size\f$ is the number of elements of the transposition
   /// table.
