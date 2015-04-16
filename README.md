@@ -16,13 +16,13 @@ It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org
 
 This software was originally developed by [EOS][1] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
-Although the core development team is still anchored at EOS (the project is maintained by Manlio Morini), Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
+Although the core development team is still anchored at EOS, Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
 
 ## Requirements ##
 
 Vita is designed to have fairly minimal requirements to build and use with your projects, but there are some. Currently, we support Linux and Windows. We will also make our best effort to support other platforms (e.g. Mac OS X, Solaris, AIX).
 However, since core members of the Vita project have no access to these platforms, Vita may have outstanding issues there. If you notice any problems on your platform, please use the
-[issue tracking system](https://bitbucket.org/morinim/vita/issues). Patches for fixing them are even more welcome!
+[issue tracking system](https://bitbucket.org/morinim/vita/issues); patches for fixing them are even more welcome!
 
 ### Linux requirements ###
 
@@ -79,7 +79,7 @@ vita/
   LICENSE
   README.md
   src/
-    AUTHORS
+    CONTRIBUTORS
     copyright
     Makefile
     examples/..............Various examples
@@ -123,7 +123,7 @@ If you choose other distributions, you'd need to build Boost:
 
 1. Set up a MinGW/MSYS environment.
 2. Get the latest Boost.
-3. Extract Boost archive under `vita/src/` directory (you can expand Boost in a different path but you'll have to add the `stage\lib` directory to the library search path and `boost/` to the include search path).
+3. Extract Boost archive under `vita/src/` directory (you can expand Boost in a different path but you'll have to add the `stage/lib` directory to the library search path and `boost/` to the include search path).
 4. Open the Windows command prompt (`cmd.exe` *not* MSYS) and cd to your boost directory.
 5. Execute
     `bootstrap.bat mingw`
