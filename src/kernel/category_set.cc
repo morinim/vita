@@ -85,8 +85,8 @@ unsigned category_set::size() const
 
 ///
 /// \param[in] name name of a category.
-/// \return the category with the specified \a name (if it doesn't exist
-///         returns category::null).
+/// \return the category with the specified `name` (if it doesn't exist
+///         returns `category::null`).
 ///
 category category_set::find(const std::string &name) const
 {
@@ -106,8 +106,8 @@ category category_set::find(const std::string &name) const
 
 ///
 /// \param[in] t tag of a category.
-/// \return a the category with the spcified \a t (if it doesn't exist
-///         returns category::null).
+/// \return the category with tag `t` (if it doesn't exist returns
+///         category::null).
 ///
 category category_set::find(category_t t) const
 {
@@ -116,7 +116,7 @@ category category_set::find(category_t t) const
 
 ///
 /// \param[in] c a new untagged_category for the set.
-/// \return the tag associated with \a c.
+/// \return the tag associated with `c`.
 ///
 category_t category_set::insert(const untagged_category &c)
 {
@@ -137,7 +137,7 @@ category_t category_set::insert(const untagged_category &c)
 /// \param[in] t the tag of a category.
 /// \param[in] l a label.
 ///
-/// Add the label \a l to the set of labels associated with category \a t.
+/// Add the label `l` to the set of labels associated with category `t`.
 ///
 void category_set::add_label(category_t t, const std::string &l)
 {
@@ -151,7 +151,7 @@ void category_set::add_label(category_t t, const std::string &l)
 /// \param[in] t1 a tag of a category.
 /// \param[in] t2 a tag of category.
 ///
-/// Swap categories \a t1 and \a t2.
+/// Swap categories `t1` and `t2`.
 ///
 void category_set::swap(category_t t1, category_t t2)
 {
@@ -164,7 +164,7 @@ void category_set::swap(category_t t1, category_t t2)
 ///
 /// \param[out] s output stream.
 /// \param[in] c category to print.
-/// \return output stream including \a c.
+/// \return output stream including `c`.
 ///
 /// Utility function used for debugging purpose.
 ///
