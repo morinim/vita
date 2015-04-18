@@ -1,6 +1,6 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Vita Project
-Source: http://code.google.com/p/vita/
+Source: https://bitbucket.org/morinim/vita
 
 Files: *
 Copyright: Copyright 2011 EOS di Manlio Morini <morinim@gmail.com>
