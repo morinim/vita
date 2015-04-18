@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "kernel/variant.h"
+#include "kernel/staging/variant.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE variant_test

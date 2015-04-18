@@ -24,7 +24,7 @@ template<class C> std::vector<C> seq_with_rep(const C &, std::size_t);
 }}
 
 template<class T, class U>
-bool equal(const T &c1, const U &c2)
+bool is_equal(const T &c1, const U &c2)
 {
   assert(c1.size() == c2.size());
   return std::equal(c1.begin(), c1.end(), c2.begin());
@@ -40,8 +40,10 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   BOOST_REQUIRE_EQUAL(seq[0][0], v[0]);
 
   seq = vita::detail::seq_with_rep(v, 4);
+  vita::cvect r = {v[0], v[0], v[0], v[0]};
   BOOST_REQUIRE_EQUAL(seq.size(), 1);
-  BOOST_REQUIRE(equal(seq[0], vita::cvect{v[0], v[0], v[0], v[0]}));
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[0].begin(), seq[0].end(),
+                                  r.begin(), r.end());
 
   v = {1, 2};
   seq = vita::detail::seq_with_rep(v, 1);
@@ -52,10 +54,11 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   v = {1, 2};
   seq = vita::detail::seq_with_rep(v, 2);
   BOOST_REQUIRE_EQUAL(seq.size(), 4);
-  BOOST_REQUIRE(equal(seq[0], vita::cvect{v[0], v[0]}));
-  BOOST_REQUIRE(equal(seq[1], vita::cvect{v[0], v[1]}));
-  BOOST_REQUIRE(equal(seq[2], vita::cvect{v[1], v[0]}));
-  BOOST_REQUIRE(equal(seq[3], vita::cvect{v[1], v[1]}));
+  std::vector<vita::cvect> rv{ {v[0], v[0]}, {v[0], v[1]}, {v[1], v[0]}, {v[1], v[1]} };
+
+  for (unsigned i(0); i < seq.size(); ++i)
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[i].begin(), seq[i].end(),
+                                    rv[i].begin(), rv[i].end());
 
   v = {1, 2, 3};
   seq = vita::detail::seq_with_rep(v, 3);
@@ -63,8 +66,13 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   for (unsigned i(0); i < 3; ++i)
     for (unsigned j(0); j < 3; ++j)
       for (unsigned k(0); k < 3; ++k)
-        BOOST_REQUIRE(equal(seq[9*k + 3*j + i],
-                            vita::cvect{v[k], v[j], v[i]}));
+      {
+        const auto index(9*k + 3*j + i);
+        r = {v[k], v[j], v[i]};
+
+        BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[index].begin(), seq[index].end(),
+                                        r.begin(), r.end());
+      }
 
   v = {1, 2, 3, 4};
   seq = vita::detail::seq_with_rep(v, 8);
