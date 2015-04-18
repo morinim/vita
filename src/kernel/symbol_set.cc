@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -91,7 +91,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(), by_()
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = make_unique<argument>(i);
 
-  assert(debug());
+  assert(debug(true));
 }
 
 ///
@@ -340,18 +340,26 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::debug() const
+bool symbol_set::debug(bool verbose) const
 {
-  if (!all_.debug())
+  if (!all_.debug(verbose))
     return false;
 
   for (const collection &c : by_.category)
-    if (!c.debug())
+    if (!c.debug(verbose))
       return false;
 
-  return enough_terminals();
+  if (!enough_terminals())
+  {
+    if (verbose)
+      std::cerr << k_s_debug << " Symbol set doesn't contain enough symbols\n";
+    return false;
+  }
+
+  return true;
 }
 
 ///
@@ -363,50 +371,94 @@ symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::collection::debug() const
+bool symbol_set::collection::debug(bool verbose) const
 {
   decltype(sum) check_sum(0);
 
   for (auto s : symbols)
   {
     if (!s->debug())
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Invalid symbol " << s->display() << "\n";
       return false;
+    }
 
     check_sum += s->weight;
 
     if (s->weight == 0)
+    {
+      if (verbose)
+        std::cerr << k_s_debug << " Null weight for symbol " << s->display()
+                  << "\n";
       return false;
+    }
 
     if (s->terminal())
     {
       // Terminals must be in the terminals' vector.
       if (std::find(terminals.begin(), terminals.end(), s) ==
           terminals.end())
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Terminal " << s->display()
+                    << " not correctly stored in the symbol set\n";
         return false;
+      }
 
       if (s->auto_defined() &&
           std::find(adt.begin(), adt.end(), s) == adt.end())
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Automatic defined terminal "
+                    << s->display()
+                    << " not correctly stored in the symbol set\n";
         return false;
+      }
     }
     else  // Function
     {
       // Function must not be in the terminals' vector.
       if (std::find(terminals.begin(), terminals.end(), s) != terminals.end())
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Function " << s->display()
+                    << "Not correctly stored in the symbol set\n";
         return false;
+      }
 
       if (s->auto_defined() &&
           std::find(adf.begin(), adf.end(), s) == adf.end())
+      {
+        if (verbose)
+          std::cerr << k_s_debug << " Automatic defined function "
+                    << s->display()
+                    << " not correctly stored in the symbol set\n";
         return false;
+      }
     }
   }
 
   if (check_sum != sum)
+  {
+    if (verbose)
+      std::cerr << k_s_debug
+                << " Incorrect cached sum of weights in the symbol set\n";
     return false;
+  }
 
   // There should be one terminal at least.
-  return symbols.size() == 0 || terminals.size() > 0;
+  if (symbols.size() && !terminals.size())
+  {
+    if (verbose)
+      std::cerr << k_s_debug << " No terminal in the symbol set\n";
+    return false;
+  }
+
+  return true;
 }
 
 ///
@@ -444,25 +496,41 @@ symbol_set::by_category::by_category(const collection &c) : category()
               [](const symbol *s1, const symbol *s2)
               { return s1->weight > s2->weight; });
 
-  assert(debug());
+  assert(debug(true));
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::by_category::debug() const
+bool symbol_set::by_category::debug(bool verbose) const
 {
   for (const collection &coll : category)
   {
     const std::size_t s(coll.symbols.size());
     if (s < coll.terminals.size())
+    {
+      if (verbose)
+        std::cerr << k_s_debug
+                  << " Wrong symbol set size (less than terminal set)\n";
       return false;
+    }
     if (s < coll.adf.size())
+    {
+      if (verbose)
+        std::cerr << k_s_debug
+                  << " Wrong symbol set size (less than ADF set)\n";
       return false;
+    }
     if (s < coll.adt.size())
+    {
+      if (verbose)
+        std::cerr << k_s_debug
+                  << " Wrong symbol set size (less than ADT set)\n";
       return false;
+    }
 
-    if (!coll.debug())
+    if (!coll.debug(verbose))
       return false;
   }
 

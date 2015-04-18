@@ -29,9 +29,9 @@ public:
                        const std::string & = "");
 
   bool operator!() const;
-  std::pair<std::size_t, unsigned> load(const std::string &,
-                                        const std::string & = "",
-                                        const std::string & = "");
+  std::pair<std::size_t, std::size_t> load(const std::string &,
+                                           const std::string & = "",
+                                           const std::string & = "");
   unsigned load_symbols(const std::string &);
   std::size_t load_test_set(const std::string &);
   void setup_default_symbols();

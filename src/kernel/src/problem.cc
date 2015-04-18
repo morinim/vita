@@ -63,14 +63,15 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 ///
 /// \brief New empty instance of src_problem
 ///
-/// \note
 /// Usually the environment isn't initialized so that the search class would
 /// choose the best values for the specific problem before starting the
 /// run (this is how the constructor works).
+///
 /// Anyway, for debug purpose, we can set up a default environment in a
-/// second step:
-///    src_problem p;
-///    p.env = environment(true);
+/// two steps:
+///
+///     src_problem p;
+///     p.env = environment(true);
 ///
 src_problem::src_problem() : problem()
 {
@@ -123,7 +124,7 @@ void src_problem::clear(bool initialize)
 ///
 /// Loads `data` into the active dataset.
 ///
-std::pair<std::size_t, unsigned> src_problem::load(
+std::pair<std::size_t, std::size_t> src_problem::load(
   const std::string &ds, const std::string &ts, const std::string &symbols)
 {
   if (ds.empty())
@@ -137,8 +138,11 @@ std::pair<std::size_t, unsigned> src_problem::load(
   if (!ts.empty())
     load_test_set(ts);
 
-  const unsigned n_symbols(symbols.empty() ? setup_default_symbols(), 0
-                                           : load_symbols(symbols));
+  std::size_t n_symbols(0);
+  if (symbols.empty())
+    setup_default_symbols();
+  else
+    n_symbols = load_symbols(symbols);
 
   return {n_examples, n_symbols};
 }
@@ -198,8 +202,7 @@ void src_problem::setup_default_symbols()
 
   symbol_factory &factory(symbol_factory::instance());
 
-  const auto sup(dat_.categories().size());
-  for (category_t tag(0); tag < sup; ++tag)
+  for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
     {
       sset.insert(factory.make("1.0", {tag}));
@@ -233,8 +236,8 @@ void src_problem::setup_default_symbols()
 /// \return number of parsed symbols.
 ///
 /// \note
-/// Data should be loaded before symbols: if we haven't data we don't know,
-/// among other things, what features the dataset has.
+/// Data should be loaded before symbols: without data we don't know, among
+/// other things, the features the dataset has.
 ///
 unsigned src_problem::load_symbols(const std::string &s_file)
 {
@@ -242,7 +245,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 
   unsigned parsed(0);
 
-  const auto c_size(dat_.categories().size());
+  const auto c_size(categories());
 
   cvect used_categories(c_size);
   std::iota(used_categories.begin(), used_categories.end(), 0);

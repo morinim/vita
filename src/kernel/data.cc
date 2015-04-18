@@ -314,8 +314,9 @@ void data::partition(unsigned percentage)
 ///
 /// \return number of columns of the dataset.
 ///
-/// \note data class supports just one output for every instance, so, if
-/// the dataset is not empty: \code variables() + 1 == columns() \endcode.
+/// \note
+/// data class supports just one output for every instance, so, if
+/// the dataset is not empty: `variables() + 1 == columns()`.
 ///
 unsigned data::columns() const
 {

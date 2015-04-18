@@ -44,15 +44,15 @@ vita::data *problem::data()
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool problem::debug(bool verbose) const
 {
   if (!env.debug(verbose, false))
     return false;
 
-  return sset.debug();
+  return sset.debug(verbose);
 }
 
 }  // namespace vita

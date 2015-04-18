@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,7 +53,7 @@ namespace vita
     unsigned terminals(category_t) const;
 
     bool enough_terminals() const;
-    bool debug() const;
+    bool debug(bool) const;
 
     friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
@@ -84,7 +84,7 @@ namespace vita
       // The sum of the weights of all the symbols in the collection.
       unsigned sum;
 
-      bool debug() const;
+      bool debug(bool) const;
     } all_;
 
     // This struct contains all the symbols (\a all_) divided by category.
@@ -92,7 +92,7 @@ namespace vita
     {
       explicit by_category(const collection & = collection());
 
-      bool debug() const;
+      bool debug(bool) const;
 
       std::vector<collection> category;
     } by_;
