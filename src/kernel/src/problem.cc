@@ -38,22 +38,24 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 
   std::vector<C> ret;
 
-  std::function<void (unsigned, const C &)> swr(
-    [&](unsigned length, const C &base)
+  std::function<void (std::size_t, C)> swr(
+    [&](std::size_t left, C current)
     {
+      if (!left)  // we have a sequence of the correct length
+      {
+        ret.push_back(current);
+        return;
+      }
+
       for (auto elem : availables)
       {
-        C current(base);
         current.push_back(elem);
-
-        if (length + 1 < size)
-          swr(length + 1, current);
-        else
-          ret.push_back(current);
+        swr(left - 1, current);
+        current.pop_back();
       }
     });
 
-  swr(0, {});
+  swr(size, {});
   return ret;
 }
 }  // namespace detail
