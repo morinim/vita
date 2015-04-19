@@ -52,7 +52,7 @@ void family_competition<T>::run(const std::vector<coord> &parent,
   };
   const bool id_worst(f_parent[0] < f_parent[1] ? 0 : 1);
 
-  if (pop.env().elitism)
+  if (pop.env().elitism == trilean::yes)
   {
     if (fit_off > f_parent[id_worst])
       pop[parent[id_worst]] = offspring[0];
@@ -122,7 +122,7 @@ void tournament<T>::run(const std::vector<coord> &parent,
   const bool replace(f_rep_idx < fit_off);
 
   assert(pop.env().elitism != trilean::unknown);
-  if (!pop.env().elitism || replace)
+  if (pop.env().elitism == trilean::no || replace)
     pop[rep_idx] = offspring[0];
 
   if (fit_off > s->best.fitness)
