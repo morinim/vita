@@ -166,7 +166,9 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 ///
 /// param[in] skip features in this set will be ignored.
 ///
-/// Inserts into the symbol_set variables and labels for nominal attributes.
+/// Inserts variables and labels for nominal attributes into the symbol_set.
+/// The name used for variables, if not specified in the dataset, are in the
+/// form `X1`, ... `Xn`.
 ///
 void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 {
@@ -244,9 +246,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 
   unsigned parsed(0);
 
-  const auto c_size(categories());
-
-  cvect used_categories(c_size);
+  cvect used_categories(categories());
   std::iota(used_categories.begin(), used_categories.end(), 0);
 
   boost::property_tree::ptree pt;
@@ -266,62 +266,64 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   // When I wrote this, only God and I understood what I was doing.
   // Now, God only knows.
   for (const auto &s : pt.get_child("symbolset"))
-    if (s.first == "symbol")
+  {
+    if (s.first != "symbol")
+      continue;
+
+    const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
+    const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature", ""));
+
+    if (sym_sig.empty())
     {
-      const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
-      const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature", ""));
+      for (const auto &sig : s.second)
+        if (sig.first == "signature")
+        {
+          std::vector<std::string> args;
+          for (const auto &arg : sig.second)
+            if (arg.first == "arg")
+              args.push_back(arg.second.data());
 
-      if (sym_sig.empty())
-      {
-        for (const auto &sig : s.second)
-          if (sig.first == "signature")
-          {
-            std::vector<std::string> args;
-            for (const auto &arg : sig.second)
-              if (arg.first == "arg")
-                args.push_back(arg.second.data());
+          // From the list of all the sequences with repetition of
+          // args.size() elements (categories)...
+          const auto sequences(detail::seq_with_rep(used_categories,
+                                                    args.size()));
 
-            // From the list of all the sequences with repetition of
-            // args.size() elements (categories)...
-            const auto sequences(detail::seq_with_rep(used_categories,
-                                                      args.size()));
-
-            // ...we choose those compatible with the xml signature of the
-            // current symbol.
-            for (const auto &seq : sequences)
-              if (compatible(seq, args))
-              {
+          // ...we choose those compatible with the xml signature of the
+          // current symbol.
+          for (const auto &seq : sequences)
+            if (compatible(seq, args))
+            {
 #if !defined(NDEBUG)
-                std::cout << k_s_debug << ' ' << sym_name << '(';
-                for (const auto &j : seq)
-                  std::cout << dat_.categories().find(j).name
-                            << (&j == &seq.back() ? ")" : ", ");
-                std::cout << '\n';
+              std::cout << k_s_debug << ' ' << sym_name << '(';
+              for (const auto &j : seq)
+                std::cout << dat_.categories().find(j).name
+                          << (&j == &seq.back() ? ")" : ", ");
+              std::cout << '\n';
 #endif
-                sset.insert(factory.make(sym_name, seq));
-              }
-          }
-      }
-      else  // !sym_sig.empty() => single category, uniform initialization
-      {
-        for (category_t tag(0); tag < c_size; ++tag)
-          if (compatible({tag}, {sym_sig}))
-          {
-            const auto n_args(factory.args(sym_name));
-
-#if !defined(NDEBUG)
-            std::cout << k_s_debug << ' ' << sym_name << '(';
-            for (auto j(decltype(n_args){0}); j < n_args; ++j)
-              std::cout << dat_.categories().find(tag).name
-                        << (j + 1 == n_args ? ")" : ", ");
-            std::cout << '\n';
-#endif
-            sset.insert(factory.make(sym_name, cvect(n_args, tag)));
-          }
-      }
-
-      ++parsed;
+              sset.insert(factory.make(sym_name, seq));
+            }
+        }
     }
+    else  // !sym_sig.empty() => single category, uniform initialization
+    {
+      for (category_t tag(0), sup(categories()); tag < sup; ++tag)
+        if (compatible({tag}, {sym_sig}))
+        {
+          const auto n_args(factory.args(sym_name));
+
+#if !defined(NDEBUG)
+          std::cout << k_s_debug << ' ' << sym_name << '(';
+          for (auto j(decltype(n_args){0}); j < n_args; ++j)
+            std::cout << dat_.categories().find(tag).name
+                      << (j + 1 == n_args ? ")" : ", ");
+          std::cout << '\n';
+#endif
+          sset.insert(factory.make(sym_name, cvect(n_args, tag)));
+        }
+    }
+
+    ++parsed;
+  }
 
   return parsed;
 }
