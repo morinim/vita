@@ -166,8 +166,7 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 ///
 /// param[in] skip features in this set will be ignored.
 ///
-/// Inserts into the symbol_set variables and labels for nominal
-/// attributes.
+/// Inserts into the symbol_set variables and labels for nominal attributes.
 ///
 void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 {
@@ -250,11 +249,11 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   cvect used_categories(c_size);
   std::iota(used_categories.begin(), used_categories.end(), 0);
 
-  // Load the XML file (sf) into the property tree (pt).
   boost::property_tree::ptree pt;
   read_xml(s_file, pt);
 
 #if !defined(NDEBUG)
+  // Prints the list of categories as inferred from the dataset.
   std::cout << "\n\n";
 
   for (const category &c : dat_.categories())
@@ -270,8 +269,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
     if (s.first == "symbol")
     {
       const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
-      const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature",
-                                                   ""));
+      const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature", ""));
 
       if (sym_sig.empty())
       {
@@ -312,7 +310,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
             const auto n_args(factory.args(sym_name));
 
 #if !defined(NDEBUG)
-            std::cout << sym_name << '(';
+            std::cout << k_s_debug << ' ' << sym_name << '(';
             for (auto j(decltype(n_args){0}); j < n_args; ++j)
               std::cout << dat_.categories().find(tag).name
                         << (j + 1 == n_args ? ")" : ", ");
