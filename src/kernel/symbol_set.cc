@@ -21,13 +21,12 @@ namespace
 {
 ///
 /// \param[in] symbols set of symbols.
-/// \param[in] sum sum of the weights of the elements contained in
-///                \a symbols.
-/// \return a random symbol from \a symbols.
+/// \param[in] sum sum of the weights of the elements contained in `symbols`.
+/// \return a random symbol from `symbols`.
 ///
 /// Probably the fastest way to produce a realization of a random variable
-/// X in a computer is to create a big table where each outcome \a i is
-/// inserted a number of times proportional to P(X=i).
+/// X in a computer is to create a big table where each outcome _i_ is
+/// inserted a number of times proportional to _P(X=i)_.
 ///
 /// Two fast methods are described in "Fast Generation of Discrete Random
 /// Variables" (Marsaglia, Tsang, Wang).
@@ -84,7 +83,7 @@ symbol *roulette_(const std::vector<symbol *> &symbols, unsigned sum)
 
 ///
 /// Sets up the object.
-/// The constructor allocates memory for up to \a k_args argument.
+/// The constructor allocates memory for up to `k_args` argument.
 ///
 symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(), by_()
 {
@@ -124,7 +123,7 @@ unsigned symbol_set::adts() const
 
 ///
 /// \param[in] i symbol to be added.
-/// \return a raw pointer to the symbol just added (or \c nullptr in case of
+/// \return a raw pointer to the symbol just added (or `nullptr` in case of
 ///         error).
 ///
 /// Adds a new symbol to the set. We manage to sort the symbols in
@@ -202,7 +201,7 @@ void symbol_set::reset_adf_weights()
 
 ///
 /// \param[in] c a category.
-/// \return a random terminal of category \a c.
+/// \return a random terminal of category `c`.
 ///
 symbol *symbol_set::roulette_terminal(category_t c) const
 {
@@ -213,7 +212,7 @@ symbol *symbol_set::roulette_terminal(category_t c) const
 
 ///
 /// \param[in] c a category.
-/// \return a random symbol of category \a c.
+/// \return a random symbol of category `c`.
 ///
 symbol *symbol_set::roulette(category_t c) const
 {
@@ -230,8 +229,8 @@ symbol *symbol_set::roulette() const
 
 ///
 /// \param[in] opcode numerical code used as primary key for a symbol.
-/// \return a pointer to the \c vita::symbol identified by 'opcode'
-///         (\c nullptr if not found).
+/// \return a pointer to the vita::symbol identified by `opcode`
+///         (`nullptr` if not found).
 ///
 symbol *symbol_set::decode(opcode_t opcode) const
 {
@@ -244,7 +243,7 @@ symbol *symbol_set::decode(opcode_t opcode) const
 
 ///
 /// \param[in] dex the name of a symbol.
-/// \return a pointer to the \c symbol identified by 'dex' (0 if not found).
+/// \return a pointer to the symbol identified by `dex` (0 if not found).
 ///
 /// \attention Please note that opcodes (automatically assigned) are primary
 /// keys for symbols. Conversely the name of a symbol is chosen by the
@@ -265,7 +264,7 @@ symbol *symbol_set::decode(const std::string &dex) const
 ///
 /// \return number of categories in the symbol set (>= 1).
 ///
-/// See also \c data::categories().
+/// See also data::categories().
 ///
 unsigned symbol_set::categories() const
 {
@@ -274,7 +273,7 @@ unsigned symbol_set::categories() const
 
 ///
 /// \param[in] c a category.
-/// \return number of terminals in category \a c.
+/// \return number of terminals in category `c`.
 ///
 unsigned symbol_set::terminals(category_t c) const
 {
@@ -283,7 +282,7 @@ unsigned symbol_set::terminals(category_t c) const
 }
 
 ///
-/// \return \c true if there are enough terminals for secure individual
+/// \return `true` if there are enough terminals for secure individual
 ///         generation.
 ///
 /// We want at least one terminal for every category.
@@ -312,7 +311,7 @@ bool symbol_set::enough_terminals() const
 ///
 /// \param[out] o output stream.
 /// \param[in] ss symbol set to be printed.
-/// \return output stream including \a ss.
+/// \return output stream including `ss`.
 ///
 /// Useful for debugging purpose.
 ///
@@ -505,8 +504,8 @@ bool symbol_set::collection::debug(bool verbose) const
 ///
 /// \param[in] c a collection containing many categories of symbol.
 ///
-/// Initialize the struct using collection \a c as input parameter (\a c
-/// should be a collection containing more than one category).
+/// Initialize the struct using collection `c` as input parameter (`c` should
+/// be a collection containing more than one category).
 ///
 symbol_set::by_category::by_category(const collection &c) : category()
 {
