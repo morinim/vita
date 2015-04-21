@@ -23,13 +23,6 @@ namespace vita { namespace detail {
 template<class C> std::vector<C> seq_with_rep(const C &, std::size_t);
 }}
 
-template<class T, class U>
-bool is_equal(const T &c1, const U &c2)
-{
-  assert(c1.size() == c2.size());
-  return std::equal(c1.begin(), c1.end(), c2.begin());
-}
-
 BOOST_AUTO_TEST_SUITE(test_src_problem)
 
 BOOST_AUTO_TEST_CASE(t_seq_with_rep)
@@ -79,6 +72,13 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   BOOST_REQUIRE_EQUAL(
     seq.size(),
     v.size()*v.size()*v.size()*v.size()*v.size()*v.size()*v.size()*v.size());
+}
+
+BOOST_AUTO_TEST_CASE(t_compatible)
+{
+  vita::src_problem p("src_problem.xrff", "", "src_problem.xml");
+
+  BOOST_REQUIRE_EQUAL(!p, false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

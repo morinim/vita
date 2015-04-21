@@ -1,0 +1,38 @@
+<dataset name="src_problem test dataset">
+  <header>
+    <attributes>
+      <attribute class="yes" name="output" type="nominal">
+        <labels>
+          <label>A</label>
+          <label>B</label>
+          <label>C</label>
+        </labels>
+      </attribute>
+      <attribute name="input1" category="km/h" type="numeric" />
+      <attribute name="input2" category="kg" type="numeric" />
+      <attribute name="input3" category="euro" type="integer" />
+    </attributes>
+  </header>
+  <body>
+    <instances>
+      <instance>
+        <value>A</value>
+        <value>50</value>
+        <value>10</value>
+        <value>500</value>
+      </instance>
+      <instance>
+        <value>B</value>
+        <value>120</value>
+        <value>100</value>
+        <value>1500</value>
+      </instance>
+      <instance>
+        <value>C</value>
+        <value>800</value>
+        <value>10000</value>
+        <value>450000</value>
+      </instance>
+    </instances>
+  </body>
+</dataset>

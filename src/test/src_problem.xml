@@ -1,0 +1,12 @@
+<symbolset name="src_problem test symbol set">
+  <symbol name="FADD" signature="numeric" />
+  <symbol name="FIFE">
+    <signature>
+      <arg>numeric</arg>
+      <arg>euro</arg>
+    </signature>
+  </symbol>
+  <symbol name="DIV" signature="integer" />
+  <symbol name="FSUB" signature="numeric" />
+  <symbol name="REAL" signature="numeric" />
+</symbolset>
