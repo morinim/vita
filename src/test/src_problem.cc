@@ -71,14 +71,21 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   seq = vita::detail::seq_with_rep(v, 8);
   BOOST_REQUIRE_EQUAL(
     seq.size(),
-    v.size()*v.size()*v.size()*v.size()*v.size()*v.size()*v.size()*v.size());
+    v.size() * v.size() * v.size() * v.size() *
+    v.size() * v.size() * v.size() * v.size());
 }
 
-BOOST_AUTO_TEST_CASE(t_compatible)
+BOOST_AUTO_TEST_CASE(t_loading)
 {
   vita::src_problem p("src_problem.xrff", "", "src_problem.xml");
 
   BOOST_REQUIRE_EQUAL(!p, false);
+
+  BOOST_REQUIRE_EQUAL(p.data()->size(), 3);
+  BOOST_REQUIRE(p.classification());
+  BOOST_REQUIRE_EQUAL(p.classes(), 3);
+  BOOST_REQUIRE_EQUAL(p.categories(), 4);
+  BOOST_REQUIRE_EQUAL(p.variables(), 3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
