@@ -107,7 +107,7 @@ inline bool kbhit()
   // check + 1.
   if (select(STDIN_FILENO + 1, &readfd, nullptr, nullptr, &tv) == -1)
     return false;  // an error occured
-   // read_fd now holds a bit map of files that are readable. We test the
+  // read_fd now holds a bit map of files that are readable. We test the
   // entry for the standard input (file 0).
   return FD_ISSET(STDIN_FILENO, &readfd);
 }

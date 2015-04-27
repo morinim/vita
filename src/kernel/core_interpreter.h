@@ -17,26 +17,28 @@
 
 namespace vita
 {
-  ///
-  /// \brief Minimum interface of an interpreter
-  ///
-  /// The class "executes" an individual (a program) in its environment. The
-  /// program can produce an output or perform some action.
-  ///
-  /// The class can also check if an individual breaks some constraints
-  /// assigning a penalty to unfeasible individuals.
-  ///
-  class core_interpreter
-  {
-  public:
-    any run() { return run_nvi(); }
-    double penalty() { return penalty_nvi(); }
-    bool debug() const { return debug_nvi(); }
+///
+/// \brief Minimum interface of an interpreter
+///
+/// The class "executes" an individual (a program) in its environment. The
+/// program can produce an output or perform some action.
+///
+/// The class can also check if an individual breaks some constraints
+/// assigning a penalty to infeasible individuals.
+///
+class core_interpreter
+{
+public:
+  any run() { return run_nvi(); }
+  double penalty() { return penalty_nvi(); }
+  bool debug() const { return debug_nvi(); }
 
-  private:
-    virtual any run_nvi() = 0;
-    virtual double penalty_nvi() = 0;
-    virtual bool debug_nvi() const = 0;
-  };
+private:
+  virtual any run_nvi() = 0;
+  virtual double penalty_nvi() = 0;
+  virtual bool debug_nvi() const = 0;
+};
+
 }  // namespace vita
+
 #endif  // Include guard
