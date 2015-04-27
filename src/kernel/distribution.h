@@ -21,48 +21,48 @@
 
 namespace vita
 {
-  ///
-  /// \brief Simplifies the calculation of statistics regarding a sequence
-  ///        (mean, variance, standard deviation, entropy, min and max)
-  ///
-  template<class T>
-  class distribution
-  {
-  public:
-    distribution();
+///
+/// \brief Simplifies the calculation of statistics regarding a sequence
+///        (mean, variance, standard deviation, entropy, min and max)
+///
+template<class T>
+class distribution
+{
+public:
+  distribution();
 
-    void clear();
+  void clear();
 
-    void add(T);
+  void add(T);
 
-    std::uintmax_t count() const;
-    double entropy() const;
-    T max() const;
-    T mean() const;
-    T min() const;
-    const std::map<T, std::uintmax_t> &seen() const;
-    T standard_deviation() const;
-    T variance() const;
+  std::uintmax_t count() const;
+  double entropy() const;
+  T max() const;
+  T mean() const;
+  T min() const;
+  const std::map<T, std::uintmax_t> &seen() const;
+  T standard_deviation() const;
+  T variance() const;
 
-    bool debug(bool) const;
+  bool debug(bool) const;
 
-  public:   // Serialization
-    bool load(std::istream &);
-    bool save(std::ostream &) const;
+public:   // Serialization
+  bool load(std::istream &);
+  bool save(std::ostream &) const;
 
-  private:  // Private methods
-    void update_variance(T);
+private:  // Private methods
+  void update_variance(T);
 
-  private:  // Private data members
-    std::map<T, std::uintmax_t> seen_;
+private:  // Private data members
+  std::map<T, std::uintmax_t> seen_;
 
-    T m2_;
-    T max_;
-    T mean_;
-    T min_;
+  T m2_;
+  T max_;
+  T mean_;
+  T min_;
 
-    std::uintmax_t count_;
-  };
+  std::uintmax_t count_;
+};
 
 #include "kernel/distribution.tcc"
 }  // namespace vita
