@@ -705,7 +705,7 @@ std::size_t data::load_xrff(const std::string &filename)
 ///
 std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 {
-  std::ifstream from(filename.c_str());
+  std::ifstream from(filename);
   if (!from)
     return 0;
 
