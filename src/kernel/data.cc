@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
@@ -832,8 +831,14 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 ///
 std::size_t data::open(const std::string &f, unsigned verbosity)
 {
-  const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
-                  boost::algorithm::iends_with(f, ".xml"));
+  auto ends_with =
+    [](const std::string &name, const std::string &ext)
+    {
+      return ext.length() <= name.length() &&
+             std::equal(ext.rbegin(), ext.rend(), name.rbegin());
+    };
+
+  const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
   return xrff ? load_xrff(f) : load_csv(f, verbosity);
 }
