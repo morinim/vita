@@ -18,12 +18,12 @@
 #define      VITA_INTERPRETER_TCC
 
 ///
-/// \param[in] ind individual whose value we are interested in. The lifetime
-///                of \a ind must extend beyond that of the interpreter.
+/// \param[in] ind individual whose value we are interested in.
 /// \param[in] ctx context in which we calculate the output value (used for
-///                the evaluation of ADF). It can be empty (\c nullptr).
-///                The lifetime of \a ctx must extend beyon that of the
-///                interpreter.
+///                the evaluation of ADF). It can be empty (`nullptr`).
+///
+/// \warning
+/// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
 ///
 template<class T>
 interpreter<T>::interpreter(const T *ind, interpreter<T> *ctx)
@@ -36,7 +36,7 @@ interpreter<T>::interpreter(const T *ind, interpreter<T> *ctx)
 
 ///
 /// \param[in] ip locus of the genome we are starting evaluation from.
-/// \return the output value of \c this \a individual.
+/// \return the output value of `this` individual.
 ///
 template<class T>
 any interpreter<T>::run_locus(const locus &ip)
@@ -49,7 +49,7 @@ any interpreter<T>::run_locus(const locus &ip)
 }
 
 ///
-/// \return the output value of \c this \a individual.
+/// \return the output value of `this` individual.
 ///
 /// Calls run_locus() using the default starting locus.
 ///
@@ -76,7 +76,7 @@ any interpreter<T>::fetch_param()
 /// \return the value of the i-th argument of the current function.
 ///
 /// We use a cache to avoid recalculating the same value during the same
-/// \c interpreter execution.
+/// interpreter execution.
 /// This means that side effects are not evaluated to date: WE ASSUME
 /// REFERENTIAL TRANSPARENCY for all the expressions.
 ///
@@ -158,7 +158,7 @@ index_t interpreter<T>::fetch_index(unsigned i) const
 
 ///
 /// \param[in] ip locus of the genome we are starting evaluation from.
-/// \return the penalty value for \c this \a individual.
+/// \return the penalty value for `this` individual.
 ///
 template<class T>
 double interpreter<T>::penalty_locus(const locus &ip)
@@ -168,7 +168,7 @@ double interpreter<T>::penalty_locus(const locus &ip)
 }
 
 ///
-/// \return the penalty for \c this \a individual.
+/// \return the penalty for `this` individual.
 ///
 /// Calls penalty_locus() using the default starting locus.
 //
@@ -179,7 +179,7 @@ double interpreter<T>::penalty_nvi()
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
 bool interpreter<T>::debug_nvi() const

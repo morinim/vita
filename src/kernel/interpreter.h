@@ -59,14 +59,14 @@ public:
   any fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
-private:  // Methods of the non-virtual interface
-  virtual any run_nvi() override;
-  virtual double penalty_nvi() override;
-  virtual bool debug_nvi() const override;
-
 private:  // Private support methods
   any run_locus(const locus &);
   double penalty_locus(const locus &);
+
+  // Non-virtual interface
+  virtual any run_nvi() override;
+  virtual double penalty_nvi() override;
+  virtual bool debug_nvi() const override;
 
 private:  // Private data members
   // There are different opinions about the use of references as data member:
