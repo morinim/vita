@@ -266,6 +266,20 @@ bool load_float_from_stream(std::istream &in, T *i)
             >> *i;
 }
 
+///
+/// \param[in] s the input string.
+/// \return a copy of `s` with spaces removed on both sides of the string.
+///
+inline std::string trim(const std::string &s)
+{
+  auto ws_front = std::find_if_not(s.begin(), s.end(),
+                                   [](int c) {return std::isspace(c); });
+  auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
+                                  [](int c){return std::isspace(c); }).base();
+
+  return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
+}
+
 }  // namespace vita
 
 #endif  // Include guard

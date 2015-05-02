@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/data.h"
@@ -385,11 +384,11 @@ std::string data::class_name(class_t i) const
 ///
 /// \param[in] line line to be parsed.
 /// \param[in] delimiter separator character for fields.
-/// \param[in] trim if `true` trims leading and trailing spaces adjacent to
-///                 commas (this practice is contentious and in fact is
-///                 specifically prohibited by RFC 4180, which states,
-///                 "Spaces are considered part of a field and should not be
-///                 ignored."
+/// \param[in] trimws if `true` trims leading and trailing spaces adjacent to
+///                   commas (this practice is contentious and in fact is
+///                   specifically prohibited by RFC 4180, which states,
+///                   "Spaces are considered part of a field and should not be
+///                   ignored."
 /// \return a vector where each element is a field of the CSV line.
 ///
 /// This function parses a line of data by a delimiter. If you pass in a
@@ -411,7 +410,7 @@ std::string data::class_name(class_t i) const
 /// and efficient for parsing, but it is not as easily applied.
 ///
 std::vector<std::string> data::csvline(const std::string &line, char delimiter,
-                                       bool trim)
+                                       bool trimws)
 {
   std::vector<std::string> record;  // the return value
 
@@ -455,9 +454,9 @@ std::vector<std::string> data::csvline(const std::string &line, char delimiter,
 
   record.push_back(curstring);
 
-  if (trim)
+  if (trimws)
     for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
-      boost::trim(record[i]);
+      trim(record[i]);
 
   return record;
 }
