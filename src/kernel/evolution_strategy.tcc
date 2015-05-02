@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -70,7 +70,7 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
 
   if (env.stat_layers)
   {
-    const std::string n_lys(env.stat_dir + "/" + environment::lys_filename);
+    const std::string n_lys(env.stat_dir + "/" + env.lys_filename);
     std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
     if (f_lys.good())
     {

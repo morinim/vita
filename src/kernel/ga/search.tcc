@@ -186,7 +186,7 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
     const std::string f_sum(this->env_.stat_dir + "/" +
-                            environment::sum_filename);
+                            this->env_.sum_filename);
 
     this->env_.log(&pt, path);
 

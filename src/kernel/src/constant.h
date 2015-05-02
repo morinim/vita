@@ -31,10 +31,10 @@ public:
     : constant(std::to_string(c), t) {}
 
   ///
-  /// \return the value of the constant (as a \c any).
+  /// \return the value of the constant (as a `any`).
   ///
   /// The argument is not used: the value of a constant is stored within the
-  /// object and we don't need an \c interpreter to discover it.
+  /// object and we don't need an interpreter to discover it.
   ///
   virtual any eval(core_interpreter *) const override { return any(val_); }
 
@@ -52,10 +52,10 @@ public:
     : constant(std::string(c), t) {}
 
   ///
-  /// \return the value of the constant (as a \c any).
+  /// \return the value of the constant (as a `any`).
   ///
   /// The argument is not used: the value of a constant is stored within the
-  /// object and we don't need an \c interpreter to discover it.
+  /// object and we don't need an interpreter to discover it.
   ///
   virtual any eval(core_interpreter *) const override { return any(val_); }
 

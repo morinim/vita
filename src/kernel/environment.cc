@@ -17,13 +17,6 @@
 
 namespace vita
 {
-const char environment::arl_filename[] =        "arl";
-const char environment::dyn_filename[] =    "dynamic";
-const char environment::lys_filename[] =     "layers";
-const char environment::pop_filename[] = "population";
-const char environment::sum_filename[] =    "summary";
-const char environment::tst_filename[] =       "test";
-
 ///
 /// \param[in] initialize if `true` initializes every parameter in such a
 ///                       way as to allow the object to pass

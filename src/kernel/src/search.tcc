@@ -88,7 +88,7 @@ void src_search<T, ES>::arl(const U &base)
     return;  // We need a finite fitness to search for an improvement
 
   // Logs ADFs
-  const auto filename(this->env_.stat_dir + "/" + environment::arl_filename);
+  const auto filename(this->env_.stat_dir + "/" + this->env_.arl_filename);
   std::ofstream adf_log(filename.c_str(), std::ios_base::app);
   if (this->env_.stat_arl && adf_log.good())
   {
@@ -586,7 +586,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
     const std::string f_sum(this->env_.stat_dir + "/" +
-                            environment::sum_filename);
+                            this->env_.sum_filename);
 
     this->env_.log(&pt, path);
 
@@ -609,7 +609,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(this->env_.stat_dir + "/" + environment::tst_filename);
+    std::ofstream tf(this->env_.stat_dir + "/" + this->env_.tst_filename);
     for (const auto &example : data)
       tf << lambda->name((*lambda)(example)) << '\n';
 

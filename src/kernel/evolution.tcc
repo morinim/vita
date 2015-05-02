@@ -156,7 +156,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
   if (env().stat_dynamic)
   {
-    const std::string n_dyn(env().stat_dir + "/" + environment::dyn_filename);
+    const std::string n_dyn(env().stat_dir + "/" + env().dyn_filename);
     std::ofstream f_dyn(n_dyn.c_str(), std::ios_base::app);
     if (f_dyn.good())
     {
@@ -198,7 +198,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
   if (env().stat_population)
   {
-    const std::string n_pop(env().stat_dir + "/" + environment::pop_filename);
+    const std::string n_pop(env().stat_dir + "/" + env().pop_filename);
     std::ofstream f_pop(n_pop.c_str(), std::ios_base::app);
     if (f_pop.good())
     {

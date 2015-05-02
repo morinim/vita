@@ -259,14 +259,14 @@ public:  // Data members
     unsigned individuals = 3;
   } team;
 
-  static const char arl_filename[];
-  static const char dyn_filename[];
-  static const char lys_filename[];
-  static const char pop_filename[];
-  static const char sum_filename[];
-  static const char tst_filename[];
+  std::string arl_filename =        "arl";
+  std::string dyn_filename =    "dynamic";
+  std::string lys_filename =     "layers";
+  std::string pop_filename = "population";
+  std::string sum_filename =    "summary";
+  std::string tst_filename =       "test";
 };  // class environment
 
 }  // namespace vita
 
-#endif  // Include guard.
+#endif  // Include guard
