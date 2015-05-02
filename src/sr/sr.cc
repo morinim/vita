@@ -558,7 +558,7 @@ void set_runs(unsigned r)
 ///
 void stat_arl(const std::string &v)
 {
-  problem->env.stat_arl = is_true(v);
+  problem->env.stat.arl = is_true(v);
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " ARL is " << v << '\n';
@@ -567,11 +567,11 @@ void stat_arl(const std::string &v)
 ///
 /// \param[in] dir a directory.
 ///
-/// Logs statistics in the `stat_dir` directory.
+/// Logs statistics in the `stat.dir` directory.
 ///
 void stat_dir(const std::string &dir)
 {
-  problem->env.stat_dir = dir;
+  problem->env.stat.dir = dir;
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Logging folder is " << dir << '\n';
@@ -582,11 +582,11 @@ void stat_dir(const std::string &dir)
 ///
 void stat_dynamic(const std::string &v)
 {
-  problem->env.stat_dynamic = is_true(v);
+  problem->env.stat.dynamic = is_true(v);
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Dynamic evolution logging is "
-              << problem->env.stat_dynamic << '\n';
+              << problem->env.stat.dynamic << '\n';
 }
 
 ///
@@ -594,11 +594,11 @@ void stat_dynamic(const std::string &v)
 ///
 void stat_layers(const std::string &v)
 {
-  problem->env.stat_layers = is_true(v);
+  problem->env.stat.layers = is_true(v);
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Layers logging is "
-              << problem->env.stat_layers << '\n';
+              << problem->env.stat.layers << '\n';
 }
 
 ///
@@ -606,11 +606,11 @@ void stat_layers(const std::string &v)
 ///
 void stat_population(const std::string &v)
 {
-  problem->env.stat_population = is_true(v);
+  problem->env.stat.population = is_true(v);
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Population logging is "
-              << problem->env.stat_population << '\n';
+              << problem->env.stat.population << '\n';
 }
 
 ///
@@ -618,7 +618,7 @@ void stat_population(const std::string &v)
 ///
 void stat_summary(const std::string &v)
 {
-  problem->env.stat_summary = true;
+  problem->env.stat.summary = true;
 
   if (problem->env.verbosity >= 2)
     std::cout << vita::k_s_info << " Summary logging is " << v << '\n';

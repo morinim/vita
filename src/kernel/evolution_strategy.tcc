@@ -60,7 +60,7 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 /// Saves working / statistical informations about layer status.
 ///
 /// Parameters from the environment:
-/// * env.stat_layers if \c false the method will not write any data.
+/// * env.stat.layers if `false` the method will not write any data.
 ///
 template<class T, template<class> class CS>
 void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
@@ -68,10 +68,10 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  if (env.stat_layers)
+  if (env.stat.layers)
   {
-    const std::string n_lys(env.stat_dir + "/" + env.lys_filename);
-    std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
+    const std::string n_lys(env.stat.dir + "/" + env.stat.lys_name);
+    std::ofstream f_lys(n_lys, std::ios_base::app);
     if (f_lys.good())
     {
       if (last_run != current_run)

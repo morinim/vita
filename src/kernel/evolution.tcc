@@ -154,10 +154,14 @@ void evolution<T, ES>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
-  if (env().stat_dynamic)
+  auto fullpath = [this](const std::string &f)
+                  {
+                    return env().stat.dir + "/" + f;
+                  };
+
+  if (env().stat.dynamic)
   {
-    const std::string n_dyn(env().stat_dir + "/" + env().dyn_filename);
-    std::ofstream f_dyn(n_dyn.c_str(), std::ios_base::app);
+    std::ofstream f_dyn(fullpath(env().stat.dyn_name), std::ios_base::app);
     if (f_dyn.good())
     {
       if (last_run != run_count)
@@ -196,10 +200,9 @@ void evolution<T, ES>::log(unsigned run_count) const
     }
   }
 
-  if (env().stat_population)
+  if (env().stat.population)
   {
-    const std::string n_pop(env().stat_dir + "/" + env().pop_filename);
-    std::ofstream f_pop(n_pop.c_str(), std::ios_base::app);
+    std::ofstream f_pop(fullpath(env().stat.pop_name), std::ios_base::app);
     if (f_pop.good())
     {
       if (last_run != run_count)

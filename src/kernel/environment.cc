@@ -63,7 +63,7 @@ environment::environment(bool initialize)
 void environment::log(boost::property_tree::ptree *const pt,
                       const std::string &path) const
 {
-  assert(stat_summary);
+  assert(stat.summary);
 
   const std::string env(path + "environment.");
   pt->put(env + "layers", layers);
@@ -85,12 +85,12 @@ void environment::log(boost::property_tree::ptree *const pt,
   pt->put(env + "team.individuals", team.individuals);
   pt->put(env + "validation_percentage", validation_percentage);
   pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
-  pt->put(env + "statistics.directory", stat_dir);
-  pt->put(env + "statistics.save_arl", stat_arl);
-  pt->put(env + "statistics.save_dynamics", stat_dynamic);
-  pt->put(env + "statistics.save_layers", stat_layers);
-  pt->put(env + "statistics.save_population", stat_population);
-  pt->put(env + "statistics.save_summary", stat_summary);
+  pt->put(env + "statistics.directory", stat.dir);
+  pt->put(env + "statistics.save_arl", stat.arl);
+  pt->put(env + "statistics.save_dynamics", stat.dynamic);
+  pt->put(env + "statistics.save_layers", stat.layers);
+  pt->put(env + "statistics.save_population", stat.population);
+  pt->put(env + "statistics.save_summary", stat.summary);
 }
 
 ///

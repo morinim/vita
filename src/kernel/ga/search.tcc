@@ -156,7 +156,7 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
                               unsigned best_run, unsigned runs)
 {
   // Summary logging.
-  if (this->env_.stat_summary)
+  if (this->env_.stat.summary)
   {
     std::ostringstream best_list;
     run_sum.best.solution.list(best_list);
@@ -185,8 +185,8 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
 
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
-    const std::string f_sum(this->env_.stat_dir + "/" +
-                            this->env_.sum_filename);
+    const std::string f_sum(this->env_.stat.dir + "/" +
+                            this->env_.stat.sum_name);
 
     this->env_.log(&pt, path);
 

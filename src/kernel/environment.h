@@ -174,24 +174,34 @@ public:  // Data members
   /// table.
   unsigned ttable_size = 16;
 
-  /// Where shuld we save statistics / status files?
-  std::string stat_dir = "";
+  struct statistics
+  {
+    /// Where shuld we save statistics / status files?
+    std::string dir = "";
 
-  /// Should we save a list of active ADF?
-  bool stat_arl = false;
+    /// Should we save a list of active ADF?
+    bool arl             = false;
+    std::string arl_name = "arl";
 
-  /// Should we save a dynamic execution status file?
-  bool stat_dynamic = false;
+    /// Should we save a dynamic execution status file?
+    bool dynamic         =     false;
+    std::string dyn_name = "dynamic";
 
-  /// Should we save dynamic statistics about layers status?
-  bool stat_layers = false;
+    /// Should we save dynamic statistics about layers status?
+    bool layers          =    false;
+    std::string lys_name = "layers";
 
-  /// Should we save a dynamic population status file?
-  /// \warning It can be quite slow!
-  bool stat_population = false;
+    /// Should we save a dynamic population status file?
+    /// \warning It can be quite slow!
+    bool population      =        false;
+    std::string pop_name = "population";
 
-  /// Should we save a summary of the run?
-  bool stat_summary = false;
+    /// Should we save a summary of the run?
+    bool summary         =     false;
+    std::string sum_name = "summary";
+
+    std::string tst_name = "test";
+  } stat;
 
   struct
   {
@@ -258,13 +268,6 @@ public:  // Data members
     /// > 1 means team mode.
     unsigned individuals = 3;
   } team;
-
-  std::string arl_filename =        "arl";
-  std::string dyn_filename =    "dynamic";
-  std::string lys_filename =     "layers";
-  std::string pop_filename = "population";
-  std::string sum_filename =    "summary";
-  std::string tst_filename =       "test";
 };  // class environment
 
 }  // namespace vita

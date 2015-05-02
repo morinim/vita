@@ -88,9 +88,9 @@ void src_search<T, ES>::arl(const U &base)
     return;  // We need a finite fitness to search for an improvement
 
   // Logs ADFs
-  const auto filename(this->env_.stat_dir + "/" + this->env_.arl_filename);
-  std::ofstream adf_log(filename.c_str(), std::ios_base::app);
-  if (this->env_.stat_arl && adf_log.good())
+  const auto filename(this->env_.stat.dir + "/" + this->env_.stat.arl_name);
+  std::ofstream adf_log(filename, std::ios_base::app);
+  if (this->env_.stat.arl && adf_log.good())
   {
     const auto adts(this->prob_.sset.adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
@@ -136,7 +136,7 @@ void src_search<T, ES>::arl(const U &base)
         else  // !adf_args
           p = vita::make_unique<adt>(candidate_block, 100u);
 
-        if (this->env_.stat_arl && adf_log.good())
+        if (this->env_.stat.arl && adf_log.good())
         {
           adf_log << p->display() << " (Base: " << base_fit
                   << "  DF: " << delta
@@ -551,7 +551,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
                             unsigned best_run, unsigned runs)
 {
   // Summary logging.
-  if (this->env_.stat_summary)
+  if (this->env_.stat.summary)
   {
     std::ostringstream best_list, best_tree, best_graph;
     run_sum.best.solution.list(best_list);
@@ -585,8 +585,8 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
-    const std::string f_sum(this->env_.stat_dir + "/" +
-                            this->env_.sum_filename);
+    const std::string f_sum(this->env_.stat.dir + "/" +
+                            this->env_.stat.sum_name);
 
     this->env_.log(&pt, path);
 
@@ -609,7 +609,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(this->env_.stat_dir + "/" + this->env_.tst_filename);
+    std::ofstream tf(this->env_.stat.dir + "/" + this->env_.stat.tst_name);
     for (const auto &example : data)
       tf << lambda->name((*lambda)(example)) << '\n';
 
