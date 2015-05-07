@@ -47,7 +47,8 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
   v = {1, 2};
   seq = vita::detail::seq_with_rep(v, 2);
   BOOST_REQUIRE_EQUAL(seq.size(), 4);
-  std::vector<vita::cvect> rv{ {v[0], v[0]}, {v[0], v[1]}, {v[1], v[0]}, {v[1], v[1]} };
+  std::vector<vita::cvect> rv{ {v[0], v[0]}, {v[0], v[1]}, {v[1], v[0]},
+                               {v[1], v[1]} };
 
   for (unsigned i(0); i < seq.size(); ++i)
     BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[i].begin(), seq[i].end(),
