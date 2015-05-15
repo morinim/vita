@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(Creation)
     env.individuals = vita::random::between(30u, 200u);
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
-    vita::population<vita::i_mep> pop(env, sset);
+    vita::population<vita::i_mep> pop(env);
 
     BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals());
 
@@ -50,11 +50,11 @@ BOOST_AUTO_TEST_CASE(Serialization)
     env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
 
     std::stringstream ss;
-    vita::population<vita::i_mep> pop1(env, sset);
+    vita::population<vita::i_mep> pop1(env);
 
     BOOST_REQUIRE(pop1.save(ss));
 
-    vita::population<vita::i_mep> pop2(env, sset);
+    vita::population<vita::i_mep> pop2(env);
     BOOST_REQUIRE(pop2.load(ss));
     BOOST_REQUIRE(pop2.debug(true));
 

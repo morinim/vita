@@ -35,8 +35,8 @@ class i_mep : public individual
 public:
   i_mep() : individual(), genome_(), best_(locus::npos()) {}
 
-  i_mep(const environment &, const symbol_set &);
-  i_mep(const environment &, const symbol_set &, const std::vector<gene> &);
+  explicit i_mep(const environment &);
+  i_mep(const environment &, const std::vector<gene> &);
 
   // Visualization/output methods
   std::ostream &dump(std::ostream &) const;

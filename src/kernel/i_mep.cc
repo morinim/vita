@@ -22,50 +22,51 @@ namespace vita
 {
 ///
 /// \param[in] e base environment.
-/// \param[in] ss a symbol set.
 ///
 /// The process that generates the initial, random expressions has to be
 /// implemented so as to ensure that they do not violate the type system's
 /// constraints.
 ///
-i_mep::i_mep(const environment &e, const symbol_set &ss)
-  : individual(e, ss), genome_(e.code_length, ss.categories()), best_{0, 0}
+i_mep::i_mep(const environment &e)
+  : individual(e), genome_(e.code_length, e.sset->categories()), best_{0, 0}
 {
+  assert(e.sset);
+
   assert(size());
   assert(e.patch_length);
   assert(size() > e.patch_length);
 
   const index_t sup(size()), patch(sup - e.patch_length);
 
-  const auto categories(ss.categories());
+  const auto categories(env().sset->categories());
   assert(categories);
   assert(categories < sup);
 
   // STANDARD SECTION. Filling the genome with random symbols.
   for (index_t i(0); i < patch; ++i)
     for (category_t c(0); c < categories; ++c)
-      genome_(i, c) = gene(ss.roulette(c), i + 1, size());
+      genome_(i, c) = gene(env().sset->roulette(c), i + 1, size());
 
   // PATCH SUBSECTION. Placing terminals for satisfying constraints on
   // types.
   for (index_t i(patch); i < sup; ++i)
     for (category_t c(0); c < categories; ++c)
-      genome_(i, c) = gene(ss.roulette_terminal(c));
+      genome_(i, c) = gene(env().sset->roulette_terminal(c));
 
   assert(debug(true));
 }
 
 ///
 /// \param[in] e base environment.
-/// \param[in] ss a symbol set.
 /// \param[in] gv vector of genes.
 ///
 /// Create a new individual obtained containing the genes of `gv`.
 /// This is useful for debugging purpouse (i.e. setup ad-hoc individuals).
 ///
-i_mep::i_mep(const environment &e, const symbol_set &ss,
-             const std::vector<gene> &gv) : i_mep(e, ss)
+i_mep::i_mep(const environment &e, const std::vector<gene> &gv) : i_mep(e)
 {
+  assert(e.sset);
+
   index_t i(0);
   for (const auto &g : gv)
     set({i++, g.sym->category()}, g);
@@ -136,14 +137,14 @@ unsigned i_mep::mutation(double p)
       const auto c(l.category);
 
       if (i < sup)
-        set(l, gene(sset().roulette(c), i + 1, size()));
+        set(l, gene(env().sset->roulette(c), i + 1, size()));
       else
-        set(l, gene(sset().roulette_terminal(c)));
+        set(l, gene(env().sset->roulette_terminal(c)));
     }
 
 /*
   // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-  const category_t categories(sset().categories());
+  const category_t categories(env().sset->categories());
 
   for (index_t i(0); i < sup; ++i)
     for (category_t c(0); c < categories; ++c)
@@ -151,7 +152,7 @@ unsigned i_mep::mutation(double p)
       {
         ++n;
 
-        set({i, c}, gene(sset().roulette(c), i + 1, size()));
+        set({i, c}, gene(env().sset->roulette(c), i + 1, size()));
       }
 
   for (category_t c(0); c < categories; ++c)
@@ -159,7 +160,7 @@ unsigned i_mep::mutation(double p)
     {
       ++n;
 
-      set({sup, c}, gene(sset().roulette_terminal(c)));
+      set({sup, c}, gene(env().sset->roulette_terminal(c)));
     }
 */
 
@@ -233,9 +234,9 @@ i_mep i_mep::destroy_block(index_t index) const
   assert(index < size());
 
   i_mep ret(*this);
-  const category_t categories(sset().categories());
+  const category_t categories(env().sset->categories());
   for (category_t c(0); c < categories; ++c)
-    ret.set({index, c}, gene(sset().roulette_terminal(c)));
+    ret.set({index, c}, gene(env().sset->roulette_terminal(c)));
 
   assert(ret.debug());
   return ret;
@@ -279,7 +280,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   // Step 3: randomly substitute n terminals with function arguments.
   i_mep ret(*this);
   for (auto j(decltype(n){0}); j < n; ++j)
-    ret.genome_(terminals[j]).sym = sset().arg(j);
+    ret.genome_(terminals[j]).sym = env().sset->arg(j);
   ret.signature_.clear();
 
   assert(ret.debug());
@@ -322,7 +323,7 @@ bool i_mep::operator==(const i_mep &x) const
 unsigned i_mep::distance(const i_mep &ind) const
 {
   const index_t cs(size());
-  const category_t categories(sset().categories());
+  const category_t categories(env().sset->categories());
 
   unsigned d(0);
   for (index_t i(0); i < cs; ++i)
@@ -462,7 +463,7 @@ bool i_mep::debug(bool verbose) const
     return true;
   }
 
-  const auto categories(sset().categories());
+  const auto categories(env().sset->categories());
 
   for (index_t i(0); i < size(); ++i)
     for (category_t c(0); c < categories; ++c)
@@ -638,7 +639,7 @@ std::ostream &i_mep::list(std::ostream &s) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(sset().categories());
+  const auto categories(env().sset->categories());
   const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
   const auto w2(1 + static_cast<int>(std::log10(categories)));
 
@@ -715,7 +716,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(sset().categories());
+  const auto categories(env().sset->categories());
   const auto width(1 + static_cast<int>(std::log10(size() - 1)));
 
   for (unsigned i(0); i < size(); ++i)
@@ -781,7 +782,7 @@ bool i_mep::load_nvi(std::istream &in)
       return false;
 
     gene g;
-    g.sym = sset().decode(opcode);
+    g.sym = env().sset->decode(opcode);
     if (!g.sym)
       return false;
 
@@ -899,7 +900,7 @@ i_mep i_mep::crossover(i_mep rhs) const
   assert(size() == rhs.size());
 
   const auto cs(size());
-  const auto categories(sset().categories());
+  const auto categories(env().sset->categories());
 
   const auto cut(random::between<index_t>(1, cs - 1));
 
@@ -945,7 +946,7 @@ i_mep i_mep::crossover(i_mep rhs) const
   assert(size() == rhs.size());
 
   const auto cs(size());
-  const auto categories(sset().categories());
+  const auto categories(env().sset->categories());
 
   const auto cut1(random::sup(cs - 1));
   const auto cut2(random::between(cut1 + 1, cs));

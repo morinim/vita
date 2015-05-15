@@ -15,7 +15,6 @@
 
 #include "kernel/data.h"
 #include "kernel/environment.h"
-#include "kernel/symbol_set.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
@@ -38,9 +37,10 @@ public:
 
   virtual bool debug(bool) const;
 
-public:  // Public data members
+public:
   environment env;
 
+private:
   symbol_set sset;
 };
 

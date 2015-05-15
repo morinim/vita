@@ -42,7 +42,7 @@ class i_ga : public individual
 public:
   i_ga() : individual(), genome_() {}
 
-  i_ga(const environment &, const symbol_set &);
+  explicit i_ga(const environment &);
 
   // Visualization/output methods
   void graphviz(std::ostream &) const;

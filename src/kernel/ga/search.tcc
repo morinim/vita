@@ -42,7 +42,7 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::tune_parameters_nvi()
 {
-  const environment dflt(true);
+  const environment dflt(nullptr, true);
   const environment &constrained(this->prob_.env);
 
   if (constrained.p_mutation < 0.0)
@@ -85,7 +85,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
   for (unsigned r(0); r < n; ++r)
   {
     auto &eval(*this->active_eva_);  // just a short-cut
-    evolution<T, ES> evo(this->env_, this->prob_.sset, eval, nullptr, nullptr);
+    evolution<T, ES> evo(this->env_, eval, nullptr, nullptr);
     summary<T> s(evo.run(r));
 
     // The training fitness for the current run.

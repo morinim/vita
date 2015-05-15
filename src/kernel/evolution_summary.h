@@ -31,7 +31,7 @@ public:  // Constructor and support functions
   void clear();
 
 public:   // Serialization
-  bool load(std::istream &, const environment &, const symbol_set &);
+  bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
 public:  // Public data members

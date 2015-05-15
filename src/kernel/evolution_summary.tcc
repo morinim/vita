@@ -38,15 +38,13 @@ void summary<T>::clear()
 ///
 /// \param[in] in input stream.
 /// \param[in] e an environment (needed to build the best individual).
-/// \param[in] s a symbol_set (needed to build the best individual).
 /// \return `true` if the object loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current object isn't changed.
 ///
 template<class T>
-bool summary<T>::load(std::istream &in, const environment &e,
-                      const symbol_set &s)
+bool summary<T>::load(std::istream &in, const environment &e)
 {
   unsigned known_best(false);
   if (!(in >> known_best))
@@ -55,7 +53,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
   summary tmp_summary;
   if (known_best)
   {
-    T tmp_ind(e, s);
+    T tmp_ind(e);
     if (!tmp_ind.load(in))
       return false;
 

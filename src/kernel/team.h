@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,7 +13,7 @@
 #if !defined(VITA_TEAM_H)
 #define      VITA_TEAM_H
 
-#include "kernel/symbol_set.h"
+#include "kernel/environment.h"
 #include "kernel/ttable.h"
 
 namespace vita
@@ -53,7 +53,7 @@ namespace vita
   class team
   {
   public:
-    team(const environment &, const symbol_set &);
+    explicit team(const environment &);
     explicit team(std::vector<T>);
 
     // Visualization/output methods
@@ -81,7 +81,6 @@ namespace vita
     void inc_age();
 
     const environment &env() const;
-    const symbol_set &sset() const;
 
     bool debug(bool = true) const;
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -132,11 +132,10 @@ namespace vita { namespace detail
 
       assert(team_.size());
       const environment &env(team_[0].ind_.env());
-      const symbol_set &sset(team_[0].ind_.sset());
 
       for (unsigned j(0); j < n; ++j)
       {
-        v.emplace_back(T(env, sset));
+        v.emplace_back(T(env));
 
         if (!v.back().load(i))
           return false;

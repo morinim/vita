@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(Compact)
 {
   env.code_length = 100;
 
-  std::cout << env.sset << std::endl;
+  std::cout << *env.sset << std::endl;
 
   BOOST_TEST_CHECKPOINT("Functional equivalence.");
   for (unsigned n(0); n < 1000; ++n)
@@ -79,10 +79,10 @@ BOOST_AUTO_TEST_CASE(Compact)
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(sset.categories() + 2); l < 100; ++l)
+  for (unsigned l(env.sset->categories() + 2); l < 100; ++l)
   {
     env.code_length = l;
-    vita::i_mep i(env, sset);
+    vita::i_mep i(env);
 
     BOOST_REQUIRE(i.debug());
     BOOST_REQUIRE_EQUAL(i.size(), l);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
   BOOST_REQUIRE(i.empty());
   BOOST_REQUIRE_EQUAL(i.size(), 0);
 
-  i = vita::i_mep(env, sset);
+  i = vita::i_mep(env);
   BOOST_REQUIRE(!i.empty());
 }
 
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 {
   env.code_length = 100;
 
-  vita::i_mep ind(env, sset);
+  vita::i_mep ind(env);
   const vita::i_mep orig(ind);
 
   const unsigned n(4000);
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_mep a(env, sset);
+    vita::i_mep a(env);
     BOOST_REQUIRE_EQUAL(a, a);
     BOOST_REQUIRE_EQUAL(a.distance(a), 0);
 
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_REQUIRE_EQUAL(a, b);
     BOOST_REQUIRE_EQUAL(a.distance(b), 0);
 
-    vita::i_mep c(env, sset);
+    vita::i_mep c(env);
     if (a.signature() != c.signature())
     {
       BOOST_REQUIRE_NE(a, c);
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
 {
   env.code_length = 100;
 
-  vita::i_mep i1(env, sset), i2(env, sset);
+  vita::i_mep i1(env), i2(env);
 
   const unsigned n(2000);
   double dist(0.0);
@@ -182,7 +182,8 @@ BOOST_AUTO_TEST_CASE(Crossover)
     dist += i1.distance(ic);
   }
 
-  const double perc(100.0 * dist / (env.code_length * sset.categories() * n));
+  const double perc(100.0 * dist /
+                    (env.code_length * env.sset->categories() * n));
   BOOST_CHECK_GT(perc, 45.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -193,14 +194,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_mep i1(env, sset);
+    vita::i_mep i1(env);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::i_mep i2(env, sset);
+    vita::i_mep i2(env);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 
@@ -212,7 +213,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   vita::i_mep empty;
   BOOST_REQUIRE(empty.save(ss));
 
-  vita::i_mep empty1(env, sset);
+  vita::i_mep empty1(env);
   BOOST_REQUIRE(empty1.load(ss));
   BOOST_REQUIRE(empty1.debug());
   BOOST_REQUIRE(empty1.empty());
@@ -228,11 +229,11 @@ BOOST_AUTO_TEST_CASE(Blocks)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    vita::i_mep base(env, sset);
+    vita::i_mep base(env);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = vita::i_mep(env, sset);
+      base = vita::i_mep(env);
       base_es = base.eff_size();
     }
 
@@ -252,7 +253,7 @@ BOOST_AUTO_TEST_CASE(Blocks)
 
 BOOST_AUTO_TEST_CASE(Output)
 {
-  vita::i_mep i(env, sset,
+  vita::i_mep i(env,
                 {
                   {{f_sub, {1, 2}}},  // [0] SUB 1,2
                   {{f_add, {3, 4}}},  // [1] ADD 3,4

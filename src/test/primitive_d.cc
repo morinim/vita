@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(ABS)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("ABS(-X) == X");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_abs,  {1}}},  // [0] ABS 1
                    {{neg_x, null}}   // [1] -X
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(ABS)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ABS(X) == X");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_abs,  {1}}},  // [0] ABS 1
                    {{    x, null}}   // [1] X
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(ADD)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("ADD(X,0) == X");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_add, {1, 2}}},  // [0] ADD 1,2
                    {{   c0,   null}},  // [1] 0
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(ADD)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_add, {1, 2}}},  // [0] ADD 1,2
                    {{    y,   null}},  // [1] Y
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(ADD)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_add, {1, 2}}},  // [0] ADD 1,2
                    {{    x,   null}},  // [1] X
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(ADD)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
-  const i_mep i4(env, sset,
+  const i_mep i4(env,
                  {
                    {{f_sub, {1, 2}}},  // [0] SUB 1,2
                    {{f_add, {3, 4}}},  // [1] ADD 3,4
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(DIV)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_div, {1, 2}}},  // [0] DIV 1, 2
                    {{neg_x,   null}},  // [1] -X
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), -1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("DIV(X,0) == nan");
-  const i_mep i4(env, sset,
+  const i_mep i4(env,
                  {
                    {{f_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
@@ -159,7 +159,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("IDIV(X,X) == 1");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_idiv, {1, 2}}},  // [0] DIV 1, 2
                    {{     x,   null}},  // [1] X
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,1) == X");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_idiv, {1, 2}}},  // [0] IDIV 1, 2
                    {{     x,   null}},  // [1] X
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(-X,X) == -1");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_idiv, {1, 2}}},  // [0] IDIV 1, 2
                    {{ neg_x,   null}},  // [1] -X
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), -1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(3,2) == 1");
-  const i_mep i4(env, sset,
+  const i_mep i4(env,
                  {
                    {{f_idiv, {1, 2}}},  // [0] IDIV 1, 2
                    {{    c3,   null}},  // [1] 3
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(IDIV)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IDIV(X,0) == nan");
-  const i_mep i5(env, sset,
+  const i_mep i5(env,
                  {
                    {{f_idiv, {1, 2}}},  // [0] IDIV 1, 2
                    {{     x,   null}},  // [1] X
@@ -216,7 +216,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_ife, {1, 1, 2, 1}}},  // [0] IFE 1,1,2,1
                    {{   c0,         null}},  // [1] 0
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_ife, {1, 2, 2, 1}}},  // [0] IFE 1,2,2,1
                    {{   c0,         null}},  // [1] 0
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_ife, {1, 2, 3, 4}}},  // [0] IFE Z, X, 1, 0
                    {{    z,         null}},  // [1] Z
@@ -259,7 +259,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_EQUAL(penalty, 0);
 
   BOOST_TEST_CHECKPOINT("IFE SAME RESULT PENALTY");
-  const i_mep i4(env, sset,
+  const i_mep i4(env,
                  {
                    {{f_ife, {1, 2, 2, 2}}},  // [0] IFE 1,2,2,2
                    {{   c0,         null}},  // [1] 0
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(MAX)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("MAX(0,0) == 0");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_max, {1, 2}}},  // [0] MAX 1, 2
                    {{   c0,   null}},  // [1] 0
@@ -285,7 +285,7 @@ BOOST_AUTO_TEST_CASE(MAX)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("MAX(0,1) == 1");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_max, {1, 2}}},  // [0] MAX 1, 2
                    {{   c0,   null}},  // [1] 0
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(MUL)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
@@ -311,7 +311,7 @@ BOOST_AUTO_TEST_CASE(MUL)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(MUL)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{f_add, {3, 3}}},  // [1] ADD 3, 3
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE(SQRT)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("SQRT(1) == 1");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_sqrt,  {1}}},  // [0] SQRT 1
                    {{    c1, null}}   // [1] 1
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(SQRT)
   BOOST_REQUIRE_CLOSE(any_cast<double>(ret), 1.0, epsilon);
 
   BOOST_TEST_CHECKPOINT("SQRT(-X) == nan");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_sqrt,  {1}}},  // [0] SQRT 1
                    {{neg_x,  null}}   // [1] -X
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(SQRT)
   BOOST_REQUIRE_MESSAGE(ret.empty(), "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("SQRT(Z) = std::sqrt(Z)");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_sqrt,  {1}}},  // [0] LN 1
                    {{     z, null}}   // [1] Z
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(SUB)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
@@ -388,7 +388,7 @@ BOOST_AUTO_TEST_CASE(SUB)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
@@ -399,7 +399,7 @@ BOOST_AUTO_TEST_CASE(SUB)
                       any_cast<double>(x->eval(nullptr)), epsilon);
 
   BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    z,   null}},  // [1] Z
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(LN)
   using i_interp = interpreter<i_mep>;
 
   BOOST_TEST_CHECKPOINT("LN(1) == 0");
-  const i_mep i1(env, sset,
+  const i_mep i1(env,
                  {
                    {{f_ln,  {1}}},  // [0] LN 1
                    {{  c1, null}}   // [1] 1
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(LN)
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
 
   BOOST_TEST_CHECKPOINT("LN(0) == nan");
-  const i_mep i2(env, sset,
+  const i_mep i2(env,
                  {
                    {{f_ln,  {1}}},  // [0] LN 1
                    {{  c0, null}}   // [1] 0
@@ -441,7 +441,7 @@ BOOST_AUTO_TEST_CASE(LN)
   BOOST_REQUIRE_MESSAGE(ret.empty(), "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("LN(Z) = std::log(Z)");
-  const i_mep i3(env, sset,
+  const i_mep i3(env,
                  {
                    {{f_ln,  {1}}},  // [0] LN 1
                    {{   z, null}}   // [1] Z

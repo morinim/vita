@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,21 +19,21 @@
 
 ///
 /// \param[in] e base environment.
-/// \param[in] ss a symbol set.
 ///
 /// Creates a team of individuals that will cooperate to solve a task.
 ///
 template<class T>
-team<T>::team(const environment &e, const symbol_set &ss) : signature_()
+team<T>::team(const environment &e) : signature_()
 {
   assert(e.debug(true, true));
   assert(e.team.individuals);
+  assert(e.sset);
 
   const auto n(e.team.individuals);
   individuals_.reserve(n);
 
   for (auto i(decltype(n){0}); i < n; ++i)
-    individuals_.emplace_back(e, ss);
+    individuals_.emplace_back(e);
 
   assert(debug());
 }
@@ -247,7 +247,7 @@ unsigned team<T>::distance(const team<T> &x) const
   for (auto i(decltype(sup){0}); i < sup; ++i)
   {
     const index_t cs(individuals_[i].size());
-    const category_t categories(sset().categories());
+    const category_t categories(env().sset->categories());
 
     for (index_t j(0); j < cs; ++j)
       for (category_t c(0); c < categories; ++c)
@@ -294,15 +294,6 @@ const environment &team<T>::env() const
 }
 
 ///
-/// \return the symbol_set of the team.
-///
-template<class T>
-const symbol_set &team<T>::sset() const
-{
-  return individuals_[0].sset();
-}
-
-///
 /// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the team passes the internal consistency check.
 ///
@@ -338,7 +329,7 @@ bool team<T>::load(std::istream &in)
 
   for (unsigned j(0); j < n; ++j)
   {
-    T i(env(), sset());
+    T i(env());
     if (!i.load(in))
       return false;
     v.push_back(i);

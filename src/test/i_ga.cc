@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,11 +34,11 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_ga ind(env, sset);
+    vita::i_ga ind(env);
     vita::interpreter<vita::i_ga> check(&ind);
 
     BOOST_REQUIRE(ind.debug());
-    BOOST_REQUIRE_EQUAL(ind.parameters(), sset.categories());
+    BOOST_REQUIRE_EQUAL(ind.parameters(), env.sset->categories());
     BOOST_REQUIRE_EQUAL(ind.age(), 0);
     BOOST_REQUIRE_EQUAL(check.penalty(), 0);
   }
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(Penalty)
 {
   for (unsigned i(0); i < 100; ++i)
   {
-    vita::i_ga ind(env, sset);
+    vita::i_ga ind(env);
     vita::interpreter<vita::i_ga> check(&ind);
 
     BOOST_REQUIRE_EQUAL(check.penalty(), 0);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(Penalty)
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  vita::i_ga t(env, sset);
+  vita::i_ga t(env);
   const vita::i_ga orig(t);
 
   const unsigned n(1000);
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_ga a(env, sset);
+    vita::i_ga a(env);
     BOOST_REQUIRE_EQUAL(a, a);
     BOOST_REQUIRE_EQUAL(a.distance(a), 0);
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_REQUIRE_EQUAL(a, b);
     BOOST_REQUIRE_EQUAL(a.distance(b), 0);
 
-    vita::i_ga c(env, sset);
+    vita::i_ga c(env);
     if (a.signature() != c.signature())
     {
       BOOST_REQUIRE_NE(a, c);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 {
   for (unsigned j(0); j < 1000; ++j)
   {
-    vita::i_ga ind(env, sset);
+    vita::i_ga ind(env);
 
     unsigned i(0);
     for (const auto &l : ind)
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 
 BOOST_AUTO_TEST_CASE(StandardCrossover)
 {
-  vita::i_ga i1(env, sset), i2(env, sset);
+  vita::i_ga i1(env), i2(env);
 
   double dist(0.0);
   const unsigned n(1000);
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
   }
 
   // +1 since we have at least one gene involved in crossover.
-  const double perc(100.0 * dist / ((sset.categories() + 1) * n));
+  const double perc(100.0 * dist / ((env.sset->categories() + 1) * n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
   for (unsigned j(0); j < 1000; ++j)
   {
-    const vita::i_ga p(env, sset);
-    vita::i_ga a(env, sset), b(env, sset), c(env, sset);
+    const vita::i_ga p(env);
+    vita::i_ga a(env), b(env), c(env);
 
     const auto n_a(vita::random::between<unsigned>(0, 100));
     for (unsigned k(0); k < n_a; ++k)
@@ -243,14 +243,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_ga i1(env, sset);
+    vita::i_ga i1(env);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_REQUIRE(i1.save(ss));
 
-    vita::i_ga i2(env, sset);
+    vita::i_ga i2(env);
     BOOST_REQUIRE(i2.load(ss));
     BOOST_REQUIRE(i2.debug());
 
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   vita::i_ga empty;
   BOOST_REQUIRE(empty.save(ss));
 
-  vita::i_ga empty1(env, sset);
+  vita::i_ga empty1(env);
   BOOST_REQUIRE(empty1.load(ss));
   BOOST_REQUIRE(empty1.debug());
   BOOST_REQUIRE(empty1.empty());

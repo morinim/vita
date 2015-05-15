@@ -18,16 +18,17 @@
 namespace vita
 {
 ///
+/// \param[in] ss a pointer to the symbol set used in the current environment.
 /// \param[in] initialize if `true` initializes every parameter in such a
 ///                       way as to allow the object to pass
-///                       environment::debug().
+///                       `environment::debug(..., true)`.
 ///
 /// Class constructor. Default values are quite standard, but specific
 /// problems need ad-hoc tuning.
 ///
 /// \see search::tune_parameters
 ///
-environment::environment(bool initialize)
+environment::environment(symbol_set *ss, bool initialize) : sset(ss)
 {
   if (initialize)
   {

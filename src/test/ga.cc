@@ -33,7 +33,7 @@ BOOST_FIXTURE_TEST_SUITE(t_ga1, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Penalty)
 {
-  vita::i_ga ind(env, sset);
+  vita::i_ga ind(env);
   BOOST_REQUIRE(ind.debug());
 /*
   vita::interpreter<vita::i_ga> intr(&ind);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    i_ga ind(env, sset);
+    i_ga ind(env);
     BOOST_REQUIRE(ind.debug());
 
     const auto eva_ret(eva(ind));
@@ -97,7 +97,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
     [](const std::vector<double> &v)
     { return std::accumulate(v.begin(), v.end(), 0.0); }));
 
-  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, eva);
   BOOST_REQUIRE(evo1.debug(true));
 
   const auto s1(evo1.run(1));
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s1.best.solution[2], 990.0);
   BOOST_CHECK_GT(s1.best.solution[3], 9980.0);
 
-  vita::evolution<vita::i_ga, vita::std_es> evo2(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::std_es> evo2(env, eva);
   BOOST_REQUIRE(evo2.debug(true));
 
   const auto s2(evo2.run(1));
@@ -133,8 +133,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 
   vita::problem prob;
   prob.env = env;
-  prob.sset.insert(vita::ga::parameter<>(0, 0.0, 6.0));
-  prob.sset.insert(vita::ga::parameter<>(1, 0.0, 6.0));
+  prob.env.sset->insert(vita::ga::parameter<>(0, 0.0, 6.0));
+  prob.env.sset->insert(vita::ga::parameter<>(1, 0.0, 6.0));
 
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
@@ -201,10 +201,10 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 
   // Problem's parameters.
   for (unsigned i(0); i < 9; ++i)
-    prob.sset.insert(vita::ga::parameter(i, 0.0, 1.0));
+    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 1.0));
   for (unsigned i(9); i < 12; ++i)
-    prob.sset.insert(vita::ga::parameter(i, 0.0, 100.0));
-  prob.sset.insert(vita::ga::parameter(12, 0.0, 1.0));
+    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 100.0));
+  prob.env.sset->insert(vita::ga::parameter(12, 0.0, 1.0));
 
   auto f = [](const std::vector<double> &x)
     {

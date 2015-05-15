@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -65,13 +65,13 @@ void test_serialization(vita::src_problem &pr)
 
   for (unsigned k(0); k < 256; ++k)
   {
-    const T ind(pr.env, pr.sset);
+    const T ind(pr.env);
     const auto lambda1(build<L, T, P>()(ind, pr.data()));
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const T ind2(pr.env, pr.sset);
+    const T ind2(pr.env);
     auto lambda2(build<L, T, P>()(ind2, pr.data()));
     BOOST_REQUIRE(lambda2.load(ss));
     BOOST_REQUIRE(lambda2.debug());
@@ -93,7 +93,7 @@ void test_team_of_one(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env, pr.sset);
+    const i_mep ind(pr.env);
     const auto li(build<L, i_mep, P>()(ind, pr.data()));
 
     const team<i_mep> t{{ind}};
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("mep.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env, pr.sset);
+    const i_mep ind(pr.env);
     const reg_lambda_f<i_mep> li(ind);
 
     const team<i_mep> t{{ind, ind, ind, ind}};
@@ -157,10 +157,10 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep i1(pr.env, pr.sset);
-    const i_mep i2(pr.env, pr.sset);
-    const i_mep i3(pr.env, pr.sset);
-    const i_mep i4(pr.env, pr.sset);
+    const i_mep i1(pr.env);
+    const i_mep i2(pr.env);
+    const i_mep i3(pr.env);
+    const i_mep i4(pr.env);
 
     const reg_lambda_f<i_mep> lambda1(i1);
     const reg_lambda_f<i_mep> lambda2(i2);
@@ -217,18 +217,18 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("mep.csv").first, 0);
 
   for (unsigned k(0); k < 1000; ++k)
   {
-    const i_mep ind(pr.env, pr.sset);
+    const i_mep ind(pr.env);
     const reg_lambda_f<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const i_mep ind2(pr.env, pr.sset);
+    const i_mep ind2(pr.env);
     reg_lambda_f<i_mep> lambda2(ind2);
     BOOST_REQUIRE(lambda2.load(ss));
     BOOST_REQUIRE(lambda2.debug());
@@ -253,9 +253,9 @@ void test_team(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind1(pr.env, pr.sset);
-    const i_mep ind2(pr.env, pr.sset);
-    const i_mep ind3(pr.env, pr.sset);
+    const i_mep ind1(pr.env);
+    const i_mep ind2(pr.env);
+    const i_mep ind3(pr.env);
 
     const auto lambda1(build<L, i_mep, P>()(ind1, pr.data()));
     const auto lambda2(build<L, i_mep, P>()(ind2, pr.data()));
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   constexpr unsigned slots(10);
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   constexpr unsigned slots(10);
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("ionosphere.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 351);
@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("ionosphere.csv").first, 0);
 
 

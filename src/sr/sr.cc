@@ -361,7 +361,7 @@ void generations(unsigned g)
 void go(bool = true)
 {
   if (problem->data()->size())
-    if (problem->sset.enough_terminals())
+    if (problem->env.sset->enough_terminals())
     {
       fix_parameters(problem);
 
@@ -664,7 +664,7 @@ bool symbols(const std::string &symbol_file)
                 << '\n';
   }
 
-  if (!problem->sset.enough_terminals())
+  if (!problem->env.sset->enough_terminals())
   {
     std::cerr << vita::k_s_error << " Too few terminals\n";
     return false;

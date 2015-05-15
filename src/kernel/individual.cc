@@ -35,10 +35,7 @@ bool individual::load(std::istream &in)
     return false;
 
   if (t_empty)
-  {
     env_ = nullptr;
-    sset_ = nullptr;
-  }
 
   age_ = t_age;
 

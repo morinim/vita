@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,12 +25,11 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  environment env(true);
+  vita::symbol_set sset;
+  environment env(&sset, true);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 5);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
-
-  vita::symbol_set sset;
 
   symbol_factory &factory(symbol_factory::instance());
   sset.insert(factory.make(domain_t::d_double, -200, 200));
@@ -46,31 +45,31 @@ int main(int argc, char *argv[])
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    i_mep base(env, sset);
+    i_mep base(env);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = i_mep(env, sset);
+      base = i_mep(env);
       base_es = base.eff_size();
     }
 
-    std::cout << std::string(40, '-') << std::endl << "BASE" << std::endl;
+    std::cout << std::string(40, '-') << "\nBASE\n";
     base.list(std::cout);
-    std::cout << std::endl;
+    std::cout << '\n';
 
     auto bl(base.blocks());
     for (const locus &l : bl)
     {
       i_mep blk(base.get_block(l));
 
-      std::cout << std::endl << "BLOCK at locus " << l << std::endl;
+      std::cout << "\nBLOCK at locus " << l << '\n';
       blk.list(std::cout);
       const any val(interpreter<i_mep>(&blk).run());
       if (val.empty())
         std::cout << "Empty output.";
       else
         std::cout << "Output: " << to<std::string>(val);
-      std::cout << std::endl;
+      std::cout << '\n';
 
       if (blk.eff_size() <= 20)
       {
@@ -89,29 +88,29 @@ int main(int argc, char *argv[])
 
         symbol *const f(sset.insert(vita::make_unique<adf>(blk2, categories,
                                                            100u)));
-        std::cout << std::endl << f->display() << std::endl;
+        std::cout << '\n' << f->display() << '\n';
         blk2.list(std::cout);
 
         i_mep blk3(blk.replace({{f, positions}}));
-        std::cout << std::endl;
+        std::cout << '\n';
         blk3.list(std::cout);
         const any val3(interpreter<i_mep>(&blk3).run());
         if (val3.empty())
           std::cout << "Empty output.";
         else
           std::cout << "Output: " << to<std::string>(val3);
-        std::cout << std::endl << std::endl;
+        std::cout << "\n\n";
 
         if (val.empty() != val3.empty() ||
             (!val.empty() && !val3.empty() &&
              to<std::string>(val) != to<std::string>(val3)))
         {
-          std::cerr << "ADF EVAL ERROR." << std::endl;
+          std::cerr << "ADF EVAL ERROR.\n";
           return EXIT_FAILURE;
         }
       }
       else
-        std::cout << "Skipping block at line " << l << std::endl;
+        std::cout << "Skipping block at line " << l << '\n';
     }
   }
 

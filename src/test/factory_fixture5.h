@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,12 +14,11 @@
 #define      FACTORY_FIXTURE5_H
 
 #include "kernel/environment.h"
-#include "kernel/symbol_set.h"
 #include "kernel/ga/primitive.h"
 
 struct F_FACTORY5
 {
-  F_FACTORY5(unsigned n = 4) : env(true), sset()
+  F_FACTORY5(unsigned n = 4) : env(&sset, true), sset()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY5)");
 

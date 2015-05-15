@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -39,7 +39,7 @@ namespace vita
   class evolution
   {
   public:
-    evolution(const environment &, const symbol_set &, evaluator<T> &,
+    evolution(const environment &, evaluator<T> &,
               std::function<bool (const summary<T> &)> = nullptr,
               std::function<void (unsigned)> = nullptr);
 

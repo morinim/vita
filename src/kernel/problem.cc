@@ -17,7 +17,7 @@ namespace vita
 ///
 /// A new uninitialized problem.
 ///
-problem::problem()
+problem::problem() : env(&sset)
 {
 }
 
@@ -29,7 +29,7 @@ problem::problem()
 ///
 void problem::clear(bool initialize)
 {
-  env = environment(initialize);
+  env = environment(&sset, initialize);
   sset = symbol_set();
 }
 

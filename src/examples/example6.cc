@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -94,13 +94,12 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
   env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(vita::make_unique<X>());
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
 
   auto eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::i_mep, vita::std_es> evo(env, sset, *eva.get());
+  vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva.get());
 
   evo.run(1);
 

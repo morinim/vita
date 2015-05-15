@@ -71,7 +71,7 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 /// two steps:
 ///
 ///     src_problem p;
-///     p.env = environment(true);
+///     p.clear(true);
 ///
 src_problem::src_problem() : problem()
 {
@@ -97,7 +97,7 @@ src_problem::src_problem(const std::string &ds, const std::string &ts,
 ///
 bool src_problem::operator!() const
 {
-  return !dat_.size(data::training) || !sset.enough_terminals();
+  return !dat_.size(data::training) || !env.sset->enough_terminals();
 }
 
 ///
@@ -108,9 +108,7 @@ bool src_problem::operator!() const
 ///
 void src_problem::clear(bool initialize)
 {
-  env = environment(initialize);
-
-  sset = symbol_set();
+  problem::clear(initialize);
 
   dat_.clear();
 }
@@ -130,7 +128,7 @@ std::pair<std::size_t, std::size_t> src_problem::load(
   if (ds.empty())
     return {0, 0};
 
-  sset = vita::symbol_set();
+  env.sset->clear();
   dat_.clear();
 
   const auto n_examples(dat_.open(ds, env.verbosity));
@@ -172,7 +170,7 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 ///
 void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 {
-  sset = vita::symbol_set();
+  env.sset->clear();
 
   // Sets up the variables (features).
   const auto columns(dat_.columns());
@@ -184,13 +182,13 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
         name = "X" + std::to_string(i);
 
       const category_t category(dat_.get_column(i).category_id);
-      sset.insert(vita::make_unique<variable>(name, i - 1, category));
+      env.sset->insert(vita::make_unique<variable>(name, i - 1, category));
     }
 
   // Sets up the labels for nominal attributes.
   for (const category &c : dat_.categories())
     for (const std::string &l : c.labels)
-      sset.insert(vita::make_unique<constant<std::string>>(l, c.tag));
+      env.sset->insert(vita::make_unique<constant<std::string>>(l, c.tag));
 }
 
 ///
@@ -206,29 +204,29 @@ void src_problem::setup_default_symbols()
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
     {
-      sset.insert(factory.make("1.0", {tag}));
-      sset.insert(factory.make("2.0", {tag}));
-      sset.insert(factory.make("3.0", {tag}));
-      sset.insert(factory.make("4.0", {tag}));
-      sset.insert(factory.make("5.0", {tag}));
-      sset.insert(factory.make("6.0", {tag}));
-      sset.insert(factory.make("7.0", {tag}));
-      sset.insert(factory.make("8.0", {tag}));
-      sset.insert(factory.make("9.0", {tag}));
-      sset.insert(factory.make("FABS", {tag}));
-      sset.insert(factory.make("FADD", {tag}));
-      sset.insert(factory.make("FDIV", {tag}));
-      sset.insert(factory.make("FLN",  {tag}));
-      sset.insert(factory.make("FMUL", {tag}));
-      sset.insert(factory.make("FMOD", {tag}));
-      sset.insert(factory.make("FSUB", {tag}));
+      env.sset->insert(factory.make("1.0", {tag}));
+      env.sset->insert(factory.make("2.0", {tag}));
+      env.sset->insert(factory.make("3.0", {tag}));
+      env.sset->insert(factory.make("4.0", {tag}));
+      env.sset->insert(factory.make("5.0", {tag}));
+      env.sset->insert(factory.make("6.0", {tag}));
+      env.sset->insert(factory.make("7.0", {tag}));
+      env.sset->insert(factory.make("8.0", {tag}));
+      env.sset->insert(factory.make("9.0", {tag}));
+      env.sset->insert(factory.make("FABS", {tag}));
+      env.sset->insert(factory.make("FADD", {tag}));
+      env.sset->insert(factory.make("FDIV", {tag}));
+      env.sset->insert(factory.make("FLN",  {tag}));
+      env.sset->insert(factory.make("FMUL", {tag}));
+      env.sset->insert(factory.make("FMOD", {tag}));
+      env.sset->insert(factory.make("FSUB", {tag}));
     }
     else if (compatible({tag}, {"string"}))
     {
       //for (decltype(tag) j(0); j < sup; ++j)
       // if (j != tag)
-      //   sset.insert(factory.make("SIFE", {tag, j}));
-      sset.insert(factory.make("SIFE", {tag, 0}));
+      //   env.sset->insert(factory.make("SIFE", {tag, j}));
+      env.sset->insert(factory.make("SIFE", {tag, 0}));
     }
 }
 
@@ -300,7 +298,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
                           << (&j == &seq.back() ? ")" : ", ");
               std::cout << '\n';
 #endif
-              sset.insert(factory.make(sym_name, seq));
+              env.sset->insert(factory.make(sym_name, seq));
             }
         }
     }
@@ -318,7 +316,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
                       << (j + 1 == n_args ? ")" : ", ");
           std::cout << '\n';
 #endif
-          sset.insert(factory.make(sym_name, cvect(n_args, tag)));
+          env.sset->insert(factory.make(sym_name, cvect(n_args, tag)));
         }
     }
 

@@ -94,6 +94,14 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(), by_()
 }
 
 ///
+/// Clear the current symbol set.
+///
+void symbol_set::clear()
+{
+  *this = {};
+}
+
+///
 /// \param[in] n index of an argument symbol.
 /// \return a pointer to the n-th argument symbol.
 ///

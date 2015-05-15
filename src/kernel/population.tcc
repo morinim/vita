@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,15 +19,15 @@
 
 ///
 /// \param[in] e base vita::environment.
-/// \param[in] sset base vita::symbol_set.
 ///
 /// Creates a random population (initial size \a e.individuals).
 ///
 template<class T>
-population<T>::population(const environment &e, const symbol_set &sset)
+population<T>::population(const environment &e)
   : pop_(1), allowed_(1)
 {
   assert(e.debug(true, true));
+  assert(e.sset);
 
   const auto n(e.individuals);
   pop_[0].reserve(n);
@@ -36,7 +36,7 @@ population<T>::population(const environment &e, const symbol_set &sset)
   // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
   // isn't a well defined environment and init_layer doesn't work.
   for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[0].emplace_back(e, sset);
+    pop_[0].emplace_back(e);
 
   assert(debug(true));
 }
@@ -44,7 +44,6 @@ population<T>::population(const environment &e, const symbol_set &sset)
 ///
 /// \param[in] l a layer of the population.
 /// \param[in] e an environment (used for individual generation).
-/// \param[in] s a symbol_set (used for individual generation).
 ///
 /// Resets layer \a l of the population.
 ///
@@ -52,22 +51,19 @@ population<T>::population(const environment &e, const symbol_set &sset)
 /// If layer \a l is nonexistent/empty the method doesn't work!
 ///
 template<class T>
-void population<T>::init_layer(unsigned l, const environment *e,
-                               const symbol_set *s)
+void population<T>::init_layer(unsigned l, const environment *e)
 {
   assert(l < layers());
-  assert(individuals(l) || (e && s));
+  assert(individuals(l) || (e && e->sset));
 
   if (!e)
     e = &pop_[l][0].env();
-  if (!s)
-    s = &pop_[l][0].sset();
 
   pop_[l].clear();
 
   const auto n(allowed(l));
   for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[l].emplace_back(*e, *s);
+    pop_[l].emplace_back(*e);
 }
 
 ///
@@ -97,14 +93,13 @@ void population<T>::add_layer()
   assert(individuals(0));
 
   const auto &e(env());
-  const auto &s(pop_[0][0].sset());
 
   pop_.insert(pop_.begin(), layer_t());
   pop_[0].reserve(e.individuals);
 
   allowed_.insert(allowed_.begin(), e.individuals);
 
-  init_layer(0, &e, &s);
+  init_layer(0, &e);
 }
 
 ///
@@ -324,7 +319,7 @@ bool population<T>::load(std::istream &in)
   if (!(in >> n_layers) || !n_layers)
     return false;
 
-  population p(env(), pop_[0][0].sset());
+  population p(env());
   p.pop_.reserve(n_layers);
   p.allowed_.reserve(n_layers);
 

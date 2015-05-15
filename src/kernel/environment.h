@@ -19,6 +19,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "kernel/fitness.h"
+#include "kernel/symbol_set.h"
 #include "kernel/trilean.h"
 
 namespace vita
@@ -33,7 +34,7 @@ namespace vita
 class environment
 {
 public:  // Constructor and support functions
-  explicit environment(bool = false);
+  explicit environment(symbol_set *, bool = false);
 
   void log(boost::property_tree::ptree *const, const std::string & = "") const;
 
@@ -268,6 +269,8 @@ public:  // Data members
     /// > 1 means team mode.
     unsigned individuals = 3;
   } team;
+
+  symbol_set *sset = nullptr;
 };  // class environment
 
 }  // namespace vita

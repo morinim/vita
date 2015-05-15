@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,7 +23,7 @@ namespace vita
   class symbol_set;
 
   ///
-  /// \brief Holds the coordinates of an individual in a population.
+  /// \brief Holds the coordinates of an individual in a population
   ///
   struct coord
   {
@@ -49,7 +49,7 @@ namespace vita
   class population
   {
   public:
-    population(const environment &, const symbol_set &);
+    explicit population(const environment &);
 
     T &operator[](coord);
     const T &operator[](coord) const;
@@ -58,8 +58,7 @@ namespace vita
     unsigned individuals() const;
     unsigned individuals(unsigned) const;
 
-    void init_layer(unsigned, const environment * = nullptr,
-                    const symbol_set * = nullptr);
+    void init_layer(unsigned, const environment * = nullptr);
     void add_layer();
     unsigned layers() const;
     void inc_age();

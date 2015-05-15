@@ -28,7 +28,7 @@
 template<class T>
 interpreter<T>::interpreter(const T *ind, interpreter<T> *ctx)
   : core_interpreter(), prg_(*ind),
-    cache_(ind->size(), ind->sset().categories()), ip_(ind->best_),
+    cache_(ind->size(), ind->env().sset->categories()), ip_(ind->best_),
     context_(ctx)
 {
   assert(ind);

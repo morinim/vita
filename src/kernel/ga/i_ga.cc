@@ -17,24 +17,23 @@ namespace vita
 {
 ///
 /// \param[in] e base environment.
-/// \param[in] ss a symbol set.
 ///
 /// The process that generates the initial, random expressions has to be
 /// implemented so as to ensure that they do not violate the type system's
 /// constraints.
 ///
-i_ga::i_ga(const environment &e, const symbol_set &ss)
-  : individual(e, ss), genome_(ss.categories())
+i_ga::i_ga(const environment &e) : individual(e), genome_(e.sset->categories())
 {
   assert(e.debug(true, true));
+  assert(e.sset);
 
   assert(parameters());
 
-  const auto cs(ss.categories());
+  const auto cs(env().sset->categories());
   assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(ss.roulette_terminal(c));
+    genome_[c] = gene(env().sset->roulette_terminal(c));
 
   assert(debug(true));
 }
@@ -78,7 +77,7 @@ std::ostream &i_ga::in_line(std::ostream &s) const
 ///
 std::ostream &i_ga::list(std::ostream &s) const
 {
-  const auto cs(sset().categories());
+  const auto cs(env().sset->categories());
   const auto w(1 + static_cast<int>(std::log10(cs)));
 
   unsigned i(0);
@@ -125,7 +124,7 @@ unsigned i_ga::mutation(double p)
     {
       ++n;
 
-      genome_[c] = gene(sset().roulette_terminal(c));
+      genome_[c] = gene(env().sset->roulette_terminal(c));
     }
 
   signature_ = hash();
@@ -318,7 +317,7 @@ bool i_ga::operator==(const i_ga &x) const
 ///
 unsigned i_ga::distance(const i_ga &ind) const
 {
-  const auto cs(sset().categories());
+  const auto cs(env().sset->categories());
 
   unsigned d(0);
   for (auto i(decltype(cs){0}); i < cs; ++i)
@@ -438,7 +437,7 @@ bool i_ga::load_nvi(std::istream &in)
       return false;
 
     gene g;
-    g.sym = sset().decode(opcode);
+    g.sym = env().sset->decode(opcode);
     if (!g.sym)
       return false;
 

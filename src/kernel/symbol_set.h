@@ -34,6 +34,8 @@ class symbol_set
 public:
   symbol_set();
 
+  void clear();
+
   symbol *insert(std::unique_ptr<symbol>);
 
   symbol *roulette() const;

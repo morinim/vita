@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 
 struct F_FACTORY2
 {
-  F_FACTORY2() : env(true)
+  F_FACTORY2() : env(&sset, true)
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY2)");
 

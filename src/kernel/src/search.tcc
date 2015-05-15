@@ -92,10 +92,10 @@ void src_search<T, ES>::arl(const U &base)
   std::ofstream adf_log(filename, std::ios_base::app);
   if (this->env_.stat.arl && adf_log.good())
   {
-    const auto adts(this->prob_.sset.adts());
+    const auto adts(this->prob_.env.sset->adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const symbol &f(*this->prob_.sset.get_adt(i));
+      const symbol &f(*this->prob_.env.sset->get_adt(i));
       adf_log << f.display() << ' ' << f.weight << '\n';
     }
     adf_log << '\n';
@@ -146,7 +146,7 @@ void src_search<T, ES>::arl(const U &base)
           adf_log << '\n';
         }
 
-        this->prob_.sset.insert(std::move(p));
+        this->prob_.env.sset->insert(std::move(p));
       }
     }
   }
@@ -197,7 +197,7 @@ void src_search<T, ES>::arl(const team<U> &)
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters_nvi()
 {
-  const environment dflt(true);
+  const environment dflt(nullptr, true);
   const environment &constrained(this->prob_.env);
 
   const auto d_size(this->prob_.data() ? this->prob_.data()->size() : 0);
@@ -429,7 +429,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   for (unsigned r(0); r < n; ++r)
   {
     auto &eval(*this->active_eva_);  // Just a short cut
-    evolution<T, ES> evo(this->env_, this->prob_.sset, eval, stop, shake);
+    evolution<T, ES> evo(this->env_, eval, stop, shake);
     summary<T> s(evo.run(r));
 
     // Depending on validation, this can be the training fitness or the
@@ -500,7 +500,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     if (this->env_.arl == trilean::yes)
     {
-      this->prob_.sset.reset_adf_weights();
+      this->prob_.env.sset->reset_adf_weights();
       arl(s.best.solution);
     }
 

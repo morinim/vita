@@ -34,7 +34,7 @@ struct F_FACTORY4
     int val;
   };
 
-  F_FACTORY4() : env(true), null({})
+  F_FACTORY4() : env(&sset, true), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY4)");
 

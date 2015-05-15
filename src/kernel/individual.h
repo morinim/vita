@@ -15,8 +15,8 @@
 
 #include <fstream>
 
+#include "kernel/environment.h"
 #include "kernel/locus.h"
-#include "kernel/symbol_set.h"
 #include "kernel/ttable.h"
 #include "kernel/vitafwd.h"
 
@@ -36,9 +36,9 @@ namespace vita
 class individual
 {
 public:
-  individual() : signature_(), env_(nullptr), sset_(nullptr), age_() {}
+  individual() : signature_(), env_(nullptr), age_() {}
 
-  individual(const environment &, const symbol_set &);
+  explicit individual(const environment &);
 
   /// This is a measure of how long an individual's family of genotypic
   /// material has been in the population. Randomly generated individuals,
@@ -56,7 +56,6 @@ public:
   bool empty() const { return !env_; }
 
   const environment &env() const {  assert(env_); return *env_; }
-  const symbol_set &sset() const { assert(sset_); return *sset_; }
 
   // Visualization/output methods.
   virtual std::ostream &in_line(std::ostream &) const = 0;
@@ -80,12 +79,11 @@ private:  // Non-virtual interface members
 
 private:
   const environment *env_;
-  const symbol_set *sset_;
   unsigned age_;
 };  // class individual
 
-inline individual::individual(const environment &e, const symbol_set &ss)
-  : signature_(), env_(&e), sset_(&ss), age_(0)
+inline individual::individual(const environment &e) : signature_(), env_(&e),
+                                                      age_(0)
 {
   assert(e.debug(true, true));
 }

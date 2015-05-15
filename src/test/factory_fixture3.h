@@ -15,7 +15,6 @@
 
 #include "kernel/environment.h"
 #include "kernel/interpreter.h"
-#include "kernel/symbol_set.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
@@ -34,7 +33,7 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : env(true), null({})
+  F_FACTORY3() : env(&sset, true), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
 
