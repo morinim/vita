@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
     const auto t1{t};
 
     t.mutation();
-    diff += t.distance(t1);
+    diff += distance(t, t1);
     length += t1.eff_size();
   }
 
@@ -85,18 +85,18 @@ BOOST_AUTO_TEST_CASE(Comparison)
   {
     vita::team<vita::i_mep> a(env);
     BOOST_REQUIRE_EQUAL(a, a);
-    BOOST_REQUIRE_EQUAL(a.distance(a), 0);
+    BOOST_REQUIRE_EQUAL(distance(a, a), 0);
 
     vita::team<vita::i_mep> b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
     BOOST_REQUIRE_EQUAL(a, b);
-    BOOST_REQUIRE_EQUAL(a.distance(b), 0);
+    BOOST_REQUIRE_EQUAL(distance(a, b), 0);
 
     vita::team<vita::i_mep> c(env);
     if (a.signature() != c.signature())
     {
       BOOST_REQUIRE_NE(a, c);
-      BOOST_REQUIRE_GT(a.distance(c), 0);
+      BOOST_REQUIRE_GT(distance(a, c), 0);
     }
   }
 }
@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
     const auto tc(t1.crossover(t2));
     BOOST_CHECK(tc.debug(true));
 
-    dist += t1.distance(tc);
+    dist += distance(t1, tc);
   }
 
   const double perc(100.0 * dist /

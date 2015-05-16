@@ -74,8 +74,6 @@ public:
 
   hash_t signature() const;
 
-  unsigned distance(const team<T> &) const;
-
   unsigned age() const;
   void inc_age();
 
@@ -108,6 +106,7 @@ private:  // Private data members
 // *  Comparison operators                                               *
 // ***********************************************************************
 template<class T> bool operator==(const team<T> &, const team<T> &);
+template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 

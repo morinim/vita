@@ -235,26 +235,30 @@ bool operator==(const team<T> &lhs, const team<T> &rhs)
 }
 
 ///
-/// \param[in] x a team to compare with `this`.
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
 /// \return a numeric measurement of the difference between `x` and `this`
-/// (the number of different genes between teams).
+///         (the number of different genes between teams).
+///
+/// \relates team<T>
 ///
 template<class T>
-unsigned team<T>::distance(const team<T> &x) const
+unsigned distance(const team<T> &lhs, const team<T> &rhs)
 {
-  unsigned d(0);
+  const auto sup(lhs.individuals());
+  assert(sup == rhs.individuals());
 
-  const auto sup(individuals());
+  unsigned d(0);
   for (auto i(decltype(sup){0}); i < sup; ++i)
   {
-    const index_t cs(individuals_[i].size());
-    const category_t categories(env().sset->categories());
+    const index_t cs(lhs[i].size());
+    const category_t categories(lhs[i].env().sset->categories());
 
     for (index_t j(0); j < cs; ++j)
       for (category_t c(0); c < categories; ++c)
       {
         const locus l{j, c};
-        if (individuals_[i][l] != x[i][l])
+        if (lhs[i][l] != rhs[i][l])
           ++d;
       }
   }
