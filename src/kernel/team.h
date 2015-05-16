@@ -104,7 +104,11 @@ private:  // Private data members
   mutable hash_t signature_;
 };
 
+// ***********************************************************************
+// *  Comparison operators                                               *
+// ***********************************************************************
 template<class T> bool operator==(const team<T> &, const team<T> &);
+
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
 // The SFINAE way of recognize a team.

@@ -220,8 +220,7 @@ hash_t team<T>::hash() const
 /// \param[in] rhs second term of comparision.
 /// \return `true` if the two teams are equal (individual by individual).
 ///
-/// \note
-/// Age is not checked.
+/// \note Age is not checked.
 ///
 /// \relates team<T>
 ///

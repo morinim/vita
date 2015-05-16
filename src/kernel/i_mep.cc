@@ -301,8 +301,7 @@ category_t i_mep::category() const
 /// \return `true` if the two individuals are equal (symbol by symbol,
 ///         including introns).
 ///
-/// \note
-/// Age is not checked.
+/// \note Age is not checked.
 ///
 bool i_mep::operator==(const i_mep &x) const
 {
@@ -316,21 +315,27 @@ bool i_mep::operator==(const i_mep &x) const
 }
 
 ///
-/// \param[in] ind an individual to compare with `this`.
-/// \return a numeric measurement of the difference between `ind` and
-///         `this` (the number of different genes between individuals).
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return a numeric measurement of the difference between `lhs` and
+///         `rhs` (the number of different genes between individuals).
 ///
-unsigned i_mep::distance(const i_mep &ind) const
+/// \relates i_mep
+///
+unsigned distance(const i_mep &lhs, const i_mep &rhs)
 {
-  const index_t cs(size());
-  const category_t categories(env().sset->categories());
+  const index_t cs(lhs.size());
+  const category_t categories(lhs.env().sset->categories());
+
+  assert(cs == rhs.size());
+  assert(categories == rhs.env().sset->categories());
 
   unsigned d(0);
   for (index_t i(0); i < cs; ++i)
     for (category_t c(0); c < categories; ++c)
     {
       const locus l{i, c};
-      if (genome_(l) != ind.genome_(l))
+      if (lhs[l] != rhs[l])
         ++d;
     }
 

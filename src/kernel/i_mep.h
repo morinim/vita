@@ -63,9 +63,7 @@ public:
 
   void set(const locus &l, const gene &g);
 
-  // Comparison
   bool operator==(const i_mep &) const;
-  unsigned distance(const i_mep &) const;
 
   hash_t signature() const;
 
@@ -104,6 +102,8 @@ private:  // Private data members
   // of genes is starting here).
   locus best_;
 };  // class i_mep
+
+unsigned distance(const i_mep &, const i_mep &);
 
 ///
 /// \param[in] l locus of a `gene`.

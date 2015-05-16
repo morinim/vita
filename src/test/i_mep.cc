@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
     const vita::i_mep i1(ind);
 
     ind.mutation();
-    diff += i1.distance(ind);
+    diff += distance(i1, ind);
     length += i1.eff_size();
   }
 
@@ -143,19 +143,19 @@ BOOST_AUTO_TEST_CASE(Comparison)
   {
     vita::i_mep a(env);
     BOOST_REQUIRE_EQUAL(a, a);
-    BOOST_REQUIRE_EQUAL(a.distance(a), 0);
+    BOOST_REQUIRE_EQUAL(distance(a, a), 0);
 
     vita::i_mep b(a);
     BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
     BOOST_REQUIRE_EQUAL(a, b);
-    BOOST_REQUIRE_EQUAL(a.distance(b), 0);
+    BOOST_REQUIRE_EQUAL(distance(a, b), 0);
 
     vita::i_mep c(env);
     if (a.signature() != c.signature())
     {
       BOOST_REQUIRE_NE(a, c);
-      BOOST_REQUIRE_GT(a.distance(c), 0);
-      BOOST_REQUIRE_EQUAL(a.distance(c), c.distance(a));
+      BOOST_REQUIRE_GT(distance(a, c), 0);
+      BOOST_REQUIRE_EQUAL(distance(a, c), distance(c, a));
     }
   }
 }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
     BOOST_CHECK(ic.debug(true));
     BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
 
-    dist += i1.distance(ic);
+    dist += distance(i1, ic);
   }
 
   const double perc(100.0 * dist /
