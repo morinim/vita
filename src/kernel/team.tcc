@@ -216,21 +216,23 @@ hash_t team<T>::hash() const
 }
 
 ///
-/// \param[in] x second term of comparison.
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
 /// \return `true` if the two teams are equal (individual by individual).
 ///
 /// \note
 /// Age is not checked.
 ///
+/// \relates team<T>
+///
 template<class T>
-bool team<T>::operator==(const team<T> &x) const
+bool operator==(const team<T> &lhs, const team<T> &rhs)
 {
-  const auto sup(individuals());
-  for (auto i(decltype(sup){0}); i < sup; ++i)
-    if (!(individuals_[i] == x[i]))
-      return false;
+  const auto sup(lhs.individuals());
+  if (sup != rhs.individuals())
+    return false;
 
-  return true;
+  return std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
 
 ///

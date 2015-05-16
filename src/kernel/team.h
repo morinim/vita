@@ -48,7 +48,7 @@ namespace vita
 /// \see
 /// "Evolving Teams of Predictors with Linear Genetic Programming"
 /// (Markus Braimer, Wolfgang Banzhaf).
-  ///
+///
 template<class T>
 class team
 {
@@ -74,7 +74,6 @@ public:
 
   hash_t signature() const;
 
-  bool operator==(const team<T> &) const;
   unsigned distance(const team<T> &) const;
 
   unsigned age() const;
@@ -105,6 +104,7 @@ private:  // Private data members
   mutable hash_t signature_;
 };
 
+template<class T> bool operator==(const team<T> &, const team<T> &);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
 // The SFINAE way of recognize a team.
