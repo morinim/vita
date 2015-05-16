@@ -41,7 +41,7 @@ team<T>::team(const environment &e) : signature_()
 ///
 /// \param v a vector of individuals
 ///
-/// Builds a team containing the individuals of vector \a v.
+/// Builds a team containing the individuals of vector `v`.
 ///
 template<class T>
 team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
@@ -69,7 +69,7 @@ unsigned team<T>::mutation()
 /// \param[in] p probability of gene mutation.
 /// \return number of mutations performed.
 ///
-/// Mutates the individuals in \c this team and returns the number of mutations
+/// Mutates the individuals in `this` team and returns the number of mutations
 /// performed.
 ///
 template<class T>
@@ -178,7 +178,7 @@ unsigned team<T>::eff_size() const
 }
 
 ///
-/// \return the signature of \c this team.
+/// \return the signature of `this` team.
 ///
 /// Signature maps syntactically distinct (but logically equivalent)
 /// teams to the same value.
@@ -201,7 +201,7 @@ hash_t team<T>::signature() const
 }
 
 ///
-/// \return the signature of \c this team.
+/// \return the signature of `this` team.
 ///
 ///
 template<class T>
@@ -217,7 +217,7 @@ hash_t team<T>::hash() const
 
 ///
 /// \param[in] x second term of comparison.
-/// \return \c true if the two teams are equal (individual by individual).
+/// \return `true` if the two teams are equal (individual by individual).
 ///
 /// \note
 /// Age is not checked.
@@ -234,8 +234,8 @@ bool team<T>::operator==(const team<T> &x) const
 }
 
 ///
-/// \param[in] x a team to compare with \c this.
-/// \return a numeric measurement of the difference between \a x and \c this
+/// \param[in] x a team to compare with `this`.
+/// \return a numeric measurement of the difference between `x` and `this`
 /// (the number of different genes between teams).
 ///
 template<class T>
@@ -294,8 +294,8 @@ const environment &team<T>::env() const
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the team passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the team passes the internal consistency check.
 ///
 template<class T>
 bool team<T>::debug(bool verbose) const
@@ -312,7 +312,7 @@ bool team<T>::debug(bool verbose) const
 
 ///
 /// \param[in] in input stream.
-/// \return \c true if team was loaded correctly.
+/// \return `true` if team was loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current team isn't modified.
@@ -345,7 +345,7 @@ bool team<T>::load(std::istream &in)
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if team was saved correctly.
+/// \return `true` if team was saved correctly.
 ///
 template<class T>
 bool team<T>::save(std::ostream &out) const
@@ -364,7 +364,7 @@ bool team<T>::save(std::ostream &out) const
 ///
 /// \param[out] s output stream.
 /// \param[in] t team to print.
-/// \return output stream including \a t.
+/// \return output stream including `t`.
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
@@ -378,7 +378,7 @@ std::ostream &operator<<(std::ostream &s, const team<T> &t)
 /// \param[out] s output stream.
 ///
 /// The output stream contains a graph, described in dot language
-/// (http://www.graphviz.org), of \c this team.
+/// (http://www.graphviz.org), of `this` team.
 ///
 template<class T>
 void team<T>::graphviz(std::ostream &s) const
@@ -397,7 +397,7 @@ void team<T>::graphviz(std::ostream &s) const
 ///
 /// \param[out] s output stream
 ///
-/// The \a team is printed on a single line with symbols separated by
+/// The team is printed on a single line with symbols separated by
 /// spaces and individuals between curly braces.
 /// Not at all human readable, but a compact representation for import/export.
 ///

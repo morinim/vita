@@ -18,7 +18,7 @@ int main()
 {
   using namespace vita;
 
-  src_problem titanic("titanic_train.csv");  // reading training set
+  src_problem titanic("titanic_train.csv");
 
   if (!titanic)
     return EXIT_FAILURE;
