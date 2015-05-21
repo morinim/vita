@@ -18,38 +18,38 @@
 
 namespace vita
 {
-  ///
-  /// \tparam T the type of individual used
-  ///
-  /// Provides a surrogate for an \a evaluator to control access to it. The
-  /// reason for controlling access is to cache fitness scores of individuals.
-  /// \c evaluator_proxy uses an ad-hoc internal hash table (\a ttable).
-  ///
-  template<class T>
-  class evaluator_proxy : public evaluator<T>
-  {
-  public:
-    evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
+///
+/// \tparam T the type of individual used
+///
+/// Provides a surrogate for an \a evaluator to control access to it. The
+/// reason for controlling access is to cache fitness scores of individuals.
+/// \c evaluator_proxy uses an ad-hoc internal hash table (\a ttable).
+///
+template<class T>
+class evaluator_proxy : public evaluator<T>
+{
+public:
+  evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
 
-    virtual void clear(typename evaluator<T>::clear_flag) override;
-    virtual void clear(const T &) override;
+  virtual void clear(typename evaluator<T>::clear_flag) override;
+  virtual void clear(const T &) override;
 
-    virtual fitness_t operator()(const T &) override;
-    virtual fitness_t fast(const T &) override;
+  virtual fitness_t operator()(const T &) override;
+  virtual fitness_t fast(const T &) override;
 
-    virtual std::string info() const override;
+  virtual std::string info() const override;
 
-    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
-    virtual unsigned seen(const T &) const override;
+  virtual unsigned seen(const T &) const override;
 
-  private:
-    // Access to the real evaluator.
-    std::unique_ptr<evaluator<T>> eva_;
+private:
+  // Access to the real evaluator.
+  std::unique_ptr<evaluator<T>> eva_;
 
-    // Transposition table (hash table cache).
-    ttable cache_;
-  };
+  // Transposition table (hash table cache).
+  ttable cache_;
+};
 
 #include "kernel/evaluator_proxy.tcc"
 }  // namespace vita
