@@ -31,17 +31,17 @@ class evaluator_proxy : public evaluator<T>
 public:
   evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
 
-  virtual void clear(typename evaluator<T>::clear_flag) override;
-  virtual void clear(const T &) override;
+  void clear(typename evaluator<T>::clear_flag);
+  void clear(const T &);
 
-  virtual fitness_t operator()(const T &) override;
-  virtual fitness_t fast(const T &) override;
+  fitness_t operator()(const T &);
+  fitness_t fast(const T &);
 
-  virtual std::string info() const override;
+  std::string info() const;
 
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
 
-  virtual unsigned seen(const T &) const override;
+  unsigned seen(const T &) const;
 
 private:
   // Access to the real evaluator.
