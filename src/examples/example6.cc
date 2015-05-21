@@ -65,7 +65,7 @@ double Z::val;
 
 class my_evaluator : public vita::evaluator<vita::i_mep>
 {
-  vita::fitness_t operator()(const vita::i_mep &ind)
+  virtual vita::fitness_t operator()(const vita::i_mep &ind) override
   {
     vita::interpreter<vita::i_mep> agent(&ind);
 
