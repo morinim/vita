@@ -29,6 +29,8 @@ constexpr double epsilon(0.00001);
 
 #define TEST_WTA
 
+template<class T> using reg_model = vita::basic_reg_lambda_f<T, true>;
+
 BOOST_AUTO_TEST_SUITE(lambda)
 
 template<template<class> class L, class T, unsigned P>
@@ -50,11 +52,11 @@ struct build<L, T, 0>
 };
 
 template<class T>
-struct build<vita::reg_lambda_f, T, 0>
+struct build<reg_model, T, 0>
 {
-  vita::reg_lambda_f<T> operator()(const T &prg, vita::data *) const
+  reg_model<T> operator()(const T &prg, vita::data *) const
   {
-    return vita::reg_lambda_f<T>(prg);
+    return reg_model<T>(prg);
   }
 };
 
@@ -127,16 +129,16 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF ONE INDIVIDUAL");
-  test_team_of_one<reg_lambda_f>(pr);
+  test_team_of_one<reg_model>(pr);
 
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep ind(pr.env);
-    const reg_lambda_f<i_mep> li(ind);
+    const reg_model<i_mep> li(ind);
 
     const team<i_mep> t{{ind, ind, ind, ind}};
-    const reg_lambda_f<team<i_mep>> lt(t);
+    const reg_model<team<i_mep>> lt(t);
 
     for (const auto &e : *pr.data())
     {
@@ -162,13 +164,13 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     const i_mep i3(pr.env);
     const i_mep i4(pr.env);
 
-    const reg_lambda_f<i_mep> lambda1(i1);
-    const reg_lambda_f<i_mep> lambda2(i2);
-    const reg_lambda_f<i_mep> lambda3(i3);
-    const reg_lambda_f<i_mep> lambda4(i4);
+    const reg_model<i_mep> lambda1(i1);
+    const reg_model<i_mep> lambda2(i2);
+    const reg_model<i_mep> lambda3(i3);
+    const reg_model<i_mep> lambda4(i4);
 
     const team<i_mep> t{{i1, i2, i3, i4}};
-    const reg_lambda_f<team<i_mep>> lambda_team(t);
+    const reg_model<team<i_mep>> lambda_team(t);
 
     for (const auto &e : *pr.data())
     {
@@ -223,13 +225,13 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
   for (unsigned k(0); k < 1000; ++k)
   {
     const i_mep ind(pr.env);
-    const reg_lambda_f<i_mep> lambda1(ind);
+    const reg_model<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
     const i_mep ind2(pr.env);
-    reg_lambda_f<i_mep> lambda2(ind2);
+    reg_model<i_mep> lambda2(ind2);
     BOOST_REQUIRE(lambda2.load(ss));
     BOOST_REQUIRE(lambda2.debug());
 

@@ -389,11 +389,14 @@ public:
 // ***********************************************************************
 // *  Template aliases to simplify the syntax and help the end user      *
 // ***********************************************************************
-template<class T> using dyn_slot_lambda_f =
-  basic_dyn_slot_lambda_f<T, true, true>;
-template<class T> using gaussian_lambda_f =
-  basic_gaussian_lambda_f<T, true, true>;
-template<class T> using binary_lambda_f = basic_binary_lambda_f<T, true, true>;
+template<class T>
+using dyn_slot_lambda_f = basic_dyn_slot_lambda_f<T, true, true>;
+
+template<class T>
+using gaussian_lambda_f = basic_gaussian_lambda_f<T, true, true>;
+
+template<class T>
+using binary_lambda_f = basic_binary_lambda_f<T, true, true>;
 
 #include "kernel/lambda_f.tcc"
 }  // namespace vita
