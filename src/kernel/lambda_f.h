@@ -93,7 +93,7 @@ class basic_reg_lambda_f : public reg_lambda_f<T>,
                            public detail::core_reg_lambda_f<T, S>
 {
 public:
-  basic_reg_lambda_f(const T &);
+  explicit basic_reg_lambda_f(const T &);
 
   virtual any operator()(const data::example &) const override;
 
@@ -339,7 +339,8 @@ protected:
 };
 
 ///
-/// \brief Slotted Dynamic Class Boundary Determination specialization for teams
+/// \brief Slotted Dynamic Class Boundary Determination specialization for
+///        teams
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
