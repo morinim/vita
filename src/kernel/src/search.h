@@ -58,11 +58,12 @@ private:  // NVI template methods
   virtual void tune_parameters_nvi() override;
 
 private:  // Private support methods
-  double accuracy(const T &) const;
+  struct metrics;
+  metrics calculate_metrics(const T &) const;
   void dss(unsigned) const;
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned);
-  void print_resume(bool, const fitness_t &, double) const;
+  void print_resume(bool, const fitness_t &, const metrics &) const;
 
 private:  // Private data members
   // Preferred evaluator for symbolic regression.

@@ -17,17 +17,24 @@
 #if !defined(VITA_SRC_SEARCH_TCC)
 #define      VITA_SRC_SEARCH_TCC
 
+template<class T, template<class> class ES>
+struct src_search<T, ES>::metrics
+{
+  double accuracy = std::numeric_limits<decltype(accuracy)>::max();
+  double f1_score = std::numeric_limits<decltype(f1_score)>::quiet_NaN();
+};
+
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
 ///              the lifetime of `this` class.
-/// \param[in] metrics a bit field used to store a set of flags regarding the
-///                    performance metrics calculated during the search.
+/// \param[in] m a bit field used to store matrics regarding the performance
+///              of the best program found.
 ///
 template<class T, template<class> class ES>
-src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
+src_search<T, ES>::src_search(src_problem &p, unsigned m)
   : search<T, ES>(p),
     p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian),
-    m_accuracy(metrics & metric::accuracy)
+    m_accuracy(m & metric::accuracy)
 {
   assert(p.debug(true));
 
@@ -54,15 +61,18 @@ src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
 /// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
-double src_search<T, ES>::accuracy(const T &ind) const
+typename src_search<T, ES>::metrics src_search<T, ES>::calculate_metrics(
+  const T &ind) const
 {
+  metrics m;
+
   if (m_accuracy || this->env_.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(ind));
-    return model->measure(accuracy_metric<T>(), *this->prob_.data());
+    m.accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
   }
 
-  return this->env_.threshold.accuracy;
+  return m;
 }
 
 ///
@@ -438,9 +448,9 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
     // validation fitness for the current run.
     fitness_t run_fitness;
 
-    // Depending on validation, this can be the training accuracy or the
-    // validation accuracy for the current run.
-    double run_accuracy(-1.0);
+    // Depending on `validation`, these metrics can refer to the training set
+    // or to the validation set (anyway they're regards the current run).
+    metrics run_metrics;
 
     if (validation)
     {
@@ -450,7 +460,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       eval.clear(s.best.solution);
 
       run_fitness = this->fitness(s.best.solution);
-      run_accuracy = accuracy(s.best.solution);
+      run_metrics = calculate_metrics(s.best.solution);
 
       data.dataset(backup);
       eval.clear(s.best.solution);
@@ -472,21 +482,22 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       else
         run_fitness = s.best.fitness;
 
-      run_accuracy = accuracy(s.best.solution);
+      run_metrics = calculate_metrics(s.best.solution);
     }
 
-    print_resume(validation, run_fitness, run_accuracy);
+    print_resume(validation, run_fitness, run_metrics);
 
     if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
-      overall_summary.best = {s.best.solution, run_fitness, run_accuracy};
+      overall_summary.best = {s.best.solution, run_fitness,
+                              run_metrics.accuracy};
       best_run = r;
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(
       dominating(run_fitness, this->env_.threshold.fitness) &&
-      run_accuracy >= this->env_.threshold.accuracy);
+      run_metrics.accuracy >= this->env_.threshold.accuracy);
 
     if (solution_found)
     {
@@ -518,19 +529,20 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 ///
 /// \param[in] validation is it a validation or training resume?
 /// \param[in] fit fitness reached in the current run.
-/// \param[in] acc accuracy reached in the current run.
+/// \param[in] m metrics relative to the current run.
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
-                                     double acc) const
+                                     const metrics &m) const
 {
   if (this->env_.verbosity >= 2)
   {
     const std::string ds(validation ? " Validation" : " Training");
 
     std::cout << k_s_info << ds << " fitness: " << fit << '\n';
-    if (this->env_.threshold.accuracy >= 0.0)
-      std::cout << k_s_info << ds << " accuracy: " << 100.0 * acc << '%';
+    if (!std::isnan(m.accuracy))
+      std::cout << k_s_info << ds << " accuracy: " << 100.0 * m.accuracy
+                << '%';
 
     std::cout << "\n\n";
   }
