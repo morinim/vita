@@ -18,6 +18,7 @@
 #include "kernel/data.h"
 #include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"
+#include "kernel/src/model_metric.h"
 #include "kernel/team.h"
 #include "kernel/utility.h"
 
@@ -58,6 +59,8 @@ public:
 
   virtual std::string name(const any &) const = 0;
 
+  virtual double measure(const model_metric<T> &, const data &) const = 0;
+
   virtual bool debug() const = 0;
 
 public:   // Serialization
@@ -68,6 +71,12 @@ public:   // Serialization
 // ***********************************************************************
 // * Symbolic regression                                                 *
 // ***********************************************************************
+
+/// Often, working with regression models, we aren't interested in
+/// implementation details (i.e. class basic_reg_lambda_f) but only in the
+/// general class of the model (e.g. the measurement of some metric in class
+/// model_metric).
+template<class T> class reg_lambda_f : public lambda_f<T> {};
 
 ///
 /// \brief Transforms individual to a lambda function for regression
@@ -80,7 +89,7 @@ public:   // Serialization
 ///           not persistence
 ///
 template<class T, bool S>
-class basic_reg_lambda_f : public lambda_f<T>,
+class basic_reg_lambda_f : public reg_lambda_f<T>,
                            public detail::core_reg_lambda_f<T, S>
 {
 public:
@@ -89,6 +98,8 @@ public:
   virtual any operator()(const data::example &) const override;
 
   virtual std::string name(const any &) const override;
+
+  virtual double measure(const model_metric<T> &, const data &) const override;
 
   virtual bool debug() const override;
 
@@ -105,6 +116,16 @@ private:  // Private support methods
 // * Classification                                                      *
 // ***********************************************************************
 
+/// Often, working with classification models, we aren't interested in
+/// implementation details (i.e. class basic_class_lambda_f) but only in the
+/// general class of the model (e.g. the measurement of some metric in
+/// class model_metric).
+template<class T> class class_lambda_f : public lambda_f<T>
+{
+public:
+  virtual std::pair<class_t, double> tag(const data::example &) const = 0;
+};
+
 ///
 /// \brief The basic interface of a classification lambda class
 ///
@@ -118,16 +139,17 @@ private:  // Private support methods
 /// * optionally stores class names.
 ///
 template<class T, bool N>
-class basic_class_lambda_f : public lambda_f<T>,
+class basic_class_lambda_f : public class_lambda_f<T>,
                              public detail::class_names<N>
 {
 public:
   explicit basic_class_lambda_f(const data &);
 
-  virtual std::pair<class_t, double> tag(const data::example &) const = 0;
   virtual any operator()(const data::example &) const override;
 
   virtual std::string name(const any &) const override final;
+
+  virtual double measure(const model_metric<T> &, const data &) const override;
 
 public:   // Serialization
   virtual bool load(std::istream &) override;
@@ -367,8 +389,6 @@ public:
 // ***********************************************************************
 // *  Template aliases to simplify the syntax and help the end user      *
 // ***********************************************************************
-template<class T> using reg_lambda_f = basic_reg_lambda_f<T, true>;
-template<class T> using class_lambda_f = basic_class_lambda_f<T, true>;
 template<class T> using dyn_slot_lambda_f =
   basic_dyn_slot_lambda_f<T, true, true>;
 template<class T> using gaussian_lambda_f =

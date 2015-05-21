@@ -38,7 +38,7 @@ src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
 }
 
 ///
-/// param[in] ind an individual.
+/// \param[in] ind an individual.
 /// \return the accuracy of `ind`.
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
@@ -48,17 +48,19 @@ src_search<T, ES>::src_search(src_problem &p, unsigned metrics)
 /// * we explicitly asked for accuracy calculation (see the `src_search`
 ///   constructor).
 ///
-/// otherwise the function will skip accuracy calculation, returning a negative
+/// Otherwise the function will skip accuracy calculation, returning a negative
 /// value.
 ///
-/// \warning
-/// Could be very time consuming.
+/// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
 double src_search<T, ES>::accuracy(const T &ind) const
 {
   if (m_accuracy || this->env_.threshold.accuracy > 0.0)
-    return this->active_eva_->accuracy(ind);
+  {
+    const auto model(this->lambdify(ind));
+    return model->measure(accuracy_metric<T>(), *this->prob_.data());
+  }
 
   return this->env_.threshold.accuracy;
 }

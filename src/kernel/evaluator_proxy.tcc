@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -139,15 +139,6 @@ template<class T>
 void evaluator_proxy<T>::clear(const T &prg)
 {
   cache_.clear(prg.signature());
-}
-
-///
-/// \return the accuracy of \a prg.
-///
-template<class T>
-double evaluator_proxy<T>::accuracy(const T &prg) const
-{
-  return eva_->accuracy(prg);
 }
 
 ///

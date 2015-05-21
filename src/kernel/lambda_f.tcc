@@ -79,6 +79,20 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 }
 
 ///
+/// \brief Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`
+///
+/// \param[in] m a metric we are evaluating.
+/// \param[in] d a dataset.
+/// \return the value of `this` according to metric `m`.
+///
+template<class T, bool S>
+double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
+                                         const data &d) const
+{
+  return m(this, d);
+}
+
+///
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, bool S>
@@ -126,7 +140,21 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const data &d)
 template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const data::example &e) const
 {
-  return any(tag(e).first);
+  return any(this->tag(e).first);
+}
+
+///
+/// \brief Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`
+///
+/// \param[in] m a metric we are evaluating.
+/// \param[in] d a dataset.
+/// \return the value of `this` according to metric `m`.
+///
+template<class T, bool N>
+double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
+                                           const data &d) const
+{
+  return m(this, d);
 }
 
 ///

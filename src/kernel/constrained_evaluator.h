@@ -39,8 +39,6 @@ public:
   virtual fitness_t operator()(const T &) override;
   virtual fitness_t fast(const T &) override;
 
-  virtual double accuracy(const T &) const override;
-
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:

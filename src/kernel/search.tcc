@@ -70,7 +70,7 @@ bool search<T, ES>::stop_condition(const summary<T> &s) const
 /// The lambda function depends on the active evaluator.
 ///
 template<class T, template<class> class ES>
-std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind)
+std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind) const
 {
   return active_eva_->lambdify(ind);
 }

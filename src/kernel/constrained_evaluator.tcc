@@ -51,15 +51,6 @@ fitness_t constrained_evaluator<T, E, P>::fast(const T &prg)
 }
 
 ///
-/// \return the accuracy of `prg`.
-///
-template<class T, class E, class P>
-double constrained_evaluator<T, E, P>::accuracy(const T &prg) const
-{
-  return eva_.accuracy(prg);
-}
-
-///
 /// \param[in] prg a program (individual/team).
 /// \return a pointer to the executable version of `prg`.
 ///

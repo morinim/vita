@@ -21,7 +21,7 @@
 /// \param[in] d dataset that the evaluator will use.
 ///
 template<class T>
-src_evaluator<T>::src_evaluator(data &d) : dat_(&d)
+src_evaluator<T>::src_evaluator(vita::data &d) : dat_(&d)
 {
 }
 
@@ -94,35 +94,6 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 }
 
 ///
-/// \param[in] prg program (individual/team) used for scoring accuracy.
-/// \return the accuracy.
-///
-template<class T>
-double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
-{
-  assert(!this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
-
-  const auto f(lambdify(prg));
-
-  std::uintmax_t ok(0), total_nr(0);
-
-  for (const auto &example : *this->dat_)
-  {
-    const any res((*f)(example));
-    if (!res.empty() &&
-        issmall(to<number>(res) - example.template cast_output<number>()))
-      ++ok;
-
-    ++total_nr;
-  }
-
-  assert(total_nr);
-
-  return static_cast<double>(ok) / static_cast<double>(total_nr);
-}
-
-///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
 ///                function.
 /// \return the lambda function associated with `prg` (`nullptr` in case of
@@ -132,7 +103,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
   const T &prg) const
 {
-  return make_unique<reg_lambda_f<T>>(prg);
+  return make_unique<basic_reg_lambda_f<T, true>>(prg);
 }
 
 ///
@@ -259,34 +230,6 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 }
 
 ///
-/// \param[in] prg program (individual/team) used for scoring accuracy.
-/// \return the accuracy.
-///
-template<class T>
-double classification_evaluator<T>::accuracy(const T &prg) const
-{
-  assert(this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
-
-  const auto f(this->lambdify(prg));
-
-  std::uintmax_t ok(0), total_nr(0);
-
-  for (const auto &example : *this->dat_)
-  {
-    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example).first ==
-        example.template tag())
-      ++ok;
-
-    ++total_nr;
-  }
-
-  assert(total_nr);
-
-  return static_cast<double>(ok) / static_cast<double>(total_nr);
-}
-
-///
 /// \param[in] d training data.
 /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
 ///                   Determination algorithm.
@@ -353,7 +296,7 @@ template<class T>
 fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 {
   assert(ind.debug());
-  assert(this->dat_->classes() > 1);
+  assert(this->dat_->classes() >= 2);
 
   basic_gaussian_lambda_f<T, false, false> lambda(ind, *this->dat_);
 
@@ -405,14 +348,12 @@ std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
 template<class T>
 fitness_t binary_evaluator<T>::operator()(const T &ind)
 {
-  auto &dataset(*this->dat_);
+  assert(this->dat_->classes() == 2);
 
-  assert(dataset.classes() == 2);
-
-  basic_binary_lambda_f<T, false, false> agent(ind, dataset);
+  basic_binary_lambda_f<T, false, false> agent(ind, *this->dat_);
   fitness_t::value_type err(0.0);
 
-  for (auto &example : dataset)
+  for (auto &example : *this->dat_)
     if (example.tag() != agent.tag(example).first)
     {
       ++example.difficulty;

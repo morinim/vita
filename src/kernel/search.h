@@ -46,13 +46,13 @@ class search
 public:
   explicit search(problem &);
 
-  std::unique_ptr<lambda_f<T>> lambdify(const T &);
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
 
   summary<T> run(unsigned = 1);
 
   bool debug(bool) const;
 
-protected: // Protected support methods
+protected:  // Protected support methods
   fitness_t fitness(const T &);
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   virtual bool stop_condition(const summary<T> &) const;

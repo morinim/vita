@@ -33,8 +33,8 @@ namespace vita
 /// \note
 /// Our convention is to convert raw fitness to standardized fitness. The
 /// requirements for standardized fitness are:
-/// * bigger values represent better choices;
-/// * (useful but not mandatory) optimal value is 0.
+/// - bigger values represent better choices;
+/// - (useful but not mandatory) optimal value is 0.
 ///
 /// \warning
 /// This class shouldn't be confused with the vita::interpreter class (that
@@ -50,7 +50,6 @@ public:
   virtual fitness_t operator()(const T &) = 0;
 
   // The following methods have a default implementation (usually empty).
-  virtual double accuracy(const T &) const;
   virtual void clear(clear_flag);
   virtual void clear(const T &);
   virtual fitness_t fast(const T &);

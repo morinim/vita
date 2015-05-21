@@ -33,29 +33,6 @@ fitness_t evaluator<T>::fast(const T &i)
 }
 
 ///
-/// \return the accuracy of a program. A negative value means that accuracy
-///         isn't available (`-1.0` is the default value returned).
-///
-/// Accuracy refers to the number of training examples that are correctly
-/// valued/classified as a proportion of the total number of examples in
-/// the training set. According to this design, the best accuracy is 1.0
-/// (100%), meaning that all the training examples have been correctly
-/// recognized.
-///
-/// \note
-/// Accuracy and fitness aren't the same thing.
-/// Accuracy can be used to measure fitness but it sometimes hasn't
-/// enough "granularity"; also it isn't appropriated for classification
-/// tasks with imbalanced learning data (where at least one class is
-/// under/over represented relative to others).
-///
-template<class T>
-double evaluator<T>::accuracy(const T &) const
-{
-  return -1.0;
-}
-
-///
 /// \return `0`.
 ///
 /// Some evaluators keep additional statistics about the individual seen

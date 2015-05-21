@@ -35,7 +35,7 @@ public:
   explicit src_evaluator(data &);
 
 protected:
-  data *dat_;
+  class data *dat_;
 };
 
 ///
@@ -54,8 +54,6 @@ public:
   virtual fitness_t operator()(const T &) override;
   virtual fitness_t fast(const T &) override;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
-
-  virtual double accuracy(const T &) const override;
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
@@ -176,8 +174,6 @@ class classification_evaluator : public src_evaluator<T>
 {
 public:
   explicit classification_evaluator(data &d) : src_evaluator<T>(d) {}
-
-  virtual double accuracy(const T &) const override;
 };
 
 ///
