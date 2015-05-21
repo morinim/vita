@@ -21,9 +21,9 @@ namespace vita
 ///
 /// \tparam T the type of individual used
 ///
-/// Provides a surrogate for an \a evaluator to control access to it. The
+/// Provides a surrogate for an evaluator to control access to it. The
 /// reason for controlling access is to cache fitness scores of individuals.
-/// \c evaluator_proxy uses an ad-hoc internal hash table (\a ttable).
+/// evaluator_proxy uses an ad-hoc internal hash table (ttable).
 ///
 template<class T>
 class evaluator_proxy : public evaluator<T>

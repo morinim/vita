@@ -19,7 +19,7 @@
 
 ///
 /// \param[in] eva pointer that lets the proxy access the real evaluator.
-/// \param[in] ts 2^\a ts is the number of elements of the cache.
+/// \param[in] ts `2^ts` is the number of elements of the cache.
 ///
 template<class T>
 evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
@@ -32,7 +32,7 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
 
 ///
 /// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the fitness of \a ind.
+/// \return the fitness of `prg`.
 ///
 template<class T>
 fitness_t evaluator_proxy<T>::operator()(const T &prg)
@@ -99,7 +99,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 
 ///
 /// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the an approximation of the fitness of \a i.
+/// \return the an approximation of the fitness of `prg`.
 ///
 template<class T>
 fitness_t evaluator_proxy<T>::fast(const T &prg)
@@ -133,7 +133,7 @@ void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
 ///
 /// \param[in] prg a program (individual/team).
 ///
-/// Clears the cached informations for program \a prg.
+/// Clears the cached informations for program `prg`.
 ///
 template<class T>
 void evaluator_proxy<T>::clear(const T &prg)
@@ -143,7 +143,7 @@ void evaluator_proxy<T>::clear(const T &prg)
 
 ///
 /// \param[in] prg a program (individual/team).
-/// \return how many times we have seen the program \a prg from during the
+/// \return how many times we have seen the program `prg` from during the
 ///         current run of the evolution / the last call of the clear
 ///         function.
 ///
@@ -167,7 +167,7 @@ std::string evaluator_proxy<T>::info() const
 
 ///
 /// \param[in] prg a program (individual/team).
-/// \return a pointer to the executable version of \a prg.
+/// \return a pointer to the executable version of `prg`.
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
