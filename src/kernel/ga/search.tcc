@@ -73,6 +73,8 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
 template<class T, template<class> class ES, class F>
 summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 {
+  auto &eval(*this->active_eva_);  // just a shorthand
+
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
@@ -84,38 +86,33 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto &eval(*this->active_eva_);  // just a short-cut
     evolution<T, ES> evo(this->env_, eval, nullptr, nullptr);
-    summary<T> s(evo.run(r));
+    summary<T> run_summary(evo.run(r));
 
-    // The training fitness for the current run.
-    fitness_t run_fitness;
+    print_resume(run_summary.best.score.fitness);
 
-    run_fitness = s.best.fitness;
-
-    print_resume(run_fitness);
-
-    if (r == 0 || run_fitness > overall_summary.best.fitness)
+    if (r == 0 ||
+        run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
-      overall_summary.best = {s.best.solution, run_fitness, -1.0};
+      overall_summary.best = run_summary.best;
       best_run = r;
     }
 
     // We use fitness to identify successful runs.
-    const bool solution_found(dominating(run_fitness,
+    const bool solution_found(dominating(run_summary.best.score.fitness,
                                          this->env_.threshold.fitness));
 
     if (solution_found)
     {
-      overall_summary.last_imp += s.last_imp;
+      overall_summary.last_imp += run_summary.last_imp;
 
       good_runs.push_back(r);
     }
 
-    if (isfinite(run_fitness))
-      fd.add(run_fitness);
+    if (isfinite(run_summary.best.score.fitness))
+      fd.add(run_summary.best.score.fitness);
 
-    overall_summary.elapsed += s.elapsed;
+    overall_summary.elapsed += run_summary.elapsed;
 
     assert(good_runs.empty() ||
            std::find(good_runs.begin(), good_runs.end(), best_run) !=
@@ -173,7 +170,7 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
     pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best.fitness);
+    pt.put(summary + "best.fitness", run_sum.best.score.fitness);
     pt.put(summary + "best.run", best_run);
     pt.put(summary + "best.solution.list", best_list.str());
 

@@ -25,13 +25,6 @@ constexpr std::underlying_type<metric_flags>::type operator&(metric_flags f1,
   return static_cast<type>(f1) & static_cast<type>(f2);
 }
 
-template<class T, template<class> class ES>
-struct src_search<T, ES>::measurements
-{
-  double accuracy = std::numeric_limits<decltype(accuracy)>::max();
-  double f1_score = std::numeric_limits<decltype(f1_score)>::quiet_NaN();
-};
-
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
 ///              the lifetime of `this` class.
@@ -53,7 +46,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 
 ///
 /// \param[in] ind an individual.
-/// \return metrics regarding `ind`.
+/// \param[out] res metrics regarding `ind`.
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
@@ -68,18 +61,14 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 /// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
-typename src_search<T, ES>::measurements src_search<T, ES>::calculate_metrics(
-  const T &ind) const
+void src_search<T, ES>::calculate_metrics(
+  const T &ind, typename summary<T>::measurements *out) const
 {
-  measurements m;
-
   if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(ind));
-    m.accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
+    out->accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
   }
-
-  return m;
 }
 
 ///
@@ -345,69 +334,69 @@ void src_search<T, ES>::tune_parameters_nvi()
 template<class T, template<class> class ES>
 void src_search<T, ES>::dss(unsigned generation) const
 {
-  if (this->prob_.data())
+  if (!this->prob_.data())
+    return;
+
+  data &d(*this->prob_.data());
+
+  std::uintmax_t weight_sum(0);
+  auto weight([](const data::example &v) -> decltype(weight_sum)
+              {
+                return v.difficulty + v.age * v.age * v.age;
+              });
+
+  d.dataset(data::training);
+  d.slice(false);
+  for (auto &i : d)
   {
-    data &d(*this->prob_.data());
-
-    std::uintmax_t weight_sum(0);
-    auto weight([](const data::example &v) -> decltype(weight_sum)
-                {
-                  return v.difficulty + v.age * v.age * v.age;
-                });
-
-    d.dataset(data::training);
-    d.slice(false);
-    for (auto &i : d)
-    {
-      if (generation == 0)  // preliminary setup for generation 0
-      {
-        i.difficulty = 0;
-        i.age        = 1;
-      }
-      else
-        ++i.age;
-
-      weight_sum += weight(i);
-    }
-
-    // Select a subset of the training examples.
-    // Training examples, contained in d, are partitioned into two subsets
-    // by multiple swaps (first subset: [0, count[,  second subset:
-    // [count, d.size()[).
-    // Note that the actual size of the selected subset (count) is not fixed
-    // and, in fact, it averages slightly above target_size (Gathercole and
-    // Ross felt that this might improve performance).
-    const auto s(static_cast<double>(d.size()));
-    const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
-    assert(0.2 <= ratio && ratio <= 0.6);
-    const auto target_size(s * ratio);
-    assert(0.0 <= target_size && target_size <= s);
-
-    data::iterator base(d.begin());
-    unsigned count(0);
-    for (auto i(d.begin()); i != d.end(); ++i)
-    {
-      const auto p1(static_cast<double>(weight(*i)) * target_size /
-                    static_cast<double>(weight_sum));
-      const auto prob(std::min(p1, 1.0));
-
-      if (random::boolean(prob))
-      {
-        std::iter_swap(base, i);
-        ++base;
-        ++count;
-      }
-    }
-
-    d.slice(std::max(count, 10u));
-    this->active_eva_->clear(evaluator<T>::all);
-
-    // Selected training examples have their difficulties and ages reset.
-    for (auto &i : d)
+    if (generation == 0)  // preliminary setup for generation 0
     {
       i.difficulty = 0;
       i.age        = 1;
     }
+    else
+      ++i.age;
+
+    weight_sum += weight(i);
+  }
+
+  // Select a subset of the training examples.
+  // Training examples, contained in d, are partitioned into two subsets
+  // by multiple swaps (first subset: [0, count[,  second subset:
+  // [count, d.size()[).
+  // Note that the actual size of the selected subset (count) is not fixed
+  // and, in fact, it averages slightly above target_size (Gathercole and
+  // Ross felt that this might improve performance).
+  const auto s(static_cast<double>(d.size()));
+  const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
+  assert(0.2 <= ratio && ratio <= 0.6);
+  const auto target_size(s * ratio);
+  assert(0.0 <= target_size && target_size <= s);
+
+  data::iterator base(d.begin());
+  unsigned count(0);
+  for (auto i(d.begin()); i != d.end(); ++i)
+  {
+    const auto p1(static_cast<double>(weight(*i)) * target_size /
+                  static_cast<double>(weight_sum));
+    const auto prob(std::min(p1, 1.0));
+
+    if (random::boolean(prob))
+    {
+      std::iter_swap(base, i);
+      ++base;
+      ++count;
+    }
+  }
+
+  d.slice(std::max(count, 10u));
+  this->active_eva_->clear(evaluator<T>::all);
+
+  // Selected training examples have their difficulties and ages reset.
+  for (auto &i : d)
+  {
+    i.difficulty = 0;
+    i.age        = 1;
   }
 }
 
@@ -418,11 +407,13 @@ void src_search<T, ES>::dss(unsigned generation) const
 template<class T, template<class> class ES>
 summary<T> src_search<T, ES>::run_nvi(unsigned n)
 {
+  assert(this->prob_.data());
+  auto &data(*this->prob_.data());
+
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
   unsigned best_run(0);
-
   std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
@@ -436,41 +427,34 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   const auto stop(std::bind(&src_search::stop_condition, this,
                             std::placeholders::_1));
 
-  assert(this->prob_.data());
-  auto &data(*this->prob_.data());
-
   const bool validation(0 < this->env_.validation_percentage &&
                         this->env_.validation_percentage < 100);
 
   if (validation)
     data.partition(this->env_.validation_percentage);
 
+  auto &eval(*this->active_eva_);  // Just a shorthand
+
   for (unsigned r(0); r < n; ++r)
   {
-    auto &eval(*this->active_eva_);  // Just a short cut
     evolution<T, ES> evo(this->env_, eval, stop, shake);
-    summary<T> s(evo.run(r));
+    summary<T> run_summary(evo.run(r));
 
-    // Depending on validation, this can be the training fitness or the
-    // validation fitness for the current run.
-    fitness_t run_fitness;
-
-    // Depending on `validation`, these metrics can refer to the training set
-    // or to the validation set (anyway they're regards the current run).
-    measurements run_measurements;
-
+    // Depending on `validation`, the metrics stored in run_summary.best.score
+    // can refer to the training set or to the validation set (anyway they
+    // regards the current run).
     if (validation)
     {
       const data::dataset_t backup(data.dataset());
 
       data.dataset(data::validation);
-      eval.clear(s.best.solution);
+      eval.clear(run_summary.best.solution);
 
-      run_fitness = this->fitness(s.best.solution);
-      run_measurements = calculate_metrics(s.best.solution);
+      run_summary.best.score.fitness = this->fitness(run_summary.best.solution);
+      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
 
       data.dataset(backup);
-      eval.clear(s.best.solution);
+      eval.clear(run_summary.best.solution);
     }
     else  // not using a validation set
     {
@@ -482,46 +466,45 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       {
         data.dataset(data::training);
         data.slice(false);
-        eval.clear(s.best.solution);
+        eval.clear(run_summary.best.solution);
 
-        run_fitness = this->fitness(s.best.solution);
+        run_summary.best.score.fitness =
+          this->fitness(run_summary.best.solution);
       }
-      else
-        run_fitness = s.best.fitness;
 
-      run_measurements = calculate_metrics(s.best.solution);
+      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
     }
 
-    print_resume(validation, run_fitness, run_measurements);
+    print_resume(validation, run_summary.best.score);
 
-    if (r == 0 || run_fitness > overall_summary.best.fitness)
+    if (r == 0 ||
+        run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
-      overall_summary.best = {s.best.solution, run_fitness,
-                              run_measurements.accuracy};
+      overall_summary.best = run_summary.best;
       best_run = r;
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(
-      dominating(run_fitness, this->env_.threshold.fitness) &&
-      run_measurements.accuracy >= this->env_.threshold.accuracy);
+      dominating(run_summary.best.score.fitness, this->env_.threshold.fitness) &&
+      run_summary.best.score.accuracy >= this->env_.threshold.accuracy);
 
     if (solution_found)
     {
-      overall_summary.last_imp += s.last_imp;
+      overall_summary.last_imp += run_summary.last_imp;
 
       good_runs.push_back(r);
     }
 
-    if (isfinite(run_fitness))
-      fd.add(run_fitness);
+    if (isfinite(run_summary.best.score.fitness))
+      fd.add(run_summary.best.score.fitness);
 
-    overall_summary.elapsed += s.elapsed;
+    overall_summary.elapsed += run_summary.elapsed;
 
     if (this->env_.arl == trilean::yes)
     {
       this->prob_.env.sset->reset_adf_weights();
-      arl(s.best.solution);
+      arl(run_summary.best.solution);
     }
 
     assert(good_runs.empty() ||
@@ -539,15 +522,15 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 /// \param[in] m metrics relative to the current run.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
-                                     const measurements &m) const
+void src_search<T, ES>::print_resume(
+  bool validation, const typename summary<T>::measurements &m) const
 {
   if (this->env_.verbosity >= 2)
   {
     const std::string ds(validation ? " Validation" : " Training");
 
-    std::cout << k_s_info << ds << " fitness: " << fit << '\n';
-    if (!std::isnan(m.accuracy))
+    std::cout << k_s_info << ds << " fitness: " << m.fitness << '\n';
+    if (0 <= m.accuracy && m.accuracy <= 1.0)
       std::cout << k_s_info << ds << " accuracy: " << 100.0 * m.accuracy
                 << '%';
 
@@ -591,8 +574,8 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best.fitness);
-    pt.put(summary + "best.accuracy", run_sum.best.accuracy);
+    pt.put(summary + "best.fitness", run_sum.best.score.fitness);
+    pt.put(summary + "best.accuracy", run_sum.best.score.accuracy);
     pt.put(summary + "best.run", best_run);
     pt.put(summary + "best.solution.tree", best_tree.str());
     pt.put(summary + "best.solution.list", best_list.str());

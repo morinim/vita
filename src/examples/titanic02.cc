@@ -16,17 +16,17 @@
 
 int main()
 {
-  vita::src_problem titanic("titanic_train.csv");  // reading training set
+  vita::src_problem titanic("titanic_train.csv");
 
   if (!titanic)
     return EXIT_FAILURE;
 
-  vita::src_search<> s(titanic, vita::metric::accuracy);
+  vita::src_search<> s(titanic, vita::metric_flags::accuracy);
   const auto summary(s.run(10));                   // starting search (10 runs)
                                                    // and getting a summary
 
   std::cout << summary.best.solution << '\n'
-            << summary.best.accuracy << '\n';
+            << summary.best.score.accuracy << '\n';
 
   return EXIT_SUCCESS;
 }

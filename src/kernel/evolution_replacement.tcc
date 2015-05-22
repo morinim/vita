@@ -78,10 +78,11 @@ void family_competition<T>::run(const std::vector<coord> &parent,
     }
   }
 
-  if (fit_off > s->best.fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    s->last_imp = s->gen;
-    s->best     = {offspring[0], fit_off};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 
@@ -125,10 +126,11 @@ void tournament<T>::run(const std::vector<coord> &parent,
   if (pop.env().elitism == trilean::no || replace)
     pop[rep_idx] = offspring[0];
 
-  if (fit_off > s->best.fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    s->last_imp =                        s->gen;
-    s->best     = {offspring[0], fit_off, -1.0};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 
@@ -262,7 +264,7 @@ void alps<T>::run(const std::vector<coord> &parent,
     ins = try_add_to_layer(layer, offspring[0]);
   }
 
-  if (f_off > s->best.fitness)
+  if (f_off > s->best.score.fitness)
   {
     // Sometimes a new best individual is discovered in a lower layer but he is
     // too old for its layer and the random tournament may choose only "not
@@ -274,8 +276,9 @@ void alps<T>::run(const std::vector<coord> &parent,
     if (!ins && pop.env().elitism == trilean::yes)
       try_add_to_layer(pop.layers() - 1, offspring[0]);
 
-    s->last_imp =                      s->gen;
-    s->best     = {offspring[0], f_off, -1.0};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = f_off;
   }
 }
 
@@ -322,10 +325,11 @@ void pareto<T>::run(const std::vector<coord> &parent,
     {
       pop[i] = offspring[0];
 
-      if (fit_off > s->best.fitness)
+      if (fit_off > s->best.score.fitness)
       {
-        s->last_imp =                        s->gen;
-        s->best     = {offspring[0], fit_off, -1.0};
+        s->last_imp           = s->gen;
+        s->best.solution      = offspring[0];
+        s->best.score.fitness = fit_off;
       }
 
       break;
@@ -350,10 +354,11 @@ void pareto<T>::run(const std::vector<coord> &parent,
   if (pop.env().elitism == trilean::no || !dominated)
     pop[parent.back()] = offspring[0];
 
-  if (fit_off > s->best.fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    s->last_imp =                        s->gen;
-    s->best     = {offspring[0], fit_off, -1.0};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 #endif  // Include guard

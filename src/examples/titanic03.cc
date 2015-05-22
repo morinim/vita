@@ -27,11 +27,11 @@ int main()
   titanic.env.individuals = 1000;
   titanic.env.generations =  200;
 
-  src_search<> s(titanic, metric::accuracy);
+  src_search<> s(titanic, metric_flags::accuracy);
   const auto summary(s.run(10));
 
   std::cout << summary.best.solution << '\n'
-            << summary.best.accuracy << '\n';
+            << summary.best.score.accuracy << '\n';
 
   return EXIT_SUCCESS;
 }

@@ -171,7 +171,7 @@ void evolution<T, ES>::log(unsigned run_count) const
       if (stats_.best.solution.empty())
         f_dyn << " ?";
       else
-        f_dyn << ' ' << stats_.best.fitness[0];
+        f_dyn << ' ' << stats_.best.score.fitness[0];
 
       f_dyn << ' ' << stats_.az.fit_dist().mean()[0]
             << ' ' << stats_.az.fit_dist().standard_deviation()[0]
@@ -240,7 +240,7 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
     if (status)
       std::cout << "Run " << run_count << '.' << std::setw(6)
                 << stats_.gen << " (" << std::setw(3)
-                << perc << "%): fitness " << stats_.best.fitness
+                << perc << "%): fitness " << stats_.best.score.fitness
                 << '\n';
     else
       std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
@@ -249,24 +249,35 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
 }
 
 ///
-/// \param[in] run_count run number (used for print and log).
+/// \param[in] run_count run number (used for printing and logging).
+/// \return a partial summary of the search (see notes).
 ///
 /// The genetic programming loop:
+///
 /// * select the individual(s) to participate (default algorithm: tournament
 ///   selection) in the genetic operation;
 /// * perform genetic operation creating a new offspring individual;
 /// * place the offspring into the original population (steady state)
 ///   replacing a bad individual.
+///
 /// This whole process repeats until the termination criteria is satisfied.
 /// With any luck, it will produce an individual that solves the problem at
 /// hand.
+///
+/// \note
+/// The return value is a partial summary: the `measurement` section is only
+/// partially filled (fitness) since many metrics are expensive to calculate
+/// and not significative for all kind of problems (e.g. f1-score for a
+/// symbolic regression problem). The src_search class has a simple scheme to
+/// request the computation of additional metrics.
 ///
 template<class T, template<class> class ES>
 const summary<T> &
 evolution<T, ES>::run(unsigned run_count)
 {
   stats_.clear();
-  stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}]), -1.0};
+  stats_.best.solution = pop_[{0, 0}];
+  stats_.best.score.fitness = eva_(stats_.best.solution);
 
   timer measure;
 
@@ -289,7 +300,7 @@ evolution<T, ES>::run(unsigned run_count)
       // cleared (the best individual and its fitness refer to an old
       // training set).
       assert(!stats_.best.solution.empty());
-      stats_.best.fitness = eva_(stats_.best.solution);
+      stats_.best.score.fitness = eva_(stats_.best.solution);
       print_progress(0, run_count, true);
     }
 
@@ -312,10 +323,10 @@ evolution<T, ES>::run(unsigned run_count)
       auto off(es_.recombination.run(parents));
 
       // --------- REPLACEMENT --------
-      const auto before(stats_.best.fitness);
+      const auto before(stats_.best.score.fitness);
       es_.replacement.run(parents, off, &stats_);
 
-      if (stats_.best.fitness != before)
+      if (stats_.best.score.fitness != before)
         print_progress(k, run_count, true);
     }
 

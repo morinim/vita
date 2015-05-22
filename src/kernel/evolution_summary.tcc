@@ -21,7 +21,7 @@
 /// Default constructor just call the summary::clear method.
 ///
 template<class T>
-summary<T>::summary() : az(), best{T(), fitness_t(), -1.0}, elapsed(0.0),
+summary<T>::summary() : az(), best{T(), measurements()}, elapsed(0.0),
                         crossovers(0), mutations(0), gen(0), last_imp(0)
 {
 }
@@ -57,18 +57,18 @@ bool summary<T>::load(std::istream &in, const environment &e)
     if (!tmp_ind.load(in))
       return false;
 
-    decltype(best.fitness) tmp_fitness;
+    decltype(best.score.fitness) tmp_fitness;
     if (!tmp_fitness.load(in))
       return false;
 
-    decltype(best.accuracy) tmp_accuracy;
+    decltype(best.score.accuracy) tmp_accuracy;
     if (!load_float_from_stream(in, &tmp_accuracy))
       return false;
 
-    tmp_summary.best = {tmp_ind, tmp_fitness, tmp_accuracy};
+    tmp_summary.best.solution = tmp_ind;
+    tmp_summary.best.score.fitness = tmp_fitness;
+    tmp_summary.best.score.accuracy = tmp_accuracy;
   }
-  else
-    tmp_summary.best = {T(), fitness_t(), -1.0};
 
   if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
            >> tmp_summary.crossovers >> tmp_summary.gen
@@ -95,8 +95,8 @@ bool summary<T>::save(std::ostream &out) const
   {
     out << "1\n";
     best.solution.save(out);
-    best.fitness.save(out);
-    save_float_to_stream(out, best.accuracy);
+    best.score.fitness.save(out);
+    save_float_to_stream(out, best.score.accuracy);
     out << '\n';
   }
 
