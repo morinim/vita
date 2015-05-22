@@ -20,7 +20,7 @@ namespace vita
 {
 ///
 /// There are a lot of metrics related to a model (a lambda_f) and we don't
-/// want a fat classes.
+/// want fat classes.
 /// The Visitor pattern is ideal to simplify the interface of lambda_f and
 /// to keep possibility for future expansions (new metrics).
 ///

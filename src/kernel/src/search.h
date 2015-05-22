@@ -27,10 +27,15 @@ enum class evaluator_id
   count = 0, mae, rmae, mse, bin, dyn_slot, gaussian, undefined
 };
 
-namespace metric
+enum class metric_flags : unsigned
 {
-constexpr unsigned accuracy = 1;
-}
+  nothing = 0x0000,
+
+  accuracy = 1 << 0,
+  f1_score = 1 << 1,
+
+  everything = 0xFFFF
+};
 
 ///
 /// \brief search for GP
@@ -45,7 +50,7 @@ template<class T = i_mep, template<class> class ES = std_es>
 class src_search : public search<T, ES>
 {
 public:
-  explicit src_search(src_problem &, unsigned = 0);
+  explicit src_search(src_problem &, metric_flags = metric_flags::nothing);
 
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);
@@ -58,12 +63,12 @@ private:  // NVI template methods
   virtual void tune_parameters_nvi() override;
 
 private:  // Private support methods
-  struct metrics;
-  metrics calculate_metrics(const T &) const;
+  struct measurements;
+  measurements calculate_metrics(const T &) const;
   void dss(unsigned) const;
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned);
-  void print_resume(bool, const fitness_t &, const metrics &) const;
+  void print_resume(bool, const fitness_t &, const measurements &) const;
 
 private:  // Private data members
   // Preferred evaluator for symbolic regression.
@@ -72,8 +77,8 @@ private:  // Private data members
   // Preferred evaluator for classification.
   evaluator_id p_class;
 
-  // Should we perform accuracy calculation during the search?
-  bool m_accuracy;
+  // Metrics we have to calculate during the search.
+  metric_flags metrics;
 };
 
 #include "kernel/src/search.tcc"

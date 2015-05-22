@@ -17,8 +17,16 @@
 #if !defined(VITA_SRC_SEARCH_TCC)
 #define      VITA_SRC_SEARCH_TCC
 
+constexpr std::underlying_type<metric_flags>::type operator&(metric_flags f1,
+                                                             metric_flags f2)
+{
+  using type = std::underlying_type<metric_flags>::type;
+
+  return static_cast<type>(f1) & static_cast<type>(f2);
+}
+
 template<class T, template<class> class ES>
-struct src_search<T, ES>::metrics
+struct src_search<T, ES>::measurements
 {
   double accuracy = std::numeric_limits<decltype(accuracy)>::max();
   double f1_score = std::numeric_limits<decltype(f1_score)>::quiet_NaN();
@@ -27,14 +35,13 @@ struct src_search<T, ES>::metrics
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
 ///              the lifetime of `this` class.
-/// \param[in] m a bit field used to store matrics regarding the performance
-///              of the best program found.
+/// \param[in] m a bit field used to specify matrics we have to calculate while
+///              searching.
 ///
 template<class T, template<class> class ES>
-src_search<T, ES>::src_search(src_problem &p, unsigned m)
+src_search<T, ES>::src_search(src_problem &p, metric_flags m)
   : search<T, ES>(p),
-    p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian),
-    m_accuracy(m & metric::accuracy)
+    p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian), metrics(m)
 {
   assert(p.debug(true));
 
@@ -46,7 +53,7 @@ src_search<T, ES>::src_search(src_problem &p, unsigned m)
 
 ///
 /// \param[in] ind an individual.
-/// \return the accuracy of `ind`.
+/// \return metrics regarding `ind`.
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
@@ -61,12 +68,12 @@ src_search<T, ES>::src_search(src_problem &p, unsigned m)
 /// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
-typename src_search<T, ES>::metrics src_search<T, ES>::calculate_metrics(
+typename src_search<T, ES>::measurements src_search<T, ES>::calculate_metrics(
   const T &ind) const
 {
-  metrics m;
+  measurements m;
 
-  if (m_accuracy || this->env_.threshold.accuracy > 0.0)
+  if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(ind));
     m.accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
@@ -450,7 +457,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 
     // Depending on `validation`, these metrics can refer to the training set
     // or to the validation set (anyway they're regards the current run).
-    metrics run_metrics;
+    measurements run_measurements;
 
     if (validation)
     {
@@ -460,7 +467,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       eval.clear(s.best.solution);
 
       run_fitness = this->fitness(s.best.solution);
-      run_metrics = calculate_metrics(s.best.solution);
+      run_measurements = calculate_metrics(s.best.solution);
 
       data.dataset(backup);
       eval.clear(s.best.solution);
@@ -482,22 +489,22 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       else
         run_fitness = s.best.fitness;
 
-      run_metrics = calculate_metrics(s.best.solution);
+      run_measurements = calculate_metrics(s.best.solution);
     }
 
-    print_resume(validation, run_fitness, run_metrics);
+    print_resume(validation, run_fitness, run_measurements);
 
     if (r == 0 || run_fitness > overall_summary.best.fitness)
     {
       overall_summary.best = {s.best.solution, run_fitness,
-                              run_metrics.accuracy};
+                              run_measurements.accuracy};
       best_run = r;
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(
       dominating(run_fitness, this->env_.threshold.fitness) &&
-      run_metrics.accuracy >= this->env_.threshold.accuracy);
+      run_measurements.accuracy >= this->env_.threshold.accuracy);
 
     if (solution_found)
     {
@@ -533,7 +540,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
-                                     const metrics &m) const
+                                     const measurements &m) const
 {
   if (this->env_.verbosity >= 2)
   {
