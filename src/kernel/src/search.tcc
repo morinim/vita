@@ -550,10 +550,11 @@ void src_search<T, ES>::print_resume(bool validation,
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES>
+template<class C>
 void src_search<T, ES>::log(const summary<T> &run_sum,
                             const distribution<fitness_t> &fd,
-                            const std::vector<unsigned> &good_runs,
-                            unsigned best_run, unsigned runs)
+                            const C &good_runs,
+                            typename C::value_type best_run, unsigned runs)
 {
   // Summary logging.
   if (this->env_.stat.summary)

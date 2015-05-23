@@ -79,7 +79,6 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
   distribution<fitness_t> fd;
 
   unsigned best_run(0);
-
   std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
@@ -115,8 +114,8 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
     overall_summary.elapsed += run_summary.elapsed;
 
     assert(good_runs.empty() ||
-           std::find(good_runs.begin(), good_runs.end(), best_run) !=
-           good_runs.end());
+           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
+           std::end(good_runs));
     log(overall_summary, fd, good_runs, best_run, n);
   }
 
@@ -147,10 +146,11 @@ void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES, class F>
+template<class C>
 void ga_search<T, ES, F>::log(const summary<T> &run_sum,
                               const distribution<fitness_t> &fd,
-                              const std::vector<unsigned> &good_runs,
-                              unsigned best_run, unsigned runs)
+                              const C &good_runs,
+                              typename C::value_type best_run, unsigned runs)
 {
   // Summary logging.
   if (this->env_.stat.summary)

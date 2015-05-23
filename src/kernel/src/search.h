@@ -65,8 +65,9 @@ private:  // NVI template methods
 private:  // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
-  void log(const summary<T> &, const distribution<fitness_t> &,
-           const std::vector<unsigned> &, unsigned, unsigned);
+  template<class C> void log(const summary<T> &,
+                             const distribution<fitness_t> &,
+                             const C &, typename C::value_type, unsigned);
   void print_resume(bool, const model_measurements &) const;
 
 private:  // Private data members

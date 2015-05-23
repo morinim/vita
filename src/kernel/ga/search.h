@@ -41,8 +41,9 @@ private:  // NVI template methods
   virtual void tune_parameters_nvi() override;
 
 private:  // Private support methods
-  void log(const summary<T> &, const distribution<fitness_t> &,
-           const std::vector<unsigned> &, unsigned, unsigned);
+  template<class C> void log(const summary<T> &,
+                             const distribution<fitness_t> &,
+                             const C &, typename C::value_type, unsigned);
   void print_resume(const fitness_t &) const;
 };
 
