@@ -14,6 +14,7 @@
 #define      VITA_EVOLUTION_SUMMARY_H
 
 #include "kernel/analyzer.h"
+#include "kernel/model_measurements.h"
 
 namespace vita
 {
@@ -35,19 +36,12 @@ public:   // Serialization
   bool save(std::ostream &) const;
 
 public:  // Public data members
-  struct measurements
-  {
-    fitness_t fitness = fitness_t();
-    double accuracy = std::numeric_limits<decltype(accuracy)>::max();
-    //double f1_score = std::numeric_limits<decltype(f1_score)>::quiet_NaN();
-  };
-
   analyzer<T> az;
 
   struct
   {
-    T         solution;
-    measurements score;
+    T               solution;
+    model_measurements score;
   } best;
 
   /// Time (in milliseconds) elapsed from evolution beginning.

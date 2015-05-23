@@ -61,8 +61,8 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 /// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::calculate_metrics(
-  const T &ind, typename summary<T>::measurements *out) const
+void src_search<T, ES>::calculate_metrics(const T &ind,
+                                          model_measurements *out) const
 {
   if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
   {
@@ -82,7 +82,7 @@ void src_search<T, ES>::calculate_metrics(
 /// \note
 /// No partial specialization for member functions of class templates is
 /// allowed but we need it for this method (we need partial specialization on
-/// T).
+/// `T`).
 /// The tipical work around is to introduce overloaded functions inside the
 /// class (this has the benefit that they have the same access to member
 /// variables, functions...).
@@ -485,9 +485,8 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found(
-      dominating(run_summary.best.score.fitness, this->env_.threshold.fitness) &&
-      run_summary.best.score.accuracy >= this->env_.threshold.accuracy);
+    const bool solution_found(run_summary.best.score >=
+                              this->env_.threshold);
 
     if (solution_found)
     {
@@ -508,8 +507,9 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
     }
 
     assert(good_runs.empty() ||
-           std::find(good_runs.begin(), good_runs.end(), best_run) !=
-           good_runs.end());
+           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
+           std::end(good_runs));
+
     log(overall_summary, fd, good_runs, best_run, n);
   }
 
@@ -522,14 +522,15 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
 /// \param[in] m metrics relative to the current run.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::print_resume(
-  bool validation, const typename summary<T>::measurements &m) const
+void src_search<T, ES>::print_resume(bool validation,
+                                     const model_measurements &m) const
 {
   if (this->env_.verbosity >= 2)
   {
     const std::string ds(validation ? " Validation" : " Training");
 
     std::cout << k_s_info << ds << " fitness: " << m.fitness << '\n';
+
     if (0 <= m.accuracy && m.accuracy <= 1.0)
       std::cout << k_s_info << ds << " accuracy: " << 100.0 * m.accuracy
                 << '%';

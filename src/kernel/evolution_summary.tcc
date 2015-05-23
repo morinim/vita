@@ -21,7 +21,7 @@
 /// Default constructor just call the summary::clear method.
 ///
 template<class T>
-summary<T>::summary() : az(), best{T(), measurements()}, elapsed(0.0),
+summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0.0),
                         crossovers(0), mutations(0), gen(0), last_imp(0)
 {
 }

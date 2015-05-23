@@ -63,11 +63,11 @@ private:  // NVI template methods
   virtual void tune_parameters_nvi() override;
 
 private:  // Private support methods
-  void calculate_metrics(const T &, typename summary<T>::measurements *) const;
+  void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned);
-  void print_resume(bool, const typename summary<T>::measurements &) const;
+  void print_resume(bool, const model_measurements &) const;
 
 private:  // Private data members
   // Preferred evaluator for symbolic regression.

@@ -18,7 +18,7 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-#include "kernel/fitness.h"
+#include "kernel/model_measurements.h"
 #include "kernel/symbol_set.h"
 #include "kernel/trilean.h"
 
@@ -204,18 +204,10 @@ public:  // Data members
     std::string tst_name = "test";
   } stat;
 
-  struct
-  {
-    /// `fitness` is used to identify successfully learned (matched, classified
-    /// resolved...) examples by fitness comparison.
-    fitness_t fitness;
-
-    /// `accuracy` is used to identify successfully learned (matched,
-    /// classified, resolved...) examples by accuracy comparison.
-    /// \note
-    /// a negative value means not used (only `fitness` is used).
-    double accuracy = -1.0;
-  } threshold;
+  /// Used to identify successfully learned (matched, classified, resolved...)
+  /// examples.
+  /// By default only fitness is considered.
+  model_measurements threshold = {fitness_t(), -1.0};
 
   ///
   /// \brief Parameters for the Age-Layered Population Structure (ALPS)
