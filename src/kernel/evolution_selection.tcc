@@ -57,10 +57,10 @@ coord strategy<T>::pickup() const
 
 ///
 /// \param[in] l a layer.
-/// \param[in] p the probability of extracting an individual in layer \a l
-///              (1 - \a p is the probability of extracting an individual
-///              in layer \a l-1).
-/// \return the coordinates of a random individual in layer \a l or \a l-1.
+/// \param[in] p the probability of extracting an individual in layer `l`
+///              (`1 - p` is the probability of extracting an individual
+///              in layer `l-1`).
+/// \return the coordinates of a random individual in layer `l` or `l-1`.
 ///
 template<class T>
 coord strategy<T>::pickup(unsigned l, double p) const
@@ -306,8 +306,8 @@ std::vector<coord> pareto<T>::run()
 
 ///
 /// \param[in] pool indexes of individuals in the population.
-/// \param[out] front the set of nondominated individuals of \a pool.
-/// \param[out] dominated the set of dominated individuals of \a pool.
+/// \param[out] front the set of nondominated individuals of `pool`.
+/// \param[out] dominated the set of dominated individuals of `pool.
 ///
 template<class T>
 void pareto<T>::front(const std::vector<unsigned> &pool,

@@ -33,8 +33,8 @@ namespace vita
 /// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
 ///
 /// \note
-/// The "template template parameter" approach allows coordination between T
-/// and ES to be handled by the search class, rather than in all the various
+/// The "template template parameter" approach allows coordination between `T`
+/// and `ES` to be handled by the search class, rather than in all the various
 /// code that specializes search.
 /// A very interesting description of this technique can be found in
 /// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
