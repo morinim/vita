@@ -361,7 +361,7 @@ void src_search<T, ES>::dss(unsigned generation) const
   }
 
   // Select a subset of the training examples.
-  // Training examples, contained in d, are partitioned into two subsets
+  // Training examples, contained in `d`, are partitioned into two subsets
   // by multiple swaps (first subset: [0, count[,  second subset:
   // [count, d.size()[).
   // Note that the actual size of the selected subset (count) is not fixed
@@ -703,14 +703,16 @@ bool src_search<T, ES>::debug_nvi(bool verbose) const
   if (p_symre == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred sym.reg. evaluator.\n";
+      std::cerr << k_s_debug
+                << " Undefined ID for preferred sym.reg. evaluator\n";
     return false;
   }
 
   if (p_class == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred classification evaluator.\n";
+      std::cerr << k_s_debug
+                << "Undefined ID for preferred classification evaluator\n";
     return false;
   }
 
