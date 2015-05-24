@@ -385,17 +385,17 @@ bool symbol_set::collection::debug(bool verbose) const
 {
   decltype(sum) check_sum(0);
 
-  auto print_head = [this]() -> std::ostream &
+  auto print_head = [this](std::ostream &o) -> std::ostream &
                     {
-                      std::cerr << k_s_debug;
+                      o << k_s_debug;
                       if (symbols.empty())
-                        std::cerr << " Empty collection";
+                        o << " Empty collection";
                       else
-                        std::cerr << " Collection " << symbols[0]->category();
+                        o << " Collection " << symbols[0]->category();
 
-                      std::cerr << ": ";
+                      o << ": ";
 
-                      return std::cerr;
+                      return o;
                     };
 
   for (auto s : symbols)
@@ -403,7 +403,7 @@ bool symbol_set::collection::debug(bool verbose) const
     if (!s->debug())
     {
       if (verbose)
-        std::cerr << print_head() << "invalid symbol " << s->display() << "\n";
+        print_head(std::cerr) << "invalid symbol " << s->display() << "\n";
       return false;
     }
 
@@ -412,8 +412,8 @@ bool symbol_set::collection::debug(bool verbose) const
     if (s->weight == 0)
     {
       if (verbose)
-        std::cerr << print_head() << "null weight for symbol " << s->display()
-                  << "\n";
+        print_head(std::cerr) << "null weight for symbol " << s->display()
+                              << "\n";
       return false;
     }
 
@@ -424,8 +424,8 @@ bool symbol_set::collection::debug(bool verbose) const
           terminals.end())
       {
         if (verbose)
-          std::cerr << print_head() << "terminal " << s->display()
-                    << " not correctly stored\n";
+          print_head(std::cerr) << "terminal " << s->display()
+                                << " not correctly stored\n";
         return false;
       }
 
@@ -433,8 +433,8 @@ bool symbol_set::collection::debug(bool verbose) const
           std::find(adt.begin(), adt.end(), s) == adt.end())
       {
         if (verbose)
-          std::cerr << print_head() << "automatic defined terminal "
-                    << s->display() << " not correctly stored\n";
+          print_head(std::cerr) << "automatic defined terminal "
+                                << s->display() << " not correctly stored\n";
         return false;
       }
     }
@@ -444,8 +444,8 @@ bool symbol_set::collection::debug(bool verbose) const
       if (std::find(terminals.begin(), terminals.end(), s) != terminals.end())
       {
         if (verbose)
-          std::cerr << print_head() << "function " << s->display()
-                    << " not correctly stored\n";
+          print_head(std::cerr) << "function " << s->display()
+                                << " not correctly stored\n";
         return false;
       }
 
@@ -453,8 +453,8 @@ bool symbol_set::collection::debug(bool verbose) const
           std::find(adf.begin(), adf.end(), s) == adf.end())
       {
         if (verbose)
-          std::cerr << print_head() << "automatic defined function "
-                    << s->display() << " not correctly stored\n";
+          print_head(std::cerr) << "automatic defined function "
+                                << s->display() << " not correctly stored\n";
         return false;
       }
     }
@@ -463,8 +463,8 @@ bool symbol_set::collection::debug(bool verbose) const
   if (check_sum != sum)
   {
     if (verbose)
-      std::cerr << print_head() << "incorrect cached sum of weights (stored: "
-                << sum << ", correct: " << check_sum << ")\n";
+      print_head(std::cerr) << "incorrect cached sum of weights (stored: "
+                            << sum << ", correct: " << check_sum << ")\n";
     return false;
   }
 
@@ -478,31 +478,28 @@ bool symbol_set::collection::debug(bool verbose) const
   //     if (ssize && !terminals.size())
   //     {
   //       if (verbose)
-  //         std::cerr << print_head() << "no terminal in the symbol set\n";
+  //         print_head(std::cerr) << "no terminal in the symbol set\n";
   //       return false;
   //     }
 
   if (ssize < terminals.size())
   {
     if (verbose)
-      std::cerr << print_head()
-                << "wrong terminal set size (less than symbol set)\n";
-      return false;
+      print_head(std::cerr) << "wrong terminal set size (less than symbol set)\n";
+    return false;
   }
 
   if (ssize < adf.size())
   {
     if (verbose)
-      std::cerr << print_head()
-                << " wrong ADF set size (less than symbol set)\n";
+      print_head(std::cerr) << "wrong ADF set size (less than symbol set)\n";
     return false;
   }
 
   if (ssize < adt.size())
   {
     if (verbose)
-      std::cerr << print_head()
-                << " wrong ADT set size (less than symbol set)\n";
+      print_head(std::cerr) << "wrong ADT set size (less than symbol set)\n";
     return false;
   }
 

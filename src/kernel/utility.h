@@ -261,9 +261,9 @@ bool load_float_from_stream(std::istream &in, T *i)
 {
   SAVE_FLAGS(in);
 
-  return in >> std::fixed >> std::scientific
-            >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
-            >> *i;
+  return !!(in >> std::fixed >> std::scientific
+               >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
+               >> *i);
 }
 
 ///
