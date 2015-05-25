@@ -673,10 +673,10 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
         s << genome_(arg_j);
       else
       {
-        s << '(' << std::setw(w1) << arg_j.index;
+        s << '[' << std::setw(w1) << arg_j.index;
         if (categories > 1)
           s << ',' << std::setw(w2) << arg_j.category;
-        s << ')';
+        s << ']';
       }
     }
 
@@ -751,10 +751,10 @@ std::ostream &i_mep::dump(std::ostream &s) const
       {
         const locus arg_j{g.args[j], function::cast(g.sym)->arg_category(j)};
 
-        s << " (" << std::setw(w1) << arg_j.index;
+        s << " [" << std::setw(w1) << arg_j.index;
         if (categories > 1)
           s << ',' << std::setw(w2) << arg_j.category;
-        s << ')';
+        s << ']';
       }
 
       s << '\n';

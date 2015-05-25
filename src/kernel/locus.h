@@ -90,7 +90,7 @@ inline locus locus::operator+(index_t i) const
 ///
 inline std::ostream &operator<<(std::ostream &s, const locus &l)
 {
-  return s << '(' << l.index << ',' << l.category << ')';
+  return s << '[' << l.index << ',' << l.category << ']';
 }
 }  // namespace vita
 
