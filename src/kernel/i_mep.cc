@@ -573,8 +573,8 @@ bool i_mep::debug(bool verbose) const
 /// \param[out] s output stream.
 /// \param[in] id used for subgraph plot (usually this is an empty string).
 ///
-/// The output stream contains a graph, described in dot language
-/// (http://www.graphviz.org/), of this individual.
+/// The output stream contains a graph of this individual described in dot
+/// language (see http://www.graphviz.org/).
 ///
 void i_mep::graphviz(std::ostream &s, const std::string &id) const
 {
@@ -688,36 +688,29 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 
 ///
 /// \param[out] s output stream.
-/// \param[in] child child node (this is the node we are "printing").
-/// \param[in] indent indentation level.
-/// \param[in] parent parent of `child`.
-///
-void i_mep::tree(std::ostream &s, const locus &child, unsigned indent,
-                 const locus &parent) const
-{
-  const gene &g(genome_(child));
-
-  if (child == parent ||
-      !genome_(parent).sym->associative() ||
-      genome_(parent).sym != g.sym)
-  {
-    std::string spaces(indent, ' ');
-    s << spaces << g << '\n';
-    indent += 2;
-  }
-
-  const auto arity(g.sym->arity());
-  for (auto i(decltype(arity){0}); i < arity; ++i)
-    tree(s, {g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
-         child);
-}
-
-///
-/// \param[out] s output stream.
 ///
 std::ostream &i_mep::tree(std::ostream &s) const
 {
-  tree(s, best_, 0, best_);
+  std::function<void (locus, unsigned, locus)> tree_(
+    [&](locus child, unsigned indent, locus parent)
+    {
+      const gene &g(genome_(child));
+
+      if (child == parent ||
+          !genome_(parent).sym->associative() ||
+          genome_(parent).sym != g.sym)
+      {
+        s << std::string(indent, ' ') << g << '\n';
+        indent += 2;
+      }
+
+      const auto arity(g.sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
+        tree_({g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
+              child);
+    });
+
+  tree_(best_, 0, best_);
   return s;
 }
 

@@ -90,7 +90,6 @@ private:   // NVI implementation (serialization)
 private:  // Private support methods
   hash_t hash() const;
   void pack(const locus &, std::vector<unsigned char> *const) const;
-  void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
 private:  // Private data members
   // This is the genome: the entire collection of genes (the entirety of an

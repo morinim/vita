@@ -24,7 +24,6 @@ int main()
   const auto summary(s.run());                     // starting search and
                                                    // getting a summary
   std::cout << summary.best.solution << '\n';
-  summary.best.solution.dump(std::cout);
 
   return EXIT_SUCCESS;
 }
