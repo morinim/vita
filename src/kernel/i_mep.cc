@@ -630,7 +630,9 @@ std::ostream &i_mep::in_line(std::ostream &s) const
 }
 
 ///
-/// \param[out] s output stream
+/// \param[out] s output stream.
+/// \param[in] short_form if `true` prints a shorter and more human-readable
+///                       form of the genome.
 ///
 /// Do you remember C=64 list? :-)
 ///
@@ -638,7 +640,7 @@ std::ostream &i_mep::in_line(std::ostream &s) const
 /// 20 PRINT "SWEET"
 /// 30 GOTO 10
 ///
-std::ostream &i_mep::list(std::ostream &s) const
+std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 {
   SAVE_FLAGS(s);
 
@@ -649,6 +651,9 @@ std::ostream &i_mep::list(std::ostream &s) const
   for (const auto &l : *this)
   {
     const gene &g(genome_(l));
+
+    if (short_form && g.sym->terminal())
+      continue;
 
     s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
@@ -661,12 +666,18 @@ std::ostream &i_mep::list(std::ostream &s) const
     for (auto j(decltype(arity){0}); j < arity; ++j)
     {
       s << ' ';
-      if (categories > 1)
-        s << '(';
-      s << std::setw(w1) << g.args[j];
-      if (categories > 1)
-        s << ',' << std::setw(w2) << function::cast(g.sym)->arg_category(j)
-          << ')';
+
+      const locus arg_j{g.args[j], function::cast(g.sym)->arg_category(j)};
+
+      if (short_form && genome_(arg_j).sym->terminal())
+        s << genome_(arg_j);
+      else
+      {
+        s << '(' << std::setw(w1) << arg_j.index;
+        if (categories > 1)
+          s << ',' << std::setw(w2) << arg_j.category;
+        s << ')';
+      }
     }
 
     s << '\n';
@@ -756,7 +767,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
 ///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {
-  return ind.list(s);
+  return ind.list(s, true);
 }
 
 ///

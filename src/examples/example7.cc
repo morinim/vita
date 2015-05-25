@@ -54,9 +54,7 @@ int main(int argc, char *argv[])
 
     individuals.add(base_es);
 
-    std::cout << std::string(40, '-') << '\n';
-    base.list(std::cout);
-    std::cout << '\n';
+    std::cout << std::string(40, '-') << '\n' << base << '\n';
 
     auto bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
@@ -65,13 +63,9 @@ int main(int argc, char *argv[])
 
       auto generalized(ib.generalize(2));
 
-      std::cout << '\n';
-      ib.list(std::cout);
-
-      std::cout << "GENERALIZED\n";
-      generalized.first.list(std::cout);
-
-      std::cout << "\nArguments: [";
+      std::cout << '\n' << ib
+                << "GENERALIZED\n" << generalized.first
+                << "\nArguments: [";
       for (const auto &l : generalized.second)
         std::cout << ' ' << l;
       std::cout << " ]\n";

@@ -53,17 +53,14 @@ int main(int argc, char *argv[])
       base_es = base.eff_size();
     }
 
-    std::cout << std::string(40, '-') << "\nBASE\n";
-    base.list(std::cout);
-    std::cout << '\n';
+    std::cout << std::string(40, '-') << "\nBASE\n" << base << '\n';
 
     auto bl(base.blocks());
     for (const locus &l : bl)
     {
       i_mep blk(base.get_block(l));
 
-      std::cout << "\nBLOCK at locus " << l << '\n';
-      blk.list(std::cout);
+      std::cout << "\nBLOCK at locus " << l << '\n' << blk;
       const any val(interpreter<i_mep>(&blk).run());
       if (val.empty())
         std::cout << "Empty output.";
@@ -88,12 +85,10 @@ int main(int argc, char *argv[])
 
         symbol *const f(sset.insert(vita::make_unique<adf>(blk2, categories,
                                                            100u)));
-        std::cout << '\n' << f->display() << '\n';
-        blk2.list(std::cout);
+        std::cout << '\n' << f->display() << '\n' << blk2;
 
         i_mep blk3(blk.replace({{f, positions}}));
-        std::cout << '\n';
-        blk3.list(std::cout);
+        std::cout << '\n' << blk3;
         const any val3(interpreter<i_mep>(&blk3).run());
         if (val3.empty())
           std::cout << "Empty output.";

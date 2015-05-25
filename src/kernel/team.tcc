@@ -421,6 +421,8 @@ std::ostream &team<T>::in_line(std::ostream &s) const
 
 ///
 /// \param[out] s output stream
+/// \param[in] short_form if `true` prints a shorter and more human-readable
+///                       form of the genome.
 ///
 /// Do you remember C=64 list? :-)
 ///
@@ -429,11 +431,11 @@ std::ostream &team<T>::in_line(std::ostream &s) const
 /// 30 GOTO 10
 ///
 template<class T>
-std::ostream &team<T>::list(std::ostream &s) const
+std::ostream &team<T>::list(std::ostream &s, bool short_form) const
 {
   for (const auto &i : individuals_)
   {
-    i.list(s);
+    i.list(s, short_form);
     s << '\n';
   }
 

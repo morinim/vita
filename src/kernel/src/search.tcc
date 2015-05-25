@@ -149,9 +149,8 @@ void src_search<T, ES>::arl(const U &base)
           adf_log << p->display() << " (Base: " << base_fit
                   << "  DF: " << delta
                   << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-                  << "%)\n";
-          candidate_block.list(adf_log);
-          adf_log << '\n';
+                  << "%)\n"
+                  << candidate_block << '\n';
         }
 
         this->prob_.env.sset->insert(std::move(p));
@@ -560,7 +559,7 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
   if (this->env_.stat.summary)
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best.solution.list(best_list);
+    run_sum.best.solution.list(best_list, true);
     run_sum.best.solution.tree(best_tree);
     run_sum.best.solution.graphviz(best_graph);
 

@@ -34,9 +34,7 @@ int main(int argc, char *argv[])
   vita::i_mep i(env);
 
   i.dump(std::cout);
-  std::cout << '\n';
-  i.list(std::cout);
-  std::cout << '\n';
+  std::cout << '\n' << i << '\n';
   i.tree(std::cout);
 
   return EXIT_SUCCESS;
