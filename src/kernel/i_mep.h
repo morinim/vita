@@ -89,7 +89,6 @@ private:   // NVI implementation (serialization)
 
 private:  // Private support methods
   hash_t hash() const;
-  void in_line(std::ostream &, const locus &) const;
   void pack(const locus &, std::vector<unsigned char> *const) const;
   void tree(std::ostream &, const locus &, unsigned, const locus &) const;
 
