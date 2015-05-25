@@ -731,31 +731,34 @@ std::ostream &i_mep::dump(std::ostream &s) const
   SAVE_FLAGS(s);
 
   const auto categories(env().sset->categories());
-  const auto width(1 + static_cast<int>(std::log10(size() - 1)));
+  const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
+  const auto w2(1 + static_cast<int>(std::log10(categories)));
 
-  for (unsigned i(0); i < size(); ++i)
-  {
-    s << '[' << std::setfill('0') << std::setw(width) << i << "] ";
-
+  for (index_t i(0); i < size(); ++i)
     for (category_t c(0); c < categories; ++c)
     {
       const gene &g(genome_(i, c));
 
-      if (categories > 1)
-        s << '{';
+      s << '[' << std::setfill('0') << std::setw(w1) << i;
 
-      s << g;
+      if (categories > 1)
+        s << ',' << std::setw(w2) << c;
+
+      s  << "] " << g;
 
       const auto arity(g.sym->arity());
       for (auto j(decltype(arity){0}); j < arity; ++j)
-        s << ' ' << std::setw(width) << g.args[j];
+      {
+        const locus arg_j{g.args[j], function::cast(g.sym)->arg_category(j)};
 
-      if (categories > 1)
-        s << '}';
+        s << " (" << std::setw(w1) << arg_j.index;
+        if (categories > 1)
+          s << ',' << std::setw(w2) << arg_j.category;
+        s << ')';
+      }
+
+      s << '\n';
     }
-
-    s << '\n';
-  }
 
   return s;
 }

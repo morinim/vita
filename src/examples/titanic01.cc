@@ -1,5 +1,4 @@
-/**
- *  \file
+/*
  *  \remark This file is part of VITA.
  *
  *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
@@ -25,6 +24,7 @@ int main()
   const auto summary(s.run());                     // starting search and
                                                    // getting a summary
   std::cout << summary.best.solution << '\n';
+  summary.best.solution.dump(std::cout);
 
   return EXIT_SUCCESS;
 }
