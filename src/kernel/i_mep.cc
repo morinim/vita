@@ -889,6 +889,9 @@ i_mep i_mep::compress() const
 
   std::map<gene, locus, cmp_gene> new_locus;
 
+  using ARRAY_ELEM_TYPE =
+    typename std::remove_reference<decltype(gene::args[0])>::type;
+
   for (index_t i(size()); i > 0; --i)
     for (category_t c(0); c < ret.genome_.cols(); ++c)
     {
@@ -899,7 +902,12 @@ i_mep i_mep::compress() const
       {
         const auto where(new_locus.find(ret[g.arg_locus(p)]));
         if (where != new_locus.end())
-          g.args[p] = where->second.index;
+        {
+          assert(where->second.index <=
+                 std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+
+          g.args[p] = static_cast<ARRAY_ELEM_TYPE>(where->second.index);
+        }
       }
 
       new_locus.insert({g, {i - 1, c}});
