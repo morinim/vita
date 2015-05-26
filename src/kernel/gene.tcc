@@ -22,7 +22,7 @@ template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 ///
 /// \param[in] t a terminal.
 ///
-/// A new gene built from terminal \a t.
+/// A new gene built from terminal `t`.
 ///
 /// \note
 /// This is usually called for filling the patch section of an individual.
@@ -72,7 +72,7 @@ basic_gene<K>::basic_gene(
 /// \param[in] from a starting index in the genome.
 /// \param[in] sup an upper limit in the genome.
 ///
-/// A new gene built from symbol \a s with argument in the [from;sup[ range.
+/// A new gene built from symbol `s` with argument in the [from;sup[ range.
 ///
 /// \note
 /// This is usually called for filling the standard section of an individual.
@@ -111,7 +111,7 @@ locus basic_gene<K>::arg_locus(unsigned i) const
 
 ///
 /// \param[in] g second term of comparison.
-/// \return \c true if \c this == \a g
+/// \return `true` if `*this == `g`
 ///
 template<unsigned K>
 bool basic_gene<K>::operator==(const basic_gene<K> &g) const
@@ -136,7 +136,7 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
 ///
 /// \param[out] s output stream.
 /// \param[in] g gene to print.
-/// \return output stream including \a g.
+/// \return output stream including `g`.
 ///
 template<unsigned K>
 std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
