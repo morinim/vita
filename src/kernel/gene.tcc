@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -98,6 +98,18 @@ basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
 }
 
 ///
+/// \param[in] i ordinal of an argument.
+/// \return the locus that `i`-th argument of the current symbol refers to.
+///
+template<unsigned K>
+locus basic_gene<K>::arg_locus(unsigned i) const
+{
+  assert(i < sym->arity());
+
+  return {args[i], function::cast(sym)->arg_category(i)};
+}
+
+///
 /// \param[in] g second term of comparison.
 /// \return \c true if \c this == \a g
 ///
@@ -108,7 +120,10 @@ bool basic_gene<K>::operator==(const basic_gene<K> &g) const
     return false;
 
   if (sym->parametric())
+  {
+    assert(sym->terminal());
     return almost_equal(par, g.par);
+  }
 
   const auto arity(sym->arity());
   for (auto i(decltype(arity){0}); i < arity; ++i)

@@ -13,8 +13,9 @@
 #if !defined(VITA_GENE_H)
 #define      VITA_GENE_H
 
+#include "kernel/locus.h"
+#include "kernel/function.h"
 #include "kernel/random.h"
-#include "kernel/symbol.h"
 #include "kernel/utility.h"
 
 namespace vita
@@ -37,6 +38,8 @@ public:
 
   bool operator==(const basic_gene<K> &) const;
   bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
+
+  locus arg_locus(unsigned) const;
 
 public:  // Types and constants
   using param_type = double;
