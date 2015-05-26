@@ -84,4 +84,4 @@ struct F_FACTORY4
   const std::vector<vita::index_t> null;
 };
 
-#endif  // FACTORY_FIXTURE4_H
+#endif  // Include guard

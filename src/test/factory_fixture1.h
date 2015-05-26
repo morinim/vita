@@ -48,7 +48,7 @@ struct F_FACTORY1
     sset.insert(factory.make("plum", {1}));
     sset.insert(factory.make("date", {1}));
     sset.insert(factory.make("peach", {1}));
-    sset.insert(factory.make("IFE", {1, 0}));
+    sset.insert(factory.make("SIFE", {1, 0}));
   }
 
   ~F_FACTORY1()

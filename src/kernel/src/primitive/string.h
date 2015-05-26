@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,8 +15,6 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <limits>
-#include <sstream>
 #include <string>
 
 #include "kernel/function.h"

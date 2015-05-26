@@ -59,6 +59,8 @@ public:
   i_mep replace(const gene &) const;
   i_mep replace(const locus &, const gene &) const;
 
+  i_mep compress() const;
+
   std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
 
   void set(const locus &l, const gene &g);

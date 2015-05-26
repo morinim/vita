@@ -11,6 +11,7 @@
  */
 
 #include <algorithm>
+#include <map>
 
 #include "kernel/i_mep.h"
 #include "kernel/adf.h"
@@ -652,7 +653,7 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
   {
     const gene &g(genome_(l));
 
-    if (short_form && g.sym->terminal())
+    if (short_form && g.sym->terminal() && l != best_)
       continue;
 
     s << '[' << std::setfill('0') << std::setw(w1) << l.index;
@@ -850,6 +851,61 @@ bool i_mep::save_nvi(std::ostream &out) const
     out << best_.index << ' ' << best_.category << '\n';
 
   return out.good();
+}
+
+///
+/// \brief A sort of "common subexpression elimination" optimization
+///
+/// The function doesn't rely on the meaning of the symbols, just on the
+/// genome layout.
+///
+i_mep i_mep::compress() const
+{
+  i_mep ret(*this);
+
+  // std::map needs a compare function and there isn't a predefined less
+  // operator for gene class.
+  struct cmp_gene
+  {
+    bool operator()(const gene &a, const gene &b) const
+    {
+      if (a.sym->opcode() < b.sym->opcode())
+        return true;
+
+      if (a.sym->opcode() == b.sym->opcode())
+      {
+        if (a.sym->terminal())
+          return a.sym->parametric() ? a.par < b.par : false;
+
+        const auto arity(a.sym->arity());
+        for (auto i(decltype(arity){0}); i < arity; ++i)
+          if (a.args[i] < b.args[i])
+            return true;
+      }
+
+      return false;
+    }
+  };
+
+  std::map<gene, locus, cmp_gene> new_locus;
+
+  for (index_t i(size()); i > 0; --i)
+    for (category_t c(0); c < ret.genome_.cols(); ++c)
+    {
+      gene &g(ret.genome_(i - 1, c));
+
+      const auto arity(g.sym->arity());
+      for (auto p(decltype(arity){0}); p < arity; ++p)
+      {
+        const auto where(new_locus.find(ret[g.arg_locus(p)]));
+        if (where != new_locus.end())
+          g.args[p] = where->second.index;
+      }
+
+      new_locus.insert({g, {i - 1, c}});
+    }
+
+  return ret;
 }
 
 #if defined(UNIFORM_CROSSOVER)

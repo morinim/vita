@@ -22,59 +22,11 @@
 
 using namespace boost;
 
+#include "factory_fixture1.h"
 #include "factory_fixture3.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(t_i_mep, F_FACTORY3)
-/*
-BOOST_AUTO_TEST_CASE(Compact)
-{
-  env.code_length = 100;
-
-  std::cout << *env.sset << std::endl;
-
-  BOOST_TEST_CHECKPOINT("Functional equivalence.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::i_mep i1(env, true);
-    const vita::i_mep i2(i1.compact());
-
-    std::cout << i1 << std::endl << i2 << std::endl;
-    BOOST_REQUIRE(i1.debug(true));
-
-    const boost::any v1( (vita::interpreter(i1))() );
-    const boost::any v2( (vita::interpreter(i2))() );
-
-    BOOST_REQUIRE_EQUAL(v1.empty(), v2.empty());
-    if (!v1.empty() && !v2.empty())
-      BOOST_REQUIRE_EQUAL(vita::interpreter::to_string(v1),
-                          vita::interpreter::to_string(v2));
-  }
-
-  BOOST_TEST_CHECKPOINT("Not interleaved active symbols.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::i_mep ind(vita::i_mep(env, true).compact());
-
-    unsigned line(0), old_line(0);
-    for (vita::i_mep::const_iterator it(ind); it(); line = ++it)
-      if (line)
-      {
-        BOOST_REQUIRE_EQUAL(old_line, line-1);
-        ++old_line;
-      }
-  }
-
-  BOOST_TEST_CHECKPOINT("Same signature.");
-  for (unsigned n(0); n < 1000; ++n)
-  {
-    const vita::i_mep i1(env, true);
-    const vita::i_mep i2(i1.compact());
-
-    BOOST_REQUIRE_EQUAL(i1.signature(), i2.signature());
-  }
-}
-*/
+BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory3, F_FACTORY3)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
@@ -289,5 +241,43 @@ BOOST_AUTO_TEST_CASE(Output)
                     "g2_0 -- g3_0;" \
                     "g3_0 [label=2.0, shape=circle];" \
                     "g4_0 [label=3.0, shape=circle];}");
+}
+BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory1, F_FACTORY1)
+BOOST_AUTO_TEST_CASE(Compress)
+{
+  const unsigned n(5000);
+
+  for (unsigned k(0); k < n; ++k)
+  {
+    const vita::i_mep i(env), i1(i.compress());
+
+    BOOST_REQUIRE(i1.debug(true));
+
+    /*
+    std::cout << "\n\n";
+    i.list(std::cout, false);
+    std::cout << "\n\n";
+    i1.list(std::cout, false);
+    */
+
+    const auto v(vita::interpreter<vita::i_mep>(&i).run());
+    const auto v1(vita::interpreter<vita::i_mep>(&i1).run());
+
+    BOOST_REQUIRE_EQUAL(v.empty(), v1.empty());
+
+    if (!v.empty())
+    {
+      const auto d(vita::to<double>(v));
+      const auto d1(vita::to<double>(v1));
+
+      BOOST_REQUIRE_EQUAL(d, d1);
+    }
+
+    BOOST_REQUIRE_LE(i1.eff_size(), i.eff_size());
+
+    BOOST_REQUIRE_EQUAL(i.signature(), i1.signature());
+  }
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -42,4 +42,4 @@ struct F_FACTORY2
   vita::symbol_set sset;
 };
 
-#endif  // FACTORY_FIXTURE2_H
+#endif  // Include guard
