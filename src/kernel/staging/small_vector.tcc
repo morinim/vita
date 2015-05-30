@@ -123,9 +123,9 @@ small_vector<T, S>::small_vector(const small_vector &v)
 }
 
 template<class T, std::size_t S>
-small_vector<T, S>::small_vector(small_vector &&v)
+small_vector<T, S>::small_vector(small_vector &&rhs)
 {
-  const auto n(v.size());
+  const auto n(rhs.size());
 
   if (n <= S)
   {
@@ -133,17 +133,17 @@ small_vector<T, S>::small_vector(small_vector &&v)
     size_ = data_ + n;
     capacity_ = data_ + S;
 
-    std::move(v.begin(), v.end(), begin());
+    std::move(rhs.begin(), rhs.end(), begin());
   }
   else
   {
-    data_ = v.data_;
-    size_ = v.size_;
-    capacity_ = v.capacity_;
+    data_ = rhs.data_;
+    size_ = rhs.size_;
+    capacity_ = rhs.capacity_;
 
-    v.data_ = data_small_;
-    v.size_ = data_small_;
-    v.capacity_ = data_small_ + S;
+    rhs.data_ = rhs.data_small_;
+    rhs.size_ = rhs.data_small_;
+    rhs.capacity_ = rhs.data_small_ + S;
   }
 
   assert(size() == n);
@@ -211,7 +211,7 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
     else  // n > S
     {
       if (is_data_small_used())
-        std::fill_n(data_small_, S, T());
+        std::fill_n(begin(), S, T());
       else
         free_heap_memory();
 
@@ -223,7 +223,6 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
       rhs.size_ = rhs.data_small_;
       rhs.capacity_ = rhs.data_small_ + S;
     }
-
 
     assert(size() == n);
     assert(capacity() >= std::max(S, n));

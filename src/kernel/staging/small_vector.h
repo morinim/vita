@@ -182,7 +182,7 @@ private:  // Support methods
       ::new (d) T(std::move(*b));
   }
 
-  bool is_data_small_used() const { return begin() == data_small_; }
+  bool is_data_small_used() const { return data_ == data_small_; }
 
   void free_heap_memory()
   {
