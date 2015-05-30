@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(t_push_back)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    sv2.push_back(i);
-    v2.push_back(i);
+    sv2.push_back(static_cast<int>(i));
+    v2.push_back(static_cast<int>(i));
 
     BOOST_CHECK_EQUAL_COLLECTIONS(sv2.begin(), sv2.end(), v2.begin(), v2.end());
   }
@@ -73,8 +73,8 @@ BOOST_AUTO_TEST_CASE(t_push_back)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    sv3.push_back(not_pod(i, i + 1));
-    v3.push_back(not_pod(i, i + 1));
+    sv3.push_back(not_pod(static_cast<int>(i), i + 1));
+    v3.push_back(not_pod(static_cast<int>(i), i + 1));
 
     BOOST_CHECK_EQUAL_COLLECTIONS(sv3.begin(), sv3.end(), v3.begin(), v3.end());
   }
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(t_insert)
 
     for (unsigned i(0); i < 200; ++i)
     {
-      const auto n(v3.size() / 2);
+      const auto n(static_cast<std::ptrdiff_t>(v3.size() / 2));
 
       sv3.insert(std::next(sv3.begin(), n), src3.begin(), src3.end());
       v3.insert(std::next(v3.begin(), n), src3.begin(), src3.end());
