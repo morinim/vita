@@ -161,7 +161,8 @@ small_vector<T, S> &small_vector<T, S>::operator=(const small_vector &rhs)
 
     if (needs_memory)
     {
-      free_heap_memory();
+      if (!is_data_small_used())
+        free_heap_memory();
 
       data_ = static_cast<T *>(::operator new(n * sizeof(T)));
       capacity_ = size_ = data_ + n;

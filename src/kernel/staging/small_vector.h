@@ -186,6 +186,8 @@ private:  // Support methods
 
   void free_heap_memory()
   {
+    assert(!is_data_small_used());
+
     if (!std::is_pod<T>::value)
       destroy_range(begin(), end());
 
