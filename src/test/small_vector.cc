@@ -42,6 +42,38 @@ std::ostream &operator<<(std::ostream &o, const not_pod &x)
 
 BOOST_AUTO_TEST_SUITE(small_vector)
 
+BOOST_AUTO_TEST_CASE(t_constructor_assignment)
+{
+  vita::small_vector<double, 1> sv1;
+  vita::small_vector<double, 1> sv1_bis(1, 3.1415);
+  vita::small_vector<double, 2> sv2{1.0, 2.0};
+  vita::small_vector<double, 3> sv3(3);
+
+  BOOST_REQUIRE(sv1.empty());
+  BOOST_REQUIRE_EQUAL(sv1.size(), 0);
+  BOOST_REQUIRE(!sv1_bis.empty());
+  BOOST_REQUIRE_EQUAL(sv1_bis.size(), 1);
+  BOOST_REQUIRE(!sv2.empty());
+  BOOST_REQUIRE_EQUAL(sv2.size(), 2);
+  BOOST_REQUIRE(!sv3.empty());
+  BOOST_REQUIRE_EQUAL(sv3.size(), 3);
+
+  sv1 = sv1_bis;
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(),
+                                  sv1_bis.begin(), sv1_bis.end());
+
+  sv1 = {1.0, 2.0};
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(), sv2.begin(), sv2.end());
+
+  sv3 = {1.0, 2.0, 3.0};
+  sv1 = {1.0, 2.0, 3.0};
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(), sv3.begin(), sv3.end());
+
+  sv1_bis = sv1;
+  BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(),
+                                  sv1_bis.begin(), sv1_bis.end());
+}
+
 BOOST_AUTO_TEST_CASE(t_push_back)
 {
   vita::small_vector<double, 1> sv1;
@@ -52,7 +84,7 @@ BOOST_AUTO_TEST_CASE(t_push_back)
     sv1.push_back(i);
     v.push_back(i);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(), v.begin(), v.end());
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(), v.begin(), v.end());
   }
 
   vita::small_vector<int, 2> sv2;
