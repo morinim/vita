@@ -36,6 +36,7 @@ using namespace boost;
 #include "test/population.cc"
 #include "test/primitive_d.cc"
 #include "test/primitive_i.cc"
+#include "test/small_vector.cc"
 #include "test/src_constant.cc"
 #include "test/src_problem.cc"
 #include "test/summary.cc"
