@@ -27,7 +27,7 @@ small_vector<T, S>::small_vector(std::size_t n)
   {
     data_ = data_small_;
     size_ = data_ + n;
-    capacity_ = data_small_ + S;
+    capacity_ = data_ + S;
   }
   else  // n > S
   {
@@ -55,15 +55,15 @@ small_vector<T, S>::small_vector(std::size_t n, const T &x)
     size_ = data_ + n;
     capacity_ = data_ + S;
 
-    for (std::size_t k(0); k < n; ++k)
-      data_[k] = x;
+    std::fill_n(begin(), n, x);
   }
   else
   {
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    // Similar to std::uninitialized_fill_n(data_, n, x);
+    // Similar to `std::uninitialized_fill_n(data_, n, x)` but we don't handle
+    // exceptions.
     for (std::size_t k(0); k < n; ++k)
       new (data_ + k) T(x);
   }
@@ -87,7 +87,7 @@ small_vector<T, S>::small_vector(std::initializer_list<T> list)
   }
   else
   {
-    data_ = static_cast<T*>(::operator new(n * sizeof(T)));
+    data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
     uninitialized_copy(list.begin(), list.end(), begin());

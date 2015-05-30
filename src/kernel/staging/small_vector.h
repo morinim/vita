@@ -163,9 +163,9 @@ private:  // Support methods
     }
   }
 
-  /// Copy the range [I, E) onto the uninitialized memory starting with
-  /// `dest`, constructing elements as needed.
-  /// This is similar to std::uninitialized_copy but doesn't handle exceptions.
+  /// Copy the range `[I, E)` onto the uninitialized memory starting with
+  /// `d`, constructing elements as needed. This is similar to
+  /// `std::uninitialized_copy` but doesn't handle exceptions.
   template<class It1, class It2>
   static void uninitialized_copy(It1 b, It1 e, It2 d)
   {
