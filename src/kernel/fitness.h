@@ -16,8 +16,8 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <vector>
 
+#include "kernel/staging/small_vector.h"
 #include "kernel/utility.h"
 
 namespace vita
@@ -67,7 +67,7 @@ template<class T>
 class basic_fitness_t
 {
 public:  // Type alias and iterators
-  using values_t = std::vector<T>;
+  using values_t = small_vector<T, 1>;
   using value_type = typename values_t::value_type;
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
@@ -78,7 +78,7 @@ public:
   basic_fitness_t() : basic_fitness_t(1, fit_tag::components) {}
 
   basic_fitness_t(std::initializer_list<T>);
-  basic_fitness_t(std::vector<T>);
+  basic_fitness_t(values_t);
 
   unsigned size() const;
   T operator[](unsigned) const;

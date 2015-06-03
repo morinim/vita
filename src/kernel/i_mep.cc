@@ -48,8 +48,7 @@ i_mep::i_mep(const environment &e)
     for (category_t c(0); c < categories; ++c)
       genome_(i, c) = gene(env().sset->roulette(c), i + 1, size());
 
-  // PATCH SUBSECTION. Placing terminals for satisfying constraints on
-  // types.
+  // PATCH SUBSECTION. Placing terminals for satisfying constraints on types.
   for (index_t i(patch); i < sup; ++i)
     for (category_t c(0); c < categories; ++c)
       genome_(i, c) = gene(env().sset->roulette_terminal(c));
@@ -486,18 +485,19 @@ bool i_mep::debug(bool verbose) const
 
       // Maximum number of function arguments is gene::k_args.
       const auto arity(genome_(l).sym->arity());
-      if (arity > gene::k_args)
+      if (genome_(l).args.size() != arity)
       {
         if (verbose)
-          std::cerr << k_s_debug << "Function arity exceeds maximum size.\n";
+          std::cerr << k_s_debug
+                    << "Arity and actual number of parameters don't match.\n";
         return false;
       }
 
       // Checking arguments' addresses.
-      for (auto j(decltype(arity){0}); j < arity; ++j)
+      for (const auto &arg : genome_(l).args)
       {
         // Arguments' addresses must be smaller than the size of the genome.
-        if (genome_(l).args[j] >= size())
+        if (arg >= size())
         {
           if (verbose)
             std::cerr << k_s_debug << " Argument is out of range.\n";
@@ -505,10 +505,10 @@ bool i_mep::debug(bool verbose) const
         }
 
         // Function address must be smaller than its arguments' addresses.
-        if (genome_(l).args[j] <= i)
+        if (arg <= i)
         {
           if (verbose)
-            std::cerr << k_s_debug << " Self reference in locus " << l
+            std::cerr << k_s_debug << " Wrong reference in locus " << l
                       << ".\n";
           return false;
         }
@@ -793,6 +793,7 @@ bool i_mep::load_nvi(std::istream &in)
       return false;
 
     gene g;
+
     g.sym = env().sset->decode(opcode);
     if (!g.sym)
       return false;
@@ -801,15 +802,20 @@ bool i_mep::load_nvi(std::istream &in)
       if (!(in >> g.par))
         return false;
 
-    if (g.sym->arity())
-      for (unsigned i(0); i < g.sym->arity(); ++i)
+    const auto arity(g.sym->arity());
+    if (arity)
+    {
+      g.args.resize(arity);
+
+      for (unsigned i(0); i < arity; ++i)
         if (!(in >> g.args[i]))
           return false;
+    }
 
     e = g;
   }
 
-  decltype(best_) best(locus::npos());
+  auto best(locus::npos());
 
   if (cols)
   {

@@ -47,7 +47,7 @@ basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
 /// Builds a fitness from a vector of values.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(std::vector<T> v) : vect_(std::move(v))
+basic_fitness_t<T>::basic_fitness_t(values_t v) : vect_(std::move(v))
 {
 }
 
@@ -407,7 +407,7 @@ basic_fitness_t<T> operator-(basic_fitness_t<T> lhs,
 /// \return the product of `this` and `f`.
 ///
 template<class T>
-basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t<T> &f)
+basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t &f)
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
@@ -425,7 +425,7 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t<T> &f)
 ///
 template<class T>
 basic_fitness_t<T> operator*(basic_fitness_t<T> lhs,
-                             const basic_fitness_t<T>&rhs)
+                             const basic_fitness_t<T> &rhs)
 {
   return lhs *= rhs;
 }
@@ -618,7 +618,7 @@ template<class T>
 basic_fitness_t<T> combine(const basic_fitness_t<T> &f1,
                            const basic_fitness_t<T> &f2)
 {
-  std::vector<T> ret;
+  typename basic_fitness_t<T>::values_t ret;
   ret.reserve(f1.size() + f2.size());
 
   ret.insert(ret.end(), std::begin(f1), std::end(f1));

@@ -16,6 +16,7 @@
 #include "kernel/locus.h"
 #include "kernel/function.h"
 #include "kernel/random.h"
+#include "kernel/staging/small_vector.h"
 #include "kernel/utility.h"
 
 namespace vita
@@ -25,7 +26,7 @@ namespace vita
 ///
 /// \tparam K the maximum `function`'s number of arguments
 ///
-/// The class `gene` is the building block of an `individual`.
+/// The class `gene` is the building block of a `i_mep` individual.
 ///
 template<unsigned K>
 class basic_gene
@@ -36,30 +37,27 @@ public:
   basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
   basic_gene(symbol *, index_t, index_t);
 
-  bool operator==(const basic_gene<K> &) const;
-  bool operator!=(const basic_gene<K> &g) const { return !(*this == g); }
+  bool operator==(const basic_gene &) const;
+  bool operator!=(const basic_gene &g) const { return !(*this == g); }
 
   locus arg_locus(unsigned) const;
 
 public:  // Types and constants
   using param_type = double;
-  using arg_pack   = std::array<std::uint16_t, K>;
+  using arg_pack = small_vector<std::uint16_t, K>;
 
   static constexpr decltype(K) k_args{K};
 
 public:  // Public data members
-  symbol *sym;
-  union
-  {
-    param_type  par;
-    arg_pack   args;
-  };
+  symbol     *sym;
+  param_type  par;
+  arg_pack   args;
 };
 
 template<unsigned K>
 std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
 
-using gene = basic_gene<4>;
+using gene = basic_gene<1>;
 
 #include "kernel/gene.tcc"
 }  // namespace vita

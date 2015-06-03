@@ -28,7 +28,7 @@ template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 /// This is usually called for filling the patch section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(symbol *t) : sym(t)
+basic_gene<K>::basic_gene(symbol *t) : sym(t), args(t->arity())
 {
   assert(sym->terminal());
 
@@ -48,8 +48,8 @@ basic_gene<K>::basic_gene(symbol *t) : sym(t)
 ///     };
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(
-  const std::pair<symbol *, std::vector<index_t>> &g) : sym(g.first)
+basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
+  : sym(g.first), args(g.first->arity())
 {
   if (sym->parametric())
     par = sym->init();
@@ -78,7 +78,8 @@ basic_gene<K>::basic_gene(
 /// This is usually called for filling the standard section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup) : sym(s)
+basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup)
+  : sym(s), args(s->arity())
 {
   assert(from < sup);
 
@@ -114,7 +115,7 @@ locus basic_gene<K>::arg_locus(unsigned i) const
 /// \return `true` if `*this == `g`
 ///
 template<unsigned K>
-bool basic_gene<K>::operator==(const basic_gene<K> &g) const
+bool basic_gene<K>::operator==(const basic_gene &g) const
 {
   if (sym != g.sym)
     return false;

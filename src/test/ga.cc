@@ -122,7 +122,6 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
-
 // Test problem 1 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
@@ -143,7 +142,6 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
              return -(std::pow(x[0] * x[0] + x[1] - 11, 2.0) +
                       std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
-
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
   BOOST_REQUIRE(s.debug(true));
 
