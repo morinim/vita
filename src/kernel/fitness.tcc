@@ -621,8 +621,8 @@ basic_fitness_t<T> combine(const basic_fitness_t<T> &f1,
   typename basic_fitness_t<T>::values_t ret;
   ret.reserve(f1.size() + f2.size());
 
-  ret.insert(ret.end(), std::begin(f1), std::end(f1));
-  ret.insert(ret.end(), std::begin(f2), std::end(f2));
+  ret.insert(std::end(ret), std::begin(f1), std::end(f1));
+  ret.insert(std::end(ret), std::begin(f2), std::end(f2));
 
   return ret;
 }

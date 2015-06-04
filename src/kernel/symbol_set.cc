@@ -25,12 +25,12 @@ namespace
 /// \return a random symbol from `symbols`.
 ///
 /// Probably the fastest way to produce a realization of a random variable
-/// X in a computer is to create a big table where each outcome _i_ is
-/// inserted a number of times proportional to _P(X=i)_.
+/// X in a computer is to create a big table where each outcome `i` is
+/// inserted a number of times proportional to `P(X=i)`.
 ///
 /// Two fast methods are described in "Fast Generation of Discrete Random
 /// Variables" (Marsaglia, Tsang, Wang).
-/// Also boost::random::discrete_distribution seems quite fast.
+/// Also `std::discrete_distribution` seems quite fast.
 ///
 /// Anyway we choose the "roulette algorithm" because it's very simple and
 /// allows changing weights dynamically (performance differences can hardly
@@ -334,7 +334,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
       o << '(';
     for (auto j(decltype(arity){0}); j < arity; ++j)
       o << function::cast(s)->arg_category(j)
-        << (j+1 == arity ? "" : ", ");
+        << (j + 1 == arity ? "" : ", ");
     if (arity)
       o << ')';
 

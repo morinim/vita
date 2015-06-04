@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,7 +56,7 @@ public:
 
       const auto arity(g.sym->arity());
       for (auto j(decltype(arity){0}); j < arity; ++j)
-        loci_.insert({g.args[j], function::cast(g.sym)->arg_category(j)});
+        loci_.insert(g.arg_locus(j));
 
       loci_.erase(loci_.begin());
     }

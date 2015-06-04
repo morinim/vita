@@ -384,7 +384,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
   {
     const auto arity(g.sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
-      pack({g.args[i], function::cast(g.sym)->arg_category(i)}, p);
+      pack(g.arg_locus(i), p);
   }
 }
 
@@ -623,7 +623,7 @@ std::ostream &i_mep::in_line(std::ostream &s) const
 
       const auto arity(g.sym->arity());
       for (auto i(decltype(arity){0}); i < arity; ++i)
-        in_line_({g.args[i], function::cast(g.sym)->arg_category(i)});
+        in_line_(g.arg_locus(i));
     });
 
   in_line_(best_);
@@ -668,7 +668,7 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
     {
       s << ' ';
 
-      const locus arg_j{g.args[j], function::cast(g.sym)->arg_category(j)};
+      const auto arg_j(g.arg_locus(j));
 
       if (short_form && genome_(arg_j).sym->terminal())
         s << genome_(arg_j);
@@ -707,8 +707,7 @@ std::ostream &i_mep::tree(std::ostream &s) const
 
       const auto arity(g.sym->arity());
       for (auto i(decltype(arity){0}); i < arity; ++i)
-        tree_({g.args[i], function::cast(g.sym)->arg_category(i)}, indent,
-              child);
+        tree_(g.arg_locus(i), indent, child);
     });
 
   tree_(best_, 0, best_);
@@ -743,7 +742,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
       const auto arity(g.sym->arity());
       for (auto j(decltype(arity){0}); j < arity; ++j)
       {
-        const locus arg_j{g.args[j], function::cast(g.sym)->arg_category(j)};
+        const auto arg_j(g.arg_locus(j));
 
         s << " [" << std::setw(w1) << arg_j.index;
         if (categories > 1)

@@ -92,8 +92,7 @@ any interpreter<T>::fetch_arg(unsigned i)
   assert(g.sym->arity());
   assert(i < g.sym->arity());
 
-  const function &f(*function::cast(g.sym));
-  const locus l{g.args[i], f.arg_category(i)};
+  const locus l(g.arg_locus(i));
 
   const auto get_val([&]()
                      {
