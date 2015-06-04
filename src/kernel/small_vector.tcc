@@ -285,13 +285,7 @@ template<class T, std::size_t S>
 void small_vector<T, S>::push_back(const T &x)
 {
   if (size_ == capacity_)
-  {
-    const auto n_old(size());
-    const auto n(n_old > 1 ? (3 * n_old) / 2 : n_old + 1);
-
-    grow(n);
-    size_ = data_ + n_old;
-  }
+    grow();
 
   if (local_storage_used())
     *size_ = x;
@@ -305,13 +299,7 @@ template<class T, std::size_t S>
 template<class... Args> void small_vector<T, S>::emplace_back(Args &&... args)
 {
   if (size_ == capacity_)
-  {
-    const auto n_old(size());
-    const auto n(n_old > 1 ? (3 * n_old) / 2 : n_old + 1);
-
-    grow(n);
-    size_ = data_ + n_old;
-  }
+    grow();
 
   if (local_storage_used())
     *size_ = T(std::forward<Args>(args)...);
@@ -327,15 +315,7 @@ typename small_vector<T,S>::iterator small_vector<T, S>::append(IT b, IT e)
 {
   const auto n(static_cast<size_type>(std::distance(b, e)));
 
-  // Grow allocated space if needed.
-  if (size_ + n > capacity_)
-  {
-    const auto n_old(size());
-    const auto n_new(n_old + n);
-
-    grow(n_new);
-    size_ = data_ + n_old;
-  }
+  reserve(size() + n);
 
   if (local_storage_used())
     std::copy(b, e, end());
@@ -355,7 +335,7 @@ typename small_vector<T,S>::iterator small_vector<T, S>::insert(
   assert(i >= begin());
   assert(i <= end());
 
-  if (i == end())  // Important special case for empty vector
+  if (i == end())  // Important special case
     return append(b, e);
 
   // Convert iterator to index to avoid invalidating iterator after reserve().
@@ -363,7 +343,6 @@ typename small_vector<T,S>::iterator small_vector<T, S>::insert(
 
   const auto n(static_cast<size_type>(std::distance(b, e)));
 
-  // Ensure there is enough space.
   reserve(size() + n);
 
   // Uninvalidate the iterator.
@@ -452,13 +431,10 @@ void small_vector<T, S>::resize(size_type n)
   }
   else  // n > capacity()
   {
-    const auto n_old(size());
-
     grow(n);
-    size_ = capacity_;
 
-    for (auto k(n_old); k < n; ++k)
-      new (data_ + k) T();
+    for (; size_ < capacity_; ++size_)
+      new (size_) T();
   }
 
   assert(size() == n);
@@ -480,12 +456,7 @@ template<class T, std::size_t S>
 void small_vector<T, S>::reserve(size_type n)
 {
   if (n > capacity())
-  {
-    const auto n_old(size());
-
     grow(n);
-    size_ = data_ + n_old;
-  }
 
   assert(size() <= capacity());
   assert(capacity() >= n);
@@ -502,11 +473,20 @@ void small_vector<T, S>::free_heap_memory()
   ::operator delete(data_);
 }
 
+///
+/// Allocates memory (without initializing new elements) so that the vector
+/// could contain up to `n` elements.
+///
+/// \note
+/// The difference between `resize(n)` and `grow(n)` is that the former checks
+/// if there isn't enough capacity before growing the vector.
+///
 template<class T, std::size_t S>
 void small_vector<T, S>::grow(size_type n)
 {
-  assert(capacity() < n);
+  assert(n > capacity());
 
+  const auto n_old(size());
   auto new_data(static_cast<T *>(::operator new(n * sizeof(T))));
 
   uninitialized_move<T>(begin(), end(), new_data);
@@ -520,6 +500,20 @@ void small_vector<T, S>::grow(size_type n)
 
   data_ = new_data;
   capacity_ = data_ + n;
+  size_ = data_ + n_old;
+}
+
+///
+/// Allocates memory (without initializing new elements) so that the vector
+/// could contain at least one more element.
+///
+template<class T, std::size_t S>
+void small_vector<T, S>::grow()
+{
+  const auto n_old(size());
+  const auto n(n_old > 1 ? (3 * n_old) / 2 : n_old + 1);
+
+  grow(n);
 }
 
 ///

@@ -198,6 +198,7 @@ private:  // Support methods
   bool local_storage_used() const { return data_ == local_storage_; }
 
   void free_heap_memory();
+  void grow();
   void grow(size_type);
 
   template<class IT> iterator append(IT, IT);
