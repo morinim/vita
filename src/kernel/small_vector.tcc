@@ -62,9 +62,6 @@ small_vector<T, S>::small_vector(size_type n)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    // We aren't using the array version of the new operator since it stores
-    // additional information about the array size in the first few bytes of
-    // the memory allocation.
     if (!std::is_pod<T>::value)
       for (std::size_t k(0); k < n; ++k)
         new (data_ + k) T();
@@ -87,6 +84,9 @@ small_vector<T, S>::small_vector(size_type n, const T &x)
   }
   else
   {
+    // We aren't using the array version of the new operator since it stores
+    // additional information about the array size in the first few bytes of
+    // the memory allocation.
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 

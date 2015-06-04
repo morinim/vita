@@ -74,25 +74,38 @@ public:
   small_vector &operator=(const small_vector &);
   small_vector &operator=(small_vector &&);
 
-  const_reference operator[](size_type k) const
+  /// \param[in] pos position of the element to return.
+  /// \return a reference to the elemente at specified location `pos`.
+  /// \note No bounds checking is performed.
+  const_reference operator[](size_type pos) const
   {
-    assert(k < size());
-    return cbegin()[k];
+    assert(pos < size());
+    return cbegin()[pos];
   }
 
-  reference operator[](size_type k)
+  /// \param[in] pos position of the element to return.
+  /// \return a constant reference to the elemente at specified location `pos`.
+  /// \note No bounds checking is performed.
+  reference operator[](size_type pos)
   {
-    assert(k < size());
-    return begin()[k];
+    assert(pos < size());
+    return begin()[pos];
   }
 
-  /// Return a pointer to the vector's buffer, even if empty().
+  /// \return a pointer to the vector's buffer, even if `empty()`.
   pointer data() { return data_; }
-
-  /// Return a pointer to the vector's buffer, even if empty().
+  /// \return a pointer to the vector's buffer, even if `empty()`.
   const_pointer data() const { return data_; }
 
+  /// \return an iterator to the first element of the container.
+  /// \note
+  /// if the container is empty, the returned iterator is equal to `end()`.
   iterator begin() { return data_; }
+  /// \return an iterator to the element following the last element of the
+  ///         container.
+  /// \warning
+  /// This element acts as a placeholder; attempting to access it results in
+  /// undefined behaviour.
   iterator end() { return size_; }
 
   const_iterator cbegin() const { return data_; }
@@ -100,43 +113,69 @@ public:
   const_iterator begin() const { return cbegin(); }
   const_iterator end() const { return cend(); }
 
+  /// \return a reverse iterator to the first element of the reversed
+  ///         container. It corresponds to the last element of the non-reversed
+  ///         container.
   reverse_iterator rbegin() { return reverse_iterator(end()); }
-  const_reverse_iterator rbegin() const{ return const_reverse_iterator(end()); }
+  /// \return a reverse itarator to the element following the last element of
+  ///         of the reversed container. It corresponds to the element
+  ///         preceding the first element of the non-reversed container.
+  /// \warning
+  /// This element acts as a placeholder, attempting to access it results in
+  /// undefined behaviour.
   reverse_iterator rend() { return reverse_iterator(begin()); }
-  const_reverse_iterator rend() const { return const_reverse_iterator(begin());}
 
+  const_reverse_iterator rbegin() const {return const_reverse_iterator(end());}
+  const_reverse_iterator rend() const {return const_reverse_iterator(begin());}
+
+  /// \return the number of elements in the container.
   size_type size() const
   {
     assert(end() >= begin());
     return static_cast<size_type>(end() - begin());
   }
 
+  /// \return the capacity of the currently allocated storage.
   size_type capacity() const
   {
     assert(capacity_ >= data_);
     return static_cast<size_type>(capacity_ - begin());
   }
 
+  /// \return the maximum number of elements the container is able to hold
+  ///         due to system or library implementation limitations.
+  /// \warning
+  /// At runtime the size of the container may be limited to a value smaller
+  /// than `max_size()` by the amount of RAM available.
   size_type max_size() const { return static_cast<size_type>(-1); }
 
+  /// \return `true` if the container is empty, `false` otherwise.
   bool empty() const { return end() == begin(); }
 
+  // \return a reference to the first element in the container
+  // \warning Calling `front` on an empty container is undefined.
   reference front()
   {
     assert(!empty());
     return begin()[0];
   }
+  // \return a reference to the first element in the container
+  // \warning Calling `front` on an empty container is undefined.
   const_reference front() const
   {
     assert(!empty());
     return cbegin()[0];
   }
 
+  // \return a reference to the last element in the container
+  // \warning Calling `back` on an empty container is undefined.
   reference back()
   {
     assert(!empty());
     return end()[-1];
   }
+  // \return a reference to the last element in the container
+  // \warning Calling `back` on an empty container is undefined.
   const_reference back() const
   {
     assert(!empty());
@@ -177,7 +216,7 @@ private:  // Private data members
   T local_storage_[S > 0 ? S : 1];
 };
 
-#include "kernel/staging/small_vector.tcc"
+#include "kernel/small_vector.tcc"
 }  // namespace vita
 
 #endif  // Include guard

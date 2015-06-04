@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "kernel/staging/small_vector.h"
+#include "kernel/small_vector.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE small_vector_test

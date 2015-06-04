@@ -16,7 +16,7 @@
 #include "kernel/locus.h"
 #include "kernel/function.h"
 #include "kernel/random.h"
-#include "kernel/staging/small_vector.h"
+#include "kernel/small_vector.h"
 #include "kernel/utility.h"
 
 namespace vita
