@@ -8,10 +8,6 @@
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
- *  Original idea by Kenneth Micklas
- *  (<https://github.com/kmicklas/variadic-variant>).
- *  Code used under MPL2 licence with author's permission (2015-02-03).
  */
 
 #if !defined(VITA_SMALL_VECTOR_H)
@@ -67,8 +63,8 @@ public:  // Type aliases
   using const_reference = const value_type &;
 
 public:
-  explicit small_vector(std::size_t = 0);
-  small_vector(std::size_t, const T &);
+  explicit small_vector(size_type = 0);
+  small_vector(size_type, const T &);
   small_vector(std::initializer_list<T>);
   small_vector(const small_vector &);
   small_vector(small_vector &&);
@@ -78,13 +74,13 @@ public:
   small_vector &operator=(const small_vector &);
   small_vector &operator=(small_vector &&);
 
-  const_reference operator[](std::size_t k) const
+  const_reference operator[](size_type k) const
   {
     assert(k < size());
     return cbegin()[k];
   }
 
-  reference operator[](std::size_t k)
+  reference operator[](size_type k)
   {
     assert(k < size());
     return begin()[k];
@@ -147,42 +143,14 @@ public:
     return end()[-1];
   }
 
-  void resize(std::size_t);
-  void reserve(std::size_t);
+  void resize(size_type);
+  void reserve(size_type);
 
   void push_back(const T &);
   template<class IT> iterator insert(iterator, IT, IT);
 
 private:  // Support methods
-  static void destroy_range(T *b, T *e)
-  {
-    while (b != e)
-    {
-      --e;
-      e->~T();
-    }
-  }
-
-  /// Copy the range `[I, E)` onto the uninitialized memory starting with
-  /// `d`, constructing elements as needed. This is similar to
-  /// `std::uninitialized_copy` but doesn't handle exceptions.
-  template<class It1, class It2>
-  static void uninitialized_copy(It1 b, It1 e, It2 d)
-  {
-    for (; b != e; ++b, ++d)
-      ::new (d) T(*b);
-  }
-
-  /// Move the range [I, E) onto the uninitialized memory starting with
-  /// `dest`, constructing elements as needed.
-  template<class It1, class It2>
-  static void uninitialized_move(It1 b, It1 e, It2 d)
-  {
-    for (; b != e; ++b, ++d)
-      ::new (d) T(std::move(*b));
-  }
-
-  bool is_data_small_used() const { return data_ == data_small_; }
+  bool local_storage_used() const { return data_ == local_storage_; }
 
   void free_heap_memory();
   void grow(size_type);
@@ -192,7 +160,7 @@ private:  // Support methods
 private:  // Private data members
   // Always point to the beginning of the vector. It points to some memory on
   // the heap when small size optimization is not used and points to
-  // `data_small_` when small size optimization is used.
+  // `local_storage_` when small size optimization is used.
   T *data_;
 
   T *size_;
@@ -201,11 +169,12 @@ private:  // Private data members
   // optimization is in use (in this case the capacity is equal to `S`) or not.
   T *capacity_;
 
-  // Objects on `data_small_` are never destructed but are reinitialized to T()
+  // Objects contained in `local_storage_` are never destructed; if the macro
+  // `VITA_SMALL_VECTOR_LOW_MEMORY` is defined, they're reinitialized to `T()`
   // when not used anymore. Objects on the heap are destructed if:
   // - they aren't plain old data;
   // - aren't used anymore.
-  T data_small_[S > 0 ? S : 1];
+  T local_storage_[S > 0 ? S : 1];
 };
 
 #include "kernel/staging/small_vector.tcc"

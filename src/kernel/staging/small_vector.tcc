@@ -17,15 +17,43 @@
 #if !defined(VITA_SMALL_VECTOR_TCC)
 #define      VITA_SMALL_VECTOR_TCC
 
+/// Calls the destructor for objects in the range `[b, e)`.
+template<class T>
+void destroy_range(T *b, T *e)
+{
+  for (; b != e; ++b)
+    b->~T();
+}
+
+/// Copies the range `[b, e)` onto the uninitialized memory starting with
+/// `d`, constructing elements as needed. This is similar to
+/// `std::uninitialized_copy` but doesn't handle exceptions.
+template<class T, class It1, class It2>
+void uninitialized_copy(It1 b, It1 e, It2 d)
+{
+  for (; b != e; ++b, ++d)
+    ::new (d) T(*b);
+}
+
+/// Moves the range [b, e) onto the uninitialized memory starting with `d`,
+/// constructing elements as needed.
+template<class T, class It1, class It2>
+void uninitialized_move(It1 b, It1 e, It2 d)
+{
+  for (; b != e; ++b, ++d)
+    ::new (d) T(std::move(*b));
+}
+
+
 ///
 /// \brief small_vector with capacity equal to `S` and size equal to `n`
 ///
 template<class T, std::size_t S>
-small_vector<T, S>::small_vector(std::size_t n)
+small_vector<T, S>::small_vector(size_type n)
 {
   if (n <= S)
   {
-    data_ = data_small_;
+    data_ = local_storage_;
     size_ = data_ + n;
     capacity_ = data_ + S;
   }
@@ -47,11 +75,11 @@ small_vector<T, S>::small_vector(std::size_t n)
 }
 
 template<class T, std::size_t S>
-small_vector<T, S>::small_vector(std::size_t n, const T &x)
+small_vector<T, S>::small_vector(size_type n, const T &x)
 {
   if (n <= S)
   {
-    data_ = data_small_;
+    data_ = local_storage_;
     size_ = data_ + n;
     capacity_ = data_ + S;
 
@@ -79,7 +107,7 @@ small_vector<T, S>::small_vector(std::initializer_list<T> list)
 
   if (n <= S)
   {
-    data_ = data_small_;
+    data_ = local_storage_;
     size_ = data_ + n;
     capacity_ = data_ + S;
 
@@ -90,7 +118,7 @@ small_vector<T, S>::small_vector(std::initializer_list<T> list)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    uninitialized_copy(list.begin(), list.end(), begin());
+    uninitialized_copy<T>(list.begin(), list.end(), begin());
   }
 
   assert(size() == n);
@@ -104,7 +132,7 @@ small_vector<T, S>::small_vector(const small_vector &v)
 
   if (n <= S)
   {
-    data_ = data_small_;
+    data_ = local_storage_;
     size_ = data_ + n;
     capacity_ = data_ + S;
 
@@ -115,7 +143,7 @@ small_vector<T, S>::small_vector(const small_vector &v)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    uninitialized_copy(v.begin(), v.end(), data_);
+    uninitialized_copy<T>(v.begin(), v.end(), data_);
   }
 
   assert(size() == n);
@@ -129,7 +157,7 @@ small_vector<T, S>::small_vector(small_vector &&rhs)
 
   if (n <= S)
   {
-    data_ = data_small_;
+    data_ = local_storage_;
     size_ = data_ + n;
     capacity_ = data_ + S;
 
@@ -141,9 +169,9 @@ small_vector<T, S>::small_vector(small_vector &&rhs)
     size_ = rhs.size_;
     capacity_ = rhs.capacity_;
 
-    rhs.data_ = rhs.data_small_;
-    rhs.size_ = rhs.data_small_;
-    rhs.capacity_ = rhs.data_small_ + S;
+    rhs.data_ = rhs.local_storage_;
+    rhs.size_ = rhs.local_storage_;
+    rhs.capacity_ = rhs.local_storage_ + S;
   }
 
   assert(size() == n);
@@ -161,19 +189,19 @@ small_vector<T, S> &small_vector<T, S>::operator=(const small_vector &rhs)
 
     if (needs_memory)
     {
-      if (!is_data_small_used())
+      if (!local_storage_used())
         free_heap_memory();
 
       data_ = static_cast<T *>(::operator new(n * sizeof(T)));
       capacity_ = size_ = data_ + n;
 
-      uninitialized_copy(rhs.begin(), rhs.end(), begin());
+      uninitialized_copy<T>(rhs.begin(), rhs.end(), begin());
     }
     else  // !needs_memory
     {
       if (!std::is_pod<T>::value)
       {
-        if (!is_data_small_used())
+        if (!local_storage_used())
           destroy_range(begin() + n, end());
 #if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
         else
@@ -200,21 +228,21 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
   {
     const auto n(rhs.size());
 
-    if (!is_data_small_used())
+    if (!local_storage_used())
       free_heap_memory();
 
     if (n <= S)
     {
-      data_ = data_small_;
-      size_ = data_small_ + n;
-      capacity_ = data_small_ + S;
+      data_ = local_storage_;
+      size_ = local_storage_ + n;
+      capacity_ = local_storage_ + S;
 
       std::move(rhs.begin(), rhs.end(), begin());
     }
     else  // n > S
     {
 #if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
-      if (is_data_small_used())
+      if (local_storage_used())
         std::fill_n(begin(), S, T());
 #endif
 
@@ -222,9 +250,9 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
       size_ = rhs.size_;
       capacity_ = rhs.capacity_;
 
-      rhs.data_ = rhs.data_small_;
-      rhs.size_ = rhs.data_small_;
-      rhs.capacity_ = rhs.data_small_ + S;
+      rhs.data_ = rhs.local_storage_;
+      rhs.size_ = rhs.local_storage_;
+      rhs.capacity_ = rhs.local_storage_ + S;
     }
 
     assert(size() == n);
@@ -237,7 +265,7 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
 template<class T, std::size_t S>
 small_vector<T, S>::~small_vector()
 {
-  if (!is_data_small_used())
+  if (!local_storage_used())
     free_heap_memory();
 }
 
@@ -253,7 +281,7 @@ void small_vector<T, S>::push_back(const T &x)
     size_ = data_ + n_old;
   }
 
-  if (is_data_small_used())
+  if (local_storage_used())
     *size_ = x;
   else
     new (size_) T(x);
@@ -277,10 +305,10 @@ typename small_vector<T,S>::iterator small_vector<T, S>::append(IT b, IT e)
     size_ = data_ + n_old;
   }
 
-  if (is_data_small_used())
+  if (local_storage_used())
     std::copy(b, e, end());
   else
-    uninitialized_copy(b, e, end());
+    uninitialized_copy<T>(b, e, end());
 
   size_ += n;
 
@@ -337,14 +365,14 @@ typename small_vector<T,S>::iterator small_vector<T, S>::insert(
 
   auto overwritten(old_end - i);
 
-  uninitialized_move(i, old_end, end() - overwritten);
+  uninitialized_move<T>(i, old_end, end() - overwritten);
 
   // Replace the overwritten part.
   for (auto j(i); overwritten; --overwritten, ++j, ++b)
     *j = *b;
 
   // Insert the non-overwritten middle part.
-  uninitialized_copy(b, e, old_end);
+  uninitialized_copy<T>(b, e, old_end);
 
   return i;
 }
@@ -362,13 +390,13 @@ typename small_vector<T,S>::iterator small_vector<T, S>::insert(
 /// invalidated by the equivalent sequence of `pop_back()` calls.
 ///
 template<class T, std::size_t S>
-void small_vector<T, S>::resize(std::size_t n)
+void small_vector<T, S>::resize(size_type n)
 {
   if (n <= capacity())
   {
     if (!std::is_pod<T>::value)
     {
-      if (is_data_small_used())
+      if (local_storage_used())
       {
         if (n >= size())
           std::fill(end(), begin() + n, T());
@@ -377,7 +405,7 @@ void small_vector<T, S>::resize(std::size_t n)
           std::fill(begin() + n, end(), T());
 #endif
       }
-      else  // !is_data_small_used()
+      else  // !local_storage_used()
       {
         if (n < size())
           destroy_range(begin() + n, end());
@@ -417,7 +445,7 @@ void small_vector<T, S>::resize(std::size_t n)
 /// references are invalidated.
 ///
 template<class T, std::size_t S>
-void small_vector<T, S>::reserve(std::size_t n)
+void small_vector<T, S>::reserve(size_type n)
 {
   if (n > capacity())
   {
@@ -434,7 +462,7 @@ void small_vector<T, S>::reserve(std::size_t n)
 template<class T, std::size_t S>
 void small_vector<T, S>::free_heap_memory()
 {
-  assert(!is_data_small_used());
+  assert(!local_storage_used());
 
   if (!std::is_pod<T>::value)
     destroy_range(begin(), end());
@@ -449,9 +477,9 @@ void small_vector<T, S>::grow(size_type n)
 
   auto new_data(static_cast<T *>(::operator new(n * sizeof(T))));
 
-  uninitialized_move(begin(), end(), new_data);
+  uninitialized_move<T>(begin(), end(), new_data);
 
-  if (!is_data_small_used())
+  if (!local_storage_used())
     free_heap_memory();
 #if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
   else if (!std::is_pod<T>::value)
