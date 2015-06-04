@@ -184,17 +184,7 @@ private:  // Support methods
 
   bool is_data_small_used() const { return data_ == data_small_; }
 
-  void free_heap_memory()
-  {
-    assert(!is_data_small_used());
-
-    if (!std::is_pod<T>::value)
-      destroy_range(begin(), end());
-
-    ::operator delete(data_);
-  }
-
-  void free_all_memory();
+  void free_heap_memory();
   void grow(size_type);
 
   template<class IT> iterator append(IT, IT);

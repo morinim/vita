@@ -34,9 +34,9 @@ small_vector<T, S>::small_vector(std::size_t n)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    // We aren't using the array version of the new operator since, in some
-    // (many?) implementation, it stores information about the array size in
-    // the first few bytes of the memory allocation.
+    // We aren't using the array version of the new operator since it stores
+    // additional information about the array size in the first few bytes of
+    // the memory allocation.
     if (!std::is_pod<T>::value)
       for (std::size_t k(0); k < n; ++k)
         new (data_ + k) T();
@@ -173,10 +173,12 @@ small_vector<T, S> &small_vector<T, S>::operator=(const small_vector &rhs)
     {
       if (!std::is_pod<T>::value)
       {
-        if (is_data_small_used())
-          std::fill(begin() + n, end(), T());
-        else
+        if (!is_data_small_used())
           destroy_range(begin() + n, end());
+#if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
+        else
+          std::fill(begin() + n, end(), T());
+#endif
       }
 
       size_ = begin() + n;
@@ -198,11 +200,11 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
   {
     const auto n(rhs.size());
 
+    if (!is_data_small_used())
+      free_heap_memory();
+
     if (n <= S)
     {
-      if (!is_data_small_used())
-        free_heap_memory();
-
       data_ = data_small_;
       size_ = data_small_ + n;
       capacity_ = data_small_ + S;
@@ -211,10 +213,10 @@ small_vector<T, S> &small_vector<T, S>::operator=(small_vector &&rhs)
     }
     else  // n > S
     {
+#if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
       if (is_data_small_used())
         std::fill_n(begin(), S, T());
-      else
-        free_heap_memory();
+#endif
 
       data_ = rhs.data_;
       size_ = rhs.size_;
@@ -368,10 +370,12 @@ void small_vector<T, S>::resize(std::size_t n)
     {
       if (is_data_small_used())
       {
-        if (n < size())
-          std::fill(begin() + n, end(), T());
-        else
+        if (n >= size())
           std::fill(end(), begin() + n, T());
+#if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
+        else
+          std::fill(begin() + n, end(), T());
+#endif
       }
       else  // !is_data_small_used()
       {
@@ -428,15 +432,14 @@ void small_vector<T, S>::reserve(std::size_t n)
 }
 
 template<class T, std::size_t S>
-void small_vector<T, S>::free_all_memory()
+void small_vector<T, S>::free_heap_memory()
 {
-  if (is_data_small_used())
-  {
-    if (!std::is_pod<T>::value)
-      std::fill(begin(), end(), T());
-  }
-  else
-    free_heap_memory();
+  assert(!is_data_small_used());
+
+  if (!std::is_pod<T>::value)
+    destroy_range(begin(), end());
+
+  ::operator delete(data_);
 }
 
 template<class T, std::size_t S>
@@ -448,7 +451,12 @@ void small_vector<T, S>::grow(size_type n)
 
   uninitialized_move(begin(), end(), new_data);
 
-  free_all_memory();
+  if (!is_data_small_used())
+    free_heap_memory();
+#if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
+  else if (!std::is_pod<T>::value)
+    std::fill(begin(), end(), T());
+#endif
 
   data_ = new_data;
   capacity_ = data_ + n;
