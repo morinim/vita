@@ -148,6 +148,7 @@ public:
 
 #include "kernel/evolution_selection.tcc"
 
-} } // namespace vita :: selection
+}  // namespace selection
+}  // namespace vita
 
 #endif  // Include guard

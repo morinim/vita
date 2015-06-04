@@ -176,4 +176,26 @@ BOOST_AUTO_TEST_CASE(t_clear)
   BOOST_REQUIRE(sv.empty());
 }
 
+BOOST_AUTO_TEST_CASE(t_comparison)
+{
+  vita::small_vector<int, 1> sv1(10, 3);
+  vita::small_vector<int, 5> sv2(10, 3);
+  vita::small_vector<int, 6> sv3(10, 4);
+
+  BOOST_REQUIRE(sv1 == sv1);
+  BOOST_REQUIRE(sv1 == sv2);
+  BOOST_REQUIRE(sv2 == sv1);
+  BOOST_REQUIRE(sv1 != sv3);
+  BOOST_REQUIRE(sv2 != sv3);
+
+  BOOST_REQUIRE(sv1 >= sv1);
+  BOOST_REQUIRE(sv1 >= sv2);
+  BOOST_REQUIRE(sv3 >= sv1);
+  BOOST_REQUIRE(sv3 >  sv1);
+  BOOST_REQUIRE(sv1 <= sv1);
+  BOOST_REQUIRE(sv2 <= sv2);
+  BOOST_REQUIRE(sv2 <= sv3);
+  BOOST_REQUIRE(sv2 <  sv3);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

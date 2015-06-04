@@ -502,4 +502,95 @@ void small_vector<T, S>::grow(size_type n)
   capacity_ = data_ + n;
 }
 
+///
+/// \brief Checks if the contents of `lhs` and `rhs` are equal
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` whether `lhs.size() == rhs.size()` and each element in `lhs`
+///         compares equal with the element in `rhs` at the same position.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator==(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return lhs.size() == rhs.size() &&
+         std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs));
+}
+
+///
+/// \brief Checks if the contents of `lhs` and `rhs` aren't equal
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` whether `!(lhs == rhs)`.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator!=(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return !operator==(lhs, rhs);
+}
+
+///
+/// \brief Compares the contents of `lhs` and `rhs` lexicographically
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if the contents of `lhs` are lexicographically less than
+///         the contents of `rhs`, `false` otherwise.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator<(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return std::lexicographical_compare(std::begin(lhs), std::end(lhs),
+                                      std::begin(rhs), std::end(rhs));
+}
+
+///
+/// \brief Compares the contents of `lhs` and `rhs` lexicographically
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if the contents of `lhs` are lexicographically greater than
+///         the contents of `rhs`, `false` otherwise.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator>(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return operator<(rhs, lhs);
+}
+
+///
+/// \brief Compares the contents of `lhs` and `rhs` lexicographically
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if the contents of the `lhs` are lexicographically greater
+///         than or equal the contents of `rhs`, `false` otherwise.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator>=(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return !operator<(lhs, rhs);
+}
+
+///
+/// \brief Compares the contents of `lhs` and `rhs` lexicographically
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if the contents of the `lhs` are lexicographically less
+///         than or equal the contents of `rhs`, `false` otherwise.
+///
+/// \relates small_vector
+///
+template<class T, std::size_t LS, std::size_t RS>
+bool operator<=(const small_vector<T, LS> &lhs, const small_vector<T, RS> &rhs)
+{
+  return !operator>(lhs, rhs);
+}
+
 #endif  // Include guard

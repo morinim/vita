@@ -116,7 +116,7 @@ typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::begin() const
 template<class T>
 typename basic_fitness_t<T>::iterator basic_fitness_t<T>::end()
 {
-  return vect_.end();
+  return std::end(vect_);
 }
 
 ///
@@ -168,6 +168,8 @@ bool operator!=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison.
 /// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically less than
+///         the contents of `rhs`, `false` otherwise.
 ///
 /// Behaves as if using algorithm lexicographical_compare, which compares
 /// the elements sequentially, stopping at the first mismatch.
@@ -203,6 +205,8 @@ bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison.
 /// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically greater
+///         than or equal the contents of `rhs`, `false` otherwise.
 ///
 /// \see basic_fitness_t::operator<
 ///
@@ -219,6 +223,8 @@ bool operator>(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison.
 /// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically greater
+///         than or equal the contents of `rhs`, `false` otherwise.
 ///
 /// \see basic_fitness_t::operator<
 ///
@@ -235,6 +241,8 @@ bool operator>=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison.
 /// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically less
+///         than or equal the contents of `rhs`, `false` otherwise.
 ///
 /// \see basic_fitness_t::operator<
 ///
