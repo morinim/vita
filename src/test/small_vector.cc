@@ -198,4 +198,42 @@ BOOST_AUTO_TEST_CASE(t_comparison)
   BOOST_REQUIRE(sv2 <  sv3);
 }
 
+BOOST_AUTO_TEST_CASE(t_emplace_back)
+{
+  vita::small_vector<double, 1> sv1;
+  std::vector<double> v;
+
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    sv1.emplace_back(i);
+    v.emplace_back(i);
+
+    BOOST_REQUIRE_EQUAL_COLLECTIONS(sv1.begin(), sv1.end(), v.begin(), v.end());
+  }
+
+  vita::small_vector<int, 2> sv2;
+  std::vector<int> v2;
+
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    sv2.emplace_back(static_cast<int>(i));
+    v2.emplace_back(static_cast<int>(i));
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(sv2.begin(), sv2.end(), v2.begin(), v2.end());
+  }
+
+  assert(!std::is_pod<not_pod>::value);
+
+  vita::small_vector<not_pod, 3> sv3;
+  std::vector<not_pod> v3;
+
+  for (unsigned i(0); i < 1000; ++i)
+  {
+    sv3.emplace_back(static_cast<int>(i), i + 1);
+    v3.emplace_back(static_cast<int>(i), i + 1);
+
+    BOOST_CHECK_EQUAL_COLLECTIONS(sv3.begin(), sv3.end(), v3.begin(), v3.end());
+  }
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -190,6 +190,8 @@ public:
   void reserve(size_type);
 
   void push_back(const T &);
+  template<class... Args> void emplace_back(Args &&...);
+
   template<class IT> iterator insert(iterator, IT, IT);
 
 private:  // Support methods

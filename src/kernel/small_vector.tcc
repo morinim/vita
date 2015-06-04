@@ -302,6 +302,26 @@ void small_vector<T, S>::push_back(const T &x)
 }
 
 template<class T, std::size_t S>
+template<class... Args> void small_vector<T, S>::emplace_back(Args &&... args)
+{
+  if (size_ == capacity_)
+  {
+    const auto n_old(size());
+    const auto n(n_old > 1 ? (3 * n_old) / 2 : n_old + 1);
+
+    grow(n);
+    size_ = data_ + n_old;
+  }
+
+  if (local_storage_used())
+    *size_ = T(std::forward<Args>(args)...);
+  else
+    new (size_) T(std::forward<Args>(args)...);
+
+  ++size_;
+}
+
+template<class T, std::size_t S>
 template<class IT>
 typename small_vector<T,S>::iterator small_vector<T, S>::append(IT b, IT e)
 {
