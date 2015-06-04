@@ -43,6 +43,8 @@ namespace vita
 /// want to allocate lots of them (doing so will waste a lot of space). As
 /// such, small vectors are most useful when on the stack.
 ///
+/// \warning Note that this doesn't attempt to be exception safe.
+///
 template<class T, std::size_t S = 0>
 class small_vector
 {

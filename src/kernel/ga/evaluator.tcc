@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,14 +30,14 @@ ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
 
 ///
 /// \param[in] f objective function.
-/// \return an evaluator based on \a f.
+/// \return an evaluator based on `f`.
 ///
 /// This is the so called object generator idiom. Here it's used because C++11
 /// standard doesn't allow for template argument deduction from the parameters
 /// passed to the constructor.
 ///
 /// Any reasonable compiler will optimize away the temporary object and this
-/// is usually faster than a solution based on \c std::function.
+/// is usually faster than a solution based on `std::function`.
 ///
 /// \see
 /// * <http://stackoverflow.com/q/984394/3235496>
