@@ -57,7 +57,7 @@ public:  // Public data members
 template<unsigned K>
 std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
 
-using gene = basic_gene<1>;
+using gene = basic_gene<4>;
 
 #include "kernel/gene.tcc"
 }  // namespace vita
