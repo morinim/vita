@@ -167,4 +167,13 @@ BOOST_AUTO_TEST_CASE(t_insert)
   }
 }
 
+BOOST_AUTO_TEST_CASE(t_clear)
+{
+  vita::small_vector<double, 1> sv(10, 3.1415);
+
+  BOOST_REQUIRE(!sv.empty());
+  sv.clear();
+  BOOST_REQUIRE(sv.empty());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

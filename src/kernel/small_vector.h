@@ -74,6 +74,8 @@ public:
   small_vector &operator=(const small_vector &);
   small_vector &operator=(small_vector &&);
 
+  void clear();
+
   /// \param[in] pos position of the element to return.
   /// \return a reference to the elemente at specified location `pos`.
   /// \note No bounds checking is performed.

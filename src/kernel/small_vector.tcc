@@ -270,6 +270,18 @@ small_vector<T, S>::~small_vector()
 }
 
 template<class T, std::size_t S>
+void small_vector<T, S>::clear()
+{
+  if (!local_storage_used())
+    free_heap_memory();
+
+  data_ = local_storage_;
+  size_ = data_;
+  capacity_ = data_ + S;
+
+}
+
+template<class T, std::size_t S>
 void small_vector<T, S>::push_back(const T &x)
 {
   if (size_ == capacity_)
