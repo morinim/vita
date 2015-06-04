@@ -26,17 +26,19 @@ namespace vita {  namespace replacement {
 /// vita::evolution is the context.
 ///
 /// \see
-/// http://en.wikipedia.org/wiki/Strategy_pattern
+/// - <http://en.wikipedia.org/wiki/Strategy_pattern>
 ///
 template<class T>
 class strategy
 {
 public:
+  using offspring_t = typename recombination::strategy<T>::offspring_t;
+
   strategy(population<T> &, evaluator<T> &);
   virtual ~strategy() {}
 
-  virtual void run(const std::vector<coord> &, const std::vector<T> &,
-                   summary<T> *const) = 0;
+  virtual void run(const std::vector<coord> &, const offspring_t &,
+                   summary<T> *) = 0;
 
 protected:
   population<T> &pop_;
@@ -67,8 +69,9 @@ class family_competition : public strategy<T>
 public:
   using family_competition::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &, const std::vector<T> &,
-                   summary<T> *const) override;
+  virtual void run(const std::vector<coord> &,
+                   const typename strategy<T>::offspring_t &,
+                   summary<T> *) override;
 };
 
 ///
@@ -89,8 +92,9 @@ class tournament : public strategy<T>
 public:
   using tournament::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &, const std::vector<T> &,
-                   summary<T> *const) override;
+  virtual void run(const std::vector<coord> &,
+                   const typename strategy<T>::offspring_t &,
+                   summary<T> *) override;
 };
 
 ///
@@ -116,8 +120,9 @@ class alps : public strategy<T>
 public:
   using alps::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &, const std::vector<T> &,
-                   summary<T> *const) override;
+  virtual void run(const std::vector<coord> &,
+                   const typename strategy<T>::offspring_t &,
+                   summary<T> *) override;
 
   void try_move_up_layer(unsigned);
 
@@ -132,8 +137,9 @@ class pareto : public strategy<T>
 public:
   using pareto::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &, const std::vector<T> &,
-                   summary<T> *const) override;
+  virtual void run(const std::vector<coord> &,
+                   const typename strategy<T>::offspring_t &,
+                   summary<T> *) override;
 };
 
 #include "kernel/evolution_replacement.tcc"

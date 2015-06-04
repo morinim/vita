@@ -39,7 +39,8 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// generates numerous offspring from a single parent.
 ///
 template<class T>
-std::vector<T> strategy<T>::run(const std::vector<coord> &parent)
+typename strategy<T>::offspring_t strategy<T>::run(
+  const std::vector<coord> &parent)
 {
   return run_nvi(parent);
 }
@@ -51,7 +52,8 @@ std::vector<T> strategy<T>::run(const std::vector<coord> &parent)
 /// This is a quite standard crossover + mutation operator.
 ///
 template<class T>
-std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
+typename strategy<T>::offspring_t base<T>::run_nvi(
+  const std::vector<coord> &parent)
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
@@ -127,7 +129,8 @@ std::vector<T> base<T>::run_nvi(const std::vector<coord> &parent)
 /// This is strictly based on the DE crossover operator.
 ///
 template<class T>
-std::vector<T> de<T>::run_nvi(const std::vector<coord> &parent)
+typename strategy<T>::offspring_t de<T>::run_nvi(
+  const std::vector<coord> &parent)
 {
   assert(parent.size() >= 2);
 

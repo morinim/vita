@@ -48,13 +48,15 @@ template<class T>
 class strategy
 {
 public:
+  using offspring_t = small_vector<T, 1>;
+
   strategy(const population<T> &, evaluator<T> &, summary<T> *const);
   virtual ~strategy() {}
 
-  std::vector<T> run(const std::vector<coord> &);
+  offspring_t run(const std::vector<coord> &);
 
 private:  // NVI template methods
-  virtual std::vector<T> run_nvi(const std::vector<coord> &) = 0;
+  virtual offspring_t run_nvi(const std::vector<coord> &) = 0;
 
 protected:
   const population<T> &pop_;
@@ -76,7 +78,8 @@ public:
   using base::strategy::strategy;
 
 private:  // NVI template methods
-  virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
+  virtual typename strategy<T>::offspring_t run_nvi(
+    const std::vector<coord> &) override;
 };
 
 ///
@@ -89,7 +92,8 @@ public:
   using de::strategy::strategy;
 
 private:  // NVI template methods
-  virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
+  virtual typename strategy<T>::offspring_t run_nvi(
+    const std::vector<coord> &) override;
 };
 
 #include "kernel/evolution_recombination.tcc"

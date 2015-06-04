@@ -37,9 +37,9 @@ strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
 ///   child is better.
 ///
 template<class T>
-void family_competition<T>::run(const std::vector<coord> &parent,
-                                const std::vector<T> &offspring,
-                                summary<T> *const s)
+void family_competition<T>::run(
+  const std::vector<coord> &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
   assert(pop.env().elitism != trilean::unknown);
@@ -101,9 +101,9 @@ void family_competition<T>::run(const std::vector<coord> &parent,
 ///   child is better.
 ///
 template<class T>
-void tournament<T>::run(const std::vector<coord> &parent,
-                        const std::vector<T> &offspring,
-                        summary<T> *const s)
+void tournament<T>::run(
+  const std::vector<coord> &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
 
@@ -241,8 +241,9 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 ///   population.
 ///
 template<class T>
-void alps<T>::run(const std::vector<coord> &parent,
-                  const std::vector<T> &offspring, summary<T> *const s)
+void alps<T>::run(
+  const std::vector<coord> &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   const auto layer(std::max(parent[0].layer, parent[1].layer));
   const auto f_off(this->eva_(offspring[0]));
@@ -309,9 +310,9 @@ void alps<T>::run(const std::vector<coord> &parent,
 /// K. Srinivas, S. Armfield, J. Periaux.
 ///
 template<class T>
-void pareto<T>::run(const std::vector<coord> &parent,
-                    const std::vector<T> &offspring,
-                    summary<T> *const s)
+void pareto<T>::run(
+  const std::vector<coord> &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
 
