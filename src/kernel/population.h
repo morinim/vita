@@ -78,7 +78,7 @@ namespace vita
     const_iterator end() const;
 
   public:   // Serialization
-    bool load(std::istream &);
+    bool load(std::istream &, const environment &);
     bool save(std::ostream &) const;
 
   private:  // Private data members

@@ -65,7 +65,7 @@ public:   // Serialization
     if (!(in >> n) || n != 1)
       return false;
 
-    return ind_.load(in);
+    return ind_.load(in, ind_.env());
   }
 
   bool save(std::ostream &out) const
@@ -89,8 +89,8 @@ public:   // Public data members
   mutable src_interpreter<T> int_;
 
 public:   // Serialization
-  constexpr bool load(std::istream &) const { return false; }
-  constexpr bool save(std::ostream &) const { return false; }
+  bool load(std::istream &) { return false; }
+  bool save(std::ostream &) const { return false; }
 };
 
 // ********* Third specialization (teams, individuals stored) *********
@@ -185,8 +185,8 @@ public:
   }
 
 public:   // Serialization
-  constexpr bool load(std::istream &) const { return false; }
-  constexpr bool save(std::ostream &) const { return false; }
+  bool load(std::istream &) { return false; }
+  bool save(std::ostream &) const { return false; }
 
 public:   // Public data members
   std::vector<reg_lambda_f_storage<T, false>> team_;
@@ -215,8 +215,8 @@ template<bool N>
 class class_names
 {
 public:   // Serialization
-  constexpr bool load(std::istream &) const { return true; }
-  constexpr bool save(std::ostream &) const { return true; }
+  bool load(std::istream &) { return true; }
+  bool save(std::ostream &) const { return true; }
 
 protected:
   /// Without names... there isn't anything to do.

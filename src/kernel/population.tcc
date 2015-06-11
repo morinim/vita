@@ -305,6 +305,7 @@ bool population<T>::debug(bool verbose) const
 }
 
 ///
+/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
 /// \return \c true if population was loaded correctly.
 ///
@@ -313,13 +314,13 @@ bool population<T>::debug(bool verbose) const
 /// changed.
 ///
 template<class T>
-bool population<T>::load(std::istream &in)
+bool population<T>::load(std::istream &in, const environment &e)
 {
   unsigned n_layers;
   if (!(in >> n_layers) || !n_layers)
     return false;
 
-  population p(env());
+  population p(e);
   p.pop_.reserve(n_layers);
   p.allowed_.reserve(n_layers);
 
@@ -333,7 +334,7 @@ bool population<T>::load(std::istream &in)
       return false;
 
     for (decltype(n_elem) i(0); i < n_elem; ++i)
-      if (!p[{l, i}].load(in))
+      if (!p[{l, i}].load(in, e))
         return false;
   }
 

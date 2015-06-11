@@ -106,7 +106,7 @@ public:
   bool debug(bool = true) const;
 
 private:   // NVI implementation (serialization)
-  virtual bool load_nvi(std::istream &) override;
+  virtual bool load_nvi(std::istream &, const environment &) override;
   virtual bool save_nvi(std::ostream &) const override;
 
 private:  // Private support methods

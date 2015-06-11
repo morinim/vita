@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(i1.save(ss));
 
     vita::i_ga i2(env);
-    BOOST_REQUIRE(i2.load(ss));
+    BOOST_REQUIRE(i2.load(ss, env));
     BOOST_REQUIRE(i2.debug());
 
     BOOST_CHECK_EQUAL(i1, i2);
@@ -262,8 +262,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
   vita::i_ga empty;
   BOOST_REQUIRE(empty.save(ss));
 
-  vita::i_ga empty1(env);
-  BOOST_REQUIRE(empty1.load(ss));
+  vita::i_ga empty1;
+  BOOST_REQUIRE(empty1.load(ss, env));
   BOOST_REQUIRE(empty1.debug());
   BOOST_REQUIRE(empty1.empty());
 

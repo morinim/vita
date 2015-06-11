@@ -83,16 +83,14 @@ public:
 
   bool debug(bool = true) const;
 
-private:
+  // Iterators.
   using members_t = std::vector<T>;
-
-public:  // Iterators
   using const_iterator = typename members_t::const_iterator;
   const_iterator begin() const;
   const_iterator end() const;
 
-public:   // Serialization
-  bool load(std::istream &);
+  // Serialization.
+  bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
 private:  // Private support methods

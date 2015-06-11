@@ -15,13 +15,14 @@
 namespace vita
 {
 ///
+/// \param[in] env environment used for building the individual.
 /// \param[in] in input stream.
 /// \return `true` if the object has been loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the object isn't modified.
 ///
-bool individual::load(std::istream &in)
+bool individual::load(std::istream &in, const environment &env)
 {
   bool t_empty;
   if (!(in >> t_empty))
@@ -31,17 +32,14 @@ bool individual::load(std::istream &in)
   if (!(in >> t_age))
     return false;
 
-  if (!load_nvi(in))
+  if (!load_nvi(in, env))
     return false;
 
-  if (t_empty)
-    env_ = nullptr;
-
+  env_ = t_empty ? nullptr : &env;
   age_ = t_age;
 
   // We don't save/load signature: it can be easily calculated on the fly.
   signature_.clear();
-  // signature_ = hash();
 
   return true;
 }

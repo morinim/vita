@@ -39,19 +39,19 @@ i_mep::i_mep(const environment &e)
 
   const index_t sup(size()), patch(sup - e.patch_length);
 
-  const auto categories(env().sset->categories());
+  const auto categories(e.sset->categories());
   assert(categories);
   assert(categories < sup);
 
   // STANDARD SECTION. Filling the genome with random symbols.
   for (index_t i(0); i < patch; ++i)
     for (category_t c(0); c < categories; ++c)
-      genome_(i, c) = gene(env().sset->roulette(c), i + 1, size());
+      genome_(i, c) = gene(e.sset->roulette(c), i + 1, size());
 
   // PATCH SUBSECTION. Placing terminals for satisfying constraints on types.
   for (index_t i(patch); i < sup; ++i)
     for (category_t c(0); c < categories; ++c)
-      genome_(i, c) = gene(env().sset->roulette_terminal(c));
+      genome_(i, c) = gene(e.sset->roulette_terminal(c));
 
   assert(debug(true));
 }
@@ -767,6 +767,7 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 }
 
 ///
+/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
 /// \return `true` if the object has been loaded correctly.
 ///
@@ -774,7 +775,7 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_mep::load_nvi(std::istream &in)
+bool i_mep::load_nvi(std::istream &in, const environment &e)
 {
   unsigned rows, cols;
   if (!(in >> rows >> cols))
@@ -785,33 +786,33 @@ bool i_mep::load_nvi(std::istream &in)
   // (among other things it needs access to the symbol_set to decode the
   // symbols).
   decltype(genome_) genome(rows, cols);
-  for (auto &e : genome)
+  for (auto &g : genome)
   {
     opcode_t opcode;
     if (!(in >> opcode))
       return false;
 
-    gene g;
+    gene temp;
 
-    g.sym = env().sset->decode(opcode);
-    if (!g.sym)
+    temp.sym = e.sset->decode(opcode);
+    if (!temp.sym)
       return false;
 
-    if (g.sym->parametric())
-      if (!(in >> g.par))
+    if (temp.sym->parametric())
+      if (!(in >> temp.par))
         return false;
 
-    const auto arity(g.sym->arity());
+    const auto arity(temp.sym->arity());
     if (arity)
     {
-      g.args.resize(arity);
+      temp.args.resize(arity);
 
       for (unsigned i(0); i < arity; ++i)
-        if (!(in >> g.args[i]))
+        if (!(in >> temp.args[i]))
           return false;
     }
 
-    e = g;
+    g = temp;
   }
 
   auto best(locus::npos());

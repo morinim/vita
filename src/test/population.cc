@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(pop1.save(ss));
 
     vita::population<vita::i_mep> pop2(env);
-    BOOST_REQUIRE(pop2.load(ss));
+    BOOST_REQUIRE(pop2.load(ss, env));
     BOOST_REQUIRE(pop2.debug(true));
 
     BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());

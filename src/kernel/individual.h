@@ -61,7 +61,7 @@ public:
   virtual std::ostream &in_line(std::ostream &) const = 0;
 
   // Serialization
-  bool load(std::istream &);
+  bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
 protected:  // Protected support methods
@@ -74,7 +74,7 @@ protected:  // Protected data members
   mutable hash_t signature_;
 
 private:  // Non-virtual interface members
-  virtual bool load_nvi(std::istream &) = 0;
+  virtual bool load_nvi(std::istream &, const environment &) = 0;
   virtual bool save_nvi(std::ostream &) const = 0;
 
 private:

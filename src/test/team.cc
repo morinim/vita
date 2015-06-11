@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(t1.save(ss));
 
     vita::team<vita::i_mep> t2(env);
-    BOOST_REQUIRE(t2.load(ss));
+    BOOST_REQUIRE(t2.load(ss, env));
     BOOST_REQUIRE(t2.debug());
 
     BOOST_CHECK_EQUAL(t1, t2);

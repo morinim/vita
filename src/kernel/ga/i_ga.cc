@@ -416,6 +416,7 @@ bool i_ga::debug(bool verbose) const
 }
 
 ///
+/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
 /// \return `true` if the object has been loaded correctly.
 ///
@@ -423,28 +424,28 @@ bool i_ga::debug(bool verbose) const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_ga::load_nvi(std::istream &in)
+bool i_ga::load_nvi(std::istream &in, const environment &e)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
     return false;
 
   decltype(genome_) v(sz);
-  for (auto &e : v)
+  for (auto &g : v)
   {
     opcode_t opcode;
     if (!(in >> opcode))
       return false;
 
-    gene g;
-    g.sym = env().sset->decode(opcode);
-    if (!g.sym)
+    gene temp;
+    temp.sym = e.sset->decode(opcode);
+    if (!temp.sym)
       return false;
 
-    if (!(in >> g.par))
+    if (!(in >> temp.par))
       return false;
 
-    e = g;
+    g = temp;
   }
 
   genome_ = v;

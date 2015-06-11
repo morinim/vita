@@ -53,8 +53,8 @@ bool summary<T>::load(std::istream &in, const environment &e)
   summary tmp_summary;
   if (known_best)
   {
-    T tmp_ind(e);
-    if (!tmp_ind.load(in))
+    T tmp_ind;
+    if (!tmp_ind.load(in, e))
       return false;
 
     decltype(best.score.fitness) tmp_fitness;

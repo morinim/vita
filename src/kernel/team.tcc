@@ -330,6 +330,7 @@ bool team<T>::debug(bool verbose) const
 }
 
 ///
+/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
 /// \return `true` if team was loaded correctly.
 ///
@@ -337,7 +338,7 @@ bool team<T>::debug(bool verbose) const
 /// If the load operation isn't successful the current team isn't modified.
 ///
 template<class T>
-bool team<T>::load(std::istream &in)
+bool team<T>::load(std::istream &in, const environment &e)
 {
   unsigned n;
   if (!(in >> n) || !n)
@@ -348,8 +349,8 @@ bool team<T>::load(std::istream &in)
 
   for (unsigned j(0); j < n; ++j)
   {
-    T i(env());
-    if (!i.load(in))
+    T i;
+    if (!i.load(in, e))
       return false;
     v.push_back(i);
   }
