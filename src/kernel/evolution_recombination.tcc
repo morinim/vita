@@ -80,10 +80,10 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
     // * optimize the exploitation phase.
     while (pop[r1].signature() == off.signature() ||
            pop[r2].signature() == off.signature())
-      this->stats_->mutations += off.mutation();
+      this->stats_->mutations += off.mutation(env.p_mutation);
 
     //if (eva_.seen(off))
-    //  stats_->mutations += off.mutation();
+    //  stats_->mutations += off.mutation(env.p_mutation);
 
     if (*env.brood_recombination > 0)
     {
@@ -96,7 +96,7 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
 
         while (pop[r1].signature() == tmp.signature() ||
                pop[r2].signature() == tmp.signature())
-          this->stats_->mutations += tmp.mutation();
+          this->stats_->mutations += tmp.mutation(env.p_mutation);
 
         const auto fit_tmp(this->eva_.fast(tmp));
         if (fit_tmp > fit_off)
@@ -115,7 +115,7 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
   else // !crossover
   {
     T off(pop[random::boolean() ? r1 : r2]);
-    this->stats_->mutations += off.mutation();
+    this->stats_->mutations += off.mutation(env.p_mutation);
 
     assert(off.debug());
     return {off};

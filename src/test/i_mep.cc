@@ -28,7 +28,7 @@ using namespace boost;
 
 BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory3, F_FACTORY3)
 
-BOOST_AUTO_TEST_CASE(RandomCreation)
+BOOST_AUTO_TEST_CASE(t_random_creation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
   for (unsigned l(env.sset->categories() + 2); l < 100; ++l)
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   }
 }
 
-BOOST_AUTO_TEST_CASE(EmptyIndividual)
+BOOST_AUTO_TEST_CASE(t_empty_individual)
 {
   vita::i_mep i;
 
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
   BOOST_REQUIRE(!i.empty());
 }
 
-BOOST_AUTO_TEST_CASE(Mutation)
+BOOST_AUTO_TEST_CASE(t_mutation)
 {
   env.code_length = 100;
 
@@ -64,22 +64,20 @@ BOOST_AUTO_TEST_CASE(Mutation)
   const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
-  env.p_mutation = 0.0;
   for (unsigned i(0); i < n; ++i)
   {
-    ind.mutation();
+    ind.mutation(0.0);
     BOOST_REQUIRE_EQUAL(ind, orig);
   }
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
-  env.p_mutation = 0.5;
   unsigned diff(0), length(0);
 
   for (unsigned i(0); i < n; ++i)
   {
     const vita::i_mep i1(ind);
 
-    ind.mutation();
+    ind.mutation(0.5);
     diff += distance(i1, ind);
     length += i1.eff_size();
   }
@@ -89,7 +87,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_CHECK_LT(perc, 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(Comparison)
+BOOST_AUTO_TEST_CASE(t_comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
@@ -112,7 +110,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
   }
 }
 
-BOOST_AUTO_TEST_CASE(Crossover)
+BOOST_AUTO_TEST_CASE(t_crossover)
 {
   env.code_length = 100;
 
@@ -140,7 +138,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
   BOOST_CHECK_LT(perc, 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+BOOST_AUTO_TEST_CASE(t_serialization)
 {
   BOOST_TEST_CHECKPOINT("Non-empty i_mep serialization");
   for (unsigned i(0); i < 2000; ++i)
@@ -173,7 +171,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   BOOST_REQUIRE_EQUAL(empty, empty1);
 }
 
-BOOST_AUTO_TEST_CASE(Blocks)
+BOOST_AUTO_TEST_CASE(t_blocks)
 {
   const unsigned n(1000);
 
@@ -203,7 +201,7 @@ BOOST_AUTO_TEST_CASE(Blocks)
   }
 }
 
-BOOST_AUTO_TEST_CASE(Output)
+BOOST_AUTO_TEST_CASE(t_output)
 {
   vita::i_mep i(env,
                 {
@@ -245,7 +243,7 @@ BOOST_AUTO_TEST_CASE(Output)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory1, F_FACTORY1)
-BOOST_AUTO_TEST_CASE(Compress)
+BOOST_AUTO_TEST_CASE(t_compress)
 {
   const unsigned n(5000);
 

@@ -46,8 +46,6 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation()
-  { assert(env().p_mutation >= 0.0); return mutation(env().p_mutation); }
   unsigned mutation(double);
   i_mep crossover(i_mep) const;
 

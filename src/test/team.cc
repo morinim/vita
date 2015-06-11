@@ -53,15 +53,13 @@ BOOST_AUTO_TEST_CASE(Mutation)
   const unsigned n(4000);
 
   BOOST_TEST_CHECKPOINT("Zero probability mutation");
-  env.p_mutation = 0.0;
   for (unsigned i(0); i < n; ++i)
   {
-    t.mutation();
+    t.mutation(0.0);
     BOOST_REQUIRE_EQUAL(t, orig);
   }
 /*
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
-  env.p_mutation = 0.5;
 
   double diff(0.0), avg_length(0.0);
 
@@ -69,7 +67,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     const auto t1{t};
 
-    t.mutation();
+    t.mutation(0.5);
     diff += distance(t, t1);
     length += t1.eff_size();
   }

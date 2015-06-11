@@ -55,22 +55,6 @@ team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 }
 
 ///
-/// \return number of mutations performed.
-///
-/// Calls team::mutation(double) using the mutation probability specified in
-/// the environment.
-///
-template<class T>
-unsigned team<T>::mutation()
-{
-  const auto p(env().p_mutation);
-  assert(0.0 <= p);
-  assert(p <= 1.0);
-
-  return mutation(p);
-}
-
-///
 /// \param[in] p probability of gene mutation.
 /// \return number of mutations performed.
 ///
