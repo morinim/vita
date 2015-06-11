@@ -63,7 +63,7 @@ public:
 
   std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
 
-  void set(const locus &l, const gene &g);
+  void set(const locus &, const gene &);
 
   bool operator==(const i_mep &) const;
 
@@ -85,13 +85,13 @@ public:
 
   friend class interpreter<i_mep>;
 
-private:   // NVI implementation (serialization)
-  virtual bool load_nvi(std::istream &, const environment &) override;
-  virtual bool save_nvi(std::ostream &) const override;
-
 private:  // Private support methods
   hash_t hash() const;
   void pack(const locus &, std::vector<unsigned char> *const) const;
+
+  // NVI implementation (serialization)
+  virtual bool load_nvi(std::istream &, const environment &) override;
+  virtual bool save_nvi(std::ostream &) const override;
 
 private:  // Private data members
   // This is the genome: the entire collection of genes (the entirety of an
