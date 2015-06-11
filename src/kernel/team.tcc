@@ -264,18 +264,7 @@ unsigned distance(const team<T> &lhs, const team<T> &rhs)
 
   unsigned d(0);
   for (auto i(decltype(sup){0}); i < sup; ++i)
-  {
-    const index_t i_sup(lhs[i].size());
-    const category_t c_sup(lhs[i].categories());
-
-    for (index_t j(0); j < i_sup; ++j)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{j, c};
-        if (lhs[i][l] != rhs[i][l])
-          ++d;
-      }
-  }
+    d += distance(lhs[i], rhs[i]);
 
   return d;
 }
