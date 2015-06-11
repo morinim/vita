@@ -36,11 +36,14 @@ public:
   explicit core_reg_lambda_f(const T &ind) : ind_(ind), int_(&ind_)
   { assert(debug()); }
 
-  bool debug() const { return ind_.debug() && int_.debug(); }
+  bool debug() const
+  {
+    if (!ind_.debug())
+      return false;
 
-  // Without this copy assignment operator the object cannot by copied since
-  // the default assignment is deleted due to the non-copyable `int_`
-  // data member.
+    return int_.debug(&ind_);
+  }
+
   // We just need to copy the `ind_` data member, the `int_` interpreter
   // contains only a reference to `ind_`.
   core_reg_lambda_f &operator=(const core_reg_lambda_f &rhs)
@@ -90,9 +93,9 @@ public:   // Serialization
   constexpr bool save(std::ostream &) const { return false; }
 };
 
-// ********* Third specialization (teams) *********
-template<class T, bool S>
-class core_reg_lambda_f<team<T>, S, true>
+// ********* Third specialization (teams, individuals stored) *********
+template<class T>
+class core_reg_lambda_f<team<T>, true, true>
 {
 public:
   explicit core_reg_lambda_f(const team<T> &t)
@@ -112,9 +115,6 @@ public:
 
     return true;
   }
-
-public:   // Public data members
-  std::vector<core_reg_lambda_f<T, S>> team_;
 
 public:   // Serialization
   /// Load is atomic: if it doesn't succeed this object isn't modified; if
@@ -156,6 +156,40 @@ public:   // Serialization
 
     return o.good();
   }
+
+public:   // Public data members
+  std::vector<core_reg_lambda_f<T, true>> team_;
+};
+
+// ********* Fourth specialization (teams, individuals not stored) *********
+template<class T>
+class core_reg_lambda_f<team<T>, false, true>
+{
+public:
+  explicit core_reg_lambda_f(const team<T> &t)
+  {
+    team_.reserve(t.individuals());
+    for (const auto &ind : t)
+      team_.emplace_back(ind);
+
+    assert(debug());
+  }
+
+  bool debug() const
+  {
+    for (const auto &lambda : team_)
+      if (!lambda.debug())
+        return false;
+
+    return true;
+  }
+
+public:   // Serialization
+  constexpr bool load(std::istream &) const { return false; }
+  constexpr bool save(std::ostream &) const { return false; }
+
+public:   // Public data members
+  std::vector<core_reg_lambda_f<T, false>> team_;
 };
 
 // ***********************************************************************

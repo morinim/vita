@@ -26,8 +26,8 @@
 /// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
 ///
 template<class T>
-interpreter<T>::interpreter(const T *ind, interpreter<T> *ctx)
-  : core_interpreter(), prg_(*ind),
+interpreter<T>::interpreter(const T *ind, interpreter *ctx)
+  : core_interpreter(), prg_(ind),
     cache_(ind->size(), ind->env().sset->categories()), ip_(ind->best_),
     context_(ctx)
 {
@@ -45,7 +45,7 @@ any interpreter<T>::run_locus(const locus &ip)
     e.valid = false;
 
   ip_ = ip;
-  return prg_[ip_].sym->eval(this);
+  return (*prg_)[ip_].sym->eval(this);
 }
 
 ///
@@ -56,7 +56,7 @@ any interpreter<T>::run_locus(const locus &ip)
 template<class T>
 any interpreter<T>::run_nvi()
 {
-  return run_locus(prg_.best_);
+  return run_locus(prg_->best_);
 }
 
 ///
@@ -65,7 +65,7 @@ any interpreter<T>::run_nvi()
 template<class T>
 any interpreter<T>::fetch_param()
 {
-  const gene &g(prg_[ip_]);
+  const gene &g((*prg_)[ip_]);
 
   assert(g.sym->parametric());
   return any(g.par);
@@ -87,7 +87,7 @@ any interpreter<T>::fetch_param()
 template<class T>
 any interpreter<T>::fetch_arg(unsigned i)
 {
-  const gene &g(prg_[ip_]);
+  const gene &g((*prg_)[ip_]);
 
   assert(g.sym->arity());
   assert(i < g.sym->arity());
@@ -99,7 +99,7 @@ any interpreter<T>::fetch_arg(unsigned i)
                        const locus backup(ip_);
                        ip_ = l;
                        assert(ip_.index > backup.index);
-                       const auto ret(prg_[ip_].sym->eval(this));
+                       const auto ret((*prg_)[ip_].sym->eval(this));
                        ip_ = backup;
                        return ret;
                      });
@@ -134,7 +134,7 @@ any interpreter<T>::fetch_adf_arg(unsigned i)
   assert(context_->debug());
   assert(i < gene::k_args);
 
-  const gene ctx_g(context_->prg_[context_->ip_]);
+  const gene ctx_g(context_->prg_->operator[](context_->ip_));
   assert(!ctx_g.sym->terminal() && ctx_g.sym->auto_defined());
 #endif
   return context_->fetch_arg(i);
@@ -147,7 +147,7 @@ any interpreter<T>::fetch_adf_arg(unsigned i)
 template<class T>
 index_t interpreter<T>::fetch_index(unsigned i) const
 {
-  const gene &g(prg_[ip_]);
+  const gene &g((*prg_)[ip_]);
 
   assert(g.sym->arity());
   assert(i < g.sym->arity());
@@ -163,7 +163,7 @@ template<class T>
 double interpreter<T>::penalty_locus(const locus &ip)
 {
   ip_ = ip;
-  return prg_[ip_].sym->penalty(this);
+  return (*prg_)[ip_].sym->penalty(this);
 }
 
 ///
@@ -174,21 +174,26 @@ double interpreter<T>::penalty_locus(const locus &ip)
 template<class T>
 double interpreter<T>::penalty_nvi()
 {
-  return penalty_locus(prg_.best_);
+  return penalty_locus(prg_->best_);
 }
 
 ///
+/// \param[in] p a pointer to an individual (used to check if the interpreter
+///              is working on the expected individual).
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool interpreter<T>::debug_nvi() const
+bool interpreter<T>::debug_nvi(const void *p) const
 {
   if (context_ && !context_->debug())
     return false;
 
-  if (!prg_.debug())
+  if (!prg_->debug())
     return false;
 
-  return ip_.index < prg_.size();
+  if (p && static_cast<const T *>(p) != prg_)
+    return false;
+
+  return ip_.index < prg_->size();
 }
 #endif  // Include guard

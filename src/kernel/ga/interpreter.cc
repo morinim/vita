@@ -54,10 +54,15 @@ double interpreter<i_ga>::penalty_nvi()
 }
 
 ///
+/// \param[in] i a pointer to an individual (used to check if the interpreter
+///              is working on the expected individual).
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool interpreter<i_ga>::debug_nvi() const
+bool interpreter<i_ga>::debug_nvi(const void *i) const
 {
+  if (i && static_cast<const i_ga *>(i) != &p_)
+    return false;
+
   return p_.debug();
 }
 }  // namespace vita

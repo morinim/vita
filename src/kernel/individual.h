@@ -60,7 +60,7 @@ public:
   // Visualization/output methods.
   virtual std::ostream &in_line(std::ostream &) const = 0;
 
-public:   // Serialization
+  // Serialization
   bool load(std::istream &);
   bool save(std::ostream &) const;
 

@@ -17,6 +17,11 @@
 #if !defined(VITA_TEAM_TCC)
 #define      VITA_TEAM_TCC
 
+template<class T>
+team<T>::team() : individuals_(), signature_()
+{
+}
+
 ///
 /// \param[in] e base environment.
 ///
@@ -151,6 +156,15 @@ const T &team<T>::operator[](unsigned i) const
 {
   assert(i < individuals());
   return individuals_[i];
+}
+
+///
+/// \return `true` if the team is empty, `false` otherwise.
+///
+template<class T>
+bool team<T>::empty() const
+{
+  return individuals_.empty();
 }
 
 ///

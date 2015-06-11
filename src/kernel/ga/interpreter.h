@@ -35,10 +35,11 @@ public:
 
   double fetch_param(unsigned) const;
 
-private:  // Methods of the non-virtual interface
+private:
+  // Methods of the non-virtual interface
   virtual any run_nvi() override;
   virtual double penalty_nvi() override;
-  virtual bool debug_nvi() const override;
+  virtual bool debug_nvi(const void *) const override;
 
 private:  // Private data members
   const i_ga &p_;

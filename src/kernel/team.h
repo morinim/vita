@@ -53,6 +53,7 @@ template<class T>
 class team
 {
 public:
+  explicit team();
   explicit team(const environment &);
   explicit team(std::vector<T>);
 
@@ -69,6 +70,7 @@ public:
 
   const T &operator[](unsigned) const;
 
+  bool empty() const;
   unsigned individuals() const;
   unsigned eff_size() const;
 

@@ -642,7 +642,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::bin:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<binary_evaluator<T>>(data));
+        vita::make_unique<binary_evaluator<T>>(data));
       return true;
 
     case evaluator_id::dyn_slot:

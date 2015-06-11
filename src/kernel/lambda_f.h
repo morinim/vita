@@ -320,7 +320,7 @@ class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
 {
 public:
   template<class... Args> team_class_lambda_f(const team<T> &, data &,
-                                              Args&& ...);
+                                              Args &&...);
 
   virtual std::pair<class_t, double> tag(const data::example &) const override;
 

@@ -852,10 +852,10 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 }
 
 ///
+/// \brief Loads the lambda team from persistent storage
+///
 /// \param[in] in input stream.
 /// \return true on success.
-///
-/// Loads the lambda team from persistent storage.
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.

@@ -52,7 +52,7 @@ template<class T>
 class interpreter : public core_interpreter
 {
 public:
-  explicit interpreter(const T *, interpreter<T> * = nullptr);
+  explicit interpreter(const T *, interpreter * = nullptr);
 
   any fetch_param();
   any fetch_arg(unsigned);
@@ -66,13 +66,11 @@ private:  // Private support methods
   // Non-virtual interface
   virtual any run_nvi() override;
   virtual double penalty_nvi() override;
-  virtual bool debug_nvi() const override;
+  virtual bool debug_nvi(const void *) const override;
 
 private:  // Private data members
-  // There are different opinions about the use of references as data member:
-  // many prefer pointers. Here we prefer a reference since prg_ cannot be
-  // null and assignment between interpreters is a rare scenario.
-  const T &prg_;
+  const T *prg_;
+
   struct elem_ {bool valid; any value;};
   mutable matrix<elem_> cache_;
 
@@ -80,7 +78,7 @@ private:  // Private data members
   locus ip_;
 
   // This is a pointer since we need to describe a one-or-zero relationship.
-  interpreter<T> *const context_;
+  interpreter *context_;
 };
 
 #include "kernel/interpreter.tcc"
