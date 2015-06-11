@@ -58,14 +58,14 @@ BOOST_AUTO_TEST_CASE(Mutation)
     t.mutation(0.0);
     BOOST_REQUIRE_EQUAL(t, orig);
   }
-/*
+
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
 
-  double diff(0.0), avg_length(0.0);
+  double diff(0.0), length(0.0);
 
   for (unsigned i(0); i < n; ++i)
   {
-    const auto t1{t};
+    const vita::team<vita::i_mep> t1{t};
 
     t.mutation(0.5);
     diff += distance(t, t1);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
 
   const double perc(100.0 * diff / length);
   BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 52.0);*/
+  BOOST_CHECK_LT(perc, 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
