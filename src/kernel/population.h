@@ -20,78 +20,76 @@
 
 namespace vita
 {
-  class symbol_set;
+///
+/// \brief Holds the coordinates of an individual in a population
+///
+struct coord
+{
+  unsigned layer;
+  unsigned index;
 
-  ///
-  /// \brief Holds the coordinates of an individual in a population
-  ///
-  struct coord
-  {
-    unsigned layer;
-    unsigned index;
+  bool operator==(coord c) const
+  { return layer == c.layer && index == c.index; }
+  bool operator!=(coord c) const { return !(*this == c); }
+};
 
-    bool operator==(coord c) const
-    { return layer == c.layer && index == c.index; }
-    bool operator!=(coord c) const { return !(*this == c); }
-  };
+///
+/// \brief A group of individuals which may interact together (for example by
+///        mating) producing offspring
+///
+/// \tparam T the type of the an individual
+///
+/// Typical population size in GP ranges from ten to many thousands. The
+/// population is organized in one or more layers that can interact in
+/// many ways (depending on the evolution strategy).
+///
+template<class T>
+class population
+{
+public:
+  explicit population(const environment &);
 
-  ///
-  /// \brief A group of individuals which may interact together (for example by
-  ///        mating) producing offspring
-  ///
-  /// \tparam T the type of the an individual
-  ///
-  /// Typical population size in GP ranges from ten to many thousands. The
-  /// population is organized in one or more layers that can interact in
-  /// many ways (depending on the evolution strategy).
-  ///
-  template<class T>
-  class population
-  {
-  public:
-    explicit population(const environment &);
+  T &operator[](coord);
+  const T &operator[](coord) const;
 
-    T &operator[](coord);
-    const T &operator[](coord) const;
+  unsigned allowed(unsigned) const;
+  unsigned individuals() const;
+  unsigned individuals(unsigned) const;
 
-    unsigned allowed(unsigned) const;
-    unsigned individuals() const;
-    unsigned individuals(unsigned) const;
+  void init_layer(unsigned, const environment * = nullptr);
+  void add_layer();
+  unsigned layers() const;
+  void inc_age();
+  void add_to_layer(unsigned, const T &);
+  void pop_from_layer(unsigned);
+  void set_allowed(unsigned, unsigned);
 
-    void init_layer(unsigned, const environment * = nullptr);
-    void add_layer();
-    unsigned layers() const;
-    void inc_age();
-    void add_to_layer(unsigned, const T &);
-    void pop_from_layer(unsigned);
-    void set_allowed(unsigned, unsigned);
+  const environment &env() const;
 
-    const environment &env() const;
+  bool debug(bool) const;
 
-    bool debug(bool) const;
+  // Iterators
+  using layer_t = std::vector<T>;
+  using const_iterator = typename std::vector<layer_t>::const_iterator;
 
-  public:  // Iterators
-    using layer_t = std::vector<T>;
-    using const_iterator = typename std::vector<layer_t>::const_iterator;
+  const_iterator begin() const;
+  const_iterator end() const;
 
-    const_iterator begin() const;
-    const_iterator end() const;
+  // Serialization
+  bool load(std::istream &, const environment &);
+  bool save(std::ostream &) const;
 
-  public:   // Serialization
-    bool load(std::istream &, const environment &);
-    bool save(std::ostream &) const;
-
-  private:  // Private data members
-    std::vector<layer_t> pop_;
-    std::vector<unsigned> allowed_;
-  };
+private:  // Private data members
+  std::vector<layer_t> pop_;
+  std::vector<unsigned> allowed_;
+};
 
 #include "kernel/population.tcc"
 
-  ///
-  /// \example example2.cc
-  /// Creates a random population and shows its content.
-  ///
+///
+/// \example example2.cc
+/// Creates a random population and shows its content.
+///
 }  // namespace vita
 
 #endif  // Include guard
