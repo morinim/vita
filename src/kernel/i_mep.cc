@@ -36,21 +36,19 @@ i_mep::i_mep(const environment &e)
   assert(size());
   assert(e.patch_length);
   assert(size() > e.patch_length);
+  assert(categories());
 
-  const index_t sup(size()), patch(sup - e.patch_length);
-
-  const auto categories(e.sset->categories());
-  assert(categories);
-  assert(categories < sup);
+  const index_t i_sup(size()), patch(i_sup - e.patch_length);
+  const category_t c_sup(categories());
 
   // STANDARD SECTION. Filling the genome with random symbols.
   for (index_t i(0); i < patch; ++i)
-    for (category_t c(0); c < categories; ++c)
+    for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(e.sset->roulette(c), i + 1, size());
 
   // PATCH SUBSECTION. Placing terminals for satisfying constraints on types.
-  for (index_t i(patch); i < sup; ++i)
-    for (category_t c(0); c < categories; ++c)
+  for (index_t i(patch); i < i_sup; ++i)
+    for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(e.sset->roulette_terminal(c));
 
   assert(debug(true));
@@ -144,10 +142,10 @@ unsigned i_mep::mutation(double p)
 
 /*
   // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-  const category_t categories(env().sset->categories());
+  const category_t c_sup(categories());
 
   for (index_t i(0); i < sup; ++i)
-    for (category_t c(0); c < categories; ++c)
+    for (category_t c(0); c < c_sup; ++c)
       if (random::boolean(p))
       {
         ++n;
@@ -155,7 +153,7 @@ unsigned i_mep::mutation(double p)
         set({i, c}, gene(env().sset->roulette(c), i + 1, size()));
       }
 
-  for (category_t c(0); c < categories; ++c)
+  for (category_t c(0); c < c_sup; ++c)
     if (random::boolean(p))
     {
       ++n;
@@ -234,8 +232,8 @@ i_mep i_mep::destroy_block(index_t index) const
   assert(index < size());
 
   i_mep ret(*this);
-  const category_t categories(env().sset->categories());
-  for (category_t c(0); c < categories; ++c)
+  const category_t c_sup(categories());
+  for (category_t c(0); c < c_sup; ++c)
     ret.set({index, c}, gene(env().sset->roulette_terminal(c)));
 
   assert(ret.debug());
@@ -324,15 +322,15 @@ bool i_mep::operator==(const i_mep &x) const
 ///
 unsigned distance(const i_mep &lhs, const i_mep &rhs)
 {
-  const index_t cs(lhs.size());
-  const category_t categories(lhs.env().sset->categories());
+  assert(lhs.size() == rhs.size());
+  assert(lhs.categories() == rhs.categories());
 
-  assert(cs == rhs.size());
-  assert(categories == rhs.env().sset->categories());
+  const index_t i_sup(lhs.size());
+  const category_t c_sup(lhs.categories());
 
   unsigned d(0);
-  for (index_t i(0); i < cs; ++i)
-    for (category_t c(0); c < categories; ++c)
+  for (index_t i(0); i < i_sup; ++i)
+    for (category_t c(0); c < c_sup; ++c)
     {
       const locus l{i, c};
       if (lhs[l] != rhs[l])
@@ -468,10 +466,8 @@ bool i_mep::debug(bool verbose) const
     return true;
   }
 
-  const auto categories(env().sset->categories());
-
   for (index_t i(0); i < size(); ++i)
-    for (category_t c(0); c < categories; ++c)
+    for (category_t c(0); c < categories(); ++c)
     {
       const locus l{i, c};
 
@@ -515,7 +511,7 @@ bool i_mep::debug(bool verbose) const
       }
     }
 
-  for (category_t c(0); c < categories; ++c)
+  for (category_t c(0); c < categories(); ++c)
     if (!genome_(genome_.rows() - 1, c).sym->terminal())
     {
       if (verbose)
@@ -526,7 +522,7 @@ bool i_mep::debug(bool verbose) const
 
   // Type checking.
   for (index_t i(0); i < size(); ++i)
-    for (category_t c(0); c < categories; ++c)
+    for (category_t c(0); c < categories(); ++c)
     {
       const locus l{i, c};
 
@@ -547,7 +543,7 @@ bool i_mep::debug(bool verbose) const
       std::cerr << k_s_debug << " Incorrect index for first active symbol.\n";
     return false;
   }
-  if (best_.category >= categories)
+  if (best_.category >= categories())
   {
     if (verbose)
       std::cerr << k_s_debug
@@ -555,7 +551,7 @@ bool i_mep::debug(bool verbose) const
     return false;
   }
 
-  if (categories == 1 && eff_size() > size())
+  if (categories() == 1 && eff_size() > size())
   {
     if (verbose)
       std::cerr << k_s_debug
@@ -645,9 +641,8 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(env().sset->categories());
   const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories)));
+  const auto w2(1 + static_cast<int>(std::log10(categories())));
 
   for (const auto &l : *this)
   {
@@ -658,7 +653,7 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 
     s << '[' << std::setfill('0') << std::setw(w1) << l.index;
 
-    if (categories > 1)
+    if (categories() > 1)
       s << ',' << std::setw(w2) << l.category;
 
     s << "] " << g;
@@ -675,7 +670,7 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
       else
       {
         s << '[' << std::setw(w1) << arg_j.index;
-        if (categories > 1)
+        if (categories() > 1)
           s << ',' << std::setw(w2) << arg_j.category;
         s << ']';
       }
@@ -723,18 +718,17 @@ std::ostream &i_mep::dump(std::ostream &s) const
 {
   SAVE_FLAGS(s);
 
-  const auto categories(env().sset->categories());
   const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories)));
+  const auto w2(1 + static_cast<int>(std::log10(categories())));
 
   for (index_t i(0); i < size(); ++i)
-    for (category_t c(0); c < categories; ++c)
+    for (category_t c(0); c < categories(); ++c)
     {
       const gene &g(genome_(i, c));
 
       s << '[' << std::setfill('0') << std::setw(w1) << i;
 
-      if (categories > 1)
+      if (categories() > 1)
         s << ',' << std::setw(w2) << c;
 
       s  << "] " << g;
@@ -745,7 +739,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
         const auto arg_j(g.arg_locus(j));
 
         s << " [" << std::setw(w1) << arg_j.index;
-        if (categories > 1)
+        if (categories() > 1)
           s << ',' << std::setw(w2) << arg_j.category;
         s << ']';
       }
@@ -979,21 +973,21 @@ i_mep i_mep::crossover(i_mep rhs) const
   assert(rhs.debug());
   assert(size() == rhs.size());
 
-  const auto cs(size());
-  const auto categories(env().sset->categories());
+  const auto i_sup(size());
+  const auto c_sup(categories());
 
-  const auto cut(random::between<index_t>(1, cs - 1));
+  const auto cut(random::between<index_t>(1, i_sup - 1));
 
   if (random::boolean())
-    for (index_t i(cut); i < cs; ++i)
-      for (category_t c(0); c < categories; ++c)
+    for (index_t i(cut); i < i_sup; ++i)
+      for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
         rhs.set(l, operator[](l));
       }
   else
     for (index_t i(0); i < cut; ++i)
-      for (category_t c(0); c < categories; ++c)
+      for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
         rhs.set(l, operator[](l));
@@ -1025,16 +1019,16 @@ i_mep i_mep::crossover(i_mep rhs) const
   assert(rhs.debug());
   assert(size() == rhs.size());
 
-  const auto cs(size());
-  const auto categories(env().sset->categories());
+  const auto i_sup(size());
+  const auto c_sup(categories());
 
-  const auto cut1(random::sup(cs - 1));
-  const auto cut2(random::between(cut1 + 1, cs));
+  const auto cut1(random::sup(i_sup - 1));
+  const auto cut2(random::between(cut1 + 1, i_sup));
 
   if (random::boolean())
   {
     for (index_t i(cut1); i < cut2; ++i)
-      for (category_t c(0); c < categories; ++c)
+      for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
         rhs.set(l, operator[](l));
@@ -1043,14 +1037,14 @@ i_mep i_mep::crossover(i_mep rhs) const
   else
   {
     for (index_t i(0); i < cut1; ++i)
-      for (category_t c(0); c < categories; ++c)
+      for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
         rhs.set(l, operator[](l));
       }
 
-    for (index_t i(cut2); i < cs; ++i)
-      for (category_t c(0); c < categories; ++c)
+    for (index_t i(cut2); i < i_sup; ++i)
+      for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
         rhs.set(l, operator[](l));

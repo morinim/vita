@@ -71,9 +71,9 @@ public:
 
   const gene &operator[](const locus &l) const;
 
-  unsigned size() const;
-
+  unsigned categories() const;
   unsigned eff_size() const;
+  unsigned size() const;
 
   category_t category() const;
 
@@ -112,6 +112,14 @@ unsigned distance(const i_mep &, const i_mep &);
 inline const gene &i_mep::operator[](const locus &l) const
 {
   return genome_(l);
+}
+
+///
+/// \return the total number of categories the individual is using.
+///
+inline unsigned i_mep::categories() const
+{
+  return genome_.cols();
 }
 
 ///
