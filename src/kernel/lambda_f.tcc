@@ -22,7 +22,7 @@
 ///
 template<class T, bool S>
 basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
-  : detail::core_reg_lambda_f<T, S>(prg)
+  : detail::reg_lambda_f_storage<T, S>(prg)
 {
   assert(debug());
 }
@@ -98,7 +98,7 @@ double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::debug() const
 {
-  return detail::core_reg_lambda_f<T, S>::debug();
+  return detail::reg_lambda_f_storage<T, S>::debug();
 }
 
 ///
@@ -111,7 +111,7 @@ bool basic_reg_lambda_f<T, S>::debug() const
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::load(std::istream &in)
 {
-  return detail::core_reg_lambda_f<T, S>::load(in);
+  return detail::reg_lambda_f_storage<T, S>::load(in);
 }
 
 ///
@@ -121,7 +121,7 @@ bool basic_reg_lambda_f<T, S>::load(std::istream &in)
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
 {
-  return detail::core_reg_lambda_f<T, S>::save(out);
+  return detail::reg_lambda_f_storage<T, S>::save(out);
 }
 
 ///

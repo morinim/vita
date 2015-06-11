@@ -19,21 +19,21 @@ template<bool> struct is_true : std::false_type {};
 template<> struct is_true<true> : std::true_type {};
 
 // ***********************************************************************
-// *  core_reg_lambda_f                                                  *
+// *  reg_lambda_f_storage                                               *
 // ***********************************************************************
 
 /// This is the general template. The last parameter is used for
 /// disambiguation since we need three specializations that, without
 /// the third parameter, overlap (see below).
 /// This technique is called tag dispatching by type (Barend Gehrels).
-template<class T, bool S, bool = is_team<T>::value> class core_reg_lambda_f;
+template<class T, bool S, bool = is_team<T>::value> class reg_lambda_f_storage;
 
 // ********* First specialization (individual stored inside) *********
 template<class T>
-class core_reg_lambda_f<T, true, false>
+class reg_lambda_f_storage<T, true, false>
 {
 public:
-  explicit core_reg_lambda_f(const T &ind) : ind_(ind), int_(&ind_)
+  explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
   { assert(debug()); }
 
   bool debug() const
@@ -46,7 +46,7 @@ public:
 
   // We just need to copy the `ind_` data member, the `int_` interpreter
   // contains only a reference to `ind_`.
-  core_reg_lambda_f &operator=(const core_reg_lambda_f &rhs)
+  reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
   {
     if (this != &rhs)
       ind_ = rhs.ind_;
@@ -77,10 +77,10 @@ public:   // Serialization
 
 // ********* Second specialization (individual not stored) *********
 template<class T>
-class core_reg_lambda_f<T, false, false>
+class reg_lambda_f_storage<T, false, false>
 {
 public:
-  explicit core_reg_lambda_f(const T &ind) : int_(&ind)
+  explicit reg_lambda_f_storage(const T &ind) : int_(&ind)
   { assert(debug()); }
 
   bool debug() const { return int_.debug(); }
@@ -95,10 +95,10 @@ public:   // Serialization
 
 // ********* Third specialization (teams, individuals stored) *********
 template<class T>
-class core_reg_lambda_f<team<T>, true, true>
+class reg_lambda_f_storage<team<T>, true, true>
 {
 public:
-  explicit core_reg_lambda_f(const team<T> &t)
+  explicit reg_lambda_f_storage(const team<T> &t)
   {
     team_.reserve(t.individuals());
     for (const auto &ind : t)
@@ -158,15 +158,15 @@ public:   // Serialization
   }
 
 public:   // Public data members
-  std::vector<core_reg_lambda_f<T, true>> team_;
+  std::vector<reg_lambda_f_storage<T, true>> team_;
 };
 
 // ********* Fourth specialization (teams, individuals not stored) *********
 template<class T>
-class core_reg_lambda_f<team<T>, false, true>
+class reg_lambda_f_storage<team<T>, false, true>
 {
 public:
-  explicit core_reg_lambda_f(const team<T> &t)
+  explicit reg_lambda_f_storage(const team<T> &t)
   {
     team_.reserve(t.individuals());
     for (const auto &ind : t)
@@ -189,7 +189,7 @@ public:   // Serialization
   constexpr bool save(std::ostream &) const { return false; }
 
 public:   // Public data members
-  std::vector<core_reg_lambda_f<T, false>> team_;
+  std::vector<reg_lambda_f_storage<T, false>> team_;
 };
 
 // ***********************************************************************

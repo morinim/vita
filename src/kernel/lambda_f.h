@@ -90,7 +90,7 @@ template<class T> class reg_lambda_f : public lambda_f<T> {};
 ///
 template<class T, bool S>
 class basic_reg_lambda_f : public reg_lambda_f<T>,
-                           public detail::core_reg_lambda_f<T, S>
+                           public detail::reg_lambda_f_storage<T, S>
 {
 public:
   explicit basic_reg_lambda_f(const T &);
