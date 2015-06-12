@@ -23,8 +23,7 @@
 /// Creates a random population (initial size `e.individuals`).
 ///
 template<class T>
-population<T>::population(const environment &e)
-  : pop_(1), allowed_(1)
+population<T>::population(const environment &e) : pop_(1), allowed_(1)
 {
   assert(e.debug(true, true));
   assert(e.sset);

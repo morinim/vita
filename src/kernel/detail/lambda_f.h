@@ -59,18 +59,18 @@ public:   // Public data members
   mutable src_interpreter<T> int_;
 
 public:   // Serialization
-  bool load(std::istream &in)
+  bool load(std::istream &in, const environment &e)
   {
     unsigned n;
     if (!(in >> n) || n != 1)
       return false;
 
-    return ind_.load(in, ind_.env());
+    return ind_.load(in, e);
   }
 
   bool save(std::ostream &out) const
   {
-    out << 1 << std::endl;
+    out << 1 << '\n';
     return ind_.save(out);
   }
 };
@@ -89,7 +89,7 @@ public:   // Public data members
   mutable src_interpreter<T> int_;
 
 public:   // Serialization
-  bool load(std::istream &) { return false; }
+  bool load(std::istream &, const environment &) { return false; }
   bool save(std::ostream &) const { return false; }
 };
 
@@ -120,7 +120,7 @@ public:   // Serialization
   /// Load is atomic: if it doesn't succeed this object isn't modified; if
   /// it succeeds the team if replaced with a new team (eventually with a
   /// different size) loaded from the input stream.
-  bool load(std::istream &i)
+  bool load(std::istream &i, const environment &e)
   {
     unsigned n;
     if (!(i >> n) || !n)
@@ -129,14 +129,11 @@ public:   // Serialization
     decltype(team_) v;
     v.reserve(n);
 
-    assert(!team_.empty());
-    const environment &env(team_[0].ind_.env());
-
     for (unsigned j(0); j < n; ++j)
     {
-      v.emplace_back(T(env));
+      v.emplace_back(T());
 
-      if (!v.back().load(i))
+      if (!v.back().load(i, e))
         return false;
     }
 
@@ -185,7 +182,7 @@ public:
   }
 
 public:   // Serialization
-  bool load(std::istream &) { return false; }
+  bool load(std::istream &, const environment &) { return false; }
   bool save(std::ostream &) const { return false; }
 
 public:   // Public data members
@@ -214,7 +211,8 @@ public:   // Public data members
 template<bool N>
 class class_names
 {
-public:   // Serialization
+public:
+  // Serialization
   bool load(std::istream &) { return true; }
   bool save(std::ostream &) const { return true; }
 
@@ -222,13 +220,14 @@ protected:
   /// Without names... there isn't anything to do.
   explicit class_names(const data &) {}
 
-    std::string string(const any &) const;
+  std::string string(const any &) const;
 };
 
 template<>
 class class_names<true>
 {
-public:   // Serialization
+public:
+  // Serialization
   bool load(std::istream &);
   bool save(std::ostream &) const;
 

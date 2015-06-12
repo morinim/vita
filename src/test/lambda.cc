@@ -75,7 +75,7 @@ void test_serialization(vita::src_problem &pr)
     BOOST_REQUIRE(lambda1.save(ss));
     const T ind2(pr.env);
     auto lambda2(build<L, T, P>()(ind2, pr.data()));
-    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
     for (const auto &e : *pr.data())
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
     BOOST_REQUIRE(lambda1.save(ss));
     const i_mep ind2(pr.env);
     reg_model<i_mep> lambda2(ind2);
-    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
     for (const auto &e : *pr.data())

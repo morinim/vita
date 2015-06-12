@@ -102,6 +102,7 @@ bool basic_reg_lambda_f<T, S>::debug() const
 }
 
 ///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
 /// \return `true` if the lambda has been loaded correctly.
 ///
@@ -109,9 +110,9 @@ bool basic_reg_lambda_f<T, S>::debug() const
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S>
-bool basic_reg_lambda_f<T, S>::load(std::istream &in)
+bool basic_reg_lambda_f<T, S>::load(std::istream &in, const environment &e)
 {
-  return detail::reg_lambda_f_storage<T, S>::load(in);
+  return detail::reg_lambda_f_storage<T, S>::load(in, e);
 }
 
 ///
@@ -155,33 +156,6 @@ double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
                                            const data &d) const
 {
   return m(this, d);
-}
-
-///
-/// \param[out] out output stream.
-/// \return true on success.
-///
-/// Saves the lambda on persistent storage.
-///
-template<class T, bool N>
-bool basic_class_lambda_f<T, N>::save(std::ostream &out) const
-{
-  return detail::class_names<N>::save(out);
-}
-
-///
-/// \param[in] in input stream.
-/// \return true on success.
-///
-/// Loads the lambda from persistent storage.
-///
-/// \note
-/// If the operation fails the object isn't modified.
-///
-template<class T, bool N>
-bool basic_class_lambda_f<T, N>::load(std::istream &in)
-{
-  return detail::class_names<N>::load(in);
 }
 
 ///
@@ -393,43 +367,48 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 
   out << dataset_size_ << '\n';
 
-  if (!basic_class_lambda_f<T, N>::save(out))
+  if (!detail::class_names<N>::save(out))
     return false;
 
   return out.good();
 }
 
 ///
+/// \brief Loads the lambda from persistent storage
+///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
 /// \return true on success.
-///
-/// Loads the lambda from persistent storage.
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in)
+bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in,
+                                            const environment &e)
 {
   // Tag dispatching to select the appropriate method.
   // Note that there is an implementation of operator= only for S==true.
   // Without tag dispatching the compiler would need a complete implementation
   // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, detail::is_true<S>());
+  return load_(in, e, detail::is_true<S>());
 }
 
 ///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
-/// \return true on success.
+/// \return `true` on success.
 ///
 /// This is part of the tag dispatching method used by the
 /// basic_dyn_slot_lambda_f::load method.
 ///
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
+bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in,
+                                             const environment &e,
+                                             std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in))
+  if (!l.load(in, e))
     return false;
 
   decltype(slot_matrix_) m;
@@ -437,15 +416,15 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
     return false;
 
   decltype(slot_class_) s(slot_matrix_.rows());
-  for (auto &e : s)
-    if (!(in >> e))
+  for (auto &r : s)
+    if (!(in >> r))
       return false;
 
   decltype(dataset_size_) d;
   if (!(in >> d))
     return false;
 
-  if (!basic_class_lambda_f<T, N>::load(in))
+  if (!detail::class_names<N>::load(in))
     return false;
 
   lambda_ = l;
@@ -457,7 +436,9 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
 }
 
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
+bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &,
+                                             const environment &,
+                                             std::false_type)
 {
   return false;
 }
@@ -597,13 +578,14 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
     if (!g.save(out))
       return false;
 
-  if (!basic_class_lambda_f<T, N>::save(out))
+  if (!detail::class_names<N>::save(out))
     return false;
 
   return out.good();
 }
 
 ///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
 /// \return true on success.
 ///
@@ -613,20 +595,31 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in)
+bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in,
+                                            const environment &e)
 {
   // Tag dispatching to select the appropriate method.
   // Note that there is an implementation of operator= only for S==true.
   // Without tag dispatching the compiler would need a complete implementation
   // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, detail::is_true<S>());
+  return load_(in, e, detail::is_true<S>());
 }
 
+///
+/// \param[in] e environment used to build the object.
+/// \param[in] in input stream.
+/// \return `true` on success.
+///
+/// This is part of the tag dispatching method used by the
+/// basic_gaussian_lambda_f::load method.
+///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
+bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in,
+                                             const environment &e,
+                                             std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in))
+  if (!l.load(in, e))
     return false;
 
   typename decltype(gauss_dist_)::size_type n;
@@ -638,7 +631,7 @@ bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
     if (!d.load(in))
       return false;
 
-  if (!basic_class_lambda_f<T, N>::load(in))
+  if (!detail::class_names<N>::load(in))
     return false;
 
   lambda_ = l;
@@ -647,8 +640,14 @@ bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
   return true;
 }
 
+///
+/// This is part of the tag dispatching method used by the
+/// basic_gaussian_lambda_f::load method.
+///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
+bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &,
+                                             const environment &,
+                                             std::false_type)
 {
   return false;
 }
@@ -711,13 +710,14 @@ bool basic_binary_lambda_f<T, S, N>::save(std::ostream &out) const
   if (!lambda_.save(out))
     return false;
 
-  if (!basic_class_lambda_f<T, N>::save(out))
+  if (!detail::class_names<N>::save(out))
     return false;
 
   return out.good();
 }
 
 ///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
 /// \return true on success.
 ///
@@ -727,23 +727,34 @@ bool basic_binary_lambda_f<T, S, N>::save(std::ostream &out) const
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load(std::istream &in)
+bool basic_binary_lambda_f<T, S, N>::load(std::istream &in,
+                                          const environment &e)
 {
   // Tag dispatching to select the appropriate method.
   // Note that there is an implementation of operator= only for S==true.
   // Without tag dispatching the compiler would need a complete implementation
   // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, detail::is_true<S>());
+  return load_(in, e, detail::is_true<S>());
 }
 
+///
+/// \param[in] e environment used to build the object.
+/// \param[in] in input stream.
+/// \return `true` on success.
+///
+/// This is part of the tag dispatching method used by the
+/// basic_binary_lambda_f::load method.
+///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
+bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in,
+                                           const environment &e,
+                                           std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in))
+  if (!l.load(in, e))
     return false;
 
-  if (!basic_class_lambda_f<T, N>::load(in))
+  if (!detail::class_names<N>::load(in))
     return false;
 
   lambda_ = l;
@@ -751,8 +762,14 @@ bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in, std::true_type)
   return true;
 }
 
+///
+/// This is part of the tag dispatching method used by the
+/// basic_binary_lambda_f::load method.
+///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, std::false_type)
+bool basic_binary_lambda_f<T, S, N>::load_(std::istream &,
+                                           const environment &,
+                                           std::false_type)
 {
   return false;
 }
@@ -829,10 +846,10 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
 }
 
 ///
+/// \brief Saves the lambda team on persistent storage
+///
 /// \param[out] out output stream.
 /// \return true on success.
-///
-/// Saves the lambda team on persistent storage.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
@@ -845,7 +862,7 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
     if (!i.save(out))
       return false;
 
-  if (!basic_class_lambda_f<team<T>, N>::save(out))
+  if (!detail::class_names<N>::save(out))
     return false;
 
   return out.good();
@@ -854,15 +871,17 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 ///
 /// \brief Loads the lambda team from persistent storage
 ///
+/// \param[in] e environment used to build the object.
 /// \param[in] in input stream.
-/// \return true on success.
+/// \return `true` on success.
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
-bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in)
+bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in,
+                                              const environment &e)
 {
   decltype(classes_) cl;
   if (!(in >> cl))
@@ -876,12 +895,12 @@ bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in)
   for (unsigned i(0); i < s; ++i)
   {
     typename decltype(team_)::value_type lambda(team_[0]);
-    if (!lambda.load(in))
+    if (!lambda.load(in, e))
       return false;
     t.push_back(lambda);
   }
 
-  if (!basic_class_lambda_f<team<T>, N>::load(in))
+  if (!detail::class_names<N>::load(in))
     return false;
 
   team_ = t;

@@ -63,8 +63,8 @@ public:
 
   virtual bool debug() const = 0;
 
-public:   // Serialization
-  virtual bool load(std::istream &) { return false; }
+  // Serialization
+  virtual bool load(std::istream &, const environment &) { return false; }
   virtual bool save(std::ostream &) const { return false; }
 };
 
@@ -90,7 +90,7 @@ template<class T> class reg_lambda_f : public lambda_f<T> {};
 ///
 template<class T, bool S>
 class basic_reg_lambda_f : public reg_lambda_f<T>,
-                           public detail::reg_lambda_f_storage<T, S>
+                           protected detail::reg_lambda_f_storage<T, S>
 {
 public:
   explicit basic_reg_lambda_f(const T &);
@@ -103,8 +103,8 @@ public:
 
   virtual bool debug() const override;
 
-public:   // Serialization
-  virtual bool load(std::istream &) override;
+  // Serialization
+  virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
 private:  // Private support methods
@@ -140,7 +140,7 @@ public:
 ///
 template<class T, bool N>
 class basic_class_lambda_f : public class_lambda_f<T>,
-                             public detail::class_names<N>
+                             protected detail::class_names<N>
 {
 public:
   explicit basic_class_lambda_f(const data &);
@@ -150,10 +150,6 @@ public:
   virtual std::string name(const any &) const override final;
 
   virtual double measure(const model_metric<T> &, const data &) const override;
-
-public:   // Serialization
-  virtual bool load(std::istream &) override;
-  virtual bool save(std::ostream &) const override;
 };
 
 ///
@@ -181,14 +177,14 @@ public:
 
   double training_accuracy() const;
 
-public:   // Serialization
-  virtual bool load(std::istream &) override;
+  // Serialization
+  virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
 private:  // Private support methods
   static number normalize_01(number);
-  bool load_(std::istream &, std::true_type);
-  bool load_(std::istream &, std::false_type);
+  bool load_(std::istream &, const environment &, std::true_type);
+  bool load_(std::istream &, const environment &, std::false_type);
 
   void fill_matrix(data &, unsigned);
   unsigned slot(const data::example &) const;
@@ -231,14 +227,14 @@ public:
 
   virtual bool debug() const override;
 
-public:   // Serialization
-  virtual bool load(std::istream &) override;
+  // Serialization
+  virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
 private:  // Private support methods
   void fill_vector(data &);
-  bool load_(std::istream &, std::true_type);
-  bool load_(std::istream &, std::false_type);
+  bool load_(std::istream &, const environment &, std::true_type);
+  bool load_(std::istream &, const environment &, std::false_type);
 
 private:  // Private data members
   basic_reg_lambda_f<T, S> lambda_;
@@ -268,13 +264,13 @@ public:
 
   virtual bool debug() const override;
 
-public:   // Serialization
-  virtual bool load(std::istream &) override;
+  // Serialization
+  virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
 private:  // Private support methods
-  bool load_(std::istream &, std::true_type);
-  bool load_(std::istream &, std::false_type);
+  bool load_(std::istream &, const environment &, std::true_type);
+  bool load_(std::istream &, const environment &, std::false_type);
 
 private:  // Private data members
   basic_reg_lambda_f<T, S> lambda_;
@@ -326,8 +322,8 @@ public:
 
   virtual bool debug() const override;
 
-public:   // Serialization
-  virtual bool load(std::istream &) override;
+  // Serialization
+  virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
 protected:
