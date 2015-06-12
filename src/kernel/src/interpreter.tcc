@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,14 +10,18 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_SRC_INTERPRETER_INL_H)
-#define      VITA_SRC_INTERPRETER_INL_H
+#if !defined(VITA_SRC_INTERPRETER_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
+#if !defined(VITA_SRC_INTERPRETER_TCC)
+#define      VITA_SRC_INTERPRETER_TCC
 
 ///
 /// \param[in] ex a vector of values for the problem's variables.
 /// \return the output value of the src_interpreter.
 ///
-/// Calculates the output of a program (individual) given the \a ex training
+/// Calculates the output of a program (individual) given the `ex` training
 /// example.
 ///
 template<class T>

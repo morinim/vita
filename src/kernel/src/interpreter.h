@@ -20,7 +20,7 @@ namespace vita
 /// This is the return type of the src_interpreter::run method. Internal
 /// calculations could be performed via different types but the final
 /// result is stored in a `number`.
-typedef double number;
+using number = double;
 
 ///
 /// \tparam T the type of individual used.
@@ -54,7 +54,7 @@ private:  // Private data members
   const std::vector<any> *example_;
 };
 
-#include "kernel/src/interpreter_inl.h"
+#include "kernel/src/interpreter.tcc"
 
 }  // namespace vita
 
