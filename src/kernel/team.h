@@ -53,7 +53,7 @@ template<class T>
 class team
 {
 public:
-  explicit team();
+  team();
   explicit team(const environment &);
   explicit team(std::vector<T>);
 

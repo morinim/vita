@@ -131,10 +131,11 @@ public:   // Serialization
 
     for (unsigned j(0); j < n; ++j)
     {
-      v.emplace_back(T());
-
-      if (!v.back().load(i, e))
+      T temp;
+      if (!temp.load(i,e))
         return false;
+
+      v.emplace_back(temp);
     }
 
     team_ = v;
@@ -143,7 +144,7 @@ public:   // Serialization
 
   bool save(std::ostream &o) const
   {
-    o << team_.size() << std::endl;
+    o << team_.size() << '\n';
     if (!o.good())
       return false;
 
@@ -296,13 +297,13 @@ inline bool class_names<true>::load(std::istream &in)
 ///
 inline bool class_names<true>::save(std::ostream &o) const
 {
-  o << names_.size() << std::endl;
+  o << names_.size() << '\n';
   if (!o.good())
     return false;
 
   for (const auto &n : names_)
   {
-    o << n << std::endl;
+    o << n << '\n';
     if (!o.good())
       return false;
   }
