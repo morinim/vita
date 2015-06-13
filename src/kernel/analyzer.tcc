@@ -213,7 +213,7 @@ template<class T>
 unsigned analyzer<T>::count(const T &ind)
 {
   for (index_t i(0); i < ind.size(); ++i)
-    for (category_t c(0); c < ind.env().sset->categories(); ++c)
+    for (category_t c(0); c < ind.categories(); ++c)
       core_analyzer<T>::count(ind[{i, c}].sym, false);
 
   unsigned length(0);
@@ -240,7 +240,7 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
   for (const auto &ind : t)
   {
     for (index_t i(0); i < ind.size(); ++i)
-      for (category_t c(0); c < ind.env().sset->categories(); ++c)
+      for (category_t c(0); c < ind.categories(); ++c)
         core_analyzer<team<T>>::count(ind[{i, c}].sym, false);
 
     for (const auto &l : ind)

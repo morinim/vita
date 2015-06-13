@@ -80,6 +80,8 @@ public:
   bool save(std::ostream &) const;
 
 private:  // Private data members
+  const environment *env_;
+
   std::vector<layer_t> pop_;
   std::vector<unsigned> allowed_;
 };

@@ -95,16 +95,18 @@ void src_search<T, ES>::arl(const U &base)
   if (!isfinite(base_fit))
     return;  // We need a finite fitness to search for an improvement
 
+  const auto env(this->env_);
+
   // Logs ADFs
-  const auto filename(this->env_.stat.dir + "/" + this->env_.stat.arl_name);
+  const auto filename(env.stat.dir + "/" + env.stat.arl_name);
   std::ofstream adf_log(filename, std::ios_base::app);
-  if (this->env_.stat.arl && adf_log.good())
+  if (env.stat.arl && adf_log.good())
   {
-    const auto adts(this->prob_.env.sset->adts());
+    const auto adts(env.sset->adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const symbol &f(*this->prob_.env.sset->get_adt(i));
-      adf_log << f.display() << ' ' << f.weight << '\n';
+      const symbol *f(env.sset->get_adt(i));
+      adf_log << f->display() << ' ' << f->weight << '\n';
     }
     adf_log << '\n';
   }
@@ -123,7 +125,8 @@ void src_search<T, ES>::arl(const U &base)
       // (base.destroy_block) the current block.
       // Useful blocks have delta values greater than 0.
       const auto delta(base_fit[0] -
-                       this->fitness(base.destroy_block(l.index))[0]);
+                       this->fitness(base.destroy_block(l.index,
+                                                        *env.sset))[0]);
 
       // Semantic introns cannot be building blocks...
       // When delta is greater than 10% of the base fitness we have a
@@ -133,7 +136,7 @@ void src_search<T, ES>::arl(const U &base)
         std::unique_ptr<symbol> p;
         if (adf_args)
         {
-          auto generalized(candidate_block.generalize(adf_args));
+          auto generalized(candidate_block.generalize(adf_args, *env.sset));
           cvect categories(generalized.second.size());
 
           for (const auto &replaced : generalized.second)
@@ -144,7 +147,7 @@ void src_search<T, ES>::arl(const U &base)
         else  // !adf_args
           p = vita::make_unique<adt>(candidate_block, 100u);
 
-        if (this->env_.stat.arl && adf_log.good())
+        if (env.stat.arl && adf_log.good())
         {
           adf_log << p->display() << " (Base: " << base_fit
                   << "  DF: " << delta
@@ -153,7 +156,7 @@ void src_search<T, ES>::arl(const U &base)
                   << candidate_block << '\n';
         }
 
-        this->prob_.env.sset->insert(std::move(p));
+        env.sset->insert(std::move(p));
       }
     }
   }

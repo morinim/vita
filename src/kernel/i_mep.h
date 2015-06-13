@@ -46,12 +46,12 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation(double);
+  unsigned mutation(double, const symbol_set &);
   i_mep crossover(i_mep) const;
 
   // Working with blocks / genome
   std::vector<locus> blocks() const;
-  i_mep destroy_block(index_t) const;
+  i_mep destroy_block(index_t, const symbol_set &) const;
   i_mep get_block(const locus &) const;
 
   i_mep replace(const gene &) const;
@@ -59,7 +59,8 @@ public:
 
   i_mep compress() const;
 
-  std::pair<i_mep, std::vector<locus>> generalize(unsigned) const;
+  std::pair<i_mep, std::vector<locus>> generalize(unsigned,
+                                                  const symbol_set &) const;
 
   void set(const locus &, const gene &);
 
@@ -72,6 +73,7 @@ public:
   unsigned categories() const;
   unsigned eff_size() const;
   unsigned size() const;
+  bool empty() const;
 
   category_t category() const;
 
@@ -130,6 +132,14 @@ inline unsigned i_mep::categories() const
 inline unsigned i_mep::size() const
 {
   return genome_.rows();
+}
+
+///
+/// \return `true` if the individual isn't initialized.
+///
+inline bool i_mep::empty() const
+{
+  return size() == 0;
 }
 
 ///

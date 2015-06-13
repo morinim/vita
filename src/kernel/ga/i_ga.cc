@@ -22,18 +22,18 @@ namespace vita
 /// implemented so as to ensure that they do not violate the type system's
 /// constraints.
 ///
-i_ga::i_ga(const environment &e) : individual(e), genome_(e.sset->categories())
+i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
 {
   assert(e.debug(true, true));
   assert(e.sset);
 
   assert(parameters());
 
-  const auto cs(env().sset->categories());
+  const auto cs(parameters());
   assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(env().sset->roulette_terminal(c));
+    genome_[c] = gene(e.sset->roulette_terminal(c));
 
   assert(debug(true));
 }
@@ -77,8 +77,7 @@ std::ostream &i_ga::in_line(std::ostream &s) const
 ///
 std::ostream &i_ga::list(std::ostream &s) const
 {
-  const auto cs(env().sset->categories());
-  const auto w(1 + static_cast<int>(std::log10(cs)));
+  const auto w(1 + static_cast<int>(std::log10(parameters())));
 
   unsigned i(0);
   for (const auto &g : genome_)
@@ -101,17 +100,18 @@ std::ostream &i_ga::tree(std::ostream &s) const
 }
 
 ///
-/// \param[in] p probability of gene mutation.
-/// \return number of mutations performed.
+/// \brief A new individual is created mutating `this`
 ///
-/// A new individual is created mutating `this`.
+/// \param[in] p probability of gene mutation.
+/// \param[in] sset a symbol set.
+/// \return number of mutations performed.
 ///
 /// \note
 /// This function is included for compatibility with GP recombination
 /// strategies. Typical differential evolution GA algorithm won't use
 /// this method.
 ///
-unsigned i_ga::mutation(double p)
+unsigned i_ga::mutation(double p, const symbol_set &sset)
 {
   assert(0.0 <= p);
   assert(p <= 1.0);
@@ -124,7 +124,7 @@ unsigned i_ga::mutation(double p)
     {
       ++n;
 
-      genome_[c] = gene(env().sset->roulette_terminal(c));
+      genome_[c] = gene(sset.roulette_terminal(c));
     }
 
   signature_ = hash();
@@ -172,14 +172,17 @@ i_ga i_ga::crossover(i_ga rhs) const
 
 ///
 /// \brief Differential evolution crossover
+/// \param[in] p crossover probability.
+/// \param[in] f scaling factor range (`environment.de.weight`).
 /// \param[in] a first parent.
 /// \param[in] b second parent.
 /// \param[in] c third parent.
 /// \return the offspring.
 ///
+/// The offspring, also called trial vector, is generated as follows:
+///
 ///     offspring = crossover(this, c + F * (a - b))
 ///
-/// The offspring, also called trial vector, is generated as follows:
 /// first the search direction is defined by calculating a
 /// _difference vector_ between the pair of vectors `a` and `b` (usually
 /// choosen at random from the population). This difference vector is scaled by
@@ -194,8 +197,11 @@ i_ga i_ga::crossover(i_ga rhs) const
 ///
 /// `a` and `b` are used for mutation, `this` and `c` for crossover.
 ///
-i_ga i_ga::crossover(const i_ga &a, const i_ga &b, i_ga c) const
+i_ga i_ga::crossover(double p, const double f[2],
+                     const i_ga &a, const i_ga &b, i_ga c) const
 {
+  assert(0.0 <= p);
+  assert(p <= 1.0);
   assert(a.debug());
   assert(b.debug());
   assert(c.debug());
@@ -205,14 +211,8 @@ i_ga i_ga::crossover(const i_ga &a, const i_ga &b, i_ga c) const
   assert(ps == b.parameters());
   assert(ps == c.parameters());
 
-  const auto p_cross(env().p_cross);
-  assert(0.0 <= p_cross);
-  assert(p_cross <= 1.0);
-
-  const auto &f(env().de.weight);  // scaling factor range
-
   for (auto i(decltype(ps){0}); i < ps; ++i)
-    if (random::boolean(p_cross))
+    if (random::boolean(p))
       c[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
     else
       c[i] = operator[](i);
@@ -317,7 +317,7 @@ bool i_ga::operator==(const i_ga &x) const
 ///
 unsigned i_ga::distance(const i_ga &ind) const
 {
-  const auto cs(env().sset->categories());
+  const auto cs(parameters());
 
   unsigned d(0);
   for (auto i(decltype(cs){0}); i < cs; ++i)
@@ -412,7 +412,7 @@ bool i_ga::debug(bool verbose) const
     return false;
   }
 
-  return env().debug(verbose, true);
+  return true;
 }
 
 ///

@@ -36,9 +36,7 @@ namespace vita
 class individual
 {
 public:
-  individual() : signature_(), env_(nullptr), age_() {}
-
-  explicit individual(const environment &);
+  individual() : signature_(), age_() {}
 
   /// This is a measure of how long an individual's family of genotypic
   /// material has been in the population. Randomly generated individuals,
@@ -52,10 +50,6 @@ public:
   /// individual (e.g. mutation or recombination) start with an age of 0.
   unsigned age() const { return age_; }
   void inc_age() { ++age_; }
-
-  bool empty() const { return !env_; }
-
-  const environment &env() const {  assert(env_); return *env_; }
 
   // Visualization/output methods.
   virtual std::ostream &in_line(std::ostream &) const = 0;
@@ -78,15 +72,8 @@ private:  // Non-virtual interface members
   virtual bool save_nvi(std::ostream &) const = 0;
 
 private:
-  const environment *env_;
   unsigned age_;
 };  // class individual
-
-inline individual::individual(const environment &e) : signature_(), env_(&e),
-                                                      age_(0)
-{
-  assert(e.debug(true, true));
-}
 
 }  // namespace vita
 #endif  // Include guard

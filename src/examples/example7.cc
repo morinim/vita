@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     {
       i_mep ib(base.get_block(*i));
 
-      auto generalized(ib.generalize(2));
+      auto generalized(ib.generalize(2, *env.sset));
 
       std::cout << '\n' << ib
                 << "GENERALIZED\n" << generalized.first

@@ -23,7 +23,8 @@
 /// Creates a random population (initial size `e.individuals`).
 ///
 template<class T>
-population<T>::population(const environment &e) : pop_(1), allowed_(1)
+population<T>::population(const environment &e) : env_(&e), pop_(1),
+                                                  allowed_(1)
 {
   assert(e.debug(true, true));
   assert(e.sset);
@@ -56,7 +57,7 @@ void population<T>::init_layer(unsigned l, const environment *e)
   assert(individuals(l) || (e && e->sset));
 
   if (!e)
-    e = &pop_[l][0].env();
+    e = env_;
 
   pop_[l].clear();
 
@@ -71,7 +72,7 @@ void population<T>::init_layer(unsigned l, const environment *e)
 /// \note
 /// * The number of active layers is a dynamic value (it is a monotonically
 ///   increasing function of the generation number).
-/// * Maximum number of layers (`env().alps.layers`) is a constant value
+/// * Maximum number of layers (`env.alps.layers`) is a constant value
 ///   greater than or equal to `layers()`.
 ///
 template<class T>
@@ -91,14 +92,12 @@ void population<T>::add_layer()
   assert(layers());
   assert(individuals(0));
 
-  const auto &e(env());
-
   pop_.insert(pop_.begin(), layer_t());
-  pop_[0].reserve(e.individuals);
+  pop_[0].reserve(env_->individuals);
 
-  allowed_.insert(allowed_.begin(), e.individuals);
+  allowed_.insert(allowed_.begin(), env_->individuals);
 
-  init_layer(0, &e);
+  init_layer(0, env_);
 }
 
 ///
@@ -224,10 +223,8 @@ unsigned population<T>::individuals() const
 template<class T>
 const environment &population<T>::env() const
 {
-  assert(layers());
-  assert(individuals(0));
-
-  return pop_[0][0].env();
+  assert(env_);
+  return *env_;
 }
 
 ///

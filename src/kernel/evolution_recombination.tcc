@@ -80,10 +80,10 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
     // * optimize the exploitation phase.
     while (pop[r1].signature() == off.signature() ||
            pop[r2].signature() == off.signature())
-      this->stats_->mutations += off.mutation(env.p_mutation);
+      this->stats_->mutations += off.mutation(env.p_mutation, *env.sset);
 
     //if (eva_.seen(off))
-    //  stats_->mutations += off.mutation(env.p_mutation);
+    //  stats_->mutations += off.mutation(env.p_mutation, *env.sset);
 
     if (*env.brood_recombination > 0)
     {
@@ -96,7 +96,7 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
 
         while (pop[r1].signature() == tmp.signature() ||
                pop[r2].signature() == tmp.signature())
-          this->stats_->mutations += tmp.mutation(env.p_mutation);
+          this->stats_->mutations += tmp.mutation(env.p_mutation, *env.sset);
 
         const auto fit_tmp(this->eva_.fast(tmp));
         if (fit_tmp > fit_off)
@@ -115,7 +115,7 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
   else // !crossover
   {
     T off(pop[random::boolean() ? r1 : r2]);
-    this->stats_->mutations += off.mutation(env.p_mutation);
+    this->stats_->mutations += off.mutation(env.p_mutation, *env.sset);
 
     assert(off.debug());
     return {off};
@@ -135,13 +135,15 @@ typename strategy<T>::offspring_t de<T>::run_nvi(
   assert(parent.size() >= 2);
 
   const auto &pop(this->pop_);
+  const auto &env(pop.env());
 
-  assert(0.0 < pop.env().p_cross);
-  assert(pop.env().p_cross <= 1.0);
+  assert(0.0 < env.p_cross);
+  assert(env.p_cross <= 1.0);
 
   const auto a(pickup(pop, parent[0]));
   const auto b(pickup(pop, parent[0]));
 
-  return {pop[parent[0]].crossover(pop[parent[1]], pop[a], pop[b])};
+  return {pop[parent[0]].crossover(env.p_cross, env.de.weight,
+                                   pop[parent[1]], pop[a], pop[b])};
 }
 #endif  // Include guard

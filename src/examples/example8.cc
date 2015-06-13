@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 
       if (blk.eff_size() <= 20)
       {
-        auto generalized (blk.generalize(2));
+        auto generalized (blk.generalize(2, *env.sset));
 
         const auto &blk2(generalized.first);
         const auto &replaced(generalized.second);

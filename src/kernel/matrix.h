@@ -38,15 +38,13 @@ namespace vita
   template<class T>
   class matrix
   {
-  private:
+  public:
+    // Type alias
     using values_t = std::vector<T>;
-
-  public:  // Type alias
     using value_type = typename values_t::value_type;
     using reference = typename values_t::reference;
     using const_reference = typename values_t::const_reference;
 
-  public:
     matrix();
     matrix(unsigned, unsigned);
 
@@ -63,7 +61,7 @@ namespace vita
     unsigned rows() const;
     unsigned cols() const;
 
-  public:  // Iterators
+    // Iterators
     using iterator = typename values_t::iterator;
     using const_iterator = typename values_t::const_iterator;
 
@@ -72,7 +70,7 @@ namespace vita
     const_iterator end() const;
     iterator end();
 
-  public:   // Serialization
+    // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 

@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < n; ++i)
   {
-    ind.mutation(0.0);
+    ind.mutation(0.0, *env.sset);
     BOOST_REQUIRE_EQUAL(ind, orig);
   }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   {
     const vita::i_mep i1(ind);
 
-    ind.mutation(0.5);
+    ind.mutation(0.5, *env.sset);
     diff += distance(i1, ind);
     length += i1.eff_size();
   }

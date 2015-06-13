@@ -56,19 +56,20 @@ team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 
 ///
 /// \param[in] p probability of gene mutation.
+/// \param[in] sset a symbol_set
 /// \return number of mutations performed.
 ///
 /// Mutates the individuals in `this` team and returns the number of mutations
 /// performed.
 ///
 template<class T>
-unsigned team<T>::mutation(double p)
+unsigned team<T>::mutation(double p, const symbol_set &sset)
 {
   assert(0.0 <= p);
   assert(p <= 1.0);
 
   /*
-  const auto nm(random::element(individuals_).mutation(p));
+  const auto nm(random::element(individuals_).mutation(p, sset));
   if (nm)
     signature_.clear();
 
@@ -77,7 +78,7 @@ unsigned team<T>::mutation(double p)
 
   unsigned nm(0);
   for (auto &i : individuals_)
-    nm += i.mutation(p);
+    nm += i.mutation(p, sset);
 
   if (nm)
     signature_.clear();
@@ -296,10 +297,7 @@ bool team<T>::debug(bool verbose) const
     if (!i.debug(verbose))
       return false;
 
-  if (!signature_.empty() && signature_ != hash())
-    return false;
-
-  return env().debug(verbose, true);
+  return signature_.empty() || signature_ == hash();
 }
 
 ///

@@ -51,11 +51,10 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation()
-  { assert(env().p_mutation >= 0.0); return mutation(env().p_mutation); }
-  unsigned mutation(double);
+  unsigned mutation(double, const symbol_set &);
   i_ga crossover(i_ga) const;
-  i_ga crossover(const i_ga &, const i_ga &, i_ga) const;
+  i_ga crossover(double, const double [2], const i_ga &, const i_ga &,
+                 i_ga) const;
 
   class const_iterator;
   const_iterator begin() const;
@@ -83,6 +82,11 @@ public:
   i_ga &operator=(const std::vector<gene::param_type> &);
 
   ///
+  /// \return `true` if the individual is empty, `0` otherwise.
+  ///
+  bool empty() const { return !parameters(); }
+
+  ///
   /// \return `1` if the individual is not empty, `0` otherwise.
   ///
   /// This is for compatibility for GP algorithm, but isn't significative
@@ -91,6 +95,7 @@ public:
   /// \see i_ga::parameters()
   ///
   unsigned size() const { return !empty(); }
+  unsigned categories() const { return parameters(); }
 
   ///
   /// \return the number of parameters stored in the individual.
@@ -105,13 +110,13 @@ public:
 
   bool debug(bool = true) const;
 
-private:   // NVI implementation (serialization)
-  virtual bool load_nvi(std::istream &, const environment &) override;
-  virtual bool save_nvi(std::ostream &) const override;
-
 private:  // Private support methods
   hash_t hash() const;
   void pack(std::vector<unsigned char> *const) const;
+
+  // NVI implementation (serialization)
+  virtual bool load_nvi(std::istream &, const environment &) override;
+  virtual bool save_nvi(std::ostream &) const override;
 
 private:  // Private data members
   // This is the genome: the entire collection of genes (the entirety of an

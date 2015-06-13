@@ -64,7 +64,7 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators.
-  unsigned mutation(double);
+  unsigned mutation(double, const symbol_set &);
   team<T> crossover(team<T>) const;
 
   const T &operator[](unsigned) const;

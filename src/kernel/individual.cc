@@ -24,10 +24,6 @@ namespace vita
 ///
 bool individual::load(std::istream &in, const environment &env)
 {
-  bool t_empty;
-  if (!(in >> t_empty))
-    return false;
-
   decltype(age()) t_age;
   if (!(in >> t_age))
     return false;
@@ -35,7 +31,6 @@ bool individual::load(std::istream &in, const environment &env)
   if (!load_nvi(in, env))
     return false;
 
-  env_ = t_empty ? nullptr : &env;
   age_ = t_age;
 
   // We don't save/load signature: it can be easily calculated on the fly.
@@ -50,7 +45,7 @@ bool individual::load(std::istream &in, const environment &env)
 ///
 bool individual::save(std::ostream &out) const
 {
-  out << empty() << ' ' << age() << '\n';
+  out << age() << '\n';
 
   return save_nvi(out);
 }

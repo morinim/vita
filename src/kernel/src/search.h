@@ -57,11 +57,6 @@ public:
 
   bool set_evaluator(evaluator_id, const std::string & = "");
 
-private:  // NVI template methods
-  virtual bool debug_nvi(bool) const override;
-  virtual summary<T> run_nvi(unsigned) override;
-  virtual void tune_parameters_nvi() override;
-
 private:  // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
@@ -69,6 +64,11 @@ private:  // Private support methods
                              const distribution<fitness_t> &,
                              const C &, typename C::value_type, unsigned);
   void print_resume(bool, const model_measurements &) const;
+
+  // NVI template methods
+  virtual bool debug_nvi(bool) const override;
+  virtual summary<T> run_nvi(unsigned) override;
+  virtual void tune_parameters_nvi() override;
 
 private:  // Private data members
   // Preferred evaluator for symbolic regression.

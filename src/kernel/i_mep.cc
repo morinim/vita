@@ -29,7 +29,7 @@ namespace vita
 /// constraints.
 ///
 i_mep::i_mep(const environment &e)
-  : individual(e), genome_(e.code_length, e.sset->categories()), best_{0, 0}
+  : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0}
 {
   assert(e.sset);
 
@@ -112,12 +112,13 @@ i_mep i_mep::get_block(const locus &l) const
 }
 
 ///
+/// \brief A new individual is created mutating `this`
+///
 /// \param[in] p probability of gene mutation.
+/// \param[in] sset a symbol set.
 /// \return number of mutations performed.
 ///
-/// A new individual is created mutating `this`.
-///
-unsigned i_mep::mutation(double p)
+unsigned i_mep::mutation(double p, const symbol_set &sset)
 {
   assert(0.0 <= p && p <= 1.0);
 
@@ -125,8 +126,7 @@ unsigned i_mep::mutation(double p)
 
   const auto sup(size() - 1);
 
-  // Here mutation affects only exons.
-  for (const auto &l : *this)
+  for (const auto &l : *this)  // Here mutation affects only exons
     if (random::boolean(p))
     {
       ++n;
@@ -135,9 +135,9 @@ unsigned i_mep::mutation(double p)
       const auto c(l.category);
 
       if (i < sup)
-        set(l, gene(env().sset->roulette(c), i + 1, size()));
+        set(l, gene(sset.roulette(c), i + 1, size()));
       else
-        set(l, gene(env().sset->roulette_terminal(c)));
+        set(l, gene(sset.roulette_terminal(c)));
     }
 
 /*
@@ -150,7 +150,7 @@ unsigned i_mep::mutation(double p)
       {
         ++n;
 
-        set({i, c}, gene(env().sset->roulette(c), i + 1, size()));
+        set({i, c}, gene(sset->roulette(c), i + 1, size()));
       }
 
   for (category_t c(0); c < c_sup; ++c)
@@ -158,7 +158,7 @@ unsigned i_mep::mutation(double p)
     {
       ++n;
 
-      set({sup, c}, gene(env().sset->roulette_terminal(c)));
+      set({sup, c}, gene(sset->roulette_terminal(c)));
     }
 */
 
@@ -223,24 +223,26 @@ i_mep i_mep::replace(const gene &g) const
 }
 
 ///
+/// \param[in] sset a symbol set.
 /// \param[in] index index of a symbol in the individual.
 /// \return a new individual obtained from `this` inserting a random terminal
 ///         at index `index`.
 ///
-i_mep i_mep::destroy_block(index_t index) const
+i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 {
   assert(index < size());
 
   i_mep ret(*this);
   const category_t c_sup(categories());
   for (category_t c(0); c < c_sup; ++c)
-    ret.set({index, c}, gene(env().sset->roulette_terminal(c)));
+    ret.set({index, c}, gene(sset.roulette_terminal(c)));
 
   assert(ret.debug());
   return ret;
 }
 
 ///
+/// \param[in] sset a symbol set.
 /// \param[in] max_args maximum number of arguments for the ADF.
 /// \return the generalized individual and a set of loci (ADF arguments
 ///         positions).
@@ -250,7 +252,7 @@ i_mep i_mep::destroy_block(index_t index) const
 /// ADF.
 ///
 std::pair<i_mep, std::vector<locus>> i_mep::generalize(
-  unsigned max_args) const
+  unsigned max_args, const symbol_set &sset) const
 {
   assert(max_args && max_args <= gene::k_args);
 
@@ -270,7 +272,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   if (n < size())
     for (auto j(decltype(n){0}); j < n; ++j)
     {
-      const auto r(random::between<unsigned>(j, t_size));
+      const auto r(random::between(j, t_size));
 
       std::swap(terminals[j], terminals[r]);
     }
@@ -278,7 +280,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   // Step 3: randomly substitute n terminals with function arguments.
   i_mep ret(*this);
   for (auto j(decltype(n){0}); j < n; ++j)
-    ret.genome_(terminals[j]).sym = env().sset->arg(j);
+    ret.genome_(terminals[j]).sym = sset.arg(j);
   ret.signature_.clear();
 
   assert(ret.debug());
@@ -560,10 +562,7 @@ bool i_mep::debug(bool verbose) const
     return false;
   }
 
-  if (!signature_.empty() && signature_ != hash())
-    return false;
-
-  return env().debug(verbose, true);
+  return signature_.empty() || signature_ == hash();
 }
 
 ///
@@ -811,14 +810,8 @@ bool i_mep::load_nvi(std::istream &in, const environment &e)
 
   auto best(locus::npos());
 
-  if (cols)
-  {
-    if (!(in >> best.index >> best.category))
+  if (rows && !(in >> best.index >> best.category))
       return false;
-
-    if (best.index >= genome.rows())
-      return false;
-  }
 
   best_ = best;
   genome_ = genome;
