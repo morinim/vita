@@ -56,7 +56,7 @@ public:
   unsigned individuals() const;
   unsigned individuals(unsigned) const;
 
-  void init_layer(unsigned, const environment * = nullptr);
+  void init_layer(unsigned);
   void add_layer();
   unsigned layers() const;
   void inc_age();

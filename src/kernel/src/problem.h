@@ -41,7 +41,7 @@ public:
   virtual void clear(bool) override;
 
   /// Just a shorthand for checking number of classes.
-  bool classification() { return classes() > 1; }
+  bool classification() const { return classes() > 1; }
 
   unsigned categories() const;
   unsigned classes() const;

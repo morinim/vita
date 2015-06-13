@@ -76,7 +76,7 @@ template<class T> bool isnonnegative(T v)
 /// \param[in] container a STL container.
 /// \param[in] pred a unary predicate.
 ///
-/// A shortcut for the well known C++ erase-remove idiom.
+/// A shorthand for the well known C++ erase-remove idiom.
 ///
 template<class T, class Pred> void erase_if(T &container, Pred pred)
 {

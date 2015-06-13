@@ -27,7 +27,7 @@ summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0.0),
 }
 
 ///
-/// Resets summary informations.
+/// \brief Resets summary informations
 ///
 template<class T>
 void summary<T>::clear()

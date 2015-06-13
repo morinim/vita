@@ -33,17 +33,13 @@ population<T>::population(const environment &e) : env_(&e), pop_(1),
   pop_[0].reserve(n);
   allowed_[0] = n;
 
-  // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
-  // isn't a well defined environment and init_layer doesn't work.
-  for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[0].emplace_back(e);
-
+  init_layer(0);
+  
   assert(debug(true));
 }
 
 ///
 /// \param[in] l a layer of the population.
-/// \param[in] e an environment (used for individual generation).
 ///
 /// Resets layer `l` of the population.
 ///
@@ -51,19 +47,15 @@ population<T>::population(const environment &e) : env_(&e), pop_(1),
 /// If layer `l` is nonexistent/empty the method doesn't work!
 ///
 template<class T>
-void population<T>::init_layer(unsigned l, const environment *e)
+void population<T>::init_layer(unsigned l)
 {
   assert(l < layers());
-  assert(individuals(l) || (e && e->sset));
-
-  if (!e)
-    e = env_;
 
   pop_[l].clear();
 
   const auto n(allowed(l));
   for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[l].emplace_back(*e);
+    pop_[l].emplace_back(env());
 }
 
 ///
@@ -82,7 +74,7 @@ unsigned population<T>::layers() const
 }
 
 ///
-/// Add a new layer to the population.
+/// \brief Add a new layer to the population
 ///
 /// The new layer is inserted as the lower layer and randomly initialized.
 ///
@@ -97,7 +89,7 @@ void population<T>::add_layer()
 
   allowed_.insert(allowed_.begin(), env_->individuals);
 
-  init_layer(0, env_);
+  init_layer(0);
 }
 
 ///
@@ -170,7 +162,7 @@ unsigned population<T>::allowed(unsigned l) const
 /// \param[in] n number of programs allowed in layer `l`.
 ///
 /// Sets the number of programs allowed in layer `l`. If layer `l` contains
-/// more programs than the allowed, the excedence will be deleted.
+/// more programs than the allowed, the surplus will be deleted.
 ///
 template<class T>
 void population<T>::set_allowed(unsigned l, unsigned n)
@@ -294,6 +286,13 @@ bool population<T>::debug(bool verbose) const
 
     if (pop_[l].capacity() < allowed(l))
       return false;
+  }
+
+  if (!env_)
+  {
+    if (verbose)
+      std::cerr << k_s_debug << "Undefined environment.\n";
+    return false;
   }
 
   return true;
