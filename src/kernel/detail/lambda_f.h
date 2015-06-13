@@ -36,6 +36,16 @@ public:
   explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
   { assert(debug()); }
 
+  // We just need to copy the `ind_` data member, the `int_` interpreter
+  // contains only a reference to `ind_`.
+  reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
+  {
+    if (this != &rhs)
+      ind_ = rhs.ind_;
+
+    return *this;
+  }
+
   bool debug() const
   {
     if (!ind_.debug())
@@ -47,21 +57,7 @@ public:
     return &int_.program() == &ind_;
   }
 
-  // We just need to copy the `ind_` data member, the `int_` interpreter
-  // contains only a reference to `ind_`.
-  reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
-  {
-    if (this != &rhs)
-      ind_ = rhs.ind_;
-
-    return *this;
-  }
-
-public:   // Public data members
-  T ind_;
-  mutable src_interpreter<T> int_;
-
-public:   // Serialization
+  // Serialization
   bool load(std::istream &in, const environment &e)
   {
     unsigned n;
@@ -76,6 +72,10 @@ public:   // Serialization
     out << 1 << '\n';
     return ind_.save(out);
   }
+
+public:
+  T ind_;
+  mutable src_interpreter<T> int_;
 };
 
 // ********* Second specialization (individual not stored) *********
@@ -88,17 +88,22 @@ public:
 
   bool debug() const { return int_.debug(); }
 
-public:   // Public data members
-  mutable src_interpreter<T> int_;
-
-public:   // Serialization
+  // Serialization
   bool load(std::istream &, const environment &) { return false; }
-  bool save(std::ostream &) const { return false; }
+
+  bool save(std::ostream &out) const
+  {
+    out << 1 << '\n';
+    return int_.program().save(out);
+  }
+
+public:
+  mutable src_interpreter<T> int_;
 };
 
-// ********* Third specialization (teams, individuals stored) *********
-template<class T>
-class reg_lambda_f_storage<team<T>, true, true>
+// ********* Third specialization (teams) *********
+template<class T, bool S>
+class reg_lambda_f_storage<team<T>, S, true>
 {
 public:
   explicit reg_lambda_f_storage(const team<T> &t)
@@ -119,14 +124,15 @@ public:
     return true;
   }
 
-public:   // Serialization
+  // Serialization
+
   /// Load is atomic: if it doesn't succeed this object isn't modified; if
   /// it succeeds the team if replaced with a new team (eventually with a
   /// different size) loaded from the input stream.
-  bool load(std::istream &i, const environment &e)
+  bool load(std::istream &in, const environment &e)
   {
     unsigned n;
-    if (!(i >> n) || !n)
+    if (!(in >> n) || !n)
       return false;
 
     decltype(team_) v;
@@ -134,11 +140,12 @@ public:   // Serialization
 
     for (unsigned j(0); j < n; ++j)
     {
-      T temp;
-      if (!temp.load(i,e))
+      reg_lambda_f_storage<T, S> temp_storage{T()};
+
+      if (!temp_storage.load(in, e))
         return false;
 
-      v.emplace_back(temp);
+      v.push_back(temp_storage);
     }
 
     team_ = v;
@@ -158,40 +165,10 @@ public:   // Serialization
     return o.good();
   }
 
-public:   // Public data members
-  std::vector<reg_lambda_f_storage<T, true>> team_;
-};
-
-// ********* Fourth specialization (teams, individuals not stored) *********
-template<class T>
-class reg_lambda_f_storage<team<T>, false, true>
-{
 public:
-  explicit reg_lambda_f_storage(const team<T> &t)
-  {
-    team_.reserve(t.individuals());
-    for (const auto &ind : t)
-      team_.emplace_back(ind);
-
-    assert(debug());
-  }
-
-  bool debug() const
-  {
-    for (const auto &lambda : team_)
-      if (!lambda.debug())
-        return false;
-
-    return true;
-  }
-
-public:   // Serialization
-  bool load(std::istream &, const environment &) { return false; }
-  bool save(std::ostream &) const { return false; }
-
-public:   // Public data members
-  std::vector<reg_lambda_f_storage<T, false>> team_;
+  std::vector<reg_lambda_f_storage<T, S>> team_;
 };
+
 
 // ***********************************************************************
 // *  class_names                                                        *
