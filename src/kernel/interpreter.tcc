@@ -179,20 +179,15 @@ double interpreter<T>::penalty_nvi()
 }
 
 ///
-/// \param[in] p a pointer to an individual (used to check if the interpreter
-///              is working on the expected individual).
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool interpreter<T>::debug_nvi(const void *p) const
+bool interpreter<T>::debug_nvi() const
 {
   if (context_ && !context_->debug())
     return false;
 
   if (!prg_->debug())
-    return false;
-
-  if (p && static_cast<const T *>(p) != prg_)
     return false;
 
   return ip_.index < prg_->size();

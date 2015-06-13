@@ -41,7 +41,10 @@ public:
     if (!ind_.debug())
       return false;
 
-    return int_.debug(&ind_);
+    if (!int_.debug())
+      return false;
+
+    return &int_.program() == &ind_;
   }
 
   // We just need to copy the `ind_` data member, the `int_` interpreter

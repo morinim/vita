@@ -68,7 +68,7 @@ private:  // Private support methods
   // Non-virtual interface
   virtual any run_nvi() override;
   virtual double penalty_nvi() override;
-  virtual bool debug_nvi(const void *) const override;
+  virtual bool debug_nvi() const override;
 
 private:  // Private data members
   const T *prg_;
