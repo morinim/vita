@@ -46,6 +46,11 @@ public:
     return *this;
   }
 
+  template<class ...Args> any run(Args && ...args) const
+  {
+    return int_.run(std::forward<Args>(args)...);
+  }
+
   bool debug() const
   {
     if (!ind_.debug())
@@ -73,7 +78,7 @@ public:
     return ind_.save(out);
   }
 
-public:
+private:
   T ind_;
   mutable src_interpreter<T> int_;
 };
@@ -86,6 +91,11 @@ public:
   explicit reg_lambda_f_storage(const T &ind) : int_(&ind)
   { assert(debug()); }
 
+  template<class ...Args> any run(Args && ...args) const
+  {
+    return int_.run(std::forward<Args>(args)...);
+  }
+
   bool debug() const { return int_.debug(); }
 
   // Serialization
@@ -97,7 +107,7 @@ public:
     return int_.program().save(out);
   }
 
-public:
+private:
   mutable src_interpreter<T> int_;
 };
 

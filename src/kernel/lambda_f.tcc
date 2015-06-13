@@ -47,7 +47,7 @@ template<class T, bool S>
 any basic_reg_lambda_f<T, S>::eval(const data::example &e,
                                    std::false_type) const
 {
-  return this->int_.run(e.input);
+  return this->run(e.input);
 }
 
 template<class T, bool S>
@@ -59,7 +59,7 @@ any basic_reg_lambda_f<T, S>::eval(const data::example &e,
   // Calculate the running average.
   for (const auto &core : this->team_)
   {
-    const auto res(core.int_.run(e.input));
+    const auto res(core.run(e.input));
 
     if (!res.empty())
       avg += (to<number>(res) - avg) / ++count;
