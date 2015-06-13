@@ -59,6 +59,8 @@ public:
   any fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
+  const T &program() const { return *prg_; }
+
 private:  // Private support methods
   any run_locus(const locus &);
   double penalty_locus(const locus &);

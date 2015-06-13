@@ -94,15 +94,16 @@ any interpreter<T>::fetch_arg(unsigned i)
 
   const locus l(g.arg_locus(i));
 
-  const auto get_val([&]()
-                     {
-                       const locus backup(ip_);
-                       ip_ = l;
-                       assert(ip_.index > backup.index);
-                       const auto ret((*prg_)[ip_].sym->eval(this));
-                       ip_ = backup;
-                       return ret;
-                     });
+  const auto get_val(
+    [&]()
+    {
+      const locus backup(ip_);
+      ip_ = l;
+      assert(ip_.index > backup.index);
+      const auto ret((*prg_)[ip_].sym->eval(this));
+      ip_ = backup;
+      return ret;
+    });
 
   auto &elem(cache_(l));
 

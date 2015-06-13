@@ -23,10 +23,10 @@ namespace vita
 using number = double;
 
 ///
-/// \tparam T the type of individual used.
+/// \tparam T the type of individual used
 ///
 /// This class extends vita::interpreter to simply manage input variables.
-/// For further details see also src_variable.
+/// For further details see vita::variable class.
 ///
 template<class T>
 class src_interpreter : public interpreter<T>
