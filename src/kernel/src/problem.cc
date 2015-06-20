@@ -250,14 +250,16 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   boost::property_tree::ptree pt;
   read_xml(s_file, pt);
 
-#if !defined(NDEBUG)
   // Prints the list of categories as inferred from the dataset.
-  std::cout << "\n\n";
+  if (env.verbosity >= 3)
+  {
+    std::cout << "\n\n";
 
-  for (const category &c : dat_.categories())
-    std::cout << k_s_debug << ' ' << c << '\n';
-  std::cout << '\n';
-#endif
+    for (const category &c : dat_.categories())
+      std::cout << k_s_debug << ' ' << c << '\n';
+
+    std::cout << '\n';
+  }
 
   symbol_factory &factory(symbol_factory::instance());
 
@@ -291,13 +293,15 @@ unsigned src_problem::load_symbols(const std::string &s_file)
           for (const auto &seq : sequences)
             if (compatible(seq, args))
             {
-#if !defined(NDEBUG)
-              std::cout << k_s_debug << ' ' << sym_name << '(';
-              for (const auto &j : seq)
-                std::cout << dat_.categories().find(j).name
-                          << (&j == &seq.back() ? ")" : ", ");
-              std::cout << '\n';
-#endif
+              if (env.verbosity >= 3)
+              {
+                std::cout << k_s_debug << ' ' << sym_name << '(';
+                for (const auto &j : seq)
+                  std::cout << dat_.categories().find(j).name
+                            << (&j == &seq.back() ? ")" : ", ");
+                std::cout << '\n';
+              }
+
               env.sset->insert(factory.make(sym_name, seq));
             }
         }
@@ -309,13 +313,15 @@ unsigned src_problem::load_symbols(const std::string &s_file)
         {
           const auto n_args(factory.args(sym_name));
 
-#if !defined(NDEBUG)
-          std::cout << k_s_debug << ' ' << sym_name << '(';
-          for (auto j(decltype(n_args){0}); j < n_args; ++j)
-            std::cout << dat_.categories().find(tag).name
-                      << (j + 1 == n_args ? ")" : ", ");
-          std::cout << '\n';
-#endif
+          if (env.verbosity >= 3)
+          {
+            std::cout << k_s_debug << ' ' << sym_name << '(';
+            for (auto j(decltype(n_args){0}); j < n_args; ++j)
+              std::cout << dat_.categories().find(tag).name
+                        << (j + 1 == n_args ? ")" : ", ");
+            std::cout << '\n';
+          }
+
           env.sset->insert(factory.make(sym_name, cvect(n_args, tag)));
         }
     }

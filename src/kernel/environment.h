@@ -45,7 +45,7 @@ public:  // Data members
   /// - 0 only fatal errors;
   /// - 1 search results and errors;
   /// - 2 search results, informations, warnings and errors;
-  /// - >= 3 everything.
+  /// - >= 3 everything (e.g. diagnostic messages...).
   unsigned verbosity = 2;
 
   /// The number of genes (maximum length of an evolved program in the
