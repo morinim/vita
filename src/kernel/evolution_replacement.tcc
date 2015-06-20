@@ -30,7 +30,7 @@ strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
 ///
 /// \param[in] parent coordinates of the parents (in the population).
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
 /// * elitism is `true` => child replaces a member of the population only if
@@ -46,15 +46,19 @@ void family_competition<T>::run(
 
   const fitness_t fit_off(this->eva_(offspring[0]));
 
-  const fitness_t f_parent[] =
+  const fitness_t fit_parent[] =
   {
     this->eva_(pop[parent[0]]), this->eva_(pop[parent[1]])
   };
-  const bool id_worst(f_parent[0] < f_parent[1] ? 0 : 1);
+  const unsigned id_worst(fit_parent[0] < fit_parent[1] ? 0 : 1);
+
+  // The algorithm assumes that fitness values have same sign.
+  assert((fit_off[0] <= 0.0) == (fit_parent[0][0] <= 0.0));
+  assert((fit_off[0] <= 0.0) == (fit_parent[1][0] <= 0.0));
 
   if (pop.env().elitism == trilean::yes)
   {
-    if (fit_off > f_parent[id_worst])
+    if (fit_off > fit_parent[id_worst])
       pop[parent[id_worst]] = offspring[0];
   }
   else  // !elitism
@@ -63,15 +67,15 @@ void family_competition<T>::run(
     // when fitness is a vector but the replacement probability should be
     // calculated in a better way.
 
-    //double replace(1.0 / (1.0 + exp(f_parent[id_worst][0] - fit_off[0])));
+    //double replace(1.0 / (1.0 + exp(fit_parent[id_worst][0] - fit_off[0])));
     double replace(1.0 - (fit_off[0] /
-                          (fit_off[0] + f_parent[id_worst][0])));
+                          (fit_off[0] + fit_parent[id_worst][0])));
     if (random::boolean(replace))
       pop[parent[id_worst]] = offspring[0];
     else
     {
       //replace = 1.0 / (1.0 + exp(f_parent[!id_worst][0] - fit_off[0]));
-      replace = 1.0 - (fit_off[0] / (fit_off[0] + f_parent[!id_worst][0]));
+      replace = 1.0 - (fit_off[0] / (fit_off[0] + fit_parent[!id_worst][0]));
 
       if (random::boolean(replace))
         pop[parent[!id_worst]] = offspring[0];
@@ -94,7 +98,7 @@ void family_competition<T>::run(
 ///                   coordinates of the worst individual of the selection
 ///                   phase.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
 /// * elitism is `true` => child replaces a member of the population only if
@@ -234,7 +238,7 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 ///                   last element is the coordinates of the worst individual
 ///                   of the tournament.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
 /// * elitism is `true` => a new best individual is always inserted into the
@@ -289,7 +293,7 @@ void alps<T>::run(
 ///                   dominance (from pareto non dominated front to
 ///                   dominated points.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical summary.
+/// \param[in,out] s statistical summary.
 ///
 /// To determine whether a new individual x is to be accepted into the main
 /// population, we compare it with the `parent` buffer, simply ensuring

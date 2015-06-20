@@ -15,7 +15,8 @@
 
 #include "kernel/alps.h"
 
-namespace vita {  namespace replacement {
+namespace vita {
+namespace replacement {
 ///
 /// \brief The replacement strategy (random, tournament...) for the
 ///        vita::evolution_strategy class
@@ -144,6 +145,7 @@ public:
 
 #include "kernel/evolution_replacement.tcc"
 
-} }  // namespace vita::replacement
+}  // namespace replacement
+}  // namespace vita
 
 #endif  // Include guard
