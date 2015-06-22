@@ -13,10 +13,12 @@
 #if !defined(VITA_EVOLUTION_RECOMBINATION_H)
 #define      VITA_EVOLUTION_RECOMBINATION_H
 
+#include "kernel/evolution_selection.h"
 #include "kernel/population.h"
 #include "kernel/vitafwd.h"
 
-namespace vita { namespace recombination {
+namespace vita {
+namespace recombination {
 ///
 /// \brief The operation strategy (crossover, recombination, mutation...) for
 ///        the evolution class
@@ -53,10 +55,11 @@ public:
   strategy(const population<T> &, evaluator<T> &, summary<T> *const);
   virtual ~strategy() {}
 
-  offspring_t run(const std::vector<coord> &);
+  offspring_t run(const typename selection::strategy<T>::parents_t &);
 
 private:  // NVI template methods
-  virtual offspring_t run_nvi(const std::vector<coord> &) = 0;
+  virtual offspring_t run_nvi(
+    const typename selection::strategy<T>::parents_t &) = 0;
 
 protected:
   const population<T> &pop_;
@@ -79,7 +82,7 @@ public:
 
 private:  // NVI template methods
   virtual typename strategy<T>::offspring_t run_nvi(
-    const std::vector<coord> &) override;
+    const typename selection::strategy<T>::parents_t &) override;
 };
 
 ///
@@ -93,10 +96,11 @@ public:
 
 private:  // NVI template methods
   virtual typename strategy<T>::offspring_t run_nvi(
-    const std::vector<coord> &) override;
+    const typename selection::strategy<T>::parents_t &) override;
 };
 
 #include "kernel/evolution_recombination.tcc"
-} }  // namespace vita::recombination
+}  // namespace recombination
+}  // namespace vita
 
 #endif  // Include guard

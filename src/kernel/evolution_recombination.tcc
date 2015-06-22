@@ -40,7 +40,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 ///
 template<class T>
 typename strategy<T>::offspring_t strategy<T>::run(
-  const std::vector<coord> &parent)
+  const typename selection::strategy<T>::parents_t &parent)
 {
   return run_nvi(parent);
 }
@@ -53,7 +53,7 @@ typename strategy<T>::offspring_t strategy<T>::run(
 ///
 template<class T>
 typename strategy<T>::offspring_t base<T>::run_nvi(
-  const std::vector<coord> &parent)
+  const typename selection::strategy<T>::parents_t &parent)
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
@@ -130,7 +130,7 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
 ///
 template<class T>
 typename strategy<T>::offspring_t de<T>::run_nvi(
-  const std::vector<coord> &parent)
+  const typename selection::strategy<T>::parents_t &parent)
 {
   assert(parent.size() >= 2);
 

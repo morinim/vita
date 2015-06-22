@@ -17,7 +17,8 @@
 
 #include "kernel/alps.h"
 
-namespace vita {  namespace selection {
+namespace vita {
+namespace selection {
 ///
 /// \brief The strategy (tournament, fitness proportional...) for the
 ///        evolution class
@@ -34,10 +35,12 @@ template<class T>
 class strategy
 {
 public:
+  using parents_t = std::vector<coord>;
+
   strategy(const population<T> &, evaluator<T> &, const summary<T> &);
   virtual ~strategy() {}
 
-  virtual std::vector<coord> run() = 0;
+  virtual parents_t run() = 0;
 
 protected:  // Support methods
   coord pickup() const;
@@ -76,7 +79,7 @@ class tournament : public strategy<T>
 public:
   using tournament::strategy::strategy;
 
-  virtual std::vector<coord> run() override;
+  virtual typename strategy<T>::parents_t run() override;
 };
 
 ///
@@ -90,7 +93,7 @@ class alps : public strategy<T>
 public:
   using alps::strategy::strategy;
 
-  virtual std::vector<coord> run() override;
+  virtual typename strategy<T>::parents_t run() override;
 };
 
 ///
@@ -110,7 +113,7 @@ class fuss : public strategy<T>
 public:
   using fuss::strategy::strategy;
 
-  virtual std::vector<coord> run() override;
+  virtual typename strategy<T>::parents_t run() override;
 };
 
 ///
@@ -123,7 +126,7 @@ class pareto : public strategy<T>
 public:
   using pareto::strategy::strategy;
 
-  virtual std::vector<coord> run() override;
+  virtual typename strategy<T>::parents_t run() override;
 
 private:
   void front(const std::vector<unsigned> &, std::set<unsigned> *,
@@ -143,7 +146,7 @@ class random : public strategy<T>
 public:
   using random::strategy::strategy;
 
-  virtual std::vector<coord> run() override;
+  virtual typename strategy<T>::parents_t run() override;
 };
 
 #include "kernel/evolution_selection.tcc"

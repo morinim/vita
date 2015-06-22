@@ -90,7 +90,7 @@ coord strategy<T>::pickup(unsigned l, double p) const
 /// * tournament_size - to control selection pressure.
 ///
 template<class T>
-std::vector<coord> tournament<T>::run()
+typename strategy<T>::parents_t tournament<T>::run()
 {
   const auto &pop(this->pop_);
 
@@ -98,7 +98,7 @@ std::vector<coord> tournament<T>::run()
   const auto target(this->pickup());
 
   assert(rounds);
-  std::vector<coord> ret(rounds);
+  typename strategy<T>::parents_t ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
@@ -138,7 +138,7 @@ std::vector<coord> tournament<T>::run()
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-std::vector<coord> alps<T>::run()
+typename strategy<T>::parents_t alps<T>::run()
 {
   const auto &pop(this->pop_);
 
@@ -213,7 +213,7 @@ std::vector<coord> alps<T>::run()
 /// depends on the population of that level.
 ///
 template<class T>
-std::vector<coord> fuss<T>::run()
+typename strategy<T>::parents_t fuss<T>::run()
 {
   const auto &pop(this->pop_);
 
@@ -235,7 +235,7 @@ std::vector<coord> fuss<T>::run()
     assert(level[i] <= std::max(min[i], max[i]) + 0.5);
   }
 
-  std::vector<coord> ret(rounds);
+  typename strategy<T>::parents_t ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
@@ -278,7 +278,7 @@ std::vector<coord> fuss<T>::run()
 ///   selected individuals for dominance evaluation).
 ///
 template<class T>
-std::vector<coord> pareto<T>::run()
+typename strategy<T>::parents_t pareto<T>::run()
 {
   const auto &pop(this->pop_);
   const auto rounds(pop.env().tournament_size);
@@ -294,7 +294,7 @@ std::vector<coord> pareto<T>::run()
 
   assert(front_set.size());
 
-  std::vector<coord> ret{
+  typename strategy<T>::parents_t ret{
     {0, vita::random::element(front_set)},
     {0, vita::random::element(front_set)}};
 
@@ -357,12 +357,12 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-std::vector<coord> random<T>::run()
+typename strategy<T>::parents_t random<T>::run()
 {
   const auto size(this->pop_.env().tournament_size);
 
   assert(size);
-  std::vector<coord> ret(size);
+  typename strategy<T>::parents_t ret(size);
 
   for (auto &v : ret)
     v = this->pickup();
