@@ -19,54 +19,54 @@
 
 namespace term
 {
-  ///
-  /// \return \c true when the user press the '.' key.
-  ///
-  inline bool user_stop()
-  {
-    const bool stop(kbhit() && std::cin.get() == '.');
+///
+/// \return `true` when the user press the '.' key.
+///
+inline bool user_stop()
+{
+  const bool stop(kbhit() && std::cin.get() == '.');
 
-    if (stop)
-      std::cout << k_s_info << " Stopping evolution...\n";
+  if (stop)
+    std::cout << k_s_info << " Stopping evolution...\n";
 
-    return stop;
-  }
+  return stop;
+}
 
-  ///
-  /// Resets the term and restores the default signal handlers.
-  ///
-  inline void reset()
-  {
-    std::signal(SIGABRT, SIG_DFL);
-    std::signal(SIGINT, SIG_DFL);
-    std::signal(SIGTERM, SIG_DFL);
+///
+/// Resets the term and restores the default signal handlers.
+///
+inline void reset()
+{
+  std::signal(SIGABRT, SIG_DFL);
+  std::signal(SIGINT, SIG_DFL);
+  std::signal(SIGTERM, SIG_DFL);
 
-    term_raw_mode(false);
-  }
+  term_raw_mode(false);
+}
 
-  ///
-  /// If the program receives a SIGABRT / SIGINT / SIGTERM, it must handle
-  /// the signal and reset the terminal to the initial state.
-  ///
-  inline void signal_handler(int signum)
-  {
-    term::reset();
+///
+/// If the program receives a SIGABRT / SIGINT / SIGTERM, it must handle
+/// the signal and reset the terminal to the initial state.
+///
+inline void signal_handler(int signum)
+{
+  term::reset();
 
-    std::raise(signum);
-  }
+  std::raise(signum);
+}
 
-  ///
-  /// Sets the term in raw mode and handles the interrupt signals.
-  ///
-  inline void set()
-  {
-    // Install our signal handler.
-    std::signal(SIGABRT, term::signal_handler);
-    std::signal(SIGINT, term::signal_handler);
-    std::signal(SIGTERM, term::signal_handler);
+///
+/// Sets the term in raw mode and handles the interrupt signals.
+///
+inline void set()
+{
+  // Install our signal handler.
+  std::signal(SIGABRT, term::signal_handler);
+  std::signal(SIGINT, term::signal_handler);
+  std::signal(SIGTERM, term::signal_handler);
 
-    term_raw_mode(true);
-  }
+  term_raw_mode(true);
+}
 }  // namespace term
 
 ///
@@ -92,7 +92,7 @@ evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
 
 ///
 /// \param[in] s an up to date evolution summary.
-/// \return \c true when evolution should be interrupted.
+/// \return `true` when evolution should be interrupted.
 ///
 template<class T, template<class> class ES>
 bool evolution<T, ES>::stop_condition(const summary<T> &s) const
@@ -226,9 +226,9 @@ void evolution<T, ES>::log(unsigned run_count) const
 ///
 /// \param[in] k current generation.
 /// \param[in] run_count total number of runs planned.
-/// \param[in] status if \c true print a run/generation/fitness status line.
+/// \param[in] status if `true` print a run/generation/fitness status line.
 ///
-/// Print evolution informations (if environment::verbosity > 0).
+/// Print evolution informations (if `environment::verbosity > 0`).
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
@@ -345,7 +345,7 @@ evolution<T, ES>::run(unsigned run_count)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return true if object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
