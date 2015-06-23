@@ -26,6 +26,7 @@ using namespace boost;
 #include "test/factory_fixture5.h"
 
 #include "test/evolution.cc"
+#include "test/evolution_selection.cc"
 #include "test/fitness.cc"
 #include "test/ga.cc"
 //#include "test_ga_perf.cc"

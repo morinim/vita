@@ -122,6 +122,8 @@ typename strategy<T>::parents_t tournament<T>::run()
   }
 
 #if !defined(NDEBUG)
+  assert(ret.size() == rounds);
+
   for (unsigned i(1); i < rounds; ++i)
     assert(this->eva_(pop[ret[i - 1]]) >= this->eva_(pop[ret[i]]));
 #endif
@@ -239,7 +241,7 @@ typename strategy<T>::parents_t fuss<T>::run()
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
-  // DO NOT USE std::sort it is way slower.
+  // DO NOT USE std::sort it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(this->pickup());

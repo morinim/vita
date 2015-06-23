@@ -138,6 +138,19 @@ public:
 template<class T> using alps_es = basic_alps_es<T, recombination::base>;
 
 ///
+/// \brief FUSS evolution strategy
+///
+template<class T>
+class fuss_es : public evolution_strategy<T,
+                                         selection::fuss,
+                                         recombination::base,
+                                         replacement::tournament>
+{
+public:
+  using fuss_es::evolution_strategy::evolution_strategy;
+};
+
+///
 /// \brief Standard evolution strategy
 ///
 template<class T>

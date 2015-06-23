@@ -34,7 +34,7 @@ population<T>::population(const environment &e) : env_(&e), pop_(1),
   allowed_[0] = n;
 
   init_layer(0);
-  
+
   assert(debug(true));
 }
 
