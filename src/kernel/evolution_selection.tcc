@@ -192,10 +192,10 @@ typename strategy<T>::parents_t alps<T>::run()
     assert(age_fit1.second == this->eva_(pop[c1]));
     assert(age_fit0 >= age_fit1);
     assert(!vita::alps::aged(pop, c0) || vita::alps::aged(pop, c1));
-    assert(layer <= c0.layer + 1);
-    assert(layer <= c1.layer + 1);
     assert(c0.layer <= layer);
+    assert(layer <= c0.layer + 1);
     assert(c1.layer <= layer);
+    assert(layer <= c1.layer + 1);
   }
 
   return {c0, c1};
@@ -222,16 +222,17 @@ typename strategy<T>::parents_t fuss<T>::run()
   const auto rounds(pop.env().tournament_size);
   assert(rounds);
 
-  const auto min(this->sum_.az.fit_dist().min);
-  const auto max(this->sum_.az.fit_dist().max);
+  const auto min(this->sum_.az.fit_dist().min());
+  const auto max(this->sum_.az.fit_dist().max());
   auto level(max - min);
 
-  for (unsigned i(0); i < decltype(level)::size; ++i)
+  const auto sup(level.size());
+  for (unsigned i(0); i < sup; ++i)
   {
     const auto base(std::min(min[i], max[i]));
     const auto delta(std::fabs(level[i]));
 
-    level[i] = base + vita::random::between<decltype(base)>(-0.5, delta + 0.5);
+    level[i] = base + vita::random::between(-0.5, delta + 0.5);
 
     assert(std::min(min[i], max[i]) - 0.5 <= level[i]);
     assert(level[i] <= std::max(min[i], max[i]) + 0.5);
@@ -241,7 +242,7 @@ typename strategy<T>::parents_t fuss<T>::run()
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
-  // DO NOT USE std::sort it's way slower.
+  // DO NOT USE `std::sort` it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(this->pickup());
@@ -251,7 +252,7 @@ typename strategy<T>::parents_t fuss<T>::run()
 
     // Where is the insertion point?
     while (j < i &&
-           level.distance(new_fit) > level.distance(this->eva_(pop[ret[j]])))
+           distance(level, new_fit) > distance(level, this->eva_(pop[ret[j]])))
       ++j;
 
     // Shift right elements after the insertion point.
@@ -264,8 +265,8 @@ typename strategy<T>::parents_t fuss<T>::run()
 #if !defined(NDEBUG)
   const auto size(ret.size());
   for (auto i(decltype(size){1}); i < size; ++i)
-    assert(level.distance(this->eva_(pop[ret[i - 1]])) <=
-           level.distance(this->eva_(pop[ret[i]])));
+    assert(distance(level, this->eva_(pop[ret[i - 1]])) <=
+           distance(level, this->eva_(pop[ret[i]])));
 #endif
 
   return ret;
