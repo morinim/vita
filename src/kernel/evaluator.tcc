@@ -103,4 +103,24 @@ fitness_t random_evaluator<T>::operator()(const T &)
   return f;
 }
 
+///
+/// \param[in] prg a program (individual/team).
+/// \return a unique, time-constant, unspecified fitness value for individual
+///         `prg`.
+///
+template<class T>
+fitness_t test_evaluator<T>::operator()(const T &prg)
+{
+  auto it(std::find(buffer_.begin(), buffer_.end(), prg));
+
+  if (it == buffer_.end())
+  {
+    buffer_.push_back(prg);
+    it = buffer_.end() - 1;
+  }
+
+  return {static_cast<fitness_t::value_type>(std::distance(buffer_.begin(),
+                                                           it))};
+}
+
 #endif  // Include guard

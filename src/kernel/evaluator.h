@@ -62,7 +62,7 @@ public:
 /// \brief A random fitness function used for debug purpose
 ///
 /// \note
-/// The output is population independent.
+/// The output doesn't depend on the input parameter (individual).
 ///
 template<class T>
 class random_evaluator : public evaluator<T>
@@ -71,6 +71,22 @@ public:
   virtual fitness_t operator()(const T &) override;
 };
 
+///
+/// \brief A fitness function used for debug purpose
+///
+/// \note
+/// Fixed (unspecified) fitness for every individual. Different individuals
+/// will have a different fitness.
+///
+template<class T>
+class test_evaluator : public vita::evaluator<T>
+{
+public:
+  virtual fitness_t operator()(const T &) override;
+
+private:
+  std::vector<T> buffer_ = {};
+};
 #include "kernel/evaluator.tcc"
 
 }  // namespace vita
