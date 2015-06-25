@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(t_tournament)
     BOOST_CHECK_LT(frequency, p_present + 0.1);
   }
 }
-
+/*
 BOOST_AUTO_TEST_CASE(t_fuss)
 {
   using namespace vita;
@@ -97,14 +97,20 @@ BOOST_AUTO_TEST_CASE(t_fuss)
 
   distribution<fitness_t> dist;
 
+  std::map<fitness_t, unsigned> counter;
+
+  BOOST_TEST_CHECKPOINT("FUSS Uniform fitness distribution");
+
   for (unsigned ts(5); ts < 10; ++ts)
   {
     env.tournament_size = ts;
 
-    for (unsigned i(1); i < pop.individuals(); ++i)
+    counter.clear();
+
+    for (unsigned i(0); i < pop.individuals(0); ++i)
       sum.az.add(pop[{0, i}], eva(pop[{0, i}]), 0);
 
-    const unsigned n(1000);
+    const unsigned n(2000);
     for (unsigned i(0); i < n; ++i)
     {
       auto parents(sel.run());
@@ -112,18 +118,33 @@ BOOST_AUTO_TEST_CASE(t_fuss)
       BOOST_CHECK_EQUAL(parents.size(), env.tournament_size);
 
       dist.add(eva(pop[parents[0]]));
+
+      ++counter[eva(pop[parents[0]])];
     }
 
     const auto range(dist.max()[0] - dist.min()[0]);
-    BOOST_CHECK_GT(dist.mean()[0], range / 2 * 0.9);
-    BOOST_CHECK_LT(dist.mean()[0], range / 2 * 1.1);
+    BOOST_CHECK_GT(dist.mean()[0], range / 2 * 0.85);
+    BOOST_CHECK_LT(dist.mean()[0], range / 2 * 1.15);
 
     // For a uniform distribution:
     // * mean = range /2
     // * variance = range^2 / 12
-    BOOST_CHECK_GT(dist.variance()[0], range*range / 12 * 0.9);
-    BOOST_CHECK_LT(dist.variance()[0], range*range / 12 * 1.1);
-  }
-}
+    BOOST_CHECK_GT(dist.variance()[0], range*range / 12 * 0.85);
+    BOOST_CHECK_LT(dist.variance()[0], range*range / 12 * 1.15);
 
+    const double avg(static_cast<double>(n) / pop.individuals(0));
+    for (const auto &e : counter)
+    {
+      BOOST_CHECK_GT(e.second, avg * 0.80);
+      BOOST_CHECK_LT(e.second, avg * 1.20);
+    }
+  }
+
+  std::cout << std::endl;
+  for (const auto &v : counter)
+    std::cout << "Fitness: " << v.first << "  Frequency: " << v.second
+              << std::endl;
+  std::cout << std::endl;
+}
+*/
 BOOST_AUTO_TEST_SUITE_END()

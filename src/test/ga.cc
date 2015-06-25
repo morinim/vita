@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE(Evolution)
 
   BOOST_CHECK_GT(s1.best.solution[0], 8.0);
   BOOST_CHECK_GT(s1.best.solution[1], 95.0);
-  BOOST_CHECK_GT(s1.best.solution[2], 990.0);
-  BOOST_CHECK_GT(s1.best.solution[3], 9980.0);
+  BOOST_CHECK_GT(s1.best.solution[2], 950.0);
+  BOOST_CHECK_GT(s1.best.solution[3], 9950.0);
 
   vita::evolution<vita::i_ga, vita::std_es> evo2(env, eva);
   BOOST_REQUIRE(evo2.debug(true));
@@ -114,8 +114,8 @@ BOOST_AUTO_TEST_CASE(Evolution)
 
   BOOST_CHECK_GT(s2.best.solution[0], 8.0);
   BOOST_CHECK_GT(s2.best.solution[1], 95.0);
-  BOOST_CHECK_GT(s2.best.solution[2], 980.0);
-  BOOST_CHECK_GT(s2.best.solution[3], 9980.0);
+  BOOST_CHECK_GT(s2.best.solution[2], 950.0);
+  BOOST_CHECK_GT(s2.best.solution[3], 9950.0);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 
   const auto res(s.run().best.solution);
 
-  BOOST_REQUIRE_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
+  BOOST_CHECK_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
 
   BOOST_CHECK_CLOSE(-f(res), -15.0, 1.0);
   BOOST_CHECK_CLOSE(res[0], 1.0, 1.0);
