@@ -45,4 +45,4 @@ using namespace boost;
 #include "test/team.cc"
 #include "test/terminal.cc"
 #include "test/ttable.cc"
-#include "test/variant.cc"
+//#include "test/variant.cc"
