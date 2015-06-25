@@ -44,17 +44,19 @@ BOOST_AUTO_TEST_CASE(Creation)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
+  using namespace vita;
+
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = vita::random::between(30u, 300u);
-    env.tournament_size = vita::random::between<unsigned>(1, *env.mate_zone);
+    env.individuals = random::between(30u, 300u);
+    env.tournament_size = random::between<unsigned>(1, *env.mate_zone);
 
     std::stringstream ss;
-    vita::population<vita::i_mep> pop1(env);
+    vita::population<i_mep> pop1(env);
 
     BOOST_REQUIRE(pop1.save(ss));
 
-    vita::population<vita::i_mep> pop2(env);
+    decltype(pop1) pop2(env);
     BOOST_REQUIRE(pop2.load(ss, env));
     BOOST_REQUIRE(pop2.debug(true));
 
@@ -66,7 +68,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
       for (unsigned j(0); j < pop1.individuals(); ++j)
       {
-        const vita::coord c{l, j};
+        const typename vita::population<i_mep>::coord c{l, j};
         BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
       }
     }

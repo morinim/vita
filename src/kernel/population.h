@@ -21,19 +21,6 @@
 namespace vita
 {
 ///
-/// \brief Holds the coordinates of an individual in a population
-///
-struct coord
-{
-  unsigned layer;
-  unsigned index;
-
-  bool operator==(coord c) const
-  { return layer == c.layer && index == c.index; }
-  bool operator!=(coord c) const { return !(*this == c); }
-};
-
-///
 /// \brief A group of individuals which may interact together (for example by
 ///        mating) producing offspring
 ///
@@ -46,6 +33,20 @@ struct coord
 template<class T>
 class population
 {
+public:
+  ///
+  /// \brief Holds the coordinates of an individual in a population
+  ///
+  struct coord
+  {
+    unsigned layer;
+    unsigned index;
+
+    bool operator==(coord c) const
+    { return layer == c.layer && index == c.index; }
+    bool operator!=(coord c) const { return !(*this == c); }
+  };
+
 public:
   explicit population(const environment &);
 

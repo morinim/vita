@@ -35,7 +35,7 @@ template<class T>
 class strategy
 {
 public:
-  using parents_t = std::vector<coord>;
+  using parents_t = std::vector<typename population<T>::coord>;
 
   strategy(const population<T> &, evaluator<T> &, const summary<T> &);
   virtual ~strategy() {}
@@ -43,8 +43,8 @@ public:
   virtual parents_t run() = 0;
 
 protected:  // Support methods
-  coord pickup() const;
-  coord pickup(unsigned, double = 1.0) const;
+  typename population<T>::coord pickup() const;
+  typename population<T>::coord pickup(unsigned, double = 1.0) const;
 
 protected:  // Data members
   const population<T> &pop_;

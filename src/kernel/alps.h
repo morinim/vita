@@ -33,7 +33,8 @@ unsigned max_age(unsigned, unsigned, unsigned);
 ///
 /// This is just a convenience method to save some keystroke.
 ///
-template<class T> bool aged(const population<T> &p, coord c)
+template<class T> bool aged(const population<T> &p,
+                            typename population<T>::coord c)
 {
   return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
 }

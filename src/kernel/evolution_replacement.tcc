@@ -38,7 +38,7 @@ strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
 ///
 template<class T>
 void family_competition<T>::run(
-  const std::vector<coord> &parent,
+  const typename strategy<T>::parents_t &parent,
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
@@ -106,7 +106,7 @@ void family_competition<T>::run(
 ///
 template<class T>
 void tournament<T>::run(
-  const std::vector<coord> &parent,
+  const typename strategy<T>::parents_t &parent,
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
@@ -122,7 +122,7 @@ void tournament<T>::run(
   // is greater than 2 we perform a traditional selection / replacement
   // scheme; if it's smaller we perform a family competition replacement
   // (aka deterministic / probabilistic crowding).
-  const coord rep_idx(parent.back());
+  const auto rep_idx(parent.back());
   const auto f_rep_idx(this->eva_(pop[rep_idx]));
   const bool replace(f_rep_idx < fit_off);
 
@@ -186,6 +186,8 @@ void alps<T>::try_move_up_layer(unsigned l)
 template<class T>
 bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 {
+  using coord = typename population<T>::coord;
+
   auto &p(this->pop_);
   assert(layer < p.layers());
 
@@ -246,7 +248,7 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 ///
 template<class T>
 void alps<T>::run(
-  const std::vector<coord> &parent,
+  const typename strategy<T>::parents_t &parent,
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   const auto layer(std::max(parent[0].layer, parent[1].layer));
@@ -315,7 +317,7 @@ void alps<T>::run(
 ///
 template<class T>
 void pareto<T>::run(
-  const std::vector<coord> &parent,
+  const typename strategy<T>::parents_t &parent,
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);

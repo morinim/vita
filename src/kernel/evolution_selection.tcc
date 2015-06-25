@@ -33,7 +33,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// \return the index of a random individual.
 ///
 template<class T>
-coord strategy<T>::pickup() const
+typename population<T>::coord strategy<T>::pickup() const
 {
   const auto n_layers(pop_.layers());
 
@@ -63,7 +63,7 @@ coord strategy<T>::pickup() const
 /// \return the coordinates of a random individual in layer `l` or `l-1`.
 ///
 template<class T>
-coord strategy<T>::pickup(unsigned l, double p) const
+typename population<T>::coord strategy<T>::pickup(unsigned l, double p) const
 {
   assert(0.0 <= p);
   assert(p <= 1.0);

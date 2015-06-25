@@ -34,12 +34,12 @@ class strategy
 {
 public:
   using offspring_t = typename recombination::strategy<T>::offspring_t;
+  using parents_t = typename selection::strategy<T>::parents_t;
 
   strategy(population<T> &, evaluator<T> &);
   virtual ~strategy() {}
 
-  virtual void run(const std::vector<coord> &, const offspring_t &,
-                   summary<T> *) = 0;
+  virtual void run(const parents_t &, const offspring_t &, summary<T> *) = 0;
 
 protected:
   population<T> &pop_;
@@ -70,7 +70,7 @@ class family_competition : public strategy<T>
 public:
   using family_competition::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &,
+  virtual void run(const typename strategy<T>::parents_t &,
                    const typename strategy<T>::offspring_t &,
                    summary<T> *) override;
 };
@@ -93,7 +93,7 @@ class tournament : public strategy<T>
 public:
   using tournament::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &,
+  virtual void run(const typename strategy<T>::parents_t &,
                    const typename strategy<T>::offspring_t &,
                    summary<T> *) override;
 };
@@ -121,7 +121,7 @@ class alps : public strategy<T>
 public:
   using alps::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &,
+  virtual void run(const typename strategy<T>::parents_t &,
                    const typename strategy<T>::offspring_t &,
                    summary<T> *) override;
 
@@ -138,7 +138,7 @@ class pareto : public strategy<T>
 public:
   using pareto::strategy::strategy;
 
-  virtual void run(const std::vector<coord> &,
+  virtual void run(const typename strategy<T>::parents_t &,
                    const typename strategy<T>::offspring_t &,
                    summary<T> *) override;
 };

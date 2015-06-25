@@ -38,6 +38,8 @@ BOOST_AUTO_TEST_CASE(t_tournament)
   test_evaluator<i_mep>      eva;
   summary<i_mep>             sum;
 
+  using coord = typename population<i_mep>::coord;
+
   selection::tournament<i_mep> sel(pop, eva, sum);
 
   for (unsigned ts(1); ts < 10; ++ts)

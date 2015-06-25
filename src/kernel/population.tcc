@@ -369,7 +369,8 @@ bool population<T>::save(std::ostream &out) const
 ///   the population.
 ///
 template<class T>
-coord pickup(const population<T> &p, coord target)
+typename population<T>::coord pickup(const population<T> &p,
+                                     typename population<T>::coord target)
 {
   return {target.layer, random::ring(target.index, *p.env().mate_zone,
                                      p.individuals(target.layer))};
