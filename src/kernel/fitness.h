@@ -93,7 +93,7 @@ public:
   basic_fitness_t &operator-=(const basic_fitness_t &);
   basic_fitness_t &operator*=(const basic_fitness_t &);
 
-public:   // Serialization
+  // Serialization
   bool load(std::istream &);
   bool save(std::ostream &) const;
 

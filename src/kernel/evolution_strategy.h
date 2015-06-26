@@ -74,7 +74,7 @@ public:  // Public data members
   CS<T> recombination;
   RS<T> replacement;
 
- protected:  // Protected data members
+protected:  // Protected data members
   population<T> &pop_;
   summary<T>    *sum_;
 };

@@ -118,46 +118,45 @@ void src_search<T, ES>::arl(const U &base)
     auto candidate_block(base.get_block(l));
 
     // Building blocks must be simple.
-    if (candidate_block.eff_size() <= 5 + adf_args)
+    if (candidate_block.eff_size() > 5 + adf_args)
+      continue;
+
+    // This is an approximation of the fitness due to the current block.
+    // The idea is to see how the individual (base) would perform without
+    // (base.destroy_block) the current block.
+    // Useful blocks have delta values greater than 0.
+    const auto delta(base_fit[0] -
+                     this->fitness(base.destroy_block(l.index, *env.sset))[0]);
+
+    // Semantic introns cannot be building blocks...
+    // When delta is greater than 10% of the base fitness we have a
+    // building block.
+    if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
     {
-      // This is an approximation of the fitness due to the current block.
-      // The idea is to see how the individual (base) would perform without
-      // (base.destroy_block) the current block.
-      // Useful blocks have delta values greater than 0.
-      const auto delta(base_fit[0] -
-                       this->fitness(base.destroy_block(l.index,
-                                                        *env.sset))[0]);
-
-      // Semantic introns cannot be building blocks...
-      // When delta is greater than 10% of the base fitness we have a
-      // building block.
-      if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
+      std::unique_ptr<symbol> p;
+      if (adf_args)
       {
-        std::unique_ptr<symbol> p;
-        if (adf_args)
-        {
-          auto generalized(candidate_block.generalize(adf_args, *env.sset));
-          cvect categories(generalized.second.size());
+        auto generalized(candidate_block.generalize(adf_args, *env.sset));
+        cvect categories(generalized.second.size());
 
-          for (const auto &replaced : generalized.second)
-            categories.push_back(replaced.category);
+        for (const auto &replaced : generalized.second)
+          categories.push_back(replaced.category);
 
-          p = vita::make_unique<adf>(generalized.first, categories, 10u);
-        }
-        else  // !adf_args
-          p = vita::make_unique<adt>(candidate_block, 100u);
-
-        if (env.stat.arl && adf_log.good())
-        {
-          adf_log << p->display() << " (Base: " << base_fit
-                  << "  DF: " << delta
-                  << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-                  << "%)\n"
-                  << candidate_block << '\n';
-        }
-
-        env.sset->insert(std::move(p));
+        p = vita::make_unique<adf>(generalized.first, categories, 10u);
       }
+      else  // !adf_args
+        p = vita::make_unique<adt>(candidate_block, 100u);
+
+      if (env.stat.arl && adf_log.good())
+      {
+        adf_log << p->display() << " (Base: " << base_fit
+                << "  DF: " << delta
+                << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
+                << "%)\n"
+                << candidate_block << '\n';
+      }
+
+      env.sset->insert(std::move(p));
     }
   }
 }
