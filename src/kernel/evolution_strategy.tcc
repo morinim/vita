@@ -57,7 +57,6 @@ void basic_alps_es<T, CS>::post_bookkeeping()
   const auto layers(pop.layers());
   for (auto l(decltype(layers){1}); l < layers; ++l)
     if (issmall(sum->az.fit_dist(l).standard_deviation()))
-    //if (sum->az.fit_dist(l).standard_deviation() < fitness_t{0.00000001, 0.00000001})
     {
       if (pop.individuals(l) / 2 > pop.env().individuals / 10)
         pop.set_allowed(l, pop.individuals(l) / 2);

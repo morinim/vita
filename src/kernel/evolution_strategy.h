@@ -54,16 +54,16 @@ public:
 
   /// Evolution strategy specific log function (it's called by the
   /// evolution::log method).
-  virtual void log(unsigned, unsigned) const {}
+  void log(unsigned, unsigned) const {}
 
   /// Set strategy specific parameters.
   static environment shape(environment env) { return env; }
 
   /// Initial setup before evolution starts.
-  virtual void pre_bookkeeping() {}
+  void pre_bookkeeping() const {}
 
   /// Work to be done at the end of an evolution run.
-  virtual void post_bookkeeping() {}
+  void post_bookkeeping() const {}
 
   static constexpr bool is_alps =
     std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
@@ -134,8 +134,8 @@ class basic_alps_es : public evolution_strategy<T,
 public:
   using basic_alps_es::evolution_strategy::evolution_strategy;
 
-  virtual void log(unsigned, unsigned) const override;
-  virtual void post_bookkeeping() override;
+  void log(unsigned, unsigned) const;
+  void post_bookkeeping();
 
   static environment shape(environment);
 };
