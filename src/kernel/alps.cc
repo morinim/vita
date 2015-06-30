@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@ namespace alps {
 ///
 /// \param[in] l a layer.
 /// \param[in] age_gap see environment::age_gap data member.
-/// \return the maximum allowed age for an individual in layer \a l.
+/// \return the maximum allowed age for an individual in layer `l`.
 ///
 unsigned max_age(unsigned l, unsigned age_gap)
 {
@@ -72,7 +72,7 @@ unsigned max_age(unsigned l, unsigned age_gap)
 /// \param[in] l a layer.
 /// \param[in] n total number of layers for the current population.
 /// \param[in] age_gap see environment::age_gap data member.
-/// \return the maximum allowed age for an individual in layer \a l. For
+/// \return the maximum allowed age for an individual in layer `l`. For
 ///         individuals in the last layer there isn't a age limit.
 ///
 unsigned max_age(unsigned l, unsigned n, unsigned age_gap)

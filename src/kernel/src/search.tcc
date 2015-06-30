@@ -206,7 +206,10 @@ void src_search<T, ES>::arl(const team<U> &)
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters_nvi()
 {
-  const environment dflt(nullptr, true);
+  // We use the setup function to modify general default parameters with
+  // strategy-specific defaults.
+  const environment dflt(ES<T>::shape(environment(nullptr, true)));
+
   const environment &constrained(this->prob_.env);
 
   const auto d_size(this->prob_.data() ? this->prob_.data()->size() : 0);
@@ -244,7 +247,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 
   if (!constrained.layers)
   {
-    if (d_size > 8)
+    if (dflt.layers > 1 && d_size > 8)
       this->env_.layers = static_cast<unsigned>(std::log(d_size));
     else
       this->env_.layers = dflt.layers;

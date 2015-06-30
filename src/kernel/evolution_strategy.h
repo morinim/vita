@@ -56,6 +56,9 @@ public:
   /// evolution::log method).
   virtual void log(unsigned, unsigned) const {}
 
+  /// Set strategy specific parameters.
+  static environment shape(environment env) { return env; }
+
   /// Initial setup before evolution starts.
   virtual void pre_bookkeeping() {}
 
@@ -133,6 +136,8 @@ public:
 
   virtual void log(unsigned, unsigned) const override;
   virtual void post_bookkeeping() override;
+
+  static environment shape(environment);
 };
 
 template<class T> using alps_es = basic_alps_es<T, recombination::base>;
@@ -148,6 +153,8 @@ class std_es : public evolution_strategy<T,
 {
 public:
   using std_es::evolution_strategy::evolution_strategy;
+
+  static environment shape(environment);
 };
 
 ///
