@@ -34,17 +34,15 @@ template<class T>
 class population
 {
 public:
-  ///
   /// \brief Holds the coordinates of an individual in a population
-  ///
   struct coord
   {
     unsigned layer;
     unsigned index;
 
-    bool operator==(coord c) const
-    { return layer == c.layer && index == c.index; }
-    bool operator!=(coord c) const { return !(*this == c); }
+    bool operator==(coord rhs) const
+    { return layer == rhs.layer && index == rhs.index; }
+    bool operator!=(coord rhs) const { return !(*this == rhs); }
   };
 
 public:
