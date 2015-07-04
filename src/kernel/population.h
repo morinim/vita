@@ -45,6 +45,8 @@ public:
     bool operator!=(coord rhs) const { return !(*this == rhs); }
   };
 
+  using layer_t = std::vector<T>;
+
 public:
   explicit population(const environment &);
 
@@ -68,8 +70,9 @@ public:
   bool debug(bool) const;
 
   // Iterators
-  using layer_t = std::vector<T>;
-  using const_iterator = typename std::vector<layer_t>::const_iterator;
+  template<bool> class base_iterator;
+  using const_iterator = base_iterator<true>;
+  using iterator = base_iterator<false>;
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -85,6 +88,7 @@ private:  // Private data members
   std::vector<unsigned> allowed_;
 };
 
+#include "kernel/population_iterator.tcc"
 #include "kernel/population.tcc"
 
 ///

@@ -234,7 +234,7 @@ const environment &population<T>::env() const
 template<class T>
 typename population<T>::const_iterator population<T>::begin() const
 {
-  return pop_.begin();
+  return const_iterator(*this, true);
 }
 
 ///
@@ -244,7 +244,7 @@ typename population<T>::const_iterator population<T>::begin() const
 template<class T>
 typename population<T>::const_iterator population<T>::end() const
 {
-  return pop_.end();
+  return const_iterator(*this, false);
 }
 
 ///
