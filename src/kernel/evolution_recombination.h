@@ -51,15 +51,9 @@ class strategy
 {
 public:
   using offspring_t = small_vector<T, 1>;
+  using parents_t = typename selection::strategy<T>::parents_t;
 
   strategy(const population<T> &, evaluator<T> &, summary<T> *const);
-  virtual ~strategy() {}
-
-  offspring_t run(const typename selection::strategy<T>::parents_t &);
-
-private:  // NVI template methods
-  virtual offspring_t run_nvi(
-    const typename selection::strategy<T>::parents_t &) = 0;
 
 protected:
   const population<T> &pop_;
@@ -80,9 +74,8 @@ class base : public strategy<T>
 public:
   using base::strategy::strategy;
 
-private:  // NVI template methods
-  virtual typename strategy<T>::offspring_t run_nvi(
-    const typename selection::strategy<T>::parents_t &) override;
+  typename strategy<T>::offspring_t run(
+    const typename strategy<T>::parents_t &);
 };
 
 ///
@@ -94,9 +87,8 @@ class de : public strategy<T>
 public:
   using de::strategy::strategy;
 
-private:  // NVI template methods
-  virtual typename strategy<T>::offspring_t run_nvi(
-    const typename selection::strategy<T>::parents_t &) override;
+  typename strategy<T>::offspring_t run(
+    const typename strategy<T>::parents_t &);
 };
 
 #include "kernel/evolution_recombination.tcc"

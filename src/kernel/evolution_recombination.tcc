@@ -31,29 +31,14 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 }
 
 ///
-/// \param[in] parent a vector of ordered (decreasing fitness) parents.
-/// \return the offspring.
-///
-/// Defining offspring as a set of individuals lets the generalized
-/// recombination encompass recent additions, such as scan mutation, that
-/// generates numerous offspring from a single parent.
-///
-template<class T>
-typename strategy<T>::offspring_t strategy<T>::run(
-  const typename selection::strategy<T>::parents_t &parent)
-{
-  return run_nvi(parent);
-}
-
-///
 /// \param[in] parent a vector of ordered parents.
 /// \return the offspring.
 ///
 /// This is a quite standard crossover + mutation operator.
 ///
 template<class T>
-typename strategy<T>::offspring_t base<T>::run_nvi(
-  const typename selection::strategy<T>::parents_t &parent)
+typename strategy<T>::offspring_t base<T>::run(
+  const typename strategy<T>::parents_t &parent)
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
@@ -129,8 +114,8 @@ typename strategy<T>::offspring_t base<T>::run_nvi(
 /// This is strictly based on the DE crossover operator.
 ///
 template<class T>
-typename strategy<T>::offspring_t de<T>::run_nvi(
-  const typename selection::strategy<T>::parents_t &parent)
+typename strategy<T>::offspring_t de<T>::run(
+  const typename strategy<T>::parents_t &parent)
 {
   assert(parent.size() >= 2);
 

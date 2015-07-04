@@ -121,12 +121,8 @@ analyzer<T> evolution<T, ES>::get_stats() const
 {
   analyzer<T> az;
 
-  for (unsigned l(0); l < pop_.layers(); ++l)
-    for (unsigned i(0); i < pop_.individuals(l); ++i)
-    {
-      const T &ind(pop_[{l, i}]);
-      az.add(ind, eva_(ind), l);
-    }
+  for (auto it(pop_.begin()), end(pop_.end()); it != end; ++it)
+    az.add(*it, eva_(*it), it.layer());
 
   return az;
 }
