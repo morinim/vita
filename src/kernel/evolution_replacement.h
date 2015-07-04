@@ -37,9 +37,6 @@ public:
   using parents_t = typename selection::strategy<T>::parents_t;
 
   strategy(population<T> &, evaluator<T> &);
-  virtual ~strategy() {}
-
-  virtual void run(const parents_t &, const offspring_t &, summary<T> *) = 0;
 
 protected:
   population<T> &pop_;
@@ -70,9 +67,8 @@ class family_competition : public strategy<T>
 public:
   using family_competition::strategy::strategy;
 
-  virtual void run(const typename strategy<T>::parents_t &,
-                   const typename strategy<T>::offspring_t &,
-                   summary<T> *) override;
+  void run(const typename strategy<T>::parents_t &,
+           const typename strategy<T>::offspring_t &, summary<T> *);
 };
 
 ///
@@ -93,9 +89,8 @@ class tournament : public strategy<T>
 public:
   using tournament::strategy::strategy;
 
-  virtual void run(const typename strategy<T>::parents_t &,
-                   const typename strategy<T>::offspring_t &,
-                   summary<T> *) override;
+  void run(const typename strategy<T>::parents_t &,
+           const typename strategy<T>::offspring_t &, summary<T> *);
 };
 
 ///
@@ -121,13 +116,12 @@ class alps : public strategy<T>
 public:
   using alps::strategy::strategy;
 
-  virtual void run(const typename strategy<T>::parents_t &,
-                   const typename strategy<T>::offspring_t &,
-                   summary<T> *) override;
+  void run(const typename strategy<T>::parents_t &,
+           const typename strategy<T>::offspring_t &, summary<T> *);
 
   void try_move_up_layer(unsigned);
 
-private:  // Private support methods.
+private:  // Private support methods
   unsigned max_age(unsigned) const;
   bool try_add_to_layer(unsigned, const T &);
 };
@@ -138,9 +132,8 @@ class pareto : public strategy<T>
 public:
   using pareto::strategy::strategy;
 
-  virtual void run(const typename strategy<T>::parents_t &,
-                   const typename strategy<T>::offspring_t &,
-                   summary<T> *) override;
+  void run(const typename strategy<T>::parents_t &,
+           const typename strategy<T>::offspring_t &, summary<T> *);
 };
 
 #include "kernel/evolution_replacement.tcc"

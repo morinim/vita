@@ -38,9 +38,6 @@ public:
   using parents_t = std::vector<typename population<T>::coord>;
 
   strategy(const population<T> &, evaluator<T> &, const summary<T> &);
-  virtual ~strategy() {}
-
-  virtual parents_t run() = 0;
 
 protected:  // Support methods
   typename population<T>::coord pickup() const;
@@ -79,7 +76,7 @@ class tournament : public strategy<T>
 public:
   using tournament::strategy::strategy;
 
-  virtual typename strategy<T>::parents_t run() override;
+  typename strategy<T>::parents_t run();
 };
 
 ///
@@ -93,7 +90,7 @@ class alps : public strategy<T>
 public:
   using alps::strategy::strategy;
 
-  virtual typename strategy<T>::parents_t run() override;
+  typename strategy<T>::parents_t run();
 };
 
 ///
@@ -106,7 +103,7 @@ class pareto : public strategy<T>
 public:
   using pareto::strategy::strategy;
 
-  virtual typename strategy<T>::parents_t run() override;
+  typename strategy<T>::parents_t run();
 
 private:
   void front(const std::vector<unsigned> &, std::set<unsigned> *,
@@ -126,7 +123,7 @@ class random : public strategy<T>
 public:
   using random::strategy::strategy;
 
-  virtual typename strategy<T>::parents_t run() override;
+  typename strategy<T>::parents_t run();
 };
 
 #include "kernel/evolution_selection.tcc"
