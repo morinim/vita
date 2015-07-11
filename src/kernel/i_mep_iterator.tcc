@@ -27,14 +27,13 @@ public:
   using difference_type = std::ptrdiff_t;
   using value_type = locus;
   using pointer = value_type *;
-  using reference = value_type &;
   using const_pointer = const value_type *;
+  using reference = value_type &;
   using const_reference = const value_type &;
 
   /// \brief Builds an empty iterator
   ///
-  /// Empty iterator is used as sentry (it is the value returned by
-  /// i_mep::end()).
+  /// Empty iterator is used as sentry (it is the value returned by end()).
   const_iterator() : loci_(), ind_(nullptr) {}
 
   /// \param[in] id an individual.
@@ -57,7 +56,7 @@ public:
       loci_.erase(loci_.begin());
     }
 
-    return *this;;
+    return *this;
   }
 
   /// \param[in] rhs second term of comparison.

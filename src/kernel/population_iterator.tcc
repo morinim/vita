@@ -18,7 +18,7 @@
 #define      VITA_POPULATION_ITERATOR_TCC
 
 ///
-/// \brief Iterator for individuals of a population
+/// \brief Iterator for a population
 ///
 /// population<T>::base_iterator / population<T>::begin() / population<T>::end()
 /// are general and clear, so they should by the preferred way to scan /
@@ -32,12 +32,9 @@ class population<T>::base_iterator
 {
 public:
   using iterator_category = std::forward_iterator_tag;
-
   using value_type = T;
-
   using pointer = value_type *;
   using const_pointer = const value_type *;
-
   using reference = value_type &;
   using const_reference = const value_type &;
 
@@ -58,7 +55,7 @@ public:
   /// \brief Prefix increment operator
   /// \return iterator to the next individual.
   /// \warning
-  /// Incrementing the `end()` iterator results in undefined behaviour.
+  /// Advancing past the `end()` iterator results in undefined behaviour.
   base_iterator &operator++()
   {
     if (++index_ >= pop_->individuals(layer_))
@@ -73,7 +70,7 @@ public:
     assert((layer_ < pop_->layers() && index_ < pop_->individuals(layer_)) ||
            (layer_ == pop_->layers() && index_ == 0));
 
-    return *this;;
+    return *this;
   }
 
   /// \brief Postfix increment operator
