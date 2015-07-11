@@ -26,24 +26,14 @@ class core_analyzer
 public:
   struct sym_counter
   {
-    sym_counter() : counter{0, 0} {}
-
     /// Typical use: `counter[active]` or `counter[!active]` (where
     /// `active` is a boolean).
-    std::uintmax_t counter[2];
+    std::uintmax_t counter[2] = {0, 0};
   };
-
-  /// Type returned by begin() and end() methods to iterate through the
-  /// statistics of the various symbols.
-  using const_iterator =
-    typename std::map<const symbol *, sym_counter>::const_iterator;
-
-  const_iterator begin() const;
-  const_iterator end() const;
 
   core_analyzer();
 
-  void add(const T &, const fitness_t &, unsigned);
+  void add(const T &, const fitness_t &, unsigned = 0);
 
   void clear();
 
@@ -57,10 +47,18 @@ public:
   const distribution<double> &age_dist(unsigned) const;
   const distribution<fitness_t> &fit_dist(unsigned) const;
 
+  /// Type returned by begin() and end() methods to iterate through the
+  /// statistics of the various symbols.
+  using const_iterator =
+    typename std::map<const symbol *, sym_counter>::const_iterator;
+
+  const_iterator begin() const;
+  const_iterator end() const;
+
   bool debug() const;
 
 protected:  // Protected support methods
-  virtual unsigned count(const T &) = 0;  // <-- VIRTUAL
+  virtual unsigned count(const T &) = 0;
   void count(const symbol *const, bool);
 
 private:  // Private data members
@@ -76,15 +74,15 @@ private:  // Private data members
   };
   std::map<const symbol *, sym_counter, cmp_symbol_ptr> sym_counter_;
 
-  struct layer_stat
+  struct group_stat
   {
-    distribution<double> age;
+    distribution<double>        age;
     distribution<fitness_t> fitness;
   };
-  std::map<unsigned, layer_stat> layer_stat_;
+  std::map<unsigned, group_stat> group_stat_;
 
   distribution<fitness_t> fit_;
-  distribution<double> age_;
+  distribution<double>    age_;
   distribution<double> length_;
 
   sym_counter functions_;
@@ -101,11 +99,12 @@ private:  // Private data members
 ///    individual at time;
 /// 2. statistics can be checked executing the desidered methods.
 ///
-/// Informations regard:
-/// * the set as a whole (analyzer::fit_dist, analyzer::length_dist,
-///   analyzer::functions, analyzer::terminals methods);
-/// * symbols appearing in the set (accessed via analyzer::begin and
-///   analyzer::end methods).
+/// You can get information about:
+/// - the set as a whole (age_dist(), fit_dist(), length_dist(), functions(),
+///   terminals() methods);
+/// - specific symbols appearing in the set (accessed via `begin()` / `end()`
+///   methods);
+/// - grouped information (age_dist(unsigned), fit_dist(unsigned)).
 ///
 template<class T>
 class analyzer : public core_analyzer<T>
