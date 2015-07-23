@@ -280,6 +280,19 @@ inline std::string trim(const std::string &s)
   return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
 }
 
+///
+/// \param[in] s1 first term of comparison
+/// \param[in] s2 second term of comparison
+/// \return `true` if all elements in both strings are same (case
+///         insensitively).
+///
+inline bool iequals(const std::string &s1, const std::string &s2)
+{
+  return std::equal(
+    s1.begin(), s1.end(), s2.begin(),
+    [](int c1, int c2) { return std::tolower(c1) == std::tolower(c2); });
+}
+
 }  // namespace vita
 
 #endif  // Include guard

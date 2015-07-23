@@ -15,7 +15,6 @@
 #include <iterator>
 #include <string>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
 
 #include "kernel/environment.h"
@@ -116,7 +115,7 @@ void fix_parameters(vita::src_problem *const problem)
 ///
 bool is_true(const std::string &s)
 {
-  return s != "0" && !boost::iequals(s, "false");
+  return s != "0" && !vita::iequals(s, "false");
 }
 
 ///
@@ -940,15 +939,13 @@ int main(int argc, char *const argv[])
   if (ret == 0)  // error
     return EXIT_FAILURE;
 
-  assert(ret > 0);
-
   if (problem.data()->size())
     ui::go();
   else
   {
     // Do not change the name of the variable:
     //   po::options_description interface("Interface");
-    // don't compile with mingw.
+    // won't compile with mingw.
     po::options_description interf("Interface");
     interf.add_options()
       ("go", po::value<bool>()->zero_tokens()->notifier(&ui::go),
