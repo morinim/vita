@@ -99,7 +99,7 @@ private:  // Private data members
   matrix<gene> genome_;
 
   // Starting point of the active code in this individual (the best sequence
-  // of genes is starting here).
+  // of genes starts here).
   locus best_;
 };  // class i_mep
 

@@ -65,6 +65,8 @@ public:
   /// to the end.
   bool operator==(const const_iterator &rhs) const
   {
+    assert(ind_ == rhs.ind_);
+
     return (loci_.empty() && rhs.loci_.empty()) ||
            loci_.cbegin() == rhs.loci_.cbegin();
   }
@@ -88,6 +90,8 @@ public:
 
 private:  // Private data members
   // A partial set of active loci to be explored.
+  // We have tried with `std::vector<bool>` and `std::vector<uint8_t>` based
+  // iterators without measuring significant speed differences.
   std::set<value_type> loci_;
 
   // A pointer to the individual we are iterating on.

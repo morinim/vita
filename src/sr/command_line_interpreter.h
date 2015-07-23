@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,8 @@
 
 #include "kernel/vita.h"
 
-namespace vita { namespace cli {
+namespace vita {
+namespace cli {
 
 typedef boost::program_options::options_description commands_description;
 
@@ -145,23 +146,23 @@ private:
     {
       std::cerr << vita::k_s_error << " Ambiguous command '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
-                << "'" << std::endl;
+                << "'\n";
     }
     catch (boost::program_options::invalid_command_line_syntax &e)
     {
       std::cerr << vita::k_s_error << " The required argument for option '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
-                << "' is missing" << std::endl;
+                << "' is missing\n";
     }
     catch (boost::program_options::unknown_option &e)
     {
       std::cerr << vita::k_s_error << " Unknown command '"
                 << boost::program_options::strip_prefixes(e.get_option_name())
-                << "'" << std::endl;
+                << "'\n";
     }
     catch (boost::program_options::error &e)
     {
-      std::cerr << vita::k_s_error << ' ' << e.what() << std::endl;
+      std::cerr << vita::k_s_error << ' ' << e.what() << '\n';
     }
   }
 
@@ -170,6 +171,7 @@ private:
   std::string               prompt_;
 };
 
-} }  // namespace vita::cli
+}  // namespace cli
+}  // namespace vita
 
 #endif // Include guard
