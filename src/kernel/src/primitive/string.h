@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,8 +15,6 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <limits>
-#include <sstream>
 #include <string>
 
 #include "kernel/function.h"
@@ -26,32 +24,36 @@
 
 namespace vita
 {
-  namespace str
+namespace str
+{
+///
+/// \brief String comparison for equality
+///
+class ife : public function
+{
+public:
+  explicit ife(const cvect &c)
+    : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
   {
-    class ife : public function
-    {
-    public:
-      explicit ife(const cvect &c)
-        : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
-      { assert(c.size() == 2); }
+    auto *const i(static_cast<interpreter<i_mep> *>(ci));
 
-      virtual any eval(core_interpreter *ci) const override
-      {
-        auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    const any v0(i->fetch_arg(0));
+    if (v0.empty())  return v0;
 
-        const any v0(i->fetch_arg(0));
-        if (v0.empty())  return v0;
+    const any v1(i->fetch_arg(1));
+    if (v1.empty())  return v1;
 
-        const any v1(i->fetch_arg(1));
-        if (v1.empty())  return v1;
+    if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
+      return i->fetch_arg(2);
+    else
+      return i->fetch_arg(3);
+  }
+};
 
-        if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
-          return i->fetch_arg(2);
-        else
-          return i->fetch_arg(3);
-      }
-    };
-  }  // namespace str
+}  // namespace str
 }  // namespace vita
 
 #endif  // Include guard

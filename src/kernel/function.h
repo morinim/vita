@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,59 +19,71 @@
 
 namespace vita
 {
-  ///
-  /// \brief A symbol (arity > 0) used in GP
-  ///
-  /// A \a function labels the internal (non-leaf) points of the parse trees
-  /// that represent the programs in the population. An example function set
-  /// might be {+, -, *}.
-  ///
-  /// \warning
-  /// Each function should be able to handle gracefully all values it might
-  /// receive as input (this is called closure property).
-  /// If there is a way to crash the system, the GP system will certainly hit
-  /// upon hit.
-  ///
-  class function : public symbol
-  {
-  public:
-    function(const std::string &, category_t, cvect);
+///
+/// \brief A symbol (arity > 0) used in GP
+///
+/// A function labels the internal (non-leaf) points of the parse trees that
+/// represent the programs in the population. An example function set might be
+/// {+, -, *}.
+///
+/// \warning
+/// Each function should be able to handle gracefully all values it might
+/// receive as input (this is called closure property).
+/// If there is a way to crash the system, the GP system will certainly hit
+/// upon hit.
+///
+class function : public symbol
+{
+public:
+  function(const std::string &, category_t, cvect);
 
-    category_t arg_category(unsigned) const;
+  category_t arg_category(unsigned) const;
 
-    virtual bool debug() const override;
+  virtual unsigned arity() const override;
 
-    static const function *cast(const symbol *);
+  virtual bool debug() const override;
 
-  private:  // Private data members
-    cvect argt_;
-  };
+  static const function *cast(const symbol *);
 
-  ///
-  /// \param[in] i index of a function argument.
-  /// \return category of the i-th function argument.
-  ///
-  inline category_t function::arg_category(unsigned i) const
-  {
-    assert(i < arity());
-    return argt_[i];
-  }
+private:  // Private data members
+  cvect argt_;
+};
 
-  ///
-  /// \param[in] s symbol pointer.
-  /// \return \a s casted to a vita::function pointer.
-  ///
-  /// This is a short cut function.
-  ///
-  inline const function *function::cast(const symbol *s)
-  {
-    assert(s->arity());
-    return static_cast<const function *>(s);
-  }
+///
+/// \return the number arguments of a funtion.
+///
+inline unsigned function::arity() const
+{
+  assert(argt_.size());
+  return static_cast<unsigned>(argt_.size());
+}
+
+///
+/// \param[in] i index of a function argument.
+/// \return category of the i-th function argument.
+///
+inline category_t function::arg_category(unsigned i) const
+{
+  assert(i < arity());
+  return argt_[i];
+}
+
+///
+/// \param[in] s symbol pointer.
+/// \return `s` casted to a vita::function pointer.
+///
+/// This is a short cut function.
+///
+inline const function *function::cast(const symbol *s)
+{
+  assert(s->arity());
+  return static_cast<const function *>(s);
+}
+
 }  // namespace vita
 
 #if defined(VITA_NO_LIB)
-#  include "function.cc"
+#  include "kernel/function.cc"
 #endif
 
 #endif  // Include guard

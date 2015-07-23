@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,11 +23,10 @@
 //
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 50);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
 
   std::vector<vita::i_mep> pool;
   for (size_t i(0); i < 1000; ++i)
-    pool.emplace_back(env, sset);
+    pool.emplace_back(env);
 
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
@@ -60,7 +59,7 @@ int main(int argc, char *argv[])
   }
 
   std::cout << static_cast<unsigned>(1000.0 * n / t.elapsed())
-            << " store/read sec" << std::endl;
+            << " store/read sec\n";
 
   return EXIT_SUCCESS;
 }

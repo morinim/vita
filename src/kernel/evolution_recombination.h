@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,86 +13,86 @@
 #if !defined(VITA_EVOLUTION_RECOMBINATION_H)
 #define      VITA_EVOLUTION_RECOMBINATION_H
 
+#include "kernel/evolution_selection.h"
 #include "kernel/population.h"
 #include "kernel/vitafwd.h"
 
-namespace vita { namespace recombination {
-  ///
-  /// \brief The operation strategy (crossover, recombination, mutation...) for
-  ///        the \a evolution class
-  ///
-  /// \tparam T type of individual
-  ///
-  /// A recombination acts upon sets of individuals to generate offspring
-  /// (this definition generalizes the traditional mutation and crossover
-  /// operators).
-  ///
-  /// Operator application is atomic from the point of view of the
-  /// evolutionary algorithm and every recombination is applied to a well
-  /// defined list of individuals, without dependencies upon past history.
-  ///
-  /// In the strategy design pattern, this class is the strategy interface and
-  /// vita::evolution is the context.
-  ///
-  /// This is an abstract class: introduction of new operators or redefinition
-  /// of existing ones is obtained implementing recombination::strategy.
-  ///
-  /// The design adheres to the NVI pattern ("Virtuality" in C/C++ Users
-  /// Journal September 2001).
-  ///
-  /// \see
-  /// * <http://en.wikipedia.org/wiki/Strategy_pattern>
-  /// * <http://www.gotw.ca/publications/mill18.htm>
-  ///
-  template<class T>
-  class strategy
-  {
-  public:
-    strategy(const population<T> &, evaluator<T> &, summary<T> *const);
-    virtual ~strategy() {}
+namespace vita {
+namespace recombination {
+///
+/// \brief The operation strategy (crossover, recombination, mutation...) for
+///        the evolution class
+///
+/// \tparam T type of program (individual/team)
+///
+/// A recombination acts upon sets of individuals to generate offspring
+/// (this definition generalizes the traditional mutation and crossover
+/// operators).
+///
+/// Operator application is atomic from the point of view of the
+/// evolutionary algorithm and every recombination is applied to a well
+/// defined list of individuals, without dependencies upon past history.
+///
+/// In the strategy design pattern, this class is the strategy interface and
+/// vita::evolution is the context.
+///
+/// This is an abstract class: introduction of new operators or redefinition
+/// of existing ones is obtained implementing recombination::strategy.
+///
+/// The design adheres to the NVI pattern ("Virtuality" in C/C++ Users
+/// Journal September 2001).
+///
+/// \see
+/// * <http://en.wikipedia.org/wiki/Strategy_pattern>
+/// * <http://www.gotw.ca/publications/mill18.htm>
+///
+template<class T>
+class strategy
+{
+public:
+  using offspring_t = small_vector<T, 1>;
+  using parents_t = typename selection::strategy<T>::parents_t;
 
-    std::vector<T> run(const std::vector<coord> &);
+  strategy(const population<T> &, evaluator<T> &, summary<T> *const);
 
-  private:  // NVI template methods
-    virtual std::vector<T> run_nvi(const std::vector<coord> &) = 0;
+protected:
+  const population<T> &pop_;
+  evaluator<T>        &eva_;
+  summary<T>        *stats_;
+};
 
-  protected:
-    const population<T> &pop_;
-    evaluator<T> &eva_;
-    summary<T> *stats_;
-  };
+///
+/// This class defines the program skeleton of a standard genetic
+/// programming crossover plus mutation operation. It's a template method
+/// design pattern: one or more of the algorithm steps can be overriden
+/// by subclasses to allow differing behaviours while ensuring that the
+/// overarching algorithm is still followed.
+///
+template<class T>
+class base : public strategy<T>
+{
+public:
+  using base::strategy::strategy;
 
-  ///
-  /// This class defines the program skeleton of a standard genetic
-  /// programming crossover plus mutation operation. It's a template method
-  /// design pattern: one or more of the algorithm steps can be overriden
-  /// by subclasses to allow differing behaviours while ensuring that the
-  /// overarching algorithm is still followed.
-  ///
-  template<class T>
-  class base : public strategy<T>
-  {
-  public:
-    using base::strategy::strategy;
+  typename strategy<T>::offspring_t run(
+    const typename strategy<T>::parents_t &);
+};
 
-  private:  // NVI template methods
-    virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
-  };
+///
+/// This is based on the differential evolution four members crossover.
+///
+template<class T>
+class de : public strategy<T>
+{
+public:
+  using de::strategy::strategy;
 
-  ///
-  /// This is based on the differential evolution four members crossover.
-  ///
-  template<class T>
-  class de : public strategy<T>
-  {
-  public:
-    using de::strategy::strategy;
-
-  private:  // NVI template methods
-    virtual std::vector<T> run_nvi(const std::vector<coord> &) override;
-  };
+  typename strategy<T>::offspring_t run(
+    const typename strategy<T>::parents_t &);
+};
 
 #include "kernel/evolution_recombination.tcc"
-} }  // namespace vita::recombination
+}  // namespace recombination
+}  // namespace vita
 
 #endif  // Include guard

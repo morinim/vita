@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@
 /// \param[in] d dataset that the evaluator will use.
 ///
 template<class T>
-src_evaluator<T>::src_evaluator(data &d) : dat_(&d)
+src_evaluator<T>::src_evaluator(vita::data &d) : dat_(&d)
 {
 }
 
@@ -94,45 +94,16 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 }
 
 ///
-/// \param[in] prg program (individual/team) used for scoring accuracy.
-/// \return the accuracy.
-///
-template<class T>
-double sum_of_errors_evaluator<T>::accuracy(const T &prg) const
-{
-  assert(!this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
-
-  const auto f(lambdify(prg));
-
-  std::uintmax_t ok(0), total_nr(0);
-
-  for (const auto &example : *this->dat_)
-  {
-    const any res((*f)(example));
-    if (!res.empty() &&
-        issmall(to<number>(res) - example.template cast_output<number>()))
-      ++ok;
-
-    ++total_nr;
-  }
-
-  assert(total_nr);
-
-  return static_cast<double>(ok) / static_cast<double>(total_nr);
-}
-
-///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
 ///                function.
-/// \return the lambda function associated with \a prg (\c nullptr in case of
+/// \return the lambda function associated with `prg` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
   const T &prg) const
 {
-  return make_unique<reg_lambda_f<T>>(prg);
+  return make_unique<basic_reg_lambda_f<T, true>>(prg);
 }
 
 ///
@@ -142,7 +113,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
 /// \return a measurement of the error of the current program on the
-///         training case \a t. The value returned is in the [0;+inf[ range.
+///         training case `t`. The value returned is in the [0;+inf[ range.
 ///
 template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -168,7 +139,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
-///         training case \a t. The value returned is in the [0;200] range.
+///         training case `t`. The value returned is in the [0;200] range.
 ///
 template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -214,7 +185,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far.
 /// \return a measurement of the error of the current program on the
-///         training case \a t.
+///         training case `t`.
 ///
 template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -241,7 +212,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///                  program.
 /// \param[in] t the current training case.
 /// \return a measurement of the error of the current program on the
-///         training case \a t.
+///         training case `t`.
 ///
 template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -256,34 +227,6 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
     ++t.difficulty;
 
   return err ? 1.0 : 0.0;
-}
-
-///
-/// \param[in] prg program (individual/team) used for scoring accuracy.
-/// \return the accuracy.
-///
-template<class T>
-double classification_evaluator<T>::accuracy(const T &prg) const
-{
-  assert(this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
-
-  const auto f(this->lambdify(prg));
-
-  std::uintmax_t ok(0), total_nr(0);
-
-  for (const auto &example : *this->dat_)
-  {
-    if (static_cast<class_lambda_f<T> *>(f.get())->tag(example).first ==
-        example.template tag())
-      ++ok;
-
-    ++total_nr;
-  }
-
-  assert(total_nr);
-
-  return static_cast<double>(ok) / static_cast<double>(total_nr);
 }
 
 ///
@@ -323,13 +266,14 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
   // The following code is faster but doesn't work for teams and doesn't
   // "cooperate" with DSS.
-  //basic_dyn_slot_lambda_f<T, false, false> lambda(ind, *this->dat_, x_slot_);
-  //return {100.0 * (lambda.training_accuracy() - 1.0)};
+  //
+  // basic_dyn_slot_lambda_f<T,false,false> lambda(ind, *this->dat_, x_slot_);
+  // return {100.0 * (lambda.training_accuracy() - 1.0)};
 }
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
@@ -352,14 +296,14 @@ template<class T>
 fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 {
   assert(ind.debug());
-  assert(this->dat_->classes() > 1);
+  assert(this->dat_->classes() >= 2);
 
   basic_gaussian_lambda_f<T, false, false> lambda(ind, *this->dat_);
 
   fitness_t::value_type d(0.0);
   for (auto &example : *this->dat_)
   {
-    const auto res(lambda.tag(example));
+    const auto res(lambda.tag(example));  // confidence in classification
 
     if (res.first == example.template tag())
     {
@@ -367,16 +311,14 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
       // * (1.0 - confidence) is the sum of the errors;
       // * (confidence - 1.0) is the opposite (standardized fitness);
       // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
-      //   average error;
-      // * (1.0 - confidence) is the uncertainty about the right class;
-      // * 0.001 is a scaling factor.
+      //   average error.
       d += (res.second - 1.0) / (this->dat_->classes() - 1);
     }
     else
     {
       // Note:
-      // * the maximum single class error is -1.0;
-      // * the maximum average class error is -1.0 / dat_->classes();
+      // * the maximum single class error is 1.0;
+      // * the maximum average class error is `1.0 / dat_->classes()`;
       // So -1.0 is like to say that we have a complete failure.
       d -= 1.0;
 
@@ -389,7 +331,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>
@@ -401,19 +343,17 @@ std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
 
 ///
 /// \param[in] ind an individual.
-/// \return the fitness of individual \a ind (greater is better, max is 0).
+/// \return the fitness of individual `ind` (greater is better, max is 0).
 ///
 template<class T>
 fitness_t binary_evaluator<T>::operator()(const T &ind)
 {
-  auto &dataset(*this->dat_);
+  assert(this->dat_->classes() == 2);
 
-  assert(dataset.classes() == 2);
-
-  basic_binary_lambda_f<T, false, false> agent(ind, dataset);
+  basic_binary_lambda_f<T, false, false> agent(ind, *this->dat_);
   fitness_t::value_type err(0.0);
 
-  for (auto &example : dataset)
+  for (auto &example : *this->dat_)
     if (example.tag() != agent.tag(example).first)
     {
       ++example.difficulty;
@@ -427,7 +367,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 template<class T>

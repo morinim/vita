@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,26 +30,26 @@ matrix<T>::matrix() : data_(), cols_(0)
 /// \param[in] rs number of rows.
 /// \param[in] cs number of columns.
 ///
-/// \brief Standard \a rows x \a cols matrix. Entries aren't initialized.
+/// \brief Standard `rs` x `cs` matrix. Entries aren't initialized.
 ///
 template<class T>
 matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
 {
+  assert((rs && cs) || (!rs && !cs));
 }
 
 ///
 /// \param[in] r row.
 /// \param[in] c column.
-/// \return index in \a data_ vector.
-///
-/// \brief From (c, r) to an index in \a data_ vector.
+/// \return the index in the internal vector used to store the content of the
+///         matrix.
 ///
 template<class T>
 unsigned matrix<T>::index(unsigned r, unsigned c) const
 {
-  assert(c < cols_);
+  assert(c < cols());
 
-  return r * cols_ + c;
+  return r * cols() + c;
 }
 
 ///
@@ -98,6 +98,15 @@ typename matrix<T>::reference matrix<T>::operator()(unsigned r, unsigned c)
 }
 
 ///
+/// \return `true` if the matrix is empty (`cols() == 0`).
+///
+template<class T>
+bool matrix<T>::empty() const
+{
+  return size() == 0;
+}
+
+///
 /// \return number of elements of the matrix.
 ///
 template<class T>
@@ -112,7 +121,7 @@ unsigned matrix<T>::size() const
 template<class T>
 unsigned matrix<T>::rows() const
 {
-  return static_cast<unsigned>(data_.size() / cols_);
+  return cols() ? static_cast<unsigned>(data_.size() / cols()) : 0;
 }
 
 ///
@@ -126,7 +135,7 @@ unsigned matrix<T>::cols() const
 
 ///
 /// \param[in] m second term of comparison.
-/// \return \c true if \a m is equal to \c *this.
+/// \return `true` if `m` is equal to `*this`.
 ///
 template<class T>
 bool matrix<T>::operator==(const matrix<T> &m) const
@@ -137,7 +146,7 @@ bool matrix<T>::operator==(const matrix<T> &m) const
 ///
 /// \param[in] v a value.
 ///
-/// Sets the elements of the matrix to \a v.
+/// Sets the elements of the matrix to `v`.
 ///
 template<class T>
 void matrix<T>::fill(const T &v)
@@ -190,7 +199,7 @@ typename matrix<T>::iterator matrix<T>::end()
 /// Saves the matrix on persistent storage.
 ///
 /// \note
-/// The method is based on operator<< so it works for basic \a T only.
+/// The method is based on `operator<<` so it works for basic `T` only.
 ///
 template<class T>
 bool matrix<T>::save(std::ostream &out) const
@@ -214,7 +223,7 @@ bool matrix<T>::save(std::ostream &out) const
 ///
 /// \note
 /// * If the operation fails the object isn't modified.
-/// * The method is based on operator>> so it works for basic \a T only.
+/// * The method is based on `operator>>` so it works for basic `T` only.
 ///
 template<class T>
 bool matrix<T>::load(std::istream &in)
@@ -223,11 +232,11 @@ bool matrix<T>::load(std::istream &in)
                 "matrix::load doesn't support non-integral types");
 
   decltype(cols_) cs;
-  if (!(in >> cs) || !cs)
+  if (!(in >> cs))
     return false;
 
   decltype(cols_) rs;
-  if (!(in >> rs) || !rs)
+  if (!(in >> rs))
     return false;
 
   decltype(data_) v(cs * rs);
@@ -239,6 +248,7 @@ bool matrix<T>::load(std::istream &in)
   cols_ = cs;
   data_ = v;
 
+  assert(!empty() || (cols() == 0 && size() == 0));
   return true;
 }
 
@@ -246,7 +256,7 @@ bool matrix<T>::load(std::istream &in)
 /// \param[out] o output stream
 /// \param[in] m a matrix
 ///
-/// Prints \a m on the output stream. This is mainly used for debug purpose
+/// Prints `m` on the output stream. This is mainly used for debug purpose
 /// (boost test needs the operator to report errors).
 ///
 template<class T>

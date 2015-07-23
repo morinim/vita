@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief A bidimensional array.
+/// \brief A bidimensional array
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
 /// * std::vector<std::vector<T>> is slow;
@@ -38,12 +38,13 @@ namespace vita
   template<class T>
   class matrix
   {
-  public:  // Member types
-    using value_type = T;
-    using reference = typename std::vector<T>::reference;
-    using const_reference = typename std::vector<T>::const_reference;
-
   public:
+    // Type alias
+    using values_t = std::vector<T>;
+    using value_type = typename values_t::value_type;
+    using reference = typename values_t::reference;
+    using const_reference = typename values_t::const_reference;
+
     matrix();
     matrix(unsigned, unsigned);
 
@@ -56,19 +57,20 @@ namespace vita
 
     bool operator==(const matrix<T> &) const;
 
+    bool empty() const;
     unsigned rows() const;
     unsigned cols() const;
 
-  public:  // Iterators
-    using iterator = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    // Iterators
+    using iterator = typename values_t::iterator;
+    using const_iterator = typename values_t::const_iterator;
 
     iterator begin();
     const_iterator begin() const;
     const_iterator end() const;
     iterator end();
 
-  public:   // Serialization
+    // Serialization
     bool load(std::istream &);
     bool save(std::ostream &) const;
 
@@ -77,7 +79,7 @@ namespace vita
     unsigned index(unsigned, unsigned) const;
 
   private:  // Private data members
-    std::vector<T> data_;
+    values_t data_;
 
     unsigned cols_;
   };

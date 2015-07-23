@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,8 +13,6 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "kernel/data.h"
@@ -50,7 +48,7 @@ any convert(const std::string &s, domain_t d)
 
 ///
 /// \param[in] s the string to be tested.
-/// \return \c true if \a s contains a number.
+/// \return `true` if \a s contains a number.
 ///
 bool is_number(const std::string &s)
 {
@@ -314,8 +312,9 @@ void data::partition(unsigned percentage)
 ///
 /// \return number of columns of the dataset.
 ///
-/// \note data class supports just one output for every instance, so, if
-/// the dataset is not empty: \code variables() + 1 == columns() \endcode.
+/// \note
+/// data class supports just one output for every instance, so, if
+/// the dataset is not empty: `variables() + 1 == columns()`.
 ///
 unsigned data::columns() const
 {
@@ -366,7 +365,7 @@ class_t data::encode(const std::string &label)
 
 ///
 /// \param[in] i the encoded (data::encode()) value of a class.
-/// \return the name of the class encoded with the \c unsigned \a i (or an
+/// \return the name of the class encoded with the `unsigned` \a i (or an
 ///         empty string if such class cannot be find).
 ///
 /// \note
@@ -385,11 +384,11 @@ std::string data::class_name(class_t i) const
 ///
 /// \param[in] line line to be parsed.
 /// \param[in] delimiter separator character for fields.
-/// \param[in] trim if \c true trims leading and trailing spaces adjacent to
-///                 commas (this practice is contentious and in fact is
-///                 specifically prohibited by RFC 4180, which states,
-///                 "Spaces are considered part of a field and should not be
-///                 ignored."
+/// \param[in] trimws if `true` trims leading and trailing spaces adjacent to
+///                   commas (this practice is contentious and in fact is
+///                   specifically prohibited by RFC 4180, which states,
+///                   "Spaces are considered part of a field and should not be
+///                   ignored."
 /// \return a vector where each element is a field of the CSV line.
 ///
 /// This function parses a line of data by a delimiter. If you pass in a
@@ -411,7 +410,7 @@ std::string data::class_name(class_t i) const
 /// and efficient for parsing, but it is not as easily applied.
 ///
 std::vector<std::string> data::csvline(const std::string &line, char delimiter,
-                                       bool trim)
+                                       bool trimws)
 {
   std::vector<std::string> record;  // the return value
 
@@ -455,9 +454,9 @@ std::vector<std::string> data::csvline(const std::string &line, char delimiter,
 
   record.push_back(curstring);
 
-  if (trim)
+  if (trimws)
     for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
-      boost::trim(record[i]);
+      trim(record[i]);
 
   return record;
 }
@@ -704,7 +703,7 @@ std::size_t data::load_xrff(const std::string &filename)
 ///
 std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 {
-  std::ifstream from(filename.c_str());
+  std::ifstream from(filename);
   if (!from)
     return 0;
 
@@ -831,14 +830,20 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 ///
 std::size_t data::open(const std::string &f, unsigned verbosity)
 {
-  const bool xrff(boost::algorithm::iends_with(f, ".xrff") ||
-                  boost::algorithm::iends_with(f, ".xml"));
+  auto ends_with =
+    [](const std::string &name, const std::string &ext)
+    {
+      return ext.length() <= name.length() &&
+             std::equal(ext.rbegin(), ext.rend(), name.rbegin());
+    };
+
+  const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
   return xrff ? load_xrff(f) : load_csv(f, verbosity);
 }
 
 ///
-/// \return \c true if the current dataset is empty.
+/// \return `true` if the current dataset is empty.
 ///
 bool data::operator!() const
 {
@@ -846,7 +851,7 @@ bool data::operator!() const
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool data::debug() const
 {
@@ -876,7 +881,7 @@ bool data::debug() const
 
 ///
 /// \param[in] n the name of a weka domain.
-/// \return the internel id of the weka-domain \a n (\c d_void if it's
+/// \return the internel id of the weka-domain \a n (`d_void` if it's
 ///         unknown or not managed).
 ///
 domain_t data::from_weka(const std::string &n)

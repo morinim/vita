@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,7 @@ using namespace boost;
 #endif
 
 
-BOOST_AUTO_TEST_SUITE(hash)
+BOOST_AUTO_TEST_SUITE(test_hash)
 
 // This should hopefully be a thorough and uambiguous test of whether the hash
 // is correctly implemented.
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 
-BOOST_FIXTURE_TEST_SUITE(ttable, F_FACTORY2)
+BOOST_FIXTURE_TEST_SUITE(test_ttable, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
@@ -94,14 +94,14 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::i_mep i1(env, sset);
+    const vita::i_mep i1(env);
     const auto base_f(static_cast<vita::fitness_t::value_type>(i));
-    vita::fitness_t f(1, base_f);
+    vita::fitness_t f{base_f};
 
     cache.insert(i1.signature(), f);
 
     BOOST_REQUIRE(cache.find(i1.signature(), &f));
-    BOOST_REQUIRE_EQUAL(f, vita::fitness_t(1, base_f));
+    BOOST_REQUIRE_EQUAL(f, vita::fitness_t{base_f});
   }
 }
 
@@ -116,10 +116,10 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   std::vector<vita::i_mep> vi;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::i_mep i1(env, sset);
+    vita::i_mep i1(env);
     const vita::any val(i_interp(&i1).run());
-    vita::fitness_t f(
-      1, val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
+    vita::fitness_t f{val.empty() ?
+        0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -131,9 +131,8 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     if (cache.find(vi[i].signature(), &f))
     {
       const vita::any val(i_interp(&vi[i]).run());
-      vita::fitness_t f1(
-        1,
-        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
+      vita::fitness_t f1{
+        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
 
       BOOST_CHECK_EQUAL(f, f1);
     }
@@ -142,20 +141,21 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  using i_interp = vita::interpreter<vita::i_mep>;
-  vita::ttable cache(14), cache2(14);
+  using namespace vita;
+
+  using i_interp = interpreter<i_mep>;
+  ttable cache(14), cache2(14);
   env.code_length = 64;
 
   const unsigned n(1000);
-  std::vector<vita::i_mep> vi;
+  std::vector<i_mep> vi;
   std::vector<bool> present(n);
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::i_mep i1(env, sset);
+    i_mep i1(env);
     const vita::any val(i_interp(&i1).run());
-    vita::fitness_t f(
-      1, val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
+    fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < n; ++i)
   {
-    vita::fitness_t f;
+    fitness_t f;
     present[i] = cache.find(vi[i].signature(), &f);
   }
 
@@ -176,15 +176,29 @@ BOOST_AUTO_TEST_CASE(Serialization)
     if (present[i])
     {
       const vita::any val(i_interp(&vi[i]).run());
-      vita::fitness_t f(
-        1,
-        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val));
+      fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
 
-      vita::fitness_t f1(f.size());
+      fitness_t f1(f.size(), fit_tag::components);
       BOOST_CHECK(cache2.find(vi[i].signature(), &f1));
 
       BOOST_CHECK_EQUAL(f, f1);
     }
+}
+
+BOOST_AUTO_TEST_CASE(HashT)
+{
+  vita::hash_t empty;
+  BOOST_REQUIRE(empty.empty());
+
+  vita::hash_t h(123, 345);
+  BOOST_REQUIRE(!h.empty());
+
+  BOOST_REQUIRE_NE(empty, h);
+
+  h.clear();
+  BOOST_REQUIRE(h.empty());
+
+  BOOST_REQUIRE_EQUAL(empty, h);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

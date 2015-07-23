@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,13 +18,36 @@
 #define      VITA_EVOLUTION_STRATEGY_TCC
 
 ///
+/// \param[out] env environemnt
+/// \return a strategy-specific environment
+///
+/// For standard evolution we only need one layer.
+///
+template<class T>
+environment std_es<T>::shape(environment env)
+{
+  env.layers = 1;
+  return env;
+}
+
+///
+/// \param[out] env environemnt
+/// \return a strategy-specific environment
+///
+/// ALPS need more than one layer.
+///
+template<class T, template<class> class CS>
+environment basic_alps_es<T, CS>::shape(environment env)
+{
+  env.layers = 4;
+  return env;
+}
+
+///
 /// Increments population's age and checks if it's time to add a new layer.
 ///
-template<class T,
-         template<class> class SS,
-         template<class> class CS,
-         template<class> class RS>
-void basic_alps_es<T, SS, CS, RS>::post_bookkeeping()
+template<class T, template<class> class CS>
+void basic_alps_es<T, CS>::post_bookkeeping()
 {
   const auto &sum(this->sum_);
   auto &pop(this->pop_);
@@ -41,9 +64,12 @@ void basic_alps_es<T, SS, CS, RS>::post_bookkeeping()
     else
       pop.set_allowed(l, pop.env().individuals);
 
+  // Code executed every age_gap interval.
   if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
   {
-    if (layers < pop.env().layers)
+    if (layers < pop.env().layers ||
+        sum->az.age_dist(layers - 1).mean() >
+        alps::max_age(layers, pop.env().alps.age_gap))
       pop.add_layer();
     else
     {
@@ -60,22 +86,18 @@ void basic_alps_es<T, SS, CS, RS>::post_bookkeeping()
 /// Saves working / statistical informations about layer status.
 ///
 /// Parameters from the environment:
-/// * env.stat_layers if \c false the method will not write any data.
+/// * env.stat.layers if `false` the method will not write any data.
 ///
-template<class T,
-         template<class> class SS,
-         template<class> class CS,
-         template<class> class RS>
-void basic_alps_es<T, SS, CS, RS>::log(unsigned last_run,
-                                       unsigned current_run) const
+template<class T, template<class> class CS>
+void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
 {
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  if (env.stat_layers)
+  if (env.stat.layers)
   {
-    const std::string n_lys(env.stat_dir + "/" + environment::lys_filename);
-    std::ofstream f_lys(n_lys.c_str(), std::ios_base::app);
+    const std::string n_lys(env.stat.dir + "/" + env.stat.lys_name);
+    std::ofstream f_lys(n_lys, std::ios_base::app);
     if (f_lys.good())
     {
       if (last_run != current_run)

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,18 +16,15 @@
 
 namespace vita
 {
-  ///
-  /// \return \c true if the \a function passes the internal consistency check.
-  ///
-  VITA_INLINE
-  bool terminal::debug() const
-  {
-    if (arity_)  // This is a terminal, so there shouldn't be arguments
-      return false;
+///
+/// \return `true` if the function passes the internal consistency check.
+///
+VITA_INLINE
+bool terminal::debug() const
+{
+  if (associative())
+    return false;
 
-    if (associative_)
-      return false;
-
-    return symbol::debug();
-  }
+  return symbol::debug();
+}
 }  // namespace vita

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,189 +20,177 @@
 
 namespace vita
 {
-  ///
-  /// GP assembles variable length program structures from basic units called
-  /// functions and terminals. Functions perform operations on their inputs,
-  /// which are either terminals or output from other functions.
-  /// Together functions and terminals are referred to as symbols.
-  ///
-  class symbol
-  {
-  public:
-    symbol(const std::string &, category_t);
+///
+/// GP assembles variable length program structures from basic units called
+/// functions and terminals. Functions perform operations on their inputs,
+/// which are either terminals or output from other functions.
+/// Together functions and terminals are referred to as symbols.
+///
+class symbol
+{
+public:
+  symbol(const std::string &, category_t);
 
-    unsigned arity() const;
-    bool associative() const;
-    bool auto_defined() const;
-    category_t category() const;
-    bool input() const;
-    opcode_t opcode() const;
-    bool parametric() const;
-    bool terminal() const;
+  virtual unsigned arity() const = 0;
+  virtual bool associative() const;
+  virtual bool auto_defined() const;
+  virtual bool input() const;
+  virtual bool parametric() const;
 
-    virtual std::string display() const;
-    virtual std::string display(double) const;
-    virtual double init() const;
+  category_t category() const;
+  opcode_t opcode() const;
+  bool terminal() const;
 
-    /// Calculates the value of / performs the action associated with the symbol
-    /// (it is implementation specific).
-    virtual any eval(core_interpreter *) const = 0;
+  virtual std::string display() const;
+  virtual std::string display(double) const;
+  virtual double init() const;
 
-    double penalty(core_interpreter *) const;
+  /// Calculates the value of / performs the action associated with the symbol
+  /// (it's implementation specific).
+  virtual any eval(core_interpreter *) const = 0;
 
-    virtual bool debug() const;
+  double penalty(core_interpreter *) const;
 
-  public:  // Public data members
-    /// Weight is used by the symbol_set::roulette method to control the
-    /// probability of extraction of the symbol.
-    unsigned weight;
+  virtual bool debug() const;
 
-    /// This is the default weight. Weights are used by the
-    /// symbol_set::roulette method to control the probability of extraction of
-    /// the symbols.
-    static decltype(weight) constexpr k_base_weight{100};
+public:  // Public data members
+  /// Weight is used by the symbol_set::roulette method to control the
+  /// probability of extraction of the symbol.
+  unsigned weight;
 
-  protected:  // Protected data members
-    unsigned arity_;
-    bool associative_;
-    bool auto_defined_;
-    bool input_;
-    bool parametric_;
+  /// This is the default weight. Weights are used by the
+  /// symbol_set::roulette method to control the probability of extraction of
+  /// the symbols.
+  static constexpr decltype(weight) k_base_weight{100};
 
-  private:  // NVI template methods
-    virtual double penalty_nvi(core_interpreter *) const;
+private:  // NVI template methods
+  virtual double penalty_nvi(core_interpreter *) const;
 
-  private:  // Private data members
-    static opcode_t opc_count_;
+private:  // Private data members
+  static opcode_t opc_count_;
 
-    opcode_t opcode_;
+  opcode_t opcode_;
 
-    category_t category_;
+  category_t category_;
 
-    std::string name_;
-  };
+  std::string name_;
+};
 
-  ///
-  /// \param[in] ci interpreter used for symbol's constraints evaluation.
-  /// \return 0
-  ///
-  /// Return a penalty based on symbol-specific broken constraints:
-  /// - 0 states that no constraint penalty is applied;
-  /// - larger values specify larger penalties.
-  ///
-  inline double symbol::penalty(core_interpreter *ci) const
-  {
-    return penalty_nvi(ci);
-  }
+///
+/// \param[in] ci interpreter used for symbol's constraints evaluation.
+/// \return a penalty based on symbol specific broken constraints.
+///
+/// Return value:
+/// - `0.0` states that no constraint penalty is applied;
+/// - larger values specify larger penalties.
+///
+inline double symbol::penalty(core_interpreter *ci) const
+{
+  return penalty_nvi(ci);
+}
 
-  ///
-  /// \return \c 0.
-  ///
-  /// This function is used to initialize the symbol's internal parameter.
-  /// Derived classes should redefine the init member function in a
-  /// meaningful way.
-  ///
-  inline double symbol::init() const
-  {
-    return 0.0;
-  }
+///
+/// \return `0.0`.
+///
+/// This function is used to initialize the symbol's internal parameter.
+/// Derived classes should redefine the init member function in a
+/// meaningful way.
+///
+inline double symbol::init() const
+{
+  return 0.0;
+}
 
-  ///
-  /// \return the number of inputs to or arguments of a funtion.
-  ///
-  /// \note
-  /// 0 arguments <=> terminal.
-  ///
-  inline unsigned symbol::arity() const
-  {
-    return arity_;
-  }
+///
+/// \return `true` if the function is associative.
+///
+/// The associative law of arithmetic: if OP is associative then
+///
+///     a OP (b OP c) = (a OP b) OP c = a OP b OP c
+///
+/// This information can be used for optimization and visualization.
+///
+/// \note
+/// * Terminals haven't arguments and cannot be associative.
+/// * Default (safe) value is `false`.
+///
+inline bool symbol::associative() const
+{
+  return false;
+}
 
-  ///
-  /// \return true if the function is associative.
-  ///
-  /// The associative law of arithmetic: if OP is associative then
-  /// > a OP (b OP c) = (a OP b) OP c = a OP b OP c
-  ///
-  /// This information can be used for optimization and visualization.
-  ///
-  /// \note
-  /// Terminals haven't arguments and cannot be associative.
-  ///
-  inline bool symbol::associative() const
-  {
-    return associative_;
-  }
+///
+/// \return `true` if the symbol has been automatically defined (e.g.
+///         ADF / ADT), `false` otherwise (this is the default value).
+///
+inline bool symbol::auto_defined() const
+{
+  return false;
+}
 
-  ///
-  /// \return \c true if the \a symbol has been automatically defined (e.g.
-  ///         ADF / ADT), \c false otherwise (this is the default value).
-  ///
-  inline bool symbol::auto_defined() const
-  {
-    return auto_defined_;
-  }
+///
+/// \return the category of the symbol.
+///
+/// In strongly typed GP, every terminal has a type (i.e. category) and every
+/// function has types for each of its arguments and a type for its return
+/// value.
+///
+inline category_t symbol::category() const
+{
+  return category_;
+}
 
-  ///
-  /// \return the category of the \a symbol.
-  ///
-  /// In strongly typed GP, every terminal has a type (i.e. category) and every
-  /// function has types for each of its arguments and a type for its return
-  /// value.
-  ///
-  inline category_t symbol::category() const
-  {
-    return category_;
-  }
+///
+/// \return `true` if the symbol is an input variable.
+///
+/// An input variable is a feature from the learning domain. Only terminal
+/// can be input variable.
+///
+/// Default (safe) value is `false`.
+///
+inline bool symbol::input() const
+{
+  return false;
+}
 
-  ///
-  /// \return \c true if the symbol is an input variable.
-  ///
-  /// An input variable is a feature from the learning domain. Only terminal
-  /// can be input variable.
-  ///
-  inline bool symbol::input() const
-  {
-    return input_;
-  }
+///
+/// \return the opcode of the symbol.
+///
+/// The opcode is a fast way to uniquely identify a symbol and is primarily
+/// used for hashing.
+/// The other way to identify a symbol is by its name (std::string). The name
+/// is often a better way since the opcode of a symbol can vary between
+/// executions.
+///
+inline opcode_t symbol::opcode() const
+{
+  return opcode_;
+}
 
-  ///
-  /// \return the opcode of the symbol.
-  ///
-  /// The opcode is a fast way to uniquely identify a symbol and is primarily
-  /// used for hashing.
-  /// The other way to identify a symbol is by its name (std::string). The name
-  /// is often a better way since the opcode of a symbol can vary between
-  /// executions.
-  ///
-  inline opcode_t symbol::opcode() const
-  {
-    return opcode_;
-  }
+///
+/// \return `true` for parametric symbols.
+///
+/// A parametric symbol needs an additional argument to be evaluated.
+///
+/// A value for this argument is stored in every gene where the parametric
+/// symbol is used and it's fetched at run-time.
+///
+/// \note
+/// Functions are never parametric, terminals can be.
+///
+inline bool symbol::parametric() const
+{
+  return false;
+}
 
-  ///
-  /// \return true for parametric symbols.
-  ///
-  /// A parametric symbol needs an additional argument to be evaluated.
-  ///
-  /// A value for this argument is stored in every gene where the parametric
-  /// symbol is used and it's fetched at run-time.
-  ///
-  /// \note
-  /// Functions are never parametric, terminals can be.
-  ///
-  inline bool symbol::parametric() const
-  {
-    return parametric_;
-  }
+///
+/// \return `true` if this symbol is a `terminal`.
+///
+inline bool symbol::terminal() const
+{
+  return arity() == 0;
+}
 
-  ///
-  /// \return \c true if this symbol is a \c terminal.
-  ///
-  inline bool symbol::terminal() const
-  {
-    return arity() == 0;
-  }
 }  // namespace vita
 
 #endif  // Include guard

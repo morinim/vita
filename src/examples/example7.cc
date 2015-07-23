@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,12 +23,12 @@
 int main(int argc, char *argv[])
 {
   using namespace vita;
-  environment env(true);
+
+  vita::symbol_set sset;
+  environment env(&sset, true);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
-
-  vita::symbol_set sset;
 
   symbol_factory &factory(symbol_factory::instance());
   sset.insert(factory.make(domain_t::d_double, -200, 200));
@@ -44,54 +44,48 @@ int main(int argc, char *argv[])
 
   for (unsigned k(0); k < n; ++k)
   {
-    i_mep base(env, sset);
+    i_mep base(env);
     auto base_es(base.eff_size());
     while (base_es < 5)
     {
-      base = i_mep(env, sset);
+      base = i_mep(env);
       base_es = base.eff_size();
     }
 
     individuals.add(base_es);
 
-    std::cout << std::string(40, '-') << std::endl;
-    base.list(std::cout);
-    std::cout << std::endl;
+    std::cout << std::string(40, '-') << '\n' << base << '\n';
 
     auto bl(base.blocks());
     for (auto i(bl.begin()); i != bl.end(); ++i)
     {
       i_mep ib(base.get_block(*i));
 
-      auto generalized(ib.generalize(2));
+      auto generalized(ib.generalize(2, *env.sset));
 
-      std::cout << std::endl;
-      ib.list(std::cout);
-
-      std::cout << "GENERALIZED" << std::endl;
-      generalized.first.list(std::cout);
-
-      std::cout << std::endl << "Arguments: [";
+      std::cout << '\n' << ib
+                << "GENERALIZED\n" << generalized.first
+                << "\nArguments: [";
       for (const auto &l : generalized.second)
         std::cout << ' ' << l;
-      std::cout << " ]" << std::endl;
+      std::cout << " ]\n";
 
       blocks_len.add(ib.eff_size());
       arguments.add(static_cast<double>(generalized.second.size()));
     }
   }
 
-  std::cout << std::string(40, '-') << std::endl
-            << "Individuals effective lengths." << std::endl
-            << "Min: " << individuals.min() << "  Mean: " << individuals.mean()
+  std::cout << std::string(40, '-')
+            << "\nIndividuals effective lengths.\nMin: " << individuals.min()
+            << "  Mean: " << individuals.mean()
             << "  StdDev: " << individuals.standard_deviation()
-            << "  Max: " << individuals.max() << std::endl
-            << "Blocks effective lengths." << std::endl
-            << "Min: " << blocks_len.min() << "  Mean: " << blocks_len.mean()
+            << "  Max: " << individuals.max()
+            << "\nBlocks effective lengths.\nMin: " << blocks_len.min()
+            << "  Mean: " << blocks_len.mean()
             << "  StdDev: " << std::sqrt(blocks_len.variance())
-            << "  Max: " << blocks_len.max() << std::endl
-            << "Number of arguments." << std::endl
-            << "Min: " << arguments.min() << "  Mean: " << arguments.mean()
+            << "  Max: " << blocks_len.max()
+            << "\nNumber of arguments.\nMin: " << arguments.min()
+            << "  Mean: " << arguments.mean()
             << "  StdDev: " << arguments.standard_deviation()
             << "  Max: " << arguments.max() << std::endl;
 

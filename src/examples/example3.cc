@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,11 +22,10 @@
 //
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 10);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
@@ -36,16 +35,15 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::i_mep i1(env, sset), i2(env, sset);
+  vita::i_mep i1(env), i2(env);
 
-  std::cout << "PARENTS" << std::endl << std::string(40, '-') << std::endl;
+  std::cout << "PARENTS\n" << std::string(40, '-') << '\n';
   i1.dump(std::cout);
-  std::cout << std::endl;
+  std::cout << '\n';
   i2.dump(std::cout);
-  std::cout << std::endl;
+  std::cout << '\n';
 
-  std::cout << "OFFSPRING" << std::endl
-            << std::string(40, '-') << std::endl;
+  std::cout << "OFFSPRING\n" << std::string(40, '-') << '\n';
 
   i1.crossover(i2).dump(std::cout);
   std::cout << std::endl;

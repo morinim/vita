@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,59 +19,58 @@
 
 namespace term
 {
-  ///
-  /// \return \c true when the user press the '.' key.
-  ///
-  inline bool user_stop()
-  {
-    const bool stop(kbhit() && std::cin.get() == '.');
+///
+/// \return `true` when the user press the '.' key.
+///
+inline bool user_stop()
+{
+  const bool stop(kbhit() && std::cin.get() == '.');
 
-    if (stop)
-      std::cout << k_s_info << " Stopping evolution...\n";
+  if (stop)
+    std::cout << k_s_info << " Stopping evolution...\n";
 
-    return stop;
-  }
+  return stop;
+}
 
-  ///
-  /// Resets the term and restores the default signal handlers.
-  ///
-  inline void reset()
-  {
-    std::signal(SIGABRT, SIG_DFL);
-    std::signal(SIGINT, SIG_DFL);
-    std::signal(SIGTERM, SIG_DFL);
+///
+/// Resets the term and restores the default signal handlers.
+///
+inline void reset()
+{
+  std::signal(SIGABRT, SIG_DFL);
+  std::signal(SIGINT, SIG_DFL);
+  std::signal(SIGTERM, SIG_DFL);
 
-    term_raw_mode(false);
-  }
+  term_raw_mode(false);
+}
 
-  ///
-  /// If the program receives a SIGABRT / SIGINT / SIGTERM, it must handle
-  /// the signal and reset the terminal to the initial state.
-  ///
-  inline void signal_handler(int signum)
-  {
-    term::reset();
+///
+/// If the program receives a SIGABRT / SIGINT / SIGTERM, it must handle
+/// the signal and reset the terminal to the initial state.
+///
+inline void signal_handler(int signum)
+{
+  term::reset();
 
-    std::raise(signum);
-  }
+  std::raise(signum);
+}
 
-  ///
-  /// Sets the term in raw mode and handles the interrupt signals.
-  ///
-  inline void set()
-  {
-    // Install our signal handler.
-    std::signal(SIGABRT, term::signal_handler);
-    std::signal(SIGINT, term::signal_handler);
-    std::signal(SIGTERM, term::signal_handler);
+///
+/// Sets the term in raw mode and handles the interrupt signals.
+///
+inline void set()
+{
+  // Install our signal handler.
+  std::signal(SIGABRT, term::signal_handler);
+  std::signal(SIGINT, term::signal_handler);
+  std::signal(SIGTERM, term::signal_handler);
 
-    term_raw_mode(true);
-  }
+  term_raw_mode(true);
+}
 }  // namespace term
 
 ///
 /// \param[in] e environment (mostly used for population initialization).
-/// \param[in] sset environment (mostly used for polulation initialization).
 /// \param[in] eva evaluator used during the evolution.
 /// \param[in] sc function used to identify a stop condition (i.e. it's
 ///               most improbable that evolution will discover better
@@ -81,19 +80,19 @@ namespace term
 ///               environment.
 ///
 template<class T, template<class> class ES>
-evolution<T, ES>::evolution(const environment &e, const symbol_set &sset,
-                            evaluator<T> &eva,
+evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
                             std::function<bool (const summary<T> &)> sc,
                             std::function<void (unsigned)> sd)
-  : pop_(e, sset), eva_(eva), es_(pop_, eva, &stats_),
+  : pop_(e), eva_(eva), es_(pop_, eva, &stats_),
     external_stop_condition_(sc), shake_data_(sd)
 {
+  assert(e.sset);
   assert(debug(true));
 }
 
 ///
 /// \param[in] s an up to date evolution summary.
-/// \return \c true when evolution should be interrupted.
+/// \return `true` when evolution should be interrupted.
 ///
 template<class T, template<class> class ES>
 bool evolution<T, ES>::stop_condition(const summary<T> &s) const
@@ -122,12 +121,8 @@ analyzer<T> evolution<T, ES>::get_stats() const
 {
   analyzer<T> az;
 
-  for (unsigned l(0); l < pop_.layers(); ++l)
-    for (unsigned i(0); i < pop_.individuals(l); ++i)
-    {
-      const T &ind(pop_[{l, i}]);
-      az.add(ind, eva_(ind), l);
-    }
+  for (auto it(pop_.begin()), end(pop_.end()); it != end; ++it)
+    az.add(*it, eva_(*it), it.layer());
 
   return az;
 }
@@ -154,10 +149,14 @@ void evolution<T, ES>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
-  if (env().stat_dynamic)
+  auto fullpath = [this](const std::string &f)
+                  {
+                    return env().stat.dir + "/" + f;
+                  };
+
+  if (env().stat.dynamic)
   {
-    const std::string n_dyn(env().stat_dir + "/" + environment::dyn_filename);
-    std::ofstream f_dyn(n_dyn.c_str(), std::ios_base::app);
+    std::ofstream f_dyn(fullpath(env().stat.dyn_name), std::ios_base::app);
     if (f_dyn.good())
     {
       if (last_run != run_count)
@@ -165,10 +164,10 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       f_dyn << run_count << ' ' << stats_.gen;
 
-      if (stats_.best)
-        f_dyn << ' ' << stats_.best->fitness[0];
-      else
+      if (stats_.best.solution.empty())
         f_dyn << " ?";
+      else
+        f_dyn << ' ' << stats_.best.score.fitness[0];
 
       f_dyn << ' ' << stats_.az.fit_dist().mean()[0]
             << ' ' << stats_.az.fit_dist().standard_deviation()[0]
@@ -190,16 +189,15 @@ void evolution<T, ES>::log(unsigned run_count) const
                 << ' ' << symb_stat.second.counter[active];
 
       f_dyn << " \"";
-      if (stats_.best)
-        stats_.best->ind.in_line(f_dyn);
+      if (!stats_.best.solution.empty())
+        stats_.best.solution.in_line(f_dyn);
       f_dyn << "\"\n";
     }
   }
 
-  if (env().stat_population)
+  if (env().stat.population)
   {
-    const std::string n_pop(env().stat_dir + "/" + environment::pop_filename);
-    std::ofstream f_pop(n_pop.c_str(), std::ios_base::app);
+    std::ofstream f_pop(fullpath(env().stat.pop_name), std::ios_base::app);
     if (f_pop.good())
     {
       if (last_run != run_count)
@@ -224,9 +222,9 @@ void evolution<T, ES>::log(unsigned run_count) const
 ///
 /// \param[in] k current generation.
 /// \param[in] run_count total number of runs planned.
-/// \param[in] status if \c true print a run/generation/fitness status line.
+/// \param[in] status if `true` print a run/generation/fitness status line.
 ///
-/// Print evolution informations (if environment::verbosity > 0).
+/// Print evolution informations (if `environment::verbosity > 0`).
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
@@ -238,7 +236,7 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
     if (status)
       std::cout << "Run " << run_count << '.' << std::setw(6)
                 << stats_.gen << " (" << std::setw(3)
-                << perc << "%): fitness " << stats_.best->fitness
+                << perc << "%): fitness " << stats_.best.score.fitness
                 << '\n';
     else
       std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
@@ -247,24 +245,35 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
 }
 
 ///
-/// \param[in] run_count run number (used for print and log).
+/// \param[in] run_count run number (used for printing and logging).
+/// \return a partial summary of the search (see notes).
 ///
 /// The genetic programming loop:
+///
 /// * select the individual(s) to participate (default algorithm: tournament
 ///   selection) in the genetic operation;
 /// * perform genetic operation creating a new offspring individual;
 /// * place the offspring into the original population (steady state)
 ///   replacing a bad individual.
+///
 /// This whole process repeats until the termination criteria is satisfied.
 /// With any luck, it will produce an individual that solves the problem at
 /// hand.
+///
+/// \note
+/// The return value is a partial summary: the `measurement` section is only
+/// partially filled (fitness) since many metrics are expensive to calculate
+/// and not significative for all kind of problems (e.g. f1-score for a
+/// symbolic regression problem). The src_search class has a simple scheme to
+/// request the computation of additional metrics.
 ///
 template<class T, template<class> class ES>
 const summary<T> &
 evolution<T, ES>::run(unsigned run_count)
 {
   stats_.clear();
-  stats_.best = {pop_[{0, 0}], eva_(pop_[{0, 0}])};
+  stats_.best.solution = pop_[{0, 0}];
+  stats_.best.score.fitness = eva_(stats_.best.solution);
 
   timer measure;
 
@@ -286,8 +295,8 @@ evolution<T, ES>::run(unsigned run_count)
       // If we 'shake' the data, the statistics picked so far have to be
       // cleared (the best individual and its fitness refer to an old
       // training set).
-      assert(stats_.best);
-      stats_.best->fitness = eva_(stats_.best->ind);
+      assert(!stats_.best.solution.empty());
+      stats_.best.score.fitness = eva_(stats_.best.solution);
       print_progress(0, run_count, true);
     }
 
@@ -310,10 +319,10 @@ evolution<T, ES>::run(unsigned run_count)
       auto off(es_.recombination.run(parents));
 
       // --------- REPLACEMENT --------
-      const auto before(stats_.best->fitness);
+      const auto before(stats_.best.score.fitness);
       es_.replacement.run(parents, off, &stats_);
 
-      if (stats_.best->fitness != before)
+      if (stats_.best.score.fitness != before)
         print_progress(k, run_count, true);
     }
 
@@ -332,7 +341,7 @@ evolution<T, ES>::run(unsigned run_count)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return true if object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>

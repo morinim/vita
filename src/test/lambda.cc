@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,6 +29,8 @@ constexpr double epsilon(0.00001);
 
 #define TEST_WTA
 
+template<class T> using reg_model = vita::basic_reg_lambda_f<T, true>;
+
 BOOST_AUTO_TEST_SUITE(lambda)
 
 template<template<class> class L, class T, unsigned P>
@@ -50,11 +52,11 @@ struct build<L, T, 0>
 };
 
 template<class T>
-struct build<vita::reg_lambda_f, T, 0>
+struct build<reg_model, T, 0>
 {
-  vita::reg_lambda_f<T> operator()(const T &prg, vita::data *) const
+  reg_model<T> operator()(const T &prg, vita::data *) const
   {
-    return vita::reg_lambda_f<T>(prg);
+    return reg_model<T>(prg);
   }
 };
 
@@ -65,15 +67,15 @@ void test_serialization(vita::src_problem &pr)
 
   for (unsigned k(0); k < 256; ++k)
   {
-    const T ind(pr.env, pr.sset);
+    const T ind(pr.env);
     const auto lambda1(build<L, T, P>()(ind, pr.data()));
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const T ind2(pr.env, pr.sset);
+    const T ind2(pr.env);
     auto lambda2(build<L, T, P>()(ind2, pr.data()));
-    BOOST_REQUIRE(lambda2.load(ss));
+    BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
     for (const auto &e : *pr.data())
@@ -93,7 +95,7 @@ void test_team_of_one(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env, pr.sset);
+    const i_mep ind(pr.env);
     const auto li(build<L, i_mep, P>()(ind, pr.data()));
 
     const team<i_mep> t{{ind}};
@@ -121,22 +123,22 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("mep.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
 
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF ONE INDIVIDUAL");
-  test_team_of_one<reg_lambda_f>(pr);
+  test_team_of_one<reg_model>(pr);
 
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env, pr.sset);
-    const reg_lambda_f<i_mep> li(ind);
+    const i_mep ind(pr.env);
+    const reg_model<i_mep> li(ind);
 
     const team<i_mep> t{{ind, ind, ind, ind}};
-    const reg_lambda_f<team<i_mep>> lt(t);
+    const reg_model<team<i_mep>> lt(t);
 
     for (const auto &e : *pr.data())
     {
@@ -157,18 +159,18 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep i1(pr.env, pr.sset);
-    const i_mep i2(pr.env, pr.sset);
-    const i_mep i3(pr.env, pr.sset);
-    const i_mep i4(pr.env, pr.sset);
+    const i_mep i1(pr.env);
+    const i_mep i2(pr.env);
+    const i_mep i3(pr.env);
+    const i_mep i4(pr.env);
 
-    const reg_lambda_f<i_mep> lambda1(i1);
-    const reg_lambda_f<i_mep> lambda2(i2);
-    const reg_lambda_f<i_mep> lambda3(i3);
-    const reg_lambda_f<i_mep> lambda4(i4);
+    const reg_model<i_mep> lambda1(i1);
+    const reg_model<i_mep> lambda2(i2);
+    const reg_model<i_mep> lambda3(i3);
+    const reg_model<i_mep> lambda4(i4);
 
     const team<i_mep> t{{i1, i2, i3, i4}};
-    const reg_lambda_f<team<i_mep>> lambda_team(t);
+    const reg_model<team<i_mep>> lambda_team(t);
 
     for (const auto &e : *pr.data())
     {
@@ -217,20 +219,20 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("mep.csv").first, 0);
 
   for (unsigned k(0); k < 1000; ++k)
   {
-    const i_mep ind(pr.env, pr.sset);
-    const reg_lambda_f<i_mep> lambda1(ind);
+    const i_mep ind(pr.env);
+    const reg_model<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
     BOOST_REQUIRE(lambda1.save(ss));
-    const i_mep ind2(pr.env, pr.sset);
-    reg_lambda_f<i_mep> lambda2(ind2);
-    BOOST_REQUIRE(lambda2.load(ss));
+    const i_mep ind2(pr.env);
+    reg_model<i_mep> lambda2(ind2);
+    BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
     for (const auto &e : *pr.data())
@@ -253,9 +255,9 @@ void test_team(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind1(pr.env, pr.sset);
-    const i_mep ind2(pr.env, pr.sset);
-    const i_mep ind3(pr.env, pr.sset);
+    const i_mep ind1(pr.env);
+    const i_mep ind2(pr.env);
+    const i_mep ind3(pr.env);
 
     const auto lambda1(build<L, i_mep, P>()(ind1, pr.data()));
     const auto lambda2(build<L, i_mep, P>()(ind2, pr.data()));
@@ -327,7 +329,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   constexpr unsigned slots(10);
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
@@ -346,7 +348,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   constexpr unsigned slots(10);
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -361,7 +363,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("iris.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 150);
@@ -378,7 +380,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("iris.csv").first, 0);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -393,7 +395,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
 
   auto res(pr.load("ionosphere.csv"));
   BOOST_REQUIRE_EQUAL(res.first, 351);
@@ -410,7 +412,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
   using namespace vita;
 
   src_problem pr;
-  pr.env = environment(true);
+  pr.clear(true);
   BOOST_REQUIRE_GT(pr.load("ionosphere.csv").first, 0);
 
 

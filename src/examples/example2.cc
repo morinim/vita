@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,14 +24,13 @@
 //
 int main(int argc, char *const argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   // Size of the population.
   env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   // Size of an individual.
   env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
@@ -41,7 +40,7 @@ int main(int argc, char *const argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::population<vita::i_mep> p(env, sset);
+  vita::population<vita::i_mep> p(env);
 
   std::cout << p << std::endl;
 

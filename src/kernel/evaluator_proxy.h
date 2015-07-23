@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,40 +18,38 @@
 
 namespace vita
 {
-  ///
-  /// \tparam T the type of individual used
-  ///
-  /// Provides a surrogate for an \a evaluator to control access to it. The
-  /// reason for controlling access is to cache fitness scores of individuals.
-  /// \c evaluator_proxy uses an ad-hoc internal hash table (\a ttable).
-  ///
-  template<class T>
-  class evaluator_proxy : public evaluator<T>
-  {
-  public:
-    evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
+///
+/// \tparam T the type of individual used
+///
+/// Provides a surrogate for an evaluator to control access to it. The
+/// reason for controlling access is to cache fitness scores of individuals.
+/// evaluator_proxy uses an ad-hoc internal hash table (ttable).
+///
+template<class T>
+class evaluator_proxy : public evaluator<T>
+{
+public:
+  evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
 
-    virtual void clear(typename evaluator<T>::clear_flag) override;
-    virtual void clear(const T &) override;
+  void clear(typename evaluator<T>::clear_flag);
+  void clear(const T &);
 
-    virtual fitness_t operator()(const T &) override;
-    virtual fitness_t fast(const T &) override;
+  fitness_t operator()(const T &);
+  fitness_t fast(const T &);
 
-    virtual double accuracy(const T &) const override;
+  std::string info() const;
 
-    virtual std::string info() const override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
 
-    virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  unsigned seen(const T &) const;
 
-    virtual unsigned seen(const T &) const override;
+private:
+  // Access to the real evaluator.
+  std::unique_ptr<evaluator<T>> eva_;
 
-  private:
-    // Access to the real evaluator.
-    std::unique_ptr<evaluator<T>> eva_;
-
-    // Transposition table (hash table cache).
-    ttable cache_;
-  };
+  // Transposition table (hash table cache).
+  ttable cache_;
+};
 
 #include "kernel/evaluator_proxy.tcc"
 }  // namespace vita

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,44 +14,43 @@
 #define      VITA_EVOLUTION_SUMMARY_H
 
 #include "kernel/analyzer.h"
+#include "kernel/model_measurements.h"
 
 namespace vita
 {
-  ///
-  /// \brief A summary of evolution (results, statistics...)
-  ///
-  /// \tparam T type of individual.
-  ///
-  template<class T>
-  class summary
+///
+/// \brief A summary of evolution (results, statistics...)
+///
+/// \tparam T type of individual
+///
+template<class T>
+class summary
+{
+public:  // Constructor and support functions
+  summary();
+
+  void clear();
+
+public:   // Serialization
+  bool load(std::istream &, const environment &);
+  bool save(std::ostream &) const;
+
+public:  // Public data members
+  analyzer<T> az;
+
+  struct
   {
-  public:  // Constructor and support functions
-    summary();
+    T               solution;
+    model_measurements score;
+  } best;
 
-    void clear();
+  /// Time (in milliseconds) elapsed from evolution beginning.
+  double elapsed;
 
-  public:   // Serialization
-    bool load(std::istream &, const environment &, const symbol_set &);
-    bool save(std::ostream &) const;
+  std::uintmax_t crossovers, mutations;
 
-  public:  // Public data members
-    analyzer<T> az;
-
-    struct best_
-    {
-      T             ind;
-      fitness_t fitness;
-    };
-
-    boost::optional<best_> best;
-
-    /// Time (in milliseconds) elapsed from evolution beginning.
-    double elapsed;
-
-    std::uintmax_t crossovers, mutations;
-
-    unsigned gen, last_imp;
-  };
+  unsigned gen, last_imp;
+};
 
 #include "kernel/evolution_summary.tcc"
 

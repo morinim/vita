@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,12 +17,11 @@
 namespace vita
 {
   ///
-  /// \param[in] a value that should be converted to \c double.
-  /// \return the result of the conversion of \a a in a \c double.
+  /// \param[in] a value that should be converted to `double`.
+  /// \return the result of the conversion of \a a in a `double`.
   ///
   /// This function is useful for:
-  /// * debugging purpose (otherwise comparison of \c any values is
-  ///   complex);
+  /// * debugging purpose (otherwise comparison of `any` values is complex);
   /// * symbolic regression and classification task (the value returned by
   ///   the interpeter will be used in a "numeric way").
   ///
@@ -46,11 +45,11 @@ namespace vita
   }
 
   ///
-  /// \param[in] a value that should be converted to \c std::string.
+  /// \param[in] a value that should be converted to `std::string`.
   /// \return the result of the conversion of \a a in a string.
   ///
   /// This function is useful for debugging purpose (otherwise comparison /
-  /// printing of \c any values is complex).
+  /// printing of `any` values is complex).
   ///
   template<>
   std::string to<std::string>(const any &a)

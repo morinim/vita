@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,22 +22,24 @@ namespace vita
 ///
 namespace alps
 {
-  unsigned max_age(unsigned, unsigned, unsigned);
+unsigned max_age(unsigned, unsigned);
+unsigned max_age(unsigned, unsigned, unsigned);
 
-  ///
-  /// \param[in] p the population.
-  /// \param[in] c the coordinates of an individual.
-  /// \return \c true if the individual at coordinates \c is too old for his
-  ///         layer.
-  ///
-  /// This is just a convenience method to save some keystroke.
-  ///
-  template<class T> bool aged(const population<T> &p, coord c)
-  {
-    return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
-  }
+///
+/// \param[in] p the population.
+/// \param[in] c the coordinates of an individual.
+/// \return `true` if the individual at coordinates `c` is too old for his
+///         layer.
+///
+/// This is just a convenience method to save some keystroke.
+///
+template<class T> bool aged(const population<T> &p,
+                            typename population<T>::coord c)
+{
+  return p[c].age() > max_age(c.layer, p.layers(), p.env().alps.age_gap);
+}
 
-  }  // namespace alps
+}  // namespace alps
 }  // namespace vita
 
 #endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,11 +20,10 @@
 
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 14);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
@@ -40,16 +39,16 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("grapefruit", {1}));
   sset.insert(factory.make("orange", {1}));
 
-  vita::i_mep ind(env, sset);
+  vita::i_mep ind(env);
 
   ind.dump(std::cout);
-  std::cout << std::endl;
+  std::cout << '\n';
 
   const vita::any val(vita::interpreter<vita::i_mep>(&ind).run());
   if (val.empty())
-    std::cout << "Incorrect program." << std::endl;
+    std::cout << "Incorrect program.\n";
   else
-    std::cout << "Output: " << vita::to<std::string>(val) << std::endl;
+    std::cout << "Output: " << vita::to<std::string>(val) << '\n';
 
   return EXIT_SUCCESS;
 }

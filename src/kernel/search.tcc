@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,8 @@
 #define      VITA_SEARCH_TCC
 
 ///
-/// \param[in] p the problem we're working on. The lifetime of \a p must exceed
-///              the lifetime of \c this class.
+/// \param[in] p the problem we're working on. The lifetime of `p` must exceed
+///              the lifetime of `this` class.
 ///
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
@@ -35,17 +35,17 @@ fitness_t search<T, ES>::fitness(const T &ind)
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES>
-T search<T, ES>::run(unsigned n)
+summary<T> search<T, ES>::run(unsigned n)
 {
   return run_nvi(n);
 }
 
 ///
 /// \param[in] s an up to date run summary.
-/// \return \c true when a run should be interrupted.
+/// \return `true` when a run should be interrupted.
 ///
 template<class T, template<class> class ES>
 bool search<T, ES>::stop_condition(const summary<T> &s) const
@@ -64,13 +64,13 @@ bool search<T, ES>::stop_condition(const summary<T> &s) const
 
 ///
 /// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with \a ind (\c nullptr in case of
+/// \return the lambda function associated with `ind` (`nullptr` in case of
 ///         errors).
 ///
 /// The lambda function depends on the active evaluator.
 ///
 template<class T, template<class> class ES>
-std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind)
+std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind) const
 {
   return active_eva_->lambdify(ind);
 }
@@ -89,8 +89,8 @@ void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
 bool search<T, ES>::debug(bool verbose) const

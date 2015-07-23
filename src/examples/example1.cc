@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,10 +19,9 @@
 
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
-  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 10);
-
   vita::symbol_set sset;
+  vita::environment env(&sset, true);
+  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 10);
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
@@ -32,12 +31,10 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::i_mep i(env, sset);
+  vita::i_mep i(env);
 
   i.dump(std::cout);
-  std::cout << std::endl;
-  i.list(std::cout);
-  std::cout << std::endl;
+  std::cout << '\n' << i << '\n';
   i.tree(std::cout);
 
   return EXIT_SUCCESS;

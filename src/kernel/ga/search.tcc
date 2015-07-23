@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,13 +42,13 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::tune_parameters_nvi()
 {
-  const environment dflt(true);
+  const environment dflt(nullptr, true);
   const environment &constrained(this->prob_.env);
 
-  if (constrained.p_mutation >= 0.0)
+  if (constrained.p_mutation < 0.0)
     this->env_.p_mutation = dflt.p_mutation;
 
-  if (constrained.p_cross >= 0.0)
+  if (constrained.p_cross < 0.0)
     this->env_.p_cross = dflt.p_cross;
 
   if (!constrained.tournament_size)
@@ -68,61 +68,58 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES, class F>
-T ga_search<T, ES, F>::run_nvi(unsigned n)
+summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 {
+  auto &eval(*this->active_eva_);  // just a shorthand
+
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
   unsigned best_run(0);
-
-  std::list<unsigned> good_runs;
+  std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto &eval(*this->active_eva_);  // just a short-cut
-    evolution<T, ES> evo(this->env_, this->prob_.sset, eval, nullptr, nullptr);
-    summary<T> s(evo.run(r));
+    evolution<T, ES> evo(this->env_, eval, nullptr, nullptr);
+    summary<T> run_summary(evo.run(r));
 
-    // The training fitness for the current run.
-    fitness_t run_fitness;
+    print_resume(run_summary.best.score.fitness);
 
-    run_fitness = s.best->fitness;
-
-    print_resume(run_fitness);
-
-    if (r == 0 || run_fitness > overall_summary.best->fitness)
+    if (r == 0 ||
+        run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
-      overall_summary.best = {s.best->ind, run_fitness};
+      overall_summary.best = run_summary.best;
       best_run = r;
     }
 
-    // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found(run_fitness.dominating(this->env_.f_threashold));
+    // We use fitness to identify successful runs.
+    const bool solution_found(dominating(run_summary.best.score.fitness,
+                                         this->env_.threshold.fitness));
 
     if (solution_found)
     {
-      overall_summary.last_imp += s.last_imp;
+      overall_summary.last_imp += run_summary.last_imp;
 
       good_runs.push_back(r);
     }
 
-    if (isfinite(run_fitness))
-      fd.add(run_fitness);
+    if (isfinite(run_summary.best.score.fitness))
+      fd.add(run_summary.best.score.fitness);
 
-    overall_summary.elapsed += s.elapsed;
+    overall_summary.elapsed += run_summary.elapsed;
 
     assert(good_runs.empty() ||
-           std::find(good_runs.begin(), good_runs.end(), best_run) !=
-           good_runs.end());
+           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
+           std::end(good_runs));
     log(overall_summary, fd, good_runs, best_run, n);
   }
 
-  return overall_summary.best->ind;
+  return overall_summary;
 }
 
 ///
@@ -149,16 +146,17 @@ void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES, class F>
+template<class C>
 void ga_search<T, ES, F>::log(const summary<T> &run_sum,
                               const distribution<fitness_t> &fd,
-                              const std::list<unsigned> &good_runs,
-                              unsigned best_run, unsigned runs)
+                              const C &good_runs,
+                              typename C::value_type best_run, unsigned runs)
 {
   // Summary logging.
-  if (this->env_.stat_summary)
+  if (this->env_.stat.summary)
   {
     std::ostringstream best_list;
-    run_sum.best->ind.list(best_list);
+    run_sum.best.solution.list(best_list);
 
     const std::string path("vita.");
     const std::string summary(path + "summary.");
@@ -172,9 +170,9 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
     pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best->fitness);
+    pt.put(summary + "best.fitness", run_sum.best.score.fitness);
     pt.put(summary + "best.run", best_run);
-    pt.put(summary + "best.individual.list", best_list.str());
+    pt.put(summary + "best.solution.list", best_list.str());
 
     for (const auto &p : good_runs)
       pt.add(summary + "solutions.runs.run", p);
@@ -184,8 +182,8 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
 
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
-    const std::string f_sum(this->env_.stat_dir + "/" +
-                            environment::sum_filename);
+    const std::string f_sum(this->env_.stat.dir + "/" +
+                            this->env_.stat.sum_name);
 
     this->env_.log(&pt, path);
 

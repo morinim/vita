@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,26 +20,27 @@
 
 namespace vita
 {
-  ///
-  /// \a argument is a special \a terminal used by \a adf functions for
-  /// input parameters passing.
-  ///
-  class argument : public terminal
-  {
-  public:
-    explicit argument(unsigned);
+///
+/// `argument` is a special `terminal` used by adf functions for
+/// input parameters passing.
+///
+class argument : public terminal
+{
+public:
+  explicit argument(unsigned);
 
-    virtual std::string display() const override;
+  virtual std::string display() const override;
 
-    unsigned index() const;
+  unsigned index() const;
 
-    virtual any eval(core_interpreter *) const override;
+  virtual any eval(core_interpreter *) const override;
 
-    virtual bool debug() const override;
+  virtual bool debug() const override;
 
-  private:
-    const unsigned index_;
-  };
+private:
+  const unsigned index_;
+};  // class argument
+
 }  // namespace vita
 
 #endif  // Include guard

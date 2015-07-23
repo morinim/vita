@@ -271,8 +271,8 @@ bool distribution<T>::load(std::istream &in)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
 bool distribution<T>::debug(bool verbose) const

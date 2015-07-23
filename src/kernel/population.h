@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,78 +20,81 @@
 
 namespace vita
 {
-  class symbol_set;
-
-  ///
-  /// \brief Holds the coordinates of an individual in a population.
-  ///
+///
+/// \brief A group of individuals which may interact together (for example by
+///        mating) producing offspring
+///
+/// \tparam T the type of the an individual
+///
+/// Typical population size in GP ranges from ten to many thousands. The
+/// population is organized in one or more layers that can interact in
+/// many ways (depending on the evolution strategy).
+///
+template<class T>
+class population
+{
+public:
+  /// \brief Holds the coordinates of an individual in a population
   struct coord
   {
     unsigned layer;
     unsigned index;
 
-    bool operator==(coord c) const
-    { return layer == c.layer && index == c.index; }
-    bool operator!=(coord c) const { return !(*this == c); }
+    bool operator==(coord rhs) const
+    { return layer == rhs.layer && index == rhs.index; }
+    bool operator!=(coord rhs) const { return !(*this == rhs); }
   };
 
-  ///
-  /// \brief A group of individuals which may interact together (for example by
-  ///        mating) producing offspring
-  ///
-  /// \tparam T the type of the an individual
-  ///
-  /// Typical population size in GP ranges from ten to many thousands. The
-  /// population is organized in one or more layers that can interact in
-  /// many ways (depending on the evolution strategy).
-  ///
-  template<class T>
-  class population
-  {
-  public:
-    using layer_t = std::vector<T>;
-    using const_iterator = typename std::vector<layer_t>::const_iterator;
+  using layer_t = std::vector<T>;
 
-    population(const environment &, const symbol_set &);
+public:
+  explicit population(const environment &);
 
-    T &operator[](coord);
-    const T &operator[](coord) const;
+  T &operator[](coord);
+  const T &operator[](coord) const;
 
-    const_iterator begin() const;
-    const_iterator end() const;
+  unsigned allowed(unsigned) const;
+  unsigned individuals() const;
+  unsigned individuals(unsigned) const;
 
-    unsigned allowed(unsigned) const;
-    unsigned individuals() const;
-    unsigned individuals(unsigned) const;
+  void init_layer(unsigned);
+  void add_layer();
+  unsigned layers() const;
+  void inc_age();
+  void add_to_layer(unsigned, const T &);
+  void pop_from_layer(unsigned);
+  void set_allowed(unsigned, unsigned);
 
-    void init_layer(unsigned, const environment * = nullptr,
-                    const symbol_set * = nullptr);
-    void add_layer();
-    unsigned layers() const;
-    void inc_age();
-    void add_to_layer(unsigned, const T &);
-    void pop_from_layer(unsigned);
-    void set_allowed(unsigned, unsigned);
+  const environment &env() const;
 
-    const environment &env() const;
+  bool debug(bool) const;
 
-    bool debug(bool) const;
+  // Iterators
+  template<bool> class base_iterator;
+  using const_iterator = base_iterator<true>;
+  using iterator = base_iterator<false>;
 
-  public:   // Serialization
-    bool load(std::istream &);
-    bool save(std::ostream &) const;
+  const_iterator begin() const;
+  const_iterator end() const;
 
-  private:  // Private data members
-    std::vector<layer_t> pop_;
-    std::vector<unsigned> allowed_;
-  };
+  // Serialization
+  bool load(std::istream &, const environment &);
+  bool save(std::ostream &) const;
 
+private:  // Private data members
+  const environment *env_;
+
+  std::vector<layer_t> pop_;
+  std::vector<unsigned> allowed_;
+};
+
+#include "kernel/population_iterator.tcc"
 #include "kernel/population.tcc"
 
-  ///
-  /// \example example2.cc
-  /// Creates a random population and shows its content.
-  ///
+///
+/// \example example2.cc
+/// Creates a random population and shows its content.
+///
 }  // namespace vita
 
 #endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -40,11 +40,11 @@ void core_analyzer<T>::clear()
   terminals_ = sym_counter();
 
   sym_counter_.clear();
-  layer_stat_.clear();
+  group_stat_.clear();
 }
 
 ///
-/// \return a constant reference to the first statistical \a symbol we have
+/// \return a constant reference to the first statistical symbol we have
 ///         informations about.
 ///
 template<class T>
@@ -94,17 +94,18 @@ const distribution<double> &core_analyzer<T>::age_dist() const
 }
 
 ///
-/// \param[in] l a layer.
-/// \return statistics about the age distribution of individuals in layer
-///         \a l.
+/// \param[in] g a group.
+/// \return statistics about the age distribution of individuals in group `g`.
 ///
 template<class T>
-const distribution<double> &core_analyzer<T>::age_dist(unsigned l) const
+const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
 {
-  assert(layer_stat_.find(l) != layer_stat_.end());
-  assert(layer_stat_.find(l)->second.age.debug(true));
+  const auto gi(group_stat_.find(g));
 
-  return layer_stat_.find(l)->second.age;
+  assert(gi != group_stat_.end());
+  assert(gi->second.age.debug(true));
+
+  return gi->second.age;
 }
 
 ///
@@ -119,17 +120,19 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
 }
 
 ///
-/// \param[in] l a layer.
-/// \return statistics about the fitness distribution of individuals in layer
-///         \a l.
+/// \param[in] g a group.
+/// \return statistics about the fitness distribution of individuals in group
+///         `g`.
 ///
 template<class T>
-const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned l) const
+const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
 {
-  assert(layer_stat_.find(l) != layer_stat_.end());
-  assert(layer_stat_.find(l)->second.fitness.debug(true));
+  const auto gi(group_stat_.find(g));
 
-  return layer_stat_.find(l)->second.fitness;
+  assert(gi != group_stat_.end());
+  assert(gi->second.fitness.debug(true));
+
+  return gi->second.fitness;
 }
 
 ///
@@ -163,7 +166,7 @@ void core_analyzer<T>::count(const symbol *const sym, bool active)
 }
 
 ///
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
 bool core_analyzer<T>::debug() const
@@ -184,27 +187,30 @@ bool core_analyzer<T>::debug() const
 ///
 /// \param[in] ind new individual.
 /// \param[in] f fitness of the new individual.
-/// \param[in] l a layer of the population.
+/// \param[in] g a group of the population.
 ///
 /// Adds a new individual to the pool used to calculate statistics.
 ///
+/// The optional `g` parameter can be used to group information (e.g. for the
+/// ALPS algorithm it's used for layer specific statistics).
+///
 template<class T>
-void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned l)
+void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 {
   age_.add(ind.age());
-  layer_stat_[l].age.add(ind.age());
+  group_stat_[g].age.add(ind.age());
 
   length_.add(count(ind));
 
   if (isfinite(f))
   {
     fit_.add(f);
-    layer_stat_[l].fitness.add(f);
+    group_stat_[g].fitness.add(f);
   }
 }
 
 ///
-/// \tparam T type of individual.
+/// \tparam T type of individual
 ///
 /// \param[in] ind individual to be analyzed.
 /// \return effective length of individual we gathered statistics about.
@@ -213,7 +219,7 @@ template<class T>
 unsigned analyzer<T>::count(const T &ind)
 {
   for (index_t i(0); i < ind.size(); ++i)
-    for (category_t c(0); c < ind.sset().categories(); ++c)
+    for (category_t c(0); c < ind.categories(); ++c)
       core_analyzer<T>::count(ind[{i, c}].sym, false);
 
   unsigned length(0);
@@ -227,7 +233,7 @@ unsigned analyzer<T>::count(const T &ind)
 }
 
 ///
-/// \tparam T type of individual.
+/// \tparam T type of individual
 ///
 /// \param[in] t team to be analyzed.
 /// \return effective length of the team we gathered statistics about.
@@ -240,7 +246,7 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
   for (const auto &ind : t)
   {
     for (index_t i(0); i < ind.size(); ++i)
-      for (category_t c(0); c < ind.sset().categories(); ++c)
+      for (category_t c(0); c < ind.categories(); ++c)
         core_analyzer<team<T>>::count(ind[{i, c}].sym, false);
 
     for (const auto &l : ind)

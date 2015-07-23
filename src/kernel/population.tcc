@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,55 +19,43 @@
 
 ///
 /// \param[in] e base vita::environment.
-/// \param[in] sset base vita::symbol_set.
 ///
-/// Creates a random population (initial size \a e.individuals).
+/// Creates a random population (initial size `e.individuals`).
 ///
 template<class T>
-population<T>::population(const environment &e, const symbol_set &sset)
-  : pop_(1), allowed_(1)
+population<T>::population(const environment &e) : env_(&e), pop_(1),
+                                                  allowed_(1)
 {
   assert(e.debug(true, true));
+  assert(e.sset);
 
   const auto n(e.individuals);
   pop_[0].reserve(n);
   allowed_[0] = n;
 
-  // DO NOT CHANGE with a call to init_layer(0): when layer 0 is empty, there
-  // isn't a well defined environment and init_layer doesn't work.
-  for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[0].emplace_back(e, sset);
+  init_layer(0);
 
   assert(debug(true));
 }
 
 ///
 /// \param[in] l a layer of the population.
-/// \param[in] e an environment (used for individual generation).
-/// \param[in] s a symbol_set (used for individual generation).
 ///
-/// Resets layer \a l of the population.
+/// Resets layer `l` of the population.
 ///
 /// \warning
-/// If layer \a l is nonexistent/empty the method doesn't work!
+/// If layer `l` is nonexistent/empty the method doesn't work!
 ///
 template<class T>
-void population<T>::init_layer(unsigned l, const environment *e,
-                               const symbol_set *s)
+void population<T>::init_layer(unsigned l)
 {
   assert(l < layers());
-  assert(individuals(l) || (e && s));
-
-  if (!e)
-    e = &pop_[l][0].env();
-  if (!s)
-    s = &pop_[l][0].sset();
 
   pop_[l].clear();
 
   const auto n(allowed(l));
   for (auto i(decltype(n){0}); i < n; ++i)
-    pop_[l].emplace_back(*e, *s);
+    pop_[l].emplace_back(env());
 }
 
 ///
@@ -76,8 +64,8 @@ void population<T>::init_layer(unsigned l, const environment *e,
 /// \note
 /// * The number of active layers is a dynamic value (it is a monotonically
 ///   increasing function of the generation number).
-/// * Maximum number of layers (\c env().alps.layers) is a constant value
-///   greater than or equal to \c layers().
+/// * Maximum number of layers (`env.alps.layers`) is a constant value
+///   greater than or equal to `layers()`.
 ///
 template<class T>
 unsigned population<T>::layers() const
@@ -86,7 +74,7 @@ unsigned population<T>::layers() const
 }
 
 ///
-/// Add a new layer to the population.
+/// \brief Add a new layer to the population
 ///
 /// The new layer is inserted as the lower layer and randomly initialized.
 ///
@@ -96,22 +84,19 @@ void population<T>::add_layer()
   assert(layers());
   assert(individuals(0));
 
-  const auto &e(env());
-  const auto &s(pop_[0][0].sset());
-
   pop_.insert(pop_.begin(), layer_t());
-  pop_[0].reserve(e.individuals);
+  pop_[0].reserve(env_->individuals);
 
-  allowed_.insert(allowed_.begin(), e.individuals);
+  allowed_.insert(allowed_.begin(), env_->individuals);
 
-  init_layer(0, &e, &s);
+  init_layer(0);
 }
 
 ///
 /// \param[in] l index of a layer.
 /// \param[in] i an individual.
 ///
-/// Add individual \a i to layer \a l.
+/// Add individual `i` to layer `l`.
 ///
 template<class T>
 void population<T>::add_to_layer(unsigned l, const T &i)
@@ -125,7 +110,7 @@ void population<T>::add_to_layer(unsigned l, const T &i)
 ///
 /// \param[in] l index of a layer.
 ///
-/// Remove the last individual of layer \a l.
+/// Remove the last individual of layer `l`.
 ///
 template<class T>
 void population<T>::pop_from_layer(unsigned l)
@@ -136,8 +121,8 @@ void population<T>::pop_from_layer(unsigned l)
 
 
 ///
-/// \param[in] c coordinates of an \a individual.
-/// \return a reference to the \a individual at coordinates \a c.
+/// \param[in] c coordinates of an individual.
+/// \return a reference to the individual at coordinates `c`.
 ///
 template<class T>
 T &population<T>::operator[](coord c)
@@ -149,7 +134,7 @@ T &population<T>::operator[](coord c)
 
 ///
 /// \param[in] c coordinates of an individual.
-/// \return a constant reference to the individual at coordinates \a c.
+/// \return a constant reference to the individual at coordinates `c`.
 ///
 template<class T>
 const T &population<T>::operator[](coord c) const
@@ -161,10 +146,9 @@ const T &population<T>::operator[](coord c) const
 
 ///
 /// \param[in] l a layer.
-/// \return the number of individuals allowed in layer \a l.
+/// \return the number of individuals allowed in layer `l`.
 ///
-/// \note
-/// for each l: individuals(l) < allowed(l)
+/// \note `for each l: individuals(l) < allowed(l)`
 ///
 template<class T>
 unsigned population<T>::allowed(unsigned l) const
@@ -175,10 +159,10 @@ unsigned population<T>::allowed(unsigned l) const
 
 ///
 /// \param[in] l a layer.
-/// \param[in] n number of programs allowed in layer \a l.
+/// \param[in] n number of programs allowed in layer `l`.
 ///
-/// Sets the number of programs allowed in layer \a l. If layer \a l contains
-/// more programs than the allowed, the excedence will be deleted.
+/// Sets the number of programs allowed in layer `l`. If layer `l` contains
+/// more programs than the allowed, the surplus will be deleted.
 ///
 template<class T>
 void population<T>::set_allowed(unsigned l, unsigned n)
@@ -203,7 +187,7 @@ void population<T>::set_allowed(unsigned l, unsigned n)
 
 ///
 /// \param[in] l a layer.
-/// \return the number of individuals in layer \a l.
+/// \return the number of individuals in layer `l`.
 ///
 template<class T>
 unsigned population<T>::individuals(unsigned l) const
@@ -231,10 +215,8 @@ unsigned population<T>::individuals() const
 template<class T>
 const environment &population<T>::env() const
 {
-  assert(layers());
-  assert(individuals(0));
-
-  return pop_[0][0].env();
+  assert(env_);
+  return *env_;
 }
 
 ///
@@ -252,7 +234,7 @@ const environment &population<T>::env() const
 template<class T>
 typename population<T>::const_iterator population<T>::begin() const
 {
-  return pop_.begin();
+  return const_iterator(*this, true);
 }
 
 ///
@@ -262,7 +244,7 @@ typename population<T>::const_iterator population<T>::begin() const
 template<class T>
 typename population<T>::const_iterator population<T>::end() const
 {
-  return pop_.end();
+  return const_iterator(*this, false);
 }
 
 ///
@@ -277,8 +259,8 @@ void population<T>::inc_age()
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
 bool population<T>::debug(bool verbose) const
@@ -306,25 +288,33 @@ bool population<T>::debug(bool verbose) const
       return false;
   }
 
+  if (!env_)
+  {
+    if (verbose)
+      std::cerr << k_s_debug << "Undefined environment.\n";
+    return false;
+  }
+
   return true;
 }
 
 ///
+/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
-/// \return \c true if population was loaded correctly.
+/// \return `true` if population was loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current population isn't
 /// changed.
 ///
 template<class T>
-bool population<T>::load(std::istream &in)
+bool population<T>::load(std::istream &in, const environment &e)
 {
   unsigned n_layers;
   if (!(in >> n_layers) || !n_layers)
     return false;
 
-  population p(env(), pop_[0][0].sset());
+  population p(e);
   p.pop_.reserve(n_layers);
   p.allowed_.reserve(n_layers);
 
@@ -338,7 +328,7 @@ bool population<T>::load(std::istream &in)
       return false;
 
     for (decltype(n_elem) i(0); i < n_elem; ++i)
-      if (!p[{l, i}].load(in))
+      if (!p[{l, i}].load(in, e))
         return false;
   }
 
@@ -348,7 +338,7 @@ bool population<T>::load(std::istream &in)
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if population was saved correctly.
+/// \return `true` if population was saved correctly.
 ///
 template<class T>
 bool population<T>::save(std::ostream &out) const
@@ -370,25 +360,26 @@ bool population<T>::save(std::ostream &out) const
 
 ///
 /// \param[in] p the population (we extract the coordinates of an individual
-///              of \a p).
+///              of `p`).
 /// \param[in] target coordinates of a reference individual.
-/// \return the coordinates of a random individual "near" \a target.
+/// \return the coordinates of a random individual "near" `target`.
 ///
 /// Other parameters from the environment:
 /// * mate_zone - to restrict the selection of individuals to a segment of
 ///   the population.
 ///
 template<class T>
-coord pickup(const population<T> &p, coord target)
+typename population<T>::coord pickup(const population<T> &p,
+                                     typename population<T>::coord target)
 {
   return {target.layer, random::ring(target.index, *p.env().mate_zone,
                                      p.individuals(target.layer))};
 }
 
 ///
-/// \param[in,out] s output \c stream.
+/// \param[in,out] s output stream.
 /// \param[in] pop population to be listed.
-/// \return the output \c stream.
+/// \return the output stream.
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &s, const population<T> &pop)

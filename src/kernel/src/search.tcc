@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,14 +17,24 @@
 #if !defined(VITA_SRC_SEARCH_TCC)
 #define      VITA_SRC_SEARCH_TCC
 
+constexpr std::underlying_type<metric_flags>::type operator&(metric_flags f1,
+                                                             metric_flags f2)
+{
+  using type = std::underlying_type<metric_flags>::type;
+
+  return static_cast<type>(f1) & static_cast<type>(f2);
+}
+
 ///
-/// \param[in] p the problem we're working on. The lifetime of \a p must exceed
-///              the lifetime of \c this class.
+/// \param[in] p the problem we're working on. The lifetime of `p` must exceed
+///              the lifetime of `this` class.
+/// \param[in] m a bit field used to specify matrics we have to calculate while
+///              searching.
 ///
 template<class T, template<class> class ES>
-src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
-                                                p_symre(evaluator_id::rmae),
-                                                p_class(evaluator_id::gaussian)
+src_search<T, ES>::src_search(src_problem &p, metric_flags m)
+  : search<T, ES>(p),
+    p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian), metrics(m)
 {
   assert(p.debug(true));
 
@@ -35,27 +45,34 @@ src_search<T, ES>::src_search(src_problem &p) : search<T, ES>(p),
 }
 
 ///
-/// param[in] ind an individual.
-/// \return the accuracy of \a ind.
+/// \param[in] ind an individual.
+/// \param[out] res metrics regarding `ind`.
 ///
-/// \note
-/// If env_.a_threashold < 0.0 (undefined) then this method will skip
-/// accuracy calculation and return will return a negative value.
+/// Accuracy calculation is performed if AT LEAST ONE of the following
+/// conditions is satisfied:
 ///
-/// \warning
-/// This method can be very time consuming.
+/// * the accuracy threshold is defined (`env_.threshold.accuracy > 0.0`);
+/// * we explicitly asked for accuracy calculation (see the `src_search`
+///   constructor).
+///
+/// Otherwise the function will skip accuracy calculation, returning a negative
+/// value.
+///
+/// \warning Could be very time consuming.
 ///
 template<class T, template<class> class ES>
-double src_search<T, ES>::accuracy(const T &ind) const
+void src_search<T, ES>::calculate_metrics(const T &ind,
+                                          model_measurements *out) const
 {
-  if (this->env_.a_threashold < 0.0)
-    return this->env_.a_threashold;
-
-  return this->active_eva_->accuracy(ind);
+  if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
+  {
+    const auto model(this->lambdify(ind));
+    out->accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
+  }
 }
 
 ///
-/// \param[in] base \a individual we are examining to extract building blocks.
+/// \param[in] base individual we are examining to extract building blocks.
 ///
 /// Adaptive Representation through Learning (ARL). The algorithm extract
 /// common knowledge (building blocks) emerging during the evolutionary
@@ -65,7 +82,7 @@ double src_search<T, ES>::accuracy(const T &ind) const
 /// \note
 /// No partial specialization for member functions of class templates is
 /// allowed but we need it for this method (we need partial specialization on
-/// T).
+/// `T`).
 /// The tipical work around is to introduce overloaded functions inside the
 /// class (this has the benefit that they have the same access to member
 /// variables, functions...).
@@ -78,16 +95,18 @@ void src_search<T, ES>::arl(const U &base)
   if (!isfinite(base_fit))
     return;  // We need a finite fitness to search for an improvement
 
+  const auto env(this->env_);
+
   // Logs ADFs
-  const auto filename(this->env_.stat_dir + "/" + environment::arl_filename);
-  std::ofstream adf_log(filename.c_str(), std::ios_base::app);
-  if (this->env_.stat_arl && adf_log.good())
+  const auto filename(env.stat.dir + "/" + env.stat.arl_name);
+  std::ofstream adf_log(filename, std::ios_base::app);
+  if (env.stat.arl && adf_log.good())
   {
-    const auto adts(this->prob_.sset.adts());
+    const auto adts(env.sset->adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const symbol &f(*this->prob_.sset.get_adt(i));
-      adf_log << f.display() << ' ' << f.weight << '\n';
+      const symbol *f(env.sset->get_adt(i));
+      adf_log << f->display() << ' ' << f->weight << '\n';
     }
     adf_log << '\n';
   }
@@ -99,46 +118,45 @@ void src_search<T, ES>::arl(const U &base)
     auto candidate_block(base.get_block(l));
 
     // Building blocks must be simple.
-    if (candidate_block.eff_size() <= 5 + adf_args)
+    if (candidate_block.eff_size() > 5 + adf_args)
+      continue;
+
+    // This is an approximation of the fitness due to the current block.
+    // The idea is to see how the individual (base) would perform without
+    // (base.destroy_block) the current block.
+    // Useful blocks have delta values greater than 0.
+    const auto delta(base_fit[0] -
+                     this->fitness(base.destroy_block(l.index, *env.sset))[0]);
+
+    // Semantic introns cannot be building blocks...
+    // When delta is greater than 10% of the base fitness we have a
+    // building block.
+    if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
     {
-      // This is an approximation of the fitness due to the current block.
-      // The idea is to see how the individual (base) would perform without
-      // (base.destroy_block) the current block.
-      // Useful blocks have delta values greater than 0.
-      const auto delta(base_fit[0] -
-                       this->fitness(base.destroy_block(l.index))[0]);
-
-      // Semantic introns cannot be building blocks...
-      // When delta is greater than 10% of the base fitness we have a
-      // building block.
-      if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
+      std::unique_ptr<symbol> p;
+      if (adf_args)
       {
-        std::unique_ptr<symbol> p;
-        if (adf_args)
-        {
-          auto generalized(candidate_block.generalize(adf_args));
-          cvect categories(generalized.second.size());
+        auto generalized(candidate_block.generalize(adf_args, *env.sset));
+        cvect categories(generalized.second.size());
 
-          for (const auto &replaced : generalized.second)
-            categories.push_back(replaced.category);
+        for (const auto &replaced : generalized.second)
+          categories.push_back(replaced.category);
 
-          p = vita::make_unique<adf>(generalized.first, categories, 10u);
-        }
-        else  // !adf_args
-          p = vita::make_unique<adt>(candidate_block, 100u);
-
-        if (this->env_.stat_arl && adf_log.good())
-        {
-          adf_log << p->display() << " (Base: " << base_fit
-                  << "  DF: " << delta
-                  << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-                  << "%)\n";
-          candidate_block.list(adf_log);
-          adf_log << '\n';
-        }
-
-        this->prob_.sset.insert(std::move(p));
+        p = vita::make_unique<adf>(generalized.first, categories, 10u);
       }
+      else  // !adf_args
+        p = vita::make_unique<adt>(candidate_block, 100u);
+
+      if (env.stat.arl && adf_log.good())
+      {
+        adf_log << p->display() << " (Base: " << base_fit
+                << "  DF: " << delta
+                << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
+                << "%)\n"
+                << candidate_block << '\n';
+      }
+
+      env.sset->insert(std::move(p));
     }
   }
 }
@@ -188,7 +206,10 @@ void src_search<T, ES>::arl(const team<U> &)
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters_nvi()
 {
-  const environment dflt(true);
+  // We use the setup function to modify general default parameters with
+  // strategy-specific defaults.
+  const environment dflt(ES<T>::shape(environment(nullptr, true)));
+
   const environment &constrained(this->prob_.env);
 
   const auto d_size(this->prob_.data() ? this->prob_.data()->size() : 0);
@@ -199,13 +220,13 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (constrained.patch_length == 0)
     this->env_.patch_length = 1 + this->env_.code_length / 3;
 
-  if (boost::indeterminate(constrained.elitism))
+  if (constrained.elitism == trilean::unknown)
     this->env_.elitism = dflt.elitism;
 
-  if (constrained.p_mutation >= 0.0)
+  if (constrained.p_mutation < 0.0)
     this->env_.p_mutation = dflt.p_mutation;
 
-  if (constrained.p_cross >= 0.0)
+  if (constrained.p_cross < 0.0)
     this->env_.p_cross = dflt.p_cross;
 
   if (!constrained.brood_recombination)
@@ -216,9 +237,9 @@ void src_search<T, ES>::tune_parameters_nvi()
   // * DSS speed up isn't so sensible;
   // BUT
   // * DSS can help against overfitting.
-  if (boost::indeterminate(constrained.dss))
+  if (constrained.dss == trilean::unknown)
   {
-    this->env_.dss = d_size > 400;
+    this->env_.dss = d_size > 400 ? trilean::yes : trilean::no;
 
     if (this->env_.verbosity >= 2)
       std::cout << k_s_info << " DSS set to " << this->env_.dss << '\n';
@@ -226,7 +247,7 @@ void src_search<T, ES>::tune_parameters_nvi()
 
   if (!constrained.layers)
   {
-    if (d_size > 8)
+    if (dflt.layers > 1 && d_size > 8)
       this->env_.layers = static_cast<unsigned>(std::log(d_size));
     else
       this->env_.layers = dflt.layers;
@@ -294,7 +315,7 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (!constrained.g_without_improvement)
     this->env_.g_without_improvement = dflt.g_without_improvement;
 
-  if (boost::indeterminate(constrained.arl))
+  if (constrained.arl == trilean::unknown)
     this->env_.arl = dflt.arl;
 
   assert(this->env_.debug(true, true));
@@ -317,100 +338,98 @@ void src_search<T, ES>::tune_parameters_nvi()
 template<class T, template<class> class ES>
 void src_search<T, ES>::dss(unsigned generation) const
 {
-  if (this->prob_.data())
+  if (!this->prob_.data())
+    return;
+
+  data &d(*this->prob_.data());
+
+  std::uintmax_t weight_sum(0);
+  auto weight([](const data::example &v) -> decltype(weight_sum)
+              {
+                return v.difficulty + v.age * v.age * v.age;
+              });
+
+  d.dataset(data::training);
+  d.slice(false);
+  for (auto &i : d)
   {
-    data &d(*this->prob_.data());
-
-    std::uintmax_t weight_sum(0);
-    auto weight([](const data::example &v) -> decltype(weight_sum)
-                {
-                  return v.difficulty + v.age * v.age * v.age;
-                });
-
-    d.dataset(data::training);
-    d.slice(false);
-    for (auto &i : d)
-    {
-      if (generation == 0)  // preliminary setup for generation 0
-      {
-        i.difficulty = 0;
-        i.age        = 1;
-      }
-      else
-        ++i.age;
-
-      weight_sum += weight(i);
-    }
-
-    // Select a subset of the training examples.
-    // Training examples, contained in d, are partitioned into two subsets
-    // by multiple swaps (first subset: [0, count[,  second subset:
-    // [count, d.size()[).
-    // Note that the actual size of the selected subset (count) is not fixed
-    // and, in fact, it averages slightly above target_size (Gathercole and
-    // Ross felt that this might improve performance).
-    const auto s(static_cast<double>(d.size()));
-    const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
-    assert(0.2 <= ratio && ratio <= 0.6);
-    const auto target_size(s * ratio);
-    assert(0.0 <= target_size && target_size <= s);
-
-    data::iterator base(d.begin());
-    unsigned count(0);
-    for (auto i(d.begin()); i != d.end(); ++i)
-    {
-      const auto p1(static_cast<double>(weight(*i)) * target_size /
-                    static_cast<double>(weight_sum));
-      const auto prob(std::min(p1, 1.0));
-
-      if (random::boolean(prob))
-      {
-        std::iter_swap(base, i);
-        ++base;
-        ++count;
-      }
-    }
-
-    d.slice(std::max(count, 10u));
-    this->active_eva_->clear(evaluator<T>::all);
-
-    // Selected training examples have their difficulties and ages reset.
-    for (auto &i : d)
+    if (generation == 0)  // preliminary setup for generation 0
     {
       i.difficulty = 0;
       i.age        = 1;
     }
+    else
+      ++i.age;
+
+    weight_sum += weight(i);
+  }
+
+  // Select a subset of the training examples.
+  // Training examples, contained in `d`, are partitioned into two subsets
+  // by multiple swaps (first subset: [0, count[,  second subset:
+  // [count, d.size()[).
+  // Note that the actual size of the selected subset (count) is not fixed
+  // and, in fact, it averages slightly above target_size (Gathercole and
+  // Ross felt that this might improve performance).
+  const auto s(static_cast<double>(d.size()));
+  const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
+  assert(0.2 <= ratio && ratio <= 0.6);
+  const auto target_size(s * ratio);
+  assert(0.0 <= target_size && target_size <= s);
+
+  data::iterator base(d.begin());
+  unsigned count(0);
+  for (auto i(d.begin()); i != d.end(); ++i)
+  {
+    const auto p1(static_cast<double>(weight(*i)) * target_size /
+                  static_cast<double>(weight_sum));
+    const auto prob(std::min(p1, 1.0));
+
+    if (random::boolean(prob))
+    {
+      std::iter_swap(base, i);
+      ++base;
+      ++count;
+    }
+  }
+
+  d.slice(std::max(count, 10u));
+  this->active_eva_->clear(evaluator<T>::all);
+
+  // Selected training examples have their difficulties and ages reset.
+  for (auto &i : d)
+  {
+    i.difficulty = 0;
+    i.age        = 1;
   }
 }
 
 ///
 /// \param[in] n number of runs.
-/// \return best individual found.
+/// \return a summary of the search.
 ///
 template<class T, template<class> class ES>
-T src_search<T, ES>::run_nvi(unsigned n)
+summary<T> src_search<T, ES>::run_nvi(unsigned n)
 {
+  assert(this->prob_.data());
+  auto &data(*this->prob_.data());
+
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
-  double best_accuracy(-1.0);
   unsigned best_run(0);
-
-  std::list<unsigned> good_runs;
+  std::vector<unsigned> good_runs;
 
   tune_parameters_nvi();
 
-  // For std::placeholders and std::bind see:
-  //  <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
+  // For `std::placeholders` and `std::bind` see:
+  // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
   std::function<void (unsigned)> shake;
-  if (this->env_.dss)
+  if (this->env_.dss == trilean::yes)
     shake = std::bind(&src_search::dss, this, std::placeholders::_1);
 
   const auto stop(std::bind(&src_search::stop_condition, this,
                             std::placeholders::_1));
-
-  assert(this->prob_.data());
-  auto &data(*this->prob_.data());
 
   const bool validation(0 < this->env_.validation_percentage &&
                         this->env_.validation_percentage < 100);
@@ -418,32 +437,28 @@ T src_search<T, ES>::run_nvi(unsigned n)
   if (validation)
     data.partition(this->env_.validation_percentage);
 
+  auto &eval(*this->active_eva_);  // Just a shorthand
+
   for (unsigned r(0); r < n; ++r)
   {
-    auto &eval(*this->active_eva_);  // Just a short cut
-    evolution<T, ES> evo(this->env_, this->prob_.sset, eval, stop, shake);
-    summary<T> s(evo.run(r));
+    evolution<T, ES> evo(this->env_, eval, stop, shake);
+    summary<T> run_summary(evo.run(r));
 
-    // Depending on validation, this can be the training fitness or the
-    // validation fitness for the current run.
-    fitness_t run_fitness;
-
-    // Depending on validation, this can be the training accuracy or the
-    // validation accuracy for the current run.
-    double run_accuracy(-1.0);
-
+    // Depending on `validation`, the metrics stored in run_summary.best.score
+    // can refer to the training set or to the validation set (anyway they
+    // regards the current run).
     if (validation)
     {
       const data::dataset_t backup(data.dataset());
 
       data.dataset(data::validation);
-      eval.clear(s.best->ind);
+      eval.clear(run_summary.best.solution);
 
-      run_fitness = this->fitness(s.best->ind);
-      run_accuracy = accuracy(s.best->ind);
+      run_summary.best.score.fitness = this->fitness(run_summary.best.solution);
+      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
 
       data.dataset(backup);
-      eval.clear(s.best->ind);
+      eval.clear(run_summary.best.solution);
     }
     else  // not using a validation set
     {
@@ -455,73 +470,74 @@ T src_search<T, ES>::run_nvi(unsigned n)
       {
         data.dataset(data::training);
         data.slice(false);
-        eval.clear(s.best->ind);
+        eval.clear(run_summary.best.solution);
 
-        run_fitness = this->fitness(s.best->ind);
+        run_summary.best.score.fitness =
+          this->fitness(run_summary.best.solution);
       }
-      else
-        run_fitness = s.best->fitness;
 
-      run_accuracy = accuracy(s.best->ind);
+      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
     }
 
-    print_resume(validation, run_fitness, run_accuracy);
+    print_resume(validation, run_summary.best.score);
 
-    if (r == 0 || run_fitness > overall_summary.best->fitness)
+    if (r == 0 ||
+        run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
-      overall_summary.best = {s.best->ind, run_fitness};
-      best_accuracy = run_accuracy;
+      overall_summary.best = run_summary.best;
       best_run = r;
     }
 
     // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found(
-      run_fitness.dominating(this->env_.f_threashold) &&
-      run_accuracy >= this->env_.a_threashold);
+    const bool solution_found(run_summary.best.score >=
+                              this->env_.threshold);
 
     if (solution_found)
     {
-      overall_summary.last_imp += s.last_imp;
+      overall_summary.last_imp += run_summary.last_imp;
 
       good_runs.push_back(r);
     }
 
-    if (isfinite(run_fitness))
-      fd.add(run_fitness);
+    if (isfinite(run_summary.best.score.fitness))
+      fd.add(run_summary.best.score.fitness);
 
-    overall_summary.elapsed += s.elapsed;
+    overall_summary.elapsed += run_summary.elapsed;
 
-    if (this->env_.arl && good_runs.front() == r)
+    if (this->env_.arl == trilean::yes)
     {
-      this->prob_.sset.reset_adf_weights();
-      arl(s.best->ind);
+      this->prob_.env.sset->reset_adf_weights();
+      arl(run_summary.best.solution);
     }
 
     assert(good_runs.empty() ||
-           std::find(good_runs.begin(), good_runs.end(), best_run) !=
-           good_runs.end());
-    log(overall_summary, fd, good_runs, best_run, best_accuracy, n);
+           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
+           std::end(good_runs));
+
+    log(overall_summary, fd, good_runs, best_run, n);
   }
 
-  return overall_summary.best->ind;
+  return overall_summary;
 }
 
 ///
 /// \param[in] validation is it a validation or training resume?
 /// \param[in] fit fitness reached in the current run.
-/// \param[in] acc accuracy reached in the current run.
+/// \param[in] m metrics relative to the current run.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
-                                     double acc) const
+void src_search<T, ES>::print_resume(bool validation,
+                                     const model_measurements &m) const
 {
   if (this->env_.verbosity >= 2)
   {
     const std::string ds(validation ? " Validation" : " Training");
 
-    std::cout << k_s_info << ds << " fitness: " << fit << '\n';
-    if (this->env_.a_threashold >= 0.0)
-      std::cout << k_s_info << ds << " accuracy: " << 100.0 * acc << '%';
+    std::cout << k_s_info << ds << " fitness: " << m.fitness << '\n';
+
+    if (0 <= m.accuracy && m.accuracy <= 1.0)
+      std::cout << k_s_info << ds << " accuracy: " << 100.0 * m.accuracy
+                << '%';
 
     std::cout << "\n\n";
   }
@@ -532,26 +548,25 @@ void src_search<T, ES>::print_resume(bool validation, const fitness_t &fit,
 /// \param[in] fd statistics about population fitness.
 /// \param[in] good_runs list of the best runs of the search.
 /// \param[in] best_run best overall run.
-/// \param[in] best_accuracy accuracy of the best individual (if available).
 /// \param[in] runs number of runs performed.
-/// \return \c true if the write operation succeed.
+/// \return `true` if the write operation succeed.
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES>
+template<class C>
 void src_search<T, ES>::log(const summary<T> &run_sum,
                             const distribution<fitness_t> &fd,
-                            const std::list<unsigned> &good_runs,
-                            unsigned best_run, double best_accuracy,
-                            unsigned runs)
+                            const C &good_runs,
+                            typename C::value_type best_run, unsigned runs)
 {
   // Summary logging.
-  if (this->env_.stat_summary)
+  if (this->env_.stat.summary)
   {
     std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best->ind.list(best_list);
-    run_sum.best->ind.tree(best_tree);
-    run_sum.best->ind.graphviz(best_graph);
+    run_sum.best.solution.list(best_list, true);
+    run_sum.best.solution.tree(best_tree);
+    run_sum.best.solution.graphviz(best_graph);
 
     const std::string path("vita.");
     const std::string summary(path + "summary.");
@@ -565,12 +580,12 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     pt.put(summary + "mean_fitness", fd.mean());
     pt.put(summary + "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best->fitness);
-    pt.put(summary + "best.accuracy", best_accuracy);
+    pt.put(summary + "best.fitness", run_sum.best.score.fitness);
+    pt.put(summary + "best.accuracy", run_sum.best.score.accuracy);
     pt.put(summary + "best.run", best_run);
-    pt.put(summary + "best.individual.tree", best_tree.str());
-    pt.put(summary + "best.individual.list", best_list.str());
-    pt.put(summary + "best.individual.graph", best_graph.str());
+    pt.put(summary + "best.solution.tree", best_tree.str());
+    pt.put(summary + "best.solution.list", best_list.str());
+    pt.put(summary + "best.solution.graph", best_graph.str());
 
     for (const auto &p : good_runs)
       pt.add(summary + "solutions.runs.run", p);
@@ -580,8 +595,8 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 
     pt.put(summary + "other.evaluator", this->active_eva_->info());
 
-    const std::string f_sum(this->env_.stat_dir + "/" +
-                            environment::sum_filename);
+    const std::string f_sum(this->env_.stat.dir + "/" +
+                            this->env_.stat.sum_name);
 
     this->env_.log(&pt, path);
 
@@ -602,9 +617,9 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     const data::dataset_t backup(data.dataset());
     data.dataset(data::test);
 
-    const auto lambda(this->lambdify(run_sum.best->ind));
+    const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(this->env_.stat_dir + "/" + environment::tst_filename);
+    std::ofstream tf(this->env_.stat.dir + "/" + this->env_.stat.tst_name);
     for (const auto &example : data)
       tf << lambda->name((*lambda)(example)) << '\n';
 
@@ -615,11 +630,11 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
 ///
 /// \param[in] id numerical id of the evaluator to be activated.
 /// \param[in] msg input parameters for the evaluator constructor.
-/// \return \c true if the active evaluator has been changed.
+/// \return `true` if the active evaluator has been changed.
 ///
 /// \note
-/// If the evaluator \a id is not compatible with the problem type the
-/// function return \c false and the active evaluator stays the same.
+/// If the evaluator `id` is not compatible with the problem type the
+/// function return `false` and the active evaluator stays the same.
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
@@ -632,7 +647,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::bin:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<binary_evaluator<T>>(data));
+        vita::make_unique<binary_evaluator<T>>(data));
       return true;
 
     case evaluator_id::dyn_slot:
@@ -684,8 +699,8 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
-/// \return \c true if the object passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::debug_nvi(bool verbose) const
@@ -693,14 +708,16 @@ bool src_search<T, ES>::debug_nvi(bool verbose) const
   if (p_symre == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred sym.reg. evaluator.\n";
+      std::cerr << k_s_debug
+                << " Undefined ID for preferred sym.reg. evaluator\n";
     return false;
   }
 
   if (p_class == evaluator_id::undefined)
   {
     if (verbose)
-      std::cerr << "Undefined ID for preferred classification evaluator.\n";
+      std::cerr << k_s_debug
+                << "Undefined ID for preferred classification evaluator\n";
     return false;
   }
 

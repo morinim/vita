@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #define      VITA_INDIVIDUAL_GA_ITERATOR_TCC
 
 ///
-/// \brief Iterator to scan the active genes of an \c individual
+/// \brief Iterator to scan the active genes of an individual
 ///
 class i_ga::const_iterator
 {
@@ -60,7 +60,7 @@ public:
   ///
   /// \param[in] rhs second term of comparison.
   ///
-  /// Returns \c true if iterators point to the same locus.
+  /// Returns `true` if iterators point to the same locus.
   ///
   bool operator==(const const_iterator &rhs) const
   {
@@ -73,7 +73,7 @@ public:
   }
 
   ///
-  /// \return the current \a locus of the \a individual.
+  /// \return the current locus of the individual.
   ///
   value_type operator*() const
   {

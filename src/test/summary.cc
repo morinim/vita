@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,16 +41,17 @@ BOOST_AUTO_TEST_CASE(Serialization)
     before.last_imp = vita::random::between(0u, 1000u);
 
     if (vita::random::boolean(0.8))
-      before.best = {
-        vita::i_mep(env, sset),
-        vita::fitness_t(1, vita::random::between<double>(0.0, 1000.0))
-      };
+    {
+      before.best.solution = vita::i_mep(env);
+      before.best.score.fitness = {vita::random::between(0.0, 1000.0)};
+      before.best.score.accuracy = vita::random::between(0.0, 1.0);
+    }
 
     std::stringstream ss;
     BOOST_REQUIRE(before.save(ss));
 
     vita::summary<vita::i_mep> after;
-    BOOST_REQUIRE(after.load(ss, env, sset));
+    BOOST_REQUIRE(after.load(ss, env));
 
     BOOST_CHECK_EQUAL(before.elapsed, after.elapsed);
     BOOST_CHECK_EQUAL(before.mutations, after.mutations);
@@ -58,13 +59,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_CHECK_EQUAL(before.gen, after.gen);
     BOOST_CHECK_EQUAL(before.last_imp, after.last_imp);
 
-    if (before.best)
-    {
-      BOOST_CHECK_EQUAL(before.best->ind, after.best->ind);
-      BOOST_CHECK_EQUAL(before.best->fitness, after.best->fitness);
-    }
-    else
-      BOOST_CHECK(!after.best);
+    BOOST_CHECK_EQUAL(before.best.solution, after.best.solution);
+    BOOST_CHECK_EQUAL(before.best.score.fitness, after.best.score.fitness);
+    BOOST_CHECK_EQUAL(before.best.score.accuracy, after.best.score.accuracy);
   }
 }
 

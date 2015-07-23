@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,9 @@ using i_interp = vita::core_interpreter;
 class X : public vita::terminal
 {
 public:
-  X() : vita::terminal("X", 0) { input_ = true; }
+  X() : vita::terminal("X", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
@@ -36,7 +38,9 @@ public:
 class Y : public vita::terminal
 {
 public:
-  Y() : vita::terminal("Y", 0) { input_ = true; }
+  Y() : vita::terminal("Y", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
@@ -46,7 +50,9 @@ public:
 class Z : public vita::terminal
 {
 public:
-  Z() : vita::terminal("Z", 0) { input_ = true; }
+  Z() : vita::terminal("Z", 0) {}
+
+  virtual bool input() const override { return true; }
 
   virtual vita::any eval(i_interp *) const override { return vita::any(val); }
 
@@ -59,7 +65,7 @@ double Z::val;
 
 class my_evaluator : public vita::evaluator<vita::i_mep>
 {
-  vita::fitness_t operator()(const vita::i_mep &ind)
+  virtual vita::fitness_t operator()(const vita::i_mep &ind) override
   {
     vita::interpreter<vita::i_mep> agent(&ind);
 
@@ -88,13 +94,12 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 
 int main(int argc, char *argv[])
 {
-  vita::environment env(true);
+  vita::symbol_set sset;
+  vita::environment env(&sset, true);
 
   env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
   env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
-
-  vita::symbol_set sset;
 
   vita::symbol_factory &factory(vita::symbol_factory::instance());
   sset.insert(vita::make_unique<X>());
@@ -108,7 +113,7 @@ int main(int argc, char *argv[])
 
   auto eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::i_mep, vita::std_es> evo(env, sset, *eva.get());
+  vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva.get());
 
   evo.run(1);
 

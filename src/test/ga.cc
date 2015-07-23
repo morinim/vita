@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,10 +13,10 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "kernel/ga/evaluator.h"
 #include "kernel/ga/i_ga.h"
 #include "kernel/ga/interpreter.h"
-#include "kernel/ga/ga_evaluator.h"
-#include "kernel/ga/ga_search.h"
+#include "kernel/ga/search.h"
 #include "kernel/evolution.h"
 #include "kernel/problem.h"
 
@@ -33,9 +33,9 @@ BOOST_FIXTURE_TEST_SUITE(t_ga1, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Penalty)
 {
-  vita::i_ga ind(env, sset);
+  vita::i_ga ind(env);
   BOOST_REQUIRE(ind.debug());
-
+/*
   vita::interpreter<vita::i_ga> intr(&ind);
 
   BOOST_REQUIRE_EQUAL(intr.penalty(), 0);
@@ -50,26 +50,28 @@ BOOST_AUTO_TEST_CASE(Penalty)
   BOOST_REQUIRE_EQUAL(intr.penalty(), 3);
 
   ind[3] = 20000;
-  BOOST_REQUIRE_EQUAL(intr.penalty(), 4);
+  BOOST_REQUIRE_EQUAL(intr.penalty(), 4);*/
 }
 
 BOOST_AUTO_TEST_CASE(Evaluator)
 {
+  using namespace vita;
+
   auto f = [](const std::vector<double> &v)
            { return std::accumulate(v.begin(), v.end(), 0.0); };
 
-  auto eva(vita::make_ga_evaluator<vita::i_ga>(f));
+  auto eva(make_ga_evaluator<i_ga>(f));
 
-  vita::fitness_t eva_prev;
+  fitness_t eva_prev;
   double v_prev(0.0);
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_ga ind(env, sset);
+    i_ga ind(env);
     BOOST_REQUIRE(ind.debug());
 
     const auto eva_ret(eva(ind));
-    BOOST_REQUIRE_LE(eva_ret, vita::fitness_t(1, 0.0));
+    BOOST_REQUIRE_LE(eva_ret, fitness_t{0.0});
 
     const auto v(f(ind));
 
@@ -95,25 +97,25 @@ BOOST_AUTO_TEST_CASE(Evolution)
     [](const std::vector<double> &v)
     { return std::accumulate(v.begin(), v.end(), 0.0); }));
 
-  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, eva);
   BOOST_REQUIRE(evo1.debug(true));
 
   const auto s1(evo1.run(1));
 
-  BOOST_CHECK_GT(s1.best->ind[0], 8.0);
-  BOOST_CHECK_GT(s1.best->ind[1], 95.0);
-  BOOST_CHECK_GT(s1.best->ind[2], 990.0);
-  BOOST_CHECK_GT(s1.best->ind[3], 9980.0);
+  BOOST_CHECK_GT(s1.best.solution[0], 8.0);
+  BOOST_CHECK_GT(s1.best.solution[1], 95.0);
+  BOOST_CHECK_GT(s1.best.solution[2], 950.0);
+  BOOST_CHECK_GT(s1.best.solution[3], 9950.0);
 
-  vita::evolution<vita::i_ga, vita::std_es> evo2(env, sset, eva);
+  vita::evolution<vita::i_ga, vita::std_es> evo2(env, eva);
   BOOST_REQUIRE(evo2.debug(true));
 
   const auto s2(evo2.run(1));
 
-  BOOST_CHECK_GT(s2.best->ind[0], 8.0);
-  BOOST_CHECK_GT(s2.best->ind[1], 95.0);
-  BOOST_CHECK_GT(s2.best->ind[2], 980.0);
-  BOOST_CHECK_GT(s2.best->ind[3], 9980.0);
+  BOOST_CHECK_GT(s2.best.solution[0], 8.0);
+  BOOST_CHECK_GT(s2.best.solution[1], 95.0);
+  BOOST_CHECK_GT(s2.best.solution[2], 950.0);
+  BOOST_CHECK_GT(s2.best.solution[3], 9950.0);
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -125,26 +127,25 @@ BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 {
   env.individuals = 100;
-  env.f_threashold = {0, 0};
+  env.threshold.fitness = {0, 0};
   env.verbosity = 0;
 
   vita::problem prob;
   prob.env = env;
-  prob.sset.insert(vita::ga::parameter(0, 0.0, 6.0));
-  prob.sset.insert(vita::ga::parameter(1, 0.0, 6.0));
+  prob.env.sset->insert(vita::ga::parameter<>(0, 0.0, 6.0));
+  prob.env.sset->insert(vita::ga::parameter<>(1, 0.0, 6.0));
 
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
   auto f = [](const std::vector<double> &x)
            {
-             return -(std::pow(x[0]*x[0] + x[1] - 11, 2.0) +
+             return -(std::pow(x[0] * x[0] + x[1] - 11, 2.0) +
                       std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
-
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run());
+  const auto res(s.run().best.solution);
 
   BOOST_CHECK_SMALL(f(res), 1.0);
   BOOST_CHECK_CLOSE(res[0], 3.0, 1.0);
@@ -177,7 +178,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s2(prob, f, p);
   BOOST_REQUIRE(s2.debug(true));
 
-  const auto res2(s2.run());
+  const auto res2(s2.run().best.solution);
 
   BOOST_CHECK_CLOSE(-f(res2), 13.59086, 1.0);
   BOOST_CHECK_CLOSE(res2[0], 2.246826, 1.0);
@@ -190,7 +191,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 {
   env.individuals = 130;
   env.generations = 1000;
-  env.f_threashold = {0, 0};
+  env.threshold.fitness = {0, 0};
   env.verbosity = 0;
 
   vita::problem prob;
@@ -198,10 +199,10 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 
   // Problem's parameters.
   for (unsigned i(0); i < 9; ++i)
-    prob.sset.insert(vita::ga::parameter(i, 0.0, 1.0));
+    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 1.0));
   for (unsigned i(9); i < 12; ++i)
-    prob.sset.insert(vita::ga::parameter(i, 0.0, 100.0));
-  prob.sset.insert(vita::ga::parameter(12, 0.0, 1.0));
+    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 100.0));
+  prob.env.sset->insert(vita::ga::parameter(12, 0.0, 1.0));
 
   auto f = [](const std::vector<double> &x)
     {
@@ -306,9 +307,9 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
   BOOST_REQUIRE(s.debug(true));
 
-  const auto res(s.run());
+  const auto res(s.run().best.solution);
 
-  BOOST_REQUIRE_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
+  BOOST_CHECK_CLOSE(f({1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 , 3, 3, 3, 1}), 15, 0.01);
 
   BOOST_CHECK_CLOSE(-f(res), -15.0, 1.0);
   BOOST_CHECK_CLOSE(res[0], 1.0, 1.0);
@@ -325,81 +326,4 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   BOOST_CHECK_CLOSE(res[11], 3.0, 1.0);
   BOOST_CHECK_CLOSE(res[12], 1.0, 1.0);
 }
-/*
-// Test problem 7 from "An Efficient Constraint Handling Method for Genetic
-// Algorithms"
-BOOST_AUTO_TEST_CASE(Search_TestProblem7)
-{
-  env.individuals = 100;
-  env.generations = 10000;
-  env.f_threashold = {0, 0};
-  env.verbosity = 1;
-
-  vita::problem prob;
-  prob.env = env;
-  prob.env.stat_dir = ".";
-  prob.env.stat_layers = true;
-  prob.sset.insert(vita::ga::parameter(0, -2.3, 2.3));
-  prob.sset.insert(vita::ga::parameter(1, -2.3, 2.3));
-  prob.sset.insert(vita::ga::parameter(2, -3.2, 3.2));
-  prob.sset.insert(vita::ga::parameter(3, -3.2, 3.2));
-  prob.sset.insert(vita::ga::parameter(4, -3.2, 3.2));
-
-  auto f = [](const std::vector<double> &x)
-           {
-             return -std::exp(x[0] * x[1] * x[2] * x[3] * x[4]);
-           };
-
-  auto p = [](const vita::i_ga &prg)
-    {
-      auto h1 = [](const std::vector<double> &x)
-      {
-        return x[0]*x[0] + x[1]*x[1] + x[2]*x[2] + x[3]*x[3] + x[4]*x[4] -10.0;
-      };
-      auto h2 = [](const std::vector<double> &x)
-      {
-        return x[1] * x[2] - 5.0 * x[3] * x[4];
-      };
-      auto h3 = [](const std::vector<double> &x)
-      {
-        return x[0] * x[0] * x[0] + x[1] * x[1] * x[1] + 1.0;
-      };
-
-      const double delta(0.01);
-
-      double r(0.0);
-
-      const auto c1(std::abs(h1(prg)));
-      if (c1 > delta)
-        r += c1;
-
-      const auto c2(std::abs(h2(prg)));
-      if (c2 > delta)
-        r += c2;
-
-      const auto c3(std::abs(h3(prg)));
-      if (c3 > delta)
-        r += c3;
-
-      for (unsigned i(0); i < 5; ++i)
-      {
-        if (prg[i] < -2.3)
-          r += -2.3 - prg[i];
-        else if (prg[i] > 3.2)
-          r += prg[i] - 3.2;
-      }
-
-      return r;
-    };
-
-  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
-  BOOST_REQUIRE(s.debug(true));
-  const auto res(s.run(10));
-
-  BOOST_CHECK_CLOSE(-f(res), 0.053950, 2.0);
-  BOOST_CHECK_CLOSE(res[0], -1.717143, 1.0);
-  BOOST_CHECK_CLOSE(res[1], 1.595709, 1.0);
-  BOOST_CHECK_CLOSE(res[2], 1.827247, 1.0);
-}
-*/
 BOOST_AUTO_TEST_SUITE_END()

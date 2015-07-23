@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,30 +15,33 @@
 
 namespace vita
 {
-  class data;
+class data;
 
-  class i_mep;
-  class i_ga;
-  template<class T> class team;
+class i_mep;
+class i_ga;
+template<class T> class team;
 
-  class core_interpreter;
-  template<class T> class interpreter;
+class core_interpreter;
+template<class T> class interpreter;
 
-  template<class T> class evaluator;
+template<class T> class evaluator;
+template<class T> class src_evaluator;
 
-  template<class T,
-           template<class> class SS,
-           template<class> class CS,
-           template<class> class RS> class evolution_strategy;
-  template<class T,
-           template<class> class SS,
-           template<class> class CS,
-           template<class> class RS> class basic_alps_es;
-  template<class T> class std_es;
+template<class T> class reg_lambda_f;
+template<class T> class class_lambda_f;
 
-  template<class T, template<class> class ES> class src_search;
+template<class T> class model_metric;
 
-  template<class T> class summary;
+template<class T,
+         template<class> class SS,
+         template<class> class CS,
+         template<class> class RS> class evolution_strategy;
+template<class T, template<class> class CS> class basic_alps_es;
+template<class T> class std_es;
+
+template<class T, template<class> class ES> class src_search;
+
+template<class T> class summary;
 }  // namespace vita
 
 #endif  // Include guard

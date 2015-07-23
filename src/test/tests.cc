@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,25 +19,30 @@ constexpr double epsilon(0.00001);
 
 using namespace boost;
 
-#include "factory_fixture1.h"
-#include "factory_fixture2.h"
-#include "factory_fixture3.h"
-#include "factory_fixture4.h"
-#include "factory_fixture5.h"
+#include "test/factory_fixture1.h"
+#include "test/factory_fixture2.h"
+#include "test/factory_fixture3.h"
+#include "test/factory_fixture4.h"
+#include "test/factory_fixture5.h"
 
-#include "test_evolution.cc"
-#include "test_fitness.cc"
-#include "test_ga.cc"
-#include "test_i_mep.cc"
-#include "test_i_ga.cc"
-#include "test_lambda.cc"
-#include "test_matrix.cc"
-#include "test_population.cc"
-#include "test_primitive_d.cc"
-#include "test_primitive_i.cc"
-#include "test_src_constant.cc"
-#include "test_summary.cc"
-#include "test_symbol_set.cc"
-#include "test_team.cc"
-#include "test_terminal.cc"
-#include "test_ttable.cc"
+#include "test/evolution.cc"
+#include "test/evolution_selection.cc"
+#include "test/fitness.cc"
+#include "test/ga.cc"
+//#include "test_ga_perf.cc"
+#include "test/i_mep.cc"
+#include "test/i_ga.cc"
+#include "test/lambda.cc"
+#include "test/matrix.cc"
+#include "test/population.cc"
+#include "test/primitive_d.cc"
+#include "test/primitive_i.cc"
+#include "test/small_vector.cc"
+#include "test/src_constant.cc"
+#include "test/src_problem.cc"
+#include "test/summary.cc"
+#include "test/symbol_set.cc"
+#include "test/team.cc"
+#include "test/terminal.cc"
+#include "test/ttable.cc"
+//#include "test/variant.cc"

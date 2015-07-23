@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,86 +19,88 @@
 
 namespace vita
 {
-  class argument;
+class argument;
 
-  ///
-  /// This is a container for the symbol set. Symbols are stored to be quickly
-  /// recalled by category and randomly extracted.
-  /// The functions and terminals used should be powerful enough to be able to
-  /// represent a solution to the problem. On the other hand, it is better not
-  /// to use a symbol set too large (this enlarges the search space and can
-  /// sometimes make the search for a solution harder).
-  ///
-  class symbol_set
+///
+/// This is a container for the symbol set. Symbols are stored to be quickly
+/// recalled by category and randomly extracted.
+/// The functions and terminals used should be powerful enough to be able to
+/// represent a solution to the problem. On the other hand, it is better not
+/// to use a symbol set too large (this enlarges the search space and can
+/// sometimes make the search for a solution harder).
+///
+class symbol_set
+{
+public:
+  symbol_set();
+
+  void clear();
+
+  symbol *insert(std::unique_ptr<symbol>);
+
+  symbol *roulette() const;
+  symbol *roulette(category_t) const;
+  symbol *roulette_terminal(category_t) const;
+
+  symbol *arg(unsigned) const;
+
+  symbol *get_adt(unsigned) const;
+  unsigned adts() const;
+  void reset_adf_weights();
+
+  symbol *decode(opcode_t) const;
+  symbol *decode(const std::string &) const;
+
+  unsigned categories() const;
+  unsigned terminals(category_t) const;
+
+  bool enough_terminals() const;
+  bool debug(bool) const;
+
+  friend std::ostream &operator<<(std::ostream &, const symbol_set &);
+
+private:  // Private data members.
+  // arguments_ data member:
+  // * is not present in the `collection` struct because an argument isn't
+  //   bounded to a category (see `argument` class for more details);
+  // * is not a subset of `symbols_` (the intersection of `arguments_` and
+  //   symbol_ is an empty set) because arguments aren't returned by the
+  //   roulette functions .
+  std::vector<std::unique_ptr<symbol>> arguments_;
+
+  // This is the real, unordered repository of symbols (it owns the
+  // pointers).
+  std::vector<std::unique_ptr<symbol>> symbols_;
+
+  // A collection is a structured-view on symbols_ (the all_ variable) or on
+  // a subset of symbols_ (e.g. only on symbol of a specific category).
+  struct collection
   {
-  public:
-    symbol_set();
+    collection();
 
-    symbol *insert(std::unique_ptr<symbol>);
+    std::vector<symbol *>   symbols;
+    std::vector<symbol *> terminals;
+    std::vector<symbol *>       adf;
+    std::vector<symbol *>       adt;
 
-    symbol *roulette() const;
-    symbol *roulette(category_t) const;
-    symbol *roulette_terminal(category_t) const;
+    // The sum of the weights of all the symbols in the collection.
+    unsigned sum;
 
-    symbol *arg(unsigned) const;
+    bool debug(bool) const;
+  } all_;
 
-    symbol *get_adt(unsigned) const;
-    unsigned adts() const;
-    void reset_adf_weights();
+  // This struct contains all the symbols (`all_`) divided by category.
+  struct by_category
+  {
+    explicit by_category(const collection & = collection());
 
-    symbol *decode(opcode_t) const;
-    symbol *decode(const std::string &) const;
+    bool debug(bool) const;
 
-    unsigned categories() const;
-    unsigned terminals(category_t) const;
+    std::vector<collection> category;
+  } by_;
+};
 
-    bool enough_terminals() const;
-    bool debug() const;
-
-    friend std::ostream &operator<<(std::ostream &, const symbol_set &);
-
-  private:  // Private data members.
-    // arguments_ data member:
-    // * is not present in the \a collection struct because an argument isn't
-    //   bounded to a category (see \c argument constructor for more details);
-    // * is not a subset of symbols_ (the intersection of arguments_ and
-    //   symbol_ is an empty set) because arguments aren't returned by the
-    //   roulette functions .
-    std::vector<std::unique_ptr<symbol>> arguments_;
-
-    // This is the real, unordered repository of symbols (it owns the
-    // pointers).
-    std::vector<std::unique_ptr<symbol>> symbols_;
-
-    // A collection is a structured-view on symbols_ (the all_ variable) or on
-    // a subset of symbols_ (e.g. only on symbol of a specific category).
-    struct collection
-    {
-      collection();
-
-      std::vector<symbol *>   symbols;
-      std::vector<symbol *> terminals;
-      std::vector<symbol *>       adf;
-      std::vector<symbol *>       adt;
-
-      // The sum of the weights of all the symbols in the collection.
-      unsigned sum;
-
-      bool debug() const;
-    } all_;
-
-    // This struct contains all the symbols (\a all_) divided by category.
-    struct by_category
-    {
-      explicit by_category(const collection & = collection());
-
-      bool debug() const;
-
-      std::vector<collection> category;
-    } by_;
-  };
-
-  std::ostream &operator<<(std::ostream &, const symbol_set &);
+std::ostream &operator<<(std::ostream &, const symbol_set &);
 }  // namespace vita
 
 #endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,24 +17,33 @@
 
 namespace vita
 {
-  ///
-  /// \brief A symbol with zero-arity
-  ///
-  /// A terminal might be a variable (input to the program), a constant value
-  /// or a function taking no arguments (e.g. move-north).
-  ///
-  class terminal : public symbol
-  {
-  public:
-    using symbol::symbol;
+///
+/// \brief A symbol with zero-arity
+///
+/// A terminal might be a variable (input to the program), a constant value
+/// or a function taking no arguments (e.g. move-north).
+///
+class terminal : public symbol
+{
+public:
+  using symbol::symbol;
 
-    virtual bool debug() const override;
-  };
+  virtual unsigned arity() const override;
+
+  virtual bool debug() const override;
+};
+
+///
+/// \return 0 (this is a terminal!)
+///
+inline unsigned terminal::arity() const
+{
+  return 0;
+}
+}  // namespace vita
 
 #if defined(VITA_NO_LIB)
-#  include "terminal.cc"
+#  include "kernel/terminal.cc"
 #endif
-
-}  // namespace vita
 
 #endif  // Include guard

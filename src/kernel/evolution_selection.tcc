@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// \return the index of a random individual.
 ///
 template<class T>
-coord strategy<T>::pickup() const
+typename population<T>::coord strategy<T>::pickup() const
 {
   const auto n_layers(pop_.layers());
 
@@ -57,13 +57,13 @@ coord strategy<T>::pickup() const
 
 ///
 /// \param[in] l a layer.
-/// \param[in] p the probability of extracting an individual in layer \a l
-///              (1 - \a p is the probability of extracting an individual
-///              in layer \a l-1).
-/// \return the coordinates of a random individual in layer \a l or \a l-1.
+/// \param[in] p the probability of extracting an individual in layer `l`
+///              (`1 - p` is the probability of extracting an individual
+///              in layer `l-1`).
+/// \return the coordinates of a random individual in layer `l` or `l-1`.
 ///
 template<class T>
-coord strategy<T>::pickup(unsigned l, double p) const
+typename population<T>::coord strategy<T>::pickup(unsigned l, double p) const
 {
   assert(0.0 <= p);
   assert(p <= 1.0);
@@ -90,7 +90,7 @@ coord strategy<T>::pickup(unsigned l, double p) const
 /// * tournament_size - to control selection pressure.
 ///
 template<class T>
-std::vector<coord> tournament<T>::run()
+typename strategy<T>::parents_t tournament<T>::run()
 {
   const auto &pop(this->pop_);
 
@@ -98,7 +98,7 @@ std::vector<coord> tournament<T>::run()
   const auto target(this->pickup());
 
   assert(rounds);
-  std::vector<coord> ret(rounds);
+  typename strategy<T>::parents_t ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
@@ -122,6 +122,8 @@ std::vector<coord> tournament<T>::run()
   }
 
 #if !defined(NDEBUG)
+  assert(ret.size() == rounds);
+
   for (unsigned i(1); i < rounds; ++i)
     assert(this->eva_(pop[ret[i - 1]]) >= this->eva_(pop[ret[i]]));
 #endif
@@ -138,7 +140,7 @@ std::vector<coord> tournament<T>::run()
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-std::vector<coord> alps<T>::run()
+typename strategy<T>::parents_t alps<T>::run()
 {
   const auto &pop(this->pop_);
 
@@ -147,7 +149,7 @@ std::vector<coord> alps<T>::run()
   auto c0(this->pickup(layer));
   auto c1(this->pickup(layer));
 
-  // This type is mainly used because of the lexicographic comparison
+  // This type is used to take advantage of the lexicographic comparison
   // capabilities of std::pair.
   using age_fit_t = std::pair<bool, fitness_t>;
   age_fit_t age_fit0{!vita::alps::aged(pop, c0), this->eva_(pop[c0])};
@@ -190,83 +192,13 @@ std::vector<coord> alps<T>::run()
     assert(age_fit1.second == this->eva_(pop[c1]));
     assert(age_fit0 >= age_fit1);
     assert(!vita::alps::aged(pop, c0) || vita::alps::aged(pop, c1));
-    assert(layer <= c0.layer + 1);
-    assert(layer <= c1.layer + 1);
     assert(c0.layer <= layer);
+    assert(layer <= c0.layer + 1);
     assert(c1.layer <= layer);
+    assert(layer <= c1.layer + 1);
   }
 
   return {c0, c1};
-}
-
-///
-/// \return a vector of coordinates of individuals with fitness nearest to a
-///         random fitness value.
-///
-/// A random fitness value is chosen in the interval \f$[f_min, f_max]\f$,
-/// where \f$f_max\f$ and \f$f_min\f$ are the maximum and minimum fitness value
-/// in the current population.
-/// Then we round a tournament to find the individuals with fitness nearest to
-/// this random value.
-/// While the probability of selection each fitness level is equal,
-/// the probability of then selecting a given individual within a fitness level
-/// depends on the population of that level.
-///
-template<class T>
-std::vector<coord> fuss<T>::run()
-{
-  const auto &pop(this->pop_);
-
-  const auto rounds(pop.env().tournament_size);
-  assert(rounds);
-
-  const auto min(this->sum_.az.fit_dist().min);
-  const auto max(this->sum_.az.fit_dist().max);
-  auto level(max - min);
-
-  for (unsigned i(0); i < decltype(level)::size; ++i)
-  {
-    const auto base(std::min(min[i], max[i]));
-    const auto delta(std::fabs(level[i]));
-
-    level[i] = base + vita::random::between<decltype(base)>(-0.5, delta + 0.5);
-
-    assert(std::min(min[i], max[i]) - 0.5 <= level[i]);
-    assert(level[i] <= std::max(min[i], max[i]) + 0.5);
-  }
-
-  std::vector<coord> ret(rounds);
-
-  // This is the inner loop of an insertion sort algorithm. It is simple,
-  // fast (if rounds is small) and doesn't perform too much comparisons.
-  // DO NOT USE std::sort it is way slower.
-  for (unsigned i(0); i < rounds; ++i)
-  {
-    const auto new_coord(this->pickup());
-    const auto new_fit(this->eva_(pop[new_coord]));
-
-    unsigned j(0);
-
-    // Where is the insertion point?
-    while (j < i &&
-           level.distance(new_fit) > level.distance(this->eva_(pop[ret[j]])))
-      ++j;
-
-    // Shift right elements after the insertion point.
-    for (auto k(j); k < i; ++k)
-      ret[k + 1] = ret[k];
-
-    ret[j] = new_coord;
-  }
-
-#if !defined(NDEBUG)
-  const auto size(ret.size());
-  for (auto i(decltype(size){1}); i < size; ++i)
-    assert(level.distance(this->eva_(pop[ret[i - 1]])) <=
-           level.distance(this->eva_(pop[ret[i]])));
-#endif
-
-  return ret;
 }
 
 ///
@@ -278,7 +210,7 @@ std::vector<coord> fuss<T>::run()
 ///   selected individuals for dominance evaluation).
 ///
 template<class T>
-std::vector<coord> pareto<T>::run()
+typename strategy<T>::parents_t pareto<T>::run()
 {
   const auto &pop(this->pop_);
   const auto rounds(pop.env().tournament_size);
@@ -294,7 +226,7 @@ std::vector<coord> pareto<T>::run()
 
   assert(front_set.size());
 
-  std::vector<coord> ret{
+  typename strategy<T>::parents_t ret{
     {0, vita::random::element(front_set)},
     {0, vita::random::element(front_set)}};
 
@@ -306,8 +238,8 @@ std::vector<coord> pareto<T>::run()
 
 ///
 /// \param[in] pool indexes of individuals in the population.
-/// \param[out] front the set of nondominated individuals of \a pool.
-/// \param[out] dominated the set of dominated individuals of \a pool.
+/// \param[out] front the set of nondominated individuals of `pool`.
+/// \param[out] dominated the set of dominated individuals of `pool.
 ///
 template<class T>
 void pareto<T>::front(const std::vector<unsigned> &pool,
@@ -357,12 +289,12 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 /// * tournament_size - to control number of selected individuals.
 ///
 template<class T>
-std::vector<coord> random<T>::run()
+typename strategy<T>::parents_t random<T>::run()
 {
   const auto size(this->pop_.env().tournament_size);
 
   assert(size);
-  std::vector<coord> ret(size);
+  typename strategy<T>::parents_t ret(size);
 
   for (auto &v : ret)
     v = this->pickup();

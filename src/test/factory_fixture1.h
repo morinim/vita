@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 
 struct F_FACTORY1
 {
-  F_FACTORY1() : env(true)
+  F_FACTORY1() : env(&sset, true)
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY1)");
 
@@ -48,7 +48,7 @@ struct F_FACTORY1
     sset.insert(factory.make("plum", {1}));
     sset.insert(factory.make("date", {1}));
     sset.insert(factory.make("peach", {1}));
-    sset.insert(factory.make("IFE", {1, 0}));
+    sset.insert(factory.make("SIFE", {1, 0}));
   }
 
   ~F_FACTORY1()

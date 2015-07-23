@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,31 +30,35 @@ strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
 ///
 /// \param[in] parent coordinates of the parents (in the population).
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical \a summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
-/// * elitism is \c true => child replaces a member of the population only if
+/// * elitism is `true` => child replaces a member of the population only if
 ///   child is better.
 ///
 template<class T>
-void family_competition<T>::run(const std::vector<coord> &parent,
-                                const std::vector<T> &offspring,
-                                summary<T> *const s)
+void family_competition<T>::run(
+  const typename strategy<T>::parents_t &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
-  assert(!boost::indeterminate(pop.env().elitism));
+  assert(pop.env().elitism != trilean::unknown);
 
   const fitness_t fit_off(this->eva_(offspring[0]));
 
-  const fitness_t f_parent[] =
+  const fitness_t fit_parent[] =
   {
     this->eva_(pop[parent[0]]), this->eva_(pop[parent[1]])
   };
-  const bool id_worst(f_parent[0] < f_parent[1] ? 0 : 1);
+  const unsigned id_worst(fit_parent[0] < fit_parent[1] ? 0 : 1);
 
-  if (pop.env().elitism)
+  // The algorithm assumes that fitness values have same sign.
+  assert((fit_off[0] <= 0.0) == (fit_parent[0][0] <= 0.0));
+  assert((fit_off[0] <= 0.0) == (fit_parent[1][0] <= 0.0));
+
+  if (pop.env().elitism == trilean::yes)
   {
-    if (fit_off > f_parent[id_worst])
+    if (fit_off > fit_parent[id_worst])
       pop[parent[id_worst]] = offspring[0];
   }
   else  // !elitism
@@ -63,26 +67,26 @@ void family_competition<T>::run(const std::vector<coord> &parent,
     // when fitness is a vector but the replacement probability should be
     // calculated in a better way.
 
-    //double replace(1.0 / (1.0 + exp(f_parent[id_worst][0] - fit_off[0])));
+    //double replace(1.0 / (1.0 + exp(fit_parent[id_worst][0] - fit_off[0])));
     double replace(1.0 - (fit_off[0] /
-                          (fit_off[0] + f_parent[id_worst][0])));
+                          (fit_off[0] + fit_parent[id_worst][0])));
     if (random::boolean(replace))
       pop[parent[id_worst]] = offspring[0];
     else
     {
       //replace = 1.0 / (1.0 + exp(f_parent[!id_worst][0] - fit_off[0]));
-      replace = 1.0 - (fit_off[0] / (fit_off[0] + f_parent[!id_worst][0]));
+      replace = 1.0 - (fit_off[0] / (fit_off[0] + fit_parent[!id_worst][0]));
 
       if (random::boolean(replace))
         pop[parent[!id_worst]] = offspring[0];
     }
   }
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    typename summary<T>::best_ b{offspring[0], fit_off};
-    s->last_imp = s->gen;
-    s->best     =      b;
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 
@@ -94,16 +98,16 @@ void family_competition<T>::run(const std::vector<coord> &parent,
 ///                   coordinates of the worst individual of the selection
 ///                   phase.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical \a summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
-/// * elitism is \c true => child replaces a member of the population only if
+/// * elitism is `true` => child replaces a member of the population only if
 ///   child is better.
 ///
 template<class T>
-void tournament<T>::run(const std::vector<coord> &parent,
-                        const std::vector<T> &offspring,
-                        summary<T> *const s)
+void tournament<T>::run(
+  const typename strategy<T>::parents_t &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
 
@@ -118,24 +122,25 @@ void tournament<T>::run(const std::vector<coord> &parent,
   // is greater than 2 we perform a traditional selection / replacement
   // scheme; if it's smaller we perform a family competition replacement
   // (aka deterministic / probabilistic crowding).
-  const coord rep_idx(parent.back());
+  const auto rep_idx(parent.back());
   const auto f_rep_idx(this->eva_(pop[rep_idx]));
   const bool replace(f_rep_idx < fit_off);
 
-  assert(!boost::indeterminate(pop.env().elitism));
-  if (!pop.env().elitism || replace)
+  assert(pop.env().elitism != trilean::unknown);
+  if (pop.env().elitism == trilean::no || replace)
     pop[rep_idx] = offspring[0];
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    s->last_imp =                  s->gen;
-    s->best     = {offspring[0], fit_off};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 
 ///
 /// \param[in] l a layer.
-/// \return the maximum allowed age for an individual in layer \a l.
+/// \return the maximum allowed age for an individual in layer `l`.
 ///
 /// This is just a convenience method to save some keystroke.
 ///
@@ -149,7 +154,7 @@ unsigned alps<T>::max_age(unsigned l) const
 ///
 /// \param[in] l a layer.
 ///
-/// Try to move individuals in layer \a l in the upper layer (calling
+/// Try to move individuals in layer `l` in the upper layer (calling
 /// try_add_to_layer for each individual).
 ///
 template<class T>
@@ -170,17 +175,19 @@ void alps<T>::try_move_up_layer(unsigned l)
 /// \param[in] layer a layer
 /// \param[in] incoming an individual
 ///
-/// We would like to add \a incoming in layer \a layer. The insertion will take
-/// place if:
-/// * \a layer is not full or...
+/// We would like to add `incoming` in layer `layer`. The insertion will
+/// take place if:
+/// * `layer` is not full or...
 /// * after a "kill tournament" selection, the worst individual found is
-///   too old for \a layer while the incoming one is within the limits or...
+///   too old for `layer` while the incoming one is within the limits or...
 /// * the worst individual has a lower fitness than the incoming one and
-///   both are simultaneously within/outside the time frame of \a layer.
+///   both are simultaneously within/outside the time frame of `layer`.
 ///
 template<class T>
 bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 {
+  using coord = typename population<T>::coord;
+
   auto &p(this->pop_);
   assert(layer < p.layers());
 
@@ -233,21 +240,22 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
 ///                   last element is the coordinates of the worst individual
 ///                   of the tournament.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical \a summary.
+/// \param[in,out] s statistical summary.
 ///
 /// Parameters from the environment:
-/// * elitism is \c true => a new best individual is always inserted into the
+/// * elitism is `true` => a new best individual is always inserted into the
 ///   population.
 ///
 template<class T>
-void alps<T>::run(const std::vector<coord> &parent,
-                  const std::vector<T> &offspring, summary<T> *const s)
+void alps<T>::run(
+  const typename strategy<T>::parents_t &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   const auto layer(std::max(parent[0].layer, parent[1].layer));
   const auto f_off(this->eva_(offspring[0]));
   const auto &pop(this->pop_);
 
-  assert(!boost::indeterminate(pop.env().elitism));
+  assert(pop.env().elitism != trilean::unknown);
 
   bool ins;
 #if defined(MUTUAL_IMPROVEMENT)
@@ -263,7 +271,7 @@ void alps<T>::run(const std::vector<coord> &parent,
     ins = try_add_to_layer(layer, offspring[0]);
   }
 
-  if (f_off > s->best->fitness)
+  if (f_off > s->best.score.fitness)
   {
     // Sometimes a new best individual is discovered in a lower layer but he is
     // too old for its layer and the random tournament may choose only "not
@@ -272,11 +280,12 @@ void alps<T>::run(const std::vector<coord> &parent,
     // command below.
     // There isn't an age limit for the last layer so try_add_to_layer will
     // always succeed.
-    if (!ins && pop.env().elitism)
+    if (!ins && pop.env().elitism == trilean::yes)
       try_add_to_layer(pop.layers() - 1, offspring[0]);
 
-    s->last_imp =                s->gen;
-    s->best     = {offspring[0], f_off};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = f_off;
   }
 }
 
@@ -286,10 +295,10 @@ void alps<T>::run(const std::vector<coord> &parent,
 ///                   dominance (from pareto non dominated front to
 ///                   dominated points.
 /// \param[in] offspring vector of the "children".
-/// \param[in] s statistical \a summary.
+/// \param[in,out] s statistical summary.
 ///
 /// To determine whether a new individual x is to be accepted into the main
-/// population, we compare it with the \a parent buffer, simply ensuring
+/// population, we compare it with the `parent` buffer, simply ensuring
 /// that the new individual is not dominated.
 ///
 /// If this is the case, then it is immediately accepted and is inserted
@@ -298,7 +307,7 @@ void alps<T>::run(const std::vector<coord> &parent,
 /// exist in a single objective optimisation anyway.
 ///
 /// Parameters from the environment:
-/// * elitism is \c true => child replaces a member of the population only if
+/// * elitism is `true` => child replaces a member of the population only if
 ///   child is better.
 ///
 /// \see
@@ -307,9 +316,9 @@ void alps<T>::run(const std::vector<coord> &parent,
 /// K. Srinivas, S. Armfield, J. Periaux.
 ///
 template<class T>
-void pareto<T>::run(const std::vector<coord> &parent,
-                    const std::vector<T> &offspring,
-                    summary<T> *const s)
+void pareto<T>::run(
+  const typename strategy<T>::parents_t &parent,
+  const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
 
@@ -323,10 +332,11 @@ void pareto<T>::run(const std::vector<coord> &parent,
     {
       pop[i] = offspring[0];
 
-      if (fit_off > s->best.fitness)
+      if (fit_off > s->best.score.fitness)
       {
-        s->last_imp =                  s->gen;
-        s->best     = {offspring[0], fit_off};
+        s->last_imp           = s->gen;
+        s->best.solution      = offspring[0];
+        s->best.score.fitness = fit_off;
       }
 
       break;
@@ -346,15 +356,16 @@ void pareto<T>::run(const std::vector<coord> &parent,
     }
   }
 
-  assert(!boost::indeterminate(pop.env().elitism));
+  assert(pop.env().elitism != trilean::unknown);
 
-  if (!pop.env().elitism || !dominated)
+  if (pop.env().elitism == trilean::no || !dominated)
     pop[parent.back()] = offspring[0];
 
-  if (fit_off > s->best->fitness)
+  if (fit_off > s->best.score.fitness)
   {
-    s->last_imp =                  s->gen;
-    s->best     = {offspring[0], fit_off};
+    s->last_imp           = s->gen;
+    s->best.solution      = offspring[0];
+    s->best.score.fitness = fit_off;
   }
 }
 #endif  // Include guard

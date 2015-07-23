@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,6 +26,23 @@ using namespace boost;
 
 
 BOOST_AUTO_TEST_SUITE(matrix)
+
+BOOST_AUTO_TEST_CASE(EmptyMatrix)
+{
+  vita::matrix<int> m;
+
+  BOOST_REQUIRE(m.empty());
+  BOOST_REQUIRE_EQUAL(m.cols(), 0);
+
+  decltype(m) m1(3, 3);
+  BOOST_REQUIRE(!m1.empty());
+
+  std::stringstream ss;
+  BOOST_REQUIRE(m.save(ss));
+
+  BOOST_REQUIRE(m1.load(ss));
+  BOOST_REQUIRE_EQUAL(m, m1);
+}
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {

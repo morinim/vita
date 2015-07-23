@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,42 +17,36 @@
 
 namespace vita
 {
-const char environment::arl_filename[] =        "arl";
-const char environment::dyn_filename[] =    "dynamic";
-const char environment::lys_filename[] =     "layers";
-const char environment::pop_filename[] = "population";
-const char environment::sum_filename[] =    "summary";
-const char environment::tst_filename[] =       "test";
-
 ///
-/// \param[in] initialize if \c true initializes every parameter in such a
+/// \param[in] ss a pointer to the symbol set used in the current environment.
+/// \param[in] initialize if `true` initializes every parameter in such a
 ///                       way as to allow the object to pass
-///                       environment::debug().
+///                       `environment::debug(..., true)`.
 ///
 /// Class constructor. Default values are quite standard, but specific
 /// problems need ad-hoc tuning.
 ///
 /// \see search::tune_parameters
 ///
-environment::environment(bool initialize)
+environment::environment(symbol_set *ss, bool initialize) : sset(ss)
 {
   if (initialize)
   {
     code_length = 100;
     patch_length = 1;
-    elitism = true;
+    elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
     brood_recombination = 0;
-    dss = true;
-    layers = 4;
+    dss = trilean::yes;
+    layers = 1;
     individuals = 100;
     tournament_size = 5;
     mate_zone = 20;
     generations = 100;
     g_without_improvement =
       std::numeric_limits<decltype(g_without_improvement)>::max();
-    arl = false;
+    arl = trilean::no;
     validation_percentage = 20;
 
     assert(debug(true, true));
@@ -63,14 +57,14 @@ environment::environment(bool initialize)
 
 ///
 /// \param[out] pt output tree.
-/// \param[in] path \a path where to store the environment data file.
+/// \param[in] path where to store the environment data file.
 ///
-/// Saves the environment using the \a pt boost property tree.
+/// Saves the environment using the `pt` boost property tree.
 ///
 void environment::log(boost::property_tree::ptree *const pt,
                       const std::string &path) const
 {
-  assert(stat_summary);
+  assert(stat.summary);
 
   const std::string env(path + "environment.");
   pt->put(env + "layers", layers);
@@ -92,20 +86,20 @@ void environment::log(boost::property_tree::ptree *const pt,
   pt->put(env + "team.individuals", team.individuals);
   pt->put(env + "validation_percentage", validation_percentage);
   pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
-  pt->put(env + "statistics.directory", stat_dir);
-  pt->put(env + "statistics.save_arl", stat_arl);
-  pt->put(env + "statistics.save_dynamics", stat_dynamic);
-  pt->put(env + "statistics.save_layers", stat_layers);
-  pt->put(env + "statistics.save_population", stat_population);
-  pt->put(env + "statistics.save_summary", stat_summary);
+  pt->put(env + "statistics.directory", stat.dir);
+  pt->put(env + "statistics.save_arl", stat.arl);
+  pt->put(env + "statistics.save_dynamics", stat.dynamic);
+  pt->put(env + "statistics.save_layers", stat.layers);
+  pt->put(env + "statistics.save_population", stat.population);
+  pt->put(env + "statistics.save_summary", stat.summary);
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \param force_defined all the optional parameter have to be in a
 ///                      'well defined' state for the function to pass
 ///                      the test.
-/// \return \c true if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool environment::debug(bool verbose, bool force_defined) const
 {
@@ -125,7 +119,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(elitism))
+    if (elitism == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined elitism data member\n";
@@ -154,7 +148,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(dss))
+    if (dss == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined dss data member\n";
@@ -204,7 +198,7 @@ bool environment::debug(bool verbose, bool force_defined) const
       return false;
     }
 
-    if (boost::indeterminate(arl))
+    if (arl == trilean::unknown)
     {
       if (verbose)
         std::cerr << k_s_debug << " Undefined arl data member\n";

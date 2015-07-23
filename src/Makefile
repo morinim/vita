@@ -1,16 +1,7 @@
-# Further details / ideas:
-# * http://gpwiki.org/index.php/Makefile
-# * http://mad-scientist.net/make/autodep.html
-# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
-# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
-# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
-
-
-
-# Build type: debug, profile, release.
+# Build type: debug, profile, release
 TYPE := release
 
-# Compiler (clang++, g++)
+# Compiler: clang++, g++
 CXX := g++
 #CLANG := $(shell command -v clang++ >/dev/null; echo $$?)
 #ifeq ($(CLANG), 0)
@@ -32,6 +23,8 @@ DEFS :=
 # -------------------------------------------------------------------------
 $(info Building: $(TYPE))
 $(info Using: $(CXX))
+
+#VERSION := $(shell hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}')
 
 # Boost library
 LIB := -static -lboost_program_options
@@ -79,7 +72,7 @@ ifeq ($(TYPE), release)
 
   # Link time optimization has some issues with MinGW
   ifeq ($(CXX), g++)
-    ifneq ($(OS),Windows_NT)
+    ifneq ($(OS), Windows_NT)
       TYPE_PARAM += -flto
     endif
   endif
@@ -113,25 +106,22 @@ else
 endif
 endif
 
-examples: example1 example2 example3 example4 example5 example6 example7 example8 example9a
+examples: $(EXAMPLES_SRC:.cc=)
+	@echo $(notdir $^) successfully built
 
-example%: examples/example%.o $(KERNEL_OBJ)
+examples/%: examples/%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
-
-titanic%: examples/titanic%.o $(KERNEL_OBJ)
-	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o examples/$@
+	@$(COMPILE) $< $(KERNEL_OBJ) -o $@
 
 tests: test/tests.o $(KERNEL_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
 	@cd test; ./$@ --show_progress --build_info
 
-test_%: test/test_%.o $(KERNEL_OBJ)
+test/%: test/%.o $(KERNEL_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
-	@cd test; ./$@ --show_progress --build_info
+	@$(COMPILE) $< $(KERNEL_OBJ) -o $@ $(DEBUG_LIB)
+	@cd test; ./$(@F) --show_progress --build_info
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a
@@ -177,3 +167,11 @@ backup:
 	@-if [ ! -e ../backup ]; then mkdir ../backup; fi;
 	@make clean
 	@tar --exclude="boost" --exclude="backup" --exclude="doxygen/latex" --exclude="doxygen/html" --xz -cvf ../backup/vita_`date +%y-%m-%d_%H.%M`.txz ../../vita
+
+
+# Further details / ideas:
+# * http://gpwiki.org/index.php/Makefile
+# * http://mad-scientist.net/make/autodep.html
+# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
+# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
+# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script

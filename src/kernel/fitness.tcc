@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,10 +18,19 @@
 #define      VITA_FITNESS_TCC
 
 ///
-/// Fills the fitness with value \a v.
+/// \brief Fills the fitness with `n` copy of value `v`
+///
+/// \param[in] n number of components of the fitness.
+/// \param[in] v default value.
+///
+/// Both Herb Sutter and Scott Meyers recommend to avoid class designs where
+/// a `initializer_list` constructor overload can cause ambiguities to the
+/// programmer. We use tags on the constructor to avoid such situations.
+///
+/// The tag also helps to clarify the meaning of the other arguments.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(unsigned n, T v) : vect_(n, v)
+basic_fitness_t<T>::basic_fitness_t(unsigned n, fit_tag, T v) : vect_(n, v)
 {
   assert(n);
 }
@@ -38,7 +47,7 @@ basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
 /// Builds a fitness from a vector of values.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(std::vector<T> v) : vect_(std::move(v))
+basic_fitness_t<T>::basic_fitness_t(values_t v) : vect_(std::move(v))
 {
 }
 
@@ -86,7 +95,7 @@ T &basic_fitness_t<T>::operator[](unsigned i)
 template<class T>
 typename basic_fitness_t<T>::iterator basic_fitness_t<T>::begin()
 {
-  return vect_.begin();
+  return std::begin(vect_);
 }
 
 ///
@@ -107,13 +116,13 @@ typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::begin() const
 template<class T>
 typename basic_fitness_t<T>::iterator basic_fitness_t<T>::end()
 {
-  return vect_.end();
+  return std::end(vect_);
 }
 
 ///
 /// \return returns an iterator to the element following the last element of
 ///         the container. This element acts as a placeholder; attempting to
-//          access it results in undefined behavior.
+///         access it results in undefined behavior.
 ///
 template<class T>
 typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::end() const
@@ -122,25 +131,46 @@ typename basic_fitness_t<T>::const_iterator basic_fitness_t<T>::end() const
 }
 
 ///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
 /// Operation is performed by first comparing sizes and, if they match,
 /// the elements are compared sequentially using algorithm equal, which
 /// stops at the first mismatch.
 ///
+/// \relates basic_fitness_t
+///
 template<class T>
-bool basic_fitness_t<T>::operator==(const basic_fitness_t<T> &f) const
+bool operator==(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ == f.vect_;
+  return lhs.size() == rhs.size() &&
+         std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs));
 }
 
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+///
 /// Operation is performed by first comparing sizes and, if they match,
 /// the elements are compared sequentially using algorithm equal, which
 /// stops at the first mismatch.
+///
+/// \relates basic_fitness_t
+///
 template<class T>
-bool basic_fitness_t<T>::operator!=(const basic_fitness_t<T> &f) const
+bool operator!=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ != f.vect_;
+  return !operator==(lhs, rhs);
 }
 
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically less than
+///         the contents of `rhs`, `false` otherwise.
+///
 /// Behaves as if using algorithm lexicographical_compare, which compares
 /// the elements sequentially, stopping at the first mismatch.
 ///
@@ -153,10 +183,14 @@ bool basic_fitness_t<T>::operator!=(const basic_fitness_t<T> &f) const
 /// of the lexicographical comparison.
 /// If both sequences compare equal until one of them ends, the shorter
 /// sequence is lexicographically less than the longer one.
+///
+/// \relates basic_fitness_t
+///
 template<class T>
-bool basic_fitness_t<T>::operator>(const basic_fitness_t<T> &f) const
+bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ > f.vect_;
+  return std::lexicographical_compare(std::begin(lhs), std::end(lhs),
+                                      std::begin(rhs), std::end(rhs));
 
   // An alternative implementation:
   // > for (unsigned i(0); i < size(); ++i)
@@ -165,54 +199,88 @@ bool basic_fitness_t<T>::operator>(const basic_fitness_t<T> &f) const
   // > return false;
 }
 
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
-template<class T>
-bool basic_fitness_t<T>::operator>=(const basic_fitness_t<T> &f) const
-{
-  return vect_ >= f.vect_;
-}
 
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically greater
+///         than or equal the contents of `rhs`, `false` otherwise.
+///
+/// \see basic_fitness_t::operator<
+///
+/// \relates basic_fitness_t
+///
 template<class T>
-bool basic_fitness_t<T>::operator<(const basic_fitness_t<T> &f) const
+bool operator>(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  return vect_ < f.vect_;
-}
-
-/// Lexicographic ordering.
-/// \see basic_fitness_t::operator>
-template<class T>
-bool basic_fitness_t<T>::operator<=(const basic_fitness_t<T> &f) const
-{
-  return vect_ <= f.vect_;
+  return operator<(rhs, lhs);
 }
 
 ///
-/// \param[in] f second term of comparison.
-/// \return \c true if \a this is a Pareto improvement of \a f.
+/// \brief Lexicographic ordering
 ///
-/// \a this dominates \a f (is a Pareto improvement) if:
-/// * each component of \a this is not strictly worst (less) than the
-///   correspondig component of \a f;
-/// * there is at least one component in which \a this is better than \a f.
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically greater
+///         than or equal the contents of `rhs`, `false` otherwise.
+///
+/// \see basic_fitness_t::operator<
+///
+/// \relates basic_fitness_t
+///
+template<class T>
+bool operator>=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
+{
+  return !operator<(lhs, rhs);
+}
+
+///
+/// \brief Lexicographic ordering
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparision.
+/// \return `true` if the contents of the `lhs` are lexicographically less
+///         than or equal the contents of `rhs`, `false` otherwise.
+///
+/// \see basic_fitness_t::operator<
+///
+/// \relates basic_fitness_t
+///
+template<class T>
+bool operator<=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
+{
+  return !operator>(lhs, rhs);
+}
+
+///
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if `lhs` is a Pareto improvement of `rhs`.
+///
+/// `lhs` dominates `rhs` (is a Pareto improvement) if:
+/// - each component of `lhs` is not strictly worst (less) than the
+///   correspondig component of `rhs`;
+/// - there is at least one component in which `lhs` is better than `rhs`.
 ///
 /// \note
-/// An interesting property is that if a vector x does not dominate a
-/// vector y, this does not imply that y dominates x (for example they can
-/// be both non-dominated).
+/// An interesting property is that if a vector `x` does not dominate a
+/// vector `y`, this does not imply that `y` dominates `x` (they can be both
+/// non-dominated).
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
-bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
+bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
   bool one_better(false);
 
-  const auto n(size());
+  const auto n(lhs.size());
   for (unsigned i(0); i < n; ++i)
-    if (operator[](i) > f[i])
+    if (lhs[i] > rhs[i])
       one_better = true;
-    else if (operator[](i) < f[i])
+    else if (lhs[i] < rhs[i])
       return false;
 
   return one_better;
@@ -220,7 +288,7 @@ bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
 
 ///
 /// \param[in] in input stream.
-/// \return \c true if basic_fitness_t loaded correctly.
+/// \return `true` if the object has been loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current basic_fitness_t isn't
@@ -229,18 +297,14 @@ bool basic_fitness_t<T>::dominating(const basic_fitness_t<T> &f) const
 template<class T>
 bool basic_fitness_t<T>::load(std::istream &in)
 {
-  SAVE_FLAGS(in);
-
   unsigned s;
   if (!(in >> s))
     return false;
 
-  basic_fitness_t<T> tmp(s);
+  basic_fitness_t<T> tmp(s, fit_tag::components);
 
   for (auto &e : tmp.vect_)
-    if (!(in >> std::fixed >> std::scientific
-             >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
-             >> e))
+    if (!load_float_from_stream(in, &e))
       return false;
 
   *this = tmp;
@@ -250,19 +314,18 @@ bool basic_fitness_t<T>::load(std::istream &in)
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if basic_fitness_t was saved correctly.
+/// \return `true` if object has been saved correctly.
 ///
 template<class T>
 bool basic_fitness_t<T>::save(std::ostream &out) const
 {
-  SAVE_FLAGS(out);
-
   out << size() << '\n';
 
   for (const auto &i : vect_)
-    out << std::fixed << std::scientific
-        << std::setprecision(std::numeric_limits<T>::digits10 + 1)
-        << i << ' ';
+  {
+    save_float_to_stream(out, i);
+    out << ' ';
+  }
 
   out << '\n';
 
@@ -271,6 +334,8 @@ bool basic_fitness_t<T>::save(std::ostream &out) const
 
 ///
 /// Standard output operator for basic_fitness_t.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &o, basic_fitness_t<T> f)
@@ -284,7 +349,7 @@ std::ostream &operator<<(std::ostream &o, basic_fitness_t<T> f)
 
 ///
 /// \param[in] f a fitness.
-/// \return the sum of \a this and \a f.
+/// \return the sum of `this` and `f`.
 ///
 template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
@@ -297,8 +362,29 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
 }
 
 ///
+/// \param[in] lhs first addend.
+/// \param[in] rhs second addend.
+/// \return the sum of `lhs` and `rhs`.
+///
+/// \relates basic_fitness_t
+///
+template<class T>
+basic_fitness_t<T> operator+(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T> &rhs)
+{
+  // operator+ shouldn't be a member function otherwise it won't work as
+  // naturally as user may expect (i.e. asymmetry in implicit conversion from
+  // other types.
+  // Implementing `+` in terms of `+=` makes the code simpler and guarantees
+  // consistent semantics as the two functions are less likely to diverge
+  // during maintenance.
+  return lhs += rhs;
+}
+
+
+///
 /// \param[in] f a fitness.
-/// \return the difference of \a this and \a f.
+/// \return the difference of `this` and `f`.
 ///
 template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
@@ -311,92 +397,112 @@ basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
 }
 
 ///
-/// \param[in] f a fitness.
-/// \return the difference between \a this and \a f.
+/// \param[in] lhs the minuend.
+/// \param[in] rhs the subtrahend.
+/// \return the difference between `lhs` and `rhs`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator-(basic_fitness_t<T> f) const
+basic_fitness_t<T> operator-(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T> &rhs)
+{
+  return lhs -= rhs;
+}
+
+///
+/// \param[in] f a fitness.
+/// \return the product of `this` and `f`.
+///
+template<class T>
+basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t &f)
 {
   const auto n(size());
   for (unsigned i(0); i < n; ++i)
-    f[i] = operator[](i) - f[i];
+    operator[](i) *= f[i];
+
+  return *this;
+}
+
+///
+/// \param[in] lhs first factor.
+/// \param[in] rhs second factor.
+/// \return the product of `lhs` and `rhs`.
+///
+/// \relates basic_fitness_t
+///
+template<class T>
+basic_fitness_t<T> operator*(basic_fitness_t<T> lhs,
+                             const basic_fitness_t<T> &rhs)
+{
+  return lhs *= rhs;
+}
+
+///
+/// \param[in] f a fitness value.
+/// \param[in] v a scalar.
+/// \return a new vector obtained dividing each component of `f` by the scalar
+///         value `v`.
+///
+/// \relates basic_fitness_t
+///
+template<class T>
+basic_fitness_t<T> operator/(basic_fitness_t<T> f, T v)
+{
+  for (auto &f_i : f)
+    f_i /= v;
 
   return f;
 }
 
 ///
-/// \param[in] f a fitness.
-/// \return the product of \a this and \a f.
+/// \param[in] f a fitness value.
+/// \param[in] v a scalar.
+/// \return a new vector obtained multiplying each component of `f` by the
+///         scalar value `v`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator*(basic_fitness_t<T> f) const
+basic_fitness_t<T> operator*(basic_fitness_t<T> f, T v)
 {
-  const auto n(size());
-  for (unsigned i(0); i < n; ++i)
-    f[i] *= operator[](i);
+  for (auto &f_i : f)
+    f_i *= v;
 
   return f;
 }
 
 ///
-/// \param[in] val a scalar.
-/// \return a new vector obtained dividing each component of \a this by tha
-///         scalar value \a val.
-///
-template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator/(T val) const
-{
-  const auto n(size());
-  basic_fitness_t<T> tmp(n);
-
-  for (unsigned i(0); i < n; ++i)
-    tmp[i] = operator[](i) / val;
-
-  return tmp;
-}
-
-///
-/// \param[in] val a scalar.
-/// \return the product of \a this and \a val.
-///
-template<class T>
-basic_fitness_t<T> basic_fitness_t<T>::operator*(T val) const
-{
-  const auto n(size());
-  basic_fitness_t<T> tmp(n);
-
-  for (unsigned i(0); i < n; ++i)
-    tmp[i] = operator[](i) * val;
-
-  return tmp;
-}
-
-///
+/// \param[in] f a fitness value.
 /// \return a new vector obtained taking the absolute value of each component
-///         of \a this.
+///         of `f`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 basic_fitness_t<T> abs(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = std::abs(v);
+  for (auto &f_i : f)
+    f_i = std::abs(f_i);
 
   return f;
 
   // An alternative is:
-  // > std::transform(&f[0], &f[0]+n, &f[0], static_cast<T (*)(T)>(std::abs));
-  // but the compiler won't do a good job for n == 1
+  //     std::transform(std::begin(f), std::end(f), std::begin(f),
+  //                    static_cast<T (*)(T)>(std::abs));
 }
 
 ///
 /// \param[in] f a fitness.
-/// \return a new vector obtained "rounding" each component of \a this.
+/// \return a new vector obtained "rounding" each component of `f`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = round_to(v);
+  for (auto &f_i : f)
+    f_i = round_to(f_i);
 
   return f;
 }
@@ -404,61 +510,74 @@ basic_fitness_t<T> round_to(basic_fitness_t<T> f)
 ///
 /// \param[in] f a fitness.
 /// \return a new vector obtained taking the square root of each component of
-///         \a this.
+///         `f`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 basic_fitness_t<T> sqrt(basic_fitness_t<T> f)
 {
-  for (auto &v : f)
-    v = std::sqrt(v);
+  for (auto &f_i : f)
+    f_i = std::sqrt(f_i);
 
   return f;
 }
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if every component of the fitness is finite.
+/// \return `true` if every component of the fitness is finite.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 bool isfinite(const basic_fitness_t<T> &f)
 {
-  return std::all_of(f.begin(), f.end(),
+  return std::all_of(std::begin(f), std::end(f),
                      static_cast<bool (*)(T)>(std::isfinite));
 }
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if a component of the fitness is NAN.
+/// \return `true` if a component of the fitness is `NAN`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 bool isnan(const basic_fitness_t<T> &f)
 {
-  return std::any_of(f.begin(), f.end(), static_cast<bool (*)(T)>(std::isnan));
+  return std::any_of(std::begin(f), std::end(f),
+                     static_cast<bool (*)(T)>(std::isnan));
 }
 
 ///
 /// \param[in] f fitness to check.
-/// \return \c true if each component of the fitness vector is small.
+/// \return `true` if each component of the fitness vector is small.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 bool issmall(const basic_fitness_t<T> &f)
 {
-  return std::all_of(f.begin(), f.end(),
+  return std::all_of(std::begin(f), std::end(f),
                      static_cast<bool (*)(T)>(vita::issmall));
 }
 
 ///
 /// \param[in] f a fitness to check.
-/// \return true if every element of \a f is nonnegative.
+/// \return true if every element of `f` is nonnegative.
+///
+/// \relates basic_fitness_t
 ///
 template<class T> bool isnonnegative(const basic_fitness_t<T> &f)
 {
-  return std::all_of(f.begin(), f.end(),
+  return std::all_of(std::begin(f), std::end(f),
                      static_cast<bool (*)(T)>(vita::isnonnegative));
 }
 
 ///
 /// See vita::almost_equal function for scalar types.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 bool almost_equal(const basic_fitness_t<T> &f1,
@@ -477,7 +596,9 @@ bool almost_equal(const basic_fitness_t<T> &f1,
 ///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
-/// \return the distance between \a f1 and \a f2.
+/// \return the distance between `f1` and `f2`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
@@ -497,17 +618,19 @@ double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 ///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
-/// \return the fitness vector obtained joining \a f1 and \a f2.
+/// \return the fitness vector obtained joining `f1` and `f2`.
+///
+/// \relates basic_fitness_t
 ///
 template<class T>
 basic_fitness_t<T> combine(const basic_fitness_t<T> &f1,
                            const basic_fitness_t<T> &f2)
 {
-  std::vector<T> ret;
+  typename basic_fitness_t<T>::values_t ret;
   ret.reserve(f1.size() + f2.size());
 
-  ret.insert(ret.end(), f1.begin(), f1.end());
-  ret.insert(ret.end(), f2.begin(), f2.end());
+  ret.insert(std::end(ret), std::begin(f1), std::end(f1));
+  ret.insert(std::end(ret), std::begin(f2), std::end(f2));
 
   return ret;
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,40 +21,30 @@
 /// Default constructor just call the summary::clear method.
 ///
 template<class T>
-summary<T>::summary()
+summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0.0),
+                        crossovers(0), mutations(0), gen(0), last_imp(0)
 {
-  clear();
 }
 
 ///
-/// Resets summary informations.
+/// \brief Resets summary informations
 ///
 template<class T>
 void summary<T>::clear()
 {
-  az.clear();
-
-  best = boost::none;
-
-  elapsed    = 0.0;
-  mutations  = 0;
-  crossovers = 0;
-  gen        = 0;
-  last_imp   = 0;
+  *this = summary<T>();
 }
 
 ///
 /// \param[in] in input stream.
 /// \param[in] e an environment (needed to build the best individual).
-/// \param[in] s a symbol_set (needed to build the best individual).
-/// \return \c true if hash_t loaded correctly.
+/// \return `true` if the object loaded correctly.
 ///
 /// \note
-/// If the load operation isn't successful the current hash_t isn't changed.
+/// If the load operation isn't successful the current object isn't changed.
 ///
 template<class T>
-bool summary<T>::load(std::istream &in, const environment &e,
-                      const symbol_set &s)
+bool summary<T>::load(std::istream &in, const environment &e)
 {
   unsigned known_best(false);
   if (!(in >> known_best))
@@ -63,18 +53,22 @@ bool summary<T>::load(std::istream &in, const environment &e,
   summary tmp_summary;
   if (known_best)
   {
-    T tmp_ind(e, s);
-    if (!tmp_ind.load(in))
+    T tmp_ind;
+    if (!tmp_ind.load(in, e))
       return false;
 
-    decltype(best->fitness) tmp_fitness;
+    decltype(best.score.fitness) tmp_fitness;
     if (!tmp_fitness.load(in))
       return false;
 
-    tmp_summary.best = {tmp_ind, tmp_fitness};
+    decltype(best.score.accuracy) tmp_accuracy;
+    if (!load_float_from_stream(in, &tmp_accuracy))
+      return false;
+
+    tmp_summary.best.solution = tmp_ind;
+    tmp_summary.best.score.fitness = tmp_fitness;
+    tmp_summary.best.score.accuracy = tmp_accuracy;
   }
-  else
-    tmp_summary.best = boost::none;
 
   if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
            >> tmp_summary.crossovers >> tmp_summary.gen
@@ -87,7 +81,7 @@ bool summary<T>::load(std::istream &in, const environment &e,
 
 ///
 /// \param[out] out output stream.
-/// \return \c true if summary was saved correctly.
+/// \return `true` if summary was saved correctly.
 ///
 template<class T>
 bool summary<T>::save(std::ostream &out) const
@@ -95,14 +89,16 @@ bool summary<T>::save(std::ostream &out) const
   // analyzer az doesn't need to be saved: it'll be recalculated at the
   // beginning of evolution.
 
-  if (best)
+  if (best.solution.empty())
+    out << "0\n";
+  else
   {
     out << "1\n";
-    best->ind.save(out);
-    best->fitness.save(out);
+    best.solution.save(out);
+    best.score.fitness.save(out);
+    save_float_to_stream(out, best.score.accuracy);
+    out << '\n';
   }
-  else
-    out << "0\n";
 
   out << elapsed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
       << last_imp << '\n';

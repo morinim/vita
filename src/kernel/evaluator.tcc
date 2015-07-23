@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 
 ///
 /// \param[in] i an individual to be evaluated.
-/// \return the fitness (usually an approximation of) \a i.
+/// \return the fitness (usually an approximation of) `i`.
 ///
 /// Some evaluators have a faster but approximated version of the standard
 /// fitness evaluation method.
@@ -33,30 +33,7 @@ fitness_t evaluator<T>::fast(const T &i)
 }
 
 ///
-/// \return the accuracy of a program. A negative value means that accuracy
-///         isn't available (\c -1.0 is the default value returned).
-///
-/// Accuracy refers to the number of training examples that are correctly
-/// scored/classified as a proportion of the total number of examples in
-/// the training set. According to this design, the best accuracy is 1.0
-/// (100%), meaning that all the training examples have been correctly
-/// recognized.
-///
-/// \note
-/// Accuracy and fitness aren't the same thing.
-/// Accuracy can be used to measure fitness but it sometimes hasn't
-/// enough "granularity"; also it isn't appropriated for classification
-/// tasks with imbalanced learning data (where at least one class is
-/// under/over represented relative to others).
-///
-template<class T>
-double evaluator<T>::accuracy(const T &) const
-{
-  return -1.0;
-}
-
-///
-/// \return \c 0.
+/// \return `0`.
 ///
 /// Some evaluators keep additional statistics about the individual seen
 /// so far.
@@ -99,7 +76,7 @@ std::string evaluator<T>::info() const
 }
 
 ///
-/// \return \c nullptr.
+/// \return `nullptr`.
 ///
 /// Derived methods create the 'executable' form of an individual.
 ///
@@ -124,6 +101,26 @@ fitness_t random_evaluator<T>::operator()(const T &)
     f[i] = random::sup(sup);
 
   return f;
+}
+
+///
+/// \param[in] prg a program (individual/team).
+/// \return a unique, time-constant, unspecified fitness value for individual
+///         `prg`.
+///
+template<class T>
+fitness_t test_evaluator<T>::operator()(const T &prg)
+{
+  auto it(std::find(buffer_.begin(), buffer_.end(), prg));
+
+  if (it == buffer_.end())
+  {
+    buffer_.push_back(prg);
+    it = buffer_.end() - 1;
+  }
+
+  return {static_cast<fitness_t::value_type>(std::distance(buffer_.begin(),
+                                                           it))};
 }
 
 #endif  // Include guard
