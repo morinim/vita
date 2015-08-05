@@ -65,7 +65,7 @@ public:
   /// to the end.
   bool operator==(const const_iterator &rhs) const
   {
-    assert(ind_ == rhs.ind_);
+    assert(!ind_ || !rhs.ind_ || ind_ == rhs.ind_);
 
     return (loci_.empty() && rhs.loci_.empty()) ||
            loci_.cbegin() == rhs.loci_.cbegin();

@@ -481,7 +481,7 @@ bool i_mep::debug(bool verbose) const
         return false;
       }
 
-      // Maximum number of function arguments is gene::k_args.
+      // Correspondence between arity of the symbol and numbers of parameters.
       const auto arity(genome_(l).sym->arity());
       if (genome_(l).args.size() != arity)
       {
