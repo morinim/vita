@@ -913,8 +913,7 @@ i_mep i_mep::compress() const
 ///
 /// \brief Uniform Crossover
 /// \param[in] rhs the second parent.
-/// \return the result of the crossover (we only generate a single
-///         offspring).
+/// \return the result of the crossover (we only generate a single offspring).
 ///
 /// The i-th locus of the offspring has a 50% probability to be filled with
 /// the i-th gene of `this` and 50% with i-th gene of `rhs`. Parents must
@@ -947,10 +946,9 @@ i_mep i_mep::crossover(i_mep rhs) const
 }
 #elif defined(ONE_POINT_CROSSOVER)
 ///
-/// \brief One Point Crossover
+/// \brief Tree Crossover
 /// \param[in] rhs the second parent.
-/// \return the result of the crossover (we only generate a single
-///         offspring).
+/// \return the result of the crossover (we only generate a single offspring).
 ///
 /// We randomly select a parent (between `this` and `rhs`) and a single locus
 /// (common crossover point). The offspring is created with genes from the
@@ -991,12 +989,38 @@ i_mep i_mep::crossover(i_mep rhs) const
   assert(rhs.debug());
   return rhs;
 }
+#elif defined(TREE_CROSSOVER)
+///
+/// \brief Two Point Crossover
+/// \param[in] rhs the second parent.
+/// \return the result of the crossover (we only generate a single offspring).
+///
+/// This crossover insert a complete tree from one parent into the other ones.
+/// This is somewhat less disruptive than other forms of crossover since
+/// an entire tree is copied (not just a part). Anyway, due to size
+/// constraints, existing genes in the target individual could be overwritten.
+///
+/// \note
+/// Parents must have the same size.
+///
+i_mep i_mep::crossover(i_mep rhs) const
+{
+  assert(rhs.debug());
+  assert(size() == rhs.size());
+
+  for (auto it(std::next(begin(), eff_size())); it != end(); ++it)
+    rhs.set(*it, operator[](*it));
+
+  rhs.set_older_age(age());
+
+  assert(rhs.debug());
+  return rhs;
+}
 #else  // TWO_POINT_CROSSOVER (default)
 ///
 /// \brief Two Point Crossover
 /// \param[in] rhs the second parent.
-/// \return the result of the crossover (we only generate a single
-///         offspring).
+/// \return the result of the crossover (we only generate a single offspring).
 ///
 /// We randomly select a parent (between `this` and `rhs`) and a two loci
 /// (common crossover points). The offspring is created with genes from the
