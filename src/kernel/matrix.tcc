@@ -18,19 +18,13 @@
 #define      VITA_MATRIX_TCC
 
 ///
-/// \brief Uninitialized matrix... can be dangerous but sometimes we need it
-///        for performance.
-///
-template<class T>
-matrix<T>::matrix() : data_(), cols_(0)
-{
-}
-
-///
+/// \brief Standard `rs` x `cs` matrix. Entries aren't initialized
 /// \param[in] rs number of rows.
 /// \param[in] cs number of columns.
 ///
-/// \brief Standard `rs` x `cs` matrix. Entries aren't initialized.
+/// \note
+/// Default values for `rs` and `cs` is `0` (i.e. uninitialized matrix,
+/// sometimes we need it for performance).
 ///
 template<class T>
 matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
@@ -138,7 +132,7 @@ unsigned matrix<T>::cols() const
 /// \return `true` if `m` is equal to `*this`.
 ///
 template<class T>
-bool matrix<T>::operator==(const matrix<T> &m) const
+bool matrix<T>::operator==(const matrix &m) const
 {
   return cols() == m.cols() && data_ == m.data_;
 }

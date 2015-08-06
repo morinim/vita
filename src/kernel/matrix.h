@@ -45,8 +45,7 @@ namespace vita
     using reference = typename values_t::reference;
     using const_reference = typename values_t::const_reference;
 
-    matrix();
-    matrix(unsigned, unsigned);
+    explicit matrix(unsigned = 0, unsigned = 0);
 
     const_reference operator()(const locus &) const;
     reference operator()(const locus &);
@@ -55,7 +54,7 @@ namespace vita
 
     void fill(const T &);
 
-    bool operator==(const matrix<T> &) const;
+    bool operator==(const matrix &) const;
 
     bool empty() const;
     unsigned rows() const;
