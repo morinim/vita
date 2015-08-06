@@ -42,9 +42,12 @@ struct hash_t
   ///
   /// \note
   /// In spite of its handy bit-mixing properties, XOR is not a good way to
-  /// combine hashes due to its commutativity.
+  /// combine hashes due to its commutativity (e.g. see
+  /// http://stackoverflow.com/q/5889238/3235496).
   void combine(hash_t h)
   {
+    // This combiner is a tip from Bob Jenkins. An alternative from Boost is:
+    // data[i] ^= h.data[i] + 0x9e3779b9 + (data[i] << 6) + (dati[i] >> 2);
     data[0] += 11 * h.data[0];
     data[1] += 13 * h.data[1];
   }

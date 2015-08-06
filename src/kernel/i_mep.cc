@@ -396,6 +396,11 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 ///
 hash_t i_mep::hash() const
 {
+  // Calling hash() for an empty individual is UB. We could trade speed for
+  // robustness adding:
+  //     if (empty())  return hash_t();
+  assert(size());
+
   // From an individual to a packed byte stream...
   thread_local std::vector<unsigned char> packed;
 
