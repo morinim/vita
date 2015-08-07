@@ -17,6 +17,7 @@
 #include "kernel/function.h"
 #include "kernel/random.h"
 #include "kernel/small_vector.h"
+#include "kernel/terminal.h"
 #include "kernel/utility.h"
 
 namespace vita
@@ -33,7 +34,7 @@ class basic_gene
 {
 public:
   basic_gene() {}
-  explicit basic_gene(symbol *);
+  explicit basic_gene(terminal *);
   basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
   basic_gene(symbol *, index_t, index_t);
 

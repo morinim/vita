@@ -28,10 +28,8 @@ template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 /// This is usually called for filling the patch section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(symbol *t) : sym(t), args(t->arity())
+basic_gene<K>::basic_gene(terminal *t) : sym(t), args(t->arity())
 {
-  assert(sym->terminal());
-
   if (sym->parametric())
     par = sym->init();
 }

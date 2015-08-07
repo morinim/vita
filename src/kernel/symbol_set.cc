@@ -153,7 +153,7 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> i)
 
   if (raw->terminal())
   {
-    all_.terminals.push_back(raw);
+    all_.terminals.push_back(static_cast<terminal *>(raw));
 
     if (raw->auto_defined())
       all_.adt.push_back(raw);
@@ -211,7 +211,7 @@ void symbol_set::reset_adf_weights()
 /// \param[in] c a category.
 /// \return a random terminal of category `c`.
 ///
-symbol *symbol_set::roulette_terminal(category_t c) const
+terminal *symbol_set::roulette_terminal(category_t c) const
 {
   assert(c < categories());
 

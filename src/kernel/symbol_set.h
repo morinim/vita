@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "kernel/symbol.h"
+#include "kernel/terminal.h"
 
 namespace vita
 {
@@ -40,7 +40,7 @@ public:
 
   symbol *roulette() const;
   symbol *roulette(category_t) const;
-  symbol *roulette_terminal(category_t) const;
+  terminal *roulette_terminal(category_t) const;
 
   symbol *arg(unsigned) const;
 
@@ -78,10 +78,10 @@ private:  // Private data members.
   {
     collection();
 
-    std::vector<symbol *>   symbols;
-    std::vector<symbol *> terminals;
-    std::vector<symbol *>       adf;
-    std::vector<symbol *>       adt;
+    std::vector<symbol *>     symbols;
+    std::vector<terminal *> terminals;
+    std::vector<symbol *>         adf;
+    std::vector<symbol *>         adt;
 
     // The sum of the weights of all the symbols in the collection.
     unsigned sum;
