@@ -396,10 +396,8 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 ///
 hash_t i_mep::hash() const
 {
-  // Calling hash() for an empty individual is UB. We could trade speed for
-  // robustness adding:
-  //     if (empty())  return hash_t();
-  assert(size());
+  if (empty())
+    return hash_t();
 
   // From an individual to a packed byte stream...
   thread_local std::vector<unsigned char> packed;
@@ -408,8 +406,8 @@ hash_t i_mep::hash() const
   pack(best_, &packed);
 
   /// ... and from a packed byte stream to a signature...
-  const auto len(static_cast<unsigned>(
-                   packed.size() * sizeof(packed[0])));  // Length in bytes
+  const auto len(static_cast<unsigned>(packed.size() *
+                                       sizeof(packed[0])));  // Length in bytes
 
   return vita::hash(packed.data(), len, 1973);
 }
