@@ -119,7 +119,7 @@ data::dataset_t data::dataset() const
 ///
 /// \param[in] n number of elements for the slice.
 ///
-/// Cuts a 'slice' of \a n elements in the active dataset. Future calls to
+/// Cuts a 'slice' of `n` elements in the active dataset. Future calls to
 /// data::end() will refer to the active slice (a subset of the dataset).
 /// To reset the slice call data::slice with argument 0.
 ///
@@ -176,7 +176,7 @@ data::const_iterator data::end() const
 
 ///
 /// \param[in] d a dataset (training / validation / test set).
-/// \return the size of the dataset \a d.
+/// \return the size of the dataset `d`.
 ///
 /// \note
 /// Please note that the result is independent of the active slice.
@@ -230,14 +230,12 @@ void data::sort(std::function<bool (const example &, const example &)> f)
 }
 
 ///
-/// \param[in] percentage \a size_of_validation_set / \a size_of_dataset
-///                       ratio.
+/// \param[in] percentage `size_of_validation_set / size_of_dataset` ratio.
 ///
 /// Splits the dataset in two subsets (training set, validation set)
-/// according to the \a r ratio.
+/// according to the `percentage` ratio.
 ///
-/// \attention
-/// The procedure resets active slices.
+/// \attention The procedure resets active slices.
 ///
 void data::partition(unsigned percentage)
 {
@@ -334,7 +332,7 @@ unsigned data::classes() const
 /// \return input vector dimension.
 ///
 /// \note data class supports just one output for every instance, so, if
-/// the dataset is not empty, \code variables() + 1 == columns() \endcode.
+/// the dataset is not empty, `variables() + 1 == columns()`.
 ///
 unsigned data::variables() const
 {
@@ -348,7 +346,7 @@ unsigned data::variables() const
 
 ///
 /// \param[in] label name of a class of the learning collection.
-/// \return the (numerical) tag associated with class \a label.
+/// \return the (numerical) tag associated with class `label`.
 ///
 class_t data::encode(const std::string &label)
 {
@@ -363,11 +361,11 @@ class_t data::encode(const std::string &label)
 
 ///
 /// \param[in] i the encoded (data::encode()) value of a class.
-/// \return the name of the class encoded with the `unsigned` \a i (or an
+/// \return the name of the class encoded with the `unsigned i` (or an
 ///         empty string if such class cannot be find).
 ///
 /// \note
-/// Boost Bitmap could be used to speed up the search in \a classes_map_, but
+/// Boost Bitmap could be used to speed up the search in `classes_map_`, but
 /// to date speed isn't an issue.
 ///
 std::string data::class_name(class_t i) const
@@ -383,8 +381,8 @@ std::string data::class_name(class_t i) const
 /// \param[in] c1 a category.
 /// \param[in] c2 a category.
 ///
-/// Swap categories \a c1 and \a c2, updating the \a header_ and
-/// \a categories_ vector.
+/// Swap categories `c1` and `c2`, updating the `header_` and `categories_`
+/// vector.
 ///
 void data::swap_category(category_t c1, category_t c2)
 {
@@ -406,7 +404,7 @@ void data::swap_category(category_t c1, category_t c2)
 /// \param[in] filename the xrff file.
 /// \return number of lines parsed (0 in case of errors).
 ///
-/// Loads the content of \a filename into the active dataset.
+/// Loads the content of `filename` into the active dataset.
 ///
 /// \note
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
@@ -422,11 +420,11 @@ void data::swap_category(category_t c1, category_t c2)
 /// Programming).
 ///
 /// \post
-/// * \a header_[0] is the output column (it contains informations about
+/// * `header_[0]` is the output column (it contains informations about
 ///   problem's output);
-/// * \a category(0) is the output category (for symbolic regression
+/// * `category(0)` is the output category (for symbolic regression
 ///   problems it is the output type of the xrff file, for classification
-///   problems it is the \a numeric type).
+///   problems it is the `numeric` type).
 ///
 /// \warning
 /// To date:
@@ -729,7 +727,7 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 ///            further details).
 /// \return number of lines parsed (0 in case of errors).
 ///
-/// Loads the content of \a f into the active dataset.
+/// Loads the content of `f` into the active dataset.
 ///
 /// \warning
 /// * Training/valutation set must be loaded before test set.
@@ -803,7 +801,7 @@ bool data::debug() const
 
 ///
 /// \param[in] n the name of a weka domain.
-/// \return the internel id of the weka-domain \a n (`d_void` if it's
+/// \return the internel id of the weka-domain `n` (`d_void` if it's
 ///         unknown or not managed).
 ///
 domain_t data::from_weka(const std::string &n)

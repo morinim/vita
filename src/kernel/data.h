@@ -43,31 +43,28 @@ public:  // Structures
 private:
   using examples_t = std::vector<example>;
 
-public:  // Iterators
-  /// example *
-  using iterator = typename examples_t::iterator;
-  /// const example *
-  using const_iterator = typename examples_t::const_iterator;
-
-  enum dataset_t {training = 0, validation, test, k_sup_dataset};
-
-public:  // Construction, convenience
+public:
   data();
   explicit data(const std::string &, unsigned = 0);
 
-  void dataset(dataset_t);
-  dataset_t dataset() const;
-  void slice(std::size_t);
+  // Iterators
+  using iterator = typename examples_t::iterator;
+  using const_iterator = typename examples_t::const_iterator;
 
   iterator begin();
   const_iterator begin() const;
   iterator end();
   const_iterator end() const;
-  std::size_t size() const;
-  std::size_t size(dataset_t) const;
 
+  // Convenience
   std::size_t open(const std::string &, unsigned = 0);
   bool operator!() const;
+
+  enum dataset_t {training = 0, validation, test, k_sup_dataset};
+
+  void dataset(dataset_t);
+  dataset_t dataset() const;
+  void slice(std::size_t);
 
   void clear();
 
@@ -77,6 +74,9 @@ public:  // Construction, convenience
   const category_set &categories() const;
 
   const column &get_column(unsigned) const;
+
+  std::size_t size() const;
+  std::size_t size(dataset_t) const;
 
   unsigned classes() const;
   unsigned columns() const;
@@ -97,40 +97,40 @@ private: // Private support methods
   void swap_category(category_t, category_t);
 
 private:  // Private data members
-  /// Integer are simpler to manage than textual data, so, when appropriate,
-  /// input strings are converted into integers by these maps (and the `encode`
-  /// static function).
+  // Integer are simpler to manage than textual data, so, when appropriate,
+  // input strings are converted into integers by these maps (and the `encode`
+  // static function).
   std::map<std::string, class_t> classes_map_;
 
-  /// How is the dataset organized? Sometimes we have a dataset header (XRFF
-  /// file format), other times it has to be implicitly derived (e.g. CSV).
+  // How is the dataset organized? Sometimes we have a dataset header (XRFF
+  // file format), other times it has to be implicitly derived (e.g. CSV).
   std::vector<column> header_;
 
-  /// What are the categories we are dealing with?
+  // What are the categories we are dealing with?
   category_set categories_;
 
-  /// Data are stored in three datasets:
-  /// * a training set used directly for learning;
-  /// * a validation set for controlling overfitting and measuring the
-  ///   performance of an individual;
-  /// * a test set for a forecast of how well an individual will do in the
-  ///   real world.
-  /// We don't validate on the training data because that would overfit the
-  /// model. We don't stop at the validation step because we've iteratively
-  /// been adjusting things to get a winner in the validation step. So we need
-  /// an independent test to have an idea of how well we'll do outside the
-  /// current arena.
-  /// The user provides a dataset and (optionally) a test set. Training set
-  /// and validation set are automatically created from the dataset
-  /// (see environment::validation_ratio).
+  // Data are stored in three datasets:
+  // * a training set used directly for learning;
+  // * a validation set for controlling overfitting and measuring the
+  //   performance of an individual;
+  // * a test set for a forecast of how well an individual will do in the
+  //   real world.
+  // We don't validate on the training data because that would overfit the
+  // model. We don't stop at the validation step because we've iteratively
+  // been adjusting things to get a winner in the validation step. So we need
+  // an independent test to have an idea of how well we'll do outside the
+  // current arena.
+  // The user provides a dataset and (optionally) a test set. Training set
+  // and validation set are automatically created from the dataset
+  // (see environment::validation_ratio).
   std::vector<examples_t> dataset_;
 
-  /// Used to keep track of subset of the dataset.
+  // Used to keep track of subset of the dataset.
   std::vector<std::size_t> slice_;
 
-  /// Used to choose the data we want to operate on (training / validation
-  /// set).
-  /// begin(), end() and size() methods operate on the selected set.
+  // Used to choose the data we want to operate on (training / validation
+  // set).
+  // begin(), end() and size() methods operate on the selected set.
   dataset_t active_dataset_;
 };
 
