@@ -26,13 +26,11 @@ namespace
 {
 ///
 /// \param[in] s the string to be converted.
-/// \param[in] d what type should \a s be converted in?
-/// \return the converted data.
+/// \param[in] d what type should `s` be converted in?
+/// \return the converted data or an empty `any` if no conversion can be
+///         applied.
 ///
 ///     convert("123.1", sym_double) == any(123.1f)
-///
-/// \exception std::invalid_argument
-/// if no conversion could be performed.
 ///
 any convert(const std::string &s, domain_t d)
 {
@@ -48,7 +46,7 @@ any convert(const std::string &s, domain_t d)
 
 ///
 /// \param[in] s the string to be tested.
-/// \return `true` if \a s contains a number.
+/// \return `true` if `s` contains a number.
 ///
 bool is_number(const std::string &s)
 {
@@ -80,7 +78,7 @@ data::data() : classes_map_(), header_(), categories_(),
 /// \param[in] verbosity verbosity level (see environment::verbosity for
 ///            further details).
 ///
-/// New data instance containing the learning collection from \a filename.
+/// New data instance containing the learning collection from `filename`.
 ///
 data::data(const std::string &filename, unsigned verbosity) : data()
 {
@@ -382,86 +380,6 @@ std::string data::class_name(class_t i) const
 }
 
 ///
-/// \param[in] line line to be parsed.
-/// \param[in] delimiter separator character for fields.
-/// \param[in] trimws if `true` trims leading and trailing spaces adjacent to
-///                   commas (this practice is contentious and in fact is
-///                   specifically prohibited by RFC 4180, which states,
-///                   "Spaces are considered part of a field and should not be
-///                   ignored."
-/// \return a vector where each element is a field of the CSV line.
-///
-/// This function parses a line of data by a delimiter. If you pass in a
-/// comma as your delimiter it will parse out a Comma Separated Value (CSV)
-/// file. If you pass in a '\t' char it will parse out a tab delimited file
-/// (.txt or .tsv). CSV files often have commas in the actual data, but
-/// accounts for this by surrounding the data in quotes. This also means the
-/// quotes need to be parsed out, this function accounts for that as well.
-/// The only (known) problem with this code, is that the definition of a csv
-/// (http://en.wikipedia.org/wiki/Comma-separated_values) allows for the
-/// newline character '\n' to be part of a csv field if the field is
-/// surrounded by quotes. The csvline function takes care of this properly,
-/// but the data::open function, which calls csvline, doesn't handle it. Most
-/// CSV files do not have a \n in the middle of the field, so it is usually
-/// not worth worrying about.
-/// This is a slightly modified version of the function at
-/// <http://www.zedwood.com/article/112/cpp-csv-parser>.
-/// Escaped List Separator class from Boost C++ libraries is also very nice
-/// and efficient for parsing, but it is not as easily applied.
-///
-std::vector<std::string> data::csvline(const std::string &line, char delimiter,
-                                       bool trimws)
-{
-  std::vector<std::string> record;  // the return value
-
-  const char quote('"');
-
-  bool inquotes(false);
-  std::string curstring;
-
-  for (auto length(line.length()), pos(decltype(length){0});
-       pos < length && line[pos];)
-  {
-    const char c(line[pos]);
-
-    if (!inquotes && !curstring.length() && c == quote)  // begin quote char
-      inquotes = true;
-    else if (inquotes && c == quote)
-    {
-      if (pos + 1 < length && line[pos + 1] == quote)  // quote char
-      {
-        // Encountered 2 double quotes in a row (resolves to 1 double quote).
-        curstring.push_back(c);
-        ++pos;
-      }
-      else  // end quote char
-        inquotes = false;
-    }
-    else if (!inquotes && c == delimiter)  // end of field
-    {
-      record.push_back(curstring);
-      curstring = "";
-    }
-    else if (!inquotes && (c == '\r' || c == '\n'))
-      break;
-    else
-      curstring.push_back(c);
-
-    ++pos;
-  }
-
-  assert(!inquotes);
-
-  record.push_back(curstring);
-
-  if (trimws)
-    for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
-      trim(record[i]);
-
-  return record;
-}
-
-///
 /// \param[in] c1 a category.
 /// \param[in] c2 a category.
 ///
@@ -668,7 +586,11 @@ std::size_t data::load_xrff(const std::string &filename)
 /// (https://developers.google.com/prediction/docs/developer-guide?hl=it#data-format):
 /// * NO HEADER ROW is allowed;
 /// * only one example is allowed per line. A single example cannot contain
-///   newlines and cannot span multiple lines;
+///   newlines and cannot span multiple lines.
+///   Note than CSV standard (e.g.
+///   http://en.wikipedia.org/wiki/Comma-separated_values) allows for the
+///   newline character `\n` to be part of a csv field if the field is
+///   surrounded by quotes;
 /// * columns are separated by commas. Commas inside a quoted string are not
 ///   column delimiters;
 /// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
@@ -712,7 +634,7 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
   std::string line;
   while (std::getline(from, line))
   {
-    const auto record(csvline(line));
+    const auto record(parse_csvline(line));
     const auto fields(record.size());
 
     // If we don't know the dataset format, the first line will be used to

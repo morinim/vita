@@ -21,6 +21,12 @@
 
 namespace vita
 {
+bool iequals(const std::string &, const std::string &);
+std::vector<std::string> parse_csvline(const std::string &, char = ',',
+                                       bool = false);
+
+std::string trim(const std::string &);
+
 ///
 /// An implementation of `make_unique()` as proposed by Herb Sutter in
 /// GotW #102.
@@ -153,12 +159,12 @@ class infix_iterator : public std::iterator<std::output_iterator_tag, void,
                                             void, void, void>
 {
 public:  // Type alias
-  using char_type = C;
-  using traits_type = traits;
+  using char_type    = C;
+  using traits_type  = traits;
   using ostream_type = std::basic_ostream<C, traits>;
 
 public:
-  explicit infix_iterator(ostream_type &s, C const *d = nullptr)
+  explicit infix_iterator(ostream_type &s, const C *d = nullptr)
     : os_(&s), delimiter_(d), first_elem_(true)
   {}
 
@@ -180,7 +186,7 @@ public:
 
 private:
   std::basic_ostream<C, traits> *os_;
-  C const *delimiter_;
+  const C *delimiter_;
   bool first_elem_;
 };  // class infix_iterator
 
@@ -265,34 +271,6 @@ bool load_float_from_stream(std::istream &in, T *i)
                >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
                >> *i);
 }
-
-///
-/// \param[in] s the input string.
-/// \return a copy of `s` with spaces removed on both sides of the string.
-///
-inline std::string trim(const std::string &s)
-{
-  auto ws_front = std::find_if_not(s.begin(), s.end(),
-                                   [](int c) {return std::isspace(c); });
-  auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
-                                  [](int c){return std::isspace(c); }).base();
-
-  return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
-}
-
-///
-/// \param[in] s1 first term of comparison
-/// \param[in] s2 second term of comparison
-/// \return `true` if all elements in both strings are same (case
-///         insensitively).
-///
-inline bool iequals(const std::string &s1, const std::string &s2)
-{
-  return std::equal(
-    s1.begin(), s1.end(), s2.begin(),
-    [](int c1, int c2) { return std::tolower(c1) == std::tolower(c2); });
-}
-
 }  // namespace vita
 
 #endif  // Include guard

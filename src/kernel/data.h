@@ -90,8 +90,6 @@ public:  // Construction, convenience
 
 private: // Private support methods
   class_t encode(const std::string &);
-  static std::vector<std::string> csvline(const std::string &, char = ',',
-                                          bool = false);
 
   std::size_t load_csv(const std::string &, unsigned);
   std::size_t load_xrff(const std::string &);
@@ -100,7 +98,7 @@ private: // Private support methods
 
 private:  // Private data members
   /// Integer are simpler to manage than textual data, so, when appropriate,
-  /// input strings are converted into integers by these maps (and the encode
+  /// input strings are converted into integers by these maps (and the `encode`
   /// static function).
   std::map<std::string, class_t> classes_map_;
 
