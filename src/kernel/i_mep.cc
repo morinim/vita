@@ -396,8 +396,9 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 ///
 hash_t i_mep::hash() const
 {
-  if (empty())
-    return hash_t();
+  assert(size());
+  //if (empty())
+  //  return hash_t();
 
   // From an individual to a packed byte stream...
   thread_local std::vector<unsigned char> packed;
