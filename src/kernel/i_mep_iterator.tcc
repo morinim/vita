@@ -37,9 +37,8 @@ public:
   const_iterator() : loci_(), ind_(nullptr) {}
 
   /// \param[in] id an individual.
-  explicit const_iterator(const i_mep &id) : ind_(&id)
+  explicit const_iterator(const i_mep &id) : loci_({id.best_}), ind_(&id)
   {
-    loci_.insert(id.best_);
   }
 
   /// \return locus of the next active symbol.
