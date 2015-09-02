@@ -589,7 +589,7 @@ std::size_t data::load_xrff(const std::string &filename)
 ///   http://en.wikipedia.org/wiki/Comma-separated_values) allows for the
 ///   newline character `\n` to be part of a csv field if the field is
 ///   surrounded by quotes;
-/// * columns are separated by commas. Commas inside a quoted string are not
+/// * columns are separated by commas. Commas inside a quoted string aren't
 ///   column delimiters;
 /// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
 ///   example. If the first column is numeric, this model is a REGRESSION
@@ -618,8 +618,7 @@ std::size_t data::load_xrff(const std::string &filename)
 ///       Numbers: "2", "12", "236"
 ///       Strings: "2 12", "a 23"
 ///
-/// \note
-/// Test set can have an empty output value.
+/// \note Test set can have an empty output value.
 ///
 std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 {
@@ -629,10 +628,8 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 
   bool classification(false), format(columns());
 
-  std::string line;
-  while (std::getline(from, line))
+  for (auto record : csv_parser(from))
   {
-    const auto record(parse_csvline(line));
     const auto fields(record.size());
 
     // If we don't know the dataset format, the first line will be used to
@@ -667,55 +664,55 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
       format = true;
     }  // if (!format)
 
-    if (fields == columns())
-    {
-      example instance;
+    if (fields != columns())  // skip lines with wrong number of columns
+      continue;
 
-      for (auto field(decltype(fields){0}); field < fields; ++field)
-        try
+    example instance;
+
+    for (auto field(decltype(fields){0}); field < fields; ++field)
+      try
+      {
+        const category_t c(header_[field].category_id);
+        const domain_t d(categories_.find(c).domain);
+
+        const auto value(record[field]);
+
+        if (field == 0)  // output value
         {
-          const category_t c(header_[field].category_id);
-          const domain_t d(categories_.find(c).domain);
-
-          const auto value(record[field]);
-
-          if (field == 0)  // output value
+          if (value.empty())
           {
-            if (value.empty())
-            {
-              assert(dataset() == test);
-              // For test set the output class/value could be missing (e.g.
-              // for kaggle.com competition test set).
-            }
+            assert(dataset() == test);
+            // For test set the output class/value could be missing (e.g.
+            // for kaggle.com competition test set).
+          }
+          else
+          {
+            if (classification)
+              instance.output = encode(value);
             else
             {
-              if (classification)
-                instance.output = encode(value);
-              else
-              {
-                instance.output = convert(value, d);
-                instance.d_output = d;
-              }
+              instance.output = convert(value, d);
+              instance.d_output = d;
             }
           }
-          else  // input value
-          {
-            instance.input.push_back(convert(value, d));
-            if (d == domain_t::d_string)
-              categories_.add_label(c, value);
-          }
         }
-        catch(std::invalid_argument &)
+        else  // input value
         {
-          instance.clear();
-          continue;
+          instance.input.push_back(convert(value, d));
+          if (d == domain_t::d_string)
+            categories_.add_label(c, value);
         }
+      }
+      catch(std::invalid_argument &)
+      {
+        instance.clear();
+        continue;
+      }
 
-      if (instance.input.size() + 1 == columns())
-        dataset_[dataset()].push_back(instance);
-      else if (verbosity >= 2)
-        std::cout << k_s_warning << " [" << line << "] skipped\n";
-    }
+    if (instance.input.size() + 1 == columns())
+      dataset_[dataset()].push_back(instance);
+    else if (verbosity >= 2)
+      std::cout << k_s_warning << " Line " << size() << " skipped\n";
   }
 
   return debug() ? size() : static_cast<std::size_t>(0);

@@ -15,16 +15,13 @@
 
 #include <algorithm>
 #include <iomanip>
-#include <iostream>
+#include <fstream>
 
 #include "kernel/vita.h"
 
 namespace vita
 {
 bool iequals(const std::string &, const std::string &);
-std::vector<std::string> parse_csvline(const std::string &, char = ',',
-                                       bool = false);
-
 std::string trim(const std::string &);
 
 ///
@@ -271,6 +268,109 @@ bool load_float_from_stream(std::istream &in, T *i)
                >> std::setprecision(std::numeric_limits<T>::digits10 + 1)
                >> *i);
 }
+
+///
+/// \brief Simple parser for CSV files
+///
+/// \warning The class doesn't support multi-line fields
+///
+class csv_parser
+{
+public:
+  explicit csv_parser(std::istream &is, char delim = ',', bool t_ws = false)
+    : is_(&is), delimiter_(delim), trim_ws_(t_ws)
+  {}
+
+  csv_parser &delimiter(char delim)
+  {
+    delimiter_ = delim;
+    return *this;
+  }
+
+  csv_parser &trim_ws(bool t)
+  {
+    trim_ws_ = t;
+    return *this;
+  }
+
+  class const_iterator;
+  const_iterator begin() const;
+  const_iterator end() const;
+
+private:
+  std::istream *is_;
+  char delimiter_;
+  bool trim_ws_;
+};  // class csv_parser
+
+///
+/// \brief A forward iterator for CSV records
+///
+class csv_parser::const_iterator
+{
+public:
+  using iterator_category = std::forward_iterator_tag;
+  using difference_type = std::ptrdiff_t;
+  using value_type = std::vector<std::string>;
+  using pointer = value_type *;
+  using const_pointer = const value_type *;
+  using reference = value_type &;
+  using const_reference = const value_type &;
+
+  /// \brief Builds an empty iterator
+  ///
+  /// Empty iterator is used as sentry (it is the value returned by end()).
+  const_iterator() : ptr_(nullptr), delimiter_(','), trim_ws_(false), value_()
+  {}
+
+  /// \param[in] is an input stream.
+  const_iterator(std::istream &is, char delim, bool trim)
+    : ptr_(&is), delimiter_(delim), trim_ws_(trim), value_(get_input())
+  {}
+
+  /// \return an iterator pointing to the next record of the CSV file.
+  const_iterator &operator++()
+  {
+    value_ = get_input();
+    return *this;
+  }
+
+  /// \return reference to the current record of the CSV file.
+  const_reference operator*() const { return value_; }
+
+  /// \return pointer to the current record of the CSV file.
+  const_pointer operator->() const { return &operator*(); }
+
+  /// \param[in] lhs first term of comparison.
+  /// \param[in] rhs second term of comparison.
+  ///
+  /// Returns `true` if iterators point to the same line.
+  friend bool operator==(const const_iterator &lhs, const const_iterator &rhs)
+  {
+    return lhs.ptr_ == rhs.ptr_ && lhs.value_ == rhs.value_ &&
+           (!lhs.ptr_ || lhs.ptr_->tellg() == rhs.ptr_->tellg());
+  }
+
+  friend bool operator!=(const const_iterator &lhs, const const_iterator &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+private:
+  static value_type parse_line(const std::string &, char, bool);
+  value_type get_input();
+
+  // Data members MUST BE INITIALIZED IN THE CORRECT ORDER:
+  // * `value_` is initialized via the `get_input` member function
+  // * `get_input` works only if `_ptr`, `delimiter_` and `value_` are already
+  //   initialized
+  // So `value_` is the last value to be initialized.
+  std::istream *ptr_;
+  char delimiter_;
+  bool trim_ws_;
+  value_type value_;
+};  // class csv_parser::const_iterator
+
 }  // namespace vita
 
 #endif  // Include guard

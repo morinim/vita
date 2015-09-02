@@ -28,6 +28,49 @@ bool iequals(const std::string &s1, const std::string &s2)
 }
 
 ///
+/// \param[in] s the input string.
+/// \return a copy of `s` with spaces removed on both sides of the string.
+///
+std::string trim(const std::string &s)
+{
+  auto ws_front = std::find_if_not(s.begin(), s.end(),
+                                   [](int c) {return std::isspace(c); });
+  auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
+                                  [](int c){return std::isspace(c); }).base();
+
+  return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
+}
+
+///
+/// \return an iterator to the first record of the CSV file.
+///
+csv_parser::const_iterator csv_parser::begin() const
+{
+  return *is_ ? const_iterator(*is_, delimiter_, trim_ws_) : end();
+}
+
+///
+/// \return an iterator used as sentry value to stop a cycle.
+///
+csv_parser::const_iterator csv_parser::end() const
+{
+  return const_iterator();
+}
+
+///
+/// \return the next record of the CSV file.
+///
+csv_parser::const_iterator::value_type csv_parser::const_iterator::get_input()
+{
+  std::string line;
+  if (ptr_ && std::getline(*ptr_, line))
+    return parse_line(line, delimiter_, trim_ws_);
+
+  *this = const_iterator();
+  return value_;
+}
+
+///
 /// \param[in] line line to be parsed.
 /// \param[in] delimiter separator character for fields.
 /// \param[in] trimws if `true` trims leading and trailing spaces adjacent to
@@ -46,16 +89,18 @@ bool iequals(const std::string &s1, const std::string &s2)
 ///
 /// \note
 /// This is a slightly modified version of the function at
-/// <http://www.zedwood.com/article/112/cpp-csv-parser>.
+/// <http://www.zedwood.com/article/112/cpp-csv-parser>. A simpler
+/// implementation is <http://stackoverflow.com/a/1120224/3235496> (but it
+/// *doesn't escape comma and newline*).
 ///
 /// \note
 /// Escaped List Separator class from Boost C++ libraries is also very nice
 /// and efficient for parsing, but it isn't as easily applied.
 ///
-std::vector<std::string> parse_csvline(const std::string &line, char delimiter,
-                                       bool trimws)
+csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
+  const std::string &line, char delimiter, bool trimws)
 {
-  std::vector<std::string> record;  // the return value
+  value_type record;  // the return value
 
   const char quote('"');
 
@@ -102,20 +147,6 @@ std::vector<std::string> parse_csvline(const std::string &line, char delimiter,
       trim(record[i]);
 
   return record;
-}
-
-///
-/// \param[in] s the input string.
-/// \return a copy of `s` with spaces removed on both sides of the string.
-///
-std::string trim(const std::string &s)
-{
-  auto ws_front = std::find_if_not(s.begin(), s.end(),
-                                   [](int c) {return std::isspace(c); });
-  auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
-                                  [](int c){return std::isspace(c); }).base();
-
-  return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
 }
 
 }  // namespace vita
