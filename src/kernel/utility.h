@@ -277,19 +277,39 @@ bool load_float_from_stream(std::istream &in, T *i)
 class csv_parser
 {
 public:
-  explicit csv_parser(std::istream &is, char delim = ',', bool t_ws = false)
-    : is_(&is), delimiter_(delim), trim_ws_(t_ws)
+  using value_type = std::vector<std::string>;
+  using filter_hook_t = bool (*)(const value_type &);
+
+  explicit csv_parser(std::istream &is)
+    : is_(&is), filter_hook_(nullptr), delimiter_(','), trim_ws_(false)
   {}
 
+  /// \param[in] delim separator character for fields.
+  /// \return a reference to `this` object (fluent interface).
   csv_parser &delimiter(char delim)
   {
     delimiter_ = delim;
     return *this;
   }
 
+  /// \param[in] t if `true` trims leading and trailing spaces adjacent to
+  ///              commas (this practice is contentious and in fact is
+  ///              specifically prohibited by RFC 4180, which states: "Spaces
+  ///              are considered part of a field and should not be ignored.").
+  /// \return a reference to `this` object (fluent interface).
   csv_parser &trim_ws(bool t)
   {
     trim_ws_ = t;
+    return *this;
+  }
+
+  /// \param[in] filter a filter function for CSV records.
+  /// \return a reference to `this` object (fluent interface).
+  ///
+  /// \note A filter function returns `true` for records to be keep.
+  csv_parser &filter_hook(filter_hook_t filter)
+  {
+    filter_hook_ = filter;
     return *this;
   }
 
@@ -299,6 +319,8 @@ public:
 
 private:
   std::istream *is_;
+
+  filter_hook_t filter_hook_;
   char delimiter_;
   bool trim_ws_;
 };  // class csv_parser
@@ -311,27 +333,26 @@ class csv_parser::const_iterator
 public:
   using iterator_category = std::forward_iterator_tag;
   using difference_type = std::ptrdiff_t;
-  using value_type = std::vector<std::string>;
+  using value_type = csv_parser::value_type;
   using pointer = value_type *;
   using const_pointer = const value_type *;
   using reference = value_type &;
   using const_reference = const value_type &;
 
-  /// \brief Builds an empty iterator
-  ///
-  /// Empty iterator is used as sentry (it is the value returned by end()).
-  const_iterator() : ptr_(nullptr), delimiter_(','), trim_ws_(false), value_()
-  {}
-
-  /// \param[in] is an input stream.
-  const_iterator(std::istream &is, char delim, bool trim)
-    : ptr_(&is), delimiter_(delim), trim_ws_(trim), value_(get_input())
-  {}
+  const_iterator(std::istream *is = nullptr,
+                 csv_parser::filter_hook_t f = nullptr,
+                 char delim = ',', bool trim = false)
+    : ptr_(is), filter_hook_(f), delimiter_(delim), trim_ws_(trim),
+      value_({})
+  {
+    if (ptr_)
+      get_input();
+  }
 
   /// \return an iterator pointing to the next record of the CSV file.
   const_iterator &operator++()
   {
-    value_ = get_input();
+    get_input();
     return *this;
   }
 
@@ -357,15 +378,16 @@ public:
   }
 
 private:
-  static value_type parse_line(const std::string &, char, bool);
-  value_type get_input();
+  value_type parse_line(const std::string &);
+  void get_input();
 
   // Data members MUST BE INITIALIZED IN THE CORRECT ORDER:
   // * `value_` is initialized via the `get_input` member function
   // * `get_input` works only if `_ptr`, `delimiter_` and `value_` are already
   //   initialized
-  // So `value_` is the last value to be initialized.
+  // So it's important that `value_` is the last value to be initialized.
   std::istream *ptr_;
+  csv_parser::filter_hook_t filter_hook_;
   char delimiter_;
   bool trim_ws_;
   value_type value_;

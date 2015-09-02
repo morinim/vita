@@ -46,7 +46,8 @@ std::string trim(const std::string &s)
 ///
 csv_parser::const_iterator csv_parser::begin() const
 {
-  return *is_ ? const_iterator(*is_, delimiter_, trim_ws_) : end();
+  return *is_ ? const_iterator(is_, filter_hook_, delimiter_, trim_ws_)
+              : end();
 }
 
 ///
@@ -60,24 +61,32 @@ csv_parser::const_iterator csv_parser::end() const
 ///
 /// \return the next record of the CSV file.
 ///
-csv_parser::const_iterator::value_type csv_parser::const_iterator::get_input()
+void csv_parser::const_iterator::get_input()
 {
-  std::string line;
-  if (ptr_ && std::getline(*ptr_, line))
-    return parse_line(line, delimiter_, trim_ws_);
+  enum class get_input_fail {missing_istream, eof};
 
-  *this = const_iterator();
-  return value_;
+  try
+  {
+    if (!ptr_)
+      throw get_input_fail::missing_istream;
+
+    do
+    {
+      std::string line;
+      if (!std::getline(*ptr_, line))
+        throw get_input_fail::eof;
+
+      value_ = parse_line(line);
+    } while (filter_hook_ && !filter_hook_(value_));
+  }
+  catch (get_input_fail)
+  {
+    *this = const_iterator();
+  }
 }
 
 ///
 /// \param[in] line line to be parsed.
-/// \param[in] delimiter separator character for fields.
-/// \param[in] trimws if `true` trims leading and trailing spaces adjacent to
-///                   commas (this practice is contentious and in fact is
-///                   specifically prohibited by RFC 4180, which states,
-///                   "Spaces are considered part of a field and should not be
-///                   ignored.").
 /// \return a vector where each element is a field of the CSV line.
 ///
 /// This function parses a line of data by a delimiter. If you pass in a
@@ -98,7 +107,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::get_input()
 /// and efficient for parsing, but it isn't as easily applied.
 ///
 csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
-  const std::string &line, char delimiter, bool trimws)
+  const std::string &line)
 {
   value_type record;  // the return value
 
@@ -125,7 +134,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
       else  // end quote char
         inquotes = false;
     }
-    else if (!inquotes && c == delimiter)  // end of field
+    else if (!inquotes && c == delimiter_)  // end of field
     {
       record.push_back(curstring);
       curstring = "";
@@ -142,7 +151,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
 
   record.push_back(curstring);
 
-  if (trimws)
+  if (trim_ws_)
     for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
       trim(record[i]);
 

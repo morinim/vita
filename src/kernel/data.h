@@ -91,7 +91,8 @@ public:
 private: // Private support methods
   class_t encode(const std::string &);
 
-  std::size_t load_csv(const std::string &, unsigned);
+  std::size_t load_csv(const std::string &, csv_parser::filter_hook_t filter,
+                       unsigned);
   std::size_t load_xrff(const std::string &);
 
   void swap_category(category_t, category_t);
@@ -130,7 +131,7 @@ private:  // Private data members
 
   // Used to choose the data we want to operate on (training / validation
   // set).
-  // begin(), end() and size() methods operate on the selected set.
+  // begin(), end() and size() methods operate on the `active_dataset`.
   dataset_t active_dataset_;
 };
 

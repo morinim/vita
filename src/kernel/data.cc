@@ -576,6 +576,7 @@ std::size_t data::load_xrff(const std::string &filename)
 
 ///
 /// \param[in] filename the csv file.
+/// \param[in] filter a filter function to select a subset of the records.
 /// \param[in] verbosity verbosity level (see environment::verbosity for
 ///            further details).
 /// \return number of lines parsed (0 in case of errors).
@@ -620,7 +621,8 @@ std::size_t data::load_xrff(const std::string &filename)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
+std::size_t data::load_csv(const std::string &filename,
+                           csv_parser::filter_hook_t filter, unsigned verbosity)
 {
   std::ifstream from(filename);
   if (!from)
@@ -628,7 +630,7 @@ std::size_t data::load_csv(const std::string &filename, unsigned verbosity)
 
   bool classification(false), format(columns());
 
-  for (auto record : csv_parser(from))
+  for (auto record : csv_parser(from).filter_hook(filter))
   {
     const auto fields(record.size());
 
@@ -756,7 +758,7 @@ std::size_t data::open(const std::string &f, unsigned verbosity)
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
-  return xrff ? load_xrff(f) : load_csv(f, verbosity);
+  return xrff ? load_xrff(f) : load_csv(f, nullptr, verbosity);
 }
 
 ///
