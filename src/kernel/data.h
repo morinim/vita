@@ -60,6 +60,8 @@ public:
   std::size_t open(const std::string &, unsigned = 0);
   bool operator!() const;
 
+  void push_back(const example &);
+
   enum dataset_t {training = 0, validation, test, k_sup_dataset};
 
   void dataset(dataset_t);

@@ -345,6 +345,16 @@ unsigned data::variables() const
 }
 
 ///
+/// \brief Appends the given element to the end of the active dataset
+///
+/// \param[in] e the value of the element to append
+///
+void data::push_back(const example &e)
+{
+  dataset_[dataset()].push_back(e);
+}
+
+///
 /// \param[in] label name of a class of the learning collection.
 /// \return the (numerical) tag associated with class `label`.
 ///
@@ -569,7 +579,7 @@ std::size_t data::load_xrff(const std::string &filename)
 
     if (instance.input.size() + 1 == columns())
     {
-      dataset_[dataset()].push_back(instance);
+      push_back(instance);
       ++parsed;
     }
   }
@@ -715,7 +725,7 @@ std::size_t data::load_csv(const std::string &filename,
       }
 
     if (instance.input.size() + 1 == columns())
-      dataset_[dataset()].push_back(instance);
+      push_back(instance);
     else if (verbosity >= 2)
       std::cout << k_s_warning << " Line " << size() << " skipped\n";
   }
