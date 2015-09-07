@@ -26,7 +26,7 @@ const category category::null(0, {"", domain_t::d_void, {}});
 category::operator bool() const
 {
   return tag != null.tag || name != null.name || domain != null.domain ||
-    labels != null.labels;
+         labels != null.labels;
 }
 
 ///
@@ -70,6 +70,7 @@ category_set::const_iterator category_set::end() const
 ///     </attribute>
 ///     <attribute name="sepallength" type="numeric" />
 ///     ...
+///
 /// It has a nominal attribute to describe output classes and four numeric
 /// attributes as inputs. So there are two distinct attribute types
 /// (nominal and numeric), i.e. two categories.

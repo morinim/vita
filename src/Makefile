@@ -50,11 +50,11 @@ endif
 # Specifications Issue 7" and
 # <http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html>)
 INCPATH := ../src/ ./
-SYSTEMINCPATH := $(BOOST_INCLUDE)
+SYSTEMINCPATH := $(BOOST_INCLUDE) ./third_party/
 
 # -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN := --std=c++11 -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
+WARN := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
 ifeq ($(CXX), g++)
   WARN += -Wdouble-promotion -Wzero-as-null-pointer-constant
 endif
@@ -83,12 +83,12 @@ ifeq ($(TYPE), release)
   endif
 endif
 
-CXXFLAGS := -pipe -march=native $(TYPE_PARAM) $(WARN) $(DEFS)
+CXXFLAGS := -pipe -march=native --std=c++11 $(TYPE_PARAM) $(WARN) $(DEFS)
 LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
+KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc) third_party/tinyxml2/tinyxml2.cc
 KERNEL_OBJ := $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC := $(wildcard examples/*.cc)
 SR_SRC := $(wildcard sr/*.cc)
@@ -134,6 +134,12 @@ kernel: $(KERNEL_OBJ)
 ifeq ($(TYPE), release)
 	@strip kernel/libvita.a
 endif
+
+# Disable all warnings for TinyXML2
+third_party/tinyxml2/tinyxml2.o: third_party/tinyxml2/tinyxml2.cc
+	@echo Creating object file for $*...
+	$(COMPILE) -w -MMD -o $@ -c $<
+	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; $(RM) $*.d
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...

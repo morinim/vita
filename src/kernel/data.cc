@@ -13,11 +13,11 @@
 #include <algorithm>
 #include <vector>
 
-#include <boost/property_tree/xml_parser.hpp>
-
 #include "kernel/data.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
+
+#include "tinyxml2/tinyxml2.h"
 
 namespace vita
 {
@@ -439,78 +439,79 @@ std::size_t data::load_xrff(const std::string &filename)
 {
   assert(dataset() == training);
 
-  using boost::property_tree::ptree;
-  using boost::property_tree::read_xml;
-
-  ptree pt;
-  read_xml(filename, pt);
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_NO_ERROR)
+    return 0;
 
   unsigned n_output(0);
   bool classification(false);
 
   // Iterate over dataset.header.attributes selection and store all found
-  // attributes in the header vector. The get_child() function returns a
-  // reference to the child at the specified path; if there is no such child
-  // IT THROWS.
-  for (auto dha : pt.get_child("dataset.header.attributes"))
-    if (dha.first == "attribute")
+  // attributes in the header vector.
+  tinyxml2::XMLHandle handle(&doc);
+  auto *attributes = handle.FirstChildElement("dataset")
+                           .FirstChildElement("header")
+                           .FirstChildElement("attributes").ToElement();
+  if (!attributes)
+    return 0;
+
+  for (auto *attribute = attributes->FirstChildElement("attribute");
+       attribute;
+       attribute = attribute->NextSiblingElement("attribute"))
+  {
+    column a;
+
+    const char *s = attribute->Attribute("name");
+    if (s)
+      a.name = s;
+
+    // One can define which attribute should act as output value via the
+    // `class="yes"` attribute in the attribute specification of the header.
+    const bool output(attribute->Attribute("class", "yes"));
+
+    s = attribute->Attribute("type");
+    std::string xml_type(s ? s : "");
+
+    s = attribute->Attribute("category");
+    std::string category_name(s ? s : xml_type);
+
+    if (output)
     {
-      bool output(false);
+      ++n_output;
 
-      column a;
+      // We can manage only one output column.
+      if (n_output > 1)
+        return 0;
 
-      // In a ptree xml-attributes are just sub-elements of a special element
-      // <xmlattr>.
-      // Note that we don't have to provide the template parameter when it is
-      // deduced from the default value.
-      a.name = dha.second.get("<xmlattr>.name", "");
-
-      // One can define which attribute should act as output value via the
-      // class="yes" attribute in the attribute specification in the header.
-      output = dha.second.get("<xmlattr>.class", "no") == "yes";
-
-      auto xml_type(dha.second.get("<xmlattr>.type", ""));
-      auto category_name(dha.second.get("<xmlattr>.category", xml_type));
-
-      if (output)
+      // For classification problems we use discriminant functions, so the
+      // actual output type is always numeric.
+      classification = (xml_type == "nominal" || xml_type == "string");
+      if (classification)
       {
-        ++n_output;
+        xml_type = "numeric";
+        category_name = "numeric";
+      }
+    }
 
-        // We can manage only one output column.
-        if (n_output > 1)
-          return 0;
+    a.category_id = categories_.insert({category_name, from_weka(xml_type),
+                                        {}});
 
-        // For classification problems we use discriminant functions, so the
-        // actual output type is always numeric.
-        classification = (xml_type == "nominal" || xml_type == "string");
-        if (classification)
-        {
-          xml_type = "numeric";
-          category_name = "numeric";
-        }
+    // Store label1... labelN.
+    if (xml_type == "nominal")
+      for (auto *l = attribute->FirstChildElement("label");
+           l;
+           l = l->NextSiblingElement("label"))
+      {
+        const std::string label(l->GetText() ? l->GetText() : "");
+        categories_.add_label(a.category_id, label);
       }
 
-      a.category_id = categories_.insert({category_name, from_weka(xml_type),
-                                          {}});
-
-      if (xml_type == "nominal")
-        try
-        {
-          // Store label1... labelN.
-          for (auto l : dha.second.get_child("labels"))
-            if (l.first == "label")
-              categories_.add_label(a.category_id, l.second.data());
-        }
-        catch(...)
-        {
-        }
-
-      // Output column is always the first one.
-      if (output)
-        header_.insert(header_.begin(), a);
-      else
-        header_.push_back(a);
-    }
+    // Output column is always the first one.
+    if (output)
+      header_.insert(header_.begin(), a);
+    else
+      header_.push_back(a);
+  }
 
   // XRFF needs informations about the columns.
   if (!columns())
@@ -528,48 +529,50 @@ std::size_t data::load_xrff(const std::string &filename)
   swap_category(category_t(0), header_[0].category_id);
 
   unsigned parsed(0);
-  for (auto bi : pt.get_child("dataset.body.instances"))
-    if (bi.first == "instance")
+
+  auto *instances = handle.FirstChildElement("dataset")
+                          .FirstChildElement("body")
+                          .FirstChildElement("instances").ToElement();
+  if (!instances)
+    return 0;
+
+  for (auto *i = instances->FirstChildElement("instance");
+       i;
+       i = i->NextSiblingElement("instance"))
+  {
+    example instance;
+
+    unsigned index(0);
+    for (auto *v = i->FirstChildElement("value");
+         v;
+         v = v->NextSiblingElement("value"), ++index)
     {
-      example instance;
+      const auto domain(categories_.find(header_[index].category_id).domain);
 
-      unsigned index(0);
-      for (auto v(bi.second.begin()); v != bi.second.end(); ++v, ++index)
-        if (v->first == "value")
-          try
-          {
-            const auto domain(
-              categories_.find(header_[index].category_id).domain);
+      const std::string value(v->GetText() ? v->GetText() : "");
 
-            const std::string value(v->second.data());
-
-            if (index == 0)  // output value
-            {
-              // Strings could be used as label for classes, but integers
-              // are simpler and faster to manage (arrays instead of maps).
-              if (classification)
-                instance.output = encode(value);
-              else
-              {
-                instance.output = convert(value, domain);
-                instance.d_output = domain;
-              }
-            }
-            else  // input value
-              instance.input.push_back(convert(value, domain));
-          }
-          catch(std::invalid_argument &)
-          {
-            instance.clear();
-            continue;
-          }
-
-      if (instance.input.size() + 1 == columns())
+      if (index)  // input value
+        instance.input.push_back(convert(value, domain));
+      else  // output value
       {
-        dataset_[dataset()].push_back(instance);
-        ++parsed;
+        // Strings could be used as label for classes, but integers
+        // are simpler and faster to manage (arrays instead of maps).
+        if (classification)
+          instance.output = encode(value);
+        else
+        {
+          instance.output = convert(value, domain);
+          instance.d_output = domain;
+        }
       }
     }
+
+    if (instance.input.size() + 1 == columns())
+    {
+      dataset_[dataset()].push_back(instance);
+      ++parsed;
+    }
+  }
 
   return debug() ? parsed : 0;
 }
