@@ -274,6 +274,18 @@ bool load_float_from_stream(std::istream &in, T *i)
 ///
 /// \warning The class doesn't support multi-line fields
 ///
+/// \warning
+/// Usually, in C++, a fluent interface returns a **reference**.
+/// Here we return a **copy** of `this` object. The design decision is due to
+/// the fact that a `csv_parser' is a sort of Python generator and tends to
+/// be used in for loops.
+/// Users often write:
+/// `for (auto record : csv_parser(f).filter_hook(filter))`
+/// but it's broken (it only works if `filter_hook` returns by value).
+/// `csv_parser` is a lighweight parser and this shouldn't be a performance
+/// concern.
+/// See <http://stackoverflow.com/q/10593686/3235496>.
+///
 class csv_parser
 {
 public:
@@ -286,7 +298,7 @@ public:
 
   /// \param[in] delim separator character for fields.
   /// \return a reference to `this` object (fluent interface).
-  csv_parser &delimiter(char delim)
+  csv_parser delimiter(char delim)
   {
     delimiter_ = delim;
     return *this;
@@ -297,7 +309,7 @@ public:
   ///              specifically prohibited by RFC 4180, which states: "Spaces
   ///              are considered part of a field and should not be ignored.").
   /// \return a reference to `this` object (fluent interface).
-  csv_parser &trim_ws(bool t)
+  csv_parser trim_ws(bool t)
   {
     trim_ws_ = t;
     return *this;
@@ -308,17 +320,6 @@ public:
   ///
   /// \note A filter function returns `true` for records to be keep.
   ///
-  /// \warning
-  /// Usually, in C++, a fluent interface returns a **reference**.
-  /// Here we return a **copy** of `this` object. The design decision is due to
-  /// the fact that a `csv_parser' is a sort of Python generator and tends to
-  /// be used in for loops.
-  /// Users often write:
-  /// `for (auto record : csv_parser(f).filter_hook(filter))`
-  /// but this work only if `filter_hook` returns a copy
-  /// (see <http://stackoverflow.com/q/10593686/3235496>).
-  /// `csv_parser` is a lighweight parser and this shouldn't be a performance
-  /// concern.
   csv_parser filter_hook(filter_hook_t filter)
   {
     filter_hook_ = filter;
