@@ -307,7 +307,19 @@ public:
   /// \return a reference to `this` object (fluent interface).
   ///
   /// \note A filter function returns `true` for records to be keep.
-  csv_parser &filter_hook(filter_hook_t filter)
+  ///
+  /// \warning
+  /// Usually, in C++, a fluent interface returns a **reference**.
+  /// Here we return a **copy** of `this` object. The design decision is due to
+  /// the fact that a `csv_parser' is a sort of Python generator and tends to
+  /// be used in for loops.
+  /// Users often write:
+  /// `for (auto record : csv_parser(f).filter_hook(filter))`
+  /// but this work only if `filter_hook` returns a copy
+  /// (see <http://stackoverflow.com/q/10593686/3235496>).
+  /// `csv_parser` is a lighweight parser and this shouldn't be a performance
+  /// concern.
+  csv_parser filter_hook(filter_hook_t filter)
   {
     filter_hook_ = filter;
     return *this;
