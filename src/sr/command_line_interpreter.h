@@ -36,8 +36,8 @@ static std::vector<std::string> split_command_line(const std::string &input)
 {
   std::vector<std::string> result;
 
-  std::string::const_iterator i(input.cbegin());
-  const std::string::const_iterator e(input.cend());
+  auto i(input.cbegin());
+  const auto e(input.cend());
   while (i != e && std::isspace(*i))
     ++i;
 
@@ -84,7 +84,7 @@ static std::vector<std::string> split_command_line(const std::string &input)
           // Space outside quoted section terminate the current argument
           result.push_back(current);
           current.resize(0);
-          for (; i != e && isspace(*i); ++i)
+          for (; i != e && std::isspace(*i); ++i)
           {}
 
           --i;
@@ -124,6 +124,10 @@ public:
     while (std::getline(input_stream, command, '\n'))
     {
       handle_read_line(command);
+
+      if (command == "exit" || command == "EXIT")
+        return;
+
       std::cout << prompt_ << std::flush;
     }
   }
@@ -132,7 +136,7 @@ private:
   void handle_read_line(const std::string &line)
   {
     // huu, ugly...
-    std::vector<std::string> args(split_command_line(std::string("--") + line));
+    const auto args(split_command_line(std::string("--") + line));
 
     try
     {

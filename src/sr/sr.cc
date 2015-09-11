@@ -271,7 +271,7 @@ void elitism(const std::string &v)
 ///
 void environment(bool)
 {
-  std::cout << "NOT READY\n";
+  print.info("NOT READY");
 }
 
 ///
@@ -324,8 +324,6 @@ void evaluator(const std::string &v)
 void exit(bool)
 {
   print.output("Bye");
-
-  std::exit(EXIT_SUCCESS);
 }
 
 ///
@@ -380,7 +378,15 @@ void gwi(unsigned g)
 ///
 void help(bool)
 {
-  std::cout << cmdl_opt << '\n';
+  print.output(cmdl_opt);
+}
+
+///
+/// Shows the version header.
+///
+void version(bool)
+{
+  print.output(vita_sr_version1, '\n', vita_sr_version2);
 }
 
 ///
@@ -725,7 +731,8 @@ int parse_command_line(int argc, char *const argv[])
     // Declare a group of options that will be allowed only on command line.
     po::options_description generic("Generic");
     generic.add_options()
-      ("version,v", "print version string")
+      ("version,v", po::value<bool>()->zero_tokens()->notifier(&ui::version),
+       "print version string")
       ("help,h", po::value<bool>()->zero_tokens()->notifier(&ui::help),
        "produce the help message")
       ("quiet",
@@ -847,10 +854,7 @@ int parse_command_line(int argc, char *const argv[])
     notify(vm);
 
     if (vm.count("version"))
-    {
-      std::cout << vita_sr_version1 << '\n' << vita_sr_version2 << '\n';
       return -1;
-    }
 
     if (vm.count("help"))
       return -1;
@@ -867,7 +871,7 @@ int parse_command_line(int argc, char *const argv[])
 int main(int argc, char *const argv[])
 {
   std::cout.setf(std::ios::boolalpha);
-  std::cout << ui::header << '\n';
+  vita::print.output(ui::header);
 
   vita::src_problem problem;
   ui::problem = &problem;
