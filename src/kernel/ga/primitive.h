@@ -78,7 +78,16 @@ public:
   {
     const auto v(static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
 
-    return std::isnan(v) || v < min || v >= upp;
+    if (std::isnan(v))
+      return std::numeric_limits<double>::max();
+
+    if (v < min)
+      return min - v;
+
+    if (v >= upp)
+      return v - upp;
+
+    return 0.0;
   }
 
 private:  // Private data members

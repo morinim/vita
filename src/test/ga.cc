@@ -35,22 +35,26 @@ BOOST_AUTO_TEST_CASE(Penalty)
 {
   vita::i_ga ind(env);
   BOOST_REQUIRE(ind.debug());
-/*
+
   vita::interpreter<vita::i_ga> intr(&ind);
 
   BOOST_REQUIRE_EQUAL(intr.penalty(), 0);
 
   ind[0] = 20;
-  BOOST_REQUIRE_EQUAL(intr.penalty(), 1);
+  const auto p1(intr.penalty());
+  BOOST_REQUIRE_GT(p1, 0.0);
 
   ind[1] = 200;
-  BOOST_REQUIRE_EQUAL(intr.penalty(), 2);
+  const auto p2(intr.penalty());
+  BOOST_REQUIRE_GT(p2, p1);
 
   ind[2] = 2000;
-  BOOST_REQUIRE_EQUAL(intr.penalty(), 3);
+  const auto p3(intr.penalty());
+  BOOST_REQUIRE_GT(p3, p2);
 
   ind[3] = 20000;
-  BOOST_REQUIRE_EQUAL(intr.penalty(), 4);*/
+  const auto p4(intr.penalty());
+  BOOST_REQUIRE_GT(p4, p3);
 }
 
 BOOST_AUTO_TEST_CASE(Evaluator)
