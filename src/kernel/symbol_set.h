@@ -55,7 +55,7 @@ public:
   unsigned terminals(category_t) const;
 
   bool enough_terminals() const;
-  bool debug(bool) const;
+  bool debug() const;
 
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
@@ -73,7 +73,7 @@ private:  // Private data members.
   std::vector<std::unique_ptr<symbol>> symbols_;
 
   // A collection is a structured-view on symbols_ (the all_ variable) or on
-  // a subset of symbols_ (e.g. only on symbol of a specific category).
+  // a subset of symbols_ (e.g. only on symbols of a specific category).
   struct collection
   {
     collection();
@@ -86,7 +86,7 @@ private:  // Private data members.
     // The sum of the weights of all the symbols in the collection.
     unsigned sum;
 
-    bool debug(bool) const;
+    bool debug(std::string) const;
   } all_;
 
   // This struct contains all the symbols (`all_`) divided by category.
@@ -94,7 +94,7 @@ private:  // Private data members.
   {
     explicit by_category(const collection & = collection());
 
-    bool debug(bool) const;
+    bool debug() const;
 
     std::vector<collection> category;
   } by_;

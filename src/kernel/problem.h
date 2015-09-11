@@ -35,7 +35,7 @@ public:
 
   virtual void clear(bool);
 
-  virtual bool debug(bool) const;
+  virtual bool debug() const;
 
 public:
   environment env;

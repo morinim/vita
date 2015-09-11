@@ -24,7 +24,7 @@
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
 {
-  assert(debug(true));
+  assert(debug());
 }
 
 template<class T, template<class> class ES>
@@ -89,15 +89,14 @@ void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool search<T, ES>::debug(bool verbose) const
+bool search<T, ES>::debug() const
 {
-  if (!env_.debug(verbose, false))
+  if (!env_.debug(false))
     return false;
 
-  return debug_nvi(verbose);
+  return debug_nvi();
 }
 #endif  // Include guard

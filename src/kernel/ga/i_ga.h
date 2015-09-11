@@ -108,7 +108,7 @@ public:
   bool operator==(const i_ga &) const;
   unsigned distance(const i_ga &) const;
 
-  bool debug(bool = true) const;
+  bool debug() const;
 
 private:  // Private support methods
   hash_t hash() const;

@@ -80,7 +80,7 @@ public:
 
   const environment &env() const;
 
-  bool debug(bool = true) const;
+  bool debug() const;
 
   // Iterators.
   using members_t = std::vector<T>;

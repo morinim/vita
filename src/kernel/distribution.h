@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <map>
 
+#include "kernel/log.h"
 #include "kernel/utility.h"
 
 namespace vita
@@ -44,7 +45,7 @@ public:
   T standard_deviation() const;
   T variance() const;
 
-  bool debug(bool) const;
+  bool debug() const;
 
 public:   // Serialization
   bool load(std::istream &);

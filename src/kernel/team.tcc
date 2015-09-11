@@ -30,7 +30,7 @@ team<T>::team() : individuals_(), signature_()
 template<class T>
 team<T>::team(const environment &e) : signature_()
 {
-  assert(e.debug(true, true));
+  assert(e.debug(true));
   assert(e.team.individuals);
   assert(e.sset);
 
@@ -291,10 +291,10 @@ const environment &team<T>::env() const
 /// \return `true` if the team passes the internal consistency check.
 ///
 template<class T>
-bool team<T>::debug(bool verbose) const
+bool team<T>::debug() const
 {
   for (const auto &i : individuals_)
-    if (!i.debug(verbose))
+    if (!i.debug())
       return false;
 
   return signature_.empty() || signature_ == hash();

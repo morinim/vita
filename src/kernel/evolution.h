@@ -45,7 +45,7 @@ public:
 
   const summary<T> &run(unsigned);
 
-  bool debug(bool) const;
+  bool debug() const;
 
 private:  // Private support methods
   const environment &env() const { return pop_.env(); }

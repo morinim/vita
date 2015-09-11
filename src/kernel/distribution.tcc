@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -271,11 +271,10 @@ bool distribution<T>::load(std::istream &in)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool distribution<T>::debug(bool verbose) const
+bool distribution<T>::debug() const
 {
   // This way, for "regular" types we'll use std::infinite / std::isnan
   // ("taken in" by the using statement), while for our types the overload
@@ -285,24 +284,19 @@ bool distribution<T>::debug(bool verbose) const
 
   if (count() && isfinite(min()) && isfinite(mean()) && min() > mean())
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Distribution: min=" << min() << " > mean="
-                << mean() << ".\n";
+    print.error("Distribution: min=", min(), " > mean=", mean());
     return false;
   }
 
   if (count() && isfinite(max()) && isfinite(mean()) && max() < mean())
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Distribution: max=" << max() << " < mean="
-                << mean() << ".\n";
+    print.error("Distribution: max=", max(), " < mean=", mean());
     return false;
   }
 
   if (count() && (isnan(variance()) || !isnonnegative(variance())))
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Distribution: negative variance.\n";
+    print.error("Distribution: negative variance");
     return false;
   }
 

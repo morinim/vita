@@ -48,11 +48,9 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
       std::numeric_limits<decltype(g_without_improvement)>::max();
     arl = trilean::no;
     validation_percentage = 20;
-
-    assert(debug(true, true));
   }
-  else
-    assert(debug(true, false));
+
+  assert(debug(initialize));
 }
 
 ///
@@ -95,204 +93,172 @@ void environment::log(boost::property_tree::ptree *const pt,
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \param force_defined all the optional parameter have to be in a
 ///                      'well defined' state for the function to pass
 ///                      the test.
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool environment::debug(bool verbose, bool force_defined) const
+bool environment::debug(bool force_defined) const
 {
   if (force_defined)
   {
     if (!code_length)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined code_length data member\n";
+      print.error("Undefined code_length data member");
       return false;
     }
 
     if (!patch_length)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined patch_length data member\n";
+      print.error("Undefined patch_length data member");
       return false;
     }
 
     if (elitism == trilean::unknown)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined elitism data member\n";
+      print.error("Undefined elitism data member");
       return false;
     }
 
     if (p_mutation < 0.0)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined p_mutation data member\n";
+      print.error("Undefined p_mutation data member");
       return false;
     }
 
     if (p_cross < 0.0)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined p_cross data member\n";
+      print.error("Undefined p_cross data member");
       return false;
     }
 
     if (!brood_recombination)
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Undefined brood_recombination data member\n";
+      print.error("Undefined brood_recombination data member");
       return false;
     }
 
     if (dss == trilean::unknown)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined dss data member\n";
+      print.error("Undefined dss data member");
       return false;
     }
 
     if (!layers)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined layer data member\n";
+      print.error("Undefined layer data member");
       return false;
     }
 
     if (!individuals)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined individuals data member\n";
+      print.error("Undefined individuals data member");
       return false;
     }
 
     if (!tournament_size)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined tournament_size data member\n";
+      print.error("Undefined tournament_size data member");
       return false;
     }
 
     if (!mate_zone)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined mate_zone data member\n";
+      print.error("Undefined mate_zone data member");
       return false;
     }
 
     if (!generations)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined generations data member\n";
+      print.error("Undefined generations data member");
       return false;
     }
 
     if (!g_without_improvement)
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Undefined g_without_improvement data member\n";
+      print.error("Undefined g_without_improvement data member");
       return false;
     }
 
     if (arl == trilean::unknown)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined arl data member\n";
+      print.error("Undefined arl data member");
       return false;
     }
 
     if (validation_percentage > 100)
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Undefined validation_percentage data member\n";
+      print.error("Undefined validation_percentage data member");
       return false;
     }
 
     if (!alps.age_gap)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined age_gap parameter\n";
+      print.error("Undefined age_gap parameter");
       return false;
     }
 
     if (alps.p_same_layer < 0.0)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined p_same_layer parameter\n";
+      print.error("Undefined p_same_layer parameter");
       return false;
     }
 
     if (!team.individuals)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Undefined team size parameter\n";
-
+      print.error("Undefined team size parameter");
       return false;
     }
   }  // if (force_defined)
 
   if (code_length == 1)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " code_length is too short\n";
+    print.error("code_length is too short");
     return false;
   }
 
   if (code_length && patch_length && patch_length >= code_length)
   {
-    std::cerr << k_s_debug
-              << " patch_length must be shorter than code_length\n";
+    print.error("patch_length must be shorter than code_length");
     return false;
   }
 
   if (p_mutation > 1.0)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " p_mutation out of range\n";
+    print.error("p_mutation out of range");
     return false;
   }
 
   if (p_cross > 1.0)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " p_cross out of range\n";
+    print.error("p_cross out of range");
     return false;
   }
 
   if (alps.p_same_layer > 1.0)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " p_same_layer out of range\n";
+    print.error("p_same_layer out of range");
     return false;
   }
 
   if (individuals && individuals <= 3)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Too few individuals\n";
+    print.error("Too few individuals");
     return false;
   }
 
   if (individuals && tournament_size && tournament_size > individuals)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " tournament_size (" << tournament_size
-                << ") cannot be greater than population size ("
-                << individuals << ")\n";
+    print.error("tournament_size (", tournament_size,
+                ") cannot be greater than population size (", individuals,
+                ")");
     return false;
   }
 
   if (mate_zone && tournament_size && tournament_size > *mate_zone)
   {
-    if (verbose)
-      std::cerr << k_s_debug << " tournament_size (" << tournament_size
-                << ") cannot be greater than mate_zone (" << *mate_zone
-                << ")\n";
+    print.error("tournament_size (", tournament_size,
+                ") cannot be greater than mate_zone (", *mate_zone, ")");
     return false;
   }
 

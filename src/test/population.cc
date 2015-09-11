@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(creation)
 
     BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals());
 
-    BOOST_REQUIRE(pop.debug(true));
+    BOOST_REQUIRE(pop.debug());
   }
 }
 
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(serialization)
 
     decltype(pop1) pop2(env);
     BOOST_REQUIRE(pop2.load(ss, env));
-    BOOST_REQUIRE(pop2.debug(true));
+    BOOST_REQUIRE(pop2.debug());
 
     BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());
     BOOST_REQUIRE_EQUAL(pop1.individuals(), pop2.individuals());

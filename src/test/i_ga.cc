@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
       i2.inc_age();
 
     const auto ic(i1.crossover(i2));
-    BOOST_CHECK(ic.debug(true));
+    BOOST_CHECK(ic.debug());
     BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
 
     dist += i1.distance(ic);
@@ -191,14 +191,14 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
     BOOST_TEST_CHECKPOINT("DE self-crossover without mutation");
     auto off(p.crossover(env.p_cross, env.de.weight, a, a, p));
-    BOOST_CHECK(off.debug(true));
+    BOOST_CHECK(off.debug());
 
     for (unsigned i(0); i < p.parameters(); ++i)
       BOOST_CHECK_CLOSE(off[i], p[i], epsilon);
 
     BOOST_TEST_CHECKPOINT("DE self-crossover with mutation");
     off = p.crossover(env.p_cross, env.de.weight, a, b, p);
-    BOOST_CHECK(off.debug(true));
+    BOOST_CHECK(off.debug());
     BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age()}));
 
     for (unsigned i(0); i < p.parameters(); ++i)
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
     BOOST_TEST_CHECKPOINT("DE crossover without mutation");
     off = p.crossover(env.p_cross, env.de.weight, a, b, c);
-    BOOST_CHECK(off.debug(true));
+    BOOST_CHECK(off.debug());
     BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age(),
                                              c.age()}));
     for (unsigned i(0); i < p.parameters(); ++i)

@@ -13,6 +13,7 @@
 #include "kernel/symbol_set.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
+#include "kernel/log.h"
 #include "kernel/random.h"
 
 namespace vita
@@ -90,7 +91,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(), by_()
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = make_unique<argument>(i);
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -347,22 +348,19 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::debug(bool verbose) const
+bool symbol_set::debug() const
 {
-  if (!all_.debug(verbose))
+  if (!all_.debug("[Collection ALL]"))
     return false;
 
-  for (const collection &c : by_.category)
-    if (!c.debug(verbose))
-      return false;
+  if (!by_.debug())
+    return false;
 
   if (!enough_terminals())
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Symbol set doesn't contain enough symbols\n";
+    print.error("Symbol set doesn't contain enough symbols");
     return false;
   }
 
@@ -378,32 +376,23 @@ symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
+/// \param[in] name the name of the collection (using for printing debugging
+///                 messages).
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::collection::debug(bool verbose) const
+bool symbol_set::collection::debug(std::string name) const
 {
+  if (name.empty())
+    name = "?";
+  name = "Collection " + name + ": ";
+
   decltype(sum) check_sum(0);
-
-  auto print_head = [this](std::ostream &o) -> std::ostream &
-                    {
-                      o << k_s_debug;
-                      if (symbols.empty())
-                        o << " Empty collection";
-                      else
-                        o << " Collection " << symbols[0]->category();
-
-                      o << ": ";
-
-                      return o;
-                    };
 
   for (auto s : symbols)
   {
     if (!s->debug())
     {
-      if (verbose)
-        print_head(std::cerr) << "invalid symbol " << s->display() << "\n";
+      print.error(name, "invalid symbol ", s->display());
       return false;
     }
 
@@ -411,9 +400,7 @@ bool symbol_set::collection::debug(bool verbose) const
 
     if (s->weight == 0)
     {
-      if (verbose)
-        print_head(std::cerr) << "null weight for symbol " << s->display()
-                              << "\n";
+      print.error(name, "null weight for symbol ", s->display());
       return false;
     }
 
@@ -423,18 +410,15 @@ bool symbol_set::collection::debug(bool verbose) const
       if (std::find(terminals.begin(), terminals.end(), s) ==
           terminals.end())
       {
-        if (verbose)
-          print_head(std::cerr) << "terminal " << s->display()
-                                << " not correctly stored\n";
+        print.error(name, "terminal ", s->display(), " not correctly stored");
         return false;
       }
 
       if (s->auto_defined() &&
           std::find(adt.begin(), adt.end(), s) == adt.end())
       {
-        if (verbose)
-          print_head(std::cerr) << "automatic defined terminal "
-                                << s->display() << " not correctly stored\n";
+        print.error(name, "automatic defined terminal ", s->display(),
+                    " not correctly stored");
         return false;
       }
     }
@@ -443,18 +427,15 @@ bool symbol_set::collection::debug(bool verbose) const
       // Function must not be in the terminals' vector.
       if (std::find(terminals.begin(), terminals.end(), s) != terminals.end())
       {
-        if (verbose)
-          print_head(std::cerr) << "function " << s->display()
-                                << " not correctly stored\n";
+        print.error(name, "function ", s->display(), " not correctly stored");
         return false;
       }
 
       if (s->auto_defined() &&
           std::find(adf.begin(), adf.end(), s) == adf.end())
       {
-        if (verbose)
-          print_head(std::cerr) << "automatic defined function "
-                                << s->display() << " not correctly stored\n";
+        print.error(name, "automatic defined function ", s->display(),
+                    " not correctly stored");
         return false;
       }
     }
@@ -462,9 +443,8 @@ bool symbol_set::collection::debug(bool verbose) const
 
   if (check_sum != sum)
   {
-    if (verbose)
-      print_head(std::cerr) << "incorrect cached sum of weights (stored: "
-                            << sum << ", correct: " << check_sum << ")\n";
+    print.error(name, "incorrect cached sum of weights (stored: ", sum,
+                ", correct: ", check_sum, ')');
     return false;
   }
 
@@ -477,29 +457,25 @@ bool symbol_set::collection::debug(bool verbose) const
   //
   //     if (ssize && !terminals.size())
   //     {
-  //       if (verbose)
-  //         print_head(std::cerr) << "no terminal in the symbol set\n";
+  //       print.error(name, "no terminal in the symbol set");
   //       return false;
   //     }
 
   if (ssize < terminals.size())
   {
-    if (verbose)
-      print_head(std::cerr) << "wrong terminal set size (less than symbol set)\n";
+    print.error(name, "wrong terminal set size (less than symbol set)");
     return false;
   }
 
   if (ssize < adf.size())
   {
-    if (verbose)
-      print_head(std::cerr) << "wrong ADF set size (less than symbol set)\n";
+    print.error(name, "wrong ADF set size (less than symbol set)");
     return false;
   }
 
   if (ssize < adt.size())
   {
-    if (verbose)
-      print_head(std::cerr) << "wrong ADT set size (less than symbol set)\n";
+    print.error(name, "wrong ADT set size (less than symbol set)");
     return false;
   }
 
@@ -541,18 +517,22 @@ symbol_set::by_category::by_category(const collection &c) : category()
               [](const symbol *s1, const symbol *s2)
               { return s1->weight > s2->weight; });
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::by_category::debug(bool verbose) const
+bool symbol_set::by_category::debug() const
 {
+  unsigned idx(0);
   for (const collection &coll : category)
-    if (!coll.debug(verbose))
+  {
+    const auto name("[Collection idx " + std::to_string(idx++) + "]");
+
+    if (!coll.debug(name))
       return false;
+  }
 
   return true;
 }

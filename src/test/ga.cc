@@ -91,14 +91,15 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 BOOST_AUTO_TEST_CASE(Evolution)
 {
   env.individuals = 100;
-  env.verbosity = 0;
+
+  vita::print.verbosity(vita::log::WARNING);
 
   auto eva(vita::make_ga_evaluator<vita::i_ga>(
     [](const std::vector<double> &v)
     { return std::accumulate(v.begin(), v.end(), 0.0); }));
 
   vita::evolution<vita::i_ga, vita::alps_es> evo1(env, eva);
-  BOOST_REQUIRE(evo1.debug(true));
+  BOOST_REQUIRE(evo1.debug());
 
   const auto s1(evo1.run(1));
 
@@ -108,7 +109,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s1.best.solution[3], 9950.0);
 
   vita::evolution<vita::i_ga, vita::std_es> evo2(env, eva);
-  BOOST_REQUIRE(evo2.debug(true));
+  BOOST_REQUIRE(evo2.debug());
 
   const auto s2(evo2.run(1));
 
@@ -128,7 +129,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 {
   env.individuals = 100;
   env.threshold.fitness = {0, 0};
-  env.verbosity = 0;
+
+  vita::print.verbosity(vita::log::WARNING);
 
   vita::problem prob;
   prob.env = env;
@@ -143,7 +145,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
                       std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f);
-  BOOST_REQUIRE(s.debug(true));
+  BOOST_REQUIRE(s.debug());
 
   const auto res(s.run().best.solution);
 
@@ -176,7 +178,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
     };
 
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s2(prob, f, p);
-  BOOST_REQUIRE(s2.debug(true));
+  BOOST_REQUIRE(s2.debug());
 
   const auto res2(s2.run().best.solution);
 
@@ -192,7 +194,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   env.individuals = 130;
   env.generations = 1000;
   env.threshold.fitness = {0, 0};
-  env.verbosity = 0;
+
+  vita::print.verbosity(vita::log::WARNING);
 
   vita::problem prob;
   prob.env = env;
@@ -305,7 +308,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
     };
 
   vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
-  BOOST_REQUIRE(s.debug(true));
+  BOOST_REQUIRE(s.debug());
 
   const auto res(s.run().best.solution);
 

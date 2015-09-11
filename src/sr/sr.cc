@@ -19,6 +19,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/src/evaluator.h"
+#include "kernel/log.h"
 #include "kernel/src/problem.h"
 #include "kernel/src/primitive/factory.h"
 #include "kernel/src/search.h"
@@ -47,23 +48,25 @@ const std::string vita_sr_defs(
 ///
 /// Fixes conflicting parameters.
 ///
-void fix_parameters(vita::src_problem *const problem)
+void fix_parameters(vita::src_problem *problem)
 {
-  using namespace vita;
+  using vita::print;
+  using vita::trilean;
+  using vita::fitness_t;
 
-  environment &env(problem->env);
+  vita::environment &env(problem->env);
 
   if (env.code_length && env.code_length <= problem->categories())
   {
     const decltype(env.code_length) new_length(2 * problem->categories());
-    std::cout << k_s_warning << " Adjusting code length ("
-              << env.code_length << " => " << new_length << ")\n";
+    print.warning("Adjusting code length (", env.code_length, " => ",
+                  new_length, ")");
     env.code_length = new_length;
   }
 
   if (env.dss != trilean::no && problem->data()->size() <= 30)
   {
-    std::cout << k_s_warning << " Adjusting DSS (=> false)\n";
+    print.warning("Adjusting DSS (=> false)");
     env.dss = trilean::no;
   }
 
@@ -71,21 +74,21 @@ void fix_parameters(vita::src_problem *const problem)
   {
     if (env.tournament_size < 2)
     {
-      std::cout << k_s_warning << " Adjusting tournament size (=> 2)\n";
+      print.warning("Adjusting tournament size (=> 2)");
       env.tournament_size = 2;
     }
 
     if (env.mate_zone && env.tournament_size > *env.mate_zone)
     {
-      std::cout << k_s_warning << " Adjusting tournament size ("
-                << env.tournament_size << " => " << *env.mate_zone << ")\n";
+      print.warning("Adjusting tournament size (", env.tournament_size, " => ",
+                    *env.mate_zone, ")");
       env.tournament_size = *env.mate_zone;
     }
 
     if (env.individuals && env.tournament_size > env.individuals)
     {
-      std::cout << k_s_warning << " Adjusting tournament size ("
-                << env.tournament_size << " => " << env.individuals << ")\n";
+      print.warning("Adjusting tournament size (", env.tournament_size, " => ",
+                    env.individuals, ")");
       env.tournament_size = env.individuals;
     }
   }
@@ -96,15 +99,13 @@ void fix_parameters(vita::src_problem *const problem)
     {
       env.threshold.accuracy = 0.99;
 
-      std::cout << k_s_info << " Accuracy threshold set to "
-                << env.threshold.accuracy << '\n';
+      print.info("Accuracy threshold set to ", env.threshold.accuracy);
     }
     else  // symbolic regression
     {
       env.threshold.fitness = {-0.0001};
 
-      std::cout << k_s_info << " Fitness threshold set to "
-                << env.threshold.fitness << '\n';
+      print.info("Fitness threshold set to ", env.threshold.fitness);
     }
   }
 }
@@ -126,6 +127,8 @@ bool is_true(const std::string &s)
 ///
 namespace ui
 {
+using vita::print;
+
 const std::string header(
   "(==(     )==)\n"
   " `-.`. ,',-' \n"
@@ -159,10 +162,7 @@ void arl(const std::string &v)
 {
   assign(problem->env.arl, is_true(v));
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info
-              << " Adaptive Representation through Learning is "
-              << problem->env.arl << '\n';
+  print.info("Adaptive Representation through Learning is ", problem->env.arl);
 }
 
 ///
@@ -174,9 +174,7 @@ void brood(unsigned size)
 {
   problem->env.brood_recombination = size;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Brood size for recombination set to "
-              << size << '\n';
+  print.info("Brood size for recombination set to ", size);
 }
 
 ///
@@ -187,10 +185,10 @@ void brood(unsigned size)
 void code_length(unsigned length)
 {
   assert(length);
+
   problem->env.code_length = length;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Code length set to " << length << '\n';
+  print.info("Code length set to ", length);
 }
 
 ///
@@ -204,20 +202,17 @@ void crossover_rate(double r)
   if (r < 0.0)
   {
     r = 0.0;
-    std::cout << vita::k_s_warning << " Adjusting crossover probability ("
-              << r << " => 0.0)\n";
+    print.warning("Adjusting crossover probability (", r, " => 0.0)");
   }
   else if (r > 1.0)
   {
     r = 1.0;
-    std::cout << vita::k_s_warning << " Adjusting crossover probability ("
-              << r << " => 1.0)\n";
+    print.warning("Adjusting crossover probability (", r, " => 1.0)");
   }
 
   problem->env.p_cross = r;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Crossover rate set to " << r << '\n';
+  print.info("Crossover rate set to ", r);
 }
 
 ///
@@ -226,9 +221,7 @@ void crossover_rate(double r)
 ///
 bool data(const std::string &data_file)
 {
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Reading data file " << data_file
-              << "...\n";
+  print.info("Reading data file ", data_file, "...");
 
   std::size_t parsed(0);
   try
@@ -240,13 +233,13 @@ bool data(const std::string &data_file)
     parsed = 0;
   }
 
-  if (!parsed)
-    std::cerr << vita::k_s_error << " Dataset file format error\n";
-  else if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Dataset read. Examples: " << parsed
-              << ", categories: " << problem->categories()
-              << ", features: " << problem->variables()
-              << ", classes: " << problem->classes() << '\n';
+  if (parsed)
+    print.info("Dataset read. Examples: ", parsed,
+               ", categories: ",           problem->categories(),
+               ", features: ",             problem->variables(),
+               ", classes: ",              problem->classes());
+  else
+    print.error("Dataset file format error");
 
   return parsed;
 }
@@ -260,9 +253,7 @@ void dss(const std::string &v)
 {
   assign(problem->env.dss, is_true(v));
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Dynamic Subset Selection is "
-              << problem->env.dss << '\n';
+  print.info("Dynamic Subset Selection is ", problem->env.dss);
 }
 
 ///
@@ -272,9 +263,7 @@ void elitism(const std::string &v)
 {
   assign(problem->env.elitism, is_true(v));
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Elitism is " << problem->env.elitism
-              << '\n';
+  print.info("Elitism is ", problem->env.elitism);
 }
 
 ///
@@ -321,13 +310,12 @@ void evaluator(const std::string &v)
 
   if (ok)
   {
-    std::cout << vita::k_s_info << " Evaluator is " << keyword;
-    if (!eva_args.empty())
-      std::cout << " (parameters: " << eva_args << ")";
-    std::cout << '\n';
+    print.info("Evaluator is ", keyword,
+               (eva_args.empty() ? std::string()
+                                 : " (parameters: " + eva_args + ")"));
   }
   else
-    std::cerr << vita::k_s_error << " Wrong argument for evaluator command\n";
+    print.error("Wrong argument for evaluator command");
 }
 
 ///
@@ -335,8 +323,7 @@ void evaluator(const std::string &v)
 ///
 void exit(bool)
 {
-  if (problem->env.verbosity >= 2)
-    std::cout << "Bye\n";
+  print.output("Bye");
 
   std::exit(EXIT_SUCCESS);
 }
@@ -350,8 +337,7 @@ void generations(unsigned g)
 {
   problem->env.generations = g;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Generations set to " << g << '\n';
+  print.info("Generations set to ", g);
 }
 
 ///
@@ -372,9 +358,9 @@ void go(bool = true)
       s.run(runs);
     }
     else
-      std::cerr << vita::k_s_error << " Too few terminals\n";
+      print.error("Too few terminals");
   else
-    std::cerr << vita::k_s_error << " Missing data set\n";
+    print.error("Missing data set");
 }
 
 ///
@@ -386,10 +372,7 @@ void gwi(unsigned g)
 {
   problem->env.g_without_improvement = g;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info
-              << " Max number of generations without improvement set to "
-              << g << '\n';
+  print.info("Max number of generations without improvement set to ", g);
 }
 
 ///
@@ -401,16 +384,14 @@ void help(bool)
 }
 
 ///
+/// \brief Set mating zone
 /// \param[in] z mating zone (0 for panmictic).
-///
-/// Set mating zone.
 ///
 void mate_zone(unsigned z)
 {
   problem->env.mate_zone = z;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Mate zone set to " << z << '\n';
+  print.info("Mate zone set to ", z);
 }
 
 ///
@@ -424,21 +405,17 @@ void mutation_rate(double r)
   if (r < 0.0)
   {
     r = 0.0;
-    std::cout << vita::k_s_warning << " Adjusting mutation probability ("
-              << r << " => 0.0)\n";
+    print.warning("Adjusting mutation probability (", r, " => 0.0)");
   }
   else if (r > 1.0)
   {
     r = 1.0;
-    std::cout << vita::k_s_warning << " Adjusting mutation probability ("
-              << r << " => 1.0)\n";
+    print.warning("Adjusting mutation probability (", r, " => 1.0)");
   }
 
   problem->env.p_mutation = r;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Mutation rate set to " << r
-              << '\n';
+  print.info("Mutation rate set to ", r);
 }
 
 ///
@@ -447,8 +424,7 @@ void mutation_rate(double r)
 ///
 bool testset(const std::string &ts)
 {
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Reading test set file " << ts << "...\n";
+  print.info("Reading test set file ", ts, "...");
 
   std::size_t parsed(0);
   try
@@ -460,13 +436,13 @@ bool testset(const std::string &ts)
     parsed = 0;
   }
 
-  if (!parsed)
-    std::cerr << vita::k_s_error << " Test set file format error\n";
-  else if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Testset read. Examples: " << parsed
-              << ", categories: " << problem->categories()
-              << ", features: " << problem->variables()
-              << ", classes: " << problem->classes() << '\n';
+  if (parsed)
+    print.info("Testset read. Examples: ", parsed,
+               ", categories: ",           problem->categories(),
+               ", features: ",             problem->variables(),
+               ", classes: ",              problem->classes());
+  else
+    print.error("Test set file format error");
 
   return parsed;
 }
@@ -480,9 +456,7 @@ void tournament_size(unsigned n)
 {
   problem->env.tournament_size = n;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Tournament size set to " << n
-              << '\n';
+  print.info("Tournament size set to ", n);
 }
 
 ///
@@ -494,15 +468,8 @@ void layers(unsigned l)
 {
   problem->env.layers = l;
 
-  if (problem->env.verbosity >= 2)
-  {
-    std::cout << vita::k_s_info << " Number of layers set to ";
-    if (l)
-      std::cout << l;
-    else
-      std::cout << "automatic";
-    std::cout << '\n';
-  }
+  print.info("Number of layers set to ",
+             (l ? std::to_string(l) : "automatic"));
 }
 
 ///
@@ -514,15 +481,8 @@ void population_size(unsigned size)
 {
   problem->env.individuals = size;
 
-  if (problem->env.verbosity >= 2)
-  {
-    std::cout << vita::k_s_info << " Population size set to ";
-    if (size)
-      std::cout << size;
-    else
-      std::cout << "automatic";
-    std::cout << '\n';
-  }
+  print.info("Population size set to ",
+             (size ? std::to_string(size) : "automatic"));
 }
 
 ///
@@ -534,8 +494,7 @@ void random_seed(unsigned seed)
 {
   vita::random::seed(seed);
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Random seed is " << seed << '\n';
+  print.info("Random seed is ", seed);
 }
 
 ///
@@ -548,8 +507,7 @@ void set_runs(unsigned r)
   assert(r);
   runs = r;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Number of runs set to " << r << '\n';
+  print.info("Number of runs set to ", r);
 }
 
 ///
@@ -559,8 +517,7 @@ void stat_arl(const std::string &v)
 {
   problem->env.stat.arl = is_true(v);
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " ARL is " << v << '\n';
+  print.info("ARL is ", v);
 }
 
 ///
@@ -572,8 +529,7 @@ void stat_dir(const std::string &dir)
 {
   problem->env.stat.dir = dir;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Logging folder is " << dir << '\n';
+  print.info("Logging folder is ", dir);
 }
 
 ///
@@ -583,9 +539,7 @@ void stat_dynamic(const std::string &v)
 {
   problem->env.stat.dynamic = is_true(v);
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Dynamic evolution logging is "
-              << problem->env.stat.dynamic << '\n';
+  print.info("Dynamic evolution logging is ", problem->env.stat.dynamic);
 }
 
 ///
@@ -595,9 +549,7 @@ void stat_layers(const std::string &v)
 {
   problem->env.stat.layers = is_true(v);
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Layers logging is "
-              << problem->env.stat.layers << '\n';
+  print.info("Layers logging is ", problem->env.stat.layers);
 }
 
 ///
@@ -607,9 +559,7 @@ void stat_population(const std::string &v)
 {
   problem->env.stat.population = is_true(v);
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Population logging is "
-              << problem->env.stat.population << '\n';
+  print.info("Population logging is ", problem->env.stat.population);
 }
 
 ///
@@ -619,8 +569,7 @@ void stat_summary(const std::string &v)
 {
   problem->env.stat.summary = true;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Summary logging is " << v << '\n';
+  print.info("Summary logging is ", v);
 }
 
 ///
@@ -633,15 +582,12 @@ bool symbols(const std::string &symbol_file)
 {
   if (symbol_file.empty())
   {
-    if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << "Using default symbol set\n";
+    print.info("Using default symbol set");
     problem->setup_default_symbols();
   }
   else
   {
-    if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Reading symbol file " << symbol_file
-                << "...\n";
+    print.info("Reading symbol file ", symbol_file, "...");
 
     unsigned parsed(0);
     try
@@ -655,17 +601,16 @@ bool symbols(const std::string &symbol_file)
 
     if (!parsed)
     {
-      std::cerr << vita::k_s_error << " Symbol file format error\n";
+      print.error("Symbol file format error");
       return false;
     }
-    if (problem->env.verbosity >= 2)
-      std::cout << vita::k_s_info << " Symbolset read. Symbols: " << parsed
-                << '\n';
+
+    print.info("Symbolset read. Symbols: ", parsed);
   }
 
   if (!problem->env.sset->enough_terminals())
   {
-    std::cerr << vita::k_s_error << " Too few terminals\n";
+    print.error("Too few terminals");
     return false;
   }
 
@@ -703,13 +648,10 @@ void threshold(const std::string &v)
     }
   }
 
-  if (problem->env.verbosity >= 2)
-  {
-    if (set)
-      std::cout << vita::k_s_info << " Threshold is " << v << '\n';
-    else
-      std::cerr << vita::k_s_error << " Invalid threshold value\n";
-  }
+  if (set)
+    print.info("Threshold is ", v);
+  else
+    print.error("Invalid threshold value");
 }
 
 ///
@@ -721,8 +663,7 @@ void ttable(unsigned bits)
   assert(bits);
   problem->env.ttable_size = bits;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " TTable size is " << bits << " bits\n";
+  print.info("TTable size is ", bits, " bits");
 }
 
 ///
@@ -748,14 +689,10 @@ void validation(const std::string &v)
       problem->env.validation_percentage = percentage;
   }
 
-  if (problem->env.verbosity >= 2)
-  {
-    if (set)
-      std::cout << vita::k_s_info << " Validation set percentage is " << v
-                << '\n';
-    else
-      std::cerr << vita::k_s_error << " Invalid validation percentage\n";
-  }
+  if (set)
+    print.info("Validation set percentage is ", v);
+  else
+    print.error("Invalid validation percentage");
 }
 
 ///
@@ -763,10 +700,12 @@ void validation(const std::string &v)
 ///
 void verbosity(unsigned v)
 {
-  problem->env.verbosity = v;
+  if (v > vita::log::ALL)
+    v = vita::log::ALL;
 
-  if (problem->env.verbosity >= 2)
-    std::cout << vita::k_s_info << " Verbosity is " << v << '\n';
+  print.verbosity(static_cast<vita::log::level>(v));
+
+  print.info("Verbosity is ", v);
 }
 
 }  // namespace ui
@@ -794,9 +733,9 @@ int parse_command_line(int argc, char *const argv[])
          &ui::verbosity),
        "turn off verbosity")
       ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(2)->notifier(
-         &ui::verbosity),
-       "turn on verbosity");
+       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::INFO)
+       ->notifier(&ui::verbosity),
+       "select verbosity level");
 
     po::options_description data("Data");
     data.add_options()
@@ -812,9 +751,10 @@ int parse_command_line(int argc, char *const argv[])
     po::options_description config("Config");
     config.add_options()
       ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
-       "sets preferred evaluator (count, mae, rmae, mse, binary, dynslot, gaussian)")
+       "sets preferred evaluator "
+       "(count, mae, rmae, mse, binary, dynslot, gaussian)")
       ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
-       "sets the seed for the pseudo-random number generator. "\
+       "sets the seed for the pseudo-random number generator. "
        "Pseudo-random sequences are repeatable by using the same seed value")
       ("ttable", po::value<unsigned>()->notifier(&ui::ttable),
        "number of bits used for the ttable (ttable contains 2^bits elements)");
@@ -852,10 +792,10 @@ int parse_command_line(int argc, char *const argv[])
       ("elitism", po::value<std::string>()->notifier(&ui::elitism),
        "when elitism is true an individual will never replace a better one")
       ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),
-       "sets the overall probability of mutation of the individuals that have "\
+       "sets the overall probability of mutation of the individuals that have "
        "been selected as winners in a tournament. Range is [0,1]")
       ("crossover-rate,c", po::value<double>()->notifier(&ui::crossover_rate),
-       "sets the overall probability that crossover will occour between "\
+       "sets the overall probability that crossover will occour between "
        "winners in a tournament. Range is [0,1]")
       ("tournament-size",
        po::value<unsigned>()->notifier(&ui::tournament_size),
@@ -867,7 +807,7 @@ int parse_command_line(int argc, char *const argv[])
       ("generations,g", po::value<unsigned>()->notifier(&ui::generations),
        "sets the maximum number of generations in a run")
       ("gwi", po::value<unsigned>()->notifier(&ui::gwi),
-       "sets the maximum number of generations without improvement in a run "\
+       "sets the maximum number of generations without improvement in a run "
        "(0 disable)")
       ("runs,r", po::value<unsigned>()->notifier(&ui::set_runs),
        "number of runs to be tried")
@@ -917,7 +857,7 @@ int parse_command_line(int argc, char *const argv[])
   }
   catch(std::exception &e)
   {
-    std::cerr << vita::k_s_error << ' ' << e.what() << '\n';
+    vita::print.error(e.what());
     return 0;
   }
 
@@ -943,8 +883,8 @@ int main(int argc, char *const argv[])
     ui::go();
   else
   {
-    // Do not change the name of the variable:
-    //   po::options_description interface("Interface");
+    // Do not change the name of the variable: e.g.
+    // `po::options_description interface("Interface");`
     // won't compile with mingw.
     po::options_description interf("Interface");
     interf.add_options()

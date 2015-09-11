@@ -11,6 +11,7 @@
  */
 
 #include "kernel/ga/i_ga.h"
+#include "kernel/log.h"
 #include "kernel/ttable_hash.h"
 
 namespace vita
@@ -24,7 +25,7 @@ namespace vita
 ///
 i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
 {
-  assert(e.debug(true, true));
+  assert(e.debug(true));
   assert(e.sset);
 
   assert(parameters());
@@ -35,7 +36,7 @@ i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
   for (auto c(decltype(cs){0}); c < cs; ++c)
     genome_[c] = gene(e.sset->roulette_terminal(c));
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -345,27 +346,21 @@ i_ga &i_ga::operator=(const std::vector<gene::param_type> &v)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the individual passes the internal consistency check.
 ///
-bool i_ga::debug(bool verbose) const
+bool i_ga::debug() const
 {
   if (empty())
   {
     if (!genome_.empty())
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Inconsistent internal status for empty individual.\n";
-
+      print.error("Inconsistent internal status for empty individual");
       return false;
     }
 
     if (!signature_.empty())
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Empty individual must empty signature.\n";
-
+      print.error("Empty individual must empty signature");
       return false;
     }
 
@@ -378,37 +373,28 @@ bool i_ga::debug(bool verbose) const
   {
     if (!genome_[i].sym)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Empty symbol pointer at position " << i
-                  << ".\n";
+      print.error("Empty symbol pointer at position ", i);
       return false;
     }
 
     if (!genome_[i].sym->terminal())
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Not-terminal symbol at position " << i
-                  << ".\n";
-
+      print.error("Not-terminal symbol at position ", i);
       return false;
     }
 
     if (genome_[i].sym->category() != i)
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Wrong category: " << i
-                  << genome_[i].sym->display() << " -> "
-                  << genome_[i].sym->category() << " should be " << i
-                  << '\n';
+      print.error("Wrong category: ", i,
+                  genome_[i].sym->display(), " -> ",
+                  genome_[i].sym->category(), " should be ", i);
       return false;
     }
   }
 
   if (!signature_.empty() && signature_ != hash())
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Wrong signature: " << signature_
-                << " should be " << hash() << '\n';
+    print.error("Wrong signature: ", signature_, " should be ", hash());
     return false;
   }
 

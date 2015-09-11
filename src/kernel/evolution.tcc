@@ -27,7 +27,7 @@ inline bool user_stop()
   const bool stop(kbhit() && std::cin.get() == '.');
 
   if (stop)
-    std::cout << k_s_info << " Stopping evolution...\n";
+    print.info("Stopping evolution...");
 
   return stop;
 }
@@ -87,7 +87,7 @@ evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
     external_stop_condition_(sc), shake_data_(sd)
 {
   assert(e.sset);
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -224,13 +224,13 @@ void evolution<T, ES>::log(unsigned run_count) const
 /// \param[in] run_count total number of runs planned.
 /// \param[in] status if `true` print a run/generation/fitness status line.
 ///
-/// Print evolution informations (if `environment::verbosity > 0`).
+/// Print evolution informations (if `environment::log_level >= OUTPUT`).
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
                                       bool status) const
 {
-  if (env().verbosity >= 1)
+  if (print.verbosity() >= log::OUTPUT)
   {
     const unsigned perc(100 * k / pop_.individuals());
     if (status)
@@ -331,10 +331,8 @@ evolution<T, ES>::run(unsigned run_count)
     es_.post_bookkeeping();
   }
 
-  if (env().verbosity >= 2)
-    std::cout << k_s_info << " Elapsed time: "
-              << stats_.elapsed / 1000.0 << "s" << std::string(10, ' ')
-              << '\n';
+  print.info("Elapsed time: ", stats_.elapsed / 1000.0, "s",
+             std::string(10, ' '));
 
   term::reset();
   return stats_;
@@ -345,11 +343,8 @@ evolution<T, ES>::run(unsigned run_count)
 /// \return true if object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool evolution<T, ES>::debug(bool verbose) const
+bool evolution<T, ES>::debug() const
 {
-  if (!pop_.debug(verbose))
-    return false;
-
-  return true;
+  return pop_.debug();
 }
 #endif  // Include guard

@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(t1.crossover(t2));
-    BOOST_CHECK(tc.debug(true));
+    BOOST_CHECK(tc.debug());
 
     dist += distance(t1, tc);
   }

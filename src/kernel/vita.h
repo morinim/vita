@@ -55,16 +55,6 @@ using cvect = std::vector<category_t>;
 /// category.
 using index_t = unsigned;
 
-/// \brief Prefix for debug messages
-const char k_s_debug[] = "[DEBUG]";
-/// \brief Prefix for error messages
-const char k_s_error[] = "[ERROR]";
-/// \brief Prefix for information messages
-/// Information messages regard the status of the program.
-const char k_s_info[] = "[INFO]";
-/// \brief Prefix for warning messages
-const char k_s_warning[] = "[WARNING]";
-
 /// A macro to disallow the copy constructor and operator= functions.
 /// A good alternative is boost::noncopyable but that gives some false
 /// positive with `g++ -Weffc++` so, for now, we keep the macro.

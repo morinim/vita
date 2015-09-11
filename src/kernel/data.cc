@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "kernel/data.h"
+#include "kernel/log.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
 
@@ -75,16 +76,14 @@ data::data() : classes_map_(), header_(), categories_(),
 
 ///
 /// \param[in] filename name of the file containing the learning collection.
-/// \param[in] verbosity verbosity level (see environment::verbosity for
-///            further details).
 ///
 /// New data instance containing the learning collection from `filename`.
 ///
-data::data(const std::string &filename, unsigned verbosity) : data()
+data::data(const std::string &filename) : data()
 {
   assert(!filename.empty());
 
-  open(filename, verbosity);
+  open(filename);
 
   assert(debug());
 }
@@ -590,8 +589,6 @@ std::size_t data::load_xrff(const std::string &filename)
 ///
 /// \param[in] filename the csv file.
 /// \param[in] filter a filter function to select a subset of the records.
-/// \param[in] verbosity verbosity level (see environment::verbosity for
-///            further details).
 /// \return number of lines parsed (0 in case of errors).
 ///
 /// We follow the Google Prediction API convention
@@ -635,7 +632,7 @@ std::size_t data::load_xrff(const std::string &filename)
 /// \note Test set can have an empty output value.
 ///
 std::size_t data::load_csv(const std::string &filename,
-                           csv_parser::filter_hook_t filter, unsigned verbosity)
+                           csv_parser::filter_hook_t filter)
 {
   std::ifstream from(filename);
   if (!from)
@@ -726,8 +723,8 @@ std::size_t data::load_csv(const std::string &filename,
 
     if (instance.input.size() + 1 == columns())
       push_back(instance);
-    else if (verbosity >= 2)
-      std::cout << k_s_warning << " Line " << size() << " skipped\n";
+    else
+      print.warning("Malformed line ", size(), " skipped");
   }
 
   return debug() ? size() : static_cast<std::size_t>(0);
@@ -735,8 +732,6 @@ std::size_t data::load_csv(const std::string &filename,
 
 ///
 /// \param[in] f name of the file containing the data set.
-/// \param[in] verbosity verbosity level (see environment::verbosity for
-///            further details).
 /// \return number of lines parsed (0 in case of errors).
 ///
 /// Loads the content of `f` into the active dataset.
@@ -760,7 +755,7 @@ std::size_t data::load_csv(const std::string &filename,
 /// \note
 /// Test set can have an empty output value.
 ///
-std::size_t data::open(const std::string &f, unsigned verbosity)
+std::size_t data::open(const std::string &f)
 {
   auto ends_with =
     [](const std::string &name, const std::string &ext)
@@ -771,7 +766,7 @@ std::size_t data::open(const std::string &f, unsigned verbosity)
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
-  return xrff ? load_xrff(f) : load_csv(f, nullptr, verbosity);
+  return xrff ? load_xrff(f) : load_csv(f, nullptr);
 }
 
 ///

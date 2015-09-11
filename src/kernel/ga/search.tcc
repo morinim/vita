@@ -63,7 +63,7 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
   if (!constrained.g_without_improvement)
     this->env_.g_without_improvement = dflt.g_without_improvement;
 
-  assert(this->env_.debug(true, true));
+  assert(this->env_.debug(true));
 }
 
 ///
@@ -128,11 +128,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 {
-  if (this->env_.verbosity >= 2)
-  {
-    std::cout << k_s_info << " Fitness: " << fit
-              << "\n\n\n";
-  }
+  print.info("Fitness: ", fit, "\n\n");
 }
 
 ///
@@ -199,11 +195,10 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
 }
 
 ///
-/// \param[in] verbose if \c true prints error messages to \c std::cerr.
 /// \return \c true if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES, class F>
-bool ga_search<T, ES, F>::debug_nvi(bool) const
+bool ga_search<T, ES, F>::debug_nvi() const
 {
   return true;
 }

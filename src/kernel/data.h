@@ -45,7 +45,7 @@ private:
 
 public:
   data();
-  explicit data(const std::string &, unsigned = 0);
+  explicit data(const std::string &);
 
   // Iterators
   using iterator = typename examples_t::iterator;
@@ -57,7 +57,7 @@ public:
   const_iterator end() const;
 
   // Convenience
-  std::size_t open(const std::string &, unsigned = 0);
+  std::size_t open(const std::string &);
   bool operator!() const;
 
   void push_back(const example &);
@@ -93,8 +93,7 @@ public:
 private: // Private support methods
   class_t encode(const std::string &);
 
-  std::size_t load_csv(const std::string &, csv_parser::filter_hook_t filter,
-                       unsigned);
+  std::size_t load_csv(const std::string &, csv_parser::filter_hook_t);
   std::size_t load_xrff(const std::string &);
 
   void swap_category(category_t, category_t);

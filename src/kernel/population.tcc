@@ -26,7 +26,7 @@ template<class T>
 population<T>::population(const environment &e) : env_(&e), pop_(1),
                                                   allowed_(1)
 {
-  assert(e.debug(true, true));
+  assert(e.debug(true));
   assert(e.sset);
 
   const auto n(e.individuals);
@@ -35,7 +35,7 @@ population<T>::population(const environment &e) : env_(&e), pop_(1),
 
   init_layer(0);
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -182,7 +182,7 @@ void population<T>::set_allowed(unsigned l, unsigned n)
 
   allowed_[l] = n;
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -259,22 +259,19 @@ void population<T>::inc_age()
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool population<T>::debug(bool verbose) const
+bool population<T>::debug() const
 {
   for (const auto &l : pop_)
     for (const auto &i : l)
-      if (!i.debug(verbose))
+      if (!i.debug())
         return false;
 
   if (layers() != allowed_.size())
   {
-    if (verbose)
-      std::cerr << k_s_debug
-                << "Number of layers doesn't match allowed array size.\n";
+    print.error("Number of layers doesn't match allowed array size");
     return false;
   }
 
@@ -290,8 +287,7 @@ bool population<T>::debug(bool verbose) const
 
   if (!env_)
   {
-    if (verbose)
-      std::cerr << k_s_debug << "Undefined environment.\n";
+    print.error("Undefined environment");
     return false;
   }
 

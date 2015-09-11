@@ -73,7 +73,7 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 ///     src_problem p;
 ///     p.clear(true);
 ///
-src_problem::src_problem() : problem()
+src_problem::src_problem()
 {
 }
 
@@ -131,7 +131,7 @@ std::pair<std::size_t, std::size_t> src_problem::load(
   env.sset->clear();
   dat_.clear();
 
-  const auto n_examples(dat_.open(ds, env.verbosity));
+  const auto n_examples(dat_.open(ds));
 
   if (!ts.empty())
     load_test_set(ts);
@@ -155,7 +155,7 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 {
   const auto backup(dat_.dataset());
   dat_.dataset(data::test);
-  const auto n(dat_.open(ts, env.verbosity));
+  const auto n(dat_.open(ts));
   dat_.dataset(backup);
 
   return n;
@@ -251,15 +251,8 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   read_xml(s_file, pt);
 
   // Prints the list of categories as inferred from the dataset.
-  if (env.verbosity >= 3)
-  {
-    std::cout << "\n\n";
-
-    for (const category &c : dat_.categories())
-      std::cout << k_s_debug << ' ' << c << '\n';
-
-    std::cout << '\n';
-  }
+  for (const category &c : dat_.categories())
+    print.debug("Using ", c);
 
   symbol_factory &factory(symbol_factory::instance());
 
@@ -293,14 +286,10 @@ unsigned src_problem::load_symbols(const std::string &s_file)
           for (const auto &seq : sequences)
             if (compatible(seq, args))
             {
-              if (env.verbosity >= 3)
-              {
-                std::cout << k_s_debug << ' ' << sym_name << '(';
-                for (const auto &j : seq)
-                  std::cout << dat_.categories().find(j).name
-                            << (&j == &seq.back() ? ")" : ", ");
-                std::cout << '\n';
-              }
+              std::string signature(sym_name + ":");
+              for (const auto &j : seq)
+                signature += " " + dat_.categories().find(j).name;
+              print.debug("Adding to symbol set ", signature);
 
               env.sset->insert(factory.make(sym_name, seq));
             }
@@ -312,15 +301,11 @@ unsigned src_problem::load_symbols(const std::string &s_file)
         if (compatible({tag}, {sym_sig}))
         {
           const auto n_args(factory.args(sym_name));
+          std::string signature(sym_name + ":");
 
-          if (env.verbosity >= 3)
-          {
-            std::cout << k_s_debug << ' ' << sym_name << '(';
-            for (auto j(decltype(n_args){0}); j < n_args; ++j)
-              std::cout << dat_.categories().find(tag).name
-                        << (j + 1 == n_args ? ")" : ", ");
-            std::cout << '\n';
-          }
+          for (auto j(decltype(n_args){0}); j < n_args; ++j)
+            signature += " " + dat_.categories().find(tag).name;
+          print.debug("Adding to symbol set ", signature);
 
           env.sset->insert(factory.make(sym_name, cvect(n_args, tag)));
         }
@@ -401,12 +386,11 @@ unsigned src_problem::variables() const
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool src_problem::debug(bool verbose) const
+bool src_problem::debug() const
 {
-  if (!problem::debug(verbose))
+  if (!problem::debug())
     return false;
 
   if (!dat_.debug())

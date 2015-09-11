@@ -35,16 +35,16 @@ class ga_search : public search<T, ES>
 public:
   ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
-private:  // NVI template methods
-  virtual bool debug_nvi(bool) const override;
-  virtual summary<T> run_nvi(unsigned) override;
-  virtual void tune_parameters_nvi() override;
-
 private:  // Private support methods
   template<class C> void log(const summary<T> &,
                              const distribution<fitness_t> &,
                              const C &, typename C::value_type, unsigned);
   void print_resume(const fitness_t &) const;
+
+  // NVI template methods
+  virtual bool debug_nvi() const override;
+  virtual summary<T> run_nvi(unsigned) override;
+  virtual void tune_parameters_nvi() override;
 };
 
 #include "kernel/ga/search.tcc"

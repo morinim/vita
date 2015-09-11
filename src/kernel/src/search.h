@@ -66,7 +66,7 @@ private:  // Private support methods
   void print_resume(bool, const model_measurements &) const;
 
   // NVI template methods
-  virtual bool debug_nvi(bool) const override;
+  virtual bool debug_nvi() const override;
   virtual summary<T> run_nvi(unsigned) override;
   virtual void tune_parameters_nvi() override;
 

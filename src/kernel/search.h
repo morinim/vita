@@ -50,7 +50,7 @@ public:
 
   summary<T> run(unsigned = 1);
 
-  bool debug(bool) const;
+  bool debug() const;
 
 protected:  // Protected support methods
   fitness_t fitness(const T &);
@@ -68,7 +68,7 @@ protected:  // Protected data members
   problem &prob_;
 
 private:  // NVI template methods
-  virtual bool debug_nvi(bool) const { return true; }
+  virtual bool debug_nvi() const { return true; }
   virtual summary<T> run_nvi(unsigned) = 0;
   virtual void tune_parameters_nvi() = 0;
 };

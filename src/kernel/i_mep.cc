@@ -16,6 +16,7 @@
 #include "kernel/i_mep.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
+#include "kernel/log.h"
 #include "kernel/random.h"
 #include "kernel/ttable_hash.h"
 
@@ -51,7 +52,7 @@ i_mep::i_mep(const environment &e)
     for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(e.sset->roulette_terminal(c));
 
-  assert(debug(true));
+  assert(debug());
 }
 
 ///
@@ -436,36 +437,27 @@ hash_t i_mep::signature() const
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the individual passes the internal consistency check.
 ///
-bool i_mep::debug(bool verbose) const
+bool i_mep::debug() const
 {
   if (empty())
   {
     if (!genome_.empty())
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Inconsistent internal status for empty individual.\n";
-
+      print.debug("Inconsistent internal status for empty individual");
       return false;
     }
 
     if (best_ != locus::npos())
     {
-      if (verbose)
-        std::cerr << k_s_debug
-                  << " Empty individual must have undefined best locus.\n";
-
+      print.error("Empty individual must have undefined best locus");
       return false;
     }
 
     if (!signature_.empty())
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Empty individual must empty signature.\n";
-
+      print.error("Empty individual must empty signature");
       return false;
     }
 
@@ -479,9 +471,7 @@ bool i_mep::debug(bool verbose) const
 
       if (!genome_(l).sym)
       {
-        if (verbose)
-          std::cerr << k_s_debug << " Empty symbol pointer at locus " << l
-                    << ".\n";
+        print.error("Empty symbol pointer at locus ", l);
         return false;
       }
 
@@ -489,9 +479,7 @@ bool i_mep::debug(bool verbose) const
       const auto arity(genome_(l).sym->arity());
       if (genome_(l).args.size() != arity)
       {
-        if (verbose)
-          std::cerr << k_s_debug
-                    << "Arity and actual number of parameters don't match.\n";
+        print.error("Arity and actual number of parameters don't match");
         return false;
       }
 
@@ -501,17 +489,14 @@ bool i_mep::debug(bool verbose) const
         // Arguments' addresses must be smaller than the size of the genome.
         if (arg >= size())
         {
-          if (verbose)
-            std::cerr << k_s_debug << " Argument is out of range.\n";
+          print.error("Argument is out of range");
           return false;
         }
 
         // Function address must be smaller than its arguments' addresses.
         if (arg <= i)
         {
-          if (verbose)
-            std::cerr << k_s_debug << " Wrong reference in locus " << l
-                      << ".\n";
+          print.error("Wrong reference in locus ", l);
           return false;
         }
       }
@@ -520,9 +505,7 @@ bool i_mep::debug(bool verbose) const
   for (category_t c(0); c < categories(); ++c)
     if (!genome_(genome_.rows() - 1, c).sym->terminal())
     {
-      if (verbose)
-        std::cerr << k_s_debug << " Last symbol of type " << c
-                  << " in the genome isn't a terminal.\n";
+      print.error("Last symbol of type ", c, " in the genome isn't a terminal");
       return false;
     }
 
@@ -534,35 +517,28 @@ bool i_mep::debug(bool verbose) const
 
       if (genome_(l).sym->category() != c)
       {
-        if (verbose)
-          std::cerr << k_s_debug << " Wrong category: " << l
-                    << genome_(l).sym->display() << " -> "
-                    << genome_(l).sym->category() << " should be " << c
-                    << '\n';
+        print.error("Wrong category: ", l,
+                    genome_(l).sym->display(), " -> ",
+                    genome_(l).sym->category(), " should be ", c);
         return false;
       }
     }
 
   if (best_.index >= size())
   {
-    if (verbose)
-      std::cerr << k_s_debug << " Incorrect index for first active symbol.\n";
+    print.error("Incorrect index for first active symbol");
     return false;
   }
   if (best_.category >= categories())
   {
-    if (verbose)
-      std::cerr << k_s_debug
-                << " Incorrect category for first active symbol.\n";
+    print.error("Incorrect category for first active symbol");
     return false;
   }
 
   if (categories() == 1 && eff_size() > size())
   {
-    if (verbose)
-      std::cerr << k_s_debug
-                << "eff_size() cannot be greater than size() in single "
-                   "category individuals.\n";
+    print.error("eff_size() cannot be greater than size() in single "
+                "category individuals");
     return false;
   }
 

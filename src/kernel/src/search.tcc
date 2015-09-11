@@ -36,12 +36,12 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
   : search<T, ES>(p),
     p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian), metrics(m)
 {
-  assert(p.debug(true));
+  assert(p.debug());
 
   if (p.data()->size() && !this->active_eva_)
     set_evaluator(p.classification() ? p_class : p_symre);
 
-  assert(this->debug(true));
+  assert(this->debug());
 }
 
 ///
@@ -241,8 +241,7 @@ void src_search<T, ES>::tune_parameters_nvi()
   {
     this->env_.dss = d_size > 400 ? trilean::yes : trilean::no;
 
-    if (this->env_.verbosity >= 2)
-      std::cout << k_s_info << " DSS set to " << this->env_.dss << '\n';
+    print.info("DSS set to ", this->env_.dss);
   }
 
   if (!constrained.layers)
@@ -252,9 +251,7 @@ void src_search<T, ES>::tune_parameters_nvi()
     else
       this->env_.layers = dflt.layers;
 
-    if (this->env_.verbosity >= 2)
-      std::cout << k_s_info << " Number of layers set to " << this->env_.layers
-                << '\n';
+    print.info("Number of layers set to ", this->env_.layers);
   }
 
   // A larger number of training cases requires an increase in the population
@@ -279,9 +276,7 @@ void src_search<T, ES>::tune_parameters_nvi()
     else
       this->env_.individuals = dflt.individuals;
 
-    if (this->env_.verbosity >= 2)
-      std::cout << k_s_info << " Population size set to "
-                << this->env_.individuals << '\n';
+    print.info("Population size set to ", this->env_.individuals);
   }
 
   // Note that this setting, once set, will not be changed.
@@ -298,9 +293,8 @@ void src_search<T, ES>::tune_parameters_nvi()
     else
       this->env_.validation_percentage = dflt.validation_percentage;
 
-    if (this->env_.verbosity >= 2)
-      std::cout << k_s_info << " Validation percentage set to "
-                << this->env_.validation_percentage << "%\n";
+    print.info("Validation percentage set to ",
+               this->env_.validation_percentage, '%');
   }
 
   if (!constrained.tournament_size)
@@ -318,7 +312,7 @@ void src_search<T, ES>::tune_parameters_nvi()
   if (constrained.arl == trilean::unknown)
     this->env_.arl = dflt.arl;
 
-  assert(this->env_.debug(true, true));
+  assert(this->env_.debug(true));
 }
 
 ///
@@ -529,18 +523,11 @@ template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(bool validation,
                                      const model_measurements &m) const
 {
-  if (this->env_.verbosity >= 2)
-  {
-    const std::string ds(validation ? " Validation" : " Training");
+  const std::string ds(validation ? " Validation" : " Training");
+  print.info(ds, " fitness: ", m.fitness);
 
-    std::cout << k_s_info << ds << " fitness: " << m.fitness << '\n';
-
-    if (0 <= m.accuracy && m.accuracy <= 1.0)
-      std::cout << k_s_info << ds << " accuracy: " << 100.0 * m.accuracy
-                << '%';
-
-    std::cout << "\n\n";
-  }
+  if (0 <= m.accuracy && m.accuracy <= 1.0)
+    print.info(ds, " accuracy: ", 100.0 * m.accuracy, '%');
 }
 
 ///
@@ -699,25 +686,20 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::debug_nvi(bool verbose) const
+bool src_search<T, ES>::debug_nvi() const
 {
   if (p_symre == evaluator_id::undefined)
   {
-    if (verbose)
-      std::cerr << k_s_debug
-                << " Undefined ID for preferred sym.reg. evaluator\n";
+    print.error("Undefined ID for preferred sym.reg. evaluator");
     return false;
   }
 
   if (p_class == evaluator_id::undefined)
   {
-    if (verbose)
-      std::cerr << k_s_debug
-                << "Undefined ID for preferred classification evaluator\n";
+    print.error("Undefined ID for preferred classification evaluator");
     return false;
   }
 

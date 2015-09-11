@@ -47,7 +47,7 @@ public:
   unsigned classes() const;
   unsigned variables() const;
 
-  virtual bool debug(bool) const override;
+  virtual bool debug() const override;
 
 private:  // Private support methods
   bool compatible(const cvect &, const std::vector<std::string> &) const;

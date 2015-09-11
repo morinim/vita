@@ -88,7 +88,7 @@ std::uintmax_t core_analyzer<T>::terminals(bool eff) const
 template<class T>
 const distribution<double> &core_analyzer<T>::age_dist() const
 {
-  assert(age_.debug(true));
+  assert(age_.debug());
 
   return age_;
 }
@@ -103,7 +103,7 @@ const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
   const auto gi(group_stat_.find(g));
 
   assert(gi != group_stat_.end());
-  assert(gi->second.age.debug(true));
+  assert(gi->second.age.debug());
 
   return gi->second.age;
 }
@@ -114,7 +114,7 @@ const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
 template<class T>
 const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
 {
-  assert(fit_.debug(true));
+  assert(fit_.debug());
 
   return fit_;
 }
@@ -130,7 +130,7 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
   const auto gi(group_stat_.find(g));
 
   assert(gi != group_stat_.end());
-  assert(gi->second.fitness.debug(true));
+  assert(gi->second.fitness.debug());
 
   return gi->second.fitness;
 }
@@ -141,7 +141,7 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
 template<class T>
 const distribution<double> &core_analyzer<T>::length_dist() const
 {
-  assert(length_.debug(true));
+  assert(length_.debug());
 
   return length_;
 }
@@ -175,13 +175,13 @@ bool core_analyzer<T>::debug() const
     if (i.second.counter[true] > i.second.counter[false])
       return false;
 
-  if (!age_.debug(true))
+  if (!age_.debug())
     return false;
 
-  if (!fit_.debug(true))
+  if (!fit_.debug())
     return false;
 
-  return length_.debug(true);
+  return length_.debug();
 }
 
 ///

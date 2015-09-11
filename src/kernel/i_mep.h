@@ -77,7 +77,7 @@ public:
 
   category_t category() const;
 
-  bool debug(bool = true) const;
+  bool debug() const;
 
   class const_iterator;
   const_iterator begin() const;

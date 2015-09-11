@@ -19,6 +19,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "kernel/model_measurements.h"
+#include "kernel/log.h"
 #include "kernel/symbol_set.h"
 #include "kernel/trilean.h"
 
@@ -38,16 +39,9 @@ public:  // Constructor and support functions
 
   void log(boost::property_tree::ptree *const, const std::string & = "") const;
 
-  bool debug(bool, bool) const;
+  bool debug(bool) const;
 
 public:  // Data members
-  /// Verbosity level:
-  /// - 0 only fatal errors;
-  /// - 1 search results and errors;
-  /// - 2 search results, informations, warnings and errors;
-  /// - >= 3 everything (e.g. diagnostic messages...).
-  unsigned verbosity = 2;
-
   /// The number of genes (maximum length of an evolved program in the
   /// population).
   /// Code length have to be chosen before population is created and cannot be

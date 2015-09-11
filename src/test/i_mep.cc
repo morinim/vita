@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(t_crossover)
       i2.inc_age();
 
     const auto ic(i1.crossover(i2));
-    BOOST_CHECK(ic.debug(true));
+    BOOST_CHECK(ic.debug());
     BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
 
     dist += distance(i1, ic);
@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(t_compress)
   {
     const vita::i_mep i(env), i1(i.compress());
 
-    BOOST_REQUIRE(i1.debug(true));
+    BOOST_REQUIRE(i1.debug());
 
     /*
     std::cout << "\n\n";

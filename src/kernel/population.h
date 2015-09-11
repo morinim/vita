@@ -16,6 +16,7 @@
 #include <fstream>
 
 #include "kernel/environment.h"
+#include "kernel/log.h"
 #include "kernel/random.h"
 
 namespace vita
@@ -67,7 +68,7 @@ public:
 
   const environment &env() const;
 
-  bool debug(bool) const;
+  bool debug() const;
 
   // Iterators
   template<bool> class base_iterator;

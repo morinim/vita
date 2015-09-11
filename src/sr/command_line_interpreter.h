@@ -22,12 +22,12 @@
 
 #include <boost/program_options.hpp>
 
-#include "kernel/vita.h"
+#include "kernel/log.h"
 
 namespace vita {
 namespace cli {
 
-typedef boost::program_options::options_description commands_description;
+using commands_description =  boost::program_options::options_description;
 
 ///
 /// This is the the boost::split_winmain function developed by Vladimir Prus.
@@ -144,25 +144,25 @@ private:
     }
     catch (boost::program_options::ambiguous_option &e)
     {
-      std::cerr << vita::k_s_error << " Ambiguous command '"
-                << boost::program_options::strip_prefixes(e.get_option_name())
-                << "'\n";
+      print.error("Ambiguous command '",
+                  boost::program_options::strip_prefixes(e.get_option_name()),
+                  "'");
     }
     catch (boost::program_options::invalid_command_line_syntax &e)
     {
-      std::cerr << vita::k_s_error << " The required argument for option '"
-                << boost::program_options::strip_prefixes(e.get_option_name())
-                << "' is missing\n";
+      print.error("The required argument for option '",
+                  boost::program_options::strip_prefixes(e.get_option_name()),
+                  "' is missing");
     }
     catch (boost::program_options::unknown_option &e)
     {
-      std::cerr << vita::k_s_error << " Unknown command '"
-                << boost::program_options::strip_prefixes(e.get_option_name())
-                << "'\n";
+      print.error("Unknown command '",
+                  boost::program_options::strip_prefixes(e.get_option_name()),
+                  "'");
     }
     catch (boost::program_options::error &e)
     {
-      std::cerr << vita::k_s_error << ' ' << e.what() << '\n';
+      print.error(e.what());
     }
   }
 
