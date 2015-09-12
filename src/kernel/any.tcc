@@ -139,8 +139,8 @@ struct get_table
 
 inline std::istream &operator>>(std::istream &i, empty &)
 {
-  // If this assertion fires you tried to insert from a std istream
-  // into an empty hold_any instance. This simply can't work, because
+  // If this assertion fires you tried to insert from a std::istream
+  // into an empty `hold_any` instance. This simply can't work, because
   // there is no way to figure out what type to extract from the
   // stream.
   // The only way to make this work is to assign an arbitrary
@@ -158,14 +158,14 @@ inline std::ostream & operator<<(std::ostream &o, const empty &)
 }
 }}  // namespace detail::any_
 
-/// \post \c this->empty()
+/// \post `this->empty()`
 inline any::any() : table(detail::any_::get_table<detail::any_::empty>::get())
 {
 }
 
-/// Copy constructor that copies content of \a x into new instance, so
-/// that any content is equivalent in both type and value to the content of
-/// \a x or empty if \a x is empty.
+/// Copy constructor that copies content of `x` into new instance, so that any
+/// content is equivalent in both type and value to the content of `x` or empty
+/// if `x` is empty.
 inline any::any(const any &x)
   : table(detail::any_::get_table<detail::any_::empty>::get())
 {
@@ -173,10 +173,10 @@ inline any::any(const any &x)
 }
 
 ///
-/// \param[in] x any will contain object \a x.
+/// \param[in] x any will contain object `x`.
 ///
-/// Makes a copy of \a x, so that the initial content of the new instance is
-/// equivalent in both type and value to \a x.
+/// Makes a copy of `x`, so that the initial content of the new instance is
+/// equivalent in both type and value to `x`.
 ///
 template <class T>
 any::any(const T &x) : table(detail::any_::get_table<T>::get())
@@ -248,10 +248,10 @@ any &any::assign(const T &x)
 
 ///
 /// \param[in] rhs new any value.
-/// \return \c this object after assignment.
+/// \return `this` object after assignment.
 ///
-/// Forwards \a rhs, discarding previous content, so that the new content of is
-/// equivalent in both type and value to \a rhs before forward.
+/// Forwards `rhs`, discarding previous content, so that the new content of is
+/// equivalent in both type and value to `rhs` before forward.
 ///
 template <class T>
 any &any::operator=(T &&rhs)
@@ -273,7 +273,7 @@ inline const std::type_info &any::type() const
 }
 
 ///
-/// return \c true if instance is empty, otherwise \c false.
+/// return `true` if instance is empty, otherwise `false`.
 ///
 inline bool any::empty() const
 {
@@ -352,7 +352,7 @@ const T *any_cast(const any *operand)
 ///
 /// \brief Custom keyword cast for extracting a value of a given type from any
 /// \param operand an any.
-/// \return the value contained in \a operand.
+/// \return the value contained in `operand`.
 ///
 template<class T>
 T any_cast(any &operand)
@@ -369,7 +369,7 @@ T any_cast(any &operand)
 ///
 /// \brief Custom keyword cast for extracting a value of a given type from any
 /// \param operand an any.
-/// \return a constant reference to the value contained in \a operand.
+/// \return a constant reference to the value contained in `operand`.
 ///
 template<class T>
 const T &any_cast(const any &operand)

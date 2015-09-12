@@ -77,8 +77,9 @@ public:  // Constructors
   any();
   any(const any &);
 
-  /// Move constructor that moves content of \a x into new instance and
-  /// leaves \a x empty.
+  /// Move constructor that moves content of `x` into new instance and leaves
+  /// `x` empty.
+  ///
   /// \post `x->empty()`
   any(any &&x) : any() { swap(x); }
 
@@ -89,12 +90,13 @@ public:  // Assignment operator
 
   /// Copies content of rhs into current instance, discarding previous
   /// content, so that the new content is equivalent in both type and value
-  /// to the content of \a rhs, or empty if `rhs.empty()`.
+  /// to the content of `rhs`, or empty if `rhs.empty()`.
+  ///
   /// \post `rhs->empty()`
   any &operator=(const any &rhs) { return assign(rhs); }
 
 public:  // Utility functions
-  /// Exchange of the contents of `*this` and \a rhs.
+  /// Exchange of the contents of `*this` and `rhs`.
   any &swap(any &rhs)
   {
     std::swap(table, rhs.table);

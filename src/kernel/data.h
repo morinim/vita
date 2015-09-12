@@ -151,12 +151,10 @@ private:  // Private data members
 ///
 struct data::example
 {
-  example() : input(), output(any()), d_output(domain_t::d_void),
-              difficulty(0), age(0) {}
+  example() : input(), output(any()), difficulty(0), age(0) {}
 
   std::vector<any> input;
   any             output;
-  domain_t      d_output;
 
   std::uintmax_t difficulty;
   unsigned              age;
@@ -170,13 +168,16 @@ struct data::example
 template<class T>
 T data::example::cast_output() const
 {
-  switch (d_output)
-  {
-  case domain_t::d_bool:    return static_cast<T>(any_cast<bool>(output));
-  case domain_t::d_int:     return static_cast<T>(any_cast<int>(output));
-  case domain_t::d_double:  return static_cast<T>(any_cast<double>(output));
-  default:                  return static_cast<T>(0.0);
-  }
+  if (auto *v = any_cast<double>(&output))
+    return static_cast<T>(*v);
+
+  if (auto *v = any_cast<int>(&output))
+    return static_cast<T>(*v);
+
+  if (auto *v = any_cast<bool>(&output))
+    return static_cast<T>(*v);
+
+  return static_cast<T>(0.0);
 }
 
 ///

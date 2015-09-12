@@ -568,10 +568,7 @@ std::size_t data::load_xrff(const std::string &filename)
         if (classification)
           instance.output = encode(value);
         else
-        {
           instance.output = convert(value, domain);
-          instance.d_output = domain;
-        }
       }
     }
 
@@ -701,10 +698,7 @@ std::size_t data::load_csv(const std::string &filename,
             if (classification)
               instance.output = encode(value);
             else
-            {
               instance.output = convert(value, d);
-              instance.d_output = d;
-            }
           }
         }
         else  // input value
