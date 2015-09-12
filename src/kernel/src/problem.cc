@@ -131,7 +131,7 @@ std::pair<std::size_t, std::size_t> src_problem::load(
   env.sset->clear();
   dat_.clear();
 
-  const auto n_examples(dat_.open(ds));
+  const auto n_examples(dat_.load(ds));
 
   if (!ts.empty())
     load_test_set(ts);
@@ -155,7 +155,7 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 {
   const auto backup(dat_.dataset());
   dat_.dataset(data::test);
-  const auto n(dat_.open(ts));
+  const auto n(dat_.load(ts));
   dat_.dataset(backup);
 
   return n;

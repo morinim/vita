@@ -57,7 +57,7 @@ public:
   const_iterator end() const;
 
   // Convenience
-  std::size_t open(const std::string &);
+  std::size_t load(const std::string &);
   bool operator!() const;
 
   void push_back(const example &);

@@ -83,7 +83,7 @@ data::data(const std::string &filename) : data()
 {
   assert(!filename.empty());
 
-  open(filename);
+  load(filename);
 
   assert(debug());
 }
@@ -410,10 +410,9 @@ void data::swap_category(category_t c1, category_t c2)
 }
 
 ///
+/// \brief Loads the content of `filename` into the active dataset
 /// \param[in] filename the xrff file.
 /// \return number of lines parsed (0 in case of errors).
-///
-/// Loads the content of `filename` into the active dataset.
 ///
 /// \note
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
@@ -743,19 +742,19 @@ std::size_t data::load_csv(const std::string &filename,
 /// So:
 ///
 ///     dataset(training);
-///     open("training.csv");
+///     load("training.csv");
 ///     dataset(test);
-///     open("test.csv");
+///     load("test.csv");
 ///     ...
 ///     clear();
 ///     dataset(training);
-///     open("training2.csv");
+///     load("training2.csv");
 ///     ...
 ///
 /// \note
 /// Test set can have an empty output value.
 ///
-std::size_t data::open(const std::string &f)
+std::size_t data::load(const std::string &f)
 {
   auto ends_with =
     [](const std::string &name, const std::string &ext)
