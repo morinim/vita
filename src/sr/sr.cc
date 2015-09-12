@@ -706,8 +706,8 @@ void validation(const std::string &v)
 ///
 void verbosity(unsigned v)
 {
-  if (v > vita::log::ALL)
-    v = vita::log::ALL;
+  if (v > vita::log::L_ALL)
+    v = vita::log::L_ALL;
 
   print.verbosity(static_cast<vita::log::level>(v));
 
@@ -740,7 +740,7 @@ int parse_command_line(int argc, char *const argv[])
          &ui::verbosity),
        "turn off verbosity")
       ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::INFO)
+       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::L_INFO)
        ->notifier(&ui::verbosity),
        "select verbosity level");
 

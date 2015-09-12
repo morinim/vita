@@ -230,7 +230,7 @@ template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
                                       bool status) const
 {
-  if (print.verbosity() >= log::OUTPUT)
+  if (print.verbosity() >= log::L_OUTPUT)
   {
     const unsigned perc(100 * k / pop_.individuals());
     if (status)

@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
 {
   env.individuals = 100;
 
-  vita::print.verbosity(vita::log::WARNING);
+  vita::print.verbosity(vita::log::L_WARNING);
 
   auto eva(vita::make_ga_evaluator<vita::i_ga>(
     [](const std::vector<double> &v)
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
   env.individuals = 100;
   env.threshold.fitness = {0, 0};
 
-  vita::print.verbosity(vita::log::WARNING);
+  vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
   prob.env = env;
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   env.generations = 1000;
   env.threshold.fitness = {0, 0};
 
-  vita::print.verbosity(vita::log::WARNING);
+  vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
   prob.env = env;

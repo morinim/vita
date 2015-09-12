@@ -16,7 +16,7 @@ namespace vita
 {
 log print;
 
-log::log() : level_(ALL)
+log::log() : level_(L_ALL)
 {
 }
 

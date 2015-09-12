@@ -39,7 +39,8 @@ public:
   /// \remarks
   /// The `DEBUG` log level can be switched on only if the `NDEBUG` macro is
   /// defined.
-  enum level : unsigned {OFF, FATAL, ERROR, WARNING, OUTPUT, INFO, DEBUG, ALL};
+  enum level : unsigned {L_OFF, L_FATAL, L_ERROR, L_WARNING, L_OUTPUT,
+                         L_INFO, L_DEBUG, L_ALL};
 
   log();
 
@@ -49,7 +50,7 @@ public:
   template<class... Args>
   void fatal(Args &&... args) const
   {
-    if (level_ >= FATAL)
+    if (level_ >= L_FATAL)
     {
       std::cerr << "[FATAL] ";
       to_<std::cerr>(std::forward<Args>(args)...);
@@ -62,7 +63,7 @@ public:
   template<class... Args>
   void debug(Args &&... args) const
   {
-    if (level_ >= DEBUG)
+    if (level_ >= L_DEBUG)
     {
       std::cout << "[DEBUG] ";
       to_<std::cout>(std::forward<Args>(args)...);
@@ -73,7 +74,7 @@ public:
   template<class... Args>
   void error(Args &&... args) const
   {
-    if (level_ >= ERROR)
+    if (level_ >= L_ERROR)
     {
       std::cerr << "[ERROR] ";
       to_<std::cerr>(std::forward<Args>(args)...);
@@ -83,7 +84,7 @@ public:
   template<class... Args>
   void info(Args &&... args) const
   {
-    if (level_ >= INFO)
+    if (level_ >= L_INFO)
     {
       std::cout << "[INFO] ";
       to_<std::cout>(std::forward<Args>(args)...);
@@ -93,14 +94,14 @@ public:
   template<class... Args>
   void output(Args &&... args) const
   {
-    if (level_ >= OUTPUT)
+    if (level_ >= L_OUTPUT)
       to_<std::cout>(std::forward<Args>(args)...);
   }
 
   template<class... Args>
   void warning(Args &&... args) const
   {
-    if (level_ >= WARNING)
+    if (level_ >= L_WARNING)
     {
       std::cout << "[WARNING] ";
       to_<std::cout>(std::forward<Args>(args)...);
