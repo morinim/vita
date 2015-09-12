@@ -91,6 +91,8 @@ public:
   static domain_t from_weka(const std::string &);
 
 private: // Private support methods
+  example to_example(const std::vector<std::string> &, bool, bool);
+
   class_t encode(const std::string &);
 
   std::size_t load_csv(const std::string &, csv_parser::filter_hook_t);

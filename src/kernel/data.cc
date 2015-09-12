@@ -410,6 +410,56 @@ void data::swap_category(category_t c1, category_t c2)
 }
 
 ///
+/// \param[in] v a record containing the example (all fields, i.e. feature, are
+///              `std::string`.
+/// \param[in] classification is this a classification task?
+/// \param[in] add_label should we automatically add labels for text-features?
+/// \return `v` converted to `example` type.
+///
+/// \remark
+/// When `add_label` is `true` the function can have side-effects (changing
+/// the set of labels associated to a category).
+///
+data::example data::to_example(const std::vector<std::string> &v,
+                               bool classification, bool add_label)
+{
+  assert(v.size());
+
+  example ret;
+
+  unsigned index(0);
+  for (const auto &feature : v)
+  {
+    const auto categ(header_[index].category_id);
+    const auto domain(categories_.find(categ).domain);
+
+    if (index)  // input value
+    {
+      ret.input.push_back(convert(feature, domain));
+
+      if (add_label && domain == domain_t::d_string)
+        categories_.add_label(categ, feature);
+    }
+    else if (!feature.empty())  // output value (not empty)
+    {
+      // Strings could be used as label for classes, but integers
+      // are simpler and faster to manage (arrays instead of maps).
+      if (classification)
+        ret.output = encode(feature);
+      else
+        ret.output = convert(feature, domain);
+    }
+
+    ++index;
+  }
+
+  // The output class/value can be empty only for the test-set.
+  assert(dataset() == test || !ret.output.empty());
+
+  return ret;
+}
+
+///
 /// \brief Loads the content of `filename` into the active dataset
 /// \param[in] filename the xrff file.
 /// \return number of lines parsed (0 in case of errors).
@@ -526,7 +576,7 @@ std::size_t data::load_xrff(const std::string &filename)
     return 0;
 
   // If no output column is specified the default XRFF output column is the
-  // last one (and it is the first element of the header_ vector).
+  // last one (and it's the first element of the `header_` vector).
   if (n_output == 0)
   {
     header_.insert(header_.begin(), header_.back());
@@ -535,8 +585,6 @@ std::size_t data::load_xrff(const std::string &filename)
 
   // Category 0 is the output category.
   swap_category(category_t(0), header_[0].category_id);
-
-  unsigned parsed(0);
 
   auto *instances = handle.FirstChildElement("dataset")
                           .FirstChildElement("body")
@@ -548,38 +596,22 @@ std::size_t data::load_xrff(const std::string &filename)
        i;
        i = i->NextSiblingElement("instance"))
   {
-    example instance;
-
-    unsigned index(0);
+    std::vector<std::string> record;
     for (auto *v = i->FirstChildElement("value");
          v;
-         v = v->NextSiblingElement("value"), ++index)
-    {
-      const auto domain(categories_.find(header_[index].category_id).domain);
+         v = v->NextSiblingElement("value"))
+      record.push_back(v->GetText() ? v->GetText() : "");
 
-      const std::string value(v->GetText() ? v->GetText() : "");
-
-      if (index)  // input value
-        instance.input.push_back(convert(value, domain));
-      else  // output value
-      {
-        // Strings could be used as label for classes, but integers
-        // are simpler and faster to manage (arrays instead of maps).
-        if (classification)
-          instance.output = encode(value);
-        else
-          instance.output = convert(value, domain);
-      }
-    }
+    const auto instance(to_example(record, classification, false));
 
     if (instance.input.size() + 1 == columns())
-    {
       push_back(instance);
-      ++parsed;
-    }
+    else
+      print.warning("Malformed example ", size(), " skipped");
+
   }
 
-  return debug() ? parsed : 0;
+  return debug() ? size() : static_cast<std::size_t>(0);
 }
 
 ///
@@ -675,44 +707,7 @@ std::size_t data::load_csv(const std::string &filename,
     if (fields != columns())  // skip lines with wrong number of columns
       continue;
 
-    example instance;
-
-    for (auto field(decltype(fields){0}); field < fields; ++field)
-      try
-      {
-        const category_t c(header_[field].category_id);
-        const domain_t d(categories_.find(c).domain);
-
-        const auto value(record[field]);
-
-        if (field == 0)  // output value
-        {
-          if (value.empty())
-          {
-            assert(dataset() == test);
-            // For test set the output class/value could be missing (e.g.
-            // for kaggle.com competition test set).
-          }
-          else
-          {
-            if (classification)
-              instance.output = encode(value);
-            else
-              instance.output = convert(value, d);
-          }
-        }
-        else  // input value
-        {
-          instance.input.push_back(convert(value, d));
-          if (d == domain_t::d_string)
-            categories_.add_label(c, value);
-        }
-      }
-      catch(std::invalid_argument &)
-      {
-        instance.clear();
-        continue;
-      }
+    const auto instance(to_example(record, classification, true));
 
     if (instance.input.size() + 1 == columns())
       push_back(instance);
