@@ -40,19 +40,19 @@ BOOST_AUTO_TEST_CASE(Penalty)
 
   BOOST_REQUIRE_EQUAL(intr.penalty(), 0);
 
-  ind[0] = 20;
+  ind[0] = 20.0;
   const auto p1(intr.penalty());
   BOOST_REQUIRE_GT(p1, 0.0);
 
-  ind[1] = 200;
+  ind[1] = 200.0;
   const auto p2(intr.penalty());
   BOOST_REQUIRE_GT(p2, p1);
 
-  ind[2] = 2000;
+  ind[2] = 2000.0;
   const auto p3(intr.penalty());
   BOOST_REQUIRE_GT(p3, p2);
 
-  ind[3] = 20000;
+  ind[3] = 20000.0;
   const auto p4(intr.penalty());
   BOOST_REQUIRE_GT(p4, p3);
 }
