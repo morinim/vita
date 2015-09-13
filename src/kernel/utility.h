@@ -289,8 +289,8 @@ bool load_float_from_stream(std::istream &in, T *i)
 class csv_parser
 {
 public:
-  using value_type = std::vector<std::string>;
-  using filter_hook_t = bool (*)(const value_type &);
+  using record_t = std::vector<std::string>;
+  using filter_hook_t = std::function<bool (record_t *)>;
 
   explicit csv_parser(std::istream &is)
     : is_(&is), filter_hook_(nullptr), delimiter_(','), trim_ws_(false)
@@ -305,10 +305,13 @@ public:
   }
 
   /// \param[in] t if `true` trims leading and trailing spaces adjacent to
-  ///              commas (this practice is contentious and in fact is
-  ///              specifically prohibited by RFC 4180, which states: "Spaces
-  ///              are considered part of a field and should not be ignored.").
+  ///              commas.
   /// \return a reference to `this` object (fluent interface).
+  ///
+  /// \remark
+  /// Trimming spaces is contentious and in fact the prectice is specifically
+  /// prohibited by RFC 4180, which states: "Spaces are considered part of a
+  /// field and should not be ignored".
   csv_parser trim_ws(bool t)
   {
     trim_ws_ = t;
@@ -346,11 +349,13 @@ class csv_parser::const_iterator
 public:
   using iterator_category = std::forward_iterator_tag;
   using difference_type = std::ptrdiff_t;
-  using value_type = csv_parser::value_type;
+  using value_type = csv_parser::record_t;
   using pointer = value_type *;
   using const_pointer = const value_type *;
   using reference = value_type &;
   using const_reference = const value_type &;
+
+  enum class get_input_fail {missing_istream, eof};
 
   const_iterator(std::istream *is = nullptr,
                  csv_parser::filter_hook_t f = nullptr,
@@ -395,9 +400,8 @@ private:
   void get_input();
 
   // Data members MUST BE INITIALIZED IN THE CORRECT ORDER:
-  // * `value_` is initialized via the `get_input` member function
-  // * `get_input` works only if `_ptr`, `delimiter_` and `value_` are already
-  //   initialized
+  // * `value_` is initialized via the `get_input` member function;
+  // * `get_input` works only if `_ptr` is already initialized.
   // So it's important that `value_` is the last value to be initialized.
   std::istream *ptr_;
   csv_parser::filter_hook_t filter_hook_;

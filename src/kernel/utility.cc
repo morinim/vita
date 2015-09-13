@@ -63,8 +63,6 @@ csv_parser::const_iterator csv_parser::end() const
 ///
 void csv_parser::const_iterator::get_input()
 {
-  enum class get_input_fail {missing_istream, eof};
-
   try
   {
     if (!ptr_)
@@ -77,7 +75,7 @@ void csv_parser::const_iterator::get_input()
         throw get_input_fail::eof;
 
       value_ = parse_line(line);
-    } while (filter_hook_ && !filter_hook_(value_));
+    } while (filter_hook_ && !filter_hook_(&value_));
   }
   catch (get_input_fail)
   {

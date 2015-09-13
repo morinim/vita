@@ -44,8 +44,17 @@ private:
   using examples_t = std::vector<example>;
 
 public:
+  /// Raw input record. The ETL chain is:
+  /// > DATASET -> record_t -> example --(vita::push_back)--> vita::data
+  using record_t = std::vector<std::string>;
+
+  /// A filter and transform function (returns `true` for records that should
+  /// be loaded and, possibly, transform its input parameter).
+  using filter_hook_t = std::function<bool (record_t *)>;
+
+  // Constructors
   data();
-  explicit data(const std::string &);
+  explicit data(const std::string &, filter_hook_t = nullptr);
 
   // Iterators
   using iterator = typename examples_t::iterator;
@@ -57,7 +66,7 @@ public:
   const_iterator end() const;
 
   // Convenience
-  std::size_t load(const std::string &);
+  std::size_t load(const std::string &, filter_hook_t = nullptr);
   bool operator!() const;
 
   void push_back(const example &);
@@ -95,8 +104,8 @@ private: // Private support methods
 
   class_t encode(const std::string &);
 
-  std::size_t load_csv(const std::string &, csv_parser::filter_hook_t);
-  std::size_t load_xrff(const std::string &);
+  std::size_t load_csv(const std::string &, filter_hook_t);
+  std::size_t load_xrff(const std::string &, filter_hook_t);
 
   void swap_category(category_t, category_t);
 

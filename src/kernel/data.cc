@@ -76,14 +76,15 @@ data::data() : classes_map_(), header_(), categories_(),
 
 ///
 /// \param[in] filename name of the file containing the learning collection.
+/// \param[in] ft a filter and transform function.
 ///
 /// New data instance containing the learning collection from `filename`.
 ///
-data::data(const std::string &filename) : data()
+data::data(const std::string &filename, filter_hook_t ft) : data()
 {
   assert(!filename.empty());
 
-  load(filename);
+  load(filename, ft);
 
   assert(debug());
 }
@@ -462,6 +463,7 @@ data::example data::to_example(const std::vector<std::string> &v,
 ///
 /// \brief Loads the content of `filename` into the active dataset
 /// \param[in] filename the xrff file.
+/// \param[in] ft a filter and transform function.
 /// \return number of lines parsed (0 in case of errors).
 ///
 /// \note
@@ -493,7 +495,7 @@ data::example data::to_example(const std::vector<std::string> &v,
 /// \note
 /// Test set can have an empty output value.
 ///
-std::size_t data::load_xrff(const std::string &filename)
+std::size_t data::load_xrff(const std::string &filename, filter_hook_t ft)
 {
   assert(dataset() == training);
 
@@ -602,6 +604,9 @@ std::size_t data::load_xrff(const std::string &filename)
          v = v->NextSiblingElement("value"))
       record.push_back(v->GetText() ? v->GetText() : "");
 
+    if (ft && ft(&record) == false)
+      continue;
+
     const auto instance(to_example(record, classification, false));
 
     if (instance.input.size() + 1 == columns())
@@ -616,7 +621,7 @@ std::size_t data::load_xrff(const std::string &filename)
 
 ///
 /// \param[in] filename the csv file.
-/// \param[in] filter a filter function to select a subset of the records.
+/// \param[in] ft a filter and transform function.
 /// \return number of lines parsed (0 in case of errors).
 ///
 /// We follow the Google Prediction API convention
@@ -659,8 +664,7 @@ std::size_t data::load_xrff(const std::string &filename)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t data::load_csv(const std::string &filename,
-                           csv_parser::filter_hook_t filter)
+std::size_t data::load_csv(const std::string &filename, filter_hook_t ft)
 {
   std::ifstream from(filename);
   if (!from)
@@ -668,7 +672,7 @@ std::size_t data::load_csv(const std::string &filename,
 
   bool classification(false), format(columns());
 
-  for (auto record : csv_parser(from).filter_hook(filter))
+  for (auto record : csv_parser(from).filter_hook(ft))
   {
     const auto fields(record.size());
 
@@ -720,6 +724,7 @@ std::size_t data::load_csv(const std::string &filename,
 
 ///
 /// \param[in] f name of the file containing the data set.
+/// \param[in] ft a filter and transform function.
 /// \return number of lines parsed (0 in case of errors).
 ///
 /// Loads the content of `f` into the active dataset.
@@ -743,7 +748,7 @@ std::size_t data::load_csv(const std::string &filename,
 /// \note
 /// Test set can have an empty output value.
 ///
-std::size_t data::load(const std::string &f)
+std::size_t data::load(const std::string &f, filter_hook_t ft)
 {
   auto ends_with =
     [](const std::string &name, const std::string &ext)
@@ -754,7 +759,7 @@ std::size_t data::load(const std::string &f)
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
-  return xrff ? load_xrff(f) : load_csv(f, nullptr);
+  return xrff ? load_xrff(f, ft) : load_csv(f, ft);
 }
 
 ///
