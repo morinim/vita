@@ -472,7 +472,7 @@ data::example data::to_example(const std::vector<std::string> &v,
 /// The original format is defined in http://weka.wikispaces.com/XRFF, we
 /// extend it with an additional (non-standard) feature: attribute category.
 ///
-///     <attribute name="vehicle length" type="numeric" category="length" /
+///     <attribute name="vehicle length" type="numeric" category="length" />
 ///     <attribute name="vehicle width" type="numeric" category="length" />
 ///     <attribute name="vehicle weight" type="numeric" category="weight" />
 ///
@@ -483,8 +483,8 @@ data::example data::to_example(const std::vector<std::string> &v,
 /// * `header_[0]` is the output column (it contains informations about
 ///   problem's output);
 /// * `category(0)` is the output category (for symbolic regression
-///   problems it is the output type of the xrff file, for classification
-///   problems it is the `numeric` type).
+///   problems it's the output type of the xrff file, for classification
+///   problems it's the `numeric` type).
 ///
 /// \warning
 /// To date:
@@ -492,8 +492,7 @@ data::example data::to_example(const std::vector<std::string> &v,
 /// * XRFF files cannot be used to load test set (problems with missing
 ///   output column and possible column category redefinition).
 ///
-/// \note
-/// Test set can have an empty output value.
+/// \note Test set examples can have an empty output value.
 ///
 std::size_t data::load_xrff(const std::string &filename, filter_hook_t ft)
 {
