@@ -51,7 +51,7 @@ enum class fit_tag {copies_of, components};
 /// The definition of standardized fitness given here is different from that
 /// used in Koza's "Genetic Programming: On the Programming of Computers by
 /// Means of Natural Selection". In the book a **LOWER** numerical value is
-//  always a better one.
+/// always a better one.
 /// The main difference is that Vita attempts to maximize the fitness (while
 /// other softwares try to minimize it).
 /// We chose this convention since it seemed more natural (a greater fitness
