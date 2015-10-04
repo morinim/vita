@@ -16,7 +16,8 @@
 #include <cmath>
 #include <string>
 
-#include <boost/property_tree/ptree.hpp>
+#include <boost/optional.hpp>
+#include "tinyxml2/tinyxml2.h"
 
 #include "kernel/model_measurements.h"
 #include "kernel/log.h"
@@ -37,7 +38,11 @@ class environment
 public:  // Constructor and support functions
   explicit environment(symbol_set *, bool = false);
 
-  void log(boost::property_tree::ptree *const, const std::string & = "") const;
+  void xml(tinyxml2::XMLPrinter *) const;
+
+  // Serialization
+  //bool load(std::istream &) {}
+  //bool save(std::ostream &) const;
 
   bool debug(bool) const;
 
@@ -46,14 +51,13 @@ public:  // Data members
   /// population).
   /// Code length have to be chosen before population is created and cannot be
   /// changed afterwards.
-  /// \note
-  /// A length of 0 means undefined (auto-tune).
+  ///
+  /// \note A length of 0 means undefined (auto-tune).
   unsigned code_length = 0;
 
   /// The number of symbols in the patch section (a section of the genome that
   /// contains terminals only).
-  /// \note
-  /// A length of 0 means undefined (auto-tune).
+  /// \note A length of 0 means undefined (auto-tune).
   unsigned patch_length = 0;
 
   /// Number of layers for the population.
@@ -63,14 +67,13 @@ public:  // Data members
   /// layer don't interact).
   /// A value greater than one is usually choosen for vita::basic_alps_es or
   /// with other strategies that allow migrants.
-  /// \note
-  /// A value of 0 means undefined (auto-tune).
+  ///
+  /// \note A value of 0 means undefined (auto-tune).
   unsigned layers = 0;
 
   /// Number of individuals in a layer of the population.
   ///
-  /// \note
-  /// A value of 0 means undefined (auto-tune).
+  /// \note A value of 0 means undefined (auto-tune).
   unsigned individuals = 0;
 
   /// An elitist algorithm is one that ALWAYS retains in the population the
@@ -86,12 +89,11 @@ public:  // Data members
   ///
   /// \warning
   ///     p_cross + p_mutation != 1.0
-  /// `p_mutation` is the probability to mutate a gene; it is not the
+  /// `p_mutation` is the probability to mutate a gene; it's not the
   /// probability to choose the mutation operator (which depends depends on the
   /// recombination algorithm).
   ///
-  /// \note
-  /// A negative value means undefined (auto-tune).
+  /// \note A negative value means undefined (auto-tune).
   ///
   /// \see
   /// * individual::mutation;
@@ -100,8 +102,7 @@ public:  // Data members
 
   /// \brief Crossover probability
   ///
-  /// \note
-  /// A negative value means means undefined (auto-tune).
+  /// \note A negative value means means undefined (auto-tune).
   ///
   /// \see operation_strategy::run.
   double p_cross = -1.0;
@@ -139,27 +140,28 @@ public:  // Data members
   /// This is used for the trivial geography scheme (Spector, Klein 2005).
   /// The population is viewed as having a 1-dimensional spatial structure -
   /// actually a circle, as we consider the first and last locations to be
-  /// adiacent. The production of an individual from location _i_ is permitted
-  /// to involve only parents from _i_'s local neightborhood, where the
+  /// adiacent. The production of an individual from location `i` is permitted
+  /// to involve only parents from `i`'s local neightborhood, where the
   /// neightborhood is defined as all individuals within distance
-  /// `mate_zone/2` of _i_ (`0` for panmictic).
+  /// `mate_zone/2` of `i` (`0` for panmictic).
   boost::optional<unsigned> mate_zone;
 
   /// Maximun number of generations allowed before terminate a run.
-  /// \note
-  /// A value of 0 means undefined (auto-tune).
+  ///
+  /// \note A value of 0 means undefined (auto-tune).
   unsigned generations = 0;
 
   /// Stop a run when we cannot see improvements within g_without_improvement
   /// generations.
-  /// \note
-  /// A value of 0 means undefined (auto-tune).
+  ///
+  /// \note A value of 0 means undefined (auto-tune).
   unsigned g_without_improvement;
 
   /// How much data should be reserved for the validation set?
   /// `validation_percentage` is the fraction of the original data that goes
   /// into the validation set.
-  /// A value greater than 100 means undefined (auto-tune).
+  ///
+  /// \note A value greater than 100 means undefined (auto-tune).
   unsigned validation_percentage = 101;
 
   /// Should we use Adaptive Representation through Learning?
@@ -226,15 +228,14 @@ public:  // Data members
     /// Also, the `age_gap` parameter sets the frequency of how often the first
     /// layer is restarted.
     ///
-    /// \note
-    /// A value of 0 means undefined (auto-tune).
+    /// \note A value of 0 means undefined (auto-tune).
     unsigned age_gap = 20;
 
     /// We already have a parent (individual) from a layer, which is the
     /// probability that the second parent will be extracted from the same
     /// layer? (with ALPS it could be taken from the previous layer).
-    /// \note
-    /// A negative value means undefined (auto-tune).
+    ///
+    /// \note A negative value means undefined (auto-tune).
     double p_same_layer = 0.75;
   } alps;
 

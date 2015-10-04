@@ -550,51 +550,70 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
   // Summary logging.
   if (this->env_.stat.summary)
   {
-    std::ostringstream best_list, best_tree, best_graph;
-    run_sum.best.solution.list(best_list, true);
-    run_sum.best.solution.tree(best_tree);
-    run_sum.best.solution.graphviz(best_graph);
+    tinyxml2::XMLPrinter p;
+    p.OpenElement("vita");
 
-    const std::string path("vita.");
-    const std::string summary(path + "summary.");
+    p.OpenElement("summary");
 
     const auto solutions(static_cast<unsigned>(good_runs.size()));
+    const auto success_rate(
+      runs ? static_cast<double>(solutions) / static_cast<double>(runs)
+           : 0);
 
-    boost::property_tree::ptree pt;
-    pt.put(summary + "success_rate", runs ?
-           static_cast<double>(solutions) / static_cast<double>(runs) : 0);
-    pt.put(summary + "elapsed_time", run_sum.elapsed);
-    pt.put(summary + "mean_fitness", fd.mean());
-    pt.put(summary + "standard_deviation", fd.standard_deviation());
+    push_text(p, "success_rate", success_rate);
+    push_text(p, "elapsed_time", run_sum.elapsed);
+    push_text(p, "mean_fitness", fd.mean());
+    push_text(p, "standard_deviation", fd.standard_deviation());
 
-    pt.put(summary + "best.fitness", run_sum.best.score.fitness);
-    pt.put(summary + "best.accuracy", run_sum.best.score.accuracy);
-    pt.put(summary + "best.run", best_run);
-    pt.put(summary + "best.solution.tree", best_tree.str());
-    pt.put(summary + "best.solution.list", best_list.str());
-    pt.put(summary + "best.solution.graph", best_graph.str());
+    p.OpenElement("best");
+    push_text(p, "fitness", run_sum.best.score.fitness);
+    push_text(p, "accuracy", run_sum.best.score.accuracy);
+    push_text(p, "run", best_run);
 
-    for (const auto &p : good_runs)
-      pt.add(summary + "solutions.runs.run", p);
-    pt.put(summary + "solutions.found", solutions);
-    pt.put(summary + "solutions.avg_depth",
-           solutions ? run_sum.last_imp / solutions : 0);
+    p.OpenElement("solution");
 
-    pt.put(summary + "other.evaluator", this->active_eva_->info());
+    std::ostringstream ss;
+    run_sum.best.solution.tree(ss);
+    push_text(p, "tree", ss.str());
+
+    ss = std::ostringstream();
+    run_sum.best.solution.list(ss, true);
+    push_text(p, "list", ss.str());
+
+    ss = std::ostringstream();
+    run_sum.best.solution.graphviz(ss);
+    push_text(p, "graph", ss.str());
+
+    p.CloseElement();  // </solution>
+    p.CloseElement();  // </best>
+
+    p.OpenElement("solutions");
+    p.OpenElement("runs");
+    for (const auto &gr : good_runs)
+      push_text(p, "run", gr);
+    p.CloseElement();  // </runs>
+
+    push_text(p, "found", solutions);
+
+    const auto avg_depth(solutions ? run_sum.last_imp / solutions : 0);
+    push_text(p, "avg_depth", avg_depth);
+
+    p.CloseElement();  // </solution>
+
+    p.OpenElement("other");
+    push_text(p, "evaluator", this->active_eva_->info());
+    p.CloseElement();  // </other>
+
+    p.CloseElement();  // </summary>
+
+    this->env_.xml(&p);
+
+    p.CloseElement();  // </vita>
 
     const std::string f_sum(this->env_.stat.dir + "/" +
                             this->env_.stat.sum_name);
-
-    this->env_.log(&pt, path);
-
-    using namespace boost::property_tree;
-#if BOOST_VERSION >= 105600
-    write_xml(f_sum, pt, std::locale(),
-              xml_writer_make_settings<std::string>(' ', 2));
-#else
-    write_xml(f_sum, pt, std::locale(),
-              xml_writer_make_settings(' ', 2));
-#endif
+    std::ofstream of(f_sum);
+    of << p.CStr();
   }
 
   // Test set results logging.

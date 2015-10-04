@@ -54,42 +54,65 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
 }
 
 ///
-/// \param[out] pt output tree.
-/// \param[in] path where to store the environment data file.
+/// \param[out] p output document where to save the environment.
 ///
-/// Saves the environment using the `pt` boost property tree.
+/// Saves the environment (XML format).
 ///
-void environment::log(boost::property_tree::ptree *const pt,
-                      const std::string &path) const
+void environment::xml(tinyxml2::XMLPrinter *p) const
 {
   assert(stat.summary);
 
-  const std::string env(path + "environment.");
-  pt->put(env + "layers", layers);
-  pt->put(env + "individuals", individuals);
-  pt->put(env + "code_length", code_length);
-  pt->put(env + "patch_length", patch_length);
-  pt->put(env + "elitism", elitism);
-  pt->put(env + "mutation_rate", p_mutation);
-  pt->put(env + "crossover_rate", p_cross);
-  pt->put(env + "brood_recombination", brood_recombination);
-  pt->put(env + "dss", dss);
-  pt->put(env + "tournament_size", tournament_size);
-  pt->put(env + "mating_zone", mate_zone);
-  pt->put(env + "max_generations", generations);
-  pt->put(env + "max_gens_wo_imp", g_without_improvement);
-  pt->put(env + "arl", arl);
-  pt->put(env + "alps.age_gap", alps.age_gap);
-  pt->put(env + "alps.p_same_layer", alps.p_same_layer);
-  pt->put(env + "team.individuals", team.individuals);
-  pt->put(env + "validation_percentage", validation_percentage);
-  pt->put(env + "ttable_bits", ttable_size);  // size 1u << ttable_size.
-  pt->put(env + "statistics.directory", stat.dir);
-  pt->put(env + "statistics.save_arl", stat.arl);
-  pt->put(env + "statistics.save_dynamics", stat.dynamic);
-  pt->put(env + "statistics.save_layers", stat.layers);
-  pt->put(env + "statistics.save_population", stat.population);
-  pt->put(env + "statistics.save_summary", stat.summary);
+  auto tti =
+  [](trilean v)
+  {
+    return static_cast<std::underlying_type<trilean>::type>(v);
+  };
+
+  // TO BE CHANGED WITH POLIMORPHIC LAMBDA when switching to C++14
+  // auto print = [&](const std::string &s, auto v) { ... }
+#define env_print(s, v) p->OpenElement(s); p->PushText(v); p->CloseElement()
+
+  p->OpenElement("environment");
+
+  env_print("layers", layers);
+  env_print("individuals", individuals);
+  env_print("code_length", code_length);
+  env_print("patch_length", patch_length);
+  env_print("elitism", tti(elitism));
+  env_print("mutation_rate", p_mutation);
+  env_print("crossover_rate", p_cross);
+  env_print("brood_recombination", *brood_recombination);
+  env_print("dss", tti(dss));
+  env_print("tournament_size", tournament_size);
+  env_print("mating_zone", *mate_zone);
+  env_print("max_generations", generations);
+  env_print("max_gens_wo_imp", g_without_improvement);
+  env_print("arl", tti(arl));
+
+  p->OpenElement("alps");
+  env_print("age_gap", alps.age_gap);
+  env_print("p_same_layer", alps.p_same_layer);
+  p->CloseElement();
+
+  p->OpenElement("team");
+  env_print("individuals", team.individuals);
+  p->CloseElement();
+
+  env_print("validation_percentage", validation_percentage);
+  env_print("ttable_bits", ttable_size);  // size 1u << ttable_size.
+
+  p->OpenElement("statistics");
+  env_print("directory", stat.dir.c_str());
+  env_print("save_arl", stat.arl);
+  env_print("save_dynamics", stat.dynamic);
+  env_print("save_layers", stat.layers);
+  env_print("save_population", stat.population);
+  env_print("save_summary", stat.summary);
+  p->CloseElement();
+
+  p->CloseElement();  // </environment>
+
+#undef env_save_print
 }
 
 ///
