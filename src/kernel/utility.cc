@@ -156,33 +156,6 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   return record;
 }
 
-///
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] s xml element's value
-///
-/// Specialization for `int`.
-///
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e, int v)
-{
-  p.OpenElement(e.c_str());
-  p.PushText(v);
-  p.CloseElement();
-}
-
-///
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] s xml element's value
-///
-/// Specialization for `double`.
-///
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e, double v)
-{
-  p.OpenElement(e.c_str());
-  p.PushText(v);
-  p.CloseElement();
-}
 
 ///
 /// \param[out] p output xml printer
@@ -197,6 +170,77 @@ void push_text(tinyxml2::XMLPrinter &p, const std::string &e,
   p.OpenElement(e.c_str());
   p.PushText(s.c_str());
   p.CloseElement();
+}
+
+///
+/// \param[out] p output xml printer
+/// \param[in] e xml element
+/// \param[in] v xml element's value
+///
+/// Specialization for `int`.
+///
+void push_text(tinyxml2::XMLPrinter &p, const std::string &e, int v)
+{
+  p.OpenElement(e.c_str());
+  p.PushText(v);
+  p.CloseElement();
+}
+
+///
+/// \param[out] p output xml printer
+/// \param[in] e xml element
+/// \param[in] v xml element's value
+///
+/// Specialization for `double`.
+///
+void push_text(tinyxml2::XMLPrinter &p, const std::string &e, double v)
+{
+  p.OpenElement(e.c_str());
+  p.PushText(v);
+  p.CloseElement();
+}
+
+///
+/// \param[out] p parent element
+/// \param[in] e new xml element
+/// \param[in] s new xml element's value
+///
+/// Specialization for `std::string`.
+///
+void set_text(tinyxml2::XMLElement *p, const std::string &e,
+              const std::string &s)
+{
+  auto *pe(p->GetDocument()->NewElement(e.c_str()));
+  pe->SetText(s.c_str());
+  p->InsertEndChild(pe);
+}
+
+///
+/// \param[out] p parent element
+/// \param[in] e new xml element
+/// \param[in] v new xml element's value
+///
+/// Specialization for `int`.
+///
+void set_text(tinyxml2::XMLElement *p, const std::string &e, int v)
+{
+  auto *pe(p->GetDocument()->NewElement(e.c_str()));
+  pe->SetText(v);
+  p->InsertEndChild(pe);
+}
+
+///
+/// \param[out] p parent element
+/// \param[in] e new xml element
+/// \param[in] v new xml element's value
+///
+/// Specialization for `double`.
+///
+void set_text(tinyxml2::XMLElement *p, const std::string &e, double v)
+{
+  auto *pe(p->GetDocument()->NewElement(e.c_str()));
+  pe->SetText(v);
+  p->InsertEndChild(pe);
 }
 
 }  // namespace vita

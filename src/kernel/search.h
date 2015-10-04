@@ -57,6 +57,10 @@ protected:  // Protected support methods
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   virtual bool stop_condition(const summary<T> &) const;
 
+  template<class C> void log(tinyxml2::XMLDocument *, const summary<T> &,
+                             const distribution<fitness_t> &, const C &,
+                             typename C::value_type, unsigned);
+
 protected:  // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
 

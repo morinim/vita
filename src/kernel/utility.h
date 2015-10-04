@@ -413,24 +413,24 @@ private:
   value_type value_;
 };  // class csv_parser::const_iterator
 
-void push_text(tinyxml2::XMLPrinter &, const std::string &, int);
-void push_text(tinyxml2::XMLPrinter &, const std::string &, double);
-void push_text(tinyxml2::XMLPrinter &, const std::string &,
-               const std::string &);
+void set_text(tinyxml2::XMLElement *, const std::string &, int);
+void set_text(tinyxml2::XMLElement *, const std::string &, double);
+void set_text(tinyxml2::XMLElement *, const std::string &,
+              const std::string &);
 
 ///
-/// \brief A convenient arrangement for printing stream aware-objects to
-///        `XMLPrinter`
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] s xml element's value
+/// \brief A convenient arrangement for inserting stream-aware objects into
+///        `XMLDocument`
+/// \param[out] p parent element
+/// \param[in] e new xml element
+/// \param[in] s new xml element's value
 ///
 template<class T>
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e, const T &v)
+void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
 {
   std::ostringstream ss;
   ss << v;
-  push_text(p, e, ss.str());
+  set_text(p, e, ss.str());
 }
 
 }  // namespace vita

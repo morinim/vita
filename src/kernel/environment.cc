@@ -54,65 +54,57 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
 }
 
 ///
-/// \param[out] p output document where to save the environment.
+/// \param[out] d output document for saving the environment.
 ///
 /// Saves the environment (XML format).
 ///
-void environment::xml(tinyxml2::XMLPrinter *p) const
+void environment::xml(tinyxml2::XMLDocument *d) const
 {
   assert(stat.summary);
 
-  auto tti =
-  [](trilean v)
+  auto tti = [](trilean v)
   {
     return static_cast<std::underlying_type<trilean>::type>(v);
   };
 
-  // TO BE CHANGED WITH POLIMORPHIC LAMBDA when switching to C++14
-  // auto print = [&](const std::string &s, auto v) { ... }
-#define env_print(s, v) p->OpenElement(s); p->PushText(v); p->CloseElement()
+  auto *root(d->RootElement());
 
-  p->OpenElement("environment");
+  auto *e_environment(d->NewElement("environment"));
+  root->InsertEndChild(e_environment);
+  set_text(e_environment, "layers", layers);
+  set_text(e_environment, "individuals", individuals);
+  set_text(e_environment, "code_length", code_length);
+  set_text(e_environment, "patch_length", patch_length);
+  set_text(e_environment, "elitism", tti(elitism));
+  set_text(e_environment, "mutation_rate", p_mutation);
+  set_text(e_environment, "crossover_rate", p_cross);
+  set_text(e_environment, "brood_recombination", *brood_recombination);
+  set_text(e_environment, "dss", tti(dss));
+  set_text(e_environment, "tournament_size", tournament_size);
+  set_text(e_environment, "mating_zone", *mate_zone);
+  set_text(e_environment, "max_generations", generations);
+  set_text(e_environment, "max_gens_wo_imp", g_without_improvement);
+  set_text(e_environment, "arl", tti(arl));
+  set_text(e_environment, "validation_percentage", validation_percentage);
+  set_text(e_environment, "ttable_bits", ttable_size);  // size 1u << ttable_size.
 
-  env_print("layers", layers);
-  env_print("individuals", individuals);
-  env_print("code_length", code_length);
-  env_print("patch_length", patch_length);
-  env_print("elitism", tti(elitism));
-  env_print("mutation_rate", p_mutation);
-  env_print("crossover_rate", p_cross);
-  env_print("brood_recombination", *brood_recombination);
-  env_print("dss", tti(dss));
-  env_print("tournament_size", tournament_size);
-  env_print("mating_zone", *mate_zone);
-  env_print("max_generations", generations);
-  env_print("max_gens_wo_imp", g_without_improvement);
-  env_print("arl", tti(arl));
+  auto *e_alps(d->NewElement("alps"));
+  e_environment->InsertEndChild(e_alps);
+  set_text(e_alps, "age_gap", alps.age_gap);
+  set_text(e_alps, "p_same_layer", alps.p_same_layer);
 
-  p->OpenElement("alps");
-  env_print("age_gap", alps.age_gap);
-  env_print("p_same_layer", alps.p_same_layer);
-  p->CloseElement();
+  auto *e_team(d->NewElement("team"));
+  e_environment->InsertEndChild(e_team);
+  set_text(e_team, "individuals", team.individuals);
 
-  p->OpenElement("team");
-  env_print("individuals", team.individuals);
-  p->CloseElement();
-
-  env_print("validation_percentage", validation_percentage);
-  env_print("ttable_bits", ttable_size);  // size 1u << ttable_size.
-
-  p->OpenElement("statistics");
-  env_print("directory", stat.dir.c_str());
-  env_print("save_arl", stat.arl);
-  env_print("save_dynamics", stat.dynamic);
-  env_print("save_layers", stat.layers);
-  env_print("save_population", stat.population);
-  env_print("save_summary", stat.summary);
-  p->CloseElement();
-
-  p->CloseElement();  // </environment>
-
-#undef env_save_print
+  auto *e_statistics(d->NewElement("statistics"));
+  e_environment->InsertEndChild(e_statistics);
+  set_text(e_statistics, "directory", stat.dir.c_str());
+  set_text(e_statistics, "save_arl", stat.arl);
+  set_text(e_statistics, "save_dynamics", stat.dynamic);
+  set_text(e_statistics, "save_layers", stat.layers);
+  set_text(e_statistics, "save_population", stat.population);
+  set_text(e_statistics, "save_summary", stat.summary);
 }
 
 ///

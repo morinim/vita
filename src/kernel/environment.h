@@ -38,7 +38,7 @@ class environment
 public:  // Constructor and support functions
   explicit environment(symbol_set *, bool = false);
 
-  void xml(tinyxml2::XMLPrinter *) const;
+  void xml(tinyxml2::XMLDocument *) const;
 
   // Serialization
   //bool load(std::istream &) {}

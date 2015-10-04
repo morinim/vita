@@ -152,63 +152,12 @@ void ga_search<T, ES, F>::log(const summary<T> &run_sum,
     return;
 
   // Summary logging.
-  tinyxml2::XMLPrinter p;
-  p.OpenElement("vita");
-
-  p.OpenElement("summary");
-
-  const auto solutions(static_cast<unsigned>(good_runs.size()));
-  const auto success_rate(
-    runs ? static_cast<double>(solutions) / static_cast<double>(runs)
-         : 0);
-
-  push_text(p, "success_rate", success_rate);
-
-  push_text(p, "elapsed_time", run_sum.elapsed);
-  push_text(p, "mean_fitness", fd.mean());
-  push_text(p, "standard_deviation", fd.standard_deviation());
-
-  p.OpenElement("best");
-
-  push_text(p, "fitness", run_sum.best.score.fitness);
-  push_text(p, "run", best_run);
-
-  p.OpenElement("solution");
-
-  std::ostringstream ss;
-  run_sum.best.solution.list(ss);
-  push_text(p, "list", ss.str());
-
-  p.CloseElement();  // </solution>
-  p.CloseElement();  // </best>
-
-  p.OpenElement("solutions");
-  p.OpenElement("runs");
-  for (const auto &gr : good_runs)
-    push_text(p, "run", gr);
-  p.CloseElement();  // </runs>
-
-  push_text(p, "found", solutions);
-
-  const auto avg_depth(solutions ? run_sum.last_imp / solutions : 0);
-  push_text(p, "avg_depth", avg_depth);
-
-  p.CloseElement();  // </solution>
-
-  p.OpenElement("other");
-  push_text(p, "evaluator", this->active_eva_->info());
-  p.CloseElement();  // </other>
-
-  p.CloseElement();  // </summary>
-
-  this->env_.xml(&p);
-
-  p.CloseElement();  // </vita>
+  tinyxml2::XMLDocument d;
+  search<T, ES>::log(&d, run_sum, fd, good_runs, best_run, runs);
 
   const std::string f_sum(this->env_.stat.dir + "/" +
                           this->env_.stat.sum_name);
-  std::ofstream of(f_sum);
-  of << p.CStr();
+  d.SaveFile(f_sum.c_str());
 }
 
 ///
