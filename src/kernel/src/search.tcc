@@ -506,7 +506,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
            std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
            std::end(good_runs));
 
-    log(overall_summary, fd, good_runs, best_run, n);
+    this->log(overall_summary, fd, good_runs, best_run, n);
   }
 
   return overall_summary;
@@ -529,6 +529,7 @@ void src_search<T, ES>::print_resume(bool validation,
 }
 
 ///
+/// \param[out] d output xml document.
 /// \param[in] run_sum summary information regarding the search.
 /// \param[in] fd statistics about population fitness.
 /// \param[in] good_runs list of the best runs of the search.
@@ -539,22 +540,18 @@ void src_search<T, ES>::print_resume(bool validation,
 /// Writes end-of-run logs (run summary, results for test...).
 ///
 template<class T, template<class> class ES>
-template<class C>
-void src_search<T, ES>::log(const summary<T> &run_sum,
-                            const distribution<fitness_t> &fd,
-                            const C &good_runs,
-                            typename C::value_type best_run, unsigned runs)
+void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
+                                const summary<T> &run_sum) const
 {
+  assert(d);
+
   if (this->env_.stat.summary)
   {
-    tinyxml2::XMLDocument d;
+    assert(d->FirstChild());
+    assert(d->FirstChild()->FirstChildElement("summary"));
 
-    search<T, ES>::log(&d, run_sum, fd, good_runs, best_run, runs);
-
-    assert(d.FirstChild());
-    assert(d.FirstChild()->FirstChildElement("summary"));
-
-    auto *e_best(d.FirstChild()->FirstChildElement("summary")->FirstChildElement("best"));
+    auto *e_best(d->FirstChild()->FirstChildElement("summary")
+                 ->FirstChildElement("best"));
     assert(e_best);
     set_text(e_best, "accuracy", run_sum.best.score.accuracy);
 
@@ -568,10 +565,6 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     std::ostringstream ss_graph;
     run_sum.best.solution.graphviz(ss_graph);
     set_text(e_solution, "graph", ss_graph.str());
-
-    const std::string f_sum(this->env_.stat.dir + "/" +
-                            this->env_.stat.sum_name);
-    d.SaveFile(f_sum.c_str());
   }
 
   // Test set results logging.

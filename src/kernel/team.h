@@ -60,12 +60,12 @@ public:
   // Visualization/output methods
   void graphviz(std::ostream &) const;
   std::ostream &in_line(std::ostream &) const;
-  std::ostream &list(std::ostream &, bool) const;
+  std::ostream &list(std::ostream &, bool = true) const;
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators.
   unsigned mutation(double, const symbol_set &);
-  team<T> crossover(team<T>) const;
+  team crossover(team) const;
 
   const T &operator[](unsigned) const;
 
@@ -109,7 +109,7 @@ template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
-// The SFINAE way of recognize a team.
+// The SFINAE way of recognizing a team.
 template<class T> struct is_team : std::false_type {};
 template<class T> struct is_team<team<T>> : std::true_type {};
 

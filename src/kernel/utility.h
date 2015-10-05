@@ -283,8 +283,10 @@ bool load_float_from_stream(std::istream &in, T *i)
 /// the fact that a `csv_parser' is a sort of Python generator and tends to
 /// be used in for loops.
 /// Users often write:
-/// `for (auto record : csv_parser(f).filter_hook(filter))`
-/// but it's broken (it only works if `filter_hook` returns by value).
+///
+///     for (auto record : csv_parser(f).filter_hook(filter))
+///
+/// but that's broken (it only works if `filter_hook` returns by value).
 /// `csv_parser` is a lighweight parser and this shouldn't be a performance
 /// concern.
 /// See <http://stackoverflow.com/q/10593686/3235496>.

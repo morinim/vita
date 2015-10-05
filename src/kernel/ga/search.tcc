@@ -115,7 +115,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
            std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
            std::end(good_runs));
 
-    log(overall_summary, fd, good_runs, best_run, n);
+    this->log(overall_summary, fd, good_runs, best_run, n);
   }
 
   return overall_summary;
@@ -128,35 +128,6 @@ template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
 {
   print.info("Fitness: ", fit, "\n\n");
-}
-
-///
-/// \param[in] run_sum summary information regarding the search.
-/// \param[in] fd statistics about population fitness.
-/// \param[in] good_runs list of the best runs of the search.
-/// \param[in] best_run best overall run.
-/// \param[in] runs number of runs performed.
-/// \return \c true if the write operation succeed.
-///
-/// Writes end-of-run logs (run summary, results for test...).
-///
-template<class T, template<class> class ES, class F>
-template<class C>
-void ga_search<T, ES, F>::log(const summary<T> &run_sum,
-                              const distribution<fitness_t> &fd,
-                              const C &good_runs,
-                              typename C::value_type best_run, unsigned runs)
-{
-  if (!this->env_.stat.summary)
-    return;
-
-  // Summary logging.
-  tinyxml2::XMLDocument d;
-  search<T, ES>::log(&d, run_sum, fd, good_runs, best_run, runs);
-
-  const std::string f_sum(this->env_.stat.dir + "/" +
-                          this->env_.stat.sum_name);
-  d.SaveFile(f_sum.c_str());
 }
 
 ///

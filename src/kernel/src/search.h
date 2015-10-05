@@ -60,13 +60,12 @@ public:
 private:  // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
-  template<class C> void log(const summary<T> &,
-                             const distribution<fitness_t> &,
-                             const C &, typename C::value_type, unsigned);
   void print_resume(bool, const model_measurements &) const;
 
   // NVI template methods
   virtual bool debug_nvi() const override;
+  virtual void log_nvi(tinyxml2::XMLDocument *,
+                       const summary<T> &) const override;
   virtual summary<T> run_nvi(unsigned) override;
   virtual void tune_parameters_nvi() override;
 

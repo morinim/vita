@@ -13,7 +13,6 @@
 #if !defined(VITA_SEARCH_H)
 #define      VITA_SEARCH_H
 
-#include <boost/property_tree/xml_parser.hpp>
 #include <boost/version.hpp>
 
 #include "kernel/evolution.h"
@@ -57,9 +56,8 @@ protected:  // Protected support methods
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   virtual bool stop_condition(const summary<T> &) const;
 
-  template<class C> void log(tinyxml2::XMLDocument *, const summary<T> &,
-                             const distribution<fitness_t> &, const C &,
-                             typename C::value_type, unsigned);
+  void log(const summary<T> &, const distribution<fitness_t> &,
+           const std::vector<unsigned> &, unsigned, unsigned) const;
 
 protected:  // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
@@ -73,6 +71,7 @@ protected:  // Protected data members
 
 private:  // NVI template methods
   virtual bool debug_nvi() const { return true; }
+  virtual void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const = 0;
   virtual summary<T> run_nvi(unsigned) = 0;
   virtual void tune_parameters_nvi() = 0;
 };
