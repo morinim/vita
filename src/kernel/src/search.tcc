@@ -563,13 +563,13 @@ void src_search<T, ES>::log(const summary<T> &run_sum,
     auto *e_solution(e_best->FirstChildElement("solution"));
     assert(e_solution);
 
-    std::ostringstream ss;
-    run_sum.best.solution.tree(ss);
-    set_text(e_solution, "tree", ss.str());
+    std::ostringstream ss_tree;
+    run_sum.best.solution.tree(ss_tree);
+    set_text(e_solution, "tree", ss_tree.str());
 
-    ss = std::ostringstream();
-    run_sum.best.solution.graphviz(ss);
-    set_text(e_solution, "graph", ss.str());
+    std::ostringstream ss_graph;
+    run_sum.best.solution.graphviz(ss_graph);
+    set_text(e_solution, "graph", ss_graph.str());
 
     const std::string f_sum(this->env_.stat.dir + "/" +
                             this->env_.stat.sum_name);

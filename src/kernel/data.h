@@ -30,6 +30,9 @@ using class_t = unsigned;
 ///
 /// \brief Stores the dataset used to evolve vita::population
 ///
+/// Data is a collection of "monomorphic" examples (all samples have the same
+/// type and arity) that is forward iterable.
+///
 /// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
 /// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
 /// files.
