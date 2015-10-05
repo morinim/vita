@@ -40,6 +40,8 @@ fitness_t search<T, ES>::fitness(const T &ind)
 template<class T, template<class> class ES>
 summary<T> search<T, ES>::run(unsigned n)
 {
+  tune_parameters_nvi();
+
   return run_nvi(n);
 }
 

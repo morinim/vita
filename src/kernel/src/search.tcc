@@ -414,8 +414,6 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   unsigned best_run(0);
   std::vector<unsigned> good_runs;
 
-  tune_parameters_nvi();
-
   // For `std::placeholders` and `std::bind` see:
   // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
   std::function<void (unsigned)> shake;

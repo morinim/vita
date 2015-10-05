@@ -81,8 +81,6 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
   unsigned best_run(0);
   std::vector<unsigned> good_runs;
 
-  tune_parameters_nvi();
-
   for (unsigned r(0); r < n; ++r)
   {
     evolution<T, ES> evo(this->env_, eval, nullptr, nullptr);
@@ -116,6 +114,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
     assert(good_runs.empty() ||
            std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
            std::end(good_runs));
+
     log(overall_summary, fd, good_runs, best_run, n);
   }
 
