@@ -748,7 +748,7 @@ int parse_command_line(int argc, char *const argv[])
     data.add_options()
       ("data,d", po::value<std::string>()->notifier(&ui::data), "data set")
       ("symbols,s",
-       po::value<std::string>()->implicit_value("")->notifier(&ui::symbols),
+       po::value<std::string>()->notifier(&ui::symbols),
        "symbols file")
       ("testset,t", po::value<std::string>()->notifier(&ui::testset),
        "test set")
