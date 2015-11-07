@@ -505,7 +505,7 @@ std::size_t data::load_xrff(const std::string &filename, filter_hook_t ft)
   unsigned n_output(0);
   bool classification(false);
 
-  // Iterate over dataset.header.attributes selection and store all found
+  // Iterate over `dataset.header.attributes` selection and store all found
   // attributes in the header vector.
   tinyxml2::XMLHandle handle(&doc);
   auto *attributes = handle.FirstChildElement("dataset")

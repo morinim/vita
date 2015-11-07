@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(t_loading)
 {
   vita::src_problem p("src_problem.xrff", "", "src_problem.xml");
 
-  BOOST_REQUIRE_EQUAL(!p, false);
+  BOOST_REQUIRE(!!p);
 
   BOOST_REQUIRE_EQUAL(p.data()->size(), 3);
   BOOST_REQUIRE(p.classification());

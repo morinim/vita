@@ -10,8 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
+#include "tinyxml2/tinyxml2.h"
 
 #include "kernel/src/problem.h"
 #include "kernel/lambda_f.h"
@@ -242,63 +241,46 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 {
   setup_terminals_from_data();
 
-  unsigned parsed(0);
-
-  cvect used_categories(categories());
-  std::iota(used_categories.begin(), used_categories.end(), 0);
-
-  boost::property_tree::ptree pt;
-  read_xml(s_file, pt);
-
   // Prints the list of categories as inferred from the dataset.
   for (const category &c : dat_.categories())
     print.debug("Using ", c);
 
+  cvect used_categories(categories());
+  std::iota(used_categories.begin(), used_categories.end(), 0);
+
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_NO_ERROR)
+    return 0;
+
   symbol_factory &factory(symbol_factory::instance());
+  unsigned parsed(0);
 
   // When I wrote this, only God and I understood what I was doing.
   // Now, God only knows.
-  for (const auto &s : pt.get_child("symbolset"))
+  tinyxml2::XMLHandle handle(&doc);
+  auto *symbolset(handle.FirstChildElement("symbolset").ToElement());
+
+  if (!symbolset)
+    return 0;
+
+  for (auto *s(symbolset->FirstChildElement("symbol"));
+       s;
+       s = s->NextSiblingElement("symbol"))
   {
-    if (s.first != "symbol")
+    const char *c_sym_name(s->Attribute("name"));
+    if (!c_sym_name)
+    {
+      print.error("Skipped unnamed symbol in symbolset");
       continue;
-
-    const auto sym_name(s.second.get<std::string>("<xmlattr>.name"));
-    const auto sym_sig(s.second.get<std::string>("<xmlattr>.signature", ""));
-
-    if (sym_sig.empty())
-    {
-      for (const auto &sig : s.second)
-        if (sig.first == "signature")
-        {
-          std::vector<std::string> args;
-          for (const auto &arg : sig.second)
-            if (arg.first == "arg")
-              args.push_back(arg.second.data());
-
-          // From the list of all the sequences with repetition of
-          // args.size() elements (categories)...
-          const auto sequences(detail::seq_with_rep(used_categories,
-                                                    args.size()));
-
-          // ...we choose those compatible with the xml signature of the
-          // current symbol.
-          for (const auto &seq : sequences)
-            if (compatible(seq, args))
-            {
-              std::string signature(sym_name + ":");
-              for (const auto &j : seq)
-                signature += " " + dat_.categories().find(j).name;
-              print.debug("Adding to symbol set ", signature);
-
-              env.sset->insert(factory.make(sym_name, seq));
-            }
-        }
     }
-    else  // !sym_sig.empty() => single category, uniform initialization
+    const std::string sym_name(c_sym_name);
+
+    const char *sym_sig(s->Attribute("signature"));
+
+    if (sym_sig)  // single category, uniform initialization
     {
-      for (category_t tag(0), sup(categories()); tag < sup; ++tag)
-        if (compatible({tag}, {sym_sig}))
+      for (auto tag : used_categories)
+        if (compatible({tag}, {std::string(sym_sig)}))
         {
           const auto n_args(factory.args(sym_name));
           std::string signature(sym_name + ":");
@@ -308,6 +290,47 @@ unsigned src_problem::load_symbols(const std::string &s_file)
           print.debug("Adding to symbol set ", signature);
 
           env.sset->insert(factory.make(sym_name, cvect(n_args, tag)));
+        }
+    }
+    else  // !sym_sig => complex signature
+    {
+      auto *sig(s->FirstChildElement("signature"));
+      if (!sig)
+      {
+        print.error("Skipping " + sym_name + " symbol (empty signature)");
+        continue;
+      }
+
+      std::vector<std::string> args;
+      for (auto *arg(sig->FirstChildElement("arg"));
+           arg;
+           arg = arg->NextSiblingElement("arg"))
+      {
+        if (!arg->GetText())
+        {
+          print.error("Skipping " + sym_name + " symbol (wrong signature)");
+          args.clear();
+          break;
+        }
+
+        args.push_back(arg->GetText());
+      }
+
+      // From the list of all the sequences with repetition of `args.size()`
+      // elements...
+      const auto sequences(detail::seq_with_rep(used_categories, args.size()));
+
+      // ...we choose those compatible with the xml signature of the current
+      // symbol.
+      for (const auto &seq : sequences)
+        if (compatible(seq, args))
+        {
+          std::string signature(sym_name + ":");
+          for (const auto &j : seq)
+            signature += " " + dat_.categories().find(j).name;
+          print.debug("Adding to symbol set ", signature);
+
+          env.sset->insert(factory.make(sym_name, seq));
         }
     }
 
