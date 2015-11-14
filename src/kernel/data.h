@@ -39,14 +39,14 @@ using class_t = unsigned;
 ///
 class data
 {
-public:  // Structures
+public:
+  // ---- Structures ----
   struct example;
   struct column;
 
-private:
+  // ---- Aliases ----
   using examples_t = std::vector<example>;
 
-public:
   /// Raw input record. The ETL chain is:
   /// > DATASET -> record_t -> example --(vita::push_back)--> vita::data
   using record_t = std::vector<std::string>;
@@ -55,11 +55,11 @@ public:
   /// be loaded and, possibly, transform its input parameter).
   using filter_hook_t = std::function<bool (record_t *)>;
 
-  // Constructors
+  // ---- Constructors ----
   data();
   explicit data(const std::string &, filter_hook_t = nullptr);
 
-  // Iterators
+  // ---- Iterators ----
   using iterator = typename examples_t::iterator;
   using const_iterator = typename examples_t::const_iterator;
 
@@ -68,7 +68,7 @@ public:
   iterator end();
   const_iterator end() const;
 
-  // Convenience
+  // ---- Convenience ----
   std::size_t load(const std::string &, filter_hook_t = nullptr);
   bool operator!() const;
 
