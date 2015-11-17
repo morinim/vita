@@ -153,7 +153,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -179,7 +179,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -225,7 +225,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -254,7 +254,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -291,7 +291,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -323,7 +323,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -355,7 +355,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -447,7 +447,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -473,7 +473,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -498,7 +498,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -564,7 +564,7 @@ public:
 
   virtual any eval(core_interpreter *ci) const override
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;

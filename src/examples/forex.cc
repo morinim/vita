@@ -440,6 +440,11 @@ struct add : vita::real::add
   add() : vita::real::add({money}) {}
 };
 
+struct sub : vita::real::sub
+{
+  sub() : vita::real::sub({money}) {}
+};
+
 struct lt : vita::real::lt
 {
   lt() : vita::real::lt({money, logic}) {}
@@ -466,6 +471,7 @@ bool setup_symbols(vita::symbol_set *ss)
   ss->insert(vita::make_unique<fxs::l_or>());
 
   ss->insert(vita::make_unique<fxs::add>());
+  ss->insert(vita::make_unique<fxs::sub>());
 
   ss->insert(vita::make_unique<fxs::lt>());
 
