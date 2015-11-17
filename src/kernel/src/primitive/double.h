@@ -195,6 +195,27 @@ public:
 };
 
 ///
+/// \brief "Greater Then" operator
+///
+class gt : public function
+{
+public:
+  explicit gt(const cvect &c)
+    : function(">", c[1], {c[0], c[0]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+    return any(std::isgreater(dbl::cast(i->fetch_arg(0)),
+                              dbl::cast(i->fetch_arg(1))));
+    // If one or both arguments of isless are Nan, the function returns
+    // false, but no FE_INVALID exception is raised (note that the
+    // expression v0 < v1 may raise an exception in this case).
+  }
+};
+
+///
 /// \brief Quotient of the division between two real numbers
 ///
 class idiv : public function
@@ -312,14 +333,10 @@ public:
     if (a1.empty())  return a1;
 
     const auto v0(dbl::cast(a0)), v1(dbl::cast(a1));
-    if (std::isless(v0, v1))
+    if (v0 < v1)
       return i->fetch_arg(2);
     else
       return i->fetch_arg(3);
-
-    // If one or both arguments of isless are Nan, the function returns
-    // false, but no FE_INVALID exception is raised (note that the
-    // expression v0 < v1 may raise an exception in this case).
   }
 
   virtual double penalty_nvi(core_interpreter *ci) const override
@@ -397,6 +414,27 @@ public:
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
+  }
+};
+
+///
+/// \brief "Less Then" operator
+///
+class lt : public function
+{
+public:
+  explicit lt(const cvect &c)
+    : function("<", c[1], {c[0], c[0]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+    return any(std::isless(dbl::cast(i->fetch_arg(0)),
+                           dbl::cast(i->fetch_arg(1))));
+    // If one or both arguments of isless are Nan, the function returns
+    // false, but no FE_INVALID exception is raised (note that the
+    // expression v0 < v1 may raise an exception in this case).
   }
 };
 
@@ -542,43 +580,6 @@ public:
     return any(ret);
   }
 };
-
-///
-/// \brief "Less Then" operator
-///
-class lt : public function
-{
-public:
-  explicit lt(const cvect &c)
-    : function("<", c[1], {c[0], c[0]})
-  { assert(c.size() == 2); }
-
-  virtual any eval(core_interpreter *ci) const override
-  {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isless(dbl::cast(i->fetch_arg(0)),
-                           dbl::cast(i->fetch_arg(1))));
-  }
-};
-
-///
-/// \brief "Greater Then" operator
-///
-class gt : public function
-{
-public:
-  explicit gt(const cvect &c)
-    : function(">", c[1], {c[0], c[0]})
-  { assert(c.size() == 2); }
-
-  virtual any eval(core_interpreter *ci) const override
-  {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isgreater(dbl::cast(i->fetch_arg(0)),
-                              dbl::cast(i->fetch_arg(1))));
-  }
-};
-
 
 }  // namespace dbl
 }  // namespace vita
