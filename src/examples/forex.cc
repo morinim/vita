@@ -13,7 +13,11 @@
 #include <cstdlib>
 #include <iostream>
 
+#include "kernel/interpreter.h"
 #include "kernel/utility.h"
+#include "kernel/i_mep.h"
+#include "kernel/src/primitive/bool.h"
+#include "kernel/src/primitive/double.h"
 
 struct timepoint
 {
@@ -43,17 +47,21 @@ public:
 
   bool empty() const { return trading[0].empty(); }
 
-  int bars(int tf = 0) const { return static_cast<int>(trading[tf].size()); }
-  double close(int tf, int shift) const { return get(tf, shift).close; }
-  double close(int shift) const { return close(0, shift); }
-  double high(int tf, int shift) const { return get(tf, shift).high; }
-  double high(int shift) const { return high(0, shift); }
-  double low(int tf, int shift) const { return get(tf, shift).low; }
-  double low(int shift) const { return low(0, shift); }
-  double open(int tf, int shift) const { return get(tf, shift).open; }
-  double open(int shift) const { return open(0, shift); }
-  double volume(int tf, int shift) const { return get(tf, shift).volume; }
-  double volume(int shift) const { return volume(0, shift); }
+  unsigned bars(unsigned tf = 0) const
+  { return static_cast<unsigned>(trading[tf].size()); }
+  double close(unsigned tf, unsigned shift) const
+  { return get(tf, shift).close; }
+  double close(unsigned shift) const { return close(0, shift); }
+  double high(unsigned tf, unsigned shift) const { return get(tf, shift).high; }
+  double high(unsigned shift) const { return high(0, shift); }
+  double low(unsigned tf, unsigned shift) const { return get(tf, shift).low; }
+  double low(unsigned shift) const { return low(0, shift); }
+  double open(unsigned tf, unsigned shift) const
+  { return get(tf, shift).open; }
+  double open(unsigned shift) const { return open(0, shift); }
+  double volume(unsigned tf, unsigned shift) const
+  { return get(tf, shift).volume; }
+  double volume(unsigned shift) const { return volume(0, shift); }
 
 private:
   struct trade_info_point
@@ -82,25 +90,42 @@ private:
 
 private:
   bool compute_longer_timeframes();
-  trade_info_point get(int tf, int shift) const
+  trade_info_point get(unsigned tf, unsigned shift) const
   {
-    assert(tf < static_cast<int>(trading.size()));
+    assert(tf < trading.size());
     assert(shift < bars(tf));
     return trading[tf][shift];
   }
 
   bool load_data(const std::string &);
-  std::pair<double, double> minmax_vol(int) const;
-  bool normalize_volume(int);
+  std::pair<double, double> minmax_vol(unsigned) const;
+  bool normalize_volume(unsigned);
 };
 
-struct order
+class order
 {
+public:
+  explicit order(int t = na, double a = 0.0, double o = 0.0, unsigned b = 0)
+    : amount_(a), open_price_(o), type_(t), bar_(b)
+  {
+    assert(t == na || t == buy || t == sell);
+    assert((t == na && a <= 0.0) || (t != na && a > 0.0));
+    assert((t == na && o <= 0.0) || (t != na && o > 0.0));
+    assert((t == na && b == 0) || (t != na && b > 0));
+  }
+
+  double amount() const { return amount_; }
+  double open_price() const { return open_price_; }
+  int type() const { return type_; }
+  unsigned bar() const { return bar_; }
+
   enum {na = -1, buy = 0, sell};
 
-  int type = na;
-  double amount = 0.0;
-  int bar = -1;
+private:
+  double amount_;
+  double open_price_;
+  int type_;
+  unsigned bar_;
 };
 
 // More details:
@@ -127,8 +152,38 @@ public:
   // means that you can buy EUR/USD at 1.5763
   double ask() const { return bid() + spread_; }
 
-  double order_amount() const { return order_.amount; }
-  int order_type() const { return order_.type; }
+  double close(unsigned i) const
+  {
+    assert(cur_bar_);
+
+    return td_.close(cur_bar_ >= i ? cur_bar_ - i : 0);
+  }
+
+  double high(unsigned i) const
+  {
+    assert(cur_bar_);
+
+    return td_.high(cur_bar_ >= i ? cur_bar_ - i : 0);
+  }
+
+  double low(unsigned i) const
+  {
+    assert(cur_bar_);
+
+    return td_.low(cur_bar_ >= i ? cur_bar_ - i : 0);
+  }
+
+  double open(unsigned i) const
+  {
+    assert(cur_bar_);
+
+    return td_.open(cur_bar_ >= i ? cur_bar_ - i : 0);
+  }
+
+  double order_amount() const { return order_.amount(); }
+  double order_open_price() const { return order_.open_price(); }
+  double order_profit() const;
+  int order_type() const { return order_.type(); }
 
   bool order_send(int, double);
   bool close();
@@ -138,10 +193,12 @@ private:
   double balance_ = 0.0;
 
   order order_;
-  int cur_bar_ = 0;
+  unsigned cur_bar_ = 1;
 
   trading_data td_;
 };
+
+trade_simulator ts;
 
 timepoint string_to_timepoint(const std::string &s)
 {
@@ -153,7 +210,7 @@ timepoint string_to_timepoint(const std::string &s)
   return tf;
 }
 
-std::pair<double, double> trading_data::minmax_vol(int tf) const
+std::pair<double, double> trading_data::minmax_vol(unsigned tf) const
 {
   double min(999999999.0), max(0.0);
   for (const auto &tip : trading[tf])
@@ -169,7 +226,7 @@ std::pair<double, double> trading_data::minmax_vol(int tf) const
   return {min, max};
 }
 
-bool trading_data::normalize_volume(int tf)
+bool trading_data::normalize_volume(unsigned tf)
 {
   std::cout << "  Normalizing volumes for timeframe " << tf << '\n';
 
@@ -190,13 +247,13 @@ bool trading_data::compute_longer_timeframes()
 
   normalize_volume(0);
 
-  for (int tf(1); tf < timeframe::sup; ++tf)
+  for (unsigned tf(1); tf < timeframe::sup; ++tf)
   {
     double frame_high(high(tf - 1, 0)), frame_low(low(tf - 1, 0));
     double frame_volume(0.0);
 
-    int begin(0), end(timeframe::ratio[tf]);
-    for (int i(0); i < bars(tf - 1); ++i)
+    unsigned begin(0), end(timeframe::ratio[tf]);
+    for (unsigned i(0); i < bars(tf - 1); ++i)
     {
       if (i == end || i + 1 == bars(tf - 1))
       {
@@ -223,7 +280,7 @@ bool trading_data::compute_longer_timeframes()
 
 #if !defined(NDEBUG)
   auto minmax(minmax_vol(0));
-  for (int tf(1); tf < timeframe::sup; ++tf)
+  for (unsigned tf(1); tf < timeframe::sup; ++tf)
   {
     auto mm(minmax_vol(tf));
     assert(minmax == mm);
@@ -256,7 +313,7 @@ bool trading_data::load_data(const std::string &filename)
     return std::stoi((*r)[f_volume]) > 0;
   };
 
-  int i(0);
+  unsigned i(0);
   for (auto record : csv_parser(from).filter_hook(csv_filter))
   {
     trading[0].emplace_back(std::stod(record[  f_open]),
@@ -281,58 +338,145 @@ bool trade_simulator::order_send(int type, double lots)
   assert(type == order::buy || type == order::sell);
   assert(lots >= 0.01);
 
+  double open_price;
+
   const double amount(lots * 100000);
-  switch (type)
+  if (type == order::buy)  // buying base currency
   {
-  case order::buy:
-    // Buying base currency.
+    open_price = ask();
     balance_ -= amount * ask();
-    break;
-
-  case order::sell:
-    // Selling base currency to buy counter currency.
+  }
+  else  // selling base currency to buy counter currency
+  {
+    open_price = bid();
     balance_ += amount * bid();
-    break;
-
-  default:
-    return false;
   }
 
-  order_.type = type;
-  order_.amount = amount;
-  order_.bar = cur_bar_;
+  order_ = order(type, amount, open_price, cur_bar_);
 
   return true;
 }
 
 bool trade_simulator::close()
 {
-  switch (order_.type)
-  {
-  case order::buy:
+  assert(order_.type() != order::na);
+
+  if (order_.type() == order::buy)
     // Having bought base currency, we now want back counter currency.
     balance_ += order_amount() * bid();
-    break;
-
-  case order::sell:
+  else
     // Having sold base currency to buy counter currency, we now want back
     // base currency.
     balance_ -= order_amount() * ask();
-    break;
-
-  default:
-    return false;
-  };
 
   order_ = order();
   return true;
 }
 
+double trade_simulator::order_profit() const
+{
+  switch (order_.type())
+  {
+  case order::buy:   return order_amount() * (bid() - order_open_price());
+  case order::sell:  return order_amount() * (order_open_price() - ask());
+  default:           return 0.0;
+  }
+}
+
+namespace fxs  // Forex symbols
+{
+using i_interp = vita::core_interpreter;
+
+enum {logic, money};
+
+template<unsigned I>
+struct close : vita::terminal
+{
+  close() : vita::terminal("CLOSE[" + std::to_string(I) + "]", money) {}
+  virtual bool input() const override { return true; }
+  virtual vita::any eval(i_interp *) const override
+  { return vita::any(ts.close(I)); }
+};
+
+template<unsigned I>
+struct high : vita::terminal
+{
+  high() : vita::terminal("HIGH[" + std::to_string(I) + "]", money) {}
+  virtual bool input() const override { return true; }
+  virtual vita::any eval(i_interp *) const override
+  { return vita::any(ts.high(I)); }
+};
+
+template<unsigned I>
+struct low : vita::terminal
+{
+  low() : vita::terminal("LOW[" + std::to_string(I) + "]", money) {}
+  virtual bool input() const override { return true; }
+  virtual vita::any eval(i_interp *) const override
+  { return vita::any(ts.low(I)); }
+};
+
+template<unsigned I>
+struct open : vita::terminal
+{
+  open() : vita::terminal("OPEN[" + std::to_string(I) + "]", money) {}
+  virtual bool input() const override { return true; }
+  virtual vita::any eval(i_interp *) const override
+  { return vita::any(ts.open(I)); }
+};
+
+struct l_and : vita::boolean::l_and
+{
+  l_and() : vita::boolean::l_and({logic}) {}
+};
+
+struct l_or : vita::boolean::l_or
+{
+  l_or() : vita::boolean::l_or({logic}) {}
+};
+
+struct add : vita::dbl::add
+{
+  add() : vita::dbl::add({money}) {}
+};
+
+struct lt : vita::dbl::lt
+{
+  lt() : vita::dbl::lt({money, logic}) {}
+};
+
+}  // namespace fxs
+
+bool setup_symbols(vita::symbol_set *ss)
+{
+  ss->insert(vita::make_unique<fxs::close<1>>());
+  ss->insert(vita::make_unique<fxs::close<2>>());
+  ss->insert(vita::make_unique<fxs::close<3>>());
+  ss->insert(vita::make_unique<fxs::high<1>>());
+  ss->insert(vita::make_unique<fxs::high<2>>());
+  ss->insert(vita::make_unique<fxs::high<3>>());
+  ss->insert(vita::make_unique<fxs::low<1>>());
+  ss->insert(vita::make_unique<fxs::low<2>>());
+  ss->insert(vita::make_unique<fxs::low<3>>());
+  ss->insert(vita::make_unique<fxs::open<1>>());
+  ss->insert(vita::make_unique<fxs::open<2>>());
+  ss->insert(vita::make_unique<fxs::open<3>>());
+
+  ss->insert(vita::make_unique<fxs::l_and>());
+  ss->insert(vita::make_unique<fxs::l_or>());
+
+  ss->insert(vita::make_unique<fxs::add>());
+
+  ss->insert(vita::make_unique<fxs::lt>());
+
+  return true;
+}
+
 int main()
 {
-  trading_data data;
+  vita::symbol_set ss;
 
-  if (data.empty())
+  if (!setup_symbols(&ss))
     return EXIT_FAILURE;
 
   return EXIT_SUCCESS;
