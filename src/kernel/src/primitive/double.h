@@ -20,6 +20,7 @@
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "kernel/utility.h"
+#include "kernel/src/primitive/comp_penalty.h"
 
 namespace vita
 {
@@ -541,6 +542,43 @@ public:
     return any(ret);
   }
 };
+
+///
+/// \brief "Less Then" operator
+///
+class lt : public function
+{
+public:
+  explicit lt(const cvect &c)
+    : function("<", c[1], {c[0], c[0]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+    return any(std::isless(dbl::cast(i->fetch_arg(0)),
+                           dbl::cast(i->fetch_arg(1))));
+  }
+};
+
+///
+/// \brief "Greater Then" operator
+///
+class gt : public function
+{
+public:
+  explicit gt(const cvect &c)
+    : function(">", c[1], {c[0], c[0]})
+  { assert(c.size() == 2); }
+
+  virtual any eval(core_interpreter *ci) const override
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+    return any(std::isgreater(dbl::cast(i->fetch_arg(0)),
+                              dbl::cast(i->fetch_arg(1))));
+  }
+};
+
 
 }  // namespace dbl
 }  // namespace vita
