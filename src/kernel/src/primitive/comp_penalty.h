@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,26 +17,25 @@
 
 namespace vita
 {
-  ///
-  /// \return 0 / 1 / 2
-  ///
-  /// A convenient function to "factorize" the penalty function of a typical
-  /// comparison class.
-  ///
-  /// Maximum penalty for
-  ///     if ("apple" == "apple") then "orange" else "orange"
-  ///
-  double comparison_function_penalty(core_interpreter *ci)
-  {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+///
+/// \return a penalty in the {0, 1, 2} set.
+///
+/// A simple, convenient function for the penalty score of the typical
+/// four-terms comparison.
+///
+/// Maximum penalty for `if ("apple" == "apple") then "orange" else "orange"`
+///
+inline double comparison_function_penalty(core_interpreter *ci)
+{
+  auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const auto id0(i->fetch_index(0));
-    const auto id1(i->fetch_index(1));
-    const auto id2(i->fetch_index(2));
-    const auto id3(i->fetch_index(3));
+  const auto id0(i->fetch_index(0));
+  const auto id1(i->fetch_index(1));
+  const auto id2(i->fetch_index(2));
+  const auto id3(i->fetch_index(3));
 
-    return (id0 == id1) + (id2 == id3);
-  }
+  return (id0 == id1) + (id2 == id3);
+}
 }  // namespace vita
 
 #endif  // Include guard
