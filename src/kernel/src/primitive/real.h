@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_DOUBLE_PRIMITIVE_H)
-#define      VITA_DOUBLE_PRIMITIVE_H
+#if !defined(VITA_REAL_PRIMITIVE_H)
+#define      VITA_REAL_PRIMITIVE_H
 
 #include <string>
 
@@ -34,7 +34,7 @@ namespace vita
 /// well as the function being applied).
 /// Instead we detect them and take alternative action (usually returning
 /// an empty value).
-namespace dbl
+namespace real
 {
 using base_t = double;
 
@@ -47,7 +47,7 @@ static_assert(std::numeric_limits<base_t>::is_iec559,
 ///
 /// Just a simple shortcut.
 ///
-inline base_t cast(const any &v) { return any_cast<base_t>(v); }
+inline base_t base(const any &v) { return any_cast<base_t>(v); }
 
 ///
 /// \brief Ephemeral random constant
@@ -93,7 +93,7 @@ private:  // Private data members
 ///
 /// \brief Ephemeral random integer constant
 ///
-/// This is like dbl::real but restricted to integer numbers.
+/// This is like real::real but restricted to integer numbers.
 ///
 class integer : public terminal
 {
@@ -137,7 +137,7 @@ public:
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
 
-    return a.empty() ? a : any(std::fabs(dbl::cast(a)));
+    return a.empty() ? a : any(std::fabs(base(a)));
   }
 };
 
@@ -161,7 +161,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(dbl::cast(a0) + dbl::cast(a1));
+    const base_t ret(base(a0) + base(a1));
     if (std::isinf(ret))  return any();
 
     return any(ret);
@@ -187,7 +187,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(dbl::cast(a0) / dbl::cast(a1));
+    const base_t ret(base(a0) / base(a1));
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
@@ -207,8 +207,7 @@ public:
   virtual any eval(core_interpreter *ci) const override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isgreater(dbl::cast(i->fetch_arg(0)),
-                              dbl::cast(i->fetch_arg(1))));
+    return any(std::isgreater(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
     // If one or both arguments of isless are Nan, the function returns
     // false, but no FE_INVALID exception is raised (note that the
     // expression v0 < v1 may raise an exception in this case).
@@ -234,7 +233,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(std::floor(dbl::cast(a0) / dbl::cast(a1)));
+    const base_t ret(std::floor(base(a0) / base(a1)));
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
@@ -266,9 +265,9 @@ public:
     const any a2(i->fetch_arg(2));
     if (a2.empty())  return a2;
 
-    const auto v0(dbl::cast(a0));
-    const auto v1(dbl::cast(a1));
-    const auto v2(dbl::cast(a2));
+    const auto v0(base(a0));
+    const auto v1(base(a1));
+    const auto v2(base(a2));
 
     const auto min(std::fmin(v1, v2));
     const auto max(std::fmax(v1, v2));
@@ -300,7 +299,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    if (issmall(dbl::cast(a0) - dbl::cast(a1)))
+    if (issmall(base(a0) - base(a1)))
       return i->fetch_arg(2);
     else
       return i->fetch_arg(3);
@@ -332,7 +331,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const auto v0(dbl::cast(a0)), v1(dbl::cast(a1));
+    const auto v0(base(a0)), v1(base(a1));
     if (v0 < v1)
       return i->fetch_arg(2);
     else
@@ -361,7 +360,7 @@ public:
     const any a0(i->fetch_arg(0));
     if (a0.empty())  return a0;
 
-    if (issmall(dbl::cast(a0)))
+    if (issmall(base(a0)))
       return i->fetch_arg(1);
     else
       return i->fetch_arg(2);
@@ -410,7 +409,7 @@ public:
     const any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a0.empty())  return a0;
 
-    const base_t ret(std::log(dbl::cast(a0)));
+    const base_t ret(std::log(base(a0)));
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
@@ -430,8 +429,7 @@ public:
   virtual any eval(core_interpreter *ci) const override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isless(dbl::cast(i->fetch_arg(0)),
-                           dbl::cast(i->fetch_arg(1))));
+    return any(std::isless(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
     // If one or both arguments of isless are Nan, the function returns
     // false, but no FE_INVALID exception is raised (note that the
     // expression v0 < v1 may raise an exception in this case).
@@ -457,7 +455,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(std::fmax(dbl::cast(a0), dbl::cast(a1)));
+    const base_t ret(std::fmax(base(a0), base(a1)));
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
@@ -483,7 +481,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(std::fmod(dbl::cast(a0), dbl::cast(a1)));
+    const base_t ret(std::fmod(base(a0), base(a1)));
     if (!std::isfinite(ret))  return any();
 
     return any(ret);
@@ -508,7 +506,7 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(dbl::cast(a0) * dbl::cast(a1));
+    const base_t ret(base(a0) * base(a1));
     if (std::isinf(ret))  return any();
 
     return any(ret);
@@ -529,7 +527,7 @@ public:
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
 
-    return any(std::sin(dbl::cast(a)));
+    return any(std::sin(base(a)));
   }
 };
 
@@ -547,7 +545,7 @@ public:
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
 
-    const auto v(dbl::cast(a));
+    const auto v(base(a));
     if (std::isless(v, 0.0))
       return any();
 
@@ -574,14 +572,14 @@ public:
     const any a1(i->fetch_arg(1));
     if (a1.empty())  return a1;
 
-    const base_t ret(dbl::cast(a0) - dbl::cast(a1));
+    const base_t ret(base(a0) - base(a1));
     if (std::isinf(ret))  return any();
 
     return any(ret);
   }
 };
 
-}  // namespace dbl
+}  // namespace real
 }  // namespace vita
 
 #endif  // Include guard

@@ -17,7 +17,7 @@
 #include "kernel/utility.h"
 #include "kernel/i_mep.h"
 #include "kernel/src/primitive/bool.h"
-#include "kernel/src/primitive/double.h"
+#include "kernel/src/primitive/real.h"
 
 struct timepoint
 {
@@ -435,14 +435,14 @@ struct l_or : vita::boolean::l_or
   l_or() : vita::boolean::l_or({logic}) {}
 };
 
-struct add : vita::dbl::add
+struct add : vita::real::add
 {
-  add() : vita::dbl::add({money}) {}
+  add() : vita::real::add({money}) {}
 };
 
-struct lt : vita::dbl::lt
+struct lt : vita::real::lt
 {
-  lt() : vita::dbl::lt({money, logic}) {}
+  lt() : vita::real::lt({money, logic}) {}
 };
 
 }  // namespace fxs
