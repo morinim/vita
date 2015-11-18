@@ -50,7 +50,7 @@ any interpreter<T>::run_locus(const locus &ip)
 ///
 /// \return the output value of `this` individual.
 ///
-/// Calls run_locus() using the default starting locus.
+/// Calls `run_locus()` using the default starting locus.
 ///
 template<class T>
 any interpreter<T>::run_nvi()

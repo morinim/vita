@@ -42,11 +42,10 @@ namespace vita
 /// instantiation.
 ///
 /// \see
-/// * <http://en.wikipedia.org/wiki/Dependency_injection>
-/// * <http://devcockpit.com/post/2012/12/30/Dependency-Inversion-in-CPP-choosing-the-right-reference>
-/// * <http://stackoverflow.com/q/4542789/3235496>
-/// * <http://stackoverflow.com/q/12387239/3235496>
-/// * <http://stackoverflow.com/q/1974682/3235496>
+/// - <http://en.wikipedia.org/wiki/Dependency_injection>
+/// - <http://stackoverflow.com/q/4542789/3235496>
+/// - <http://stackoverflow.com/q/12387239/3235496>
+/// - <http://stackoverflow.com/q/1974682/3235496>
 ///
 template<class T>
 class interpreter : public core_interpreter
