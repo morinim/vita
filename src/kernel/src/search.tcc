@@ -279,6 +279,14 @@ void src_search<T, ES>::tune_parameters_nvi()
     print.info("Population size set to ", this->env_.individuals);
   }
 
+  if (!constrained.min_individuals)
+  {
+    this->env_.min_individuals = std::max(this->env_.individuals / 10, 2u);
+
+    print.info("Minimum number of individuals for a layer is ",
+               this->env_.min_individuals);
+  }
+
   // Note that this setting, once set, will not be changed.
   if (constrained.validation_percentage > 100 &&
       this->env_.validation_percentage > 100)

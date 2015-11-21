@@ -41,6 +41,7 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     dss = trilean::yes;
     layers = 1;
     individuals = 100;
+    min_individuals = 2;
     tournament_size = 5;
     mate_zone = 20;
     generations = 100;
@@ -73,6 +74,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   root->InsertEndChild(e_environment);
   set_text(e_environment, "layers", layers);
   set_text(e_environment, "individuals", individuals);
+  set_text(e_environment, "min_individuals", min_individuals);
   set_text(e_environment, "code_length", code_length);
   set_text(e_environment, "patch_length", patch_length);
   set_text(e_environment, "elitism", tti(elitism));
@@ -167,7 +169,13 @@ bool environment::debug(bool force_defined) const
 
     if (!individuals)
     {
-      print.error("Undefined individuals data member");
+      print.error("Undefined `individuals` data member");
+      return false;
+    }
+
+    if (!min_individuals)
+    {
+      print.error("Undefined `min_individuals` data member");
       return false;
     }
 
@@ -252,13 +260,19 @@ bool environment::debug(bool force_defined) const
 
   if (alps.p_same_layer > 1.0)
   {
-    print.error("p_same_layer out of range");
+    print.error("`p_same_layer` out of range");
     return false;
   }
 
-  if (individuals && individuals <= 3)
+  if (min_individuals == 1)
   {
-    print.error("Too few individuals");
+    print.error("At least 2 individuals for layer");
+    return false;
+  }
+
+  if (individuals && min_individuals && individuals < min_individuals)
+  {
+    print.warning("Too few individuals");
     return false;
   }
 

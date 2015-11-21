@@ -170,6 +170,11 @@ void population<T>::set_allowed(unsigned l, unsigned n)
   assert(l < layers());
   assert(n <= pop_[l].capacity());
 
+  // Unless explicitly forced by the environment, do not drop under a
+  // predefined number of individuals.
+  const auto min(std::min(env().min_individuals, env().individuals));
+  n = std::max(n, min);
+
   if (individuals(l) > n)
   {
     const auto delta(individuals(l) - n);
