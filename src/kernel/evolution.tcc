@@ -277,16 +277,16 @@ evolution<T, ES>::run(unsigned run_count)
 
   timer measure;
 
-  bool ext_int(false);
+  bool stop(false);
   term::set();
 
 #if defined(CLONE_SCALING)
   eva_.clear(evaluator<T>::stats);
 #endif
 
-  es_.pre_bookkeeping();
+  es_.pre_bookkeeping();  // hook for strategy-specific preliminary bookkeeping
 
-  for (stats_.gen = 0; !stop_condition(stats_) && !ext_int;  ++stats_.gen)
+  for (stats_.gen = 0; !stop_condition(stats_) && !stop;  ++stats_.gen)
   {
     if (shake_data_ && stats_.gen % 4 == 0)
     {
@@ -303,13 +303,15 @@ evolution<T, ES>::run(unsigned run_count)
     stats_.az = get_stats();
     log(run_count);
 
-    for (unsigned k(0); k < pop_.individuals() && !ext_int; ++k)
+    timer from_last_msg;
+    for (unsigned k(0); k < pop_.individuals() && !stop; ++k)
     {
-      if (k % std::max(pop_.individuals() / 100, 2u))
+      if (from_last_msg.elapsed() > 1000.0)
       {
         print_progress(k, run_count, false);
 
-        ext_int = term::user_stop();
+        from_last_msg.restart();
+        stop = term::user_stop();
       }
 
       // --------- SELECTION ---------
@@ -328,7 +330,7 @@ evolution<T, ES>::run(unsigned run_count)
 
     stats_.elapsed = measure.elapsed();
 
-    es_.post_bookkeeping();
+    es_.post_bookkeeping();  // hook for strategy-specific final bookkeeping
   }
 
   print.info("Elapsed time: ", stats_.elapsed / 1000.0, "s",
