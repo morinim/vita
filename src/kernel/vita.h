@@ -22,12 +22,6 @@
 
 namespace vita
 {
-#if defined(VITA_NO_LIB)
-#  define VITA_INLINE inline
-#else
-#  define VITA_INLINE
-#endif
-
 /// This is the type used as key for symbol identification.
 using opcode_t = unsigned;
 

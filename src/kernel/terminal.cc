@@ -10,16 +10,13 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_NO_LIB)
-#  include "kernel/terminal.h"
-#endif
+#include "kernel/terminal.h"
 
 namespace vita
 {
 ///
 /// \return `true` if the function passes the internal consistency check.
 ///
-VITA_INLINE
 bool terminal::debug() const
 {
   if (associative())

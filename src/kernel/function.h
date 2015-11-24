@@ -82,8 +82,4 @@ inline const function *function::cast(const symbol *s)
 
 }  // namespace vita
 
-#if defined(VITA_NO_LIB)
-#  include "kernel/function.cc"
-#endif
-
 #endif  // Include guard

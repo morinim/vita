@@ -10,9 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_NO_LIB)
-#  include "kernel/function.h"
-#endif
+#include "kernel/function.h"
 
 namespace vita
 {
@@ -24,7 +22,6 @@ namespace vita
 /// \param[in] args input parameters (type and number) of the function (in
 ///                 C++ they are called the "function signature").
 ///
-VITA_INLINE
 function::function(const std::string &dis, category_t c, cvect args)
   : symbol(dis, c), argt_(std::move(args))
 {
@@ -34,7 +31,6 @@ function::function(const std::string &dis, category_t c, cvect args)
 ///
 /// \return `true` if the object passes the internal consistency check.
 ///
-VITA_INLINE
 bool function::debug() const
 {
   if (!arity())  // This is a function, we want some argument...
