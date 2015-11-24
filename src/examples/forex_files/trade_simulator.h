@@ -11,6 +11,8 @@
 
 #include <algorithm>
 
+#include "trading_data.h"
+
 #if !defined(FOREX_TRADE_SIMULATOR_H)
 #define      FOREX_TRADE_SIMULATOR_H
 
@@ -65,7 +67,7 @@ public:
 
   // If the current bid price for the EUR/USD currency pair is 1.5760 this
   // means that you can sell EUR/USD at 1.5760
-  double bid() const { return td_.open(cur_bar_); }
+  double bid() const { return td_.open(0, cur_bar_); }
 
   // If the current ask price for the EUR/USD currency pair is 1.5763 this
   // means that you can buy EUR/USD at 1.5763
@@ -73,42 +75,32 @@ public:
 
   double close(unsigned tf, unsigned i) const
   {
-    assert(tf < sup_tf);
     assert(cur_bar_);
-
-    return td_.close(tf, as_series(i));
+    return td_.close(tf, as_series(tf, i));
   }
 
   double high(unsigned tf, unsigned i) const
   {
-    assert(tf < sup_tf);
     assert(cur_bar_);
-
-    return td_.high(tf, as_series(i));
+    return td_.high(tf, as_series(tf, i));
   }
 
   double low(unsigned tf, unsigned i) const
   {
-    assert(tf < sup_tf);
     assert(cur_bar_);
-
-    return td_.low(tf, as_series(i));
+    return td_.low(tf, as_series(tf, i));
   }
 
   double open(unsigned tf, unsigned i) const
   {
-    assert(tf < sup_tf);
     assert(cur_bar_);
-
-    return td_.open(tf, as_series(i));
+    return td_.open(tf, as_series(tf, i));
   }
 
   double volume(unsigned tf, unsigned i) const
   {
-    assert(tf < sup_tf);
     assert(cur_bar_);
-
-    return td_.volume(tf, as_series(i));
+    return td_.volume(tf, as_series(tf, i));
   }
 
   double order_amount() const { return order_.amount(); }
@@ -124,7 +116,26 @@ public:
   template<class T> double run(const T &);
 
 private:  // Private support functions
-  unsigned as_series(unsigned i) const {return cur_bar_ > i ? cur_bar_ - i : 0;}
+  unsigned as_series(unsigned tf, unsigned i) const
+  {
+    assert(tf < trading_data::sup_tf);
+
+    unsigned b(cur_bar_);
+
+    switch (tf)
+    {
+    case trading_data::short_tf:
+      break;
+    case trading_data::medium_tf:
+      b /= trading_data::ratio[tf];
+      break;
+    default:
+      b /= trading_data::ratio[tf] * trading_data::ratio[tf - 1];
+    }
+
+    return b > i ? b - i : 0;
+  }
+
   void clear_status();
   unsigned inc_bar() { return ++cur_bar_; }
 

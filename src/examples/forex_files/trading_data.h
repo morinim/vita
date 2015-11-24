@@ -49,8 +49,8 @@ public:
   static constexpr unsigned ratio[sup_tf] =
   {
     1,   // Duration of timeframe short_t is one minute
-    60,  // 60 short_t timeframes are equivalent to one medium_t (1 hour)
-    24   // 24 medium_t timeframes are equivalent to one long_t (1 day)
+    60,  // 60 short_t periods are equivalent to one medium_t (1 hour)
+    24   // 24 medium_t periods are equivalent to one long_t (1 day)
   };
 
 public:
@@ -60,19 +60,12 @@ public:
 
   unsigned bars(unsigned tf = 0) const
   { return static_cast<unsigned>(trading[tf].size()); }
-  double close(unsigned tf, unsigned shift) const
-  { return get(tf, shift).close; }
-  double close(unsigned shift) const { return close(0, shift); }
-  double high(unsigned tf, unsigned shift) const { return get(tf, shift).high; }
-  double high(unsigned shift) const { return high(0, shift); }
-  double low(unsigned tf, unsigned shift) const { return get(tf, shift).low; }
-  double low(unsigned shift) const { return low(0, shift); }
-  double open(unsigned tf, unsigned shift) const
-  { return get(tf, shift).open; }
-  double open(unsigned shift) const { return open(0, shift); }
-  double volume(unsigned tf, unsigned shift) const
-  { return get(tf, shift).volume; }
-  double volume(unsigned shift) const { return volume(0, shift); }
+
+  double close(unsigned tf, unsigned i) const { return get(tf, i).close; }
+  double high(unsigned tf, unsigned i) const { return get(tf, i).high; }
+  double low(unsigned tf, unsigned i) const { return get(tf, i).low; }
+  double open(unsigned tf, unsigned i) const { return get(tf, i).open; }
+  double volume(unsigned tf, unsigned i) const { return get(tf, i).volume; }
 
 private:
   struct trade_info_point
@@ -101,11 +94,13 @@ private:
 
 private:
   bool compute_longer_timeframes();
-  trade_info_point get(unsigned tf, unsigned shift) const
+
+  trade_info_point get(unsigned tf, unsigned i) const
   {
-    assert(tf < trading.size());
-    assert(shift < bars(tf));
-    return trading[tf][shift];
+    assert(tf < sup_tf);
+    assert(i < bars(tf));
+
+    return trading[tf][i];
   }
 
   bool load_data(const std::string &);
