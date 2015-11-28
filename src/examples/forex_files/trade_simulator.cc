@@ -30,7 +30,7 @@ bool trade_simulator::order_send(int type, double lots)
 
   double open_price;
 
-  const double amount(lots * 100000);
+  const double amount(lots * 100000.0);
   if (type == order::buy)  // buying base currency
   {
     open_price = ask();
@@ -123,16 +123,17 @@ double trade_simulator::run(const T &prg)
     const unsigned check_at(4);
     if (cur_bar_ == bars / check_at)
     {
-      if (balance_ < 0.0)
+      if (balance_ <= 0.0)
       {
         balance_ -= std::fabs(balance_) / 10.0;
         balance_ *= check_at;
         break;
       }
 
-      if (orders_history_total() * 2880 < cur_bar_)
+      if (orders_history_total() *
+          trading_data::ratio[1] * trading_data::ratio[2] * 7 < cur_bar_)
       {
-        balance_ -= std::fabs(balance_) / 10.0;
+        balance_ -= std::fabs(balance_) / 20.0;
         balance_ *= check_at;
         break;
       }
