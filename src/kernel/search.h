@@ -53,6 +53,7 @@ public:
 
 protected:  // Protected support methods
   fitness_t fitness(const T &);
+  void print_resume(std::string, const model_measurements &) const;
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   virtual bool stop_condition(const summary<T> &) const;
 

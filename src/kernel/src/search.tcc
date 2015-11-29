@@ -479,7 +479,8 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       calculate_metrics(run_summary.best.solution, &run_summary.best.score);
     }
 
-    print_resume(validation, run_summary.best.score);
+    this->print_resume(validation ? "Validation" : "Training",
+                       run_summary.best.score);
 
     if (r == 0 ||
         run_summary.best.score.fitness > overall_summary.best.score.fitness)
@@ -518,22 +519,6 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   }
 
   return overall_summary;
-}
-
-///
-/// \param[in] validation is it a validation or training resume?
-/// \param[in] fit fitness reached in the current run.
-/// \param[in] m metrics relative to the current run.
-///
-template<class T, template<class> class ES>
-void src_search<T, ES>::print_resume(bool validation,
-                                     const model_measurements &m) const
-{
-  const std::string ds(validation ? " Validation" : " Training");
-  print.info(ds, " fitness: ", m.fitness);
-
-  if (0 <= m.accuracy && m.accuracy <= 1.0)
-    print.info(ds, " accuracy: ", 100.0 * m.accuracy, '%');
 }
 
 ///

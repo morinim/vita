@@ -35,9 +35,7 @@ class ga_search : public search<T, ES>
 public:
   ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
-private:  // Private support methods
-  void print_resume(const fitness_t &) const;
-
+private:
   // NVI template methods
   virtual bool debug_nvi() const override;
   virtual void log_nvi(tinyxml2::XMLDocument *,

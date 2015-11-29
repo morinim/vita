@@ -60,7 +60,6 @@ public:
 private:  // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
-  void print_resume(bool, const model_measurements &) const;
 
   // NVI template methods
   virtual bool debug_nvi() const override;
