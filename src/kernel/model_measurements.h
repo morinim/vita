@@ -22,10 +22,11 @@ namespace vita
 ///
 struct model_measurements
 {
-  model_measurements(const fitness_t &f = fitness_t(),
-                     double a = std::numeric_limits<decltype(accuracy)>::max())
+  explicit model_measurements(const fitness_t &f = fitness_t(),
+                              double a = -1.0)
     : fitness(f), accuracy(a)
   {
+    assert(accuracy <= 1.0);
   }
 
   fitness_t fitness;

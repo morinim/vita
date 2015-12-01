@@ -85,7 +85,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
   {
     auto run_summary(evolution<T, ES>(this->env_, eval).run(r));
 
-    print_resume(run_summary.best.score.fitness);
+    this->print_resume("", run_summary.best.score);
 
     if (r == 0 ||
         run_summary.best.score.fitness > overall_summary.best.score.fitness)
@@ -118,15 +118,6 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
   }
 
   return overall_summary;
-}
-
-///
-/// \param[in] fit fitness reached in the current run.
-///
-template<class T, template<class> class ES, class F>
-void ga_search<T, ES, F>::print_resume(const fitness_t &fit) const
-{
-  print.info("Fitness: ", fit, "\n\n");
 }
 
 ///

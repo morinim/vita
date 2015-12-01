@@ -210,7 +210,7 @@ public:  // Data members
   /// Used to identify successfully learned (matched, classified, resolved...)
   /// examples.
   /// By default only fitness is considered.
-  model_measurements threshold = {fitness_t(), -1.0};
+  model_measurements threshold = model_measurements();
 
   ///
   /// \brief Parameters for the Age-Layered Population Structure (ALPS)

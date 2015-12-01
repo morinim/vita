@@ -40,6 +40,23 @@ summary<T> search<T, ES>::run(unsigned n)
 }
 
 ///
+/// \param[in] s introductory message.
+/// \param[in] m metrics relative to the current run.
+///
+template<class T, template<class> class ES>
+void search<T, ES>::print_resume(std::string s,
+                                 const model_measurements &m) const
+{
+  if (!s.empty())
+    s += " ";
+
+  print.info(s, "Fitness: ", m.fitness);
+
+  if (0.0 <= m.accuracy && m.accuracy <= 1.0)
+    print.info(s, "Accuracy: ", 100.0 * m.accuracy, '%');
+}
+
+///
 /// \param[in] s an up to date run summary.
 /// \return `true` when a run should be interrupted.
 ///
