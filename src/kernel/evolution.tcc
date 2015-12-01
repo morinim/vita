@@ -106,7 +106,7 @@ bool evolution<T, ES>::stop_condition(const summary<T> &s) const
   if (term::user_stop())
     return true;
 
-  // When we have an external_stop_condition_ function we use it
+  // When we have an external_stop_condition_ function we use it.
   if (external_stop_condition_)
     return external_stop_condition_(s);
 
