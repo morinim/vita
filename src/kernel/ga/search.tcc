@@ -83,8 +83,7 @@ summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    evolution<T, ES> evo(this->env_, eval, nullptr, nullptr);
-    summary<T> run_summary(evo.run(r));
+    auto run_summary(evolution<T, ES>(this->env_, eval).run(r));
 
     print_resume(run_summary.best.score.fitness);
 

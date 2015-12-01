@@ -91,7 +91,9 @@ template<class T, template<class> class ES>
 template<class U>
 void src_search<T, ES>::arl(const U &base)
 {
-  const auto base_fit(this->fitness(base));
+  auto &eval(*this->active_eva_);  // just a shorthand
+
+  const auto base_fit(eval(base));
   if (!isfinite(base_fit))
     return;  // We need a finite fitness to search for an improvement
 
@@ -126,7 +128,7 @@ void src_search<T, ES>::arl(const U &base)
     // (base.destroy_block) the current block.
     // Useful blocks have delta values greater than 0.
     const auto delta(base_fit[0] -
-                     this->fitness(base.destroy_block(l.index, *env.sset))[0]);
+                     eval(base.destroy_block(l.index, *env.sset))[0]);
 
     // Semantic introns cannot be building blocks...
     // When delta is greater than 10% of the base fitness we have a
@@ -437,12 +439,11 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
   if (validation)
     data.partition(this->env_.validation_percentage);
 
-  auto &eval(*this->active_eva_);  // Just a shorthand
+  auto &eval(*this->active_eva_);  // just a shorthand
 
   for (unsigned r(0); r < n; ++r)
   {
-    evolution<T, ES> evo(this->env_, eval, stop, shake);
-    summary<T> run_summary(evo.run(r));
+    auto run_summary(evolution<T, ES>(this->env_, eval, stop, shake).run(r));
 
     // Depending on `validation`, the metrics stored in run_summary.best.score
     // can refer to the training set or to the validation set (anyway they
@@ -454,7 +455,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
       data.dataset(data::validation);
       eval.clear(run_summary.best.solution);
 
-      run_summary.best.score.fitness = this->fitness(run_summary.best.solution);
+      run_summary.best.score.fitness = eval(run_summary.best.solution);
       calculate_metrics(run_summary.best.solution, &run_summary.best.score);
 
       data.dataset(backup);
@@ -472,8 +473,7 @@ summary<T> src_search<T, ES>::run_nvi(unsigned n)
         data.slice(false);
         eval.clear(run_summary.best.solution);
 
-        run_summary.best.score.fitness =
-          this->fitness(run_summary.best.solution);
+        run_summary.best.score.fitness = eval(run_summary.best.solution);
       }
 
       calculate_metrics(run_summary.best.solution, &run_summary.best.score);

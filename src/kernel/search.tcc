@@ -27,12 +27,6 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
   assert(debug());
 }
 
-template<class T, template<class> class ES>
-fitness_t search<T, ES>::fitness(const T &ind)
-{
-  return (*active_eva_)(ind);
-}
-
 ///
 /// \param[in] n number of runs.
 /// \return a summary of the search.

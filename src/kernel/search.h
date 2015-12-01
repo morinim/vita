@@ -13,8 +13,6 @@
 #if !defined(VITA_SEARCH_H)
 #define      VITA_SEARCH_H
 
-#include <boost/version.hpp>
-
 #include "kernel/evolution.h"
 #include "kernel/lambda_f.h"
 #include "kernel/problem.h"
@@ -52,7 +50,6 @@ public:
   bool debug() const;
 
 protected:  // Protected support methods
-  fitness_t fitness(const T &);
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   virtual bool stop_condition(const summary<T> &) const;
 
