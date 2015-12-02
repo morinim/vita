@@ -206,7 +206,7 @@ void src_search<T, ES>::arl(const team<U> &)
 ///   Francone).
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::tune_parameters_nvi()
+void src_search<T, ES>::tune_parameters()
 {
   // We use the setup function to modify general default parameters with
   // strategy-specific defaults.
@@ -409,116 +409,111 @@ void src_search<T, ES>::dss(unsigned generation) const
 }
 
 ///
-/// \param[in] n number of runs.
-/// \return a summary of the search.
+/// \param[in] s an up to date run summary.
+/// \return `true` when a run should be interrupted.
 ///
 template<class T, template<class> class ES>
-summary<T> src_search<T, ES>::run_nvi(unsigned n)
+bool src_search<T, ES>::stop_condition(const summary<T> &s) const
+{
+  // We use an accelerated stop condition when
+  // * all the individuals have the same fitness
+  // * after env_.g_without_improvement generations the situation doesn't
+  //   change.
+  assert(this->env_.g_without_improvement);
+  if (s.gen - s.last_imp > this->env_.g_without_improvement &&
+      issmall(s.az.fit_dist().variance()))
+    return true;
+
+  return false;
+}
+
+template<class T, template<class> class ES>
+bool src_search<T, ES>::validation() const
+{
+  return 0.0 < this->env_.validation_percentage &&
+         this->env_.validation_percentage < 100.0;
+}
+
+template<class T, template<class> class ES>
+void src_search<T, ES>::preliminary_setup()
 {
   assert(this->prob_.data());
-  auto &data(*this->prob_.data());
 
-  summary<T> overall_summary;
-  distribution<fitness_t> fd;
-
-  unsigned best_run(0);
-  std::vector<unsigned> good_runs;
+  if (validation())
+    this->prob_.data()->partition(this->env_.validation_percentage);
 
   // For `std::placeholders` and `std::bind` see:
   // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
-  std::function<void (unsigned)> shake;
   if (this->env_.dss == trilean::yes)
-    shake = std::bind(&src_search::dss, this, std::placeholders::_1);
+    this->shake_ = std::bind(&src_search::dss, this, std::placeholders::_1);
 
-  const auto stop(std::bind(&src_search::stop_condition, this,
-                            std::placeholders::_1));
+  this->stop_ = std::bind(&src_search::stop_condition, this,
+                          std::placeholders::_1);
+}
 
-  const bool validation(0 < this->env_.validation_percentage &&
-                        this->env_.validation_percentage < 100);
+template<class T, template<class> class ES>
+void src_search<T, ES>::after_evolution(summary<T> *s)
+{
+  assert(this->prob_.data());
+  assert(this->active_eva_);
 
-  if (validation)
-    data.partition(this->env_.validation_percentage);
+  // Some shorthands.
+  auto &data(*this->prob_.data());
+  auto &eval(*this->active_eva_);
 
-  auto &eval(*this->active_eva_);  // just a shorthand
-
-  for (unsigned r(0); r < n; ++r)
+  // Depending on `validation`, the metrics stored in `s.best.score` can refer
+  // to the training set or to the validation set (anyway they regard the
+  // current run).
+  if (validation())
   {
-    auto run_summary(evolution<T, ES>(this->env_, eval, stop, shake).run(r));
+    const data::dataset_t backup(data.dataset());
 
-    // Depending on `validation`, the metrics stored in run_summary.best.score
-    // can refer to the training set or to the validation set (anyway they
-    // regards the current run).
-    if (validation)
+    data.dataset(data::validation);
+    eval.clear(s->best.solution);
+
+    s->best.score.fitness = eval(s->best.solution);
+    calculate_metrics(s->best.solution, &s->best.score);
+
+    data.dataset(backup);
+    eval.clear(s->best.solution);
+  }
+  else  // not using a validation set
+  {
+    // If shake is true, the values calculated during the evolution
+    // refer to a subset of the available training set. Since we need an
+    // overall fitness for comparison, a new calculation has to be
+    // performed.
+    if (this->shake_)
     {
-      const data::dataset_t backup(data.dataset());
+      data.dataset(data::training);
+      data.slice(false);
+      eval.clear(s->best.solution);
 
-      data.dataset(data::validation);
-      eval.clear(run_summary.best.solution);
-
-      run_summary.best.score.fitness = eval(run_summary.best.solution);
-      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
-
-      data.dataset(backup);
-      eval.clear(run_summary.best.solution);
-    }
-    else  // not using a validation set
-    {
-      // If shake is true, the values calculated during the evolution
-      // refer to a subset of the available training set. Since we need an
-      // overall fitness for comparison, a new calculation has to be
-      // performed.
-      if (shake)
-      {
-        data.dataset(data::training);
-        data.slice(false);
-        eval.clear(run_summary.best.solution);
-
-        run_summary.best.score.fitness = eval(run_summary.best.solution);
-      }
-
-      calculate_metrics(run_summary.best.solution, &run_summary.best.score);
+      s->best.score.fitness = eval(s->best.solution);
     }
 
-    this->print_resume(validation ? "Validation" : "Training",
-                       run_summary.best.score);
-
-    if (r == 0 ||
-        run_summary.best.score.fitness > overall_summary.best.score.fitness)
-    {
-      overall_summary.best = run_summary.best;
-      best_run = r;
-    }
-
-    // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found(run_summary.best.score >=
-                              this->env_.threshold);
-
-    if (solution_found)
-    {
-      overall_summary.last_imp += run_summary.last_imp;
-
-      good_runs.push_back(r);
-    }
-
-    if (isfinite(run_summary.best.score.fitness))
-      fd.add(run_summary.best.score.fitness);
-
-    overall_summary.elapsed += run_summary.elapsed;
-
-    if (this->env_.arl == trilean::yes)
-    {
-      this->prob_.env.sset->reset_adf_weights();
-      arl(run_summary.best.solution);
-    }
-
-    assert(good_runs.empty() ||
-           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
-           std::end(good_runs));
-
-    this->log(overall_summary, fd, good_runs, best_run, n);
+    calculate_metrics(s->best.solution, &s->best.score);
   }
 
-  return overall_summary;
+  if (this->env_.arl == trilean::yes)
+  {
+    this->prob_.env.sset->reset_adf_weights();
+    arl(s->best.solution);
+  }
+}
+
+///
+/// \param[in] m metrics relative to the current run.
+///
+template<class T, template<class> class ES>
+void src_search<T, ES>::print_resume(const model_measurements &m) const
+{
+  const std::string s(validation() ? "Validation " : "Training ");
+
+  print.info(s, "fitness: ", m.fitness);
+
+  if (0.0 <= m.accuracy && m.accuracy <= 1.0)
+    print.info(s, "Accuracy: ", 100.0 * m.accuracy, '%');
 }
 
 ///

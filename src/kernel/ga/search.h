@@ -36,12 +36,7 @@ public:
   ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
 private:
-  // NVI template methods
-  virtual bool debug_nvi() const override;
-  virtual void log_nvi(tinyxml2::XMLDocument *,
-                       const summary<T> &) const override {}
-  virtual summary<T> run_nvi(unsigned) override;
-  virtual void tune_parameters_nvi() override;
+  virtual void tune_parameters() override;
 };
 
 #include "kernel/ga/search.tcc"

@@ -51,10 +51,7 @@ public:
 
 protected:  // Protected support methods
   fitness_t fitness(const T &);
-  void print_resume(std::string, const model_measurements &) const;
   void set_evaluator(std::unique_ptr<evaluator<T>>);
-  virtual bool stop_condition(const summary<T> &) const;
-
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
 
@@ -68,11 +65,19 @@ protected:  // Protected data members
   // Problem we're working on.
   problem &prob_;
 
-private:  // NVI template methods
+  std::function<void (unsigned)> shake_;
+  std::function<bool (const summary<T> &)> stop_;
+
+private:
+  // Template methods for search::run() member function.
+  virtual void tune_parameters() = 0;
+  virtual void preliminary_setup() {}
+  virtual void after_evolution(summary<T> *) {}
+  virtual void print_resume(const model_measurements &) const;
+
+  // NVI template methods
   virtual bool debug_nvi() const { return true; }
-  virtual void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const = 0;
-  virtual summary<T> run_nvi(unsigned) = 0;
-  virtual void tune_parameters_nvi() = 0;
+  virtual void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const {}
 };
 
 #include "kernel/search.tcc"

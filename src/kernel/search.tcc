@@ -22,7 +22,8 @@
 ///              the lifetime of `this` class.
 ///
 template<class T, template<class> class ES>
-search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
+search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env),
+                                    prob_(p), shake_(nullptr), stop_(nullptr)
 {
   assert(debug());
 }
@@ -34,45 +35,65 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env), prob_(p)
 template<class T, template<class> class ES>
 summary<T> search<T, ES>::run(unsigned n)
 {
-  tune_parameters_nvi();
+  tune_parameters();
 
-  return run_nvi(n);
+  preliminary_setup();
+
+  summary<T> overall_summary;
+  distribution<fitness_t> fd;
+
+  unsigned best_run(0);
+  std::vector<decltype(best_run)> good_runs;
+
+  for (unsigned r(0); r < n; ++r)
+  {
+    auto run_summary(evolution<T, ES>(this->env_, *this->active_eva_,
+                                      stop_,shake_).run(r));
+
+    after_evolution(&run_summary);
+
+    print_resume(run_summary.best.score);
+
+    if (r == 0 ||
+        run_summary.best.score.fitness > overall_summary.best.score.fitness)
+    {
+      overall_summary.best = run_summary.best;
+      best_run = r;
+    }
+
+    // We use accuracy or fitness (or both) to identify successful runs.
+    const bool solution_found(run_summary.best.score >=
+                              this->env_.threshold);
+
+    if (solution_found)
+    {
+      overall_summary.last_imp += run_summary.last_imp;
+
+      good_runs.push_back(r);
+    }
+
+    if (isfinite(run_summary.best.score.fitness))
+      fd.add(run_summary.best.score.fitness);
+
+    overall_summary.elapsed += run_summary.elapsed;
+
+    assert(good_runs.empty() ||
+           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
+           std::end(good_runs));
+
+    this->log(overall_summary, fd, good_runs, best_run, n);
+  }
+
+  return overall_summary;
 }
 
 ///
-/// \param[in] s introductory message.
 /// \param[in] m metrics relative to the current run.
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::print_resume(std::string s,
-                                 const model_measurements &m) const
+void search<T, ES>::print_resume(const model_measurements &m) const
 {
-  if (!s.empty())
-    s += " ";
-
-  print.info(s, "Fitness: ", m.fitness);
-
-  if (0.0 <= m.accuracy && m.accuracy <= 1.0)
-    print.info(s, "Accuracy: ", 100.0 * m.accuracy, '%');
-}
-
-///
-/// \param[in] s an up to date run summary.
-/// \return `true` when a run should be interrupted.
-///
-template<class T, template<class> class ES>
-bool search<T, ES>::stop_condition(const summary<T> &s) const
-{
-  // We use an accelerated stop condition when
-  // * all the individuals have the same fitness
-  // * after env_.g_without_improvement generations the situation doesn't
-  //   change.
-  assert(env_.g_without_improvement);
-  if (s.gen - s.last_imp > env_.g_without_improvement &&
-      issmall(s.az.fit_dist().variance()))
-    return true;
-
-  return false;
+  print.info("Fitness: ", m.fitness);
 }
 
 ///

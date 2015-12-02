@@ -57,16 +57,23 @@ public:
 
   bool set_evaluator(evaluator_id, const std::string & = "");
 
-private:  // Private support methods
+private:
+  // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
   void dss(unsigned) const;
+  bool stop_condition(const summary<T> &) const;
+  bool validation() const;
+
+  // Template methods for search::run() member function.
+  virtual void tune_parameters() override;
+  virtual void preliminary_setup() override;
+  virtual void after_evolution(summary<T> *) override;
+  virtual void print_resume(const model_measurements &) const override;
 
   // NVI template methods
   virtual bool debug_nvi() const override;
   virtual void log_nvi(tinyxml2::XMLDocument *,
                        const summary<T> &) const override;
-  virtual summary<T> run_nvi(unsigned) override;
-  virtual void tune_parameters_nvi() override;
 
 private:  // Private data members
   // Preferred evaluator for symbolic regression.

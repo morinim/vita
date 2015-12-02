@@ -40,7 +40,7 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 /// \see src_search::tune_parameters_nvi comments for further details
 ///
 template<class T, template<class> class ES, class F>
-void ga_search<T, ES, F>::tune_parameters_nvi()
+void ga_search<T, ES, F>::tune_parameters()
 {
   const environment dflt(nullptr, true);
   const environment &constrained(this->prob_.env);
@@ -63,69 +63,12 @@ void ga_search<T, ES, F>::tune_parameters_nvi()
   if (!constrained.g_without_improvement)
     this->env_.g_without_improvement = dflt.g_without_improvement;
 
-  assert(this->env_.debug(true));
-}
-
-///
-/// \param[in] n number of runs.
-/// \return a summary of the search.
-///
-template<class T, template<class> class ES, class F>
-summary<T> ga_search<T, ES, F>::run_nvi(unsigned n)
-{
-  auto &eval(*this->active_eva_);  // just a shorthand
-
-  summary<T> overall_summary;
-  distribution<fitness_t> fd;
-
-  unsigned best_run(0);
-  std::vector<unsigned> good_runs;
-
-  for (unsigned r(0); r < n; ++r)
+  if (this->env_.arl != trilean::no)
   {
-    auto run_summary(evolution<T, ES>(this->env_, eval).run(r));
-
-    this->print_resume("", run_summary.best.score);
-
-    if (r == 0 ||
-        run_summary.best.score.fitness > overall_summary.best.score.fitness)
-    {
-      overall_summary.best = run_summary.best;
-      best_run = r;
-    }
-
-    // We use fitness to identify successful runs.
-    const bool solution_found(dominating(run_summary.best.score.fitness,
-                                         this->env_.threshold.fitness));
-
-    if (solution_found)
-    {
-      overall_summary.last_imp += run_summary.last_imp;
-
-      good_runs.push_back(r);
-    }
-
-    if (isfinite(run_summary.best.score.fitness))
-      fd.add(run_summary.best.score.fitness);
-
-    overall_summary.elapsed += run_summary.elapsed;
-
-    assert(good_runs.empty() ||
-           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
-           std::end(good_runs));
-
-    this->log(overall_summary, fd, good_runs, best_run, n);
+    this->env_.arl = trilean::no;
+    print.info("ARL set to false");
   }
 
-  return overall_summary;
-}
-
-///
-/// \return \c true if the object passes the internal consistency check.
-///
-template<class T, template<class> class ES, class F>
-bool ga_search<T, ES, F>::debug_nvi() const
-{
-  return true;
+  assert(this->env_.debug(true));
 }
 #endif  // Include guard
