@@ -130,5 +130,28 @@ bool trading_data::load_data(const std::string &filename)
   }
   std::cout << "  " << i << " examples read\n";
 
-  return compute_longer_timeframes();
+  if (!compute_longer_timeframes())
+    return false;
+
+  return debug();
+}
+
+bool trading_data::debug() const
+{
+  bool ret(true);
+
+  double prev(open(0, 0));
+  for (unsigned i(1); i < bars(); ++i)
+  {
+    if (std::fabs(prev - open(0, i)) > 0.1)
+    {
+      std::cerr << "Open(" << i - 1 << ") - Open(" << i << ") = "
+                << (prev - open(0, i)) << "\n";
+      ret = false;
+    }
+
+    prev = open(0, i);
+  }
+
+  return ret;
 }

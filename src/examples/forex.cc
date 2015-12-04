@@ -240,10 +240,10 @@ int main()
 
   vita::environment env(&ss, true);
 
-  env.individuals     = 20;
+  env.individuals     = 40;
   env.min_individuals =  8;
   env.code_length = 200;
-  env.generations = 200;
+  env.generations = 400;
   env.layers = 6;
   env.team.individuals = 2;
   env.stat.dynamic = true;
@@ -253,7 +253,7 @@ int main()
   env.stat.dir = "forex_results/";
 
   auto eva(vita::make_unique<fxs::evaluator>(&ts));
-  vita::evolution<vita::team<vita::i_mep>, vita::alps_es> evo(env, *eva.get());
+  vita::evolution<vita::team<vita::i_mep>, vita::alps_es> evo(env, *eva);
 
   std::cout << "STARTING RUN\n";
 

@@ -94,6 +94,7 @@ private:
 
 private:
   bool compute_longer_timeframes();
+  bool debug() const;
 
   trade_info_point get(unsigned tf, unsigned i) const
   {

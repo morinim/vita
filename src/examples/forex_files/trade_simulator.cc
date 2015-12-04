@@ -14,7 +14,7 @@
 void trade_simulator::clear_status()
 {
   order_ = order();
-  spread_ = 0.0002;
+  spread_ = 0.0010;
   balance_ = 0.0;
   cur_bar_ = 1;
   orders_history_total_ = 0;
@@ -85,7 +85,8 @@ double trade_simulator::run(const T &prg)
 {
   clear_status();
 
-  const auto bars(td_.bars(0));
+  const auto bars(td_.bars(0) - 1);
+
   while (cur_bar_ < bars)
   {
     const auto type(order_.type());
@@ -116,20 +117,31 @@ double trade_simulator::run(const T &prg)
 
     inc_bar();
 
-    //if (cur_bar_ % 100000 == 0)
-    //  std::cout << "  Bar " << cur_bar_ << "  balance " << balance_
-    //            << "          \r" << std::flush;
+    /*
+    if (cur_bar_ % 100000 == 0)
+      std::cout << "  Bar " << cur_bar_ << "  balance " << balance_
+                << "          \r" << std::flush;
+    */
 
-    const unsigned check_at(4);
+    const unsigned check_at(10);
     if (cur_bar_ == bars / check_at)
     {
+      if (orders_history_total() == 0)
+      {
+        balance_ -= 10000.0;
+        break;
+      }
+
+      /*
       if (balance_ <= 0.0)
       {
         balance_ -= std::fabs(balance_) / 10.0;
         balance_ *= check_at;
         break;
       }
+      */
 
+      /*
       if (orders_history_total() *
           trading_data::ratio[1] * trading_data::ratio[2] * 7 < cur_bar_)
       {
@@ -137,8 +149,14 @@ double trade_simulator::run(const T &prg)
         balance_ *= check_at;
         break;
       }
+      */
     }
   }
+
+  assert(cur_bar_ <= bars);
+
+  if (order_type() != order::na)
+    order_close();
 
   //std::cout << "BALANCE: " << balance_ << " (" << orders_history_total()
   //          << " operations)\n";

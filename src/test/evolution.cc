@@ -40,10 +40,10 @@ BOOST_AUTO_TEST_CASE(Creation)
 
       const auto eva(make_unique<vita::random_evaluator<i_mep>>());
 
-      vita::evolution<i_mep, alps_es> evo1(env, *eva.get());
+      vita::evolution<i_mep, alps_es> evo1(env, *eva);
       BOOST_REQUIRE(evo1.debug());
 
-      vita::evolution<i_mep, std_es> evo2(env, *eva.get());
+      vita::evolution<i_mep, std_es> evo2(env, *eva);
       BOOST_REQUIRE(evo2.debug());
     }
 }

@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 
   auto eva(vita::make_unique<my_evaluator>());
 
-  vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva.get());
+  vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva);
 
   evo.run(1);
 
