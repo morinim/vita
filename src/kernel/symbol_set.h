@@ -72,8 +72,8 @@ private:  // Private data members.
   // pointers).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
-  // A collection is a structured-view on symbols_ (the all_ variable) or on
-  // a subset of symbols_ (e.g. only on symbols of a specific category).
+  // A collection is a structured-view on `symbols_` (the `all_` variable) or
+  // on a subset of `symbols_` (e.g. only on symbols of a specific category).
   struct collection
   {
     collection();
@@ -103,4 +103,4 @@ private:  // Private data members.
 std::ostream &operator<<(std::ostream &, const symbol_set &);
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

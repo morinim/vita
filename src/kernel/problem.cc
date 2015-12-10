@@ -15,9 +15,12 @@
 namespace vita
 {
 ///
-/// A new uninitialized problem.
+/// \brief A new uninitialized problem
 ///
-problem::problem() : env(&sset)
+/// \param[in] initialize should the environment be initialized with default
+///                       values?
+///
+problem::problem(bool initialize) : env(&sset, initialize)
 {
 }
 
@@ -29,8 +32,9 @@ problem::problem() : env(&sset)
 ///
 void problem::clear(bool initialize)
 {
-  env = environment(&sset, initialize);
-  sset = symbol_set();
+  *this = std::move(problem(initialize));
+  //env = environment(&sset, initialize);
+  //sset = symbol_set();
 }
 
 ///

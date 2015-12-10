@@ -29,7 +29,7 @@ namespace vita
 class problem
 {
 public:
-  problem();
+  explicit problem(bool = false);
 
   virtual vita::data *data();
 

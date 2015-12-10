@@ -62,6 +62,9 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 ///
 /// \brief New empty instance of src_problem
 ///
+/// \param[in] initialize should the environment be initialized with default
+///                       values?
+///
 /// Usually the environment isn't initialized so that the search class would
 /// choose the best values for the specific problem before starting the
 /// run (this is how the constructor works).
@@ -72,7 +75,7 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 ///     src_problem p;
 ///     p.clear(true);
 ///
-src_problem::src_problem()
+src_problem::src_problem(bool initialize) : problem(initialize)
 {
 }
 
@@ -86,7 +89,7 @@ src_problem::src_problem()
 ///
 src_problem::src_problem(const std::string &ds, const std::string &ts,
                          const std::string &symbols)
-  : problem()
+  : problem(false)
 {
   load(ds, ts, symbols);
 }

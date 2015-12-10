@@ -24,7 +24,7 @@ namespace vita
 class src_problem : public problem
 {
 public:
-  src_problem();
+  explicit src_problem(bool = false);
   explicit src_problem(const std::string &, const std::string & = "",
                        const std::string & = "");
 
