@@ -28,18 +28,12 @@ class terminal : public symbol
 public:
   using symbol::symbol;
 
-  virtual unsigned arity() const override;
+  /// \return `0` (this is a terminal!)
+  virtual unsigned arity() const override { return 0; }
 
   virtual bool debug() const override;
 };
 
-///
-/// \return 0 (this is a terminal!)
-///
-inline unsigned terminal::arity() const
-{
-  return 0;
-}
 }  // namespace vita
 
 #endif  // Include guard
