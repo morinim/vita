@@ -81,7 +81,7 @@ double trade_simulator::order_profit() const
 }
 
 template<class T>
-double trade_simulator::run(const T &prg)
+double trade_simulator::run_bs(const T &prg)
 {
   clear_status();
 
@@ -109,19 +109,22 @@ double trade_simulator::run(const T &prg)
     }
     else   // short/long position
     {
-      const double close_level(10.0);
+      vita::interpreter<vita::i_mep> intr(&prg[type == order::buy ? 1 : 0]);
 
-      if (std::fabs(order_profit()) > close_level)
+      auto a(intr.run());
+      const bool v(!a.empty() && vita::any_cast<bool>(a));
+
+      if (v)
         order_close();
+      else
+      {
+        const double close_level(100.0);
+        if (std::fabs(order_profit()) > close_level)
+          order_close();
+      }
     }
 
     inc_bar();
-
-    /*
-    if (cur_bar_ % 100000 == 0)
-      std::cout << "  Bar " << cur_bar_ << "  balance " << balance_
-                << "          \r" << std::flush;
-    */
 
     const unsigned check_at(10);
     if (cur_bar_ == bars / check_at)

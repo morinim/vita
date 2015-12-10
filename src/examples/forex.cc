@@ -156,14 +156,15 @@ struct lt_v : vita::real::lt
   lt_v() : vita::real::lt({c_volume, c_logic}) {}
 };
 
-class evaluator : public vita::evaluator<vita::team<vita::i_mep>>
+template<class T>
+class evaluator : public vita::evaluator<T>
 {
 public:
   explicit evaluator(trade_simulator *ts) : ts_(ts) {}
 
-  virtual vita::fitness_t operator()(const vita::team<vita::i_mep> &t) override
+  virtual vita::fitness_t operator()(const T &t) override
   {
-    return {ts_->run(t)};
+    return {ts_->run_bs(t)};
   }
 
 private:
@@ -246,13 +247,14 @@ int main()
   env.generations = 400;
   env.layers = 6;
   env.team.individuals = 2;
+  env.alps.age_gap = 10;
   env.stat.dynamic = true;
   env.stat.layers = true;
   env.stat.population = true;
   env.stat.summary = true;
   env.stat.dir = "forex_results/";
 
-  auto eva(vita::make_unique<fxs::evaluator>(&ts));
+  auto eva(vita::make_unique<fxs::evaluator<vita::team<vita::i_mep>>>(&ts));
   vita::evolution<vita::team<vita::i_mep>, vita::alps_es> evo(env, *eva);
 
   std::cout << "STARTING RUN\n";
