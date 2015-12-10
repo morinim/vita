@@ -39,8 +39,6 @@ public:
 
 public:
   environment env;
-
-private:
   symbol_set sset;
 };
 
