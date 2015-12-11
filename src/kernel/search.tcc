@@ -29,6 +29,68 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env),
 }
 
 ///
+/// \brief Tries to tune search parameters for the current problem
+///
+template<class T, template<class> class ES>
+void search<T, ES>::tune_parameters()
+{
+  // The `shape` function modifies the default parameters with
+  // strategy-specific values.
+  const environment dflt(ES<T>::shape(environment(nullptr, true)));
+  const environment &constrained(prob_.env);
+
+  if (!constrained.code_length)
+    env_.code_length = dflt.code_length;
+
+  if (!constrained.patch_length)
+    env_.patch_length = 1 + env_.code_length / 3;
+
+  if (constrained.elitism == trilean::unknown)
+    env_.elitism = dflt.elitism;
+
+  if (constrained.p_mutation < 0.0)
+    env_.p_mutation = dflt.p_mutation;
+
+  if (constrained.p_cross < 0.0)
+    env_.p_cross = dflt.p_cross;
+
+  if (!constrained.brood_recombination)
+    env_.brood_recombination = *dflt.brood_recombination;
+
+  if (constrained.dss == trilean::unknown)
+    env_.dss = trilean::no;
+
+  if (!constrained.layers)
+    env_.layers = dflt.layers;
+
+  if (constrained.validation_percentage > 100)
+    env_.validation_percentage = dflt.validation_percentage;
+
+  if (!constrained.individuals)
+    env_.individuals = dflt.individuals;
+
+  if (!constrained.min_individuals)
+    env_.min_individuals = dflt.min_individuals;
+
+  if (!constrained.tournament_size)
+    env_.tournament_size = dflt.tournament_size;
+
+  if (!constrained.mate_zone)
+    env_.mate_zone = *dflt.mate_zone;
+
+  if (!constrained.generations)
+    env_.generations = dflt.generations;
+
+  if (!constrained.g_without_improvement)
+    env_.g_without_improvement = dflt.g_without_improvement;
+
+  if (constrained.arl == trilean::unknown)
+    env_.arl = dflt.arl;
+
+  assert(env_.debug(true));
+}
+
+///
 /// \param[in] n number of runs.
 /// \return a summary of the search.
 ///

@@ -35,7 +35,7 @@ class ga_search : public search<T, ES>
 public:
   ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
-private:
+protected:
   virtual void tune_parameters() override;
 };
 

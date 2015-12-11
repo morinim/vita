@@ -50,10 +50,10 @@ public:
   bool debug() const;
 
 protected:  // Protected support methods
-  fitness_t fitness(const T &);
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
+  virtual void tune_parameters();
 
 protected:  // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
@@ -70,7 +70,6 @@ protected:  // Protected data members
 
 private:
   // Template methods for search::run() member function.
-  virtual void tune_parameters() = 0;
   virtual void preliminary_setup() {}
   virtual void after_evolution(summary<T> *) {}
   virtual void print_resume(const model_measurements &) const;

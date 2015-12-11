@@ -57,6 +57,9 @@ public:
 
   bool set_evaluator(evaluator_id, const std::string & = "");
 
+protected:
+  virtual void tune_parameters() override;
+
 private:
   // Private support methods
   void calculate_metrics(const T &, model_measurements *) const;
@@ -65,7 +68,6 @@ private:
   bool validation() const;
 
   // Template methods for search::run() member function.
-  virtual void tune_parameters() override;
   virtual void preliminary_setup() override;
   virtual void after_evolution(summary<T> *) override;
   virtual void print_resume(const model_measurements &) const override;

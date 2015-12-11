@@ -208,31 +208,14 @@ void src_search<T, ES>::arl(const team<U> &)
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters()
 {
-  // We use the setup function to modify general default parameters with
-  // strategy-specific defaults.
-  const environment dflt(ES<T>::shape(environment(nullptr, true)));
+  search<T, ES>::tune_parameters();
 
+  // The `shape` function modifies the default parameters with
+  // strategy-specific values.
+  const environment dflt(ES<T>::shape(environment(nullptr, true)));
   const environment &constrained(this->prob_.env);
 
   const auto d_size(this->prob_.data() ? this->prob_.data()->size() : 0);
-
-  if (constrained.code_length == 0)
-    this->env_.code_length = dflt.code_length;
-
-  if (constrained.patch_length == 0)
-    this->env_.patch_length = 1 + this->env_.code_length / 3;
-
-  if (constrained.elitism == trilean::unknown)
-    this->env_.elitism = dflt.elitism;
-
-  if (constrained.p_mutation < 0.0)
-    this->env_.p_mutation = dflt.p_mutation;
-
-  if (constrained.p_cross < 0.0)
-    this->env_.p_cross = dflt.p_cross;
-
-  if (!constrained.brood_recombination)
-    this->env_.brood_recombination = *dflt.brood_recombination;
 
   // With a small number of training case:
   // * we need every training case;
@@ -281,46 +264,16 @@ void src_search<T, ES>::tune_parameters()
     print.info("Population size set to ", this->env_.individuals);
   }
 
-  if (!constrained.min_individuals)
+  if (constrained.validation_percentage > 100)
   {
-    this->env_.min_individuals = std::max(this->env_.individuals / 10, 2u);
-
-    print.info("Minimum number of individuals for a layer is ",
-               this->env_.min_individuals);
-  }
-
-  // Note that this setting, once set, will not be changed.
-  if (constrained.validation_percentage > 100 &&
-      this->env_.validation_percentage > 100)
-  {
-    if (d_size)
-    {
-      if (d_size * dflt.validation_percentage < 10000)
-        this->env_.validation_percentage = 0;
-      else
-        this->env_.validation_percentage = dflt.validation_percentage;
-    }
+    if (d_size && d_size * dflt.validation_percentage < 10000)
+      this->env_.validation_percentage = 0;
     else
       this->env_.validation_percentage = dflt.validation_percentage;
 
     print.info("Validation percentage set to ",
                this->env_.validation_percentage, '%');
   }
-
-  if (!constrained.tournament_size)
-    this->env_.tournament_size = dflt.tournament_size;
-
-  if (!constrained.mate_zone)
-    this->env_.mate_zone = *dflt.mate_zone;
-
-  if (!constrained.generations)
-    this->env_.generations = dflt.generations;
-
-  if (!constrained.g_without_improvement)
-    this->env_.g_without_improvement = dflt.g_without_improvement;
-
-  if (constrained.arl == trilean::unknown)
-    this->env_.arl = dflt.arl;
 
   assert(this->env_.debug(true));
 }
