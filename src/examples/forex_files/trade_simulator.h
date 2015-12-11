@@ -113,7 +113,7 @@ public:
 
   unsigned orders_history_total() const;
 
-  template<class T> double run_bs(const T &);
+  template<class T> double run(const T &);
 
 private:  // Private support functions
   unsigned as_series(unsigned tf, unsigned i) const

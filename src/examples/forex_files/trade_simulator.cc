@@ -81,7 +81,7 @@ double trade_simulator::order_profit() const
 }
 
 template<class T>
-double trade_simulator::run_bs(const T &prg)
+double trade_simulator::run(const T &prg)
 {
   clear_status();
 

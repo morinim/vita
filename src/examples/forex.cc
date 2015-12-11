@@ -10,9 +10,9 @@
  */
 
 #include "kernel/evaluator.h"
-#include "kernel/evolution.h"
 #include "kernel/interpreter.h"
 #include "kernel/i_mep.h"
+#include "kernel/search.h"
 #include "kernel/src/primitive/bool.h"
 #include "kernel/src/primitive/real.h"
 #include "kernel/team.h"
@@ -164,7 +164,7 @@ public:
 
   virtual vita::fitness_t operator()(const T &t) override
   {
-    return {ts_->run_bs(t)};
+    return {ts_->run(t)};
   }
 
 private:
@@ -235,31 +235,31 @@ int main()
 
   trade_simulator ts(td);
 
-  vita::symbol_set ss;
-  if (!setup_symbols(&ss, &ts))
+  vita::problem p(true);
+
+  if (!setup_symbols(&p.sset, &ts))
     return EXIT_FAILURE;
 
-  vita::environment env(&ss, true);
-
-  env.individuals     = 40;
-  env.min_individuals =  8;
-  env.code_length = 200;
-  env.generations = 400;
-  env.layers = 6;
-  env.team.individuals = 2;
-  env.alps.age_gap = 10;
-  env.stat.dynamic = true;
-  env.stat.layers = true;
-  env.stat.population = true;
-  env.stat.summary = true;
-  env.stat.dir = "forex_results/";
-
-  auto eva(vita::make_unique<fxs::evaluator<vita::team<vita::i_mep>>>(&ts));
-  vita::evolution<vita::team<vita::i_mep>, vita::alps_es> evo(env, *eva);
+  p.env.individuals = 40;
+  p.env.min_individuals =  8;
+  p.env.code_length = 200;
+  p.env.generations = 400;
+  p.env.layers = 6;
+  p.env.team.individuals = 2;
+  p.env.alps.age_gap = 10;
+  p.env.stat.dynamic = true;
+  p.env.stat.layers = true;
+  p.env.stat.population = true;
+  p.env.stat.summary = true;
+  p.env.stat.dir = "forex_results/";
 
   std::cout << "STARTING RUN\n";
+  vita::search<vita::team<vita::i_mep>, vita::alps_es> engine(p);
 
-  evo.run(1);
+  using team = vita::team<vita::i_mep>;
+  engine.set_evaluator(vita::make_unique<fxs::evaluator<team>>(&ts));
+
+  engine.run(1);
 
   return EXIT_SUCCESS;
 }
