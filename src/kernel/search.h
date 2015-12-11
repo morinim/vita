@@ -47,10 +47,11 @@ public:
 
   summary<T> run(unsigned = 1);
 
+  void set_evaluator(std::unique_ptr<evaluator<T>>);
+
   bool debug() const;
 
 protected:  // Protected support methods
-  void set_evaluator(std::unique_ptr<evaluator<T>>);
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
   virtual void tune_parameters();
