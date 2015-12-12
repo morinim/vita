@@ -19,8 +19,6 @@
 
 namespace vita
 {
-class argument;
-
 ///
 /// This is a container for the symbol set. Symbols are stored to be quickly
 /// recalled by category and randomly extracted.

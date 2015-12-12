@@ -198,8 +198,7 @@ void symbol_set::reset_adf_weights()
   for (auto adf : all_.adf)
   {
     const auto w(adf->weight);
-    const auto delta(w >  1 ? w/2 :
-                       w == 1 ?   1 : 0);
+    const auto delta(w > 1 ? w/2 : w);
     all_.sum -= delta;
     adf->weight -= delta;
   }

@@ -55,12 +55,10 @@ public:
 
 public:  // Public data members
   /// Weight is used by the symbol_set::roulette method to control the
-  /// probability of extraction of the symbol.
+  /// probability of selection for the symbol.
   unsigned weight;
 
-  /// This is the default weight. Weights are used by the
-  /// symbol_set::roulette method to control the probability of extraction of
-  /// the symbols.
+  /// This is the default weight.
   static constexpr decltype(weight) k_base_weight{100};
 
 private:  // NVI template methods
