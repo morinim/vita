@@ -453,7 +453,7 @@ bool symbol_set::collection::debug(std::string name) const
     return false;
   }
 
-  if (check_sum != sum_t)
+  if (check_sum_t != sum_t)
   {
     print.error(name, "incorrect cached sum of weights for terminal (stored: ",
                 sum_t, ", correct: ", check_sum_t, ')');
