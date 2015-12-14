@@ -76,13 +76,13 @@ private:  // Private data members.
   {
     collection();
 
-    std::vector<symbol *>     symbols;
-    std::vector<terminal *> terminals;
-    std::vector<symbol *>         adf;
-    std::vector<symbol *>         adt;
+    std::vector<symbol *>   symbols;
+    std::vector<symbol *> terminals;
+    std::vector<symbol *>       adf;
+    std::vector<symbol *>       adt;
 
-    // The sum of the weights of all the symbols in the collection.
-    unsigned sum;
+    unsigned sum;    // sum of the weights of all the symbols in the collection
+    unsigned sum_t;  // sum of the weights of the terminals in the collection
 
     bool debug(std::string) const;
   } all_;

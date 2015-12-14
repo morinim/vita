@@ -154,7 +154,8 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> i)
 
   if (raw->terminal())
   {
-    all_.terminals.push_back(static_cast<terminal *>(raw));
+    all_.terminals.push_back(raw);
+    all_.sum_t += raw->weight;
 
     if (raw->auto_defined())
       all_.adt.push_back(raw);
@@ -180,6 +181,7 @@ void symbol_set::reset_adf_weights()
     const auto w(adt->weight);
     const auto delta(w > 1 ? w/2 : w);
     all_.sum -= delta;
+    all_.sum_t -= delta;
     adt->weight -= delta;
 
     if (delta && adt->weight == 0)
@@ -214,7 +216,9 @@ terminal *symbol_set::roulette_terminal(category_t c) const
 {
   assert(c < categories());
 
-  return random::element(by_.category[c].terminals);
+  return static_cast<terminal *>(roulette_(by_.category[c].terminals,
+                                           by_.category[c].sum_t));
+  //return random::element(by_.category[c].terminals);
 }
 
 ///
@@ -223,6 +227,8 @@ terminal *symbol_set::roulette_terminal(category_t c) const
 ///
 symbol *symbol_set::roulette(category_t c) const
 {
+  assert(c < categories());
+
   return roulette_(by_.category[c].symbols, by_.category[c].sum);
 }
 
@@ -369,7 +375,7 @@ bool symbol_set::debug() const
 /// New empty collection.
 ///
 symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
-                                       sum(0)
+                                       sum(0), sum_t(0)
 {
 }
 
@@ -384,7 +390,7 @@ bool symbol_set::collection::debug(std::string name) const
     name = "?";
   name = "Collection " + name + ": ";
 
-  decltype(sum) check_sum(0);
+  decltype(sum) check_sum(0), check_sum_t(0);
 
   for (auto s : symbols)
   {
@@ -404,9 +410,10 @@ bool symbol_set::collection::debug(std::string name) const
 
     if (s->terminal())
     {
+      check_sum_t += s->weight;
+
       // Terminals must be in the terminals' vector.
-      if (std::find(terminals.begin(), terminals.end(), s) ==
-          terminals.end())
+      if (std::find(terminals.begin(), terminals.end(), s) == terminals.end())
       {
         print.error(name, "terminal ", s->display(), " not correctly stored");
         return false;
@@ -443,6 +450,13 @@ bool symbol_set::collection::debug(std::string name) const
   {
     print.error(name, "incorrect cached sum of weights (stored: ", sum,
                 ", correct: ", check_sum, ')');
+    return false;
+  }
+
+  if (check_sum != sum_t)
+  {
+    print.error(name, "incorrect cached sum of weights for terminal (stored: ",
+                sum_t, ", correct: ", check_sum_t, ')');
     return false;
   }
 
@@ -499,6 +513,9 @@ symbol_set::by_category::by_category(const collection &c) : category()
 
     category[cat].symbols.push_back(s);
     category[cat].sum += s->weight;
+
+    if (s->terminal())
+      category[cat].sum_t += s->weight;
   }
 
   for (auto t : c.terminals)
