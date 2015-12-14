@@ -42,10 +42,9 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 template<class T, template<class> class ES, class F>
 void ga_search<T, ES, F>::tune_parameters()
 {
-  searc<T, ES>::tune_parameters();
+  search<T, ES>::tune_parameters();
 
   const environment dflt(nullptr, true);
-  const environment &constrained(this->prob_.env);
 
   if (this->env_.min_individuals < 10)
     this->env_.min_individuals = 10;
