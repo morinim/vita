@@ -25,6 +25,7 @@ class src_problem : public problem
 {
 public:
   explicit src_problem(bool = false);
+  explicit src_problem(const char []);
   explicit src_problem(const std::string &, const std::string & = "",
                        const std::string & = "");
 

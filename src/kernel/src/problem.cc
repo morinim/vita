@@ -80,6 +80,18 @@ src_problem::src_problem(bool initialize) : problem(initialize)
 }
 
 ///
+/// A delegating constructor to avoid that the `src_problem("data.csv")` call
+/// call could be resolved with `src_problem(bool)` instead of
+/// `src_problem(std::string)` (conversion from `const char []` to `bool` is
+/// a standard conversion, while the one to `std::string` is a user-defined
+/// conversion).
+///
+src_problem::src_problem(const char ds[])
+  : src_problem(std::string(ds), std::string(), std::string())
+{
+}
+
+///
 /// \param[in] ds name of the dataset file (training/validation set).
 /// \param[in] ts name of the test set.
 /// \param[in] symbols name of the file containing the symbols. If it is
