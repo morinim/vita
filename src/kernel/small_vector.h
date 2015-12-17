@@ -48,6 +48,8 @@ namespace vita
 template<class T, std::size_t S = 0>
 class small_vector
 {
+  static_assert(S >= 1, "smalla_vector requires a positive size");
+
 public:  // Type aliases
   using value_type = T;
   using size_type = std::size_t;
@@ -220,7 +222,7 @@ private:  // Private data members
   // when not used anymore. Objects on the heap are destructed if:
   // - they aren't plain old data;
   // - aren't used anymore.
-  T local_storage_[S > 0 ? S : 1];
+  T local_storage_[S];
 };
 
 #include "kernel/small_vector.tcc"
