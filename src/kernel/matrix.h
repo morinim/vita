@@ -35,53 +35,53 @@ namespace vita
 /// work, you could prefer \c matrix<char> for performance reasons
 /// (\c std::vector<bool> is a "peculiar" specialization).
 ///
-  template<class T>
-  class matrix
-  {
-  public:
-    // Type alias
-    using values_t = std::vector<T>;
-    using value_type = typename values_t::value_type;
-    using reference = typename values_t::reference;
-    using const_reference = typename values_t::const_reference;
+template<class T>
+class matrix
+{
+public:
+  // Type alias
+  using values_t = std::vector<T>;
+  using value_type = typename values_t::value_type;
+  using reference = typename values_t::reference;
+  using const_reference = typename values_t::const_reference;
 
-    explicit matrix(unsigned = 0, unsigned = 0);
+  explicit matrix(unsigned = 0, unsigned = 0);
 
-    const_reference operator()(const locus &) const;
-    reference operator()(const locus &);
-    const_reference operator()(unsigned, unsigned) const;
-    reference operator()(unsigned, unsigned);
+  const_reference operator()(const locus &) const;
+  reference operator()(const locus &);
+  const_reference operator()(unsigned, unsigned) const;
+  reference operator()(unsigned, unsigned);
 
-    void fill(const T &);
+  void fill(const T &);
 
-    bool operator==(const matrix &) const;
+  bool operator==(const matrix &) const;
 
-    bool empty() const;
-    unsigned rows() const;
-    unsigned cols() const;
+  bool empty() const;
+  unsigned rows() const;
+  unsigned cols() const;
 
-    // Iterators
-    using iterator = typename values_t::iterator;
-    using const_iterator = typename values_t::const_iterator;
+  // Iterators
+  using iterator = typename values_t::iterator;
+  using const_iterator = typename values_t::const_iterator;
 
-    iterator begin();
-    const_iterator begin() const;
-    const_iterator end() const;
-    iterator end();
+  iterator begin();
+  const_iterator begin() const;
+  const_iterator end() const;
+  iterator end();
 
-    // Serialization
-    bool load(std::istream &);
-    bool save(std::ostream &) const;
+  // Serialization
+  bool load(std::istream &);
+  bool save(std::ostream &) const;
 
-  private:  // Private support functions
-    unsigned size() const;
-    unsigned index(unsigned, unsigned) const;
+private:  // Private support functions
+  unsigned size() const;
+  unsigned index(unsigned, unsigned) const;
 
-  private:  // Private data members
-    values_t data_;
+private:  // Private data members
+  values_t data_;
 
-    unsigned cols_;
-  };
+  unsigned cols_;
+};
 
 #include "kernel/matrix.tcc"
 }  // namespace vita
