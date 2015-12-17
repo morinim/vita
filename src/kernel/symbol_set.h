@@ -19,6 +19,23 @@
 
 namespace vita
 {
+struct w_symbol
+{
+  w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { assert(s); }
+
+  bool operator==(w_symbol rhs) const
+  {return sym == rhs.sym && weight == rhs.weight; }
+
+  symbol *sym;
+
+  /// Weight is used by the symbol_set::roulette method to control the
+  /// probability of selection for the symbol.
+  unsigned weight;
+
+  /// This is the default weight.
+  static constexpr decltype(weight) base_weight{100};
+};
+
 ///
 /// This is a container for the symbol set. Symbols are stored to be quickly
 /// recalled by category and randomly extracted.
@@ -34,7 +51,7 @@ public:
 
   void clear();
 
-  symbol *insert(std::unique_ptr<symbol>);
+  symbol *insert(std::unique_ptr<symbol>, double = 1.0);
 
   symbol *roulette() const;
   symbol *roulette(category_t) const;
@@ -52,13 +69,15 @@ public:
   unsigned categories() const;
   unsigned terminals(category_t) const;
 
+  unsigned weight(const symbol *) const;
+
   bool enough_terminals() const;
   bool debug() const;
 
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
-private:  // Private data members.
-  // arguments_ data member:
+private:
+  // `arguments_` data member:
   // * is not present in the `collection` struct because an argument isn't
   //   bounded to a category (see `argument` class for more details);
   // * is not a subset of `symbols_` (the intersection of `arguments_` and
@@ -66,8 +85,7 @@ private:  // Private data members.
   //   roulette functions .
   std::vector<std::unique_ptr<symbol>> arguments_;
 
-  // This is the real, unordered repository of symbols (it owns the
-  // pointers).
+  // This is the real, raw repository of symbols (it owns/stores the symbols).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
   // A collection is a structured-view on `symbols_` (the `all_` variable) or
@@ -76,10 +94,10 @@ private:  // Private data members.
   {
     collection();
 
-    std::vector<symbol *>   symbols;
-    std::vector<symbol *> terminals;
-    std::vector<symbol *>       adf;
-    std::vector<symbol *>       adt;
+    std::vector<w_symbol>   symbols;
+    std::vector<w_symbol> terminals;
+    std::vector<w_symbol>       adf;
+    std::vector<w_symbol>       adt;
 
     unsigned sum;    // sum of the weights of all the symbols in the collection
     unsigned sum_t;  // sum of the weights of the terminals in the collection

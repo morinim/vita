@@ -53,18 +53,11 @@ public:
 
   virtual bool debug() const;
 
-public:  // Public data members
-  /// Weight is used by the symbol_set::roulette method to control the
-  /// probability of selection for the symbol.
-  unsigned weight;
-
-  /// This is the default weight.
-  static constexpr decltype(weight) k_base_weight{100};
-
-private:  // NVI template methods
+private:
+  // NVI template methods
   virtual double penalty_nvi(core_interpreter *) const;
 
-private:  // Private data members
+  // Private data members
   static opcode_t opc_count_;
 
   opcode_t opcode_;

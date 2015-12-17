@@ -74,7 +74,7 @@ private:  // Private data members
 class adf : public function
 {
 public:
-  adf(const i_mep &, std::vector<category_t>, unsigned);
+  adf(const i_mep &, std::vector<category_t>);
 
   virtual bool auto_defined() const override;
 
@@ -100,7 +100,7 @@ private:
 class adt : public terminal
 {
 public:
-  adt(const i_mep &, unsigned);
+  explicit adt(const i_mep &);
 
   virtual bool auto_defined() const override;
 

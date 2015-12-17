@@ -29,8 +29,6 @@ namespace vita
 ///
 argument::argument(unsigned n) : terminal("ARG", category_t(0)), index_(n)
 {
-  weight = 0;
-
   assert(debug());
 }
 

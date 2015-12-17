@@ -23,7 +23,6 @@ opcode_t symbol::opc_count_(0);
 ///
 /// \note
 /// By default a symbol:
-/// - has weight `k_default_weight`;
 /// - is NOT associative;
 /// - is NOT auto defined;
 /// - is NOT an input;
@@ -36,7 +35,7 @@ opcode_t symbol::opc_count_(0);
 /// Of course even the opcode is unique, but it can vary between executions.
 ///
 symbol::symbol(const std::string &name, category_t c)
-  : weight(k_base_weight), opcode_(opc_count_++), category_(c), name_(name)
+  : opcode_(opc_count_++), category_(c), name_(name)
 {
   assert(debug());
 }

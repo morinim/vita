@@ -107,8 +107,8 @@ void src_search<T, ES>::arl(const U &base)
     const auto adts(env.sset->adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const symbol *f(env.sset->get_adt(i));
-      adf_log << f->display() << ' ' << f->weight << '\n';
+      const auto f(env.sset->get_adt(i));
+      adf_log << f->display() << ' ' << env.sset->weight(f) << '\n';
     }
     adf_log << '\n';
   }
@@ -144,10 +144,10 @@ void src_search<T, ES>::arl(const U &base)
         for (const auto &replaced : generalized.second)
           categories.push_back(replaced.category);
 
-        p = vita::make_unique<adf>(generalized.first, categories, 10u);
+        p = vita::make_unique<adf>(generalized.first, categories);
       }
       else  // !adf_args
-        p = vita::make_unique<adt>(candidate_block, 100u);
+        p = vita::make_unique<adt>(candidate_block);
 
       if (env.stat.arl && adf_log.good())
       {

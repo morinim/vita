@@ -18,15 +18,12 @@ namespace vita
 ///
 /// \param[in] ind the code for the ADF.
 /// \param[in] sv categories of the function arguments.
-/// \param[in] w the weight of the ADF.
 ///
-adf::adf(const i_mep &ind, cvect sv, unsigned w)
+adf::adf(const i_mep &ind, cvect sv)
   : function("ADF", ind.category(), std::move(sv)), core_(ind)
 {
   assert(ind.debug());
   assert(ind.eff_size() >= 2);
-
-  weight = w;
 
   assert(debug());
 }
@@ -89,15 +86,11 @@ const i_mep &adf::code() const
 
 ///
 /// \param[in] ind the code for the ADT.
-/// \param[in] w the weight of the ADT.
 ///
-adt::adt(const i_mep &ind, unsigned w) : terminal("ADT", ind.category()),
-                                         core_(ind)
+adt::adt(const i_mep &ind) : terminal("ADT", ind.category()), core_(ind)
 {
   assert(ind.debug());
   assert(ind.eff_size() >= 2);
-
-  weight = w;
 
   assert(debug());
 }

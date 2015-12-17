@@ -396,8 +396,7 @@ public:
 class ln : public function
 {
 public:
-  explicit ln(const cvect &c) : function("FLN", c[0], {c[0]})
-  { weight = k_base_weight / 2; }
+  explicit ln(const cvect &c) : function("FLN", c[0], {c[0]}) {}
 
   ///
   /// \param[in] i pointer to the active interpreter.

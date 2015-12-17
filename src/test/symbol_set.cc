@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(Distribution)
   {
     const vita::symbol *s(sset.roulette());
     ++hist[s];
-    weight[s] = s->weight;
+    weight[s] = sset.weight(s);
   }
 
   double sum(0.0);

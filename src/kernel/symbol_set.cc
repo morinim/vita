@@ -37,18 +37,18 @@ namespace
 /// allows changing weights dynamically (performance differences can hardly
 /// be measured).
 ///
-symbol *roulette_(const std::vector<symbol *> &symbols, unsigned sum)
+symbol *roulette_(const std::vector<w_symbol> &symbols, unsigned sum)
 {
   const auto slot(random::sup(sum));
 
   std::size_t i(0);
-  for (auto wedge(symbols[i]->weight);
+  for (auto wedge(symbols[i].weight);
        wedge <= slot;
-       wedge += symbols[++i]->weight)
+       wedge += symbols[++i].weight)
   {}
 
   assert(i < symbols.size());
-  return symbols[i];
+  return symbols[i].sym;
 
   // The so called roulette-wheel selection via stochastic acceptance:
   //
@@ -74,7 +74,7 @@ symbol *roulette_(const std::vector<symbol *> &symbols, unsigned sum)
   //       if (random::sup(total + 1) < symbols[i]->weight)
   //         winner = i;
   //     }
-  //     return winner;
+  //     return symbols[winner].sym;
   //
   // The interesting property of this algorithm is that you don't need to
   // know the sum of weights in advance in order to use it. The method is
@@ -119,7 +119,7 @@ symbol *symbol_set::arg(unsigned n) const
 symbol *symbol_set::get_adt(unsigned i) const
 {
   assert(i < all_.adt.size());
-  return all_.adt[i];
+  return all_.adt[i].sym;
 }
 
 ///
@@ -131,7 +131,9 @@ unsigned symbol_set::adts() const
 }
 
 ///
-/// \param[in] i symbol to be added.
+/// \param[in] s symbol to be added.
+/// \param[in] wr the weight of `i` (1.0 means standard frequency, 2.0 double
+///               probability of selection).
 /// \return a raw pointer to the symbol just added (or `nullptr` in case of
 ///         error).
 ///
@@ -139,38 +141,38 @@ unsigned symbol_set::adts() const
 /// descending order, with respect to the weight, so the selection algorithm
 /// would run faster.
 ///
-symbol *symbol_set::insert(std::unique_ptr<symbol> i)
+symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
-  assert(i);
-  assert(i->weight);
-  assert(i->debug());
+  assert(s);
+  assert(s->debug());
+  assert(wr >= 0.0);
 
-  const auto raw(i.get());
+  const auto w(static_cast<unsigned>(wr * w_symbol::base_weight));
+  const w_symbol ws(s.get(), w);
 
-  symbols_.push_back(std::move(i));
+  symbols_.push_back(std::move(s));
 
-  all_.symbols.push_back(raw);
-  all_.sum += raw->weight;
+  all_.symbols.push_back(ws);
+  all_.sum += ws.weight;
 
-  if (raw->terminal())
+  if (ws.sym->terminal())
   {
-    all_.terminals.push_back(raw);
-    all_.sum_t += raw->weight;
+    all_.terminals.push_back(ws);
+    all_.sum_t += ws.weight;
 
-    if (raw->auto_defined())
-      all_.adt.push_back(raw);
+    if (ws.sym->auto_defined())
+      all_.adt.push_back(ws);
   }
   else  // not a terminal
-    if (raw->auto_defined())
-      all_.adf.push_back(raw);
+    if (ws.sym->auto_defined())
+      all_.adf.push_back(ws);
 
   by_ = by_category(all_);
 
   std::sort(all_.symbols.begin(), all_.symbols.end(),
-            [](const symbol *s1, const symbol *s2)
-            { return s1->weight > s2->weight; });
+            [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
 
-  return raw;
+  return ws.sym;
 }
 
 ///
@@ -178,18 +180,18 @@ void symbol_set::reset_adf_weights()
 {
   for (auto adt : all_.adt)
   {
-    const auto w(adt->weight);
+    const auto w(adt.weight);
     const auto delta(w > 1 ? w/2 : w);
     all_.sum -= delta;
     all_.sum_t -= delta;
-    adt->weight -= delta;
+    adt.weight -= delta;
 
-    if (delta && adt->weight == 0)
+    if (delta && adt.weight == 0)
     {
-      const auto opcode(adt->opcode());
-      const auto adt_opcode([opcode](const symbol *s)
+      const auto opcode(adt.sym->opcode());
+      const auto adt_opcode([opcode](w_symbol s)
                             {
-                              return s->opcode() == opcode;
+                              return s.sym->opcode() == opcode;
                             });
 
       erase_if(all_.terminals, adt_opcode);
@@ -199,10 +201,10 @@ void symbol_set::reset_adf_weights()
 
   for (auto adf : all_.adf)
   {
-    const auto w(adf->weight);
+    const auto w(adf.weight);
     const auto delta(w > 1 ? w/2 : w);
     all_.sum -= delta;
-    adf->weight -= delta;
+    adf.weight -= delta;
   }
 
   by_ = by_category(all_);
@@ -248,8 +250,8 @@ symbol *symbol_set::roulette() const
 symbol *symbol_set::decode(opcode_t opcode) const
 {
   for (auto s : all_.symbols)
-    if (s->opcode() == opcode)
-      return s;
+    if (s.sym->opcode() == opcode)
+      return s.sym;
 
   return nullptr;
 }
@@ -268,8 +270,8 @@ symbol *symbol_set::decode(const std::string &dex) const
   assert(dex != "");
 
   for (auto s : all_.symbols)
-    if (s->display() == dex)
-      return s;
+    if (s.sym->display() == dex)
+      return s.sym;
 
   return nullptr;
 }
@@ -304,11 +306,11 @@ bool symbol_set::enough_terminals() const
 {
   std::set<category_t> need;
 
-  for (const auto &sym : all_.symbols)
+  for (const auto &s : all_.symbols)
   {
-    const auto arity(sym->arity());
+    const auto arity(s.sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
-      need.insert(function::cast(sym)->arg_category(i));
+      need.insert(function::cast(s.sym)->arg_category(i));
   }
 
   for (const auto &i : need)
@@ -322,6 +324,21 @@ bool symbol_set::enough_terminals() const
 }
 
 ///
+/// \param[in] s a symbol
+/// \return the weight of `s`.
+///
+unsigned symbol_set::weight(const symbol *s) const
+{
+  assert(s);
+
+  for (const auto &i : all_.symbols)
+    if (i.sym == s)
+      return i.weight;
+
+  return 0;
+}
+
+///
 /// \param[out] o output stream.
 /// \param[in] ss symbol set to be printed.
 /// \return output stream including `ss`.
@@ -330,22 +347,22 @@ bool symbol_set::enough_terminals() const
 ///
 std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 {
-  for (const auto *s : ss.all_.symbols)
+  for (const auto &s : ss.all_.symbols)
   {
-    o << s->display();
+    o << s.sym->display();
 
-    const auto arity(s->arity());
+    const auto arity(s.sym->arity());
     if (arity)
       o << '(';
     for (auto j(decltype(arity){0}); j < arity; ++j)
-      o << function::cast(s)->arg_category(j)
+      o << function::cast(s.sym)->arg_category(j)
         << (j + 1 == arity ? "" : ", ");
     if (arity)
       o << ')';
 
-    o << " -> " << s->category() << " (opcode " << s->opcode()
-      << ", parametric " << s->parametric()
-      << ", weight " << s->weight << ")\n";
+    o << " -> " << s.sym->category() << " (opcode " << s.sym->opcode()
+      << ", parametric " << s.sym->parametric()
+      << ", weight " << s.weight << ")\n";
   }
 
   return o << "Sum: " << ss.all_.sum << '\n';
@@ -392,37 +409,38 @@ bool symbol_set::collection::debug(std::string name) const
 
   decltype(sum) check_sum(0), check_sum_t(0);
 
-  for (auto s : symbols)
+  for (const auto &s : symbols)
   {
-    if (!s->debug())
+    if (!s.sym->debug())
     {
-      print.error(name, "invalid symbol ", s->display());
+      print.error(name, "invalid symbol ", s.sym->display());
       return false;
     }
 
-    check_sum += s->weight;
+    check_sum += s.weight;
 
-    if (s->weight == 0)
+    if (s.weight == 0)
     {
-      print.error(name, "null weight for symbol ", s->display());
+      print.error(name, "null weight for symbol ", s.sym->display());
       return false;
     }
 
-    if (s->terminal())
+    if (s.sym->terminal())
     {
-      check_sum_t += s->weight;
+      check_sum_t += s.weight;
 
       // Terminals must be in the terminals' vector.
       if (std::find(terminals.begin(), terminals.end(), s) == terminals.end())
       {
-        print.error(name, "terminal ", s->display(), " not correctly stored");
+        print.error(name, "terminal ", s.sym->display(),
+                    " not correctly stored");
         return false;
       }
 
-      if (s->auto_defined() &&
+      if (s.sym->auto_defined() &&
           std::find(adt.begin(), adt.end(), s) == adt.end())
       {
-        print.error(name, "automatic defined terminal ", s->display(),
+        print.error(name, "automatic defined terminal ", s.sym->display(),
                     " not correctly stored");
         return false;
       }
@@ -432,14 +450,15 @@ bool symbol_set::collection::debug(std::string name) const
       // Function must not be in the terminals' vector.
       if (std::find(terminals.begin(), terminals.end(), s) != terminals.end())
       {
-        print.error(name, "function ", s->display(), " not correctly stored");
+        print.error(name, "function ", s.sym->display(),
+                    " not correctly stored");
         return false;
       }
 
-      if (s->auto_defined() &&
+      if (s.sym->auto_defined() &&
           std::find(adf.begin(), adf.end(), s) == adf.end())
       {
-        print.error(name, "automatic defined function ", s->display(),
+        print.error(name, "automatic defined function ", s.sym->display(),
                     " not correctly stored");
         return false;
       }
@@ -504,7 +523,7 @@ symbol_set::by_category::by_category(const collection &c) : category()
 {
   for (auto s : c.symbols)
   {
-    const category_t cat(s->category());
+    const category_t cat(s.sym->category());
     if (cat >= category.size())
     {
       category.resize(cat + 1);
@@ -512,25 +531,24 @@ symbol_set::by_category::by_category(const collection &c) : category()
     }
 
     category[cat].symbols.push_back(s);
-    category[cat].sum += s->weight;
+    category[cat].sum += s.weight;
 
-    if (s->terminal())
-      category[cat].sum_t += s->weight;
+    if (s.sym->terminal())
+      category[cat].sum_t += s.weight;
   }
 
   for (auto t : c.terminals)
-    category[t->category()].terminals.push_back(t);
+    category[t.sym->category()].terminals.push_back(t);
 
   for (auto adf : c.adf)
-    category[adf->category()].adf.push_back(adf);
+    category[adf.sym->category()].adf.push_back(adf);
 
   for (auto adt : c.adt)
-    category[adt->category()].adt.push_back(adt);
+    category[adt.sym->category()].adt.push_back(adt);
 
   for (collection &coll : category)
     std::sort(coll.symbols.begin(), coll.symbols.end(),
-              [](const symbol *s1, const symbol *s2)
-              { return s1->weight > s2->weight; });
+              [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
 
   assert(debug());
 }
