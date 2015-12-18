@@ -37,12 +37,16 @@ struct w_symbol
 };
 
 ///
-/// This is a container for the symbol set. Symbols are stored to be quickly
-/// recalled by category and randomly extracted.
+/// \brief A container for the symbols used by the GP engine
+///
+/// Symbols are stored to be quickly recalled by category and randomly
+/// selected.
+///
+/// \note
 /// The functions and terminals used should be powerful enough to be able to
 /// represent a solution to the problem. On the other hand, it is better not
-/// to use a symbol set too large (this enlarges the search space and can
-/// sometimes make the search for a solution harder).
+/// to use a symbol set too large (this enlarges the search space and makes
+/// harder the search for a solution).
 ///
 class symbol_set
 {
@@ -59,8 +63,8 @@ public:
 
   symbol *arg(unsigned) const;
 
-  symbol *get_adt(unsigned) const;
-  unsigned adts() const;
+  symbol *get_adt(std::size_t) const;
+  std::size_t adts() const;
   void reset_adf_weights();
 
   symbol *decode(opcode_t) const;
@@ -88,27 +92,71 @@ private:
   // This is the real, raw repository of symbols (it owns/stores the symbols).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
+
   // A collection is a structured-view on `symbols_` (the `all_` variable) or
   // on a subset of `symbols_` (e.g. only on symbols of a specific category).
-  struct collection
+  class collection
   {
-    collection();
+  public:
+    class sum_container
+    {
+    public:
+      using sum_container_t = std::vector<w_symbol>;
+      using iterator = sum_container_t::iterator;
+      using const_iterator = sum_container_t::const_iterator;
 
-    std::vector<w_symbol>   symbols;
-    std::vector<w_symbol> terminals;
-    std::vector<w_symbol>       adf;
-    std::vector<w_symbol>       adt;
+      explicit sum_container(std::string n)
+        : elems_(), sum_(0), name_(std::move(n))
+      {
+        assert(!name_.empty());
+      }
 
-    unsigned sum;    // sum of the weights of all the symbols in the collection
-    unsigned sum_t;  // sum of the weights of the terminals in the collection
+      void insert(const w_symbol &);
 
-    bool debug(std::string) const;
+      std::size_t size() const { return elems_.size(); }
+      const w_symbol &operator[](std::size_t i) const { return elems_[i]; }
+
+      iterator begin() { return elems_.begin(); }
+      const_iterator begin() const { return elems_.begin(); }
+      iterator end() { return elems_.end(); }
+      const_iterator end() const { return elems_.end(); }
+      iterator erase(iterator first, iterator last)
+      { return elems_.erase(first, last); }
+
+      unsigned sum() const { return sum_; }
+      void changed_weight(unsigned d) { sum_ += d; };
+
+      symbol *roulette() const;
+
+      bool debug() const;
+
+    private:
+      sum_container_t elems_;
+
+      /// Sum of the weights of the symbols in the container.
+      unsigned sum_;
+
+      std::string name_;
+    };
+
+    explicit collection(std::string = "");
+
+    sum_container   symbols;
+    sum_container terminals;
+    sum_container       adf;
+    sum_container       adt;
+
+    bool debug() const;
+
+  private:
+    std::string name_;
   } all_;
 
   // This struct contains all the symbols (`all_`) divided by category.
   struct by_category
   {
-    explicit by_category(const collection & = collection());
+    by_category() : category() {}
+    explicit by_category(const collection &);
 
     bool debug() const;
 
@@ -117,6 +165,7 @@ private:
 };
 
 std::ostream &operator<<(std::ostream &, const symbol_set &);
+
 }  // namespace vita
 
 #endif  // include guard

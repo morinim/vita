@@ -18,75 +18,12 @@
 
 namespace vita
 {
-namespace
-{
-///
-/// \param[in] symbols set of symbols.
-/// \param[in] sum sum of the weights of the elements contained in `symbols`.
-/// \return a random symbol from `symbols`.
-///
-/// Probably the fastest way to produce a realization of a random variable
-/// X in a computer is to create a big table where each outcome `i` is
-/// inserted a number of times proportional to `P(X=i)`.
-///
-/// Two fast methods are described in "Fast Generation of Discrete Random
-/// Variables" (Marsaglia, Tsang, Wang).
-/// Also `std::discrete_distribution` seems quite fast.
-///
-/// Anyway we choose the "roulette algorithm" because it's very simple and
-/// allows changing weights dynamically (performance differences can hardly
-/// be measured).
-///
-symbol *roulette_(const std::vector<w_symbol> &symbols, unsigned sum)
-{
-  const auto slot(random::sup(sum));
-
-  std::size_t i(0);
-  for (auto wedge(symbols[i].weight);
-       wedge <= slot;
-       wedge += symbols[++i].weight)
-  {}
-
-  assert(i < symbols.size());
-  return symbols[i].sym;
-
-  // The so called roulette-wheel selection via stochastic acceptance:
-  //
-  // for (;;)
-  // {
-  //   const symbol *s(random::element(symbols));
-  //
-  //   if (random::sup(max) < s->weight)
-  //     return s;
-  // }
-  //
-  // Internal tests have proved this is slower for Vita.
-
-  // This is a different approach from Eli Bendersky
-  // (<http://eli.thegreenplace.net/>):
-  //
-  //     unsigned total(0);
-  //     std::size_t winner(0);
-  //
-  //     for (std::size_t i(0); i < symbols.size(); ++i)
-  //     {
-  //       total += symbols[i]->weight;
-  //       if (random::sup(total + 1) < symbols[i]->weight)
-  //         winner = i;
-  //     }
-  //     return symbols[winner].sym;
-  //
-  // The interesting property of this algorithm is that you don't need to
-  // know the sum of weights in advance in order to use it. The method is
-  // cool, but slower than the standard roulette.
-}
-}  // namespace
-
 ///
 /// Sets up the object.
 /// The constructor allocates memory for up to `k_args` argument.
 ///
-symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_(), by_()
+symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_("ALL"),
+                           by_()
 {
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = make_unique<argument>(i);
@@ -116,7 +53,7 @@ symbol *symbol_set::arg(unsigned n) const
 /// \param[in] i index of an ADT symbol.
 /// \return a pointer to the i-th ADT symbol.
 ///
-symbol *symbol_set::get_adt(unsigned i) const
+symbol *symbol_set::get_adt(std::size_t i) const
 {
   assert(i < all_.adt.size());
   return all_.adt[i].sym;
@@ -125,9 +62,9 @@ symbol *symbol_set::get_adt(unsigned i) const
 ///
 /// \return the number of ADT functions stored.
 ///
-unsigned symbol_set::adts() const
+std::size_t symbol_set::adts() const
 {
-  return static_cast<unsigned>(all_.adt.size());
+  return all_.adt.size();
 }
 
 ///
@@ -152,25 +89,20 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 
   symbols_.push_back(std::move(s));
 
-  all_.symbols.push_back(ws);
-  all_.sum += ws.weight;
+  all_.symbols.insert(ws);
 
   if (ws.sym->terminal())
   {
-    all_.terminals.push_back(ws);
-    all_.sum_t += ws.weight;
+    all_.terminals.insert(ws);
 
     if (ws.sym->auto_defined())
-      all_.adt.push_back(ws);
+      all_.adt.insert(ws);
   }
   else  // not a terminal
     if (ws.sym->auto_defined())
-      all_.adf.push_back(ws);
+      all_.adf.insert(ws);
 
   by_ = by_category(all_);
-
-  std::sort(all_.symbols.begin(), all_.symbols.end(),
-            [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
 
   return ws.sym;
 }
@@ -182,9 +114,10 @@ void symbol_set::reset_adf_weights()
   {
     const auto w(adt.weight);
     const auto delta(w > 1 ? w/2 : w);
-    all_.sum -= delta;
-    all_.sum_t -= delta;
+
     adt.weight -= delta;
+    all_.symbols.changed_weight(-delta);
+    all_.terminals.changed_weight(-delta);
 
     if (delta && adt.weight == 0)
     {
@@ -203,8 +136,9 @@ void symbol_set::reset_adf_weights()
   {
     const auto w(adf.weight);
     const auto delta(w > 1 ? w/2 : w);
-    all_.sum -= delta;
+
     adf.weight -= delta;
+    all_.symbols.changed_weight(-delta);
   }
 
   by_ = by_category(all_);
@@ -218,8 +152,7 @@ terminal *symbol_set::roulette_terminal(category_t c) const
 {
   assert(c < categories());
 
-  return static_cast<terminal *>(roulette_(by_.category[c].terminals,
-                                           by_.category[c].sum_t));
+  return static_cast<terminal *>(by_.category[c].terminals.roulette());
   //return random::element(by_.category[c].terminals);
 }
 
@@ -231,7 +164,7 @@ symbol *symbol_set::roulette(category_t c) const
 {
   assert(c < categories());
 
-  return roulette_(by_.category[c].symbols, by_.category[c].sum);
+  return by_.category[c].symbols.roulette();
 }
 
 ///
@@ -239,7 +172,7 @@ symbol *symbol_set::roulette(category_t c) const
 ///
 symbol *symbol_set::roulette() const
 {
-  return roulette_(all_.symbols, all_.sum);
+  return all_.symbols.roulette();
 }
 
 ///
@@ -365,7 +298,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
       << ", weight " << s.weight << ")\n";
   }
 
-  return o << "Sum: " << ss.all_.sum << '\n';
+  return o << "Sum: " << ss.all_.symbols.sum() << '\n';
 }
 
 ///
@@ -373,7 +306,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 ///
 bool symbol_set::debug() const
 {
-  if (!all_.debug("[Collection ALL]"))
+  if (!all_.debug())
     return false;
 
   if (!by_.debug())
@@ -389,94 +322,58 @@ bool symbol_set::debug() const
 }
 
 ///
-/// New empty collection.
+/// \brief New empty collection
+/// \param[in] n name of the collection
 ///
-symbol_set::collection::collection() : symbols(), terminals(), adf(), adt(),
-                                       sum(0), sum_t(0)
+symbol_set::collection::collection(std::string n)
+  : symbols("symbols"), terminals("terminals"), adf("adf"), adt("adt"),
+    name_(std::move(n))
 {
 }
 
 ///
-/// \param[in] name the name of the collection (using for printing debugging
-///                 messages).
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool symbol_set::collection::debug(std::string name) const
+bool symbol_set::collection::debug() const
 {
-  if (name.empty())
-    name = "?";
-  name = "Collection " + name + ": ";
-
-  decltype(sum) check_sum(0), check_sum_t(0);
+  if (!symbols.debug() || !terminals.debug() || !adf.debug() || !adt.debug())
+  {
+    print.error("(inside ", name_, ")");
+    return false;
+  }
 
   for (const auto &s : symbols)
   {
-    if (!s.sym->debug())
+    const bool not_found_t(
+      std::find(terminals.begin(), terminals.end(), s) == terminals.end());
+
+    // Terminals must be in the terminals' vector and functions must not be in
+    // the terminals' vector.
+    if (s.sym->terminal() == not_found_t)
     {
-      print.error(name, "invalid symbol ", s.sym->display());
+      print.error(name_, ": terminal ", s.sym->display(), " badly stored");
       return false;
     }
 
-    check_sum += s.weight;
-
-    if (s.weight == 0)
+    if (s.sym->auto_defined())
     {
-      print.error(name, "null weight for symbol ", s.sym->display());
-      return false;
-    }
-
-    if (s.sym->terminal())
-    {
-      check_sum_t += s.weight;
-
-      // Terminals must be in the terminals' vector.
-      if (std::find(terminals.begin(), terminals.end(), s) == terminals.end())
+      if (s.sym->terminal())
       {
-        print.error(name, "terminal ", s.sym->display(),
-                    " not correctly stored");
-        return false;
+        if (std::find(adt.begin(), adt.end(), s) == adt.end())
+        {
+          print.error(name_, ": ADT ", s.sym->display(), " badly stored");
+          return false;
+        }
       }
-
-      if (s.sym->auto_defined() &&
-          std::find(adt.begin(), adt.end(), s) == adt.end())
+      else  // function
       {
-        print.error(name, "automatic defined terminal ", s.sym->display(),
-                    " not correctly stored");
-        return false;
+        if (std::find(adf.begin(), adf.end(), s) == adf.end())
+        {
+          print.error(name_, ": ADF ", s.sym->display(), " badly stored");
+          return false;
+        }
       }
     }
-    else  // Function
-    {
-      // Function must not be in the terminals' vector.
-      if (std::find(terminals.begin(), terminals.end(), s) != terminals.end())
-      {
-        print.error(name, "function ", s.sym->display(),
-                    " not correctly stored");
-        return false;
-      }
-
-      if (s.sym->auto_defined() &&
-          std::find(adf.begin(), adf.end(), s) == adf.end())
-      {
-        print.error(name, "automatic defined function ", s.sym->display(),
-                    " not correctly stored");
-        return false;
-      }
-    }
-  }
-
-  if (check_sum != sum)
-  {
-    print.error(name, "incorrect cached sum of weights (stored: ", sum,
-                ", correct: ", check_sum, ')');
-    return false;
-  }
-
-  if (check_sum_t != sum_t)
-  {
-    print.error(name, "incorrect cached sum of weights for terminal (stored: ",
-                sum_t, ", correct: ", check_sum_t, ')');
-    return false;
   }
 
   const auto ssize(symbols.size());
@@ -488,25 +385,25 @@ bool symbol_set::collection::debug(std::string name) const
   //
   //     if (ssize && !terminals.size())
   //     {
-  //       print.error(name, "no terminal in the symbol set");
+  //       print.error(name_, ": no terminal in the symbol set");
   //       return false;
   //     }
 
   if (ssize < terminals.size())
   {
-    print.error(name, "wrong terminal set size (less than symbol set)");
+    print.error(name_, ": wrong terminal set size (more than symbol set)");
     return false;
   }
 
   if (ssize < adf.size())
   {
-    print.error(name, "wrong ADF set size (less than symbol set)");
+    print.error(name_, ": wrong ADF set size (more than symbol set)");
     return false;
   }
 
   if (ssize < adt.size())
   {
-    print.error(name, "wrong ADT set size (less than symbol set)");
+    print.error(name_, ": wrong ADT set size (more than symbol set)");
     return false;
   }
 
@@ -527,28 +424,20 @@ symbol_set::by_category::by_category(const collection &c) : category()
     if (cat >= category.size())
     {
       category.resize(cat + 1);
-      category[cat] = collection();
+      category[cat] = collection("By category " + std::to_string(cat));
     }
 
-    category[cat].symbols.push_back(s);
-    category[cat].sum += s.weight;
-
-    if (s.sym->terminal())
-      category[cat].sum_t += s.weight;
+    category[cat].symbols.insert(s);
   }
 
   for (auto t : c.terminals)
-    category[t.sym->category()].terminals.push_back(t);
+    category[t.sym->category()].terminals.insert(t);
 
   for (auto adf : c.adf)
-    category[adf.sym->category()].adf.push_back(adf);
+    category[adf.sym->category()].adf.insert(adf);
 
   for (auto adt : c.adt)
-    category[adt.sym->category()].adt.push_back(adt);
-
-  for (collection &coll : category)
-    std::sort(coll.symbols.begin(), coll.symbols.end(),
-              [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
+    category[adt.sym->category()].adt.insert(adt);
 
   assert(debug());
 }
@@ -558,13 +447,110 @@ symbol_set::by_category::by_category(const collection &c) : category()
 ///
 bool symbol_set::by_category::debug() const
 {
-  unsigned idx(0);
   for (const collection &coll : category)
-  {
-    const auto name("[Collection idx " + std::to_string(idx++) + "]");
-
-    if (!coll.debug(name))
+    if (!coll.debug())
       return false;
+
+  return true;
+}
+
+void symbol_set::collection::sum_container::insert(const w_symbol &ws)
+{
+  elems_.push_back(ws);
+  sum_ += ws.weight;
+
+  std::sort(begin(), end(),
+            [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
+}
+
+///
+/// \return a random symbol from the container.
+///
+/// Probably the fastest way to produce a realization of a random variable
+/// X in a computer is to create a big table where each outcome `i` is
+/// inserted a number of times proportional to `P(X=i)`.
+///
+/// Two fast methods are described in "Fast Generation of Discrete Random
+/// Variables" (Marsaglia, Tsang, Wang).
+/// Also `std::discrete_distribution` seems quite fast.
+///
+/// Anyway we choose the "roulette algorithm" because it's very simple and
+/// allows changing weights dynamically (performance differences can hardly
+/// be measured).
+///
+symbol *symbol_set::collection::sum_container::roulette() const
+{
+  const auto slot(random::sup(sum()));
+
+  std::size_t i(0);
+  for (auto wedge(elems_[i].weight);
+       wedge <= slot;
+       wedge += elems_[++i].weight)
+  {}
+
+  assert(i < elems_.size());
+  return elems_[i].sym;
+
+  // The so called roulette-wheel selection via stochastic acceptance:
+  //
+  // for (;;)
+  // {
+  //   const symbol *s(random::element(elems_));
+  //
+  //   if (random::sup(max) < s->weight)
+  //     return s;
+  // }
+  //
+  // Internal tests have proved this is slower for Vita.
+
+  // This is a different approach from Eli Bendersky
+  // (<http://eli.thegreenplace.net/>):
+  //
+  //     unsigned total(0);
+  //     std::size_t winner(0);
+  //
+  //     for (std::size_t i(0); i < symbols.size(); ++i)
+  //     {
+  //       total += elems_[i]->weight;
+  //       if (random::sup(total + 1) < elems_[i]->weight)
+  //         winner = i;
+  //     }
+  //     return elems_[winner].sym;
+  //
+  // The interesting property of this algorithm is that you don't need to
+  // know the sum of weights in advance in order to use it. The method is
+  // cool, but slower than the standard roulette.
+}
+
+///
+/// \return `true` if the object passes the internal consistency check
+///
+bool symbol_set::collection::sum_container::debug() const
+{
+  unsigned check_sum(0);
+
+  for (const auto &e : elems_)
+  {
+    if (!e.sym->debug())
+    {
+      print.error(name_, ": invalid symbol ", e.sym->display());
+      return false;
+    }
+
+    check_sum += e.weight;
+
+    if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))
+    {
+      print.error(name_, ": null weight for symbol ", e.sym->display());
+      return false;
+    }
+  }
+
+  if (check_sum != sum())
+  {
+    print.error(name_, ": incorrect cached sum of weights (stored: ", sum(),
+                ", correct: ", check_sum, ')');
+    return false;
   }
 
   return true;
