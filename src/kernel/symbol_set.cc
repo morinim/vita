@@ -108,6 +108,9 @@ void symbol_set::build_view()
 
   views_.clear();
   views_.resize(max_category + 2);
+  for (unsigned i(0); i <= max_category; ++i)
+    views_[i] = collection("Collection " + std::to_string(i));
+  views_.back() = collection("Colletion ALL");
 
   for (const auto &s : symbols_)
   {
@@ -363,14 +366,14 @@ bool symbol_set::collection::debug() const
 
   for (const auto &s : all)
   {
-    const bool not_found_t(
+    const bool t_not_found(
       std::find(terminals.begin(), terminals.end(), s) == terminals.end());
 
     // Terminals must be in the terminals' vector and functions must not be in
     // the terminals' vector.
-    if (s.sym->terminal() == not_found_t)
+    if (s.sym->terminal() == t_not_found)
     {
-      print.error(name_, ": terminal ", s.sym->display(), " badly stored");
+      print.error(name_, ": symbol ", s.sym->display(), " badly stored");
       return false;
     }
 
@@ -455,9 +458,7 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 /// Variables" (Marsaglia, Tsang, Wang).
 /// Also `std::discrete_distribution` seems quite fast.
 ///
-/// Anyway we choose the "roulette algorithm" because it's very simple and
-/// allows changing weights dynamically (performance differences can hardly
-/// be measured).
+/// Anyway we choose the "roulette algorithm" because it's very simple.
 ///
 symbol *symbol_set::collection::sum_container::roulette() const
 {
