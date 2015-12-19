@@ -13,29 +13,13 @@
 #if !defined(VITA_SYMBOL_SET_H)
 #define      VITA_SYMBOL_SET_H
 
+#include <map>
 #include <string>
 
 #include "kernel/terminal.h"
 
 namespace vita
 {
-struct w_symbol
-{
-  w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { assert(s); }
-
-  bool operator==(w_symbol rhs) const
-  {return sym == rhs.sym && weight == rhs.weight; }
-
-  symbol *sym;
-
-  /// Weight is used by the symbol_set::roulette method to control the
-  /// probability of selection for the symbol.
-  unsigned weight;
-
-  /// This is the default weight.
-  static constexpr decltype(weight) base_weight{100};
-};
-
 ///
 /// \brief A container for the symbols used by the GP engine
 ///
@@ -61,7 +45,7 @@ public:
   symbol *roulette(category_t) const;
   terminal *roulette_terminal(category_t) const;
 
-  symbol *arg(unsigned) const;
+  symbol *arg(std::size_t) const;
 
   symbol *get_adt(std::size_t) const;
   std::size_t adts() const;
@@ -81,6 +65,8 @@ public:
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
 private:
+  void build_view();
+
   // `arguments_` data member:
   // * is not present in the `collection` struct because an argument isn't
   //   bounded to a category (see `argument` class for more details);
@@ -92,9 +78,28 @@ private:
   // This is the real, raw repository of symbols (it owns/stores the symbols).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
+  // A structure for fast retrieval of weights.
+  std::map<const symbol *, unsigned> weights_;
 
-  // A collection is a structured-view on `symbols_` (the `all_` variable) or
-  // on a subset of `symbols_` (e.g. only on symbols of a specific category).
+  struct w_symbol
+  {
+    w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { assert(s); }
+
+    bool operator==(w_symbol rhs) const
+    {return sym == rhs.sym && weight == rhs.weight; }
+
+    symbol *sym;
+
+    /// Weight is used by the symbol_set::roulette method to control the
+    /// probability of selection for the symbol.
+    unsigned weight;
+
+    /// This is the default weight.
+    static constexpr decltype(weight) base_weight{100};
+  };
+
+  // A collection is a structured-view on `symbols_` or on a subset of
+  // `symbols_` (e.g. only on symbols of a specific category).
   class collection
   {
   public:
@@ -124,7 +129,6 @@ private:
       { return elems_.erase(first, last); }
 
       unsigned sum() const { return sum_; }
-      void changed_weight(unsigned d) { sum_ += d; };
 
       symbol *roulette() const;
 
@@ -141,7 +145,7 @@ private:
 
     explicit collection(std::string = "");
 
-    sum_container   symbols;
+    sum_container       all;
     sum_container terminals;
     sum_container       adf;
     sum_container       adt;
@@ -150,18 +154,14 @@ private:
 
   private:
     std::string name_;
-  } all_;
+  };
 
-  // This struct contains all the symbols (`all_`) divided by category.
-  struct by_category
-  {
-    by_category() : category() {}
-    explicit by_category(const collection &);
-
-    bool debug() const;
-
-    std::vector<collection> category;
-  } by_;
+  // The last element of the vector contains the category-agnostic view of
+  // symbols:
+  // - views_.back().all.size() is equal to the total number of symbols
+  // while:
+  // - views_[0].all.size() is the number of symbols in category `0`
+  std::vector<collection> views_;
 };
 
 std::ostream &operator<<(std::ostream &, const symbol_set &);

@@ -83,8 +83,7 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j].category;
         }
 
-        symbol *const f(sset.insert(vita::make_unique<adf>(blk2, categories,
-                                                           100u)));
+        auto f(sset.insert(vita::make_unique<adf>(blk2, categories)));
         std::cout << '\n' << f->display() << '\n' << blk2;
 
         i_mep blk3(blk.replace({{f, positions}}));

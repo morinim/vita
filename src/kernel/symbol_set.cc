@@ -20,10 +20,11 @@ namespace vita
 {
 ///
 /// Sets up the object.
+///
 /// The constructor allocates memory for up to `k_args` argument.
 ///
-symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_("ALL"),
-                           by_()
+symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), weights_(),
+                           views_()
 {
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = make_unique<argument>(i);
@@ -32,7 +33,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), all_("ALL"),
 }
 
 ///
-/// Clear the current symbol set.
+/// Clears the current symbol set.
 ///
 void symbol_set::clear()
 {
@@ -43,7 +44,7 @@ void symbol_set::clear()
 /// \param[in] n index of an argument symbol.
 /// \return a pointer to the n-th argument symbol.
 ///
-symbol *symbol_set::arg(unsigned n) const
+symbol *symbol_set::arg(std::size_t n) const
 {
   assert(n < gene::k_args);
   return arguments_[n].get();
@@ -55,8 +56,8 @@ symbol *symbol_set::arg(unsigned n) const
 ///
 symbol *symbol_set::get_adt(std::size_t i) const
 {
-  assert(i < all_.adt.size());
-  return all_.adt[i].sym;
+  assert(i < adts());
+  return views_.back().adt[i].sym;
 }
 
 ///
@@ -64,19 +65,17 @@ symbol *symbol_set::get_adt(std::size_t i) const
 ///
 std::size_t symbol_set::adts() const
 {
-  return all_.adt.size();
+  return views_.back().adt.size();
 }
 
 ///
+/// Adds a new symbol to the set.
+///
 /// \param[in] s symbol to be added.
-/// \param[in] wr the weight of `i` (1.0 means standard frequency, 2.0 double
+/// \param[in] wr the weight of `s` (1.0 means standard frequency, 2.0 double
 ///               probability of selection).
 /// \return a raw pointer to the symbol just added (or `nullptr` in case of
 ///         error).
-///
-/// Adds a new symbol to the set. We manage to sort the symbols in
-/// descending order, with respect to the weight, so the selection algorithm
-/// would run faster.
 ///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
@@ -89,59 +88,77 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 
   symbols_.push_back(std::move(s));
 
-  all_.symbols.insert(ws);
+  assert(weights_.find(ws.sym) == weights_.end());
+  weights_[ws.sym] = ws.weight;
 
-  if (ws.sym->terminal())
-  {
-    all_.terminals.insert(ws);
-
-    if (ws.sym->auto_defined())
-      all_.adt.insert(ws);
-  }
-  else  // not a terminal
-    if (ws.sym->auto_defined())
-      all_.adf.insert(ws);
-
-  by_ = by_category(all_);
+  build_view();
 
   return ws.sym;
 }
 
 ///
+/// Compiles the `views_` array.
+///
+void symbol_set::build_view()
+{
+  unsigned max_category(0);
+  for (const auto &s : symbols_)
+    if (s->category() > max_category)
+      max_category = s->category();
+
+  views_.clear();
+  views_.resize(max_category + 2);
+
+  for (const auto &s : symbols_)
+  {
+    const w_symbol ws(s.get(), weight(s.get()));
+    const category_t category(s->category());
+
+    assert(category <= max_category);
+
+    views_[category].all.insert(ws);
+    views_.back().all.insert(ws);
+
+    if (s->terminal())
+    {
+      views_[category].terminals.insert(ws);
+      views_.back().terminals.insert(ws);
+
+      if (s->auto_defined())
+      {
+        views_[category].adt.insert(ws);
+        views_.back().adt.insert(ws);
+      }
+    }
+    else  // function
+      if (s->auto_defined())
+      {
+        views_[category].adf.insert(ws);
+        views_.back().adf.insert(ws);
+      }
+  }
+}
+
+///
 void symbol_set::reset_adf_weights()
 {
-  for (auto adt : all_.adt)
+  for (auto adt : views_.back().adt)
   {
     const auto w(adt.weight);
     const auto delta(w > 1 ? w/2 : w);
 
-    adt.weight -= delta;
-    all_.symbols.changed_weight(-delta);
-    all_.terminals.changed_weight(-delta);
-
-    if (delta && adt.weight == 0)
-    {
-      const auto opcode(adt.sym->opcode());
-      const auto adt_opcode([opcode](w_symbol s)
-                            {
-                              return s.sym->opcode() == opcode;
-                            });
-
-      erase_if(all_.terminals, adt_opcode);
-      erase_if(all_.symbols, adt_opcode);
-    }
+    weights_[adt.sym] -= delta;
   }
 
-  for (auto adf : all_.adf)
+  for (auto adf : views_.back().adf)
   {
     const auto w(adf.weight);
     const auto delta(w > 1 ? w/2 : w);
 
-    adf.weight -= delta;
-    all_.symbols.changed_weight(-delta);
+    weights_[adf.sym] -= delta;
   }
 
-  by_ = by_category(all_);
+  build_view();
 }
 
 ///
@@ -152,8 +169,8 @@ terminal *symbol_set::roulette_terminal(category_t c) const
 {
   assert(c < categories());
 
-  return static_cast<terminal *>(by_.category[c].terminals.roulette());
-  //return random::element(by_.category[c].terminals);
+  return static_cast<terminal *>(views_[c].terminals.roulette());
+  //return random::element(views_[c].terminals);
 }
 
 ///
@@ -164,7 +181,7 @@ symbol *symbol_set::roulette(category_t c) const
 {
   assert(c < categories());
 
-  return by_.category[c].symbols.roulette();
+  return views_[c].all.roulette();
 }
 
 ///
@@ -172,7 +189,7 @@ symbol *symbol_set::roulette(category_t c) const
 ///
 symbol *symbol_set::roulette() const
 {
-  return all_.symbols.roulette();
+  return views_.back().all.roulette();
 }
 
 ///
@@ -182,7 +199,7 @@ symbol *symbol_set::roulette() const
 ///
 symbol *symbol_set::decode(opcode_t opcode) const
 {
-  for (auto s : all_.symbols)
+  for (auto s : views_.back().all)
     if (s.sym->opcode() == opcode)
       return s.sym;
 
@@ -202,7 +219,7 @@ symbol *symbol_set::decode(const std::string &dex) const
 {
   assert(dex != "");
 
-  for (auto s : all_.symbols)
+  for (auto s : views_.back().all)
     if (s.sym->display() == dex)
       return s.sym;
 
@@ -216,7 +233,10 @@ symbol *symbol_set::decode(const std::string &dex) const
 ///
 unsigned symbol_set::categories() const
 {
-  return static_cast<unsigned>(by_.category.size());
+  const auto size(views_.size());
+
+  assert(size != 1);
+  return static_cast<unsigned>(size ? size - 1 : size);
 }
 
 ///
@@ -225,21 +245,24 @@ unsigned symbol_set::categories() const
 ///
 unsigned symbol_set::terminals(category_t c) const
 {
-  assert(c < by_.category.size());
-  return static_cast<unsigned>(by_.category[c].terminals.size());
+  assert(c < categories());
+  return static_cast<unsigned>(views_[c].terminals.size());
 }
 
 ///
 /// \return `true` if there are enough terminals for secure individual
 ///         generation.
 ///
-/// We want at least one terminal for every category.
+/// We want at least one terminal for every used category.
 ///
 bool symbol_set::enough_terminals() const
 {
+  if (views_.size() == 0)
+    return true;
+
   std::set<category_t> need;
 
-  for (const auto &s : all_.symbols)
+  for (const auto &s : views_.back().all)
   {
     const auto arity(s.sym->arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
@@ -247,12 +270,9 @@ bool symbol_set::enough_terminals() const
   }
 
   for (const auto &i : need)
-  {
-    const collection &cc(by_.category[i]);
-
-    if (i >= categories() || !cc.terminals.size())
+    if (i >= categories() || !views_[i].terminals.size())
       return false;
-  }
+
   return true;
 }
 
@@ -264,11 +284,11 @@ unsigned symbol_set::weight(const symbol *s) const
 {
   assert(s);
 
-  for (const auto &i : all_.symbols)
-    if (i.sym == s)
-      return i.weight;
+  const auto v(weights_.find(s));
+  if (v == weights_.end())
+    return 0;
 
-  return 0;
+  return v->second;
 }
 
 ///
@@ -280,7 +300,7 @@ unsigned symbol_set::weight(const symbol *s) const
 ///
 std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 {
-  for (const auto &s : ss.all_.symbols)
+  for (const auto &s : ss.views_.back().all)
   {
     o << s.sym->display();
 
@@ -298,7 +318,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
       << ", weight " << s.weight << ")\n";
   }
 
-  return o << "Sum: " << ss.all_.symbols.sum() << '\n';
+  return o << "Sum: " << ss.views_.back().all.sum() << '\n';
 }
 
 ///
@@ -306,11 +326,9 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 ///
 bool symbol_set::debug() const
 {
-  if (!all_.debug())
-    return false;
-
-  if (!by_.debug())
-    return false;
+  for (const auto &i : views_)
+    if (!i.debug())
+      return false;
 
   if (!enough_terminals())
   {
@@ -322,11 +340,12 @@ bool symbol_set::debug() const
 }
 
 ///
-/// \brief New empty collection
-/// \param[in] n name of the collection
+/// New empty collection.
+//
+/// \param[in] n name of the collection.
 ///
 symbol_set::collection::collection(std::string n)
-  : symbols("symbols"), terminals("terminals"), adf("adf"), adt("adt"),
+  : all("all"), terminals("terminals"), adf("adf"), adt("adt"),
     name_(std::move(n))
 {
 }
@@ -336,13 +355,13 @@ symbol_set::collection::collection(std::string n)
 ///
 bool symbol_set::collection::debug() const
 {
-  if (!symbols.debug() || !terminals.debug() || !adf.debug() || !adt.debug())
+  if (!all.debug() || !terminals.debug() || !adf.debug() || !adt.debug())
   {
     print.error("(inside ", name_, ")");
     return false;
   }
 
-  for (const auto &s : symbols)
+  for (const auto &s : all)
   {
     const bool not_found_t(
       std::find(terminals.begin(), terminals.end(), s) == terminals.end());
@@ -376,7 +395,7 @@ bool symbol_set::collection::debug() const
     }
   }
 
-  const auto ssize(symbols.size());
+  const auto ssize(all.size());
 
   // The following condition should be met at the end of the symbol_set
   // specification.
@@ -411,49 +430,11 @@ bool symbol_set::collection::debug() const
 }
 
 ///
-/// \param[in] c a collection containing many categories of symbol.
+/// Inserts a weighted symbol in the container.
 ///
-/// Initialize the struct using collection `c` as input parameter (`c` should
-/// be a collection containing more than one category).
+/// We manage to sort the symbols in descending order, with respect to the
+/// weight, so the selection algorithm would run faster.
 ///
-symbol_set::by_category::by_category(const collection &c) : category()
-{
-  for (auto s : c.symbols)
-  {
-    const category_t cat(s.sym->category());
-    if (cat >= category.size())
-    {
-      category.resize(cat + 1);
-      category[cat] = collection("By category " + std::to_string(cat));
-    }
-
-    category[cat].symbols.insert(s);
-  }
-
-  for (auto t : c.terminals)
-    category[t.sym->category()].terminals.insert(t);
-
-  for (auto adf : c.adf)
-    category[adf.sym->category()].adf.insert(adf);
-
-  for (auto adt : c.adt)
-    category[adt.sym->category()].adt.insert(adt);
-
-  assert(debug());
-}
-
-///
-/// \return `true` if the object passes the internal consistency check.
-///
-bool symbol_set::by_category::debug() const
-{
-  for (const collection &coll : category)
-    if (!coll.debug())
-      return false;
-
-  return true;
-}
-
 void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 {
   elems_.push_back(ws);
@@ -495,7 +476,7 @@ symbol *symbol_set::collection::sum_container::roulette() const
   //
   // for (;;)
   // {
-  //   const symbol *s(random::element(elems_));
+  //   const symbol *s(random::element(elems));
   //
   //   if (random::sup(max) < s->weight)
   //     return s;
@@ -509,13 +490,13 @@ symbol *symbol_set::collection::sum_container::roulette() const
   //     unsigned total(0);
   //     std::size_t winner(0);
   //
-  //     for (std::size_t i(0); i < symbols.size(); ++i)
+  //     for (std::size_t i(0); i < size(); ++i)
   //     {
-  //       total += elems_[i]->weight;
-  //       if (random::sup(total + 1) < elems_[i]->weight)
+  //       total += elems[i].weight;
+  //       if (random::sup(total + 1) < elems[i].weight)
   //         winner = i;
   //     }
-  //     return elems_[winner].sym;
+  //     return elems[winner].sym;
   //
   // The interesting property of this algorithm is that you don't need to
   // know the sum of weights in advance in order to use it. The method is
