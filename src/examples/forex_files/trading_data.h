@@ -67,6 +67,18 @@ public:
   double open(unsigned tf, unsigned i) const { return get(tf, i).open; }
   double volume(unsigned tf, unsigned i) const { return get(tf, i).volume; }
 
+  bool black_candle(unsigned tf, unsigned i) const
+  {
+    const auto c(close(tf, i)), o(open(tf, i));
+    return c < o;
+  }
+
+  bool white_candle(unsigned tf, unsigned i) const
+  {
+    const auto c(close(tf, i)), o(open(tf, i));
+    return c > o;
+  }
+
 private:
   struct trade_info_point
   {

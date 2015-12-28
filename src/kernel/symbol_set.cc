@@ -462,6 +462,8 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 ///
 symbol *symbol_set::collection::sum_container::roulette() const
 {
+  assert(sum());
+
   const auto slot(random::sup(sum()));
 
   std::size_t i(0);
