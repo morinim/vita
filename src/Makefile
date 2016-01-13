@@ -52,36 +52,37 @@ SYSTEMINCPATH := $(BOOST_INCLUDE) ./third_party/
 
 # -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
+WARN_FLAGS := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
 ifeq ($(CXX), g++)
-  WARN += -Wdouble-promotion -Wzero-as-null-pointer-constant
+  WARN_FLAGS += -Wdouble-promotion -Wzero-as-null-pointer-constant
+endif
+
+OPTIMIZE_FLAGS := -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
+# Link time optimization has some issues with MinGW
+ifeq ($(CXX), g++)
+  ifneq ($(OS), Windows_NT)
+    OPTIMIZE_FLAGS += -flto
+  endif
 endif
 
 # The next blocks change some variables depending on the build type.
 ifeq ($(TYPE), debug)
-  TYPE_PARAM := -g
+TYPE_FLAGS := -g
 
-#ifeq ($(CXX), g++)
-#  TYPE_PARAM += -Og
-#endif
+ifeq ($(CXX), g++)
+  TYPE_FLAGS += -Og
+endif
 endif
 
 ifeq ($(TYPE), profile)
-  TYPE_PARAM := -pg -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
+  TYPE_FLAGS := -pg $(OPTIMIZE_FLAGS)
 endif
 
 ifeq ($(TYPE), release)
-  TYPE_PARAM += -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
-
-  # Link time optimization has some issues with MinGW
-  ifeq ($(CXX), g++)
-    ifneq ($(OS), Windows_NT)
-      TYPE_PARAM += -flto
-    endif
-  endif
+  TYPE_FLAGS := $(OPTIMIZE_FLAGS)
 endif
 
-CXXFLAGS := -pipe -march=native --std=c++11 $(TYPE_PARAM) $(WARN) $(DEFS)
+CXXFLAGS := -pipe -march=native --std=c++11 $(TYPE_FLAGS) $(WARN_FLAGS) $(DEFS)
 LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
@@ -134,10 +135,7 @@ ifeq ($(TYPE), release)
 endif
 
 # Disable all warnings for TinyXML2
-third_party/tinyxml2/tinyxml2.o: third_party/tinyxml2/tinyxml2.cc
-	@echo Creating object file for $*...
-	$(COMPILE) -w -MMD -o $@ -c $<
-	@cp $*.d $*.P; sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' -e '/^$$/ d' -e 's/$$/ :/' < $*.d >> $*.P; $(RM) $*.d
+third_party/tinyxml2/tinyxml2.o: COMPILE += -w
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
@@ -162,9 +160,9 @@ clean:
 	@echo Making clean...
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*~" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name ".*~" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.P" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ -name "*.P" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "#*#" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.o" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ -name "*.o" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
