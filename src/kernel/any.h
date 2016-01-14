@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,13 +29,15 @@ using boost::any_cast<T>;
 
 #else
 
-namespace detail { namespace any_
+namespace detail
+{ namespace any_
 {
 struct empty;
 struct fxn_ptr_table;
 template<bool> struct fxns;
 template<class> struct get_table;
-}}  // namespace detail::any_
+}  // namespace any_
+}  // namespace detail
 
 ///
 /// \brief The exception thrown in the event of a failed any_cast of an any
@@ -67,13 +69,13 @@ struct bad_any_cast : std::bad_cast
 ///   <http://stackoverflow.com/q/24065769/3235496> and
 ///   <https://svn.boost.org/trac/boost/ticket/8268> for details about a
 ///   major bug in boost::spirit::hold_any v1.55);
-/// - assuming C++11 is a bit simpler.
+/// - assuming C++11 makes things a bit simpler.
 ///
 class any
 {
-public:  // Constructors
+public:
+  // Constructors / destructor.
   template<class T> explicit any(const T &);
-
   any();
   any(const any &);
 
@@ -85,17 +87,17 @@ public:  // Constructors
 
   ~any();
 
-public:  // Assignment operator
+  // Assignment operators.
   template<class T> any &operator=(T &&);
 
   /// Copies content of rhs into current instance, discarding previous
   /// content, so that the new content is equivalent in both type and value
   /// to the content of `rhs`, or empty if `rhs.empty()`.
   ///
-  /// \post `rhs->empty()`
+  /// \post `rhs.empty()`
   any &operator=(const any &rhs) { return assign(rhs); }
 
-public:  // Utility functions
+  // Utility functions
   /// Exchange of the contents of `*this` and `rhs`.
   any &swap(any &rhs)
   {
@@ -113,17 +115,18 @@ public:  // Utility functions
   friend std::istream &operator>>(std::istream&, any &);
   friend std::ostream &operator<<(std::ostream&, const any &);
 
-public:  // Types
+  // Types
   template<class T> friend T *any_cast(any *);
 
-private:  // Assignment and casting
+private:
+  // Assignment and casting
   template<class T> any &assign(const T &);
 
   any &assign(const any &);
 
   template<class T> const T &cast() const;
 
-private:  // Private data members
+  // Private data members
   detail::any_::fxn_ptr_table *table;
 
   void *object = nullptr;

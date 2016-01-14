@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -88,7 +88,7 @@ domain_t find_domain(const std::string &s)
 }
 
 ///
-/// \param[in] name name of the symbol to be created.
+/// \param[in] name name of the symbol to be created (case sensitive).
 /// \param[in] c a list of categories used by the the symbol constructor.
 /// \return an abstract pointer to the created symbol.
 ///
@@ -129,9 +129,7 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
   assert(!name.empty());
   assert(!c.empty());
 
-  const map_key k(boost::to_upper_copy(name));
-
-  const auto it(factory_.find(k));
+  const auto it(factory_.find(name));
   if (it != factory_.end())
   {
     while (c.size() < it->second.n)
@@ -140,14 +138,14 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
     return (it->second.f)(c);
   }
 
-  switch (find_domain(k))
+  switch (find_domain(name))
   {
   case domain_t::d_bool:
-    return vita::make_unique<constant<bool>>(k, c[0]);
+    return vita::make_unique<constant<bool>>(name, c[0]);
   case domain_t::d_double:
-    return vita::make_unique<constant<double>>(k, c[0]);
+    return vita::make_unique<constant<double>>(name, c[0]);
   case domain_t::d_int:
-    return vita::make_unique<constant<int>>(k, c[0]);
+    return vita::make_unique<constant<int>>(name, c[0]);
   case domain_t::d_string:
     return vita::make_unique<constant<std::string>>(name, c[0]);
   default:
@@ -181,19 +179,18 @@ std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
 }
 
 ///
-/// \param[in] name name of the symbol.
+/// \param[in] name name of the symbol (case sensitive).
 /// \return number of distinct categories needed to build the symbol.
 ///
 unsigned symbol_factory::args(const std::string &name) const
 {
-  const map_key k(boost::to_upper_copy(name));
-  const auto it(factory_.find(k));
+  const auto it(factory_.find(name));
 
   return it == factory_.end() ? 1 : it->second.n;
 }
 
 ///
-/// \param[in] name name of the symbol.
+/// \param[in] name name of the symbol (case sensitive).
 /// \return `true` if the symbol has been unregistered.
 ///
 /// Unregister the symbol from the factory.
@@ -202,8 +199,6 @@ unsigned symbol_factory::args(const std::string &name) const
 ///
 bool symbol_factory::unregister_symbol(const std::string &name)
 {
-  const map_key k(boost::to_upper_copy(name));
-
-  return factory_.erase(k) == 1;
+  return factory_.erase(name) == 1;
 }
 }  // namespace vita
