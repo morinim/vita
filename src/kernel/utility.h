@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -248,6 +248,9 @@ bool almost_equal(T v1, T v2, T e = 0.00001)
 template<class T>
 std::ostream &save_float_to_stream(std::ostream &out, T i)
 {
+  static_assert(std::is_floating_point<T>::value,
+                "save_float_to_stream requires a floating point type");
+
   SAVE_FLAGS(out);
 
   out << std::fixed << std::scientific
@@ -265,6 +268,9 @@ std::ostream &save_float_to_stream(std::ostream &out, T i)
 template<class T>
 bool load_float_from_stream(std::istream &in, T *i)
 {
+  static_assert(std::is_floating_point<T>::value,
+                "load_float_from_stream requires a floating point type");
+
   SAVE_FLAGS(in);
 
   return !!(in >> std::fixed >> std::scientific
