@@ -19,6 +19,30 @@
 
 namespace vita
 {
+
+namespace
+{
+///
+/// \param[in] s the string to be tested.
+/// \return the domain `s` is element of.
+///
+domain_t find_domain(const std::string &s)
+{
+  try
+  {
+    stod(s);
+  }
+  catch(std::invalid_argument)  // not a number
+  {
+    return (s == "{TRUE}" || s == "{FALSE}") ?
+      domain_t::d_bool : domain_t::d_string;
+  }
+
+  return s.find('.') == std::string::npos ? domain_t::d_int
+                                          : domain_t::d_double;
+}
+}  // unnamed namespace
+
 ///
 /// \return an instance of the singleton object symbol_factory.
 ///
@@ -68,26 +92,6 @@ symbol_factory::symbol_factory()
 }
 
 ///
-/// \param[in] s the string to be tested.
-/// \return the domain `s` is element of.
-///
-domain_t find_domain(const std::string &s)
-{
-  try
-  {
-    stod(s);
-  }
-  catch(std::invalid_argument)  // not a number
-  {
-    return (s == "{TRUE}" || s == "{FALSE}") ?
-      domain_t::d_bool : domain_t::d_string;
-  }
-
-  return s.find('.') == std::string::npos ? domain_t::d_int
-                                          : domain_t::d_double;
-}
-
-///
 /// \param[in] name name of the symbol to be created (case sensitive).
 /// \param[in] c a list of categories used by the the symbol constructor.
 /// \return an abstract pointer to the created symbol.
@@ -99,8 +103,8 @@ domain_t find_domain(const std::string &s)
 /// factory via the `name` and `c` arguments.
 ///
 /// \attention
-/// If `name` is not recognized as a preregistered symbol, it is
-/// registered on the fly as a constant.
+/// If `name` is not recognized as a preregistered symbol, it's registered on
+/// the fly as a constant.
 ///
 /// \note
 /// * The client code has no knowledge whatsoever of the concrete type, not
@@ -135,7 +139,7 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
     while (c.size() < it->second.n)
       c.push_back(category_t(0));
 
-    return (it->second.f)(c);
+    return it->second.f(c);
   }
 
   switch (find_domain(name))
