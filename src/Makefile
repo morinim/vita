@@ -65,7 +65,7 @@ ifeq ($(CXX), g++)
   endif
 endif
 
-# The next blocks change some variables depending on the build type.
+# Build type specific flags.
 ifeq ($(TYPE), debug)
 TYPE_FLAGS := -g
 
@@ -134,8 +134,8 @@ ifeq ($(TYPE), release)
 	@strip kernel/libvita.a
 endif
 
-# Disable all warnings for TinyXML2
-third_party/tinyxml2/tinyxml2.o: COMPILE += -w
+# Disable all warnings for third_party libraries.
+third_party/%.o: COMPILE += -w
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...
