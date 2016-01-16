@@ -44,18 +44,6 @@ domain_t find_domain(const std::string &s)
 }  // unnamed namespace
 
 ///
-/// \return an instance of the singleton object symbol_factory.
-///
-symbol_factory &symbol_factory::instance()
-{
-  // The so called "static stack variable Singleton" implementation.
-  static symbol_factory singleton;
-  // Returning a reference removes the temptation to try and delete the
-  // returned instance.
-  return singleton;
-}
-
-///
 /// The factory is preloaded with a number of common symbols.
 ///
 symbol_factory::symbol_factory()

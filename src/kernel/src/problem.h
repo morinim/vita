@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,6 +18,7 @@
 
 #include "kernel/data.h"
 #include "kernel/problem.h"
+#include "kernel/src/primitive/factory.h"
 
 namespace vita
 {
@@ -50,12 +51,14 @@ public:
 
   virtual bool debug() const override;
 
-private:  // Private support methods
+private:
+  // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
   void setup_terminals_from_data(const std::set<unsigned> & = {});
 
-private:  // Private data members
+  // Private data members.
   vita::data dat_;
+  vita::symbol_factory factory_;
 };
 
 }  // namespace vita

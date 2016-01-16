@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
   env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  vita::symbol_factory factory;
   sset.insert(vita::make_unique<X>());
   sset.insert(vita::make_unique<Y>());
   sset.insert(vita::make_unique<Z>());

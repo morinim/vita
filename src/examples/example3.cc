@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 10);
 
-  vita::symbol_factory &factory(vita::symbol_factory::instance());
+  vita::symbol_factory factory;;
   sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FSUB"));

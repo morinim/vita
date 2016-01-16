@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,11 +33,9 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : env(&sset, true), null({})
+  F_FACTORY3() : env(&sset, true), factory(), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
-
-    static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
     c0 = sset.insert(factory.make("0.0"));
     c1 = sset.insert(factory.make("1.0"));
@@ -86,8 +84,10 @@ struct F_FACTORY3
   vita::symbol *f_sqrt;
   vita::symbol *f_sub;
 
-  vita::environment env;
-  vita::symbol_set sset;
+  vita::environment        env;
+  vita::symbol_factory factory;
+  vita::symbol_set        sset;
+
   vita::any ret;
 
   const std::vector<vita::index_t> null;

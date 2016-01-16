@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,11 +19,9 @@
 
 struct F_FACTORY2
 {
-  F_FACTORY2() : env(&sset, true)
+  F_FACTORY2() : env(&sset, true), factory()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY2)");
-
-    vita::symbol_factory &factory(vita::symbol_factory::instance());
 
     sset.insert(factory.make("REAL"));
     sset.insert(factory.make("FADD"));
@@ -38,8 +36,9 @@ struct F_FACTORY2
     BOOST_TEST_MESSAGE("Teardown fixture (FACTORY2)");
   }
 
-  vita::environment env;
-  vita::symbol_set sset;
+  vita::environment        env;
+  vita::symbol_factory factory;
+  vita::symbol_set        sset;
 };
 
 #endif  // Include guard

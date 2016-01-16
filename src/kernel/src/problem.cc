@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -213,34 +213,32 @@ void src_problem::setup_default_symbols()
 {
   setup_terminals_from_data();
 
-  symbol_factory &factory(symbol_factory::instance());
-
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
     {
-      env.sset->insert(factory.make("1.0", {tag}));
-      env.sset->insert(factory.make("2.0", {tag}));
-      env.sset->insert(factory.make("3.0", {tag}));
-      env.sset->insert(factory.make("4.0", {tag}));
-      env.sset->insert(factory.make("5.0", {tag}));
-      env.sset->insert(factory.make("6.0", {tag}));
-      env.sset->insert(factory.make("7.0", {tag}));
-      env.sset->insert(factory.make("8.0", {tag}));
-      env.sset->insert(factory.make("9.0", {tag}));
-      env.sset->insert(factory.make("FABS", {tag}));
-      env.sset->insert(factory.make("FADD", {tag}));
-      env.sset->insert(factory.make("FDIV", {tag}));
-      env.sset->insert(factory.make("FLN",  {tag}));
-      env.sset->insert(factory.make("FMUL", {tag}));
-      env.sset->insert(factory.make("FMOD", {tag}));
-      env.sset->insert(factory.make("FSUB", {tag}));
+      env.sset->insert(factory_.make("1.0", {tag}));
+      env.sset->insert(factory_.make("2.0", {tag}));
+      env.sset->insert(factory_.make("3.0", {tag}));
+      env.sset->insert(factory_.make("4.0", {tag}));
+      env.sset->insert(factory_.make("5.0", {tag}));
+      env.sset->insert(factory_.make("6.0", {tag}));
+      env.sset->insert(factory_.make("7.0", {tag}));
+      env.sset->insert(factory_.make("8.0", {tag}));
+      env.sset->insert(factory_.make("9.0", {tag}));
+      env.sset->insert(factory_.make("FABS", {tag}));
+      env.sset->insert(factory_.make("FADD", {tag}));
+      env.sset->insert(factory_.make("FDIV", {tag}));
+      env.sset->insert(factory_.make("FLN",  {tag}));
+      env.sset->insert(factory_.make("FMUL", {tag}));
+      env.sset->insert(factory_.make("FMOD", {tag}));
+      env.sset->insert(factory_.make("FSUB", {tag}));
     }
     else if (compatible({tag}, {"string"}))
     {
       //for (decltype(tag) j(0); j < sup; ++j)
       // if (j != tag)
-      //   env.sset->insert(factory.make("SIFE", {tag, j}));
-      env.sset->insert(factory.make("SIFE", {tag, 0}));
+      //   env.sset->insert(factory_.make("SIFE", {tag, j}));
+      env.sset->insert(factory_.make("SIFE", {tag, 0}));
     }
 }
 
@@ -267,7 +265,6 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_NO_ERROR)
     return 0;
 
-  symbol_factory &factory(symbol_factory::instance());
   unsigned parsed(0);
 
   // When I wrote this, only God and I understood what I was doing.
@@ -297,14 +294,14 @@ unsigned src_problem::load_symbols(const std::string &s_file)
       for (auto tag : used_categories)
         if (compatible({tag}, {std::string(sym_sig)}))
         {
-          const auto n_args(factory.args(sym_name));
+          const auto n_args(factory_.args(sym_name));
           std::string signature(sym_name + ":");
 
           for (auto j(decltype(n_args){0}); j < n_args; ++j)
             signature += " " + dat_.categories().find(tag).name;
           print.debug("Adding to symbol set ", signature);
 
-          env.sset->insert(factory.make(sym_name, cvect(n_args, tag)));
+          env.sset->insert(factory_.make(sym_name, cvect(n_args, tag)));
         }
     }
     else  // !sym_sig => complex signature
@@ -345,7 +342,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
             signature += " " + dat_.categories().find(j).name;
           print.debug("Adding to symbol set ", signature);
 
-          env.sset->insert(factory.make(sym_name, seq));
+          env.sset->insert(factory_.make(sym_name, seq));
         }
     }
 

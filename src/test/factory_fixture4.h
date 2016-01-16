@@ -34,11 +34,9 @@ struct F_FACTORY4
     int val;
   };
 
-  F_FACTORY4() : env(&sset, true), null({})
+  F_FACTORY4() : env(&sset, true), factory(), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY4)");
-
-    static vita::symbol_factory &factory(vita::symbol_factory::instance());
 
     c0 = sset.insert(factory.make("0"));
     c1 = sset.insert(factory.make("1"));
@@ -77,8 +75,10 @@ struct F_FACTORY4
   vita::symbol *i_mul;
   vita::symbol *i_sub;
 
-  vita::environment env;
-  vita::symbol_set sset;
+  vita::environment        env;
+  vita::symbol_factory factory;
+  vita::symbol_set        sset;
+
   vita::any ret;
 
   const std::vector<vita::index_t> null;

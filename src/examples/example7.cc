@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
-  symbol_factory &factory(symbol_factory::instance());
+  symbol_factory factory;
   sset.insert(factory.make(domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FSUB"));

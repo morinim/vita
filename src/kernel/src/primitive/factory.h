@@ -37,7 +37,7 @@ namespace vita
 class symbol_factory
 {
 public:
-  static symbol_factory &instance();
+  symbol_factory();
 
   std::unique_ptr<symbol> make(const std::string &, cvect = cvect{0});
   std::unique_ptr<symbol> make(domain_t, int, int, category_t = 0);
@@ -48,16 +48,12 @@ public:
   bool unregister_symbol(const std::string &);
 
 private:
-  // Private support methods
-  symbol_factory();
-  DISALLOW_COPY_AND_ASSIGN(symbol_factory);
-
   using build_func = std::unique_ptr<symbol> (*)(const cvect &);
 
   template<class T> static std::unique_ptr<symbol> build(const cvect &c)
   { return vita::make_unique<T>(c); }
 
-  // Private data members
+  // Private data members.
   struct build_info
   {
     build_func make;
