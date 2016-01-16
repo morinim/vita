@@ -15,8 +15,6 @@
 
 #include <map>
 
-#include <boost/algorithm/string/case_conv.hpp>
-
 #include "kernel/symbol.h"
 #include "kernel/utility.h"
 
@@ -62,8 +60,8 @@ private:
   // Private data members
   struct build_info
   {
-    build_func f;
-    unsigned   n;
+    build_func make;
+    unsigned   args;
   };
 
   std::map<std::string, build_info> factory_;

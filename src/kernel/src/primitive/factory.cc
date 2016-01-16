@@ -136,10 +136,10 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
   const auto it(factory_.find(name));
   if (it != factory_.end())
   {
-    while (c.size() < it->second.n)
+    while (c.size() < it->second.args)
       c.push_back(category_t(0));
 
-    return it->second.f(c);
+    return it->second.make(c);
   }
 
   switch (find_domain(name))
@@ -190,7 +190,7 @@ unsigned symbol_factory::args(const std::string &name) const
 {
   const auto it(factory_.find(name));
 
-  return it == factory_.end() ? 1 : it->second.n;
+  return it == factory_.end() ? 1 : it->second.args;
 }
 
 ///
