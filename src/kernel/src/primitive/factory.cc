@@ -152,7 +152,11 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 /// \param[in] c a category used by the symbol constructor.
 /// \return an abstract pointer to the created symbol.
 ///
-/// This is an alternative way to build a number.
+/// This is an alternative way to build a number. The other `make` method finds
+/// the domain of the number checking the input string's format.
+///
+/// Here there're explicit parameters for domain / category and we can also
+/// specify a range (`[min; max]`).
 ///
 std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
                                              category_t c)
