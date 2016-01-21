@@ -636,13 +636,13 @@ std::size_t data::load_xrff(const std::string &filename, filter_hook_t ft)
 ///   column delimiters;
 /// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
 ///   example. If the first column is numeric, this model is a REGRESSION
-///   model; if the first column is a string, it is a CATEGORIZATION
+///   model; if the first column is a string, it's a CATEGORIZATION
 ///   (i.e. classification) model. Each column must describe the same kind of
 ///   information for that example;
-/// * the column order of features in the table does not weight the results;
-///   the first feature is not weighted any more than the last;
+/// * the column order of features in the table does not weight the results.
+///   The first feature is not weighted any more than the last;
 /// * as a best practice, remove punctuation (other than apostrophes) from
-///   your data. This is because commas, periods, and other punctuation
+///   your data. This is because commas, periods and other punctuation
 ///   rarely add meaning to the training data, but are treated as meaningful
 ///   elements by the learning engine. For example, "end." is not matched to
 ///   "end";
