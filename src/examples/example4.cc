@@ -58,8 +58,7 @@ int main(int argc, char *argv[])
       std::cout << i << '\r' << std::flush;
   }
 
-  std::cout << static_cast<unsigned>(1000.0 * n / t.elapsed())
-            << " store/read sec\n";
+  std::cout << 1000.0l * n * t.elapsed().count() << " store/read sec\n";
 
   return EXIT_SUCCESS;
 }

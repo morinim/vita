@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,6 +12,8 @@
 
 #if !defined(VITA_EVOLUTION_SUMMARY_H)
 #define      VITA_EVOLUTION_SUMMARY_H
+
+#include <chrono>
 
 #include "kernel/analyzer.h"
 #include "kernel/model_measurements.h"
@@ -44,8 +46,8 @@ public:  // Public data members
     model_measurements score;
   } best;
 
-  /// Time (in milliseconds) elapsed from evolution beginning.
-  double elapsed;
+  /// Time elapsed from evolution beginning.
+  std::chrono::milliseconds elapsed;
 
   std::uintmax_t crossovers, mutations;
 

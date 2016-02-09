@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,6 @@ namespace vita
 {
 ///
 /// We always run into the task of measuring the time between two points.
-/// This is easy to do with C++11 but quite verbose.
 ///
 /// The vita::timer class cuts down the verbose syntax needed to measure
 /// elapsed time. It is similar to boost::cpu_timer but tailored to our
@@ -36,8 +35,7 @@ namespace vita
 ///     {
 ///       vita::timer t;
 ///
-///       for (long i(0); i < 100000000; ++i)
-///         std::sqrt(123.456L); // burn some time
+///       do_stuff_and_burn_some_time();
 ///
 ///       std::cout << "Elapsed (milliseconds): " << t.elapsed() << '\n'
 ///
@@ -66,11 +64,10 @@ public:
   /// \return time elapsed in milliseconds (as would be measured by a clock
   ///         on the wall. It's NOT the processor time).
   ///
-  double elapsed() const
+  std::chrono::milliseconds elapsed() const
   {
-    return static_cast<double>(
-      std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::steady_clock::now() - start_).count());
+    return std::chrono::duration_cast<std::chrono::milliseconds>(
+      std::chrono::steady_clock::now() - start_);
   }
 
 private:
@@ -78,4 +75,4 @@ private:
 };
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

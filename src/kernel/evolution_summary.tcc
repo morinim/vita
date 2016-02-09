@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@
 /// Default constructor just call the summary::clear method.
 ///
 template<class T>
-summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0.0),
+summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0),
                         crossovers(0), mutations(0), gen(0), last_imp(0)
 {
 }
@@ -70,9 +70,13 @@ bool summary<T>::load(std::istream &in, const environment &e)
     tmp_summary.best.score.accuracy = tmp_accuracy;
   }
 
-  if (!(in >> tmp_summary.elapsed >> tmp_summary.mutations
-           >> tmp_summary.crossovers >> tmp_summary.gen
-           >> tmp_summary.last_imp))
+  int ms;
+  if (!(in >> ms))
+    return false;
+  tmp_summary.elapsed = std::chrono::milliseconds(ms);
+
+  if (!(in >> tmp_summary.mutations  >> tmp_summary.crossovers
+           >> tmp_summary.gen >> tmp_summary.last_imp))
     return false;
 
   *this = tmp_summary;
@@ -100,8 +104,8 @@ bool summary<T>::save(std::ostream &out) const
     out << '\n';
   }
 
-  out << elapsed << ' ' << mutations << ' ' << crossovers << ' ' << gen << ' '
-      << last_imp << '\n';
+  out << elapsed.count() << ' ' << mutations << ' ' << crossovers << ' '
+      << gen << ' ' << last_imp << '\n';
 
   return out.good();
 }

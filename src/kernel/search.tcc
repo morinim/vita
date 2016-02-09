@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -230,7 +230,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
          : 0);
 
   set_text(e_summary, "success_rate", success_rate);
-  set_text(e_summary, "elapsed_time", run_sum.elapsed);
+  set_text(e_summary, "elapsed_time", run_sum.elapsed.count());
   set_text(e_summary, "mean_fitness", fd.mean());
   set_text(e_summary, "standard_deviation", fd.standard_deviation());
 

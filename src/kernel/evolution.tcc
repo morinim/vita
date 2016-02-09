@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -306,7 +306,7 @@ evolution<T, ES>::run(unsigned run_count)
     timer from_last_msg;
     for (unsigned k(0); k < pop_.individuals() && !stop; ++k)
     {
-      if (from_last_msg.elapsed() > 1000.0)
+      if (from_last_msg.elapsed() > std::chrono::seconds(1))
       {
         print_progress(k, run_count, false);
 
@@ -333,7 +333,7 @@ evolution<T, ES>::run(unsigned run_count)
     es_.post_bookkeeping();  // hook for strategy-specific final bookkeeping
   }
 
-  print.info("Elapsed time: ", stats_.elapsed / 1000.0, "s",
+  print.info("Elapsed time: ", stats_.elapsed.count() / 1000.0, "s",
              std::string(10, ' '));
 
   term::reset();

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(Speed)
     if (vita::random::boolean())
       s = sset.roulette();
 
-  BOOST_TEST_MESSAGE(static_cast<unsigned>(1000.0 * n / t.elapsed())
+  BOOST_TEST_MESSAGE(1000.0l * n / t.elapsed().count()
                      << " extractions/sec - symbol: " << s->display());
 }
 
