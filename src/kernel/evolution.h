@@ -51,7 +51,7 @@ private:  // Private support methods
   const environment &env() const { return pop_.env(); }
   analyzer<T> get_stats() const;
   void log(unsigned) const;
-  void print_progress(unsigned, unsigned, bool) const;
+  void print_progress(unsigned, unsigned, bool, timer *) const;
   bool stop_condition(const summary<T> &) const;
 
 private:  // Private data members

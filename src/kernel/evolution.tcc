@@ -223,12 +223,13 @@ void evolution<T, ES>::log(unsigned run_count) const
 /// \param[in] k current generation.
 /// \param[in] run_count total number of runs planned.
 /// \param[in] status if `true` print a run/generation/fitness status line.
+/// \param[in] from_last_msg time elapsed from the last message.
 ///
 /// Print evolution informations (if `environment::log_level >= OUTPUT`).
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
-                                      bool status) const
+                                      bool status, timer *from_last_msg) const
 {
   if (print.verbosity() >= log::L_OUTPUT)
   {
@@ -240,7 +241,11 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
                 << '\n';
     else
       std::cout << "Crunching " << run_count << '.' << stats_.gen << " ("
-                << std::setw(3) << perc << "%)\r" << std::flush;
+                << std::setw(3) << perc << "%)\r";
+
+    std::cout << std::flush;
+
+    from_last_msg->restart();
   }
 }
 
@@ -276,6 +281,7 @@ evolution<T, ES>::run(unsigned run_count)
   stats_.best.score.fitness = eva_(stats_.best.solution);
 
   timer measure;
+  timer from_last_msg;
 
   bool stop(false);
   term::set();
@@ -297,20 +303,18 @@ evolution<T, ES>::run(unsigned run_count)
       // training set).
       assert(!stats_.best.solution.empty());
       stats_.best.score.fitness = eva_(stats_.best.solution);
-      print_progress(0, run_count, true);
+      print_progress(0, run_count, true, &from_last_msg);
     }
 
     stats_.az = get_stats();
     log(run_count);
 
-    timer from_last_msg;
     for (unsigned k(0); k < pop_.individuals() && !stop; ++k)
     {
-      if (from_last_msg.elapsed() > std::chrono::seconds(1))
+      if (from_last_msg.elapsed() > std::chrono::seconds(2))
       {
-        print_progress(k, run_count, false);
+        print_progress(k, run_count, false, &from_last_msg);
 
-        from_last_msg.restart();
         stop = term::user_stop();
       }
 
@@ -325,7 +329,7 @@ evolution<T, ES>::run(unsigned run_count)
       es_.replacement.run(parents, off, &stats_);
 
       if (stats_.best.score.fitness != before)
-        print_progress(k, run_count, true);
+        print_progress(k, run_count, true, &from_last_msg);
     }
 
     stats_.elapsed = measure.elapsed();
@@ -333,8 +337,9 @@ evolution<T, ES>::run(unsigned run_count)
     es_.post_bookkeeping();  // hook for strategy-specific final bookkeeping
   }
 
-  print.info("Elapsed time: ", stats_.elapsed.count() / 1000.0, "s",
-             std::string(10, ' '));
+  print.info("Elapsed time: ",
+             std::chrono::duration<double>(stats_.elapsed).count(),
+             "s", std::string(10, ' '));
 
   term::reset();
   return stats_;
