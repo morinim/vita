@@ -46,15 +46,10 @@ class trading_data
 public:
   enum timeframe {short_tf = 0, medium_tf, long_tf, sup_tf};
 
-  static constexpr unsigned ratio[sup_tf] =
-  {
-    1,   // Duration of timeframe short_t is one minute
-    60,  // 60 short_t periods are equivalent to one medium_t (1 hour)
-    24   // 24 medium_t periods are equivalent to one long_t (1 day)
-  };
+  unsigned tf_duration[sup_tf];
 
 public:
-  trading_data() { load_data("forex_files/eurusd_1m_bid.csv"); }
+  explicit trading_data(unsigned);
 
   bool empty() const { return trading[0].empty(); }
 

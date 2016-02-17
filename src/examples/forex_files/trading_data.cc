@@ -11,7 +11,36 @@
 
 #include "trading_data.h"
 
-constexpr unsigned trading_data::ratio[sup_tf];
+trading_data::trading_data(unsigned seconds)
+{
+  assert(seconds);
+  assert(seconds <= 14400);
+
+  tf_duration[short_tf] = seconds;
+
+  if (seconds <= 300)  // 5 minutes
+  {
+    tf_duration[medium_tf] = 1800;  // 30 minutes
+    tf_duration[long_tf]   = 3600;  // 1 hour
+  }
+  else if (seconds <= 1800)  // 30 minutes
+  {
+    tf_duration[medium_tf] =  3600;  // 30 minutes
+    tf_duration[long_tf]   = 14400;  // 4 hours
+  }
+  else if (seconds <= 3600)  // 1 hour
+  {
+    tf_duration[medium_tf] = 14400;  // 4 hours
+    tf_duration[long_tf]   = 86400;  // 1 day
+  }
+  else if (seconds <= 14400)  // 4 hours
+  {
+    tf_duration[medium_tf] =  86400;  // 1 day
+    tf_duration[long_tf]   = 604800;  // 1 week
+  }
+
+  load_data("forex_files/eurusd_1m_bid.csv");
+}
 
 std::pair<double, double> trading_data::minmax_vol(unsigned tf) const
 {
@@ -55,7 +84,8 @@ bool trading_data::compute_longer_timeframes()
     double frame_high(high(tf - 1, 0)), frame_low(low(tf - 1, 0));
     double frame_volume(0.0);
 
-    unsigned begin(0), end(ratio[tf]);
+    const unsigned ratio(tf_duration[tf] / tf_duration[tf -1]);
+    unsigned begin(0), end(ratio);
     for (unsigned i(0); i < bars(tf - 1); ++i)
     {
       if (i == end || i + 1 == bars(tf - 1))
@@ -68,7 +98,7 @@ bool trading_data::compute_longer_timeframes()
         frame_volume = 0.0;
 
         begin = end;
-        end += ratio[tf];
+        end += ratio;
       }
 
       frame_high = std::max(high(tf - 1, i), frame_high);

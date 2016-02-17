@@ -25,7 +25,12 @@ namespace fxs  // Forex symbols
 {
 using i_interp = vita::core_interpreter;
 
-enum {c_logic, c_money, c_volume};
+enum
+{
+  c_logic,  // boolean values
+  c_money,  // currencies
+  c_volume  // volume of a transaction
+};
 
 template<unsigned TF, unsigned I>
 class tfi_terminal : public vita::terminal
@@ -116,7 +121,7 @@ struct black_candle : tfi_terminal<TF, I>
   }
 };
 
-/// Black candle is formed when the opening price is lower than the closing
+/// White candle is formed when the opening price is lower than the closing
 /// price.
 template<unsigned TF, unsigned I>
 struct white_candle : tfi_terminal<TF, I>
@@ -317,7 +322,7 @@ bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
 
 int main()
 {
-  trading_data td;
+  trading_data td(60);
   if (td.empty())
     return EXIT_FAILURE;
 

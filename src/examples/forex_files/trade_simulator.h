@@ -127,23 +127,16 @@ public:
 
   template<class T> double run(const T &);
 
-private:  // Private support functions
+private:
+  // Private support functions
   unsigned as_series(unsigned tf, unsigned i) const
   {
     assert(tf < trading_data::sup_tf);
 
     unsigned b(cur_bar_);
 
-    switch (tf)
-    {
-    case trading_data::short_tf:
-      break;
-    case trading_data::medium_tf:
-      b /= trading_data::ratio[tf];
-      break;
-    default:
-      b /= trading_data::ratio[tf] * trading_data::ratio[tf - 1];
-    }
+    if (tf != trading_data::short_tf)
+      b /= td_.tf_duration[tf] / td_.tf_duration[0];
 
     return b > i ? b - i : 0;
   }
@@ -151,12 +144,12 @@ private:  // Private support functions
   void clear_status();
   unsigned inc_bar() { return ++cur_bar_; }
 
-private:  // Private data members
+  // Private data members
   const trading_data &td_;
 
   order order_ = order();
 
-  double spread_ = 0.0002;
+  double spread_ = 0.0003;  // 30 Points
   double balance_ = 0.0;
 
   unsigned cur_bar_ = 1;
