@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015, 2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -225,7 +225,7 @@ private:  // Private data members
   T local_storage_[S];
 };
 
-#include "kernel/small_vector.tcc"
+#include "utility/small_vector.tcc"
 }  // namespace vita
 
 #endif  // Include guard

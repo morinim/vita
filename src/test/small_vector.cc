@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "kernel/small_vector.h"
+#include "utility/small_vector.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE small_vector_test
