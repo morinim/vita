@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,7 @@
 #include <iterator>
 
 #include "kernel/category_set.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 namespace vita
 {

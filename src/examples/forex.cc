@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,7 +16,7 @@
 #include "kernel/src/primitive/bool.h"
 #include "kernel/src/primitive/real.h"
 #include "kernel/team.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 #include "forex_files/trading_data.cc"
 #include "forex_files/trade_simulator.cc"

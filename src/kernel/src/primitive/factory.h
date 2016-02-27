@@ -16,7 +16,7 @@
 #include <map>
 
 #include "kernel/symbol.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 namespace vita
 {

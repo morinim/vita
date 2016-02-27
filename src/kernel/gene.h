@@ -18,7 +18,7 @@
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "utility/small_vector.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 namespace vita
 {

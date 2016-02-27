@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include "utility/small_vector.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 namespace vita
 {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@
 #include "kernel/src/interpreter.h"
 #include "kernel/src/model_metric.h"
 #include "kernel/team.h"
-#include "kernel/utility.h"
+#include "utility/utility.h"
 
 #include "kernel/detail/lambda_f.h"
 
