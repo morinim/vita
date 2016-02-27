@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,7 +13,7 @@
 #if !defined(VITA_CORE_INTERPRETER_H)
 #define      VITA_CORE_INTERPRETER_H
 
-#include "kernel/any.h"
+#include "utility/any.h"
 
 namespace vita
 {

@@ -87,7 +87,7 @@ LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc) third_party/tinyxml2/tinyxml2.cc
+KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc) $(wildcard utility/*.cc) third_party/tinyxml2/tinyxml2.cc
 KERNEL_OBJ := $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC := $(wildcard examples/*.cc)
 SR_SRC := $(wildcard sr/*.cc)
