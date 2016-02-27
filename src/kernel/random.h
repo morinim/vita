@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -57,7 +57,7 @@ using engine_t = std::mt19937;
 /// This function grants access to a shared engine.
 ///
 /// \note
-/// \c the engine can be shared among multiple threads.
+/// the engine can be shared among multiple threads.
 ///
 inline engine_t &engine()
 {
@@ -96,10 +96,10 @@ T ephemeral(distribution d, T p1, T p2)
 ///
 /// \param[in] min minimum random number.
 /// \param[in] sup upper bound.
-/// \return a random \c double in the [min;sup[ range.
+/// \return a random `double` in the [min;sup[ range.
 ///
 /// This is a specialization for floating pint values of the
-//  \c random::between(T, T) template function.
+//  `random::between(T, T)` template function.
 ///
 /// \see
 /// - <http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3551.pdf>
@@ -152,7 +152,7 @@ between(T min, T sup)
 /// \return a random number in the [0;sup[ range.
 ///
 /// \note
-/// This is a shortcut for: \c between<T>(0, sup);
+/// This is a shortcut for: `between<T>(0, sup)`
 ///
 template<class T>
 T sup(T sup)
@@ -192,7 +192,7 @@ typename C::value_type &element(C &c)
 
 ///
 /// \param[in] p a probability ([0;1] range).
-/// \return \c true \a p% times.
+/// \return `true` `p%` times.
 ///
 /// bool values are produced according to the Bernoulli distribution.
 ///
