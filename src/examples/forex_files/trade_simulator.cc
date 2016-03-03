@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -70,6 +70,22 @@ unsigned trade_simulator::orders_history_total() const
   return orders_history_total_;
 }
 
+// The profits and losses in the Foreign Exchange market (aka Forex) are
+// determined by the currency's pips. A pip is the fourth decimal point in a
+// currency pair (0.0001).
+// If the current exchange rate in EURUSD (Euro-Dollar) is 1.2305, it means
+// 1 Euro is worth 1.230*5* Dollars where the number 5 represents the pip in
+// EURUSD.
+// If EURUSD price was 1.2305 and it's now 1.2306, the pair gained 1 pip.
+// To calculate the value of a pip, we must first make a note of size of trade.
+// The minimum trade size in forex trading platforms are 1000 units of the
+// base currency (1000 Euro) or 0.01 lots (aka microlot, we will use that as
+// an example).
+// So a change of one pip in EURUSD means 1000 x 0.0001 = 0.10$, i.e. the
+// value of each pip in a trade size of 1 microlot is 10 cents (the value
+// of a pip in a trade size of 1 lot is 10$).
+// For further details see:
+// <https://www.ddmarkets.com/pips-calculation-in-the-forex-market/>
 double trade_simulator::order_profit() const
 {
   switch (order_.type())
@@ -83,6 +99,8 @@ double trade_simulator::order_profit() const
 template<class T>
 double trade_simulator::run(const T &prg)
 {
+  enum {id_buy, id_sell};
+
   clear_status();
 
   const auto bars(td_.bars(0) - 1);
@@ -93,24 +111,24 @@ double trade_simulator::run(const T &prg)
 
     if (type == order::na)
     {
-      vita::interpreter<vita::i_mep> i_buy(&prg[0]);
-      vita::interpreter<vita::i_mep> i_sell(&prg[1]);
+      bool signal[2];
+      for (unsigned i(0); i < 2; ++i)
+      {
+        vita::interpreter<vita::i_mep> i_res(&prg[i]);
 
-      auto a_buy(i_buy.run());
-      const bool buy(!a_buy.empty() && vita::any_cast<bool>(a_buy));
+        auto a(i_res.run());
+        signal[i] = !a.empty() && vita::any_cast<bool>(a);
+      }
 
-      auto a_sell(i_sell.run());
-      const bool sell(!a_sell.empty() && vita::any_cast<bool>(a_sell));
-
-      if (buy && !sell)
+      if (signal[id_buy] && !signal[id_sell])
         order_send(order::buy, 0.01);
-      else if (sell && !buy)
+      else if (signal[id_sell] && !signal[id_buy])
         order_send(order::sell, 0.01);
     }
     else   // short/long position
     {
-      vita::interpreter<vita::i_mep> intr(&prg[type == order::buy ? 1 : 0]);
-
+      vita::interpreter<vita::i_mep> intr(&prg[type == order::buy ?
+                                               id_sell : id_buy]);
       auto a(intr.run());
       const bool v(!a.empty() && vita::any_cast<bool>(a));
 

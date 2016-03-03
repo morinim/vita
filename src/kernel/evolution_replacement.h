@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,9 +19,9 @@ namespace vita {
 namespace replacement {
 ///
 /// \brief The replacement strategy (random, tournament...) for the
-///        vita::evolution_strategy class
+///        vita::evolution_strategy class.
 ///
-/// \tparam T type of program (individual/team)
+/// \tparam T type of program (individual/team).
 ///
 /// In the strategy design pattern, this class is the strategy interface and
 /// vita::evolution is the context.
@@ -44,9 +44,9 @@ protected:
 };
 
 ///
-/// \brief A family competition replacement scheme
+/// \brief A family competition replacement scheme.
 ///
-/// \tparam T type of program (individual/team)
+/// \tparam T type of program (individual/team).
 ///
 /// We assume that the parents would be ones of the members of the population
 /// closest to the new elements. In this way, children compete with their

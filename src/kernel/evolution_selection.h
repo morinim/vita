@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,9 +21,9 @@ namespace vita {
 namespace selection {
 ///
 /// \brief The strategy (tournament, fitness proportional...) for the
-///        evolution class
+///        evolution class.
 ///
-/// \tparam T the type of program (individual/team)
+/// \tparam T the type of program (individual/team).
 ///
 /// In the strategy design pattern, this class is the strategy interface and
 /// evolution is the context.
@@ -80,8 +80,7 @@ public:
 };
 
 ///
-/// Alps selection as described in
-/// <http://idesign.ucsc.edu/projects/alps.html> (see also
+/// Alps selection as described in <https://github.com/ghornby/alps> (see also
 /// vita::basic_alps_es for further details).
 ///
 template<class T>
