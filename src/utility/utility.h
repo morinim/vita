@@ -439,6 +439,35 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
   set_text(p, e, ss.str());
 }
 
+///
+/// \brief Encapsulate the logic to convert a scoped enumeration element to its
+///        integer value.
+/// \tparam E a scoped enumeration.
+/// \param[in] v element of an enum class.
+/// \return the integer value of `v`.
+///
+template<class E>
+constexpr typename std::underlying_type<E>::type as_integer(E v)
+{
+  static_assert(std::is_enum<E>::value,
+                "as_integer needs a scoped enumeration");
+  return static_cast<typename std::underlying_type<E>::type>(v);
+}
+
+///
+/// \brief A generic function to "print" any scoped enum.
+/// \tparam E a scoped enumeration.
+/// \param[in, out] s an output stream.
+/// \param[in] v element of an enum class.
+/// \return the modified output stream.
+///
+template<class E>
+typename std::enable_if<std::is_enum<E>::value, std::ostream>::type &
+operator<<(std::ostream &s, E v)
+{
+  return s << as_integer(v);
+}
+
 }  // namespace vita
 
 #endif  // Include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -39,7 +39,7 @@ enum class trilean {unknown = -1, no, yes};
 
 inline std::ostream &operator<<(std::ostream &o, trilean v)
 {
-  return o << static_cast<std::underlying_type<trilean>::type>(v);
+  return o << v;
 }
 
 inline std::istream &operator>>(std::iostream &i, trilean &v)

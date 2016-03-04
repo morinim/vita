@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -63,11 +63,6 @@ void environment::xml(tinyxml2::XMLDocument *d) const
 {
   assert(stat.summary);
 
-  auto tti = [](trilean v)
-  {
-    return static_cast<std::underlying_type<trilean>::type>(v);
-  };
-
   auto *root(d->RootElement());
 
   auto *e_environment(d->NewElement("environment"));
@@ -77,18 +72,18 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "min_individuals", min_individuals);
   set_text(e_environment, "code_length", code_length);
   set_text(e_environment, "patch_length", patch_length);
-  set_text(e_environment, "elitism", tti(elitism));
+  set_text(e_environment, "elitism", as_integer(elitism));
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
   set_text(e_environment, "brood_recombination", *brood_recombination);
-  set_text(e_environment, "dss", tti(dss));
+  set_text(e_environment, "dss", as_integer(dss));
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", *mate_zone);
   set_text(e_environment, "max_generations", generations);
   set_text(e_environment, "max_gens_wo_imp", g_without_improvement);
-  set_text(e_environment, "arl", tti(arl));
+  set_text(e_environment, "arl", as_integer(arl));
   set_text(e_environment, "validation_percentage", validation_percentage);
-  set_text(e_environment, "ttable_bits", ttable_size);  // size 1u << ttable_size.
+  set_text(e_environment, "ttable_bits", ttable_size);  // size 1u<<ttable_size
 
   auto *e_alps(d->NewElement("alps"));
   e_environment->InsertEndChild(e_alps);

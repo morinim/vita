@@ -171,8 +171,7 @@ void category_set::swap(category_t t1, category_t t2)
 ///
 std::ostream &operator<<(std::ostream &s, const category &c)
 {
-  s << c.name << " (category " << c.tag << ", domain "
-    << static_cast<std::underlying_type<domain_t>::type>(c.domain);
+  s << c.name << " (category " << c.tag << ", domain " << c.domain;
 
   s << ", [";
 
