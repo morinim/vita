@@ -14,7 +14,7 @@
 void trade_simulator::clear_status()
 {
   order_ = order();
-  spread_ = 0.0010;
+  spread_ = 0.0001;  // 1 pip
   balance_ = 0.0;
   cur_bar_ = 1;
   orders_history_total_ = 0;
@@ -103,7 +103,7 @@ double trade_simulator::run(const T &prg)
 
   clear_status();
 
-  const auto bars(td_.bars(0) - 1);
+  const auto bars(td_.bars(short_tf) - 1);
 
   while (cur_bar_ < bars)
   {

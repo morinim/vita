@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,33 +10,21 @@
  */
 
 #include <algorithm>
+#include <chrono>
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 #if !defined(FOREX_TRADING_DATA_H)
 #define      FOREX_TRADING_DATA_H
 
-// ****************************************************************************
-// timepoint
-// ****************************************************************************
-struct timepoint
-{
-  unsigned year;
-  unsigned month;
-  unsigned day;
-  unsigned hour;
-  unsigned minute;
-};
+enum timeframe : unsigned {short_tf = 0, medium_tf, long_tf, sup_tf};
 
-timepoint string_to_timepoint(const std::string &s)
-{
-  timepoint tf;
+constexpr timeframe shorter(timeframe tf)
+{ return timeframe(vita::as_integer(tf) - 1); }
 
-  std::sscanf(s.c_str(), "%2u.%2u.%4u %2u:%2u",
-              &tf.day, &tf.month, &tf.year, &tf.hour, &tf.minute);
-
-  return tf;
-}
+constexpr timeframe longer(timeframe tf)
+{ return timeframe(vita::as_integer(tf) + 1); }
 
 // ****************************************************************************
 // trading_data
@@ -44,34 +32,29 @@ timepoint string_to_timepoint(const std::string &s)
 class trading_data
 {
 public:
-  enum timeframe {short_tf = 0, medium_tf, long_tf, sup_tf};
-
-  unsigned tf_duration[sup_tf];
+  std::chrono::seconds tf_duration[sup_tf];
 
 public:
-  explicit trading_data(unsigned);
+  explicit trading_data(const std::string &);
 
-  bool empty() const { return trading[0].empty(); }
+  bool empty() const { return trading[short_tf].empty(); }
 
-  unsigned bars(unsigned tf = 0) const
-  { return static_cast<unsigned>(trading[tf].size()); }
+  std::size_t bars(timeframe tf = short_tf) const {return trading[tf].size();}
 
-  double close(unsigned tf, unsigned i) const { return get(tf, i).close; }
-  double high(unsigned tf, unsigned i) const { return get(tf, i).high; }
-  double low(unsigned tf, unsigned i) const { return get(tf, i).low; }
-  double open(unsigned tf, unsigned i) const { return get(tf, i).open; }
-  double volume(unsigned tf, unsigned i) const { return get(tf, i).volume; }
+  double close(timeframe tf, std::size_t i) const { return get(tf, i).close; }
+  double high(timeframe tf, std::size_t i) const { return get(tf, i).high; }
+  double low(timeframe tf, std::size_t i) const { return get(tf, i).low; }
+  double open(timeframe tf, std::size_t i) const { return get(tf, i).open; }
+  double volume(timeframe tf, std::size_t i) const {return get(tf, i).volume;}
 
-  bool black_candle(unsigned tf, unsigned i) const
+  bool black_candle(timeframe tf, std::size_t i) const
   {
-    const auto c(close(tf, i)), o(open(tf, i));
-    return c < o;
+    return close(tf, i) < open(tf, i);
   }
 
-  bool white_candle(unsigned tf, unsigned i) const
+  bool white_candle(timeframe tf, std::size_t i) const
   {
-    const auto c(close(tf, i)), o(open(tf, i));
-    return c > o;
+    return close(tf, i) > open(tf, i);
   }
 
 private:
@@ -81,29 +64,23 @@ private:
                               double c = 0.0, double v = 0.0)
       : open(o), high(h), low(l), close(c), volume(v)
     {
-      assert(h >= o);
-      assert(h >= l);
-      assert(h >= c);
-      assert(l <= o);
-      assert(l <= c);
+      assert(h >= std::max(o, c));
+      assert(l <= std::min(o, c));
       assert(v > 0.0);
     }
 
-    // timepoint point;
+    // std::tm point;
     double   open;
     double   high;
     double    low;
     double  close;
     double volume;
-  };
+  };  // trade_info_point
 
-  std::array<std::vector<trade_info_point>, sup_tf> trading;
-
-private:
   bool compute_longer_timeframes();
   bool debug() const;
 
-  trade_info_point get(unsigned tf, unsigned i) const
+  trade_info_point get(timeframe tf, std::size_t i) const
   {
     assert(tf < sup_tf);
     assert(i < bars(tf));
@@ -112,8 +89,11 @@ private:
   }
 
   bool load_data(const std::string &);
-  std::pair<double, double> minmax_vol(unsigned) const;
-  bool normalize_volume(unsigned);
+  std::pair<double, double> minmax_vol(timeframe) const;
+  bool normalize_volume(timeframe);
+  bool set_timeframe_duration(std::tm, std::tm);
+
+  std::array<std::vector<trade_info_point>, sup_tf> trading;
 };
 
 #endif  // include guard

@@ -32,7 +32,7 @@ enum
   c_volume  // volume of a transaction
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 class tfi_terminal : public vita::terminal
 {
 public:
@@ -50,7 +50,7 @@ protected:
   trade_simulator *ts_;
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct close : tfi_terminal<TF, I>
 {
   explicit close(trade_simulator *ts)
@@ -61,7 +61,7 @@ struct close : tfi_terminal<TF, I>
   { return vita::any(this->ts_->close(TF, I)); }
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct high : tfi_terminal<TF, I>
 {
   explicit high(trade_simulator *ts)
@@ -72,7 +72,7 @@ struct high : tfi_terminal<TF, I>
   { return vita::any(this->ts_->high(TF, I)); }
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct low : tfi_terminal<TF, I>
 {
   explicit low(trade_simulator *ts)
@@ -83,7 +83,7 @@ struct low : tfi_terminal<TF, I>
   { return vita::any(this->ts_->low(TF, I)); }
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct open : tfi_terminal<TF, I>
 {
   explicit open(trade_simulator *ts)
@@ -94,7 +94,7 @@ struct open : tfi_terminal<TF, I>
   { return vita::any(this->ts_->open(TF, I)); }
 };
 
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct volume : tfi_terminal<TF, I>
 {
   explicit volume(trade_simulator *ts)
@@ -107,7 +107,7 @@ struct volume : tfi_terminal<TF, I>
 
 /// Black candle is formed when the opening price is higher than the closing
 /// price.
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct black_candle : tfi_terminal<TF, I>
 {
   explicit black_candle(trade_simulator *ts)
@@ -123,7 +123,7 @@ struct black_candle : tfi_terminal<TF, I>
 
 /// White candle is formed when the opening price is lower than the closing
 /// price.
-template<unsigned TF, unsigned I>
+template<timeframe TF, unsigned I>
 struct white_candle : tfi_terminal<TF, I>
 {
   explicit white_candle(trade_simulator *ts)
@@ -171,7 +171,7 @@ struct lt_v : vita::real::lt
 /// large white body followed by a small black body (contained within large
 /// white body).
 /// It's considered as a bearish pattern when preceded by an uptrend.
-template<unsigned TF>
+template<timeframe TF>
 struct bearish_harami : tfi_terminal<TF, 1>
 {
   explicit bearish_harami(trade_simulator *ts)
@@ -194,7 +194,7 @@ struct bearish_harami : tfi_terminal<TF, 1>
 /// large black body followed by a small white body (contained within large
 /// black body).
 /// It's considered as a bullish pattern when preceded by a downtrend.
-template<unsigned TF>
+template<timeframe TF>
 struct bullish_harami : tfi_terminal<TF, 1>
 {
   explicit bullish_harami(trade_simulator *ts)
@@ -217,7 +217,7 @@ struct bullish_harami : tfi_terminal<TF, 1>
 /// candlestick that opens above the high of the white candlestick and closes
 /// well into the body of the white candlestick. It is considered as a bearish
 /// reversal signal during an uptrend.
-template<unsigned TF>
+template<timeframe TF>
 struct dark_cloud_cover : tfi_terminal<TF, 1>
 {
   explicit dark_cloud_cover(trade_simulator *ts)
@@ -255,62 +255,62 @@ private:
 
 bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
 {
-  ss->insert(vita::make_unique<fxs::close<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::close<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::close<0, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::high<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::high<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::high<0, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::low<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::low<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::low<0, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::open<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::open<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::open<0, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::close<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::close<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::close<short_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::high<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::high<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::high<short_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::low<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::low<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::low<short_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::open<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::open<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::open<short_tf, 3>>(ts));
 
-  ss->insert(vita::make_unique<fxs::close<1, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::close<1, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::close<1, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::high<1, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::high<1, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::high<1, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::low<1, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::low<1, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::low<1, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::open<1, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::open<1, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::open<1, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::close<medium_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::close<medium_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::close<medium_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::high<medium_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::high<medium_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::high<medium_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::low<medium_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::low<medium_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::low<medium_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::open<medium_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::open<medium_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::open<medium_tf, 3>>(ts));
 
-  ss->insert(vita::make_unique<fxs::close<2, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::close<2, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::close<2, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::high<2, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::high<2, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::high<2, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::low<2, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::low<2, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::low<2, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::open<2, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::open<2, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::open<2, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::close<long_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::close<long_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::close<long_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::high<long_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::high<long_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::high<long_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::low<long_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::low<long_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::low<long_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::open<long_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::open<long_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::open<long_tf, 3>>(ts));
 
   ss->insert(vita::make_unique<fxs::l_and>());
   ss->insert(vita::make_unique<fxs::l_or>());
-  ss->insert(vita::make_unique<fxs::black_candle<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::white_candle<0, 1>>(ts));
-  ss->insert(vita::make_unique<fxs::black_candle<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::white_candle<0, 2>>(ts));
-  ss->insert(vita::make_unique<fxs::black_candle<0, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::white_candle<0, 3>>(ts));
-  ss->insert(vita::make_unique<fxs::bearish_harami<0>>(ts));
-  ss->insert(vita::make_unique<fxs::bearish_harami<1>>(ts));
-  ss->insert(vita::make_unique<fxs::bearish_harami<2>>(ts));
-  ss->insert(vita::make_unique<fxs::bullish_harami<0>>(ts));
-  ss->insert(vita::make_unique<fxs::bullish_harami<1>>(ts));
-  ss->insert(vita::make_unique<fxs::bullish_harami<2>>(ts));
-  ss->insert(vita::make_unique<fxs::dark_cloud_cover<0>>(ts));
-  ss->insert(vita::make_unique<fxs::dark_cloud_cover<1>>(ts));
-  ss->insert(vita::make_unique<fxs::dark_cloud_cover<2>>(ts));
+  ss->insert(vita::make_unique<fxs::black_candle<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::white_candle<short_tf, 1>>(ts));
+  ss->insert(vita::make_unique<fxs::black_candle<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::white_candle<short_tf, 2>>(ts));
+  ss->insert(vita::make_unique<fxs::black_candle<short_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::white_candle<short_tf, 3>>(ts));
+  ss->insert(vita::make_unique<fxs::bearish_harami<short_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::bearish_harami<medium_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::bearish_harami<long_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::bullish_harami<short_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::bullish_harami<medium_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::bullish_harami<long_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::dark_cloud_cover<short_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::dark_cloud_cover<medium_tf>>(ts));
+  ss->insert(vita::make_unique<fxs::dark_cloud_cover<long_tf>>(ts));
 
   ss->insert(vita::make_unique<fxs::add>());
   ss->insert(vita::make_unique<fxs::sub>());
@@ -322,7 +322,7 @@ bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
 
 int main()
 {
-  trading_data td(60);
+  trading_data td("forex_files/eurusd_1m_bid.csv");
   if (td.empty())
     return EXIT_FAILURE;
 

@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@
 class order
 {
 public:
-  explicit order(int t = na, double a = 0.0, double o = 0.0, unsigned b = 0)
+  explicit order(int t = na, double a = 0.0, double o = 0.0, std::size_t b = 0)
     : amount_(a), open_price_(o), type_(t), bar_(b)
   {
     assert(t == na || t == buy || t == sell);
@@ -34,7 +34,7 @@ public:
   double amount() const { return amount_; }
   double open_price() const { return open_price_; }
   int type() const { return type_; }
-  unsigned bar() const { return bar_; }
+  std::size_t bar() const { return bar_; }
 
   enum {na = -1, buy = 0, sell};
 
@@ -42,7 +42,7 @@ private:
   double amount_;
   double open_price_;
   int type_;
-  unsigned bar_;
+  std::size_t bar_;
 };
 
 // ****************************************************************************
@@ -66,50 +66,50 @@ public:
   double account_balance() const { return balance_; }
 
   // If the current bid price for the EUR/USD currency pair is 1.5760 this
-  // means that you can sell EUR/USD at 1.5760
-  double bid() const { return td_.open(0, cur_bar_); }
+  // means that you can sell 1 Euro and get 1.5760$.
+  double bid() const { return td_.open(short_tf, cur_bar_); }
 
   // If the current ask price for the EUR/USD currency pair is 1.5763 this
-  // means that you can buy EUR/USD at 1.5763
+  // means that you can buy 1 EUR for 1.5763$.
   double ask() const { return bid() + spread_; }
 
-  double close(unsigned tf, unsigned i) const
+  double close(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.close(tf, as_series(tf, i));
   }
 
-  double high(unsigned tf, unsigned i) const
+  double high(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.high(tf, as_series(tf, i));
   }
 
-  double low(unsigned tf, unsigned i) const
+  double low(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.low(tf, as_series(tf, i));
   }
 
-  double open(unsigned tf, unsigned i) const
+  double open(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.open(tf, as_series(tf, i));
   }
 
-  double volume(unsigned tf, unsigned i) const
+  double volume(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.volume(tf, as_series(tf, i));
   }
 
-  bool black_candle(unsigned tf, unsigned i) const
+  bool black_candle(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.black_candle(tf, as_series(tf, i));
   }
 
-  bool white_candle(unsigned tf, unsigned i) const
+  bool white_candle(timeframe tf, std::size_t i) const
   {
     assert(cur_bar_);
     return td_.white_candle(tf, as_series(tf, i));
@@ -129,14 +129,15 @@ public:
 
 private:
   // Private support functions
-  unsigned as_series(unsigned tf, unsigned i) const
+  std::size_t as_series(timeframe tf, std::size_t i) const
   {
-    assert(tf < trading_data::sup_tf);
+    assert(tf < sup_tf);
 
-    unsigned b(cur_bar_);
+    std::size_t b(cur_bar_);
 
-    if (tf != trading_data::short_tf)
-      b /= td_.tf_duration[tf] / td_.tf_duration[0];
+    if (tf != short_tf)
+      b /= static_cast<unsigned>(td_.tf_duration[tf].count() /
+                                 td_.tf_duration[short_tf].count());
 
     return b > i ? b - i : 0;
   }

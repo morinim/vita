@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,41 +11,81 @@
 
 #include "trading_data.h"
 
-trading_data::trading_data(unsigned seconds)
+namespace
 {
-  assert(seconds);
-  assert(seconds <= 14400);
 
-  tf_duration[short_tf] = seconds;
+std::tm string_to_timepoint(const std::string &s)
+{
+  std::tm tp;
 
-  if (seconds <= 300)  // 5 minutes
-  {
-    tf_duration[medium_tf] = 1800;  // 30 minutes
-    tf_duration[long_tf]   = 3600;  // 1 hour
-  }
-  else if (seconds <= 1800)  // 30 minutes
-  {
-    tf_duration[medium_tf] =  3600;  // 30 minutes
-    tf_duration[long_tf]   = 14400;  // 4 hours
-  }
-  else if (seconds <= 3600)  // 1 hour
-  {
-    tf_duration[medium_tf] = 14400;  // 4 hours
-    tf_duration[long_tf]   = 86400;  // 1 day
-  }
-  else if (seconds <= 14400)  // 4 hours
-  {
-    tf_duration[medium_tf] =  86400;  // 1 day
-    tf_duration[long_tf]   = 604800;  // 1 week
-  }
+  std::sscanf(s.c_str(), "%2d.%2d.%4d %2d:%2d",
+              &tp.tm_mday, &tp.tm_mon, &tp.tm_year, &tp.tm_hour, &tp.tm_min);
 
-  load_data("forex_files/eurusd_1m_bid.csv");
+  assert(tp.tm_year >= 1900);
+  tp.tm_year -= 1900;
+
+  assert(tp.tm_mon >= 1);
+  --tp.tm_mon;
+
+  tp.tm_sec = 0;
+  tp.tm_isdst = -1;
+
+  return tp;
 }
 
-std::pair<double, double> trading_data::minmax_vol(unsigned tf) const
+const std::string tf_name[] = {"Short", "Medium", "Long", "Sup"};
+}
+
+trading_data::trading_data(const std::string &fn)
+{
+  load_data(fn);
+}
+
+bool trading_data::set_timeframe_duration(std::tm p0, std::tm p1)
+{
+  auto t0(std::mktime(&p0));
+  auto t1(std::mktime(&p1));
+  assert(t1 > t0);
+  const auto delta_s(std::difftime(t1, t0));
+  std::chrono::seconds sec(static_cast<std::uint64_t>(delta_s));
+
+  assert(sec > std::chrono::seconds::zero());
+  assert(sec <= std::chrono::hours(4));
+
+  tf_duration[short_tf] = sec;
+
+  if (sec <= std::chrono::minutes(5))
+  {
+    tf_duration[medium_tf] = std::chrono::minutes(30);
+    tf_duration[long_tf]   = std::chrono::hours(1);
+  }
+  else if (sec <= std::chrono::minutes(30))
+  {
+    tf_duration[medium_tf] = std::chrono::hours(1);
+    tf_duration[long_tf]   = std::chrono::hours(4);
+  }
+  else if (sec <= std::chrono::hours(1))
+  {
+    tf_duration[medium_tf] =  std::chrono::hours(4);
+    tf_duration[long_tf]   = std::chrono::hours(24);
+  }
+  else if (sec <= std::chrono::hours(4))
+  {
+    tf_duration[medium_tf] =  std::chrono::hours(24);
+    tf_duration[long_tf]   = std::chrono::hours(168);  // 1 week
+  }
+
+  for (timeframe tf(short_tf); tf < sup_tf; tf = longer(tf))
+    std::cout << "  " << tf_name[vita::as_integer(tf)]
+              << " timeframe duration is " << tf_duration[tf].count() << "s\n";
+
+  return true;
+}
+
+std::pair<double, double> trading_data::minmax_vol(timeframe tf) const
 {
   double min(999999999.0), max(0.0);
-  for (const auto &tip : trading[tf])
+  for (const auto &tip : trading[vita::as_integer(tf)])
   {
     if (tip.volume < min)
       min = tip.volume;
@@ -58,9 +98,10 @@ std::pair<double, double> trading_data::minmax_vol(unsigned tf) const
   return {min, max};
 }
 
-bool trading_data::normalize_volume(unsigned tf)
+bool trading_data::normalize_volume(timeframe tf)
 {
-  std::cout << "  Normalizing volumes for timeframe " << tf << '\n';
+  std::cout << "  Normalizing volumes for " << tf_name[vita::as_integer(tf)]
+            << " timeframe\n";
 
   std::cout << "  Getting min/max volumes\r" << std::flush;
   auto minmax(minmax_vol(tf));
@@ -68,7 +109,12 @@ bool trading_data::normalize_volume(unsigned tf)
   std::cout << "  Scaling                \r" << std::flush;
   const double delta(minmax.second - minmax.first);
   for (auto &tip : trading[tf])
+  {
     tip.volume = (tip.volume - minmax.first) / delta;
+
+    assert(0.0 <= tip.volume);
+    assert(tip.volume <= 1.0);
+  }
 
   return true;
 }
@@ -77,43 +123,45 @@ bool trading_data::compute_longer_timeframes()
 {
   std::cout << "COMPUTING RESUMES FOR LONGER TIMEFRAMES\n";
 
-  normalize_volume(0);
-
-  for (unsigned tf(1); tf < sup_tf; ++tf)
+  for (timeframe tf(short_tf); tf < long_tf; tf = longer(tf))
   {
-    double frame_high(high(tf - 1, 0)), frame_low(low(tf - 1, 0));
+    double frame_high(high(tf, 0)), frame_low(low(tf, 0));
     double frame_volume(0.0);
 
-    const unsigned ratio(tf_duration[tf] / tf_duration[tf -1]);
-    unsigned begin(0), end(ratio);
-    for (unsigned i(0); i < bars(tf - 1); ++i)
+    const auto ratio(static_cast<std::size_t>(tf_duration[longer(tf)].count() /
+                                              tf_duration[tf].count()));
+    std::size_t begin(0), end(ratio);
+    for (std::size_t i(0); i < bars(tf); ++i)
     {
-      if (i == end || i + 1 == bars(tf - 1))
+      if (i == end || i + 1 == bars(tf))
       {
-        trading[tf].emplace_back(open(tf - 1, begin), frame_high, frame_low,
-                                 close(tf - 1, i - 1), frame_volume);
+        trading[longer(tf)].emplace_back(open(tf, begin), frame_high,
+                                         frame_low, close(tf, i - 1),
+                                         frame_volume);
 
-        frame_high = high(tf - 1, i);
-        frame_low = low(tf - 1, i);
+        frame_high = high(tf, i);
+        frame_low = low(tf, i);
         frame_volume = 0.0;
 
         begin = end;
         end += ratio;
       }
 
-      frame_high = std::max(high(tf - 1, i), frame_high);
-      frame_low = std::min(low(tf - 1, i), frame_low);
-      frame_volume += volume(tf - 1, i);
+      frame_high = std::max(high(tf, i), frame_high);
+      frame_low = std::min(low(tf, i), frame_low);
+      frame_volume += volume(tf, i);
     }
 
-    normalize_volume(tf);
-    std::cout << "  Timeframe " << tf << " computed (" << bars(tf)
-              << " examples)\n";
+    std::cout << "  " << tf_name[longer(tf)] << " timeframe computed ("
+              << bars(longer(tf)) << " examples)\n";
   }
 
+  for (timeframe tf(short_tf); tf < sup_tf; tf = longer(tf))
+    normalize_volume(tf);
+
 #if !defined(NDEBUG)
-  auto minmax(minmax_vol(0));
-  for (unsigned tf(1); tf < sup_tf; ++tf)
+  auto minmax(minmax_vol(short_tf));
+  for (timeframe tf(medium_tf); tf < sup_tf; tf = longer(tf))
   {
     auto mm(minmax_vol(tf));
     assert(minmax == mm);
@@ -147,20 +195,25 @@ bool trading_data::load_data(const std::string &filename)
   };
 
   unsigned i(0);
+  std::tm p[2];
   for (auto record : csv_parser(from).filter_hook(csv_filter))
   {
-    trading[0].emplace_back(std::stod(record[  f_open]),
-                            std::stod(record[  f_high]),
-                            std::stod(record[   f_low]),
-                            std::stod(record[ f_close]),
-                            std::stod(record[f_volume]));
+    trading[short_tf].emplace_back(std::stod(record[  f_open]),
+                                   std::stod(record[  f_high]),
+                                   std::stod(record[   f_low]),
+                                   std::stod(record[ f_close]),
+                                   std::stod(record[f_volume]));
+
+    if (i < 2)
+      p[i] = string_to_timepoint(record[f_timestamp]);
 
     if (++i % 100000 == 0)
       std::cout << "  " << i << '\r' << std::flush;
   }
   std::cout << "  " << i << " examples read\n";
 
-  if (!compute_longer_timeframes())
+  if (!set_timeframe_duration(p[0], p[1]) ||
+      !compute_longer_timeframes())
     return false;
 
   return debug();
@@ -170,17 +223,17 @@ bool trading_data::debug() const
 {
   bool ret(true);
 
-  double prev(open(0, 0));
-  for (unsigned i(1); i < bars(); ++i)
+  double prev(open(short_tf, 0));
+  for (std::size_t i(1); i < bars(); ++i)
   {
-    if (std::fabs(prev - open(0, i)) > 0.1)
+    if (std::fabs(prev - open(short_tf, i)) > 0.1)
     {
       std::cerr << "Open(" << i - 1 << ") - Open(" << i << ") = "
-                << (prev - open(0, i)) << "\n";
+                << (prev - open(short_tf, i)) << "\n";
       ret = false;
     }
 
-    prev = open(0, i);
+    prev = open(short_tf, i);
   }
 
   return ret;
