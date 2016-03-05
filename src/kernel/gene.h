@@ -23,9 +23,9 @@
 namespace vita
 {
 ///
-/// \brief A gene is a unit of heredity in a living organism
+/// \brief A gene is a unit of heredity in a living organism.
 ///
-/// \tparam K the maximum `function`'s number of arguments
+/// \tparam K the maximum `function`'s number of arguments.
 ///
 /// The class `gene` is the building block of a `i_mep` individual.
 ///

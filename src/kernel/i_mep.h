@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ public:
   i_mep() : individual(), genome_(), best_(locus::npos()) {}
 
   explicit i_mep(const environment &);
-  i_mep(const environment &, const std::vector<gene> &);
+  explicit i_mep(const std::vector<gene> &);
 
   // Visualization/output methods
   std::ostream &dump(std::ostream &) const;

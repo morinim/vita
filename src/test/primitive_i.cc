@@ -3,7 +3,7 @@
  *  \file test_primitive_i.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -33,19 +33,17 @@ BOOST_AUTO_TEST_CASE(ADD)
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
 
-  const i_mep i1(env,
-                 {
-                   {{i_add, {1, 2}}},  // [0] ADD 1,2
-                   {{   c0,   null}},  // [1] 0
-                   {{    x,   null}}   // [2] X
+  const i_mep i1({
+                  {{i_add, {1, 2}}},  // [0] ADD 1,2
+                  {{   c0,   null}},  // [1] 0
+                  {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i1).run();
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
                         "\n" << i1);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
-  const i_mep i2(env,
-                 {
+  const i_mep i2({
                    {{i_add, {1, 2}}},  // [0] ADD 1,2
                    {{    y,   null}},  // [1] Y
                    {{    x,   null}}   // [2] X
@@ -55,8 +53,7 @@ BOOST_AUTO_TEST_CASE(ADD)
                         any_cast<int>(x->eval(nullptr)), "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
-  const i_mep i3(env,
-                 {
+  const i_mep i3({
                    {{i_add, {1, 2}}},  // [0] ADD 1,2
                    {{    x,   null}},  // [1] X
                    {{neg_x,   null}}   // [2] -X
@@ -65,8 +62,7 @@ BOOST_AUTO_TEST_CASE(ADD)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i3);
 
   BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
-  const i_mep i4(env,
-                 {
+  const i_mep i4({
                    {{i_sub, {1, 2}}},  // [0] SUB 1,2
                    {{i_add, {3, 4}}},  // [1] ADD 3,4
                    {{i_add, {4, 3}}},  // [2] ADD 4,3
@@ -83,8 +79,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   using i_interp = vita::interpreter<vita::i_mep>;
 
   BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
-  const i_mep i1(env,
-                 {
+  const i_mep i1({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
@@ -93,8 +88,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i1);
 
   BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
-  const i_mep i2(env,
-                 {
+  const i_mep i2({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
@@ -104,8 +98,7 @@ BOOST_AUTO_TEST_CASE(DIV)
                         "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
-  const i_mep i3(env,
-                 {
+  const i_mep i3({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{neg_x,   null}},  // [1] -X
                    {{    x,   null}}   // [2] X
@@ -114,8 +107,7 @@ BOOST_AUTO_TEST_CASE(DIV)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == -1, "\n" << i3);
 
   BOOST_TEST_CHECKPOINT("DIV(X,0) == X");
-  const i_mep i4(env,
-                 {
+  const i_mep i4({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
@@ -131,8 +123,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   using i_interp = vita::interpreter<vita::i_mep>;
 
   BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
-  const i_mep i1(env,
-                 {
+  const i_mep i1({
                    {{i_ife, {1, 1, 2, 1}}},  // [0] IFE 1,1,2,1
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
@@ -141,8 +132,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i1);
 
   BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
-  const i_mep i2(env,
-                 {
+  const i_mep i2({
                    {{i_ife, {1, 2, 2, 1}}},  // [0] IFE 1,2,2,1
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
@@ -151,8 +141,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
-  const i_mep i3(env,
-                 {
+  const i_mep i3({
                    {{i_ife, {1, 2, 3, 4}}},  // [0] IFE Z, X, 1, 0
                    {{    z,         null}},  // [1] Z
                    {{    x,         null}},  // [2] X
@@ -174,8 +163,7 @@ BOOST_AUTO_TEST_CASE(IFE)
   BOOST_REQUIRE_EQUAL(penalty, 0);
 
   BOOST_TEST_CHECKPOINT("IFE SAME RESULT PENALTY");
-  const i_mep i4(env,
-                 {
+  const i_mep i4({
                    {{i_ife, {1, 2, 2, 2}}},  // [0] IFE 1,2,2,2
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
@@ -190,8 +178,7 @@ BOOST_AUTO_TEST_CASE(MUL)
   using i_interp = vita::interpreter<vita::i_mep>;
 
   BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
-  const i_mep i1(env,
-                 {
+  const i_mep i1({
                    {{i_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
@@ -200,8 +187,7 @@ BOOST_AUTO_TEST_CASE(MUL)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i1);
 
   BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
-  const i_mep i2(env,
-                 {
+  const i_mep i2({
                    {{i_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
@@ -211,8 +197,7 @@ BOOST_AUTO_TEST_CASE(MUL)
                         "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
-  const i_mep i3(env,
-                 {
+  const i_mep i3({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{i_add, {3, 3}}},  // [1] ADD 3, 3
                    {{i_mul, {3, 4}}},  // [2] MUL 3, 4
@@ -229,8 +214,7 @@ BOOST_AUTO_TEST_CASE(SUB)
   using i_interp = vita::interpreter<vita::i_mep>;
 
   BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
-  const i_mep i1(env,
-                 {
+  const i_mep i1({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
@@ -239,8 +223,7 @@ BOOST_AUTO_TEST_CASE(SUB)
   BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i1);
 
   BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
-  const i_mep i2(env,
-                 {
+  const i_mep i2({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
@@ -250,8 +233,7 @@ BOOST_AUTO_TEST_CASE(SUB)
                         "\n" << i2);
 
   BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
-  const i_mep i3(env,
-                 {
+  const i_mep i3({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    z,   null}},  // [1] Z
                    {{    x,   null}}   // [2] X

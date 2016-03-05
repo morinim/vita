@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -203,8 +203,7 @@ BOOST_AUTO_TEST_CASE(t_blocks)
 
 BOOST_AUTO_TEST_CASE(t_output)
 {
-  vita::i_mep i(env,
-                {
+  vita::i_mep i({
                   {{f_sub, {1, 2}}},  // [0] SUB 1,2
                   {{f_add, {3, 4}}},  // [1] ADD 3,4
                   {{f_add, {4, 3}}},  // [2] ADD 4,3

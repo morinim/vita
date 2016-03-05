@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,16 +56,21 @@ i_mep::i_mep(const environment &e)
 }
 
 ///
-/// \param[in] e base environment.
 /// \param[in] gv vector of genes.
 ///
-/// Create a new individual obtained containing the genes of `gv`.
+/// Create a new individual containing the genes of `gv`.
 /// This is useful for debugging purpouse (i.e. setup ad-hoc individuals).
 ///
-i_mep::i_mep(const environment &e, const std::vector<gene> &gv) : i_mep(e)
+i_mep::i_mep(const std::vector<gene> &gv)
+  : individual(),
+    genome_(gv.size(),
+            std::max_element(gv.begin(), gv.end(),
+                             [](gene g1, gene g2)
+                             {
+                               return g1.sym->category() < g2.sym->category();
+                             })->sym->category() + 1),
+    best_{0, 0}
 {
-  assert(e.sset);
-
   index_t i(0);
   for (const auto &g : gv)
     set({i++, g.sym->category()}, g);
