@@ -11,27 +11,29 @@
 
 #include "trade_simulator.h"
 
+trade_simulator::trade_simulator(const trading_data &data)
+  : td_(&data), order_(), spread_(0.0001), balance_(0.0), cur_bar_(1),
+    orders_history_total_(0)
+{
+}
+
 void trade_simulator::clear_status()
 {
-  order_ = order();
-  spread_ = 0.0001;  // 1 pip
-  balance_ = 0.0;
-  cur_bar_ = 1;
-  orders_history_total_ = 0;
+  *this = trade_simulator(*td_);
 }
 
 // A lot is the basic trade size. It translates to 100000 units of the base
 // currency (the currency on the left of the currancy pair).
 // Also used are mini lot (10000 units) and micro lots (1000 units).
-bool trade_simulator::order_send(int type, double lots)
+bool trade_simulator::order_send(o_type type, double lots)
 {
-  assert(type == order::buy || type == order::sell);
+  assert(type == o_type::buy || type == o_type::sell);
   assert(lots >= 0.01);
 
   double open_price;
 
   const double amount(lots * 100000.0);
-  if (type == order::buy)  // buying base currency
+  if (type == o_type::buy)  // buying base currency
   {
     open_price = ask();
     balance_ -= amount * ask();
@@ -50,9 +52,9 @@ bool trade_simulator::order_send(int type, double lots)
 
 bool trade_simulator::order_close()
 {
-  assert(order_.type() != order::na);
+  assert(order_.type() != o_type::na);
 
-  if (order_.type() == order::buy)
+  if (order_.type() == o_type::buy)
     // Having bought base currency, we now want back counter currency.
     balance_ += order_amount() * bid();
   else
@@ -90,9 +92,9 @@ double trade_simulator::order_profit() const
 {
   switch (order_.type())
   {
-  case order::buy:   return order_amount() * (bid() - order_open_price());
-  case order::sell:  return order_amount() * (order_open_price() - ask());
-  default:           return 0.0;
+  case o_type::buy:   return order_amount() * (bid() - order_open_price());
+  case o_type::sell:  return order_amount() * (order_open_price() - ask());
+  default:             return 0.0;
   }
 }
 
@@ -103,13 +105,13 @@ double trade_simulator::run(const T &prg)
 
   clear_status();
 
-  const auto bars(td_.bars(short_tf) - 1);
+  const auto bars(td_->bars(short_tf) - 1);
 
   while (cur_bar_ < bars)
   {
     const auto type(order_.type());
 
-    if (type == order::na)
+    if (type == o_type::na)
     {
       bool signal[2];
       for (unsigned i(0); i < 2; ++i)
@@ -121,13 +123,13 @@ double trade_simulator::run(const T &prg)
       }
 
       if (signal[id_buy] && !signal[id_sell])
-        order_send(order::buy, 0.01);
+        order_send(o_type::buy, 0.01);
       else if (signal[id_sell] && !signal[id_buy])
-        order_send(order::sell, 0.01);
+        order_send(o_type::sell, 0.01);
     }
     else   // short/long position
     {
-      vita::interpreter<vita::i_mep> intr(&prg[type == order::buy ?
+      vita::interpreter<vita::i_mep> intr(&prg[type == o_type::buy ?
                                                id_sell : id_buy]);
       auto a(intr.run());
       const bool v(!a.empty() && vita::any_cast<bool>(a));
@@ -176,7 +178,7 @@ double trade_simulator::run(const T &prg)
 
   assert(cur_bar_ <= bars);
 
-  if (order_type() != order::na)
+  if (order_type() != o_type::na)
     order_close();
 
   //std::cout << "BALANCE: " << balance_ << " (" << orders_history_total()
