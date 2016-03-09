@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,7 +45,8 @@ public:
   using reference = typename values_t::reference;
   using const_reference = typename values_t::const_reference;
 
-  explicit matrix(unsigned = 0, unsigned = 0);
+  explicit matrix() : matrix(0, 0) {}
+  explicit matrix(unsigned, unsigned);
 
   const_reference operator()(const locus &) const;
   reference operator()(const locus &);
