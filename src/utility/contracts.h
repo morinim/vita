@@ -1,0 +1,76 @@
+/**
+ *  \file
+ *  \remark This file is part of VITA.
+ *
+ *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *
+ *  \license
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ *  You can obtain one at http://mozilla.org/MPL/2.0/
+ */
+
+#if !defined(VITA_CONTRACTS_H)
+#define      VITA_CONTRACTS_H
+
+#include <cassert>
+
+namespace vita
+{
+
+namespace detail
+{
+
+template<class Func>
+class call_on_destructor
+{
+public:
+  call_on_destructor(Func f) : function_(f) {}
+  ~call_on_destructor() { function_(); }
+
+private:
+  Func function_;
+};
+
+template<class Func>
+inline call_on_destructor<Func> make_call_on_destructor(Func f)
+{
+  return call_on_destructor<Func>(f);
+}
+
+#ifndef VITA_UN
+#  define VITA_CONCAT(a, b, c) a##b##c
+#  define VITA_UN VITA_CONCAT(vita_concepts_uname_, __FILE__, __LINE__)
+#endif
+
+}  // namespace detail
+
+#if defined(NDEBUG)
+#  define Expects(expression)
+#  define Ensures(expression)
+#else
+
+/// Preconditions can be stated in many ways, including comments, `if`
+/// statements and `assert()`. This can make them hard to distinguish from
+/// ordinary code, hard to update, hard to manipulate by tools.
+/// \see C++ Core Guidelines I.6 <https://github.com/isocpp/CppCoreGuidelines/>
+#define Expects(expression)  assert(expression)
+
+/// Postconditions are often informally stated in a comment that states the
+/// purpose of a function; `Ensures()` can be used to make this more
+/// systematic, visible and checkable.
+/// Postconditions are especially important when they relate to something that
+/// isn't directly reflected in a returned result, such as a state of a data
+/// structure used.
+/// \note
+/// Postconditions of the form "this resource must be released" are best
+/// expressed by RAII.
+/// \see C++ Core Guidelines I.7 <https://github.com/isocpp/CppCoreGuidelines/>
+#define Ensures(expression) \
+  auto VITA_UN(detail::make_call_on_destructor([&]() { assert(expression); }))
+
+#endif  // !defined(NDEBUG)
+
+}  // namespace vita
+
+#endif  // include guard

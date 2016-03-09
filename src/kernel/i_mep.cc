@@ -32,12 +32,13 @@ namespace vita
 i_mep::i_mep(const environment &e)
   : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0}
 {
-  assert(e.sset);
+  Expects(e.sset);
+  Expects(size());
+  Expects(e.patch_length);
+  Expects(size() > e.patch_length);
+  Expects(categories());
 
-  assert(size());
-  assert(e.patch_length);
-  assert(size() > e.patch_length);
-  assert(categories());
+  Ensures(debug());
 
   const index_t i_sup(size()), patch(i_sup - e.patch_length);
   const category_t c_sup(categories());
@@ -51,8 +52,6 @@ i_mep::i_mep(const environment &e)
   for (index_t i(patch); i < i_sup; ++i)
     for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(e.sset->roulette_terminal(c));
-
-  assert(debug());
 }
 
 ///
@@ -63,7 +62,7 @@ i_mep::i_mep(const environment &e)
 ///
 i_mep::i_mep(const std::vector<gene> &gv)
   : individual(),
-    genome_(gv.size(),
+    genome_(static_cast<unsigned>(gv.size()),
             std::max_element(gv.begin(), gv.end(),
                              [](gene g1, gene g2)
                              {
