@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,6 @@
 
 #if !defined(VITA_GENE_TCC)
 #define      VITA_GENE_TCC
-
-template<unsigned K> constexpr decltype(K) basic_gene<K>::k_args;
 
 ///
 /// \param[in] t a terminal.
@@ -52,17 +50,16 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
   if (sym->parametric())
     par = sym->init();
   else
-  {
-    const auto arity(sym->arity());
-    for (auto i(decltype(arity){0}); i < arity; ++i)
-    {
-      using ARRAY_ELEM_TYPE =
-        typename std::remove_reference<decltype(args[0])>::type;
+    std::transform(g.second.begin(), g.second.end(), args.begin(),
+                   [](index_t i)
+                   {
+                     using ARRAY_ELEM_TYPE =
+                       typename std::remove_reference<decltype(args[0])>::type;
 
-      assert(g.second[i] <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
-      args[i] = static_cast<ARRAY_ELEM_TYPE>(g.second[i]);
-    }
-  }
+                     Ensures(i <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+
+                     return static_cast<ARRAY_ELEM_TYPE>(i);
+                   });
 }
 
 ///

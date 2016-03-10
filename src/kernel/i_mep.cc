@@ -38,8 +38,6 @@ i_mep::i_mep(const environment &e)
   Expects(size() > e.patch_length);
   Expects(categories());
 
-  Ensures(debug());
-
   const index_t i_sup(size()), patch(i_sup - e.patch_length);
   const category_t c_sup(categories());
 
@@ -52,6 +50,8 @@ i_mep::i_mep(const environment &e)
   for (index_t i(patch); i < i_sup; ++i)
     for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(e.sset->roulette_terminal(c));
+
+  Ensures(debug());
 }
 
 ///
@@ -63,7 +63,7 @@ i_mep::i_mep(const environment &e)
 i_mep::i_mep(const std::vector<gene> &gv)
   : individual(),
     genome_(static_cast<unsigned>(gv.size()),
-            std::max_element(gv.begin(), gv.end(),
+            std::max_element(std::begin(gv), std::end(gv),
                              [](gene g1, gene g2)
                              {
                                return g1.sym->category() < g2.sym->category();
@@ -259,7 +259,7 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   unsigned max_args, const symbol_set &sset) const
 {
-  assert(max_args && max_args <= gene::k_args);
+  Expects(max_args && max_args <= gene::k_args);
 
   std::vector<locus> terminals;
 
