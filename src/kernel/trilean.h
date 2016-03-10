@@ -37,17 +37,17 @@ namespace vita
 ///
 enum class trilean {unknown = -1, no, yes};
 
-inline std::ostream &operator<<(std::ostream &o, trilean v)
-{
-  return o << v;
-}
-
 inline std::istream &operator>>(std::iostream &i, trilean &v)
 {
   int tmp;
 
   if (i >> tmp)
-    v = (tmp == 0) ? trilean::no : tmp == 1 ? trilean::yes : trilean::unknown;
+    switch (tmp)
+    {
+    case 0:  v =      trilean::no; break;
+    case 1:  v =     trilean::yes; break;
+    default: v = trilean::unknown;
+    }
 
   return i;
 }
