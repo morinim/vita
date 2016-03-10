@@ -155,7 +155,7 @@ unsigned i_mep::mutation(double p, const symbol_set &sset)
       {
         ++n;
 
-        set({i, c}, gene(sset->roulette(c), i + 1, size()));
+        set({i, c}, gene(sset.roulette(c), i + 1, size()));
       }
 
   for (category_t c(0); c < c_sup; ++c)
@@ -163,7 +163,7 @@ unsigned i_mep::mutation(double p, const symbol_set &sset)
     {
       ++n;
 
-      set({sup, c}, gene(sset->roulette_terminal(c)));
+      set({sup, c}, gene(sset.roulette_terminal(c)));
     }
 */
 

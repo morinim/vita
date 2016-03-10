@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -107,8 +107,8 @@ void src_search<T, ES>::arl(const U &base)
     const auto adts(env.sset->adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const auto f(env.sset->get_adt(i));
-      adf_log << f->display() << ' ' << env.sset->weight(f) << '\n';
+      const auto &f(env.sset->get_adt(i));
+      adf_log << f.display() << ' ' << env.sset->weight(f) << '\n';
     }
     adf_log << '\n';
   }

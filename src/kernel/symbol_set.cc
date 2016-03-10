@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,12 +52,12 @@ symbol *symbol_set::arg(std::size_t n) const
 
 ///
 /// \param[in] i index of an ADT symbol.
-/// \return a pointer to the i-th ADT symbol.
+/// \return a reference to the i-th ADT symbol.
 ///
-symbol *symbol_set::get_adt(std::size_t i) const
+const symbol &symbol_set::get_adt(std::size_t i) const
 {
-  assert(i < adts());
-  return views_.back().adt[i].sym;
+  Expects(i < adts());
+  return *views_.back().adt[i].sym;
 }
 
 ///
@@ -114,7 +114,7 @@ void symbol_set::build_view()
 
   for (const auto &s : symbols_)
   {
-    const w_symbol ws(s.get(), weight(s.get()));
+    const w_symbol ws(s.get(), weight(*s));
     const category_t category(s->category());
 
     assert(category <= max_category);
@@ -168,31 +168,30 @@ void symbol_set::reset_adf_weights()
 /// \param[in] c a category.
 /// \return a random terminal of category `c`.
 ///
-terminal *symbol_set::roulette_terminal(category_t c) const
+const terminal &symbol_set::roulette_terminal(category_t c) const
 {
-  assert(c < categories());
+  Expects(c < categories());
 
-  return static_cast<terminal *>(views_[c].terminals.roulette());
-  //return random::element(views_[c].terminals);
+  return *static_cast<terminal *>(views_[c].terminals.roulette());
 }
 
 ///
 /// \param[in] c a category.
 /// \return a random symbol of category `c`.
 ///
-symbol *symbol_set::roulette(category_t c) const
+const symbol &symbol_set::roulette(category_t c) const
 {
-  assert(c < categories());
+  Expects(c < categories());
 
-  return views_[c].all.roulette();
+  return *views_[c].all.roulette();
 }
 
 ///
 /// \return a random symbol from the set of all symbols.
 ///
-symbol *symbol_set::roulette() const
+const symbol &symbol_set::roulette() const
 {
-  return views_.back().all.roulette();
+  return *views_.back().all.roulette();
 }
 
 ///
@@ -283,11 +282,9 @@ bool symbol_set::enough_terminals() const
 /// \param[in] s a symbol
 /// \return the weight of `s`.
 ///
-unsigned symbol_set::weight(const symbol *s) const
+unsigned symbol_set::weight(const symbol &s) const
 {
-  assert(s);
-
-  const auto v(weights_.find(s));
+  const auto v(weights_.find(&s));
   if (v == weights_.end())
     return 0;
 
@@ -462,7 +459,7 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 ///
 symbol *symbol_set::collection::sum_container::roulette() const
 {
-  assert(sum());
+  Expects(sum());
 
   const auto slot(random::sup(sum()));
 
@@ -507,7 +504,7 @@ symbol *symbol_set::collection::sum_container::roulette() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check
+/// \return `true` if the object passes the internal consistency check.
 ///
 bool symbol_set::collection::sum_container::debug() const
 {

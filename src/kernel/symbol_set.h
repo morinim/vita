@@ -41,13 +41,13 @@ public:
 
   symbol *insert(std::unique_ptr<symbol>, double = 1.0);
 
-  symbol *roulette() const;
-  symbol *roulette(category_t) const;
-  terminal *roulette_terminal(category_t) const;
+  const symbol &roulette() const;
+  const symbol &roulette(category_t) const;
+  const terminal &roulette_terminal(category_t) const;
 
   symbol *arg(std::size_t) const;
 
-  symbol *get_adt(std::size_t) const;
+  const symbol &get_adt(std::size_t) const;
   std::size_t adts() const;
   void reset_adf_weights();
 
@@ -57,7 +57,7 @@ public:
   unsigned categories() const;
   unsigned terminals(category_t) const;
 
-  unsigned weight(const symbol *) const;
+  unsigned weight(const symbol &) const;
 
   bool enough_terminals() const;
   bool debug() const;

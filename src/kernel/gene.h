@@ -34,9 +34,9 @@ class basic_gene
 {
 public:
   basic_gene() {}
-  explicit basic_gene(terminal *);
+  explicit basic_gene(const terminal &);
   basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
-  basic_gene(symbol *, index_t, index_t);
+  basic_gene(const symbol &, index_t, index_t);
 
   locus arg_locus(unsigned) const;
 
@@ -48,8 +48,8 @@ public:
 
   // Public data members
   const symbol *sym;
-  param_type  par;
-  arg_pack   args;
+  param_type    par;
+  arg_pack     args;
 };
 
 template<unsigned K>

@@ -26,10 +26,10 @@
 /// This is usually called for filling the patch section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(terminal *t) : sym(t), args(t->arity())
+basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(t.arity())
 {
-  if (sym->parametric())
-    par = sym->init();
+  if (t.parametric())
+    par = t.init();
 }
 
 ///
@@ -56,7 +56,7 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
                      using ARRAY_ELEM_TYPE =
                        typename std::remove_reference<decltype(args[0])>::type;
 
-                     Ensures(i <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
+                     assert(i <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
 
                      return static_cast<ARRAY_ELEM_TYPE>(i);
                    });
@@ -73,16 +73,16 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
 /// This is usually called for filling the standard section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup)
-  : sym(s), args(s->arity())
+basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
+  : sym(&s), args(s.arity())
 {
-  assert(from < sup);
+  Expects(from < sup);
 
-  if (sym->parametric())
-    par = sym->init();
+  if (s.parametric())
+    par = s.init();
   else
   {
-    const auto arity(sym->arity());
+    const auto arity(s.arity());
     for (auto i(decltype(arity){0}); i < arity; ++i)
     {
       using ARRAY_ELEM_TYPE =
@@ -100,7 +100,7 @@ basic_gene<K>::basic_gene(symbol *s, index_t from, index_t sup)
 template<unsigned K>
 locus basic_gene<K>::arg_locus(unsigned i) const
 {
-  assert(i < sym->arity());
+  Expects(i < sym->arity());
 
   return {args[i], function::cast(sym)->arg_category(i)};
 }
