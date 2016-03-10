@@ -38,9 +38,6 @@ public:
   basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
   basic_gene(symbol *, index_t, index_t);
 
-  bool operator==(const basic_gene &) const;
-  bool operator!=(const basic_gene &g) const { return !(*this == g); }
-
   locus arg_locus(unsigned) const;
 
   // Types and constants
@@ -57,6 +54,12 @@ public:
 
 template<unsigned K>
 std::ostream &operator<<(std::ostream &, const basic_gene<K> &);
+
+template<unsigned K>
+bool operator==(const basic_gene<K> &, const basic_gene<K> &);
+template<unsigned K>
+bool operator!=(const basic_gene<K> &, const basic_gene<K> &);
+
 
 using gene = basic_gene<4>;
 

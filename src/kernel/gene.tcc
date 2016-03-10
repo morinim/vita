@@ -106,27 +106,34 @@ locus basic_gene<K>::arg_locus(unsigned i) const
 }
 
 ///
-/// \param[in] g second term of comparison.
-/// \return `true` if `*this == `g`
+/// \param[in] g1 first term of comparison.
+/// \param[in] g2 second term of comparison.
+/// \return `true` if `g1 == g2`
 ///
 template<unsigned K>
-bool basic_gene<K>::operator==(const basic_gene &g) const
+bool operator==(const basic_gene<K> &g1, const basic_gene<K> &g2)
 {
-  if (sym != g.sym)
+  if (g1.sym != g2.sym)
     return false;
 
-  if (sym->parametric())
+  if (g1.sym->parametric())
   {
-    assert(sym->terminal());
-    return almost_equal(par, g.par);
+    assert(g1.sym->terminal());
+    return almost_equal(g1.par, g2.par);
   }
 
-  const auto arity(sym->arity());
-  for (auto i(decltype(arity){0}); i < arity; ++i)
-    if (args[i] != g.args[i])
-      return false;
+  return std::equal(g1.args.begin(), g1.args.end(), g2.args.begin());
+}
 
-  return true;
+///
+/// \param[in] g1 first term of comparison.
+/// \param[in] g2 second term of comparison.
+/// \return `true` if `g1 != g2`
+///
+template<unsigned K>
+bool operator!=(const basic_gene<K> &g1, const basic_gene<K> &g2)
+{
+  return !(g1 == g2);
 }
 
 ///
