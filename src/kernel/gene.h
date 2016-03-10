@@ -47,7 +47,7 @@ public:
   enum : decltype(K) {k_args = K};
 
   // Public data members
-  symbol     *sym;
+  const symbol *sym;
   param_type  par;
   arg_pack   args;
 };
@@ -59,7 +59,6 @@ template<unsigned K>
 bool operator==(const basic_gene<K> &, const basic_gene<K> &);
 template<unsigned K>
 bool operator!=(const basic_gene<K> &, const basic_gene<K> &);
-
 
 using gene = basic_gene<4>;
 
