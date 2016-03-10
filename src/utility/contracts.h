@@ -18,41 +18,40 @@
 namespace vita
 {
 
-namespace detail
-{
+#if defined(VITA_CONCEPTS_THROW)
 
-template<class Func>
-class call_on_destructor
-{
-public:
-  call_on_destructor(Func f) : function_(f) {}
-  ~call_on_destructor() { function_(); }
+#include <exception>
+#include <stdexcept>
 
-private:
-  Func function_;
+#define VITA_CONCEPT_STRING(x) #x
+
+struct concept_fail : public std::runtime_error
+{
+  explicit concept_fail(const char message[]) : std::runtime_error(message) {}
 };
 
-template<class Func>
-inline call_on_destructor<Func> make_call_on_destructor(Func f)
-{
-  return call_on_destructor<Func>(f);
-}
+#define Expects(expression)                                        \
+  if (!(expression))                                               \
+    throw concept_fail("VITA: precondition failure at " __FILE__   \
+                       ": " VITA_CONCEPT_STRING(__LINE__));
 
-#ifndef VITA_UN
-#  define VITA_CONCAT(a, b, c) a##b##c
-#  define VITA_UN VITA_CONCAT(vita_concepts_uname_, __FILE__, __LINE__)
-#endif
+#define Ensures(expression)                                        \
+  if (!(expression))                                               \
+    throw concept_fail("VITA: postcondition failure at " __FILE__  \
+                       ": " VITA_CONCEPT_STRING(__LINE__));
 
-}  // namespace detail
+#elif defined(NDEBUG)
 
-#if defined(NDEBUG)
-#  define Expects(expression)
-#  define Ensures(expression)
+#define Expects(expression)
+#define Ensures(expression)
+
 #else
 
 /// Preconditions can be stated in many ways, including comments, `if`
 /// statements and `assert()`. This can make them hard to distinguish from
-/// ordinary code, hard to update, hard to manipulate by tools.
+/// ordinary code, hard to update, hard to manipulate by tools and may have
+/// the wrong semantics (do you always want to abort in debug mode and check
+/// nothing in productions runs?).
 /// \see C++ Core Guidelines I.6 <https://github.com/isocpp/CppCoreGuidelines/>
 #define Expects(expression)  assert(expression)
 
@@ -66,10 +65,9 @@ inline call_on_destructor<Func> make_call_on_destructor(Func f)
 /// Postconditions of the form "this resource must be released" are best
 /// expressed by RAII.
 /// \see C++ Core Guidelines I.7 <https://github.com/isocpp/CppCoreGuidelines/>
-#define Ensures(expression) \
-  auto VITA_UN(detail::make_call_on_destructor([&]() { assert(expression); }))
+#define Ensures(expression)  assert(expression)
 
-#endif  // !defined(NDEBUG)
+#endif
 
 }  // namespace vita
 

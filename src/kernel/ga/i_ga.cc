@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,7 +31,6 @@ i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
   assert(parameters());
 
   const auto cs(parameters());
-  assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
     genome_[c] = gene(e.sset->roulette_terminal(c));

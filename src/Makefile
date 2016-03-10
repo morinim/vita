@@ -18,6 +18,8 @@ CXX := g++
 # -DTWO_POINT_CROSSOVER (default)
 #
 # -DUSE_BOOST_ANY
+#
+# -DVITA_CONCEPTS_THROW
 DEFS :=
 
 
