@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -83,7 +83,7 @@ public:
 
   const_iterator begin() const;
   const_iterator end() const;
-  unsigned size() const;
+  category_t size() const;
 
   category find(const std::string &) const;
   category find(category_t) const;

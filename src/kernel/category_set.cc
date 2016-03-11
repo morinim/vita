@@ -58,8 +58,8 @@ category_set::const_iterator category_set::end() const
 /// \return number of categories.
 ///
 /// \attention
-/// please note that the value categories() returns may differ from the
-/// intuitive number of categories of the dataset (it can be 1 unit smaller).
+/// please note that the value size() returns may differ from the intuitive
+/// number of categories of the dataset (it can be 1 unit smaller).
 /// For instance consider the simple Iris classification problem:
 ///
 ///     ...
@@ -79,9 +79,9 @@ category_set::const_iterator category_set::end() const
 /// we use (based on a discriminant function) doesn't manipulate (skips) the
 /// output category (it only uses the number of output classes).
 ///
-unsigned category_set::size() const
+category_t category_set::size() const
 {
-  return static_cast<unsigned>(categories_.size());
+  return static_cast<category_t>(categories_.size());
 }
 
 ///

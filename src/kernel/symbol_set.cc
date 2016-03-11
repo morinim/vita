@@ -42,12 +42,12 @@ void symbol_set::clear()
 
 ///
 /// \param[in] n index of an argument symbol.
-/// \return a pointer to the n-th argument symbol.
+/// \return a reference to the n-th `argument` symbol.
 ///
-symbol *symbol_set::arg(std::size_t n) const
+const symbol &symbol_set::arg(std::size_t n) const
 {
-  assert(n < gene::k_args);
-  return arguments_[n].get();
+  Expects(n < gene::k_args);
+  return *arguments_[n];
 }
 
 ///
@@ -79,9 +79,9 @@ std::size_t symbol_set::adts() const
 ///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
-  assert(s);
-  assert(s->debug());
-  assert(wr >= 0.0);
+  Expects(s);
+  Expects(s->debug());
+  Expects(wr >= 0.0);
 
   const auto w(static_cast<unsigned>(wr * w_symbol::base_weight));
   const w_symbol ws(s.get(), w);
@@ -97,20 +97,23 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 }
 
 ///
-/// Compiles the `views_` array.
+/// \brief Compiles the `views_` array.
 ///
 void symbol_set::build_view()
 {
-  unsigned max_category(0);
-  for (const auto &s : symbols_)
-    if (s->category() > max_category)
-      max_category = s->category();
+  const category_t max_category(
+    std::max_element(symbols_.begin(), symbols_.end(),
+                     [](const std::unique_ptr<symbol> &s1,
+                        const std::unique_ptr<symbol> &s2)
+                     {
+                       return s1->category() < s2->category();
+                     })->get()->category());
 
   views_.clear();
   views_.resize(max_category + 2);
-  for (unsigned i(0); i <= max_category; ++i)
+  for (category_t i(0); i <= max_category; ++i)
     views_[i] = collection("Collection " + std::to_string(i));
-  views_.back() = collection("Colletion ALL");
+  views_.back() = collection("Collection ALL");
 
   for (const auto &s : symbols_)
   {
@@ -172,7 +175,7 @@ const terminal &symbol_set::roulette_terminal(category_t c) const
 {
   Expects(c < categories());
 
-  return *static_cast<terminal *>(views_[c].terminals.roulette());
+  return static_cast<const terminal &>(views_[c].terminals.roulette());
 }
 
 ///
@@ -183,7 +186,7 @@ const symbol &symbol_set::roulette(category_t c) const
 {
   Expects(c < categories());
 
-  return *views_[c].all.roulette();
+  return views_[c].all.roulette();
 }
 
 ///
@@ -191,7 +194,7 @@ const symbol &symbol_set::roulette(category_t c) const
 ///
 const symbol &symbol_set::roulette() const
 {
-  return *views_.back().all.roulette();
+  return views_.back().all.roulette();
 }
 
 ///
@@ -231,14 +234,14 @@ symbol *symbol_set::decode(const std::string &dex) const
 ///
 /// \return number of categories in the symbol set (>= 1).
 ///
-/// See also data::categories().
+/// See also category_set::size().
 ///
-unsigned symbol_set::categories() const
+category_t symbol_set::categories() const
 {
   const auto size(views_.size());
 
   assert(size != 1);
-  return static_cast<unsigned>(size ? size - 1 : size);
+  return static_cast<category_t>(size ? size - 1 : size);
 }
 
 ///
@@ -247,7 +250,7 @@ unsigned symbol_set::categories() const
 ///
 unsigned symbol_set::terminals(category_t c) const
 {
-  assert(c < categories());
+  Expects(c < categories());
   return static_cast<unsigned>(views_[c].terminals.size());
 }
 
@@ -457,7 +460,7 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 ///
 /// Anyway we choose the "roulette algorithm" because it's very simple.
 ///
-symbol *symbol_set::collection::sum_container::roulette() const
+const symbol &symbol_set::collection::sum_container::roulette() const
 {
   Expects(sum());
 
@@ -470,7 +473,7 @@ symbol *symbol_set::collection::sum_container::roulette() const
   {}
 
   assert(i < elems_.size());
-  return elems_[i].sym;
+  return *elems_[i].sym;
 
   // The so called roulette-wheel selection via stochastic acceptance:
   //
@@ -479,7 +482,7 @@ symbol *symbol_set::collection::sum_container::roulette() const
   //   const symbol *s(random::element(elems));
   //
   //   if (random::sup(max) < s->weight)
-  //     return s;
+  //     return *s;
   // }
   //
   // Internal tests have proved this is slower for Vita.
@@ -496,7 +499,7 @@ symbol *symbol_set::collection::sum_container::roulette() const
   //       if (random::sup(total + 1) < elems[i].weight)
   //         winner = i;
   //     }
-  //     return elems[winner].sym;
+  //     return *elems[winner].sym;
   //
   // The interesting property of this algorithm is that you don't need to
   // know the sum of weights in advance in order to use it. The method is

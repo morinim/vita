@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,14 +21,14 @@
 namespace vita
 {
 ///
-/// \brief A container for the symbols used by the GP engine
+/// \brief A container for the symbols used by the GP engine.
 ///
 /// Symbols are stored to be quickly recalled by category and randomly
 /// selected.
 ///
 /// \note
 /// The functions and terminals used should be powerful enough to be able to
-/// represent a solution to the problem. On the other hand, it is better not
+/// represent a solution to the problem. On the other hand, it's better not
 /// to use a symbol set too large (this enlarges the search space and makes
 /// harder the search for a solution).
 ///
@@ -45,7 +45,7 @@ public:
   const symbol &roulette(category_t) const;
   const terminal &roulette_terminal(category_t) const;
 
-  symbol *arg(std::size_t) const;
+  const symbol &arg(std::size_t) const;
 
   const symbol &get_adt(std::size_t) const;
   std::size_t adts() const;
@@ -54,7 +54,7 @@ public:
   symbol *decode(opcode_t) const;
   symbol *decode(const std::string &) const;
 
-  unsigned categories() const;
+  category_t categories() const;
   unsigned terminals(category_t) const;
 
   unsigned weight(const symbol &) const;
@@ -71,8 +71,8 @@ private:
   // * is not present in the `collection` struct because an argument isn't
   //   bounded to a category (see `argument` class for more details);
   // * is not a subset of `symbols_` (the intersection of `arguments_` and
-  //   symbol_ is an empty set) because arguments aren't returned by the
-  //   roulette functions .
+  //   `symbol_` is empty) because arguments aren't returned by the roulette
+  //   functions.
   std::vector<std::unique_ptr<symbol>> arguments_;
 
   // This is the real, raw repository of symbols (it owns/stores the symbols).
@@ -83,7 +83,7 @@ private:
 
   struct w_symbol
   {
-    w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { assert(s); }
+    w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { Expects(s); }
 
     bool operator==(w_symbol rhs) const
     {return sym == rhs.sym && weight == rhs.weight; }
@@ -91,11 +91,11 @@ private:
     symbol *sym;
 
     /// Weight is used by the symbol_set::roulette method to control the
-    /// probability of selection for the symbol.
+    /// probability of selection.
     unsigned weight;
 
     /// This is the default weight.
-    static constexpr decltype(weight) base_weight{100};
+    enum : decltype(weight) {base_weight = 100};
   };
 
   // A collection is a structured-view on `symbols_` or on a subset of
@@ -113,7 +113,7 @@ private:
       explicit sum_container(std::string n)
         : elems_(), sum_(0), name_(std::move(n))
       {
-        assert(!name_.empty());
+        Expects(!name_.empty());
       }
 
       void insert(const w_symbol &);
@@ -130,7 +130,7 @@ private:
 
       unsigned sum() const { return sum_; }
 
-      symbol *roulette() const;
+      const symbol &roulette() const;
 
       bool debug() const;
 
@@ -159,7 +159,6 @@ private:
   // The last element of the vector contains the category-agnostic view of
   // symbols:
   // - views_.back().all.size() is equal to the total number of symbols
-  // while:
   // - views_[0].all.size() is the number of symbols in category `0`
   std::vector<collection> views_;
 };

@@ -285,10 +285,10 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   // Step 3: randomly substitute n terminals with function arguments.
   i_mep ret(*this);
   for (auto j(decltype(n){0}); j < n; ++j)
-    ret.genome_(terminals[j]).sym = sset.arg(j);
+    ret.genome_(terminals[j]).sym = &sset.arg(j);
   ret.signature_.clear();
 
-  assert(ret.debug());
+  Ensures(ret.debug());
 
   return {ret, std::vector<locus>(terminals.begin(), terminals.begin() + n)};
 }
