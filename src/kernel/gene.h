@@ -42,7 +42,8 @@ public:
 
   // Types and constants
   using param_type = double;
-  using arg_pack = small_vector<std::uint16_t, K>;
+  using index_type = std::uint16_t;
+  using arg_pack = small_vector<index_type, K>;
 
   enum : decltype(K) {k_args = K};
 

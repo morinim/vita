@@ -53,12 +53,9 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
     std::transform(g.second.begin(), g.second.end(), args.begin(),
                    [](index_t i)
                    {
-                     using ARRAY_ELEM_TYPE =
-                       typename std::remove_reference<decltype(args[0])>::type;
+                     assert(i <= std::numeric_limits<index_type>::max());
 
-                     assert(i <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
-
-                     return static_cast<ARRAY_ELEM_TYPE>(i);
+                     return static_cast<index_type>(i);
                    });
 }
 
@@ -82,14 +79,13 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
     par = s.init();
   else
   {
-    const auto arity(s.arity());
-    for (auto i(decltype(arity){0}); i < arity; ++i)
-    {
-      using ARRAY_ELEM_TYPE =
-        typename std::remove_reference<decltype(args[0])>::type;
-      assert(sup <= std::numeric_limits<ARRAY_ELEM_TYPE>::max());
-      args[i] = static_cast<ARRAY_ELEM_TYPE>(random::between(from, sup));
-    }
+    assert(sup <= std::numeric_limits<index_type>::max());
+
+    std::generate(args.begin(), args.end(),
+                  [from, sup]()
+                  {
+                    return static_cast<index_type>(random::between(from, sup));
+                  });
   }
 }
 
@@ -147,4 +143,4 @@ std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
   return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
 }
 
-#endif  // Include guard
+#endif  // include guard
