@@ -16,10 +16,10 @@
 #include <type_traits>
 
 #include "kernel/data.h"
-#include "kernel/matrix.h"
 #include "kernel/src/interpreter.h"
 #include "kernel/src/model_metric.h"
 #include "kernel/team.h"
+#include "utility/matrix.h"
 #include "utility/utility.h"
 
 #include "kernel/detail/lambda_f.h"

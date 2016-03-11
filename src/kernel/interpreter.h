@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,8 @@
 #include "kernel/core_interpreter.h"
 #include "kernel/function.h"
 #include "kernel/gene.h"
-#include "kernel/matrix.h"
 #include "kernel/vitafwd.h"
+#include "utility/matrix.h"
 
 namespace vita
 {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/matrix.h"
 #include "kernel/random.h"
+#include "utility/matrix.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE Matrix

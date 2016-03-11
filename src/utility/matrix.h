@@ -84,7 +84,7 @@ private:  // Private data members
   unsigned cols_;
 };
 
-#include "kernel/matrix.tcc"
+#include "utility/matrix.tcc"
 }  // namespace vita
 
 #endif  // Include guard

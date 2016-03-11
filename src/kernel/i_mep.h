@@ -21,7 +21,7 @@
 #include "kernel/function.h"
 #include "kernel/gene.h"
 #include "kernel/individual.h"
-#include "kernel/matrix.h"
+#include "utility/matrix.h"
 
 namespace vita
 {
