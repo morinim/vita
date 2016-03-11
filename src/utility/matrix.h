@@ -21,8 +21,8 @@ namespace vita
 /// \brief A bidimensional array
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
-/// * std::vector<std::vector<T>> is slow;
-/// * boost uBLAS and boost.MultiArray are good, general solutions but a bit
+/// * `std::vector<std::vector<T>>` is slow;
+/// * boost uBLAS and `boost.MultiArray` are good, general solutions but a bit
 ///   oversized for our needs;
 ///
 /// The idea is to use a vector and translate the 2 dimensions to one
@@ -31,9 +31,9 @@ namespace vita
 /// row.
 ///
 /// \note
-/// This class is based on \c std::vector. So although \c matrix<bool> will
-/// work, you could prefer \c matrix<char> for performance reasons
-/// (\c std::vector<bool> is a "peculiar" specialization).
+/// This class is based on `std::vector`. So although `matrix<bool>` will
+/// work, you could prefer `matrix<char>` for performance reasons
+/// (`std::vector<bool>` is a "peculiar" specialization).
 ///
 template<class T>
 class matrix
@@ -46,20 +46,20 @@ public:
   using const_reference = typename values_t::const_reference;
 
   explicit matrix() : matrix(0, 0) {}
-  explicit matrix(unsigned, unsigned);
+  explicit matrix(std::size_t, std::size_t);
 
   const_reference operator()(const locus &) const;
   reference operator()(const locus &);
-  const_reference operator()(unsigned, unsigned) const;
-  reference operator()(unsigned, unsigned);
+  const_reference operator()(std::size_t, std::size_t) const;
+  reference operator()(std::size_t, std::size_t);
 
   void fill(const T &);
 
   bool operator==(const matrix &) const;
 
   bool empty() const;
-  unsigned rows() const;
-  unsigned cols() const;
+  std::size_t rows() const;
+  std::size_t cols() const;
 
   // Iterators
   using iterator = typename values_t::iterator;
@@ -75,16 +75,16 @@ public:
   bool save(std::ostream &) const;
 
 private:  // Private support functions
-  unsigned size() const;
-  unsigned index(unsigned, unsigned) const;
+  std::size_t size() const;
+  std::size_t index(std::size_t, std::size_t) const;
 
 private:  // Private data members
   values_t data_;
 
-  unsigned cols_;
+  std::size_t cols_;
 };
 
 #include "utility/matrix.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

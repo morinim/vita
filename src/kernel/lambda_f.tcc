@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -207,10 +207,10 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
     slot_matrix_(d.classes() * x_slot, d.classes()),
     slot_class_(d.classes() * x_slot), dataset_size_(0)
 {
-  assert(ind.debug());
-  assert(d.debug());
-  assert(d.classes() > 1);
-  assert(x_slot);
+  Expects(ind.debug());
+  Expects(d.debug());
+  Expects(d.classes() > 1);
+  Expects(x_slot);
 
   // Use the training set for lambdification.
   const auto backup(d.dataset());
@@ -228,9 +228,9 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(data &d, unsigned x_slot)
 {
-  assert(d.debug());
-  assert(d.classes() > 1);
-  assert(x_slot);
+  Expects(d.debug());
+  Expects(d.classes() > 1);
+  Expects(x_slot);
 
   const auto n_slots(d.classes() * x_slot);
   assert(n_slots == slot_matrix_.rows());
@@ -289,7 +289,7 @@ void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(data &d, unsigned x_slot)
 /// \return the slot example `e` falls into.
 ///
 template<class T, bool S, bool N>
-unsigned basic_dyn_slot_lambda_f<T, S, N>::slot(const data::example &e) const
+std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(const data::example &e) const
 {
   const any res(lambda_(e));
 

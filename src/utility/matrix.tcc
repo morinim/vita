@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,7 +27,7 @@
 /// sometimes we need it for performance).
 ///
 template<class T>
-matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
+matrix<T>::matrix(std::size_t rs, std::size_t cs) : data_(rs * cs), cols_(cs)
 {
   assert((rs && cs) || (!rs && !cs));
 }
@@ -39,7 +39,7 @@ matrix<T>::matrix(unsigned rs, unsigned cs) : data_(rs * cs), cols_(cs)
 ///         matrix.
 ///
 template<class T>
-unsigned matrix<T>::index(unsigned r, unsigned c) const
+std::size_t matrix<T>::index(std::size_t r, std::size_t c) const
 {
   assert(c < cols());
 
@@ -73,8 +73,8 @@ typename matrix<T>::reference matrix<T>::operator()(const locus &l)
 /// \return an element of the matrix.
 ///
 template<class T>
-typename matrix<T>::const_reference matrix<T>::operator()(unsigned r,
-                                                          unsigned c) const
+typename matrix<T>::const_reference matrix<T>::operator()(std::size_t r,
+                                                          std::size_t c) const
 {
   return data_[index(r, c)];
 }
@@ -85,7 +85,8 @@ typename matrix<T>::const_reference matrix<T>::operator()(unsigned r,
 /// \return an element of the matrix.
 ///
 template<class T>
-typename matrix<T>::reference matrix<T>::operator()(unsigned r, unsigned c)
+typename matrix<T>::reference matrix<T>::operator()(std::size_t r,
+                                                    std::size_t c)
 {
   // DO NOT CHANGE THE RETURN TYPE WITH T (the method won't work for T == bool)
   return data_[index(r, c)];
@@ -104,25 +105,25 @@ bool matrix<T>::empty() const
 /// \return number of elements of the matrix.
 ///
 template<class T>
-unsigned matrix<T>::size() const
+std::size_t matrix<T>::size() const
 {
-  return static_cast<unsigned>(data_.size());
+  return data_.size();
 }
 
 ///
 /// \return number of rows of the matrix.
 ///
 template<class T>
-unsigned matrix<T>::rows() const
+std::size_t matrix<T>::rows() const
 {
-  return cols() ? static_cast<unsigned>(data_.size() / cols()) : 0;
+  return cols() ? data_.size() / cols() : 0;
 }
 
 ///
 /// \return number of columns of the matrix.
 ///
 template<class T>
-unsigned matrix<T>::cols() const
+std::size_t matrix<T>::cols() const
 {
   return cols_;
 }
@@ -256,7 +257,7 @@ bool matrix<T>::load(std::istream &in)
 template<class T>
 std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
 {
-  unsigned i(0);
+  std::size_t i(0);
 
   for (const auto &e : m)
   {

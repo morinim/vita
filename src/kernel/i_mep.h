@@ -70,7 +70,7 @@ public:
 
   const gene &operator[](const locus &l) const;
 
-  unsigned categories() const;
+  category_t categories() const;
   unsigned eff_size() const;
   unsigned size() const;
   bool empty() const;
@@ -117,9 +117,9 @@ inline const gene &i_mep::operator[](const locus &l) const
 ///
 /// \return the total number of categories the individual is using.
 ///
-inline unsigned i_mep::categories() const
+inline category_t i_mep::categories() const
 {
-  return genome_.cols();
+  return static_cast<category_t>(genome_.cols());
 }
 
 ///
@@ -131,7 +131,7 @@ inline unsigned i_mep::categories() const
 ///
 inline unsigned i_mep::size() const
 {
-  return genome_.rows();
+  return static_cast<unsigned>(genome_.rows());
 }
 
 ///

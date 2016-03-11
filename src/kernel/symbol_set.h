@@ -137,7 +137,7 @@ private:
     private:
       sum_container_t elems_;
 
-      /// Sum of the weights of the symbols in the container.
+      // Sum of the weights of the symbols in the container.
       unsigned sum_;
 
       std::string name_;
@@ -158,8 +158,8 @@ private:
 
   // The last element of the vector contains the category-agnostic view of
   // symbols:
-  // - views_.back().all.size() is equal to the total number of symbols
-  // - views_[0].all.size() is the number of symbols in category `0`
+  // - `views_.back().all.size()` is equal to the total number of symbols
+  // - `views_[0].all.size()` is the number of symbols in category `0`
   std::vector<collection> views_;
 };
 

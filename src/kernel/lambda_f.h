@@ -181,15 +181,17 @@ public:
   virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
-private:  // Private support methods
+private:
+  // Private support methods
   static number normalize_01(number);
   bool load_(std::istream &, const environment &, std::true_type);
   bool load_(std::istream &, const environment &, std::false_type);
 
   void fill_matrix(data &, unsigned);
-  unsigned slot(const data::example &) const;
+  std::size_t slot(const data::example &) const;
 
-private:  // Private data members
+  // Private data members
+
   /// Mainly used by the slot private method.
   basic_reg_lambda_f<T, S> lambda_;
 
@@ -199,7 +201,7 @@ private:  // Private data members
   matrix<unsigned> slot_matrix_;
 
   /// slot_class[i] = "label of the predominant class" for the i-th slot.
-  std::vector<unsigned> slot_class_;
+  std::vector<std::size_t> slot_class_;
 
   /// Size of the dataset used to construct `slot_matrix`.
   std::uintmax_t dataset_size_;
