@@ -24,7 +24,7 @@ template<class T, bool S>
 basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
   : detail::reg_lambda_f_storage<T, S>(prg)
 {
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -319,7 +319,7 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 
   assert(dataset_size_ >= ok);
 
-  return static_cast<double>(ok) / dataset_size_;
+  return ok / dataset_size_;
 }
 
 ///
@@ -467,9 +467,9 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
                                                           data &d)
   : basic_class_lambda_f<T, N>(d), lambda_(ind), gauss_dist_(d.classes())
 {
-  assert(ind.debug());
-  assert(d.debug());
-  assert(d.classes() > 1);
+  Expects(ind.debug());
+  Expects(d.debug());
+  Expects(d.classes() > 1);
 
   // Use the training set for lambdification.
   const auto backup(d.dataset());
@@ -486,7 +486,7 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 void basic_gaussian_lambda_f<T, S, N>::fill_vector(data &d)
 {
-  assert(d.classes() > 1);
+  Expects(d.classes() > 1);
 
   // For a set of training data, we assume that the behaviour of a program
   // classifier is modelled using multiple Gaussian distributions, each of
@@ -669,9 +669,9 @@ template<class T, bool S, bool N>
 basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind, data &d)
   : basic_class_lambda_f<T, N>(d), lambda_(ind)
 {
-  assert(ind.debug());
-  assert(d.debug());
-  assert(d.classes() == 2);
+  Expects(ind.debug());
+  Expects(d.debug());
+  Expects(d.classes() == 2);
 }
 
 ///
