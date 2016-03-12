@@ -47,16 +47,6 @@ public:
   double open(timeframe tf, std::size_t i) const { return get(tf, i).open; }
   double volume(timeframe tf, std::size_t i) const {return get(tf, i).volume;}
 
-  bool black_candle(timeframe tf, std::size_t i) const
-  {
-    return close(tf, i) < open(tf, i);
-  }
-
-  bool white_candle(timeframe tf, std::size_t i) const
-  {
-    return close(tf, i) > open(tf, i);
-  }
-
 private:
   struct trade_info_point
   {
@@ -95,5 +85,11 @@ private:
 
   std::array<std::vector<trade_info_point>, sup_tf> trading;
 };
+
+bool black_candle(const trading_data &, timeframe, std::size_t);
+bool white_candle(const trading_data &, timeframe, std::size_t);
+bool long_candle(const trading_data &, timeframe, std::size_t);
+bool long_black_candle(const trading_data &, timeframe, std::size_t);
+bool long_white_candle(const trading_data &, timeframe, std::size_t);
 
 #endif  // include guard

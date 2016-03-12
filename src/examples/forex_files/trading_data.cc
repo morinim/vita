@@ -84,18 +84,16 @@ bool trading_data::set_timeframe_duration(std::tm p0, std::tm p1)
 
 std::pair<double, double> trading_data::minmax_vol(timeframe tf) const
 {
-  double min(999999999.0), max(0.0);
-  for (const auto &tip : trading[vita::as_integer(tf)])
-  {
-    if (tip.volume < min)
-      min = tip.volume;
-    else if (tip.volume > max)
-      max = tip.volume;
-  }
+  const auto &dataset(trading[vita::as_integer(tf)]);
 
-  assert(min < max);
+  const auto res(std::minmax_element(dataset.begin(), dataset.end(),
+                                     [](const trade_info_point &t1,
+                                        const trade_info_point &t2)
+                                     {
+                                       return t1.volume < t2.volume;
+                                     }));
 
-  return {min, max};
+  return {res.first->volume, res.second->volume};
 }
 
 bool trading_data::normalize_volume(timeframe tf)
@@ -237,4 +235,45 @@ bool trading_data::debug() const
   }
 
   return ret;
+}
+
+bool black_candle(const trading_data &d, timeframe tf, std::size_t i)
+{
+  return d.close(tf, i) < d.open(tf, i);
+}
+
+bool white_candle(const trading_data &d, timeframe tf, std::size_t i)
+{
+  return d.close(tf, i) > d.open(tf, i);
+}
+
+/// \param[in] d trading data.
+/// \param[in] tf timeframe.
+/// \param[in] i candle (array mode: 0 is the older candle in the dataset).
+/// \return `true` if the i-th bar is a long candle.
+/// \note
+/// Our definition of long candle: a candle whose real body is at least 3
+/// times the average real body of the last 5 candles.
+bool long_candle(const trading_data &d, timeframe tf, std::size_t i)
+{
+  if (i < 5)
+    return false;
+
+  double avg_length(0.0);
+  for (std::size_t j(i > 5 ? i - 5 : 0); j != i; ++j)
+    avg_length += std::fabs(d.open(tf, j) - d.close(tf, j));
+
+  avg_length /= 5.0;
+
+  return std::fabs(d.open(tf, i) - d.close(tf, i)) > 3.0 * avg_length;
+}
+
+bool long_black_candle(const trading_data &d, timeframe tf, std::size_t i)
+{
+  return black_candle(d, tf, i) && long_candle(d, tf, i);
+}
+
+bool long_white_candle(const trading_data &d, timeframe tf, std::size_t i)
+{
+  return white_candle(d, tf, i) && long_candle(d, tf, i);
 }

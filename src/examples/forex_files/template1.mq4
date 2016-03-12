@@ -18,8 +18,35 @@ int gp_tf[3] = {PERIOD_M5, PERIOD_M30, PERIOD_H1};
 
 const int magic = 3141492;
 
-/// \brief 
-bool black_candle() { return true; }
+bool black_candle(int tf, int bar)
+{
+  return iClose(NULL, tf, bar) < iOpen(NULL, tf, bar);
+}
+
+bool white_candle(int tf, int bar)
+{
+  return iClose(NULL, tf, bar) > iOpen(NULL, tf, bar);
+}
+
+bool long_candle(int tf, int bar)
+{
+  double avg_body = 0.0;
+  for (int i(1); i <= 5; ++i)
+    avg_body += MathAbs(iOpen(NULL, tf, bar - i) - iClose(NULL, tf, bar - i));
+
+  double real_body = MathAbs(iOpen(NULL, tf, bar) - iClose(NULL, tf, bar));
+  return real_body > 3.0 * avg_body;
+}
+
+bool long_black_candle(int tf, int bar)
+{
+  return black_candle(tf, bar) && long_candle(tf, bar);
+}
+
+bool long_white_candle(int tf, int bar)
+{
+  return white_candle(tf, bar) && long_candle(tf, bar);
+}
 
 /// \brief Expert initialization function
 int OnInit()

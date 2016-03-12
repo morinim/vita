@@ -100,17 +100,8 @@ public:
     return td_->volume(tf, as_series(tf, i));
   }
 
-  bool black_candle(timeframe tf, std::size_t i) const
-  {
-    assert(cur_bar_);
-    return td_->black_candle(tf, as_series(tf, i));
-  }
-
-  bool white_candle(timeframe tf, std::size_t i) const
-  {
-    assert(cur_bar_);
-    return td_->white_candle(tf, as_series(tf, i));
-  }
+  bool black_candle(timeframe, std::size_t) const;
+  bool white_candle(timeframe, std::size_t) const;
 
   double order_amount() const { return order_.amount(); }
   double order_open_price() const { return order_.open_price(); }

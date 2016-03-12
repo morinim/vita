@@ -185,3 +185,13 @@ double trade_simulator::run(const T &prg)
   //          << " operations)\n";
   return balance_;
 }
+
+bool trade_simulator::black_candle(timeframe tf, std::size_t i) const
+{
+  return ::black_candle(*td_, tf, i);
+}
+
+bool trade_simulator::white_candle(timeframe tf, std::size_t i) const
+{
+  return ::white_candle(*td_, tf, i);
+}
