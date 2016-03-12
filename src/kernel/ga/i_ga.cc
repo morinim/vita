@@ -103,7 +103,7 @@ std::ostream &i_ga::tree(std::ostream &s) const
 /// \brief A new individual is created mutating `this`
 ///
 /// \param[in] p probability of gene mutation.
-/// \param[in] sset a symbol set.
+/// \param[in] env the current environment.
 /// \return number of mutations performed.
 ///
 /// \note
@@ -111,10 +111,10 @@ std::ostream &i_ga::tree(std::ostream &s) const
 /// strategies. Typical differential evolution GA algorithm won't use
 /// this method.
 ///
-unsigned i_ga::mutation(double p, const symbol_set &sset)
+unsigned i_ga::mutation(double p, const environment &env)
 {
-  assert(0.0 <= p);
-  assert(p <= 1.0);
+  Expects(0.0 <= p);
+  Expects(p <= 1.0);
 
   unsigned n(0);
 
@@ -124,12 +124,12 @@ unsigned i_ga::mutation(double p, const symbol_set &sset)
     {
       ++n;
 
-      genome_[c] = gene(sset.roulette_terminal(c));
+      genome_[c] = gene(env.sset->roulette_terminal(c));
     }
 
   signature_ = hash();
 
-  assert(debug());
+  Ensures(debug());
   return n;
 }
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -51,7 +51,7 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation(double, const symbol_set &);
+  unsigned mutation(double, const environment &);
   i_ga crossover(i_ga) const;
   i_ga crossover(double, const double [2], const i_ga &, const i_ga &,
                  i_ga) const;

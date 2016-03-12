@@ -43,7 +43,8 @@ void search<T, ES>::tune_parameters()
     env_.code_length = dflt.code_length;
 
   if (!constrained.patch_length)
-    env_.patch_length = 1 + env_.code_length / 3;
+    env_.patch_length = 1 + env_.code_length / 10;
+    //env_.patch_length = 1 + env_.code_length / 3;
 
   if (constrained.elitism == trilean::unknown)
     env_.elitism = dflt.elitism;

@@ -29,7 +29,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), weights_(),
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = make_unique<argument>(i);
 
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -262,7 +262,7 @@ unsigned symbol_set::terminals(category_t c) const
 ///
 bool symbol_set::enough_terminals() const
 {
-  if (views_.size() == 0)
+  if (views_.empty())
     return true;
 
   std::set<category_t> need;

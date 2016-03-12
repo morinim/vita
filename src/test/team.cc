@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation");
   for (unsigned i(0); i < n; ++i)
   {
-    t.mutation(0.0, *env.sset);
+    t.mutation(0.0, env);
     BOOST_REQUIRE_EQUAL(t, orig);
   }
 
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     const vita::team<vita::i_mep> t1{t};
 
-    t.mutation(0.5, *env.sset);
+    t.mutation(0.5, env);
     diff += distance(t, t1);
     length += t1.eff_size();
   }

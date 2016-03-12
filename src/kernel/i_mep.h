@@ -46,7 +46,7 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation(double, const symbol_set &);
+  unsigned mutation(double, const environment &);
   i_mep crossover(i_mep) const;
 
   // Working with blocks / genome

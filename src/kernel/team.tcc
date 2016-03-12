@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,17 +56,17 @@ team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 
 ///
 /// \param[in] p probability of gene mutation.
-/// \param[in] sset a symbol_set
+/// \param[in] env the current environment.
 /// \return number of mutations performed.
 ///
 /// Mutates the individuals in `this` team and returns the number of mutations
 /// performed.
 ///
 template<class T>
-unsigned team<T>::mutation(double p, const symbol_set &sset)
+unsigned team<T>::mutation(double p, const environment &env)
 {
-  assert(0.0 <= p);
-  assert(p <= 1.0);
+  Expects(0.0 <= p);
+  Expects(p <= 1.0);
 
   /*
   const auto nm(random::element(individuals_).mutation(p, sset));
@@ -78,7 +78,7 @@ unsigned team<T>::mutation(double p, const symbol_set &sset)
 
   unsigned nm(0);
   for (auto &i : individuals_)
-    nm += i.mutation(p, sset);
+    nm += i.mutation(p, env);
 
   if (nm)
     signature_.clear();
@@ -275,15 +275,6 @@ void team<T>::inc_age()
 {
   for (auto &i : individuals_)
     i.inc_age();
-}
-
-///
-/// \return the environment of the team.
-///
-template<class T>
-const environment &team<T>::env() const
-{
-  return individuals_[0].env();
 }
 
 ///

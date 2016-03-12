@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,7 +64,7 @@ public:
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators.
-  unsigned mutation(double, const symbol_set &);
+  unsigned mutation(double, const environment &);
   team crossover(team) const;
 
   const T &operator[](unsigned) const;
@@ -78,8 +78,6 @@ public:
   unsigned age() const;
   void inc_age();
 
-  const environment &env() const;
-
   bool debug() const;
 
   // Iterators.
@@ -92,10 +90,11 @@ public:
   bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
-private:  // Private support methods
+private:
+  // Private support methods
   hash_t hash() const;
 
-private:  // Private data members
+  // Private data members
   members_t individuals_;
 
   mutable hash_t signature_;
@@ -120,4 +119,4 @@ template<class T> struct not_team<team<T>> : std::false_type {};
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

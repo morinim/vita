@@ -44,7 +44,7 @@ i_mep::i_mep(const environment &e)
   // STANDARD SECTION. Filling the genome with random symbols.
   for (index_t i(0); i < patch; ++i)
     for (category_t c(0); c < c_sup; ++c)
-      genome_(i, c) = gene(e.sset->roulette(c), i + 1, size());
+      genome_(i, c) = gene(e.sset->roulette(c), i + 1, i_sup);
 
   // PATCH SUBSECTION. Placing terminals for satisfying constraints on types.
   for (index_t i(patch); i < i_sup; ++i)
@@ -117,19 +117,20 @@ i_mep i_mep::get_block(const locus &l) const
 }
 
 ///
-/// \brief A new individual is created mutating `this`
+/// \brief A new individual is created mutating `this`.
 ///
 /// \param[in] p probability of gene mutation.
-/// \param[in] sset a symbol set.
+/// \param[in] e the current environment.
 /// \return number of mutations performed.
 ///
-unsigned i_mep::mutation(double p, const symbol_set &sset)
+unsigned i_mep::mutation(double p, const environment &e)
 {
-  assert(0.0 <= p && p <= 1.0);
+  Expects(0.0 <= p && p <= 1.0);
 
   unsigned n(0);
 
-  const auto sup(size() - 1);
+  const auto i_size(size());
+  const auto patch(i_size - e.patch_length);
 
   for (const auto &l : *this)  // Here mutation affects only exons
     if (random::boolean(p))
@@ -139,35 +140,13 @@ unsigned i_mep::mutation(double p, const symbol_set &sset)
       const auto i(l.index);
       const auto c(l.category);
 
-      if (i < sup)
-        set(l, gene(sset.roulette(c), i + 1, size()));
+      if (i < patch)
+        set(l, gene(e.sset->roulette(c), i + 1, i_size));
       else
-        set(l, gene(sset.roulette_terminal(c)));
+        set(l, gene(e.sset->roulette_terminal(c)));
     }
 
-/*
-  // MUTATION OF THE ENTIRE GENOME (EXONS + INTRONS).
-  const category_t c_sup(categories());
-
-  for (index_t i(0); i < sup; ++i)
-    for (category_t c(0); c < c_sup; ++c)
-      if (random::boolean(p))
-      {
-        ++n;
-
-        set({i, c}, gene(sset.roulette(c), i + 1, size()));
-      }
-
-  for (category_t c(0); c < c_sup; ++c)
-    if (random::boolean(p))
-    {
-      ++n;
-
-      set({sup, c}, gene(sset.roulette_terminal(c)));
-    }
-*/
-
-  assert(debug());
+  Ensures(debug());
   return n;
 }
 
