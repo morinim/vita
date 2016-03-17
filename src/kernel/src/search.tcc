@@ -20,9 +20,7 @@
 constexpr std::underlying_type<metric_flags>::type operator&(metric_flags f1,
                                                              metric_flags f2)
 {
-  using type = std::underlying_type<metric_flags>::type;
-
-  return static_cast<type>(f1) & static_cast<type>(f2);
+  return as_integer(f1) & as_integer(f2);
 }
 
 ///
@@ -36,12 +34,12 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
   : search<T, ES>(p),
     p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian), metrics(m)
 {
-  assert(p.debug());
+  Expects(p.debug());
 
   if (p.data()->size() && !this->active_eva_)
     set_evaluator(p.classification() ? p_class : p_symre);
 
-  assert(this->debug());
+  Ensures(this->debug());
 }
 
 ///
@@ -232,7 +230,7 @@ void src_search<T, ES>::tune_parameters()
   if (!constrained.layers)
   {
     if (dflt.layers > 1 && d_size > 8)
-      this->env_.layers = static_cast<unsigned>(std::log(d_size));
+      this->env_.layers = static_cast<decltype(dflt.layers)>(std::log(d_size));
     else
       this->env_.layers = dflt.layers;
 
@@ -245,15 +243,15 @@ void src_search<T, ES>::tune_parameters()
   // between 1000 and 10000 individuals for complex problem (more than 200
   // fitness cases).
   //
-  // We choosed a strictly increasing function to link training set size
-  // and population size.
+  // We chose a strictly increasing function to link training set size and
+  // population size.
   if (!constrained.individuals)
   {
     if (d_size > 8)
     {
       this->env_.individuals = 2 *
-        static_cast<unsigned>(std::pow((std::log2(d_size)), 3)) /
-        this->env_.layers;
+        static_cast<decltype(this->env_.individuals)>(
+          std::pow(std::log2(d_size), 3)) / this->env_.layers;
 
       if (this->env_.individuals < 4)
         this->env_.individuals = 4;
@@ -275,7 +273,7 @@ void src_search<T, ES>::tune_parameters()
                this->env_.validation_percentage, '%');
   }
 
-  assert(this->env_.debug(true));
+  Ensures(this->env_.debug(true));
 }
 
 ///
@@ -390,7 +388,7 @@ bool src_search<T, ES>::validation() const
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  assert(this->prob_.data());
+  Expects(this->prob_.data());
 
   if (validation())
     this->prob_.data()->partition(this->env_.validation_percentage);
@@ -407,8 +405,8 @@ void src_search<T, ES>::preliminary_setup()
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  assert(this->prob_.data());
-  assert(this->active_eva_);
+  Expects(this->prob_.data());
+  Expects(this->active_eva_);
 
   // Some shorthands.
   auto &data(*this->prob_.data());
@@ -484,7 +482,7 @@ template<class T, template<class> class ES>
 void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
                                 const summary<T> &run_sum) const
 {
-  assert(d);
+  Expects(d);
 
   if (this->env_.stat.summary)
   {

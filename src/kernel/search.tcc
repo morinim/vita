@@ -87,7 +87,7 @@ void search<T, ES>::tune_parameters()
   if (constrained.arl == trilean::unknown)
     env_.arl = dflt.arl;
 
-  assert(env_.debug(true));
+  Ensures(env_.debug(true));
 }
 
 ///
@@ -105,7 +105,7 @@ summary<T> search<T, ES>::run(unsigned n)
   distribution<fitness_t> fd;
 
   unsigned best_run(0);
-  std::vector<decltype(best_run)> good_runs;
+  std::vector<unsigned> good_runs;
 
   for (unsigned r(0); r < n; ++r)
   {
@@ -268,4 +268,4 @@ void search<T, ES>::log(const summary<T> &run_sum,
   const std::string f_sum(env_.stat.dir + "/" + env_.stat.sum_name);
   d.SaveFile(f_sum.c_str());
 }
-#endif  // Include guard
+#endif  // include guard
