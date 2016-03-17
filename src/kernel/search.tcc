@@ -25,7 +25,7 @@ template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env),
                                     prob_(p), shake_(nullptr), stop_(nullptr)
 {
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -43,8 +43,7 @@ void search<T, ES>::tune_parameters()
     env_.code_length = dflt.code_length;
 
   if (!constrained.patch_length)
-    env_.patch_length = 1 + env_.code_length / 10;
-    //env_.patch_length = 1 + env_.code_length / 3;
+    env_.patch_length = 1 + prob_.env.sset->terminals(0) / 2;
 
   if (constrained.elitism == trilean::unknown)
     env_.elitism = dflt.elitism;
