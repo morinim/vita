@@ -20,7 +20,7 @@
 #include "kernel/src/model_metric.h"
 #include "kernel/team.h"
 #include "utility/matrix.h"
-#include "utility/utility.h"
+#include "utility/saturation.h"
 
 #include "kernel/detail/lambda_f.h"
 
@@ -183,7 +183,6 @@ public:
 
 private:
   // Private support methods
-  static number normalize_01(number);
   bool load_(std::istream &, const environment &, std::true_type);
   bool load_(std::istream &, const environment &, std::false_type);
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +12,7 @@
 
 #define MASTER_TEST_SET
 
-#define BOOST_TEST_MODULE Master Test Suite
+#define BOOST_TEST_MODULE MASTER_TEST_SUITE
 #include <boost/test/unit_test.hpp>
 
 constexpr double epsilon(0.00001);
@@ -37,6 +37,7 @@ using namespace boost;
 #include "test/population.cc"
 #include "test/primitive_d.cc"
 #include "test/primitive_i.cc"
+#include "test/saturation.cc"
 #include "test/small_vector.cc"
 #include "test/src_constant.cc"
 #include "test/src_problem.cc"

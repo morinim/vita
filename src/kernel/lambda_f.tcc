@@ -169,32 +169,6 @@ std::string basic_class_lambda_f<T, N>::name(const any &a) const
 }
 
 ///
-/// \param[in] x the numeric value (a real number in the [-inf;+inf] range)
-///              that should be mapped in the [0,1] interval.
-/// \return a number in the [0,1] range.
-///
-/// This is a sigmoid function (it is a bounded real function, "S" shaped,
-/// with positive derivative everywhere).
-/// Among the various uses there is continuous value discretization when we
-/// don't know an upper/lower bound for the continuos value.
-///
-/// \see
-/// * <http://en.wikipedia.org/wiki/Sigmoid_function>
-/// * <http://en.wikipedia.org/wiki/Generalised_logistic_function>
-///
-template<class T, bool S, bool N>
-number basic_dyn_slot_lambda_f<T, S, N>::normalize_01(number x)
-{
-  // return (1.0 + x / (1 + std::fabs(x))) / 2.0;  // Algebraic function
-
-  return 0.5 + std::atan(x) / 3.1415926535;        // Arctangent
-
-  // return 0.5 + std::tanh(x) / 2.0;              // Hyperbolic tangent
-
-  // return 1.0 / (1.0 + std::exp(-x));            // Logistic function
-}
-
-///
 /// \param[in] ind individual "to be transformed" into a lambda function.
 /// \param[in] d the training set.
 /// \param[in] x_slot number of slots for each class of the training set.
@@ -299,7 +273,8 @@ std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(const data::example &e) const
     return last_slot;
 
   const auto val(to<number>(res));
-  const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
+  const auto where(max_saturation(val, last_slot));
+  //const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
 
   return (where >= ns) ? last_slot : where;
 }
