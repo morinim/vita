@@ -25,7 +25,8 @@ template<class T, class F>
 bool is_in_range(F value)
 {
   if (!std::numeric_limits<T>::is_integer)
-    return (value > 0 ? value : -value) <= std::numeric_limits<T>::max();
+    return (value > 0 ? value : -value) <= std::numeric_limits<T>::max() ||
+           (std::isinf(value) && std::numeric_limits<T>::has_infinity);
 
   if (std::numeric_limits<T>::is_signed == std::numeric_limits<F>::is_signed)
     return value >= std::numeric_limits<T>::lowest() &&
