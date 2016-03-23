@@ -16,8 +16,8 @@
 #include <string>
 #include <set>
 
-#include "kernel/data.h"
 #include "kernel/problem.h"
+#include "kernel/src/data.h"
 #include "kernel/src/primitive/factory.h"
 
 namespace vita
@@ -38,7 +38,7 @@ public:
   std::size_t load_test_set(const std::string &);
   void setup_default_symbols();
 
-  virtual vita::data *data() override { return &dat_; }
+  virtual vita::src_data *data() override { return &dat_; }
 
   virtual void clear(bool) override;
 
@@ -57,7 +57,7 @@ private:
   void setup_terminals_from_data(const std::set<unsigned> & = {});
 
   // Private data members.
-  vita::data dat_;
+  vita::src_data dat_;
   vita::symbol_factory factory_;
 };
 

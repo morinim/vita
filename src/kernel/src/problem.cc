@@ -167,10 +167,10 @@ std::pair<std::size_t, std::size_t> src_problem::load(
 ///
 std::size_t src_problem::load_test_set(const std::string &ts)
 {
-  const auto backup(dat_.dataset());
-  dat_.dataset(data::test);
+  const auto backup(dat_.active_dataset());
+  dat_.select(data::test);
   const auto n(dat_.load(ts));
-  dat_.dataset(backup);
+  dat_.select(backup);
 
   return n;
 }
@@ -375,11 +375,12 @@ bool src_problem::compatible(const cvect &instance,
   for (auto i(decltype(sup){0}); i < sup; ++i)
   {
     const std::string p_i(pattern[i]);
-    const bool generic(data::from_weka(p_i) != domain_t::d_void);
+    const bool generic(src_data::from_weka(p_i) != domain_t::d_void);
 
     if (generic)  // numeric, string, integer...
     {
-      if (dat_.categories().find(instance[i]).domain != data::from_weka(p_i))
+      if (dat_.categories().find(instance[i]).domain !=
+          src_data::from_weka(p_i))
         return false;
     }
     else

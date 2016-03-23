@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,6 +15,7 @@
 
 #include "kernel/lambda_f.h"
 #include "kernel/vitafwd.h"
+#include "kernel/src/data.h"
 
 namespace vita
 {
@@ -31,8 +32,10 @@ template<class T>
 class model_metric
 {
 public:
-  virtual double operator()(const reg_lambda_f<T> *, const data &) const = 0;
-  virtual double operator()(const class_lambda_f<T> *, const data &) const = 0;
+  virtual double operator()(const reg_lambda_f<T> *,
+                            const src_data &) const = 0;
+  virtual double operator()(const class_lambda_f<T> *,
+                            const src_data &) const = 0;
 };
 
 ///
@@ -54,10 +57,10 @@ class accuracy_metric : public model_metric<T>
 {
 public:
   virtual double operator()(const reg_lambda_f<T> *,
-                            const data &) const override;
+                            const src_data &) const override;
 
   virtual double operator()(const class_lambda_f<T> *,
-                            const data &) const override;
+                            const src_data &) const override;
 };
 
 #include "kernel/src/model_metric.tcc"

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@ struct model_measurements
                               double a = -1.0)
     : fitness(f), accuracy(a)
   {
-    assert(accuracy <= 1.0);
+    Expects(accuracy <= 1.0);
   }
 
   fitness_t fitness;
@@ -53,4 +53,4 @@ inline bool operator>=(const model_measurements &lhs,
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

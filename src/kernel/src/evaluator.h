@@ -31,10 +31,10 @@ template<class T>
 class src_evaluator : public evaluator<T>
 {
 public:
-  explicit src_evaluator(data &);
+  explicit src_evaluator(src_data &);
 
 protected:
-  class data *dat_;
+  class src_data *dat_;
 };
 
 ///
@@ -48,15 +48,15 @@ template<class T>
 class sum_of_errors_evaluator : public src_evaluator<T>
 {
 public:
-  explicit sum_of_errors_evaluator(data &d) : src_evaluator<T>(d) {}
+  explicit sum_of_errors_evaluator(src_data &d) : src_evaluator<T>(d) {}
 
   virtual fitness_t operator()(const T &) override;
   virtual fitness_t fast(const T &) override;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
-                       int *const) = 0;
+  virtual double error(const basic_reg_lambda_f<T, false> &,
+                       src_data::example &, int *const) = 0;
 };
 
 ///
@@ -80,11 +80,11 @@ template<class T>
 class mae_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit mae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
-                       int *const) override;
+  virtual double error(const basic_reg_lambda_f<T, false> &,
+                       src_data::example &, int *const) override;
 };
 
 ///
@@ -110,11 +110,11 @@ template<class T>
 class rmae_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit rmae_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit rmae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
-                       int *const) override;
+  virtual double error(const basic_reg_lambda_f<T, false> &,
+                       src_data::example &, int *const) override;
 };
 
 ///
@@ -139,11 +139,11 @@ template<class T>
 class mse_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit mse_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mse_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
-                       int *const) override;
+  virtual double error(const basic_reg_lambda_f<T, false> &,
+                       src_data::example &, int *const) override;
 };
 
 ///
@@ -157,11 +157,11 @@ template<class T>
 class count_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit count_evaluator(data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit count_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &, data::example &,
-                       int *const) override;
+  virtual double error(const basic_reg_lambda_f<T, false> &,
+                       src_data::example &, int *const) override;
 };
 
 ///
@@ -172,7 +172,7 @@ template<class T>
 class classification_evaluator : public src_evaluator<T>
 {
 public:
-  explicit classification_evaluator(data &d) : src_evaluator<T>(d) {}
+  explicit classification_evaluator(src_data &d) : src_evaluator<T>(d) {}
 };
 
 ///
@@ -192,7 +192,7 @@ template<class T>
 class dyn_slot_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit dyn_slot_evaluator(data &, unsigned = 10);
+  explicit dyn_slot_evaluator(src_data &, unsigned = 10);
 
   virtual fitness_t operator()(const T &) override;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
@@ -219,7 +219,7 @@ template<class T>
 class gaussian_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit gaussian_evaluator(data &d) : classification_evaluator<T>(d) {}
+  explicit gaussian_evaluator(src_data &d) : classification_evaluator<T>(d) {}
 
   virtual fitness_t operator()(const T &) override;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
@@ -232,7 +232,7 @@ template<class T>
 class binary_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit binary_evaluator(data &d) : classification_evaluator<T>(d) {}
+  explicit binary_evaluator(src_data &d) : classification_evaluator<T>(d) {}
 
   virtual fitness_t operator()(const T &) override;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;

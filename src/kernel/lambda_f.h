@@ -15,7 +15,7 @@
 
 #include <type_traits>
 
-#include "kernel/data.h"
+#include "kernel/src/data.h"
 #include "kernel/src/interpreter.h"
 #include "kernel/src/model_metric.h"
 #include "kernel/team.h"
@@ -55,11 +55,11 @@ template<class T>
 class lambda_f
 {
 public:
-  virtual any operator()(const data::example &) const = 0;
+  virtual any operator()(const src_data::example &) const = 0;
 
   virtual std::string name(const any &) const = 0;
 
-  virtual double measure(const model_metric<T> &, const data &) const = 0;
+  virtual double measure(const model_metric<T> &, const src_data &) const = 0;
 
   virtual bool debug() const = 0;
 
@@ -95,11 +95,12 @@ class basic_reg_lambda_f : public reg_lambda_f<T>,
 public:
   explicit basic_reg_lambda_f(const T &);
 
-  virtual any operator()(const data::example &) const override;
+  virtual any operator()(const src_data::example &) const override;
 
   virtual std::string name(const any &) const override;
 
-  virtual double measure(const model_metric<T> &, const data &) const override;
+  virtual double measure(const model_metric<T> &,
+                         const src_data &) const override;
 
   virtual bool debug() const override;
 
@@ -107,9 +108,9 @@ public:
   virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
-private:  // Private support methods
-  any eval(const data::example &, std::false_type) const;
-  any eval(const data::example &, std::true_type) const;
+private:
+  any eval(const src_data::example &, std::false_type) const;
+  any eval(const src_data::example &, std::true_type) const;
 };
 
 // ***********************************************************************
@@ -123,7 +124,7 @@ private:  // Private support methods
 template<class T> class class_lambda_f : public lambda_f<T>
 {
 public:
-  virtual std::pair<class_t, double> tag(const data::example &) const = 0;
+  virtual std::pair<class_t, double> tag(const src_data::example &) const = 0;
 };
 
 ///
@@ -143,13 +144,14 @@ class basic_class_lambda_f : public class_lambda_f<T>,
                              protected detail::class_names<N>
 {
 public:
-  explicit basic_class_lambda_f(const data &);
+  explicit basic_class_lambda_f(const src_data &);
 
-  virtual any operator()(const data::example &) const override;
+  virtual any operator()(const src_data::example &) const override;
 
   virtual std::string name(const any &) const override final;
 
-  virtual double measure(const model_metric<T> &, const data &) const override;
+  virtual double measure(const model_metric<T> &,
+                         const src_data &) const override;
 };
 
 ///
@@ -168,10 +170,10 @@ template<class T, bool S, bool N>
 class basic_dyn_slot_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_dyn_slot_lambda_f(const T &, data &, unsigned);
+  basic_dyn_slot_lambda_f(const T &, src_data &, unsigned);
 
   virtual std::pair<class_t, double> tag(
-    const data::example &) const override;
+    const src_data::example &) const override;
 
   virtual bool debug() const override;
 
@@ -186,8 +188,8 @@ private:
   bool load_(std::istream &, const environment &, std::true_type);
   bool load_(std::istream &, const environment &, std::false_type);
 
-  void fill_matrix(data &, unsigned);
-  std::size_t slot(const data::example &) const;
+  void fill_matrix(src_data &, unsigned);
+  std::size_t slot(const src_data::example &) const;
 
   // Private data members
 
@@ -203,7 +205,7 @@ private:
   std::vector<std::size_t> slot_class_;
 
   /// Size of the dataset used to construct `slot_matrix`.
-  std::uintmax_t dataset_size_;
+  std::size_t dataset_size_;
 };
 
 ///
@@ -222,9 +224,10 @@ template<class T, bool S, bool N>
 class basic_gaussian_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_gaussian_lambda_f(const T &, data &);
+  basic_gaussian_lambda_f(const T &, src_data &);
 
-  virtual std::pair<class_t, double> tag(const data::example &) const override;
+  virtual std::pair<class_t, double> tag(
+    const src_data::example &) const override;
 
   virtual bool debug() const override;
 
@@ -232,12 +235,13 @@ public:
   virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
-private:  // Private support methods
-  void fill_vector(data &);
+private:
+  // Private support methods
+  void fill_vector(src_data &);
   bool load_(std::istream &, const environment &, std::true_type);
   bool load_(std::istream &, const environment &, std::false_type);
 
-private:  // Private data members
+  // Private data members
   basic_reg_lambda_f<T, S> lambda_;
 
   // gauss_dist[i] = "the gaussian distribution of the i-th class if the
@@ -259,9 +263,10 @@ template<class T, bool S, bool N>
 class basic_binary_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_binary_lambda_f(const T &, data &);
+  basic_binary_lambda_f(const T &, src_data &);
 
-  virtual std::pair<class_t, double> tag(const data::example &) const override;
+  virtual std::pair<class_t, double> tag(
+    const src_data::example &) const override;
 
   virtual bool debug() const override;
 
@@ -269,11 +274,12 @@ public:
   virtual bool load(std::istream &, const environment &) override;
   virtual bool save(std::ostream &) const override;
 
-private:  // Private support methods
+private:
+  // Private support methods
   bool load_(std::istream &, const environment &, std::true_type);
   bool load_(std::istream &, const environment &, std::false_type);
 
-private:  // Private data members
+  // Private data members
   basic_reg_lambda_f<T, S> lambda_;
 };
 
@@ -316,10 +322,11 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
 class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
 {
 public:
-  template<class... Args> team_class_lambda_f(const team<T> &, data &,
+  template<class... Args> team_class_lambda_f(const team<T> &, src_data &,
                                               Args &&...);
 
-  virtual std::pair<class_t, double> tag(const data::example &) const override;
+  virtual std::pair<class_t, double> tag(
+    const src_data::example &) const override;
 
   virtual bool debug() const override;
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE(lambda)
 template<template<class> class L, class T, unsigned P>
 struct build
 {
-  L<T> operator()(const T &prg, vita::data *d) const
+  L<T> operator()(const T &prg, vita::src_data *d) const
   {
     return L<T>(prg, *d, P);
   }
@@ -45,7 +45,7 @@ struct build
 template<template<class> class L, class T>
 struct build<L, T, 0>
 {
-  L<T> operator()(const T &prg, vita::data *d) const
+  L<T> operator()(const T &prg, vita::src_data *d) const
   {
     return L<T>(prg, *d);
   }
@@ -54,7 +54,7 @@ struct build<L, T, 0>
 template<class T>
 struct build<reg_model, T, 0>
 {
-  reg_model<T> operator()(const T &prg, vita::data *) const
+  reg_model<T> operator()(const T &prg, vita::src_data *) const
   {
     return reg_model<T>(prg);
   }

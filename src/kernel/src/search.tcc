@@ -43,6 +43,15 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 }
 
 ///
+/// \return a reference to the available data.
+///
+template<class T, template<class> class ES>
+src_data &src_search<T, ES>::data() const
+{
+  return static_cast<src_data &>(*this->prob_.data());
+}
+
+///
 /// \param[in] ind an individual.
 /// \param[out] res metrics regarding `ind`.
 ///
@@ -65,7 +74,7 @@ void src_search<T, ES>::calculate_metrics(const T &ind,
   if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(ind));
-    out->accuracy = model->measure(accuracy_metric<T>(), *this->prob_.data());
+    out->accuracy = model->measure(accuracy_metric<T>(), data());
   }
 }
 
@@ -213,7 +222,8 @@ void src_search<T, ES>::tune_parameters()
   const environment dflt(ES<T>::shape(environment(nullptr, true)));
   const environment &constrained(this->prob_.env);
 
-  const auto d_size(this->prob_.data() ? this->prob_.data()->size() : 0);
+  assert(this->prob_.data());
+  const auto d_size(data().size());
 
   // With a small number of training case:
   // * we need every training case;
@@ -296,17 +306,15 @@ void src_search<T, ES>::dss(unsigned generation) const
   if (!this->prob_.data())
     return;
 
-  data &d(*this->prob_.data());
-
   std::uintmax_t weight_sum(0);
-  auto weight([](const data::example &v) -> decltype(weight_sum)
+  auto weight([](const src_data::example &v) -> decltype(weight_sum)
               {
                 return v.difficulty + v.age * v.age * v.age;
               });
 
-  d.dataset(data::training);
-  d.slice(false);
-  for (auto &i : d)
+  data().select(data::training);
+  data().slice(false);
+  for (auto &i : data())
   {
     if (generation == 0)  // preliminary setup for generation 0
     {
@@ -320,21 +328,21 @@ void src_search<T, ES>::dss(unsigned generation) const
   }
 
   // Select a subset of the training examples.
-  // Training examples, contained in `d`, are partitioned into two subsets
+  // Training examples, contained in `data()`, are partitioned into two subsets
   // by multiple swaps (first subset: [0, count[,  second subset:
   // [count, d.size()[).
   // Note that the actual size of the selected subset (count) is not fixed
   // and, in fact, it averages slightly above target_size (Gathercole and
   // Ross felt that this might improve performance).
-  const auto s(static_cast<double>(d.size()));
+  const auto s(static_cast<double>(data().size()));
   const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
   const auto target_size(s * ratio);
   assert(0.0 <= target_size && target_size <= s);
 
-  data::iterator base(d.begin());
+  auto base(data().begin());
   unsigned count(0);
-  for (auto i(d.begin()); i != d.end(); ++i)
+  for (auto i(data().begin()); i != data().end(); ++i)
   {
     const auto p1(static_cast<double>(weight(*i)) * target_size /
                   static_cast<double>(weight_sum));
@@ -348,11 +356,11 @@ void src_search<T, ES>::dss(unsigned generation) const
     }
   }
 
-  d.slice(std::max(count, 10u));
+  data().slice(std::max(count, 10u));
   this->active_eva_->clear(evaluator<T>::all);
 
   // Selected training examples have their difficulties and ages reset.
-  for (auto &i : d)
+  for (auto &i : data())
   {
     i.difficulty = 0;
     i.age        = 1;
@@ -391,7 +399,7 @@ void src_search<T, ES>::preliminary_setup()
   Expects(this->prob_.data());
 
   if (validation())
-    this->prob_.data()->partition(this->env_.validation_percentage);
+    data().partition(this->env_.validation_percentage);
 
   // For `std::placeholders` and `std::bind` see:
   // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
@@ -409,7 +417,6 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
   Expects(this->active_eva_);
 
   // Some shorthands.
-  auto &data(*this->prob_.data());
   auto &eval(*this->active_eva_);
 
   // Depending on `validation`, the metrics stored in `s.best.score` can refer
@@ -417,15 +424,15 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
   // current run).
   if (validation())
   {
-    const data::dataset_t backup(data.dataset());
+    //const auto original_dataset(data().active_dataset());
 
-    data.dataset(data::validation);
+    data().select(data::validation);
     eval.clear(s->best.solution);
 
     s->best.score.fitness = eval(s->best.solution);
     calculate_metrics(s->best.solution, &s->best.score);
 
-    data.dataset(backup);
+    data().select(data::training);
     eval.clear(s->best.solution);
   }
   else  // not using a validation set
@@ -436,8 +443,8 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
     // performed.
     if (this->shake_)
     {
-      data.dataset(data::training);
-      data.slice(false);
+      data().select(data::training);
+      data().slice(false);
       eval.clear(s->best.solution);
 
       s->best.score.fitness = eval(s->best.solution);
@@ -507,19 +514,18 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
   }
 
   // Test set results logging.
-  vita::data &data(*this->prob_.data());
-  if (data.size(data::test))
+  if (data().size(data::test))
   {
-    const data::dataset_t backup(data.dataset());
-    data.dataset(data::test);
+    const auto original_dataset(data().active_dataset());
+    data().select(data::test);
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
     std::ofstream tf(this->env_.stat.dir + "/" + this->env_.stat.tst_name);
-    for (const auto &example : data)
+    for (const auto &example : data())
       tf << lambda->name((*lambda)(example)) << '\n';
 
-    data.dataset(backup);
+    data().select(original_dataset);
   }
 }
 
@@ -535,15 +541,15 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 {
-  auto &data(*this->prob_.data());
+  auto &d(static_cast<src_data &>(*this->prob_.data()));
 
-  if (data.classes() > 1)
+  if (d.classes() > 1)
   {
     switch (id)
     {
     case evaluator_id::bin:
       search<T, ES>::set_evaluator(
-        vita::make_unique<binary_evaluator<T>>(data));
+        vita::make_unique<binary_evaluator<T>>(d));
       return true;
 
     case evaluator_id::dyn_slot:
@@ -551,13 +557,13 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
         search<T, ES>::set_evaluator(
-          vita::make_unique<dyn_slot_evaluator<T>>(data, x_slot));
+          vita::make_unique<dyn_slot_evaluator<T>>(d, x_slot));
       }
       return true;
 
     case evaluator_id::gaussian:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<gaussian_evaluator<T>>(data));
+	    vita::make_unique<gaussian_evaluator<T>>(d));
       return true;
 
     default:
@@ -570,22 +576,22 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::count:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<count_evaluator<T>>(data));
+	    vita::make_unique<count_evaluator<T>>(d));
       return true;
 
     case evaluator_id::mae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mae_evaluator<T>>(data));
+	    vita::make_unique<mae_evaluator<T>>(d));
       return true;
 
     case evaluator_id::rmae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<rmae_evaluator<T>>(data));
+	    vita::make_unique<rmae_evaluator<T>>(d));
       return true;
 
     case evaluator_id::mse:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mse_evaluator<T>>(data));
+	    vita::make_unique<mse_evaluator<T>>(d));
       return true;
 
     default:

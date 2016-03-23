@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,10 +24,10 @@
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
-                                      const data &d) const
+                                      const src_data &d) const
 {
-  assert(!d.classes());
-  assert(d.begin() != d.end());
+  Expects(!d.classes());
+  Expects(d.begin() != d.end());
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -41,8 +41,7 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
     ++total_nr;
   }
 
-  assert(total_nr);
-
+  Ensures(total_nr);
   return static_cast<double>(ok) / static_cast<double>(total_nr);
 }
 
@@ -53,10 +52,10 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const class_lambda_f<T> *l,
-                                      const data &d) const
+                                      const src_data &d) const
 {
-  assert(d.classes());
-  assert(d.begin() != d.end());
+  Expects(d.classes());
+  Expects(d.begin() != d.end());
 
   std::uintmax_t ok(0), total_nr(0);
 
@@ -68,9 +67,8 @@ double accuracy_metric<T>::operator()(const class_lambda_f<T> *l,
     ++total_nr;
   }
 
-  assert(total_nr);
-
+  Ensures(total_nr);
   return static_cast<double>(ok) / static_cast<double>(total_nr);
 }
 
-#endif  // Include guard
+#endif  // include guard
