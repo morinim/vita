@@ -36,25 +36,25 @@ BOOST_AUTO_TEST_SUITE(lambda)
 template<template<class> class L, class T, unsigned P>
 struct build
 {
-  L<T> operator()(const T &prg, vita::src_data *d) const
+  L<T> operator()(const T &prg, vita::src_data &d) const
   {
-    return L<T>(prg, *d, P);
+    return L<T>(prg, d, P);
   }
 };
 
 template<template<class> class L, class T>
 struct build<L, T, 0>
 {
-  L<T> operator()(const T &prg, vita::src_data *d) const
+  L<T> operator()(const T &prg, vita::src_data &d) const
   {
-    return L<T>(prg, *d);
+    return L<T>(prg, d);
   }
 };
 
 template<class T>
 struct build<reg_model, T, 0>
 {
-  reg_model<T> operator()(const T &prg, vita::src_data *) const
+  reg_model<T> operator()(const T &prg, vita::src_data &) const
   {
     return reg_model<T>(prg);
   }
@@ -78,7 +78,7 @@ void test_serialization(vita::src_problem &pr)
     BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1.name(lambda1(e)));
       const auto out2(lambda2.name(lambda2(e)));
@@ -101,7 +101,7 @@ void test_team_of_one(vita::src_problem &pr)
     const team<i_mep> t{{ind}};
     const auto lt(build<L, team<i_mep>, P>()(t, pr.data()));
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out_i(li(e)), out_t(lt(e));
 
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     const team<i_mep> t{{ind, ind, ind, ind}};
     const reg_model<team<i_mep>> lt(t);
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out_i(li(e)), out_t(lt(e));
 
@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     const team<i_mep> t{{i1, i2, i3, i4}};
     const reg_model<team<i_mep>> lambda_team(t);
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1(e));
       const auto out2(lambda2(e));
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
     BOOST_REQUIRE(lambda2.load(ss, pr.env));
     BOOST_REQUIRE(lambda2.debug());
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1(e));
       const auto out2(lambda2(e));
@@ -265,7 +265,7 @@ void test_team(vita::src_problem &pr)
     const auto ts(t.individuals());
     const auto lambda_t(build<L, team<i_mep>, P>()(t, pr.data()));
 
-    for (const auto &example : *pr.data())
+    for (const auto &example : pr.data())
     {
       const std::vector<vita::any> out =
       {

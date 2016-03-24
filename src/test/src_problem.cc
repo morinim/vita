@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(t_loading)
 
   BOOST_REQUIRE(!!p);
 
-  BOOST_REQUIRE_EQUAL(p.data()->size(), 3);
+  BOOST_REQUIRE_EQUAL(p.data().size(), 3);
   BOOST_REQUIRE(p.classification());
   BOOST_REQUIRE_EQUAL(p.classes(), 3);
   BOOST_REQUIRE_EQUAL(p.categories(), 4);

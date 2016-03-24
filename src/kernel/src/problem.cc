@@ -32,8 +32,8 @@ namespace detail
 template<class C>
 std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 {
-  assert(availables.size());
-  assert(size);
+  Expects(availables.size());
+  Expects(size);
 
   std::vector<C> ret;
 
@@ -75,7 +75,8 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 ///     src_problem p;
 ///     p.clear(true);
 ///
-src_problem::src_problem(bool initialize) : problem(initialize)
+src_problem::src_problem(bool initialize) : problem(initialize), dat_(),
+                                            factory_()
 {
 }
 
@@ -101,7 +102,7 @@ src_problem::src_problem(const char ds[])
 ///
 src_problem::src_problem(const std::string &ds, const std::string &ts,
                          const std::string &symbols)
-  : problem(false)
+  : problem(false), dat_(), factory_()
 {
   load(ds, ts, symbols);
 }

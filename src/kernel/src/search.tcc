@@ -36,7 +36,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 {
   Expects(p.debug());
 
-  if (p.data()->size() && !this->active_eva_)
+  if (p.data().size() && !this->active_eva_)
     set_evaluator(p.classification() ? p_class : p_symre);
 
   Ensures(this->debug());
@@ -48,7 +48,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 template<class T, template<class> class ES>
 src_data &src_search<T, ES>::data() const
 {
-  return static_cast<src_data &>(*this->prob_.data());
+  return static_cast<src_problem &>(this->prob_).data();
 }
 
 ///
@@ -302,7 +302,7 @@ void src_search<T, ES>::tune_parameters()
 template<class T, template<class> class ES>
 void src_search<T, ES>::dss(unsigned generation) const
 {
-  if (!this->prob_.data())
+  if (!data())
     return;
 
   std::uintmax_t weight_sum(0);
@@ -395,8 +395,6 @@ bool src_search<T, ES>::validation() const
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  Expects(this->prob_.data());
-
   if (validation())
     data().partition(this->env_.validation_percentage);
 
@@ -412,7 +410,6 @@ void src_search<T, ES>::preliminary_setup()
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  Expects(this->prob_.data());
   Expects(this->active_eva_);
 
   // Some shorthands.
@@ -423,8 +420,6 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
   // current run).
   if (validation())
   {
-    //const auto original_dataset(data().active_dataset());
-
     data().select(data::validation);
     eval.clear(s->best.solution);
 
@@ -540,15 +535,13 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 {
-  auto &d(static_cast<src_data &>(*this->prob_.data()));
-
-  if (d.classes() > 1)
+  if (data().classes() > 1)
   {
     switch (id)
     {
     case evaluator_id::bin:
       search<T, ES>::set_evaluator(
-        vita::make_unique<binary_evaluator<T>>(d));
+        vita::make_unique<binary_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::dyn_slot:
@@ -556,13 +549,13 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
         search<T, ES>::set_evaluator(
-          vita::make_unique<dyn_slot_evaluator<T>>(d, x_slot));
+          vita::make_unique<dyn_slot_evaluator<T>>(data(), x_slot));
       }
       return true;
 
     case evaluator_id::gaussian:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<gaussian_evaluator<T>>(d));
+	    vita::make_unique<gaussian_evaluator<T>>(data()));
       return true;
 
     default:
@@ -575,22 +568,22 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::count:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<count_evaluator<T>>(d));
+	    vita::make_unique<count_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::mae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mae_evaluator<T>>(d));
+	    vita::make_unique<mae_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::rmae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<rmae_evaluator<T>>(d));
+	    vita::make_unique<rmae_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::mse:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mse_evaluator<T>>(d));
+	    vita::make_unique<mse_evaluator<T>>(data()));
       return true;
 
     default:

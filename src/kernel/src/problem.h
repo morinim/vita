@@ -38,7 +38,7 @@ public:
   std::size_t load_test_set(const std::string &);
   void setup_default_symbols();
 
-  virtual vita::src_data *data() override { return &dat_; }
+  vita::src_data &data() { return dat_; }
 
   virtual void clear(bool) override;
 
@@ -63,4 +63,4 @@ private:
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

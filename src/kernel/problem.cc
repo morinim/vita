@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,16 +35,6 @@ void problem::clear(bool initialize)
   *this = std::move(problem(initialize));
   //env = environment(&sset, initialize);
   //sset = symbol_set();
-}
-
-///
-/// \return an access point for the dataset.
-///
-/// The default value is `nullptr`. Not every problem is dataset-based.
-///
-vita::data *problem::data()
-{
-  return nullptr;
 }
 
 ///

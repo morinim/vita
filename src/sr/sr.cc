@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,7 +64,7 @@ void fix_parameters(vita::src_problem *problem)
     env.code_length = new_length;
   }
 
-  if (env.dss != trilean::no && problem->data()->size() <= 30)
+  if (env.dss != trilean::no && problem->data().size() <= 30)
   {
     print.warning("Adjusting DSS (=> false)");
     env.dss = trilean::no;
@@ -343,22 +343,26 @@ void generations(unsigned g)
 ///
 void go(bool = true)
 {
-  if (problem->data()->size())
-    if (problem->env.sset->enough_terminals())
-    {
-      fix_parameters(problem);
-
-      vita::src_search<vita::i_mep, vita::alps_es> s(*problem);
-
-      if (eva != vita::evaluator_id::undefined)
-        s.set_evaluator(eva, eva_args);
-
-      s.run(runs);
-    }
-    else
-      print.error("Too few terminals");
-  else
+  if (!problem->data().size())
+  {
     print.error("Missing data set");
+    return;
+  }
+
+  if (!problem->env.sset->enough_terminals())
+  {
+    print.error("Too few terminals");
+    return;
+  }
+
+  fix_parameters(problem);
+
+  vita::src_search<vita::i_mep, vita::alps_es> s(*problem);
+
+  if (eva != vita::evaluator_id::undefined)
+    s.set_evaluator(eva, eva_args);
+
+  s.run(runs);
 }
 
 ///
@@ -883,7 +887,7 @@ int main(int argc, char *const argv[])
   if (ret == 0)  // error
     return EXIT_FAILURE;
 
-  if (problem.data()->size())
+  if (problem.data().size())
     ui::go();
   else
   {
