@@ -192,10 +192,8 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
   for (auto i(decltype(columns){1}); i < columns; ++i)
     if (skip.find(i) == skip.end())
     {
-      std::string name(dat_.get_column(i).name);
-      if (name.empty())
-        name = "X" + std::to_string(i);
-
+      const std::string name(coalesce(dat_.get_column(i).name,
+                                      "X" + std::to_string(i)));
       const category_t category(dat_.get_column(i).category_id);
       env.sset->insert(vita::make_unique<variable>(name, i - 1, category));
     }
