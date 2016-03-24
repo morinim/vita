@@ -78,7 +78,7 @@ private:
   virtual void log_nvi(tinyxml2::XMLDocument *,
                        const summary<T> &) const override;
 
-private:  // Private data members
+  // Private data members.
   // Preferred evaluator for symbolic regression.
   evaluator_id p_symre;
 
@@ -92,4 +92,4 @@ private:  // Private data members
 #include "kernel/src/search.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

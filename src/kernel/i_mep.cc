@@ -74,7 +74,7 @@ i_mep::i_mep(const std::vector<gene> &gv)
   for (const auto &g : gv)
     set({i++, g.sym->category()}, g);
 
-  assert(debug());
+  Ensures(debug());
 }
 
 
@@ -112,7 +112,7 @@ i_mep i_mep::get_block(const locus &l) const
   ret.best_ = l;
   ret.signature_.clear();
 
-  assert(ret.debug());
+  Ensures(ret.debug());
   return ret;
 }
 
@@ -190,7 +190,7 @@ i_mep i_mep::replace(const locus &l, const gene &g) const
 
   ret.set(l, g);
 
-  assert(ret.debug());
+  Ensures(ret.debug());
   return ret;
 }
 
@@ -214,14 +214,14 @@ i_mep i_mep::replace(const gene &g) const
 ///
 i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 {
-  assert(index < size());
+  Expects(index < size());
 
   i_mep ret(*this);
   const category_t c_sup(categories());
   for (category_t c(0); c < c_sup; ++c)
     ret.set({index, c}, gene(sset.roulette_terminal(c)));
 
-  assert(ret.debug());
+  Ensures(ret.debug());
   return ret;
 }
 
@@ -291,9 +291,9 @@ bool i_mep::operator==(const i_mep &x) const
 {
   const bool eq(genome_ == x.genome_);
 
-  assert(!eq ||
-         signature_.empty() != x.signature_.empty() ||
-         signature_ == x.signature_);
+  Ensures(!eq ||
+          signature_.empty() != x.signature_.empty() ||
+          signature_ == x.signature_);
 
   return eq;
 }
@@ -308,8 +308,8 @@ bool i_mep::operator==(const i_mep &x) const
 ///
 unsigned distance(const i_mep &lhs, const i_mep &rhs)
 {
-  assert(lhs.size() == rhs.size());
-  assert(lhs.categories() == rhs.categories());
+  Expects(lhs.size() == rhs.size());
+  Expects(lhs.categories() == rhs.categories());
 
   const index_t i_sup(lhs.size());
   const category_t c_sup(lhs.categories());
@@ -380,7 +380,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 ///
 hash_t i_mep::hash() const
 {
-  assert(size());
+  Expects(size());
   //if (empty())
   //  return hash_t();
 
@@ -895,8 +895,8 @@ i_mep i_mep::compress() const
 ///
 i_mep i_mep::crossover(i_mep rhs) const
 {
-  assert(rhs.debug());
-  assert(size() == rhs.size());
+  Expects(rhs.debug());
+  Expects(size() == rhs.size());
 
   for (auto &l : rhs)
     if (random::boolean())
@@ -904,7 +904,7 @@ i_mep i_mep::crossover(i_mep rhs) const
 
   rhs.set_older_age(age());
 
-  assert(rhs.debug(true));
+  Ensures(rhs.debug(true));
   return rhs;
 }
 #elif defined(ONE_POINT_CROSSOVER)
@@ -924,8 +924,8 @@ i_mep i_mep::crossover(i_mep rhs) const
 ///
 i_mep i_mep::crossover(i_mep rhs) const
 {
-  assert(rhs.debug());
-  assert(size() == rhs.size());
+  Expects(rhs.debug());
+  Expects(size() == rhs.size());
 
   const auto i_sup(size());
   const auto c_sup(categories());
@@ -949,7 +949,7 @@ i_mep i_mep::crossover(i_mep rhs) const
 
   rhs.set_older_age(age());
 
-  assert(rhs.debug());
+  Ensures(rhs.debug());
   return rhs;
 }
 #elif defined(TREE_CROSSOVER)
@@ -968,15 +968,15 @@ i_mep i_mep::crossover(i_mep rhs) const
 ///
 i_mep i_mep::crossover(i_mep rhs) const
 {
-  assert(rhs.debug());
-  assert(size() == rhs.size());
+  Expects(rhs.debug());
+  Expects(size() == rhs.size());
 
   for (auto it(std::next(begin(), eff_size())); it != end(); ++it)
     rhs.set(*it, operator[](*it));
 
   rhs.set_older_age(age());
 
-  assert(rhs.debug());
+  Ensures(rhs.debug());
   return rhs;
 }
 #else  // TWO_POINT_CROSSOVER (default)
@@ -996,8 +996,8 @@ i_mep i_mep::crossover(i_mep rhs) const
 ///
 i_mep i_mep::crossover(i_mep rhs) const
 {
-  assert(rhs.debug());
-  assert(size() == rhs.size());
+  Expects(rhs.debug());
+  Expects(size() == rhs.size());
 
   const auto i_sup(size());
   const auto c_sup(categories());
@@ -1033,7 +1033,7 @@ i_mep i_mep::crossover(i_mep rhs) const
 
   rhs.set_older_age(age());
 
-  assert(rhs.debug());
+  Ensures(rhs.debug());
   return rhs;
 }
 #endif

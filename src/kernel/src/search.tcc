@@ -222,7 +222,6 @@ void src_search<T, ES>::tune_parameters()
   const environment dflt(ES<T>::shape(environment(nullptr, true)));
   const environment &constrained(this->prob_.env);
 
-  assert(this->prob_.data());
   const auto d_size(data().size());
 
   // With a small number of training case:
@@ -389,8 +388,8 @@ bool src_search<T, ES>::stop_condition(const summary<T> &s) const
 template<class T, template<class> class ES>
 bool src_search<T, ES>::validation() const
 {
-  return 0.0 < this->env_.validation_percentage &&
-         this->env_.validation_percentage < 100.0;
+  return 0 < this->env_.validation_percentage &&
+         this->env_.validation_percentage < 100;
 }
 
 template<class T, template<class> class ES>
