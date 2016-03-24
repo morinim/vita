@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -168,8 +168,8 @@ public:  // Data members
   /// `validation_percentage` is the fraction of the original data that goes
   /// into the validation set.
   ///
-  /// \note A value greater than 100 means undefined (auto-tune).
-  unsigned validation_percentage = 101;
+  /// \note The special value 100 means auto-tune.
+  unsigned validation_percentage = 100;
 
   /// Should we use Adaptive Representation through Learning?
   trilean arl = trilean::unknown;

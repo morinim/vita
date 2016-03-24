@@ -271,7 +271,7 @@ void src_search<T, ES>::tune_parameters()
     print.info("Population size set to ", this->env_.individuals);
   }
 
-  if (constrained.validation_percentage > 100)
+  if (constrained.validation_percentage == 100)
   {
     if (d_size && d_size * dflt.validation_percentage < 10000)
       this->env_.validation_percentage = 0;
@@ -388,14 +388,14 @@ bool src_search<T, ES>::stop_condition(const summary<T> &s) const
 template<class T, template<class> class ES>
 bool src_search<T, ES>::validation() const
 {
-  return 0 < this->env_.validation_percentage &&
-         this->env_.validation_percentage < 100;
+  return data().size(data::validation);
 }
 
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  if (validation())
+  Expects(this->env_.validation_percentage < 100);
+  if (this->env_.validation_percentage)
     data().partition(this->env_.validation_percentage);
 
   // For `std::placeholders` and `std::bind` see:

@@ -63,7 +63,7 @@ void search<T, ES>::tune_parameters()
   if (!constrained.layers)
     env_.layers = dflt.layers;
 
-  if (constrained.validation_percentage > 100)
+  if (constrained.validation_percentage == 100)
     env_.validation_percentage = dflt.validation_percentage;
 
   if (!constrained.individuals)

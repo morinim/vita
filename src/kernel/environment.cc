@@ -48,17 +48,16 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     validation_percentage = 20;
   }
 
-  assert(debug(initialize));
+  Ensures(debug(initialize));
 }
 
 ///
+/// \brief Saves the environment in XML format.
 /// \param[out] d output document for saving the environment.
-///
-/// Saves the environment (XML format).
 ///
 void environment::xml(tinyxml2::XMLDocument *d) const
 {
-  assert(stat.summary);
+  Expects(stat.summary);
 
   auto *root(d->RootElement());
 
@@ -201,7 +200,7 @@ bool environment::debug(bool force_defined) const
       return false;
     }
 
-    if (validation_percentage > 100)
+    if (validation_percentage == 100)
     {
       print.error("Undefined validation_percentage data member");
       return false;
@@ -247,6 +246,12 @@ bool environment::debug(bool force_defined) const
   if (p_cross > 1.0)
   {
     print.error("p_cross out of range");
+    return false;
+  }
+
+  if (validation_percentage > 100)
+  {
+    print.error("validation_percentage out of range");
     return false;
   }
 
