@@ -52,6 +52,19 @@ src_data &src_search<T, ES>::data() const
 }
 
 ///
+/// \param[in] ind individual to be transformed in a lambda function.
+/// \return the lambda function associated with `ind` (`nullptr` in case of
+///         errors).
+///
+/// The lambda function depends on the active evaluator.
+///
+template<class T, template<class> class ES>
+std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
+{
+  return this->active_eva_->lambdify(ind);
+}
+
+///
 /// \param[in] ind an individual.
 /// \param[out] res metrics regarding `ind`.
 ///

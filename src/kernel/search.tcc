@@ -159,19 +159,6 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with `ind` (`nullptr` in case of
-///         errors).
-///
-/// The lambda function depends on the active evaluator.
-///
-template<class T, template<class> class ES>
-std::unique_ptr<lambda_f<T>> search<T, ES>::lambdify(const T &ind) const
-{
-  return active_eva_->lambdify(ind);
-}
-
-///
 /// \param[in] e the evaluator that should be set as active.
 ///
 template<class T, template<class> class ES>

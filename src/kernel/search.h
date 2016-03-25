@@ -43,8 +43,6 @@ class search
 public:
   explicit search(problem &);
 
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
-
   summary<T> run(unsigned = 1);
 
   void set_evaluator(std::unique_ptr<evaluator<T>>);
