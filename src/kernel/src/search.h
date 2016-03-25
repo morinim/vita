@@ -66,7 +66,6 @@ private:
   src_data &data() const;
   void dss(unsigned) const;
   bool stop_condition(const summary<T> &) const;
-  bool validation() const;
 
   // Template methods for search::run() member function.
   virtual void preliminary_setup() override;

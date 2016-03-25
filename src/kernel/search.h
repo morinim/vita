@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -51,12 +51,13 @@ public:
 
   bool debug() const;
 
-protected:  // Protected support methods
+protected:
+  // Protected support methods
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
   virtual void tune_parameters();
 
-protected:  // Protected data members
+  // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
 
   // This is the environment actually used during the search (`prob_->env`

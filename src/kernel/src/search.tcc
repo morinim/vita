@@ -386,12 +386,6 @@ bool src_search<T, ES>::stop_condition(const summary<T> &s) const
 }
 
 template<class T, template<class> class ES>
-bool src_search<T, ES>::validation() const
-{
-  return data().size(data::validation);
-}
-
-template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
   Expects(this->env_.validation_percentage < 100);
@@ -418,7 +412,7 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
   // Depending on `validation`, the metrics stored in `s.best.score` can refer
   // to the training set or to the validation set (anyway they regard the
   // current run).
-  if (validation())
+  if (data().size(data::validation))
   {
     data().select(data::validation);
     eval.clear(s->best.solution);
@@ -460,7 +454,8 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(validation() ? "Validation " : "Training ");
+  const std::string s(data().size(data::validation) ? "Validation "
+                                                    : "Training ");
 
   print.info(s, "fitness: ", m.fitness);
 

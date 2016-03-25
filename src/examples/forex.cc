@@ -24,6 +24,7 @@
 namespace fxs  // Forex symbols
 {
 using i_interp = vita::core_interpreter;
+using team = vita::team<vita::i_mep>;
 
 enum
 {
@@ -236,19 +237,29 @@ struct dark_cloud_cover : tfi_terminal<TF, 1>
   }
 };
 
-template<class T>
-class evaluator : public vita::evaluator<T>
+class evaluator : public vita::evaluator<team>
 {
 public:
   explicit evaluator(trade_simulator *ts) : ts_(ts) {}
 
-  virtual vita::fitness_t operator()(const T &t) override
+  virtual vita::fitness_t operator()(const team &t) override
   {
     return {ts_->run(t)};
   }
 
 private:
   trade_simulator *ts_;
+};
+
+class search : public vita::search<team, vita::alps_es>
+{
+public:
+  using vita::search<team, vita::alps_es>::search;
+
+private:
+  virtual void after_evolution(vita::summary<team> *)
+  {
+  }
 };
 
 }  // namespace fxs
@@ -347,10 +358,9 @@ int main()
   p.env.stat.dir = "forex_results/";
 
   std::cout << "STARTING RUN\n";
-  vita::search<vita::team<vita::i_mep>, vita::alps_es> engine(p);
+  fxs::search engine(p);
 
-  using team = vita::team<vita::i_mep>;
-  engine.set_evaluator(vita::make_unique<fxs::evaluator<team>>(&ts));
+  engine.set_evaluator(vita::make_unique<fxs::evaluator>(&ts));
 
   engine.run(1);
 
