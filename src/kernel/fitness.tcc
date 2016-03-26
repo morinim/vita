@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@
 template<class T>
 basic_fitness_t<T>::basic_fitness_t(unsigned n, fit_tag, T v) : vect_(n, v)
 {
-  assert(n);
+  Expects(n);
 }
 
 ///

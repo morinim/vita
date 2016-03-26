@@ -64,12 +64,13 @@ protected:
 
 private:
   // Private support methods
-  void calculate_metrics(const T &, model_measurements *) const;
   src_data &data() const;
   void dss(unsigned) const;
   bool stop_condition(const summary<T> &) const;
 
   // Template methods for search::run() member function.
+  virtual model_measurements calculate_metrics(
+    const summary<T> &) const override;
   virtual void preliminary_setup() override;
   virtual void after_evolution(summary<T> *) override;
   virtual void print_resume(const model_measurements &) const override;

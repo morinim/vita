@@ -47,8 +47,6 @@ public:
   virtual bool has(dataset_t) const = 0;
 
 private:
-  // The active dataset (begin(), end() and size() methods operate on that
-  // one).
   dataset_t active_dataset_;
 };
 

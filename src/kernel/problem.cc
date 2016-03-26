@@ -15,7 +15,7 @@
 namespace vita
 {
 ///
-/// \brief A new uninitialized problem
+/// \brief A new uninitialized problem.
 ///
 /// \param[in] initialize should the environment be initialized with default
 ///                       values?
@@ -25,10 +25,19 @@ problem::problem(bool initialize) : env(&sset, initialize)
 }
 
 ///
+/// \return an access point for the data.
+///
+/// The default value is `nullptr`: not every problem is dataset-based.
+///
+vita::data *problem::data()
+{
+  return nullptr;
+}
+
+///
+/// \brief Resets the object.
 /// \param[in] initialize if `true` initialize the environment with default
 ///                       values.
-///
-/// Resets the object.
 ///
 void problem::clear(bool initialize)
 {

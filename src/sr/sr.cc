@@ -64,7 +64,7 @@ void fix_parameters(vita::src_problem *problem)
     env.code_length = new_length;
   }
 
-  if (env.dss != trilean::no && problem->data().size() <= 30)
+  if (env.dss != trilean::no && problem->data()->size() <= 30)
   {
     print.warning("Adjusting DSS (=> false)");
     env.dss = trilean::no;
@@ -343,7 +343,7 @@ void generations(unsigned g)
 ///
 void go(bool = true)
 {
-  if (!problem->data().size())
+  if (!problem->data()->size())
   {
     print.error("Missing data set");
     return;
@@ -887,7 +887,7 @@ int main(int argc, char *const argv[])
   if (ret == 0)  // error
     return EXIT_FAILURE;
 
-  if (problem.data().size())
+  if (problem.data()->size())
     ui::go();
   else
   {

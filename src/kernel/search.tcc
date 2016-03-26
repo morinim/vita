@@ -29,6 +29,20 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env),
 }
 
 ///
+/// \param[in] s summary of the evolution run just finished.
+/// \return the fitness of `s.best.solution` (other record of
+///         model_measurements are unmodified).
+///
+/// Specializations of this method can calculate further problem specific
+/// metrics regarding `s.best.solution`.
+///
+template<class T, template<class> class ES>
+model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
+{
+  return s.best.score;
+}
+
+///
 /// \brief Tries to tune search parameters for the current problem
 ///
 template<class T, template<class> class ES>
@@ -109,8 +123,8 @@ summary<T> search<T, ES>::run(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto run_summary(evolution<T, ES>(this->env_, *this->active_eva_,
-                                      stop_,shake_).run(r));
+    auto run_summary(evolution<T, ES>(env_, *active_eva_, stop_,
+                                      shake_).run(r));
 
     after_evolution(&run_summary);
 

@@ -36,7 +36,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 {
   Expects(p.debug());
 
-  if (p.data().size() && !this->active_eva_)
+  if (data().size() && !this->active_eva_)
     set_evaluator(p.classification() ? p_class : p_symre);
 
   Ensures(this->debug());
@@ -48,7 +48,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 template<class T, template<class> class ES>
 src_data &src_search<T, ES>::data() const
 {
-  return static_cast<src_problem &>(this->prob_).data();
+  return *static_cast<src_problem &>(this->prob_).data();
 }
 
 ///
@@ -65,8 +65,8 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 }
 
 ///
-/// \param[in] ind an individual.
-/// \param[out] res metrics regarding `ind`.
+/// \param[in] s summary of the evolution run just finished.
+/// \return metrics regarding `s.best.solution`.
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
@@ -75,20 +75,23 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 /// * we explicitly asked for accuracy calculation (see the `src_search`
 ///   constructor).
 ///
-/// Otherwise the function will skip accuracy calculation, returning a negative
-/// value.
+/// Otherwise the function will skip accuracy calculation.
 ///
-/// \warning Could be very time consuming.
+/// \warning Can be very time consuming.
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::calculate_metrics(const T &ind,
-                                          model_measurements *out) const
+model_measurements src_search<T, ES>::calculate_metrics(
+  const summary<T> &s) const
 {
+  model_measurements ret(s.best.score);
+
   if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
   {
-    const auto model(this->lambdify(ind));
-    out->accuracy = model->measure(accuracy_metric<T>(), data());
+    const auto model(this->lambdify(s.best.solution));
+    ret.accuracy = model->measure(accuracy_metric<T>(), data());
   }
+
+  return ret;
 }
 
 ///
@@ -300,8 +303,8 @@ void src_search<T, ES>::tune_parameters()
 
 ///
 /// \param[in] generation the generation that has been reached by the
-///            evolution. The method uses this parameter to setup some
-///            structures when generation == 0.
+///                       evolution. The method uses this parameter to
+///                       initialize some structures when `generation == 0`.
 ///
 /// Dynamic Training Subset Selection for Supervised Learning in Genetic
 /// Programming.
@@ -342,8 +345,8 @@ void src_search<T, ES>::dss(unsigned generation) const
   // Select a subset of the training examples.
   // Training examples, contained in `data()`, are partitioned into two subsets
   // by multiple swaps (first subset: [0, count[,  second subset:
-  // [count, d.size()[).
-  // Note that the actual size of the selected subset (count) is not fixed
+  // [count, data().size()[).
+  // Note that the actual size of the selected subset (`count`) is not fixed
   // and, in fact, it averages slightly above target_size (Gathercole and
   // Ross felt that this might improve performance).
   const auto s(static_cast<double>(data().size()));
@@ -418,25 +421,22 @@ template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
   Expects(this->active_eva_);
-
-  // Some shorthands.
   auto &eval(*this->active_eva_);
 
-  // Depending on `validation`, the metrics stored in `s.best.score` can refer
-  // to the training set or to the validation set (anyway they regard the
-  // current run).
-  if (data().size(data::validation))
+  // If a validation test is available the performance of the best trained
+  // individual is recalculated.
+  if (data().has(data::validation))
   {
     data().select(data::validation);
     eval.clear(s->best.solution);
 
     s->best.score.fitness = eval(s->best.solution);
-    calculate_metrics(s->best.solution, &s->best.score);
+    s->best.score = calculate_metrics(*s);
 
     data().select(data::training);
     eval.clear(s->best.solution);
   }
-  else  // not using a validation set
+  else
   {
     // If shake is true, the values calculated during the evolution
     // refer to a subset of the available training set. Since we need an
@@ -451,7 +451,7 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
       s->best.score.fitness = eval(s->best.solution);
     }
 
-    calculate_metrics(s->best.solution, &s->best.score);
+    s->best.score = calculate_metrics(*s);
   }
 
   if (this->env_.arl == trilean::yes)

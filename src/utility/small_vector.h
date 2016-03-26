@@ -48,7 +48,7 @@ namespace vita
 template<class T, std::size_t S = 0>
 class small_vector
 {
-  static_assert(S >= 1, "smalla_vector requires a positive size");
+  static_assert(S >= 1, "small_vector requires a positive size");
 
 public:  // Type aliases
   using value_type = T;

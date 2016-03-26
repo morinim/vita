@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(t_loading)
 
   BOOST_REQUIRE(!!p);
 
-  BOOST_REQUIRE_EQUAL(p.data().size(), 3);
+  BOOST_REQUIRE_EQUAL(p.data()->size(), 3);
   BOOST_REQUIRE(p.classification());
   BOOST_REQUIRE_EQUAL(p.classes(), 3);
   BOOST_REQUIRE_EQUAL(p.categories(), 4);

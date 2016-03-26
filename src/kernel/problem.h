@@ -13,6 +13,7 @@
 #if !defined(VITA_PROBLEM_H)
 #define      VITA_PROBLEM_H
 
+#include "kernel/data.h"
 #include "kernel/environment.h"
 
 namespace vita
@@ -28,6 +29,8 @@ class problem
 {
 public:
   explicit problem(bool = false);
+
+  virtual vita::data *data();
 
   virtual void clear(bool);
 

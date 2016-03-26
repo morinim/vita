@@ -70,6 +70,7 @@ protected:
 
 private:
   // Template methods for search::run() member function.
+  virtual model_measurements calculate_metrics(const summary<T> &) const;
   virtual void preliminary_setup() {}
   virtual void after_evolution(summary<T> *) {}
   virtual void print_resume(const model_measurements &) const;
@@ -82,4 +83,4 @@ private:
 #include "kernel/search.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
