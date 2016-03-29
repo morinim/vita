@@ -467,13 +467,13 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(data().size(data::validation) ? "Validation "
-                                                    : "Training ");
+  const std::string s(data().has(data::validation) ? "Validation "
+                                                   : "Training ");
 
   print.info(s, "fitness: ", m.fitness);
 
   if (0.0 <= m.accuracy && m.accuracy <= 1.0)
-    print.info(s, "Accuracy: ", 100.0 * m.accuracy, '%');
+    print.info(s, "accuracy: ", 100.0 * m.accuracy, '%');
 }
 
 ///

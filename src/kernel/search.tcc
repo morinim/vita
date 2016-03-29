@@ -169,7 +169,11 @@ summary<T> search<T, ES>::run(unsigned n)
 template<class T, template<class> class ES>
 void search<T, ES>::print_resume(const model_measurements &m) const
 {
-  print.info("Fitness: ", m.fitness);
+  const std::string s(prob_.data() &&
+                      prob_.data()->has(data::validation) ? "Validation "
+                                                          : "Training ");
+
+  print.info(s, "fitness: ", m.fitness);
 }
 
 ///
