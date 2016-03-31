@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,9 +20,9 @@ namespace vita
 template<class T> using penalty_func_t = std::function<double (const T &)>;
 
 ///
-/// \tparam T the type of individual used
-/// \tparam E the basic evaluator
-/// \tparam P the penalty function
+/// \tparam T the type of individual used.
+/// \tparam E the basic evaluator.
+/// \tparam P the penalty function.
 ///
 /// The class merges a basic evaluator and a penalty function into a new
 /// combined evaluator.

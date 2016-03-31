@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -333,4 +333,51 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
   BOOST_CHECK_CLOSE(res[11], 3.0, 1.0);
   BOOST_CHECK_CLOSE(res[12], 1.0, 1.0);
 }
+
+// Test problem from <http://stackoverflow.com/q/36230735/3235496>
+BOOST_AUTO_TEST_CASE(Search_TestProblem4)
+{
+  env.individuals = 20;
+  env.generations = 120;
+  env.threshold.fitness = {0, 0};
+
+  vita::print.verbosity(vita::log::L_WARNING);
+
+  vita::problem prob;
+  prob.env = env;
+
+  // Problem's parameters.
+  prob.env.sset->insert(vita::ga::parameter(0, 0.0, 100.0));
+  prob.env.sset->insert(vita::ga::parameter(1, 0.0, 100.0));
+
+  auto f = [](const std::vector<double> &x)
+    {
+      return
+      x[0] - (std::max(0.0, x[0] - 50.0) * x[1]) +
+      std::max(0.0, x[0] - 75.0) * 2 * x[1];
+    };
+
+  auto p = [](const vita::i_ga &prg)
+    {
+      double r(0.0);
+
+      for (unsigned i(0); i < 2; ++i)
+      {
+        if (prg[i] < 0.0)
+          r += -prg[i];
+        else if(prg[i] > 100.0)
+          r += prg[i] - 100.0;
+      }
+
+      return r;
+    };
+
+  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
+  BOOST_REQUIRE(s.debug());
+
+  const auto res(s.run().best.solution);
+
+  BOOST_CHECK_CLOSE(f(res), 100.0, 0.1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
