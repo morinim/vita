@@ -211,11 +211,13 @@ i_ga i_ga::crossover(double p, const double f[2],
   assert(ps == b.parameters());
   assert(ps == c.parameters());
 
-  for (auto i(decltype(ps){0}); i < ps; ++i)
+  const auto rf(random::between(f[0], f[1]));
+  for (auto i(decltype(ps){0}); i < ps - 1; ++i)
     if (random::boolean(p))
-      c[i] += random::between(f[0], f[1]) * (a[i] - b[i]);
+      c[i] += rf * (a[i] - b[i]);
     else
       c[i] = operator[](i);
+  c[ps - 1] += rf * (a[ps - 1] - b[ps - 1]);
 
   c.set_older_age(std::max({age(), a.age(), b.age()}));
 
