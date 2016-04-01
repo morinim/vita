@@ -337,8 +337,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 // Test problem from <http://stackoverflow.com/q/36230735/3235496>
 BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 {
-  env.individuals = 20;
-  env.generations = 120;
+  env.individuals = 50;
+  env.generations = 1000;
   env.threshold.fitness = {0, 0};
 
   vita::print.verbosity(vita::log::L_WARNING);
@@ -378,6 +378,72 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
   const auto res(s.run().best.solution);
 
   BOOST_CHECK_CLOSE(f(res), 100.0, 0.1);
+}
+
+// Test problem based on Langermann function (multimodal, with many unevely
+// distributed local minima).
+BOOST_AUTO_TEST_CASE(Search_TestProblem5)
+{
+  env.individuals = 100;
+  env.generations = 500;
+  env.threshold.fitness = {0, 0};
+
+  vita::print.verbosity(vita::log::L_WARNING);
+
+  vita::problem prob;
+  prob.env = env;
+
+  // Problem's parameters.
+  for (unsigned i(0); i < 2; ++i)
+    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 10.0));
+
+  auto f = [](const std::vector<double> &x)
+    {
+      const double A[5][2] = {{3.0, 5.0}, {5.0, 2.0}, {2.0, 1.0},
+                              {1.0, 4.0}, {7.0, 9.0}};
+      const double c[5] = {1.0, 2.0, 5.0, 2.0, 3.0};
+      const double pi(3.1415926535897932);
+      const unsigned d(2);
+      const unsigned m(5);
+
+      double ret(0.0);
+
+      for (unsigned i(0); i < m; ++i)
+      {
+        double s(0.0);
+        for (unsigned j(0); j < d; ++j)
+          s += std::pow(x[j] - A[i][j], 2.0);
+
+        ret += c[i] * std::exp(-s / pi) * std::cos(pi * s);
+      }
+
+      return ret;
+    };
+  assert(std::abs(f({2.00299219, 1.006096}) - 5.1621259) < 0.001);
+
+  auto p = [](const vita::i_ga &prg)
+    {
+      double r(0.0);
+
+      for (unsigned i(0); i < 2; ++i)
+      {
+        if (prg[i] < 0.0)
+          r += -prg[i];
+        else if(prg[i] > 10.0)
+          r += prg[i] - 10.0;
+      }
+
+      return r;
+    };
+
+  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
+  BOOST_REQUIRE(s.debug());
+
+  const auto res(s.run().best.solution);
+
+  BOOST_CHECK_CLOSE(f(res), 5.1621259, 0.1);
+  BOOST_CHECK_CLOSE(res[0], 2.00299219, 0.1);
+  BOOST_CHECK_CLOSE(res[1], 1.006096, 0.1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
