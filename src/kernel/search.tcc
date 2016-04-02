@@ -229,7 +229,10 @@ bool search<T, ES>::debug() const
   if (!env_.debug(false))
     return false;
 
-  return debug_nvi();
+  if (!prob_.debug())
+    return false;
+
+  return true;
 }
 
 ///

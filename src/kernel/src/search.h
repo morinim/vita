@@ -61,6 +61,8 @@ public:
 
   bool set_evaluator(evaluator_id, const std::string & = "");
 
+  virtual bool debug() const override;
+
 protected:
   virtual void tune_parameters() override;
 
@@ -77,7 +79,6 @@ private:
   virtual void print_resume(const model_measurements &) const override;
 
   // NVI template methods
-  virtual bool debug_nvi() const override;
   virtual void log_nvi(tinyxml2::XMLDocument *,
                        const summary<T> &) const override;
 

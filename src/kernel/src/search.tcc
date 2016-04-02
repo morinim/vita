@@ -314,11 +314,12 @@ void src_search<T, ES>::tune_parameters()
 template<class T, template<class> class ES>
 bool src_search<T, ES>::stop_condition(const summary<T> &s) const
 {
-  // We use an accelerated stop condition when
-  // * all the individuals have the same fitness
-  // * after env_.g_without_improvement generations the situation doesn't
+  Expects(this->env_.g_without_improvement);
+
+  // We use an accelerated stop condition when:
+  // - all the individuals have the same fitness;
+  // - after `env_.g_without_improvement` generations the situation doesn't
   //   change.
-  assert(this->env_.g_without_improvement);
   if (s.gen - s.last_imp > this->env_.g_without_improvement &&
       issmall(s.az.fit_dist().variance()))
     return true;
@@ -494,7 +495,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::debug_nvi() const
+bool src_search<T, ES>::debug() const
 {
   if (p_symre == evaluator_id::undefined)
   {
@@ -508,7 +509,7 @@ bool src_search<T, ES>::debug_nvi() const
     return false;
   }
 
-  return true;
+  return search<T, ES>::debug();
 }
 
-#endif  // Include guard
+#endif  // include guard

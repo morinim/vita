@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -49,7 +49,7 @@ public:
     : selection(pop, eva, *s), recombination(pop, eva, s),
       replacement(pop, eva), pop_(pop), sum_(s)
   {
-    assert(s);
+    Expects(s);
   }
 
   /// Evolution strategy specific log function (it's called by the
@@ -72,18 +72,18 @@ public:
   static constexpr bool is_de =
     std::is_same<CS<T>, typename vita::recombination::de<T>>::value;
 
-public:  // Public data members
+public:
   SS<T> selection;
   CS<T> recombination;
   RS<T> replacement;
 
-protected:  // Protected data members
+protected:
   population<T> &pop_;
   summary<T>    *sum_;
 };
 
 ///
-/// \brief ALPS evolution strategy
+/// \brief ALPS evolution strategy.
 ///
 /// With ALPS, several instances of a search algorithm are run in parallel,
 /// each in its own age-layer, and the age of solutions is kept track of. The
@@ -123,7 +123,7 @@ protected:  // Protected data members
 /// replaced with a new sub-population of randomly generated individuals,
 /// each with an age of 0.
 ///
-/// \see <http://idesign.ucsc.edu/projects/alps.html>
+/// \see <https://github.com/ghornby/alps>
 ///
 template<class T, template<class> class CS>
 class basic_alps_es : public evolution_strategy<T,

@@ -20,14 +20,14 @@
 namespace vita
 {
 ///
-/// \brief Search drives the evolution
+/// \brief Search drives the evolution.
 ///
-/// \tparam T the type of individual used
-/// \tparam ES the adopted evolution strategy
+/// \tparam T the type of individual used.
+/// \tparam ES the adopted evolution strategy.
 ///
-/// The class is an interface for specific search strategies. The design
-/// adheres to the NVI pattern ("Virtuality" in C/C++ Users Journal September
-/// 2001 - <http://www.gotw.ca/publications/mill18.htm>).
+/// The class offers a general / customizable search strategy (the design
+/// adheres to the NVI pattern, see "Virtuality" in C/C++ Users Journal
+/// September 2001 - <http://www.gotw.ca/publications/mill18.htm>).
 ///
 /// \note
 /// The "template template parameter" approach allows coordination between `T`
@@ -48,15 +48,15 @@ public:
   void set_evaluator(std::unique_ptr<evaluator<T>>);
   void set_validator(std::unique_ptr<validation_strategy>);
 
-  bool debug() const;
+  virtual bool debug() const;
 
 protected:
-  // Protected support methods
+  // Protected support methods.
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
   virtual void tune_parameters();
 
-  // Protected data members
+  // Protected data members.
   std::unique_ptr<evaluator<T>> active_eva_;
   std::unique_ptr<validation_strategy> vs_;
 
@@ -76,8 +76,7 @@ private:
   virtual void after_evolution(summary<T> *) {}
   virtual void print_resume(const model_measurements &) const;
 
-  // NVI template methods
-  virtual bool debug_nvi() const { return true; }
+  // NVI template methods.
   virtual void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const {}
 };
 
