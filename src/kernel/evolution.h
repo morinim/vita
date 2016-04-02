@@ -40,10 +40,10 @@ class evolution
 {
 public:
   evolution(const environment &, evaluator<T> &,
-            std::function<bool (const summary<T> &)> = nullptr,
-            std::function<bool (unsigned)> = nullptr);
+            std::function<bool (const summary<T> &)> = nullptr);
 
   const summary<T> &run(unsigned);
+  template<class S> const summary<T> &run(unsigned, S);
 
   bool debug() const;
 
@@ -62,7 +62,6 @@ private:
   ES<T>                es_;
 
   std::function<bool (const summary<T> &)> external_stop_condition_;
-  std::function<bool (unsigned)>                        shake_data_;
 };
 
 #include "kernel/evolution.tcc"

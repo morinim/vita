@@ -24,8 +24,7 @@
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr),
                                     vs_(make_unique<as_is_validation>()),
-                                    env_(p.env), prob_(p), shake_(nullptr),
-                                    stop_(nullptr)
+                                    env_(p.env), prob_(p), stop_(nullptr)
 {
   Ensures(debug());
 }
@@ -118,7 +117,7 @@ summary<T> search<T, ES>::run(unsigned n)
   preliminary_setup();
 
   vs_->preliminary_setup();
-  shake_ = [this](unsigned g) { return vs_->shake(g); };
+  auto shake([this](unsigned g) { return vs_->shake(g); });
 
   summary<T> overall_summary;
   distribution<fitness_t> fd;
@@ -128,8 +127,8 @@ summary<T> search<T, ES>::run(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto run_summary(evolution<T, ES>(env_, *active_eva_, stop_,
-                                      shake_).run(r));
+    auto run_summary(evolution<T, ES>(env_, *active_eva_, stop_).run(r,
+                                                                     shake));
 
     // If a validation test is available the performance of the best trained
     // individual is recalculated.

@@ -75,16 +75,12 @@ inline void set()
 /// \param[in] sc function used to identify a stop condition (i.e. it's
 ///               most improbable that evolution will discover better
 ///               solutions).
-/// \param[in] sd the "shake data" function. It is used to alter the training
-///               set so that evolution would take place in a dynamic
-///               environment.
 ///
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
-                            std::function<bool (const summary<T> &)> sc,
-                            std::function<bool (unsigned)> sd)
+                            std::function<bool (const summary<T> &)> sc)
   : pop_(e), eva_(eva), es_(pop_, eva, &stats_),
-    external_stop_condition_(sc), shake_data_(sd)
+    external_stop_condition_(sc)
 {
   Expects(e.sset);
   Ensures(debug());
@@ -251,6 +247,9 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
 
 ///
 /// \param[in] run_count run number (used for printing and logging).
+/// \param[in] shake the "shake data" function. It's used to alter the training
+///                  set so that evolution would take place in a dynamic
+///                  environment.
 /// \return a partial summary of the search (see notes).
 ///
 /// The genetic programming loop:
@@ -273,8 +272,8 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
 /// request the computation of additional metrics.
 ///
 template<class T, template<class> class ES>
-const summary<T> &
-evolution<T, ES>::run(unsigned run_count)
+template<class S>
+const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
 {
   stats_.clear();
   stats_.best.solution = pop_[{0, 0}];
@@ -294,7 +293,7 @@ evolution<T, ES>::run(unsigned run_count)
 
   for (stats_.gen = 0; !stop_condition(stats_) && !stop;  ++stats_.gen)
   {
-    if (shake_data_ && shake_data_(stats_.gen))
+    if (shake(stats_.gen))
     {
       // If we 'shake' the data, fitness values and the statistics picked so
       // far have to be cleared (the best individual and its fitness refer to
@@ -344,6 +343,15 @@ evolution<T, ES>::run(unsigned run_count)
 
   term::reset();
   return stats_;
+}
+
+///
+/// \brief A shortcut to call the `run` method without a shake function.
+///
+template<class T, template<class> class ES>
+const summary<T> &evolution<T, ES>::run(unsigned run_count)
+{
+  return run(run_count, [](unsigned) { return false; });
 }
 
 ///

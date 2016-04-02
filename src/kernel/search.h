@@ -67,7 +67,6 @@ protected:
   // Problem we're working on.
   problem &prob_;
 
-  std::function<bool (unsigned)> shake_;
   std::function<bool (const summary<T> &)> stop_;
 
 private:
