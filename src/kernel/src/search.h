@@ -15,7 +15,9 @@
 
 #include "kernel/adf.h"
 #include "kernel/search.h"
+#include "kernel/src/dss.h"
 #include "kernel/src/evaluator.h"
+#include "kernel/src/holdout_validation.h"
 #include "kernel/src/problem.h"
 #include "kernel/team.h"
 #include "kernel/vitafwd.h"
@@ -65,7 +67,6 @@ protected:
 private:
   // Private support methods
   src_data &data() const;
-  void dss(unsigned) const;
   bool stop_condition(const summary<T> &) const;
 
   // Template methods for search::run() member function.

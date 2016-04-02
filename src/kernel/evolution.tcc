@@ -82,12 +82,12 @@ inline void set()
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
                             std::function<bool (const summary<T> &)> sc,
-                            std::function<void (unsigned)> sd)
+                            std::function<bool (unsigned)> sd)
   : pop_(e), eva_(eva), es_(pop_, eva, &stats_),
     external_stop_condition_(sc), shake_data_(sd)
 {
-  assert(e.sset);
-  assert(debug());
+  Expects(e.sset);
+  Ensures(debug());
 }
 
 ///
@@ -294,15 +294,16 @@ evolution<T, ES>::run(unsigned run_count)
 
   for (stats_.gen = 0; !stop_condition(stats_) && !stop;  ++stats_.gen)
   {
-    if (shake_data_ && stats_.gen % 4 == 0)
+    if (shake_data_ && shake_data_(stats_.gen))
     {
-      shake_data_(stats_.gen);
+      // If we 'shake' the data, fitness values and the statistics picked so
+      // far have to be cleared (the best individual and its fitness refer to
+      // the previous training set).
+      eva_.clear(evaluator<T>::all);
 
-      // If we 'shake' the data, the statistics picked so far have to be
-      // cleared (the best individual and its fitness refer to an old
-      // training set).
       assert(!stats_.best.solution.empty());
       stats_.best.score.fitness = eva_(stats_.best.solution);
+
       print_progress(0, run_count, true, &from_last_msg);
     }
 

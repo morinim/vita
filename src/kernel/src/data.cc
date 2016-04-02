@@ -68,7 +68,7 @@ bool is_number(const std::string &s)
 /// New empty data instance.
 ///
 src_data::src_data() : data(training), classes_map_(), header_(),
-                       categories_(), datasets_(npos), slice_(npos, 0)
+                       categories_(), datasets_(npos)
 {
   Ensures(debug());
 }
@@ -98,23 +98,11 @@ void src_data::clear()
 }
 
 ///
-/// \param[in] n number of elements for the slice.
-///
-/// Cuts a 'slice' of `n` elements in the active dataset. Future calls to
-/// src_data::end() will refer to the active slice (a subset of the dataset).
-/// To reset the slice call src_data::slice with argument 0.
-///
-void src_data::slice(std::size_t n)
-{
-  slice_[active_dataset()] = n;
-}
-
-///
 /// \return reference to the first element of the active dataset.
 ///
 src_data::iterator src_data::begin()
 {
-  return datasets_[active_dataset()].begin();
+  return begin(active_dataset());
 }
 
 ///
@@ -122,45 +110,68 @@ src_data::iterator src_data::begin()
 ///
 src_data::const_iterator src_data::begin() const
 {
-  return datasets_[active_dataset()].begin();
+  return begin(active_dataset());
 }
 
 ///
-/// \return a reference to the last+1 (sentry) element of the active
-///         dataset.
+/// \param[in] d a dataset (training / validation / test set).
+/// \return reference to the first element of dataset `d`.
+///
+src_data::iterator src_data::begin(dataset_t d)
+{
+  Expects(d != npos);
+  return datasets_[d].begin();
+}
+
+///
+/// \param[in] d a dataset (training / validation / test set).
+/// \return a constant reference to the first element dataset `d`.
+///
+src_data::const_iterator src_data::begin(dataset_t d) const
+{
+  Expects(d != npos);
+  return datasets_[d].begin();
+}
+
+///
+/// \return a reference to the sentinel element of the active dataset.
 ///
 src_data::iterator src_data::end()
 {
-  const auto n(slice_[active_dataset()]);
-
-  if (n == 0 || n > size())
-    return datasets_[active_dataset()].end();
-
-  return std::next(datasets_[active_dataset()].begin(),
-                   static_cast<decltype(datasets_)::difference_type>(n));
+  return end(active_dataset());
 }
 
 ///
-/// \return a constant reference to the last+1 (sentry) element of the active
-///         dataset.
+/// \return a constant reference to the sentinel element of the active dataset.
 ///
 src_data::const_iterator src_data::end() const
 {
-  const auto n(slice_[active_dataset()]);
+  return end(active_dataset());
+}
 
-  if (n == 0 || n > size())
-    return datasets_[active_dataset()].end();
+///
+/// \param[in] d a dataset (training / validation / test set).
+/// \return a reference to the sentinel element of dataset `d`
+///
+src_data::iterator src_data::end(dataset_t d)
+{
+  Expects(d != npos);
+  return datasets_[d].end();
+}
 
-  return std::next(datasets_[active_dataset()].begin(),
-                   static_cast<decltype(datasets_)::difference_type>(n));
+///
+/// \param[in] d a dataset (training / validation / test set).
+/// \return a constant reference to the sentinel element of dataset `d`.
+///
+src_data::const_iterator src_data::end(dataset_t d) const
+{
+  Expects(d != npos);
+  return datasets_[d].end();
 }
 
 ///
 /// \param[in] d a dataset (training / validation / test set).
 /// \return the size of the dataset `d`.
-///
-/// \note
-/// Please note that the result is independent of the active slice.
 ///
 std::size_t src_data::size(dataset_t d) const
 {
@@ -199,97 +210,33 @@ const src_data::column &src_data::get_column(unsigned i) const
   return header_[i];
 }
 
-///
-/// \param[in] f the comparer used for sorting.
-///
-/// Sorts the active slice in the current dataset (slice is preserved).
-///
-void src_data::sort(std::function<bool (const example &, const example &)> f)
+void src_data::move_append(dataset_t src, dataset_t dst)
 {
-  const auto partition_size(static_cast<std::size_t>(
-                              std::distance(begin(), end())));
+  Expects(src != npos);
+  Expects(dst != npos);
+  Expects(src != dst);
 
-  auto &d(datasets_[active_dataset()]);
-  std::sort(d.begin(), d.end(), f);
-
-  slice(partition_size);
+  if (datasets_[dst].empty())
+    std::swap(datasets_[src], datasets_[dst]);
+  else
+  {
+    std::move(begin(src), end(src), std::back_inserter(datasets_[dst]));
+    datasets_[src].clear();
+  }
 }
 
-///
-/// \param[in] percentage `size_of_validation_set / size_of_dataset` ratio.
-///
-/// Splits the dataset in two subsets (training set, validation set)
-/// according to the `percentage` ratio.
-///
-/// \attention The procedure resets active slices.
-///
-void src_data::partition(unsigned percentage)
+void src_data::move_append(dataset_t src, dataset_t dst, std::size_t n)
 {
-  Expects(percentage < 100);
+  Expects(src != npos);
+  Expects(dst != npos);
+  Expects(src != dst);
+  Expects(n < size(src));
 
-  if (!percentage)
-    return;
+  const auto from_src(std::next(end(src), -static_cast<std::ptrdiff_t>(n)));
 
-  // Validation set items are moved to the training set.
-  std::move(datasets_[validation].begin(), datasets_[validation].end(),
-            std::back_inserter(datasets_[training]));
-  datasets_[validation].clear();
+  std::move(from_src, end(src), std::back_inserter(datasets_[dst]));
 
-  auto available(datasets_[training].size());
-  if (available && percentage)
-  {
-    using diff_t = decltype(datasets_)::difference_type;
-    const auto needed(static_cast<diff_t>(available * percentage / 100));
-
-    std::shuffle(datasets_[training].begin(), datasets_[training].end(),
-                 random::engine());
-
-    std::move(std::prev(datasets_[training].end(), needed),
-              datasets_[training].end(),
-              std::back_inserter(datasets_[validation]));
-
-    datasets_[training].erase(std::prev(datasets_[training].end(), needed),
-                             datasets_[training].end());
-
-    /*
-    // An alternative is the Selection sampling / Algorithm S (see
-    // <http://stackoverflow.com/q/35065764/3235496>)
-    //
-    // > Iterate through and for each element make the probability of
-    // >  selection = (number needed)/(number left)
-    // >
-    // > So if you had 40 items, the first would have a 5/40 chance of being
-    // > selected. If it is, the next has a 4/39 chance, otherwise it has a
-    // > 5/39 chance. By the time you get to the end you will have your 5
-    // > items, and often you'll have all of them before that.
-    auto iter(datasets_[training].begin());
-    while (needed)
-    {
-      assert(available);
-
-      if (needed == available ||
-          random::boolean(static_cast<double>(needed) /
-                          static_cast<double>(available)))
-      {   // selected
-        datasets_[validation].push_back(*iter);
-        iter = datasets_[training].erase(iter);
-
-        --needed;
-      }
-      else  // not selected
-        ++iter;
-
-      assert(datasets_[training].begin() <= iter);
-      assert(iter < datasets_[training].end());
-
-      --available;
-    }
-
-    assert(!needed);
-    */
-
-    std::fill(slice_.begin(), slice_.end(), 0);
-  }
+  datasets_[src].erase(from_src, end(src));
 }
 
 ///

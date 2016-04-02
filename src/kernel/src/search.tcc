@@ -239,10 +239,11 @@ void src_search<T, ES>::tune_parameters()
   const environment &constrained(this->prob_.env);
 
   const auto d_size(data().size());
+  assert(d_size);
 
   // With a small number of training case:
   // * we need every training case;
-  // * DSS speed up isn't so sensible;
+  // * DSS speed up isn't sensible;
   // BUT
   // * DSS can help against overfitting.
   if (constrained.dss == trilean::unknown)
@@ -289,97 +290,21 @@ void src_search<T, ES>::tune_parameters()
 
   if (constrained.validation_percentage == 100)
   {
-    if (d_size && d_size * dflt.validation_percentage < 10000)
-      this->env_.validation_percentage = 0;
+    if (this->env_.dss == trilean::yes)
+      print.info("Using DSS and skipping holdout validation");
     else
-      this->env_.validation_percentage = dflt.validation_percentage;
+    {
+      if (d_size * dflt.validation_percentage < 10000)
+        this->env_.validation_percentage = 0;
+      else
+        this->env_.validation_percentage = dflt.validation_percentage;
 
-    print.info("Validation percentage set to ",
-               this->env_.validation_percentage, '%');
+      print.info("Validation percentage set to ",
+                 this->env_.validation_percentage, '%');
+    }
   }
 
   Ensures(this->env_.debug(true));
-}
-
-///
-/// \param[in] generation the generation that has been reached by the
-///                       evolution. The method uses this parameter to
-///                       initialize some structures when `generation == 0`.
-///
-/// Dynamic Training Subset Selection for Supervised Learning in Genetic
-/// Programming.
-/// When using GP on a difficult problem, with a large set of training data,
-/// a large population size is needed and a very large number of
-/// function-trees evaluation must be carried out. DSS is a subset selection
-/// method which uses the current run to select:
-/// * firstly 'difficult' cases;
-/// * secondly cases which have not been looked at for several generations.
-///
-template<class T, template<class> class ES>
-void src_search<T, ES>::dss(unsigned generation) const
-{
-  if (!data())
-    return;
-
-  std::uintmax_t weight_sum(0);
-  auto weight([](const src_data::example &v) -> decltype(weight_sum)
-              {
-                return v.difficulty + v.age * v.age * v.age;
-              });
-
-  data().select(data::training);
-  data().slice(false);
-  for (auto &i : data())
-  {
-    if (generation == 0)  // preliminary setup for generation 0
-    {
-      i.difficulty = 0;
-      i.age        = 1;
-    }
-    else
-      ++i.age;
-
-    weight_sum += weight(i);
-  }
-
-  // Select a subset of the training examples.
-  // Training examples, contained in `data()`, are partitioned into two subsets
-  // by multiple swaps (first subset: [0, count[,  second subset:
-  // [count, data().size()[).
-  // Note that the actual size of the selected subset (`count`) is not fixed
-  // and, in fact, it averages slightly above target_size (Gathercole and
-  // Ross felt that this might improve performance).
-  const auto s(static_cast<double>(data().size()));
-  const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
-  assert(0.2 <= ratio && ratio <= 0.6);
-  const auto target_size(s * ratio);
-  assert(0.0 <= target_size && target_size <= s);
-
-  auto base(data().begin());
-  unsigned count(0);
-  for (auto i(data().begin()); i != data().end(); ++i)
-  {
-    const auto p1(static_cast<double>(weight(*i)) * target_size /
-                  static_cast<double>(weight_sum));
-    const auto prob(std::min(p1, 1.0));
-
-    if (random::boolean(prob))
-    {
-      std::iter_swap(base, i);
-      ++base;
-      ++count;
-    }
-  }
-
-  data().slice(std::max(count, 10u));
-  this->active_eva_->clear(evaluator<T>::all);
-
-  // Selected training examples have their difficulties and ages reset.
-  for (auto &i : data())
-  {
-    i.difficulty = 0;
-    i.age        = 1;
-  }
 }
 
 ///
@@ -404,15 +329,14 @@ bool src_search<T, ES>::stop_condition(const summary<T> &s) const
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  Expects(this->env_.validation_percentage < 100);
-  if (this->env_.validation_percentage)
-    data().partition(this->env_.validation_percentage);
+  if (this->env_.dss == trilean::yes)
+    this->set_validator(vita::make_unique<dss>(data()));
+  else if (this->env_.validation_percentage)
+    this->set_validator(vita::make_unique<holdout_validation>(
+                        data(), this->env_.validation_percentage));
 
   // For `std::placeholders` and `std::bind` see:
   // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
-  if (this->env_.dss == trilean::yes)
-    this->shake_ = std::bind(&src_search::dss, this, std::placeholders::_1);
-
   this->stop_ = std::bind(&src_search::stop_condition, this,
                           std::placeholders::_1);
 }
@@ -420,40 +344,6 @@ void src_search<T, ES>::preliminary_setup()
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  Expects(this->active_eva_);
-  auto &eval(*this->active_eva_);
-
-  // If a validation test is available the performance of the best trained
-  // individual is recalculated.
-  if (data().has(data::validation))
-  {
-    data().select(data::validation);
-    eval.clear(s->best.solution);
-
-    s->best.score.fitness = eval(s->best.solution);
-    s->best.score = calculate_metrics(*s);
-
-    data().select(data::training);
-    eval.clear(s->best.solution);
-  }
-  else
-  {
-    // If shake is true, the values calculated during the evolution
-    // refer to a subset of the available training set. Since we need an
-    // overall fitness for comparison, a new calculation has to be
-    // performed.
-    if (this->shake_)
-    {
-      data().select(data::training);
-      data().slice(false);
-      eval.clear(s->best.solution);
-
-      s->best.score.fitness = eval(s->best.solution);
-    }
-
-    s->best.score = calculate_metrics(*s);
-  }
-
   if (this->env_.arl == trilean::yes)
   {
     this->prob_.env.sset->reset_adf_weights();

@@ -14,8 +14,8 @@
 #define      VITA_SEARCH_H
 
 #include "kernel/evolution.h"
-#include "kernel/lambda_f.h"
 #include "kernel/problem.h"
+#include "kernel/validation_strategy.h"
 
 namespace vita
 {
@@ -46,6 +46,7 @@ public:
   summary<T> run(unsigned = 1);
 
   void set_evaluator(std::unique_ptr<evaluator<T>>);
+  void set_validator(std::unique_ptr<validation_strategy>);
 
   bool debug() const;
 
@@ -57,6 +58,7 @@ protected:
 
   // Protected data members
   std::unique_ptr<evaluator<T>> active_eva_;
+  std::unique_ptr<validation_strategy> vs_;
 
   // This is the environment actually used during the search (`prob_->env`
   // is used for compiling `env_` via the `tune_parameters` method).
@@ -65,7 +67,7 @@ protected:
   // Problem we're working on.
   problem &prob_;
 
-  std::function<void (unsigned)> shake_;
+  std::function<bool (unsigned)> shake_;
   std::function<bool (const summary<T> &)> stop_;
 
 private:

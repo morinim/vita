@@ -22,8 +22,10 @@
 ///              the lifetime of `this` class.
 ///
 template<class T, template<class> class ES>
-search<T, ES>::search(problem &p) : active_eva_(nullptr), env_(p.env),
-                                    prob_(p), shake_(nullptr), stop_(nullptr)
+search<T, ES>::search(problem &p) : active_eva_(nullptr),
+                                    vs_(make_unique<as_is_validation>()),
+                                    env_(p.env), prob_(p), shake_(nullptr),
+                                    stop_(nullptr)
 {
   Ensures(debug());
 }
@@ -115,6 +117,9 @@ summary<T> search<T, ES>::run(unsigned n)
 
   preliminary_setup();
 
+  vs_->preliminary_setup();
+  shake_ = [this](unsigned g) { return vs_->shake(g); };
+
   summary<T> overall_summary;
   distribution<fitness_t> fd;
 
@@ -125,6 +130,22 @@ summary<T> search<T, ES>::run(unsigned n)
   {
     auto run_summary(evolution<T, ES>(env_, *active_eva_, stop_,
                                       shake_).run(r));
+
+    // If a validation test is available the performance of the best trained
+    // individual is recalculated.
+    if (prob_.data() && prob_.data()->has(data::validation))
+    {
+      prob_.data()->select(data::validation);
+      active_eva_->clear(run_summary.best.solution);
+
+      run_summary.best.score.fitness=(*active_eva_)(run_summary.best.solution);
+      run_summary.best.score = calculate_metrics(run_summary);
+
+      prob_.data()->select(data::training);
+      active_eva_->clear(run_summary.best.solution);
+    }
+    else
+      run_summary.best.score = calculate_metrics(run_summary);
 
     after_evolution(&run_summary);
 
@@ -187,6 +208,17 @@ void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
                                                         env_.ttable_size);
   else
     active_eva_ = std::move(e);
+}
+
+///
+/// \param[in] v a new validation strategy
+///
+template<class T, template<class> class ES>
+void search<T, ES>::set_validator(std::unique_ptr<validation_strategy> v)
+{
+  Expects(v);
+
+  vs_ = std::move(v);
 }
 
 ///

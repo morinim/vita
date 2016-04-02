@@ -67,6 +67,10 @@ public:
   const_iterator begin() const;
   iterator end();
   const_iterator end() const;
+  iterator begin(dataset_t);
+  const_iterator begin(dataset_t) const;
+  iterator end(dataset_t);
+  const_iterator end(dataset_t) const;
 
   // ---- Convenience ----
   std::size_t load(const std::string &, filter_hook_t = nullptr);
@@ -74,12 +78,10 @@ public:
 
   void push_back(const example &);
 
-  void slice(std::size_t);
-
   void clear();
 
-  void partition(unsigned);
-  void sort(std::function<bool (const example &, const example &)>);
+  void move_append(dataset_t, dataset_t, std::size_t);
+  void move_append(dataset_t, dataset_t);
 
   const category_set &categories() const;
 
@@ -138,9 +140,6 @@ private:  // Private data members
   // and validation set are automatically created from the dataset
   // (see environment::validation_ratio).
   std::vector<examples_t> datasets_;
-
-  // Used to keep track of subset of the dataset.
-  std::vector<std::size_t> slice_;
 };
 
 ///

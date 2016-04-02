@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,27 +41,28 @@ class evolution
 public:
   evolution(const environment &, evaluator<T> &,
             std::function<bool (const summary<T> &)> = nullptr,
-            std::function<void (unsigned)> = nullptr);
+            std::function<bool (unsigned)> = nullptr);
 
   const summary<T> &run(unsigned);
 
   bool debug() const;
 
-private:  // Private support methods
+private:
+  // Private support methods.
   const environment &env() const { return pop_.env(); }
   analyzer<T> get_stats() const;
   void log(unsigned) const;
   void print_progress(unsigned, unsigned, bool, timer *) const;
   bool stop_condition(const summary<T> &) const;
 
-private:  // Private data members
+  // Private data members.
   vita::population<T> pop_;
   evaluator<T>       &eva_;
   summary<T>        stats_;
   ES<T>                es_;
 
   std::function<bool (const summary<T> &)> external_stop_condition_;
-  std::function<void (unsigned)>                        shake_data_;
+  std::function<bool (unsigned)>                        shake_data_;
 };
 
 #include "kernel/evolution.tcc"
