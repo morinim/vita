@@ -158,11 +158,11 @@ public:  // Data members
   /// \note A value of 0 means undefined (auto-tune).
   unsigned generations = 0;
 
-  /// Stop a run when we cannot see improvements within g_without_improvement
-  /// generations.
+  /// Used by some evolution strategies to stop a run when there aren't
+  /// improvements within g_without_improvement generations.
   ///
-  /// \note A value of 0 means undefined (auto-tune).
-  unsigned g_without_improvement;
+  /// \note A value of 0 means disabled (this parameter isn't auto-tuned).
+  unsigned g_without_improvement = 0;
 
   /// How much data should be reserved for the validation set?
   /// `validation_percentage` is the fraction of the original data that goes

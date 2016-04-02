@@ -26,10 +26,10 @@ namespace vita
 {
 ///
 /// \brief Progressively evolves a population of programs over a series of
-///        generations
+///        generations.
 ///
-/// \tparam T type of individual
-/// \tparam ES evolution strategy in use
+/// \tparam T type of individual.
+/// \tparam ES evolution strategy in use.
 ///
 /// The evolutionary search uses the Darwinian principle of natural selection
 /// (survival of the fittest) and analogs of various naturally occurring
@@ -39,8 +39,7 @@ template<class T, template<class> class ES>
 class evolution
 {
 public:
-  evolution(const environment &, evaluator<T> &,
-            std::function<bool (const summary<T> &)> = nullptr);
+  evolution(const environment &, evaluator<T> &);
 
   const summary<T> &run(unsigned);
   template<class S> const summary<T> &run(unsigned, S);
@@ -60,8 +59,6 @@ private:
   evaluator<T>       &eva_;
   summary<T>        stats_;
   ES<T>                es_;
-
-  std::function<bool (const summary<T> &)> external_stop_condition_;
 };
 
 #include "kernel/evolution.tcc"
@@ -72,4 +69,4 @@ private:
 ///
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

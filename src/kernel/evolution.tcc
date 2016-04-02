@@ -72,15 +72,10 @@ inline void set()
 ///
 /// \param[in] e environment (mostly used for population initialization).
 /// \param[in] eva evaluator used during the evolution.
-/// \param[in] sc function used to identify a stop condition (i.e. it's
-///               most improbable that evolution will discover better
-///               solutions).
 ///
 template<class T, template<class> class ES>
-evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
-                            std::function<bool (const summary<T> &)> sc)
-  : pop_(e), eva_(eva), es_(pop_, eva, &stats_),
-    external_stop_condition_(sc)
+evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva)
+  : pop_(e), eva_(eva), es_(pop_, eva, &stats_)
 {
   Expects(e.sset);
   Ensures(debug());
@@ -93,7 +88,7 @@ evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva,
 template<class T, template<class> class ES>
 bool evolution<T, ES>::stop_condition(const summary<T> &s) const
 {
-  assert(env().generations);
+  Expects(env().generations);
 
   // Check the number of generations.
   if (s.gen > env().generations)
@@ -102,11 +97,8 @@ bool evolution<T, ES>::stop_condition(const summary<T> &s) const
   if (term::user_stop())
     return true;
 
-  // When we have an external_stop_condition_ function we use it.
-  if (external_stop_condition_)
-    return external_stop_condition_(s);
-
-  return false;
+  // Check strategy specific stop conditions.
+  return es_.stop_condition();
 }
 
 ///

@@ -307,26 +307,6 @@ void src_search<T, ES>::tune_parameters()
   Ensures(this->env_.debug(true));
 }
 
-///
-/// \param[in] s an up to date run summary.
-/// \return `true` when a run should be interrupted.
-///
-template<class T, template<class> class ES>
-bool src_search<T, ES>::stop_condition(const summary<T> &s) const
-{
-  Expects(this->env_.g_without_improvement);
-
-  // We use an accelerated stop condition when:
-  // - all the individuals have the same fitness;
-  // - after `env_.g_without_improvement` generations the situation doesn't
-  //   change.
-  if (s.gen - s.last_imp > this->env_.g_without_improvement &&
-      issmall(s.az.fit_dist().variance()))
-    return true;
-
-  return false;
-}
-
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
@@ -335,11 +315,6 @@ void src_search<T, ES>::preliminary_setup()
   else if (this->env_.validation_percentage)
     this->set_validator(vita::make_unique<holdout_validation>(
                         data(), this->env_.validation_percentage));
-
-  // For `std::placeholders` and `std::bind` see:
-  // <http://en.cppreference.com/w/cpp/utility/functional/placeholders>
-  this->stop_ = std::bind(&src_search::stop_condition, this,
-                          std::placeholders::_1);
 }
 
 template<class T, template<class> class ES>

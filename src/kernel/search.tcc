@@ -24,7 +24,7 @@
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr),
                                     vs_(make_unique<as_is_validation>()),
-                                    env_(p.env), prob_(p), stop_(nullptr)
+                                    env_(p.env), prob_(p)
 {
   Ensures(debug());
 }
@@ -127,8 +127,7 @@ summary<T> search<T, ES>::run(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto run_summary(evolution<T, ES>(env_, *active_eva_, stop_).run(r,
-                                                                     shake));
+    auto run_summary(evolution<T, ES>(env_, *active_eva_).run(r, shake));
 
     // If a validation test is available the performance of the best trained
     // individual is recalculated.

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,6 +28,27 @@ environment std_es<T>::shape(environment env)
 {
   env.layers = 1;
   return env;
+}
+
+///
+/// \return `true` when evolution must be stopped.
+///
+/// We use an accelerated stop condition when:
+/// - all the individuals have the same fitness;
+/// - after `env_.g_without_improvement` generations the situation doesn't
+///   change.
+///
+template<class T>
+bool std_es<T>::stop_condition() const
+{
+  const auto &env(this->pop_.env());
+
+  if (env.g_without_improvement &&
+      this->sum_->gen - this->sum_->last_imp > env.g_without_improvement &&
+      issmall(this->sum_->az.fit_dist().variance()))
+    return true;
+
+  return false;
 }
 
 ///
@@ -57,16 +78,6 @@ void basic_alps_es<T, CS>::post_bookkeeping()
   const auto layers(pop.layers());
   for (auto l(decltype(layers){1}); l < layers; ++l)
   {
-/*
-    if (issmall(sum->az.fit_dist(l).standard_deviation()))
-    {
-      if (pop.individuals(l) / 2 > pop.env().individuals / 10)
-        pop.set_allowed(l, pop.individuals(l) / 2);
-    }
-    else
-      pop.set_allowed(l, pop.env().individuals);
-*/
-
     const auto allowed(pop.env().individuals);
     const auto current(pop.individuals(l));
     if (issmall(sum->az.fit_dist(l).standard_deviation()))
@@ -78,7 +89,7 @@ void basic_alps_es<T, CS>::post_bookkeeping()
       pop.set_allowed(l, allowed);
   }
 
-  // Code executed every age_gap interval.
+  // Code executed every `age_gap` interval.
   if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
   {
     if (layers < pop.env().layers ||
@@ -141,4 +152,4 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
     }
   }
 }
-#endif  // Include guard
+#endif  // include guard

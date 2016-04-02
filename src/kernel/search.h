@@ -67,8 +67,6 @@ protected:
   // Problem we're working on.
   problem &prob_;
 
-  std::function<bool (const summary<T> &)> stop_;
-
 private:
   // Template methods for search::run() member function.
   virtual model_measurements calculate_metrics(const summary<T> &) const;

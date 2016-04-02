@@ -65,6 +65,9 @@ public:
   /// Work to be done at the end of an evolution run.
   void post_bookkeeping() const {}
 
+  /// Used to signal strategy specific stop conditions.
+  bool stop_condition() const { return false; }
+
   static constexpr bool is_alps =
     std::is_same<SS<T>, typename vita::selection::alps<T>>::value &&
     std::is_same<RS<T>, typename vita::replacement::alps<T>>::value;
@@ -153,6 +156,8 @@ class std_es : public evolution_strategy<T,
 {
 public:
   using std_es::evolution_strategy::evolution_strategy;
+
+  bool stop_condition() const;
 
   static environment shape(environment);
 };
