@@ -13,6 +13,9 @@
 #include <cstdlib>
 #include <sstream>
 
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
+
 #include "kernel/random.h"
 #include "utility/saturation.h"
 
