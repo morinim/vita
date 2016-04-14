@@ -9,8 +9,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <algorithm>
-
+#include "kernel/interpreter.h"
 #include "trading_data.h"
 
 #if !defined(FOREX_TRADE_SIMULATOR_H)
@@ -143,5 +142,93 @@ private:
 
   unsigned orders_history_total_ = 0;
 };
+
+template<class T>
+double trade_simulator::run(const T &prg)
+{
+  enum {id_buy, id_sell};
+
+  clear_status();
+
+  const auto bars(td_->bars(short_tf) - 1);
+
+  while (cur_bar_ < bars)
+  {
+    const auto type(order_.type());
+
+    if (type == o_type::na)
+    {
+      bool signal[2];
+      for (unsigned i(0); i < 2; ++i)
+      {
+        vita::interpreter<vita::i_mep> i_res(&prg[i]);
+
+        auto a(i_res.run());
+        signal[i] = !a.empty() && vita::any_cast<bool>(a);
+      }
+
+      if (signal[id_buy] && !signal[id_sell])
+        order_send(o_type::buy, 0.01);
+      else if (signal[id_sell] && !signal[id_buy])
+        order_send(o_type::sell, 0.01);
+    }
+    else   // short/long position
+    {
+      vita::interpreter<vita::i_mep> intr(&prg[type == o_type::buy ?
+                                               id_sell : id_buy]);
+      auto a(intr.run());
+      const bool v(!a.empty() && vita::any_cast<bool>(a));
+
+      if (v)
+        order_close();
+      else
+      {
+        const double close_level(100.0);
+        if (std::fabs(order_profit()) > close_level)
+          order_close();
+      }
+    }
+
+    inc_bar();
+
+    const unsigned check_at(10);
+    if (cur_bar_ == bars / check_at)
+    {
+      if (orders_history_total() == 0)
+      {
+        balance_ -= 10000.0;
+        break;
+      }
+
+      /*
+      if (balance_ <= 0.0)
+      {
+        balance_ -= std::fabs(balance_) / 10.0;
+        balance_ *= check_at;
+        break;
+      }
+      */
+
+      /*
+      if (orders_history_total() *
+          trading_data::ratio[1] * trading_data::ratio[2] * 7 < cur_bar_)
+      {
+        balance_ -= std::fabs(balance_) / 20.0;
+        balance_ *= check_at;
+        break;
+      }
+      */
+    }
+  }
+
+  assert(cur_bar_ <= bars);
+
+  if (order_type() != o_type::na)
+    order_close();
+
+  //std::cout << "BALANCE: " << balance_ << " (" << orders_history_total()
+  //          << " operations)\n";
+  return balance_;
+}
 
 #endif  // include guard

@@ -49,7 +49,7 @@ endif
 # This should work in POSIX compliant environment (see "The Open Group Base
 # Specifications Issue 7" and
 # <http://pubs.opengroup.org/onlinepubs/9699919799/utilities/c99.html>)
-INCPATH := ../src/ ./
+INCPATH := ../../src/ ../src/ ./
 SYSTEMINCPATH := $(BOOST_INCLUDE) ./third_party/
 
 # -Wsign-conversion -Weffc++ are other interesting warning
@@ -92,14 +92,27 @@ COMPILE := $(CXX) $(CXXFLAGS)
 KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc) $(wildcard utility/*.cc) third_party/tinyxml2/tinyxml2.cc
 KERNEL_OBJ := $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC := $(wildcard examples/*.cc)
+FOREX_SRC := $(wildcard examples/forex/*.cc)
+FOREX_OBJ := $(FOREX_SRC:.cc=.o)
 SR_SRC := $(wildcard sr/*.cc)
 TESTS_SRC := $(wildcard test/*.cc)
 
-ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(SR_SRC) $(TESTS_SRC)
+ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(FOREX_SRC) $(SR_SRC) $(TESTS_SRC)
 
 .PRECIOUS: %.o
 
 all: kernel sr
+
+forex: $(FOREX_OBJ) $(KERNEL_OBJ)
+	@echo Linking $@
+	@$(COMPILE) $(FOREX_OBJ) $(KERNEL_OBJ) -o examples/forex/$@ $(LIB)
+ifeq ($(TYPE), release)
+ifdef MSYSTEM
+	@strip examples/forex/$@.exe
+else
+	@strip examples/forex/$@
+endif
+endif
 
 sr: sr/sr.o $(KERNEL_OBJ)
 	@echo Linking $@
@@ -112,7 +125,7 @@ else
 endif
 endif
 
-examples: $(EXAMPLES_SRC:.cc=)
+examples: $(EXAMPLES_SRC:.cc=) forex
 	@echo $(notdir $^) successfully built
 
 examples/%: examples/%.o $(KERNEL_OBJ)

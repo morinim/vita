@@ -18,8 +18,8 @@
 #include "kernel/team.h"
 #include "utility/utility.h"
 
-#include "forex_files/trading_data.cc"
-#include "forex_files/trade_simulator.cc"
+#include "trading_data.h"
+#include "trade_simulator.h"
 
 namespace fxs  // Forex symbols
 {
@@ -333,7 +333,7 @@ bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
 
 int main()
 {
-  trading_data td("forex_files/eurusd_1m_bid.csv");
+  trading_data td("eurusd_1m_bid.csv");
   if (td.empty())
     return EXIT_FAILURE;
 
