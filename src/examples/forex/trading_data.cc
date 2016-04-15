@@ -11,6 +11,8 @@
 
 #include "trading_data.h"
 
+#include "utility/csv_parser.h"
+
 namespace
 {
 
@@ -187,9 +189,9 @@ bool trading_data::load_data(const std::string &filename)
   // Skips null volume records.
   // We should check for holidays and skip the corrensponding records but this
   // is simpler and almost equivalent for timeframes greater than 10s.
-  auto csv_filter = [](vita::csv_parser::record_t *r)
+  auto csv_filter = [](vita::csv_parser::record_t &r)
   {
-    return std::stoi((*r)[f_volume]) > 0;
+    return std::stoi(r[f_volume]) > 0;
   };
 
   unsigned i(0);

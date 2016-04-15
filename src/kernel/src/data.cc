@@ -18,6 +18,8 @@
 #include "kernel/random.h"
 #include "kernel/symbol.h"
 
+#include "utility/csv_parser.h"
+
 #include "tinyxml2/tinyxml2.h"
 
 namespace vita
@@ -537,7 +539,7 @@ std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
          v = v->NextSiblingElement("value"))
       record.push_back(v->GetText() ? v->GetText() : "");
 
-    if (ft && ft(&record) == false)
+    if (ft && ft(record) == false)
       continue;
 
     const auto instance(to_example(record, classification, false));

@@ -53,7 +53,7 @@ public:
 
   /// A filter and transform function (returns `true` for records that should
   /// be loaded and, possibly, transform its input parameter).
-  using filter_hook_t = std::function<bool (record_t *)>;
+  using filter_hook_t = std::function<bool (record_t &)>;
 
   // ---- Constructors ----
   src_data();
