@@ -173,15 +173,15 @@ check_cpplint:
 .phony:	clean
 clean:
 	@echo Making clean...
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*~" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name ".*~" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ -name "*.P" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "#*#" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ -name "*.o" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ -name "*.gch" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*~" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name ".*~" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.P" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "#*#" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.o" -type f -delete -print
+	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
 	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
-	@$(RM) sr/sr kernel/libvita.a cppcheck.txt cpplint.txt
+	@$(RM) sr/sr kernel/libvita.a examples/forex/forex cppcheck.txt cpplint.txt
 
 .phony:	backup
 backup:
