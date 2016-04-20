@@ -210,7 +210,7 @@ bool trading_data::load_data(const std::string &filename)
     if (++i % 100000 == 0)
       std::cout << "  " << i << '\r' << std::flush;
   }
-  std::cout << "  " << i << " examples read\n";
+  std::cout << "  " << i << " records read\n";
 
   if (!set_timeframe_duration(p[0], p[1]) ||
       !compute_longer_timeframes())

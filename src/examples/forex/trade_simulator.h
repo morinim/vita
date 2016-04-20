@@ -27,9 +27,9 @@ public:
                  std::size_t b = 0)
     : amount_(a), open_price_(o), type_(t), bar_(b)
   {
-    assert((t == o_type::na && a <= 0.0) || (t != o_type::na && a > 0.0));
-    assert((t == o_type::na && o <= 0.0) || (t != o_type::na && o > 0.0));
-    assert((t == o_type::na && b == 0) || (t != o_type::na && b > 0));
+    Expects((t == o_type::na && a <= 0.0) || (t != o_type::na && a > 0.0));
+    Expects((t == o_type::na && o <= 0.0) || (t != o_type::na && o > 0.0));
+    Expects((t == o_type::na && b == 0) || (t != o_type::na && b > 0));
   }
 
   double amount() const { return amount_; }

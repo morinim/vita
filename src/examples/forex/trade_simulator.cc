@@ -23,12 +23,12 @@ void trade_simulator::clear_status()
 }
 
 // A lot is the basic trade size. It translates to 100000 units of the base
-// currency (the currency on the left of the currancy pair).
-// Also used are mini lot (10000 units) and micro lots (1000 units).
+// currency (the currency on the left of the currency pair).
+// Also used are mini lot (10000 units) and micro lot (1000 units).
 bool trade_simulator::order_send(o_type type, double lots)
 {
-  assert(type == o_type::buy || type == o_type::sell);
-  assert(lots >= 0.01);
+  Expects(type == o_type::buy || type == o_type::sell);
+  Expects(lots >= 0.01);
 
   double open_price;
 
@@ -45,14 +45,12 @@ bool trade_simulator::order_send(o_type type, double lots)
   }
 
   order_ = order(type, amount, open_price, cur_bar_);
-  ++orders_history_total_;
-
   return true;
 }
 
 bool trade_simulator::order_close()
 {
-  assert(order_.type() != o_type::na);
+  Expects(order_.type() != o_type::na);
 
   if (order_.type() == o_type::buy)
     // Having bought base currency, we now want back counter currency.
@@ -62,6 +60,7 @@ bool trade_simulator::order_close()
     // base currency.
     balance_ -= order_amount() * ask();
 
+  ++orders_history_total_;
   order_ = order();
   return true;
 }
@@ -73,7 +72,7 @@ unsigned trade_simulator::orders_history_total() const
 }
 
 // The profits and losses in the Foreign Exchange market (aka Forex) are
-// determined by the currency's pips. A pip is the fourth decimal point in a
+// determined by the currency's pips. A PIP is the fourth decimal point in a
 // currency pair (0.0001).
 // If the current exchange rate in EURUSD (Euro-Dollar) is 1.2305, it means
 // 1 Euro is worth 1.230*5* Dollars where the number 5 represents the pip in
