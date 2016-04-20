@@ -347,7 +347,6 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count)
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
 /// \return true if object passes the internal consistency check.
 ///
 template<class T, template<class> class ES>
