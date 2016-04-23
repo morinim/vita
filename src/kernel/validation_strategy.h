@@ -36,7 +36,7 @@ public:
 /// \brief a "null object" implementation of validation_strategy
 ///
 /// Implements the interface of a `validation_strategy` with empty body
-/// methods (so is very predictable and has no side effects: it does nothing).
+/// methods (it's very predictable and has no side effects: it does nothing).
 ///
 /// \see <https://en.wikipedia.org/wiki/Null_Object_pattern>
 ///

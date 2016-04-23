@@ -37,7 +37,6 @@ class trading_data
 public:
   std::chrono::seconds tf_duration[sup_tf];
 
-public:
   explicit trading_data(const std::string &);
 
   bool empty() const { return trading[short_tf].empty(); }
@@ -57,9 +56,9 @@ private:
                               double c = 0.0, double v = 0.0)
       : open(o), high(h), low(l), close(c), volume(v)
     {
-      assert(h >= std::max(o, c));
-      assert(l <= std::min(o, c));
-      assert(v > 0.0);
+      Expects(h >= std::max(o, c));
+      Expects(l <= std::min(o, c));
+      Expects(v > 0.0);
     }
 
     // std::tm point;
@@ -75,8 +74,8 @@ private:
 
   trade_info_point get(timeframe tf, std::size_t i) const
   {
-    assert(tf < sup_tf);
-    assert(i < bars(tf));
+    Expects(tf < sup_tf);
+    Expects(i < bars(tf));
 
     return trading[tf][i];
   }

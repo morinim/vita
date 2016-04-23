@@ -9,14 +9,11 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/evaluator.h"
-#include "kernel/interpreter.h"
 #include "kernel/i_mep.h"
 #include "kernel/search.h"
 #include "kernel/src/primitive/bool.h"
 #include "kernel/src/primitive/real.h"
 #include "kernel/team.h"
-#include "utility/utility.h"
 
 #include "trading_data.h"
 #include "trade_simulator.h"
