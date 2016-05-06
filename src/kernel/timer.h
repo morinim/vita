@@ -37,7 +37,7 @@ namespace vita
 ///
 ///       do_stuff_and_burn_some_time();
 ///
-///       std::cout << "Elapsed (milliseconds): " << t.elapsed() << '\n'
+///       std::cout << "Elapsed (ms): " << t.elapsed().count() << '\n'
 ///
 ///       return 0;
 ///     }
