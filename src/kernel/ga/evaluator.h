@@ -38,7 +38,7 @@ public:
 
   virtual fitness_t operator()(const T &) override;
 
-private:  // Private data members
+private:
   F f_;
 };
 
