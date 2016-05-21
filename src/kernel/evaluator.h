@@ -44,6 +44,8 @@ template<class T>
 class evaluator
 {
 public:
+  virtual ~evaluator() {}
+
   enum clear_flag {cache = 1, stats = 2, all = cache | stats};
 
   /// \return the fitness of the individual.
