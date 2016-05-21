@@ -40,8 +40,8 @@ enum class fit_tag {copies_of, components};
 /// achieved...).
 ///
 /// We use a **STANDARDIZED FITNESS**: a greater numerical value is **always**
-/// a better value (often the optimal value is 0, but this isn't strictly
-/// necessary).
+/// a better value (in many examples the optimal value is 0, but this isn't
+/// strictly necessary).
 ///
 /// If, for a particular problem, a greater value of raw fitness is better,
 /// standardized fitness equals the raw fitness for that problem (otherwise
@@ -53,11 +53,11 @@ enum class fit_tag {copies_of, components};
 /// Means of Natural Selection". In the book a **LOWER** numerical value is
 /// always a better one.
 /// The main difference is that Vita attempts to maximize the fitness (while
-/// other softwares try to minimize it).
+/// other applications try to minimize it).
 /// We chose this convention since it seemed more natural (a greater fitness
 /// is a better fitness; achieving a better fitness means to maximize the
-/// fitness). The downside is that we have to manage negative numbers, but for
-/// out purposes it's not so bad.
+/// fitness). The downside is that sometimes we have to manage negative
+/// numbers, but for  our purposes it's not so bad.
 /// Anyway maximization and minimization problems are basically the same: the
 /// solution of `max(f(x))` is the same as `-min(-f(x))`. This is usually
 /// all you have to remember when dealing with examples/problems expressed

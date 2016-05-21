@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ ga_evaluator<T, F> make_ga_evaluator(F f)
 }
 
 ///
-/// \return the fitness of the individual (range [-1000;0]).
+/// \return the fitness of the individual.
 ///
 template<class T, class F>
 fitness_t ga_evaluator<T, F>::operator()(const T &ind)
@@ -58,10 +58,8 @@ fitness_t ga_evaluator<T, F>::operator()(const T &ind)
   const auto f_v(f_(ind));
 
   if (std::isfinite(f_v))
-    //return {f_v};
-    return {1000.0 * (std::atan(f_v) / 3.14159265358979323846 - 0.5)};
-    //return {-std::exp(-f_v / 1000.0)};
+    return {f_v};
 
-  return fitness_t();
+  return {};
 }
-#endif  // Include guard
+#endif  // include guard

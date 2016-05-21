@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,13 +20,15 @@
 namespace vita
 {
 ///
-/// \brief Calculates the fitness of a i_ga individual
+/// \brief Calculates the fitness of an individual.
 ///
 /// \note
-/// Our convention is to convert raw fitness to standardized fitness. The
-/// requirements for standardized fitness are:
-/// * bigger values represent better choices;
-/// * optimal value is 0.
+/// This is a simple adapter for the objective function.
+///
+/// \warning
+/// Being a simple adapter implies that the evolutionary algorithm will try to
+/// find out the maximum of the objective function (this derives from our
+/// definition of **standardized fitness**).
 ///
 template<class T, class F>
 class ga_evaluator : public evaluator<T>
