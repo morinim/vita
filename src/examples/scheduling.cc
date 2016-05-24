@@ -43,18 +43,19 @@ double f(std::vector<double> start)
       ret += start[i];
 
     // A job starts more than its length prior to the 24 hour limit.
-    if (start[i] + job_duration[i].count() >= 24.0)
-      ret -= start[i] + job_duration[i].count() - 24.0;
+    const auto end(start[i] + job_duration[i].count());
+    if (end >= 24.0)
+      ret -= end - 24.0;
 
-    int occupied(0);
+    int occupied(1);
     for (unsigned j(0); j < start.size(); ++j)
       if (j != i &&
-          start[j] < start[i] &&
+          start[j] <= start[i] &&
           start[j] + job_duration[j].count() > start[i])
-        occupied += 1;
+        ++occupied;
 
-    if (n_machines < occupied + 1)
-      ret -= occupied + 1 - n_machines;
+    if (occupied > n_machines)
+      ret -= occupied - n_machines;
   }
 
   return ret;
@@ -68,19 +69,24 @@ int main()
                   return std::chrono::hours(vita::random::between(1, 4));
                 });
 
+  std::cout << "Total time required: "
+            << std::accumulate(job_duration.begin(), job_duration.end(),
+                               std::chrono::hours(0)).count()
+            << '\n';
+
   vita::symbol_set ss;
   vita::environment env(&ss);
 
-  env.individuals =  250;
-  env.generations = 200;
-  env.threshold.fitness = {0};
+  env.individuals = 250;
+  env.generations = 2000;
 
   vita::problem prob;
-  prob.env = env;
+  prob.env.individuals =  250;
+  prob.env.generations = 2000;
 
   // Problem's parameters.
   for (unsigned i(0); i < n_jobs; ++i)
-    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 24.0));
+    prob.env.sset->insert(vita::ga::parameter(i, -0.5, 23.5));
 
   vita::ga_search<vita::i_ga, vita::de_es, decltype(&f)> search(prob, &f);
 

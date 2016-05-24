@@ -22,8 +22,7 @@ namespace vita
 ///
 struct model_measurements
 {
-  explicit model_measurements(const fitness_t &f = fitness_t(),
-                              double a = -1.0)
+  explicit model_measurements(const fitness_t &f = {}, double a = -1.0)
     : fitness(f), accuracy(a)
   {
     Expects(accuracy <= 1.0);
