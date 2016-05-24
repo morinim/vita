@@ -74,12 +74,6 @@ int main()
                                std::chrono::hours(0)).count()
             << '\n';
 
-  vita::symbol_set ss;
-  vita::environment env(&ss);
-
-  env.individuals = 250;
-  env.generations = 2000;
-
   vita::problem prob;
   prob.env.individuals =  250;
   prob.env.generations = 2000;
@@ -95,6 +89,13 @@ int main()
   for (unsigned i(0); i < n_jobs; ++i)
     std::cout << i << ' ' << std::round(res[i]) << ' '
               << job_duration[i].count() << '\n';
+
+  // A simple script for GnuPlot:
+  // set xtics 1
+  // set ytics 2
+  // grid xtics ytics
+  // plot [x=0:24][y=-0.5:50.5] "test.dat" using 2:1:3:(0)
+  //      w vectors head filled lw 2 notitle
 
   return EXIT_SUCCESS;
 }
