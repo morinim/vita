@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(max_discretization)
              tt::tolerance(0.00001));
 }
 
-BOOST_AUTO_TEST_CASE(discretization, * unit_test::tolerance(0.00001))
+BOOST_AUTO_TEST_CASE(discretization)
 {
   using vita::discretization;
 
@@ -64,6 +64,21 @@ BOOST_AUTO_TEST_CASE(discretization, * unit_test::tolerance(0.00001))
     BOOST_TEST((1 <= s && s <= 10));
     BOOST_TEST(s >= discretization(x - 1.0, 0u, 10u));
   }
+}
+
+BOOST_AUTO_TEST_CASE(discretization_bound, * unit_test::tolerance(0.00001))
+{
+  using vita::discretization;
+
+  for (double x(-1000.0); x < 1000.0; ++x)
+  {
+    const auto s(discretization(x, -1000.0, 1000.0, -1000, 1000));
+
+    BOOST_TEST(static_cast<int>(x) == s);
+  }
+
+  BOOST_TEST(discretization(1000.0, 0.0, 500.0, 0u, 10u) == 10);
+  BOOST_TEST(discretization( -10.0, 0.0, 500.0, 0u, 10u) ==  0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

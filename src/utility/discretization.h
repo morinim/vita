@@ -75,20 +75,49 @@ Target discretization(Source x, Target min, Target max)
 
   Expects(min < max);
 
-  const auto ret(std::fma(static_cast<Source>(max - min),
-                          sigmoid_01(x),
-                          static_cast<Source>(min)));
+  const auto ret(static_cast<Target>(
+                   std::round(std::fma(static_cast<Source>(max - min),
+                                       sigmoid_01(x),
+                                       static_cast<Source>(min)))));
 
-  Ensures(static_cast<Source>(min) <= ret);
-  Ensures(ret <= static_cast<Source>(max));
-
-  return static_cast<Target>(std::round(ret));
+  Ensures(min <= ret);
+  Ensures(ret <= max);
+  return ret;
 }
 
 template<class Target, class Source>
 Target discretization(Source x, Target max)
 {
   return discretization(x, Target(0), max);
+}
+
+template<class Target, class Source>
+Target discretization(Source x, Source s_min, Source s_max,
+                      Target t_min, Target t_max)
+{
+  static_assert(std::is_floating_point<Source>::value,
+                "discretization() requires a floating point input");
+  static_assert(std::is_integral<Target>::value,
+                "discretization() requires an integral output");
+
+  Expects(s_min < s_max);
+  Expects(t_min < t_max);
+
+  if (x < s_min)
+    return t_min;
+  if (x > s_max)
+    return t_max;
+
+  const auto ret(static_cast<Target>(
+                   std::round(static_cast<Source>(t_max - t_min) *
+                              (x - s_min) /
+                              (s_max - s_min) +
+                              static_cast<Source>(t_min))));
+
+  Ensures(t_min <= ret);
+  Ensures(ret <= t_max);
+
+  return ret;
 }
 
 }  // namespace vita
