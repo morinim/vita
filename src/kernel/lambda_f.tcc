@@ -275,8 +275,7 @@ std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
     return last_slot;
 
   const auto val(to<number>(res));
-  const auto where(max_saturation(val, last_slot));
-  //const auto where(static_cast<decltype(ns)>(normalize_01(val) * ns));
+  const auto where(discretization(val, last_slot));
 
   return (where >= ns) ? last_slot : where;
 }

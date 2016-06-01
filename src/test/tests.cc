@@ -25,6 +25,7 @@ using namespace boost;
 #include "test/factory_fixture4.h"
 #include "test/factory_fixture5.h"
 
+#include "test/discretization.cc"
 #include "test/evolution.cc"
 #include "test/evolution_selection.cc"
 #include "test/fitness.cc"
@@ -37,7 +38,6 @@ using namespace boost;
 #include "test/population.cc"
 #include "test/primitive_d.cc"
 #include "test/primitive_i.cc"
-#include "test/saturation.cc"
 #include "test/small_vector.cc"
 #include "test/src_constant.cc"
 #include "test/src_problem.cc"
