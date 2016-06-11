@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,8 +29,6 @@ struct locus
 {
   index_t       index;
   category_t category;
-
-  locus operator+(index_t) const;
 
   static constexpr locus npos()
   {
@@ -74,13 +72,14 @@ inline bool operator<(const locus &l1, const locus &l2)
 }
 
 ///
+/// \param[in] l base locus.
 /// \param[in] i displacement.
-/// \return a new locus obtained from `this` incrementing index component by
-///         `i` (and not changing category component).
+/// \return a new locus obtained from `l` incrementing index component by
+///         `i` (and not changing the category component).
 ///
-inline locus locus::operator+(index_t i) const
+inline locus operator+(const locus &l, index_t i)
 {
-  return {index + i, category};
+  return {l.index + i, l.category};
 }
 
 ///

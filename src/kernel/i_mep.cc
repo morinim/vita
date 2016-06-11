@@ -25,9 +25,9 @@ namespace vita
 ///
 /// \param[in] e base environment.
 ///
-/// The process that generates the initial, random expressions has to be
-/// implemented so as to ensure that they do not violate the type system's
-/// constraints.
+/// Generates the initial, random expressions that make up an individual. This
+/// has to be implemented so as to ensure that there is no violation of the
+/// type system's constraints.
 ///
 i_mep::i_mep(const environment &e)
   : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0}
