@@ -731,7 +731,7 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_mep::load_nvi(std::istream &in, const environment &e)
+bool i_mep::load_impl(std::istream &in, const environment &e)
 {
   unsigned rows, cols;
   if (!(in >> rows >> cols))
@@ -786,7 +786,7 @@ bool i_mep::load_nvi(std::istream &in, const environment &e)
 /// \param[out] out output stream.
 /// \return `true` if the object has been saved correctly.
 ///
-bool i_mep::save_nvi(std::ostream &out) const
+bool i_mep::save_impl(std::ostream &out) const
 {
   out << genome_.rows() << ' ' << genome_.cols() << '\n';
   for (const auto &g : genome_)

@@ -19,7 +19,7 @@
 namespace vita
 {
 ///
-/// \brief An individual optimized for genetic algorithms
+/// \brief An individual optimized for genetic algorithms.
 ///
 /// This is a special case of a GP individual. Logically it seems a GP
 /// individual with as many categories as parameters to be optimized and
@@ -37,7 +37,7 @@ namespace vita
 /// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264 april
 /// 1997).
 ///
-class i_ga : public individual
+class i_ga : public individual<i_ga>
 {
 public:
   i_ga() : individual(), genome_() {}
@@ -110,15 +110,19 @@ public:
 
   bool debug() const;
 
-private:  // Private support methods
+  friend class individual<i_ga>;
+
+private:
+  // *** Private support methods ***
   hash_t hash() const;
   void pack(std::vector<unsigned char> *const) const;
 
-  // NVI implementation (serialization)
-  virtual bool load_nvi(std::istream &, const environment &) override;
-  virtual bool save_nvi(std::ostream &) const override;
+  // Serialization.
+  bool load_impl(std::istream &, const environment &);
+  bool save_impl(std::ostream &) const;
 
-private:  // Private data members
+  // *** Private data members ***
+
   // This is the genome: the entire collection of genes (the entirety of an
   // organism's hereditary information).
   std::vector<gene> genome_;

@@ -30,7 +30,7 @@ namespace vita
 /// which represents a possible solution to the task being tackled (i.e. a
 /// point in the search space).
 ///
-class i_mep : public individual
+class i_mep : public individual<i_mep>
 {
 public:
   i_mep() : individual(), genome_(), best_(locus::npos()) {}
@@ -83,17 +83,20 @@ public:
   const_iterator begin() const;
   const_iterator end() const;
 
+  friend class individual<i_mep>;
   friend class interpreter<i_mep>;
 
-private:  // Private support methods
+private:
+  // *** Private support methods ***
   hash_t hash() const;
   void pack(const locus &, std::vector<unsigned char> *const) const;
 
-  // NVI implementation (serialization)
-  virtual bool load_nvi(std::istream &, const environment &) override;
-  virtual bool save_nvi(std::ostream &) const override;
+  // Serialization.
+  bool load_impl(std::istream &, const environment &);
+  bool save_impl(std::ostream &) const;
 
-private:  // Private data members
+  // *** Private data members ***
+
   // This is the genome: the entire collection of genes (the entirety of an
   // organism's hereditary information).
   matrix<gene> genome_;

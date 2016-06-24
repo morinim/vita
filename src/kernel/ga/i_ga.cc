@@ -411,7 +411,7 @@ bool i_ga::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_ga::load_nvi(std::istream &in, const environment &e)
+bool i_ga::load_impl(std::istream &in, const environment &e)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
@@ -444,7 +444,7 @@ bool i_ga::load_nvi(std::istream &in, const environment &e)
 /// \param[out] out output stream.
 /// \return `true` if the object has been saved correctly.
 ///
-bool i_ga::save_nvi(std::ostream &out) const
+bool i_ga::save_impl(std::ostream &out) const
 {
   out << parameters() << '\n';
   for (const auto &g : genome_)
