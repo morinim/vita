@@ -36,7 +36,7 @@ public:
     : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto *const i(static_cast<interpreter<i_mep> *>(ci));
 
