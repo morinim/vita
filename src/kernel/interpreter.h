@@ -22,9 +22,9 @@
 namespace vita
 {
 ///
-/// \brief A template specialization of the core_interpreter class
+/// \brief A template specialization of the core_interpreter class.
 ///
-/// \tparam T the type of individual used
+/// \tparam T the type of individual used.
 ///
 /// \note
 /// This class would like to be a generic `interpreter<T>` implementation,
@@ -36,7 +36,7 @@ namespace vita
 /// \note
 /// This is an example of dependency injection via constructor injection: the
 /// class gets the dependencies as an argument to its constructor. It saves
-/// the reference to dependent classes as a private variables.
+/// the reference to dependent classes as private variables.
 /// All the dependencies are truly visible with constructor signature and
 /// cyclic dependencies don't happen because of the well-defined order of
 /// instantiation.
@@ -60,16 +60,17 @@ public:
 
   const T &program() const { return *prg_; }
 
-private:  // Private support methods
+private:
+  // *** Private support methods ***
   any run_locus(const locus &);
   double penalty_locus(const locus &);
 
-  // Non-virtual interface
+  // Nonvirtual interface.
   virtual any run_nvi() override;
   virtual double penalty_nvi() override;
   virtual bool debug_nvi() const override;
 
-private:  // Private data members
+  // *** Private data members ***
   const T *prg_;
 
   struct elem_ {bool valid; any value;};
@@ -88,4 +89,4 @@ private:  // Private data members
 /// Output value calculation for an individual.
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

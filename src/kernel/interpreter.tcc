@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,7 +53,7 @@ any interpreter<T>::run_locus(const locus &ip)
 /// Calls `run_locus()` using the default starting locus.
 ///
 template<class T>
-any interpreter<T>::run_nvi()
+inline any interpreter<T>::run_nvi()
 {
   return run_locus(prg_->best_);
 }

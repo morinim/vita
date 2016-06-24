@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief Minimum interface of an interpreter
+/// \brief Minimum interface of an interpreter.
 ///
 /// The class "executes" an individual (a program) in its environment. The
 /// program can produce an output or perform some actions.
@@ -41,4 +41,4 @@ private:
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

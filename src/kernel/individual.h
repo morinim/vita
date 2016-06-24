@@ -25,6 +25,8 @@ namespace vita
 ///
 /// \brief A single member of a `population`.
 ///
+/// \tparam Derived the derived class in the CRTP.
+///
 /// Each individual contains a genome which represents a possible solution to
 /// the task being tackled (i.e. a point in the search space).
 ///

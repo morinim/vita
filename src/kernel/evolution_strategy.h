@@ -22,21 +22,21 @@ namespace vita
 ///
 /// \brief A class to specify the evolution steps
 ///
-/// \tparam T type of individual
-/// \tparam SS class containing the selection strategy
-/// \tparam CS class containing the recombination strategy
-/// \tparam RS class containing the replacement strategy
+/// \tparam T type of individual.
+/// \tparam SS class containing the selection strategy.
+/// \tparam CS class containing the recombination strategy.
+/// \tparam RS class containing the replacement strategy.
 ///
 /// Selection, recombination and replacement are the main steps of evolution.
 /// In the literature a lot of different algorithms are described and many of
-/// them are implemented in Vita (but not every combination is meaningful).
+/// them are implemented in Vita (not every combination is meaningful).
 ///
 /// The user can choose, at compile time, how the evolution class should
 /// work via the evolution strategy class (or one of its specialization).
 ///
 /// In other words the template method design pattern is used to "inject"
 /// selection, recombination and replacement methods specified by the
-/// evolution_strategy object into an evolution object.
+/// evolution_strategy object into an `evolution` object.
 ///
 template<class T,
          template<class> class SS,
@@ -53,7 +53,7 @@ public:
   }
 
   /// Evolution strategy specific log function (it's called by the
-  /// evolution::log method).
+  /// `evolution::log` method).
   void log(unsigned, unsigned) const {}
 
   /// Set strategy specific parameters.
