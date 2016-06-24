@@ -31,7 +31,7 @@ namespace vita
 /// * factorizes out common code;
 /// * defines a minimum common interface.
 ///
-/// \note AKA chromosome
+/// \note AKA chromosome.
 ///
 class individual
 {
@@ -51,14 +51,13 @@ public:
   unsigned age() const { return age_; }
   void inc_age() { ++age_; }
 
-  // Visualization/output methods.
-  virtual std::ostream &in_line(std::ostream &) const = 0;
-
   // Serialization
   bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
-protected:  // Protected support methods
+protected:
+  ~individual() {}
+
   void set_older_age(unsigned);
 
 protected:  // Protected data members

@@ -46,7 +46,7 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &) const;
-  virtual std::ostream &in_line(std::ostream &) const override;
+  std::ostream &in_line(std::ostream &) const;
   std::ostream &list(std::ostream &) const;
   std::ostream &tree(std::ostream &) const;
 
