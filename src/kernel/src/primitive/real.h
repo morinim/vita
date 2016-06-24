@@ -71,22 +71,22 @@ public:
     assert(m < u);
   }
 
-  virtual bool parametric() const override { return true; }
+  virtual bool parametric() const final override { return true; }
 
-  virtual double init() const override
+  virtual double init() const final override
   { return random::between<base_t>(min, upp); }
 
-  virtual std::string display(double v) const override
+  virtual std::string display(double v) const final override
   { return std::to_string(v); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     return any(static_cast<base_t>(
                  any_cast<gene::param_type>(
                    static_cast<interpreter<i_mep> *>(i)->fetch_param())));
   }
 
-private:  // Private data members
+private:
   const base_t min, upp;
 };
 
@@ -105,15 +105,15 @@ public:
     assert(m < u);
   }
 
-  virtual bool parametric() const override { return true; }
+  virtual bool parametric() const final override { return true; }
 
-  virtual double init() const override
+  virtual double init() const final override
   { return random::between<int>(min, upp); }
 
-  virtual std::string display(double v) const override
+  virtual std::string display(double v) const final override
   { return std::to_string(static_cast<int>(v)); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     return any(static_cast<base_t>(
                  any_cast<gene::param_type>(
@@ -133,7 +133,7 @@ public:
   explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
 
@@ -149,9 +149,9 @@ class add : public function
 public:
   explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]}) {}
 
-  virtual bool associative() const override { return true; }
+  virtual bool associative() const final override { return true; }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -177,7 +177,7 @@ public:
   explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -204,7 +204,7 @@ public:
     : function(">", c[1], {c[0], c[0]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     return any(std::isgreater(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
@@ -223,7 +223,7 @@ public:
   explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -252,7 +252,7 @@ public:
     : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -289,7 +289,7 @@ public:
     : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -305,7 +305,7 @@ public:
       return i->fetch_arg(3);
   }
 
-  virtual double penalty_nvi(core_interpreter *ci) const override
+  virtual double penalty_nvi(core_interpreter *ci) const final override
   {
     return comparison_function_penalty(ci);
   }
@@ -321,7 +321,7 @@ public:
     : function("FIFL", c[1], {c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -338,7 +338,7 @@ public:
       return i->fetch_arg(3);
   }
 
-  virtual double penalty_nvi(core_interpreter *ci) const override
+  virtual double penalty_nvi(core_interpreter *ci) const final override
   {
     return comparison_function_penalty(ci);
   }
@@ -353,7 +353,7 @@ public:
   explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -366,7 +366,7 @@ public:
       return i->fetch_arg(2);
   }
 
-  virtual double penalty_nvi(core_interpreter *ci) const override
+  virtual double penalty_nvi(core_interpreter *ci) const final override
   {
     return comparison_function_penalty(ci);
   }
@@ -381,7 +381,7 @@ public:
   explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
@@ -403,7 +403,7 @@ public:
   /// \return the natural logarithm of its argument or an empty value in case
   //          of invalid argument / infinite result.
   ///
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     const any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a0.empty())  return a0;
@@ -425,7 +425,7 @@ public:
     : function("<", c[1], {c[0], c[0]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     return any(std::isless(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
@@ -444,7 +444,7 @@ public:
   explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -470,7 +470,7 @@ public:
   explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -495,7 +495,7 @@ class mul : public function
 public:
   explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]}) {}
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
@@ -521,7 +521,7 @@ public:
   explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
@@ -539,7 +539,7 @@ public:
   explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *i) const override
+  virtual any eval(core_interpreter *i) const final override
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
@@ -561,7 +561,7 @@ public:
   explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
   { assert(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const override
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
