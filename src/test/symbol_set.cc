@@ -16,7 +16,7 @@
 
 #include "kernel/i_mep.h"
 #include "kernel/random.h"
-#include "kernel/timer.h"
+#include "utility/timer.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE symbol_set

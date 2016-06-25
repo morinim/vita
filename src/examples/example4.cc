@@ -16,7 +16,7 @@
 #include "kernel/i_mep.h"
 #include "kernel/ttable.h"
 #include "kernel/src/primitive/factory.h"
-#include "kernel/timer.h"
+#include "utility/timer.h"
 
 //
 // Performs a speed test on the transposition table (insert-find cycle).

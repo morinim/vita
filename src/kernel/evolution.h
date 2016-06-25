@@ -20,7 +20,7 @@
 #include "kernel/evolution_strategy.h"
 #include "kernel/evolution_summary.h"
 #include "kernel/population.h"
-#include "kernel/timer.h"
+#include "utility/timer.h"
 
 namespace vita
 {
