@@ -11,6 +11,7 @@
 
 #include "trading_data.h"
 
+#include "kernel/timer.h"
 #include "utility/csv_parser.h"
 
 namespace
@@ -30,24 +31,80 @@ std::tm string_to_timepoint(const std::string &s)
   --tp.tm_mon;
 
   tp.tm_sec = 0;
-  tp.tm_isdst = -1;
-
+  tp.tm_isdst = -1;  // DST (Daylight Saving Time). A negative value causes the
+                     //  mktime() function to attempt to divine whether summer
+                     // time is in effect for the specified time
   return tp;
 }
 
-const std::string tf_name[] = {"Short", "Medium", "Long", "Sup"};
-}
+const std::string tf_name[timeframe::sup_tf + 1] = {"Short", "Medium", "Long",
+                                                    "Sup"};
+}  // namespace
 
 trading_data::trading_data(const std::string &fn)
 {
   load_data(fn);
 }
 
+bool trading_data::load_data(const std::string &filename)
+{
+  std::cout << "READING DATA\n";
+  vita::timer t;
+
+  using vita::csv_parser;
+
+  std::ifstream from(filename);
+  if (!from)
+  {
+    std::cerr << "Error opening input file\n";
+    return false;
+  }
+
+  enum {f_timestamp = 0, f_open, f_high, f_low, f_close, f_volume};
+
+  // Skips null volume records.
+  // We should check for holidays and skip the corrensponding records but this
+  // is simpler and almost equivalent for timeframes greater than 10s.
+  auto csv_filter = [](vita::csv_parser::record_t &r)
+  {
+    return std::stod(r[f_volume]) > 0.0;
+  };
+
+  unsigned i(0);
+  std::tm p[2];
+  for (auto record : csv_parser(from).filter_hook(csv_filter))
+  {
+    trading[short_tf].emplace_back(std::stod(record[  f_open]),
+                                   std::stod(record[  f_high]),
+                                   std::stod(record[   f_low]),
+                                   std::stod(record[ f_close]),
+                                   std::stod(record[f_volume]));
+
+    if (i < 2)
+      p[i] = string_to_timepoint(record[f_timestamp]);
+
+    if (++i % 100000 == 0)
+      std::cout << "  " << i << '\r' << std::flush;
+  }
+
+  assert(i > 2);
+  std::cout << "  " << i << " records read ("
+            << std::chrono::duration_cast<std::chrono::seconds>(
+                 t.elapsed()).count()
+            << "s)\n";
+
+  if (!set_timeframe_duration(p[0], p[1]) ||
+      !compute_longer_timeframes())
+    return false;
+
+  return debug();
+}
+
 bool trading_data::set_timeframe_duration(std::tm p0, std::tm p1)
 {
   auto t0(std::mktime(&p0));
   auto t1(std::mktime(&p1));
-  assert(t1 > t0);
+  Expects(t1 > t0);
   const auto delta_s(std::difftime(t1, t0));
   std::chrono::seconds sec(static_cast<std::uint64_t>(delta_s));
 
@@ -171,52 +228,9 @@ bool trading_data::compute_longer_timeframes()
   return true;
 }
 
-bool trading_data::load_data(const std::string &filename)
+bool trading_data::empty() const
 {
-  std::cout << "READING DATA\n";
-
-  using vita::csv_parser;
-
-  std::ifstream from(filename);
-  if (!from)
-  {
-    std::cerr << "Error opening input file\n";
-    return false;
-  }
-
-  enum {f_timestamp = 0, f_open, f_high, f_low, f_close, f_volume};
-
-  // Skips null volume records.
-  // We should check for holidays and skip the corrensponding records but this
-  // is simpler and almost equivalent for timeframes greater than 10s.
-  auto csv_filter = [](vita::csv_parser::record_t &r)
-  {
-    return std::stoi(r[f_volume]) > 0;
-  };
-
-  unsigned i(0);
-  std::tm p[2];
-  for (auto record : csv_parser(from).filter_hook(csv_filter))
-  {
-    trading[short_tf].emplace_back(std::stod(record[  f_open]),
-                                   std::stod(record[  f_high]),
-                                   std::stod(record[   f_low]),
-                                   std::stod(record[ f_close]),
-                                   std::stod(record[f_volume]));
-
-    if (i < 2)
-      p[i] = string_to_timepoint(record[f_timestamp]);
-
-    if (++i % 100000 == 0)
-      std::cout << "  " << i << '\r' << std::flush;
-  }
-  std::cout << "  " << i << " records read\n";
-
-  if (!set_timeframe_duration(p[0], p[1]) ||
-      !compute_longer_timeframes())
-    return false;
-
-  return debug();
+  return trading[short_tf].empty();
 }
 
 bool trading_data::debug() const

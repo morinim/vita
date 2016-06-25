@@ -39,7 +39,7 @@ public:
 
   explicit trading_data(const std::string &);
 
-  bool empty() const { return trading[short_tf].empty(); }
+  bool empty() const;
 
   std::size_t bars(timeframe tf = short_tf) const {return trading[tf].size();}
 
@@ -58,7 +58,7 @@ private:
     {
       Expects(h >= std::max(o, c));
       Expects(l <= std::min(o, c));
-      Expects(v > 0.0);
+      Expects(v >= 0.0);
     }
 
     // std::tm point;
