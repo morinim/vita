@@ -23,14 +23,13 @@ namespace vita
 ///
 /// This is a special case of a GP individual. Logically it seems a GP
 /// individual with as many categories as parameters to be optimized and
-/// index dimension equal to 1 (of course internal representation is
-/// different).
+/// index dimension equal to 1 (but internal representation is different).
 ///
-/// This way, having the same interface of i_mep, this class is compatible
+/// This way, having the same interface of i_mep, the class is compatible
 /// with many GP algorithms (and is directly suitable for combinatorial
 /// optimization).
 ///
-/// The class also adds a special three term crossover operator and other
+/// i_ga also adds the special three terms crossover operator and other
 /// methods to support differential evolution.
 ///
 /// \see
@@ -64,17 +63,20 @@ public:
 
   const gene &operator[](const locus &l) const
   {
-    assert(l.index == 0);
-    assert(l.category < parameters());
+    Expects(l.index == 0);
+    Expects(l.category < parameters());
     return genome_[l.category];
   }
 
   double operator[](unsigned i) const
-  { assert(i < parameters()); return genome_[i].par; }
+  {
+    Expects(i < parameters());
+    return genome_[i].par;
+  }
 
   double &operator[](unsigned i)
   {
-    assert(i < parameters());
+    Expects(i < parameters());
     signature_.clear();
     return genome_[i].par;
   }

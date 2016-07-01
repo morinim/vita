@@ -25,8 +25,8 @@ namespace vita
 ///
 i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
 {
-  assert(e.debug(true));
-  assert(e.sset);
+  Expects(e.debug(true));
+  Expects(e.sset);
 
   assert(parameters());
 
@@ -35,7 +35,7 @@ i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
   for (auto c(decltype(cs){0}); c < cs; ++c)
     genome_[c] = gene(e.sset->roulette_terminal(c));
 
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -337,8 +337,8 @@ unsigned i_ga::distance(const i_ga &ind) const
 ///
 i_ga &i_ga::operator=(const std::vector<gene::param_type> &v)
 {
+  Expects(v.size() == parameters());
   const auto ps(parameters());
-  assert(v.size() == ps);
 
   for (auto i(decltype(ps){0}); i < ps; ++i)
     operator[](i) = v[i];

@@ -2,7 +2,7 @@
 
 ## Overview ##
 
-Vita is a scalable, high performance genetic programming / genetic algorithms environment.
+Vita is a scalable, high performance genetic programming / algorithms framework.
 
 It's suitable for classification, symbolic regression, content base image retrieval, data mining and agent control. Main features:
 
