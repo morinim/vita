@@ -18,14 +18,17 @@
 #define      VITA_GA_EVALUATOR_TCC
 
 ///
-/// \param[in] f a pointer to an objective function.
+/// \param[in] f an objective function.
 ///
 /// GP-evaluators use datasets, GA-evaluators need functions to be maximized.
 ///
 template<class T, class F>
 ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
 {
-  assert(f_);
+  // The assertion `assert(f)` works with function pointers and non capturing
+  // lambdas (which are implicitly convertible to function pointers) but
+  // fails with capturing lambdas
+  // (e.g. <http://stackoverflow.com/q/7852101/3235496>).
 }
 
 ///
@@ -57,7 +60,8 @@ fitness_t ga_evaluator<T, F>::operator()(const T &ind)
 {
   const auto f_v(f_(ind));
 
-  if (std::isfinite(f_v))
+  using std::isfinite;
+  if (isfinite(f_v))
     return {f_v};
 
   return {};
