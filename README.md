@@ -86,7 +86,9 @@ vita/
     kernel/ ...............Vita kernel(core library)
     sr/ ...................Symbolic regression and classification utility
     test/ .................Vita-wide test-suite
-    tools/ ................Utilities (C++ lint checker...)
+    third_party/ ..........Third party libraries
+    tools/ ................C++ lint checker and other tools
+    utility/ ..............Support libraries / files
 ```
 
 ## Setting up the build ##
