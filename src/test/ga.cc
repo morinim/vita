@@ -130,13 +130,11 @@ BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 {
-  env.individuals = 100;
-  env.threshold.fitness = {0, 0};
-
   vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env = env;
+  prob.env.individuals = 100;
+  prob.env.threshold.fitness = {0,0};
   prob.env.sset->insert(vita::ga::parameter<>(0, 0.0, 6.0));
   prob.env.sset->insert(vita::ga::parameter<>(1, 0.0, 6.0));
 
@@ -194,14 +192,12 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1)
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 {
-  env.individuals = 130;
-  env.generations = 1000;
-  env.threshold.fitness = {0, 0};
-
   vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env = env;
+  prob.env.individuals = 130;
+  prob.env.generations = 1000;
+  prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
   for (unsigned i(0); i < 9; ++i)
@@ -336,14 +332,12 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3)
 // Test problem from <http://stackoverflow.com/q/36230735/3235496>
 BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 {
-  env.individuals = 50;
-  env.generations = 1000;
-  env.threshold.fitness = {0, 0};
-
   vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env = env;
+  prob.env.individuals = 50;
+  prob.env.generations = 1000;
+  prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
   prob.env.sset->insert(vita::ga::parameter(0, 0.0, 100.0));
@@ -383,14 +377,12 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 // distributed local minima).
 BOOST_AUTO_TEST_CASE(Search_TestProblem5)
 {
-  env.individuals = 100;
-  env.generations = 500;
-  env.threshold.fitness = {0, 0};
-
   vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env = env;
+  prob.env.individuals = 100;
+  prob.env.generations = 500;
+  prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
   for (unsigned i(0); i < 2; ++i)
