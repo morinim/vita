@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,7 +35,7 @@ public:
   /// Empty iterator is used as sentry (it is the value returned by
   /// i_ga::end()).
   ///
-  const_iterator() : sup_(0), i_(std::numeric_limits<category_t>::max()) {}
+  const_iterator() : sup_(0), i_(std::numeric_limits<decltype(i_)>::max()) {}
 
   ///
   /// \param[in] id an individual.
@@ -52,7 +52,7 @@ public:
     ++i_;
 
     if (i_ >= sup_)
-      i_ = std::numeric_limits<category_t>::max();
+      i_ = std::numeric_limits<decltype(i_)>::max();
 
     return *this;;
   }
@@ -80,7 +80,7 @@ public:
     return {0, i_};
   }
 
-private:  // Private data members
+private:
   const category_t sup_;
   category_t i_;
 };  // class i_ga::const_iterator
