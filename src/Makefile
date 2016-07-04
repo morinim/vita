@@ -52,9 +52,9 @@ endif
 INCPATH := ../../src/ ../src/ ./
 SYSTEMINCPATH := $(BOOST_INCLUDE) ./third_party/
 
-# -Wsign-conversion -Weffc++ are other interesting warning
+# -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN_FLAGS := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wconversion
+WARN_FLAGS := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow
 ifeq ($(CXX), g++)
   WARN_FLAGS += -Wdouble-promotion -Wzero-as-null-pointer-constant
 endif
