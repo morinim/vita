@@ -84,7 +84,7 @@ ifeq ($(TYPE), release)
   TYPE_FLAGS := $(OPTIMIZE_FLAGS)
 endif
 
-CXXFLAGS := -pipe -march=native --std=c++11 $(TYPE_FLAGS) $(WARN_FLAGS) $(DEFS)
+CXXFLAGS := -pipe -march=native --std=c++14 $(TYPE_FLAGS) $(WARN_FLAGS) $(DEFS)
 LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
