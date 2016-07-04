@@ -52,7 +52,7 @@ public:
 
   virtual std::string display(double v) const override
   {
-    switch (static_cast<cardinal_dir>(v))
+    switch (static_cast<unsigned>(v))
     {
     case north: return "N";
     case south: return "S";
