@@ -32,8 +32,6 @@ public:
 
   virtual vita::data *data();
 
-  virtual void clear(bool);
-
   virtual bool debug() const;
 
 public:

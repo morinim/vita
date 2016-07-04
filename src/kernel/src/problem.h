@@ -40,8 +40,6 @@ public:
 
   vita::src_data *data() override { return &dat_; }
 
-  virtual void clear(bool) override;
-
   /// Just a shorthand for checking number of classes.
   bool classification() const { return classes() > 1; }
 

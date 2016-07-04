@@ -35,18 +35,6 @@ vita::data *problem::data()
 }
 
 ///
-/// \brief Resets the object.
-/// \param[in] initialize if `true` initialize the environment with default
-///                       values.
-///
-void problem::clear(bool initialize)
-{
-  *this = std::move(problem(initialize));
-  //env = environment(&sset, initialize);
-  //sset = symbol_set();
-}
-
-///
 /// \return `true` if the object passes the internal consistency check.
 ///
 bool problem::debug() const

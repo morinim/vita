@@ -65,16 +65,6 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 /// \param[in] initialize should the environment be initialized with default
 ///                       values?
 ///
-/// Usually the environment isn't initialized so that the search class would
-/// choose the best values for the specific problem before starting the
-/// run (this is how the constructor works).
-///
-/// Anyway, for debug purpose, we can set up a default environment in a
-/// two steps:
-///
-///     src_problem p;
-///     p.clear(true);
-///
 src_problem::src_problem(bool initialize) : problem(initialize), dat_(),
                                             factory_()
 {
@@ -113,19 +103,6 @@ src_problem::src_problem(const std::string &ds, const std::string &ts,
 bool src_problem::operator!() const
 {
   return !dat_.size(data::training) || !env.sset->enough_terminals();
-}
-
-///
-/// \param[in] initialize if `true` initialize the environment with default
-///                       values.
-///
-/// Resets the object.
-///
-void src_problem::clear(bool initialize)
-{
-  problem::clear(initialize);
-
-  dat_.clear();
 }
 
 ///
