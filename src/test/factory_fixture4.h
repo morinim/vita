@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,7 +45,7 @@ struct F_FACTORY4
     x = sset.insert(factory.make("123"));
     neg_x = sset.insert(factory.make("-123"));
     y = sset.insert(factory.make("321"));
-    z = sset.insert(vita::make_unique<Z>());
+    z = sset.insert(std::make_unique<Z>());
     i_add = sset.insert(factory.make("ADD"));
     i_div = sset.insert(factory.make("DIV"));
     i_ife = sset.insert(factory.make("IFE"));

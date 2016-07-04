@@ -18,7 +18,6 @@
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 #include "kernel/ga/interpreter.h"
-#include "utility/utility.h"
 
 namespace vita
 {
@@ -136,9 +135,9 @@ template<class T = real>
 std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
                                   base_t u = 1000.0)
 {
-  return vita::make_unique<T>(static_cast<category_t>(i),
-                              static_cast<typename T::value_t>(m),
-                              static_cast<typename T::value_t>(u));
+  return std::make_unique<T>(static_cast<category_t>(i),
+                             static_cast<typename T::value_t>(m),
+                             static_cast<typename T::value_t>(u));
 }
 
 }  // namespace ga

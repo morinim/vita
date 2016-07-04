@@ -133,13 +133,13 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
   switch (find_domain(name))
   {
   case domain_t::d_bool:
-    return vita::make_unique<constant<bool>>(name, c[0]);
+    return std::make_unique<constant<bool>>(name, c[0]);
   case domain_t::d_double:
-    return vita::make_unique<constant<double>>(name, c[0]);
+    return std::make_unique<constant<double>>(name, c[0]);
   case domain_t::d_int:
-    return vita::make_unique<constant<int>>(name, c[0]);
+    return std::make_unique<constant<int>>(name, c[0]);
   case domain_t::d_string:
-    return vita::make_unique<constant<std::string>>(name, c[0]);
+    return std::make_unique<constant<std::string>>(name, c[0]);
   default:
     return nullptr;
   }
@@ -166,9 +166,9 @@ std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
   switch (d)
   {
   case domain_t::d_double:
-    return vita::make_unique<real::integer>(cvect{c}, min, max);
+    return std::make_unique<real::integer>(cvect{c}, min, max);
   case domain_t::d_int:
-    return vita::make_unique<integer::number>(cvect{c}, min, max);
+    return std::make_unique<integer::number>(cvect{c}, min, max);
   default:
     return nullptr;
   }

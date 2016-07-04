@@ -264,9 +264,9 @@ private:
 template<template<timeframe, unsigned> class F, timeframe TF>
 void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
 {
-  ss->insert(vita::make_unique<F<TF, 1>>(ts));
-  ss->insert(vita::make_unique<F<TF, 2>>(ts));
-  ss->insert(vita::make_unique<F<TF, 3>>(ts));
+  ss->insert(std::make_unique<F<TF, 1>>(ts));
+  ss->insert(std::make_unique<F<TF, 2>>(ts));
+  ss->insert(std::make_unique<F<TF, 3>>(ts));
 }
 
 template<template<timeframe, unsigned> class F>
@@ -280,9 +280,9 @@ void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
 template<template<timeframe> class F>
 void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
 {
-  ss->insert(vita::make_unique<F<short_tf>>(ts));
-  ss->insert(vita::make_unique<F<medium_tf>>(ts));
-  ss->insert(vita::make_unique<F<long_tf>>(ts));
+  ss->insert(std::make_unique<F<short_tf>>(ts));
+  ss->insert(std::make_unique<F<medium_tf>>(ts));
+  ss->insert(std::make_unique<F<long_tf>>(ts));
 }
 
 bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
@@ -299,13 +299,13 @@ bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
   insert_symbol<fxs::bullish_harami>(ss, ts);
   insert_symbol<fxs::dark_cloud_cover>(ss, ts);
 
-  ss->insert(vita::make_unique<fxs::l_and>());
-  ss->insert(vita::make_unique<fxs::l_or>());
+  ss->insert(std::make_unique<fxs::l_and>());
+  ss->insert(std::make_unique<fxs::l_or>());
 
-  ss->insert(vita::make_unique<fxs::add>());
-  ss->insert(vita::make_unique<fxs::sub>());
+  ss->insert(std::make_unique<fxs::add>());
+  ss->insert(std::make_unique<fxs::sub>());
 
-  ss->insert(vita::make_unique<fxs::lt_m>());
+  ss->insert(std::make_unique<fxs::lt_m>());
 
   return true;
 }
@@ -339,7 +339,7 @@ int main()
   std::cout << "STARTING RUN\n";
   fxs::search engine(p);
 
-  engine.set_evaluator(vita::make_unique<fxs::evaluator>(&ts));
+  engine.set_evaluator(std::make_unique<fxs::evaluator>(&ts));
 
   engine.run(1);
 

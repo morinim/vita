@@ -27,7 +27,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), weights_(),
                            views_()
 {
   for (unsigned i(0); i < gene::k_args; ++i)
-    arguments_[i] = make_unique<argument>(i);
+    arguments_[i] = std::make_unique<argument>(i);
 
   Ensures(debug());
 }

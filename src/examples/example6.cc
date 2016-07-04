@@ -102,16 +102,16 @@ int main(int argc, char *argv[])
   env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
 
   vita::symbol_factory factory;
-  sset.insert(vita::make_unique<X>());
-  sset.insert(vita::make_unique<Y>());
-  sset.insert(vita::make_unique<Z>());
+  sset.insert(std::make_unique<X>());
+  sset.insert(std::make_unique<Y>());
+  sset.insert(std::make_unique<Z>());
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FSUB"));
   sset.insert(factory.make("FMUL"));
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  auto eva(vita::make_unique<my_evaluator>());
+  auto eva(std::make_unique<my_evaluator>());
 
   vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva);
 

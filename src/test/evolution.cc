@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(Creation)
       env.code_length = l;
       env.tournament_size = 3;
 
-      const auto eva(make_unique<vita::random_evaluator<i_mep>>());
+      const auto eva(std::make_unique<vita::random_evaluator<i_mep>>());
 
       vita::evolution<i_mep, alps_es> evo1(env, *eva);
       BOOST_REQUIRE(evo1.debug());

@@ -172,13 +172,13 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
       const std::string name(coalesce(dat_.get_column(i).name,
                                       "X" + std::to_string(i)));
       const category_t category(dat_.get_column(i).category_id);
-      env.sset->insert(vita::make_unique<variable>(name, i - 1, category));
+      env.sset->insert(std::make_unique<variable>(name, i - 1, category));
     }
 
   // Sets up the labels for nominal attributes.
   for (const category &c : dat_.categories())
     for (const std::string &l : c.labels)
-      env.sset->insert(vita::make_unique<constant<std::string>>(l, c.tag));
+      env.sset->insert(std::make_unique<constant<std::string>>(l, c.tag));
 }
 
 ///

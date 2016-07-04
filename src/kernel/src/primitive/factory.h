@@ -16,7 +16,6 @@
 #include <map>
 
 #include "kernel/symbol.h"
-#include "utility/utility.h"
 
 namespace vita
 {
@@ -51,7 +50,7 @@ private:
   using build_func = std::unique_ptr<symbol> (*)(const cvect &);
 
   template<class T> static std::unique_ptr<symbol> build(const cvect &c)
-  { return vita::make_unique<T>(c); }
+  { return std::make_unique<T>(c); }
 
   // Private data members.
   struct build_info

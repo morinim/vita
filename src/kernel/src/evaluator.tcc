@@ -103,7 +103,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
   const T &prg) const
 {
-  return make_unique<basic_reg_lambda_f<T, true>>(prg);
+  return std::make_unique<basic_reg_lambda_f<T, true>>(prg);
 }
 
 ///
@@ -280,7 +280,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> dyn_slot_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<dyn_slot_lambda_f<T>>(ind, *this->dat_, x_slot_);
+  return std::make_unique<dyn_slot_lambda_f<T>>(ind, *this->dat_, x_slot_);
 }
 
 ///
@@ -338,7 +338,7 @@ template<class T>
 std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
   const T &ind) const
 {
-  return make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
+  return std::make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
 }
 
 ///
@@ -373,7 +373,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 template<class T>
 std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const
 {
-  return make_unique<binary_lambda_f<T>>(ind, *this->dat_);
+  return std::make_unique<binary_lambda_f<T>>(ind, *this->dat_);
 }
 
-#endif  // Include guard
+#endif  // include guard

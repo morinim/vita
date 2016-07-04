@@ -167,10 +167,10 @@ void src_search<T, ES>::arl(const U &base)
         for (const auto &replaced : generalized.second)
           categories.push_back(replaced.category);
 
-        p = vita::make_unique<adf>(generalized.first, categories);
+        p = std::make_unique<adf>(generalized.first, categories);
       }
       else  // !adf_args
-        p = vita::make_unique<adt>(candidate_block);
+        p = std::make_unique<adt>(candidate_block);
 
       if (env.stat.arl && adf_log.good())
       {
@@ -311,9 +311,9 @@ template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
   if (this->env_.dss == trilean::yes)
-    this->set_validator(vita::make_unique<dss>(data()));
+    this->set_validator(std::make_unique<dss>(data()));
   else if (this->env_.validation_percentage)
-    this->set_validator(vita::make_unique<holdout_validation>(
+    this->set_validator(std::make_unique<holdout_validation>(
                         data(), this->env_.validation_percentage));
 }
 
@@ -415,7 +415,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::bin:
       search<T, ES>::set_evaluator(
-        vita::make_unique<binary_evaluator<T>>(data()));
+        std::make_unique<binary_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::dyn_slot:
@@ -423,13 +423,13 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
         search<T, ES>::set_evaluator(
-          vita::make_unique<dyn_slot_evaluator<T>>(data(), x_slot));
+          std::make_unique<dyn_slot_evaluator<T>>(data(), x_slot));
       }
       return true;
 
     case evaluator_id::gaussian:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<gaussian_evaluator<T>>(data()));
+	    std::make_unique<gaussian_evaluator<T>>(data()));
       return true;
 
     default:
@@ -442,22 +442,22 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::count:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<count_evaluator<T>>(data()));
+	    std::make_unique<count_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::mae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mae_evaluator<T>>(data()));
+	    std::make_unique<mae_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::rmae:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<rmae_evaluator<T>>(data()));
+	    std::make_unique<rmae_evaluator<T>>(data()));
       return true;
 
     case evaluator_id::mse:
       search<T, ES>::set_evaluator(
-	    vita::make_unique<mse_evaluator<T>>(data()));
+	    std::make_unique<mse_evaluator<T>>(data()));
       return true;
 
     default:

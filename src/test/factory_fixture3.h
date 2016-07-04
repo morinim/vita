@@ -44,7 +44,7 @@ struct F_FACTORY3
     x = sset.insert(factory.make("123.0"));
     neg_x = sset.insert(factory.make("-123.0"));
     y = sset.insert(factory.make("321.0"));
-    z = sset.insert(vita::make_unique<Z>());
+    z = sset.insert(std::make_unique<Z>());
     f_abs = sset.insert(factory.make("FABS"));
     f_add = sset.insert(factory.make("FADD"));
     f_div = sset.insert(factory.make("FDIV"));

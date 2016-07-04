@@ -24,11 +24,11 @@ template<class T, template<class> class ES, class F>
 ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
   : search<T, ES>(pr)
 {
-  auto base_eva(vita::make_unique<ga_evaluator<T, F>>(f));
+  auto base_eva(std::make_unique<ga_evaluator<T, F>>(f));
 
   if (pf)
   {
-    auto eva(vita::make_unique<
+    auto eva(std::make_unique<
 	  constrained_evaluator<T, ga_evaluator<T, F>,
                             penalty_func_t<T>>>(*base_eva, pf));
     search<T, ES>::set_evaluator(std::move(eva));

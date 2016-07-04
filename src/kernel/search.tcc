@@ -23,7 +23,7 @@
 ///
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr),
-                                    vs_(make_unique<as_is_validation>()),
+                                    vs_(std::make_unique<as_is_validation>()),
                                     env_(p.env), prob_(p)
 {
   Ensures(debug());
@@ -202,8 +202,8 @@ template<class T, template<class> class ES>
 void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 {
   if (env_.ttable_size)
-    active_eva_ = vita::make_unique<evaluator_proxy<T>>(std::move(e),
-                                                        env_.ttable_size);
+    active_eva_ = std::make_unique<evaluator_proxy<T>>(std::move(e),
+                                                       env_.ttable_size);
   else
     active_eva_ = std::move(e);
 }

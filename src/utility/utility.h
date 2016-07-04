@@ -28,16 +28,6 @@ bool iequals(const std::string &, const std::string &);
 std::string trim(const std::string &);
 
 ///
-/// An implementation of `make_unique()` as proposed by Herb Sutter in
-/// GotW #102.
-///
-template<typename T, typename ...Args>
-std::unique_ptr<T> make_unique(Args&& ...args)
-{
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-///
 /// \return an `std::array` filled with value `v`.
 ///
 /// This function is used to initialize array in member initialization list
