@@ -130,7 +130,7 @@ public:
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const
+  virtual any eval(core_interpreter *ci) const final override
   {
     auto *const i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -224,7 +224,7 @@ public:
 
   virtual bool associative() const final override { return true; }
 
-  virtual any eval(core_interpreter *ci) const
+  virtual any eval(core_interpreter *ci) const final override
   {
     static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
