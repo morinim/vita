@@ -20,9 +20,9 @@ namespace vita
 {
 ///
 /// \brief A collection of cooperating individuals used as a member of
-///        vita::population
+///        vita::population.
 ///
-/// \tparam T type of the elements of the team (individuals)
+/// \tparam T type of the elements of the team (individuals).
 ///
 /// In generals teams of individuals can be implemented in different ways.
 /// * Firstly, a certain number of individuals can be selected randomly from

@@ -30,9 +30,9 @@ team<T>::team() : individuals_(), signature_()
 template<class T>
 team<T>::team(const environment &e) : signature_()
 {
-  assert(e.debug(true));
-  assert(e.team.individuals);
-  assert(e.sset);
+  Expects(e.debug(true));
+  Expects(e.team.individuals);
+  Expects(e.sset);
 
   const auto n(e.team.individuals);
   individuals_.reserve(n);
@@ -40,7 +40,7 @@ team<T>::team(const environment &e) : signature_()
   for (auto i(decltype(n){0}); i < n; ++i)
     individuals_.emplace_back(e);
 
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -51,7 +51,7 @@ team<T>::team(const environment &e) : signature_()
 template<class T>
 team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 {
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
@@ -96,8 +96,8 @@ unsigned team<T>::mutation(double p, const environment &env)
 template<class T>
 team<T> team<T>::crossover(team<T> t) const
 {
-  assert(t.debug());
-  assert(individuals() == t.individuals());
+  Expects(t.debug());
+  Expects(individuals() == t.individuals());
 
 /*
   const auto j(random::sup(individuals()));
@@ -139,7 +139,7 @@ typename team<T>::const_iterator team<T>::end() const
 template<class T>
 const T &team<T>::operator[](unsigned i) const
 {
-  assert(i < individuals());
+  Expects(i < individuals());
   return individuals_[i];
 }
 
@@ -230,7 +230,7 @@ bool operator==(const team<T> &lhs, const team<T> &rhs)
   if (sup != rhs.individuals())
     return false;
 
-  return std::equal(lhs.begin(), lhs.end(), rhs.begin());
+  return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 }
 
 ///

@@ -34,7 +34,6 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   {
     env.code_length = l;
     vita::team<vita::i_mep> t(env);
-    // std::cout << t << '\n';
 
     BOOST_REQUIRE(t.debug());
     BOOST_REQUIRE_EQUAL(t.age(), 0);
@@ -46,7 +45,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   env.code_length = 100;
 
   vita::team<vita::i_mep> t(env);
-  const vita::team<vita::i_mep> orig(t);
+  const auto orig(t);
 
   BOOST_REQUIRE_GT(t.individuals(), 0);
 
