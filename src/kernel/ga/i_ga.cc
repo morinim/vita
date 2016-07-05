@@ -66,40 +66,6 @@ std::ostream &i_ga::in_line(std::ostream &s) const
 }
 
 ///
-/// \param[out] s output stream
-///
-/// Do you remember C=64 list? :-)
-///
-///     01 123.37
-///     02 13
-///     03 99.99
-///     ...
-///
-std::ostream &i_ga::list(std::ostream &s) const
-{
-  const auto w(1 + static_cast<int>(std::log10(parameters())));
-
-  unsigned i(0);
-  for (const auto &g : genome_)
-  {
-    assert(i == g.sym->category());
-
-    s << '[' << std::setfill('0') << std::setw(w) << i++ << "] " << g
-      << '\n';
-  }
-
-  return s;
-}
-
-///
-/// \param[out] s output stream.
-///
-std::ostream &i_ga::tree(std::ostream &s) const
-{
-  return in_line(s);
-}
-
-///
 /// \brief A new individual is created mutating `this`
 ///
 /// \param[in] p probability of gene mutation.

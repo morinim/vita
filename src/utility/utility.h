@@ -330,4 +330,4 @@ const T &coalesce(const T &v1, const T &v2)
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // nclude guard

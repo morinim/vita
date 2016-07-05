@@ -46,8 +46,6 @@ public:
   // Visualization/output methods
   void graphviz(std::ostream &) const;
   std::ostream &in_line(std::ostream &) const;
-  std::ostream &list(std::ostream &) const;
-  std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
   unsigned mutation(double, const environment &);

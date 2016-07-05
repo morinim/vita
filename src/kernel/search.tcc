@@ -280,7 +280,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
   auto *e_solution(d.NewElement("solution"));
   e_best->InsertEndChild(e_solution);
   std::ostringstream ss;
-  run_sum.best.solution.list(ss);
+  ss << run_sum.best.solution;
   set_text(e_solution, "list", ss.str());
 
   auto *e_solutions(d.NewElement("solutions"));
