@@ -144,7 +144,7 @@ test/%: test/%.o $(KERNEL_OBJ)
 
 kernel: $(KERNEL_OBJ)
 	@echo Linking libvita.a
-	@ar rcs kernel/libvita.a $(KERNEL_OBJ)
+	@gcc-ar rcs kernel/libvita.a $(KERNEL_OBJ)
 ifeq ($(TYPE), release)
 	@strip kernel/libvita.a
 endif
