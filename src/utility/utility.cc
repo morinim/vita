@@ -23,7 +23,7 @@ namespace vita
 bool iequals(const std::string &s1, const std::string &s2)
 {
   return std::equal(
-    s1.begin(), s1.end(), s2.begin(),
+    s1.begin(), s1.end(), s2.begin(), s2.end(),
     [](int c1, int c2) { return std::tolower(c1) == std::tolower(c2); });
 }
 
