@@ -10,7 +10,7 @@ It's suitable for classification, symbolic regression, content base image retrie
 * easy integration with other systems
 * simple addition of features and modules
 * fast experimentation with detailed run-log
-* modern, standard ISO C++11/C++14 source code
+* modern, standard ISO C++14 source code
 
 It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org/MPL/2.0/) (see the accompanying LICENSE file for more details).
 
@@ -29,12 +29,12 @@ However, since core members of the Vita project have no access to these platform
 * GNU-compatible make
 * POSIX-standard shell
 * [Boost library][2]
-* A C++11-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v4.8.x or newer, clang 3.3 or newer)
+* A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 * Python v3 (for some functions)
 
 ### Windows requirements ###
 
-* MinGW/MSYS with a C++11-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v4.8.x or newer, clang 3.3 or newer)
+* MinGW/MSYS with a C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 * [Boost library][2]
 * Python v3 (for some functions)
 
