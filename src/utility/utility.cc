@@ -99,32 +99,4 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e,
   p->InsertEndChild(pe);
 }
 
-///
-/// \param[out] p parent element
-/// \param[in] e new xml element
-/// \param[in] v new xml element's value
-///
-/// Specialization for `int`.
-///
-void set_text(tinyxml2::XMLElement *p, const std::string &e, int v)
-{
-  auto *pe(p->GetDocument()->NewElement(e.c_str()));
-  pe->SetText(v);
-  p->InsertEndChild(pe);
-}
-
-///
-/// \param[out] p parent element
-/// \param[in] e new xml element
-/// \param[in] v new xml element's value
-///
-/// Specialization for `double`.
-///
-void set_text(tinyxml2::XMLElement *p, const std::string &e, double v)
-{
-  auto *pe(p->GetDocument()->NewElement(e.c_str()));
-  pe->SetText(v);
-  p->InsertEndChild(pe);
-}
-
 }  // namespace vita

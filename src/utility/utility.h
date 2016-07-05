@@ -268,8 +268,6 @@ bool load_float_from_stream(std::istream &in, T *i)
                >> *i);
 }
 
-void set_text(tinyxml2::XMLElement *, const std::string &, int);
-void set_text(tinyxml2::XMLElement *, const std::string &, double);
 void set_text(tinyxml2::XMLElement *, const std::string &,
               const std::string &);
 
