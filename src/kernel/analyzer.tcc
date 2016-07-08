@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -223,9 +223,9 @@ unsigned analyzer<T>::count(const T &ind)
       core_analyzer<T>::count(ind[{i, c}].sym, false);
 
   unsigned length(0);
-  for (const auto &l : ind)
+  for (const auto &g : ind)
   {
-    core_analyzer<T>::count(ind[l].sym, true);
+    core_analyzer<T>::count(g.sym, true);
     ++length;
   }
 

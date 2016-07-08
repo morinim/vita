@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015, 2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,12 +18,13 @@
 #define      VITA_POPULATION_ITERATOR_TCC
 
 ///
-/// \brief Iterator for a population
+/// \brief Iterator for a population.
 ///
-/// population<T>::base_iterator / population<T>::begin() / population<T>::end()
-/// are general and clear, so they should by the preferred way to scan /
-/// perform an action over every individual of a population.
-/// For performance critical code accessing to individuals via the operator[]
+/// `population<T>::base_iterator` / `population<T>::begin()` /
+/// `population<T>::end()` are general and clear, so they should by the
+/// preferred way to scan / perform an action over every individual of a
+/// population.
+/// For performance critical code accessing individuals via the `operator[]`
 /// could give better results.
 ///
 template<class T>

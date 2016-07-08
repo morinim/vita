@@ -39,8 +39,7 @@ namespace vita
 class i_ga : public individual<i_ga>
 {
 public:
-  i_ga() : individual(), genome_() {}
-
+  i_ga() = default;
   explicit i_ga(const environment &);
 
   // Visualization/output methods
@@ -53,9 +52,15 @@ public:
   i_ga crossover(double, const double [2], const i_ga &, const i_ga &,
                  i_ga) const;
 
-  class const_iterator;
+  // Iterators.
+  using const_iterator = std::vector<gene>::const_iterator;
+  using iterator = std::vector<gene>::iterator;
+
   const_iterator begin() const;
   const_iterator end() const;
+
+  iterator begin();
+  iterator end();
 
   operator std::vector<double>() const;
 
@@ -130,24 +135,38 @@ private:
 
 std::ostream &operator<<(std::ostream &, const i_ga &);
 
-#include "kernel/ga/i_ga_iterator.tcc"
+///
+/// \return a const iterator pointing to the first individual of the team.
+///
+inline i_ga::const_iterator i_ga::begin() const
+{
+  return genome_.begin();
+}
+
+///
+/// \return a const iterator pointing to a end-of-team sentry.
+///
+inline i_ga::const_iterator i_ga::end() const
+{
+  return genome_.end();
+}
 
 ///
 /// \return an iterator pointing to the first individual of the team.
 ///
-inline i_ga::const_iterator i_ga::begin() const
+inline i_ga::iterator i_ga::begin()
 {
-  return i_ga::const_iterator(*this);
+  return genome_.begin();
 }
 
 ///
 /// \return an iterator pointing to a end-of-team sentry.
 ///
-inline i_ga::const_iterator i_ga::end() const
+inline i_ga::iterator i_ga::end()
 {
-  return i_ga::const_iterator();
+  return genome_.end();
 }
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

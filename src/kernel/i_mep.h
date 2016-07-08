@@ -68,7 +68,8 @@ public:
 
   hash_t signature() const;
 
-  const gene &operator[](const locus &l) const;
+  const gene &operator[](locus) const;
+  gene &operator[](locus);
 
   category_t categories() const;
   unsigned eff_size() const;
@@ -79,9 +80,16 @@ public:
 
   bool debug() const;
 
-  class const_iterator;
+  // Iterators.
+  template<bool> class basic_iterator;
+  using const_iterator = basic_iterator<true>;
+  using iterator = basic_iterator<false>;
+
   const_iterator begin() const;
   const_iterator end() const;
+
+  iterator begin();
+  iterator end();
 
   friend class individual<i_mep>;
   friend class interpreter<i_mep>;
@@ -112,7 +120,16 @@ unsigned distance(const i_mep &, const i_mep &);
 /// \param[in] l locus of a `gene`.
 /// \return the l-th gene of `this` individual.
 ///
-inline const gene &i_mep::operator[](const locus &l) const
+inline const gene &i_mep::operator[](locus l) const
+{
+  return genome_(l);
+}
+
+///
+/// \param[in] l locus of a `gene`.
+/// \return the l-th gene of `this` individual.
+///
+inline gene &i_mep::operator[](locus l)
 {
   return genome_(l);
 }
@@ -176,6 +193,22 @@ inline i_mep::const_iterator i_mep::begin() const
 inline i_mep::const_iterator i_mep::end() const
 {
   return i_mep::const_iterator();
+}
+
+///
+/// \return an iterator to the first active locus of the individual.
+///
+inline i_mep::iterator i_mep::begin()
+{
+  return i_mep::iterator(*this);
+}
+
+///
+/// \return an iterator used as sentry value to stop a cycle.
+///
+inline i_mep::iterator i_mep::end()
+{
+  return i_mep::iterator();
 }
 
 ///

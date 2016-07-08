@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
     length += i1.eff_size();
   }
 
-  const double perc(100.0 * double(diff) / double(length));
+  const double perc(100.0 * diff / length);
   BOOST_CHECK_GT(perc, 47.0);
   BOOST_CHECK_LT(perc, 52.0);
 }

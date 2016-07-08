@@ -132,19 +132,24 @@ unsigned i_mep::mutation(double p, const environment &e)
   const auto i_size(size());
   const auto patch(i_size - e.patch_length);
 
-  for (const auto &l : *this)  // Here mutation affects only exons
+  for (auto i(begin()); i != end(); ++i)  // Here mutation affects only exons
     if (random::boolean(p))
     {
-      ++n;
+      const auto ix(i.locus().index);
+      const auto ct(i.locus().category);
 
-      const auto i(l.index);
-      const auto c(l.category);
+      const gene g(ix < patch ? gene(e.sset->roulette(ct), ix + 1, i_size)
+                              : gene(e.sset->roulette_terminal(ct)));
 
-      if (i < patch)
-        set(l, gene(e.sset->roulette(c), i + 1, i_size));
-      else
-        set(l, gene(e.sset->roulette_terminal(c)));
+      if (*i != g)
+      {
+        ++n;
+        *i = g;
+      }
     }
+
+  if (n)
+    signature_.clear();
 
   Ensures(debug());
   return n;
@@ -165,9 +170,9 @@ std::vector<locus> i_mep::blocks() const
 {
   std::vector<locus> bl;
 
-  for (const auto &l : *this)
-    if (genome_(l).sym->arity())
-      bl.push_back(l);
+  for (auto i(begin()); i != end(); ++i)
+    if (i->sym->arity())
+      bl.push_back(i.locus());
 
   return bl;
 }
@@ -243,9 +248,9 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
   std::vector<locus> terminals;
 
   // Step 1: mark the active terminal symbols.
-  for (const auto &l : *this)
-    if (genome_(l).sym->terminal())
-      terminals.push_back(l);
+  for (auto i(begin()); i != end(); ++i)
+    if (i->sym->terminal())
+      terminals.push_back(i.locus());
 
   const auto t_size(static_cast<unsigned>(terminals.size()));
 
@@ -543,16 +548,14 @@ void i_mep::graphviz(std::ostream &s, const std::string &id) const
     s << "subgraph " << id;
   s << " {";
 
-  for (const auto &l : *this)
+  for (auto i(begin()); i != end(); ++i)
   {
-    const gene &g(genome_(l));
+    s << 'g' << i.locus().index << '_' << i.locus().category << " [label="
+      << *i << ", shape=" << (i->sym->arity() ? "box" : "circle") << "];";
 
-    s << 'g' << l.index << '_' << l.category << " [label=" << g
-      << ", shape=" << (g.sym->arity() ? "box" : "circle") << "];";
-
-    for (unsigned j(0); j < g.sym->arity(); ++j)
-      s << 'g' << l.index << '_' << l.category << " -- g" << g.args[j]
-        << '_' << function::cast(g.sym)->arg_category(j) << ';';
+    for (unsigned j(0); j < i->sym->arity(); ++j)
+      s << 'g' << i.locus().index << '_' << i.locus().category << " -- g"
+        << i->args[j] << '_' << function::cast(i->sym)->arg_category(j) << ';';
   }
 
   s << '}';
@@ -606,26 +609,24 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
   const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
   const auto w2(1 + static_cast<int>(std::log10(categories())));
 
-  for (const auto &l : *this)
+  for (auto i(begin()); i != end(); ++i)
   {
-    const gene &g(genome_(l));
-
-    if (short_form && g.sym->terminal() && l != best_)
+    if (short_form && i->sym->terminal() && i.locus() != best_)
       continue;
 
-    s << '[' << std::setfill('0') << std::setw(w1) << l.index;
+    s << '[' << std::setfill('0') << std::setw(w1) << i.locus().index;
 
     if (categories() > 1)
-      s << ',' << std::setw(w2) << l.category;
+      s << ',' << std::setw(w2) << i.locus().category;
 
-    s << "] " << g;
+    s << "] " << *i;
 
-    const auto arity(g.sym->arity());
-    for (auto j(decltype(arity){0}); j < arity; ++j)
+    const auto arity(i->sym->arity());
+    for (unsigned j(0); j < arity; ++j)
     {
       s << ' ';
 
-      const auto arg_j(g.arg_locus(j));
+      const auto arg_j(i->arg_locus(j));
 
       if (short_form && genome_(arg_j).sym->terminal())
         s << genome_(arg_j);

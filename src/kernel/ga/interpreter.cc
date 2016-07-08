@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,8 +47,8 @@ double interpreter<i_ga>::penalty_nvi()
 {
   double n(0);
 
-  for (const auto &l : p_)
-    n += p_[l].sym->penalty(this);
+  for (const auto &g : p_)
+    n += g.sym->penalty(this);
 
   return n;
 }

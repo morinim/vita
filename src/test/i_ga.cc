@@ -150,9 +150,9 @@ BOOST_AUTO_TEST_CASE(Iterators)
     vita::i_ga ind(env);
 
     unsigned i(0);
-    for (const auto &l : ind)
+    for (const auto &g : ind)
     {
-      BOOST_CHECK_EQUAL(ind[l].par, ind[i]);
+      BOOST_CHECK_EQUAL(g.par, ind[i]);
       ++i;
     }
   }

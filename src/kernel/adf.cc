@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -66,8 +66,8 @@ bool adf::debug() const
 {
   const auto cod(code());
   // No recursive calls.
-  for (const auto &l : cod)
-    if (cod[l].sym == this)
+  for (const auto &g : cod)
+    if (g.sym == this)
       return false;
 
   if (!core_.debug())
@@ -129,8 +129,8 @@ bool adt::debug() const
 {
   const auto cod(code());
   // No recursive calls.
-  for (const auto &l : cod)
-    if (cod[l].sym == this)
+  for (const auto &g : cod)
+    if (g.sym == this)
       return false;
 
   if (!core_.debug())
