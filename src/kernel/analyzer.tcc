@@ -249,9 +249,9 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
       for (category_t c(0); c < ind.categories(); ++c)
         core_analyzer<team<T>>::count(ind[{i, c}].sym, false);
 
-    for (const auto &l : ind)
+    for (const auto &g : ind)
     {
-      core_analyzer<team<T>>::count(ind[l].sym, true);
+      core_analyzer<team<T>>::count(g.sym, true);
       ++length;
     }
   }

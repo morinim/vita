@@ -71,8 +71,9 @@ i_mep::i_mep(const std::vector<gene> &gv)
     best_{0, 0}
 {
   index_t i(0);
+
   for (const auto &g : gv)
-    set({i++, g.sym->category()}, g);
+    genome_({i++, g.sym->category()}) = g;
 
   Ensures(debug());
 }
@@ -185,15 +186,12 @@ std::vector<locus> i_mep::blocks() const
 /// Create a new individual obtained from `this` replacing the original
 /// symbol at locus `l` with `g`.
 ///
-/// \note
-/// i_mep::replace method is similar to i_mep::set but the former
-/// creates a new individual while the latter modify `this`.
-///
 i_mep i_mep::replace(const locus &l, const gene &g) const
 {
   i_mep ret(*this);
 
-  ret.set(l, g);
+  ret.genome_(l) = g;
+  ret.signature_.clear();
 
   Ensures(ret.debug());
   return ret;
@@ -224,7 +222,9 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
   i_mep ret(*this);
   const category_t c_sup(categories());
   for (category_t c(0); c < c_sup; ++c)
-    ret.set({index, c}, gene(sset.roulette_terminal(c)));
+    ret.genome_({index, c}) = gene(sset.roulette_terminal(c));
+
+  ret.signature_.clear();
 
   Ensures(ret.debug());
   return ret;
@@ -899,18 +899,19 @@ i_mep i_mep::crossover(i_mep rhs) const
   Expects(rhs.debug());
   Expects(size() == rhs.size());
 
-  for (auto &l : rhs)
+  for (auto i(rhs.begin()); i != end(); ++i)
     if (random::boolean())
-      rhs.set(l, operator[](l));
+      rhs.genome_(i.locus()) = genome_(i.locus());
 
   rhs.set_older_age(age());
+  rhs.signature_.clear();
 
   Ensures(rhs.debug(true));
   return rhs;
 }
 #elif defined(ONE_POINT_CROSSOVER)
 ///
-/// \brief Tree Crossover
+/// \brief One Point Crossover.
 /// \param[in] rhs the second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
@@ -938,31 +939,31 @@ i_mep i_mep::crossover(i_mep rhs) const
       for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
-        rhs.set(l, operator[](l));
+        rhs.genome_(l) = genome_(l);
       }
   else
     for (index_t i(0); i < cut; ++i)
       for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
-        rhs.set(l, operator[](l));
+        rhs.genome_(l) = genome_(l);
       }
 
   rhs.set_older_age(age());
+  rhs.signature_.clear();
 
   Ensures(rhs.debug());
   return rhs;
 }
 #elif defined(TREE_CROSSOVER)
 ///
-/// \brief Two Point Crossover
+/// \brief Tree Crossover.
 /// \param[in] rhs the second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
 /// This crossover insert a complete tree from one parent into the other ones.
 /// This is somewhat less disruptive than other forms of crossover since
-/// an entire tree is copied (not just a part). Anyway, due to size
-/// constraints, existing genes in the target individual could be overwritten.
+/// an entire tree is copied (not just a part).
 ///
 /// \note
 /// Parents must have the same size.
@@ -972,10 +973,13 @@ i_mep i_mep::crossover(i_mep rhs) const
   Expects(rhs.debug());
   Expects(size() == rhs.size());
 
-  for (auto it(std::next(begin(), eff_size())); it != end(); ++it)
-    rhs.set(*it, operator[](*it));
+  const auto base(random::between(0u, eff_size()));
+
+  for (auto i(std::next(begin(), base)); i != end(); ++i)
+    rhs.genome_(i.locus()) = *i;
 
   rhs.set_older_age(age());
+  rhs.signature_.clear();
 
   Ensures(rhs.debug());
   return rhs;
@@ -1012,7 +1016,7 @@ i_mep i_mep::crossover(i_mep rhs) const
       for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
-        rhs.set(l, operator[](l));
+        rhs.genome_(l) = genome_(l);
       }
   }
   else
@@ -1021,18 +1025,19 @@ i_mep i_mep::crossover(i_mep rhs) const
       for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
-        rhs.set(l, operator[](l));
+        rhs.genome_(l) = genome_(l);
       }
 
     for (index_t i(cut2); i < i_sup; ++i)
       for (category_t c(0); c < c_sup; ++c)
       {
         const locus l{i, c};
-        rhs.set(l, operator[](l));
+        rhs.genome_(l) = genome_(l);
       }
   }
 
   rhs.set_older_age(age());
+  rhs.signature_.clear();
 
   Ensures(rhs.debug());
   return rhs;

@@ -62,14 +62,11 @@ public:
   std::pair<i_mep, std::vector<locus>> generalize(unsigned,
                                                   const symbol_set &) const;
 
-  void set(const locus &, const gene &);
-
   bool operator==(const i_mep &) const;
 
   hash_t signature() const;
 
   const gene &operator[](locus) const;
-  gene &operator[](locus);
 
   category_t categories() const;
   unsigned eff_size() const;
@@ -90,6 +87,8 @@ public:
 
   iterator begin();
   iterator end();
+
+  template<bool> friend class basic_iterator;
 
   friend class individual<i_mep>;
   friend class interpreter<i_mep>;
@@ -126,15 +125,6 @@ inline const gene &i_mep::operator[](locus l) const
 }
 
 ///
-/// \param[in] l locus of a `gene`.
-/// \return the l-th gene of `this` individual.
-///
-inline gene &i_mep::operator[](locus l)
-{
-  return genome_(l);
-}
-
-///
 /// \return the total number of categories the individual is using.
 ///
 inline category_t i_mep::categories() const
@@ -160,19 +150,6 @@ inline unsigned i_mep::size() const
 inline bool i_mep::empty() const
 {
   return size() == 0;
-}
-
-///
-/// \param[in] l locus of a `gene`.
-/// \param[in] g a new gene.
-///
-/// Set locus `l` of the genome to `g`. Please note that this is one of
-/// the very few methods that aren't const.
-///
-inline void i_mep::set(const locus &l, const gene &g)
-{
-  genome_(l) = g;
-  signature_.clear();
 }
 
 std::ostream &operator<<(std::ostream &, const i_mep &);

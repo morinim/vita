@@ -86,7 +86,7 @@ public:
   /// \return reference to the current locus of the individual.
   ref operator*() const
   {
-    return (*ind_)[locus()];
+    return ind_->genome_(locus());
   }
 
   /// \return pointer to the current locus of the individual.
