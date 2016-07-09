@@ -77,26 +77,18 @@ void dss::preliminary_setup()
   dat_.move_append(data::training, data::validation);
 
   reset_age_difficulty(data::validation);
+
+  shake_impl();
 }
 
-bool dss::shake(unsigned generation)
+void dss::shake_impl()
 {
-  if (generation % 4 != 0)
-    return false;
-
-  const auto avg_t(average_age_difficulty(data::training));
-  print.debug("DSS average training difficulty ", avg_t.second);
-  assert(avg_t.first == 1);
-
-  dat_.move_append(data::training, data::validation);
-
-  if (generation)
-    std::for_each(dat_.begin(data::validation), dat_.end(data::validation),
-                  [](src_data::example &e) { ++e.age; });
+  Expects(dat_.size(data::validation));
+  Expects(dat_.size(data::training) == 0);
 
   const auto avg_v(average_age_difficulty(data::validation));
   print.debug("DSS average validation difficulty ", avg_v.second, ", age ",
-             avg_v.first);
+              avg_v.first);
 
   const auto weight_sum(
     std::accumulate(dat_.begin(data::validation), dat_.end(data::validation),
@@ -139,6 +131,26 @@ bool dss::shake(unsigned generation)
               ")");
 
   reset_age_difficulty(data::training);
+}
+
+bool dss::shake(unsigned generation)
+{
+  if (generation == 0 ||    // already handled by preliminary_setup()
+      generation % 4 != 0)
+    return false;
+
+  print.debug("DSS shaking generation ", generation);
+
+  const auto avg_t(average_age_difficulty(data::training));
+  print.debug("DSS average training difficulty ", avg_t.second);
+  assert(avg_t.first == 1);
+
+  dat_.move_append(data::training, data::validation);
+
+  std::for_each(dat_.begin(data::validation), dat_.end(data::validation),
+                [](src_data::example &e) { ++e.age; });
+
+  shake_impl();
 
   return true;
 }

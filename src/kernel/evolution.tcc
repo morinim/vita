@@ -288,8 +288,8 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
     if (shake(stats_.gen))
     {
       // If we 'shake' the data, fitness values and the statistics picked so
-      // far have to be cleared (the best individual and its fitness refer to
-      // the previous training set).
+      // far have to be cleared (the best fitness of the best individual refers
+      // to the previous training set).
       eva_.clear(evaluator<T>::all);
 
       assert(!stats_.best.solution.empty());

@@ -40,10 +40,10 @@ enum class metric_flags : unsigned
 };
 
 ///
-/// \brief search for GP
+/// \brief search for GP.
 ///
-/// \tparam T the type of individual used
-/// \tparam ES the adopted evolution strategy
+/// \tparam T the type of individual used.
+/// \tparam ES the adopted evolution strategy.
 ///
 /// This class implements vita::search for GP symbolic regression
 /// classification tasks.
@@ -67,7 +67,7 @@ protected:
   virtual void tune_parameters() override;
 
 private:
-  // Private support methods
+  // *** Private support methods ***
   src_data &data() const;
   bool stop_condition(const summary<T> &) const;
 
@@ -82,7 +82,7 @@ private:
   virtual void log_nvi(tinyxml2::XMLDocument *,
                        const summary<T> &) const override;
 
-  // Private data members.
+  // *** Private data members ***
   // Preferred evaluator for symbolic regression.
   evaluator_id p_symre;
 

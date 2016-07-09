@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,12 +21,12 @@ namespace vita
 {
 
 ///
-/// \brief A basic console logger
+/// \brief A basic console logger.
 ///
 class log
 {
 public:
-  /// \brief The log level
+  /// \brief The log level.
   ///
   /// * `OFF`     - No output
   /// * `FATAL`   - The program cannot continue
@@ -118,11 +118,11 @@ private:
   template<std::ostream &Out>
   void to_() const { Out << '\n'; }
 
-private:  // Private data member
   // Current log level.
   level level_;
 };
 
 extern log print;
+
 }  // namespace vita
-#endif  // Include guard
+#endif  // include guard

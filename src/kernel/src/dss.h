@@ -23,9 +23,9 @@ namespace vita
 /// \brief Dynamic Training Subset Selection.
 ///
 /// When using GP on a difficult problem, with a large set of training data,
-/// a large population size is needed and a very large number of
-/// evaluation must be carried out. DSS is a subset selection method which uses
-/// the current run to select:
+/// a large population size is needed and a very large number of evaluations
+/// must be carried out. DSS is a subset selection method which uses the
+/// current run to select:
 /// - firstly 'difficult' cases;
 /// - secondly cases which have not been looked at for several generations.
 ///
@@ -41,6 +41,7 @@ public:
 private:
   std::pair<uintmax_t,uintmax_t> average_age_difficulty(data::dataset_t) const;
   void reset_age_difficulty(data::dataset_t);
+  void shake_impl();
 
   src_data &dat_;
 };
