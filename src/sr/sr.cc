@@ -746,7 +746,11 @@ int parse_command_line(int argc, char *const argv[])
       ("verbose",
        po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::L_INFO)
        ->notifier(&ui::verbosity),
-       "select verbosity level");
+       "set verbose level")
+      ("debug",
+       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::L_DEBUG)
+       ->notifier(&ui::verbosity),
+       "print debug information");
 
     po::options_description data("Data");
     data.add_options()
