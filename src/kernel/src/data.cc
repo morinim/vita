@@ -435,7 +435,7 @@ std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
   Expects(active_dataset() == training);
 
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_NO_ERROR)
+  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
     return 0;
 
   unsigned n_output(0);

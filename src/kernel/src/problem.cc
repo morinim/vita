@@ -238,7 +238,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   std::iota(used_categories.begin(), used_categories.end(), 0);
 
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_NO_ERROR)
+  if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_SUCCESS)
     return 0;
 
   unsigned parsed(0);
