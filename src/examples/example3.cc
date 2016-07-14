@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
   std::cout << "OFFSPRING\n" << std::string(40, '-') << '\n';
 
-  i1.crossover(i2).dump(std::cout);
+  crossover(i1, i2).dump(std::cout);
   std::cout << std::endl;
 
   return EXIT_SUCCESS;

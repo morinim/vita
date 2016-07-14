@@ -22,6 +22,11 @@ team<T>::team() : individuals_(), signature_()
 {
 }
 
+template<class T>
+team<T>::team(unsigned n) : individuals_(n), signature_()
+{
+}
+
 ///
 /// \param[in] e base environment.
 ///
@@ -87,31 +92,38 @@ unsigned team<T>::mutation(double p, const environment &env)
 }
 
 ///
-/// \param[in] t the second parent.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single
 ///         offspring).
 ///
-/// \see individual::crossover for further details
+/// \see individual::crossover for further details.
 ///
 template<class T>
-team<T> team<T>::crossover(team<T> t) const
+team<T> crossover(const team<T> &lhs, const team<T> &rhs)
 {
-  Expects(t.debug());
-  Expects(individuals() == t.individuals());
+  Expects(lhs.debug());
+  Expects(rhs.debug());
+  Expects(lhs.individuals() == rhs.individuals());
 
 /*
-  const auto j(random::sup(individuals()));
+  const auto j(random::sup(lhs.individuals()));
 
-  t.individuals_[j] = operator[](j).crossover(t[j])
-  t.signature_.clear();
+  auto ret(lhs);
+  ret.individuals_[j] = crossover(lhs[j], rhs[j])
+  ret.signature_.clear();
 */
 
-  const auto sup(individuals());
-  for (auto i(decltype(sup){0}); i < sup; ++i)
-    t.individuals_[i] = operator[](i).crossover(t[i]);
+  const auto sup(lhs.individuals());
+  team<T> ret(sup);
 
-  t.signature_.clear();
-  return t;
+  for (unsigned i(0); i < sup; ++i)
+    ret.individuals_[i] = crossover(lhs[i], rhs[i]);
+
+  // Clearing signature isn't required.
+
+  Ensures(ret.debug());
+  return ret;
 }
 
 ///

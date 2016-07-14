@@ -54,6 +54,7 @@ class team
 {
 public:
   team();
+  explicit team(unsigned);
   explicit team(const environment &);
   explicit team(std::vector<T>);
 
@@ -65,7 +66,6 @@ public:
 
   // Recombination operators.
   unsigned mutation(double, const environment &);
-  team crossover(team) const;
 
   const T &operator[](unsigned) const;
 
@@ -90,11 +90,13 @@ public:
   bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
+  template<class U> friend team<U> crossover(const team<U> &, const team<U> &);
+
 private:
-  // Private support methods
+  // Private support methods.
   hash_t hash() const;
 
-  // Private data members
+  // Private data members.
   members_t individuals_;
 
   mutable hash_t signature_;
@@ -105,6 +107,8 @@ private:
 // ***********************************************************************
 template<class T> bool operator==(const team<T> &, const team<T> &);
 template<class T> unsigned distance(const team<T> &, const team<T> &);
+
+template<class T> team<T> crossover(const team<T> &, const team<T> &);
 
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 

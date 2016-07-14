@@ -48,9 +48,8 @@ public:
 
   // Recombination operators
   unsigned mutation(double, const environment &);
-  i_ga crossover(i_ga) const;
-  i_ga crossover(double, const double [2], const i_ga &, const i_ga &,
-                 i_ga) const;
+  i_ga crossover(double, const double [2],
+                 const i_ga &, const i_ga &, const i_ga &) const;
 
   // Iterators.
   using const_iterator = std::vector<gene>::const_iterator;
@@ -116,6 +115,7 @@ public:
   bool debug() const;
 
   friend class individual<i_ga>;
+  friend i_ga crossover(const i_ga &, const i_ga &);
 
 private:
   // *** Private support methods ***
@@ -132,6 +132,9 @@ private:
   // organism's hereditary information).
   std::vector<gene> genome_;
 };  // class i_ga
+
+// Recombination operators.
+i_ga crossover(const i_ga &, const i_ga &);
 
 std::ostream &operator<<(std::ostream &, const i_ga &);
 

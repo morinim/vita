@@ -52,9 +52,9 @@ typename strategy<T>::offspring_t base<T>::run(
 
   const auto r1(parent[0]), r2(parent[1]);
 
-  if (vita::random::boolean(env.p_cross))
+  if (random::boolean(env.p_cross))
   {
-    T off(pop[r1].crossover(pop[r2]));
+    auto off(crossover(pop[r1], pop[r2]));
     ++this->stats_->crossovers;
 
     // This could be an original contribution of Vita... but it's hard
@@ -77,7 +77,7 @@ typename strategy<T>::offspring_t base<T>::run(
       unsigned i(0);
       do
       {
-        T tmp(pop[r1].crossover(pop[r2]));
+        auto tmp(crossover(pop[r1], pop[r2]));
 
         while (pop[r1].signature() == tmp.signature() ||
                pop[r2].signature() == tmp.signature())
@@ -131,4 +131,4 @@ typename strategy<T>::offspring_t de<T>::run(
   return {pop[parent[0]].crossover(env.p_cross, env.de.weight,
                                    pop[parent[1]], pop[a], pop[b])};
 }
-#endif  // Include guard
+#endif  // include guard

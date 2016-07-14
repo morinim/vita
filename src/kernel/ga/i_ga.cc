@@ -100,15 +100,15 @@ unsigned i_ga::mutation(double p, const environment &env)
 }
 
 ///
-/// \brief Two points crossover
-/// \param[in] rhs the second parent.
-/// \return the result of the crossover (we only generate a single
-///         offspring).
+/// \brief Two points crossover.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
+/// \return the result of the crossover (we only generate a single offspring).
 ///
 /// We randomly select two loci (common crossover points). The offspring is
 /// created with genes from the `rhs` parent before the first crossover
 /// point and after the second crossover point; genes between crossover
-/// points are taken from the other `*this` parent.
+/// points are taken from the `lhs` parent.
 ///
 /// \note
 /// - Parents must have the same size.
@@ -116,34 +116,35 @@ unsigned i_ga::mutation(double p, const environment &env)
 ///   strategies. Typical differential evolution GA algorithm won't use
 ///   this method.
 ///
-i_ga i_ga::crossover(i_ga rhs) const
+i_ga crossover(const i_ga &lhs, const i_ga &rhs)
 {
-  assert(rhs.debug());
+  Expects(lhs.debug());
+  Expects(rhs.debug());
+  Expects(lhs.parameters() == rhs.parameters());
 
-  const auto ps(parameters());
-  assert(ps == rhs.parameters());
-
+  const auto ps(lhs.parameters());
   const auto cut1(random::sup(ps - 1));
   const auto cut2(random::between(cut1 + 1, ps));
 
+  i_ga ret(rhs);
   for (auto i(cut1); i < cut2; ++i)
-    rhs.genome_[i] = genome_[i];
+    ret[i] = lhs[i];
 
-  rhs.set_older_age(age());
+  ret.set_older_age(lhs.age());
+  ret.signature_ = ret.hash();
 
-  rhs.signature_ = rhs.hash();
-  assert(rhs.debug());
-  return rhs;
+  Ensures(ret.debug());
+  return ret;
 }
 
 ///
-/// \brief Differential evolution crossover
+/// \brief Differential evolution crossover.
 /// \param[in] p crossover probability.
 /// \param[in] f scaling factor range (`environment.de.weight`).
 /// \param[in] a first parent.
 /// \param[in] b second parent.
-/// \param[in] c third parent.
-/// \return the offspring.
+/// \param[in] c third parent (base vector).
+/// \return the offspring (trial vector).
 ///
 /// The offspring, also called trial vector, is generated as follows:
 ///
@@ -164,32 +165,37 @@ i_ga i_ga::crossover(i_ga rhs) const
 /// `a` and `b` are used for mutation, `this` and `c` for crossover.
 ///
 i_ga i_ga::crossover(double p, const double f[2],
-                     const i_ga &a, const i_ga &b, i_ga c) const
+                     const i_ga &a, const i_ga &b, const i_ga &c) const
 {
-  assert(0.0 <= p);
-  assert(p <= 1.0);
-  assert(a.debug());
-  assert(b.debug());
-  assert(c.debug());
+  Expects(0.0 <= p && p <= 1.0);
+  Expects(a.debug());
+  Expects(b.debug());
+  Expects(c.debug());
 
   const auto ps(parameters());
-  assert(ps == a.parameters());
-  assert(ps == b.parameters());
-  assert(ps == c.parameters());
+  Expects(ps == a.parameters());
+  Expects(ps == b.parameters());
+  Expects(ps == c.parameters());
 
+  // The wighting factor is randomly selected from an interval for each
+  // difference vector (a technique called dither). Dither improves convergence
+  // behaviour significantly, especially for noisy objective functions.
   const auto rf(random::between(f[0], f[1]));
+
+  i_ga ret(c);
+
   for (auto i(decltype(ps){0}); i < ps - 1; ++i)
     if (random::boolean(p))
-      c[i] += rf * (a[i] - b[i]);
+      ret[i] += rf * (a[i] - b[i]);
     else
-      c[i] = operator[](i);
-  c[ps - 1] += rf * (a[ps - 1] - b[ps - 1]);
+      ret[i] = operator[](i);
+  ret[ps - 1] += rf * (a[ps - 1] - b[ps - 1]);
 
-  c.set_older_age(std::max({age(), a.age(), b.age()}));
+  ret.set_older_age(std::max({age(), a.age(), b.age()}));
 
-  c.signature_.clear();
-  assert(c.debug());
-  return c;
+  ret.signature_.clear();
+  Ensures(ret.debug());
+  return ret;
 }
 
 ///

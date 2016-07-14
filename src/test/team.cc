@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
   }
 }
 
-BOOST_AUTO_TEST_CASE(Crossover)
+BOOST_AUTO_TEST_CASE(t_crossover)
 {
   env.code_length = 100;
 
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(Crossover)
   double dist(0.0);
   for (unsigned j(0); j < n; ++j)
   {
-    const auto tc(t1.crossover(t2));
+    const auto tc(crossover(t1, t2));
     BOOST_CHECK(tc.debug());
 
     dist += distance(t1, tc);

@@ -171,7 +171,7 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
     if (vita::random::boolean())
       i2.inc_age();
 
-    const auto ic(i1.crossover(i2));
+    const auto ic(crossover(i1, i2));
     BOOST_CHECK(ic.debug());
     BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
 

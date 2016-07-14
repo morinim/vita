@@ -875,12 +875,13 @@ i_mep i_mep::compress() const
 
 #if defined(UNIFORM_CROSSOVER)
 ///
-/// \brief Uniform Crossover
-/// \param[in] rhs the second parent.
+/// \brief Uniform Crossover.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
 /// The i-th locus of the offspring has a 50% probability to be filled with
-/// the i-th gene of `this` and 50% with i-th gene of `rhs`. Parents must
+/// the i-th gene of `lhs` and 50% with i-th gene of `rhs`. Parents must
 /// have the same size.
 /// Uniform crossover, as the name suggests, is a GP operator inspired by the
 /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
@@ -894,28 +895,32 @@ i_mep i_mep::compress() const
 /// and the same length. GP uniform crossover begins with the observation that
 /// many parse trees are at least partially structurally similar.
 ///
-i_mep i_mep::crossover(i_mep rhs) const
+i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
+  Expects(lhs.debug());
   Expects(rhs.debug());
-  Expects(size() == rhs.size());
+  Expects(lhs.size() == rhs.size());
 
-  for (auto i(rhs.begin()); i != end(); ++i)
+  i_mep ret(lhs);
+
+  for (auto i(rhs.begin()); i != rhs.end(); ++i)
     if (random::boolean())
-      rhs.genome_(i.locus()) = genome_(i.locus());
+      ret.genome_(i.locus()) = *i;
 
-  rhs.set_older_age(age());
-  rhs.signature_.clear();
+  ret.set_older_age(rhs.age());
+  ret.signature_.clear();
 
-  Ensures(rhs.debug(true));
-  return rhs;
+  Ensures(ret.debug(true));
+  return ret;
 }
 #elif defined(ONE_POINT_CROSSOVER)
 ///
 /// \brief One Point Crossover.
-/// \param[in] rhs the second parent.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
-/// We randomly select a parent (between `this` and `rhs`) and a single locus
+/// We randomly select a parent (between `lhs` and `rhs`) and a single locus
 /// (common crossover point). The offspring is created with genes from the
 /// chosen parent up to the crossover point and genes from the other parent
 /// beyond that point.
@@ -924,73 +929,79 @@ i_mep i_mep::crossover(i_mep rhs) const
 /// \note
 /// Parents must have the same size.
 ///
-i_mep i_mep::crossover(i_mep rhs) const
+i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
+  Expects(lhs.debug());
   Expects(rhs.debug());
-  Expects(size() == rhs.size());
+  Expects(lhs.size() == rhs.size());
 
-  const auto i_sup(size());
-  const auto c_sup(categories());
+  const auto i_sup(lhs.size());
+  const auto c_sup(lhs.categories());
 
   const auto cut(random::between<index_t>(1, i_sup - 1));
 
-  if (random::boolean())
-    for (index_t i(cut); i < i_sup; ++i)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{i, c};
-        rhs.genome_(l) = genome_(l);
-      }
-  else
-    for (index_t i(0); i < cut; ++i)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{i, c};
-        rhs.genome_(l) = genome_(l);
-      }
+  const bool b(random::boolean());
+  const i_mep *parents[] = {&lhs, &rhs};
+  i_mep ret(*parents[b]);
 
-  rhs.set_older_age(age());
-  rhs.signature_.clear();
+  for (index_t i(cut); i < i_sup; ++i)
+    for (category_t c(0); c < c_sup; ++c)
+    {
+      const locus l{i, c};
+      ret.genome_(l) = parents[!b]->genome_(l);
+    }
 
-  Ensures(rhs.debug());
-  return rhs;
+  ret.set_older_age(parents[!b]->age());
+  ret.signature_.clear();
+
+  Ensures(ret.debug());
+  return ret;
 }
 #elif defined(TREE_CROSSOVER)
 ///
 /// \brief Tree Crossover.
-/// \param[in] rhs the second parent.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
-/// This crossover insert a complete tree from one parent into the other ones.
-/// This is somewhat less disruptive than other forms of crossover since
+/// Inserts a complete tree from one parent into the other.
+/// The operation is less disruptive than other forms of crossover since
 /// an entire tree is copied (not just a part).
 ///
 /// \note
 /// Parents must have the same size.
 ///
-i_mep i_mep::crossover(i_mep rhs) const
+i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
+  Expects(lhs.debug());
   Expects(rhs.debug());
-  Expects(size() == rhs.size());
+  Expects(lhs.size() == rhs.size());
 
-  const auto base(random::between(0u, eff_size()));
+  const bool b(random::boolean());
+  const i_mep *parents[] = {&lhs, &rhs};
+  i_mep ret(*parents[b]);
 
-  for (auto i(std::next(begin(), base)); i != end(); ++i)
-    rhs.genome_(i.locus()) = *i;
+  const auto delta(random::between(0u, lhs.eff_size()));
 
-  rhs.set_older_age(age());
-  rhs.signature_.clear();
+  for (auto i(std::next(parents[!b]->begin(), delta));
+       i != parents[!b]->end();
+       ++i)
+    ret.genome_(i.locus()) = *i;
 
-  Ensures(rhs.debug());
-  return rhs;
+  ret.set_older_age(parents[!b]->age());
+  ret.signature_.clear();
+
+  Ensures(ret.debug());
+  return ret;
 }
 #else  // TWO_POINT_CROSSOVER (default)
 ///
-/// \brief Two Point Crossover
-/// \param[in] rhs the second parent.
+/// \brief Two Point Crossover.
+/// \param[in] lhs first parent.
+/// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single offspring).
 ///
-/// We randomly select a parent (between `this` and `rhs`) and a two loci
+/// We randomly select a parent (between `lhs` and `rhs`) and a two loci
 /// (common crossover points). The offspring is created with genes from the
 /// chosen parent before the first crossover point and after the second
 /// crossover point; genes between crossover points are taken from the other
@@ -999,48 +1010,34 @@ i_mep i_mep::crossover(i_mep rhs) const
 /// \note
 /// Parents must have the same size.
 ///
-i_mep i_mep::crossover(i_mep rhs) const
+i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
+  Expects(lhs.debug());
   Expects(rhs.debug());
-  Expects(size() == rhs.size());
+  Expects(lhs.size() == rhs.size());
 
-  const auto i_sup(size());
-  const auto c_sup(categories());
+  const auto i_sup(lhs.size());
+  const auto c_sup(lhs.categories());
 
   const auto cut1(random::sup(i_sup - 1));
   const auto cut2(random::between(cut1 + 1, i_sup));
 
-  if (random::boolean())
-  {
-    for (index_t i(cut1); i < cut2; ++i)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{i, c};
-        rhs.genome_(l) = genome_(l);
-      }
-  }
-  else
-  {
-    for (index_t i(0); i < cut1; ++i)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{i, c};
-        rhs.genome_(l) = genome_(l);
-      }
+  const bool b(random::boolean());
+  const i_mep *parents[] = {&lhs, &rhs};
+  i_mep ret(*parents[b]);
 
-    for (index_t i(cut2); i < i_sup; ++i)
-      for (category_t c(0); c < c_sup; ++c)
-      {
-        const locus l{i, c};
-        rhs.genome_(l) = genome_(l);
-      }
-  }
+  for (index_t i(cut1); i != cut2; ++i)
+    for (category_t c(0); c < c_sup; ++c)
+    {
+      const locus l{i, c};
+      ret.genome_(l) = parents[!b]->genome_(l);
+    }
 
-  rhs.set_older_age(age());
-  rhs.signature_.clear();
+  ret.set_older_age(parents[!b]->age());
+  ret.signature_.clear();
 
-  Ensures(rhs.debug());
-  return rhs;
+  Ensures(ret.debug());
+  return ret;
 }
 #endif
 }  // namespace vita

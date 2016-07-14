@@ -47,7 +47,6 @@ public:
 
   // Recombination operators
   unsigned mutation(double, const environment &);
-  i_mep crossover(i_mep) const;
 
   // Working with blocks / genome
   std::vector<locus> blocks() const;
@@ -89,7 +88,7 @@ public:
   iterator end();
 
   template<bool> friend class basic_iterator;
-
+  friend i_mep crossover(const i_mep &, const i_mep &);
   friend class individual<i_mep>;
   friend class interpreter<i_mep>;
 
@@ -113,6 +112,7 @@ private:
   locus best_;
 };  // class i_mep
 
+i_mep crossover(const i_mep &, const i_mep &);
 unsigned distance(const i_mep &, const i_mep &);
 
 ///
@@ -197,4 +197,4 @@ inline i_mep::iterator i_mep::end()
 ///
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
