@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2015 EOS di Manlio Morini.
+#  Copyright (C) 2011-2016 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -23,7 +23,7 @@ dynamic_filename = "dynamic"
 stat_dir = "stat/"
 summary_filename = "summary"
 symbol_set_dir = "symbolset/"
-ttable_bit = 20
+cache_bit = 20
 
 # Key: [dataset file, generations, individuals, code_length, runs, symbolset,
 #       evaluator]
@@ -83,14 +83,14 @@ def sr(args, data_set, generations, individuals, code_length, rounds,
         randomize = "--random-seed " + str(random.randint(0, 1000000000))
 
     cmd = Template("$sr --verbose $eva $elitism_switch --stat-dir $sd "\
-                   "--stat-dynamic --stat-summary --ttable $tt -g $gen "\
+                   "--stat-dynamic --stat-summary --cache $cb -g $gen "\
                    "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
                    "$arl_switch $dss_switch $ss $ds")
     s = cmd.substitute(
         sr = sr,
         elitism_switch = elitism,
         sd = stat_dir,
-        tt = ttable_bit,
+        cb = cache_bit,
         gen = generations,
         nind = individuals,
         cl = code_length,

@@ -18,8 +18,8 @@
 #include <boost/program_options.hpp>
 
 #include "kernel/environment.h"
-#include "kernel/src/evaluator.h"
 #include "kernel/log.h"
+#include "kernel/src/evaluator.h"
 #include "kernel/src/problem.h"
 #include "kernel/src/primitive/factory.h"
 #include "kernel/src/search.h"
@@ -668,7 +668,7 @@ void threshold(const std::string &v)
 /// \param[in] bits number of bits used for the cache (which contains `2^bits`
 ///                 elements).
 ///
-void cache(std::uint8_t bits)
+void cache(unsigned bits)
 {
   Expects(bits);
   problem->env.cache_size = bits;
@@ -765,7 +765,7 @@ int parse_command_line(int argc, char *const argv[])
 
     po::options_description config("Config");
     config.add_options()
-      ("cache", po::value<std::uint8_t>()->notifier(&ui::cache),
+      ("cache", po::value<unsigned>()->notifier(&ui::cache),
        "number of bits used for the cache (cache contains `2^bits` elements)")
       ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
        "sets preferred evaluator "
