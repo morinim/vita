@@ -174,9 +174,9 @@ public:  // Data members
   /// Should we use Adaptive Representation through Learning?
   trilean arl = trilean::unknown;
 
-  /// \f$2^ttable_size\f$ is the number of elements of the transposition
+  /// \f$2^cache_size\f$ is the number of elements of the transposition
   /// table.
-  unsigned ttable_size = 16;
+  unsigned cache_size = 16;
 
   struct statistics
   {

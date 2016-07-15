@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include "kernel/i_mep.h"
-#include "kernel/ttable.h"
+#include "kernel/cache.h"
 #include "kernel/src/primitive/factory.h"
 #include "utility/timer.h"
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 10000000));
 
-  vita::ttable cache(static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 16));
+  vita::cache cache(static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 16));
 
   std::vector<vita::i_mep> pool;
   for (size_t i(0); i < 1000; ++i)

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_TTABLE_H)
-#define      VITA_TTABLE_H
+#if !defined(VITA_CACHE_H)
+#define      VITA_CACHE_H
 
 #include "kernel/environment.h"
 
@@ -38,7 +38,7 @@ struct hash_t
   bool operator!=(hash_t h) const
   { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
-  /// \brief Used to combine multiple hashes
+  /// \brief Used to combine multiple hashes.
   ///
   /// \note
   /// In spite of its handy bit-mixing properties, XOR is not a good way to
@@ -55,11 +55,11 @@ struct hash_t
   /// We assume that a string of 128 zero bits means empty.
   bool empty() const { return !data[0] && !data[1]; }
 
-public:   // Serialization
+  // Serialization.
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
-public:  // Public data members
+  // Data members.
   std::uint_least64_t data[2];
 };
 
@@ -70,13 +70,13 @@ std::ostream &operator<<(std::ostream &, hash_t);
 ///        fitness (mainly used by the evaluator_proxy class).
 ///
 /// During the evolution semantically equivalent (but syntactically distinct)
-/// individuals are often generated and ttable could give a significant
-/// speed improvement avoiding the recalculation of shared information.
+/// individuals are often generated and cache can give a significant speed
+/// improvement avoiding the recalculation of shared information.
 ///
-class ttable
+class cache
 {
 public:
-  explicit ttable(unsigned);
+  explicit cache(std::uint8_t);
 
   void clear();
   void clear(const hash_t &);
@@ -89,7 +89,7 @@ public:
   bool find(const hash_t &, fitness_t *const) const;
   unsigned seen(const hash_t &) const;
 
-  /// \return number of searches in the hash table
+  /// \return number of searches in the hash table.
   /// Every call to the find method increment the counter.
   std::uintmax_t probes() const { return probes_; }
 
@@ -100,16 +100,17 @@ public:
 
   // Class has pointer data members so disabling the copy constructor /
   // `operator=()` is a good idea (see "Effective C++").
-  DISALLOW_COPY_AND_ASSIGN(ttable);
+  DISALLOW_COPY_AND_ASSIGN(cache);
 
-public:   // Serialization
+  // Serialization.
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
-private:  // Private support methods
+private:
+  // Private support methods.
   std::size_t index(const hash_t &) const;
 
-private:  // Private data members
+  // Private data members
   struct slot
   {
     /// This is used as primary key for access to the table.
@@ -125,16 +126,16 @@ private:  // Private data members
     };
 
   const std::uint64_t k_mask;
-  std::vector<slot> table_;
+  std::vector<slot>   table_;
 
   decltype(slot::seal) seal_;
 
   mutable std::uintmax_t probes_;
-  mutable std::uintmax_t hits_;
+  mutable std::uintmax_t   hits_;
 };
 
 /// \example example4.cc
 /// Performs a speed test on the transposition table (insert-find cycle).
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

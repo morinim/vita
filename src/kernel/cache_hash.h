@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_TTABLE_HASH_H)
-#define      VITA_TTABLE_HASH_H
+#if !defined(VITA_CACHE_HASH_H)
+#define      VITA_CACHE_HASH_H
 
 #include "kernel/vita.h"
 
@@ -23,7 +23,7 @@ namespace vita
 /// \param[in] seed initialization seed.
 /// \return the signature of `data`.
 ///
-/// MurmurHash3 (http://code.google.com/p/smhasher/), by Austin Appleby, is a
+/// MurmurHash3 (https://github.com/aappleby/smhasher), by Austin Appleby, is a
 /// relatively simple non-cryptographic hash algorithm. It's noted for being
 /// fast, with excellent distribution, avalanche behavior and overall
 /// collision resistance.
@@ -41,8 +41,7 @@ namespace vita
 /// * <http://code.google.com/p/cityhash/>
 /// * <http://code.google.com/p/smhasher/>
 ///
-inline
-hash_t hash(void *const data, unsigned len, const unsigned seed)
+inline hash_t hash(void *const data, unsigned len, const unsigned seed)
 {
   /// Murmurhash3 follows.
   const unsigned n_blocks(len / 16);  // Block size is 128bit
@@ -133,5 +132,4 @@ hash_t hash(void *const data, unsigned len, const unsigned seed)
 }
 
 }  // namespace vita
-
-#endif  // Include guard
+#endif  // include guard

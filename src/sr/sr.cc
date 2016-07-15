@@ -665,15 +665,15 @@ void threshold(const std::string &v)
 }
 
 ///
-/// \param[in] bits number of bits used for the ttable (ttable contains
-///                 `2^bits elements`).
+/// \param[in] bits number of bits used for the cache (which contains `2^bits`
+///                 elements).
 ///
-void ttable(unsigned bits)
+void cache(std::uint8_t bits)
 {
-  assert(bits);
-  problem->env.ttable_size = bits;
+  Expects(bits);
+  problem->env.cache_size = bits;
 
-  print.info("TTable size is ", bits, " bits");
+  print.info("Cache size is ", bits, " bits");
 }
 
 ///
@@ -765,14 +765,14 @@ int parse_command_line(int argc, char *const argv[])
 
     po::options_description config("Config");
     config.add_options()
+      ("cache", po::value<std::uint8_t>()->notifier(&ui::cache),
+       "number of bits used for the cache (cache contains `2^bits` elements)")
       ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
        "sets preferred evaluator "
        "(count, mae, rmae, mse, binary, dynslot, gaussian)")
       ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
        "sets the seed for the pseudo-random number generator. "
-       "Pseudo-random sequences are repeatable by using the same seed value")
-      ("ttable", po::value<unsigned>()->notifier(&ui::ttable),
-       "number of bits used for the ttable (ttable contains 2^bits elements)");
+       "Pseudo-random sequences are repeatable by using the same seed value");
 
     // Declare a group of options that will be allowed both on command line
     // and in config file.

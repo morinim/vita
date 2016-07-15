@@ -25,6 +25,7 @@ using namespace boost;
 #include "test/factory_fixture4.h"
 #include "test/factory_fixture5.h"
 
+#include "test/cache.cc"
 #include "test/discretization.cc"
 #include "test/evolution.cc"
 #include "test/evolution_selection.cc"
@@ -45,5 +46,4 @@ using namespace boost;
 #include "test/symbol_set.cc"
 #include "test/team.cc"
 #include "test/terminal.cc"
-#include "test/ttable.cc"
 //#include "test/variant.cc"

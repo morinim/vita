@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,11 +13,11 @@
 #include <cstdlib>
 #include <sstream>
 
+#include "kernel/cache_hash.h"
 #include "kernel/environment.h"
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
 #include "kernel/src/primitive/factory.h"
-#include "kernel/ttable_hash.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE TranspositionTable
@@ -83,11 +83,11 @@ BOOST_AUTO_TEST_SUITE_END()
 
 
 
-BOOST_FIXTURE_TEST_SUITE(test_ttable, F_FACTORY2)
+BOOST_FIXTURE_TEST_SUITE(test_cache, F_FACTORY2)
 
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
-  vita::ttable cache(16);
+  vita::cache cache(16);
   env.code_length = 64;
 
   const unsigned n(6000);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 BOOST_AUTO_TEST_CASE(CollisionDetection)
 {
   using i_interp = vita::interpreter<vita::i_mep>;
-  vita::ttable cache(14);
+  vita::cache cache(14);
   env.code_length = 64;
 
   const unsigned n(1000);
@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   using namespace vita;
 
   using i_interp = interpreter<i_mep>;
-  ttable cache(14), cache2(14);
+  vita::cache cache1(14), cache2(14);
   env.code_length = 64;
 
   const unsigned n(1000);
@@ -157,18 +157,18 @@ BOOST_AUTO_TEST_CASE(Serialization)
     const vita::any val(i_interp(&i1).run());
     fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
 
-    cache.insert(i1.signature(), f);
+    cache1.insert(i1.signature(), f);
     vi.push_back(i1);
   }
 
   for (unsigned i(0); i < n; ++i)
   {
     fitness_t f;
-    present[i] = cache.find(vi[i].signature(), &f);
+    present[i] = cache1.find(vi[i].signature(), &f);
   }
 
   std::stringstream ss;
-  BOOST_REQUIRE(cache.save(ss));
+  BOOST_REQUIRE(cache1.save(ss));
 
   BOOST_REQUIRE(cache2.load(ss));
 

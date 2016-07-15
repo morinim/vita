@@ -16,9 +16,9 @@
 #include "kernel/i_mep.h"
 #include "kernel/adf.h"
 #include "kernel/argument.h"
+#include "kernel/cache_hash.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
-#include "kernel/ttable_hash.h"
 
 namespace vita
 {

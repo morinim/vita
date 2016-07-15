@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,7 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/ttable.h"
+#include "kernel/cache.h"
 
 namespace vita
 {
@@ -49,17 +49,19 @@ bool hash_t::save(std::ostream &out) const
 ///
 /// Creates a new hash table.
 ///
-ttable::ttable(unsigned bits)
-  : k_mask((1 << bits) - 1), table_(1 << bits), seal_(1), probes_(0), hits_(0)
+cache::cache(std::uint8_t bits)
+  : k_mask((1u << bits) - 1), table_(1u << bits),
+    seal_(1), probes_(0), hits_(0)
 {
-  assert(debug());
+  Expects(bits);
+  Ensures(debug());
 }
 
 ///
 /// \param[in] u the signature of an individual.
 /// \return an index in the hash table.
 ///
-inline std::size_t ttable::index(const hash_t &h) const
+inline std::size_t cache::index(const hash_t &h) const
 {
   return h.data[0] & k_mask;
 }
@@ -68,7 +70,7 @@ inline std::size_t ttable::index(const hash_t &h) const
 /// Clears the content and the statistical informations of the table
 /// (allocated size isn't changed).
 ///
-void ttable::clear()
+void cache::clear()
 {
   probes_ = hits_ = 0;
 
@@ -86,7 +88,7 @@ void ttable::clear()
 ///
 /// Clears the cached information for individual `h`.
 ///
-void ttable::clear(const hash_t &h)
+void cache::clear(const hash_t &h)
 {
   table_[index(h)].hash = hash_t();
 
@@ -99,7 +101,7 @@ void ttable::clear(const hash_t &h)
 /// \brief Resets the `seen` counter
 ///
 #if defined(CLONE_SCALING)
-void ttable::reset_seen()
+void cache::reset_seen()
 {
   probes_ = hits_ = 0;
 
@@ -116,7 +118,7 @@ void ttable::reset_seen()
 /// \return `true` if `h` is found in the transposition table, `false`
 ///         otherwise.
 ///
-bool ttable::find(const hash_t &h, fitness_t *const fitness) const
+bool cache::find(const hash_t &h, fitness_t *const fitness) const
 {
   ++probes_;
 
@@ -140,7 +142,7 @@ bool ttable::find(const hash_t &h, fitness_t *const fitness) const
 /// \param[in] h individual's signature to look for.
 /// \return number of times `h` has been looked for.
 ///
-unsigned ttable::seen(const hash_t &h) const
+unsigned cache::seen(const hash_t &h) const
 {
   const slot &s(table_[index(h)]);
 
@@ -160,7 +162,7 @@ unsigned ttable::seen(const hash_t &h) const
 ///
 /// Stores fitness information in the transposition table.
 ///
-void ttable::insert(const hash_t &h, const fitness_t &fitness)
+void cache::insert(const hash_t &h, const fitness_t &fitness)
 {
   slot s;
   s.hash    =       h;
@@ -180,7 +182,7 @@ void ttable::insert(const hash_t &h, const fitness_t &fitness)
 /// \note
 /// If the load operation isn't successful the current object isn't changed.
 ///
-bool ttable::load(std::istream &in)
+bool cache::load(std::istream &in)
 {
   decltype(seal_) t_seal;
   if (!(in >> t_seal))
@@ -227,7 +229,7 @@ bool ttable::load(std::istream &in)
 /// \param[out] out output stream.
 /// \return `true` if the object was saved correctly.
 ///
-bool ttable::save(std::ostream &out) const
+bool cache::save(std::ostream &out) const
 {
   out << seal_ << ' ' << probes_ << ' ' << hits_ << '\n';
 
@@ -255,7 +257,7 @@ bool ttable::save(std::ostream &out) const
 ///
 /// \return `true` if the object passes the internal consistency check.
 ///
-bool ttable::debug() const
+bool cache::debug() const
 {
   return probes() >= hits();
 }

@@ -15,9 +15,9 @@
 
 #include <fstream>
 
+#include "kernel/cache.h"
 #include "kernel/environment.h"
 #include "kernel/locus.h"
-#include "kernel/ttable.h"
 #include "kernel/vitafwd.h"
 
 namespace vita

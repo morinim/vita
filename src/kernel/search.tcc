@@ -201,9 +201,9 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 template<class T, template<class> class ES>
 void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
 {
-  if (env_.ttable_size)
+  if (env_.cache_size)
     active_eva_ = std::make_unique<evaluator_proxy<T>>(std::move(e),
-                                                       env_.ttable_size);
+                                                       env_.cache_size);
   else
     active_eva_ = std::move(e);
 }

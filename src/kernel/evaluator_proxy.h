@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,8 +13,8 @@
 #if !defined(VITA_EVALUATOR_PROXY_H)
 #define      VITA_EVALUATOR_PROXY_H
 
+#include "kernel/cache.h"
 #include "kernel/evaluator.h"
-#include "kernel/ttable.h"
 
 namespace vita
 {
@@ -23,7 +23,7 @@ namespace vita
 ///
 /// Provides a surrogate for an evaluator to control access to it. The
 /// reason for controlling access is to cache fitness scores of individuals.
-/// evaluator_proxy uses an ad-hoc internal hash table (ttable).
+/// evaluator_proxy uses an ad-hoc internal hash table (cache).
 ///
 template<class T>
 class evaluator_proxy : public evaluator<T>
@@ -47,8 +47,8 @@ private:
   // Access to the real evaluator.
   std::unique_ptr<evaluator<T>> eva_;
 
-  // Transposition table (hash table cache).
-  ttable cache_;
+  // Hash table cache.
+  cache cache_;
 };
 
 #include "kernel/evaluator_proxy.tcc"

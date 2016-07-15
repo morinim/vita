@@ -79,7 +79,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "max_gens_wo_imp", g_without_improvement);
   set_text(e_environment, "arl", as_integer(arl));
   set_text(e_environment, "validation_percentage", validation_percentage);
-  set_text(e_environment, "ttable_bits", ttable_size);  // size 1u<<ttable_size
+  set_text(e_environment, "cache_bits", cache_size);  // size `1u<<cache_size`
 
   auto *e_alps(d->NewElement("alps"));
   e_environment->InsertEndChild(e_alps);

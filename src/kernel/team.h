@@ -13,8 +13,7 @@
 #if !defined(VITA_TEAM_H)
 #define      VITA_TEAM_H
 
-#include "kernel/environment.h"
-#include "kernel/ttable.h"
+#include "kernel/cache.h"
 
 namespace vita
 {
