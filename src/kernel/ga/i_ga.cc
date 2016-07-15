@@ -28,9 +28,8 @@ i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
   Expects(e.debug(true));
   Expects(e.sset);
 
-  assert(parameters());
-
   const auto cs(parameters());
+  assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
     genome_[c] = gene(e.sset->roulette_terminal(c));
@@ -88,12 +87,25 @@ unsigned i_ga::mutation(double p, const environment &env)
   for (category_t c(0); c < ps; ++c)
     if (random::boolean(p))
     {
-      ++n;
+      const gene g(env.sset->roulette_terminal(c));
 
-      genome_[c] = gene(env.sset->roulette_terminal(c));
+      if (g != genome_[c])
+      {
+        ++n;
+        genome_[c] = g;
+      }
     }
 
-  signature_ = hash();
+  // Here we assume that a micromutation of a terminal isn't significative.
+  // It can happen (the probability is very very low but...) that
+  //
+  // {1.0, 0, 0} --MUTATION--> {0.999999999999999999999999999999999999, 0, 0}
+  //
+  // The individuals are considered equal (the comparison between parametric
+  // terminals are based on the `almost_equal` function) so this doesn't count
+  // as mutation.
+  if (n)
+    signature_ = hash();
 
   Ensures(debug());
   return n;
@@ -112,7 +124,7 @@ unsigned i_ga::mutation(double p, const environment &env)
 ///
 /// \note
 /// - Parents must have the same size.
-/// - This function is included for compatibility with GP recombination
+/// - The function is included for compatibility with GP recombination
 ///   strategies. Typical differential evolution GA algorithm won't use
 ///   this method.
 ///
@@ -307,7 +319,7 @@ unsigned i_ga::distance(const i_ga &ind) const
 ///
 /// Sets the individuals with values from `v`.
 ///
-i_ga &i_ga::operator=(const std::vector<gene::param_type> &v)
+i_ga &i_ga::operator=(const std::vector<double> &v)
 {
   Expects(v.size() == parameters());
   const auto ps(parameters());

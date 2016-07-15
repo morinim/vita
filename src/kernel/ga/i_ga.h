@@ -83,7 +83,7 @@ public:
     return genome_[i].par;
   }
 
-  i_ga &operator=(const std::vector<gene::param_type> &);
+  i_ga &operator=(const std::vector<double> &);
 
   ///
   /// \return `true` if the individual is empty, `0` otherwise.
