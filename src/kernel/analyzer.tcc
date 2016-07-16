@@ -88,7 +88,7 @@ std::uintmax_t core_analyzer<T>::terminals(bool eff) const
 template<class T>
 const distribution<double> &core_analyzer<T>::age_dist() const
 {
-  assert(age_.debug());
+  Expects(age_.debug());
 
   return age_;
 }
@@ -101,10 +101,9 @@ template<class T>
 const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
 {
   const auto gi(group_stat_.find(g));
-
   assert(gi != group_stat_.end());
-  assert(gi->second.age.debug());
 
+  Ensures(gi->second.age.debug());
   return gi->second.age;
 }
 
@@ -114,8 +113,7 @@ const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
 template<class T>
 const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
 {
-  assert(fit_.debug());
-
+  Ensures(fit_.debug());
   return fit_;
 }
 
@@ -128,10 +126,9 @@ template<class T>
 const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
 {
   const auto gi(group_stat_.find(g));
-
   assert(gi != group_stat_.end());
-  assert(gi->second.fitness.debug());
 
+  Ensures(gi->second.fitness.debug());
   return gi->second.fitness;
 }
 
@@ -141,8 +138,7 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
 template<class T>
 const distribution<double> &core_analyzer<T>::length_dist() const
 {
-  assert(length_.debug());
-
+  Ensures(length_.debug());
   return length_;
 }
 
@@ -150,12 +146,12 @@ const distribution<double> &core_analyzer<T>::length_dist() const
 /// \param[in] sym symbol we are gathering statistics about.
 /// \param[in] active is this an active gene?
 ///
-/// Used by core_analyzer<T>::count(const T &)
+/// Used by `count(const T &)`.
 ///
 template<class T>
-void core_analyzer<T>::count(const symbol *const sym, bool active)
+void core_analyzer<T>::count(const symbol *sym, bool active)
 {
-  assert(sym);
+  Expects(sym);
 
   ++sym_counter_[sym].counter[active];
 
@@ -210,7 +206,7 @@ void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 }
 
 ///
-/// \tparam T type of individual
+/// \tparam T type of individual.
 ///
 /// \param[in] ind individual to be analyzed.
 /// \return effective length of individual we gathered statistics about.
@@ -233,7 +229,7 @@ unsigned analyzer<T>::count(const T &ind)
 }
 
 ///
-/// \tparam T type of individual
+/// \tparam T type of individual.
 ///
 /// \param[in] t team to be analyzed.
 /// \return effective length of the team we gathered statistics about.
@@ -259,4 +255,20 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
   return length;
 }
 
-#endif  // Include guard
+///
+/// \param[in] ind individual to be analyzed.
+/// \return effective length of individual we gathered statistics about.
+///
+unsigned analyzer<i_ga>::count(const i_ga &ind)
+{
+  unsigned length(0);
+  for (const auto &g : ind)
+  {
+    core_analyzer<i_ga>::count(g.sym, true);
+    ++length;
+  }
+
+  return length;
+}
+
+#endif  // include guard

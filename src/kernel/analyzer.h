@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,6 +17,7 @@
 
 #include "kernel/distribution.h"
 #include "kernel/symbol.h"
+#include "kernel/ga/i_ga.h"
 
 namespace vita
 {
@@ -57,11 +58,11 @@ public:
 
   bool debug() const;
 
-protected:  // Protected support methods
+protected:
   virtual unsigned count(const T &) = 0;
-  void count(const symbol *const, bool);
+  void count(const symbol *, bool);
 
-private:  // Private data members
+private:
   /// This comparator is useful for debugging purpose: when we insert a
   /// symbol pointer in an ordered container, it induces a well defined
   /// order. Without this the default comparison for pointers has a
@@ -90,9 +91,9 @@ private:  // Private data members
 };  // core_analyzer
 
 ///
-/// \brief Analyzer takes a statistics snapshot of a population
+/// \brief Analyzer takes a statistics snapshot of a population.
 ///
-/// \tparam T type of individual
+/// \tparam T type of individual.
 ///
 /// Procedure:
 /// 1. the population set should be loaded adding (analyzer::add method) one
@@ -112,14 +113,14 @@ class analyzer : public core_analyzer<T>
 public:
   using analyzer::core_analyzer::core_analyzer;
 
-private:  // Private support methods
+private:
   virtual unsigned count(const T &) override;
 };
 
 ///
-/// \brief Analyzer specialization for populations of teams
+/// \brief Analyzer specialization for populations of teams.
 ///
-/// \tparam T type of individual
+/// \tparam T type of individual.
 ///
 template<class T>
 class analyzer<team<T>> : public core_analyzer<team<T>>
@@ -127,8 +128,21 @@ class analyzer<team<T>> : public core_analyzer<team<T>>
 public:
   using analyzer::core_analyzer::core_analyzer;
 
-private:  // Private support methods
+private:
   virtual unsigned count(const team<T> &) override;
+};
+
+///
+/// \brief Analyzer specialization for genetic algorithms.
+///
+template<>
+class analyzer<i_ga> : public core_analyzer<i_ga>
+{
+public:
+  using analyzer::core_analyzer::core_analyzer;
+
+private:
+  virtual unsigned count(const i_ga &) override;
 };
 
 #include "kernel/analyzer.tcc"

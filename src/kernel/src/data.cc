@@ -225,6 +225,8 @@ void src_data::move_append(dataset_t src, dataset_t dst)
     std::move(begin(src), end(src), std::back_inserter(datasets_[dst]));
     datasets_[src].clear();
   }
+
+  Ensures(datasets_[src].empty());
 }
 
 void src_data::move_append(dataset_t src, dataset_t dst, std::size_t n)

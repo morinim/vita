@@ -143,7 +143,7 @@ private:  // Private data members
 };
 
 ///
-/// \brief Stores a single element of the data set
+/// \brief Stores a single element of the dataset.
 ///
 /// The `struct` consists of an input vector (`input`) and an answer value
 /// (`output`). Depending on the kind of problem, `output` stores:

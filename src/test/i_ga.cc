@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
 
   BOOST_REQUIRE(ind.debug());
   BOOST_REQUIRE(ind.empty());
-  BOOST_REQUIRE(!ind.size());
 }
 
 BOOST_AUTO_TEST_CASE(Penalty)

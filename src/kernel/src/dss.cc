@@ -105,7 +105,7 @@ void dss::shake_impl()
   // Note that the actual size of the selected subset is not fixed and, in
   // fact, it averages slightly above target_size (Gathercole and Ross felt
   // that this might improve performance).
-  const auto s(static_cast<double>(dat_.size(data::validation)));
+  const double s(dat_.size(data::validation));
   const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
   const auto target_size(s * ratio);

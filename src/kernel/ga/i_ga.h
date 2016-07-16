@@ -21,14 +21,6 @@ namespace vita
 ///
 /// \brief An individual optimized for genetic algorithms.
 ///
-/// This is a special case of a GP individual. Logically it seems a GP
-/// individual with as many categories as parameters to be optimized and
-/// index dimension equal to 1 (but internal representation is different).
-///
-/// This way, having the same interface of i_mep, the class is compatible
-/// with many GP algorithms (and is directly suitable for combinatorial
-/// optimization).
-///
 /// i_ga also adds the special three terms crossover operator and other
 /// methods to support differential evolution.
 ///
@@ -89,17 +81,6 @@ public:
   /// \return `true` if the individual is empty, `0` otherwise.
   ///
   bool empty() const { return !parameters(); }
-
-  ///
-  /// \return `1` if the individual is not empty, `0` otherwise.
-  ///
-  /// This is for compatibility for GP algorithm, but isn't significative
-  /// for differential evolution.
-  ///
-  /// \see i_ga::parameters()
-  ///
-  unsigned size() const { return !empty(); }
-  unsigned categories() const { return parameters(); }
 
   ///
   /// \return the number of parameters stored in the individual.
