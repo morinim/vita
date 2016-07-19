@@ -92,7 +92,6 @@ public:
   bool debug() const;
 
   friend class individual<i_de>;
-  friend i_de crossover(const i_de &, const i_de &);
 
 private:
   // *** Private support methods ***
@@ -111,9 +110,6 @@ private:
 };  // class i_de
 
 double distance(const i_de &, const i_de &);
-
-// Recombination operators.
-i_de crossover(const i_de &, const i_de &);
 
 std::ostream &operator<<(std::ostream &, const i_de &);
 

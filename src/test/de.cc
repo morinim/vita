@@ -63,37 +63,6 @@ BOOST_AUTO_TEST_CASE(Evaluator)
     eva_prev = eva_ret;
   }
 }
-
-BOOST_AUTO_TEST_CASE(Evolution)
-{
-  env.individuals = 100;
-
-  vita::print.verbosity(vita::log::L_WARNING);
-
-  auto eva(vita::make_ga_evaluator<vita::i_de>(
-    [](const std::vector<double> &v)
-    { return std::accumulate(v.begin(), v.end(), 0.0); }));
-
-  vita::evolution<vita::i_de, vita::alps_es> evo1(env, eva);
-  BOOST_TEST(evo1.debug());
-
-  const auto s1(evo1.run(1));
-
-  BOOST_TEST(s1.best.solution[0] >    8.0);
-  BOOST_TEST(s1.best.solution[1] >   95.0);
-  BOOST_TEST(s1.best.solution[2] >  950.0);
-  BOOST_TEST(s1.best.solution[3] > 9950.0);
-
-  vita::evolution<vita::i_de, vita::std_es> evo2(env, eva);
-  BOOST_TEST(evo2.debug());
-
-  const auto s2(evo2.run(1));
-
-  BOOST_TEST(s2.best.solution[0] >    8.0);
-  BOOST_TEST(s2.best.solution[1] >   95.0);
-  BOOST_TEST(s2.best.solution[2] >  950.0);
-  BOOST_TEST(s2.best.solution[3] > 9950.0);
-}
 BOOST_AUTO_TEST_SUITE_END()
 
 

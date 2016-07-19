@@ -112,44 +112,6 @@ unsigned i_de::mutation(double p, const environment &env)
 }
 
 ///
-/// \brief Two points crossover.
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
-///
-/// We randomly select two loci (common crossover points). The offspring is
-/// created with genes from the `rhs` parent before the first crossover
-/// point and after the second crossover point; genes between crossover
-/// points are taken from the `lhs` parent.
-///
-/// \note
-/// - Parents must have the same size.
-/// - The function is included for compatibility with GP recombination
-///   strategies. Typical differential evolution GA algorithm won't use
-///   this method.
-///
-i_de crossover(const i_de &lhs, const i_de &rhs)
-{
-  Expects(lhs.debug());
-  Expects(rhs.debug());
-  Expects(lhs.parameters() == rhs.parameters());
-
-  const auto ps(lhs.parameters());
-  const auto cut1(random::sup(ps - 1));
-  const auto cut2(random::between(cut1 + 1, ps));
-
-  i_de ret(rhs);
-  for (auto i(cut1); i < cut2; ++i)
-    ret[i] = lhs[i];
-
-  ret.set_older_age(lhs.age());
-  ret.signature_ = ret.hash();
-
-  Ensures(ret.debug());
-  return ret;
-}
-
-///
 /// \brief Differential evolution crossover.
 /// \param[in] p crossover probability.
 /// \param[in] f scaling factor range (`environment.de.weight`).
