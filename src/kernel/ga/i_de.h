@@ -36,7 +36,6 @@ public:
   std::ostream &in_line(std::ostream &) const;
 
   // Recombination operators
-  unsigned mutation(double, const environment &);
   i_de crossover(double, const double [2],
                  const i_de &, const i_de &, const i_de &) const;
 

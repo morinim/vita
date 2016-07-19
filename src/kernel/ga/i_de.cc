@@ -65,53 +65,6 @@ std::ostream &i_de::in_line(std::ostream &s) const
 }
 
 ///
-/// \brief A new individual is created mutating `this`
-///
-/// \param[in] p probability of gene mutation.
-/// \param[in] env the current environment.
-/// \return number of mutations performed.
-///
-/// \note
-/// This function is included for compatibility with GP recombination
-/// strategies. Typical differential evolution GA algorithm won't use
-/// this method.
-///
-unsigned i_de::mutation(double p, const environment &env)
-{
-  Expects(0.0 <= p);
-  Expects(p <= 1.0);
-
-  unsigned n(0);
-
-  const auto ps(parameters());
-  for (category_t c(0); c < ps; ++c)
-    if (random::boolean(p))
-    {
-      const gene g(env.sset->roulette_terminal(c));
-
-      if (g != genome_[c])
-      {
-        ++n;
-        genome_[c] = g;
-      }
-    }
-
-  // Here we assume that a micromutation of a terminal isn't significative.
-  // It can happen (the probability is very very low but...) that
-  //
-  // {1.0, 0, 0} --MUTATION--> {0.999999999999999999999999999999999999, 0, 0}
-  //
-  // The individuals are considered equal (the comparison between parametric
-  // terminals are based on the `almost_equal` function) so this doesn't count
-  // as mutation.
-  if (n)
-    signature_ = hash();
-
-  Ensures(debug());
-  return n;
-}
-
-///
 /// \brief Differential evolution crossover.
 /// \param[in] p crossover probability.
 /// \param[in] f scaling factor range (`environment.de.weight`).

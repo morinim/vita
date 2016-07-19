@@ -53,35 +53,6 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
   BOOST_TEST(ind.empty());
 }
 
-BOOST_AUTO_TEST_CASE(Mutation)
-{
-  vita::i_de t(env);
-  const vita::i_de orig(t);
-
-  const unsigned n(1000);
-
-  BOOST_TEST_CHECKPOINT("Zero probability mutation");
-  for (unsigned i(0); i < n; ++i)
-  {
-    t.mutation(0.0, env);
-    BOOST_TEST(t == orig);
-  }
-
-  BOOST_TEST_CHECKPOINT("50% probability mutation.");
-  unsigned m(0);
-
-  for (unsigned i(0); i < n; ++i)
-  {
-    auto i1(orig);
-
-    m += i1.mutation(0.5, env);
-  }
-
-  const double perc(100.0 * m / (orig.parameters() * n));
-  BOOST_TEST(perc > 47.0);
-  BOOST_TEST(perc < 53.0);
-}
-
 BOOST_AUTO_TEST_CASE(Comparison, * boost::unit_test::tolerance(0.0001))
 {
   for (unsigned i(0); i < 2000; ++i)
