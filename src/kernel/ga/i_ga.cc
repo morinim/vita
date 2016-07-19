@@ -218,8 +218,7 @@ void i_ga::pack(std::vector<unsigned char> *const p) const
 
 ///
 /// \param[in] x second term of comparison.
-/// \return `true` if the two individuals are equal (symbol by symbol,
-///         including introns).
+/// \return `true` if the two individuals are equal.
 ///
 /// \note
 /// Age is not checked.

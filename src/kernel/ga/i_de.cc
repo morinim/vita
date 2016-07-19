@@ -175,20 +175,18 @@ void i_de::pack(std::vector<unsigned char> *const p) const
 }
 
 ///
-/// \param[in] x second term of comparison.
-/// \return `true` if the two individuals are equal (symbol by symbol,
-///         including introns).
+/// \param[in] lhs first term of comparison.
+/// \param[in] rhs second term of comparison.
+/// \return `true` if the two individuals are equal.
 ///
 /// \note
 /// Age is not checked.
 ///
-bool i_de::operator==(const i_de &x) const
+bool operator==(const i_de &lhs, const i_de &rhs)
 {
-  const bool eq(genome_ == x.genome_);
+  const bool eq(std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
 
-  assert(signature_.empty() != x.signature_.empty() ||
-         (signature_ == x.signature_) == eq);
-
+  Ensures((lhs.signature() == rhs.signature()) == eq);
   return eq;
 }
 

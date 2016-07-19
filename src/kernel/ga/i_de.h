@@ -80,8 +80,6 @@ public:
 
   hash_t signature() const;
 
-  bool operator==(const i_de &) const;
-
   bool debug() const;
 
   friend class individual<i_de>;
@@ -102,6 +100,7 @@ private:
   genome_t genome_;
 };  // class i_de
 
+bool operator==(const i_de &, const i_de &);
 double distance(const i_de &, const i_de &);
 
 std::ostream &operator<<(std::ostream &, const i_de &);
