@@ -40,8 +40,9 @@ public:
                  const i_de &, const i_de &, const i_de &) const;
 
   // Iterators.
-  using const_iterator = std::vector<gene>::const_iterator;
-  using iterator = std::vector<gene>::iterator;
+  using genome_t = std::vector<double>;
+  using const_iterator = genome_t::const_iterator;
+  using iterator = genome_t::iterator;
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -51,24 +52,17 @@ public:
 
   operator std::vector<double>() const;
 
-  const gene &operator[](const locus &l) const
-  {
-    Expects(l.index == 0);
-    Expects(l.category < parameters());
-    return genome_[l.category];
-  }
-
   double operator[](unsigned i) const
   {
     Expects(i < parameters());
-    return genome_[i].par;
+    return genome_[i];
   }
 
   double &operator[](unsigned i)
   {
     Expects(i < parameters());
     signature_.clear();
-    return genome_[i].par;
+    return genome_[i];
   }
 
   i_de &operator=(const std::vector<double> &);
@@ -105,7 +99,7 @@ private:
 
   // This is the genome: the entire collection of genes (the entirety of an
   // organism's hereditary information).
-  std::vector<gene> genome_;
+  genome_t genome_;
 };  // class i_de
 
 double distance(const i_de &, const i_de &);

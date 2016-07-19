@@ -308,8 +308,8 @@ bool i_ga::debug() const
 }
 
 ///
-/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
+/// \param[in] e environment used to build the individual.
 /// \return `true` if the object has been loaded correctly.
 ///
 /// \note

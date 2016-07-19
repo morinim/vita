@@ -32,7 +32,7 @@ i_de::i_de(const environment &e) : individual(), genome_(e.sset->categories())
   assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(e.sset->roulette_terminal(c));
+    genome_[c] = gene(e.sset->roulette_terminal(c)).par;
 
   Ensures(debug());
 }
@@ -60,7 +60,8 @@ void i_de::graphviz(std::ostream &s) const
 ///
 std::ostream &i_de::in_line(std::ostream &s) const
 {
-  std::copy(genome_.begin(), genome_.end(), infix_iterator<gene>(s, " "));
+  std::copy(genome_.begin(), genome_.end(),
+            infix_iterator<decltype(genome_[0])>(s, " "));
   return s;
 }
 
@@ -165,31 +166,11 @@ hash_t i_de::hash() const
 ///
 void i_de::pack(std::vector<unsigned char> *const p) const
 {
-  for (const auto &g : genome_)
+  for (const auto &v : genome_)
   {
-    // Although 16 bit are enough to contain opcodes and parameters, they are
-    // usually stored in unsigned variables (i.e. 32 or 64 bit) for
-    // performance reasons.
-    // Anyway before hashing opcodes/parameters we convert them to 16 bit
-    // types to avoid hashing more than necessary.
-    const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
-    assert(g.sym->opcode() <= std::numeric_limits<opcode_t>::max());
-
-    // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
-    // std::uint8_t has the exact same size and representation as
-    // unsigned char, if the implementation made it a distinct, non-character
-    // type, the aliasing rules would not apply to it
-    // (see http://stackoverflow.com/q/16138237/3235496)
-    const auto *const s1 = reinterpret_cast<const unsigned char *>(&opcode);
-    for (std::size_t i(0); i < sizeof(opcode); ++i)
-      p->push_back(s1[i]);
-
-    assert(g.sym->parametric());
-    const auto param(g.par);
-
-    auto s2 = reinterpret_cast<const unsigned char *>(&param);
-    for (std::size_t i(0); i < sizeof(param); ++i)
-      p->push_back(s2[i]);
+    auto s(reinterpret_cast<const unsigned char *>(&v));
+    for (std::size_t i(0); i < sizeof(v); ++i)
+      p->push_back(s[i]);
   }
 }
 
@@ -241,10 +222,8 @@ double distance(const i_de &lhs, const i_de &rhs)
 i_de &i_de::operator=(const std::vector<double> &v)
 {
   Expects(v.size() == parameters());
-  const auto ps(parameters());
 
-  for (auto i(decltype(ps){0}); i < ps; ++i)
-    operator[](i) = v[i];
+  genome_ = v;
 
   return *this;
 }
@@ -271,31 +250,6 @@ bool i_de::debug() const
     return true;
   }
 
-  const auto ps(parameters());
-
-  for (auto i(decltype(ps){0}); i < ps; ++i)
-  {
-    if (!genome_[i].sym)
-    {
-      print.error("Empty symbol pointer at position ", i);
-      return false;
-    }
-
-    if (!genome_[i].sym->terminal())
-    {
-      print.error("Not-terminal symbol at position ", i);
-      return false;
-    }
-
-    if (genome_[i].sym->category() != i)
-    {
-      print.error("Wrong category: ", i,
-                  genome_[i].sym->display(), " -> ",
-                  genome_[i].sym->category(), " should be ", i);
-      return false;
-    }
-  }
-
   if (!signature_.empty() && signature_ != hash())
   {
     print.error("Wrong signature: ", signature_, " should be ", hash());
@@ -306,7 +260,6 @@ bool i_de::debug() const
 }
 
 ///
-/// \param[in] e environment used to build the individual.
 /// \param[in] in input stream.
 /// \return `true` if the object has been loaded correctly.
 ///
@@ -314,7 +267,7 @@ bool i_de::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_de::load_impl(std::istream &in, const environment &e)
+bool i_de::load_impl(std::istream &in, const environment &)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
@@ -322,21 +275,8 @@ bool i_de::load_impl(std::istream &in, const environment &e)
 
   decltype(genome_) v(sz);
   for (auto &g : v)
-  {
-    opcode_t opcode;
-    if (!(in >> opcode))
+    if (!load_float_from_stream(in, &g))
       return false;
-
-    gene temp;
-    temp.sym = e.sset->decode(opcode);
-    if (!temp.sym)
-      return false;
-
-    if (!(in >> temp.par))
-      return false;
-
-    g = temp;
-  }
 
   genome_ = v;
 
@@ -350,8 +290,11 @@ bool i_de::load_impl(std::istream &in, const environment &e)
 bool i_de::save_impl(std::ostream &out) const
 {
   out << parameters() << '\n';
-  for (const auto &g : genome_)
-    out << g.sym->opcode() << ' ' << g.par << '\n';
+  for (const auto &v : genome_)
+  {
+    save_float_to_stream(out, v);
+    out << '\n';
+  }
 
   return out.good();
 }
@@ -374,13 +317,7 @@ std::ostream &operator<<(std::ostream &s, const i_de &ind)
 ///
 i_de::operator std::vector<double>() const
 {
-  const auto ps(parameters());
-  std::vector<double> v(ps);
-
-  for (auto i(decltype(ps){0}); i < ps; ++i)
-    v[i] = operator[](i);
-
-  return v;
+  return genome_;
 }
 
 }  // namespace vita

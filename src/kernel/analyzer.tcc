@@ -261,14 +261,10 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
 ///
 unsigned analyzer<i_ga>::count(const i_ga &ind)
 {
-  unsigned length(0);
   for (const auto &g : ind)
-  {
     core_analyzer<i_ga>::count(g.sym, true);
-    ++length;
-  }
 
-  return length;
+  return ind.parameters();
 }
 
 ///
@@ -277,14 +273,7 @@ unsigned analyzer<i_ga>::count(const i_ga &ind)
 ///
 unsigned analyzer<i_de>::count(const i_de &ind)
 {
-  unsigned length(0);
-  for (const auto &g : ind)
-  {
-    core_analyzer<i_de>::count(g.sym, true);
-    ++length;
-  }
-
-  return length;
+  return ind.parameters();
 }
 
 #endif  // include guard

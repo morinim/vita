@@ -83,9 +83,9 @@ BOOST_AUTO_TEST_CASE(Iterators)
     vita::i_de ind(env);
 
     unsigned i(0);
-    for (const auto &g : ind)
+    for (const auto &v : ind)
     {
-      BOOST_TEST(g.par == ind[i]);
+      BOOST_TEST(v == ind[i]);
       ++i;
     }
   }
