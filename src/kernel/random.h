@@ -108,7 +108,7 @@ T ephemeral(distribution d, T p1, T p2)
 /// for further details.
 ///
 template<class T>
-typename std::enable_if<std::is_floating_point<T>::value, T>::type
+std::enable_if_t<std::is_floating_point<T>::value, T>
 between(T min, T sup)
 {
   static_assert(std::is_floating_point<T>::value,
@@ -135,7 +135,7 @@ between(T min, T sup)
 /// real number distribution).
 ///
 template<class T>
-typename std::enable_if<std::is_integral<T>::value, T>::type
+std::enable_if_t<std::is_integral<T>::value, T>
 between(T min, T sup)
 {
   static_assert(std::is_integral<T>::value,

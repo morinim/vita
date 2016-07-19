@@ -309,7 +309,7 @@ constexpr typename std::underlying_type<E>::type as_integer(E v)
 /// \return the modified output stream.
 ///
 template<class E>
-typename std::enable_if<std::is_enum<E>::value, std::ostream>::type &
+std::enable_if_t<std::is_enum<E>::value, std::ostream> &
 operator<<(std::ostream &s, E v)
 {
   return s << as_integer(v);

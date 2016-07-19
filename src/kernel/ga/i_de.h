@@ -13,7 +13,6 @@
 #if !defined(VITA_GA_I_DE_H)
 #define      VITA_GA_I_DE_H
 
-#include "kernel/gene.h"
 #include "kernel/individual.h"
 
 namespace vita
@@ -31,11 +30,10 @@ public:
   i_de() = default;
   explicit i_de(const environment &);
 
-  // Visualization/output methods
+  // Visualization/output methods.
   void graphviz(std::ostream &) const;
   std::ostream &in_line(std::ostream &) const;
 
-  // Recombination operators
   i_de crossover(double, const double [2],
                  const i_de &, const i_de &, const i_de &) const;
 
