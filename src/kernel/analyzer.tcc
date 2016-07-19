@@ -18,10 +18,10 @@
 #define      VITA_ANALYZER_TCC
 
 ///
-/// New empty core_analyzer.
+/// New empty analyzer.
 ///
 template<class T>
-core_analyzer<T>::core_analyzer()
+analyzer<T>::analyzer()
 {
   clear();
 }
@@ -30,7 +30,7 @@ core_analyzer<T>::core_analyzer()
 /// Resets gathered statics.
 ///
 template<class T>
-void core_analyzer<T>::clear()
+void analyzer<T>::clear()
 {
   age_.clear();
   fit_.clear();
@@ -48,7 +48,7 @@ void core_analyzer<T>::clear()
 ///         informations about.
 ///
 template<class T>
-typename core_analyzer<T>::const_iterator core_analyzer<T>::begin() const
+typename analyzer<T>::const_iterator analyzer<T>::begin() const
 {
   return sym_counter_.begin();
 }
@@ -57,7 +57,7 @@ typename core_analyzer<T>::const_iterator core_analyzer<T>::begin() const
 /// \return a constant reference (sentry) used for loops.
 ///
 template<class T>
-typename core_analyzer<T>::const_iterator core_analyzer<T>::end() const
+typename analyzer<T>::const_iterator analyzer<T>::end() const
 {
   return sym_counter_.end();
 }
@@ -67,7 +67,7 @@ typename core_analyzer<T>::const_iterator core_analyzer<T>::end() const
 /// \return number of functions in the population.
 ///
 template<class T>
-std::uintmax_t core_analyzer<T>::functions(bool eff) const
+std::uintmax_t analyzer<T>::functions(bool eff) const
 {
   return functions_.counter[eff];
 }
@@ -77,7 +77,7 @@ std::uintmax_t core_analyzer<T>::functions(bool eff) const
 /// \return number of terminals in the population.
 ///
 template<class T>
-std::uintmax_t core_analyzer<T>::terminals(bool eff) const
+std::uintmax_t analyzer<T>::terminals(bool eff) const
 {
   return terminals_.counter[eff];
 }
@@ -86,7 +86,7 @@ std::uintmax_t core_analyzer<T>::terminals(bool eff) const
 /// \return statistics about the age distribution of the individuals.
 ///
 template<class T>
-const distribution<double> &core_analyzer<T>::age_dist() const
+const distribution<double> &analyzer<T>::age_dist() const
 {
   Expects(age_.debug());
 
@@ -98,7 +98,7 @@ const distribution<double> &core_analyzer<T>::age_dist() const
 /// \return statistics about the age distribution of individuals in group `g`.
 ///
 template<class T>
-const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
+const distribution<double> &analyzer<T>::age_dist(unsigned g) const
 {
   const auto gi(group_stat_.find(g));
   assert(gi != group_stat_.end());
@@ -111,7 +111,7 @@ const distribution<double> &core_analyzer<T>::age_dist(unsigned g) const
 /// \return statistics about the fitness distribution of the individuals.
 ///
 template<class T>
-const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
+const distribution<fitness_t> &analyzer<T>::fit_dist() const
 {
   Ensures(fit_.debug());
   return fit_;
@@ -123,7 +123,7 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist() const
 ///         `g`.
 ///
 template<class T>
-const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
+const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned g) const
 {
   const auto gi(group_stat_.find(g));
   assert(gi != group_stat_.end());
@@ -136,7 +136,7 @@ const distribution<fitness_t> &core_analyzer<T>::fit_dist(unsigned g) const
 /// \return statistic about the length distribution of the individuals.
 ///
 template<class T>
-const distribution<double> &core_analyzer<T>::length_dist() const
+const distribution<double> &analyzer<T>::length_dist() const
 {
   Ensures(length_.debug());
   return length_;
@@ -149,7 +149,7 @@ const distribution<double> &core_analyzer<T>::length_dist() const
 /// Used by `count(const T &)`.
 ///
 template<class T>
-void core_analyzer<T>::count(const symbol *sym, bool active)
+void analyzer<T>::count(const symbol *sym, bool active)
 {
   Expects(sym);
 
@@ -165,7 +165,7 @@ void core_analyzer<T>::count(const symbol *sym, bool active)
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool core_analyzer<T>::debug() const
+bool analyzer<T>::debug() const
 {
   for (const auto &i : sym_counter_)
     if (i.second.counter[true] > i.second.counter[false])
@@ -191,7 +191,7 @@ bool core_analyzer<T>::debug() const
 /// ALPS algorithm it's used for layer specific statistics).
 ///
 template<class T>
-void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
+void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 {
   age_.add(ind.age());
   group_stat_[g].age.add(ind.age());
@@ -214,14 +214,24 @@ void core_analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 template<class T>
 unsigned analyzer<T>::count(const T &ind)
 {
+  return count(ind, is_team<T>());
+}
+
+///
+/// Specialization of `count(T)` for non-teams.
+///
+template<class T>
+template<class U>
+unsigned analyzer<T>::count(const U &ind, std::false_type)
+{
   for (index_t i(0); i < ind.size(); ++i)
     for (category_t c(0); c < ind.categories(); ++c)
-      core_analyzer<T>::count(ind[{i, c}].sym, false);
+      count(ind[{i, c}].sym, false);
 
   unsigned length(0);
   for (const auto &g : ind)
   {
-    core_analyzer<T>::count(g.sym, true);
+    count(g.sym, true);
     ++length;
   }
 
@@ -229,28 +239,15 @@ unsigned analyzer<T>::count(const T &ind)
 }
 
 ///
-/// \tparam T type of individual.
-///
-/// \param[in] t team to be analyzed.
-/// \return effective length of the team we gathered statistics about.
+/// Specialization of `count(T)` for teams.
 ///
 template<class T>
-unsigned analyzer<team<T>>::count(const team<T> &t)
+unsigned analyzer<T>::count(const T &t, std::true_type)
 {
   unsigned length(0);
 
   for (const auto &ind : t)
-  {
-    for (index_t i(0); i < ind.size(); ++i)
-      for (category_t c(0); c < ind.categories(); ++c)
-        core_analyzer<team<T>>::count(ind[{i, c}].sym, false);
-
-    for (const auto &g : ind)
-    {
-      core_analyzer<team<T>>::count(g.sym, true);
-      ++length;
-    }
-  }
+    length += count(ind, std::false_type());
 
   return length;
 }
@@ -259,10 +256,11 @@ unsigned analyzer<team<T>>::count(const team<T> &t)
 /// \param[in] ind individual to be analyzed.
 /// \return effective length of individual we gathered statistics about.
 ///
+template<>
 unsigned analyzer<i_ga>::count(const i_ga &ind)
 {
   for (const auto &g : ind)
-    core_analyzer<i_ga>::count(g.sym, true);
+    count(g.sym, true);
 
   return ind.parameters();
 }
@@ -271,6 +269,7 @@ unsigned analyzer<i_ga>::count(const i_ga &ind)
 /// \param[in] ind individual to be analyzed.
 /// \return effective length of individual we gathered statistics about.
 ///
+template<>
 unsigned analyzer<i_de>::count(const i_de &ind)
 {
   return ind.parameters();

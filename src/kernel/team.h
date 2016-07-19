@@ -112,11 +112,15 @@ template<class T> team<T> crossover(const team<T> &, const team<T> &);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
 // The SFINAE way of recognizing a team.
-template<class T> struct is_team : std::false_type {};
-template<class T> struct is_team<team<T>> : std::true_type {};
+template<class T> struct is_team : std::false_type
+{ enum {value = false}; };
+template<class T> struct is_team<team<T>> : std::true_type
+{ enum {value = true}; };
 
-template<class T> struct not_team : std::true_type {};
-template<class T> struct not_team<team<T>> : std::false_type {};
+template<class T> struct not_team : std::true_type
+{ enum {value = true}; };
+template<class T> struct not_team<team<T>> : std::false_type
+{ enum {value = false}; };
 
 #include "kernel/team.tcc"
 

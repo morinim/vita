@@ -111,11 +111,7 @@ template<class T>
 std::enable_if_t<std::is_floating_point<T>::value, T>
 between(T min, T sup)
 {
-  static_assert(std::is_floating_point<T>::value,
-                "random::between needs a template-parameter of floating point"
-                " type");
-
-  assert(min < sup);
+  Expects(min < sup);
 
   std::uniform_real_distribution<T> d(min, sup);
   return d(engine());
@@ -138,10 +134,7 @@ template<class T>
 std::enable_if_t<std::is_integral<T>::value, T>
 between(T min, T sup)
 {
-  static_assert(std::is_integral<T>::value,
-                "random::between needs a template-parameter of integer type");
-
-  assert(min < sup);
+  Expects(min < sup);
 
   std::uniform_int_distribution<T> d(min, sup - 1);
   return d(engine());

@@ -22,8 +22,25 @@
 
 namespace vita
 {
+
+///
+/// \brief Analyzer takes a statistics snapshot of a population.
+///
+/// \tparam T type of individual.
+///
+/// Procedure:
+/// 1. the population set should be loaded adding one individual at time
+///    (analyzer::add method);
+/// 2. statistics can be checked calling specific methods.
+///
+/// You can get information about:
+/// - the set as a whole (`age_dist()`, `fit_dist()`, `length_dist()`,
+///   `functions()`, `terminals()` methods);
+/// - symbols appearing in the set (accessed via `begin()` / `end()` methods);
+/// - grouped information (`age_dist(unsigned)`, `fit_dist(unsigned)`).
+///
 template<class T>
-class core_analyzer
+class analyzer
 {
 public:
   struct sym_counter
@@ -33,7 +50,7 @@ public:
     std::uintmax_t counter[2] = {0, 0};
   };
 
-  core_analyzer();
+  analyzer();
 
   void add(const T &, const fitness_t &, unsigned = 0);
 
@@ -59,16 +76,17 @@ public:
 
   bool debug() const;
 
-protected:
-  virtual unsigned count(const T &) = 0;
-  void count(const symbol *, bool);
-
 private:
-  /// This comparator is useful for debugging purpose: when we insert a
-  /// symbol pointer in an ordered container, it induces a well defined
-  /// order. Without this the default comparison for pointers has a
-  /// unspecified (and not necessarily stable & consistent) behaviour.
-  /// Well defined order means a simple way of debugging statistics.
+  void count(const symbol *, bool);
+  unsigned count(const T &);
+  unsigned count(const T &, std::true_type);
+  template<class U> unsigned count(const U &, std::false_type);
+
+  // This comparator is useful for debugging purpose: when we insert a
+  // symbol pointer in an ordered container, it induces a well defined
+  // order. Without this the default comparison for pointers has a
+  // unspecified (and not necessarily stable & consistent) behaviour.
+  // Well defined order means a simple way of debugging statistics.
   struct cmp_symbol_ptr
   {
     bool operator()(const symbol *a, const symbol *b) const
@@ -89,75 +107,7 @@ private:
 
   sym_counter functions_;
   sym_counter terminals_;
-};  // core_analyzer
-
-///
-/// \brief Analyzer takes a statistics snapshot of a population.
-///
-/// \tparam T type of individual.
-///
-/// Procedure:
-/// 1. the population set should be loaded adding (analyzer::add method) one
-///    individual at time;
-/// 2. statistics can be checked executing the desidered methods.
-///
-/// You can get information about:
-/// - the set as a whole (age_dist(), fit_dist(), length_dist(), functions(),
-///   terminals() methods);
-/// - specific symbols appearing in the set (accessed via `begin()` / `end()`
-///   methods);
-/// - grouped information (age_dist(unsigned), fit_dist(unsigned)).
-///
-template<class T>
-class analyzer : public core_analyzer<T>
-{
-public:
-  using analyzer::core_analyzer::core_analyzer;
-
-private:
-  virtual unsigned count(const T &) override;
-};
-
-///
-/// \brief Analyzer specialization for populations of teams.
-///
-/// \tparam T type of individual.
-///
-template<class T>
-class analyzer<team<T>> : public core_analyzer<team<T>>
-{
-public:
-  using analyzer::core_analyzer::core_analyzer;
-
-private:
-  virtual unsigned count(const team<T> &) override;
-};
-
-///
-/// \brief Analyzer specialization for genetic algorithms.
-///
-template<>
-class analyzer<i_ga> : public core_analyzer<i_ga>
-{
-public:
-  using analyzer::core_analyzer::core_analyzer;
-
-private:
-  virtual unsigned count(const i_ga &) override;
-};
-
-///
-/// \brief Analyzer specialization for differential evolution.
-///
-template<>
-class analyzer<i_de> : public core_analyzer<i_de>
-{
-public:
-  using analyzer::core_analyzer::core_analyzer;
-
-private:
-  virtual unsigned count(const i_de &) override;
-};
+};  // analyzer
 
 #include "kernel/analyzer.tcc"
 }  // namespace vita
