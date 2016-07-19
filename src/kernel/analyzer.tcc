@@ -271,4 +271,20 @@ unsigned analyzer<i_ga>::count(const i_ga &ind)
   return length;
 }
 
+///
+/// \param[in] ind individual to be analyzed.
+/// \return effective length of individual we gathered statistics about.
+///
+unsigned analyzer<i_de>::count(const i_de &ind)
+{
+  unsigned length(0);
+  for (const auto &g : ind)
+  {
+    core_analyzer<i_de>::count(g.sym, true);
+    ++length;
+  }
+
+  return length;
+}
+
 #endif  // include guard

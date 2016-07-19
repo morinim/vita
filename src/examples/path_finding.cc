@@ -100,7 +100,7 @@ std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const map_t &map,
   unsigned step(0);
   for (; step < path.parameters() && now != goal; ++step)
     now = update_coord(map, now,
-                       static_cast<direction::cardinal_dir>(path[step]));
+                       static_cast<direction::cardinal_dir>(path[step].par));
 
   return {now, step};
 }
@@ -180,7 +180,7 @@ int main()
       break;
 
     now = update_coord(map, now,
-                       static_cast<direction::cardinal_dir>(best_path[i]));
+                       static_cast<direction::cardinal_dir>(best_path[i].par));
   }
 
   print_map(path_on_map);

@@ -21,8 +21,6 @@
 
 using namespace boost;
 
-constexpr double epsilon(0.00001);
-
 #include "factory_fixture5.h"
 #endif
 
@@ -37,10 +35,10 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     vita::i_ga ind(env);
     vita::interpreter<vita::i_ga> check(&ind);
 
-    BOOST_REQUIRE(ind.debug());
-    BOOST_REQUIRE_EQUAL(ind.parameters(), env.sset->categories());
-    BOOST_REQUIRE_EQUAL(ind.age(), 0);
-    BOOST_REQUIRE_EQUAL(check.penalty(), 0);
+    BOOST_TEST(ind.debug());
+    BOOST_TEST(ind.parameters() == env.sset->categories());
+    BOOST_TEST(ind.age() == 0);
+    BOOST_TEST(check.penalty() == 0);
   }
 }
 
@@ -48,44 +46,45 @@ BOOST_AUTO_TEST_CASE(EmptyIndividual)
 {
   vita::i_ga ind;
 
-  BOOST_REQUIRE(ind.debug());
-  BOOST_REQUIRE(ind.empty());
+  BOOST_TEST(ind.debug());
+  BOOST_TEST(ind.empty());
 }
 
-BOOST_AUTO_TEST_CASE(Penalty)
+
+BOOST_AUTO_TEST_CASE(Penalty, * boost::unit_test::tolerance(0.000001))
 {
   for (unsigned i(0); i < 100; ++i)
   {
     vita::i_ga ind(env);
     vita::interpreter<vita::i_ga> check(&ind);
 
-    BOOST_REQUIRE_EQUAL(check.penalty(), 0);
+    BOOST_TEST(check.penalty() == 0.0);
 
-    ind[0] = 20.0;
+    ind[0].par = 20.0;
     const auto p1(check.penalty());
-    BOOST_REQUIRE_GT(p1, 0.0);
+    BOOST_TEST(p1 > 0.0);
 
-    ind[0] = -20.0;
+    ind[0].par = -20.0;
     const auto p1n(check.penalty());
-    BOOST_REQUIRE_EQUAL(p1, p1n);
+    BOOST_TEST(p1 == p1n);
 
-    ind[1] = 200.0;
+    ind[1].par = 200.0;
     const auto p2(check.penalty());
-    BOOST_REQUIRE_GT(p2, p1);
+    BOOST_TEST(p2 > p1);
 
-    ind[1] = -200.0;
+    ind[1].par = -200.0;
     const auto p2n(check.penalty());
-    BOOST_REQUIRE_GT(p2, p1);
-    BOOST_REQUIRE_EQUAL(p2, p2n);
+    BOOST_TEST(p2 > p1);
+    BOOST_TEST(p2 == p2n);
 
-    ind[2] = 2000.0;
+    ind[2].par = 2000.0;
     const auto p3(check.penalty());
-    BOOST_REQUIRE_GT(p3, p2);
+    BOOST_TEST(p3 > p2);
 
-    ind[2] = -2000.0;
+    ind[2].par = -2000.0;
     const auto p3n(check.penalty());
-    BOOST_REQUIRE_GT(p3, p2);
-    BOOST_REQUIRE_EQUAL(p3, p3n);
+    BOOST_TEST(p3n > p2);
+    BOOST_TEST(p3 == p3n);
   }
 }
 
@@ -100,7 +99,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   for (unsigned i(0); i < n; ++i)
   {
     t.mutation(0.0, env);
-    BOOST_REQUIRE_EQUAL(t, orig);
+    BOOST_TEST(t == orig);
   }
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
@@ -115,8 +114,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * double(diff) / double(orig.parameters() * n));
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 53.0);
+  BOOST_TEST(perc > 47.0);
+  BOOST_TEST(perc < 53.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
@@ -124,20 +123,20 @@ BOOST_AUTO_TEST_CASE(Comparison)
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::i_ga a(env);
-    BOOST_REQUIRE_EQUAL(a, a);
-    BOOST_REQUIRE_EQUAL(a.distance(a), 0);
+    BOOST_TEST(a == a);
+    BOOST_TEST(a.distance(a) == 0);
 
     vita::i_ga b(a);
-    BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
-    BOOST_REQUIRE_EQUAL(a, b);
-    BOOST_REQUIRE_EQUAL(a.distance(b), 0);
+    BOOST_TEST(a.signature() == b.signature());
+    BOOST_TEST(a == b);
+    BOOST_TEST(a.distance(b) == 0);
 
     vita::i_ga c(env);
     if (a.signature() != c.signature())
     {
-      BOOST_REQUIRE_NE(a, c);
-      BOOST_REQUIRE_GT(a.distance(c), 0);
-      BOOST_REQUIRE_EQUAL(a.distance(c), c.distance(a));
+      BOOST_TEST(!(a == c));
+      BOOST_TEST(a.distance(c) > 0);
+      BOOST_TEST(a.distance(c) == c.distance(a));
     }
   }
 }
@@ -151,7 +150,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &g : ind)
     {
-      BOOST_CHECK_EQUAL(g.par, ind[i]);
+      BOOST_TEST(g == ind[i]);
       ++i;
     }
   }
@@ -183,71 +182,6 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
   BOOST_CHECK_LT(perc, 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(DeCrossover)
-{
-  double diff(0), length(0);
-
-  for (unsigned j(0); j < 1000; ++j)
-  {
-    const vita::i_ga p(env);
-    vita::i_ga a(env), b(env), c(env);
-
-    const auto n_a(vita::random::between<unsigned>(0, 100));
-    for (unsigned k(0); k < n_a; ++k)
-      a.inc_age();
-    const auto n_b(vita::random::between<unsigned>(0, 100));
-    for (unsigned k(0); k < n_b; ++k)
-      b.inc_age();
-    const auto n_c(vita::random::between<unsigned>(0, 100));
-    for (unsigned k(0); k < n_c; ++k)
-      c.inc_age();
-
-    BOOST_TEST_CHECKPOINT("DE self-crossover without mutation");
-    auto off(p.crossover(env.p_cross, env.de.weight, a, a, p));
-    BOOST_CHECK(off.debug());
-
-    for (unsigned i(0); i < p.parameters(); ++i)
-      BOOST_CHECK_CLOSE(off[i], p[i], epsilon);
-
-    BOOST_TEST_CHECKPOINT("DE self-crossover with mutation");
-    off = p.crossover(env.p_cross, env.de.weight, a, b, p);
-    BOOST_CHECK(off.debug());
-    BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age()}));
-
-    for (unsigned i(0); i < p.parameters(); ++i)
-    {
-      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
-
-      BOOST_CHECK_GT(off[i], p[i] - delta);
-      BOOST_CHECK_LT(off[i], p[i] + delta);
-
-      if (!vita::almost_equal(p[i], off[i]))
-        ++diff;
-    }
-
-    BOOST_TEST_CHECKPOINT("DE crossover without mutation");
-    off = p.crossover(env.p_cross, env.de.weight, a, b, c);
-    BOOST_CHECK(off.debug());
-    BOOST_REQUIRE_EQUAL(off.age(), std::max({p.age(), a.age(), b.age(),
-                                             c.age()}));
-    for (unsigned i(0); i < p.parameters(); ++i)
-    {
-      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
-
-      if (!vita::almost_equal(p[i], off[i]))
-      {
-        BOOST_CHECK_GT(off[i], c[i] - delta);
-        BOOST_CHECK_LT(off[i], c[i] + delta);
-      }
-    }
-
-    length += p.parameters();
-  }
-
-  BOOST_CHECK_LT(diff / length, env.p_cross + 2.0);
-  BOOST_CHECK_GT(diff / length, env.p_cross - 2.0);
-}
-
 BOOST_AUTO_TEST_CASE(Serialization)
 {
   BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
@@ -259,11 +193,11 @@ BOOST_AUTO_TEST_CASE(Serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
-    BOOST_REQUIRE(i1.save(ss));
+    BOOST_TEST(i1.save(ss));
 
     vita::i_ga i2(env);
-    BOOST_REQUIRE(i2.load(ss, env));
-    BOOST_REQUIRE(i2.debug());
+    BOOST_TEST(i2.load(ss, env));
+    BOOST_TEST(i2.debug());
 
     BOOST_CHECK_EQUAL(i1, i2);
   }
@@ -271,12 +205,12 @@ BOOST_AUTO_TEST_CASE(Serialization)
   BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
   std::stringstream ss;
   vita::i_ga empty;
-  BOOST_REQUIRE(empty.save(ss));
+  BOOST_TEST(empty.save(ss));
 
   vita::i_ga empty1;
-  BOOST_REQUIRE(empty1.load(ss, env));
-  BOOST_REQUIRE(empty1.debug());
-  BOOST_REQUIRE(empty1.empty());
+  BOOST_TEST(empty1.load(ss, env));
+  BOOST_TEST(empty1.debug());
+  BOOST_TEST(empty1.empty());
 
   BOOST_REQUIRE_EQUAL(empty, empty1);
 

@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "kernel/ga/evaluator.h"
-#include "kernel/ga/i_ga.h"
+#include "kernel/ga/i_de.h"
 #include "kernel/ga/search.h"
 
 // Examples taken from "Differential Evolution in Discrete Optimization" by
@@ -82,7 +82,7 @@ int main()
   for (unsigned i(0); i < n_jobs; ++i)
     prob.env.sset->insert(vita::ga::parameter(i, -0.5, 23.5));
 
-  vita::ga_search<vita::i_ga, vita::de_es, decltype(&f)> search(prob, &f);
+  vita::ga_search<vita::i_de, vita::de_es, decltype(&f)> search(prob, &f);
 
   const auto res(search.run().best.solution);
 

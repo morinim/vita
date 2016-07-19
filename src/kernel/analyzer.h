@@ -18,6 +18,7 @@
 #include "kernel/distribution.h"
 #include "kernel/symbol.h"
 #include "kernel/ga/i_ga.h"
+#include "kernel/ga/i_de.h"
 
 namespace vita
 {
@@ -143,6 +144,19 @@ public:
 
 private:
   virtual unsigned count(const i_ga &) override;
+};
+
+///
+/// \brief Analyzer specialization for differential evolution.
+///
+template<>
+class analyzer<i_de> : public core_analyzer<i_de>
+{
+public:
+  using analyzer::core_analyzer::core_analyzer;
+
+private:
+  virtual unsigned count(const i_de &) override;
 };
 
 #include "kernel/analyzer.tcc"

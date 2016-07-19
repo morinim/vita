@@ -35,7 +35,7 @@ any interpreter<i_ga>::run_nvi()
 ///
 double interpreter<i_ga>::fetch_param(unsigned i) const
 {
-  return p_[i];
+  return p_[i].par;
 }
 
 ///
