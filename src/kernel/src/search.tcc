@@ -17,8 +17,8 @@
 #if !defined(VITA_SRC_SEARCH_TCC)
 #define      VITA_SRC_SEARCH_TCC
 
-constexpr std::underlying_type<metric_flags>::type operator&(metric_flags f1,
-                                                             metric_flags f2)
+constexpr std::underlying_type_t<metric_flags> operator&(metric_flags f1,
+                                                         metric_flags f2)
 {
   return as_integer(f1) & as_integer(f2);
 }

@@ -53,7 +53,7 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
     std::transform(g.second.begin(), g.second.end(), args.begin(),
                    [](index_t i)
                    {
-                     assert(i <= std::numeric_limits<index_type>::max());
+                     Expects(i <= std::numeric_limits<index_type>::max());
 
                      return static_cast<index_type>(i);
                    });
@@ -84,7 +84,7 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
     std::generate(args.begin(), args.end(),
                   [from, sup]()
                   {
-                    return static_cast<index_type>(random::between(from, sup));
+                    return random::between<index_type>(from, sup);
                   });
   }
 }

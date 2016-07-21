@@ -34,9 +34,9 @@ bool iequals(const std::string &s1, const std::string &s2)
 std::string trim(const std::string &s)
 {
   auto ws_front = std::find_if_not(s.begin(), s.end(),
-                                   [](int c) {return std::isspace(c); });
+                                   [](int c) { return std::isspace(c); });
   auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
-                                  [](int c){return std::isspace(c); }).base();
+                                  [](int c){ return std::isspace(c); }).base();
 
   return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
 }

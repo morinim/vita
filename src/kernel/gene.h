@@ -40,14 +40,14 @@ public:
 
   locus arg_locus(unsigned) const;
 
-  // Types and constants
+  // Types and constants.
   using param_type = double;
   using index_type = std::uint16_t;
   using arg_pack = small_vector<index_type, K>;
 
   enum : decltype(K) {k_args = K};
 
-  // Public data members
+  // Public data members.
   const symbol *sym;
   param_type    par;
   arg_pack     args;

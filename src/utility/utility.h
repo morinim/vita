@@ -298,7 +298,7 @@ constexpr typename std::underlying_type<E>::type as_integer(E v)
 {
   static_assert(std::is_enum<E>::value,
                 "as_integer needs a scoped enumeration");
-  return static_cast<typename std::underlying_type<E>::type>(v);
+  return static_cast<std::underlying_type_t<E>>(v);
 }
 
 ///

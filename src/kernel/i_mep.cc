@@ -846,8 +846,7 @@ i_mep i_mep::compress() const
 
   std::map<gene, locus, cmp_gene> new_locus;
 
-  using ARRAY_ELEM_TYPE =
-    typename std::remove_reference<decltype(gene::args[0])>::type;
+  using ARRAY_ELEM_TYPE = std::remove_reference_t<decltype(gene::args[0])>;
 
   for (index_t i(size()); i > 0; --i)
     for (category_t c(0); c < ret.genome_.cols(); ++c)

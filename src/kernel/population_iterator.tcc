@@ -39,12 +39,9 @@ public:
   using reference = value_type &;
   using const_reference = const value_type &;
 
-  using ptr =
-    typename std::conditional<is_const, const_pointer, pointer>::type;
-  using ref =
-    typename std::conditional<is_const, const_reference, reference>::type;
-  using pop =
-    typename std::conditional<is_const, const population, population>::type;
+  using ptr = std::conditional_t<is_const, const_pointer, pointer>;
+  using ref = std::conditional_t<is_const, const_reference, reference>;
+  using pop = std::conditional_t<is_const, const population, population>;
 
   /// \param[in] p a population.
   /// \param[in] begin `false` for the `end()` iterator.
@@ -120,8 +117,7 @@ public:
   }
 
 private:  // Private data members
-  typename std::conditional<is_const, const population *, population *>::type
-  pop_;
+  std::conditional_t<is_const, const population *, population *> pop_;
 
   unsigned layer_;
   unsigned index_;
