@@ -103,8 +103,7 @@ void symbol_set::build_view()
 {
   const category_t max_category(
     std::max_element(symbols_.begin(), symbols_.end(),
-                     [](const std::unique_ptr<symbol> &s1,
-                        const std::unique_ptr<symbol> &s2)
+                     [](const auto &s1, const auto &s2)
                      {
                        return s1->category() < s2->category();
                      })->get()->category());
@@ -444,7 +443,7 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
   sum_ += ws.weight;
 
   std::sort(begin(), end(),
-            [](w_symbol s1, w_symbol s2) { return s1.weight > s2.weight; });
+            [](auto s1, auto s2) { return s1.weight > s2.weight; });
 }
 
 ///

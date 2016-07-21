@@ -294,7 +294,7 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
 /// \return the integer value of `v`.
 ///
 template<class E>
-constexpr typename std::underlying_type<E>::type as_integer(E v)
+constexpr std::underlying_type_t<E> as_integer(E v)
 {
   static_assert(std::is_enum<E>::value,
                 "as_integer needs a scoped enumeration");

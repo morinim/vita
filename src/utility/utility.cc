@@ -15,8 +15,8 @@
 namespace vita
 {
 ///
-/// \param[in] s1 first term of comparison
-/// \param[in] s2 second term of comparison
+/// \param[in] s1 first term of comparison.
+/// \param[in] s2 second term of comparison.
 /// \return `true` if all elements in both strings are same (case
 ///         insensitively).
 ///
@@ -24,7 +24,7 @@ bool iequals(const std::string &s1, const std::string &s2)
 {
   return std::equal(
     s1.begin(), s1.end(), s2.begin(), s2.end(),
-    [](int c1, int c2) { return std::tolower(c1) == std::tolower(c2); });
+    [](auto c1, auto c2) { return std::tolower(c1) == std::tolower(c2); });
 }
 
 ///
@@ -33,18 +33,18 @@ bool iequals(const std::string &s1, const std::string &s2)
 ///
 std::string trim(const std::string &s)
 {
-  auto ws_front = std::find_if_not(s.begin(), s.end(),
-                                   [](int c) { return std::isspace(c); });
-  auto ws_back = std::find_if_not(s.rbegin(), s.rend(),
-                                  [](int c){ return std::isspace(c); }).base();
+  auto i_front = std::find_if_not(s.begin(), s.end(),
+                                  [](auto c) { return std::isspace(c); });
+  auto i_back = std::find_if_not(s.rbegin(), s.rend(),
+                                 [](auto c){ return std::isspace(c); }).base();
 
-  return ws_back <= ws_front ? std::string() : std::string(ws_front, ws_back);
+  return i_back <= i_front ? std::string() : std::string(i_front, i_back);
 }
 
 ///
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] s xml element's value
+/// \param[out] p output xml printer.
+/// \param[in] e xml element.
+/// \param[in] s xml element's value.
 ///
 /// Specialization for `std::string`.
 ///
@@ -57,9 +57,9 @@ void push_text(tinyxml2::XMLPrinter &p, const std::string &e,
 }
 
 ///
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] v xml element's value
+/// \param[out] p output xml printer.
+/// \param[in] e xml element.
+/// \param[in] v xml element's value.
 ///
 /// Specialization for `int`.
 ///
@@ -71,9 +71,9 @@ void push_text(tinyxml2::XMLPrinter &p, const std::string &e, int v)
 }
 
 ///
-/// \param[out] p output xml printer
-/// \param[in] e xml element
-/// \param[in] v xml element's value
+/// \param[out] p output xml printer.
+/// \param[in] e xml element.
+/// \param[in] v xml element's value.
 ///
 /// Specialization for `double`.
 ///
@@ -85,9 +85,9 @@ void push_text(tinyxml2::XMLPrinter &p, const std::string &e, double v)
 }
 
 ///
-/// \param[out] p parent element
-/// \param[in] e new xml element
-/// \param[in] s new xml element's value
+/// \param[out] p parent element.
+/// \param[in] e new xml element.
+/// \param[in] s new xml element's value.
 ///
 /// Specialization for `std::string`.
 ///

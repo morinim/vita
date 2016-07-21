@@ -40,6 +40,9 @@ public:
 
   locus arg_locus(unsigned) const;
 
+  template<class T> T as() const;
+  template<class T> void operator=(T);
+
   // Types and constants.
   using param_type = double;
   using index_type = std::uint16_t;

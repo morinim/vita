@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -357,9 +357,9 @@ const T *any_cast(const any *operand)
 template<class T>
 T any_cast(any &operand)
 {
-  using nonref = typename std::remove_reference<T>::type;
+  using nonref = std::remove_reference_t<T>;
 
-  nonref *result = any_cast<nonref>(&operand);
+  auto *result = any_cast<nonref>(&operand);
   if (!result)
     throw bad_any_cast(operand.type(), typeid(T));
 
@@ -374,7 +374,7 @@ T any_cast(any &operand)
 template<class T>
 const T &any_cast(const any &operand)
 {
-  using nonref = typename std::remove_reference<T>::type;
+  using nonref = std::remove_reference_t<T>;
 
   return any_cast<const nonref &>(const_cast<any &>(operand));
 }

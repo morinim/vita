@@ -89,6 +89,26 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
   }
 }
 
+template<unsigned K>
+template<class T>
+T basic_gene<K>::as() const
+{
+  static_assert(std::is_arithmetic<T>::value,
+                "basic_gene::as<T> requires an arithmetic type");
+  Expects(sym->parametric());
+  return static_cast<T>(par);
+}
+
+template<unsigned K>
+template<class T>
+void basic_gene<K>::operator=(T v)
+{
+  static_assert(std::is_arithmetic<T>::value,
+                "basic_gene::operator=<T> requires an arithmetic type");
+  Expects(sym->parametric());
+  par = static_cast<decltype(par)>(v);
+}
+
 ///
 /// \param[in] i ordinal of an argument.
 /// \return the locus that `i`-th argument of the current symbol refers to.
