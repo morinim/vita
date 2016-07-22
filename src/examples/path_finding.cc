@@ -62,7 +62,8 @@ public:
   }
 };
 
-cell_coord update_coord(const map_t map, cell_coord start, int d)
+cell_coord update_coord(const map_t map, cell_coord start,
+                        direction::cardinal_dir d)
 {
   auto to(start);
 
@@ -98,7 +99,7 @@ std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const map_t &map,
 
   unsigned step(0);
   for (; step < path.parameters() && now != goal; ++step)
-    now = update_coord(map, now, path[step].as<int>());
+    now = update_coord(map, now, path[step].as<direction::cardinal_dir>());
 
   return {now, step};
 }
@@ -177,7 +178,7 @@ int main()
     if (now == goal)
       break;
 
-    now = update_coord(map, now, best_path[i].as<int>());
+    now = update_coord(map, now, best_path[i].as<direction::cardinal_dir>());
   }
 
   print_map(path_on_map);

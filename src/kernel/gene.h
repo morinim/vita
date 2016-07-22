@@ -54,6 +54,14 @@ public:
   const symbol *sym;
   param_type    par;
   arg_pack     args;
+
+private:
+  template<bool, bool> struct param_t;
+  using arithmetic_p = param_t<1, 0>;
+  using enum_p       = param_t<0, 1>;
+
+  template<class T> void copy_param(T, arithmetic_p);
+  template<class T> void copy_param(T, enum_p);
 };
 
 template<unsigned K>

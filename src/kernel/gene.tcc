@@ -89,24 +89,52 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
   }
 }
 
+///
+/// \return the value, casted to type `T`, contained in this gene.
+///
+/// \warning The method support only arithmetic / enum types.
+///
 template<unsigned K>
 template<class T>
 T basic_gene<K>::as() const
 {
-  static_assert(std::is_arithmetic<T>::value,
-                "basic_gene::as<T> requires an arithmetic type");
+  static_assert(std::is_arithmetic<T>::value || std::is_enum<T>::value,
+                "basic_gene::as<T> requires an arithmetic / enum type");
   Expects(sym->parametric());
   return static_cast<T>(par);
 }
 
+///
+/// \param[in] v value to be assigned to the gene.
+///
+/// \warning The method support only arithmetic / enum types.
+///
 template<unsigned K>
 template<class T>
 void basic_gene<K>::operator=(T v)
 {
-  static_assert(std::is_arithmetic<T>::value,
-                "basic_gene::operator=<T> requires an arithmetic type");
+  static_assert(std::is_arithmetic<T>::value || std::is_enum<T>::value,
+                "Only arithmetic / enum types can be assigned to a gene");
+
   Expects(sym->parametric());
+  copy_param(v,
+             param_t<std::is_arithmetic<T>::value, std::is_enum<T>::value>());
+}
+
+/// Implements operator= for arithmetic types.
+template<unsigned K>
+template<class T>
+void basic_gene<K>::copy_param(T v, arithmetic_p)
+{
   par = static_cast<decltype(par)>(v);
+}
+
+/// Implements operator= for enum types.
+template<unsigned K>
+template<class T>
+void basic_gene<K>::copy_param(T v, enum_p)
+{
+  par = static_cast<decltype(par)>(v.as_integer());
 }
 
 ///
