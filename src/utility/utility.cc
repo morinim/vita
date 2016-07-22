@@ -33,12 +33,13 @@ bool iequals(const std::string &s1, const std::string &s2)
 ///
 std::string trim(const std::string &s)
 {
-  auto i_front = std::find_if_not(s.begin(), s.end(),
-                                  [](auto c) { return std::isspace(c); });
-  auto i_back = std::find_if_not(s.rbegin(), s.rend(),
-                                 [](auto c){ return std::isspace(c); }).base();
+  auto is_space = [](auto c) { return std::isspace(c); };
 
-  return i_back <= i_front ? std::string() : std::string(i_front, i_back);
+  auto front = std::find_if_not(s.begin(), s.end(), isspace);
+  auto back = std::find_if_not(s.rbegin(), std::make_reverse_iterator(front),
+                               isspace).base();
+
+  return {front, back};
 }
 
 ///
