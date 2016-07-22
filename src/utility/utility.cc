@@ -30,12 +30,16 @@ bool iequals(const std::string &s1, const std::string &s2)
 ///
 /// \param[in] s the input string.
 /// \return a copy of `s` with spaces removed on both sides of the string.
+/// \see http://stackoverflow.com/a/24425221/3235496
 ///
 std::string trim(const std::string &s)
 {
   auto is_space = [](auto c) { return std::isspace(c); };
 
   auto front = std::find_if_not(s.begin(), s.end(), isspace);
+
+  // The search is limited in the reverse direction to the last non-space value
+  // found in the search in the forward direction.
   auto back = std::find_if_not(s.rbegin(), std::make_reverse_iterator(front),
                                isspace).base();
 
