@@ -34,14 +34,13 @@ bool iequals(const std::string &s1, const std::string &s2)
 ///
 std::string trim(const std::string &s)
 {
-  auto is_space = [](auto c) { return std::isspace(c); };
-
-  auto front = std::find_if_not(s.begin(), s.end(), isspace);
+  auto front = std::find_if_not(s.begin(), s.end(),
+                                [](auto c) { return std::isspace(c); });
 
   // The search is limited in the reverse direction to the last non-space value
   // found in the search in the forward direction.
   auto back = std::find_if_not(s.rbegin(), std::make_reverse_iterator(front),
-                               isspace).base();
+                               [](auto c) { return std::isspace(c); }).base();
 
   return {front, back};
 }
