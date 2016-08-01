@@ -17,26 +17,22 @@
 #include "kernel/ga/i_ga.h"
 #include "kernel/ga/search.h"
 
-using map_t = std::vector<std::vector<char>>;
+using maze = std::vector<std::string>;
 
 enum cell {Start = 'S', Goal = 'G', Wall = '*', Empty = ' '};
 
 struct cell_coord
 {
+  bool operator==(cell_coord rhs) const
+  { return row == rhs.row && col == rhs.col; }
+
+  bool operator!=(cell_coord rhs) const { return !(*this == rhs); }
+
   unsigned row;
   unsigned col;
 };
 
-bool operator==(cell_coord c1, cell_coord c2)
-{
-  return c1.row == c2.row && c1.col == c2.col;
-}
-
-bool operator!=(cell_coord c1, cell_coord c2)
-{
-  return !(c1 == c2);
-}
-
+// Taxicab distance.
 double distance(cell_coord c1, cell_coord c2)
 {
   return std::max(c1.row, c2.row) - std::min(c1.row, c2.row) +
@@ -62,7 +58,7 @@ public:
   }
 };
 
-cell_coord update_coord(const map_t map, cell_coord start,
+cell_coord update_coord(const maze &m, cell_coord start,
                         direction::cardinal_dir d)
 {
   auto to(start);
@@ -75,7 +71,7 @@ cell_coord update_coord(const map_t map, cell_coord start,
     break;
 
   case direction::south:
-    if (start.row + 1 < map.size())
+    if (start.row + 1 < m.size())
       ++to.row;
     break;
 
@@ -85,32 +81,32 @@ cell_coord update_coord(const map_t map, cell_coord start,
     break;
 
   default:
-    if (start.col + 1 < map[0].size())
+    if (start.col + 1 < m[0].size())
       ++to.col;
   }
 
-  return map[to.row][to.col] == Empty ? to : start;
+  return m[to.row][to.col] == Empty ? to : start;
 }
 
-std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const map_t &map,
+std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const maze &m,
                                     cell_coord start, cell_coord goal)
 {
   cell_coord now(start);
 
   unsigned step(0);
   for (; step < path.parameters() && now != goal; ++step)
-    now = update_coord(map, now, path[step].as<direction::cardinal_dir>());
+    now = update_coord(m, now, path[step].as<direction::cardinal_dir>());
 
   return {now, step};
 }
 
-void print_map(const map_t &map)
+void print_maze(const maze &m)
 {
-  const std::string hr(map[0].size() + 2, '-');
+  const std::string hr(m[0].size() + 2, '-');
 
   std::cout << hr << '\n';
 
-  for (const auto &rows : map)
+  for (const auto &rows : m)
   {
     std::cout << '|';
 
@@ -123,25 +119,57 @@ void print_map(const map_t &map)
   std::cout << hr << '\n';
 }
 
+maze path_on_maze(const vita::i_ga &path, const maze &base,
+                  cell_coord start, cell_coord goal)
+{
+  auto ret(base);
+  auto now = start;
+
+  for (unsigned i(0); i < path.parameters(); ++i)
+  {
+    auto &c = ret[now.row][now.col];
+
+    if (now == start)
+      c = Start;
+    else if (now == goal)
+    {
+      c = Goal;
+      break;
+    }
+    else
+      c = '.';
+
+    now = update_coord(base, now, path[i].as<direction::cardinal_dir>());
+  }
+
+  return ret;
+}
+
 int main()
 {
-  const cell_coord start{3,0}, goal{0,9};
-
-  const map_t map =
+  const cell_coord start{0, 0}, goal{16, 8};
+  const maze m =
   {
-    {' ',' ',' ','*',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ','*',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ','*',' ','*',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ','*',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ','*',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-    {' ',' ',' ',' ',' ',' ',' ',' ',' ',' '}
+    " *       ",
+    " * *** * ",
+    "   *   * ",
+    " *** ****",
+    " *   *   ",
+    " ***** **",
+    "   *     ",
+    "** * ****",
+    "   * *   ",
+    "** * * * ",
+    "   *   * ",
+    " ******* ",
+    "       * ",
+    "**** * * ",
+    "   * * * ",
+    " *** * **",
+    "     *   "
   };
 
-  const std::size_t sup_length(map.size() * map[0].size() / 2);
+  const std::size_t sup_length(m.size() * m[0].size() / 2);
 
   vita::problem prob;
 
@@ -151,37 +179,18 @@ int main()
   prob.env.individuals = 150;
   prob.env.generations =  20;
 
-  auto f = [map, start, goal](const vita::i_ga &x)
+  auto f = [m, start, goal](const vita::i_ga &x)
   {
-    const auto final(run(x, map, start, goal));
+    const auto final(run(x, m, start, goal));
 
-    return -distance(final.first, goal) - final.second / 100.0;
+    return -distance(final.first, goal) - final.second / 1000.0;
   };
 
   vita::ga_search<vita::i_ga, vita::std_es, decltype(f)> search(prob, f);
 
   const auto best_path(search.run().best.solution);
 
-  auto path_on_map = map;
-  auto now = start;
-  for (unsigned i(0); i < sup_length; ++i)
-  {
-    auto &c = path_on_map[now.row][now.col];
-
-    if (now == start)
-      c = Start;
-    else if (now == goal)
-      c = Goal;
-    else
-      c = '.';
-
-    if (now == goal)
-      break;
-
-    now = update_coord(map, now, best_path[i].as<direction::cardinal_dir>());
-  }
-
-  print_map(path_on_map);
+  print_maze(path_on_maze(best_path, m, start, goal));
 
   return EXIT_SUCCESS;
 }
