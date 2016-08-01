@@ -67,12 +67,19 @@ public:
   ///
   /// \return `true` if the individual is empty, `0` otherwise.
   ///
-  bool empty() const { return !parameters(); }
+  bool empty() const { return size() == 0; }
 
   ///
   /// \return the number of parameters stored in the individual.
+  /// \note `parameters()` is just an alias for `size()`.
   ///
-  unsigned parameters() const { return genome_.size(); }
+  unsigned size() const { return genome_.size(); }
+
+  ///
+  /// \return the number of parameters stored in the individual.
+  /// \note `size()` is just an alias for `parameters()`.
+  ///
+  unsigned parameters() const { return size(); }
 
   hash_t signature() const;
 
