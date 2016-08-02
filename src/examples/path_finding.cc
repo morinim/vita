@@ -21,22 +21,13 @@ using maze = std::vector<std::string>;
 
 enum cell {Start = 'S', Goal = 'G', Wall = '*', Empty = ' '};
 
-struct cell_coord
-{
-  bool operator==(cell_coord rhs) const
-  { return row == rhs.row && col == rhs.col; }
-
-  bool operator!=(cell_coord rhs) const { return !(*this == rhs); }
-
-  unsigned row;
-  unsigned col;
-};
+using cell_coord = std::pair<unsigned, unsigned>;
 
 // Taxicab distance.
 double distance(cell_coord c1, cell_coord c2)
 {
-  return std::max(c1.row, c2.row) - std::min(c1.row, c2.row) +
-         std::max(c1.col, c2.col) - std::min(c1.col, c2.col);
+  return std::max(c1.first, c2.first) - std::min(c1.first, c2.first) +
+         std::max(c1.second, c2.second) - std::min(c1.second, c2.second);
 }
 
 class direction : public vita::ga::integer
@@ -66,26 +57,26 @@ cell_coord update_coord(const maze &m, cell_coord start,
   switch(d)
   {
   case direction::north:
-    if (start.row > 0)
-      --to.row;
+    if (start.first > 0)
+      --to.first;
     break;
 
   case direction::south:
-    if (start.row + 1 < m.size())
-      ++to.row;
+    if (start.first + 1 < m.size())
+      ++to.first;
     break;
 
   case direction::west:
-    if (start.col > 0)
-      --to.col;
+    if (start.second > 0)
+      --to.second;
     break;
 
   default:
-    if (start.col + 1 < m[0].size())
-      ++to.col;
+    if (start.second + 1 < m[0].size())
+      ++to.second;
   }
 
-  return m[to.row][to.col] == Empty ? to : start;
+  return m[to.first][to.second] == Empty ? to : start;
 }
 
 std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const maze &m,
@@ -127,7 +118,7 @@ maze path_on_maze(const vita::i_ga &path, const maze &base,
 
   for (unsigned i(0); i < path.parameters(); ++i)
   {
-    auto &c = ret[now.row][now.col];
+    auto &c = ret[now.first][now.second];
 
     if (now == start)
       c = Start;
