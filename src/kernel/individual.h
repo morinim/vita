@@ -62,6 +62,11 @@ private:
   unsigned age_;
 };  // class individual
 
+/// The SFINAE way of recognizing if an individual has introns.
+/// In general we assume it hasn't. Specific class can specialize the
+/// `has_introns` struct to signal their presence.
+template<class T> struct has_introns : std::false_type {};
+
 #include "kernel/individual.tcc"
 
 }  // namespace vita

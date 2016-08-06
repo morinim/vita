@@ -188,6 +188,8 @@ inline i_mep::iterator i_mep::end()
   return i_mep::iterator();
 }
 
+template<> struct has_introns<i_mep> : std::true_type {};
+
 ///
 /// \example example1.cc
 /// Creates a random individual and shows its content.

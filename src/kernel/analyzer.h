@@ -17,7 +17,6 @@
 
 #include "kernel/distribution.h"
 #include "kernel/symbol.h"
-#include "kernel/ga/i_ga.h"
 #include "kernel/ga/i_de.h"
 
 namespace vita
@@ -79,8 +78,10 @@ public:
 private:
   void count(const symbol *, bool);
   unsigned count(const T &);
-  unsigned count(const T &, std::true_type);
-  template<class U> unsigned count(const U &, std::false_type);
+  unsigned count_team(const T &, std::true_type);
+  template<class U> unsigned count_team(const U &, std::false_type);
+  unsigned count_introns(const T &, std::true_type);
+  unsigned count_introns(const T &, std::false_type);
 
   // This comparator is useful for debugging purpose: when we insert a
   // symbol pointer in an ordered container, it induces a well defined

@@ -214,35 +214,24 @@ void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 template<class T>
 unsigned analyzer<T>::count(const T &ind)
 {
-  return count(ind, is_team<T>());
+  return count_team(ind, is_team<T>());
 }
 
 ///
-/// Specialization of `count(T)` for non-teams.
+/// Specialization of `count_team(T)` for non-teams.
 ///
 template<class T>
 template<class U>
-unsigned analyzer<T>::count(const U &ind, std::false_type)
+unsigned analyzer<T>::count_team(const U &ind, std::false_type)
 {
-  for (index_t i(0); i < ind.size(); ++i)
-    for (category_t c(0); c < ind.categories(); ++c)
-      count(ind[{i, c}].sym, false);
-
-  unsigned length(0);
-  for (const auto &g : ind)
-  {
-    count(g.sym, true);
-    ++length;
-  }
-
-  return length;
+  return count_introns(ind, has_introns<T>());
 }
 
 ///
-/// Specialization of `count(T)` for teams.
+/// Specialization of `count_team(T)` for teams.
 ///
 template<class T>
-unsigned analyzer<T>::count(const T &t, std::true_type)
+unsigned analyzer<T>::count_team(const T &t, std::true_type)
 {
   unsigned length(0);
 
@@ -253,16 +242,32 @@ unsigned analyzer<T>::count(const T &t, std::true_type)
 }
 
 ///
-/// \param[in] ind individual to be analyzed.
-/// \return effective length of individual we gathered statistics about.
+/// Specialization of `count_introns(T)` for individuals with introns.
 ///
-template<>
-unsigned analyzer<i_ga>::count(const i_ga &ind)
+template<class T>
+unsigned analyzer<T>::count_introns(const T &ind, std::true_type)
 {
-  for (const auto &g : ind)
-    count(g.sym, true);
+  for (index_t i(0); i < ind.size(); ++i)
+    for (category_t c(0); c < ind.categories(); ++c)
+      count(ind[{i, c}].sym, false);
 
-  return ind.parameters();
+  return count_introns(ind, std::false_type());
+}
+
+///
+/// Specialization of `count_introns(T)` for individuals without introns.
+///
+template<class T>
+unsigned analyzer<T>::count_introns(const T &ind, std::false_type)
+{
+  unsigned length(0);
+  for (const auto &g : ind)
+  {
+    count(g.sym, true);
+    ++length;
+  }
+
+  return length;
 }
 
 ///
