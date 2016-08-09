@@ -7,6 +7,8 @@
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
+ *
+ *  \see https://bitbucket.org/morinim/vita/wiki/path_finding_tutorial
  */
 
 #include <cstdlib>
@@ -49,6 +51,18 @@ public:
   }
 };
 
+bool crossing(const maze &m, cell_coord pos)
+{
+  unsigned n(0);
+
+  n += pos.first > 0                && m[pos.first - 1][pos.second] == Empty;
+  n += pos.first + 1 < m.size()     && m[pos.first + 1][pos.second] == Empty;
+  n += pos.second > 0               && m[pos.first][pos.second - 1] == Empty;
+  n += pos.second + 1 < m[0].size() && m[pos.first][pos.second + 1] == Empty;
+
+  return n > 2;
+}
+
 cell_coord update_coord(const maze &m, cell_coord start,
                         direction::cardinal_dir d)
 {
@@ -79,16 +93,37 @@ cell_coord update_coord(const maze &m, cell_coord start,
   return m[to.first][to.second] == Empty ? to : start;
 }
 
-std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const maze &m,
-                                    cell_coord start, cell_coord goal)
+std::vector<cell_coord> extract_path(const vita::i_ga &dirs, const maze &m,
+                                     cell_coord start, cell_coord goal)
 {
+  std::vector<cell_coord> ret;
+
   cell_coord now(start);
 
-  unsigned step(0);
-  for (; step < path.parameters() && now != goal; ++step)
-    now = update_coord(m, now, path[step].as<direction::cardinal_dir>());
+  for (unsigned i(0); i < dirs.size() && now != goal; ++i)
+  {
+    const auto dir(dirs[i].as<direction::cardinal_dir>());
+    cell_coord prev;
+    do
+    {
+      prev = now;
+      ret.push_back(now);
+      now = update_coord(m, now, dir);
+    } while (now != prev && now != goal && !crossing(m, now));
 
-  return {now, step};
+    if (now == goal)
+      ret.push_back(goal);
+  }
+
+  return ret;
+}
+
+std::pair<cell_coord, unsigned> run(const vita::i_ga &dirs, const maze &m,
+                                    cell_coord start, cell_coord goal)
+{
+  const auto path(extract_path(dirs, m, start, goal));
+
+  return {path.back(), path.size()};
 }
 
 void print_maze(const maze &m)
@@ -110,54 +145,42 @@ void print_maze(const maze &m)
   std::cout << hr << '\n';
 }
 
-maze path_on_maze(const vita::i_ga &path, const maze &base,
-                  cell_coord start, cell_coord goal)
+maze path_on_maze(const std::vector<cell_coord> &path, maze base,
+                  cell_coord goal)
 {
-  auto ret(base);
-  auto now = start;
+  for (const auto &c : path)
+    base[c.first][c.second] = '.';
 
-  for (unsigned i(0); i < path.parameters(); ++i)
-  {
-    auto &c = ret[now.first][now.second];
+  base[path.front().first][path.front().second] = Start;
 
-    if (now == start)
-      c = Start;
-    else if (now == goal)
-    {
-      c = Goal;
-      break;
-    }
-    else
-      c = '.';
+  if (path.back() == goal)
+    base[goal.first][goal.second] = Goal;
 
-    now = update_coord(base, now, path[i].as<direction::cardinal_dir>());
-  }
-
-  return ret;
+  return base;
 }
 
 int main()
 {
-  const cell_coord start{0, 0}, goal{16, 8};
+  const cell_coord start{0, 0}, goal{16, 16};
   const maze m =
   {
-    " *       ",
-    " * *** * ",
-    "   *   * ",
-    " *** ****",
-    " *   *   ",
-    " ***** **",
-    "   *     ",
-    "** * ****",
-    "   * *   ",
-    "** * * * ",
-    "   *   * ",
-    " ******* ",
-    "       * ",
-    "**** * * ",
-    "   * * * ",
-    " *** * **",
-    "     *   "
+    " *               ",
+    " * *** * ********",
+    "   *   *         ",
+    " *** ********* * ",
+    " *   *       * * ",
+    " ***** ***** *** ",
+    "   *       * *   ",
+    "** * ***** * * * ",
+    "   * *   * * * * ",
+    "** * * * * * * * ",
+    "   *   * * *   * ",
+    " ******* ********",
+    "       * *       ",
+    "**** * * * ***** ",
+    "   * * *   *   * ",
+    " *** * ***** * * ",
+    "     *       * * "
   };
 
   const std::size_t sup_length(m.size() * m[0].size() / 2);
@@ -179,9 +202,10 @@ int main()
 
   vita::ga_search<vita::i_ga, vita::std_es, decltype(f)> search(prob, f);
 
-  const auto best_path(search.run().best.solution);
+  const auto best_path(extract_path(search.run().best.solution, m, start,
+                                    goal));
 
-  print_maze(path_on_maze(best_path, m, start, goal));
+  print_maze(path_on_maze(best_path, m, goal));
 
   return EXIT_SUCCESS;
 }
