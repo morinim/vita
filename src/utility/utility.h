@@ -14,6 +14,7 @@
 #define      VITA_UTILITY_H
 
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
