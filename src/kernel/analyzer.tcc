@@ -236,16 +236,17 @@ unsigned analyzer<T>::count_team(const T &t, std::true_type)
   unsigned length(0);
 
   for (const auto &ind : t)
-    length += count(ind, std::false_type());
+    length += count_team(ind, std::false_type());
 
   return length;
 }
 
 ///
-/// Specialization of `count_introns(T)` for individuals with introns.
+/// Specialization of `count_introns(U)` for individuals with introns.
 ///
 template<class T>
-unsigned analyzer<T>::count_introns(const T &ind, std::true_type)
+template<class U>
+unsigned analyzer<T>::count_introns(const U &ind, std::true_type)
 {
   for (index_t i(0); i < ind.size(); ++i)
     for (category_t c(0); c < ind.categories(); ++c)
@@ -255,10 +256,11 @@ unsigned analyzer<T>::count_introns(const T &ind, std::true_type)
 }
 
 ///
-/// Specialization of `count_introns(T)` for individuals without introns.
+/// Specialization of `count_introns(U)` for individuals without introns.
 ///
 template<class T>
-unsigned analyzer<T>::count_introns(const T &ind, std::false_type)
+template<class U>
+unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
 {
   unsigned length(0);
   for (const auto &g : ind)
