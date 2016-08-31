@@ -60,11 +60,4 @@ using index_t = unsigned;
   Class &operator=(const Class &) = delete
 }  // namespace vita
 
-/// \page page1 VITA Architecture
-/// * [Tutorial](https://bitbucket.org/morinim/vita/wiki/quick_start)
-/// * [Anatomy of Vita](https://bitbucket.org/morinim/vita/wiki/anatomy)
-/// \page page2 Contributor guidelines
-/// * [Coding style](https://bitbucket.org/morinim/vita/wiki/coding_style)
-/// * [Development cycle](https://bitbucket.org/morinim/vita/wiki/development_cycle)
-
-#endif  // Include guard
+#endif  // include guard

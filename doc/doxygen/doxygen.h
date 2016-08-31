@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,7 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
  *
- *  \mainpage VITA v0.9.11
+ *  \mainpage VITA v0.9.12
  *
  *  \section Introduction
  *  Welcome to the Vita project.
@@ -18,7 +18,7 @@
  *  This is the reference guide for the Vita APIs.
  *
  *  \section note_sec Notes
- *  New versions of this program will be available at
+ *  New versions of this framework will be available at
  *  https://bitbucket.org/morinim/vita
  *
  *  Please reports any suggestions and/or bugs to:
@@ -31,6 +31,15 @@
  *
  */
 
+/**
+ *  \page page1 VITA Architecture
+ *  - [Tutorials](https://bitbucket.org/morinim/vita/wiki/tutorials)
+ *  - [Anatomy of Vita](https://bitbucket.org/morinim/vita/wiki/anatomy)
+ *
+ *  \page page2 Contributor guidelines
+ *  - [Coding style](https://bitbucket.org/morinim/vita/wiki/coding_style)
+ *  - [Development cycle](https://bitbucket.org/morinim/vita/wiki/development_cycle)
+ */
 
 /**
  *  \namespace vita

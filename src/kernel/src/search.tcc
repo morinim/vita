@@ -404,7 +404,7 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 ///
 /// \note
 /// If the evaluator `id` is not compatible with the problem type the
-/// function return `false` and the active evaluator stays the same.
+/// function returns `false` and the active evaluator stays the same.
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
