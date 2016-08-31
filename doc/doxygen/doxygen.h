@@ -52,6 +52,30 @@
  *  detail folder.
  */
 
+/**
+ *  \example titanic01.cc
+ *  "Hello world" classification task (Genetic Programming)
+ *  (see also <https://bitbucket.org/morinim/vita/wiki/titanic_tutorial>).
+ *  \example titanic02.cc
+ *  "Hello world" classification task (calculating accuracy metric).
+ *  (see also <https://bitbucket.org/morinim/vita/wiki/titanic_tutorial>).
+ *  \example titanic03.cc
+ *  "Hello world" classification task (setting some parameters).
+ *  (see also <https://bitbucket.org/morinim/vita/wiki/titanic_tutorial>).
+ *  \example titanic03.cc
+ *  "Hello world" classification task (team-based classification).
+ *  (see also <https://bitbucket.org/morinim/vita/wiki/titanic_tutorial>).
+ *
+ *  \example pathfinding01.cc
+ *  Simple pathfinding (Genetic Algorithms).
+ *  \example pathfinding02.cc
+ *  More complex pathfinding (Genetic Algorithms).
+ *
+ *  \example scheduling.cc
+ *  Scheduling concurrent jobs for several machines (Differential Evolution).
+ *  (see also <https://bitbucket.org/morinim/vita/wiki/scheduling_tutorial>).
+ */
+
 // This is a global "project documentation" file that supplies the front page
 // docs for the project, sets up the groups (for use with /ingroup tags) and
 // documents the namespaces all in one place. This allows all the "overviews"

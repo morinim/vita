@@ -94,6 +94,7 @@ private:
 };
 
 #include "kernel/src/search.tcc"
+
 }  // namespace vita
 
 #endif  // include guard

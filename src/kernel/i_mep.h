@@ -14,9 +14,7 @@
 #define      VITA_I_MEP_H
 
 #include <cmath>
-#include <functional>
 #include <iomanip>
-#include <set>
 
 #include "kernel/function.h"
 #include "kernel/gene.h"
