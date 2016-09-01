@@ -37,7 +37,8 @@ namespace vita
 /// In an environment where a symbol such as '+' may have many different
 /// meanings, it's useful to specify a "domain of computation" to restrict
 /// attention to specific meanings of interest (e.g. double domain:
-/// 1 + 1 = 2; string domain: "a" + "b" = "ab").
+/// `1 + 1 = 2`; string domain: `"a" + "b" = "ab"`).
+///
 /// The operations of a domain are defined in files named after the domain
 /// and grouped in the `primitive/` folder.
 enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
@@ -53,10 +54,6 @@ using category_t = unsigned;
 
 /// A useful shortcut for a group of categories.
 using cvect = std::vector<category_t>;
-
-/// Index in the genome. Locus is uniquely identified by an index and a
-/// category.
-using index_t = unsigned;
 
 /// A macro to disallow the copy constructor and operator= functions.
 /// A good alternative is boost::noncopyable but that gives some false

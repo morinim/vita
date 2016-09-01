@@ -20,6 +20,10 @@
 
 namespace vita
 {
+/// Index in the genome. Locus is uniquely identified by an index and a
+/// category.
+using index_t = unsigned;
+
 static_assert(sizeof(index_t) <= sizeof(std::size_t),
               "index_t size expected to be <= std::size_t");
 static_assert(sizeof(category_t) <= sizeof(std::size_t),

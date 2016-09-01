@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -74,7 +74,7 @@ private:  // Private data members
 class adf : public function
 {
 public:
-  adf(const i_mep &, std::vector<category_t>);
+  adf(const i_mep &, cvect);
 
   virtual bool auto_defined() const override;
 
