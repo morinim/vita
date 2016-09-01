@@ -277,7 +277,7 @@ unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
 /// \return effective length of individual we gathered statistics about.
 ///
 template<>
-unsigned analyzer<i_de>::count(const i_de &ind)
+inline unsigned analyzer<i_de>::count(const i_de &ind)
 {
   return ind.parameters();
 }
