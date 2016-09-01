@@ -54,7 +54,9 @@ using index_t = unsigned;
 /// A good alternative is boost::noncopyable but that gives some false
 /// positive with `g++ -Weffc++` so, for now, we keep the macro.
 ///
-/// \see <http://stackoverflow.com/q/7823990/3235496>
+/// \see
+/// <http://stackoverflow.com/q/7823990/3235496> and
+/// <http://stackoverflow.com/q/1454407/3235496> for further details.
 #define DISALLOW_COPY_AND_ASSIGN(Class) \
   Class(const Class &) = delete;        \
   Class &operator=(const Class &) = delete
