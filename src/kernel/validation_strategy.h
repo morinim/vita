@@ -13,7 +13,7 @@
 #if !defined(VITA_VALIDATION_STRATEGY_H)
 #define      VITA_VALIDATION_STRATEGY_H
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {

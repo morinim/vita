@@ -15,7 +15,7 @@
 
 #include <chrono>
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {
@@ -23,7 +23,7 @@ namespace vita
 /// We always run into the task of measuring the time between two points.
 ///
 /// The vita::timer class cuts down the verbose syntax needed to measure
-/// elapsed time. It is similar to boost::cpu_timer but tailored to our
+/// elapsed time. It is similar to `boost::cpu_timer` but tailored to our
 /// needs (so less general).
 ///
 /// The simplest and most common use is:

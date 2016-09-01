@@ -17,12 +17,12 @@
 #include <set>
 #include <string>
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {
 ///
-/// \brief Informations about a category of the dataset
+/// \brief Informations about a category of the dataset.
 ///
 /// For example:
 ///
@@ -52,7 +52,7 @@ struct untagged_category
 };
 
 ///
-/// \brief Integrates untagged_category struct with a unique identifier
+/// \brief Integrates untagged_category struct with a unique identifier.
 ///
 struct category : public untagged_category
 {
@@ -72,7 +72,7 @@ struct category : public untagged_category
 std::ostream &operator<<(std::ostream &, const category &);
 
 ///
-/// \brief The set of categories used in a specific problem
+/// \brief The set of categories used in a specific problem.
 ///
 class category_set
 {
@@ -102,7 +102,7 @@ private:
 };  // class category_set
 
 ///
-/// \brief Forward iterator to read the elements of a category_set
+/// \brief Forward iterator to read the elements of a category_set.
 ///
 class category_set::const_iterator
 {

@@ -13,7 +13,7 @@
 #if !defined(VITA_DATA_H)
 #define      VITA_DATA_H
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {

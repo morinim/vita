@@ -15,13 +15,13 @@
 
 #include <iostream>
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {
 
 ///
-/// \brief Three-valued logic enum
+/// \brief Three-valued logic enum.
 ///
 /// Used where we need three truth values indicating `true`, `false` and some
 /// indeterminate third value.

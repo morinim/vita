@@ -17,7 +17,7 @@
 #include <random>
 #include <set>
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {

@@ -21,7 +21,7 @@
 
 #include "tinyxml2/tinyxml2.h"
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {
@@ -98,7 +98,7 @@ template<> inline std::string lexical_cast(const std::string &s)
 
 ///
 /// \brief A RAII class to restore the state of a stream to its original
-///        state
+///        state.
 ///
 /// `iomanip` manipulators are "sticky" (except `setw` which only affects the
 /// next insertion). Often we need a way to apply an arbitrary number of
@@ -274,10 +274,10 @@ void set_text(tinyxml2::XMLElement *, const std::string &,
 
 ///
 /// \brief A convenient arrangement for inserting stream-aware objects into
-///        `XMLDocument`
-/// \param[out] p parent element
-/// \param[in] e new xml element
-/// \param[in] s new xml element's value
+///        `XMLDocument`.
+/// \param[out] p parent element.
+/// \param[in] e new xml element.
+/// \param[in] s new xml element's value.
 ///
 template<class T>
 void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)

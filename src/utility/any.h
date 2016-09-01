@@ -13,7 +13,7 @@
 #if !defined(VITA_ANY_H)
 #define      VITA_ANY_H
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 #if defined(USE_BOOST_ANY)
 #  include <boost/any.hpp>
@@ -41,7 +41,7 @@ template<class> struct get_table;
 
 ///
 /// \brief The exception thrown in the event of a failed any_cast of an any
-///        value
+///        value.
 ///
 struct bad_any_cast : std::bad_cast
 {
@@ -57,7 +57,7 @@ struct bad_any_cast : std::bad_cast
 
 ///
 /// \brief A boost::any equivalent with small buffer optimization and
-///        support for the streaming operators
+///        support for the streaming operators.
 ///
 /// This class is derived from and equivalent to boost::spirit::hold_any
 /// (which is built based on the any class published in

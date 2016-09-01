@@ -13,7 +13,7 @@
 #if !defined(VITA_CACHE_HASH_H)
 #define      VITA_CACHE_HASH_H
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {

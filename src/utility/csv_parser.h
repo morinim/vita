@@ -18,7 +18,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "kernel/vita.h"
+#include "kernel/common.h"
 
 namespace vita
 {
