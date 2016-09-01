@@ -11,15 +11,10 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
 
-#include "kernel/adf.h"
-#include "kernel/distribution.h"
-#include "kernel/environment.h"
-#include "kernel/interpreter.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 int main(int argc, char *argv[])
 {
@@ -107,6 +102,4 @@ int main(int argc, char *argv[])
         std::cout << "Skipping block at line " << l << '\n';
     }
   }
-
-  return EXIT_SUCCESS;
 }

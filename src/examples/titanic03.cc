@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,13 +12,11 @@
 
 #include <cstdlib>
 
-#include "kernel/src/search.h"
+#include "kernel/vita.h"
 
 int main()
 {
-  using namespace vita;
-
-  src_problem titanic("titanic_train.csv");
+  vita::src_problem titanic("titanic_train.csv");
 
   if (!titanic)
     return EXIT_FAILURE;
@@ -27,11 +25,9 @@ int main()
   titanic.env.individuals = 1000;
   titanic.env.generations =  200;
 
-  src_search<> s(titanic, metric_flags::accuracy);
+  vita::src_search<> s(titanic, vita::metric_flags::accuracy);
   const auto summary(s.run(10));
 
   std::cout << summary.best.solution << '\n'
             << summary.best.score.accuracy << '\n';
-
-  return EXIT_SUCCESS;
 }

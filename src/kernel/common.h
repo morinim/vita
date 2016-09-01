@@ -10,8 +10,19 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_H)
-#define      VITA_H
+#if !defined(VITA_COMMON_H)
+#define      VITA_COMMON_H
+
+// This file must be kept small! Avoid the One Big Header File C/C++
+// anti-pattern (and its lack of modularity).
+// Just put here:
+// - `#include`s that address portability issues or workarounds for broken
+//   headers;
+// - conditional-compilation macros and instructions that affect the whole
+//   codebase;
+// - any other definitions that **really** are needed in every compilation
+//   unit.
+// See also <http://c2.com/cgi/wiki?OneBigHeaderFile>.
 
 #include <cassert>
 #include <cstdint>
@@ -23,9 +34,6 @@
 
 namespace vita
 {
-/// This is the type used as key for symbol identification.
-using opcode_t = unsigned;
-
 /// In an environment where a symbol such as '+' may have many different
 /// meanings, it's useful to specify a "domain of computation" to restrict
 /// attention to specific meanings of interest (e.g. double domain:

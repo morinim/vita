@@ -20,6 +20,9 @@
 
 namespace vita
 {
+/// This is the type used as key for symbol identification.
+using opcode_t = unsigned;
+
 ///
 /// GP assembles variable length program structures from basic units called
 /// functions and terminals. Functions perform operations on their inputs,

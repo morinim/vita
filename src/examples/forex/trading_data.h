@@ -15,8 +15,7 @@
 #include <ctime>
 #include <iostream>
 
-#include "kernel/common.h"
-#include "utility/utility.h"
+#include "kernel/vita.h"
 
 #if !defined(FOREX_TRADING_DATA_H)
 #define      FOREX_TRADING_DATA_H

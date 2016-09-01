@@ -10,12 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 
-#include "kernel/environment.h"
-#include "kernel/i_mep.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 //
 // Performs three types of crossover between two random individuals.
@@ -47,6 +44,4 @@ int main(int argc, char *argv[])
 
   crossover(i1, i2).dump(std::cout);
   std::cout << std::endl;
-
-  return EXIT_SUCCESS;
 }

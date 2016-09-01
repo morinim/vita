@@ -10,13 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 
-#include "kernel/environment.h"
-#include "kernel/i_mep.h"
-#include "kernel/interpreter.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 int main(int argc, char *argv[])
 {
@@ -49,6 +45,4 @@ int main(int argc, char *argv[])
     std::cout << "Incorrect program.\n";
   else
     std::cout << "Output: " << vita::to<std::string>(val) << '\n';
-
-  return EXIT_SUCCESS;
 }

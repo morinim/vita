@@ -9,11 +9,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/i_mep.h"
-#include "kernel/search.h"
-#include "kernel/src/primitive/bool.h"
-#include "kernel/src/primitive/real.h"
-#include "kernel/team.h"
+#include "kernel/vita.h"
 
 #include "trading_data.h"
 #include "trade_simulator.h"
@@ -342,6 +338,4 @@ int main()
   engine.set_evaluator(std::make_unique<fxs::evaluator>(&ts));
 
   engine.run(1);
-
-  return EXIT_SUCCESS;
 }

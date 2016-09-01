@@ -11,13 +11,10 @@
  *  \see https://bitbucket.org/morinim/vita/wiki/scheduling_tutorial
  */
 
-#include <cstdlib>
 #include <chrono>
 #include <vector>
 
-#include "kernel/ga/evaluator.h"
-#include "kernel/ga/i_de.h"
-#include "kernel/ga/search.h"
+#include "kernel/vita.h"
 
 // Examples taken from "Differential Evolution in Discrete Optimization" by
 // Daniel Lichtblau.
@@ -98,6 +95,4 @@ int main()
   // grid xtics ytics
   // plot [x=0:24][y=-0.5:50.5] "test.dat" using 2:1:3:(0)
   //      w vectors head filled lw 2 notitle
-
-  return EXIT_SUCCESS;
 }

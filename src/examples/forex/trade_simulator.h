@@ -9,7 +9,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/interpreter.h"
 #include "trading_data.h"
 
 #if !defined(FOREX_TRADE_SIMULATOR_H)
@@ -115,7 +114,7 @@ public:
   template<class T> double run(const T &);
 
 private:
-  // Private support functions
+  // Private support functions.
   std::size_t as_series(timeframe tf, std::size_t i) const
   {
     std::size_t b(cur_bar_);
@@ -130,7 +129,7 @@ private:
   void clear_status();
   std::size_t inc_bar() { return ++cur_bar_; }
 
-  // Private data members
+  // Private data members.
   const trading_data *td_;
 
   order order_ = order();

@@ -11,14 +11,10 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
 
-#include "kernel/adf.h"
-#include "kernel/distribution.h"
-#include "kernel/environment.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 int main(int argc, char *argv[])
 {
@@ -88,6 +84,4 @@ int main(int argc, char *argv[])
             << "  Mean: " << arguments.mean()
             << "  StdDev: " << arguments.standard_deviation()
             << "  Max: " << arguments.max() << std::endl;
-
-  return EXIT_SUCCESS;
 }

@@ -11,13 +11,10 @@
  *  \see https://bitbucket.org/morinim/vita/wiki/path_finding_tutorial
  */
 
-#include <cstdlib>
 #include <iostream>
 #include <vector>
 
-#include "kernel/ga/evaluator.h"
-#include "kernel/ga/i_ga.h"
-#include "kernel/ga/search.h"
+#include "kernel/vita.h"
 
 using maze = std::vector<std::string>;
 
@@ -184,6 +181,4 @@ int main()
   const auto best_path(search.run().best.solution);
 
   print_maze(path_on_maze(best_path, m, start, goal));
-
-  return EXIT_SUCCESS;
 }

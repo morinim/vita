@@ -10,14 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
-#include <memory>
 
-#include "kernel/environment.h"
-#include "kernel/i_mep.h"
-#include "kernel/population.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 //
 // Creates a random population and prints it out.
@@ -43,6 +38,4 @@ int main(int argc, char *const argv[])
   vita::population<vita::i_mep> p(env);
 
   std::cout << p << std::endl;
-
-  return EXIT_SUCCESS;
 }

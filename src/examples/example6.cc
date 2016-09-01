@@ -10,15 +10,10 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <memory>
 
-#include "kernel/evolution.h"
-#include "kernel/i_mep.h"
-#include "kernel/terminal.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/vita.h"
 
 using i_interp = vita::core_interpreter;
 
@@ -116,6 +111,4 @@ int main(int argc, char *argv[])
   vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva);
 
   evo.run(1);
-
-  return EXIT_SUCCESS;
 }

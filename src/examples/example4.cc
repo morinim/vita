@@ -10,13 +10,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <cstdlib>
 #include <iostream>
 
-#include "kernel/i_mep.h"
-#include "kernel/cache.h"
-#include "kernel/src/primitive/factory.h"
-#include "utility/timer.h"
+#include "kernel/vita.h"
 
 //
 // Performs a speed test on the transposition table (insert-find cycle).
@@ -59,6 +55,4 @@ int main(int argc, char *argv[])
   }
 
   std::cout << 1000.0l * n * t.elapsed().count() << " store/read sec\n";
-
-  return EXIT_SUCCESS;
 }
