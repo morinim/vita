@@ -18,25 +18,24 @@ This software was originally developed by [EOS][1] without open source in mind. 
 
 Although the core development team is still anchored at EOS, Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
 
-## Requirements ##
+## Build requirements ##
 
 Vita is designed to have fairly minimal requirements to build and use with your projects, but there are some. Currently, we support Linux and Windows. We will also make our best effort to support other platforms (e.g. Mac OS X, Solaris, AIX).
 However, since core members of the Vita project have no access to these platforms, Vita may have outstanding issues there. If you notice any problems on your platform, please use the
 [issue tracking system](https://bitbucket.org/morinim/vita/issues); patches for fixing them are even more welcome!
 
-### Linux requirements ###
+### Mandatory ###
 
 * GNU-compatible make
 * POSIX-standard shell
-* [Boost library][2]
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
-* Python v3 (for some functions)
 
-### Windows requirements ###
+Under Windows this means a recent version of MinGW / MSYS (our standard Windows test environment is [Nuwen](http://nuwen.net/mingw.html): it's simple and ready to use).
 
-* MinGW/MSYS with a C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
-* [Boost library][2]
-* Python v3 (for some functions)
+### Optional ###
+
+* [Boost library][2] for some executables and for testing
+* [Python v3][4] for additional functionalities
 
 ## Getting the source ##
 
@@ -93,11 +92,7 @@ vita/
 
 ## Setting up the build ##
 
-If they are not already installed, you need the following libraries:
-
-* [BOOST][2]
-
-Kernel library can be built with a header-only Boost library; other programs may need Boost separately-compiled library binaries (e.g. SR utility needs Program Options Library to compile). To build Boost library under MinGW see below.
+Kernel library can be built without a header-only [Boost library][2]; other programs may need Boost headers / separately-compiled library binaries (e.g. SR utility needs Program Options Library to compile).
 
 ### GCC / MinGW ###
 
@@ -117,23 +112,7 @@ All output files will, per default, be stored together with the source code.
 
 With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
 
-### Additional instructions for building Boost on MinGW / MSYS ###
-
-Our standard Windows test environment is [Nuwen](http://nuwen.net/mingw.html): it's simple and ready to use.
-
-If you choose other distributions, you'd need to build Boost:
-
-1. Set up a MinGW/MSYS environment.
-2. Get the latest Boost.
-3. Extract Boost archive under `vita/src/` directory (you can expand Boost in a different path but you'll have to add the `stage/lib` directory to the library search path and `boost/` to the include search path).
-4. Open the Windows command prompt (`cmd.exe` *not* MSYS) and cd to your boost directory.
-5. Execute
-    `bootstrap.bat mingw`
-    and
-    `b2 link=static runtime-link=static threading=multi toolset=gcc variant=release --build-type=minimal --layout=system`
-6. Go and make yourself *several* cups of sencha green tea.
-7. The stage subdir now contains libs.
-
 [1]: http://www.eosdev.it/
 [2]: http://www.boost.org/
 [3]: https://bitbucket.org/morinim/vita
+[4]: http://www.python.org/
