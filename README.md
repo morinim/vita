@@ -86,17 +86,17 @@ vita/
     sr/ ...................Symbolic regression and classification utility
     test/ .................Vita-wide test-suite
     third_party/ ..........Third party libraries
-    tools/ ................C++ lint checker and other tools
     utility/ ..............Support libraries / files
+  tools/ ..................C++ lint checker and other tools
 ```
 
 ## Setting up the build ##
 
 Kernel library can be built without a header-only [Boost library][2]; other programs may need Boost headers / separately-compiled library binaries (e.g. SR utility needs Program Options Library to compile).
 
-### GCC / MinGW ###
+### make ###
 
-```cd vita```
+```cd vita/src```
 
 * To build all: `make`
 * To build the kernel library (libvita.a): `make vita`
@@ -104,11 +104,10 @@ Kernel library can be built without a header-only [Boost library][2]; other prog
 * To build tests: `make tests`
 * To build example ABC: `make examples/ABC`
 
-If you see errors, try to tweak the contents of Makefile to make them go away.
-
 The default compiler is g++, to use clang++ type `make CXX=clang++`.
 
-All output files will, per default, be stored together with the source code.
+All the output files will, per default, be stored together with the source
+code.
 
 With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
 

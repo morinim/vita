@@ -169,11 +169,12 @@ check: check_cppcheck check_cpplint
 
 .phony:	check_cppcheck
 check_cppcheck:
-	@command -v ./tools/cppcheck/cppcheck >/dev/null && ./tools/cppcheck/cppcheck --enable=all --std=c++11 kernel/ 2> cppcheck.txt || { echo >&2 "cppcheck not installed."; }
+	@command -v ../tools/cppcheck/cppcheck > /dev/null && ../tools/cppcheck/cppcheck --enable=all --std=c++11 kernel/ || { echo >&2 "Error: cppcheck not found."; }
 
+# Without `|| true` make cplains when cpplint found errors.
 .phony:	check_cpplint
 check_cpplint:
-	@command -v python >/dev/null || { echo >&2 "Python not installed."; } && ./tools/cpplint.py --filter=-whitespace/braces,-whitespace/newline,-build/header_guard,-readability/streams kernel/*.cc 2> cpplint.txt
+	@../tools/cpplint.py --filter=-whitespace/braces,-whitespace/newline,-build/header_guard,-readability/streams $(FRAMEWORK_SRC) || true
 
 .phony:	clean
 clean:
