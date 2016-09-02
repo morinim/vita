@@ -89,23 +89,28 @@ LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
 
-KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc) $(wildcard utility/*.cc) third_party/tinyxml2/tinyxml2.cc
-KERNEL_OBJ := $(KERNEL_SRC:.cc=.o)
 EXAMPLES_SRC := $(wildcard examples/*.cc)
 FOREX_SRC := $(wildcard examples/forex/*.cc)
-FOREX_OBJ := $(FOREX_SRC:.cc=.o)
+KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
 SR_SRC := $(wildcard sr/*.cc)
 TESTS_SRC := $(wildcard test/*.cc)
+THIRD_PARTY_SRC := third_party/tinyxml2/tinyxml2.cc
+UTILITY_SRC := $(wildcard utility/*.cc)
+FRAMEWORK_SRC := $(KERNEL_SRC) $(THIRD_PARTY_SRC) $(UTILITY_SRC)
 
-ALL_SRC := $(KERNEL_SRC) $(EXAMPLES_SRC) $(FOREX_SRC) $(SR_SRC) $(TESTS_SRC)
+FRAMEWORK_OBJ := $(FRAMEWORK_SRC:.cc=.o)
+FOREX_OBJ := $(FOREX_SRC:.cc=.o)
+THIRD_PARTY_OBJ := $(THIRD_PARTY_SRC:.cc=.o)
+
+ALL_SRC := $(FRAMEWORK_SRC) $(EXAMPLES_SRC) $(FOREX_SRC) $(SR_SRC) $(TESTS_SRC)
 
 .PRECIOUS: %.o
 
-all: kernel sr
+all: vita sr
 
-forex: $(FOREX_OBJ) $(KERNEL_OBJ)
+forex: $(FOREX_OBJ) $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $(FOREX_OBJ) $(KERNEL_OBJ) -o examples/forex/$@ $(LIB)
+	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o examples/forex/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
 	@strip examples/forex/$@.exe
@@ -114,9 +119,9 @@ else
 endif
 endif
 
-sr: sr/sr.o $(KERNEL_OBJ)
+sr: sr/sr.o $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o sr/$@ $(LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o sr/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
 	@strip sr/$@.exe
@@ -128,29 +133,29 @@ endif
 examples: $(EXAMPLES_SRC:.cc=) forex
 	@echo $(notdir $^) successfully built
 
-examples/%: examples/%.o $(KERNEL_OBJ)
+examples/%: examples/%.o $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o $@
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@
 
-tests: test/tests.o $(KERNEL_OBJ)
+tests: test/tests.o $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o test/$@ $(DEBUG_LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o test/$@ $(DEBUG_LIB)
 	@cd test; ./$@ --show_progress --build_info
 
-test/%: test/%.o $(KERNEL_OBJ)
+test/%: test/%.o $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $< $(KERNEL_OBJ) -o $@ $(DEBUG_LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@ $(DEBUG_LIB)
 	@cd test; ./$(@F) --show_progress --build_info
 
-kernel: $(KERNEL_OBJ)
+vita: $(FRAMEWORK_OBJ)
 	@echo Linking libvita.a
-	@gcc-ar rcs kernel/libvita.a $(KERNEL_OBJ)
+	@gcc-ar rcs kernel/libvita.a $(FRAMEWORK_OBJ)
 ifeq ($(TYPE), release)
 	@strip kernel/libvita.a
 endif
 
 # Disable all warnings for third_party libraries.
-third_party/%.o: COMPILE += -w
+$(THIRD_PARTY_OBJ): COMPILE += -w
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...

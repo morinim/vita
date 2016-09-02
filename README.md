@@ -104,7 +104,7 @@ Kernel library can be built with a header-only Boost library; other programs may
 ```cd vita```
 
 * To build all: `make`
-* To build the kernel library (libvita.a): `make kernel`
+* To build the kernel library (libvita.a): `make vita`
 * To build the sr tool: `make sr`
 * To build tests: `make tests`
 * To build example ABC: `make examples/ABC`
