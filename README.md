@@ -77,9 +77,9 @@ This is a sketch of the resulting directory structure:
 vita/
   LICENSE
   README.md
+  copyright
   src/
     CONTRIBUTORS
-    copyright
     Makefile
     examples/..............Various examples
     kernel/ ...............Vita kernel(core library)

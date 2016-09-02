@@ -200,6 +200,6 @@ backup:
 # Further details / ideas:
 # * http://gpwiki.org/index.php/Makefile
 # * http://mad-scientist.net/make/autodep.html
-# * http://stackoverflow.com/questions/5127977/makefile-define-compilation-variables-based-on-target-for
-# * http://stackoverflow.com/questions/448910/makefile-variable-assignment
-# * http://stackoverflow.com/questions/592620/how-to-check-if-a-program-exists-from-a-bash-script
+# * Target-specific variable values: http://stackoverflow.com/q/5127977/3235496
+# * Variable assignment: http://stackoverflow.com/q/448910/3235496
+# * Check if a program exists: http://stackoverflow.com/q/592620/3235496
