@@ -84,7 +84,7 @@ vita/
     examples/..............Various examples
     kernel/ ...............Vita kernel(core library)
     sr/ ...................Symbolic regression and classification utility
-    test/ .................Vita-wide test-suite
+    test/ .................Test-suite
     third_party/ ..........Third party libraries
     utility/ ..............Support libraries / files
   tools/ ..................C++ lint checker and other tools

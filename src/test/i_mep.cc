@@ -226,18 +226,30 @@ BOOST_AUTO_TEST_CASE(t_output)
 
   i.graphviz(ss);
   BOOST_CHECK_EQUAL(ss.str(),
-                    "graph {" \
-                    "g0_0 [label=FSUB, shape=box];" \
-                    "g0_0 -- g1_0;" \
-                    "g0_0 -- g2_0;" \
-                    "g1_0 [label=FADD, shape=box];" \
-                    "g1_0 -- g3_0;" \
-                    "g1_0 -- g4_0;" \
-                    "g2_0 [label=FADD, shape=box];" \
-                    "g2_0 -- g4_0;" \
-                    "g2_0 -- g3_0;" \
-                    "g3_0 [label=2.0, shape=circle];" \
+                    "graph {"
+                    "g0_0 [label=FSUB, shape=box];"
+                    "g0_0 -- g1_0;"
+                    "g0_0 -- g2_0;"
+                    "g1_0 [label=FADD, shape=box];"
+                    "g1_0 -- g3_0;"
+                    "g1_0 -- g4_0;"
+                    "g2_0 [label=FADD, shape=box];"
+                    "g2_0 -- g4_0;"
+                    "g2_0 -- g3_0;"
+                    "g3_0 [label=2.0, shape=circle];"
                     "g4_0 [label=3.0, shape=circle];}");
+
+  BOOST_TEST_CHECKPOINT("Dump output");
+  ss.clear();
+  ss.str(std::string());
+  i.dump(ss);
+
+  BOOST_CHECK_EQUAL(ss.str(),
+                    "[0] FSUB [1] [2]\n"
+                    "[1] FADD [3] [4]\n"
+                    "[2] FADD [4] [3]\n"
+                    "[3] 2.0\n"
+                    "[4] 3.0\n");
 }
 BOOST_AUTO_TEST_SUITE_END()
 
