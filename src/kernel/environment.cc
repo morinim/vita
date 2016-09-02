@@ -34,7 +34,7 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
-    brood_recombination = 0;
+    brood_recombination = 1;
     dss = trilean::yes;
     layers = 1;
     individuals = 100;
@@ -71,7 +71,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "elitism", as_integer(elitism));
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
-  set_text(e_environment, "brood_recombination", *brood_recombination);
+  set_text(e_environment, "brood_recombination", brood_recombination);
   set_text(e_environment, "dss", as_integer(dss));
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", *mate_zone);

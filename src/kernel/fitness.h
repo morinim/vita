@@ -29,10 +29,10 @@ enum class fit_tag {copies_of, components};
 
 ///
 /// \brief A value assigned to an individual which reflects how well the
-///        individual solves the task
+///        individual solves the task.
 ///
 /// \tparam T a numerical type used as a building block for the fitness
-///           (e.g. `double`)
+///           (e.g. `double`).
 ///
 /// This is **NOT THE RAW FITNESS**. Raw fitness is stated in the natural
 /// terminology of the problem: the better value may be either smaller (as when
@@ -66,13 +66,13 @@ enum class fit_tag {copies_of, components};
 template<class T>
 class basic_fitness_t
 {
-public:  // Type alias and iterators
+public:
+  // Type alias and iterators.
   using values_t = small_vector<T, 1>;
   using value_type = typename values_t::value_type;
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
 
-public:
   basic_fitness_t(unsigned, fit_tag, T = std::numeric_limits<T>::lowest());
 
   basic_fitness_t() : basic_fitness_t(1, fit_tag::components) {}
@@ -93,11 +93,11 @@ public:
   basic_fitness_t &operator-=(const basic_fitness_t &);
   basic_fitness_t &operator*=(const basic_fitness_t &);
 
-  // Serialization
+  // Serialization.
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
-private:  // Private data members
+private:
   values_t vect_;
 };
 
@@ -155,4 +155,4 @@ using fitness_t = basic_fitness_t<double>;
 #include "kernel/fitness.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

@@ -67,13 +67,12 @@ unsigned basic_fitness_t<T>::size() const
 template<class T>
 T basic_fitness_t<T>::operator[](unsigned i) const
 {
-  // This assert is a bit to strict: taking the address of one past the last
-  // element of vect_ could be allowed, e.g.
+  // This assert could be considered a bit too strict. In general taking the
+  // address of one past the last element is allowed, e.g.
   //     std::copy(&f[0], &f[N], &dest);
-  // but the assertion will signal this use case. The workaround is:
+  // but here the assertion will signal this use case. The workaround is:
   //     std::copy(&f[0], &f[0] + N, &dest);
-  assert(i < size());
-
+  Expects(i < size());
   return vect_[i];
 }
 
@@ -84,7 +83,7 @@ T basic_fitness_t<T>::operator[](unsigned i) const
 template<class T>
 T &basic_fitness_t<T>::operator[](unsigned i)
 {
-  assert(i < size());
+  Expects(i < size());
   return vect_[i];
 }
 

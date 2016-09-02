@@ -43,45 +43,46 @@ typename strategy<T>::offspring_t base<T>::run(
   const auto &pop(this->pop_);
   const auto &env(pop.env());
 
-  assert(0.0 <= env.p_cross);
-  assert(env.p_cross <= 1.0);
-  assert(0.0 <= env.p_mutation);
-  assert(env.p_mutation <= 1.0);
-  assert(env.brood_recombination);
-  assert(parent.size() >= 2);
+  Expects(0.0 <= env.p_cross && env.p_cross <= 1.0);
+  Expects(0.0 <= env.p_mutation && env.p_mutation <= 1.0);
+  Expects(env.brood_recombination);
+  Expects(parent.size() >= 2);
 
   const auto r1(parent[0]), r2(parent[1]);
 
   if (random::boolean(env.p_cross))
   {
-    auto off(crossover(pop[r1], pop[r2]));
-    ++this->stats_->crossovers;
+    auto cross_and_mutate(
+      [&](const T &p1, const T &p2)
+      {
+        T ret(crossover(p1, p2));
+        ++this->stats_->crossovers;
 
-    // This could be an original contribution of Vita... but it's hard
-    // to be sure.
-    // It remembers of the hereditary repulsion constraint (I guess you could
-    // call it signature repulsion) and seems to:
-    // * maintain diversity during the exploration phase;
-    // * optimize the exploitation phase.
-    while (pop[r1].signature() == off.signature() ||
-           pop[r2].signature() == off.signature())
-      this->stats_->mutations += off.mutation(env.p_mutation, env);
+        // This could be an original contribution of Vita but it's hard to be
+        // sure.
+        // It remembers of the hereditary repulsion constraint (I guess you
+        // could call it signature repulsion) and seems to:
+        // * maintain diversity during the exploration phase;
+        // * optimize the exploitation phase.
+        while (p1.signature() == ret.signature() ||
+               p2.signature() == ret.signature())
+          this->stats_->mutations += ret.mutation(env.p_mutation, env);
+
+        return ret;
+      });
+
+    T off(cross_and_mutate(pop[r1], pop[r2]));
 
     //if (eva_.seen(off))
     //  stats_->mutations += off.mutation(env.p_mutation, env);
 
-    if (*env.brood_recombination > 0)
+    if (env.brood_recombination > 1)
     {
       fitness_t fit_off(this->eva_.fast(off));
 
-      unsigned i(0);
-      do
+      for (unsigned i(1); i < env.brood_recombination; ++i)
       {
-        auto tmp(crossover(pop[r1], pop[r2]));
-
-        while (pop[r1].signature() == tmp.signature() ||
-               pop[r2].signature() == tmp.signature())
-          this->stats_->mutations += tmp.mutation(env.p_mutation, env);
+        T tmp(cross_and_mutate(pop[r1], pop[r2]));
 
         const auto fit_tmp(this->eva_.fast(tmp));
         if (fit_tmp > fit_off)
@@ -89,22 +90,19 @@ typename strategy<T>::offspring_t base<T>::run(
           off     =     tmp;
           fit_off = fit_tmp;
         }
-      } while (++i < *env.brood_recombination);
-
-      this->stats_->crossovers += i;
+      }
     }
 
-    assert(off.debug());
+    Ensures(off.debug());
     return {off};
   }
-  else // !crossover
-  {
-    T off(pop[random::boolean() ? r1 : r2]);
-    this->stats_->mutations += off.mutation(env.p_mutation, env);
 
-    assert(off.debug());
-    return {off};
-  }
+  // !crossover
+  T off(pop[random::boolean() ? r1 : r2]);
+  this->stats_->mutations += off.mutation(env.p_mutation, env);
+
+  Ensures(off.debug());
+  return {off};
 }
 
 ///

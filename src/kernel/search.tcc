@@ -70,7 +70,7 @@ void search<T, ES>::tune_parameters()
     env_.p_cross = dflt.p_cross;
 
   if (!constrained.brood_recombination)
-    env_.brood_recombination = *dflt.brood_recombination;
+    env_.brood_recombination = dflt.brood_recombination;
 
   if (constrained.dss == trilean::unknown)
     env_.dss = trilean::no;

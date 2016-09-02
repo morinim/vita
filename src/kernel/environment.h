@@ -117,17 +117,22 @@ public:  // Data members
   /// This parameter controls the brood recombination/selection level (0 to
   /// turn it off).
   ///
-  /// In nature it is common for organisms to produce many offspring and then
+  /// In nature it's common for organisms to produce many offspring and then
   /// neglect, abort, resorb, eat some of them or allow them to eat each
   /// other. There are many reasons for this behavior ("Kozlowski & Stearns,
-  /// 1989"). This phenomenon is known variously as soft selection, brood
+  /// 1989"). The phenomenon is known variously as soft selection, brood
   /// selection, spontaneous abortion. The "bottom line" of this behaviour in
   /// nature is the reduction of parental resource investment in offspring who
   /// are potentially less fit than others.
   /// \see
   /// "Greedy recombination and genetic search on the space of computer
   /// programs" (Walter Alden Tackett - 1995).
-  boost::optional<unsigned> brood_recombination;
+  /// \note
+  /// - `0` means undefined (auto-tune);
+  //  - `1` is the standard recombination (perform 1 crossover);
+  //  - larger values enable the brood recombination method (more than one
+  //    crossover).
+  unsigned brood_recombination = 0;
 
   /// Size of the tournament to choose the parents from.
   /// Tournament sizes tend to be small relative to the population size. The
