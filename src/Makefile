@@ -174,7 +174,7 @@ check_cppcheck:
 # Without `|| true` make cplains when cpplint found errors.
 .phony:	check_cpplint
 check_cpplint:
-	@../tools/cpplint.py --filter=-whitespace/braces,-whitespace/newline,-build/header_guard,-readability/streams $(FRAMEWORK_SRC) || true
+	@../tools/cpplint.py --filter=-whitespace/braces,-whitespace/newline,-build/header_guard,-build/include_what_you_use,-readability/streams $(FRAMEWORK_SRC) || true
 
 .phony:	clean
 clean:
