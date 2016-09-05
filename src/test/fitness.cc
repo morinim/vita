@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   using namespace vita;
 
-  fitness_t fitness2d(2, fit_tag::components);
-  fitness_t fitness3d(3, fit_tag::components);
-  fitness_t fitness4d(4, fit_tag::components);
+  fitness_t fitness2d(2, copies_of);
+  fitness_t fitness3d(3, copies_of);
+  fitness_t fitness4d(4, copies_of);
 
   fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0}, f3{2.0, 0.0, 0.0};
 
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   BOOST_REQUIRE(f.save(ss));
 
-  fitness_t f2(4, fit_tag::components);
+  fitness_t f2(4, copies_of);
   BOOST_REQUIRE(f2.load(ss));
 
   BOOST_CHECK_EQUAL(f, f2);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(Operators)
   fitness_t x{2.0, 4.0, 8.0};
   fitness_t f1{2.0, 4.0, 8.0};
   fitness_t f2{4.0, 8.0, 16.0};
-  fitness_t inf(3, fit_tag::copies_of,
+  fitness_t inf(3, copies_of,
                 std::numeric_limits<fitness_t::value_type>::infinity());
 
   x += x;

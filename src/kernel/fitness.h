@@ -22,10 +22,10 @@
 
 namespace vita
 {
-///
-/// Tags used in the `basic_fitness_t`'s constructor.
-///
-enum class fit_tag {copies_of, components};
+
+/// Tag used in the `basic_fitness_t`'s constructor.
+struct copies_of_t {};
+constexpr copies_of_t copies_of;
 
 ///
 /// \brief A value assigned to an individual which reflects how well the
@@ -73,12 +73,10 @@ public:
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
 
-  basic_fitness_t(unsigned, fit_tag, T = std::numeric_limits<T>::lowest());
-
-  basic_fitness_t() : basic_fitness_t(1, fit_tag::components) {}
-
+  basic_fitness_t();
   basic_fitness_t(std::initializer_list<T>);
   basic_fitness_t(values_t);
+  basic_fitness_t(unsigned, copies_of_t, T = std::numeric_limits<T>::lowest());
 
   unsigned size() const;
   T operator[](unsigned) const;

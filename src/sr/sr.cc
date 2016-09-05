@@ -93,10 +93,11 @@ void fix_parameters(vita::src_problem *problem)
     }
   }
 
-  if (env.threshold.fitness == fitness_t() && env.threshold.accuracy < 0.0)
+  if (!env.threshold.fitness.size() && env.threshold.accuracy < 0.0)
   {
     if (problem->classification())
     {
+      env.threshold.fitness = fitness_t(1, vita::copies_of);
       env.threshold.accuracy = 0.99;
 
       print.info("Accuracy threshold set to ", env.threshold.accuracy);

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,8 +26,8 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
                                     unsigned ts)
   : eva_(std::move(eva)), cache_(ts)
 {
-  assert(eva_);
-  assert(ts > 6);
+  Expects(eva_);
+  Expects(ts > 6);
 }
 
 ///
@@ -37,8 +37,9 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
 template<class T>
 fitness_t evaluator_proxy<T>::operator()(const T &prg)
 {
-  fitness_t f;
-  if (cache_.find(prg.signature(), &f))
+  fitness_t f(cache_.find(prg.signature()));
+
+  if (f.size())
   {
     assert(cache_.hits());
 
@@ -81,15 +82,15 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
     // effective size and so distinct fitnesses.
 #endif
   }
-  else
+  else  // not found in cache
   {
     f = (*eva_)(prg);
 
     cache_.insert(prg.signature(), f);
 
 #if !defined(NDEBUG)
-    fitness_t f1;
-    assert(cache_.find(prg.signature(), &f1));
+    fitness_t f1(cache_.find(prg.signature()));
+    assert(f1.size());
     assert(almost_equal(f, f1));
 #endif
   }

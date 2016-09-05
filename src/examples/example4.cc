@@ -47,8 +47,7 @@ int main(int argc, char *argv[])
     const vita::i_mep &ind(vita::random::element(pool));
 
     cache.insert(ind.signature(), f);
-
-    cache.find(ind.signature(), &f);
+    cache.find(ind.signature());
 
     if (i % 1000 == 0)
       std::cout << i << '\r' << std::flush;

@@ -18,25 +18,39 @@
 #define      VITA_FITNESS_TCC
 
 ///
-/// \brief Fills the fitness with `n` copy of value `v`
+/// \brief Fills the fitness with `n` copies of value `v`.
 ///
 /// \param[in] n number of components of the fitness.
 /// \param[in] v default value.
 ///
 /// Both Herb Sutter and Scott Meyers recommend to avoid class designs where
 /// a `initializer_list` constructor overload can cause ambiguities to the
-/// programmer. We use tags on the constructor to avoid such situations.
+/// programmer. We use a tag to avoid such situations.
 ///
 /// The tag also helps to clarify the meaning of the other arguments.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(unsigned n, fit_tag, T v) : vect_(n, v)
+basic_fitness_t<T>::basic_fitness_t(unsigned n, copies_of_t, T v)
+  : vect_(n, v)
 {
   Expects(n);
 }
 
 ///
-/// Builds a fitness from a list of values.
+/// \brief Builds an empty fitness values.
+///
+/// \note
+/// This is equivalent to building the object starting from an empty
+//  initializer list.
+///
+template<class T>
+basic_fitness_t<T>::basic_fitness_t() : vect_()
+{
+  Ensures(!size());
+}
+
+///
+/// \brief Builds a fitness from a list of values.
 ///
 template<class T>
 basic_fitness_t<T>::basic_fitness_t(std::initializer_list<T> l) : vect_(l)
@@ -300,7 +314,7 @@ bool basic_fitness_t<T>::load(std::istream &in)
   if (!(in >> s))
     return false;
 
-  basic_fitness_t<T> tmp(s, fit_tag::components);
+  basic_fitness_t<T> tmp(s, copies_of);
 
   for (auto &e : tmp.vect_)
     if (!load_float_from_stream(in, &e))

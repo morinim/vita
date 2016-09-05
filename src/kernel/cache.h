@@ -86,7 +86,8 @@ public:
 
   void insert(const hash_t &, const fitness_t &);
 
-  bool find(const hash_t &, fitness_t *const) const;
+  const fitness_t &find(const hash_t &) const;
+
   unsigned seen(const hash_t &) const;
 
   /// \return number of searches in the hash table.
@@ -110,7 +111,7 @@ private:
   // Private support methods.
   std::size_t index(const hash_t &) const;
 
-  // Private data members
+  // Private data members.
   struct slot
   {
     /// This is used as primary key for access to the table.

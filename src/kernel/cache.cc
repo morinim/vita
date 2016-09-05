@@ -98,7 +98,7 @@ void cache::clear(const hash_t &h)
 }
 
 ///
-/// \brief Resets the `seen` counter
+/// \brief Resets the `seen` counter.
 ///
 #if defined(CLONE_SCALING)
 void cache::reset_seen()
@@ -111,19 +111,17 @@ void cache::reset_seen()
 #endif
 
 ///
-/// \brief Looks for the fitness of an individual in the transposition table
+/// \brief Looks for the fitness of an individual in the transposition table.
 ///
 /// \param[in] h individual's signature to look for.
-/// \param[out] fitness the fitness of the individual (if present).
-/// \return `true` if `h` is found in the transposition table, `false`
-///         otherwise.
+/// \return the fitness of the individual. If the individuals isn't present
+///         returns an empty fitness.
 ///
-bool cache::find(const hash_t &h, fitness_t *const fitness) const
+const fitness_t &cache::find(const hash_t &h) const
 {
   ++probes_;
 
   const slot &s(table_[index(h)]);
-
   const bool ret(seal_ == s.seal && h == s.hash);
 
   if (ret)
@@ -132,10 +130,11 @@ bool cache::find(const hash_t &h, fitness_t *const fitness) const
     ++s.seen;
 #endif
     ++hits_;
-    *fitness = s.fitness;
+    return s.fitness;
   }
 
-  return ret;
+  const static fitness_t empty{};
+  return empty;
 }
 
 ///
