@@ -60,12 +60,6 @@ ifeq ($(CXX), g++)
 endif
 
 OPTIMIZE_FLAGS := -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
-# Link time optimization has some issues with MinGW
-ifeq ($(CXX), g++)
-  ifneq ($(OS), Windows_NT)
-    OPTIMIZE_FLAGS += -flto
-  endif
-endif
 
 # Build type specific flags.
 ifeq ($(TYPE), debug)
