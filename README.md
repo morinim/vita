@@ -34,6 +34,7 @@ Under Windows this means a recent version of MinGW / MSYS (our standard Windows 
 
 ### Optional ###
 
+* [CMake][5]
 * [Boost library][2] for some executables and for testing
 * [Python v3][4] for additional functionalities
 
@@ -111,7 +112,28 @@ code.
 
 With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
 
+### cmake ###
+
+```
+cd vita/src
+mkdir build
+cd build/
+cmake ..
+```
+
+To suggest a specific compiler you can write:
+
+```
+CXX=clang++ cmake ..
+```
+
+You're now ready to build using the traditional `make` system (see above).
+
+All the output files will be stored in subdirectories of `build/` (out of source builds).
+
+
 [1]: http://www.eosdev.it/
 [2]: http://www.boost.org/
 [3]: https://bitbucket.org/morinim/vita
 [4]: http://www.python.org/
+[5]: https://cmake.org/

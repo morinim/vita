@@ -2,13 +2,7 @@
 TYPE := release
 
 # Compiler: clang++, g++
-CXX := g++
-#CLANG := $(shell command -v clang++ >/dev/null; echo $$?)
-#ifeq ($(CLANG), 0)
-#  CXX := clang++
-#else
-#  CXX := g++
-#endif
+# CXX := g++
 
 # -DCLONE_SCALING
 #
