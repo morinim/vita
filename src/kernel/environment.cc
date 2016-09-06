@@ -74,7 +74,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "brood_recombination", brood_recombination);
   set_text(e_environment, "dss", as_integer(dss));
   set_text(e_environment, "tournament_size", tournament_size);
-  set_text(e_environment, "mating_zone", *mate_zone);
+  set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
   set_text(e_environment, "max_gens_wo_imp", g_without_improvement);
   set_text(e_environment, "arl", as_integer(arl));
@@ -281,10 +281,10 @@ bool environment::debug(bool force_defined) const
     return false;
   }
 
-  if (mate_zone && tournament_size && tournament_size > *mate_zone)
+  if (mate_zone && tournament_size && tournament_size > mate_zone)
   {
     print.error("tournament_size (", tournament_size,
-                ") cannot be greater than mate_zone (", *mate_zone, ")");
+                ") cannot be greater than mate_zone (", mate_zone, ")");
     return false;
   }
 

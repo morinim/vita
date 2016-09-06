@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,9 +41,9 @@ typename population<T>::coord strategy<T>::pickup() const
     return {0, vita::random::sup(pop_.individuals(0))};
 
   // If we have multiple layers we cannot be sure that every layer has the
-  // same number of individuals. So the simple (and faster) solution:
+  // same number of individuals. So the simple (and fast) solution:
   //
-  //   const auto l(vita::random::sup(n_layers));
+  //     const auto l(vita::random::sup(n_layers));
   //
   // isn't appropriate.
   std::vector<unsigned> s(n_layers);
@@ -65,9 +65,8 @@ typename population<T>::coord strategy<T>::pickup() const
 template<class T>
 typename population<T>::coord strategy<T>::pickup(unsigned l, double p) const
 {
-  assert(0.0 <= p);
-  assert(p <= 1.0);
-  assert(l < pop_.layers());
+  Expects(l < pop_.layers());
+  Expects(0.0 <= p && p <= 1.0);
 
   if (l > 0 && !vita::random::boolean(p))
     --l;

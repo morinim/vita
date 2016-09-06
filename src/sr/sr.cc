@@ -78,11 +78,11 @@ void fix_parameters(vita::src_problem *problem)
       env.tournament_size = 2;
     }
 
-    if (env.mate_zone && env.tournament_size > *env.mate_zone)
+    if (env.mate_zone && env.tournament_size > env.mate_zone)
     {
       print.warning("Adjusting tournament size (", env.tournament_size, " => ",
-                    *env.mate_zone, ")");
-      env.tournament_size = *env.mate_zone;
+                    env.mate_zone, ")");
+      env.tournament_size = env.mate_zone;
     }
 
     if (env.individuals && env.tournament_size > env.individuals)

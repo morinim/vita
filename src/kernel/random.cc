@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,25 +48,21 @@ void randomize()
 /// \param[in] n
 /// \return the index of the choosen individual.
 ///
-/// Return a random number in the range `[base-width/2, base+width/2] mod n`.
-/// This is like a circular protractor marked from `0` to `n`: starting from
-/// position `base` we want a random number whose distance from `base`
-/// is less than or equal to `width/2`.
-/// If `base` is greater than `n` we take a random starting position on the
-/// protractor.
+/// Return a random number in the interval
+/// `[base - width/2, base + width/2] mod n`.
 ///
 unsigned ring(unsigned base, unsigned width, unsigned n)
 {
-  assert(width);
-  assert(n > 1);
-  assert(base < n);
+  Expects(base < n);
+  Expects(width);
+  Expects(n > 1);
 
-  if (width > n)
-    width = n;
+  if (width >= n)
+    return random::between(0u, n);
 
-  const auto offset(base + n - width / 2);
+  const auto min_val(base + n - width / 2);
 
-  return (offset + random::between(0u, width)) % n;
+  return (min_val + random::between(0u, width)) % n;
 }
 
 }  // namespace random

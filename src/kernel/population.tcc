@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -366,14 +366,14 @@ bool population<T>::save(std::ostream &out) const
 /// \return the coordinates of a random individual "near" `target`.
 ///
 /// Other parameters from the environment:
-/// * mate_zone - to restrict the selection of individuals to a segment of
-///   the population.
+/// * mate_zone - restricts the selection of individuals to a segment of the
+///   population.
 ///
 template<class T>
 typename population<T>::coord pickup(const population<T> &p,
                                      typename population<T>::coord target)
 {
-  return {target.layer, random::ring(target.index, *p.env().mate_zone,
+  return {target.layer, random::ring(target.index, p.env().mate_zone,
                                      p.individuals(target.layer))};
 }
 

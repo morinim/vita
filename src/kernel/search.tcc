@@ -91,7 +91,7 @@ void search<T, ES>::tune_parameters()
     env_.tournament_size = dflt.tournament_size;
 
   if (!constrained.mate_zone)
-    env_.mate_zone = *dflt.mate_zone;
+    env_.mate_zone = dflt.mate_zone;
 
   if (!constrained.generations)
     env_.generations = dflt.generations;

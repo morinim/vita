@@ -16,7 +16,6 @@
 #include <cmath>
 #include <string>
 
-#include <boost/optional.hpp>
 #include "tinyxml2/tinyxml2.h"
 
 #include "kernel/model_measurements.h"
@@ -88,7 +87,7 @@ public:  // Data members
   /// converge quicker but losing diversity.
   trilean elitism = trilean::unknown;
 
-  /// \brief Mutation rate probability
+  /// \brief Mutation rate probability.
   ///
   /// Mutation is one of the principal "search operators" used to transform
   /// programs in the Genetic Programming algorithm. It causes random
@@ -107,7 +106,7 @@ public:  // Data members
   /// * operation_strategy::run.
   double p_mutation = -1.0;
 
-  /// \brief Crossover probability
+  /// \brief Crossover probability.
   ///
   /// \note A negative value means means undefined (auto-tune).
   ///
@@ -155,8 +154,12 @@ public:  // Data members
   /// adiacent. The production of an individual from location `i` is permitted
   /// to involve only parents from `i`'s local neightborhood, where the
   /// neightborhood is defined as all individuals within distance
-  /// `mate_zone/2` of `i` (`0` for panmictic).
-  boost::optional<unsigned> mate_zone;
+  /// `mate_zone/2` of `i`.
+  ///
+  /// \note
+  /// - A value of 0 means auto tune.
+  /// - `std::numeric_limits<unsigned>::max()` disables `mate_zone`.
+  unsigned mate_zone = 0;
 
   /// Maximun number of generations allowed before terminate a run.
   ///
@@ -219,7 +222,7 @@ public:  // Data members
 
   ///
   /// \brief Parameters for the Age-Layered Population Structure (ALPS)
-  ///        paradigm
+  ///        paradigm.
   ///
   /// ALPS is a meta heuristic for overcoming premature convergence by
   /// running multiple instances of a search algorithm in parallel, with each
@@ -253,7 +256,7 @@ public:  // Data members
 
   struct de_parameters
   {
-    /// \brief Weighting factor range (aka differential factor range)
+    /// \brief Weighting factor range (aka differential factor range).
     ///
     /// It has been found recently that selecting the weight from the
     /// interval [0.5, 1.0] randomly for each generation or for each
