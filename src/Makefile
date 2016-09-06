@@ -54,9 +54,9 @@ SYSTEMINCPATH := $(BOOST_INCLUDE) ./third_party/
 
 # -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
 # switches to try from time to time (they gives many false positives).
-WARN_FLAGS := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow
+WARN_FLAGS := -Wpedantic -Wall -Wextra -Winvalid-pch -Wpedantic -Wformat=2 -Wfloat-equal -Wshadow -Wdouble-promotion
 ifeq ($(CXX), g++)
-  WARN_FLAGS += -Wdouble-promotion -Wzero-as-null-pointer-constant
+  WARN_FLAGS += -Wzero-as-null-pointer-constant
 endif
 
 OPTIMIZE_FLAGS := -O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS
@@ -173,10 +173,10 @@ check_cpplint:
 .phony:	clean
 clean:
 	@echo Making clean...
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*~" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name ".*~" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*~" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name ".*~" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.P" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "#*#" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "#*#" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.o" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*.gch" -type f -delete -print
 	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
