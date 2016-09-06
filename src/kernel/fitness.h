@@ -25,7 +25,7 @@ namespace vita
 
 /// Tag used in the `basic_fitness_t`'s constructor.
 struct copies_of_t {};
-constexpr copies_of_t copies_of;
+constexpr copies_of_t copies_of{};
 
 ///
 /// \brief A value assigned to an individual which reflects how well the
