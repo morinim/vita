@@ -23,9 +23,9 @@ namespace vita
 {
 ///
 /// \brief A group of individuals which may interact together (for example by
-///        mating) producing offspring
+///        mating) producing offspring.
 ///
-/// \tparam T the type of the an individual
+/// \tparam T the type of the an individual.
 ///
 /// Typical population size in GP ranges from ten to many thousands. The
 /// population is organized in one or more layers that can interact in
@@ -70,7 +70,7 @@ public:
 
   bool debug() const;
 
-  // Iterators
+  // Iterators.
   template<bool> class base_iterator;
   using const_iterator = base_iterator<true>;
   using iterator = base_iterator<false>;
@@ -78,7 +78,7 @@ public:
   const_iterator begin() const;
   const_iterator end() const;
 
-  // Serialization
+  // Serialization.
   bool load(std::istream &, const environment &);
   bool save(std::ostream &) const;
 
@@ -92,10 +92,6 @@ private:
 #include "kernel/population_iterator.tcc"
 #include "kernel/population.tcc"
 
-///
-/// \example example2.cc
-/// Creates a random population and shows its content.
-///
 }  // namespace vita
 
 #endif  // include guard

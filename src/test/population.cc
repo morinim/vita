@@ -37,9 +37,8 @@ BOOST_AUTO_TEST_CASE(creation)
 
     vita::population<vita::i_mep> pop(env);
 
-    BOOST_REQUIRE_EQUAL(env.individuals, pop.individuals());
-
-    BOOST_REQUIRE(pop.debug());
+    BOOST_TEST(env.individuals == pop.individuals());
+    BOOST_TEST(pop.debug());
   }
 }
 
@@ -67,7 +66,7 @@ BOOST_AUTO_TEST_CASE(iterators)
       ++count;
     }
 
-    BOOST_REQUIRE_EQUAL(count, pop.individuals());
+    BOOST_TEST(count == pop.individuals());
   }
 }
 
@@ -83,22 +82,22 @@ BOOST_AUTO_TEST_CASE(serialization)
     std::stringstream ss;
     vita::population<i_mep> pop1(env);
 
-    BOOST_REQUIRE(pop1.save(ss));
+    BOOST_TEST(pop1.save(ss));
 
     decltype(pop1) pop2(env);
-    BOOST_REQUIRE(pop2.load(ss, env));
-    BOOST_REQUIRE(pop2.debug());
+    BOOST_TEST(pop2.load(ss, env));
+    BOOST_TEST(pop2.debug());
 
-    BOOST_REQUIRE_EQUAL(pop1.layers(), pop2.layers());
-    BOOST_REQUIRE_EQUAL(pop1.individuals(), pop2.individuals());
+    BOOST_TEST(pop1.layers() == pop2.layers());
+    BOOST_TEST(pop1.individuals() == pop2.individuals());
     for (unsigned l(0); l < pop1.layers(); ++l)
     {
-      BOOST_REQUIRE_EQUAL(pop1.individuals(l), pop2.individuals(l));
+      BOOST_TEST(pop1.individuals(l) == pop2.individuals(l));
 
       for (unsigned j(0); j < pop1.individuals(); ++j)
       {
-        const typename vita::population<i_mep>::coord c{l, j};
-        BOOST_CHECK_EQUAL(pop1[c], pop2[c]);
+        const vita::population<i_mep>::coord c{l, j};
+        BOOST_TEST(pop1[c] == pop2[c]);
       }
     }
   }
