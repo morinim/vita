@@ -30,51 +30,6 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 }
 
 ///
-/// \return the index of a random individual.
-///
-template<class T>
-typename population<T>::coord strategy<T>::pickup() const
-{
-  const auto n_layers(pop_.layers());
-
-  if (n_layers == 1)
-    return {0, vita::random::sup(pop_.individuals(0))};
-
-  // If we have multiple layers we cannot be sure that every layer has the
-  // same number of individuals. So the simple (and fast) solution:
-  //
-  //     const auto l(vita::random::sup(n_layers));
-  //
-  // isn't appropriate.
-  std::vector<unsigned> s(n_layers);
-  for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
-    s[l] = pop_.individuals(l);
-
-  std::discrete_distribution<unsigned> dd(s.begin(), s.end());
-  const auto l(dd(vita::random::engine()));
-  return {l, vita::random::sup(s[l])};
-}
-
-///
-/// \param[in] l a layer.
-/// \param[in] p the probability of extracting an individual in layer `l`
-///              (`1 - p` is the probability of extracting an individual
-///              in layer `l-1`).
-/// \return the coordinates of a random individual in layer `l` or `l-1`.
-///
-template<class T>
-typename population<T>::coord strategy<T>::pickup(unsigned l, double p) const
-{
-  Expects(l < pop_.layers());
-  Expects(0.0 <= p && p <= 1.0);
-
-  if (l > 0 && !vita::random::boolean(p))
-    --l;
-
-  return {l, vita::random::sup(pop_.individuals(l))};
-}
-
-///
 /// \return a collection of coordinates of individuals ordered in descending
 ///         fitness.
 ///
@@ -96,7 +51,7 @@ typename strategy<T>::parents_t tournament<T>::run()
   const auto rounds(pop.env().tournament_size);
   assert(rounds);
 
-  const auto target(this->pickup());
+  const auto target(pickup(pop));
   typename strategy<T>::parents_t ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
@@ -128,6 +83,25 @@ typename strategy<T>::parents_t tournament<T>::run()
 #endif
 
   return ret;
+}
+
+///
+/// \param[in] l a layer.
+/// \param[in] p the probability of extracting an individual in layer `l`
+///              (`1 - p` is the probability of extracting an individual
+///              in layer `l-1`).
+/// \return the coordinates of a random individual in layer `l` or `l-1`.
+///
+template<class T>
+typename population<T>::coord alps<T>::pickup(unsigned l, double p) const
+{
+  Expects(l < this->pop_.layers());
+  Expects(0.0 <= p && p <= 1.0);
+
+  if (l > 0 && !vita::random::boolean(p))
+    --l;
+
+  return {l, vita::random::sup(this->pop_.individuals(l))};
 }
 
 ///
@@ -216,7 +190,7 @@ typename strategy<T>::parents_t pareto<T>::run()
 
   std::vector<unsigned> pool(rounds);
   for (unsigned i(0); i < rounds; ++i)
-    pool.push_back(this->pickup());
+    pool.push_back(pickup(pop));
 
   assert(pool.size());
 
@@ -291,13 +265,12 @@ template<class T>
 typename strategy<T>::parents_t random<T>::run()
 {
   const auto size(this->pop_.env().tournament_size);
-
   assert(size);
   typename strategy<T>::parents_t ret(size);
 
   for (auto &v : ret)
-    v = this->pickup();
+    v = pickup(this->pop_);
 
   return ret;
 }
-#endif  // Include guard
+#endif  // include guard

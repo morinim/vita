@@ -360,10 +360,38 @@ bool population<T>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] p the population (we extract the coordinates of an individual
-///              of `p`).
+/// \param[in] p a population.
+/// \return the index of a random individual in `p`.
+/// \related population.
+///
+template<class T>
+typename population<T>::coord pickup(const population<T> &p)
+{
+  const auto n_layers(p.layers());
+
+  if (n_layers == 1)
+    return {0, random::sup(p.individuals(0))};
+
+  // With multiple layers we cannot be sure that every layer has the same
+  // number of individuals. So the simple (and fast) solution:
+  //
+  //     const auto l(random::sup(n_layers));
+  //
+  // isn't appropriate.
+  std::vector<unsigned> s(n_layers);
+  for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
+    s[l] = p.individuals(l);
+
+  std::discrete_distribution<unsigned> dd(s.begin(), s.end());
+  const auto l(dd(random::engine()));
+  return {l, random::sup(s[l])};
+}
+
+///
+/// \param[in] p a population.
 /// \param[in] target coordinates of a reference individual.
 /// \return the coordinates of a random individual "near" `target`.
+/// \related population.
 ///
 /// Other parameters from the environment:
 /// * mate_zone - restricts the selection of individuals to a segment of the

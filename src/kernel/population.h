@@ -89,6 +89,11 @@ private:
   std::vector<unsigned> allowed_;
 };
 
+template<class T> typename population<T>::coord pickup();
+template<class T> typename population<T>::coord pickup(
+  const population<T> &, typename population<T>::coord);
+
+
 #include "kernel/population_iterator.tcc"
 #include "kernel/population.tcc"
 

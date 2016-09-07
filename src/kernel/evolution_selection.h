@@ -40,10 +40,6 @@ public:
   strategy(const population<T> &, evaluator<T> &, const summary<T> &);
 
 protected:
-  typename population<T>::coord pickup() const;
-  typename population<T>::coord pickup(unsigned, double = 1.0) const;
-
-protected:
   const population<T> &pop_;
   evaluator<T>        &eva_;
   const summary<T>    &sum_;
@@ -90,6 +86,9 @@ public:
   using alps::strategy::strategy;
 
   typename strategy<T>::parents_t run();
+
+private:
+  typename population<T>::coord pickup(unsigned, double = 1.0) const;
 };
 
 ///
