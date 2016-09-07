@@ -157,8 +157,8 @@ public:  // Data members
   /// `mate_zone/2` of `i`.
   ///
   /// \note
-  /// - A value of 0 means auto tune.
-  /// - `std::numeric_limits<unsigned>::max()` disables `mate_zone`.
+  /// - `0` means auto-tune.
+  /// - `std::numeric_limits<unsigned>::max()` disables the scheme.
   unsigned mate_zone = 0;
 
   /// Maximun number of generations allowed before terminate a run.

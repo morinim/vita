@@ -75,11 +75,11 @@ typename population<T>::coord strategy<T>::pickup(unsigned l, double p) const
 }
 
 ///
-/// \return a vector of coordinates of individuals ordered in descending
+/// \return a collection of coordinates of individuals ordered in descending
 ///         fitness.
 ///
 /// Tournament selection works by selecting a number of individuals from the
-/// population at random, a tournament, and then choosing only the best
+/// population at random (a tournament,)and then choosing only the best
 /// of those individuals.
 /// Recall that better individuals have highter fitnesses.
 ///
@@ -94,14 +94,14 @@ typename strategy<T>::parents_t tournament<T>::run()
   const auto &pop(this->pop_);
 
   const auto rounds(pop.env().tournament_size);
-  const auto target(this->pickup());
-
   assert(rounds);
+
+  const auto target(this->pickup());
   typename strategy<T>::parents_t ret(rounds);
 
   // This is the inner loop of an insertion sort algorithm. It is simple,
   // fast (if rounds is small) and doesn't perform too much comparisons.
-  // DO NOT USE std::sort it's way slower.
+  // DO NOT USE `std::sort` it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {
     const auto new_coord(pickup(pop, target));

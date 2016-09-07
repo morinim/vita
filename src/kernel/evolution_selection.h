@@ -39,11 +39,11 @@ public:
 
   strategy(const population<T> &, evaluator<T> &, const summary<T> &);
 
-protected:  // Support methods
+protected:
   typename population<T>::coord pickup() const;
   typename population<T>::coord pickup(unsigned, double = 1.0) const;
 
-protected:  // Data members
+protected:
   const population<T> &pop_;
   evaluator<T>        &eva_;
   const summary<T>    &sum_;
@@ -110,7 +110,7 @@ private:
 };
 
 ///
-/// \brief Pick a set of random individuals
+/// \brief Pick a set of random individuals.
 ///
 /// Very simple selection strategy: pick a set of random individuals. The
 /// environment::tournamnet_size property controls the cardinality of the

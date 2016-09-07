@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015, 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,7 +50,7 @@ public:
   {
   }
 
-  /// \brief Prefix increment operator
+  /// \brief Prefix increment operator.
   /// \return iterator to the next individual.
   /// \warning
   /// Advancing past the `end()` iterator results in undefined behaviour.
@@ -71,7 +71,7 @@ public:
     return *this;
   }
 
-  /// \brief Postfix increment operator
+  /// \brief Postfix increment operator.
   /// \return iterator to the current individual.
   base_iterator operator++(int)
   {
