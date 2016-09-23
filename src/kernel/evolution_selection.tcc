@@ -265,6 +265,7 @@ template<class T>
 typename strategy<T>::parents_t random<T>::run()
 {
   const auto size(this->pop_.env().tournament_size);
+
   assert(size);
   typename strategy<T>::parents_t ret(size);
 

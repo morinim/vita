@@ -29,7 +29,7 @@ namespace selection {
 /// evolution is the context.
 ///
 /// \see
-/// * <http://en.wikipedia.org/wiki/Strategy_pattern>
+/// - <http://en.wikipedia.org/wiki/Strategy_pattern>
 ///
 template<class T>
 class strategy

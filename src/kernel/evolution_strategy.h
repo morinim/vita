@@ -20,7 +20,7 @@
 namespace vita
 {
 ///
-/// \brief A class to specify the evolution steps
+/// \brief A class to specify the evolution steps.
 ///
 /// \tparam T type of individual.
 /// \tparam SS class containing the selection strategy.

@@ -19,7 +19,8 @@
 namespace vita
 {
 ///
-/// \brief The interface of a evolutionary program's problem
+/// \brief Aggregates the problem-related data needed by an evolutionary
+///        program.
 ///
 /// \note
 /// What a horror! Public data members... please read the coding style

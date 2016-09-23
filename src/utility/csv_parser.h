@@ -28,18 +28,6 @@ namespace vita
 ///
 /// \warning The class doesn't support multi-line fields.
 ///
-/// \warning
-/// Usually, in C++, a fluent interface returns a **reference**.
-/// Here we return a **copy** of `this` object. The design decision is due to
-/// the fact that a `csv_parser' is a sort of Python generator and tends to
-/// be used in for-loops.
-/// Users often write:
-///     for (auto record : csv_parser(f).filter_hook(filter))
-/// but that's broken (it only works if `filter_hook` returns by value).
-/// `csv_parser` is a lighweight parser and this shouldn't be a performance
-/// concern.
-/// See <http://stackoverflow.com/q/10593686/3235496>.
-///
 class csv_parser
 {
 public:
@@ -77,7 +65,31 @@ public:
   ///
   /// \note A filter function returns `true` for records to be keep.
   ///
-  csv_parser filter_hook(filter_hook_t filter)
+  csv_parser &filter_hook(filter_hook_t filter) &
+  {
+    filter_hook_ = filter;
+    return *this;
+  }
+
+  /// \param[in] filter a filter function for CSV records.
+  /// \return a reference to `this` object (fluent interface).
+  ///
+  /// \note A filter function returns `true` for records to be keep.
+  ///
+  /// \warning
+  /// Usually, in C++, a fluent interface returns a **reference**.
+  /// Here we return a **copy** of `this` object. The design decision is due to
+  /// the fact that a `csv_parser' is a sort of Python generator and tends to
+  /// be used in for-loops.
+  /// Users often write:
+  ///     for (auto record : csv_parser(f).filter_hook(filter))
+  /// but that's broken (it only works if `filter_hook` returns by value).
+  /// `csv_parser` is a lighweight parser and this shouldn't be a performance
+  /// concern.
+  ///
+  /// \see <http://stackoverflow.com/q/10593686/3235496>.
+  ///
+  csv_parser filter_hook(filter_hook_t filter) &&
   {
     filter_hook_ = filter;
     return *this;
