@@ -29,6 +29,7 @@ double distance(cell_coord c1, cell_coord c2)
          std::max(c1.second, c2.second) - std::min(c1.second, c2.second);
 }
 
+// Encodes the i-th move of a path.
 class move : public vita::ga::integer
 {
 public:
@@ -158,7 +159,7 @@ int main()
     "     *   "
   };
 
-  const std::size_t sup_length(m.size() * m[0].size() / 2);
+  const std::size_t sup_length(m.size() * m[0].size());
 
   vita::problem prob;
 
