@@ -287,9 +287,9 @@ bool operator<=(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 template<class T>
 bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 {
-  bool one_better(false);
+  bool one_better(lhs.size() && !rhs.size());
 
-  const auto n(lhs.size());
+  const auto n(std::min(lhs.size(), rhs.size()));
   for (unsigned i(0); i < n; ++i)
     if (lhs[i] > rhs[i])
       one_better = true;
