@@ -19,7 +19,7 @@
 namespace vita
 {
 ///
-/// \brief An individual optimized for genetic algorithms.
+/// \brief An individual optimized for standard genetic algorithms.
 ///
 class i_ga : public individual<i_ga>
 {
@@ -27,16 +27,17 @@ public:
   i_ga() = default;
   explicit i_ga(const environment &);
 
-  // Visualization/output methods
+  // Visualization/output methods.
   void graphviz(std::ostream &) const;
   std::ostream &in_line(std::ostream &) const;
 
-  // Recombination operators
+  // Recombination operators.
   unsigned mutation(double, const environment &);
 
   // Iterators.
-  using const_iterator = std::vector<gene>::const_iterator;
-  using iterator = std::vector<gene>::iterator;
+  using genome_t = std::vector<gene>;
+  using const_iterator = genome_t::const_iterator;
+  using iterator = genome_t::iterator;
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -65,7 +66,7 @@ public:
   }
 
   ///
-  /// \return `true` if the individual is empty, `0` otherwise.
+  /// \return `true` if the individual is empty, `false` otherwise.
   ///
   bool empty() const { return size() == 0; }
 
@@ -104,7 +105,7 @@ private:
 
   // This is the genome: the entire collection of genes (the entirety of an
   // organism's hereditary information).
-  std::vector<gene> genome_;
+  genome_t genome_;
 };  // class i_ga
 
 // Recombination operators.

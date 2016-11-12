@@ -66,7 +66,7 @@ public:
   i_de &operator=(const std::vector<double> &);
 
   ///
-  /// \return `true` if the individual is empty, `0` otherwise.
+  /// \return `true` if the individual is empty, `false` otherwise.
   ///
   bool empty() const { return !parameters(); }
 
