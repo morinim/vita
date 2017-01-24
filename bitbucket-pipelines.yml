@@ -10,7 +10,7 @@ pipelines:
     - step:
         script:
           - apt-get update
-          - apt-get -y install cmake libboost-all-dev
+          - apt-get -y install cmake libboost
           - cd src/
           - mkdir build
           - cd build/
