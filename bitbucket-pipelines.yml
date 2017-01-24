@@ -3,14 +3,12 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: gcc:6.1
+image: debian:testing
 
 pipelines:
   default:
     - step:
         script:
-          - apt-get update
-          - apt-get -y install cmake
           - cd src/
           - mkdir build
           - cd build/
