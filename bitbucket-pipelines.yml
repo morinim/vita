@@ -10,7 +10,7 @@ pipelines:
     - step:
         script:
           - apt-get update
-          - apt-get -y install cmake        
+          - apt-get -y install build-essential
           - cd src/
           - mkdir build
           - cd build/
