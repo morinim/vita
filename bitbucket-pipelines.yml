@@ -9,6 +9,7 @@ pipelines:
   default:
     - step:
         script:
+          - apt-get -y install cmake libboost-all-dev
           - cd src/
           - mkdir build
           - cd build/
