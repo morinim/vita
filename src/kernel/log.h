@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,11 +50,7 @@ public:
   template<class... Args>
   void fatal(Args &&... args) const
   {
-    if (level_ >= L_FATAL)
-    {
-      std::cerr << "[FATAL] ";
-      to_<std::cerr>(std::forward<Args>(args)...);
-    }
+    print_if_(std::cerr, L_FATAL, "FATAL", std::forward<Args>(args)...);
   }
 
 #if defined(NDEBUG)
@@ -63,60 +59,54 @@ public:
   template<class... Args>
   void debug(Args &&... args) const
   {
-    if (level_ >= L_DEBUG)
-    {
-      std::cout << "[DEBUG] ";
-      to_<std::cout>(std::forward<Args>(args)...);
-    }
+    print_if_(std::cout, L_DEBUG, "DEBUG", std::forward<Args>(args)...);
   }
 #endif
 
   template<class... Args>
   void error(Args &&... args) const
   {
-    if (level_ >= L_ERROR)
-    {
-      std::cerr << "[ERROR] ";
-      to_<std::cerr>(std::forward<Args>(args)...);
-    }
+    print_if_(std::cerr, L_ERROR, "ERROR", std::forward<Args>(args)...);
   }
 
   template<class... Args>
   void info(Args &&... args) const
   {
-    if (level_ >= L_INFO)
-    {
-      std::cout << "[INFO] ";
-      to_<std::cout>(std::forward<Args>(args)...);
-    }
+    print_if_(std::cout, L_INFO, "INFO", std::forward<Args>(args)...);
   }
 
   template<class... Args>
   void output(Args &&... args) const
   {
-    if (level_ >= L_OUTPUT)
-      to_<std::cout>(std::forward<Args>(args)...);
+    print_if_(std::cout, L_OUTPUT, "", std::forward<Args>(args)...);
   }
 
   template<class... Args>
   void warning(Args &&... args) const
   {
-    if (level_ >= L_WARNING)
-    {
-      std::cout << "[WARNING] ";
-      to_<std::cout>(std::forward<Args>(args)...);
-    }
+    print_if_(std::cout, L_WARNING, "WARNING", std::forward<Args>(args)...);
   }
 
 private:
-  template<std::ostream &Out, class Head, class... Tail>
-  void to_(Head &&head, Tail &&... tail) const
+  template<class... Args>
+  void print_if_(std::ostream &out, level l, const std::string &tag,
+                 Args &&... args) const
   {
-    Out << std::forward<Head>(head);
-    to_<Out>(std::forward<Tail>(tail)...);
+    if (level_ >= l)
+    {
+      if (!tag.empty())
+        out << "[" << tag << "] ";
+      to_(out, std::forward<Args>(args)...);
+    }
   }
-  template<std::ostream &Out>
-  void to_() const { Out << '\n'; }
+
+  template<class Head, class... Tail>
+  void to_(std::ostream &out, Head &&head, Tail &&... tail) const
+  {
+    out << std::forward<Head>(head);
+    to_(out, std::forward<Tail>(tail)...);
+  }
+  void to_(std::ostream &out) const { out << '\n'; }
 
   // Current log level.
   level level_;
