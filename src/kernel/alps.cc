@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,13 +17,13 @@
 namespace vita {
 namespace alps {
 ///
-/// \param[in] l a layer.
-/// \param[in] age_gap see environment::age_gap data member.
-/// \return the maximum allowed age for an individual in layer `l`.
+/// \param[in] l a layer
+/// \param[in] age_gap see environment::age_gap data member
+/// \return the maximum allowed age for an individual in layer `l`
 ///
 unsigned max_age(unsigned l, unsigned age_gap)
 {
-  // This is a polynomial aging scheme.
+  // A polynomial aging scheme.
   switch (l)
   {
   case 0:   return age_gap;
@@ -66,23 +66,6 @@ unsigned max_age(unsigned l, unsigned age_gap)
   //   num1 = num3;
   // }
   // return num2;
-}
-
-///
-/// \param[in] l a layer.
-/// \param[in] n total number of layers for the current population.
-/// \param[in] age_gap see environment::age_gap data member.
-/// \return the maximum allowed age for an individual in layer `l`. For
-///         individuals in the last layer there isn't a age limit.
-///
-unsigned max_age(unsigned l, unsigned n, unsigned age_gap)
-{
-  assert(l < n);
-
-  if (l + 1 == n)
-    return std::numeric_limits<unsigned>::max();
-
-  return max_age(l, age_gap);
 }
 
 }  // namespace alps

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -139,16 +139,15 @@ void tournament<T>::run(
 }
 
 ///
-/// \param[in] l a layer.
-/// \return the maximum allowed age for an individual in layer `l`.
+/// \param[in] l a layer
+/// \return the maximum allowed age for an individual in layer `l`
 ///
 /// This is just a convenience method to save some keystroke.
 ///
 template<class T>
-unsigned alps<T>::max_age(unsigned l) const
+unsigned alps<T>::allowed_age(unsigned l) const
 {
-  return vita::alps::max_age(l, this->pop_.layers(),
-                             this->pop_.env().alps.age_gap);
+  return vita::alps::allowed_age(this->pop_, l);
 }
 
 ///
@@ -198,7 +197,7 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
   }
 
   // Layer is full, can we replace an existing individual?
-  const auto m_age(max_age(layer));
+  const auto m_age(allowed_age(layer));
 
   // Well, let's see if the worst individual we can find with a tournament...
   coord c_worst{layer, random::sup(p.individuals(layer))};

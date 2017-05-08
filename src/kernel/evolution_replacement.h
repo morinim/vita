@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -121,8 +121,8 @@ public:
 
   void try_move_up_layer(unsigned);
 
-private:  // Private support methods
-  unsigned max_age(unsigned) const;
+private:
+  unsigned allowed_age(unsigned) const;
   bool try_add_to_layer(unsigned, const T &);
 };
 

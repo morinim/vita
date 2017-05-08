@@ -1,8 +1,8 @@
 /**
  *  \file
- *  \remark This file is part of VITA.
+ *  \remark This file is part of VITA
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #define      VITA_EVOLUTION_STRATEGY_TCC
 
 ///
-/// \param[out] env environemnt
+/// \param[out] env environment
 /// \return a strategy-specific environment
 ///
 /// For standard evolution we only need one layer.
@@ -31,7 +31,7 @@ environment std_es<T>::shape(environment env)
 }
 
 ///
-/// \return `true` when evolution must be stopped.
+/// \return `true` when evolution must be stopped
 ///
 /// We use an accelerated stop condition when:
 /// - all the individuals have the same fitness;
@@ -65,7 +65,8 @@ environment basic_alps_es<T, CS>::shape(environment env)
 }
 
 ///
-/// Increments population's age and checks if it's time to add a new layer.
+/// \brief Increments population's age and checks if it's time to add a new
+///        layer
 ///
 template<class T, template<class> class CS>
 void basic_alps_es<T, CS>::post_bookkeeping()
@@ -105,10 +106,10 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 }
 
 ///
-/// \param[in] last_run last run processed.
-/// \param[in] current_run the current run.
+/// \breif Saves working / statistical informations about layer status
 ///
-/// Saves working / statistical informations about layer status.
+/// \param[in] last_run last run processed
+/// \param[in] current_run the current run
 ///
 /// Parameters from the environment:
 /// * env.stat.layers if `false` the method will not write any data.
@@ -128,12 +129,12 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
       if (last_run != current_run)
         f_lys << "\n\n";
 
-      const auto layers(pop.layers());
-      for (auto l(decltype(layers){0}); l < layers; ++l)
+      auto layers(pop.layers());
+      for (decltype(layers) l(0); l < layers; ++l)
       {
         f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
 
-        const auto ma(alps::max_age(l, layers, env.alps.age_gap));
+        const auto ma(alps::allowed_age(pop, l));
         if (ma == std::numeric_limits<decltype(ma)>::max())
           f_lys << "inf";
         else

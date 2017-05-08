@@ -1,8 +1,8 @@
 /**
  *  \file
- *  \remark This file is part of VITA.
+ *  \remark This file is part of VITA
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,12 +20,13 @@
 namespace vita
 {
 ///
-/// \brief A class to specify the evolution steps.
+/// \brief Define the skeleton of the evolution, deferring some steps to client
+///        subclasses
 ///
-/// \tparam T type of individual.
-/// \tparam SS class containing the selection strategy.
-/// \tparam CS class containing the recombination strategy.
-/// \tparam RS class containing the replacement strategy.
+/// \tparam T type of individual
+/// \tparam SS class containing the selection strategy
+/// \tparam CS class containing the recombination strategy
+/// \tparam RS class containing the replacement strategy
 ///
 /// Selection, recombination and replacement are the main steps of evolution.
 /// In the literature a lot of different algorithms are described and many of
@@ -52,11 +53,11 @@ public:
     Expects(s);
   }
 
-  /// Evolution strategy specific log function (it's called by the
+  /// Evolution strategy specific log function (it's called via the
   /// `evolution::log` method).
   void log(unsigned, unsigned) const {}
 
-  /// Set strategy specific parameters.
+  /// Sets strategy-specific parameters.
   static environment shape(environment env) { return env; }
 
   /// Initial setup before evolution starts.
@@ -86,7 +87,7 @@ protected:
 };
 
 ///
-/// \brief ALPS evolution strategy.
+/// \brief ALPS evolution strategy
 ///
 /// With ALPS, several instances of a search algorithm are run in parallel,
 /// each in its own age-layer, and the age of solutions is kept track of. The
@@ -191,4 +192,4 @@ public:
 #include "kernel/evolution_strategy.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
