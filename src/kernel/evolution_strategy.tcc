@@ -1,8 +1,8 @@
 /**
  *  \file
- *  \remark This file is part of VITA
+ *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,9 +19,9 @@
 
 ///
 /// \param[out] env environment
-/// \return a strategy-specific environment
+/// \return         a strategy-specific environment
 ///
-/// For standard evolution we only need one layer.
+/// \remark For standard evolution we only need one layer.
 ///
 template<class T>
 environment std_es<T>::shape(environment env)
@@ -53,9 +53,9 @@ bool std_es<T>::stop_condition() const
 
 ///
 /// \param[out] env environemnt
-/// \return a strategy-specific environment
+/// \return         a strategy-specific environment
 ///
-/// ALPS need more than one layer.
+/// \remark ALPS need more than one layer.
 ///
 template<class T, template<class> class CS>
 environment basic_alps_es<T, CS>::shape(environment env)
@@ -65,8 +65,7 @@ environment basic_alps_es<T, CS>::shape(environment env)
 }
 
 ///
-/// \brief Increments population's age and checks if it's time to add a new
-///        layer
+/// Increments population's age and checks if it's time to add a new layer.
 ///
 template<class T, template<class> class CS>
 void basic_alps_es<T, CS>::post_bookkeeping()
@@ -106,10 +105,10 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 }
 
 ///
-/// \breif Saves working / statistical informations about layer status
+/// Saves working / statistical informations about layer status.
 ///
-/// \param[in] last_run last run processed
-/// \param[in] current_run the current run
+/// \param[in] last_run    last run processed
+/// \param[in] current_run current run
 ///
 /// Parameters from the environment:
 /// * env.stat.layers if `false` the method will not write any data.

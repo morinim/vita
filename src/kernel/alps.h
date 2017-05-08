@@ -18,18 +18,17 @@
 namespace vita
 {
 ///
-/// \brief contains some support functions for the ALPS algorithm
+/// Contains some support functions for the ALPS algorithm.
 ///
 namespace alps
 {
 unsigned max_age(unsigned, unsigned);
 
 ///
-/// \param[in] l a layer
-/// \param[in] n total number of layers for the current population
-/// \param[in] age_gap see environment::age_gap data member
+/// \param[in] p the population.
+/// \param[in] l a layer of the population.
 /// \return the maximum allowed age for an individual in layer `l`. For
-///         individuals in the last layer there isn't a age limit
+///         individuals in the last layer there isn't a age limit.
 ///
 template<class T>
 unsigned allowed_age(const population<T> &pop, unsigned l)

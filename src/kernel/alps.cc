@@ -17,9 +17,9 @@
 namespace vita {
 namespace alps {
 ///
-/// \param[in] l a layer
-/// \param[in] age_gap see environment::age_gap data member
-/// \return the maximum allowed age for an individual in layer `l`
+/// \param[in] l a layer.
+/// \param[in] age_gap see environment::age_gap data member.
+/// \return the maximum allowed age for an individual in layer `l`.
 ///
 unsigned max_age(unsigned l, unsigned age_gap)
 {

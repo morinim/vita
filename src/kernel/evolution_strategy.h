@@ -1,8 +1,8 @@
 /**
  *  \file
- *  \remark This file is part of VITA
+ *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,10 +20,10 @@
 namespace vita
 {
 ///
-/// \brief Define the skeleton of the evolution, deferring some steps to client
-///        subclasses
+/// Defines the skeleton of the evolution, deferring some steps to client
+/// subclasses.
 ///
-/// \tparam T type of individual
+/// \tparam T  type of individual
 /// \tparam SS class containing the selection strategy
 /// \tparam CS class containing the recombination strategy
 /// \tparam RS class containing the replacement strategy
@@ -53,7 +53,7 @@ public:
     Expects(s);
   }
 
-  /// Evolution strategy specific log function (it's called via the
+  /// Evolution strategy specific log function (it's called by the
   /// `evolution::log` method).
   void log(unsigned, unsigned) const {}
 
@@ -87,7 +87,7 @@ protected:
 };
 
 ///
-/// \brief ALPS evolution strategy
+/// Basic ALPS strategy.
 ///
 /// With ALPS, several instances of a search algorithm are run in parallel,
 /// each in its own age-layer, and the age of solutions is kept track of. The
@@ -147,7 +147,7 @@ public:
 template<class T> using alps_es = basic_alps_es<T, recombination::base>;
 
 ///
-/// \brief Standard evolution strategy
+/// Standard evolution strategy.
 ///
 template<class T>
 class std_es : public evolution_strategy<T,
@@ -164,7 +164,7 @@ public:
 };
 
 ///
-/// \brief Differential evolution strategy
+/// Differential evolution strategy.
 ///
 template<class T>
 class de_es : public evolution_strategy<T,
@@ -177,7 +177,7 @@ public:
 };
 
 ///
-/// \brief Differential evolution strategy enhanced with ALPS
+/// Differential evolution strategy enhanced with ALPS.
 ///
 /// This is similar to the de_es evolution strategy but more suitable for
 /// long/hard searches.
