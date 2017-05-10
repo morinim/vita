@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(creation)
   }
 }
 
-BOOST_AUTO_TEST_CASE(iterators)
+BOOST_AUTO_TEST_CASE(layers_and_indeividuals)
 {
   for (unsigned i(0); i < 100; ++i)
   {
@@ -55,16 +55,16 @@ BOOST_AUTO_TEST_CASE(iterators)
     {
       const auto n(vita::random::between(0u, pop.individuals(l)));
 
+      const auto before(pop.individuals(l));
+
       for (unsigned j(0); j < n; ++j)
         pop.pop_from_layer(l);
+
+      BOOST_TEST(pop.individuals(l) == before - n);
     }
 
-    unsigned count(0);
-    for (const auto &ind : pop)
-    {
-      std::ignore = ind;
-      ++count;
-    }
+    unsigned count(std::accumulate(pop.begin(), pop.end(), 0,
+                                   [](auto acc, auto) { return ++acc; }));
 
     BOOST_TEST(count == pop.individuals());
   }
