@@ -123,32 +123,32 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
   {
     const std::string n_lys(env.stat.dir + "/" + env.stat.lys_name);
     std::ofstream f_lys(n_lys, std::ios_base::app);
-    if (f_lys.good())
+    if (!f_lys.good())
+      return;
+
+    if (last_run != current_run)
+      f_lys << "\n\n";
+
+    auto layers(pop.layers());
+    for (decltype(layers) l(0); l < layers; ++l)
     {
-      if (last_run != current_run)
-        f_lys << "\n\n";
+      f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
 
-      auto layers(pop.layers());
-      for (decltype(layers) l(0); l < layers; ++l)
-      {
-        f_lys << current_run << ' ' << this->sum_->gen << ' ' << l << " <";
+      const auto ma(alps::allowed_age(pop, l));
+      if (ma == std::numeric_limits<decltype(ma)>::max())
+        f_lys << "inf";
+      else
+        f_lys << ma + 1;
 
-        const auto ma(alps::allowed_age(pop, l));
-        if (ma == std::numeric_limits<decltype(ma)>::max())
-          f_lys << "inf";
-        else
-          f_lys << ma + 1;
-
-        f_lys << ' ' << this->sum_->az.age_dist(l).mean()
-              << ' ' << this->sum_->az.age_dist(l).standard_deviation()
-              << ' ' << static_cast<unsigned>(this->sum_->az.age_dist(l).min())
-              << '-' << static_cast<unsigned>(this->sum_->az.age_dist(l).max())
-              << ' ' << this->sum_->az.fit_dist(l).mean()
-              << ' ' << this->sum_->az.fit_dist(l).standard_deviation()
-              << ' ' << this->sum_->az.fit_dist(l).min()
-              << '-' << this->sum_->az.fit_dist(l).max()
-              << ' ' << pop.individuals(l) << '\n';
-      }
+      f_lys << ' ' << this->sum_->az.age_dist(l).mean()
+            << ' ' << this->sum_->az.age_dist(l).standard_deviation()
+            << ' ' << static_cast<unsigned>(this->sum_->az.age_dist(l).min())
+            << '-' << static_cast<unsigned>(this->sum_->az.age_dist(l).max())
+            << ' ' << this->sum_->az.fit_dist(l).mean()
+            << ' ' << this->sum_->az.fit_dist(l).standard_deviation()
+            << ' ' << this->sum_->az.fit_dist(l).min()
+            << '-' << this->sum_->az.fit_dist(l).max()
+            << ' ' << pop.individuals(l) << '\n';
     }
   }
 }

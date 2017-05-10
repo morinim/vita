@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,14 +18,15 @@
 #define      VITA_POPULATION_ITERATOR_TCC
 
 ///
-/// \brief Iterator for a population.
+/// Iterator for a population.
 ///
 /// `population<T>::base_iterator` / `population<T>::begin()` /
 /// `population<T>::end()` are general and clear, so they should by the
 /// preferred way to scan / perform an action over every individual of a
 /// population.
-/// For performance critical code accessing individuals via the `operator[]`
-/// could give better results.
+///
+/// \remark For performance critical code accessing individuals via the
+///         `operator[]` could give better results.
 ///
 template<class T>
 template<bool is_const>
@@ -43,17 +44,17 @@ public:
   using ref = std::conditional_t<is_const, const_reference, reference>;
   using pop = std::conditional_t<is_const, const population, population>;
 
-  /// \param[in] p a population.
-  /// \param[in] begin `false` for the `end()` iterator.
+  /// \param[in] p     a population
+  /// \param[in] begin `false` for the `end()` iterator
   base_iterator(pop &p, bool begin)
     : pop_(&p), layer_(begin ? 0 : p.layers()), index_(0)
   {
   }
 
-  /// \brief Prefix increment operator.
-  /// \return iterator to the next individual.
-  /// \warning
-  /// Advancing past the `end()` iterator results in undefined behaviour.
+  /// Prefix increment operator.
+  /// \return iterator to the next individual
+  /// \warning Advancing past the `end()` iterator results in undefined
+  ///          behaviour.
   base_iterator &operator++()
   {
     if (++index_ >= pop_->individuals(layer_))
@@ -71,8 +72,8 @@ public:
     return *this;
   }
 
-  /// \brief Postfix increment operator.
-  /// \return iterator to the current individual.
+  /// Postfix increment operator.
+  /// \return iterator to the current individual
   base_iterator operator++(int)
   {
     base_iterator tmp(*this);
@@ -80,9 +81,8 @@ public:
     return tmp;
   }
 
-  /// \param[in] rhs second term of comparison.
-  ///
-  /// Returns `true` if iterators point to correspondant individuals.
+  /// \param[in] rhs second term of comparison
+  /// \return        `true` if iterators point to correspondant individuals
   bool operator==(const base_iterator &rhs) const
   {
     return pop_ == rhs.pop_ && layer_ == rhs.layer_ && index_ == rhs.index_;
@@ -98,13 +98,13 @@ public:
     return layer_;
   }
 
-  /// \return reference to the current individual.
+  /// \return reference to the current individual
   ref operator*() const
   {
     return pop_->operator[]({layer_, index_});
   }
 
-  /// \return pointer to the current individual.
+  /// \return pointer to the current individual
   ptr operator->() const
   {
     return &operator*();
@@ -116,11 +116,11 @@ public:
     return out;
   }
 
-private:  // Private data members
+private:
   std::conditional_t<is_const, const population *, population *> pop_;
 
   unsigned layer_;
   unsigned index_;
 };
 
-#endif  // Include guard
+#endif  // include guard

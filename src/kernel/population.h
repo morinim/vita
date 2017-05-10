@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,10 +22,10 @@
 namespace vita
 {
 ///
-/// \brief A group of individuals which may interact together (for example by
-///        mating) producing offspring.
+/// A group of individuals which may interact together (for example by mating)
+/// producing offspring.
 ///
-/// \tparam T the type of the an individual.
+/// \tparam T the type of the an individual
 ///
 /// Typical population size in GP ranges from ten to many thousands. The
 /// population is organized in one or more layers that can interact in
@@ -35,20 +35,9 @@ template<class T>
 class population
 {
 public:
-  /// \brief Holds the coordinates of an individual in a population.
-  struct coord
-  {
-    unsigned layer;
-    unsigned index;
-
-    bool operator==(coord rhs) const
-    { return layer == rhs.layer && index == rhs.index; }
-    bool operator!=(coord rhs) const { return !(*this == rhs); }
-  };
-
+  struct coord;
   using layer_t = std::vector<T>;
 
-public:
   explicit population(const environment &);
 
   T &operator[](coord);
@@ -94,6 +83,7 @@ template<class T> typename population<T>::coord pickup(
   const population<T> &, typename population<T>::coord);
 
 
+#include "kernel/population_coord.tcc"
 #include "kernel/population_iterator.tcc"
 #include "kernel/population.tcc"
 
