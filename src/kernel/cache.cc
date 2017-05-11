@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -133,7 +133,7 @@ const fitness_t &cache::find(const hash_t &h) const
     return s.fitness;
   }
 
-  const static fitness_t empty{};
+  static const fitness_t empty{};
   return empty;
 }
 

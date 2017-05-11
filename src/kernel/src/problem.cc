@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -211,9 +211,9 @@ void src_problem::setup_default_symbols()
     }
     else if (compatible({tag}, {"string"}))
     {
-      //for (decltype(tag) j(0); j < sup; ++j)
-      // if (j != tag)
-      //   env.sset->insert(factory_.make("SIFE", {tag, j}));
+      // for (decltype(tag) j(0); j < sup; ++j)
+      //   if (j != tag)
+      //     env.sset->insert(factory_.make("SIFE", {tag, j}));
       env.sset->insert(factory_.make("SIFE", {tag, 0}));
     }
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -386,8 +386,8 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 hash_t i_mep::hash() const
 {
   Expects(size());
-  //if (empty())
-  //  return hash_t();
+  // if (empty())
+  //   return hash_t();
 
   // From an individual to a packed byte stream...
   thread_local std::vector<unsigned char> packed;

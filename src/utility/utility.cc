@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,49 +43,6 @@ std::string trim(const std::string &s)
                                [](auto c) { return std::isspace(c); }).base();
 
   return {front, back};
-}
-
-///
-/// \param[out] p output xml printer.
-/// \param[in] e xml element.
-/// \param[in] s xml element's value.
-///
-/// Specialization for `std::string`.
-///
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e,
-               const std::string &s)
-{
-  p.OpenElement(e.c_str());
-  p.PushText(s.c_str());
-  p.CloseElement();
-}
-
-///
-/// \param[out] p output xml printer.
-/// \param[in] e xml element.
-/// \param[in] v xml element's value.
-///
-/// Specialization for `int`.
-///
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e, int v)
-{
-  p.OpenElement(e.c_str());
-  p.PushText(v);
-  p.CloseElement();
-}
-
-///
-/// \param[out] p output xml printer.
-/// \param[in] e xml element.
-/// \param[in] v xml element's value.
-///
-/// Specialization for `double`.
-///
-void push_text(tinyxml2::XMLPrinter &p, const std::string &e, double v)
-{
-  p.OpenElement(e.c_str());
-  p.PushText(v);
-  p.CloseElement();
 }
 
 ///

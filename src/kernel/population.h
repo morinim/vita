@@ -35,11 +35,10 @@ template<class T>
 class population
 {
 public:
-  struct coord;
-  using layer_t = std::vector<T>;
-
   explicit population(const environment &);
 
+  struct coord;
+  using layer_t = std::vector<T>;
   T &operator[](coord);
   const T &operator[](coord) const;
 
