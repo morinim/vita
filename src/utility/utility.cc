@@ -15,21 +15,22 @@
 namespace vita
 {
 ///
-/// \param[in] s1 first term of comparison.
-/// \param[in] s2 second term of comparison.
-/// \return `true` if all elements in both strings are same (case
-///         insensitively).
+/// \param[in] s1 first term of comparison
+/// \param[in] s2 second term of comparison
+/// \return       `true` if all elements in both strings are same (case
+///               insensitively)
 ///
-bool iequals(const std::string &s1, const std::string &s2)
+bool iequals(const std::string &lhs, const std::string &rhs)
 {
   return std::equal(
-    s1.begin(), s1.end(), s2.begin(), s2.end(),
+    lhs.begin(), lhs.end(), rhs.begin(), rhs.end(),
     [](auto c1, auto c2) { return std::tolower(c1) == std::tolower(c2); });
 }
 
 ///
-/// \param[in] s the input string.
-/// \return a copy of `s` with spaces removed on both sides of the string.
+/// \param[in] s the input string
+/// \return      a copy of `s` with spaces removed on both sides of the string
+///
 /// \see http://stackoverflow.com/a/24425221/3235496
 ///
 std::string trim(const std::string &s)
@@ -46,9 +47,11 @@ std::string trim(const std::string &s)
 }
 
 ///
-/// \param[out] p parent element.
-/// \param[in] e new xml element.
-/// \param[in] s new xml element's value.
+/// A convenient arrangement for inserting strings into `XMLDocument`.
+///
+/// \param[out] p parent element
+/// \param[in]  e new xml element
+/// \param[in]  s new xml element's value
 ///
 /// Specialization for `std::string`.
 ///

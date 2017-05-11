@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,9 @@ bool iequals(const std::string &, const std::string &);
 std::string trim(const std::string &);
 
 ///
-/// \return an `std::array` filled with value `v`.
+/// Mainly used to initialize an array with a specific value.
+///
+/// \return an `std::array` filled with value `v`
 ///
 /// This function is used to initialize array in member initialization list
 /// of a constructor (so to be compliant with Effective C++).
@@ -46,12 +48,12 @@ template<class T, unsigned N> std::array<T, N> make_array(T v)
 }
 
 ///
-/// \param[in] v value to check.
-/// \return `true` if v is less than epsilon-tolerance.
+/// \param[in] v value to check
+/// \return      `true` if `v` is less than `epsilon`-tolerance
 ///
 /// \note
 /// `epsilon` is the smallest T-value that can be added to `1.0` without
-/// getting `1.0` back. Note that this is a much larger value than `DBL_MIN`.
+/// getting `1.0` back (this is a much larger value than `DBL_MIN`).
 ///
 template<class T> bool issmall(T v)
 {
@@ -61,8 +63,8 @@ template<class T> bool issmall(T v)
 }
 
 ///
-/// \param[in] v value to check.
-/// \return `true` if v is nonnegative.
+/// \param[in] v value to check
+/// \return      `true` if `v` is nonnegative
 ///
 template<class T> bool isnonnegative(T v)
 {
@@ -70,10 +72,10 @@ template<class T> bool isnonnegative(T v)
 }
 
 ///
-/// \param[in] container a STL container.
-/// \param[in] pred a unary predicate.
+/// A shorthand for the well known erase-remove C++ idiom.
 ///
-/// A shorthand for the well known C++ erase-remove idiom.
+/// \param[in] container a STL container
+/// \param[in] pred      a unary predicate
 ///
 template<class T, class Pred> void erase_if(T &container, Pred pred)
 {
@@ -84,10 +86,10 @@ template<class T, class Pred> void erase_if(T &container, Pred pred)
 }
 
 ///
-/// \param[in] s a string
-/// \return the content of string `s` converted in an object of type `T`.
-///
 /// Reduced version of `boost::lexical_cast`.
+///
+/// \param[in] s a string
+/// \return      the content of string `s` converted in an object of type `T`
 ///
 template<class T> T lexical_cast(const std::string &s)
 { return std::stoi(s); }
@@ -97,8 +99,7 @@ template<> inline std::string lexical_cast(const std::string &s)
 { return s; }
 
 ///
-/// \brief A RAII class to restore the state of a stream to its original
-///        state.
+/// A RAII class to restore the state of a stream to its original state.
 ///
 /// `iomanip` manipulators are "sticky" (except `setw` which only affects the
 /// next insertion). Often we need a way to apply an arbitrary number of
@@ -107,8 +108,7 @@ template<> inline std::string lexical_cast(const std::string &s)
 /// \note
 /// An alternative is to shuffle everything into a temporary `stringstream` and
 /// finally put that on the real stream (which has never changed its flags at
-/// all).
-/// This approach is exception-safe but a little less performant.
+/// all). This approach is exception-safe but a little less performant.
 ///
 class ios_flag_saver
 {
@@ -143,7 +143,7 @@ private:
 ///
 /// Same interface as an std::ostream_iterator.
 ///
-/// Lifted from Jerry Coffin's `prefix_ostream_iterator`.
+/// \remark Lifted from Jerry Coffin's `prefix_ostream_iterator`.
 ///
 template <class T, class C = char, class traits = std::char_traits<C>>
 class infix_iterator : public std::iterator<std::output_iterator_tag, void,
@@ -182,9 +182,8 @@ private:
 };  // class infix_iterator
 
 ///
-/// \brief Rounds `val` to the number of decimals of `float_epsilon`.
-///
-/// \param val a value to be rounded.
+/// \param[in] val a value to be rounded
+/// \return        `val` rounded to a fixed, vita-specific, number of decimals
 ///
 template<class T>
 T round_to(T val)
@@ -199,15 +198,14 @@ T round_to(T val)
 }
 
 ///
-/// \param[in] v1 a floating point number.
-/// \param[in] v2 a floating point number.
-/// \param[in] e max relative error. If we want 99.999% accuracy then we
-///              should pass a `e` of 0.00001.
-/// \return `true` if the difference between `v1` and `v2` is "small" compared
-///         to their magnitude.
+/// \param[in] v1 a floating point number
+/// \param[in] v2 a floating point number
+/// \param[in] e  max relative error. If we want 99.999% accuracy then we
+///               should pass a `e` of 0.00001
+/// \return       `true` if the difference between `v1` and `v2` is "small"
+///               compared to their magnitude
 ///
-/// \note
-/// Code from Bruce Dawson:
+/// \note Code from Bruce Dawson:
 /// <www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm>
 ///
 template<class T>
@@ -232,9 +230,9 @@ bool almost_equal(T v1, T v2, T e = 0.00001)
 }
 
 ///
-/// \param[out] out the output stream.
-/// \param[in] i the floating-point value to be saved.
-/// \return a reference to the output stream.
+/// \param[out] out the output stream
+/// \param[in]  i   the floating-point value to be saved
+/// \return         a reference to the output stream
 ///
 template<class T>
 std::ostream &save_float_to_stream(std::ostream &out, T i)
@@ -252,9 +250,9 @@ std::ostream &save_float_to_stream(std::ostream &out, T i)
 }
 
 ///
-/// \param[in] in the input stream.
-/// \param[out] i the floating-point value to be loaded.
-/// \return `true` if the operation is successful.
+/// \param[in]  in the input stream
+/// \param[out] i  the floating-point value to be loaded
+/// \return        `true` if the operation is successful
 ///
 template<class T>
 bool load_float_from_stream(std::istream &in, T *i)
@@ -273,11 +271,14 @@ void set_text(tinyxml2::XMLElement *, const std::string &,
               const std::string &);
 
 ///
-/// \brief A convenient arrangement for inserting stream-aware objects into
-///        `XMLDocument`.
-/// \param[out] p parent element.
-/// \param[in] e new xml element.
-/// \param[in] s new xml element's value.
+/// A convenient arrangement for inserting stream-aware objects into
+/// `XMLDocument`.
+///
+/// \tparam T type of the value
+///
+/// \param[out] p parent element
+/// \param[in]  e new xml element
+/// \param[in]  s new xml element's value
 ///
 template<class T>
 void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
@@ -288,11 +289,13 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
 }
 
 ///
-/// \brief Encapsulate the logic to convert a scoped enumeration element to its
-///        integer value.
-/// \tparam E a scoped enumeration.
-/// \param[in] v element of an enum class.
-/// \return the integer value of `v`.
+/// Encapsulate the logic to convert a scoped enumeration element to its
+/// integer value.
+///
+/// \tparam E a scoped enumeration
+///
+/// \param[in] v element of an enum class
+/// \return      the integer value of `v`
 ///
 template<class E>
 constexpr std::underlying_type_t<E> as_integer(E v)
@@ -303,11 +306,13 @@ constexpr std::underlying_type_t<E> as_integer(E v)
 }
 
 ///
-/// \brief A generic function to "print" any scoped enum.
-/// \tparam E a scoped enumeration.
-/// \param[in, out] s an output stream.
-/// \param[in] v element of an enum class.
-/// \return the modified output stream.
+/// A generic function to "print" any scoped enum.
+///
+/// \tparam E a scoped enumeration
+///
+/// \param[in, out] s an output stream
+/// \param[in]      v element of an enum class
+/// \return           the modified output stream
 ///
 template<class E>
 std::enable_if_t<std::is_enum<E>::value, std::ostream> &
@@ -317,11 +322,12 @@ operator<<(std::ostream &s, E v)
 }
 
 ///
-/// \brief Null-coalescing operator.
-/// \param[in] v1 first operand.
-/// \param[in] v2 second operand.
-/// \return the first operand if it isn't `empty`; otherwise it returns the
-///         second operand.
+/// Null-coalescing operator.
+///
+/// \param[in] v1 first operand
+/// \param[in] v2 second operand
+/// \return    the first operand if it isn't `empty`; otherwise it returns the
+///            second operand
 ///
 template<class T>
 const T &coalesce(const T &v1, const T &v2)
@@ -331,4 +337,4 @@ const T &coalesce(const T &v1, const T &v2)
 
 }  // namespace vita
 
-#endif  // nclude guard
+#endif  // include guard
