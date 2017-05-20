@@ -40,7 +40,7 @@ Under Windows this means a recent version of MinGW / MSYS (our standard Windows 
 
 ## Getting the source ##
 
-There are two ways of getting Vita's source code: you can download a stable source release in your preferred archive format or directly clone the source from a repository.
+There are two ways of getting Vita's source code: you can [download](https://github.com/morinim/vita/archive/master.zip) a stable source release in your preferred archive format or directly clone the source from a repository.
 
 Cloning a repository requires a few extra steps and some extra software packages on your system, but lets you track the latest development and make patches much more easily, so we highly encourage it.
 
@@ -116,6 +116,6 @@ All the output files will be stored in subdirectories of `build/` (out of source
 
 [1]: http://www.eosdev.it/
 [2]: http://www.boost.org/
-[3]: https://bitbucket.org/morinim/vita
+[3]: https://github.com/morinim/vita
 [4]: http://www.python.org/
 [5]: https://cmake.org/

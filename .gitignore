@@ -2,7 +2,6 @@
 *.o
 *.*~
 *.a
-doc/dev/*.odg
 src/boost/
 src/examples/example?
 src/examples/forex/forex_results/
@@ -11,4 +10,4 @@ src/debug/
 src/release/
 tmp/
 tools/cppcheck/
-tools/enforce-message.pyc
+tools/*.pyc
