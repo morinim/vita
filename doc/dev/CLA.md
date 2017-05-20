@@ -11,12 +11,14 @@ Please read this document carefully before signing and keep a copy for your reco
 
 ----
 
+```
 FULL NAME:       _____________________________________
 MAILING ADDRESS: _____________________________________
                  _____________________________________
 				 _____________________________________
 E-MAIL:          _____________________________________
 TELEPHONE:       _____________________________________
+```
 
 ----
 
@@ -33,4 +35,4 @@ You accept and agree to the following terms and conditions for Your present and 
 
 
 
-Please sign: __________________________________		Date: ________________
+PLEASE SIGN  __________________________________      DATE ________________
