@@ -12,7 +12,7 @@ It's suitable for classification, symbolic regression, content base image retrie
 * fast experimentation with detailed run-log
 * modern, standard ISO C++14 source code
 
-It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org/MPL/2.0/) (see the accompanying LICENSE file for more details).
+It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org/MPL/2.0/) (see the accompanying [LICENSE](https://github.com/morinim/vita/blob/master/LICENSE) file for more details).
 
 This software was originally developed by [EOS][1] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
@@ -22,7 +22,7 @@ Although the core development team is still anchored at EOS, Vita is now open so
 
 Vita is designed to have fairly minimal requirements to build and use with your projects, but there are some. Currently, we support Linux and Windows. We will also make our best effort to support other platforms (e.g. Mac OS X, Solaris, AIX).
 However, since core members of the Vita project have no access to these platforms, Vita may have outstanding issues there. If you notice any problems on your platform, please use the
-[issue tracking system](https://bitbucket.org/morinim/vita/issues); patches for fixing them are even more welcome!
+[issue tracking system](https://github.com/morinim/vita/issues); patches for fixing them are even more welcome!
 
 ### Mandatory ###
 
@@ -44,31 +44,10 @@ There are two ways of getting Vita's source code: you can download a stable sour
 
 Cloning a repository requires a few extra steps and some extra software packages on your system, but lets you track the latest development and make patches much more easily, so we highly encourage it.
 
-### HG Clone ###
-
 Run the following command:
-```
-hg clone https://bitbucket.org/morinim/vita
-```
-
-### Git Clone ###
 
 ```
 git clone https://github.com/morinim/vita.git
-```
-
-Please consider that the [primary repository][3] is Mercurial-based (HG) and hosted on Bitbucket. The repository on Github is a mirror kept for Git users' convenience.
-
-### Source Package ###
-
-Vita is released in versioned source packages which can be downloaded from the project's [download page](https://bitbucket.org/morinim/vita/downloads). Several different archive formats are provided, but the only difference is the tools used to manipulate them and the size of the resulting file. Download whichever you are most comfortable with.
-
-Once the package is downloaded, expand it using whichever tools you prefer for that type. This will result in a new directory with the name "vita-X.Y.Z" which contains all of the source code. Here are some examples on Linux:
-
-```
-$ tar -xvJf vita-X.Y.Z.txz
-$ tar -xvjf vita-X.Y.Z.tar.bz2
-$ unzip vita-X.Y.Z.zip
 ```
 
 ## The Vita distribution ##
@@ -79,7 +58,10 @@ vita/
   LICENSE
   README.md
   copyright
+  doc/
+  misc/
   src/
+    CMakeLists.txt
     CONTRIBUTORS
     Makefile
     examples/..............Various examples
