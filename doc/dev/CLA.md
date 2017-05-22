@@ -18,7 +18,7 @@ TELEPHONE:       _____________________________________
 
 Please take a moment to read and accept this agreement, which lets other contributors and users know the terms of your contribution.
 
-Send a signed Agreement to the [project maintainer](morinim@gmail.com)
+Send a signed Agreement to the project maintainer (morinim@gmail.com)
 
 # Contributor License Agreement
 
