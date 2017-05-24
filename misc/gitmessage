@@ -23,6 +23,7 @@ well-enough.
 # - [REF] refactoring that doesn't include any changes in features
 # - [FMT] formatting only (spacing...)
 # - [TEST] related to test code only
+# - [MAK] repository related changes (e.g. changes in the ignore list)
 #
 # --------------------
 # Remember to
