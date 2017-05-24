@@ -1,0 +1,33 @@
+[tag] Concise but complete summary
+
+An awesome description describing WHY this work over HOW/WHAT it does.
+The diff attached to commit should describe implementation (HOW)
+well-enough.
+
+# [Ticket #12]
+
+# --- COMMIT END ---
+#-----------------------------------------------@----------------------#
+#
+# 1. Summary should be under 50 characters. @-symbol above is a marker
+#    for that
+# 2. Description of commit should explain WHY a change was made and
+#    lines should be wrapped to 72 characters; marked by the #-symbol
+# 3. Optionally, reference a ticket number.
+#
+# --------------------
+# Tag can be:
+# - [FIX] bug fix
+# - [ADD] new feature or extended functionality
+# - [DOC] for all kinds of documentation-only related commits
+# - [REF] refactoring that doesn't include any changes in features
+# - [FMT] formatting only (spacing...)
+# - [TEST] related to test code only
+#
+# --------------------
+# Remember to
+# - Capitalize the subject line
+# - Summary is in 3rd person declarative / descriptive rather than 2nd
+#   person imperative / prescriptive
+# - Do not end the subject line with a period
+# - Separate subject from body with a blank line
