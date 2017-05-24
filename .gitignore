@@ -2,6 +2,7 @@
 *.o
 *.*~
 *.a
+doc/wiki/
 src/boost/
 src/examples/example?
 src/examples/forex/forex_results/
