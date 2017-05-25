@@ -9,8 +9,8 @@ os: linux
 addons:
   apt:
     packages:
-    - cmake
-    - gcc-6
-	- libboost-dev
+      - cmake
+      - gcc-6
+      - libboost-dev
 
 script: cd src; make tests
