@@ -1,15 +1,22 @@
+sudo: false
+
 language: cpp
 
 compiler:
   - g++
-#  - clang++
+  - clang++
 
-dist: trusty
-sudo: true
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.8
+    packages:
+      - g++-6
+      - clang-3.8
 
-before_install:
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -q
-  - sudo apt-get install gcc-6 -y
+install:
+- "[ $CXX = g++ ] && export CXX=g++-6 || true"
+- "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 
 script: cd src; make tests
