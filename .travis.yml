@@ -4,13 +4,12 @@ compiler:
   - g++
 #  - clang++
 
-dist: precise
-sudo: false
+dist: trusty
+sudo: true
 
-addons:
-  apt:
-    packages:
-      - libboost-dev
-      - gcc-5
+before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -q
+  - sudo apt-get install gcc-6 -y
 
 script: cd src; make tests
