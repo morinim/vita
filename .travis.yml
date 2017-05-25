@@ -4,12 +4,13 @@ compiler:
   - g++
 #  - clang++
 
-dist: trusty
+dist: precise
 sudo: false
 
 addons:
   apt:
     packages:
       - libboost-dev
+	  - gcc-6
 
 script: cd src; make tests
