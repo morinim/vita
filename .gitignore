@@ -6,6 +6,8 @@ doc/wiki/
 src/boost/
 src/examples/example?
 src/examples/forex/forex_results/
+src/sr/sr
+src/test/tests
 src/build/
 src/debug/
 src/release/
