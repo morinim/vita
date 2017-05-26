@@ -135,9 +135,11 @@ test/%: test/%.o $(FRAMEWORK_OBJ)
 	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@ $(DEBUG_LIB)
 	@cd test; ./$(@F) --show_progress --build_info
 
+# In case of errors try switching to gcc-ar.
+# See <https://stackoverflow.com/a/25878408/3235496>
 vita: $(FRAMEWORK_OBJ)
 	@echo Linking libvita.a
-	@gcc-ar rcs kernel/libvita.a $(FRAMEWORK_OBJ)
+	@ar rcs kernel/libvita.a $(FRAMEWORK_OBJ)
 ifeq ($(TYPE), release)
 	@strip kernel/libvita.a
 endif
