@@ -1,8 +1,6 @@
-[tag] Concise but complete summary
+[] Concise but complete summary
 
-An awesome description describing WHY this work over HOW/WHAT it does.
-The diff attached to commit should describe implementation (HOW)
-well-enough.
+#An awesome description describing WHY this work over HOW/WHAT it does.
 
 # [Ticket #12]
 
