@@ -20,4 +20,4 @@ install:
 - "[ $CXX = g++ ] && export CXX=g++-6 || true"
 - "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 
-script: cd src; make tests
+script: cd src; make
