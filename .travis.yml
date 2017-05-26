@@ -12,8 +12,9 @@ addons:
       - ubuntu-toolchain-r-test
       - llvm-toolchain-precise-3.8
     packages:
-      - g++-6
       - clang-3.8
+      - g++-6
+	  - libboost-dev
 
 install:
 - "[ $CXX = g++ ] && export CXX=g++-6 || true"
