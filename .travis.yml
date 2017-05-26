@@ -14,7 +14,7 @@ addons:
     packages:
       - clang-3.8
       - g++-6
-	  - libboost-dev
+      - libboost-dev
 
 install:
 - "[ $CXX = g++ ] && export CXX=g++-6 || true"
