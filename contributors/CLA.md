@@ -1,26 +1,28 @@
-Vita Project - Individual Contributor License Agreement ("Agreement"), v1.1
-===========================================================================
-
 **This license is for your protection as a contributor as well as the protection of project users; it does not change your rights to use your own contributions for any other purpose**.
 
 ----
-
 ```
 FULL NAME:       _____________________________________
+GITHUB USER ID:  _____________________________________
 MAILING ADDRESS: _____________________________________
-                 _____________________________________
+*(optional)*     _____________________________________
                  _____________________________________
 E-MAIL:          _____________________________________
-TELEPHONE:       _____________________________________
+*(optional)*
+WEBSITE:         _____________________________________
+*(optional)*
 ```
+
+I hereby agree to the terms of the following Contributors License Agreement.
+
+I furthermore declare that I am authorized and able to make this agreement and sign this declaration.
 
 ----
 
 Please take a moment to read and accept this agreement, which lets other contributors and users know the terms of your contribution.
 
-Send a signed Agreement to the project maintainer (morinim@gmail.com)
-
-# Contributor License Agreement
+Individual Contributor License Agreement
+========================================
 
 The following terms are used throughout this agreement:
 
@@ -42,6 +44,3 @@ If any entity institutes patent litigation - including cross-claim or countercla
 ## 3. Source of Contribution
 
 Your contribution is either your original creation, based upon previous work that, to the best of your knowledge, is covered under an appropriate open source license and you have the right under that license to submit that work with modifications, whether created in whole or in part by you, or you have clearly identified the source of the contribution and any license or other restriction (like related patents, trademarks, and license agreements) of which you are personally aware.
-
-
-PLEASE SIGN  __________________________________      DATE ________________
