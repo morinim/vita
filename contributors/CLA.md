@@ -3,6 +3,12 @@
 Please take a moment to read and accept this agreement, which lets other contributors and users know the terms of your contribution.
 
 ----
+I hereby agree to the terms of the following Contributors License Agreement.
+
+I furthermore declare that I am authorized and able to make this agreement and sign this declaration.
+
+Signed,
+
 ```
 FULL NAME:       _____________________________________
 GITHUB USER ID:  _____________________________________
@@ -10,11 +16,6 @@ MAILING ADDRESS: _____________________________________
 *(optional)*     _____________________________________
                  _____________________________________
 ```
-
-I hereby agree to the terms of the following Contributors License Agreement.
-
-I furthermore declare that I am authorized and able to make this agreement and sign this declaration.
-
 ----
 
 Individual Contributor License Agreement
