@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,26 +19,20 @@
  *
  *  \section note_sec Notes
  *  New versions of this framework will be available at
- *  https://bitbucket.org/morinim/vita
+ *  https://github.com/morinim/vita
  *
- *  Please reports any suggestions and/or bugs to:
- *  <dl>
- *    <dt>Issue tracking system</dt>
- *    <dd>https://bitbucket.org/morinim/vita/issues</dd>
- *    <dt>The project owner</dt>
- *    <dd>https://bitbucket.org/morinim/</dd>
- *  </dl>
+ *  Please reports any suggestions and/or bugs via the [issue tracking system](https://github.com/morinim/vita/issues).
  *
  */
 
 /**
  *  \page page1 VITA Architecture
- *  - [Tutorials](https://bitbucket.org/morinim/vita/wiki/tutorials)
- *  - [Anatomy of Vita](https://bitbucket.org/morinim/vita/wiki/anatomy)
+ *  - [Tutorials](https://github.com/morinim/vita/wiki/tutorials)
+ *  - [Anatomy of Vita](https://github.com/morinim/vita/wiki/anatomy)
  *
  *  \page page2 Contributor guidelines
- *  - [Coding style](https://bitbucket.org/morinim/vita/wiki/coding_style)
- *  - [Development cycle](https://bitbucket.org/morinim/vita/wiki/development_cycle)
+ *  - [Coding style](https://github.com/morinim/vita/wiki/coding_style)
+ *  - [Development cycle](https://github.com/morinim/vita/wiki/development_cycle)
  */
 
 /**
