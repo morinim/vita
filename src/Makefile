@@ -23,8 +23,6 @@ DEFS :=
 $(info Building: $(TYPE))
 $(info Using: $(CXX))
 
-#VERSION := $(shell hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}')
-
 # Boost library
 LIB := -static -lboost_program_options
 DEBUG_LIB := -static -lboost_unit_test_framework
@@ -134,6 +132,15 @@ test/%: test/%.o $(FRAMEWORK_OBJ)
 	@echo Linking $@
 	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@ $(DEBUG_LIB)
 	@cd test; ./$(@F) --show_progress --build_info
+
+# For HG the version ID is:
+# `hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}`
+.phony:	version
+version:
+	@echo Updating version
+	@echo -n '#define VITA_COMMIT_VERSION "' > kernel/version.h
+	@echo -n git describe --long >> kernel/version.h
+	@echo '"' >> kernel/version.h
 
 # In case of errors try switching to gcc-ar.
 # See <https://stackoverflow.com/a/25878408/3235496>
