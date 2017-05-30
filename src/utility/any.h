@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -40,8 +40,7 @@ template<class> struct get_table;
 }  // namespace detail
 
 ///
-/// \brief The exception thrown in the event of a failed any_cast of an any
-///        value.
+/// The exception thrown in the event of a failed any_cast of an any value.
 ///
 struct bad_any_cast : std::bad_cast
 {
@@ -56,20 +55,14 @@ struct bad_any_cast : std::bad_cast
 };
 
 ///
-/// \brief A boost::any equivalent with small buffer optimization and
-///        support for the streaming operators.
+/// A boost::any equivalent with small buffer optimization and support for the
+/// streaming operators.
 ///
 /// This class is derived from and equivalent to boost::spirit::hold_any
 /// (which is built based on the any class published in
 /// <http://www.codeproject.com/cpp/dynamic_typing.asp>).
 ///
-/// vita::any:
-/// - doesn't depend on Boost library (but needs C++11);
-/// - correctly supports copy assignment (see
-///   <http://stackoverflow.com/q/24065769/3235496> and
-///   <https://svn.boost.org/trac/boost/ticket/8268> for details about a
-///   major bug in boost::spirit::hold_any v1.55);
-/// - assuming C++11 makes things a bit simpler.
+/// vita::any doesn't depend on Boost library but needs C++14.
 ///
 class any
 {
@@ -119,6 +112,9 @@ public:
   template<class T> friend T *any_cast(any *);
 
 private:
+  template<class T> explicit any(const T &, std::true_type *);
+  template<class T> explicit any(const T &, std::false_type *);
+
   // Assignment and casting
   template<class T> any &assign(const T &);
 
@@ -139,4 +135,4 @@ template<class T> T to(const any &);
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

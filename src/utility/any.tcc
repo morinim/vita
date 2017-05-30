@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -107,7 +107,7 @@ struct fxns<false>
       return i;
     }
 
-    static std::ostream &stream_out(std::ostream &o, void * const*obj)
+    static std::ostream &stream_out(std::ostream &o, void *const *obj)
     {
       o << **reinterpret_cast<T *const *>(obj);
       return o;
@@ -119,6 +119,7 @@ template<class T>
 struct get_table
 {
   static constexpr bool is_small = sizeof(T) <= sizeof(void *);
+  using is_small_t = std::integral_constant<bool, is_small>;
 
   static fxn_ptr_table *get()
   {
@@ -173,21 +174,32 @@ inline any::any(const any &x)
 }
 
 ///
-/// \param[in] x any will contain object `x`.
+/// \param[in] x any will contain object `x`
 ///
 /// Makes a copy of `x`, so that the initial content of the new instance is
 /// equivalent in both type and value to `x`.
 ///
-template <class T>
-any::any(const T &x) : table(detail::any_::get_table<T>::get())
+template<class T>
+inline any::any(const T &x)
+  : any(x,  // a tag dispatch solution
+        static_cast<typename detail::any_::get_table<T>::is_small_t *>(nullptr))
 {
-  if (detail::any_::get_table<T>::is_small)
-    new (&object) T(x);
-  else
-    object = new T(x);
 }
 
-/// \brief Releases any and all resources used in management of instance
+template<class T>
+any::any(const T &x, std::true_type *)
+  : table(detail::any_::get_table<T>::get())
+{
+  new (&object) T(x);
+}
+
+template<class T>
+any::any(const T &x, std::false_type *)
+  : table(detail::any_::get_table<T>::get()), object(new T(x))
+{
+}
+
+/// Releases any and all resources used in management of instance
 inline any::~any()
 {
   table->static_delete(&object);
@@ -247,8 +259,8 @@ any &any::assign(const T &x)
 }
 
 ///
-/// \param[in] rhs new any value.
-/// \return `this` object after assignment.
+/// \param[in] rhs new any value
+/// \return        `this` object after assignment
 ///
 /// Forwards `rhs`, discarding previous content, so that the new content of is
 /// equivalent in both type and value to `rhs` before forward.
@@ -281,7 +293,7 @@ inline bool any::empty() const
 }
 
 ///
-/// \brief Resets the content of the any.
+/// Resets the content of the any.
 ///
 inline void any::clear()
 {
@@ -321,10 +333,11 @@ inline std::ostream &operator<<(std::ostream& o, const any &obj)
 }
 
 ///
-/// \brief Custom keyword cast for extracting a value of a given type from any
-/// \param[in] operand a pointer to any.
-/// \return a similarly qualified pointer to the value content if successful,
-///         otherwise null is returned.
+/// Custom keyword cast for extracting a value of a given type from any.
+///
+/// \param[in] operand a pointer to any
+/// \return            a similarly qualified pointer to the value content if
+///                    successful, otherwise null is returned
 ///
 template<class T>
 T *any_cast(any *operand)
@@ -338,10 +351,11 @@ T *any_cast(any *operand)
 }
 
 ///
-/// \brief Custom keyword cast for extracting a value of a given type from any
-/// \param[in] operand a pointer to any.
-/// \return a similarly qualified pointer to the value content if successful,
-///         otherwise null is returned.
+/// Custom keyword cast for extracting a value of a given type from any.
+///
+/// \param[in] operand a pointer to any
+/// \return            a similarly qualified pointer to the value content if
+///                    successful, otherwise null is returned
 ///
 template<class T>
 const T *any_cast(const any *operand)
@@ -350,9 +364,10 @@ const T *any_cast(const any *operand)
 }
 
 ///
-/// \brief Custom keyword cast for extracting a value of a given type from any
-/// \param operand an any.
-/// \return the value contained in `operand`.
+/// Custom keyword cast for extracting a value of a given type from any.
+///
+/// \param[in] operand an any
+/// \return            the value contained in `operand`
 ///
 template<class T>
 T any_cast(any &operand)
@@ -367,9 +382,10 @@ T any_cast(any &operand)
 }
 
 ///
-/// \brief Custom keyword cast for extracting a value of a given type from any
-/// \param operand an any.
-/// \return a constant reference to the value contained in `operand`.
+/// Custom keyword cast for extracting a value of a given type from any.
+///
+/// \param[in] operand an any
+/// \return            a constant reference to the value contained in `operand`
 ///
 template<class T>
 const T &any_cast(const any &operand)
@@ -380,4 +396,4 @@ const T &any_cast(const any &operand)
 }
 #endif  // !USE_BOOST_ANY guard
 
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 namespace vita
 {
 ///
-/// \brief A constant value (bool, int, double, string)
+/// A constant value (`bool`, `int`, `double`, `string`).
 ///
 template<class T>
 class constant : public terminal
@@ -31,14 +31,15 @@ public:
     : constant(std::to_string(c), t) {}
 
   ///
-  /// \return the value of the constant (as a `any`).
+  /// \return the value of the constant (as a `any`)
   ///
+  /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
   virtual any eval(core_interpreter *) const override { return any(val_); }
 
-private:  // Private data members
+private:
   T val_;
 };
 
@@ -52,16 +53,17 @@ public:
     : constant(std::string(c), t) {}
 
   ///
-  /// \return the value of the constant (as a `any`).
+  /// \return the value of the constant (as a `any`)
   ///
+  /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
   virtual any eval(core_interpreter *) const override { return any(val_); }
 
-private:  // Private data members
+private:
   std::string val_;
 };
 
 }  // namespace vita
-#endif // Include guard
+#endif  // include guard
