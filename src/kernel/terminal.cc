@@ -15,7 +15,7 @@
 namespace vita
 {
 ///
-/// \return `true` if the function passes the internal consistency check.
+/// \return `true` if the function passes the internal consistency check
 ///
 bool terminal::debug() const
 {
