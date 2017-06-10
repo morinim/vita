@@ -140,7 +140,7 @@ test/%: test/%.o $(FRAMEWORK_OBJ) directories
 directories: $(OUTDIR)
 
 $(OUTDIR):
-	$(MKDIR) $(OUTDIR)
+	@$(MKDIR) $(OUTDIR)
 
 # For HG the version ID is:
 # `hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}`
