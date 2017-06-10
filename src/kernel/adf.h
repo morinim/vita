@@ -76,7 +76,7 @@ class adf : public function
 public:
   adf(const i_mep &, cvect);
 
-  bool auto_defined() const override;
+  bool auto_defined() const final;
 
   any eval(core_interpreter *) const override;
 
@@ -102,7 +102,7 @@ class adt : public terminal
 public:
   explicit adt(const i_mep &);
 
-  bool auto_defined() const override;
+  bool auto_defined() const final;
 
   any eval(core_interpreter *) const override;
 
