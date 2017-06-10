@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,8 @@ namespace vita
 opcode_t symbol::opc_count_(0);
 
 ///
-/// \param[in] name name of the symbol.
-/// \param[in] c category of the symbol.
+/// \param[in] name name of the symbol
+/// \param[in] c    category of the symbol
 ///
 /// \note
 /// By default a symbol:
@@ -31,8 +31,7 @@ opcode_t symbol::opc_count_(0);
 ///
 /// \warning
 /// Since the name of the symbol is used for serialization, it must be
-/// unique.
-/// Of course even the opcode is unique, but it can vary between executions.
+/// unique. Even the opcode is unique, but it can change between executions.
 ///
 symbol::symbol(const std::string &name, category_t c)
   : opcode_(opc_count_++), category_(c), name_(name)
@@ -41,7 +40,7 @@ symbol::symbol(const std::string &name, category_t c)
 }
 
 ///
-/// \return the name of the symbol.
+/// \return the name of the symbol
 ///
 std::string symbol::display() const
 {
@@ -49,8 +48,8 @@ std::string symbol::display() const
 }
 
 ///
-/// \param[in] v additional informations regarding parametric symbols.
-/// \return a string representing the symbol.
+/// \param[in] v additional informations regarding parametric symbols
+/// \return      a string representing the symbol
 ///
 /// This function is called for parametric symbols only. The `v` argument is
 /// used to build a more meaningful name for the symbol (i.e. for a numeric
@@ -58,7 +57,7 @@ std::string symbol::display() const
 ///
 std::string symbol::display(double v) const
 {
-  assert(parametric());
+  Expects(parametric());
 
   return display() + "_" + std::to_string(v);
 }
@@ -72,7 +71,7 @@ double symbol::penalty_nvi(core_interpreter *) const
 }
 
 ///
-/// \return \c `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool symbol::debug() const
 {

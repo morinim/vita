@@ -71,10 +71,13 @@ private:
 };
 
 ///
+/// Used for automatic calculation of penalities due to broken constraints.
+///
 /// \param[in] ci interpreter used for symbol's constraints evaluation
-/// \return       a penalty based on symbol specific broken constraints:
-///               - `0.0` states that no constraint penalty is applied;
-///               - larger values specify larger penalties
+/// \return       a penalty based on symbol specific broken constraints
+///
+/// - `0.0` states that no constraint penalty is applied;
+/// - larger values specify larger penalties.
 ///
 inline double symbol::penalty(core_interpreter *ci) const
 {
@@ -97,7 +100,7 @@ inline double symbol::init() const
 
 ///
 /// \return `true` if the symbol has been automatically defined (e.g.
-///         ADF / ADT), `false` otherwise (this is the default value).
+///         ADF / ADT), `false` otherwise (this is the default value)
 ///
 inline bool symbol::auto_defined() const
 {
@@ -105,11 +108,12 @@ inline bool symbol::auto_defined() const
 }
 
 ///
-/// \return the category of the symbol.
+/// The type (a.k.a. category) of the symbol
 ///
-/// In strongly typed GP, every terminal has a type (i.e. category) and every
-/// function has types for each of its arguments and a type for its return
-/// value.
+/// \return the category
+///
+/// In strongly typed GP every terminal and every function argument / return
+/// value has a type (a.k.a. category).
 ///
 inline category_t symbol::category() const
 {
@@ -117,10 +121,11 @@ inline category_t symbol::category() const
 }
 
 ///
-/// \return `true` if the symbol is an input variable.
+/// An input variable is a feature from the learning domain
 ///
-/// An input variable is a feature from the learning domain. Only terminal
-/// can be input variable.
+/// \return `true` if the symbol is an input variable
+///
+/// Only a terminal can be an input variable.
 ///
 /// Default (safe) value is `false`.
 ///
@@ -130,13 +135,16 @@ inline bool symbol::input() const
 }
 
 ///
-/// \return the opcode of the symbol.
+/// An opcode is a unique, numerical session ID for a symbol
+///
+/// \return the opcode
 ///
 /// The opcode is a fast way to uniquely identify a symbol and is primarily
 /// used for hashing.
-/// The other way to identify a symbol is by its name (std::string). The name
-/// is often a better way since the opcode of a symbol can vary between
-/// executions.
+///
+/// \remark
+/// A symbol can be identified also by its name (a `std::string`). The name
+/// is often a better option since it doesn't change among executions.
 ///
 inline opcode_t symbol::opcode() const
 {
@@ -144,15 +152,14 @@ inline opcode_t symbol::opcode() const
 }
 
 ///
-/// \return `true` for parametric symbols.
+/// A parametric symbol needs an additional parameter to be evaluated.
 ///
-/// A parametric symbol needs an additional argument to be evaluated.
+/// \return `true` for parametric symbols
 ///
-/// A value for this argument is stored in every gene where the parametric
-/// symbol is used and it's fetched at run-time.
+/// Genes associated with parametric symbols store an additional parameter
+/// fetched at run-time and used for symbol evaluation.
 ///
-/// \note
-/// Functions are never parametric, terminals can be.
+/// \note Functions cannot be parametric.
 ///
 inline bool symbol::parametric() const
 {
@@ -160,7 +167,7 @@ inline bool symbol::parametric() const
 }
 
 ///
-/// \return `true` if this symbol is a `terminal`.
+/// \return `true` if this symbol is a `terminal`
 ///
 inline bool symbol::terminal() const
 {
@@ -169,4 +176,4 @@ inline bool symbol::terminal() const
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
