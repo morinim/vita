@@ -64,7 +64,7 @@ vita/
     CMakeLists.txt
     CONTRIBUTORS
     Makefile
-	build/ ................Built executables
+    build/ ................Built executables
     examples/ .............Various examples
     kernel/ ...............Vita kernel(core library)
     sr/ ...................Symbolic regression and classification utility
