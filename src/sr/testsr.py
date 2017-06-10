@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2016 EOS di Manlio Morini.
+#  Copyright (C) 2011-2017 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -54,7 +54,7 @@ settings = {
 
 def sr(args, data_set, generations, individuals, code_length, rounds,
        symbol_set, evaluator):
-    sr = "./sr_test" if os.path.exists("./sr_test") else "./sr"
+    sr = "../build/sr_test" if os.path.exists("../build/sr_test") else "../build/sr"
 
     mode = args.mode;
 

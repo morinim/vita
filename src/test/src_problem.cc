@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -78,7 +78,8 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
 
 BOOST_AUTO_TEST_CASE(t_loading)
 {
-  vita::src_problem p("src_problem.xrff", "", "src_problem.xml");
+  vita::src_problem p("../test/src_problem.xrff", "",
+                      "../test/src_problem.xml");
 
   BOOST_REQUIRE(!!p);
 

@@ -90,48 +90,57 @@ THIRD_PARTY_OBJ := $(THIRD_PARTY_SRC:.cc=.o)
 
 ALL_SRC := $(FRAMEWORK_SRC) $(EXAMPLES_SRC) $(FOREX_SRC) $(SR_SRC) $(TESTS_SRC)
 
+MKDIR := mkdir -p
+OUTDIR := build
+
 .PRECIOUS: %.o
 
-all: vita sr
+all: directories vita sr
 
-forex: $(FOREX_OBJ) $(FRAMEWORK_OBJ)
+forex: directories $(FOREX_OBJ) $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o examples/forex/$@ $(LIB)
+	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
-	@strip examples/forex/$@.exe
+	@strip $(OUTDIR)/$@.exe
 else
-	@strip examples/forex/$@
+	@strip $(OUTDIR)/$@
 endif
 endif
 
-sr: sr/sr.o $(FRAMEWORK_OBJ)
+sr: sr/sr.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o sr/$@ $(LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
-	@strip sr/$@.exe
+	@strip $(OUTDIR)/$@.exe
 else
-	@strip sr/$@
+	@strip $(OUTDIR)/$@
 endif
 endif
 
-examples: $(EXAMPLES_SRC:.cc=) forex
+examples: $(EXAMPLES_SRC:.cc=) forex directories
 	@echo $(notdir $^) successfully built
 
-examples/%: examples/%.o $(FRAMEWORK_OBJ)
+examples/%: examples/%.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$(@F)
 
-tests: test/tests.o $(FRAMEWORK_OBJ)
+tests: test/tests.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o test/$@ $(DEBUG_LIB)
-	@cd test; ./$@ --show_progress --build_info
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(DEBUG_LIB)
+	@cd $(OUTDIR) && ./$@ --show_progress --build_info
 
-test/%: test/%.o $(FRAMEWORK_OBJ)
+test/%: test/%.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $@ $(DEBUG_LIB)
-	@cd test; ./$(@F) --show_progress --build_info
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$(@F) $(DEBUG_LIB)
+	@cd $(OUTDIR) && ./$(@F) --show_progress --build_info
+
+.phony: directories
+directories: $(OUTDIR)
+
+$(OUTDIR):
+	$(MKDIR) $(OUTDIR)
 
 # For HG the version ID is:
 # `hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}`
@@ -182,8 +191,7 @@ clean:
 	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "#*#" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.o" -type f -delete -print
 	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*.gch" -type f -delete -print
-	@find ./test/ ./examples/ -executable -not -name "*.*" -type f -delete -print
-	@find ./test/ ./examples/ -executable -name "*.exe" -type f -delete -print
+	@$(RM) -rf $(OUTDIR)
 	@$(RM) sr/sr kernel/libvita.a examples/forex/forex cppcheck.txt cpplint.txt
 
 .phony:	backup

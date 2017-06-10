@@ -64,7 +64,8 @@ vita/
     CMakeLists.txt
     CONTRIBUTORS
     Makefile
-    examples/..............Various examples
+	build/ ................Built executables
+    examples/ .............Various examples
     kernel/ ...............Vita kernel(core library)
     sr/ ...................Symbolic regression and classification utility
     test/ .................Test-suite
@@ -89,23 +90,23 @@ Kernel library can be built without a header-only [Boost library][2]; other prog
 
 The default compiler is g++, to use clang++ type `make CXX=clang++`.
 
-All the output files will, per default, be stored together with the source
-code.
+All the output executables will, per default, be stored inside the `build/`
+directory.
 
 With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
 
 ### cmake ###
 
-```
+```shell
 cd vita/src
-mkdir build
+mkdir -p build
 cd build/
 cmake ..
 ```
 
 To suggest a specific compiler you can write:
 
-```
+```shell
 CXX=clang++ cmake ..
 ```
 
