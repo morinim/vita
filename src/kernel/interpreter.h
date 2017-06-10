@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -66,9 +66,9 @@ private:
   double penalty_locus(const locus &);
 
   // Nonvirtual interface.
-  virtual any run_nvi() override;
-  virtual double penalty_nvi() override;
-  virtual bool debug_nvi() const override;
+  any run_nvi() override;
+  double penalty_nvi() override;
+  bool debug_nvi() const override;
 
   // *** Private data members ***
   const T *prg_;

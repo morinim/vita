@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -76,13 +76,13 @@ class adf : public function
 public:
   adf(const i_mep &, cvect);
 
-  virtual bool auto_defined() const override;
+  bool auto_defined() const override;
 
-  virtual any eval(core_interpreter *) const override;
+  any eval(core_interpreter *) const override;
 
-  virtual std::string display() const override;
+  std::string display() const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   const i_mep &code() const;
 
@@ -102,13 +102,13 @@ class adt : public terminal
 public:
   explicit adt(const i_mep &);
 
-  virtual bool auto_defined() const override;
+  bool auto_defined() const override;
 
-  virtual any eval(core_interpreter *) const override;
+  any eval(core_interpreter *) const override;
 
-  virtual std::string display() const override;
+  std::string display() const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   const i_mep &code() const;
 

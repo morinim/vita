@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -90,7 +90,7 @@ public:
   std::size_t size() const;
   std::size_t size(dataset_t) const;
 
-  virtual bool has(dataset_t) const override;
+  bool has(dataset_t) const override;
 
   unsigned classes() const;
   unsigned columns() const;

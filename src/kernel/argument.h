@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,13 +29,13 @@ class argument : public terminal
 public:
   explicit argument(unsigned);
 
-  virtual std::string display() const override;
+  std::string display() const override;
 
   unsigned index() const;
 
-  virtual any eval(core_interpreter *) const override;
+  any eval(core_interpreter *) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
 private:
   const unsigned index_;

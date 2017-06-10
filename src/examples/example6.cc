@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,9 +23,9 @@ class X : public vita::terminal
 public:
   X() : vita::terminal("X", 0) {}
 
-  virtual bool input() const override { return true; }
+  bool input() const override { return true; }
 
-  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
+  vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -35,9 +35,9 @@ class Y : public vita::terminal
 public:
   Y() : vita::terminal("Y", 0) {}
 
-  virtual bool input() const override { return true; }
+  bool input() const override { return true; }
 
-  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
+  vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -47,9 +47,9 @@ class Z : public vita::terminal
 public:
   Z() : vita::terminal("Z", 0) {}
 
-  virtual bool input() const override { return true; }
+  bool input() const override { return true; }
 
-  virtual vita::any eval(i_interp *) const override { return vita::any(val); }
+  vita::any eval(i_interp *) const override { return vita::any(val); }
 
   static double val;
 };
@@ -60,7 +60,7 @@ double Z::val;
 
 class my_evaluator : public vita::evaluator<vita::i_mep>
 {
-  virtual vita::fitness_t operator()(const vita::i_mep &ind) override
+  vita::fitness_t operator()(const vita::i_mep &ind) override
   {
     vita::interpreter<vita::i_mep> agent(&ind);
 

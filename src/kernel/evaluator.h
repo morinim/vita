@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -70,7 +70,7 @@ template<class T>
 class random_evaluator : public evaluator<T>
 {
 public:
-  virtual fitness_t operator()(const T &) override;
+  fitness_t operator()(const T &) override;
 };
 
 ///
@@ -84,7 +84,7 @@ template<class T>
 class test_evaluator : public vita::evaluator<T>
 {
 public:
-  virtual fitness_t operator()(const T &) override;
+  fitness_t operator()(const T &) override;
 
 private:
   std::vector<T> buffer_ = {};

@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,7 @@ public:
 
   explicit move(unsigned step) : vita::ga::integer(step, 0, 4)  {}
 
-  virtual std::string display(double v) const override
+  std::string display(double v) const override
   {
     switch (static_cast<unsigned>(v))
     {

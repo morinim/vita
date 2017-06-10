@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ namespace vita
       : terminal(name, t), var_(var_id)
     {}
 
-    virtual bool input() const override { return true; }
+    bool input() const override { return true; }
 
     ///
     /// \return the value of the variable (as a \c any).
@@ -38,7 +38,7 @@ namespace vita
     /// \note
     /// the method requires a src_interpreter to work.
     ///
-    virtual any eval(core_interpreter *i) const override
+    any eval(core_interpreter *i) const override
     {
       return static_cast<src_interpreter<i_mep> *>(i)->fetch_var(var_);
     }
@@ -48,4 +48,4 @@ namespace vita
   };
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

@@ -29,10 +29,9 @@ public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  virtual std::string display() const final override { return "0"; }
+  std::string display() const final { return "0"; }
 
-  virtual any eval(core_interpreter *) const final override
-  { return any(false); }
+  any eval(core_interpreter *) const final { return any(false); }
 };
 
 class one : public terminal
@@ -41,10 +40,9 @@ public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
 
-  virtual std::string display() const final override { return "1"; }
+  std::string display() const final { return "1"; }
 
-  virtual any eval(core_interpreter *) const final override
-  { return any(true); }
+  any eval(core_interpreter *) const final { return any(true); }
 };
 
 class l_and : public function
@@ -53,9 +51,9 @@ public:
   explicit l_and(const cvect &c) : function("AND", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  virtual bool associative() const final override { return true; }
+  bool associative() const final { return true; }
 
-  virtual any eval(core_interpreter *ci) const final override
+  any eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
     return any(any_cast<bool>(i.fetch_arg(0)) &&
@@ -69,7 +67,7 @@ public:
   explicit l_not(const cvect &c) : function("NOT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
-  virtual any eval(core_interpreter *ci) const final override
+  any eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
     return any(!any_cast<bool>(i.fetch_arg(0)));
@@ -82,9 +80,9 @@ public:
   explicit l_or(const cvect &c) : function("OR", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  virtual bool associative() const final override { return true; }
+  bool associative() const final { return true; }
 
-  virtual any eval(core_interpreter *ci) const final override
+  any eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
     return any(any_cast<bool>(i.fetch_arg(0)) ||

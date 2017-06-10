@@ -40,9 +40,9 @@ public:
 
   virtual bool associative() const;
 
-  virtual unsigned arity() const override;
+  unsigned arity() const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   static const function *cast(const symbol *);
 

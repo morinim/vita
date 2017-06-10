@@ -29,9 +29,9 @@ public:
   using symbol::symbol;
 
   /// \return `0` (this is a terminal!)
-  virtual unsigned arity() const override final { return 0; }
+  unsigned arity() const final { return 0; }
 
-  virtual bool debug() const override;
+  bool debug() const override;
 };
 
 }  // namespace vita

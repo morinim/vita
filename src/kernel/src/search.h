@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -59,10 +59,10 @@ public:
 
   bool set_evaluator(evaluator_id, const std::string & = "");
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
 protected:
-  virtual void tune_parameters() override;
+  void tune_parameters() override;
 
 private:
   // *** Private support methods ***
@@ -70,15 +70,13 @@ private:
   bool stop_condition(const summary<T> &) const;
 
   // Template methods for search::run() member function.
-  virtual model_measurements calculate_metrics(
-    const summary<T> &) const override;
-  virtual void preliminary_setup() override;
-  virtual void after_evolution(summary<T> *) override;
-  virtual void print_resume(const model_measurements &) const override;
+  model_measurements calculate_metrics(const summary<T> &) const override;
+  void preliminary_setup() override;
+  void after_evolution(summary<T> *) override;
+  void print_resume(const model_measurements &) const override;
 
   // NVI template methods
-  virtual void log_nvi(tinyxml2::XMLDocument *,
-                       const summary<T> &) const override;
+  void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const override;
 
   // *** Private data members ***
   // Preferred evaluator for symbolic regression.

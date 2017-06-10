@@ -37,7 +37,7 @@ public:
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
-  virtual any eval(core_interpreter *) const override { return any(val_); }
+  any eval(core_interpreter *) const override { return any(val_); }
 
 private:
   T val_;
@@ -59,7 +59,7 @@ public:
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
-  virtual any eval(core_interpreter *) const override { return any(val_); }
+  any eval(core_interpreter *) const override { return any(val_); }
 
 private:
   std::string val_;

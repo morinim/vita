@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,9 +50,9 @@ class sum_of_errors_evaluator : public src_evaluator<T>
 public:
   explicit sum_of_errors_evaluator(src_data &d) : src_evaluator<T>(d) {}
 
-  virtual fitness_t operator()(const T &) override;
-  virtual fitness_t fast(const T &) override;
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  fitness_t operator()(const T &) override;
+  fitness_t fast(const T &) override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
@@ -83,8 +83,8 @@ public:
   explicit mae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &,
-                       src_data::example &, int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
+               int *const) override;
 };
 
 ///
@@ -113,8 +113,8 @@ public:
   explicit rmae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &,
-                       src_data::example &, int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
+               int *const) override;
 };
 
 ///
@@ -142,8 +142,8 @@ public:
   explicit mse_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &,
-                       src_data::example &, int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
+               int *const) override;
 };
 
 ///
@@ -160,8 +160,8 @@ public:
   explicit count_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &,
-                       src_data::example &, int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
+               int *const) override;
 };
 
 ///
@@ -194,8 +194,8 @@ class dyn_slot_evaluator : public classification_evaluator<T>
 public:
   explicit dyn_slot_evaluator(src_data &, unsigned = 10);
 
-  virtual fitness_t operator()(const T &) override;
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  fitness_t operator()(const T &) override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:
   /// Number of slots for each class of the training set.
@@ -221,8 +221,8 @@ class gaussian_evaluator : public classification_evaluator<T>
 public:
   explicit gaussian_evaluator(src_data &d) : classification_evaluator<T>(d) {}
 
-  virtual fitness_t operator()(const T &) override;
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  fitness_t operator()(const T &) override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 };
 
 ///
@@ -234,8 +234,8 @@ class binary_evaluator : public classification_evaluator<T>
 public:
   explicit binary_evaluator(src_data &d) : classification_evaluator<T>(d) {}
 
-  virtual fitness_t operator()(const T &) override;
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  fitness_t operator()(const T &) override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 };
 
 #include "kernel/src/evaluator.tcc"

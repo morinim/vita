@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,9 +43,9 @@ public:
 class as_is_validation : public validation_strategy
 {
 public:
-  virtual void preliminary_setup() final override {}
-  virtual bool shake(unsigned) final override { return false; }
-  virtual void final_bookkeeping() final override {}
+  void preliminary_setup() final {}
+  bool shake(unsigned) final { return false; }
+  void final_bookkeeping() final {}
 };
 
 }  // namespace vita

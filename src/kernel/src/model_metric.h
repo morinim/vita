@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,11 +56,10 @@ template<class T>
 class accuracy_metric : public model_metric<T>
 {
 public:
-  virtual double operator()(const reg_lambda_f<T> *,
-                            const src_data &) const override;
+  double operator()(const reg_lambda_f<T> *, const src_data &) const override;
 
-  virtual double operator()(const class_lambda_f<T> *,
-                            const src_data &) const override;
+  double operator()(const class_lambda_f<T> *,
+                    const src_data &) const override;
 };
 
 #include "kernel/src/model_metric.tcc"

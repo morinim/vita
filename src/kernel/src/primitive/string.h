@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ public:
     : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
   { assert(c.size() == 2); }
 
-  virtual any eval(core_interpreter *ci) const final override
+  any eval(core_interpreter *ci) const final
   {
     auto *const i(static_cast<interpreter<i_mep> *>(ci));
 

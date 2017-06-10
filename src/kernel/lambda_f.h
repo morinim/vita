@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -95,18 +95,17 @@ class basic_reg_lambda_f : public reg_lambda_f<T>,
 public:
   explicit basic_reg_lambda_f(const T &);
 
-  virtual any operator()(const src_data::example &) const override;
+  any operator()(const src_data::example &) const override;
 
-  virtual std::string name(const any &) const override;
+  std::string name(const any &) const override;
 
-  virtual double measure(const model_metric<T> &,
-                         const src_data &) const override;
+  double measure(const model_metric<T> &, const src_data &) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   // Serialization
-  virtual bool load(std::istream &, const environment &) override;
-  virtual bool save(std::ostream &) const override;
+  bool load(std::istream &, const environment &) override;
+  bool save(std::ostream &) const override;
 
 private:
   any eval(const src_data::example &, std::false_type) const;
@@ -146,12 +145,11 @@ class basic_class_lambda_f : public class_lambda_f<T>,
 public:
   explicit basic_class_lambda_f(const src_data &);
 
-  virtual any operator()(const src_data::example &) const override;
+  any operator()(const src_data::example &) const override;
 
-  virtual std::string name(const any &) const override final;
+  std::string name(const any &) const final;
 
-  virtual double measure(const model_metric<T> &,
-                         const src_data &) const override;
+  double measure(const model_metric<T> &, const src_data &) const override;
 };
 
 ///
@@ -172,16 +170,15 @@ class basic_dyn_slot_lambda_f : public basic_class_lambda_f<T, N>
 public:
   basic_dyn_slot_lambda_f(const T &, src_data &, unsigned);
 
-  virtual std::pair<class_t, double> tag(
-    const src_data::example &) const override;
+  std::pair<class_t, double> tag(const src_data::example &) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   double training_accuracy() const;
 
   // Serialization
-  virtual bool load(std::istream &, const environment &) override;
-  virtual bool save(std::ostream &) const override;
+  bool load(std::istream &, const environment &) override;
+  bool save(std::ostream &) const override;
 
 private:
   // Private support methods
@@ -226,14 +223,13 @@ class basic_gaussian_lambda_f : public basic_class_lambda_f<T, N>
 public:
   basic_gaussian_lambda_f(const T &, src_data &);
 
-  virtual std::pair<class_t, double> tag(
-    const src_data::example &) const override;
+  std::pair<class_t, double> tag(const src_data::example &) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   // Serialization
-  virtual bool load(std::istream &, const environment &) override;
-  virtual bool save(std::ostream &) const override;
+  bool load(std::istream &, const environment &) override;
+  bool save(std::ostream &) const override;
 
 private:
   // Private support methods
@@ -265,14 +261,13 @@ class basic_binary_lambda_f : public basic_class_lambda_f<T, N>
 public:
   basic_binary_lambda_f(const T &, src_data &);
 
-  virtual std::pair<class_t, double> tag(
-    const src_data::example &) const override;
+  std::pair<class_t, double> tag(const src_data::example &) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   // Serialization
-  virtual bool load(std::istream &, const environment &) override;
-  virtual bool save(std::ostream &) const override;
+  bool load(std::istream &, const environment &) override;
+  bool save(std::ostream &) const override;
 
 private:
   // Private support methods
@@ -325,14 +320,13 @@ public:
   template<class... Args> team_class_lambda_f(const team<T> &, src_data &,
                                               Args &&...);
 
-  virtual std::pair<class_t, double> tag(
-    const src_data::example &) const override;
+  std::pair<class_t, double> tag(const src_data::example &) const override;
 
-  virtual bool debug() const override;
+  bool debug() const override;
 
   // Serialization
-  virtual bool load(std::istream &, const environment &) override;
-  virtual bool save(std::ostream &) const override;
+  bool load(std::istream &, const environment &) override;
+  bool save(std::ostream &) const override;
 
 protected:
   // The components of the team never store the names of the classes. If we

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,9 +34,9 @@ class dss : public validation_strategy
 public:
   explicit dss(src_data &);
 
-  virtual void preliminary_setup() override;
-  virtual bool shake(unsigned) override;
-  virtual void final_bookkeeping() override {}
+  void preliminary_setup() override;
+  bool shake(unsigned) override;
+  void final_bookkeeping() override {}
 
 private:
   std::pair<uintmax_t,uintmax_t> average_age_difficulty(data::dataset_t) const;

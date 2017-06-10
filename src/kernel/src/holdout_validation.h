@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,9 +33,9 @@ class holdout_validation : public validation_strategy
 public:
   holdout_validation(src_data &, unsigned);
 
-  virtual void preliminary_setup() override;
-  virtual bool shake(unsigned) override { return false; }
-  virtual void final_bookkeeping() override {}
+  void preliminary_setup() override;
+  bool shake(unsigned) override { return false; }
+  void final_bookkeeping() override {}
 
 private:
   src_data &dat_;

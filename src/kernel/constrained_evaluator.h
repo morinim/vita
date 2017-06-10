@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,10 +36,10 @@ class constrained_evaluator : public evaluator<T>
 public:
   constrained_evaluator(E, P);
 
-  virtual fitness_t operator()(const T &) override;
-  virtual fitness_t fast(const T &) override;
+  fitness_t operator()(const T &) override;
+  fitness_t fast(const T &) override;
 
-  virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:
   // Base evaluator.
