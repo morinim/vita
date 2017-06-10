@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,10 +27,9 @@ BOOST_AUTO_TEST_CASE(Base)
 {
   vita::constant<std::string> t("A TERMINAL");
 
-  BOOST_CHECK_EQUAL(t.associative(), false);
-  BOOST_CHECK_EQUAL(t.arity(), 0);
-  BOOST_CHECK_EQUAL(t.auto_defined(), false);
-  BOOST_CHECK(t.debug());
+  BOOST_TEST(!t.arity());
+  BOOST_TEST(!t.auto_defined());
+  BOOST_TEST(t.debug());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

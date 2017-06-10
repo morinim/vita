@@ -596,7 +596,7 @@ std::ostream &i_mep::in_line(std::ostream &s) const
 /// \param[in] short_form if `true` prints a shorter and more human-readable
 ///                       form of the genome.
 ///
-/// Do you remember C=64 list? :-)
+/// Do you remember C=64's `LIST`? :-)
 ///
 /// 10 PRINT "HOME"
 /// 20 PRINT "SWEET"
@@ -650,25 +650,23 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 ///
 std::ostream &i_mep::tree(std::ostream &s) const
 {
-  std::function<void (locus, unsigned, locus)> tree_(
-    [&](locus child, unsigned indent, locus parent)
+  std::function<void (const gene &, const gene &, unsigned)> tree_(
+    [&](const gene &parent, const gene &child, unsigned indent)
     {
-      const gene &g(genome_(child));
-
       if (child == parent ||
-          !genome_(parent).sym->associative() ||
-          genome_(parent).sym != g.sym)
+          parent.sym != child.sym ||
+          function::cast(parent.sym)->associative() == false)
       {
-        s << std::string(indent, ' ') << g << '\n';
+        s << std::string(indent, ' ') << child << '\n';
         indent += 2;
       }
 
-      const auto arity(g.sym->arity());
+      const auto arity(child.sym->arity());
       for (auto i(decltype(arity){0}); i < arity; ++i)
-        tree_(g.arg_locus(i), indent, child);
+        tree_(child, genome_(child.arg_locus(i)), indent);
     });
 
-  tree_(best_, 0, best_);
+  tree_(genome_(best_), genome_(best_), 0);
   return s;
 }
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,10 +24,11 @@ namespace vita
 using opcode_t = unsigned;
 
 ///
+/// Together functions and terminals are referred to as symbols.
+///
 /// GP assembles variable length program structures from basic units called
 /// functions and terminals. Functions perform operations on their inputs,
 /// which are either terminals or output from other functions.
-/// Together functions and terminals are referred to as symbols.
 ///
 class symbol
 {
@@ -35,7 +36,6 @@ public:
   symbol(const std::string &, category_t);
 
   virtual unsigned arity() const = 0;
-  virtual bool associative() const;
   virtual bool auto_defined() const;
   virtual bool input() const;
   virtual bool parametric() const;
@@ -71,12 +71,10 @@ private:
 };
 
 ///
-/// \param[in] ci interpreter used for symbol's constraints evaluation.
-/// \return a penalty based on symbol specific broken constraints.
-///
-/// Return value:
-/// - `0.0` states that no constraint penalty is applied;
-/// - larger values specify larger penalties.
+/// \param[in] ci interpreter used for symbol's constraints evaluation
+/// \return       a penalty based on symbol specific broken constraints:
+///               - `0.0` states that no constraint penalty is applied;
+///               - larger values specify larger penalties
 ///
 inline double symbol::penalty(core_interpreter *ci) const
 {
@@ -84,33 +82,17 @@ inline double symbol::penalty(core_interpreter *ci) const
 }
 
 ///
-/// \return `0.0`.
+/// Used to initialize the symbol's internal parameter.
 ///
-/// This function is used to initialize the symbol's internal parameter.
-/// Derived classes should redefine the init member function in a
-/// meaningful way.
+/// \return `0.0`
+///
+/// \remark
+/// Derived classes should redefine the init member function in a meaningful
+/// way.
 ///
 inline double symbol::init() const
 {
   return 0.0;
-}
-
-///
-/// \return `true` if the function is associative.
-///
-/// The associative law of arithmetic: if OP is associative then
-///
-///     a OP (b OP c) = (a OP b) OP c = a OP b OP c
-///
-/// This information can be used for optimization and visualization.
-///
-/// \note
-/// * Terminals haven't arguments and cannot be associative.
-/// * Default (safe) value is `false`.
-///
-inline bool symbol::associative() const
-{
-  return false;
 }
 
 ///

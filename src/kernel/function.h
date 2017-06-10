@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@
 namespace vita
 {
 ///
-/// \brief A symbol (arity > 0) used in GP
+/// A symbol with `arity() > 0`.
 ///
 /// A function labels the internal (non-leaf) points of the parse trees that
 /// represent the programs in the population. An example function set might be
@@ -28,9 +28,8 @@ namespace vita
 ///
 /// \warning
 /// Each function should be able to handle gracefully all values it might
-/// receive as input (this is called closure property).
-/// If there is a way to crash the system, the GP system will certainly hit
-/// upon hit.
+/// receive as input (this is called closure property). If there is a way to
+/// crash the system, the GP system will certainly hit upon hit.
 ///
 class function : public symbol
 {
@@ -39,13 +38,15 @@ public:
 
   category_t arg_category(unsigned) const;
 
+  virtual bool associative() const;
+
   virtual unsigned arity() const override;
 
   virtual bool debug() const override;
 
   static const function *cast(const symbol *);
 
-private:  // Private data members
+private:
   cvect argt_;
 };
 
@@ -56,6 +57,26 @@ inline unsigned function::arity() const
 {
   assert(argt_.size());
   return static_cast<unsigned>(argt_.size());
+}
+
+///
+/// Is the symbol subject to the associative law of arithmetic?
+///
+/// \return `true` if the function is associative
+///
+/// `OP` is associative iff:
+///
+///     a OP (b OP c) = (a OP b) OP c = a OP b OP c
+///
+/// This information can be used for optimization and visualization.
+///
+/// \note
+/// * Terminals haven't arguments and cannot be associative.
+/// * Default (safe) value is `false`.
+///
+inline bool function::associative() const
+{
+  return false;
 }
 
 ///
