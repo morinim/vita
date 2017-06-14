@@ -121,7 +121,7 @@ inline category_t symbol::category() const
 }
 
 ///
-/// An input variable is a feature from the learning domain
+/// An input variable is a feature from the learning domain.
 ///
 /// \return `true` if the symbol is an input variable
 ///
@@ -135,7 +135,7 @@ inline bool symbol::input() const
 }
 
 ///
-/// An opcode is a unique, numerical session ID for a symbol
+/// An opcode is a unique, numerical session ID for a symbol.
 ///
 /// \return the opcode
 ///

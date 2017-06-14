@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_INTERPRETER_TCC
 
 ///
-/// \param[in] ind individual whose value we are interested in.
+/// \param[in] ind individual whose value we are interested in
 /// \param[in] ctx context in which we calculate the output value (used for
-///                the evaluation of ADF). It can be empty (`nullptr`).
+///                the evaluation of ADF). It can be empty (`nullptr`)
 ///
 /// \warning
 /// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
@@ -30,12 +30,12 @@ interpreter<T>::interpreter(const T *ind, interpreter *ctx)
   : core_interpreter(), prg_(ind), cache_(ind->size(), ind->categories()),
     ip_(ind->best_), context_(ctx)
 {
-  assert(ind);
+  Expects(ind);
 }
 
 ///
-/// \param[in] ip locus of the genome we are starting evaluation from.
-/// \return the output value of `this` individual.
+/// \param[in] ip locus of the genome we are starting evaluation from
+/// \return       the output value of `this` individual
 ///
 template<class T>
 any interpreter<T>::run_locus(const locus &ip)
@@ -48,9 +48,9 @@ any interpreter<T>::run_locus(const locus &ip)
 }
 
 ///
-/// \return the output value of `this` individual.
-///
 /// Calls `run_locus()` using the default starting locus.
+///
+/// \return the output value of `this` individual
 ///
 template<class T>
 inline any interpreter<T>::run_nvi()
@@ -59,7 +59,7 @@ inline any interpreter<T>::run_nvi()
 }
 
 ///
-/// \return the output value of the current terminal symbol.
+/// \return the output value of the current terminal symbol
 ///
 template<class T>
 any interpreter<T>::fetch_param()
@@ -71,8 +71,10 @@ any interpreter<T>::fetch_param()
 }
 
 ///
-/// \param[in] i i-th argument of the current function.
-/// \return the value of the i-th argument of the current function.
+/// Fetches the value of the `i`-th argument of the current gene.
+///
+/// \param[in] i i-th argument of the current gene
+/// \return      the required value
 ///
 /// We use a cache to avoid recalculating the same value during the same
 /// interpreter execution.
@@ -80,8 +82,8 @@ any interpreter<T>::fetch_param()
 /// REFERENTIAL TRANSPARENCY for all the expressions.
 ///
 /// \see
-/// * <http://en.wikipedia.org/wiki/Referential_transparency_(computer_science)>
-/// * <http://en.wikipedia.org/wiki/Memoization>
+/// - <http://wikipedia.org/wiki/Referential_transparency_(computer_science)>
+/// - <http://wikipedia.org/wiki/Memoization>
 ///
 template<class T>
 any interpreter<T>::fetch_arg(unsigned i)
@@ -118,13 +120,13 @@ any interpreter<T>::fetch_arg(unsigned i)
   }
 #endif
 
-  assert(elem.valid);
+  Ensures(elem.valid);
   return elem.value;
 }
 
 ///
-/// \param[in] i i-th argument of the current ADF.
-/// \return the value of the i-th argument of the current ADF function.
+/// \param[in] i i-th argument of the current ADF
+/// \return      the value of the i-th argument of the current ADF function
 ///
 template<class T>
 any interpreter<T>::fetch_adf_arg(unsigned i)
@@ -141,8 +143,9 @@ any interpreter<T>::fetch_adf_arg(unsigned i)
 }
 
 ///
-/// \param[in] i i-th argument of the current function.
-/// \return the index referenced by the i-th argument of the current function.
+/// \param[in] i `i`-th argument of the current function
+/// \return      the index referenced by the `i`-th argument of the current
+///              function
 ///
 template<class T>
 index_t interpreter<T>::fetch_index(unsigned i) const
@@ -156,8 +159,8 @@ index_t interpreter<T>::fetch_index(unsigned i) const
 }
 
 ///
-/// \param[in] ip locus of the genome we are starting evaluation from.
-/// \return the penalty value for `this` individual.
+/// \param[in] ip locus of the genome we are starting evaluation from
+/// \return       the penalty value for `this` individual
 ///
 template<class T>
 double interpreter<T>::penalty_locus(const locus &ip)
@@ -167,10 +170,10 @@ double interpreter<T>::penalty_locus(const locus &ip)
 }
 
 ///
-/// \return the penalty for `this` individual.
-///
 /// Calls penalty_locus() using the default starting locus.
-//
+///
+/// \return the penalty for `this` individual
+///
 template<class T>
 double interpreter<T>::penalty_nvi()
 {
@@ -178,7 +181,7 @@ double interpreter<T>::penalty_nvi()
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
 bool interpreter<T>::debug_nvi() const
@@ -191,4 +194,4 @@ bool interpreter<T>::debug_nvi() const
 
   return ip_.index < prg_->size();
 }
-#endif  // Include guard
+#endif  // include guard

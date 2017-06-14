@@ -22,9 +22,9 @@
 namespace vita
 {
 ///
-/// \brief A template specialization of the core_interpreter class.
+/// A template specialization of the core_interpreter class.
 ///
-/// \tparam T the type of individual used.
+/// \tparam T the type of individual used
 ///
 /// \note
 /// This class would like to be a generic `interpreter<T>` implementation,
