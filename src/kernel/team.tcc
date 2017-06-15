@@ -219,8 +219,8 @@ hash_t team<T>::hash() const
 {
   hash_t ret;
 
-  for (const auto &i : individuals_)
-    ret.combine(i.signature());
+  for_each(begin(), end(),
+           [&ret](const T &i) { ret.combine(i.signature()); });
 
   return ret;
 }
@@ -271,9 +271,11 @@ unsigned distance(const team<T> &lhs, const team<T> &rhs)
 template<class T>
 unsigned team<T>::age() const
 {
-  unsigned age_sum(0);
-  for (const auto &i : individuals_)
-    age_sum += i.age();
+  const unsigned age_sum(std::accumulate(begin(), end(), 0,
+                                         [](unsigned sum, const T &i)
+                                         {
+                                           return sum + i.age();
+                                         }));
 
   return age_sum / individuals();
 }
@@ -295,9 +297,9 @@ void team<T>::inc_age()
 template<class T>
 bool team<T>::debug() const
 {
-  for (const auto &i : individuals_)
-    if (!i.debug())
-      return false;
+  if (!std::all_of(begin(), end(),
+                   [](const T &i) { return i.debug(); }))
+    return false;
 
   return signature_.empty() || signature_ == hash();
 }
@@ -347,9 +349,9 @@ bool team<T>::save(std::ostream &out) const
   if (!out.good())
     return false;
 
-  for (const auto &i : individuals_)
-    if (!i.save(out))
-      return false;
+  if (std::any_of(begin(), end(),
+                  [&](const T &i) { return !i.save(out); }))
+    return false;
 
   return out.good();
 }
@@ -419,20 +421,22 @@ std::ostream &in_line(const team<T> &t, std::ostream &s)
 ///
 /// Do you remember C=64 list? :-)
 ///
-/// \param[out] s output stream
-/// \param[in] short_form if `true` prints a shorter and more human-readable
-///                       form of the genome.
+/// \param[in]  t          the team to be printed
+/// \param[out] s          output stream
+/// \param[in]  short_form if `true` prints a shorter and more human-readable
+///                        form of the genome
+/// \return                a constant reference to the output stream
 ///
 /// 10 PRINT "HOME"
 /// 20 PRINT "SWEET"
 /// 30 GOTO 10
 ///
 template<class T>
-std::ostream &team<T>::list(std::ostream &s, bool short_form) const
+std::ostream &list(const team<T> &t, std::ostream &s, bool short_form)
 {
-  for (const auto &i : individuals_)
+  for (const auto &i : t)
   {
-    i.list(s, short_form);
+    list(i, s, short_form);
     s << '\n';
   }
 

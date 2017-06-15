@@ -39,7 +39,6 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &, const std::string & = "") const;
-  std::ostream &list(std::ostream &, bool = true) const;
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators
@@ -162,6 +161,7 @@ inline bool i_mep::empty() const
 // Visualization/output methods.
 std::ostream &dump(const i_mep &, std::ostream & = std::cout);
 std::ostream &in_line(const i_mep &, std::ostream & = std::cout);
+std::ostream &list(const i_mep &, std::ostream & = std::cout, bool = true);
 std::ostream &operator<<(std::ostream &, const i_mep &);
 
 #include "kernel/i_mep_iterator.tcc"

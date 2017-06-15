@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,7 +38,7 @@ struct hash_t
   bool operator!=(hash_t h) const
   { return data[0] != h.data[0] || data[1] != h.data[1]; }
 
-  /// \brief Used to combine multiple hashes.
+  /// Used to combine multiple hashes.
   ///
   /// \note
   /// In spite of its handy bit-mixing properties, XOR is not a good way to
@@ -66,8 +66,8 @@ struct hash_t
 std::ostream &operator<<(std::ostream &, hash_t);
 
 ///
-/// \brief Implements a hash table that links individuals' signature to
-///        fitness (mainly used by the evaluator_proxy class).
+/// Implements a hash table that links individuals' signature to fitness
+/// (mainly used by the evaluator_proxy class).
 ///
 /// During the evolution semantically equivalent (but syntactically distinct)
 /// individuals are often generated and cache can give a significant speed

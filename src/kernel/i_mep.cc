@@ -608,31 +608,38 @@ std::ostream &in_line(const i_mep &mep, std::ostream &s)
 ///
 /// Prints a human readable representation of the individual.
 ///
-/// \param[out] s         output stream
-/// \param[in] short_form if `true` prints a shorter and more human-readable
-///                       form of the genome
+/// \param[in]  mep        the individual to be printed
+/// \param[out] s          output stream
+/// \param[in]  short_form if `true` prints a shorter and more human-readable
+///                        form of the genome
+/// \return                a reference to the output stream
 ///
 /// Do you remember C=64's `LIST`? :-)
 ///
-/// 10 PRINT "HOME"
-/// 20 PRINT "SWEET"
-/// 30 GOTO 10
+///     10 PRINT "HOME"
+///     20 PRINT "SWEET"
+///     30 GOTO 10
 ///
-std::ostream &i_mep::list(std::ostream &s, bool short_form) const
+/// \relates i_mep
+///
+std::ostream &list(const i_mep &mep, std::ostream &s, bool short_form)
 {
   SAVE_FLAGS(s);
 
-  const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories())));
+  const auto size(mep.size());
+  const auto categories(mep.categories());
 
-  for (auto i(begin()); i != end(); ++i)
+  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
+  const auto w2(1 + static_cast<int>(std::log10(categories)));
+
+  for (auto i(mep.begin()); i != mep.end(); ++i)
   {
-    if (short_form && i->sym->terminal() && i.locus() != best())
+    if (short_form && i->sym->terminal() && i.locus() != mep.best())
       continue;
 
     s << '[' << std::setfill('0') << std::setw(w1) << i.locus().index;
 
-    if (categories() > 1)
+    if (categories > 1)
       s << ',' << std::setw(w2) << i.locus().category;
 
     s << "] " << *i;
@@ -644,12 +651,12 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 
       const auto arg_j(i->arg_locus(j));
 
-      if (short_form && genome_(arg_j).sym->terminal())
-        s << genome_(arg_j);
+      if (short_form && mep[arg_j].sym->terminal())
+        s << mep[arg_j];
       else
       {
         s << '[' << std::setw(w1) << arg_j.index;
-        if (categories() > 1)
+        if (categories > 1)
           s << ',' << std::setw(w2) << arg_j.category;
         s << ']';
       }
@@ -744,7 +751,7 @@ std::ostream &dump(const i_mep &mep, std::ostream &s)
 ///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {
-  return ind.list(s, true);
+  return list(ind, s, true);
 }
 
 ///

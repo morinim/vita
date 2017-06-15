@@ -59,7 +59,6 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &) const;
-  std::ostream &list(std::ostream &, bool = true) const;
   std::ostream &tree(std::ostream &) const;
 
   // Recombination operators.
@@ -113,6 +112,8 @@ template<class T> team<T> crossover(const team<T> &, const team<T> &);
 // ***********************************************************************
 template<class T> std::ostream &in_line(const team<T> &,
                                         std::ostream & = std::cout);
+template<class T> std::ostream &list(const team<T> &,
+                                     std::ostream & = std::cout, bool = true);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
 // The SFINAE way of recognizing a team.
