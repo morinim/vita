@@ -388,20 +388,19 @@ std::ostream &operator<<(std::ostream &s, const team<T> &t)
 /// The output stream contains a graph, described in dot language, of `this`
 /// team.
 ///
+/// \param[in]  t team to be printed
 /// \param[out] s output stream
 ///
 /// \see <http://www.graphviz.org>
 ///
 template<class T>
-void team<T>::graphviz(std::ostream &s) const
+void graphviz(const team<T> &t, std::ostream &s)
 {
-  const auto size(individuals_.size());
+  const auto size(t.individuals());
 
   s << "graph {";
   for (auto i(decltype(size){0}); i < size; ++i)
-    individuals_[i].graphviz(s,
-                             std::string("Individual ") +
-                             std::to_string(i));
+    graphviz(t[i], s, std::string("Individual ") + std::to_string(i));
 
   s << "}\n";
 }

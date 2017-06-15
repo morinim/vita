@@ -553,12 +553,13 @@ bool i_mep::debug() const
 /// The output stream contains a graph of this individual described in dot
 /// language.
 ///
-/// \param[out] s output stream
-/// \param[in] id used for subgraph plot (usually this is an empty string)
+/// \param[in]  mep individual to be exported
+/// \param[out] s   output stream
+/// \param[in]  id  used for subgraph plot (usually this is an empty string)
 ///
 /// \see http://www.graphviz.org/
 ///
-void i_mep::graphviz(std::ostream &s, const std::string &id) const
+void graphviz(const i_mep &mep, std::ostream &s, const std::string &id)
 {
   if (id.empty())
     s << "graph";
@@ -566,7 +567,7 @@ void i_mep::graphviz(std::ostream &s, const std::string &id) const
     s << "subgraph " << id;
   s << " {";
 
-  for (auto i(begin()); i != end(); ++i)
+  for (auto i(mep.begin()); i != mep.end(); ++i)
   {
     s << 'g' << i.locus().index << '_' << i.locus().category << " [label="
       << *i << ", shape=" << (i->sym->arity() ? "box" : "circle") << "];";

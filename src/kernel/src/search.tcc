@@ -377,7 +377,7 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
     set_text(e_solution, "tree", ss_tree.str());
 
     std::ostringstream ss_graph;
-    run_sum.best.solution.graphviz(ss_graph);
+    graphviz(run_sum.best.solution, ss_graph);
     set_text(e_solution, "graph", ss_graph.str());
   }
 

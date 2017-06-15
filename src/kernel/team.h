@@ -57,9 +57,6 @@ public:
   explicit team(const environment &);
   explicit team(std::vector<T>);
 
-  // Visualization/output methods
-  void graphviz(std::ostream &) const;
-
   // Recombination operators.
   unsigned mutation(double, const environment &);
 
@@ -110,6 +107,7 @@ template<class T> team<T> crossover(const team<T> &, const team<T> &);
 // ***********************************************************************
 // * Visualization/output                                                *
 // ***********************************************************************
+template<class T> void graphviz(const team<T> &, std::ostream &);
 template<class T> std::ostream &in_line(const team<T> &,
                                         std::ostream & = std::cout);
 template<class T> std::ostream &list(const team<T> &,

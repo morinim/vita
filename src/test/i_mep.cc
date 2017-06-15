@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(t_output)
   ss.clear();
   ss.str(std::string());
 
-  i.graphviz(ss);
+  graphviz(i, ss);
   BOOST_TEST(ss.str() ==
              "graph {"
              "g0_0 [label=FSUB, shape=box];"

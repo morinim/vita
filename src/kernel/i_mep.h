@@ -37,9 +37,6 @@ public:
   explicit i_mep(const environment &);
   explicit i_mep(const std::vector<gene> &);
 
-  // Visualization/output methods
-  void graphviz(std::ostream &, const std::string & = "") const;
-
   // Recombination operators
   unsigned mutation(double, const environment &);
 
@@ -163,6 +160,7 @@ bool operator!=(const i_mep &, const i_mep &);
 // * Visualization/output methods. *
 // *********************************
 std::ostream &dump(const i_mep &, std::ostream & = std::cout);
+void graphviz(const i_mep &, std::ostream &, const std::string & = "");
 std::ostream &in_line(const i_mep &, std::ostream & = std::cout);
 std::ostream &list(const i_mep &, std::ostream & = std::cout, bool = true);
 std::ostream &operator<<(std::ostream &, const i_mep &);
