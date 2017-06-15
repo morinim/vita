@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(t_output)
   std::stringstream ss;
 
   BOOST_TEST_CHECKPOINT("Inline output");
-  i.in_line(ss);
+  in_line(i, ss);
   BOOST_CHECK_EQUAL(ss.str(), "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
 
   BOOST_TEST_CHECKPOINT("Graphviz output");

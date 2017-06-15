@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,8 @@
 namespace vita
 {
 ///
-/// \brief A collection of cooperating individuals used as a member of
-///        vita::population.
+/// A collection of cooperating individuals used as a member of
+/// vita::population.
 ///
 /// \tparam T type of the elements of the team (individuals).
 ///
@@ -59,7 +59,6 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &) const;
-  std::ostream &in_line(std::ostream &) const;
   std::ostream &list(std::ostream &, bool = true) const;
   std::ostream &tree(std::ostream &) const;
 
@@ -109,6 +108,9 @@ template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> team<T> crossover(const team<T> &, const team<T> &);
 
+// Visualization/output methods
+template<class T> std::ostream &in_line(const team<T> &,
+                                        std::ostream & = std::cout);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
 
 // The SFINAE way of recognizing a team.

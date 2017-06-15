@@ -562,23 +562,29 @@ void i_mep::graphviz(std::ostream &s, const std::string &id) const
 }
 
 ///
-/// \param[out] s output stream
-///
 /// The individual is printed on a single line with symbols separated by
-/// spaces. Not at all human readable, but a compact representation for
+/// spaces.
+///
+/// \param[in]  mep individual to be printed
+/// \param[out] s   output stream
+/// \return         a reference to the output stream
+///
+/// Not at all human readable, but a compact representation for
 /// import / export.
 ///
 /// \note
 /// Prints active genes visiting the genome in pre-order.
 ///
-std::ostream &i_mep::in_line(std::ostream &s) const
+/// \relates i_mep
+///
+std::ostream &in_line(const i_mep &mep, std::ostream &s)
 {
   std::function<void (locus)> in_line_(
     [&](locus l)
     {
-      const gene &g(genome_(l));
+      const gene &g(mep[l]);
 
-      if (l != best_)
+      if (l != mep.best())
         s << ' ';
       s << g;
 
@@ -587,7 +593,7 @@ std::ostream &i_mep::in_line(std::ostream &s) const
         in_line_(g.arg_locus(i));
     });
 
-  in_line_(best_);
+  in_line_(mep.best());
   return s;
 }
 
@@ -677,6 +683,8 @@ std::ostream &i_mep::tree(std::ostream &s) const
 /// \param[out] s   output stream
 /// \return         a reference to `s`
 ///
+/// \relates i_mep
+///
 std::ostream &dump(const i_mep &mep, std::ostream &s)
 {
   SAVE_FLAGS(s);
@@ -717,9 +725,9 @@ std::ostream &dump(const i_mep &mep, std::ostream &s)
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] ind individual to print.
-/// \return output stream including `ind`.
+/// \param[out] s   output stream
+/// \param[in]  ind individual to print
+/// \return         output stream including `ind`
 ///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,6 @@ public:
 
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
-  std::ostream &in_line(std::ostream &) const;
 
   // Recombination operators.
   unsigned mutation(double, const environment &);
@@ -111,6 +110,8 @@ private:
 // Recombination operators.
 i_ga crossover(const i_ga &, const i_ga &);
 
+// Visualization/output methods.
+std::ostream &in_line(const i_ga &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_ga &);
 
 ///

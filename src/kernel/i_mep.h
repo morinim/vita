@@ -38,7 +38,6 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &, const std::string & = "") const;
-  std::ostream &in_line(std::ostream &) const;
   std::ostream &list(std::ostream &, bool = true) const;
   std::ostream &tree(std::ostream &) const;
 
@@ -70,6 +69,7 @@ public:
   bool empty() const;
 
   category_t category() const;
+  locus best() const;
 
   bool debug() const;
 
@@ -109,11 +109,16 @@ private:
   locus best_;
 };  // class i_mep
 
-// Visualization/output methods.
-std::ostream &dump(const i_mep &, std::ostream & = std::cout);
-
 i_mep crossover(const i_mep &, const i_mep &);
 unsigned distance(const i_mep &, const i_mep &);
+
+///
+/// \return the starting locus of the best sequence available
+///
+inline locus i_mep::best() const
+{
+  return best_;
+}
 
 ///
 /// \param[in] l locus of a `gene`.
@@ -152,6 +157,9 @@ inline bool i_mep::empty() const
   return size() == 0;
 }
 
+// Visualization/output methods.
+std::ostream &dump(const i_mep &, std::ostream & = std::cout);
+std::ostream &in_line(const i_mep &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_mep &);
 
 #include "kernel/i_mep_iterator.tcc"

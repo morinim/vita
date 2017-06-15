@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,13 +54,17 @@ void i_ga::graphviz(std::ostream &s) const
 }
 
 ///
-/// \param[out] s output stream
+/// Prints the genes of the individual.
 ///
-/// Prints genes of the individual.
+/// \param[in]  ga data to be printed
+/// \param[out] s  output stream
+/// \return        a reference to the output stream
 ///
-std::ostream &i_ga::in_line(std::ostream &s) const
+/// \relates i_ga
+///
+std::ostream &in_line(const i_ga &ga, std::ostream &s)
 {
-  std::copy(genome_.begin(), genome_.end(), infix_iterator<gene>(s, " "));
+  std::copy(ga.begin(), ga.end(), infix_iterator<gene>(s, " "));
   return s;
 }
 
@@ -358,13 +362,15 @@ bool i_ga::save_impl(std::ostream &out) const
 }
 
 ///
-/// \param[out] s output stream.
+/// \param[out] s  output stream
 /// \param[in] ind individual to print.
-/// \return output stream including `ind`.
+/// \return        output stream including `ind`
+///
+/// \relates i_ga
 ///
 std::ostream &operator<<(std::ostream &s, const i_ga &ind)
 {
-  return ind.in_line(s);
+  return in_line(ind, s);
 }
 
 }  // namespace vita

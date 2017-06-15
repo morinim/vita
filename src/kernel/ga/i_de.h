@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief An individual optimized for differential evolution.
+/// An individual optimized for differential evolution.
 ///
 /// \see
 /// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264 april
@@ -32,7 +32,6 @@ public:
 
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
-  std::ostream &in_line(std::ostream &) const;
 
   i_de crossover(double, const double [2],
                  const i_de &, const i_de &, const i_de &) const;
@@ -101,6 +100,8 @@ private:
 bool operator==(const i_de &, const i_de &);
 double distance(const i_de &, const i_de &);
 
+// Visualization/output methods.
+std::ostream &in_line(const i_de &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_de &);
 
 ///

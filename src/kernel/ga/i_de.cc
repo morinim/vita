@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,14 +55,17 @@ void i_de::graphviz(std::ostream &s) const
 }
 
 ///
-/// \param[out] s output stream
+/// Prints the genes of the individual.
 ///
-/// Prints genes of the individual.
+/// \param[in]  de data to be printed
+/// \param[out] s  output stream
+/// \return        a reference to the output stream
 ///
-std::ostream &i_de::in_line(std::ostream &s) const
+/// \relates i_de
+///
+std::ostream &in_line(const i_de &de, std::ostream &s)
 {
-  std::copy(genome_.begin(), genome_.end(),
-            infix_iterator<decltype(genome_[0])>(s, " "));
+  std::copy(de.begin(), de.end(), infix_iterator<decltype(de[0])>(s, " "));
   return s;
 }
 
@@ -303,9 +306,11 @@ bool i_de::save_impl(std::ostream &out) const
 /// \param[in] ind individual to print.
 /// \return output stream including `ind`.
 ///
+/// \relates i_de
+///
 std::ostream &operator<<(std::ostream &s, const i_de &ind)
 {
-  return ind.in_line(s);
+  return in_line(ind, s);
 }
 
 ///

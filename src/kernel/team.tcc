@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -356,9 +356,11 @@ bool team<T>::save(std::ostream &out) const
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] t team to print.
-/// \return output stream including `t`.
+/// \param[out] s output stream
+/// \param[in]  t team to print
+/// \return       output stream including `t`
+///
+/// \relates team<T>
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
@@ -389,19 +391,23 @@ void team<T>::graphviz(std::ostream &s) const
 }
 
 ///
+/// \param[in]  t the team to be printed
 /// \param[out] s output stream
+/// \return       a reference to the output stream
 ///
 /// The team is printed on a single line with symbols separated by
 /// spaces and individuals between curly braces.
 /// Not at all human readable, but a compact representation for import/export.
 ///
+/// \relates team<T>
+///
 template<class T>
-std::ostream &team<T>::in_line(std::ostream &s) const
+std::ostream &in_line(const team<T> &t, std::ostream &s)
 {
-  for (const auto &i : individuals_)
+  for (const auto &i : t)
   {
     s << '{';
-    i.in_line(s);
+    in_line(i, s);
     s << '}';
   }
 

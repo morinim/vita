@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -178,7 +178,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       f_dyn << " \"";
       if (!stats_.best.solution.empty())
-        stats_.best.solution.in_line(f_dyn);
+        in_line(stats_.best.solution, f_dyn);
       f_dyn << "\"\n";
     }
   }
