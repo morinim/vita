@@ -59,7 +59,6 @@ public:
 
   // Visualization/output methods
   void graphviz(std::ostream &) const;
-  std::ostream &tree(std::ostream &) const;
 
   // Recombination operators.
   unsigned mutation(double, const environment &);
@@ -103,6 +102,7 @@ private:
 // *  Comparison operators                                               *
 // ***********************************************************************
 template<class T> bool operator==(const team<T> &, const team<T> &);
+template<class T> bool operator!=(const team<T> &, const team<T> &);
 template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> team<T> crossover(const team<T> &, const team<T> &);
@@ -115,6 +115,8 @@ template<class T> std::ostream &in_line(const team<T> &,
 template<class T> std::ostream &list(const team<T> &,
                                      std::ostream & = std::cout, bool = true);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
+template<class T> std::ostream &tree(const team<T> &,
+                                     std::ostream & = std::cout);
 
 // The SFINAE way of recognizing a team.
 template<class T> struct is_team : std::false_type

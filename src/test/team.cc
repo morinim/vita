@@ -35,8 +35,8 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
     env.code_length = l;
     vita::team<vita::i_mep> t(env);
 
-    BOOST_REQUIRE(t.debug());
-    BOOST_REQUIRE_EQUAL(t.age(), 0);
+    BOOST_TEST(t.debug());
+    BOOST_TEST(t.age() == 0);
   }
 }
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   vita::team<vita::i_mep> t(env);
   const auto orig(t);
 
-  BOOST_REQUIRE_GT(t.individuals(), 0);
+  BOOST_TEST(t.individuals() > 0);
 
   const unsigned n(4000);
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   for (unsigned i(0); i < n; ++i)
   {
     t.mutation(0.0, env);
-    BOOST_REQUIRE_EQUAL(t, orig);
+    BOOST_TEST(t == orig);
   }
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
@@ -72,8 +72,8 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * diff / length);
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  BOOST_TEST(perc > 47.0);
+  BOOST_TEST(perc < 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Comparison)
@@ -81,19 +81,19 @@ BOOST_AUTO_TEST_CASE(Comparison)
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::team<vita::i_mep> a(env);
-    BOOST_REQUIRE_EQUAL(a, a);
-    BOOST_REQUIRE_EQUAL(distance(a, a), 0);
+    BOOST_TEST(a == a);
+    BOOST_TEST(distance(a, a) == 0);
 
     vita::team<vita::i_mep> b(a);
-    BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
-    BOOST_REQUIRE_EQUAL(a, b);
-    BOOST_REQUIRE_EQUAL(distance(a, b), 0);
+    BOOST_TEST(a.signature() == b.signature());
+    BOOST_TEST(a == b);
+    BOOST_TEST(distance(a, b) == 0);
 
     vita::team<vita::i_mep> c(env);
     if (a.signature() != c.signature())
     {
-      BOOST_REQUIRE_NE(a, c);
-      BOOST_REQUIRE_GT(distance(a, c), 0);
+      BOOST_TEST(a != c);
+      BOOST_TEST(distance(a, c) > 0);
     }
   }
 }
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &ind : t)
     {
-      BOOST_CHECK_EQUAL(ind, t[i]);
+      BOOST_TEST(ind == t[i]);
       ++i;
     }
   }
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(t_crossover)
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(crossover(t1, t2));
-    BOOST_CHECK(tc.debug());
+    BOOST_TEST(tc.debug());
 
     dist += distance(t1, tc);
   }
@@ -132,8 +132,8 @@ BOOST_AUTO_TEST_CASE(t_crossover)
   const double perc(100.0 * dist /
                     (env.code_length * env.sset->categories() * n *
                      t1.individuals()));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  BOOST_TEST(perc > 45.0);
+  BOOST_TEST(perc < 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
@@ -146,13 +146,13 @@ BOOST_AUTO_TEST_CASE(Serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       t1.inc_age();
 
-    BOOST_REQUIRE(t1.save(ss));
+    BOOST_TEST(t1.save(ss));
 
     vita::team<vita::i_mep> t2(env);
-    BOOST_REQUIRE(t2.load(ss, env));
-    BOOST_REQUIRE(t2.debug());
+    BOOST_TEST(t2.load(ss, env));
+    BOOST_TEST(t2.debug());
 
-    BOOST_CHECK_EQUAL(t1, t2);
+    BOOST_TEST(t1 == t2);
   }
 }
 BOOST_AUTO_TEST_SUITE_END()

@@ -679,10 +679,11 @@ std::ostream &list(const i_mep &mep, std::ostream &s, bool short_form)
 }
 
 ///
-/// \param[out] s output stream
-/// \return       a reference to the output stream
+/// \param[in]  mep the individual to be printed
+/// \param[out] s   output stream
+/// \return         a reference to the (modified) output stream
 ///
-std::ostream &i_mep::tree(std::ostream &s) const
+std::ostream &tree(const i_mep &mep, std::ostream &s)
 {
   std::function<void (const gene &, const gene &, unsigned)> tree_(
     [&](const gene &parent, const gene &child, unsigned indent)
@@ -697,10 +698,10 @@ std::ostream &i_mep::tree(std::ostream &s) const
 
       const auto arity(child.sym->arity());
       for (auto i(decltype(arity){0}); i < arity; ++i)
-        tree_(child, genome_(child.arg_locus(i)), indent);
+        tree_(child, mep[child.arg_locus(i)], indent);
     });
 
-  tree_(genome_(best()), genome_(best()), 0);
+  tree_(mep[mep.best()], mep[mep.best()], 0);
   return s;
 }
 

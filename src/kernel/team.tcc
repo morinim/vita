@@ -247,6 +247,19 @@ bool operator==(const team<T> &lhs, const team<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison
 /// \param[in] rhs second term of comparision
+/// \return        `true` if the two teams aren't equal
+///
+/// \relates team<T>
+///
+template<class T>
+bool operator!=(const team<T> &lhs, const team<T> &rhs)
+{
+  return !(lhs == rhs);
+}
+
+///
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparision
 /// \return        a numeric measurement of the difference between `x` and
 ///                `this` (the number of different genes between teams)
 ///
@@ -444,14 +457,16 @@ std::ostream &list(const team<T> &t, std::ostream &s, bool short_form)
 }
 
 ///
+/// \param[in]  t team to be printed
 /// \param[out] s output stream
+/// \return       a reference to the (modified) output stream
 ///
 template<class T>
-std::ostream &team<T>::tree(std::ostream &s) const
+std::ostream &tree(const team<T> &t, std::ostream &s)
 {
-  for (const auto &i : individuals_)
+  for (const auto &i : t)
   {
-    i.tree(s);
+    tree(i, s);
     s << '\n';
   }
 
