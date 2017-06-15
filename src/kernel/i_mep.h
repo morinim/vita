@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,6 @@ public:
   explicit i_mep(const std::vector<gene> &);
 
   // Visualization/output methods
-  std::ostream &dump(std::ostream &) const;
   void graphviz(std::ostream &, const std::string & = "") const;
   std::ostream &in_line(std::ostream &) const;
   std::ostream &list(std::ostream &, bool = true) const;
@@ -109,6 +108,9 @@ private:
   // of genes starts here).
   locus best_;
 };  // class i_mep
+
+// Visualization/output methods.
+std::ostream &dump(const i_mep &, std::ostream & = std::cout);
 
 i_mep crossover(const i_mep &, const i_mep &);
 unsigned distance(const i_mep &, const i_mep &);

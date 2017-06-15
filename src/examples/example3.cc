@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,13 +35,13 @@ int main(int argc, char *argv[])
   vita::i_mep i1(env), i2(env);
 
   std::cout << "PARENTS\n" << std::string(40, '-') << '\n';
-  i1.dump(std::cout);
+  dump(i1);
   std::cout << '\n';
-  i2.dump(std::cout);
+  dump(i2);
   std::cout << '\n';
 
   std::cout << "OFFSPRING\n" << std::string(40, '-') << '\n';
 
-  crossover(i1, i2).dump(std::cout);
+  dump(crossover(i1, i2));
   std::cout << std::endl;
 }

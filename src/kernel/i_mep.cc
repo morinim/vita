@@ -671,25 +671,30 @@ std::ostream &i_mep::tree(std::ostream &s) const
 }
 
 ///
-/// \param[out] s output stream.
+/// Prints the complete content of this individual.
 ///
-/// Print the complete content of this individual.
+/// \param[in]  mep individual to be printed
+/// \param[out] s   output stream
+/// \return         a reference to `s`
 ///
-std::ostream &i_mep::dump(std::ostream &s) const
+std::ostream &dump(const i_mep &mep, std::ostream &s)
 {
   SAVE_FLAGS(s);
 
-  const auto w1(1 + static_cast<int>(std::log10(size() - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories())));
+  const auto size(mep.size());
+  const auto categories(mep.categories());
 
-  for (index_t i(0); i < size(); ++i)
-    for (category_t c(0); c < categories(); ++c)
+  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
+  const auto w2(1 + static_cast<int>(std::log10(categories)));
+
+  for (index_t i(0); i < size; ++i)
+    for (category_t c(0); c < categories; ++c)
     {
-      const gene &g(genome_(i, c));
+      const gene &g(mep[{i, c}]);
 
       s << '[' << std::setfill('0') << std::setw(w1) << i;
 
-      if (categories() > 1)
+      if (categories > 1)
         s << ',' << std::setw(w2) << c;
 
       s  << "] " << g;
@@ -700,7 +705,7 @@ std::ostream &i_mep::dump(std::ostream &s) const
         const auto arg_j(g.arg_locus(j));
 
         s << " [" << std::setw(w1) << arg_j.index;
-        if (categories() > 1)
+        if (categories > 1)
           s << ',' << std::setw(w2) << arg_j.category;
         s << ']';
       }
