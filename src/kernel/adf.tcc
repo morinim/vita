@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #define      VITA_ADF_TCC
 
 ///
-/// \param[in] ind individual whose code is used as ADF/ADT.
+/// \param[in] ind individual whose code is used as ADF/ADT
 ///
 template<class T>
 adf_core<T>::adf_core(const T &ind) : code_(ind), id_(adf_count())
@@ -26,8 +26,8 @@ adf_core<T>::adf_core(const T &ind) : code_(ind), id_(adf_count())
 }
 
 ///
-/// \param[in] prefix a string identifying adf type.
-/// \return a string identifying an ADF/ADT.
+/// \param[in] prefix a string identifying adf type
+/// \return           a string identifying an ADF/ADT
 ///
 template<class T>
 std::string adf_core<T>::display(const std::string &prefix) const
@@ -36,7 +36,7 @@ std::string adf_core<T>::display(const std::string &prefix) const
 }
 
 ///
-/// \return the code (program) of the ADF/ADT.
+/// \return the code (program) of the ADF/ADT
 ///
 template<class T>
 const T &adf_core<T>::code() const
@@ -45,12 +45,12 @@ const T &adf_core<T>::code() const
 }
 
 ///
-/// \return \c true if the \a object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
 bool adf_core<T>::debug() const
 {
-  return code_.eff_size() >= 2;
+  return code_.active_symbols() >= 2;
 }
 
-#endif  // Include guard
+#endif  // include guard

@@ -28,9 +28,9 @@ team<T>::team(unsigned n) : individuals_(n), signature_()
 }
 
 ///
-/// \param[in] e base environment.
-///
 /// Creates a team of individuals that will cooperate to solve a task.
+///
+/// \param[in] e base environment
 ///
 template<class T>
 team<T>::team(const environment &e) : signature_()
@@ -49,9 +49,9 @@ team<T>::team(const environment &e) : signature_()
 }
 
 ///
-/// \param v a vector of individuals
-///
 /// Builds a team containing the individuals of vector `v`.
+///
+/// \param[in] v a vector of individuals
 ///
 template<class T>
 team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
@@ -60,12 +60,12 @@ team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 }
 
 ///
-/// \param[in] p probability of gene mutation.
-/// \param[in] env the current environment.
-/// \return number of mutations performed.
-///
 /// Mutates the individuals in `this` team and returns the number of mutations
 /// performed.
+///
+/// \param[in] p   probability of gene mutation
+/// \param[in] env the current environment
+/// \return        number of mutations performed
 ///
 template<class T>
 unsigned team<T>::mutation(double p, const environment &env)
@@ -92,10 +92,10 @@ unsigned team<T>::mutation(double p, const environment &env)
 }
 
 ///
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single
-///         offspring).
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        the result of the crossover (we only generate a single
+///                offspring)
 ///
 /// \see individual::crossover for further details.
 ///
@@ -127,7 +127,7 @@ team<T> crossover(const team<T> &lhs, const team<T> &rhs)
 }
 
 ///
-/// \return an iterator pointing to the first individual of the team.
+/// \return an iterator pointing to the first individual of the team
 ///
 template<class T>
 typename team<T>::const_iterator team<T>::begin() const
@@ -136,7 +136,7 @@ typename team<T>::const_iterator team<T>::begin() const
 }
 
 ///
-/// \return an iterator pointing to a end-of-team sentry.
+/// \return an iterator pointing to a end-of-team sentry
 ///
 template<class T>
 typename team<T>::const_iterator team<T>::end() const
@@ -145,8 +145,8 @@ typename team<T>::const_iterator team<T>::end() const
 }
 
 ///
-/// \param[in] i index of a member of the team.
-/// \return the i-th member of the team.
+/// \param[in] i index of a member of the team
+/// \return      the `i`-th member of the team
 ///
 template<class T>
 const T &team<T>::operator[](unsigned i) const
@@ -156,7 +156,7 @@ const T &team<T>::operator[](unsigned i) const
 }
 
 ///
-/// \return `true` if the team is empty, `false` otherwise.
+/// \return `true` if the team is empty, `false` otherwise
 ///
 template<class T>
 bool team<T>::empty() const
@@ -174,27 +174,26 @@ unsigned team<T>::individuals() const
 }
 
 ///
-/// \return the effective size of the team.
+/// \return the number of active symbols in the team
 /// \see team::size()
 ///
 template<class T>
-unsigned team<T>::eff_size() const
+unsigned team<T>::active_symbols() const
 {
-  unsigned es(0);
-
-  for (const auto &ind : individuals_)
-    es += ind.eff_size();
-
-  return es;
+  return std::accumulate(begin(), end(), 0,
+                         [](unsigned n, const T &ind)
+                         {
+                           return n + ind.active_symbols();
+                         });
 }
 
-///
-/// \return the signature of `this` team.
 ///
 /// Signature maps syntactically distinct (but logically equivalent)
 /// teams to the same value.
 ///
-/// In other words identical teamss at genotypic level have the same
+/// \return the signature of `this` team
+///
+/// In other words identical teams, at genotypic level, have the same
 /// signature; different teams at the genotipic level may be mapped
 /// to the same signature since the value of terminals is considered and not
 /// the index.
@@ -212,7 +211,7 @@ hash_t team<T>::signature() const
 }
 
 ///
-/// \return the signature of `this` team.
+/// \return the signature of `this` team
 ///
 ///
 template<class T>
@@ -227,9 +226,9 @@ hash_t team<T>::hash() const
 }
 
 ///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparision.
-/// \return `true` if the two teams are equal (individual by individual).
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparision
+/// \return        `true` if the two teams are equal (individual by individual)
 ///
 /// \note Age is not checked.
 ///
@@ -246,19 +245,19 @@ bool operator==(const team<T> &lhs, const team<T> &rhs)
 }
 
 ///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparision.
-/// \return a numeric measurement of the difference between `x` and `this`
-///         (the number of different genes between teams).
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparision
+/// \return        a numeric measurement of the difference between `x` and
+///                `this` (the number of different genes between teams)
 ///
 /// \relates team<T>
 ///
 template<class T>
 unsigned distance(const team<T> &lhs, const team<T> &rhs)
 {
-  const auto sup(lhs.individuals());
-  assert(sup == rhs.individuals());
+  Expects(lhs.individuals() == rhs.individuals());
 
+  const auto sup(lhs.individuals());
   unsigned d(0);
   for (auto i(decltype(sup){0}); i < sup; ++i)
     d += distance(lhs[i], rhs[i]);
@@ -267,7 +266,7 @@ unsigned distance(const team<T> &lhs, const team<T> &rhs)
 }
 
 ///
-/// \return the age of the team (average age of the team members).
+/// \return the age of the team (average age of the team members)
 ///
 template<class T>
 unsigned team<T>::age() const
@@ -280,7 +279,7 @@ unsigned team<T>::age() const
 }
 
 ///
-/// Increments the age of every element of the team.
+/// Increments the age of every element of the team
 ///
 template<class T>
 void team<T>::inc_age()
@@ -290,8 +289,8 @@ void team<T>::inc_age()
 }
 
 ///
-/// \param[in] verbose if `true` prints error messages to `std::cerr`.
-/// \return `true` if the team passes the internal consistency check.
+/// \param[in] verbose if `true` prints error messages to `std::cerr`
+/// \return            `true` if the team passes the internal consistency check
 ///
 template<class T>
 bool team<T>::debug() const
@@ -304,9 +303,9 @@ bool team<T>::debug() const
 }
 
 ///
-/// \param[in] e environment used to build the individual.
-/// \param[in] in input stream.
-/// \return `true` if team was loaded correctly.
+/// \param[in] e  environment used to build the individual
+/// \param[in] in input stream
+/// \return       `true` if team was loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current team isn't modified.
@@ -338,8 +337,8 @@ bool team<T>::load(std::istream &in, const environment &e)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if team was saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if team was saved correctly
 ///
 template<class T>
 bool team<T>::save(std::ostream &out) const
@@ -371,10 +370,12 @@ std::ostream &operator<<(std::ostream &s, const team<T> &t)
 }
 
 ///
-/// \param[out] s output stream.
+/// The output stream contains a graph, described in dot language, of `this`
+/// team.
 ///
-/// The output stream contains a graph, described in dot language
-/// (http://www.graphviz.org), of `this` team.
+/// \param[out] s output stream
+///
+/// \see <http://www.graphviz.org>
 ///
 template<class T>
 void team<T>::graphviz(std::ostream &s) const
@@ -391,12 +392,13 @@ void team<T>::graphviz(std::ostream &s) const
 }
 
 ///
+/// The team is printed on a single line with symbols separated by
+/// spaces and individuals between curly braces.
+///
 /// \param[in]  t the team to be printed
 /// \param[out] s output stream
 /// \return       a reference to the output stream
 ///
-/// The team is printed on a single line with symbols separated by
-/// spaces and individuals between curly braces.
 /// Not at all human readable, but a compact representation for import/export.
 ///
 /// \relates team<T>
@@ -415,11 +417,11 @@ std::ostream &in_line(const team<T> &t, std::ostream &s)
 }
 
 ///
+/// Do you remember C=64 list? :-)
+///
 /// \param[out] s output stream
 /// \param[in] short_form if `true` prints a shorter and more human-readable
 ///                       form of the genome.
-///
-/// Do you remember C=64 list? :-)
 ///
 /// 10 PRINT "HOME"
 /// 20 PRINT "SWEET"
@@ -438,7 +440,7 @@ std::ostream &team<T>::list(std::ostream &s, bool short_form) const
 }
 
 ///
-/// \param[out] s output stream.
+/// \param[out] s output stream
 ///
 template<class T>
 std::ostream &team<T>::tree(std::ostream &s) const
@@ -451,4 +453,4 @@ std::ostream &team<T>::tree(std::ostream &s) const
 
   return s;
 }
-#endif  // Include guard
+#endif  // include guard

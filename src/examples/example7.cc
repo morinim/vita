@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,11 +41,11 @@ int main(int argc, char *argv[])
   for (unsigned k(0); k < n; ++k)
   {
     i_mep base(env);
-    auto base_es(base.eff_size());
+    auto base_es(base.active_symbols());
     while (base_es < 5)
     {
       base = i_mep(env);
-      base_es = base.eff_size();
+      base_es = base.active_symbols();
     }
 
     individuals.add(base_es);
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
         std::cout << ' ' << l;
       std::cout << " ]\n";
 
-      blocks_len.add(ib.eff_size());
+      blocks_len.add(ib.active_symbols());
       arguments.add(static_cast<double>(generalized.second.size()));
     }
   }

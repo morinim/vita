@@ -64,10 +64,10 @@ public:
 
   const gene &operator[](locus) const;
 
+  unsigned active_symbols() const;
   category_t categories() const;
-  unsigned eff_size() const;
-  unsigned size() const;
   bool empty() const;
+  unsigned size() const;
 
   category_t category() const;
   locus best() const;

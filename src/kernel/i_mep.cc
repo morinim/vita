@@ -82,14 +82,14 @@ i_mep::i_mep(const std::vector<gene> &gv)
 
 
 ///
-/// Effective size of an individual.
+/// Number of active symbols.
 ///
-/// \return the effective size of the individual
+/// \return number of active symbols
 ///
 /// \see size()
 ///
-/// When `category() > 1`, eff_size() can be greater than size(). For instance
-/// consider the following individual:
+/// When `category() > 1`, active_symbols() can be greater than size(). For
+/// instance consider the following individual:
 ///
 ///     [0, 1] FIFL 1 2 2 3
 ///     [1, 0] "car"
@@ -97,9 +97,9 @@ i_mep::i_mep(const std::vector<gene> &gv)
 ///     [2, 1] 10
 ///     [3, 1] 20
 ///
-/// `size() == 4` but `eff_size() == 5`.
+/// `size() == 4` (four slots / rows) and `active_symbols() == 5`.
 ///
-unsigned i_mep::eff_size() const
+unsigned i_mep::active_symbols() const
 {
   return static_cast<unsigned>(std::distance(begin(), end()));
 }
@@ -202,7 +202,7 @@ i_mep i_mep::replace(const locus &l, const gene &g) const
 
 ///
 /// Creates a new individual obtained from `this` replacing the original
-/// symbol at locus `best_` with `g`.
+/// symbol at locus `best()` with `g`.
 ///
 /// \param[in] g new gene for replacement
 /// \return      a new individual with gene at locus `best()` replaced by `g`
@@ -287,7 +287,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
 ///
 category_t i_mep::category() const
 {
-  return best_.category;
+  return best().category;
 }
 
 ///
@@ -399,7 +399,7 @@ hash_t i_mep::hash() const
   thread_local std::vector<unsigned char> packed;
 
   packed.clear();
-  pack(best_, &packed);
+  pack(best(), &packed);
 
   /// ... and from a packed byte stream to a signature...
   const auto len(static_cast<unsigned>(packed.size() *
@@ -443,7 +443,7 @@ bool i_mep::debug() const
       return false;
     }
 
-    if (best_ != locus::npos())
+    if (best() != locus::npos())
     {
       print.error("Empty individual must have undefined best locus");
       return false;
@@ -518,20 +518,20 @@ bool i_mep::debug() const
       }
     }
 
-  if (best_.index >= size())
+  if (best().index >= size())
   {
     print.error("Incorrect index for first active symbol");
     return false;
   }
-  if (best_.category >= categories())
+  if (best().category >= categories())
   {
     print.error("Incorrect category for first active symbol");
     return false;
   }
 
-  if (categories() == 1 && eff_size() > size())
+  if (categories() == 1 && active_symbols() > size())
   {
-    print.error("eff_size() cannot be greater than size() in single "
+    print.error("active_symbols() cannot be greater than size() in single "
                 "category individuals");
     return false;
   }
@@ -627,7 +627,7 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 
   for (auto i(begin()); i != end(); ++i)
   {
-    if (short_form && i->sym->terminal() && i.locus() != best_)
+    if (short_form && i->sym->terminal() && i.locus() != best())
       continue;
 
     s << '[' << std::setfill('0') << std::setw(w1) << i.locus().index;
@@ -683,7 +683,7 @@ std::ostream &i_mep::tree(std::ostream &s) const
         tree_(child, genome_(child.arg_locus(i)), indent);
     });
 
-  tree_(genome_(best_), genome_(best_), 0);
+  tree_(genome_(best()), genome_(best()), 0);
   return s;
 }
 
@@ -829,7 +829,7 @@ bool i_mep::save_impl(std::ostream &out) const
   }
 
   if (!empty())
-    out << best_.index << ' ' << best_.category << '\n';
+    out << best().index << ' ' << best().category << '\n';
 
   return out.good();
 }
@@ -1008,7 +1008,7 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   const i_mep *parents[] = {&lhs, &rhs};
   i_mep ret(*parents[b]);
 
-  const auto delta(random::between(0u, lhs.eff_size()));
+  const auto delta(random::between(0u, lhs.active_symbols()));
 
   for (auto i(std::next(parents[!b]->begin(), delta));
        i != parents[!b]->end();

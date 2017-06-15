@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,20 +16,20 @@
 namespace vita
 {
 ///
-/// \param[in] ind the code for the ADF.
-/// \param[in] sv categories of the function arguments.
+/// \param[in] ind the code for the ADF
+/// \param[in] sv  categories of the function arguments
 ///
 adf::adf(const i_mep &ind, cvect sv)
   : function("ADF", ind.category(), std::move(sv)), core_(ind)
 {
-  assert(ind.debug());
-  assert(ind.eff_size() >= 2);
+  Expects(ind.debug());
+  Expects(ind.active_symbols() >= 2);
 
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
-/// \return `true`.
+/// \return `true`
 ///
 bool adf::auto_defined() const
 {
@@ -37,8 +37,8 @@ bool adf::auto_defined() const
 }
 
 ///
-/// \param[in] i the context in which this ADF is evaluated.
-/// \return the output of the ADF.
+/// \param[in] i the context in which this ADF is evaluated
+/// \return      the output of the ADF
 ///
 /// Adf functions need input parameters from the a context (contrary to
 /// adt::eval).
@@ -52,7 +52,7 @@ any adf::eval(core_interpreter *i) const
 }
 
 ///
-/// \return the name of the ADF.
+/// \return the name of the ADF
 ///
 std::string adf::display() const
 {
@@ -60,7 +60,7 @@ std::string adf::display() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool adf::debug() const
 {
@@ -77,7 +77,7 @@ bool adf::debug() const
 }
 
 ///
-/// \return the code (program) of the ADF.
+/// \return the code (program) of the ADF
 ///
 const i_mep &adf::code() const
 {
@@ -85,18 +85,18 @@ const i_mep &adf::code() const
 }
 
 ///
-/// \param[in] ind the code for the ADT.
+/// \param[in] ind the code for the ADT
 ///
 adt::adt(const i_mep &ind) : terminal("ADT", ind.category()), core_(ind)
 {
-  assert(ind.debug());
-  assert(ind.eff_size() >= 2);
+  Expects(ind.debug());
+  Expects(ind.active_symbols() >= 2);
 
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
-/// \return `true`.
+/// \return `true`
 ///
 bool adt::auto_defined() const
 {
@@ -104,7 +104,7 @@ bool adt::auto_defined() const
 }
 
 ///
-/// \return the output of the ADT.
+/// \return the output of the ADT
 ///
 /// Adt hasn't input parameters so the context is ignored (contrary to
 /// adf::eval).
@@ -115,7 +115,7 @@ any adt::eval(core_interpreter *) const
 }
 
 ///
-/// \return the name of the ADT.
+/// \return the name of the ADT
 ///
 std::string adt::display() const
 {
@@ -123,7 +123,7 @@ std::string adt::display() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool adt::debug() const
 {
@@ -140,7 +140,7 @@ bool adt::debug() const
 }
 
 ///
-/// \return the code (program) of the ADT.
+/// \return the code (program) of the ADT
 ///
 const i_mep &adt::code() const
 {

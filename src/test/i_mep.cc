@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
 
     ind.mutation(0.5, env);
     diff += distance(i1, ind);
-    length += i1.eff_size();
+    length += i1.active_symbols();
   }
 
   const double perc(100.0 * diff / length);
@@ -180,11 +180,11 @@ BOOST_AUTO_TEST_CASE(t_blocks)
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
     vita::i_mep base(env);
-    auto base_es(base.eff_size());
+    auto base_es(base.active_symbols());
     while (base_es < 5)
     {
       base = vita::i_mep(env);
-      base_es = base.eff_size();
+      base_es = base.active_symbols();
     }
 
     auto blk_idx(base.blocks());
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(t_blocks)
     {
       auto blk(base.get_block(l));
 
-      BOOST_REQUIRE_GT(blk.eff_size(), 1);
+      BOOST_REQUIRE_GT(blk.active_symbols(), 1);
       BOOST_REQUIRE_GT(blk[l].sym->arity(), 0);
     }
   }
@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(t_compress)
       BOOST_REQUIRE_EQUAL(d, d1);
     }
 
-    BOOST_REQUIRE_LE(i1.eff_size(), i.eff_size());
+    BOOST_REQUIRE_LE(i1.active_symbols(), i.active_symbols());
 
     BOOST_REQUIRE_EQUAL(i.signature(), i1.signature());
   }

@@ -21,7 +21,7 @@ namespace vita
 /// A collection of cooperating individuals used as a member of
 /// vita::population.
 ///
-/// \tparam T type of the elements of the team (individuals).
+/// \tparam T type of the elements of the team (individuals)
 ///
 /// In generals teams of individuals can be implemented in different ways.
 /// * Firstly, a certain number of individuals can be selected randomly from
@@ -69,7 +69,7 @@ public:
 
   bool empty() const;
   unsigned individuals() const;
-  unsigned eff_size() const;
+  unsigned active_symbols() const;
 
   hash_t signature() const;
 
@@ -108,7 +108,9 @@ template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> team<T> crossover(const team<T> &, const team<T> &);
 
-// Visualization/output methods
+// ***********************************************************************
+// * Visualization/output                                                *
+// ***********************************************************************
 template<class T> std::ostream &in_line(const team<T> &,
                                         std::ostream & = std::cout);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);

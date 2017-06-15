@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -143,7 +143,7 @@ void src_search<T, ES>::arl(const U &base)
     auto candidate_block(base.get_block(l));
 
     // Building blocks must be simple.
-    if (candidate_block.eff_size() > 5 + adf_args)
+    if (candidate_block.active_symbols() > 5 + adf_args)
       continue;
 
     // This is an approximation of the fitness due to the current block.

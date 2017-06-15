@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,11 +41,11 @@ int main(int argc, char *argv[])
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
     i_mep base(env);
-    auto base_es(base.eff_size());
+    auto base_es(base.active_symbols());
     while (base_es < 5)
     {
       base = i_mep(env);
-      base_es = base.eff_size();
+      base_es = base.active_symbols();
     }
 
     std::cout << std::string(40, '-') << "\nBASE\n" << base << '\n';
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         std::cout << "Output: " << to<std::string>(val);
       std::cout << '\n';
 
-      if (blk.eff_size() <= 20)
+      if (blk.active_symbols() <= 20)
       {
         auto generalized (blk.generalize(2, *env.sset));
 
