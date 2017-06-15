@@ -24,9 +24,10 @@
 namespace vita
 {
 ///
-/// A single member of a `population`. Each individual contains a genome
-/// which represents a possible solution to the task being tackled (i.e. a
-/// point in the search space).
+/// A single member of a `population`.
+///
+/// Each individual contains a genome which represents a possible solution to
+/// the task being tackled (i.e. a point in the search space).
 ///
 class i_mep : public individual<i_mep>
 {
@@ -121,8 +122,8 @@ inline locus i_mep::best() const
 }
 
 ///
-/// \param[in] l locus of a `gene`.
-/// \return the l-th gene of `this` individual.
+/// \param[in] l locus of a `gene`
+/// \return      the `l`-th gene of `this` individual
 ///
 inline const gene &i_mep::operator[](locus l) const
 {
@@ -130,7 +131,7 @@ inline const gene &i_mep::operator[](locus l) const
 }
 
 ///
-/// \return the total number of categories the individual is using.
+/// \return the total number of categories the individual is using
 ///
 inline category_t i_mep::categories() const
 {
@@ -138,10 +139,11 @@ inline category_t i_mep::categories() const
 }
 
 ///
-/// \return the total size of the individual (effective size + introns).
+/// \return the total size of the individual (effective size + introns)
 ///
-/// The size is constant for any individual (it's chosen at initialization
-/// time).
+/// \remark Size is constant for any individual (it's chosen at initialization
+///         time).
+///
 /// \see eff_size()
 ///
 inline unsigned i_mep::size() const
@@ -150,7 +152,7 @@ inline unsigned i_mep::size() const
 }
 
 ///
-/// \return `true` if the individual isn't initialized.
+/// \return `true` if the individual isn't initialized
 ///
 inline bool i_mep::empty() const
 {
@@ -165,7 +167,7 @@ std::ostream &operator<<(std::ostream &, const i_mep &);
 #include "kernel/i_mep_iterator.tcc"
 
 ///
-/// \return an iterator to the first active locus of the individual.
+/// \return an iterator to the first active locus of the individual
 ///
 inline i_mep::const_iterator i_mep::begin() const
 {
@@ -173,7 +175,7 @@ inline i_mep::const_iterator i_mep::begin() const
 }
 
 ///
-/// \return an iterator used as sentry value to stop a cycle.
+/// \return an iterator used as sentry value to stop a cycle
 ///
 inline i_mep::const_iterator i_mep::end() const
 {
@@ -181,7 +183,7 @@ inline i_mep::const_iterator i_mep::end() const
 }
 
 ///
-/// \return an iterator to the first active locus of the individual.
+/// \return an iterator to the first active locus of the individual
 ///
 inline i_mep::iterator i_mep::begin()
 {
@@ -189,7 +191,7 @@ inline i_mep::iterator i_mep::begin()
 }
 
 ///
-/// \return an iterator used as sentry value to stop a cycle.
+/// \return an iterator used as sentry value to stop a cycle
 ///
 inline i_mep::iterator i_mep::end()
 {

@@ -23,11 +23,12 @@
 namespace vita
 {
 ///
-/// \param[in] e base environment.
+/// Generates the initial, random expressions that make up an individual.
 ///
-/// Generates the initial, random expressions that make up an individual. This
-/// has to be implemented so as to ensure that there is no violation of the
-/// type system's constraints.
+/// \param[in] e base environment
+///
+/// The constructor is implemented so as to ensure that there is no violation
+/// of the type system's constraints.
 ///
 i_mep::i_mep(const environment &e)
   : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0}
@@ -55,9 +56,10 @@ i_mep::i_mep(const environment &e)
 }
 
 ///
-/// \param[in] gv vector of genes.
+/// Creates a new individual containing genes from `gv`.
 ///
-/// Create a new individual containing the genes of `gv`.
+/// \param[in] gv vector of genes
+///
 /// This is useful for debugging purpouse (i.e. setup ad-hoc individuals).
 ///
 i_mep::i_mep(const std::vector<gene> &gv)
@@ -80,11 +82,13 @@ i_mep::i_mep(const std::vector<gene> &gv)
 
 
 ///
-/// \return the effective size of the individual.
+/// Effective size of an individual.
+///
+/// \return the effective size of the individual
+///
 /// \see size()
 ///
-/// \note
-/// eff_size() can be greater than size() when `category() > 1`. For instance
+/// When `category() > 1`, eff_size() can be greater than size(). For instance
 /// consider the following individual:
 ///
 ///     [0, 1] FIFL 1 2 2 3
@@ -101,11 +105,11 @@ unsigned i_mep::eff_size() const
 }
 
 ///
-/// \param[in] l locus of the genome.
-/// \return an individual obtained from `this` choosing the gene sequence
-///         starting at `l`.
+/// \param[in] l locus of the genome
+/// \return      an individual obtained from `this` choosing the gene sequence
+///              starting at `l`
 ///
-/// This function is often used along with the \ref blocks function.
+/// \note This function is often used along with the i_mep::blocks function.
 ///
 i_mep i_mep::get_block(const locus &l) const
 {
@@ -118,11 +122,11 @@ i_mep i_mep::get_block(const locus &l) const
 }
 
 ///
-/// \brief A new individual is created mutating `this`.
+/// A new individual is created mutating `this`.
 ///
-/// \param[in] p probability of gene mutation.
-/// \param[in] e the current environment.
-/// \return number of mutations performed.
+/// \param[in] p probability of gene mutation
+/// \param[in] e the current environment
+/// \return      number of mutations performed
 ///
 unsigned i_mep::mutation(double p, const environment &e)
 {
@@ -157,10 +161,9 @@ unsigned i_mep::mutation(double p, const environment &e)
 }
 
 ///
-/// \return a list of loci referring to active symbols.
+/// Calculates a set of indexes to blocks contained in `this` individual.
 ///
-/// The function calculates a set of indexes to blocks contained in `this`
-/// individual.
+/// \return a list of loci referring to active symbols
 ///
 /// Indexes can be used by the i_mep::get_block function.
 ///
@@ -179,12 +182,12 @@ std::vector<locus> i_mep::blocks() const
 }
 
 ///
-/// \param[in] l locus where replacement takes place.
-/// \param[in] g new gene for replacement.
-/// \return a new individual with gene at locus `l` replaced by `g`.
-///
 /// Create a new individual obtained from `this` replacing the original
 /// symbol at locus `l` with `g`.
+///
+/// \param[in] l locus where replacement takes place
+/// \param[in] g new gene for replacement
+/// \return      a new individual with gene at locus `l` replaced by `g`
 ///
 i_mep i_mep::replace(const locus &l, const gene &g) const
 {
@@ -198,22 +201,22 @@ i_mep i_mep::replace(const locus &l, const gene &g) const
 }
 
 ///
-/// \param[in] g new gene for replacement.
-/// \return a new individual with gene at locus `best_` replaced by `g`.
-///
-/// Create a new individual obtained from `this` replacing the original
+/// Creates a new individual obtained from `this` replacing the original
 /// symbol at locus `best_` with `g`.
+///
+/// \param[in] g new gene for replacement
+/// \return      a new individual with gene at locus `best()` replaced by `g`
 ///
 i_mep i_mep::replace(const gene &g) const
 {
-  return replace(best_, g);
+  return replace(best(), g);
 }
 
 ///
-/// \param[in] sset a symbol set.
-/// \param[in] index index of a symbol in the individual.
-/// \return a new individual obtained from `this` inserting a random terminal
-///         at index `index`.
+/// \param[in] sset  a symbol set
+/// \param[in] index index of a symbol in the individual
+/// \return          a new individual obtained from `this` inserting a random
+///                  terminal at index `index`
 ///
 i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 {
@@ -231,10 +234,12 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 }
 
 ///
-/// \param[in] sset a symbol set.
-/// \param[in] max_args maximum number of arguments for the ADF.
-/// \return the generalized individual and a set of loci (ADF arguments
-///         positions).
+/// Produces the body for a ADF.
+///
+/// \param[in] sset     a symbol set
+/// \param[in] max_args maximum number of arguments for the ADF
+/// \return             the generalized individual and a set of loci (ADF
+///                     arguments positions)
 ///
 /// Changes up to `max_args` terminals (exactly `max_args` when available)
 /// of `this` individual with formal arguments, thus producing the body for a
@@ -278,7 +283,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
 }
 
 ///
-/// \return the category of the individual.
+/// \return the category of the individual
 ///
 category_t i_mep::category() const
 {
@@ -287,8 +292,8 @@ category_t i_mep::category() const
 
 ///
 /// \param[in] x second term of comparison.
-/// \return `true` if the two individuals are equal (symbol by symbol,
-///         including introns).
+/// \return      `true` if the two individuals are equal (symbol by symbol,
+///                     including introns)
 ///
 /// \note Age is not checked.
 ///
@@ -304,10 +309,10 @@ bool i_mep::operator==(const i_mep &x) const
 }
 
 ///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparison.
-/// \return a numeric measurement of the difference between `lhs` and
-///         `rhs` (the number of different genes between individuals).
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// \return        a numeric measurement of the difference between `lhs` and
+///                `rhs` (the number of different genes between individuals)
 ///
 /// \relates i_mep
 ///
@@ -332,13 +337,14 @@ unsigned distance(const i_mep &lhs, const i_mep &rhs)
 }
 
 ///
-/// \param[in] l locus in this individual.
-/// \param[out] p byte stream compacted version of the gene sequence
-///               starting at locus `l`.
+/// Maps syntactically distinct (but logically equivalent) individuals to the
+/// same byte stream.
 ///
-/// This function map syntactically distinct (but logically equivalent)
-/// individuals to the same byte stream. This is a very interesting
-/// property, useful for individual comparison / information retrieval.
+/// \param[in] l  locus in this individual
+/// \param[out] p byte stream compacted version of the gene sequence
+///               starting at locus `l`
+///
+/// Useful for individual comparison / information retrieval.
 ///
 void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 {
@@ -378,10 +384,10 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 }
 
 ///
-/// \return the signature of this individual.
-///
 /// Converts this individual in a packed byte level representation and
 /// performs the MurmurHash3 algorithm on it.
+///
+/// \return the signature of this individual
 ///
 hash_t i_mep::hash() const
 {
@@ -403,10 +409,10 @@ hash_t i_mep::hash() const
 }
 
 ///
-/// \return the signature of this individual.
-///
 /// Signature maps syntactically distinct (but logically equivalent)
 /// individuals to the same value.
+///
+/// \return the signature of this individual.
 ///
 /// In other words identical individuals at genotypic level have the same
 /// signature; different individuals at the genotipic level may be mapped
@@ -425,7 +431,7 @@ hash_t i_mep::signature() const
 }
 
 ///
-/// \return `true` if the individual passes the internal consistency check.
+/// \return `true` if the individual passes the internal consistency check
 ///
 bool i_mep::debug() const
 {
@@ -534,11 +540,13 @@ bool i_mep::debug() const
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] id used for subgraph plot (usually this is an empty string).
-///
 /// The output stream contains a graph of this individual described in dot
-/// language (see http://www.graphviz.org/).
+/// language.
+///
+/// \param[out] s output stream
+/// \param[in] id used for subgraph plot (usually this is an empty string)
+///
+/// \see http://www.graphviz.org/
 ///
 void i_mep::graphviz(std::ostream &s, const std::string &id) const
 {
@@ -598,9 +606,11 @@ std::ostream &in_line(const i_mep &mep, std::ostream &s)
 }
 
 ///
-/// \param[out] s output stream.
+/// Prints a human readable representation of the individual.
+///
+/// \param[out] s         output stream
 /// \param[in] short_form if `true` prints a shorter and more human-readable
-///                       form of the genome.
+///                       form of the genome
 ///
 /// Do you remember C=64's `LIST`? :-)
 ///
@@ -652,7 +662,8 @@ std::ostream &i_mep::list(std::ostream &s, bool short_form) const
 }
 
 ///
-/// \param[out] s output stream.
+/// \param[out] s output stream
+/// \return       a reference to the output stream
 ///
 std::ostream &i_mep::tree(std::ostream &s) const
 {
@@ -729,15 +740,17 @@ std::ostream &dump(const i_mep &mep, std::ostream &s)
 /// \param[in]  ind individual to print
 /// \return         output stream including `ind`
 ///
+/// \relates i_mep
+///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {
   return ind.list(s, true);
 }
 
 ///
-/// \param[in] e environment used to build the individual.
-/// \param[in] in input stream.
-/// \return `true` if the object has been loaded correctly.
+/// \param[in] e  environment used to build the individual
+/// \param[in] in input stream
+/// \return       `true` if the object has been loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current individual isn't
@@ -795,8 +808,8 @@ bool i_mep::load_impl(std::istream &in, const environment &e)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if the object has been saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if the object has been saved correctly
 ///
 bool i_mep::save_impl(std::ostream &out) const
 {
@@ -822,7 +835,7 @@ bool i_mep::save_impl(std::ostream &out) const
 }
 
 ///
-/// \brief A sort of "common subexpression elimination" optimization
+/// A sort of "common subexpression elimination" optimization.
 ///
 /// The function doesn't rely on the meaning of the symbols, just on the
 /// genome layout.
@@ -885,10 +898,12 @@ i_mep i_mep::compress() const
 
 #if defined(UNIFORM_CROSSOVER)
 ///
-/// \brief Uniform Crossover.
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
+/// Uniform Crossover.
+///
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        the result of the crossover (we only generate a single
+///                offspring).
 ///
 /// The i-th locus of the offspring has a 50% probability to be filled with
 /// the i-th gene of `lhs` and 50% with i-th gene of `rhs`. Parents must
@@ -925,10 +940,12 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 }
 #elif defined(ONE_POINT_CROSSOVER)
 ///
-/// \brief One Point Crossover.
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
+/// One Point Crossover.
+///
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        the result of the crossover (we only generate a single
+///                offspring)
 ///
 /// We randomly select a parent (between `lhs` and `rhs`) and a single locus
 /// (common crossover point). The offspring is created with genes from the
@@ -936,8 +953,7 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 /// beyond that point.
 /// One-point crossover is the oldest homologous crossover in tree-based GP.
 ///
-/// \note
-/// Parents must have the same size.
+/// \note Parents must have the same size.
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
@@ -969,17 +985,18 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 }
 #elif defined(TREE_CROSSOVER)
 ///
-/// \brief Tree Crossover.
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
+/// Tree Crossover.
+///
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        the result of the crossover (we only generate a single
+///                offspring)
 ///
 /// Inserts a complete tree from one parent into the other.
 /// The operation is less disruptive than other forms of crossover since
 /// an entire tree is copied (not just a part).
 ///
-/// \note
-/// Parents must have the same size.
+/// \note Parents must have the same size.
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
@@ -1006,10 +1023,12 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 }
 #else  // TWO_POINT_CROSSOVER (default)
 ///
-/// \brief Two Point Crossover.
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
+/// Two Point Crossover.
+///
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        the result of the crossover (we only generate a single
+///                offspring)
 ///
 /// We randomly select a parent (between `lhs` and `rhs`) and a two loci
 /// (common crossover points). The offspring is created with genes from the
@@ -1017,8 +1036,7 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 /// crossover point; genes between crossover points are taken from the other
 /// parent.
 ///
-/// \note
-/// Parents must have the same size.
+/// \note Parents must have the same size.
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
@@ -1050,4 +1068,5 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   return ret;
 }
 #endif
+
 }  // namespace vita
