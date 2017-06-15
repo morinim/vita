@@ -36,9 +36,9 @@ BOOST_AUTO_TEST_CASE(t_random_creation)
     env.code_length = l;
     vita::i_mep i(env);
 
-    BOOST_REQUIRE(i.debug());
-    BOOST_REQUIRE_EQUAL(i.size(), l);
-    BOOST_REQUIRE_EQUAL(i.age(), 0);
+    BOOST_TEST(i.debug());
+    BOOST_TEST(i.size() == l);
+    BOOST_TEST(i.age() == 0);
   }
 }
 
@@ -46,12 +46,12 @@ BOOST_AUTO_TEST_CASE(t_empty_individual)
 {
   vita::i_mep i;
 
-  BOOST_REQUIRE(i.debug());
-  BOOST_REQUIRE(i.empty());
-  BOOST_REQUIRE_EQUAL(i.size(), 0);
+  BOOST_TEST(i.debug());
+  BOOST_TEST(i.empty());
+  BOOST_TEST(i.size() == 0);
 
   i = vita::i_mep(env);
-  BOOST_REQUIRE(!i.empty());
+  BOOST_TEST(!i.empty());
 }
 
 BOOST_AUTO_TEST_CASE(t_mutation)
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   for (unsigned i(0); i < n; ++i)
   {
     ind.mutation(0.0, env);
-    BOOST_REQUIRE_EQUAL(ind, orig);
+    BOOST_TEST(ind == orig);
   }
 
   BOOST_TEST_CHECKPOINT("50% probability mutation.");
@@ -83,8 +83,8 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   }
 
   const double perc(100.0 * diff / length);
-  BOOST_CHECK_GT(perc, 47.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  BOOST_TEST(perc > 47.0);
+  BOOST_TEST(perc < 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(t_comparison)
@@ -92,20 +92,20 @@ BOOST_AUTO_TEST_CASE(t_comparison)
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::i_mep a(env);
-    BOOST_REQUIRE_EQUAL(a, a);
-    BOOST_REQUIRE_EQUAL(distance(a, a), 0);
+    BOOST_TEST(a == a);
+    BOOST_TEST(distance(a, a) == 0);
 
     vita::i_mep b(a);
-    BOOST_REQUIRE_EQUAL(a.signature(), b.signature());
-    BOOST_REQUIRE_EQUAL(a, b);
-    BOOST_REQUIRE_EQUAL(distance(a, b), 0);
+    BOOST_TEST(a.signature() == b.signature());
+    BOOST_TEST(a == b);
+    BOOST_TEST(distance(a, b) == 0);
 
     vita::i_mep c(env);
     if (a.signature() != c.signature())
     {
-      BOOST_REQUIRE_NE(a, c);
-      BOOST_REQUIRE_GT(distance(a, c), 0);
-      BOOST_REQUIRE_EQUAL(distance(a, c), distance(c, a));
+      BOOST_TEST(a != c);
+      BOOST_TEST(distance(a, c) > 0);
+      BOOST_TEST(distance(a, c) == distance(c, a));
     }
   }
 }
@@ -126,16 +126,16 @@ BOOST_AUTO_TEST_CASE(t_crossover)
       i2.inc_age();
 
     const auto ic(crossover(i1, i2));
-    BOOST_CHECK(ic.debug());
-    BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
+    BOOST_TEST(ic.debug());
+    BOOST_TEST(ic.age() == std::max(i1.age(), i2.age()));
 
     dist += distance(i1, ic);
   }
 
   const double perc(100.0 * dist /
                     (env.code_length * env.sset->categories() * n));
-  BOOST_CHECK_GT(perc, 45.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  BOOST_TEST(perc > 45.0);
+  BOOST_TEST(perc < 52.0);
 }
 
 BOOST_AUTO_TEST_CASE(t_serialization)
@@ -149,26 +149,26 @@ BOOST_AUTO_TEST_CASE(t_serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
-    BOOST_REQUIRE(i1.save(ss));
+    BOOST_TEST(i1.save(ss));
 
     vita::i_mep i2(env);
-    BOOST_REQUIRE(i2.load(ss, env));
-    BOOST_REQUIRE(i2.debug());
+    BOOST_TEST(i2.load(ss, env));
+    BOOST_TEST(i2.debug());
 
-    BOOST_CHECK_EQUAL(i1, i2);
+    BOOST_TEST(i1 == i2);
   }
 
   BOOST_TEST_CHECKPOINT("Empty i_mep serialization");
   std::stringstream ss;
   vita::i_mep empty;
-  BOOST_REQUIRE(empty.save(ss));
+  BOOST_TEST(empty.save(ss));
 
   vita::i_mep empty1;
-  BOOST_REQUIRE(empty1.load(ss, env));
-  BOOST_REQUIRE(empty1.debug());
-  BOOST_REQUIRE(empty1.empty());
+  BOOST_TEST(empty1.load(ss, env));
+  BOOST_TEST(empty1.debug());
+  BOOST_TEST(empty1.empty());
 
-  BOOST_REQUIRE_EQUAL(empty, empty1);
+  BOOST_TEST(empty == empty1);
 }
 
 BOOST_AUTO_TEST_CASE(t_blocks)
@@ -189,14 +189,14 @@ BOOST_AUTO_TEST_CASE(t_blocks)
 
     auto blk_idx(base.blocks());
 
-    BOOST_REQUIRE_GT(blk_idx.size(), 0);
+    BOOST_TEST(blk_idx.size() > 0);
 
     for (const auto &l : blk_idx)
     {
       auto blk(base.get_block(l));
 
-      BOOST_REQUIRE_GT(blk.active_symbols(), 1);
-      BOOST_REQUIRE_GT(blk[l].sym->arity(), 0);
+      BOOST_TEST(blk.active_symbols() > 1);
+      BOOST_TEST(blk[l].sym->arity() > 0);
     }
   }
 }
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(t_output)
 
   BOOST_TEST_CHECKPOINT("Inline output");
   in_line(i, ss);
-  BOOST_CHECK_EQUAL(ss.str(), "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
+  BOOST_TEST(ss.str() == "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
 
   BOOST_TEST_CHECKPOINT("Graphviz output");
   // Typically to 'reset' a stringstream you need to both reset the underlying
@@ -225,31 +225,43 @@ BOOST_AUTO_TEST_CASE(t_output)
   ss.str(std::string());
 
   i.graphviz(ss);
-  BOOST_CHECK_EQUAL(ss.str(),
-                    "graph {"
-                    "g0_0 [label=FSUB, shape=box];"
-                    "g0_0 -- g1_0;"
-                    "g0_0 -- g2_0;"
-                    "g1_0 [label=FADD, shape=box];"
-                    "g1_0 -- g3_0;"
-                    "g1_0 -- g4_0;"
-                    "g2_0 [label=FADD, shape=box];"
-                    "g2_0 -- g4_0;"
-                    "g2_0 -- g3_0;"
-                    "g3_0 [label=2.0, shape=circle];"
-                    "g4_0 [label=3.0, shape=circle];}");
+  BOOST_TEST(ss.str() ==
+             "graph {"
+             "g0_0 [label=FSUB, shape=box];"
+             "g0_0 -- g1_0;"
+             "g0_0 -- g2_0;"
+             "g1_0 [label=FADD, shape=box];"
+             "g1_0 -- g3_0;"
+             "g1_0 -- g4_0;"
+             "g2_0 [label=FADD, shape=box];"
+             "g2_0 -- g4_0;"
+             "g2_0 -- g3_0;"
+             "g3_0 [label=2.0, shape=circle];"
+             "g4_0 [label=3.0, shape=circle];}");
 
   BOOST_TEST_CHECKPOINT("Dump output");
   ss.clear();
   ss.str(std::string());
   dump(i, ss);
 
-  BOOST_CHECK_EQUAL(ss.str(),
-                    "[0] FSUB [1] [2]\n"
-                    "[1] FADD [3] [4]\n"
-                    "[2] FADD [4] [3]\n"
-                    "[3] 2.0\n"
-                    "[4] 3.0\n");
+  const std::string dump_str();
+
+  BOOST_TEST(ss.str() ==
+             "[0] FSUB [1] [2]\n"
+             "[1] FADD [3] [4]\n"
+             "[2] FADD [4] [3]\n"
+             "[3] 2.0\n"
+             "[4] 3.0\n");
+
+  BOOST_TEST_CHECKPOINT("List output");
+  ss.clear();
+  ss.str(std::string());
+  list(i, ss);
+
+  BOOST_TEST(ss.str() ==
+             "[0] FSUB [1] [2]\n"
+             "[1] FADD 2.0 3.0\n"
+             "[2] FADD 3.0 2.0\n");
 }
 BOOST_AUTO_TEST_SUITE_END()
 
@@ -262,7 +274,7 @@ BOOST_AUTO_TEST_CASE(t_compress)
   {
     const vita::i_mep i(env), i1(i.compress());
 
-    BOOST_REQUIRE(i1.debug());
+    BOOST_TEST(i1.debug());
 
     /*
     std::cout << "\n\n";
@@ -274,19 +286,19 @@ BOOST_AUTO_TEST_CASE(t_compress)
     const auto v(vita::interpreter<vita::i_mep>(&i).run());
     const auto v1(vita::interpreter<vita::i_mep>(&i1).run());
 
-    BOOST_REQUIRE_EQUAL(v.empty(), v1.empty());
+    BOOST_TEST(v.empty() == v1.empty());
 
     if (!v.empty())
     {
       const auto d(vita::to<double>(v));
       const auto d1(vita::to<double>(v1));
 
-      BOOST_REQUIRE_EQUAL(d, d1);
+      BOOST_TEST(d == d1);
     }
 
-    BOOST_REQUIRE_LE(i1.active_symbols(), i.active_symbols());
+    BOOST_TEST(i1.active_symbols() <= i.active_symbols());
 
-    BOOST_REQUIRE_EQUAL(i.signature(), i1.signature());
+    BOOST_TEST(i.signature() == i1.signature());
   }
 }
 BOOST_AUTO_TEST_SUITE_END()

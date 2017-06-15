@@ -311,6 +311,16 @@ bool i_mep::operator==(const i_mep &x) const
 ///
 /// \param[in] lhs first term of comparison
 /// \param[in] rhs second term of comparison
+/// \return      `true` if the two individuals aren't equal
+///
+bool operator!=(const i_mep &lhs, const i_mep &rhs)
+{
+  return !(lhs == rhs);
+}
+
+///
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
 /// \return        a numeric measurement of the difference between `lhs` and
 ///                `rhs` (the number of different genes between individuals)
 ///
@@ -695,7 +705,7 @@ std::ostream &i_mep::tree(std::ostream &s) const
 }
 
 ///
-/// Prints the complete content of this individual.
+/// Prints the complete content of an individual.
 ///
 /// \param[in]  mep individual to be printed
 /// \param[out] s   output stream
