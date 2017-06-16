@@ -37,8 +37,7 @@ int main(int argc, char *argv[])
 
   vita::i_mep ind(env);
 
-  dump(ind);
-  std::cout << '\n';
+  std::cout << vita::out::dump << ind << '\n';
 
   const vita::any val(vita::interpreter<vita::i_mep>(&ind).run());
   if (val.empty())

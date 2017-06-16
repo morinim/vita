@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,9 +23,9 @@
 namespace vita
 {
 ///
-/// \brief A single member of a `population`.
+/// A single member of a `population`.
 ///
-/// \tparam Derived the derived class in the CRTP.
+/// \tparam Derived the derived class in the CRTP
 ///
 /// Each individual contains a genome which represents a possible solution to
 /// the task being tackled (i.e. a point in the search space).
@@ -66,6 +66,23 @@ private:
 /// In general we assume it hasn't. Specific class can specialize the
 /// `has_introns` struct to signal their presence.
 template<class T> struct has_introns : std::false_type {};
+
+namespace out
+{
+enum print_format_t {dump_f, graphviz_f, in_line_f, list_f, tree_f};
+
+extern const long print_format_flag;
+extern const long long_form_flag;
+
+std::ostream &dump(std::ostream &);
+std::ostream &graphviz(std::ostream &);
+std::ostream &in_line(std::ostream &);
+std::ostream &list(std::ostream &);
+std::ostream &tree(std::ostream &);
+
+std::ostream &long_form(std::ostream &);
+std::ostream &short_form(std::ostream &);
+}  // namespace out
 
 #include "kernel/individual.tcc"
 

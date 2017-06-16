@@ -379,96 +379,22 @@ bool team<T>::save(std::ostream &out) const
 template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
 {
-  for (const auto &i : t)
-    s << i << '\n';
-  return s;
-}
+  const auto format(s.iword(out::print_format_flag));
 
-///
-/// The output stream contains a graph, described in dot language, of `this`
-/// team.
-///
-/// \param[in]  t team to be printed
-/// \param[out] s output stream
-///
-/// \see <http://www.graphviz.org>
-///
-template<class T>
-void graphviz(const team<T> &t, std::ostream &s)
-{
-  const auto size(t.individuals());
-
-  s << "graph {";
-  for (auto i(decltype(size){0}); i < size; ++i)
-    graphviz(t[i], s, std::string("Individual ") + std::to_string(i));
-
-  s << "}\n";
-}
-
-///
-/// The team is printed on a single line with symbols separated by
-/// spaces and individuals between curly braces.
-///
-/// \param[in]  t the team to be printed
-/// \param[out] s output stream
-/// \return       a reference to the output stream
-///
-/// Not at all human readable, but a compact representation for import/export.
-///
-/// \relates team<T>
-///
-template<class T>
-std::ostream &in_line(const team<T> &t, std::ostream &s)
-{
   for (const auto &i : t)
   {
-    s << '{';
-    in_line(i, s);
-    s << '}';
+    if (format == out::in_line_f)
+      s << '{';
+
+    s << i;
+
+    if (format == out::in_line_f)
+      s << '}';
+    else
+      s << '\n';
   }
 
   return s;
 }
 
-///
-/// Do you remember C=64 list? :-)
-///
-/// \param[in]  t          the team to be printed
-/// \param[out] s          output stream
-/// \param[in]  short_form if `true` prints a shorter and more human-readable
-///                        form of the genome
-/// \return                a constant reference to the output stream
-///
-/// 10 PRINT "HOME"
-/// 20 PRINT "SWEET"
-/// 30 GOTO 10
-///
-template<class T>
-std::ostream &list(const team<T> &t, std::ostream &s, bool short_form)
-{
-  for (const auto &i : t)
-  {
-    list(i, s, short_form);
-    s << '\n';
-  }
-
-  return s;
-}
-
-///
-/// \param[in]  t team to be printed
-/// \param[out] s output stream
-/// \return       a reference to the (modified) output stream
-///
-template<class T>
-std::ostream &tree(const team<T> &t, std::ostream &s)
-{
-  for (const auto &i : t)
-  {
-    tree(i, s);
-    s << '\n';
-  }
-
-  return s;
-}
 #endif  // include guard

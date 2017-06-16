@@ -34,14 +34,11 @@ int main(int argc, char *argv[])
 
   vita::i_mep i1(env), i2(env);
 
-  std::cout << "PARENTS\n" << std::string(40, '-') << '\n';
-  dump(i1);
-  std::cout << '\n';
-  dump(i2);
-  std::cout << '\n';
-
-  std::cout << "OFFSPRING\n" << std::string(40, '-') << '\n';
-
-  dump(crossover(i1, i2));
-  std::cout << std::endl;
+  std::cout << "PARENTS\n" << std::string(40, '-') << '\n'
+            << vita::out::dump
+            << i1 << '\n'
+            << i2 << '\n'
+            << "OFFSPRING\n" << std::string(40, '-') << '\n'
+            << crossover(i1, i2)
+            << std::endl;
 }

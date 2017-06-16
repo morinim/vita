@@ -156,15 +156,7 @@ inline bool i_mep::empty() const
 
 bool operator!=(const i_mep &, const i_mep &);
 
-// *********************************
-// * Visualization/output methods. *
-// *********************************
-std::ostream &dump(const i_mep &, std::ostream & = std::cout);
-void graphviz(const i_mep &, std::ostream &, const std::string & = "");
-std::ostream &in_line(const i_mep &, std::ostream & = std::cout);
-std::ostream &list(const i_mep &, std::ostream & = std::cout, bool = true);
 std::ostream &operator<<(std::ostream &, const i_mep &);
-std::ostream &tree(const i_mep &, std::ostream & = std::cout);
 
 #include "kernel/i_mep_iterator.tcc"
 

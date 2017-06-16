@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_INDIVIDUAL_TCC
 
 ///
-/// \brief A measurement of the age of an individual (mainly used for ALPS).
+/// A measurement of the age of an individual (mainly used for ALPS).
 ///
-/// \return The individual's age.
+/// \return The individual's age
 ///
 /// This is a measure of how long an individual's family of genotypic
 /// material has been in the population. Randomly generated individuals,
@@ -41,7 +41,7 @@ inline unsigned individual<Derived>::age() const
 }
 
 ///
-/// \brief Increments the individual's age.
+/// Increments the individual's age.
 ///
 template<class Derived>
 inline void individual<Derived>::inc_age()
@@ -50,12 +50,11 @@ inline void individual<Derived>::inc_age()
 }
 
 ///
-/// \param[in] env environment used for building the individual.
-/// \param[in] in input stream.
-/// \return `true` if the object has been loaded correctly.
+/// \param[in] env environment used for building the individual
+/// \param[in] in  input stream
+/// \return        `true` if the object has been loaded correctly
 ///
-/// \note
-/// If the load operation isn't successful the object isn't modified.
+/// \note If the load operation isn't successful the object isn't modified.
 ///
 template<class Derived>
 bool individual<Derived>::load(std::istream &in, const environment &env)
@@ -76,8 +75,8 @@ bool individual<Derived>::load(std::istream &in, const environment &env)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if the object has been saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if the object has been saved correctly
 ///
 template<class Derived>
 bool individual<Derived>::save(std::ostream &out) const
@@ -88,9 +87,9 @@ bool individual<Derived>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] rhs_age the age of an individual.
-///
 /// Updates the age of this individual if it's smaller than `rhs_age`.
+///
+/// \param[in] rhs_age the age of an individual
 ///
 template<class Derived>
 void individual<Derived>::set_older_age(unsigned rhs_age)

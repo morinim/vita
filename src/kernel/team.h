@@ -14,6 +14,7 @@
 #define      VITA_TEAM_H
 
 #include "kernel/cache.h"
+#include "kernel/individual.h"
 
 namespace vita
 {
@@ -104,17 +105,7 @@ template<class T> unsigned distance(const team<T> &, const team<T> &);
 
 template<class T> team<T> crossover(const team<T> &, const team<T> &);
 
-// ***********************************************************************
-// * Visualization/output                                                *
-// ***********************************************************************
-template<class T> void graphviz(const team<T> &, std::ostream &);
-template<class T> std::ostream &in_line(const team<T> &,
-                                        std::ostream & = std::cout);
-template<class T> std::ostream &list(const team<T> &,
-                                     std::ostream & = std::cout, bool = true);
 template<class T> std::ostream &operator<<(std::ostream &, const team<T> &);
-template<class T> std::ostream &tree(const team<T> &,
-                                     std::ostream & = std::cout);
 
 // The SFINAE way of recognizing a team.
 template<class T> struct is_team : std::false_type

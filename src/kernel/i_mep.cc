@@ -550,223 +550,6 @@ bool i_mep::debug() const
 }
 
 ///
-/// The output stream contains a graph of this individual described in dot
-/// language.
-///
-/// \param[in]  mep individual to be exported
-/// \param[out] s   output stream
-/// \param[in]  id  used for subgraph plot (usually this is an empty string)
-///
-/// \see http://www.graphviz.org/
-///
-void graphviz(const i_mep &mep, std::ostream &s, const std::string &id)
-{
-  if (id.empty())
-    s << "graph";
-  else
-    s << "subgraph " << id;
-  s << " {";
-
-  for (auto i(mep.begin()); i != mep.end(); ++i)
-  {
-    s << 'g' << i.locus().index << '_' << i.locus().category << " [label="
-      << *i << ", shape=" << (i->sym->arity() ? "box" : "circle") << "];";
-
-    for (unsigned j(0); j < i->sym->arity(); ++j)
-      s << 'g' << i.locus().index << '_' << i.locus().category << " -- g"
-        << i->args[j] << '_' << function::cast(i->sym)->arg_category(j) << ';';
-  }
-
-  s << '}';
-}
-
-///
-/// The individual is printed on a single line with symbols separated by
-/// spaces.
-///
-/// \param[in]  mep individual to be printed
-/// \param[out] s   output stream
-/// \return         a reference to the output stream
-///
-/// Not at all human readable, but a compact representation for
-/// import / export.
-///
-/// \note
-/// Prints active genes visiting the genome in pre-order.
-///
-/// \relates i_mep
-///
-std::ostream &in_line(const i_mep &mep, std::ostream &s)
-{
-  std::function<void (locus)> in_line_(
-    [&](locus l)
-    {
-      const gene &g(mep[l]);
-
-      if (l != mep.best())
-        s << ' ';
-      s << g;
-
-      const auto arity(g.sym->arity());
-      for (auto i(decltype(arity){0}); i < arity; ++i)
-        in_line_(g.arg_locus(i));
-    });
-
-  in_line_(mep.best());
-  return s;
-}
-
-///
-/// Prints a human readable representation of the individual.
-///
-/// \param[in]  mep        the individual to be printed
-/// \param[out] s          output stream
-/// \param[in]  short_form if `true` prints a shorter and more human-readable
-///                        form of the genome
-/// \return                a reference to the output stream
-///
-/// Do you remember C=64's `LIST`? :-)
-///
-///     10 PRINT "HOME"
-///     20 PRINT "SWEET"
-///     30 GOTO 10
-///
-/// \relates i_mep
-///
-std::ostream &list(const i_mep &mep, std::ostream &s, bool short_form)
-{
-  SAVE_FLAGS(s);
-
-  const auto size(mep.size());
-  const auto categories(mep.categories());
-
-  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories)));
-
-  for (auto i(mep.begin()); i != mep.end(); ++i)
-  {
-    if (short_form && i->sym->terminal() && i.locus() != mep.best())
-      continue;
-
-    s << '[' << std::setfill('0') << std::setw(w1) << i.locus().index;
-
-    if (categories > 1)
-      s << ',' << std::setw(w2) << i.locus().category;
-
-    s << "] " << *i;
-
-    const auto arity(i->sym->arity());
-    for (unsigned j(0); j < arity; ++j)
-    {
-      s << ' ';
-
-      const auto arg_j(i->arg_locus(j));
-
-      if (short_form && mep[arg_j].sym->terminal())
-        s << mep[arg_j];
-      else
-      {
-        s << '[' << std::setw(w1) << arg_j.index;
-        if (categories > 1)
-          s << ',' << std::setw(w2) << arg_j.category;
-        s << ']';
-      }
-    }
-
-    s << '\n';
-  }
-
-  return s;
-}
-
-///
-/// \param[in]  mep the individual to be printed
-/// \param[out] s   output stream
-/// \return         a reference to the (modified) output stream
-///
-std::ostream &tree(const i_mep &mep, std::ostream &s)
-{
-  std::function<void (const gene &, const gene &, unsigned)> tree_(
-    [&](const gene &parent, const gene &child, unsigned indent)
-    {
-      if (child == parent ||
-          parent.sym != child.sym ||
-          function::cast(parent.sym)->associative() == false)
-      {
-        s << std::string(indent, ' ') << child << '\n';
-        indent += 2;
-      }
-
-      const auto arity(child.sym->arity());
-      for (auto i(decltype(arity){0}); i < arity; ++i)
-        tree_(child, mep[child.arg_locus(i)], indent);
-    });
-
-  tree_(mep[mep.best()], mep[mep.best()], 0);
-  return s;
-}
-
-///
-/// Prints the complete content of an individual.
-///
-/// \param[in]  mep individual to be printed
-/// \param[out] s   output stream
-/// \return         a reference to `s`
-///
-/// \relates i_mep
-///
-std::ostream &dump(const i_mep &mep, std::ostream &s)
-{
-  SAVE_FLAGS(s);
-
-  const auto size(mep.size());
-  const auto categories(mep.categories());
-
-  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
-  const auto w2(1 + static_cast<int>(std::log10(categories)));
-
-  for (index_t i(0); i < size; ++i)
-    for (category_t c(0); c < categories; ++c)
-    {
-      const gene &g(mep[{i, c}]);
-
-      s << '[' << std::setfill('0') << std::setw(w1) << i;
-
-      if (categories > 1)
-        s << ',' << std::setw(w2) << c;
-
-      s  << "] " << g;
-
-      const auto arity(g.sym->arity());
-      for (auto j(decltype(arity){0}); j < arity; ++j)
-      {
-        const auto arg_j(g.arg_locus(j));
-
-        s << " [" << std::setw(w1) << arg_j.index;
-        if (categories > 1)
-          s << ',' << std::setw(w2) << arg_j.category;
-        s << ']';
-      }
-
-      s << '\n';
-    }
-
-  return s;
-}
-
-///
-/// \param[out] s   output stream
-/// \param[in]  ind individual to print
-/// \return         output stream including `ind`
-///
-/// \relates i_mep
-///
-std::ostream &operator<<(std::ostream &s, const i_mep &ind)
-{
-  return list(ind, s, true);
-}
-
-///
 /// \param[in] e  environment used to build the individual
 /// \param[in] in input stream
 /// \return       `true` if the object has been loaded correctly
@@ -1087,5 +870,184 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   return ret;
 }
 #endif
+
+namespace
+{
+std::ostream &dump(const i_mep &mep, std::ostream &s)
+{
+  SAVE_FLAGS(s);
+
+  const auto size(mep.size());
+  const auto categories(mep.categories());
+
+  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
+  const auto w2(1 + static_cast<int>(std::log10(categories)));
+
+  for (index_t i(0); i < size; ++i)
+    for (category_t c(0); c < categories; ++c)
+    {
+      const gene &g(mep[{i, c}]);
+
+      s << '[' << std::setfill('0') << std::setw(w1) << i;
+
+      if (categories > 1)
+        s << ',' << std::setw(w2) << c;
+
+      s  << "] " << g;
+
+      const auto arity(g.sym->arity());
+      for (auto j(decltype(arity){0}); j < arity; ++j)
+      {
+        const auto arg_j(g.arg_locus(j));
+
+        s << " [" << std::setw(w1) << arg_j.index;
+        if (categories > 1)
+          s << ',' << std::setw(w2) << arg_j.category;
+        s << ']';
+      }
+
+      s << '\n';
+    }
+
+  return s;
+}
+
+void graphviz(const i_mep &mep, std::ostream &s)
+{
+  s << "graph {";
+
+  for (auto i(mep.begin()); i != mep.end(); ++i)
+  {
+    s << 'g' << i.locus().index << '_' << i.locus().category << " [label="
+      << *i << ", shape=" << (i->sym->arity() ? "box" : "circle") << "];";
+
+    for (unsigned j(0); j < i->sym->arity(); ++j)
+      s << 'g' << i.locus().index << '_' << i.locus().category << " -- g"
+        << i->args[j] << '_' << function::cast(i->sym)->arg_category(j) << ';';
+  }
+
+  s << '}';
+}
+
+std::ostream &in_line(const i_mep &mep, std::ostream &s)
+{
+  std::function<void (locus)> in_line_(
+    [&](locus l)
+    {
+      const gene &g(mep[l]);
+
+      if (l != mep.best())
+        s << ' ';
+      s << g;
+
+      const auto arity(g.sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
+        in_line_(g.arg_locus(i));
+    });
+
+  in_line_(mep.best());
+  return s;
+}
+
+std::ostream &list(const i_mep &mep, std::ostream &s)
+{
+  SAVE_FLAGS(s);
+
+  const auto size(mep.size());
+  const auto categories(mep.categories());
+
+  const auto w1(1 + static_cast<int>(std::log10(size - 1)));
+  const auto w2(1 + static_cast<int>(std::log10(categories)));
+
+  const bool short_form(!s.iword(out::long_form_flag));
+
+  for (auto i(mep.begin()); i != mep.end(); ++i)
+  {
+    if (short_form && i->sym->terminal() && i.locus() != mep.best())
+      continue;
+
+    s << '[' << std::setfill('0') << std::setw(w1) << i.locus().index;
+
+    if (categories > 1)
+      s << ',' << std::setw(w2) << i.locus().category;
+
+    s << "] " << *i;
+
+    const auto arity(i->sym->arity());
+    for (unsigned j(0); j < arity; ++j)
+    {
+      s << ' ';
+
+      const auto arg_j(i->arg_locus(j));
+
+      if (short_form && mep[arg_j].sym->terminal())
+        s << mep[arg_j];
+      else
+      {
+        s << '[' << std::setw(w1) << arg_j.index;
+        if (categories > 1)
+          s << ',' << std::setw(w2) << arg_j.category;
+        s << ']';
+      }
+    }
+
+    s << '\n';
+  }
+
+  return s;
+}
+
+std::ostream &tree(const i_mep &mep, std::ostream &s)
+{
+  std::function<void (const gene &, const gene &, unsigned)> tree_(
+    [&](const gene &parent, const gene &child, unsigned indent)
+    {
+      if (child == parent ||
+          parent.sym != child.sym ||
+          function::cast(parent.sym)->associative() == false)
+      {
+        s << std::string(indent, ' ') << child << '\n';
+        indent += 2;
+      }
+
+      const auto arity(child.sym->arity());
+      for (auto i(decltype(arity){0}); i < arity; ++i)
+        tree_(child, mep[child.arg_locus(i)], indent);
+    });
+
+  tree_(mep[mep.best()], mep[mep.best()], 0);
+  return s;
+}
+
+}  // namespace
+
+///
+/// \param[out] s   output stream
+/// \param[in]  ind individual to print
+/// \return         output stream including `ind`
+///
+/// \relates i_mep
+///
+std::ostream &operator<<(std::ostream &s, const i_mep &ind)
+{
+  switch (s.iword(out::print_format_flag))
+  {
+  case out::dump_f:
+    return dump(ind, s);
+
+  case out::graphviz_f:
+    graphviz(ind, s);
+    return s;
+
+  case out::in_line_f:
+    return in_line(ind, s);
+
+  case out::tree_f:
+    tree(ind, s);
+
+  default:
+    return list(ind, s);
+  }
+}
 
 }  // namespace vita

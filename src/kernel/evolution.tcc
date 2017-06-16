@@ -178,7 +178,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       f_dyn << " \"";
       if (!stats_.best.solution.empty())
-        in_line(stats_.best.solution, f_dyn);
+        f_dyn << out::in_line << stats_.best.solution;
       f_dyn << "\"\n";
     }
   }

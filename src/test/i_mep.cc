@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(t_output)
   std::stringstream ss;
 
   BOOST_TEST_CHECKPOINT("Inline output");
-  in_line(i, ss);
+  ss << vita::out::in_line << i;
   BOOST_TEST(ss.str() == "FSUB FADD 2.0 3.0 FADD 3.0 2.0");
 
   BOOST_TEST_CHECKPOINT("Graphviz output");
@@ -223,8 +223,8 @@ BOOST_AUTO_TEST_CASE(t_output)
   // with clear.
   ss.clear();
   ss.str(std::string());
+  ss << vita::out::graphviz << i;
 
-  graphviz(i, ss);
   BOOST_TEST(ss.str() ==
              "graph {"
              "g0_0 [label=FSUB, shape=box];"
@@ -242,9 +242,7 @@ BOOST_AUTO_TEST_CASE(t_output)
   BOOST_TEST_CHECKPOINT("Dump output");
   ss.clear();
   ss.str(std::string());
-  dump(i, ss);
-
-  const std::string dump_str();
+  ss << vita::out::dump << i;
 
   BOOST_TEST(ss.str() ==
              "[0] FSUB [1] [2]\n"
@@ -256,7 +254,7 @@ BOOST_AUTO_TEST_CASE(t_output)
   BOOST_TEST_CHECKPOINT("List output");
   ss.clear();
   ss.str(std::string());
-  list(i, ss);
+  ss << vita::out::list << i;
 
   BOOST_TEST(ss.str() ==
              "[0] FSUB [1] [2]\n"
