@@ -295,7 +295,7 @@ bool i_ga::debug() const
     if (genome_[i].sym->category() != i)
     {
       print.error("Wrong category: ", i,
-                  genome_[i].sym->display(), " -> ",
+                  genome_[i].sym->name(), " -> ",
                   genome_[i].sym->category(), " should be ", i);
       return false;
     }

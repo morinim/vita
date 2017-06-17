@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -224,7 +224,7 @@ symbol *symbol_set::decode(const std::string &dex) const
   assert(dex != "");
 
   for (auto s : views_.back().all)
-    if (s.sym->display() == dex)
+    if (s.sym->name() == dex)
       return s.sym;
 
   return nullptr;
@@ -304,7 +304,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 {
   for (const auto &s : ss.views_.back().all)
   {
-    o << s.sym->display();
+    o << s.sym->name();
 
     const auto arity(s.sym->arity());
     if (arity)
@@ -372,7 +372,7 @@ bool symbol_set::collection::debug() const
     // the terminals' vector.
     if (s.sym->terminal() == t_not_found)
     {
-      print.error(name_, ": symbol ", s.sym->display(), " badly stored");
+      print.error(name_, ": symbol ", s.sym->name(), " badly stored");
       return false;
     }
 
@@ -382,7 +382,7 @@ bool symbol_set::collection::debug() const
       {
         if (std::find(adt.begin(), adt.end(), s) == adt.end())
         {
-          print.error(name_, ": ADT ", s.sym->display(), " badly stored");
+          print.error(name_, ": ADT ", s.sym->name(), " badly stored");
           return false;
         }
       }
@@ -390,7 +390,7 @@ bool symbol_set::collection::debug() const
       {
         if (std::find(adf.begin(), adf.end(), s) == adf.end())
         {
-          print.error(name_, ": ADF ", s.sym->display(), " badly stored");
+          print.error(name_, ": ADF ", s.sym->name(), " badly stored");
           return false;
         }
       }
@@ -516,7 +516,7 @@ bool symbol_set::collection::sum_container::debug() const
   {
     if (!e.sym->debug())
     {
-      print.error(name_, ": invalid symbol ", e.sym->display());
+      print.error(name_, ": invalid symbol ", e.sym->name());
       return false;
     }
 
@@ -524,7 +524,7 @@ bool symbol_set::collection::sum_container::debug() const
 
     if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))
     {
-      print.error(name_, ": null weight for symbol ", e.sym->display());
+      print.error(name_, ": null weight for symbol ", e.sym->name());
       return false;
     }
   }

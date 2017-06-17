@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
         }
 
         auto f(sset.insert(std::make_unique<adf>(blk2, categories)));
-        std::cout << '\n' << f->display() << '\n' << blk2;
+        std::cout << '\n' << f->name() << '\n' << blk2;
 
         i_mep blk3(blk.replace({{f, positions}}));
         std::cout << '\n' << blk3;

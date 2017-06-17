@@ -131,7 +131,7 @@ void src_search<T, ES>::arl(const U &base)
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
       const auto &f(env.sset->get_adt(i));
-      adf_log << f.display() << ' ' << env.sset->weight(f) << '\n';
+      adf_log << f.name() << ' ' << env.sset->weight(f) << '\n';
     }
     adf_log << '\n';
   }
@@ -174,7 +174,7 @@ void src_search<T, ES>::arl(const U &base)
 
       if (env.stat.arl && adf_log.good())
       {
-        adf_log << p->display() << " (Base: " << base_fit
+        adf_log << p->name() << " (Base: " << base_fit
                 << "  DF: " << delta
                 << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
                 << "%)\n"

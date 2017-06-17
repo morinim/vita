@@ -42,15 +42,15 @@ static_assert(std::numeric_limits<base_t>::is_iec559,
               "Vita requires IEC 559/IEEE 754 floating-point types");
 
 ///
-/// \param[in] v the value that must be casted to base type (`base_t`).
-/// \return the content of `v`.
-///
 /// Just a simple shortcut.
+///
+/// \param[in] v the value that must be casted to base type (`base_t`)
+/// \return      the content of `v`
 ///
 inline base_t base(const any &v) { return any_cast<base_t>(v); }
 
 ///
-/// \brief Ephemeral random constant
+/// Ephemeral random constant.
 ///
 /// It is assumed that the creation of floating-point constants is
 /// necessary to do symbolic regression in evolutionary computation.
@@ -67,15 +67,16 @@ public:
   explicit real(const cvect &c, base_t m = -1000.0, base_t u = 1000.0)
     : terminal("REAL", c[0]), min(m), upp(u)
   {
-    assert(c.size() == 1);
-    assert(m < u);
+    Expects(c.size() == 1);
+    Expects(m < u);
   }
 
   bool parametric() const final { return true; }
 
   double init() const final { return random::between<base_t>(min, upp); }
 
-  std::string display(double v) const final { return std::to_string(v); }
+  std::string display(double v, format) const final
+  { return std::to_string(v); }
 
   any eval(core_interpreter *i) const final
   {
@@ -89,7 +90,7 @@ private:
 };
 
 ///
-/// \brief Ephemeral random integer constant
+/// Ephemeral random integer constant.
 ///
 /// This is like real::real but restricted to integer numbers.
 ///
@@ -99,15 +100,15 @@ public:
   explicit integer(const cvect &c, int m = -128, int u = 127)
     : terminal("REAL", c[0]), min(m), upp(u)
   {
-    assert(c.size() == 1);
-    assert(m < u);
+    Expects(c.size() == 1);
+    Expects(m < u);
   }
 
   bool parametric() const final { return true; }
 
   double init() const final { return random::between<int>(min, upp); }
 
-  std::string display(double v) const final
+  std::string display(double v, format) const final
   { return std::to_string(static_cast<int>(v)); }
 
   any eval(core_interpreter *i) const final
@@ -122,13 +123,13 @@ private:
 };
 
 ///
-/// \brief The absolute value of a real number
+/// The absolute value of a real number.
 ///
 class abs : public function
 {
 public:
   explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *i) const final
   {
@@ -139,7 +140,7 @@ public:
 };
 
 ///
-/// \brief Sum of two real numbers
+/// Sum of two real numbers.
 ///
 class add : public function
 {
@@ -166,13 +167,13 @@ public:
 };
 
 ///
-/// Division between two real numbers
+/// Division between two real numbers.
 ///
 class div : public function
 {
 public:
   explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -192,14 +193,14 @@ public:
 };
 
 ///
-/// \brief "Greater Then" operator
+/// "Greater Then" operator.
 ///
 class gt : public function
 {
 public:
   explicit gt(const cvect &c)
     : function(">", c[1], {c[0], c[0]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -212,13 +213,13 @@ public:
 };
 
 ///
-/// \brief Quotient of the division between two real numbers
+/// Quotient of the division between two real numbers.
 ///
 class idiv : public function
 {
 public:
   explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -238,7 +239,7 @@ public:
 };
 
 ///
-/// \brief "If between" operator
+/// "If between" operator.
 ///
 /// \warning Requires five input arguments.
 ///
@@ -247,7 +248,7 @@ class ifb : public function
 public:
   explicit ifb(const cvect &c)
     : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -277,14 +278,14 @@ public:
 };
 
 ///
-/// \brief "If equal" operator
+/// "If equal" operator.
 ///
 class ife : public function
 {
 public:
   explicit ife(const cvect &c)
     : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -309,7 +310,7 @@ public:
 };
 
 ///
-/// \brief "If less then" operator
+/// "If less then" operator.
 ///
 class ifl : public function
 {
@@ -342,13 +343,13 @@ public:
 };
 
 ///
-/// \brief "If zero" operator
+/// "If zero" operator.
 ///
 class ifz : public function
 {
 public:
   explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -370,13 +371,13 @@ public:
 };
 
 ///
-/// \brief Length of a string
+/// Length of a string.
 ///
 class length : public function
 {
 public:
   explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *i) const final
   {
@@ -388,17 +389,18 @@ public:
 };
 
 ///
-/// \brief Natural logarithm of a real number
+/// Natural logarithm of a real number.
 ///
 class ln : public function
 {
 public:
-  explicit ln(const cvect &c) : function("FLN", c[0], {c[0]}) {}
+  explicit ln(const cvect &c) : function("FLN", c[0], {c[0]})
+  { Expects(c.size() == 1); }
 
   ///
-  /// \param[in] i pointer to the active interpreter.
-  /// \return the natural logarithm of its argument or an empty value in case
-  //          of invalid argument / infinite result.
+  /// \param[in] i pointer to the active interpreter
+  /// \return      the natural logarithm of its argument or an empty value in
+  ///              case of invalid argument / infinite result.
   ///
   any eval(core_interpreter *i) const final
   {
@@ -413,14 +415,14 @@ public:
 };
 
 ///
-/// \brief "Less Then" operator
+/// "Less Then" operator.
 ///
 class lt : public function
 {
 public:
   explicit lt(const cvect &c)
     : function("<", c[1], {c[0], c[0]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -433,13 +435,13 @@ public:
 };
 
 ///
-/// \brief The larger of two floating point values
+/// The larger of two floating point values.
 ///
 class max : public function
 {
 public:
   explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -459,13 +461,13 @@ public:
 };
 
 ///
-/// \brief Remainder of the division between real numbers
+/// Remainder of the division between real numbers.
 ///
 class mod : public function
 {
 public:
   explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -485,7 +487,7 @@ public:
 };
 
 ///
-/// \brief Product of real numbers
+/// Product of real numbers.
 ///
 class mul : public function
 {
@@ -510,13 +512,13 @@ public:
 };
 
 ///
-/// \brief sin() of a real number
+/// sin() of a real number.
 ///
 class sin : public function
 {
 public:
   explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *i) const final
   {
@@ -528,13 +530,13 @@ public:
 };
 
 ///
-/// \brief square root of a real number
+/// Square root of a real number.
 ///
 class sqrt : public function
 {
 public:
   explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *i) const final
   {
@@ -550,13 +552,13 @@ public:
 };
 
 ///
-/// \brief Subtraction between real numbers
+/// Subtraction between real numbers.
 ///
 class sub : public function
 {
 public:
   explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -578,4 +580,4 @@ public:
 }  // namespace real
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

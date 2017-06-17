@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
-    brood_recombination = 1;
+    brood_recombination = 0;
     dss = trilean::yes;
     layers = 1;
     individuals = 100;

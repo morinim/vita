@@ -32,19 +32,21 @@ namespace vita
 /// may also trap on signed arithmetic overflows, or simply assume that
 /// overflows will never happen and generate object code accordingly. For
 /// these reasons, it is important to ensure that operations on signed
-/// integers do no result in signed overflow
+/// integers do no result in signed overflow.
 namespace integer
 {
 using base_t = int;
 
 ///
-/// \param[in] v the value that must be casted to base type (`base_t`).
-///
 /// Just a simple shortcut.
+///
+/// \param[in] v the value that must be casted to base type (`base_t`)
+///
 inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
 ///
 /// Integer ephemeral random constant.
+///
 /// \see dbl::number
 ///
 class number : public terminal
@@ -53,15 +55,16 @@ public:
   explicit number(const cvect &c, int m = -128, int u = 127)
     : terminal("INT", c[0]), min(m), upp(u)
   {
-    assert(c.size() == 1);
-    assert(m < u);
+    Expects(c.size() == 1);
+    Expects(m < u);
   }
 
   bool parametric() const final { return true; }
 
   double init() const final { return random::between<int>(min, upp); }
 
-  std::string display(double v) const final { return std::to_string(v); }
+  std::string display(double v, format) const final
+  { return std::to_string(v); }
 
   any eval(core_interpreter *i) const final
   {
@@ -74,20 +77,20 @@ private:
   const int min, upp;
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Addition
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Addition
 class add : public function
 {
 public:
   explicit add(const cvect &c) : function("ADD", c[0], {c[0], c[0]})
   {
-    assert(c.size() == 1);
+    Expects(c.size() == 1);
   }
 
   bool associative() const final { return true; }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -100,16 +103,16 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Division
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Division
 class div : public function
 {
 public:
   explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -126,11 +129,11 @@ class ife : public function
 public:
   explicit ife(const cvect &c)
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -151,11 +154,11 @@ class ifl : public function
 public:
   explicit ifl(const cvect &c)
     : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -175,11 +178,11 @@ class ifz : public function
 {
 public:
   explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
 
     if (v0 == 0)
@@ -194,16 +197,16 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Modulo
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Modulo
 class mod : public function
 {
 public:
   explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -214,11 +217,12 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Multiplication
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Multiplication
 class mul : public function
 {
 public:
-  explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]}) {}
+  explicit mul(const cvect &c) : function("MUL", c[0], {c[0], c[0]})
+  { Expects(c.size() == 1); }
 
   bool associative() const final { return true; }
 
@@ -227,7 +231,7 @@ public:
     static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
 
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -275,16 +279,16 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-LeftShiftOperator
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-LeftShiftOperator
 class shl : public function
 {
 public:
   explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -297,16 +301,16 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#INT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Subtraction
+/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Subtraction
 class sub : public function
 {
 public:
   explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
-  { assert(c.size() == 1); }
+  { Expects(c.size() == 1); }
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -322,4 +326,4 @@ public:
 }  // namespace integer
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

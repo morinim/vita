@@ -522,7 +522,7 @@ bool i_mep::debug() const
       if (genome_(l).sym->category() != c)
       {
         print.error("Wrong category: ", l,
-                    genome_(l).sym->display(), " -> ",
+                    genome_(l).sym->name(), " -> ",
                     genome_(l).sym->category(), " should be ", c);
         return false;
       }
@@ -873,6 +873,26 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 
 namespace
 {
+std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
+{
+  std::function<std::string (const gene &)> language_(
+    [&](const gene &g)
+    {
+      std::string ret(g.sym->display(g.par, f));
+
+      auto arity(g.sym->arity());
+      for (decltype(arity) i(0); i < arity; ++i)
+      {
+        const std::string from("%%" + std::to_string(i) + "%%");
+        ret = replace_all(ret, from, language_(mep[g.arg_locus(i)]));
+      }
+
+      return ret;
+    });
+
+  return s << language_(mep[mep.best()]);
+}
+
 std::ostream &dump(const i_mep &mep, std::ostream &s)
 {
   SAVE_FLAGS(s);
@@ -1030,8 +1050,13 @@ std::ostream &tree(const i_mep &mep, std::ostream &s)
 ///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {
-  switch (s.iword(out::print_format_flag))
+  const auto format(s.iword(out::print_format_flag));
+
+  switch (format)
   {
+  case out::c_language_f:
+    return language(s, symbol::format(format), ind);
+
   case out::dump_f:
     return dump(ind, s);
 
@@ -1043,7 +1068,7 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
     return in_line(ind, s);
 
   case out::tree_f:
-    tree(ind, s);
+    return tree(ind, s);
 
   default:
     return list(ind, s);

@@ -40,12 +40,12 @@ bool adf::auto_defined() const
 /// \param[in] i the context in which this ADF is evaluated
 /// \return      the output of the ADF
 ///
-/// Adf functions need input parameters from the a context (contrary to
-/// adt::eval).
+/// \note
+/// Adf functions need input parameters from a context (contrary to adt::eval).
 ///
 any adf::eval(core_interpreter *i) const
 {
-  assert(typeid(*i) == typeid(interpreter<i_mep>));
+  Expects(typeid(*i) == typeid(interpreter<i_mep>));
 
   return interpreter<i_mep>(&code(),
                             static_cast<interpreter<i_mep> *>(i)).run();
@@ -54,9 +54,9 @@ any adf::eval(core_interpreter *i) const
 ///
 /// \return the name of the ADF
 ///
-std::string adf::display() const
+std::string adf::name() const
 {
-  return core_.display(symbol::display());
+  return core_.name(symbol::name());
 }
 
 ///
@@ -106,6 +106,7 @@ bool adt::auto_defined() const
 ///
 /// \return the output of the ADT
 ///
+/// \note
 /// Adt hasn't input parameters so the context is ignored (contrary to
 /// adf::eval).
 ///
@@ -117,9 +118,9 @@ any adt::eval(core_interpreter *) const
 ///
 /// \return the name of the ADT
 ///
-std::string adt::display() const
+std::string adt::name() const
 {
-  return core_.display(symbol::display());
+  return core_.name(symbol::name());
 }
 
 ///

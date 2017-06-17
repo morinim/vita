@@ -69,7 +69,8 @@ template<class T> struct has_introns : std::false_type {};
 
 namespace out
 {
-enum print_format_t {dump_f, graphviz_f, in_line_f, list_f, tree_f};
+enum print_format_t {c_language_f = symbol::c_format, dump_f, graphviz_f,
+                     in_line_f, list_f, tree_f};
 
 extern const long print_format_flag;
 extern const long long_form_flag;

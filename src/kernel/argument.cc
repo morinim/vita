@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,22 +18,24 @@
 namespace vita
 {
 ///
-/// \param[in] n argument index.
+/// `n`-th argument constructor.
+///
+/// \param[in] n argument index
 ///
 /// An adf function may have up to `k_args` arguments. Arguments' category is
-/// special (here it is initialized with `0` but we could say they haven't a
-/// type) because arguments are communication channels among adf functions
-/// and their calling environments. So the type that is travelling on channel
-/// `i` (`argument(i)`) varies depending on the function being evaluated
-/// (instead, adf functions have a precise, fixed signature).
+/// special: they haven't a type because arguments are communication channels
+/// among adf functions and their calling environments.
+/// So the type that is travelling on channel `i` (`argument(i)`) varies
+/// depending on the function being evaluated (instead, adf functions have a
+/// precise, fixed signature).
 ///
-argument::argument(unsigned n) : terminal("ARG", category_t(0)), index_(n)
+argument::argument(unsigned n) : terminal("ARG", category_t()), index_(n)
 {
-  assert(debug());
+  Ensures(debug());
 }
 
 ///
-/// \return the index of the argument.
+/// \return the index of the argument
 ///
 unsigned argument::index() const
 {
@@ -41,29 +43,30 @@ unsigned argument::index() const
 }
 
 ///
-/// \return the string representation of the argument.
+/// \return the name of the argument
 ///
-std::string argument::display() const
+std::string argument::name() const
 {
   return "ARG_" + std::to_string(index_);
 }
 
 ///
 /// \param[in] agent current interpreter
-/// \return the value of the argument.
+/// \return          the value of the argument
 ///
 any argument::eval(core_interpreter *agent) const
 {
-  assert(typeid(*agent) == typeid(interpreter<i_mep>));
+  Expects(typeid(*agent) == typeid(interpreter<i_mep>));
 
   return static_cast<interpreter<i_mep> *>(agent)->fetch_adf_arg(index_);
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool argument::debug() const
 {
   return index_ < gene::k_args && terminal::debug();
 }
+
 }  // namespace vita

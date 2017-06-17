@@ -33,6 +33,8 @@ using opcode_t = unsigned;
 class symbol
 {
 public:
+  enum format {default_format, c_format, python_format};
+
   symbol(const std::string &, category_t);
 
   virtual unsigned arity() const = 0;
@@ -44,8 +46,8 @@ public:
   opcode_t opcode() const;
   bool terminal() const;
 
-  virtual std::string display() const;
-  virtual std::string display(double) const;
+  virtual std::string name() const;
+  virtual std::string display(double, format = default_format) const;
   virtual double init() const;
 
   /// Calculates the value of / performs the action associated with the symbol

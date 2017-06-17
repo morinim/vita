@@ -42,24 +42,22 @@ symbol::symbol(const std::string &name, category_t c)
 ///
 /// \return the name of the symbol
 ///
-std::string symbol::display() const
+std::string symbol::name() const
 {
   return name_;
 }
 
 ///
 /// \param[in] v additional informations regarding parametric symbols
-/// \return      a string representing the symbol
+/// \param[in] f output format
+/// \return      a string representing the symbol in the `f` format
 ///
-/// This function is called for parametric symbols only. The `v` argument is
-/// used to build a more meaningful name for the symbol (i.e. for a numeric
-/// terminal it's better to print 123 than "NUMBER").
+/// The `v` argument is required for parametric symbols (i.e. for a numeric
+/// terminal we have to print 123 rather than "NUMBER").
 ///
-std::string symbol::display(double v) const
+std::string symbol::display(double v, format) const
 {
-  Expects(parametric());
-
-  return display() + "_" + std::to_string(v);
+  return name() + "_" + std::to_string(v);
 }
 
 ///
@@ -75,7 +73,7 @@ double symbol::penalty_nvi(core_interpreter *) const
 ///
 bool symbol::debug() const
 {
-  return display().size() > 0;
+  return name().size() > 0;
 }
 
 }  // namespace vita

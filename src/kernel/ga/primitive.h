@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,10 +36,10 @@ namespace ga
 using base_t = gene::param_type;
 
 ///
-/// \param[in] v the value that must be casted to base type (`base_t`).
-/// \return the content of `v`.
-///
 /// Just a simple shortcut.
+///
+/// \param[in] v the value that must be casted to base type (`base_t`)
+/// \return      the content of `v`
 ///
 inline base_t cast(const any &v) { return any_cast<base_t>(v); }
 
@@ -53,7 +53,7 @@ public:
                   T m = T(-1000), T u = T(1000))
     : terminal(name, c), min(m), upp(u)
   {
-    assert(m < u);
+    Expects(m < u);
   }
 
   virtual bool parametric() const override { return true; }
@@ -61,7 +61,7 @@ public:
   virtual double init() const override
   { return static_cast<double>(random::between<T>(min, upp)); }
 
-  virtual std::string display(double v) const override
+  virtual std::string display(double v, format) const override
   { return std::to_string(static_cast<T>(v)); }
 
   /// \warning
@@ -89,7 +89,7 @@ public:
     return 0.0;
   }
 
-private:  // Private data members
+private:
   const T min, upp;
 };
 
@@ -124,12 +124,12 @@ public:
 };
 
 ///
-/// \param[in] i this will be the i-th arguments.
-/// \param[in] m minimum value of the argument.
-/// \param[in] u upper limit for the argument.
-/// \return a pointer to the created parameter.
-///
 /// A convenient shortcut to build the symbol set of a GA problem.
+///
+/// \param[in] i this will be the i-th arguments
+/// \param[in] m minimum value of the argument
+/// \param[in] u upper limit for the argument
+/// \return      a pointer to the created parameter
 ///
 template<class T = real>
 std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
@@ -143,4 +143,4 @@ std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
 }  // namespace ga
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

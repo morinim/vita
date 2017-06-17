@@ -24,7 +24,7 @@
 namespace vita
 {
 ///
-/// \brief The core of vita::adt and vita::adf
+/// The core of vita::adt and vita::adf.
 ///
 /// Human programmers organize sequences of repeated steps into reusable
 /// components such as subroutines, functions and classes. They then
@@ -53,11 +53,11 @@ public:
 
   const T &code() const;
 
-  std::string display(const std::string &) const;
+  std::string name(const std::string &) const;
 
   bool debug() const;
 
-private:  // Private data members
+private:
   T        code_;
   opcode_t   id_;
 
@@ -69,7 +69,7 @@ private:  // Private data members
 };
 
 ///
-/// \brief Subroutine with arguments
+/// Subroutine with arguments.
 ///
 class adf : public function
 {
@@ -80,7 +80,7 @@ public:
 
   any eval(core_interpreter *) const override;
 
-  std::string display() const override;
+  std::string name() const override;
 
   bool debug() const override;
 
@@ -91,7 +91,7 @@ private:
 };
 
 ///
-/// \brief Subroutines WITHOUT arguments
+/// Subroutines WITHOUT arguments.
 ///
 /// \see
 /// "An Analysis of Automatic Subroutine Discovery in Genetic Programming" -
@@ -106,7 +106,7 @@ public:
 
   any eval(core_interpreter *) const override;
 
-  std::string display() const override;
+  std::string name() const override;
 
   bool debug() const override;
 
@@ -119,4 +119,4 @@ private:
 #include "kernel/adf.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

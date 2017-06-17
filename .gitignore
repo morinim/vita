@@ -1,13 +1,28 @@
+# Temporary files
 *.P
 *.o
 *.*~
 *.a
+tmp/
+
+# Html output of doxygen
 doc/doxygen/vita.api
+
+# Clone of Github's Vita Wiki
 doc/wiki/
+
+# Custom boost library (used for tests)
 src/boost/
+
+# Dummy directories for sr utility
+src/sr/dataset
+src/sr/stat
+src/sr/symbolset
+
+# Executables
 src/build/
 src/examples/forex/forex_results/
-src/build/
-tmp/
+
+# External tools
 tools/cppcheck/
 tools/*.pyc

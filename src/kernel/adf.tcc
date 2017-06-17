@@ -30,7 +30,7 @@ adf_core<T>::adf_core(const T &ind) : code_(ind), id_(adf_count())
 /// \return           a string identifying an ADF/ADT
 ///
 template<class T>
-std::string adf_core<T>::display(const std::string &prefix) const
+std::string adf_core<T>::name(const std::string &prefix) const
 {
   return prefix + std::to_string(id_);
 }

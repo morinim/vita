@@ -27,14 +27,14 @@ namespace vita
 namespace str
 {
 ///
-/// \brief String comparison for equality
+/// String comparison for equality.
 ///
 class ife : public function
 {
 public:
   explicit ife(const cvect &c)
     : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
 
   any eval(core_interpreter *ci) const final
   {
@@ -56,4 +56,4 @@ public:
 }  // namespace str
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

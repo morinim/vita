@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_GENE_TCC
 
 ///
-/// \param[in] t a terminal.
-///
 /// A new gene built from terminal `t`.
+///
+/// \param[in] t a terminal
 ///
 /// \note
 /// This is usually called for filling the patch section of an individual.
@@ -33,7 +33,9 @@ basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(t.arity())
 }
 
 ///
-/// \param[in] g a reference to a symbol and its arguments.
+/// Utility constructor to input hard-coded genomes.
+///
+/// \param[in] g a reference to a symbol and its arguments
 ///
 /// With this constructor it is easy to write genome "by hand":
 ///     std::vector<gene> g(
@@ -60,11 +62,11 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
 }
 
 ///
-/// \param[in] s a symbol.
-/// \param[in] from a starting index in the genome.
-/// \param[in] sup an upper limit in the genome.
+/// A new gene built from symbol `s` with argument in the `[from;sup[` range.
 ///
-/// A new gene built from symbol `s` with argument in the [from;sup[ range.
+/// \param[in] s    a symbol
+/// \param[in] from a starting index in the genome
+/// \param[in] sup  an upper limit in the genome
 ///
 /// \note
 /// This is usually called for filling the standard section of an individual.
@@ -90,7 +92,7 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
 }
 
 ///
-/// \return the value, casted to type `T`, contained in this gene.
+/// \return the value, casted to type `T`, contained in this gene
 ///
 /// \warning The method support only arithmetic / enum types.
 ///
@@ -105,7 +107,7 @@ T basic_gene<K>::as() const
 }
 
 ///
-/// \param[in] v value to be assigned to the gene.
+/// \param[in] v value to be assigned to the gene
 ///
 /// \warning The method support only arithmetic / enum types.
 ///
@@ -121,7 +123,9 @@ void basic_gene<K>::operator=(T v)
              param_t<std::is_arithmetic<T>::value, std::is_enum<T>::value>());
 }
 
+///
 /// Implements operator= for arithmetic types.
+///
 template<unsigned K>
 template<class T>
 void basic_gene<K>::copy_param(T v, arithmetic_p)
@@ -129,7 +133,9 @@ void basic_gene<K>::copy_param(T v, arithmetic_p)
   par = static_cast<decltype(par)>(v);
 }
 
+///
 /// Implements operator= for enum types.
+///
 template<unsigned K>
 template<class T>
 void basic_gene<K>::copy_param(T v, enum_p)
@@ -138,8 +144,8 @@ void basic_gene<K>::copy_param(T v, enum_p)
 }
 
 ///
-/// \param[in] i ordinal of an argument.
-/// \return the locus that `i`-th argument of the current symbol refers to.
+/// \param[in] i ordinal of an argument
+/// \return      the locus that `i`-th argument of the current symbol refers to
 ///
 template<unsigned K>
 locus basic_gene<K>::arg_locus(unsigned i) const
@@ -150,9 +156,9 @@ locus basic_gene<K>::arg_locus(unsigned i) const
 }
 
 ///
-/// \param[in] g1 first term of comparison.
-/// \param[in] g2 second term of comparison.
-/// \return `true` if `g1 == g2`
+/// \param[in] g1 first term of comparison
+/// \param[in] g2 second term of comparison
+/// \return       `true` if `g1 == g2`
 ///
 template<unsigned K>
 bool operator==(const basic_gene<K> &g1, const basic_gene<K> &g2)
@@ -170,9 +176,9 @@ bool operator==(const basic_gene<K> &g1, const basic_gene<K> &g2)
 }
 
 ///
-/// \param[in] g1 first term of comparison.
-/// \param[in] g2 second term of comparison.
-/// \return `true` if `g1 != g2`
+/// \param[in] g1 first term of comparison
+/// \param[in] g2 second term of comparison
+/// \return       `true` if `g1 != g2`
 ///
 template<unsigned K>
 bool operator!=(const basic_gene<K> &g1, const basic_gene<K> &g2)
@@ -181,14 +187,14 @@ bool operator!=(const basic_gene<K> &g1, const basic_gene<K> &g2)
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] g gene to print.
-/// \return output stream including `g`.
+/// \param[out] s output stream
+/// \param[in]  g gene to print
+/// \return       output stream including `g`
 ///
 template<unsigned K>
 std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
 {
-  return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->display());
+  return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->name());
 }
 
 #endif  // include guard

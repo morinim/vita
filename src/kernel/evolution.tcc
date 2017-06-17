@@ -173,7 +173,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
       for (unsigned active(0); active <= 1; ++active)
         for (const auto &symb_stat : stats_.az)
-          f_dyn << ' ' << (symb_stat.first)->display()
+          f_dyn << ' ' << symb_stat.first->name()
                 << ' ' << symb_stat.second.counter[active];
 
       f_dyn << " \"";

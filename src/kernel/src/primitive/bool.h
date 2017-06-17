@@ -29,7 +29,7 @@ public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  std::string display() const final { return "0"; }
+  std::string name() const final { return "0"; }
 
   any eval(core_interpreter *) const final { return any(false); }
 };
@@ -40,7 +40,7 @@ public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
 
-  std::string display() const final { return "1"; }
+  std::string name() const final { return "1"; }
 
   any eval(core_interpreter *) const final { return any(true); }
 };
@@ -84,9 +84,9 @@ public:
 
   any eval(core_interpreter *ci) const final
   {
-    auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return any(any_cast<bool>(i.fetch_arg(0)) ||
-               any_cast<bool>(i.fetch_arg(1)));
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+    return any(any_cast<bool>(i->fetch_arg(0)) ||
+               any_cast<bool>(i->fetch_arg(1)));
   }
 };
 

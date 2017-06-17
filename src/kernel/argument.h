@@ -21,15 +21,14 @@
 namespace vita
 {
 ///
-/// `argument` is a special `terminal` used by adf functions for
-/// input parameters passing.
+/// A special `terminal` used by adf functions for input parameters passing.
 ///
 class argument : public terminal
 {
 public:
   explicit argument(unsigned);
 
-  std::string display() const override;
+  std::string name() const override;
 
   unsigned index() const;
 
@@ -43,4 +42,4 @@ private:
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

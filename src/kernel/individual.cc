@@ -24,6 +24,17 @@ const long print_format_flag = std::ios_base::xalloc();
 const long long_form_flag = std::ios_base::xalloc();
 
 ///
+/// Used to print the content of an individual in c-language format.
+///
+/// \remark Sticky manipulator.
+///
+std::ostream &c_language(std::ostream &o)
+{
+  o.iword(print_format_flag) = c_language_f;
+  return o;
+}
+
+///
 /// Used to print the complete content of an individual.
 ///
 /// \note Mostly used during debugging.
