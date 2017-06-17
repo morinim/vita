@@ -39,6 +39,10 @@
  *  \namespace vita
  *  The main namespace for the project.
  *
+ *  \namespace out
+ *  Contains flags and manipulators to control the output format of
+ *  individuals.
+ *
  *  \namespace detail
  *  The contents of this namespace isn't intended for general consumption: it
  *  contains implementation details, not the interface.
@@ -53,7 +57,7 @@
  *  "Hello world" classification task (calculating accuracy metric).
  *  \example titanic03.cc
  *  "Hello world" classification task (setting some parameters).
- *  \example titanic03.cc
+ *  \example titanic04.cc
  *  "Hello world" classification task (team-based classification).
  *
  *  \example pathfinding01.cc
