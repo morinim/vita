@@ -33,7 +33,7 @@ using opcode_t = unsigned;
 class symbol
 {
 public:
-  enum format {c_format, cpp_format, mql_format, python_format};
+  enum format {c_format, cpp_format, mql_format, python_format, sup_format};
 
   symbol(const std::string &, category_t);
 

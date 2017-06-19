@@ -981,7 +981,7 @@ std::ostream &list(const i_mep &mep, std::ostream &s)
   const auto w1(1 + static_cast<int>(std::log10(size - 1)));
   const auto w2(1 + static_cast<int>(std::log10(categories)));
 
-  const bool short_form(!s.iword(out::long_form_flag));
+  const bool short_form(!out::long_form_flag(s));
 
   for (auto i(mep.begin()); i != mep.end(); ++i)
   {
@@ -1052,13 +1052,10 @@ std::ostream &tree(const i_mep &mep, std::ostream &s)
 ///
 std::ostream &operator<<(std::ostream &s, const i_mep &ind)
 {
-  const auto format(s.iword(out::print_format_flag));
+  const auto format(out::print_format_flag(s));
 
   switch (format)
   {
-  case out::c_language_f:
-    return language(s, symbol::format(format), ind);
-
   case out::dump_f:
     return dump(ind, s);
 
@@ -1069,11 +1066,15 @@ std::ostream &operator<<(std::ostream &s, const i_mep &ind)
   case out::in_line_f:
     return in_line(ind, s);
 
+  case out::list_f:
+    return list(ind, s);
+
   case out::tree_f:
     return tree(ind, s);
 
   default:
-    return list(ind, s);
+    assert(format >= out::language_f);
+    return language(s, symbol::format(format - out::language_f), ind);
   }
 }
 

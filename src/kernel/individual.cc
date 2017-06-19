@@ -12,6 +12,21 @@
 
 #include "kernel/individual.h"
 
+namespace
+{
+
+///
+/// Index of the print format flag (used as argument of `std::iword`).
+///
+static const long print_format_index = std::ios_base::xalloc();
+
+///
+/// Index of the long-format flag (used as argument of `std::iword`).
+///
+static const long long_form_index = std::ios_base::xalloc();
+
+}  // namespace
+
 namespace vita
 {
 
@@ -20,8 +35,23 @@ namespace vita
 // **********************
 namespace out
 {
-const long print_format_flag = std::ios_base::xalloc();
-const long long_form_flag = std::ios_base::xalloc();
+///
+/// \param[in] o an output stream
+/// \return      the current value of the long format flag for the `o` stream
+///
+bool long_form_flag(std::ostream &o)
+{
+  return o.iword(long_form_index);
+}
+
+///
+/// \param[in] o an output stream
+/// \return      the current value of the print format flag for the `o` stream
+///
+print_format_t print_format_flag(std::ostream &o)
+{
+  return static_cast<print_format_t>(o.iword(print_format_index));
+}
 
 ///
 /// Used to print the content of an individual in c-language format.
@@ -30,7 +60,7 @@ const long long_form_flag = std::ios_base::xalloc();
 ///
 std::ostream &c_language(std::ostream &o)
 {
-  o.iword(print_format_flag) = c_language_f;
+  o.iword(print_format_index) = c_language_f;
   return o;
 }
 
@@ -42,7 +72,7 @@ std::ostream &c_language(std::ostream &o)
 ///
 std::ostream &dump(std::ostream &o)
 {
-  o.iword(print_format_flag) = dump_f;
+  o.iword(print_format_index) = dump_f;
   return o;
 }
 
@@ -54,7 +84,7 @@ std::ostream &dump(std::ostream &o)
 ///
 std::ostream &graphviz(std::ostream &o)
 {
-  o.iword(print_format_flag) = graphviz_f;
+  o.iword(print_format_index) = graphviz_f;
   return o;
 }
 
@@ -67,7 +97,7 @@ std::ostream &graphviz(std::ostream &o)
 ///
 std::ostream &in_line(std::ostream &o)
 {
-  o.iword(print_format_flag) = in_line_f;
+  o.iword(print_format_index) = in_line_f;
   return o;
 }
 
@@ -84,7 +114,7 @@ std::ostream &in_line(std::ostream &o)
 ///
 std::ostream &list(std::ostream &o)
 {
-  o.iword(print_format_flag) = list_f;
+  o.iword(print_format_index) = list_f;
   return o;
 }
 
@@ -95,7 +125,7 @@ std::ostream &list(std::ostream &o)
 ///
 std::ostream &tree(std::ostream &o)
 {
-  o.iword(print_format_flag) = tree_f;
+  o.iword(print_format_index) = tree_f;
   return o;
 }
 
@@ -106,7 +136,7 @@ std::ostream &tree(std::ostream &o)
 ///
 std::ostream &long_form(std::ostream &o)
 {
-  o.iword(long_form_flag) = true;
+  o.iword(long_form_index) = true;
   return o;
 }
 
@@ -117,7 +147,7 @@ std::ostream &long_form(std::ostream &o)
 ///
 std::ostream &short_form(std::ostream &o)
 {
-  o.iword(long_form_flag) = false;
+  o.iword(long_form_index) = false;
   return o;
 }
 

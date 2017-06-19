@@ -379,7 +379,7 @@ bool team<T>::save(std::ostream &out) const
 template<class T>
 std::ostream &operator<<(std::ostream &s, const team<T> &t)
 {
-  const auto format(s.iword(out::print_format_flag));
+  const auto format(out::print_format_flag(s));
 
   for (const auto &i : t)
   {
