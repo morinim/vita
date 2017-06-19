@@ -878,7 +878,9 @@ std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
   std::function<std::string (const gene &)> language_(
     [&](const gene &g)
     {
-      std::string ret(g.sym->display(g.par, f));
+      std::string ret(g.sym->parametric()
+                        ? terminal::cast(g.sym)->display(g.par, f)
+                        : function::cast(g.sym)->display(f));
 
       auto arity(g.sym->arity());
       for (decltype(arity) i(0); i < arity; ++i)

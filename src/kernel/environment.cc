@@ -34,7 +34,7 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
-    brood_recombination = 0;
+    brood_recombination = 1;
     dss = trilean::yes;
     layers = 1;
     individuals = 100;

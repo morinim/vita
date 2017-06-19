@@ -131,6 +131,17 @@ public:
   explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::abs(%%1%%)";
+    case mql_format:     return  "MathAbs(%%1%%)";
+    case python_format:  return      "abs(%%1%%)";
+    default:             return     "fabs(%%1%%)";
+    }
+  }
+
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
@@ -148,6 +159,11 @@ public:
   explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]}) {}
 
   bool associative() const final { return true; }
+
+  std::string display(format) const final
+  {
+    return "(%%1%%) + (%%2%%)";
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -175,6 +191,11 @@ public:
   explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
+  std::string display(format) const final
+  {
+    return "(%%1%%) / (%%2%%)";
+  }
+
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
@@ -193,7 +214,7 @@ public:
 };
 
 ///
-/// "Greater Then" operator.
+/// "Greater Than" operator.
 ///
 class gt : public function
 {
@@ -201,6 +222,15 @@ public:
   explicit gt(const cvect &c)
     : function(">", c[1], {c[0], c[0]})
   { Expects(c.size() == 2); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:  return "std::isgreater(%%1%%,%%2%%)";
+    default:          return "(%%1%% > %%2%%)";
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -220,6 +250,17 @@ class idiv : public function
 public:
   explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::floor((%%1%%) / (%%2%%))";
+    case mql_format:     return  "MathFloor((%%1%%) / (%%2%%))";
+    case python_format:  return            "(%%1%%) // (%%2%%)";
+    default:             return      "floor((%%1%%) / (%%2%%))";
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {

@@ -29,8 +29,6 @@ public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  std::string name() const final { return "0"; }
-
   any eval(core_interpreter *) const final { return any(false); }
 };
 
@@ -39,8 +37,6 @@ class one : public terminal
 public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
-
-  std::string name() const final { return "1"; }
 
   any eval(core_interpreter *) const final { return any(true); }
 };

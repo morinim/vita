@@ -33,22 +33,20 @@ using opcode_t = unsigned;
 class symbol
 {
 public:
-  enum format {default_format, c_format, python_format};
+  enum format {c_format, cpp_format, mql_format, python_format};
 
   symbol(const std::string &, category_t);
 
   virtual unsigned arity() const = 0;
   virtual bool auto_defined() const;
   virtual bool input() const;
-  virtual bool parametric() const;
+  virtual bool parametric() const = 0;
 
   category_t category() const;
   opcode_t opcode() const;
   bool terminal() const;
 
   virtual std::string name() const;
-  virtual std::string display(double, format = default_format) const;
-  virtual double init() const;
 
   /// Calculates the value of / performs the action associated with the symbol
   /// (it's implementation specific).
@@ -84,20 +82,6 @@ private:
 inline double symbol::penalty(core_interpreter *ci) const
 {
   return penalty_nvi(ci);
-}
-
-///
-/// Used to initialize the symbol's internal parameter.
-///
-/// \return `0.0`
-///
-/// \remark
-/// Derived classes should redefine the init member function in a meaningful
-/// way.
-///
-inline double symbol::init() const
-{
-  return 0.0;
 }
 
 ///
@@ -151,21 +135,6 @@ inline bool symbol::input() const
 inline opcode_t symbol::opcode() const
 {
   return opcode_;
-}
-
-///
-/// A parametric symbol needs an additional parameter to be evaluated.
-///
-/// \return `true` for parametric symbols
-///
-/// Genes associated with parametric symbols store an additional parameter
-/// fetched at run-time and used for symbol evaluation.
-///
-/// \note Functions cannot be parametric.
-///
-inline bool symbol::parametric() const
-{
-  return false;
 }
 
 ///

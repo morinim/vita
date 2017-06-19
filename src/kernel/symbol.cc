@@ -44,20 +44,8 @@ symbol::symbol(const std::string &name, category_t c)
 ///
 std::string symbol::name() const
 {
+  // This has to be a virtual member functions because of ADT/ADF functions.
   return name_;
-}
-
-///
-/// \param[in] v additional informations regarding parametric symbols
-/// \param[in] f output format
-/// \return      a string representing the symbol in the `f` format
-///
-/// The `v` argument is required for parametric symbols (i.e. for a numeric
-/// terminal we have to print 123 rather than "NUMBER").
-///
-std::string symbol::display(double v, format) const
-{
-  return name() + "_" + std::to_string(v);
 }
 
 ///

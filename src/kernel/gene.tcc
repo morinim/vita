@@ -50,7 +50,7 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
   : sym(g.first), args(g.first->arity())
 {
   if (sym->parametric())
-    par = sym->init();
+    par = terminal::cast(sym)->init();
   else
     std::transform(g.second.begin(), g.second.end(), args.begin(),
                    [](index_t i)
@@ -78,7 +78,7 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
   Expects(from < sup);
 
   if (s.parametric())
-    par = s.init();
+    par = terminal::cast(&s)->init();
   else
   {
     assert(sup <= std::numeric_limits<index_type>::max());
@@ -194,7 +194,8 @@ bool operator!=(const basic_gene<K> &g1, const basic_gene<K> &g2)
 template<unsigned K>
 std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
 {
-  return s << (g.sym->parametric() ? g.sym->display(g.par) : g.sym->name());
+  return s << (g.sym->parametric() ? terminal::cast(g.sym)->display(g.par)
+                                   : g.sym->name());
 }
 
 #endif  // include guard

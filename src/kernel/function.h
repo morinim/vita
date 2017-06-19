@@ -40,7 +40,10 @@ public:
 
   virtual bool associative() const;
 
-  unsigned arity() const override;
+  virtual std::string display(format = c_format) const;
+
+  unsigned arity() const final;
+  bool parametric() const final;
 
   bool debug() const override;
 
@@ -51,11 +54,11 @@ private:
 };
 
 ///
-/// \return the number arguments of a funtion.
+/// \return the number arguments of a funtion
 ///
 inline unsigned function::arity() const
 {
-  assert(argt_.size());
+  Expects(argt_.size());
   return static_cast<unsigned>(argt_.size());
 }
 
@@ -80,27 +83,35 @@ inline bool function::associative() const
 }
 
 ///
-/// \param[in] i index of a function argument.
-/// \return category of the i-th function argument.
+/// Functions cannot be parametric.
+///
+inline bool function::parametric() const
+{
+  return false;
+}
+
+///
+/// \param[in] i index of a function argument
+/// \return      category of the `i`-th function argument
 ///
 inline category_t function::arg_category(unsigned i) const
 {
-  assert(i < arity());
+  Expects(i < arity());
   return argt_[i];
 }
 
 ///
-/// \param[in] s symbol pointer.
-/// \return `s` casted to a vita::function pointer.
-///
 /// This is a short cut function.
+///
+/// \param[in] s symbol pointer
+/// \return      `s` casted to a vita::function pointer
 ///
 inline const function *function::cast(const symbol *s)
 {
-  assert(s->arity());
+  Expects(s->arity());
   return static_cast<const function *>(s);
 }
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
