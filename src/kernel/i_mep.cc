@@ -878,7 +878,7 @@ std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
   std::function<std::string (const gene &)> language_(
     [&](const gene &g)
     {
-      std::string ret(g.sym->parametric()
+      std::string ret(g.sym->terminal()
                         ? terminal::cast(g.sym)->display(g.par, f)
                         : function::cast(g.sym)->display(f));
 
