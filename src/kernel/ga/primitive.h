@@ -56,24 +56,24 @@ public:
     Expects(m < u);
   }
 
-  virtual bool parametric() const override { return true; }
+  bool parametric() const override { return true; }
 
-  virtual double init() const override
+  double init() const override
   { return static_cast<double>(random::between<T>(min, upp)); }
 
-  virtual std::string display(double v, format) const override
+  std::string display(double v, format) const override
   { return std::to_string(static_cast<T>(v)); }
 
   /// \warning
-  /// This work but isn't very useful. i_ga / ga_evaluator classes directly
+  /// This works but isn't very useful. i_ga / ga_evaluator classes directly
   /// access the value of a real object.
-  virtual any eval(core_interpreter *i) const override
+  any eval(core_interpreter *i) const override
   {
     return any(
       static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
   }
 
-  virtual double penalty_nvi(core_interpreter *i) const override
+  double penalty_nvi(core_interpreter *i) const override
   {
     const auto v(static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
 
@@ -94,8 +94,7 @@ private:
 };
 
 ///
-/// This is mainly used for differential evolution (e.g. DDJ #264 april
-/// 1997).
+/// Mainly used for differential evolution.
 ///
 /// While many genetic algorithms use integers to approximate continuous
 /// parameters, the choice limits the resolution with which an optimum can
@@ -104,6 +103,7 @@ private:
 /// Parameters can be input, manipulated and output as ordinary
 /// floating-point numbers without ever being reformatted as genes with a
 /// different binary representation.
+
 ///
 class real : public number<double>
 {
