@@ -304,20 +304,25 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 {
   for (const auto &s : ss.views_.back().all)
   {
-    o << s.sym->name();
+    const auto sym(s.sym);
 
-    const auto arity(s.sym->arity());
+    o << sym->name();
+
+    auto arity(sym->arity());
     if (arity)
+    {
       o << '(';
-    for (auto j(decltype(arity){0}); j < arity; ++j)
-      o << function::cast(s.sym)->arg_category(j)
-        << (j + 1 == arity ? "" : ", ");
-    if (arity)
+      for (decltype(arity) j(0); j < arity; ++j)
+        o << function::cast(sym)->arg_category(j)
+          << (j + 1 == arity ? "" : ", ");
       o << ')';
+    }
 
-    o << " -> " << s.sym->category() << " (opcode " << s.sym->opcode()
-      << ", parametric " << s.sym->parametric()
-      << ", weight " << s.weight << ")\n";
+    o << " -> " << sym->category() << " (opcode " << sym->opcode()
+      << ", parametric "
+      << (sym->terminal() && terminal::cast(sym)->parametric())
+      << ", weight "
+      << s.weight << ")\n";
   }
 
   return o << "Sum: " << ss.views_.back().all.sum() << '\n';

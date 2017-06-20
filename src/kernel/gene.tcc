@@ -28,8 +28,20 @@
 template<unsigned K>
 basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(t.arity())
 {
-  if (t.parametric())
-    par = t.init();
+  init_if_parametric();
+}
+
+///
+///  Possibly inits the parameter.
+///
+template<unsigned K>
+void basic_gene<K>::init_if_parametric()
+{
+  Expects(sym->terminal());
+
+  const auto t(terminal::cast(sym));
+  if (t->parametric())
+    par = t->init();
 }
 
 ///
@@ -49,16 +61,18 @@ template<unsigned K>
 basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
   : sym(g.first), args(g.first->arity())
 {
-  if (sym->parametric())
-    par = terminal::cast(sym)->init();
-  else
+  if (sym->arity())
+  {
     std::transform(g.second.begin(), g.second.end(), args.begin(),
                    [](index_t i)
                    {
-                     Expects(i <= std::numeric_limits<index_type>::max());
+                     Expects(i <= std::numeric_limits<packed_index_t>::max());
 
-                     return static_cast<index_type>(i);
+                     return static_cast<packed_index_t>(i);
                    });
+  }
+  else
+    init_if_parametric();
 }
 
 ///
@@ -77,18 +91,19 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
 {
   Expects(from < sup);
 
-  if (s.parametric())
-    par = terminal::cast(&s)->init();
-  else
+
+  if (s.arity())
   {
-    assert(sup <= std::numeric_limits<index_type>::max());
+    assert(sup <= std::numeric_limits<packed_index_t>::max());
 
     std::generate(args.begin(), args.end(),
                   [from, sup]()
                   {
-                    return random::between<index_type>(from, sup);
+                    return random::between<packed_index_t>(from, sup);
                   });
   }
+  else
+    init_if_parametric();
 }
 
 ///
@@ -102,7 +117,9 @@ T basic_gene<K>::as() const
 {
   static_assert(std::is_arithmetic<T>::value || std::is_enum<T>::value,
                 "basic_gene::as<T> requires an arithmetic / enum type");
-  Expects(sym->parametric());
+
+  Expects(sym->terminal() && terminal::cast(sym)->parametric());
+
   return static_cast<T>(par);
 }
 
@@ -118,7 +135,8 @@ void basic_gene<K>::operator=(T v)
   static_assert(std::is_arithmetic<T>::value || std::is_enum<T>::value,
                 "Only arithmetic / enum types can be assigned to a gene");
 
-  Expects(sym->parametric());
+  Expects(sym->terminal() && terminal::cast(sym)->parametric());
+
   copy_param(v,
              param_t<std::is_arithmetic<T>::value, std::is_enum<T>::value>());
 }
@@ -166,13 +184,16 @@ bool operator==(const basic_gene<K> &g1, const basic_gene<K> &g2)
   if (g1.sym != g2.sym)
     return false;
 
-  if (g1.sym->parametric())
-  {
-    assert(g1.sym->terminal());
-    return almost_equal(g1.par, g2.par);
-  }
+  assert(g1.sym->arity() == g2.sym->arity());
 
-  return std::equal(g1.args.begin(), g1.args.end(), g2.args.begin());
+  if (g1.sym->arity())
+    return std::equal(g1.args.begin(), g1.args.end(),
+                      g2.args.begin(), g2.args.end());
+
+  assert(g1.sym->terminal());
+  const auto t(terminal::cast(g1.sym));
+
+  return !t->parametric() || almost_equal(g1.par, g2.par);
 }
 
 ///
@@ -194,8 +215,16 @@ bool operator!=(const basic_gene<K> &g1, const basic_gene<K> &g2)
 template<unsigned K>
 std::ostream &operator<<(std::ostream &s, const basic_gene<K> &g)
 {
-  return s << (g.sym->parametric() ? terminal::cast(g.sym)->display(g.par)
-                                   : g.sym->name());
+  const auto *sym(g.sym);
+
+  if (sym->terminal())
+  {
+    const auto t(terminal::cast(g.sym));
+    if (t->parametric())
+      return s << t->display(g.par);
+  }
+
+  return s << sym->name();
 }
 
 #endif  // include guard

@@ -66,7 +66,7 @@ terminal::param_t interpreter<T>::fetch_param()
 {
   const gene &g((*prg_)[ip_]);
 
-  assert(g.sym->parametric());
+  assert(g.sym->terminal() && terminal::cast(g.sym)->parametric());
   return g.par;
 }
 

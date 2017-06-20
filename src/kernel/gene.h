@@ -44,8 +44,8 @@ public:
   template<class T> void operator=(T);
 
   // Types and constants.
-  using index_type = std::uint16_t;
-  using arg_pack = small_vector<index_type, K>;
+  using packed_index_t = std::uint16_t;
+  using arg_pack = small_vector<packed_index_t, K>;
 
   enum : decltype(K) {k_args = K};
 
@@ -61,6 +61,8 @@ private:
 
   template<class T> void copy_param(T, arithmetic_p);
   template<class T> void copy_param(T, enum_p);
+
+  void init_if_parametric();
 };
 
 template<unsigned K>

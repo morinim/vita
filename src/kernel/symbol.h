@@ -40,7 +40,6 @@ public:
   virtual unsigned arity() const = 0;
   virtual bool auto_defined() const;
   virtual bool input() const;
-  virtual bool parametric() const = 0;
 
   category_t category() const;
   opcode_t opcode() const;

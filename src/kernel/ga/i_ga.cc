@@ -211,7 +211,7 @@ void i_ga::pack(std::vector<unsigned char> *const p) const
     for (std::size_t i(0); i < sizeof(opcode); ++i)
       p->push_back(s1[i]);
 
-    assert(g.sym->parametric());
+    assert(terminal::cast(g.sym)->parametric());
     const auto param(g.par);
 
     auto s2 = reinterpret_cast<const unsigned char *>(&param);

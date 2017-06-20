@@ -43,7 +43,6 @@ public:
   virtual std::string display(format = c_format) const;
 
   unsigned arity() const final;
-  bool parametric() const final;
 
   bool debug() const override;
 
@@ -78,14 +77,6 @@ inline unsigned function::arity() const
 /// * Default (safe) value is `false`.
 ///
 inline bool function::associative() const
-{
-  return false;
-}
-
-///
-/// Functions cannot be parametric.
-///
-inline bool function::parametric() const
 {
   return false;
 }

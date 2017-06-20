@@ -377,19 +377,24 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
   for (std::size_t i(0); i < sizeof(opcode); ++i)
     p->push_back(s1[i]);
 
-  if (g.sym->parametric())
+  auto arity(g.sym->arity());
+  if (arity)
   {
-    const auto param(g.par);
-
-    auto s2 = reinterpret_cast<const unsigned char *>(&param);
-    for (std::size_t i(0); i < sizeof(param); ++i)
-      p->push_back(s2[i]);
+    decltype(arity) i(0);
+    do
+      pack(g.arg_locus(i), p);
+    while (++i < arity);
   }
   else
   {
-    const auto arity(g.sym->arity());
-    for (auto i(decltype(arity){0}); i < arity; ++i)
-      pack(g.arg_locus(i), p);
+    if (terminal::cast(g.sym)->parametric())
+    {
+      const auto param(g.par);
+
+      auto s2 = reinterpret_cast<const unsigned char *>(&param);
+      for (std::size_t i(0); i < sizeof(param); ++i)
+        p->push_back(s2[i]);
+    }
   }
 }
 
@@ -581,17 +586,17 @@ bool i_mep::load_impl(std::istream &in, const environment &e)
     if (!temp.sym)
       return false;
 
-    if (temp.sym->parametric())
+    if (temp.sym->terminal() && terminal::cast(temp.sym)->parametric())
       if (!(in >> temp.par))
         return false;
 
-    const auto arity(temp.sym->arity());
+    auto arity(temp.sym->arity());
     if (arity)
     {
       temp.args.resize(arity);
 
-      for (unsigned i(0); i < arity; ++i)
-        if (!(in >> temp.args[i]))
+      for (auto &arg : temp.args)
+        if (!(in >> arg))
           return false;
     }
 
@@ -620,7 +625,7 @@ bool i_mep::save_impl(std::ostream &out) const
   {
     out << g.sym->opcode();
 
-    if (g.sym->parametric())
+    if (g.sym->terminal() && terminal::cast(g.sym)->parametric())
       out << ' ' << g.par;
 
     const auto arity(g.sym->arity());
@@ -658,10 +663,10 @@ i_mep i_mep::compress() const
       if (a.sym->opcode() == b.sym->opcode())
       {
         if (a.sym->terminal())
-          return a.sym->parametric() ? a.par < b.par : false;
+          return terminal::cast(a.sym)->parametric() ? a.par < b.par : false;
 
-        const auto arity(a.sym->arity());
-        for (auto i(decltype(arity){0}); i < arity; ++i)
+        auto arity(a.sym->arity());
+        for (decltype(arity) i(0); i < arity; ++i)
           if (a.args[i] < b.args[i])
             return true;
       }
