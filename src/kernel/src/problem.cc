@@ -26,24 +26,25 @@ namespace detail
 ///
 /// \param[in] availables the "dictionary" for the sequence
 /// \param[in] size       size of the output sequence
-/// \return               a vector of sequences with repetition with elements
+/// \return               a set of sequences with repetition with elements
 ///                       taken from a given set (`availables`) and fixed
 ///                       length (`size`).
 ///
 template<class C>
-std::vector<C> seq_with_rep(const C &availables, std::size_t size)
+std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
+                                      std::size_t size)
 {
   Expects(availables.size());
   Expects(size);
 
-  std::vector<C> ret;
+  std::set<std::vector<C>> ret;
 
-  std::function<void (std::size_t, C)> swr(
-    [&](std::size_t left, C current)
+  std::function<void (std::size_t, std::vector<C>)> swr(
+    [&](std::size_t left, std::vector<C> current)
     {
       if (!left)  // we have a sequence of the correct length
       {
-        ret.push_back(current);
+        ret.insert(current);
         return;
       }
 
@@ -239,8 +240,9 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
   for (const category &c : dat_.categories())
     print.debug("Using ", c);
 
-  cvect used_categories(categories());
-  std::iota(used_categories.begin(), used_categories.end(), 0);
+  std::set<category_t> used_categories;
+  for (category_t i(0); i < categories(); ++i)
+    used_categories.insert(used_categories.end(), i);
 
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_SUCCESS)

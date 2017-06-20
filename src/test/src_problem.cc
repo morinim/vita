@@ -20,60 +20,56 @@ using namespace boost;
 #endif
 
 namespace vita { namespace detail {
-template<class C> std::vector<C> seq_with_rep(const C &, std::size_t);
+template<class C>
+std::set<std::vector<C>> seq_with_rep(const std::set<C> &, std::size_t);
 }}
 
 BOOST_AUTO_TEST_SUITE(test_src_problem)
 
 BOOST_AUTO_TEST_CASE(t_seq_with_rep)
 {
-  vita::cvect v = {1};
+  vita::category_t v0{1}, v1{2}, v2{3}, v3{4};
+
+  std::set<vita::category_t> v = { v0 };
   auto seq(vita::detail::seq_with_rep(v, 1));
-  BOOST_REQUIRE_EQUAL(seq.size(), 1);
-  BOOST_REQUIRE_EQUAL(seq[0][0], v[0]);
+  std::set<vita::cvect> res = { {v0} };
+  BOOST_TEST(seq.size() == 1);
+  BOOST_TEST(seq == res);
 
   seq = vita::detail::seq_with_rep(v, 4);
-  vita::cvect r = {v[0], v[0], v[0], v[0]};
-  BOOST_REQUIRE_EQUAL(seq.size(), 1);
-  BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[0].begin(), seq[0].end(),
-                                  r.begin(), r.end());
+  res = { {v0, v0, v0, v0} };
+  BOOST_TEST(seq.size() == 1);
+  BOOST_TEST(seq == res);
 
-  v = {1, 2};
+  v = {v0, v1};
   seq = vita::detail::seq_with_rep(v, 1);
-  BOOST_REQUIRE_EQUAL(seq.size(), 2);
-  BOOST_REQUIRE_EQUAL(seq[0][0], v[0]);
-  BOOST_REQUIRE_EQUAL(seq[1][0], v[1]);
+  res = { {v0}, {v1} };
+  BOOST_TEST(seq.size() == 2);
+  BOOST_TEST(seq == res);
 
-  v = {1, 2};
+  v = {v0, v1};
   seq = vita::detail::seq_with_rep(v, 2);
-  BOOST_REQUIRE_EQUAL(seq.size(), 4);
-  std::vector<vita::cvect> rv{ {v[0], v[0]}, {v[0], v[1]}, {v[1], v[0]},
-                               {v[1], v[1]} };
+  res = { {v0, v0}, {v0, v1}, {v1, v0}, {v1, v1} };
+  BOOST_TEST(seq.size() == 4);
+  BOOST_TEST(seq == res);
 
-  for (unsigned i(0); i < seq.size(); ++i)
-    BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[i].begin(), seq[i].end(),
-                                    rv[i].begin(), rv[i].end());
-
-  v = {1, 2, 3};
+  v = {v0, v1, v2};
   seq = vita::detail::seq_with_rep(v, 3);
-  BOOST_REQUIRE_EQUAL(seq.size(), 27);
+  res.clear();
   for (unsigned i(0); i < 3; ++i)
     for (unsigned j(0); j < 3; ++j)
       for (unsigned k(0); k < 3; ++k)
-      {
-        const auto index(9*k + 3*j + i);
-        r = {v[k], v[j], v[i]};
+        res.insert({*std::next(v.begin(), i),
+                    *std::next(v.begin(), j),
+                    *std::next(v.begin(), k)});
+  BOOST_TEST(seq.size() == 27);
+  BOOST_TEST(seq == res);
 
-        BOOST_REQUIRE_EQUAL_COLLECTIONS(seq[index].begin(), seq[index].end(),
-                                        r.begin(), r.end());
-      }
-
-  v = {1, 2, 3, 4};
+  v = {v0, v1, v2, v3};
   seq = vita::detail::seq_with_rep(v, 8);
-  BOOST_REQUIRE_EQUAL(
-    seq.size(),
-    v.size() * v.size() * v.size() * v.size() *
-    v.size() * v.size() * v.size() * v.size());
+  BOOST_TEST(seq.size() ==
+             v.size() * v.size() * v.size() * v.size() *
+             v.size() * v.size() * v.size() * v.size());
 }
 
 BOOST_AUTO_TEST_CASE(t_loading)
