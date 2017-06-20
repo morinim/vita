@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,8 +19,7 @@
 namespace vita
 {
 ///
-/// \brief Aggregates the problem-related data needed by an evolutionary
-///        program.
+/// Aggregates the problem-related data needed by an evolutionary program.
 ///
 /// \note
 /// What a horror! Public data members... please read the coding style

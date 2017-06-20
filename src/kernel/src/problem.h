@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ public:
   std::pair<std::size_t, std::size_t> load(const std::string &,
                                            const std::string & = "",
                                            const std::string & = "");
-  unsigned load_symbols(const std::string &);
+  std::size_t load_symbols(const std::string &);
   std::size_t load_test_set(const std::string &);
   void setup_default_symbols();
 

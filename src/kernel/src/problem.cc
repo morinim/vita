@@ -24,10 +24,11 @@ namespace vita
 namespace detail
 {
 ///
-/// \param[in] availables the "dictionary" for the sequence.
-/// \param[in] size size of the output sequence.
-/// \return a vector of sequences with repetition with elements taken from a
-///         given set (`availables`) and fixed length (`size`).
+/// \param[in] availables the "dictionary" for the sequence
+/// \param[in] size       size of the output sequence
+/// \return               a vector of sequences with repetition with elements
+///                       taken from a given set (`availables`) and fixed
+///                       length (`size`).
 ///
 template<class C>
 std::vector<C> seq_with_rep(const C &availables, std::size_t size)
@@ -60,7 +61,7 @@ std::vector<C> seq_with_rep(const C &availables, std::size_t size)
 }  // namespace detail
 
 ///
-/// \brief New empty instance of src_problem
+/// New empty instance of src_problem.
 ///
 /// \param[in] initialize should the environment be initialized with default
 ///                       values?
@@ -72,10 +73,10 @@ src_problem::src_problem(bool initialize) : problem(initialize), dat_(),
 
 ///
 /// A delegating constructor to avoid that the `src_problem("data.csv")` call
-/// call could be resolved with `src_problem(bool)` instead of
-/// `src_problem(std::string)` (conversion from `const char []` to `bool` is
-/// a standard conversion, while the one to `std::string` is a user-defined
-/// conversion).
+/// call could be resolved with `src_problem(bool)`.
+///
+/// Conversion from `const char []` to `bool` is a standard conversion, while
+/// the one to `std::string` is a user-defined conversion.
 ///
 src_problem::src_problem(const char ds[])
   : src_problem(std::string(ds), std::string(), std::string())
@@ -83,12 +84,12 @@ src_problem::src_problem(const char ds[])
 }
 
 ///
-/// \param[in] ds name of the dataset file (training/validation set).
-/// \param[in] ts name of the test set.
-/// \param[in] symbols name of the file containing the symbols. If it is
-///                    empty, src_problem::setup_default_symbols is called.
-///
 /// Initialize the problem with data from the input files.
+///
+/// \param[in] ds name of the dataset file (training/validation set)
+/// \param[in] ts name of the test set
+/// \param[in] symbols name of the file containing the symbols. If it is
+///                    empty, src_problem::setup_default_symbols is called
 ///
 src_problem::src_problem(const std::string &ds, const std::string &ts,
                          const std::string &symbols)
@@ -98,7 +99,7 @@ src_problem::src_problem(const std::string &ds, const std::string &ts,
 }
 
 ///
-/// \return `false` if the current problem isn't ready for a run.
+/// \return `false` if the current problem isn't ready for a run
 ///
 bool src_problem::operator!() const
 {
@@ -106,13 +107,14 @@ bool src_problem::operator!() const
 }
 
 ///
-/// \param[in] ds name of the dataset file (training/validation set).
-/// \param[in] ts name of the test set.
-/// \param[in] symbols name of the file containing the symbols. If it is
-///                    empty, src_problem::setup_default_symbols is called.
-/// \return number of examples (lines) parsed and number of symbols parsed.
-///
 /// Loads `data` into the active dataset.
+///
+/// \param[in] ds      filename of the dataset file (training/validation set)
+/// \param[in] ts      filename of the test set
+/// \param[in] symbols name of the file containing the symbols. If it's empty,
+///                    src_problem::setup_default_symbols is called
+/// \return            number of examples (lines) parsed and number of symbols
+///                    parsed
 ///
 std::pair<std::size_t, std::size_t> src_problem::load(
   const std::string &ds, const std::string &ts, const std::string &symbols)
@@ -138,10 +140,10 @@ std::pair<std::size_t, std::size_t> src_problem::load(
 }
 
 ///
-/// \param[in] ts name of the file containing the test set.
-/// \return number of examples parsed.
+/// Loads the test set.
 ///
-/// Load the test set.
+/// \param[in] ts filename of the file containing the test set
+/// \return       number of examples parsed
 ///
 std::size_t src_problem::load_test_set(const std::string &ts)
 {
@@ -154,10 +156,11 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 }
 
 ///
-/// param[in] skip features in this set will be ignored.
-///
 /// Inserts variables and labels for nominal attributes into the symbol_set.
-/// The name used for variables, if not specified in the dataset, are in the
+///
+/// param[in] skip features in this set will be ignored
+///
+/// The names used for variables, if not specified in the dataset, are in the
 /// form `X1`, ... `Xn`.
 ///
 void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
@@ -182,8 +185,10 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 }
 
 ///
-/// Default symbol set. This is useful for simple problems (single category
-/// regression / classification).
+/// Default symbol set.
+///
+/// This is useful for simple problems (single category regression /
+/// classification).
 ///
 void src_problem::setup_default_symbols()
 {
@@ -219,14 +224,14 @@ void src_problem::setup_default_symbols()
 }
 
 ///
-/// \param[in] s_file name of the file containing the symbols.
-/// \return number of parsed symbols.
+/// \param[in] s_file name of the file containing the symbols
+/// \return           number of parsed symbols
 ///
 /// \note
 /// Data should be loaded before symbols: without data we don't know, among
 /// other things, the features the dataset has.
 ///
-unsigned src_problem::load_symbols(const std::string &s_file)
+std::size_t src_problem::load_symbols(const std::string &s_file)
 {
   setup_terminals_from_data();
 
@@ -241,7 +246,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
   if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_SUCCESS)
     return 0;
 
-  unsigned parsed(0);
+  std::size_t parsed(0);
 
   // When I wrote this, only God and I understood what I was doing.
   // Now, God only knows.
@@ -329,9 +334,11 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 }
 
 ///
-/// \param[in] instance a vector of categories.
-/// \param[in] pattern a mixed vector of category names and domain names.
-/// \return `true` if `instance` match `pattern`.
+/// Checks if a sequence of categories matches a sequence of domain names.
+///
+/// \param[in] instance a vector of categories
+/// \param[in] pattern  a mixed vector of category names and domain names
+/// \return             `true` if `instance` match `pattern`
 ///
 /// For instance:
 ///
@@ -345,7 +352,7 @@ unsigned src_problem::load_symbols(const std::string &s_file)
 bool src_problem::compatible(const cvect &instance,
                              const std::vector<std::string> &pattern) const
 {
-  assert(instance.size() == pattern.size());
+  Expects(instance.size() == pattern.size());
 
   const auto sup(instance.size());
   for (auto i(decltype(sup){0}); i < sup; ++i)
@@ -370,7 +377,7 @@ bool src_problem::compatible(const cvect &instance,
 }
 
 ///
-/// \return number of categories of the problem (>= 1).
+/// \return number of categories of the problem (>= 1)
 ///
 unsigned src_problem::categories() const
 {
@@ -378,19 +385,17 @@ unsigned src_problem::categories() const
 }
 
 ///
-/// \return number of classes of the problem (== 0 for a symbolic regression
-///         problem, > 1 for a classification problem).
+/// \return number of classes of the problem (`== 0` for a symbolic regression
+///         problem, > 1 for a classification problem)
 ///
 unsigned src_problem::classes() const
 {
-  assert(dat_.classes() != 1);
-
   return dat_.classes();
 }
 
 ///
 /// \return dimension of the input vectors (i.e. the number of variable of
-///         the problem).
+///         the problem)
 ///
 unsigned src_problem::variables() const
 {
@@ -398,7 +403,7 @@ unsigned src_problem::variables() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool src_problem::debug() const
 {
@@ -410,4 +415,5 @@ bool src_problem::debug() const
 
   return true;
 }
+
 }  // namespace vita

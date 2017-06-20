@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,7 @@
 namespace vita
 {
 ///
-/// \brief A new uninitialized problem.
+/// A new uninitialized problem.
 ///
 /// \param[in] initialize should the environment be initialized with default
 ///                       values?
@@ -25,9 +25,9 @@ problem::problem(bool initialize) : env(&sset, initialize)
 }
 
 ///
-/// \return an access point for the data.
+/// \return an access point for the data
 ///
-/// The default value is `nullptr`: not every problem is dataset-based.
+/// \note The default value is `nullptr`: not every problem is dataset-based.
 ///
 vita::data *problem::data()
 {
@@ -35,7 +35,7 @@ vita::data *problem::data()
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool problem::debug() const
 {
