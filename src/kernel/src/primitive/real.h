@@ -162,7 +162,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%) + (%%2%%)";
+    return "(%%1%%)+(%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final
@@ -193,7 +193,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%) / (%%2%%)";
+    return "(%%1%%)/(%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final
@@ -228,7 +228,7 @@ public:
     switch (f)
     {
     case cpp_format:  return "std::isgreater(%%1%%,%%2%%)";
-    default:          return "(%%1%% > %%2%%)";
+    default:          return "(%%1%%)>(%%2%%)";
     }
   }
 
@@ -255,10 +255,10 @@ public:
   {
     switch (f)
     {
-    case cpp_format:     return "std::floor((%%1%%) / (%%2%%))";
-    case mql_format:     return  "MathFloor((%%1%%) / (%%2%%))";
-    case python_format:  return            "(%%1%%) // (%%2%%)";
-    default:             return      "floor((%%1%%) / (%%2%%))";
+    case cpp_format:     return "std::floor((%%1%%)/(%%2%%))";
+    case mql_format:     return  "MathFloor((%%1%%)/(%%2%%))";
+    case python_format:  return            "(%%1%%)//(%%2%%)";
+    default:             return      "floor((%%1%%)/(%%2%%))";
     }
   }
 
@@ -290,6 +290,18 @@ public:
   explicit ifb(const cvect &c)
     : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:
+      return "(%%4%%) if (%%2%%) <= (%%1%%) <= (%%3%%) else (%%5%%)";
+    default:
+      return "fmin(%%2%%,%%3%%) <= (%%1%%) && (%%1%%) <= fmax(%%2%%,%%3%%) ?"
+             "(%%4%%) : (%%5%%)";
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -328,6 +340,22 @@ public:
     : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:
+      return "abs((%%1%%)-(%%2%%))<2*std::numeric_limits<T>::epsilon() ?"
+             "(%%3%%) : (%%4%%)";
+    case mql_format:
+      return "NormalizeDouble((%%1%%)-(%%2%%),8)==0 ? (%%3%%) : (%%4%%)";
+    case python_format:
+      return "(%%3%%) if math.isclose(%%1%%, %%2%%) else (%%4%%)";
+    default:
+      return "fabs((%%1%%)-(%%2%%)) < 2*DBL_EPSILON ? (%%3%%) : (%%4%%)";
+    }
+  }
+
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
@@ -358,7 +386,16 @@ class ifl : public function
 public:
   explicit ifl(const cvect &c)
     : function("FIFL", c[1], {c[0], c[0], c[1], c[1]})
-  { assert(c.size() == 2); }
+  { Expects(c.size() == 2); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:  return "(%%3%%) if (%%1%%)<(%%2%%) else (%%4%%)";
+    default:             return     "(%%1%%)<(%%2%%) ? (%%3%%) : (%%4%%)";
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -392,6 +429,22 @@ public:
   explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:
+      return "abs(%%1%%)<2*std::numeric_limits<T>::epsilon() ?"
+             "(%%3%%) : (%%4%%)";
+    case mql_format:
+      return "NormalizeDouble(%%1%%,8)==0 ? (%%3%%) : (%%4%%)";
+    case python_format:
+      return "(%%3%%) if abs(%%1%%) < 1e-10 else (%%4%%)";
+    default:
+      return "fabs(%%1%%)<2*DBL_EPSILON ? (%%3%%) : (%%4%%)";
+    }
+  }
+
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
@@ -420,6 +473,17 @@ public:
   explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
   { Expects(c.size() == 2); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::string(%%1%%).length()";
+    case mql_format:     return            "StringLen(%%1%%)";
+    case python_format:  return                  "len(%%1%%)";
+    default:             return               "strlen(%%1%%)";
+    }
+  }
+
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
@@ -437,6 +501,16 @@ class ln : public function
 public:
   explicit ln(const cvect &c) : function("FLN", c[0], {c[0]})
   { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:  return "std::log(%%1%%)";
+    case mql_format:  return  "MathLog(%%1%%)";
+    default:          return      "log(%%1%%)";
+    }
+  }
 
   ///
   /// \param[in] i pointer to the active interpreter
@@ -465,6 +539,15 @@ public:
     : function("<", c[1], {c[0], c[0]})
   { Expects(c.size() == 2); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:  return "std::isless(%%1%%,%%2%%)";
+    default:          return          "(%%1%%)<(%%2%%)";
+    }
+  }
+
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
@@ -483,6 +566,15 @@ class max : public function
 public:
   explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:  return  "max(%%1%%,%%2%%)";
+    default:             return "fmax(%%1%%,%%2%%)";
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -510,6 +602,17 @@ public:
   explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::fmod(%%1%%,%%2%%)";
+    case mql_format:     return   "MathMod(%%1%%,%%2%%)";
+    case python_format:  return        "(%%1%%)%(%%2%%)";
+    default:             return      "fmod(%%1%%,%%2%%)";
+    }
+  }
+
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
@@ -533,7 +636,13 @@ public:
 class mul : public function
 {
 public:
-  explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]}) {}
+  explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]})
+  { Expects(c.size() == 1); }
+
+  std::string display(format) const final
+  {
+    return "(%%1%%)*(%%2%%)";
+  }
 
   any eval(core_interpreter *ci) const final
   {
@@ -561,6 +670,17 @@ public:
   explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::sin(%%1%%)";
+    case mql_format:     return  "MathSin(%%1%%)";
+    case python_format:  return "math.sin(%%1%%)";
+    default:             return      "sin(%%1%%)";
+    }
+  }
+
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
@@ -578,6 +698,17 @@ class sqrt : public function
 public:
   explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
   { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::sqrt(%%1%%)";
+    case mql_format:     return  "MathSqrt(%%1%%)";
+    case python_format:  return "math.sqrt(%%1%%)";
+    default:             return      "sqrt(%%1%%)";
+    }
+  }
 
   any eval(core_interpreter *i) const final
   {
@@ -600,6 +731,11 @@ class sub : public function
 public:
   explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
+
+  std::string display(format) const final
+  {
+    return "(%%1%%)-(%%2%%)";
+  }
 
   any eval(core_interpreter *ci) const final
   {
