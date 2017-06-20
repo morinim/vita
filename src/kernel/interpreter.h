@@ -53,7 +53,7 @@ class interpreter : public core_interpreter
 public:
   explicit interpreter(const T *, interpreter * = nullptr);
 
-  any fetch_param();
+  terminal::param_t fetch_param();
   any fetch_arg(unsigned);
   any fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;

@@ -33,15 +33,7 @@ namespace vita
 /// an empty `any()`).
 namespace ga
 {
-using base_t = gene::param_type;
-
-///
-/// Just a simple shortcut.
-///
-/// \param[in] v the value that must be casted to base type (`base_t`)
-/// \return      the content of `v`
-///
-inline base_t cast(const any &v) { return any_cast<base_t>(v); }
+using base_t = terminal::param_t;
 
 template<class T>
 class number : public terminal
@@ -56,12 +48,12 @@ public:
     Expects(m < u);
   }
 
-  bool parametric() const override { return true; }
+  bool parametric() const final { return true; }
 
-  double init() const override
-  { return static_cast<double>(random::between<T>(min, upp)); }
+  terminal::param_t init() const override
+  { return random::between<T>(min, upp); }
 
-  std::string display(double v, format) const override
+  std::string display(terminal::param_t v, format) const override
   { return std::to_string(static_cast<T>(v)); }
 
   /// \warning
@@ -103,7 +95,6 @@ private:
 /// Parameters can be input, manipulated and output as ordinary
 /// floating-point numbers without ever being reformatted as genes with a
 /// different binary representation.
-
 ///
 class real : public number<double>
 {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,7 @@ class interpreter<i_ga> : public core_interpreter
 public:
   explicit interpreter(const i_ga *);
 
-  double fetch_param(unsigned) const;
+  terminal::param_t fetch_param(unsigned) const;
 
 private:
   // Methods of the non-virtual interface
@@ -54,4 +54,4 @@ inline double base_penalty(const i_ga &ind)
 }
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

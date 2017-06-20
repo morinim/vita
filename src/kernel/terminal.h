@@ -32,9 +32,10 @@ public:
 
   virtual bool parametric() const;
 
-  virtual double init() const;
+  using param_t = double;
+  virtual param_t init() const;
 
-  virtual std::string display(double, format = c_format) const;
+  virtual std::string display(param_t, format = c_format) const;
 
   bool debug() const override;
 
@@ -70,7 +71,7 @@ inline bool terminal::parametric() const
 /// \remark
 /// Derived classes should redefine this member function in a meaningful way.
 ///
-inline double terminal::init() const
+inline terminal::param_t terminal::init() const
 {
   return 0.0;
 }

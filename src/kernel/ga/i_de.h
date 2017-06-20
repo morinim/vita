@@ -37,9 +37,9 @@ public:
                  const i_de &, const i_de &, const i_de &) const;
 
   // Iterators.
-  using genome_t = std::vector<double>;
+  using genome_t       = std::vector<double>;
   using const_iterator = genome_t::const_iterator;
-  using iterator = genome_t::iterator;
+  using iterator       = genome_t::iterator;
 
   const_iterator begin() const;
   const_iterator end() const;

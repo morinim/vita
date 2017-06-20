@@ -37,7 +37,7 @@ public:
 
   explicit move(unsigned step) : vita::ga::integer(step, 0, 4)  {}
 
-  std::string display(double v, format) const override
+  std::string display(terminal::param_t v, format) const override
   {
     switch (static_cast<unsigned>(v))
     {

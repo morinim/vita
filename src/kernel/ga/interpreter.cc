@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@ namespace vita
 ///
 interpreter<i_ga>::interpreter(const i_ga *p) : core_interpreter(), p_(*p)
 {
-  assert(p);
+  Expects(p);
 }
 
 ///
@@ -27,13 +27,13 @@ interpreter<i_ga>::interpreter(const i_ga *p) : core_interpreter(), p_(*p)
 ///
 any interpreter<i_ga>::run_nvi()
 {
-  return any();
+  return {};
 }
 
 ///
 /// \return the output value of the current terminal symbol.
 ///
-double interpreter<i_ga>::fetch_param(unsigned i) const
+terminal::param_t interpreter<i_ga>::fetch_param(unsigned i) const
 {
   return p_[i].par;
 }

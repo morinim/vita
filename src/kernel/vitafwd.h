@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -44,4 +44,4 @@ template<class T, template<class> class ES> class src_search;
 template<class T> class summary;
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

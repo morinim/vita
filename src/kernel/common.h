@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -59,9 +59,9 @@ using cvect = std::vector<category_t>;
 /// A good alternative is boost::noncopyable but that gives some false
 /// positive with `g++ -Weffc++` so, for now, we keep the macro.
 ///
-/// \see
-/// <http://stackoverflow.com/q/7823990/3235496> and
-/// <http://stackoverflow.com/q/1454407/3235496> for further details.
+/// \see For further details:
+/// - <http://stackoverflow.com/q/7823990/3235496>
+/// - <http://stackoverflow.com/q/1454407/3235496>
 #define DISALLOW_COPY_AND_ASSIGN(Class) \
   Class(const Class &) = delete;        \
   Class &operator=(const Class &) = delete

@@ -62,12 +62,12 @@ inline any interpreter<T>::run_nvi()
 /// \return the output value of the current terminal symbol
 ///
 template<class T>
-any interpreter<T>::fetch_param()
+terminal::param_t interpreter<T>::fetch_param()
 {
   const gene &g((*prg_)[ip_]);
 
   assert(g.sym->parametric());
-  return any(g.par);
+  return g.par;
 }
 
 ///

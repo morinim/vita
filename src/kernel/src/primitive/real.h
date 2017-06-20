@@ -73,16 +73,16 @@ public:
 
   bool parametric() const final { return true; }
 
-  double init() const final { return random::between<base_t>(min, upp); }
+  terminal::param_t init() const final
+  { return random::between<base_t>(min, upp); }
 
-  std::string display(double v, format) const final
+  std::string display(terminal::param_t v, format) const final
   { return std::to_string(v); }
 
   any eval(core_interpreter *i) const final
   {
     return any(static_cast<base_t>(
-                 any_cast<gene::param_type>(
-                   static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+                 static_cast<interpreter<i_mep> *>(i)->fetch_param()));
   }
 
 private:
@@ -106,16 +106,16 @@ public:
 
   bool parametric() const final { return true; }
 
-  double init() const final { return random::between<int>(min, upp); }
+  terminal::param_t init() const final
+  { return random::between<int>(min, upp); }
 
-  std::string display(double v, format) const final
+  std::string display(terminal::param_t v, format) const final
   { return std::to_string(static_cast<int>(v)); }
 
   any eval(core_interpreter *i) const final
   {
     return any(static_cast<base_t>(
-                 any_cast<gene::param_type>(
-                   static_cast<interpreter<i_mep> *>(i)->fetch_param())));
+                 static_cast<interpreter<i_mep> *>(i)->fetch_param()));
   }
 
 private:

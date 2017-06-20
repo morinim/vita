@@ -22,7 +22,7 @@ namespace vita
 /// The `v` argument is required for parametric symbols (i.e. for a numeric
 /// terminal we have to print 123 rather than "NUMBER").
 ///
-std::string terminal::display(double v, format) const
+std::string terminal::display(terminal::param_t v, format) const
 {
   return name() + "_" + std::to_string(v);
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,9 +23,9 @@
 namespace vita
 {
 ///
-/// \brief A gene is a unit of heredity in a living organism.
+/// A gene is a unit of heredity in a living organism.
 ///
-/// \tparam K the maximum `function`'s number of arguments.
+/// \tparam K the maximum `function`'s number of arguments
 ///
 /// The class `gene` is the building block of a `i_mep` individual.
 ///
@@ -44,16 +44,15 @@ public:
   template<class T> void operator=(T);
 
   // Types and constants.
-  using param_type = double;
   using index_type = std::uint16_t;
   using arg_pack = small_vector<index_type, K>;
 
   enum : decltype(K) {k_args = K};
 
   // Public data members.
-  const symbol *sym;
-  param_type    par;
-  arg_pack     args;
+  const symbol     *sym;
+  terminal::param_t par;
+  arg_pack         args;
 
 private:
   template<bool, bool> struct param_t;
@@ -77,4 +76,4 @@ using gene = basic_gene<4>;
 #include "kernel/gene.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
