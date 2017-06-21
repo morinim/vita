@@ -33,7 +33,7 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : env(&sset, true), factory(), null({})
+  F_FACTORY3() : env(&sset, true), factory(), null()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
 
@@ -47,6 +47,7 @@ struct F_FACTORY3
     z = sset.insert(std::make_unique<Z>());
     f_abs = sset.insert(factory.make("FABS"));
     f_add = sset.insert(factory.make("FADD"));
+    f_aq = sset.insert(factory.make("FAQ"));
     f_div = sset.insert(factory.make("FDIV"));
     f_idiv = sset.insert(factory.make("FIDIV"));
     f_ife = sset.insert(factory.make("FIFE"));
@@ -75,6 +76,7 @@ struct F_FACTORY3
 
   vita::symbol *f_abs;
   vita::symbol *f_add;
+  vita::symbol *f_aq;
   vita::symbol *f_div;
   vita::symbol *f_idiv;
   vita::symbol *f_ife;
@@ -93,4 +95,4 @@ struct F_FACTORY3
   const std::vector<vita::index_t> null;
 };
 
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,8 +23,8 @@ namespace vita
 namespace
 {
 ///
-/// \param[in] s the string to be tested.
-/// \return the domain `s` is element of.
+/// \param[in] s string to be tested
+/// \return      the domain `s` is element of
 ///
 domain_t find_domain(const std::string &s)
 {
@@ -50,6 +50,7 @@ symbol_factory::symbol_factory()
 {
   register_symbol<real::abs>    ("FABS", 1);
   register_symbol<real::add>    ("FADD", 1);
+  register_symbol<real::aq>     ("FAQ", 1);
   register_symbol<real::div>    ("FDIV", 1);
   register_symbol<real::idiv>   ("FIDIV", 1);
   register_symbol<real::ife>    ("FIFE", 2);
@@ -80,9 +81,11 @@ symbol_factory::symbol_factory()
 }
 
 ///
-/// \param[in] name name of the symbol to be created (case sensitive).
-/// \param[in] c a list of categories used by the the symbol constructor.
-/// \return an abstract pointer to the created symbol.
+/// Creates a specific instance of a symbol.
+///
+/// \param[in] name name of the symbol to be created (case sensitive)
+/// \param[in] c    a list of categories used by the the symbol constructor
+/// \return         an abstract pointer to the created symbol
 ///
 /// As the factory only returns an abstract pointer, the client code (which
 /// requests the object from the factory) does not know - and is not burdened
@@ -118,8 +121,8 @@ symbol_factory::symbol_factory()
 ///
 std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 {
-  assert(!name.empty());
-  assert(!c.empty());
+  Expects(!name.empty());
+  Expects(!c.empty());
 
   const auto it(factory_.find(name));
   if (it != factory_.end())
@@ -146,11 +149,13 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 }
 
 ///
-/// \param[in] d domain of the symbol.
-/// \param[in] min lower bound for the number value.
-/// \param[in] max upper bound for the number value.
-/// \param[in] c a category used by the symbol constructor.
-/// \return an abstract pointer to the created symbol.
+/// Creates an instance of a number.
+///
+/// \param[in] d   domain of the symbol
+/// \param[in] min lower bound for the number value
+/// \param[in] max upper bound for the number value
+/// \param[in] c   a category used by the symbol constructor
+/// \return        an abstract pointer to the created symbol
 ///
 /// This is an alternative way to build a number. The other `make` method finds
 /// the domain of the number checking the input string's format.
@@ -161,7 +166,7 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
                                              category_t c)
 {
-  assert(d == domain_t::d_double || d == domain_t::d_int);
+  Expects(d == domain_t::d_double || d == domain_t::d_int);
 
   switch (d)
   {
@@ -175,8 +180,8 @@ std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
 }
 
 ///
-/// \param[in] name name of the symbol (case sensitive).
-/// \return number of distinct categories needed to build the symbol.
+/// \param[in] name name of the symbol (case sensitive)
+/// \return         number of distinct categories needed to build the symbol
 ///
 unsigned symbol_factory::args(const std::string &name) const
 {
@@ -186,12 +191,14 @@ unsigned symbol_factory::args(const std::string &name) const
 }
 
 ///
-/// \param[in] name name of the symbol (case sensitive).
-/// \return `true` if the symbol has been unregistered.
-///
 /// Unregister the symbol from the factory.
-/// \note constants and variable aren't registered in the factory, so they
-/// cannot be unregistered.
+///
+/// \param[in] name name of the symbol (case sensitive)
+/// \return         `true` if the symbol has been unregistered
+///
+/// \note
+/// Constants and variable aren't registered in the factory, so they cannot be
+/// unregistered.
 ///
 bool symbol_factory::unregister_symbol(const std::string &name)
 {

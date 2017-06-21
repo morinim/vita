@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,9 +20,11 @@
 namespace vita
 {
 ///
-/// An abstract factory (the essence of the pattern is to provide an interface
-/// for creating families of related or dependent objects, i.e. symbols,
-/// without specifying ther concrete classes, e.g. numbers, functions...).
+/// An abstract factory for symbols.
+///
+/// The essence of the pattern is to provide an interface for creating families
+/// of related or dependent objects, i.e. symbols, without specifying their
+/// concrete classes (e.g. numbers, functions...).
 ///
 /// The factory determines the actual concrete type of the symbol to be
 /// created and it's here that the object is actually created. However,
@@ -38,7 +40,7 @@ class symbol_factory
 public:
   symbol_factory();
 
-  std::unique_ptr<symbol> make(const std::string &, cvect = cvect{0});
+  std::unique_ptr<symbol> make(const std::string &, cvect = {0});
   std::unique_ptr<symbol> make(domain_t, int, int, category_t = 0);
 
   unsigned args(const std::string &) const;
@@ -63,10 +65,11 @@ private:
 };
 
 ///
-/// \brief registers a new symbol inside the factory
-/// \param[in] name name of the symbol to be registered (case sensitive).
-/// \param[in] n number of arguments for the constructor of the symbol.
-/// \return `true` if the symbol `T` has been added to the factory.
+/// Registers a new symbol inside the factory.
+///
+/// \param[in] name name of the symbol to be registered (case sensitive)
+/// \param[in] n    number of arguments for the constructor of the symbol
+/// \return         `true` if the symbol `T` has been added to the factory
 ///
 /// \warning
 /// `name` is a key: the function doesn't register different symbols with the
@@ -80,4 +83,4 @@ bool symbol_factory::register_symbol(const std::string &name, unsigned n)
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,6 +15,7 @@
 
 #include "kernel/i_mep.h"
 #include "kernel/random.h"
+#include "kernel/src/primitive/real.h"
 
 #if !defined(MASTER_TEST_SET)
 #define BOOST_TEST_MODULE primitive
@@ -98,6 +99,60 @@ BOOST_AUTO_TEST_CASE(ADD)
                  });
   ret = i_interp(&i4).run();
   BOOST_REQUIRE_SMALL(any_cast<double>(ret), epsilon);
+}
+
+BOOST_AUTO_TEST_CASE(AQ, * boost::unit_test::tolerance(epsilon))
+{
+  using namespace vita;
+  using i_interp = interpreter<i_mep>;
+
+  const auto rx(real::base(x->eval(nullptr)));
+
+  BOOST_TEST_CHECKPOINT("AQ(X,X) == 1");
+  const i_mep i1({
+                   {{f_aq, {1, 2}}},  // [0] FAQ [1], [2]
+                   {{   x,   null}},  // [1] X
+                   {{   x,   null}}   // [2] X
+                 });
+  ret = i_interp(&i1).run();
+  const double res1(real::base(ret));
+  BOOST_TEST(res1 == rx / std::sqrt(1.0 + std::pow(rx, 2.0)));
+
+  BOOST_TEST_CHECKPOINT("AQ(X,1) == X/SQRT(2)");
+  const i_mep i2({
+                   {{f_aq, {1, 2}}},  // [0] FAQ [1], [2]
+                   {{   x,   null}},  // [1] X
+                   {{  c1,   null}}   // [2] 1
+                 });
+  ret = i_interp(&i2).run();
+  BOOST_TEST(real::base(ret) == rx / std::sqrt(2.0));
+
+  BOOST_TEST_CHECKPOINT("AQ(-X,X) == -AQ(X,X)");
+  const i_mep i3({
+                   {{ f_aq, {1, 2}}},  // [0] FAQ [1], [2]
+                   {{neg_x,   null}},  // [1] -X
+                   {{    x,   null}}   // [2] X
+                 });
+  ret = i_interp(&i3).run();
+  BOOST_TEST(real::base(ret) == -res1);
+
+  BOOST_TEST_CHECKPOINT("AQ(X,0) == X");
+  const i_mep i4({
+                   {{f_aq, {1, 2}}},  // [0] FAQ [1], [2]
+                   {{   x,   null}},  // [1] X
+                   {{  c0,   null}}   // [2] 0
+                 });
+  ret = i_interp(&i4).run();
+  BOOST_TEST(real::base(ret) == rx);
+
+  BOOST_TEST_CHECKPOINT("AQ(0,X) == 0");
+  const i_mep i5({
+                   {{f_aq, {2, 1}}},  // [0] FAQ [2], [1]
+                   {{   x,   null}},  // [1] X
+                   {{  c0,   null}}   // [2] 0
+                 });
+  ret = i_interp(&i5).run();
+  BOOST_TEST(real::base(ret) == 0.0);
 }
 
 BOOST_AUTO_TEST_CASE(DIV)

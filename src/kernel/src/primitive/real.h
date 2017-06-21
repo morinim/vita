@@ -183,7 +183,51 @@ public:
 };
 
 ///
-/// Division between two real numbers.
+/// Analytic quotient (AQ).
+///
+/// Analytic quotient (AQ) operator systematically yields lower mean squared
+/// errors over a range of regression tasks, due principally to removing the
+/// discontinuities or singularities that can often result from using either
+/// protected or unprotected division. Further, the AQ operator is
+/// differentiable.
+///
+class aq : public function
+{
+public:
+  explicit aq(const cvect &c) : function("AQ", c[0], {c[0], c[0]})
+  { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "(%%1%%)/std::sqrt(1.0+std::pow(%%2%%,2.0))";
+    case mql_format:     return        "(%%1%%)/MathSqrt(1+MathPow(%%2%%,2)";
+    case python_format:  return      "(%%1%%)/math.sqrt(1+math.pow(%%2%%,2)";
+    default:             return           "(%%1%%)/sqrt(1.0+pow(%%2%%,2.0))";
+    }
+  }
+
+  any eval(core_interpreter *ci) const final
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+
+    const any a0(i->fetch_arg(0));
+    if (a0.empty())  return a0;
+
+    const any a1(i->fetch_arg(1));
+    if (a1.empty())  return a1;
+
+    const auto x(base(a0)), y(base(a1));
+    const base_t ret(x / std::sqrt(1.0 + y * y));
+    if (!std::isfinite(ret))  return any();
+
+    return any(ret);
+  }
+};
+
+///
+/// Unprotected division (UPD) between two real numbers.
 ///
 class div : public function
 {
