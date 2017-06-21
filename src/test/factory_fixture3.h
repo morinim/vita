@@ -51,6 +51,7 @@ struct F_FACTORY3
     f_div = sset.insert(factory.make("FDIV"));
     f_idiv = sset.insert(factory.make("FIDIV"));
     f_ife = sset.insert(factory.make("FIFE"));
+    f_ifz = sset.insert(factory.make("FIFZ"));
     f_ln = sset.insert(factory.make("FLN"));
     f_max = sset.insert(factory.make("FMAX"));
     f_mul = sset.insert(factory.make("FMUL"));
@@ -80,6 +81,7 @@ struct F_FACTORY3
   vita::symbol *f_div;
   vita::symbol *f_idiv;
   vita::symbol *f_ife;
+  vita::symbol *f_ifz;
   vita::symbol *f_ln;
   vita::symbol *f_max;
   vita::symbol *f_mul;

@@ -501,11 +501,6 @@ public:
     else
       return i->fetch_arg(2);
   }
-
-  double penalty_nvi(core_interpreter *ci) const final
-  {
-    return comparison_function_penalty(ci);
-  }
 };
 
 ///
