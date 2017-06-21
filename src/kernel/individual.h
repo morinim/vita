@@ -77,6 +77,7 @@ enum print_format_t {list_f,  // this is the default
 bool long_form_flag(std::ostream &);
 print_format_t print_format_flag(std::ostream &);
 
+std::ostream &c_language(std::ostream &);
 std::ostream &dump(std::ostream &);
 std::ostream &graphviz(std::ostream &);
 std::ostream &in_line(std::ostream &);
