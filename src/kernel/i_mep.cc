@@ -890,7 +890,7 @@ std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
       auto arity(g.sym->arity());
       for (decltype(arity) i(0); i < arity; ++i)
       {
-        const std::string from("%%" + std::to_string(i) + "%%");
+        const std::string from("%%" + std::to_string(i + 1) + "%%");
         ret = replace_all(ret, from, language_(mep[g.arg_locus(i)]));
       }
 
