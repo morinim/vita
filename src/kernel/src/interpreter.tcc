@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,11 +18,10 @@
 #define      VITA_SRC_INTERPRETER_TCC
 
 ///
-/// \param[in] ex a vector of values for the problem's variables.
-/// \return the output value of the src_interpreter.
+/// Calculates the output of a program (individual) given a specific input.
 ///
-/// Calculates the output of a program (individual) given the `ex` training
-/// example.
+/// \param[in] ex a vector of values for the problem's variables
+/// \return       the output value of the src_interpreter
 ///
 template<class T>
 any src_interpreter<T>::run(const std::vector<any> &ex)
@@ -32,17 +31,16 @@ any src_interpreter<T>::run(const std::vector<any> &ex)
 }
 
 ///
-/// \param[in] i the index of a variable.
-/// \return the value of the i-th variable.
+/// Used by the vita::variable class to retrieve the value of a variable.
 ///
-/// This is used by the vita::variable class to retrieve the value of a
-/// variable.
+/// \param[in] i the index of a variable
+/// \return      the value of the `i`-th variable
 ///
 template<class T>
 any src_interpreter<T>::fetch_var(unsigned i)
 {
-  assert(i < example_->size());
+  Expects(i < example_->size());
   return (*example_)[i];
 }
 
-#endif  // Include guard
+#endif  // include guard

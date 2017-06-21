@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,8 +32,8 @@ src_evaluator<T>::src_evaluator(src_data &d) : dat_(&d)
 template<class T>
 fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 {
-  assert(!this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
+  Expects(!this->dat_->classes());
+  Expects(this->dat_->begin() != this->dat_->end());
 
   const basic_reg_lambda_f<T, false> agent(prg);
 

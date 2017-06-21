@@ -42,7 +42,7 @@ static_assert(std::numeric_limits<base_t>::is_iec559,
               "Vita requires IEC 559/IEEE 754 floating-point types");
 
 ///
-/// Just a simple shortcut.
+/// A simple shortcut for casting an `any` to `base_t`.
 ///
 /// \param[in] v the value that must be casted to base type (`base_t`)
 /// \return      the content of `v`
@@ -176,7 +176,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(base(a0) + base(a1));
-    if (std::isinf(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -220,7 +220,7 @@ public:
 
     const auto x(base(a0)), y(base(a1));
     const base_t ret(x / std::sqrt(1.0 + y * y));
-    if (!std::isfinite(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -251,7 +251,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(base(a0) / base(a1));
-    if (!std::isfinite(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -279,10 +279,17 @@ public:
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isgreater(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
-    // If one or both arguments of isless are Nan, the function returns
-    // false, but no FE_INVALID exception is raised (note that the
-    // expression v0 < v1 may raise an exception in this case).
+
+    const any a0(i->fetch_arg(0));
+    if (a0.empty())  return a0;
+
+    const any a1(i->fetch_arg(1));
+    if (a1.empty())  return a1;
+
+    return any(std::isgreater(base(a0), base(a1)));
+    // If one or both arguments of isgreater are NaN, the function returns
+    // `false`, but no FE_INVALID exception is raised (note that the
+    // expression `v0 < v1` may raise an exception in this case).
   }
 };
 
@@ -317,7 +324,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(std::floor(base(a0) / base(a1)));
-    if (!std::isfinite(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -367,10 +374,10 @@ public:
     const auto min(std::fmin(v1, v2));
     const auto max(std::fmax(v1, v2));
 
-    if (min <= v0 && v0 <= max)
-      return i->fetch_arg(3);
-    else
+    if (std::isless(v0, min) || std::isgreater(v0, max))
       return i->fetch_arg(4);
+    else
+      return i->fetch_arg(3);
   }
 };
 
@@ -452,7 +459,7 @@ public:
     if (a1.empty())  return a1;
 
     const auto v0(base(a0)), v1(base(a1));
-    if (v0 < v1)
+    if (std::isless(v0, v1))
       return i->fetch_arg(2);
     else
       return i->fetch_arg(3);
@@ -528,7 +535,7 @@ public:
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a.empty())  return a;
 
-    return any(static_cast<base_t>(any_cast<std::string>(a).size()));
+    return any(static_cast<base_t>(any_cast<std::string>(a).length()));
   }
 };
 
@@ -561,8 +568,8 @@ public:
     const any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (a0.empty())  return a0;
 
-    const base_t ret(std::log(base(a0)));
-    if (!std::isfinite(ret))  return any();
+    const auto ret(std::log(base(a0)));
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -590,10 +597,17 @@ public:
   any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(std::isless(base(i->fetch_arg(0)), base(i->fetch_arg(1))));
-    // If one or both arguments of isless are Nan, the function returns
+
+    const any a0(i->fetch_arg(0));
+    if (a0.empty())  return a0;
+
+    const any a1(i->fetch_arg(1));
+    if (a1.empty())  return a1;
+
+    return any(std::isless(base(a0), base(a1)));
+    // If one or both arguments of `isless` are NaN, the function returns
     // false, but no FE_INVALID exception is raised (note that the
-    // expression v0 < v1 may raise an exception in this case).
+    // expression `v0 < v1` may raise an exception in this case).
   }
 };
 
@@ -626,7 +640,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(std::fmax(base(a0), base(a1)));
-    if (!std::isfinite(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -663,7 +677,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(std::fmod(base(a0), base(a1)));
-    if (!std::isfinite(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -694,7 +708,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(base(a0) * base(a1));
-    if (std::isinf(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
@@ -756,7 +770,7 @@ public:
 
     const auto v(base(a));
     if (std::isless(v, 0.0))
-      return any();
+      return {};
 
     return any(std::sqrt(v));
   }
@@ -787,7 +801,7 @@ public:
     if (a1.empty())  return a1;
 
     const base_t ret(base(a0) - base(a1));
-    if (std::isinf(ret))  return any();
+    if (!std::isfinite(ret))  return {};
 
     return any(ret);
   }
