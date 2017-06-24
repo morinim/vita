@@ -812,21 +812,19 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   Expects(lhs.size() == rhs.size());
 
   const bool b(random::boolean());
-  const i_mep *parents[] = {&lhs, &rhs};
-  i_mep ret(*parents[b]);
+  const i_mep &from(b ? rhs : lhs);
+  i_mep          to(b ? lhs : rhs);
 
-  const auto delta(random::between(0u, lhs.active_symbols()));
+  const auto delta(random::sup(from.active_symbols()));
 
-  for (auto i(std::next(parents[!b]->begin(), delta));
-       i != parents[!b]->end();
-       ++i)
-    ret.genome_(i.locus()) = *i;
+  for (auto i(std::next(from.begin(), delta)); i != from.end(); ++i)
+    to.genome_(i.locus()) = *i;
 
-  ret.set_older_age(parents[!b]->age());
-  ret.signature_.clear();
+  to.set_older_age(from.age());
+  to.signature_.clear();
 
-  Ensures(ret.debug());
-  return ret;
+  Ensures(to.debug());
+  return to;
 }
 #else  // TWO_POINT_CROSSOVER (default)
 ///
