@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,12 +52,11 @@ void randomize();
 using engine_t = std::mt19937;
 
 ///
-/// \return a reference to a single engine shared whereever needed.
+/// Grants access to the shared random engine generator.
 ///
-/// This function grants access to a shared engine.
+/// \return a reference to a single engine shared whereever needed
 ///
-/// \note
-/// the engine can be shared among multiple threads.
+/// \note the engine can be shared among multiple threads.
 ///
 inline engine_t &engine()
 {
@@ -71,14 +70,14 @@ inline engine_t &engine()
 }
 
 ///
-/// \param[in] d type of distribution.
-/// \param[in] p1 minimum for uniform distribution, mean for normal
-///               distribution.
-/// \param[in] p2 maximum for uniform distribution, standard deviation for
-///               normal distribution.
-/// \return a random number distributed according to \a d distribution.
+/// Used for ephemeral random constant generation.
 ///
-/// This is used for ephemeral random constant generation.
+/// \param[in] d  type of distribution
+/// \param[in] p1 **minimum** for uniform distribution; **mean** for normal
+///               distribution
+/// \param[in] p2 **maximum** for uniform distribution, **standard deviation**
+///               for normal distribution
+/// \return       a random number distributed according to distribution `d`
 ///
 template<class T>
 T ephemeral(distribution d, T p1, T p2)
@@ -94,18 +93,18 @@ T ephemeral(distribution d, T p1, T p2)
 }
 
 ///
-/// \param[in] min minimum random number.
-/// \param[in] sup upper bound.
-/// \return a random `double` in the [min;sup[ range.
+/// A specialization for floating point values of the `random::between(T, T)`
+/// template function.
 ///
-/// This is a specialization for floating pint values of the
-//  `random::between(T, T)` template function.
+/// \param[in] min minimum random number
+/// \param[in] sup upper bound
+/// \return        a random `double` in the `[min;sup[` range
 ///
 /// \see
+/// For further details:
 /// - <http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2013/n3551.pdf>
 /// - <http://stackoverflow.com/q/24566574/3235496>
 /// - <http://stackoverflow.com/q/25222167/3235496>
-/// for further details.
 ///
 template<class T>
 std::enable_if_t<std::is_floating_point<T>::value, T>
@@ -118,12 +117,12 @@ between(T min, T sup)
 }
 
 ///
-/// \param[in] min minimum random number.
-/// \param[in] sup upper bound.
-/// \return a random number in the [min;sup[ range.
-///
 /// Picks up a random integer value uniformly distributed in the set of
-/// integers {min, min+1, ..., sup-1}.
+/// integers `{min, min+1, ..., sup-1}`.
+///
+/// \param[in] min minimum random number
+/// \param[in] sup upper bound
+/// \return        a random number in the `[min;sup[` range
 ///
 /// \note
 /// Contrary to boost usage this function does not take a closed range.
@@ -141,11 +140,10 @@ between(T min, T sup)
 }
 
 ///
-/// \param[in] sup upper bound.
-/// \return a random number in the [0;sup[ range.
+/// \param[in] sup upper bound
+/// \return        a random number in the [0;sup[ range
 ///
-/// \note
-/// This is a shortcut for: `between<T>(0, sup)`
+/// \note This is a shortcut for: `between<T>(0, sup)`
 ///
 template<class T>
 T sup(T sup)
@@ -154,45 +152,43 @@ T sup(T sup)
 }
 
 ///
-/// \param[in] c a STL container.
-/// \return a random element of container \a c.
+/// \param[in] c a STL container
+/// \return      a random element of container `c`
 ///
 template<class C>
 const typename C::value_type &element(const C &c)
 {
   const auto size(c.size());
-  assert(size);
+  Expects(size);
 
   return *std::next(c.begin(),
-                    static_cast<typename C::difference_type>(
-                      between<decltype(size)>(0, size)));
+                    static_cast<typename C::difference_type>(sup(size)));
 }
 
 ///
-/// \param[in] c a STL container.
-/// \return a random element of container \a c.
+/// \param[in] c a STL container
+/// \return      a random element of container `c`
 ///
 template<class C>
 typename C::value_type &element(C &c)
 {
   const auto size(c.size());
-  assert(size);
+  Expects(size);
 
   return *std::next(c.begin(),
-                    static_cast<typename C::difference_type>(
-                      between<decltype(size)>(0, size)));
+                    static_cast<typename C::difference_type>(sup(size)));
 }
 
 ///
-/// \param[in] p a probability ([0;1] range).
-/// \return `true` `p%` times.
+/// \param[in] p a probability (`[0;1]` range)
+/// \return      `true` `p%` times
 ///
-/// bool values are produced according to the Bernoulli distribution.
+/// \bote `bool` values are produced according to the Bernoulli distribution.
 ///
 inline bool boolean(double p)
 {
-  assert(0.0 <= p);
-  assert(p <= 1.0);
+  Expects(0.0 <= p);
+  Expects(p <= 1.0);
 
   std::bernoulli_distribution d(p);
   return d(engine());
@@ -203,4 +199,4 @@ inline bool boolean(double p)
 }  // namespace random
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
