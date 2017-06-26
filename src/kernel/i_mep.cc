@@ -815,10 +815,20 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   const i_mep &from(b ? rhs : lhs);
   i_mep          to(b ? lhs : rhs);
 
-  const auto delta(random::sup(from.active_symbols()));
+  auto crossover_ = [&](locus l, const auto &lambda) -> void
+  {
+    to.genome_(l) = from[l];
 
-  for (auto i(std::next(from.begin(), delta)); i != from.end(); ++i)
-    to.genome_(i.locus()) = *i;
+    if (!from[l].sym->terminal())
+    {
+      const auto &f(*function::cast(from[l].sym));
+      for (unsigned i(0); i < f.arity(); ++i)
+        lambda(from[l].arg_locus(i), lambda);
+    }
+  };
+
+  const auto delta(random::sup(from.active_symbols()));
+  crossover_(std::next(from.begin(), delta).locus(), crossover_);
 
   to.set_older_age(from.age());
   to.signature_.clear();
