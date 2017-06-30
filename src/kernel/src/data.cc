@@ -393,7 +393,7 @@ src_data::example src_data::to_example(const std::vector<std::string> &v,
   }
 
   // The output class/value can be empty only for the test-set.
-  Ensures(active_dataset() == test || !ret.output.empty());
+  Ensures(active_dataset() == test || ret.output.has_value());
 
   return ret;
 }

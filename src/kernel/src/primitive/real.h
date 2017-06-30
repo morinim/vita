@@ -146,7 +146,7 @@ public:
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
 
-    return a.empty() ? a : any(std::fabs(base(a)));
+    return a.has_value() ? any(std::fabs(base(a))) : a;
   }
 };
 
@@ -170,10 +170,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) + base(a1));
     if (!std::isfinite(ret))  return {};
@@ -213,10 +213,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const auto x(base(a0)), y(base(a1));
     const base_t ret(x / std::sqrt(1.0 + y * y));
@@ -245,10 +245,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) / base(a1));
     if (!std::isfinite(ret))  return {};
@@ -281,10 +281,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     return any(std::isgreater(base(a0), base(a1)));
     // If one or both arguments of isgreater are NaN, the function returns
@@ -318,10 +318,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(std::floor(base(a0) / base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -359,13 +359,13 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const any a2(i->fetch_arg(2));
-    if (a2.empty())  return a2;
+    if (!a2.has_value())  return a2;
 
     const auto v0(base(a0));
     const auto v1(base(a1));
@@ -412,10 +412,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     if (issmall(base(a0) - base(a1)))
       return i->fetch_arg(2);
@@ -453,10 +453,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const auto v0(base(a0)), v1(base(a1));
     if (std::isless(v0, v1))
@@ -501,7 +501,7 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     if (issmall(base(a0)))
       return i->fetch_arg(1);
@@ -533,7 +533,7 @@ public:
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (a.empty())  return a;
+    if (!a.has_value())  return a;
 
     return any(static_cast<base_t>(any_cast<std::string>(a).length()));
   }
@@ -566,7 +566,7 @@ public:
   any eval(core_interpreter *i) const final
   {
     const any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const auto ret(std::log(base(a0)));
     if (!std::isfinite(ret))  return {};
@@ -599,10 +599,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     return any(std::isless(base(a0), base(a1)));
     // If one or both arguments of `isless` are NaN, the function returns
@@ -634,10 +634,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(std::fmax(base(a0), base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -671,10 +671,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(std::fmod(base(a0), base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -702,10 +702,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) * base(a1));
     if (!std::isfinite(ret))  return {};
@@ -737,7 +737,7 @@ public:
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (a.empty())  return a;
+    if (!a.has_value())  return a;
 
     return any(std::sin(base(a)));
   }
@@ -766,7 +766,7 @@ public:
   any eval(core_interpreter *i) const final
   {
     const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (a.empty())  return a;
+    if (!a.has_value())  return a;
 
     const auto v(base(a));
     if (std::isless(v, 0.0))
@@ -795,10 +795,10 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const any a0(i->fetch_arg(0));
-    if (a0.empty())  return a0;
+    if (!a0.has_value())  return a0;
 
     const any a1(i->fetch_arg(1));
-    if (a1.empty())  return a1;
+    if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) - base(a1));
     if (!std::isfinite(ret))  return {};

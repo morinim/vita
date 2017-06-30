@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
   std::cout << vita::out::dump << ind << '\n';
 
   const vita::any val(vita::interpreter<vita::i_mep>(&ind).run());
-  if (val.empty())
-    std::cout << "Incorrect program.\n";
-  else
+  if (val.has_value())
     std::cout << "Output: " << vita::to<std::string>(val) << '\n';
+  else
+    std::cout << "Incorrect program.\n";
 }

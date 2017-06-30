@@ -51,14 +51,12 @@ struct bad_any_cast : std::bad_cast
 };
 
 ///
-/// A boost::any equivalent with small buffer optimization and support for the
+/// A `std::any` equivalent with small buffer optimization and support for the
 /// streaming operators.
 ///
-/// This class is derived from and equivalent to boost::spirit::hold_any
-/// (which is built based on the any class published in
+/// This class is derived from `boost::spirit::hold_any` (which is built based
+/// on the any class published in
 /// <http://www.codeproject.com/cpp/dynamic_typing.asp>).
-///
-/// vita::any doesn't depend on Boost library but needs C++14.
 ///
 class any
 {
@@ -97,7 +95,7 @@ public:
 
   const std::type_info &type() const;
 
-  bool empty() const;
+  bool has_value() const;
 
   void clear();
 

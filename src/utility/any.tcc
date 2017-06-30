@@ -285,11 +285,13 @@ inline const std::type_info &any::type() const
 }
 
 ///
-/// return `true` if instance is empty, otherwise `false`.
+/// Checks whether the object contains a value.
 ///
-inline bool any::empty() const
+/// \return `true` if instance contains a value, otherwise `false`.
+///
+inline bool any::has_value() const
 {
-  return table == detail::any_::get_table<detail::any_::empty>::get();
+  return table != detail::any_::get_table<detail::any_::empty>::get();
 }
 
 ///
@@ -297,7 +299,7 @@ inline bool any::empty() const
 ///
 inline void any::clear()
 {
-  if (!empty())
+  if (has_value())
   {
     table->static_delete(&object);
     table = detail::any_::get_table<detail::any_::empty>::get();

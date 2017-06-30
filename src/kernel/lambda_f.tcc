@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -61,7 +61,7 @@ any basic_reg_lambda_f<T, S>::eval(const src_data::example &e,
   {
     const auto res(core.run(e.input));
 
-    if (!res.empty())
+    if (res.has_value())
       avg += (to<number>(res) - avg) / ++count;
   }
 
@@ -271,7 +271,7 @@ std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
 
   const auto ns(slot_matrix_.rows());
   const auto last_slot(ns - 1);
-  if (res.empty())
+  if (!res.has_value())
     return last_slot;
 
   const auto val(to<number>(res));
@@ -474,7 +474,7 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(src_data &d)
   {
     const any res(lambda_(example));
 
-    number val(res.empty() ? 0.0 : to<number>(res));
+    number val(res.has_value() ? to<number>(res) : 0.0);
     const number cut(10000000.0);
     if (val > cut)
       val = cut;
@@ -497,7 +497,7 @@ std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
   const src_data::example &example) const
 {
   const any res(lambda_(example));
-  const number x(res.empty() ? 0.0 : to<number>(res));
+  const number x(res.has_value() ? to<number>(res) : 0.0);
 
   number val_(0.0), sum_(0.0);
   class_t probable_class(0);
@@ -661,7 +661,7 @@ std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
   const src_data::example &e) const
 {
   const any res(lambda_(e));
-  const number val(res.empty() ? 0.0 : to<number>(res));
+  const number val(res.has_value() ? to<number>(res) : 0.0);
 
   return {val > 0.0 ? 1u : 0u, std::fabs(val)};
 }

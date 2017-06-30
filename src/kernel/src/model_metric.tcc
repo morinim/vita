@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
   for (const auto &example : d)
   {
     const any res((*l)(example));
-    if (!res.empty() &&
+    if (res.has_value() &&
         issmall(to<number>(res) - example.cast_output<number>()))
       ++ok;
 

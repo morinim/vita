@@ -123,10 +123,10 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
   number err;
 
-  if (res.empty())
-    err = std::pow(100.0, ++(*illegals));
-  else
+  if (res.has_value())
     err = std::fabs(to<number>(res) - t.cast_output<number>());
+  else
+    err = std::pow(100.0, ++(*illegals));
 
   if (!issmall(err))
     ++t.difficulty;
@@ -149,9 +149,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
   number err;
 
-  if (res.empty())
-    err = 200.0;
-  else
+  if (res.has_value())
   {
     const auto approx(to<number>(res));
     const auto target(t.cast_output<number>());
@@ -171,6 +169,8 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
     // The chosen formula seems numerically more stable and gives a result
     // in a limited range of values.
   }
+  else
+    err = 200.0;
 
   if (err > 0.0)
     ++t.difficulty;
@@ -193,13 +193,13 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 {
   const any res(agent(t));
   number err;
-  if (res.empty())
-    err = std::pow(100.0, ++(*illegals));
-  else
+  if (res.has_value())
   {
     err = to<number>(res) - t.cast_output<number>();
     err *= err;
   }
+  else
+    err = std::pow(100.0, ++(*illegals));
 
   if (!issmall(err))
     ++t.difficulty;
@@ -220,7 +220,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 {
   const any res(agent(t));
 
-  const bool err(res.empty() ||
+  const bool err(!res.has_value() ||
                  !issmall(to<number>(res) - t.cast_output<number>()));
 
   if (err)

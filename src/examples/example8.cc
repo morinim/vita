@@ -57,10 +57,10 @@ int main(int argc, char *argv[])
 
       std::cout << "\nBLOCK at locus " << l << '\n' << blk;
       const any val(interpreter<i_mep>(&blk).run());
-      if (val.empty())
-        std::cout << "Empty output.";
-      else
+      if (val.has_value())
         std::cout << "Output: " << to<std::string>(val);
+      else
+        std::cout << "Empty output.";
       std::cout << '\n';
 
       if (blk.active_symbols() <= 20)
@@ -84,14 +84,14 @@ int main(int argc, char *argv[])
         i_mep blk3(blk.replace({{f, positions}}));
         std::cout << '\n' << blk3;
         const any val3(interpreter<i_mep>(&blk3).run());
-        if (val3.empty())
-          std::cout << "Empty output.";
-        else
+        if (val3.has_value())
           std::cout << "Output: " << to<std::string>(val3);
+        else
+          std::cout << "Empty output.";
         std::cout << "\n\n";
 
-        if (val.empty() != val3.empty() ||
-            (!val.empty() && !val3.empty() &&
+        if (val.has_value() != val3.has_value() ||
+            (val.has_value() && val3.has_value() &&
              to<std::string>(val) != to<std::string>(val3)))
         {
           std::cerr << "ADF EVAL ERROR.\n";

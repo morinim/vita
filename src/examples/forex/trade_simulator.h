@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -163,7 +163,7 @@ double trade_simulator::run(const T &prg)
         vita::interpreter<vita::i_mep> i_res(&prg[i]);
 
         auto a(i_res.run());
-        signal[i] = !a.empty() && vita::any_cast<bool>(a);
+        signal[i] = a.has_value() && vita::any_cast<bool>(a);
       }
 
       if (signal[id_buy] && !signal[id_sell])
@@ -176,7 +176,7 @@ double trade_simulator::run(const T &prg)
       vita::interpreter<vita::i_mep> intr(&prg[type == o_type::buy ?
                                                id_sell : id_buy]);
       auto a(intr.run());
-      const bool v(!a.empty() && vita::any_cast<bool>(a));
+      const bool v(a.has_value() && vita::any_cast<bool>(a));
 
       if (v)
         order_close();

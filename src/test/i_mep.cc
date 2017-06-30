@@ -286,9 +286,9 @@ BOOST_AUTO_TEST_CASE(t_compress)
     const auto v(vita::interpreter<vita::i_mep>(&i).run());
     const auto v1(vita::interpreter<vita::i_mep>(&i1).run());
 
-    BOOST_TEST(v.empty() == v1.empty());
+    BOOST_TEST(v.has_value() == v1.has_value());
 
-    if (!v.empty())
+    if (v.has_value())
     {
       const auto d(vita::to<double>(v));
       const auto d1(vita::to<double>(v1));

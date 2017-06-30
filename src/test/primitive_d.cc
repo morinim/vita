@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(DIV, * boost::unit_test::tolerance(epsilon))
                    {{   c0,   null}}   // [2] 0.0
                  });
   ret = i_interp(&i4).run();
-  BOOST_TEST(ret.empty());
+  BOOST_TEST(!ret.has_value());
 }
 
 BOOST_AUTO_TEST_CASE(IDIV, * boost::unit_test::tolerance(epsilon))
@@ -250,7 +250,7 @@ BOOST_AUTO_TEST_CASE(IDIV, * boost::unit_test::tolerance(epsilon))
                    {{    c0,   null}}   // [2] 0.0
                  });
   ret = i_interp(&i5).run();
-  BOOST_TEST(ret.empty());
+  BOOST_TEST(!ret.has_value());
 }
 
 BOOST_AUTO_TEST_CASE(IFE, * boost::unit_test::tolerance(epsilon))
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE(SQRT, * boost::unit_test::tolerance(epsilon))
                    {{neg_x,  null}}   // [1] -X
                  });
   ret = i_interp(&i2).run();
-  BOOST_TEST(ret.empty());
+  BOOST_TEST(!ret.has_value());
 
   BOOST_TEST_CHECKPOINT("SQRT(Z) = std::sqrt(Z)");
   const i_mep i3({
@@ -518,7 +518,7 @@ BOOST_AUTO_TEST_CASE(LN, * boost::unit_test::tolerance(epsilon))
                    {{  c0, null}}   // [1] 0.0
                  });
   ret = i_interp(&i2).run();
-  BOOST_TEST(ret.empty());
+  BOOST_TEST(!ret.has_value());
 
   BOOST_TEST_CHECKPOINT("LN(Z) = std::log(Z)");
   const i_mep i3({

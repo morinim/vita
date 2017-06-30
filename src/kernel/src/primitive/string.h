@@ -41,10 +41,10 @@ public:
     auto *const i(static_cast<interpreter<i_mep> *>(ci));
 
     const any v0(i->fetch_arg(0));
-    if (v0.empty())  return v0;
+    if (!v0.has_value())  return v0;
 
     const any v1(i->fetch_arg(1));
-    if (v1.empty())  return v1;
+    if (!v1.has_value())  return v1;
 
     if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
       return i->fetch_arg(2);

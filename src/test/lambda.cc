@@ -105,15 +105,15 @@ void test_team_of_one(vita::src_problem &pr)
     {
       const auto out_i(li(e)), out_t(lt(e));
 
-      if (out_i.empty())
-        BOOST_REQUIRE(out_t.empty());
-      else
-	    {
+      if (out_i.has_value())
+      {
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
         BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
       }
+      else
+        BOOST_REQUIRE(!out_t.has_value());
     }
   }
 }
@@ -143,15 +143,15 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
     {
       const auto out_i(li(e)), out_t(lt(e));
 
-      if (out_i.empty())
-        BOOST_REQUIRE(out_t.empty());
-      else
+      if (out_i.has_value())
       {
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
         BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
       }
+      else
+        BOOST_REQUIRE(!out_t.has_value());
     }
   }
 
@@ -179,22 +179,22 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
       const auto out4(lambda4(e));
 
       number sum(0.0), n(0.0);
-      if (!out1.empty())
+      if (out1.has_value())
       {
         sum += to<number>(out1);
         ++n;
       }
-      if (!out2.empty())
+      if (out2.has_value())
       {
         sum += to<number>(out2);
         ++n;
       }
-      if (!out3.empty())
+      if (out3.has_value())
       {
         sum += to<number>(out3);
         ++n;
       }
-      if (!out4.empty())
+      if (out4.has_value())
       {
         sum += to<number>(out4);
         ++n;
@@ -238,10 +238,10 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
       const auto out1(lambda1(e));
       const auto out2(lambda2(e));
 
-      if (out1.empty())
-        BOOST_REQUIRE(out2.empty());
-      else
+      if (out1.has_value())
         BOOST_CHECK_CLOSE(to<number>(out1), to<number>(out2), epsilon);
+      else
+        BOOST_REQUIRE(!out2.has_value());
     }
   }
 }

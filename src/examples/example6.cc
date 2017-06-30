@@ -75,7 +75,7 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 
           const vita::any res(agent.run());
 
-          if (!res.empty())
+          if (res.has_value())
           {
             const auto dres(vita::any_cast<double>(res));
             assert(std::isfinite(dres));

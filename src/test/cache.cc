@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -117,8 +117,8 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
   {
     vita::i_mep i1(env);
     const vita::any val(i_interp(&i1).run());
-    vita::fitness_t f{val.empty() ?
-        0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
+    vita::fitness_t f{val.has_value()
+                      ? vita::any_cast<vita::fitness_t::value_type>(val) : 0.0};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -130,8 +130,9 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
     if (f.size())
     {
       const vita::any val(i_interp(&vi[i]).run());
-      vita::fitness_t f1{
-        val.empty() ? 0.0 : vita::any_cast<vita::fitness_t::value_type>(val)};
+      vita::fitness_t f1{val.has_value()
+                         ? vita::any_cast<vita::fitness_t::value_type>(val)
+                         : 0.0};
 
       BOOST_CHECK(f == f1);
     }
@@ -154,7 +155,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   {
     i_mep i1(env);
     const vita::any val(i_interp(&i1).run());
-    fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
+    fitness_t f{val.has_value() ? any_cast<fitness_t::value_type>(val) : 0.0};
 
     cache1.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -175,7 +176,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
     if (present[i])
     {
       const vita::any val(i_interp(&vi[i]).run());
-      fitness_t f{val.empty() ? 0.0 : any_cast<fitness_t::value_type>(val)};
+      fitness_t f{val.has_value()
+                  ? any_cast<fitness_t::value_type>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
       BOOST_CHECK(f1.size());
