@@ -5,13 +5,11 @@
 # [Ticket #12]
 
 # --- COMMIT END ---
-#-----------------------------------------------@----------------------#
+#--------------------------------------------------------------------------#
 #
-# 1. Summary should be under 50 characters. @-symbol above is a marker
-#    for that
-# 2. Description of commit should explain WHY a change was made and
-#    lines should be wrapped to 72 characters; marked by the #-symbol
-# 3. Optionally, reference a ticket number.
+# 1. Summary and description should be wrapped to 76 characters. #-symbol
+#    above is a marker for that.
+# 2. Optionally, reference a ticket number.
 #
 # --------------------
 # Tag can be:
