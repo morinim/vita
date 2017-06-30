@@ -31,7 +31,8 @@ namespace vita
 /// of the type system's constraints.
 ///
 i_mep::i_mep(const environment &e)
-  : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0}
+  : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0},
+    active_crossover_type_(random::sup(NUM_CROSSOVERS))
 {
   Expects(e.sset);
   Expects(size());
@@ -70,7 +71,8 @@ i_mep::i_mep(const std::vector<gene> &gv)
                              {
                                return g1.sym->category() < g2.sym->category();
                              })->sym->category() + 1),
-    best_{0, 0}
+    best_{0, 0},
+    active_crossover_type_(random::sup(NUM_CROSSOVERS))
 {
   index_t i(0);
 
@@ -703,18 +705,54 @@ i_mep i_mep::compress() const
   return ret;
 }
 
-#if defined(UNIFORM_CROSSOVER)
 ///
-/// Uniform Crossover.
+/// A Self-Adaptive Crossover operator.
 ///
 /// \param[in] lhs first parent
 /// \param[in] rhs second parent
 /// \return        the result of the crossover (we only generate a single
 ///                offspring).
 ///
+/// Well known elementary crossover operators traverse the problem domain in
+/// different ways, exhibiting variable performances and specific problems.
+/// An attempt to make the algorithm more robust is combining various search
+/// strategies, encapsulated by the different elementary crossover operators
+/// available, via self adaptation.
+///
+/// We associate, with each individual, the type of crossover used to create it
+/// (initially this is set to a random type). This type is used afterwards to
+/// determine which crossover to apply and allows the algorithm to adjust the
+/// relative mixture of operators.
+///
+/// Here we briefly describe the elementary crossover operators that are
+/// utilised:
+///
+/// **ONE POINT**
+///
+/// We randomly select a parent (between `from` and `to`) and a single locus
+/// (common crossover point). The offspring is created with genes from the
+/// chosen parent up to the crossover point and genes from the other parent
+/// beyond that point.
+/// One-point crossover is the oldest homologous crossover in tree-based GP.
+///
+/// **TREE**
+///
+/// Inserts a complete tree from one parent into the other.
+/// The operation is less disruptive than other forms of crossover since
+/// an entire tree is copied (not just a part).
+///
+/// **TWO POINTS**
+///
+/// We randomly select two loci (common crossover points). The offspring is
+/// created with genes from the one parent before the first crossover point and
+/// after the second crossover point; genes between crossover points are taken
+/// from the other parent.
+///
+/// **UNIFORM CROSSOVER**
+///
 /// The i-th locus of the offspring has a 50% probability to be filled with
-/// the i-th gene of `lhs` and 50% with i-th gene of `rhs`. Parents must
-/// have the same size.
+/// the i-th gene of `from` and 50% with i-th gene of `to`.
+///
 /// Uniform crossover, as the name suggests, is a GP operator inspired by the
 /// GA operator of the same name (G. Syswerda. Uniform crossover in genetic
 /// algorithms - Proceedings of the Third International Conference on Genetic
@@ -727,83 +765,14 @@ i_mep i_mep::compress() const
 /// and the same length. GP uniform crossover begins with the observation that
 /// many parse trees are at least partially structurally similar.
 ///
-i_mep crossover(const i_mep &lhs, const i_mep &rhs)
-{
-  Expects(lhs.debug());
-  Expects(rhs.debug());
-  Expects(lhs.size() == rhs.size());
-
-  i_mep ret(lhs);
-
-  for (auto i(rhs.begin()); i != rhs.end(); ++i)
-    if (random::boolean())
-      ret.genome_(i.locus()) = *i;
-
-  ret.set_older_age(rhs.age());
-  ret.signature_.clear();
-
-  Ensures(ret.debug(true));
-  return ret;
-}
-#elif defined(ONE_POINT_CROSSOVER)
-///
-/// One Point Crossover.
-///
-/// \param[in] lhs first parent
-/// \param[in] rhs second parent
-/// \return        the result of the crossover (we only generate a single
-///                offspring)
-///
-/// We randomly select a parent (between `lhs` and `rhs`) and a single locus
-/// (common crossover point). The offspring is created with genes from the
-/// chosen parent up to the crossover point and genes from the other parent
-/// beyond that point.
-/// One-point crossover is the oldest homologous crossover in tree-based GP.
-///
 /// \note Parents must have the same size.
 ///
-i_mep crossover(const i_mep &lhs, const i_mep &rhs)
-{
-  Expects(lhs.debug());
-  Expects(rhs.debug());
-  Expects(lhs.size() == rhs.size());
-
-  const auto i_sup(lhs.size());
-  const auto c_sup(lhs.categories());
-
-  const auto cut(random::between<index_t>(1, i_sup - 1));
-
-  const bool b(random::boolean());
-  const i_mep *parents[] = {&lhs, &rhs};
-  i_mep ret(*parents[b]);
-
-  for (index_t i(cut); i < i_sup; ++i)
-    for (category_t c(0); c < c_sup; ++c)
-    {
-      const locus l{i, c};
-      ret.genome_(l) = parents[!b]->genome_(l);
-    }
-
-  ret.set_older_age(parents[!b]->age());
-  ret.signature_.clear();
-
-  Ensures(ret.debug());
-  return ret;
-}
-#elif defined(TREE_CROSSOVER)
+/// \remark
+/// What has to be noticed is that the adaption of the parameter happens before
+/// the fitness is given to it. That means that getting a good parameter
+/// doesn't rise the individual's fitness but only its performance over time.
 ///
-/// Tree Crossover.
-///
-/// \param[in] lhs first parent
-/// \param[in] rhs second parent
-/// \return        the result of the crossover (we only generate a single
-///                offspring)
-///
-/// Inserts a complete tree from one parent into the other.
-/// The operation is less disruptive than other forms of crossover since
-/// an entire tree is copied (not just a part).
-///
-/// \note Parents must have the same size.
+/// \see "Adapting Crossover in Evolutionary Algorithms" - William M. Spears.
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
@@ -815,74 +784,73 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   const i_mep &from(b ? rhs : lhs);
   i_mep          to(b ? lhs : rhs);
 
-  auto crossover_ = [&](locus l, const auto &lambda) -> void
+  switch (from.active_crossover_type_)
   {
-    to.genome_(l) = from[l];
-
-    if (!from[l].sym->terminal())
+  case i_mep::crossover_t::one_point:
     {
-      const auto &f(*function::cast(from[l].sym));
-      for (unsigned i(0); i < f.arity(); ++i)
-        lambda(from[l].arg_locus(i), lambda);
+    const auto i_sup(from.size());
+    const auto c_sup(from.categories());
+    const auto cut(random::between<index_t>(1, i_sup - 1));
+
+    for (index_t i(cut); i < i_sup; ++i)
+      for (category_t c(0); c < c_sup; ++c)
+      {
+        const locus l{i, c};
+        to.genome_(l) = from[l];
+      }
     }
-  };
+    break;
 
-  const auto delta(random::sup(from.active_symbols()));
-  crossover_(std::next(from.begin(), delta).locus(), crossover_);
+  case i_mep::crossover_t::two_points:
+    {
+    const auto i_sup(from.size());
+    const auto c_sup(from.categories());
 
+    const auto cut1(random::sup(i_sup - 1));
+    const auto cut2(random::between(cut1 + 1, i_sup));
+
+    for (index_t i(cut1); i != cut2; ++i)
+      for (category_t c(0); c < c_sup; ++c)
+      {
+        const locus l{i, c};
+        to.genome_(l) = from[l];
+      }
+    }
+    break;
+
+  case i_mep::crossover_t::uniform:
+    for (auto i(from.begin()); i != from.end(); ++i)
+      if (random::boolean())
+        to.genome_(i.locus()) = *i;
+    break;
+
+  default:  // Tree crossover
+    {
+      auto crossover_ = [&](locus l, const auto &lambda) -> void
+      {
+        to.genome_(l) = from[l];
+
+        if (!from[l].sym->terminal())
+        {
+          const auto &f(*function::cast(from[l].sym));
+          for (unsigned i(0); i < f.arity(); ++i)
+            lambda(from[l].arg_locus(i), lambda);
+        }
+      };
+
+      const auto delta(random::sup(from.active_symbols()));
+      crossover_(std::next(from.begin(), delta).locus(), crossover_);
+    }
+    break;
+  }
+
+  to.active_crossover_type_ = from.active_crossover_type_;
   to.set_older_age(from.age());
   to.signature_.clear();
 
   Ensures(to.debug());
   return to;
 }
-#else  // TWO_POINT_CROSSOVER (default)
-///
-/// Two Point Crossover.
-///
-/// \param[in] lhs first parent
-/// \param[in] rhs second parent
-/// \return        the result of the crossover (we only generate a single
-///                offspring)
-///
-/// We randomly select a parent (between `lhs` and `rhs`) and a two loci
-/// (common crossover points). The offspring is created with genes from the
-/// chosen parent before the first crossover point and after the second
-/// crossover point; genes between crossover points are taken from the other
-/// parent.
-///
-/// \note Parents must have the same size.
-///
-i_mep crossover(const i_mep &lhs, const i_mep &rhs)
-{
-  Expects(lhs.debug());
-  Expects(rhs.debug());
-  Expects(lhs.size() == rhs.size());
-
-  const auto i_sup(lhs.size());
-  const auto c_sup(lhs.categories());
-
-  const auto cut1(random::sup(i_sup - 1));
-  const auto cut2(random::between(cut1 + 1, i_sup));
-
-  const bool b(random::boolean());
-  const i_mep *parents[] = {&lhs, &rhs};
-  i_mep ret(*parents[b]);
-
-  for (index_t i(cut1); i != cut2; ++i)
-    for (category_t c(0); c < c_sup; ++c)
-    {
-      const locus l{i, c};
-      ret.genome_(l) = parents[!b]->genome_(l);
-    }
-
-  ret.set_older_age(parents[!b]->age());
-  ret.signature_.clear();
-
-  Ensures(ret.debug());
-  return ret;
-}
-#endif
 
 namespace
 {

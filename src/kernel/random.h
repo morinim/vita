@@ -139,6 +139,15 @@ between(T min, T sup)
   return d(engine());
 }
 
+template<class T>
+std::enable_if_t<std::is_enum<T>::value, T>
+between(T min, T sup)
+{
+  Expects(min < sup);
+
+  return static_cast<T>(between<std::underlying_type_t<T>>(min, sup));
+}
+
 ///
 /// \param[in] sup upper bound
 /// \return        a random number in the [0;sup[ range
@@ -148,7 +157,7 @@ between(T min, T sup)
 template<class T>
 T sup(T sup)
 {
-  return between<T>(0, sup);
+  return between<T>(static_cast<T>(0), sup);
 }
 
 ///

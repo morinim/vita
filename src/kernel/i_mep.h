@@ -32,15 +32,19 @@ namespace vita
 class i_mep : public individual<i_mep>
 {
 public:
-  i_mep() : individual(), genome_(), best_(locus::npos()) {}
+  i_mep() : individual(), genome_(), best_(locus::npos()),
+            active_crossover_type_() {}
 
   explicit i_mep(const environment &);
   explicit i_mep(const std::vector<gene> &);
 
-  // Recombination operators
+  // ---- Recombination operators ----
+  enum crossover_t {one_point, two_points, tree, uniform, NUM_CROSSOVERS};
+
+  friend i_mep crossover(const i_mep &, const i_mep &);
   unsigned mutation(double, const environment &);
 
-  // Working with blocks / genome
+  // ---- Working with blocks / genome ----
   std::vector<locus> blocks() const;
   i_mep destroy_block(index_t, const symbol_set &) const;
   i_mep get_block(const locus &) const;
@@ -69,7 +73,7 @@ public:
 
   bool debug() const;
 
-  // Iterators.
+  // ---- Iterators ----
   template<bool> class basic_iterator;
   using const_iterator = basic_iterator<true>;
   using iterator = basic_iterator<false>;
@@ -81,12 +85,11 @@ public:
   iterator end();
 
   template<bool> friend class basic_iterator;
-  friend i_mep crossover(const i_mep &, const i_mep &);
   friend class individual<i_mep>;
   friend class interpreter<i_mep>;
 
 private:
-  // *** Private support methods ***
+  // ---- Private support methods ----
   hash_t hash() const;
   void pack(const locus &, std::vector<unsigned char> *const) const;
 
@@ -94,7 +97,7 @@ private:
   bool load_impl(std::istream &, const environment &);
   bool save_impl(std::ostream &) const;
 
-  // *** Private data members ***
+  // ---- Private data members ----
 
   // This is the genome: the entire collection of genes (the entirety of an
   // organism's hereditary information).
@@ -103,9 +106,12 @@ private:
   // Starting point of the active code in this individual (the best sequence
   // of genes starts here).
   locus best_;
+
+  // Crossover operator used to create this individual. Initially this is set
+  // to a random type.
+  crossover_t active_crossover_type_;
 };  // class i_mep
 
-i_mep crossover(const i_mep &, const i_mep &);
 unsigned distance(const i_mep &, const i_mep &);
 
 ///
@@ -199,7 +205,7 @@ template<> struct has_introns<i_mep> : std::true_type {};
 /// Creates a random individual and shows its content.
 ///
 /// \example example3.cc
-/// Performs three types of crossover between two random individuals.
+/// Performs various types of crossover between random individuals.
 ///
 }  // namespace vita
 
