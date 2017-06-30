@@ -23,14 +23,10 @@
 
 namespace vita
 {
-#if defined(USE_BOOST_ANY)
-
-using boost::any_cast<T>;
-
-#else
 
 namespace detail
-{ namespace any_
+{
+namespace any_
 {
 struct empty;
 struct fxn_ptr_table;
@@ -127,7 +123,6 @@ private:
 
   void *object = nullptr;
 };  // class any
-#endif  // !USE_BOOST_ANY guard
 
 template<class T> T to(const any &);
 

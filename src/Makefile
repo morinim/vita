@@ -8,8 +8,6 @@ TYPE := release
 #
 # -DMUTUAL_IMPROVEMENT
 #
-# -DUSE_BOOST_ANY
-#
 # -DVITA_CONCEPTS_THROW
 DEFS :=
 

@@ -17,8 +17,8 @@
 #if !defined(VITA_ANY_TCC)
 #define      VITA_ANY_TCC
 
-#if !defined(USE_BOOST_ANY)
-namespace detail { namespace any_ {
+namespace detail {
+namespace any_ {
 
 struct empty {};
 
@@ -394,6 +394,5 @@ const T &any_cast(const any &operand)
 
   return any_cast<const nonref &>(const_cast<any &>(operand));
 }
-#endif  // !USE_BOOST_ANY guard
 
 #endif  // include guard
