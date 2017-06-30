@@ -819,9 +819,18 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
     break;
 
   case i_mep::crossover_t::uniform:
-    for (auto i(from.begin()); i != from.end(); ++i)
-      if (random::boolean())
-        to.genome_(i.locus()) = *i;
+    {
+    const auto i_sup(from.size());
+    const auto c_sup(from.categories());
+
+    for (index_t i(0); i != i_sup; ++i)
+      for (category_t c(0); c < c_sup; ++c)
+        if (random::boolean())
+        {
+          const locus l{i, c};
+          to.genome_(l) = from[l];
+        }
+    }
     break;
 
   default:  // Tree crossover
