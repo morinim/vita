@@ -77,7 +77,7 @@ i_mep::i_mep(const std::vector<gene> &gv)
   index_t i(0);
 
   for (const auto &g : gv)
-    genome_({i++, g.sym->category()}) = g;
+    genome_(i++, g.sym->category()) = g;
 
   Ensures(debug());
 }
@@ -227,7 +227,7 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
   i_mep ret(*this);
   const category_t c_sup(categories());
   for (category_t c(0); c < c_sup; ++c)
-    ret.genome_({index, c}) = gene(sset.roulette_terminal(c));
+    ret.genome_(index, c) = gene(sset.roulette_terminal(c));
 
   ret.signature_.clear();
 
@@ -773,6 +773,8 @@ i_mep i_mep::compress() const
 /// doesn't rise the individual's fitness but only its performance over time.
 ///
 /// \see "Adapting Crossover in Evolutionary Algorithms" - William M. Spears.
+///
+/// \relates i_mep
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
