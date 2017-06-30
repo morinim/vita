@@ -112,30 +112,32 @@ BOOST_AUTO_TEST_CASE(t_comparison)
 
 BOOST_AUTO_TEST_CASE(t_crossover)
 {
+  using namespace vita;
+
   env.code_length = 100;
 
-  vita::i_mep i1(env), i2(env);
+  i_mep i1(env), i2(env);
 
   const unsigned n(2000);
-  double dist(0.0);
   for (unsigned j(0); j < n; ++j)
   {
-    if (vita::random::boolean())
+    if (random::boolean())
       i1.inc_age();
-    if (vita::random::boolean())
+    if (random::boolean())
       i2.inc_age();
 
     const auto ic(crossover(i1, i2));
     BOOST_TEST(ic.debug());
     BOOST_TEST(ic.age() == std::max(i1.age(), i2.age()));
 
-    dist += distance(i1, ic);
-  }
+    for (index_t i(0); i != ic.size(); ++i)
+      for (category_t c(0); c < ic.categories(); ++c)
+      {
+        const locus l{i, c};
 
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset->categories() * n));
-  BOOST_TEST(perc > 45.0);
-  BOOST_TEST(perc < 52.0);
+        BOOST_TEST((ic[l] == i1[l] || ic[l] == i2[l]));
+      }
+  }
 }
 
 BOOST_AUTO_TEST_CASE(t_serialization)

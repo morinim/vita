@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
   vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env.individuals = 100;
+  prob.env.individuals = 120;
   prob.env.threshold.fitness = {0,0};
   prob.env.sset->insert(vita::ga::parameter<>(0, 0.0, 6.0));
   prob.env.sset->insert(vita::ga::parameter<>(1, 0.0, 6.0));

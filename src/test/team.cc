@@ -25,7 +25,7 @@ using namespace boost;
 #include "factory_fixture1.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(team, F_FACTORY1)
+BOOST_FIXTURE_TEST_SUITE(t_team, F_FACTORY1)
 
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
@@ -115,25 +115,27 @@ BOOST_AUTO_TEST_CASE(Iterators)
 
 BOOST_AUTO_TEST_CASE(t_crossover)
 {
+  using namespace vita;
+
   env.code_length = 100;
 
-  vita::team<vita::i_mep> t1(env), t2(env);
+  team<vita::i_mep> t1(env), t2(env);
 
   const unsigned n(2000);
-  double dist(0.0);
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(crossover(t1, t2));
     BOOST_TEST(tc.debug());
 
-    dist += distance(t1, tc);
-  }
+    for (unsigned x(0); x < tc.individuals(); ++x)
+      for (index_t i(0); i != tc[x].size(); ++i)
+        for (category_t c(0); c < tc[x].categories(); ++c)
+        {
+          const locus l{i, c};
 
-  const double perc(100.0 * dist /
-                    (env.code_length * env.sset->categories() * n *
-                     t1.individuals()));
-  BOOST_TEST(perc > 45.0);
-  BOOST_TEST(perc < 52.0);
+          BOOST_TEST((tc[x][l] == t1[x][l] || tc[x][l] == t2[x][l]));
+        }
+  }
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
