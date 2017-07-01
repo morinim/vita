@@ -72,7 +72,10 @@ namespace out
 enum print_format_t {list_f,  // this is the default
                      dump_f, graphviz_f, in_line_f, tree_f,
                      language_f,
-                     c_language_f = language_f + symbol::c_format};
+                     c_language_f = language_f + symbol::c_format,
+                     cpp_language_f = language_f + symbol::cpp_format,
+                     mql_language_f = language_f + symbol::mql_format,
+                     python_language_f = language_f + symbol::python_format};
 
 bool long_form_flag(std::ostream &);
 print_format_t print_format_flag(std::ostream &);
