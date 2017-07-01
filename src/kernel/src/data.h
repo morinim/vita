@@ -23,19 +23,17 @@
 
 namespace vita
 {
-/// \brief The type used as class id in classification tasks.
+/// The type used as class id in classification tasks.
 using class_t = unsigned;
 
 ///
-/// \brief Implementation of vita::data for symbolic regression and
-///        classification tasks.
+/// Implementation of vita::data for symbolic regression and classification
+/// tasks.
 ///
-/// src_data is a collection of "monomorphic" examples (all samples have the
-/// same type and arity) that is forward iterable.
+/// src_data is a forward iterable collection of "monomorphic" examples (all
+/// samples have the same type and arity).
 ///
-/// It can read xrff (http://weka.wikispaces.com/XRFF) and CSV
-/// (https://developers.google.com/prediction/docs/developer-guide?hl=it)
-/// files.
+/// It can read XRFF (http://weka.wikispaces.com/XRFF) and CSV files.
 ///
 class src_data : public data
 {
@@ -102,7 +100,7 @@ public:
 
   static domain_t from_weka(const std::string &);
 
-private: // Private support methods
+private:
   example to_example(const std::vector<std::string> &, bool, bool);
 
   class_t encode(const std::string &);
@@ -112,7 +110,7 @@ private: // Private support methods
 
   void swap_category(category_t, category_t);
 
-private:  // Private data members
+private:
   // Integer are simpler to manage than textual data, so, when appropriate,
   // input strings are converted into integers by these maps (and the `encode`
   // static function).
@@ -143,7 +141,7 @@ private:  // Private data members
 };
 
 ///
-/// \brief Stores a single element of the dataset.
+/// Stores a single element of the dataset.
 ///
 /// The `struct` consists of an input vector (`input`) and an answer value
 /// (`output`). Depending on the kind of problem, `output` stores:
@@ -187,7 +185,7 @@ T src_data::example::cast_output() const
 }
 
 ///
-/// \brief Informations about a "column" (feature) of the dataset
+/// Informations about a "column" (feature) of the dataset.
 ///
 struct src_data::column
 {

@@ -28,12 +28,12 @@ namespace vita
 namespace
 {
 ///
-/// \param[in] s the string to be converted.
+/// \param[in] s the string to be converted
 /// \param[in] d what type should `s` be converted in?
-/// \return the converted data or an empty `any` if no conversion can be
-///         applied.
+/// \return      the converted data or an empty `any` if no conversion can be
+///              applied
 ///
-///     convert("123.1", sym_double) == any(123.1f)
+/// `convert("123.1", sym_double) == any(123.1f)`
 ///
 any convert(const std::string &s, domain_t d)
 {
@@ -48,8 +48,8 @@ any convert(const std::string &s, domain_t d)
 }
 
 ///
-/// \param[in] s the string to be tested.
-/// \return `true` if `s` contains a number.
+/// \param[in] s the string to be tested
+/// \return      `true` if `s` contains a number
 ///
 bool is_number(const std::string &s)
 {
@@ -76,11 +76,10 @@ src_data::src_data() : data(training), classes_map_(), header_(),
 }
 
 ///
-/// \param[in] filename name of the file containing the learning collection.
-/// \param[in] ft a filter and transform function.
+/// New data instance containing the learning collection from `filename`.
 ///
-/// \brief New data instance containing the learning collection from
-///        `filename`.
+/// \param[in] filename name of the file containing the learning collection
+/// \param[in] ft       a filter and transform function
 ///
 src_data::src_data(const std::string &filename, filter_hook_t ft) : data()
 {
@@ -92,7 +91,7 @@ src_data::src_data(const std::string &filename, filter_hook_t ft) : data()
 }
 
 ///
-/// \brief Resets the object.
+/// Resets the object.
 ///
 void src_data::clear()
 {
@@ -100,7 +99,7 @@ void src_data::clear()
 }
 
 ///
-/// \return reference to the first element of the active dataset.
+/// \return reference to the first element of the active dataset
 ///
 src_data::iterator src_data::begin()
 {
@@ -108,7 +107,7 @@ src_data::iterator src_data::begin()
 }
 
 ///
-/// \return a constant reference to the first element of the active dataset.
+/// \return a constant reference to the first element of the active dataset
 ///
 src_data::const_iterator src_data::begin() const
 {
@@ -116,8 +115,8 @@ src_data::const_iterator src_data::begin() const
 }
 
 ///
-/// \param[in] d a dataset (training / validation / test set).
-/// \return reference to the first element of dataset `d`.
+/// \param[in] d a dataset (training / validation / test set)
+/// \return      reference to the first element of dataset `d`
 ///
 src_data::iterator src_data::begin(dataset_t d)
 {
@@ -126,8 +125,8 @@ src_data::iterator src_data::begin(dataset_t d)
 }
 
 ///
-/// \param[in] d a dataset (training / validation / test set).
-/// \return a constant reference to the first element dataset `d`.
+/// \param[in] d a dataset (training / validation / test set)
+/// \return      a constant reference to the first element dataset `d`
 ///
 src_data::const_iterator src_data::begin(dataset_t d) const
 {
@@ -136,7 +135,7 @@ src_data::const_iterator src_data::begin(dataset_t d) const
 }
 
 ///
-/// \return a reference to the sentinel element of the active dataset.
+/// \return a reference to the sentinel element of the active dataset
 ///
 src_data::iterator src_data::end()
 {
@@ -144,7 +143,7 @@ src_data::iterator src_data::end()
 }
 
 ///
-/// \return a constant reference to the sentinel element of the active dataset.
+/// \return a constant reference to the sentinel element of the active dataset
 ///
 src_data::const_iterator src_data::end() const
 {
@@ -152,8 +151,8 @@ src_data::const_iterator src_data::end() const
 }
 
 ///
-/// \param[in] d a dataset (training / validation / test set).
-/// \return a reference to the sentinel element of dataset `d`
+/// \param[in] d a dataset (training / validation / test set)
+/// \return      a reference to the sentinel element of dataset `d`
 ///
 src_data::iterator src_data::end(dataset_t d)
 {
@@ -162,8 +161,8 @@ src_data::iterator src_data::end(dataset_t d)
 }
 
 ///
-/// \param[in] d a dataset (training / validation / test set).
-/// \return a constant reference to the sentinel element of dataset `d`.
+/// \param[in] d a dataset (training / validation / test set)
+/// \return      a constant reference to the sentinel element of dataset `d`
 ///
 src_data::const_iterator src_data::end(dataset_t d) const
 {
@@ -172,8 +171,8 @@ src_data::const_iterator src_data::end(dataset_t d) const
 }
 
 ///
-/// \param[in] d a dataset (training / validation / test set).
-/// \return the size of the dataset `d`.
+/// \param[in] d a dataset (training / validation / test set)
+/// \return      the size of the dataset `d`
 ///
 std::size_t src_data::size(dataset_t d) const
 {
@@ -181,13 +180,17 @@ std::size_t src_data::size(dataset_t d) const
 }
 
 ///
-/// \return the size of the active dataset.
+/// \return the size of the active dataset
 ///
 std::size_t src_data::size() const
 {
   return size(active_dataset());
 }
 
+///
+/// \param[in] d a dataset type
+/// \return      `true` if a dataset of type `d` is available
+///
 bool src_data::has(dataset_t d) const
 {
   return size(d);
@@ -195,7 +198,7 @@ bool src_data::has(dataset_t d) const
 
 ///
 /// \return a const reference to the set of categories associated with the
-///         dataset.
+///         dataset
 ///
 const category_set &src_data::categories() const
 {
@@ -203,8 +206,8 @@ const category_set &src_data::categories() const
 }
 
 ///
-/// \param[in] i index of a column.
-/// \return a const reference to the i-th column of the dataset.
+/// \param[in] i index of a column
+/// \return      a const reference to the `i`-th column of the dataset
 ///
 const src_data::column &src_data::get_column(unsigned i) const
 {
@@ -244,7 +247,7 @@ void src_data::move_append(dataset_t src, dataset_t dst, std::size_t n)
 }
 
 ///
-/// \return number of columns of the dataset.
+/// \return number of columns of the dataset
 ///
 /// \note
 /// data class supports just one output for every instance, so, if
@@ -259,8 +262,8 @@ unsigned src_data::columns() const
 }
 
 ///
-/// \return number of classes of the problem (== 0 for a symbolic regression
-///         problem, > 1 for a classification problem).
+/// \return number of classes of the problem (`== 0` for a symbolic regression
+///         problem, `> 1` for a classification problem)
 ///
 class_t src_data::classes() const
 {
@@ -268,7 +271,7 @@ class_t src_data::classes() const
 }
 
 ///
-/// \return input vector dimension.
+/// \return input vector dimension
 ///
 /// \note data class supports just one output for every instance, so, if
 /// the dataset is not empty, `variables() + 1 == columns()`.
@@ -283,7 +286,7 @@ unsigned src_data::variables() const
 }
 
 ///
-/// \brief Appends the given element to the end of the active dataset
+/// Appends the given element to the end of the active dataset.
 ///
 /// \param[in] e the value of the element to append
 ///
@@ -293,8 +296,8 @@ void src_data::push_back(const example &e)
 }
 
 ///
-/// \param[in] label name of a class of the learning collection.
-/// \return the (numerical) tag associated with class `label`.
+/// \param[in] label name of a class of the learning collection
+/// \return          the (numerical) tag associated with class `label`
 ///
 class_t src_data::encode(const std::string &label)
 {
@@ -308,9 +311,9 @@ class_t src_data::encode(const std::string &label)
 }
 
 ///
-/// \param[in] i the encoded (src_data::encode()) value of a class.
-/// \return the name of the class encoded with the `unsigned i` (or an
-///         empty string if such class cannot be find).
+/// \param[in] i the encoded (src_data::encode()) value of a class
+/// \return      the name of the class encoded with the `unsigned i` (or an
+///              empty string if such class cannot be find)
 ///
 /// \note
 /// Boost Bitmap could be used to speed up the search in `classes_map_`, but
@@ -326,18 +329,18 @@ std::string src_data::class_name(class_t i) const
 }
 
 ///
-/// \param[in] c1 a category.
-/// \param[in] c2 a category.
-///
 /// Swap categories `c1` and `c2`, updating the `header_` and `categories_`
 /// vector.
+///
+/// \param[in] c1 a category
+/// \param[in] c2 a category
 ///
 void src_data::swap_category(category_t c1, category_t c2)
 {
   const auto n_col(columns());
 
-  assert(c1 < n_col);
-  assert(c2 < n_col);
+  Expects(c1 < n_col);
+  Expects(c2 < n_col);
 
   categories_.swap(c1, c2);
 
@@ -349,11 +352,12 @@ void src_data::swap_category(category_t c1, category_t c2)
 }
 
 ///
-/// \param[in] v a record containing the example (all fields, i.e. feature, are
-///              `std::string`.
+/// \param[in] v              a record containing the example (features encoded
+///                           as `std::string`)
 /// \param[in] classification is this a classification task?
-/// \param[in] add_label should we automatically add labels for text-features?
-/// \return `v` converted to `example` type.
+/// \param[in] add_label      should we automatically add labels for
+///                           text-features?
+/// \return                   `v` converted to `example` type
 ///
 /// \remark
 /// When `add_label` is `true` the function can have side-effects (changing
@@ -399,12 +403,12 @@ src_data::example src_data::to_example(const std::vector<std::string> &v,
 }
 
 ///
-/// \brief Loads the content of `filename` into the active dataset
-/// \param[in] filename the xrff file.
-/// \param[in] ft a filter and transform function.
-/// \return number of lines parsed (0 in case of errors).
+/// Loads a XRFF file into the active dataset.
 ///
-/// \note
+/// \param[in] filename the xrff file
+/// \param[in] ft       a filter and transform function
+/// \return             number of lines parsed (0 in case of errors)
+///
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
 /// of instances sharing a set of attributes.
 /// The original format is defined in http://weka.wikispaces.com/XRFF, we
@@ -556,12 +560,13 @@ std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
 }
 
 ///
-/// \param[in] filename the csv file.
-/// \param[in] ft a filter and transform function.
-/// \return number of lines parsed (0 in case of errors).
+/// Loads a CSV file into the active dataset.
 ///
-/// We follow the Google Prediction API convention
-/// (https://developers.google.com/prediction/docs/developer-guide?hl=it#data-format):
+/// \param[in] filename the csv file
+/// \param[in] ft       a filter and transform function
+/// \return             number of lines parsed (0 in case of errors)
+///
+/// General conventions:
 /// * NO HEADER ROW is allowed;
 /// * only one example is allowed per line. A single example cannot contain
 ///   newlines and cannot span multiple lines.
@@ -659,30 +664,26 @@ std::size_t src_data::load_csv(const std::string &filename, filter_hook_t ft)
 }
 
 ///
-/// \param[in] f name of the file containing the data set.
-/// \param[in] ft a filter and transform function.
-/// \return number of lines parsed (0 in case of errors).
+/// Loads the content of a file into the active dataset.
 ///
-/// Loads the content of `f` into the active dataset.
+/// \param[in] f  name of the file containing the data set
+/// \param[in] ft a filter and transform function
+/// \return       number of lines parsed (0 in case of errors)
 ///
 /// \warning
 /// * Training/valutation set must be loaded before test set.
-/// * Before changing problem the data object should be clear.
+/// * Before changing problem the `data` object should be clear. So:
+///       dataset(training);
+///       load("training.csv");
+///       dataset(test);
+///       load("test.csv");
+///       ...
+///       clear();
+///       dataset(training);
+///       load("training2.csv");
+///       ...
 ///
-/// So:
-///
-///     dataset(training);
-///     load("training.csv");
-///     dataset(test);
-///     load("test.csv");
-///     ...
-///     clear();
-///     dataset(training);
-///     load("training2.csv");
-///     ...
-///
-/// \note
-/// Test set can have an empty output value.
+/// \note Test set can have an empty output value.
 ///
 std::size_t src_data::load(const std::string &f, filter_hook_t ft)
 {
@@ -699,7 +700,7 @@ std::size_t src_data::load(const std::string &f, filter_hook_t ft)
 }
 
 ///
-/// \return `true` if the current dataset is empty.
+/// \return `true` if the current dataset is empty
 ///
 bool src_data::operator!() const
 {
@@ -707,7 +708,7 @@ bool src_data::operator!() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool src_data::debug() const
 {
@@ -736,9 +737,9 @@ bool src_data::debug() const
 }
 
 ///
-/// \param[in] n the name of a weka domain.
-/// \return the internel id of the weka-domain `n` (`d_void` if it's
-///         unknown or not managed).
+/// \param[in] n the name of a weka domain
+/// \return      the internel id of the weka-domain `n` (`d_void` if it's
+///              unknown or not managed)
 ///
 domain_t src_data::from_weka(const std::string &n)
 {
