@@ -30,6 +30,16 @@ public:
   { Expects(c.size() == 1); }
 
   any eval(core_interpreter *) const final { return any(false); }
+
+  std::string display(terminal::param_t, format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "false";
+    case python_format:  return "False";
+    default:             return     "0";
+    }
+  }
 };
 
 class one : public terminal
@@ -39,6 +49,16 @@ public:
   { Expects(c.size() == 1); }
 
   any eval(core_interpreter *) const final { return any(true); }
+
+  std::string display(terminal::param_t, format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "true";
+    case python_format:  return "True";
+    default:             return    "1";
+    }
+  }
 };
 
 class l_and : public function
@@ -55,6 +75,15 @@ public:
     return any(any_cast<bool>(i.fetch_arg(0)) &&
                any_cast<bool>(i.fetch_arg(1)));
   }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:  return "(%%1%%) and (%%2%%)";
+    default:             return  "(%%1%%) && (%%2%%)";
+    }
+  }
 };
 
 class l_not : public function
@@ -67,6 +96,15 @@ public:
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
     return any(!any_cast<bool>(i.fetch_arg(0)));
+  }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:  return "not(%%1%%)";
+    default:             return   "!(%%1%%)";
+    }
   }
 };
 
@@ -83,6 +121,15 @@ public:
     auto i(static_cast<interpreter<i_mep> *>(ci));
     return any(any_cast<bool>(i->fetch_arg(0)) ||
                any_cast<bool>(i->fetch_arg(1)));
+  }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case python_format:  return "(%%1%%) or (%%2%%)";
+    default:             return "(%%1%%) || (%%2%%)";
+    }
   }
 };
 
