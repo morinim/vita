@@ -15,13 +15,16 @@
 namespace vita
 {
 ///
-/// \param[in] ss a pointer to the symbol set used in the current environment.
+/// Class constructor.
+///
+/// \param[in] ss         a pointer to the symbol set used in the current
+///                       environment
 /// \param[in] initialize if `true` initializes every parameter in such a
 ///                       way as to allow the object to pass
-///                       `environment::debug(..., true)`.
+///                       `environment::debug(true)`
 ///
-/// Class constructor. Default values are quite standard, but specific
-/// problems need ad-hoc tuning.
+/// Default values are quite standard, but specific problems need ad-hoc
+/// tuning.
 ///
 /// \see search::tune_parameters
 ///
@@ -52,8 +55,9 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
 }
 
 ///
-/// \brief Saves the environment in XML format.
-/// \param[out] d output document for saving the environment.
+/// Saves the environment in XML format.
+///
+/// \param[out] d output document for saving the environment
 ///
 void environment::xml(tinyxml2::XMLDocument *d) const
 {
@@ -101,10 +105,10 @@ void environment::xml(tinyxml2::XMLDocument *d) const
 }
 
 ///
-/// \param force_defined all the optional parameter have to be in a
-///                      'well defined' state for the function to pass
-///                      the test.
-/// \return `true` if the object passes the internal consistency check.
+/// \param[in] force_defined all the optional parameter have to be in a
+///                          'well defined' state for the function to pass
+///                          the test
+/// \return `true` if the object passes the internal consistency check
 ///
 bool environment::debug(bool force_defined) const
 {

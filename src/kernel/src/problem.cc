@@ -85,7 +85,7 @@ src_problem::src_problem(const char ds[])
 }
 
 ///
-/// Initialize the problem with data from the input files.
+/// Initializes the problem with data from the input files.
 ///
 /// \param[in] ds name of the dataset file (training/validation set)
 /// \param[in] ts name of the test set
@@ -108,7 +108,7 @@ bool src_problem::operator!() const
 }
 
 ///
-/// Loads `data` into the active dataset.
+/// Loads data from file.
 ///
 /// \param[in] ds      filename of the dataset file (training/validation set)
 /// \param[in] ts      filename of the test set

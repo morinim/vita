@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,15 +26,19 @@
 namespace vita
 {
 ///
-/// A context object (as defined in the Context Object Pattern) aggregating
+/// Context object aggregating multiple related parameters into one structure.
+///
+/// A context object (as defined in the Context Object Pattern) aggregates
 /// multiple related parameters into one structure, so there needs to be only
 /// one common parameter passed amongst functions and classes.
+///
 /// Included values are used as parameters for object initializations and
 /// runtime execution control.
 ///
 class environment
 {
-public:  // Constructor and support functions
+public:
+  // Constructor and support functions
   explicit environment(symbol_set *, bool = false);
 
   void xml(tinyxml2::XMLDocument *) const;
@@ -45,9 +49,9 @@ public:  // Constructor and support functions
 
   bool debug(bool) const;
 
-public:  // Data members
   /// The number of genes (maximum length of an evolved program in the
   /// population).
+  ///
   /// Code length have to be chosen before population is created and cannot be
   /// changed afterwards.
   ///
@@ -56,16 +60,17 @@ public:  // Data members
 
   /// The number of symbols in the patch section (a section of the genome that
   /// contains terminals only).
+  ///
   /// \note A length of 0 means undefined (auto-tune).
   unsigned patch_length = 0;
 
   /// Number of layers for the population.
+  ///
   /// \warning
   /// When the evolution strategy is vita::basic_std_es, setting `layers > 1`
   /// is like running `n` evolutions "in parallel" (the sub-populations of each
-  /// layer don't interact).
-  /// A value greater than one is usually choosen for vita::basic_alps_es or
-  /// with other strategies that allow migrants.
+  /// layer don't interact). A value greater than one is usually choosen for
+  /// vita::basic_alps_es or with other strategies that allow migrants.
   ///
   /// \note A value of 0 means undefined (auto-tune).
   unsigned layers = 0;
@@ -76,6 +81,7 @@ public:  // Data members
   unsigned individuals = 0;
 
   /// Minimum number of individuals in a layer of the population.
+  ///
   /// Some evolution strategies dynamically change the number of individuals of
   /// the population. This parameter avoid to drop below a predefined limit
   ///
@@ -87,17 +93,16 @@ public:  // Data members
   /// converge quicker but losing diversity.
   trilean elitism = trilean::unknown;
 
-  /// \brief Mutation rate probability.
+  /// Mutation rate probability.
   ///
   /// Mutation is one of the principal "search operators" used to transform
   /// programs in the Genetic Programming algorithm. It causes random
   /// changes in individuals.
   ///
   /// \warning
-  ///     p_cross + p_mutation != 1.0
-  /// `p_mutation` is the probability to mutate a gene; it's not the
-  /// probability to choose the mutation operator (which depends depends on the
-  /// recombination algorithm).
+  /// `p_cross + p_mutation != 1.0`: `p_mutation` is the probability to mutate
+  /// a gene; it's not the probability to choose the mutation operator (which
+  /// depends depends on the recombination algorithm).
   ///
   /// \note A negative value means undefined (auto-tune).
   ///
@@ -106,14 +111,14 @@ public:  // Data members
   /// * operation_strategy::run.
   double p_mutation = -1.0;
 
-  /// \brief Crossover probability.
+  /// Crossover probability.
   ///
   /// \note A negative value means means undefined (auto-tune).
   ///
   /// \see operation_strategy::run.
   double p_cross = -1.0;
 
-  /// This parameter controls the brood recombination/selection level (0 to
+  /// This parameter controls the brood recombination/selection level (`0` to
   /// turn it off).
   ///
   /// In nature it's common for organisms to produce many offspring and then
@@ -123,9 +128,11 @@ public:  // Data members
   /// selection, spontaneous abortion. The "bottom line" of this behaviour in
   /// nature is the reduction of parental resource investment in offspring who
   /// are potentially less fit than others.
+  ///
   /// \see
   /// "Greedy recombination and genetic search on the space of computer
   /// programs" (Walter Alden Tackett - 1995).
+  ///
   /// \note
   /// - `0` means undefined (auto-tune);
   //  - `1` is the standard recombination (perform 1 crossover);
@@ -134,6 +141,7 @@ public:  // Data members
   unsigned brood_recombination = 0;
 
   /// Size of the tournament to choose the parents from.
+  ///
   /// Tournament sizes tend to be small relative to the population size. The
   /// ratio of tournament size to population size can be used as a measure of
   /// selective pressure.
@@ -145,6 +153,7 @@ public:  // Data members
   unsigned tournament_size = 0;
 
   /// Switches Dynamic Subset Selection on/off.
+  ///
   /// \see search::dss()
   trilean dss = trilean::unknown;
 
@@ -217,12 +226,12 @@ public:  // Data members
 
   /// Used to identify successfully learned (matched, classified, resolved...)
   /// examples.
+  ///
   /// By default only fitness is considered.
   model_measurements threshold = model_measurements();
 
   ///
-  /// \brief Parameters for the Age-Layered Population Structure (ALPS)
-  ///        paradigm.
+  /// Parameters for the Age-Layered Population Structure (ALPS) paradigm.
   ///
   /// ALPS is a meta heuristic for overcoming premature convergence by
   /// running multiple instances of a search algorithm in parallel, with each
@@ -256,7 +265,7 @@ public:  // Data members
 
   struct de_parameters
   {
-    /// \brief Weighting factor range (aka differential factor range).
+    /// Weighting factor range (aka differential factor range).
     ///
     /// It has been found recently that selecting the weight from the
     /// interval [0.5, 1.0] randomly for each generation or for each
