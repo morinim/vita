@@ -47,6 +47,24 @@ std::string trim(const std::string &s)
 }
 
 ///
+/// Replaces the first occurrence of a string with another string.
+///
+/// \param[in] s    input string
+/// \param[in] from substring to be searched for
+/// \param[in] to   substitute string
+/// \return         the modified input
+///
+std::string replace(std::string s,
+                    const std::string &from, const std::string &to)
+{
+  const auto start_pos(s.find(from));
+  if (start_pos != std::string::npos)
+    s.replace(start_pos, from.length(), to);
+
+  return s;
+}
+
+///
 /// Replaces all occurrences of a string with another string.
 ///
 /// \param[in] s    input string
