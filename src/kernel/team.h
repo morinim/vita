@@ -13,6 +13,8 @@
 #if !defined(VITA_TEAM_H)
 #define      VITA_TEAM_H
 
+#include <algorithm>
+
 #include "kernel/cache.h"
 #include "kernel/individual.h"
 

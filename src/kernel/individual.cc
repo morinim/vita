@@ -65,6 +65,17 @@ std::ostream &c_language(std::ostream &o)
 }
 
 ///
+/// Used to print the content of an individual in MQL-language format.
+///
+/// \remark Sticky manipulator.
+///
+std::ostream &mql_language(std::ostream &o)
+{
+  o.iword(print_format_index) = mql_language_f;
+  return o;
+}
+
+///
 /// Used to print the complete content of an individual.
 ///
 /// \note Mostly used during debugging.
