@@ -323,20 +323,6 @@ operator<<(std::ostream &s, E v)
   return s << as_integer(v);
 }
 
-///
-/// Null-coalescing operator.
-///
-/// \param[in] v1 first operand
-/// \param[in] v2 second operand
-/// \return    the first operand if it isn't `empty`; otherwise it returns the
-///            second operand
-///
-template<class T>
-const T &coalesce(const T &v1, const T &v2)
-{
-  return v1.empty() ? v2 : v1;
-}
-
 }  // namespace vita
 
 #endif  // include guard

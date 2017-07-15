@@ -173,8 +173,9 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
   for (auto i(decltype(columns){1}); i < columns; ++i)
     if (skip.find(i) == skip.end())
     {
-      const std::string name(coalesce(dat_.get_column(i).name,
-                                      "X" + std::to_string(i)));
+      const auto provided_name(dat_.get_column(i).name);
+      const auto name(provided_name.empty() ? "X" + std::to_string(i)
+                                            : provided_name);
       const category_t category(dat_.get_column(i).category_id);
       env.sset->insert(std::make_unique<variable>(name, i - 1, category));
     }
