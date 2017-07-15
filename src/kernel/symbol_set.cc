@@ -21,7 +21,7 @@ namespace vita
 ///
 /// Sets up the object.
 ///
-/// The constructor allocates memory for up to `k_args` argument.
+/// The constructor allocates memory for up to `k_args` arguments.
 ///
 symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), weights_(),
                            views_()
@@ -41,8 +41,8 @@ void symbol_set::clear()
 }
 
 ///
-/// \param[in] n index of an argument symbol.
-/// \return a reference to the n-th `argument` symbol.
+/// \param[in] n index of an argument symbol
+/// \return      a reference to the `n`-th `argument` symbol
 ///
 const symbol &symbol_set::arg(std::size_t n) const
 {
@@ -51,8 +51,8 @@ const symbol &symbol_set::arg(std::size_t n) const
 }
 
 ///
-/// \param[in] i index of an ADT symbol.
-/// \return a reference to the i-th ADT symbol.
+/// \param[in] i index of an ADT symbol
+/// \return      a reference to the `i`-th ADT symbol
 ///
 const symbol &symbol_set::get_adt(std::size_t i) const
 {
@@ -61,7 +61,7 @@ const symbol &symbol_set::get_adt(std::size_t i) const
 }
 
 ///
-/// \return the number of ADT functions stored.
+/// \return the number of ADT functions stored
 ///
 std::size_t symbol_set::adts() const
 {
@@ -71,11 +71,11 @@ std::size_t symbol_set::adts() const
 ///
 /// Adds a new symbol to the set.
 ///
-/// \param[in] s symbol to be added.
-/// \param[in] wr the weight of `s` (1.0 means standard frequency, 2.0 double
-///               probability of selection).
-/// \return a raw pointer to the symbol just added (or `nullptr` in case of
-///         error).
+/// \param[in] s  symbol to be added
+/// \param[in] wr the weight of `s` (`1.0` means standard frequency, `2.0`
+///               double probability of selection)
+/// \return       a raw pointer to the symbol just added (or `nullptr` in case
+///               of error).
 ///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
@@ -97,7 +97,7 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 }
 
 ///
-/// \brief Compiles the `views_` array.
+/// Compiles the `views_` array.
 ///
 void symbol_set::build_view()
 {
@@ -167,8 +167,8 @@ void symbol_set::reset_adf_weights()
 }
 
 ///
-/// \param[in] c a category.
-/// \return a random terminal of category `c`.
+/// \param[in] c a category
+/// \return      a random terminal of category `c`
 ///
 const terminal &symbol_set::roulette_terminal(category_t c) const
 {
@@ -178,8 +178,8 @@ const terminal &symbol_set::roulette_terminal(category_t c) const
 }
 
 ///
-/// \param[in] c a category.
-/// \return a random symbol of category `c`.
+/// \param[in] c a category
+/// \return      a random symbol of category `c`
 ///
 const symbol &symbol_set::roulette(category_t c) const
 {
@@ -189,7 +189,7 @@ const symbol &symbol_set::roulette(category_t c) const
 }
 
 ///
-/// \return a random symbol from the set of all symbols.
+/// \return a random symbol from the set of all symbols
 ///
 const symbol &symbol_set::roulette() const
 {
@@ -197,9 +197,9 @@ const symbol &symbol_set::roulette() const
 }
 
 ///
-/// \param[in] opcode numerical code used as primary key for a symbol.
-/// \return a pointer to the vita::symbol identified by `opcode`
-///         (`nullptr` if not found).
+/// \param[in] opcode numerical code used as primary key for a symbol
+/// \return           a pointer to the vita::symbol identified by `opcode`
+///                   (`nullptr` if not found).
 ///
 symbol *symbol_set::decode(opcode_t opcode) const
 {
@@ -211,17 +211,18 @@ symbol *symbol_set::decode(opcode_t opcode) const
 }
 
 ///
-/// \param[in] dex the name of a symbol.
-/// \return a pointer to the symbol identified by `dex` (0 if not found).
+/// \param[in] dex the name of a symbol
+/// \return        a pointer to the symbol identified by `dex` (0 if not found)
 ///
-/// \attention Please note that opcodes (automatically assigned) are primary
-/// keys for symbols. Conversely the name of a symbol is chosen by the
-/// user, so, if you don't pay attention, different symbols may have the same
-/// name.
+/// \attention
+/// Please note that opcodes are automatically generated and fully identify
+/// a symbol (they're primary keys). Conversely the name of a symbol is chosen
+/// by the user, so, if you don't pay attention, different symbols may have the
+/// same name.
 ///
 symbol *symbol_set::decode(const std::string &dex) const
 {
-  assert(dex != "");
+  Expects(!dex.empty());
 
   for (auto s : views_.back().all)
     if (s.sym->name() == dex)
@@ -231,9 +232,9 @@ symbol *symbol_set::decode(const std::string &dex) const
 }
 
 ///
-/// \return number of categories in the symbol set (>= 1).
+/// \return number of categories in the symbol set (`>= 1`)
 ///
-/// See also category_set::size().
+/// \see category_set::size().
 ///
 category_t symbol_set::categories() const
 {
@@ -244,8 +245,8 @@ category_t symbol_set::categories() const
 }
 
 ///
-/// \param[in] c a category.
-/// \return number of terminals in category `c`.
+/// \param[in] c a category
+/// \return      number of terminals in category `c`
 ///
 unsigned symbol_set::terminals(category_t c) const
 {
@@ -254,10 +255,10 @@ unsigned symbol_set::terminals(category_t c) const
 }
 
 ///
-/// \return `true` if there are enough terminals for secure individual
-///         generation.
-///
 /// We want at least one terminal for every used category.
+///
+/// \return `true` if there are enough terminals for secure individual
+///         generation
 ///
 bool symbol_set::enough_terminals() const
 {
@@ -282,7 +283,7 @@ bool symbol_set::enough_terminals() const
 
 ///
 /// \param[in] s a symbol
-/// \return the weight of `s`.
+/// \return      the weight of `s`
 ///
 unsigned symbol_set::weight(const symbol &s) const
 {
@@ -294,11 +295,13 @@ unsigned symbol_set::weight(const symbol &s) const
 }
 
 ///
-/// \param[out] o output stream.
-/// \param[in] ss symbol set to be printed.
-/// \return output stream including `ss`.
+/// Prints the symbol set to an output stream.
 ///
-/// Useful for debugging purpose.
+/// \param[out] o output stream
+/// \param[in] ss symbol set to be printed
+/// \return       output stream including `ss`
+///
+/// \note Useful for debugging purpose.
 ///
 std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 {
@@ -329,7 +332,7 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool symbol_set::debug() const
 {
@@ -349,7 +352,7 @@ bool symbol_set::debug() const
 ///
 /// New empty collection.
 //
-/// \param[in] n name of the collection.
+/// \param[in] n name of the collection
 ///
 symbol_set::collection::collection(std::string n)
   : all("all"), terminals("terminals"), adf("adf"), adt("adt"),
@@ -358,7 +361,7 @@ symbol_set::collection::collection(std::string n)
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool symbol_set::collection::debug() const
 {
@@ -439,6 +442,8 @@ bool symbol_set::collection::debug() const
 ///
 /// Inserts a weighted symbol in the container.
 ///
+/// \param[in] ws a weighted symbol
+///
 /// We manage to sort the symbols in descending order, with respect to the
 /// weight, so the selection algorithm would run faster.
 ///
@@ -452,7 +457,9 @@ void symbol_set::collection::sum_container::insert(const w_symbol &ws)
 }
 
 ///
-/// \return a random symbol from the container.
+/// Extracts a random symbol from the collection.
+///
+/// \return a random symbol
 ///
 /// Probably the fastest way to produce a realization of a random variable
 /// X in a computer is to create a big table where each outcome `i` is
@@ -511,7 +518,7 @@ const symbol &symbol_set::collection::sum_container::roulette() const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool symbol_set::collection::sum_container::debug() const
 {
