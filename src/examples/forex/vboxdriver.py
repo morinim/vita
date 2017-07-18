@@ -94,10 +94,14 @@ class VBox:
         sn = os.path.join(dest_dir, f)
         dn = os.path.join(dest_dir, f + ".tmp")
 
-        with open(sn, encoding = "utf-16") as source:
-            with open(dn, encoding = "iso-8859-15", mode="w") as target:
+        with open(sn, encoding = "utf-16", errors = "ignore") as source:
+            with open(dn, encoding = "iso-8859-1", mode = "w") as target:
                 for line in source:
-                    target.write(line)
+                    try:
+                        target.write(line)
+                    except (UnicodeEncodeError, UnicodeDecodeError):
+                        # copyfrom sometimes produces spurious bytes
+                        pass
 
         shutil.move(dn, sn)
 
