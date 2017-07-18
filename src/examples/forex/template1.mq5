@@ -21,76 +21,98 @@ input int StopLoss   = 50;
 input int TakeProfit = 50;
 input int EA_Magic = 31415;
 
-input ENUM_TIMEFRAMES medium_tf = PERIOD_H1;
-input ENUM_TIMEFRAMES long_tf   = PERIOD_H4;
+input ENUM_TIMEFRAMES medium_timeframe = PERIOD_H1;
+input ENUM_TIMEFRAMES long_timeframe   = PERIOD_H4;
 
 input double Lot =  0.1;
 
 // Global variables
 MqlTick latest_price;  // TIME, BID, ASK, LAST, VOLUME
-MqlRates rate[];       // TIME, OPEN, HIGH, LOW, CLOSE, TICKET_VOLUME, SPREAD, REAL_VOLUME
-MqlRates rate_m[];
-MqlRates rate_l[];
 
-int STP, TKP;          // normalized Stop Loss & Take Profit values
-
-bool close(ENUM_TIMEFRAMES tf, int bar)
+struct timeframe_rates
 {
-  if (tf == medium_tf)
-    return rate_m[bar].close;
-  if (tf == long_tf)
-    return rate_l[bar].close;
+  MqlRates bar[];  // TIME, OPEN, HIGH, LOW, CLOSE, TICKET_VOLUME, SPREAD,
+                   // REAL_VOLUME
+} rates[3];
 
-  return rate[bar].close;
+int STP, TKP;  // normalized Stop Loss & Take Profit values
+
+double close(unsigned tf, unsigned bar)
+{
+  return rates[tf].bar[bar].close;
 }
 
-bool open(ENUM_TIMEFRAMES tf, int bar)
+double open(unsigned tf, unsigned bar)
 {
-  if (tf == medium_tf)
-    return rate_m[bar].open;
-  if (tf == long_tf)
-    return rate_l[bar].open;
-
-  return rate[bar].open;
+  return rates[tf].bar[bar].open;
 }
 
-bool black_candle(ENUM_TIMEFRAMES tf, int bar)
+double high(unsigned tf, unsigned bar)
+{
+  return rates[tf].bar[bar].high;
+}
+
+double low(unsigned tf, unsigned bar)
+{
+  return rates[tf].bar[bar].low;
+}
+
+bool black_candle(unsigned tf, unsigned bar)
 {
   return close(tf, bar) < open(tf, bar);
 }
 
-bool white_candle(ENUM_TIMEFRAMES tf, int bar)
+bool white_candle(unsigned tf, unsigned bar)
 {
   return close(tf, bar) > open(tf, bar);
 }
 
-bool long_candle(ENUM_TIMEFRAMES tf, int bar)
+bool long_candle(unsigned tf, unsigned bar)
 {
   double real_body = MathAbs(open(tf, bar) - close(tf, bar));
 
   double avg_body = 0.0;
-  for (int i = 1; i <= 5; ++i)
+  for (unsigned i = 1; i <= 5; ++i)
   {
-    double new_bar = MathAbs(open(tf, bar - i) - close(tf, bar - i));
+    double new_bar = MathAbs(open(tf, bar + i) - close(tf, bar + i));
     avg_body += (new_bar - avg_body) / i;
   }
 
   return real_body > 3.0 * avg_body;
 }
 
-bool long_black_candle(ENUM_TIMEFRAMES tf, int bar)
+bool long_black_candle(unsigned tf, unsigned bar)
 {
   return black_candle(tf, bar) && long_candle(tf, bar);
 }
 
-bool long_white_candle(ENUM_TIMEFRAMES tf, int bar)
+bool long_white_candle(unsigned tf, unsigned bar)
 {
   return white_candle(tf, bar) && long_candle(tf, bar);
 }
 
+bool bearish_harami(unsigned tf)
+{
+  return white_candle(tf, 2) && black_candle(tf, 1) &&
+         close(tf, 1) > open(tf, 2) && open(tf, 1) < close(tf, 2);
+}
+
+bool bullish_harami(unsigned tf)
+{
+  return black_candle(tf, 2) && white_candle(tf, 1) &&
+         close(tf, 1) < open(tf, 2) && open(tf, 1) > close(tf, 2);
+}
+
+bool dark_cloud_cover(unsigned tf)
+{
+  return white_candle(tf, 2) && black_candle(tf, 1) &&
+         close(tf, 1) > open(tf, 2) && open(tf, 1) > high(tf, 2);
+}
+
 int OnInit()
 {
-  if (Period() >= medium_tf || medium_tf >= long_tf)
+  if (Period() >= medium_timeframe ||
+      medium_timeframe >= long_timeframe)
     return INIT_PARAMETERS_INCORRECT;
 
   // Let us handle currency pairs with 5 or 3 digit prices instead of 4
@@ -102,15 +124,24 @@ int OnInit()
     TKP = TKP * 10;
   }
 
-  ArraySetAsSeries(rate, true);
-  ArraySetAsSeries(rate_m, true);
-  ArraySetAsSeries(rate_l, true);
+  ArraySetAsSeries(rates[0].bar, true);
+  ArraySetAsSeries(rates[1].bar, true);
+  ArraySetAsSeries(rates[2].bar, true);
 
   return INIT_SUCCEEDED;
 }
 
-void OnDeinit(const int reason)
+void OnDeinit(const int /*reason*/)
 {
+  int h = FileOpen("results.txt", FILE_WRITE|FILE_UNICODE|FILE_TXT|FILE_COMMON);
+
+  if (h != INVALID_HANDLE)
+  {
+    FileWrite(h, TesterStatistics(STAT_PROFIT));
+    FileWrite(h, TesterStatistics(STAT_TRADES));
+    FileWrite(h, TesterStatistics(STAT_BALANCE_DDREL_PERCENT));
+    FileClose(h);
+  }
 }
 
 bool place_order(ENUM_ORDER_TYPE type, MqlTradeResult &mresult)
@@ -118,29 +149,33 @@ bool place_order(ENUM_ORDER_TYPE type, MqlTradeResult &mresult)
   MqlTradeRequest mrequest;  // to be used for sending our trade requests
   ZeroMemory(mrequest);      // initialization of mrequest structure
 
-  double ref_price = (type == ORDER_TYPE_BUY) ? latest_price.ask : latest_price.bid;
+  double ref_price = (type == ORDER_TYPE_BUY) ? latest_price.ask
+                                              : latest_price.bid;
   int sgn = (type == ORDER_TYPE_BUY) ? +1 : -1;
 
-  mrequest.action = TRADE_ACTION_DEAL;                                     // immediate order execution
-  mrequest.price = NormalizeDouble(ref_price, _Digits);                    // latest ask price
-  mrequest.sl = NormalizeDouble(ref_price - sgn * STP * _Point, _Digits);  // stop loss
-  mrequest.tp = NormalizeDouble(ref_price + sgn * TKP * _Point, _Digits);  // take profit
+  mrequest.action = TRADE_ACTION_DEAL;  // immediate order execution
+  mrequest.price = NormalizeDouble(ref_price, _Digits);
+  mrequest.sl = NormalizeDouble(ref_price - sgn * STP * _Point, _Digits);
+  mrequest.tp = NormalizeDouble(ref_price + sgn * TKP * _Point, _Digits);
   mrequest.symbol = _Symbol;
   mrequest.volume = Lot;
   mrequest.magic = EA_Magic;
   mrequest.type = type;
-  mrequest.deviation = 100;                                           // deviation from current price
-  mrequest.type_filling = ORDER_FILLING_FOK;                          // means that the deal can be executed exclusively
-                                                                      // with a specified volume at the equal or better price
-                                                                      // than the order specified price. If there is no
-                                                                      // sufficient volume of offers on the order symbol, the
-                                                                      // order will not be executed
+  mrequest.deviation = 100;  // deviation from current price
+
+  // Means that the deal can be executed exclusively with a specified volume at
+  // the equal or better price than the order specified price. If there is no
+  // sufficient volume of offers on the order symbol, the order will not be
+  // executed.
+  mrequest.type_filling = ORDER_FILLING_FOK;
 
   bool ret = OrderSend(mrequest, mresult) &&
-             (mresult.retcode == TRADE_RETCODE_PLACED || mresult.retcode == TRADE_RETCODE_DONE);
+             (mresult.retcode == TRADE_RETCODE_PLACED ||
+              mresult.retcode == TRADE_RETCODE_DONE);
 
   if (!ret)
-    Alert("**** ERROR placing a ", (type == ORDER_TYPE_BUY ? "buy" : "sell"), " order request - error: ",
+    Alert("**** ERROR placing a ", (type == ORDER_TYPE_BUY ? "buy" : "sell"),
+          " order request - error: ",
           GetLastError());
 
   return ret;
@@ -153,7 +188,8 @@ bool new_bar()
   datetime new_time[1];
   if (CopyTime(_Symbol, _Period, 0, 1, new_time) <= 0)
   {
-    Alert("**** ERROR in copying historical times data - error: ", GetLastError());
+    Alert("**** ERROR in copying historical times data - error: ",
+          GetLastError());
     ResetLastError();
     return false;
   }
@@ -166,29 +202,25 @@ bool new_bar()
   return is_new_bar;
 }
 
-bool buy_pattern()
-{
-  return false;
-}
+bool buy_pattern() {return false;}
 
-bool sell_pattern()
-{
-  return false;
-}
+bool sell_pattern() {return false;}
 
 bool pick_data()
 {
   if (!SymbolInfoTick(_Symbol, latest_price))
   {
-    Alert("**** ERROR getting the latest price quote - error: ", GetLastError());
+    Alert("**** ERROR getting the latest price quote - error: ",
+          GetLastError());
     return false;
   }
 
-  if (CopyRates(_Symbol, Period(), 0, 3, rate) < 0 ||
-      CopyRates(_Symbol, medium_tf, 0, 3, rate_m) < 0 ||
-      CopyRates(_Symbol, long_tf, 0, 3, rate_l) < 0)
+  if (CopyRates(_Symbol, Period(), 0, 3, rates[0].bar) < 0 ||
+      CopyRates(_Symbol, medium_timeframe, 0, 3, rates[1].bar) < 0 ||
+      CopyRates(_Symbol, long_timeframe, 0, 3, rates[2].bar) < 0)
   {
-    Alert("**** ERROR copying rates/history data - error: ", GetLastError());
+    Alert("**** ERROR copying rates/history data - error: ",
+          GetLastError());
     return false;
   }
 

@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -9,100 +9,111 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#include <stdexcept>
+
 #include "trade_simulator.h"
+#include "utility/utility.h"
+#include "tinyxml2/tinyxml2.h"
 
-trade_simulator::trade_simulator(const trading_data &data)
-  : td_(&data), order_(), spread_(0.0001), balance_(0.0), cur_bar_(1),
-    orders_history_total_(0)
+std::string trade_simulator::merge_path(const std::string &p1,
+                                        const std::string &p2)
 {
+  if (p1.empty())
+    return p2;
+  if (p2.empty())
+    return p1;
+
+  const char sep('/');
+
+  const auto last_p1(p1.back() == sep ? std::prev(p1.end()) : p1.end());
+  const auto first_p2(p2.front() == sep ? std::next(p2.begin()) : p2.begin());
+
+  return std::string(p1.begin(), last_p1) +
+         std::string(1, sep) +
+         std::string(first_p2, p2.end());
 }
 
-void trade_simulator::clear_status()
+std::string trade_simulator::full_path(const std::string &fn) const
 {
-  *this = trade_simulator(*td_);
+  return merge_path(example_dir_, fn);
 }
 
-// A lot is the basic trade size. It translates to 100000 units of the base
-// currency (the currency on the left of the currency pair).
-// Also used are mini lot (10000 units) and micro lot (1000 units).
-bool trade_simulator::order_send(o_type type, double lots)
+trade_simulator::trade_simulator(const std::string &folder)
+  : example_dir_(folder)
 {
-  Expects(type == o_type::buy || type == o_type::sell);
-  Expects(lots >= 0.01);
+  const std::string ini(full_path("forex.xml"));
 
-  double open_price;
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(ini.c_str()) != tinyxml2::XML_SUCCESS)
+    throw std::runtime_error("Error opening initialization file: " + ini);
 
-  const double amount(lots * 100000.0);
-  if (type == o_type::buy)  // buying base currency
-  {
-    open_price = ask();
-    balance_ -= amount * ask();
-  }
-  else  // selling base currency to buy counter currency
-  {
-    open_price = bid();
-    balance_ += amount * bid();
-  }
+  tinyxml2::XMLHandle h(&doc);
+  tinyxml2::XMLHandle files(h.FirstChildElement("mtgp")
+                             .FirstChildElement("files"));
 
-  order_ = order(type, amount, open_price, cur_bar_);
-  return true;
+  const auto coalesce = [](const tinyxml2::XMLElement *e, const char def[])
+                        {
+                          return e && e->GetText() ? e->GetText() : def;
+                        };
+
+  // --- Template name ---
+  auto *e(files.FirstChildElement("template").ToElement());
+  std::string f_ea_template(coalesce(e, "template1.mq5"));
+  std::ifstream from(full_path(f_ea_template));
+  if (!from)
+    throw std::runtime_error("Error opening EA template: " + f_ea_template);
+
+  std::stringstream buffer;
+  buffer << from.rdbuf();
+  ea_template_ = buffer.str();
+
+  driver_  = coalesce(files.FirstChildElement("driver").ToElement(),
+                      "vboxdriver.py");
+  ea_name_ = coalesce(files.FirstChildElement("name").ToElement(), "gpea.mq5");
+  results_name_ = coalesce(files.FirstChildElement("results").ToElement(),
+                           "results.txt");
+  tmp_dir_ = coalesce(files.FirstChildElement("tmpdir").ToElement(), "/tmp/");
 }
 
-bool trade_simulator::order_close()
+double trade_simulator::run(const vita::team<vita::i_mep> &prg)
 {
-  Expects(order_.type() != o_type::na);
+  std::stringstream ss[2];
 
-  if (order_.type() == o_type::buy)
-    // Having bought base currency, we now want back counter currency.
-    balance_ += order_amount() * bid();
-  else
-    // Having sold base currency to buy counter currency, we now want back
-    // base currency.
-    balance_ -= order_amount() * ask();
+  ss[0] << vita::out::mql_language << prg[0];
+  ss[1] << vita::out::mql_language << prg[1];
 
-  ++orders_history_total_;
-  order_ = order();
-  return true;
-}
+  auto ea(ea_template_);
 
-// Returns the number of closed orders in the simulation history.
-unsigned trade_simulator::orders_history_total() const
-{
-  return orders_history_total_;
-}
+  ea = vita::replace(ea,
+                     "bool buy_pattern() {return false;}",
+                     "bool buy_pattern() {return " + ss[0].str() + ";}");
 
-// The profits and losses in the Foreign Exchange market (aka Forex) are
-// determined by the currency's pips. A PIP is the fourth decimal point in a
-// currency pair (0.0001).
-// If the current exchange rate in EURUSD (Euro-Dollar) is 1.2305, it means
-// 1 Euro is worth 1.230*5* Dollars where the number 5 represents the pip in
-// EURUSD.
-// If EURUSD price was 1.2305 and it's now 1.2306, the pair gained 1 pip.
-// To calculate the value of a pip, we must first make a note of size of trade.
-// The minimum trade size in forex trading platforms are 1000 units of the
-// base currency (1000 Euro) or 0.01 lots (aka microlot, we will use that as
-// an example).
-// So a change of one pip in EURUSD means 1000 x 0.0001 = 0.10$, i.e. the
-// value of each pip in a trade size of 1 microlot is 10 cents (the value
-// of a pip in a trade size of 1 lot is 10$).
-// For further details see:
-// <https://www.ddmarkets.com/pips-calculation-in-the-forex-market/>
-double trade_simulator::order_profit() const
-{
-  switch (order_.type())
-  {
-  case o_type::buy:   return order_amount() * (bid() - order_open_price());
-  case o_type::sell:  return order_amount() * (order_open_price() - ask());
-  default:             return 0.0;
-  }
-}
+  ea = vita::replace(ea,
+                     "bool sell_pattern() {return false; }",
+                     "bool sell_pattern() {return " + ss[1].str() + ";}");
 
-bool trade_simulator::black_candle(timeframe tf, std::size_t i) const
-{
-  return ::black_candle(*td_, tf, i);
-}
+  const auto fo(merge_path(tmp_dir_, ea_name_));
+  std::ofstream o(fo);
+  if (!o)
+    throw std::runtime_error("Error creating EA file: " + fo);
+  o << ea;
+  o.close();
 
-bool trade_simulator::white_candle(timeframe tf, std::size_t i) const
-{
-  return ::white_candle(*td_, tf, i);
+  static std::string init(" --init");
+  const std::string driver(full_path(driver_) + init);
+  init = "";
+
+  std::system(driver.c_str());
+
+  const auto fr(merge_path(tmp_dir_, results_name_));
+  std::ifstream results(fr);
+  if (!results)
+    throw std::runtime_error("Error opening results file: " + fr);
+
+  double profit;
+  if (!(results >> profit))
+    throw std::runtime_error("Cannot read profit from " + fr);
+  results.close();
+
+  return -std::exp(-profit / 10000.0);
 }

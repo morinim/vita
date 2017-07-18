@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,12 @@
  */
 
 #include "kernel/vita.h"
-
-#include "trading_data.h"
 #include "trade_simulator.h"
+
+enum timeframe : unsigned {short_tf = 0, medium_tf, long_tf, sup_tf};
 
 namespace fxs  // Forex symbols
 {
-using i_interp = vita::core_interpreter;
 using team = vita::team<vita::i_mep>;
 
 enum
@@ -30,73 +29,41 @@ template<timeframe TF, unsigned I>
 class tfi_terminal : public vita::terminal
 {
 public:
-  tfi_terminal(const std::string &n, vita::category_t c, trade_simulator *ts)
-    : vita::terminal(n + "[" + std::to_string(TF) + "," + std::to_string(I)
-                     + "]", c),
-      ts_(ts)
+  tfi_terminal(const std::string &n, vita::category_t c) : vita::terminal(n, c)
   {
-    assert(ts_);
   }
 
-  virtual bool input() const override { return true; }
+  bool input() const override { return true; }
+  vita::any eval(vita::core_interpreter *) const override { return {}; }
 
-protected:
-  trade_simulator *ts_;
+  std::string display(terminal::param_t, format) const override
+  {
+    return name() + "(" + std::to_string(TF) + "," + std::to_string(I) + ")";
+  }
 };
 
 template<timeframe TF, unsigned I>
 struct close : tfi_terminal<TF, I>
 {
-  explicit close(trade_simulator *ts)
-    : tfi_terminal<TF, I>("CLOSE", c_money, ts)
-  {}
-
-  virtual vita::any eval(i_interp *) const override
-  { return vita::any(this->ts_->close(TF, I)); }
+  close() : tfi_terminal<TF, I>("close", c_money) {}
 };
 
 template<timeframe TF, unsigned I>
 struct high : tfi_terminal<TF, I>
 {
-  explicit high(trade_simulator *ts)
-    : tfi_terminal<TF, I>("HIGH", c_money, ts)
-  {}
-
-  virtual vita::any eval(i_interp *) const override
-  { return vita::any(this->ts_->high(TF, I)); }
+  high() : tfi_terminal<TF, I>("high", c_money) {}
 };
 
 template<timeframe TF, unsigned I>
 struct low : tfi_terminal<TF, I>
 {
-  explicit low(trade_simulator *ts)
-    : tfi_terminal<TF, I>("LOW", c_money, ts)
-  {}
-
-  virtual vita::any eval(i_interp *) const override
-  { return vita::any(this->ts_->low(TF, I)); }
+  low() : tfi_terminal<TF, I>("low", c_money) {}
 };
 
 template<timeframe TF, unsigned I>
 struct open : tfi_terminal<TF, I>
 {
-  explicit open(trade_simulator *ts)
-    : tfi_terminal<TF, I>("OPEN", c_money, ts)
-  {}
-
-  virtual vita::any eval(i_interp *) const override
-  { return vita::any(this->ts_->open(TF, I)); }
-};
-
-template<timeframe TF, unsigned I>
-struct volume : tfi_terminal<TF, I>
-{
-  explicit volume(trade_simulator *ts)
-    : tfi_terminal<TF, I>("VOLUME", c_volume, ts)
-  {}
-
-  virtual vita::any eval(i_interp *) const override
-  { return vita::any(this->ts_->volume(TF, I)); }
+  open() : tfi_terminal<TF, I>("open", c_money) {}
 };
 
 /// Black candle is formed when the opening price is higher than the closing
@@ -104,15 +71,7 @@ struct volume : tfi_terminal<TF, I>
 template<timeframe TF, unsigned I>
 struct black_candle : tfi_terminal<TF, I>
 {
-  explicit black_candle(trade_simulator *ts)
-    : tfi_terminal<TF, I>("BLACK_CANDLE", c_logic, ts)
-  {
-  }
-
-  virtual vita::any eval(i_interp *) const override
-  {
-    return vita::any(this->ts_->black_candle(TF, I));
-  }
+  black_candle() : tfi_terminal<TF, I>("black_candle", c_logic) {}
 };
 
 /// White candle is formed when the opening price is lower than the closing
@@ -120,15 +79,55 @@ struct black_candle : tfi_terminal<TF, I>
 template<timeframe TF, unsigned I>
 struct white_candle : tfi_terminal<TF, I>
 {
-  explicit white_candle(trade_simulator *ts)
-    : tfi_terminal<TF, I>("WHITE_CANDLE", c_logic, ts)
-  {
-  }
+  white_candle() : tfi_terminal<TF, I>("white_candle", c_logic) {}
+};
 
-  virtual vita::any eval(i_interp *) const override
-  {
-    return vita::any(this->ts_->white_candle(TF, I));
-  }
+/// Bearish Harami (meaning "pregnant" in Japanese) consists of an unusually
+/// large white body followed by a small black body (contained within large
+/// white body).
+/// It's considered as a bearish pattern when preceded by an uptrend.
+template<timeframe TF>
+struct bearish_harami : tfi_terminal<TF, 1>
+{
+  bearish_harami() : tfi_terminal<TF, 1>("bearish_harami", c_logic) {}
+};
+
+/// Bullish Harami (meaning "pregnant" in Japanese) consists of an unusually
+/// large black body followed by a small white body (contained within large
+/// black body).
+/// It's considered as a bullish pattern when preceded by a downtrend.
+template<timeframe TF>
+struct bullish_harami : tfi_terminal<TF, 1>
+{
+  bullish_harami() : tfi_terminal<TF, 1>("bullish_harami", c_logic) {}
+};
+
+/// Dark Cloud Cover consists of a long white candlestick followed by a black
+/// candlestick that opens above the high of the white candlestick and closes
+/// well into the body of the white candlestick. It is considered as a bearish
+/// reversal signal during an uptrend.
+template<timeframe TF>
+struct dark_cloud_cover : tfi_terminal<TF, 1>
+{
+  dark_cloud_cover() : tfi_terminal<TF, 1>("dark_cloud_cover", c_logic) {}
+};
+
+template<timeframe TF, unsigned I>
+struct long_candle : tfi_terminal<TF, I>
+{
+  long_candle() : tfi_terminal<TF, I>("long_candle", c_logic) {}
+};
+
+template<timeframe TF, unsigned I>
+struct long_black_candle : tfi_terminal<TF, I>
+{
+  long_black_candle() : tfi_terminal<TF, I>("long_black_candle", c_logic) {}
+};
+
+template<timeframe TF, unsigned I>
+struct long_white_candle : tfi_terminal<TF, I>
+{
+  long_white_candle() : tfi_terminal<TF, I>("long_white_candle", c_logic) {}
 };
 
 struct l_and : vita::boolean::l_and
@@ -156,86 +155,12 @@ struct lt_m : vita::real::lt
   lt_m() : vita::real::lt({c_money, c_logic}) {}
 };
 
-struct lt_v : vita::real::lt
-{
-  lt_v() : vita::real::lt({c_volume, c_logic}) {}
-};
-
-/// Bearish Harami (meaning "pregnant" in Japanese) consists of an unusually
-/// large white body followed by a small black body (contained within large
-/// white body).
-/// It's considered as a bearish pattern when preceded by an uptrend.
-template<timeframe TF>
-struct bearish_harami : tfi_terminal<TF, 1>
-{
-  explicit bearish_harami(trade_simulator *ts)
-    : tfi_terminal<TF, 1>("BEARISH_HARAMI", c_logic, ts)
-  {
-  }
-
-  virtual vita::any eval(i_interp *) const override
-  {
-    bool ret(this->ts_->white_candle(TF, 2) &&
-             this->ts_->black_candle(TF, 1) &&
-             this->ts_->close(TF, 1) > this->ts_->open(TF, 2) &&
-             this->ts_->open(TF, 1) < this->ts_->close(TF, 2));
-
-    return vita::any(ret);
-  }
-};
-
-/// Bullish Harami (meaning "pregnant" in Japanese) consists of an unusually
-/// large black body followed by a small white body (contained within large
-/// black body).
-/// It's considered as a bullish pattern when preceded by a downtrend.
-template<timeframe TF>
-struct bullish_harami : tfi_terminal<TF, 1>
-{
-  explicit bullish_harami(trade_simulator *ts)
-    : tfi_terminal<TF, 1>("BULLISH_HARAMI", c_logic, ts)
-  {
-  }
-
-  virtual vita::any eval(i_interp *) const override
-  {
-    bool ret(this->ts_->black_candle(TF, 2) &&
-             this->ts_->white_candle(TF, 1) &&
-             this->ts_->close(TF, 1) < this->ts_->open(TF, 2) &&
-             this->ts_->open(TF, 1) > this->ts_->close(TF, 2));
-
-    return vita::any(ret);
-  }
-};
-
-/// Dark Cloud Cover consists of a long white candlestick followed by a black
-/// candlestick that opens above the high of the white candlestick and closes
-/// well into the body of the white candlestick. It is considered as a bearish
-/// reversal signal during an uptrend.
-template<timeframe TF>
-struct dark_cloud_cover : tfi_terminal<TF, 1>
-{
-  explicit dark_cloud_cover(trade_simulator *ts)
-    : tfi_terminal<TF, 1>("DARK_CLOUD_COVER", c_logic, ts)
-  {
-  }
-
-  virtual vita::any eval(i_interp *) const override
-  {
-    bool ret(this->ts_->white_candle(TF, 2) &&
-             this->ts_->black_candle(TF, 1) &&
-             this->ts_->close(TF, 1) > this->ts_->open(TF, 2) &&
-             this->ts_->open(TF, 1) > this->ts_->high(TF, 2));
-
-    return vita::any(ret);
-  }
-};
-
 class evaluator : public vita::evaluator<team>
 {
 public:
   explicit evaluator(trade_simulator *ts) : ts_(ts) {}
 
-  virtual vita::fitness_t operator()(const team &t) override
+  vita::fitness_t operator()(const team &t) final
   {
     return {ts_->run(t)};
   }
@@ -248,55 +173,54 @@ class search : public vita::search<team, vita::alps_es>
 {
 public:
   using vita::search<team, vita::alps_es>::search;
-
-private:
-  virtual void after_evolution(vita::summary<team> *)
-  {
-  }
 };
 
 }  // namespace fxs
 
 template<template<timeframe, unsigned> class F, timeframe TF>
-void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
+void insert_symbol(vita::symbol_set *ss)
 {
-  ss->insert(std::make_unique<F<TF, 1>>(ts));
-  ss->insert(std::make_unique<F<TF, 2>>(ts));
-  ss->insert(std::make_unique<F<TF, 3>>(ts));
+  ss->insert(std::make_unique<F<TF, 1>>());
+  ss->insert(std::make_unique<F<TF, 2>>());
+  ss->insert(std::make_unique<F<TF, 3>>());
 }
 
 template<template<timeframe, unsigned> class F>
-void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
+void insert_symbol(vita::symbol_set *ss)
 {
-  insert_symbol<F, short_tf>(ss, ts);
-  insert_symbol<F, medium_tf>(ss, ts);
-  insert_symbol<F, long_tf>(ss, ts);
+  insert_symbol<F, short_tf>(ss);
+  insert_symbol<F, medium_tf>(ss);
+  insert_symbol<F, long_tf>(ss);
 }
 
 template<template<timeframe> class F>
-void insert_symbol(vita::symbol_set *ss, trade_simulator *ts)
+void insert_symbol(vita::symbol_set *ss)
 {
-  ss->insert(std::make_unique<F<short_tf>>(ts));
-  ss->insert(std::make_unique<F<medium_tf>>(ts));
-  ss->insert(std::make_unique<F<long_tf>>(ts));
+  ss->insert(std::make_unique<F<short_tf>>());
+  ss->insert(std::make_unique<F<medium_tf>>());
+  ss->insert(std::make_unique<F<long_tf>>());
 }
 
-bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
+bool setup_symbols(vita::symbol_set *ss)
 {
-  insert_symbol<fxs::close>(ss, ts);
-  insert_symbol<fxs::high>(ss, ts);
-  insert_symbol<fxs::low>(ss, ts);
-  insert_symbol<fxs::open>(ss, ts);
+  insert_symbol<fxs::close>(ss);
+  insert_symbol<fxs::high>(ss);
+  insert_symbol<fxs::low>(ss);
+  insert_symbol<fxs::open>(ss);
 
-  insert_symbol<fxs::black_candle, short_tf>(ss, ts);
-  insert_symbol<fxs::white_candle, short_tf>(ss, ts);
+  insert_symbol<fxs::black_candle>(ss);
+  insert_symbol<fxs::white_candle>(ss);
 
-  insert_symbol<fxs::bearish_harami>(ss, ts);
-  insert_symbol<fxs::bullish_harami>(ss, ts);
-  insert_symbol<fxs::dark_cloud_cover>(ss, ts);
+  insert_symbol<fxs::long_candle>(ss);
+  insert_symbol<fxs::long_black_candle>(ss);
+  insert_symbol<fxs::long_white_candle>(ss);
 
-  ss->insert(std::make_unique<fxs::l_and>());
-  ss->insert(std::make_unique<fxs::l_or>());
+  insert_symbol<fxs::bearish_harami>(ss);
+  insert_symbol<fxs::bullish_harami>(ss);
+  insert_symbol<fxs::dark_cloud_cover>(ss);
+
+  ss->insert(std::make_unique<fxs::l_and>(), 4.0);
+  ss->insert(std::make_unique< fxs::l_or>(), 4.0);
 
   ss->insert(std::make_unique<fxs::add>());
   ss->insert(std::make_unique<fxs::sub>());
@@ -308,18 +232,14 @@ bool setup_symbols(vita::symbol_set *ss, trade_simulator *ts)
 
 int main()
 {
-  trading_data td("eurusd_1m_bid.csv");
-  if (td.empty())
-    return EXIT_FAILURE;
-
-  trade_simulator ts(td);
+  trade_simulator ts("../examples/forex/");
 
   vita::problem p(true);
 
-  if (!setup_symbols(&p.sset, &ts))
+  if (!setup_symbols(&p.sset))
     return EXIT_FAILURE;
 
-  p.env.individuals = 40;
+  p.env.individuals = 10;
   p.env.min_individuals =  8;
   p.env.code_length = 200;
   p.env.generations = 400;
@@ -330,7 +250,7 @@ int main()
   p.env.stat.layers = true;
   p.env.stat.population = true;
   p.env.stat.summary = true;
-  p.env.stat.dir = "forex_results/";
+  p.env.stat.dir = "./";
 
   std::cout << "STARTING RUN\n";
   fxs::search engine(p);

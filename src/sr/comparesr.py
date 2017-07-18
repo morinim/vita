@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2013 EOS di Manlio Morini.
+#  Copyright (C) 2011-2017 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -49,8 +49,7 @@ def compare_file(files, scores):
     success_rate = dict()
 
     for f in files:
-        tree = ElementTree()
-        tree.parse(f)
+        tree = ElementTree().parse(f)
         summary = tree.find("summary")
         if summary.find("success_rate") is None:
             print("Missing success rate in file {0}.".format(f))
