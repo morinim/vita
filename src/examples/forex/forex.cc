@@ -29,7 +29,10 @@ template<timeframe TF, unsigned I>
 class tfi_terminal : public vita::terminal
 {
 public:
-  tfi_terminal(const std::string &n, vita::category_t c) : vita::terminal(n, c)
+  tfi_terminal(const std::string &n, vita::category_t c)
+    : vita::terminal(n + "(" + std::to_string(TF) + "," + std::to_string(I) +
+                     ")",
+                     c)
   {
   }
 
@@ -38,7 +41,7 @@ public:
 
   std::string display(terminal::param_t, format) const override
   {
-    return name() + "(" + std::to_string(TF) + "," + std::to_string(I) + ")";
+    return name();
   }
 };
 
@@ -219,13 +222,13 @@ bool setup_symbols(vita::symbol_set *ss)
   insert_symbol<fxs::bullish_harami>(ss);
   insert_symbol<fxs::dark_cloud_cover>(ss);
 
-  ss->insert(std::make_unique<fxs::l_and>(), 4.0);
-  ss->insert(std::make_unique< fxs::l_or>(), 4.0);
+  ss->insert(std::make_unique<fxs::l_and>(), 2.0);
+  ss->insert(std::make_unique< fxs::l_or>(), 2.0);
 
   ss->insert(std::make_unique<fxs::add>());
   ss->insert(std::make_unique<fxs::sub>());
 
-  ss->insert(std::make_unique<fxs::lt_m>());
+  ss->insert(std::make_unique<fxs::lt_m>(), 2.0);
 
   return true;
 }
@@ -239,7 +242,7 @@ int main()
   if (!setup_symbols(&p.sset))
     return EXIT_FAILURE;
 
-  p.env.individuals = 10;
+  p.env.individuals = 30;
   p.env.min_individuals =  8;
   p.env.code_length = 200;
   p.env.generations = 400;

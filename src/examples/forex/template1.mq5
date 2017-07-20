@@ -138,7 +138,8 @@ void OnDeinit(const int /*reason*/)
   if (h != INVALID_HANDLE)
   {
     FileWrite(h, TesterStatistics(STAT_PROFIT));
-    FileWrite(h, TesterStatistics(STAT_TRADES));
+    FileWrite(h, TesterStatistics(STAT_SHORT_TRADES));
+    FileWrite(h, TesterStatistics(STAT_LONG_TRADES));
     FileWrite(h, TesterStatistics(STAT_BALANCE_DDREL_PERCENT));
     FileClose(h);
   }

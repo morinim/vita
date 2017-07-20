@@ -83,7 +83,7 @@ public:
   /// Minimum number of individuals in a layer of the population.
   ///
   /// Some evolution strategies dynamically change the number of individuals of
-  /// the population. This parameter avoid to drop below a predefined limit
+  /// the population. This parameter avoids to drop below a predefined limit
   ///
   /// \note A value of 0 means undefined (auto-tune)
   unsigned min_individuals = 0;

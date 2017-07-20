@@ -113,7 +113,21 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
   double profit;
   if (!(results >> profit))
     throw std::runtime_error("Cannot read profit from " + fr);
+
+  unsigned short_trades;
+  if (!(results >> short_trades))
+    throw std::runtime_error("Cannot read number of short trades from " + fr);
+
+  unsigned long_trades;
+  if (!(results >> long_trades))
+    throw std::runtime_error("Cannot read numer of long trades from " + fr);
+
   results.close();
 
-  return -std::exp(-profit / 10000.0);
+  const double trades(short_trades + long_trades);
+  const double active_symbols(prg.active_symbols());
+
+  return -std::exp(-profit / 10000.0)
+         - std::max(100.0 - trades, 0.0)
+         - std::max(20.0 - active_symbols, 0.0);
 }

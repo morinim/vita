@@ -55,7 +55,7 @@ bool std_es<T>::stop_condition() const
 /// \param[out] env environemnt
 /// \return         a strategy-specific environment
 ///
-/// \remark ALPS need more than one layer.
+/// \remark ALPS requires more than one layer.
 ///
 template<class T, template<class> class CS>
 environment basic_alps_es<T, CS>::shape(environment env)
