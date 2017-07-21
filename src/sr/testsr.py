@@ -14,99 +14,144 @@ import argparse
 import configparser
 import os
 import random
-from string import Template
+import subprocess
 
 
 arl_filename = "arl"
-data_set_dir = "dataset/"
 dynamic_filename = "dynamic"
 stat_dir = "stat/"
 summary_filename = "summary"
-symbol_set_dir = "symbolset/"
-cache_bit = 20
 
-# Key: [dataset file, generations, individuals, code_length, runs, symbolset,
-#       evaluator]
-testcases = {
-    "adult":      [     "adult.csv",  50, 100, 100,  10, "class.xml"],
-    "fibonacci":  [ "fibonacci.csv", 120, 180, 200,  80, "arithmetic.xml"],
-    "ionosphere": ["ionosphere.csv", 100, 180, 100,  80, "class.xml", "binary"],
-    "iris":       [     "iris.xrff", 100, 180, 100,  80, "class.xml"],
-    "mep":        [       "mep.csv", 100,  75, 500, 100],
-    "petalrose":  ["petalrose.xrff", 100, 180, 200,  80, "iarithmetic.xml"],
-    "petalrose3": ["petalrose3.csv", 100, 180, 200,  80, "arithmetic.xml"],
-    "petalrose2": ["petalrose2.csv", 100, 180, 200,  80, "arithmetic.xml"],
-    "petalrosec": ["petalrosec.csv", 100, 180, 200,  30, "class3.xml"],
-    "spambase":   [  "spambase.csv", 100, 260, 100,  50, "class.xml"],
-    "wine":       [      "wine.csv", 120, 170, 100,  80, "class.xml"],
-    "x2y2z2":     [   "x2y2_z2.csv", 100,  75, 500,  80, "math.xml"],
-    "x2y2z2bias": [   "x2y2_z2.csv", 100,  75, 100,  80, "arithmetic.xml"]
-    }
+
+class TestParameters:
+    def __init__(self, filename, generations = 100, individuals = 180,
+                 code_length = 100, runs = 80, layers = 4, symbol_set = "",
+                 evaluator = ""):
+        if not filename:
+            raise Exception("Unspecified test filename")
+
+        self.filename = filename
+        self.generations = generations
+        self.individuals = individuals
+        self.code_length = code_length
+        self.runs = runs
+        self.layers = layers
+        self.symbol_set = symbol_set
+        self.evaluator = evaluator
+
+test_collection = {
+    "adult": TestParameters("adult.csv", generations = 50, individuals = 100,
+                            runs = 10, symbol_set = "class.xml"),
+
+    "fibonacci": TestParameters("fibonacci.csv", generations = 120,
+                                code_length = 200,
+                                symbol_set = "arithmetic.xml"),
+
+    "ionosphere": TestParameters("ionosphere.csv", symbol_set = "class.xml",
+                                 evaluator = "binary"),
+
+    "iris": TestParameters("iris.xrff", symbol_set = "class.xml"),
+
+    "mep": TestParameters("mep.csv", individuals = 75, code_length = 500,
+                          runs = 100),
+
+    "petalrose": TestParameters("petalrose.xrff", code_length = 200,
+                                symbol_set = "iarithmetic.xml"),
+
+    "petalrose3": TestParameters("petalrose3.csv", code_length = 200,
+                                 symbol_set = "arithmetic.xml"),
+
+    "petalrose2": TestParameters("petalrose2.csv", code_length = 200,
+                                 symbol_set = "arithmetic.xml"),
+
+    "petalrosec": TestParameters("petalrosec.csv", code_length = 200,
+                                 runs = 30, symbol_set = "class3.xml"),
+
+    "spambase": TestParameters("spambase.csv", individuals = 260, runs = 50,
+                               symbol_set = "class.xml"),
+
+    "wine": TestParameters("wine.csv", generations = 120, individuals = 170,
+                           symbol_set = "class.xml"),
+
+    "x2y2z2": TestParameters("x2y2_z2.csv", individuals = 75,
+                             code_length = 500, symbol_set = "math.xml"),
+
+    "x2y2z2bias": TestParameters("x2y2_z2.csv", individuals = 75,
+                                 symbol_set = "arithmetic.xml")
+
     # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
     # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
+}
 
-settings = {
+
+mode_settings = {
     "debug": {},
     "profile": {"deeptest": True, "randomize": True}
-    }
+}
 
 
+def sr(args, dataset):
+    cache_bit = 20
+    dataset_dir = "./dataset/"
+    sr_dir = "../build/"
+    symbol_set_dir = "./symbolset/"
 
-def sr(args, data_set, generations, individuals, code_length, rounds,
-       symbol_set, evaluator):
-    sr = "../build/sr_test" if os.path.exists("../build/sr_test") else "../build/sr"
+    sr = os.path.join(sr_dir, "sr_test")
+    if not os.path.exists(sr):
+        sr = os.path.join(sr_dir, "sr")
 
     mode = args.mode;
 
-    arl = ""
-    if "arl" in settings[mode]:
-        arl = "--arl --stat-arl" if settings[mode]["arl"] else "",
-
-    elitism = ""
-    if "elitism" in settings[mode]:
-        elitism = "--elitism " + str(settings[mode]["elitism"])
+    generations = test_collection[dataset].generations
+    individuals = test_collection[dataset].individuals
+    code_length = test_collection[dataset].code_length
+    runs = test_collection[dataset].runs
+    layers = test_collection[dataset].layers
+    symbol_set = test_collection[dataset].symbol_set
+    evaluator = test_collection[dataset].evaluator
 
     # Default values are for a fast evaluation. Profiling requires bigger
     # numbers...
-    if "deeptest" in settings[mode] and settings[mode]["deeptest"]:
-        rounds *= 3
+    if "deeptest" in mode_settings[mode] and mode_settings[mode]["deeptest"]:
+        runs *= 3
         generations = (generations * 3) // 2
 
-    dss = ""
-    if "dss" in settings[mode]:
-        dss = "--dss " + str(settings[mode]["dss"])
+    cmd = [sr, "--verbose",
+           "--stat-dir", stat_dir,
+           "--stat-dynamic", "--stat-summary",
+           "--cache", str(cache_bit),
+           "-g", str(generations),
+           "--layers", str(layers),
+           "-P", str(individuals),
+           "-l", str(code_length),
+           "-r", str(runs)]
+
+    if evaluator:
+        cmd += ["--evaluator", evaluator]
+
+    if symbol_set:
+        cmd += ["-s", os.path.join(symbol_set_dir, symbol_set)]
+
+    if "arl" in mode_settings[mode]:
+        cmd += ["--arl", "--stat-arl"]
+
+    if "dss" in mode_settings[mode]:
+        cmd += ["--dss ", str(mode_settings[mode]["dss"])]
+
+    if "elitism" in mode_settings[mode]:
+        cmd += ["--elitism", str(mode_settings[mode]["elitism"])]
 
     # When randomize is off, tests are reproducible (good for debugging).
-    randomize = ""
-    if "randomize" in settings[mode]:
+    if "randomize" in mode_settings[mode]:
         random.seed()
-        randomize = "--random-seed " + str(random.randint(0, 1000000000))
+        cmd += ["--random-seed", str(random.randint(0, 1000000000))]
 
-    cmd = Template("$sr --verbose $eva $elitism_switch --stat-dir $sd "\
-                   "--stat-dynamic --stat-summary --cache $cb -g $gen "\
-                   "--layers 4 -P $nind -l $cl -r $rs $rnd_switch "\
-                   "$arl_switch $dss_switch $ss $ds")
-    s = cmd.substitute(
-        sr = sr,
-        elitism_switch = elitism,
-        sd = stat_dir,
-        cb = cache_bit,
-        gen = generations,
-        nind = individuals,
-        cl = code_length,
-        rs = rounds,
-        rnd_switch = randomize,
-        arl_switch = arl,
-        dss_switch = dss,
-        eva = "--evaluator " + evaluator if evaluator != "" else "",
-        ss = "-s " + os.path.join(symbol_set_dir, symbol_set)
-             if symbol_set != "" else "",
-        ds = os.path.join(data_set_dir, data_set))
+    cmd.append(os.path.join(dataset_dir, test_collection[dataset].filename))
 
-    return os.system(s) == 0
+    return subprocess.run(cmd).returncode == 0
 
 
-def save_results(args, name, data_set):
+def save_results(args, dataset):
     """Renames output files so they wouldn't conflict with the output of a new
        test
 
@@ -121,22 +166,20 @@ def save_results(args, name, data_set):
     for f, ext in files.items():
         before = os.path.join(stat_dir, f)
         if os.path.exists(before):
-            after = os.path.join(stat_dir, name + "_" + args.mode + ext)
+            after = os.path.join(stat_dir, dataset + "_" + args.mode + ext)
             os.rename(before, after)
 
 
-def test_dataset(args, name, data_set, generations, individuals, code_length,
-                 rounds, symbol_set = "", evaluator = ""):
-    print("Testing " + name + " [" + str(args) + "]")
-    sr(args, data_set, generations, individuals, code_length, rounds,
-       symbol_set, evaluator)
-    save_results(args, name, data_set)
+def test_dataset(args, dataset):
+    print("Testing " + dataset + " [" + str(args) + "]")
+    sr(args, dataset)
+    save_results(args, dataset)
 
 
 def start_testing(args):
-    for k, a in testcases.items():
-        if (args.test == []) or (k in args.test):
-            test_dataset(args, k, *a)
+    for test_case in test_collection:
+        if (args.test == []) or (test_case in args.test):
+            test_dataset(args, test_case)
 
 
 def get_cmd_line_options():
@@ -144,10 +187,10 @@ def get_cmd_line_options():
 
     parser = argparse.ArgumentParser(
         fromfile_prefix_chars = "@",
-        description = "A simple command line utility to simplify debugging "\
+        description = "A simple command line utility to simplify debugging "
                       "and profiling")
 
-    parser.add_argument("mode", choices = settings)
+    parser.add_argument("mode", choices = mode_settings)
     parser.add_argument("test", nargs = "*")
 
     return parser.parse_args()
