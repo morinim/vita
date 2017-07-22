@@ -92,7 +92,7 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
                      "bool buy_pattern() {return " + ss[0].str() + ";}");
 
   ea = vita::replace(ea,
-                     "bool sell_pattern() {return false; }",
+                     "bool sell_pattern() {return false;}",
                      "bool sell_pattern() {return " + ss[1].str() + ";}");
 
   const auto fo(merge_path(tmp_dir_, ea_name_));
