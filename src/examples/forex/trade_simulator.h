@@ -15,7 +15,7 @@
 #include "kernel/vita.h"
 
 ///
-/// Interface to run Metatrader5 software.
+/// Interface to Metatrader5 software.
 ///
 class trade_simulator
 {
@@ -31,7 +31,7 @@ private:
   std::string       driver_;
   std::string      ea_name_;
   std::string  ea_template_;
-  std::string  example_dir_;
+  std::string   config_dir_;
   std::string results_name_;
   std::string      tmp_dir_;
 };

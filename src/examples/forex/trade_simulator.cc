@@ -35,11 +35,14 @@ std::string trade_simulator::merge_path(const std::string &p1,
 
 std::string trade_simulator::full_path(const std::string &fn) const
 {
-  return merge_path(example_dir_, fn);
+  return merge_path(config_dir_, fn);
 }
 
-trade_simulator::trade_simulator(const std::string &folder)
-  : example_dir_(folder)
+///
+/// \param[in] example_dir directory containing configuration files
+///
+trade_simulator::trade_simulator(const std::string &config_dir)
+  : config_dir_(config_dir)
 {
   const std::string ini(full_path("forex.xml"));
 
@@ -129,5 +132,5 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
 
   return -std::exp(-profit / 10000.0)
          - std::max(100.0 - trades, 0.0)
-         - std::max(20.0 - active_symbols, 0.0);
+         - std::max(40.0 - active_symbols, 0.0);
 }
