@@ -92,6 +92,16 @@ void population<T>::add_layer()
   init_layer(0);
 }
 
+template<class T>
+void population<T>::remove_layer(unsigned l)
+{
+  Expects(l);
+  Expects(l < layers());
+
+  pop_.erase(std::next(pop_.begin(), l));
+  allowed_.erase(std::next(allowed_.begin(), l));
+}
+
 ///
 /// Adds individual `i` to layer `l`.
 ///
@@ -163,8 +173,8 @@ unsigned population<T>::allowed(unsigned l) const
 /// \param[in] l a layer
 /// \param[in] n number of programs allowed in layer `l`
 ///
-/// If layer `l` contains more programs than the allowed, the surplus will be
-/// deleted.
+/// If layer `l` contains more programs than the amount allowed, the surplus
+/// is deleted.
 ///
 template<class T>
 void population<T>::set_allowed(unsigned l, unsigned n)

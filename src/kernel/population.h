@@ -42,17 +42,19 @@ public:
   T &operator[](coord);
   const T &operator[](coord) const;
 
-  unsigned allowed(unsigned) const;
   unsigned individuals() const;
   unsigned individuals(unsigned) const;
+  unsigned allowed(unsigned) const;
 
   void init_layer(unsigned);
   void add_layer();
   unsigned layers() const;
-  void inc_age();
   void add_to_layer(unsigned, const T &);
   void pop_from_layer(unsigned);
+  void remove_layer(unsigned);
   void set_allowed(unsigned, unsigned);
+
+  void inc_age();
 
   const environment &env() const;
 
