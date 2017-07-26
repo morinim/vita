@@ -114,8 +114,7 @@ bool dark_cloud_cover(unsigned tf, unsigned bar)
 
 int OnInit()
 {
-  if (Period() >= medium_timeframe ||
-      medium_timeframe >= long_timeframe)
+  if (Period() >= medium_timeframe || medium_timeframe >= long_timeframe)
     return INIT_PARAMETERS_INCORRECT;
 
   // Let us handle currency pairs with 5 or 3 digit prices instead of 4
@@ -173,9 +172,9 @@ bool place_order(ENUM_ORDER_TYPE type, MqlTradeResult &mresult)
   // executed.
   mrequest.type_filling = ORDER_FILLING_FOK;
 
-  bool ret = OrderSend(mrequest, mresult) &&
-             (mresult.retcode == TRADE_RETCODE_PLACED ||
-              mresult.retcode == TRADE_RETCODE_DONE);
+  bool ret = OrderSend(mrequest, mresult)
+             && (mresult.retcode == TRADE_RETCODE_PLACED
+                 || mresult.retcode == TRADE_RETCODE_DONE);
 
   if (!ret)
     Alert("**** ERROR placing a ", (type == ORDER_TYPE_BUY ? "buy" : "sell"),
@@ -189,8 +188,8 @@ bool new_bar()
 {
   static datetime old_time;
 
-  datetime new_time[1];
-  if (CopyTime(_Symbol, _Period, 0, 1, new_time) <= 0)
+  datetime current_time[1];
+  if (CopyTime(_Symbol, _Period, 0, 1, current_time) <= 0)
   {
     Alert("**** ERROR in copying historical times data - error: ",
           GetLastError());
@@ -198,10 +197,10 @@ bool new_bar()
     return false;
   }
 
-  bool is_new_bar = (old_time != new_time[0]);
+  bool is_new_bar = (old_time != current_time[0]);
 
   if (is_new_bar)
-    old_time = new_time[0];
+    old_time = current_time[0];
 
   return is_new_bar;
 }
@@ -219,9 +218,12 @@ bool pick_data()
     return false;
   }
 
-  if (CopyRates(_Symbol, Period(), 0, 3, rates[0].bar) < 0 ||
-      CopyRates(_Symbol, medium_timeframe, 0, 3, rates[1].bar) < 0 ||
-      CopyRates(_Symbol, long_timeframe, 0, 3, rates[2].bar) < 0)
+  const int Window_Size = 4;
+  if (CopyRates(_Symbol, Period(), 0, Window_Size, rates[0].bar) < Window_Size
+      || CopyRates(_Symbol, medium_timeframe, 0, Window_Size, rates[1].bar)
+         < Window_Size
+      || CopyRates(_Symbol, long_timeframe, 0, Window_Size, rates[2].bar)
+         < Window_Size)
   {
     Alert("**** ERROR copying rates/history data - error: ",
           GetLastError());
@@ -233,10 +235,9 @@ bool pick_data()
 
 void OnTick()
 {
-  const int my_bars = Bars(_Symbol, Period());
-  if (my_bars < 60)
+  if (Bars(_Symbol, Period()) < 60)
   {
-    Alert("**** We have less than 60 bars, EA will now exit");
+    Alert("**** We have less than 60 bars, EA disabled");
     return;
   }
 
@@ -246,8 +247,8 @@ void OnTick()
   if (!pick_data())
     return;
 
-  bool buy_opened = PositionSelect(_Symbol) &&  // we have an open position
-                    PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY;
+  bool buy_opened = PositionSelect(_Symbol)  // we have an open position
+                    && PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY;
 
   bool buy_condition = buy_opened ? false : buy_pattern();
   bool sell_condition = buy_opened ? sell_pattern() : false;
