@@ -91,22 +91,25 @@ bool long_white_candle(unsigned tf, unsigned bar)
   return white_candle(tf, bar) && long_candle(tf, bar);
 }
 
-bool bearish_harami(unsigned tf)
+bool bearish_harami(unsigned tf, unsigned bar)
 {
-  return white_candle(tf, 2) && black_candle(tf, 1) &&
-         close(tf, 1) > open(tf, 2) && open(tf, 1) < close(tf, 2);
+  return white_candle(tf, bar + 1) && black_candle(tf, bar)
+           && close(tf, bar) >  open(tf, bar + 1)
+           &&  open(tf, bar) < close(tf, bar + 1);
 }
 
-bool bullish_harami(unsigned tf)
+bool bullish_harami(unsigned tf, unsigned bar)
 {
-  return black_candle(tf, 2) && white_candle(tf, 1) &&
-         close(tf, 1) < open(tf, 2) && open(tf, 1) > close(tf, 2);
+  return black_candle(tf, bar + 1) && white_candle(tf, bar)
+           && close(tf, bar) <  open(tf, bar + 1)
+           &&  open(tf, bar) > close(tf, bar + 1);
 }
 
-bool dark_cloud_cover(unsigned tf)
+bool dark_cloud_cover(unsigned tf, unsigned bar)
 {
-  return white_candle(tf, 2) && black_candle(tf, 1) &&
-         close(tf, 1) > open(tf, 2) && open(tf, 1) > high(tf, 2);
+  return white_candle(tf, bar + 1) && black_candle(tf, bar)
+           && close(tf, bar) > open(tf, bar + 1)
+           &&  open(tf, bar) > high(tf, bar + 1);
 }
 
 int OnInit()
