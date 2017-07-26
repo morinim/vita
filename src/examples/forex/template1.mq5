@@ -93,14 +93,14 @@ bool long_white_candle(unsigned tf, unsigned bar)
 
 bool bearish_harami(unsigned tf, unsigned bar)
 {
-  return white_candle(tf, bar + 1) && black_candle(tf, bar)
+  return long_white_candle(tf, bar + 1) && black_candle(tf, bar)
            && close(tf, bar) >  open(tf, bar + 1)
            &&  open(tf, bar) < close(tf, bar + 1);
 }
 
 bool bullish_harami(unsigned tf, unsigned bar)
 {
-  return black_candle(tf, bar + 1) && white_candle(tf, bar)
+  return long_black_candle(tf, bar + 1) && white_candle(tf, bar)
            && close(tf, bar) <  open(tf, bar + 1)
            &&  open(tf, bar) > close(tf, bar + 1);
 }
