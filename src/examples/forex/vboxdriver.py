@@ -79,14 +79,17 @@ class VBox:
         subprocess.run(cpy_to, check = True)
 
     def compile(self, path):
-        # Unfortunately we cannot use `subprocess.run` which, on Windows,
-        # doesn't permit quotation marks within arguments (see
-        # <http://bugs.python.org/issue23862>).
+        # `subprocess.run`, under Windows, doesn't permit quotation marks
+        # within arguments (see <http://bugs.python.org/issue23862>).
         cmd = self.control_ + ["run", '"{}"'.format(self.metaeditor_),
                                ' /compile:"{}"'.format(path.replace("/",
                                                                     "\\"))]
         scmd = " ".join(cmd)
         subprocess.run(scmd, shell = True)
+
+    def remove_file(self, filename):
+        cmd = self.control_ + ["rm", filename]
+        subprocess.run(cmd, check = True)
 
     def results(self, src_dir, dest_dir, f):
         self.copy_from(src_dir, dest_dir, f)
@@ -104,6 +107,10 @@ class VBox:
                         pass
 
         shutil.move(dn, sn)
+
+        # This isn't stricly necessary, but helps to identify situations in
+        # which the EA doesn't correctly write the result file.
+        self.remove_file(os.path.join(src_dir, f))
 
     def simulator(self, path):
         dpath = path.replace("/", "\\")
