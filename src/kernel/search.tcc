@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,7 +19,7 @@
 
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
-///              the lifetime of `this` class.
+///              the lifetime of `this` class
 ///
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr),
@@ -30,9 +30,11 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr),
 }
 
 ///
-/// \param[in] s summary of the evolution run just finished.
-/// \return the fitness of `s.best.solution` (other record of
-///         model_measurements are unmodified).
+/// Calculates problem-specific metrics regarding the solution found.
+///
+/// \param[in] s summary of the evolution run just finished
+/// \return      the fitness of `s.best.solution` (other record of
+///              model_measurements are unmodified).
 ///
 /// Specializations of this method can calculate further problem specific
 /// metrics regarding `s.best.solution`.
@@ -44,7 +46,7 @@ model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
 }
 
 ///
-/// \brief Tries to tune search parameters for the current problem
+/// Tries to tune search parameters for the current problem.
 ///
 template<class T, template<class> class ES>
 void search<T, ES>::tune_parameters()
@@ -106,8 +108,8 @@ void search<T, ES>::tune_parameters()
 }
 
 ///
-/// \param[in] n number of runs.
-/// \return a summary of the search.
+/// \param[in] n number of runs
+/// \return      a summary of the search
 ///
 template<class T, template<class> class ES>
 summary<T> search<T, ES>::run(unsigned n)
@@ -183,7 +185,7 @@ summary<T> search<T, ES>::run(unsigned n)
 }
 
 ///
-/// \param[in] m metrics relative to the current run.
+/// \param[in] m metrics relative to the current run
 ///
 template<class T, template<class> class ES>
 void search<T, ES>::print_resume(const model_measurements &m) const
@@ -196,7 +198,7 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 }
 
 ///
-/// \param[in] e the evaluator that should be set as active.
+/// \param[in] e the evaluator that should be set as active
 ///
 template<class T, template<class> class ES>
 void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
@@ -220,7 +222,7 @@ void search<T, ES>::set_validator(std::unique_ptr<validation_strategy> v)
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
 bool search<T, ES>::debug() const
@@ -235,14 +237,14 @@ bool search<T, ES>::debug() const
 }
 
 ///
-/// \param[in] run_sum summary information regarding the search.
-/// \param[in] fd statistics about population fitness.
-/// \param[in] good_runs list of the best runs of the search.
-/// \param[in] best_run best overall run.
-/// \param[in] runs number of runs performed.
-/// \return `true` if the write operation succeed.
-///
 /// Writes end-of-run logs (run summary, results for test...).
+///
+/// \param[in] run_sum       summary information regarding the search
+/// \param[in] fd statistics about population fitness
+/// \param[in] good_runs     list of the best runs of the search
+/// \param[in] best_run      best overall run
+/// \param[in] runs          number of runs performed
+/// \return                  `true` if the write operation succeed
 ///
 template<class T, template<class> class ES>
 void search<T, ES>::log(const summary<T> &run_sum,
@@ -306,4 +308,5 @@ void search<T, ES>::log(const summary<T> &run_sum,
   const std::string f_sum(env_.stat.dir + "/" + env_.stat.sum_name);
   d.SaveFile(f_sum.c_str());
 }
+
 #endif  // include guard

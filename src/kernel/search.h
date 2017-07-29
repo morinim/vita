@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,10 +20,10 @@
 namespace vita
 {
 ///
-/// \brief Search drives the evolution.
+/// Search drives the evolution.
 ///
-/// \tparam T the type of individual used.
-/// \tparam ES the adopted evolution strategy.
+/// \tparam T  the type of individual used
+/// \tparam ES the adopted evolution strategy
 ///
 /// The class offers a general / customizable search strategy (the design
 /// adheres to the NVI pattern, see "Virtuality" in C/C++ Users Journal
