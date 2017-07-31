@@ -85,6 +85,19 @@ struct white_candle : tfi_terminal<TF, I>
   white_candle() : tfi_terminal<TF, I>("white_candle", c_logic) {}
 };
 
+/// Doji are important candlesticks that provide information on their own and
+/// as components of in a number of important patterns. Doji form when a
+/// security's open and close are virtually equal.
+/// The length of the upper and lower shadows can vary and the resulting
+/// candlestick looks like a cross, inverted cross or plus sign. Alone, doji
+/// are neutral patterns. Any bullish or bearish bias is based on preceding
+/// price action and future confirmation.
+template<timeframe TF, unsigned I>
+struct doji : tfi_terminal<TF, I>
+{
+  doji() : tfi_terminal<TF, I>("doji", c_logic) {}
+};
+
 /// Bearish Harami (meaning "pregnant" in Japanese) consists of an unusually
 /// large white body followed by a small black body (contained within large
 /// white body).
@@ -217,6 +230,8 @@ bool setup_symbols(vita::symbol_set *ss)
   insert_symbol<fxs::long_candle>(ss);
   insert_symbol<fxs::long_black_candle>(ss);
   insert_symbol<fxs::long_white_candle>(ss);
+
+  insert_symbol<fxs::doji>(ss);
 
   insert_symbol<fxs::bearish_harami>(ss);
   insert_symbol<fxs::bullish_harami>(ss);

@@ -12,7 +12,7 @@
 
 #property copyright   "Copyright 2017, EOS di Manlio Morini"
 #property link        "https://www.eosdev.it/"
-#property version     "1.00"
+#property version     "1.01"
 #property description "Expert Advisor Template compiled by Vita"
 #property description "Based on buy / sell pattern recognition"
 
@@ -69,7 +69,7 @@ bool white_candle(unsigned tf, unsigned bar)
 
 bool long_candle(unsigned tf, unsigned bar)
 {
-  double real_body = MathAbs(open(tf, bar) - close(tf, bar));
+  const double real_body = MathAbs(open(tf, bar) - close(tf, bar));
 
   double avg_body = 0.0;
   for (unsigned i = 1; i <= 5; ++i)
@@ -91,25 +91,36 @@ bool long_white_candle(unsigned tf, unsigned bar)
   return white_candle(tf, bar) && long_candle(tf, bar);
 }
 
+bool doji(unsigned tf, unsigned bar)
+{
+  const double real_body = MathAbs(open(tf, bar) - close(tf, bar));
+  const double shadow = high(tf, bar) - low(tf, bar);
+
+  if (shadow > 0.0)
+    return real_body / shadow < 0.01;
+
+  return false;
+}
+
 bool bearish_harami(unsigned tf, unsigned bar)
 {
   return long_white_candle(tf, bar + 1) && black_candle(tf, bar)
-           && close(tf, bar) >  open(tf, bar + 1)
-           &&  open(tf, bar) < close(tf, bar + 1);
+         && close(tf, bar) >  open(tf, bar + 1)
+         &&  open(tf, bar) < close(tf, bar + 1);
 }
 
 bool bullish_harami(unsigned tf, unsigned bar)
 {
   return long_black_candle(tf, bar + 1) && white_candle(tf, bar)
-           && close(tf, bar) <  open(tf, bar + 1)
-           &&  open(tf, bar) > close(tf, bar + 1);
+         && close(tf, bar) <  open(tf, bar + 1)
+         &&  open(tf, bar) > close(tf, bar + 1);
 }
 
 bool dark_cloud_cover(unsigned tf, unsigned bar)
 {
   return white_candle(tf, bar + 1) && black_candle(tf, bar)
-           && close(tf, bar) > open(tf, bar + 1)
-           &&  open(tf, bar) > high(tf, bar + 1);
+         && close(tf, bar) > open(tf, bar + 1)
+         &&  open(tf, bar) > high(tf, bar + 1);
 }
 
 int OnInit()
