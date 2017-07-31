@@ -20,7 +20,7 @@
 namespace term
 {
 ///
-/// \return `true` when the user press the '.' key.
+/// \return `true` when the user presses the '.' key
 ///
 inline bool user_stop()
 {
@@ -70,8 +70,8 @@ inline void set()
 }  // namespace term
 
 ///
-/// \param[in] e environment (mostly used for population initialization).
-/// \param[in] eva evaluator used during the evolution.
+/// \param[in] e   environment (mostly used for population initialization)
+/// \param[in] eva evaluator used during the evolution
 ///
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva)
@@ -82,8 +82,8 @@ evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva)
 }
 
 ///
-/// \param[in] s an up to date evolution summary.
-/// \return `true` when evolution should be interrupted.
+/// \param[in] s an up to date evolution summary
+/// \return      `true` when evolution should be interrupted
 ///
 template<class T, template<class> class ES>
 bool evolution<T, ES>::stop_condition(const summary<T> &s) const
@@ -102,7 +102,7 @@ bool evolution<T, ES>::stop_condition(const summary<T> &s) const
 }
 
 ///
-/// \return statistical informations about the elements of the population.
+/// \return statistical informations about the elements of the population
 ///
 template<class T, template<class> class ES>
 analyzer<T> evolution<T, ES>::get_stats() const
@@ -116,17 +116,22 @@ analyzer<T> evolution<T, ES>::get_stats() const
 }
 
 ///
-/// \param[in] run_count run number.
-///
 /// Saves working / statistical informations in a log file.
+///
+/// \param[in] run_count run number
+///
 /// Data are written in a CSV-like fashion and are partitioned in blocks
 /// separated by two blank lines:
-/// [BLOCK_1]\n\n
-/// [BLOCK_2]\n\n
-/// ...
-/// [BLOCK_x]
+///
+///     [BLOCK_1]\n\n
+///     [BLOCK_2]\n\n
+///     ...
+///     [BLOCK_x]
+///
 /// where each block is a set of line like this:
-///   data_1 [space] data_2 [space] ... [space] data_n
+///
+///     data_1 [space] data_2 [space] ... [space] data_n
+///
 /// We use this format, instead of XML, because statistics are produced
 /// incrementally and so it's simple and fast to append new data to a
 /// CSV-like file. Note also that data sets are ready to be plotted by
@@ -208,21 +213,21 @@ void evolution<T, ES>::log(unsigned run_count) const
 }
 
 ///
-/// \param[in] k current generation.
-/// \param[in] run_count total number of runs planned.
-/// \param[in] status if `true` print a run/generation/fitness status line.
-/// \param[in] from_last_msg time elapsed from the last message.
+/// Prints evolution information (if `environment::log_level >= OUTPUT`).
 ///
-/// Print evolution informations (if `environment::log_level >= OUTPUT`).
+/// \param[in] k             current generation
+/// \param[in] run_count     total number of runs planned
+/// \param[in] status        if `true` prints a summary line
+/// \param[in] from_last_msg time elapsed from the last message
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
-                                      bool status, timer *from_last_msg) const
+                                      bool summary, timer *from_last_msg) const
 {
   if (print.verbosity() >= log::L_OUTPUT)
   {
     const unsigned perc(100 * k / pop_.individuals());
-    if (status)
+    if (summary)
       std::cout << "Run " << run_count << '.' << std::setw(6)
                 << stats_.gen << " (" << std::setw(3)
                 << perc << "%): fitness " << stats_.best.score.fitness
@@ -238,11 +243,13 @@ void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
 }
 
 ///
-/// \param[in] run_count run number (used for printing and logging).
-/// \param[in] shake the "shake data" function. It's used to alter the training
-///                  set so that evolution would take place in a dynamic
-///                  environment.
-/// \return a partial summary of the search (see notes).
+/// The evolutionary core loop.
+///
+/// \param[in] run_count run number (used for printing and logging)
+/// \param[in] shake     the "shake data" function. It's used to alter the
+///                      training set so that evolution would take place in a
+///                      dynamic environment
+/// \return              a partial summary of the search (see notes)
 ///
 /// The genetic programming loop:
 ///
@@ -338,7 +345,7 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
 }
 
 ///
-/// \brief A shortcut to call the `run` method without a shake function.
+/// A shortcut to call the `run` method without a shake function.
 ///
 template<class T, template<class> class ES>
 const summary<T> &evolution<T, ES>::run(unsigned run_count)
@@ -347,11 +354,11 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count)
 }
 
 ///
-/// \return true if object passes the internal consistency check.
+/// \return `true` if object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
 bool evolution<T, ES>::debug() const
 {
   return pop_.debug();
 }
-#endif  // Include guard
+#endif  // include guard
