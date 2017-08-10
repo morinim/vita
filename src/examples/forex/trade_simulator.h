@@ -20,7 +20,7 @@
 class trade_simulator
 {
 public:
-  explicit trade_simulator(const std::string &);
+  trade_simulator();
 
   double run(const vita::team<vita::i_mep> &);
 
@@ -28,12 +28,10 @@ private:
   static std::string merge_path(const std::string &, const std::string &);
   std::string full_path(const std::string &) const;
 
-  std::string       driver_;
   std::string      ea_name_;
   std::string  ea_template_;
-  std::string   config_dir_;
   std::string results_name_;
-  std::string      tmp_dir_;
+  std::string  working_dir_;
 };
 
 #endif  // include guard

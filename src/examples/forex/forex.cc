@@ -250,7 +250,7 @@ bool setup_symbols(vita::symbol_set *ss)
 
 int main()
 {
-  trade_simulator ts("../examples/forex/");
+  trade_simulator ts;
 
   vita::problem p(true);
 

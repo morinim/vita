@@ -229,7 +229,7 @@ bool pick_data()
     return false;
   }
 
-  const int Window_Size = 4;
+  const int Window_Size = 16;
   if (CopyRates(_Symbol, Period(), 0, Window_Size, rates[0].bar) < Window_Size
       || CopyRates(_Symbol, medium_timeframe, 0, Window_Size, rates[1].bar)
          < Window_Size

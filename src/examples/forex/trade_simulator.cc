@@ -9,7 +9,9 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#include <cstdio>
 #include <stdexcept>
+#include <thread>
 
 #include "trade_simulator.h"
 #include "utility/utility.h"
@@ -35,14 +37,13 @@ std::string trade_simulator::merge_path(const std::string &p1,
 
 std::string trade_simulator::full_path(const std::string &fn) const
 {
-  return merge_path(config_dir_, fn);
+  return merge_path(working_dir_, fn);
 }
 
 ///
 /// \param[in] example_dir directory containing configuration files
 ///
-trade_simulator::trade_simulator(const std::string &config_dir)
-  : config_dir_(config_dir)
+trade_simulator::trade_simulator()
 {
   const std::string ini(full_path("forex.xml"));
 
@@ -61,7 +62,7 @@ trade_simulator::trade_simulator(const std::string &config_dir)
 
   // --- Template name ---
   auto *e(files.FirstChildElement("template").ToElement());
-  std::string f_ea_template(coalesce(e, "template1.mq5"));
+  std::string f_ea_template(coalesce(e, "template.mq5"));
   std::ifstream from(full_path(f_ea_template));
   if (!from)
     throw std::runtime_error("Error opening EA template: " + f_ea_template);
@@ -70,12 +71,11 @@ trade_simulator::trade_simulator(const std::string &config_dir)
   buffer << from.rdbuf();
   ea_template_ = buffer.str();
 
-  driver_  = coalesce(files.FirstChildElement("driver").ToElement(),
-                      "vboxdriver.py");
   ea_name_ = coalesce(files.FirstChildElement("name").ToElement(), "gpea.mq5");
   results_name_ = coalesce(files.FirstChildElement("results").ToElement(),
                            "results.txt");
-  tmp_dir_ = coalesce(files.FirstChildElement("tmpdir").ToElement(), "/tmp/");
+  working_dir_ = coalesce(files.FirstChildElement("workingdir").ToElement(),
+                          "./");
 }
 
 double trade_simulator::run(const vita::team<vita::i_mep> &prg)
@@ -95,23 +95,22 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
                      "bool sell_pattern() {return false;}",
                      "bool sell_pattern() {return " + ss[1].str() + ";}");
 
-  const auto fo(merge_path(tmp_dir_, ea_name_));
-  std::ofstream o(fo);
+  const auto fo(merge_path(working_dir_, ea_name_));
+  const auto fo_tmp(fo + ".tmp");
+  std::ofstream o(fo_tmp);
   if (!o)
     throw std::runtime_error("Error creating EA file: " + fo);
   o << ea;
   o.close();
+  std::rename(fo_tmp.c_str(), fo.c_str());
 
-  static std::string init(" --init");
-  const std::string driver(full_path(driver_) + init);
-  init = "";
-
-  std::system(driver.c_str());
-
-  const auto fr(merge_path(tmp_dir_, results_name_));
+  const auto fr(merge_path(working_dir_, results_name_));
   std::ifstream results(fr);
-  if (!results)
-    throw std::runtime_error("Error opening results file: " + fr);
+  while (!results.is_open())
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    results.open(fr);
+  }
 
   double profit;
   if (!(results >> profit))
@@ -126,6 +125,7 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
     throw std::runtime_error("Cannot read numer of long trades from " + fr);
 
   results.close();
+  std::remove(fr.c_str());
 
   const double trades(short_trades + long_trades);
   const double active_symbols(prg.active_symbols());

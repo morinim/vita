@@ -1,17 +1,17 @@
 <mtgp>
   <files>
-	<driver>vboxdriver.py</driver>
+	<driver>driver.py</driver>
 	<ea>gpea.mq5</ea>
 	<ini>gpea.ini</ini>
 	<results>results.txt</results>
-	<template>template1.mq5</template>
-	<tmpdir>/tmp/</tmpdir>
+	<template>template.mq5</template>
+	<workingdir>./</workingdir>
   </files>
 
-  <vm>
-	<name>Mule</name>
-	<mt_data_dir>C:/Users/manlio/AppData/Roaming/MetaQuotes/Terminal/F762D69EEEA9B4430D7F17C82167C844/</mt_data_dir>
+  <metatrader>
+	<data_dir>C:/Users/manlio/AppData/Roaming/MetaQuotes/Terminal/F762D69EEEA9B4430D7F17C82167C844/</data_dir>
 	<metaeditor>C:/Program Files/MetaTrader/metaeditor64.exe</metaeditor>
 	<terminal>C:/Program Files/MetaTrader/terminal64.exe</terminal>
-  </vm>
+	<timeout>120</timeout>
+  </metatrader>
 </mtgp>
