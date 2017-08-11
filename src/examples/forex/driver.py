@@ -11,6 +11,7 @@
 #
 
 import argparse
+from datetime import datetime
 import os.path
 import pathlib
 import shutil
@@ -24,7 +25,7 @@ def default(e, v = ""):
         return e if e else v
 
     return v if e is None else e.text
-    
+
 def to_int_def(s, default):
     try:
         return int(s)
@@ -65,7 +66,7 @@ class Metatrader:
         self._data_dir = data_dir
         self._scripts_dir = os.path.join(self._data_dir, "MQL5/Experts")
         self._working_dir= working_dir
-        
+
         self._metaeditor = default(metaeditor, os.path.join(install_dir,
                                                             "metaeditor64.exe"))
         self._terminal = default(terminal, os.path.join(install_dir,
@@ -86,18 +87,18 @@ class Metatrader:
 
     def _check_results(self):
         self._log(" " * 4, "Checking existence of results file...", end = "")
-        
+
         common_files_dir = (pathlib.PureWindowsPath(self._data_dir).parent
                             / "Common" / "Files")
 
         results = os.path.join(common_files_dir, str(self._results_name))
-           
+
         for attempt in range(3):
             if os.path.isfile(results):
                 self._log("ok")
                 return True
-            
-            time.sleep(1)       
+
+            time.sleep(1)
 
         self._log("failed")
         eprint("*** Missing results file (", results , ")")
@@ -108,7 +109,7 @@ class Metatrader:
         if os.path.isfile(results):
             os.remove(results)
             self._log(" " * 4, "Removing old results file")
-        
+
     def compile(self, filename = ""):
         self._log("COMPILING EA")
 
@@ -122,14 +123,14 @@ class Metatrader:
         # `subprocess.run`, under Windows, doesn't permit quotation marks
         # within arguments (see <http://bugs.python.org/issue23862>).
         cmd = ['"{}"'.format(self._metaeditor),
-               '/compile:"{}"'.format(dest.replace("/", "\\"))]       
+               '/compile:"{}"'.format(dest.replace("/", "\\"))]
         scmd = " ".join(cmd)
 
         ret = subprocess.run(scmd, shell = True).returncode
         if ret != 1:
             eprint("*** Error", ret, "compiling ", src, "(" + dest + ")")
             sys.exit()
-           
+
     def get_results(self, dest_dir):
         self._log("READING RESULTS")
 
@@ -138,7 +139,7 @@ class Metatrader:
 
         src = os.path.join(common_files_dir, str(self._results_name))
         tmp = src + ".tmp"
-           
+
         with open(src, encoding = "utf-16", errors = "ignore") as source:
             with open(tmp, encoding = "iso-8859-1", mode = "w") as temp:
                 for line in source:
@@ -161,7 +162,7 @@ class Metatrader:
         ini = default(ini,
                       os.path.join(self._data_dir,
                                    self._ini_name).replace("/", "\\"))
-        
+
         cmd = [self._terminal, "/config:{}".format(ini)]
 
         while True:
@@ -178,7 +179,7 @@ class Metatrader:
                            self._ea_name)
                     continue
                 self._log("ok")
-                
+
                 if self._check_results():
                     break
                 #else
@@ -186,7 +187,7 @@ class Metatrader:
 
             except subprocess.TimeoutExpired:
                 eprint("*** Metatrader hanged... restarting backtest")
-                time.sleep(2)                
+                time.sleep(2)
 
 
 class Watcher:
@@ -194,6 +195,7 @@ class Watcher:
         if not to_watch:
             raise Exception("File to be monitored missing")
         self.to_watch = to_watch
+        self.last_modified = 0
 
         self._verbose = verbose
 
@@ -202,12 +204,16 @@ class Watcher:
             print("WAITING FOR NEW EA")
 
         try:
-            while not os.path.isfile(self.to_watch):
-                time.sleep(.5)
+            #while not os.path.isfile(self.to_watch):
+            #    time.sleep(.5)
 
-            if self._verbose:
-                print(" " * 4, "Found new EA")
-                
+            self.last_modified = 0;
+            while self.last_modified == 0:
+                try:
+                    self.last_modified = os.path.getmtime(self.to_watch)
+                except OSError:
+                    time.sleep(.5)
+
             return True
 
         except KeyboardInterrupt:
@@ -238,10 +244,16 @@ def main():
                     results_name = config.results_name,
                     timeout = config.timeout,
                     verbose = args.verbose)
-    
+
     watchdog = Watcher(os.path.join(config.working_dir, config.ea_name),
                        verbose = args.verbose)
     while watchdog.run():
+        if args.verbose:
+            print(" " * 4, "Found new EA",
+                  "("
+                  + str(datetime.fromtimestamp(watchdog.last_modified))
+                  + ")")
+
         mt.compile(watchdog.to_watch)
         mt.simulator()
         mt.get_results(config.working_dir)
