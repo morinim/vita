@@ -25,9 +25,9 @@ constexpr std::underlying_type_t<metric_flags> operator&(metric_flags f1,
 
 ///
 /// \param[in] p the problem we're working on. The lifetime of `p` must exceed
-///              the lifetime of `this` class.
+///              the lifetime of `this` class
 /// \param[in] m a bit field used to specify matrics we have to calculate while
-///              searching.
+///              searching
 ///
 template<class T, template<class> class ES>
 src_search<T, ES>::src_search(src_problem &p, metric_flags m)
@@ -43,7 +43,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 }
 
 ///
-/// \return a reference to the available data.
+/// \return a reference to the available data
 ///
 template<class T, template<class> class ES>
 src_data &src_search<T, ES>::data() const
@@ -52,9 +52,10 @@ src_data &src_search<T, ES>::data() const
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with `ind` (`nullptr` in case of
-///         errors).
+/// Creates a lambda function associated with `ind`.
+///
+/// \param[in] ind individual to be transformed in a lambda function
+/// \return        the lambda function (`nullptr` in case of errors)
 ///
 /// The lambda function depends on the active evaluator.
 ///
@@ -65,8 +66,10 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 }
 
 ///
-/// \param[in] s summary of the evolution run just finished.
-/// \return metrics regarding `s.best.solution`.
+/// Calculates various performance metrics.
+///
+/// \param[in] s summary of the evolution run just finished
+/// \return      metrics regarding `s.best.solution`
 ///
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
@@ -95,12 +98,13 @@ model_measurements src_search<T, ES>::calculate_metrics(
 }
 
 ///
-/// \param[in] base individual we are examining to extract building blocks.
+/// Adaptive Representation through Learning (ARL).
 ///
-/// Adaptive Representation through Learning (ARL). The algorithm extract
-/// common knowledge (building blocks) emerging during the evolutionary
-/// process and acquires the necessary structure for solving the problem
-/// (see ARL - Justinian P. Rosca and Dana H. Ballard).
+/// \param[in] base individual we are examining to extract building blocks
+///
+/// The algorithm extracts common knowledge (building blocks) emerging during
+/// the evolutionary process and acquires the necessary structure for solving
+/// the problem (see ARL - Justinian P. Rosca and Dana H. Ballard).
 ///
 /// \note
 /// No partial specialization for member functions of class templates is
@@ -187,9 +191,9 @@ void src_search<T, ES>::arl(const U &base)
 }
 
 ///
-/// \param[in] base a team we are examining to extract building blocks.
+/// Repeatedly calls `arl()` for each member of the team.
 ///
-/// Repeatedly calls arl(const U &) for each member of the team.
+/// \param[in] base a team we are examining to extract building blocks
 ///
 template<class T, template<class> class ES>
 template<class U>
@@ -199,7 +203,7 @@ void src_search<T, ES>::arl(const team<U> &)
 }
 
 ///
-/// \brief Tries to tune search parameters for the current problem
+/// Tries to tune search parameters for the current problem.
 ///
 /// Parameter tuning is a typical approach to algorithm design. Such tuning
 /// is done by experimenting with different values and selecting the ones
@@ -328,7 +332,7 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 }
 
 ///
-/// \param[in] m metrics relative to the current run.
+/// \param[in] m metrics relative to the current run
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
@@ -343,15 +347,15 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 }
 
 ///
-/// \param[out] d output xml document.
-/// \param[in] run_sum summary information regarding the search.
-/// \param[in] fd statistics about population fitness.
-/// \param[in] good_runs list of the best runs of the search.
-/// \param[in] best_run best overall run.
-/// \param[in] runs number of runs performed.
-/// \return `true` if the write operation succeed.
-///
 /// Writes end-of-run logs (run summary, results for test...).
+///
+/// \param[out] d               output xml document
+/// \param[in]  run_sum summary information regarding the search
+/// \param[in]  fd              statistics about population fitness
+/// \param[in]  good_runs       list of the best runs of the search
+/// \param[in]  best_run        best overall run
+/// \param[in]  runs            number of runs performed
+/// \return                     `true` if the write operation succeed
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
@@ -398,9 +402,9 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 }
 
 ///
-/// \param[in] id numerical id of the evaluator to be activated.
-/// \param[in] msg input parameters for the evaluator constructor.
-/// \return `true` if the active evaluator has been changed.
+/// \param[in] id  numerical id of the evaluator to be activated
+/// \param[in] msg input parameters for the evaluator constructor
+/// \return        `true` if the active evaluator has been changed
 ///
 /// \note
 /// If the evaluator `id` is not compatible with the problem type the
@@ -436,7 +440,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
       return false;
     }
   }
-  else // Symbolic regression
+  else // symbolic regression
   {
     switch (id)
     {
@@ -467,7 +471,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
 bool src_search<T, ES>::debug() const

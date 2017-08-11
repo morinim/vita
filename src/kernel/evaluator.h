@@ -20,7 +20,7 @@
 namespace vita
 {
 ///
-/// \brief Calculates the fitness of an individual
+/// Calculates the fitness of an individual.
 ///
 /// \tparam T the type of individual used
 ///
@@ -61,7 +61,7 @@ public:
 };
 
 ///
-/// \brief A random fitness function used for debug purpose
+/// A random fitness function used for debug purpose.
 ///
 /// \note
 /// The output doesn't depend on the input parameter (individual).
@@ -74,7 +74,7 @@ public:
 };
 
 ///
-/// \brief A fitness function used for debug purpose
+/// A fitness function used for debug purpose.
 ///
 /// \note
 /// Fixed (unspecified) fitness for every individual. Different individuals

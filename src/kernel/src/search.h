@@ -40,11 +40,11 @@ enum class metric_flags : unsigned
 };
 
 ///
-/// \brief Drives the search for solutions of symbolic regression /
-///        classification tasks.
+/// Drives the search for solutions of symbolic regression / classification
+/// tasks.
 ///
-/// \tparam T the type of individual used.
-/// \tparam ES the adopted evolution strategy.
+/// \tparam T  the type of individual used
+/// \tparam ES the adopted evolution strategy
 ///
 template<class T = i_mep, template<class> class ES = std_es>
 class src_search : public search<T, ES>
