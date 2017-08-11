@@ -372,17 +372,6 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
                  ->FirstChildElement("best"));
     assert(e_best);
     set_text(e_best, "accuracy", run_sum.best.score.accuracy);
-
-    auto *e_solution(e_best->FirstChildElement("solution"));
-    assert(e_solution);
-
-    std::ostringstream ss_tree;
-    ss_tree << out::tree << run_sum.best.solution;
-    set_text(e_solution, "tree", ss_tree.str());
-
-    std::ostringstream ss_graph;
-    ss_graph << out::graphviz << run_sum.best.solution;
-    set_text(e_solution, "graph", ss_graph.str());
   }
 
   // Test set results logging.

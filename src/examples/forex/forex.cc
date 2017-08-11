@@ -269,6 +269,7 @@ int main()
   p.env.stat.population = true;
   p.env.stat.summary = true;
   p.env.stat.dir = "./";
+  p.env.stat.ind_format = vita::out::mql_language_f;
 
   std::cout << "STARTING RUN\n";
   fxs::search engine(p);

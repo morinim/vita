@@ -25,6 +25,17 @@
 
 namespace vita
 {
+namespace out
+{
+enum print_format_t {list_f,  // default value
+                     dump_f, graphviz_f, in_line_f, tree_f,
+                     language_f,
+                     c_language_f = language_f + symbol::c_format,
+                     cpp_language_f = language_f + symbol::cpp_format,
+                     mql_language_f = language_f + symbol::mql_format,
+                     python_language_f = language_f + symbol::python_format};
+}
+
 ///
 /// Context object aggregating multiple related parameters into one structure.
 ///
@@ -213,7 +224,7 @@ public:
     std::string lys_name = "layers";
 
     /// Should we save a dynamic population status file?
-    /// \warning It can be quite slow!
+    /// \warning It can be very slow!
     bool population      =        false;
     std::string pop_name = "population";
 
@@ -222,6 +233,8 @@ public:
     std::string sum_name = "summary";
 
     std::string tst_name = "test";
+
+    out::print_format_t ind_format = out::list_f;
   } stat;
 
   /// Used to identify successfully learned (matched, classified, resolved...)

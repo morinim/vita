@@ -279,11 +279,9 @@ void search<T, ES>::log(const summary<T> &run_sum,
   set_text(e_best, "fitness", run_sum.best.score.fitness);
   set_text(e_best, "run", best_run);
 
-  auto *e_solution(d.NewElement("solution"));
-  e_best->InsertEndChild(e_solution);
   std::ostringstream ss;
-  ss << run_sum.best.solution;
-  set_text(e_solution, "list", ss.str());
+  ss << out::print_format(env_.stat.ind_format) << run_sum.best.solution;
+  set_text(e_best, "code", ss.str());
 
   auto *e_solutions(d.NewElement("solutions"));
   e_summary->InsertEndChild(e_solutions);

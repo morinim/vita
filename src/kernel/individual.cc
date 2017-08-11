@@ -53,6 +53,12 @@ print_format_t print_format_flag(std::ostream &o)
   return static_cast<print_format_t>(o.iword(print_format_index));
 }
 
+std::ostream &operator<<(std::ostream &o, print_format pf)
+{
+  o.iword(print_format_index) = pf.t_;
+  return o;
+}
+
 ///
 /// Used to print the content of an individual in c-language format.
 ///

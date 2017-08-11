@@ -19,12 +19,16 @@ namespace vita
 ///
 /// \param[in] ss         a pointer to the symbol set used in the current
 ///                       environment
-/// \param[in] initialize if `true` initializes every parameter in such a
-///                       way as to allow the object to pass
-///                       `environment::debug(true)`
+/// \param[in] initialize if `true` initializes every auto-tuning-parameter
+///                       with standard values (thus disabling the
+///                       `search::tune_parameters` method)
 ///
 /// Default values are quite standard, but specific problems need ad-hoc
 /// tuning.
+///
+/// \note
+/// If `initialize` is `true` the environment passes the
+/// `environment::debug(true)` check.
 ///
 /// \see search::tune_parameters
 ///
@@ -102,6 +106,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_statistics, "save_layers", stat.layers);
   set_text(e_statistics, "save_population", stat.population);
   set_text(e_statistics, "save_summary", stat.summary);
+  set_text(e_statistics, "individual_format", stat.ind_format);
 }
 
 ///
