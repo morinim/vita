@@ -39,8 +39,6 @@ template<class Derived>
 class individual
 {
 public:
-  individual() = default;
-
   unsigned age() const;
   void inc_age();
 
@@ -49,6 +47,9 @@ public:
   bool save(std::ostream &) const;
 
 protected:
+  // Protected to prevent individual<Derived> from being instantiated as a non
+  // base class.
+  individual() = default;
   ~individual() = default;
 
   void set_older_age(unsigned);
