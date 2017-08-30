@@ -75,19 +75,24 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 
   pop.inc_age();
 
-  const auto layers(pop.layers());
-  for (auto l(decltype(layers){1}); l < layers; ++l)
-  {
-    const auto allowed(pop.env().individuals);
-    const auto current(pop.individuals(l));
+  for (auto l(pop.layers() - 1); l; --l)
+    if (almost_equal(sum->az.fit_dist(l - 1).mean(),
+                     sum->az.fit_dist(    l).mean()))
+      pop.remove_layer(l);
+
+  auto layers(pop.layers());
+
+  for (decltype(layers) l(1); l < layers; ++l)
     if (issmall(sum->az.fit_dist(l).standard_deviation()))
     {
-      if (current > allowed / 5)
-        pop.set_allowed(l, current / 2);
+      const auto current(pop.individuals(l));
+      pop.set_allowed(l, std::max(pop.env().min_individuals, current / 2));
     }
     else
+    {
+      const auto allowed(pop.env().individuals);
       pop.set_allowed(l, allowed);
-  }
+    }
 
   // Code executed every `age_gap` interval.
   if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
