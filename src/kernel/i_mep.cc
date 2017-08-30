@@ -352,7 +352,7 @@ unsigned distance(const i_mep &lhs, const i_mep &rhs)
 /// Maps syntactically distinct (but logically equivalent) individuals to the
 /// same byte stream.
 ///
-/// \param[in] l  locus in this individual
+/// \param[in]  l locus in this individual
 /// \param[out] p byte stream compacted version of the gene sequence
 ///               starting at locus `l`
 ///
@@ -402,7 +402,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
 
 ///
 /// Converts this individual in a packed byte level representation and
-/// performs the MurmurHash3 algorithm on it.
+/// performs the hash algorithm on it.
 ///
 /// \return the signature of this individual
 ///
@@ -419,10 +419,9 @@ hash_t i_mep::hash() const
   pack(best(), &packed);
 
   /// ... and from a packed byte stream to a signature...
-  const auto len(static_cast<unsigned>(packed.size() *
-                                       sizeof(packed[0])));  // Length in bytes
+  const auto len(packed.size() * sizeof(packed[0]));  // length in bytes
 
-  return vita::hash(packed.data(), len, 1973);
+  return vita::hash::hash128(packed.data(), len);
 }
 
 ///

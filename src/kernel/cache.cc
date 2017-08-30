@@ -15,36 +15,6 @@
 namespace vita
 {
 ///
-/// \param[in] in input stream.
-/// \return `true` if hash_t loaded correctly.
-///
-/// \note
-/// If the load operation isn't successful the current hash_t isn't changed.
-///
-bool hash_t::load(std::istream &in)
-{
-  hash_t tmp;
-
-  if (!(in >> tmp.data[0] >> tmp.data[1]))
-    return false;
-
-  *this = tmp;
-
-  return true;
-}
-
-///
-/// \param[out] out output stream.
-/// \return `true` if hash_t was saved correctly.
-///
-bool hash_t::save(std::ostream &out) const
-{
-  out << data[0] << ' ' << data[1] << '\n';
-
-  return out.good();
-}
-
-///
 /// \param[in] bits `2^bits` is the number of elements of the table.
 ///
 /// Creates a new hash table.
@@ -261,14 +231,4 @@ bool cache::debug() const
   return probes() >= hits();
 }
 
-///
-/// \param[out] o output stream.
-/// \param[in] h hash signature to be printed.
-///
-/// Mainly useful for debugging / testing.
-///
-std::ostream &operator<<(std::ostream &o, hash_t h)
-{
-  return o << h.data[0] << h.data[1];
-}
 }  // namespace vita

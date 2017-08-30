@@ -160,9 +160,9 @@ hash_t i_de::hash() const
   /// ... and from a packed byte stream to a signature...
 
   // Length in bytes.
-  const auto len(static_cast<unsigned>(packed.size() * sizeof(packed[0])));
+  const auto len(packed.size() * sizeof(packed[0]));  // length in bytes
 
-  return vita::hash(packed.data(), len, 1973);
+  return vita::hash::hash128(packed.data(), len);
 }
 
 ///

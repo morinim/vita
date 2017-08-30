@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,22 +23,6 @@
 
 namespace vita
 {
-#if defined(_MSC_VER)
-#  define ROTL64(x, y)  _rotl64(x, y)
-#else
-///
-/// \param[in] x unsigned 64-bit to be rotated.
-/// \param[in] r number of steps.
-/// \return the value corresponding to rotating the bits of \a x \a r-steps
-///         to the right (r must be between 1 to 31 inclusive).
-///
-inline std::uint64_t rotl64(std::uint64_t x, std::uint8_t r)
-{
-  return (x << r) | (x >> (64 - r));
-}
-#define ROTL64(x, y)  rotl64(x, y)
-#endif
-
 /// A way to hide warnings about variables only used in compile time asserts.
 /// There are GCC compiler flags that control unused warnings, but we want a
 /// selective behaviour (generally this is useful to check for dead code).
@@ -117,4 +101,4 @@ inline void term_raw_mode(bool) {}
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

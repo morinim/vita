@@ -13,58 +13,11 @@
 #if !defined(VITA_CACHE_H)
 #define      VITA_CACHE_H
 
+#include "kernel/cache_hash.h"
 #include "kernel/environment.h"
 
 namespace vita
 {
-///
-/// This is a 128bit stream used as individual signature / hash table
-/// look up key.
-///
-struct hash_t
-{
-  /// Hash signature is a 128 bit unsigned and is built by two 64 bit
-  /// halves.
-  explicit hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
-
-  /// Resets the content of hash_t.
-  void clear() { data[0] = data[1] = 0; }
-
-  /// Standard equality operator for hash signature.
-  bool operator==(hash_t h) const
-  { return data[0] == h.data[0] && data[1] == h.data[1]; }
-
-  /// Standard inequality operator for hash signature.
-  bool operator!=(hash_t h) const
-  { return data[0] != h.data[0] || data[1] != h.data[1]; }
-
-  /// Used to combine multiple hashes.
-  ///
-  /// \note
-  /// In spite of its handy bit-mixing properties, XOR is not a good way to
-  /// combine hashes due to its commutativity (e.g. see
-  /// http://stackoverflow.com/q/5889238/3235496).
-  void combine(hash_t h)
-  {
-    // This combiner is a tip from Bob Jenkins. An alternative from Boost is:
-    // data[i] ^= h.data[i] + 0x9e3779b9 + (data[i] << 6) + (dati[i] >> 2);
-    data[0] += 11 * h.data[0];
-    data[1] += 13 * h.data[1];
-  }
-
-  /// We assume that a string of 128 zero bits means empty.
-  bool empty() const { return !data[0] && !data[1]; }
-
-  // Serialization.
-  bool load(std::istream &);
-  bool save(std::ostream &) const;
-
-  // Data members.
-  std::uint_least64_t data[2];
-};
-
-std::ostream &operator<<(std::ostream &, hash_t);
-
 ///
 /// Implements a hash table that links individuals' signature to fitness
 /// (mainly used by the evaluator_proxy class).

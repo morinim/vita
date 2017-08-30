@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,43 +18,104 @@
 namespace vita
 {
 ///
-/// \param[in] data data stream to be hashed.
-/// \param[in] len length, in bytes, of `data`.
-/// \param[in] seed initialization seed.
-/// \return the signature of `data`.
+/// A 128bit unsigned integer used as individual's signature / hash table
+/// look-up key.
 ///
-/// MurmurHash3 (https://github.com/aappleby/smhasher), by Austin Appleby, is a
-/// relatively simple non-cryptographic hash algorithm. It's noted for being
-/// fast, with excellent distribution, avalanche behavior and overall
-/// collision resistance.
+struct hash_t
+{
+  explicit hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
+
+  /// Resets the content of hash_t.
+  void clear() { data[0] = data[1] = 0; }
+
+  /// Standard equality operator for hash signature.
+  bool operator==(hash_t h) const
+  { return data[0] == h.data[0] && data[1] == h.data[1]; }
+
+  /// Standard inequality operator for hash signature.
+  bool operator!=(hash_t h) const
+  { return data[0] != h.data[0] || data[1] != h.data[1]; }
+
+  /// Used to combine multiple hashes.
+  ///
+  /// \note
+  /// In spite of its handy bit-mixing properties, XOR is not a good way to
+  /// combine hashes due to its commutativity (e.g. see
+  /// http://stackoverflow.com/q/5889238/3235496).
+  void combine(hash_t h)
+  {
+    // This combine is a tip from Bob Jenkins. An alternative from Boost is:
+    // data[i] ^= h.data[i] + 0x9e3779b9 + (data[i] << 6) + (data[i] >> 2);
+    data[0] += 11 * h.data[0];
+    data[1] += 13 * h.data[1];
+  }
+
+  /// We assume that a string of 128 zero bits means empty.
+  bool empty() const { return !data[0] && !data[1]; }
+
+  // Serialization.
+  bool load(std::istream &);
+  bool save(std::ostream &) const;
+
+  // Data members.
+  std::uint_least64_t data[2];
+};
+
+std::ostream &operator<<(std::ostream &, hash_t);
+
+#if defined(_MSC_VER)
+#  define ROTL64(x, y)  _rotl64(x, y)
+#else
+///
+/// \param[in] x unsigned 64-bit to be rotated
+/// \param[in] r number of steps
+/// \return      the value corresponding to rotating the bits of `x` `r`-steps
+///              to the right (`r` must be between `1` to `31` inclusive)
+///
+inline std::uint64_t rotl64(std::uint64_t x, std::uint8_t r)
+{
+  return (x << r) | (x >> (64 - r));
+}
+#define ROTL64(x, y)  rotl64(x, y)
+#endif
+
+///
+/// MurmurHash3 (https://github.com/aappleby/smhasher) by Austin Appleby.
+///
+/// MurmurHash3 is a relatively simple non-cryptographic hash algorithm. It's
+/// noted for being fast, with excellent distribution, avalanche behavior and
+/// overall collision resistance.
 ///
 /// \note
-/// MurmurHash and CityHash are excellent hash functions and are equally
-/// portable.  In favor of MurmurHash: it's been around for longer and is
-/// already used in many STL implementations.  In favor of CityHash: it
-/// performs a bit better than Murmurhash, on average (at least on x86-64
-/// architectures).
+/// An interesting alternative is SpookyHash
+/// (<http://burtleburtle.net/bob/hash/spooky.html>) by Bob Jenkins.
 ///
-/// \see
-/// * <http://comments.gmane.org/gmane.comp.compilers.clang.devel/18702>
-/// * <http://blog.reverberate.org/2012/01/state-of-hash-functions-2012.html>
-/// * <http://code.google.com/p/cityhash/>
-/// * <http://code.google.com/p/smhasher/>
-///
-inline hash_t hash(void *const data, unsigned len, const unsigned seed)
+class murmurhash3
 {
-  /// Murmurhash3 follows.
-  const unsigned n_blocks(len / 16);  // Block size is 128bit
+public:
+  static hash_t hash128(void *const, std::size_t, hash_t = hash_t(1973, 1973));
+};
 
-  std::uint64_t h1(seed), h2(seed);
+///
+/// Hashes a single message in one call, return 128-bit output.
+///
+/// \param[in] data data stream to be hashed
+/// \param[in] len  length, in bytes, of `data`
+/// \param[in] seed initialization seed
+/// \return         the signature of `data`
+///
+inline hash_t murmurhash3::hash128(void *const data, std::size_t len,
+                                   hash_t seed)
+{
+  const auto n_blocks(len / 16);  // block size is 128bit
 
   const std::uint64_t c1(0x87c37b91114253d5), c2(0x4cf5ad432745937f);
 
   // Body.
-  const std::uint64_t *const blocks(
-    reinterpret_cast<const std::uint64_t *>(data));
+  const auto *blocks(reinterpret_cast<const std::uint64_t *>(data));
+  hash_t h(seed);
 
-  for (unsigned i(0); i < n_blocks; ++i)
+  for (std::size_t i(0); i < n_blocks; ++i)
   {
     std::uint64_t k1(blocks[i * 2 + 0]);
     std::uint64_t k2(blocks[i * 2 + 1]);
@@ -62,20 +123,20 @@ inline hash_t hash(void *const data, unsigned len, const unsigned seed)
     k1 *= c1;
     k1  = ROTL64(k1, 31);
     k1 *= c2;
-    h1 ^= k1;
+    h.data[0] ^= k1;
 
-    h1 = ROTL64(h1, 27);
-    h1 += h2;
-    h1 = h1*5 + 0x52dce729;
+    h.data[0] = ROTL64(h.data[0], 27);
+    h.data[0] += h.data[1];
+    h.data[0] = h.data[0] * 5 + 0x52dce729;
 
     k2 *= c2;
     k2  = ROTL64(k2, 33);
     k2 *= c1;
-    h2 ^= k2;
+    h.data[1] ^= k2;
 
-    h2 = ROTL64(h2, 31);
-    h2 += h1;
-    h2 = h2*5 + 0x38495ab5;
+    h.data[1] = ROTL64(h.data[1], 31);
+    h.data[1] += h.data[0];
+    h.data[1] = h.data[1] * 5 + 0x38495ab5;
   }
 
   // Tail.
@@ -93,7 +154,7 @@ inline hash_t hash(void *const data, unsigned len, const unsigned seed)
   case 11: k2 ^= std::uint64_t(tail[10]) << 16;
   case 10: k2 ^= std::uint64_t(tail[ 9]) << 8;
   case  9: k2 ^= std::uint64_t(tail[ 8]) << 0;
-           k2 *= c2; k2  = ROTL64(k2, 33); k2 *= c1; h2 ^= k2;
+           k2 *= c2; k2  = ROTL64(k2, 33); k2 *= c1; h.data[1] ^= k2;
 
   case  8: k1 ^= std::uint64_t(tail[ 7]) << 56;
   case  7: k1 ^= std::uint64_t(tail[ 6]) << 48;
@@ -103,33 +164,36 @@ inline hash_t hash(void *const data, unsigned len, const unsigned seed)
   case  3: k1 ^= std::uint64_t(tail[ 2]) << 16;
   case  2: k1 ^= std::uint64_t(tail[ 1]) << 8;
   case  1: k1 ^= std::uint64_t(tail[ 0]) << 0;
-           k1 *= c1; k1  = ROTL64(k1, 31); k1 *= c2; h1 ^= k1;
+           k1 *= c1; k1  = ROTL64(k1, 31); k1 *= c2; h.data[0] ^= k1;
   }
 
   // Finalization.
-  h1 ^= len;
-  h2 ^= len;
+  // The constants were generated by a simple simulated-annealing algorithm.
+  h.data[0] ^= len;
+  h.data[1] ^= len;
 
-  h1 += h2;
-  h2 += h1;
+  h.data[0] += h.data[1];
+  h.data[1] += h.data[0];
 
-  h1 ^= h1 >> 33;
-  h1 *= 0xff51afd7ed558ccd;
-  h1 ^= h1 >> 33;
-  h1 *= 0xc4ceb9fe1a85ec53;
-  h1 ^= h1 >> 33;
+  h.data[0] ^= h.data[0] >> 33;
+  h.data[0] *= 0xff51afd7ed558ccd;
+  h.data[0] ^= h.data[0] >> 33;
+  h.data[0] *= 0xc4ceb9fe1a85ec53;
+  h.data[0] ^= h.data[0] >> 33;
 
-  h2 ^= h2 >> 33;
-  h2 *= 0xff51afd7ed558ccd;
-  h2 ^= h2 >> 33;
-  h2 *= 0xc4ceb9fe1a85ec53;
-  h2 ^= h2 >> 33;
+  h.data[1] ^= h.data[1] >> 33;
+  h.data[1] *= 0xff51afd7ed558ccd;
+  h.data[1] ^= h.data[1] >> 33;
+  h.data[1] *= 0xc4ceb9fe1a85ec53;
+  h.data[1] ^= h.data[1] >> 33;
 
-  h1 += h2;
-  h2 += h1;
+  h.data[0] += h.data[1];
+  h.data[1] += h.data[0];
 
-  return hash_t(h1, h2);
+  return h;
 }
+
+typedef murmurhash3 hash;
 
 }  // namespace vita
 #endif  // include guard
