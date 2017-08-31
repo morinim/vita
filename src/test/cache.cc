@@ -55,13 +55,13 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
   {
     key[i] = static_cast<byte>(i);
 
-    auto h(vita::hash::hash128(key, i, hash_t(256 - i, 256 - i)));
+    auto h(vita::hash::hash128(key, i, 256 - i));
     reinterpret_cast<std::uint64_t *>(&hashes[i * hashbytes])[0] = h.data[0];
     reinterpret_cast<std::uint64_t *>(&hashes[i * hashbytes])[1] = h.data[1];
   }
 
   // Then hash the result array.
-  auto h(vita::hash::hash128(hashes, hashbytes * 256, hash_t()));
+  auto h(vita::hash::hash128(hashes, hashbytes * 256, 0));
   reinterpret_cast<std::uint64_t *>(final)[0] = h.data[0];
   reinterpret_cast<std::uint64_t *>(final)[1] = h.data[1];
 

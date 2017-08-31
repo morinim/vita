@@ -94,7 +94,7 @@ inline std::uint64_t rotl64(std::uint64_t x, std::uint8_t r)
 class murmurhash3
 {
 public:
-  static hash_t hash128(void *const, std::size_t, hash_t = hash_t(1973, 1973));
+  static hash_t hash128(void *const, std::size_t, std::uint32_t = 1973);
 
 private:
   static std::uint64_t fmix(std::uint64_t);
@@ -111,7 +111,7 @@ private:
 /// \return         the signature of `data`
 ///
 inline hash_t murmurhash3::hash128(void *const data, std::size_t len,
-                                   hash_t seed)
+                                   std::uint32_t seed)
 {
   const auto n_blocks(len / 16);  // block size is 128bit
 
@@ -119,7 +119,7 @@ inline hash_t murmurhash3::hash128(void *const data, std::size_t len,
 
   // Body.
   const auto *blocks(reinterpret_cast<const std::uint64_t *>(data));
-  hash_t h(seed);
+  hash_t h(seed, seed);
 
   for (std::size_t i(0); i < n_blocks; ++i)
   {
@@ -146,8 +146,7 @@ inline hash_t murmurhash3::hash128(void *const data, std::size_t len,
   }
 
   // Tail.
-  const std::uint8_t *const tail(
-    reinterpret_cast<const std::uint8_t *>(data) + n_blocks * 16);
+  auto tail(reinterpret_cast<const unsigned char *>(data) + n_blocks * 16);
 
   std::uint64_t k1(0), k2(0);
 
