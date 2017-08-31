@@ -374,7 +374,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
   // std::uint8_t has the exact same size and representation as
   // unsigned char, if the implementation made it a distinct, non-character
   // type, the aliasing rules would not apply to it
-  // (see http://stackoverflow.com/q/16138237/3235496)
+  // (see <http://stackoverflow.com/q/16138237/3235496>)
   auto s1 = reinterpret_cast<const unsigned char *>(&opcode);
   for (std::size_t i(0); i < sizeof(opcode); ++i)
     p->push_back(s1[i]);
