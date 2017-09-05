@@ -81,6 +81,13 @@ public:
   /// \post `rhs.empty()`
   any &operator=(const any &rhs) { return assign(rhs); }
 
+  /// Assigns by moving the state of `rhs`.
+  ///
+  /// \note
+  /// `rhs` is left in a valid but unspecified state after the assignment.
+  any &operator=(any &&rhs) noexcept
+  { return any(std::move(rhs)).swap(*this); }
+
   // Utility functions
   /// Exchange of the contents of `*this` and `rhs`.
   any &swap(any &rhs) noexcept
