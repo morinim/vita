@@ -49,7 +49,7 @@ void basic_gene<K>::init_if_parametric()
 ///
 /// \param[in] g a reference to a symbol and its arguments
 ///
-/// With this constructor it is easy to write genome "by hand":
+/// A constructor that makes it easy to write genome "by hand":
 ///     std::vector<gene> g(
 ///     {
 ///       {{f_add, {1, 2}}},  // [0] ADD 1,2

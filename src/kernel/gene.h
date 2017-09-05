@@ -73,6 +73,12 @@ bool operator==(const basic_gene<K> &, const basic_gene<K> &);
 template<unsigned K>
 bool operator!=(const basic_gene<K> &, const basic_gene<K> &);
 
+///
+/// A basic_gene with the standard size.
+///
+/// A gene supports function with more than 4 arguments but with a performance
+/// penality.
+///
 using gene = basic_gene<4>;
 
 #include "kernel/gene.tcc"
