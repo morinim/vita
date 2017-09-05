@@ -26,7 +26,7 @@ struct empty {};
 struct fxn_ptr_table
 {
   const std::type_info &(*get_type)();
-  void (*static_delete)(void **);
+  void (*static_delete)(void **) noexcept;
   void (*destruct)(void **);
   void (*clone)(void *const *, void **);
   void (*move)(void *const *, void **);
@@ -42,7 +42,8 @@ template<> struct fxns<true>
   {
     static constexpr const std::type_info &get_type() { return typeid(T); }
 
-    static void static_delete(void **x) { reinterpret_cast<T *>(x)->~T(); }
+    static void static_delete(void **x) noexcept
+    { reinterpret_cast<T *>(x)->~T(); }
 
     static void destruct(void **x) { reinterpret_cast<T *>(x)->~T(); }
 
@@ -70,7 +71,7 @@ template<> struct fxns<true>
   };  // struct type
 };  // struct fxns<true>
 
-// Static functions for big value-types (bigger than a void*)
+// Static functions for big value-types (bigger than a `void *`)
 template<>
 struct fxns<false>
 {
@@ -79,7 +80,7 @@ struct fxns<false>
   {
     static constexpr const std::type_info &get_type() { return typeid(T); }
 
-    static void static_delete(void **x)
+    static void static_delete(void **x) noexcept
     {
       // destruct and free memory
       delete (*reinterpret_cast<T **>(x));
@@ -121,7 +122,7 @@ struct get_table
   static constexpr bool is_small = sizeof(T) <= sizeof(void *);
   using is_small_t = std::integral_constant<bool, is_small>;
 
-  static fxn_ptr_table *get()
+  static fxn_ptr_table *get() noexcept
   {
     static fxn_ptr_table static_table =
     {
@@ -159,14 +160,24 @@ inline std::ostream & operator<<(std::ostream &o, const empty &)
 }
 }}  // namespace detail::any_
 
+///
+/// Constructs an empty object.
+///
 /// \post `this->empty()`
-inline any::any() : table(detail::any_::get_table<detail::any_::empty>::get())
+///
+inline any::any() noexcept
+  : table(detail::any_::get_table<detail::any_::empty>::get())
 {
 }
 
-/// Copy constructor that copies content of `x` into new instance, so that any
-/// content is equivalent in both type and value to the content of `x` or empty
+///
+/// Copy constructor that copies content of `x` into new instance.
+///
+/// \param[in] x content to be copied `x`
+///
+/// Content is equivalent in both type and value to the content of `x` or empty
 /// if `x` is empty.
+///
 inline any::any(const any &x)
   : table(detail::any_::get_table<detail::any_::empty>::get())
 {
@@ -199,7 +210,9 @@ any::any(const T &x, std::false_type *)
 {
 }
 
-/// Releases any and all resources used in management of instance
+///
+/// Releases any and all resources used in management of instance.
+///
 inline any::~any()
 {
   table->static_delete(&object);
@@ -226,7 +239,7 @@ inline any &any::assign(const any &x)
 template<class T>
 any &any::assign(const T &x)
 {
-  detail::any_::fxn_ptr_table *x_table(detail::any_::get_table<T>::get());
+  auto *x_table(detail::any_::get_table<T>::get());
 
   // Are we copying between the same type?
   if (table == x_table)
@@ -259,6 +272,8 @@ any &any::assign(const T &x)
 }
 
 ///
+/// Assigns the type and values of `rhs`.
+///
 /// \param[in] rhs new any value
 /// \return        `this` object after assignment
 ///
@@ -272,6 +287,8 @@ any &any::operator=(T &&rhs)
 }
 
 ///
+/// Queries the contained type.
+///
 /// \return the typeid of the contained value if instance is non-empty,
 ///         otherwise typeid(void).
 ///
@@ -279,7 +296,7 @@ any &any::operator=(T &&rhs)
 /// Useful for querying against types known either at compile time or only
 /// at runtime.
 ///
-inline const std::type_info &any::type() const
+inline const std::type_info &any::type() const noexcept
 {
   return table->get_type();
 }
@@ -289,7 +306,7 @@ inline const std::type_info &any::type() const
 ///
 /// \return `true` if instance contains a value, otherwise `false`.
 ///
-inline bool any::has_value() const
+inline bool any::has_value() const noexcept
 {
   return table != detail::any_::get_table<detail::any_::empty>::get();
 }
@@ -297,7 +314,7 @@ inline bool any::has_value() const
 ///
 /// Resets the content of the any.
 ///
-inline void any::clear()
+inline void any::clear() noexcept
 {
   if (has_value())
   {
@@ -319,16 +336,14 @@ const T &any::cast() const
 }
 
 // This function has been added in the assumption that the embedded
-// type has a corresponding operator defined, which is completely safe
-// because any is used only in contexts where these operators do exist
+// type has a corresponding operator defined.
 inline std::istream &operator>>(std::istream& i, any &obj)
 {
   return obj.table->stream_in(i, &obj.object);
 }
 
 // This function has been added in the assumption that the embedded
-// type has a corresponding operator defined, which is completely safe
-// because any is used only in contexts where these operators do exist
+// type has a corresponding operator defined.
 inline std::ostream &operator<<(std::ostream& o, const any &obj)
 {
   return obj.table->stream_out(o, &obj.object);
@@ -342,7 +357,7 @@ inline std::ostream &operator<<(std::ostream& o, const any &obj)
 ///                    successful, otherwise null is returned
 ///
 template<class T>
-T *any_cast(any *operand)
+T *any_cast(any *operand) noexcept
 {
   if (operand && operand->type() == typeid(T))
     return detail::any_::get_table<T>::is_small ?
@@ -360,7 +375,7 @@ T *any_cast(any *operand)
 ///                    successful, otherwise null is returned
 ///
 template<class T>
-const T *any_cast(const any *operand)
+const T *any_cast(const any *operand) noexcept
 {
   return any_cast<T>(const_cast<any *>(operand));
 }

@@ -15,11 +15,7 @@
 
 #include "kernel/common.h"
 
-#if defined(USE_BOOST_ANY)
-#  include <boost/any.hpp>
-#else
-#  include <typeinfo>
-#endif
+#include <typeinfo>
 
 namespace vita
 {
@@ -44,7 +40,7 @@ struct bad_any_cast : std::bad_cast
     : from(src.name()), to(dest.name())
   {}
 
-  virtual const char *what() const throw() { return "bad any cast"; }
+  const char *what() const noexcept override { return "bad any cast"; }
 
   const char *from;
   const char *to;
@@ -63,47 +59,48 @@ class any
 public:
   // Constructors / destructor.
   template<class T> explicit any(const T &);
-  any();
+  any() noexcept;
   any(const any &);
 
   /// Move constructor that moves content of `x` into new instance and leaves
   /// `x` empty.
   ///
   /// \post `x->empty()`
-  any(any &&x) : any() { swap(x); }
+  any(any &&x) noexcept : any() { swap(x); }
 
   ~any();
 
   // Assignment operators.
   template<class T> any &operator=(T &&);
 
-  /// Copies content of rhs into current instance, discarding previous
-  /// content, so that the new content is equivalent in both type and value
-  /// to the content of `rhs`, or empty if `rhs.empty()`.
+  /// Copies content of rhs into current instance.
+  ///
+  /// Discards previous content, so that the new content is equivalent in both
+  /// type and value to the content of `rhs`, or empty if `rhs.empty()`.
   ///
   /// \post `rhs.empty()`
   any &operator=(const any &rhs) { return assign(rhs); }
 
   // Utility functions
   /// Exchange of the contents of `*this` and `rhs`.
-  any &swap(any &rhs)
+  any &swap(any &rhs) noexcept
   {
     std::swap(table, rhs.table);
     std::swap(object, rhs.object);
     return *this;
   }
 
-  const std::type_info &type() const;
+  const std::type_info &type() const noexcept;
 
-  bool has_value() const;
+  bool has_value() const noexcept;
 
-  void clear();
+  void clear() noexcept;
 
   friend std::istream &operator>>(std::istream&, any &);
   friend std::ostream &operator<<(std::ostream&, const any &);
 
   // Types
-  template<class T> friend T *any_cast(any *);
+  template<class T> friend T *any_cast(any *) noexcept;
 
 private:
   template<class T> explicit any(const T &, std::true_type *);
