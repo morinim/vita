@@ -227,7 +227,7 @@ inline any &any::assign(const any &x)
       table->move(&x.object, &object);
     else
     {
-      clear();
+      reset();
       x.table->clone(&x.object, &object);
       table = x.table;
     }
@@ -261,7 +261,7 @@ any &any::assign(const T &x)
     }
     else
     {
-      clear();  // first delete the old content
+      reset();  // first delete the old content
       object = new T(x);
     }
 
@@ -314,7 +314,7 @@ inline bool any::has_value() const noexcept
 ///
 /// Resets the content of the any.
 ///
-inline void any::clear() noexcept
+inline void any::reset() noexcept
 {
   if (has_value())
   {

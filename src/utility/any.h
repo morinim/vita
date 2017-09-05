@@ -94,7 +94,7 @@ public:
 
   bool has_value() const noexcept;
 
-  void clear() noexcept;
+  void reset() noexcept;
 
   friend std::istream &operator>>(std::istream&, any &);
   friend std::ostream &operator<<(std::ostream&, const any &);
@@ -108,7 +108,6 @@ private:
 
   // Assignment and casting
   template<class T> any &assign(const T &);
-
   any &assign(const any &);
 
   template<class T> const T &cast() const;
