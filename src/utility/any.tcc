@@ -341,17 +341,6 @@ inline void any::reset() noexcept
   }
 }
 
-template<class T>
-const T &any::cast() const
-{
-  if (type() != typeid(T))
-    throw bad_any_cast(type(), typeid(T));
-
-  return detail::any_::get_table<T>::is_small ?
-    *reinterpret_cast<const T *>(&object) :
-    *reinterpret_cast<const T *>(object);
-}
-
 // This function has been added in the assumption that the embedded
 // type has a corresponding operator defined.
 inline std::istream &operator>>(std::istream& i, any &obj)

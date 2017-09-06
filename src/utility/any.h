@@ -115,11 +115,9 @@ private:
   template<class T> explicit any(const T &, std::true_type *);
   template<class T> explicit any(const T &, std::false_type *);
 
-  // Assignment and casting
+  // Assignment
   template<class T> any &assign(const T &);
   any &assign(const any &);
-
-  template<class T> const T &cast() const;
 
   // Private data members
   detail::any_::fxn_ptr_table *table;
