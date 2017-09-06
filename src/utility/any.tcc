@@ -20,8 +20,6 @@
 namespace detail {
 namespace any_ {
 
-struct empty {};
-
 // Function pointer table.
 struct fxn_ptr_table
 {
@@ -30,6 +28,7 @@ struct fxn_ptr_table
   void (*destruct)(void **);
   void (*clone)(void *const *, void **);
   void (*move)(void *const *, void **);
+  std::size_t (*hash)(void *const *);
   std::istream &(*stream_in)(std::istream &, void **);
   std::ostream &(*stream_out)(std::ostream &, void *const *);
 };
@@ -55,6 +54,11 @@ template<> struct fxns<true>
     static void move(void *const *src, void **dest)
     {
       *reinterpret_cast<T *>(dest) = *reinterpret_cast<const T *>(src);
+    }
+
+    static std::size_t hash(void *const *obj)
+    {
+      return std::hash<T>()(*reinterpret_cast<const T *>(obj));
     }
 
     static std::istream &stream_in(std::istream &i, void **obj)
@@ -102,9 +106,14 @@ struct fxns<false>
       **reinterpret_cast<T **>(dest) = **reinterpret_cast<T *const *>(src);
     }
 
+    static std::size_t hash(void *const *obj)
+    {
+      return std::hash<T>()(**reinterpret_cast<T *const *>(obj));
+    }
+
     static std::istream &stream_in(std::istream &i, void **obj)
     {
-      i >> **reinterpret_cast<T**>(obj);
+      i >> **reinterpret_cast<T **>(obj);
       return i;
     }
 
@@ -131,6 +140,7 @@ struct get_table
       fxns<is_small>::template type<T>::destruct,
       fxns<is_small>::template type<T>::clone,
       fxns<is_small>::template type<T>::move,
+      fxns<is_small>::template type<T>::hash,
       fxns<is_small>::template type<T>::stream_in,
       fxns<is_small>::template type<T>::stream_out
     };
@@ -138,6 +148,7 @@ struct get_table
     return &static_table;
   }
 };  // class get_table
+
 
 inline std::istream &operator>>(std::istream &i, empty &)
 {
@@ -154,10 +165,16 @@ inline std::istream &operator>>(std::istream &i, empty &)
   return i;
 }
 
-inline std::ostream & operator<<(std::ostream &o, const empty &)
+inline std::ostream &operator<<(std::ostream &o, const empty &)
 {
   return o;
 }
+
+template<> constexpr const std::type_info &fxns<true>::type<empty>::get_type()
+{
+  return typeid(void);
+}
+
 }}  // namespace detail::any_
 
 ///

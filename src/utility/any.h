@@ -15,6 +15,7 @@
 
 #include "kernel/common.h"
 
+#include <functional>
 #include <typeinfo>
 
 namespace vita
@@ -24,7 +25,7 @@ namespace detail
 {
 namespace any_
 {
-struct empty;
+struct empty {};
 struct fxn_ptr_table;
 template<bool> struct fxns;
 template<class> struct get_table;
@@ -105,6 +106,7 @@ public:
 
   friend std::istream &operator>>(std::istream&, any &);
   friend std::ostream &operator<<(std::ostream&, const any &);
+  friend struct std::hash<any>;
 
   // Types
   template<class T> friend T *any_cast(any *) noexcept;
@@ -128,7 +130,36 @@ private:
 template<class T> T to(const any &);
 
 #include "utility/any.tcc"
-
 }  // namespace vita
+
+
+namespace std
+{
+template<>
+struct hash<vita::detail::any_::empty>
+{
+  constexpr
+  std::size_t operator()(const vita::detail::any_::empty &) const noexcept
+  { return 0; }
+};
+
+template<>
+struct hash<vita::any>
+{
+  // Since (<http://en.cppreference.com/w/cpp/utility/hash>):
+  // > all member functions of all standard library specializations of this
+  // > template are noexcept except for the member functions of
+  // > std::hash<std::optional>, std::hash<std::variant> and
+  // > std::hash<std::unique_ptr>
+  //
+  // here we cannot use the `noexcept` specifier (the contained object could be
+  // `std::optional` / `std::variant` / `std::unique_ptr`).
+  std::size_t operator()(const vita::any &obj) const
+  {
+    // A call to the appropriate std::hash<T>::operator().
+    return obj.table->hash(&obj.object);
+  }
+};
+}  // namespace std
 
 #endif  // include guard
