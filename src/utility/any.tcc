@@ -358,7 +358,7 @@ inline std::ostream &operator<<(std::ostream& o, const any &obj)
 ///
 /// Custom keyword cast for extracting a value of a given type from any.
 ///
-/// \param[in] operand a pointer to any
+/// \param[in] operand a pointer to same `any`
 /// \return            a similarly qualified pointer to the value content if
 ///                    successful, otherwise null is returned
 ///
@@ -376,7 +376,7 @@ T *any_cast(any *operand) noexcept
 ///
 /// Custom keyword cast for extracting a value of a given type from any.
 ///
-/// \param[in] operand a pointer to any
+/// \param[in] operand a pointer to some `any`
 /// \return            a similarly qualified pointer to the value content if
 ///                    successful, otherwise null is returned
 ///
@@ -395,13 +395,13 @@ const T *any_cast(const any *operand) noexcept
 template<class T>
 T any_cast(any &operand)
 {
-  using nonref = std::remove_reference_t<T>;
+  using U = std::remove_cv_t<std::remove_reference_t<T>>;
 
-  auto *result = any_cast<nonref>(&operand);
+  auto *result = any_cast<U>(&operand);
   if (!result)
     throw bad_any_cast(operand.type(), typeid(T));
 
-  return *result;
+  return static_cast<T>(*result);
 }
 
 ///
@@ -411,11 +411,9 @@ T any_cast(any &operand)
 /// \return            a constant reference to the value contained in `operand`
 ///
 template<class T>
-const T &any_cast(const any &operand)
+T any_cast(const any &operand)
 {
-  using nonref = std::remove_reference_t<T>;
-
-  return any_cast<const nonref &>(const_cast<any &>(operand));
+  return any_cast<T>(const_cast<any &>(operand));
 }
 
 #endif  // include guard

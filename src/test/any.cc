@@ -189,13 +189,14 @@ BOOST_AUTO_TEST_CASE(reset)
   BOOST_CHECK(!value.has_value());
 }
 
+// Covers the case from Boost #9462
+// (<https://svn.boost.org/trac/boost/ticket/9462>).
 BOOST_AUTO_TEST_CASE(vectors)
 {
   const std::size_t vs(100);
   auto make_vect([&]() { return vita::any(std::vector<int>(vs, 7)); });
 
-  vita::any a(make_vect());
-  const std::vector<int> &vec(vita::any_cast<std::vector<int>>(a));
+  const std::vector<int> &vec(vita::any_cast<std::vector<int>>(make_vect()));
 
   BOOST_CHECK(vec.size() == vs);
   BOOST_CHECK(vec.back() == 7);
