@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,6 +25,7 @@ using namespace boost;
 #include "test/factory_fixture4.h"
 #include "test/factory_fixture5.h"
 
+#include "test/any.cc"
 #include "test/cache.cc"
 #include "test/de.cc"
 #include "test/discretization.cc"
@@ -48,4 +49,3 @@ using namespace boost;
 #include "test/symbol_set.cc"
 #include "test/team.cc"
 #include "test/terminal.cc"
-//#include "test/variant.cc"
