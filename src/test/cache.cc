@@ -13,7 +13,7 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/cache_hash.h"
+#include "kernel/cache.h"
 #include "kernel/environment.h"
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
@@ -31,7 +31,7 @@ using namespace boost;
 
 BOOST_AUTO_TEST_SUITE(test_hash)
 
-// This should hopefully be a thorough and uambiguous test of whether the hash
+// This should hopefully be a thorough and unambiguous test of whether the hash
 // is correctly implemented.
 BOOST_AUTO_TEST_CASE(MurmurHash)
 {
