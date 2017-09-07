@@ -192,6 +192,9 @@ inline any::any() noexcept
 ///
 /// \param[in] x content to be copied `x`
 ///
+/// \exception std::bad_alloc may also fail with exceptions arising from the
+///                           the copy constructor of the contained type
+///
 /// Content is equivalent in both type and value to the content of `x` or empty
 /// if `x` is empty.
 ///
@@ -202,7 +205,12 @@ inline any::any(const any &x)
 }
 
 ///
+/// Makes a copy of 'x'.
+///
 /// \param[in] x any will contain object `x`
+///
+/// \exception std::bad_alloc may also fail with exceptions arising from the
+///                           the copy constructor of the contained type
 ///
 /// Makes a copy of `x`, so that the initial content of the new instance is
 /// equivalent in both type and value to `x`.
@@ -389,8 +397,26 @@ const T *any_cast(const any *operand) noexcept
 ///
 /// Custom keyword cast for extracting a value of a given type from any.
 ///
-/// \param[in] operand an any
+/// \param[in] operand target `any` object
+/// \return            a constant reference to the value contained in `operand`
+///
+/// \exception vita::bad_any_cast if the `typeid` of the requested `T` doesn't
+///                               matches that of the contents of `operand`
+///
+template<class T>
+T any_cast(const any &operand)
+{
+  return any_cast<T>(const_cast<any &>(operand));
+}
+
+///
+/// Custom keyword cast for extracting a value of a given type from any.
+///
+/// \param[in] operand target `any` object
 /// \return            the value contained in `operand`
+///
+/// \exception vita::bad_any_cast if the `typeid` of the requested `T` doesn't
+///                               matches that of the contents of `operand`
 ///
 template<class T>
 T any_cast(any &operand)
@@ -407,13 +433,22 @@ T any_cast(any &operand)
 ///
 /// Custom keyword cast for extracting a value of a given type from any.
 ///
-/// \param[in] operand an any
-/// \return            a constant reference to the value contained in `operand`
+/// \param[in] operand target `any` object
+/// \return            the value contained in `operand`
+///
+/// \exception vita::bad_any_cast if the `typeid` of the requested `T` doesn't
+///                               matches that of the contents of `operand`
 ///
 template<class T>
-T any_cast(const any &operand)
+T any_cast(any &&operand)
 {
-  return any_cast<T>(const_cast<any &>(operand));
+  using U = std::remove_cv_t<std::remove_reference_t<T>>;
+
+  auto *result = any_cast<U>(&operand);
+  if (!result)
+    throw bad_any_cast(operand.type(), typeid(T));
+
+  return static_cast<T>(std::move(*result));
 }
 
 #endif  // include guard
