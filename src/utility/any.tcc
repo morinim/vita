@@ -28,9 +28,6 @@ struct fxn_ptr_table
   void (*destruct)(void **);
   void (*clone)(void *const *, void **);
   void (*move)(void *const *, void **);
-  std::size_t (*hash)(void *const *);
-  std::istream &(*stream_in)(std::istream &, void **);
-  std::ostream &(*stream_out)(std::ostream &, void *const *);
 };
 
 // Static functions for small value-types
@@ -54,23 +51,6 @@ template<> struct fxns<true>
     static void move(void *const *src, void **dest)
     {
       *reinterpret_cast<T *>(dest) = *reinterpret_cast<const T *>(src);
-    }
-
-    static std::size_t hash(void *const *obj)
-    {
-      return std::hash<T>()(*reinterpret_cast<const T *>(obj));
-    }
-
-    static std::istream &stream_in(std::istream &i, void **obj)
-    {
-      i >> *reinterpret_cast<T *>(obj);
-      return i;
-    }
-
-    static std::ostream &stream_out(std::ostream &o, void *const *obj)
-    {
-      o << *reinterpret_cast<const T *>(obj);
-      return o;
     }
   };  // struct type
 };  // struct fxns<true>
@@ -105,23 +85,6 @@ struct fxns<false>
     {
       **reinterpret_cast<T **>(dest) = **reinterpret_cast<T *const *>(src);
     }
-
-    static std::size_t hash(void *const *obj)
-    {
-      return std::hash<T>()(**reinterpret_cast<T *const *>(obj));
-    }
-
-    static std::istream &stream_in(std::istream &i, void **obj)
-    {
-      i >> **reinterpret_cast<T **>(obj);
-      return i;
-    }
-
-    static std::ostream &stream_out(std::ostream &o, void *const *obj)
-    {
-      o << **reinterpret_cast<T *const *>(obj);
-      return o;
-    }
   };  // struct type
 };  // struct fxns<false>
 
@@ -139,36 +102,12 @@ struct get_table
       fxns<is_small>::template type<T>::static_delete,
       fxns<is_small>::template type<T>::destruct,
       fxns<is_small>::template type<T>::clone,
-      fxns<is_small>::template type<T>::move,
-      fxns<is_small>::template type<T>::hash,
-      fxns<is_small>::template type<T>::stream_in,
-      fxns<is_small>::template type<T>::stream_out
+      fxns<is_small>::template type<T>::move
     };
 
     return &static_table;
   }
 };  // class get_table
-
-
-inline std::istream &operator>>(std::istream &i, empty &)
-{
-  // If this assertion fires you tried to insert from a std::istream
-  // into an empty `hold_any` instance. This simply can't work, because
-  // there is no way to figure out what type to extract from the
-  // stream.
-  // The only way to make this work is to assign an arbitrary
-  // value of the required type to the hold_any instance you want to
-  // stream to. This assignment has to be executed before the actual
-  // call to the operator>>().
-  assert(false);
-
-  return i;
-}
-
-inline std::ostream &operator<<(std::ostream &o, const empty &)
-{
-  return o;
-}
 
 template<> constexpr const std::type_info &fxns<true>::type<empty>::get_type()
 {
@@ -347,20 +286,6 @@ inline void any::reset() noexcept
     table = detail::any_::get_table<detail::any_::empty>::get();
     object = nullptr;
   }
-}
-
-// This function has been added in the assumption that the embedded
-// type has a corresponding operator defined.
-inline std::istream &operator>>(std::istream& i, any &obj)
-{
-  return obj.table->stream_in(i, &obj.object);
-}
-
-// This function has been added in the assumption that the embedded
-// type has a corresponding operator defined.
-inline std::ostream &operator<<(std::ostream& o, const any &obj)
-{
-  return obj.table->stream_out(o, &obj.object);
 }
 
 ///

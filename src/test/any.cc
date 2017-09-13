@@ -203,23 +203,4 @@ BOOST_AUTO_TEST_CASE(vectors)
   BOOST_CHECK(vec.front() ==  7);
 }
 
-BOOST_AUTO_TEST_CASE(hash)
-{
-  const int v_int(1234);
-  const double v_double(3.14159265);
-  const std::string v_string("Hello world!");
-
-  vita::any a_int(v_int);
-  vita::any a_double(v_double);
-  vita::any a_string(v_string);
-  vita::any a_empty;
-
-  BOOST_CHECK(std::hash<vita::any>()(a_int) == std::hash<int>()(v_int));
-  BOOST_CHECK(std::hash<vita::any>()(a_double)
-              == std::hash<double>()(v_double));
-  BOOST_CHECK(std::hash<vita::any>()(a_string)
-              == std::hash<std::string>()(v_string));
-  BOOST_CHECK(std::hash<vita::any>()(a_empty) == 0);
-}
-
 BOOST_AUTO_TEST_SUITE_END()
