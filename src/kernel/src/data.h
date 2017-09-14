@@ -13,6 +13,7 @@
 #if !defined(VITA_SRC_DATA_H)
 #define      VITA_SRC_DATA_H
 
+#include <functional>
 #include <map>
 #include <string>
 

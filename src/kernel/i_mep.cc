@@ -11,6 +11,7 @@
  */
 
 #include <algorithm>
+#include <functional>
 #include <map>
 
 #include "kernel/i_mep.h"
