@@ -12,7 +12,7 @@ It's suitable for classification, symbolic regression, content base image retrie
 * fast experimentation with detailed run-log
 * modern, standard ISO C++14 source code
 
-It's distributed under the [Mozilla Public License v2.0](https://www.mozilla.org/MPL/2.0/) (see the accompanying [LICENSE](https://github.com/morinim/vita/blob/master/LICENSE) file for more details).
+It's distributed under the [Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
 
 This software was originally developed by [EOS][1] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
@@ -22,7 +22,7 @@ Although the core development team is still anchored at EOS, Vita is now open so
 
 Vita is designed to have fairly minimal requirements to build and use with your projects, but there are some. Currently, we support Linux and Windows. We will also make our best effort to support other platforms (e.g. Mac OS X, Solaris, AIX).
 However, since core members of the Vita project have no access to these platforms, Vita may have outstanding issues there. If you notice any problems on your platform, please use the
-[issue tracking system](https://github.com/morinim/vita/issues); patches for fixing them are even more welcome!
+[issue tracking system][9]; patches for fixing them are even more welcome!
 
 ### Mandatory ###
 
@@ -30,7 +30,7 @@ However, since core members of the Vita project have no access to these platform
 * POSIX-standard shell
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 
-Under Windows this means a recent version of MinGW / MSYS (our standard Windows test environment is [Nuwen](http://nuwen.net/mingw.html): it's simple and ready to use).
+For further details about building Vita under Windows can take a look at the [specific walkthrough][6].
 
 ### Optional ###
 
@@ -76,7 +76,7 @@ vita/
 
 ## Setting up the build ##
 
-Kernel library can be built without a header-only [Boost library][2]; other programs may need Boost headers / separately-compiled library binaries (e.g. SR utility needs Program Options Library to compile).
+Kernel library can be built without the [Boost library][2]; some programs / examples may need Boost headers / separately-compiled library binaries (e.g. `sr` utility needs *Boost Program Options Library* to compile).
 
 ### make ###
 
@@ -114,9 +114,15 @@ You're now ready to build using the traditional `make` system (see above).
 
 All the output files will be stored in subdirectories of `build/` (out of source builds).
 
+The real story is that Windows may need various expedients about which you can read in the [Windows walkthrough][6].
+
 
 [1]: http://www.eosdev.it/
 [2]: http://www.boost.org/
 [3]: https://github.com/morinim/vita
 [4]: http://www.python.org/
 [5]: https://cmake.org/
+[6]: https://github.com/morinim/vita/wiki/win_build
+[7]: https://www.mozilla.org/MPL/2.0/
+[8]: https://github.com/morinim/vita/blob/master/LICENSE
+[9]: https://github.com/morinim/vita/issues
