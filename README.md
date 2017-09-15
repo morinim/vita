@@ -30,7 +30,7 @@ However, since core members of the Vita project have no access to these platform
 * POSIX-standard shell
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 
-For further details about building Vita under Windows take a look at the [specific walkthrough][6].
+For details about building Vita under Windows take a look at the [specific walkthrough][6].
 
 ### Optional ###
 
@@ -55,14 +55,16 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
+  CHANGELOG.md
+  CONTRIBUTING.md
   LICENSE
   README.md
   copyright
+  contributors/
   doc/
   misc/
   src/
     CMakeLists.txt
-    CONTRIBUTORS
     Makefile
     build/ ................Built executables
     examples/ .............Various examples
@@ -82,10 +84,10 @@ Kernel library can be built without the [Boost library][2]; some programs / exam
 
 ```cd vita/src```
 
-* To build all: `make`
-* To build the kernel library (libvita.a): `make vita`
+* To build (almost) all: `make`
+* To build the kernel library (`libvita.a`): `make vita`
 * To build the sr tool: `make sr`
-* To build tests: `make tests`
+* To build / perform tests: `make tests`
 * To build example ABC: `make examples/ABC`
 
 The default compiler is g++, to use clang++ type `make CXX=clang++`.
