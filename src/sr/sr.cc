@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,10 +31,10 @@ namespace po = boost::program_options;
 namespace
 {
 const std::string vita_sr_version1(
-  "Vita - Symbolic Regression and classification v0.9.12"
+  "Vita - Symbolic Regression and classification"
   );
 const std::string vita_sr_version2(
-  "Copyright 2011-2016 EOS di Manlio Morini (http://www.eosdev.it/)"
+  "Copyright 2011-2017 EOS di Manlio Morini (http://www.eosdev.it/)"
   );
 const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
