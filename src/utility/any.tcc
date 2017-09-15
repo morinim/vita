@@ -201,7 +201,30 @@ inline any &any::assign(const any &x)
 }
 
 template<class T>
-any &any::assign(const T &x)
+inline any &any::assign(const T &x)
+{
+  return assign(  // a tag dispatch solution
+    x,
+    static_cast<typename detail::any_::get_table<T>::is_small_t *>(nullptr));
+}
+
+template<class T>
+any &any::assign(const T &x, std::true_type *)
+{
+  auto *x_table(detail::any_::get_table<T>::get());
+
+  table->destruct(&object);  // first destruct the old content
+  new (&object) T(x);        // create copy on-top of object pointer itself
+
+  // Are we copying between the different types?
+  if (table != x_table)
+    table = x_table;  // update table pointer
+
+  return *this;
+}
+
+template<class T>
+any &any::assign(const T &x, std::false_type *)
 {
   auto *x_table(detail::any_::get_table<T>::get());
 
@@ -209,27 +232,15 @@ any &any::assign(const T &x)
   if (table == x_table)
   {
     // If so, we can avoid deallocating and re-use memory.
-    table->destruct(&object);    // first destruct the old content
-    if (detail::any_::get_table<T>::is_small)
-      new (&object) T(x);  // create copy on-top of object pointer itself
-    else
-      new (object) T(x);   // create copy on-top of old version
+    table->destruct(&object);  // first destruct the old content
+    new (object) T(x);   // create copy on-top of old version
   }
   else
   {
-    if (detail::any_::get_table<T>::is_small)
-    {
-      // Create copy on-top of object pointer itself.
-      table->destruct(&object);  // first destruct the old content
-      new (&object) T(x);
-    }
-    else
-    {
-      reset();  // first delete the old content
-      object = new T(x);
-    }
+    reset();  // first delete the old content
+    object = new T(x);
 
-    table = x_table;      // update table pointer
+    table = x_table;  // update table pointer
   }
 
   return *this;

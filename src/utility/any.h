@@ -112,6 +112,8 @@ private:
 
   // Assignment
   template<class T> any &assign(const T &);
+  template<class T> any &assign(const T &, std::true_type *);
+  template<class T> any &assign(const T &, std::false_type *);
   any &assign(const any &);
 
   // Private data members
