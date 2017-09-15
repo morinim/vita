@@ -1,11 +1,11 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: VitaFramework
-Source: https://bitbucket.org/morinim/vita
+Source: https://github.com/morinim/vita
 License: MPL-2.0
 
 Files: *
 Copyright: Copyright 2011 EOS di Manlio Morini
-License: MPl-2.0
+License: MPL-2.0
 
 Files: third_party/tinyxml2/*
 License: Zlib
