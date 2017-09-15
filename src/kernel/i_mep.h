@@ -77,7 +77,7 @@ public:
   template<bool> class basic_iterator;
   using const_iterator = basic_iterator<true>;
   using iterator = basic_iterator<false>;
-  using value_type = basic_iterator<true>::value_type;
+  using value_type = gene;
 
   const_iterator begin() const;
   const_iterator end() const;
