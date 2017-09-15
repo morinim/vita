@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,15 +13,14 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/ga/i_ga.h"
-#include "kernel/ga/interpreter.h"
-#include "kernel/ga/ga_evaluator.h"
-#include "kernel/ga/ga_search.h"
+#include "kernel/ga/evaluator.h"
+#include "kernel/ga/i_de.h"
+#include "kernel/ga/search.h"
 #include "kernel/evolution.h"
 #include "kernel/problem.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_ga_perf
+#define BOOST_TEST_MODULE t_de_perf
 #include <boost/test/unit_test.hpp>
 
 using namespace boost;
@@ -29,21 +28,20 @@ using namespace boost;
 #include "factory_fixture5.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(t_ga2, F_FACTORY5_NO_INIT)
+BOOST_FIXTURE_TEST_SUITE(t_de7, F_FACTORY5_NO_INIT)
 
 // Test problem 7 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
-BOOST_AUTO_TEST_CASE(Search_TestProblem7)
+BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
 {
-  env.individuals = 100;
-  env.generations = 2000;
-  env.f_threashold = {0, 0};
-  env.verbosity = 1;
+  vita::print.verbosity(vita::log::L_WARNING);
 
   vita::problem prob;
-  prob.env = env;
-  prob.env.stat_dir = ".";
-  prob.env.stat_layers = true;
+  prob.env.individuals = 100;
+  prob.env.generations = 2000;
+  prob.env.threshold.fitness = {0, 0};
+  prob.env.stat.dir = ".";
+  prob.env.stat.layers = true;
   prob.sset.insert(vita::ga::parameter(0, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(1, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(2, -3.2, 3.2));
@@ -55,7 +53,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7)
              return -std::exp(x[0] * x[1] * x[2] * x[3] * x[4]);
            };
 
-  auto p = [](const vita::i_ga &prg)
+  auto p = [](const vita::i_de &prg)
     {
       auto h1 = [](const std::vector<double> &x)
       {
@@ -87,25 +85,25 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7)
       if (c3 > delta)
         r += c3;
 
-      for (unsigned i(0), size(prg.size()); i < size; ++i)
+      for (const auto &pi : prg)
       {
-        if (prg[i] < -2.3)
-          r += -2.3 - prg[i];
-        else if (prg[i] > 3.2)
-          r += prg[i] - 3.2;
+        if (pi < -2.3)
+          r += -2.3 - pi;
+        else if (pi > 3.2)
+          r += pi - 3.2;
       }
 
       return r;
     };
 
-  vita::ga_search<vita::i_ga, vita::de_es, decltype(f)> s(prob, f, p);
-  BOOST_REQUIRE(s.debug(true));
-  const auto res(s.run(10));
+  vita::ga_search<vita::i_de, vita::de_es, decltype(f)> s(prob, f, p);
+  BOOST_TEST(s.debug());
+  const auto res(s.run(10).best.solution);
 
-  BOOST_CHECK_CLOSE(-f(res), 0.053950, 2.0);
-  BOOST_CHECK_CLOSE(res[0], -1.717143, 1.0);
-  BOOST_CHECK_CLOSE(res[1], 1.595709, 1.0);
-  BOOST_CHECK_CLOSE(res[2], 1.827247, 1.0);
+  BOOST_TEST(-f(res) == 0.053950);
+  BOOST_TEST(res[0] == -1.717143);
+  BOOST_TEST(res[1] == 1.595709);
+  BOOST_TEST(res[2] == 1.827247);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
