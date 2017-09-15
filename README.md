@@ -30,7 +30,7 @@ However, since core members of the Vita project have no access to these platform
 * POSIX-standard shell
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 
-For further details about building Vita under Windows can take a look at the [specific walkthrough][6].
+For further details about building Vita under Windows take a look at the [specific walkthrough][6].
 
 ### Optional ###
 
@@ -76,7 +76,7 @@ vita/
 
 ## Setting up the build ##
 
-Kernel library can be built without the [Boost library][2]; some programs / examples may need Boost headers / separately-compiled library binaries (e.g. `sr` utility needs *Boost Program Options Library* to compile).
+Kernel library can be built without the [Boost library][2]; some programs / examples may need Boost headers / separately-compiled library binaries (e.g. the `sr` utility needs *Boost Program Options Library* to compile).
 
 ### make ###
 
@@ -92,8 +92,6 @@ The default compiler is g++, to use clang++ type `make CXX=clang++`.
 
 All the output executables will, per default, be stored inside the `build/`
 directory.
-
-With MinGW, if you're [experiencing long delays](http://stackoverflow.com/q/8571657/3235496) after the `make` command, try `make -r` (avoid implicit rules).
 
 ### cmake ###
 
