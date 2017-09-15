@@ -79,6 +79,7 @@ public:
   // Iterators.
   using members_t = std::vector<T>;
   using const_iterator = typename members_t::const_iterator;
+  using value_type = typename members_t::value_type;
   const_iterator begin() const;
   const_iterator end() const;
 

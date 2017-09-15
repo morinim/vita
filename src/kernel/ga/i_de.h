@@ -40,6 +40,7 @@ public:
   using genome_t       = std::vector<double>;
   using const_iterator = genome_t::const_iterator;
   using iterator       = genome_t::iterator;
+  using value_type     = genome_t::value_type;
 
   const_iterator begin() const;
   const_iterator end() const;
