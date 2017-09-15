@@ -90,7 +90,7 @@ OUTDIR := build
 
 .PRECIOUS: %.o
 
-all: directories vita sr
+all: directories vita sr examples
 
 forex: directories $(FOREX_OBJ) $(FRAMEWORK_OBJ)
 	@echo Linking $@
