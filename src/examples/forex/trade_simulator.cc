@@ -9,9 +9,23 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#include <chrono>
 #include <cstdio>
 #include <stdexcept>
+
+// MinGW compiled with the win32 threading model (a common choice) at the
+// moment doesn't support C++11 threading classes (see
+// <https://github.com/StephanTLavavej/mingw-distro/issues/26> and
+// <https://github.com/meganz/mingw-std-threads>)
+#if defined(__MINGW32__)
+#include <windows.h>
+inline void sleep_for(std::chrono::milliseconds x)
+{ Sleep(x.count()); }
+#else
 #include <thread>
+inline void sleep_for(std::chrono::milliseconds x)
+{ std::this_thread::sleep_for(x); }
+#endif
 
 #include "trade_simulator.h"
 #include "utility/utility.h"
@@ -108,7 +122,7 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
   std::ifstream results(fr);
   while (!results.is_open())
   {
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    sleep_for(std::chrono::milliseconds(500));
     results.open(fr);
   }
 
