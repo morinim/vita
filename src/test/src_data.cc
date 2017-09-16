@@ -32,11 +32,11 @@ BOOST_AUTO_TEST_CASE(t_load_csv)
   src_data d1, d2, d3;
   const std::size_t n1(10), n2(150), n3(351);
 
-  BOOST_TEST(d1.load("../test/mep.csv") == n1);
+  BOOST_TEST(d1.load("./test_resources/mep.csv") == n1);
   BOOST_TEST(d1.size() == n1);
-  BOOST_TEST(d2.load("../test/iris.csv") == n2);
+  BOOST_TEST(d2.load("./test_resources/iris.csv") == n2);
   BOOST_TEST(d2.size() == n2);
-  BOOST_TEST(d3.load("../test/ionosphere.csv") = n3);
+  BOOST_TEST(d3.load("./test_resources/ionosphere.csv") = n3);
   BOOST_TEST(d3.size() == n3);
 
   auto csv_filter = [](src_data::record_t &)
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(t_load_csv)
   {
     src_data d3f;
 
-    d3f.load("../test/ionosphere.csv", csv_filter);
+    d3f.load("./test_resources/ionosphere.csv", csv_filter);
     n += d3f.size();
   }
 

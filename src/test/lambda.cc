@@ -29,6 +29,11 @@ constexpr double epsilon(0.00001);
 
 #define TEST_WTA
 
+// Examples in dataset
+const std::size_t MEP_COUNT        =  10;
+const std::size_t IRIS_COUNT       = 150;
+const std::size_t IONOSPHERE_COUNT = 351;
+
 template<class T> using reg_model = vita::basic_reg_lambda_f<T, true>;
 
 BOOST_AUTO_TEST_SUITE(lambda)
@@ -72,18 +77,18 @@ void test_serialization(vita::src_problem &pr)
 
     std::stringstream ss;
 
-    BOOST_REQUIRE(lambda1.save(ss));
+    BOOST_TEST(lambda1.save(ss));
     const T ind2(pr.env);
     auto lambda2(build<L, T, P>()(ind2, *pr.data()));
-    BOOST_REQUIRE(lambda2.load(ss, pr.env));
-    BOOST_REQUIRE(lambda2.debug());
+    BOOST_TEST(lambda2.load(ss, pr.env));
+    BOOST_TEST(lambda2.debug());
 
     for (const auto &e : *pr.data())
     {
       const auto out1(lambda1.name(lambda1(e)));
       const auto out2(lambda2.name(lambda2(e)));
 
-      BOOST_CHECK_EQUAL(out1, out2);
+      BOOST_TEST(out1 == out2);
     }
   }
 }
@@ -110,22 +115,21 @@ void test_team_of_one(vita::src_problem &pr)
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
-        BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+        BOOST_TEST(v1 == v2, boost::test_tools::tolerance(epsilon));
       }
       else
-        BOOST_REQUIRE(!out_t.has_value());
+        BOOST_TEST(!out_t.has_value());
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(reg_lambda)
+BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
 {
   using namespace vita;
 
   src_problem pr(true);
 
-  auto res(pr.load("../test/mep.csv"));
-  BOOST_REQUIRE_EQUAL(res.first, 10);  // mep.csv is a 10 lines file
+  BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF ONE INDIVIDUAL");
   test_team_of_one<reg_model>(pr);
@@ -148,10 +152,10 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
-        BOOST_REQUIRE_CLOSE(v1, v2, epsilon);
+        BOOST_TEST(v1 == v2);
       }
       else
-        BOOST_REQUIRE(!out_t.has_value());
+        BOOST_TEST(!out_t.has_value());
     }
   }
 
@@ -205,20 +209,21 @@ BOOST_AUTO_TEST_CASE(reg_lambda)
         const auto out_t(lambda_team(e));
 
         if (std::fabs(sum / n) < 0.000001)
-          BOOST_REQUIRE_SMALL(to<number>(out_t), epsilon);
+          BOOST_TEST(to<number>(out_t) == 0.0);
         else
-          BOOST_REQUIRE_CLOSE(sum / n, to<number>(out_t), epsilon);
+          BOOST_TEST(sum / n == to<number>(out_t));
       }
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
+BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
+                     * boost::unit_test::tolerance(epsilon))
 {
   using namespace vita;
 
   src_problem pr(true);
-  BOOST_REQUIRE_GT(pr.load("../test/mep.csv").first, 0);
+  BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
   for (unsigned k(0); k < 1000; ++k)
   {
@@ -227,11 +232,11 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
 
     std::stringstream ss;
 
-    BOOST_REQUIRE(lambda1.save(ss));
+    BOOST_TEST(lambda1.save(ss));
     const i_mep ind2(pr.env);
     reg_model<i_mep> lambda2(ind2);
-    BOOST_REQUIRE(lambda2.load(ss, pr.env));
-    BOOST_REQUIRE(lambda2.debug());
+    BOOST_TEST(lambda2.load(ss, pr.env));
+    BOOST_TEST(lambda2.debug());
 
     for (const auto &e : *pr.data())
     {
@@ -239,9 +244,9 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization)
       const auto out2(lambda2(e));
 
       if (out1.has_value())
-        BOOST_CHECK_CLOSE(to<number>(out1), to<number>(out2), epsilon);
+        BOOST_TEST(to<number>(out1) == to<number>(out2));
       else
-        BOOST_REQUIRE(!out2.has_value());
+        BOOST_TEST(!out2.has_value());
     }
   }
 }
@@ -281,7 +286,7 @@ void test_team(vita::src_problem &pr)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        BOOST_REQUIRE_EQUAL(any_cast<class_t>(out[j]), tags[j].first);
+        BOOST_TEST(any_cast<class_t>(out[j]) == tags[j].first);
 
       std::string s_best(names[0]);
 
@@ -315,7 +320,7 @@ void test_team(vita::src_problem &pr)
         }
 #endif
 
-      BOOST_REQUIRE_EQUAL(s_best, lambda_t.name(lambda_t(example)));
+      BOOST_TEST(s_best == lambda_t.name(lambda_t(example)));
     }
   }
 }
@@ -327,9 +332,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
   constexpr unsigned slots(10);
 
   src_problem pr(true);
-
-  auto res(pr.load("../test/iris.csv"));
-  BOOST_REQUIRE_EQUAL(res.first, 150);
+  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL");
   test_team_of_one<dyn_slot_lambda_f, slots>(pr);
@@ -345,7 +348,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
   constexpr unsigned slots(10);
 
   src_problem pr(true);
-  BOOST_REQUIRE_GT(pr.load("../test/iris.csv").first, 0);
+  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
   test_serialization<dyn_slot_lambda_f, i_mep, slots>(pr);
@@ -359,9 +362,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
   using namespace vita;
 
   src_problem pr(true);
-
-  auto res(pr.load("../test/iris.csv"));
-  BOOST_REQUIRE_EQUAL(res.first, 150);
+  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL");
   test_team_of_one<gaussian_lambda_f>(pr);
@@ -375,7 +376,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
   using namespace vita;
 
   src_problem pr(true);
-  BOOST_REQUIRE_GT(pr.load("../test/iris.csv").first, 0);
+  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
   test_serialization<gaussian_lambda_f, i_mep>(pr);
@@ -389,9 +390,8 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
   using namespace vita;
 
   src_problem pr(true);
-
-  auto res(pr.load("../test/ionosphere.csv"));
-  BOOST_REQUIRE_EQUAL(res.first, 351);
+  BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
+             == IONOSPHERE_COUNT);
 
   BOOST_TEST_CHECKPOINT("BINARY LAMBDA TEAM OF ONE INDIVIDUAL");
   test_team_of_one<binary_lambda_f>(pr);
@@ -405,7 +405,8 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
   using namespace vita;
 
   src_problem pr(true);
-  BOOST_REQUIRE_GT(pr.load("../test/ionosphere.csv").first, 0);
+  BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
+             == IONOSPHERE_COUNT);
 
   BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL");
   test_serialization<binary_lambda_f, i_mep>(pr);

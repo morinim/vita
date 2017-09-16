@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
 
 BOOST_AUTO_TEST_CASE(t_loading)
 {
-  vita::src_problem p("../test/src_problem.xrff", "",
-                      "../test/src_problem.xml");
+  vita::src_problem p("./test_resources/src_problem.xrff", "",
+                      "./test_resources/src_problem.xml");
 
   BOOST_REQUIRE(!!p);
 

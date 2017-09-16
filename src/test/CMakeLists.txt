@@ -1,7 +1,8 @@
 # Creates the tests.
 
 # See <http://stackoverflow.com/q/6646405/3235496> and
-# <https://stackoverflow.com/q/28887680>
+# <https://stackoverflow.com/q/28887680> for details about linking Boost.
+
 find_package (Boost REQUIRED COMPONENTS unit_test_framework)
 include_directories (SYSTEM ${Boost_INCLUDE_DIRS})
 
@@ -14,3 +15,7 @@ foreach (test_src ${TESTS_SRC})
   endif()
   target_link_libraries(${test} vita ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
 endforeach()
+
+# Resources needed for testing
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_resources
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

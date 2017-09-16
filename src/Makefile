@@ -124,11 +124,13 @@ examples/%: examples/%.o $(FRAMEWORK_OBJ) directories
 tests: test/tests.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
 	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(DEBUG_LIB)
+	@cp -r ./test/test_resources/ $(OUTDIR)
 	@cd $(OUTDIR) && ./$@ --show_progress --build_info
 
 test/%: test/%.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
 	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$(@F) $(DEBUG_LIB)
+	@cp -r ./test/test_resources/ $(OUTDIR)
 	@cd $(OUTDIR) && ./$(@F) --show_progress --build_info
 
 .phony: directories
