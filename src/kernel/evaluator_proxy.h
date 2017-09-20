@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,11 +19,12 @@
 namespace vita
 {
 ///
+/// Provides a surrogate for an evaluator to control access to it.
+///
 /// \tparam T the type of individual used
 ///
-/// Provides a surrogate for an evaluator to control access to it. The
-/// reason for controlling access is to cache fitness scores of individuals.
-/// evaluator_proxy uses an ad-hoc internal hash table (cache).
+/// evaluator_proxy uses an ad-hoc internal hash table to cache fitness scores
+/// of individuals.
 ///
 template<class T>
 class evaluator_proxy : public evaluator<T>

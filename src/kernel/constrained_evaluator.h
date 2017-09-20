@@ -20,14 +20,15 @@ namespace vita
 template<class T> using penalty_func_t = std::function<double (const T &)>;
 
 ///
-/// \tparam T the type of individual used.
-/// \tparam E the basic evaluator.
-/// \tparam P the penalty function.
-///
 /// The class merges a basic evaluator and a penalty function into a new
 /// combined evaluator.
 ///
-/// The new evaluator calculates a augmented fitness of this form:
+/// \tparam T the type of individual used
+/// \tparam E the basic evaluator
+/// \tparam P the penalty function
+///
+/// The new evaluator calculates an augmented fitness of this form:
+///
 ///     (-penalty, base fitness)
 ///
 template<class T, class E, class P>

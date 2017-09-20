@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #define      VITA_CONSTRAINED_EVALUATOR_TCC
 
 ///
-/// \param[in] e the base evaluator.
+/// \param[in] e the base evaluator
 /// \param[in] p the penalty function (as described in "An Efficient Constraint
 ///              Handling Method for Genetic Algorithms" - Kalyanmoy Deb)
 ///
@@ -29,8 +29,8 @@ constrained_evaluator<T, E, P>::constrained_evaluator(E e, P p)
 }
 
 ///
-/// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the fitness of `ind`.
+/// \param[in] prg the program (individual/team) whose fitness we want to know
+/// \return        the fitness of `ind`
 ///
 template<class T, class E, class P>
 fitness_t constrained_evaluator<T, E, P>::operator()(const T &prg)
@@ -40,8 +40,8 @@ fitness_t constrained_evaluator<T, E, P>::operator()(const T &prg)
 }
 
 ///
-/// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the an approximation of the fitness of `prg`.
+/// \param[in] prg a program (individual/team)
+/// \return        the an approximation of the fitness of `prg`
 ///
 template<class T, class E, class P>
 fitness_t constrained_evaluator<T, E, P>::fast(const T &prg)
@@ -51,8 +51,8 @@ fitness_t constrained_evaluator<T, E, P>::fast(const T &prg)
 }
 
 ///
-/// \param[in] prg a program (individual/team).
-/// \return a pointer to the executable version of `prg`.
+/// \param[in] prg a program (individual/team)
+/// \return        a pointer to the executable version of `prg`
 ///
 template<class T, class E, class P>
 std::unique_ptr<lambda_f<T>> constrained_evaluator<T, E, P>::lambdify(
@@ -61,4 +61,4 @@ std::unique_ptr<lambda_f<T>> constrained_evaluator<T, E, P>::lambdify(
   return eva_.lambdify(prg);
 }
 
-#endif  // Include guard
+#endif  // include guard

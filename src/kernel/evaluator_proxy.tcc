@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,8 @@
 #define      VITA_EVALUATOR_PROXY_TCC
 
 ///
-/// \param[in] eva pointer that lets the proxy access the real evaluator.
-/// \param[in] ts `2^ts` is the number of elements of the cache.
+/// \param[in] eva pointer that lets the proxy access the real evaluator
+/// \param[in] ts  `2^ts` is the number of elements of the cache
 ///
 template<class T>
 evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
@@ -31,8 +31,8 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
 }
 
 ///
-/// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the fitness of `prg`.
+/// \param[in] prg the program (individual/team) whose fitness we want to know
+/// \return        the fitness of `prg`
 ///
 template<class T>
 fitness_t evaluator_proxy<T>::operator()(const T &prg)
@@ -99,8 +99,8 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 }
 
 ///
-/// \param[in] prg the program (individual/team) whose fitness we want to know.
-/// \return the an approximation of the fitness of `prg`.
+/// \param[in] prg the program (individual/team) whose fitness we want to know
+/// \return        an approximation of the fitness of `prg`
 ///
 template<class T>
 fitness_t evaluator_proxy<T>::fast(const T &prg)
@@ -109,9 +109,9 @@ fitness_t evaluator_proxy<T>::fast(const T &prg)
 }
 
 ///
-/// \param[in] what what should be cleared? (all, cache, stats)
+/// Resets the evaluation cache / clear the statistics.
 ///
-/// \brief Resets the evaluation cache / clear the statistics.
+/// \param[in] what what should be cleared? (all, cache, stats
 ///
 template<class T>
 void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
@@ -132,9 +132,9 @@ void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
 }
 
 ///
-/// \param[in] prg a program (individual/team).
+/// Clears the cached informations for a specific individual.
 ///
-/// Clears the cached informations for program `prg`.
+/// \param[in] prg a program (individual/team)
 ///
 template<class T>
 void evaluator_proxy<T>::clear(const T &prg)
@@ -143,10 +143,10 @@ void evaluator_proxy<T>::clear(const T &prg)
 }
 
 ///
-/// \param[in] prg a program (individual/team).
-/// \return how many times we have seen the program `prg` from during the
-///         current run of the evolution / the last call of the clear
-///         function.
+/// \param[in] prg a program (individual/team)
+/// \return        how many times we have seen the program `prg` during the
+///                current run of the evolution / the last call of the clear
+///                function
 ///
 template<class T>
 unsigned evaluator_proxy<T>::seen(const T &prg) const
@@ -155,7 +155,7 @@ unsigned evaluator_proxy<T>::seen(const T &prg) const
 }
 
 ///
-/// \return number of cache probes / hits.
+/// \return number of cache probes / hits
 ///
 template<class T>
 std::string evaluator_proxy<T>::info() const
@@ -167,8 +167,8 @@ std::string evaluator_proxy<T>::info() const
 }
 
 ///
-/// \param[in] prg a program (individual/team).
-/// \return a pointer to the executable version of `prg`.
+/// \param[in] prg a program (individual/team)
+/// \return        a pointer to the executable version of `prg`
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
@@ -176,4 +176,4 @@ std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
   return eva_->lambdify(prg);
 }
 
-#endif  // Include guard
+#endif  // include guard
