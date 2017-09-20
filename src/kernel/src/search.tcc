@@ -407,22 +407,20 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::bin:
-      search<T, ES>::set_evaluator(
-        std::make_unique<binary_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<binary_evaluator<T>>(data());
       return true;
 
     case evaluator_id::dyn_slot:
       {
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
-        search<T, ES>::set_evaluator(
-          std::make_unique<dyn_slot_evaluator<T>>(data(), x_slot));
+        search<T, ES>::template set_evaluator<dyn_slot_evaluator<T>>(data(),
+                                                                     x_slot);
       }
       return true;
 
     case evaluator_id::gaussian:
-      search<T, ES>::set_evaluator(
-	    std::make_unique<gaussian_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<gaussian_evaluator<T>>(data());
       return true;
 
     default:
@@ -434,23 +432,19 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::count:
-      search<T, ES>::set_evaluator(
-	    std::make_unique<count_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<count_evaluator<T>>(data());
       return true;
 
     case evaluator_id::mae:
-      search<T, ES>::set_evaluator(
-	    std::make_unique<mae_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<mae_evaluator<T>>(data());
       return true;
 
     case evaluator_id::rmae:
-      search<T, ES>::set_evaluator(
-	    std::make_unique<rmae_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<rmae_evaluator<T>>(data());
       return true;
 
     case evaluator_id::mse:
-      search<T, ES>::set_evaluator(
-	    std::make_unique<mse_evaluator<T>>(data()));
+      search<T, ES>::template set_evaluator<mse_evaluator<T>>(data());
       return true;
 
     default:

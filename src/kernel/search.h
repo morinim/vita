@@ -46,6 +46,8 @@ public:
   summary<T> run(unsigned = 1);
 
   void set_evaluator(std::unique_ptr<evaluator<T>>);
+  template<class E, class ...Args> void set_evaluator(Args &&... args);
+
   void set_validator(std::unique_ptr<validation_strategy>);
 
   virtual bool debug() const;

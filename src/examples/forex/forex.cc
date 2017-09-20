@@ -274,7 +274,7 @@ int main()
   std::cout << "STARTING RUN\n";
   fxs::search engine(p);
 
-  engine.set_evaluator(std::make_unique<fxs::evaluator>(&ts));
+  engine.set_evaluator<fxs::evaluator>(&ts);
 
   engine.run(1);
 }
