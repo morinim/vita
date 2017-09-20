@@ -25,7 +25,7 @@ endif ()
 
 add_compile_options(${OTHER_FLAGS} ${WARN_FLAGS})
 
-# Compile must support C++14 standard.
+# Compiler must support the C++14 standard.
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

@@ -94,12 +94,12 @@ all: directories vita sr examples
 
 forex: directories $(FOREX_OBJ) $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(LIB)
+	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
-	@strip $(OUTDIR)/$@.exe
+	@strip $(OUTDIR)/examples/$@.exe
 else
-	@strip $(OUTDIR)/$@
+	@strip $(OUTDIR)/examples/$@
 endif
 endif
 
@@ -119,7 +119,7 @@ examples: $(EXAMPLES_SRC:.cc=) forex directories
 
 examples/%: examples/%.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$(@F)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$(@F)
 
 tests: test/tests.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
@@ -138,6 +138,7 @@ directories: $(OUTDIR)
 
 $(OUTDIR):
 	@$(MKDIR) $(OUTDIR)
+	@$(MKDIR) $(OUTDIR)/examples
 
 # For HG the version ID is:
 # `hg log -r . --template '{latesttag}-{latesttagdistance}-{node|short}`
