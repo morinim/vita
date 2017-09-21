@@ -26,11 +26,11 @@ namespace vita
 /// evaluator_proxy uses an ad-hoc internal hash table to cache fitness scores
 /// of individuals.
 ///
-template<class T>
+template<class T, class E>
 class evaluator_proxy : public evaluator<T>
 {
 public:
-  evaluator_proxy(std::unique_ptr<evaluator<T>>, unsigned);
+  evaluator_proxy(E, unsigned);
 
   void clear(typename evaluator<T>::clear_flag);
   void clear(const T &);
@@ -46,7 +46,7 @@ public:
 
 private:
   // Access to the real evaluator.
-  std::unique_ptr<evaluator<T>> eva_;
+  E eva_;
 
   // Hash table cache.
   cache cache_;

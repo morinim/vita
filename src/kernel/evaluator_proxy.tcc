@@ -21,12 +21,10 @@
 /// \param[in] eva pointer that lets the proxy access the real evaluator
 /// \param[in] ts  `2^ts` is the number of elements of the cache
 ///
-template<class T>
-evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
-                                    unsigned ts)
+template<class T, class E>
+evaluator_proxy<T, E>::evaluator_proxy(E eva, unsigned ts)
   : eva_(std::move(eva)), cache_(ts)
 {
-  Expects(eva_);
   Expects(ts > 6);
 }
 
@@ -34,8 +32,8 @@ evaluator_proxy<T>::evaluator_proxy(std::unique_ptr<evaluator<T>> eva,
 /// \param[in] prg the program (individual/team) whose fitness we want to know
 /// \return        the fitness of `prg`
 ///
-template<class T>
-fitness_t evaluator_proxy<T>::operator()(const T &prg)
+template<class T, class E>
+fitness_t evaluator_proxy<T, E>::operator()(const T &prg)
 {
   fitness_t f(cache_.find(prg.signature()));
 
@@ -44,10 +42,10 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
     assert(cache_.hits());
 
 #if defined(CLONE_SCALING)
-    // Before evaluating a program, we check if identical programs
-    // (clones) are already present in the population.
-    // When the number of clones is greater than zero, the fitness assigned to
-    // the program is multiplied by a clone-scaling factor.
+    // Before evaluating a program, we check if clones are already present in
+    // the population.
+    // When the number of clones is greater than `0`, the fitness assigned to
+    // the program is multiplied by a scaling factor.
     // For further details see "Evolving Assembly Programs: How Games Help
     // Microprocessor Validation" - F.Corno, E.Sanchez, G.Squillero.
 
@@ -61,7 +59,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
-    const fitness_t f1((*eva_)(prg));
+    const fitness_t f1(eva_(prg));
     if (!almost_equal(f[0], f1[0]))
       std::cerr << "********* COLLISION ********* [" << f << " != " << f1
                 << "]\n";
@@ -84,7 +82,7 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
   }
   else  // not found in cache
   {
-    f = (*eva_)(prg);
+    f = eva_(prg);
 
     cache_.insert(prg.signature(), f);
 
@@ -102,10 +100,10 @@ fitness_t evaluator_proxy<T>::operator()(const T &prg)
 /// \param[in] prg the program (individual/team) whose fitness we want to know
 /// \return        an approximation of the fitness of `prg`
 ///
-template<class T>
-fitness_t evaluator_proxy<T>::fast(const T &prg)
+template<class T, class E>
+fitness_t evaluator_proxy<T, E>::fast(const T &prg)
 {
-  return eva_->fast(prg);
+  return eva_.fast(prg);
 }
 
 ///
@@ -113,8 +111,8 @@ fitness_t evaluator_proxy<T>::fast(const T &prg)
 ///
 /// \param[in] what what should be cleared? (all, cache, stats
 ///
-template<class T>
-void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
+template<class T, class E>
+void evaluator_proxy<T, E>::clear(typename evaluator<T>::clear_flag what)
 {
   switch (what)
   {
@@ -136,8 +134,8 @@ void evaluator_proxy<T>::clear(typename evaluator<T>::clear_flag what)
 ///
 /// \param[in] prg a program (individual/team)
 ///
-template<class T>
-void evaluator_proxy<T>::clear(const T &prg)
+template<class T, class E>
+void evaluator_proxy<T, E>::clear(const T &prg)
 {
   cache_.clear(prg.signature());
 }
@@ -148,8 +146,8 @@ void evaluator_proxy<T>::clear(const T &prg)
 ///                current run of the evolution / the last call of the clear
 ///                function
 ///
-template<class T>
-unsigned evaluator_proxy<T>::seen(const T &prg) const
+template<class T, class E>
+unsigned evaluator_proxy<T, E>::seen(const T &prg) const
 {
   return cache_.seen(prg.signature());
 }
@@ -157,8 +155,8 @@ unsigned evaluator_proxy<T>::seen(const T &prg) const
 ///
 /// \return number of cache probes / hits
 ///
-template<class T>
-std::string evaluator_proxy<T>::info() const
+template<class T, class E>
+std::string evaluator_proxy<T, E>::info() const
 {
   return
     "hits " + std::to_string(cache_.hits()) +
@@ -170,10 +168,11 @@ std::string evaluator_proxy<T>::info() const
 /// \param[in] prg a program (individual/team)
 /// \return        a pointer to the executable version of `prg`
 ///
-template<class T>
-std::unique_ptr<lambda_f<T>> evaluator_proxy<T>::lambdify(const T &prg) const
+template<class T, class E>
+std::unique_ptr<lambda_f<T>> evaluator_proxy<T, E>::lambdify(
+  const T &prg) const
 {
-  return eva_->lambdify(prg);
+  return eva_.lambdify(prg);
 }
 
 #endif  // include guard

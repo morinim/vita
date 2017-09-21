@@ -209,8 +209,8 @@ template<class E, class ...Args>
 void search<T, ES>::set_evaluator(Args &&... args)
 {
   if (env_.cache_size)
-    active_eva_ = std::make_unique<evaluator_proxy<T>>(
-      std::make_unique<E>(std::forward<Args>(args)...), env_.cache_size);
+    active_eva_ = std::make_unique<evaluator_proxy<T, E>>(
+      E(std::forward<Args>(args)...), env_.cache_size);
   else
     active_eva_ = std::make_unique<E>(std::forward<Args>(args)...);
 }
