@@ -9,6 +9,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Code of conduct for contributors
 
 ### Changed
+- BREAKING CHANGE. Replaced the `search::set_evaluator` method:
+  Instead of:
+
+  ```C++
+  std::unique_ptr<E> eva(f);
+  std::search engine(prob);
+  engine.set_evaluator(std::move(eva));
+  ```
+
+  you can write:
+
+  ```C++
+  std::search engine(prob);
+  engine.set_evaluator<E>(f);
+  ```
+
 - Uniform output results for make / cmake build systems
 
 

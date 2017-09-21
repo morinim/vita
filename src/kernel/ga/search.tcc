@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014, 2015, 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,17 +24,14 @@ template<class T, template<class> class ES, class F>
 ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
   : search<T, ES>(pr)
 {
-  auto base_eva(std::make_unique<ga_evaluator<T, F>>(f));
-
   if (pf)
   {
-    auto eva(std::make_unique<
-	  constrained_evaluator<T, ga_evaluator<T, F>,
-                            penalty_func_t<T>>>(*base_eva, pf));
-    search<T, ES>::set_evaluator(std::move(eva));
+    search<T, ES>::template set_evaluator<
+      constrained_evaluator<T, ga_evaluator<T, F>, penalty_func_t<T>>>(
+        ga_evaluator<T, F>(f), pf);
   }
   else
-    search<T, ES>::set_evaluator(std::move(base_eva));
+    search<T, ES>::template set_evaluator<ga_evaluator<T, F>>(f);
 }
 
 ///

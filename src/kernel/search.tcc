@@ -200,21 +200,6 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 ///
 /// Sets the active evaluator.
 ///
-/// \param[in] e the evaluator that will be used
-///
-template<class T, template<class> class ES>
-void search<T, ES>::set_evaluator(std::unique_ptr<evaluator<T>> e)
-{
-  if (env_.cache_size)
-    active_eva_ = std::make_unique<evaluator_proxy<T>>(std::move(e),
-                                                       env_.cache_size);
-  else
-    active_eva_ = std::move(e);
-}
-
-///
-/// Sets the active evaluator.
-///
 /// \tparam E an evaluator
 ///
 /// \param[in] args arguments used to build the `E` evaluator
@@ -223,15 +208,11 @@ template<class T, template<class> class ES>
 template<class E, class ...Args>
 void search<T, ES>::set_evaluator(Args &&... args)
 {
-  set_evaluator(std::make_unique<E>(std::forward<Args>(args)...));
-
-  /*
   if (env_.cache_size)
     active_eva_ = std::make_unique<evaluator_proxy<T>>(
       std::make_unique<E>(std::forward<Args>(args)...), env_.cache_size);
   else
     active_eva_ = std::make_unique<E>(std::forward<Args>(args)...);
-  */
 }
 
 ///
