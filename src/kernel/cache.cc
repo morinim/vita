@@ -15,9 +15,9 @@
 namespace vita
 {
 ///
-/// \param[in] bits `2^bits` is the number of elements of the table.
-///
 /// Creates a new hash table.
+///
+/// \param[in] bits `2^bits` is the number of elements of the table
 ///
 cache::cache(std::uint8_t bits)
   : k_mask((1u << bits) - 1), table_(1u << bits),
@@ -28,8 +28,8 @@ cache::cache(std::uint8_t bits)
 }
 
 ///
-/// \param[in] u the signature of an individual.
-/// \return an index in the hash table.
+/// \param[in] u the signature of an individual
+/// \return      an index in the hash table
 ///
 inline std::size_t cache::index(const hash_t &h) const
 {
@@ -37,8 +37,9 @@ inline std::size_t cache::index(const hash_t &h) const
 }
 
 ///
-/// Clears the content and the statistical informations of the table
-/// (allocated size isn't changed).
+/// Clears the content and the statistical informations of the table.
+///
+/// \note Allocated size isn't changed.
 ///
 void cache::clear()
 {
@@ -54,9 +55,9 @@ void cache::clear()
 }
 
 ///
-/// \param[in] h individual's signature whose informations we have to clear.
+/// Clears the cached information for a specific individual.
 ///
-/// Clears the cached information for individual `h`.
+/// \param[in] h individual's signature whose informations we have to clear
 ///
 void cache::clear(const hash_t &h)
 {
@@ -68,7 +69,7 @@ void cache::clear(const hash_t &h)
 }
 
 ///
-/// \brief Resets the `seen` counter.
+/// Resets the `seen` counter.
 ///
 #if defined(CLONE_SCALING)
 void cache::reset_seen()
@@ -81,11 +82,11 @@ void cache::reset_seen()
 #endif
 
 ///
-/// \brief Looks for the fitness of an individual in the transposition table.
+/// Looks for the fitness of an individual in the transposition table.
 ///
-/// \param[in] h individual's signature to look for.
-/// \return the fitness of the individual. If the individuals isn't present
-///         returns an empty fitness.
+/// \param[in] h individual's signature to look for
+/// \return      the fitness of the individual. If the individuals isn't
+///              present returns an empty fitness
 ///
 const fitness_t &cache::find(const hash_t &h) const
 {
@@ -108,8 +109,8 @@ const fitness_t &cache::find(const hash_t &h) const
 }
 
 ///
-/// \param[in] h individual's signature to look for.
-/// \return number of times `h` has been looked for.
+/// \param[in] h individual's signature to look for
+/// \return      number of times `h` has been looked for
 ///
 unsigned cache::seen(const hash_t &h) const
 {
@@ -125,11 +126,11 @@ unsigned cache::seen(const hash_t &h) const
 }
 
 ///
-/// \param[in] h a (possibly) new individual's signature to be stored in the
-///              table.
-/// \param[in] fitness the fitness of the individual.
-///
 /// Stores fitness information in the transposition table.
+///
+/// \param[in] h       a (possibly) new individual's signature to be stored in
+///                    the table
+/// \param[in] fitness the fitness of the individual
 ///
 void cache::insert(const hash_t &h, const fitness_t &fitness)
 {
@@ -145,8 +146,8 @@ void cache::insert(const hash_t &h, const fitness_t &fitness)
 }
 
 ///
-/// \param[in] in input stream.
-/// \return `true` if the object loaded correctly.
+/// \param[in] in input stream
+/// \return       `true` if the object loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current object isn't changed.
@@ -195,8 +196,8 @@ bool cache::load(std::istream &in)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if the object was saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if the object was saved correctly
 ///
 bool cache::save(std::ostream &out) const
 {
@@ -224,7 +225,7 @@ bool cache::save(std::ostream &out) const
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 bool cache::debug() const
 {

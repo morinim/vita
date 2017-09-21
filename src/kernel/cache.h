@@ -29,6 +29,8 @@ namespace vita
 class cache
 {
 public:
+  DISALLOW_COPY_AND_ASSIGN(cache);
+
   explicit cache(std::uint8_t);
 
   void clear();
@@ -43,18 +45,14 @@ public:
 
   unsigned seen(const hash_t &) const;
 
-  /// \return number of searches in the hash table.
-  /// Every call to the find method increment the counter.
+  /// \return number of searches in the hash table
+  /// \note Every call to the find method increment the counter.
   std::uintmax_t probes() const { return probes_; }
 
-  /// \return number of successful searches in the hash table.
+  /// \return number of successful searches in the hash table
   std::uintmax_t hits() const { return hits_; }
 
   bool debug() const;
-
-  // Class has pointer data members so disabling the copy constructor /
-  // `operator=()` is a good idea (see "Effective C++").
-  DISALLOW_COPY_AND_ASSIGN(cache);
 
   // Serialization.
   bool load(std::istream &);
