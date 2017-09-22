@@ -17,24 +17,23 @@ namespace vita
 ///
 /// Class constructor.
 ///
-/// \param[in] ss         a pointer to the symbol set used in the current
-///                       environment
-/// \param[in] initialize if `true` initializes every auto-tuning-parameter
-///                       with standard values (thus disabling the
-///                       `search::tune_parameters` method)
+/// \param[in] ss   a pointer to the symbol set used in the current environment
+/// \param[in] init if `standard` sets every auto-tuning-parameter with
+///                 "safe" values (thus disabling the `search::tune_parameters`
+///                 method)
 ///
 /// Default values are quite standard, but specific problems need ad-hoc
 /// tuning.
 ///
 /// \note
-/// If `initialize` is `true` the environment passes the
+/// If `init` value is `standard` the environment passes the
 /// `environment::debug(true)` check.
 ///
 /// \see search::tune_parameters
 ///
-environment::environment(symbol_set *ss, bool initialize) : sset(ss)
+environment::environment(symbol_set *ss, initialization init) : sset(ss)
 {
-  if (initialize)
+  if (init == initialization::standard)
   {
     code_length = 100;
     patch_length = 1;
@@ -55,7 +54,7 @@ environment::environment(symbol_set *ss, bool initialize) : sset(ss)
     validation_percentage = 20;
   }
 
-  Ensures(debug(initialize));
+  Ensures(debug(init == initialization::standard));
 }
 
 ///
@@ -110,10 +109,11 @@ void environment::xml(tinyxml2::XMLDocument *d) const
 }
 
 ///
-/// \param[in] force_defined all the optional parameter have to be in a
-///                          'well defined' state for the function to pass
-///                          the test
-/// \return `true` if the object passes the internal consistency check
+/// \param[in] force_defined all the undefined / auto-tuned parameters have to
+///                          be in a "well defined" state for the function to
+///                          pass the test
+/// \return                  `true` if the object passes the internal
+///                          consistency check
 ///
 bool environment::debug(bool force_defined) const
 {

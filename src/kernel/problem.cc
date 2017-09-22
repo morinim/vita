@@ -17,10 +17,10 @@ namespace vita
 ///
 /// A new uninitialized problem.
 ///
-/// \param[in] initialize should the environment be initialized with default
-///                       values?
+/// \param[in] flag should the environment be initialized with common / default
+///                 values?
 ///
-problem::problem(bool initialize) : env(&sset, initialize)
+problem::problem(initialization flag) : env(&sset, flag)
 {
 }
 

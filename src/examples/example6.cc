@@ -89,14 +89,15 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 
 int main(int argc, char *argv[])
 {
-  vita::symbol_set sset;
-  vita::environment env(&sset, true);
+  using namespace vita;
+  symbol_set sset;
+  environment env(&sset, initialization::standard);
 
   env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
   env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
 
-  vita::symbol_factory factory;
+  symbol_factory factory;
   sset.insert(std::make_unique<X>());
   sset.insert(std::make_unique<Y>());
   sset.insert(std::make_unique<Z>());
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
 
   auto eva(std::make_unique<my_evaluator>());
 
-  vita::evolution<vita::i_mep, vita::std_es> evo(env, *eva);
+  evolution<i_mep, std_es> evo(env, *eva);
 
   evo.run(1);
 }

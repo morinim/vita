@@ -20,8 +20,8 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  vita::symbol_set sset;
-  environment env(&sset, true);
+  symbol_set sset;
+  environment env(&sset, initialization::standard);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));

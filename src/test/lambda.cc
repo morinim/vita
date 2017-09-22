@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
 
   BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
@@ -222,7 +222,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
   for (unsigned k(0); k < 1000; ++k)
@@ -331,7 +331,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
 
   constexpr unsigned slots(10);
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL");
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
 
   constexpr unsigned slots(10);
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL");
@@ -375,7 +375,7 @@ BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
   BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
@@ -389,7 +389,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
              == IONOSPHERE_COUNT);
 
@@ -404,7 +404,7 @@ BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
 {
   using namespace vita;
 
-  src_problem pr(true);
+  src_problem pr(initialization::standard);
   BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
              == IONOSPHERE_COUNT);
 

@@ -64,11 +64,11 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 ///
 /// New empty instance of src_problem.
 ///
-/// \param[in] initialize should the environment be initialized with default
-///                       values?
+/// \param[in] init should the environment be initialized with common / default
+///                 values?
 ///
-src_problem::src_problem(bool initialize) : problem(initialize), dat_(),
-                                            factory_()
+src_problem::src_problem(initialization init) : problem(init), dat_(),
+                                                factory_()
 {
 }
 
@@ -94,7 +94,7 @@ src_problem::src_problem(const char ds[])
 ///
 src_problem::src_problem(const std::string &ds, const std::string &ts,
                          const std::string &symbols)
-  : problem(false), dat_(), factory_()
+  : problem(initialization::skip), dat_(), factory_()
 {
   load(ds, ts, symbols);
 }

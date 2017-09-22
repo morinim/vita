@@ -16,13 +16,14 @@
 
 int main(int argc, char *argv[])
 {
-  vita::symbol_set sset;
-  vita::environment env(&sset, true);
+  using namespace vita;
+  symbol_set sset;
+  environment env(&sset, initialization::standard);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 14);
 
-  vita::symbol_factory factory;
-  sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
+  symbol_factory factory;
+  sset.insert(factory.make(domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FIFE"));
   sset.insert(factory.make("FIFL"));
@@ -35,13 +36,13 @@ int main(int argc, char *argv[])
   sset.insert(factory.make("grapefruit", {1}));
   sset.insert(factory.make("orange", {1}));
 
-  vita::i_mep ind(env);
+  i_mep ind(env);
 
-  std::cout << vita::out::dump << ind << '\n';
+  std::cout << out::dump << ind << '\n';
 
-  const vita::any val(vita::interpreter<vita::i_mep>(&ind).run());
+  const any val(interpreter<i_mep>(&ind).run());
   if (val.has_value())
-    std::cout << "Output: " << vita::to<std::string>(val) << '\n';
+    std::cout << "Output: " << to<std::string>(val) << '\n';
   else
     std::cout << "Incorrect program.\n";
 }

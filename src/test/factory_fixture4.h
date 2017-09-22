@@ -34,7 +34,8 @@ struct F_FACTORY4
     int val;
   };
 
-  F_FACTORY4() : env(&sset, true), factory(), null({})
+  F_FACTORY4() : env(&sset, vita::initialization::standard),
+                 factory(), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY4)");
 
@@ -84,4 +85,4 @@ struct F_FACTORY4
   const std::vector<vita::index_t> null;
 };
 
-#endif  // Include guard
+#endif  // include guard

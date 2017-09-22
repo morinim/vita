@@ -19,23 +19,24 @@
 //
 int main(int argc, char *argv[])
 {
-  vita::symbol_set sset;
-  vita::environment env(&sset, true);
+  using namespace vita;
+  symbol_set sset;
+  environment env(&sset, initialization::standard);
 
   env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 10);
 
-  vita::symbol_factory factory;;
-  sset.insert(factory.make(vita::domain_t::d_double, -200, 200));
+  symbol_factory factory;;
+  sset.insert(factory.make(domain_t::d_double, -200, 200));
   sset.insert(factory.make("FADD"));
   sset.insert(factory.make("FSUB"));
   sset.insert(factory.make("FMUL"));
   sset.insert(factory.make("FIFL"));
   sset.insert(factory.make("FIFE"));
 
-  vita::i_mep i1(env), i2(env);
+  i_mep i1(env), i2(env);
 
   std::cout << "PARENTS\n" << std::string(40, '-') << '\n'
-            << vita::out::dump
+            << out::dump
             << i1 << '\n'
             << i2 << '\n'
             << "OFFSPRING\n" << std::string(40, '-') << '\n'

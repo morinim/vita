@@ -28,7 +28,7 @@ namespace vita
 class problem
 {
 public:
-  explicit problem(bool = false);
+  explicit problem(initialization = initialization::skip);
 
   virtual vita::data *data();
 

@@ -252,7 +252,7 @@ int main()
 {
   trade_simulator ts;
 
-  vita::problem p(true);
+  vita::problem p(vita::initialization::standard);
 
   if (!setup_symbols(&p.sset))
     return EXIT_FAILURE;
