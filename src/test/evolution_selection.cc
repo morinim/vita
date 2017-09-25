@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,10 +31,10 @@ BOOST_AUTO_TEST_CASE(t_tournament)
 {
   using namespace vita;
 
-  env.individuals = 10;
-  env.layers      =  1;
+  prob.env.individuals = 10;
+  prob.env.layers      =  1;
 
-  population<i_mep>     pop(env);
+  population<i_mep>    pop(prob);
   test_evaluator<i_mep>      eva;
   summary<i_mep>             sum;
 
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(t_tournament)
 
   for (unsigned ts(1); ts < 10; ++ts)
   {
-    env.tournament_size = ts;
+    prob.env.tournament_size = ts;
 
     coord max{0, 0};
     for (unsigned i(1); i < pop.individuals(); ++i)
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(t_tournament)
     {
       auto parents(sel.run());
 
-      BOOST_CHECK_EQUAL(parents.size(), env.tournament_size);
+      BOOST_TEST(parents.size() == prob.env.tournament_size);
 
       const bool is_sorted(
         std::is_sorted(parents.begin(), parents.end(),
@@ -88,10 +88,10 @@ BOOST_AUTO_TEST_CASE(t_fuss)
 {
   using namespace vita;
 
-  env.individuals = 10;
-  env.layers      =  1;
+  prob.env.individuals = 10;
+  prob.env.layers      =  1;
 
-  population<i_mep>     pop(env);
+  population<i_mep     pop(prob);
   test_evaluator<i_mep>      eva;
   summary<i_mep>             sum;
 
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(t_fuss)
 
   for (unsigned ts(5); ts < 10; ++ts)
   {
-    env.tournament_size = ts;
+    prob.env.tournament_size = ts;
 
     counter.clear();
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(t_fuss)
     {
       auto parents(sel.run());
 
-      BOOST_CHECK_EQUAL(parents.size(), env.tournament_size);
+      BOOST_CHECK_EQUAL(parents.size(), prob.env.tournament_size);
 
       dist.add(eva(pop[parents[0]]));
 

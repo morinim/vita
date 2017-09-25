@@ -17,7 +17,6 @@ namespace vita
 ///
 /// Class constructor.
 ///
-/// \param[in] ss   a pointer to the symbol set used in the current environment
 /// \param[in] init if `standard` sets every auto-tuning-parameter with
 ///                 "safe" values (thus disabling the `search::tune_parameters`
 ///                 method)
@@ -31,7 +30,7 @@ namespace vita
 ///
 /// \see search::tune_parameters
 ///
-environment::environment(symbol_set *ss, initialization init) : sset(ss)
+environment::environment(initialization init)
 {
   if (init == initialization::standard)
   {

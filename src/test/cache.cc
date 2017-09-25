@@ -14,9 +14,9 @@
 #include <sstream>
 
 #include "kernel/cache.h"
-#include "kernel/environment.h"
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
+#include "kernel/problem.h"
 #include "kernel/src/primitive/factory.h"
 
 #if !defined(MASTER_TEST_SET)
@@ -90,13 +90,13 @@ BOOST_FIXTURE_TEST_SUITE(test_cache, F_FACTORY2)
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
   vita::cache cache(16);
-  env.code_length = 64;
+  prob.env.code_length = 64;
 
   const unsigned n(6000);
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::i_mep i1(env);
+    const vita::i_mep i1(prob);
     const auto base_f(static_cast<vita::fitness_t::value_type>(i));
     vita::fitness_t f{base_f};
 
@@ -110,14 +110,14 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
 {
   using i_interp = vita::interpreter<vita::i_mep>;
   vita::cache cache(14);
-  env.code_length = 64;
+  prob.env.code_length = 64;
 
   const unsigned n(1000);
 
   std::vector<vita::i_mep> vi;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::i_mep i1(env);
+    vita::i_mep i1(prob);
     const vita::any val(i_interp(&i1).run());
     vita::fitness_t f{val.has_value()
                       ? vita::any_cast<vita::fitness_t::value_type>(val) : 0.0};
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   using i_interp = interpreter<i_mep>;
   vita::cache cache1(14), cache2(14);
-  env.code_length = 64;
+  prob.env.code_length = 64;
 
   const unsigned n(1000);
   std::vector<i_mep> vi;
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   for (unsigned i(0); i < n; ++i)
   {
-    i_mep i1(env);
+    i_mep i1(prob);
     const vita::any val(i_interp(&i1).run());
     fitness_t f{val.has_value() ? any_cast<fitness_t::value_type>(val) : 0.0};
 

@@ -42,7 +42,8 @@ void family_competition<T>::run(
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
-  assert(pop.env().elitism != trilean::unknown);
+  const auto elitism(pop.get_problem().env.elitism);
+  Expects(elitism != trilean::unknown);
 
   const fitness_t fit_off(this->eva_(offspring[0]));
 
@@ -56,7 +57,7 @@ void family_competition<T>::run(
   assert((fit_off[0] <= 0.0) == (fit_parent[0][0] <= 0.0));
   assert((fit_off[0] <= 0.0) == (fit_parent[1][0] <= 0.0));
 
-  if (pop.env().elitism == trilean::yes)
+  if (elitism == trilean::yes)
   {
     if (fit_off > fit_parent[id_worst])
       pop[parent[id_worst]] = offspring[0];
@@ -110,6 +111,8 @@ void tournament<T>::run(
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
+  const auto elitism(pop.get_problem().env.elitism);
+  Expects(elitism != trilean::unknown);
 
   const auto fit_off(this->eva_(offspring[0]));
 
@@ -126,8 +129,7 @@ void tournament<T>::run(
   const auto f_rep_idx(this->eva_(pop[rep_idx]));
   const bool replace(f_rep_idx < fit_off);
 
-  assert(pop.env().elitism != trilean::unknown);
-  if (pop.env().elitism == trilean::no || replace)
+  if (elitism == trilean::no || replace)
     pop[rep_idx] = offspring[0];
 
   if (fit_off > s->best.score.fitness)
@@ -203,7 +205,7 @@ bool alps<T>::try_add_to_layer(unsigned layer, const T &incoming)
   coord c_worst{layer, random::sup(p.individuals(layer))};
   auto f_worst(this->eva_(p[c_worst]));
 
-  auto rounds(p.env().tournament_size);
+  auto rounds(p.get_problem().env.tournament_size);
   while (rounds--)
   {
     const coord c_x{layer, random::sup(p.individuals(layer))};
@@ -253,8 +255,9 @@ void alps<T>::run(
   const auto layer(std::max(parent[0].layer, parent[1].layer));
   const auto f_off(this->eva_(offspring[0]));
   const auto &pop(this->pop_);
+  const auto elitism(pop.get_problem().env.elitism);
 
-  assert(pop.env().elitism != trilean::unknown);
+  Expects(elitism != trilean::unknown);
 
   bool ins;
 #if defined(MUTUAL_IMPROVEMENT)
@@ -279,7 +282,7 @@ void alps<T>::run(
     // command below.
     // There isn't an age limit for the last layer so try_add_to_layer will
     // always succeed.
-    if (!ins && pop.env().elitism == trilean::yes)
+    if (!ins && elitism == trilean::yes)
       try_add_to_layer(pop.layers() - 1, offspring[0]);
 
     s->last_imp           = s->gen;
@@ -320,6 +323,9 @@ void pareto<T>::run(
   const typename strategy<T>::offspring_t &offspring, summary<T> *s)
 {
   auto &pop(this->pop_);
+  const auto elitism(pop.get_problem().env.elitism);
+
+  Expects(elitism != trilean::unknown);
 
   const auto fit_off(this->eva_(offspring[0]));
 /*
@@ -355,9 +361,7 @@ void pareto<T>::run(
     }
   }
 
-  assert(pop.env().elitism != trilean::unknown);
-
-  if (pop.env().elitism == trilean::no || !dominated)
+  if (elitism == trilean::no || !dominated)
     pop[parent.back()] = offspring[0];
 
   if (fit_off > s->best.score.fitness)

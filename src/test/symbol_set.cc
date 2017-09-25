@@ -34,12 +34,12 @@ BOOST_AUTO_TEST_CASE(Speed)
   const unsigned n(10000000);
 
   // Because of s the compiler have to perform the entire for loop (see below).
-  const vita::symbol *s(&sset.roulette());
+  const vita::symbol *s(&prob.sset.roulette());
 
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
     if (vita::random::boolean())
-      s = &sset.roulette();
+      s = &prob.sset.roulette();
 
   BOOST_TEST_MESSAGE(1000.0l * n / t.elapsed().count()
                      << " extractions/sec - symbol: " << s->name());
@@ -52,9 +52,9 @@ BOOST_AUTO_TEST_CASE(Distribution)
   const unsigned n(20000000);
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::symbol &s(sset.roulette());
+    const vita::symbol &s(prob.sset.roulette());
     ++hist[&s];
-    weight[&s] = sset.weight(s);
+    weight[&s] = prob.sset.weight(s);
   }
 
   double sum(0.0);

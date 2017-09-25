@@ -104,7 +104,7 @@ src_problem::src_problem(const std::string &ds, const std::string &ts,
 ///
 bool src_problem::operator!() const
 {
-  return !dat_.size(data::training) || !env.sset->enough_terminals();
+  return !dat_.size(data::training) || !sset.enough_terminals();
 }
 
 ///
@@ -123,7 +123,7 @@ std::pair<std::size_t, std::size_t> src_problem::load(
   if (ds.empty())
     return {0, 0};
 
-  env.sset->clear();
+  sset.clear();
   dat_.clear();
 
   const auto n_examples(dat_.load(ds));
@@ -166,7 +166,7 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 ///
 void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 {
-  env.sset->clear();
+  sset.clear();
 
   // Sets up the variables (features).
   const auto columns(dat_.columns());
@@ -177,13 +177,13 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
       const auto name(provided_name.empty() ? "X" + std::to_string(i)
                                             : provided_name);
       const category_t category(dat_.get_column(i).category_id);
-      env.sset->insert(std::make_unique<variable>(name, i - 1, category));
+      sset.insert(std::make_unique<variable>(name, i - 1, category));
     }
 
   // Sets up the labels for nominal attributes.
   for (const category &c : dat_.categories())
     for (const std::string &l : c.labels)
-      env.sset->insert(std::make_unique<constant<std::string>>(l, c.tag));
+      sset.insert(std::make_unique<constant<std::string>>(l, c.tag));
 }
 
 ///
@@ -199,29 +199,29 @@ void src_problem::setup_default_symbols()
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
     {
-      env.sset->insert(factory_.make("1.0", {tag}));
-      env.sset->insert(factory_.make("2.0", {tag}));
-      env.sset->insert(factory_.make("3.0", {tag}));
-      env.sset->insert(factory_.make("4.0", {tag}));
-      env.sset->insert(factory_.make("5.0", {tag}));
-      env.sset->insert(factory_.make("6.0", {tag}));
-      env.sset->insert(factory_.make("7.0", {tag}));
-      env.sset->insert(factory_.make("8.0", {tag}));
-      env.sset->insert(factory_.make("9.0", {tag}));
-      env.sset->insert(factory_.make("FABS", {tag}));
-      env.sset->insert(factory_.make("FADD", {tag}));
-      env.sset->insert(factory_.make("FDIV", {tag}));
-      env.sset->insert(factory_.make("FLN",  {tag}));
-      env.sset->insert(factory_.make("FMUL", {tag}));
-      env.sset->insert(factory_.make("FMOD", {tag}));
-      env.sset->insert(factory_.make("FSUB", {tag}));
+      sset.insert(factory_.make("1.0", {tag}));
+      sset.insert(factory_.make("2.0", {tag}));
+      sset.insert(factory_.make("3.0", {tag}));
+      sset.insert(factory_.make("4.0", {tag}));
+      sset.insert(factory_.make("5.0", {tag}));
+      sset.insert(factory_.make("6.0", {tag}));
+      sset.insert(factory_.make("7.0", {tag}));
+      sset.insert(factory_.make("8.0", {tag}));
+      sset.insert(factory_.make("9.0", {tag}));
+      sset.insert(factory_.make("FABS", {tag}));
+      sset.insert(factory_.make("FADD", {tag}));
+      sset.insert(factory_.make("FDIV", {tag}));
+      sset.insert(factory_.make("FLN",  {tag}));
+      sset.insert(factory_.make("FMUL", {tag}));
+      sset.insert(factory_.make("FMOD", {tag}));
+      sset.insert(factory_.make("FSUB", {tag}));
     }
     else if (compatible({tag}, {"string"}))
     {
       // for (decltype(tag) j(0); j < sup; ++j)
       //   if (j != tag)
-      //     env.sset->insert(factory_.make("SIFE", {tag, j}));
-      env.sset->insert(factory_.make("SIFE", {tag, 0}));
+      //     sset.insert(factory_.make("SIFE", {tag, j}));
+      sset.insert(factory_.make("SIFE", {tag, 0}));
     }
 }
 
@@ -285,7 +285,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
             signature += " " + dat_.categories().find(tag).name;
           print.debug("Adding to symbol set ", signature);
 
-          env.sset->insert(factory_.make(sym_name, cvect(n_args, tag)));
+          sset.insert(factory_.make(sym_name, cvect(n_args, tag)));
         }
     }
     else  // !sym_sig => complex signature
@@ -326,7 +326,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
             signature += " " + dat_.categories().find(j).name;
           print.debug("Adding to symbol set ", signature);
 
-          env.sset->insert(factory_.make(sym_name, seq));
+          sset.insert(factory_.make(sym_name, seq));
         }
     }
 

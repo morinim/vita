@@ -13,22 +13,21 @@
 #if !defined FACTORY_FIXTURE2_H
 #define      FACTORY_FIXTURE2_H
 
-#include "kernel/environment.h"
-#include "kernel/symbol_set.h"
+#include "kernel/problem.h"
 #include "kernel/src/primitive/factory.h"
 
 struct F_FACTORY2
 {
-  F_FACTORY2() : env(&sset, vita::initialization::standard), factory()
+  F_FACTORY2() : prob(vita::initialization::standard), factory()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY2)");
 
-    sset.insert(factory.make("REAL"));
-    sset.insert(factory.make("FADD"));
-    sset.insert(factory.make("FSUB"));
-    sset.insert(factory.make("FMUL"));
-    sset.insert(factory.make("FIFL"));
-    sset.insert(factory.make("FIFE"));
+    prob.sset.insert(factory.make("REAL"));
+    prob.sset.insert(factory.make("FADD"));
+    prob.sset.insert(factory.make("FSUB"));
+    prob.sset.insert(factory.make("FMUL"));
+    prob.sset.insert(factory.make("FIFL"));
+    prob.sset.insert(factory.make("FIFE"));
   }
 
   ~F_FACTORY2()
@@ -36,9 +35,8 @@ struct F_FACTORY2
     BOOST_TEST_MESSAGE("Teardown fixture (FACTORY2)");
   }
 
-  vita::environment        env;
+  vita::problem           prob;
   vita::symbol_factory factory;
-  vita::symbol_set        sset;
 };
 
 #endif  // include guard

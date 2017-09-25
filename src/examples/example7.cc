@@ -20,31 +20,31 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  symbol_set sset;
-  environment env(&sset, initialization::standard);
+  problem p(initialization::standard);
 
-  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
+  p.env.code_length = static_cast<unsigned>(argc > 1
+                                            ? std::atoi(argv[1]) : 100);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
   symbol_factory factory;
-  sset.insert(factory.make(domain_t::d_double, -200, 200));
-  sset.insert(factory.make("FADD"));
-  sset.insert(factory.make("FSUB"));
-  sset.insert(factory.make("FMUL"));
-  sset.insert(factory.make("FIFL"));
-  sset.insert(factory.make("FIFE"));
-  sset.insert(factory.make("FABS"));
-  sset.insert(factory.make("FLN"));
+  p.sset.insert(factory.make(domain_t::d_double, -200, 200));
+  p.sset.insert(factory.make("FADD"));
+  p.sset.insert(factory.make("FSUB"));
+  p.sset.insert(factory.make("FMUL"));
+  p.sset.insert(factory.make("FIFL"));
+  p.sset.insert(factory.make("FIFE"));
+  p.sset.insert(factory.make("FABS"));
+  p.sset.insert(factory.make("FLN"));
 
   distribution<double> individuals, blocks_len, blocks_n, arguments;
 
   for (unsigned k(0); k < n; ++k)
   {
-    i_mep base(env);
+    i_mep base(p);
     auto base_es(base.active_symbols());
     while (base_es < 5)
     {
-      base = i_mep(env);
+      base = i_mep(p);
       base_es = base.active_symbols();
     }
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     {
       i_mep ib(base.get_block(*i));
 
-      auto generalized(ib.generalize(2, *env.sset));
+      auto generalized(ib.generalize(2, p.sset));
 
       std::cout << '\n' << ib
                 << "GENERALIZED\n" << generalized.first

@@ -25,13 +25,13 @@ class i_ga : public individual<i_ga>
 {
 public:
   i_ga() = default;
-  explicit i_ga(const environment &);
+  explicit i_ga(const problem &);
 
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
 
   // Recombination operators.
-  unsigned mutation(double, const environment &);
+  unsigned mutation(double, const problem &);
 
   // Iterators.
   using genome_t = std::vector<gene>;
@@ -98,7 +98,7 @@ private:
   void pack(std::vector<unsigned char> *const) const;
 
   // Serialization.
-  bool load_impl(std::istream &, const environment &);
+  bool load_impl(std::istream &, const problem &);
   bool save_impl(std::ostream &) const;
 
   // *** Private data members ***

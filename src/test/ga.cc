@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,7 @@ BOOST_FIXTURE_TEST_SUITE(t_ga, F_FACTORY5)
 
 BOOST_AUTO_TEST_CASE(Evolution)
 {
-  env.individuals = 100;
+  prob.env.individuals = 100;
 
   vita::print.verbosity(vita::log::L_WARNING);
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
                                       });
              }));
 
-  vita::evolution<vita::i_ga, vita::alps_es> evo1(env, eva);
+  vita::evolution<vita::i_ga, vita::alps_es> evo1(prob, eva);
   BOOST_REQUIRE(evo1.debug());
 
   const auto s1(evo1.run(1));
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
   BOOST_CHECK_GT(s1.best.solution[2].par, 950.0);
   BOOST_CHECK_GT(s1.best.solution[3].par, 9950.0);
 
-  vita::evolution<vita::i_ga, vita::std_es> evo2(env, eva);
+  vita::evolution<vita::i_ga, vita::std_es> evo2(prob, eva);
   BOOST_REQUIRE(evo2.debug());
 
   const auto s2(evo2.run(1));

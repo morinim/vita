@@ -18,22 +18,21 @@
 namespace vita
 {
 ///
-/// \param[in] e base environment.
+/// \param[in] p current problem.
 ///
 /// The process that generates the initial, random expressions has to be
 /// implemented so as to ensure that they do not violate the type system's
 /// constraints.
 ///
-i_de::i_de(const environment &e) : individual(), genome_(e.sset->categories())
+i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
 {
-  Expects(e.debug(true));
-  Expects(e.sset);
+  Expects(p.debug());
 
   const auto cs(parameters());
   assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(e.sset->roulette_terminal(c)).par;
+    genome_[c] = gene(p.sset.roulette_terminal(c)).par;
 
   Ensures(debug());
 }
@@ -269,7 +268,7 @@ bool i_de::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_de::load_impl(std::istream &in, const environment &)
+bool i_de::load_impl(std::istream &in, const problem &)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,7 +48,7 @@ typename strategy<T>::parents_t tournament<T>::run()
 {
   const auto &pop(this->pop_);
 
-  const auto rounds(pop.env().tournament_size);
+  const auto rounds(pop.get_problem().env.tournament_size);
   assert(rounds);
 
   const auto target(pickup(pop));
@@ -136,8 +136,9 @@ typename strategy<T>::parents_t alps<T>::run()
 
   assert(age_fit0 >= age_fit1);
 
-  const auto same_layer_p(pop.env().alps.p_same_layer);
-  auto rounds(pop.env().tournament_size);
+  const auto &env(pop.get_problem().env);
+  const auto same_layer_p(env.alps.p_same_layer);
+  auto rounds(env.tournament_size);
 
   while (rounds--)
   {
@@ -264,13 +265,14 @@ void pareto<T>::front(const std::vector<unsigned> &pool,
 template<class T>
 typename strategy<T>::parents_t random<T>::run()
 {
-  const auto size(this->pop_.env().tournament_size);
+  const auto pop(this->pop_);
+  const auto size(pop.get_problem().env.tournament_size);
 
   assert(size);
   typename strategy<T>::parents_t ret(size);
 
   for (auto &v : ret)
-    v = pickup(this->pop_);
+    v = pickup(pop);
 
   return ret;
 }

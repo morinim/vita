@@ -70,14 +70,14 @@ inline void set()
 }  // namespace term
 
 ///
-/// \param[in] e   environment (mostly used for population initialization)
+/// \param[in] p   the current problem
 /// \param[in] eva evaluator used during the evolution
 ///
 template<class T, template<class> class ES>
-evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva)
-  : pop_(e), eva_(eva), es_(pop_, eva, &stats_)
+evolution<T, ES>::evolution(const problem &p, evaluator<T> &eva)
+  : pop_(p), eva_(eva), es_(pop_, eva, &stats_)
 {
-  Expects(e.sset);
+  Expects(p.debug());
   Ensures(debug());
 }
 
@@ -88,10 +88,11 @@ evolution<T, ES>::evolution(const environment &e, evaluator<T> &eva)
 template<class T, template<class> class ES>
 bool evolution<T, ES>::stop_condition(const summary<T> &s) const
 {
-  Expects(env().generations);
+  const auto generations(pop_.get_problem().env.generations);
+  Expects(generations);
 
   // Check the number of generations.
-  if (s.gen > env().generations)
+  if (s.gen > generations)
     return true;
 
   if (term::user_stop())
@@ -142,14 +143,16 @@ void evolution<T, ES>::log(unsigned run_count) const
 {
   static unsigned last_run(0);
 
-  auto fullpath = [this](const std::string &f)
+  const auto &env(pop_.get_problem().env);
+
+  auto fullpath = [env](const std::string &f)
                   {
-                    return env().stat.dir + "/" + f;
+                    return env.stat.dir + "/" + f;
                   };
 
-  if (env().stat.dynamic)
+  if (env.stat.dynamic)
   {
-    std::ofstream f_dyn(fullpath(env().stat.dyn_name), std::ios_base::app);
+    std::ofstream f_dyn(fullpath(env.stat.dyn_name), std::ios_base::app);
     if (f_dyn.good())
     {
       if (last_run != run_count)
@@ -188,9 +191,9 @@ void evolution<T, ES>::log(unsigned run_count) const
     }
   }
 
-  if (env().stat.population)
+  if (env.stat.population)
   {
-    std::ofstream f_pop(fullpath(env().stat.pop_name), std::ios_base::app);
+    std::ofstream f_pop(fullpath(env.stat.pop_name), std::ios_base::app);
     if (f_pop.good())
     {
       if (last_run != run_count)

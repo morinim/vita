@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,16 +41,20 @@ typename strategy<T>::offspring_t base<T>::run(
   const typename strategy<T>::parents_t &parent)
 {
   const auto &pop(this->pop_);
-  const auto &env(pop.env());
+  const auto &prob(pop.get_problem());
 
-  Expects(0.0 <= env.p_cross && env.p_cross <= 1.0);
-  Expects(0.0 <= env.p_mutation && env.p_mutation <= 1.0);
-  Expects(env.brood_recombination);
+  const auto p_cross(prob.env.p_cross);
+  const auto p_mutation(prob.env.p_mutation);
+  const auto brood_recombination(prob.env.brood_recombination);
+
+  Expects(0.0 <= p_cross && p_cross <= 1.0);
+  Expects(0.0 <= p_mutation && p_mutation <= 1.0);
+  Expects(brood_recombination);
   Expects(parent.size() >= 2);
 
   const auto r1(parent[0]), r2(parent[1]);
 
-  if (random::boolean(env.p_cross))
+  if (random::boolean(p_cross))
   {
     auto cross_and_mutate(
       [&](const T &p1, const T &p2)
@@ -66,7 +70,7 @@ typename strategy<T>::offspring_t base<T>::run(
         // * optimize the exploitation phase.
         while (p1.signature() == ret.signature() ||
                p2.signature() == ret.signature())
-          this->stats_->mutations += ret.mutation(env.p_mutation, env);
+          this->stats_->mutations += ret.mutation(p_mutation, prob);
 
         return ret;
       });
@@ -74,13 +78,13 @@ typename strategy<T>::offspring_t base<T>::run(
     T off(cross_and_mutate(pop[r1], pop[r2]));
 
     //if (eva_.seen(off))
-    //  stats_->mutations += off.mutation(env.p_mutation, env);
+    //  stats_->mutations += off.mutation(p_mutation, prob);
 
-    if (env.brood_recombination > 1)
+    if (brood_recombination > 1)
     {
       fitness_t fit_off(this->eva_.fast(off));
 
-      for (unsigned i(1); i < env.brood_recombination; ++i)
+      for (unsigned i(1); i < brood_recombination; ++i)
       {
         T tmp(cross_and_mutate(pop[r1], pop[r2]));
 
@@ -99,7 +103,7 @@ typename strategy<T>::offspring_t base<T>::run(
 
   // !crossover
   T off(pop[random::boolean() ? r1 : r2]);
-  this->stats_->mutations += off.mutation(env.p_mutation, env);
+  this->stats_->mutations += off.mutation(p_mutation, prob);
 
   Ensures(off.debug());
   return {off};
@@ -118,7 +122,7 @@ typename strategy<T>::offspring_t de<T>::run(
   assert(parent.size() >= 2);
 
   const auto &pop(this->pop_);
-  const auto &env(pop.env());
+  const auto &env(pop.get_problem().env);
 
   assert(0.0 < env.p_cross);
   assert(env.p_cross <= 1.0);

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -63,13 +63,13 @@ public:
   }
 
   // Serialization
-  bool load(std::istream &in, const environment &e)
+  bool load(std::istream &in, const problem &p)
   {
     unsigned n;
     if (!(in >> n) || n != 1)
       return false;
 
-    return ind_.load(in, e);
+    return ind_.load(in, p);
   }
 
   bool save(std::ostream &out) const
@@ -99,7 +99,7 @@ public:
   bool debug() const { return int_.debug(); }
 
   // Serialization
-  bool load(std::istream &, const environment &) { return false; }
+  bool load(std::istream &, const problem &) { return false; }
 
   bool save(std::ostream &out) const
   {
@@ -139,7 +139,7 @@ public:
   /// Load is atomic: if it doesn't succeed this object isn't modified; if
   /// it succeeds the team if replaced with a new team (eventually with a
   /// different size) loaded from the input stream.
-  bool load(std::istream &in, const environment &e)
+  bool load(std::istream &in, const problem &p)
   {
     unsigned n;
     if (!(in >> n) || !n)
@@ -152,7 +152,7 @@ public:
     {
       reg_lambda_f_storage<T, S> temp_storage{T()};
 
-      if (!temp_storage.load(in, e))
+      if (!temp_storage.load(in, p))
         return false;
 
       v.push_back(temp_storage);

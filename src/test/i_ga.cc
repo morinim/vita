@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,11 +32,11 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_ga ind(env);
+    vita::i_ga ind(prob);
     vita::interpreter<vita::i_ga> check(&ind);
 
     BOOST_TEST(ind.debug());
-    BOOST_TEST(ind.parameters() == env.sset->categories());
+    BOOST_TEST(ind.parameters() == prob.sset.categories());
     BOOST_TEST(ind.age() == 0);
     BOOST_TEST(check.penalty() == 0);
   }
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(Penalty, * boost::unit_test::tolerance(0.000001))
 {
   for (unsigned i(0); i < 100; ++i)
   {
-    vita::i_ga ind(env);
+    vita::i_ga ind(prob);
     vita::interpreter<vita::i_ga> check(&ind);
 
     BOOST_TEST(check.penalty() == 0.0);
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(Penalty, * boost::unit_test::tolerance(0.000001))
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  vita::i_ga t(env);
+  vita::i_ga t(prob);
   const vita::i_ga orig(t);
 
   const unsigned n(1000);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation");
   for (unsigned i(0); i < n; ++i)
   {
-    t.mutation(0.0, env);
+    t.mutation(0.0, prob);
     BOOST_TEST(t == orig);
   }
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     auto i1(orig);
 
-    i1.mutation(0.5, env);
+    i1.mutation(0.5, prob);
     diff += orig.distance(i1);
   }
 
@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_ga a(env);
+    vita::i_ga a(prob);
     BOOST_TEST(a == a);
     BOOST_TEST(a.distance(a) == 0);
 
@@ -131,7 +131,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_TEST(a == b);
     BOOST_TEST(a.distance(b) == 0);
 
-    vita::i_ga c(env);
+    vita::i_ga c(prob);
     if (a.signature() != c.signature())
     {
       BOOST_TEST(!(a == c));
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 {
   for (unsigned j(0); j < 1000; ++j)
   {
-    vita::i_ga ind(env);
+    vita::i_ga ind(prob);
 
     unsigned i(0);
     for (const auto &g : ind)
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 
 BOOST_AUTO_TEST_CASE(StandardCrossover)
 {
-  vita::i_ga i1(env), i2(env);
+  vita::i_ga i1(prob), i2(prob);
 
   double dist(0.0);
   const unsigned n(1000);
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
   }
 
   // +1 since we have at least one gene involved in crossover.
-  const double perc(100.0 * dist / ((env.sset->categories() + 1) * n));
+  const double perc(100.0 * dist / ((prob.sset.categories() + 1) * n));
   BOOST_CHECK_GT(perc, 48.0);
   BOOST_CHECK_LT(perc, 52.0);
 }
@@ -188,15 +188,15 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_ga i1(env);
+    vita::i_ga i1(prob);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_TEST(i1.save(ss));
 
-    vita::i_ga i2(env);
-    BOOST_TEST(i2.load(ss, env));
+    vita::i_ga i2(prob);
+    BOOST_TEST(i2.load(ss, prob));
     BOOST_TEST(i2.debug());
 
     BOOST_CHECK_EQUAL(i1, i2);
@@ -208,7 +208,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   BOOST_TEST(empty.save(ss));
 
   vita::i_ga empty1;
-  BOOST_TEST(empty1.load(ss, env));
+  BOOST_TEST(empty1.load(ss, prob));
   BOOST_TEST(empty1.debug());
   BOOST_TEST(empty1.empty());
 

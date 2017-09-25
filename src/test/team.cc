@@ -30,10 +30,10 @@ BOOST_FIXTURE_TEST_SUITE(t_team, F_FACTORY1)
 BOOST_AUTO_TEST_CASE(RandomCreation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation");
-  for (unsigned l(env.sset->categories() + 2); l < 100; ++l)
+  for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
   {
-    env.code_length = l;
-    vita::team<vita::i_mep> t(env);
+    prob.env.code_length = l;
+    vita::team<vita::i_mep> t(prob);
 
     BOOST_TEST(t.debug());
     BOOST_TEST(t.age() == 0);
@@ -42,9 +42,9 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  env.code_length = 100;
+  prob.env.code_length = 100;
 
-  vita::team<vita::i_mep> t(env);
+  vita::team<vita::i_mep> t(prob);
   const auto orig(t);
 
   BOOST_TEST(t.individuals() > 0);
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation");
   for (unsigned i(0); i < n; ++i)
   {
-    t.mutation(0.0, env);
+    t.mutation(0.0, prob);
     BOOST_TEST(t == orig);
   }
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(Mutation)
   {
     const vita::team<vita::i_mep> t1{t};
 
-    t.mutation(0.5, env);
+    t.mutation(0.5, prob);
     diff += distance(t, t1);
     length += t1.active_symbols();
   }
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::team<vita::i_mep> a(env);
+    vita::team<vita::i_mep> a(prob);
     BOOST_TEST(a == a);
     BOOST_TEST(distance(a, a) == 0);
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
     BOOST_TEST(a == b);
     BOOST_TEST(distance(a, b) == 0);
 
-    vita::team<vita::i_mep> c(env);
+    vita::team<vita::i_mep> c(prob);
     if (a.signature() != c.signature())
     {
       BOOST_TEST(a != c);
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 {
   for (unsigned j(0); j < 1000; ++j)
   {
-    vita::team<vita::i_mep> t(env);
+    vita::team<vita::i_mep> t(prob);
 
     unsigned i(0);
     for (const auto &ind : t)
@@ -117,9 +117,9 @@ BOOST_AUTO_TEST_CASE(t_crossover)
 {
   using namespace vita;
 
-  env.code_length = 100;
+  prob.env.code_length = 100;
 
-  team<vita::i_mep> t1(env), t2(env);
+  team<vita::i_mep> t1(prob), t2(prob);
 
   const unsigned n(2000);
   for (unsigned j(0); j < n; ++j)
@@ -143,15 +143,15 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::team<vita::i_mep> t1(env);
+    vita::team<vita::i_mep> t1(prob);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       t1.inc_age();
 
     BOOST_TEST(t1.save(ss));
 
-    vita::team<vita::i_mep> t2(env);
-    BOOST_TEST(t2.load(ss, env));
+    vita::team<vita::i_mep> t2(prob);
+    BOOST_TEST(t2.load(ss, prob));
     BOOST_TEST(t2.debug());
 
     BOOST_TEST(t1 == t2);

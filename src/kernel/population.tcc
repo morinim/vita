@@ -20,18 +20,17 @@
 ///
 /// Creates a random population.
 ///
-/// \param[in] e vita::environment
+/// \param[in] e current problem
 ///
 /// Starting size of the population is `e.individuals`.
 ///
 template<class T>
-population<T>::population(const environment &e) : env_(&e), pop_(1),
-                                                  allowed_(1)
+population<T>::population(const problem &p) : prob_(&p), pop_(1),
+                                              allowed_(1)
 {
-  Expects(e.debug(true));
-  Expects(e.sset);
+  Expects(p.debug());
 
-  const auto n(e.individuals);
+  const auto n(p.env.individuals);
   pop_[0].reserve(n);
   allowed_[0] = n;
 
@@ -55,15 +54,15 @@ void population<T>::init_layer(unsigned l)
   pop_[l].clear();
 
   std::generate_n(std::back_inserter(pop_[l]), allowed(l),
-                  [this] {return T(env()); });
+                  [this] {return T(get_problem()); });
 }
 
 ///
 /// \return number of active layers
 ///
 /// \note
-/// * The number of active layers is a dynamic value (it's a monotonically
-///   increasing function of the generation number).
+/// * The number of active layers is a dynamic value (almost monotonically
+///   increasing with the generation number).
 /// * Maximum number of layers (`env.alps.layers`) is a constant value
 ///   greater than or equal to `layers()`.
 ///
@@ -84,10 +83,12 @@ void population<T>::add_layer()
   Expects(layers());
   Expects(individuals(0));
 
-  pop_.insert(pop_.begin(), layer_t());
-  pop_[0].reserve(env_->individuals);
+  const auto individuals(get_problem().env.individuals);
 
-  allowed_.insert(allowed_.begin(), env_->individuals);
+  pop_.insert(pop_.begin(), layer_t());
+  pop_[0].reserve(individuals);
+
+  allowed_.insert(allowed_.begin(), individuals);
 
   init_layer(0);
 }
@@ -182,9 +183,10 @@ void population<T>::set_allowed(unsigned l, unsigned n)
   Expects(l < layers());
   Expects(n <= pop_[l].capacity());
 
+  const auto &env(get_problem().env);
   // Unless explicitly allowed by the environment, do not drop under a
   // predefined number of individuals.
-  const auto min(std::min(env().min_individuals, env().individuals));
+  const auto min(std::min(env.min_individuals, env.individuals));
   n = std::max(n, min);
 
   if (individuals(l) > n)
@@ -227,13 +229,13 @@ unsigned population<T>::individuals() const
 }
 
 ///
-/// \return a constant reference to the active environment
+/// \return a constant reference to the active problem
 ///
 template<class T>
-const environment &population<T>::env() const
+const problem &population<T>::get_problem() const
 {
-  Expects(env_);
-  return *env_;
+  Expects(prob_);
+  return *prob_;
 }
 
 ///
@@ -295,9 +297,9 @@ bool population<T>::debug() const
       return false;
   }
 
-  if (!env_)
+  if (!prob_)
   {
-    print.error("Undefined environment");
+    print.error("Undefined problem");
     return false;
   }
 
@@ -305,20 +307,20 @@ bool population<T>::debug() const
 }
 
 ///
-/// \param[in] e  environment used to build the individual
-/// \param[in] in input stream
-/// \return       `true` if population was loaded correctly
+/// \param[in] prob current problem
+/// \param[in] in   input stream
+/// \return         `true` if population was loaded correctly
 ///
 /// \note The current population isn't changed if the load operation fails.
 ///
 template<class T>
-bool population<T>::load(std::istream &in, const environment &e)
+bool population<T>::load(std::istream &in, const problem &prob)
 {
   unsigned n_layers;
   if (!(in >> n_layers) || !n_layers)
     return false;
 
-  population p(e);
+  population p(prob);
   p.pop_.reserve(n_layers);
   p.allowed_.reserve(n_layers);
 
@@ -332,7 +334,7 @@ bool population<T>::load(std::istream &in, const environment &e)
       return false;
 
     for (decltype(n_elem) i(0); i < n_elem; ++i)
-      if (!p[{l, i}].load(in, e))
+      if (!p[{l, i}].load(in, prob))
         return false;
   }
 
@@ -406,8 +408,12 @@ template<class T>
 typename population<T>::coord pickup(const population<T> &p,
                                      typename population<T>::coord target)
 {
-  return {target.layer, random::ring(target.index, p.env().mate_zone,
-                                     p.individuals(target.layer))};
+  const auto &layer(target.layer);
+  const auto &index(target.index);
+  const auto mate_zone(p.get_problem().env.mate_zone);
+  const auto individuals(p.individuals(layer));
+
+  return {layer, random::ring(index, mate_zone,  individuals)};
 }
 
 ///

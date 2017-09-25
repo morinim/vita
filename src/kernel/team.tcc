@@ -30,20 +30,19 @@ team<T>::team(unsigned n) : individuals_(n), signature_()
 ///
 /// Creates a team of individuals that will cooperate to solve a task.
 ///
-/// \param[in] e base environment
+/// \param[in] p current problem
 ///
 template<class T>
-team<T>::team(const environment &e) : signature_()
+team<T>::team(const problem &p) : signature_()
 {
-  Expects(e.debug(true));
-  Expects(e.team.individuals);
-  Expects(e.sset);
+  Expects(p.debug());
+  Expects(p.env.team.individuals);
 
-  const auto n(e.team.individuals);
+  auto n(p.env.team.individuals);
   individuals_.reserve(n);
 
-  for (auto i(decltype(n){0}); i < n; ++i)
-    individuals_.emplace_back(e);
+  for (decltype(n) i(0); i < n; ++i)
+    individuals_.emplace_back(p);
 
   Ensures(debug());
 }
@@ -63,18 +62,18 @@ team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 /// Mutates the individuals in `this` team and returns the number of mutations
 /// performed.
 ///
-/// \param[in] p   probability of gene mutation
-/// \param[in] env the current environment
+/// \param[in] pgm probability of gene mutation
+/// \param[in] prb current problem
 /// \return        number of mutations performed
 ///
 template<class T>
-unsigned team<T>::mutation(double p, const environment &env)
+unsigned team<T>::mutation(double pgm, const problem &prb)
 {
-  Expects(0.0 <= p);
-  Expects(p <= 1.0);
+  Expects(0.0 <= pgm);
+  Expects(pgm <= 1.0);
 
   /*
-  const auto nm(random::element(individuals_).mutation(p, sset));
+  const auto nm(random::element(individuals_).mutation(pgm, prb));
   if (nm)
     signature_.clear();
 
@@ -83,7 +82,7 @@ unsigned team<T>::mutation(double p, const environment &env)
 
   unsigned nm(0);
   for (auto &i : individuals_)
-    nm += i.mutation(p, env);
+    nm += i.mutation(pgm, prb);
 
   if (nm)
     signature_.clear();
@@ -318,7 +317,7 @@ bool team<T>::debug() const
 }
 
 ///
-/// \param[in] e  environment used to build the individual
+/// \param[in] p  active problem
 /// \param[in] in input stream
 /// \return       `true` if team was loaded correctly
 ///
@@ -326,7 +325,7 @@ bool team<T>::debug() const
 /// If the load operation isn't successful the current team isn't modified.
 ///
 template<class T>
-bool team<T>::load(std::istream &in, const environment &e)
+bool team<T>::load(std::istream &in, const problem &p)
 {
   unsigned n;
   if (!(in >> n) || !n)
@@ -338,7 +337,7 @@ bool team<T>::load(std::istream &in, const environment &e)
   for (unsigned j(0); j < n; ++j)
   {
     T i;
-    if (!i.load(in, e))
+    if (!i.load(in, p))
       return false;
     v.push_back(i);
   }

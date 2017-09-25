@@ -17,6 +17,7 @@
 
 #include "kernel/environment.h"
 #include "kernel/log.h"
+#include "kernel/problem.h"
 #include "kernel/random.h"
 
 namespace vita
@@ -35,7 +36,7 @@ template<class T>
 class population
 {
 public:
-  explicit population(const environment &);
+  explicit population(const problem &);
 
   struct coord;
   using layer_t = std::vector<T>;
@@ -56,7 +57,7 @@ public:
 
   void inc_age();
 
-  const environment &env() const;
+  const problem &get_problem() const;
 
   bool debug() const;
 
@@ -69,11 +70,14 @@ public:
   const_iterator end() const;
 
   // Serialization.
-  bool load(std::istream &, const environment &);
+  bool load(std::istream &, const problem &);
   bool save(std::ostream &) const;
 
 private:
-  const environment *env_;
+  const environment &get_helper(environment *) const;
+  const problem &get_helper(problem *) const;
+
+  const problem *prob_;
 
   std::vector<layer_t> pop_;
   std::vector<unsigned> allowed_;
@@ -82,7 +86,6 @@ private:
 template<class T> typename population<T>::coord pickup();
 template<class T> typename population<T>::coord pickup(
   const population<T> &, typename population<T>::coord);
-
 
 #include "kernel/population_coord.tcc"
 #include "kernel/population_iterator.tcc"

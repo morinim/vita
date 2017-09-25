@@ -61,7 +61,7 @@ class environment
 {
 public:
   // Constructor and support functions
-  explicit environment(symbol_set *, initialization = initialization::skip);
+  explicit environment(initialization = initialization::skip);
 
   void xml(tinyxml2::XMLDocument *) const;
 
@@ -304,10 +304,6 @@ public:
     /// > 1 means team mode.
     unsigned individuals = 3;
   } team;
-
-  /// The environment doesn't own the symbol_set: it's stored somewhere else
-  /// (usually inside the `problem` object).
-  symbol_set *sset = nullptr;
 };  // class environment
 
 }  // namespace vita

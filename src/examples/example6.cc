@@ -90,26 +90,25 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 int main(int argc, char *argv[])
 {
   using namespace vita;
-  symbol_set sset;
-  environment env(&sset, initialization::standard);
+  problem p(initialization::standard);
 
-  env.individuals = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 100);
-  env.code_length = static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 100);
-  env.generations = static_cast<unsigned>(argc > 3 ? std::atoi(argv[3]) : 100);
+  p.env.individuals = static_cast<unsigned>(argc>1 ? std::atoi(argv[1]) : 100);
+  p.env.code_length = static_cast<unsigned>(argc>2 ? std::atoi(argv[2]) : 100);
+  p.env.generations = static_cast<unsigned>(argc>3 ? std::atoi(argv[3]) : 100);
 
   symbol_factory factory;
-  sset.insert(std::make_unique<X>());
-  sset.insert(std::make_unique<Y>());
-  sset.insert(std::make_unique<Z>());
-  sset.insert(factory.make("FADD"));
-  sset.insert(factory.make("FSUB"));
-  sset.insert(factory.make("FMUL"));
-  sset.insert(factory.make("FIFL"));
-  sset.insert(factory.make("FIFE"));
+  p.sset.insert(std::make_unique<X>());
+  p.sset.insert(std::make_unique<Y>());
+  p.sset.insert(std::make_unique<Z>());
+  p.sset.insert(factory.make("FADD"));
+  p.sset.insert(factory.make("FSUB"));
+  p.sset.insert(factory.make("FMUL"));
+  p.sset.insert(factory.make("FIFL"));
+  p.sset.insert(factory.make("FIFE"));
 
   auto eva(std::make_unique<my_evaluator>());
 
-  evolution<i_mep, std_es> evo(env, *eva);
+  evolution<i_mep, std_es> evo(p, *eva);
 
   evo.run(1);
 }

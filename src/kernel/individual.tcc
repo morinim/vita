@@ -50,20 +50,20 @@ inline void individual<Derived>::inc_age()
 }
 
 ///
-/// \param[in] env environment used for building the individual
-/// \param[in] in  input stream
-/// \return        `true` if the object has been loaded correctly
+/// \param[in] p  currently tackled problem
+/// \param[in] in input stream
+/// \return       `true` if the object has been loaded correctly
 ///
 /// \note If the load operation isn't successful the object isn't modified.
 ///
 template<class Derived>
-bool individual<Derived>::load(std::istream &in, const environment &env)
+bool individual<Derived>::load(std::istream &in, const problem &p)
 {
   decltype(age()) t_age;
   if (!(in >> t_age))
     return false;
 
-  if (!static_cast<Derived *>(this)->load_impl(in, env))
+  if (!static_cast<Derived *>(this)->load_impl(in, p))
     return false;
 
   age_ = t_age;

@@ -39,7 +39,7 @@ unsigned allowed_age(const population<T> &pop, unsigned l)
   if (l + 1 == layers)
     return std::numeric_limits<unsigned>::max();
 
-  return max_age(l, pop.env().alps.age_gap);
+  return max_age(l, pop.get_problem().env.alps.age_gap);
 }
 
 ///

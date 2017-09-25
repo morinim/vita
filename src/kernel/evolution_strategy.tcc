@@ -41,7 +41,7 @@ environment std_es<T>::shape(environment env)
 template<class T>
 bool std_es<T>::stop_condition() const
 {
-  const auto &env(this->pop_.env());
+  const auto &env(this->pop_.get_problem().env);
 
   if (env.g_without_improvement &&
       this->sum_->gen - this->sum_->last_imp > env.g_without_improvement &&
@@ -72,6 +72,7 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 {
   const auto &sum(this->sum_);
   auto &pop(this->pop_);
+  const auto &env(pop.get_problem().env);
 
   pop.inc_age();
 
@@ -86,20 +87,20 @@ void basic_alps_es<T, CS>::post_bookkeeping()
     if (issmall(sum->az.fit_dist(l).standard_deviation()))
     {
       const auto current(pop.individuals(l));
-      pop.set_allowed(l, std::max(pop.env().min_individuals, current / 2));
+      pop.set_allowed(l, std::max(env.min_individuals, current / 2));
     }
     else
     {
-      const auto allowed(pop.env().individuals);
+      const auto allowed(env.individuals);
       pop.set_allowed(l, allowed);
     }
 
   // Code executed every `age_gap` interval.
-  if (sum->gen && sum->gen % pop.env().alps.age_gap == 0)
+  if (sum->gen && sum->gen % env.alps.age_gap == 0)
   {
-    if (layers < pop.env().layers ||
+    if (layers < env.layers ||
         sum->az.age_dist(layers - 1).mean() >
-        alps::max_age(layers, pop.env().alps.age_gap))
+        alps::max_age(layers, env.alps.age_gap))
       pop.add_layer();
     else
     {
@@ -122,7 +123,7 @@ template<class T, template<class> class CS>
 void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
 {
   const auto &pop(this->pop_);
-  const auto &env(pop.env());
+  const auto &env(pop.get_problem().env);
 
   if (env.stat.layers)
   {

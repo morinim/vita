@@ -35,14 +35,14 @@ public:
   i_mep() : individual(), genome_(), best_(locus::npos()),
             active_crossover_type_() {}
 
-  explicit i_mep(const environment &);
+  explicit i_mep(const problem &);
   explicit i_mep(const std::vector<gene> &);
 
   // ---- Recombination operators ----
   enum crossover_t {one_point, two_points, tree, uniform, NUM_CROSSOVERS};
 
   friend i_mep crossover(const i_mep &, const i_mep &);
-  unsigned mutation(double, const environment &);
+  unsigned mutation(double, const problem &);
 
   // ---- Working with blocks / genome ----
   std::vector<locus> blocks() const;
@@ -95,7 +95,7 @@ private:
   void pack(const locus &, std::vector<unsigned char> *const) const;
 
   // Serialization.
-  bool load_impl(std::istream &, const environment &);
+  bool load_impl(std::istream &, const problem &);
   bool save_impl(std::ostream &) const;
 
   // ---- Private data members ----

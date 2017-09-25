@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ public:  // Constructor and support functions
   void clear();
 
 public:   // Serialization
-  bool load(std::istream &, const environment &);
+  bool load(std::istream &, const problem &);
   bool save(std::ostream &) const;
 
 public:  // Public data members

@@ -9,6 +9,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Code of conduct for contributors
 
 ### Changed
+- BREAKING CHANGE.
+  Instead of:
+  ```C++
+  symbol_set sset;
+  environment e(&sset, initialization::standard);
+
+  evolution<i_mep, std_es> evo(env, *eva);
+  ```
+
+  you should write:
+
+  ```C++
+  problem p(initialization::standard);
+
+  evolution<i_mep, std_es> evo(p, *eva);
+  ```
+
+  The `problem` object aggregates an `environment` and a `symbol_set` (which
+  are almost always used together).
+
+  This also permits to remove the pointer from the environment to the
+  symbol_set.
+
 - BREAKING CHANGE. Replaced the `search::set_evaluator` method:
   Instead of:
 

@@ -57,11 +57,11 @@ class team
 public:
   team();
   explicit team(unsigned);
-  explicit team(const environment &);
+  explicit team(const problem &);
   explicit team(std::vector<T>);
 
   // Recombination operators.
-  unsigned mutation(double, const environment &);
+  unsigned mutation(double, const problem &);
 
   const T &operator[](unsigned) const;
 
@@ -84,7 +84,7 @@ public:
   const_iterator end() const;
 
   // Serialization.
-  bool load(std::istream &, const environment &);
+  bool load(std::istream &, const problem &);
   bool save(std::ostream &) const;
 
   template<class U> friend team<U> crossover(const team<U> &, const team<U> &);

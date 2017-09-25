@@ -61,10 +61,6 @@ protected:
   std::unique_ptr<evaluator<T>> active_eva_;
   std::unique_ptr<validation_strategy> vs_;
 
-  // This is the environment actually used during the search (`prob_->env`
-  // is used for compiling `env_` via the `tune_parameters` method).
-  environment env_;
-
   // Problem we're working on.
   problem &prob_;
 

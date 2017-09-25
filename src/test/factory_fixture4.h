@@ -13,9 +13,8 @@
 #if !defined FACTORY_FIXTURE4_H
 #define      FACTORY_FIXTURE4_H
 
-#include "kernel/environment.h"
 #include "kernel/interpreter.h"
-#include "kernel/symbol_set.h"
+#include "kernel/problem.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
@@ -34,26 +33,25 @@ struct F_FACTORY4
     int val;
   };
 
-  F_FACTORY4() : env(&sset, vita::initialization::standard),
-                 factory(), null({})
+  F_FACTORY4() : prob(vita::initialization::standard), factory(), null({})
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY4)");
 
-    c0 = sset.insert(factory.make("0"));
-    c1 = sset.insert(factory.make("1"));
-    c2 = sset.insert(factory.make("2"));
-    c3 = sset.insert(factory.make("3"));
-    x = sset.insert(factory.make("123"));
-    neg_x = sset.insert(factory.make("-123"));
-    y = sset.insert(factory.make("321"));
-    z = sset.insert(std::make_unique<Z>());
-    i_add = sset.insert(factory.make("ADD"));
-    i_div = sset.insert(factory.make("DIV"));
-    i_ife = sset.insert(factory.make("IFE"));
-    i_mul = sset.insert(factory.make("MUL"));
-    i_sub = sset.insert(factory.make("SUB"));
+    c0 = prob.sset.insert(factory.make("0"));
+    c1 = prob.sset.insert(factory.make("1"));
+    c2 = prob.sset.insert(factory.make("2"));
+    c3 = prob.sset.insert(factory.make("3"));
+    x = prob.sset.insert(factory.make("123"));
+    neg_x = prob.sset.insert(factory.make("-123"));
+    y = prob.sset.insert(factory.make("321"));
+    z = prob.sset.insert(std::make_unique<Z>());
+    i_add = prob.sset.insert(factory.make("ADD"));
+    i_div = prob.sset.insert(factory.make("DIV"));
+    i_ife = prob.sset.insert(factory.make("IFE"));
+    i_mul = prob.sset.insert(factory.make("MUL"));
+    i_sub = prob.sset.insert(factory.make("SUB"));
 
-    env.code_length = 32;
+    prob.env.code_length = 32;
   }
 
   ~F_FACTORY4()
@@ -76,9 +74,8 @@ struct F_FACTORY4
   vita::symbol *i_mul;
   vita::symbol *i_sub;
 
-  vita::environment        env;
+  vita::problem           prob;
   vita::symbol_factory factory;
-  vita::symbol_set        sset;
 
   vita::any ret;
 

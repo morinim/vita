@@ -185,7 +185,7 @@ int main()
   vita::problem prob;
 
   for (unsigned step(0); step < sup_length; ++step)
-    prob.env.sset->insert(std::make_unique<direction>(step));
+    prob.sset.insert(std::make_unique<direction>(step));
 
   prob.env.individuals = 150;
   prob.env.generations =  20;

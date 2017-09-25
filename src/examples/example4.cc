@@ -20,18 +20,17 @@
 int main(int argc, char *argv[])
 {
   using namespace vita;
-  symbol_set sset;
-  environment env(&sset, initialization::standard);
+  problem p(initialization::standard);
 
-  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 50);
+  p.env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 50);
 
   symbol_factory factory;
-  sset.insert(factory.make(domain_t::d_double, -200, 200));
-  sset.insert(factory.make("FADD"));
-  sset.insert(factory.make("FSUB"));
-  sset.insert(factory.make("FMUL"));
-  sset.insert(factory.make("FIFL"));
-  sset.insert(factory.make("FIFE"));
+  p.sset.insert(factory.make(domain_t::d_double, -200, 200));
+  p.sset.insert(factory.make("FADD"));
+  p.sset.insert(factory.make("FSUB"));
+  p.sset.insert(factory.make("FMUL"));
+  p.sset.insert(factory.make("FIFL"));
+  p.sset.insert(factory.make("FIFE"));
 
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 10000000));
 
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
 
   std::vector<i_mep> pool;
   for (size_t i(0); i < 1000; ++i)
-    pool.emplace_back(env);
+    pool.emplace_back(p);
 
   timer t;
   for (unsigned i(0); i < n; ++i)

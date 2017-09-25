@@ -34,7 +34,7 @@ const std::string vita_sr_version1(
   "Vita - Symbolic Regression and classification"
   );
 const std::string vita_sr_version2(
-  "Copyright 2011-2017 EOS di Manlio Morini (http://www.eosdev.it/)"
+  "Copyright 2011-2017 EOS di Manlio Morini (http://eosdev.it/)"
   );
 const std::string vita_sr_defs(
 #if defined(CLONE_SCALING)
@@ -350,7 +350,7 @@ void go(bool = true)
     return;
   }
 
-  if (!problem->env.sset->enough_terminals())
+  if (!problem->sset.enough_terminals())
   {
     print.error("Too few terminals");
     return;
@@ -619,7 +619,7 @@ bool symbols(const std::string &symbol_file)
     print.info("Symbolset read. Symbols: ", parsed);
   }
 
-  if (!problem->env.sset->enough_terminals())
+  if (!problem->sset.enough_terminals())
   {
     print.error("Too few terminals");
     return false;

@@ -17,22 +17,21 @@
 namespace vita
 {
 ///
-/// \param[in] e base environment.
+/// \param[in] p current problem.
 ///
 /// The process that generates the initial, random expressions has to be
 /// implemented so as to ensure that they do not violate the type system's
 /// constraints.
 ///
-i_ga::i_ga(const environment &e) : individual(), genome_(e.sset->categories())
+i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
 {
-  Expects(e.debug(true));
-  Expects(e.sset);
+  Expects(p.debug());
 
   const auto cs(parameters());
   assert(cs);
 
   for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(e.sset->roulette_terminal(c));
+    genome_[c] = gene(p.sset.roulette_terminal(c));
 
   Ensures(debug());
 }
@@ -71,8 +70,8 @@ std::ostream &in_line(const i_ga &ga, std::ostream &s)
 ///
 /// \brief A new individual is created mutating `this`
 ///
-/// \param[in] p probability of gene mutation.
-/// \param[in] env the current environment.
+/// \param[in] pgm probability of gene mutation.
+/// \param[in] prb the current problem.
 /// \return number of mutations performed.
 ///
 /// \note
@@ -80,17 +79,18 @@ std::ostream &in_line(const i_ga &ga, std::ostream &s)
 /// strategies. Typical differential evolution GA algorithm won't use
 /// this method.
 ///
-unsigned i_ga::mutation(double p, const environment &env)
+unsigned i_ga::mutation(double pgm, const problem &prb)
 {
-  Expects(0.0 <= p && p <= 1.0);
+  Expects(0.0 <= pgm);
+  Expects(pgm <= 1.0);
 
   unsigned n(0);
 
   const auto ps(parameters());
   for (category_t c(0); c < ps; ++c)
-    if (random::boolean(p))
+    if (random::boolean(pgm))
     {
-      const gene g(env.sset->roulette_terminal(c));
+      const gene g(prb.sset.roulette_terminal(c));
 
       if (g != genome_[c])
       {
@@ -115,7 +115,8 @@ unsigned i_ga::mutation(double p, const environment &env)
 }
 
 ///
-/// \brief Two points crossover.
+/// Two points crossover.
+///
 /// \param[in] lhs first parent.
 /// \param[in] rhs second parent.
 /// \return the result of the crossover (we only generate a single offspring).
@@ -312,14 +313,14 @@ bool i_ga::debug() const
 
 ///
 /// \param[in] in input stream.
-/// \param[in] e environment used to build the individual.
+/// \param[in] p  the current problem.
 /// \return `true` if the object has been loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_ga::load_impl(std::istream &in, const environment &e)
+bool i_ga::load_impl(std::istream &in, const problem &p)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
@@ -333,7 +334,7 @@ bool i_ga::load_impl(std::istream &in, const environment &e)
       return false;
 
     gene temp;
-    temp.sym = e.sset->decode(opcode);
+    temp.sym = p.sset.decode(opcode);
     if (!temp.sym)
       return false;
 

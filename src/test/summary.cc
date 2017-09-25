@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 {
   using vita::random::between;
 
-  env.code_length = 100;
+  prob.env.code_length = 100;
 
   for (unsigned i(0); i < 2000; ++i)
   {
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
     if (vita::random::boolean(0.8))
     {
-      before.best.solution = vita::i_mep(env);
+      before.best.solution = vita::i_mep(prob);
       before.best.score.fitness = {between(0.0, 1000.0)};
       before.best.score.accuracy = between(0.0, 1.0);
     }
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
     BOOST_REQUIRE(before.save(ss));
 
     vita::summary<vita::i_mep> after;
-    BOOST_REQUIRE(after.load(ss, env));
+    BOOST_REQUIRE(after.load(ss, prob));
 
     BOOST_CHECK_EQUAL(before.elapsed.count(), after.elapsed.count());
     BOOST_CHECK_EQUAL(before.mutations, after.mutations);

@@ -24,7 +24,7 @@
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : active_eva_(nullptr),
                                     vs_(std::make_unique<as_is_validation>()),
-                                    env_(p.env), prob_(p)
+                                    prob_(p)
 {
   Ensures(debug());
 }
@@ -53,59 +53,58 @@ void search<T, ES>::tune_parameters()
 {
   // The `shape` function modifies the default parameters with
   // strategy-specific values.
-  const environment dflt(ES<T>::shape(environment(nullptr,
-                                                  initialization::standard)));
-  const environment &constrained(prob_.env);
+  const environment dflt(ES<T>::shape(environment(initialization::standard)));
+  const environment constrained(prob_.env);
 
   if (!constrained.code_length)
-    env_.code_length = dflt.code_length;
+    prob_.env.code_length = dflt.code_length;
 
   if (!constrained.patch_length)
-    env_.patch_length = 1 + prob_.env.sset->terminals(0) / 2;
+    prob_.env.patch_length = 1 + prob_.sset.terminals(0) / 2;
 
   if (constrained.elitism == trilean::unknown)
-    env_.elitism = dflt.elitism;
+    prob_.env.elitism = dflt.elitism;
 
   if (constrained.p_mutation < 0.0)
-    env_.p_mutation = dflt.p_mutation;
+    prob_.env.p_mutation = dflt.p_mutation;
 
   if (constrained.p_cross < 0.0)
-    env_.p_cross = dflt.p_cross;
+    prob_.env.p_cross = dflt.p_cross;
 
   if (!constrained.brood_recombination)
-    env_.brood_recombination = dflt.brood_recombination;
+    prob_.env.brood_recombination = dflt.brood_recombination;
 
   if (constrained.dss == trilean::unknown)
-    env_.dss = trilean::no;
+    prob_.env.dss = trilean::no;
 
   if (!constrained.layers)
-    env_.layers = dflt.layers;
+    prob_.env.layers = dflt.layers;
 
   if (constrained.validation_percentage == 100)
-    env_.validation_percentage = dflt.validation_percentage;
+    prob_.env.validation_percentage = dflt.validation_percentage;
 
   if (!constrained.individuals)
-    env_.individuals = dflt.individuals;
+    prob_.env.individuals = dflt.individuals;
 
   if (!constrained.min_individuals)
-    env_.min_individuals = dflt.min_individuals;
+    prob_.env.min_individuals = dflt.min_individuals;
 
   if (!constrained.tournament_size)
-    env_.tournament_size = dflt.tournament_size;
+    prob_.env.tournament_size = dflt.tournament_size;
 
   if (!constrained.mate_zone)
-    env_.mate_zone = dflt.mate_zone;
+    prob_.env.mate_zone = dflt.mate_zone;
 
   if (!constrained.generations)
-    env_.generations = dflt.generations;
+    prob_.env.generations = dflt.generations;
 
   if (!constrained.g_without_improvement)
-    env_.g_without_improvement = dflt.g_without_improvement;
+    prob_.env.g_without_improvement = dflt.g_without_improvement;
 
   if (constrained.arl == trilean::unknown)
-    env_.arl = dflt.arl;
+    prob_.env.arl = dflt.arl;
 
-  Ensures(env_.debug(true));
+  Ensures(prob_.env.debug(true));
 }
 
 ///
@@ -130,7 +129,7 @@ summary<T> search<T, ES>::run(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
-    auto run_summary(evolution<T, ES>(env_, *active_eva_).run(r, shake));
+    auto run_summary(evolution<T, ES>(prob_, *active_eva_).run(r, shake));
 
     // If a validation test is available the performance of the best trained
     // individual is recalculated.
@@ -161,7 +160,7 @@ summary<T> search<T, ES>::run(unsigned n)
 
     // We use accuracy or fitness (or both) to identify successful runs.
     const bool solution_found(run_summary.best.score >=
-                              this->env_.threshold);
+                              this->prob_.env.threshold);
 
     if (solution_found)
     {
@@ -209,9 +208,9 @@ template<class T, template<class> class ES>
 template<class E, class ...Args>
 void search<T, ES>::set_evaluator(Args &&... args)
 {
-  if (env_.cache_size)
+  if (prob_.env.cache_size)
     active_eva_ = std::make_unique<evaluator_proxy<T, E>>(
-      E(std::forward<Args>(args)...), env_.cache_size);
+      E(std::forward<Args>(args)...), prob_.env.cache_size);
   else
     active_eva_ = std::make_unique<E>(std::forward<Args>(args)...);
 }
@@ -233,13 +232,7 @@ void search<T, ES>::set_validator(std::unique_ptr<validation_strategy> v)
 template<class T, template<class> class ES>
 bool search<T, ES>::debug() const
 {
-  if (!env_.debug(false))
-    return false;
-
-  if (!prob_.debug())
-    return false;
-
-  return true;
+  return prob_.debug();
 }
 
 ///
@@ -259,7 +252,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
                         unsigned best_run, unsigned runs) const
 {
   // Summary logging.
-  if (!env_.stat.summary)
+  if (!prob_.env.stat.summary)
     return;
 
   tinyxml2::XMLDocument d;
@@ -286,7 +279,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
   set_text(e_best, "run", best_run);
 
   std::ostringstream ss;
-  ss << out::print_format(env_.stat.ind_format) << run_sum.best.solution;
+  ss << out::print_format(prob_.env.stat.ind_format) << run_sum.best.solution;
   set_text(e_best, "code", ss.str());
 
   auto *e_solutions(d.NewElement("solutions"));
@@ -305,11 +298,11 @@ void search<T, ES>::log(const summary<T> &run_sum,
   e_summary->InsertEndChild(e_other);
   set_text(e_other,"evaluator", active_eva_->info());
 
-  env_.xml(&d);
+  prob_.env.xml(&d);
 
   log_nvi(&d, run_sum);
 
-  const std::string f_sum(env_.stat.dir + "/" + env_.stat.sum_name);
+  const std::string f_sum(prob_.env.stat.dir + "/" + prob_.env.stat.sum_name);
   d.SaveFile(f_sum.c_str());
 }
 

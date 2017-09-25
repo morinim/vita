@@ -74,7 +74,7 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 /// Accuracy calculation is performed if AT LEAST ONE of the following
 /// conditions is satisfied:
 ///
-/// * the accuracy threshold is defined (`env_.threshold.accuracy > 0.0`);
+/// * the accuracy threshold is defined (`env.threshold.accuracy > 0.0`);
 /// * we explicitly asked for accuracy calculation (see the `src_search`
 ///   constructor).
 ///
@@ -88,7 +88,8 @@ model_measurements src_search<T, ES>::calculate_metrics(
 {
   model_measurements ret(s.best.score);
 
-  if (metrics & metric_flags::accuracy || this->env_.threshold.accuracy > 0.0)
+  if (metrics & metric_flags::accuracy
+      || this->prob_.env.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(s.best.solution));
     ret.accuracy = model->measure(accuracy_metric<T>(), data());
@@ -124,18 +125,18 @@ void src_search<T, ES>::arl(const U &base)
   if (!isfinite(base_fit))
     return;  // We need a finite fitness to search for an improvement
 
-  const auto env(this->env_);
+  auto &prob(this->prob_);
 
   // Logs ADFs
-  const auto filename(env.stat.dir + "/" + env.stat.arl_name);
+  const auto filename(prob.env.stat.dir + "/" + prob.env.stat.arl_name);
   std::ofstream adf_log(filename, std::ios_base::app);
-  if (env.stat.arl && adf_log.good())
+  if (prob.env.stat.arl && adf_log.good())
   {
-    const auto adts(env.sset->adts());
+    const auto adts(prob.sset.adts());
     for (auto i(decltype(adts){0}); i < adts; ++i)
     {
-      const auto &f(env.sset->get_adt(i));
-      adf_log << f.name() << ' ' << env.sset->weight(f) << '\n';
+      const auto &f(prob.sset.get_adt(i));
+      adf_log << f.name() << ' ' << prob.sset.weight(f) << '\n';
     }
     adf_log << '\n';
   }
@@ -155,7 +156,7 @@ void src_search<T, ES>::arl(const U &base)
     // (base.destroy_block) the current block.
     // Useful blocks have delta values greater than 0.
     const auto delta(base_fit[0] -
-                     eval(base.destroy_block(l.index, *env.sset))[0]);
+                     eval(base.destroy_block(l.index, prob.sset))[0]);
 
     // Semantic introns cannot be building blocks...
     // When delta is greater than 10% of the base fitness we have a
@@ -165,7 +166,7 @@ void src_search<T, ES>::arl(const U &base)
       std::unique_ptr<symbol> p;
       if (adf_args)
       {
-        auto generalized(candidate_block.generalize(adf_args, *env.sset));
+        auto generalized(candidate_block.generalize(adf_args, prob.sset));
         cvect categories(generalized.second.size());
 
         for (const auto &replaced : generalized.second)
@@ -176,7 +177,7 @@ void src_search<T, ES>::arl(const U &base)
       else  // !adf_args
         p = std::make_unique<adt>(candidate_block);
 
-      if (env.stat.arl && adf_log.good())
+      if (prob.env.stat.arl && adf_log.good())
       {
         adf_log << p->name() << " (Base: " << base_fit
                 << "  DF: " << delta
@@ -185,7 +186,7 @@ void src_search<T, ES>::arl(const U &base)
                 << candidate_block << '\n';
       }
 
-      env.sset->insert(std::move(p));
+      prob.sset.insert(std::move(p));
     }
   }
 }
@@ -235,37 +236,34 @@ void src_search<T, ES>::arl(const team<U> &)
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters()
 {
-  search<T, ES>::tune_parameters();
-
   // The `shape` function modifies the default parameters with
   // strategy-specific values.
-  const environment dflt(ES<T>::shape(environment(nullptr,
-                                                  initialization::standard)));
-  const environment &constrained(this->prob_.env);
+  const environment dflt(ES<T>::shape(environment(initialization::standard)));
+  const environment constrained(this->prob_.env);
+
+  search<T, ES>::tune_parameters();
 
   const auto d_size(data().size());
-  assert(d_size);
+  Expects(d_size);
 
-  // With a small number of training case:
-  // * we need every training case;
-  // * DSS speed up isn't sensible;
-  // BUT
-  // * DSS can help against overfitting.
+  // DSS helps against overfitting but cannot be used when there're just
+  // a few examples.
   if (constrained.dss == trilean::unknown)
   {
-    this->env_.dss = d_size > 400 ? trilean::yes : trilean::no;
+    this->prob_.env.dss = d_size > 400 ? trilean::yes : trilean::no;
 
-    print.info("DSS set to ", this->env_.dss);
+    print.info("DSS set to ", this->prob_.env.dss);
   }
 
   if (!constrained.layers)
   {
     if (dflt.layers > 1 && d_size > 8)
-      this->env_.layers = static_cast<decltype(dflt.layers)>(std::log(d_size));
+      this->prob_.env.layers = static_cast<decltype(dflt.layers)>(
+        std::log(d_size));
     else
-      this->env_.layers = dflt.layers;
+      this->prob_.env.layers = dflt.layers;
 
-    print.info("Number of layers set to ", this->env_.layers);
+    print.info("Number of layers set to ", this->prob_.env.layers);
   }
 
   // A larger number of training cases requires an increase in the population
@@ -280,54 +278,54 @@ void src_search<T, ES>::tune_parameters()
   {
     if (d_size > 8)
     {
-      this->env_.individuals = 2 *
-        static_cast<decltype(this->env_.individuals)>(
-          std::pow(std::log2(d_size), 3)) / this->env_.layers;
+      this->prob_.env.individuals = 2 *
+        static_cast<decltype(dflt.individuals)>(
+          std::pow(std::log2(d_size), 3)) / this->prob_.env.layers;
 
-      if (this->env_.individuals < 4)
-        this->env_.individuals = 4;
+      if (this->prob_.env.individuals < 4)
+        this->prob_.env.individuals = 4;
     }
     else
-      this->env_.individuals = dflt.individuals;
+      this->prob_.env.individuals = dflt.individuals;
 
-    print.info("Population size set to ", this->env_.individuals);
+    print.info("Population size set to ", this->prob_.env.individuals);
   }
 
   if (constrained.validation_percentage == 100)
   {
-    if (this->env_.dss == trilean::yes)
+    if (this->prob_.env.dss == trilean::yes)
       print.info("Using DSS and skipping holdout validation");
     else
     {
       if (d_size * dflt.validation_percentage < 10000)
-        this->env_.validation_percentage = 0;
+        this->prob_.env.validation_percentage = 0;
       else
-        this->env_.validation_percentage = dflt.validation_percentage;
+        this->prob_.env.validation_percentage = dflt.validation_percentage;
 
       print.info("Validation percentage set to ",
-                 this->env_.validation_percentage, '%');
+                 this->prob_.env.validation_percentage, '%');
     }
   }
 
-  Ensures(this->env_.debug(true));
+  Ensures(this->prob_.env.debug(true));
 }
 
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  if (this->env_.dss == trilean::yes)
+  if (this->prob_.env.dss == trilean::yes)
     this->set_validator(std::make_unique<dss>(data()));
-  else if (this->env_.validation_percentage)
+  else if (this->prob_.env.validation_percentage)
     this->set_validator(std::make_unique<holdout_validation>(
-                        data(), this->env_.validation_percentage));
+                        data(), this->prob_.env.validation_percentage));
 }
 
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  if (this->env_.arl == trilean::yes)
+  if (this->prob_.env.arl == trilean::yes)
   {
-    this->prob_.env.sset->reset_adf_weights();
+    this->prob_.sset.reset_adf_weights();
     arl(s->best.solution);
   }
 }
@@ -364,7 +362,7 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 {
   Expects(d);
 
-  if (this->env_.stat.summary)
+  if (this->prob_.env.stat.summary)
   {
     assert(d->FirstChild());
     assert(d->FirstChild()->FirstChildElement("summary"));
@@ -383,7 +381,8 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(this->env_.stat.dir + "/" + this->env_.stat.tst_name);
+    std::ofstream tf(this->prob_.env.stat.dir + "/"
+                     + this->prob_.env.stat.tst_name);
     for (const auto &example : data())
       tf << lambda->name((*lambda)(example)) << '\n';
 

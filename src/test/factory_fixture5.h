@@ -13,13 +13,12 @@
 #if !defined FACTORY_FIXTURE5_H
 #define      FACTORY_FIXTURE5_H
 
-#include "kernel/environment.h"
+#include "kernel/problem.h"
 #include "kernel/ga/primitive.h"
 
 struct F_FACTORY5
 {
-  F_FACTORY5(unsigned n = 4) : env(&sset, vita::initialization::standard),
-                               sset()
+  F_FACTORY5(unsigned n = 4) : prob(vita::initialization::standard)
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY5)");
 
@@ -27,7 +26,7 @@ struct F_FACTORY5
 
     for (unsigned i(0); i < n; ++i)
     {
-      sset.insert(vita::ga::parameter<>(i, -v, +v));
+      prob.sset.insert(vita::ga::parameter<>(i, -v, +v));
       v *= 10.0;
     }
   }
@@ -37,8 +36,7 @@ struct F_FACTORY5
     BOOST_TEST_MESSAGE("Teardown fixture (FACTORY5)");
   }
 
-  vita::environment env;
-  vita::symbol_set sset;
+  vita::problem prob;
 };
 
 struct F_FACTORY5_NO_INIT : F_FACTORY5

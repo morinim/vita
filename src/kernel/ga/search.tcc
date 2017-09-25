@@ -44,12 +44,12 @@ void ga_search<T, ES, F>::tune_parameters()
 {
   search<T, ES>::tune_parameters();
 
-  if (this->env_.min_individuals < 10)
-    this->env_.min_individuals = 10;
+  if (this->prob_.env.min_individuals < 10)
+    this->prob_.env.min_individuals = 10;
 
-  this->env_.arl = trilean::no;
+  this->prob_.env.arl = trilean::no;
 
-  Ensures(this->env_.debug(true));
+  Ensures(this->prob_.env.debug(true));
 }
 
 #endif  // include guard

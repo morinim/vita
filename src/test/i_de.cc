@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,10 +34,10 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    vita::i_de ind(env);
+    vita::i_de ind(prob);
 
     BOOST_TEST(ind.debug());
-    BOOST_TEST(ind.parameters() == env.sset->categories());
+    BOOST_TEST(ind.parameters() == prob.sset.categories());
     BOOST_TEST(ind.age() == 0);
 
     for (unsigned j(0); j < ind.parameters(); ++j)
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(Comparison, * boost::unit_test::tolerance(0.0001))
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_de a(env);
+    vita::i_de a(prob);
     BOOST_TEST(a == a);
     BOOST_TEST(distance(a, a) == 0.0);
 
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(Comparison, * boost::unit_test::tolerance(0.0001))
     BOOST_TEST(a == b);
     BOOST_TEST(distance(a, b) == 0.0);
 
-    vita::i_de c(env);
+    vita::i_de c(prob);
     if (a.signature() != c.signature())
     {
       BOOST_TEST(!(a == c));
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Iterators)
 {
   for (unsigned j(0); j < 1000; ++j)
   {
-    vita::i_de ind(env);
+    vita::i_de ind(prob);
 
     unsigned i(0);
     for (const auto &v : ind)
@@ -97,8 +97,8 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
 
   for (unsigned j(0); j < 1000; ++j)
   {
-    const vita::i_de p(env);
-    vita::i_de a(env), b(env), c(env);
+    const vita::i_de p(prob);
+    vita::i_de a(prob), b(prob), c(prob);
 
     const auto n_a(vita::random::between<unsigned>(0, 100));
     for (unsigned k(0); k < n_a; ++k)
@@ -111,20 +111,20 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
       c.inc_age();
 
     BOOST_TEST_CHECKPOINT("DE self-crossover without mutation");
-    auto off(p.crossover(env.p_cross, env.de.weight, a, a, p));
+    auto off(p.crossover(prob.env.p_cross, prob.env.de.weight, a, a, p));
     BOOST_TEST(off.debug());
 
     for (unsigned i(0); i < p.parameters(); ++i)
       BOOST_TEST(off[i] == p[i], boost::test_tools::tolerance(epsilon));
 
     BOOST_TEST_CHECKPOINT("DE self-crossover with mutation");
-    off = p.crossover(env.p_cross, env.de.weight, a, b, p);
+    off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, p);
     BOOST_TEST(off.debug());
     BOOST_TEST(off.age() == std::max({p.age(), a.age(), b.age()}));
 
     for (unsigned i(0); i < p.parameters(); ++i)
     {
-      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
+      const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
 
       BOOST_TEST(off[i] > p[i] - delta);
       BOOST_TEST(off[i] < p[i] + delta);
@@ -134,12 +134,12 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     }
 
     BOOST_TEST_CHECKPOINT("DE crossover without mutation");
-    off = p.crossover(env.p_cross, env.de.weight, a, b, c);
+    off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, c);
     BOOST_TEST(off.debug());
     BOOST_TEST(off.age() == std::max({p.age(), a.age(), b.age(), c.age()}));
     for (unsigned i(0); i < p.parameters(); ++i)
     {
-      const auto delta(env.de.weight[1] * std::abs(a[i] - b[i]));
+      const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
 
       if (!vita::almost_equal(p[i], off[i]))
       {
@@ -151,8 +151,8 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     length += p.parameters();
   }
 
-  BOOST_TEST(diff / length < env.p_cross + 2.0);
-  BOOST_TEST(diff / length > env.p_cross - 2.0);
+  BOOST_TEST(diff / length < prob.env.p_cross + 2.0);
+  BOOST_TEST(diff / length > prob.env.p_cross - 2.0);
 }
 
 BOOST_AUTO_TEST_CASE(Serialization)
@@ -161,15 +161,15 @@ BOOST_AUTO_TEST_CASE(Serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_de i1(env);
+    vita::i_de i1(prob);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_TEST(i1.save(ss));
 
-    vita::i_de i2(env);
-    BOOST_TEST(i2.load(ss, env));
+    vita::i_de i2(prob);
+    BOOST_TEST(i2.load(ss, prob));
     BOOST_TEST(i2.debug());
 
     BOOST_TEST(i1 == i2);
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
   BOOST_TEST(empty.save(ss));
 
   vita::i_de empty1;
-  BOOST_TEST(empty1.load(ss, env));
+  BOOST_TEST(empty1.load(ss, prob));
   BOOST_TEST(empty1.debug());
   BOOST_TEST(empty1.empty());
 

@@ -72,15 +72,15 @@ void test_serialization(vita::src_problem &pr)
 
   for (unsigned k(0); k < 256; ++k)
   {
-    const T ind(pr.env);
+    const T ind(pr);
     const auto lambda1(build<L, T, P>()(ind, *pr.data()));
 
     std::stringstream ss;
 
     BOOST_TEST(lambda1.save(ss));
-    const T ind2(pr.env);
+    const T ind2(pr);
     auto lambda2(build<L, T, P>()(ind2, *pr.data()));
-    BOOST_TEST(lambda2.load(ss, pr.env));
+    BOOST_TEST(lambda2.load(ss, pr));
     BOOST_TEST(lambda2.debug());
 
     for (const auto &e : *pr.data())
@@ -100,7 +100,7 @@ void test_team_of_one(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env);
+    const i_mep ind(pr);
     const auto li(build<L, i_mep, P>()(ind, *pr.data()));
 
     const team<i_mep> t{{ind}};
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind(pr.env);
+    const i_mep ind(pr);
     const reg_model<i_mep> li(ind);
 
     const team<i_mep> t{{ind, ind, ind, ind}};
@@ -162,10 +162,10 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
   BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep i1(pr.env);
-    const i_mep i2(pr.env);
-    const i_mep i3(pr.env);
-    const i_mep i4(pr.env);
+    const i_mep i1(pr);
+    const i_mep i2(pr);
+    const i_mep i3(pr);
+    const i_mep i4(pr);
 
     const reg_model<i_mep> lambda1(i1);
     const reg_model<i_mep> lambda2(i2);
@@ -227,15 +227,15 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
 
   for (unsigned k(0); k < 1000; ++k)
   {
-    const i_mep ind(pr.env);
+    const i_mep ind(pr);
     const reg_model<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
     BOOST_TEST(lambda1.save(ss));
-    const i_mep ind2(pr.env);
+    const i_mep ind2(pr);
     reg_model<i_mep> lambda2(ind2);
-    BOOST_TEST(lambda2.load(ss, pr.env));
+    BOOST_TEST(lambda2.load(ss, pr));
     BOOST_TEST(lambda2.debug());
 
     for (const auto &e : *pr.data())
@@ -258,9 +258,9 @@ void test_team(vita::src_problem &pr)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    const i_mep ind1(pr.env);
-    const i_mep ind2(pr.env);
-    const i_mep ind3(pr.env);
+    const i_mep ind1(pr);
+    const i_mep ind2(pr);
+    const i_mep ind3(pr);
 
     const auto lambda1(build<L, i_mep, P>()(ind1, *pr.data()));
     const auto lambda2(build<L, i_mep, P>()(ind2, *pr.data()));

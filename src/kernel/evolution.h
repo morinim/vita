@@ -39,7 +39,7 @@ template<class T, template<class> class ES>
 class evolution
 {
 public:
-  evolution(const environment &, evaluator<T> &);
+  evolution(const problem &, evaluator<T> &);
 
   const summary<T> &run(unsigned);
   template<class S> const summary<T> &run(unsigned, S);
@@ -48,7 +48,6 @@ public:
 
 private:
   // Support methods.
-  const environment &env() const { return pop_.env(); }
   analyzer<T> get_stats() const;
   void log(unsigned) const;
   void print_progress(unsigned, unsigned, bool, timer *) const;

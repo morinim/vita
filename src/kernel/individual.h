@@ -18,6 +18,7 @@
 #include "kernel/cache.h"
 #include "kernel/environment.h"
 #include "kernel/locus.h"
+#include "kernel/problem.h"
 #include "kernel/vitafwd.h"
 
 namespace vita
@@ -43,7 +44,7 @@ public:
   void inc_age();
 
   // Serialization.
-  bool load(std::istream &, const environment &);
+  bool load(std::istream &, const problem &);
   bool save(std::ostream &) const;
 
 protected:

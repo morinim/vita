@@ -26,33 +26,32 @@ namespace vita
 ///
 /// Generates the initial, random expressions that make up an individual.
 ///
-/// \param[in] e base environment
+/// \param[in] p base problem
 ///
 /// The constructor is implemented so as to ensure that there is no violation
 /// of the type system's constraints.
 ///
-i_mep::i_mep(const environment &e)
-  : individual(), genome_(e.code_length, e.sset->categories()), best_{0, 0},
-    active_crossover_type_(random::sup(NUM_CROSSOVERS))
+i_mep::i_mep(const problem &p)
+  : individual(), genome_(p.env.code_length, p.sset.categories()),
+    best_{0, 0}, active_crossover_type_(random::sup(NUM_CROSSOVERS))
 {
-  Expects(e.sset);
   Expects(size());
-  Expects(e.patch_length);
-  Expects(size() > e.patch_length);
+  Expects(p.env.patch_length);
+  Expects(size() > p.env.patch_length);
   Expects(categories());
 
-  const index_t i_sup(size()), patch(i_sup - e.patch_length);
+  const index_t i_sup(size()), patch(i_sup - p.env.patch_length);
   const category_t c_sup(categories());
 
   // STANDARD SECTION. Filling the genome with random symbols.
   for (index_t i(0); i < patch; ++i)
     for (category_t c(0); c < c_sup; ++c)
-      genome_(i, c) = gene(e.sset->roulette(c), i + 1, i_sup);
+      genome_(i, c) = gene(p.sset.roulette(c), i + 1, i_sup);
 
   // PATCH SUBSECTION. Placing terminals for satisfying constraints on types.
   for (index_t i(patch); i < i_sup; ++i)
     for (category_t c(0); c < c_sup; ++c)
-      genome_(i, c) = gene(e.sset->roulette_terminal(c));
+      genome_(i, c) = gene(p.sset.roulette_terminal(c));
 
   Ensures(debug());
 }
@@ -127,27 +126,27 @@ i_mep i_mep::get_block(const locus &l) const
 ///
 /// A new individual is created mutating `this`.
 ///
-/// \param[in] p probability of gene mutation
-/// \param[in] e the current environment
-/// \return      number of mutations performed
+/// \param[in] pgm probability of gene mutation
+/// \param[in] prb the current problem
+/// \return        number of mutations performed
 ///
-unsigned i_mep::mutation(double p, const environment &e)
+unsigned i_mep::mutation(double pgm, const problem &prb)
 {
-  Expects(0.0 <= p && p <= 1.0);
+  Expects(0.0 <= pgm && pgm <= 1.0);
 
   unsigned n(0);
 
   const auto i_size(size());
-  const auto patch(i_size - e.patch_length);
+  const auto patch(i_size - prb.env.patch_length);
 
   for (auto i(begin()); i != end(); ++i)  // Here mutation affects only exons
-    if (random::boolean(p))
+    if (random::boolean(pgm))
     {
       const auto ix(i.locus().index);
       const auto ct(i.locus().category);
 
-      const gene g(ix < patch ? gene(e.sset->roulette(ct), ix + 1, i_size)
-                              : gene(e.sset->roulette_terminal(ct)));
+      const gene g(ix < patch ? gene(prb.sset.roulette(ct), ix + 1, i_size)
+                              : gene(prb.sset.roulette_terminal(ct)));
 
       if (*i != g)
       {
@@ -557,7 +556,7 @@ bool i_mep::debug() const
 }
 
 ///
-/// \param[in] e  environment used to build the individual
+/// \param[in] p  current problem
 /// \param[in] in input stream
 /// \return       `true` if the object has been loaded correctly
 ///
@@ -565,7 +564,7 @@ bool i_mep::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_mep::load_impl(std::istream &in, const environment &e)
+bool i_mep::load_impl(std::istream &in, const problem &p)
 {
   unsigned rows, cols;
   if (!(in >> rows >> cols))
@@ -584,7 +583,7 @@ bool i_mep::load_impl(std::istream &in, const environment &e)
 
     gene temp;
 
-    temp.sym = e.sset->decode(opcode);
+    temp.sym = p.sset.decode(opcode);
     if (!temp.sym)
       return false;
 

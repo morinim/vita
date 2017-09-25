@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(Evaluator)
 
   for (unsigned i(0); i < 1000; ++i)
   {
-    i_de ind(env);
+    i_de ind(prob);
     BOOST_TEST(ind.debug());
 
     const auto eva_ret(eva(ind));
@@ -74,11 +74,10 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
 {
   vita::print.verbosity(vita::log::L_WARNING);
 
-  vita::problem prob;
   prob.env.individuals = 120;
   prob.env.threshold.fitness = {0,0};
-  prob.env.sset->insert(vita::ga::parameter<>(0, 0.0, 6.0));
-  prob.env.sset->insert(vita::ga::parameter<>(1, 0.0, 6.0));
+  prob.sset.insert(vita::ga::parameter<>(0, 0.0, 6.0));
+  prob.sset.insert(vita::ga::parameter<>(1, 0.0, 6.0));
 
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
@@ -136,17 +135,16 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3, * boost::unit_test::tolerance(1.0))
 {
   vita::print.verbosity(vita::log::L_WARNING);
 
-  vita::problem prob;
   prob.env.individuals = 130;
   prob.env.generations = 1000;
   prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
   for (unsigned i(0); i < 9; ++i)
-    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 1.0));
+    prob.sset.insert(vita::ga::parameter(i, 0.0, 1.0));
   for (unsigned i(9); i < 12; ++i)
-    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 100.0));
-  prob.env.sset->insert(vita::ga::parameter(12, 0.0, 1.0));
+    prob.sset.insert(vita::ga::parameter(i, 0.0, 100.0));
+  prob.sset.insert(vita::ga::parameter(12, 0.0, 1.0));
 
   auto f = [](const std::vector<double> &x)
     {
@@ -277,14 +275,13 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 {
   vita::print.verbosity(vita::log::L_WARNING);
 
-  vita::problem prob;
   prob.env.individuals = 50;
   prob.env.generations = 1000;
   prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
-  prob.env.sset->insert(vita::ga::parameter(0, 0.0, 100.0));
-  prob.env.sset->insert(vita::ga::parameter(1, 0.0, 100.0));
+  prob.sset.insert(vita::ga::parameter(0, 0.0, 100.0));
+  prob.sset.insert(vita::ga::parameter(1, 0.0, 100.0));
 
   auto f = [](const std::vector<double> &x)
     {
@@ -322,14 +319,13 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem5, * boost::unit_test::tolerance(0.1))
 {
   vita::print.verbosity(vita::log::L_WARNING);
 
-  vita::problem prob;
   prob.env.individuals = 100;
   prob.env.generations = 500;
   prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
   for (unsigned i(0); i < 2; ++i)
-    prob.env.sset->insert(vita::ga::parameter(i, 0.0, 10.0));
+    prob.sset.insert(vita::ga::parameter(i, 0.0, 10.0));
 
   auto f = [](const std::vector<double> &x)
     {

@@ -20,7 +20,7 @@ namespace vita
 /// \param[in] flag should the environment be initialized with common / default
 ///                 values?
 ///
-problem::problem(initialization flag) : env(&sset, flag)
+problem::problem(initialization flag) : env(flag)
 {
 }
 

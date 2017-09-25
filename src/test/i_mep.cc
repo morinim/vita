@@ -31,10 +31,10 @@ BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory3, F_FACTORY3)
 BOOST_AUTO_TEST_CASE(t_random_creation)
 {
   BOOST_TEST_CHECKPOINT("Variable length random creation.");
-  for (unsigned l(env.sset->categories() + 2); l < 100; ++l)
+  for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
   {
-    env.code_length = l;
-    vita::i_mep i(env);
+    prob.env.code_length = l;
+    vita::i_mep i(prob);
 
     BOOST_TEST(i.debug());
     BOOST_TEST(i.size() == l);
@@ -50,15 +50,15 @@ BOOST_AUTO_TEST_CASE(t_empty_individual)
   BOOST_TEST(i.empty());
   BOOST_TEST(i.size() == 0);
 
-  i = vita::i_mep(env);
+  i = vita::i_mep(prob);
   BOOST_TEST(!i.empty());
 }
 
 BOOST_AUTO_TEST_CASE(t_mutation)
 {
-  env.code_length = 100;
+  prob.env.code_length = 100;
 
-  vita::i_mep ind(env);
+  vita::i_mep ind(prob);
   const vita::i_mep orig(ind);
 
   const unsigned n(4000);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   BOOST_TEST_CHECKPOINT("Zero probability mutation.");
   for (unsigned i(0); i < n; ++i)
   {
-    ind.mutation(0.0, env);
+    ind.mutation(0.0, prob);
     BOOST_TEST(ind == orig);
   }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(t_mutation)
   {
     const vita::i_mep i1(ind);
 
-    ind.mutation(0.5, env);
+    ind.mutation(0.5, prob);
     diff += distance(i1, ind);
     length += i1.active_symbols();
   }
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(t_comparison)
 {
   for (unsigned i(0); i < 2000; ++i)
   {
-    vita::i_mep a(env);
+    vita::i_mep a(prob);
     BOOST_TEST(a == a);
     BOOST_TEST(distance(a, a) == 0);
 
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(t_comparison)
     BOOST_TEST(a == b);
     BOOST_TEST(distance(a, b) == 0);
 
-    vita::i_mep c(env);
+    vita::i_mep c(prob);
     if (a.signature() != c.signature())
     {
       BOOST_TEST(a != c);
@@ -114,9 +114,9 @@ BOOST_AUTO_TEST_CASE(t_crossover)
 {
   using namespace vita;
 
-  env.code_length = 100;
+  prob.env.code_length = 100;
 
-  i_mep i1(env), i2(env);
+  i_mep i1(prob), i2(prob);
 
   const unsigned n(2000);
   for (unsigned j(0); j < n; ++j)
@@ -146,15 +146,15 @@ BOOST_AUTO_TEST_CASE(t_serialization)
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
-    vita::i_mep i1(env);
+    vita::i_mep i1(prob);
 
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
     BOOST_TEST(i1.save(ss));
 
-    vita::i_mep i2(env);
-    BOOST_TEST(i2.load(ss, env));
+    vita::i_mep i2(prob);
+    BOOST_TEST(i2.load(ss, prob));
     BOOST_TEST(i2.debug());
 
     BOOST_TEST(i1 == i2);
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(t_serialization)
   BOOST_TEST(empty.save(ss));
 
   vita::i_mep empty1;
-  BOOST_TEST(empty1.load(ss, env));
+  BOOST_TEST(empty1.load(ss, prob));
   BOOST_TEST(empty1.debug());
   BOOST_TEST(empty1.empty());
 
@@ -181,11 +181,11 @@ BOOST_AUTO_TEST_CASE(t_blocks)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    vita::i_mep base(env);
+    vita::i_mep base(prob);
     auto base_es(base.active_symbols());
     while (base_es < 5)
     {
-      base = vita::i_mep(env);
+      base = vita::i_mep(prob);
       base_es = base.active_symbols();
     }
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(t_compress)
 
   for (unsigned k(0); k < n; ++k)
   {
-    const vita::i_mep i(env), i1(i.compress());
+    const vita::i_mep i(prob), i1(i.compress());
 
     BOOST_TEST(i1.debug());
 

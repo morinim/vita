@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,14 +37,14 @@ void summary<T>::clear()
 
 ///
 /// \param[in] in input stream.
-/// \param[in] e an environment (needed to build the best individual).
+/// \param[in] p  active problem.
 /// \return `true` if the object loaded correctly.
 ///
 /// \note
 /// If the load operation isn't successful the current object isn't changed.
 ///
 template<class T>
-bool summary<T>::load(std::istream &in, const environment &e)
+bool summary<T>::load(std::istream &in, const problem &p)
 {
   unsigned known_best(false);
   if (!(in >> known_best))
@@ -54,7 +54,7 @@ bool summary<T>::load(std::istream &in, const environment &e)
   if (known_best)
   {
     T tmp_ind;
-    if (!tmp_ind.load(in, e))
+    if (!tmp_ind.load(in, p))
       return false;
 
     decltype(best.score.fitness) tmp_fitness;

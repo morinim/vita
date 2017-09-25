@@ -20,31 +20,30 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  symbol_set sset;
-  environment env(&sset, initialization::standard);
+  problem p(initialization::standard);
 
-  env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 5);
+  p.env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 5);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
   symbol_factory factory;
-  sset.insert(factory.make(domain_t::d_double, -200, 200));
-  sset.insert(factory.make("FADD"));
-  sset.insert(factory.make("FSUB"));
-  sset.insert(factory.make("FMUL"));
-  sset.insert(factory.make("FIFL"));
-  sset.insert(factory.make("FIFE"));
-  sset.insert(factory.make("FABS"));
-  sset.insert(factory.make("FLN"));
+  p.sset.insert(factory.make(domain_t::d_double, -200, 200));
+  p.sset.insert(factory.make("FADD"));
+  p.sset.insert(factory.make("FSUB"));
+  p.sset.insert(factory.make("FMUL"));
+  p.sset.insert(factory.make("FIFL"));
+  p.sset.insert(factory.make("FIFE"));
+  p.sset.insert(factory.make("FABS"));
+  p.sset.insert(factory.make("FLN"));
 
   for (unsigned k(0); k < n; ++k)
   {
     // We build, by repeated trials, an individual with an effective size
     // greater than 4.
-    i_mep base(env);
+    i_mep base(p);
     auto base_es(base.active_symbols());
     while (base_es < 5)
     {
-      base = i_mep(env);
+      base = i_mep(p);
       base_es = base.active_symbols();
     }
 
@@ -65,7 +64,7 @@ int main(int argc, char *argv[])
 
       if (blk.active_symbols() <= 20)
       {
-        auto generalized (blk.generalize(2, *env.sset));
+        auto generalized (blk.generalize(2, p.sset));
 
         const auto &blk2(generalized.first);
         const auto &replaced(generalized.second);
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j].category;
         }
 
-        auto f(sset.insert(std::make_unique<adf>(blk2, categories)));
+        auto f(p.sset.insert(std::make_unique<adf>(blk2, categories)));
         std::cout << '\n' << f->name() << '\n' << blk2;
 
         i_mep blk3(blk.replace({{f, positions}}));

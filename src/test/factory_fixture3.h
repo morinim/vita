@@ -13,7 +13,7 @@
 #if !defined(VITA_FACTORY_FIXTURE3_H)
 #define      VITA_FACTORY_FIXTURE3_H
 
-#include "kernel/environment.h"
+#include "kernel/problem.h"
 #include "kernel/interpreter.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
@@ -33,32 +33,32 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : env(&sset, vita::initialization::standard), factory(), null()
+  F_FACTORY3() : prob(vita::initialization::standard), factory(), null()
   {
     BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
 
-    c0 = sset.insert(factory.make("0.0"));
-    c1 = sset.insert(factory.make("1.0"));
-    c2 = sset.insert(factory.make("2.0"));
-    c3 = sset.insert(factory.make("3.0"));
-    x = sset.insert(factory.make("123.0"));
-    neg_x = sset.insert(factory.make("-123.0"));
-    y = sset.insert(factory.make("321.0"));
-    z = sset.insert(std::make_unique<Z>());
-    f_abs = sset.insert(factory.make("FABS"));
-    f_add = sset.insert(factory.make("FADD"));
-    f_aq = sset.insert(factory.make("FAQ"));
-    f_div = sset.insert(factory.make("FDIV"));
-    f_idiv = sset.insert(factory.make("FIDIV"));
-    f_ife = sset.insert(factory.make("FIFE"));
-    f_ifz = sset.insert(factory.make("FIFZ"));
-    f_ln = sset.insert(factory.make("FLN"));
-    f_max = sset.insert(factory.make("FMAX"));
-    f_mul = sset.insert(factory.make("FMUL"));
-    f_sqrt = sset.insert(factory.make("FSQRT"));
-    f_sub = sset.insert(factory.make("FSUB"));
+    c0 = prob.sset.insert(factory.make("0.0"));
+    c1 = prob.sset.insert(factory.make("1.0"));
+    c2 = prob.sset.insert(factory.make("2.0"));
+    c3 = prob.sset.insert(factory.make("3.0"));
+    x = prob.sset.insert(factory.make("123.0"));
+    neg_x = prob.sset.insert(factory.make("-123.0"));
+    y = prob.sset.insert(factory.make("321.0"));
+    z = prob.sset.insert(std::make_unique<Z>());
+    f_abs = prob.sset.insert(factory.make("FABS"));
+    f_add = prob.sset.insert(factory.make("FADD"));
+    f_aq = prob.sset.insert(factory.make("FAQ"));
+    f_div = prob.sset.insert(factory.make("FDIV"));
+    f_idiv = prob.sset.insert(factory.make("FIDIV"));
+    f_ife = prob.sset.insert(factory.make("FIFE"));
+    f_ifz = prob.sset.insert(factory.make("FIFZ"));
+    f_ln = prob.sset.insert(factory.make("FLN"));
+    f_max = prob.sset.insert(factory.make("FMAX"));
+    f_mul = prob.sset.insert(factory.make("FMUL"));
+    f_sqrt = prob.sset.insert(factory.make("FSQRT"));
+    f_sub = prob.sset.insert(factory.make("FSUB"));
 
-    env.code_length = 32;
+    prob.env.code_length = 32;
   }
 
   ~F_FACTORY3()
@@ -88,9 +88,8 @@ struct F_FACTORY3
   vita::symbol *f_sqrt;
   vita::symbol *f_sub;
 
-  vita::environment        env;
+  vita::problem           prob;
   vita::symbol_factory factory;
-  vita::symbol_set        sset;
 
   vita::any ret;
 

@@ -28,7 +28,7 @@ class i_de : public individual<i_de>
 {
 public:
   i_de() = default;
-  explicit i_de(const environment &);
+  explicit i_de(const problem &);
 
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
@@ -88,7 +88,7 @@ private:
   void pack(std::vector<unsigned char> *const) const;
 
   // Serialization.
-  bool load_impl(std::istream &, const environment &);
+  bool load_impl(std::istream &, const problem &);
   bool save_impl(std::ostream &) const;
 
   // *** Private data members ***

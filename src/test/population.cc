@@ -29,15 +29,15 @@ BOOST_FIXTURE_TEST_SUITE(t_population, F_FACTORY1)
 
 BOOST_AUTO_TEST_CASE(creation)
 {
-  env.layers = 1;
+  prob.env.layers = 1;
 
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = vita::random::between(30u, 200u);
+    prob.env.individuals = vita::random::between(30u, 200u);
 
-    vita::population<vita::i_mep> pop(env);
+    vita::population<vita::i_mep> pop(prob);
 
-    BOOST_TEST(env.individuals == pop.individuals());
+    BOOST_TEST(prob.env.individuals == pop.individuals());
     BOOST_TEST(pop.debug());
   }
 }
@@ -46,10 +46,10 @@ BOOST_AUTO_TEST_CASE(layers_and_indeividuals)
 {
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = vita::random::between(30u, 200u);
-    env.layers = vita::random::between(1u, 10u);
+    prob.env.individuals = vita::random::between(30u, 200u);
+    prob.env.layers = vita::random::between(1u, 10u);
 
-    vita::population<vita::i_mep> pop(env);
+    vita::population<vita::i_mep> pop(prob);
 
     for (unsigned l(0); l < pop.layers(); ++l)
     {
@@ -76,16 +76,16 @@ BOOST_AUTO_TEST_CASE(serialization)
 
   for (unsigned i(0); i < 100; ++i)
   {
-    env.individuals = random::between(30u, 300u);
-    env.tournament_size = random::between<unsigned>(1, env.mate_zone);
+    prob.env.individuals = random::between(30u, 300u);
+    prob.env.tournament_size = random::between<unsigned>(1,prob.env.mate_zone);
 
     std::stringstream ss;
-    vita::population<i_mep> pop1(env);
+    vita::population<i_mep> pop1(prob);
 
     BOOST_TEST(pop1.save(ss));
 
-    decltype(pop1) pop2(env);
-    BOOST_TEST(pop2.load(ss, env));
+    decltype(pop1) pop2(prob);
+    BOOST_TEST(pop2.load(ss, prob));
     BOOST_TEST(pop2.debug());
 
     BOOST_TEST(pop1.layers() == pop2.layers());
