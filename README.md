@@ -40,7 +40,7 @@ For details about building Vita under Windows take a look at the [specific walkt
 
 ## Getting the source ##
 
-There are two ways of getting Vita's source code: you can [download](https://github.com/morinim/vita/archive/master.zip) a stable source release in your preferred archive format or directly clone the source from a repository.
+There are two ways of getting Vita's source code: you can [download][10] a stable source release in your preferred archive format or directly clone the source from a repository.
 
 Cloning a repository requires a few extra steps and some extra software packages on your system, but lets you track the latest development and make patches much more easily, so we highly encourage it.
 
@@ -56,6 +56,7 @@ This is a sketch of the resulting directory structure:
 ```
 vita/
   CHANGELOG.md
+  CODE_OF_CONDUCT.md
   CONTRIBUTING.md
   LICENSE
   README.md
@@ -68,7 +69,8 @@ vita/
     Makefile
     build/ ................Built executables
     examples/ .............Various examples
-    kernel/ ...............Vita kernel(core library)
+      forex/ ..............Forex example
+    kernel/ ...............Vita kernel (core library)
     sr/ ...................Symbolic regression and classification utility
     test/ .................Test-suite
     third_party/ ..........Third party libraries
@@ -126,3 +128,4 @@ The real story is that Windows may need various expedients about which you can r
 [7]: https://www.mozilla.org/MPL/2.0/
 [8]: https://github.com/morinim/vita/blob/master/LICENSE
 [9]: https://github.com/morinim/vita/issues
+[10]: https://github.com/morinim/vita/archive/master.zip
