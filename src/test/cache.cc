@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
 
   //----------
 
-  BOOST_CHECK(0x6384BA69 == verification);
+  BOOST_TEST(0x6384BA69 == verification);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
     cache.insert(i1.signature(), f);
 
-    BOOST_CHECK(cache.find(i1.signature()) == f);
+    BOOST_TEST(cache.find(i1.signature()) == f);
   }
 }
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
                          ? vita::any_cast<vita::fitness_t::value_type>(val)
                          : 0.0};
 
-      BOOST_CHECK(f == f1);
+      BOOST_TEST(f == f1);
     }
   }
 }
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
                  });
 
   std::stringstream ss;
-  BOOST_CHECK(cache1.save(ss));
+  BOOST_TEST(cache1.save(ss));
 
-  BOOST_CHECK(cache2.load(ss));
+  BOOST_TEST(cache2.load(ss));
 
   for (unsigned i(0); i < n; ++i)
     if (present[i])
@@ -182,25 +182,25 @@ BOOST_AUTO_TEST_CASE(Serialization)
                   ? any_cast<fitness_t::value_type>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
-      BOOST_CHECK(f1.size());
-      BOOST_CHECK(f == f1);
+      BOOST_TEST(f1.size());
+      BOOST_TEST(f == f1);
     }
 }
 
 BOOST_AUTO_TEST_CASE(HashT)
 {
   const vita::hash_t empty;
-  BOOST_CHECK(empty.empty());
+  BOOST_TEST(empty.empty());
 
   vita::hash_t h(123, 345);
-  BOOST_CHECK(!h.empty());
+  BOOST_TEST(!h.empty());
 
-  BOOST_CHECK(h != empty);
+  BOOST_TEST(h != empty);
 
   h.clear();
-  BOOST_CHECK(h.empty());
+  BOOST_TEST(h.empty());
 
-  BOOST_CHECK(h == empty);
+  BOOST_TEST(h == empty);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

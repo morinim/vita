@@ -173,12 +173,11 @@ bool cache::load(std::istream &in)
   for (decltype(n) i(0); i < n; ++i)
   {
     slot s;
+    s.seal = t_seal;
 
     if (!s.hash.load(in))
       return false;
     if (!s.fitness.load(in))
-      return false;
-    if (!(in >> s.seal))
       return false;
 #if defined(CLONE_SCALING)
     if (!(in >> s.seen))
@@ -188,9 +187,9 @@ bool cache::load(std::istream &in)
     table_[index(s.hash)] = s;
   }
 
-  seal_ = t_seal;
+  seal_   = t_seal;
   probes_ = t_probes;
-  hits_ = t_hits;
+  hits_   = t_hits;
 
   return true;
 }
@@ -210,13 +209,12 @@ bool cache::save(std::ostream &out) const
   out << num << '\n';
 
   for (const auto &s : table_)
-    if (!s.hash.empty())
+    if (s.seal == seal_ && !s.hash.empty())
     {
       s.hash.save(out);
       s.fitness.save(out);
-      out << s.seal;
 #if defined(CLONE_SCALING)
-      out << ' ' << s.seen;
+      out << s.seen;
 #endif
       out << '\n';
     }
