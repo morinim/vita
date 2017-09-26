@@ -21,7 +21,8 @@
  *  New versions of this framework will be available at
  *  https://github.com/morinim/vita
  *
- *  Please reports any suggestions and/or bugs via the [issue tracking system](https://github.com/morinim/vita/issues).
+ *  Please reports any suggestions and/or bugs via the
+ *  [issue tracking system](https://github.com/morinim/vita/issues).
  *
  */
 
