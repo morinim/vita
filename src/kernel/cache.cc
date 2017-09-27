@@ -214,9 +214,8 @@ bool cache::save(std::ostream &out) const
       s.hash.save(out);
       s.fitness.save(out);
 #if defined(CLONE_SCALING)
-      out << s.seen;
+      out << s.seen << '\n';
 #endif
-      out << '\n';
     }
 
   return out.good();

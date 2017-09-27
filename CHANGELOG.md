@@ -10,9 +10,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - BREAKING CHANGE.
-  Serialization file format for cache has changed. The new format produces
-  files up to 20% smaller (omitting the `seal` value which is assumed equal to
-  the `cache::seal` value).
+  Serialization file format for cache and fitness has changed. The new format
+  produces files up to 20% smaller omitting:
+  1. the `seal` value which is assumed equal to the `cache::seal` value
+  2. the fitness vector size (and assuming that all the components of the
+     vector are on the same line)
 
 - BREAKING CHANGE.
   Instead of:

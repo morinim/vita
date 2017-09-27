@@ -318,18 +318,18 @@ bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 template<class T>
 bool basic_fitness_t<T>::load(std::istream &in)
 {
-  unsigned s;
-  if (!(in >> s))
+  std::string line;
+  if (!std::getline(in >> std::ws, line))
     return false;
 
-  basic_fitness_t<T> tmp(s, copies_of);
+  std::istringstream line_in(line);
 
-  for (auto &e : tmp.vect_)
-    if (!load_float_from_stream(in, &e))
-      return false;
+  values_t tmp;
+  value_type elem;
+  while (load_float_from_stream(line_in, &elem))
+    tmp.push_back(elem);
 
   *this = tmp;
-
   return true;
 }
 
@@ -340,8 +340,6 @@ bool basic_fitness_t<T>::load(std::istream &in)
 template<class T>
 bool basic_fitness_t<T>::save(std::ostream &out) const
 {
-  out << size() << '\n';
-
   for (const auto &i : vect_)
   {
     save_float_to_stream(out, i);
