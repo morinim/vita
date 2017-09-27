@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,11 +28,11 @@ struct copies_of_t {};
 constexpr copies_of_t copies_of{};
 
 ///
-/// \brief A value assigned to an individual which reflects how well the
-///        individual solves the task.
+/// A value assigned to an individual which reflects how well the individual
+/// solves the task.
 ///
 /// \tparam T a numerical type used as a building block for the fitness
-///           (e.g. `double`).
+///           (e.g. `double`)
 ///
 /// This is **NOT THE RAW FITNESS**. Raw fitness is stated in the natural
 /// terminology of the problem: the better value may be either smaller (as when
@@ -76,7 +76,8 @@ public:
   basic_fitness_t();
   basic_fitness_t(std::initializer_list<T>);
   basic_fitness_t(values_t);
-  basic_fitness_t(unsigned, copies_of_t, T = std::numeric_limits<T>::lowest());
+  basic_fitness_t(std::size_t, copies_of_t,
+                  T = std::numeric_limits<T>::lowest());
 
   unsigned size() const;
   T operator[](unsigned) const;
