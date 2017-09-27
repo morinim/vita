@@ -55,6 +55,8 @@ protected:
   // Protected support methods.
   void log(const summary<T> &, const distribution<fitness_t> &,
            const std::vector<unsigned> &, unsigned, unsigned) const;
+  bool load();
+  bool save() const;
   virtual void tune_parameters();
 
   // Protected data members.

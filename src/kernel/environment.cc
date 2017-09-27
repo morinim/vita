@@ -105,6 +105,10 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_statistics, "save_population", stat.population);
   set_text(e_statistics, "save_summary", stat.summary);
   set_text(e_statistics, "individual_format", stat.ind_format);
+
+  auto *e_misc(d->NewElement("misc"));
+  e_environment->InsertEndChild(e_misc);
+  set_text(e_misc, "serialization_file", misc.serialization_name);
 }
 
 ///

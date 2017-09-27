@@ -51,6 +51,10 @@ public:
   /// \return the fitness of the individual.
   virtual fitness_t operator()(const T &) = 0;
 
+  // Serialization.
+  virtual bool load(std::istream &);
+  virtual bool save(std::ostream &) const;
+
   // The following methods have a default implementation (usually empty).
   virtual void clear(clear_flag);
   virtual void clear(const T &);

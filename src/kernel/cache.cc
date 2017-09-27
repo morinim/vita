@@ -147,7 +147,7 @@ void cache::insert(const hash_t &h, const fitness_t &fitness)
 
 ///
 /// \param[in] in input stream
-/// \return       `true` if the object loaded correctly
+/// \return       `true` if the object is correctly loaded
 ///
 /// \note
 /// If the load operation isn't successful the current object isn't changed.

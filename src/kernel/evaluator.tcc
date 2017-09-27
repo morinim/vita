@@ -35,6 +35,29 @@ fitness_t evaluator<T>::fast(const T &i)
 }
 
 ///
+/// \param[in] in input stream
+/// \return       `true` if the object loaded correctly
+///
+/// \note
+/// If the load operation isn't successful the current object isn't changed.
+///
+template<class T>
+bool evaluator<T>::load(std::istream &)
+{
+  return true;
+}
+
+///
+/// \param[out] out output stream
+/// \return         `true` if the object was saved correctly
+///
+template<class T>
+bool evaluator<T>::save(std::ostream &) const
+{
+  return true;
+}
+
+///
 /// Some evaluators keep additional statistics about the individual seen
 /// so far.
 ///

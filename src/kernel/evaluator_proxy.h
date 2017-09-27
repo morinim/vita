@@ -32,6 +32,10 @@ class evaluator_proxy : public evaluator<T>
 public:
   evaluator_proxy(E, unsigned);
 
+  // Serialization.
+  bool load(std::istream &);
+  bool save(std::ostream &) const;
+
   void clear(typename evaluator<T>::clear_flag);
   void clear(const T &);
 

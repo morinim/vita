@@ -129,8 +129,8 @@ public:
   /// \note A negative value means undefined (auto-tune).
   ///
   /// \see
-  /// * individual::mutation;
-  /// * operation_strategy::run.
+  /// - individual::mutation;
+  /// - operation_strategy::run.
   double p_mutation = -1.0;
 
   /// Crossover probability.
@@ -169,9 +169,9 @@ public:
   /// selective pressure.
   ///
   /// \note
-  /// * A tournament size of 1 would be equivalent to selecting individuals
+  /// - A tournament size of 1 would be equivalent to selecting individuals
   ///   at random.
-  /// * A length of 0 means undefined (auto-tune).
+  /// - A length of 0 means undefined (auto-tune).
   unsigned tournament_size = 0;
 
   /// Switches Dynamic Subset Selection on/off.
@@ -213,9 +213,15 @@ public:
   /// Should we use Adaptive Representation through Learning?
   trilean arl = trilean::unknown;
 
-  /// \f$2^cache_size\f$ is the number of elements of the transposition
-  /// table.
+  /// \f$2^cache_size\f$ is the number of elements of the cache.
   unsigned cache_size = 16;
+
+  struct misc_parameters
+  {
+    /// Filename used for persistance. An empty name is used to skip
+    /// serialization.
+    std::string serialization_name = "";
+  } misc;
 
   struct statistics
   {
@@ -308,4 +314,4 @@ public:
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

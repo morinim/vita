@@ -25,14 +25,20 @@ enum
   c_volume  // volume of a transaction
 };
 
+///
+/// \tparam TF timeframe
+/// \tparam I  index of a candle. `0` is the current bar, `1` is the previous
+///            one and so on (a greater value identifies an older candle).
+///            It's called shift in Metatrader
+///
 template<timeframe TF, unsigned I>
 class tfi_terminal : public vita::terminal
 {
 public:
   tfi_terminal(const std::string &n, vita::category_t c)
-    : vita::terminal(n + "(" + std::to_string(TF) + "," + std::to_string(I) +
-                     ")",
-                     c)
+    : vita::terminal(n + "("
+                     + std::to_string(TF) + "," + std::to_string(I) +
+                     ")", c)
   {
   }
 
@@ -250,8 +256,6 @@ bool setup_symbols(vita::symbol_set *ss)
 
 int main()
 {
-  trade_simulator ts;
-
   vita::problem p(vita::initialization::standard);
 
   if (!setup_symbols(&p.sset))
@@ -262,8 +266,13 @@ int main()
   p.env.code_length = 200;
   p.env.generations = 400;
   p.env.layers = 6;
-  p.env.team.individuals = 2;
+  p.env.team.individuals = 2;  // DO NOT CHANGE
   p.env.alps.age_gap = 10;
+  p.env.cache_size = 18;       // A hash table of `2^18 = 262144` elements.
+                               // Considering the speed of the Metatrader
+                               // back-tester this should ensure a very low
+                               // hash collision rate.
+
   p.env.stat.dynamic = true;
   p.env.stat.layers = true;
   p.env.stat.population = true;
@@ -271,9 +280,12 @@ int main()
   p.env.stat.dir = "./";
   p.env.stat.ind_format = vita::out::mql_language_f;
 
+  p.env.misc.serialization_name = "cache.txt";
+
   std::cout << "STARTING RUN\n";
   fxs::search engine(p);
 
+  trade_simulator ts;
   engine.set_evaluator<fxs::evaluator>(&ts);
 
   engine.run(1);

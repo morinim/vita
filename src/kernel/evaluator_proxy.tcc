@@ -107,6 +107,31 @@ fitness_t evaluator_proxy<T, E>::fast(const T &prg)
 }
 
 ///
+/// \param[in] in input stream
+/// \return       `true` if the object loaded correctly
+///
+/// \warning
+/// If the load operation isn't successful the current object COULD BE changed.
+/// The temporary object needed to holds values from the stream conceivably is
+/// too big to justify the "no change" warranty.
+///
+template<class T, class E>
+bool evaluator_proxy<T, E>::load(std::istream &in)
+{
+  return eva_.load(in) && cache_.load(in);
+}
+
+///
+/// \param[out] out output stream
+/// \return         `true` if the object was saved correctly
+///
+template<class T, class E>
+bool evaluator_proxy<T, E>::save(std::ostream &out) const
+{
+  return eva_.save(out) && cache_.save(out);
+}
+
+///
 /// Resets the evaluation cache / clear the statistics.
 ///
 /// \param[in] what what should be cleared? (all, cache, stats

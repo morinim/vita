@@ -127,6 +127,8 @@ summary<T> search<T, ES>::run(unsigned n)
   unsigned best_run(0);
   std::vector<unsigned> good_runs;
 
+  load();
+
   for (unsigned r(0); r < n; ++r)
   {
     auto run_summary(evolution<T, ES>(prob_, *active_eva_).run(r, shake));
@@ -181,7 +183,55 @@ summary<T> search<T, ES>::run(unsigned n)
     this->log(overall_summary, fd, good_runs, best_run, n);
   }
 
+  save();
+
   return overall_summary;
+}
+
+///
+/// \return `true` if the object is correctly loaded
+///
+template<class T, template<class> class ES>
+bool search<T, ES>::load()
+{
+  if (prob_.env.misc.serialization_name.empty())
+    return true;
+
+  std::ifstream in(prob_.env.misc.serialization_name.c_str());
+  if (!in)
+    return false;
+
+  if (prob_.env.cache_size)
+  {
+    if (!active_eva_->load(in))
+      return false;
+    print.info("Loading cache");
+  }
+
+  return true;
+}
+
+///
+/// \return `true` if the object was saved correctly
+///
+template<class T, template<class> class ES>
+bool search<T, ES>::save() const
+{
+  if (prob_.env.misc.serialization_name.empty())
+    return true;
+
+  std::ofstream out(prob_.env.misc.serialization_name.c_str());
+  if (!out)
+    return false;
+
+  if (prob_.env.cache_size)
+  {
+    if (!active_eva_->save(out))
+      return false;
+    print.info("Saving cache");
+  }
+
+  return true;
 }
 
 ///

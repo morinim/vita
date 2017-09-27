@@ -57,7 +57,7 @@ constexpr copies_of_t copies_of{};
 /// We chose this convention since it seemed more natural (a greater fitness
 /// is a better fitness; achieving a better fitness means to maximize the
 /// fitness). The downside is that sometimes we have to manage negative
-/// numbers, but for  our purposes it's not so bad.
+/// numbers, but for our purposes it's not so bad.
 /// Anyway maximization and minimization problems are basically the same: the
 /// solution of `max(f(x))` is the same as `-min(-f(x))`. This is usually
 /// all you have to remember when dealing with examples/problems expressed
