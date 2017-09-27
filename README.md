@@ -26,11 +26,16 @@ However, since core members of the Vita project have no access to these platform
 
 ### Mandatory ###
 
-* GNU-compatible make
-* POSIX-standard shell
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
 
-For details about building Vita under Windows take a look at the [specific walkthrough][6].
+#### Unix ####
+
+* GNU-compatible make
+* POSIX-standard shell
+
+#### Windows ####
+
+Take a look at the [specific walkthrough][6].
 
 ### Optional ###
 
