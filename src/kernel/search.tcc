@@ -352,7 +352,8 @@ void search<T, ES>::log(const summary<T> &run_sum,
 
   log_nvi(&d, run_sum);
 
-  const std::string f_sum(prob_.env.stat.dir + "/" + prob_.env.stat.sum_name);
+  const std::string f_sum(merge_path(prob_.env.stat.dir,
+                                     prob_.env.stat.sum_name));
   d.SaveFile(f_sum.c_str());
 }
 

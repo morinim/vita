@@ -25,7 +25,6 @@ public:
   double run(const vita::team<vita::i_mep> &);
 
 private:
-  static std::string merge_path(const std::string &, const std::string &);
   std::string full_path(const std::string &) const;
 
   std::string      ea_name_;

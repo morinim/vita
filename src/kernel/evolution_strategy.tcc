@@ -127,7 +127,7 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
 
   if (env.stat.layers)
   {
-    const std::string n_lys(env.stat.dir + "/" + env.stat.lys_name);
+    const std::string n_lys(merge_path(env.stat.dir, env.stat.lys_name));
     std::ofstream f_lys(n_lys, std::ios_base::app);
     if (!f_lys.good())
       return;

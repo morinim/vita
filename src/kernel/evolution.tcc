@@ -147,7 +147,7 @@ void evolution<T, ES>::log(unsigned run_count) const
 
   auto fullpath = [env](const std::string &f)
                   {
-                    return env.stat.dir + "/" + f;
+                    return merge_path(env.stat.dir, f);
                   };
 
   if (env.stat.dynamic)

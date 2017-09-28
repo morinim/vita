@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <stdexcept>
 
+
 // MinGW compiled with the win32 threading model (a common choice) at the
 // moment doesn't support C++11 threading classes (see
 // <https://github.com/StephanTLavavej/mingw-distro/issues/26> and
@@ -31,27 +32,9 @@ inline void sleep_for(std::chrono::milliseconds x)
 #include "utility/utility.h"
 #include "tinyxml2/tinyxml2.h"
 
-std::string trade_simulator::merge_path(const std::string &p1,
-                                        const std::string &p2)
-{
-  if (p1.empty())
-    return p2;
-  if (p2.empty())
-    return p1;
-
-  const char sep('/');
-
-  const auto last_p1(p1.back() == sep ? std::prev(p1.end()) : p1.end());
-  const auto first_p2(p2.front() == sep ? std::next(p2.begin()) : p2.begin());
-
-  return std::string(p1.begin(), last_p1) +
-         std::string(1, sep) +
-         std::string(first_p2, p2.end());
-}
-
 std::string trade_simulator::full_path(const std::string &fn) const
 {
-  return merge_path(working_dir_, fn);
+  return vita::merge_path(working_dir_, fn);
 }
 
 ///
@@ -109,7 +92,7 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
                      "bool sell_pattern() {return false;}",
                      "bool sell_pattern() {return " + ss[1].str() + ";}");
 
-  const auto fo(merge_path(working_dir_, ea_name_));
+  const auto fo(full_path(ea_name_));
   const auto fo_tmp(fo + ".tmp");
   std::ofstream o(fo_tmp);
   if (!o)
@@ -118,7 +101,7 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
   o.close();
   std::rename(fo_tmp.c_str(), fo.c_str());
 
-  const auto fr(merge_path(working_dir_, results_name_));
+  const auto fr(full_path(results_name_));
   std::ifstream results(fr);
   while (!results.is_open())
   {
