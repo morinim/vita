@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,28 +25,35 @@ void destroy_range(T *b, T *e)
     b->~T();
 }
 
-/// Copies the range `[b, e)` onto the uninitialized memory starting with
-/// `d`, constructing elements as needed. This is similar to
-/// `std::uninitialized_copy` but doesn't handle exceptions.
-template<class T, class It1, class It2>
-void uninitialized_copy(It1 b, It1 e, It2 d)
+/// Copies the range `[b, e)` onto the uninitialized memory starting with `d`,
+/// constructing elements as needed.
+///
+/// This is similar to `std::uninitialized_copy` but doesn't handle exceptions.
+template<class InputIt, class ForwardIt>
+void uninitialized_copy(InputIt b, InputIt e, ForwardIt d)
 {
-  for (; b != e; ++b, ++d)
+  using T = typename std::iterator_traits<ForwardIt>::value_type;
+
+  // For the `void` cast see <https://stackoverflow.com/q/38357089/3235496>
+  for (; b != e; ++b, (void) ++d)
     ::new (d) T(*b);
 }
 
-/// Moves the range [b, e) onto the uninitialized memory starting with `d`,
+/// Moves the range `[b, e)` onto the uninitialized memory starting with `d`,
 /// constructing elements as needed.
-template<class T, class It1, class It2>
-void uninitialized_move(It1 b, It1 e, It2 d)
+template<class InputIt, class ForwardIt>
+void uninitialized_move(InputIt b, InputIt e, ForwardIt d)
 {
-  for (; b != e; ++b, ++d)
+  using T = typename std::iterator_traits<ForwardIt>::value_type;
+
+  // For the `void` cast see <https://stackoverflow.com/q/38357089/3235496>
+  for (; b != e; ++b, (void) ++d)
     ::new (d) T(std::move(*b));
 }
 
 
 ///
-/// \brief small_vector with capacity equal to `S` and size equal to `n`
+/// small_vector with capacity equal to `S` and size equal to `n`
 ///
 template<class T, std::size_t S>
 small_vector<T, S>::small_vector(size_type n)
@@ -63,7 +70,7 @@ small_vector<T, S>::small_vector(size_type n)
     capacity_ = size_ = data_ + n;
 
     if (!std::is_pod<T>::value)
-      for (std::size_t k(0); k < n; ++k)
+      for (size_type k(0); k < n; ++k)
         new (data_ + k) T();
   }
 
@@ -92,7 +99,7 @@ small_vector<T, S>::small_vector(size_type n, const T &x)
 
     // Similar to `std::uninitialized_fill_n(data_, n, x)` but we don't handle
     // exceptions.
-    for (std::size_t k(0); k < n; ++k)
+    for (size_type k(0); k < n; ++k)
       new (data_ + k) T(x);
   }
 
@@ -118,7 +125,7 @@ small_vector<T, S>::small_vector(std::initializer_list<T> list)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    uninitialized_copy<T>(list.begin(), list.end(), begin());
+    vita::uninitialized_copy(list.begin(), list.end(), begin());
   }
 
   assert(size() == n);
@@ -143,7 +150,7 @@ small_vector<T, S>::small_vector(const small_vector &v)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    uninitialized_copy<T>(v.begin(), v.end(), data_);
+    vita::uninitialized_copy(v.begin(), v.end(), data_);
   }
 
   assert(size() == n);
@@ -195,7 +202,7 @@ small_vector<T, S> &small_vector<T, S>::operator=(const small_vector &rhs)
       data_ = static_cast<T *>(::operator new(n * sizeof(T)));
       capacity_ = size_ = data_ + n;
 
-      uninitialized_copy<T>(rhs.begin(), rhs.end(), begin());
+      vita::uninitialized_copy(rhs.begin(), rhs.end(), begin());
     }
     else  // !needs_memory
     {
@@ -320,7 +327,7 @@ typename small_vector<T,S>::iterator small_vector<T, S>::append(IT b, IT e)
   if (local_storage_used())
     std::copy(b, e, end());
   else
-    uninitialized_copy<T>(b, e, end());
+    vita::uninitialized_copy(b, e, end());
 
   size_ += n;
 
@@ -376,14 +383,14 @@ typename small_vector<T,S>::iterator small_vector<T, S>::insert(
 
   auto overwritten(old_end - i);
 
-  uninitialized_move<T>(i, old_end, end() - overwritten);
+  vita::uninitialized_move(i, old_end, end() - overwritten);
 
   // Replace the overwritten part.
   for (auto j(i); overwritten; --overwritten, ++j, ++b)
     *j = *b;
 
   // Insert the non-overwritten middle part.
-  uninitialized_copy<T>(b, e, old_end);
+  vita::uninitialized_copy(b, e, old_end);
 
   return i;
 }
@@ -489,7 +496,7 @@ void small_vector<T, S>::grow(size_type n)
   const auto n_old(size());
   auto new_data(static_cast<T *>(::operator new(n * sizeof(T))));
 
-  uninitialized_move<T>(begin(), end(), new_data);
+  vita::uninitialized_move(begin(), end(), new_data);
 
   if (!local_storage_used())
     free_heap_memory();
