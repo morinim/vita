@@ -268,7 +268,7 @@ int main()
   p.env.layers = 6;
   p.env.team.individuals = 2;  // DO NOT CHANGE
   p.env.alps.age_gap = 10;
-  p.env.cache_size = 18;       // A hash table of `2^18 = 262144` elements.
+  p.env.cache_size = 19;       // A hash table of `2^19 = 524288` elements.
                                // Considering the speed of the Metatrader
                                // back-tester this should ensure a very low
                                // hash collision rate.
@@ -282,11 +282,11 @@ int main()
 
   p.env.misc.serialization_name = "cache.txt";
 
-  std::cout << "STARTING RUN\n";
   fxs::search engine(p);
 
   trade_simulator ts;
   engine.set_evaluator<fxs::evaluator>(&ts);
 
+  std::cout << "STARTING RUN\n";
   engine.run(1);
 }

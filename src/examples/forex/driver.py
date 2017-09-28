@@ -60,7 +60,7 @@ class Metatrader:
     def __init__(self, data_dir, install_dir = "C:/Program Files/MetaTrader/",
                  working_dir = "./", metaeditor = "", terminal = "",
                  ea_name = "gpea.mq5", ini_name = "gpea.ini",
-                 results_name = "results.txt", timeout = 120, verbose = False):
+                 results_name = "results.txt", timeout = 120, quiet = False):
         if not data_dir:
             raise Exception("Unknown Metatrader data folder")
         self._data_dir = data_dir
@@ -76,13 +76,13 @@ class Metatrader:
         self._results_name = default(results_name, "results.txt")
 
         self._timeout = timeout
-        self._verbose = verbose
+        self._quiet = quiet
 
         shutil.copy(os.path.join(self._working_dir, self._ini_name),
                     self._data_dir)
 
     def _log(self, *args, **kwargs):
-        if self._verbose:
+        if not self._quiet:
             print(*args, **kwargs)
 
     def _check_results(self):
@@ -191,16 +191,16 @@ class Metatrader:
 
 
 class Watcher:
-    def __init__(self, to_watch, verbose = False):
+    def __init__(self, to_watch, quiet = False):
         if not to_watch:
             raise Exception("File to be monitored missing")
         self.to_watch = to_watch
         self.last_modified = 0
 
-        self._verbose = verbose
+        self._quiet = quiet
 
     def run(self):
-        if self._verbose:
+        if not self._quiet:
             print("WAITING FOR NEW EA")
 
         try:
@@ -221,11 +221,11 @@ class Watcher:
 
 
 def get_cmd_line_options():
-    description = "A bridge between GP engine and Metatrader5"
+    description = "A bridge between Vita and Metatrader 5"
     parser = argparse.ArgumentParser(description = description)
 
-    parser.add_argument("-v", "--verbose", action = "store_true",
-                        help = "Turn on verbose mode")
+    parser.add_argument("-q", "--quiet", action = "store_true",
+                        help = "Output to the console only in case of errors")
 
     return parser
 
@@ -243,12 +243,12 @@ def main():
                     ini_name = config.ini_name,
                     results_name = config.results_name,
                     timeout = config.timeout,
-                    verbose = args.verbose)
+                    quiet = args.quiet)
 
     watchdog = Watcher(os.path.join(config.working_dir, config.ea_name),
-                       verbose = args.verbose)
+                       quiet = args.quiet)
     while watchdog.run():
-        if args.verbose:
+        if not args.quiet:
             print(" " * 4, "Found new EA",
                   "("
                   + str(datetime.fromtimestamp(watchdog.last_modified))
@@ -258,7 +258,7 @@ def main():
         mt.simulator()
         mt.get_results(config.working_dir)
 
-        if args.verbose:
+        if not args.quiet:
             print("-" * 70)
 
 
