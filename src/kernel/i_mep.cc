@@ -163,22 +163,23 @@ unsigned i_mep::mutation(double pgm, const problem &prb)
 }
 
 ///
-/// Calculates a set of indexes to blocks contained in `this` individual.
+/// Calculates a set of loci referring to blocks contained in the individual.
 ///
-/// \return a list of loci referring to active symbols
+/// \return a set of loci
 ///
-/// Indexes can be used by the i_mep::get_block function.
+/// A locus obtained with this function is usually an argument for the
+/// i_mep::get_block function.
 ///
 /// \note
 /// A block is a subset of the active code composed of, at least, a function.
 ///
-std::vector<locus> i_mep::blocks() const
+std::set<locus> i_mep::blocks() const
 {
-  std::vector<locus> bl;
+  std::set<locus> bl;
 
   for (auto i(begin()); i != end(); ++i)
     if (i->sym->arity())
-      bl.push_back(i.locus());
+      bl.insert(i.locus());
 
   return bl;
 }

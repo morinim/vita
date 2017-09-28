@@ -45,7 +45,7 @@ public:
   unsigned mutation(double, const problem &);
 
   // ---- Working with blocks / genome ----
-  std::vector<locus> blocks() const;
+  std::set<locus> blocks() const;
   i_mep destroy_block(index_t, const symbol_set &) const;
   i_mep get_block(const locus &) const;
 
