@@ -273,11 +273,10 @@ int main()
                                // back-tester this should ensure a very low
                                // hash collision rate.
 
-  p.env.stat.dynamic = true;
-  p.env.stat.layers = true;
-  p.env.stat.population = true;
-  p.env.stat.summary = true;
-  p.env.stat.dir = "./";
+  p.env.stat.dynamic_file    = "dynamic.txt";
+  p.env.stat.layers_file     = "layers.txt";
+  p.env.stat.population_file = "population.txt";
+  p.env.stat.summary_file    = "summary.txt";
   p.env.stat.ind_format = vita::out::mql_language_f;
 
   p.env.misc.serialization_name = "cache.txt";

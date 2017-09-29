@@ -117,7 +117,7 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 /// \param[in] current_run current run
 ///
 /// Parameters from the environment:
-/// * env.stat.layers if `false` the method will not write any data.
+/// * `env.stat.layers_file` if empty the method will not write any data.
 ///
 template<class T, template<class> class CS>
 void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
@@ -125,9 +125,9 @@ void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
   const auto &pop(this->pop_);
   const auto &env(pop.get_problem().env);
 
-  if (env.stat.layers)
+  if (!env.stat.layers_file.empty())
   {
-    const std::string n_lys(merge_path(env.stat.dir, env.stat.lys_name));
+    const std::string n_lys(merge_path(env.stat.dir, env.stat.layers_file));
     std::ofstream f_lys(n_lys, std::ios_base::app);
     if (!f_lys.good())
       return;

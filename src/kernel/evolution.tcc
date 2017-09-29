@@ -150,9 +150,9 @@ void evolution<T, ES>::log(unsigned run_count) const
                     return merge_path(env.stat.dir, f);
                   };
 
-  if (env.stat.dynamic)
+  if (!env.stat.dynamic_file.empty())
   {
-    std::ofstream f_dyn(fullpath(env.stat.dyn_name), std::ios_base::app);
+    std::ofstream f_dyn(fullpath(env.stat.dynamic_file), std::ios_base::app);
     if (f_dyn.good())
     {
       if (last_run != run_count)
@@ -191,9 +191,10 @@ void evolution<T, ES>::log(unsigned run_count) const
     }
   }
 
-  if (env.stat.population)
+  if (!env.stat.population_file.empty())
   {
-    std::ofstream f_pop(fullpath(env.stat.pop_name), std::ios_base::app);
+    std::ofstream f_pop(fullpath(env.stat.population_file),
+                        std::ios_base::app);
     if (f_pop.good())
     {
       if (last_run != run_count)

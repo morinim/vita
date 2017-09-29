@@ -301,8 +301,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
                         const std::vector<unsigned> &good_runs,
                         unsigned best_run, unsigned runs) const
 {
-  // Summary logging.
-  if (!prob_.env.stat.summary)
+  if (prob_.env.stat.summary_file.empty())
     return;
 
   tinyxml2::XMLDocument d;
@@ -353,7 +352,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
   log_nvi(&d, run_sum);
 
   const std::string f_sum(merge_path(prob_.env.stat.dir,
-                                     prob_.env.stat.sum_name));
+                                     prob_.env.stat.summary_file));
   d.SaveFile(f_sum.c_str());
 }
 

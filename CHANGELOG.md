@@ -10,6 +10,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - BREAKING CHANGE.
+  Enable/disable logging of specific information is a bit simpler.
+  Instead of
+  ```C++
+  env.dynamic = true;
+  env_dyn_name = "dynamic.txt";
+  ```
+
+  this is enough:
+
+  ```C++
+  env.dynamic_file = "dynamic.txt"
+  ```
+
+- BREAKING CHANGE.
   Serialization file format for cache and fitness has changed. The new format
   produces files up to 20% smaller omitting:
   1. the `seal` value which is assumed equal to the `cache::seal` value

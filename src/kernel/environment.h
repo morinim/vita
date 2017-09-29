@@ -230,27 +230,30 @@ public:
     std::string dir = "";
 
     /// Name of the log file used to save ARL-specific information.
-    /// \note An empty string disable the logging.
+    /// \note An empty string disable logging.
     std::string arl_file = "";
 
-    /// Should we save a dynamic execution status file?
-    bool dynamic         =     false;
-    std::string dyn_name = "dynamic";
+    /// Name of the log file used to save real-time information.
+    /// \note An empty string disable logging.
+    std::string dynamic_file = "";
 
-    /// Should we save dynamic statistics about layers status?
-    bool layers          =    false;
-    std::string lys_name = "layers";
+    /// Name of the log file used to save layer-specific information.
+    /// \note An empty string disable logging.
+    std::string layers_file = "";
 
-    /// Should we save a dynamic population status file?
-    /// \warning It can be very slow!
-    bool population      =        false;
-    std::string pop_name = "population";
+    /// Name of the log file used to save population-specific information.
+    /// \note An empty string disable logging.
+    /// \warning
+    /// Enabling this log with large populations has a big performance impact.
+    std::string population_file = "";
 
-    /// Should we save a summary of the run?
-    bool summary         =     false;
-    std::string sum_name = "summary";
+    /// Name of the log file used to save a summary report.
+    /// \note An empty string disable logging.
+    std::string summary_file = "";
 
-    std::string tst_name = "test";
+    /// Name of the file used to save test results.
+    /// \name An empty string disable savings.
+    std::string test_file = "";
 
     out::print_format_t ind_format = out::list_f;
   } stat;

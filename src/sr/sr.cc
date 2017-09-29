@@ -548,9 +548,10 @@ void stat_dir(const std::string &dir)
 ///
 void stat_dynamic(const std::string &v)
 {
-  problem->env.stat.dynamic = is_true(v);
+  const bool log(is_true(v));
+  problem->env.stat.dynamic_file = log ? "dynamic" : "";
 
-  print.info("Dynamic evolution logging is ", problem->env.stat.dynamic);
+  print.info("Dynamic evolution logging is ", log);
 }
 
 ///
@@ -558,9 +559,10 @@ void stat_dynamic(const std::string &v)
 ///
 void stat_layers(const std::string &v)
 {
-  problem->env.stat.layers = is_true(v);
+  const bool log(is_true(v));
+  problem->env.stat.layers_file = log ? "layers" : "";
 
-  print.info("Layers logging is ", problem->env.stat.layers);
+  print.info("Layers logging is ", log);
 }
 
 ///
@@ -568,9 +570,10 @@ void stat_layers(const std::string &v)
 ///
 void stat_population(const std::string &v)
 {
-  problem->env.stat.population = is_true(v);
+  const bool log(is_true(v));
+  problem->env.stat.population_file = log ? "population" : "";
 
-  print.info("Population logging is ", problem->env.stat.population);
+  print.info("Population logging is ", log);
 }
 
 ///
@@ -578,9 +581,10 @@ void stat_population(const std::string &v)
 ///
 void stat_summary(const std::string &v)
 {
-  problem->env.stat.summary = true;
+  const bool log(is_true(v));
+  problem->env.stat.summary_file = log ? "summary" : "";
 
-  print.info("Summary logging is ", v);
+  print.info("Summary logging is ", log);
 }
 
 ///
@@ -835,17 +839,17 @@ int parse_command_line(int argc, char *const argv[])
     po::options_description statistics("Statistics");
     statistics.add_options()
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
-       "log statistics in the specified folder/directory")
+       "base path for log files")
       ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
        "set ARL logging status")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
-       "generates a dynamic execution status file")
+       "set general real-time logging status")
       ("stat-layers", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_layers),
-       "generates a layers status file")
+       "set layer-specific information logging status")
       ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
-       "generates a population status file")
+       "set population-specific information logging status")
       ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
-       "saves a summary of the runs")
+       "set end-of-run summary logging status")
       ("threshold", po::value<std::string>()->notifier(&ui::threshold),
        "sets the success threshold for a run");
 

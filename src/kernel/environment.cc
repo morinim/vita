@@ -100,10 +100,11 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   e_environment->InsertEndChild(e_statistics);
   set_text(e_statistics, "directory", stat.dir);
   set_text(e_statistics, "save_arl", stat.arl_file);
-  set_text(e_statistics, "save_dynamics", stat.dynamic);
-  set_text(e_statistics, "save_layers", stat.layers);
-  set_text(e_statistics, "save_population", stat.population);
-  set_text(e_statistics, "save_summary", stat.summary);
+  set_text(e_statistics, "save_dynamics", stat.dynamic_file);
+  set_text(e_statistics, "save_layers", stat.layers_file);
+  set_text(e_statistics, "save_population", stat.population_file);
+  set_text(e_statistics, "save_summary", stat.summary_file);
+  set_text(e_statistics, "save_test", stat.test_file);
   set_text(e_statistics, "individual_format", stat.ind_format);
 
   auto *e_misc(d->NewElement("misc"));

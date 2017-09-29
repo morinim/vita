@@ -367,7 +367,7 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 
   const auto &stat(this->prob_.env.stat);
 
-  if (stat.summary)
+  if (!stat.summary_file.empty())
   {
     assert(d->FirstChild());
     assert(d->FirstChild()->FirstChildElement("summary"));
@@ -379,14 +379,14 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
   }
 
   // Test set results logging.
-  if (data().size(data::test))
+  if (!stat.test_file.empty() && data().size(data::test))
   {
     const auto original_dataset(data().active_dataset());
     data().select(data::test);
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(merge_path(stat.dir, stat.tst_name));
+    std::ofstream tf(merge_path(stat.dir, stat.test_file));
     for (const auto &example : data())
       tf << lambda->name((*lambda)(example)) << '\n';
 
