@@ -109,7 +109,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
 
   auto *e_misc(d->NewElement("misc"));
   e_environment->InsertEndChild(e_misc);
-  set_text(e_misc, "serialization_file", misc.serialization_name);
+  set_text(e_misc, "serialization_file", misc.serialization_file);
 }
 
 ///

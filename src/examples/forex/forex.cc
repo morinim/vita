@@ -279,7 +279,7 @@ int main()
   p.env.stat.summary_file    = "summary.txt";
   p.env.stat.ind_format = vita::out::mql_language_f;
 
-  p.env.misc.serialization_name = "cache.txt";
+  p.env.misc.serialization_file = "cache.txt";
 
   fxs::search engine(p);
 

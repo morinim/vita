@@ -194,10 +194,10 @@ summary<T> search<T, ES>::run(unsigned n)
 template<class T, template<class> class ES>
 bool search<T, ES>::load()
 {
-  if (prob_.env.misc.serialization_name.empty())
+  if (prob_.env.misc.serialization_file.empty())
     return true;
 
-  std::ifstream in(prob_.env.misc.serialization_name.c_str());
+  std::ifstream in(prob_.env.misc.serialization_file);
   if (!in)
     return false;
 
@@ -217,10 +217,10 @@ bool search<T, ES>::load()
 template<class T, template<class> class ES>
 bool search<T, ES>::save() const
 {
-  if (prob_.env.misc.serialization_name.empty())
+  if (prob_.env.misc.serialization_file.empty())
     return true;
 
-  std::ofstream out(prob_.env.misc.serialization_name.c_str());
+  std::ofstream out(prob_.env.misc.serialization_file);
   if (!out)
     return false;
 

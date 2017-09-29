@@ -220,7 +220,7 @@ public:
   {
     /// Filename used for persistance. An empty name is used to skip
     /// serialization.
-    std::string serialization_name = "";
+    std::string serialization_file = "";
   } misc;
 
   struct statistics
