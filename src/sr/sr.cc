@@ -155,9 +155,9 @@ std::string eva_args;
 vita::src_problem *problem;
 
 ///
-/// \param[in] v a value for ARL (\see is_true).
-///
 /// Sets Adaptive Representation through Learning.
+///
+/// \param[in] v a value for ARL (\see is_true)
 ///
 void arl(const std::string &v)
 {
@@ -522,13 +522,13 @@ void set_runs(unsigned r)
 }
 
 ///
-/// \param[in] v if `true` saves the list of active ADFs.
+/// \param[in] v if `true` saves the list of active ADFs
 ///
 void stat_arl(const std::string &v)
 {
-  problem->env.stat.arl = is_true(v);
-
-  print.info("ARL is ", v);
+  const bool log(is_true(v));
+  problem->env.stat.arl_file = log ? "arl" : "";
+  print.info("ARL logging is ", log);
 }
 
 ///
@@ -837,7 +837,7 @@ int parse_command_line(int argc, char *const argv[])
       ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
        "log statistics in the specified folder/directory")
       ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
-       "saves the list of active ADFs")
+       "set ARL logging status")
       ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
        "generates a dynamic execution status file")
       ("stat-layers", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_layers),

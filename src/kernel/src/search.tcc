@@ -127,18 +127,22 @@ void src_search<T, ES>::arl(const U &base)
 
   auto &prob(this->prob_);
 
-  // Logs ADFs
-  const auto filename(prob.env.stat.dir + "/" + prob.env.stat.arl_name);
-  std::ofstream adf_log(filename, std::ios_base::app);
-  if (prob.env.stat.arl && adf_log.good())
+  std::ofstream log;
+  if (!prob.env.stat.arl_file.empty())
   {
-    const auto adts(prob.sset.adts());
-    for (auto i(decltype(adts){0}); i < adts; ++i)
+    const auto filename(merge_path(prob.env.stat.dir, prob.env.stat.arl_file));
+    log.open(filename, std::ios_base::app);
+
+    if (log.is_open())  // logs ADTs
     {
-      const auto &f(prob.sset.get_adt(i));
-      adf_log << f.name() << ' ' << prob.sset.weight(f) << '\n';
+      auto adts(prob.sset.adts());
+      for (decltype(adts) i(0); i < adts; ++i)
+      {
+        const auto &f(prob.sset.get_adt(i));
+        log << f.name() << ' ' << prob.sset.weight(f) << '\n';
+      }
+      log << '\n';
     }
-    adf_log << '\n';
   }
 
   const unsigned adf_args(0);
@@ -177,13 +181,12 @@ void src_search<T, ES>::arl(const U &base)
       else  // !adf_args
         p = std::make_unique<adt>(candidate_block);
 
-      if (prob.env.stat.arl && adf_log.good())
+      if (log.is_open())  // logs ADFs
       {
-        adf_log << p->name() << " (Base: " << base_fit
-                << "  DF: " << delta
-                << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-                << "%)\n"
-                << candidate_block << '\n';
+        log << p->name() << " (Base: " << base_fit
+            << "  DF: " << delta
+            << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
+            << "%)\n" << candidate_block << '\n';
       }
 
       prob.sset.insert(std::move(p));
@@ -362,7 +365,9 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 {
   Expects(d);
 
-  if (this->prob_.env.stat.summary)
+  const auto &stat(this->prob_.env.stat);
+
+  if (stat.summary)
   {
     assert(d->FirstChild());
     assert(d->FirstChild()->FirstChildElement("summary"));
@@ -381,8 +386,7 @@ void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
-    std::ofstream tf(this->prob_.env.stat.dir + "/"
-                     + this->prob_.env.stat.tst_name);
+    std::ofstream tf(merge_path(stat.dir, stat.tst_name));
     for (const auto &example : data())
       tf << lambda->name((*lambda)(example)) << '\n';
 

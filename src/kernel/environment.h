@@ -225,12 +225,13 @@ public:
 
   struct statistics
   {
-    /// Where shuld we save statistics / status files?
+    /// A base common path for the log files.
+    /// A single log file can overwrite this path specifying an absolute path.
     std::string dir = "";
 
-    /// Should we save a list of active ADF?
-    bool arl             = false;
-    std::string arl_name = "arl";
+    /// Name of the log file used to save ARL-specific information.
+    /// \note An empty string disable the logging.
+    std::string arl_file = "";
 
     /// Should we save a dynamic execution status file?
     bool dynamic         =     false;

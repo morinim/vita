@@ -99,7 +99,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   auto *e_statistics(d->NewElement("statistics"));
   e_environment->InsertEndChild(e_statistics);
   set_text(e_statistics, "directory", stat.dir);
-  set_text(e_statistics, "save_arl", stat.arl);
+  set_text(e_statistics, "save_arl", stat.arl_file);
   set_text(e_statistics, "save_dynamics", stat.dynamic);
   set_text(e_statistics, "save_layers", stat.layers);
   set_text(e_statistics, "save_population", stat.population);
