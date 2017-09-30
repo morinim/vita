@@ -75,7 +75,7 @@ trade_simulator::trade_simulator()
                           "./");
 }
 
-double trade_simulator::run(const vita::team<vita::i_mep> &prg)
+vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
 {
   std::stringstream ss[2];
 
@@ -121,13 +121,24 @@ double trade_simulator::run(const vita::team<vita::i_mep> &prg)
   if (!(results >> long_trades))
     throw std::runtime_error("Cannot read numer of long trades from " + fr);
 
+  double drawdown;
+  if (!(results >> drawdown))
+    throw std::runtime_error("Cannot read balance drawdown from " + fr);
+
   results.close();
   std::remove(fr.c_str());
 
   const double trades(short_trades + long_trades);
-  const double active_symbols(prg.active_symbols());
 
-  return -std::exp(-profit / 10000.0)
-         - std::max(100.0 - trades, 0.0)
-         - std::max(40.0 - active_symbols, 0.0);
+  double fit(profit - drawdown + std::sqrt(std::min(trades, 100.0)));
+  vita::fitness_t ret({fit, profit, drawdown, trades});
+
+  vita::print.debug("CURRENT EA. Profit:", profit,
+                    " Drawdown:", drawdown,
+                    " Trades:", trades,
+                    " Fit:", fit);
+
+  return ret;
+
+  //const double active_symbols(prg.active_symbols());
 }

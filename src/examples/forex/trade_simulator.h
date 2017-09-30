@@ -22,7 +22,7 @@ class trade_simulator
 public:
   trade_simulator();
 
-  double run(const vita::team<vita::i_mep> &);
+  vita::fitness_t run(const vita::team<vita::i_mep> &);
 
 private:
   std::string full_path(const std::string &) const;
