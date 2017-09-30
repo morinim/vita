@@ -20,7 +20,7 @@
 namespace vita
 {
 ///
-/// There are a lot of metrics related to a model (a lambda_f) and we don't
+/// There are a lot of metrics related to a model (a `lambda_f`) and we don't
 /// want fat classes.
 /// The Visitor pattern is ideal to simplify the interface of lambda_f and
 /// to keep possibility for future expansions (new metrics).
@@ -41,12 +41,13 @@ public:
 ///
 /// Accuracy refers to the number of training examples that are correctly
 /// valued/classified as a proportion of the total number of examples in
-/// the training set. According to this design, the best accuracy is 1.0
-/// (100%), meaning that all the training examples have been correctly
-/// recognized.
+/// the training set.
+///
+/// According to this design, the best accuracy is `1.0` (100%), meaning that
+/// all the training examples have been correctly recognized.
 ///
 /// \note
-/// Accuracy and fitness aren't the same thing.
+/// **Accuracy and fitness aren't the same thing**.
 /// Accuracy can be used to measure fitness but it sometimes hasn't
 /// enough "granularity"; also it isn't appropriated for classification
 /// tasks with imbalanced learning data (where at least one class is
@@ -65,4 +66,4 @@ public:
 #include "kernel/src/model_metric.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

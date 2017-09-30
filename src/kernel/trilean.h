@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@ namespace vita
 {
 
 ///
-/// \brief Three-valued logic enum.
+/// Three-valued logic enum.
 ///
 /// Used where we need three truth values indicating `true`, `false` and some
 /// indeterminate third value.
@@ -29,11 +29,10 @@ namespace vita
 /// \note
 /// Boost::tribool already implements a similar object and in the past we were
 /// using it. Logical operators in `boost:tribool` are overloaded and unlike
-/// built in logical operators of C++ the left to right evaluation of logical
-/// operators is not applied and there is no short circuiting so the
-/// evaluations of operands remains unspecified. As a result we decided to
-/// switch to something with less syntactic sugar but with a less unexpected
-/// behaviour.
+/// built-in logical operators of C++ the left to right evaluation is not
+/// applied. There is no short circuiting so the order-evaluation of operands
+/// remains unspecified. As a result we decided to switch to something with
+/// less syntactic sugar but with a less unexpected behaviour.
 ///
 enum class trilean {unknown = -1, no, yes};
 
@@ -59,4 +58,4 @@ inline trilean &assign(trilean &lhs, bool rhs)
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

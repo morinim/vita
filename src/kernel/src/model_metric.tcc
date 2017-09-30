@@ -18,9 +18,9 @@
 #define      VITA_SRC_MODEL_METRIC_TCC
 
 ///
-/// \param[in] l the model whose accuracy we are evaluating.
-/// \param[in] d a dataset.
-/// \return the accuracy.
+/// \param[in] l the model whose accuracy we are evaluating
+/// \param[in] d a dataset
+/// \return      the accuracy
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
@@ -46,9 +46,9 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
 }
 
 ///
-/// \param[in] l the model whose accuracy we are evaluating.
-/// \param[in] d a dataset.
-/// \return the accuracy.
+/// \param[in] l the model whose accuracy we are evaluating
+/// \param[in] d a dataset
+/// \return      the accuracy
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const class_lambda_f<T> *l,
