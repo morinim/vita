@@ -17,8 +17,6 @@
 #property description "Based on buy / sell pattern recognition"
 
 // Input parameters
-input int StopLoss   = 50;
-input int TakeProfit = 50;
 input int EA_Magic = 31415;
 
 input ENUM_TIMEFRAMES medium_timeframe = PERIOD_H1;
@@ -34,8 +32,6 @@ struct timeframe_rates
   MqlRates bar[];  // TIME, OPEN, HIGH, LOW, CLOSE, TICKET_VOLUME, SPREAD,
                    // REAL_VOLUME
 } rates[3];
-
-int STP, TKP;  // normalized Stop Loss & Take Profit values
 
 double close(unsigned tf, unsigned bar)
 {
@@ -78,7 +74,7 @@ bool long_candle(unsigned tf, unsigned bar)
     avg_body += (new_bar - avg_body) / i;
   }
 
-  return real_body > 3.0 * avg_body;
+  return 3.0 * avg_body < real_body && real_body < 6.0 * avg_body;
 }
 
 bool long_black_candle(unsigned tf, unsigned bar)
@@ -97,9 +93,18 @@ bool doji(unsigned tf, unsigned bar)
   const double shadow = high(tf, bar) - low(tf, bar);
 
   if (shadow > 0.0)
-    return real_body / shadow < 0.01;
+    return real_body / shadow < 0.025;
 
   return false;
+}
+
+bool harami(unsigned tf, unsigned bar)
+{
+  return long_candle(tf, bar + 1)
+         && MathMax(open(tf, bar), close(tf, bar))
+            < MathMax(open(tf, bar + 1), close(tf, bar + 1))
+         && MathMin(open(tf, bar), close(tf, bar))
+            > MathMin(open(tf, bar + 1), close(tf, bar + 1));
 }
 
 bool bearish_harami(unsigned tf, unsigned bar)
@@ -120,22 +125,13 @@ bool dark_cloud_cover(unsigned tf, unsigned bar)
 {
   return white_candle(tf, bar + 1) && black_candle(tf, bar)
          && close(tf, bar) > open(tf, bar + 1)
-         &&  open(tf, bar) > high(tf, bar + 1);
+         &&  open(tf, bar) >= high(tf, bar + 1);
 }
 
 int OnInit()
 {
   if (Period() >= medium_timeframe || medium_timeframe >= long_timeframe)
     return INIT_PARAMETERS_INCORRECT;
-
-  // Let us handle currency pairs with 5 or 3 digit prices instead of 4
-  STP = StopLoss;
-  TKP = TakeProfit;
-  if (_Digits == 5 || _Digits == 3)
-  {
-    STP = STP * 10;
-    TKP = TKP * 10;
-  }
 
   ArraySetAsSeries(rates[0].bar, true);
   ArraySetAsSeries(rates[1].bar, true);
@@ -153,6 +149,7 @@ void OnDeinit(const int /*reason*/)
     FileWrite(h, TesterStatistics(STAT_PROFIT));
     FileWrite(h, TesterStatistics(STAT_SHORT_TRADES));
     FileWrite(h, TesterStatistics(STAT_LONG_TRADES));
+    FileWrite(h, TesterStatistics(STAT_BALANCE_DD));
     FileWrite(h, TesterStatistics(STAT_BALANCE_DDREL_PERCENT));
     FileClose(h);
   }
@@ -167,10 +164,18 @@ bool place_order(ENUM_ORDER_TYPE type, MqlTradeResult &mresult)
                                               : latest_price.bid;
   int sgn = (type == ORDER_TYPE_BUY) ? +1 : -1;
 
+  double lowest = low(0, 1), highest = high(0, 1);
+  for (unsigned i = 2; i <= 5; ++i)
+  {
+    highest = MathMax(highest, high(0, i));
+    lowest  = MathMin(lowest,   low(0, i));
+  }
+  double delta = MathMax(highest - lowest, 100.0 * _Point);
+
   mrequest.action = TRADE_ACTION_DEAL;  // immediate order execution
   mrequest.price = NormalizeDouble(ref_price, _Digits);
-  mrequest.sl = NormalizeDouble(ref_price - sgn * STP * _Point, _Digits);
-  mrequest.tp = NormalizeDouble(ref_price + sgn * TKP * _Point, _Digits);
+  mrequest.sl = NormalizeDouble(ref_price - sgn * delta, _Digits);
+  mrequest.tp = NormalizeDouble(ref_price + sgn * delta, _Digits);
   mrequest.symbol = _Symbol;
   mrequest.volume = Lot;
   mrequest.magic = EA_Magic;
