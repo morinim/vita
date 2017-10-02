@@ -304,7 +304,7 @@ void search<T, ES>::log(const summary<T> &run_sum,
   if (prob_.env.stat.summary_file.empty())
     return;
 
-  tinyxml2::XMLDocument d;
+  tinyxml2::XMLDocument d(false);
 
   auto *root(d.NewElement("vita"));
   d.InsertFirstChild(root);
