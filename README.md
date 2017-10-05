@@ -75,8 +75,8 @@ vita/
     build/ ................Built executables
     examples/ .............Various examples
       forex/ ..............Forex example
+      sr/ .................Symbolic regression and classification utility
     kernel/ ...............Vita kernel (core library)
-    sr/ ...................Symbolic regression and classification utility
     test/ .................Test-suite
     third_party/ ..........Third party libraries
     utility/ ..............Support libraries / files

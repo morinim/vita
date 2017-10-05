@@ -73,7 +73,7 @@ COMPILE := $(CXX) $(CXXFLAGS)
 EXAMPLES_SRC := $(wildcard examples/*.cc)
 FOREX_SRC := $(wildcard examples/forex/*.cc)
 KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
-SR_SRC := $(wildcard sr/*.cc)
+SR_SRC := $(wildcard examples/sr/*.cc)
 TESTS_SRC := $(wildcard test/*.cc)
 THIRD_PARTY_SRC := third_party/tinyxml2/tinyxml2.cc
 UTILITY_SRC := $(wildcard utility/*.cc)
@@ -103,18 +103,18 @@ else
 endif
 endif
 
-sr: sr/sr.o $(FRAMEWORK_OBJ) directories
+sr: examples/sr/sr.o $(FRAMEWORK_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/$@ $(LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
-	@strip $(OUTDIR)/$@.exe
+	@strip $(OUTDIR)/examples/$@.exe
 else
-	@strip $(OUTDIR)/$@
+	@strip $(OUTDIR)/examples/$@
 endif
 endif
 
-examples: $(EXAMPLES_SRC:.cc=) forex directories
+examples: $(EXAMPLES_SRC:.cc=) forex sr directories
 	@echo $(notdir $^) successfully built
 
 examples/%: examples/%.o $(FRAMEWORK_OBJ) directories
@@ -183,14 +183,14 @@ check_cpplint:
 .phony:	clean
 clean:
 	@echo Making clean...
-	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*~" -type f -delete -print
-	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name ".*~" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.P" -type f -delete -print
-	@find ./ ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "#*#" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./third_party/ ./utility/ -name "*.o" -type f -delete -print
-	@find ./kernel/ ./examples/ ./sr/ ./test/ ./utility/ -name "*.gch" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./test/ ./utility/ -name "*~" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./test/ ./utility/ -name ".*~" -type f -delete -print
+	@find ./kernel/ ./examples/ ./test/ ./third_party/ ./utility/ -name "*.P" -type f -delete -print
+	@find ./ ./kernel/ ./examples/ ./test/ ./utility/ -name "#*#" -type f -delete -print
+	@find ./kernel/ ./examples/ ./test/ ./third_party/ ./utility/ -name "*.o" -type f -delete -print
+	@find ./kernel/ ./examples/ ./test/ ./utility/ -name "*.gch" -type f -delete -print
 	@$(RM) -rf $(OUTDIR)
-	@$(RM) sr/sr kernel/libvita.a examples/forex/forex cppcheck.txt cpplint.txt
+	@$(RM) kernel/libvita.a cppcheck.txt cpplint.txt
 
 .phony:	backup
 backup:

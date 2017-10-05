@@ -1,5 +1,7 @@
 # Creates the examples.
 
+add_subdirectory(sr)
+
 file(GLOB FOREX_SRC "forex/*.cc")
 add_executable(forex ${FOREX_SRC})
 target_link_libraries(forex vita)
