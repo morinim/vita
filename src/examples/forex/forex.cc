@@ -243,13 +243,13 @@ bool setup_symbols(vita::symbol_set *ss)
   insert_symbol<fxs::bullish_harami>(ss);
   insert_symbol<fxs::dark_cloud_cover>(ss);
 
-  ss->insert(std::make_unique<fxs::l_and>(), 2.0);
-  ss->insert(std::make_unique< fxs::l_or>(), 2.0);
+  ss->insert(std::make_unique<fxs::l_and>(), 20.0);
+  ss->insert(std::make_unique< fxs::l_or>(), 20.0);
 
-  ss->insert(std::make_unique<fxs::add>());
-  ss->insert(std::make_unique<fxs::sub>());
+  ss->insert(std::make_unique<fxs::add>(), 20.0);
+  ss->insert(std::make_unique<fxs::sub>(), 20.0);
 
-  ss->insert(std::make_unique<fxs::lt_m>(), 2.0);
+  ss->insert(std::make_unique<fxs::lt_m>(), 20.0);
 
   return true;
 }
