@@ -263,11 +263,20 @@ void OnTick()
   if (!pick_data())
     return;
 
-  bool buy_opened = PositionSelect(_Symbol)  // we have an open position
-                    && PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY;
-
-  bool buy_condition = buy_opened ? false : buy_pattern();
-  bool sell_condition = buy_opened ? sell_pattern() : false;
+  bool buy_condition = false, sell_condition = false;
+  if (PositionSelect(_Symbol))  // we have an open position
+  {
+    if (PositionGetInteger(POSITION_TYPE) == POSITION_TYPE_BUY)
+      sell_condition = sell_pattern();
+    else  // POSITION_TYPE_SELL
+      buy_condition = buy_pattern();
+  }
+  else
+  {
+    buy_condition = buy_pattern();
+    if (!buy_condition)
+      sell_condition = sell_pattern();
+  }
 
   if (buy_condition != sell_condition)
   {
