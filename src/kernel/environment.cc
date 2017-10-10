@@ -63,7 +63,7 @@ environment::environment(initialization init)
 ///
 void environment::xml(tinyxml2::XMLDocument *d) const
 {
-  Expects(stat.summary);
+  Expects(!stat.summary_file.empty());
 
   auto *root(d->RootElement());
 
