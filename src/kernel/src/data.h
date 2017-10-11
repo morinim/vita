@@ -28,7 +28,7 @@ namespace vita
 using class_t = unsigned;
 
 ///
-/// Implementation of vita::data for symbolic regression and classification
+/// Specialization of vita::data for symbolic regression and classification
 /// tasks.
 ///
 /// src_data is a forward iterable collection of "monomorphic" examples (all
@@ -46,7 +46,8 @@ public:
   // ---- Aliases ----
   using examples_t = std::vector<example>;
 
-  /// Raw input record. The ETL chain is:
+  /// Raw input record.
+  /// The ETL chain is:
   /// > FILE -> record_t -> example --(vita::push_back)--> vita::src_data
   using record_t = std::vector<std::string>;
 

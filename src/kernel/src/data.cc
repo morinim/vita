@@ -81,7 +81,7 @@ src_data::src_data() : data(training), classes_map_(), header_(),
 /// \param[in] filename name of the file containing the learning collection
 /// \param[in] ft       a filter and transform function
 ///
-src_data::src_data(const std::string &filename, filter_hook_t ft) : data()
+src_data::src_data(const std::string &filename, filter_hook_t ft) : src_data()
 {
   Expects(!filename.empty());
 
@@ -438,8 +438,6 @@ src_data::example src_data::to_example(const std::vector<std::string> &v,
 ///
 std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
 {
-  Expects(active_dataset() == training);
-
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
     return 0;
@@ -687,12 +685,11 @@ std::size_t src_data::load_csv(const std::string &filename, filter_hook_t ft)
 ///
 std::size_t src_data::load(const std::string &f, filter_hook_t ft)
 {
-  auto ends_with =
-    [](const std::string &name, const std::string &ext)
-    {
-      return ext.length() <= name.length() &&
-             std::equal(ext.rbegin(), ext.rend(), name.rbegin());
-    };
+  auto ends_with = [](const std::string &name, const std::string &ext)
+  {
+    return ext.length() <= name.length()
+           && std::equal(ext.rbegin(), ext.rend(), name.rbegin());
+  };
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
