@@ -199,28 +199,28 @@ public:
 
 }  // namespace fxs
 
-template<template<timeframe, unsigned> class F, timeframe TF>
-void insert_symbol(vita::symbol_set *ss)
-{
-  ss->insert(std::make_unique<F<TF, 1>>());
-  ss->insert(std::make_unique<F<TF, 2>>());
-  ss->insert(std::make_unique<F<TF, 3>>());
-}
-
 template<template<timeframe, unsigned> class F>
 void insert_symbol(vita::symbol_set *ss)
 {
-  insert_symbol<F, short_tf>(ss);
-  insert_symbol<F, medium_tf>(ss);
-  insert_symbol<F, long_tf>(ss);
+  ss->insert<F<short_tf, 1>>();
+  ss->insert<F<short_tf, 2>>();
+  ss->insert<F<short_tf, 3>>();
+
+  ss->insert<F<medium_tf, 1>>();
+  ss->insert<F<medium_tf, 2>>();
+  ss->insert<F<medium_tf, 3>>();
+
+  ss->insert<F<long_tf, 1>>();
+  ss->insert<F<long_tf, 2>>();
+  ss->insert<F<long_tf, 3>>();
 }
 
 template<template<timeframe> class F>
 void insert_symbol(vita::symbol_set *ss)
 {
-  ss->insert(std::make_unique<F<short_tf>>());
-  ss->insert(std::make_unique<F<medium_tf>>());
-  ss->insert(std::make_unique<F<long_tf>>());
+  ss->insert<F< short_tf>>();
+  ss->insert<F<medium_tf>>();
+  ss->insert<F<  long_tf>>();
 }
 
 bool setup_symbols(vita::symbol_set *ss)
@@ -243,13 +243,13 @@ bool setup_symbols(vita::symbol_set *ss)
   insert_symbol<fxs::bullish_harami>(ss);
   insert_symbol<fxs::dark_cloud_cover>(ss);
 
-  ss->insert(std::make_unique<fxs::l_and>(), 20.0);
-  ss->insert(std::make_unique< fxs::l_or>(), 20.0);
+  ss->insert<fxs::l_and>(20.0);
+  ss->insert< fxs::l_or>(20.0);
 
-  ss->insert(std::make_unique<fxs::add>(), 20.0);
-  ss->insert(std::make_unique<fxs::sub>(), 20.0);
+  ss->insert<fxs::add>(20.0);
+  ss->insert<fxs::sub>(20.0);
 
-  ss->insert(std::make_unique<fxs::lt_m>(), 20.0);
+  ss->insert<fxs::lt_m>(20.0);
 
   return true;
 }

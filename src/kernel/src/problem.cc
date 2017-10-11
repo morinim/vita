@@ -177,13 +177,13 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
       const auto name(provided_name.empty() ? "X" + std::to_string(i)
                                             : provided_name);
       const category_t category(dat_.get_column(i).category_id);
-      sset.insert(std::make_unique<variable>(name, i - 1, category));
+      sset.insert<variable>(name, i - 1, category);
     }
 
   // Sets up the labels for nominal attributes.
   for (const category &c : dat_.categories())
     for (const std::string &l : c.labels)
-      sset.insert(std::make_unique<constant<std::string>>(l, c.tag));
+      sset.insert<constant<std::string>>(l, c.tag);
 }
 
 ///

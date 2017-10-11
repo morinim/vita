@@ -75,7 +75,7 @@ std::size_t symbol_set::adts() const
 /// \param[in] wr the weight of `s` (`1.0` means standard frequency, `2.0`
 ///               double probability of selection)
 /// \return       a raw pointer to the symbol just added (or `nullptr` in case
-///               of error).
+///               of error)
 ///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {

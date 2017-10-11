@@ -40,6 +40,8 @@ public:
   void clear();
 
   symbol *insert(std::unique_ptr<symbol>, double = 1.0);
+  template<class S, class ...Args> symbol *insert(double, Args &&...);
+  template<class S, class ...Args> symbol *insert(Args &&...);
 
   const symbol &roulette() const;
   const symbol &roulette(category_t) const;
@@ -162,6 +164,36 @@ private:
   // - `views_[0].all.size()` is the number of symbols in category `0`
   std::vector<collection> views_;
 };
+
+///
+/// Adds a symbol to the symbol set.
+///
+/// \tparam    S    symbol to be added
+/// \param[in] wr   the weight of `S` (`1.0` means standard frequency, `2.0`
+///                 double probability of selection)
+/// \param[in] args arguments used to build `S`
+/// \return         a raw pointer to the symbol just added (or `nullptr` in
+///                 case of error)
+///
+/// Insert a symbol in the symbol set without the user having to allocate
+/// memory. It doesn't completely replace the `insert(std::unique_ptr)`
+/// method (e.g. building from factory).
+///
+template<class S, class ...Args> symbol *symbol_set::insert(double wr,
+                                                            Args &&... args)
+{
+  return insert(std::make_unique<S>(args...), wr);
+}
+
+///
+/// Adds a symbol to the symbol set.
+///
+/// \note Assumes a standard frequency (`1.0`) for symbol `S`.
+///
+template<class S, class ...Args> symbol *symbol_set::insert(Args &&... args)
+{
+  return insert(std::make_unique<S>(args...), 1.0);
+}
 
 std::ostream &operator<<(std::ostream &, const symbol_set &);
 

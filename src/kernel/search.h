@@ -45,7 +45,7 @@ public:
 
   summary<T> run(unsigned = 1);
 
-  template<class E, class ...Args> void set_evaluator(Args &&... args);
+  template<class E, class ...Args> void set_evaluator(Args &&...);
 
   void set_validator(std::unique_ptr<validation_strategy>);
 
