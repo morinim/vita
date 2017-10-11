@@ -44,7 +44,7 @@ struct F_FACTORY3
     x = prob.sset.insert(factory.make("123.0"));
     neg_x = prob.sset.insert(factory.make("-123.0"));
     y = prob.sset.insert(factory.make("321.0"));
-    z = prob.sset.insert(std::make_unique<Z>());
+    z = prob.sset.insert<Z>();
     f_abs = prob.sset.insert(factory.make("FABS"));
     f_add = prob.sset.insert(factory.make("FADD"));
     f_aq = prob.sset.insert(factory.make("FAQ"));

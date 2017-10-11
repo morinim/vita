@@ -97,9 +97,9 @@ int main(int argc, char *argv[])
   p.env.generations = static_cast<unsigned>(argc>3 ? std::atoi(argv[3]) : 100);
 
   symbol_factory factory;
-  p.sset.insert(std::make_unique<X>());
-  p.sset.insert(std::make_unique<Y>());
-  p.sset.insert(std::make_unique<Z>());
+  p.sset.insert<X>();
+  p.sset.insert<Y>();
+  p.sset.insert<Z>();
   p.sset.insert(factory.make("FADD"));
   p.sset.insert(factory.make("FSUB"));
   p.sset.insert(factory.make("FMUL"));
