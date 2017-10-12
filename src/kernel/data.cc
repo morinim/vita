@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,10 +23,10 @@ data::data(dataset_t d) : active_dataset_(d)
 }
 
 ///
-/// \param[in] d the active dataset.
-///
 /// Activates the dataset we want to operate on (training / validation /
 /// test set).
+///
+/// \param[in] d the active dataset
 ///
 void data::select(dataset_t d)
 {
@@ -34,7 +34,7 @@ void data::select(dataset_t d)
 }
 
 ///
-/// \return the type (training, validation, test) of the active dataset.
+/// \return the type (training, validation, test) of the active dataset
 ///
 data::dataset_t data::active_dataset() const
 {
