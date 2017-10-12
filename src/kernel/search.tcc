@@ -33,10 +33,9 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr),
 /// Calculates problem-specific metrics regarding the solution found.
 ///
 /// \param[in] s summary of the evolution run just finished
-/// \return      the fitness of `s.best.solution` (other record of
-///              model_measurements are unmodified).
+/// \return      `s.best.score`
 ///
-/// Specializations of this method can calculate further problem specific
+/// Specializations of this method can calculate further problem-specific
 /// metrics regarding `s.best.solution`.
 ///
 template<class T, template<class> class ES>

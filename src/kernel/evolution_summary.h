@@ -21,23 +21,24 @@
 namespace vita
 {
 ///
-/// \brief A summary of evolution (results, statistics...)
+/// A summary of evolution (results, statistics...).
 ///
 /// \tparam T type of individual
 ///
 template<class T>
 class summary
 {
-public:  // Constructor and support functions
+public:
+  // --- Constructor and support functions ---
   summary();
 
   void clear();
 
-public:   // Serialization
+  // --- Serialization ---
   bool load(std::istream &, const problem &);
   bool save(std::ostream &) const;
 
-public:  // Public data members
+  // --- Public data members ---
   analyzer<T> az;
 
   struct
@@ -49,7 +50,11 @@ public:  // Public data members
   /// Time elapsed from evolution beginning.
   std::chrono::milliseconds elapsed;
 
-  std::uintmax_t crossovers, mutations;
+  /// Number of crossovers performed.
+  std::uintmax_t crossovers;
+
+  /// Number of mutations performed.
+  std::uintmax_t mutations;
 
   unsigned gen, last_imp;
 };
@@ -58,4 +63,4 @@ public:  // Public data members
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

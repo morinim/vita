@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief A collection of measurements
+/// A collection of measurements.
 ///
 struct model_measurements
 {
@@ -34,8 +34,8 @@ struct model_measurements
 };
 
 ///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparision.
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparision
 ///
 /// \warning
 /// This is a partial ordering relation since is somewhat based on Pareto

@@ -27,7 +27,7 @@ summary<T>::summary() : az(), best{T(), model_measurements()}, elapsed(0),
 }
 
 ///
-/// \brief Resets summary informations
+/// Resets summary informations.
 ///
 template<class T>
 void summary<T>::clear()
@@ -36,9 +36,11 @@ void summary<T>::clear()
 }
 
 ///
-/// \param[in] in input stream.
-/// \param[in] p  active problem.
-/// \return `true` if the object loaded correctly.
+/// Loads the object from a stream.
+///
+/// \param[in] in input stream
+/// \param[in] p  active problem
+/// \return       `true` if the object loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current object isn't changed.
@@ -84,8 +86,10 @@ bool summary<T>::load(std::istream &in, const problem &p)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if summary was saved correctly.
+/// Saves the object into a stream.
+///
+/// \param[out] out output stream
+/// \return     `true` if summary was saved correctly
 ///
 template<class T>
 bool summary<T>::save(std::ostream &out) const
@@ -110,4 +114,4 @@ bool summary<T>::save(std::ostream &out) const
   return out.good();
 }
 
-#endif  // Include guard
+#endif  // include guard
