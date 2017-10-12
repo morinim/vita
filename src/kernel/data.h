@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,8 +19,7 @@ namespace vita
 {
 
 ///
-/// \brief Interface for data used by vita::search class to to evolve
-///        vita::population.
+/// Interface for data used by vita::search class to evolve vita::population.
 ///
 class data
 {
@@ -39,12 +38,12 @@ public:
   enum dataset_t {training = 0, validation, test, npos};
 
   // ---- Constructors ----
-  explicit data(dataset_t = npos);
+  explicit data(dataset_t = training);
 
-  void select(dataset_t);
-  dataset_t active_dataset() const;
-
+  virtual void select(dataset_t);
   virtual bool has(dataset_t) const = 0;
+
+  dataset_t active_dataset() const;
 
 private:
   dataset_t active_dataset_;
