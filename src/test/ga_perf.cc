@@ -36,12 +36,9 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
 {
   vita::print.verbosity(vita::log::L_WARNING);
 
-  vita::problem prob;
   prob.env.individuals = 100;
   prob.env.generations = 2000;
   prob.env.threshold.fitness = {0, 0};
-  prob.env.stat.dir = ".";
-  prob.env.stat.layers = true;
   prob.sset.insert(vita::ga::parameter(0, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(1, -2.3, 2.3));
   prob.sset.insert(vita::ga::parameter(2, -3.2, 3.2));
@@ -49,52 +46,52 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
   prob.sset.insert(vita::ga::parameter(4, -3.2, 3.2));
 
   auto f = [](const std::vector<double> &x)
-           {
-             return -std::exp(x[0] * x[1] * x[2] * x[3] * x[4]);
-           };
+  {
+    return -std::exp(x[0] * x[1] * x[2] * x[3] * x[4]);
+  };
 
   auto p = [](const vita::i_de &prg)
+  {
+    auto h1 = [](const std::vector<double> &x)
     {
-      auto h1 = [](const std::vector<double> &x)
-      {
-        return x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3] +
-               x[4] * x[4] - 10.0;
-      };
-      auto h2 = [](const std::vector<double> &x)
-      {
-        return x[1] * x[2] - 5.0 * x[3] * x[4];
-      };
-      auto h3 = [](const std::vector<double> &x)
-      {
-        return x[0] * x[0] * x[0] + x[1] * x[1] * x[1] + 1.0;
-      };
-
-      const double delta(0.01);
-
-      double r(0.0);
-
-      const auto c1(std::abs(h1(prg)));
-      if (c1 > delta)
-        r += c1;
-
-      const auto c2(std::abs(h2(prg)));
-      if (c2 > delta)
-        r += c2;
-
-      const auto c3(std::abs(h3(prg)));
-      if (c3 > delta)
-        r += c3;
-
-      for (const auto &pi : prg)
-      {
-        if (pi < -2.3)
-          r += -2.3 - pi;
-        else if (pi > 3.2)
-          r += pi - 3.2;
-      }
-
-      return r;
+      return x[0] * x[0] + x[1] * x[1] + x[2] * x[2] + x[3] * x[3] +
+      x[4] * x[4] - 10.0;
     };
+    auto h2 = [](const std::vector<double> &x)
+    {
+      return x[1] * x[2] - 5.0 * x[3] * x[4];
+    };
+    auto h3 = [](const std::vector<double> &x)
+    {
+      return x[0] * x[0] * x[0] + x[1] * x[1] * x[1] + 1.0;
+    };
+
+    const double delta(0.01);
+
+    double r(0.0);
+
+    const auto c1(std::abs(h1(prg)));
+    if (c1 > delta)
+      r += c1;
+
+    const auto c2(std::abs(h2(prg)));
+    if (c2 > delta)
+      r += c2;
+
+    const auto c3(std::abs(h3(prg)));
+    if (c3 > delta)
+      r += c3;
+
+    for (const auto &pi : prg)
+    {
+      if (pi < -2.3)
+        r += -2.3 - pi;
+      else if (pi > 3.2)
+        r += pi - 3.2;
+    }
+
+    return r;
+  };
 
   vita::ga_search<vita::i_de, vita::de_es, decltype(f)> s(prob, f, p);
   BOOST_TEST(s.debug());
