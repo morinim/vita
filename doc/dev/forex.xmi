@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XMI verified="false" xmi.version="1.2" timestamp="2017-09-11T15:11:38" xmlns:UML="http://schema.omg.org/spec/UML/1.3">
+<XMI verified="false" xmi.version="1.2" timestamp="2017-10-14T12:28:53" xmlns:UML="http://schema.omg.org/spec/UML/1.3">
  <XMI.header>
   <XMI.documentation>
    <XMI.exporter>umbrello uml modeller http://umbrello.kde.org</XMI.exporter>
@@ -291,7 +291,7 @@
          </assocwidget>
         </associations>
        </diagram>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="1" showstereotype="1" name="state diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="325" canvaswidth="474" localid="-1" snapcsgrid="0" showgrid="1" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="qKxm5pCxIGWh" documentation="" showscope="1" snapgrid="1" showatts="1" type="5">
+       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="1" showstereotype="1" name="state diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="150" canvaswidth="274" localid="-1" snapcsgrid="0" showgrid="1" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="qKxm5pCxIGWh" documentation="" showscope="1" snapgrid="1" showatts="1" type="5">
         <widgets>
          <statewidget linecolor="none" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-250" showstereotype="1" y="-300" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="MK1iVbd9hwrO" statename="State" statetype="0" width="10" isinstance="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="NeBUhqI0n45d" documentation="" height="10">
           <Activities/>
@@ -319,7 +319,6 @@
          <UML:Namespace.ownedElement>
           <UML:Component visibility="public" isSpecification="false" namespace="k0mQOvym6ZVD" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Rz4tpvzkkcEC" name="forex" executable="1"/>
           <UML:Component visibility="public" isSpecification="false" namespace="k0mQOvym6ZVD" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="Z7HtmngDCyOG" name="driver.py" executable="1"/>
-          <UML:Component visibility="public" isSpecification="false" namespace="k0mQOvym6ZVD" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="RUyKAVRRMBE0" name="gpea.ini" executable="0"/>
           <UML:Component visibility="public" isSpecification="false" namespace="k0mQOvym6ZVD" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="cMG6LhaJzkmQ" name="forex.xml" executable="0"/>
           <UML:Component visibility="public" isSpecification="false" namespace="k0mQOvym6ZVD" isAbstract="false" isLeaf="false" isRoot="false" xmi.id="PHSmBMgvmPmH" name="template.mq5" executable="0"/>
          </UML:Namespace.ownedElement>
@@ -336,50 +335,42 @@
      </UML:Namespace.ownedElement>
      <XMI.extension xmi.extender="umbrello">
       <diagrams>
-       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="1" showstereotype="1" name="vita-core - Component diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="402" canvaswidth="652" localid="-1" snapcsgrid="0" showgrid="1" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="100" xmi.id="a5e3DruzqTM8" documentation="" showscope="1" snapgrid="1" showatts="1" type="7">
+       <diagram showopsig="1" linecolor="#ff0000" snapx="25" showattribassocs="1" snapy="25" linewidth="0" showattsig="1" textcolor="#000000" isopen="1" showpackage="1" showpubliconly="1" showstereotype="1" name="vita-core - Component diagram" font="Sans Serif,9,-1,0,50,0,0,0,0,0" canvasheight="324.680419921875" canvaswidth="667.0412345964885" localid="-1" snapcsgrid="0" showgrid="1" showops="1" griddotcolor="#d3d3d3" backgroundcolor="#ffffff" usefillcolor="1" fillcolor="#ffff00" zoom="97" xmi.id="a5e3DruzqTM8" documentation="" showscope="1" snapgrid="1" showatts="1" type="7">
         <widgets>
          <componentwidget width="164" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-725" usesdiagramfillcolor="0" isinstance="0" localid="kaGbLfVnTPKB" fillcolor="#ffff00" height="62" linecolor="#ff0000" xmi.id="Rz4tpvzkkcEC" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
          <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-650" usesdiagramfillcolor="0" isinstance="0" localid="ElbMtp90btzW" fillcolor="#ffff00" height="62" linecolor="#ff0000" xmi.id="Z7HtmngDCyOG" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
-         <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-575" usesdiagramfillcolor="0" isinstance="0" localid="OzlefzPGLJ3U" fillcolor="#ffff00" height="60" linecolor="#ff0000" xmi.id="RUyKAVRRMBE0" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
-         <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-500" usesdiagramfillcolor="0" isinstance="0" localid="9ZO9yn6jRjgp" fillcolor="#ffff00" height="60" linecolor="#ff0000" xmi.id="cMG6LhaJzkmQ" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
-         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-725" text="Executable controlling the evolution process." font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="eawYFVdDLASA" width="173" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="vQ83ecf6MrTo" height="61"/>
-         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-650" text="Python program interfacing the forex executable and Metatrader 5." font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="0xLvzT6XCRQ3" width="227" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="FTqRdgJN9FTU" height="63"/>
-         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-575" text="Control parameters for Metatrader 5 Strategy Tester." font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="3jN88bCKunrE" width="223" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="fhcL3NeECdlM" height="60"/>
-         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-500" text="Control parameters for the forex executable" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="E4JmNIiRz3X5" width="174" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="ehNWUFk8uMTv" height="60"/>
-         <componentwidget width="174" showstereotype="1" x="-1425" usesdiagramusefillcolor="0" y="-750" usesdiagramfillcolor="0" isinstance="0" localid="AJHFncfEAhLC" fillcolor="#ffff00" height="402" linecolor="none" xmi.id="k0mQOvym6ZVD" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
-         <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-425" usesdiagramfillcolor="0" isinstance="0" localid="RfdO5ufCBBns" fillcolor="#ffff00" height="61" linecolor="none" xmi.id="PHSmBMgvmPmH" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
-         <notewidget linecolor="none" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-425" text="Skeleton of an EA" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="dZyYfZy5sDQC" width="176" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="mzTKKiC2LD4Q" height="60"/>
+         <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-575" usesdiagramfillcolor="0" isinstance="0" localid="9ZO9yn6jRjgp" fillcolor="#ffff00" height="60" linecolor="#ff0000" xmi.id="cMG6LhaJzkmQ" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
+         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-725" text="Executable controlling the evolution process" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="eawYFVdDLASA" width="224.5463926964198" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="vQ83ecf6MrTo" height="62.03092748111067"/>
+         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-650" text="Python program interfacing the forex executable and Metatrader 5" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="0xLvzT6XCRQ3" width="224.9381451164323" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="FTqRdgJN9FTU" height="65.06185913085938"/>
+         <notewidget linecolor="#ff0000" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-575" text="Control parameters for the forex executable / Metatrader 5 simulator" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="E4JmNIiRz3X5" width="224.5154614006121" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="ehNWUFk8uMTv" height="60.00000102249612"/>
+         <componentwidget width="175.0309295654297" showstereotype="1" x="-1425" usesdiagramusefillcolor="0" y="-750" usesdiagramfillcolor="0" isinstance="0" localid="AJHFncfEAhLC" fillcolor="#ffff00" height="324.680419921875" linecolor="none" xmi.id="k0mQOvym6ZVD" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
+         <componentwidget width="163" showstereotype="1" x="-1200" usesdiagramusefillcolor="0" y="-500" usesdiagramfillcolor="0" isinstance="0" localid="RfdO5ufCBBns" fillcolor="#ffff00" height="61" linecolor="none" xmi.id="PHSmBMgvmPmH" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0"/>
+         <notewidget linecolor="none" usesdiagramfillcolor="0" linewidth="0" textcolor="#000000" usesdiagramusefillcolor="0" x="-1000" showstereotype="1" y="-500" text="Skeleton of an EA" font="Sans Serif,9,-1,0,50,0,0,0,0,0" localid="dZyYfZy5sDQC" width="225.4845301048042" isinstance="0" noteType="0" usefillcolor="1" fillcolor="#ffff00" xmi.id="mzTKKiC2LD4Q" height="61.03092783505156"/>
         </widgets>
         <messages/>
         <associations>
          <assocwidget roleBdoc="" linecolor="none" indexa="1" usesdiagramfillcolor="1" widgetbid="Rz4tpvzkkcEC" indexb="1" linewidth="none" seqnum="" textcolor="none" usesdiagramusefillcolor="1" totalcounta="2" totalcountb="2" roleAdoc="" widgetaid="k0mQOvym6ZVD" font="Sans Serif,9,-1,0,50,0,0,0,0,0" visibilityA="0" visibilityB="0" usefillcolor="1" fillcolor="none" changeabilityA="900" changeabilityB="900" documentation="" type="509">
           <linepath layout="Polyline">
-           <startpoint startx="-1251" starty="-725"/>
+           <startpoint startx="-1249.96907043457" starty="-725"/>
            <endpoint endx="-1200" endy="-725"/>
           </linepath>
          </assocwidget>
          <assocwidget roleBdoc="" linecolor="none" indexa="1" usesdiagramfillcolor="0" widgetbid="Z7HtmngDCyOG" indexb="1" linewidth="none" seqnum="" textcolor="none" usesdiagramusefillcolor="1" totalcounta="2" totalcountb="2" roleAdoc="" widgetaid="k0mQOvym6ZVD" font="Sans Serif,9,-1,0,50,0,0,0,0,0" visibilityA="0" visibilityB="0" usefillcolor="1" fillcolor="#ffff00" changeabilityA="900" changeabilityB="900" documentation="" type="509">
           <linepath layout="Polyline">
-           <startpoint startx="-1251" starty="-650"/>
+           <startpoint startx="-1249.96907043457" starty="-650"/>
            <endpoint endx="-1200" endy="-650"/>
-          </linepath>
-         </assocwidget>
-         <assocwidget roleBdoc="" linecolor="none" indexa="1" usesdiagramfillcolor="0" widgetbid="RUyKAVRRMBE0" indexb="1" linewidth="none" seqnum="" textcolor="none" usesdiagramusefillcolor="1" totalcounta="2" totalcountb="2" roleAdoc="" widgetaid="k0mQOvym6ZVD" font="Sans Serif,9,-1,0,50,0,0,0,0,0" visibilityA="0" visibilityB="0" usefillcolor="1" fillcolor="#ffff00" changeabilityA="900" changeabilityB="900" documentation="" type="509">
-          <linepath layout="Polyline">
-           <startpoint startx="-1251" starty="-575"/>
-           <endpoint endx="-1200" endy="-575"/>
           </linepath>
          </assocwidget>
          <assocwidget roleBdoc="" linecolor="none" indexa="1" usesdiagramfillcolor="0" widgetbid="cMG6LhaJzkmQ" indexb="1" linewidth="none" seqnum="" textcolor="none" usesdiagramusefillcolor="0" totalcounta="2" totalcountb="2" roleAdoc="" widgetaid="k0mQOvym6ZVD" font="Sans Serif,9,-1,0,50,0,0,0,0,0" visibilityA="0" visibilityB="0" usefillcolor="1" fillcolor="#ffff00" changeabilityA="900" changeabilityB="900" documentation="" type="509">
           <linepath layout="Polyline">
-           <startpoint startx="-1251" starty="-500"/>
-           <endpoint endx="-1200" endy="-500"/>
+           <startpoint startx="-1249.96907043457" starty="-575"/>
+           <endpoint endx="-1200" endy="-575"/>
           </linepath>
          </assocwidget>
          <assocwidget indexa="1" indexb="1" usesdiagramusefillcolor="0" widgetaid="k0mQOvym6ZVD" usesdiagramfillcolor="0" fillcolor="#ffff00" linecolor="#ff0000" seqnum="" totalcounta="2" xmi.id="lrx0KEz1nxJP" widgetbid="PHSmBMgvmPmH" totalcountb="2" type="509" textcolor="#000000" usefillcolor="1" linewidth="0" font="Sans Serif,9,-1,0,50,0,0,0,0,0">
           <linepath layout="Polyline">
-           <startpoint startx="-1251" starty="-425"/>
-           <endpoint endx="-1200" endy="-425"/>
+           <startpoint startx="-1249.96907043457" starty="-500"/>
+           <endpoint endx="-1200" endy="-500"/>
           </linepath>
          </assocwidget>
         </associations>
@@ -472,7 +463,7 @@
   </UML:Model>
  </XMI.content>
  <XMI.extensions xmi.extender="umbrello">
-  <docsettings viewid="gvH5js7uruDZ" uniqueid="2CVh8M5TzGvg" documentation=""/>
+  <docsettings viewid="a5e3DruzqTM8" uniqueid="2CVh8M5TzGvg" documentation=""/>
   <listview>
    <listitem open="1" type="800" id="Views">
     <listitem open="1" type="821" id="Component View">
@@ -482,7 +473,6 @@
        <listitem open="0" type="822" id="Z7HtmngDCyOG"/>
        <listitem open="0" type="822" id="Rz4tpvzkkcEC"/>
        <listitem open="0" type="822" id="cMG6LhaJzkmQ"/>
-       <listitem open="0" type="822" id="RUyKAVRRMBE0"/>
        <listitem open="1" type="822" id="PHSmBMgvmPmH"/>
       </listitem>
      </listitem>
