@@ -14,4 +14,15 @@
 	<terminal>C:/Program Files/MetaTrader/terminal64.exe</terminal>
 	<timeout>120</timeout>
   </metatrader>
+
+  <tester>
+	<symbol>EURUSD</symbol>
+	<period>M15</period>
+	<deposit>10000</deposit>
+	<model>1</model>  <!-- see https://www.mql5.com/en/articles/2612 -->
+	<execution_mode>65</execution_mode>
+	<from_date>2016-01-01</from_date>
+	<to_date>2017-01-01</to_date>
+	<forward_date></forward_date>
+  </tester>
 </mtgp>

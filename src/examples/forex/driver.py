@@ -78,9 +78,6 @@ class Metatrader:
         self._timeout = timeout
         self._quiet = quiet
 
-        shutil.copy(os.path.join(self._working_dir, self._ini_name),
-                    self._data_dir)
-
     def _log(self, *args, **kwargs):
         if not self._quiet:
             print(*args, **kwargs)
@@ -159,9 +156,10 @@ class Metatrader:
     def simulator(self, ini = ""):
         self._log("STARTING SIMULATION")
 
-        ini = default(ini,
-                      os.path.join(self._data_dir,
-                                   self._ini_name).replace("/", "\\"))
+        if not ini:
+            ini = os.path.join(self._data_dir, self._ini_name)
+            shutil.move(os.path.join(self._working_dir, self._ini_name), ini)
+            ini = ini.replace("/", "\\")
 
         cmd = [self._terminal, "/config:{}".format(ini)]
 

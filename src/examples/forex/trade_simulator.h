@@ -13,6 +13,23 @@
 #define      FOREX_TRADE_SIMULATOR_H
 
 #include "kernel/vita.h"
+#include "third_party/date/date.h"
+
+///
+/// A temporal interval.
+///
+struct period
+{
+  period() = default;
+  period(date::year_month_day d1, date::year_month_day d2)
+    : start(std::min(d1, d2)), end(std::max(d1, d2))
+  { Expects(!empty()); }
+
+  bool empty() const { return start == end; }
+
+  date::year_month_day start;
+  date::year_month_day   end;
+};
 
 ///
 /// Interface to Metatrader5 software.
@@ -26,11 +43,23 @@ public:
 
 private:
   std::string full_path(const std::string &) const;
+  void write_ea_file(const vita::team<vita::i_mep> &) const;
+  void write_ini_file(const period &) const;
 
   std::string      ea_name_;
   std::string  ea_template_;
+  std::string     ini_name_;
   std::string results_name_;
   std::string  working_dir_;
+
+  std::string        deposit_;
+  std::string execution_mode_;
+  std::string          model_;
+  std::string         period_;
+  std::string         symbol_;
+
+  period   training_set_;
+  period validation_set_;
 };
 
 #endif  // include guard

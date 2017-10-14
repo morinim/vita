@@ -11,8 +11,8 @@
 
 #include <chrono>
 #include <cstdio>
+#include <iostream>
 #include <stdexcept>
-
 
 // MinGW compiled with the win32 threading model (a common choice) at the
 // moment doesn't support C++11 threading classes (see
@@ -32,13 +32,24 @@ inline void sleep_for(std::chrono::milliseconds x)
 #include "utility/utility.h"
 #include "tinyxml2/tinyxml2.h"
 
+// Always output Windows EOL (`\r\n`).
+// This is useful for ini files of Windows programs.
+std::ostream &wendl(std::ostream &o)
+{
+  o.put('\r');
+  o.put('\n');
+  return o;
+}
+
 std::string trade_simulator::full_path(const std::string &fn) const
 {
   return vita::merge_path(working_dir_, fn);
 }
 
 ///
-/// \param[in] example_dir directory containing configuration files
+/// Inits the object.
+///
+/// Reads the configuration from `forex.xml` file.
 ///
 trade_simulator::trade_simulator()
 {
@@ -46,36 +57,108 @@ trade_simulator::trade_simulator()
 
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(ini.c_str()) != tinyxml2::XML_SUCCESS)
-    throw std::runtime_error("Error opening initialization file: " + ini);
+    throw std::runtime_error("Error opening configuration file: " + ini);
 
   tinyxml2::XMLHandle h(&doc);
   tinyxml2::XMLHandle files(h.FirstChildElement("mtgp")
                              .FirstChildElement("files"));
+  tinyxml2::XMLHandle tester(h.FirstChildElement("mtgp")
+                              .FirstChildElement("tester"));
 
-  const auto coalesce = [](const tinyxml2::XMLElement *e, const char def[])
-                        {
-                          return e && e->GetText() ? e->GetText() : def;
-                        };
+  const auto value_or = [](tinyxml2::XMLHandle he, const char def[])
+  {
+    return he.ToElement() && he.ToElement()->GetText()
+             ? he.ToElement()->GetText() : def;
+  };
 
-  // --- Template name ---
-  auto *e(files.FirstChildElement("template").ToElement());
-  std::string f_ea_template(coalesce(e, "template.mq5"));
-  std::ifstream from(full_path(f_ea_template));
-  if (!from)
-    throw std::runtime_error("Error opening EA template: " + f_ea_template);
+  auto read_file = [this](const std::string name)
+  {
+    std::ifstream from(full_path(name));
+    if (!from)
+      throw std::runtime_error("Error opening " + name);
 
-  std::stringstream buffer;
-  buffer << from.rdbuf();
-  ea_template_ = buffer.str();
+    std::stringstream buffer;
+    buffer << from.rdbuf();
+    return buffer.str();
+  };
 
-  ea_name_ = coalesce(files.FirstChildElement("name").ToElement(), "gpea.mq5");
-  results_name_ = coalesce(files.FirstChildElement("results").ToElement(),
-                           "results.txt");
-  working_dir_ = coalesce(files.FirstChildElement("workingdir").ToElement(),
-                          "./");
+  // --- Various filenames ---
+  ea_name_      = value_or(files.FirstChildElement("name"), "gpea.mq5");
+  ini_name_     = value_or(files.FirstChildElement("ini"), "gpea.ini");
+  results_name_ = value_or(files.FirstChildElement("results"), "results.txt");
+  working_dir_  = value_or(files.FirstChildElement("workingdir"), "./");
+
+  // --- Content of buffered files ---
+  ea_template_ = read_file(value_or(files.FirstChildElement("template"),
+                                    "template.mq5"));
+
+  // --- Testing parameters ---
+  symbol_         = value_or(tester.FirstChildElement("symbol"), "EURUSD");
+  period_         = value_or(tester.FirstChildElement("period"), "M15");
+  deposit_        = value_or(tester.FirstChildElement("deposit"), "10000");
+  model_          = value_or(tester.FirstChildElement("model"), "1");
+  execution_mode_ = value_or(tester.FirstChildElement("execution_mode"), "65");
+
+  std::istringstream from_date(value_or(tester.FirstChildElement("from_date"),
+                                        "2016-01-01"));
+  std::istringstream to_date(value_or(tester.FirstChildElement("to_date"),
+                                      "2017-01-01"));
+  std::istringstream forward_date(
+    value_or(tester.FirstChildElement("forward_date"), ""));
+
+  from_date >> date::parse("%F", training_set_.start);
+
+  if (forward_date.str().empty())
+    to_date >> date::parse("%F", training_set_.end);
+  else
+  {
+    forward_date >> date::parse("%F", validation_set_.start);
+    to_date >> date::parse("%F", validation_set_.end);
+    training_set_.end = date::sys_days(validation_set_.start) - date::days(1);
+  }
+
+  Ensures(validation_set_.empty() == forward_date.str().empty());
+  Ensures(!training_set_.empty());
 }
 
-vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
+void trade_simulator::write_ini_file(const period &p) const
+{
+  // Get the expert name removing the extension from EA filename.
+  std::string expert(ea_name_);
+  auto last_dot(expert.find_last_of("."));
+  if (last_dot != std::string::npos)
+    expert = expert.substr(0, last_dot);
+
+  // See <https://www.metatrader5.com/en/terminal/help/start_advanced/start>
+  std::ofstream o(full_path(ini_name_));
+  if (!o)
+    throw std::runtime_error("Error creating ini file: " + ini_name_);
+
+  o << "[Tester]"                          << wendl
+    << "Expert="        << expert          << wendl
+    << "Symbol="        << symbol_         << wendl
+    << "Period="        << period_         << wendl
+    << "Deposit="       << deposit_        << wendl
+    << "Model="         << model_          << wendl
+    << "Optimization=0"                    << wendl
+    << "ExecutionMode=" << execution_mode_ << wendl;
+
+  o << "FromDate=";
+  date::to_stream(o, "%Y.%m.%d", p.start);
+  o << wendl;
+
+  o << "ToDate=";
+  date::to_stream(o, "%Y.%m.%d", p.end);
+  o << wendl;
+
+  o << "ReplaceReport=1" << wendl
+    << "ShutdownTerminal=1" << wendl
+    << "Visual=0" << wendl;
+
+  o.close();
+}
+
+void trade_simulator::write_ea_file(const vita::team<vita::i_mep> &prg) const
 {
   std::stringstream ss[2];
 
@@ -99,7 +182,14 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
     throw std::runtime_error("Error creating EA file: " + fo);
   o << ea;
   o.close();
+
   std::rename(fo_tmp.c_str(), fo.c_str());
+}
+
+vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
+{
+  write_ini_file(training_set_);
+  write_ea_file(prg);
 
   const auto fr(full_path(results_name_));
   std::ifstream results(fr);
@@ -133,12 +223,10 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
   double fit(profit - drawdown + std::sqrt(std::min(trades, 100.0)));
   vita::fitness_t ret({fit, profit, drawdown, trades});
 
-  vita::print.debug("CURRENT EA. Profit:", profit,
+  vita::print.info("CURRENT EA. Profit:", profit,
                     " Drawdown:", drawdown,
                     " Trades:", trades,
                     " Fit:", fit);
 
   return ret;
-
-  //const double active_symbols(prg.active_symbols());
 }
