@@ -186,6 +186,11 @@ void trade_simulator::write_ea_file(const vita::team<vita::i_mep> &prg) const
   std::rename(fo_tmp.c_str(), fo.c_str());
 }
 
+date::days period::size() const
+{
+  return date::sys_days(end) - date::sys_days(start);
+}
+
 vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
 {
   write_ini_file(training_set_);
@@ -203,11 +208,11 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
   if (!(results >> profit))
     throw std::runtime_error("Cannot read profit from " + fr);
 
-  unsigned short_trades;
+  double short_trades;
   if (!(results >> short_trades))
     throw std::runtime_error("Cannot read number of short trades from " + fr);
 
-  unsigned long_trades;
+  double long_trades;
   if (!(results >> long_trades))
     throw std::runtime_error("Cannot read numer of long trades from " + fr);
 
@@ -218,15 +223,13 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
   results.close();
   std::remove(fr.c_str());
 
-  const double trades(short_trades + long_trades);
-
+  const auto trades(short_trades + long_trades);
   double fit(profit - drawdown + std::sqrt(std::min(trades, 100.0)));
-  vita::fitness_t ret({fit, profit, drawdown, trades});
 
   vita::print.info("CURRENT EA. Profit:", profit,
-                    " Drawdown:", drawdown,
-                    " Trades:", trades,
-                    " Fit:", fit);
+                   " Drawdown:", drawdown,
+                   " Trades:", trades,
+                   " Fit:", fit);
 
-  return ret;
+  return {fit, profit, drawdown, trades};
 }

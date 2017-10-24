@@ -26,6 +26,7 @@ struct period
   { Expects(!empty()); }
 
   bool empty() const { return start == end; }
+  date::days size() const;
 
   date::year_month_day start;
   date::year_month_day   end;
