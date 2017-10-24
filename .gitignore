@@ -21,7 +21,6 @@ src/examples/sr/symbolset
 
 # Executables
 src/build/
-src/examples/forex/forex_results/
 
 # External tools
 tools/cppcheck/
