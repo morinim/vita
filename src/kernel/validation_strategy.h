@@ -19,8 +19,8 @@ namespace vita
 {
 
 ///
-/// \brief Interface for specific training / cross validation techniques (e.g.
-///        one round cross validation, dynamic subsect selection...).
+/// Interface for specific training / cross validation techniques (e.g.
+/// one round cross validation, dynamic subsect selection...).
 ///
 class validation_strategy
 {
@@ -33,7 +33,7 @@ public:
 };
 
 ///
-/// \brief a "null object" implementation of validation_strategy.
+/// A "null object" implementation of validation_strategy.
 ///
 /// Implements the interface of a `validation_strategy` with empty body
 /// methods (it's very predictable and has no side effects: it does nothing).

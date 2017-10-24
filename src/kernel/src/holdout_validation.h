@@ -20,8 +20,8 @@ namespace vita
 {
 
 ///
-/// \brief Holdout validation, aka one round cross-validation or conventional
-///        validation.
+/// Holdout validation, aka *one round cross-validation* or *conventional
+/// validation*.
 ///
 /// Holdout validation involves partitioning a sample of data into
 /// complementary subsets, performing the analysis on one subset (called the

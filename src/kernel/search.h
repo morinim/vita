@@ -25,9 +25,7 @@ namespace vita
 /// \tparam T  the type of individual used
 /// \tparam ES the adopted evolution strategy
 ///
-/// The class offers a general / customizable search strategy (the design
-/// adheres to the NVI pattern, see "Virtuality" in C/C++ Users Journal
-/// September 2001 - <http://www.gotw.ca/publications/mill18.htm>).
+/// The class offers a general / customizable search strategy.
 ///
 /// \note
 /// The "template template parameter" approach allows coordination between `T`

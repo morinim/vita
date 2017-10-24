@@ -20,7 +20,7 @@ namespace vita
 {
 
 ///
-/// \brief Dynamic Training Subset Selection.
+/// Dynamic training Subset Selection.
 ///
 /// When using GP on a difficult problem, with a large set of training data,
 /// a large population size is needed and a very large number of evaluations
