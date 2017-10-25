@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,10 @@
 #define      VITA_MATRIX_TCC
 
 ///
-/// \brief Standard `rs` x `cs` matrix. Entries aren't initialized
-/// \param[in] rs number of rows.
-/// \param[in] cs number of columns.
+/// Standard `rs` x `cs` matrix.
+///
+/// \param[in] rs number of rows
+/// \param[in] cs number of columns
 ///
 /// \note
 /// Default values for `rs` and `cs` is `0` (i.e. uninitialized matrix,
@@ -29,14 +30,14 @@
 template<class T>
 matrix<T>::matrix(std::size_t rs, std::size_t cs) : data_(rs * cs), cols_(cs)
 {
-  assert((rs && cs) || (!rs && !cs));
+  Expects((rs && cs) || (!rs && !cs));
 }
 
 ///
-/// \param[in] r row.
-/// \param[in] c column.
-/// \return the index in the internal vector used to store the content of the
-///         matrix.
+/// \param[in] r row
+/// \param[in] c column
+/// \return      the index in the internal vector used to store the content of
+///              the matrix
 ///
 template<class T>
 std::size_t matrix<T>::index(std::size_t r, std::size_t c) const
@@ -47,8 +48,8 @@ std::size_t matrix<T>::index(std::size_t r, std::size_t c) const
 }
 
 ///
-/// \param[in] l a locus of the genome.
-/// \return an element of the matrix.
+/// \param[in] l a locus of the genome
+/// \return      an element of the matrix
 ///
 template<class T>
 typename matrix<T>::const_reference matrix<T>::operator()(const locus &l) const
@@ -57,8 +58,8 @@ typename matrix<T>::const_reference matrix<T>::operator()(const locus &l) const
 }
 
 ///
-/// \param[in] l a locus of the genome.
-/// \return an element of the matrix.
+/// \param[in] l a locus of the genome
+/// \return      an element of the matrix
 ///
 template<class T>
 typename matrix<T>::reference matrix<T>::operator()(const locus &l)
@@ -68,9 +69,9 @@ typename matrix<T>::reference matrix<T>::operator()(const locus &l)
 }
 
 ///
-/// \param[in] r row.
-/// \param[in] c column.
-/// \return an element of the matrix.
+/// \param[in] r row
+/// \param[in] c column
+/// \return      an element of the matrix
 ///
 template<class T>
 typename matrix<T>::const_reference matrix<T>::operator()(std::size_t r,
@@ -80,9 +81,9 @@ typename matrix<T>::const_reference matrix<T>::operator()(std::size_t r,
 }
 
 ///
-/// \param[in] r row.
-/// \param[in] c column.
-/// \return an element of the matrix.
+/// \param[in] r row
+/// \param[in] c column
+/// \return      an element of the matrix
 ///
 template<class T>
 typename matrix<T>::reference matrix<T>::operator()(std::size_t r,
@@ -93,7 +94,7 @@ typename matrix<T>::reference matrix<T>::operator()(std::size_t r,
 }
 
 ///
-/// \return `true` if the matrix is empty (`cols() == 0`).
+/// \return `true` if the matrix is empty (`cols() == 0`)
 ///
 template<class T>
 bool matrix<T>::empty() const
@@ -102,7 +103,7 @@ bool matrix<T>::empty() const
 }
 
 ///
-/// \return number of elements of the matrix.
+/// \return number of elements of the matrix
 ///
 template<class T>
 std::size_t matrix<T>::size() const
@@ -111,7 +112,7 @@ std::size_t matrix<T>::size() const
 }
 
 ///
-/// \return number of rows of the matrix.
+/// \return number of rows of the matrix
 ///
 template<class T>
 std::size_t matrix<T>::rows() const
@@ -120,7 +121,7 @@ std::size_t matrix<T>::rows() const
 }
 
 ///
-/// \return number of columns of the matrix.
+/// \return number of columns of the matrix
 ///
 template<class T>
 std::size_t matrix<T>::cols() const
@@ -129,8 +130,8 @@ std::size_t matrix<T>::cols() const
 }
 
 ///
-/// \param[in] m second term of comparison.
-/// \return `true` if `m` is equal to `*this`.
+/// \param[in] m second term of comparison
+/// \return      `true` if `m` is equal to `*this`
 ///
 template<class T>
 bool matrix<T>::operator==(const matrix &m) const
@@ -139,9 +140,9 @@ bool matrix<T>::operator==(const matrix &m) const
 }
 
 ///
-/// \param[in] v a value.
+/// Sets all the elements of the matrix to a specific value.
 ///
-/// Sets the elements of the matrix to `v`.
+/// \param[in] v a value
 ///
 template<class T>
 void matrix<T>::fill(const T &v)
@@ -150,7 +151,7 @@ void matrix<T>::fill(const T &v)
 }
 
 ///
-/// \return iterator to the first element of the matrix.
+/// \return iterator to the first element of the matrix
 ///
 template<class T>
 typename matrix<T>::iterator matrix<T>::begin()
@@ -159,7 +160,7 @@ typename matrix<T>::iterator matrix<T>::begin()
 }
 
 ///
-/// \return constant iterator to the first element of the matrix.
+/// \return constant iterator to the first element of the matrix
 ///
 template<class T>
 typename matrix<T>::const_iterator matrix<T>::begin() const
@@ -169,7 +170,7 @@ typename matrix<T>::const_iterator matrix<T>::begin() const
 
 ///
 /// \return iterator to the end (i.e. the element after the last element) of
-///         the matrix.
+///         the matrix
 ///
 template<class T>
 typename matrix<T>::const_iterator matrix<T>::end() const
@@ -179,7 +180,7 @@ typename matrix<T>::const_iterator matrix<T>::end() const
 
 ///
 /// \return iterator to the end (i.e. the element after the last element) of
-///         the matrix.
+///         the matrix
 ///
 template<class T>
 typename matrix<T>::iterator matrix<T>::end()
@@ -188,10 +189,10 @@ typename matrix<T>::iterator matrix<T>::end()
 }
 
 ///
-/// \param[out] out output stream.
-/// \return true on success.
-///
 /// Saves the matrix on persistent storage.
+///
+/// \param[out] out output stream
+/// \return         `true` on success
 ///
 /// \note
 /// The method is based on `operator<<` so it works for basic `T` only.
@@ -211,10 +212,10 @@ bool matrix<T>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] in input stream.
-/// \return true on success.
-///
 /// Loads the matrix from persistent storage.
+///
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 /// \note
 /// * If the operation fails the object isn't modified.
@@ -248,11 +249,13 @@ bool matrix<T>::load(std::istream &in)
 }
 
 ///
-/// \param[out] o output stream
-/// \param[in] m a matrix
+/// Prints the matrix on an output stream.
 ///
-/// Prints `m` on the output stream. This is mainly used for debug purpose
-/// (boost test needs the operator to report errors).
+/// \param[out] o output stream
+/// \param[in]  m a matrix
+///
+/// This is mainly used for debug purpose (Boost Test needs the operator to
+/// report errors).
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
@@ -269,4 +272,4 @@ std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
   return o;
 }
 
-#endif  // Include guard
+#endif  // include guard

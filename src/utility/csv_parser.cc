@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,7 +17,7 @@ namespace vita
 {
 
 ///
-/// \return an iterator to the first record of the CSV file.
+/// \return an iterator to the first record of the CSV file
 ///
 csv_parser::const_iterator csv_parser::begin() const
 {
@@ -26,7 +26,7 @@ csv_parser::const_iterator csv_parser::begin() const
 }
 
 ///
-/// \return an iterator used as sentry value to stop a cycle.
+/// \return an iterator used as sentry value to stop a cycle
 ///
 csv_parser::const_iterator csv_parser::end() const
 {
@@ -34,7 +34,7 @@ csv_parser::const_iterator csv_parser::end() const
 }
 
 ///
-/// \return the next record of the CSV file.
+/// \return the next record of the CSV file
 ///
 void csv_parser::const_iterator::get_input()
 {
@@ -59,15 +59,17 @@ void csv_parser::const_iterator::get_input()
 }
 
 ///
-/// \param[in] line line to be parsed.
-/// \return a vector where each element is a field of the CSV line.
+/// This function parses a line of data by a delimiter.
 ///
-/// This function parses a line of data by a delimiter. If you pass in a
-/// comma as your delimiter it will parse out a Comma Separated Value (CSV)
-/// file. If you pass in a `\t` char it will parse out a tab delimited file
-/// (.txt or .tsv). CSV files often have commas in the actual data, but
-/// accounts for this by surrounding the data in quotes. This also means the
-/// quotes need to be parsed out, this function accounts for that as well.
+/// \param[in] line line to be parsed
+/// \return         a vector where each element is a field of the CSV line
+///
+/// If you pass in a comma as your delimiter it will parse out a
+/// Comma Separated Value (*CSV*) file. If you pass in a `\t` char it will
+/// parse out a tab delimited file (`.txt` or `.tsv`). CSV files often have
+/// commas in the actual data, but accounts for this by surrounding the data in
+/// quotes. This also means the quotes need to be parsed out, this function
+/// accounts for that as well.
 ///
 /// \note
 /// This is a slightly modified version of the function at

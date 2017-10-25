@@ -25,7 +25,7 @@ namespace vita
 {
 
 ///
-/// \brief Simple parser for CSV files.
+/// Simple parser for CSV files.
 ///
 /// \warning The class doesn't support multi-line fields.
 ///
@@ -39,8 +39,8 @@ public:
     : is_(&is), filter_hook_(nullptr), delimiter_(','), trim_ws_(false)
   {}
 
-  /// \param[in] delim separator character for fields.
-  /// \return a reference to `this` object (fluent interface).
+  /// \param[in] delim separator character for fields
+  /// \return          a reference to `this` object (fluent interface)
   csv_parser delimiter(char delim)
   {
     delimiter_ = delim;
@@ -48,8 +48,8 @@ public:
   }
 
   /// \param[in] t if `true` trims leading and trailing spaces adjacent to
-  ///              commas.
-  /// \return a reference to `this` object (fluent interface).
+  ///              commas
+  /// \return      a reference to `this` object (fluent interface)
   ///
   /// \remark
   /// Trimming spaces is contentious and in fact the prectice is specifically
@@ -61,8 +61,8 @@ public:
     return *this;
   }
 
-  /// \param[in] filter a filter function for CSV records.
-  /// \return a reference to `this` object (fluent interface).
+  /// \param[in] filter a filter function for CSV records
+  /// \return           a reference to `this` object (fluent interface)
   ///
   /// \note A filter function returns `true` for records to be keep.
   ///
@@ -72,8 +72,8 @@ public:
     return *this;
   }
 
-  /// \param[in] filter a filter function for CSV records.
-  /// \return a reference to `this` object (fluent interface).
+  /// \param[in] filter a filter function for CSV records
+  /// \return           a reference to `this` object (fluent interface)
   ///
   /// \note A filter function returns `true` for records to be keep.
   ///
@@ -109,7 +109,7 @@ private:
 };  // class csv_parser
 
 ///
-/// \brief A forward iterator for CSV records.
+/// A forward iterator for CSV records.
 ///
 class csv_parser::const_iterator
 {
@@ -134,23 +134,22 @@ public:
       get_input();
   }
 
-  /// \return an iterator pointing to the next record of the CSV file.
+  /// \return an iterator pointing to the next record of the CSV file
   const_iterator &operator++()
   {
     get_input();
     return *this;
   }
 
-  /// \return reference to the current record of the CSV file.
+  /// \return reference to the current record of the CSV file
   const_reference operator*() const { return value_; }
 
-  /// \return pointer to the current record of the CSV file.
+  /// \return pointer to the current record of the CSV file
   const_pointer operator->() const { return &operator*(); }
 
-  /// \param[in] lhs first term of comparison.
-  /// \param[in] rhs second term of comparison.
-  ///
-  /// Returns `true` if iterators point to the same line.
+  /// \param[in] lhs first term of comparison
+  /// \param[in] rhs second term of comparison
+  /// \return        `true` if iterators point to the same line
   friend bool operator==(const const_iterator &lhs, const const_iterator &rhs)
   {
     return lhs.ptr_ == rhs.ptr_ && lhs.value_ == rhs.value_ &&

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,12 +18,12 @@
 namespace vita
 {
 ///
-/// \brief A bidimensional array
+/// A bidimensional array.
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
 /// * `std::vector<std::vector<T>>` is slow;
 /// * boost uBLAS and `boost.MultiArray` are good, general solutions but a bit
-///   oversized for our needs;
+///   oversized for our needs.
 ///
 /// The idea is to use a vector and translate the 2 dimensions to one
 /// dimension (matrix::index() method). This way the whole thing is stored in
@@ -74,11 +74,12 @@ public:
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
-private:  // Private support functions
+private:
+  // Private support functions
   std::size_t size() const;
   std::size_t index(std::size_t, std::size_t) const;
 
-private:  // Private data members
+  // Private data members
   values_t data_;
 
   std::size_t cols_;

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,9 +22,11 @@ namespace vita
 {
 
 ///
+/// A "S" shaped, bounded real function with positive derivative everywhere.
+///
 /// \param[in] x a numeric value (a real number in the `[-inf; +inf]` range)
-///              that should be mapped in the `[0; 1]` interval.
-/// \return a number in the `[0; 1]` range.
+///              that should be mapped in the `[0; 1]` interval
+/// \return      a number in the `[0; 1]` range
 ///
 /// This is a sigmoid function (it's a bounded real function, "S" shaped,
 /// with positive derivative everywhere).
@@ -49,13 +51,15 @@ T sigmoid_01(T x)
 }
 
 ///
-/// \tparam Source type of the input value.
-/// \tparam Target type of the output value.
+/// Scales a real number to an integral in a range.
 ///
-/// \param[in] x an input value.
-/// \param[in] min minimum value of the saturation range.
-/// \param[in] max maximum value of the saturation range.
-/// \return the casted and (possibly) saturated value of `x`.
+/// \tparam Source type of the input value
+/// \tparam Target type of the output value
+///
+/// \param[in] x   an input value
+/// \param[in] min minimum value of the saturation range
+/// \param[in] max maximum value of the saturation range
+/// \return        the casted and (possibly) saturated value of `x`
 ///
 /// Partitions the `]-inf, +inf[` range
 /// (where `inf = std::numeric_limits<Source>::infinity()`) to a discretized
@@ -109,10 +113,9 @@ Target discretization(Source x, Source s_min, Source s_max,
     return t_max;
 
   const auto ret(static_cast<Target>(
-                   std::round(static_cast<Source>(t_max - t_min) *
-                              (x - s_min) /
-                              (s_max - s_min) +
-                              static_cast<Source>(t_min))));
+                   std::round(static_cast<Source>(t_max - t_min) * (x - s_min)
+                              / (s_max - s_min)
+                              + static_cast<Source>(t_min))));
 
   Ensures(t_min <= ret);
   Ensures(ret <= t_max);

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -62,7 +62,7 @@ public:
 
   ///
   /// \return time elapsed in milliseconds (as would be measured by a clock
-  ///         on the wall. It's NOT the processor time).
+  ///         on the wall. It's NOT the processor time)
   ///
   std::chrono::milliseconds elapsed() const
   {
