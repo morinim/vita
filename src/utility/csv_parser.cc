@@ -91,6 +91,11 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   bool inquotes(false);
   std::string curstring;
 
+  const auto &add_field = [&](const std::string &field) -> void
+  {
+    record.push_back(trim_ws_ ? trim(field) : field);
+  };
+
   for (auto length(line.length()), pos(decltype(length){0});
        pos < length && line[pos];)
   {
@@ -111,7 +116,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
     }
     else if (!inquotes && c == delimiter_)  // end of field
     {
-      record.push_back(curstring);
+      add_field(curstring);
       curstring = "";
     }
     else if (!inquotes && (c == '\r' || c == '\n'))
@@ -124,11 +129,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
 
   assert(!inquotes);
 
-  record.push_back(curstring);
-
-  if (trim_ws_)
-    for (auto size(record.size()), i(decltype(size){0}); i < size; ++i)
-      trim(record[i]);
+  add_field(curstring);
 
   return record;
 }
