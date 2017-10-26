@@ -61,7 +61,7 @@ i_mep::i_mep(const problem &p)
 ///
 /// \param[in] gv vector of genes
 ///
-/// This is useful for debugging purpouse (i.e. setup ad-hoc individuals).
+/// This is useful for debugging purpose (i.e. setup *ad-hoc* individuals).
 ///
 i_mep::i_mep(const std::vector<gene> &gv)
   : individual(),
@@ -116,8 +116,12 @@ unsigned i_mep::active_symbols() const
 i_mep i_mep::get_block(const locus &l) const
 {
   i_mep ret(*this);
-  ret.best_ = l;
-  ret.signature_.clear();
+
+  if (ret.best_ != l)
+  {
+    ret.best_ = l;
+    ret.signature_.clear();
+  }
 
   Ensures(ret.debug());
   return ret;
