@@ -94,7 +94,7 @@ all: directories vita sr examples
 
 forex: directories $(FOREX_OBJ) $(FRAMEWORK_OBJ)
 	@echo Linking $@
-	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$@ $(LIB)
+	@$(COMPILE) $(FOREX_OBJ) $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$@
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
 	@strip $(OUTDIR)/examples/$@.exe
