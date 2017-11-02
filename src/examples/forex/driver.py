@@ -173,18 +173,18 @@ class Metatrader:
 
                 if ret != 0:
                     self._log("failed")
-                    eprint("*** Error", ret, ": error backtesting",
-                           self._ea_name)
+                    eprint("*** Restarting (error ", ret, ")")
                     continue
-                self._log("ok")
 
+                self._log("ok")
                 if self._check_results():
                     break
                 #else
                 #    sys.exit()
 
             except subprocess.TimeoutExpired:
-                eprint("*** Metatrader hanged... restarting backtest")
+                self._log("failed")
+                eprint("*** Restarting (Metatrader stuck in back-test)")
                 time.sleep(2)
 
 
