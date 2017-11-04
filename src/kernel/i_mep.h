@@ -52,7 +52,7 @@ public:
   i_mep replace(const gene &) const;
   i_mep replace(const locus &, const gene &) const;
 
-  i_mep compress() const;
+  i_mep cse() const;
 
   std::pair<i_mep, std::vector<locus>> generalize(unsigned,
                                                   const symbol_set &) const;

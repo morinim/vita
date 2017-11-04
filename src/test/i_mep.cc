@@ -266,13 +266,13 @@ BOOST_AUTO_TEST_CASE(t_output)
 BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_FIXTURE_TEST_SUITE(t_i_mep_factory1, F_FACTORY1)
-BOOST_AUTO_TEST_CASE(t_compress)
+BOOST_AUTO_TEST_CASE(t_cse)
 {
   const unsigned n(5000);
 
   for (unsigned k(0); k < n; ++k)
   {
-    const vita::i_mep i(prob), i1(i.compress());
+    const vita::i_mep i(prob), i1(i.cse());
 
     BOOST_TEST(i1.debug());
 

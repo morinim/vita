@@ -266,7 +266,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
 
   const auto t_size(static_cast<unsigned>(terminals.size()));
 
-  // Step 2: shuffle the terminals and pick elements 0..n-1.
+  // Step 2: shuffle the terminals and pick elements `0...n-1`.
   const auto n(std::min<unsigned>(max_args, t_size));
   assert(n);
 
@@ -278,7 +278,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
       std::swap(terminals[j], terminals[r]);
     }
 
-  // Step 3: randomly substitute n terminals with function arguments.
+  // Step 3: randomly substitute `n` terminals with function arguments.
   i_mep ret(*this);
   for (auto j(decltype(n){0}); j < n; ++j)
     ret.genome_(terminals[j]).sym = &sset.arg(j);
@@ -308,9 +308,9 @@ bool i_mep::operator==(const i_mep &x) const
 {
   const bool eq(genome_ == x.genome_);
 
-  Ensures(!eq ||
-          signature_.empty() != x.signature_.empty() ||
-          signature_ == x.signature_);
+  Ensures(!eq
+          || signature_.empty() != x.signature_.empty()
+          || signature_ == x.signature_);
 
   return eq;
 }
@@ -650,10 +650,17 @@ bool i_mep::save_impl(std::ostream &out) const
 ///
 /// A sort of "common subexpression elimination" optimization.
 ///
+/// \return a cse-optimized individual
+///
 /// The function doesn't rely on the meaning of the symbols, just on the
 /// genome layout.
 ///
-i_mep i_mep::compress() const
+/// Some features of the cse-optimized individual are:
+/// - same signature of the unoptimized one;
+/// - the interpretation yields the same value of the unoptimized one;
+/// - the unoptimized individual has more active symbols.
+///
+i_mep i_mep::cse() const
 {
   i_mep ret(*this);
 

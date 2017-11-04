@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Code of conduct for contributors
+- Code of conduct for contributors.
 
 ### Changed
 - BREAKING CHANGE.
@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   ```C++
   env.dynamic_file = "dynamic.txt"
   ```
+
+- BREAKING CHANGE.
+  `i_mep::compress` function renamed to `i_mep::cse` (Common Subexpression
+  Elimination).
 
 - BREAKING CHANGE.
   Serialization file format for cache and fitness has changed. The new format
@@ -69,7 +73,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   engine.set_evaluator<E>(f);
   ```
 
-- Uniform output results for make / cmake build systems
+- Uniform output results for make / cmake build systems.
 
 
 ## [0.9.13] - 2017-09-15
@@ -85,7 +89,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - ALPS can remove multiple identical layers.
 
 ### Fixed
-- Various compilation warning with recent version of gcc (7.x)
+- Various compilation warning with recent version of gcc (7.x).
 
 
 [Unreleased]: https://github.com/morinim/vita/compare/v0.9.13...HEAD
