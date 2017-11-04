@@ -328,7 +328,7 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 {
   if (this->prob_.env.arl == trilean::yes)
   {
-    this->prob_.sset.reset_adf_weights();
+    this->prob_.sset.scale_adf_weights();
     arl(s->best.solution);
   }
 }

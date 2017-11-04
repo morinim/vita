@@ -51,7 +51,7 @@ public:
 
   const symbol &get_adt(std::size_t) const;
   std::size_t adts() const;
-  void reset_adf_weights();
+  void scale_adf_weights();
 
   symbol *decode(opcode_t) const;
   symbol *decode(const std::string &) const;

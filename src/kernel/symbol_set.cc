@@ -145,23 +145,24 @@ void symbol_set::build_view()
 }
 
 ///
-void symbol_set::reset_adf_weights()
+/// Halves ADF / ADT weights.
+///
+void symbol_set::scale_adf_weights()
 {
-  for (auto adt : views_.back().adt)
+  const auto scale = [this](const auto &ws) -> void
   {
-    const auto w(adt.weight);
-    const auto delta(w > 1 ? w/2 : w);
+    const auto w(ws.weight);
+    const auto delta(w > 1 ? w / 2 : w);
 
-    weights_[adt.sym] -= delta;
-  }
+    assert(weights_[ws.sym] >= delta);
+    weights_[ws.sym] -= delta;
+  };
+
+  for (auto adt : views_.back().adt)
+    scale(adt);
 
   for (auto adf : views_.back().adf)
-  {
-    const auto w(adf.weight);
-    const auto delta(w > 1 ? w/2 : w);
-
-    weights_[adf.sym] -= delta;
-  }
+    scale(adf);
 
   build_view();
 }
