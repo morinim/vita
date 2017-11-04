@@ -104,7 +104,7 @@ model_measurements src_search<T, ES>::calculate_metrics(
 /// \param[in] base individual we are examining to extract building blocks
 ///
 /// The algorithm extracts common knowledge (building blocks) emerging during
-/// the evolutionary process and acquires the necessary structure for solving
+/// the evolutionary process and acquires the necessary structures for solving
 /// the problem (see ARL - Justinian P. Rosca and Dana H. Ballard).
 ///
 /// \note
@@ -123,7 +123,7 @@ void src_search<T, ES>::arl(const U &base)
 
   const auto base_fit(eval(base));
   if (!isfinite(base_fit))
-    return;  // We need a finite fitness to search for an improvement
+    return;  // we need a finite fitness to search for an improvement
 
   auto &prob(this->prob_);
 
@@ -157,15 +157,17 @@ void src_search<T, ES>::arl(const U &base)
 
     // This is an approximation of the fitness due to the current block.
     // The idea is to see how the individual (base) would perform without
-    // (base.destroy_block) the current block.
-    // Useful blocks have delta values greater than 0.
-    const auto delta(base_fit[0] -
-                     eval(base.destroy_block(l.index, prob.sset))[0]);
+    // (`base.destroy_block`) the current block.
+    // Useful blocks have positive `delta` values.
+    const auto delta(base_fit - eval(base.destroy_block(l.index, prob.sset)));
+
+    using std::isfinite;
+    using std::abs;
 
     // Semantic introns cannot be building blocks...
     // When delta is greater than 10% of the base fitness we have a
     // building block.
-    if (std::isfinite(delta) && std::fabs(base_fit[0] / 10.0) < delta)
+    if (isfinite(delta) && abs(base_fit / 10.0) < delta)
     {
       std::unique_ptr<symbol> p;
       if (adf_args)
@@ -184,9 +186,7 @@ void src_search<T, ES>::arl(const U &base)
       if (log.is_open())  // logs ADFs
       {
         log << p->name() << " (Base: " << base_fit
-            << "  DF: " << delta
-            << "  Weight: " << std::fabs(delta / base_fit[0]) * 100.0
-            << "%)\n" << candidate_block << '\n';
+            << "  DF: " << delta << ")\n" << candidate_block << '\n';
       }
 
       prob.sset.insert(std::move(p));

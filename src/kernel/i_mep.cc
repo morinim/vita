@@ -691,7 +691,7 @@ i_mep i_mep::cse() const
   std::map<gene, locus, cmp_gene> new_locus;
 
   for (index_t i(size()); i > 0; --i)
-    for (category_t c(0); c < ret.genome_.cols(); ++c)
+    for (category_t c(0); c < genome_.cols(); ++c)
     {
       gene &g(ret.genome_(i - 1, c));
 
