@@ -51,7 +51,7 @@ struct F_FACTORY4
     i_mul = prob.sset.insert(factory.make("MUL"));
     i_sub = prob.sset.insert(factory.make("SUB"));
 
-    prob.env.code_length = 32;
+    prob.env.mep.code_length = 32;
   }
 
   ~F_FACTORY4()

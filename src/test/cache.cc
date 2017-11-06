@@ -90,7 +90,7 @@ BOOST_FIXTURE_TEST_SUITE(test_cache, F_FACTORY2)
 BOOST_AUTO_TEST_CASE(InsertFindCicle)
 {
   vita::cache cache(16);
-  prob.env.code_length = 64;
+  prob.env.mep.code_length = 64;
 
   const unsigned n(6000);
 
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
 {
   using i_interp = vita::interpreter<vita::i_mep>;
   vita::cache cache(14);
-  prob.env.code_length = 64;
+  prob.env.mep.code_length = 64;
 
   const unsigned n(1000);
 
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
   using i_interp = interpreter<i_mep>;
   vita::cache cache1(14), cache2(14);
-  prob.env.code_length = 64;
+  prob.env.mep.code_length = 64;
 
   const unsigned n(1000);
   std::vector<i_mep> vi;

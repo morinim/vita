@@ -34,8 +34,8 @@ environment::environment(initialization init)
 {
   if (init == initialization::standard)
   {
-    code_length = 100;
-    patch_length = 1;
+    mep.code_length = 100;
+    mep.patch_length = 1;
     elitism = trilean::yes;
     p_mutation = 0.04;
     p_cross = 0.9;
@@ -72,8 +72,8 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "layers", layers);
   set_text(e_environment, "individuals", individuals);
   set_text(e_environment, "min_individuals", min_individuals);
-  set_text(e_environment, "code_length", code_length);
-  set_text(e_environment, "patch_length", patch_length);
+  set_text(e_environment, "code_length", mep.code_length);
+  set_text(e_environment, "patch_length", mep.patch_length);
   set_text(e_environment, "elitism", as_integer(elitism));
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
@@ -123,13 +123,13 @@ bool environment::debug(bool force_defined) const
 {
   if (force_defined)
   {
-    if (!code_length)
+    if (!mep.code_length)
     {
       print.error("Undefined code_length data member");
       return false;
     }
 
-    if (!patch_length)
+    if (!mep.patch_length)
     {
       print.error("Undefined patch_length data member");
       return false;
@@ -238,13 +238,14 @@ bool environment::debug(bool force_defined) const
     }
   }  // if (force_defined)
 
-  if (code_length == 1)
+  if (mep.code_length == 1)
   {
     print.error("code_length is too short");
     return false;
   }
 
-  if (code_length && patch_length && patch_length >= code_length)
+  if (mep.code_length && mep.patch_length
+      && mep.patch_length >= mep.code_length)
   {
     print.error("patch_length must be shorter than code_length");
     return false;

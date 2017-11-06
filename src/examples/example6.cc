@@ -92,9 +92,15 @@ int main(int argc, char *argv[])
   using namespace vita;
   problem p(initialization::standard);
 
-  p.env.individuals = static_cast<unsigned>(argc>1 ? std::atoi(argv[1]) : 100);
-  p.env.code_length = static_cast<unsigned>(argc>2 ? std::atoi(argv[2]) : 100);
-  p.env.generations = static_cast<unsigned>(argc>3 ? std::atoi(argv[3]) : 100);
+  p.env.individuals = static_cast<unsigned>(argc > 1
+                                            ? std::atoi(argv[1])
+                                            : 100);
+  p.env.mep.code_length = static_cast<unsigned>(argc > 2
+                                                ? std::atoi(argv[2])
+                                                : 100);
+  p.env.generations = static_cast<unsigned>(argc > 3
+                                            ? std::atoi(argv[3])
+                                            : 100);
 
   symbol_factory factory;
   p.sset.insert<X>();

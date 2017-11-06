@@ -55,11 +55,11 @@ void search<T, ES>::tune_parameters()
   const environment dflt(ES<T>::shape(environment(initialization::standard)));
   const environment constrained(prob_.env);
 
-  if (!constrained.code_length)
-    prob_.env.code_length = dflt.code_length;
+  if (!constrained.mep.code_length)
+    prob_.env.mep.code_length = dflt.mep.code_length;
 
-  if (!constrained.patch_length)
-    prob_.env.patch_length = 1 + prob_.sset.terminals(0) / 2;
+  if (!constrained.mep.patch_length)
+    prob_.env.mep.patch_length = 1 + prob_.sset.terminals(0) / 2;
 
   if (constrained.elitism == trilean::unknown)
     prob_.env.elitism = dflt.elitism;

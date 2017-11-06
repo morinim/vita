@@ -56,12 +56,12 @@ void fix_parameters(vita::src_problem *problem)
 
   vita::environment &env(problem->env);
 
-  if (env.code_length && env.code_length <= problem->categories())
+  if (env.mep.code_length && env.mep.code_length <= problem->categories())
   {
-    const decltype(env.code_length) new_length(2 * problem->categories());
-    print.warning("Adjusting code length (", env.code_length, " => ",
+    const decltype(env.mep.code_length) new_length(2 * problem->categories());
+    print.warning("Adjusting code length (", env.mep.code_length, " => ",
                   new_length, ")");
-    env.code_length = new_length;
+    env.mep.code_length = new_length;
   }
 
   if (env.dss != trilean::no && problem->data()->size() <= 30)
@@ -185,9 +185,9 @@ void brood(unsigned size)
 ///
 void code_length(unsigned length)
 {
-  assert(length);
+  Expects(length);
 
-  problem->env.code_length = length;
+  problem->env.mep.code_length = length;
 
   print.info("Code length set to ", length);
 }

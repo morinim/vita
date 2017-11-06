@@ -58,7 +58,7 @@ struct F_FACTORY3
     f_sqrt = prob.sset.insert(factory.make("FSQRT"));
     f_sub = prob.sset.insert(factory.make("FSUB"));
 
-    prob.env.code_length = 32;
+    prob.env.mep.code_length = 32;
   }
 
   ~F_FACTORY3()

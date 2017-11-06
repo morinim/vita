@@ -262,8 +262,8 @@ int main()
     return EXIT_FAILURE;
 
   p.env.individuals = 30;
-  p.env.min_individuals =  8;
-  p.env.code_length = 200;
+  p.env.min_individuals = 8;
+  p.env.mep.code_length = 200;
   p.env.generations = 400;
   p.env.layers = 6;
   p.env.team.individuals = 2;  // DO NOT CHANGE

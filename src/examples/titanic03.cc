@@ -21,7 +21,7 @@ int main()
   if (!titanic)
     return EXIT_FAILURE;
 
-  titanic.env.code_length =  130;
+  titanic.env.mep.code_length = 130;
   titanic.env.individuals = 1000;
   titanic.env.generations =  200;
 

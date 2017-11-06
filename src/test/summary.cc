@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(Serialization)
 {
   using vita::random::between;
 
-  prob.env.code_length = 100;
+  prob.env.mep.code_length = 100;
 
   for (unsigned i(0); i < 2000; ++i)
   {

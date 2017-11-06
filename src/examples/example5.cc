@@ -19,7 +19,9 @@ int main(int argc, char *argv[])
   using namespace vita;
   problem p(initialization::standard);
 
-  p.env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 14);
+  p.env.mep.code_length = static_cast<unsigned>(argc > 1
+                                                ? std::atoi(argv[1])
+                                                : 14);
 
   symbol_factory factory;
   p.sset.insert(factory.make(domain_t::d_double, -200, 200));

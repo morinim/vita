@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
   BOOST_TEST_CHECKPOINT("Variable length random creation");
   for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
   {
-    prob.env.code_length = l;
+    prob.env.mep.code_length = l;
     vita::team<vita::i_mep> t(prob);
 
     BOOST_TEST(t.debug());
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(RandomCreation)
 
 BOOST_AUTO_TEST_CASE(Mutation)
 {
-  prob.env.code_length = 100;
+  prob.env.mep.code_length = 100;
 
   vita::team<vita::i_mep> t(prob);
   const auto orig(t);
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(t_crossover)
 {
   using namespace vita;
 
-  prob.env.code_length = 100;
+  prob.env.mep.code_length = 100;
 
   team<vita::i_mep> t1(prob), t2(prob);
 

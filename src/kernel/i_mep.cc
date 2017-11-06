@@ -32,15 +32,15 @@ namespace vita
 /// of the type system's constraints.
 ///
 i_mep::i_mep(const problem &p)
-  : individual(), genome_(p.env.code_length, p.sset.categories()),
+  : individual(), genome_(p.env.mep.code_length, p.sset.categories()),
     best_{0, 0}, active_crossover_type_(random::sup(NUM_CROSSOVERS))
 {
   Expects(size());
-  Expects(p.env.patch_length);
-  Expects(size() > p.env.patch_length);
+  Expects(p.env.mep.patch_length);
+  Expects(size() > p.env.mep.patch_length);
   Expects(categories());
 
-  const index_t i_sup(size()), patch(i_sup - p.env.patch_length);
+  const index_t i_sup(size()), patch(i_sup - p.env.mep.patch_length);
   const category_t c_sup(categories());
 
   // STANDARD SECTION. Filling the genome with random symbols.
@@ -141,7 +141,7 @@ unsigned i_mep::mutation(double pgm, const problem &prb)
   unsigned n(0);
 
   const auto i_size(size());
-  const auto patch(i_size - prb.env.patch_length);
+  const auto patch(i_size - prb.env.mep.patch_length);
 
   for (auto i(begin()); i != end(); ++i)  // Here mutation affects only exons
     if (random::boolean(pgm))

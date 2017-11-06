@@ -22,7 +22,9 @@ int main(int argc, char *argv[])
 
   problem p(initialization::standard);
 
-  p.env.code_length = static_cast<unsigned>(argc > 1 ? std::atoi(argv[1]) : 5);
+  p.env.mep.code_length = static_cast<unsigned>(argc > 1
+                                                ? std::atoi(argv[1])
+                                                : 5);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));
 
   symbol_factory factory;

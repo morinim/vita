@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(Creation)
     for (auto l(prob.sset.categories() + 2); l <= 100; l += (l < 10 ? 1 : 30))
     {
       prob.env.individuals = n;
-      prob.env.code_length = l;
+      prob.env.mep.code_length = l;
       prob.env.tournament_size = 3;
 
       const auto eva(std::make_unique<vita::random_evaluator<i_mep>>());
