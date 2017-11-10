@@ -24,49 +24,170 @@
 
 using namespace boost;
 
-#include "factory_fixture3.h"
+#include "factory_fixture1.h"
 #endif
 
-BOOST_FIXTURE_TEST_SUITE(symbol_set, F_FACTORY3)
+BOOST_AUTO_TEST_SUITE(symbol_set)
 
+/*
 BOOST_AUTO_TEST_CASE(Speed)
 {
   const unsigned n(10000000);
 
   // Because of s the compiler have to perform the entire for loop (see below).
-  const vita::symbol *s(&prob.sset.roulette());
+  const vita::symbol *s(&prob.sset.roulette(0));
 
   vita::timer t;
   for (unsigned i(0); i < n; ++i)
-    if (vita::random::boolean())
-      s = &prob.sset.roulette();
+    s = &prob.sset.roulette(0);
 
-  BOOST_TEST_MESSAGE(1000.0l * n / t.elapsed().count()
+  BOOST_TEST_MESSAGE(1000.0 * n / t.elapsed().count()
                      << " extractions/sec - symbol: " << s->name());
 }
+*/
 
-BOOST_AUTO_TEST_CASE(Distribution)
+BOOST_AUTO_TEST_CASE(Constructor_Insertion)
 {
-  std::map<const vita::symbol *, unsigned> hist, weight;
+  vita::problem prob;
+
+  BOOST_TEST_CHECKPOINT("Empty symbol set");
+  BOOST_TEST(prob.sset.categories() == 0);
+  BOOST_TEST(prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.arg(1).name() == "ARG_1");
+  BOOST_TEST(prob.sset.debug());
+  BOOST_TEST(prob.sset.adts().empty());
+
+  vita::symbol_factory factory;
+
+  BOOST_TEST_CHECKPOINT("Undersized symbol set");
+  auto *fadd = prob.sset.insert(factory.make("FADD", {0}));
+
+  BOOST_TEST(prob.sset.categories() == 1);
+  BOOST_TEST(prob.sset.terminals(0) == 0);
+  BOOST_TEST(!prob.sset.enough_terminals());
+
+  auto *fsub = prob.sset.insert(factory.make("FSUB", {0}));
+
+  BOOST_TEST(prob.sset.categories() == 1);
+  BOOST_TEST(prob.sset.terminals(0) == 0);
+  BOOST_TEST(!prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.weight(*fadd) == prob.sset.weight(*fsub));
+
+  BOOST_TEST_CHECKPOINT("Single category symbol set");
+  auto *real = prob.sset.insert(factory.make("REAL", {0}));
+
+  BOOST_TEST(prob.sset.categories() == 1);
+  BOOST_TEST(prob.sset.terminals(0) == 1);
+  BOOST_TEST(prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.weight(*fadd) == prob.sset.weight(*real));
+  BOOST_TEST(prob.sset.debug());
+
+  auto *sife = prob.sset.insert(factory.make("SIFE", {1, 0}));
+
+  BOOST_TEST(prob.sset.categories() == 1);
+  BOOST_TEST(prob.sset.terminals(0) == 1);
+  BOOST_TEST(!prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.weight(*fadd) == prob.sset.weight(*sife));
+
+  BOOST_TEST_CHECKPOINT("Multi category symbol set");
+  auto *apple = prob.sset.insert(factory.make("apple", {1}));
+
+  BOOST_TEST(prob.sset.categories() == 2);
+  BOOST_TEST(prob.sset.terminals(0) == 1);
+  BOOST_TEST(prob.sset.terminals(1) == 1);
+  BOOST_TEST(prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.weight(*fadd) == prob.sset.weight(*apple));
+
+  BOOST_TEST(prob.sset.debug());
+
+  BOOST_TEST(prob.sset.decode("\"apple\"") == apple);
+  BOOST_TEST(prob.sset.decode(apple->opcode()) == apple);
+  BOOST_TEST(prob.sset.decode("SIFE") == sife);
+  BOOST_TEST(prob.sset.decode(sife->opcode()) == sife);
+  BOOST_TEST(prob.sset.decode("FSUB") == fsub);
+  BOOST_TEST(prob.sset.decode(fsub->opcode()) == fsub);
+  BOOST_TEST(prob.sset.decode("FADD") == fadd);
+  BOOST_TEST(prob.sset.decode(fadd->opcode()) == fadd);
+
+  BOOST_TEST(prob.sset.adts().empty());
+
+  BOOST_TEST_CHECKPOINT("Reset");
+  prob.sset.clear();
+
+  BOOST_TEST(prob.sset.categories() == 0);
+  BOOST_TEST(prob.sset.enough_terminals());
+  BOOST_TEST(prob.sset.debug());
+}
+
+BOOST_AUTO_TEST_CASE(Distribution, * boost::unit_test::tolerance(0.01))
+{
+  vita::problem prob;
+  vita::symbol_factory factory;
+
+  BOOST_TEST_CHECKPOINT("Initial setup");
+  std::vector<std::vector<const vita::symbol *>> symbols = { {}, {} };
+  std::map<const vita::symbol *, double> wanted;
+  symbols[0].push_back(prob.sset.insert(factory.make("REAL", {0}), 4.0));
+  wanted[symbols[0].back()] = 4.0;
+  symbols[0].push_back(prob.sset.insert(factory.make("FADD", {0}), 3.0));
+  wanted[symbols[0].back()] = 3.0;
+  symbols[0].push_back(prob.sset.insert(factory.make("FSUB", {0}), 2.0));
+  wanted[symbols[0].back()] = 2.0;
+  symbols[0].push_back(prob.sset.insert(factory.make("SIFE", {1, 0}), 2.0));
+  wanted[symbols[0].back()] = 2.0;
+  symbols[0].push_back(prob.sset.insert(factory.make("FMUL", {0}), 1.0));
+  wanted[symbols[0].back()] = 1.0;
+
+  symbols[1].push_back(prob.sset.insert(factory.make("apple", {1}), 3.0));
+  wanted[symbols[1].back()] = 3.0;
+  symbols[1].push_back(prob.sset.insert(factory.make("orange", {1}), 1.0));
+  wanted[symbols[1].back()] = 1.0;
+
+  std::vector<double> base =
+  {
+    static_cast<double>(prob.sset.weight(*symbols[0].back())),
+    static_cast<double>(prob.sset.weight(*symbols[1].back()))
+  };
+
+  for (vita::category_t c(0); c < prob.sset.categories(); ++c)
+    for (const auto *s : symbols[c])
+      BOOST_TEST(prob.sset.weight(*s) / base[c] == wanted[s]);
+
+  BOOST_TEST_CHECKPOINT("roulette()");
+  std::map<const vita::symbol *, double> hist;
 
   const unsigned n(20000000);
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::symbol &s(prob.sset.roulette());
+    const vita::symbol &s(prob.sset.roulette(vita::random::boolean()));
     ++hist[&s];
-    weight[&s] = prob.sset.weight(s);
   }
 
-  double sum(0.0);
-  for (const auto &i : weight)
-    sum += i.second;
+  for (vita::category_t c(0); c < prob.sset.categories(); ++c)
+    for (const auto *s : symbols[c])
+      {
+        BOOST_TEST(hist[s] > 0.0);
+        BOOST_TEST(hist[s] / hist[symbols[c][0]]
+                   == wanted[s] / wanted[symbols[c][0]]);
+      }
 
-  for (const auto &i : hist)
+  BOOST_TEST_CHECKPOINT("roulette_terminal()");
+  std::map<const vita::symbol *, double> hist_term;
+  const unsigned nt(1000000);
+  for (unsigned i(0); i < nt; ++i)
   {
-    const auto p(static_cast<double>(weight[i.first]) / sum);
-    const auto actual(static_cast<double>(i.second) / n);
-    BOOST_CHECK_CLOSE(p, actual, 1.0);
+    const vita::symbol &s(prob.sset.roulette_terminal(vita::random::boolean()));
+    ++hist_term[&s];
   }
+
+  for (vita::category_t c(0); c < prob.sset.categories(); ++c)
+    for (const auto *s : symbols[c])
+      if (s->terminal())
+      {
+        BOOST_TEST(hist_term[s] > 0.0);
+        BOOST_TEST(hist_term[s] / hist_term[symbols[c][0]]
+                   == wanted[s] / wanted[symbols[c][0]]);
+      }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

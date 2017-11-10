@@ -13,7 +13,6 @@
 #if !defined(VITA_SYMBOL_SET_H)
 #define      VITA_SYMBOL_SET_H
 
-#include <map>
 #include <string>
 
 #include "kernel/terminal.h"
@@ -35,6 +34,8 @@ namespace vita
 class symbol_set
 {
 public:
+  using weight_t = unsigned;
+
   symbol_set();
 
   void clear();
@@ -43,14 +44,12 @@ public:
   template<class S, class ...Args> symbol *insert(double, Args &&...);
   template<class S, class ...Args> symbol *insert(Args &&...);
 
-  const symbol &roulette() const;
   const symbol &roulette(category_t) const;
   const terminal &roulette_terminal(category_t) const;
 
   const symbol &arg(std::size_t) const;
 
-  const symbol &get_adt(std::size_t) const;
-  std::size_t adts() const;
+  std::vector<const symbol *> adts() const;
   void scale_adf_weights();
 
   symbol *decode(opcode_t) const;
@@ -59,7 +58,7 @@ public:
   category_t categories() const;
   unsigned terminals(category_t) const;
 
-  unsigned weight(const symbol &) const;
+  weight_t weight(const symbol &) const;
 
   bool enough_terminals() const;
   bool debug() const;
@@ -67,8 +66,6 @@ public:
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
 private:
-  void build_view();
-
   // `arguments_` data member:
   // * is not present in the `collection` struct because an argument isn't
   //   bounded to a category (see `argument` class for more details);
@@ -80,12 +77,10 @@ private:
   // This is the real, raw repository of symbols (it owns/stores the symbols).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
-  // A structure for fast retrieval of weights.
-  std::map<const symbol *, unsigned> weights_;
-
   struct w_symbol
   {
-    w_symbol(symbol *s, unsigned w) : sym(s), weight(w) { Expects(s); }
+
+    w_symbol(symbol *s, weight_t w) : sym(s), weight(w) { Expects(s); }
 
     bool operator==(w_symbol rhs) const
     {return sym == rhs.sym && weight == rhs.weight; }
@@ -94,7 +89,7 @@ private:
 
     /// Weight is used by the symbol_set::roulette method to control the
     /// probability of selection.
-    unsigned weight;
+    weight_t weight;
 
     /// This is the default weight.
     enum : decltype(weight) {base_weight = 100};
@@ -127,11 +122,10 @@ private:
       const_iterator begin() const { return elems_.begin(); }
       iterator end() { return elems_.end(); }
       const_iterator end() const { return elems_.end(); }
-      iterator erase(iterator first, iterator last)
-      { return elems_.erase(first, last); }
 
-      unsigned sum() const { return sum_; }
+      weight_t sum() const { return sum_; }
 
+      template<class F> void scale_weights(double, F);
       const symbol &roulette() const;
 
       bool debug() const;
@@ -140,7 +134,7 @@ private:
       sum_container_t elems_;
 
       // Sum of the weights of the symbols in the container.
-      unsigned sum_;
+      weight_t sum_;
 
       std::string name_;
     };

@@ -135,12 +135,8 @@ void src_search<T, ES>::arl(const U &base)
 
     if (log.is_open())  // logs ADTs
     {
-      auto adts(prob.sset.adts());
-      for (decltype(adts) i(0); i < adts; ++i)
-      {
-        const auto &f(prob.sset.get_adt(i));
-        log << f.name() << ' ' << prob.sset.weight(f) << '\n';
-      }
+      for (const auto &s : prob.sset.adts())
+        log << s->name() << ' ' << prob.sset.weight(*s) << '\n';
       log << '\n';
     }
   }
