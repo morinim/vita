@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@
 namespace vita
 {
 ///
-/// \brief Informations about a category of the dataset.
+/// Informations about a category of the dataset.
 ///
 /// For example:
 ///
@@ -35,14 +35,16 @@ namespace vita
 ///     </attribute>
 ///
 /// is mapped to:
-/// * {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
+///
+///     {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
 ///
 /// while
 ///
 ///     <attribute type="numeric" category="A" name="Speed" />
 ///
 /// is mapped to:
-/// * {"A", d_double, {}}
+///
+///     {"A", d_double, {}}
 ///
 struct untagged_category
 {
@@ -52,7 +54,7 @@ struct untagged_category
 };
 
 ///
-/// \brief Integrates untagged_category struct with a unique identifier.
+/// Integrates untagged_category struct with a unique identifier.
 ///
 struct category : public untagged_category
 {
@@ -72,7 +74,7 @@ struct category : public untagged_category
 std::ostream &operator<<(std::ostream &, const category &);
 
 ///
-/// \brief The set of categories used in a specific problem.
+/// The set of categories used in a specific problem.
 ///
 class category_set
 {
@@ -102,11 +104,11 @@ private:
 };  // class category_set
 
 ///
-/// \brief Forward iterator to read the elements of a category_set.
+/// Forward iterator to read the elements of a category_set.
 ///
 class category_set::const_iterator
 {
-private:  // Private data members
+private:
   using const_iter = std::vector<untagged_category>::const_iterator;
 
   const_iter begin_;
@@ -123,7 +125,7 @@ public:
 
   const_iterator operator++() { ++ptr_; return *this; }
   value_type operator*()
-  { return category(static_cast<category_t>(ptr_ - begin_), *ptr_); }
+  { return {static_cast<category_t>(ptr_ - begin_), *ptr_}; }
 
   bool operator==(const const_iterator &rhs) const
   { return ptr_ == rhs.ptr_; }
@@ -132,4 +134,4 @@ public:
 };  // class category_set::const_iterator
 
 }  // namespace vita
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,23 +21,23 @@ namespace vita
 const category category::null(0, {"", domain_t::d_void, {}});
 
 ///
-/// \return `true` if `*this != category::null`.
+/// \return `true` if `*this != category::null`
 ///
 category::operator bool() const
 {
-  return tag != null.tag || name != null.name || domain != null.domain ||
-         labels != null.labels;
+  return tag != null.tag || name != null.name || domain != null.domain
+         || labels != null.labels;
 }
 
 ///
-/// \brief Builds an empty category_set
+/// Builds an empty category_set.
 ///
 category_set::category_set() : categories_()
 {
 }
 
 ///
-/// \brief Standard, STL-style, begin method
+/// Standard, STL-style, begin method.
 ///
 category_set::const_iterator category_set::begin() const
 {
@@ -46,7 +46,7 @@ category_set::const_iterator category_set::begin() const
 }
 
 ///
-/// \brief Standard, STL-style, end method
+/// Standard, STL-style, end method.
 ///
 category_set::const_iterator category_set::end() const
 {
@@ -55,12 +55,13 @@ category_set::const_iterator category_set::end() const
 }
 
 ///
-/// \return number of categories.
+/// Number of input categories.
 ///
-/// \attention
-/// please note that the value size() returns may differ from the intuitive
-/// number of categories of the dataset (it can be 1 unit smaller).
-/// For instance consider the simple Iris classification problem:
+/// \return number of input categories
+///
+/// Please note that the value returned may differ from the intuitive number of
+/// categories of the dataset (it could be `1` unit smaller).
+/// For instance consider the simple *Iris* classification problem:
 ///
 ///     ...
 ///     <attribute class="yes" name="class" type="nominal">
@@ -71,13 +72,15 @@ category_set::const_iterator category_set::end() const
 ///     <attribute name="sepallength" type="numeric" />
 ///     ...
 ///
-/// It has a nominal attribute to describe output classes and four numeric
-/// attributes as inputs. So there are two distinct attribute types
-/// (nominal and numeric), i.e. two categories.
-/// But... categories() would return 1.
-/// This happens because the genetic programming algorithm for classification
-/// we use (based on a discriminant function) doesn't manipulate (skips) the
-/// output category (it only uses the number of output classes).
+/// There is a nominal attribute to describe output classes and four numeric
+/// attributes as input. So two distinct attributes / categories (nominal and
+/// numeric) but... `size()` returns `1` (the number of input categories).
+///
+/// This choice is due to the fact that:
+/// - for regression problems the output category is contained in the set of
+///   input categories;
+/// - for classification tasks the algorithm ignores the output category
+///   (because it's based on a discriminant function).
 ///
 category_t category_set::size() const
 {
@@ -85,9 +88,9 @@ category_t category_set::size() const
 }
 
 ///
-/// \param[in] name name of a category.
-/// \return the category with the specified `name` (if it doesn't exist
-///         returns `category::null`).
+/// \param[in] name name of a category
+/// \return    the category with the specified `name` or `category::null` if it
+///            doesn't exists
 ///
 category category_set::find(const std::string &name) const
 {
@@ -106,9 +109,9 @@ category category_set::find(const std::string &name) const
 }
 
 ///
-/// \param[in] t tag of a category.
-/// \return the category with tag `t` (if it doesn't exist returns
-///         category::null).
+/// \param[in] t tag of a category
+/// \return      the category with tag `t` or `category::null` if it doesn't
+///              exists)
 ///
 category category_set::find(category_t t) const
 {
@@ -116,12 +119,12 @@ category category_set::find(category_t t) const
 }
 
 ///
-/// \param[in] c a new untagged_category for the set.
-/// \return the tag associated with `c`.
+/// \param[in] c a new untagged_category for the set
+/// \return      the tag associated with `c`
 ///
 category_t category_set::insert(const untagged_category &c)
 {
-  assert(!c.name.empty());
+  Expects(!c.name.empty());
 
   category c1(find(c.name));
 
@@ -135,39 +138,39 @@ category_t category_set::insert(const untagged_category &c)
 }
 
 ///
-/// \param[in] t the tag of a category.
-/// \param[in] l a label.
+/// Adds a label to the set of labels associated with a category.
 ///
-/// Add the label `l` to the set of labels associated with category `t`.
+/// \param[in] t the tag of the category `l` should be added to
+/// \param[in] l label to be added
 ///
 void category_set::add_label(category_t t, const std::string &l)
 {
-  assert(t < size());
-  assert(categories_[t].domain == domain_t::d_string);
+  Expects(t < size());
+  Expects(categories_[t].domain == domain_t::d_string);
 
   categories_[t].labels.insert(l);
 }
 
 ///
-/// \param[in] t1 a tag of a category.
-/// \param[in] t2 a tag of category.
+/// Swaps two categories.
 ///
-/// Swap categories `t1` and `t2`.
+/// \param[in] t1 a tag of a category
+/// \param[in] t2 a tag of a category
 ///
 void category_set::swap(category_t t1, category_t t2)
 {
-  assert(t1 < size());
-  assert(t2 < size());
+  Expects(t1 < size());
+  Expects(t2 < size());
 
   std::swap(categories_[t1], categories_[t2]);
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] c category to print.
-/// \return output stream including `c`.
-///
 /// Utility function used for debugging purpose.
+///
+/// \param[out] s output stream
+/// \param[in] c  category to print
+/// \return       output stream including `c`
 ///
 std::ostream &operator<<(std::ostream &s, const category &c)
 {

@@ -15,7 +15,8 @@
  *  \section Introduction
  *  Welcome to the Vita project.
  *
- *  This is the reference guide for the Vita APIs.
+ *  This is the reference guide for the APIs. Introductory documentation is
+ *  available at the [repository's Wiki](https://github.com/morinim/vita/wiki).
  *
  *  \section note_sec Notes
  *  New versions of this framework will be available at
@@ -34,6 +35,7 @@
  *  \page page2 Contributor guidelines
  *  - [Coding style](https://github.com/morinim/vita/wiki/coding_style)
  *  - [Development cycle](https://github.com/morinim/vita/wiki/development_cycle)
+ *  - [Contributor Code of Conduct](https://github.com/morinim/vita/blob/master/CODE_OF_CONDUCT.md)
  */
 
 /**
