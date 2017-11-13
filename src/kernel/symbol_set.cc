@@ -97,8 +97,12 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
       views_[category].adt.insert(ws);
   }
   else  // function
+  {
+    views_[category].functions.insert(ws);
+
     if (s->auto_defined())
       views_[category].adf.insert(ws);
+  }
 
   symbols_.push_back(std::move(s));
   return ws.sym;
@@ -122,15 +126,41 @@ void symbol_set::collection::sum_container::scale_weights(double ratio, F f)
 void symbol_set::scale_adf_weights()
 {
   for (category_t c(0); c < views_.size(); ++c)
+  {
     views_[c].all.scale_weights(0.5,
                                 [](const auto &ws)
                                 {
                                   return ws.sym->auto_defined();
                                 });
 
-  // Weights in the `views_[c].adt` / `views_[c].adf` containers dont't change.
-  // It't right this way: we want to lower the probability of auto-defined
-  // symbols selection compared to standard symbols.
+    views_[c].functions.scale_weights(0.5,
+                                      [](const auto &ws)
+                                      {
+                                        return ws.sym->auto_defined();
+                                      });
+
+    views_[c].terminals.scale_weights(0.5,
+                                      [](const auto &ws)
+                                      {
+                                        return ws.sym->auto_defined();
+                                      });
+  }
+
+  // Weights in the `views_[c].adt` / `views_[c].adf` containers dont't change:
+  // we just want to lower the probability of auto-defined symbols selection
+  // compared to standard symbols.
+}
+
+///
+/// \param[in] c a category
+/// \return      a random function of category `c`
+///
+const function &symbol_set::roulette_function(category_t c) const
+{
+  Expects(c < categories());
+  Expects(views_[c].functions.size());
+
+  return static_cast<const function &>(views_[c].functions.roulette());
 }
 
 ///
@@ -140,18 +170,61 @@ void symbol_set::scale_adf_weights()
 const terminal &symbol_set::roulette_terminal(category_t c) const
 {
   Expects(c < categories());
+  Expects(views_[c].terminals.size());
 
   return static_cast<const terminal &>(views_[c].terminals.roulette());
 }
 
 ///
+/// Extracts a random symbol from the symbol set without bias between terminals
+/// and functions .
+///
 /// \param[in] c a category
 /// \return      a random symbol of category `c`
+///
+/// \attention
+/// - \f$P(terminal) = P(function) = 1/2\f$
+/// - \f$P(terminal_i|terminal) = \frac{w_i}{\sum_{t \in terminals} w_t}\f$
+/// - \f$P(function_i|function) = \frac{w_i}{\sum_{f \in functions} w_f}\f$
+///
+/// \note
+/// If all symbols have the same probability to appear into a chromosome, there
+/// could be some problems.
+/// For instance, if our problem has many variables (let's say 100) and the
+/// function set has only 4 symbols we cannot get too complex trees because the
+/// functions have a reduced chance to appear in the chromosome (e.g. it
+/// happens in the Forex example).
+///
+/// \see https://github.com/morinim/vita/wiki/bibliography#1
 ///
 const symbol &symbol_set::roulette(category_t c) const
 {
   Expects(c < categories());
+  Expects(views_[c].terminals.size());
 
+  if (random::boolean() && views_[c].functions.size())
+    return views_[c].functions.roulette();
+
+  return views_[c].terminals.roulette();
+}
+
+///
+/// Extracts a random symbol from the symbol set.
+///
+/// \param[in] c a category
+/// \return      a random symbol of category `c`
+///
+/// \attention
+/// Given \f$S_t = \sum_{i \in terminals} {w_i}\f$ and
+/// \f$S_f = \sum_{i \in functions} {w_i}\f$ we have:
+/// - \f$P(terminal_i|terminal) = \frac {w_i} {S_t}\f$
+/// - \f$P(function_i|function) = \frac {w_i} {S_f}\f$
+/// - \f$P(terminal) = \frac {S_t} {S_t + S_f}\f$
+/// - \f$P(function) = \frac {S_f} {S_t + S_f}\f$
+///
+const symbol &symbol_set::roulette_free(category_t c) const
+{
+  Expects(c < categories());
   return views_[c].all.roulette();
 }
 
@@ -204,10 +277,10 @@ category_t symbol_set::categories() const
 /// \param[in] c a category
 /// \return      number of terminals in category `c`
 ///
-unsigned symbol_set::terminals(category_t c) const
+std::size_t symbol_set::terminals(category_t c) const
 {
   Expects(c < categories());
-  return static_cast<unsigned>(views_[c].terminals.size());
+  return views_[c].terminals.size();
 }
 
 ///
@@ -309,8 +382,8 @@ bool symbol_set::debug() const
 /// \param[in] n name of the collection
 ///
 symbol_set::collection::collection(std::string n)
-  : all("all"), terminals("terminals"), adf("adf"), adt("adt"),
-    name_(std::move(n))
+  : all("all"), functions("functions"), terminals("terminals"), adf("adf"),
+    adt("adt"), name_(std::move(n))
 {
 }
 
@@ -319,42 +392,51 @@ symbol_set::collection::collection(std::string n)
 ///
 bool symbol_set::collection::debug() const
 {
-  if (!all.debug() || !terminals.debug() || !adf.debug() || !adt.debug())
+  if (!all.debug() || !functions.debug() || !terminals.debug() || !adf.debug()
+      || !adt.debug())
   {
     print.error("(inside ", name_, ")");
     return false;
   }
 
+  if (std::any_of(functions.begin(), functions.end(),
+                  [](const auto &s) { return s.sym->terminal(); }))
+    return false;
+
+  if (std::any_of(terminals.begin(), terminals.end(),
+                  [](const auto &s) { return !s.sym->terminal(); }))
+    return false;
+
   for (const auto &s : all)
   {
-    const bool t_not_found(
-      std::find(terminals.begin(), terminals.end(), s) == terminals.end());
-
-    // Terminals must be in the terminals' vector and functions must not be in
-    // the terminals' vector.
-    if (s.sym->terminal() == t_not_found)
+    if (s.sym->terminal())
     {
-      print.error(name_, ": symbol ", s.sym->name(), " badly stored");
-      return false;
-    }
-
-    if (s.sym->auto_defined())
-    {
-      if (s.sym->terminal())
+      if (std::find(terminals.begin(), terminals.end(), s) == terminals.end())
       {
-        if (std::find(adt.begin(), adt.end(), s) == adt.end())
-        {
-          print.error(name_, ": ADT ", s.sym->name(), " badly stored");
-          return false;
-        }
+        print.error(name_, ": terminal ", s.sym->name(), " badly stored");
+        return false;
       }
-      else  // function
+
+      if (s.sym->auto_defined()
+          && std::find(adt.begin(), adt.end(), s) == adt.end())
       {
-        if (std::find(adf.begin(), adf.end(), s) == adf.end())
-        {
-          print.error(name_, ": ADF ", s.sym->name(), " badly stored");
-          return false;
-        }
+        print.error(name_, ": ADT ", s.sym->name(), " badly stored");
+        return false;
+      }
+    }
+    else  // function
+    {
+      if (std::find(functions.begin(), functions.end(), s) == functions.end())
+      {
+        print.error(name_, ": function ", s.sym->name(), " badly stored");
+        return false;
+      }
+
+      if (s.sym->auto_defined()
+          && std::find(adf.begin(), adf.end(), s) == adf.end())
+      {
+        print.error(name_, ": ADF ", s.sym->name(), " badly stored");
+        return false;
       }
     }
   }
@@ -363,8 +445,8 @@ bool symbol_set::collection::debug() const
 
   // The following condition should be met at the end of the symbol_set
   // specification.
-  // Since we don't want to enforce a particular insertion order (e.g. terminals
-  // before functions), we cannot perform the check here.
+  // Since we don't want to enforce a particular insertion order (i.e.
+  // terminals before functions), we cannot perform the check here.
   //
   //     if (ssize && !terminals.size())
   //     {
@@ -372,25 +454,31 @@ bool symbol_set::collection::debug() const
   //       return false;
   //     }
 
+  if (ssize < functions.size())
+  {
+    print.error(name_, ": wrong terminal set size (more than symbol set)");
+    return false;
+  }
+
   if (ssize < terminals.size())
   {
     print.error(name_, ": wrong terminal set size (more than symbol set)");
     return false;
   }
 
-  if (ssize < adf.size())
+  if (functions.size() < adf.size())
   {
     print.error(name_, ": wrong ADF set size (more than symbol set)");
     return false;
   }
 
-  if (ssize < adt.size())
+  if (terminals.size() < adt.size())
   {
     print.error(name_, ": wrong ADT set size (more than symbol set)");
     return false;
   }
 
-  return true;
+  return ssize == functions.size() + terminals.size();
 }
 
 ///

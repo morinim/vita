@@ -9,8 +9,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Code of conduct for contributors.
 
 ### Changed
-- BREAKING CHANGE.
-  Enable/disable logging of specific information is a bit simpler.
+- symbol_set::roulette() function has the same probability of extracting a
+  terminal / a function regardeless of the specific symbols' weights.
+
+  If all symbols have the same probability to appear into a chromosome, there
+  could be some problems.
+  For instance, if our problem has many variables (let's say 100) and the
+  function set has only 4 symbols we cannot get too complex trees because the
+  functions have a reduced chance to appear in the chromosome (e.g. it
+  happens in the Forex example).
+
+- **BREAKING CHANGE**. Enable/disable logging of specific information is a bit
+  simpler.
+
   Instead of
   ```C++
   env.dynamic = true;
@@ -23,19 +34,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   env.dynamic_file = "dynamic.txt"
   ```
 
-- BREAKING CHANGE.
-  `i_mep::compress` function renamed to `i_mep::cse` (Common Subexpression
-  Elimination).
+- **BREAKING CHANGE**. `i_mep::compress` function renamed to `i_mep::cse`
+  (Common Subexpression Elimination).
 
-- BREAKING CHANGE.
-  Serialization file format for cache and fitness has changed. The new format
-  produces files up to 20% smaller omitting:
+- **BREAKING CHANGE**. Serialization file format for cache and fitness has
+  changed.
+
+  The new format produces files up to 20% smaller omitting:
   1. the `seal` value which is assumed equal to the `cache::seal` value
   2. the fitness vector size (and assuming that all the components of the
      vector are on the same line)
 
-- BREAKING CHANGE.
-  Instead of:
+- **BREAKING CHANGE**. Instead of:
+
   ```C++
   symbol_set sset;
   environment e(&sset, initialization::standard);
@@ -57,7 +68,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   This also permits to remove the pointer from the environment to the
   symbol_set.
 
-- BREAKING CHANGE. Replaced the `search::set_evaluator` method:
+- **BREAKING CHANGE**. Replaced the `search::set_evaluator` method:
   Instead of:
 
   ```C++

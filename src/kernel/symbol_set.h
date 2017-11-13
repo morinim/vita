@@ -15,6 +15,7 @@
 
 #include <string>
 
+#include "kernel/function.h"
 #include "kernel/terminal.h"
 
 namespace vita
@@ -45,6 +46,8 @@ public:
   template<class S, class ...Args> symbol *insert(Args &&...);
 
   const symbol &roulette(category_t) const;
+  const symbol &roulette_free(category_t) const;
+  const function &roulette_function(category_t) const;
   const terminal &roulette_terminal(category_t) const;
 
   const symbol &arg(std::size_t) const;
@@ -56,7 +59,7 @@ public:
   symbol *decode(const std::string &) const;
 
   category_t categories() const;
-  unsigned terminals(category_t) const;
+  std::size_t terminals(category_t) const;
 
   weight_t weight(const symbol &) const;
 
@@ -142,6 +145,7 @@ private:
     explicit collection(std::string = "");
 
     sum_container       all;
+    sum_container functions;
     sum_container terminals;
     sum_container       adf;
     sum_container       adt;
