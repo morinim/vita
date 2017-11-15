@@ -126,21 +126,17 @@ public:
   ///
   /// \warning
   /// `p_cross + p_mutation != 1.0`: `p_mutation` is the probability to mutate
-  /// a gene; it's not the probability to choose the mutation operator (which
+  /// a gene; it's not the probability of choosing the mutation operator (which
   /// depends depends on the recombination algorithm).
   ///
   /// \note A negative value means undefined (auto-tune).
   ///
-  /// \see
-  /// - individual::mutation;
-  /// - operation_strategy::run.
+  /// \see individual::mutation
   double p_mutation = -1.0;
 
   /// Crossover probability.
   ///
   /// \note A negative value means means undefined (auto-tune).
-  ///
-  /// \see operation_strategy::run.
   double p_cross = -1.0;
 
   /// This parameter controls the brood recombination/selection level (`0` to
@@ -148,15 +144,14 @@ public:
   ///
   /// In nature it's common for organisms to produce many offspring and then
   /// neglect, abort, resorb, eat some of them or allow them to eat each
-  /// other. There are many reasons for this behavior ("Kozlowski & Stearns,
-  /// 1989"). The phenomenon is known variously as soft selection, brood
+  /// other. There are various reasons for this behavior (e.g. progeny choice
+  /// hypothesis by "Kozlowski & Stearns, 1989"). The phenomenon is known
+  /// variously as soft selection, brood
   /// selection, spontaneous abortion. The "bottom line" of this behaviour in
   /// nature is the reduction of parental resource investment in offspring who
   /// are potentially less fit than others.
   ///
-  /// \see
-  /// "Greedy recombination and genetic search on the space of computer
-  /// programs" (Walter Alden Tackett - 1995).
+  /// \see https://github.com/morinim/vita/wiki/bibliography#4
   ///
   /// \note
   /// - `0` means undefined (auto-tune);
@@ -182,7 +177,7 @@ public:
   /// \see search::dss()
   trilean dss = trilean::unknown;
 
-  /// This is used for the trivial geography scheme (Spector, Klein 2005).
+  /// This is used for the trivial geography scheme.
   /// The population is viewed as having a 1-dimensional spatial structure -
   /// actually a circle, as we consider the first and last locations to be
   /// adiacent. The production of an individual from location `i` is permitted
@@ -193,6 +188,8 @@ public:
   /// \note
   /// - `0` means auto-tune.
   /// - `std::numeric_limits<unsigned>::max()` disables the scheme.
+  ///
+  /// \see https://github.com/morinim/vita/wiki/bibliography#5
   unsigned mate_zone = 0;
 
   /// Maximun number of generations allowed before terminate a run.

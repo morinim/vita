@@ -781,7 +781,7 @@ i_mep i_mep::cse() const
 /// the fitness is given to it. That means that getting a good parameter
 /// doesn't rise the individual's fitness but only its performance over time.
 ///
-/// \see "Adapting Crossover in Evolutionary Algorithms" - William M. Spears.
+/// \see https://github.com/morinim/vita/wiki/bibliography#6
 ///
 /// \relates i_mep
 ///
