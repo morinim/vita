@@ -200,7 +200,7 @@ public:
   /// Used by some evolution strategies to stop a run when there aren't
   /// improvements within g_without_improvement generations.
   ///
-  /// \note A value of 0 means disabled (this parameter isn't auto-tuned).
+  /// \note A value of 0 means undefined (auto-tune).
   unsigned g_without_improvement = 0;
 
   /// How much data should be reserved for the validation set?
