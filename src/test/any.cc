@@ -26,21 +26,6 @@ using namespace boost;
 
 namespace std
 {
-template<class T>
-struct hash<std::vector<T>>
-{
-  std::size_t operator()(const std::vector<T> &obj) const
-  {
-    std::size_t ret(0);
-
-    for (const auto &i : obj)
-      ret += 11 * std::hash<T>()(i);
-
-    return ret;
-  }
-};
-
-
 std::istream &operator>>(std::istream &i, std::vector<int> &)
 {
   return i;
