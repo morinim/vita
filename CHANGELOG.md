@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Code of conduct for contributors.
+- Complete control of the generational-gap between subset-selection (DSS
+  algorithm)
 
 ### Changed
 - symbol_set::roulette() function has the same probability of extracting a
