@@ -11,6 +11,7 @@ It's suitable for classification, symbolic regression, content base image retrie
 * simple addition of features and modules
 * fast experimentation with detailed run-log
 * modern, standard ISO C++14 source code
+* [more][11]
 
 It's distributed under the [Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
 
@@ -134,3 +135,4 @@ The real story is that Windows may need various expedients about which you can r
 [8]: https://github.com/morinim/vita/blob/master/LICENSE
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
+[11]: https://github.com/morinim/vita/wiki/features
