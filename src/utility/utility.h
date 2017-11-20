@@ -19,9 +19,9 @@
 #include <fstream>
 #include <sstream>
 
-#include "tinyxml2/tinyxml2.h"
-
 #include "kernel/common.h"
+
+#include "tinyxml2/tinyxml2.h"
 
 namespace vita
 {
@@ -71,7 +71,7 @@ template<class T> bool issmall(T v)
 ///
 template<class T> bool isnonnegative(T v)
 {
-  return v >= static_cast<T>(0.0);
+  return v >= static_cast<T>(0);
 }
 
 ///

@@ -238,31 +238,41 @@ void src_search<T, ES>::tune_parameters()
   // The `shape` function modifies the default parameters with
   // strategy-specific values.
   const environment dflt(ES<T>::shape(environment(initialization::standard)));
-  const environment constrained(this->prob_.env);
+
+  environment &env(this->prob_.env);
+
+  // Contains user-specified parameters that will be partly changed by the
+  // `search::tune_parameters` call.
+  const environment constrained(env);
 
   search<T, ES>::tune_parameters();
 
   const auto d_size(data().size());
   Expects(d_size);
 
-  // DSS helps against overfitting but cannot be used when there're just
+  // DSS helps against overfitting but cannot be used when there are just
   // a few examples.
-  if (constrained.dss == trilean::unknown)
+  if (!constrained.dss.has_value())
   {
-    this->prob_.env.dss = d_size > 400 ? trilean::yes : trilean::no;
+    assert(env.generations);
 
-    print.info("DSS set to ", this->prob_.env.dss);
+    if (d_size > 400 && env.generations > 20)
+      env.dss = std::max(10u, env.generations / 10);
+    else
+      env.dss = 0;
+
+    assert(env.dss.has_value());
+    print.info("DSS set to ", *env.dss);
   }
 
   if (!constrained.layers)
   {
     if (dflt.layers > 1 && d_size > 8)
-      this->prob_.env.layers = static_cast<decltype(dflt.layers)>(
-        std::log(d_size));
+      env.layers = static_cast<decltype(dflt.layers)>(std::log(d_size));
     else
-      this->prob_.env.layers = dflt.layers;
+      env.layers = dflt.layers;
 
-    print.info("Number of layers set to ", this->prob_.env.layers);
+    print.info("Number of layers set to ", env.layers);
   }
 
   // A larger number of training cases requires an increase in the population
@@ -277,46 +287,49 @@ void src_search<T, ES>::tune_parameters()
   {
     if (d_size > 8)
     {
-      this->prob_.env.individuals = 2 *
-        static_cast<decltype(dflt.individuals)>(
-          std::pow(std::log2(d_size), 3)) / this->prob_.env.layers;
+      env.individuals = 2
+                        * static_cast<decltype(dflt.individuals)>(
+                            std::pow(std::log2(d_size), 3))
+                        / env.layers;
 
-      if (this->prob_.env.individuals < 4)
-        this->prob_.env.individuals = 4;
+      if (env.individuals < 4)
+        env.individuals = 4;
     }
     else
-      this->prob_.env.individuals = dflt.individuals;
+      env.individuals = dflt.individuals;
 
-    print.info("Population size set to ", this->prob_.env.individuals);
+    print.info("Population size set to ", env.individuals);
   }
 
   if (constrained.validation_percentage == 100)
   {
-    if (this->prob_.env.dss == trilean::yes)
+    if (env.dss.value_or(0) > 0)
       print.info("Using DSS and skipping holdout validation");
     else
     {
       if (d_size * dflt.validation_percentage < 10000)
-        this->prob_.env.validation_percentage = 0;
+        env.validation_percentage = 0;
       else
-        this->prob_.env.validation_percentage = dflt.validation_percentage;
+        env.validation_percentage = dflt.validation_percentage;
 
       print.info("Validation percentage set to ",
-                 this->prob_.env.validation_percentage, '%');
+                 env.validation_percentage, '%');
     }
   }
 
-  Ensures(this->prob_.env.debug(true));
+  Ensures(env.debug(true));
 }
 
 template<class T, template<class> class ES>
 void src_search<T, ES>::preliminary_setup()
 {
-  if (this->prob_.env.dss == trilean::yes)
-    this->set_validator(std::make_unique<dss>(data()));
-  else if (this->prob_.env.validation_percentage)
+  const environment &env(this->prob_.env);
+
+  if (env.dss.value_or(0) > 0)
+    this->set_validator(std::make_unique<dss>(data(), *env.dss));
+  else if (env.validation_percentage)
     this->set_validator(std::make_unique<holdout_validation>(
-                        data(), this->prob_.env.validation_percentage));
+                        data(), env.validation_percentage));
 }
 
 template<class T, template<class> class ES>

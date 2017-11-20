@@ -40,7 +40,7 @@ environment::environment(initialization init)
     p_mutation = 0.04;
     p_cross = 0.9;
     brood_recombination = 1;
-    dss = trilean::yes;
+    dss = 0;
     layers = 1;
     individuals = 100;
     min_individuals = 2;
@@ -78,7 +78,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
   set_text(e_environment, "brood_recombination", brood_recombination);
-  set_text(e_environment, "dss", as_integer(dss));
+  set_text(e_environment, "dss", *dss);
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
@@ -159,7 +159,7 @@ bool environment::debug(bool force_defined) const
       return false;
     }
 
-    if (dss == trilean::unknown)
+    if (!dss.has_value())
     {
       print.error("Undefined dss data member");
       return false;

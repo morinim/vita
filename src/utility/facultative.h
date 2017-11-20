@@ -149,6 +149,11 @@ public:
   constexpr const value_type &value() const { return **this; }
   //constexpr value_type &value() { return **this; }
 
+  /// Returns the contained value if `*this` has a value, otherwise returns
+  /// `default_value`.
+  constexpr value_type value_or(const value_type &default_value) const
+  { return has_value() ? **this : default_value; }
+
   constexpr bool has_value() const { return !P::is_empty(val_); }
 
 private:

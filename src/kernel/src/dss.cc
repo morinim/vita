@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,8 +26,9 @@ std::uintmax_t weight(const src_data::example &v)
 
 }  // namespace
 
-dss::dss(src_data &d) : dat_(d)
+dss::dss(src_data &d, unsigned gap) : dat_(d), gap_(gap)
 {
+  Expects(gap);
 }
 
 void dss::reset_age_difficulty(data::dataset_t d)
@@ -136,7 +137,7 @@ void dss::shake_impl()
 bool dss::shake(unsigned generation)
 {
   if (generation == 0 ||    // already handled by preliminary_setup()
-      generation % 4 != 0)
+      generation % gap_)
     return false;
 
   print.debug("DSS shaking generation ", generation);

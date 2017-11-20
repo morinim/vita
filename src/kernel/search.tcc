@@ -73,8 +73,8 @@ void search<T, ES>::tune_parameters()
   if (!constrained.brood_recombination)
     prob_.env.brood_recombination = dflt.brood_recombination;
 
-  if (constrained.dss == trilean::unknown)
-    prob_.env.dss = trilean::no;
+  if (!constrained.dss.has_value())
+    prob_.env.dss = 0;
 
   if (!constrained.layers)
     prob_.env.layers = dflt.layers;

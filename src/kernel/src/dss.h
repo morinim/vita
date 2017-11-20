@@ -25,14 +25,16 @@ namespace vita
 /// When using GP on a difficult problem, with a large set of training data,
 /// a large population size is needed and a very large number of evaluations
 /// must be carried out. DSS is a subset selection method which uses the
-/// current run to select:
+/// available information to select:
 /// - firstly 'difficult' cases;
 /// - secondly cases which have not been looked at for several generations.
+///
+/// \see https://github.com/morinim/vita/wiki/bibliography#5
 ///
 class dss : public validation_strategy
 {
 public:
-  explicit dss(src_data &);
+  explicit dss(src_data &, unsigned gap);
 
   void preliminary_setup() override;
   bool shake(unsigned) override;
@@ -44,6 +46,7 @@ private:
   void shake_impl();
 
   src_data &dat_;
+  unsigned gap_;
 };
 
 }  // namespace vita

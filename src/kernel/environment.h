@@ -23,6 +23,8 @@
 #include "kernel/symbol_set.h"
 #include "kernel/trilean.h"
 
+#include "utility/facultative.h"
+
 namespace vita
 {
 
@@ -172,10 +174,14 @@ public:
   /// - A length of 0 means undefined (auto-tune).
   unsigned tournament_size = 0;
 
-  /// Switches Dynamic Subset Selection on/off.
+  /// Enables Dynamic Subset Selection every `dss` generations.
   ///
-  /// \see search::dss()
-  trilean dss = trilean::unknown;
+  /// `0` disables DSS. Default status is uninitialized (auto-tune).
+  ///
+  /// \see
+  /// - search::dss()
+  /// - https://github.com/morinim/vita/wiki/bibliography#7
+  facultative<unsigned> dss = {};
 
   /// This is used for the trivial geography scheme.
   /// The population is viewed as having a 1-dimensional spatial structure -

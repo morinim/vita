@@ -147,6 +147,14 @@ BOOST_AUTO_TEST_CASE(reset)
   BOOST_TEST(!value.has_value());
 }
 
+BOOST_AUTO_TEST_CASE(value_or)
+{
+  facultative<int, -1> v1, v2(2);
+
+  BOOST_TEST(v1.value_or(0) == 0);
+  BOOST_TEST(v2.value_or(0) == 2);
+}
+
 BOOST_AUTO_TEST_CASE(facultative_nan_policy)
 {
   using namespace vita;

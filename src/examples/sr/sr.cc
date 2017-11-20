@@ -64,10 +64,10 @@ void fix_parameters(vita::src_problem *problem)
     env.mep.code_length = new_length;
   }
 
-  if (env.dss != trilean::no && problem->data()->size() <= 30)
+  if (env.dss.value_or(0) > 0 && problem->data()->size() <= 30)
   {
-    print.warning("Adjusting DSS (=> false)");
-    env.dss = trilean::no;
+    print.warning("Adjusting DSS (=> disabled)");
+    env.dss = 0;
   }
 
   if (env.tournament_size)
@@ -246,15 +246,18 @@ bool data(const std::string &data_file)
 }
 
 ///
-/// \param[in] v a value for DSS (\see is_true).
+/// \param[in] s a value for DSS
 ///
 /// Turn on/off the Dynamic Subset Selection algorithm.
   ///
-void dss(const std::string &v)
+void dss(const std::string &s)
 {
-  assign(problem->env.dss, is_true(v));
+  problem->env.dss = decltype(problem->env.dss){s};
 
-  print.info("Dynamic Subset Selection is ", problem->env.dss);
+  if (problem->env.dss.has_value())
+    print.info("Dynamic Subset Selection is ", *problem->env.dss);
+  else
+    print.info("Auto-tuning Dynamic Subset Selection");
 }
 
 ///
@@ -823,7 +826,7 @@ int parse_command_line(int argc, char *const argv[])
       ("brood", po::value<unsigned>()->notifier(&ui::brood),
        "sets the brood size for recombination (0 to disable)")
       ("dss", po::value<std::string>()->notifier(&ui::dss),
-       "turns on/off the Dynamic Subset Selection algorithm")
+       "controls the Dynamic Subset Selection algorithm")
       ("generations,g", po::value<unsigned>()->notifier(&ui::generations),
        "sets the maximum number of generations in a run")
       ("gwi", po::value<unsigned>()->notifier(&ui::gwi),
