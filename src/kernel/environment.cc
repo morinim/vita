@@ -47,8 +47,7 @@ environment::environment(initialization init)
     tournament_size = 5;
     mate_zone = 20;
     generations = 100;
-    g_without_improvement =
-      std::numeric_limits<decltype(g_without_improvement)>::max();
+    max_stuck_time = std::numeric_limits<unsigned>::max();
     arl = trilean::no;
     validation_percentage = 20;
   }
@@ -82,7 +81,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
-  set_text(e_environment, "max_gens_wo_imp", g_without_improvement);
+  set_text(e_environment, "max_stuck_time", *max_stuck_time);
   set_text(e_environment, "arl", as_integer(arl));
   set_text(e_environment, "validation_percentage", validation_percentage);
   set_text(e_environment, "cache_bits", cache_size);  // size `1u<<cache_size`
@@ -201,9 +200,9 @@ bool environment::debug(bool force_defined) const
       return false;
     }
 
-    if (!g_without_improvement)
+    if (!max_stuck_time.has_value())
     {
-      print.error("Undefined g_without_improvement data member");
+      print.error("Undefined max_stuck_time data member");
       return false;
     }
 

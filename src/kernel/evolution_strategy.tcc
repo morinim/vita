@@ -34,18 +34,17 @@ environment std_es<T>::shape(environment env)
 /// \return `true` when evolution must be stopped
 ///
 /// We use an accelerated stop condition when:
-/// - all the individuals have the same fitness;
-/// - after `env_.g_without_improvement` generations the situation doesn't
-///   change.
+/// - after `max_stuck_time` generations the situation doesn't change;
+/// - all the individuals have the same fitness.
 ///
 template<class T>
 bool std_es<T>::stop_condition() const
 {
   const auto &env(this->pop_.get_problem().env);
+  Expects(env.max_stuck_time.has_value());
 
-  if (env.g_without_improvement &&
-      this->sum_->gen - this->sum_->last_imp > env.g_without_improvement &&
-      issmall(this->sum_->az.fit_dist().variance()))
+  if (this->sum_->gen > this->sum_->last_imp + *env.max_stuck_time
+      && issmall(this->sum_->az.fit_dist().variance()))
     return true;
 
   return false;

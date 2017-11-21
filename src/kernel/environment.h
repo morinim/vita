@@ -204,10 +204,10 @@ public:
   unsigned generations = 0;
 
   /// Used by some evolution strategies to stop a run when there aren't
-  /// improvements within g_without_improvement generations.
+  /// improvements within `max_stuck_time` generations.
   ///
-  /// \note A value of 0 means undefined (auto-tune).
-  unsigned g_without_improvement = 0;
+  /// Default status is uninitialized (auto-tune).
+  facultative<unsigned, 0> max_stuck_time = {};
 
   /// How much data should be reserved for the validation set?
   /// `validation_percentage` is the fraction of the original data that goes

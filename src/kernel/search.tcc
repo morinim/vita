@@ -97,8 +97,8 @@ void search<T, ES>::tune_parameters()
   if (!constrained.generations)
     prob_.env.generations = dflt.generations;
 
-  if (!constrained.g_without_improvement)
-    prob_.env.g_without_improvement = dflt.g_without_improvement;
+  if (!constrained.max_stuck_time.has_value())
+    prob_.env.max_stuck_time = dflt.max_stuck_time;
 
   if (constrained.arl == trilean::unknown)
     prob_.env.arl = dflt.arl;

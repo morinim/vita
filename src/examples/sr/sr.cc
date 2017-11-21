@@ -112,8 +112,8 @@ void fix_parameters(vita::src_problem *problem)
 }
 
 ///
-/// \param[in] s a value to be interpreted as boolean.
-/// \return `true` if `s` is not zero and not `"false"`.
+/// \param[in] s a value to be interpreted as boolean
+/// \return      `true` if `s` is not zero and not `"false"`
 ///
 bool is_true(const std::string &s)
 {
@@ -121,10 +121,11 @@ bool is_true(const std::string &s)
 }
 
 ///
-/// Contains the text-based command line interface. The interface is not
-/// intented to be human friendly (no code completion, command history,
-/// submenu...). We just want a light interface for the Python GUI and a simple
-/// way to debug.
+/// Contains the text-based command line interface.
+///
+/// The interface is not intented to be human friendly (no code completion,
+/// command history, submenu...). We just want a light interface for the
+/// Python GUI and a simple way of debugging.
 ///
 namespace ui
 {
@@ -167,9 +168,9 @@ void arl(const std::string &v)
 }
 
 ///
-/// \param[in] size brood size for recombination (0 to disable).
-///
 /// Sets the brood size for recombination.
+///
+/// \param[in] size brood size for recombination (0 to disable)
 ///
 void brood(unsigned size)
 {
@@ -179,9 +180,9 @@ void brood(unsigned size)
 }
 
 ///
-/// \param[in] length code/genome length of an individual.
-///
 /// Sets the code/genome length of an individual.
+///
+/// \param[in] length code/genome length of an individual
 ///
 void code_length(unsigned length)
 {
@@ -193,10 +194,10 @@ void code_length(unsigned length)
 }
 
 ///
-/// \param[in] r range is [0,1].
-///
 /// Sets the overall probability that crossover will occour between winners
 /// in a tournament.
+///
+/// \param[in] r range is `[0,1]`
 ///
 void crossover_rate(double r)
 {
@@ -217,8 +218,8 @@ void crossover_rate(double r)
 }
 
 ///
-/// \param[in] data_file guess what? This is the data file to be parsed.
-/// \return `true` if data have been correctly read and parsed.
+/// \param[in] data_file guess what? This is the data file to be parsed
+/// \return              `true` if data have been correctly read and parsed
 ///
 bool data(const std::string &data_file)
 {
@@ -246,10 +247,10 @@ bool data(const std::string &data_file)
 }
 
 ///
+/// Turn on/off the Dynamic Subset Selection algorithm.
+///
 /// \param[in] s a value for DSS
 ///
-/// Turn on/off the Dynamic Subset Selection algorithm.
-  ///
 void dss(const std::string &s)
 {
   problem->env.dss = decltype(problem->env.dss){s};
@@ -257,11 +258,13 @@ void dss(const std::string &s)
   if (problem->env.dss.has_value())
     print.info("Dynamic Subset Selection is ", *problem->env.dss);
   else
-    print.info("Auto-tuning Dynamic Subset Selection");
+    print.info("Auto-tuning the parameter");
 }
 
 ///
-/// \param[in] v a value for elitism (\see is_true).
+/// Sets the elitism tendency.
+///
+/// \param[in] v a value for elitism
 ///
 void elitism(const std::string &v)
 {
@@ -279,7 +282,7 @@ void environment(bool)
 }
 
 ///
-/// param[in] v the chosen evaluator.
+/// param[in] v the chosen evaluator
 ///
 /// \note
 /// The evaluator should fit the current problem kind (symbolic regression,
@@ -331,9 +334,9 @@ void exit(bool)
 }
 
 ///
-/// \param[in] g maximum number of generations in a run.
-///
 /// Sets the maximum number of generations in a run.
+///
+/// \param[in] g maximum number of generations in a run
 ///
 void generations(unsigned g)
 {
@@ -370,15 +373,19 @@ void go(bool = true)
 }
 
 ///
-/// \param[in] g maximum number of generations without improvement in a run
-///              (0 to disable).
 ///
 /// Sets the maximum number of generations without improvement in a run.
-void gwi(unsigned g)
+///
+/// \param[in] g maximum number of generations without improvement in a run
+///              (`0` for auto-tuning, large number for disabling)
+void max_stuck_time(unsigned g)
 {
-  problem->env.g_without_improvement = g;
+  problem->env.max_stuck_time = g;
 
-  print.info("Max number of generations without improvement set to ", g);
+  if (problem->env.max_stuck_time.has_value())
+    print.info("Max number of generations without improvement set to ", g);
+  else
+    print.info("Auto-tuning the parameter");
 }
 
 ///
@@ -398,8 +405,9 @@ void version(bool)
 }
 
 ///
-/// \brief Set mating zone
-/// \param[in] z mating zone (0 for panmictic).
+/// Sets mating zone.
+///
+/// \param[in] z mating zone (`0` for panmictic)
 ///
 void mate_zone(unsigned z)
 {
@@ -409,10 +417,10 @@ void mate_zone(unsigned z)
 }
 
 ///
-/// \param[in] r mutation rate, range is [0,1].
-///
 /// Sets the overall probability of mutation of the individuals that have
 /// been selected as winners in a tournament.
+///
+/// \param[in] r mutation rate, range is `[0,1]`
 ///
 void mutation_rate(double r)
 {
@@ -433,8 +441,8 @@ void mutation_rate(double r)
 }
 
 ///
-/// \param[in] ts The dataset used as test set.
-/// \return `true` if data have been correctly read and parsed.
+/// \param[in] ts the dataset used as test set
+/// \return       `true` if data have been correctly read and parsed
 ///
 bool testset(const std::string &ts)
 {
@@ -462,9 +470,9 @@ bool testset(const std::string &ts)
 }
 
 ///
-/// \param[in] n number of individuals.
-///
 /// Sets the number of individuals examined for choosing parents.
+///
+/// \param[in] n number of individuals
 ///
 void tournament_size(unsigned n)
 {
@@ -474,9 +482,9 @@ void tournament_size(unsigned n)
 }
 
 ///
-/// \param[in] l number of layers of the population
-///
 /// Sets the number of layers of the population.
+///
+/// \param[in] l number of layers of the population
 ///
 void layers(unsigned l)
 {
@@ -487,9 +495,9 @@ void layers(unsigned l)
 }
 
 ///
-/// \param[in] size number of individuals in a layer of the population.
-///
 /// Sets the number of individuals in a layer of the population.
+///
+/// \param[in] size number of individuals in a layer of the population
 ///
 void population_size(unsigned size)
 {
@@ -502,7 +510,7 @@ void population_size(unsigned size)
 ///
 /// \param[in] seed sets the seed for the pseudo-random number generator.
 ///                 Pseudo-random sequences are repeatable by using the same
-///                 seed value.
+///                 seed value
 ///
 void random_seed(unsigned seed)
 {
@@ -512,9 +520,9 @@ void random_seed(unsigned seed)
 }
 
 ///
-/// \param[in] r number of runs.
-///
 /// Number of runs to be tried.
+///
+/// \param[in] r number of runs
 ///
 void set_runs(unsigned r)
 {
@@ -535,9 +543,9 @@ void stat_arl(const std::string &v)
 }
 
 ///
-/// \param[in] dir a directory.
+/// Number of runs to be tried.
 ///
-/// Logs statistics in the `stat.dir` directory.
+/// \param[in] dir a directory
 ///
 void stat_dir(const std::string &dir)
 {
@@ -580,7 +588,7 @@ void stat_population(const std::string &v)
 }
 
 ///
-/// \param[in] v if `true` saves a summary of the runs.
+/// \param[in] v if `true` saves a summary of the runs
 ///
 void stat_summary(const std::string &v)
 {
@@ -593,8 +601,9 @@ void stat_summary(const std::string &v)
 ///
 /// \param[in] symbol_file file containing a list of symbols (functions and
 ///                        terminals). If `symbol_file` is `empty()`, the
-///                        default symbol set will be loaded.
-/// \return `true` if symbols have been correctly read and parsed.
+///                        default symbol set will be loaded
+/// \return                `true` if symbols have been correctly read and
+///                        parsed
 ///
 bool symbols(const std::string &symbol_file)
 {
@@ -607,7 +616,7 @@ bool symbols(const std::string &symbol_file)
   {
     print.info("Reading symbol file ", symbol_file, "...");
 
-    unsigned parsed(0);
+    std::size_t parsed(0);
     try
     {
       parsed = problem->load_symbols(symbol_file);
@@ -635,6 +644,8 @@ bool symbols(const std::string &symbol_file)
   return true;
 }
 
+///
+/// Sets the success threashold.
 ///
 /// \param[in] v the threshold value
 ///
@@ -674,7 +685,7 @@ void threshold(const std::string &v)
 
 ///
 /// \param[in] bits number of bits used for the cache (which contains `2^bits`
-///                 elements).
+///                 elements)
 ///
 void cache(unsigned bits)
 {
@@ -685,9 +696,9 @@ void cache(unsigned bits)
 }
 
 ///
-/// \param[in] v range is [0,1] or [0%,100%].
-///
 /// Sets percent of the dataset used for validation.
+///
+/// \param[in] v range is `[0,1]` or `[0%,100%]`
 ///
 void validation(const std::string &v)
 {
@@ -714,7 +725,7 @@ void validation(const std::string &v)
 }
 
 ///
-/// \param[in] v verbosity level.
+/// \param[in] v verbosity level
 ///
 void verbosity(unsigned v)
 {
@@ -829,9 +840,9 @@ int parse_command_line(int argc, char *const argv[])
        "controls the Dynamic Subset Selection algorithm")
       ("generations,g", po::value<unsigned>()->notifier(&ui::generations),
        "sets the maximum number of generations in a run")
-      ("gwi", po::value<unsigned>()->notifier(&ui::gwi),
+      ("max-stuck-time", po::value<unsigned>()->notifier(&ui::max_stuck_time),
        "sets the maximum number of generations without improvement in a run "
-       "(0 disable)")
+       "(large number for disabling, 0 for auto-tuning)")
       ("runs,r", po::value<unsigned>()->notifier(&ui::set_runs),
        "number of runs to be tried")
       ("mate-zone", po::value<unsigned>()->notifier(&ui::mate_zone),
