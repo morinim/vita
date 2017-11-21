@@ -163,13 +163,6 @@ private:
 template<class T, T V = std::numeric_limits<T>::max()>
 using facultative = facultative_with_policy<facultative_ns::value<T, V>>;
 
-template<class P, class TAG>
-std::ostream &operator<<(std::ostream &o,
-                         const facultative_with_policy<P, TAG> &f)
-{
-  return o << *f;
-}
-
 }  // namespace vita
 
 #endif // include guard
