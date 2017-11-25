@@ -326,10 +326,10 @@ void src_search<T, ES>::preliminary_setup()
   const environment &env(this->prob_.env);
 
   if (env.dss.value_or(0) > 0)
-    this->set_validator(std::make_unique<dss>(data(), *env.dss));
+    this->template set_validator<dss>(data(), *env.dss);
   else if (env.validation_percentage)
-    this->set_validator(std::make_unique<holdout_validation>(
-                        data(), env.validation_percentage));
+    this->template set_validator<holdout_validation>(
+      data(), env.validation_percentage);
 }
 
 template<class T, template<class> class ES>

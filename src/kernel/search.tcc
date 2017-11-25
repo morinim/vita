@@ -254,8 +254,8 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 /// \param[in] args arguments used to build the `E` evaluator
 ///
 template<class T, template<class> class ES>
-template<class E, class ...Args>
-void search<T, ES>::set_evaluator(Args &&... args)
+template<class E, class... Args>
+void search<T, ES>::set_evaluator(Args && ...args)
 {
   if (prob_.env.cache_size)
     active_eva_ = std::make_unique<evaluator_proxy<T, E>>(
@@ -268,11 +268,10 @@ void search<T, ES>::set_evaluator(Args &&... args)
 /// \param[in] v a new validation strategy
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::set_validator(std::unique_ptr<validation_strategy> v)
+template<class V, class... Args>
+void search<T, ES>::set_validator(Args && ...args)
 {
-  Expects(v);
-
-  vs_ = std::move(v);
+  vs_ = std::make_unique<V>(std::forward<Args>(args)...);
 }
 
 ///
