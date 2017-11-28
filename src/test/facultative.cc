@@ -149,6 +149,8 @@ BOOST_AUTO_TEST_CASE(reset)
 
 BOOST_AUTO_TEST_CASE(value_or)
 {
+  using namespace vita;
+
   facultative<int, -1> v1, v2(2);
 
   BOOST_TEST(v1.value_or(0) == 0);

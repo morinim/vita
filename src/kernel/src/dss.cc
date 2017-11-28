@@ -136,8 +136,8 @@ void dss::shake_impl()
 
 bool dss::shake(unsigned generation)
 {
-  if (generation == 0 ||    // already handled by preliminary_setup()
-      generation % gap_)
+  if (generation == 0        // already handled by preliminary_setup()
+      || generation % gap_)
     return false;
 
   print.debug("DSS shaking generation ", generation);
