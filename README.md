@@ -36,7 +36,7 @@ However, since core members of the Vita project have no access to these platform
 
 #### Windows ####
 
-Take a look at the [specific walkthrough][6].
+* The [specific walkthrough][6] contains all the details.
 
 ### Optional ###
 
@@ -112,6 +112,8 @@ cd build/
 cmake ..
 ```
 
+Windows needs various expedients about which you can read in the [Windows walkthrough][6].
+
 To suggest a specific compiler you can write:
 
 ```shell
@@ -121,8 +123,6 @@ CXX=clang++ cmake ..
 You're now ready to build using the traditional `make` system (see above).
 
 All the output files will be stored in subdirectories of `build/` (out of source builds).
-
-The real story is that Windows may need various expedients about which you can read in the [Windows walkthrough][6].
 
 
 [1]: http://www.eosdev.it/
