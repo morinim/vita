@@ -60,8 +60,8 @@ public:
   /// Sets strategy-specific parameters.
   static environment shape(environment env) { return env; }
 
-  /// Initial setup before evolution starts.
-  void pre_bookkeeping() const {}
+  /// Initial setup performed before evolution starts.
+  void init() const {}
 
   /// Work to be done at the end of an evolution run.
   void post_bookkeeping() const {}

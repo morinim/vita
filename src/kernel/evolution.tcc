@@ -292,7 +292,7 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
   eva_.clear(evaluator<T>::stats);
 #endif
 
-  es_.pre_bookkeeping();  // hook for strategy-specific preliminary bookkeeping
+  es_.init();  // customizatin point for strategy-specific initialization
 
   for (stats_.gen = 0; !stop_condition(stats_) && !stop;  ++stats_.gen)
   {
