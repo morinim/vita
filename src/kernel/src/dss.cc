@@ -54,8 +54,7 @@ std::pair<uintmax_t, uintmax_t> dss::average_age_difficulty(
   auto avg(std::accumulate(
              dat_.begin(d), dat_.end(d),
              std::pair<uintmax_t, uintmax_t>(0, 0),
-             [](const std::pair<uintmax_t, uintmax_t> &p,
-                const src_data::example &e)
+             [](const auto &p, const src_data::example &e)
              {
                return std::pair<uintmax_t, uintmax_t>(p.first + e.age,
                                                       p.second + e.difficulty);
@@ -73,7 +72,7 @@ std::pair<uintmax_t, uintmax_t> dss::average_age_difficulty(
 ///
 /// \attention The procedure resets current training / validation sets.
 ///
-void dss::preliminary_setup()
+void dss::init()
 {
   dat_.move_append(data::training, data::validation);
 

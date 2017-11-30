@@ -25,9 +25,19 @@ namespace vita
 class validation_strategy
 {
 public:
-  virtual void preliminary_setup() = 0;
-  virtual bool shake(unsigned) = 0;
-  virtual void final_bookkeeping() = 0;
+  /// Initializes the data structures needed for the validation strategy.
+  ///
+  /// \note Called only one time before the first use of the validation
+  ///       strategy.
+  virtual void init() {}
+
+  /// Changes the training environment.
+  ///
+  /// \param[in] generation current generation
+  /// \return    `true` if some change in the training environment has occured
+  ///
+  /// \note Called at the beginning of every generation.
+  virtual bool shake(unsigned generation) = 0;
 
   virtual ~validation_strategy() {}
 };
@@ -40,12 +50,11 @@ public:
 ///
 /// \see <https://en.wikipedia.org/wiki/Null_Object_pattern>
 ///
-class as_is_validation : public validation_strategy
+class as_is_validation final : public validation_strategy
 {
 public:
-  void preliminary_setup() final {}
-  bool shake(unsigned) final { return false; }
-  void final_bookkeeping() final {}
+  /// Does nothing signalling that anything is changed.
+  bool shake(unsigned) override { return false; }
 };
 
 }  // namespace vita

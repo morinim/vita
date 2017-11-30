@@ -36,9 +36,8 @@ class dss : public validation_strategy
 public:
   explicit dss(src_data &, unsigned gap);
 
-  void preliminary_setup() override;
+  void init() override;
   bool shake(unsigned) override;
-  void final_bookkeeping() override {}
 
 private:
   std::pair<uintmax_t,uintmax_t> average_age_difficulty(data::dataset_t) const;

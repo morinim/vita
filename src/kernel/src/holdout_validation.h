@@ -33,9 +33,8 @@ class holdout_validation : public validation_strategy
 public:
   holdout_validation(src_data &, unsigned);
 
-  void preliminary_setup() override;
+  void init() override;
   bool shake(unsigned) override { return false; }
-  void final_bookkeeping() override {}
 
 private:
   src_data &dat_;

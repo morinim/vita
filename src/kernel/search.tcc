@@ -117,7 +117,7 @@ summary<T> search<T, ES>::run(unsigned n)
 
   preliminary_setup();
 
-  vs_->preliminary_setup();
+  vs_->init();
   auto shake([this](unsigned g) { return vs_->shake(g); });
 
   summary<T> overall_summary;
@@ -152,8 +152,8 @@ summary<T> search<T, ES>::run(unsigned n)
 
     print_resume(run_summary.best.score);
 
-    if (r == 0 ||
-        run_summary.best.score.fitness > overall_summary.best.score.fitness)
+    if (r == 0
+        || run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
       overall_summary.best = run_summary.best;
       best_run = r;

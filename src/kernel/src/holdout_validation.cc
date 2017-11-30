@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,7 +28,7 @@ holdout_validation::holdout_validation(src_data &d, unsigned perc)
 ///
 /// \attention The procedure resets current training / validation sets.
 ///
-void holdout_validation::preliminary_setup()
+void holdout_validation::init()
 {
   // Validation set items are moved to the training set.
   dat_.move_append(data::validation, data::training);
