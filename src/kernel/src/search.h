@@ -69,9 +69,9 @@ private:
   src_data &data() const;
   bool stop_condition(const summary<T> &) const;
 
-  // Template methods for search::run() member function.
+  // Template methods / customization points for search::run().
   model_measurements calculate_metrics(const summary<T> &) const override;
-  void preliminary_setup() override;
+  void init() override;
   void after_evolution(summary<T> *) override;
   void print_resume(const model_measurements &) const override;
 

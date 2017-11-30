@@ -67,7 +67,11 @@ protected:
 private:
   // Template methods for search::run() member function.
   virtual model_measurements calculate_metrics(const summary<T> &) const;
-  virtual void preliminary_setup() {}
+
+  /// Template method of the search::run() member function called exactly one
+  /// time at the beginning of the first run.
+  virtual void init() {}
+
   virtual void after_evolution(summary<T> *) {}
   virtual void print_resume(const model_measurements &) const;
 

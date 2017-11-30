@@ -115,7 +115,7 @@ summary<T> search<T, ES>::run(unsigned n)
 {
   tune_parameters();
 
-  preliminary_setup();
+  init();
 
   vs_->init();
   auto shake([this](unsigned g) { return vs_->shake(g); });

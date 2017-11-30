@@ -321,7 +321,7 @@ void src_search<T, ES>::tune_parameters()
 }
 
 template<class T, template<class> class ES>
-void src_search<T, ES>::preliminary_setup()
+void src_search<T, ES>::init()
 {
   const environment &env(this->prob_.env);
 
