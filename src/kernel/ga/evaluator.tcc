@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_GA_EVALUATOR_TCC
 
 ///
-/// \param[in] f an objective function.
-///
 /// GP-evaluators use datasets, GA-evaluators need functions to be maximized.
+///
+/// \param[in] f an objective function
 ///
 template<class T, class F>
 ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
@@ -32,8 +32,8 @@ ga_evaluator<T, F>::ga_evaluator(F f) : f_(f)
 }
 
 ///
-/// \param[in] f objective function.
-/// \return an evaluator based on `f`.
+/// \param[in] f objective function
+/// \return      an evaluator based on `f`
 ///
 /// This is the so called object generator idiom. Here it's used because C++11
 /// standard doesn't allow for template argument deduction from the parameters
@@ -53,7 +53,7 @@ ga_evaluator<T, F> make_ga_evaluator(F f)
 }
 
 ///
-/// \return the fitness of the individual.
+/// \return the fitness of the individual
 ///
 template<class T, class F>
 fitness_t ga_evaluator<T, F>::operator()(const T &ind)

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,10 +20,9 @@
 namespace vita
 {
 ///
-/// \brief Calculates the fitness of an individual.
+/// Calculates the fitness of an individual.
 ///
-/// \note
-/// This is a simple adapter for the objective function.
+/// \note This is a simple adapter for the objective function.
 ///
 /// \warning
 /// Being a simple adapter implies that the evolutionary algorithm will try to
@@ -39,7 +38,8 @@ public:
   virtual fitness_t operator()(const T &) override;
 
 private:
-  F f_;
+  // See <https://stackoverflow.com/q/13233213/3235496>
+  std::conditional_t<std::is_function<F>::value, std::add_pointer_t<F>, F> f_;
 };
 
 template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);

@@ -81,7 +81,7 @@ int main()
   for (unsigned i(0); i < n_jobs; ++i)
     prob.sset.insert(vita::ga::parameter(i, -0.5, 23.5));
 
-  vita::ga_search<vita::i_de, vita::de_es, decltype(&f)> search(prob, &f);
+  vita::ga_search<vita::i_de, vita::de_es, decltype(f)> search(prob, f);
 
   const auto res(search.run().best.solution);
 
