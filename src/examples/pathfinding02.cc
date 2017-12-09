@@ -34,7 +34,7 @@ class direction : public vita::ga::integer
 public:
   enum cardinal_dir {north, south, west, east};
 
-  explicit direction(unsigned step) : vita::ga::integer(step, 0, 4)  {}
+  explicit direction() : vita::ga::integer({0, 4})  {}
 
   std::string display(terminal::param_t v, format) const override
   {
@@ -158,6 +158,8 @@ maze path_on_maze(const std::vector<cell_coord> &path, maze base,
 
 int main()
 {
+  using namespace vita;
+
   const cell_coord start{0, 0}, goal{16, 16};
   const maze m =
   {
@@ -180,24 +182,21 @@ int main()
     "     *       * * "
   };
 
-  const std::size_t sup_length(m.size() * m[0].size() / 2);
-
-  vita::problem prob;
-
-  for (unsigned step(0); step < sup_length; ++step)
-    prob.sset.insert<direction>(step);
-
+  problem prob;
   prob.env.individuals = 150;
   prob.env.generations =  20;
 
-  auto f = [m, start, goal](const vita::i_ga &x)
+  const auto length(m.size() * m[0].size() / 2);
+  prob.chromosome<direction>(length);
+
+  auto f = [m, start, goal](const i_ga &x)
   {
     const auto final(run(x, m, start, goal));
 
     return -distance(final.first, goal) - final.second / 1000.0;
   };
 
-  vita::ga_search<vita::i_ga, vita::std_es, decltype(f)> search(prob, f);
+  ga_search<i_ga, std_es, decltype(f)> search(prob, f);
 
   const auto best_path(extract_path(search.run().best.solution, m, start,
                                     goal));

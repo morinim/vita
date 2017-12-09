@@ -22,6 +22,14 @@
 namespace vita
 {
 
+///
+/// Half closed interval.
+///
+/// `range{m, u}` specifies the half closed interval `[m; u[` (`m` is the
+/// minimum value, `u` an exclusive thight upper bound).
+///
+template<class T> using range = std::pair<T, T>;
+
 namespace random
 {
 enum class distribution {uniform, normal};
@@ -149,6 +157,18 @@ between(T min, T sup)
 }
 
 ///
+/// Uniformly extracts a random value in a range.
+///
+/// \param[in] r a half-open range range
+/// \return      a random value in range `r`
+///
+template<class T>
+T in(range<T> r)
+{
+  return between(r.first, r.second);
+}
+
+///
 /// \param[in] sup upper bound
 /// \return        a random number in the [0;sup[ range
 ///
@@ -157,7 +177,7 @@ between(T min, T sup)
 template<class T>
 T sup(T sup)
 {
-  return between<T>(static_cast<T>(0), sup);
+  return between(static_cast<T>(0), sup);
 }
 
 ///

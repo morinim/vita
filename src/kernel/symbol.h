@@ -13,6 +13,7 @@
 #if !defined(VITA_SYMBOL_H)
 #define      VITA_SYMBOL_H
 
+#include <limits>
 #include <string>
 
 #include "kernel/vitafwd.h"
@@ -44,6 +45,8 @@ public:
   category_t category() const;
   opcode_t opcode() const;
   bool terminal() const;
+
+  void category(category_t);
 
   virtual std::string name() const;
 
@@ -103,6 +106,21 @@ inline bool symbol::auto_defined() const
 inline category_t symbol::category() const
 {
   return category_;
+}
+
+///
+/// Changes the category of a symbol.
+///
+/// \param[in] c the new category
+///
+/// \remark Should be called only for symbols with undefined category.
+///
+inline void symbol::category(category_t c)
+{
+  Expects(category_ == std::numeric_limits<category_t>::max());
+  Expects(c != category_);
+
+  category_ = c;
 }
 
 ///

@@ -34,10 +34,24 @@ public:
 
   virtual bool debug() const;
 
-public:
+  template<class T, class... Args> void chromosome(std::size_t, Args && ...);
+
   environment env;
   symbol_set sset;
 };
+
+
+template<class T, class... Args>
+void problem::chromosome(std::size_t length, Args && ...args)
+{
+  for (decltype(length) i(0); i < length; ++i)
+  {
+    auto t{std::make_unique<T>(args...)};
+    t->category(static_cast<category_t>(i));
+
+    sset.insert(std::move(t));
+  }
+}
 
 }  // namespace vita
 

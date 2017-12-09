@@ -62,10 +62,12 @@ double f(std::vector<double> start)
 
 int main()
 {
+  using namespace vita;
+
   std::generate(job_duration.begin(), job_duration.end(),
                 []
                 {
-                  return std::chrono::hours(vita::random::between(1, 4));
+                  return std::chrono::hours(random::between(1, 4));
                 });
 
   std::cout << "Total time required: "
@@ -73,15 +75,15 @@ int main()
                                std::chrono::hours(0)).count()
             << '\n';
 
-  vita::problem prob;
+  problem prob;
   prob.env.individuals =  250;
   prob.env.generations = 2000;
 
   // Problem's parameters.
   for (unsigned i(0); i < n_jobs; ++i)
-    prob.sset.insert(vita::ga::parameter(i, -0.5, 23.5));
+    prob.sset.insert(ga::parameter(i, {-0.5, 23.5}));
 
-  vita::ga_search<vita::i_de, vita::de_es, decltype(f)> search(prob, f);
+  ga_search<i_de, de_es, decltype(f)> search(prob, f);
 
   const auto res(search.run().best.solution);
 

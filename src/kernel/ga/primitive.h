@@ -41,17 +41,35 @@ class number : public terminal
 public:
   using value_t = T;
 
-  explicit number(const std::string &name, category_t c,
-                  T m = T(-1000), T u = T(1000))
-    : terminal(name, c), min(m), upp(u)
+  /// A number (terminal symbol) within a range used for genetics algorithms.
+  ///
+  /// \param[in] name the name of the terminal
+  /// \param[in] r    a half-open range
+  /// \param[in] i    a locus of the chromosome (default value means
+  ///                 unspecified and is used for a standard, uniform GA
+  ///                 chromosome)
+  ///
+  /// This is a base helper class used to build more specific numeric classes.
+  /// The general idea follows:
+  /// - **the problem can be tackled with a standard, uniform chromosome**
+  ///   (every locus contain the same kind of gene). In this case the user
+  ///   simply calls the `make_ga_problem` specifying the length of the
+  ///   chromosome and the type of the genes (keeping the default value for
+  ///   `i`);
+  /// - **the problem requires a more complex structure**. The user specifies a
+  ///   (possibly) different gene type for every locus (he has to use an
+  ///   explicit value for `i`).
+  ///
+  explicit number(const std::string &name, range<T> r = {-1000, 1000},
+                  unsigned i = std::numeric_limits<unsigned>::max())
+    : terminal(name, static_cast<category_t>(i)), range_(r)
   {
-    Expects(m < u);
+    Expects(r.first < r.second);
   }
 
   bool parametric() const final { return true; }
 
-  terminal::param_t init() const override
-  { return random::between<T>(min, upp); }
+  terminal::param_t init() const override { return random::in(range_); }
 
   std::string display(terminal::param_t v, format) const override
   { return std::to_string(static_cast<T>(v)); }
@@ -61,28 +79,32 @@ public:
   /// access the value of a real object.
   any eval(core_interpreter *i) const override
   {
-    return any(
-      static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
+    return any(fetch_param(i));
   }
 
   double penalty_nvi(core_interpreter *i) const override
   {
-    const auto v(static_cast<interpreter<i_ga> *>(i)->fetch_param(category()));
+    const auto v(fetch_param(i));
 
     if (std::isnan(v))
       return std::numeric_limits<double>::max();
 
-    if (v < min)
-      return min - v;
+    if (v < range_.first)
+      return range_.first - v;
 
-    if (v >= upp)
-      return v - upp;
+    if (v >= range_.second)
+      return v - range_.second;
 
     return 0.0;
   }
 
 private:
-  const T min, upp;
+  auto fetch_param(core_interpreter *i) const
+  {
+    return static_cast<interpreter<i_ga> *>(i)->fetch_param(category());
+  }
+
+  const range<T> range_;
 };
 
 ///
@@ -99,8 +121,9 @@ private:
 class real : public number<double>
 {
 public:
-  explicit real(category_t c, double m = -1000.0, double u = 1000.0)
-    : number<double>("REAL", c, m, u)
+  explicit real(range<double> r = {-1000.0, 1000.0},
+                unsigned i = std::numeric_limits<unsigned>::max())
+    : number<double>("REAL", r, static_cast<category_t>(i))
   {
   }
 };
@@ -108,8 +131,9 @@ public:
 class integer : public number<int>
 {
 public:
-  explicit integer(category_t c, int m = -1000, int u = 1000)
-    : number<int>("INTEGER", c, m, u)
+  explicit integer(range<int> r = {-1000, 1000},
+                   unsigned i = std::numeric_limits<unsigned>::max())
+    : number<int>("INTEGER", r, static_cast<category_t>(i))
   {
   }
 };
@@ -123,12 +147,10 @@ public:
 /// \return      a pointer to the created parameter
 ///
 template<class T = real>
-std::unique_ptr<symbol> parameter(unsigned i, base_t m = -1000.0,
-                                  base_t u = 1000.0)
+std::unique_ptr<symbol> parameter(unsigned i, range<base_t> r = {-1000, 1000})
 {
-  return std::make_unique<T>(static_cast<category_t>(i),
-                             static_cast<typename T::value_t>(m),
-                             static_cast<typename T::value_t>(u));
+  return std::make_unique<T>(range<typename T::value_t>(r.first, r.second),
+                             static_cast<category_t>(i));
 }
 
 }  // namespace ga
