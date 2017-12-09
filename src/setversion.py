@@ -10,6 +10,7 @@
 #
 
 import argparse
+import datetime
 import os
 import re
 
@@ -30,6 +31,24 @@ def file_process(name, rule, args):
     with open(name) as dest:
         dest = open(name, "w")
         dest.write(data)
+
+
+def changelog_rule(data, args):
+    new_version = version_str(args)
+
+    regex = r"## \[Unreleased\]"
+    subst = r"## [Unreleased]\n\n## [" + new_version + r"] - " + datetime.date.today().isoformat()
+
+    result = re.subn(regex, subst, data)
+    if result[1] != 1:
+        return None
+
+    regex = r"(\[Unreleased)(\]: https://github.com/morinim/vita/compare/v)(.+)(\.\.\.HEAD)"
+    subst = r"\g<1>\g<2>" + new_version + r"\g<4>\n[" + new_version + r"\g<2>\g<3>...v" + new_version
+
+    result = re.subn(regex, subst, result[0])
+
+    return result[0] if result[1] == 1 else None
 
 
 def doxygen_rule(data, args):
@@ -63,16 +82,17 @@ def main():
           + "." + str(args.minor)
           + "." + str(args.maintenance))
 
+    file_process("../CHANGELOG.md", changelog_rule, args)
     file_process("../doc/doxygen/doxygen.h", doxygen_rule, args)
 
     print("\n\nRELEASE NOTE\n")
-    print("1. Build and check.  make TYPE=debug")
-    print('2. Commit.           git commit -am"[DOC] Changed revision number to v'
+    print("1. Build & check. make TYPE=debug")
+    print('2. Commit.        git commit -am"[DOC] Changed revision number to v'
           + version_str(args) + '"')
-    print("3. Tag.              git tag -a v" + version_str(args)
+    print("3. Tag.           git tag -a v" + version_str(args)
           + " -m [tag message]")
     print("\nRemember to 'git push' both code and tag. For the tag:\n")
-    print("    git push [tagname]\n")
+    print("   git push [tagname]\n")
 
 
 if __name__ == "__main__":
