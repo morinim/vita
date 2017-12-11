@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.9.14] - 2017-12-11
+
 ### Added
 - Code of conduct for contributors.
 - Complete control of the generational-gap between subset-selection (DSS
@@ -106,5 +108,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Various compilation warning with recent version of gcc (7.x).
 
 
-[Unreleased]: https://github.com/morinim/vita/compare/v0.9.13...HEAD
+[Unreleased]: https://github.com/morinim/vita/compare/v0.9.14...HEAD
+[0.9.14]: https://github.com/morinim/vita/compare/v0.9.13...v0.9.14
 [0.9.13]: https://github.com/morinim/vita/compare/v0.9.12...v0.9.13
