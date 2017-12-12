@@ -8,7 +8,7 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  \see https://bitbucket.org/morinim/vita/wiki/path_finding_tutorial
+ *  \see https://github.com/morinim/vita/wiki/pathfinding_tutorial
  */
 
 #include <iostream>
