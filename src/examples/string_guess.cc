@@ -8,7 +8,7 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  \see https://bitbucket.org/morinim/vita/wiki/path_finding_tutorial
+ *  \see https://github.com/morinim/vita/wiki/string_guessing_tutorial
  */
 
 #include <iostream>
@@ -24,11 +24,6 @@ class letter : public vita::ga::integer
 {
 public:
   letter() : vita::ga::integer({0, GENESET.length()})  {}
-
-  std::string display(terminal::param_t v, format) const override
-  {
-    return std::string(1, GENESET[static_cast<unsigned>(v)]);
-  }
 };
 
 int main()
@@ -37,8 +32,6 @@ int main()
 
   problem prob;
   prob.env.individuals = 300;
-  prob.env.generations = 100;
-
 
   const std::string target = "Hello World";
   prob.chromosome<letter>(target.length());
