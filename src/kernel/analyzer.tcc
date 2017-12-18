@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,7 +45,7 @@ void analyzer<T>::clear()
 
 ///
 /// \return a constant reference to the first statistical symbol we have
-///         informations about.
+///         informations about
 ///
 template<class T>
 typename analyzer<T>::const_iterator analyzer<T>::begin() const
@@ -54,7 +54,7 @@ typename analyzer<T>::const_iterator analyzer<T>::begin() const
 }
 
 ///
-/// \return a constant reference (sentry) used for loops.
+/// \return a constant reference (sentry) used for loops
 ///
 template<class T>
 typename analyzer<T>::const_iterator analyzer<T>::end() const
@@ -63,8 +63,8 @@ typename analyzer<T>::const_iterator analyzer<T>::end() const
 }
 
 ///
-/// \param[in] eff effective / noneffective functions.
-/// \return number of functions in the population.
+/// \param[in] eff effective / noneffective functions
+/// \return        number of functions in the population
 ///
 template<class T>
 std::uintmax_t analyzer<T>::functions(bool eff) const
@@ -73,8 +73,8 @@ std::uintmax_t analyzer<T>::functions(bool eff) const
 }
 
 ///
-/// \param[in] eff effective / noneffective terminals.
-/// \return number of terminals in the population.
+/// \param[in] eff effective / noneffective terminals
+/// \return        number of terminals in the population
 ///
 template<class T>
 std::uintmax_t analyzer<T>::terminals(bool eff) const
@@ -83,7 +83,7 @@ std::uintmax_t analyzer<T>::terminals(bool eff) const
 }
 
 ///
-/// \return statistics about the age distribution of the individuals.
+/// \return statistics about the age distribution of the individuals
 ///
 template<class T>
 const distribution<double> &analyzer<T>::age_dist() const
@@ -94,8 +94,9 @@ const distribution<double> &analyzer<T>::age_dist() const
 }
 
 ///
-/// \param[in] g a group.
-/// \return statistics about the age distribution of individuals in group `g`.
+/// \param[in] g a group
+/// \return      statistics about the age distribution of individuals in group
+///              `g`
 ///
 template<class T>
 const distribution<double> &analyzer<T>::age_dist(unsigned g) const
@@ -108,7 +109,7 @@ const distribution<double> &analyzer<T>::age_dist(unsigned g) const
 }
 
 ///
-/// \return statistics about the fitness distribution of the individuals.
+/// \return statistics about the fitness distribution of the individuals
 ///
 template<class T>
 const distribution<fitness_t> &analyzer<T>::fit_dist() const
@@ -118,9 +119,9 @@ const distribution<fitness_t> &analyzer<T>::fit_dist() const
 }
 
 ///
-/// \param[in] g a group.
-/// \return statistics about the fitness distribution of individuals in group
-///         `g`.
+/// \param[in] g a group
+/// \return      statistics about the fitness distribution of individuals in
+///              group `g`
 ///
 template<class T>
 const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned g) const
@@ -133,7 +134,7 @@ const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned g) const
 }
 
 ///
-/// \return statistic about the length distribution of the individuals.
+/// \return statistic about the length distribution of the individuals
 ///
 template<class T>
 const distribution<double> &analyzer<T>::length_dist() const
@@ -143,7 +144,7 @@ const distribution<double> &analyzer<T>::length_dist() const
 }
 
 ///
-/// \param[in] sym symbol we are gathering statistics about.
+/// \param[in] sym    symbol we are gathering statistics about
 /// \param[in] active is this an active gene?
 ///
 /// Used by `count(const T &)`.
@@ -162,7 +163,7 @@ void analyzer<T>::count(const symbol *sym, bool active)
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
 bool analyzer<T>::debug() const
@@ -181,11 +182,11 @@ bool analyzer<T>::debug() const
 }
 
 ///
-/// \param[in] ind new individual.
-/// \param[in] f fitness of the new individual.
-/// \param[in] g a group of the population.
-///
 /// Adds a new individual to the pool used to calculate statistics.
+///
+/// \param[in] ind new individual
+/// \param[in] f   fitness of the new individual
+/// \param[in] g   a group of the population
 ///
 /// The optional `g` parameter can be used to group information (e.g. for the
 /// ALPS algorithm it's used for layer specific statistics).
@@ -206,10 +207,10 @@ void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 }
 
 ///
-/// \tparam T type of individual.
+/// \tparam T type of individual
 ///
-/// \param[in] ind individual to be analyzed.
-/// \return effective length of individual we gathered statistics about.
+/// \param[in] ind individual to be analyzed
+/// \return        effective length of individual we gathered statistics about
 ///
 template<class T>
 unsigned analyzer<T>::count(const T &ind)
@@ -273,8 +274,8 @@ unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
 }
 
 ///
-/// \param[in] ind individual to be analyzed.
-/// \return effective length of individual we gathered statistics about.
+/// \param[in] ind individual to be analyzed
+/// \return        effective length of individual we gathered statistics about
 ///
 template<>
 inline unsigned analyzer<i_de>::count(const i_de &ind)

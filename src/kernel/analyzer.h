@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,9 +23,9 @@ namespace vita
 {
 
 ///
-/// \brief Analyzer takes a statistics snapshot of a population.
+/// Analyzer takes a statistics snapshot of a population.
 ///
-/// \tparam T type of individual.
+/// \tparam T type of individual
 ///
 /// Procedure:
 /// 1. the population set should be loaded adding one individual at time
