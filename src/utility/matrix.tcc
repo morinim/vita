@@ -89,6 +89,8 @@ typename matrix<T>::reference matrix<T>::operator()(const locus &l)
 /// \param[in] c column
 /// \return      an element of the matrix
 ///
+/// \see https://isocpp.org/wiki/faq/operator-overloading#matrix-array-of-array
+///
 template<class T>
 typename matrix<T>::const_reference matrix<T>::operator()(std::size_t r,
                                                           std::size_t c) const
@@ -105,7 +107,7 @@ template<class T>
 typename matrix<T>::reference matrix<T>::operator()(std::size_t r,
                                                     std::size_t c)
 {
-  // DO NOT CHANGE THE RETURN TYPE WITH T (the method won't work for T == bool)
+  // DO NOT CHANGE THE RETURN TYPE WITH T (won't work for `T == bool`)
   return data_[index(r, c)];
 }
 
@@ -265,6 +267,18 @@ bool matrix<T>::load(std::istream &in)
 }
 
 ///
+/// Flips matrix left to right.
+///
+/// \param[in] m input matrix
+/// \return      flipped matrix
+///
+/// `B = fliplr(A)` returns `A` with its columns flipped in the left-right
+/// direction (that is, about a vertical axis).
+///
+///  E.g. if `A = { {'a' 'b' 'c'}, {'d' 'e' 'f'}, {'g' 'h' 'i'} }` then
+///  `fliplr(A) == { {'c', 'b', 'a'}, {'f', 'e', 'd'}, {'i', 'h', 'g'} }`.
+///
+/// \note Use flipup function to flip matrices in the vertical direction.
 ///
 /// \relates matrix
 ///
@@ -277,6 +291,53 @@ template<class T> matrix<T> fliplr(matrix<T> m)
       std::swap(m(row, col), m(row, m.cols() - col - 1));
 
   return m;
+}
+
+///
+/// Flips matrix up to down.
+///
+/// \param[in] m input matrix
+/// \return      flipped matrix
+///
+/// `B = fliplr(A)` returns `A` with its rows flipped in the up-down direction
+/// (that is, about a horizontal axis).
+///
+///  E.g. if `A = { {'a' 'b' 'c'}, {'d' 'e' 'f'}, {'g' 'h' 'i'} }` then
+///  `fliplr(A) == { {'g', 'h', 'i'}, {'d', 'e', 'f'}, {'a', 'b', 'c'} }`.
+///
+/// \note Use fliplr function to flip matrices in the horizontal direction.
+///
+/// \relates matrix
+///
+template<class T> matrix<T> flipud(matrix<T> m)
+{
+  const auto half(m.rows() / 2);
+
+  for (std::size_t row(0); row < half; ++row)
+    for (std::size_t col(0); col < m.cols(); ++col)
+      std::swap(m(row, col), m(m.rows() - row - 1, col));
+
+  return m;
+}
+
+///
+/// Lexicographically compares two matrices.
+///
+/// \param[in] lhs first matrix
+/// \param[in] rhs second matrix
+/// \return    `true` if `lhs` is lexicographically less than `rhs`
+///
+/// The function is based on `std::lexicographical_compare` and elements are
+/// compared using `operator<`.
+///
+/// \note mainly useful for `std::set` compatibility.
+///
+/// \relates matrix
+///
+template<class T> bool operator<(const matrix<T> &lhs, const matrix<T> &rhs)
+{
+  return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                      rhs.begin(), rhs.end());
 }
 
 ///

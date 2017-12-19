@@ -83,6 +83,54 @@ BOOST_AUTO_TEST_CASE(MatrixFliplr)
   BOOST_TEST(f == vita::fliplr(m));
 }
 
+BOOST_AUTO_TEST_CASE(MatrixFlipud)
+{
+  vita::matrix<int> m = { {1, 2, 3},
+                          {4, 5, 6} };
+
+  vita::matrix<int> f = { {4, 5, 6},
+                          {1, 2, 3} };
+
+  BOOST_TEST(f == vita::flipud(m));
+
+  m = { {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 0, 1, 2} };
+
+  f = { {9, 0, 1, 2},
+        {5, 6, 7, 8},
+        {1, 2, 3, 4} };
+
+  BOOST_TEST(f == vita::flipud(m));
+}
+
+BOOST_AUTO_TEST_CASE(MatrixLessThan)
+{
+  vita::matrix<int> m0 = { {9} };
+
+  vita::matrix<int> m1 = { {9, 9},
+                           {9, 9} };
+
+  vita::matrix<int> m2 = { {1, 2, 3},
+                           {4, 5, 6} };
+
+  vita::matrix<int> m3 = { {1, 2, 3},
+                           {4, 5, 9} };
+
+  vita::matrix<int> empty;
+
+  BOOST_TEST(m0 < m1);
+  BOOST_TEST(m2 < m0);
+  BOOST_TEST(m3 < m0);
+  BOOST_TEST(m2 < m1);
+  BOOST_TEST(m3 < m1);
+  BOOST_TEST(m2 < m3);
+  BOOST_TEST(empty < m0);
+  BOOST_TEST(empty < m1);
+  BOOST_TEST(empty < m2);
+  BOOST_TEST(empty < m3);
+}
+
 BOOST_AUTO_TEST_CASE(MatrixSerialization)
 {
   vita::matrix<int> m(100, 100);
