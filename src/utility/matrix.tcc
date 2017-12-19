@@ -33,6 +33,22 @@ matrix<T>::matrix(std::size_t rs, std::size_t cs) : data_(rs * cs), cols_(cs)
   Expects((rs && cs) || (!rs && !cs));
 }
 
+template<class T>
+matrix<T>::matrix(std::initializer_list<std::initializer_list<T>> ll)
+  : matrix(ll.size(), ll.size() ? ll.begin()->size() : 0)
+{
+  Expects(!ll.size() || (ll.size() && ll.begin()->size()));
+
+  std::size_t i(0);
+
+  for (const auto &row : ll)
+    for (const auto &val : row)
+      data_[i++] = val;
+
+  Ensures(data_.size() == (ll.size() ? ll.size() * ll.begin()->size() : 0));
+  Ensures(data_.size() == i);
+}
+
 ///
 /// \param[in] r row
 /// \param[in] c column
@@ -249,6 +265,21 @@ bool matrix<T>::load(std::istream &in)
 }
 
 ///
+///
+/// \relates matrix
+///
+template<class T> matrix<T> fliplr(matrix<T> m)
+{
+  const auto half(m.cols() / 2);
+
+  for (std::size_t row(0); row < m.rows(); ++row)
+    for (std::size_t col(0); col < half; ++col)
+      std::swap(m(row, col), m(row, m.cols() - col - 1));
+
+  return m;
+}
+
+///
 /// Prints the matrix on an output stream.
 ///
 /// \param[out] o output stream
@@ -256,6 +287,8 @@ bool matrix<T>::load(std::istream &in)
 ///
 /// This is mainly used for debug purpose (Boost Test needs the operator to
 /// report errors).
+///
+/// \relates matrix
 ///
 template<class T>
 std::ostream &operator<<(std::ostream &o, const matrix<T> &m)

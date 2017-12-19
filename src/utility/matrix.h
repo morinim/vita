@@ -18,12 +18,12 @@
 namespace vita
 {
 ///
-/// A bidimensional array.
+/// A bidimensional dense matrix that is stored in row-major form.
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
-/// * `std::vector<std::vector<T>>` is slow;
-/// * boost uBLAS and `boost.MultiArray` are good, general solutions but a bit
-///   oversized for our needs.
+/// - `std::vector<std::vector<T>>` is slow;
+/// - boost *uBLAS* and *boost.MultiArray* are good, general solutions but a
+///   bit oversized for our needs.
 ///
 /// The idea is to use a vector and translate the 2 dimensions to one
 /// dimension (matrix::index() method). This way the whole thing is stored in
@@ -47,6 +47,7 @@ public:
 
   explicit matrix() : matrix(0, 0) {}
   explicit matrix(std::size_t, std::size_t);
+  matrix(std::initializer_list<std::initializer_list<T>>);
 
   const_reference operator()(const locus &) const;
   reference operator()(const locus &);
@@ -84,6 +85,9 @@ private:
 
   std::size_t cols_;
 };
+
+template<class T> matrix<T> fliplr(matrix<T>);
+
 
 #include "utility/matrix.tcc"
 }  // namespace vita

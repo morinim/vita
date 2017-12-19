@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,24 +27,63 @@ using namespace boost;
 
 BOOST_AUTO_TEST_SUITE(matrix)
 
+BOOST_AUTO_TEST_CASE(MatrixConstructor)
+{
+  vita::matrix<int> m(3, 4);
+
+  BOOST_TEST(m.rows() == 3);
+  BOOST_TEST(m.cols() == 4);
+  BOOST_TEST(!m.empty());
+  BOOST_TEST(m(0, 0) == decltype(m)::value_type());
+
+  m = { {1, 2, 3},
+        {4, 5, 6} };
+
+  BOOST_TEST(m.rows() == 2);
+  BOOST_TEST(m.cols() == 3);
+  BOOST_TEST(!m.empty());
+  BOOST_TEST(m(0, 0) == 1);
+}
+
 BOOST_AUTO_TEST_CASE(EmptyMatrix)
 {
   vita::matrix<int> m;
 
-  BOOST_REQUIRE(m.empty());
-  BOOST_REQUIRE_EQUAL(m.cols(), 0);
+  BOOST_TEST(m.empty());
+  BOOST_TEST(m.cols() == 0);
 
   decltype(m) m1(3, 3);
-  BOOST_REQUIRE(!m1.empty());
+  BOOST_TEST(!m1.empty());
 
   std::stringstream ss;
-  BOOST_REQUIRE(m.save(ss));
+  BOOST_TEST(m.save(ss));
 
-  BOOST_REQUIRE(m1.load(ss));
-  BOOST_REQUIRE_EQUAL(m, m1);
+  BOOST_TEST(m1.load(ss));
+  BOOST_TEST(m == m1);
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+BOOST_AUTO_TEST_CASE(MatrixFliplr)
+{
+  vita::matrix<int> m = { {1, 2, 3},
+                          {4, 5, 6} };
+
+  vita::matrix<int> f = { {3, 2, 1},
+                          {6, 5, 4} };
+
+  BOOST_TEST(f == vita::fliplr(m));
+
+  m = { {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 0, 1, 2} };
+
+  f = { {4, 3, 2, 1},
+        {8, 7, 6, 5},
+        {2, 1, 0, 9} };
+
+  BOOST_TEST(f == vita::fliplr(m));
+}
+
+BOOST_AUTO_TEST_CASE(MatrixSerialization)
 {
   vita::matrix<int> m(100, 100);
 
@@ -54,12 +93,12 @@ BOOST_AUTO_TEST_CASE(Serialization)
       elem = vita::random::between(0, 1000);
 
     std::stringstream ss;
-    BOOST_REQUIRE(m.save(ss));
+    BOOST_TEST(m.save(ss));
 
     decltype(m) m1;
 
-    BOOST_REQUIRE(m1.load(ss));
-    BOOST_REQUIRE_EQUAL(m, m1);
+    BOOST_TEST(m1.load(ss));
+    BOOST_TEST(m == m1);
   }
 }
 
