@@ -320,6 +320,28 @@ template<class T> matrix<T> flipud(matrix<T> m)
   return m;
 }
 
+
+///
+/// Transposes a matrix.
+///
+/// \param[in] m a matrix
+/// \return      the transpose of `m`
+///
+/// Interchanges the row and column index for each element of the matrix.
+///
+/// \relates matrix
+///
+template<class T> matrix<T> transpose(const matrix<T> &m)
+{
+  matrix<T> t(m.cols(), m.rows());
+
+  for (std::size_t row(0); row < m.rows(); ++row)
+    for (std::size_t col(0); col < m.cols(); ++col)
+      t(col, row) = m(row, col);
+
+  return t;
+}
+
 ///
 /// Lexicographically compares two matrices.
 ///

@@ -88,6 +88,7 @@ private:
 
 template<class T> matrix<T> fliplr(matrix<T>);
 template<class T> matrix<T> flipud(matrix<T>);
+template<class T> matrix<T> transpose(const matrix<T> &);
 template<class T> bool operator<(const matrix<T> &, const matrix<T> &);
 
 

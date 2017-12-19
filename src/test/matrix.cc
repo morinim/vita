@@ -131,6 +131,34 @@ BOOST_AUTO_TEST_CASE(MatrixLessThan)
   BOOST_TEST(empty < m3);
 }
 
+BOOST_AUTO_TEST_CASE(MatrixTranspose)
+{
+  vita::matrix<int> m = { {1, 2, 3},
+                          {4, 5, 6} };
+
+  vita::matrix<int> t = { {1, 4},
+                          {2, 5},
+                          {3, 6} };
+
+  BOOST_TEST(t == vita::transpose(m));
+
+  m = { {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 0, 1, 2} };
+
+  t = { {1, 5, 9},
+        {2, 6, 0},
+        {3, 7, 1},
+        {4, 8, 2} };
+
+  BOOST_TEST(t == vita::transpose(m));
+
+  m = { {1} };
+  t = { {1} };
+
+  BOOST_TEST(t == vita::transpose(m));
+}
+
 BOOST_AUTO_TEST_CASE(MatrixSerialization)
 {
   vita::matrix<int> m(100, 100);
