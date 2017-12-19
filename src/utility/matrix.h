@@ -86,8 +86,10 @@ private:
   std::size_t cols_;
 };
 
+template<class T> matrix<T> flip(matrix<T>, unsigned);
 template<class T> matrix<T> fliplr(matrix<T>);
 template<class T> matrix<T> flipud(matrix<T>);
+template<class T> matrix<T> rot90(const matrix<T> &, unsigned = 1);
 template<class T> matrix<T> transpose(const matrix<T> &);
 template<class T> bool operator<(const matrix<T> &, const matrix<T> &);
 

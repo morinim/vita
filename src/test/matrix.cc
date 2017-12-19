@@ -159,6 +159,47 @@ BOOST_AUTO_TEST_CASE(MatrixTranspose)
   BOOST_TEST(t == vita::transpose(m));
 }
 
+BOOST_AUTO_TEST_CASE(MatrixRotation)
+{
+  const vita::matrix<int> m = { {1,  6, 11, 16, 21},
+                                {2,  7, 12, 17, 22},
+                                {3,  8, 13, 18, 23},
+                                {4,  9, 14, 19, 24},
+                                {5, 10, 15, 20, 25} };
+
+  const vita::matrix<int> r90 = { {21, 22, 23, 24, 25},
+                                  {16, 17, 18, 19, 20},
+                                  {11, 12, 13, 14, 15},
+                                  { 6,  7,  8,  9, 10},
+                                  { 1,  2,  3,  4,  5} };
+
+  const vita::matrix<int> r180 = { {25, 20, 15, 10, 5},
+                                   {24, 19, 14,  9, 4},
+                                   {23, 18, 13,  8, 3},
+                                   {22, 17, 12,  7, 2},
+                                   {21, 16, 11,  6, 1} };
+
+  const vita::matrix<int> r270 = { { 5,  4,  3,  2,  1},
+                                   {10,  9,  8,  7,  6},
+                                   {15, 14, 13, 12, 11},
+                                   {20, 19, 18, 17, 16},
+                                   {25, 24, 23, 22, 21} };
+
+  BOOST_TEST(   m == vita::rot90(   m, 0));
+  BOOST_TEST( r90 == vita::rot90( r90, 0));
+  BOOST_TEST(r180 == vita::rot90(r180, 0));
+  BOOST_TEST(r270 == vita::rot90(r270, 0));
+
+  BOOST_TEST( r90 == vita::rot90(   m, 1));
+
+  BOOST_TEST(r180 == vita::rot90( r90, 1));
+  BOOST_TEST(r180 == vita::rot90(   m, 2));
+
+  BOOST_TEST(r270 == vita::rot90(r180, 1));
+  BOOST_TEST(r270 == vita::rot90( r90, 2));
+  BOOST_TEST(r270 == vita::rot90(   m, 3));
+}
+
 BOOST_AUTO_TEST_CASE(MatrixSerialization)
 {
   vita::matrix<int> m(100, 100);

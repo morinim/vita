@@ -320,6 +320,49 @@ template<class T> matrix<T> flipud(matrix<T> m)
   return m;
 }
 
+///
+/// Flips order of elements.
+///
+/// `B = flip(A, dim)` reverses the order of the elements in `A` along
+/// dimension `dim`. For example `flip(A, 1)` reverses the elements in each
+/// column and `flip(A, 2)` reverses the elements in each row.
+///
+/// \note
+/// - `flip(m, 1) == flipud(m)`;
+/// - `flip(m, 2) == fliplr(m)`.
+///
+/// \relates matrix
+///
+template<class T> matrix<T> flip(matrix<T> m, unsigned dim)
+{
+  return dim == 2 ? fliplr(m) : flipud(m);
+}
+
+///
+/// Rotates the matrix 90 degrees.
+///
+/// \param[in] m input matrix
+/// \return      rotation constant
+///
+/// Rotates matrix `m` counterclockwise by `k * 90` degrees.
+///
+/// \relates matrix
+///
+template<class T> matrix<T> rot90(const matrix<T> &m, unsigned k)
+{
+  switch (k % 4)
+  {
+  case 0:
+    return m;
+  case 1:
+    return flipud(transpose(m));
+  case 2:
+    return fliplr(flipud(m));
+  default:
+    assert(k == 3);
+    return fliplr(transpose(m));
+  }
+}
 
 ///
 /// Transposes a matrix.
