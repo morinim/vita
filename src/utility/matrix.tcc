@@ -207,6 +207,22 @@ typename matrix<T>::iterator matrix<T>::end()
 }
 
 ///
+/// \param[in] m a matrix
+/// \return      the sum of `this` and `m`
+///
+template<class T>
+matrix<T> &matrix<T>::operator+=(const matrix<T> &m)
+{
+  Expects(m.cols() == cols());
+  Expects(m.rows() == rows());
+
+  for (std::size_t i(0); i < data_.size(); ++i)
+    data_[i] += m.data_[i];
+
+  return *this;
+}
+
+///
 /// Saves the matrix on persistent storage.
 ///
 /// \param[out] out output stream
@@ -423,9 +439,14 @@ std::ostream &operator<<(std::ostream &o, const matrix<T> &m)
 
   for (const auto &e : m)
   {
-    o << e << (i && (i % m.cols()) == 0 ? '\n' : ' ');
+    o << e;
 
     ++i;
+
+    if (i % m.cols() == 0)
+      o << '\n';
+    else
+      o << ' ';
   }
 
   return o;

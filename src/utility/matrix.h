@@ -62,6 +62,8 @@ public:
   std::size_t rows() const;
   std::size_t cols() const;
 
+  matrix &operator+=(const matrix &);
+
   // Iterators
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
