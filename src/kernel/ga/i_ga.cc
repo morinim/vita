@@ -17,7 +17,9 @@
 namespace vita
 {
 ///
-/// \param[in] p current problem.
+/// Sets up the initial random population.
+///
+/// \param[in] p current problem
 ///
 /// The process that generates the initial, random expressions has to be
 /// implemented so as to ensure that they do not violate the type system's
@@ -37,7 +39,9 @@ i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
 }
 
 ///
-/// \param[out] s output stream.
+/// Produces a dot-language representation of this individual.
+///
+/// \param[out] s output stream
 ///
 /// The output stream contains a graph, described in dot language
 /// (http://www.graphviz.org/), of this individual.
@@ -68,16 +72,13 @@ std::ostream &in_line(const i_ga &ga, std::ostream &s)
 }
 
 ///
-/// \brief A new individual is created mutating `this`
+/// Mutates the current individual.
 ///
-/// \param[in] pgm probability of gene mutation.
-/// \param[in] prb the current problem.
-/// \return number of mutations performed.
+/// \param[in] pgm probability of gene mutation
+/// \param[in] prb the current problem
+/// \return        number of mutations performed
 ///
-/// \note
-/// This function is included for compatibility with GP recombination
-/// strategies. Typical differential evolution GA algorithm won't use
-/// this method.
+/// \relates i_ga
 ///
 unsigned i_ga::mutation(double pgm, const problem &prb)
 {
@@ -117,20 +118,18 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
 ///
 /// Two points crossover.
 ///
-/// \param[in] lhs first parent.
-/// \param[in] rhs second parent.
-/// \return the result of the crossover (we only generate a single offspring).
+/// \param[in] lhs first parent
+/// \param[in] rhs second parent
+/// \return        crossover children (we only generate a single offspring)
 ///
 /// We randomly select two loci (common crossover points). The offspring is
 /// created with genes from the `rhs` parent before the first crossover
 /// point and after the second crossover point; genes between crossover
 /// points are taken from the `lhs` parent.
 ///
-/// \note
-/// - Parents must have the same size.
-/// - The function is included for compatibility with GP recombination
-///   strategies. Typical differential evolution GA algorithm won't use
-///   this method.
+/// \note Parents must have the same size.
+///
+/// \relates i_ga
 ///
 i_ga crossover(const i_ga &lhs, const i_ga &rhs)
 {
@@ -154,9 +153,13 @@ i_ga crossover(const i_ga &lhs, const i_ga &rhs)
 }
 
 ///
-/// \return the signature of this individual.
+/// The signature (hash value) of this individual.
 ///
-/// Identical individuals at genotypic level have the same signature
+/// \return the signature of this individual
+///
+/// Identical individuals at genotypic level have the same signature. The
+/// signature is calculated just at the first call and then stored inside the
+/// individual.
 ///
 hash_t i_ga::signature() const
 {
@@ -167,10 +170,12 @@ hash_t i_ga::signature() const
 }
 
 ///
-/// \return the signature of this individual.
+/// Hashes the current individual.
 ///
-/// Converts this individual in a packed byte level representation and performs
-/// the _MurmurHash3_ algorithm on it.
+/// \return the hash value of the individual
+///
+/// Converts this individual in a packed representation (raw sequence of bytes)
+/// and performs the *MurmurHash3* algorithm on it.
 ///
 hash_t i_ga::hash() const
 {
@@ -189,7 +194,7 @@ hash_t i_ga::hash() const
 }
 
 ///
-/// \param[out] p byte stream compacted version of the gene sequence.
+/// \param[out] p byte stream compacted version of the gene sequence
 ///
 void i_ga::pack(std::vector<unsigned char> *const p) const
 {
@@ -222,8 +227,8 @@ void i_ga::pack(std::vector<unsigned char> *const p) const
 }
 
 ///
-/// \param[in] x second term of comparison.
-/// \return `true` if the two individuals are equal.
+/// \param[in] x second term of comparison
+/// \return      `true` if the two individuals are equal
 ///
 /// \note
 /// Age is not checked.
@@ -239,9 +244,9 @@ bool i_ga::operator==(const i_ga &x) const
 }
 
 ///
-/// \param[in] ind an individual to compare with `this`.
-/// \return a numeric measurement of the difference between `ind` and `this`
-///         (the number of different genes between individuals).
+/// \param[in] ind an individual to compare with `this`
+/// \return        a numeric measurement of the difference between `ind` and
+///                `this` (the number of different genes between individuals)
 ///
 unsigned i_ga::distance(const i_ga &ind) const
 {
@@ -256,7 +261,7 @@ unsigned i_ga::distance(const i_ga &ind) const
 }
 
 ///
-/// \return `true` if the individual passes the internal consistency check.
+/// \return `true` if the individual passes the internal consistency check
 ///
 bool i_ga::debug() const
 {
@@ -312,9 +317,9 @@ bool i_ga::debug() const
 }
 
 ///
-/// \param[in] in input stream.
-/// \param[in] p  the current problem.
-/// \return `true` if the object has been loaded correctly.
+/// \param[in] in input stream
+/// \param[in] p  the current problem
+/// \return       `true` if the object has been loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current individual isn't
@@ -350,8 +355,8 @@ bool i_ga::load_impl(std::istream &in, const problem &p)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if the object has been saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if the object has been saved correctly
 ///
 bool i_ga::save_impl(std::ostream &out) const
 {
@@ -364,7 +369,7 @@ bool i_ga::save_impl(std::ostream &out) const
 
 ///
 /// \param[out] s  output stream
-/// \param[in] ind individual to print.
+/// \param[in] ind individual to print
 /// \return        output stream including `ind`
 ///
 /// \relates i_ga

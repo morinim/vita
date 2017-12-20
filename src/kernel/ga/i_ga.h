@@ -19,7 +19,7 @@
 namespace vita
 {
 ///
-/// \brief An individual optimized for standard genetic algorithms.
+/// An individual optimized for standard genetic algorithms.
 ///
 class i_ga : public individual<i_ga>
 {
@@ -66,18 +66,20 @@ public:
   }
 
   ///
-  /// \return `true` if the individual is empty, `false` otherwise.
+  /// \return `true` if the individual is empty, `false` otherwise
   ///
   bool empty() const { return size() == 0; }
 
   ///
-  /// \return the number of parameters stored in the individual.
+  /// \return the number of parameters stored in the individual
+  ///
   /// \note `parameters()` is just an alias for `size()`.
   ///
   unsigned size() const { return genome_.size(); }
 
   ///
-  /// \return the number of parameters stored in the individual.
+  /// \return the number of parameters stored in the individual
+  ///
   /// \note `size()` is just an alias for `parameters()`.
   ///
   unsigned parameters() const { return size(); }
@@ -116,7 +118,7 @@ std::ostream &in_line(const i_ga &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_ga &);
 
 ///
-/// \return a const iterator pointing to the first individual of the team.
+/// \return a const iterator pointing to the first individual of the team
 ///
 inline i_ga::const_iterator i_ga::begin() const
 {
@@ -124,7 +126,7 @@ inline i_ga::const_iterator i_ga::begin() const
 }
 
 ///
-/// \return a const iterator pointing to a end-of-team sentry.
+/// \return a const iterator pointing to a end-of-team sentry
 ///
 inline i_ga::const_iterator i_ga::end() const
 {
@@ -132,7 +134,7 @@ inline i_ga::const_iterator i_ga::end() const
 }
 
 ///
-/// \return an iterator pointing to the first individual of the team.
+/// \return an iterator pointing to the first individual of the team
 ///
 inline i_ga::iterator i_ga::begin()
 {
@@ -140,7 +142,7 @@ inline i_ga::iterator i_ga::begin()
 }
 
 ///
-/// \return an iterator pointing to a end-of-team sentry.
+/// \return an iterator pointing to a end-of-team sentry
 ///
 inline i_ga::iterator i_ga::end()
 {
