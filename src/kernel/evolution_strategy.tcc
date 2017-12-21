@@ -43,8 +43,14 @@ bool std_es<T>::stop_condition() const
   const auto &env(this->pop_.get_problem().env);
   Expects(env.max_stuck_time.has_value());
 
-  if (this->sum_->gen > this->sum_->last_imp + *env.max_stuck_time
-      && issmall(this->sum_->az.fit_dist().variance()))
+  const auto &sum(this->sum_);
+  Expects(sum->gen >= sum->last_imp);
+
+  // Pay attention to `env.max_stuck_time`: it can be a large number and cause
+  // overflow. E.g. `sum->gen > sum->last_imp + *env.max_stuck_time`
+
+  if (sum->gen - sum->last_imp > *env.max_stuck_time
+      && issmall(sum->az.fit_dist().variance()))
     return true;
 
   return false;
