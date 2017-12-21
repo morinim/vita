@@ -18,7 +18,7 @@
 #define      VITA_GA_SEARCH_TCC
 
 ///
-/// \brief Search class specialization for GA.
+/// Search class specialization for GAs.
 ///
 template<class T, template<class> class ES, class F>
 ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
@@ -35,7 +35,7 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 }
 
 ///
-/// \brief Tries to tune search parameters for the current function.
+/// Tries to tune search parameters for the current function.
 ///
 /// \see src_search::tune_parameters_nvi comments for further details.
 ///

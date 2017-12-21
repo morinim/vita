@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,9 +19,9 @@
 namespace vita
 {
 ///
-/// \brief search for GA
+/// Search driver for GAs.
 ///
-/// \tparam T the type of individual used
+/// \tparam T  the type of individual used
 /// \tparam ES the adopted evolution strategy
 ///
 /// This class implements vita::search for GA optimization tasks.
@@ -39,4 +39,4 @@ protected:
 #include "kernel/ga/search.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
