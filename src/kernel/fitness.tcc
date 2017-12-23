@@ -166,10 +166,7 @@ bool operator==(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
 ///
 /// \param[in] lhs first term of comparison
 /// \param[in] rhs second term of comparision
-///
-/// Operation is performed by first comparing sizes and, if they match,
-/// the elements are compared sequentially using algorithm equal, which
-/// stops at the first mismatch.
+/// \return        `true` for different fitness values
 ///
 /// \relates basic_fitness_t
 ///
