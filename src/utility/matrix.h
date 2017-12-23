@@ -94,7 +94,7 @@ template<class T> matrix<T> flipud(matrix<T>);
 template<class T> matrix<T> rot90(const matrix<T> &, unsigned = 1);
 template<class T> matrix<T> transpose(const matrix<T> &);
 template<class T> bool operator<(const matrix<T> &, const matrix<T> &);
-
+template<class T> bool operator!=(const matrix<T> &, const matrix<T> &);
 
 #include "utility/matrix.tcc"
 }  // namespace vita

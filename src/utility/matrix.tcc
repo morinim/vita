@@ -402,6 +402,19 @@ template<class T> matrix<T> transpose(const matrix<T> &m)
 }
 
 ///
+/// \param[in] lhs first matrix
+/// \param[in] rhs second matrix
+/// \return        `true` for different matrices
+///
+/// \relates matrix
+///
+template<class T>
+bool operator!=(const matrix<T> &lhs, const matrix<T> &rhs)
+{
+  return !(lhs == rhs);
+}
+
+///
 /// Lexicographically compares two matrices.
 ///
 /// \param[in] lhs first matrix
