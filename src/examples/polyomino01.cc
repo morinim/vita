@@ -148,7 +148,7 @@ void print_board(const shape &board)
       std::cout << ' ';
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }
 
 int main()

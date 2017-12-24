@@ -22,7 +22,6 @@ const std::size_t board_width  = 8;
 
 using shape = vita::matrix<int>;
 
-int max = 0;
 std::vector<std::vector<shape>> piece_masks;
 
 shape put(const shape &piece, const shape &base, std::size_t y, std::size_t x)
@@ -41,6 +40,12 @@ shape put(const shape &piece, const shape &base, std::size_t y, std::size_t x)
   return ret;
 }
 
+///
+/// Checks if a location is surrounded.
+///
+/// A location is surrounded if locations at North, South, East and West are
+/// occupied or out of the frame.
+///
 bool circled(const shape &board, std::size_t y, std::size_t x)
 {
   const auto v(board(y, x));
@@ -57,6 +62,9 @@ bool circled(const shape &board, std::size_t y, std::size_t x)
   return true;
 }
 
+///
+/// Counts how many surrounded empty location are present on the board.
+///
 unsigned circled_zero(const shape &board)
 {
   unsigned n(0);
@@ -73,7 +81,7 @@ std::size_t add_piece_variants(const shape &piece)
 {
   std::set<shape> ms;
 
-  const shape empty(board_height, board_width);
+  const shape empty(board_height, board_width);  // filled with `0`s
 
   for (unsigned reflection(0); reflection <= 1; ++reflection)
     for (unsigned rotation(0); rotation <= 3; ++rotation)
@@ -167,11 +175,16 @@ void print_board(const shape &board)
       std::cout << ' ';
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }
 
+///
+/// Blind brute force search of the best configuration.
+///
 void rec_put(const shape &base, unsigned piece_id)
 {
+  int max = 0;
+
   if (piece_id == piece_masks.size())
   {
     int filled(std::count_if(base.begin(), base.end(),
@@ -194,9 +207,14 @@ void rec_put(const shape &base, unsigned piece_id)
   }
 }
 
+///
+/// Repeatedly fills the board with random a random configuration.
+///
 void random_put(const shape &base)
 {
-  while (true)
+  int max = 0;
+
+  while (max < 64)
   {
     shape board(base);
 
@@ -217,8 +235,6 @@ void random_put(const shape &base)
 
 int main()
 {
-  using namespace vita;
-
   fill_piece_masks();
 
   shape empty(board_height, board_width);

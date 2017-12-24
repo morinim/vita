@@ -50,6 +50,12 @@ bool crash(const shape &s1, const shape &s2)
   return false;
 }
 
+///
+/// Checks if a location is surrounded.
+///
+/// A location is surrounded if locations at North, South, East and West are
+/// occupied or out of the frame.
+///
 bool circled(const shape &board, std::size_t y, std::size_t x)
 {
   const auto v(board(y, x));
@@ -66,6 +72,9 @@ bool circled(const shape &board, std::size_t y, std::size_t x)
   return true;
 }
 
+///
+/// Counts how many surrounded empty location are present on the board.
+///
 unsigned circled_zero(const shape &board)
 {
   unsigned n(0);
@@ -185,7 +194,7 @@ void print_board(const shape &board)
       std::cout << ' ';
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }
 
 int main()
