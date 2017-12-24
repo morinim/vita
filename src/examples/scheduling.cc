@@ -81,7 +81,7 @@ int main()
 
   // Problem's parameters.
   for (unsigned i(0); i < n_jobs; ++i)
-    prob.sset.insert(ga::parameter(i, {-0.5, 23.5}));
+    prob.sset.insert<ga::real>( range(-0.5, 23.5) );
 
   ga_search<i_de, de_es, decltype(f)> search(prob, f);
 

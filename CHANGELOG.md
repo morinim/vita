@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING CHANGE**. Simpler method to specify GAs parameters.
+
+  Instead of:
+  ```C++
+  for (unsigned i(0); i < n_jobs; ++i)
+    prob.sset.insert(ga::parameter(i, {-0.5, 23.5}));
+  ```
+
+  use:
+
+  ```C++
+  for (unsigned i(0); i < n_jobs; ++i)
+    prob.sset.insert<ga::real>( range(-0.5, 23.5) );
+  ```
+
+  Note that:
+  - you can omit the parameter index;
+  - the range is clearly stated.
+
+  The ga::parameter help function has been removed.
+
 ## [0.9.14] - 2017-12-11
 
 ### Added

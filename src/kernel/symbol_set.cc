@@ -72,6 +72,9 @@ std::vector<const symbol *> symbol_set::adts() const
 /// \return       a raw pointer to the symbol just added (or `nullptr` in case
 ///               of error)
 ///
+/// A symbol with undefined category will be changed to the first available
+/// category.
+///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
   Expects(s);
@@ -81,7 +84,12 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
   const auto w(static_cast<weight_t>(wr * w_symbol::base_weight));
   const w_symbol ws(s.get(), w);
 
-  const category_t category(s->category());
+  category_t category(s->category());
+  if (category == undefined_category)
+  {
+    category = views_.size();
+    s->category(category);
+  }
 
   for (category_t i(views_.size()); i <= category; ++i)
     views_.emplace_back("Collection " + std::to_string(i));

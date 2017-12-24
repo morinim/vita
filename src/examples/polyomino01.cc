@@ -161,8 +161,8 @@ int main()
   prob.env.individuals = 500;
   prob.env.generations = 1000;
 
-  for (std::size_t i(0); i < piece_masks.size(); ++i)
-    prob.sset.insert(ga::parameter<ga::integer>(i, {0, piece_masks[i].size()}));
+  for (const auto &piece : piece_masks)
+    prob.sset.insert<ga::integer>( range(0, piece.size()) );
 
   // The fitness function.
   auto f = [](const i_ga &ind) -> fitness_t

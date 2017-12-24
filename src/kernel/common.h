@@ -49,8 +49,9 @@ enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 /// For instance the number 4.0 (in the domain `d_double`) may be present
 /// in two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
 /// category "kg").
-/// Categories are the way strong typing GP is implemented in Vita.
+/// Categories are the way strong typing GP is enforced in Vita.
 using category_t = unsigned;
+constexpr category_t undefined_category = static_cast<category_t>(-1);
 
 /// A useful shortcut for a group of categories.
 using cvect = std::vector<category_t>;
