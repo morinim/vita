@@ -77,8 +77,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
 
   prob.env.individuals = 120;
   prob.env.threshold.fitness = {0,0};
-  prob.sset.insert<ga::real>(range(0.0, 6.0));
-  prob.sset.insert<ga::real>(range(0.0, 6.0));
+  prob.sset.insert<ga::real>(vita::range(0.0, 6.0));
+  prob.sset.insert<ga::real>(vita::range(0.0, 6.0));
 
   // The unconstrained objective function f(x1, x2) has a maximum solution at
   // (3, 2) with a function value equal to zero.
@@ -144,10 +144,10 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3, * boost::unit_test::tolerance(1.0))
 
   // Problem's parameters.
   for (unsigned i(0); i < 9; ++i)
-    prob.sset.insert<ga::real>(range(0.0, 1.0));
+    prob.sset.insert<ga::real>(vita::range(0.0, 1.0));
   for (unsigned i(9); i < 12; ++i)
-    prob.sset.insert<ga::real>(range(0.0, 100.0));
-  prob.sset.insert<ga::real>(range(0.0, 1.0));
+    prob.sset.insert<ga::real>(vita::range(0.0, 100.0));
+  prob.sset.insert<ga::real>(vita::range(0.0, 1.0));
 
   auto f = [](const std::vector<double> &x)
     {
@@ -284,8 +284,8 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
   prob.env.threshold.fitness = {0, 0};
 
   // Problem's parameters.
-  prob.sset.insert<ga::real>(range(0.0, 100.0));
-  prob.sset.insert<ga::real>(range(0.0, 100.0));
+  prob.sset.insert<ga::real>(vita::range(0.0, 100.0));
+  prob.sset.insert<ga::real>(vita::range(0.0, 100.0));
 
   auto f = [](const std::vector<double> &x)
     {
@@ -330,7 +330,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem5, * boost::unit_test::tolerance(0.1))
 
   // Problem's parameters.
   for (unsigned i(0); i < 2; ++i)
-    prob.sset.insert<ga::real>(range(0.0, 10.0));
+    prob.sset.insert<ga::real>(vita::range(0.0, 10.0));
 
   auto f = [](const std::vector<double> &x)
     {
