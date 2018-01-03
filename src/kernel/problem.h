@@ -34,7 +34,7 @@ public:
 
   virtual bool debug() const;
 
-  template<class T, class... Args> void chromosome(std::size_t, Args && ...);
+  template<class T, class... Args> void chromosome(std::size_t, Args &&...);
 
   environment env;
   symbol_set sset;
@@ -42,15 +42,12 @@ public:
 
 
 template<class T, class... Args>
-void problem::chromosome(std::size_t length, Args && ...args)
+void problem::chromosome(std::size_t length, Args &&... args)
 {
-  for (decltype(length) i(0); i < length; ++i)
-  {
-    auto t{std::make_unique<T>(args...)};
-    t->category(static_cast<category_t>(i));
+  Expects(sset.categories() == 0);
 
-    sset.insert(std::move(t));
-  }
+  for (decltype(length) i(0); i < length; ++i)
+    sset.insert<T>(std::forward<Args>(args)...);
 }
 
 }  // namespace vita

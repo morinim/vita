@@ -35,6 +35,8 @@ namespace ga
 {
 using base_t = terminal::param_t;
 
+namespace detail
+{
 template<class T>
 class number : public terminal
 {
@@ -53,16 +55,14 @@ public:
   /// The general idea follows:
   /// - **the problem can be tackled with a standard, uniform chromosome**
   ///   (every locus contain the same kind of gene). In this case the user
-  ///   simply calls the `make_ga_problem` specifying the length of the
-  ///   chromosome and the type of the genes (keeping the default value for
-  ///   `i`);
+  ///   simply calls the `problem::chromosome` specifying the length of the
+  ///   chromosome and the type of the genes;
   /// - **the problem requires a more complex structure**. The user specifies a
   ///   (possibly) different gene type for every locus (he has to use an
   ///   explicit value for `i`).
   ///
-  explicit number(const std::string &name, range<T> r = {-1000, 1000},
-                  unsigned i = std::numeric_limits<unsigned>::max())
-    : terminal(name, static_cast<category_t>(i)), range_(r)
+  explicit number(const std::string &name, range_t<T> r, category_t i)
+    : terminal(name, i), range_(r)
   {
     Expects(r.first < r.second);
   }
@@ -104,8 +104,10 @@ private:
     return static_cast<interpreter<i_ga> *>(i)->fetch_param(category());
   }
 
-  const range<T> range_;
+  const range_t<T> range_;
 };
+
+}  // namespace detail
 
 ///
 /// Mainly used for differential evolution.
@@ -118,40 +120,25 @@ private:
 /// floating-point numbers without ever being reformatted as genes with a
 /// different binary representation.
 ///
-class real : public number<double>
+class real : public detail::number<double>
 {
 public:
-  explicit real(range<double> r = {-1000.0, 1000.0},
-                unsigned i = std::numeric_limits<unsigned>::max())
-    : number<double>("REAL", r, static_cast<category_t>(i))
+  explicit real(range_t<double> r = {-1000.0, 1000.0},
+                category_t i = undefined_category)
+    : detail::number<double>("REAL", r, i)
   {
   }
 };
 
-class integer : public number<int>
+class integer : public detail::number<int>
 {
 public:
-  explicit integer(range<int> r = {-1000, 1000},
-                   unsigned i = std::numeric_limits<unsigned>::max())
-    : number<int>("INTEGER", r, static_cast<category_t>(i))
+  explicit integer(range_t<int> r = {-1000, 1000},
+                   category_t i = undefined_category)
+    : detail::number<int>("INTEGER", r, i)
   {
   }
 };
-
-///
-/// A convenient shortcut to build the symbol set of a GA problem.
-///
-/// \param[in] i this will be the i-th arguments
-/// \param[in] m minimum value of the argument
-/// \param[in] u upper limit for the argument
-/// \return      a pointer to the created parameter
-///
-template<class T = real>
-std::unique_ptr<symbol> parameter(unsigned i, range<base_t> r = {-1000, 1000})
-{
-  return std::make_unique<T>(range<typename T::value_t>(r.first, r.second),
-                             static_cast<category_t>(i));
-}
 
 }  // namespace ga
 }  // namespace vita

@@ -52,6 +52,12 @@ bool crash(const shape &s1, const shape &s2)
   return false;
 }
 
+///
+/// Checks if a location is surrounded.
+///
+/// A location is surrounded if locations at North, South, East and West are
+/// occupied or out of the frame.
+///
 bool circled(const shape &board, std::size_t y, std::size_t x)
 {
   const auto v(board(y, x));
@@ -68,6 +74,9 @@ bool circled(const shape &board, std::size_t y, std::size_t x)
   return true;
 }
 
+///
+/// Counts how many surrounded empty location are present on the board.
+///
 unsigned circled_zero(const shape &board)
 {
   unsigned n(0);
@@ -193,7 +202,7 @@ void print_board(const shape &board)
       std::cout << ' ';
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }
 
 int main()
@@ -208,8 +217,8 @@ int main()
 
   // The chromosome is a sequence of bounded integers (indices) used to access
   // the `piece_masks` data structure.
-  for (std::size_t i(0); i < piece_masks.size(); ++i)
-    prob.sset.insert(ga::parameter<ga::integer>(i, {0, piece_masks[i].size()}));
+  for (const auto &piece : piece_masks)
+    prob.sset.insert<ga::integer>( range(0, piece.size()) );
 
   // The fitness function.
   auto f = [](const i_ga &ind) -> fitness_t

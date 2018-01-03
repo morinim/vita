@@ -81,7 +81,6 @@ private:
 
   struct w_symbol
   {
-
     w_symbol(symbol *s, weight_t w) : sym(s), weight(w) { Expects(s); }
 
     bool operator==(w_symbol rhs) const
@@ -178,7 +177,7 @@ private:
 ///
 template<class S, class ...Args> symbol *symbol_set::insert(Args &&... args)
 {
-  return insert(std::make_unique<S>(args...));
+  return insert(std::make_unique<S>(std::forward<Args>(args)...));
 }
 
 std::ostream &operator<<(std::ostream &, const symbol_set &);

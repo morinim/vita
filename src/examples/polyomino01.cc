@@ -156,7 +156,7 @@ void print_board(const shape &board)
       std::cout << ' ';
   }
 
-  std::cout << '\n';
+  std::cout << std::endl;
 }
 
 int main()
@@ -171,8 +171,8 @@ int main()
 
   // The chromosome is a sequence of bounded integers (indices) used to access
   // the `piece_masks` data structure.
-  for (std::size_t i(0); i < piece_masks.size(); ++i)
-    prob.sset.insert(ga::parameter<ga::integer>(i, {0, piece_masks[i].size()}));
+  for (const auto &piece : piece_masks)
+    prob.sset.insert<ga::integer>( range(0, piece.size()) );
 
   // The fitness function.
   auto f = [](const i_ga &ind) -> fitness_t

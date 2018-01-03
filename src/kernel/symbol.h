@@ -117,7 +117,7 @@ inline category_t symbol::category() const
 ///
 inline void symbol::category(category_t c)
 {
-  Expects(category_ == std::numeric_limits<category_t>::max());
+  Expects(category_ == undefined_category);
   Expects(c != category_);
 
   category_ = c;
