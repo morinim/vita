@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
              return -(std::pow(x[0] * x[0] + x[1] - 11, 2.0) +
                       std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
-  ga_search<vita::i_de, vita::de_es, decltype(f)> s(prob, f);
+  de_search<decltype(f)> s(prob, f);
   BOOST_TEST(s.debug());
 
   const auto res(s.run().best.solution);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
       return p1 + p2 + p3 + p4;
     };
 
-  ga_search<i_de, de_es, decltype(f)> s2(prob, f, p);
+  de_search<decltype(f)> s2(prob, f, p);
   BOOST_TEST(s2.debug());
 
   const auto res2(s2.run().best.solution);
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3, * boost::unit_test::tolerance(1.0))
       return r;
     };
 
-  ga_search<i_de, de_es, decltype(f)> s(prob, f, p);
+  de_search<decltype(f)> s(prob, f, p);
   BOOST_TEST(s.debug());
 
   const auto res(s.run().best.solution);
@@ -309,7 +309,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
       return r;
     };
 
-  ga_search<i_de, de_es, decltype(f)> s(prob, f, p);
+  de_search<decltype(f)> s(prob, f, p);
   BOOST_TEST(s.debug());
 
   const auto res(s.run().best.solution);
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem5, * boost::unit_test::tolerance(0.1))
       return r;
     };
 
-  ga_search<i_de, de_es, decltype(f)> s(prob, f, p);
+  de_search<decltype(f)> s(prob, f, p);
   BOOST_TEST(s.debug());
 
   const auto res(s.run().best.solution);
