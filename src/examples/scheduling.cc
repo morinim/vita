@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -83,7 +83,7 @@ int main()
   for (unsigned i(0); i < n_jobs; ++i)
     prob.sset.insert(ga::parameter(i, {-0.5, 23.5}));
 
-  ga_search<i_de, de_es, decltype(f)> search(prob, f);
+  de_search<decltype(f)> search(prob, f);
 
   const auto res(search.run().best.solution);
 

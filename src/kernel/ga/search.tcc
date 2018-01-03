@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,8 @@
 /// Search class specialization for GAs.
 ///
 template<class T, template<class> class ES, class F>
-ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
+basic_ga_search<T, ES, F>::basic_ga_search(problem &pr, F f,
+                                           penalty_func_t<T> pf)
   : search<T, ES>(pr)
 {
   if (pf)
@@ -40,7 +41,7 @@ ga_search<T, ES, F>::ga_search(problem &pr, F f, penalty_func_t<T> pf)
 /// \see src_search::tune_parameters_nvi comments for further details.
 ///
 template<class T, template<class> class ES, class F>
-void ga_search<T, ES, F>::tune_parameters()
+void basic_ga_search<T, ES, F>::tune_parameters()
 {
   search<T, ES>::tune_parameters();
 

@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,15 +25,16 @@ using shape = vita::matrix<int>;
 int max = 0;
 std::vector<std::vector<shape>> piece_masks;
 
-shape put(const shape &piece, const shape &base, std::size_t y, std::size_t x)
+shape put(const shape &piece, std::size_t y, std::size_t x)
 {
-  if (y + piece.rows() > base.rows())
-    return base;
+  shape ret(board_height, board_width);  // initially filled with `0`s
 
-  if (x + piece.cols() > base.cols())
-    return base;
+  if (y + piece.rows() > ret.rows())
+    return ret;
 
-  shape ret(base);
+  if (x + ret.cols() > ret.cols())
+    return ret;
+
   for (std::size_t row(0); row < piece.rows(); ++row)
     for (std::size_t col(0); col < piece.cols(); ++col)
       ret(y + row, x + col) += piece(row, col);
@@ -83,7 +84,7 @@ std::size_t add_piece_variants(const shape &piece)
           shape flipped(reflection ? vita::fliplr(piece) : piece);
           shape piece1(vita::rot90(flipped, rotation));
 
-          shape piece_on_board(put(piece1, empty, y, x));
+          shape piece_on_board(put(piece1, y, x));
           if (piece_on_board != empty && !circled_zero(piece_on_board))
             ms.insert(piece_on_board);
         }
@@ -174,6 +175,7 @@ void rec_put(const shape &base, unsigned piece_id)
 {
   if (piece_id == piece_masks.size())
   {
+    // Number of non-empty squares.
     int filled(std::count_if(base.begin(), base.end(),
                              [](unsigned v) { return v != 0; }));
 
@@ -203,6 +205,7 @@ void random_put(const shape &base)
     for (const auto &piece : piece_masks)
       board += vita::random::element(piece);
 
+    // Number of non-empty squares.
     int filled(std::count_if(board.begin(), board.end(),
                              [](unsigned v) { return v != 0; }));
 

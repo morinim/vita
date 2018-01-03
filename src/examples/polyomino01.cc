@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,17 +22,19 @@ const std::size_t board_width  = 8;
 
 using shape = vita::matrix<int>;
 
+/// Contains the objects available in our combinatorial problem.
 std::vector<std::vector<shape>> piece_masks;
 
-shape put(const shape &piece, const shape &base, std::size_t y, std::size_t x)
+shape put(const shape &piece, std::size_t y, std::size_t x)
 {
-  if (y + piece.rows() > base.rows())
-    return base;
+  shape ret(board_height, board_width);  // initially filled with `0`s
 
-  if (x + piece.cols() > base.cols())
-    return base;
+  if (y + piece.rows() > ret.rows())
+    return ret;
 
-  shape ret(base);
+  if (x + piece.cols() > ret.cols())
+    return ret;
+
   for (std::size_t row(0); row < piece.rows(); ++row)
     for (std::size_t col(0); col < piece.cols(); ++col)
       ret(y + row, x + col) += piece(row, col);
@@ -40,6 +42,12 @@ shape put(const shape &piece, const shape &base, std::size_t y, std::size_t x)
   return ret;
 }
 
+///
+/// Enumerates and stores valid on-board configurations of a piece.
+///
+/// \param[in] piece a piece
+/// \return          number of legal configurations
+///
 std::size_t add_piece_variants(const shape &piece)
 {
   std::set<shape> ms;
@@ -52,9 +60,9 @@ std::size_t add_piece_variants(const shape &piece)
         for (unsigned x(0); x < board_width; ++x)
         {
           shape flipped(reflection ? vita::fliplr(piece) : piece);
-          shape piece1(vita::rot90(flipped, rotation));
+          shape flip_rot(vita::rot90(flipped, rotation));
 
-          shape piece_on_board(put(piece1, empty, y, x));
+          shape piece_on_board(put(flip_rot, y, x));
           if (piece_on_board != empty)
             ms.insert(piece_on_board);
         }
@@ -161,6 +169,8 @@ int main()
   prob.env.individuals = 500;
   prob.env.generations = 1000;
 
+  // The chromosome is a sequence of bounded integers (indices) used to access
+  // the `piece_masks` data structure.
   for (std::size_t i(0); i < piece_masks.size(); ++i)
     prob.sset.insert(ga::parameter<ga::integer>(i, {0, piece_masks[i].size()}));
 
@@ -172,13 +182,14 @@ int main()
     for (std::size_t i(0); i < ind.size(); ++i)
       board += piece_masks[i][ind[i].as<int>()];
 
+    // Number of non-empty squares.
     double filled(std::count_if(board.begin(), board.end(),
                                 [](unsigned v) { return v != 0; }));
 
     return {filled};
   };
 
-  ga_search<i_ga, std_es, decltype(f)> search(prob, f);
+  ga_search<decltype(f)> search(prob, f);
   auto result = search.run(10);
 
   std::cout << "\nBest result:\n";

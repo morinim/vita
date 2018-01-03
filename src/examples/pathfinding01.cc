@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -176,7 +176,7 @@ int main()
     return -distance(final.first, goal) - final.second / 1000.0;
   };
 
-  ga_search<i_ga, std_es, decltype(f)> search(prob, f);
+  ga_search<decltype(f)> search(prob, f);
 
   const auto best_path(search.run().best.solution);
 

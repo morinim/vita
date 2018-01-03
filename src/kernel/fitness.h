@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -149,6 +149,7 @@ template<class T> double distance(const basic_fitness_t<T> &,
 template<class T> basic_fitness_t<T> round_to(basic_fitness_t<T>);
 template<class T> basic_fitness_t<T> sqrt(basic_fitness_t<T>);
 
+/// Commonly used fitness type.
 using fitness_t = basic_fitness_t<double>;
 
 #include "kernel/fitness.tcc"

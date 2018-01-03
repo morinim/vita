@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,14 +27,17 @@ namespace vita
 /// This class implements vita::search for GA optimization tasks.
 ///
 template<class T, template<class> class ES, class F>
-class ga_search : public search<T, ES>
+class basic_ga_search : public search<T, ES>
 {
 public:
-  ga_search(problem &, F, penalty_func_t<T> = nullptr);
+  basic_ga_search(problem &, F, penalty_func_t<T> = nullptr);
 
 protected:
-  virtual void tune_parameters() override;
+  void tune_parameters() override;
 };
+
+template<class F> using ga_search = basic_ga_search<i_ga, std_es, F>;
+template<class F> using de_search = basic_ga_search<i_de, de_es, F>;
 
 #include "kernel/ga/search.tcc"
 }  // namespace vita
