@@ -29,9 +29,9 @@ BOOST_AUTO_TEST_CASE(Comparison)
 {
   using namespace vita;
 
-  fitness_t fitness2d(2, copies_of);
-  fitness_t fitness3d(3, copies_of);
-  fitness_t fitness4d(4, copies_of);
+  fitness_t fitness2d(with_size(2));
+  fitness_t fitness3d(with_size(3));
+  fitness_t fitness4d(with_size(4));
 
   fitness_t f1{3.0, 0.0, 0.0}, f2{2.0, 1.0, 0.0}, f3{2.0, 0.0, 0.0};
 
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(Operators, * boost::unit_test::tolerance(epsilon))
   fitness_t x{2.0, 4.0, 8.0};
   fitness_t f1{2.0, 4.0, 8.0};
   fitness_t f2{4.0, 8.0, 16.0};
-  fitness_t inf(3, copies_of,
+  fitness_t inf(with_size(3),
                 std::numeric_limits<fitness_t::value_type>::infinity());
 
   x += x;

@@ -30,10 +30,9 @@
 /// The tag also helps to clarify the meaning of the other arguments.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(std::size_t n, copies_of_t, T v)
-  : vect_(n, v)
+basic_fitness_t<T>::basic_fitness_t(with_size s, T v) : vect_(s(), v)
 {
-  Expects(n);
+  Expects(s());
 }
 
 ///

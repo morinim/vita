@@ -53,6 +53,7 @@ void fix_parameters(vita::src_problem *problem)
   using vita::print;
   using vita::trilean;
   using vita::fitness_t;
+  using vita::with_size;
 
   vita::environment &env(problem->env);
 
@@ -97,7 +98,7 @@ void fix_parameters(vita::src_problem *problem)
   {
     if (problem->classification())
     {
-      env.threshold.fitness = fitness_t(1, vita::copies_of);
+      env.threshold.fitness = fitness_t(with_size(1));
       env.threshold.accuracy = 0.99;
 
       print.info("Accuracy threshold set to ", env.threshold.accuracy);
