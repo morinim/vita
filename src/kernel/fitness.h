@@ -91,9 +91,9 @@ public:
   basic_fitness_t(values_t);
   basic_fitness_t(with_size, T = std::numeric_limits<T>::lowest());
 
-  unsigned size() const;
-  T operator[](unsigned) const;
-  T &operator[](unsigned);
+  std::size_t size() const;
+  T operator[](std::size_t) const;
+  T &operator[](std::size_t);
 
   iterator begin();
   const_iterator begin() const;

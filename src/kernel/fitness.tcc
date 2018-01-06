@@ -68,9 +68,9 @@ basic_fitness_t<T>::basic_fitness_t(values_t v) : vect_(std::move(v))
 /// \return the size of the fitness vector
 ///
 template<class T>
-unsigned basic_fitness_t<T>::size() const
+std::size_t basic_fitness_t<T>::size() const
 {
-  return static_cast<unsigned>(vect_.size());
+  return vect_.size();
 }
 
 ///
@@ -78,13 +78,13 @@ unsigned basic_fitness_t<T>::size() const
 /// \return      the `i`-th element of the fitness vector
 ///
 template<class T>
-T basic_fitness_t<T>::operator[](unsigned i) const
+T basic_fitness_t<T>::operator[](std::size_t i) const
 {
   // This assert could be considered a bit too strict. In general taking the
   // address of one past the last element is allowed, e.g.
   //     std::copy(&f[0], &f[N], &dest);
   // but here the assertion will signal this use case. The workaround is:
-  //     std::copy(&f[0], &f[0] + N, &dest);
+  //     std::copy(f.begin(), f.end(), &dest);
   Expects(i < size());
   return vect_[i];
 }
@@ -94,7 +94,7 @@ T basic_fitness_t<T>::operator[](unsigned i) const
 /// \return      a reference to the `i`-th element of the fitness vector
 ///
 template<class T>
-T &basic_fitness_t<T>::operator[](unsigned i)
+T &basic_fitness_t<T>::operator[](std::size_t i)
 {
   Expects(i < size());
   return vect_[i];
@@ -205,7 +205,7 @@ bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
                                       std::begin(rhs), std::end(rhs));
 
   // An alternative implementation:
-  // > for (unsigned i(0); i < size(); ++i)
+  // > for (std::size_t i(0); i < size(); ++i)
   // >   if (operator[](i) != f[i])
   // >     return operator[](i) > f[i];
   // > return false;
@@ -294,7 +294,7 @@ bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
   bool one_better(lhs.size() && !rhs.size());
 
   const auto n(std::min(lhs.size(), rhs.size()));
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     if (lhs[i] > rhs[i])
       one_better = true;
     else if (lhs[i] < rhs[i])
@@ -357,7 +357,7 @@ std::ostream &operator<<(std::ostream &o, basic_fitness_t<T> f)
 {
   o << '(';
 
-  std::copy(&f[0], &f[0] + f.size(), infix_iterator<T>(o, ", "));
+  std::copy(f.begin(), f.end(), infix_iterator<T>(o, ", "));
 
   return o << ')';
 }
@@ -370,7 +370,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) += f[i];
 
   return *this;
@@ -405,7 +405,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) -= f[i];
 
   return *this;
@@ -433,7 +433,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) *= f[i];
 
   return *this;
@@ -601,7 +601,7 @@ bool almost_equal(const basic_fitness_t<T> &f1,
   const auto n(f1.size());
   assert(f2.size() == n);
 
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     if (!almost_equal(f1[i], f2[i], ae_epsilon))
       return false;
 
@@ -623,7 +623,7 @@ double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
   const auto n(f1.size());
   assert(f2.size() == n);
 
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     d += std::abs(f1[i] - f2[i]);
 
   return d;
