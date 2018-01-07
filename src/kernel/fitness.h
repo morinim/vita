@@ -16,6 +16,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <numeric>
 
 #include "utility/small_vector.h"
 #include "utility/utility.h"

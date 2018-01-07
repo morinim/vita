@@ -598,9 +598,9 @@ template<class T>
 bool almost_equal(const basic_fitness_t<T> &f1,
                   const basic_fitness_t<T> &f2, T ae_epsilon)
 {
-  const auto n(f1.size());
-  assert(f2.size() == n);
+  Expects(f1.size() == f2.size());
 
+  const auto n(f1.size());
   for (std::size_t i(0); i < n; ++i)
     if (!almost_equal(f1[i], f2[i], ae_epsilon))
       return false;
@@ -609,24 +609,27 @@ bool almost_equal(const basic_fitness_t<T> &f1,
 }
 
 ///
+/// Taxicab distance between two vectors.
+///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
 /// \return       the distance between `f1` and `f2`
+///
+/// The taxicab distance between two vectors in an n-dimensional real vector
+/// space with fixed Cartesian coordinate system, is the sum of the lengths of
+/// the projections of the line segment between the points onto the coordinate
+/// axes.
 ///
 /// \relates basic_fitness_t
 ///
 template<class T>
 double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 {
-  double d(0.0);
+  Expects(f1.size() == f2.size());
 
-  const auto n(f1.size());
-  assert(f2.size() == n);
-
-  for (std::size_t i(0); i < n; ++i)
-    d += std::abs(f1[i] - f2[i]);
-
-  return d;
+  return std::inner_product(f1.begin(), f1.end(), f2.begin(), 0,
+                            std::plus<>(),
+                            [](T a, T b) { return std::abs(a - b); });
 }
 
 

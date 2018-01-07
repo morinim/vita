@@ -138,4 +138,29 @@ BOOST_AUTO_TEST_CASE(Joining)
   BOOST_TEST(f3 == f4);
 }
 
+BOOST_AUTO_TEST_CASE(Distance)
+{
+  using vita::combine;
+  using vita::distance;
+  using vita::fitness_t;
+
+  fitness_t f1{1.0, 2.0, 3.0}, f2{-4.0, -5.0, -6.0};
+
+  BOOST_TEST(distance(f1, f1) == 0.0, boost::test_tools::tolerance(epsilon));
+  BOOST_TEST(distance(f2, f2) == 0.0, boost::test_tools::tolerance(epsilon));
+
+  BOOST_TEST(distance(f1, f2) == distance(f2, f1),
+             boost::test_tools::tolerance(epsilon));
+
+  fitness_t f3{1.0, 1.0, 1.0}, f4{3.0, 2.0, 3.0};
+  const auto d1(distance(f1, f2));
+  const auto d2(distance(f3, f4));
+
+  BOOST_TEST(distance(combine(f1, f3), combine(f2, f4)) == d1 + d2,
+             boost::test_tools::tolerance(epsilon));
+
+  BOOST_TEST(distance(f1, f3) < distance(f2, f3));
+  BOOST_TEST(distance(f1, f4) == 2.0, boost::test_tools::tolerance(epsilon));
+}
+
 BOOST_AUTO_TEST_SUITE_END()
