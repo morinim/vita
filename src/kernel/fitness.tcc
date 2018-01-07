@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -211,7 +211,6 @@ bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
   // > return false;
 }
 
-
 ///
 /// Lexicographic ordering.
 ///
@@ -389,7 +388,7 @@ basic_fitness_t<T> operator+(basic_fitness_t<T> lhs,
 {
   // operator+ shouldn't be a member function otherwise it won't work as
   // naturally as user may expect (i.e. asymmetry in implicit conversion from
-  // other types.
+  // other types).
   // Implementing `+` in terms of `+=` makes the code simpler and guarantees
   // consistent semantics as the two functions are less likely to diverge
   // during maintenance.

@@ -27,7 +27,10 @@ BOOST_AUTO_TEST_SUITE(fitness)
 
 BOOST_AUTO_TEST_CASE(Comparison)
 {
-  using namespace vita;
+  using vita::distance;
+  using vita::dominating;
+  using vita::fitness_t;
+  using vita::with_size;
 
   fitness_t fitness2d(with_size(2));
   fitness_t fitness3d(with_size(3));
@@ -54,9 +57,10 @@ BOOST_AUTO_TEST_CASE(Comparison)
   BOOST_TEST(f2 == f2);
   BOOST_TEST(fitness2d == fitness2d);
 
-  BOOST_CHECK_SMALL(distance(f1, f1), epsilon);
-  BOOST_CHECK_SMALL(distance(f2, f2), epsilon);
-  BOOST_CHECK_SMALL(distance(fitness2d, fitness2d), epsilon);
+  BOOST_TEST(distance(f1, f1) == 0.0, boost::test_tools::tolerance(epsilon));
+  BOOST_TEST(distance(f2, f2) == 0.0, boost::test_tools::tolerance(epsilon));
+  BOOST_TEST(distance(fitness2d, fitness2d) == 0.0,
+             boost::test_tools::tolerance(epsilon));
 
   BOOST_TEST(dominating(f1, fitness3d));
   BOOST_TEST(!dominating(fitness3d, f1));
@@ -69,7 +73,7 @@ BOOST_AUTO_TEST_CASE(Comparison)
 
 BOOST_AUTO_TEST_CASE(Serialization)
 {
-  using namespace vita;
+  using vita::fitness_t;
 
   const fitness_t f{1.0, 2.0, 3.0,
                     std::numeric_limits<fitness_t::value_type>::lowest()};
@@ -88,7 +92,8 @@ BOOST_AUTO_TEST_CASE(Serialization)
 
 BOOST_AUTO_TEST_CASE(Operators, * boost::unit_test::tolerance(epsilon))
 {
-  using namespace vita;
+  using vita::fitness_t;
+  using vita::with_size;
 
   fitness_t x{2.0, 4.0, 8.0};
   fitness_t f1{2.0, 4.0, 8.0};
@@ -129,7 +134,8 @@ BOOST_AUTO_TEST_CASE(Operators, * boost::unit_test::tolerance(epsilon))
 
 BOOST_AUTO_TEST_CASE(Joining)
 {
-  using namespace vita;
+  using vita::combine;
+  using vita::fitness_t;
 
   const fitness_t f1{1.0, 2.0, 3.0}, f2{4.0, 5.0, 6.0};
 
