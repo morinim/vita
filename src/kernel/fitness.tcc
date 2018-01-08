@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,10 +30,9 @@
 /// The tag also helps to clarify the meaning of the other arguments.
 ///
 template<class T>
-basic_fitness_t<T>::basic_fitness_t(std::size_t n, copies_of_t, T v)
-  : vect_(n, v)
+basic_fitness_t<T>::basic_fitness_t(with_size s, T v) : vect_(s(), v)
 {
-  Expects(n);
+  Expects(s());
 }
 
 ///
@@ -69,9 +68,9 @@ basic_fitness_t<T>::basic_fitness_t(values_t v) : vect_(std::move(v))
 /// \return the size of the fitness vector
 ///
 template<class T>
-unsigned basic_fitness_t<T>::size() const
+std::size_t basic_fitness_t<T>::size() const
 {
-  return static_cast<unsigned>(vect_.size());
+  return vect_.size();
 }
 
 ///
@@ -79,13 +78,13 @@ unsigned basic_fitness_t<T>::size() const
 /// \return      the `i`-th element of the fitness vector
 ///
 template<class T>
-T basic_fitness_t<T>::operator[](unsigned i) const
+T basic_fitness_t<T>::operator[](std::size_t i) const
 {
   // This assert could be considered a bit too strict. In general taking the
   // address of one past the last element is allowed, e.g.
   //     std::copy(&f[0], &f[N], &dest);
   // but here the assertion will signal this use case. The workaround is:
-  //     std::copy(&f[0], &f[0] + N, &dest);
+  //     std::copy(f.begin(), f.end(), &dest);
   Expects(i < size());
   return vect_[i];
 }
@@ -95,7 +94,7 @@ T basic_fitness_t<T>::operator[](unsigned i) const
 /// \return      a reference to the `i`-th element of the fitness vector
 ///
 template<class T>
-T &basic_fitness_t<T>::operator[](unsigned i)
+T &basic_fitness_t<T>::operator[](std::size_t i)
 {
   Expects(i < size());
   return vect_[i];
@@ -206,12 +205,11 @@ bool operator<(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
                                       std::begin(rhs), std::end(rhs));
 
   // An alternative implementation:
-  // > for (unsigned i(0); i < size(); ++i)
+  // > for (std::size_t i(0); i < size(); ++i)
   // >   if (operator[](i) != f[i])
   // >     return operator[](i) > f[i];
   // > return false;
 }
-
 
 ///
 /// Lexicographic ordering.
@@ -295,7 +293,7 @@ bool dominating(const basic_fitness_t<T> &lhs, const basic_fitness_t<T> &rhs)
   bool one_better(lhs.size() && !rhs.size());
 
   const auto n(std::min(lhs.size(), rhs.size()));
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     if (lhs[i] > rhs[i])
       one_better = true;
     else if (lhs[i] < rhs[i])
@@ -358,7 +356,7 @@ std::ostream &operator<<(std::ostream &o, basic_fitness_t<T> f)
 {
   o << '(';
 
-  std::copy(&f[0], &f[0] + f.size(), infix_iterator<T>(o, ", "));
+  std::copy(f.begin(), f.end(), infix_iterator<T>(o, ", "));
 
   return o << ')';
 }
@@ -371,7 +369,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator+=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) += f[i];
 
   return *this;
@@ -390,7 +388,7 @@ basic_fitness_t<T> operator+(basic_fitness_t<T> lhs,
 {
   // operator+ shouldn't be a member function otherwise it won't work as
   // naturally as user may expect (i.e. asymmetry in implicit conversion from
-  // other types.
+  // other types).
   // Implementing `+` in terms of `+=` makes the code simpler and guarantees
   // consistent semantics as the two functions are less likely to diverge
   // during maintenance.
@@ -406,7 +404,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator-=(const basic_fitness_t<T> &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) -= f[i];
 
   return *this;
@@ -434,7 +432,7 @@ template<class T>
 basic_fitness_t<T> &basic_fitness_t<T>::operator*=(const basic_fitness_t &f)
 {
   const auto n(size());
-  for (unsigned i(0); i < n; ++i)
+  for (std::size_t i(0); i < n; ++i)
     operator[](i) *= f[i];
 
   return *this;
@@ -599,10 +597,10 @@ template<class T>
 bool almost_equal(const basic_fitness_t<T> &f1,
                   const basic_fitness_t<T> &f2, T ae_epsilon)
 {
-  const auto n(f1.size());
-  assert(f2.size() == n);
+  Expects(f1.size() == f2.size());
 
-  for (unsigned i(0); i < n; ++i)
+  const auto n(f1.size());
+  for (std::size_t i(0); i < n; ++i)
     if (!almost_equal(f1[i], f2[i], ae_epsilon))
       return false;
 
@@ -610,24 +608,27 @@ bool almost_equal(const basic_fitness_t<T> &f1,
 }
 
 ///
+/// Taxicab distance between two vectors.
+///
 /// \param[in] f1 first fitness value
 /// \param[in] f2 second fitness value
 /// \return       the distance between `f1` and `f2`
+///
+/// The taxicab distance between two vectors in an n-dimensional real vector
+/// space with fixed Cartesian coordinate system, is the sum of the lengths of
+/// the projections of the line segment between the points onto the coordinate
+/// axes.
 ///
 /// \relates basic_fitness_t
 ///
 template<class T>
 double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 {
-  double d(0.0);
+  Expects(f1.size() == f2.size());
 
-  const auto n(f1.size());
-  assert(f2.size() == n);
-
-  for (unsigned i(0); i < n; ++i)
-    d += std::abs(f1[i] - f2[i]);
-
-  return d;
+  return std::inner_product(f1.begin(), f1.end(), f2.begin(), 0,
+                            std::plus<>(),
+                            [](T a, T b) { return std::abs(a - b); });
 }
 
 

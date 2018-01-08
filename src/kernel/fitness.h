@@ -16,6 +16,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <numeric>
 
 #include "utility/small_vector.h"
 #include "utility/utility.h"
@@ -23,9 +24,22 @@
 namespace vita
 {
 
-/// Tag used in the `basic_fitness_t`'s constructor.
-struct copies_of_t {};
-constexpr copies_of_t copies_of{};
+///
+/// Tag representing size.
+///
+/// Used to initialize containers in a way that is completely unambiguous.
+///
+/// \see https://akrzemi1.wordpress.com/2016/06/29/competing-constructors/
+///
+class with_size
+{
+public:
+  explicit with_size(std::size_t s) : size_(s) {}
+  std::size_t operator()() const { return size_; }
+
+private:
+  std::size_t size_;
+};
 
 ///
 /// A value assigned to an individual which reflects how well the individual
@@ -76,12 +90,11 @@ public:
   basic_fitness_t();
   basic_fitness_t(std::initializer_list<T>);
   basic_fitness_t(values_t);
-  basic_fitness_t(std::size_t, copies_of_t,
-                  T = std::numeric_limits<T>::lowest());
+  basic_fitness_t(with_size, T = std::numeric_limits<T>::lowest());
 
-  unsigned size() const;
-  T operator[](unsigned) const;
-  T &operator[](unsigned);
+  std::size_t size() const;
+  T operator[](std::size_t) const;
+  T &operator[](std::size_t);
 
   iterator begin();
   const_iterator begin() const;
