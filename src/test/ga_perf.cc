@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,23 +34,25 @@ BOOST_FIXTURE_TEST_SUITE(t_de7, F_FACTORY5_NO_INIT)
 // Algorithms"
 BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
 {
-  vita::print.verbosity(vita::log::L_WARNING);
+  using namespace vita;
+
+  print.verbosity(log::L_WARNING);
 
   prob.env.individuals = 100;
   prob.env.generations = 2000;
   prob.env.threshold.fitness = {0, 0};
-  prob.sset.insert(vita::ga::parameter(0, -2.3, 2.3));
-  prob.sset.insert(vita::ga::parameter(1, -2.3, 2.3));
-  prob.sset.insert(vita::ga::parameter(2, -3.2, 3.2));
-  prob.sset.insert(vita::ga::parameter(3, -3.2, 3.2));
-  prob.sset.insert(vita::ga::parameter(4, -3.2, 3.2));
+  prob.sset.insert<ga::real>(vita::range(-2.3, 2.3));
+  prob.sset.insert<ga::real>(vita::range(-2.3, 2.3));
+  prob.sset.insert<ga::real>(vita::range(-3.2, 3.2));
+  prob.sset.insert<ga::real>(vita::range(-3.2, 3.2));
+  prob.sset.insert<ga::real>(vita::range(-3.2, 3.2));
 
   auto f = [](const std::vector<double> &x)
   {
     return -std::exp(x[0] * x[1] * x[2] * x[3] * x[4]);
   };
 
-  auto p = [](const vita::i_de &prg)
+  auto p = [](const i_de &prg)
   {
     auto h1 = [](const std::vector<double> &x)
     {
@@ -93,7 +95,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
     return r;
   };
 
-  vita::ga_search<vita::i_de, vita::de_es, decltype(f)> s(prob, f, p);
+  de_search<decltype(f)> s(prob, f, p);
   BOOST_TEST(s.debug());
   const auto res(s.run(10).best.solution);
 
