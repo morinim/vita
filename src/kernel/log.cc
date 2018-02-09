@@ -11,6 +11,7 @@
  */
 
 #include <chrono>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 
@@ -19,8 +20,21 @@
 namespace vita
 {
 
+namespace
+{
+
+std::tm tm_now()
+{
+  const auto now(std::chrono::system_clock::now());
+  const auto tt(std::chrono::system_clock::to_time_t(now));
+
+  return *std::localtime(&tt);
+}
+
+}  // unnamed namespace
+
 log::level log::reporting_level = log::ALL;
-std::ostream *log::file = nullptr;
+std::unique_ptr<std::ostream> log::stream = nullptr;
 
 ///
 /// Creates a `log` object.
@@ -44,7 +58,7 @@ log::log() : os(), level_(OUTPUT) {}
 ///
 std::ostringstream &log::get(level l)
 {
-  level_ = l;
+  level_ = std::min(FATAL, l);
   return os;
 }
 
@@ -55,17 +69,15 @@ log::~log()
     "ALL", "DEBUG", "INFO", "", "WARNING", "ERROR", "FATAL", ""
   };
 
-  if (file)
+  if (stream)  // `stream`, if available, gets all the messages
   {
-    const auto now(std::chrono::system_clock::now());
-    const auto tt(std::chrono::system_clock::to_time_t(now));
-    const auto lt(*std::localtime(&tt));
+    const auto lt(tm_now());
 
-    *file << "[" + tags[level_] + "] " << std::put_time(&lt, "%T") << ' '
-          << os.str() << std::endl;
+    *stream << std::put_time(&lt, "%T") << '\t' << tags[level_] << '\t'
+            << os.str() << std::endl;
   }
 
-  if (level_ >= reporting_level)
+  if (level_ >= reporting_level)  // `cout` is selective
   {
     std::string tag;
     if (level_ != OUTPUT)
@@ -73,6 +85,25 @@ log::~log()
 
     std::cout << tag << os.str() << std::endl;
   }
+}
+
+///
+/// Sets the `log::stream` variable with a convenient value.
+///
+/// \param[in] base base filepath of the log (e.g. `/home/doe/app`)
+///
+/// Given the `/home/doe/app` arguments associates the `log::stream` variable
+/// with the `app_123_18_30_00.log` file (the numbers represents the current:
+/// day of the year, hours, minutes, seconds) in the `/home/doe/` directory.
+///
+void log::setup_stream(const std::string &base)
+{
+  const auto lt(tm_now());
+
+  std::ostringstream fn;
+  fn << base << std::put_time(&lt, "_%j_%H_%M_%S") << ".log";
+
+  stream = std::make_unique<std::ofstream>(fn.str());
 }
 
 }  // namespace vita

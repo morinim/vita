@@ -13,6 +13,7 @@
 #if !defined(VITA_LOG_H)
 #define      VITA_LOG_H
 
+#include <memory>
 #include <sstream>
 
 #include "kernel/common.h"
@@ -24,7 +25,8 @@ namespace vita
 /// A basic console printer with integrated logger.
 ///
 /// \note
-// This is derived from "Logging in C++" by Petru Marginean (DDJ Sep 2007)
+/// This is derived from the code presented in "Logging in C++" by Petru
+/// Marginean (DDJ Sep 2007)
 ///
 class log
 {
@@ -37,7 +39,7 @@ public:
   /// * `WARNING` - I can continue but please have a look
   /// * `ERROR`   - Something really wrong... but you could be lucky
   /// * `FATAL`   - The program cannot continue
-  /// * `OFF`     - No output
+  /// * `OFF`     - Disable output
   ///
   /// \remarks
   /// The `DEBUG` log level can be switched on only if the `NDEBUG` macro is
@@ -47,8 +49,9 @@ public:
   /// Messages with a lower level aren't logged / printed.
   static level reporting_level;
 
-  /// Optional log file.
-  static std::ostream *file;
+  /// Optional log stream.
+  static std::unique_ptr<std::ostream> stream;
+  static void setup_stream(const std::string &base);
 
   explicit log();
   log(const log &) = delete;
@@ -95,7 +98,7 @@ private:
 /// When the `NDEBUG` is defined all the debug-level logging is eliminated at
 /// compile time.
 #if defined(NDEBUG)
-#define vitaPRINT(level) if (level > log::DEBUG);                   \
+#define vitaPRINT(level) if (level > log::DEBUG);\
                          else if (level < log::reporting_level);\
                          else log().get(level)
 #else
