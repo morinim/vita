@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -238,13 +238,13 @@ bool i_de::debug() const
   {
     if (!genome_.empty())
     {
-      print.error("Inconsistent internal status for empty individual");
+      vitaERROR << "Inconsistent internal status for empty individual";
       return false;
     }
 
     if (!signature_.empty())
     {
-      print.error("Empty individual must empty signature");
+      vitaERROR << "Empty individual must empty signature";
       return false;
     }
 
@@ -253,7 +253,7 @@ bool i_de::debug() const
 
   if (!signature_.empty() && signature_ != hash())
   {
-    print.error("Wrong signature: ", signature_, " should be ", hash());
+    vitaERROR << "Wrong signature: " << signature_ << " should be " << hash();
     return false;
   }
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -283,7 +283,7 @@ bool population<T>::debug() const
 
   if (layers() != allowed_.size())
   {
-    print.error("Number of layers doesn't match allowed array size");
+    vitaERROR << "Number of layers doesn't match allowed array size";
     return false;
   }
 
@@ -299,7 +299,7 @@ bool population<T>::debug() const
 
   if (!prob_)
   {
-    print.error("Undefined problem");
+    vitaERROR << "Undefined `problem`";
     return false;
   }
 

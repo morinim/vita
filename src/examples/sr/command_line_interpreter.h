@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -148,25 +148,25 @@ private:
     }
     catch (boost::program_options::ambiguous_option &e)
     {
-      print.error("Ambiguous command '",
-                  boost::program_options::strip_prefixes(e.get_option_name()),
-                  "'");
+      vitaERROR << "Ambiguous command '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "'";
     }
     catch (boost::program_options::invalid_command_line_syntax &e)
     {
-      print.error("The required argument for option '",
-                  boost::program_options::strip_prefixes(e.get_option_name()),
-                  "' is missing");
+      vitaERROR << "The required argument for option '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "' is missing";
     }
     catch (boost::program_options::unknown_option &e)
     {
-      print.error("Unknown command '",
-                  boost::program_options::strip_prefixes(e.get_option_name()),
-                  "'");
+      vitaERROR << "Unknown command '"
+                << boost::program_options::strip_prefixes(e.get_option_name())
+                << "'";
     }
     catch (boost::program_options::error &e)
     {
-      print.error(e.what());
+      vitaERROR << e.what();
     }
   }
 

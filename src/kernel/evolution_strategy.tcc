@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -125,7 +125,8 @@ void basic_alps_es<T, CS>::post_bookkeeping()
 /// * `env.stat.layers_file` if empty the method will not write any data.
 ///
 template<class T, template<class> class CS>
-void basic_alps_es<T, CS>::log(unsigned last_run, unsigned current_run) const
+void basic_alps_es<T, CS>::log_strategy(unsigned last_run,
+                                        unsigned current_run) const
 {
   const auto &pop(this->pop_);
   const auto &env(pop.get_problem().env);

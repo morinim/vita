@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -124,180 +124,181 @@ bool environment::debug(bool force_defined) const
   {
     if (!mep.code_length)
     {
-      print.error("Undefined code_length data member");
+      vitaERROR << "Undefined code_length data member";
       return false;
     }
 
     if (!mep.patch_length)
     {
-      print.error("Undefined patch_length data member");
+      vitaERROR << "Undefined patch_length data member";
       return false;
     }
 
     if (elitism == trilean::unknown)
     {
-      print.error("Undefined elitism data member");
+      vitaERROR << "Undefined elitism data member";
       return false;
     }
 
     if (p_mutation < 0.0)
     {
-      print.error("Undefined p_mutation data member");
+      vitaERROR << "Undefined p_mutation data member";
       return false;
     }
 
     if (p_cross < 0.0)
     {
-      print.error("Undefined p_cross data member");
+      vitaERROR << "Undefined p_cross data member";
       return false;
     }
 
     if (!brood_recombination)
     {
-      print.error("Undefined brood_recombination data member");
+      vitaERROR << "Undefined brood_recombination data member";
       return false;
     }
 
     if (!dss.has_value())
     {
-      print.error("Undefined dss data member");
+      vitaERROR << "Undefined dss data member";
       return false;
     }
 
     if (!layers)
     {
-      print.error("Undefined layer data member");
+      vitaERROR << "Undefined layer data member";
       return false;
     }
 
     if (!individuals)
     {
-      print.error("Undefined `individuals` data member");
+      vitaERROR << "Undefined `individuals` data member";
       return false;
     }
 
     if (!min_individuals)
     {
-      print.error("Undefined `min_individuals` data member");
+      vitaERROR << "Undefined `min_individuals` data member";
       return false;
     }
 
     if (!tournament_size)
     {
-      print.error("Undefined tournament_size data member");
+      vitaERROR << "Undefined tournament_size data member";
       return false;
     }
 
     if (!mate_zone)
     {
-      print.error("Undefined mate_zone data member");
+      vitaERROR << "Undefined mate_zone data member";
       return false;
     }
 
     if (!generations)
     {
-      print.error("Undefined generations data member");
+      vitaERROR << "Undefined generations data member";
       return false;
     }
 
     if (!max_stuck_time.has_value())
     {
-      print.error("Undefined max_stuck_time data member");
+      vitaERROR << "Undefined max_stuck_time data member";
       return false;
     }
 
     if (arl == trilean::unknown)
     {
-      print.error("Undefined arl data member");
+      vitaERROR << "Undefined arl data member";
       return false;
     }
 
     if (validation_percentage == 100)
     {
-      print.error("Undefined validation_percentage data member");
+      vitaERROR << "Undefined validation_percentage data member";
       return false;
     }
 
     if (!alps.age_gap)
     {
-      print.error("Undefined age_gap parameter");
+      vitaERROR << "Undefined age_gap parameter";
       return false;
     }
 
     if (alps.p_same_layer < 0.0)
     {
-      print.error("Undefined p_same_layer parameter");
+      vitaERROR << "Undefined p_same_layer parameter";
       return false;
     }
 
     if (!team.individuals)
     {
-      print.error("Undefined team size parameter");
+      vitaERROR << "Undefined team size parameter";
       return false;
     }
   }  // if (force_defined)
 
   if (mep.code_length == 1)
   {
-    print.error("code_length is too short");
+    vitaERROR << "code_length is too short";
     return false;
   }
 
   if (mep.code_length && mep.patch_length
       && mep.patch_length >= mep.code_length)
   {
-    print.error("patch_length must be shorter than code_length");
+    vitaERROR << "patch_length must be shorter than code_length";
     return false;
   }
 
   if (p_mutation > 1.0)
   {
-    print.error("p_mutation out of range");
+    vitaERROR << "p_mutation out of range";
     return false;
   }
 
   if (p_cross > 1.0)
   {
-    print.error("p_cross out of range");
+    vitaERROR << "p_cross out of range";
     return false;
   }
 
   if (validation_percentage > 100)
   {
-    print.error("validation_percentage out of range");
+    vitaERROR << "validation_percentage out of range";
     return false;
   }
 
   if (alps.p_same_layer > 1.0)
   {
-    print.error("`p_same_layer` out of range");
+    vitaERROR << "`p_same_layer` out of range";
     return false;
   }
 
   if (min_individuals == 1)
   {
-    print.error("At least 2 individuals for layer");
+    vitaERROR << "At least 2 individuals for layer";
     return false;
   }
 
   if (individuals && min_individuals && individuals < min_individuals)
   {
-    print.warning("Too few individuals");
+    vitaERROR << "Too few individuals";
     return false;
   }
 
   if (individuals && tournament_size && tournament_size > individuals)
   {
-    print.error("tournament_size (", tournament_size,
-                ") cannot be greater than population size (", individuals,
-                ")");
+    vitaERROR << "tournament_size (" << tournament_size
+              << ") cannot be greater than population size ("
+              << individuals << ")";
     return false;
   }
 
   if (mate_zone && tournament_size && tournament_size > mate_zone)
   {
-    print.error("tournament_size (", tournament_size,
-                ") cannot be greater than mate_zone (", mate_zone, ")");
+    vitaERROR << "tournament_size (" << tournament_size
+              << ") cannot be greater than mate_zone (" << mate_zone
+              << ")";
     return false;
   }
 

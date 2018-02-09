@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -284,19 +284,19 @@ bool distribution<T>::debug() const
 
   if (count() && isfinite(min()) && isfinite(mean()) && min() > mean())
   {
-    print.error("Distribution: min=", min(), " > mean=", mean());
+    vitaERROR << "Distribution: min=" << min() << " > mean=" << mean();
     return false;
   }
 
   if (count() && isfinite(max()) && isfinite(mean()) && max() < mean())
   {
-    print.error("Distribution: max=", max(), " < mean=", mean());
+    vitaERROR << "Distribution: max=" << max() << " < mean=" << mean();
     return false;
   }
 
   if (count() && (isnan(variance()) || !isnonnegative(variance())))
   {
-    print.error("Distribution: negative variance");
+    vitaERROR << "Distribution: negative variance";
     return false;
   }
 

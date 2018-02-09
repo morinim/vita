@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -226,10 +226,11 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
   const auto trades(short_trades + long_trades);
   double fit(profit - drawdown + std::sqrt(std::min(trades, 100.0)));
 
-  vita::print.info("CURRENT EA. Profit:", profit,
-                   " Drawdown:", drawdown,
-                   " Trades:", trades,
-                   " Fit:", fit);
+  using vita::log;
+  vitaINFO << "CURRENT EA. Profit:" << profit
+           << " Drawdown:" << drawdown
+           << " Trades:" << trades
+           << " Fit:" << fit;
 
   return {fit, profit, drawdown, trades};
 }

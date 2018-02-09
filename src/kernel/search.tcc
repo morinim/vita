@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -179,7 +179,7 @@ summary<T> search<T, ES>::run(unsigned n)
            std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
            std::end(good_runs));
 
-    this->log(overall_summary, fd, good_runs, best_run, n);
+    this->log_search(overall_summary, fd, good_runs, best_run, n);
   }
 
   save();
@@ -204,7 +204,7 @@ bool search<T, ES>::load()
   {
     if (!active_eva_->load(in))
       return false;
-    print.info("Loading cache");
+    vitaINFO << "Loading cache";
   }
 
   return true;
@@ -227,7 +227,7 @@ bool search<T, ES>::save() const
   {
     if (!active_eva_->save(out))
       return false;
-    print.info("Saving cache");
+    vitaINFO << "Saving cache";
   }
 
   return true;
@@ -243,7 +243,7 @@ void search<T, ES>::print_resume(const model_measurements &m) const
                       prob_.data()->has(data::validation) ? "Validation "
                                                           : "Training ");
 
-  print.info(s, "fitness: ", m.fitness);
+  vitaINFO << s << "fitness: " << m.fitness;
 }
 
 ///
@@ -294,10 +294,10 @@ bool search<T, ES>::debug() const
 /// \return                  `true` if the write operation succeed
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::log(const summary<T> &run_sum,
-                        const distribution<fitness_t> &fd,
-                        const std::vector<unsigned> &good_runs,
-                        unsigned best_run, unsigned runs) const
+void search<T, ES>::log_search(const summary<T> &run_sum,
+                               const distribution<fitness_t> &fd,
+                               const std::vector<unsigned> &good_runs,
+                               unsigned best_run, unsigned runs) const
 {
   if (prob_.env.stat.summary_file.empty())
     return;

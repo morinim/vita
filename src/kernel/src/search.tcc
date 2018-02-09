@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -127,17 +127,17 @@ void src_search<T, ES>::arl(const U &base)
 
   auto &prob(this->prob_);
 
-  std::ofstream log;
+  std::ofstream log_file;
   if (!prob.env.stat.arl_file.empty())
   {
     const auto filename(merge_path(prob.env.stat.dir, prob.env.stat.arl_file));
-    log.open(filename, std::ios_base::app);
+    log_file.open(filename, std::ios_base::app);
 
-    if (log.is_open())  // logs ADTs
+    if (log_file.is_open())  // logs ADTs
     {
       for (const auto &s : prob.sset.adts())
-        log << s->name() << ' ' << prob.sset.weight(*s) << '\n';
-      log << '\n';
+        log_file << s->name() << ' ' << prob.sset.weight(*s) << '\n';
+      log_file << '\n';
     }
   }
 
@@ -179,10 +179,10 @@ void src_search<T, ES>::arl(const U &base)
       else  // !adf_args
         p = std::make_unique<adt>(candidate_block);
 
-      if (log.is_open())  // logs ADFs
+      if (log_file.is_open())  // logs ADFs
       {
-        log << p->name() << " (Base: " << base_fit
-            << "  DF: " << delta << ")\n" << candidate_block << '\n';
+        log_file << p->name() << " (Base: " << base_fit
+                 << "  DF: " << delta << ")\n" << candidate_block << '\n';
       }
 
       prob.sset.insert(std::move(p));
@@ -262,7 +262,7 @@ void src_search<T, ES>::tune_parameters()
       env.dss = 0;
 
     assert(env.dss.has_value());
-    print.info("DSS set to ", *env.dss);
+    vitaINFO << "DSS set to " << *env.dss;
   }
 
   if (!constrained.layers)
@@ -272,7 +272,7 @@ void src_search<T, ES>::tune_parameters()
     else
       env.layers = dflt.layers;
 
-    print.info("Number of layers set to ", env.layers);
+    vitaINFO << "Number of layers set to " << env.layers;
   }
 
   // A larger number of training cases requires an increase in the population
@@ -298,13 +298,13 @@ void src_search<T, ES>::tune_parameters()
     else
       env.individuals = dflt.individuals;
 
-    print.info("Population size set to ", env.individuals);
+    vitaINFO << "Population size set to " << env.individuals;
   }
 
   if (constrained.validation_percentage == 100)
   {
     if (env.dss.value_or(0) > 0)
-      print.info("Using DSS and skipping holdout validation");
+      vitaINFO << "Using DSS and skipping holdout validation";
     else
     {
       if (d_size * dflt.validation_percentage < 10000)
@@ -312,8 +312,8 @@ void src_search<T, ES>::tune_parameters()
       else
         env.validation_percentage = dflt.validation_percentage;
 
-      print.info("Validation percentage set to ",
-                 env.validation_percentage, '%');
+      vitaINFO << "Validation percentage set to " << env.validation_percentage
+               << '%';
     }
   }
 
@@ -351,10 +351,12 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
   const std::string s(data().has(data::validation) ? "Validation "
                                                    : "Training ");
 
-  print.info(s, "fitness: ", m.fitness);
+  vitaINFO << s << "fitness: " << m.fitness;
 
   if (0.0 <= m.accuracy && m.accuracy <= 1.0)
-    print.info(s, "accuracy: ", 100.0 * m.accuracy, '%');
+  {
+    vitaINFO << s << "accuracy: " << 100.0 * m.accuracy << '%';
+  }
 }
 
 ///
@@ -474,13 +476,13 @@ bool src_search<T, ES>::debug() const
 {
   if (p_symre == evaluator_id::undefined)
   {
-    print.error("Undefined ID for preferred sym.reg. evaluator");
+    vitaERROR << "Undefined ID for preferred sym.reg. evaluator";
     return false;
   }
 
   if (p_class == evaluator_id::undefined)
   {
-    print.error("Undefined ID for preferred classification evaluator");
+    vitaERROR << "Undefined ID for preferred classification evaluator";
     return false;
   }
 

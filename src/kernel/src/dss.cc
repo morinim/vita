@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -87,8 +87,8 @@ void dss::shake_impl()
   Expects(dat_.size(data::training) == 0);
 
   const auto avg_v(average_age_difficulty(data::validation));
-  print.debug("DSS average validation difficulty ", avg_v.second, ", age ",
-              avg_v.first);
+  vitaDEBUG << "DSS average validation difficulty " << avg_v.second
+            << ", age " << avg_v.first;
 
   const auto weight_sum(
     std::accumulate(dat_.begin(data::validation), dat_.end(data::validation),
@@ -127,8 +127,8 @@ void dss::shake_impl()
   const std::size_t n(d < 10 ? 10 : d);
   dat_.move_append(data::validation, data::training, n);
 
-  print.debug("DSS SHAKE (weight sum: ", weight_sum, ", training with: ", n,
-              ")");
+  vitaDEBUG << "DSS SHAKE (weight sum: " << weight_sum << ", training with: "
+            << n << ')';
 
   reset_age_difficulty(data::training);
 }
@@ -139,10 +139,10 @@ bool dss::shake(unsigned generation)
       || generation % gap_)
     return false;
 
-  print.debug("DSS shaking generation ", generation);
+  vitaDEBUG << "DSS shaking generation " << generation;
 
   const auto avg_t(average_age_difficulty(data::training));
-  print.debug("DSS average training difficulty ", avg_t.second);
+  vitaDEBUG << "DSS average training difficulty " << avg_t.second;
   assert(avg_t.first == 1);
 
   dat_.move_append(data::training, data::validation);

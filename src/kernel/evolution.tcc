@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,7 +27,9 @@ inline bool user_stop()
   const bool stop(kbhit() && std::cin.get() == '.');
 
   if (stop)
-    print.info("Stopping evolution...");
+  {
+    vitaINFO << "Stopping evolution...";
+  }
 
   return stop;
 }
@@ -139,7 +141,7 @@ analyzer<T> evolution<T, ES>::get_stats() const
 /// GNUPlot.
 ///
 template<class T, template<class> class ES>
-void evolution<T, ES>::log(unsigned run_count) const
+void evolution<T, ES>::log_evolution(unsigned run_count) const
 {
   static unsigned last_run(0);
 
@@ -210,14 +212,14 @@ void evolution<T, ES>::log(unsigned run_count) const
     }
   }
 
-  es_.log(last_run, run_count);
+  es_.log_strategy(last_run, run_count);
 
   if (last_run != run_count)
     last_run = run_count;
 }
 
 ///
-/// Prints evolution information (if `environment::log_level >= OUTPUT`).
+/// Prints evolution information (if `log::reporting_level >= log::OUTPUT`).
 ///
 /// \param[in] k             current generation
 /// \param[in] run_count     total number of runs planned
@@ -228,7 +230,7 @@ template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
                                       bool summary, timer *from_last_msg) const
 {
-  if (print.verbosity() >= log::L_OUTPUT)
+  if (log::OUTPUT >= log::reporting_level)
   {
     const unsigned perc(100 * k / pop_.individuals());
     if (summary)
@@ -310,7 +312,7 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
     }
 
     stats_.az = get_stats();
-    log(run_count);
+    log_evolution(run_count);
 
     for (unsigned k(0); k < pop_.individuals() && !stop; ++k)
     {
@@ -340,9 +342,9 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
     es_.post_bookkeeping();  // hook for strategy-specific final bookkeeping
   }
 
-  print.info("Elapsed time: ",
-             std::chrono::duration<double>(stats_.elapsed).count(),
-             "s", std::string(10, ' '));
+  vitaINFO << "Elapsed time: "
+           << std::chrono::duration<double>(stats_.elapsed).count()
+           << "s" << std::string(10, ' ');
 
   term::reset();
   return stats_;

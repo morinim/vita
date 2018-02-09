@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -377,7 +377,7 @@ bool symbol_set::debug() const
 
   if (!enough_terminals())
   {
-    print.error("Symbol set doesn't contain enough symbols");
+    vitaERROR << "Symbol set doesn't contain enough symbols";
     return false;
   }
 
@@ -403,7 +403,7 @@ bool symbol_set::collection::debug() const
   if (!all.debug() || !functions.debug() || !terminals.debug() || !adf.debug()
       || !adt.debug())
   {
-    print.error("(inside ", name_, ")");
+    vitaERROR << "(inside " << name_ << ")";
     return false;
   }
 
@@ -421,14 +421,15 @@ bool symbol_set::collection::debug() const
     {
       if (std::find(terminals.begin(), terminals.end(), s) == terminals.end())
       {
-        print.error(name_, ": terminal ", s.sym->name(), " badly stored");
+        vitaERROR << name_ << ": terminal " << s.sym->name()
+                  << " badly stored";
         return false;
       }
 
       if (s.sym->auto_defined()
           && std::find(adt.begin(), adt.end(), s) == adt.end())
       {
-        print.error(name_, ": ADT ", s.sym->name(), " badly stored");
+        vitaERROR << name_ << ": ADT " << s.sym->name() << " badly stored";
         return false;
       }
     }
@@ -436,14 +437,15 @@ bool symbol_set::collection::debug() const
     {
       if (std::find(functions.begin(), functions.end(), s) == functions.end())
       {
-        print.error(name_, ": function ", s.sym->name(), " badly stored");
+        vitaERROR << name_ << ": function " << s.sym->name()
+                  << " badly stored";
         return false;
       }
 
       if (s.sym->auto_defined()
           && std::find(adf.begin(), adf.end(), s) == adf.end())
       {
-        print.error(name_, ": ADF ", s.sym->name(), " badly stored");
+        vitaERROR << name_ << ": ADF " << s.sym->name() << " badly stored";
         return false;
       }
     }
@@ -458,31 +460,31 @@ bool symbol_set::collection::debug() const
   //
   //     if (ssize && !terminals.size())
   //     {
-  //       print.error(name_, ": no terminal in the symbol set");
+  //       vitaERROR << name_ << ": no terminal in the symbol set";
   //       return false;
   //     }
 
   if (ssize < functions.size())
   {
-    print.error(name_, ": wrong terminal set size (more than symbol set)");
+    vitaERROR << name_ << ": wrong terminal set size (more than symbol set)";
     return false;
   }
 
   if (ssize < terminals.size())
   {
-    print.error(name_, ": wrong terminal set size (more than symbol set)");
+    vitaERROR << name_ << ": wrong terminal set size (more than symbol set)";
     return false;
   }
 
   if (functions.size() < adf.size())
   {
-    print.error(name_, ": wrong ADF set size (more than symbol set)");
+    vitaERROR << name_ << ": wrong ADF set size (more than symbol set)";
     return false;
   }
 
   if (terminals.size() < adt.size())
   {
-    print.error(name_, ": wrong ADT set size (more than symbol set)");
+    vitaERROR << name_ << ": wrong ADT set size (more than symbol set)";
     return false;
   }
 
@@ -578,7 +580,7 @@ bool symbol_set::collection::sum_container::debug() const
   {
     if (!e.sym->debug())
     {
-      print.error(name_, ": invalid symbol ", e.sym->name());
+      vitaERROR << name_ << ": invalid symbol " << e.sym->name();
       return false;
     }
 
@@ -586,15 +588,15 @@ bool symbol_set::collection::sum_container::debug() const
 
     if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))
     {
-      print.error(name_, ": null weight for symbol ", e.sym->name());
+      vitaERROR << name_ << ": null weight for symbol " << e.sym->name();
       return false;
     }
   }
 
   if (check_sum != sum())
   {
-    print.error(name_, ": incorrect cached sum of weights (stored: ", sum(),
-                ", correct: ", check_sum, ')');
+    vitaERROR << name_ << ": incorrect cached sum of weights (stored: "
+              << sum() << ", correct: " << check_sum << ')';
     return false;
   }
 

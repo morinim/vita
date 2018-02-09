@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
 {
   prob.env.individuals = 100;
 
-  vita::print.verbosity(vita::log::L_WARNING);
+  vita::log::reporting_level = vita::log::WARNING;
 
   auto eva(vita::make_ga_evaluator<vita::i_ga>(
              [](const vita::i_ga &v)

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -551,7 +551,7 @@ std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
     if (instance.input.size() + 1 == columns())
       push_back(instance);
     else
-      print.warning("Malformed example ", size(), " skipped");
+      vitaWARNING << "Malformed example " << size() << " skipped";
   }
 
   return debug() ? size() : static_cast<std::size_t>(0);
@@ -655,7 +655,7 @@ std::size_t src_data::load_csv(const std::string &filename, filter_hook_t ft)
     if (instance.input.size() + 1 == columns())
       push_back(instance);
     else
-      print.warning("Malformed line ", size(), " skipped");
+      vitaWARNING << "Malformed line " << size() << " skipped";
   }
 
   return debug() ? size() : static_cast<std::size_t>(0);

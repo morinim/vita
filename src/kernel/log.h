@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,7 +13,7 @@
 #if !defined(VITA_LOG_H)
 #define      VITA_LOG_H
 
-#include <iostream>
+#include <sstream>
 
 #include "kernel/common.h"
 
@@ -21,98 +21,94 @@ namespace vita
 {
 
 ///
-/// \brief A basic console logger.
+/// A basic console printer with integrated logger.
+///
+/// \note
+// This is derived from "Logging in C++" by Petru Marginean (DDJ Sep 2007)
 ///
 class log
 {
 public:
-  /// \brief The log level.
+  /// The log level.
   ///
-  /// * `OFF`     - No output
-  /// * `FATAL`   - The program cannot continue
-  /// * `ERROR`   - Something really wrong... but you could be lucky
-  /// * `WARNING` - I can continue but please have a look
-  /// * `OUTPUT`  - Standard program's console output
-  /// * `INFO`    - I say something but I don't expect you to listen
   /// * `DEBUG`   - Only interesting for developers
+  /// * `INFO`    - I say something but I don't expect you to listen
+  /// * `OUTPUT`  - Standard program's console output
+  /// * `WARNING` - I can continue but please have a look
+  /// * `ERROR`   - Something really wrong... but you could be lucky
+  /// * `FATAL`   - The program cannot continue
+  /// * `OFF`     - No output
   ///
   /// \remarks
   /// The `DEBUG` log level can be switched on only if the `NDEBUG` macro is
   /// defined.
-  enum level : unsigned {L_OFF, L_FATAL, L_ERROR, L_WARNING, L_OUTPUT,
-                         L_INFO, L_DEBUG, L_ALL};
+  enum level : unsigned {ALL, DEBUG, INFO, OUTPUT, WARNING, ERROR, FATAL, OFF};
 
-  log();
+  /// Messages with a lower level aren't logged / printed.
+  static level reporting_level;
 
-  log &verbosity(level);
-  level verbosity() const;
+  /// Optional log file.
+  static std::ostream *file;
 
-  template<class... Args>
-  void fatal(Args &&... args) const
-  {
-    print_if_(std::cerr, L_FATAL, "FATAL", std::forward<Args>(args)...);
-  }
+  explicit log();
+  log(const log &) = delete;
+  log &operator=(const log &) = delete;
 
-#if defined(NDEBUG)
-  template<class... Args> void debug(Args &&...) const {}
-#else
-  template<class... Args>
-  void debug(Args &&... args) const
-  {
-    print_if_(std::cout, L_DEBUG, "DEBUG", std::forward<Args>(args)...);
-  }
-#endif
+  virtual ~log();
 
-  template<class... Args>
-  void error(Args &&... args) const
-  {
-    print_if_(std::cerr, L_ERROR, "ERROR", std::forward<Args>(args)...);
-  }
+  std::ostringstream &get(level = OUTPUT);
 
-  template<class... Args>
-  void info(Args &&... args) const
-  {
-    print_if_(std::cout, L_INFO, "INFO", std::forward<Args>(args)...);
-  }
-
-  template<class... Args>
-  void output(Args &&... args) const
-  {
-    print_if_(std::cout, L_OUTPUT, "", std::forward<Args>(args)...);
-  }
-
-  template<class... Args>
-  void warning(Args &&... args) const
-  {
-    print_if_(std::cout, L_WARNING, "WARNING", std::forward<Args>(args)...);
-  }
+protected:
+  std::ostringstream os;
 
 private:
-  template<class... Args>
-  void print_if_(std::ostream &out, level l, const std::string &tag,
-                 Args &&... args) const
-  {
-    if (level_ >= l)
-    {
-      if (!tag.empty())
-        out << "[" << tag << "] ";
-      to_(out, std::forward<Args>(args)...);
-    }
-  }
-
-  template<class Head, class... Tail>
-  void to_(std::ostream &out, Head &&head, Tail &&... tail) const
-  {
-    out << std::forward<Head>(head);
-    to_(out, std::forward<Tail>(tail)...);
-  }
-  void to_(std::ostream &out) const { out << '\n'; }
-
-  // Current log level.
-  level level_;
+  level level_;  // current log level
 };
 
-extern log print;
+///
+/// A little trick that makes the code, when logging is not necessary, almost
+/// as fast as the code with no logging at all.
+///
+/// Logging will have a cost only if it actually produces output; otherwise,
+/// the cost is low (and actually immeasurable in most cases). This lets you
+/// control the trade-off between fast execution and detailed logging.
+///
+/// Macro-related dangers should be avoided> we shouldn't forget that the
+/// logging code might not be executed at all, subject to the logging level in
+/// effect. This is what we actually wanted and is actually what makes the code
+/// efficient. But as always, "macro-itis" can introduce subtle bugs. In this
+/// example:
+///
+///     vitaPRINT(log::INFO) << "A number of " << NotifyClients()
+///                          << " were notified.";
+///
+/// the clients will be notified only if the logging level detail will be
+/// `log::INFO` and greater. Probably not what was intended! The correct code
+/// should be:
+///
+///     const int notifiedClients = NotifyClients();
+///     vitaPRINT(log::INFO) << "A number of " << notifiedClients
+///                          << " were notified.";
+///
+///
+/// \note
+/// When the `NDEBUG` is defined all the debug-level logging is eliminated at
+/// compile time.
+#if defined(NDEBUG)
+#define vitaPRINT(level) if (level > log::DEBUG);                   \
+                         else if (level < log::reporting_level);\
+                         else log().get(level)
+#else
+#define vitaPRINT(level) if (level < log::reporting_level);\
+                         else log().get(level)
+#endif
+
+#define vitaFATAL   vitaPRINT(log::FATAL)
+#define vitaDEBUG   vitaPRINT(log::DEBUG)
+#define vitaERROR   vitaPRINT(log::ERROR)
+#define vitaINFO    vitaPRINT(log::INFO)
+#define vitaOUTPUT  vitaPRINT(log::OUTPUT)
+#define vitaWARNING vitaPRINT(log::WARNING)
 
 }  // namespace vita
 #endif  // include guard

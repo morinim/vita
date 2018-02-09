@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -269,13 +269,13 @@ bool i_ga::debug() const
   {
     if (!genome_.empty())
     {
-      print.error("Inconsistent internal status for empty individual");
+      vitaERROR << "Inconsistent internal status for empty individual";
       return false;
     }
 
     if (!signature_.empty())
     {
-      print.error("Empty individual must empty signature");
+      vitaERROR << "Empty individual must empty signature";
       return false;
     }
 
@@ -288,28 +288,28 @@ bool i_ga::debug() const
   {
     if (!genome_[i].sym)
     {
-      print.error("Empty symbol pointer at position ", i);
+      vitaERROR << "Empty symbol pointer at position " << i;
       return false;
     }
 
     if (!genome_[i].sym->terminal())
     {
-      print.error("Not-terminal symbol at position ", i);
+      vitaERROR << "Not-terminal symbol at position " << i;
       return false;
     }
 
     if (genome_[i].sym->category() != i)
     {
-      print.error("Wrong category: ",
-                  genome_[i].sym->name(), i, " -> ",
-                  genome_[i].sym->category(), " should be ", i);
+      vitaERROR << "Wrong category: " << genome_[i].sym->name() << i
+                << " -> " << genome_[i].sym->category()
+                << " should be " << i;
       return false;
     }
   }
 
   if (!signature_.empty() && signature_ != hash())
   {
-    print.error("Wrong signature: ", signature_, " should be ", hash());
+    vitaERROR << "Wrong signature: " << signature_ << " should be " << hash();
     return false;
   }
 

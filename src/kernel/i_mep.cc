@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -460,19 +460,19 @@ bool i_mep::debug() const
   {
     if (!genome_.empty())
     {
-      print.debug("Inconsistent internal status for empty individual");
+      vitaERROR << "Inconsistent internal status for empty individual";
       return false;
     }
 
     if (best() != locus::npos())
     {
-      print.error("Empty individual must have undefined best locus");
+      vitaERROR << "Empty individual must have undefined best locus";
       return false;
     }
 
     if (!signature_.empty())
     {
-      print.error("Empty individual must empty signature");
+      vitaERROR << "Empty individual and non-empty signature";
       return false;
     }
 
@@ -486,7 +486,7 @@ bool i_mep::debug() const
 
       if (!genome_(l).sym)
       {
-        print.error("Empty symbol pointer at locus ", l);
+        vitaERROR << "Empty symbol pointer at locus " << l;
         return false;
       }
 
@@ -494,7 +494,7 @@ bool i_mep::debug() const
       const auto arity(genome_(l).sym->arity());
       if (genome_(l).args.size() != arity)
       {
-        print.error("Arity and actual number of parameters don't match");
+        vitaERROR << "Arity and actual arguments don't match";
         return false;
       }
 
@@ -504,14 +504,14 @@ bool i_mep::debug() const
         // Arguments' addresses must be smaller than the size of the genome.
         if (arg >= size())
         {
-          print.error("Argument is out of range");
+          vitaERROR << "Argument is out of range";
           return false;
         }
 
         // Function address must be smaller than its arguments' addresses.
         if (arg <= i)
         {
-          print.error("Wrong reference in locus ", l);
+          vitaERROR << "Wrong reference in locus " << l;
           return false;
         }
       }
@@ -520,7 +520,8 @@ bool i_mep::debug() const
   for (category_t c(0); c < categories(); ++c)
     if (!genome_(genome_.rows() - 1, c).sym->terminal())
     {
-      print.error("Last symbol of type ", c, " in the genome isn't a terminal");
+      vitaERROR << "Last symbol of type " << c
+                        << " in the genome isn't a terminal";
       return false;
     }
 
@@ -532,28 +533,28 @@ bool i_mep::debug() const
 
       if (genome_(l).sym->category() != c)
       {
-        print.error("Wrong category: ", l,
-                    genome_(l).sym->name(), " -> ",
-                    genome_(l).sym->category(), " should be ", c);
+        vitaERROR << "Wrong category: " << l << genome_(l).sym->name()
+                  << " -> " << genome_(l).sym->category()
+                  << " should be " << c;
         return false;
       }
     }
 
   if (best().index >= size())
   {
-    print.error("Incorrect index for first active symbol");
+    vitaERROR << "Incorrect index for first active symbol";
     return false;
   }
   if (best().category >= categories())
   {
-    print.error("Incorrect category for first active symbol");
+    vitaERROR << "Incorrect category for first active symbol";
     return false;
   }
 
   if (categories() == 1 && active_symbols() > size())
   {
-    print.error("active_symbols() cannot be greater than size() in single "
-                "category individuals");
+    vitaERROR << "`active_symbols()` cannot be greater than `size()` "
+                 "in single-category individuals";
     return false;
   }
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -239,7 +239,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
 
   // Prints the list of categories as inferred from the dataset.
   for (const category &c : dat_.categories())
-    print.debug("Using ", c);
+    vitaDEBUG << "Using " << c;
 
   std::set<category_t> used_categories;
   for (category_t i(0); i < categories(); ++i)
@@ -266,7 +266,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
     const char *c_sym_name(s->Attribute("name"));
     if (!c_sym_name)
     {
-      print.error("Skipped unnamed symbol in symbolset");
+      vitaERROR << "Skipped unnamed symbol in symbolset";
       continue;
     }
     const std::string sym_name(c_sym_name);
@@ -283,7 +283,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
 
           for (auto j(decltype(n_args){0}); j < n_args; ++j)
             signature += " " + dat_.categories().find(tag).name;
-          print.debug("Adding to symbol set ", signature);
+          vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, cvect(n_args, tag)));
         }
@@ -293,7 +293,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
       auto *sig(s->FirstChildElement("signature"));
       if (!sig)
       {
-        print.error("Skipping " + sym_name + " symbol (empty signature)");
+        vitaERROR << "Skipping " << sym_name << " symbol (empty signature)";
         continue;
       }
 
@@ -304,7 +304,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
       {
         if (!arg->GetText())
         {
-          print.error("Skipping " + sym_name + " symbol (wrong signature)");
+          vitaERROR << "Skipping " << sym_name << " symbol (wrong signature)";
           args.clear();
           break;
         }
@@ -324,7 +324,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
           std::string signature(sym_name + ":");
           for (const auto &j : seq)
             signature += " " + dat_.categories().find(j).name;
-          print.debug("Adding to symbol set ", signature);
+          vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, seq));
         }

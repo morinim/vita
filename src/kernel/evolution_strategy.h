@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,7 +55,7 @@ public:
 
   /// Evolution strategy specific log function (it's called by the
   /// `evolution::log` method).
-  void log(unsigned, unsigned) const {}
+  void log_strategy(unsigned, unsigned) const {}
 
   /// Sets strategy-specific parameters.
   static environment shape(environment env) { return env; }
@@ -138,7 +138,7 @@ class basic_alps_es : public evolution_strategy<T,
 public:
   using basic_alps_es::evolution_strategy::evolution_strategy;
 
-  void log(unsigned, unsigned) const;
+  void log_strategy(unsigned, unsigned) const;
   void post_bookkeeping();
 
   static environment shape(environment);
