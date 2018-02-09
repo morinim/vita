@@ -98,7 +98,7 @@ private:
 /// When the `NDEBUG` is defined all the debug-level logging is eliminated at
 /// compile time.
 #if defined(NDEBUG)
-#define vitaPRINT(level) if (level > log::DEBUG);\
+#define vitaPRINT(level) if (level == log::DEBUG);\
                          else if (level < log::reporting_level);\
                          else log().get(level)
 #else
