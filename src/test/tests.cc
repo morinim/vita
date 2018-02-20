@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,6 @@ using namespace boost;
 #include "test/evolution_selection.cc"
 #include "test/fitness.cc"
 #include "test/ga.cc"
-//#include "test_ga_perf.cc"
 #include "test/i_de.cc"
 #include "test/i_mep.cc"
 #include "test/i_ga.cc"

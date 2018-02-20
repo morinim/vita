@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -194,8 +194,7 @@ const typename C::value_type &element(const C &c)
   const auto size(c.size());
   Expects(size);
 
-  return *std::next(c.begin(),
-                    static_cast<typename C::difference_type>(sup(size)));
+  return *std::next(c.begin(), sup<typename C::difference_type>(size));
 }
 
 ///

@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
 {
   using namespace vita;
 
-  print.verbosity(log::L_WARNING);
+  log::reporting_level = log::WARNING;
 
   prob.env.individuals = 100;
   prob.env.generations = 2000;
