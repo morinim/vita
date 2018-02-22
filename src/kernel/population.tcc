@@ -389,7 +389,7 @@ typename population<T>::coord pickup(const population<T> &p)
     s[l] = p.individuals(l);
 
   std::discrete_distribution<unsigned> dd(s.begin(), s.end());
-  const auto l(dd(random::engine()));
+  const auto l(dd(random::engine));
   return {l, random::sup(s[l])};
 }
 

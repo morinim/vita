@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,23 +14,34 @@
 
 namespace vita
 {
+
 namespace random
 {
+
 ///
-/// \param[in] s the seed for the random number generator.
+/// The shared random engine generator.
+///
+/// Every thread has its own generator.
+/// The numbers produced will be the same every time the program is run.
+///
+thread_local engine_t engine;
+
+///
+/// Initalizes the random number generator.
+///
+/// \param[in] s the seed for the random number generator
 ///
 /// The seed is used to initalize the random number generator. With the same
-/// seed the numbers produced will be the same every time the program is
-/// run.
+/// seed the numbers produced will be the same every time the program is run.
 ///
 /// \note
-/// One common method to change this is to seed with the current time
-/// (\c std::time(0)) but the preferred way in Vita is the random::randomize
-/// method (based on \c std::random_device).
+/// A common method to seed a PRNG is using the current time (`std::time(0)`).
+/// It works... but the preferred way in Vita is the `randomize` method (which
+/// is based on `std::random_device`).
 ///
 void seed(unsigned s)
 {
-  engine().seed(s);
+  engine.seed(s);
 }
 
 ///
@@ -43,13 +54,13 @@ void randomize()
 }
 
 ///
-/// \param[in] base
-/// \param[in] width
-/// \param[in] n
-/// \return the index of the choosen individual.
+/// Returns a random number in a modular arithmetic system.
 ///
-/// Return a random number in the interval
-/// `[base - width/2, base + width/2] mod n`.
+/// \param[in] base  a base number
+/// \param[in] width maximum distance from the `base` number
+/// \param[in] n     modulus
+/// \return          a random number in the
+///                  `[base - width/2, base + width/2] mod n` interval
 ///
 unsigned ring(unsigned base, unsigned width, unsigned n)
 {

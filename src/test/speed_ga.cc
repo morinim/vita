@@ -20,7 +20,7 @@
 #include "kernel/problem.h"
 
 #if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_de_perf
+#define BOOST_TEST_MODULE t_speed_ga
 #include <boost/test/unit_test.hpp>
 
 using namespace boost;

@@ -18,6 +18,7 @@
 #include <set>
 
 #include "kernel/common.h"
+#include "utility/xoroshiro128p.h"
 
 namespace vita
 {
@@ -34,9 +35,26 @@ template<class T1, class T2>
 constexpr std::pair<T1, T2> range(T1 &&t, T2 &&u)
 { return std::pair<T1, T2>(std::forward<T1>(t), std::forward<T2>(u)); }
 
+
 namespace random
 {
+
 enum class distribution {uniform, normal};
+
+///
+/// xoroshiro128+ (XOR/rotate/shift/rotate) is the successor to xorshift128+.
+/// Instead of perpetuating Marsaglia's tradition of xorshift as a basic
+/// operation, xoroshiro128+ uses a carefully handcrafted shift/rotate-based
+/// linear transformation designed in collaboration with David Blackman. The
+/// result is a significant improvement in speed (well below a nanosecond per
+/// integer) and a significant improvement in statistical quality, as detected
+/// by the long-range tests of PractRand. xoroshiro128+ is our current
+/// suggestion for replacing low-quality generators commonly found in
+/// programming languages. It is the default generator in Erlang.
+///
+using engine_t = vigna::xoroshiro128p;
+
+extern thread_local engine_t engine;
 
 template<class T> T sup(T);
 
@@ -49,37 +67,6 @@ bool boolean(double = 0.5);
 
 void seed(unsigned);
 void randomize();
-
-// The Mersenne Twister engine produces integers with a good
-// uniform distribution.
-// std::mt19937 and std::mt19937_64 are similar. There aren't
-// memory consumption differences and speed is almost equal.
-// Warning: checking for sizeof(int) <= 4 is perhaps not a very
-// portable way since on a 64-bit Windows machine, GCC (MinGW)
-// x64 compiler gives sizeof(int) = sizeof(long) = 4. So we use
-// void *.
-// using engine_t = std::conditional<sizeof(void *) <= 4,
-//                                   std::mt19937,
-//                                   std::mt19937_64>::type;
-using engine_t = std::mt19937;
-
-///
-/// Grants access to the shared random engine generator.
-///
-/// \return a reference to a single engine shared whereever needed
-///
-/// \note the engine can be shared among multiple threads.
-///
-inline engine_t &engine()
-{
-  // We are using a *global* generator object here. This is important because
-  // we don't want to create a new pseudo-random number generator at every
-  // call.
-  // The numbers produced will be the same every time the program is run.
-  thread_local engine_t e{28071973u};  // Magic!!!
-
-  return e;
-}
 
 ///
 /// Used for ephemeral random constant generation.
@@ -100,7 +87,7 @@ T ephemeral(distribution d, T p1, T p2)
     return between(p1, p2);
 
   case distribution::normal:
-    return std::normal_distribution<T>(p1, p2)(engine());
+    return std::normal_distribution<T>(p1, p2)(engine);
   }
 }
 
@@ -125,7 +112,7 @@ between(T min, T sup)
   Expects(min < sup);
 
   std::uniform_real_distribution<T> d(min, sup);
-  return d(engine());
+  return d(engine);
 }
 
 ///
@@ -148,7 +135,7 @@ between(T min, T sup)
   Expects(min < sup);
 
   std::uniform_int_distribution<T> d(min, sup - 1);
-  return d(engine());
+  return d(engine);
 }
 
 template<class T>
@@ -215,7 +202,7 @@ typename C::value_type &element(C &c)
 /// \param[in] p a probability (`[0;1]` range)
 /// \return      `true` `p%` times
 ///
-/// \bote `bool` values are produced according to the Bernoulli distribution.
+/// \note `bool` values are produced according to the Bernoulli distribution.
 ///
 inline bool boolean(double p)
 {
@@ -223,7 +210,7 @@ inline bool boolean(double p)
   Expects(p <= 1.0);
 
   std::bernoulli_distribution d(p);
-  return d(engine());
+  return d(engine);
 
   //return between<double>(0, 1) < p;
 }
