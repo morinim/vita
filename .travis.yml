@@ -22,8 +22,8 @@ matrix:
             - g++-7-multilib
             - g++-multilib
             - libboost-dev
-      install:
-        - "[ $CXX = g++ ] && export CXX=g++-7 || true"
+  install:
+    - "[ $CXX = g++ ] && export CXX=g++-7 || true"
 
     - os: linux
       compiler: clang++
@@ -37,8 +37,8 @@ matrix:
             - llvm-5.0-dev
             - g++-multilib
             - libboost-dev
-      install:
-	    - "[ $CXX = clang++ ] && export CXX=clang++-5.0 || true"
+  install:
+    - "[ $CXX = clang++ ] && export CXX=clang++-5.0 || true"
 
 
 before_script:
