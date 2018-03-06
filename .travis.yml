@@ -19,11 +19,9 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - g++-7-multilib
-            - g++-multilib
             - libboost-dev
-  install:
-    - "[ $CXX = g++ ] && export CXX=g++-7 || true"
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
     - os: linux
       compiler: clang++
@@ -34,11 +32,12 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - llvm-5.0-dev
-            - g++-multilib
             - libboost-dev
-  install:
-    - "[ $CXX = clang++ ] && export CXX=clang++-5.0 || true"
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
 
 
 before_script:
