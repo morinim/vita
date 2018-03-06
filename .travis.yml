@@ -32,7 +32,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-			- llvm-5.0-dev
+            - llvm-5.0-dev
             - libboost-dev
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
