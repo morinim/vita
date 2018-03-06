@@ -1,29 +1,49 @@
 dist: trusty
 sudo: false
+language: cpp
+
 
 notifications:
   email:
     on_success: never
     on_failure: always
 
-language: cpp
 
-compiler:
-  - g++
-  - clang++
+matrix:
+  include:
+    - os: linux
+	  compiler: g++
+	  addons:
+	    apt:
+		  sources:
+		    - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - g++-7-multilib
+            - g++-multilib
+            - libboost-dev
+	  env:
+	    - COMPILER=g++-7
+		- COMP=gcc
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.8
-    packages:
-      - clang-3.8
-      - g++-6
-      - libboost-dev
+    - os: linux
+	  compiler: g++
+	  addons:
+	    apt:
+		  sources:
+		    - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - llvm-5.0-dev
+            - g++-multilib
+            - libboost-dev
+	  env:
+	    - COMPILER=clang++-5.0
+		- COMP=clang
 
-install:
-- "[ $CXX = g++ ] && export CXX=g++-6 || true"
-- "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
+before_script:
+- cd src
 
-script: cd src; make vita
+script:
+- make vita
