@@ -1,6 +1,6 @@
 dist: trusty
-sudo: false
 language: cpp
+sudo: false
 
 
 notifications:
@@ -12,35 +12,35 @@ notifications:
 matrix:
   include:
     - os: linux
-	  compiler: g++
-	  addons:
-	    apt:
-		  sources:
-		    - ubuntu-toolchain-r-test
+      compiler: g++
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
           packages:
             - g++-7
             - g++-7-multilib
             - g++-multilib
             - libboost-dev
-	  env:
-	    - COMPILER=g++-7
-		- COMP=gcc
+      env:
+        - COMPILER=g++-7
+        - COMP=gcc
 
     - os: linux
-	  compiler: g++
-	  addons:
-	    apt:
-		  sources:
-		    - ubuntu-toolchain-r-test
+      compiler: clang++
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
             - llvm-5.0-dev
             - g++-multilib
             - libboost-dev
-	  env:
-	    - COMPILER=clang++-5.0
-		- COMP=clang
+      env:
+        - COMPILER=clang++-5.0
+        - COMP=clang
 
 before_script:
 - cd src
