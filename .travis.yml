@@ -27,14 +27,14 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
+            - llvm-toolchain-trusty-3.9
           packages:
-            - clang-5.0
+            - clang-3.9
             - libc++-dev
             - libc++abi-dev
             - libboost-dev
       env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
 
 
 before_install:
