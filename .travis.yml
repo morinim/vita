@@ -12,7 +12,6 @@ notifications:
 matrix:
   include:
     - os: linux
-      compiler: g++
       addons:
         apt:
           sources:
@@ -24,17 +23,15 @@ matrix:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
     - os: linux
-      compiler: clang++
       addons:
         apt:
           sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
+            - llvm-toolchain-trusty-5.0
           packages:
-            - clang-3.8
+            - clang-5.0
             - libboost-dev
       env:
-        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
 
 before_install:
