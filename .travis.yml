@@ -1,6 +1,6 @@
 dist: trusty
 language: cpp
-sudo: required
+sudo: false
 
 
 notifications:
@@ -22,19 +22,25 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.9
-          packages:
-            - clang-3.9
-            - libc++-dev
-            - libc++abi-dev
-            - libboost-dev
+#    - os: linux
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#            - llvm-toolchain-trusty-5.0
+#          packages:
+#            - clang-5.0
+#            - libc++-dev
+#            - libc++abi-dev
+#            - libboost-dev
+#      env:
+#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
+
+    - os: osx
+      compiler: clang++
       env:
-        - MATRIX_EVAL="CC=clang-3.9 && CXX=clang++-3.9"
+        - COMPILER=clang++ V='Apple LLVM 6.0'  # Apple LLVM version 6.0 (clang-600.0.54) (based on LLVM 3.5svn)
+        - COMP=clang
 
 
 before_install:
