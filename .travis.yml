@@ -1,6 +1,6 @@
 dist: trusty
-language: cpp
 sudo: false
+language: cpp
 
 
 notifications:
@@ -9,42 +9,25 @@ notifications:
     on_failure: always
 
 
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-            - libboost-dev
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#            - llvm-toolchain-trusty-5.0
-#          packages:
-#            - clang-5.0
-#            - libc++-dev
-#            - libc++abi-dev
-#            - libboost-dev
-#      env:
-#        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
-
-    - os: osx
-      compiler: clang++
-      env:
-        - COMPILER=clang++ V='Apple LLVM 6.0'  # Apple LLVM version 6.0 (clang-600.0.54) (based on LLVM 3.5svn)
-        - COMP=clang
+compiler:
+  - g++
+  - clang++
 
 
-before_install:
-  - eval "${MATRIX_EVAL}"
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+      - llvm-toolchain-precise-3.8
+    packages:
+      - clang-3.8
+      - g++-7
+      - libboost-dev
+
+
+install:
+- "[ $CXX = g++ ] && export CXX=g++-7 || true"
+- "[ $CXX = clang++ ] && export CXX=clang++-3.8 || true"
 
 
 before_script:
