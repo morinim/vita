@@ -346,7 +346,7 @@ void generations(unsigned g)
 {
   problem->env.generations = g;
 
-  vitaERROR << "Generations set to " << g;
+  vitaINFO << "Generations set to " << g;
 }
 
 ///
