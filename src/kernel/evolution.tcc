@@ -219,7 +219,7 @@ void evolution<T, ES>::log_evolution(unsigned run_count) const
 }
 
 ///
-/// Prints evolution information (if `log::reporting_level >= log::OUTPUT`).
+/// Prints evolution information (if `log::reporting_level >= log::lOUTPUT`).
 ///
 /// \param[in] k             current generation
 /// \param[in] run_count     total number of runs planned
@@ -230,7 +230,7 @@ template<class T, template<class> class ES>
 void evolution<T, ES>::print_progress(unsigned k, unsigned run_count,
                                       bool summary, timer *from_last_msg) const
 {
-  if (log::OUTPUT >= log::reporting_level)
+  if (log::lOUTPUT >= log::reporting_level)
   {
     const unsigned perc(100 * k / pop_.individuals());
     if (summary)

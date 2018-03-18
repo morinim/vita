@@ -33,13 +33,13 @@ std::tm tm_now()
 
 }  // unnamed namespace
 
-log::level log::reporting_level = log::ALL;
+log::level log::reporting_level = log::lALL;
 std::unique_ptr<std::ostream> log::stream = nullptr;
 
 ///
 /// Creates a `log` object.
 ///
-log::log() : os(), level_(OUTPUT) {}
+log::log() : os(), level_(lOUTPUT) {}
 
 ///
 /// Sets the logging level of a message.
@@ -58,7 +58,7 @@ log::log() : os(), level_(OUTPUT) {}
 ///
 std::ostringstream &log::get(level l)
 {
-  level_ = std::min(FATAL, l);
+  level_ = std::min(lFATAL, l);
   return os;
 }
 
@@ -80,7 +80,7 @@ log::~log()
   if (level_ >= reporting_level)  // `cout` is selective
   {
     std::string tag;
-    if (level_ != OUTPUT)
+    if (level_ != lOUTPUT)
       tag = "[" + tags[level_] + "] ";
 
     std::cout << tag << os.str() << std::endl;

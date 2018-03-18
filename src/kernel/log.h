@@ -44,7 +44,7 @@ public:
   /// \remarks
   /// The `DEBUG` log level can be switched on only if the `NDEBUG` macro is
   /// defined.
-  enum level : unsigned {ALL, DEBUG, INFO, OUTPUT, WARNING, ERROR, FATAL, OFF};
+  enum level {lALL, lDEBUG, lINFO, lOUTPUT, lWARNING, lERROR, lFATAL, lOFF};
 
   /// Messages with a lower level aren't logged / printed.
   static level reporting_level;
@@ -59,7 +59,7 @@ public:
 
   virtual ~log();
 
-  std::ostringstream &get(level = OUTPUT);
+  std::ostringstream &get(level = lOUTPUT);
 
 protected:
   std::ostringstream os;
@@ -76,7 +76,7 @@ private:
 /// the cost is low (and actually immeasurable in most cases). This lets you
 /// control the trade-off between fast execution and detailed logging.
 ///
-/// Macro-related dangers should be avoided> we shouldn't forget that the
+/// Macro-related dangers should be avoided: we shouldn't forget that the
 /// logging code might not be executed at all, subject to the logging level in
 /// effect. This is what we actually wanted and is actually what makes the code
 /// efficient. But as always, "macro-itis" can introduce subtle bugs. In this
@@ -98,7 +98,7 @@ private:
 /// When the `NDEBUG` is defined all the debug-level logging is eliminated at
 /// compile time.
 #if defined(NDEBUG)
-#define vitaPRINT(level) if (level == log::DEBUG);\
+#define vitaPRINT(level) if (level == log::lDEBUG);\
                          else if (level < log::reporting_level);\
                          else log().get(level)
 #else
@@ -106,12 +106,12 @@ private:
                          else log().get(level)
 #endif
 
-#define vitaFATAL   vitaPRINT(log::FATAL)
-#define vitaDEBUG   vitaPRINT(log::DEBUG)
-#define vitaERROR   vitaPRINT(log::ERROR)
-#define vitaINFO    vitaPRINT(log::INFO)
-#define vitaOUTPUT  vitaPRINT(log::OUTPUT)
-#define vitaWARNING vitaPRINT(log::WARNING)
+#define vitaFATAL   vitaPRINT(log::lFATAL)
+#define vitaDEBUG   vitaPRINT(log::lDEBUG)
+#define vitaERROR   vitaPRINT(log::lERROR)
+#define vitaINFO    vitaPRINT(log::lINFO)
+#define vitaOUTPUT  vitaPRINT(log::lOUTPUT)
+#define vitaWARNING vitaPRINT(log::lWARNING)
 
 }  // namespace vita
 #endif  // include guard

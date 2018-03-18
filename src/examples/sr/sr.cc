@@ -737,8 +737,8 @@ void validation(const std::string &v)
 ///
 void verbosity(unsigned v)
 {
-  if (v > vita::log::ALL)
-    v = vita::log::ALL;
+  if (v > vita::log::lALL)
+    v = vita::log::lALL;
 
   vita::log::reporting_level = static_cast<vita::log::level>(v);
 
@@ -771,11 +771,11 @@ int parse_command_line(int argc, char *const argv[])
          &ui::verbosity),
        "turn off verbosity")
       ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::INFO)
+       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::lINFO)
        ->notifier(&ui::verbosity),
        "set verbose level")
       ("debug",
-       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::DEBUG)
+       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::lDEBUG)
        ->notifier(&ui::verbosity),
        "print debug information");
 
