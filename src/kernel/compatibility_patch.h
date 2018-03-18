@@ -23,33 +23,11 @@
 
 namespace vita
 {
-/// A way to hide warnings about variables only used in compile time asserts.
-/// There are GCC compiler flags that control unused warnings, but we want a
-/// selective behaviour (generally this is useful to check for dead code).
-///
-/// Another solution could be:
-///
-///     template<class T> void unused(const T &) {}
-///     #define UNUSED(x) unused(x); struct x;
-///
-/// With `struct x` the name `x` refers to an incomplete type, so the use of the
-/// variable `x` is invalid and causes a compilation error. As a practical
-/// measure it works nicely. Some unnatural statements such as
-///     x *y;
-/// might still slip through the net but nothing is perfect (this is a mix
-/// of two ideas from Herb Sutter and Cheers-and-hth-alf/Stackoverflow).
-#if defined(__GNUC__)
-#  define UNUSED __attribute__ ((unused))
-#elif defined(_MSC_VER)
-#  define UNUSED __pragma(warning(suppress:4100))
-#else
-#  define UNUSED
-#endif
 
 #if !defined(WIN32) && !defined(_WIN32) && !defined(__WIN32)
 ///
 /// \param[in] enter if `true` sets the terminal raw mode, else restore the
-///            default terminal mode.
+///                  default terminal mode
 ///
 /// The raw mode discipline performs no line editing and the control
 /// sequences for both line editing functions and the various special
@@ -74,24 +52,24 @@ inline void term_raw_mode(bool enter)
 }
 
 ///
-/// \return `true` if the user press a key (`false` otherwise).
+/// \return `true` if the user press a key (`false` otherwise)
 ///
 inline bool kbhit()
 {
   // Do not wait at all, not even a microsecond.
   timeval tv;
-  tv.tv_sec = 0;
+  tv.tv_sec  = 0;
   tv.tv_usec = 0;
 
   fd_set readfd;
-  FD_ZERO(&readfd);  // initialize readfd
+  FD_ZERO(&readfd);  // initialize `readfd`
   FD_SET(STDIN_FILENO, &readfd);
 
   // The first parameter is the number of the largest file descriptor to
   // check + 1.
   if (select(STDIN_FILENO + 1, &readfd, nullptr, nullptr, &tv) == -1)
-    return false;  // an error occured
-  // read_fd now holds a bit map of files that are readable. We test the
+    return false;  // an error occurred
+  // `read_fd` now holds a bit map of files that are readable. We test the
   // entry for the standard input (file 0).
   return FD_ISSET(STDIN_FILENO, &readfd);
 }
