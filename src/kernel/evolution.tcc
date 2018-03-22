@@ -24,7 +24,7 @@ namespace term
 ///
 inline bool user_stop()
 {
-  const bool stop(kbhit() && std::cin.get() == '.');
+  const bool stop(keypressed('.'));
 
   if (stop)
   {

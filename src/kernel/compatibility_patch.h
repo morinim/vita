@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,6 +17,7 @@
 #  include <conio.h>
 #  include <windows.h>
 #else
+#  include <iostream>
 #  include <termios.h>
 #  include <unistd.h>
 #endif
@@ -73,8 +74,13 @@ inline bool kbhit()
   // entry for the standard input (file 0).
   return FD_ISSET(STDIN_FILENO, &readfd);
 }
+
+inline bool keypressed(int k) { return kbhit() && std::cin.get() == k; }
+
 #else
+
 inline void term_raw_mode(bool) {}
+inline bool keypressed(int k) { return _kbhit() && _getch() == k; }
 #endif
 
 }  // namespace vita
