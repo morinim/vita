@@ -41,7 +41,7 @@ However, since core members of the Vita project have no access to these platform
 ### Optional ###
 
 * [CMake][5]
-* [Boost library][2] for some executables and for testing
+* [Boost library][2] for for testing
 * [Python v3][4] for additional functionalities
 
 ## Getting the source ##
@@ -85,8 +85,6 @@ vita/
 ```
 
 ## Setting up the build ##
-
-Kernel library can be built without the [Boost library][2]; some programs / examples may need Boost headers / separately-compiled library binaries (e.g. the `sr` utility needs *Boost Program Options Library* to compile).
 
 ### make ###
 
