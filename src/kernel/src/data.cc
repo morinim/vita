@@ -250,8 +250,8 @@ void src_data::move_append(dataset_t src, dataset_t dst, std::size_t n)
 /// \return number of columns of the dataset
 ///
 /// \note
-/// data class supports just one output for every instance, so, if
-/// the dataset is not empty: `variables() + 1 == columns()`.
+/// `src_data` supports just one output for every instance, so, if the dataset
+/// is not empty: `variables() + 1 == columns()`.
 ///
 unsigned src_data::columns() const
 {

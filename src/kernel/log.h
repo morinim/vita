@@ -33,13 +33,13 @@ class log
 public:
   /// The log level.
   ///
-  /// * `DEBUG`   - Only interesting for developers
-  /// * `INFO`    - I say something but I don't expect you to listen
-  /// * `OUTPUT`  - Standard program's console output
-  /// * `WARNING` - I can continue but please have a look
-  /// * `ERROR`   - Something really wrong... but you could be lucky
-  /// * `FATAL`   - The program cannot continue
-  /// * `OFF`     - Disable output
+  /// * `lDEBUG`   - Only interesting for developers
+  /// * `lINFO`    - I say something but I don't expect you to listen
+  /// * `lOUTPUT`  - Standard program's console output
+  /// * `lWARNING` - I can continue but please have a look
+  /// * `lERROR`   - Something really wrong... but you could be lucky
+  /// * `lFATAL`   - The program cannot continue
+  /// * `lOFF`     - Disable output
   ///
   /// \remarks
   /// The `DEBUG` log level can be switched on only if the `NDEBUG` macro is
@@ -86,12 +86,12 @@ private:
 ///                          << " were notified.";
 ///
 /// the clients will be notified only if the logging level detail will be
-/// `log::INFO` and greater. Probably not what was intended! The correct code
+/// `log::lINFO` and greater. Probably not what was intended! The correct code
 /// should be:
 ///
 ///     const int notifiedClients = NotifyClients();
-///     vitaPRINT(log::INFO) << "A number of " << notifiedClients
-///                          << " were notified.";
+///     vitaPRINT(log::lINFO) << "A number of " << notifiedClients
+///                           << " were notified.";
 ///
 ///
 /// \note

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ public:
                                            const std::string & = "");
   std::size_t load_symbols(const std::string &);
   std::size_t load_test_set(const std::string &);
-  void setup_default_symbols();
+  bool setup_default_symbols();
 
   vita::src_data *data() override { return &dat_; }
 
@@ -52,7 +52,7 @@ public:
 private:
   // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
-  void setup_terminals_from_data(const std::set<unsigned> & = {});
+  std::size_t setup_terminals_from_data(const std::set<unsigned> & = {});
 
   // Private data members.
   vita::src_data dat_;

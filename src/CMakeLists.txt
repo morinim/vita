@@ -41,6 +41,7 @@ include_directories(SYSTEM ${VITA_SOURCE_DIR}/third_party/)
 # Recurse into the following subdirectories (this does not actually cause
 # another cmake executable to run. The same process will walk through the
 # project's entire directory structure).
+add_subdirectory(third_party/docopt)
 add_subdirectory(third_party/tinyxml2)
 add_subdirectory(kernel)
 add_subdirectory(examples)

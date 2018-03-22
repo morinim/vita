@@ -15,8 +15,6 @@
 #include <iterator>
 #include <string>
 
-#include <boost/program_options.hpp>
-
 #include "kernel/environment.h"
 #include "kernel/log.h"
 #include "kernel/src/evaluator.h"
@@ -24,34 +22,78 @@
 #include "kernel/src/primitive/factory.h"
 #include "kernel/src/search.h"
 
-#include "command_line_interpreter.h"
+#include "third_party/docopt/docopt.h"
 
-namespace po = boost::program_options;
+const char USAGE[] =
+R"(Vita - Symbolic Regression and classification
+Copyright 2011-2018 EOS di Manlio Morini (http://eosdev.it/)
 
-namespace
-{
-const std::string vita_sr_version1(
-  "Vita - Symbolic Regression and classification"
-  );
-const std::string vita_sr_version2(
-  "Copyright 2011-2017 EOS di Manlio Morini (http://eosdev.it/)"
-  );
-const std::string vita_sr_defs(
-#if defined(CLONE_SCALING)
-  "(clone scaling enabled)"
-#else
-  ""
-#endif
-  );
-}
+(==(     )==)
+ `-.`. ,',-'
+    _,-'
+ ,-',' `.`-.
+(==(     )==)
+ `-.`. ,',-'
+    _,-'`
+ ,-',' `.`-.
+(==(     )==)
 
-///
-/// Fixes conflicting parameters.
-///
+Usage:
+  sr [options] DATASET
+  sr -h | --help
+  sr -v | --version
+
+Arguments:
+  DATASET  filepath of the training set
+
+Options:
+  -h --help              shows this screen and exit
+  -v --version           shows version and exit
+  --quiet                turns off verbosity
+  --verbose              turns on information messages
+  --debug                prints debug information
+  --symbols=SYMBOLS      file specifying symbols used to solve the task
+  --testset=TESTSET      test set
+  --validation=<perc>    sets the percent of the dataset used for validation
+  --evaluator=<eval>     sets the preferred evaluator
+                         (count, mae, rmae, mse, binary, dynslot, gaussian)
+  --population=<size>    number of individuals in a layer of the population
+  --layers=<layers>      number of layers of the population
+  --length=<length>      sets the size of the genome
+  --no-elitism           an individual can replace a better one
+  --mutation=<rate>      sets the overall probability of mutation of the
+                         individuals that have been selected as winners in a
+                         tournament. Range is [0,1]
+  --crossover=<rate>     sets the overall probability that crossover will
+                         occour between winners in a tournament. Range is [0,1]
+  --tournament=<size>    number of individuals examined for parents' selection
+  --brood=<size>         sets the brood size for recombination (0 to disable)
+  --dss=<subset>         controls the Dynamic Subset Selection algorithm
+  --generations=<gen>    sets the maximum number of generations in a run
+  --max-stuck-time=<st>  sets the maximum number of generations without
+                         improvement in a run
+  --runs=<runs>          number of runs to be tried
+  --mate-zone=<dist>     mating zone (0 for panmictic)
+  --threshold=<val>      success threshold for a run
+  --arl                  enables Adaptive Representation through Learning
+  --cache=<bits>         cache will contain `2^bits` elements
+  --random-seed=<seed>   sets the seed for the pseudo-random number generator
+                         (equences are repeatable by using the same seed value)
+  --stat-dir=DIR         base path for log files
+  --stat-arl             enables ARL logging
+  --stat-dynamic         enables real-time logging
+  --stat-layers          enables layer-specific information logging
+  --stat-population      enables population-specific information logging
+  --stat-summary         enables end-of-run summary logging
+)";
+
+using args_t = std::map<std::string, docopt::value>;
+
+
+// Fixes conflicting parameters.
 void fix_parameters(vita::src_problem *problem)
 {
   using vita::log;
-  using vita::trilean;
   using vita::fitness_t;
   using vita::with_size;
 
@@ -112,119 +154,111 @@ void fix_parameters(vita::src_problem *problem)
   }
 }
 
-///
-/// \param[in] s a value to be interpreted as boolean
-/// \return      `true` if `s` is not zero and not `"false"`
-///
-bool is_true(const std::string &s)
+// Given a string containing:
+// - the representation of a real number in the `[0;1]` range (e.g. "0.5") or
+// - a percentage (e.g. "23%")
+// returns the corresponding double number in the `[0;100]` range.
+double to_percentage(const std::string &v)
 {
-  return s != "0" && !vita::iequals(s, "false");
+  return v.back() == '%'
+    ? std::stod(v.substr(0, v.length() - 1))
+    : std::stod(v) * 100.0;
 }
 
-///
-/// Contains the text-based command line interface.
-///
-/// The interface is not intented to be human friendly (no code completion,
-/// command history, submenu...). We just want a light interface for the
-/// Python GUI and a simple way of debugging.
-///
+// Contains the text-based command line interface.
+//
+// The interface is not intented to be human friendly (no code completion,
+// command history, submenu...). We just want a light interface for the
+// Python GUI and a simple way of debugging.
 namespace ui
 {
 using vita::log;
 
-const std::string header(
-  "(==(     )==)\n"
-  " `-.`. ,',-' \n"
-  "    _,-'       " + vita_sr_version1 + "\n" \
-  " ,-',' `.`-.   " + vita_sr_version2 + "\n" \
-  "(==(     )==)\n"
-  " `-.`. ,',-'   " + vita_sr_defs + "\n"     \
-  "    _,-'\"   \n"
-  " ,-',' `.`-. \n"
-  "(==(     )==)\n");
-
-po::options_description cmdl_opt(
-  "sr [options] [data set]\n\nAllowed options");
-
-/// Number of runs to be tried.
+// Number of runs to be tried.
 unsigned runs(1);
 
 // Active evaluator.
 vita::evaluator_id eva(vita::evaluator_id::undefined);
 std::string eva_args;
 
-/// Reference problem (the problem we will work on).
+// Reference problem (the problem we will work on).
 vita::src_problem *problem;
 
-///
-/// Sets Adaptive Representation through Learning.
-///
-/// \param[in] v a value for ARL (\see is_true)
-///
-void arl(const std::string &v)
+// Enables Adaptive Representation through Learning.
+void arl(const args_t &a)
 {
-  assign(problem->env.arl, is_true(v));
-
-  vitaINFO << "Adaptive Representation through Learning is "
-           << problem->env.arl;
+  if (a.at("--arl").asBool())
+  {
+    problem->env.arl = vita::trilean::yes;
+    vitaINFO << "Adaptive Representation through Learning is enabled";
+  }
 }
 
-///
-/// Sets the brood size for recombination.
-///
-/// \param[in] size brood size for recombination (0 to disable)
-///
-void brood(unsigned size)
+// Sets the brood size for recombination.
+//
+// `0` to disable brood recombination.
+void brood(const args_t &a)
 {
+  const auto value(a.at("--brood"));
+  if (!value)
+    return;
+
+  const auto size(value.asLong());
   problem->env.brood_recombination = size;
 
-  vitaINFO << "Brood size for recombination set to " << size;
+  if (size)
+  {
+    vitaINFO << "Brood size for recombination set to " << size;
+  }
+  else
+  {
+    vitaINFO << "Brood recombination disabled";
+  }
 }
 
-///
-/// Sets the code/genome length of an individual.
-///
-/// \param[in] length code/genome length of an individual
-///
-void code_length(unsigned length)
+// Sets the code/genome length of an individual.
+void code_length(const args_t &a)
 {
-  Expects(length);
+  const auto value(a.at("--length"));
+  if (!value)
+    return;
+
+  const auto length(value.asLong());
+  if (!length)
+  {
+    vitaWARNING << "Wrong code length. Using default value";
+    return;
+  }
 
   problem->env.mep.code_length = length;
-
   vitaINFO << "Code length set to " << length;
 }
 
-///
-/// Sets the overall probability that crossover will occour between winners
-/// in a tournament.
-///
-/// \param[in] r range is `[0,1]`
-///
-void crossover_rate(double r)
+// Sets the overall probability that crossover will occour between winners
+// in a tournament.
+//
+// Range is `[0,1]` (also accepted "23%").
+void crossover_rate(const args_t &a)
 {
-  if (r < 0.0)
+  const auto value(a.at("--crossover"));
+  if (!value)
+    return;
+
+  const double r(to_percentage(value.asString()) / 100.0);
+  if (r < 0.0 || r > 1.0)
   {
-    r = 0.0;
-    vitaWARNING << "Adjusting crossover probability (" << r << " => 0.0)";
-  }
-  else if (r > 1.0)
-  {
-    r = 1.0;
-    vitaWARNING << "Adjusting crossover probability (" << r << " => 1.0)";
+    vitaWARNING << "Wrong crossover probability. Using default value";
+    return;
   }
 
   problem->env.p_cross = r;
-
-  vitaINFO << "Crossover rate set to " << r;
+  vitaINFO << "Crossover rate set to " << problem->env.p_cross;
 }
 
-///
-/// \param[in] data_file guess what? This is the data file to be parsed
-/// \return              `true` if data have been correctly read and parsed
-///
-bool data(const std::string &data_file)
+// Loads the training set.
+void data(const args_t &a)
 {
+  const auto data_file(a.at("DATASET").asString());
   vitaINFO << "Reading data file " << data_file << "...";
 
   std::size_t parsed(0);
@@ -243,57 +277,60 @@ bool data(const std::string &data_file)
              << ", features: " << problem->variables()
              << ", classes: " << problem->classes();
   else
+  {
     vitaERROR << "Dataset file format error";
-
-  return parsed;
+    std::exit(EXIT_FAILURE);
+  }
 }
 
-///
-/// Turn on/off the Dynamic Subset Selection algorithm.
-///
-/// \param[in] s a value for DSS
-///
-void dss(const std::string &s)
+// Turn on/off the Dynamic Subset Selection algorithm.
+void dss(const args_t &a)
 {
+  const auto value(a.at("--dss"));
+  if (!value)
+    return;
+
+  const auto s(value.asString());
   problem->env.dss = decltype(problem->env.dss){s};
 
   if (problem->env.dss.has_value())
-    vitaINFO << "Dynamic Subset Selection is " << *problem->env.dss;
+  {
+    if (*problem->env.dss == 0)
+      vitaINFO << "Dynamic Subset Selection disabled";
+    else
+      vitaINFO << "Dynamic Subset Selection is " << *problem->env.dss;
+  }
   else
-    vitaINFO << "Auto-tuning the parameter";
+  {
+    vitaWARNING << "Wrong value for DSS options. Using default value";
+  }
 }
 
-///
-/// Sets the elitism tendency.
-///
-/// \param[in] v a value for elitism
-///
-void elitism(const std::string &v)
+// Disables elitism.
+void no_elitism(const args_t &a)
 {
-  assign(problem->env.elitism, is_true(v));
-
-  vitaINFO << "Elitism is " << problem->env.elitism;
+  const auto value(a.at("--no-elitism").asBool());
+  if (value)
+  {
+    problem->env.elitism = vita::trilean::no;
+    vitaINFO << "Elitism is " << problem->env.elitism;
+  }
 }
 
-///
-/// Shows the environment.
-///
-void environment(bool)
+// Selects the active evaluator.
+//
+// The evaluator must fit the current problem kind (symbolic regression,
+// classification) or it won't be used.
+void evaluator(const args_t &a)
 {
-  vitaINFO << "NOT IMPLEMENTED";
-}
+  const auto value(a.at("--evaluator"));
+  if (!value)
+    return;
 
-///
-/// param[in] v the chosen evaluator
-///
-/// \note
-/// The evaluator should fit the current problem kind (symbolic regression,
-/// classification) or it won't be used.
-///
-void evaluator(const std::string &v)
-{
+  const auto v(value.asString());
+
   const auto sep(v.find(':'));
-  const std::string keyword(v.substr(0, sep));
+  const auto keyword(v.substr(0, sep));
 
   eva_args = "";
   if (sep != std::string::npos && sep + 1 < v.size())
@@ -329,29 +366,25 @@ void evaluator(const std::string &v)
     vitaERROR << "Wrong argument for evaluator command";
 }
 
-///
-/// Quit program.
-///
-void exit(bool)
+// Sets the maximum number of generations in a run.
+void generations(const args_t &a)
 {
-  vitaOUTPUT << "Bye";
-}
+  const auto value(a.at("--generations"));
+  if (!value)
+    return;
 
-///
-/// Sets the maximum number of generations in a run.
-///
-/// \param[in] g maximum number of generations in a run
-///
-void generations(unsigned g)
-{
+  const auto g(value.asLong());
+  if (g == 0)
+  {
+    vitaWARNING << "Wrong number of generations. Using default value";
+    return;
+  }
+
   problem->env.generations = g;
-
   vitaINFO << "Generations set to " << g;
 }
 
-///
-/// Starts the search.
-///
+// Starts the search.
 void go(bool = true)
 {
   if (!problem->data()->size())
@@ -376,80 +409,61 @@ void go(bool = true)
   s.run(runs);
 }
 
-///
-///
-/// Sets the maximum number of generations without improvement in a run.
-///
-/// \param[in] g maximum number of generations without improvement in a run
-///              (`0` for auto-tuning, large number for disabling)
-void max_stuck_time(unsigned g)
+// Sets the maximum number of generations without improvement in a run.
+void max_stuck_time(const args_t &a)
 {
-  problem->env.max_stuck_time = g;
+  const auto value(a.at("--max-stuck-time"));
+  if (!value)
+    return;
 
-  if (problem->env.max_stuck_time.has_value())
+  const auto g(value.asLong());
+  problem->env.max_stuck_time = g;
+  if (g)
     vitaINFO << "Max number of generations without improvement set to " << g;
   else
-    vitaINFO << "Auto-tuning the parameter";
+    vitaINFO << "Max number of generations without improvement disabled";
 }
 
-///
-/// Shows the help screen.
-///
-void help(bool)
+// Sets mating zone (`0` for panmictic).
+void mate_zone(const args_t &a)
 {
-  vitaOUTPUT << cmdl_opt;
+  const auto value(a.at("--mate-zone"));
+  if (!value)
+    return;
+
+  problem->env.mate_zone = value.asLong();
+  vitaINFO << "Mate zone set to " << problem->env.mate_zone;
 }
 
-///
-/// Shows the version header.
-///
-void version(bool)
+// Sets the overall probability of mutation of the individuals that have
+// been selected as winners in a tournament.
+//
+// Range is `[0,1]`
+void mutation_rate(const args_t &a)
 {
-  vitaOUTPUT << vita_sr_version1 << '\n' << vita_sr_version2;
-}
+  const auto value(a.at("--mutation"));
+  if (!value)
+    return;
 
-///
-/// Sets mating zone.
-///
-/// \param[in] z mating zone (`0` for panmictic)
-///
-void mate_zone(unsigned z)
-{
-  problem->env.mate_zone = z;
-
-  vitaINFO << "Mate zone set to " << z;
-}
-
-///
-/// Sets the overall probability of mutation of the individuals that have
-/// been selected as winners in a tournament.
-///
-/// \param[in] r mutation rate, range is `[0,1]`
-///
-void mutation_rate(double r)
-{
-  if (r < 0.0)
+  const double r(to_percentage(value.asString()) / 100.0);
+  if (r < 0.0 || r > 1.0)
   {
-    r = 0.0;
-    vitaWARNING << "Adjusting mutation probability (" << r << " => 0.0)";
-  }
-  else if (r > 1.0)
-  {
-    r = 1.0;
-    vitaWARNING << "Adjusting mutation probability (" << r << " => 1.0)";
+    vitaWARNING << "Wrong mutation probability. Using default value";
+    return;
   }
 
   problem->env.p_mutation = r;
-
-  vitaINFO << "Mutation rate set to " << r;
+  vitaINFO << "Mutation rate set to " << problem->env.p_mutation;
 }
 
-///
-/// \param[in] ts the dataset used as test set
-/// \return       `true` if data have been correctly read and parsed
-///
-bool testset(const std::string &ts)
+// Reads the dataset used as test set.
+void testset(const args_t &a)
 {
+  const auto value(a.at("--testset"));
+  if (!value)
+    return;
+
+  const auto ts(value.asString());
   vitaINFO << "Reading test set file " << ts << "...";
 
   std::size_t parsed(0);
@@ -472,476 +486,352 @@ bool testset(const std::string &ts)
   else
   {
     vitaERROR << "Test set file format error";
+    std::exit(EXIT_FAILURE);
+  }
+}
+
+// Sets the number of individuals examined for choosing parents.
+void tournament_size(const args_t &a)
+{
+  const auto value(a.at("--tournament"));
+  if (!value)
+    return;
+
+  const auto n(value.asLong());
+  if (n == 0)
+  {
+    vitaWARNING << "Wrong tournament size. Using default value";
+    return;
   }
 
-  return parsed;
-}
-
-///
-/// Sets the number of individuals examined for choosing parents.
-///
-/// \param[in] n number of individuals
-///
-void tournament_size(unsigned n)
-{
   problem->env.tournament_size = n;
-
-  vitaINFO << "Tournament size set to " << n;
+  vitaINFO << "Tournament size set to " << problem->env.tournament_size;
 }
 
-///
-/// Sets the number of layers of the population.
-///
-/// \param[in] l number of layers of the population
-///
-void layers(unsigned l)
+// Sets the number of layers of the population.
+void layers(const args_t &a)
 {
+  const auto value(a.at("--layers"));
+  if (!value)
+    return;
+
+  const auto l(value.asLong());
+  if (!l)
+  {
+    vitaWARNING << "Wrong number of layers. Default initializing";
+    return;
+  }
+
   problem->env.layers = l;
-
-  vitaINFO << "Number of layers set to "
-           << (l ? std::to_string(l) : "automatic");
+  vitaINFO << "Number of layers set to " << l;
 }
 
-///
-/// Sets the number of individuals in a layer of the population.
-///
-/// \param[in] size number of individuals in a layer of the population
-///
-void population_size(unsigned size)
+// Sets the number of individuals in a layer of the population.
+void population_size(const args_t &a)
 {
+  const auto value(a.at("--population"));
+  if (!value)
+    return;
+
+  const auto size(value.asLong());
+  if (!size)
+  {
+    vitaWARNING << "Wrong population size. Using default value";
+    return;
+  }
+
   problem->env.individuals = size;
-
-  vitaINFO << "Population size set to "
-           << (size ? std::to_string(size) : "automatic");
+  vitaINFO << "Population size sets to " << size;
 }
 
-///
-/// \param[in] seed sets the seed for the pseudo-random number generator.
-///                 Pseudo-random sequences are repeatable by using the same
-///                 seed value
-///
-void random_seed(unsigned seed)
+// Sets the seed for the pseudo-random number generator.
+//
+// Pseudo-random sequences are repeatable by using the same seed value.
+void random_seed(const args_t &a)
 {
-  vita::random::seed(seed);
+  const auto value(a.at("--random-seed"));
+  if (!value)
+    return;
 
+  const auto seed(value.asLong());
+  vita::random::seed(seed);
   vitaINFO << "Random seed is " << seed;
 }
 
-///
-/// Number of runs to be tried.
-///
-/// \param[in] r number of runs
-///
-void set_runs(unsigned r)
+// Number of runs to be tried.
+void set_runs(const args_t &a)
 {
-  assert(r);
-  runs = r;
+  const auto value(a.at("--runs"));
+  if (!value)
+    return;
 
+  const auto r(value.asLong());
+  if (!r)
+  {
+    vitaWARNING << "Ignoring wrong number of runs";
+    return;
+  }
+
+  runs = r;
   vitaINFO << "Number of runs set to " << r;
 }
 
-///
-/// \param[in] v if `true` saves the list of active ADFs
-///
-void stat_arl(const std::string &v)
+// Enables ARL logging.
+void stat_arl(const args_t &a)
 {
-  const bool b(is_true(v));
-  problem->env.stat.arl_file = b ? "arl" : "";
-  vitaINFO << "ARL logging is " << b;
+  if (a.at("--stat-arl").asBool())
+  {
+    problem->env.stat.arl_file = "arl";
+    vitaINFO << "ARL logging is enabled";
+  }
 }
 
-///
-/// Number of runs to be tried.
-///
-/// \param[in] dir a directory
-///
-void stat_dir(const std::string &dir)
+// Sets the base path for log files.
+void stat_dir(const args_t &a)
 {
-  problem->env.stat.dir = dir;
-
-  vitaINFO << "Logging folder is " << dir;
+  if (const auto value = a.at("--stat-dir"))
+  {
+    problem->env.stat.dir = value.asString();
+    vitaINFO << "Logging folder is " << problem->env.stat.dir;
+  }
 }
 
-///
-/// \param[in] v should we save the dynamic execution status file?
-///
-void stat_dynamic(const std::string &v)
+/// Sets the dynamic execution status file.
+void stat_dynamic(const args_t &a)
 {
-  const bool b(is_true(v));
-  problem->env.stat.dynamic_file = b ? "dynamic" : "";
-
-  vitaINFO << "Dynamic evolution logging is " << b;
+  if (a.at("--stat-dynamic").asBool())
+  {
+    problem->env.stat.dynamic_file = "dynamic";
+    vitaINFO << "Dynamic evolution logging is enabled";
+  }
 }
 
-///
-/// \param[in] v should we save the layers status file?
-///
-void stat_layers(const std::string &v)
+// Sets the layers status file.
+void stat_layers(const args_t &a)
 {
-  const bool b(is_true(v));
-  problem->env.stat.layers_file = b ? "layers" : "";
-
-  vitaINFO << "Layers logging is " << b;
+  if (a.at("--stat-layers").asBool())
+  {
+    problem->env.stat.layers_file = "layers";
+    vitaINFO << "Layers logging is enabled";
+  }
 }
 
-///
-/// \param[in] v should we save the population status file?
-///
-void stat_population(const std::string &v)
+// Sets the population status file.
+void stat_population(const args_t &a)
 {
-  const bool b(is_true(v));
-  problem->env.stat.population_file = b ? "population" : "";
-
-  vitaINFO << "Population logging is " << b;
+  if (a.at("--stat-population").asBool())
+  {
+    problem->env.stat.population_file = "population";
+    vitaINFO << "Population logging is enabled";
+  }
 }
 
-///
-/// \param[in] v if `true` saves a summary of the runs
-///
-void stat_summary(const std::string &v)
+// Sets the summary file.
+void stat_summary(const args_t &a)
 {
-  const bool b(is_true(v));
-  problem->env.stat.summary_file = b ? "summary" : "";
-
-  vitaINFO << "Summary logging is " << b;
+  if (a.at("--stat-summary").asBool())
+  {
+    problem->env.stat.summary_file = "summary";
+    vitaINFO << "Summary logging is enabled";
+  }
 }
 
-///
-/// \param[in] symbol_file file containing a list of symbols (functions and
-///                        terminals). If `symbol_file` is `empty()`, the
-///                        default symbol set will be loaded
-/// \return                `true` if symbols have been correctly read and
-///                        parsed
-///
-bool symbols(const std::string &symbol_file)
+// Reads the file containing the symbols (functions and terminals).
+void symbols(const args_t &a)
 {
-  if (symbol_file.empty())
+  const auto value(a.at("--symbols"));
+  if (!value)
   {
     vitaINFO << "Using default symbol set";
-    problem->setup_default_symbols();
+    //problem->setup_default_symbols();
+    return;
   }
-  else
+
+  const auto symbol_file(value.asString());
+
+  vitaINFO << "Reading symbol file " << symbol_file << "...";
+  std::size_t parsed(0);
+  try
   {
-    vitaINFO << "Reading symbol file " << symbol_file << "...";
-
-    std::size_t parsed(0);
-    try
-    {
-      parsed = problem->load_symbols(symbol_file);
-    }
-    catch(...)
-    {
-      parsed = 0;
-    }
-
-    if (!parsed)
-    {
-      vitaERROR << "Symbol file format error";
-      return false;
-    }
-
-    vitaINFO << "Symbolset read. Symbols: " << parsed;
+    parsed = problem->load_symbols(symbol_file);
   }
+  catch(...)
+  {
+    parsed = 0;
+  }
+
+  if (!parsed)
+  {
+    vitaERROR << "Symbol file format error";
+    std::exit(EXIT_FAILURE);
+  }
+
+  vitaINFO << "Symbolset read. Symbols: " << parsed;
 
   if (!problem->sset.enough_terminals())
   {
     vitaERROR << "Too few terminals";
-    return false;
+    std::exit(EXIT_FAILURE);
   }
-
-  return true;
 }
 
-///
-/// Sets the success threashold.
-///
-/// \param[in] v the threshold value
-///
-/// If the output value of a run is greater than `v` it's scored as a success.
-/// The output value considered is the fitness when `v` is a simple number or
-/// the accuracy when `v` is a percentage.
-///
-void threshold(const std::string &v)
+// Sets the success threashold.
+//
+// If the output value of a run is greater than the threshold, it's scored as
+// a success.
+// When threshold is a:
+// - simple number, the reference value is the fitness;
+// - a percentage, the reference value is the accuracy.
+void threshold(const args_t &a)
 {
-  bool set(false);
+  const auto value(a.at("--threshold"));
+  if (!value)
+    return;
+
+  const auto v(value.asString());
 
   if (v.length())
   {
     if (v.back() == '%')
     {
-      const auto accuracy(std::stod(v.substr(0, v.length() - 1)) / 100.0);
+      const auto accuracy(to_percentage(v));
 
-      set = (0.0 < accuracy) && (accuracy <= 1.0);
-      if (set)
+      if (0.0 < accuracy && accuracy <= 1.0)
+      {
         problem->env.threshold.accuracy = accuracy;
+        vitaINFO << "Accuracy threshold set to " << v;
+      }
     }
     else
     {
       const vita::fitness_t::value_type fitness(std::stod(v));
-
-      set = (fitness <= 0.0);
-      if (set)
-        problem->env.threshold.fitness = {fitness};
+      problem->env.threshold.fitness = {fitness};
+      vitaINFO << "Fitness threshold set to " << v;
     }
   }
-
-  if (set)
-    vitaINFO << "Threshold is " << v;
   else
     vitaERROR << "Invalid threshold value";
 }
 
-///
-/// \param[in] bits number of bits used for the cache (which contains `2^bits`
-///                 elements)
-///
-void cache(unsigned bits)
+// Sets the number of bits used for the cache (`2^bits` elements).
+void cache(const args_t &a)
 {
-  Expects(bits);
-  problem->env.cache_size = bits;
+  const auto value(a.at("--cache"));
+  if (!value)
+    return;
 
+  const auto bits(value.asLong());
+  if (bits < 10)
+  {
+    vitaWARNING
+      << "Cache too small (it requires at least 11 bits). Using default value";
+    return;
+  }
+
+  problem->env.cache_size = bits;
   vitaINFO << "Cache size is " << bits << " bits";
 }
 
-///
-/// Sets percent of the dataset used for validation.
-///
-/// \param[in] v range is `[0,1]` or `[0%,100%]`
-///
-void validation(const std::string &v)
+// Sets percent of the dataset used for validation.
+//
+// Range is `[0,1]` or `[0%,100%]`.
+void validation(const args_t &a)
 {
-  bool set(false);
+  const auto value(a.at("--validation"));
+  if (!value)
+    return;
 
+  const auto v(value.asString());
   if (v.length())
   {
-    unsigned percentage;
-    if (v.back() == '%')
-      percentage =
-        static_cast<unsigned>(std::stoul(v.substr(0, v.length() - 1)));
-    else
-      percentage = static_cast<unsigned>(std::stod(v) * 100.0);
+    const auto percentage(static_cast<unsigned>(to_percentage(v)));
 
-    set = (percentage <= 90);
-    if (set)
+    if (percentage <= 90)
+    {
       problem->env.validation_percentage = percentage;
+      vitaINFO << "Validation set percentage is " << v;
+    }
+    else
+      vitaERROR << "Invalid validation percentage. Value ignored";
   }
-
-  if (set)
-    vitaINFO << "Validation set percentage is " << v;
-  else
-    vitaERROR << "Invalid validation percentage";
 }
 
-///
-/// \param[in] v verbosity level
-///
-void verbosity(unsigned v)
+// Sets the verbosity level.
+void verbosity(const args_t &a)
 {
-  if (v > vita::log::lALL)
-    v = vita::log::lALL;
+  const auto l(a.at("--debug").asBool() ? vita::log::lALL
+               : a.at("--verbose").asBool() ? vita::log::lINFO
+               : a.at("--quiet").asBool() ? vita::log::lOFF
+               : vita::log::lOUTPUT);
 
-  vita::log::reporting_level = static_cast<vita::log::level>(v);
-
-  vitaINFO << "Verbosity is " << v;
+  vita::log::reporting_level = l;
+  vitaINFO << "Verbosity is " << l;
 }
 
 }  // namespace ui
 
-///
-///
-/// \param[in] argc
-/// \param[in] argv
-/// \return -1 if command line parsing is enough (no further computing),
-///          0 in case of errors,
-///          1 if further computing is required.
-///
-int parse_command_line(int argc, char *const argv[])
+void parse_command_line(int argc, char *const argv[])
 {
-  try
+  auto args(docopt::docopt(USAGE,
+                           {argv + 1, argv + argc},
+                           true,      // shows help if requested
+                           __DATE__,  // version string
+                           false));    // options first (POSIX compatible)
+
+  /*if (!args.count("DATASET"))
   {
-    // Declare a group of options that will be allowed only on command line.
-    po::options_description generic("Generic");
-    generic.add_options()
-      ("version,v", po::value<bool>()->zero_tokens()->notifier(&ui::version),
-       "print version string")
-      ("help,h", po::value<bool>()->zero_tokens()->notifier(&ui::help),
-       "produce the help message")
-      ("quiet",
-       po::value<unsigned>()->zero_tokens()->implicit_value(0)->notifier(
-         &ui::verbosity),
-       "turn off verbosity")
-      ("verbose",
-       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::lINFO)
-       ->notifier(&ui::verbosity),
-       "set verbose level")
-      ("debug",
-       po::value<unsigned>()->zero_tokens()->implicit_value(vita::log::lDEBUG)
-       ->notifier(&ui::verbosity),
-       "print debug information");
+    std::cout << USAGE << '\n';
+    std::exit(EXIT_SUCCESS);
+    }*/
 
-    po::options_description data("Data");
-    data.add_options()
-      ("data,d", po::value<std::string>()->notifier(&ui::data), "data set")
-      ("symbols,s",
-       po::value<std::string>()->notifier(&ui::symbols),
-       "symbols file")
-      ("testset,t", po::value<std::string>()->notifier(&ui::testset),
-       "test set")
-      ("validation", po::value<std::string>()->notifier(&ui::validation),
-       "sets the percent of the dataset used for validation");
+  ui::verbosity(args);
 
-    po::options_description config("Config");
-    config.add_options()
-      ("cache", po::value<unsigned>()->notifier(&ui::cache),
-       "number of bits used for the cache (cache contains `2^bits` elements)")
-      ("evaluator", po::value<std::string>()->notifier(&ui::evaluator),
-       "sets preferred evaluator "
-       "(count, mae, rmae, mse, binary, dynslot, gaussian)")
-      ("random-seed", po::value<unsigned>()->notifier(&ui::random_seed),
-       "sets the seed for the pseudo-random number generator. "
-       "Pseudo-random sequences are repeatable by using the same seed value");
+  ui::cache(args);
+  ui::evaluator(args);
+  ui::random_seed(args);
 
-    // Declare a group of options that will be allowed both on command line
-    // and in config file.
-    po::options_description individual("Population/Individual");
-    individual.add_options()
-      ("population-size,P",
-       po::value<unsigned>()->notifier(&ui::population_size),
-       "sets the number of individuals in a layer of the population")
-      ("layers,L", po::value<unsigned>()->notifier(&ui::layers),
-       "sets the number of layers of the population")
-      ("code-length,l", po::value<unsigned>()->notifier(&ui::code_length),
-       "sets the code/genome length of an individual");
+  ui::population_size(args);
+  ui::layers(args);
+  ui::code_length(args);
+  ui::no_elitism(args);
+  ui::mutation_rate(args);
+  ui::crossover_rate(args);
+  ui::tournament_size(args);
+  ui::brood(args);
+  ui::dss(args);
+  ui::generations(args);
+  ui::max_stuck_time(args);
+  ui::set_runs(args);
+  ui::mate_zone(args);
+  ui::arl(args);
+  ui::threshold(args);
 
-    // ------> About boost::optional and boost::program_options <------
-    // To date there isn't a direct approach:
-    //
-    //   optional<double> x;
-    //   desc.add_options()("x", po::value(&x));
-    //
-    // is NOT supported, while this works:
-    //
-    //   desc.add_options()("x", po::value<double>()->notifier(var(x) = _1));
-    //
-    // but it is quite involuted and I prefer a longer but simpler approach.
-    // See also http://lists.boost.org/Archives/boost/2004/06/66572.php
-    // ----------------------------------------------------------------
+  ui::stat_dir(args);
+  ui::stat_arl(args);
+  ui::stat_dynamic(args);
+  ui::stat_layers(args);
+  ui::stat_population(args);
+  ui::stat_summary(args);
 
-    // Declare a group of options that will be allowed both on command line
-    // and in config file.
-    po::options_description evolution("Evolution");
-    evolution.add_options()
-      ("elitism", po::value<std::string>()->notifier(&ui::elitism),
-       "when elitism is true an individual will never replace a better one")
-      ("mutation-rate", po::value<double>()->notifier(&ui::mutation_rate),
-       "sets the overall probability of mutation of the individuals that have "
-       "been selected as winners in a tournament. Range is [0,1]")
-      ("crossover-rate,c", po::value<double>()->notifier(&ui::crossover_rate),
-       "sets the overall probability that crossover will occour between "
-       "winners in a tournament. Range is [0,1]")
-      ("tournament-size",
-       po::value<unsigned>()->notifier(&ui::tournament_size),
-       "number of individuals examined for choosing parents")
-      ("brood", po::value<unsigned>()->notifier(&ui::brood),
-       "sets the brood size for recombination (0 to disable)")
-      ("dss", po::value<std::string>()->notifier(&ui::dss),
-       "controls the Dynamic Subset Selection algorithm")
-      ("generations,g", po::value<unsigned>()->notifier(&ui::generations),
-       "sets the maximum number of generations in a run")
-      ("max-stuck-time", po::value<unsigned>()->notifier(&ui::max_stuck_time),
-       "sets the maximum number of generations without improvement in a run "
-       "(large number for disabling, 0 for auto-tuning)")
-      ("runs,r", po::value<unsigned>()->notifier(&ui::set_runs),
-       "number of runs to be tried")
-      ("mate-zone", po::value<unsigned>()->notifier(&ui::mate_zone),
-       "mating zone (0 for panmictic)")
-      ("arl", po::value<std::string>()->notifier(&ui::arl),
-       "adaptive Representation through Learning");
-
-    po::options_description statistics("Statistics");
-    statistics.add_options()
-      ("stat-dir", po::value<std::string>()->notifier(&ui::stat_dir),
-       "base path for log files")
-      ("stat-arl", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_arl),
-       "set ARL logging status")
-      ("stat-dynamic", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_dynamic),
-       "set general real-time logging status")
-      ("stat-layers", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_layers),
-       "set layer-specific information logging status")
-      ("stat-population", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_population),
-       "set population-specific information logging status")
-      ("stat-summary", po::value<std::string>()->implicit_value("true")->notifier(&ui::stat_summary),
-       "set end-of-run summary logging status")
-      ("threshold", po::value<std::string>()->notifier(&ui::threshold),
-       "sets the success threshold for a run");
-
-    ui::cmdl_opt.add(generic).add(data).add(config).add(evolution).
-      add(individual).add(statistics);
-
-    po::positional_options_description p;
-    p.add("data", 1);
-
-    po::variables_map vm;
-
-    store(po::command_line_parser(argc, argv).
-          options(ui::cmdl_opt).positional(p).run(), vm);
-
-    notify(vm);
-
-    if (vm.count("version"))
-      return -1;
-
-    if (vm.count("help"))
-      return -1;
-  }
-  catch(std::exception &e)
-  {
-    using vita::log;
-    vitaERROR << e.what();
-    return 0;
-  }
-
-  return 1;
+  ui::data(args);
+  ui::symbols(args);
+  ui::testset(args);
+  ui::validation(args);
 }
 
 int main(int argc, char *const argv[])
 {
   using vita::log;
 
-  std::cout.setf(std::ios::boolalpha);
-  vitaOUTPUT << ui::header;
-
   vita::src_problem problem;
   ui::problem = &problem;
 
-  const int ret(parse_command_line(argc, argv));
-  if (ret < 0)  // help or version option
-    return EXIT_SUCCESS;
+  parse_command_line(argc, argv);
 
-  if (ret == 0)  // error
+  if (!problem.data()->size())
     return EXIT_FAILURE;
 
-  if (problem.data()->size())
-    ui::go();
-  else
-  {
-    // Do not change the name of the variable: e.g.
-    // `po::options_description interface("Interface");`
-    // won't compile with mingw.
-    po::options_description interf("Interface");
-    interf.add_options()
-      ("go", po::value<bool>()->zero_tokens()->notifier(&ui::go),
-       "let's go!")
-      ("environment",
-       po::value<bool>()->zero_tokens()->notifier(&ui::environment),
-       "show the environment")
-      ("exit", po::value<bool>()->zero_tokens()->notifier(&ui::exit),
-       "quit the program");
-    ui::cmdl_opt.add(interf);
-
-    vita::cli::command_line_interpreter cli(ui::cmdl_opt, "> ");
-    cli.interpret(std::cin);
-  }
+  ui::go();
 
   return EXIT_SUCCESS;
 }

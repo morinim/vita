@@ -1,9 +1,9 @@
-# Creates the "tinyxml2" library.
+# Creates the "docopt" library.
 
-set(TINYXML2_SRC tinyxml2.cc)
+set(DOCOPT_SRC docopt.cc)
 
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
 add_compile_options(${NO_WARN_FLAGS})
 endif ()
 
-add_library(tinyxml2 ${TINYXML2_SRC})
+add_library(docopt ${DOCOPT_SRC})

@@ -70,18 +70,20 @@ LDFLAGS := $(CXXFLAGS)
 
 COMPILE := $(CXX) $(CXXFLAGS)
 
+DOCOPT_SRC := third_party/docopt/docopt.cc
 EXAMPLES_SRC := $(wildcard examples/*.cc)
 FOREX_SRC := $(wildcard examples/forex/*.cc)
 KERNEL_SRC := $(wildcard kernel/*.cc) $(wildcard kernel/src/*.cc) $(wildcard kernel/src/primitive/*.cc) $(wildcard kernel/ga/*.cc)
 SR_SRC := $(wildcard examples/sr/*.cc)
 TESTS_SRC := $(wildcard test/*.cc)
-THIRD_PARTY_SRC := third_party/tinyxml2/tinyxml2.cc
+TINYXML_SRC := third_party/tinyxml2/tinyxml2.cc
 UTILITY_SRC := $(wildcard utility/*.cc)
-FRAMEWORK_SRC := $(KERNEL_SRC) $(THIRD_PARTY_SRC) $(UTILITY_SRC)
+FRAMEWORK_SRC := $(KERNEL_SRC) $(TINYXML_SRC) $(UTILITY_SRC)
 
+DOCOPT_OBJ := $(DOCOPT_SRC:.cc=.o)
 FRAMEWORK_OBJ := $(FRAMEWORK_SRC:.cc=.o)
 FOREX_OBJ := $(FOREX_SRC:.cc=.o)
-THIRD_PARTY_OBJ := $(THIRD_PARTY_SRC:.cc=.o)
+TINYXML_OBJ := $(TINYXML_SRC:.cc=.o)
 
 ALL_SRC := $(FRAMEWORK_SRC) $(EXAMPLES_SRC) $(FOREX_SRC) $(SR_SRC) $(TESTS_SRC)
 
@@ -103,9 +105,9 @@ else
 endif
 endif
 
-sr: examples/sr/sr.o $(FRAMEWORK_OBJ) directories
+sr: examples/sr/sr.o $(FRAMEWORK_OBJ) $(DOCOPT_OBJ) directories
 	@echo Linking $@
-	@$(COMPILE) $< $(FRAMEWORK_OBJ) -o $(OUTDIR)/examples/$@ $(LIB)
+	@$(COMPILE) $< $(FRAMEWORK_OBJ) $(DOCOPT_OBJ) -o $(OUTDIR)/examples/$@ $(LIB)
 ifeq ($(TYPE), release)
 ifdef MSYSTEM
 	@strip $(OUTDIR)/examples/$@.exe
@@ -159,7 +161,8 @@ ifeq ($(TYPE), release)
 endif
 
 # Disable all warnings for third_party libraries.
-$(THIRD_PARTY_OBJ): COMPILE += -w
+$(TINYXML_OBJ): COMPILE += -w
+$(DOCOPT_OBJ): COMPILE += -w
 
 %.o : %.cc Makefile
 	@echo Creating object file for $*...

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -87,7 +87,7 @@ public:
     /// The number of symbols in the patch section (a section of the genome that
     /// contains terminals only).
     ///
-    /// \note A length of 0 means undefined (auto-tune).
+    /// \note A length of `0` means undefined (auto-tune).
     unsigned patch_length = 0;
   } mep;
 

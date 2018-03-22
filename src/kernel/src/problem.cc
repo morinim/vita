@@ -21,7 +21,7 @@
 namespace vita
 {
 
-namespace detail
+namespace
 {
 ///
 /// \param[in] availables the "dictionary" for the sequence
@@ -59,7 +59,7 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
   swr(size, {});
   return ret;
 }
-}  // namespace detail
+}  // unnamed namespace
 
 ///
 /// New empty instance of src_problem.
@@ -159,13 +159,17 @@ std::size_t src_problem::load_test_set(const std::string &ts)
 ///
 /// Inserts variables and labels for nominal attributes into the symbol_set.
 ///
-/// param[in] skip features in this set will be ignored
+/// \param[in] skip features in this set will be ignored
+/// \return         number of features considered / variables inserted
 ///
 /// The names used for variables, if not specified in the dataset, are in the
 /// form `X1`, ... `Xn`.
 ///
-void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
+std::size_t src_problem::setup_terminals_from_data(
+  const std::set<unsigned> &skip)
 {
+  std::size_t variables(0);
+
   sset.clear();
 
   // Sets up the variables (features).
@@ -178,12 +182,16 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
                                             : provided_name);
       const category_t category(dat_.get_column(i).category_id);
       sset.insert<variable>(name, i - 1, category);
+
+      ++variables;
     }
 
   // Sets up the labels for nominal attributes.
   for (const category &c : dat_.categories())
     for (const std::string &l : c.labels)
       sset.insert<constant<std::string>>(l, c.tag);
+
+  return variables;
 }
 
 ///
@@ -192,9 +200,12 @@ void src_problem::setup_terminals_from_data(const std::set<unsigned> &skip)
 /// This is useful for simple problems (single category regression /
 /// classification).
 ///
-void src_problem::setup_default_symbols()
+bool src_problem::setup_default_symbols()
 {
-  setup_terminals_from_data();
+  if (!setup_terminals_from_data())
+    return false;
+
+  vitaINFO << "Setting up default symbol set";
 
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
@@ -223,11 +234,15 @@ void src_problem::setup_default_symbols()
       //     sset.insert(factory_.make("SIFE", {tag, j}));
       sset.insert(factory_.make("SIFE", {tag, 0}));
     }
+
+  return true;
 }
 
 ///
 /// \param[in] s_file name of the file containing the symbols
 /// \return           number of parsed symbols
+///
+/// \warning Check the return value (it must be greater than `0`).
 ///
 /// \note
 /// Data should be loaded before symbols: without data we don't know, among
@@ -235,7 +250,8 @@ void src_problem::setup_default_symbols()
 ///
 std::size_t src_problem::load_symbols(const std::string &s_file)
 {
-  setup_terminals_from_data();
+  if (!setup_terminals_from_data())
+    return 0;
 
   // Prints the list of categories as inferred from the dataset.
   for (const category &c : dat_.categories())
@@ -314,7 +330,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
 
       // From the list of all the sequences with repetition of `args.size()`
       // elements...
-      const auto sequences(detail::seq_with_rep(used_categories, args.size()));
+      const auto sequences(seq_with_rep(used_categories, args.size()));
 
       // ...we choose those compatible with the xml signature of the current
       // symbol.

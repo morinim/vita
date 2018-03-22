@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2017 EOS di Manlio Morini.
+#  Copyright (C) 2011-2018 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -86,7 +86,8 @@ test_collection = {
 
 mode_settings = {
     "debug": {},
-    "profile": {"deeptest": True, "randomize": True}
+    "profile": {"deeptest": True, "randomize": True},
+    "stats": {"deeptest": True}
 }
 
 
@@ -110,36 +111,33 @@ def sr(args, dataset):
     symbol_set = test_collection[dataset].symbol_set
     evaluator = test_collection[dataset].evaluator
 
-    # Default values are for a fast evaluation. Profiling requires bigger
-    # numbers...
+    # Default values are for a fast/debug evaluation. Gathering statistics
+    # requires bigger numbers...
     if "deeptest" in mode_settings[mode] and mode_settings[mode]["deeptest"]:
-        runs *= 3
+        runs *= 10
         generations = (generations * 3) // 2
 
     cmd = [sr, "--verbose",
            "--stat-dir", stat_dir,
            "--stat-dynamic", "--stat-summary",
            "--cache", str(cache_bit),
-           "-g", str(generations),
+           "--generations", str(generations),
            "--layers", str(layers),
-           "-P", str(individuals),
-           "-l", str(code_length),
-           "-r", str(runs)]
+           "--population", str(individuals),
+           "--length", str(code_length),
+           "--runs", str(runs)]
 
     if evaluator:
         cmd += ["--evaluator", evaluator]
 
     if symbol_set:
-        cmd += ["-s", os.path.join(symbol_set_dir, symbol_set)]
+        cmd += ["--symbols", os.path.join(symbol_set_dir, symbol_set)]
 
     if "arl" in mode_settings[mode]:
         cmd += ["--arl", "--stat-arl"]
 
     if "dss" in mode_settings[mode]:
-        cmd += ["--dss ", str(mode_settings[mode]["dss"])]
-
-    if "elitism" in mode_settings[mode]:
-        cmd += ["--elitism", str(mode_settings[mode]["elitism"])]
+        cmd += ["--dss", str(mode_settings[mode]["dss"])]
 
     # When randomize is off, tests are reproducible (good for debugging).
     if "randomize" in mode_settings[mode]:
