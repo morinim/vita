@@ -10,6 +10,7 @@ endif ()
 # specific, well experimented systems.
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     OR CMAKE_CXX_COMPILER_ID MATCHES "CLang")
+
 set(NO_WARN_FLAGS "-w")
 
 # -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
@@ -34,6 +35,7 @@ add_compile_options(${OTHER_FLAGS} ${WARN_FLAGS})
 # Compiler must support the C++14 standard.
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 include_directories(${VITA_SOURCE_DIR})
 include_directories(SYSTEM ${VITA_SOURCE_DIR}/third_party/)

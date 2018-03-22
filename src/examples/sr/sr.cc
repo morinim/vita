@@ -776,13 +776,7 @@ void parse_command_line(int argc, char *const argv[])
                            {argv + 1, argv + argc},
                            true,      // shows help if requested
                            __DATE__,  // version string
-                           false));    // options first (POSIX compatible)
-
-  /*if (!args.count("DATASET"))
-  {
-    std::cout << USAGE << '\n';
-    std::exit(EXIT_SUCCESS);
-    }*/
+                           false));   // options first (POSIX compliant)
 
   ui::verbosity(args);
 
