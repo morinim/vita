@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -268,7 +268,7 @@ int main()
   p.env.layers = 6;
   p.env.team.individuals = 2;  // DO NOT CHANGE
   p.env.alps.age_gap = 10;
-  p.env.cache_size = 19;       // A hash table of `2^19 = 524288` elements.
+  p.env.cache_size = 20;       // A hash table of `2^20` elements.
                                // Considering the speed of the Metatrader
                                // back-tester this should ensure a very low
                                // hash collision rate.

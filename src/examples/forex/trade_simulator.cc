@@ -32,6 +32,46 @@ inline void sleep_for(std::chrono::milliseconds x)
 #include "utility/utility.h"
 #include "tinyxml2/tinyxml2.h"
 
+namespace
+{
+
+struct trade_results
+{
+  trade_results(const std::string &filepath)
+  {
+    std::ifstream results(filepath);
+    while (!results.is_open())
+    {
+      sleep_for(std::chrono::milliseconds(500));
+      results.open(filepath);
+    }
+
+    if (!(results >> profit))
+      throw std::runtime_error("Cannot read profit from " + filepath);
+
+    if (!(results >> short_trades))
+      throw std::runtime_error("Cannot read number of short trades from "
+                               + filepath);
+
+    if (!(results >> long_trades))
+      throw std::runtime_error("Cannot read numer of long trades from "
+                               + filepath);
+
+    if (!(results >> drawdown))
+      throw std::runtime_error("Cannot read balance drawdown from "
+                               + filepath);
+
+    results.close();
+  }
+
+  double profit       = 0.0;
+  double short_trades = 0.0;
+  double long_trades  = 0.0;
+  double drawdown     = 0.0;
+
+  double trades() const { return short_trades + long_trades; }
+};
+
 // Always output Windows EOL (`\r\n`).
 // This is useful for ini files of Windows programs.
 std::ostream &wendl(std::ostream &o)
@@ -40,6 +80,37 @@ std::ostream &wendl(std::ostream &o)
   o.put('\n');
   return o;
 }
+
+double fitness(const trade_results &r, int days)
+{
+  // Losing EAs don't require a complex evaluation.
+  if (r.profit <= 0.0)
+    return r.profit;
+
+  // The recovery factor value reflects the riskiness of the strategy: the
+  // amount of money risked by the EA to make the profit it obtained.
+  double recovery_factor(r.profit / (r.drawdown + 0.1));
+
+  // We require at least 7 trades / month to consider interesting an EA.
+  const auto min_trades(std::max(7 * days / 30, 10));
+
+  // The `trades_ratio_weight`:
+  // - is `1` when EA performs the minimum number of trades (`min_trades`);
+  // - increases "slowly" when `trades > min_trades`;
+  // - decreases "quickly" when `trades < min_trades`.
+  double trades_ratio(r.trades() / min_trades);
+  double trades_ratio_weight(1.0 + std::log10(trades_ratio) / 10.0);
+
+  // A penality weight bound to the displacement between short trades and
+  // long trades.
+  const auto displacement(0.5 - r.short_trades / r.trades());
+  const auto displacement_weight(1.0 - displacement * displacement);
+
+  return trades_ratio_weight * displacement_weight * recovery_factor;
+}
+
+}  // unnamed namespace
+
 
 std::string trade_simulator::full_path(const std::string &fn) const
 {
@@ -121,6 +192,7 @@ trade_simulator::trade_simulator()
   Ensures(!training_set_.empty());
 }
 
+// Writes the ini file used by Metatrader to setup the back-test.
 void trade_simulator::write_ini_file(const period &p) const
 {
   // Get the expert name removing the extension from EA filename.
@@ -196,41 +268,17 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
   write_ini_file(training_set_);
   write_ea_file(prg);
 
-  const auto fr(full_path(results_name_));
-  std::ifstream results(fr);
-  while (!results.is_open())
-  {
-    sleep_for(std::chrono::milliseconds(500));
-    results.open(fr);
-  }
+  const auto results_path(full_path(results_name_));
+  trade_results r(results_path);
+  std::remove(results_path.c_str());
 
-  double profit;
-  if (!(results >> profit))
-    throw std::runtime_error("Cannot read profit from " + fr);
-
-  double short_trades;
-  if (!(results >> short_trades))
-    throw std::runtime_error("Cannot read number of short trades from " + fr);
-
-  double long_trades;
-  if (!(results >> long_trades))
-    throw std::runtime_error("Cannot read numer of long trades from " + fr);
-
-  double drawdown;
-  if (!(results >> drawdown))
-    throw std::runtime_error("Cannot read balance drawdown from " + fr);
-
-  results.close();
-  std::remove(fr.c_str());
-
-  const auto trades(short_trades + long_trades);
-  double fit(profit - drawdown + std::sqrt(std::min(trades, 100.0)));
+  double fit(fitness(r, training_set_.size().count()));
 
   using vita::log;
-  vitaINFO << "CURRENT EA. Profit:" << profit
-           << " Drawdown:" << drawdown
-           << " Trades:" << trades
+  vitaINFO << "CURRENT EA. Profit:" << r.profit
+           << " Drawdown:" << r.drawdown
+           << " Trades:" << r.trades()
            << " Fit:" << fit;
 
-  return {fit, profit, drawdown, trades};
+  return {fit, r.profit, r.drawdown, r.trades()};
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2017 EOS di Manlio Morini.
+#  Copyright (C) 2017-2018 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -146,7 +146,7 @@ class Metatrader:
                         # skips spurious bytes
                         pass
 
-        # This seems unnecessary complex, but **atomic rename** is a necessity
+        # **Atomic rename**
         target_dir = default(dest_dir, self._working_dir)
         shutil.move(tmp, target_dir)
         os.rename(os.path.join(target_dir, str(self._results_name) + ".tmp"),
