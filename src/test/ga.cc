@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(Evolution)
 {
   prob.env.individuals = 100;
 
-  vita::log::reporting_level = vita::log::WARNING;
+  vita::log::reporting_level = vita::log::lWARNING;
 
   auto eva(vita::make_ga_evaluator<vita::i_ga>(
              [](const vita::i_ga &v)

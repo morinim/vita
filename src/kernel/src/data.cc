@@ -11,7 +11,6 @@
  */
 
 #include <algorithm>
-#include <vector>
 
 #include "kernel/src/data.h"
 #include "kernel/log.h"
@@ -27,14 +26,12 @@ namespace vita
 
 namespace
 {
-///
-/// \param[in] s the string to be converted
-/// \param[in] d what type should `s` be converted in?
-/// \return      the converted data or an empty `any` if no conversion can be
-///              applied
-///
-/// `convert("123.1", sym_double) == any(123.1f)`
-///
+// \param[in] s the string to be converted
+// \param[in] d what type should `s` be converted in?
+// \return      the converted data or an empty `any` if no conversion can be
+//              applied
+//
+// `convert("123.1", sym_double) == any(123.1f)`
 any convert(const std::string &s, domain_t d)
 {
   switch (d)
@@ -47,10 +44,8 @@ any convert(const std::string &s, domain_t d)
   }
 }
 
-///
-/// \param[in] s the string to be tested
-/// \return      `true` if `s` contains a number
-///
+// \param[in] s the string to be tested
+// \return      `true` if `s` contains a number
 bool is_number(const std::string &s)
 {
   try

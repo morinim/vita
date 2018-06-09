@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@
 namespace vita
 {
 ///
-/// Informations about a category of the dataset.
+/// Information about a category of the dataset.
 ///
 /// For example:
 ///
@@ -98,10 +98,11 @@ public:
 private:
   std::vector<untagged_category> categories_;
 
-  // Initially we had a std::map from category name to category tag used
+  // Initially we had a `std::map` linking category name and category tag used
   // to speed up the find(std::string) method.
   // Now the implementation is a bit slower but simpler and more robust.
 };  // class category_set
+
 
 ///
 /// Forward iterator to read the elements of a category_set.
@@ -127,10 +128,8 @@ public:
   value_type operator*()
   { return {static_cast<category_t>(ptr_ - begin_), *ptr_}; }
 
-  bool operator==(const const_iterator &rhs) const
-  { return ptr_ == rhs.ptr_; }
-  bool operator!=(const const_iterator &rhs) const
-  { return ptr_ != rhs.ptr_; }
+  bool operator==(const const_iterator &rhs) const { return ptr_ == rhs.ptr_; }
+  bool operator!=(const const_iterator &rhs) const { return ptr_ != rhs.ptr_; }
 };  // class category_set::const_iterator
 
 }  // namespace vita

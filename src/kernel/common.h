@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,15 +52,13 @@ enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
 /// Categories are the way strong typing GP is enforced in Vita.
 using category_t = unsigned;
 constexpr category_t undefined_category = static_cast<category_t>(-1);
-
-/// A useful shortcut for a group of categories.
-using cvect = std::vector<category_t>;
+using cvect = std::vector<category_t>;  // often used so we define a shortcut
 
 /// A macro to disallow the copy constructor and operator= functions.
 /// A good alternative is boost::noncopyable but that gives some false
 /// positive with `g++ -Weffc++` so, for now, we keep the macro.
 ///
-/// \see For further details:
+/// \see Further details:
 /// - <http://stackoverflow.com/q/7823990/3235496>
 /// - <http://stackoverflow.com/q/1454407/3235496>
 #define DISALLOW_COPY_AND_ASSIGN(Class) \

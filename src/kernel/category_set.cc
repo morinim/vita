@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -77,8 +77,8 @@ category_set::const_iterator category_set::end() const
 /// numeric) but... `size()` returns `1` (the number of input categories).
 ///
 /// This choice is due to the fact that:
-/// - for regression problems the output category is contained in the set of
-///   input categories;
+/// - for regression problems the output category is also in the set of input
+///   categories;
 /// - for classification tasks the algorithm ignores the output category
 ///   (because it's based on a discriminant function).
 ///

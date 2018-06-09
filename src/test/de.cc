@@ -73,7 +73,7 @@ BOOST_FIXTURE_TEST_SUITE(t_de2, F_FACTORY5_NO_INIT)
 BOOST_AUTO_TEST_CASE(Search_TestProblem1, * boost::unit_test::tolerance(1.0))
 {
   using namespace vita;
-  log::reporting_level = log::WARNING;
+  log::reporting_level = log::lWARNING;
 
   prob.env.individuals = 120;
   prob.env.threshold.fitness = {0,0};
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3, * boost::unit_test::tolerance(1.0))
 {
   using namespace vita;
 
-  log::reporting_level = log::WARNING;
+  log::reporting_level = log::lWARNING;
 
   prob.env.individuals = 130;
   prob.env.generations = 1000;
@@ -277,7 +277,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem3, * boost::unit_test::tolerance(1.0))
 BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 {
   using namespace vita;
-  log::reporting_level = log::WARNING;
+  log::reporting_level = log::lWARNING;
 
   prob.env.individuals = 50;
   prob.env.generations = 1000;
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem4)
 BOOST_AUTO_TEST_CASE(Search_TestProblem5, * boost::unit_test::tolerance(0.1))
 {
   using namespace vita;
-  log::reporting_level = log::WARNING;
+  log::reporting_level = log::lWARNING;
 
   prob.env.individuals = 100;
   prob.env.generations = 500;

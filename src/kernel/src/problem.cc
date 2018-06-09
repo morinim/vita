@@ -21,7 +21,7 @@
 namespace vita
 {
 
-namespace
+namespace detail
 {
 ///
 /// \param[in] availables the "dictionary" for the sequence
@@ -330,7 +330,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
 
       // From the list of all the sequences with repetition of `args.size()`
       // elements...
-      const auto sequences(seq_with_rep(used_categories, args.size()));
+      const auto sequences(detail::seq_with_rep(used_categories, args.size()));
 
       // ...we choose those compatible with the xml signature of the current
       // symbol.

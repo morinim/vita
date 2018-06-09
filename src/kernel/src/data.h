@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,6 +16,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "kernel/category_set.h"
 #include "kernel/data.h"
@@ -148,7 +149,7 @@ private:
 /// The `struct` consists of an input vector (`input`) and an answer value
 /// (`output`). Depending on the kind of problem, `output` stores:
 /// * a numeric value (symbolic regression problem);
-/// * a label (classification problem).
+/// * a categorical value (classification problem).
 ///
 /// `difficulty` and `age` are parameters used by the Dynamic Subset
 /// Selection algorithm (see "Dynamic Training Subset Selection for
@@ -157,13 +158,11 @@ private:
 ///
 struct src_data::example
 {
-  example() : input(), output(any()), difficulty(0), age(0) {}
+  std::vector<any> input = {};
+  any             output = {};
 
-  std::vector<any> input;
-  any             output;
-
-  std::uintmax_t difficulty;
-  unsigned              age;
+  std::uintmax_t difficulty = 0;
+  unsigned              age = 0;
 
   class_t tag() const { return any_cast<class_t>(output); }
   template<class T> T cast_output() const;
