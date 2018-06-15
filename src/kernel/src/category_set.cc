@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "kernel/category_set.h"
+#include "kernel/src/category_set.h"
 #include "utility/utility.h"
 
 namespace vita

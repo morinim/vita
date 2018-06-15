@@ -18,9 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "kernel/category_set.h"
 #include "kernel/data.h"
 #include "kernel/distribution.h"
+#include "kernel/src/category_set.h"
 #include "utility/any.h"
 
 namespace vita
