@@ -98,8 +98,8 @@ public:
 private:
   std::vector<untagged_category> categories_;
 
-  // Initially we had a `std::map` linking category name and category tag used
-  // to speed up the find(std::string) method.
+  // Initially we had an additional `std::map` linking category name and
+  // category tag (used to speed up the `find(std::string)` method).
   // Now the implementation is a bit slower but simpler and more robust.
 };  // class category_set
 

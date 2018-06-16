@@ -75,18 +75,18 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 /// conditions is satisfied:
 ///
 /// * the accuracy threshold is defined (`env.threshold.accuracy > 0.0`);
-/// * we explicitly asked for accuracy calculation (see the `src_search`
-///   constructor).
+/// * we explicitly asked for accuracy calculation in the `src_search`
+///   constructor.
 ///
-/// Otherwise the function will skip accuracy calculation.
+/// Otherwise the function skips accuracy calculation.
 ///
 /// \warning Can be very time consuming.
 ///
 template<class T, template<class> class ES>
-model_measurements src_search<T, ES>::calculate_metrics(
+model_measurements src_search<T, ES>::calculate_metrics_spec(
   const summary<T> &s) const
 {
-  model_measurements ret(s.best.score);
+  auto ret(s.best.score);
 
   if (metrics & metric_flags::accuracy
       || this->prob_.env.threshold.accuracy > 0.0)
@@ -371,8 +371,8 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 /// \return                     `true` if the write operation succeed
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::log_nvi(tinyxml2::XMLDocument *d,
-                                const summary<T> &run_sum) const
+void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
+                                        const summary<T> &run_sum) const
 {
   Expects(d);
 

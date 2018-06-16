@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -70,13 +70,12 @@ private:
   bool stop_condition(const summary<T> &) const;
 
   // Template methods / customization points for search::run().
-  model_measurements calculate_metrics(const summary<T> &) const override;
+  model_measurements calculate_metrics_spec(const summary<T> &) const override;
   void init() override;
   void after_evolution(summary<T> *) override;
   void print_resume(const model_measurements &) const override;
-
-  // NVI template methods
-  void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const override;
+  void log_search_spec(tinyxml2::XMLDocument *,
+                       const summary<T> &) const override;
 
   // *** Private data members ***
   // Preferred evaluator for symbolic regression.

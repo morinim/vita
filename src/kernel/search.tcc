@@ -29,19 +29,37 @@ search<T, ES>::search(problem &p) : active_eva_(nullptr),
   Ensures(debug());
 }
 
+
 ///
-/// Calculates problem-specific metrics regarding the solution found.
+/// For the base class this is just the identity function.
+///
+/// Derived classes could calculate additional problem-specific metrics.
+///
+template<class T, template<class> class ES>
+model_measurements search<T, ES>::calculate_metrics_spec(
+  const summary<T> &s) const
+{
+  return s.best.score;
+}
+
+///
+/// Calculates the fitness of the best individual so far.
 ///
 /// \param[in] s summary of the evolution run just finished
 /// \return      `s.best.score`
 ///
 /// Specializations of this method can calculate further problem-specific
-/// metrics regarding `s.best.solution`.
+/// metrics regarding `s.best.solution` (via the `calculate_metrics_spec`
+/// virtual function).
 ///
 template<class T, template<class> class ES>
 model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
 {
-  return s.best.score;
+  auto m(calculate_metrics_spec(s));
+
+  m.fitness = (*active_eva_)(s.best.solution);
+
+  return m;
 }
 
 ///
@@ -139,7 +157,6 @@ summary<T> search<T, ES>::run(unsigned n)
       prob_.data()->select(data::validation);
       active_eva_->clear(run_summary.best.solution);
 
-      run_summary.best.score.fitness=(*active_eva_)(run_summary.best.solution);
       run_summary.best.score = calculate_metrics(run_summary);
 
       prob_.data()->select(data::training);
@@ -187,6 +204,8 @@ summary<T> search<T, ES>::run(unsigned n)
   return overall_summary;
 }
 
+///
+/// Loads the saved evaluation cache from a file (if available).
 ///
 /// \return `true` if the object is correctly loaded
 ///
@@ -347,7 +366,7 @@ void search<T, ES>::log_search(const summary<T> &run_sum,
 
   prob_.env.xml(&d);
 
-  log_nvi(&d, run_sum);
+  log_search_spec(&d, run_sum);
 
   const std::string f_sum(merge_path(prob_.env.stat.dir,
                                      prob_.env.stat.summary_file));

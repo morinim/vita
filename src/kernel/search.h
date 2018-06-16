@@ -57,6 +57,8 @@ protected:
   bool save() const;
   virtual void tune_parameters();
 
+  model_measurements calculate_metrics(const summary<T> &) const;
+
   // Data members.
   std::unique_ptr<evaluator<T>> active_eva_;
   std::unique_ptr<validation_strategy> vs_;
@@ -65,9 +67,6 @@ protected:
   problem &prob_;
 
 private:
-  // Template methods for search::run() member function.
-  virtual model_measurements calculate_metrics(const summary<T> &) const;
-
   /// Template method of the search::run() member function called exactly one
   /// time at the beginning of the first run.
   virtual void init() {}
@@ -75,8 +74,12 @@ private:
   virtual void after_evolution(summary<T> *) {}
   virtual void print_resume(const model_measurements &) const;
 
-  // NVI template methods.
-  virtual void log_nvi(tinyxml2::XMLDocument *, const summary<T> &) const {}
+  // Logs additional problem-specific data.
+  virtual void log_search_spec(tinyxml2::XMLDocument *,
+                               const summary<T> &) const
+  {}
+
+  virtual model_measurements calculate_metrics_spec(const summary<T> &) const;
 };
 
 #include "kernel/search.tcc"
