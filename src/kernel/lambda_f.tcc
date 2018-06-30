@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
 /// \return the output value associated with `e`.
 ///
 template<class T, bool S>
-any basic_reg_lambda_f<T, S>::operator()(const src_data::example &e) const
+any basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
 {
   // We use tag dispatching by instance (i.e. to delegate to an implementation
   // function that receives standard arguments plus a dummy argument based on a
@@ -44,14 +44,14 @@ any basic_reg_lambda_f<T, S>::operator()(const src_data::example &e) const
 }
 
 template<class T, bool S>
-any basic_reg_lambda_f<T, S>::eval(const src_data::example &e,
+any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
                                    std::false_type) const
 {
   return this->run(e.input);
 }
 
 template<class T, bool S>
-any basic_reg_lambda_f<T, S>::eval(const src_data::example &e,
+any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
                                    std::true_type) const
 {
   number avg(0), count(0);
@@ -87,7 +87,7 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 ///
 template<class T, bool S>
 double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
-                                         const src_data &d) const
+                                         const dataframe &d) const
 {
   return m(this, d);
 }
@@ -129,7 +129,7 @@ bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
 /// \param[in] d the training set.
 ///
 template<class T, bool N>
-basic_class_lambda_f<T, N>::basic_class_lambda_f(const src_data &d)
+basic_class_lambda_f<T, N>::basic_class_lambda_f(const dataframe &d)
   : detail::class_names<N>(d)
 {
 }
@@ -139,7 +139,7 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const src_data &d)
 /// \return the label of the class that includes `e` (wrapped in class any).
 ///
 template<class T, bool N>
-any basic_class_lambda_f<T, N>::operator()(const src_data::example &e) const
+any basic_class_lambda_f<T, N>::operator()(const dataframe::example &e) const
 {
   return any(this->tag(e).first);
 }
@@ -153,7 +153,7 @@ any basic_class_lambda_f<T, N>::operator()(const src_data::example &e) const
 ///
 template<class T, bool N>
 double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
-                                           const src_data &d) const
+                                           const dataframe &d) const
 {
   return m(this, d);
 }
@@ -175,7 +175,7 @@ std::string basic_class_lambda_f<T, N>::name(const any &a) const
 ///
 template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
-                                                          src_data &d,
+                                                          dataframe &d,
                                                           unsigned x_slot)
   : basic_class_lambda_f<T, N>(d), lambda_(ind),
     slot_matrix_(d.classes() * x_slot, d.classes()),
@@ -186,11 +186,7 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
   Expects(d.classes() > 1);
   Expects(x_slot);
 
-  // Use the training set for lambdification.
-  const auto backup(d.active_dataset());
-  d.select(data::training);
   fill_matrix(d, x_slot);
-  d.select(backup);
 }
 
 ///
@@ -200,7 +196,7 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 /// Sets up the data structures needed by the 'dynamic slot' algorithm.
 ///
 template<class T, bool S, bool N>
-void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(src_data &d,
+void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
                                                    unsigned x_slot)
 {
   Expects(d.debug());
@@ -265,7 +261,7 @@ void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(src_data &d,
 ///
 template<class T, bool S, bool N>
 std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
-  const src_data::example &e) const
+  const dataframe::example &e) const
 {
   const any res(lambda_(e));
 
@@ -305,7 +301,7 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
-  const src_data::example &instance) const
+  const dataframe::example &instance) const
 {
   const auto s(slot(instance));
   const auto classes(slot_matrix_.cols());
@@ -437,18 +433,14 @@ bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
 ///
 template<class T, bool S, bool N>
 basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
-                                                          src_data &d)
+                                                          dataframe &d)
   : basic_class_lambda_f<T, N>(d), lambda_(ind), gauss_dist_(d.classes())
 {
   Expects(ind.debug());
   Expects(d.debug());
   Expects(d.classes() > 1);
 
-  // Use the training set for lambdification.
-  const auto backup(d.active_dataset());
-  d.select(data::training);
   fill_vector(d);
-  d.select(backup);
 }
 
 ///
@@ -457,7 +449,7 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
 /// Sets up the data structures needed by the gaussian algorithm.
 ///
 template<class T, bool S, bool N>
-void basic_gaussian_lambda_f<T, S, N>::fill_vector(src_data &d)
+void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
 {
   Expects(d.classes() > 1);
 
@@ -491,7 +483,7 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(src_data &d)
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
-  const src_data::example &example) const
+  const dataframe::example &example) const
 {
   const any res(lambda_(example));
   const number x(res.has_value() ? to<number>(res) : 0.0);
@@ -637,7 +629,7 @@ bool basic_gaussian_lambda_f<T, S, N>::debug() const
 ///
 template<class T, bool S, bool N>
 basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
-                                                      src_data &d)
+                                                      dataframe &d)
   : basic_class_lambda_f<T, N>(d), lambda_(ind)
 {
   Expects(ind.debug());
@@ -652,7 +644,7 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
-  const src_data::example &e) const
+  const dataframe::example &e) const
 {
   const any res(lambda_(e));
   const number val(res.has_value() ? to<number>(res) : 0.0);
@@ -751,7 +743,7 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 template<class... Args>
 team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
-                                                        src_data &d,
+                                                        dataframe &d,
                                                         Args&&... args)
   : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
 {
@@ -779,7 +771,7 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
-  const src_data::example &instance) const
+  const dataframe::example &instance) const
 {
   if (C == team_composition::wta)
   {

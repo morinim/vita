@@ -53,7 +53,6 @@ Options:
   --verbose              turns on information messages
   --debug                prints debug information
   --symbols=SYMBOLS      file specifying symbols used to solve the task
-  --testset=TESTSET      test set
   --validation=<perc>    sets the percent of the dataset used for validation
   --evaluator=<eval>     sets the preferred evaluator
                          (count, mae, rmae, mse, binary, dynslot, gaussian)
@@ -107,7 +106,7 @@ void fix_parameters(vita::src_problem *problem)
     env.mep.code_length = new_length;
   }
 
-  if (env.dss.value_or(0) > 0 && problem->data()->size() <= 30)
+  if (env.dss.value_or(0) > 0 && problem->data().size() <= 30)
   {
     vitaWARNING << "Adjusting DSS (=> disabled)";
     env.dss = 0;
@@ -387,7 +386,7 @@ void generations(const args_t &a)
 // Starts the search.
 void go(bool = true)
 {
-  if (!problem->data()->size())
+  if (!problem->data().size())
   {
     vitaERROR << "Missing data set";
     return;
@@ -454,40 +453,6 @@ void mutation_rate(const args_t &a)
 
   problem->env.p_mutation = r;
   vitaINFO << "Mutation rate set to " << problem->env.p_mutation;
-}
-
-// Reads the dataset used as test set.
-void testset(const args_t &a)
-{
-  const auto value(a.at("--testset"));
-  if (!value)
-    return;
-
-  const auto ts(value.asString());
-  vitaINFO << "Reading test set file " << ts << "...";
-
-  std::size_t parsed(0);
-  try
-  {
-    parsed = problem->load_test_set(ts);
-  }
-  catch(...)
-  {
-    parsed = 0;
-  }
-
-  if (parsed)
-  {
-    vitaINFO << "Testset read. Examples: " << parsed
-             << ", categories: " << problem->categories()
-             << ", features: " << problem->variables()
-             << ", classes: " << problem->classes();
-  }
-  else
-  {
-    vitaERROR << "Test set file format error";
-    std::exit(EXIT_FAILURE);
-  }
 }
 
 // Sets the number of individuals examined for choosing parents.
@@ -724,7 +689,7 @@ void cache(const args_t &a)
   if (bits < 10)
   {
     vitaWARNING
-      << "Cache too small (it requires at least 11 bits). Using default value";
+      << "Cache too small (11 bits required at least). Using default value";
     return;
   }
 
@@ -809,7 +774,6 @@ void parse_command_line(int argc, char *const argv[])
 
   ui::data(args);
   ui::symbols(args);
-  ui::testset(args);
   ui::validation(args);
 }
 
@@ -822,7 +786,7 @@ int main(int argc, char *const argv[])
 
   parse_command_line(argc, argv);
 
-  if (!problem.data()->size())
+  if (!problem.data().size())
     return EXIT_FAILURE;
 
   ui::go();

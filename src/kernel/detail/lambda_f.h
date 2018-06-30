@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -209,7 +209,7 @@ public:
 
 protected:
   /// Without names... there isn't anything to do.
-  explicit class_names(const src_data &) {}
+  explicit class_names(const dataframe &) {}
 
   std::string string(const any &) const;
 };
@@ -223,7 +223,7 @@ public:
   bool save(std::ostream &) const;
 
 protected:
-  explicit class_names(const src_data &);
+  explicit class_names(const dataframe &);
 
   std::string string(const any &) const;
 
@@ -234,7 +234,7 @@ private:
 ///
 /// \param[in] d the training set.
 ///
-inline class_names<true>::class_names(const src_data &d) : names_(d.classes())
+inline class_names<true>::class_names(const dataframe &d) : names_(d.classes())
 {
   const auto classes(d.classes());
   assert(classes > 1);

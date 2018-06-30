@@ -16,10 +16,13 @@
 namespace vita
 {
 
-holdout_validation::holdout_validation(src_data &d, unsigned perc)
-  : dat_(d), perc_(perc)
+holdout_validation::holdout_validation(src_problem &prob)
+  : training_(prob.data(problem::training)),
+    validation_(prob.data(problem::validation)),
+    perc_(prob.env.validation_percentage)
 {
-  Expects(perc < 100);
+  Expects(perc_ < 100);
+  Expects(validation_.empty());
 }
 
 ///
@@ -30,32 +33,32 @@ holdout_validation::holdout_validation(src_data &d, unsigned perc)
 ///
 void holdout_validation::init()
 {
-  // Validation set items are moved to the training set.
-  dat_.move_append(data::validation, data::training);
+  Expects(validation_.empty());
 
-  const auto available(dat_.size(data::training));
-  if (available)
-  {
-    assert(perc_ < 100);
-    const auto needed(available * perc_ / 100);
+  const auto available(training_.size());
+  if (!available)
+    return;
 
-    dat_.select(data::training);
-    std::shuffle(dat_.begin(data::training), dat_.end(data::training),
-                 random::engine);
+  assert(perc_ < 100);
+  const auto skip(available * (100 - perc_) / 100);
+  assert(skip <= available);
 
-    dat_.move_append(data::training, data::validation, needed);
+  std::shuffle(training_.begin(), training_.end(), random::engine);
 
-    // An alternative is the Selection sampling / Algorithm S (see
-    // <http://stackoverflow.com/q/35065764/3235496>)
-    //
-    // > Iterate through and for each element make the probability of
-    // >  selection = (number needed)/(number left)
-    // >
-    // > So if you had 40 items, the first would have a 5/40 chance of being
-    // > selected. If it is, the next has a 4/39 chance, otherwise it has a
-    // > 5/39 chance. By the time you get to the end you will have your 5
-    // > items, and often you'll have all of them before that.
-  }
+  const auto from(std::next(training_.begin(), skip));
+  std::move(from, training_.end(), std::back_inserter(validation_));
+  training_.erase(from, training_.end());
+
+  // An alternative is the Selection sampling / Algorithm S (see
+  // <http://stackoverflow.com/q/35065764/3235496>)
+  //
+  // > Iterate through and for each element make the probability of
+  // >  selection = (number needed)/(number left)
+  // >
+  // > So if you had 40 items, the first would have a 5/40 chance of being
+  // > selected. If it is, the next has a 4/39 chance, otherwise it has a
+  // > 5/39 chance. By the time you get to the end you will have your 5
+  // > items, and often you'll have all of them before that.
 }
 
 }  // namespace vita

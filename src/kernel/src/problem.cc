@@ -67,8 +67,8 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 /// \param[in] init should the environment be initialized with common / default
 ///                 values?
 ///
-src_problem::src_problem(initialization init) : problem(init), dat_(),
-                                                factory_()
+src_problem::src_problem(initialization init) : problem(init), training_(),
+                                                validation_(), factory_()
 {
 }
 
@@ -79,24 +79,22 @@ src_problem::src_problem(initialization init) : problem(init), dat_(),
 /// Conversion from `const char []` to `bool` is a standard conversion, while
 /// the one to `std::string` is a user-defined conversion.
 ///
-src_problem::src_problem(const char ds[])
-  : src_problem(std::string(ds), std::string(), std::string())
+src_problem::src_problem(const char ds[]) : src_problem(std::string(ds))
 {
+  assert(ds);
 }
 
 ///
 /// Initializes the problem with data from the input files.
 ///
-/// \param[in] ds name of the dataset file (training/validation set)
-/// \param[in] ts name of the test set
-/// \param[in] symbols name of the file containing the symbols. If it is
-///                    empty, src_problem::setup_default_symbols is called
+/// \param[in] ds name of the dataset file
+/// \param[in] symbols name of the file containing the symbols. If it's empty,
+///                    src_problem::setup_default_symbols is called
 ///
-src_problem::src_problem(const std::string &ds, const std::string &ts,
-                         const std::string &symbols)
-  : problem(initialization::skip), dat_(), factory_()
+src_problem::src_problem(const std::string &ds, const std::string &symbols)
+  : problem(initialization::skip), training_(), validation_(), factory_()
 {
-  load(ds, ts, symbols);
+  load(ds, symbols);
 }
 
 ///
@@ -104,7 +102,7 @@ src_problem::src_problem(const std::string &ds, const std::string &ts,
 ///
 bool src_problem::operator!() const
 {
-  return !dat_.size(data::training) || !sset.enough_terminals();
+  return !training_.size() || !sset.enough_terminals();
 }
 
 ///
@@ -118,18 +116,16 @@ bool src_problem::operator!() const
 ///                    parsed
 ///
 std::pair<std::size_t, std::size_t> src_problem::load(
-  const std::string &ds, const std::string &ts, const std::string &symbols)
+  const std::string &ds, const std::string &symbols)
 {
   if (ds.empty())
     return {0, 0};
 
   sset.clear();
-  dat_.clear();
+  training_.clear();
+  validation_.clear();
 
-  const auto n_examples(dat_.load(ds));
-
-  if (!ts.empty())
-    load_test_set(ts);
+  const auto n_examples(training_.load(ds));
 
   std::size_t n_symbols(0);
   if (symbols.empty())
@@ -138,22 +134,6 @@ std::pair<std::size_t, std::size_t> src_problem::load(
     n_symbols = load_symbols(symbols);
 
   return {n_examples, n_symbols};
-}
-
-///
-/// Loads the test set.
-///
-/// \param[in] ts filename of the file containing the test set
-/// \return       number of examples parsed
-///
-std::size_t src_problem::load_test_set(const std::string &ts)
-{
-  const auto backup(dat_.active_dataset());
-  dat_.select(data::test);
-  const auto n(dat_.load(ts));
-  dat_.select(backup);
-
-  return n;
 }
 
 ///
@@ -173,21 +153,21 @@ std::size_t src_problem::setup_terminals_from_data(
   sset.clear();
 
   // Sets up the variables (features).
-  const auto columns(dat_.columns());
+  const auto columns(training_.columns());
   for (auto i(decltype(columns){1}); i < columns; ++i)
     if (skip.find(i) == skip.end())
     {
-      const auto provided_name(dat_.get_column(i).name);
+      const auto provided_name(training_.get_column(i).name);
       const auto name(provided_name.empty() ? "X" + std::to_string(i)
                                             : provided_name);
-      const category_t category(dat_.get_column(i).category_id);
+      const category_t category(training_.get_column(i).category_id);
       sset.insert<variable>(name, i - 1, category);
 
       ++variables;
     }
 
   // Sets up the labels for nominal attributes.
-  for (const category &c : dat_.categories())
+  for (const category &c : training_.categories())
     for (const std::string &l : c.labels)
       sset.insert<constant<std::string>>(l, c.tag);
 
@@ -254,7 +234,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
     return 0;
 
   // Prints the list of categories as inferred from the dataset.
-  for (const category &c : dat_.categories())
+  for (const category &c : training_.categories())
     vitaDEBUG << "Using " << c;
 
   std::set<category_t> used_categories;
@@ -298,7 +278,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
           std::string signature(sym_name + ":");
 
           for (auto j(decltype(n_args){0}); j < n_args; ++j)
-            signature += " " + dat_.categories().find(tag).name;
+            signature += " " + training_.categories().find(tag).name;
           vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, cvect(n_args, tag)));
@@ -339,7 +319,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
         {
           std::string signature(sym_name + ":");
           for (const auto &j : seq)
-            signature += " " + dat_.categories().find(j).name;
+            signature += " " + training_.categories().find(j).name;
           vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, seq));
@@ -377,17 +357,17 @@ bool src_problem::compatible(const cvect &instance,
   for (auto i(decltype(sup){0}); i < sup; ++i)
   {
     const std::string p_i(pattern[i]);
-    const bool generic(src_data::from_weka(p_i) != domain_t::d_void);
+    const bool generic(dataframe::from_weka(p_i) != domain_t::d_void);
 
     if (generic)  // numeric, string, integer...
     {
-      if (dat_.categories().find(instance[i]).domain !=
-          src_data::from_weka(p_i))
+      if (training_.categories().find(instance[i]).domain !=
+          dataframe::from_weka(p_i))
         return false;
     }
     else
     {
-      if (instance[i] != dat_.categories().find(p_i).tag)
+      if (instance[i] != training_.categories().find(p_i).tag)
         return false;
     }
   }
@@ -400,7 +380,7 @@ bool src_problem::compatible(const cvect &instance,
 ///
 unsigned src_problem::categories() const
 {
-  return dat_.categories().size();
+  return training_.categories().size();
 }
 
 ///
@@ -409,7 +389,7 @@ unsigned src_problem::categories() const
 ///
 unsigned src_problem::classes() const
 {
-  return dat_.classes();
+  return training_.classes();
 }
 
 ///
@@ -418,7 +398,57 @@ unsigned src_problem::classes() const
 ///
 unsigned src_problem::variables() const
 {
-  return dat_.variables();
+  return training_.variables();
+}
+
+///
+/// \return a reference to the active dataset
+///
+dataframe &src_problem::data()
+{
+  return active_dataset() == problem::training ? training_ : validation_;
+}
+
+///
+/// \return a const reference to the active dataset
+///
+const dataframe &src_problem::data() const
+{
+  return active_dataset() == problem::training ? training_ : validation_;
+}
+
+///
+/// \param[in] t a dataset type
+/// \return      a reference to the specified dataset
+///
+dataframe &src_problem::data(dataset_t t)
+{
+  return t == problem::training ? training_ : validation_;
+}
+
+///
+/// \param[in] t a dataset type
+/// \return      a const reference to the specified dataset
+///
+const dataframe &src_problem::data(dataset_t t) const
+{
+  return t == problem::training ? training_ : validation_;
+}
+
+///
+/// Asks if a dataset of a specific kind is available.
+///
+/// \param[in] d dataset type
+/// \return      `true` if dataset of type `d` is available
+///
+bool src_problem::has(dataset_t d) const
+{
+  switch (d)
+  {
+  case problem::training:    return !training_.empty();
+  case problem::validation:  return !validation_.empty();
+  default:                   return false;
+  }
 }
 
 ///
@@ -429,10 +459,7 @@ bool src_problem::debug() const
   if (!problem::debug())
     return false;
 
-  if (!dat_.debug())
-    return false;
-
-  return true;
+  return training_.debug() && validation_.debug();
 }
 
 }  // namespace vita

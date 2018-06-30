@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@
 /// \param[in] d dataset that the evaluator will use.
 ///
 template<class T>
-src_evaluator<T>::src_evaluator(src_data &d) : dat_(&d)
+src_evaluator<T>::src_evaluator(dataframe &d) : dat_(&d)
 {
 }
 
@@ -40,7 +40,7 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
   fitness_t::value_type err(0.0);
   int illegals(0);
 
-  // We don't use src_data::size() since it gives the size of the active
+  // We don't use dataframe::size() since it gives the size of the active
   // dataset, *not* the size of the active *slice* in the dataset (so it isn't
   // appropriate with the DSS algorithm).
   unsigned total_nr(0);
@@ -117,7 +117,7 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 ///
 template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                               src_data::example &t, int *const illegals)
+                               dataframe::example &t, int *illegals)
 {
   const any res(agent(t));
 
@@ -143,7 +143,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///
 template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                                src_data::example &t, int *const)
+                                dataframe::example &t, int *)
 {
   const any res(agent(t));
 
@@ -189,7 +189,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///
 template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                               src_data::example &t, int *const illegals)
+                               dataframe::example &t, int *illegals)
 {
   const any res(agent(t));
   number err;
@@ -216,7 +216,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///
 template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                                 src_data::example &t, int *const)
+                                 dataframe::example &t, int *)
 {
   const any res(agent(t));
 
@@ -235,7 +235,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 ///                   Determination algorithm.
 ///
 template<class T>
-dyn_slot_evaluator<T>::dyn_slot_evaluator(src_data &d, unsigned x_slot)
+dyn_slot_evaluator<T>::dyn_slot_evaluator(dataframe &d, unsigned x_slot)
   : classification_evaluator<T>(d), x_slot_(x_slot)
 {
   assert(x_slot_);

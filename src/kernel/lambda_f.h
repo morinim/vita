@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,7 @@
 
 #include <type_traits>
 
-#include "kernel/src/data.h"
+#include "kernel/src/dataframe.h"
 #include "kernel/src/interpreter.h"
 #include "kernel/src/model_metric.h"
 #include "kernel/team.h"
@@ -55,11 +55,11 @@ template<class T>
 class lambda_f
 {
 public:
-  virtual any operator()(const src_data::example &) const = 0;
+  virtual any operator()(const dataframe::example &) const = 0;
 
   virtual std::string name(const any &) const = 0;
 
-  virtual double measure(const model_metric<T> &, const src_data &) const = 0;
+  virtual double measure(const model_metric<T> &, const dataframe &) const = 0;
 
   virtual bool debug() const = 0;
 
@@ -95,11 +95,11 @@ class basic_reg_lambda_f : public reg_lambda_f<T>,
 public:
   explicit basic_reg_lambda_f(const T &);
 
-  any operator()(const src_data::example &) const override;
+  any operator()(const dataframe::example &) const override;
 
   std::string name(const any &) const override;
 
-  double measure(const model_metric<T> &, const src_data &) const override;
+  double measure(const model_metric<T> &, const dataframe &) const override;
 
   bool debug() const override;
 
@@ -108,8 +108,8 @@ public:
   bool save(std::ostream &) const override;
 
 private:
-  any eval(const src_data::example &, std::false_type) const;
-  any eval(const src_data::example &, std::true_type) const;
+  any eval(const dataframe::example &, std::false_type) const;
+  any eval(const dataframe::example &, std::true_type) const;
 };
 
 // ***********************************************************************
@@ -123,7 +123,7 @@ private:
 template<class T> class class_lambda_f : public lambda_f<T>
 {
 public:
-  virtual std::pair<class_t, double> tag(const src_data::example &) const = 0;
+  virtual std::pair<class_t, double> tag(const dataframe::example &) const = 0;
 };
 
 ///
@@ -143,13 +143,13 @@ class basic_class_lambda_f : public class_lambda_f<T>,
                              protected detail::class_names<N>
 {
 public:
-  explicit basic_class_lambda_f(const src_data &);
+  explicit basic_class_lambda_f(const dataframe &);
 
-  any operator()(const src_data::example &) const override;
+  any operator()(const dataframe::example &) const override;
 
   std::string name(const any &) const final;
 
-  double measure(const model_metric<T> &, const src_data &) const override;
+  double measure(const model_metric<T> &, const dataframe &) const override;
 };
 
 ///
@@ -168,9 +168,9 @@ template<class T, bool S, bool N>
 class basic_dyn_slot_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_dyn_slot_lambda_f(const T &, src_data &, unsigned);
+  basic_dyn_slot_lambda_f(const T &, dataframe &, unsigned);
 
-  std::pair<class_t, double> tag(const src_data::example &) const override;
+  std::pair<class_t, double> tag(const dataframe::example &) const override;
 
   bool debug() const override;
 
@@ -185,8 +185,8 @@ private:
   bool load_(std::istream &, const problem &, std::true_type);
   bool load_(std::istream &, const problem &, std::false_type);
 
-  void fill_matrix(src_data &, unsigned);
-  std::size_t slot(const src_data::example &) const;
+  void fill_matrix(dataframe &, unsigned);
+  std::size_t slot(const dataframe::example &) const;
 
   // Private data members
 
@@ -221,9 +221,9 @@ template<class T, bool S, bool N>
 class basic_gaussian_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_gaussian_lambda_f(const T &, src_data &);
+  basic_gaussian_lambda_f(const T &, dataframe &);
 
-  std::pair<class_t, double> tag(const src_data::example &) const override;
+  std::pair<class_t, double> tag(const dataframe::example &) const override;
 
   bool debug() const override;
 
@@ -233,7 +233,7 @@ public:
 
 private:
   // Private support methods
-  void fill_vector(src_data &);
+  void fill_vector(dataframe &);
   bool load_(std::istream &, const problem &, std::true_type);
   bool load_(std::istream &, const problem &, std::false_type);
 
@@ -259,9 +259,9 @@ template<class T, bool S, bool N>
 class basic_binary_lambda_f : public basic_class_lambda_f<T, N>
 {
 public:
-  basic_binary_lambda_f(const T &, src_data &);
+  basic_binary_lambda_f(const T &, dataframe &);
 
-  std::pair<class_t, double> tag(const src_data::example &) const override;
+  std::pair<class_t, double> tag(const dataframe::example &) const override;
 
   bool debug() const override;
 
@@ -317,10 +317,10 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
 class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
 {
 public:
-  template<class... Args> team_class_lambda_f(const team<T> &, src_data &,
+  template<class... Args> team_class_lambda_f(const team<T> &, dataframe &,
                                               Args &&...);
 
-  std::pair<class_t, double> tag(const src_data::example &) const override;
+  std::pair<class_t, double> tag(const dataframe::example &) const override;
 
   bool debug() const override;
 

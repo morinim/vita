@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,7 @@
 #define      VITA_FIXED_VALIDATION_H
 
 #include "kernel/validation_strategy.h"
-#include "kernel/src/data.h"
+#include "kernel/src/problem.h"
 
 namespace vita
 {
@@ -31,13 +31,15 @@ namespace vita
 class holdout_validation : public validation_strategy
 {
 public:
-  holdout_validation(src_data &, unsigned);
+  holdout_validation(src_problem &);
 
   void init() override;
   bool shake(unsigned) override { return false; }
 
 private:
-  src_data &dat_;
+  dataframe &training_;
+  dataframe &validation_;
+
   unsigned perc_;
 };
 

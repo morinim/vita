@@ -150,16 +150,16 @@ summary<T> search<T, ES>::run(unsigned n)
   {
     auto run_summary(evolution<T, ES>(prob_, *active_eva_).run(r, shake));
 
-    // If a validation test is available the performance of the best trained
-    // individual is recalculated.
-    if (prob_.data() && prob_.data()->has(data::validation))
+    // If a validation test/simulation is available, the performance of the
+    // best trained individual is recalculated.
+    if (prob_.has(problem::validation))
     {
-      prob_.data()->select(data::validation);
+      prob_.select(problem::validation);
       active_eva_->clear(run_summary.best.solution);
 
       run_summary.best.score = calculate_metrics(run_summary);
 
-      prob_.data()->select(data::training);
+      prob_.select(problem::training);
       active_eva_->clear(run_summary.best.solution);
     }
     else
@@ -258,11 +258,10 @@ bool search<T, ES>::save() const
 template<class T, template<class> class ES>
 void search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(prob_.data() &&
-                      prob_.data()->has(data::validation) ? "Validation "
-                                                          : "Training ");
+  const std::string s(prob_.has(problem::validation) ? "Validation"
+                                                     : "Training");
 
-  vitaINFO << s << "fitness: " << m.fitness;
+  vitaINFO << s << " fitness: " << m.fitness;
 }
 
 ///

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,15 +15,15 @@
 
 #include "kernel/lambda_f.h"
 #include "kernel/vitafwd.h"
-#include "kernel/src/data.h"
+#include "kernel/src/dataframe.h"
 
 namespace vita
 {
 ///
 /// There are a lot of metrics related to a model (a `lambda_f`) and we don't
 /// want fat classes.
-/// The Visitor pattern is ideal to simplify the interface of lambda_f and
-/// to keep possibility for future expansions (new metrics).
+/// The `Visitor` pattern is ideal to simplify the interface of lambda_f and
+/// keep possibility for future expansions (new metrics).
 ///
 /// This works quite well since metrics can be implemented in terms of the
 /// public interface of lambda_f.
@@ -33,9 +33,9 @@ class model_metric
 {
 public:
   virtual double operator()(const reg_lambda_f<T> *,
-                            const src_data &) const = 0;
+                            const dataframe &) const = 0;
   virtual double operator()(const class_lambda_f<T> *,
-                            const src_data &) const = 0;
+                            const dataframe &) const = 0;
 };
 
 ///
@@ -57,10 +57,10 @@ template<class T>
 class accuracy_metric : public model_metric<T>
 {
 public:
-  double operator()(const reg_lambda_f<T> *, const src_data &) const override;
+  double operator()(const reg_lambda_f<T> *, const dataframe &) const override;
 
   double operator()(const class_lambda_f<T> *,
-                    const src_data &) const override;
+                    const dataframe &) const override;
 };
 
 #include "kernel/src/model_metric.tcc"

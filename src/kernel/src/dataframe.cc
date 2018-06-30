@@ -12,7 +12,7 @@
 
 #include <algorithm>
 
-#include "kernel/src/data.h"
+#include "kernel/src/dataframe.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
@@ -64,8 +64,7 @@ bool is_number(const std::string &s)
 ///
 /// New empty data instance.
 ///
-src_data::src_data() : data(training), classes_map_(), header_(),
-                       categories_(), datasets_(npos)
+dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
 {
   Ensures(debug());
 }
@@ -76,7 +75,8 @@ src_data::src_data() : data(training), classes_map_(), header_(),
 /// \param[in] filename name of the file containing the learning collection
 /// \param[in] ft       a filter and transform function
 ///
-src_data::src_data(const std::string &filename, filter_hook_t ft) : src_data()
+dataframe::dataframe(const std::string &filename, filter_hook_t ft)
+  : dataframe()
 {
   Expects(!filename.empty());
 
@@ -86,116 +86,71 @@ src_data::src_data(const std::string &filename, filter_hook_t ft) : src_data()
 }
 
 ///
-/// Resets the object.
+/// Removes all elements from the container.
 ///
-void src_data::clear()
+/// Invalidates any references, pointers or iterators referring to contained
+/// examples. Any past-the-end iterators are also invalidated.
+///
+/// Leaves the associated metadata unchanged.
+///
+void dataframe::clear()
 {
-  *this = src_data();
+  dataset_.clear();
 }
 
 ///
 /// \return reference to the first element of the active dataset
 ///
-src_data::iterator src_data::begin()
+dataframe::iterator dataframe::begin()
 {
-  return begin(active_dataset());
+  return dataset_.begin();
 }
 
 ///
-/// \return a constant reference to the first element of the active dataset
+/// \return a constant reference to the first element of the dataset
 ///
-src_data::const_iterator src_data::begin() const
+dataframe::const_iterator dataframe::begin() const
 {
-  return begin(active_dataset());
-}
-
-///
-/// \param[in] d a dataset (training / validation / test set)
-/// \return      reference to the first element of dataset `d`
-///
-src_data::iterator src_data::begin(dataset_t d)
-{
-  Expects(d != npos);
-  return datasets_[d].begin();
-}
-
-///
-/// \param[in] d a dataset (training / validation / test set)
-/// \return      a constant reference to the first element dataset `d`
-///
-src_data::const_iterator src_data::begin(dataset_t d) const
-{
-  Expects(d != npos);
-  return datasets_[d].begin();
+  return dataset_.begin();
 }
 
 ///
 /// \return a reference to the sentinel element of the active dataset
 ///
-src_data::iterator src_data::end()
+dataframe::iterator dataframe::end()
 {
-  return end(active_dataset());
+  return dataset_.end();
 }
 
 ///
 /// \return a constant reference to the sentinel element of the active dataset
 ///
-src_data::const_iterator src_data::end() const
+dataframe::const_iterator dataframe::end() const
 {
-  return end(active_dataset());
-}
-
-///
-/// \param[in] d a dataset (training / validation / test set)
-/// \return      a reference to the sentinel element of dataset `d`
-///
-src_data::iterator src_data::end(dataset_t d)
-{
-  Expects(d != npos);
-  return datasets_[d].end();
-}
-
-///
-/// \param[in] d a dataset (training / validation / test set)
-/// \return      a constant reference to the sentinel element of dataset `d`
-///
-src_data::const_iterator src_data::end(dataset_t d) const
-{
-  Expects(d != npos);
-  return datasets_[d].end();
-}
-
-///
-/// \param[in] d a dataset (training / validation / test set)
-/// \return      the size of the dataset `d`
-///
-std::size_t src_data::size(dataset_t d) const
-{
-  return datasets_[d].size();
+  return dataset_.end();
 }
 
 ///
 /// \return the size of the active dataset
 ///
-std::size_t src_data::size() const
+std::size_t dataframe::size() const
 {
-  return size(active_dataset());
+  return dataset_.size();
 }
 
 ///
-/// \param[in] d a dataset type
-/// \return      `true` if a dataset of type `d` is available
+/// \return `true` if the dataframe is empty
 ///
-bool src_data::has(dataset_t d) const
+bool dataframe::empty() const
 {
-  return size(d);
+  return size() == 0;
 }
 
 ///
 /// \return a const reference to the set of categories associated with the
 ///         dataset
 ///
-const category_set &src_data::categories() const
+const category_set &dataframe::categories() const
 {
   return categories_;
 }
@@ -204,54 +159,22 @@ const category_set &src_data::categories() const
 /// \param[in] i index of a column
 /// \return      a const reference to the `i`-th column of the dataset
 ///
-const src_data::column &src_data::get_column(unsigned i) const
+const dataframe::column &dataframe::get_column(unsigned i) const
 {
   Expects(i < columns());
   return header_[i];
-}
-
-void src_data::move_append(dataset_t src, dataset_t dst)
-{
-  Expects(src != npos);
-  Expects(dst != npos);
-  Expects(src != dst);
-
-  if (datasets_[dst].empty())
-    std::swap(datasets_[src], datasets_[dst]);
-  else
-  {
-    std::move(begin(src), end(src), std::back_inserter(datasets_[dst]));
-    datasets_[src].clear();
-  }
-
-  Ensures(datasets_[src].empty());
-}
-
-void src_data::move_append(dataset_t src, dataset_t dst, std::size_t n)
-{
-  Expects(src != npos);
-  Expects(dst != npos);
-  Expects(src != dst);
-  Expects(n < size(src));
-
-  const auto from_src(std::next(end(src), -static_cast<std::ptrdiff_t>(n)));
-
-  std::move(from_src, end(src), std::back_inserter(datasets_[dst]));
-
-  datasets_[src].erase(from_src, end(src));
 }
 
 ///
 /// \return number of columns of the dataset
 ///
 /// \note
-/// `src_data` supports just one output for every instance, so, if the dataset
+/// `dataframe` supports just one output for every instance, so, if the dataset
 /// is not empty: `variables() + 1 == columns()`.
 ///
-unsigned src_data::columns() const
+unsigned dataframe::columns() const
 {
-  Expects(datasets_[active_dataset()].empty() ||
-          variables() + 1 == header_.size());
+  Expects(dataset_.empty() || variables() + 1 == header_.size());
 
   return static_cast<unsigned>(header_.size());
 }
@@ -260,7 +183,7 @@ unsigned src_data::columns() const
 /// \return number of classes of the problem (`== 0` for a symbolic regression
 ///         problem, `> 1` for a classification problem)
 ///
-class_t src_data::classes() const
+class_t dataframe::classes() const
 {
   return static_cast<class_t>(classes_map_.size());
 }
@@ -268,15 +191,14 @@ class_t src_data::classes() const
 ///
 /// \return input vector dimension
 ///
-/// \note data class supports just one output for every instance, so, if
-/// the dataset is not empty, `variables() + 1 == columns()`.
+/// \note data class supports just one output for every instance, so, if the
+///       dataset is not empty, `variables() + 1 == columns()`.
 ///
-unsigned src_data::variables() const
+unsigned dataframe::variables() const
 {
-  const auto n(datasets_[active_dataset()].empty()
-               ? 0u : static_cast<unsigned>(begin()->input.size()));
+  const auto n(empty() ? 0u : static_cast<unsigned>(begin()->input.size()));
 
-  Ensures(datasets_[active_dataset()].empty() || n + 1 == header_.size());
+  Ensures(empty() || n + 1 == header_.size());
   return n;
 }
 
@@ -285,16 +207,16 @@ unsigned src_data::variables() const
 ///
 /// \param[in] e the value of the element to append
 ///
-void src_data::push_back(const example &e)
+void dataframe::push_back(const example &e)
 {
-  datasets_[active_dataset()].push_back(e);
+  dataset_.push_back(e);
 }
 
 ///
 /// \param[in] label name of a class of the learning collection
 /// \return          the (numerical) tag associated with class `label`
 ///
-class_t src_data::encode(const std::string &label)
+class_t dataframe::encode(const std::string &label)
 {
   if (classes_map_.find(label) == classes_map_.end())
   {
@@ -306,7 +228,7 @@ class_t src_data::encode(const std::string &label)
 }
 
 ///
-/// \param[in] i the encoded (src_data::encode()) value of a class
+/// \param[in] i the encoded (dataframe::encode()) value of a class
 /// \return      the name of the class encoded with the `unsigned i` (or an
 ///              empty string if such class cannot be find)
 ///
@@ -314,7 +236,7 @@ class_t src_data::encode(const std::string &label)
 /// Boost Bitmap could be used to speed up the search in `classes_map_`, but
 /// to date speed isn't an issue.
 ///
-std::string src_data::class_name(class_t i) const
+std::string dataframe::class_name(class_t i) const
 {
   for (const auto &p : classes_map_)
     if (p.second == i)
@@ -330,7 +252,7 @@ std::string src_data::class_name(class_t i) const
 /// \param[in] c1 a category
 /// \param[in] c2 a category
 ///
-void src_data::swap_category(category_t c1, category_t c2)
+void dataframe::swap_category(category_t c1, category_t c2)
 {
   const auto n_col(columns());
 
@@ -358,8 +280,8 @@ void src_data::swap_category(category_t c1, category_t c2)
 /// When `add_label` is `true` the function can have side-effects (changing
 /// the set of labels associated to a category).
 ///
-src_data::example src_data::to_example(const std::vector<std::string> &v,
-                                       bool classification, bool add_label)
+dataframe::example dataframe::to_example(const std::vector<std::string> &v,
+                                         bool classification, bool add_label)
 {
   Expects(v.size());
 
@@ -390,9 +312,6 @@ src_data::example src_data::to_example(const std::vector<std::string> &v,
 
     ++index;
   }
-
-  // The output class/value can be empty only for the test-set.
-  Ensures(active_dataset() == test || ret.output.has_value());
 
   return ret;
 }
@@ -431,7 +350,7 @@ src_data::example src_data::to_example(const std::vector<std::string> &v,
 ///
 /// \note Test set examples can have an empty output value.
 ///
-std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
 {
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
@@ -598,7 +517,7 @@ std::size_t src_data::load_xrff(const std::string &filename, filter_hook_t ft)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t src_data::load_csv(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::load_csv(const std::string &filename, filter_hook_t ft)
 {
   std::ifstream from(filename);
   if (!from)
@@ -678,7 +597,7 @@ std::size_t src_data::load_csv(const std::string &filename, filter_hook_t ft)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t src_data::load(const std::string &f, filter_hook_t ft)
+std::size_t dataframe::load(const std::string &f, filter_hook_t ft)
 {
   auto ends_with = [](const std::string &name, const std::string &ext)
   {
@@ -694,15 +613,27 @@ std::size_t src_data::load(const std::string &f, filter_hook_t ft)
 ///
 /// \return `true` if the current dataset is empty
 ///
-bool src_data::operator!() const
+bool dataframe::operator!() const
 {
   return size() == 0;
 }
 
 ///
+/// Removes specified elements from the dataframe.
+///
+/// \param[in] first first element of the range
+/// \param[in] last  end of the range
+/// \return          iterator following the last removed element
+///
+dataframe::iterator dataframe::erase(iterator first, iterator last)
+{
+  return dataset_.erase(first, last);
+}
+
+///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool src_data::debug() const
+bool dataframe::debug() const
 {
   const auto cl_size(classes());
   // If this is a classification problem then there should be at least two
@@ -710,20 +641,19 @@ bool src_data::debug() const
   if (cl_size == 1)
     return false;
 
-  for (const auto &d : datasets_)
-    if (!d.empty() && &d != &datasets_[test])
+  if (!empty())
+  {
+    const auto in_size(begin()->input.size());
+
+    for (const auto &e : *this)
     {
-      const auto in_size(d.begin()->input.size());
+      if (e.input.size() != in_size)
+        return false;
 
-      for (const auto &e : d)
-      {
-        if (e.input.size() != in_size)
-          return false;
-
-        if (cl_size && e.tag() >= cl_size)
-          return false;
-      }
+      if (cl_size && e.tag() >= cl_size)
+        return false;
     }
+  }
 
   return true;
 }
@@ -733,7 +663,7 @@ bool src_data::debug() const
 /// \return      the internel id of the weka-domain `n` (`d_void` if it's
 ///              unknown or not managed)
 ///
-domain_t src_data::from_weka(const std::string &n)
+domain_t dataframe::from_weka(const std::string &n)
 {
   static const std::map<const std::string, domain_t> map(
   {

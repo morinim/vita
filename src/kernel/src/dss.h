@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,7 @@
 #define      VITA_DSS_H
 
 #include "kernel/validation_strategy.h"
-#include "kernel/src/data.h"
+#include "kernel/src/problem.h"
 
 namespace vita
 {
@@ -34,17 +34,19 @@ namespace vita
 class dss : public validation_strategy
 {
 public:
-  explicit dss(src_data &, unsigned gap);
+  explicit dss(src_problem &);
 
   void init() override;
   bool shake(unsigned) override;
 
 private:
-  std::pair<uintmax_t,uintmax_t> average_age_difficulty(data::dataset_t) const;
-  void reset_age_difficulty(data::dataset_t);
+  std::pair<uintmax_t,uintmax_t> average_age_difficulty(dataframe &) const;
+
+  void reset_age_difficulty(dataframe &);
   void shake_impl();
 
-  src_data &dat_;
+  dataframe &training_;
+  dataframe &validation_;
   unsigned gap_;
 };
 

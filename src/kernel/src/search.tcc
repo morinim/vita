@@ -46,9 +46,18 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 /// \return a reference to the available data
 ///
 template<class T, template<class> class ES>
-src_data &src_search<T, ES>::data() const
+dataframe &src_search<T, ES>::data() const
 {
-  return *static_cast<src_problem &>(this->prob_).data();
+  return prob().data();
+}
+
+///
+/// \return a reference to the current problem
+///
+template<class T, template<class> class ES>
+src_problem &src_search<T, ES>::prob() const
+{
+  return static_cast<src_problem &>(this->prob_);
 }
 
 ///
@@ -88,8 +97,8 @@ model_measurements src_search<T, ES>::calculate_metrics_spec(
 {
   auto ret(s.best.score);
 
-  if (metrics & metric_flags::accuracy
-      || this->prob_.env.threshold.accuracy > 0.0)
+  if ((metrics & metric_flags::accuracy)
+      || prob().env.threshold.accuracy > 0.0)
   {
     const auto model(this->lambdify(s.best.solution));
     ret.accuracy = model->measure(accuracy_metric<T>(), data());
@@ -125,18 +134,17 @@ void src_search<T, ES>::arl(const U &base)
   if (!isfinite(base_fit))
     return;  // we need a finite fitness to search for an improvement
 
-  auto &prob(this->prob_);
-
   std::ofstream log_file;
-  if (!prob.env.stat.arl_file.empty())
+  if (!prob().env.stat.arl_file.empty())
   {
-    const auto filename(merge_path(prob.env.stat.dir, prob.env.stat.arl_file));
+    const auto filename(merge_path(prob().env.stat.dir,
+                                   prob().env.stat.arl_file));
     log_file.open(filename, std::ios_base::app);
 
     if (log_file.is_open())  // logs ADTs
     {
-      for (const auto &s : prob.sset.adts())
-        log_file << s->name() << ' ' << prob.sset.weight(*s) << '\n';
+      for (const auto &s : prob().sset.adts())
+        log_file << s->name() << ' ' << prob().sset.weight(*s) << '\n';
       log_file << '\n';
     }
   }
@@ -155,7 +163,8 @@ void src_search<T, ES>::arl(const U &base)
     // The idea is to see how the individual (base) would perform without
     // (`base.destroy_block`) the current block.
     // Useful blocks have positive `delta` values.
-    const auto delta(base_fit - eval(base.destroy_block(l.index, prob.sset)));
+    const auto delta(base_fit
+                     - eval(base.destroy_block(l.index, prob().sset)));
 
     using std::isfinite;
     using std::abs;
@@ -168,7 +177,7 @@ void src_search<T, ES>::arl(const U &base)
       std::unique_ptr<symbol> p;
       if (adf_args)
       {
-        auto generalized(candidate_block.generalize(adf_args, prob.sset));
+        auto generalized(candidate_block.generalize(adf_args, prob().sset));
         cvect categories(generalized.second.size());
 
         for (const auto &replaced : generalized.second)
@@ -185,7 +194,7 @@ void src_search<T, ES>::arl(const U &base)
                  << "  DF: " << delta << ")\n" << candidate_block << '\n';
       }
 
-      prob.sset.insert(std::move(p));
+      prob().sset.insert(std::move(p));
     }
   }
 }
@@ -239,7 +248,7 @@ void src_search<T, ES>::tune_parameters()
   // strategy-specific values.
   const environment dflt(ES<T>::shape(environment(initialization::standard)));
 
-  environment &env(this->prob_.env);
+  environment &env(prob().env);
 
   // Contains user-specified parameters that will be partly changed by the
   // `search::tune_parameters` call.
@@ -323,21 +332,20 @@ void src_search<T, ES>::tune_parameters()
 template<class T, template<class> class ES>
 void src_search<T, ES>::init()
 {
-  const environment &env(this->prob_.env);
+  const environment &env(prob().env);
 
   if (env.dss.value_or(0) > 0)
-    this->template set_validator<dss>(data(), *env.dss);
+    this->template set_validator<dss>(prob());
   else if (env.validation_percentage)
-    this->template set_validator<holdout_validation>(
-      data(), env.validation_percentage);
+    this->template set_validator<holdout_validation>(prob());
 }
 
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  if (this->prob_.env.arl == trilean::yes)
+  if (prob().env.arl == trilean::yes)
   {
-    this->prob_.sset.scale_adf_weights();
+    prob().sset.scale_adf_weights();
     arl(s->best.solution);
   }
 }
@@ -348,8 +356,8 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(data().has(data::validation) ? "Validation "
-                                                   : "Training ");
+  const std::string s(prob().has(problem::validation) ? "Validation "
+                                                      : "Training ");
 
   vitaINFO << s << "fitness: " << m.fitness;
 
@@ -376,7 +384,7 @@ void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
 {
   Expects(d);
 
-  const auto &stat(this->prob_.env.stat);
+  const auto &stat(prob().env.stat);
 
   if (!stat.summary_file.empty())
   {
@@ -390,10 +398,10 @@ void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
   }
 
   // Test set results logging.
-  if (!stat.test_file.empty() && data().size(data::test))
+  if (!stat.test_file.empty() && prob().has(problem::test))
   {
-    const auto original_dataset(data().active_dataset());
-    data().select(data::test);
+    const auto original_dataset(prob().active_dataset());
+    prob().select(problem::test);
 
     const auto lambda(this->lambdify(run_sum.best.solution));
 
@@ -401,7 +409,7 @@ void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
     for (const auto &example : data())
       tf << lambda->name((*lambda)(example)) << '\n';
 
-    data().select(original_dataset);
+    prob().select(original_dataset);
   }
 }
 

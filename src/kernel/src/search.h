@@ -66,7 +66,8 @@ protected:
 
 private:
   // *** Private support methods ***
-  src_data &data() const;
+  dataframe &data() const;
+  src_problem &prob() const;
   bool stop_condition(const summary<T> &) const;
 
   // Template methods / customization points for search::run().

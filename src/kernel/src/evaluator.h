@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,10 +31,10 @@ template<class T>
 class src_evaluator : public evaluator<T>
 {
 public:
-  explicit src_evaluator(src_data &);
+  explicit src_evaluator(dataframe &);
 
 protected:
-  class src_data *dat_;
+  class dataframe *dat_;
 };
 
 ///
@@ -48,7 +48,7 @@ template<class T>
 class sum_of_errors_evaluator : public src_evaluator<T>
 {
 public:
-  explicit sum_of_errors_evaluator(src_data &d) : src_evaluator<T>(d) {}
+  explicit sum_of_errors_evaluator(dataframe &d) : src_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
@@ -56,7 +56,7 @@ public:
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
-                       src_data::example &, int *const) = 0;
+                       dataframe::example &, int *) = 0;
 };
 
 ///
@@ -80,11 +80,11 @@ template<class T>
 class mae_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit mae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mae_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
-               int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
+               int *) override;
 };
 
 ///
@@ -110,11 +110,11 @@ template<class T>
 class rmae_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit rmae_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit rmae_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
-               int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
+               int *) override;
 };
 
 ///
@@ -139,11 +139,11 @@ template<class T>
 class mse_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit mse_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mse_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
-               int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
+               int *) override;
 };
 
 ///
@@ -157,11 +157,11 @@ template<class T>
 class count_evaluator : public sum_of_errors_evaluator<T>
 {
 public:
-  explicit count_evaluator(src_data &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit count_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, src_data::example &,
-               int *const) override;
+  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
+               int *) override;
 };
 
 ///
@@ -172,7 +172,7 @@ template<class T>
 class classification_evaluator : public src_evaluator<T>
 {
 public:
-  explicit classification_evaluator(src_data &d) : src_evaluator<T>(d) {}
+  explicit classification_evaluator(dataframe &d) : src_evaluator<T>(d) {}
 };
 
 ///
@@ -192,7 +192,7 @@ template<class T>
 class dyn_slot_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit dyn_slot_evaluator(src_data &, unsigned = 10);
+  explicit dyn_slot_evaluator(dataframe &, unsigned = 10);
 
   fitness_t operator()(const T &) override;
   std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
@@ -219,7 +219,7 @@ template<class T>
 class gaussian_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit gaussian_evaluator(src_data &d) : classification_evaluator<T>(d) {}
+  explicit gaussian_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
   std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
@@ -232,7 +232,7 @@ template<class T>
 class binary_evaluator : public classification_evaluator<T>
 {
 public:
-  explicit binary_evaluator(src_data &d) : classification_evaluator<T>(d) {}
+  explicit binary_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
   std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;

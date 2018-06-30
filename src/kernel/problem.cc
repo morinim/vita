@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,23 +15,48 @@
 namespace vita
 {
 ///
-/// A new uninitialized problem.
+/// A new problem.
 ///
 /// \param[in] flag should the environment be initialized with common / default
-///                 values?
+///                 values? (default is `false`)
 ///
-problem::problem(initialization flag) : env(flag)
+problem::problem(initialization flag) : env(flag), sset(),
+                                        active_dataset_(training)
 {
 }
 
 ///
-/// \return an access point for the data
+/// Activates the dataset/simulation we want to operate on.
 ///
-/// \note The default value is `nullptr`: not every problem is dataset-based.
+/// \param[in] d the active dataset
 ///
-vita::data *problem::data()
+void problem::select(dataset_t d)
 {
-  return nullptr;
+  active_dataset_ = d;
+
+  select_impl(d);
+}
+
+///
+/// \return the type (training, validation, test) of the active
+///         dataset / simulation
+///
+problem::dataset_t problem::active_dataset() const
+{
+  return active_dataset_;
+}
+
+///
+/// Asks if a dataset/simulation of a specific kind is available.
+///
+/// \param[in] d dataset/simulation type
+/// \return      `true` if dataset/simulation of type `d` is available
+///
+/// A training dataset/simulation should always be available.
+///
+bool problem::has(dataset_t d) const
+{
+  return d == training;
 }
 
 ///

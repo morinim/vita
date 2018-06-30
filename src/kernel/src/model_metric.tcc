@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,7 @@
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
-                                      const src_data &d) const
+                                      const dataframe &d) const
 {
   Expects(!d.classes());
   Expects(d.begin() != d.end());
@@ -52,7 +52,7 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
 ///
 template<class T>
 double accuracy_metric<T>::operator()(const class_lambda_f<T> *l,
-                                      const src_data &d) const
+                                      const dataframe &d) const
 {
   Expects(d.classes());
   Expects(d.begin() != d.end());

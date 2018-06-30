@@ -10,16 +10,16 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_SRC_DATA_H)
-#define      VITA_SRC_DATA_H
+#if !defined(VITA_DATAFRAME_H)
+#define      VITA_DATAFRAME_H
 
 #include <functional>
 #include <map>
 #include <string>
 #include <vector>
 
-#include "kernel/data.h"
 #include "kernel/distribution.h"
+#include "kernel/problem.h"
 #include "kernel/src/category_set.h"
 #include "utility/any.h"
 
@@ -29,15 +29,19 @@ namespace vita
 using class_t = unsigned;
 
 ///
-/// Specialization of vita::data for symbolic regression and classification
-/// tasks.
+/// A 2-dimensional labeled data structure with columns of potentially
+/// different types.
 ///
-/// src_data is a forward iterable collection of "monomorphic" examples (all
-/// samples have the same type and arity).
+/// You can think of it like a spreadsheet or SQL table.
 ///
-/// It can read XRFF (http://weka.wikispaces.com/XRFF) and CSV files.
+/// Dataframe:
+/// - is modelled on the corresponding *pandas* object;
+/// - is a forward iterable collection of "monomorphic" examples (all samples
+///   have the same type and arity);
+/// - accepts many different kinds of input: XRFF
+///   (http://weka.wikispaces.com/XRFF) and CSV files.
 ///
-class src_data : public data
+class dataframe
 {
 public:
   // ---- Structures ----
@@ -46,10 +50,11 @@ public:
 
   // ---- Aliases ----
   using examples_t = std::vector<example>;
+  using value_type = typename examples_t::value_type;
 
   /// Raw input record.
   /// The ETL chain is:
-  /// > FILE -> record_t -> example --(vita::push_back)--> vita::src_data
+  /// > FILE -> record_t -> example --(vita::push_back)--> vita::dataframe
   using record_t = std::vector<std::string>;
 
   /// A filter and transform function (returns `true` for records that should
@@ -57,8 +62,8 @@ public:
   using filter_hook_t = std::function<bool (record_t &)>;
 
   // ---- Constructors ----
-  src_data();
-  explicit src_data(const std::string &, filter_hook_t = nullptr);
+  dataframe();
+  explicit dataframe(const std::string &, filter_hook_t = nullptr);
 
   // ---- Iterators ----
   using iterator = typename examples_t::iterator;
@@ -68,10 +73,10 @@ public:
   const_iterator begin() const;
   iterator end();
   const_iterator end() const;
-  iterator begin(dataset_t);
-  const_iterator begin(dataset_t) const;
-  iterator end(dataset_t);
-  const_iterator end(dataset_t) const;
+
+  // ---- Modifiers ----
+  void clear();
+  iterator erase(iterator, iterator);
 
   // ---- Convenience ----
   std::size_t load(const std::string &, filter_hook_t = nullptr);
@@ -79,19 +84,12 @@ public:
 
   void push_back(const example &);
 
-  void clear();
-
-  void move_append(dataset_t, dataset_t, std::size_t);
-  void move_append(dataset_t, dataset_t);
-
   const category_set &categories() const;
 
   const column &get_column(unsigned) const;
 
   std::size_t size() const;
-  std::size_t size(dataset_t) const;
-
-  bool has(dataset_t) const override;
+  bool empty() const;
 
   unsigned classes() const;
   unsigned columns() const;
@@ -113,7 +111,6 @@ private:
 
   void swap_category(category_t, category_t);
 
-private:
   // Integer are simpler to manage than textual data, so, when appropriate,
   // input strings are converted into integers by these maps (and the `encode`
   // static function).
@@ -126,21 +123,8 @@ private:
   // What are the categories we are dealing with?
   category_set categories_;
 
-  // Data are stored in three datasets:
-  // * a training set used directly for learning;
-  // * a validation set for controlling overfitting and measuring the
-  //   performance of an individual;
-  // * a test set for a forecast of how well an individual will do in the
-  //   real world.
-  // We don't validate on the training data because that would overfit the
-  // model. We don't stop at the validation step because we've iteratively
-  // been adjusting things to get a winner in the validation step. So we need
-  // an independent test to have an idea of how well we'll do outside the
-  // current arena.
-  // The user provides a dataset and (optionally) a test set. Training set
-  // and validation set are automatically created from the dataset
-  // (see environment::validation_ratio).
-  std::vector<examples_t> datasets_;
+  // Available data.
+  examples_t dataset_;
 };
 
 ///
@@ -156,7 +140,7 @@ private:
 /// Supervised Learning in Genetic Programming" - Chris Gathercole, Peter
 /// Ross).
 ///
-struct src_data::example
+struct dataframe::example
 {
   std::vector<any> input = {};
   any             output = {};
@@ -171,7 +155,7 @@ struct src_data::example
 };
 
 template<class T>
-T src_data::example::cast_output() const
+T dataframe::example::cast_output() const
 {
   if (auto *v = any_cast<double>(&output))
     return static_cast<T>(*v);
@@ -188,7 +172,7 @@ T src_data::example::cast_output() const
 ///
 /// Informations about a "column" (feature) of the dataset.
 ///
-struct src_data::column
+struct dataframe::column
 {
   std::string       name;
   category_t category_id;

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +12,6 @@
 
 #include <cstdlib>
 
-#include "kernel/data.h"
 #include "kernel/i_mep.h"
 #include "kernel/lambda_f.h"
 #include "kernel/team.h"
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_SUITE(lambda)
 template<template<class> class L, class T, unsigned P>
 struct build
 {
-  L<T> operator()(const T &prg, vita::src_data &d) const
+  L<T> operator()(const T &prg, vita::dataframe &d) const
   {
     return L<T>(prg, d, P);
   }
@@ -50,7 +49,7 @@ struct build
 template<template<class> class L, class T>
 struct build<L, T, 0>
 {
-  L<T> operator()(const T &prg, vita::src_data &d) const
+  L<T> operator()(const T &prg, vita::dataframe &d) const
   {
     return L<T>(prg, d);
   }
@@ -59,7 +58,7 @@ struct build<L, T, 0>
 template<class T>
 struct build<reg_model, T, 0>
 {
-  reg_model<T> operator()(const T &prg, vita::src_data &) const
+  reg_model<T> operator()(const T &prg, vita::dataframe &) const
   {
     return reg_model<T>(prg);
   }
@@ -73,17 +72,17 @@ void test_serialization(vita::src_problem &pr)
   for (unsigned k(0); k < 256; ++k)
   {
     const T ind(pr);
-    const auto lambda1(build<L, T, P>()(ind, *pr.data()));
+    const auto lambda1(build<L, T, P>()(ind, pr.data()));
 
     std::stringstream ss;
 
     BOOST_TEST(lambda1.save(ss));
     const T ind2(pr);
-    auto lambda2(build<L, T, P>()(ind2, *pr.data()));
+    auto lambda2(build<L, T, P>()(ind2, pr.data()));
     BOOST_TEST(lambda2.load(ss, pr));
     BOOST_TEST(lambda2.debug());
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1.name(lambda1(e)));
       const auto out2(lambda2.name(lambda2(e)));
@@ -101,12 +100,12 @@ void test_team_of_one(vita::src_problem &pr)
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep ind(pr);
-    const auto li(build<L, i_mep, P>()(ind, *pr.data()));
+    const auto li(build<L, i_mep, P>()(ind, pr.data()));
 
     const team<i_mep> t{{ind}};
-    const auto lt(build<L, team<i_mep>, P>()(t, *pr.data()));
+    const auto lt(build<L, team<i_mep>, P>()(t, pr.data()));
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out_i(li(e)), out_t(lt(e));
 
@@ -143,7 +142,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
     const team<i_mep> t{{ind, ind, ind, ind}};
     const reg_model<team<i_mep>> lt(t);
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out_i(li(e)), out_t(lt(e));
 
@@ -175,7 +174,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
     const team<i_mep> t{{i1, i2, i3, i4}};
     const reg_model<team<i_mep>> lambda_team(t);
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1(e));
       const auto out2(lambda2(e));
@@ -238,7 +237,7 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
     BOOST_TEST(lambda2.load(ss, pr));
     BOOST_TEST(lambda2.debug());
 
-    for (const auto &e : *pr.data())
+    for (const auto &e : pr.data())
     {
       const auto out1(lambda1(e));
       const auto out2(lambda2(e));
@@ -262,15 +261,15 @@ void test_team(vita::src_problem &pr)
     const i_mep ind2(pr);
     const i_mep ind3(pr);
 
-    const auto lambda1(build<L, i_mep, P>()(ind1, *pr.data()));
-    const auto lambda2(build<L, i_mep, P>()(ind2, *pr.data()));
-    const auto lambda3(build<L, i_mep, P>()(ind3, *pr.data()));
+    const auto lambda1(build<L, i_mep, P>()(ind1, pr.data()));
+    const auto lambda2(build<L, i_mep, P>()(ind2, pr.data()));
+    const auto lambda3(build<L, i_mep, P>()(ind3, pr.data()));
 
     const team<i_mep> t{{ind1, ind2, ind3}};
     const auto ts(t.individuals());
-    const auto lambda_t(build<L, team<i_mep>, P>()(t, *pr.data()));
+    const auto lambda_t(build<L, team<i_mep>, P>()(t, pr.data()));
 
-    for (const auto &example : *pr.data())
+    for (const auto &example : pr.data())
     {
       const std::vector<vita::any> out =
       {
