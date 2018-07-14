@@ -560,7 +560,7 @@ template<class T>
 bool isnan(const basic_fitness_t<T> &f)
 {
   return std::any_of(std::begin(f), std::end(f),
-                     static_cast<bool (*)(T)>(std::isnan));
+                     [](T v) { return std::isnan(v); });
 }
 
 ///
