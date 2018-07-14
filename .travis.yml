@@ -22,7 +22,6 @@ addons:
     packages:
       - clang-5.0
       - g++-7
-      - libboost-dev
 
 
 install:
@@ -32,7 +31,9 @@ install:
 
 before_script:
 - cd src
+- mkdir -p build
+- cd build/
 
 
 script:
-- make vita
+- cmake ..
