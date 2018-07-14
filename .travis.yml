@@ -33,7 +33,8 @@ before_script:
 - cd src
 - mkdir -p build
 - cd build/
+- cmake ..
 
 
 script:
-- cmake ..
+- make
