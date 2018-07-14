@@ -3,7 +3,7 @@
  *  \file test_primitive_i.cc
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013-2016 EOS di Manlio Morini.
+ *  Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,18 +17,15 @@
 #include "kernel/i_mep.h"
 #include "kernel/random.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE primitive
-#include "boost/test/unit_test.hpp"
+#include "test/fixture4.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture4.h"
-#endif
+TEST_SUITE("PRIMITIVE_I")
+{
 
-BOOST_FIXTURE_TEST_SUITE(primitive_i, F_FACTORY4)
-
-BOOST_AUTO_TEST_CASE(ADD)
+TEST_CASE_FIXTURE(fixture4, "i_add")
 {
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
@@ -39,29 +36,31 @@ BOOST_AUTO_TEST_CASE(ADD)
                   {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i1).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
-                        "\n" << i1);
+  INFO(i1);
+  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
 
-  BOOST_TEST_CHECKPOINT("ADD(X,Y) == X+Y");
+  // ADD(X,Y) == X+Y"
   const i_mep i2({
                    {{i_add, {1, 2}}},  // [0] ADD 1,2
                    {{    y,   null}},  // [1] Y
                    {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i2).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(y->eval(nullptr)) +
-                        any_cast<int>(x->eval(nullptr)), "\n" << i2);
+  INFO(i2);
+  CHECK(any_cast<int>(ret)
+        == any_cast<int>(y->eval(nullptr)) + any_cast<int>(x->eval(nullptr)));
 
-  BOOST_TEST_CHECKPOINT("ADD(X,-X) == 0");
+  // ADD(X,-X) == 0
   const i_mep i3({
                    {{i_add, {1, 2}}},  // [0] ADD 1,2
                    {{    x,   null}},  // [1] X
                    {{neg_x,   null}}   // [2] -X
                  });
   ret = i_interp(&i3).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i3);
+  INFO(i3);
+  CHECK(any_cast<int>(ret) == 0);
 
-  BOOST_TEST_CHECKPOINT("ADD(X,Y) == ADD(Y,X)");
+  // ADD(X,Y) == ADD(Y,X)
   const i_mep i4({
                    {{i_sub, {1, 2}}},  // [0] SUB 1,2
                    {{i_add, {3, 4}}},  // [1] ADD 3,4
@@ -70,77 +69,82 @@ BOOST_AUTO_TEST_CASE(ADD)
                    {{    y,   null}}  // [4] Y
                  });
   ret = i_interp(&i4).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i4);
+  INFO(i4);
+  CHECK(any_cast<int>(ret) == 0);
 }
 
-BOOST_AUTO_TEST_CASE(DIV)
+TEST_CASE_FIXTURE(fixture4, "i_div")
 {
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
 
-  BOOST_TEST_CHECKPOINT("DIV(X,X) == 1");
+  // DIV(X,X) == 1
   const i_mep i1({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i1).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i1);
+  INFO(i1);
+  CHECK(any_cast<int>(ret) == 1);
 
-  BOOST_TEST_CHECKPOINT("DIV(X,1) == X");
+  // DIV(X,1) == X
   const i_mep i2({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
                  });
   ret = i_interp(&i2).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
-                        "\n" << i2);
+  INFO(i2);
+  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
 
-  BOOST_TEST_CHECKPOINT("DIV(-X,X) == -1");
+  // DIV(-X,X) == -1
   const i_mep i3({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{neg_x,   null}},  // [1] -X
                    {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i3).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == -1, "\n" << i3);
+  INFO(i3);
+  CHECK(any_cast<int>(ret) == -1);
 
-  BOOST_TEST_CHECKPOINT("DIV(X,0) == X");
+  // DIV(X,0) == X
   const i_mep i4({
                    {{i_div, {1, 2}}},  // [0] DIV 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
   ret = i_interp(&i4).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
-                        "\n" << i4);
+  INFO(i4);
+  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
 }
 
-BOOST_AUTO_TEST_CASE(IFE)
+TEST_CASE_FIXTURE(fixture4, "i_ife")
 {
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
 
-  BOOST_TEST_CHECKPOINT("IFE(0,0,1,0) == 1");
+  // IFE(0,0,1,0) == 1
   const i_mep i1({
                    {{i_ife, {1, 1, 2, 1}}},  // [0] IFE 1,1,2,1
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
                  });
   ret = i_interp(&i1).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 1, "\n" << i1);
+  INFO(i1);
+  CHECK(any_cast<int>(ret) == 1);
 
-  BOOST_TEST_CHECKPOINT("IFE(0,1,1,0) == 0");
+  // IFE(0,1,1,0) == 0
   const i_mep i2({
                    {{i_ife, {1, 2, 2, 1}}},  // [0] IFE 1,2,2,1
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
                  });
   ret = i_interp(&i2).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i2);
+  INFO(i2);
+  CHECK(any_cast<int>(ret) == 0);
 
-  BOOST_TEST_CHECKPOINT("IFE(Z,X,1,0) == 0");
+  // IFE(Z,X,1,0) == 0
   const i_mep i3({
                    {{i_ife, {1, 2, 3, 4}}},  // [0] IFE Z, X, 1, 0
                    {{    z,         null}},  // [1] Z
@@ -150,53 +154,51 @@ BOOST_AUTO_TEST_CASE(IFE)
                  });
   static_cast<Z *>(z)->val = 0;
   ret = i_interp(&i3).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i3);
+  INFO(i3);
+  CHECK(any_cast<int>(ret) == 0);
 
-  BOOST_TEST_CHECKPOINT("IFE SAME COMPARISON-TERM PENALTY");
-  auto penalty(i_interp(&i1).penalty());
-  BOOST_REQUIRE_GT(penalty, 0);
+  // IFE SAME TERM COMPARISON PENALTY
+  CHECK(i_interp(&i1).penalty() > 0);
 
-  BOOST_TEST_CHECKPOINT("IFE NO PENALTY");
-  penalty = i_interp(&i2).penalty();
-  BOOST_REQUIRE_EQUAL(penalty, 0);
-  penalty = i_interp(&i3).penalty();
-  BOOST_REQUIRE_EQUAL(penalty, 0);
+  // IFE NO PENALTY
+  CHECK(i_interp(&i2).penalty() == doctest::Approx(0.0));
+  CHECK(i_interp(&i3).penalty() == doctest::Approx(0.0));
 
-  BOOST_TEST_CHECKPOINT("IFE SAME RESULT PENALTY");
+  // IFE SAME RESULT PENALTY
   const i_mep i4({
                    {{i_ife, {1, 2, 2, 2}}},  // [0] IFE 1,2,2,2
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
                  });
-  penalty = i_interp(&i4).penalty();
-  BOOST_REQUIRE_GT(penalty, 0);
+  CHECK(i_interp(&i4).penalty() > 0);
 }
 
-BOOST_AUTO_TEST_CASE(MUL)
+TEST_CASE_FIXTURE(fixture4, "i_mul")
 {
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
 
-  BOOST_TEST_CHECKPOINT("MUL(X,0) == 0");
+  // MUL(X,0) == 0
   const i_mep i1({
                    {{i_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
   ret = i_interp(&i1).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i1);
+  INFO(i1);
+  CHECK(any_cast<int>(ret) == 0);
 
-  BOOST_TEST_CHECKPOINT("MUL(X,1) == X");
+  // MUL(X,1) == X
   const i_mep i2({
                    {{i_mul, {1, 2}}},  // [0] MUL 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
                  });
   ret = i_interp(&i2).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
-                        "\n" << i2);
+  INFO(i2);
+  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
 
-  BOOST_TEST_CHECKPOINT("MUL(X,2) == ADD(X,X)");
+  // MUL(X,2) == ADD(X,X)
   const i_mep i3({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{i_add, {3, 3}}},  // [1] ADD 3, 3
@@ -205,34 +207,36 @@ BOOST_AUTO_TEST_CASE(MUL)
                    {{   c2,   null}}   // [4] 2
                  });
   ret = i_interp(&i3).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i3);
+  INFO(i3);
+  CHECK(any_cast<int>(ret) == 0);
 }
 
-BOOST_AUTO_TEST_CASE(SUB)
+TEST_CASE_FIXTURE(fixture4, "i_sub")
 {
   using namespace vita;
   using i_interp = vita::interpreter<vita::i_mep>;
 
-  BOOST_TEST_CHECKPOINT("SUB(X,-X) == 0");
+  // SUB(X,-X) == 0
   const i_mep i1({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
   ret = i_interp(&i1).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == 0, "\n" << i1);
+  INFO(i1);
+  CHECK(any_cast<int>(ret) == 0);
 
-  BOOST_TEST_CHECKPOINT("SUB(X,0) == X");
+  // SUB(X,0) == X
   const i_mep i2({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
   ret = i_interp(&i2).run();
-  BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)),
-                        "\n" << i2);
+  INFO(i2);
+  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
 
-  BOOST_TEST_CHECKPOINT("SUB(Z,X) == Z-X");
+  // SUB(Z,X) == Z-X
   const i_mep i3({
                    {{i_sub, {1, 2}}},  // [0] SUB 1, 2
                    {{    z,   null}},  // [1] Z
@@ -242,10 +246,10 @@ BOOST_AUTO_TEST_CASE(SUB)
   {
     static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
     ret = i_interp(&i3).run();
-    BOOST_REQUIRE_MESSAGE(any_cast<int>(ret) ==
-                          static_cast<Z *>(z)->val -
-                          any_cast<int>(x->eval(nullptr)), "\n" << i3);
+    INFO(i3);
+    CHECK(any_cast<int>(ret)
+          == static_cast<Z *>(z)->val - any_cast<int>(x->eval(nullptr)));
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("PRIMITIVE_I")

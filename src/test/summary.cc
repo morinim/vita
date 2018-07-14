@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,18 +15,15 @@
 #include "kernel/evolution.h"
 #include "kernel/i_mep.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE summary
-#include "boost/test/unit_test.hpp"
+#include "test/fixture1.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture1.h"
-#endif
+TEST_SUITE("SUMMARY")
+{
 
-BOOST_FIXTURE_TEST_SUITE(summary, F_FACTORY1)
-
-BOOST_AUTO_TEST_CASE(Serialization)
+TEST_CASE_FIXTURE(fixture1, "Serialization")
 {
   using vita::random::between;
 
@@ -50,21 +47,22 @@ BOOST_AUTO_TEST_CASE(Serialization)
     }
 
     std::stringstream ss;
-    BOOST_REQUIRE(before.save(ss));
+    CHECK(before.save(ss));
 
     vita::summary<vita::i_mep> after;
-    BOOST_REQUIRE(after.load(ss, prob));
+    CHECK(after.load(ss, prob));
 
-    BOOST_CHECK_EQUAL(before.elapsed.count(), after.elapsed.count());
-    BOOST_CHECK_EQUAL(before.mutations, after.mutations);
-    BOOST_CHECK_EQUAL(before.crossovers, after.crossovers);
-    BOOST_CHECK_EQUAL(before.gen, after.gen);
-    BOOST_CHECK_EQUAL(before.last_imp, after.last_imp);
+    CHECK(before.elapsed.count() == after.elapsed.count());
+    CHECK(before.mutations == after.mutations);
+    CHECK(before.crossovers == after.crossovers);
+    CHECK(before.gen == after.gen);
+    CHECK(before.last_imp == after.last_imp);
 
-    BOOST_CHECK_EQUAL(before.best.solution, after.best.solution);
-    BOOST_CHECK_EQUAL(before.best.score.fitness, after.best.score.fitness);
-    BOOST_CHECK_EQUAL(before.best.score.accuracy, after.best.score.accuracy);
+    CHECK(before.best.solution == after.best.solution);
+    CHECK(before.best.score.fitness == after.best.score.fitness);
+    CHECK(before.best.score.accuracy
+          == doctest::Approx(after.best.score.accuracy));
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("SUMMARY")

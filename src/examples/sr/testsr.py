@@ -94,7 +94,7 @@ mode_settings = {
 def sr(args, dataset):
     cache_bit = 20
     dataset_dir = "./dataset/"
-    sr_dir = "../../build/examples/"
+    sr_dir = "../../build/examples/sr/"
     symbol_set_dir = "./symbolset/"
 
     sr = os.path.join(sr_dir, "sr_test")

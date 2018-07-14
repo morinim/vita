@@ -19,24 +19,23 @@
 #include "kernel/evolution.h"
 #include "kernel/problem.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_speed_ga
-#include <boost/test/unit_test.hpp>
+#include "utility/timer.h"
 
-using namespace boost;
+#include "test/fixture5.h"
 
-#include "factory_fixture5.h"
-#endif
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-BOOST_FIXTURE_TEST_SUITE(t_de7, F_FACTORY5_NO_INIT)
+TEST_SUITE("DE SPEED TEST")
+{
 
 // Test problem 7 from "An Efficient Constraint Handling Method for Genetic
 // Algorithms"
-BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
+TEST_CASE_FIXTURE(fixture5_no_init, "Test Problem 7")
 {
   using namespace vita;
 
-  log::reporting_level = log::WARNING;
+  log::reporting_level = log::lWARNING;
 
   prob.env.individuals = 100;
   prob.env.generations = 2000;
@@ -96,13 +95,16 @@ BOOST_AUTO_TEST_CASE(Search_TestProblem7, * boost::unit_test::tolerance(1.0))
   };
 
   de_search<decltype(f)> s(prob, f, p);
-  BOOST_TEST(s.debug());
-  const auto res(s.run(10).best.solution);
+  CHECK(s.debug());
 
-  BOOST_TEST(-f(res) == 0.053950);
-  BOOST_TEST(res[0] == -1.717143);
-  BOOST_TEST(res[1] == 1.595709);
-  BOOST_TEST(res[2] == 1.827247);
+  vita::timer t;
+  const auto res(s.run(10).best.solution);
+  std::cout << "Elapsed: " << t.elapsed().count() << "ms\n";
+
+  CHECK(-f(res) == doctest::Approx(0.053950).epsilon(0.01));
+  CHECK(res[0] == doctest::Approx(-1.717143).epsilon(0.01));
+  CHECK(res[1] == doctest::Approx(1.595709).epsilon(0.01));
+  CHECK(res[2] == doctest::Approx(1.827247).epsilon(0.01));
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("DE SPEED TEST")

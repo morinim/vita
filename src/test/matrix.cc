@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,53 +16,48 @@
 #include "kernel/random.h"
 #include "utility/matrix.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE Matrix
-#include <boost/test/unit_test.hpp>
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-using namespace boost;
+TEST_SUITE("MATRIX")
+{
 
-#endif
-
-
-BOOST_AUTO_TEST_SUITE(matrix)
-
-BOOST_AUTO_TEST_CASE(MatrixConstructor)
+TEST_CASE("Constructor")
 {
   vita::matrix<int> m(3, 4);
 
-  BOOST_TEST(m.rows() == 3);
-  BOOST_TEST(m.cols() == 4);
-  BOOST_TEST(!m.empty());
-  BOOST_TEST(m(0, 0) == decltype(m)::value_type());
+  CHECK(m.rows() == 3);
+  CHECK(m.cols() == 4);
+  CHECK(!m.empty());
+  CHECK(m(0, 0) == decltype(m)::value_type());
 
   m = { {1, 2, 3},
         {4, 5, 6} };
 
-  BOOST_TEST(m.rows() == 2);
-  BOOST_TEST(m.cols() == 3);
-  BOOST_TEST(!m.empty());
-  BOOST_TEST(m(0, 0) == 1);
+  CHECK(m.rows() == 2);
+  CHECK(m.cols() == 3);
+  CHECK(!m.empty());
+  CHECK(m(0, 0) == 1);
 }
 
-BOOST_AUTO_TEST_CASE(EmptyMatrix)
+TEST_CASE("Empty matrix")
 {
   vita::matrix<int> m;
 
-  BOOST_TEST(m.empty());
-  BOOST_TEST(m.cols() == 0);
+  CHECK(m.empty());
+  CHECK(m.cols() == 0);
 
   decltype(m) m1(3, 3);
-  BOOST_TEST(!m1.empty());
+  CHECK(!m1.empty());
 
   std::stringstream ss;
-  BOOST_TEST(m.save(ss));
+  CHECK(m.save(ss));
 
-  BOOST_TEST(m1.load(ss));
-  BOOST_TEST(m == m1);
+  CHECK(m1.load(ss));
+  CHECK(m == m1);
 }
 
-BOOST_AUTO_TEST_CASE(MatrixFliplr)
+TEST_CASE("Fliplr")
 {
   vita::matrix<int> m = { {1, 2, 3},
                           {4, 5, 6} };
@@ -70,7 +65,7 @@ BOOST_AUTO_TEST_CASE(MatrixFliplr)
   vita::matrix<int> f = { {3, 2, 1},
                           {6, 5, 4} };
 
-  BOOST_TEST(f == vita::fliplr(m));
+  CHECK(f == vita::fliplr(m));
 
   m = { {1, 2, 3, 4},
         {5, 6, 7, 8},
@@ -80,10 +75,10 @@ BOOST_AUTO_TEST_CASE(MatrixFliplr)
         {8, 7, 6, 5},
         {2, 1, 0, 9} };
 
-  BOOST_TEST(f == vita::fliplr(m));
+  CHECK(f == vita::fliplr(m));
 }
 
-BOOST_AUTO_TEST_CASE(MatrixFlipud)
+TEST_CASE("Flipud")
 {
   vita::matrix<int> m = { {1, 2, 3},
                           {4, 5, 6} };
@@ -91,7 +86,7 @@ BOOST_AUTO_TEST_CASE(MatrixFlipud)
   vita::matrix<int> f = { {4, 5, 6},
                           {1, 2, 3} };
 
-  BOOST_TEST(f == vita::flipud(m));
+  CHECK(f == vita::flipud(m));
 
   m = { {1, 2, 3, 4},
         {5, 6, 7, 8},
@@ -101,10 +96,10 @@ BOOST_AUTO_TEST_CASE(MatrixFlipud)
         {5, 6, 7, 8},
         {1, 2, 3, 4} };
 
-  BOOST_TEST(f == vita::flipud(m));
+  CHECK(f == vita::flipud(m));
 }
 
-BOOST_AUTO_TEST_CASE(MatrixLessThan)
+TEST_CASE("Less than")
 {
   vita::matrix<int> m0 = { {9} };
 
@@ -119,19 +114,19 @@ BOOST_AUTO_TEST_CASE(MatrixLessThan)
 
   vita::matrix<int> empty;
 
-  BOOST_TEST(m0 < m1);
-  BOOST_TEST(m2 < m0);
-  BOOST_TEST(m3 < m0);
-  BOOST_TEST(m2 < m1);
-  BOOST_TEST(m3 < m1);
-  BOOST_TEST(m2 < m3);
-  BOOST_TEST(empty < m0);
-  BOOST_TEST(empty < m1);
-  BOOST_TEST(empty < m2);
-  BOOST_TEST(empty < m3);
+  CHECK(m0 < m1);
+  CHECK(m2 < m0);
+  CHECK(m3 < m0);
+  CHECK(m2 < m1);
+  CHECK(m3 < m1);
+  CHECK(m2 < m3);
+  CHECK(empty < m0);
+  CHECK(empty < m1);
+  CHECK(empty < m2);
+  CHECK(empty < m3);
 }
 
-BOOST_AUTO_TEST_CASE(MatrixTranspose)
+TEST_CASE("Transpose")
 {
   vita::matrix<int> m = { {1, 2, 3},
                           {4, 5, 6} };
@@ -140,7 +135,7 @@ BOOST_AUTO_TEST_CASE(MatrixTranspose)
                           {2, 5},
                           {3, 6} };
 
-  BOOST_TEST(t == vita::transpose(m));
+  CHECK(t == vita::transpose(m));
 
   m = { {1, 2, 3, 4},
         {5, 6, 7, 8},
@@ -151,15 +146,15 @@ BOOST_AUTO_TEST_CASE(MatrixTranspose)
         {3, 7, 1},
         {4, 8, 2} };
 
-  BOOST_TEST(t == vita::transpose(m));
+  CHECK(t == vita::transpose(m));
 
   m = { {1} };
   t = { {1} };
 
-  BOOST_TEST(t == vita::transpose(m));
+  CHECK(t == vita::transpose(m));
 }
 
-BOOST_AUTO_TEST_CASE(MatrixRotation)
+TEST_CASE("Rotation")
 {
   const vita::matrix<int> m = { {1,  6, 11, 16, 21},
                                 {2,  7, 12, 17, 22},
@@ -185,22 +180,22 @@ BOOST_AUTO_TEST_CASE(MatrixRotation)
                                    {20, 19, 18, 17, 16},
                                    {25, 24, 23, 22, 21} };
 
-  BOOST_TEST(   m == vita::rot90(   m, 0));
-  BOOST_TEST( r90 == vita::rot90( r90, 0));
-  BOOST_TEST(r180 == vita::rot90(r180, 0));
-  BOOST_TEST(r270 == vita::rot90(r270, 0));
+  CHECK(   m == vita::rot90(   m, 0));
+  CHECK( r90 == vita::rot90( r90, 0));
+  CHECK(r180 == vita::rot90(r180, 0));
+  CHECK(r270 == vita::rot90(r270, 0));
 
-  BOOST_TEST( r90 == vita::rot90(   m, 1));
+  CHECK( r90 == vita::rot90(   m, 1));
 
-  BOOST_TEST(r180 == vita::rot90( r90, 1));
-  BOOST_TEST(r180 == vita::rot90(   m, 2));
+  CHECK(r180 == vita::rot90( r90, 1));
+  CHECK(r180 == vita::rot90(   m, 2));
 
-  BOOST_TEST(r270 == vita::rot90(r180, 1));
-  BOOST_TEST(r270 == vita::rot90( r90, 2));
-  BOOST_TEST(r270 == vita::rot90(   m, 3));
+  CHECK(r270 == vita::rot90(r180, 1));
+  CHECK(r270 == vita::rot90( r90, 2));
+  CHECK(r270 == vita::rot90(   m, 3));
 }
 
-BOOST_AUTO_TEST_CASE(MatrixSerialization)
+TEST_CASE("Serialization")
 {
   vita::matrix<int> m(100, 100);
 
@@ -210,13 +205,13 @@ BOOST_AUTO_TEST_CASE(MatrixSerialization)
       elem = vita::random::between(0, 1000);
 
     std::stringstream ss;
-    BOOST_TEST(m.save(ss));
+    CHECK(m.save(ss));
 
     decltype(m) m1;
 
-    BOOST_TEST(m1.load(ss));
-    BOOST_TEST(m == m1);
+    CHECK(m1.load(ss));
+    CHECK(m == m1);
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("MATRIX")

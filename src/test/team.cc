@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,49 +16,46 @@
 #include "kernel/i_mep.h"
 #include "kernel/team.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE team
-#include <boost/test/unit_test.hpp>
+#include "test/fixture1.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture1.h"
-#endif
-
-BOOST_FIXTURE_TEST_SUITE(t_team, F_FACTORY1)
-
-BOOST_AUTO_TEST_CASE(RandomCreation)
+TEST_SUITE("TEAM")
 {
-  BOOST_TEST_CHECKPOINT("Variable length random creation");
+
+TEST_CASE_FIXTURE(fixture1, "Random creation")
+{
+  // Variable length random creation
   for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
   {
     prob.env.mep.code_length = l;
     vita::team<vita::i_mep> t(prob);
 
-    BOOST_TEST(t.debug());
-    BOOST_TEST(t.age() == 0);
+    CHECK(t.debug());
+    CHECK(t.age() == 0);
   }
 }
 
-BOOST_AUTO_TEST_CASE(Mutation)
+TEST_CASE_FIXTURE(fixture1, "Mutation")
 {
   prob.env.mep.code_length = 100;
 
   vita::team<vita::i_mep> t(prob);
   const auto orig(t);
 
-  BOOST_TEST(t.individuals() > 0);
+  CHECK(t.individuals() > 0);
 
   const unsigned n(4000);
 
-  BOOST_TEST_CHECKPOINT("Zero probability mutation");
+  // Zero probability mutation
   for (unsigned i(0); i < n; ++i)
   {
     t.mutation(0.0, prob);
-    BOOST_TEST(t == orig);
+    CHECK(t == orig);
   }
 
-  BOOST_TEST_CHECKPOINT("50% probability mutation.");
+  // 50% probability mutation
 
   double diff(0.0), length(0.0);
 
@@ -72,33 +69,33 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * diff / length);
-  BOOST_TEST(perc > 47.0);
-  BOOST_TEST(perc < 52.0);
+  CHECK(perc > 47.0);
+  CHECK(perc < 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(Comparison)
+TEST_CASE_FIXTURE(fixture1, "Comparison")
 {
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::team<vita::i_mep> a(prob);
-    BOOST_TEST(a == a);
-    BOOST_TEST(distance(a, a) == 0);
+    CHECK(a == a);
+    CHECK(distance(a, a) == 0);
 
     vita::team<vita::i_mep> b(a);
-    BOOST_TEST(a.signature() == b.signature());
-    BOOST_TEST(a == b);
-    BOOST_TEST(distance(a, b) == 0);
+    CHECK(a.signature() == b.signature());
+    CHECK(a == b);
+    CHECK(distance(a, b) == 0);
 
     vita::team<vita::i_mep> c(prob);
     if (a.signature() != c.signature())
     {
-      BOOST_TEST(a != c);
-      BOOST_TEST(distance(a, c) > 0);
+      CHECK(a != c);
+      CHECK(distance(a, c) > 0);
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(Iterators)
+TEST_CASE_FIXTURE(fixture1, "Iterators")
 {
   for (unsigned j(0); j < 1000; ++j)
   {
@@ -107,13 +104,13 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &ind : t)
     {
-      BOOST_TEST(ind == t[i]);
+      CHECK(ind == t[i]);
       ++i;
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(t_crossover)
+TEST_CASE_FIXTURE(fixture1, "Crossover")
 {
   using namespace vita;
 
@@ -125,7 +122,7 @@ BOOST_AUTO_TEST_CASE(t_crossover)
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(crossover(t1, t2));
-    BOOST_TEST(tc.debug());
+    CHECK(tc.debug());
 
     for (unsigned x(0); x < tc.individuals(); ++x)
       for (index_t i(0); i != tc[x].size(); ++i)
@@ -133,12 +130,12 @@ BOOST_AUTO_TEST_CASE(t_crossover)
         {
           const locus l{i, c};
 
-          BOOST_TEST((tc[x][l] == t1[x][l] || tc[x][l] == t2[x][l]));
+          CHECK((tc[x][l] == t1[x][l] || tc[x][l] == t2[x][l]));
         }
   }
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+TEST_CASE_FIXTURE(fixture1, "Serialization")
 {
   for (unsigned i(0); i < 2000; ++i)
   {
@@ -148,13 +145,14 @@ BOOST_AUTO_TEST_CASE(Serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       t1.inc_age();
 
-    BOOST_TEST(t1.save(ss));
+    CHECK(t1.save(ss));
 
     vita::team<vita::i_mep> t2(prob);
-    BOOST_TEST(t2.load(ss, prob));
-    BOOST_TEST(t2.debug());
+    CHECK(t2.load(ss, prob));
+    CHECK(t2.debug());
 
-    BOOST_TEST(t1 == t2);
+    CHECK(t1 == t2);
   }
 }
-BOOST_AUTO_TEST_SUITE_END()
+
+}  // TEST_SUITE("TEAM")

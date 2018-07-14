@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,18 +16,15 @@
 #include "kernel/i_mep.h"
 #include "kernel/population.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_population
-#include "boost/test/unit_test.hpp"
+#include "test/fixture1.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture1.h"
-#endif
+TEST_SUITE("POPULATION")
+{
 
-BOOST_FIXTURE_TEST_SUITE(t_population, F_FACTORY1)
-
-BOOST_AUTO_TEST_CASE(creation)
+TEST_CASE_FIXTURE(fixture1, "Creation")
 {
   prob.env.layers = 1;
 
@@ -37,12 +34,12 @@ BOOST_AUTO_TEST_CASE(creation)
 
     vita::population<vita::i_mep> pop(prob);
 
-    BOOST_TEST(prob.env.individuals == pop.individuals());
-    BOOST_TEST(pop.debug());
+    CHECK(prob.env.individuals == pop.individuals());
+    CHECK(pop.debug());
   }
 }
 
-BOOST_AUTO_TEST_CASE(layers_and_indeividuals)
+TEST_CASE_FIXTURE(fixture1, "Layers and individuals")
 {
   for (unsigned i(0); i < 100; ++i)
   {
@@ -60,17 +57,17 @@ BOOST_AUTO_TEST_CASE(layers_and_indeividuals)
       for (unsigned j(0); j < n; ++j)
         pop.pop_from_layer(l);
 
-      BOOST_TEST(pop.individuals(l) == before - n);
+      CHECK(pop.individuals(l) == before - n);
     }
 
     unsigned count(std::accumulate(pop.begin(), pop.end(), 0,
                                    [](auto acc, auto) { return ++acc; }));
 
-    BOOST_TEST(count == pop.individuals());
+    CHECK(count == pop.individuals());
   }
 }
 
-BOOST_AUTO_TEST_CASE(serialization)
+TEST_CASE_FIXTURE(fixture1, "Serialization")
 {
   using namespace vita;
 
@@ -82,25 +79,25 @@ BOOST_AUTO_TEST_CASE(serialization)
     std::stringstream ss;
     vita::population<i_mep> pop1(prob);
 
-    BOOST_TEST(pop1.save(ss));
+    CHECK(pop1.save(ss));
 
     decltype(pop1) pop2(prob);
-    BOOST_TEST(pop2.load(ss, prob));
-    BOOST_TEST(pop2.debug());
+    CHECK(pop2.load(ss, prob));
+    CHECK(pop2.debug());
 
-    BOOST_TEST(pop1.layers() == pop2.layers());
-    BOOST_TEST(pop1.individuals() == pop2.individuals());
+    CHECK(pop1.layers() == pop2.layers());
+    CHECK(pop1.individuals() == pop2.individuals());
     for (unsigned l(0); l < pop1.layers(); ++l)
     {
-      BOOST_TEST(pop1.individuals(l) == pop2.individuals(l));
+      CHECK(pop1.individuals(l) == pop2.individuals(l));
 
       for (unsigned j(0); j < pop1.individuals(); ++j)
       {
         const vita::population<i_mep>::coord c{l, j};
-        BOOST_TEST(pop1[c] == pop2[c]);
+        CHECK(pop1[c] == pop2[c]);
       }
     }
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("POPULATION")

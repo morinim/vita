@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,27 +13,24 @@
 #include <cstdlib>
 #include <sstream>
 
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
+
 #include "kernel/cache.h"
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
 #include "kernel/problem.h"
 #include "kernel/src/primitive/factory.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE TranspositionTable
-#include <boost/test/unit_test.hpp>
-
-using namespace boost;
-
-#include "factory_fixture2.h"
-#endif
+#include "test/fixture2.h"
 
 
-BOOST_AUTO_TEST_SUITE(test_hash)
+TEST_SUITE("CACHE")
+{
 
 // This should hopefully be a thorough and unambiguous test of whether the hash
 // is correctly implemented.
-BOOST_AUTO_TEST_CASE(MurmurHash)
+TEST_CASE("Murmur Hash")
 {
   using vita::hash_t;
 
@@ -78,16 +75,11 @@ BOOST_AUTO_TEST_CASE(MurmurHash)
 
   //----------
 
-  BOOST_TEST(0x6384BA69 == verification);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+  CHECK(verification == 0x6384BA69);
+}  // TEST_CASE("Murmur Hash")
 
 
-
-BOOST_FIXTURE_TEST_SUITE(test_cache, F_FACTORY2)
-
-BOOST_AUTO_TEST_CASE(InsertFindCicle)
+TEST_CASE_FIXTURE(fixture2, "Insert/Find cycle")
 {
   vita::cache cache(16);
   prob.env.mep.code_length = 64;
@@ -102,11 +94,11 @@ BOOST_AUTO_TEST_CASE(InsertFindCicle)
 
     cache.insert(i1.signature(), f);
 
-    BOOST_TEST(cache.find(i1.signature()) == f);
+    CHECK(cache.find(i1.signature()) == f);
   }
 }
 
-BOOST_AUTO_TEST_CASE(CollisionDetection)
+TEST_CASE_FIXTURE(fixture2, "Collision detection")
 {
   using i_interp = vita::interpreter<vita::i_mep>;
   vita::cache cache(14);
@@ -136,12 +128,12 @@ BOOST_AUTO_TEST_CASE(CollisionDetection)
                          ? vita::any_cast<vita::fitness_t::value_type>(val)
                          : 0.0};
 
-      BOOST_TEST(f == f1);
+      CHECK(f == f1);
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+TEST_CASE_FIXTURE(fixture2, "Serialization")
 {
   using namespace vita;
 
@@ -170,9 +162,9 @@ BOOST_AUTO_TEST_CASE(Serialization)
                  });
 
   std::stringstream ss;
-  BOOST_TEST(cache1.save(ss));
+  CHECK(cache1.save(ss));
 
-  BOOST_TEST(cache2.load(ss));
+  CHECK(cache2.load(ss));
 
   for (unsigned i(0); i < n; ++i)
     if (present[i])
@@ -182,25 +174,25 @@ BOOST_AUTO_TEST_CASE(Serialization)
                   ? any_cast<fitness_t::value_type>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
-      BOOST_TEST(f1.size());
-      BOOST_TEST(f == f1);
+      CHECK(f1.size());
+      CHECK(f == f1);
     }
 }
 
-BOOST_AUTO_TEST_CASE(HashT)
+TEST_CASE("Type hash_t")
 {
   const vita::hash_t empty;
-  BOOST_TEST(empty.empty());
+  CHECK(empty.empty());
 
   vita::hash_t h(123, 345);
-  BOOST_TEST(!h.empty());
+  CHECK(!h.empty());
 
-  BOOST_TEST(h != empty);
+  CHECK(h != empty);
 
   h.clear();
-  BOOST_TEST(h.empty());
+  CHECK(h.empty());
 
-  BOOST_TEST(h == empty);
+  CHECK(h == empty);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("CACHE")

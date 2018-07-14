@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,15 +10,15 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_FACTORY_FIXTURE3_H)
-#define      VITA_FACTORY_FIXTURE3_H
+#if !defined(FIXTURE3_H)
+#define      FIXTURE3_H
 
 #include "kernel/problem.h"
 #include "kernel/interpreter.h"
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/factory.h"
 
-struct F_FACTORY3
+struct fixture3
 {
   class Z : public vita::terminal
   {
@@ -33,10 +33,8 @@ struct F_FACTORY3
     double val;
   };
 
-  F_FACTORY3() : prob(vita::initialization::standard), factory(), null()
+  fixture3() : prob(vita::initialization::standard), factory(), null()
   {
-    BOOST_TEST_MESSAGE("Setup fixture (FACTORY3)");
-
     c0 = prob.sset.insert(factory.make("0.0"));
     c1 = prob.sset.insert(factory.make("1.0"));
     c2 = prob.sset.insert(factory.make("2.0"));
@@ -59,11 +57,6 @@ struct F_FACTORY3
     f_sub = prob.sset.insert(factory.make("FSUB"));
 
     prob.env.mep.code_length = 32;
-  }
-
-  ~F_FACTORY3()
-  {
-    BOOST_TEST_MESSAGE("Teardown fixture (FACTORY3)");
   }
 
   vita::symbol *c0;

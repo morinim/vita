@@ -10,32 +10,19 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#define MASTER_TEST_SET
-
-#define BOOST_TEST_MODULE MASTER_TEST_SUITE
-#include <boost/test/unit_test.hpp>
-
-constexpr double epsilon(0.00001);
-
-using namespace boost;
-
-#include "test/factory_fixture1.h"
-#include "test/factory_fixture2.h"
-#include "test/factory_fixture3.h"
-#include "test/factory_fixture4.h"
-#include "test/factory_fixture5.h"
-
 #include "test/any.cc"
 #include "test/cache.cc"
+#include "test/dataframe.cc"
 #include "test/de.cc"
 #include "test/discretization.cc"
 #include "test/evolution.cc"
 #include "test/evolution_selection.cc"
+#include "test/facultative.cc"
 #include "test/fitness.cc"
 #include "test/ga.cc"
 #include "test/i_de.cc"
-#include "test/i_mep.cc"
 #include "test/i_ga.cc"
+#include "test/i_mep.cc"
 #include "test/lambda.cc"
 #include "test/matrix.cc"
 #include "test/population.cc"

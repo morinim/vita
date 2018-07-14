@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,68 +15,61 @@
 
 #include "kernel/ga/i_de.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_i_de
-#include <boost/test/unit_test.hpp>
+#include "test/fixture5.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-constexpr double epsilon(0.00001);
-
-#include "factory_fixture5.h"
-#endif
-
-BOOST_FIXTURE_TEST_SUITE(t_i_de, F_FACTORY5)
-
-BOOST_AUTO_TEST_CASE(RandomCreation)
+TEST_SUITE("I_DE")
 {
-  BOOST_TEST_CHECKPOINT("Random creation");
 
+TEST_CASE_FIXTURE(fixture5, "Random creation")
+{
   for (unsigned i(0); i < 1000; ++i)
   {
     vita::i_de ind(prob);
 
-    BOOST_TEST(ind.debug());
-    BOOST_TEST(ind.parameters() == prob.sset.categories());
-    BOOST_TEST(ind.age() == 0);
+    CHECK(ind.debug());
+    CHECK(ind.parameters() == prob.sset.categories());
+    CHECK(ind.age() == 0);
 
     for (unsigned j(0); j < ind.parameters(); ++j)
-      BOOST_TEST(std::fabs(ind[j]) <= std::pow(10.0, j + 1));
+      CHECK(std::fabs(ind[j]) <= std::pow(10.0, j + 1));
   }
 }
 
-BOOST_AUTO_TEST_CASE(EmptyIndividual)
+TEST_CASE_FIXTURE(fixture5, "Empty individual")
 {
   vita::i_de ind;
 
-  BOOST_TEST(ind.debug());
-  BOOST_TEST(ind.empty());
+  CHECK(ind.debug());
+  CHECK(ind.empty());
 }
 
-BOOST_AUTO_TEST_CASE(Comparison, * boost::unit_test::tolerance(0.0001))
+TEST_CASE_FIXTURE(fixture5, "Comparison")
 {
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::i_de a(prob);
-    BOOST_TEST(a == a);
-    BOOST_TEST(distance(a, a) == 0.0);
+    CHECK(a == a);
+    CHECK(distance(a, a) == doctest::Approx(0.0));
 
     vita::i_de b(a);
-    BOOST_TEST(a.signature() == b.signature());
-    BOOST_TEST(a == b);
-    BOOST_TEST(distance(a, b) == 0.0);
+    CHECK(a.signature() == b.signature());
+    CHECK(a == b);
+    CHECK(distance(a, b) == doctest::Approx(0.0));
 
     vita::i_de c(prob);
     if (a.signature() != c.signature())
     {
-      BOOST_TEST(!(a == c));
-      BOOST_TEST(distance(a, c) > 0.0);
-      BOOST_TEST(distance(a, c) == distance(c, a));
+      CHECK(!(a == c));
+      CHECK(distance(a, c) > 0.0);
+      CHECK(distance(a, c) == doctest::Approx(distance(c, a)));
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(Iterators)
+TEST_CASE_FIXTURE(fixture5, "Iterators")
 {
   for (unsigned j(0); j < 1000; ++j)
   {
@@ -85,13 +78,13 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &v : ind)
     {
-      BOOST_TEST(v == ind[i]);
+      CHECK(v == doctest::Approx(ind[i]));
       ++i;
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(DeCrossover)
+TEST_CASE_FIXTURE(fixture5, "DE crossover")
 {
   double diff(0), length(0);
 
@@ -110,54 +103,50 @@ BOOST_AUTO_TEST_CASE(DeCrossover)
     for (unsigned k(0); k < n_c; ++k)
       c.inc_age();
 
-    BOOST_TEST_CHECKPOINT("DE self-crossover without mutation");
     auto off(p.crossover(prob.env.p_cross, prob.env.de.weight, a, a, p));
-    BOOST_TEST(off.debug());
+    CHECK(off.debug());
 
     for (unsigned i(0); i < p.parameters(); ++i)
-      BOOST_TEST(off[i] == p[i], boost::test_tools::tolerance(epsilon));
+      CHECK(off[i] == doctest::Approx(p[i]));
 
-    BOOST_TEST_CHECKPOINT("DE self-crossover with mutation");
     off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, p);
-    BOOST_TEST(off.debug());
-    BOOST_TEST(off.age() == std::max({p.age(), a.age(), b.age()}));
+    CHECK(off.debug());
+    CHECK(off.age() == std::max({p.age(), a.age(), b.age()}));
 
     for (unsigned i(0); i < p.parameters(); ++i)
     {
       const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
 
-      BOOST_TEST(off[i] > p[i] - delta);
-      BOOST_TEST(off[i] < p[i] + delta);
+      CHECK(off[i] > p[i] - delta);
+      CHECK(off[i] < p[i] + delta);
 
       if (!vita::almost_equal(p[i], off[i]))
         ++diff;
     }
 
-    BOOST_TEST_CHECKPOINT("DE crossover without mutation");
     off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, c);
-    BOOST_TEST(off.debug());
-    BOOST_TEST(off.age() == std::max({p.age(), a.age(), b.age(), c.age()}));
+    CHECK(off.debug());
+    CHECK(off.age() == std::max({p.age(), a.age(), b.age(), c.age()}));
     for (unsigned i(0); i < p.parameters(); ++i)
     {
       const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
 
       if (!vita::almost_equal(p[i], off[i]))
       {
-        BOOST_TEST(off[i] > c[i] - delta);
-        BOOST_TEST(off[i] < c[i] + delta);
+        CHECK(off[i] > c[i] - delta);
+        CHECK(off[i] < c[i] + delta);
       }
     }
 
     length += p.parameters();
   }
 
-  BOOST_TEST(diff / length < prob.env.p_cross + 2.0);
-  BOOST_TEST(diff / length > prob.env.p_cross - 2.0);
+  CHECK(diff / length < prob.env.p_cross + 2.0);
+  CHECK(diff / length > prob.env.p_cross - 2.0);
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+TEST_CASE_FIXTURE(fixture5, "Serialization")
 {
-  BOOST_TEST_CHECKPOINT("Non-empty i_de serialization");
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
@@ -166,26 +155,26 @@ BOOST_AUTO_TEST_CASE(Serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
-    BOOST_TEST(i1.save(ss));
+    CHECK(i1.save(ss));
 
     vita::i_de i2(prob);
-    BOOST_TEST(i2.load(ss, prob));
-    BOOST_TEST(i2.debug());
+    CHECK(i2.load(ss, prob));
+    CHECK(i2.debug());
 
-    BOOST_TEST(i1 == i2);
+    CHECK(i1 == i2);
   }
 
-  BOOST_TEST_CHECKPOINT("Non-empty i_de serialization");
   std::stringstream ss;
   vita::i_de empty;
-  BOOST_TEST(empty.save(ss));
+  CHECK(empty.save(ss));
 
   vita::i_de empty1;
-  BOOST_TEST(empty1.load(ss, prob));
-  BOOST_TEST(empty1.debug());
-  BOOST_TEST(empty1.empty());
+  CHECK(empty1.load(ss, prob));
+  CHECK(empty1.debug());
+  CHECK(empty1.empty());
 
-  BOOST_TEST(empty == empty1);
+  CHECK(empty == empty1);
 
 }
-BOOST_AUTO_TEST_SUITE_END()
+
+}  // TEST_SUITE("I_DE")

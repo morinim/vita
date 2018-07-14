@@ -11,7 +11,7 @@ It's suitable for classification, symbolic regression, content base image retrie
 * simple addition of features and modules
 * fast experimentation with detailed run-log
 * modern, standard ISO C++14 source code
-* [more][11]
+* [more][2]
 
 It's distributed under the [Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
 
@@ -41,7 +41,6 @@ However, since core members of the Vita project have no access to these platform
 ### Optional ###
 
 * [CMake][5]
-* [Boost library][2] for for testing
 * [Python v3][4] for additional functionalities
 
 ## Getting the source ##
@@ -124,7 +123,7 @@ All the output files will be stored in subdirectories of `build/` (out of source
 
 
 [1]: http://www.eosdev.it/
-[2]: http://www.boost.org/
+[2]: https://github.com/morinim/vita/wiki/features
 [3]: https://github.com/morinim/vita
 [4]: http://www.python.org/
 [5]: https://cmake.org/
@@ -133,4 +132,3 @@ All the output files will be stored in subdirectories of `build/` (out of source
 [8]: https://github.com/morinim/vita/blob/master/LICENSE
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
-[11]: https://github.com/morinim/vita/wiki/features

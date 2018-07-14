@@ -17,25 +17,17 @@
 #include "kernel/team.h"
 #include "kernel/src/problem.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE lambda
-#include <boost/test/unit_test.hpp>
-
-using namespace boost;
-
-constexpr double epsilon(0.00001);
-#endif
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
 #define TEST_WTA
 
 // Examples in dataset
-const std::size_t MEP_COUNT        =  10;
-const std::size_t IRIS_COUNT       = 150;
-const std::size_t IONOSPHERE_COUNT = 351;
+constexpr std::size_t MEP_COUNT        =  10;
+constexpr std::size_t IRIS_COUNT       = 150;
+constexpr std::size_t IONOSPHERE_COUNT = 351;
 
 template<class T> using reg_model = vita::basic_reg_lambda_f<T, true>;
-
-BOOST_AUTO_TEST_SUITE(lambda)
 
 template<template<class> class L, class T, unsigned P>
 struct build
@@ -76,18 +68,18 @@ void test_serialization(vita::src_problem &pr)
 
     std::stringstream ss;
 
-    BOOST_TEST(lambda1.save(ss));
+    CHECK(lambda1.save(ss));
     const T ind2(pr);
     auto lambda2(build<L, T, P>()(ind2, pr.data()));
-    BOOST_TEST(lambda2.load(ss, pr));
-    BOOST_TEST(lambda2.debug());
+    CHECK(lambda2.load(ss, pr));
+    CHECK(lambda2.debug());
 
     for (const auto &e : pr.data())
     {
       const auto out1(lambda1.name(lambda1(e)));
       const auto out2(lambda2.name(lambda2(e)));
 
-      BOOST_TEST(out1 == out2);
+      CHECK(out1 == out2);
     }
   }
 }
@@ -114,26 +106,29 @@ void test_team_of_one(vita::src_problem &pr)
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
-        BOOST_TEST(v1 == v2, boost::test_tools::tolerance(epsilon));
+        CHECK(v1 == doctest::Approx(v2));
       }
       else
-        BOOST_TEST(!out_t.has_value());
+        CHECK(!out_t.has_value());
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
+TEST_SUITE("LAMBDA")
+{
+
+TEST_CASE("reg_lambda")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
 
-  BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
+  CHECK(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
-  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF ONE INDIVIDUAL");
+  // REGRESSION TEAM OF ONE INDIVIDUAL.
   test_team_of_one<reg_model>(pr);
 
-  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF IDENTICAL INDIVIDUALS");
+  // REGRESSION TEAM OF IDENTICAL INDIVIDUALS.
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep ind(pr);
@@ -151,14 +146,14 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
         const auto v1(to<number>(out_i));
         const auto v2(to<number>(out_t));
 
-        BOOST_TEST(v1 == v2);
+        CHECK(v1 == doctest::Approx(v2));
       }
       else
-        BOOST_TEST(!out_t.has_value());
+        CHECK(!out_t.has_value());
     }
   }
 
-  BOOST_TEST_CHECKPOINT("REGRESSION TEAM OF RANDOM INDIVIDUALS");
+  // REGRESSION TEAM OF RANDOM INDIVIDUALS.
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep i1(pr);
@@ -208,21 +203,20 @@ BOOST_AUTO_TEST_CASE(reg_lambda, * boost::unit_test::tolerance(epsilon))
         const auto out_t(lambda_team(e));
 
         if (std::fabs(sum / n) < 0.000001)
-          BOOST_TEST(to<number>(out_t) == 0.0);
+          CHECK(to<number>(out_t) == doctest::Approx(0.0));
         else
-          BOOST_TEST(sum / n == to<number>(out_t));
+          CHECK(sum / n == doctest::Approx(to<number>(out_t)));
       }
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
-                     * boost::unit_test::tolerance(epsilon))
+TEST_CASE("reg_lambda serialization")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
+  CHECK(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
 
   for (unsigned k(0); k < 1000; ++k)
   {
@@ -231,11 +225,11 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
 
     std::stringstream ss;
 
-    BOOST_TEST(lambda1.save(ss));
+    CHECK(lambda1.save(ss));
     const i_mep ind2(pr);
     reg_model<i_mep> lambda2(ind2);
-    BOOST_TEST(lambda2.load(ss, pr));
-    BOOST_TEST(lambda2.debug());
+    CHECK(lambda2.load(ss, pr));
+    CHECK(lambda2.debug());
 
     for (const auto &e : pr.data())
     {
@@ -243,9 +237,9 @@ BOOST_AUTO_TEST_CASE(reg_lambda_serialization,
       const auto out2(lambda2(e));
 
       if (out1.has_value())
-        BOOST_TEST(to<number>(out1) == to<number>(out2));
+        CHECK(to<number>(out1) == doctest::Approx(to<number>(out2)));
       else
-        BOOST_TEST(!out2.has_value());
+        CHECK(!out2.has_value());
     }
   }
 }
@@ -285,7 +279,7 @@ void test_team(vita::src_problem &pr)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        BOOST_TEST(any_cast<class_t>(out[j]) == tags[j].first);
+        CHECK(any_cast<class_t>(out[j]) == tags[j].first);
 
       std::string s_best(names[0]);
 
@@ -319,99 +313,97 @@ void test_team(vita::src_problem &pr)
         }
 #endif
 
-      BOOST_TEST(s_best == lambda_t.name(lambda_t(example)));
+      CHECK(s_best == lambda_t.name(lambda_t(example)));
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(dyn_slot_lambda)
+TEST_CASE("dyn_slot lambda")
 {
   using namespace vita;
 
   constexpr unsigned slots(10);
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
-  BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL");
+  // DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<dyn_slot_lambda_f, slots>(pr);
 
-  BOOST_TEST_CHECKPOINT("DYNSLOT LAMBDA TEAM OF RANDOM INDIVIDUALS");
+  // DYNSLOT LAMBDA TEAM OF RANDOM INDIVIDUALS.
   test_team<dyn_slot_lambda_f, slots>(pr);
 }
 
-BOOST_AUTO_TEST_CASE(dyn_slot_lambda_serialization)
+TEST_CASE("dyn_slot serialization")
 {
   using namespace vita;
 
   constexpr unsigned slots(10);
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
-  BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  // DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<dyn_slot_lambda_f, i_mep, slots>(pr);
 
-  BOOST_TEST_CHECKPOINT("DYN_SLOT_LAMBDA_F SERIALIZATION - TEAM");
+  // DYN_SLOT_LAMBDA_F SERIALIZATION - TEAM.
   test_serialization<dyn_slot_lambda_f, team<i_mep>, slots>(pr);
 }
 
-BOOST_AUTO_TEST_CASE(gaussian_lambda)
+TEST_CASE("gaussian lambda")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL");
+  // GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<gaussian_lambda_f>(pr);
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN LAMBDA TEAM OF RANDOM INDIVIDUALS");
+  // GAUSSIAN LAMBDA TEAM OF RANDOM INDIVIDUALS.
   test_team<gaussian_lambda_f>(pr);
 }
 
-BOOST_AUTO_TEST_CASE(gaussian_lambda_serialization)
+TEST_CASE("gaussian_lambda serialization")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  // GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<gaussian_lambda_f, i_mep>(pr);
 
-  BOOST_TEST_CHECKPOINT("GAUSSIAN_LAMBDA_F SERIALIZATION - TEAM");
+  // GAUSSIAN_LAMBDA_F SERIALIZATION - TEAM.
   test_serialization<gaussian_lambda_f, team<i_mep>>(pr);
 }
 
-BOOST_AUTO_TEST_CASE(binary_lambda)
+TEST_CASE("binary lambda")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
-             == IONOSPHERE_COUNT);
+  CHECK(pr.load("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
 
-  BOOST_TEST_CHECKPOINT("BINARY LAMBDA TEAM OF ONE INDIVIDUAL");
+  // BINARY LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<binary_lambda_f>(pr);
 
-  BOOST_TEST_CHECKPOINT("BINARY LAMBDA TEAM OF RANDOM INDIVIDUALS");
+  // BINARY LAMBDA TEAM OF RANDOM INDIVIDUALS.
   test_team<binary_lambda_f>(pr);
 }
 
-BOOST_AUTO_TEST_CASE(binary_lambda_serialization)
+TEST_CASE("binary_lambda serialization")
 {
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  BOOST_TEST(pr.load("./test_resources/ionosphere.csv").first
-             == IONOSPHERE_COUNT);
+  CHECK(pr.load("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
 
-  BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL");
+  // BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<binary_lambda_f, i_mep>(pr);
 
-  BOOST_TEST_CHECKPOINT("BINARY_LAMBDA_F SERIALIZATION - TEAM");
+  // BINARY_LAMBDA_F SERIALIZATION - TEAM.
   test_serialization<binary_lambda_f, team<i_mep>>(pr);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("LAMBDA")

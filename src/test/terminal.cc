@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,22 +14,19 @@
 
 #include "kernel/src/constant.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE terminal
-#include "boost/test/unit_test.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-using namespace boost;
-#endif
+TEST_SUITE("TERMINAL")
+{
 
-BOOST_AUTO_TEST_SUITE(terminal)
-
-BOOST_AUTO_TEST_CASE(Base)
+TEST_CASE("Base")
 {
   vita::constant<std::string> t("A TERMINAL");
 
-  BOOST_TEST(!t.arity());
-  BOOST_TEST(!t.auto_defined());
-  BOOST_TEST(t.debug());
+  CHECK(!t.arity());
+  CHECK(!t.auto_defined());
+  CHECK(t.debug());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("TERMINAL")

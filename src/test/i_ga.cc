@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,94 +15,89 @@
 
 #include "kernel/ga/i_ga.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE t_i_ga
-#include <boost/test/unit_test.hpp>
+#include "test/fixture5.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture5.h"
-#endif
-
-BOOST_FIXTURE_TEST_SUITE(t_i_ga, F_FACTORY5)
-
-BOOST_AUTO_TEST_CASE(RandomCreation)
+TEST_SUITE("I_GA")
 {
-  BOOST_TEST_CHECKPOINT("Random creation");
 
+TEST_CASE_FIXTURE(fixture5, "Random creation")
+{
   for (unsigned i(0); i < 1000; ++i)
   {
     vita::i_ga ind(prob);
     vita::interpreter<vita::i_ga> check(&ind);
 
-    BOOST_TEST(ind.debug());
-    BOOST_TEST(ind.parameters() == prob.sset.categories());
-    BOOST_TEST(ind.age() == 0);
-    BOOST_TEST(check.penalty() == 0);
+    CHECK(ind.debug());
+    CHECK(ind.parameters() == prob.sset.categories());
+    CHECK(ind.age() == 0);
+    CHECK(check.penalty() == doctest::Approx(0.0));
   }
 }
 
-BOOST_AUTO_TEST_CASE(EmptyIndividual)
+TEST_CASE_FIXTURE(fixture5, "Empty individual")
 {
   vita::i_ga ind;
 
-  BOOST_TEST(ind.debug());
-  BOOST_TEST(ind.empty());
+  CHECK(ind.debug());
+  CHECK(ind.empty());
 }
 
 
-BOOST_AUTO_TEST_CASE(Penalty, * boost::unit_test::tolerance(0.000001))
+TEST_CASE_FIXTURE(fixture5, "Penalty")
 {
   for (unsigned i(0); i < 100; ++i)
   {
     vita::i_ga ind(prob);
     vita::interpreter<vita::i_ga> check(&ind);
 
-    BOOST_TEST(check.penalty() == 0.0);
+    CHECK(check.penalty() == doctest::Approx(0.0));
 
     ind[0].par = 20.0;
     const auto p1(check.penalty());
-    BOOST_TEST(p1 > 0.0);
+    CHECK(p1 > 0.0);
 
     ind[0].par = -20.0;
     const auto p1n(check.penalty());
-    BOOST_TEST(p1 == p1n);
+    CHECK(p1 == doctest::Approx(p1n));
 
     ind[1].par = 200.0;
     const auto p2(check.penalty());
-    BOOST_TEST(p2 > p1);
+    CHECK(p2 > p1);
 
     ind[1].par = -200.0;
     const auto p2n(check.penalty());
-    BOOST_TEST(p2 > p1);
-    BOOST_TEST(p2 == p2n);
+    CHECK(p2 > p1);
+    CHECK(p2 == doctest::Approx(p2n));
 
     ind[2].par = 2000.0;
     const auto p3(check.penalty());
-    BOOST_TEST(p3 > p2);
+    CHECK(p3 > p2);
 
     ind[2].par = -2000.0;
     const auto p3n(check.penalty());
-    BOOST_TEST(p3n > p2);
-    BOOST_TEST(p3 == p3n);
+    CHECK(p3n > p2);
+    CHECK(p3 == doctest::Approx(p3n));
   }
 }
 
-BOOST_AUTO_TEST_CASE(Mutation)
+TEST_CASE_FIXTURE(fixture5, "Mutation")
 {
   vita::i_ga t(prob);
   const vita::i_ga orig(t);
 
   const unsigned n(1000);
 
-  BOOST_TEST_CHECKPOINT("Zero probability mutation");
+  // Zero probability mutation.
   for (unsigned i(0); i < n; ++i)
   {
     t.mutation(0.0, prob);
-    BOOST_TEST(t == orig);
+    CHECK(t == orig);
   }
 
-  BOOST_TEST_CHECKPOINT("50% probability mutation.");
+  // 50% probability mutation.
   unsigned diff(0);
 
   for (unsigned i(0); i < n; ++i)
@@ -114,34 +109,34 @@ BOOST_AUTO_TEST_CASE(Mutation)
   }
 
   const double perc(100.0 * double(diff) / double(orig.parameters() * n));
-  BOOST_TEST(perc > 47.0);
-  BOOST_TEST(perc < 53.0);
+  CHECK(perc > 47.0);
+  CHECK(perc < 53.0);
 }
 
-BOOST_AUTO_TEST_CASE(Comparison)
+TEST_CASE_FIXTURE(fixture5, "Comparison")
 {
   for (unsigned i(0); i < 2000; ++i)
   {
     vita::i_ga a(prob);
-    BOOST_TEST(a == a);
-    BOOST_TEST(a.distance(a) == 0);
+    CHECK(a == a);
+    CHECK(a.distance(a) == 0);
 
     vita::i_ga b(a);
-    BOOST_TEST(a.signature() == b.signature());
-    BOOST_TEST(a == b);
-    BOOST_TEST(a.distance(b) == 0);
+    CHECK(a.signature() == b.signature());
+    CHECK(a == b);
+    CHECK(a.distance(b) == 0);
 
     vita::i_ga c(prob);
     if (a.signature() != c.signature())
     {
-      BOOST_TEST(!(a == c));
-      BOOST_TEST(a.distance(c) > 0);
-      BOOST_TEST(a.distance(c) == c.distance(a));
+      CHECK(!(a == c));
+      CHECK(a.distance(c) > 0);
+      CHECK(a.distance(c) == c.distance(a));
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(Iterators)
+TEST_CASE_FIXTURE(fixture5, "Iterators")
 {
   for (unsigned j(0); j < 1000; ++j)
   {
@@ -150,13 +145,13 @@ BOOST_AUTO_TEST_CASE(Iterators)
     unsigned i(0);
     for (const auto &g : ind)
     {
-      BOOST_TEST(g == ind[i]);
+      CHECK(g == ind[i]);
       ++i;
     }
   }
 }
 
-BOOST_AUTO_TEST_CASE(StandardCrossover)
+TEST_CASE_FIXTURE(fixture5, "Standard crossover")
 {
   vita::i_ga i1(prob), i2(prob);
 
@@ -170,21 +165,21 @@ BOOST_AUTO_TEST_CASE(StandardCrossover)
       i2.inc_age();
 
     const auto ic(crossover(i1, i2));
-    BOOST_CHECK(ic.debug());
-    BOOST_REQUIRE_EQUAL(ic.age(), std::max(i1.age(), i2.age()));
+    CHECK(ic.debug());
+    CHECK(ic.age() == std::max(i1.age(), i2.age()));
 
     dist += i1.distance(ic);
   }
 
   // +1 since we have at least one gene involved in crossover.
   const double perc(100.0 * dist / ((prob.sset.categories() + 1) * n));
-  BOOST_CHECK_GT(perc, 48.0);
-  BOOST_CHECK_LT(perc, 52.0);
+  CHECK(perc > 48.0);
+  CHECK(perc < 52.0);
 }
 
-BOOST_AUTO_TEST_CASE(Serialization)
+TEST_CASE_FIXTURE(fixture5, "Serialization")
 {
-  BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
+  // Non-empty i_ga serialization.
   for (unsigned i(0); i < 2000; ++i)
   {
     std::stringstream ss;
@@ -193,26 +188,27 @@ BOOST_AUTO_TEST_CASE(Serialization)
     for (auto j(vita::random::between(0u, 100u)); j; --j)
       i1.inc_age();
 
-    BOOST_TEST(i1.save(ss));
+    CHECK(i1.save(ss));
 
     vita::i_ga i2(prob);
-    BOOST_TEST(i2.load(ss, prob));
-    BOOST_TEST(i2.debug());
+    CHECK(i2.load(ss, prob));
+    CHECK(i2.debug());
 
-    BOOST_CHECK_EQUAL(i1, i2);
+    CHECK(i1 == i2);
   }
 
-  BOOST_TEST_CHECKPOINT("Non-empty i_ga serialization");
+  // Non-empty i_ga serialization.
   std::stringstream ss;
   vita::i_ga empty;
-  BOOST_TEST(empty.save(ss));
+  CHECK(empty.save(ss));
 
   vita::i_ga empty1;
-  BOOST_TEST(empty1.load(ss, prob));
-  BOOST_TEST(empty1.debug());
-  BOOST_TEST(empty1.empty());
+  CHECK(empty1.load(ss, prob));
+  CHECK(empty1.debug());
+  CHECK(empty1.empty());
 
-  BOOST_REQUIRE_EQUAL(empty, empty1);
+  CHECK(empty == empty1);
 
 }
-BOOST_AUTO_TEST_SUITE_END()
+
+}  // TEST_SUITE("I_GA")

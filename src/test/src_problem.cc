@@ -12,46 +12,47 @@
 
 #include "kernel/src/problem.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE test_src_problem
-#include "boost/test/unit_test.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-using namespace boost;
-#endif
-
-namespace vita { namespace detail {
+namespace vita
+{
+namespace detail
+{
 template<class C>
 std::set<std::vector<C>> seq_with_rep(const std::set<C> &, std::size_t);
-}}
+}
+}
 
-BOOST_AUTO_TEST_SUITE(test_src_problem)
+TEST_SUITE("SRC_PROBLEM")
+{
 
-BOOST_AUTO_TEST_CASE(t_seq_with_rep)
+TEST_CASE("seq_with_rep")
 {
   vita::category_t v0{1}, v1{2}, v2{3}, v3{4};
 
   std::set<vita::category_t> v = { v0 };
   auto seq(vita::detail::seq_with_rep(v, 1));
   std::set<vita::cvect> res = { {v0} };
-  BOOST_TEST(seq.size() == 1);
-  BOOST_TEST(seq == res);
+  CHECK(seq.size() == 1);
+  CHECK(seq == res);
 
   seq = vita::detail::seq_with_rep(v, 4);
   res = { {v0, v0, v0, v0} };
-  BOOST_TEST(seq.size() == 1);
-  BOOST_TEST(seq == res);
+  CHECK(seq.size() == 1);
+  CHECK(seq == res);
 
   v = {v0, v1};
   seq = vita::detail::seq_with_rep(v, 1);
   res = { {v0}, {v1} };
-  BOOST_TEST(seq.size() == 2);
-  BOOST_TEST(seq == res);
+  CHECK(seq.size() == 2);
+  CHECK(seq == res);
 
   v = {v0, v1};
   seq = vita::detail::seq_with_rep(v, 2);
   res = { {v0, v0}, {v0, v1}, {v1, v0}, {v1, v1} };
-  BOOST_TEST(seq.size() == 4);
-  BOOST_TEST(seq == res);
+  CHECK(seq.size() == 4);
+  CHECK(seq == res);
 
   v = {v0, v1, v2};
   seq = vita::detail::seq_with_rep(v, 3);
@@ -62,28 +63,28 @@ BOOST_AUTO_TEST_CASE(t_seq_with_rep)
         res.insert({*std::next(v.begin(), i),
                     *std::next(v.begin(), j),
                     *std::next(v.begin(), k)});
-  BOOST_TEST(seq.size() == 27);
-  BOOST_TEST(seq == res);
+  CHECK(seq.size() == 27);
+  CHECK(seq == res);
 
   v = {v0, v1, v2, v3};
   seq = vita::detail::seq_with_rep(v, 8);
-  BOOST_TEST(seq.size() ==
+  CHECK(seq.size() ==
              v.size() * v.size() * v.size() * v.size() *
              v.size() * v.size() * v.size() * v.size());
 }
 
-BOOST_AUTO_TEST_CASE(t_loading)
+TEST_CASE("Loading")
 {
   vita::src_problem p("./test_resources/src_problem.xrff",
                       "./test_resources/src_problem.xml");
 
-  BOOST_REQUIRE(!!p);
+  CHECK(!!p);
 
-  BOOST_REQUIRE_EQUAL(p.data().size(), 3);
-  BOOST_REQUIRE(p.classification());
-  BOOST_REQUIRE_EQUAL(p.classes(), 3);
-  BOOST_REQUIRE_EQUAL(p.categories(), 4);
-  BOOST_REQUIRE_EQUAL(p.variables(), 3);
+  CHECK(p.data().size() == 3);
+  CHECK(p.classification());
+  CHECK(p.classes() == 3);
+  CHECK(p.categories() == 4);
+  CHECK(p.variables() == 3);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("SRC_PROBLEM")

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,18 +16,15 @@
 #include "kernel/evolution.h"
 #include "kernel/i_mep.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE evolution
-#include <boost/test/unit_test.hpp>
+#include "test/fixture2.h"
 
-using namespace boost;
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
-#include "factory_fixture2.h"
-#endif
+TEST_SUITE("EVOLUTION")
+{
 
-BOOST_FIXTURE_TEST_SUITE(evolution, F_FACTORY2)
-
-BOOST_AUTO_TEST_CASE(Creation)
+TEST_CASE_FIXTURE(fixture2, "Creation")
 {
   using namespace vita;
 
@@ -41,11 +38,11 @@ BOOST_AUTO_TEST_CASE(Creation)
       const auto eva(std::make_unique<vita::random_evaluator<i_mep>>());
 
       vita::evolution<i_mep, alps_es> evo1(prob, *eva);
-      BOOST_REQUIRE(evo1.debug());
+      CHECK(evo1.debug());
 
       vita::evolution<i_mep, std_es> evo2(prob, *eva);
-      BOOST_REQUIRE(evo2.debug());
+      CHECK(evo2.debug());
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("EVOLUTION")

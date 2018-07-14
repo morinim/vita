@@ -14,7 +14,7 @@
 #include <random>
 
 #include "utility/timer.h"
-#include "utility/xoroshiro128p/xoroshiro128p.h"
+#include "utility/xoroshiro128p.h"
 
 int main()
 {

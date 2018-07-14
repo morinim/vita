@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,12 +17,8 @@
 #include "kernel/cache_hash.h"
 #include "utility/any.h"
 
-#if !defined(MASTER_TEST_SET)
-#define BOOST_TEST_MODULE Any
-#include <boost/test/unit_test.hpp>
-
-using namespace boost;
-#endif
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "third_party/doctest/doctest.h"
 
 namespace std
 {
@@ -37,96 +33,97 @@ std::ostream &operator<<(std::ostream &o, const std::vector<int> &)
 }
 }
 
-BOOST_AUTO_TEST_SUITE(test_any)
+TEST_SUITE("ANY")
+{
 
-BOOST_AUTO_TEST_CASE(default_ctor)
+TEST_CASE("Default constructor")
 {
   const vita::any value;
 
-  BOOST_CHECK(!value.has_value());
-  BOOST_CHECK(vita::any_cast<int>(&value) == nullptr);
-  BOOST_CHECK(value.type() == typeid(void));
+  CHECK(!value.has_value());
+  CHECK(vita::any_cast<int>(&value) == nullptr);
+  CHECK(value.type() == typeid(void));
 }
 
-BOOST_AUTO_TEST_CASE(converting_ctor)
+TEST_CASE("Converting constructor")
 {
   std::string text("test message");
 
   vita::any value(text);
 
-  BOOST_CHECK(value.has_value());
-  BOOST_CHECK(value.type() == typeid(std::string));
-  BOOST_CHECK(vita::any_cast<int>(&value) == nullptr);
-  BOOST_CHECK(vita::any_cast<std::string>(&value));
-  BOOST_CHECK(vita::any_cast<std::string>(value) == text);
-  BOOST_CHECK(vita::any_cast<std::string>(&value) != &text);
+  CHECK(value.has_value());
+  CHECK(value.type() == typeid(std::string));
+  CHECK(vita::any_cast<int>(&value) == nullptr);
+  CHECK(vita::any_cast<std::string>(&value));
+  CHECK(vita::any_cast<std::string>(value) == text);
+  CHECK(vita::any_cast<std::string>(&value) != &text);
 }
 
-BOOST_AUTO_TEST_CASE(copy_ctor)
+TEST_CASE("Copy constructor")
 {
   std::string text("test message");
   vita::any original(text), copy(original);
 
-  BOOST_CHECK(copy.has_value());
-  BOOST_CHECK(original.type() == copy.type());
-  BOOST_CHECK(vita::any_cast<std::string>(original)
-              == vita:: any_cast<std::string>(copy));
-  BOOST_CHECK(text == vita::any_cast<std::string>(copy));
-  BOOST_CHECK(vita::any_cast<std::string>(&original)
-              != vita::any_cast<std::string>(&copy));
+  using vita::any_cast;
+
+  CHECK(copy.has_value());
+  CHECK(original.type() == copy.type());
+  CHECK(any_cast<std::string>(original) == any_cast<std::string>(copy));
+  CHECK(text == any_cast<std::string>(copy));
+  CHECK(any_cast<std::string>(&original) != any_cast<std::string>(&copy));
 }
 
-BOOST_AUTO_TEST_CASE(copy_assign)
+TEST_CASE("Copy assign")
 {
   std::string text("test message");
   vita::any original(text), copy;
   vita::any *assign_result = &(copy = original);
 
-  BOOST_CHECK(copy.has_value());
-  BOOST_CHECK(original.type() == copy.type());
-  BOOST_CHECK(vita::any_cast<std::string>(original)
-              == vita::any_cast<std::string>(copy));
-  BOOST_CHECK(text == vita::any_cast<std::string>(copy));
-  BOOST_CHECK(vita::any_cast<std::string>(&original)
-              != vita::any_cast<std::string>(&copy));
-  BOOST_CHECK(assign_result == &copy);
+  using vita::any_cast;
+
+  CHECK(copy.has_value());
+  CHECK(original.type() == copy.type());
+  CHECK(any_cast<std::string>(original) == any_cast<std::string>(copy));
+  CHECK(text == any_cast<std::string>(copy));
+  CHECK(any_cast<std::string>(&original) != any_cast<std::string>(&copy));
+  CHECK(assign_result == &copy);
 }
 
-BOOST_AUTO_TEST_CASE(bad_cast)
+TEST_CASE("Bad cast")
 {
   std::string text("test message");
   vita::any value(text);
 
-  BOOST_CHECK_THROW(vita::any_cast<char *>(value), vita::bad_any_cast);
+  CHECK_THROWS_AS(vita::any_cast<char *>(value), vita::bad_any_cast);
 }
 
-BOOST_AUTO_TEST_CASE(swap)
+TEST_CASE("Swap")
 {
   std::string text("test message");
   vita::any original(text), swapped;
   std::string *original_ptr(vita::any_cast<std::string>(&original));
   vita::any *swap_result(&original.swap(swapped));
 
-  BOOST_CHECK(!original.has_value());
-  BOOST_CHECK(swapped.has_value());
-  BOOST_CHECK(swapped.type() == typeid(std::string));
-  BOOST_CHECK(text == vita::any_cast<std::string>(swapped));
-  BOOST_CHECK(original_ptr);
-  BOOST_CHECK(swap_result == &original);
+  CHECK(!original.has_value());
+  CHECK(swapped.has_value());
+  CHECK(swapped.type() == typeid(std::string));
+  CHECK(text == vita::any_cast<std::string>(swapped));
+  CHECK(original_ptr);
+  CHECK(swap_result == &original);
 }
 
-BOOST_AUTO_TEST_CASE(null_copying)
+TEST_CASE("Null copying")
 {
   const vita::any null;
   vita::any copied = null, assigned;
   assigned = null;
 
-  BOOST_CHECK(!null.has_value());
-  BOOST_CHECK(!copied.has_value());
-  BOOST_CHECK(!assigned.has_value());
+  CHECK(!null.has_value());
+  CHECK(!copied.has_value());
+  CHECK(!assigned.has_value());
 }
 
-BOOST_AUTO_TEST_CASE(cast_to_reference)
+TEST_CASE("Cast to reference")
 {
   vita::any a(137);
   const vita::any b(a);
@@ -136,56 +133,56 @@ BOOST_AUTO_TEST_CASE(cast_to_reference)
   volatile int       &ra_v( vita::any_cast<      volatile int &>(a));
   volatile const int &ra_cv(vita::any_cast<volatile const int &>(a));
 
-  BOOST_CHECK(&ra == &ra_c);
-  BOOST_CHECK(&ra == &ra_v);
-  BOOST_CHECK(&ra == &ra_cv);
+  CHECK(&ra == &ra_c);
+  CHECK(&ra == &ra_v);
+  CHECK(&ra == &ra_cv);
 
   const int          &rb_c( vita::any_cast<         const int &>(b));
   volatile const int &rb_cv(vita::any_cast<volatile const int &>(b));
 
-  BOOST_CHECK(&rb_c == &rb_cv);
-  BOOST_CHECK(&ra != &rb_c);
+  CHECK(&rb_c == &rb_cv);
+  CHECK(&ra != &rb_c);
 
   ++ra;
   int incremented(vita::any_cast<int>(a));
-  BOOST_CHECK(incremented == 138);
+  CHECK(incremented == 138);
 
-  BOOST_CHECK_THROW(vita::any_cast<char &>(a), vita::bad_any_cast);
-  BOOST_CHECK_THROW(vita::any_cast<const char &>(b), vita::bad_any_cast);
+  CHECK_THROWS_AS(vita::any_cast<char &>(a), vita::bad_any_cast);
+  CHECK_THROWS_AS(vita::any_cast<const char &>(b), vita::bad_any_cast);
 }
 
-BOOST_AUTO_TEST_CASE(reset)
+TEST_CASE("Reset")
 {
   std::string text("test message");
   vita::any value(text);
 
-  BOOST_CHECK(value.has_value());
+  CHECK(value.has_value());
 
   value.reset();
-  BOOST_CHECK(!value.has_value());
+  CHECK(!value.has_value());
 
   value.reset();
-  BOOST_CHECK(!value.has_value());  // non-empty after second clear
+  CHECK(!value.has_value());  // non-empty after second clear
 
   value = text;
-  BOOST_CHECK(value.has_value());
+  CHECK(value.has_value());
 
   value.reset();
-  BOOST_CHECK(!value.has_value());
+  CHECK(!value.has_value());
 }
 
 // Covers the case from Boost #9462
 // (<https://svn.boost.org/trac/boost/ticket/9462>).
-BOOST_AUTO_TEST_CASE(vectors)
+TEST_CASE("Vectors")
 {
   const std::size_t vs(100);
   auto make_vect([&]() { return vita::any(std::vector<int>(vs, 7)); });
 
   const std::vector<int> &vec(vita::any_cast<std::vector<int>>(make_vect()));
 
-  BOOST_CHECK(vec.size() == vs);
-  BOOST_CHECK(vec.back() == 7);
-  BOOST_CHECK(vec.front() ==  7);
+  CHECK(vec.size() == vs);
+  CHECK(vec.back() == 7);
+  CHECK(vec.front() ==  7);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+}  // TEST_SUITE("ANY")
