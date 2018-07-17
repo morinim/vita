@@ -10,3 +10,5 @@ endforeach()
 # Resources needed for testing
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_resources
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+add_test(NAME UnitTests COMMAND tests)

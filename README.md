@@ -28,19 +28,10 @@ However, since core members of the Vita project have no access to these platform
 ### Mandatory ###
 
 * A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
-
-#### Unix ####
-
-* GNU-compatible make
-* POSIX-standard shell
-
-#### Windows ####
-
-* The [specific walkthrough][6] contains all the details.
+* [CMake][5]
 
 ### Optional ###
 
-* [CMake][5]
 * [Python v3][4] for additional functionalities
 
 ## Getting the source ##
@@ -71,7 +62,6 @@ vita/
   misc/
   src/
     CMakeLists.txt
-    Makefile
     build/ ................Built executables
     examples/ .............Various examples
       forex/ ..............Forex example
@@ -85,23 +75,6 @@ vita/
 
 ## Setting up the build ##
 
-### make ###
-
-```cd vita/src```
-
-* To build (almost) all: `make`
-* To build the kernel library (`libvita.a`): `make vita`
-* To build the sr tool: `make sr`
-* To build / perform tests: `make tests`
-* To build example ABC: `make examples/ABC`
-
-The default compiler is g++, to use clang++ type `make CXX=clang++`.
-
-All the output executables will, per default, be stored inside the `build/`
-directory.
-
-### cmake ###
-
 ```shell
 cd vita/src
 mkdir -p build
@@ -109,17 +82,23 @@ cd build/
 cmake ..
 ```
 
-Windows needs various expedients about which you can read in the [Windows walkthrough][6].
-
 To suggest a specific compiler you can write:
 
 ```shell
 CXX=clang++ cmake ..
 ```
 
-You're now ready to build using the traditional `make` system (see above).
+You're now ready to build using the traditional `make` system:
+
+* To build (almost) all: `make`
+* To build the kernel library (`libvita.a`): `make vita`
+* To build the sr tool: `make sr`
+* To build / perform tests: `make tests`
+* To build example ABC: `make examples/ABC`
 
 All the output files will be stored in subdirectories of `build/` (out of source builds).
+
+Windows may need various expedients about which you can read in the [Windows walkthrough][6].
 
 
 [1]: http://www.eosdev.it/

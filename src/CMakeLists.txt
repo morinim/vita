@@ -13,8 +13,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 
 set(NO_WARN_FLAGS "-w")
 
-# -Wconversion -Wsign-conversion -Weffc++ are other interesting warning
-# switches to try from time to time (they gives many false positives).
+# `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
+# switches to try from time to time (they give many false positives).
 set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
                "-Wformat=2" "-Wfloat-equal" "-Wshadow" "-Wdouble-promotion"
 			   "-Wzero-as-null-pointer-constant")
@@ -22,6 +22,7 @@ set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
 set(OTHER_FLAGS "-pipe" "-march=native")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS")
+
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
