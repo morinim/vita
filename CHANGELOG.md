@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Removed
+- standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
+
 ### Changed
 - **BREAKING CHANGE**. Simpler method to specify GAs parameters.
 

@@ -51,8 +51,8 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
-  CHANGELOG.md
-  CODE_OF_CONDUCT.md
+  CHANGELOG.md.............Don't let your friends dump git logs into changelogs
+  CODE_OF_CONDUCT.md.......Standards for how to engage in this community
   CONTRIBUTING.md
   LICENSE
   README.md
@@ -101,7 +101,7 @@ All the output files will be stored in subdirectories of `build/` (out of source
 Windows may need various expedients about which you can read in the [Windows walkthrough][6].
 
 
-[1]: http://www.eosdev.it/
+[1]: https://www.eosdev.it/
 [2]: https://github.com/morinim/vita/wiki/features
 [3]: https://github.com/morinim/vita
 [4]: http://www.python.org/
