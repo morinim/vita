@@ -124,7 +124,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   number err;
 
   if (res.has_value())
-    err = std::fabs(to<number>(res) - t.cast_output<number>());
+    err = std::fabs(to<number>(res) - label_as<number>(t));
   else
     err = std::pow(100.0, ++(*illegals));
 
@@ -152,7 +152,7 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   if (res.has_value())
   {
     const auto approx(to<number>(res));
-    const auto target(t.cast_output<number>());
+    const auto target(label_as<number>(t));
 
     const auto delta(std::fabs(target - approx));
 
@@ -195,7 +195,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   number err;
   if (res.has_value())
   {
-    err = to<number>(res) - t.cast_output<number>();
+    err = to<number>(res) - label_as<number>(t);
     err *= err;
   }
   else
@@ -221,7 +221,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   const any res(agent(t));
 
   const bool err(!res.has_value() ||
-                 !issmall(to<number>(res) - t.cast_output<number>()));
+                 !issmall(to<number>(res) - label_as<number>(t)));
 
   if (err)
     ++t.difficulty;
@@ -255,7 +255,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
   {
     const auto probable_class(lambda.tag(example).first);
 
-    if (probable_class != example.template tag())
+    if (probable_class != label(example))
     {
       ++err;
       ++example.template difficulty;
@@ -305,7 +305,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   {
     const auto res(lambda.tag(example));  // confidence in classification
 
-    if (res.first == example.template tag())
+    if (res.first == label(example))
     {
       // Note:
       // * (1.0 - confidence) is the sum of the errors;
@@ -354,7 +354,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   fitness_t::value_type err(0.0);
 
   for (auto &example : *this->dat_)
-    if (example.tag() != agent.tag(example).first)
+    if (label(example) != agent.tag(example).first)
     {
       ++example.difficulty;
       ++err;

@@ -142,35 +142,57 @@ private:
 ///
 struct dataframe::example
 {
+  /// The thing about wich we want to make a prediction (aka instance). The
+  /// elements of the vector are features.
   std::vector<any> input = {};
+  /// The answer for the prediction task either the answer produced by the
+  /// machine learning system, or the right answer supplied in the training
+  /// data.
   any             output = {};
 
   std::uintmax_t difficulty = 0;
   unsigned              age = 0;
 
-  class_t tag() const { return any_cast<class_t>(output); }
-  template<class T> T cast_output() const;
-
   void clear() { *this = example(); }
 };
 
-template<class T>
-T dataframe::example::cast_output() const
+///
+/// Gets the `class_t` ID (aka label) for a given example.
+///
+/// \param[in] e an example
+/// \return      the label of `e`
+///
+/// \warning Use only for classification problems.
+///
+inline class_t label(const dataframe::example &e)
 {
-  if (auto *v = any_cast<double>(&output))
+  return any_cast<class_t>(e.output);
+}
+
+///
+/// Get the output value for a given example in a symbolic regression task.
+///
+/// \param[in] e an example
+/// \return      the output value for example  `e`
+///
+///
+template<class T>
+T label_as(const dataframe::example &e)
+{
+  if (auto *v = any_cast<double>(&e.output))
     return static_cast<T>(*v);
 
-  if (auto *v = any_cast<int>(&output))
+  if (auto *v = any_cast<int>(&e.output))
     return static_cast<T>(*v);
 
-  if (auto *v = any_cast<bool>(&output))
+  if (auto *v = any_cast<bool>(&e.output))
     return static_cast<T>(*v);
 
   return static_cast<T>(0.0);
 }
 
 ///
-/// Informations about a "column" (feature) of the dataset.
+/// Informations about a "column" of the dataset.
 ///
 struct dataframe::column
 {

@@ -35,7 +35,7 @@ double accuracy_metric<T>::operator()(const reg_lambda_f<T> *l,
   {
     const any res((*l)(example));
     if (res.has_value() &&
-        issmall(to<number>(res) - example.cast_output<number>()))
+        issmall(to<number>(res) - label_as<number>(example)))
       ++ok;
 
     ++total_nr;
@@ -61,7 +61,7 @@ double accuracy_metric<T>::operator()(const class_lambda_f<T> *l,
 
   for (const auto &example : d)
   {
-    if (l->tag(example).first == example.tag())
+    if (l->tag(example).first == label(example))
       ++ok;
 
     ++total_nr;

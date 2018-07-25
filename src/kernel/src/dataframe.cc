@@ -214,7 +214,7 @@ void dataframe::push_back(const example &e)
 
 ///
 /// \param[in] label name of a class of the learning collection
-/// \return          the (numerical) tag associated with class `label`
+/// \return          the (numerical) value associated with class `label`
 ///
 class_t dataframe::encode(const std::string &label)
 {
@@ -229,8 +229,8 @@ class_t dataframe::encode(const std::string &label)
 
 ///
 /// \param[in] i the encoded (dataframe::encode()) value of a class
-/// \return      the name of the class encoded with the `unsigned i` (or an
-///              empty string if such class cannot be find)
+/// \return      the name of the class encoded by `i` (or an empty string if
+///              such class cannot be find)
 ///
 /// \note
 /// Boost Bitmap could be used to speed up the search in `classes_map_`, but
@@ -650,7 +650,7 @@ bool dataframe::debug() const
       if (e.input.size() != in_size)
         return false;
 
-      if (cl_size && e.tag() >= cl_size)
+      if (cl_size && label(e) >= cl_size)
         return false;
     }
   }

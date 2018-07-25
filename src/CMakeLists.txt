@@ -11,24 +11,23 @@ endif ()
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     OR CMAKE_CXX_COMPILER_ID MATCHES "CLang")
 
-set(NO_WARN_FLAGS "-w")
+  set(NO_WARN_FLAGS "-w")
 
-# `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
-# switches to try from time to time (they give many false positives).
-set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
-               "-Wformat=2" "-Wfloat-equal" "-Wshadow" "-Wdouble-promotion"
-			   "-Wzero-as-null-pointer-constant")
+  # `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
+  # switches to try from time to time (they give many false positives).
+  set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
+                 "-Wformat=2" "-Wfloat-equal" "-Wshadow" "-Wdouble-promotion"
+                 "-Wzero-as-null-pointer-constant")
 
-set(OTHER_FLAGS "-pipe" "-march=native")
+  set(OTHER_FLAGS "-pipe" "-march=native")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS")
 
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
+  set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og")
-endif ()
-
+  if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS_DEBUG "-Og")
+  endif ()
 endif ()
 
 add_compile_options(${OTHER_FLAGS} ${WARN_FLAGS})

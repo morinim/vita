@@ -217,7 +217,7 @@ void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
   {
     ++dataset_size_;
 
-    ++slot_matrix_(slot(example), example.tag());
+    ++slot_matrix_(slot(example), label(example));
   }
 
   const auto unknown(d.classes());
@@ -470,7 +470,7 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
     else if (val < -cut)
       val = -cut;
 
-    gauss_dist_[example.tag()].add(val);
+    gauss_dist_[label(example)].add(val);
   }
 }
 

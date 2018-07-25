@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 
 ### Changed
+- **BREAKING CHANGE**. `example::tag` method has been renamed to `label`; `example::cast_output` has been renamed to `label_as`. Both are now free functions.
+
+  The new naming improves consistency and adopts standard terminology.
+
+
 - **BREAKING CHANGE**. Simpler method to specify GAs parameters.
 
   Instead of:
@@ -28,7 +33,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   - you can omit the parameter index;
   - the range is clearly stated.
 
-  The ga::parameter help function has been removed.
+  The `ga::parameter` help function has been removed.
 
 ## [0.9.14] - 2017-12-11
 
