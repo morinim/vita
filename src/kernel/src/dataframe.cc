@@ -220,7 +220,7 @@ class_t dataframe::encode(const std::string &label)
 {
   if (classes_map_.find(label) == classes_map_.end())
   {
-    const auto n(static_cast<category_t>(classes_map_.size()));
+    const auto n(classes());
     classes_map_[label] = n;
   }
 
