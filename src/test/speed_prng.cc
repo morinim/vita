@@ -14,7 +14,7 @@
 #include <random>
 
 #include "utility/timer.h"
-#include "utility/xoroshiro128p.h"
+#include "utility/xoshiro256ss.h"
 
 int main()
 {
@@ -49,6 +49,15 @@ int main()
     out = e3();
 
   std::cout << "XOROSHIRO128+ - Elapsed: " << t.elapsed().count() << "ms\n";
+
+  // -------------------------------------------------------------------------
+  vigna::xoshiro256ss e4;
+
+  t.restart();
+  for (decltype(sup) i(0); i < sup; ++i)
+    out = e4();
+
+  std::cout << "XOSHIRO256**  - Elapsed: " << t.elapsed().count() << "ms\n";
 
   return !out;  // just to stop some warnings
 }

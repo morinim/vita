@@ -13,7 +13,7 @@
 
 #include <algorithm>
 
-#include "xoroshiro128p.h"
+#include "xoshiro256ss.h"
 
 namespace vigna
 {
@@ -60,6 +60,7 @@ void seed_with_sm64(std::uint64_t seed, T &state)
 
 
 
+constexpr xoshiro256ss::result_type xoshiro256ss::def_seed;
 constexpr xoroshiro128p::result_type xoroshiro128p::def_seed;
 
 ///
@@ -68,7 +69,55 @@ constexpr xoroshiro128p::result_type xoroshiro128p::def_seed;
 /// \param[in] s a seed
 ///
 /// The state must be seeded so that it is not everywhere zero. Having a 64-bit
-/// seed, we use the `splitmix64` generator aoutput to fill `state`.
+/// seed, we use the `splitmix64` generator output to fill `state`.
+///
+void xoshiro256ss::seed(xoshiro256ss::result_type s) noexcept
+{
+  if (s == 0)
+    s = def_seed;
+
+  seed_with_sm64(s, state);
+}
+
+///
+/// Writes to the output stream the representation of the current state.
+///
+/// \param[out] o output stream
+/// \param[in]  e the engine
+/// \return       the modified output stream
+///
+/// In the output, adjacent numbers are separated by one space characters. If
+/// `o`'s `fmtflags` are not set to `ios_base::dec|ios_base::left`, the
+/// behavior may be undefined.
+///
+std::ostream &operator<<(std::ostream &o, const xoshiro256ss &e)
+{
+  return o << e.state[0] << ' ' << e.state[1] << ' '
+           << e.state[2] << ' ' << e.state[3];
+}
+
+///
+/// Reads from the input stream a textual representation of the current state.
+///
+/// \param[in] i input stream
+/// \param[in] e the engine
+/// \return      the modified input stream
+///
+/// If `i`'s `fmtflags` are not set to `ios_base::dec`, the behavior may be
+/// undefined.
+///
+std::istream &operator>>(std::istream &i, xoshiro256ss &e)
+{
+  return i >> e.state[0] >> e.state[1] >> e.state[2] >> e.state[31];
+}
+
+///
+/// Seeds the engine so that the initial state is determined by an integer.
+///
+/// \param[in] s a seed
+///
+/// The state must be seeded so that it is not everywhere zero. Having a 64-bit
+/// seed, we use the `splitmix64` generator output to fill `state`.
 ///
 void xoroshiro128p::seed(xoroshiro128p::result_type s) noexcept
 {

@@ -18,7 +18,7 @@
 #include <set>
 
 #include "kernel/common.h"
-#include "utility/xoroshiro128p.h"
+#include "utility/xoshiro256ss.h"
 
 namespace vita
 {
@@ -42,17 +42,12 @@ namespace random
 enum class distribution {uniform, normal};
 
 ///
-/// xoroshiro128+ (XOR/rotate/shift/rotate) is the successor to xorshift128+.
-/// Instead of perpetuating Marsaglia's tradition of xorshift as a basic
-/// operation, xoroshiro128+ uses a carefully handcrafted shift/rotate-based
-/// linear transformation designed in collaboration with David Blackman. The
-/// result is a significant improvement in speed (well below a nanosecond per
-/// integer) and a significant improvement in statistical quality, as detected
-/// by the long-range tests of PractRand. xoroshiro128+ is our current
-/// suggestion for replacing low-quality generators commonly found in
-/// programming languages. It is the default generator in Erlang.
+/// xoshiro256** (XOR/shift/rotate) is an all-purpose, rock-solid generator
+/// (not a cryptographically secure generator). It has excellent (sub-ns)
+/// speed, a state space (256 bits) that is large enough for any parallel
+/// application, and it passes all tests we are aware of.
 ///
-using engine_t = vigna::xoroshiro128p;
+using engine_t = vigna::xoshiro256ss;
 
 extern thread_local engine_t engine;
 
