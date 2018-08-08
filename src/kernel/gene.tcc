@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@ basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(t.arity())
 }
 
 ///
-///  Possibly inits the parameter.
+/// Possibly inits the parameter.
 ///
 template<unsigned K>
 void basic_gene<K>::init_if_parametric()
@@ -158,7 +158,7 @@ template<unsigned K>
 template<class T>
 void basic_gene<K>::copy_param(T v, enum_p)
 {
-  par = static_cast<decltype(par)>(v.as_integer());
+  par = static_cast<decltype(par)>(as_integer(v));
 }
 
 ///

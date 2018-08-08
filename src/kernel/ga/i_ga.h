@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -73,14 +73,14 @@ public:
   ///
   /// \return the number of parameters stored in the individual
   ///
-  /// \note `parameters()` is just an alias for `size()`.
+  /// \note `parameters()` and `size()` are aliases.
   ///
   unsigned size() const { return genome_.size(); }
 
   ///
   /// \return the number of parameters stored in the individual
   ///
-  /// \note `size()` is just an alias for `parameters()`.
+  /// \note `size()` and `parameters()` are aliases.
   ///
   unsigned parameters() const { return size(); }
 

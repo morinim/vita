@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -76,8 +76,8 @@ bool operator!=(const basic_gene<K> &, const basic_gene<K> &);
 ///
 /// A basic_gene with the standard size.
 ///
-/// A gene supports function with more than 4 arguments but with a performance
-/// penality.
+/// A gene supports functions with more than 4 arguments (with a performance
+/// penality).
 ///
 using gene = basic_gene<4>;
 

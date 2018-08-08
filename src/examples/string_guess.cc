@@ -52,7 +52,7 @@ int main()
   auto result = search.run();
 
   std::cout << "\nBest result: ";
-  for (auto gene :  result.best.solution)
+  for (auto gene : result.best.solution)
     std::cout << GENESET[gene.as<int>()];
 
   std::cout << " (fitness " << result.best.score.fitness << ")\n";

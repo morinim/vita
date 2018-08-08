@@ -143,8 +143,8 @@ i_ga crossover(const i_ga &lhs, const i_ga &rhs)
 
   i_ga ret(rhs);
   for (auto i(cut1); i < cut2; ++i)
-    ret.genome_[i] = lhs[i];
-
+    ret.genome_[i] = lhs[i];  // not using `operator[](unsigned)` to avoid
+                              // multiple signature resets.
   ret.set_older_age(lhs.age());
   ret.signature_ = ret.hash();
 
