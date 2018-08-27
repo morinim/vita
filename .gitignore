@@ -11,9 +11,6 @@ doc/doxygen/vita.api
 # Clone of Github's Vita Wiki
 doc/wiki/
 
-# Custom boost library (used for tests)
-src/boost/
-
 # Dummy directories for sr utility
 src/examples/sr/dataset
 src/examples/sr/stat
