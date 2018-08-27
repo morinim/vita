@@ -1,5 +1,4 @@
-<h3>The fastest feature-rich C++98/C++11 single-header testing framework for unit tests and TDD</h3>
-
+<p align="center"><img src="scripts/data/logo/logo_1.svg"></p>
 <b>
 <table>
     <tr>
@@ -56,8 +55,10 @@ The **key** differences between it and other testing frameworks are that it is l
 - Ultra light on compile times both in terms of [**including the header**](doc/markdown/benchmarks.md#cost-of-including-the-header) and writing [**thousands of asserts**](doc/markdown/benchmarks.md#cost-of-an-assertion-macro)
 - Doesn't produce any warnings even on the [**most aggressive**](scripts/cmake/common.cmake#L84) warning levels for **MSVC**/**GCC**/**Clang**
 - Offers a way to remove **everything** testing-related from the binary with the [**```DOCTEST_CONFIG_DISABLE```**](doc/markdown/configuration.md#doctest_config_disable) identifier
+- [**thread-safe**](faq.md#is-doctest-thread-aware) - asserts (and logging) can be used from multiple threads spawned from a single test case - [**example**](../../examples/all_features/concurrency.cpp)
+- asserts can be used [**outside of a testing context**](doc/markdown/assertions.md#using-asserts-out-of-a-testing-context) - as a general purpose assert library - [**example**](examples/all_features/asserts_used_outside_of_tests.cpp)
 - Doesn't pollute the global namespace (everything is in namespace ```doctest```) and doesn't drag **any** headers with it
-- Very [**portable**](doc/markdown/features.md#extremely-portable) C++98 - per commit tested on CI with over 330 different builds (static analysis, sanitizers...)
+- Very [**portable**](doc/markdown/features.md#extremely-portable) C++11 (use tag [**1.2.9**](https://github.com/onqtam/doctest/tree/1.2.9) for C++98) with over 180 different CI builds (static analysis, sanitizers...)
 
 ![cost-of-including-the-framework-header](scripts/data/benchmarks/header.png)
 
@@ -82,7 +83,7 @@ The framework can be used like any other if you don't want/need to mix productio
 [![download](https://img.shields.io/badge/download%20%20-latest-blue.svg)](https://raw.githubusercontent.com/onqtam/doctest/master/doctest/doctest.h)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/503/badge)](https://bestpractices.coreinfrastructure.org/projects/503)
 [![Join the chat at https://gitter.im/onqtam/doctest](https://badges.gitter.im/onqtam/doctest.svg)](https://gitter.im/onqtam/doctest?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](https://wandbox.org/permlink/oD4eD9NgDDs7qO0d)
+[![Try it online](https://img.shields.io/badge/try%20it-online-orange.svg)](https://wandbox.org/permlink/PtVvXuY705tH6MvO)
 <!--
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 [![documentation](https://img.shields.io/badge/documentation%20%20-online-blue.svg)](https://github.com/onqtam/doctest/blob/master/doc/markdown/readme.md#reference)
@@ -131,26 +132,9 @@ If you work for a company using **doctest** or have the means to do so, please c
 
 Contributions in the form of issues and pull requests are welcome as well - check out the [**Contributing**](CONTRIBUTING.md) page.
 
+Logo
+------------
 
-Sponsors
---------
+The [logo](scripts/data/logo) is licensed under a Creative Commons Attribution 4.0 International License. Copyright &copy; 2018 [area55git](https://github.com/area55git) &nbsp; [![License: CC BY 4.0](https://licensebuttons.net/l/by/4.0/80x15.png)](https://creativecommons.org/licenses/by/4.0/)
 
-Want to see your name or the name of your company here? Consider donating!
-
-### :zap: Rockstar sponsors :zap:
-
-### :gem: Gold sponsors :gem:
-
-- Pascal Thomet
-- Mario Kostadinov
-
-### :cake: Silver sponsors :cake:
-
-- Aras Pranckevicius
-- Dan Nissenbaum
-- Dean Bodenham
-
-### :hamburger: Bronze sponsors :hamburger:
-
-- Sebastien Feldis
-- Zahari Karadzhov
+<p align="center"><img src="scripts/data/logo/icon_2.svg"></p>
