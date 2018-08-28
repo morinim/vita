@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -123,6 +123,8 @@ private:
 class real : public detail::number<double>
 {
 public:
+  // \param[in] r a half open range
+  // \param[in] i an optional category
   explicit real(range_t<double> r = {-1000.0, 1000.0},
                 category_t i = undefined_category)
     : detail::number<double>("REAL", r, i)
@@ -133,6 +135,8 @@ public:
 class integer : public detail::number<int>
 {
 public:
+  // \param[in] r a half open range
+  // \param[in] i an optional category
   explicit integer(range_t<int> r = {-1000, 1000},
                    category_t i = undefined_category)
     : detail::number<int>("INTEGER", r, i)
