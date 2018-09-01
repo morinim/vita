@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,6 +13,7 @@
 #if !defined(VITA_COMP_PENALTY_H)
 #define      VITA_COMP_PENALTY_H
 
+#include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
 
 namespace vita
@@ -21,7 +22,7 @@ namespace vita
 /// A simple, convenient function for the penalty score of the typical
 /// four-terms comparison.
 ///
-/// \return a penalty in the {0, 1, 2} set
+/// \return a penalty in the `{0, 1, 2}` set
 ///
 /// Maximum penalty for `if ("apple" == "apple") then "orange" else "orange"`
 ///

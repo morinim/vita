@@ -25,10 +25,11 @@
 TEST_SUITE("PRIMITIVE_D")
 {
 
+using i_interp = vita::interpreter<vita::i_mep>;
+
 TEST_CASE_FIXTURE(fixture3, "f_abs")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // ABS(-X) == X
   const i_mep i1({
@@ -50,7 +51,6 @@ TEST_CASE_FIXTURE(fixture3, "f_abs")
 TEST_CASE_FIXTURE(fixture3, "f_add")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // ADD(X,0) == X
   const i_mep i1({
@@ -94,7 +94,6 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
 TEST_CASE_FIXTURE(fixture3, "f_aq")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   const auto rx(real::base(x->eval(nullptr)));
 
@@ -151,10 +150,35 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
   CHECK(real::base(ret) == doctest::Approx(0.0));
 }
 
+TEST_CASE_FIXTURE(fixture3, "f_cos")
+{
+  using namespace vita;
+
+  // COS(Z) == std::cos(Z)
+  const i_mep i1({
+                   {{f_cos,  {1}}},  // [0] FCOS [1]
+                   {{    z, null}}   // [1] Z
+                 });
+  for (unsigned j(0); j < 100; ++j)
+  {
+    static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
+    ret = i_interp(&i1).run();
+    CHECK(doctest::Approx(real::base(ret))
+          == std::cos(static_cast<Z *>(z)->val));
+  }
+
+  // COS(0) == 1
+  const i_mep i2({
+                   {{f_cos,  {1}}},  // [0] FCOS [1]
+                   {{   c0, null}}   // [1] 0
+                 });
+  ret = i_interp(&i2).run();
+  CHECK(real::base(ret) == doctest::Approx(1.0));
+}
+
 TEST_CASE_FIXTURE(fixture3, "f_div")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // DIV(X,X) == 1
   const i_mep i1({
@@ -200,7 +224,6 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
 TEST_CASE_FIXTURE(fixture3, "f_idiv")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // IDIV(X,X) == 1
   const i_mep i1({
@@ -251,7 +274,6 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
 TEST_CASE_FIXTURE(fixture3, "f_ife")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // IFE(0,0,1,0) == 1
   const i_mep i1({
@@ -302,7 +324,6 @@ TEST_CASE_FIXTURE(fixture3, "f_ife")
 TEST_CASE_FIXTURE(fixture3, "f_ifz")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // IFZ(0,1,0) == 1
   const i_mep i1({
@@ -340,7 +361,6 @@ TEST_CASE_FIXTURE(fixture3, "f_ifz")
 TEST_CASE_FIXTURE(fixture3, "f_max")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // MAX(0,0) == 0
   const i_mep i1({
@@ -385,7 +405,6 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
 TEST_CASE_FIXTURE(fixture3, "f_mul")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // MUL(X,0) == 0
   const i_mep i1({
@@ -417,10 +436,35 @@ TEST_CASE_FIXTURE(fixture3, "f_mul")
   CHECK(real::base(ret) == doctest::Approx(0.0));
 }
 
+TEST_CASE_FIXTURE(fixture3, "f_sin")
+{
+  using namespace vita;
+
+  // SIN(Z) == std::sin(Z)
+  const i_mep i1({
+                   {{f_sin,  {1}}},  // [0] FSIN [1]
+                   {{    z, null}}   // [1] Z
+                 });
+  for (unsigned j(0); j < 100; ++j)
+  {
+    static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
+    ret = i_interp(&i1).run();
+    CHECK(doctest::Approx(real::base(ret))
+          == std::sin(static_cast<Z *>(z)->val));
+  }
+
+  // SIN(0) == 0
+  const i_mep i2({
+                   {{f_sin,  {1}}},  // [0] FCOS [1]
+                   {{   c0, null}}   // [1] 0
+                 });
+  ret = i_interp(&i2).run();
+  CHECK(real::base(ret) == doctest::Approx(0.0));
+}
+
 TEST_CASE_FIXTURE(fixture3, "f_sqrt")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // SQRT(1) == 1
   const i_mep i1({
@@ -455,7 +499,6 @@ TEST_CASE_FIXTURE(fixture3, "f_sqrt")
 TEST_CASE_FIXTURE(fixture3, "f_sub")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // SUB(X,-X) == 0
   const i_mep i1({
@@ -495,7 +538,6 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
 TEST_CASE_FIXTURE(fixture3, "f_ln")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
 
   // LN(1) == 0
   const i_mep i1({

@@ -33,31 +33,39 @@ struct fixture3
     double val;
   };
 
-  fixture3() : prob(vita::initialization::standard), factory(), null()
+  fixture3() : prob(vita::initialization::standard), factory(), null(),
+               c0(prob.sset.insert(factory.make("0.0"))),
+               c1(prob.sset.insert(factory.make("1.0"))),
+               c2(prob.sset.insert(factory.make("2.0"))),
+               c3(prob.sset.insert(factory.make("3.0"))),
+               x(prob.sset.insert(factory.make("123.0"))),
+               neg_x(prob.sset.insert(factory.make("-123.0"))),
+               y(prob.sset.insert(factory.make("321.0"))),
+               z(prob.sset.insert<Z>()),
+               f_abs(prob.sset.insert(factory.make("FABS"))),
+               f_add(prob.sset.insert(factory.make("FADD"))),
+               f_aq(prob.sset.insert(factory.make("FAQ"))),
+               f_cos(prob.sset.insert(factory.make("FCOS"))),
+               f_div(prob.sset.insert(factory.make("FDIV"))),
+               f_idiv(prob.sset.insert(factory.make("FIDIV"))),
+               f_ife(prob.sset.insert(factory.make("FIFE"))),
+               f_ifz(prob.sset.insert(factory.make("FIFZ"))),
+               f_ln(prob.sset.insert(factory.make("FLN"))),
+               f_max(prob.sset.insert(factory.make("FMAX"))),
+               f_mul(prob.sset.insert(factory.make("FMUL"))),
+               f_sin(prob.sset.insert(factory.make("FSIN"))),
+               f_sqrt(prob.sset.insert(factory.make("FSQRT"))),
+               f_sub(prob.sset.insert(factory.make("FSUB")))
   {
-    c0 = prob.sset.insert(factory.make("0.0"));
-    c1 = prob.sset.insert(factory.make("1.0"));
-    c2 = prob.sset.insert(factory.make("2.0"));
-    c3 = prob.sset.insert(factory.make("3.0"));
-    x = prob.sset.insert(factory.make("123.0"));
-    neg_x = prob.sset.insert(factory.make("-123.0"));
-    y = prob.sset.insert(factory.make("321.0"));
-    z = prob.sset.insert<Z>();
-    f_abs = prob.sset.insert(factory.make("FABS"));
-    f_add = prob.sset.insert(factory.make("FADD"));
-    f_aq = prob.sset.insert(factory.make("FAQ"));
-    f_div = prob.sset.insert(factory.make("FDIV"));
-    f_idiv = prob.sset.insert(factory.make("FIDIV"));
-    f_ife = prob.sset.insert(factory.make("FIFE"));
-    f_ifz = prob.sset.insert(factory.make("FIFZ"));
-    f_ln = prob.sset.insert(factory.make("FLN"));
-    f_max = prob.sset.insert(factory.make("FMAX"));
-    f_mul = prob.sset.insert(factory.make("FMUL"));
-    f_sqrt = prob.sset.insert(factory.make("FSQRT"));
-    f_sub = prob.sset.insert(factory.make("FSUB"));
-
     prob.env.mep.code_length = 32;
   }
+
+  vita::problem           prob;
+  vita::symbol_factory factory;
+
+  vita::any ret;
+
+  const std::vector<vita::index_t> null;
 
   vita::symbol *c0;
   vita::symbol *c1;
@@ -71,6 +79,7 @@ struct fixture3
   vita::symbol *f_abs;
   vita::symbol *f_add;
   vita::symbol *f_aq;
+  vita::symbol *f_cos;
   vita::symbol *f_div;
   vita::symbol *f_idiv;
   vita::symbol *f_ife;
@@ -78,15 +87,9 @@ struct fixture3
   vita::symbol *f_ln;
   vita::symbol *f_max;
   vita::symbol *f_mul;
+  vita::symbol *f_sin;
   vita::symbol *f_sqrt;
   vita::symbol *f_sub;
-
-  vita::problem           prob;
-  vita::symbol_factory factory;
-
-  vita::any ret;
-
-  const std::vector<vita::index_t> null;
 };
 
 #endif  // include guard

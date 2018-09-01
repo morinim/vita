@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -223,6 +223,35 @@ public:
     if (!std::isfinite(ret))  return {};
 
     return any(ret);
+  }
+};
+
+///
+/// `cos()` of a real number.
+///
+class cos : public function
+{
+public:
+  explicit cos(const cvect &c = {0}) : function("FCOS", c[0], {c[0]})
+  { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "std::cos(%%1%%)";
+    case mql_format:     return  "MathCos(%%1%%)";
+    case python_format:  return "math.cos(%%1%%)";
+    default:             return      "cos(%%1%%)";
+    }
+  }
+
+  any eval(core_interpreter *i) const final
+  {
+    const any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    if (!a.has_value())  return a;
+
+    return any(std::cos(base(a)));
   }
 };
 
@@ -720,7 +749,7 @@ public:
 class sin : public function
 {
 public:
-  explicit sin(const cvect &c) : function("FSIN", c[0], {c[0]})
+  explicit sin(const cvect &c = {0}) : function("FSIN", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final

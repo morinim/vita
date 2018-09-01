@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,10 +43,10 @@ public:
   std::unique_ptr<symbol> make(const std::string &, cvect = {0});
   std::unique_ptr<symbol> make(domain_t, int, int, category_t = 0);
 
-  unsigned args(const std::string &) const;
-
-  template<class> bool register_symbol(const std::string &, unsigned);
+  template<class> bool register_symbol(const std::string &, std::size_t);
   bool unregister_symbol(const std::string &);
+
+  std::size_t args(const std::string &) const;
 
 private:
   using build_func = std::unique_ptr<symbol> (*)(const cvect &);
@@ -57,8 +57,8 @@ private:
   // Private data members.
   struct build_info
   {
-    build_func make;
-    unsigned   args;
+    build_func  make;
+    std::size_t args;
   };
 
   std::map<std::string, build_info> factory_;
@@ -76,7 +76,7 @@ private:
 /// same name.
 ///
 template<class T>
-bool symbol_factory::register_symbol(const std::string &name, unsigned n)
+bool symbol_factory::register_symbol(const std::string &name, std::size_t n)
 {
   return factory_.insert(std::make_pair(name, build_info{build<T>, n})).second;
 }

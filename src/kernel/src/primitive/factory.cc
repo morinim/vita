@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,6 @@
 #include "kernel/src/primitive/real.h"
 #include "kernel/src/primitive/string.h"
 #include "kernel/src/constant.h"
-#include "kernel/i_mep.h"
 
 namespace vita
 {
@@ -23,19 +22,22 @@ namespace vita
 namespace
 {
 ///
-/// \param[in] s string to be tested
-/// \return      the domain `s` is element of
+/// Identifies the domain of a term.
+///
+/// \param[in] s term to be tested
+/// \return      the domain of `s`
 ///
 domain_t find_domain(const std::string &s)
 {
   try
   {
-    stod(s);
+    std::stod(s);
   }
   catch(std::invalid_argument)  // not a number
   {
-    return (s == "{TRUE}" || s == "{FALSE}") ?
-      domain_t::d_bool : domain_t::d_string;
+    return (s == "{TRUE}" || s == "{FALSE}")
+           ? domain_t::d_bool
+           : domain_t::d_string;
   }
 
   return s.find('.') == std::string::npos ? domain_t::d_int
@@ -51,6 +53,7 @@ symbol_factory::symbol_factory()
   register_symbol<real::abs>    ("FABS", 1);
   register_symbol<real::add>    ("FADD", 1);
   register_symbol<real::aq>     ("FAQ", 1);
+  register_symbol<real::cos>    ("FCOS", 1);
   register_symbol<real::div>    ("FDIV", 1);
   register_symbol<real::idiv>   ("FIDIV", 1);
   register_symbol<real::ife>    ("FIFE", 2);
@@ -113,11 +116,7 @@ symbol_factory::symbol_factory()
 ///   new type, which would require changing every location in the code
 ///   where a new object is created (as well as making sure that all such
 ///   code locations also have knowledge of the new concrete type, by
-///   including for instance a concrete class header file). Since all
-///   factory objects are stored globally in a singleton object and all
-///   client code goes through the singleton to access the proper factory
-///   for object creation, changing factories is as easy as changing the
-///   singleton object.
+///   including for instance a concrete class header file).
 ///
 std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 {
@@ -183,7 +182,7 @@ std::unique_ptr<symbol> symbol_factory::make(domain_t d, int min, int max,
 /// \param[in] name name of the symbol (case sensitive)
 /// \return         number of distinct categories needed to build the symbol
 ///
-unsigned symbol_factory::args(const std::string &name) const
+std::size_t symbol_factory::args(const std::string &name) const
 {
   const auto it(factory_.find(name));
 
@@ -204,4 +203,5 @@ bool symbol_factory::unregister_symbol(const std::string &name)
 {
   return factory_.erase(name) == 1;
 }
+
 }  // namespace vita

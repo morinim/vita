@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// \brief Minimum interface of an interpreter.
+/// Minimum interface of an interpreter.
 ///
 /// The class "executes" an individual (a program) in its environment. The
 /// program can produce an output or perform some actions.
