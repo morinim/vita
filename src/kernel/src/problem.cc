@@ -75,18 +75,6 @@ src_problem::src_problem(initialization init) : problem(init), training_(),
 }
 
 ///
-/// A delegating constructor to avoid that the `src_problem("data.csv")` call
-/// call could be resolved with `src_problem(bool)`.
-///
-/// Conversion from `const char []` to `bool` is a standard conversion, while
-/// the one to `std::string` is a user-defined conversion.
-///
-src_problem::src_problem(const char ds[]) : src_problem(std::string(ds))
-{
-  assert(ds);
-}
-
-///
 /// Initializes the problem with data from the input files.
 ///
 /// \param[in] ds name of the dataset file
