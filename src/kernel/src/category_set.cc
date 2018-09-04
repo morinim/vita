@@ -110,12 +110,12 @@ category category_set::find(const std::string &name) const
 
 ///
 /// \param[in] t tag of a category
-/// \return      the category with tag `t` or `category::null` if it doesn't
-///              exists)
+/// \return      the untagged_category associated to tag `t
 ///
-category category_set::find(category_t t) const
+untagged_category category_set::operator[](category_t t) const
 {
-  return t < size() ? category(t, categories_[t]) : category::null;
+  assert(t < categories_.size());
+  return categories_[t];
 }
 
 ///

@@ -88,7 +88,7 @@ public:
   category_t size() const;
 
   category find(const std::string &) const;
-  category find(category_t) const;
+  untagged_category operator[](category_t) const;
 
   category_t insert(const untagged_category &);
 

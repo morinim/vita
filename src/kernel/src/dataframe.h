@@ -79,7 +79,11 @@ public:
   iterator erase(iterator, iterator);
 
   // ---- Convenience ----
-  std::size_t load(const std::string &, filter_hook_t = nullptr);
+  std::size_t read(const std::string &, filter_hook_t = nullptr);
+  std::size_t read_csv(std::istream &, filter_hook_t = nullptr);
+  std::size_t read_csv(const std::string &, filter_hook_t = nullptr);
+  std::size_t read_xrff(std::istream &, filter_hook_t = nullptr);
+  std::size_t read_xrff(const std::string &, filter_hook_t = nullptr);
   bool operator!() const;
 
   void push_back(const example &);
@@ -99,33 +103,35 @@ public:
 
   bool debug() const;
 
-  static domain_t from_weka(const std::string &);
-
 private:
   example to_example(const std::vector<std::string> &, bool, bool);
 
   class_t encode(const std::string &);
 
-  std::size_t load_csv(const std::string &, filter_hook_t);
-  std::size_t load_xrff(const std::string &, filter_hook_t);
+  std::size_t read_xrff(tinyxml2::XMLDocument &, filter_hook_t);
 
   void swap_category(category_t, category_t);
 
   // Integer are simpler to manage than textual data, so, when appropriate,
-  // input strings are converted into integers by these maps (and the `encode`
-  // static function).
+  // input strings are converted into integers by this map and the `encode`
+  // static function.
   std::map<std::string, class_t> classes_map_;
 
   // How is the dataset organized? Sometimes we have a dataset header (XRFF
   // file format), other times it has to be implicitly derived (e.g. CSV).
+  // `header_[0]` is the output column (it contains informations about
+  //  problem's output).
   std::vector<column> header_;
 
   // What are the categories we are dealing with?
+  // Note: `category_[0]` is the output category.
   category_set categories_;
 
   // Available data.
   examples_t dataset_;
 };
+
+domain_t from_weka(const std::string &);
 
 ///
 /// Stores a single element of the dataset.

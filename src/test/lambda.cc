@@ -123,7 +123,7 @@ TEST_CASE("reg_lambda")
 
   src_problem pr(initialization::standard);
 
-  CHECK(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
+  CHECK(pr.read("./test_resources/mep.csv").first == MEP_COUNT);
 
   // REGRESSION TEAM OF ONE INDIVIDUAL.
   test_team_of_one<reg_model>(pr);
@@ -216,7 +216,7 @@ TEST_CASE("reg_lambda serialization")
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/mep.csv").first == MEP_COUNT);
+  CHECK(pr.read("./test_resources/mep.csv").first == MEP_COUNT);
 
   for (unsigned k(0); k < 1000; ++k)
   {
@@ -325,7 +325,7 @@ TEST_CASE("dyn_slot lambda")
   constexpr unsigned slots(10);
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.read("./test_resources/iris.csv").first == IRIS_COUNT);
 
   // DYNSLOT LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<dyn_slot_lambda_f, slots>(pr);
@@ -341,7 +341,7 @@ TEST_CASE("dyn_slot serialization")
   constexpr unsigned slots(10);
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.read("./test_resources/iris.csv").first == IRIS_COUNT);
 
   // DYN_SLOT_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<dyn_slot_lambda_f, i_mep, slots>(pr);
@@ -355,7 +355,7 @@ TEST_CASE("gaussian lambda")
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.read("./test_resources/iris.csv").first == IRIS_COUNT);
 
   // GAUSSIAN LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<gaussian_lambda_f>(pr);
@@ -369,7 +369,7 @@ TEST_CASE("gaussian_lambda serialization")
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/iris.csv").first == IRIS_COUNT);
+  CHECK(pr.read("./test_resources/iris.csv").first == IRIS_COUNT);
 
   // GAUSSIAN_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<gaussian_lambda_f, i_mep>(pr);
@@ -383,7 +383,7 @@ TEST_CASE("binary lambda")
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
+  CHECK(pr.read("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
 
   // BINARY LAMBDA TEAM OF ONE INDIVIDUAL.
   test_team_of_one<binary_lambda_f>(pr);
@@ -397,7 +397,7 @@ TEST_CASE("binary_lambda serialization")
   using namespace vita;
 
   src_problem pr(initialization::standard);
-  CHECK(pr.load("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
+  CHECK(pr.read("./test_resources/ionosphere.csv").first == IONOSPHERE_COUNT);
 
   // BINARY_LAMBDA_F SERIALIZATION - INDIVIDUAL.
   test_serialization<binary_lambda_f, i_mep>(pr);

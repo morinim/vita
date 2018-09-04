@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 
 ### Changed
+- **BREAKING CHANGE**. `dataframe::load...` renamed to `dataframe::read...` for uniformity with Pands' dataframe.
+
 - **BREAKING CHANGE**. `example::tag` method has been renamed to `label`; `example::cast_output` has been renamed to `label_as`. Both are now free functions.
 
   The new naming improves consistency and adopts standard terminology.

@@ -62,6 +62,38 @@ bool is_number(const std::string &s)
 }  // namespace
 
 ///
+/// \param[in] n the name of a weka domain
+/// \return      the internel id of the weka-domain `n` (`d_void` if it's
+///              unknown or not managed)
+///
+domain_t from_weka(const std::string &n)
+{
+  static const std::map<const std::string, domain_t> map(
+  {
+    // This type is vita-specific (not standard).
+    {"boolean", domain_t::d_bool},
+
+    {"integer", domain_t::d_int},
+
+    // Real and numeric are treated as double precision number (d_double).
+    {"numeric", domain_t::d_double},
+    {"real", domain_t::d_double},
+
+    // Nominal values are defined by providing a list of possible values.
+    {"nominal", domain_t::d_string},
+
+    // String attributes allow us to create attributes containing arbitrary
+    // textual values. This is very useful in text-mining applications.
+    {"string", domain_t::d_string}
+
+    // {"date", ?}, {"relational", ?}
+  });
+
+  const auto &i(map.find(n));
+  return i == map.end() ? domain_t::d_void : i->second;
+}
+
+///
 /// New empty data instance.
 ///
 dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
@@ -80,7 +112,7 @@ dataframe::dataframe(const std::string &filename, filter_hook_t ft)
 {
   Expects(!filename.empty());
 
-  load(filename, ft);
+  read(filename, ft);
 
   Ensures(debug());
 }
@@ -246,8 +278,7 @@ std::string dataframe::class_name(class_t i) const
 }
 
 ///
-/// Swap categories `c1` and `c2`, updating the `header_` and `categories_`
-/// vector.
+/// Swap two categories of the dataframe.
 ///
 /// \param[in] c1 a category
 /// \param[in] c2 a category
@@ -291,7 +322,7 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
   for (const auto &feature : v)
   {
     const auto categ(header_[index].category_id);
-    const auto domain(categories_.find(categ).domain);
+    const auto domain(categories_[categ].domain);
 
     if (index)  // input value
     {
@@ -317,7 +348,46 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
 }
 
 ///
-/// Loads a XRFF file into the active dataset.
+/// Loads a XRFF file from a file into the dataframe.
+///
+/// \param[in] filename the xrff filename
+/// \param[in] ft       a "filter and transform" function
+/// \return             number of lines parsed (`0` in case of errors)
+///
+/// \see `dataframe::load_xrff(tinyxml2::XMLDocument &)` for details.
+///
+std::size_t dataframe::read_xrff(const std::string &filename, filter_hook_t ft)
+{
+  tinyxml2::XMLDocument doc;
+  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
+    return 0;
+
+  return read_xrff(doc, ft);
+}
+
+///
+/// Loads a XRFF file from a stream into the dataframe.
+///
+/// \param[in] in the xrff stream
+/// \param[in] ft a "filter and transform" function
+/// \return       number of lines parsed (`0` in case of errors)
+///
+/// \see `dataframe::read_xrff(tinyxml2::XMLDocument &)` for details.
+///
+std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
+{
+  std::ostringstream ss;
+  ss << in.rdbuf();
+
+  tinyxml2::XMLDocument doc;
+  if (doc.Parse(ss.str().c_str()) != tinyxml2::XML_SUCCESS)
+    return 0;
+
+  return read_xrff(doc, ft);
+}
+
+///
+/// Loads a XRFF document into the active dataset.
 ///
 /// \param[in] filename the xrff file
 /// \param[in] ft       a filter and transform function
@@ -335,13 +405,6 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
 /// This feature is used to constrain the search (Strongly Typed Genetic
 /// Programming).
 ///
-/// \post
-/// * `header_[0]` is the output column (it contains informations about
-///   problem's output);
-/// * `category(0)` is the output category (for symbolic regression
-///   problems it's the output type of the xrff file, for classification
-///   problems it's the `numeric` type).
-///
 /// \warning
 /// To date:
 /// * we don't support compressed XRFF files;
@@ -350,15 +413,8 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
 ///
 /// \note Test set examples can have an empty output value.
 ///
-std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 {
-  tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
-    return 0;
-
-  unsigned n_output(0);
-  bool classification(false);
-
   // Iterate over `dataset.header.attributes` selection and store all found
   // attributes in the header vector.
   tinyxml2::XMLHandle handle(&doc);
@@ -367,6 +423,9 @@ std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
                            .FirstChildElement("attributes").ToElement();
   if (!attributes)
     return 0;
+
+  unsigned n_output(0);
+  bool classification(false);
 
   for (auto *attribute = attributes->FirstChildElement("attribute");
        attribute;
@@ -439,7 +498,7 @@ std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
   }
 
   // Category 0 is the output category.
-  swap_category(category_t(0), header_[0].category_id);
+  swap_category(0, header_[0].category_id);
 
   auto *instances = handle.FirstChildElement("dataset")
                           .FirstChildElement("body")
@@ -474,9 +533,28 @@ std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
 ///
 /// Loads a CSV file into the active dataset.
 ///
-/// \param[in] filename the csv file
+/// \param[in] filename the csv filename
 /// \param[in] ft       a filter and transform function
 /// \return             number of lines parsed (0 in case of errors)
+///
+/// \see `dataframe::load_csv(const std::string &)` for details.
+
+///
+std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
+{
+  std::ifstream in(filename);
+  if (!in)
+    return 0;
+
+  return read_csv(in, ft);
+}
+
+///
+/// Loads a CSV file into the active dataset.
+///
+/// \param[in] from the csv stream
+/// \param[in] ft   a filter and transform function
+/// \return         number of lines parsed (0 in case of errors)
 ///
 /// General conventions:
 /// * NO HEADER ROW is allowed;
@@ -517,12 +595,8 @@ std::size_t dataframe::load_xrff(const std::string &filename, filter_hook_t ft)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::load_csv(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 {
-  std::ifstream from(filename);
-  if (!from)
-    return 0;
-
   bool classification(false), format(columns());
 
   for (auto record : csv_parser(from).filter_hook(ft))
@@ -539,7 +613,7 @@ std::size_t dataframe::load_csv(const std::string &filename, filter_hook_t ft)
 
       for (auto field(decltype(fields){0}); field < fields; ++field)
       {
-        assert(!size());  // If we have data then data format must be known
+        assert(!size());  // if we have data then data format must be known
 
         std::string s_domain(is_number(record[field])
                              ? "numeric"
@@ -582,22 +656,9 @@ std::size_t dataframe::load_csv(const std::string &filename, filter_hook_t ft)
 /// \param[in] ft a filter and transform function
 /// \return       number of lines parsed (0 in case of errors)
 ///
-/// \warning
-/// * Training/valutation set must be loaded before test set.
-/// * Before changing problem the `data` object should be clear. So:
-///       dataset(training);
-///       load("training.csv");
-///       dataset(test);
-///       load("test.csv");
-///       ...
-///       clear();
-///       dataset(training);
-///       load("training2.csv");
-///       ...
-///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::load(const std::string &f, filter_hook_t ft)
+std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
 {
   auto ends_with = [](const std::string &name, const std::string &ext)
   {
@@ -607,7 +668,9 @@ std::size_t dataframe::load(const std::string &f, filter_hook_t ft)
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 
-  return xrff ? load_xrff(f, ft) : load_csv(f, ft);
+  clear();
+
+  return xrff ? read_xrff(f, ft) : read_csv(f, ft);
 }
 
 ///
@@ -658,35 +721,4 @@ bool dataframe::debug() const
   return true;
 }
 
-///
-/// \param[in] n the name of a weka domain
-/// \return      the internel id of the weka-domain `n` (`d_void` if it's
-///              unknown or not managed)
-///
-domain_t dataframe::from_weka(const std::string &n)
-{
-  static const std::map<const std::string, domain_t> map(
-  {
-    // This type is vita-specific (not standard).
-    {"boolean", domain_t::d_bool},
-
-    {"integer", domain_t::d_int},
-
-    // Real and numeric are treated as double precision number (d_double).
-    {"numeric", domain_t::d_double},
-    {"real", domain_t::d_double},
-
-    // Nominal values are defined by providing a list of possible values.
-    {"nominal", domain_t::d_string},
-
-    // String attributes allow us to create attributes containing arbitrary
-    // textual values. This is very useful in text-mining applications.
-    {"string", domain_t::d_string}
-
-    // {"date", ?}, {"relational", ?}
-  });
-
-  const auto &i(map.find(n));
-  return i == map.end() ? domain_t::d_void : i->second;
-}
 }  // namespace vita

@@ -128,7 +128,7 @@ private:
 class abs : public function
 {
 public:
-  explicit abs(const cvect &c) : function("FABS", c[0], {c[0]})
+  explicit abs(const cvect &c = {0}) : function("FABS", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -156,7 +156,7 @@ public:
 class add : public function
 {
 public:
-  explicit add(const cvect &c) : function("FADD", c[0], {c[0], c[0]}) {}
+  explicit add(const cvect &c = {0}) : function("FADD", c[0], {c[0], c[0]}) {}
 
   bool associative() const final { return true; }
 
@@ -194,7 +194,7 @@ public:
 class aq : public function
 {
 public:
-  explicit aq(const cvect &c) : function("AQ", c[0], {c[0], c[0]})
+  explicit aq(const cvect &c = {0}) : function("AQ", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -261,7 +261,7 @@ public:
 class div : public function
 {
 public:
-  explicit div(const cvect &c) : function("FDIV", c[0], {c[0], c[0]})
+  explicit div(const cvect &c = {0}) : function("FDIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format) const final
@@ -292,8 +292,7 @@ public:
 class gt : public function
 {
 public:
-  explicit gt(const cvect &c)
-    : function(">", c[1], {c[0], c[0]})
+  explicit gt(const cvect &c = {0, 0}) : function(">", c[1], {c[0], c[0]})
   { Expects(c.size() == 2); }
 
   std::string display(format f) const final
@@ -328,7 +327,7 @@ public:
 class idiv : public function
 {
 public:
-  explicit idiv(const cvect &c) : function("FIDIV", c[0], {c[0], c[0]})
+  explicit idiv(const cvect &c = {0}) : function("FIDIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -367,7 +366,7 @@ public:
 class ifb : public function
 {
 public:
-  explicit ifb(const cvect &c)
+  explicit ifb(const cvect &c = {0, 0})
     : function("FIFB", c[1], {c[0], c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
@@ -416,7 +415,7 @@ public:
 class ife : public function
 {
 public:
-  explicit ife(const cvect &c)
+  explicit ife(const cvect &c = {0, 0})
     : function("FIFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
@@ -464,7 +463,7 @@ public:
 class ifl : public function
 {
 public:
-  explicit ifl(const cvect &c)
+  explicit ifl(const cvect &c  = {0, 0})
     : function("FIFL", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
@@ -506,7 +505,8 @@ public:
 class ifz : public function
 {
 public:
-  explicit ifz(const cvect &c) : function("FIFZ", c[0], {c[0], c[0], c[0]})
+  explicit ifz(const cvect &c = {0})
+    : function("FIFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -545,7 +545,7 @@ public:
 class length : public function
 {
 public:
-  explicit length(const cvect &c) : function("FLENGTH", c[1], {c[0]})
+  explicit length(const cvect &c = {0, 0}) : function("FLENGTH", c[1], {c[0]})
   { Expects(c.size() == 2); }
 
   std::string display(format f) const final
@@ -574,7 +574,7 @@ public:
 class ln : public function
 {
 public:
-  explicit ln(const cvect &c) : function("FLN", c[0], {c[0]})
+  explicit ln(const cvect &c = {0}) : function("FLN", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -610,8 +610,7 @@ public:
 class lt : public function
 {
 public:
-  explicit lt(const cvect &c)
-    : function("<", c[1], {c[0], c[0]})
+  explicit lt(const cvect &c = {0, 0}) : function("<", c[1], {c[0], c[0]})
   { Expects(c.size() == 2); }
 
   std::string display(format f) const final
@@ -646,7 +645,7 @@ public:
 class max : public function
 {
 public:
-  explicit max(const cvect &c) : function("FMAX", c[0], {c[0], c[0]})
+  explicit max(const cvect &c = {0}) : function("FMAX", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -681,7 +680,7 @@ public:
 class mod : public function
 {
 public:
-  explicit mod(const cvect &c) : function("FMOD", c[0], {c[0], c[0]})
+  explicit mod(const cvect &c = {0}) : function("FMOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -718,7 +717,7 @@ public:
 class mul : public function
 {
 public:
-  explicit mul(const cvect &c) : function("FMUL", c[0], {c[0], c[0]})
+  explicit mul(const cvect &c = {0}) : function("FMUL", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format) const final
@@ -778,7 +777,7 @@ public:
 class sqrt : public function
 {
 public:
-  explicit sqrt(const cvect &c) : function("FSQRT", c[0], {c[0]})
+  explicit sqrt(const cvect &c = {0}) : function("FSQRT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format f) const final
@@ -811,7 +810,7 @@ public:
 class sub : public function
 {
 public:
-  explicit sub(const cvect &c) : function("FSUB", c[0], {c[0], c[0]})
+  explicit sub(const cvect &c = {0}) : function("FSUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
   std::string display(format) const final

@@ -30,6 +30,8 @@ namespace detail
 ///                       taken from a given set (`availables`) and fixed
 ///                       length (`size`).
 ///
+/// \note This is in the `detail` namespace for ease of testing.
+///
 template<class C>
 std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
                                       std::size_t size)
@@ -92,9 +94,9 @@ src_problem::src_problem(const char ds[]) : src_problem(std::string(ds))
 ///                    src_problem::setup_default_symbols is called
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
-  : problem(initialization::skip), training_(), validation_(), factory_()
+  : problem(initialization::skip)
 {
-  load(ds, symbols);
+  read(ds, symbols);
 }
 
 ///
@@ -106,6 +108,17 @@ bool src_problem::operator!() const
 }
 
 ///
+/// Loads data from a stream file.
+///
+/// \param[in] ds      filename of the dataset file (training/validation set)
+/// \param[in] ts      filename of the test set
+/// \param[in] symbols name of the file containing the symbols. If it's empty,
+///                    src_problem::setup_default_symbols is called
+/// \return            number of examples (lines) parsed and number of symbols
+///                    parsed
+///
+
+///
 /// Loads data from file.
 ///
 /// \param[in] ds      filename of the dataset file (training/validation set)
@@ -115,7 +128,7 @@ bool src_problem::operator!() const
 /// \return            number of examples (lines) parsed and number of symbols
 ///                    parsed
 ///
-std::pair<std::size_t, std::size_t> src_problem::load(
+std::pair<std::size_t, std::size_t> src_problem::read(
   const std::string &ds, const std::string &symbols)
 {
   if (ds.empty())
@@ -125,13 +138,16 @@ std::pair<std::size_t, std::size_t> src_problem::load(
   training_.clear();
   validation_.clear();
 
-  const auto n_examples(training_.load(ds));
+  const auto n_examples(training_.read(ds));
+
+  if (!setup_terminals_from_data())
+    return {n_examples, 0};
 
   std::size_t n_symbols(0);
   if (symbols.empty())
     setup_default_symbols();
   else
-    n_symbols = load_symbols(symbols);
+    n_symbols = read_symbols(symbols);
 
   return {n_examples, n_symbols};
 }
@@ -149,8 +165,6 @@ std::size_t src_problem::setup_terminals_from_data(
   const std::set<unsigned> &skip)
 {
   std::size_t variables(0);
-
-  sset.clear();
 
   // Sets up the variables (features).
   const auto columns(training_.columns());
@@ -182,7 +196,7 @@ std::size_t src_problem::setup_terminals_from_data(
 ///
 bool src_problem::setup_default_symbols()
 {
-  if (!setup_terminals_from_data())
+  if (!training_.categories().size())
     return false;
 
   vitaINFO << "Setting up default symbol set";
@@ -224,13 +238,13 @@ bool src_problem::setup_default_symbols()
 ///
 /// \warning Check the return value (it must be greater than `0`).
 ///
-/// \note
+/// \warning
 /// Data should be loaded before symbols: without data we don't know, among
 /// other things, the features the dataset has.
 ///
-std::size_t src_problem::load_symbols(const std::string &s_file)
+std::size_t src_problem::read_symbols(const std::string &s_file)
 {
-  if (!setup_terminals_from_data())
+  if (!training_.categories().size())
     return 0;
 
   // Prints the list of categories as inferred from the dataset.
@@ -278,7 +292,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
           std::string signature(sym_name + ":");
 
           for (auto j(decltype(n_args){0}); j < n_args; ++j)
-            signature += " " + training_.categories().find(tag).name;
+            signature += " " + training_.categories()[tag].name;
           vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, cvect(n_args, tag)));
@@ -319,7 +333,7 @@ std::size_t src_problem::load_symbols(const std::string &s_file)
         {
           std::string signature(sym_name + ":");
           for (const auto &j : seq)
-            signature += " " + training_.categories().find(j).name;
+            signature += " " + training_.categories()[j].name;
           vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, seq));
@@ -357,12 +371,11 @@ bool src_problem::compatible(const cvect &instance,
   for (auto i(decltype(sup){0}); i < sup; ++i)
   {
     const std::string p_i(pattern[i]);
-    const bool generic(dataframe::from_weka(p_i) != domain_t::d_void);
+    const bool generic(from_weka(p_i) != domain_t::d_void);
 
     if (generic)  // numeric, string, integer...
     {
-      if (training_.categories().find(instance[i]).domain !=
-          dataframe::from_weka(p_i))
+      if (training_.categories()[instance[i]].domain != from_weka(p_i))
         return false;
     }
     else

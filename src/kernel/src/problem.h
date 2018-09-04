@@ -30,9 +30,10 @@ public:
   explicit src_problem(const std::string &, const std::string & = "");
 
   bool operator!() const;
-  std::pair<std::size_t, std::size_t> load(const std::string &,
+  std::pair<std::size_t, std::size_t> read(const dataframe &);
+  std::pair<std::size_t, std::size_t> read(const std::string &,
                                            const std::string & = "");
-  std::size_t load_symbols(const std::string &);
+  std::size_t read_symbols(const std::string &);
   bool setup_default_symbols();
 
   const dataframe &data() const;

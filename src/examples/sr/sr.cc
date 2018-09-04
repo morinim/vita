@@ -263,7 +263,7 @@ void data(const args_t &a)
   std::size_t parsed(0);
   try
   {
-    parsed = problem->load(data_file).first;
+    parsed = problem->read(data_file).first;
   }
   catch(...)
   {
@@ -618,7 +618,7 @@ void symbols(const args_t &a)
   std::size_t parsed(0);
   try
   {
-    parsed = problem->load_symbols(symbol_file);
+    parsed = problem->read_symbols(symbol_file);
   }
   catch(...)
   {
