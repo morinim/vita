@@ -82,7 +82,7 @@ src_problem::src_problem(initialization init) : problem(init), training_(),
 ///                    src_problem::setup_default_symbols is called
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
-  : problem(initialization::skip)
+  : src_problem(initialization::skip)
 {
   read(ds, symbols);
 }
@@ -122,14 +122,10 @@ std::pair<std::size_t, std::size_t> src_problem::read(
   if (ds.empty())
     return {0, 0};
 
-  sset.clear();
   training_.clear();
   validation_.clear();
 
   const auto n_examples(training_.read(ds));
-
-  if (!setup_terminals_from_data())
-    return {n_examples, 0};
 
   std::size_t n_symbols(0);
   if (symbols.empty())
@@ -184,7 +180,9 @@ std::size_t src_problem::setup_terminals_from_data(
 ///
 bool src_problem::setup_default_symbols()
 {
-  if (!training_.categories().size())
+  sset.clear();
+
+  if (!setup_terminals_from_data())
     return false;
 
   vitaINFO << "Setting up default symbol set";
@@ -232,7 +230,9 @@ bool src_problem::setup_default_symbols()
 ///
 std::size_t src_problem::read_symbols(const std::string &s_file)
 {
-  if (!training_.categories().size())
+  sset.clear();
+
+  if (!setup_terminals_from_data())
     return 0;
 
   // Prints the list of categories as inferred from the dataset.
