@@ -96,36 +96,25 @@ bool src_problem::operator!() const
 }
 
 ///
-/// Loads data from a stream file.
+/// Loads data in the active dataframe (optionally also read a symbols file).
 ///
 /// \param[in] ds      filename of the dataset file (training/validation set)
-/// \param[in] ts      filename of the test set
 /// \param[in] symbols name of the file containing the symbols. If it's empty,
 ///                    src_problem::setup_default_symbols is called
 /// \return            number of examples (lines) parsed and number of symbols
 ///                    parsed
 ///
-
-///
-/// Loads data from file.
-///
-/// \param[in] ds      filename of the dataset file (training/validation set)
-/// \param[in] ts      filename of the test set
-/// \param[in] symbols name of the file containing the symbols. If it's empty,
-///                    src_problem::setup_default_symbols is called
-/// \return            number of examples (lines) parsed and number of symbols
-///                    parsed
+/// \exception `std::invalid_argument` missing dataset file name
 ///
 std::pair<std::size_t, std::size_t> src_problem::read(
   const std::string &ds, const std::string &symbols)
 {
   if (ds.empty())
-    return {0, 0};
+    throw std::invalid_argument("Missing dataset filename");
 
-  training_.clear();
-  validation_.clear();
+  data().clear();
 
-  const auto n_examples(training_.read(ds));
+  const auto n_examples(data().read(ds));
 
   std::size_t n_symbols(0);
   if (symbols.empty())
@@ -140,13 +129,12 @@ std::pair<std::size_t, std::size_t> src_problem::read(
 /// Inserts variables and labels for nominal attributes into the symbol_set.
 ///
 /// \param[in] skip features in this set will be ignored
-/// \return         number of features considered / variables inserted
+/// \return         number of variables inserted (one variable per feature)
 ///
 /// The names used for variables, if not specified in the dataset, are in the
 /// form `X1`, ... `Xn`.
 ///
-std::size_t src_problem::setup_terminals_from_data(
-  const std::set<unsigned> &skip)
+std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 {
   std::size_t variables(0);
 
@@ -182,7 +170,7 @@ bool src_problem::setup_default_symbols()
 {
   sset.clear();
 
-  if (!setup_terminals_from_data())
+  if (!setup_terminals())
     return false;
 
   vitaINFO << "Setting up default symbol set";
@@ -232,7 +220,7 @@ std::size_t src_problem::read_symbols(const std::string &s_file)
 {
   sset.clear();
 
-  if (!setup_terminals_from_data())
+  if (!setup_terminals())
     return 0;
 
   // Prints the list of categories as inferred from the dataset.

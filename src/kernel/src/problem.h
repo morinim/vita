@@ -16,6 +16,7 @@
 #include <string>
 #include <set>
 
+#include "kernel/exceptions.h"
 #include "kernel/problem.h"
 #include "kernel/src/dataframe.h"
 #include "kernel/src/primitive/factory.h"
@@ -34,6 +35,7 @@ public:
                                            const std::string & = "");
   std::size_t read_symbols(const std::string &);
   bool setup_default_symbols();
+  std::size_t setup_terminals(const std::set<unsigned> & = {});
 
   const dataframe &data() const;
   dataframe &data();
@@ -54,7 +56,6 @@ public:
 private:
   // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
-  std::size_t setup_terminals_from_data(const std::set<unsigned> & = {});
   void select_impl(dataset_t) override final {};
 
   // Private data members.
