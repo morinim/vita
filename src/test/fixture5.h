@@ -18,10 +18,11 @@
 
 struct fixture5
 {
-  fixture5(unsigned n = 4) : prob(vita::initialization::standard)
+  fixture5(unsigned n = 4) : prob()
   {
-    double v(10.0);
+    prob.env.init();
 
+    double v(10.0);
     for (unsigned i(0); i < n; ++i)
     {
       prob.sset.insert<vita::ga::real>(vita::range(-v, +v));

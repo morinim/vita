@@ -66,11 +66,7 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 ///
 /// New empty instance of src_problem.
 ///
-/// \param[in] init should the environment be initialized with common / default
-///                 values?
-///
-src_problem::src_problem(initialization init) : problem(init), training_(),
-                                                validation_(), factory_()
+src_problem::src_problem() : problem(), training_(), validation_(), factory_()
 {
 }
 
@@ -82,7 +78,7 @@ src_problem::src_problem(initialization init) : problem(init), training_(),
 ///                    src_problem::setup_default_symbols is called
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
-  : src_problem(initialization::skip)
+  : src_problem()
 {
   read(ds, symbols);
 }

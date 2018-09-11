@@ -70,7 +70,7 @@ void search<T, ES>::tune_parameters()
 {
   // The `shape` function modifies the default parameters with
   // strategy-specific values.
-  const environment dflt(ES<T>::shape(environment(initialization::standard)));
+  const environment dflt(ES<T>::shape(environment().init()));
   const environment constrained(prob_.env);
 
   if (!constrained.mep.code_length)

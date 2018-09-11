@@ -23,7 +23,7 @@ namespace vita
 class problem
 {
 public:
-  explicit problem(initialization = initialization::skip);
+  explicit problem();
 
   virtual bool debug() const;
 

@@ -17,42 +17,47 @@ namespace vita
 ///
 /// Class constructor.
 ///
-/// \param[in] init if `standard` sets every auto-tuning-parameter with
-///                 "safe" values (thus disabling the `search::tune_parameters`
-///                 method)
+/// \see environment::init
 ///
-/// Default values are quite standard, but specific problems need ad-hoc
-/// tuning.
+environment::environment()
+{
+}
+
 ///
-/// \note
-/// If `init` value is `standard` the environment passes the
-/// `environment::debug(true)` check.
+/// Initialises the undefined parameters with "quite common" values.
+///
+/// \return a reference to the "filled" environment.
+///
+/// Usually the undefined parameters are tuned before the start of the search
+/// (search::run calls search::tune_parameters) when there are enough at hand.
+/// The user doesn't have to fiddle with them (except after careful
+/// consideration).
+///
+/// This function is mainly convenient for debugging purpose. The chosen values
+/// are reasonable but most likely far from ideal.
 ///
 /// \see search::tune_parameters
 ///
-environment::environment(initialization init)
+environment &environment::init()
 {
-  if (init == initialization::standard)
-  {
-    mep.code_length = 100;
-    mep.patch_length = 1;
-    elitism = trilean::yes;
-    p_mutation = 0.04;
-    p_cross = 0.9;
-    brood_recombination = 1;
-    dss = 0;
-    layers = 1;
-    individuals = 100;
-    min_individuals = 2;
-    tournament_size = 5;
-    mate_zone = 20;
-    generations = 100;
-    max_stuck_time = std::numeric_limits<unsigned>::max();
-    arl = trilean::no;
-    validation_percentage = 20;
-  }
+  mep.code_length = 100;
+  mep.patch_length = 1;
+  elitism = trilean::yes;
+  p_mutation = 0.04;
+  p_cross = 0.9;
+  brood_recombination = 1;
+  dss = 0;
+  layers = 1;
+  individuals = 100;
+  min_individuals = 2;
+  tournament_size = 5;
+  mate_zone = 20;
+  generations = 100;
+  max_stuck_time = std::numeric_limits<unsigned>::max();
+  arl = trilean::no;
+  validation_percentage = 20;
 
-  Ensures(debug(init == initialization::standard));
+  return *this;
 }
 
 ///

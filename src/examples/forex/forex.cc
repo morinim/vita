@@ -256,7 +256,7 @@ bool setup_symbols(vita::symbol_set *ss)
 
 int main()
 {
-  vita::problem p(vita::initialization::standard);
+  vita::problem p;
 
   if (!setup_symbols(&p.sset))
     return EXIT_FAILURE;

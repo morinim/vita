@@ -28,16 +28,6 @@
 namespace vita
 {
 
-///
-/// Initialization type for environment class.
-///
-/// - `initialization::skip` lets the parameters in an auto-tune state. They'll
-///   be auto tuned before the start of the search;
-/// - `initialization::standard` sets the parameters to "quite common"
-///   (secure?) values.
-///
-enum class initialization : bool {skip, standard};
-
 namespace out
 {
 enum print_format_t {list_f,  // default value
@@ -63,9 +53,10 @@ class environment
 {
 public:
   // Constructor and support functions
-  explicit environment(initialization = initialization::skip);
+  explicit environment();
 
   void xml(tinyxml2::XMLDocument *) const;
+  environment &init();
 
   // Serialization
   //bool load(std::istream &) {}

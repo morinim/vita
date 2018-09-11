@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks infrastructure test.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,8 +20,9 @@ int main(int argc, char *argv[])
 {
   using namespace vita;
 
-  problem p(initialization::standard);
+  problem p;
 
+  p.env.init();
   p.env.mep.code_length = static_cast<unsigned>(argc > 1
                                                 ? std::atoi(argv[1]) : 100);
   const auto n(static_cast<unsigned>(argc > 2 ? std::atoi(argv[2]) : 1));

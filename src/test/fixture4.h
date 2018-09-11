@@ -33,8 +33,10 @@ struct fixture4
     int val;
   };
 
-  fixture4() : prob(vita::initialization::standard), factory(), null({})
+  fixture4() : prob(), factory(), null({})
   {
+    prob.env.init();
+
     c0 = prob.sset.insert(factory.make("0"));
     c1 = prob.sset.insert(factory.make("1"));
     c2 = prob.sset.insert(factory.make("2"));

@@ -9,6 +9,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 
 ### Changed
+- **BREAKING CHANGE**. Removed switch to default initialize an `environment` object.
+
+  So, instead of:
+
+  ```
+  environment e(initialization::standard);
+  ```
+
+  you should write:
+
+  ```
+  environment e;
+  e.init();  // initialization
+  ```
+
+  Usually the initialization is only needed in debug code. The common approach is:
+  - left parameters in the environment struct unitialized (auto-tune);
+  - leave to the search::run() function the task of identifying the
+    "best" values.
+
 - **BREAKING CHANGE**. `dataframe::load...` renamed to `dataframe::read...` for uniformity with Pands' dataframe.
 
 - **BREAKING CHANGE**. `example::tag` method has been renamed to `label`; `example::cast_output` has been renamed to `label_as`. Both are now free functions.

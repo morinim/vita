@@ -26,7 +26,7 @@ namespace vita
 class src_problem : public problem
 {
 public:
-  explicit src_problem(initialization = initialization::skip);
+  explicit src_problem();
   explicit src_problem(const std::string &, const std::string & = "");
 
   bool operator!() const;

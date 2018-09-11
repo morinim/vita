@@ -33,7 +33,7 @@ struct fixture3
     double val;
   };
 
-  fixture3() : prob(vita::initialization::standard), factory(), null(),
+  fixture3() : prob(), factory(), null(),
                c0(prob.sset.insert(factory.make("0.0"))),
                c1(prob.sset.insert(factory.make("1.0"))),
                c2(prob.sset.insert(factory.make("2.0"))),
@@ -57,7 +57,7 @@ struct fixture3
                f_sqrt(prob.sset.insert(factory.make("FSQRT"))),
                f_sub(prob.sset.insert(factory.make("FSUB")))
   {
-    prob.env.mep.code_length = 32;
+    prob.env.init().mep.code_length = 32;
   }
 
   vita::problem           prob;

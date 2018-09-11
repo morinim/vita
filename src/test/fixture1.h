@@ -18,8 +18,10 @@
 
 struct fixture1
 {
-  fixture1() : prob(vita::initialization::standard), factory()
+  fixture1() : prob(), factory()
   {
+    prob.env.init();
+
     prob.sset.insert(factory.make("REAL", {0}));
     prob.sset.insert(factory.make("FADD", {0}));
     prob.sset.insert(factory.make("FSUB", {0}));

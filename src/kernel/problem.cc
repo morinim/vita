@@ -17,11 +17,7 @@ namespace vita
 ///
 /// A new problem.
 ///
-/// \param[in] flag should the environment be initialized with common / default
-///                 values? (default is `false`)
-///
-problem::problem(initialization flag) : env(flag), sset(),
-                                        active_dataset_(training)
+problem::problem() : env(), sset(), active_dataset_(training)
 {
 }
 

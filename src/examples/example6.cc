@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -90,8 +90,9 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 int main(int argc, char *argv[])
 {
   using namespace vita;
-  problem p(initialization::standard);
+  problem p;
 
+  p.env.init();
   p.env.individuals = static_cast<unsigned>(argc > 1
                                             ? std::atoi(argv[1])
                                             : 100);
