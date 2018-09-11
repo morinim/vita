@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,6 +37,7 @@ public:
   enum format {c_format, cpp_format, mql_format, python_format, sup_format};
 
   symbol(const std::string &, category_t);
+  virtual ~symbol() = default;
 
   virtual unsigned arity() const = 0;
   virtual bool auto_defined() const;
