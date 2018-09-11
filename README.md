@@ -90,11 +90,12 @@ CXX=clang++ cmake ..
 
 You're now ready to build using the traditional `make` system:
 
-* To build (almost) all: `make`
-* To build the kernel library (`libvita.a`): `make vita`
-* To build the sr tool: `make sr`
-* To build / perform tests: `make tests`
-* To build example ABC: `make examples/ABC`
+* everything: `make`
+* kernel library (`libvita.a`): `make vita`
+* `sr` tool: `make sr`
+* tests: `make tests`
+* the *ABC* example: `make ABC`
+* for the list of the valid targets: `make help`
 
 All the output files will be stored in subdirectories of `build/` (out of source builds).
 
