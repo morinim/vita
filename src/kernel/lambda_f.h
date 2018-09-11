@@ -27,7 +27,7 @@
 namespace vita
 {
 ///
-/// \brief Transforms individuals into lambda functions
+/// Transforms individuals into lambda functions.
 ///
 /// \tparam T type of individual
 ///
@@ -55,6 +55,8 @@ template<class T>
 class lambda_f
 {
 public:
+  virtual ~lambda_f() = default;
+
   virtual any operator()(const dataframe::example &) const = 0;
 
   virtual std::string name(const any &) const = 0;
