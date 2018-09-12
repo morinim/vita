@@ -33,8 +33,7 @@ public:
   std::pair<std::size_t, std::size_t> read(const dataframe &);
   std::pair<std::size_t, std::size_t> read(const std::string &,
                                            const std::string & = "");
-  std::size_t read_symbols(const std::string &);
-  bool setup_default_symbols();
+  std::size_t setup_symbols(const std::string & = "");
   std::size_t setup_terminals(const std::set<unsigned> & = {});
 
   const dataframe &data() const;
@@ -57,6 +56,8 @@ private:
   // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
   void select_impl(dataset_t) override final {};
+  std::size_t setup_symbols_impl();
+  std::size_t setup_symbols_impl(const std::string &);
 
   // Private data members.
   dataframe training_;

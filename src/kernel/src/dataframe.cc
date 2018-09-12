@@ -656,10 +656,15 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 /// \param[in] ft a filter and transform function
 /// \return       number of lines parsed (0 in case of errors)
 ///
+/// \exception `std::invalid_argument` missing dataset file name
+///
 /// \note Test set can have an empty output value.
 ///
 std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
 {
+  if (trim(f).empty())
+    throw std::invalid_argument("Missing dataset filename");
+
   auto ends_with = [](const std::string &name, const std::string &ext)
   {
     return ext.length() <= name.length()

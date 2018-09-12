@@ -605,33 +605,19 @@ void stat_summary(const args_t &a)
 void symbols(const args_t &a)
 {
   const auto value(a.at("--symbols"));
-  if (!value)
-  {
-    vitaINFO << "Using default symbol set";
-    //problem->setup_default_symbols();
+  if (!value)  // default symbol set
     return;
-  }
 
-  const auto symbol_file(value.asString());
-
-  vitaINFO << "Reading symbol file " << symbol_file << "...";
-  std::size_t parsed(0);
   try
   {
-    parsed = problem->read_symbols(symbol_file);
+    const auto symbol_file(value.asString());
+    problem->setup_symbols(symbol_file);
   }
-  catch(...)
+  catch (const vita::exception::data_format &e)
   {
-    parsed = 0;
-  }
-
-  if (!parsed)
-  {
-    vitaERROR << "Symbol file format error";
+    vitaERROR << e.what();
     std::exit(EXIT_FAILURE);
   }
-
-  vitaINFO << "Symbolset read. Symbols: " << parsed;
 
   if (!problem->sset.enough_terminals())
   {

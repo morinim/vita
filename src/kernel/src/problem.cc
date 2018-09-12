@@ -74,8 +74,8 @@ src_problem::src_problem() : problem(), training_(), validation_(), factory_()
 /// Initializes the problem with data from the input files.
 ///
 /// \param[in] ds name of the dataset file
-/// \param[in] symbols name of the file containing the symbols. If it's empty,
-///                    src_problem::setup_default_symbols is called
+/// \param[in] symbols name of the file containing the symbols to be used. If
+///                    it's empty, a predefined set is arranged
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
   : src_problem()
@@ -92,31 +92,19 @@ bool src_problem::operator!() const
 }
 
 ///
-/// Loads data in the active dataframe (optionally also read a symbols file).
+/// Loads data in the active dataframe (optionally reads a symbols file).
 ///
 /// \param[in] ds      filename of the dataset file (training/validation set)
 /// \param[in] symbols name of the file containing the symbols. If it's empty,
-///                    src_problem::setup_default_symbols is called
+///                    a predefined set is arranged
 /// \return            number of examples (lines) parsed and number of symbols
 ///                    parsed
-///
-/// \exception `std::invalid_argument` missing dataset file name
 ///
 std::pair<std::size_t, std::size_t> src_problem::read(
   const std::string &ds, const std::string &symbols)
 {
-  if (ds.empty())
-    throw std::invalid_argument("Missing dataset filename");
-
-  data().clear();
-
   const auto n_examples(data().read(ds));
-
-  std::size_t n_symbols(0);
-  if (symbols.empty())
-    setup_default_symbols();
-  else
-    n_symbols = read_symbols(symbols);
+  const auto n_symbols(setup_symbols(symbols));
 
   return {n_examples, n_symbols};
 }
@@ -157,19 +145,43 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 }
 
 ///
-/// Default symbol set.
+/// Sets up the symbol set.
 ///
-/// This is useful for simple problems (single category regression /
-/// classification).
+/// \param[in] file name of the file containing the symbols
+/// \return         number of parsed symbols
 ///
-bool src_problem::setup_default_symbols()
+/// If a file isn't specified, a predefined set is arranged (useful for simple
+/// problems (single category regression / classification).
+///
+/// \exception `std::insufficient_data` missing data to generate terminal set
+///
+/// \warning
+/// Data should be loaded before symbols: without data we don't know, among
+/// other things, the features the dataset has.
+///
+std::size_t src_problem::setup_symbols(const std::string &file)
 {
   sset.clear();
 
   if (!setup_terminals())
-    return false;
+    throw exception::insufficient_data("Cannot generate the terminal set");
 
+  return file.empty() ? setup_symbols_impl() : setup_symbols_impl(file);
+}
+
+///
+/// Default symbol set.
+///
+/// \return number of symbols inserted
+///
+/// This is useful for simple problems (single category regression /
+/// classification).
+///
+std::size_t src_problem::setup_symbols_impl()
+{
   vitaINFO << "Setting up default symbol set";
+
+  std::size_t inserted(0);
 
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
@@ -190,6 +202,8 @@ bool src_problem::setup_default_symbols()
       sset.insert(factory_.make("FMUL", {tag}));
       sset.insert(factory_.make("FMOD", {tag}));
       sset.insert(factory_.make("FSUB", {tag}));
+
+      inserted += 16;
     }
     else if (compatible({tag}, {"string"}))
     {
@@ -197,27 +211,25 @@ bool src_problem::setup_default_symbols()
       //   if (j != tag)
       //     sset.insert(factory_.make("SIFE", {tag, j}));
       sset.insert(factory_.make("SIFE", {tag, 0}));
+
+      ++inserted;
     }
 
-  return true;
+  vitaINFO << "Symbolset ready. Symbols: " << inserted;
+  return inserted;
 }
 
 ///
-/// \param[in] s_file name of the file containing the symbols
-/// \return           number of parsed symbols
+/// Initialize the symbols set reading symbols from a file.
 ///
-/// \warning Check the return value (it must be greater than `0`).
+/// \param[in] file name of the file containing the symbols
+/// \return         number of parsed symbols
 ///
-/// \warning
-/// Data should be loaded before symbols: without data we don't know, among
-/// other things, the features the dataset has.
+/// \excetpion exception::data_format wrong data format for symbol file
 ///
-std::size_t src_problem::read_symbols(const std::string &s_file)
+std::size_t src_problem::setup_symbols_impl(const std::string &file)
 {
-  sset.clear();
-
-  if (!setup_terminals())
-    return 0;
+  vitaINFO << "Reading symbol file " << file << "...";
 
   // Prints the list of categories as inferred from the dataset.
   for (const category &c : training_.categories())
@@ -228,8 +240,8 @@ std::size_t src_problem::read_symbols(const std::string &s_file)
     used_categories.insert(used_categories.end(), i);
 
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(s_file.c_str()) != tinyxml2::XML_SUCCESS)
-    return 0;
+  if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS)
+    throw exception::data_format("Symbol file format error");
 
   std::size_t parsed(0);
 
@@ -239,7 +251,7 @@ std::size_t src_problem::read_symbols(const std::string &s_file)
   auto *symbolset(handle.FirstChildElement("symbolset").ToElement());
 
   if (!symbolset)
-    return 0;
+    throw exception::data_format("Empty symbol set");
 
   for (auto *s(symbolset->FirstChildElement("symbol"));
        s;
@@ -315,6 +327,7 @@ std::size_t src_problem::read_symbols(const std::string &s_file)
     ++parsed;
   }
 
+  vitaINFO << "Symbolset read. Symbols: " << parsed;
   return parsed;
 }
 
