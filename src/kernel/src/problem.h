@@ -23,6 +23,7 @@
 
 namespace vita
 {
+
 class src_problem : public problem
 {
 public:
@@ -30,7 +31,6 @@ public:
   explicit src_problem(const std::string &, const std::string & = "");
 
   bool operator!() const;
-  std::pair<std::size_t, std::size_t> read(const dataframe &);
   std::pair<std::size_t, std::size_t> read(const std::string &,
                                            const std::string & = "");
   std::size_t setup_symbols(const std::string & = "");

@@ -63,6 +63,7 @@ public:
 
   // ---- Constructors ----
   dataframe();
+  explicit dataframe(std::istream &, filter_hook_t = nullptr);
   explicit dataframe(const std::string &, filter_hook_t = nullptr);
 
   // ---- Iterators ----

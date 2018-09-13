@@ -102,7 +102,23 @@ dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
 }
 
 ///
-/// New data instance containing the learning collection from `filename`.
+/// New data instance containing the learning collection from a stream.
+///
+/// \param[in] is input stream
+/// \param[in] ft a filter and transform function
+///
+/// \remark Data from the input stream must be in CSV format.
+///
+dataframe::dataframe(std::istream &is, filter_hook_t ft)
+  : dataframe()
+{
+  Expects(is.good());
+  read_csv(is, ft);
+  Ensures(debug());
+}
+
+///
+/// New data instance containing the learning collection from a file.
 ///
 /// \param[in] filename name of the file containing the learning collection
 /// \param[in] ft       a filter and transform function
@@ -111,9 +127,7 @@ dataframe::dataframe(const std::string &filename, filter_hook_t ft)
   : dataframe()
 {
   Expects(!filename.empty());
-
   read(filename, ft);
-
   Ensures(debug());
 }
 

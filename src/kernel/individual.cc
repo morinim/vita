@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,7 +25,7 @@ static const long print_format_index = std::ios_base::xalloc();
 ///
 static const long long_form_index = std::ios_base::xalloc();
 
-}  // namespace
+}  // unnamed namespace
 
 namespace vita
 {
