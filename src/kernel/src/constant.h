@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,13 +30,19 @@ public:
   explicit constant(T c, category_t t = 0)
     : constant(std::to_string(c), t) {}
 
+  /// \return the string representation of the constant
   ///
+  /// \remark
+  /// Arguments aren't used: the value of a constant is stored within the
+  /// object.
+  std::string display(terminal::param_t, format) const final
+  { return std::to_string(static_cast<T>(val_)); }
+
   /// \return the value of the constant (as a `any`)
   ///
   /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
-  ///
   any eval(core_interpreter *) const override { return any(val_); }
 
 private:
