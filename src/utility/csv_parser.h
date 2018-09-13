@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,7 +52,7 @@ public:
   /// \return      a reference to `this` object (fluent interface)
   ///
   /// \remark
-  /// Trimming spaces is contentious and in fact the prectice is specifically
+  /// Trimming spaces is contentious and in fact the practice is specifically
   /// prohibited by RFC 4180, which states: "Spaces are considered part of a
   /// field and should not be ignored".
   csv_parser trim_ws(bool t)
@@ -121,8 +121,6 @@ public:
   using const_pointer = const value_type *;
   using reference = value_type &;
   using const_reference = const value_type &;
-
-  enum class get_input_fail {missing_istream, eof};
 
   const_iterator(std::istream *is = nullptr,
                  csv_parser::filter_hook_t f = nullptr,

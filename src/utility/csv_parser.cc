@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,24 +38,26 @@ csv_parser::const_iterator csv_parser::end() const
 ///
 void csv_parser::const_iterator::get_input()
 {
-  try
-  {
-    if (!ptr_)
-      throw get_input_fail::missing_istream;
-
-    do
-    {
-      std::string line;
-      if (!std::getline(*ptr_, line))
-        throw get_input_fail::eof;
-
-      value_ = parse_line(line);
-    } while (filter_hook_ && !filter_hook_(value_));
-  }
-  catch (get_input_fail)
+  if (!ptr_)
   {
     *this = const_iterator();
+    return;
   }
+
+  do
+  {
+    std::string line;
+
+    do  // gets the first non-empty line
+      if (!std::getline(*ptr_, line))
+      {
+        *this = const_iterator();
+        return;
+      }
+    while (trim(line).empty());
+
+    value_ = parse_line(line);
+  } while (filter_hook_ && !filter_hook_(value_));
 }
 
 ///
