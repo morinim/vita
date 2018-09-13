@@ -31,6 +31,10 @@ public:
 
   bool input() const override { return true; }
 
+  /// \return the name of the variable
+  std::string display(terminal::param_t, format) const final
+  { return name(); }
+
   /// \return the value of the variable (as a `any`)
   ///
   /// \note Requires a src_interpreter to work.
