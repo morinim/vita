@@ -69,6 +69,13 @@ std::pair<std::uintmax_t, std::uintmax_t> dss::average_age_difficulty(
   return avg;
 }
 
+void dss::move_to_validation()
+{
+  std::move(training_.begin(), training_.end(),
+            std::back_inserter(validation_));
+  training_.clear();
+}
+
 ///
 /// Available examples are randomly partitioned into two independent sets
 /// according to a given percentage.
@@ -77,9 +84,7 @@ std::pair<std::uintmax_t, std::uintmax_t> dss::average_age_difficulty(
 ///
 void dss::init()
 {
-  std::move(training_.begin(), training_.end(),
-            std::back_inserter(validation_));
-  training_.clear();
+  move_to_validation();
 
   reset_age_difficulty(validation_);
 
@@ -154,9 +159,7 @@ bool dss::shake(unsigned generation)
   vitaDEBUG << "DSS average training difficulty " << avg_t.second;
   assert(avg_t.first == 1);
 
-  std::move(training_.begin(), training_.end(),
-            std::back_inserter(validation_));
-  training_.clear();
+  move_to_validation();
 
   std::for_each(validation_.begin(), validation_.end(),
                 [](auto &e) { ++e.age; });

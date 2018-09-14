@@ -42,6 +42,7 @@ public:
 private:
   std::pair<uintmax_t,uintmax_t> average_age_difficulty(dataframe &) const;
 
+  void move_to_validation();
   void reset_age_difficulty(dataframe &);
   void shake_impl();
 
