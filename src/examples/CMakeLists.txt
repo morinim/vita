@@ -15,3 +15,7 @@ foreach (example_src ${EXAMPLES_SRC})
   add_executable(${example} ${example_src})
   target_link_libraries(${example} vita)
 endforeach()
+
+# Resources needed by examples
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/titanic_train.csv
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

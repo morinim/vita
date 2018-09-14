@@ -26,10 +26,9 @@ std::uintmax_t weight(const dataframe::example &v)
 
 }  // unnamed namespace
 
-dss::dss(src_problem &prob)
-  : training_(prob.data(problem::training)),
-    validation_(prob.data(problem::validation)),
-    gap_(*prob.env.dss)
+dss::dss(src_problem &prob) : training_(prob.data(problem::training)),
+                              validation_(prob.data(problem::validation)),
+                              gap_(*prob.env.dss)
 {
   Expects(*prob.env.dss);
   Expects(validation_.empty());
@@ -46,12 +45,12 @@ void dss::reset_age_difficulty(dataframe &d)
   std::for_each(d.begin(), d.end(), reset);
 }
 
-std::pair<uintmax_t, uintmax_t> dss::average_age_difficulty(
+std::pair<std::uintmax_t, std::uintmax_t> dss::average_age_difficulty(
   dataframe &d) const
 {
   const auto s(d.size());
 
-  const std::pair<uintmax_t, uintmax_t> zero(0, 0);
+  const std::pair<std::uintmax_t, std::uintmax_t> zero(0, 0);
 
   if (!s)
     return zero;
@@ -60,8 +59,8 @@ std::pair<uintmax_t, uintmax_t> dss::average_age_difficulty(
              d.begin(), d.end(), zero,
              [](const auto &p, const dataframe::example &e)
              {
-               return std::pair<uintmax_t, uintmax_t>(p.first + e.age,
-                                                      p.second + e.difficulty);
+               return std::pair<std::uintmax_t, std::uintmax_t>(
+                 p.first + e.age, p.second + e.difficulty);
              }));
 
   avg.first /= s;
@@ -97,19 +96,19 @@ void dss::shake_impl()
             << ", age " << avg_v.first;
 
   const auto weight_sum(
-    std::accumulate(validation_.begin(), validation_.end(), uintmax_t(0),
-                    [](const uintmax_t &s, const dataframe::example &e)
+    std::accumulate(validation_.begin(), validation_.end(), std::uintmax_t(0),
+                    [](const std::uintmax_t &s, const dataframe::example &e)
                     {
                       return s + weight(e);
                     }));
 
   assert(weight_sum);
 
-  // Move a subset of the available examples (currently contained in the
+  // Move a subset of the available examples (initially contained in the
   // validation set) into the training set.
   // Note that the actual size of the selected subset is not fixed and, in
-  // fact, it averages slightly above target_size (Gathercole and Ross felt
-  // that this might improve performance).
+  // fact, it averages slightly above `target_size` (Gathercole and Ross felt
+  // it might improve performance).
   const double s(validation_.size());
   const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
@@ -119,7 +118,7 @@ void dss::shake_impl()
 
   auto pivot(
     std::partition(validation_.begin(), validation_.end(),
-                   [=](const auto &e)
+                   [k](const auto &e)
                    {
                      const auto p1(static_cast<double>(weight(e)) * k);
                      const auto prob(std::min(p1, 1.0));
@@ -130,11 +129,15 @@ void dss::shake_impl()
   if (pivot == validation_.end())
     pivot = std::next(validation_.begin(), s / 2);
 
+  assert(validation_.size() == s);
+
   std::move(pivot, validation_.end(), std::back_inserter(training_));
   validation_.erase(pivot, validation_.end());
 
   vitaDEBUG << "DSS SHAKE (weight sum: " << weight_sum << ", training with: "
             << training_.size() << ')';
+
+  assert(s == training_.size() + validation_.size());
 
   reset_age_difficulty(training_);
 }

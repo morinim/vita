@@ -102,7 +102,7 @@ dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
 }
 
 ///
-/// New data instance containing the learning collection from a stream.
+/// New dataframe instance containing the learning collection from a stream.
 ///
 /// \param[in] is input stream
 /// \param[in] ft a filter and transform function
@@ -118,7 +118,7 @@ dataframe::dataframe(std::istream &is, filter_hook_t ft)
 }
 
 ///
-/// New data instance containing the learning collection from a file.
+/// New datafame instance containing the learning collection from a file.
 ///
 /// \param[in] filename name of the file containing the learning collection
 /// \param[in] ft       a filter and transform function

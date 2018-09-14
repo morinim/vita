@@ -179,7 +179,7 @@ std::size_t src_problem::setup_symbols(const std::string &file)
 ///
 std::size_t src_problem::setup_symbols_impl()
 {
-  vitaINFO << "Setting up default symbol set";
+  vitaINFO << "Setting up default symbol set...";
 
   std::size_t inserted(0);
 
@@ -215,7 +215,7 @@ std::size_t src_problem::setup_symbols_impl()
       ++inserted;
     }
 
-  vitaINFO << "Symbolset ready. Symbols: " << inserted;
+  vitaINFO << "...symbol set ready. Symbols: " << inserted;
   return inserted;
 }
 
@@ -327,7 +327,7 @@ std::size_t src_problem::setup_symbols_impl(const std::string &file)
     ++parsed;
   }
 
-  vitaINFO << "Symbolset read. Symbols: " << parsed;
+  vitaINFO << "...symbol set read. Symbols: " << parsed;
   return parsed;
 }
 

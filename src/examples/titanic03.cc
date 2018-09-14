@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 
 int main()
 {
-  vita::src_problem titanic("../examples/titanic_train.csv");
+  vita::src_problem titanic("titanic_train.csv");
 
   if (!titanic)
     return EXIT_FAILURE;
