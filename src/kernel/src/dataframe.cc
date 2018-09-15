@@ -438,6 +438,8 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   if (!attributes)
     return 0;
 
+  clear();
+
   unsigned n_output(0);
   bool classification(false);
 
@@ -611,6 +613,8 @@ std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
 ///
 std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 {
+  clear();
+
   bool classification(false), format(columns());
 
   for (auto record : csv_parser(from).filter_hook(ft))
@@ -686,8 +690,6 @@ std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
   };
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
-
-  clear();
 
   return xrff ? read_xrff(f, ft) : read_csv(f, ft);
 }
