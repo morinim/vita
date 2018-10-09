@@ -101,8 +101,9 @@ All the output files will be stored in subdirectories of `build/` (out of source
 Windows may need various expedients about which you can read in the [Windows walkthrough][6].
 
 ## License ##
+[![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][license]
 
-[Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
+[Mozilla Public License v2.0][7] (also available in the accompanying [LICENSE][8] file).
 
 
 
@@ -112,8 +113,7 @@ Windows may need various expedients about which you can read in the [Windows wal
 [4]: http://www.python.org/
 [5]: https://cmake.org/
 [6]: https://github.com/morinim/vita/wiki/win_build
-[7]: https://www.mozilla.org/MPL/2.0/
-[8]: https://github.com/morinim/vita/blob/master/LICENSE
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
-[twitter]: (https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita)
+[license]: https://www.mozilla.org/MPL/2.0/
+[twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
