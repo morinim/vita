@@ -33,7 +33,7 @@ domain_t find_domain(const std::string &s)
   {
     std::stod(s);
   }
-  catch(std::invalid_argument)  // not a number
+  catch (std::invalid_argument)  // not a number
   {
     return (s == "{TRUE}" || s == "{FALSE}")
            ? domain_t::d_bool

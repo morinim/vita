@@ -21,6 +21,8 @@
 namespace vita
 {
 
+const src_problem::default_symbols_t src_problem::default_symbols = {};
+
 namespace detail
 {
 ///
@@ -66,21 +68,39 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 ///
 /// New empty instance of src_problem.
 ///
+/// Users must initialize:
+/// - the training dataset
+/// - the symbol set
+/// before starting the evolution.
+///
 src_problem::src_problem() : problem(), training_(), validation_(), factory_()
+{
+}
+
+///
+/// Initializes the problem with data from a file and the default symbol set.
+///
+/// \param[in] ds name of the dataset file
+///
+/// Mainly useful for simple problems (single category regression /
+/// classification).
+///
+src_problem::src_problem(const std::string &ds, const default_symbols_t &)
+  : src_problem(ds, "")
 {
 }
 
 ///
 /// Initializes the problem with data from the input files.
 ///
-/// \param[in] ds name of the dataset file
-/// \param[in] symbols name of the file containing the symbols to be used. If
-///                    it's empty, a predefined set is arranged
+/// \param[in] ds      name of the dataset file
+/// \param[in] symbols name of the file containing the symbols to be used.
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
   : src_problem()
 {
-  read(ds, symbols);
+  data().read(ds);
+  setup_symbols(symbols);
 }
 
 ///
@@ -89,24 +109,6 @@ src_problem::src_problem(const std::string &ds, const std::string &symbols)
 bool src_problem::operator!() const
 {
   return !training_.size() || !sset.enough_terminals();
-}
-
-///
-/// Loads data in the active dataframe (optionally reads a symbols file).
-///
-/// \param[in] ds      filename of the dataset file (training/validation set)
-/// \param[in] symbols name of the file containing the symbols. If it's empty,
-///                    a predefined set is arranged
-/// \return            number of examples (lines) parsed and number of symbols
-///                    parsed
-///
-std::pair<std::size_t, std::size_t> src_problem::read(
-  const std::string &ds, const std::string &symbols)
-{
-  const auto n_examples(data().read(ds));
-  const auto n_symbols(setup_symbols(symbols));
-
-  return {n_examples, n_symbols};
 }
 
 ///
@@ -186,24 +188,15 @@ std::size_t src_problem::setup_symbols_impl()
   for (category_t tag(0), sup(categories()); tag < sup; ++tag)
     if (compatible({tag}, {"numeric"}))
     {
-      sset.insert(factory_.make("1.0", {tag}));
-      sset.insert(factory_.make("2.0", {tag}));
-      sset.insert(factory_.make("3.0", {tag}));
-      sset.insert(factory_.make("4.0", {tag}));
-      sset.insert(factory_.make("5.0", {tag}));
-      sset.insert(factory_.make("6.0", {tag}));
-      sset.insert(factory_.make("7.0", {tag}));
-      sset.insert(factory_.make("8.0", {tag}));
-      sset.insert(factory_.make("9.0", {tag}));
-      sset.insert(factory_.make("FABS", {tag}));
-      sset.insert(factory_.make("FADD", {tag}));
-      sset.insert(factory_.make("FDIV", {tag}));
-      sset.insert(factory_.make("FLN",  {tag}));
-      sset.insert(factory_.make("FMUL", {tag}));
-      sset.insert(factory_.make("FMOD", {tag}));
-      sset.insert(factory_.make("FSUB", {tag}));
+      const std::vector<std::string> base(
+        {"1.0", "2.0", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0", "9.0",
+         "FABS", "FADD", "FDIV", "FLN", "FMUL", "FMOD", "FSUB"});
 
-      inserted += 16;
+      for (const auto &s: base)
+      {
+        sset.insert(factory_.make(s, {tag}));
+        ++inserted;
+      }
     }
     else if (compatible({tag}, {"string"}))
     {
@@ -230,18 +223,17 @@ std::size_t src_problem::setup_symbols_impl()
 std::size_t src_problem::setup_symbols_impl(const std::string &file)
 {
   vitaINFO << "Reading symbol file " << file << "...";
-
-  // Prints the list of categories as inferred from the dataset.
-  for (const category &c : training_.categories())
-    vitaDEBUG << "Using " << c;
-
-  std::set<category_t> used_categories;
-  for (category_t i(0); i < categories(); ++i)
-    used_categories.insert(used_categories.end(), i);
-
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("Symbol file format error");
+
+  // Records the set of categories as inferred from the dataset.
+  std::set<category_t> used_categories;
+  for (const category &c : training_.categories())
+  {
+    vitaDEBUG << "Using " << c;
+    used_categories.insert(c.tag);
+  }
 
   std::size_t parsed(0);
 

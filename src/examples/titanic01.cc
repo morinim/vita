@@ -17,12 +17,14 @@
 
 int main()
 {
-  vita::src_problem titanic("titanic_train.csv");  // training set
+  using namespace vita;
+
+  src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
   if (!titanic)
     return EXIT_FAILURE;
 
-  vita::src_search<> s(titanic);
+  src_search<> s(titanic);
   const auto summary(s.run());  // starting search and getting a summary
 
   std::cout << summary.best.solution << '\n';  // print result

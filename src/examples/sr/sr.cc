@@ -15,18 +15,12 @@
 #include <iterator>
 #include <string>
 
-#include "kernel/environment.h"
-#include "kernel/log.h"
-#include "kernel/src/evaluator.h"
-#include "kernel/src/problem.h"
-#include "kernel/src/primitive/factory.h"
-#include "kernel/src/search.h"
-
+#include "kernel/vita.h"
 #include "third_party/docopt/docopt.h"
 
 const char USAGE[] =
 R"(Vita - Symbolic Regression and classification
-Copyright 2011-2018 EOS di Manlio Morini (http://eosdev.it/)
+Copyright 2011-2018 EOS di Manlio Morini (https://eosdev.it/)
 
 (==(     )==)
  `-.`. ,',-'
@@ -260,15 +254,7 @@ void data(const args_t &a)
   const auto data_file(a.at("DATASET").asString());
   vitaINFO << "Reading data file " << data_file << "...";
 
-  std::size_t parsed(0);
-  try
-  {
-    parsed = problem->read(data_file).first;
-  }
-  catch(...)
-  {
-    parsed = 0;
-  }
+  const auto parsed(problem->data().read(data_file));
 
   if (parsed)
     vitaINFO << "Dataset read. Examples: " << parsed
@@ -276,10 +262,7 @@ void data(const args_t &a)
              << ", features: " << problem->variables()
              << ", classes: " << problem->classes();
   else
-  {
-    vitaERROR << "Dataset file format error";
-    std::exit(EXIT_FAILURE);
-  }
+    vitaERROR << "Empty dataset";
 }
 
 // Turn on/off the Dynamic Subset Selection algorithm.
@@ -386,15 +369,11 @@ void generations(const args_t &a)
 // Starts the search.
 void go(bool = true)
 {
+  Expects(problem->sset.enough_terminals());
+
   if (!problem->data().size())
   {
     vitaERROR << "Missing data set";
-    return;
-  }
-
-  if (!problem->sset.enough_terminals())
-  {
-    vitaERROR << "Too few terminals";
     return;
   }
 
@@ -605,12 +584,11 @@ void stat_summary(const args_t &a)
 void symbols(const args_t &a)
 {
   const auto value(a.at("--symbols"));
-  if (!value)  // default symbol set
-    return;
+  const auto symbol_file(value ? value.asString() : std::string());
 
   try
   {
-    const auto symbol_file(value.asString());
+    // If there isn't a file, generate the default symbol set.
     problem->setup_symbols(symbol_file);
   }
   catch (const vita::exception::data_format &e)

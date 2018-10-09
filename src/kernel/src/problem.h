@@ -27,12 +27,14 @@ namespace vita
 class src_problem : public problem
 {
 public:
+  struct default_symbols_t {};
+  static const default_symbols_t default_symbols;
+
   explicit src_problem();
-  explicit src_problem(const std::string &, const std::string & = "");
+  src_problem(const std::string &, const default_symbols_t &);
+  src_problem(const std::string &, const std::string &);
 
   bool operator!() const;
-  std::pair<std::size_t, std::size_t> read(const std::string &,
-                                           const std::string & = "");
   std::size_t setup_symbols(const std::string & = "");
   std::size_t setup_terminals(const std::set<unsigned> & = {});
 

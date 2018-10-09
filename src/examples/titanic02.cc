@@ -18,12 +18,14 @@
 
 int main()
 {
-  vita::src_problem titanic("titanic_train.csv");
+  using namespace vita;
+
+  src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
   if (!titanic)
     return EXIT_FAILURE;
 
-  vita::src_search<> s(titanic, vita::metric_flags::accuracy);
+  src_search<> s(titanic, metric_flags::accuracy);
   const auto summary(s.run(10));                   // starting search (10 runs)
                                                    // and getting a summary
 

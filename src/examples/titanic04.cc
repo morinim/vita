@@ -18,15 +18,17 @@
 
 int main()
 {
-  vita::src_problem titanic("titanic_train.csv");
+  using namespace vita;
+
+  src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
   if (!titanic)
     return EXIT_FAILURE;
 
   using team = vita::team<vita::i_mep>;
-  vita::src_search<team> s(titanic, vita::metric_flags::accuracy);
-  const auto summary(s.run(10));                   // starting search (10 runs)
-                                                   // and getting a summary
+  src_search<team> s(titanic, metric_flags::accuracy);
+  const auto summary(s.run(10));  // starting search (10 runs)
+                                  // and getting a summary
 
   std::cout << summary.best.solution << '\n'
             << summary.best.score.accuracy << '\n';

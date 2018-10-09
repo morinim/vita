@@ -36,7 +36,10 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), views_()
 ///
 void symbol_set::clear()
 {
-  *this = {};
+  //*this = {};
+
+  symbols_.clear();
+  views_.clear();
 }
 
 ///
@@ -72,7 +75,7 @@ std::vector<const symbol *> symbol_set::adts() const
 /// \return       a raw pointer to the symbol just added (or `nullptr` in case
 ///               of error)
 ///
-/// A symbol with undefined category will be changed to the first available
+/// A symbol with undefined category will be changed to the first free
 /// category.
 ///
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -68,12 +68,11 @@ public:
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
 private:
-  // `arguments_` data member:
-  // * is not present in the `collection` struct because an argument isn't
-  //   bounded to a category (see `argument` class for more details);
-  // * is not a subset of `symbols_` (the intersection of `arguments_` and
-  //   `symbol_` is empty) because arguments aren't returned by the roulette
-  //   functions.
+  // `arguments_` data member is not:
+  // * present in the `collection` struct because an argument isn't bounded to
+  //   a category (see `argument` class for more details);
+  // * a subset of `symbols_` (the intersection of `arguments_` and `symbol_`
+  //   is empty) because arguments aren't returned by the roulette functions.
   std::vector<std::unique_ptr<symbol>> arguments_;
 
   // This is the real, raw repository of symbols (it owns/stores the symbols).
@@ -93,7 +92,7 @@ private:
     weight_t weight;
 
     /// This is the default weight.
-    enum : decltype(weight) {base_weight = 100};
+    static constexpr weight_t base_weight = 100;
   };
 
   // A collection is a structured-view on `symbols_` or on a subset of
@@ -101,6 +100,10 @@ private:
   class collection
   {
   public:
+    explicit collection(std::string = "");
+
+    bool debug() const;
+
     class sum_container
     {
     public:
@@ -140,15 +143,11 @@ private:
       std::string name_;
     };
 
-    explicit collection(std::string = "");
-
     sum_container       all;
     sum_container functions;
     sum_container terminals;
     sum_container       adf;
     sum_container       adt;
-
-    bool debug() const;
 
   private:
     std::string name_;

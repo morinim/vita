@@ -78,7 +78,7 @@ private:
 template<class T>
 bool symbol_factory::register_symbol(const std::string &name, std::size_t n)
 {
-  return factory_.insert(std::make_pair(name, build_info{build<T>, n})).second;
+  return factory_.insert({name, build_info{build<T>, n}}).second;
 }
 
 }  // namespace vita

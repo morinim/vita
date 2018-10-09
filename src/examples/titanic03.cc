@@ -18,7 +18,9 @@
 
 int main()
 {
-  vita::src_problem titanic("titanic_train.csv");
+  using namespace vita;
+
+  src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
   if (!titanic)
     return EXIT_FAILURE;
@@ -27,7 +29,7 @@ int main()
   titanic.env.individuals = 1000;
   titanic.env.generations =  200;
 
-  vita::src_search<> s(titanic, vita::metric_flags::accuracy);
+  src_search<> s(titanic, metric_flags::accuracy);
   const auto summary(s.run(10));
 
   std::cout << summary.best.solution << '\n'
