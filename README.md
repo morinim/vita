@@ -1,6 +1,7 @@
 # [VITA][3] #
 [![Travis](https://travis-ci.org/morinim/vita.svg?branch=master)][travis]
-[![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][license]
+[![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
+[![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
 
 ## Overview ##
@@ -115,6 +116,7 @@ Windows may need various expedients about which you can read in the [Windows wal
 [6]: https://github.com/morinim/vita/wiki/win_build
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
+[cii]: https://bestpractices.coreinfrastructure.org/projects/1012
 [license]: https://github.com/morinim/vita/blob/master/LICENSE
 [mpl]: https://www.mozilla.org/MPL/2.0/
 [travis]: https://travis-ci.org/morinim/vita
