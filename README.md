@@ -1,4 +1,5 @@
 # [VITA][3] #
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
 
 ## Overview ##
 
@@ -12,8 +13,6 @@ It's suitable for classification, symbolic regression, content base image retrie
 * fast experimentation with detailed run-log
 * modern, standard ISO C++14 source code
 * [more][2]
-
-It's distributed under the [Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
 
 This software was originally developed by [EOS][1] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
@@ -101,6 +100,11 @@ All the output files will be stored in subdirectories of `build/` (out of source
 
 Windows may need various expedients about which you can read in the [Windows walkthrough][6].
 
+## License ##
+
+[Mozilla Public License v2.0][7] (see the accompanying [LICENSE][8] file for more details).
+
+
 
 [1]: https://www.eosdev.it/
 [2]: https://github.com/morinim/vita/wiki/features
@@ -112,3 +116,4 @@ Windows may need various expedients about which you can read in the [Windows wal
 [8]: https://github.com/morinim/vita/blob/master/LICENSE
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
+[twitter]: (https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita)
