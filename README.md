@@ -1,4 +1,7 @@
-# [VITA][3] #
+# [VITA][homepage] #
+[![Logo](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
+[![Version](https://img.shields.io/github/tag/morinim/vita.svg)][news]
+
 [![Travis](https://travis-ci.org/morinim/vita.svg?branch=master)][travis]
 [![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
@@ -53,7 +56,7 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
-  CHANGELOG.md.............Don't let your friends dump git logs into changelogs
+  NEWS.md..................Don't let your friends dump git logs into NEWS
   CODE_OF_CONDUCT.md.......Standards for how to engage in this community
   CONTRIBUTING.md
   LICENSE
@@ -110,14 +113,15 @@ Windows may need various expedients about which you can read in the [Windows wal
 
 [1]: https://www.eosdev.it/
 [2]: https://github.com/morinim/vita/wiki/features
-[3]: https://github.com/morinim/vita
 [4]: http://www.python.org/
 [5]: https://cmake.org/
 [6]: https://github.com/morinim/vita/wiki/win_build
 [9]: https://github.com/morinim/vita/issues
 [10]: https://github.com/morinim/vita/archive/master.zip
 [cii]: https://bestpractices.coreinfrastructure.org/projects/1012
+[homepage]: https://github.com/morinim/vita
 [license]: https://github.com/morinim/vita/blob/master/LICENSE
-[mpl]: https://www.mozilla.org/MPL/2.0/
+[mpl2]: https://www.mozilla.org/MPL/2.0/
+[news]: https://github.com/morinim/vita/blob/master/NEWS.md
 [travis]: https://travis-ci.org/morinim/vita
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
