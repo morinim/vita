@@ -1,8 +1,9 @@
 # [VITA][homepage] #
-[![Logo](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
+[![Vita](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
 [![Version](https://img.shields.io/github/tag/morinim/vita.svg)][news]
 
 [![Travis](https://travis-ci.org/morinim/vita.svg?branch=master)][travis]
+![C++14](https://img.shields.io/badge/c%2B%2B-14-blue.svg)
 [![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
