@@ -73,6 +73,9 @@ void dss::move_to_validation()
   std::move(training_.begin(), training_.end(),
             std::back_inserter(validation_));
   training_.clear();
+
+  Ensures(training_.empty());
+  Ensures(!validation_.empty());
 }
 
 ///
@@ -83,16 +86,11 @@ void dss::move_to_validation()
 ///
 /// \attention The procedure changes the current training / validation sets.
 ///
-void dss::init(unsigned run)
+void dss::init(unsigned)
 {
-  if (run == 0)
-  {
-    move_to_validation();
-
-    reset_age_difficulty(validation_);
-
-    shake_impl();
-  }
+  move_to_validation();
+  reset_age_difficulty(validation_);
+  shake_impl();
 }
 
 void dss::shake_impl()
@@ -118,7 +116,7 @@ void dss::shake_impl()
   // Note that the actual size of the selected subset is not fixed and, in
   // fact, it averages slightly above `target_size` (Gathercole and Ross felt
   // it might improve performance).
-  const double s(validation_.size());
+  const auto s(validation_.size());
   const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
   const auto target_size(s * ratio);

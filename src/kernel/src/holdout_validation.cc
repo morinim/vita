@@ -21,10 +21,10 @@ holdout_validation::holdout_validation(src_problem &prob)
     validation_(prob.data(problem::validation)),
     perc_(prob.env.validation_percentage)
 {
-  Expects(prob.env.validation_percentage.value_or(0) > 0);
-  Expects(prob.env.validation_percentage.value_or(0) < 100);
+  Expects(prob.env.validation_percentage >   0);
+  Expects(prob.env.validation_percentage < 100);
 
-  Ensures(0 < oerc_ && perc_ < 100);
+  Ensures(0 < perc_ && perc_ < 100);
   Ensures(validation_.empty());
 }
 
