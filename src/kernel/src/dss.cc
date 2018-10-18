@@ -28,10 +28,12 @@ std::uintmax_t weight(const dataframe::example &v)
 
 dss::dss(src_problem &prob) : training_(prob.data(problem::training)),
                               validation_(prob.data(problem::validation)),
-                              gap_(*prob.env.dss)
+                              gap_(prob.env.dss)
 {
-  Expects(*prob.env.dss);
-  Expects(validation_.empty());
+  Expects(prob.env.dss);
+
+  Ensures(gap_);
+  Ensures(validation_.empty());
 }
 
 void dss::reset_age_difficulty(dataframe &d)

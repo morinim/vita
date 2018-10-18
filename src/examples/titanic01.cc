@@ -11,21 +11,14 @@
  *  \see https://github.com/morinim/vita/wiki/titanic_tutorial
  */
 
-#include <cstdlib>
-
 #include "kernel/vita.h"
 
 int main()
 {
-  using namespace vita;
+  vita::src_problem titanic("titanic_train.csv",  // training set
+                            vita::src_problem::default_symbols);
 
-  src_problem titanic("titanic_train.csv", src_problem::default_symbols);
-
-  if (!titanic)
-    return EXIT_FAILURE;
-
-  src_search<> s(titanic);
-  const auto summary(s.run());  // starting search and getting a summary
-
-  std::cout << summary.best.solution << '\n';  // print result
+  vita::src_search<> s(titanic);
+  const auto summary(s.run());                    // go searching
+  std::cout << summary.best.solution << '\n';     // print search result
 }

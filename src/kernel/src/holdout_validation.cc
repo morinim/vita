@@ -21,8 +21,11 @@ holdout_validation::holdout_validation(src_problem &prob)
     validation_(prob.data(problem::validation)),
     perc_(prob.env.validation_percentage)
 {
-  Expects(perc_ < 100);
-  Expects(validation_.empty());
+  Expects(prob.env.validation_percentage.value_or(0) > 0);
+  Expects(prob.env.validation_percentage.value_or(0) < 100);
+
+  Ensures(0 < oerc_ && perc_ < 100);
+  Ensures(validation_.empty());
 }
 
 ///
@@ -33,13 +36,11 @@ holdout_validation::holdout_validation(src_problem &prob)
 ///
 void holdout_validation::init()
 {
+  Expects(!training_.empty());
   Expects(validation_.empty());
+  Expects(perc_ < 100);
 
   const auto available(training_.size());
-  if (!available)
-    return;
-
-  assert(perc_ < 100);
   const auto skip(available * (100 - perc_) / 100);
   assert(skip <= available);
 

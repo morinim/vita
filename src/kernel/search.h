@@ -22,8 +22,8 @@ namespace vita
 ///
 /// Search drives the evolution.
 ///
-/// \tparam T  the type of individual used
-/// \tparam ES the adopted evolution strategy
+/// \tparam T  individual used
+/// \tparam ES evolution strategy
 ///
 /// The class offers a general / customizable search strategy.
 ///
@@ -31,8 +31,8 @@ namespace vita
 /// The "template template parameter" approach allows coordination between `T`
 /// and `ES` to be handled by the search class, rather than in all the various
 /// code that specializes search.
-/// A very interesting description of this technique can be found in
-/// "C++ Common Knowledge: Template Template Parameters" by Stephen Dewhurst
+/// A clear description of this technique can be found in "C++ Common
+/// Knowledge: Template Template Parameters" by Stephen Dewhurst
 /// (<http://www.informit.com/articles/article.aspx?p=376878>).
 ///
 template<class T, template<class> class ES>

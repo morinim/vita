@@ -40,8 +40,8 @@ class TestParameters:
         self.evaluator = evaluator
 
 test_collection = {
-    "adult": TestParameters("adult.csv", generations = 50, individuals = 100,
-                            runs = 10, symbol_set = "class.xml"),
+    #"adult": TestParameters("adult.csv", generations = 50, individuals = 100,
+    #                        runs = 10, symbol_set = "class.xml"),
 
     "fibonacci": TestParameters("fibonacci.csv", generations = 120,
                                 code_length = 200,
@@ -56,7 +56,7 @@ test_collection = {
                           runs = 100),
 
     "petalrose": TestParameters("petalrose.xrff", code_length = 200,
-                                symbol_set = "iarithmetic.xml"),
+                                runs = 10, symbol_set = "iarithmetic.xml"),
 
     "petalrose3": TestParameters("petalrose3.csv", code_length = 200,
                                  symbol_set = "arithmetic.xml"),
@@ -65,10 +65,10 @@ test_collection = {
                                  symbol_set = "arithmetic.xml"),
 
     "petalrosec": TestParameters("petalrosec.csv", code_length = 200,
-                                 runs = 30, symbol_set = "class3.xml"),
+                                 runs = 10, symbol_set = "class3.xml"),
 
-    "spambase": TestParameters("spambase.csv", individuals = 260, runs = 50,
-                               symbol_set = "class.xml"),
+    #"spambase": TestParameters("spambase.csv", individuals = 260, runs = 10,
+    #                           symbol_set = "class.xml"),
 
     "wine": TestParameters("wine.csv", generations = 120, individuals = 170,
                            symbol_set = "class.xml"),
@@ -78,16 +78,13 @@ test_collection = {
 
     "x2y2z2bias": TestParameters("x2y2_z2.csv", individuals = 75,
                                  symbol_set = "arithmetic.xml")
-
-    # "even3": ["even3.dat", 80, 200, 500,  80, "logic"]
-    # "even4": ["even4.dat", 80, 200, 500,  80, "logic"]
 }
 
 
 mode_settings = {
-    "debug": {},
-    "profile": {"deeptest": True, "randomize": True},
-    "stats": {"deeptest": True}
+    "debug": [],
+    "profile": ["deeptest", "randomize"],
+    "stats": ["deeptest"]
 }
 
 
@@ -113,8 +110,8 @@ def sr(args, dataset):
 
     # Default values are for a fast/debug evaluation. Gathering statistics
     # requires bigger numbers...
-    if "deeptest" in mode_settings[mode] and mode_settings[mode]["deeptest"]:
-        runs *= 10
+    if "deeptest" in mode_settings[mode]:
+        runs *= 15
         generations = (generations * 3) // 2
 
     cmd = [sr, "--verbose",

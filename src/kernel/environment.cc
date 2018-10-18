@@ -55,7 +55,7 @@ environment &environment::init()
   generations = 100;
   max_stuck_time = std::numeric_limits<unsigned>::max();
   arl = trilean::no;
-  validation_percentage = 20;
+  validation_percentage = 0;
 
   return *this;
 }
@@ -82,7 +82,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
   set_text(e_environment, "brood_recombination", brood_recombination);
-  set_text(e_environment, "dss", *dss);
+  set_text(e_environment, "dss", dss);
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
@@ -163,12 +163,6 @@ bool environment::debug(bool force_defined) const
       return false;
     }
 
-    if (!dss.has_value())
-    {
-      vitaERROR << "Undefined dss data member";
-      return false;
-    }
-
     if (!layers)
     {
       vitaERROR << "Undefined layer data member";
@@ -217,12 +211,6 @@ bool environment::debug(bool force_defined) const
       return false;
     }
 
-    if (validation_percentage == 100)
-    {
-      vitaERROR << "Undefined validation_percentage data member";
-      return false;
-    }
-
     if (!alps.age_gap)
     {
       vitaERROR << "Undefined age_gap parameter";
@@ -267,7 +255,7 @@ bool environment::debug(bool force_defined) const
     return false;
   }
 
-  if (validation_percentage > 100)
+  if (validation_percentage >= 100)
   {
     vitaERROR << "validation_percentage out of range";
     return false;

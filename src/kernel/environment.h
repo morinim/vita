@@ -167,12 +167,10 @@ public:
 
   /// Enables Dynamic Subset Selection every `dss` generations.
   ///
-  /// `0` disables DSS. Default status is uninitialized (auto-tune).
-  ///
   /// \see
   /// - search::dss()
   /// - https://github.com/morinim/vita/wiki/bibliography#7
-  facultative<unsigned> dss = {};
+  unsigned dss = 0;
 
   /// This is used for the trivial geography scheme.
   /// The population is viewed as having a 1-dimensional spatial structure -
@@ -203,9 +201,7 @@ public:
   /// How much data should be reserved for the validation set?
   /// `validation_percentage` is the fraction of the original data that goes
   /// into the validation set.
-  ///
-  /// \note The special value 100 means auto-tune.
-  unsigned validation_percentage = 100;
+  unsigned validation_percentage = 0;
 
   /// Should we use Adaptive Representation through Learning?
   trilean arl = trilean::unknown;

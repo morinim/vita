@@ -99,7 +99,14 @@ src_problem::src_problem(const std::string &ds, const default_symbols_t &)
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
   : src_problem()
 {
+  vitaINFO << "Reading dataset " << ds << "...";
   data().read(ds);
+
+  vitaINFO << "....dataset read. Examples: " << data().size()
+           << ", categories: " << categories()
+           << ", features: " << variables()
+           << ", classes: " << classes();
+
   setup_symbols(symbols);
 }
 
@@ -218,14 +225,14 @@ std::size_t src_problem::setup_symbols_impl()
 /// \param[in] file name of the file containing the symbols
 /// \return         number of parsed symbols
 ///
-/// \excetpion exception::data_format wrong data format for symbol file
+/// \exception exception::data_format wrong data format for symbol file
 ///
 std::size_t src_problem::setup_symbols_impl(const std::string &file)
 {
-  vitaINFO << "Reading symbol file " << file << "...";
+  vitaINFO << "Reading symbol set " << file << "...";
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS)
-    throw exception::data_format("Symbol file format error");
+    throw exception::data_format("Symbol set format error");
 
   // Records the set of categories as inferred from the dataset.
   std::set<category_t> used_categories;

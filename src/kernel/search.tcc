@@ -91,14 +91,21 @@ void search<T, ES>::tune_parameters()
   if (!constrained.brood_recombination)
     prob_.env.brood_recombination = dflt.brood_recombination;
 
-  if (!constrained.dss.has_value())
-    prob_.env.dss = 0;
+  // Holdout validation is the preferred validation method. Only when it's
+  // disabled we consider DSS.
+  if (constrained.validation_percentage > 0)
+  {
+    prob_.env.validation_percentage = dflt.validation_percentage;
+    prob_.env.dss                   =                          0;
+  }
+  else
+  {
+    prob_.env.dss                   = dflt.dss;
+    prob_.env.validation_percentage =        0;
+  }
 
   if (!constrained.layers)
     prob_.env.layers = dflt.layers;
-
-  if (constrained.validation_percentage == 100)
-    prob_.env.validation_percentage = dflt.validation_percentage;
 
   if (!constrained.individuals)
     prob_.env.individuals = dflt.individuals;

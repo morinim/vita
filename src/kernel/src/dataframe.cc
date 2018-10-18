@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include "kernel/src/dataframe.h"
+#include "kernel/exceptions.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
 #include "kernel/symbol.h"
@@ -368,13 +369,19 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
 /// \param[in] ft       a "filter and transform" function
 /// \return             number of lines parsed (`0` in case of errors)
 ///
+/// \exception exception::data_format wrong data format for data file
+/// \exception std::invalid_argument  missing dataset file name
+///
 /// \see `dataframe::load_xrff(tinyxml2::XMLDocument &)` for details.
 ///
 std::size_t dataframe::read_xrff(const std::string &filename, filter_hook_t ft)
 {
+  if (trim(filename).empty())
+    throw std::invalid_argument("Missing XRFF dataset filename");
+
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
-    return 0;
+    throw exception::data_format("XRFF data file format error");
 
   return read_xrff(doc, ft);
 }
@@ -386,6 +393,8 @@ std::size_t dataframe::read_xrff(const std::string &filename, filter_hook_t ft)
 /// \param[in] ft a "filter and transform" function
 /// \return       number of lines parsed (`0` in case of errors)
 ///
+/// \exception exception::data_format wrong data format for data file
+///
 /// \see `dataframe::read_xrff(tinyxml2::XMLDocument &)` for details.
 ///
 std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
@@ -395,7 +404,7 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
 
   tinyxml2::XMLDocument doc;
   if (doc.Parse(ss.str().c_str()) != tinyxml2::XML_SUCCESS)
-    return 0;
+    throw exception::data_format("XRFF data file format error");
 
   return read_xrff(doc, ft);
 }
@@ -406,6 +415,8 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
 /// \param[in] filename the xrff file
 /// \param[in] ft       a filter and transform function
 /// \return             number of lines parsed (0 in case of errors)
+///
+/// \exception exception::data_format wrong data format for data file
 ///
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
 /// of instances sharing a set of attributes.
@@ -436,7 +447,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
                            .FirstChildElement("header")
                            .FirstChildElement("attributes").ToElement();
   if (!attributes)
-    return 0;
+    throw exception::data_format("Missing `attributes` element in XRFF file");
 
   clear();
 
@@ -469,7 +480,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 
       // We can manage only one output column.
       if (n_output > 1)
-        return 0;
+        throw exception::data_format("Multiple output columns in XRFF file");
 
       // For classification problems we use discriminant functions, so the
       // actual output type is always numeric.
@@ -501,9 +512,9 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
       header_.push_back(a);
   }
 
-  // XRFF needs informations about the columns.
+  // XRFF needs information about the columns.
   if (!columns())
-    return 0;
+    throw exception::data_format("Missing column information in XRFF file");
 
   // If no output column is specified the default XRFF output column is the
   // last one (and it's the first element of the `header_` vector).
@@ -520,7 +531,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
                           .FirstChildElement("body")
                           .FirstChildElement("instances").ToElement();
   if (!instances)
-    return 0;
+    throw exception::data_format("Missing `instances` element in XRFF file");
 
   for (auto *i = instances->FirstChildElement("instance");
        i;
@@ -553,14 +564,19 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 /// \param[in] ft       a filter and transform function
 /// \return             number of lines parsed (0 in case of errors)
 ///
+/// \exception std::invalid_argument missing dataset file name
+/// \exception std::runtime_error    cannot read CSV data file
+///
 /// \see `dataframe::load_csv(const std::string &)` for details.
-
 ///
 std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
 {
+  if (trim(filename).empty())
+    throw std::invalid_argument("Missing CSV dataset filename");
+
   std::ifstream in(filename);
   if (!in)
-    return 0;
+    throw std::runtime_error("Cannot read CSV data file");
 
   return read_csv(in, ft);
 }
@@ -571,6 +587,8 @@ std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
 /// \param[in] from the csv stream
 /// \param[in] ft   a filter and transform function
 /// \return         number of lines parsed (0 in case of errors)
+///
+/// \exception exception::insufficient_data empty / undersized data file
 ///
 /// General conventions:
 /// * NO HEADER ROW is allowed;
@@ -664,7 +682,10 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
       vitaWARNING << "Malformed line " << size() << " skipped";
   }
 
-  return debug() ? size() : static_cast<std::size_t>(0);
+  if (!debug() || !size())
+    throw exception::insufficient_data("Empty / undersized CSV data file");
+
+  return size();
 }
 
 ///
@@ -674,20 +695,16 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 /// \param[in] ft a filter and transform function
 /// \return       number of lines parsed (0 in case of errors)
 ///
-/// \exception `std::invalid_argument` missing dataset file name
-///
 /// \note Test set can have an empty output value.
 ///
 std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
 {
-  if (trim(f).empty())
-    throw std::invalid_argument("Missing dataset filename");
-
-  auto ends_with = [](const std::string &name, const std::string &ext)
-  {
-    return ext.length() <= name.length()
-           && std::equal(ext.rbegin(), ext.rend(), name.rbegin());
-  };
+  auto ends_with(
+    [](const std::string &name, const std::string &ext)
+    {
+      return ext.length() <= name.length()
+        && std::equal(ext.rbegin(), ext.rend(), name.rbegin());
+    });
 
   const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
 

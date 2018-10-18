@@ -259,21 +259,6 @@ void src_search<T, ES>::tune_parameters()
   const auto d_size(data().size());
   Expects(d_size);
 
-  // DSS helps against overfitting but cannot be used when there are just
-  // a few examples.
-  if (!constrained.dss.has_value())
-  {
-    assert(env.generations);
-
-    if (d_size > 400 && env.generations > 20)
-      env.dss = std::max(10u, env.generations / 10);
-    else
-      env.dss = 0;
-
-    assert(env.dss.has_value());
-    vitaINFO << "DSS set to " << *env.dss;
-  }
-
   if (!constrained.layers)
   {
     if (dflt.layers > 1 && d_size > 8)
@@ -310,22 +295,6 @@ void src_search<T, ES>::tune_parameters()
     vitaINFO << "Population size set to " << env.individuals;
   }
 
-  if (constrained.validation_percentage == 100)
-  {
-    if (env.dss.value_or(0) > 0)
-      vitaINFO << "Using DSS and skipping holdout validation";
-    else
-    {
-      if (d_size * dflt.validation_percentage < 10000)
-        env.validation_percentage = 0;
-      else
-        env.validation_percentage = dflt.validation_percentage;
-
-      vitaINFO << "Validation percentage set to " << env.validation_percentage
-               << '%';
-    }
-  }
-
   Ensures(env.debug(true));
 }
 
@@ -334,10 +303,10 @@ void src_search<T, ES>::init()
 {
   const environment &env(prob().env);
 
-  if (env.dss.value_or(0) > 0)
-    this->template set_validator<dss>(prob());
-  else if (env.validation_percentage)
+  if (env.validation_percentage > 0)
     this->template set_validator<holdout_validation>(prob());
+  else if (env.dss > 0)
+    this->template set_validator<dss>(prob());
 }
 
 template<class T, template<class> class ES>

@@ -100,7 +100,7 @@ void fix_parameters(vita::src_problem *problem)
     env.mep.code_length = new_length;
   }
 
-  if (env.dss.value_or(0) > 0 && problem->data().size() <= 30)
+  if (env.dss && problem->data().size() <= 30)
   {
     vitaWARNING << "Adjusting DSS (=> disabled)";
     env.dss = 0;
@@ -252,12 +252,12 @@ void crossover_rate(const args_t &a)
 void data(const args_t &a)
 {
   const auto data_file(a.at("DATASET").asString());
-  vitaINFO << "Reading data file " << data_file << "...";
+  vitaINFO << "Reading dataset " << data_file << "...";
 
   const auto parsed(problem->data().read(data_file));
 
   if (parsed)
-    vitaINFO << "Dataset read. Examples: " << parsed
+    vitaINFO << "...dataset read. Examples: " << parsed
              << ", categories: " << problem->categories()
              << ", features: " << problem->variables()
              << ", classes: " << problem->classes();
@@ -272,20 +272,13 @@ void dss(const args_t &a)
   if (!value)
     return;
 
-  const auto s(value.asString());
-  problem->env.dss = decltype(problem->env.dss){s};
+  const auto dss(value.asLong());
+  problem->env.dss = dss;
 
-  if (problem->env.dss.has_value())
-  {
-    if (*problem->env.dss == 0)
-      vitaINFO << "Dynamic Subset Selection disabled";
-    else
-      vitaINFO << "Dynamic Subset Selection is " << *problem->env.dss;
-  }
+  if (dss)
+    vitaINFO << "Dynamic Subset Selection is " << dss;
   else
-  {
-    vitaWARNING << "Wrong value for DSS options. Using default value";
-  }
+    vitaINFO << "Dynamic Subset Selection disabled";
 }
 
 // Disables elitism.
