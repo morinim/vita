@@ -38,34 +38,31 @@ dss::dss(src_problem &prob) : training_(prob.data(problem::training)),
 
 void dss::reset_age_difficulty(dataframe &d)
 {
-  const auto reset([](dataframe::example &e)
-                   {
-                     e.difficulty = 0;
-                     e.age        = 1;
-                   });
-
-  std::for_each(d.begin(), d.end(), reset);
+  std::for_each(d.begin(), d.end(),
+                [](auto &example)
+                {
+                  example.difficulty = 0;
+                  example.age        = 1;
+                });
 }
 
 std::pair<std::uintmax_t, std::uintmax_t> dss::average_age_difficulty(
   dataframe &d) const
 {
+  constexpr std::pair<std::uintmax_t, std::uintmax_t> zero(0, 0);
+
   const auto s(d.size());
-
-  const std::pair<std::uintmax_t, std::uintmax_t> zero(0, 0);
-
   if (!s)
     return zero;
 
-  auto avg(std::accumulate(
-             d.begin(), d.end(), zero,
-             [](const auto &p, const dataframe::example &e)
-             {
-               return std::pair<std::uintmax_t, std::uintmax_t>(
-                 p.first + e.age, p.second + e.difficulty);
-             }));
+  auto avg(std::accumulate(d.begin(), d.end(), zero,
+                           [](const auto &p, const dataframe::example &e)
+                           {
+                             return std::pair<std::uintmax_t, std::uintmax_t>(
+                               p.first + e.age, p.second + e.difficulty);
+                           }));
 
-  avg.first /= s;
+  avg.first  /= s;
   avg.second /= s;
 
   return avg;
@@ -82,15 +79,20 @@ void dss::move_to_validation()
 /// Available examples are randomly partitioned into two independent sets
 /// according to a given percentage.
 ///
-/// \attention The procedure resets current training / validation sets.
+/// \param[in] run current run
 ///
-void dss::init()
+/// \attention The procedure changes the current training / validation sets.
+///
+void dss::init(unsigned run)
 {
-  move_to_validation();
+  if (run == 0)
+  {
+    move_to_validation();
 
-  reset_age_difficulty(validation_);
+    reset_age_difficulty(validation_);
 
-  shake_impl();
+    shake_impl();
+  }
 }
 
 void dss::shake_impl()
@@ -137,13 +139,11 @@ void dss::shake_impl()
     pivot = std::next(validation_.begin(), s / 2);
 
   assert(validation_.size() == s);
-
   std::move(pivot, validation_.end(), std::back_inserter(training_));
   validation_.erase(pivot, validation_.end());
 
   vitaDEBUG << "DSS SHAKE (weight sum: " << weight_sum << ", training with: "
             << training_.size() << ')';
-
   assert(s == training_.size() + validation_.size());
 
   reset_age_difficulty(training_);
@@ -169,6 +169,14 @@ bool dss::shake(unsigned generation)
   shake_impl();
 
   return true;
+}
+
+///
+/// Moves all the example in the validation set.
+///
+void dss::close(unsigned)
+{
+  move_to_validation();
 }
 
 }  // namespace vita

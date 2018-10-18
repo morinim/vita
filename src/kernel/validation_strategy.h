@@ -25,11 +25,14 @@ namespace vita
 class validation_strategy
 {
 public:
+  virtual ~validation_strategy() = default;
+
   /// Initializes the data structures needed for the validation strategy.
   ///
-  /// \note Called only one time before the first use of the validation
-  ///       strategy.
-  virtual void init() {}
+  /// \param[in] run current run
+  ///
+  /// \note Called at the beginning of the evolution.
+  virtual void init(unsigned /* run */) {}
 
   /// Changes the training environment.
   ///
@@ -37,9 +40,14 @@ public:
   /// \return    `true` if some change in the training environment has occured
   ///
   /// \note Called at the beginning of every generation.
-  virtual bool shake(unsigned generation) = 0;
+  virtual bool shake(unsigned /* generation */) = 0;
 
-  virtual ~validation_strategy() = default;
+  /// De-initializes the data structures needed for the validation strategy.
+  ///
+  /// \param[in] run current run
+  ///
+  /// \note Called at the end of the evolution.
+  virtual void close(unsigned /* run */) {}
 };
 
 ///
@@ -53,7 +61,7 @@ public:
 class as_is_validation final : public validation_strategy
 {
 public:
-  /// Does nothing signalling that anything is changed.
+  /// Does nothing, signalling that anything is changed.
   bool shake(unsigned) override { return false; }
 };
 

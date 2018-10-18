@@ -142,7 +142,6 @@ summary<T> search<T, ES>::run(unsigned n)
 
   init();
 
-  vs_->init();
   auto shake([this](unsigned g) { return vs_->shake(g); });
 
   summary<T> overall_summary;
@@ -155,7 +154,9 @@ summary<T> search<T, ES>::run(unsigned n)
 
   for (unsigned r(0); r < n; ++r)
   {
+    vs_->init(r);
     auto run_summary(evolution<T, ES>(prob_, *active_eva_).run(r, shake));
+    vs_->close(r);
 
     // If a validation test/simulation is available, the performance of the
     // best trained individual is recalculated.

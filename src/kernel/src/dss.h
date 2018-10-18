@@ -29,18 +29,22 @@ namespace vita
 /// - firstly 'difficult' cases;
 /// - secondly cases which have not been looked at for several generations.
 ///
-/// \see https://github.com/morinim/vita/wiki/bibliography#5
+/// \see
+/// - https://github.com/morinim/vita/wiki/bibliography#5
+/// - https://github.com/morinim/vita/wiki/validation#dss
 ///
 class dss : public validation_strategy
 {
 public:
   explicit dss(src_problem &);
 
-  void init() override;
+  void init(unsigned) override;
   bool shake(unsigned) override;
+  void close(unsigned) override;
 
 private:
-  std::pair<uintmax_t,uintmax_t> average_age_difficulty(dataframe &) const;
+ std::pair<std::uintmax_t, std::uintmax_t> average_age_difficulty(
+   dataframe &) const;
 
   void move_to_validation();
   void reset_age_difficulty(dataframe &);

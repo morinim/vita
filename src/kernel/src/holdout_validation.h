@@ -31,9 +31,9 @@ namespace vita
 class holdout_validation : public validation_strategy
 {
 public:
-  holdout_validation(src_problem &);
+  explicit holdout_validation(src_problem &);
 
-  void init() override;
+  void init(unsigned) override;
   bool shake(unsigned) override { return false; }
 
 private:

@@ -34,8 +34,11 @@ holdout_validation::holdout_validation(src_problem &prob)
 ///
 /// \attention The procedure resets current training / validation sets.
 ///
-void holdout_validation::init()
+void holdout_validation::init(unsigned run)
 {
+  if (run)
+    return;
+
   Expects(!training_.empty());
   Expects(validation_.empty());
   Expects(perc_ < 100);
