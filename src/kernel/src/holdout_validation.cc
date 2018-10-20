@@ -19,29 +19,35 @@ namespace vita
 holdout_validation::holdout_validation(src_problem &prob)
   : training_(prob.data(problem::training)),
     validation_(prob.data(problem::validation)),
-    perc_(prob.env.validation_percentage)
+    perc_(*prob.env.validation_percentage)
 {
-  Expects(prob.env.validation_percentage >   0);
-  Expects(prob.env.validation_percentage < 100);
+  Expects(prob.env.validation_percentage.has_value());
+  Expects(*prob.env.validation_percentage >   0);
+  Expects(*prob.env.validation_percentage < 100);
 
   Ensures(0 < perc_ && perc_ < 100);
   Ensures(validation_.empty());
 }
 
 ///
-/// Available examples are randomly partitioned into two independent sets
-/// according to a given percentage.
+/// At the first run examples are randomly partitioned into two sets according
+/// to a given percentage.
 ///
-/// \attention The procedure resets current training / validation sets.
+/// \param[in] run current run
 ///
 void holdout_validation::init(unsigned run)
 {
-  if (run)
-    return;
+  Expects(perc_ && perc_ < 100);
 
-  Expects(!training_.empty());
-  Expects(validation_.empty());
-  Expects(perc_ < 100);
+  if (run)
+  {
+    assert(!training_.empty());
+    assert(!validation_.empty());
+    return;
+  }
+
+  assert(!training_.empty());
+  assert(validation_.empty());
 
   const auto available(training_.size());
   const auto skip(available * (100 - perc_) / 100);

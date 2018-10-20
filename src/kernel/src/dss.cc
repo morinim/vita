@@ -28,12 +28,10 @@ std::uintmax_t weight(const dataframe::example &v)
 
 dss::dss(src_problem &prob) : training_(prob.data(problem::training)),
                               validation_(prob.data(problem::validation)),
-                              gap_(prob.env.dss)
+                              env_(prob.env)
 {
-  Expects(prob.env.dss);
-
-  Ensures(gap_);
-  Ensures(validation_.empty());
+  // Here `env_.dss == 0` could be true. Validation strategy can be set before
+  // parameters are tuned.
 }
 
 void dss::reset_age_difficulty(dataframe &d)
@@ -145,13 +143,24 @@ void dss::shake_impl()
   assert(s == training_.size() + validation_.size());
 
   reset_age_difficulty(training_);
+
+  Ensures(!training_.empty());
+  Ensures(!validation_.empty());
 }
 
 bool dss::shake(unsigned generation)
 {
+  assert(env_.dss.has_value());
+  const auto gap(*env_.dss);
+  assert(gap > 0);
+
   if (generation == 0        // already handled by init()
-      || generation % gap_)
+      || generation % gap)
+  {
+    assert(!training_.empty());
+    assert(!validation_.empty());
     return false;
+  }
 
   vitaDEBUG << "DSS shaking generation " << generation;
 

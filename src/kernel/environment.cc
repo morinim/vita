@@ -46,7 +46,7 @@ environment &environment::init()
   p_mutation = 0.04;
   p_cross = 0.9;
   brood_recombination = 1;
-  dss = 0;
+  dss = 1;
   layers = 1;
   individuals = 100;
   min_individuals = 2;
@@ -55,7 +55,7 @@ environment &environment::init()
   generations = 100;
   max_stuck_time = std::numeric_limits<unsigned>::max();
   arl = trilean::no;
-  validation_percentage = 0;
+  validation_percentage = 20;
 
   return *this;
 }
@@ -82,13 +82,13 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
   set_text(e_environment, "brood_recombination", brood_recombination);
-  set_text(e_environment, "dss", dss);
+  set_text(e_environment, "dss", *dss);
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
   set_text(e_environment, "max_stuck_time", *max_stuck_time);
   set_text(e_environment, "arl", as_integer(arl));
-  set_text(e_environment, "validation_percentage", validation_percentage);
+  set_text(e_environment, "validation_percentage", *validation_percentage);
   set_text(e_environment, "cache_bits", cache_size);  // size `1u<<cache_size`
 
   auto *e_alps(d->NewElement("alps"));
@@ -255,9 +255,15 @@ bool environment::debug(bool force_defined) const
     return false;
   }
 
-  if (validation_percentage >= 100)
+  if (validation_percentage.has_value() && *validation_percentage >= 100)
   {
     vitaERROR << "validation_percentage out of range";
+    return false;
+  }
+
+  if (dss.has_value() && *dss == 0)
+  {
+    vitaERROR << "dss out of range";
     return false;
   }
 
@@ -297,4 +303,5 @@ bool environment::debug(bool force_defined) const
 
   return true;
 }
+
 }  // namespace vita

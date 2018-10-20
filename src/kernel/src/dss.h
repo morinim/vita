@@ -43,7 +43,7 @@ public:
   void close(unsigned) override;
 
 private:
- std::pair<std::uintmax_t, std::uintmax_t> average_age_difficulty(
+  std::pair<std::uintmax_t, std::uintmax_t> average_age_difficulty(
    dataframe &) const;
 
   void move_to_validation();
@@ -52,7 +52,7 @@ private:
 
   dataframe &training_;
   dataframe &validation_;
-  unsigned gap_;
+  const environment &env_;
 };
 
 }  // namespace vita

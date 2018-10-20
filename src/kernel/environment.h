@@ -167,10 +167,13 @@ public:
 
   /// Enables Dynamic Subset Selection every `dss` generations.
   ///
+  /// This parameter is used by the `dss` validation strategy.
+  ///
   /// \see
   /// - search::dss()
   /// - https://github.com/morinim/vita/wiki/bibliography#7
-  unsigned dss = 0;
+  /// - https://github.com/morinim/vita/wiki/validation
+  facultative<unsigned> dss = {};
 
   /// This is used for the trivial geography scheme.
   /// The population is viewed as having a 1-dimensional spatial structure -
@@ -201,7 +204,11 @@ public:
   /// How much data should be reserved for the validation set?
   /// `validation_percentage` is the fraction of the original data that goes
   /// into the validation set.
-  unsigned validation_percentage = 0;
+  ///
+  /// This parameter is used by the `holdout_validation` strategy.
+  ///
+  /// \see https://github.com/morinim/vita/wiki/validation
+  facultative<unsigned> validation_percentage = {};
 
   /// Should we use Adaptive Representation through Learning?
   trilean arl = trilean::unknown;
