@@ -442,7 +442,7 @@ bool src_problem::has(dataset_t d) const
 {
   switch (d)
   {
-  case problem::training:    return !training_.empty();
+  case problem::training:    return problem::has(d);
   case problem::validation:  return !validation_.empty();
   default:                   return false;
   }

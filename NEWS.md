@@ -9,6 +9,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 
 ### Changed
+- **BREAKING CHANGE**. - Completely revised validation strategies. The `search`
+  class now allows specifying two evaluation (a.k.a fitness) functions via the
+  `set_training_evaluator` and `set_validation_evaluator` methods.
+
+  This:
+  - gives users the option to adopt distinct training / validation
+    strategies;
+  - allows a simpler implementation.
+
+  More details are contained in the the `validation.md` wiki page.
+
 - **BREAKING CHANGE**. Removed switch to default initialize an `environment` object.
 
   So, instead of:

@@ -26,12 +26,25 @@ std::uintmax_t weight(const dataframe::example &v)
 
 }  // unnamed namespace
 
-dss::dss(src_problem &prob) : training_(prob.data(problem::training)),
-                              validation_(prob.data(problem::validation)),
-                              env_(prob.env)
+///
+/// Sets up a DSS validator.
+///
+/// \param[in] prob current problem
+/// \param[in] eva_t active training evaluator
+/// \param[in] eva_v active validation evaluator
+///
+/// \note
+/// References to the evaluator are required since (possible) cached values
+/// must be cleared when changing the training / validation set.
+///
+dss::dss(src_problem &prob, cached_evaluator &eva_t, cached_evaluator &eva_v)
+  : training_(prob.data(problem::training)),
+    validation_(prob.data(problem::validation)),
+    eva_t_(eva_t), eva_v_(eva_v),
+    env_(prob.env)
 {
-  // Here `env_.dss == 0` could be true. Validation strategy can be set before
-  // parameters are tuned.
+  // Here `!env_.dss.has_value()` could be true. Validation strategy is set
+  // before parameters are tuned.
 }
 
 void dss::reset_age_difficulty(dataframe &d)
@@ -66,6 +79,12 @@ std::pair<std::uintmax_t, std::uintmax_t> dss::average_age_difficulty(
   return avg;
 }
 
+void dss::clear_evaluators()
+{
+  eva_t_.clear();
+  eva_v_.clear();
+}
+
 void dss::move_to_validation()
 {
   std::move(training_.begin(), training_.end(),
@@ -73,7 +92,6 @@ void dss::move_to_validation()
   training_.clear();
 
   Ensures(training_.empty());
-  Ensures(!validation_.empty());
 }
 
 ///
@@ -86,15 +104,20 @@ void dss::move_to_validation()
 ///
 void dss::init(unsigned)
 {
-  move_to_validation();
+  Expects(env_.dss.value_or(0) > 0);
+
+  reset_age_difficulty(training_);
   reset_age_difficulty(validation_);
+
   shake_impl();
+  clear_evaluators();
 }
 
 void dss::shake_impl()
 {
-  Expects(training_.empty());
-  Expects(!validation_.empty());
+  Expects(training_.size() + validation_.size() >= 2);
+
+  move_to_validation();
 
   const auto avg_v(average_age_difficulty(validation_));
   vitaDEBUG << "DSS average validation difficulty " << avg_v.second
@@ -117,8 +140,8 @@ void dss::shake_impl()
   const auto s(validation_.size());
   const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
-  const auto target_size(s * ratio);
-  assert(0.0 <= target_size && target_size <= s);
+  const auto target_size(std::max(1.0, s * ratio));
+  assert(1.0 <= target_size && target_size <= s);
   const auto k(target_size / static_cast<double>(weight_sum));
 
   auto pivot(
@@ -131,8 +154,8 @@ void dss::shake_impl()
                      return random::boolean(prob) == false;
                    }));
 
-  if (pivot == validation_.end())
-    pivot = std::next(validation_.begin(), s / 2);
+  if (pivot == validation_.begin() || pivot == validation_.end())
+    pivot = std::next(validation_.begin(), target_size);
 
   assert(validation_.size() == s);
   std::move(pivot, validation_.end(), std::back_inserter(training_));
@@ -150,9 +173,9 @@ void dss::shake_impl()
 
 bool dss::shake(unsigned generation)
 {
-  assert(env_.dss.has_value());
+  Expects(env_.dss.value_or(0) > 0);
+
   const auto gap(*env_.dss);
-  assert(gap > 0);
 
   if (generation == 0        // already handled by init()
       || generation % gap)
@@ -168,12 +191,12 @@ bool dss::shake(unsigned generation)
   vitaDEBUG << "DSS average training difficulty " << avg_t.second;
   assert(avg_t.first == 1);
 
-  move_to_validation();
-
-  std::for_each(validation_.begin(), validation_.end(),
-                [](auto &e) { ++e.age; });
+  const auto inc_age([](dataframe::example &e) { ++e.age; });
+  std::for_each(training_.begin(), training_.end(), inc_age);
+  std::for_each(validation_.begin(), validation_.end(), inc_age);
 
   shake_impl();
+  clear_evaluators();
 
   return true;
 }
@@ -184,6 +207,7 @@ bool dss::shake(unsigned generation)
 void dss::close(unsigned)
 {
   move_to_validation();
+  clear_evaluators();
 }
 
 }  // namespace vita

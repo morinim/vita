@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,15 +35,10 @@ public:
 
   void clear();
   void clear(const hash_t &);
-#if defined(CLONE_SCALING)
-  void reset_seen();
-#endif
 
   void insert(const hash_t &, const fitness_t &);
 
   const fitness_t &find(const hash_t &) const;
-
-  unsigned seen(const hash_t &) const;
 
   /// \return number of searches in the hash table
   /// \note Every call to the find method increment the counter.
@@ -71,11 +66,7 @@ private:
     fitness_t fitness;
     /// Valid slots are recognized comparing their seal with the current one.
     unsigned     seal;
-#if defined(CLONE_SCALING)
-    /// How many times have we looked for this individual in the current run?
-    mutable unsigned seen;
-#endif
-    };
+  };
 
   const std::uint64_t k_mask;
   std::vector<slot>   table_;

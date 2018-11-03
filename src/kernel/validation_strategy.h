@@ -20,7 +20,7 @@ namespace vita
 
 ///
 /// Interface for specific training / cross validation techniques (e.g.
-/// one round cross validation, dynamic subsect selection...).
+/// one holdout validation, dynamic subsect selection...).
 ///
 class validation_strategy
 {
@@ -31,22 +31,27 @@ public:
   ///
   /// \param[in] run current run
   ///
-  /// \note Called at the beginning of the evolution.
-  virtual void init(unsigned /* run */) {}
+  /// \note Called at the beginning of the evolution (one time per run).
+  virtual void init(unsigned /* run */) = 0;
 
   /// Changes the training environment.
   ///
   /// \param[in] generation current generation
-  /// \return    `true` if some change in the training environment has occured
+  /// \return               `true` if some change in the training environment
+  ///                       has occured
   ///
-  /// \note Called at the beginning of every generation.
-  virtual bool shake(unsigned /* generation */) = 0;
+  /// By default does nothing, signalling that anything is changed.
+  ///
+  /// \note
+  /// Called at the beginning of every generation (multiple times per run).
+  ///
+  virtual bool shake(unsigned /* generation */)  { return false; }
 
   /// De-initializes the data structures needed for the validation strategy.
   ///
   /// \param[in] run current run
   ///
-  /// \note Called at the end of the evolution.
+  /// \note Called at the end of the evolution (one time per run).
   virtual void close(unsigned /* run */) {}
 };
 
@@ -61,8 +66,7 @@ public:
 class as_is_validation final : public validation_strategy
 {
 public:
-  /// Does nothing, signalling that anything is changed.
-  bool shake(unsigned) override { return false; }
+  void init(unsigned) override {}
 };
 
 }  // namespace vita

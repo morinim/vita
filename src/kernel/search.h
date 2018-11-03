@@ -43,7 +43,8 @@ public:
 
   summary<T> run(unsigned = 1);
 
-  template<class E, class... Args> void set_evaluator(Args && ...);
+  template<class E, class... Args> void set_training_evaluator(Args && ...);
+  template<class E, class... Args> void set_validation_evaluator(Args && ...);
 
   template<class V, class... Args> void set_validator(Args && ...);
 
@@ -57,10 +58,12 @@ protected:
   bool save() const;
   virtual void tune_parameters();
 
-  model_measurements calculate_metrics(const summary<T> &) const;
+  model_measurements calculate_metrics(evaluator<T> &,
+                                       const summary<T> &) const;
 
   // Data members.
-  std::unique_ptr<evaluator<T>> active_eva_;
+  std::unique_ptr<evaluator<T>> eva1_;  // fitness function for training
+  std::unique_ptr<evaluator<T>> eva2_;  // fitness function for validation
   std::unique_ptr<validation_strategy> vs_;
 
   // Problem we're working on.
@@ -68,7 +71,7 @@ protected:
 
 private:
   /// Template method of the search::run() member function called exactly one
-  /// time at the beginning of the first run.
+  /// time just before the first run.
   virtual void init() {}
 
   virtual void after_evolution(summary<T> *) {}

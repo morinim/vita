@@ -82,13 +82,15 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "mutation_rate", p_mutation);
   set_text(e_environment, "crossover_rate", p_cross);
   set_text(e_environment, "brood_recombination", brood_recombination);
-  set_text(e_environment, "dss", *dss);
+  if (dss.has_value())
+    set_text(e_environment, "dss", *dss);
   set_text(e_environment, "tournament_size", tournament_size);
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
   set_text(e_environment, "max_stuck_time", *max_stuck_time);
   set_text(e_environment, "arl", as_integer(arl));
-  set_text(e_environment, "validation_percentage", *validation_percentage);
+  if (validation_percentage.has_value())
+    set_text(e_environment, "validation_percentage", *validation_percentage);
   set_text(e_environment, "cache_bits", cache_size);  // size `1u<<cache_size`
 
   auto *e_alps(d->NewElement("alps"));

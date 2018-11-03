@@ -13,6 +13,7 @@
 #if !defined(VITA_DSS_H)
 #define      VITA_DSS_H
 
+#include "kernel/evaluator.h"
 #include "kernel/validation_strategy.h"
 #include "kernel/src/problem.h"
 
@@ -36,7 +37,7 @@ namespace vita
 class dss : public validation_strategy
 {
 public:
-  explicit dss(src_problem &);
+  dss(src_problem &, cached_evaluator &, cached_evaluator &);
 
   void init(unsigned) override;
   bool shake(unsigned) override;
@@ -46,12 +47,15 @@ private:
   std::pair<std::uintmax_t, std::uintmax_t> average_age_difficulty(
    dataframe &) const;
 
+  void clear_evaluators();
   void move_to_validation();
   void reset_age_difficulty(dataframe &);
   void shake_impl();
 
   dataframe &training_;
   dataframe &validation_;
+  cached_evaluator &eva_t_;
+  cached_evaluator &eva_v_;
   const environment &env_;
 };
 

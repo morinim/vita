@@ -61,7 +61,7 @@ Options:
                          occour between winners in a tournament. Range is [0,1]
   --tournament=<size>    number of individuals examined for parents' selection
   --brood=<size>         sets the brood size for recombination (0 to disable)
-  --dss=<subset>         controls the Dynamic Subset Selection algorithm
+  --dss=<period>         controls the Dynamic Subset Selection algorithm
   --generations=<gen>    sets the maximum number of generations in a run
   --max-stuck-time=<st>  sets the maximum number of generations without
                          improvement in a run
@@ -98,12 +98,6 @@ void fix_parameters(vita::src_problem *problem)
     vitaWARNING << "Adjusting code length (" << env.mep.code_length
                 << " => " << new_length << ')';
     env.mep.code_length = new_length;
-  }
-
-  if (env.dss && problem->data().size() <= 30)
-  {
-    vitaWARNING << "Adjusting DSS (=> disabled)";
-    env.dss = 0;
   }
 
   if (env.tournament_size)
@@ -173,6 +167,9 @@ unsigned runs(1);
 // Active evaluator.
 vita::evaluator_id eva(vita::evaluator_id::undefined);
 std::string eva_args;
+
+// Active validation strategy.
+vita::validator_id validator(vita::validator_id::undefined);
 
 // Reference problem (the problem we will work on).
 vita::src_problem *problem;
@@ -273,10 +270,13 @@ void dss(const args_t &a)
     return;
 
   const auto dss(value.asLong());
-  problem->env.dss = dss;
 
-  if (dss)
-    vitaINFO << "Dynamic Subset Selection is " << dss;
+  if (dss > 0)
+  {
+    validator = vita::validator_id::dss;
+    problem->env.dss = dss;
+    vitaINFO << "Dynamic Subset Selection set to " << dss;
+  }
   else
     vitaINFO << "Dynamic Subset Selection disabled";
 }
@@ -376,6 +376,10 @@ void go(bool = true)
 
   if (eva != vita::evaluator_id::undefined)
     s.set_evaluator(eva, eva_args);
+
+  if (validator == vita::validator_id::dss
+      || validator == vita::validator_id::holdout)
+    s.set_validator(validator);
 
   s.run(runs);
 }
@@ -668,10 +672,11 @@ void validation(const args_t &a)
   {
     const auto percentage(static_cast<unsigned>(to_percentage(v)));
 
-    if (percentage <= 90)
+    if (percentage && percentage <= 90)
     {
+      validator = vita::validator_id::holdout;
       problem->env.validation_percentage = percentage;
-      vitaINFO << "Validation set percentage is " << v;
+      vitaINFO << "Validation percentage is " << v;
     }
     else
       vitaERROR << "Invalid validation percentage. Value ignored";

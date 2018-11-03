@@ -18,7 +18,7 @@
 #define      VITA_SRC_EVALUATOR_TCC
 
 ///
-/// \param[in] d dataset that the evaluator will use.
+/// \param[in] d dataset that the evaluator will use
 ///
 template<class T>
 src_evaluator<T>::src_evaluator(dataframe &d) : dat_(&d)
@@ -26,8 +26,8 @@ src_evaluator<T>::src_evaluator(dataframe &d) : dat_(&d)
 }
 
 ///
-/// \param[in] prg program (individual/team) used for fitness evaluation.
-/// \return the fitness (greater is better, max is 0).
+/// \param[in] prg program (individual/team) used for fitness evaluation
+/// \return        the fitness (greater is better, max is `0`)
 ///
 template<class T>
 fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
@@ -60,8 +60,8 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 }
 
 ///
-/// \param[in] prg program (individual/team) used for fitness evaluation.
-/// \return the fitness (greater is better, max is 0).
+/// \param[in] prg program (individual/team) used for fitness evaluation
+/// \return        the fitness (greater is better, max is `0`)
 ///
 /// This function is similar to operator()() but will skip 3 out of 4
 /// training instances, so it's faster ;-)
@@ -95,9 +95,9 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 
 ///
 /// \param[in] prg program(individual/team) to be transformed in a lambda
-///                function.
-/// \return the lambda function associated with `prg` (`nullptr` in case of
-///         errors).
+///                function
+/// \return        the lambda function associated with `prg` (`nullptr` in case
+///                of errors).
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
@@ -107,13 +107,14 @@ std::unique_ptr<lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
 }
 
 ///
-/// \param[in] agent lambda function used for the evaluation of the current
-///                  program.
-/// \param[in] t the current training case.
+/// \param[in] agent        lambda function used for the evaluation of the
+///                         current program
+/// \param[in] t            the current training case
 /// \param[in,out] illegals number of illegals values found evaluating the
-///                         current program so far.
-/// \return a measurement of the error of the current program on the
-///         training case `t`. The value returned is in the [0;+inf[ range.
+///                         current program so far
+/// \return                 a measurement of the error of the current program
+///                         on the training case `t`. The value returned is in
+///                         the `[0;+inf[` range
 ///
 template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -136,10 +137,11 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program.
-/// \param[in] t the current training case.
-/// \return a measurement of the error of the current program on the
-///         training case `t`. The value returned is in the [0;200] range.
+///                  program
+/// \param[in] t     the current training case
+/// \return          a measurement of the error of the current program on the
+///                  training case `t`. The value returned is in the `[0;200]`
+///                  range
 ///
 template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -179,13 +181,13 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 }
 
 ///
-/// \param[in] agent lambda function used for the evaluation of the current
-///                  program.
-/// \param[in] t the current training case.
+/// \param[in] agent        lambda function used for the evaluation of the
+///                         current program
+/// \param[in] t            the current training case
 /// \param[in,out] illegals number of illegals values found evaluating the
-///                         current program so far.
-/// \return a measurement of the error of the current program on the
-///         training case `t`.
+///                         current program so far
+/// \return                 a measurement of the error of the current program
+///                         on the training case `t`
 ///
 template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -209,10 +211,10 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
 ///
 /// \param[in] agent lambda function used for the evaluation of the current
-///                  program.
-/// \param[in] t the current training case.
-/// \return a measurement of the error of the current program on the
-///         training case `t`.
+///                  program
+/// \param[in] t     the current training case
+/// \return          a measurement of the error of the current program on the
+///                  training case `t`
 ///
 template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
@@ -230,9 +232,9 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 }
 
 ///
-/// \param[in] d training data.
+/// \param[in] p      current dataset
 /// \param[in] x_slot basic parameter for the Slotted Dynamic Class Boundary
-///                   Determination algorithm.
+///                   Determination algorithm
 ///
 template<class T>
 dyn_slot_evaluator<T>::dyn_slot_evaluator(dataframe &d, unsigned x_slot)
@@ -242,8 +244,8 @@ dyn_slot_evaluator<T>::dyn_slot_evaluator(dataframe &d, unsigned x_slot)
 }
 
 ///
-/// \param[in] ind program used for class recognition.
-/// \return the fitness (greater is better, max is 0).
+/// \param[in] ind program used for class recognition
+/// \return        the fitness (greater is better, max is `0`)
 ///
 template<class T>
 fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
@@ -272,9 +274,9 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with `ind` (`nullptr` in case of
-///         errors).
+/// \param[in] ind individual to be transformed in a lambda function
+/// \return        the lambda function associated with `ind` (`nullptr` in case
+///                of errors)
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> dyn_slot_evaluator<T>::lambdify(
@@ -284,8 +286,8 @@ std::unique_ptr<lambda_f<T>> dyn_slot_evaluator<T>::lambdify(
 }
 
 ///
-/// \param[in] ind program used for class recognition.
-/// \return the fitness (greater is better, max is 0).
+/// \param[in] ind program used for class recognition
+/// \return        the fitness (greater is better, max is `0`)
 ///
 /// For details about this algorithm see:
 /// * "Using Gaussian Distribution to Construct Fitnesss Functions in Genetic
@@ -330,9 +332,9 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with `ind` (`nullptr` in case of
-///         errors).
+/// \param[in] ind individual to be transformed in a lambda function
+/// \return        the lambda function associated with `ind` (`nullptr` in case
+///                of errors)
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
@@ -342,8 +344,8 @@ std::unique_ptr<lambda_f<T>> gaussian_evaluator<T>::lambdify(
 }
 
 ///
-/// \param[in] ind an individual.
-/// \return the fitness of individual `ind` (greater is better, max is 0).
+/// \param[in] ind an individual
+/// \return        the fitness of `ind` (greater is better, max is `0`)
 ///
 template<class T>
 fitness_t binary_evaluator<T>::operator()(const T &ind)
@@ -366,9 +368,9 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 }
 
 ///
-/// \param[in] ind individual to be transformed in a lambda function.
-/// \return the lambda function associated with `ind` (`nullptr` in case of
-///         errors).
+/// \param[in] ind individual to be transformed in a lambda function
+/// \return        the lambda function associated with `ind` (`nullptr` in case
+///                of errors)
 ///
 template<class T>
 std::unique_ptr<lambda_f<T>> binary_evaluator<T>::lambdify(const T &ind) const

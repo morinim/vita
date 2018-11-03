@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,20 +33,17 @@ public:
   evaluator_proxy(E, unsigned);
 
   // Serialization.
-  bool load(std::istream &);
-  bool save(std::ostream &) const;
+  bool load(std::istream &) override;
+  bool save(std::ostream &) const override;
 
-  void clear(typename evaluator<T>::clear_flag);
-  void clear(const T &);
+  void clear() override;
 
-  fitness_t operator()(const T &);
-  fitness_t fast(const T &);
+  fitness_t operator()(const T &) override;
+  fitness_t fast(const T &) override;
 
-  std::string info() const;
+  std::string info() const override;
 
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
-
-  unsigned seen(const T &) const;
+  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
 
 private:
   // Access to the real evaluator.

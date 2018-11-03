@@ -284,7 +284,7 @@ int main()
   fxs::search engine(p);
 
   trade_simulator ts;
-  engine.set_evaluator<fxs::evaluator>(&ts);
+  engine.set_training_evaluator<fxs::evaluator>(&ts);
 
   std::cout << "STARTING RUN\n";
   engine.run(1);

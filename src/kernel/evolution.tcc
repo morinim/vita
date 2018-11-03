@@ -290,21 +290,15 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
   bool stop(false);
   term::set();
 
-#if defined(CLONE_SCALING)
-  eva_.clear(evaluator<T>::stats);
-#endif
-
   es_.init();  // customizatin point for strategy-specific initialization
 
   for (stats_.gen = 0; !stop_condition(stats_) && !stop;  ++stats_.gen)
   {
     if (shake(stats_.gen))
     {
-      // If we 'shake' the data, fitness values and the statistics picked so
-      // far have to be cleared (the best fitness of the best individual refers
-      // to the previous training set).
-      eva_.clear(evaluator<T>::all);
-
+      // The `shake` functions clear cached fitness values (they refer to the
+      // previous dataset). So we must recalculate the fitness of the best
+      // individual found.
       assert(!stats_.best.solution.empty());
       stats_.best.score.fitness = eva_(stats_.best.solution);
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,6 +19,15 @@
 
 namespace vita
 {
+
+class cached_evaluator
+{
+public:
+  /// Clear possible cached values.
+  /// \note The default implementation is empty.
+  virtual void clear() {}
+};
+
 ///
 /// Calculates the fitness of an individual.
 ///
@@ -41,14 +50,12 @@ namespace vita
 /// calculates the output of an individual given an input vector).
 ///
 template<class T>
-class evaluator
+class evaluator : public cached_evaluator
 {
 public:
-  virtual ~evaluator() {}
+  virtual ~evaluator() = default;
 
-  enum clear_flag {cache = 1, stats = 2, all = cache | stats};
-
-  /// \return the fitness of the individual.
+  /// \return the fitness of the individual
   virtual fitness_t operator()(const T &) = 0;
 
   // Serialization.
@@ -56,12 +63,9 @@ public:
   virtual bool save(std::ostream &) const;
 
   // The following methods have a default implementation (usually empty).
-  virtual void clear(clear_flag);
-  virtual void clear(const T &);
   virtual fitness_t fast(const T &);
   virtual std::string info() const;
   virtual std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
-  virtual unsigned seen(const T &) const;
 };
 
 ///

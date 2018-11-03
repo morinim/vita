@@ -36,19 +36,28 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 {
   Expects(p.debug());
 
-  if (data().size() && !this->active_eva_)
-    set_evaluator(p.classification() ? p_class : p_symre);
+  set_evaluator(p.classification() ? p_class : p_symre);
 
   Ensures(this->debug());
 }
 
 ///
-/// \return a reference to the available data
+/// \return a reference to the active dataset
 ///
 template<class T, template<class> class ES>
 dataframe &src_search<T, ES>::data() const
 {
   return prob().data();
+}
+
+///
+/// \param[in] d dataset id
+/// \return      a reference to the specified dataset
+///
+template<class T, template<class> class ES>
+dataframe &src_search<T, ES>::data(problem::dataset_t d) const
+{
+  return prob().data(d);
 }
 
 ///
@@ -71,7 +80,7 @@ src_problem &src_search<T, ES>::prob() const
 template<class T, template<class> class ES>
 std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 {
-  return this->active_eva_->lambdify(ind);
+  return this->eva1_->lambdify(ind);
 }
 
 ///
@@ -128,7 +137,7 @@ template<class T, template<class> class ES>
 template<class U>
 void src_search<T, ES>::arl(const U &base)
 {
-  auto &eval(*this->active_eva_);  // just a shorthand
+  auto &eval(*this->eva1_);  // just a shorthand
 
   const auto base_fit(eval(base));
   if (!isfinite(base_fit))
@@ -238,8 +247,7 @@ void src_search<T, ES>::arl(const team<U> &)
 /// \see
 /// * "Parameter Setting in Evolutionary Algorithms" (F.G. Lobo, C.F. Lima,
 ///   Z. Michalewicz) - Springer;
-/// * "Genetic Programming - An Introduction" (Banzhaf, Nordin, Keller,
-///   Francone).
+/// - https://github.com/morinim/vita/wiki/bibliography#9
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::tune_parameters()
@@ -256,7 +264,7 @@ void src_search<T, ES>::tune_parameters()
 
   search<T, ES>::tune_parameters();
 
-  const auto d_size(data().size());
+  const auto d_size(data(problem::dataset_t::training).size());
   Expects(d_size);
 
   if (!constrained.layers)
@@ -270,10 +278,9 @@ void src_search<T, ES>::tune_parameters()
   }
 
   // A larger number of training cases requires an increase in the population
-  // size (e.g. in "Genetic Programming - An Introduction" Banzhaf, Nordin,
-  // Keller and Francone suggest 10 - 1000 individuals for smaller problems;
-  // between 1000 and 10000 individuals for complex problem (more than 200
-  // fitness cases).
+  // size (e.g. https://github.com/morinim/vita/wiki/bibliography#9 suggests
+  // 10 - 1000 individuals for smaller problems; between 1000 and 10000
+  // individuals for complex problem (more than 200 fitness cases).
   //
   // We chose a strictly increasing function to link training set size and
   // population size.
@@ -285,28 +292,24 @@ void src_search<T, ES>::tune_parameters()
                         * static_cast<decltype(dflt.individuals)>(
                             std::pow(std::log2(d_size), 3))
                         / env.layers;
-
-      if (env.individuals < 4)
-        env.individuals = 4;
     }
     else
       env.individuals = dflt.individuals;
 
+    if (env.individuals < 4)
+      env.individuals = 4;
+
     vitaINFO << "Population size set to " << env.individuals;
   }
 
+  if (!constrained.dss.has_value() && typeid(this->vs_.get()) == typeid(dss))
+    env.dss = dflt.dss;
+
+  if (!constrained.validation_percentage.has_value()
+      && typeid(this->vs_.get()) == typeid(holdout_validation))
+    env.validation_percentage = dflt.validation_percentage;
+
   Ensures(env.debug(true));
-}
-
-template<class T, template<class> class ES>
-void src_search<T, ES>::init()
-{
-  const environment &env(prob().env);
-
-  if (env.validation_percentage > 0)
-    this->template set_validator<holdout_validation>(prob());
-  else if (env.dss > 0)
-    this->template set_validator<dss>(prob());
 }
 
 template<class T, template<class> class ES>
@@ -341,11 +344,6 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 ///
 /// \param[out] d               output xml document
 /// \param[in]  run_sum summary information regarding the search
-/// \param[in]  fd              statistics about population fitness
-/// \param[in]  good_runs       list of the best runs of the search
-/// \param[in]  best_run        best overall run
-/// \param[in]  runs            number of runs performed
-/// \return                     `true` if the write operation succeed
 ///
 template<class T, template<class> class ES>
 void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
@@ -383,6 +381,46 @@ void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
 }
 
 ///
+/// \param[in] id  numerical id of the validator to be activated
+/// \return        `true` if the active validator has been changed
+///
+template<class T, template<class> class ES>
+bool src_search<T, ES>::set_validator(validator_id id)
+{
+  switch (id)
+  {
+  case validator_id::as_is:
+    search<T, ES>::template set_validator<as_is_validation>();
+    return true;
+
+  case validator_id::dss:
+    assert(this->eva1_);
+    assert(this->eva2_);
+    search<T, ES>::template set_validator<dss>(prob(),
+                                               *this->eva1_, *this->eva2_);
+    return true;
+
+  case validator_id::holdout:
+    search<T, ES>::template set_validator<holdout_validation>(prob());
+    return true;
+
+  default:
+    return false;
+  }
+}
+
+template<class T, template<class> class ES>
+template<class E, class... Args>
+void src_search<T, ES>::set_evaluator(Args && ...args)
+{
+  search<T, ES>::template set_training_evaluator<E>(
+    data(problem::dataset_t::training), std::forward<Args>(args)...);
+
+  search<T, ES>::template set_validation_evaluator<E>(
+    data(problem::dataset_t::validation), std::forward<Args>(args)...);
+}
+
+///
 /// \param[in] id  numerical id of the evaluator to be activated
 /// \param[in] msg input parameters for the evaluator constructor
 /// \return        `true` if the active evaluator has been changed
@@ -399,20 +437,19 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::bin:
-      search<T, ES>::template set_evaluator<binary_evaluator<T>>(data());
+      set_evaluator<binary_evaluator<T>>();
       return true;
 
     case evaluator_id::dyn_slot:
       {
         auto x_slot(static_cast<unsigned>(msg.empty() ? 10ul
                                                       : std::stoul(msg)));
-        search<T, ES>::template set_evaluator<dyn_slot_evaluator<T>>(data(),
-                                                                     x_slot);
+        set_evaluator<dyn_slot_evaluator<T>>(x_slot);
       }
       return true;
 
     case evaluator_id::gaussian:
-      search<T, ES>::template set_evaluator<gaussian_evaluator<T>>(data());
+      set_evaluator<gaussian_evaluator<T>>();
       return true;
 
     default:
@@ -424,19 +461,19 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     switch (id)
     {
     case evaluator_id::count:
-      search<T, ES>::template set_evaluator<count_evaluator<T>>(data());
+      set_evaluator<count_evaluator<T>>();
       return true;
 
     case evaluator_id::mae:
-      search<T, ES>::template set_evaluator<mae_evaluator<T>>(data());
+      set_evaluator<mae_evaluator<T>>();
       return true;
 
     case evaluator_id::rmae:
-      search<T, ES>::template set_evaluator<rmae_evaluator<T>>(data());
+      set_evaluator<rmae_evaluator<T>>();
       return true;
 
     case evaluator_id::mse:
-      search<T, ES>::template set_evaluator<mse_evaluator<T>>(data());
+      set_evaluator<mse_evaluator<T>>();
       return true;
 
     default:

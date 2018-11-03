@@ -22,13 +22,12 @@
 ///              the lifetime of `this` class
 ///
 template<class T, template<class> class ES>
-search<T, ES>::search(problem &p) : active_eva_(nullptr),
+search<T, ES>::search(problem &p) : eva1_(nullptr), eva2_(nullptr),
                                     vs_(std::make_unique<as_is_validation>()),
                                     prob_(p)
 {
   Ensures(debug());
 }
-
 
 ///
 /// For the base class this is just the identity function.
@@ -45,19 +44,24 @@ model_measurements search<T, ES>::calculate_metrics_spec(
 ///
 /// Calculates the fitness of the best individual so far.
 ///
-/// \param[in] s summary of the evolution run just finished
-/// \return      `s.best.score`
+/// \param[in] eva active evaluator
+/// \param[in] s   summary of the evolution run just finished
+/// \return        `s.best.score`
 ///
 /// Specializations of this method can calculate further problem-specific
 /// metrics regarding `s.best.solution` (via the `calculate_metrics_spec`
 /// virtual function).
 ///
+/// Different evaluators (i.e. fitness functions) can be used for trainining /
+/// validation.
+///
 template<class T, template<class> class ES>
-model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
+model_measurements search<T, ES>::calculate_metrics(evaluator<T> &eva,
+                                                    const summary<T> &s) const
 {
   auto m(calculate_metrics_spec(s));
 
-  m.fitness = (*active_eva_)(s.best.solution);
+  m.fitness = eva(s.best.solution);
 
   return m;
 }
@@ -90,19 +94,6 @@ void search<T, ES>::tune_parameters()
 
   if (!constrained.brood_recombination)
     prob_.env.brood_recombination = dflt.brood_recombination;
-
-  // Holdout validation is the preferred validation method. Only when it's
-  // disabled we consider DSS.
-  if (constrained.validation_percentage > 0)
-  {
-    prob_.env.validation_percentage = dflt.validation_percentage;
-    prob_.env.dss                   =                          0;
-  }
-  else
-  {
-    prob_.env.dss                   = dflt.dss;
-    prob_.env.validation_percentage =        0;
-  }
 
   if (!constrained.layers)
     prob_.env.layers = dflt.layers;
@@ -155,23 +146,15 @@ summary<T> search<T, ES>::run(unsigned n)
   for (unsigned r(0); r < n; ++r)
   {
     vs_->init(r);
-    auto run_summary(evolution<T, ES>(prob_, *active_eva_).run(r, shake));
+    auto run_summary(evolution<T, ES>(prob_, *eva1_).run(r, shake));
     vs_->close(r);
 
-    // If a validation test/simulation is available, the performance of the
-    // best trained individual is recalculated.
-    if (prob_.has(problem::validation))
-    {
-      prob_.select(problem::validation);
-      active_eva_->clear(run_summary.best.solution);
-
-      run_summary.best.score = calculate_metrics(run_summary);
-
-      prob_.select(problem::training);
-      active_eva_->clear(run_summary.best.solution);
-    }
+    // If a validation set/simulation is available, the performance of the best
+    // trained individual is calculated using the validation fitness function.
+    if (eva2_ && prob_.has(problem::dataset_t::validation))
+      run_summary.best.score = calculate_metrics(*eva2_, run_summary);
     else
-      run_summary.best.score = calculate_metrics(run_summary);
+      run_summary.best.score = calculate_metrics(*eva1_, run_summary);
 
     after_evolution(&run_summary);
 
@@ -200,9 +183,9 @@ summary<T> search<T, ES>::run(unsigned n)
 
     overall_summary.elapsed += run_summary.elapsed;
 
-    assert(good_runs.empty() ||
-           std::find(std::begin(good_runs), std::end(good_runs), best_run) !=
-           std::end(good_runs));
+    assert(good_runs.empty()
+           || std::find(std::begin(good_runs), std::end(good_runs), best_run)
+              != std::end(good_runs));
 
     this->log_search(overall_summary, fd, good_runs, best_run, n);
   }
@@ -229,7 +212,7 @@ bool search<T, ES>::load()
 
   if (prob_.env.cache_size)
   {
-    if (!active_eva_->load(in))
+    if (!eva1_->load(in))
       return false;
     vitaINFO << "Loading cache";
   }
@@ -252,7 +235,7 @@ bool search<T, ES>::save() const
 
   if (prob_.env.cache_size)
   {
-    if (!active_eva_->save(out))
+    if (!eva1_->save(out))
       return false;
     vitaINFO << "Saving cache";
   }
@@ -273,21 +256,43 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 }
 
 ///
-/// Sets the active evaluator.
+/// Sets the main evaluator (used for training).
 ///
 /// \tparam E an evaluator
 ///
 /// \param[in] args arguments used to build the `E` evaluator
 ///
+/// \warning
+/// We assume that the training evaluator could have a cache. This means that
+/// changes in the training simulation / training set should invalidate fitness
+/// values stored in that cache.
+///
 template<class T, template<class> class ES>
 template<class E, class... Args>
-void search<T, ES>::set_evaluator(Args && ...args)
+void search<T, ES>::set_training_evaluator(Args && ...args)
 {
   if (prob_.env.cache_size)
-    active_eva_ = std::make_unique<evaluator_proxy<T, E>>(
+    eva1_ = std::make_unique<evaluator_proxy<T, E>>(
       E(std::forward<Args>(args)...), prob_.env.cache_size);
   else
-    active_eva_ = std::make_unique<E>(std::forward<Args>(args)...);
+    eva1_ = std::make_unique<E>(std::forward<Args>(args)...);
+}
+
+///
+/// Sets the validation evaluator (used for validation).
+///
+/// \tparam E an evaluator
+///
+/// \param[in] args arguments used to build the `E` evaluator
+///
+/// \warning
+/// The validation evaluator cannot have a cache.
+///
+template<class T, template<class> class ES>
+template<class E, class... Args>
+void search<T, ES>::set_validation_evaluator(Args && ...args)
+{
+  eva2_ = std::make_unique<E>(std::forward<Args>(args)...);
 }
 
 ///
@@ -369,7 +374,8 @@ void search<T, ES>::log_search(const summary<T> &run_sum,
 
   auto *e_other(d.NewElement("other"));
   e_summary->InsertEndChild(e_other);
-  set_text(e_other,"evaluator", active_eva_->info());
+  set_text(e_other,"training_evaluator", eva1_->info());
+  set_text(e_other,"validation_evaluator", eva2_->info());
 
   prob_.env.xml(&d);
 

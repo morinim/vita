@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,40 +55,6 @@ template<class T>
 bool evaluator<T>::save(std::ostream &) const
 {
   return true;
-}
-
-///
-/// Some evaluators keep additional statistics about the individual seen
-/// so far.
-///
-/// \return `0`
-///
-template<class T>
-unsigned evaluator<T>::seen(const T &) const
-{
-  return 0;
-}
-
-///
-/// Empties the cache / clear the statistics.
-///
-/// Some evaluators keep a cache / some statistics to improve performances.
-///
-/// \note Default implementation is empty.
-///
-template<class T>
-void evaluator<T>::clear(clear_flag)
-{
-}
-
-///
-/// Clears cached informations about a specific individual.
-///
-/// Some evaluators keep a cache to improve performances.
-///
-template<class T>
-void evaluator<T>::clear(const T &)
-{
 }
 
 ///

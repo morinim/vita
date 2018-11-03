@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -69,19 +69,6 @@ void cache::clear(const hash_t &h)
 }
 
 ///
-/// Resets the `seen` counter.
-///
-#if defined(CLONE_SCALING)
-void cache::reset_seen()
-{
-  probes_ = hits_ = 0;
-
-  for (auto &s : table_)
-    s.seen = 0;
-}
-#endif
-
-///
 /// Looks for the fitness of an individual in the transposition table.
 ///
 /// \param[in] h individual's signature to look for
@@ -97,32 +84,12 @@ const fitness_t &cache::find(const hash_t &h) const
 
   if (ret)
   {
-#if defined(CLONE_SCALING)
-    ++s.seen;
-#endif
     ++hits_;
     return s.fitness;
   }
 
   static const fitness_t empty{};
   return empty;
-}
-
-///
-/// \param[in] h individual's signature to look for
-/// \return      number of times `h` has been looked for
-///
-unsigned cache::seen(const hash_t &h) const
-{
-  const slot &s(table_[index(h)]);
-
-  const bool ret(seal_ == s.seal && h == s.hash);
-
-#if defined(CLONE_SCALING)
-  return ret ? s.seen : 0;
-#else
-  return ret;
-#endif
 }
 
 ///
@@ -138,9 +105,6 @@ void cache::insert(const hash_t &h, const fitness_t &fitness)
   s.hash    =       h;
   s.fitness = fitness;
   s.seal    =   seal_;
-#if defined(CLONE_SCALING)
-  s.seen    =       1;
-#endif
 
   table_[index(s.hash)] = s;
 }
@@ -179,10 +143,6 @@ bool cache::load(std::istream &in)
       return false;
     if (!s.fitness.load(in))
       return false;
-#if defined(CLONE_SCALING)
-    if (!(in >> s.seen))
-      return false;
-#endif
 
     table_[index(s.hash)] = s;
   }
@@ -213,9 +173,6 @@ bool cache::save(std::ostream &out) const
     {
       s.hash.save(out);
       s.fitness.save(out);
-#if defined(CLONE_SCALING)
-      out << s.seen << '\n';
-#endif
     }
 
   return out.good();

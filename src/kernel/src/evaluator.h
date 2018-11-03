@@ -18,14 +18,13 @@
 namespace vita
 {
 ///
-/// \brief An evaluator specialized for symbolic regression / classification
-///        problems
+/// An evaluator specialized for symbolic regression / classification problems.
 ///
 /// \tparam T type of individual
 ///
-/// This specialization of the evaluator class is "dataset-aware". It is
-/// useful to group common factors of more specialized symbolic regression
-/// or classification classes.
+/// This specialization of the evaluator class is "dataset-aware". It's useful
+/// to group common factors of more specialized symbolic regression or
+/// classification classes.
 ///
 template<class T>
 class src_evaluator : public evaluator<T>
@@ -38,10 +37,11 @@ protected:
 };
 
 ///
-/// \brief An evaluator to minimize the sum of some sort of error
+/// An evaluator to minimize the sum of some sort of error.
 ///
 /// This class models the evaluators that will drive the evolution towards the
 /// minimum sum of some sort of error.
+///
 /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
 ///
 template<class T>
@@ -60,7 +60,7 @@ private:
 };
 
 ///
-/// \brief Evaluator based on the mean absolute error
+/// Evaluator based on the mean absolute error.
 ///
 /// This evaluator will drive the evolution towards the minimum sum of
 /// absolute errors(\f$\frac{1}{n} \sum_{i=1}^n |target_i - actual_i|\f$).
@@ -88,7 +88,7 @@ private:
 };
 
 ///
-/// \brief Evaluator based on the mean of relative differences
+/// Evaluator based on the mean of relative differences.
 ///
 /// This evaluator will drive the evolution towards the minimum sum of
 /// relative differences between target values and actual ones:
@@ -118,7 +118,7 @@ private:
 };
 
 ///
-/// \brief Evaluator based on the mean squared error
+/// Evaluator based on the mean squared error.
 ///
 /// This evaluator will drive the evolution towards the minimum sum of
 /// squared errors (\f$\frac{1}{n} \sum_{i=1}^n (target_i - actual_i)^2\f$).
@@ -147,7 +147,7 @@ private:
 };
 
 ///
-/// \brief Evaluator based on the number of matches
+/// Evaluator based on the number of matches.
 ///
 /// This evaluator will drive the evolution towards the maximum sum of
 /// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
@@ -176,7 +176,7 @@ public:
 };
 
 ///
-/// \brief Slotted Dynamic Class Boundary Determination
+/// Slotted Dynamic Class Boundary Determination.
 ///
 /// Rather than using fixed static thresholds as boundaries to distinguish
 /// between different classes, this approach introduces a method of
@@ -203,7 +203,7 @@ private:
 };
 
 ///
-/// \brief Gaussian distribution for multiclass object classification.
+/// Gaussian distribution for multiclass object classification.
 ///
 /// Instead of using predefined multiple thresholds to form different regions
 /// in the program output space for different classes, this approach uses
@@ -226,7 +226,7 @@ public:
 };
 
 ///
-/// \brief Single class evaluator for classification problems
+/// Single class evaluator for classification problems.
 ///
 template<class T>
 class binary_evaluator : public classification_evaluator<T>
@@ -241,4 +241,4 @@ public:
 #include "kernel/src/evaluator.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

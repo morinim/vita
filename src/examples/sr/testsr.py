@@ -26,7 +26,7 @@ summary_filename = "summary"
 class TestParameters:
     def __init__(self, filename, generations = 100, individuals = 180,
                  code_length = 100, runs = 80, layers = 4, symbol_set = "",
-                 evaluator = ""):
+                 evaluator = "", dss = 0):
         if not filename:
             raise Exception("Unspecified test filename")
 
@@ -38,6 +38,7 @@ class TestParameters:
         self.layers = layers
         self.symbol_set = symbol_set
         self.evaluator = evaluator
+        self.dss = dss
 
 test_collection = {
     #"adult": TestParameters("adult.csv", generations = 50, individuals = 100,
@@ -54,6 +55,9 @@ test_collection = {
 
     "mep": TestParameters("mep.csv", individuals = 75, code_length = 500,
                           runs = 100),
+
+    "mepdss": TestParameters("mep.csv", individuals = 75, code_length = 500,
+                             runs = 100, dss = 1),
 
     "petalrose": TestParameters("petalrose.xrff", code_length = 200,
                                 runs = 10, symbol_set = "iarithmetic.xml"),
@@ -107,6 +111,7 @@ def sr(args, dataset):
     layers = test_collection[dataset].layers
     symbol_set = test_collection[dataset].symbol_set
     evaluator = test_collection[dataset].evaluator
+    dss = test_collection[dataset].dss
 
     # Default values are for a fast/debug evaluation. Gathering statistics
     # requires bigger numbers...
@@ -130,11 +135,8 @@ def sr(args, dataset):
     if symbol_set:
         cmd += ["--symbols", os.path.join(symbol_set_dir, symbol_set)]
 
-    if "arl" in mode_settings[mode]:
-        cmd += ["--arl", "--stat-arl"]
-
-    if "dss" in mode_settings[mode]:
-        cmd += ["--dss", str(mode_settings[mode]["dss"])]
+    if dss > 0:
+        cmd += ["--dss", str(dss)]
 
     # When randomize is off, tests are reproducible (good for debugging).
     if "randomize" in mode_settings[mode]:

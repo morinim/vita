@@ -34,13 +34,12 @@ public:
   explicit holdout_validation(src_problem &);
 
   void init(unsigned) override;
-  bool shake(unsigned) override { return false; }
 
 private:
   dataframe &training_;
   dataframe &validation_;
 
-  unsigned perc_;
+  const environment &env_;
 };
 
 }  // namespace vita

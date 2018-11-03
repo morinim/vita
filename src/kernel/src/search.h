@@ -28,6 +28,10 @@ enum class evaluator_id
 {
   count = 0, mae, rmae, mse, bin, dyn_slot, gaussian, undefined
 };
+enum class validator_id
+{
+  as_is, dss, holdout, undefined
+};
 
 enum class metric_flags : unsigned
 {
@@ -58,6 +62,7 @@ public:
   template<class U> void arl(const team<U> &);
 
   bool set_evaluator(evaluator_id, const std::string & = "");
+  bool set_validator(validator_id);
 
   bool debug() const override;
 
@@ -67,12 +72,13 @@ protected:
 private:
   // *** Private support methods ***
   dataframe &data() const;
+  dataframe &data(problem::dataset_t) const;
   src_problem &prob() const;
+  template<class E, class... Args> void set_evaluator(Args && ...);
   bool stop_condition(const summary<T> &) const;
 
   // Template methods / customization points for search::run().
   model_measurements calculate_metrics_spec(const summary<T> &) const override;
-  void init() override;
   void after_evolution(summary<T> *) override;
   void print_resume(const model_measurements &) const override;
   void log_search_spec(tinyxml2::XMLDocument *,

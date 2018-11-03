@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -40,22 +40,6 @@ fitness_t evaluator_proxy<T, E>::operator()(const T &prg)
   if (f.size())
   {
     assert(cache_.hits());
-
-#if defined(CLONE_SCALING)
-    // Before evaluating a program, we check if clones are already present in
-    // the population.
-    // When the number of clones is greater than `0`, the fitness assigned to
-    // the program is multiplied by a scaling factor.
-    // For further details see "Evolving Assembly Programs: How Games Help
-    // Microprocessor Validation" - F.Corno, E.Sanchez, G.Squillero.
-
-    //const auto perc(static_cast<double>(cache_.seen(prg.signature())) /
-    //                cache_.hits());
-    //if (0.01 < perc && perc < 1.0)
-    //  f -= (f * perc).abs() * 2.0;
-
-    f -= static_cast<double>(cache_.seen(prg.signature())) / 2.0;
-#endif
 
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
@@ -132,49 +116,12 @@ bool evaluator_proxy<T, E>::save(std::ostream &out) const
 }
 
 ///
-/// Resets the evaluation cache / clear the statistics.
-///
-/// \param[in] what what should be cleared? (all, cache, stats
+/// Resets the evaluation cache.
 ///
 template<class T, class E>
-void evaluator_proxy<T, E>::clear(typename evaluator<T>::clear_flag what)
+void evaluator_proxy<T, E>::clear()
 {
-  switch (what)
-  {
-  case evaluator<T>::all:
-  case evaluator<T>::cache:
-    cache_.clear();
-    break;
-
-  case evaluator<T>::stats:
-#if defined(CLONE_SCALING)
-    cache_.reset_seen();
-#endif
-    break;
-  }
-}
-
-///
-/// Clears the cached informations for a specific individual.
-///
-/// \param[in] prg a program (individual/team)
-///
-template<class T, class E>
-void evaluator_proxy<T, E>::clear(const T &prg)
-{
-  cache_.clear(prg.signature());
-}
-
-///
-/// \param[in] prg a program (individual/team)
-/// \return        how many times we have seen the program `prg` during the
-///                current run of the evolution / the last call of the clear
-///                function
-///
-template<class T, class E>
-unsigned evaluator_proxy<T, E>::seen(const T &prg) const
-{
-  return cache_.seen(prg.signature());
+  cache_.clear();
 }
 
 ///
@@ -183,10 +130,13 @@ unsigned evaluator_proxy<T, E>::seen(const T &prg) const
 template<class T, class E>
 std::string evaluator_proxy<T, E>::info() const
 {
+  const auto hits(cache_.hits());
+  const auto probes(cache_.probes());
+
   return
-    "hits " + std::to_string(cache_.hits()) +
-    ", probes " + std::to_string(cache_.probes()) +
-    " (ratio " + std::to_string(cache_.hits() * 100 / cache_.probes()) + "%)";
+    "hits " + std::to_string(hits) +
+    ", probes " + std::to_string(probes) +
+    (probes ? " (ratio " + std::to_string(hits * 100 / probes) + "%)" : "");
 }
 
 ///
