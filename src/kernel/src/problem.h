@@ -24,6 +24,16 @@
 namespace vita
 {
 
+/// Data/simulations are categorised in three sets:
+/// - *training* used directly for learning;
+/// - *validation* for controlling overfitting and measuring the performance
+///   of an individual;
+/// - *test* for a forecast of how well an individual will do in the real
+///   world.
+/// The `vita::search` class asks the `problem` class to setup the requested
+/// simulation/dataset via the `select` function.
+enum class dataset_t {training = 0, validation, test};
+
 class src_problem : public problem
 {
 public:
@@ -38,10 +48,8 @@ public:
   std::size_t setup_symbols(const std::string & = "");
   std::size_t setup_terminals(const std::set<unsigned> & = {});
 
-  const dataframe &data() const;
-  dataframe &data();
-  const dataframe &data(dataset_t) const;
-  dataframe &data(dataset_t);
+  const dataframe &data(dataset_t  = dataset_t::training) const;
+  dataframe &data(dataset_t = dataset_t::training);
 
   /// Just a shorthand for checking number of classes.
   bool classification() const { return classes() > 1; }
@@ -50,14 +58,11 @@ public:
   unsigned classes() const;
   unsigned variables() const;
 
-  bool has(dataset_t) const override;
-
   bool debug() const override;
 
 private:
   // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
-  void select_impl(dataset_t) override final {};
   std::size_t setup_symbols_impl();
   std::size_t setup_symbols_impl(const std::string &);
 

@@ -38,8 +38,8 @@ std::uintmax_t weight(const dataframe::example &v)
 /// must be cleared when changing the training / validation set.
 ///
 dss::dss(src_problem &prob, cached_evaluator &eva_t, cached_evaluator &eva_v)
-  : training_(prob.data(problem::training)),
-    validation_(prob.data(problem::validation)),
+  : training_(prob.data(dataset_t::training)),
+    validation_(prob.data(dataset_t::validation)),
     eva_t_(eva_t), eva_v_(eva_v),
     env_(prob.env)
 {

@@ -29,41 +29,54 @@ search<T, ES>::search(problem &p) : eva1_(nullptr), eva2_(nullptr),
   Ensures(debug());
 }
 
+template<class T, template<class> class ES>
+bool search<T, ES>::can_validate() const
+{
+  return eva2_.get();
+}
+
+///
+/// Calculates the fitness of the best individual so far.
+///
+/// \param[in] s summary of the evolution run just finished
+/// \return      `s.best.score`
+///
+/// Specializations of this method can calculate further problem-specific
+/// metrics regarding `s.best.solution` (via the `calculate_metrics_custom`
+/// virtual function).
+///
+/// If a validation set / simulation is available, it's used for the
+/// calculations.
+///
+template<class T, template<class> class ES>
+model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
+{
+  auto m(calculate_metrics_custom(s));
+
+  if (can_validate())
+  {
+    assert(eva2_);
+    m.fitness = (*eva2_)(s.best.solution);
+  }
+  else
+  {
+    assert(eva1_);
+    m.fitness = (*eva1_)(s.best.solution);
+  }
+
+  return m;
+}
+
 ///
 /// For the base class this is just the identity function.
 ///
 /// Derived classes could calculate additional problem-specific metrics.
 ///
 template<class T, template<class> class ES>
-model_measurements search<T, ES>::calculate_metrics_spec(
+model_measurements search<T, ES>::calculate_metrics_custom(
   const summary<T> &s) const
 {
   return s.best.score;
-}
-
-///
-/// Calculates the fitness of the best individual so far.
-///
-/// \param[in] eva active evaluator
-/// \param[in] s   summary of the evolution run just finished
-/// \return        `s.best.score`
-///
-/// Specializations of this method can calculate further problem-specific
-/// metrics regarding `s.best.solution` (via the `calculate_metrics_spec`
-/// virtual function).
-///
-/// Different evaluators (i.e. fitness functions) can be used for trainining /
-/// validation.
-///
-template<class T, template<class> class ES>
-model_measurements search<T, ES>::calculate_metrics(evaluator<T> &eva,
-                                                    const summary<T> &s) const
-{
-  auto m(calculate_metrics_spec(s));
-
-  m.fitness = eva(s.best.solution);
-
-  return m;
 }
 
 ///
@@ -149,12 +162,8 @@ summary<T> search<T, ES>::run(unsigned n)
     auto run_summary(evolution<T, ES>(prob_, *eva1_).run(r, shake));
     vs_->close(r);
 
-    // If a validation set/simulation is available, the performance of the best
-    // trained individual is calculated using the validation fitness function.
-    if (eva2_ && prob_.has(problem::dataset_t::validation))
-      run_summary.best.score = calculate_metrics(*eva2_, run_summary);
-    else
-      run_summary.best.score = calculate_metrics(*eva1_, run_summary);
+    // Possibly calculates additional metrics.
+    run_summary.best.score = calculate_metrics(run_summary);
 
     after_evolution(&run_summary);
 
@@ -249,8 +258,7 @@ bool search<T, ES>::save() const
 template<class T, template<class> class ES>
 void search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(prob_.has(problem::validation) ? "Validation"
-                                                     : "Training");
+  const std::string s(can_validate() ? "Validation" : "Training");
 
   vitaINFO << s << " fitness: " << m.fitness;
 }
@@ -379,7 +387,7 @@ void search<T, ES>::log_search(const summary<T> &run_sum,
 
   prob_.env.xml(&d);
 
-  log_search_spec(&d, run_sum);
+  log_search_custom(&d, run_sum);
 
   const std::string f_sum(merge_path(prob_.env.stat.dir,
                                      prob_.env.stat.summary_file));

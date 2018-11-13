@@ -42,22 +42,30 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 }
 
 ///
-/// \return a reference to the active dataset
+/// \return a reference to the training set
 ///
 template<class T, template<class> class ES>
-dataframe &src_search<T, ES>::data() const
+dataframe &src_search<T, ES>::training_data() const
 {
-  return prob().data();
+  return prob().data(dataset_t::training);
 }
 
 ///
-/// \param[in] d dataset id
-/// \return      a reference to the specified dataset
+/// \return a reference to the test set
 ///
 template<class T, template<class> class ES>
-dataframe &src_search<T, ES>::data(problem::dataset_t d) const
+dataframe &src_search<T, ES>::test_data() const
 {
-  return prob().data(d);
+  return prob().data(dataset_t::test);
+}
+
+///
+/// \return a reference to the validation set
+///
+template<class T, template<class> class ES>
+dataframe &src_search<T, ES>::validation_data() const
+{
+  return prob().data(dataset_t::validation);
 }
 
 ///
@@ -70,17 +78,23 @@ src_problem &src_search<T, ES>::prob() const
 }
 
 ///
-/// Creates a lambda function associated with `ind`.
+/// Creates a lambda function associated with an individual.
 ///
 /// \param[in] ind individual to be transformed in a lambda function
 /// \return        the lambda function (`nullptr` in case of errors)
 ///
-/// The lambda function depends on the active evaluator.
+/// The lambda function depends on the active training evaluator.
 ///
 template<class T, template<class> class ES>
 std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 {
   return this->eva1_->lambdify(ind);
+}
+
+template<class T, template<class> class ES>
+bool src_search<T, ES>::can_validate() const
+{
+  return this->eva2_ && validation_data().size();
 }
 
 ///
@@ -101,7 +115,7 @@ std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 /// \warning Can be very time consuming.
 ///
 template<class T, template<class> class ES>
-model_measurements src_search<T, ES>::calculate_metrics_spec(
+model_measurements src_search<T, ES>::calculate_metrics_custom(
   const summary<T> &s) const
 {
   auto ret(s.best.score);
@@ -109,8 +123,9 @@ model_measurements src_search<T, ES>::calculate_metrics_spec(
   if ((metrics & metric_flags::accuracy)
       || prob().env.threshold.accuracy > 0.0)
   {
-    const auto model(this->lambdify(s.best.solution));
-    ret.accuracy = model->measure(accuracy_metric<T>(), data());
+    const auto model(lambdify(s.best.solution));
+    const auto &d(can_validate() ? validation_data() : training_data());
+    ret.accuracy = model->measure(accuracy_metric<T>(), d);
   }
 
   return ret;
@@ -217,7 +232,6 @@ template<class T, template<class> class ES>
 template<class U>
 void src_search<T, ES>::arl(const team<U> &)
 {
-
 }
 
 ///
@@ -264,7 +278,7 @@ void src_search<T, ES>::tune_parameters()
 
   search<T, ES>::tune_parameters();
 
-  const auto d_size(data(problem::dataset_t::training).size());
+  const auto d_size(training_data().size());
   Expects(d_size);
 
   if (!constrained.layers)
@@ -328,8 +342,7 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(prob().has(problem::validation) ? "Validation "
-                                                      : "Training ");
+  const std::string s(can_validate() ? "Validation " : "Training ");
 
   vitaINFO << s << "fitness: " << m.fitness;
 
@@ -346,8 +359,8 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 /// \param[in]  run_sum summary information regarding the search
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
-                                        const summary<T> &run_sum) const
+void src_search<T, ES>::log_search_custom(tinyxml2::XMLDocument *d,
+                                          const summary<T> &run_sum) const
 {
   Expects(d);
 
@@ -365,18 +378,13 @@ void src_search<T, ES>::log_search_spec(tinyxml2::XMLDocument *d,
   }
 
   // Test set results logging.
-  if (!stat.test_file.empty() && prob().has(problem::test))
+  if (!stat.test_file.empty() && test_data().size())
   {
-    const auto original_dataset(prob().active_dataset());
-    prob().select(problem::test);
-
-    const auto lambda(this->lambdify(run_sum.best.solution));
+    const auto lambda(lambdify(run_sum.best.solution));
 
     std::ofstream tf(merge_path(stat.dir, stat.test_file));
-    for (const auto &example : data())
+    for (const auto &example : test_data())
       tf << lambda->name((*lambda)(example)) << '\n';
-
-    prob().select(original_dataset);
   }
 }
 
@@ -414,10 +422,10 @@ template<class E, class... Args>
 void src_search<T, ES>::set_evaluator(Args && ...args)
 {
   search<T, ES>::template set_training_evaluator<E>(
-    data(problem::dataset_t::training), std::forward<Args>(args)...);
+    training_data(), std::forward<Args>(args)...);
 
   search<T, ES>::template set_validation_evaluator<E>(
-    data(problem::dataset_t::validation), std::forward<Args>(args)...);
+    validation_data(), std::forward<Args>(args)...);
 }
 
 ///
@@ -432,7 +440,7 @@ void src_search<T, ES>::set_evaluator(Args && ...args)
 template<class T, template<class> class ES>
 bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
 {
-  if (data().classes() > 1)
+  if (training_data().classes() > 1)
   {
     switch (id)
     {

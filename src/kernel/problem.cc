@@ -17,42 +17,8 @@ namespace vita
 ///
 /// A new problem.
 ///
-problem::problem() : env(), sset(), active_dataset_(training)
+problem::problem() : env(), sset()
 {
-}
-
-///
-/// Activates the dataset/simulation we want to operate on.
-///
-/// \param[in] d the active dataset
-///
-void problem::select(dataset_t d)
-{
-  active_dataset_ = d;
-
-  select_impl(d);
-}
-
-///
-/// \return the type (training, validation, test) of the active
-///         dataset / simulation
-///
-problem::dataset_t problem::active_dataset() const
-{
-  return active_dataset_;
-}
-
-///
-/// Asks if a dataset/simulation of a specific kind is available.
-///
-/// \param[in] d dataset/simulation type
-/// \return      `true` if dataset/simulation of type `d` is available
-///
-/// A training dataset/simulation should always be available.
-///
-bool problem::has(dataset_t d) const
-{
-  return d == training;
 }
 
 ///

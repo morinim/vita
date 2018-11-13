@@ -93,16 +93,16 @@ src_problem::src_problem(const std::string &ds, const default_symbols_t &)
 ///
 /// Initializes the problem with data from the input files.
 ///
-/// \param[in] ds      name of the dataset file
+/// \param[in] ds      name of the training dataset file
 /// \param[in] symbols name of the file containing the symbols to be used.
 ///
 src_problem::src_problem(const std::string &ds, const std::string &symbols)
   : src_problem()
 {
   vitaINFO << "Reading dataset " << ds << "...";
-  data().read(ds);
+  data(dataset_t::training).read(ds);
 
-  vitaINFO << "....dataset read. Examples: " << data().size()
+  vitaINFO << "....dataset read. Examples: " << data(dataset_t::training).size()
            << ", categories: " << categories()
            << ", features: " << variables()
            << ", classes: " << classes();
@@ -399,28 +399,12 @@ unsigned src_problem::variables() const
 }
 
 ///
-/// \return a reference to the active dataset
-///
-dataframe &src_problem::data()
-{
-  return active_dataset() == problem::training ? training_ : validation_;
-}
-
-///
-/// \return a const reference to the active dataset
-///
-const dataframe &src_problem::data() const
-{
-  return active_dataset() == problem::training ? training_ : validation_;
-}
-
-///
 /// \param[in] t a dataset type
 /// \return      a reference to the specified dataset
 ///
 dataframe &src_problem::data(dataset_t t)
 {
-  return t == problem::training ? training_ : validation_;
+  return t == dataset_t::training ? training_ : validation_;
 }
 
 ///
@@ -429,23 +413,7 @@ dataframe &src_problem::data(dataset_t t)
 ///
 const dataframe &src_problem::data(dataset_t t) const
 {
-  return t == problem::training ? training_ : validation_;
-}
-
-///
-/// Asks if a dataset of a specific kind is available.
-///
-/// \param[in] d dataset type
-/// \return      `true` if dataset of type `d` is available
-///
-bool src_problem::has(dataset_t d) const
-{
-  switch (d)
-  {
-  case problem::training:    return problem::has(d);
-  case problem::validation:  return !validation_.empty();
-  default:                   return false;
-  }
+  return t == dataset_t::training ? training_ : validation_;
 }
 
 ///

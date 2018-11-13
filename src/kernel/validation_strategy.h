@@ -40,7 +40,7 @@ public:
   /// \return               `true` if some change in the training environment
   ///                       has occured
   ///
-  /// By default does nothing, signalling that anything is changed.
+  /// By default does nothing, signalling that nothing is changed.
   ///
   /// \note
   /// Called at the beginning of every generation (multiple times per run).

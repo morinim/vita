@@ -58,8 +58,7 @@ protected:
   bool save() const;
   virtual void tune_parameters();
 
-  model_measurements calculate_metrics(evaluator<T> &,
-                                       const summary<T> &) const;
+  model_measurements calculate_metrics(const summary<T> &) const;
 
   // Data members.
   std::unique_ptr<evaluator<T>> eva1_;  // fitness function for training
@@ -70,19 +69,23 @@ protected:
   problem &prob_;
 
 private:
-  /// Template method of the search::run() member function called exactly one
-  /// time just before the first run.
+  virtual void after_evolution(summary<T> *) {}
+  virtual model_measurements calculate_metrics_custom(const summary<T> &) const;
+
+  // For the search class validation is possible when the validation function
+  // is set. Derived classes could add further requirements.
+  virtual bool can_validate() const;
+
+  // Template method of the search::run() member function called exactly one
+  // time just before the first run.
   virtual void init() {}
 
-  virtual void after_evolution(summary<T> *) {}
-  virtual void print_resume(const model_measurements &) const;
-
   // Logs additional problem-specific data.
-  virtual void log_search_spec(tinyxml2::XMLDocument *,
-                               const summary<T> &) const
+  virtual void log_search_custom(tinyxml2::XMLDocument *,
+                                 const summary<T> &) const
   {}
 
-  virtual model_measurements calculate_metrics_spec(const summary<T> &) const;
+  virtual void print_resume(const model_measurements &) const;
 };
 
 #include "kernel/search.tcc"

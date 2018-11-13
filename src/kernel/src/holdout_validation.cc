@@ -22,8 +22,8 @@ namespace vita
 /// \param[in] prob current problem
 ///
 holdout_validation::holdout_validation(src_problem &prob)
-  : training_(prob.data(problem::training)),
-    validation_(prob.data(problem::validation)),
+  : training_(prob.data(dataset_t::training)),
+    validation_(prob.data(dataset_t::validation)),
     env_(prob.env)
 {
   // Here `!env_.validation_percentage.has_value()` could be true. Validation

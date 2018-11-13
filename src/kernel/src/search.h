@@ -71,18 +71,24 @@ protected:
 
 private:
   // *** Private support methods ***
-  dataframe &data() const;
-  dataframe &data(problem::dataset_t) const;
+  dataframe &training_data() const;
+  dataframe &test_data() const;
+  dataframe &validation_data() const;
   src_problem &prob() const;
   template<class E, class... Args> void set_evaluator(Args && ...);
   bool stop_condition(const summary<T> &) const;
 
-  // Template methods / customization points for search::run().
-  model_measurements calculate_metrics_spec(const summary<T> &) const override;
+  // *** Template methods / customization points for `search::run()` ***
   void after_evolution(summary<T> *) override;
+  model_measurements calculate_metrics_custom(
+    const summary<T> &) const override;
+
+  // Requires the availability of a validation function and of validation data.
+  bool can_validate() const override;
+
+  void log_search_custom(tinyxml2::XMLDocument *,
+                         const summary<T> &) const override;
   void print_resume(const model_measurements &) const override;
-  void log_search_spec(tinyxml2::XMLDocument *,
-                       const summary<T> &) const override;
 
   // *** Private data members ***
   // Preferred evaluator for symbolic regression.
