@@ -1,30 +1,30 @@
 [] Concise but complete summary
 
-#An awesome description describing WHY this work over HOW/WHAT it does.
+# An awesome description describing WHY this work over HOW/WHAT it does.
 
-# [Ticket #12]
+# Any references to tickets, articles...
+# Fixes [Ticket #12]
 
 # --- COMMIT END ---
 #--------------------------------------------------------------------------#
 #
-# 1. Summary and description should be wrapped to 76 characters. #-symbol
-#    above is a marker for that.
-# 2. Optionally, reference a ticket number.
+# - Capitalize the summary line.
+# - Do not end the summary line with a period.
+# - Summary is in 3rd person declarative / descriptive rather than 2nd
+#   person imperative / prescriptive.
+# - Summary and description should be wrapped to 76 characters. #-symbol
+#   above is a marker for that.
+# - Separate summary from body with a blank line.
 #
 # --------------------
 # Tag can be:
-# - [FIX] bug fix
-# - [ADD] new feature or extended functionality
-# - [DOC] for all kinds of documentation-only related commits
-# - [REF] refactoring that doesn't include any changes in features
-# - [FMT] formatting only (spacing...)
-# - [TEST] related to test code only
-# - [MAK] repository related changes (e.g. changes in the ignore list)
 #
-# --------------------
-# Remember to
-# - Capitalize the subject line
-# - Summary is in 3rd person declarative / descriptive rather than 2nd
-#   person imperative / prescriptive
-# - Do not end the subject line with a period
-# - Separate subject from body with a blank line
+# - [ADD] new feature or extended functionality
+# - [CHG] changes to code that do affect its behavior
+# - [DOC] for all kinds of documentation-only related commits
+# - [FIX] bug fix
+# - [FMT] formatting only (spacing...)
+# - [MAK] repository related changes (e.g. changes in the ignore list)
+# - [REF] restructuring code without changing its external behavior
+# - [TEST] related to test code only
+#
