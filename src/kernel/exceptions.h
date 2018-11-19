@@ -23,7 +23,7 @@ namespace vita
 ///
 /// There is a separate header because one can ignore custom exception types
 /// (since they are descendants of `std::exception`) in general case, but can
-/// alss explicitly include the header and deal with custom exceptions if
+/// also explicitly include the header and deal with custom exceptions if
 /// necessary.
 ///
 namespace exception
