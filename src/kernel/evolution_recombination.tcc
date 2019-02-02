@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -110,10 +110,10 @@ typename strategy<T>::offspring_t base<T>::run(
 }
 
 ///
-/// \param[in] parent a vector of ordered parents.
-/// \return the offspring.
-///
 /// This is strictly based on the DE crossover operator.
+///
+/// \param[in] parent a vector of ordered parents.
+/// \return           the offspring.
 ///
 template<class T>
 typename strategy<T>::offspring_t de<T>::run(

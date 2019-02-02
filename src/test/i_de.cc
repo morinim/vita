@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -115,7 +115,7 @@ TEST_CASE_FIXTURE(fixture5, "DE crossover")
 
     for (unsigned i(0); i < p.parameters(); ++i)
     {
-      const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
+      const auto delta(prob.env.de.weight.second * std::abs(a[i] - b[i]));
 
       CHECK(off[i] > p[i] - delta);
       CHECK(off[i] < p[i] + delta);
@@ -129,7 +129,7 @@ TEST_CASE_FIXTURE(fixture5, "DE crossover")
     CHECK(off.age() == std::max({p.age(), a.age(), b.age(), c.age()}));
     for (unsigned i(0); i < p.parameters(); ++i)
     {
-      const auto delta(prob.env.de.weight[1] * std::abs(a[i] - b[i]));
+      const auto delta(prob.env.de.weight.second * std::abs(a[i] - b[i]));
 
       if (!vita::almost_equal(p[i], off[i]))
       {

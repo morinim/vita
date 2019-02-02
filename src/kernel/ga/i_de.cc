@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -69,33 +69,34 @@ std::ostream &in_line(const i_de &de, std::ostream &s)
 }
 
 ///
-/// \brief Differential evolution crossover.
-/// \param[in] p crossover probability.
-/// \param[in] f scaling factor range (`environment.de.weight`).
-/// \param[in] a first parent.
-/// \param[in] b second parent.
-/// \param[in] c third parent (base vector).
-/// \return the offspring (trial vector).
+/// Differential evolution crossover.
+///
+/// \param[in] p crossover probability
+/// \param[in] f scaling factor range (`environment.de.weight`)
+/// \param[in] a first parent
+/// \param[in] b second parent
+/// \param[in] c third parent (base vector)
+/// \return      the offspring (trial vector)
 ///
 /// The offspring, also called trial vector, is generated as follows:
 ///
 ///     offspring = crossover(this, c + F * (a - b))
 ///
-/// first the search direction is defined by calculating a
-/// _difference vector_ between the pair of vectors `a` and `b` (usually
-/// choosen at random from the population). This difference vector is scaled by
-/// using the _scale factor_ `f`. This scaled difference vector is then added
-/// to a third vector `c`, called the _base vector_. As a result a new vector
-/// is obtained, known as the _mutant vector_. The mutant vector is recombined,
-/// based on a used defined parameter, called _crossover probability_, with the
-/// target vector `this` (also called _parent vector_).
+/// first the search direction is defined by calculating a *difference vector*
+/// between the pair of vectors `a` and `b` (usually choosen at random from the
+/// population). This difference vector is scaled by using the *scale factor*
+/// `f`. This scaled difference vector is then added to a third vector `c`,
+/// called the *base vector*. As a result a new vector is obtained, known as
+/// the *mutant vector*. The mutant vector is recombined, based on a used
+/// defined parameter, called *crossover probability*, with the target vector
+/// `this` (also called *parent vector*).
 ///
 /// This way no separate probability distribution has to be used which makes
 /// the scheme completely self-organizing.
 ///
 /// `a` and `b` are used for mutation, `this` and `c` for crossover.
 ///
-i_de i_de::crossover(double p, const double f[2],
+i_de i_de::crossover(double p, const range_t<double> &f,
                      const i_de &a, const i_de &b, const i_de &c) const
 {
   Expects(0.0 <= p && p <= 1.0);
@@ -108,10 +109,10 @@ i_de i_de::crossover(double p, const double f[2],
   Expects(ps == b.parameters());
   Expects(ps == c.parameters());
 
-  // The wighting factor is randomly selected from an interval for each
+  // The weighting factor is randomly selected from an interval for each
   // difference vector (a technique called dither). Dither improves convergence
   // behaviour significantly, especially for noisy objective functions.
-  const auto rf(random::between(f[0], f[1]));
+  const auto rf(random::in(f));
 
   i_de ret(c);
 

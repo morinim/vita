@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,15 +14,14 @@
 #define      VITA_GA_I_DE_H
 
 #include "kernel/individual.h"
+#include "kernel/range.h"
 
 namespace vita
 {
 ///
 /// An individual optimized for differential evolution.
 ///
-/// \see
-/// "Differential evolution" - Kenneth Price, Rainer Storn (DDJ #264 april
-/// 1997).
+/// \see https://github.com/morinim/vita/wiki/bibliography#10
 ///
 class i_de : public individual<i_de>
 {
@@ -33,7 +32,7 @@ public:
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
 
-  i_de crossover(double, const double [2],
+  i_de crossover(double, const range_t<double> &,
                  const i_de &, const i_de &, const i_de &) const;
 
   // Iterators.

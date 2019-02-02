@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,6 +20,7 @@
 
 #include "kernel/model_measurements.h"
 #include "kernel/log.h"
+#include "kernel/range.h"
 #include "kernel/symbol_set.h"
 #include "kernel/trilean.h"
 
@@ -305,7 +306,7 @@ public:
     /// interval [0.5, 1.0] randomly for each generation or for each
     /// difference vector, a technique called dither, improves convergence
     /// behaviour significantly, especially for noisy objective functions.
-    double weight[2] = {0.5, 1.0};
+    range_t<double> weight = {0.5, 1.0};
   } de;
 
   struct team_parameters
