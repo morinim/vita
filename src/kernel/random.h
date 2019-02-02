@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,23 +18,11 @@
 #include <set>
 
 #include "kernel/common.h"
+#include "kernel/range.h"
 #include "utility/xoshiro256ss.h"
 
 namespace vita
 {
-
-///
-/// Half closed interval.
-///
-/// `range{m, u}` specifies the half closed interval `[m; u[` (`m` is the
-/// minimum value, `u` an exclusive thight upper bound).
-///
-template<class T> using range_t = std::pair<T, T>;
-
-template<class T1, class T2>
-constexpr std::pair<T1, T2> range(T1 &&t, T2 &&u)
-{ return std::pair<T1, T2>(std::forward<T1>(t), std::forward<T2>(u)); }
-
 
 namespace random
 {
