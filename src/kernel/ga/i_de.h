@@ -64,14 +64,10 @@ public:
 
   i_de &operator=(const std::vector<double> &);
 
-  ///
-  /// \return `true` if the individual is empty, `false` otherwise.
-  ///
+  /// \return `true` if the individual is empty, `false` otherwise
   bool empty() const { return !parameters(); }
 
-  ///
-  /// \return the number of parameters stored in the individual.
-  ///
+  /// \return the number of parameters stored in the individual
   std::size_t parameters() const { return genome_.size(); }
 
   hash_t signature() const;
@@ -98,12 +94,12 @@ private:
 bool operator==(const i_de &, const i_de &);
 double distance(const i_de &, const i_de &);
 
-// Visualization/output methods.
+// Visualization/output functions.
 std::ostream &in_line(const i_de &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_de &);
 
 ///
-/// \return a const iterator pointing to the first individual of the team.
+/// \return a const iterator pointing to the first individual of the team
 ///
 inline i_de::const_iterator i_de::begin() const
 {
@@ -111,7 +107,7 @@ inline i_de::const_iterator i_de::begin() const
 }
 
 ///
-/// \return a const iterator pointing to a end-of-team sentry.
+/// \return a const iterator pointing to a end-of-team sentry
 ///
 inline i_de::const_iterator i_de::end() const
 {
@@ -119,7 +115,7 @@ inline i_de::const_iterator i_de::end() const
 }
 
 ///
-/// \return an iterator pointing to the first individual of the team.
+/// \return an iterator pointing to the first individual of the team
 ///
 inline i_de::iterator i_de::begin()
 {
@@ -127,7 +123,7 @@ inline i_de::iterator i_de::begin()
 }
 
 ///
-/// \return an iterator pointing to a end-of-team sentry.
+/// \return an iterator pointing to a end-of-team sentry
 ///
 inline i_de::iterator i_de::end()
 {

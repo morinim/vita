@@ -29,12 +29,13 @@ namespace vita
 i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
 {
   Expects(p.debug());
+  Expects(parameters());
 
-  const auto cs(parameters());
-  assert(cs);
-
-  for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(p.sset.roulette_terminal(c)).par;
+  std::generate(genome_.begin(), genome_.end(),
+                [&, n = 0]() mutable
+                {
+                  return gene(p.sset.roulette_terminal(n)).par;
+                });
 
   Ensures(debug());
 }
@@ -149,7 +150,7 @@ hash_t i_de::signature() const
 }
 
 ///
-/// \return the signature of this individual.
+/// \return the signature of this individual
 ///
 /// The signature is obtained performing *MurmurHash3* on the individual.
 ///
@@ -196,10 +197,10 @@ double distance(const i_de &lhs, const i_de &rhs)
 }
 
 ///
+/// Sets up the individual with values from a vector.
+///
 /// \param[in] v input vector (a point in a multidimensional space)
 /// \return      a reference to `*this`
-///
-/// Sets the individuals with values from `v`.
 ///
 i_de &i_de::operator=(const std::vector<double> &v)
 {
