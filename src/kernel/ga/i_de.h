@@ -72,8 +72,7 @@ public:
   ///
   /// \return the number of parameters stored in the individual.
   ///
-  unsigned parameters() const
-  { return static_cast<unsigned>(genome_.size()); }
+  std::size_t parameters() const { return genome_.size(); }
 
   hash_t signature() const;
 
@@ -84,7 +83,6 @@ public:
 private:
   // *** Private support methods ***
   hash_t hash() const;
-  void pack(std::vector<unsigned char> *const) const;
 
   // Serialization.
   bool load_impl(std::istream &, const problem &);

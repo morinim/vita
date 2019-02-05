@@ -18,10 +18,12 @@
 namespace vita
 {
 ///
-/// \param[in] p current problem.
+/// Constructs a new DE individual.
+///
+/// \param[in] p current problem
 ///
 /// The process that generates the initial, random expressions has to be
-/// implemented so as to ensure that they do not violate the type system's
+/// implemented so as to ensure that they don't violate the type system's
 /// constraints.
 ///
 i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
@@ -38,10 +40,13 @@ i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
 }
 
 ///
-/// \param[out] s output stream.
+/// Inserts into the output stream the graph representation of the individual.
 ///
-/// The output stream contains a graph, described in dot language
-/// (http://www.graphviz.org/), of this individual.
+/// \param[out] s output stream
+///
+/// \note
+/// The format used to describe the graph is the dot language
+/// (http://www.graphviz.org/).
 ///
 void i_de::graphviz(std::ostream &s) const
 {
@@ -131,9 +136,9 @@ i_de i_de::crossover(double p, const range_t<double> &f,
 }
 
 ///
-/// \return the signature of this individual.
+/// \return the signature of this individual
 ///
-/// Identical individuals at genotypic level have the same signature
+/// Identical individuals, at genotypic level, have the same signature
 ///
 hash_t i_de::signature() const
 {
@@ -146,45 +151,20 @@ hash_t i_de::signature() const
 ///
 /// \return the signature of this individual.
 ///
-/// Converts this individual in a packed byte level representation and performs
-/// the _MurmurHash3_ algorithm on it.
+/// The signature is obtained performing *MurmurHash3* on the individual.
 ///
 hash_t i_de::hash() const
 {
-  // From an individual to a packed byte stream...
-  thread_local std::vector<unsigned char> packed;
-
-  packed.clear();
-  pack(&packed);
-
-  /// ... and from a packed byte stream to a signature...
-
-  // Length in bytes.
-  const auto len(packed.size() * sizeof(packed[0]));  // length in bytes
-
-  return vita::hash::hash128(packed.data(), len);
+  const auto len(genome_.size() * sizeof(genome_[0]));
+  return vita::hash::hash128(genome_.data(), len);
 }
 
 ///
-/// \param[out] p byte stream compacted version of the gene sequence.
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// \return        `true` if the two individuals are equal
 ///
-void i_de::pack(std::vector<unsigned char> *const p) const
-{
-  for (const auto &v : genome_)
-  {
-    auto s(reinterpret_cast<const unsigned char *>(&v));
-    for (std::size_t i(0); i < sizeof(v); ++i)
-      p->push_back(s[i]);
-  }
-}
-
-///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparison.
-/// \return `true` if the two individuals are equal.
-///
-/// \note
-/// Age is not checked.
+/// \note Age is not checked.
 ///
 bool operator==(const i_de &lhs, const i_de &rhs)
 {
@@ -195,10 +175,10 @@ bool operator==(const i_de &lhs, const i_de &rhs)
 }
 
 ///
-/// \param[in] lhs first term of comparison.
-/// \param[in] rhs second term of comparsion.
-/// \return a numeric measurement of the difference between `lhs` and `rhs`
-///         (taxicab / L1 distance).
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparsion
+/// \return        a numeric measurement of the difference between `lhs` and
+///                `rhs` (taxicab / L1 distance)
 ///
 double distance(const i_de &lhs, const i_de &rhs)
 {
@@ -216,8 +196,8 @@ double distance(const i_de &lhs, const i_de &rhs)
 }
 
 ///
-/// \param[in] v input vector (a point in a multidimensional space).
-/// \return a reference to `*this`.
+/// \param[in] v input vector (a point in a multidimensional space)
+/// \return      a reference to `*this`
 ///
 /// Sets the individuals with values from `v`.
 ///
@@ -231,7 +211,7 @@ i_de &i_de::operator=(const std::vector<double> &v)
 }
 
 ///
-/// \return `true` if the individual passes the internal consistency check.
+/// \return `true` if the individual passes the internal consistency check
 ///
 bool i_de::debug() const
 {
@@ -262,8 +242,8 @@ bool i_de::debug() const
 }
 
 ///
-/// \param[in] in input stream.
-/// \return `true` if the object has been loaded correctly.
+/// \param[in] in input stream
+/// \return       `true` if the object has been loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current individual isn't
@@ -286,8 +266,8 @@ bool i_de::load_impl(std::istream &in, const problem &)
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if the object has been saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if the object has been saved correctly
 ///
 bool i_de::save_impl(std::ostream &out) const
 {
@@ -302,9 +282,9 @@ bool i_de::save_impl(std::ostream &out) const
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] ind individual to print.
-/// \return output stream including `ind`.
+/// \param[out] s  output stream
+/// \param[in] ind individual to print
+/// \return        output stream including `ind`
 ///
 /// \relates i_de
 ///
@@ -314,7 +294,7 @@ std::ostream &operator<<(std::ostream &s, const i_de &ind)
 }
 
 ///
-/// \return a vector of real values.
+/// \return a vector of real values
 ///
 /// This is sweet "syntactic sugar" to manage i_de individuals as real value
 /// vectors.

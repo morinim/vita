@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2017, 2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -94,7 +94,7 @@ inline std::uint64_t rotl64(std::uint64_t x, std::uint8_t r)
 class murmurhash3
 {
 public:
-  static hash_t hash128(void *const, std::size_t, std::uint32_t = 1973);
+  static hash_t hash128(const void *const, std::size_t, std::uint32_t = 1973);
 
 private:
   static std::uint64_t fmix(std::uint64_t);
@@ -110,7 +110,7 @@ private:
 /// \param[in] seed initialization seed
 /// \return         the signature of `data`
 ///
-inline hash_t murmurhash3::hash128(void *const data, std::size_t len,
+inline hash_t murmurhash3::hash128(const void *const data, std::size_t len,
                                    std::uint32_t seed)
 {
   const auto n_blocks(len / 16);  // block size is 128bit
