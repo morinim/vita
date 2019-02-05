@@ -99,7 +99,7 @@ std::ostream &in_line(const i_de &, std::ostream & = std::cout);
 std::ostream &operator<<(std::ostream &, const i_de &);
 
 ///
-/// \return a const iterator pointing to the first individual of the team
+/// \return a const iterator pointing to the first gene
 ///
 inline i_de::const_iterator i_de::begin() const
 {
@@ -107,7 +107,7 @@ inline i_de::const_iterator i_de::begin() const
 }
 
 ///
-/// \return a const iterator pointing to a end-of-team sentry
+/// \return a const iterator pointing to (one) past the last gene
 ///
 inline i_de::const_iterator i_de::end() const
 {
@@ -115,7 +115,7 @@ inline i_de::const_iterator i_de::end() const
 }
 
 ///
-/// \return an iterator pointing to the first individual of the team
+/// \return an iterator pointing to the first gene
 ///
 inline i_de::iterator i_de::begin()
 {
@@ -123,7 +123,7 @@ inline i_de::iterator i_de::begin()
 }
 
 ///
-/// \return an iterator pointing to a end-of-team sentry
+/// \return an iterator pointing to (one) past the last gene
 ///
 inline i_de::iterator i_de::end()
 {

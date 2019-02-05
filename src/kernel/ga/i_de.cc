@@ -18,7 +18,7 @@
 namespace vita
 {
 ///
-/// Constructs a new DE individual.
+/// Constructs a new, random DE individual.
 ///
 /// \param[in] p current problem
 ///
@@ -34,7 +34,7 @@ i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
   std::generate(genome_.begin(), genome_.end(),
                 [&, n = 0]() mutable
                 {
-                  return gene(p.sset.roulette_terminal(n)).par;
+                  return p.sset.roulette_terminal(n).init();
                 });
 
   Ensures(debug());
@@ -150,6 +150,8 @@ hash_t i_de::signature() const
 }
 
 ///
+/// Hashes the current individual.
+///
 /// \return the signature of this individual
 ///
 /// The signature is obtained performing *MurmurHash3* on the individual.
@@ -226,7 +228,7 @@ bool i_de::debug() const
 
     if (!signature_.empty())
     {
-      vitaERROR << "Empty individual must empty signature";
+      vitaERROR << "Empty individual must have empty signature";
       return false;
     }
 
