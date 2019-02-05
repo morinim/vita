@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,13 +75,12 @@ int main()
                                std::chrono::hours(0)).count()
             << '\n';
 
-  problem prob;
+  // A candidate solution is a sequence of `n_jobs` double in the
+  // `[-0.5, 23.5[` interval.
+  de_problem prob(n_jobs, {-0.5, 23.5});
+
   prob.env.individuals =  250;
   prob.env.generations = 2000;
-
-  // Problem's parameters.
-  for (unsigned i(0); i < n_jobs; ++i)
-    prob.sset.insert<ga::real>( range(-0.5, 23.5) );
 
   de_search<decltype(f)> search(prob, f);
 

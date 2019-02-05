@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,24 +29,7 @@ double distance(cell_coord c1, cell_coord c2)
          std::max(c1.second, c2.second) - std::min(c1.second, c2.second);
 }
 
-class direction : public vita::ga::integer
-{
-public:
-  enum cardinal_dir {north, south, west, east};
-
-  explicit direction() : vita::ga::integer({0, 4})  {}
-
-  std::string display(terminal::param_t v, format) const override
-  {
-    switch (static_cast<unsigned>(v))
-    {
-    case north: return "N";
-    case south: return "S";
-    case west:  return "W";
-    default:    return "E";
-    }
-  }
-};
+enum cardinal_dir {north, south, west, east};
 
 bool crossing(const maze &m, cell_coord pos)
 {
@@ -60,24 +43,23 @@ bool crossing(const maze &m, cell_coord pos)
   return n > 2;
 }
 
-cell_coord update_coord(const maze &m, cell_coord start,
-                        direction::cardinal_dir d)
+cell_coord update_coord(const maze &m, cell_coord start, cardinal_dir d)
 {
   auto to(start);
 
   switch(d)
   {
-  case direction::north:
+  case north:
     if (start.first > 0)
       --to.first;
     break;
 
-  case direction::south:
+  case south:
     if (start.first + 1 < m.size())
       ++to.first;
     break;
 
-  case direction::west:
+  case west:
     if (start.second > 0)
       --to.second;
     break;
@@ -99,7 +81,7 @@ std::vector<cell_coord> extract_path(const vita::i_ga &dirs, const maze &m,
 
   for (unsigned i(0); i < dirs.size() && now != goal; ++i)
   {
-    const auto dir(dirs[i].as<direction::cardinal_dir>());
+    const auto dir(dirs[i].as<cardinal_dir>());
     cell_coord prev;
     do
     {
@@ -182,12 +164,14 @@ int main()
     "     *       * * "
   };
 
-  problem prob;
+  const auto length(m.size() * m[0].size() / 2);
+
+  // A candidate solution is a sequence of `length` integers each representing
+  // a cardinal direction.
+  ga_problem prob(length, {0, 4});
+
   prob.env.individuals = 150;
   prob.env.generations =  20;
-
-  const auto length(m.size() * m[0].size() / 2);
-  prob.chromosome<direction>(length);
 
   auto f = [m, start, goal](const i_ga &x)
   {

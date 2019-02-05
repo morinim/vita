@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -110,18 +110,12 @@ int main()
 {
   using namespace vita;
 
-  problem prob;
+  // A candidate solution is a sequence of `np.blocks()` integers in the
+  // `[0, np.rows()[` interval.
+  ga_problem prob(np.blocks(), {0, np.rows()});
+
   prob.env.individuals = 30000;
   prob.env.generations =   500;
-
-  // Relative distance of a block from the first allowed position.
-  struct distance : public vita::ga::integer
-  {
-    distance() : vita::ga::integer({0, np.rows()}) {}
-  };
-
-  // Essentially a fixed lengh sequence of integers.
-  prob.chromosome<distance>(np.blocks());
 
   // The fitness function.
   auto f = [](const i_ga &x) -> fitness_t

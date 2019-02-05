@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,25 +16,20 @@
 
 #include "kernel/vita.h"
 
-const std::string GENESET =
+const std::string CHARSET =
   " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!";
-
-// Encodes a letter of the string to be guessed.
-class letter : public vita::ga::integer
-{
-public:
-  letter() : vita::ga::integer({0, GENESET.length()})  {}
-};
 
 int main()
 {
   using namespace vita;
 
-  problem prob;
-  prob.env.individuals = 300;
-
   const std::string target = "Hello World";
-  prob.chromosome<letter>(target.length());
+
+  // A solution of this problem is a fixed length (`target.length()`) string of
+  // characters in a given charset (`CHARSET`).
+  ga_problem prob(target.length(), {0, CHARSET.size()});
+
+  prob.env.individuals = 300;
 
   // The fitness function.
   auto f = [&target](const i_ga &x) -> fitness_t
@@ -42,7 +37,7 @@ int main()
     double found(0);
 
     for (std::size_t i = 0; i < target.length(); ++i)
-      if (target[i] == GENESET[x[i].as<int>()])
+      if (target[i] == CHARSET[x[i].as<int>()])
         ++found;
 
     return {found};
@@ -53,7 +48,7 @@ int main()
 
   std::cout << "\nBest result: ";
   for (auto gene : result.best.solution)
-    std::cout << GENESET[gene.as<int>()];
+    std::cout << CHARSET[gene.as<int>()];
 
   std::cout << " (fitness " << result.best.score.fitness << ")\n";
 }

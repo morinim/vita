@@ -49,13 +49,13 @@ public:
 
   operator std::vector<double>() const;
 
-  double operator[](unsigned i) const
+  double operator[](std::size_t i) const
   {
     Expects(i < parameters());
     return genome_[i];
   }
 
-  double &operator[](unsigned i)
+  double &operator[](std::size_t i)
   {
     Expects(i < parameters());
     signature_.clear();

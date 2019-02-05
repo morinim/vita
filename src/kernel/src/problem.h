@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,6 +34,12 @@ namespace vita
 /// simulation/dataset via the `select` function.
 enum class dataset_t {training = 0, validation, test};
 
+///
+/// Provides a GP-specific interface to the generic `problem` class.
+///
+/// The class is a facade that provides a simpler interface to represent
+/// symbolic regression / classification tasks.
+///
 class src_problem : public problem
 {
 public:

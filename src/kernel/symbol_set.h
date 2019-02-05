@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,6 +16,7 @@
 #include <string>
 
 #include "kernel/function.h"
+#include "kernel/range.h"
 #include "kernel/terminal.h"
 
 namespace vita
@@ -169,10 +170,13 @@ private:
 ///                 case of error)
 ///
 /// Insert a symbol in the symbol set without the user having to allocate
-/// memory. It doesn't completely replace the `insert(std::unique_ptr)`
-/// method (e.g. building from factory).
+/// memory.
 ///
-/// \note Assumes a standard frequency (`1.0`) for symbol `S`.
+/// \note
+/// Only partially replaces the `insert(std::unique_ptr)` method (e.g. building
+/// from factory).
+///
+/// \remark Assumes a standard frequency (`1.0`) for symbol `S`.
 ///
 template<class S, class ...Args> symbol *symbol_set::insert(Args &&... args)
 {

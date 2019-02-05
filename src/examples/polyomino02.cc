@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -211,14 +211,14 @@ int main()
 
   fill_piece_masks();
 
-  problem prob;
+  ga_problem prob;
   prob.env.individuals = 500;
   prob.env.generations = 20000;
 
   // The chromosome is a sequence of bounded integers (indices) used to access
   // the `piece_masks` data structure.
   for (const auto &piece : piece_masks)
-    prob.sset.insert<ga::integer>( range(0, piece.size()) );
+    prob.insert( range(0, piece.size()) );
 
   // The fitness function.
   auto f = [](const i_ga &ind) -> fitness_t

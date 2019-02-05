@@ -5,8 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- Simpler way to setup Genetic Algorithm / Differential Evolution tasks. We now have the `ga_problem` and `de_problem` *facades*. Their constructors cover the standard situation of a sequence of uniform parameters (possibly in distinct numeric intervals).
+
+  Examples are been rewritten to take advantage of the new classes.
+
 ### Removed
 - standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
+- `problem::chromosome` help function. It was a bit of a stretch, now instead of:
+
+  ```
+  class ad_hoc_integer_like_class { /* ... */ };
+
+  vita::problem prob;
+  prob.chromosome<ad_hoc_integer_like_class>(nr_of_parameters);
+  ```
+
+  you should write:
+
+  ```
+  vita::ga_problem prob(nr_of_parameters, {min, max});
+  ```
 
 ### Changed
 - **BREAKING CHANGE**. - Completely revised validation strategies. The `search`
@@ -37,7 +56,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
   Usually the initialization is only needed in debug code. The common approach is:
   - left parameters in the environment struct unitialized (auto-tune);
-  - leave to the search::run() function the task of identifying the
+  - leave to the `search::run()` function the task of identifying the
     "best" values.
 
 - **BREAKING CHANGE**. `dataframe::load...` renamed to `dataframe::read...` for uniformity with Pands' dataframe.

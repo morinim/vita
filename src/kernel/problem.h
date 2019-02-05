@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,27 +23,15 @@ namespace vita
 class problem
 {
 public:
-  explicit problem();
+  problem();
 
   virtual bool debug() const;
-
-  template<class T, class... Args> void chromosome(std::size_t, Args &&...);
 
   // What a horror! Public data members... please read the coding style
   // document for project Vita.
   environment env;
   symbol_set sset;
 };
-
-
-template<class T, class... Args>
-void problem::chromosome(std::size_t length, Args &&... args)
-{
-  Expects(sset.categories() == 0);
-
-  for (decltype(length) i(0); i < length; ++i)
-    sset.insert<T>(std::forward<Args>(args)...);
-}
 
 }  // namespace vita
 

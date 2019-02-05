@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@
 #define      VITA_GA_SEARCH_TCC
 
 ///
-/// Search class specialization for GAs.
+/// Search class specialization for GAs / DE.
 ///
 template<class T, template<class> class ES, class F>
 basic_ga_search<T, ES, F>::basic_ga_search(problem &pr, F f,

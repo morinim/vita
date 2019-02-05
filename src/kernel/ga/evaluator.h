@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017, 2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,4 +47,4 @@ template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);
 #include "kernel/ga/evaluator.tcc"
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,43 +29,25 @@ double distance(cell_coord c1, cell_coord c2)
          std::max(c1.second, c2.second) - std::min(c1.second, c2.second);
 }
 
-// Encodes the i-th move of a path.
-class move : public vita::ga::integer
-{
-public:
-  enum cardinal_dir {north, south, west, east};
+enum cardinal_dir {north, south, west, east};
 
-  move() : vita::ga::integer({0, 4})  {}
-
-  std::string display(terminal::param_t v, format) const override
-  {
-    switch (static_cast<unsigned>(v))
-    {
-    case north: return "N";
-    case south: return "S";
-    case west:  return "W";
-    default:    return "E";
-    }
-  }
-};
-
-cell_coord update_coord(const maze &m, cell_coord start, move::cardinal_dir d)
+cell_coord update_coord(const maze &m, cell_coord start, cardinal_dir d)
 {
   auto to(start);
 
   switch(d)
   {
-  case move::north:
+  case north:
     if (start.first > 0)
       --to.first;
     break;
 
-  case move::south:
+  case south:
     if (start.first + 1 < m.size())
       ++to.first;
     break;
 
-  case move::west:
+  case west:
     if (start.second > 0)
       --to.second;
     break;
@@ -85,7 +67,7 @@ std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const maze &m,
 
   unsigned step(0);
   for (; step < path.parameters() && now != goal; ++step)
-    now = update_coord(m, now, path[step].as<move::cardinal_dir>());
+    now = update_coord(m, now, path[step].as<cardinal_dir>());
 
   return {now, step};
 }
@@ -115,7 +97,7 @@ maze path_on_maze(const vita::i_ga &path, const maze &base,
   auto ret(base);
   auto now = start;
 
-  for (unsigned i(0); i < path.parameters(); ++i)
+  for (const auto &dir : path)
   {
     auto &c = ret[now.first][now.second];
 
@@ -129,7 +111,7 @@ maze path_on_maze(const vita::i_ga &path, const maze &base,
     else
       c = '.';
 
-    now = update_coord(base, now, path[i].as<move::cardinal_dir>());
+    now = update_coord(base, now, dir.as<cardinal_dir>());
   }
 
   return ret;
@@ -161,12 +143,14 @@ int main()
     "     *   "
   };
 
-  problem prob;
+  const auto length(m.size() * m[0].size());
+
+  // A candidate solution is a sequence of `length` integers each representing
+  // a cardinal direction.
+  ga_problem prob(length, {0, 4});
+
   prob.env.individuals = 150;
   prob.env.generations =  20;
-
-  const auto length(m.size() * m[0].size());
-  prob.chromosome<move>(length);
 
   // The fitness function.
   auto f = [m, start, goal](const i_ga &x)

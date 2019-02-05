@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@
 /// This is usually called for filling the patch section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(t.arity())
+basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(0)
 {
   init_if_parametric();
 }

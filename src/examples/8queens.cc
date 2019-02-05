@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,16 +17,11 @@
 
 const int NQUEENS(8);
 
-// Encodes the queen's placement (i.e. a gene in the chromosome).
-struct row : vita::ga::integer
-{
-  row() : vita::ga::integer({0, NQUEENS}) {}  // open range [0; NQUEENS[
-};
-
 int main()
 {
-  vita::problem prob;
-  prob.chromosome<row>(NQUEENS);
+  // A candidate solution is a sequence of `NQUEENS` integers in the
+  // `[0, NQUEENS[` interval.
+  vita::ga_problem prob(NQUEENS, {0, NQUEENS});
 
   // Fitness function.
   auto f = [](const vita::i_ga &x) -> vita::fitness_t

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,6 +14,7 @@
 #define      VITA_GA_SEARCH_H
 
 #include "kernel/ga/evaluator.h"
+#include "kernel/ga/problem.h"
 #include "kernel/search.h"
 
 namespace vita
