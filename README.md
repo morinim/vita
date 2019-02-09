@@ -1,4 +1,3 @@
-# [VITA][homepage] #
 [![Vita](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
 [![Version](https://img.shields.io/github/tag/morinim/vita.svg)][news]
 
@@ -24,6 +23,9 @@ It's suitable for classification, symbolic regression, content base image retrie
 This software was originally developed by [EOS][eos] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
 
 Although the core development team is still anchored at EOS, Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
+
+## Documentation ##
+There is a [comprehensive wiki][wiki]. You should probably start with the [tutorials][tutorials].
 
 ## Build requirements ##
 
@@ -57,10 +59,10 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
-  NEWS.md..................Don't let your friends dump git logs into NEWS
   CODE_OF_CONDUCT.md.......Standards for how to engage in this community
   CONTRIBUTING.md
   LICENSE
+  NEWS.md..................Don't let your friends dump git logs into NEWS
   README.md
   copyright
   contributors/
@@ -107,9 +109,6 @@ All the output files will be stored in subdirectories of `build/` (out of source
 
 Windows may need various expedients about which you can read in the [Windows walkthrough][windows].
 
-## Documentation ##
-There is a [comprehensive wiki][wiki].
-
 ## License ##
 [Mozilla Public License v2.0][mpl2] (also available in the accompanying [LICENSE][license] file).
 
@@ -127,6 +126,7 @@ There is a [comprehensive wiki][wiki].
 [news]: https://github.com/morinim/vita/blob/master/NEWS.md
 [python]: http://www.python.org/
 [travis]: https://travis-ci.org/morinim/vita
+[tutorials]: https://github.com/morinim/vita/wiki/tutorials
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
 [wiki]: https://github.com/morinim/vita/wiki
 [windows]: https://github.com/morinim/vita/wiki/win_build
