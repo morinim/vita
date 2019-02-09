@@ -41,8 +41,6 @@ public:
   iterator begin();
   iterator end();
 
-  operator std::vector<value_type>() const;
-
   value_type operator[](std::size_t i) const
   {
     Expects(i < parameters());
@@ -56,6 +54,7 @@ public:
     return genome_[i];
   }
 
+  operator std::vector<value_type>() const;
   i_de &operator=(const std::vector<value_type> &);
 
   i_de crossover(double, const range_t<double> &,

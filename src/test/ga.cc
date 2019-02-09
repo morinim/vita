@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,12 +15,11 @@
 
 #include "kernel/ga/evaluator.h"
 #include "kernel/ga/i_ga.h"
-#include "kernel/ga/interpreter.h"
 #include "kernel/ga/search.h"
 #include "kernel/evolution.h"
 #include "kernel/problem.h"
 
-#include "test/fixture5.h"
+#include "test/fixture6.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"
@@ -28,7 +27,7 @@
 TEST_SUITE("GA")
 {
 
-TEST_CASE_FIXTURE(fixture5, "Evolution")
+TEST_CASE_FIXTURE(fixture6, "Evolution")
 {
   prob.env.individuals = 100;
 
@@ -38,9 +37,9 @@ TEST_CASE_FIXTURE(fixture5, "Evolution")
              [](const vita::i_ga &v)
              {
                return std::accumulate(v.begin(), v.end(), 0.0,
-                                      [](double sum, const vita::gene &g)
+                                      [](double sum, auto g)
                                       {
-                                        return sum + g.par;
+                                        return sum + g;
                                       });
              }));
 
@@ -49,20 +48,20 @@ TEST_CASE_FIXTURE(fixture5, "Evolution")
 
   const auto s1(evo1.run(1));
 
-  CHECK(s1.best.solution[0].par >    8.0);
-  CHECK(s1.best.solution[1].par >   95.0);
-  CHECK(s1.best.solution[2].par >  950.0);
-  CHECK(s1.best.solution[3].par > 9950.0);
+  CHECK(s1.best.solution[0] >    8);
+  CHECK(s1.best.solution[1] >   95);
+  CHECK(s1.best.solution[2] >  950);
+  CHECK(s1.best.solution[3] > 9950);
 
   vita::evolution<vita::i_ga, vita::std_es> evo2(prob, eva);
   CHECK(evo2.debug());
 
   const auto s2(evo2.run(1));
 
-  CHECK(s2.best.solution[0].par >    8.0);
-  CHECK(s2.best.solution[1].par >   95.0);
-  CHECK(s2.best.solution[2].par >  950.0);
-  CHECK(s2.best.solution[3].par > 9950.0);
+  CHECK(s2.best.solution[0] >    8);
+  CHECK(s2.best.solution[1] >   95);
+  CHECK(s2.best.solution[2] >  950);
+  CHECK(s2.best.solution[3] > 9950);
 }
 
 }  // TEST_SUITE("GA")

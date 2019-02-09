@@ -11,10 +11,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   Examples are been rewritten to take advantage of the new classes.
 
 ### Removed
-- standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 - `problem::chromosome` help function. It was a bit of a stretch, now instead of:
 
-  ```
+  ```C++
   class ad_hoc_integer_like_class { /* ... */ };
 
   vita::problem prob;
@@ -23,12 +22,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
   you should write:
 
-  ```
+  ```C++
   vita::ga_problem prob(nr_of_parameters, {min, max});
   ```
+- standalone Makefile-based build system. Now the only supported build system is CMake. This greatly simplify multi-platform testing and documentation.
 
 ### Changed
-- **BREAKING CHANGE**. - Completely revised validation strategies. The `search`
+- **BREAKING CHANGE**. GA-individuals match integer vectors. This allow a faster management, a simpler access to the genome and simpler code.
+
+  Where we wrote:
+
+  ```C++
+  genome[i].as<int>()
+  ```
+
+  we now have:
+
+  ```C++
+  genome[i]
+  ```
+
+- **BREAKING CHANGE**. Completely revised validation strategies. The `search`
   class now allows specifying two evaluation (a.k.a fitness) functions via the
   `set_training_evaluator` and `set_validation_evaluator` methods.
 
@@ -43,13 +57,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
   So, instead of:
 
-  ```
+  ```C++
   environment e(initialization::standard);
   ```
 
   you should write:
 
-  ```
+  ```C++
   environment e;
   e.init();  // initialization
   ```
@@ -75,15 +89,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   ```
 
   use:
-
   ```C++
+  // problem prob;
   for (unsigned i(0); i < n_jobs; ++i)
     prob.sset.insert<ga::real>( range(-0.5, 23.5) );
   ```
 
+  or equivalently:
+  ```C++
+  // de_problem prob;
+  for (unsigned i(0); i < n_jobs; ++i)
+    prob.insert( range(-0.5, 23.5) );
+  ```
+
+  or, even better:
+  ```C++
+  de_problem prob(n_jobs, {-0.5, 23.5});
+  ```
+
   Note that:
-  - you can omit the parameter index;
+  - the parameter index doesn't appear anymore;
   - the range is clearly stated.
+
+  The same approach applies to GAs.
 
   The `ga::parameter` help function has been removed.
 

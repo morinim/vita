@@ -30,11 +30,11 @@ int main()
 
     for (int queen(0); queen < NQUEENS - 1; ++queen)
     {
-      const int row(x[queen].as<int>());
+      const int row(x[queen]);
 
       for (int i(queen + 1); i < NQUEENS; ++i)
       {
-        const int other_row(x[i].as<int>());
+        const int other_row(x[i]);
 
         if (other_row == row                            // same row
             || std::abs(other_row - row) == i - queen)  // or diagonal
@@ -52,7 +52,7 @@ int main()
   // Prints result.
   std::cout << "\nBest result: [";
   for (auto gene : result.best.solution)
-    std::cout << " " << gene.as<int>();
+    std::cout << " " << gene;
 
   std::cout << " ]   (fitness " << result.best.score.fitness << ")\n";
 }

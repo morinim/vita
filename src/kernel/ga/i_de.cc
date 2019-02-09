@@ -164,21 +164,6 @@ hash_t i_de::hash() const
 
 ///
 /// \param[in] lhs first term of comparison
-/// \param[in] rhs second term of comparison
-/// \return        `true` if the two individuals are equal
-///
-/// \note Age is not checked.
-///
-bool operator==(const i_de &lhs, const i_de &rhs)
-{
-  const bool eq(std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
-
-  Ensures((lhs.signature() == rhs.signature()) == eq);
-  return eq;
-}
-
-///
-/// \param[in] lhs first term of comparison
 /// \param[in] rhs second term of comparsion
 /// \return        a numeric measurement of the difference between `lhs` and
 ///                `rhs` (taxicab / L1 distance)
@@ -297,14 +282,29 @@ std::ostream &operator<<(std::ostream &s, const i_de &ind)
 }
 
 ///
-/// \return a vector of real values
-///
 /// This is sweet "syntactic sugar" to manage i_de individuals as real value
 /// vectors.
 ///
-i_de::operator std::vector<i_de::value_type>() const
+/// \return a vector of real values
+///
+i_de::operator std::vector<value_type>() const
 {
   return genome_;
+}
+
+///
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// \return        `true` if the two individuals are equal
+///
+/// \note Age is not checked.
+///
+bool operator==(const i_de &lhs, const i_de &rhs)
+{
+  const bool eq(std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+
+  Ensures((lhs.signature() == rhs.signature()) == eq);
+  return eq;
 }
 
 }  // namespace vita

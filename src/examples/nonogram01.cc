@@ -60,7 +60,7 @@ struct nonogram_problem
         // Number of allowed positions for the current block.
         auto allowed(col_size - reserved - start - block_size + 1);
         // Starting position of the current block.
-        auto placed(start + x[index].as<int>() % allowed);
+        auto placed(start + x[index] % allowed);
 
         for (unsigned i(0); i < block_size; ++i)
           ret(placed + i, col) = true;

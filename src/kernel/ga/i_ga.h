@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,8 +18,9 @@
 
 namespace vita
 {
+
 ///
-/// An individual optimized for standard genetic algorithms.
+/// An GA-individual optimized for combinatorial optimization.
 ///
 class i_ga : public individual<i_ga>
 {
@@ -27,17 +28,11 @@ public:
   i_ga() = default;
   explicit i_ga(const problem &);
 
-  // Visualization/output methods.
-  void graphviz(std::ostream &) const;
-
-  // Recombination operators.
-  unsigned mutation(double, const problem &);
-
   // Iterators.
-  using genome_t = std::vector<gene>;
+  using genome_t       = std::vector<int>;
   using const_iterator = genome_t::const_iterator;
-  using iterator = genome_t::iterator;
-  using value_type = genome_t::value_type;
+  using iterator       = genome_t::iterator;
+  using value_type     = genome_t::value_type;
 
   const_iterator begin() const;
   const_iterator end() const;
@@ -45,25 +40,24 @@ public:
   iterator begin();
   iterator end();
 
-  const gene &operator[](const locus &l) const
-  {
-    Expects(l.index == 0);
-    Expects(l.category < parameters());
-    return genome_[l.category];
-  }
-
-  const gene &operator[](unsigned i) const
+  value_type operator[](std::size_t i) const
   {
     Expects(i < parameters());
     return genome_[i];
   }
 
-  gene &operator[](unsigned i)
+  value_type &operator[](std::size_t i)
   {
     Expects(i < parameters());
     signature_.clear();
     return genome_[i];
   }
+
+  operator std::vector<value_type>() const;
+  i_ga &operator=(const std::vector<value_type> &);
+
+  // Recombination operators.
+  unsigned mutation(double, const problem &);
 
   ///
   /// \return `true` if the individual is empty, `false` otherwise
@@ -89,6 +83,9 @@ public:
   bool operator==(const i_ga &) const;
   unsigned distance(const i_ga &) const;
 
+  // Visualization/output methods.
+  void graphviz(std::ostream &) const;
+
   bool debug() const;
 
   friend class individual<i_ga>;
@@ -97,7 +94,6 @@ public:
 private:
   // *** Private support methods ***
   hash_t hash() const;
-  void pack(std::vector<unsigned char> *const) const;
 
   // Serialization.
   bool load_impl(std::istream &, const problem &);

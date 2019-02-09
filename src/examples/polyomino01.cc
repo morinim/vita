@@ -180,7 +180,7 @@ int main()
     shape board(board_height, board_width);
 
     for (std::size_t i(0); i < ind.size(); ++i)
-      board += piece_masks[i][ind[i].as<int>()];
+      board += piece_masks[i][ind[i]];
 
     // Number of non-empty squares.
     double filled(std::count_if(board.begin(), board.end(),
@@ -198,6 +198,6 @@ int main()
 
   shape board(board_height, board_width);
   for (std::size_t i(0); i < result.best.solution.size(); ++i)
-    board += piece_masks[i][result.best.solution[i].as<int>()];
+    board += piece_masks[i][result.best.solution[i]];
   print_board(board);
 }

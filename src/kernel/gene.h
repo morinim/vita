@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -40,9 +40,6 @@ public:
 
   locus arg_locus(unsigned) const;
 
-  template<class T> T as() const;
-  template<class T> void operator=(T);
-
   // Types and constants.
   using packed_index_t = std::uint16_t;
   using arg_pack = small_vector<packed_index_t, K>;
@@ -55,13 +52,6 @@ public:
   arg_pack         args;
 
 private:
-  template<bool, bool> struct param_t;
-  using arithmetic_p = param_t<1, 0>;
-  using enum_p       = param_t<0, 1>;
-
-  template<class T> void copy_param(T, arithmetic_p);
-  template<class T> void copy_param(T, enum_p);
-
   void init_if_parametric();
 };
 

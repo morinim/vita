@@ -227,7 +227,7 @@ int main()
 
     for (std::size_t i(0); i < ind.size(); ++i)
     {
-      const auto mask(piece_masks[i][ind[i].as<int>()]);
+      const auto mask(piece_masks[i][ind[i]]);
 
       if (!crash(board, mask))
         board += mask;
@@ -251,6 +251,6 @@ int main()
 
   shape board(board_height, board_width);
   for (std::size_t i(0); i < result.best.solution.size(); ++i)
-    board += piece_masks[i][result.best.solution[i].as<int>()];
+    board += piece_masks[i][result.best.solution[i]];
   print_board(board);
 }

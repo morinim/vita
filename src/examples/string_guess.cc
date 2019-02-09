@@ -16,39 +16,36 @@
 
 #include "kernel/vita.h"
 
+const std::string target = "Hello World";
 const std::string CHARSET =
   " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!";
 
+// The fitness function.
+vita::fitness_t f(const vita::i_ga &x)
+{
+  double found(0);
+
+  for (std::size_t i = 0; i < target.length(); ++i)
+    if (target[i] == CHARSET[x[i]])
+      ++found;
+
+  return {found};
+}
+
 int main()
 {
-  using namespace vita;
-
-  const std::string target = "Hello World";
-
   // A solution of this problem is a fixed length (`target.length()`) string of
   // characters in a given charset (`CHARSET`).
-  ga_problem prob(target.length(), {0, CHARSET.size()});
+  vita::ga_problem prob(target.length(), {0, CHARSET.size()});
 
   prob.env.individuals = 300;
 
-  // The fitness function.
-  auto f = [&target](const i_ga &x) -> fitness_t
-  {
-    double found(0);
-
-    for (std::size_t i = 0; i < target.length(); ++i)
-      if (target[i] == CHARSET[x[i].as<int>()])
-        ++found;
-
-    return {found};
-  };
-
-  ga_search<decltype(f)> search(prob, f);
+  vita::ga_search<decltype(f)> search(prob, f);
   auto result = search.run();
 
   std::cout << "\nBest result: ";
   for (auto gene : result.best.solution)
-    std::cout << CHARSET[gene.as<int>()];
+    std::cout << CHARSET[gene];
 
   std::cout << " (fitness " << result.best.score.fitness << ")\n";
 }

@@ -31,8 +31,9 @@ double distance(cell_coord c1, cell_coord c2)
 
 enum cardinal_dir {north, south, west, east};
 
-cell_coord update_coord(const maze &m, cell_coord start, cardinal_dir d)
+cell_coord update_coord(const maze &m, cell_coord start, int d)
 {
+  Expects(d == north || d == south || dir == west || dir == east);
   auto to(start);
 
   switch(d)
@@ -67,7 +68,7 @@ std::pair<cell_coord, unsigned> run(const vita::i_ga &path, const maze &m,
 
   unsigned step(0);
   for (; step < path.parameters() && now != goal; ++step)
-    now = update_coord(m, now, path[step].as<cardinal_dir>());
+    now = update_coord(m, now, path[step]);
 
   return {now, step};
 }
@@ -111,7 +112,7 @@ maze path_on_maze(const vita::i_ga &path, const maze &base,
     else
       c = '.';
 
-    now = update_coord(base, now, dir.as<cardinal_dir>());
+    now = update_coord(base, now, dir);
   }
 
   return ret;

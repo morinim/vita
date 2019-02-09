@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,7 +17,6 @@
 
 #include "kernel/random.h"
 #include "kernel/terminal.h"
-#include "kernel/ga/interpreter.h"
 
 namespace vita
 {
@@ -55,11 +54,10 @@ public:
   /// The general idea follows:
   /// - **the problem can be tackled with a standard, uniform chromosome**
   ///   (every locus contain the same kind of gene). In this case the user
-  ///   simply calls the `problem::chromosome` specifying the length of the
-  ///   chromosome and the type of the genes;
+  ///   simply calls the `ga_problem`/`de_problem` constructor specifying the
+  ///   length of the chromosome;
   /// - **the problem requires a more complex structure**. The user specifies a
-  ///   (possibly) different gene type for every locus (he has to use an
-  ///   explicit value for `i`).
+  ///   (possibly) different type for every locus.
   ///
   explicit number(const std::string &name, range_t<T> r, category_t i)
     : terminal(name, i), range_(r)
@@ -74,35 +72,10 @@ public:
   std::string display(terminal::param_t v, format) const override
   { return std::to_string(static_cast<T>(v)); }
 
-  /// \warning
-  /// This works but isn't very useful. i_ga / ga_evaluator classes directly
-  /// access the value of a real object.
-  any eval(core_interpreter *i) const override
-  {
-    return any(fetch_param(i));
-  }
-
-  double penalty_nvi(core_interpreter *i) const override
-  {
-    const auto v(fetch_param(i));
-
-    if (std::isnan(v))
-      return std::numeric_limits<double>::max();
-
-    if (v < range_.first)
-      return range_.first - v;
-
-    if (v >= range_.second)
-      return v - range_.second;
-
-    return 0.0;
-  }
-
 private:
-  auto fetch_param(core_interpreter *i) const
-  {
-    return static_cast<interpreter<i_ga> *>(i)->fetch_param(category());
-  }
+  /// \warning
+  /// i_ga / i_de directly access the genome vector.
+  any eval(core_interpreter *) const override { return {}; }
 
   const range_t<T> range_;
 };

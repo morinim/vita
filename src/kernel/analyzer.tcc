@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -279,6 +279,16 @@ unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
 ///
 template<>
 inline unsigned analyzer<i_de>::count(const i_de &ind)
+{
+  return ind.parameters();
+}
+
+///
+/// \param[in] ind individual to be analyzed
+/// \return        effective length of individual we gathered statistics about
+///
+template<>
+inline unsigned analyzer<i_ga>::count(const i_ga &ind)
 {
   return ind.parameters();
 }

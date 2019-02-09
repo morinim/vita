@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,7 @@
 
 #include "kernel/ga/i_ga.h"
 
-#include "test/fixture5.h"
+#include "test/fixture6.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"
@@ -23,21 +23,25 @@
 TEST_SUITE("I_GA")
 {
 
-TEST_CASE_FIXTURE(fixture5, "Random creation")
+TEST_CASE_FIXTURE(fixture6, "Random creation")
 {
   for (unsigned i(0); i < 1000; ++i)
   {
     vita::i_ga ind(prob);
-    vita::interpreter<vita::i_ga> check(&ind);
 
     CHECK(ind.debug());
     CHECK(ind.parameters() == prob.sset.categories());
     CHECK(ind.age() == 0);
-    CHECK(check.penalty() == doctest::Approx(0.0));
+
+    for (std::size_t j(0); j < ind.parameters(); ++j)
+    {
+      CHECK(ranges[j].first <= ind[j]);
+      CHECK(ind[j] < ranges[j].second);
+    }
   }
 }
 
-TEST_CASE_FIXTURE(fixture5, "Empty individual")
+TEST_CASE_FIXTURE(fixture6, "Empty individual")
 {
   vita::i_ga ind;
 
@@ -45,45 +49,7 @@ TEST_CASE_FIXTURE(fixture5, "Empty individual")
   CHECK(ind.empty());
 }
 
-
-TEST_CASE_FIXTURE(fixture5, "Penalty")
-{
-  for (unsigned i(0); i < 100; ++i)
-  {
-    vita::i_ga ind(prob);
-    vita::interpreter<vita::i_ga> check(&ind);
-
-    CHECK(check.penalty() == doctest::Approx(0.0));
-
-    ind[0].par = 20.0;
-    const auto p1(check.penalty());
-    CHECK(p1 > 0.0);
-
-    ind[0].par = -20.0;
-    const auto p1n(check.penalty());
-    CHECK(p1 == doctest::Approx(p1n));
-
-    ind[1].par = 200.0;
-    const auto p2(check.penalty());
-    CHECK(p2 > p1);
-
-    ind[1].par = -200.0;
-    const auto p2n(check.penalty());
-    CHECK(p2 > p1);
-    CHECK(p2 == doctest::Approx(p2n));
-
-    ind[2].par = 2000.0;
-    const auto p3(check.penalty());
-    CHECK(p3 > p2);
-
-    ind[2].par = -2000.0;
-    const auto p3n(check.penalty());
-    CHECK(p3n > p2);
-    CHECK(p3 == doctest::Approx(p3n));
-  }
-}
-
-TEST_CASE_FIXTURE(fixture5, "Mutation")
+TEST_CASE_FIXTURE(fixture6, "Mutation")
 {
   vita::i_ga t(prob);
   const vita::i_ga orig(t);
@@ -113,7 +79,7 @@ TEST_CASE_FIXTURE(fixture5, "Mutation")
   CHECK(perc < 53.0);
 }
 
-TEST_CASE_FIXTURE(fixture5, "Comparison")
+TEST_CASE_FIXTURE(fixture6, "Comparison")
 {
   for (unsigned i(0); i < 2000; ++i)
   {
@@ -136,7 +102,7 @@ TEST_CASE_FIXTURE(fixture5, "Comparison")
   }
 }
 
-TEST_CASE_FIXTURE(fixture5, "Iterators")
+TEST_CASE_FIXTURE(fixture6, "Iterators")
 {
   for (unsigned j(0); j < 1000; ++j)
   {
@@ -151,11 +117,10 @@ TEST_CASE_FIXTURE(fixture5, "Iterators")
   }
 }
 
-TEST_CASE_FIXTURE(fixture5, "Standard crossover")
+TEST_CASE_FIXTURE(fixture6, "Standard crossover")
 {
   vita::i_ga i1(prob), i2(prob);
 
-  double dist(0.0);
   const unsigned n(1000);
   for (unsigned j(0); j < n; ++j)
   {
@@ -168,16 +133,23 @@ TEST_CASE_FIXTURE(fixture5, "Standard crossover")
     CHECK(ic.debug());
     CHECK(ic.age() == std::max(i1.age(), i2.age()));
 
-    dist += i1.distance(ic);
-  }
+    const auto d1(i1.distance(ic));
+    CHECK(0 <= d1);
+    CHECK(d1 <= i1.parameters());
 
-  // +1 since we have at least one gene involved in crossover.
-  const double perc(100.0 * dist / ((prob.sset.categories() + 1) * n));
-  CHECK(perc > 48.0);
-  CHECK(perc < 52.0);
+    const auto d2(i2.distance(ic));
+    CHECK(0 <= d2);
+    CHECK(d1 <= i2.parameters());
+
+    for (std::size_t k(0); k < ic.size(); ++k)
+    {
+      const bool from_1_or_2(ic[k] == i1[k] || ic[k] == i2[k]);
+      CHECK(from_1_or_2);
+    }
+  }
 }
 
-TEST_CASE_FIXTURE(fixture5, "Serialization")
+TEST_CASE_FIXTURE(fixture6, "Serialization")
 {
   // Non-empty i_ga serialization.
   for (unsigned i(0); i < 2000; ++i)

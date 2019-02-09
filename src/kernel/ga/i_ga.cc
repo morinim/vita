@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,7 +17,7 @@
 namespace vita
 {
 ///
-/// Sets up the initial random population.
+/// Constructs a new, random GA individual.
 ///
 /// \param[in] p current problem
 ///
@@ -28,12 +28,13 @@ namespace vita
 i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
 {
   Expects(p.debug());
+  Expects(parameters());
 
-  const auto cs(parameters());
-  assert(cs);
-
-  for (auto c(decltype(cs){0}); c < cs; ++c)
-    genome_[c] = gene(p.sset.roulette_terminal(c));
+  std::generate(genome_.begin(), genome_.end(),
+                [&, n = 0]() mutable
+                {
+                  return p.sset.roulette_terminal(n++).init();
+                });
 
   Ensures(debug());
 }
@@ -67,7 +68,7 @@ void i_ga::graphviz(std::ostream &s) const
 ///
 std::ostream &in_line(const i_ga &ga, std::ostream &s)
 {
-  std::copy(ga.begin(), ga.end(), infix_iterator<gene>(s, " "));
+  std::copy(ga.begin(), ga.end(), infix_iterator<i_ga::value_type>(s, " "));
   return s;
 }
 
@@ -91,7 +92,7 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
   for (category_t c(0); c < ps; ++c)
     if (random::boolean(pgm))
     {
-      const gene g(prb.sset.roulette_terminal(c));
+      const i_ga::value_type g(prb.sset.roulette_terminal(c).init());
 
       if (g != genome_[c])
       {
@@ -100,14 +101,6 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
       }
     }
 
-  // Here we assume that a micromutation of a terminal isn't significative.
-  // It can happen (the probability is very very low but...) that
-  //
-  // {1.0, 0, 0} --MUTATION--> {0.999999999999999999999999999999999999, 0, 0}
-  //
-  // The individuals are considered equal (the comparison between parametric
-  // terminals are based on the `almost_equal` function) so this doesn't count
-  // as mutation.
   if (n)
     signature_ = hash();
 
@@ -179,51 +172,9 @@ hash_t i_ga::signature() const
 ///
 hash_t i_ga::hash() const
 {
-  // From an individual to a packed byte stream...
-  thread_local std::vector<unsigned char> packed;
-
-  packed.clear();
-  pack(&packed);
-
-  /// ... and from a packed byte stream to a signature...
-
   // Length in bytes.
-  const auto len(packed.size() * sizeof(packed[0]));  // length in bytes
-
-  return vita::hash::hash128(packed.data(), len);
-}
-
-///
-/// \param[out] p byte stream compacted version of the gene sequence
-///
-void i_ga::pack(std::vector<unsigned char> *const p) const
-{
-  for (const auto &g : genome_)
-  {
-    // Although 16 bit are enough to contain opcodes and parameters, they are
-    // usually stored in unsigned variables (i.e. 32 or 64 bit) for
-    // performance reasons.
-    // Anyway before hashing opcodes/parameters we convert them to 16 bit
-    // types to avoid hashing more than necessary.
-    const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
-    assert(g.sym->opcode() <= std::numeric_limits<opcode_t>::max());
-
-    // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
-    // std::uint8_t has the exact same size and representation as
-    // unsigned char, if the implementation made it a distinct, non-character
-    // type, the aliasing rules would not apply to it
-    // (see http://stackoverflow.com/q/16138237/3235496)
-    const auto *const s1 = reinterpret_cast<const unsigned char *>(&opcode);
-    for (std::size_t i(0); i < sizeof(opcode); ++i)
-      p->push_back(s1[i]);
-
-    assert(terminal::cast(g.sym)->parametric());
-    const auto param(g.par);
-
-    auto s2 = reinterpret_cast<const unsigned char *>(&param);
-    for (std::size_t i(0); i < sizeof(param); ++i)
-      p->push_back(s2[i]);
-  }
+  const auto len(genome_.size() * sizeof(genome_[0]));  // length in bytes
+  return vita::hash::hash128(genome_.data(), len);
 }
 
 ///
@@ -282,31 +233,6 @@ bool i_ga::debug() const
     return true;
   }
 
-  const auto ps(parameters());
-
-  for (auto i(decltype(ps){0}); i < ps; ++i)
-  {
-    if (!genome_[i].sym)
-    {
-      vitaERROR << "Empty symbol pointer at position " << i;
-      return false;
-    }
-
-    if (!genome_[i].sym->terminal())
-    {
-      vitaERROR << "Not-terminal symbol at position " << i;
-      return false;
-    }
-
-    if (genome_[i].sym->category() != i)
-    {
-      vitaERROR << "Wrong category: " << genome_[i].sym->name() << i
-                << " -> " << genome_[i].sym->category()
-                << " should be " << i;
-      return false;
-    }
-  }
-
   if (!signature_.empty() && signature_ != hash())
   {
     vitaERROR << "Wrong signature: " << signature_ << " should be " << hash();
@@ -318,14 +244,13 @@ bool i_ga::debug() const
 
 ///
 /// \param[in] in input stream
-/// \param[in] p  the current problem
 /// \return       `true` if the object has been loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_ga::load_impl(std::istream &in, const problem &p)
+bool i_ga::load_impl(std::istream &in, const problem &)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
@@ -333,21 +258,8 @@ bool i_ga::load_impl(std::istream &in, const problem &p)
 
   decltype(genome_) v(sz);
   for (auto &g : v)
-  {
-    opcode_t opcode;
-    if (!(in >> opcode))
+    if (!(in >> g))
       return false;
-
-    gene temp;
-    temp.sym = p.sset.decode(opcode);
-    if (!temp.sym)
-      return false;
-
-    if (!(in >> temp.par))
-      return false;
-
-    g = temp;
-  }
 
   genome_ = v;
 
@@ -362,7 +274,7 @@ bool i_ga::save_impl(std::ostream &out) const
 {
   out << parameters() << '\n';
   for (const auto &g : genome_)
-    out << g.sym->opcode() << ' ' << g.par << '\n';
+    out << g << '\n';
 
   return out.good();
 }
@@ -377,6 +289,32 @@ bool i_ga::save_impl(std::ostream &out) const
 std::ostream &operator<<(std::ostream &s, const i_ga &ind)
 {
   return in_line(ind, s);
+}
+
+///
+/// This is sweet "syntactic sugar" to manage i_ga individuals as integer value
+/// vectors.
+///
+/// \return a vector of integer values
+///
+i_ga::operator std::vector<value_type>() const
+{
+  return genome_;
+}
+
+///
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// \return        `true` if the two individuals are equal
+///
+/// \note Age is not checked.
+///
+bool operator==(const i_ga &lhs, const i_ga &rhs)
+{
+  const bool eq(std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+
+  Ensures((lhs.signature() == rhs.signature()) == eq);
+  return eq;
 }
 
 }  // namespace vita

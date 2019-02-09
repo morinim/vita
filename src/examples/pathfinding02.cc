@@ -43,8 +43,9 @@ bool crossing(const maze &m, cell_coord pos)
   return n > 2;
 }
 
-cell_coord update_coord(const maze &m, cell_coord start, cardinal_dir d)
+cell_coord update_coord(const maze &m, cell_coord start, int d)
 {
+  Expects(d == north || d == south || dir == west || dir == east);
   auto to(start);
 
   switch(d)
@@ -81,7 +82,7 @@ std::vector<cell_coord> extract_path(const vita::i_ga &dirs, const maze &m,
 
   for (unsigned i(0); i < dirs.size() && now != goal; ++i)
   {
-    const auto dir(dirs[i].as<cardinal_dir>());
+    const auto dir(dirs[i]);
     cell_coord prev;
     do
     {
