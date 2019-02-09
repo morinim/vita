@@ -34,7 +34,7 @@ i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
   std::generate(genome_.begin(), genome_.end(),
                 [&, n = 0]() mutable
                 {
-                  return p.sset.roulette_terminal(n).init();
+                  return p.sset.roulette_terminal(n++).init();
                 });
 
   Ensures(debug());
@@ -70,7 +70,7 @@ void i_de::graphviz(std::ostream &s) const
 ///
 std::ostream &in_line(const i_de &de, std::ostream &s)
 {
-  std::copy(de.begin(), de.end(), infix_iterator<decltype(de[0])>(s, " "));
+  std::copy(de.begin(), de.end(), infix_iterator<i_de::value_type>(s, " "));
   return s;
 }
 
@@ -204,7 +204,7 @@ double distance(const i_de &lhs, const i_de &rhs)
 /// \param[in] v input vector (a point in a multidimensional space)
 /// \return      a reference to `*this`
 ///
-i_de &i_de::operator=(const std::vector<double> &v)
+i_de &i_de::operator=(const std::vector<i_de::value_type> &v)
 {
   Expects(v.size() == parameters());
 
@@ -302,7 +302,7 @@ std::ostream &operator<<(std::ostream &s, const i_de &ind)
 /// This is sweet "syntactic sugar" to manage i_de individuals as real value
 /// vectors.
 ///
-i_de::operator std::vector<double>() const
+i_de::operator std::vector<i_de::value_type>() const
 {
   return genome_;
 }

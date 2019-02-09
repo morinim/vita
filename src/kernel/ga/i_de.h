@@ -29,12 +29,6 @@ public:
   i_de() = default;
   explicit i_de(const problem &);
 
-  // Visualization/output methods.
-  void graphviz(std::ostream &) const;
-
-  i_de crossover(double, const range_t<double> &,
-                 const i_de &, const i_de &, const i_de &) const;
-
   // Iterators.
   using genome_t       = std::vector<double>;
   using const_iterator = genome_t::const_iterator;
@@ -47,22 +41,25 @@ public:
   iterator begin();
   iterator end();
 
-  operator std::vector<double>() const;
+  operator std::vector<value_type>() const;
 
-  double operator[](std::size_t i) const
+  value_type operator[](std::size_t i) const
   {
     Expects(i < parameters());
     return genome_[i];
   }
 
-  double &operator[](std::size_t i)
+  value_type &operator[](std::size_t i)
   {
     Expects(i < parameters());
     signature_.clear();
     return genome_[i];
   }
 
-  i_de &operator=(const std::vector<double> &);
+  i_de &operator=(const std::vector<value_type> &);
+
+  i_de crossover(double, const range_t<double> &,
+                 const i_de &, const i_de &, const i_de &) const;
 
   /// \return `true` if the individual is empty, `false` otherwise
   bool empty() const { return !parameters(); }
@@ -71,6 +68,9 @@ public:
   std::size_t parameters() const { return genome_.size(); }
 
   hash_t signature() const;
+
+  // Visualization/output methods.
+  void graphviz(std::ostream &) const;
 
   bool debug() const;
 
