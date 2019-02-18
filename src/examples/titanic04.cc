@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,11 +27,19 @@ int main()
 
   titanic.env.mep.code_length =  130;
   titanic.env.individuals     = 1000;
-  titanic.env.generations     =  200;
+  titanic.env.generations     =  100;
 
   src_search<> s(titanic, metric_flags::accuracy);
-  const auto summary(s.run(10));
+  const auto summary(s.run());
 
-  std::cout << summary.best.solution << '\n'
-            << summary.best.score.accuracy << '\n';
+  // Now, hopefully, we have a good classifier (`summary.best.solution`).
+  // How can we exploit it?
+
+  const auto model(s.class_lambdify(summary.best.solution));
+  const auto example(random::element(titanic.data()));
+  const auto result(model->tag(example));
+
+  std::cout << "Correct class: " << label(example)
+            << "   Prediction: " << result.first
+            << " Sureness: " << result.second << '\n';
 }

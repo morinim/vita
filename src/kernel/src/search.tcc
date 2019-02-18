@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -89,6 +89,27 @@ template<class T, template<class> class ES>
 std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
 {
   return this->eva1_->lambdify(ind);
+}
+
+///
+/// Creates a classification-oriented lambda function associated with an
+/// individual.
+///
+/// \param[in] ind individual to be transformed in a lambda function
+/// \return        the lambda function (`nullptr` in case of errors)
+///
+/// The lambda function depends on the active training evaluator.
+///
+template<class T, template<class> class ES>
+std::unique_ptr<class_lambda_f<T>> src_search<T, ES>::class_lambdify(
+  const T &ind) const
+{
+  Expects(dynamic_cast<classification_evaluator<T> *>(his->eva1_.get()));
+
+  auto l(this->eva1_->lambdify(ind));
+  auto p(static_cast<class_lambda_f<T> *>(l.release()));
+
+  return std::unique_ptr<class_lambda_f<T>>(p);
 }
 
 template<class T, template<class> class ES>

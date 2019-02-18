@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -229,17 +229,17 @@ public:
 
   bool debug() const override;
 
-  // Serialization
+  // Serialization.
   bool load(std::istream &, const problem &) override;
   bool save(std::ostream &) const override;
 
 private:
-  // Private support methods
+  // Private support methods.
   void fill_vector(dataframe &);
   bool load_(std::istream &, const problem &, std::true_type);
   bool load_(std::istream &, const problem &, std::false_type);
 
-  // Private data members
+  // Private data members.
   basic_reg_lambda_f<T, S> lambda_;
 
   // gauss_dist[i] = "the gaussian distribution of the i-th class if the
@@ -388,7 +388,7 @@ public:
 };
 
 // ***********************************************************************
-// *  Template aliases to simplify the syntax and help the end user      *
+// *  Template aliases to simplify the syntax and help the user          *
 // ***********************************************************************
 template<class T>
 using dyn_slot_lambda_f = basic_dyn_slot_lambda_f<T, true, true>;

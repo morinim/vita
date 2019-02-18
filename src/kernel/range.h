@@ -17,10 +17,10 @@ namespace vita
 {
 
 ///
-/// Half closed interval.
+/// Right-open interval.
 ///
-/// `range{m, u}` specifies the half closed interval `[m; u[` (`m` is the
-/// minimum value, `u` an exclusive tight upper bound).
+/// `range_t{m, u}` specifies the half-open (left-closed, right-open) interval
+/// `[m, u[`.
 ///
 template<class T> using range_t = std::pair<T, T>;
 

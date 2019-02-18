@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -57,6 +57,7 @@ public:
   explicit src_search(src_problem &, metric_flags = metric_flags::nothing);
 
   std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
+  std::unique_ptr<class_lambda_f<T>> class_lambdify(const T &) const;
 
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);
