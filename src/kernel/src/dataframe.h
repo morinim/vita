@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -69,6 +69,7 @@ public:
   // ---- Iterators ----
   using iterator = typename examples_t::iterator;
   using const_iterator = typename examples_t::const_iterator;
+  using difference_type = typename examples_t::difference_type;
 
   iterator begin();
   const_iterator begin() const;
