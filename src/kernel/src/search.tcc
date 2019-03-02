@@ -104,7 +104,7 @@ template<class T, template<class> class ES>
 std::unique_ptr<class_lambda_f<T>> src_search<T, ES>::class_lambdify(
   const T &ind) const
 {
-  Expects(dynamic_cast<classification_evaluator<T> *>(his->eva1_.get()));
+  Expects(dynamic_cast<classification_evaluator<T> *>(this->eva1_.get()));
 
   auto l(this->eva1_->lambdify(ind));
   auto p(static_cast<class_lambda_f<T> *>(l.release()));

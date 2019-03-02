@@ -163,7 +163,7 @@ TEST_CASE_FIXTURE(fixture6, "Serialization")
     CHECK(i1.save(ss));
 
     vita::i_ga i2(prob);
-    CHECK(i2.load(ss, prob));
+    CHECK(i2.load(ss));
     CHECK(i2.debug());
 
     CHECK(i1 == i2);
@@ -175,7 +175,7 @@ TEST_CASE_FIXTURE(fixture6, "Serialization")
   CHECK(empty.save(ss));
 
   vita::i_ga empty1;
-  CHECK(empty1.load(ss, prob));
+  CHECK(empty1.load(ss));
   CHECK(empty1.debug());
   CHECK(empty1.empty());
 

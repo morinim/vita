@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2017, 2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -50,20 +50,20 @@ inline void individual<Derived>::inc_age()
 }
 
 ///
-/// \param[in] p  currently tackled problem
+/// \param[in] ss active symbol set
 /// \param[in] in input stream
 /// \return       `true` if the object has been loaded correctly
 ///
 /// \note If the load operation isn't successful the object isn't modified.
 ///
 template<class Derived>
-bool individual<Derived>::load(std::istream &in, const problem &p)
+bool individual<Derived>::load(std::istream &in, const symbol_set &ss)
 {
   decltype(age()) t_age;
   if (!(in >> t_age))
     return false;
 
-  if (!static_cast<Derived *>(this)->load_impl(in, p))
+  if (!static_cast<Derived *>(this)->load_impl(in, ss))
     return false;
 
   age_ = t_age;

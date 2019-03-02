@@ -33,7 +33,7 @@ enum cardinal_dir {north, south, west, east};
 
 cell_coord update_coord(const maze &m, cell_coord start, int d)
 {
-  Expects(d == north || d == south || dir == west || dir == east);
+  Expects(d == north || d == south || d == west || d == east);
   auto to(start);
 
   switch(d)

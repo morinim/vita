@@ -41,5 +41,9 @@ int main()
 
   std::cout << "Correct class: " << label(example)
             << "   Prediction: " << result.first
-            << " Sureness: " << result.second << '\n';
+            << "   Sureness: " << result.second << '\n';
+
+  // We can make the model persistent.
+  std::stringstream ss;
+  model->save(ss);
 }

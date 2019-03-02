@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -56,7 +56,7 @@ bool summary<T>::load(std::istream &in, const problem &p)
   if (known_best)
   {
     T tmp_ind;
-    if (!tmp_ind.load(in, p))
+    if (!tmp_ind.load(in, p.sset))
       return false;
 
     decltype(best.score.fitness) tmp_fitness;

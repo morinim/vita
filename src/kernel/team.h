@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -84,7 +84,7 @@ public:
   const_iterator end() const;
 
   // Serialization.
-  bool load(std::istream &, const problem &);
+  bool load(std::istream &, const symbol_set &);
   bool save(std::ostream &) const;
 
   template<class U> friend team<U> crossover(const team<U> &, const team<U> &);

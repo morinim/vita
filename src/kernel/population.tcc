@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -334,7 +334,7 @@ bool population<T>::load(std::istream &in, const problem &prob)
       return false;
 
     for (decltype(n_elem) i(0); i < n_elem; ++i)
-      if (!p[{l, i}].load(in, prob))
+      if (!p[{l, i}].load(in, prob.sset))
         return false;
   }
 

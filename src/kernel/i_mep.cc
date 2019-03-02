@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -562,7 +562,7 @@ bool i_mep::debug() const
 }
 
 ///
-/// \param[in] p  current problem
+/// \param[in] p  active symbol set
 /// \param[in] in input stream
 /// \return       `true` if the object has been loaded correctly
 ///
@@ -570,7 +570,7 @@ bool i_mep::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_mep::load_impl(std::istream &in, const problem &p)
+bool i_mep::load_impl(std::istream &in, const symbol_set &ss)
 {
   unsigned rows, cols;
   if (!(in >> rows >> cols))
@@ -589,7 +589,7 @@ bool i_mep::load_impl(std::istream &in, const problem &p)
 
     gene temp;
 
-    temp.sym = p.sset.decode(opcode);
+    temp.sym = ss.decode(opcode);
     if (!temp.sym)
       return false;
 

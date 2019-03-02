@@ -80,7 +80,7 @@ private:
   hash_t hash() const;
 
   // Serialization.
-  bool load_impl(std::istream &, const problem &);
+  bool load_impl(std::istream &, const symbol_set &);
   bool save_impl(std::ostream &) const;
 
   // *** Private data members ***

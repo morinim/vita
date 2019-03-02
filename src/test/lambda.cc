@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -71,7 +71,7 @@ void test_serialization(vita::src_problem &pr)
     CHECK(lambda1.save(ss));
     const T ind2(pr);
     auto lambda2(build<L, T, P>()(ind2, pr.data()));
-    CHECK(lambda2.load(ss, pr));
+    CHECK(lambda2.load(ss, pr.sset));
     CHECK(lambda2.debug());
 
     for (const auto &e : pr.data())
@@ -234,7 +234,7 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda serialization")
     CHECK(lambda1.save(ss));
     const i_mep ind2(pr);
     reg_model<i_mep> lambda2(ind2);
-    CHECK(lambda2.load(ss, pr));
+    CHECK(lambda2.load(ss, pr.sset));
     CHECK(lambda2.debug());
 
     for (const auto &e : pr.data())

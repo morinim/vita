@@ -250,7 +250,7 @@ bool i_ga::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_ga::load_impl(std::istream &in, const problem &)
+bool i_ga::load_impl(std::istream &in, const symbol_set &)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -44,7 +44,7 @@ public:
   void inc_age();
 
   // Serialization.
-  bool load(std::istream &, const problem &);
+  bool load(std::istream &, const symbol_set & = symbol_set());
   bool save(std::ostream &) const;
 
 protected:

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -95,7 +95,7 @@ private:
   void pack(const locus &, std::vector<unsigned char> *const) const;
 
   // Serialization.
-  bool load_impl(std::istream &, const problem &);
+  bool load_impl(std::istream &, const symbol_set &);
   bool save_impl(std::ostream &) const;
 
   // ---- Private data members ----

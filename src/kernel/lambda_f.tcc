@@ -18,7 +18,7 @@
 #define      VITA_LAMBDA_F_TCC
 
 ///
-/// \param[in] prg the program (individual/team) to be lambdified.
+/// \param[in] prg the program (individual/team) to be lambdified
 ///
 template<class T, bool S>
 basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
@@ -28,8 +28,8 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
 }
 
 ///
-/// \param[in] e input example for the lambda function.
-/// \return the output value associated with `e`.
+/// \param[in] e input example for the lambda function
+/// \return      the output value associated with `e`
 ///
 template<class T, bool S>
 any basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
@@ -69,8 +69,8 @@ any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
 }
 
 ///
-/// \param[in] a a value produced by lambda_f::operator().
-/// \return the string version of `a`.
+/// \param[in] a value produced by lambda_f::operator()
+/// \return      the string version of `a`
 ///
 template<class T, bool S>
 std::string basic_reg_lambda_f<T, S>::name(const any &a) const
@@ -79,11 +79,11 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 }
 
 ///
-/// \brief Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`
+/// Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`.
 ///
-/// \param[in] m a metric we are evaluating.
-/// \param[in] d a dataset.
-/// \return the value of `this` according to metric `m`.
+/// \param[in] m a metric we are evaluating
+/// \param[in] d a dataset
+/// \return      the value of `this` according to metric `m`
 ///
 template<class T, bool S>
 double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
@@ -93,7 +93,7 @@ double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::debug() const
@@ -102,22 +102,22 @@ bool basic_reg_lambda_f<T, S>::debug() const
 }
 
 ///
-/// \param[in] p active problem.
-/// \param[in] in input stream.
-/// \return `true` if the lambda has been loaded correctly.
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` if the lambda has been loaded correctly
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S>
-bool basic_reg_lambda_f<T, S>::load(std::istream &in, const problem &p)
+bool basic_reg_lambda_f<T, S>::load(std::istream &in, const symbol_set &ss)
 {
-  return detail::reg_lambda_f_storage<T, S>::load(in, p);
+  return detail::reg_lambda_f_storage<T, S>::load(in, ss);
 }
 
 ///
-/// \param[out] out output stream.
-/// \return `true` if lambda was saved correctly.
+/// \param[out] out output stream
+/// \return         `true` if lambda was saved correctly
 ///
 template<class T, bool S>
 bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
@@ -126,7 +126,7 @@ bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] d the training set.
+/// \param[in] d the training set
 ///
 template<class T, bool N>
 basic_class_lambda_f<T, N>::basic_class_lambda_f(const dataframe &d)
@@ -135,8 +135,9 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f(const dataframe &d)
 }
 
 ///
-/// \param[in] e example to be classified.
-/// \return the label of the class that includes `e` (wrapped in class any).
+/// \param[in] e example to be classified
+/// \return      the label of the class that includes `e` (wrapped inside a
+///              `any`)
 ///
 template<class T, bool N>
 any basic_class_lambda_f<T, N>::operator()(const dataframe::example &e) const
@@ -145,11 +146,11 @@ any basic_class_lambda_f<T, N>::operator()(const dataframe::example &e) const
 }
 
 ///
-/// \brief Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`
+/// Calls (dynamic dispatch) polymhorphic model_metric `m` on `this`.
 ///
-/// \param[in] m a metric we are evaluating.
-/// \param[in] d a dataset.
-/// \return the value of `this` according to metric `m`.
+/// \param[in] m a metric we are evaluating
+/// \param[in] d a dataset
+/// \return      the value of `this` according to metric `m`
 ///
 template<class T, bool N>
 double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
@@ -159,8 +160,8 @@ double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
 }
 
 ///
-/// \param[in] a id of a class.
-/// \return the name of class `a`.
+/// \param[in] a id of a class
+/// \return      the name of class `a`
 ///
 template<class T, bool N>
 std::string basic_class_lambda_f<T, N>::name(const any &a) const
@@ -169,9 +170,9 @@ std::string basic_class_lambda_f<T, N>::name(const any &a) const
 }
 
 ///
-/// \param[in] ind individual "to be transformed" into a lambda function.
-/// \param[in] d the training set.
-/// \param[in] x_slot number of slots for each class of the training set.
+/// \param[in] ind    individual "to be transformed" into a lambda function
+/// \param[in] d      the training set
+/// \param[in] x_slot number of slots for each class of the training set
 ///
 template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
@@ -190,10 +191,10 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 }
 
 ///
-/// \param[in] d the training set.
-/// \param[in] x_slot number of slots for each class of the training set.
-///
 /// Sets up the data structures needed by the 'dynamic slot' algorithm.
+///
+/// \param[in] d      the training set
+/// \param[in] x_slot number of slots for each class of the training set
 ///
 template<class T, bool S, bool N>
 void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
@@ -256,8 +257,8 @@ void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
 }
 
 ///
-/// \param[in] e input data.
-/// \return the slot example `e` falls into.
+/// \param[in] e input data
+/// \return      the slot example `e` falls into
 ///
 template<class T, bool S, bool N>
 std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
@@ -277,7 +278,7 @@ std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
 }
 
 ///
-/// \return the accuracy of the lambda function on the training set.
+/// \return the accuracy of the lambda function on the training set
 ///
 template<class T, bool S, bool N>
 double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
@@ -295,9 +296,9 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 }
 
 ///
-/// \param[in] instance data to be classified.
-/// \return the class of `instance` (numerical id) and the confidence level
-///         (in the range [0,1]).
+/// \param[in] instance data to be classified
+/// \return             the class of `instance` (numerical id) and the
+///                     confidence level (in the range `[0,1]`)
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
@@ -318,10 +319,10 @@ std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
 }
 
 ///
-/// \param[out] out output stream.
-/// \return true on success.
-///
 /// Saves the lambda on persistent storage.
+///
+/// \param[out] out output stream
+/// \return         `true` on success
 ///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
@@ -346,39 +347,41 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 }
 
 ///
-/// \brief Loads the lambda from persistent storage
+/// Loads the lambda from persistent storage.
 ///
-/// \param[in] p active problem.
-/// \param[in] in input stream.
-/// \return true on success.
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in, const problem &p)
+bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in,
+                                            const symbol_set &ss)
 {
   // Tag dispatching to select the appropriate method.
-  // Note that there is an implementation of operator= only for S==true.
+  // Note that there is an implementation of `operator=` only for `S==true`.
   // Without tag dispatching the compiler would need a complete implementation
-  // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, p, detail::is_true<S>());
+  // (but we haven't a reasonable/general solution for the `S==false` case).
+  return load_(in, ss, detail::is_true<S>());
 }
 
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return `true` on success.
-///
-/// This is part of the tag dispatching method used by the
+/// Part of the tag dispatching method used by the
 /// basic_dyn_slot_lambda_f::load method.
+///
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in,
-                                             const problem &p, std::true_type)
+                                             const symbol_set &ss,
+                                             std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in, p))
+  if (!l.load(in, ss))
     return false;
 
   decltype(slot_matrix_) m;
@@ -406,14 +409,14 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in,
 }
 
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, const problem &,
+bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
                                              std::false_type)
 {
   return false;
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
@@ -428,8 +431,8 @@ bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
 }
 
 ///
-/// \param[in] ind individual "to be transformed" into a lambda function.
-/// \param[in] d the training set.
+/// \param[in] ind individual "to be transformed" into a lambda function
+/// \param[in] d   the training set
 ///
 template<class T, bool S, bool N>
 basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
@@ -444,9 +447,9 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
 }
 
 ///
-/// \param[in] d the training set.
-///
 /// Sets up the data structures needed by the gaussian algorithm.
+///
+/// \param[in] d the training set
 ///
 template<class T, bool S, bool N>
 void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
@@ -475,11 +478,12 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
 }
 
 ///
-/// \param[in] example input value whose class we are interested in.
-/// \return the class of `example` (numerical id) and the confidence level
-///         (how sure you can be that `example` is properly classified. The
-///         value is in [0;1] range and the sum of all the confidence levels of
-///         each class is 1).
+/// \param[in] example input value whose class we are interested in
+/// \return            the class of `example` (numerical id) and the confidence
+///                    level (how sure you can be that `example` is properly
+///                    classified. The value is in the `[0,1]` interval and the
+///                    sum of all the confidence levels of each class equals
+///                    `1`)
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
@@ -527,10 +531,10 @@ std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
 }
 
 ///
-/// \param[out] out output stream.
-/// \return true on success.
-///
 /// Saves the lambda on persistent storage.
+///
+/// \param[out] out output stream
+/// \return         `true` on success
 ///
 template<class T, bool S, bool N>
 bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
@@ -550,39 +554,41 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return true on success.
-///
 /// Loads the lambda from persistent storage.
+///
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in, const problem &p)
+bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in,
+                                            const symbol_set &ss)
 {
   // Tag dispatching to select the appropriate method.
   // Note that there is an implementation of operator= only for S==true.
   // Without tag dispatching the compiler would need a complete implementation
   // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, p, detail::is_true<S>());
+  return load_(in, ss, detail::is_true<S>());
 }
 
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return `true` on success.
-///
-/// This is part of the tag dispatching method used by the
+/// Part of the tag dispatching method used by the
 /// basic_gaussian_lambda_f::load method.
+///
+/// \param[in] p  current problem
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 template<class T, bool S, bool N>
 bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in,
-                                             const problem &p, std::true_type)
+                                             const symbol_set &ss,
+                                             std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in, p))
+  if (!l.load(in, ss))
     return false;
 
   typename decltype(gauss_dist_)::size_type n;
@@ -608,14 +614,14 @@ bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in,
 /// basic_gaussian_lambda_f::load method.
 ///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, const problem &,
+bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
                                              std::false_type)
 {
   return false;
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
 bool basic_gaussian_lambda_f<T, S, N>::debug() const
@@ -624,8 +630,8 @@ bool basic_gaussian_lambda_f<T, S, N>::debug() const
 }
 
 ///
-/// \param[in] ind individual "to be transformed" into a lambda function.
-/// \param[in] d the training set.
+/// \param[in] ind individual "to be transformed" into a lambda function
+/// \param[in] d   the training set
 ///
 template<class T, bool S, bool N>
 basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
@@ -638,9 +644,9 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
 }
 
 ///
-/// \param[in] e input example for the lambda function.
-/// \return the class of `e` (numerical id) and the confidence level (in the
-///         range [0,1]).
+/// \param[in] e input example for the lambda function
+/// \return      the class of `e` (numerical id) and the confidence level (in
+///              the `[0,1]` interval)
 ///
 template<class T, bool S, bool N>
 std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
@@ -653,7 +659,7 @@ std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
 bool basic_binary_lambda_f<T, S, N>::debug() const
@@ -662,10 +668,10 @@ bool basic_binary_lambda_f<T, S, N>::debug() const
 }
 
 ///
-/// \param[out] out output stream.
-/// \return true on success.
-///
 /// Saves the lambda on persistent storage.
+///
+/// \param[out] out output stream
+/// \return         `true` on success
 ///
 template<class T, bool S, bool N>
 bool basic_binary_lambda_f<T, S, N>::save(std::ostream &out) const
@@ -680,39 +686,41 @@ bool basic_binary_lambda_f<T, S, N>::save(std::ostream &out) const
 }
 
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return true on success.
-///
 /// Loads the lambda from persistent storage.
+///
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
 ///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load(std::istream &in, const problem &p)
+bool basic_binary_lambda_f<T, S, N>::load(std::istream &in,
+                                          const symbol_set &ss)
 {
   // Tag dispatching to select the appropriate method.
   // Note that there is an implementation of operator= only for S==true.
   // Without tag dispatching the compiler would need a complete implementation
   // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, p, detail::is_true<S>());
+  return load_(in, ss, detail::is_true<S>());
 }
 
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return `true` on success.
-///
-/// This is part of the tag dispatching method used by the
+/// Part of the tag dispatching method used by the
 /// basic_binary_lambda_f::load method.
 ///
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
+///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in, const problem &p,
+bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in,
+                                           const symbol_set &ss,
                                            std::true_type)
 {
   decltype(lambda_) l(lambda_);
-  if (!l.load(in, p))
+  if (!l.load(in, ss))
     return false;
 
   if (!detail::class_names<N>::load(in))
@@ -728,16 +736,16 @@ bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in, const problem &p,
 /// basic_binary_lambda_f::load method.
 ///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, const problem &,
+bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
                                            std::false_type)
 {
   return false;
 }
 
 ///
-/// \param[in] t team "to be transformed" into a lambda function.
-/// \param[in] d the training set.
-/// \param[in] args auxiliary parameters for the specific lambda function.
+/// \param[in] t    team "to be transformed" into a lambda function
+/// \param[in] d    the training set
+/// \param[in] args auxiliary parameters for the specific lambda function
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
@@ -753,11 +761,11 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
 }
 
 ///
-/// \param[in] instance data to be classified.
-/// \return the class of `instance` (numerical id) and the confidence level
-///         (in the range [0,1]).
-///
 /// Specialized method for teams.
+///
+/// \param[in] instance data to be classified
+/// \return             the class of `instance` (numerical id) and the
+///                     confidence level (in the `0,1]` interval)
 ///
 /// * `team_composition::mv` the class which most of the individuals predict
 ///   for a given example is selected as team output.
@@ -806,10 +814,10 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
 }
 
 ///
-/// \brief Saves the lambda team on persistent storage
+/// Saves the lambda team on persistent storage.
 ///
-/// \param[out] out output stream.
-/// \return true on success.
+/// \param[out] out output stream
+/// \return         `true` on success
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
@@ -829,11 +837,11 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 }
 
 ///
-/// \brief Loads the lambda team from persistent storage
+/// Loads the lambda team from persistent storage.
 ///
-/// \param[in] p current problem.
-/// \param[in] in input stream.
-/// \return `true` on success.
+/// \param[in] ss active symbol set
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 /// \note
 /// If the load operation isn't successful the current lambda isn't modified.
@@ -841,7 +849,7 @@ bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in,
-                                              const problem &p)
+                                              const symbol_set &ss)
 {
   decltype(classes_) cl;
   if (!(in >> cl))
@@ -855,7 +863,7 @@ bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in,
   for (unsigned i(0); i < s; ++i)
   {
     typename decltype(team_)::value_type lambda(team_[0]);
-    if (!lambda.load(in, p))
+    if (!lambda.load(in, ss))
       return false;
     t.push_back(lambda);
   }
@@ -870,7 +878,7 @@ bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in,
 }
 
 ///
-/// \return `true` if the object passes the internal consistency check.
+/// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
@@ -883,4 +891,4 @@ bool team_class_lambda_f<T, S, N, L, C>::debug() const
   return classes_ > 1;
 }
 
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,7 +48,7 @@ team<T>::team(const problem &p) : signature_()
 }
 
 ///
-/// Builds a team containing the individuals of vector `v`.
+/// Builds a team containing the individuals of a given vector.
 ///
 /// \param[in] v a vector of individuals
 ///
@@ -317,7 +317,7 @@ bool team<T>::debug() const
 }
 
 ///
-/// \param[in] p  active problem
+/// \param[in] ss active symbol set
 /// \param[in] in input stream
 /// \return       `true` if team was loaded correctly
 ///
@@ -325,7 +325,7 @@ bool team<T>::debug() const
 /// If the load operation isn't successful the current team isn't modified.
 ///
 template<class T>
-bool team<T>::load(std::istream &in, const problem &p)
+bool team<T>::load(std::istream &in, const symbol_set &ss)
 {
   unsigned n;
   if (!(in >> n) || !n)
@@ -337,7 +337,7 @@ bool team<T>::load(std::istream &in, const problem &p)
   for (unsigned j(0); j < n; ++j)
   {
     T i;
-    if (!i.load(in, p))
+    if (!i.load(in, ss))
       return false;
     v.push_back(i);
   }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -151,7 +151,7 @@ TEST_CASE_FIXTURE(fixture3, "Serialization")
     CHECK(i1.save(ss));
 
     vita::i_mep i2(prob);
-    CHECK(i2.load(ss, prob));
+    CHECK(i2.load(ss, prob.sset));
     CHECK(i2.debug());
 
     CHECK(i1 == i2);
@@ -163,7 +163,7 @@ TEST_CASE_FIXTURE(fixture3, "Serialization")
   CHECK(empty.save(ss));
 
   vita::i_mep empty1;
-  CHECK(empty1.load(ss, prob));
+  CHECK(empty1.load(ss, prob.sset));
   CHECK(empty1.debug());
   CHECK(empty1.empty());
 

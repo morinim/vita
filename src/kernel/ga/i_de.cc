@@ -237,7 +237,7 @@ bool i_de::debug() const
 /// If the load operation isn't successful the current individual isn't
 /// modified.
 ///
-bool i_de::load_impl(std::istream &in, const problem &)
+bool i_de::load_impl(std::istream &in, const symbol_set &)
 {
   decltype(parameters()) sz;
   if (!(in >> sz))
