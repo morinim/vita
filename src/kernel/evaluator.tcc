@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -76,7 +76,7 @@ std::string evaluator<T>::info() const
 /// The default implementation is an empty method.
 ///
 template<class T>
-std::unique_ptr<lambda_f<T>> evaluator<T>::lambdify(const T &) const
+std::unique_ptr<basic_lambda_f<T>> evaluator<T>::lambdify(const T &) const
 {
   return nullptr;
 }

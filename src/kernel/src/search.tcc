@@ -86,30 +86,15 @@ src_problem &src_search<T, ES>::prob() const
 /// The lambda function depends on the active training evaluator.
 ///
 template<class T, template<class> class ES>
-std::unique_ptr<lambda_f<T>> src_search<T, ES>::lambdify(const T &ind) const
-{
-  return this->eva1_->lambdify(ind);
-}
-
-///
-/// Creates a classification-oriented lambda function associated with an
-/// individual.
-///
-/// \param[in] ind individual to be transformed in a lambda function
-/// \return        the lambda function (`nullptr` in case of errors)
-///
-/// The lambda function depends on the active training evaluator.
-///
-template<class T, template<class> class ES>
-std::unique_ptr<class_lambda_f<T>> src_search<T, ES>::class_lambdify(
+std::unique_ptr<basic_src_lambda_f<T>> src_search<T, ES>::lambdify(
   const T &ind) const
 {
-  Expects(dynamic_cast<classification_evaluator<T> *>(this->eva1_.get()));
+  using bslf = basic_src_lambda_f<T>;
 
   auto l(this->eva1_->lambdify(ind));
-  auto p(static_cast<class_lambda_f<T> *>(l.release()));
+  auto p(static_cast<bslf *>(l.release()));
 
-  return std::unique_ptr<class_lambda_f<T>>(p);
+  return std::unique_ptr<bslf>(p);
 }
 
 template<class T, template<class> class ES>

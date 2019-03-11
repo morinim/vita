@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,7 +52,7 @@ public:
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
@@ -195,7 +195,7 @@ public:
   explicit dyn_slot_evaluator(dataframe &, unsigned = 10);
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
 
 private:
   /// Number of slots for each class of the training set.
@@ -222,7 +222,7 @@ public:
   explicit gaussian_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
 };
 
 ///
@@ -235,7 +235,7 @@ public:
   explicit binary_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
 };
 
 #include "kernel/src/evaluator.tcc"

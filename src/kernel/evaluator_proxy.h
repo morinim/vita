@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,7 +43,7 @@ public:
 
   std::string info() const override;
 
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
 
 private:
   // Access to the real evaluator.

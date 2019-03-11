@@ -69,6 +69,18 @@ any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
 }
 
 ///
+/// \return a *failed* status
+///
+/// \warning This function is useful only for classification tasks.
+///
+template<class T, bool S>
+std::pair<class_t, double> basic_reg_lambda_f<T, S>::tag(
+  const dataframe::example &) const
+{
+  return {0, 0};
+}
+
+///
 /// \param[in] a value produced by lambda_f::operator()
 /// \return      the string version of `a`
 ///

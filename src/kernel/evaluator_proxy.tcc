@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -144,7 +144,7 @@ std::string evaluator_proxy<T, E>::info() const
 /// \return        a pointer to the executable version of `prg`
 ///
 template<class T, class E>
-std::unique_ptr<lambda_f<T>> evaluator_proxy<T, E>::lambdify(
+std::unique_ptr<basic_lambda_f<T>> evaluator_proxy<T, E>::lambdify(
   const T &prg) const
 {
   return eva_.lambdify(prg);

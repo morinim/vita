@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,8 +27,8 @@ template<class T> class interpreter;
 template<class T> class evaluator;
 template<class T> class src_evaluator;
 
-template<class T> class reg_lambda_f;
-template<class T> class class_lambda_f;
+template<class T> class core_reg_lambda_f;
+template<class T> class core_class_lambda_f;
 
 template<class T> class model_metric;
 

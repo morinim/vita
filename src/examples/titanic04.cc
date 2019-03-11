@@ -35,7 +35,7 @@ int main()
   // Now, hopefully, we have a good classifier (`summary.best.solution`).
   // How can we exploit it?
 
-  const auto model(s.class_lambdify(summary.best.solution));
+  const auto model(s.lambdify(summary.best.solution));
   const auto example(random::element(titanic.data()));
   const auto result(model->tag(example));
 

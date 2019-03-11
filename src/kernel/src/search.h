@@ -54,10 +54,11 @@ template<class T = i_mep, template<class> class ES = std_es>
 class src_search : public search<T, ES>
 {
 public:
+  using individual_type = T;
+
   explicit src_search(src_problem &, metric_flags = metric_flags::nothing);
 
-  std::unique_ptr<lambda_f<T>> lambdify(const T &) const;
-  std::unique_ptr<class_lambda_f<T>> class_lambdify(const T &) const;
+  std::unique_ptr<basic_src_lambda_f<T>> lambdify(const T &) const;
 
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);

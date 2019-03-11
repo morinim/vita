@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,9 +32,9 @@ template<class T>
 class model_metric
 {
 public:
-  virtual double operator()(const reg_lambda_f<T> *,
+  virtual double operator()(const core_reg_lambda_f<T> *,
                             const dataframe &) const = 0;
-  virtual double operator()(const class_lambda_f<T> *,
+  virtual double operator()(const core_class_lambda_f<T> *,
                             const dataframe &) const = 0;
 };
 
@@ -57,9 +57,10 @@ template<class T>
 class accuracy_metric : public model_metric<T>
 {
 public:
-  double operator()(const reg_lambda_f<T> *, const dataframe &) const override;
+  double operator()(const core_reg_lambda_f<T> *,
+                    const dataframe &) const override;
 
-  double operator()(const class_lambda_f<T> *,
+  double operator()(const core_class_lambda_f<T> *,
                     const dataframe &) const override;
 };
 

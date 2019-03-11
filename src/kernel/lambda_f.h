@@ -41,57 +41,64 @@ namespace vita
 /// E.g. for **regression problems** lambda_f and interpreter are identical:
 /// they calculate the same number.
 /// lambda_f always calculates a meaningful value for the end-user (the
-/// class of the example, an approximation...) while interpreter can output
+/// class of an example, an approximation...) while interpreter can output
 /// a value that is just a building block for lambda_f (e.g. classification
 /// tasks with discriminant functions).
-/// The typical use chain is: evaluator uses lambda_f, lambda_f uses
-/// interpreter.
+/// The typical use chain is: evaluatore -uses-> lambda_f -uses-> interpreter.
 ///
 /// \note
 /// Another interesting function of lambda_f is that it extends the
 /// functionalities of interpreter to teams.
 ///
 template<class T>
-class lambda_f
+class basic_lambda_f
 {
 public:
-  virtual ~lambda_f() = default;
+  virtual ~basic_lambda_f() = default;
 
   virtual any operator()(const dataframe::example &) const = 0;
 
-  virtual std::string name(const any &) const = 0;
-
-  virtual double measure(const model_metric<T> &, const dataframe &) const = 0;
-
   virtual bool debug() const = 0;
 
-  // Serialization
+  // Serialization.
   virtual bool load(std::istream &, const symbol_set &) { return false; }
   virtual bool save(std::ostream &) const { return false; }
+};
+
+///
+/// Extends basic_lambda_f interface adding some useful methods for symbolic
+/// regression / classification.
+///
+template<class T>
+class basic_src_lambda_f : public basic_lambda_f<T>
+{
+public:
+  virtual double measure(const model_metric<T> &, const dataframe &) const = 0;
+  virtual std::string name(const any &) const = 0;
+  virtual std::pair<class_t, double> tag(const dataframe::example &) const = 0;
 };
 
 // ***********************************************************************
 // * Symbolic regression                                                 *
 // ***********************************************************************
 
-/// Often, working with regression models, we aren't interested in
-/// implementation details (i.e. class basic_reg_lambda_f) but only in the
-/// general class of the model (e.g. the measurement of some metric in class
-/// model_metric).
-template<class T> class reg_lambda_f : public lambda_f<T> {};
+///
+/// The model_metric class choose the appropriate method considering this type.
+///
+template<class T> class core_reg_lambda_f : public basic_src_lambda_f<T> {};
 
 ///
-/// \brief Transforms individual to a lambda function for regression
+/// Transforms individuals into lambda functions for regression tasks.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only.
 ///           Sometimes we need an autonomous lambda function that stores
-///           everything it needs inside (slow but will survive the death of
-///           the the program it's constructed on); sometimes we need speed,
-///           not persistence
+///           everything it needs inside (it will survive the death of the
+///           individual it's constructed on). Sometimes we prefer space
+///           efficiency (typically inside an evaluator)
 ///
 template<class T, bool S>
-class basic_reg_lambda_f : public reg_lambda_f<T>,
+class basic_reg_lambda_f : public core_reg_lambda_f<T>,
                            protected detail::reg_lambda_f_storage<T, S>
 {
 public:
@@ -110,6 +117,9 @@ public:
   bool save(std::ostream &) const override;
 
 private:
+  // Not useful for regression tasks.
+  std::pair<class_t, double> tag(const dataframe::example &) const final;
+
   any eval(const dataframe::example &, std::false_type) const;
   any eval(const dataframe::example &, std::true_type) const;
 };
@@ -118,18 +128,13 @@ private:
 // * Classification                                                      *
 // ***********************************************************************
 
-/// Often, working with classification models, we aren't interested in
-/// implementation details (i.e. class basic_class_lambda_f) but only in the
-/// general class of the model (e.g. the measurement of some metric in
-/// class model_metric).
-template<class T> class class_lambda_f : public lambda_f<T>
-{
-public:
-  virtual std::pair<class_t, double> tag(const dataframe::example &) const = 0;
-};
+///
+/// The model_metric class choose the appropriate method considering this type.
+///
+template<class T> class core_class_lambda_f : public basic_src_lambda_f<T> {};
 
 ///
-/// \brief The basic interface of a classification lambda class
+/// The basic interface of a classification lambda class.
 ///
 /// \tparam T type of individual
 /// \tparam N stores the name of the classes vs doesn't store the names
@@ -141,7 +146,7 @@ public:
 /// * optionally stores class names.
 ///
 template<class T, bool N>
-class basic_class_lambda_f : public class_lambda_f<T>,
+class basic_class_lambda_f : public core_class_lambda_f<T>,
                              protected detail::class_names<N>
 {
 public:
@@ -155,7 +160,7 @@ public:
 };
 
 ///
-/// \brief Lambda class for Slotted Dynamic Class Boundary Determination
+/// Lambda class for Slotted Dynamic Class Boundary Determination.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
@@ -183,14 +188,14 @@ public:
   bool save(std::ostream &) const override;
 
 private:
-  // Private support methods
+  // Private support methods.
   bool load_(std::istream &, const symbol_set &, std::true_type);
   bool load_(std::istream &, const symbol_set &, std::false_type);
 
   void fill_matrix(dataframe &, unsigned);
   std::size_t slot(const dataframe::example &) const;
 
-  // Private data members
+  // Private data members.
 
   /// Mainly used by the slot private method.
   basic_reg_lambda_f<T, S> lambda_;
@@ -208,7 +213,7 @@ private:
 };
 
 ///
-/// \brief Lambda class for the Gaussian Distribution Classification
+/// Lambda class for the Gaussian Distribution Classification.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
@@ -248,7 +253,7 @@ private:
 };
 
 ///
-/// \brief Lambda class for Binary Classification
+/// Lambda class for Binary Classification.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
@@ -272,11 +277,11 @@ public:
   bool save(std::ostream &) const override;
 
 private:
-  // Private support methods
+  // Private support methods.
   bool load_(std::istream &, const symbol_set &, std::true_type);
   bool load_(std::istream &, const symbol_set &, std::false_type);
 
-  // Private data members
+  // Private data members.
   basic_reg_lambda_f<T, S> lambda_;
 };
 
@@ -302,14 +307,10 @@ enum class team_composition
 };
 
 ///
-/// \brief An helper class for extending classification schemes to teams
+/// An helper class for extending classification schemes to teams.
 ///
 /// \tparam T type of individual
-/// \tparam S stores the individual inside vs keep a reference only.
-///           Sometimes we need an autonomous lambda function that stores
-///           everything it needs inside (slow but will survive the death of
-///           the the program it's constructed on); sometimes we need speed,
-///           not persistence
+/// \tparam S stores the individual inside vs keep a reference only
 /// \tparam N stores the name of the classes vs doesn't store the names
 /// \tparam L the basic classificator that must be extended
 /// \tparam C composition method for team's member responses
@@ -339,8 +340,7 @@ protected:
 };
 
 ///
-/// \brief Slotted Dynamic Class Boundary Determination specialization for
-///        teams
+/// Slotted Dynamic Class Boundary Determination specialization for teams.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
@@ -355,7 +355,7 @@ public:
 };
 
 ///
-/// \brief Gaussian Distribution Classification specialization for teams
+/// Gaussian Distribution Classification specialization for teams.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
@@ -370,7 +370,7 @@ public:
 };
 
 ///
-/// \brief Binary Classification specialization for teams
+/// Binary Classification specialization for teams.
 ///
 /// \tparam T type of individual
 /// \tparam S stores the individual inside vs keep a reference only
