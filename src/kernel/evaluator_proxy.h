@@ -43,7 +43,7 @@ public:
 
   std::string info() const override;
 
-  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
 
 private:
   // Access to the real evaluator.

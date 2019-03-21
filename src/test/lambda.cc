@@ -27,8 +27,6 @@ constexpr std::size_t MEP_COUNT        =  10;
 constexpr std::size_t IRIS_COUNT       = 150;
 constexpr std::size_t IONOSPHERE_COUNT = 351;
 
-template<class T> using reg_model = vita::basic_reg_lambda_f<T, true>;
-
 template<template<class> class L, class T, unsigned P>
 struct build
 {
@@ -48,11 +46,11 @@ struct build<L, T, 0>
 };
 
 template<class T>
-struct build<reg_model, T, 0>
+struct build<vita::reg_lambda_f, T, 0>
 {
-  reg_model<T> operator()(const T &prg, vita::dataframe &) const
+  vita::reg_lambda_f<T> operator()(const T &prg, vita::dataframe &) const
   {
-    return reg_model<T>(prg);
+    return vita::reg_lambda_f<T>(prg);
   }
 };
 
@@ -69,9 +67,7 @@ void test_serialization(vita::src_problem &pr)
     std::stringstream ss;
 
     CHECK(lambda1.save(ss));
-    const T ind2(pr);
-    auto lambda2(build<L, T, P>()(ind2, pr.data()));
-    CHECK(lambda2.load(ss, pr.sset));
+    L<T> lambda2(ss, pr.sset);
     CHECK(lambda2.debug());
 
     for (const auto &e : pr.data())
@@ -131,17 +127,17 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
   CHECK(pr.data().read("./test_resources/mep.csv") == MEP_COUNT);
   pr.setup_symbols();
 
-  // REGRESSION TEAM OF ONE INDIVIDUAL.
-  test_team_of_one<reg_model>(pr);
+  // TEAM OF ONE INDIVIDUAL.
+  test_team_of_one<reg_lambda_f>(pr);
 
-  // REGRESSION TEAM OF IDENTICAL INDIVIDUALS.
+  // TEAM OF IDENTICAL INDIVIDUALS.
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep ind(pr);
-    const reg_model<i_mep> li(ind);
+    const reg_lambda_f<i_mep> li(ind);
 
     const team<i_mep> t{{ind, ind, ind, ind}};
-    const reg_model<team<i_mep>> lt(t);
+    const reg_lambda_f<team<i_mep>> lt(t);
 
     for (const auto &e : pr.data())
     {
@@ -159,7 +155,7 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
     }
   }
 
-  // REGRESSION TEAM OF RANDOM INDIVIDUALS.
+  // TEAM OF RANDOM INDIVIDUALS.
   for (unsigned i(0); i < 1000; ++i)
   {
     const i_mep i1(pr);
@@ -167,13 +163,13 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
     const i_mep i3(pr);
     const i_mep i4(pr);
 
-    const reg_model<i_mep> lambda1(i1);
-    const reg_model<i_mep> lambda2(i2);
-    const reg_model<i_mep> lambda3(i3);
-    const reg_model<i_mep> lambda4(i4);
+    const reg_lambda_f<i_mep> lambda1(i1);
+    const reg_lambda_f<i_mep> lambda2(i2);
+    const reg_lambda_f<i_mep> lambda3(i3);
+    const reg_lambda_f<i_mep> lambda4(i4);
 
     const team<i_mep> t{{i1, i2, i3, i4}};
-    const reg_model<team<i_mep>> lambda_team(t);
+    const reg_lambda_f<team<i_mep>> lambda_team(t);
 
     for (const auto &e : pr.data())
     {
@@ -227,20 +223,18 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda serialization")
   for (unsigned k(0); k < 1000; ++k)
   {
     const i_mep ind(pr);
-    const reg_model<i_mep> lambda1(ind);
+    const reg_lambda_f<i_mep> lambda1(ind);
 
     std::stringstream ss;
 
-    CHECK(lambda1.save(ss));
-    const i_mep ind2(pr);
-    reg_model<i_mep> lambda2(ind2);
-    CHECK(lambda2.load(ss, pr.sset));
-    CHECK(lambda2.debug());
+    CHECK(serialize::save(ss, lambda1));
+    const auto lambda2(serialize::lambda::load(ss, pr.sset));
+    CHECK(lambda2->debug());
 
     for (const auto &e : pr.data())
     {
       const auto out1(lambda1(e));
-      const auto out2(lambda2(e));
+      const auto out2((*lambda2)(e));
 
       if (out1.has_value())
         CHECK(to<number>(out1) == doctest::Approx(to<number>(out2)));

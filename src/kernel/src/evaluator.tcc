@@ -100,7 +100,7 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 ///                of errors).
 ///
 template<class T>
-std::unique_ptr<basic_lambda_f<T>> sum_of_errors_evaluator<T>::lambdify(
+std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T>::lambdify(
   const T &prg) const
 {
   return std::make_unique<basic_reg_lambda_f<T, true>>(prg);
@@ -279,7 +279,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 ///                of errors)
 ///
 template<class T>
-std::unique_ptr<basic_lambda_f<T>> dyn_slot_evaluator<T>::lambdify(
+std::unique_ptr<basic_lambda_f> dyn_slot_evaluator<T>::lambdify(
   const T &ind) const
 {
   return std::make_unique<dyn_slot_lambda_f<T>>(ind, *this->dat_, x_slot_);
@@ -337,7 +337,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 ///                of errors)
 ///
 template<class T>
-std::unique_ptr<basic_lambda_f<T>> gaussian_evaluator<T>::lambdify(
+std::unique_ptr<basic_lambda_f> gaussian_evaluator<T>::lambdify(
   const T &ind) const
 {
   return std::make_unique<gaussian_lambda_f<T>>(ind, *this->dat_);
@@ -373,7 +373,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
 ///                of errors)
 ///
 template<class T>
-std::unique_ptr<basic_lambda_f<T>> binary_evaluator<T>::lambdify(
+std::unique_ptr<basic_lambda_f> binary_evaluator<T>::lambdify(
   const T &ind) const
 {
   return std::make_unique<binary_lambda_f<T>>(ind, *this->dat_);

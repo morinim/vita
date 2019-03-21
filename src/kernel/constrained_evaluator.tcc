@@ -55,7 +55,7 @@ fitness_t constrained_evaluator<T, E, P>::fast(const T &prg)
 /// \return        a pointer to the executable version of `prg`
 ///
 template<class T, class E, class P>
-std::unique_ptr<basic_lambda_f<T>> constrained_evaluator<T, E, P>::lambdify(
+std::unique_ptr<basic_lambda_f> constrained_evaluator<T, E, P>::lambdify(
   const T &prg) const
 {
   return eva_.lambdify(prg);

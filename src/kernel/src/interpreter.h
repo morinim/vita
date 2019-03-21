@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -40,7 +40,7 @@ public:
 
   any fetch_var(unsigned);
 
-private:  // Private support methods
+private:
   // Tells the compiler we want both the run function from interpreter and
   // src_interpreter.
   // Without this statement there will be no any run() function in the scope
@@ -50,7 +50,6 @@ private:  // Private support methods
   // different arguments).
   using interpreter<T>::run;
 
-private:  // Private data members
   const std::vector<any> *example_;
 };
 
@@ -58,4 +57,4 @@ private:  // Private data members
 
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

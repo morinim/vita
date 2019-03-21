@@ -144,7 +144,7 @@ std::string evaluator_proxy<T, E>::info() const
 /// \return        a pointer to the executable version of `prg`
 ///
 template<class T, class E>
-std::unique_ptr<basic_lambda_f<T>> evaluator_proxy<T, E>::lambdify(
+std::unique_ptr<basic_lambda_f> evaluator_proxy<T, E>::lambdify(
   const T &prg) const
 {
   return eva_.lambdify(prg);

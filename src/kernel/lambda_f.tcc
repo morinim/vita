@@ -17,6 +17,23 @@
 #if !defined(VITA_LAMBDA_F_TCC)
 #define      VITA_LAMBDA_F_TCC
 
+template<class T, bool S>
+const std::string basic_reg_lambda_f<T, S>::SERIALIZE_ID("REG_LAMBDA_F");
+
+template<class T, bool S, bool N>
+const std::string basic_dyn_slot_lambda_f<T, S, N>::SERIALIZE_ID("DYN_SLOT_LAMBDA_F");
+
+template<class T, bool S, bool N>
+const std::string basic_gaussian_lambda_f<T, S, N>::SERIALIZE_ID("GAUSSIAN_LAMBDA_F");
+
+template<class T, bool S, bool N>
+const std::string basic_binary_lambda_f<T, S, N>::SERIALIZE_ID("BINARY_LAMBDA_F");
+
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+const std::string team_class_lambda_f<T, S, N, L, C>::SERIALIZE_ID(
+  "TEAM_" + L<T, S, N>::SERIALIZE_ID);
+
 ///
 /// \param[in] prg the program (individual/team) to be lambdified
 ///
@@ -24,6 +41,21 @@ template<class T, bool S>
 basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
   : detail::reg_lambda_f_storage<T, S>(prg)
 {
+  Ensures(debug());
+}
+
+///
+/// \param[in] in input stream
+/// \param[in] ss active symbol set
+///
+template<class T, bool S>
+basic_reg_lambda_f<T, S>::basic_reg_lambda_f(std::istream &in,
+                                             const symbol_set &ss)
+  : detail::reg_lambda_f_storage<T, S>(in, ss)
+{
+  static_assert(
+    S, "reg_lambda_f requires storage space for de-serialization");
+
   Ensures(debug());
 }
 
@@ -81,7 +113,7 @@ std::pair<class_t, double> basic_reg_lambda_f<T, S>::tag(
 }
 
 ///
-/// \param[in] a value produced by lambda_f::operator()
+/// \param[in] a value produced by basic_lambda_f::operator()
 /// \return      the string version of `a`
 ///
 template<class T, bool S>
@@ -114,20 +146,6 @@ bool basic_reg_lambda_f<T, S>::debug() const
 }
 
 ///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` if the lambda has been loaded correctly
-///
-/// \note
-/// If the load operation isn't successful the current lambda isn't modified.
-///
-template<class T, bool S>
-bool basic_reg_lambda_f<T, S>::load(std::istream &in, const symbol_set &ss)
-{
-  return detail::reg_lambda_f_storage<T, S>::load(in, ss);
-}
-
-///
 /// \param[out] out output stream
 /// \return         `true` if lambda was saved correctly
 ///
@@ -143,6 +161,11 @@ bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
 template<class T, bool N>
 basic_class_lambda_f<T, N>::basic_class_lambda_f(const dataframe &d)
   : detail::class_names<N>(d)
+{
+}
+
+template<class T, bool N>
+basic_class_lambda_f<T, N>::basic_class_lambda_f() : detail::class_names<N>()
 {
 }
 
@@ -200,6 +223,48 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
   Expects(x_slot);
 
   fill_matrix(d, x_slot);
+
+  Ensures(debug());
+}
+
+///
+/// Constructs the object reading data from an input stream.
+///
+/// \param[in] in input stream
+/// \param[in] ss active symbol set
+///
+template<class T, bool S, bool N>
+basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(std::istream &in,
+                                                          const symbol_set &ss)
+  : basic_class_lambda_f<T, N>(), lambda_(in, ss), slot_matrix_(),
+    slot_class_(), dataset_size_()
+{
+  static_assert(
+    S, "dyn_slot_lambda_f requires storage space for de-serialization");
+
+  if (!slot_matrix_.load(in))
+    throw exception::data_format(
+      "Cannot read dyn_slot_lambda_f matrix component");
+
+  std::generate_n(std::back_inserter(slot_class_), slot_matrix_.rows(),
+                  [&in]
+                  {
+                    std::size_t v;
+                    if (!(in >> v))
+                      throw exception::data_format(
+                        "Cannot read dyn_slot_lambda_f slot_class component");
+                    return v;
+                  });
+
+  if (!(in >> dataset_size_))
+    throw exception::data_format(
+      "Cannot read dyn_slot_lambda_f dataset_size component");
+
+  if (!detail::class_names<N>::load(in))
+    throw exception::data_format(
+      "Cannot read dyn_slot_lambda_f class_names component");
+
+  Ensures(debug());
 }
 
 ///
@@ -347,84 +412,14 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 
   // Don't need to save slot_class_.size() since it's equal to
   // slot_matrix_.rows()
-  for (const auto s : slot_class_)
-    out << s << '\n';
-
-  out << dataset_size_ << '\n';
-
-  if (!detail::class_names<N>::save(out))
-    return false;
-
-  return out.good();
-}
-
-///
-/// Loads the lambda from persistent storage.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-/// \note
-/// If the load operation isn't successful the current lambda isn't modified.
-///
-template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load(std::istream &in,
-                                            const symbol_set &ss)
-{
-  // Tag dispatching to select the appropriate method.
-  // Note that there is an implementation of `operator=` only for `S==true`.
-  // Without tag dispatching the compiler would need a complete implementation
-  // (but we haven't a reasonable/general solution for the `S==false` case).
-  return load_(in, ss, detail::is_true<S>());
-}
-
-///
-/// Part of the tag dispatching method used by the
-/// basic_dyn_slot_lambda_f::load method.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &in,
-                                             const symbol_set &ss,
-                                             std::true_type)
-{
-  decltype(lambda_) l(lambda_);
-  if (!l.load(in, ss))
-    return false;
-
-  decltype(slot_matrix_) m;
-  if (!m.load(in))
-    return false;
-
-  decltype(slot_class_) s(slot_matrix_.rows());
-  for (auto &r : s)
-    if (!(in >> r))
+  for (auto s : slot_class_)
+    if (!(out << s << '\n'))
       return false;
 
-  decltype(dataset_size_) d;
-  if (!(in >> d))
+  if (!(out << dataset_size_ << '\n'))
     return false;
 
-  if (!detail::class_names<N>::load(in))
-    return false;
-
-  lambda_ = l;
-  slot_matrix_ = m;
-  slot_class_ = s;
-  dataset_size_ = d;
-
-  return true;
-}
-
-template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
-                                             std::false_type)
-{
-  return false;
+  return detail::class_names<N>::save(out);
 }
 
 ///
@@ -433,7 +428,7 @@ bool basic_dyn_slot_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
 template<class T, bool S, bool N>
 bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
 {
-  if (slot_matrix_.cols() <= 1)  // Too few classes
+  if (slot_matrix_.cols() <= 1)  // too few classes
     return false;
 
   if (slot_matrix_.rows() != slot_class_.size())
@@ -456,6 +451,44 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
   Expects(d.classes() > 1);
 
   fill_vector(d);
+
+  Ensures(debug());
+}
+
+///
+/// Constructs the object reading data from an input stream.
+///
+/// \param[in] in input stream
+/// \param[in] ss active symbol set
+///
+template<class T, bool S, bool N>
+basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(std::istream &in,
+                                                          const symbol_set &ss)
+  : basic_class_lambda_f<T, N>(), lambda_(in, ss), gauss_dist_()
+{
+  static_assert(
+    S, "gaussian_lambda_f requires storage space for de-serialization");
+
+  typename decltype(gauss_dist_)::size_type n;
+  if (!(in >> n))
+    throw exception::data_format(
+      "Cannot read gaussian_lambda_f size component");
+
+  for (decltype(n) i(0); i < n; ++i)
+  {
+    distribution<number> d;
+    if (!d.load(in))
+      throw exception::data_format(
+        "Cannot read gaussian_lambda_f distribution component");
+
+    gauss_dist_.push_back(d);
+  }
+
+  if (!detail::class_names<N>::load(in))
+      throw exception::data_format(
+        "Cannot read gaussian_lambda_f class_names component");
+
+  Ensures(debug());
 }
 
 ///
@@ -554,82 +587,14 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
   if (!lambda_.save(out))
     return false;
 
-  out << gauss_dist_.size() << '\n';
+  if (!(out << gauss_dist_.size() << '\n'))
+      return false;
+
   for (const auto g : gauss_dist_)
     if (!g.save(out))
       return false;
 
-  if (!detail::class_names<N>::save(out))
-    return false;
-
-  return out.good();
-}
-
-///
-/// Loads the lambda from persistent storage.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-/// \note
-/// If the load operation isn't successful the current lambda isn't modified.
-///
-template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load(std::istream &in,
-                                            const symbol_set &ss)
-{
-  // Tag dispatching to select the appropriate method.
-  // Note that there is an implementation of operator= only for S==true.
-  // Without tag dispatching the compiler would need a complete implementation
-  // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, ss, detail::is_true<S>());
-}
-
-///
-/// Part of the tag dispatching method used by the
-/// basic_gaussian_lambda_f::load method.
-///
-/// \param[in] p  current problem
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &in,
-                                             const symbol_set &ss,
-                                             std::true_type)
-{
-  decltype(lambda_) l(lambda_);
-  if (!l.load(in, ss))
-    return false;
-
-  typename decltype(gauss_dist_)::size_type n;
-  if (!(in >> n))
-    return false;
-
-  decltype(gauss_dist_) g(n);
-  for (auto &d : g)
-    if (!d.load(in))
-      return false;
-
-  if (!detail::class_names<N>::load(in))
-    return false;
-
-  lambda_ = l;
-  gauss_dist_ = g;
-
-  return true;
-}
-
-///
-/// This is part of the tag dispatching method used by the
-/// basic_gaussian_lambda_f::load method.
-///
-template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
-                                             std::false_type)
-{
-  return false;
+  return detail::class_names<N>::save(out);
 }
 
 ///
@@ -642,6 +607,8 @@ bool basic_gaussian_lambda_f<T, S, N>::debug() const
 }
 
 ///
+/// Constructs the object reading data from an input stream.
+///
 /// \param[in] ind individual "to be transformed" into a lambda function
 /// \param[in] d   the training set
 ///
@@ -653,6 +620,27 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
   Expects(ind.debug());
   Expects(d.debug());
   Expects(d.classes() == 2);
+
+  Ensures(debug());
+}
+
+///
+/// \param[in] in input stream
+/// \param[in] ss active symbol set
+///
+template<class T, bool S, bool N>
+basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(std::istream &in,
+                                                      const symbol_set &ss)
+  : basic_class_lambda_f<T, N>(), lambda_(in, ss)
+{
+  static_assert(
+    S, "binary_lambda_f requires storage space for de-serialization");
+
+  if (!detail::class_names<N>::load(in))
+      throw exception::data_format(
+        "Cannot read binary_lambda_f class_names component");
+
+  Ensures(debug());
 }
 
 ///
@@ -691,67 +679,7 @@ bool basic_binary_lambda_f<T, S, N>::save(std::ostream &out) const
   if (!lambda_.save(out))
     return false;
 
-  if (!detail::class_names<N>::save(out))
-    return false;
-
-  return out.good();
-}
-
-///
-/// Loads the lambda from persistent storage.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-/// \note
-/// If the load operation isn't successful the current lambda isn't modified.
-///
-template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load(std::istream &in,
-                                          const symbol_set &ss)
-{
-  // Tag dispatching to select the appropriate method.
-  // Note that there is an implementation of operator= only for S==true.
-  // Without tag dispatching the compiler would need a complete implementation
-  // (but we haven't a reasonable/general solution for the S==false case).
-  return load_(in, ss, detail::is_true<S>());
-}
-
-///
-/// Part of the tag dispatching method used by the
-/// basic_binary_lambda_f::load method.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &in,
-                                           const symbol_set &ss,
-                                           std::true_type)
-{
-  decltype(lambda_) l(lambda_);
-  if (!l.load(in, ss))
-    return false;
-
-  if (!detail::class_names<N>::load(in))
-    return false;
-
-  lambda_ = l;
-
-  return true;
-}
-
-///
-/// This is part of the tag dispatching method used by the
-/// basic_binary_lambda_f::load method.
-///
-template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::load_(std::istream &, const symbol_set &,
-                                           std::false_type)
-{
-  return false;
+  return detail::class_names<N>::save(out);
 }
 
 ///
@@ -770,6 +698,36 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
   team_.reserve(t.individuals());
   for (const auto &ind : t)
     team_.emplace_back(ind, d, std::forward<Args>(args)...);
+}
+
+///
+/// Constructs the object reading data from an input stream.
+///
+/// \param[in] in input stream
+/// \param[in] ss active symbol set
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C>
+team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(std::istream &in,
+                                                        const symbol_set &ss)
+  : basic_class_lambda_f<team<T>, N>(), classes_()
+{
+  static_assert(
+    S, "team_class_lambda_f requires storage space for de-serialization");
+
+  if (!(in >> classes_))
+    throw exception::data_format("Cannot read number of classes");
+
+  typename decltype(team_)::size_type s;
+  if (!(in >> s))
+    throw exception::data_format("Cannot read team size");
+
+  team_.reserve(s);
+  for (unsigned i(0); i < s; ++i)
+    team_.emplace_back(in, ss);
+
+  if (!detail::class_names<N>::load(in))
+    throw exception::data_format("Cannot read class_names");
 }
 
 ///
@@ -835,58 +793,28 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 bool team_class_lambda_f<T, S, N, L, C>::save(std::ostream &out) const
 {
-  out << classes_ << '\n';
+  if (!(out << classes_ << '\n'))
+    return false;
 
-  out << team_.size() << '\n';
+  if (!(out << team_.size() << '\n'))
+    return false;
+
   for (const auto &i : team_)
     if (!i.save(out))
       return false;
 
-  if (!detail::class_names<N>::save(out))
-    return false;
-
-  return out.good();
+  return detail::class_names<N>::save(out);
 }
 
 ///
-/// Loads the lambda team from persistent storage.
-///
-/// \param[in] ss active symbol set
-/// \param[in] in input stream
-/// \return       `true` on success
-///
-/// \note
-/// If the load operation isn't successful the current lambda isn't modified.
+/// \return Class ID used for serialization.
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
-bool team_class_lambda_f<T, S, N, L, C>::load(std::istream &in,
-                                              const symbol_set &ss)
+std::string team_class_lambda_f<T, S, N, L, C>::serialize_id() const
 {
-  decltype(classes_) cl;
-  if (!(in >> cl))
-    return false;
-
-  typename decltype(team_)::size_type s;
-  if (!(in >> s))
-    return false;
-
-  decltype(team_) t;
-  for (unsigned i(0); i < s; ++i)
-  {
-    typename decltype(team_)::value_type lambda(team_[0]);
-    if (!lambda.load(in, ss))
-      return false;
-    t.push_back(lambda);
-  }
-
-  if (!detail::class_names<N>::load(in))
-    return false;
-
-  team_ = t;
-  classes_ = cl;
-
-  return true;
+  Expects(team_.size());
+  return "TEAM_" + L<T, S, N>::SERIALIZE_ID;
 }
 
 ///
@@ -896,11 +824,99 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 bool team_class_lambda_f<T, S, N, L, C>::debug() const
 {
-  for (const auto &l : team_)
-    if (!l.debug())
-      return false;
+  if (classes_ <= 1)
+    return false;
 
-  return classes_ > 1;
+  return std::all_of(team_.begin(), team_.end(),
+                     [](const auto &l) { return l.debug(); });
 }
+
+namespace serialize
+{
+
+///
+/// Saves a lambda function on persistent storage.
+///
+/// \param[in] out output stream
+/// \param[in] l   lambda function
+/// \return        `true` on success
+///
+template<class T> bool save(std::ostream &out, const basic_src_lambda_f<T> *l)
+{
+  out << l->serialize_id() << '\n';;
+  return l->save(out);
+}
+
+template<class T> bool save(std::ostream &out, const basic_src_lambda_f<T> &l)
+{
+  return save(out, &l);
+}
+
+template<class T>
+bool save(std::ostream &out, const std::unique_ptr<basic_src_lambda_f<T>> &l)
+{
+  return save(out, l.get());
+}
+
+namespace lambda
+{
+
+namespace detail
+{
+
+template<class T> using build_func =
+  std::unique_ptr<basic_src_lambda_f<T>> (*)(std::istream &,
+                                             const symbol_set &);
+
+template<class T, template<class> class U>
+std::unique_ptr<basic_src_lambda_f<T>> build(std::istream &in,
+                                             const symbol_set &ss)
+{
+  return std::make_unique<U<T>>(in, ss);
+}
+
+template<class T> std::map<std::string, build_func<T>> factory_;
+
+}  // namespace detail
+
+///
+/// Allows insertion of user defined classificators.
+///
+template<class T, template<class> class U>
+bool insert(const std::string &id)
+{
+  Expects(!id.empty());
+  return detail::factory_<T>.insert({id, detail::build<T, U>}).second;
+}
+
+template<class T>
+std::unique_ptr<basic_src_lambda_f<T>> load(std::istream &in,
+                                            const symbol_set &ss)
+{
+  static_assert(
+    !is_team<T>(), "Use lambda::load_team for deserialization");
+
+  if (detail::factory_<T>.empty())
+  {
+    insert<T, reg_lambda_f>(reg_lambda_f<T>::SERIALIZE_ID);
+    insert<T, dyn_slot_lambda_f>(dyn_slot_lambda_f<T>::SERIALIZE_ID);
+    insert<T, gaussian_lambda_f>(gaussian_lambda_f<T>::SERIALIZE_ID);
+    insert<T, binary_lambda_f>(binary_lambda_f<T>::SERIALIZE_ID);
+  }
+
+  std::string id;
+  if (!(in >> id))
+    return nullptr;
+
+  const auto iter(detail::factory_<T>.find(id));
+  if (iter != detail::factory_<T>.end())
+    return iter->second(in, ss);
+
+  return nullptr;
+}
+
+}  // namespace lambda
+
+}  // namespace serialize
 
 #endif  // include guard

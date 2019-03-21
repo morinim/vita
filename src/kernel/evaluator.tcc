@@ -76,7 +76,7 @@ std::string evaluator<T>::info() const
 /// The default implementation is an empty method.
 ///
 template<class T>
-std::unique_ptr<basic_lambda_f<T>> evaluator<T>::lambdify(const T &) const
+std::unique_ptr<basic_lambda_f> evaluator<T>::lambdify(const T &) const
 {
   return nullptr;
 }

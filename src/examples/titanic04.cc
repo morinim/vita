@@ -45,5 +45,5 @@ int main()
 
   // We can make the model persistent.
   std::stringstream ss;
-  model->save(ss);
+  serialize::save(ss, model);
 }

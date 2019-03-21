@@ -470,7 +470,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
       return false;
     }
   }
-  else // symbolic regression
+  else  // symbolic regression
   {
     switch (id)
     {

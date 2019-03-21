@@ -22,10 +22,10 @@ template<> struct is_true<true> : std::true_type {};
 // *  reg_lambda_f_storage                                               *
 // ***********************************************************************
 
-/// This is the general template. The last parameter is used for
-/// disambiguation since we need three specializations that, without
-/// the third parameter, would overlap (see below).
-/// This technique is called tag dispatching by type (Barend Gehrels).
+// This is the general template.
+// The last parameter is used for disambiguation since we need three
+// specializations that, without the third parameter, would overlap (see
+// below). This technique is called tag dispatching by type (Barend Gehrels).
 template<class T, bool S, bool = is_team<T>::value> class reg_lambda_f_storage;
 
 // ********* First specialization (individual stored inside) *********
@@ -34,20 +34,35 @@ class reg_lambda_f_storage<T, true, false>
 {
 public:
   explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
-  { assert(debug()); }
+  { Ensures(debug()); }
 
-  // We just need to copy the `ind_` data member, the `int_` interpreter
-  // contains only a reference to `ind_`.
   reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
   {
     if (this != &rhs)
+    {
       ind_ = rhs.ind_;
+      int_ = src_interpreter<T>(&ind_);
+    }
 
+    assert(debug());
     return *this;
   }
 
   template<class ...Args> any run(Args && ...args) const
   {
+    // Consider that there are situations in which `&int_.program() != &ind_`
+    // and this function will blow up.
+    // It shouldn't happen: `debug` checks for this problematic condition,
+    // `operator=` resets the pointer to the reference individual... but it's
+    // not enough.
+    // A typical scenario may be that a vector of objects containing
+    // `reg_lambda_f_storage` needs reallocation after a `push_back`. All the
+    // `int_` object are invalidated...
+    //
+    // `src_interpreter` is a lightweight object so we could recreate it here
+    // every time or we could add a check:
+    // `if (&int_.program() != &ind_)  int_ = src_interpreter<T>(&ind_);`
+    // Both solutions should be checked for possible performance hits.
     return int_.run(std::forward<Args>(args)...);
   }
 
@@ -62,20 +77,19 @@ public:
     return &int_.program() == &ind_;
   }
 
-  // Serialization
-  bool load(std::istream &in, const symbol_set &ss)
-  {
-    unsigned n;
-    if (!(in >> n) || n != 1)
-      return false;
+  // Serialization.
+  bool save(std::ostream &out) const { return ind_.save(out); }
 
-    return ind_.load(in, ss);
-  }
-
-  bool save(std::ostream &out) const
+protected:
+  reg_lambda_f_storage(std::istream &in, const symbol_set &ss)
+    : int_(&ind_)
   {
-    out << 1 << '\n';
-    return ind_.save(out);
+    if (!ind_.load(in, ss))
+      throw exception::data_format("Cannot load individual");
+
+    int_ = src_interpreter<T>(&ind_);
+
+    Ensures(debug());
   }
 
 private:
@@ -89,7 +103,7 @@ class reg_lambda_f_storage<T, false, false>
 {
 public:
   explicit reg_lambda_f_storage(const T &ind) : int_(&ind)
-  { assert(debug()); }
+  { Ensures(debug()); }
 
   template<class ...Args> any run(Args && ...args) const
   {
@@ -99,11 +113,8 @@ public:
   bool debug() const { return int_.debug(); }
 
   // Serialization
-  bool load(std::istream &, const symbol_set &) { return false; }
-
   bool save(std::ostream &out) const
   {
-    out << 1 << '\n';
     return int_.program().save(out);
   }
 
@@ -116,80 +127,56 @@ template<class T, bool S>
 class reg_lambda_f_storage<team<T>, S, true>
 {
 public:
-  explicit reg_lambda_f_storage(const team<T> &t)
+  explicit reg_lambda_f_storage(const team<T> &t) : team_()
   {
     team_.reserve(t.individuals());
     for (const auto &ind : t)
       team_.emplace_back(ind);
 
-    assert(debug());
+    Ensures(debug());
+  }
+
+  reg_lambda_f_storage(std::istream &in, const symbol_set &ss) : team_()
+  {
+    unsigned n;
+    if (!(in >> n) || !n)
+      throw exception::data_format("Unknown/wrong number of programs");
+
+    team_.reserve(n);
+    for (unsigned j(0); j < n; ++j)
+      team_.emplace_back(in, ss);
+
+    Ensures(debug());
   }
 
   bool debug() const
   {
-    for (const auto &lambda : team_)
-      if (!lambda.debug())
-        return false;
-
-    return true;
+    return std::all_of(team_.begin(), team_.end(),
+                       [](const auto &lambda) { return lambda.debug(); });
   }
 
-  // Serialization
-
-  /// Load is atomic: if it doesn't succeed this object isn't modified; if
-  /// it succeeds the team if replaced with a new team (eventually with a
-  /// different size) loaded from the input stream.
-  bool load(std::istream &in, const symbol_set &ss)
-  {
-    unsigned n;
-    if (!(in >> n) || !n)
-      return false;
-
-    decltype(team_) v;
-    v.reserve(n);
-
-    for (unsigned j(0); j < n; ++j)
-    {
-      reg_lambda_f_storage<T, S> temp_storage{T()};
-
-      if (!temp_storage.load(in, ss))
-        return false;
-
-      v.push_back(temp_storage);
-    }
-
-    team_ = v;
-    return true;
-  }
-
+  // Serialization.
   bool save(std::ostream &o) const
   {
-    o << team_.size() << '\n';
-    if (!o.good())
-      return false;
-
-    for (const auto &l : team_)
-      if (!l.save(o))
-        return false;
-
-    return o.good();
+    return (o << team_.size() << '\n')
+           && std::all_of(team_.begin(), team_.end(),
+                          [&o](const auto &lambda) { return lambda.save(o); });
   }
 
 public:
   std::vector<reg_lambda_f_storage<T, S>> team_;
 };
 
-
 // ***********************************************************************
 // *  class_names                                                        *
 // ***********************************************************************
 
 ///
-/// A class to (optionally) store a vector of names.
+/// A class which (optionally) stores a vector of names.
 ///
-/// \tparam N if `true` stores the names otherwise keeps the memory free
+/// \tparam N if `true` stores the names (otherwise saves memory)
 ///
-/// This class is used for optimize the storage of vita::class_lambda_f. The
+/// This class is used for optimize the storage of basic_class_lambda_f. The
 /// strategy used is the so called 'Empty Base Class Optimization': the
 /// compiler is allowed to flatten the inheritance hierarchy in a way that
 /// the empty base class does not consume space (this is not true for empty
@@ -203,13 +190,14 @@ template<bool N>
 class class_names
 {
 public:
-  // Serialization
+  // *** Serialization ***
   bool load(std::istream &) { return true; }
   bool save(std::ostream &) const { return true; }
 
 protected:
-  /// Without names... there isn't anything to do.
+  /// Without names... there is nothing to do.
   explicit class_names(const dataframe &) {}
+  class_names() = default;
 
   std::string string(const any &) const;
 };
@@ -218,12 +206,13 @@ template<>
 class class_names<true>
 {
 public:
-  // Serialization
+  // *** Serialization ***
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
 protected:
   explicit class_names(const dataframe &);
+  class_names() : names_() {}
 
   std::string string(const any &) const;
 
@@ -236,18 +225,18 @@ private:
 ///
 inline class_names<true>::class_names(const dataframe &d) : names_(d.classes())
 {
+  Expects(d.classes() > 1);
   const auto classes(d.classes());
-  assert(classes > 1);
 
   for (auto i(decltype(classes){0}); i < classes; ++i)
     names_[i] = d.class_name(i);
 }
 
 ///
-/// \param[in] in input stream.
-/// \return `true` on success.
+/// Loads the names from storage.
 ///
-/// Loads the names from input stream `in`.
+/// \param[in] in input stream
+/// \return       `true` on success
 ///
 inline bool class_names<true>::load(std::istream &in)
 {
@@ -266,12 +255,8 @@ inline bool class_names<true>::load(std::istream &in)
   std::ws(in);
 
   for (auto &line : v)
-  {
-    getline(in, line);
-
-    if (in.fail())
+    if (!getline(in, line))
       return false;
-  }
 
   names_ = v;
 
@@ -279,31 +264,29 @@ inline bool class_names<true>::load(std::istream &in)
 }
 
 ///
-/// \param[out] o output stream.
-/// \return `true` on success.
+/// Saves the names.
 ///
-/// Saves the names (one per line, end of line character is '\n'). The first
-/// line contains the number of names.
+/// \param[out] o output stream
+/// \return       `true` on success
+///
+/// One name per line, end of line character is `\n`. First line contains the
+/// number of names.
 ///
 inline bool class_names<true>::save(std::ostream &o) const
 {
-  o << names_.size() << '\n';
-  if (!o.good())
+  if (!(o << names_.size() << '\n'))
     return false;
 
   for (const auto &n : names_)
-  {
-    o << n << '\n';
-    if (!o.good())
+    if (!(o << n << '\n'))
       return false;
-  }
 
   return o.good();
 }
 
 ///
-/// \param[in] a id of a class.
-/// \return the name of class `a`.
+/// \param[in] a id of a class
+/// \return      the name of class `a`
 ///
 template<bool N>
 std::string class_names<N>::string(const any &a) const
@@ -312,8 +295,8 @@ std::string class_names<N>::string(const any &a) const
 }
 
 ///
-/// \param[in] a id of a class.
-/// \return the name of class `a`.
+/// \param[in] a id of a class
+/// \return      the name of class `a`
 ///
 inline std::string class_names<true>::string(const any &a) const
 {
@@ -329,4 +312,4 @@ inline std::string class_names<true>::string(const any &a) const
 }  // namespace detail
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

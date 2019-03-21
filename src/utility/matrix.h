@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,24 +22,23 @@ namespace vita
 ///
 /// There are a lot of alternatives but this is *slim* and *fast*:
 /// - `std::vector<std::vector<T>>` is slow;
-/// - boost *uBLAS* and *boost.MultiArray* are good, general solutions but a
-///   bit oversized for our needs.
+/// - boost *uBLAS* and *boost.MultiArray* are good, general solutions but
+///   oversized for our needs.
 ///
 /// The idea is to use a vector and translate the 2 dimensions to one
 /// dimension (matrix::index() method). This way the whole thing is stored in
-/// a single memory block instead of in several fragmented blocks for each
-/// row.
+/// a contiguous memory block.
 ///
 /// \note
 /// This class is based on `std::vector`. So although `matrix<bool>` will
 /// work, you could prefer `matrix<char>` for performance reasons
-/// (`std::vector<bool>` is a "peculiar" specialization).
+/// (`std::vector<bool>` is a *peculiar* specialization).
 ///
 template<class T>
 class matrix
 {
 public:
-  // Type alias
+  // *** Type alias ***
   using values_t = std::vector<T>;
   using value_type = typename values_t::value_type;
   using reference = typename values_t::reference;
@@ -64,7 +63,7 @@ public:
 
   matrix &operator+=(const matrix &);
 
-  // Iterators
+  // *** Iterators ***
   using iterator = typename values_t::iterator;
   using const_iterator = typename values_t::const_iterator;
 
@@ -73,16 +72,16 @@ public:
   const_iterator end() const;
   iterator end();
 
-  // Serialization
+  // *** Serialization ***
   bool load(std::istream &);
   bool save(std::ostream &) const;
 
 private:
-  // Private support functions
+  // *** Private support functions ***
   std::size_t size() const;
   std::size_t index(std::size_t, std::size_t) const;
 
-  // Private data members
+  // *** Private data members ***
   values_t data_;
 
   std::size_t cols_;

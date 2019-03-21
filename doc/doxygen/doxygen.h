@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,6 +45,9 @@
  *  \namespace out
  *  Contains flags and manipulators to control the output format of
  *  individuals.
+ *
+ *  \namespace serialize
+ *  Contains support structures / functions for object serialization.
  *
  *  \namespace detail
  *  The contents of this namespace isn't intended for general consumption: it

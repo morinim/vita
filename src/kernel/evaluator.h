@@ -65,7 +65,7 @@ public:
   // The following methods have a default implementation (usually empty).
   virtual fitness_t fast(const T &);
   virtual std::string info() const;
-  virtual std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const;
+  virtual std::unique_ptr<basic_lambda_f> lambdify(const T &) const;
 };
 
 ///

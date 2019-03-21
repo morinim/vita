@@ -52,7 +52,7 @@ public:
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
-  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
@@ -184,9 +184,7 @@ public:
 /// dynamically determined during the evolutionary process.
 ///
 /// \see
-/// "Multiclass Object Classification Using Genetic Programming" - CS-RE-04/2
-/// - Mengjie Zhang, Will Smart -
-/// <http://www.mcs.vuw.ac.nz/comp/Publications/CS-TR-04-2.abs.html>
+/// [Multiclass Object Classification Using Genetic Programming](https://github.com/morinim/vita/wiki/bibliography#12)
 ///
 template<class T>
 class dyn_slot_evaluator : public classification_evaluator<T>
@@ -195,7 +193,7 @@ public:
   explicit dyn_slot_evaluator(dataframe &, unsigned = 10);
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
 
 private:
   /// Number of slots for each class of the training set.
@@ -211,9 +209,7 @@ private:
 /// to construct the fitness function for classification.
 ///
 /// \see
-/// "Using Gaussian Distribution to Construct Fitness Functions in Genetic
-/// Programming for Multiclass Object Classification" - CS-TR-05-5 - Mangjie
-/// Zhang, Will Smart.
+/// [Using Gaussian Distribution to Construct Fitness Functions in Genetic Programming for Multiclass Object Classification](https://github.com/morinim/vita/wiki/bibliography#13)
 ///
 template<class T>
 class gaussian_evaluator : public classification_evaluator<T>
@@ -222,7 +218,7 @@ public:
   explicit gaussian_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
 };
 
 ///
@@ -235,7 +231,7 @@ public:
   explicit binary_evaluator(dataframe &d) : classification_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
-  std::unique_ptr<basic_lambda_f<T>> lambdify(const T &) const override;
+  std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
 };
 
 #include "kernel/src/evaluator.tcc"
