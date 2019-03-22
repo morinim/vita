@@ -57,7 +57,7 @@ double accuracy_metric::operator()(const core_class_lambda_f *l,
 
   for (const auto &example : d)
   {
-    if (l->tag(example).first == label(example))
+    if (l->tag(example).label == label(example))
       ++ok;
 
     ++total_nr;

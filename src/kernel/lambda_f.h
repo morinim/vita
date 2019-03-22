@@ -76,6 +76,15 @@ bool save(std::ostream &, const std::unique_ptr<basic_src_lambda_f> &);
 }  // namespace serialize
 
 ///
+/// Contains a class ID / confidence level pair.
+///
+struct classification_result
+{
+  class_t   label;   /// class ID
+  double sureness;   /// confidence level
+};
+
+///
 /// Extends basic_lambda_f interface adding some useful methods for symbolic
 /// regression / classification and serialization.
 ///
@@ -88,7 +97,7 @@ class basic_src_lambda_f : public basic_lambda_f
 public:
   virtual double measure(const model_metric &, const dataframe &) const = 0;
   virtual std::string name(const any &) const = 0;
-  virtual std::pair<class_t, double> tag(const dataframe::example &) const = 0;
+  virtual classification_result tag(const dataframe::example &) const = 0;
 
 private:
   // *** Serialization ***
@@ -139,7 +148,7 @@ public:
 
 private:
   // Not useful for regression tasks and moved to private section.
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
+  classification_result tag(const dataframe::example &) const final;
 
   std::string serialize_id() const final { return SERIALIZE_ID; }
 
@@ -201,41 +210,6 @@ protected:
 };
 
 ///
-/// An helper class for extending classification schemes to teams.
-///
-/// \tparam T type of individual
-/// \tparam S stores the individual inside vs keep a reference only
-/// \tparam N stores the name of the classes vs doesn't store the names
-/// \tparam L the basic classificator that must be extended
-/// \tparam C composition method for team's member responses
-///
-template<class T, bool S, bool N, template<class, bool, bool> class L,
-         team_composition C = team_composition::standard>
-class team_class_lambda_f : public basic_class_lambda_f<N>
-{
-public:
-  template<class... Args> team_class_lambda_f(const team<T> &, dataframe &,
-                                              Args &&...);
-  team_class_lambda_f(std::istream &, const symbol_set &);
-
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
-
-  bool debug() const final;
-
-  static const std::string SERIALIZE_ID;
-
-private:
-  bool save(std::ostream &) const final;
-  std::string serialize_id() const final;
-
-  // The components of the team never store the names of the classes. If we
-  // need the names, the master class will memorize them.
-  std::vector<L<T, S, false>> team_;
-
-  unsigned classes_;
-};
-
-///
 /// Lambda class for Slotted Dynamic Class Boundary Determination.
 ///
 /// \tparam T type of individual
@@ -254,7 +228,7 @@ public:
   basic_dyn_slot_lambda_f(const T &, dataframe &, unsigned);
   basic_dyn_slot_lambda_f(std::istream &, const symbol_set &);
 
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
+  classification_result tag(const dataframe::example &) const final;
 
   bool debug() const final;
 
@@ -281,7 +255,7 @@ private:
   matrix<unsigned> slot_matrix_;
 
   /// slot_class[i] = "label of the predominant class" for the i-th slot.
-  std::vector<std::size_t> slot_class_;
+  std::vector<class_t> slot_class_;
 
   /// Size of the dataset used to construct `slot_matrix`.
   std::size_t dataset_size_;
@@ -306,7 +280,7 @@ public:
   basic_gaussian_lambda_f(const T &, dataframe &);
   basic_gaussian_lambda_f(std::istream &, const symbol_set &);
 
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
+  classification_result tag(const dataframe::example &) const final;
 
   bool debug() const final;
 
@@ -347,7 +321,7 @@ public:
   basic_binary_lambda_f(const T &, dataframe &);
   basic_binary_lambda_f(std::istream &, const symbol_set &);
 
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
+  classification_result tag(const dataframe::example &) const final;
 
   bool debug() const final;
 
@@ -364,6 +338,41 @@ private:
 // ***********************************************************************
 // * Extensions to support teams                                          *
 // ***********************************************************************
+
+///
+/// An helper class for extending classification schemes to teams.
+///
+/// \tparam T type of individual
+/// \tparam S stores the individual inside vs keep a reference only
+/// \tparam N stores the name of the classes vs doesn't store the names
+/// \tparam L the basic classificator that must be extended
+/// \tparam C composition method for team's member responses
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C = team_composition::standard>
+class team_class_lambda_f : public basic_class_lambda_f<N>
+{
+public:
+  template<class... Args> team_class_lambda_f(const team<T> &, dataframe &,
+                                              Args &&...);
+  team_class_lambda_f(std::istream &, const symbol_set &);
+
+  classification_result tag(const dataframe::example &) const final;
+
+  bool debug() const final;
+
+  static const std::string SERIALIZE_ID;
+
+private:
+  bool save(std::ostream &) const final;
+  std::string serialize_id() const final;
+
+  // The components of the team never store the names of the classes. If we
+  // need the names, the master class will memorize them.
+  std::vector<L<T, S, false>> team_;
+
+  unsigned classes_;
+};
 
 ///
 /// Slotted Dynamic Class Boundary Determination specialization for teams.

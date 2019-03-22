@@ -40,10 +40,18 @@ int main()
   const auto result(model->tag(example));
 
   std::cout << "Correct class: " << label(example)
-            << "   Prediction: " << result.first
-            << "   Sureness: " << result.second << '\n';
+            << "   Prediction: " << result.label
+            << "   Sureness: " << result.sureness << '\n';
 
-  // We can make the model persistent.
+  // We can make the model persistent...
   std::stringstream ss;
   serialize::save(ss, model);
+
+  // ... and reload it when needed.
+  const auto model2(serialize::lambda::load(ss, titanic.sset));
+  const auto result2(model2->tag(example));
+  std::cout << "   Prediction: " << result2.label
+            << "   Sureness: " << result2.sureness << '\n';
+
+  assert(result.label == result.label);
 }

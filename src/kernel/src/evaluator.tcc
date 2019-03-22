@@ -254,15 +254,11 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
 
   fitness_t::value_type err(0.0);
   for (auto &example : *this->dat_)
-  {
-    const auto probable_class(lambda.tag(example).first);
-
-    if (probable_class != label(example))
+    if (lambda.tag(example).label != label(example))
     {
       ++err;
       ++example.template difficulty;
     }
-  }
 
   return {-err};
 
@@ -305,16 +301,16 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   fitness_t::value_type d(0.0);
   for (auto &example : *this->dat_)
   {
-    const auto res(lambda.tag(example));  // confidence in classification
+    const auto res(lambda.tag(example));
 
-    if (res.first == label(example))
+    if (res.label == label(example))
     {
       // Note:
       // * (1.0 - confidence) is the sum of the errors;
       // * (confidence - 1.0) is the opposite (standardized fitness);
       // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
       //   average error.
-      d += (res.second - 1.0) / (this->dat_->classes() - 1);
+      d += (res.sureness - 1.0) / (this->dat_->classes() - 1);
     }
     else
     {
@@ -356,7 +352,7 @@ fitness_t binary_evaluator<T>::operator()(const T &ind)
   fitness_t::value_type err(0.0);
 
   for (auto &example : *this->dat_)
-    if (label(example) != agent.tag(example).first)
+    if (label(example) != agent.tag(example).label)
     {
       ++example.difficulty;
       ++err;

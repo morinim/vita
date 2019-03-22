@@ -275,13 +275,13 @@ void test_team(vita::src_problem &pr)
       {
         lambda1.name(out[0]), lambda2.name(out[1]), lambda3.name(out[2])
       };
-      const std::vector<std::pair<class_t, double>> tags =
+      const std::vector<classification_result> tags =
       {
         lambda1.tag(example), lambda2.tag(example), lambda3.tag(example)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        CHECK(any_cast<class_t>(out[j]) == tags[j].first);
+        CHECK(any_cast<class_t>(out[j]) == tags[j].label);
 
       std::string s_best(names[0]);
 
@@ -308,7 +308,7 @@ void test_team(vita::src_problem &pr)
       class_t c_best(0);
 
       for (auto j(decltype(ts){1}); j < ts; ++j)
-        if (tags[j].second > tags[c_best].second)
+        if (tags[j].sureness > tags[c_best].sureness)
         {
           s_best = names[j];
           c_best = j;

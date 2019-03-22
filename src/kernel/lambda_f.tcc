@@ -110,7 +110,7 @@ any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
 /// \warning This function is useful only for classification tasks.
 ///
 template<class T, bool S>
-std::pair<class_t, double> basic_reg_lambda_f<T, S>::tag(
+classification_result basic_reg_lambda_f<T, S>::tag(
   const dataframe::example &) const
 {
   return {0, 0};
@@ -178,7 +178,7 @@ basic_class_lambda_f<N>::basic_class_lambda_f(const dataframe &d)
 template<bool N>
 any basic_class_lambda_f<N>::operator()(const dataframe::example &e) const
 {
-  return any(this->tag(e).first);
+  return any(this->tag(e).label);
 }
 
 ///
@@ -379,7 +379,7 @@ double basic_dyn_slot_lambda_f<T, S, N>::training_accuracy() const
 ///                     confidence level (in the range `[0,1]`)
 ///
 template<class T, bool S, bool N>
-std::pair<class_t, double> basic_dyn_slot_lambda_f<T, S, N>::tag(
+classification_result basic_dyn_slot_lambda_f<T, S, N>::tag(
   const dataframe::example &instance) const
 {
   const auto s(slot(instance));
@@ -532,7 +532,7 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
 ///                    `1`)
 ///
 template<class T, bool S, bool N>
-std::pair<class_t, double> basic_gaussian_lambda_f<T, S, N>::tag(
+classification_result basic_gaussian_lambda_f<T, S, N>::tag(
   const dataframe::example &example) const
 {
   const any res(lambda_(example));
@@ -650,7 +650,7 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(std::istream &in,
 ///              the `[0,1]` interval)
 ///
 template<class T, bool S, bool N>
-std::pair<class_t, double> basic_binary_lambda_f<T, S, N>::tag(
+classification_result basic_binary_lambda_f<T, S, N>::tag(
   const dataframe::example &e) const
 {
   const any res(lambda_(e));
@@ -749,7 +749,7 @@ team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(std::istream &in,
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
-std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
+classification_result team_class_lambda_f<T, S, N, L, C>::tag(
   const dataframe::example &instance) const
 {
   if (C == team_composition::wta)
@@ -761,7 +761,7 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
     {
       const auto res(team_[i].tag(instance));
 
-      if (res.second > best.second)
+      if (res.sureness > best.sureness)
         best = res;
     }
 
@@ -772,7 +772,7 @@ std::pair<class_t, double> team_class_lambda_f<T, S, N, L, C>::tag(
     std::vector<unsigned> votes(classes_);
 
     for (const auto &lambda : team_)
-      ++votes[lambda.tag(instance).first];
+      ++votes[lambda.tag(instance).label];
 
     class_t max(0);
     for (auto i(max + 1); i < classes_; ++i)
