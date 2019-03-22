@@ -18,16 +18,20 @@
 #define      VITA_LAMBDA_F_TCC
 
 template<class T, bool S>
-const std::string basic_reg_lambda_f<T, S>::SERIALIZE_ID("REG_LAMBDA_F");
+const std::string basic_reg_lambda_f<T, S>::SERIALIZE_ID(
+  is_team<T>() ? "TEAM_REG_LAMBDA_F" : "REG_LAMBDA_F");
 
 template<class T, bool S, bool N>
-const std::string basic_dyn_slot_lambda_f<T, S, N>::SERIALIZE_ID("DYN_SLOT_LAMBDA_F");
+const std::string basic_dyn_slot_lambda_f<T, S, N>::SERIALIZE_ID(
+  "DYN_SLOT_LAMBDA_F");
 
 template<class T, bool S, bool N>
-const std::string basic_gaussian_lambda_f<T, S, N>::SERIALIZE_ID("GAUSSIAN_LAMBDA_F");
+const std::string basic_gaussian_lambda_f<T, S, N>::SERIALIZE_ID(
+  "GAUSSIAN_LAMBDA_F");
 
 template<class T, bool S, bool N>
-const std::string basic_binary_lambda_f<T, S, N>::SERIALIZE_ID("BINARY_LAMBDA_F");
+const std::string basic_binary_lambda_f<T, S, N>::SERIALIZE_ID(
+  "BINARY_LAMBDA_F");
 
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
@@ -130,7 +134,7 @@ std::string basic_reg_lambda_f<T, S>::name(const any &a) const
 /// \return      the value of `this` according to metric `m`
 ///
 template<class T, bool S>
-double basic_reg_lambda_f<T, S>::measure(const model_metric<T> &m,
+double basic_reg_lambda_f<T, S>::measure(const model_metric &m,
                                          const dataframe &d) const
 {
   return m(this, d);
@@ -146,6 +150,8 @@ bool basic_reg_lambda_f<T, S>::debug() const
 }
 
 ///
+/// Saves the object on persistent storage.
+///
 /// \param[out] out output stream
 /// \return         `true` if lambda was saved correctly
 ///
@@ -158,14 +164,9 @@ bool basic_reg_lambda_f<T, S>::save(std::ostream &out) const
 ///
 /// \param[in] d the training set
 ///
-template<class T, bool N>
-basic_class_lambda_f<T, N>::basic_class_lambda_f(const dataframe &d)
+template<bool N>
+basic_class_lambda_f<N>::basic_class_lambda_f(const dataframe &d)
   : detail::class_names<N>(d)
-{
-}
-
-template<class T, bool N>
-basic_class_lambda_f<T, N>::basic_class_lambda_f() : detail::class_names<N>()
 {
 }
 
@@ -174,8 +175,8 @@ basic_class_lambda_f<T, N>::basic_class_lambda_f() : detail::class_names<N>()
 /// \return      the label of the class that includes `e` (wrapped inside a
 ///              `any`)
 ///
-template<class T, bool N>
-any basic_class_lambda_f<T, N>::operator()(const dataframe::example &e) const
+template<bool N>
+any basic_class_lambda_f<N>::operator()(const dataframe::example &e) const
 {
   return any(this->tag(e).first);
 }
@@ -187,9 +188,9 @@ any basic_class_lambda_f<T, N>::operator()(const dataframe::example &e) const
 /// \param[in] d a dataset
 /// \return      the value of `this` according to metric `m`
 ///
-template<class T, bool N>
-double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
-                                           const dataframe &d) const
+template<bool N>
+double basic_class_lambda_f< N>::measure(const model_metric &m,
+                                         const dataframe &d) const
 {
   return m(this, d);
 }
@@ -198,8 +199,8 @@ double basic_class_lambda_f<T, N>::measure(const model_metric<T> &m,
 /// \param[in] a id of a class
 /// \return      the name of class `a`
 ///
-template<class T, bool N>
-std::string basic_class_lambda_f<T, N>::name(const any &a) const
+template<bool N>
+std::string basic_class_lambda_f<N>::name(const any &a) const
 {
   return detail::class_names<N>::string(a);
 }
@@ -213,7 +214,7 @@ template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
                                                           dataframe &d,
                                                           unsigned x_slot)
-  : basic_class_lambda_f<T, N>(d), lambda_(ind),
+  : basic_class_lambda_f<N>(d), lambda_(ind),
     slot_matrix_(d.classes() * x_slot, d.classes()),
     slot_class_(d.classes() * x_slot), dataset_size_(0)
 {
@@ -236,8 +237,8 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(std::istream &in,
                                                           const symbol_set &ss)
-  : basic_class_lambda_f<T, N>(), lambda_(in, ss), slot_matrix_(),
-    slot_class_(), dataset_size_()
+  : basic_class_lambda_f<N>(), lambda_(in, ss), slot_matrix_(), slot_class_(),
+    dataset_size_()
 {
   static_assert(
     S, "dyn_slot_lambda_f requires storage space for de-serialization");
@@ -444,7 +445,7 @@ bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
 template<class T, bool S, bool N>
 basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
                                                           dataframe &d)
-  : basic_class_lambda_f<T, N>(d), lambda_(ind), gauss_dist_(d.classes())
+  : basic_class_lambda_f<N>(d), lambda_(ind), gauss_dist_(d.classes())
 {
   Expects(ind.debug());
   Expects(d.debug());
@@ -464,7 +465,7 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(std::istream &in,
                                                           const symbol_set &ss)
-  : basic_class_lambda_f<T, N>(), lambda_(in, ss), gauss_dist_()
+  : basic_class_lambda_f<N>(), lambda_(in, ss), gauss_dist_()
 {
   static_assert(
     S, "gaussian_lambda_f requires storage space for de-serialization");
@@ -615,7 +616,7 @@ bool basic_gaussian_lambda_f<T, S, N>::debug() const
 template<class T, bool S, bool N>
 basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
                                                       dataframe &d)
-  : basic_class_lambda_f<T, N>(d), lambda_(ind)
+  : basic_class_lambda_f<N>(d), lambda_(ind)
 {
   Expects(ind.debug());
   Expects(d.debug());
@@ -631,7 +632,7 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
 template<class T, bool S, bool N>
 basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(std::istream &in,
                                                       const symbol_set &ss)
-  : basic_class_lambda_f<T, N>(), lambda_(in, ss)
+  : basic_class_lambda_f<N>(), lambda_(in, ss)
 {
   static_assert(
     S, "binary_lambda_f requires storage space for de-serialization");
@@ -693,7 +694,7 @@ template<class... Args>
 team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(const team<T> &t,
                                                         dataframe &d,
                                                         Args&&... args)
-  : basic_class_lambda_f<team<T>, N>(d), classes_(d.classes())
+  : basic_class_lambda_f<N>(d), classes_(d.classes())
 {
   team_.reserve(t.individuals());
   for (const auto &ind : t)
@@ -710,7 +711,7 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
 team_class_lambda_f<T, S, N, L, C>::team_class_lambda_f(std::istream &in,
                                                         const symbol_set &ss)
-  : basic_class_lambda_f<team<T>, N>(), classes_()
+  : basic_class_lambda_f<N>(), classes_()
 {
   static_assert(
     S, "team_class_lambda_f requires storage space for de-serialization");
@@ -834,82 +835,53 @@ bool team_class_lambda_f<T, S, N, L, C>::debug() const
 namespace serialize
 {
 
-///
-/// Saves a lambda function on persistent storage.
-///
-/// \param[in] out output stream
-/// \param[in] l   lambda function
-/// \return        `true` on success
-///
-template<class T> bool save(std::ostream &out, const basic_src_lambda_f<T> *l)
-{
-  out << l->serialize_id() << '\n';;
-  return l->save(out);
-}
-
-template<class T> bool save(std::ostream &out, const basic_src_lambda_f<T> &l)
-{
-  return save(out, &l);
-}
-
-template<class T>
-bool save(std::ostream &out, const std::unique_ptr<basic_src_lambda_f<T>> &l)
-{
-  return save(out, l.get());
-}
-
 namespace lambda
 {
 
 namespace detail
 {
+using build_func = std::unique_ptr<basic_src_lambda_f> (*)(std::istream &,
+                                                           const symbol_set &);
 
-template<class T> using build_func =
-  std::unique_ptr<basic_src_lambda_f<T>> (*)(std::istream &,
-                                             const symbol_set &);
-
-template<class T, template<class> class U>
-std::unique_ptr<basic_src_lambda_f<T>> build(std::istream &in,
-                                             const symbol_set &ss)
+template<class U>
+std::unique_ptr<basic_src_lambda_f> build(std::istream &in,
+                                          const symbol_set &ss)
 {
-  return std::make_unique<U<T>>(in, ss);
+  return std::make_unique<U>(in, ss);
 }
 
-template<class T> std::map<std::string, build_func<T>> factory_;
-
-}  // namespace detail
+extern std::map<std::string, build_func> factory_;
+}
 
 ///
 /// Allows insertion of user defined classificators.
 ///
-template<class T, template<class> class U>
+template<class U>
 bool insert(const std::string &id)
 {
   Expects(!id.empty());
-  return detail::factory_<T>.insert({id, detail::build<T, U>}).second;
+  return detail::factory_.insert({id, detail::build<U>}).second;
 }
 
 template<class T>
-std::unique_ptr<basic_src_lambda_f<T>> load(std::istream &in,
-                                            const symbol_set &ss)
+std::unique_ptr<basic_src_lambda_f> load(std::istream &in,
+                                         const symbol_set &ss)
 {
-  static_assert(
-    !is_team<T>(), "Use lambda::load_team for deserialization");
-
-  if (detail::factory_<T>.empty())
+  if (detail::factory_.find(reg_lambda_f<T>::SERIALIZE_ID)
+      == detail::factory_.end())
   {
-    insert<T, reg_lambda_f>(reg_lambda_f<T>::SERIALIZE_ID);
-    insert<T, dyn_slot_lambda_f>(dyn_slot_lambda_f<T>::SERIALIZE_ID);
-    insert<T, gaussian_lambda_f>(gaussian_lambda_f<T>::SERIALIZE_ID);
-    insert<T, binary_lambda_f>(binary_lambda_f<T>::SERIALIZE_ID);
+    insert<reg_lambda_f<T>>(reg_lambda_f<T>::SERIALIZE_ID);
+    insert<dyn_slot_lambda_f<T>>(dyn_slot_lambda_f<T>::SERIALIZE_ID);
+    insert<gaussian_lambda_f<T>>(gaussian_lambda_f<T>::SERIALIZE_ID);
+    insert<binary_lambda_f<T>>(binary_lambda_f<T>::SERIALIZE_ID);
   }
 
   std::string id;
   if (!(in >> id))
     return nullptr;
 
-  const auto iter(detail::factory_<T>.find(id));
-  if (iter != detail::factory_<T>.end())
+  const auto iter(detail::factory_.find(id));
+  if (iter != detail::factory_.end())
     return iter->second(in, ss);
 
   return nullptr;

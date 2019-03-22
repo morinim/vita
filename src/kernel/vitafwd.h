@@ -27,10 +27,11 @@ template<class T> class interpreter;
 template<class T> class evaluator;
 template<class T> class src_evaluator;
 
-template<class T> class core_reg_lambda_f;
-template<class T> class core_class_lambda_f;
+class basic_src_lambda_f;
 
-template<class T> class model_metric;
+class core_reg_lambda_f;
+class core_class_lambda_f;
+class model_metric;
 
 template<class T,
          template<class> class SS,

@@ -10,6 +10,10 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
+#if !defined(VITA_LAMBDA_F_H)
+#  error "Don't include this file directly, include the specific .h instead"
+#endif
+
 #if !defined(VITA_DETAIL_LAMBDA_F_H)
 #define      VITA_DETAIL_LAMBDA_F_H
 
@@ -35,6 +39,17 @@ class reg_lambda_f_storage<T, true, false>
 public:
   explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
   { Ensures(debug()); }
+
+  reg_lambda_f_storage(std::istream &in, const symbol_set &ss)
+    : int_(&ind_)
+  {
+    if (!ind_.load(in, ss))
+      throw exception::data_format("Cannot load individual");
+
+    int_ = src_interpreter<T>(&ind_);
+
+    Ensures(debug());
+  }
 
   reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
   {
@@ -79,18 +94,6 @@ public:
 
   // Serialization.
   bool save(std::ostream &out) const { return ind_.save(out); }
-
-protected:
-  reg_lambda_f_storage(std::istream &in, const symbol_set &ss)
-    : int_(&ind_)
-  {
-    if (!ind_.load(in, ss))
-      throw exception::data_format("Cannot load individual");
-
-    int_ = src_interpreter<T>(&ind_);
-
-    Ensures(debug());
-  }
 
 private:
   T ind_;

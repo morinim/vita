@@ -66,14 +66,15 @@ void test_serialization(vita::src_problem &pr)
 
     std::stringstream ss;
 
-    CHECK(lambda1.save(ss));
-    L<T> lambda2(ss, pr.sset);
-    CHECK(lambda2.debug());
+    CHECK(serialize::save(ss, lambda1));
+    const auto lambda2(serialize::lambda::load<T>(ss, pr.sset));
+    REQUIRE(lambda2);
+    REQUIRE(lambda2->debug());
 
     for (const auto &e : pr.data())
     {
       const auto out1(lambda1.name(lambda1(e)));
-      const auto out2(lambda2.name(lambda2(e)));
+      const auto out2(lambda2->name((*lambda2)(e)));
 
       CHECK(out1 == out2);
     }
@@ -229,7 +230,8 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda serialization")
 
     CHECK(serialize::save(ss, lambda1));
     const auto lambda2(serialize::lambda::load(ss, pr.sset));
-    CHECK(lambda2->debug());
+    REQUIRE(lambda2);
+    REQUIRE(lambda2->debug());
 
     for (const auto &e : pr.data())
     {

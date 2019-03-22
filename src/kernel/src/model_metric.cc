@@ -10,21 +10,18 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_SRC_MODEL_METRIC_H)
-#  error "Don't include this file directly, include the specific .h instead"
-#endif
+#include "kernel/src/model_metric.h"
 
-#if !defined(VITA_SRC_MODEL_METRIC_TCC)
-#define      VITA_SRC_MODEL_METRIC_TCC
+namespace vita
+{
 
 ///
 /// \param[in] l the model whose accuracy we are evaluating
 /// \param[in] d a dataset
 /// \return      the accuracy
 ///
-template<class T>
-double accuracy_metric<T>::operator()(const core_reg_lambda_f<T> *l,
-                                      const dataframe &d) const
+double accuracy_metric::operator()(const core_reg_lambda_f *l,
+                                   const dataframe &d) const
 {
   Expects(!d.classes());
   Expects(d.begin() != d.end());
@@ -50,9 +47,8 @@ double accuracy_metric<T>::operator()(const core_reg_lambda_f<T> *l,
 /// \param[in] d a dataset
 /// \return      the accuracy
 ///
-template<class T>
-double accuracy_metric<T>::operator()(const core_class_lambda_f<T> *l,
-                                      const dataframe &d) const
+double accuracy_metric::operator()(const core_class_lambda_f *l,
+                                   const dataframe &d) const
 {
   Expects(d.classes());
   Expects(d.begin() != d.end());
@@ -71,4 +67,4 @@ double accuracy_metric<T>::operator()(const core_class_lambda_f<T> *l,
   return static_cast<double>(ok) / static_cast<double>(total_nr);
 }
 
-#endif  // include guard
+}  // namespace vita

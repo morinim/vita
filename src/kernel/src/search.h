@@ -58,7 +58,7 @@ public:
 
   explicit src_search(src_problem &, metric_flags = metric_flags::nothing);
 
-  std::unique_ptr<basic_src_lambda_f<T>> lambdify(const T &) const;
+  std::unique_ptr<basic_src_lambda_f> lambdify(const T &) const;
 
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);

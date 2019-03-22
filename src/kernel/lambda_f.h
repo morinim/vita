@@ -21,20 +21,19 @@
 #include "kernel/exceptions.h"
 #include "kernel/team.h"
 #include "utility/discretization.h"
-#include "utility/matrix.h"
 
 #include "kernel/detail/lambda_f.h"
 
 namespace vita
 {
+
 ///
-/// Transforms individuals into lambda functions.
+/// The basic interface of a lambda function.
 ///
 /// \tparam T type of individual
 ///
-/// This class transforms individuals into lambda functions which can be
-/// used to calculate the answers for symbolic regression / classification
-/// problems.
+/// A lambda function is used to calculate the answers for our problem. It's
+/// the model we've computed.
 ///
 /// \note
 /// The output of basic_lambda_f and interpreter can be similar or distinct,
@@ -58,18 +57,21 @@ public:
   virtual bool debug() const = 0;
 };
 
-template<class T> class basic_src_lambda_f;
-
+// Forward declarations.
 namespace serialize
 {
 
 namespace lambda
 {
-template<class T = i_mep> std::unique_ptr<basic_src_lambda_f<T>> load(
+
+template<class T = i_mep> std::unique_ptr<basic_src_lambda_f> load(
   std::istream &, const symbol_set &);
+
 }  // namespace lambda
 
-template<class T> bool save(std::ostream &, const basic_src_lambda_f<T> *);
+bool save(std::ostream &, const basic_src_lambda_f *);
+bool save(std::ostream &, const basic_src_lambda_f &);
+bool save(std::ostream &, const std::unique_ptr<basic_src_lambda_f> &);
 
 }  // namespace serialize
 
@@ -81,11 +83,10 @@ template<class T> bool save(std::ostream &, const basic_src_lambda_f<T> *);
 /// Another interesting function of basic_src_lambda_f is that it extends the
 /// functionalities of interpreter to teams.
 ///
-template<class T>
 class basic_src_lambda_f : public basic_lambda_f
 {
 public:
-  virtual double measure(const model_metric<T> &, const dataframe &) const = 0;
+  virtual double measure(const model_metric &, const dataframe &) const = 0;
   virtual std::string name(const any &) const = 0;
   virtual std::pair<class_t, double> tag(const dataframe::example &) const = 0;
 
@@ -94,9 +95,9 @@ private:
   virtual std::string serialize_id() const = 0;
   virtual bool save(std::ostream &) const = 0;
 
-  friend std::unique_ptr<basic_src_lambda_f> serialize::lambda::load<T>(
-    std::istream &, const symbol_set &);
-  friend bool serialize::save<T>(std::ostream &, const basic_src_lambda_f *);
+  template<class T> friend  std::unique_ptr<basic_src_lambda_f>
+  serialize::lambda::load(std::istream &, const symbol_set &);
+  friend bool serialize::save(std::ostream &, const basic_src_lambda_f *);
 };
 
 // ***********************************************************************
@@ -104,7 +105,7 @@ private:
 // ***********************************************************************
 
 /// The model_metric class choose the appropriate method considering this type.
-template<class T> class core_reg_lambda_f : public basic_src_lambda_f<T> {};
+class core_reg_lambda_f : public basic_src_lambda_f {};
 
 ///
 /// Lambda function specialized for regression tasks.
@@ -117,7 +118,7 @@ template<class T> class core_reg_lambda_f : public basic_src_lambda_f<T> {};
 ///           efficiency (typically inside an evaluator)
 ///
 template<class T, bool S>
-class basic_reg_lambda_f : public core_reg_lambda_f<T>,
+class basic_reg_lambda_f : public core_reg_lambda_f,
                            protected detail::reg_lambda_f_storage<T, S>
 {
 public:
@@ -128,18 +129,19 @@ public:
 
   std::string name(const any &) const final;
 
-  double measure(const model_metric<T> &, const dataframe &) const final;
+  double measure(const model_metric &, const dataframe &) const final;
 
   bool debug() const final;
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
-  std::string serialize_id() const final { return SERIALIZE_ID; }
   bool save(std::ostream &) const final;
 
 private:
   // Not useful for regression tasks and moved to private section.
   std::pair<class_t, double> tag(const dataframe::example &) const final;
+
+  std::string serialize_id() const final { return SERIALIZE_ID; }
 
   any eval(const dataframe::example &, std::false_type) const;
   any eval(const dataframe::example &, std::true_type) const;
@@ -149,8 +151,25 @@ private:
 // * Classification                                                      *
 // ***********************************************************************
 
+///
+/// For classification problems there are two major possibilities to combine
+/// the outputs of multiple predictors: either the raw output values or the
+/// classification decisions can be aggregated (in the latter case the team
+/// members act as full pre-classificators themselves). We decided for the
+/// latter and combined classification decisions (thanks to the confidence
+/// parameter we don't have a reduction in the information content that each
+/// individual can contribute to the common team decision).
+///
+enum class team_composition
+{
+  mv,  // majority voting
+  wta, // winner takes all
+
+  standard = wta
+};
+
 /// The model_metric class choose the appropriate method considering this type.
-template<class T> class core_class_lambda_f : public basic_src_lambda_f<T> {};
+class core_class_lambda_f : public basic_src_lambda_f {};
 
 ///
 /// The basic interface of a classification lambda class.
@@ -164,8 +183,8 @@ template<class T> class core_class_lambda_f : public basic_src_lambda_f<T> {};
 /// - factorizes out some code from specific classification schemes;
 /// - optionally stores class names.
 ///
-template<class T, bool N>
-class basic_class_lambda_f : public core_class_lambda_f<T>,
+template<bool N>
+class basic_class_lambda_f : public core_class_lambda_f,
                              protected detail::class_names<N>
 {
 public:
@@ -175,10 +194,45 @@ public:
 
   std::string name(const any &) const final;
 
-  double measure(const model_metric<T> &, const dataframe &) const final;
+  double measure(const model_metric &, const dataframe &) const final;
 
 protected:
-  basic_class_lambda_f();
+  basic_class_lambda_f() = default;
+};
+
+///
+/// An helper class for extending classification schemes to teams.
+///
+/// \tparam T type of individual
+/// \tparam S stores the individual inside vs keep a reference only
+/// \tparam N stores the name of the classes vs doesn't store the names
+/// \tparam L the basic classificator that must be extended
+/// \tparam C composition method for team's member responses
+///
+template<class T, bool S, bool N, template<class, bool, bool> class L,
+         team_composition C = team_composition::standard>
+class team_class_lambda_f : public basic_class_lambda_f<N>
+{
+public:
+  template<class... Args> team_class_lambda_f(const team<T> &, dataframe &,
+                                              Args &&...);
+  team_class_lambda_f(std::istream &, const symbol_set &);
+
+  std::pair<class_t, double> tag(const dataframe::example &) const final;
+
+  bool debug() const final;
+
+  static const std::string SERIALIZE_ID;
+
+private:
+  bool save(std::ostream &) const final;
+  std::string serialize_id() const final;
+
+  // The components of the team never store the names of the classes. If we
+  // need the names, the master class will memorize them.
+  std::vector<L<T, S, false>> team_;
+
+  unsigned classes_;
 };
 
 ///
@@ -191,10 +245,10 @@ protected:
 /// This class transforms individuals intto lambda functions which can be used
 /// for classification tasks.
 ///
-/// See vita::dyn_slot_evaluator for further details.
+/// \see vita::dyn_slot_evaluator for further details.
 ///
 template<class T, bool S, bool N>
-class basic_dyn_slot_lambda_f : public basic_class_lambda_f<T, N>
+class basic_dyn_slot_lambda_f : public basic_class_lambda_f<N>
 {
 public:
   basic_dyn_slot_lambda_f(const T &, dataframe &, unsigned);
@@ -208,13 +262,14 @@ public:
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
-  std::string serialize_id() const final { return SERIALIZE_ID; }
   bool save(std::ostream &) const final;
 
 private:
   // *** Private support methods ***
   void fill_matrix(dataframe &, unsigned);
   std::size_t slot(const dataframe::example &) const;
+
+  std::string serialize_id() const final { return SERIALIZE_ID; }
 
   // *** Private data members ***
   /// Mainly used by the slot private method.
@@ -245,7 +300,7 @@ private:
 /// See vita::gaussian_evaluator for further details.
 ///
 template<class T, bool S, bool N>
-class basic_gaussian_lambda_f : public basic_class_lambda_f<T, N>
+class basic_gaussian_lambda_f : public basic_class_lambda_f<N>
 {
 public:
   basic_gaussian_lambda_f(const T &, dataframe &);
@@ -257,7 +312,6 @@ public:
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
-  std::string serialize_id() const final { return SERIALIZE_ID; }
   bool save(std::ostream &) const final;
 
 private:
@@ -265,6 +319,8 @@ private:
   void fill_vector(dataframe &);
   bool load_(std::istream &, const symbol_set &, std::true_type);
   bool load_(std::istream &, const symbol_set &, std::false_type);
+
+  std::string serialize_id() const final { return SERIALIZE_ID; }
 
   // *** Private data members ***
   basic_reg_lambda_f<T, S> lambda_;
@@ -285,7 +341,7 @@ private:
 /// for single-class classification tasks.
 ///
 template<class T, bool S, bool N>
-class basic_binary_lambda_f : public basic_class_lambda_f<T, N>
+class basic_binary_lambda_f : public basic_class_lambda_f<N>
 {
 public:
   basic_binary_lambda_f(const T &, dataframe &);
@@ -297,68 +353,17 @@ public:
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
-  std::string serialize_id() const final { return SERIALIZE_ID; }
   bool save(std::ostream &) const final;
 
 private:
-  // *** Private data members ***
+  std::string serialize_id() const final { return SERIALIZE_ID; }
+
   basic_reg_lambda_f<T, S> lambda_;
 };
 
 // ***********************************************************************
 // * Extensions to support teams                                          *
 // ***********************************************************************
-
-///
-/// For classification problems there are two major possibilities to combine
-/// the outputs of multiple predictors: either the raw output values or the
-/// classification decisions can be aggregated (in the latter case the team
-/// members act as full pre-classificators themselves). We decided for the
-/// latter and combined classification decisions (thanks to the confidence
-/// parameter we don't have a reduction in the information content that each
-/// individual can contribute to the common team decision).
-///
-enum class team_composition
-{
-  mv,  // majority voting
-  wta, // winner takes all
-
-  standard = wta
-};
-
-///
-/// An helper class for extending classification schemes to teams.
-///
-/// \tparam T type of individual
-/// \tparam S stores the individual inside vs keep a reference only
-/// \tparam N stores the name of the classes vs doesn't store the names
-/// \tparam L the basic classificator that must be extended
-/// \tparam C composition method for team's member responses
-///
-template<class T, bool S, bool N, template<class, bool, bool> class L,
-         team_composition C = team_composition::standard>
-class team_class_lambda_f : public basic_class_lambda_f<team<T>, N>
-{
-public:
-  template<class... Args> team_class_lambda_f(const team<T> &, dataframe &,
-                                              Args &&...);
-  team_class_lambda_f(std::istream &, const symbol_set &);
-
-  std::pair<class_t, double> tag(const dataframe::example &) const final;
-
-  bool debug() const final;
-
-  static const std::string SERIALIZE_ID;
-  std::string serialize_id() const final;
-  bool save(std::ostream &) const final;
-
-protected:
-  // The components of the team never store the names of the classes. If we
-  // need the names, the master class will memorize them.
-  std::vector<L<T, S, false>> team_;
-
-  unsigned classes_;
-};
 
 ///
 /// Slotted Dynamic Class Boundary Determination specialization for teams.

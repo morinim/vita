@@ -28,13 +28,12 @@ namespace vita
 /// This works quite well since metrics can be implemented in terms of the
 /// public interface of lambda_f.
 ///
-template<class T>
 class model_metric
 {
 public:
-  virtual double operator()(const core_reg_lambda_f<T> *,
+  virtual double operator()(const core_reg_lambda_f *,
                             const dataframe &) const = 0;
-  virtual double operator()(const core_class_lambda_f<T> *,
+  virtual double operator()(const core_class_lambda_f *,
                             const dataframe &) const = 0;
 };
 
@@ -53,18 +52,16 @@ public:
 /// tasks with imbalanced learning data (where at least one class is
 /// under/over represented relative to others).
 ///
-template<class T>
-class accuracy_metric : public model_metric<T>
+class accuracy_metric : public model_metric
 {
 public:
-  double operator()(const core_reg_lambda_f<T> *,
+  double operator()(const core_reg_lambda_f *,
                     const dataframe &) const override;
 
-  double operator()(const core_class_lambda_f<T> *,
+  double operator()(const core_class_lambda_f *,
                     const dataframe &) const override;
 };
 
-#include "kernel/src/model_metric.tcc"
 }  // namespace vita
 
 #endif  // include guard

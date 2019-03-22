@@ -86,15 +86,13 @@ src_problem &src_search<T, ES>::prob() const
 /// The lambda function depends on the active training evaluator.
 ///
 template<class T, template<class> class ES>
-std::unique_ptr<basic_src_lambda_f<T>> src_search<T, ES>::lambdify(
+std::unique_ptr<basic_src_lambda_f> src_search<T, ES>::lambdify(
   const T &ind) const
 {
-  using bslf = basic_src_lambda_f<T>;
-
   auto l(this->eva1_->lambdify(ind));
-  auto p(static_cast<bslf *>(l.release()));
+  auto p(static_cast<basic_src_lambda_f *>(l.release()));
 
-  return std::unique_ptr<bslf>(p);
+  return std::unique_ptr<basic_src_lambda_f>(p);
 }
 
 template<class T, template<class> class ES>
@@ -131,7 +129,7 @@ model_measurements src_search<T, ES>::calculate_metrics_custom(
   {
     const auto model(lambdify(s.best.solution));
     const auto &d(can_validate() ? validation_data() : training_data());
-    ret.accuracy = model->measure(accuracy_metric<T>(), d);
+    ret.accuracy = model->measure(accuracy_metric(), d);
   }
 
   return ret;
