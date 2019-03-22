@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2019-03-22
+
 ### Added
 - Simpler way to setup Genetic Algorithm / Differential Evolution tasks. We now have the `ga_problem` and `de_problem` *facades*. Their constructors cover the standard situation of a sequence of uniform parameters (possibly in distinct numeric intervals).
 
@@ -218,6 +220,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Various compilation warning with recent version of gcc (7.x).
 
 
-[Unreleased]: https://github.com/morinim/vita/compare/v0.9.14...HEAD
+[Unreleased]: https://github.com/morinim/vita/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/morinim/vita/compare/v0.9.14...v1.0.0
 [0.9.14]: https://github.com/morinim/vita/compare/v0.9.13...v0.9.14
 [0.9.13]: https://github.com/morinim/vita/compare/v0.9.12...v0.9.13

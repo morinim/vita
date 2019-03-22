@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#  Copyright (C) 2017 EOS di Manlio Morini.
+#  Copyright (C) 2017-2019 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -82,7 +82,7 @@ def main():
           + "." + str(args.minor)
           + "." + str(args.maintenance))
 
-    file_process("../CHANGELOG.md", changelog_rule, args)
+    file_process("../NEWS.md", changelog_rule, args)
     file_process("../doc/doxygen/doxygen.h", doxygen_rule, args)
 
     print("\n\nRELEASE NOTE\n")
