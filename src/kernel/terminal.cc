@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,7 @@ namespace vita
 {
 ///
 /// \param[in] v additional informations regarding parametric symbols
-/// \param[in] f output format
-/// \return      a string representing the symbol in the `f` format
+/// \return      a string representing the symbol
 ///
 /// The `v` argument is required for parametric symbols (i.e. for a numeric
 /// terminal we have to print 123 rather than "NUMBER").

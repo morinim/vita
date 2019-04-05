@@ -31,6 +31,7 @@ namespace vita
 
 namespace out
 {
+/// Rendering format used to print an individual.
 enum print_format_t {list_f,  // default value
                      dump_f, graphviz_f, in_line_f, tree_f,
                      language_f,
@@ -256,6 +257,7 @@ public:
     /// \name An empty string disable savings.
     std::string test_file = "";
 
+    /// Default rendering format used to print an individual.
     out::print_format_t ind_format = out::list_f;
   } stat;
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -57,6 +57,11 @@ public:
     : terminal("\"" + c + "\"", t), val_(c) {}
   explicit constant(const char c[], category_t t = 0)
     : constant(std::string(c), t) {}
+
+  std::string display(param_t, format) const final
+  {
+    return "\"" + val_ + "\"";
+  }
 
   ///
   /// \return the value of the constant (as a `any`)

@@ -21,13 +21,8 @@ int main()
   using namespace vita;
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
-
   if (!titanic)
     return EXIT_FAILURE;
-
-  titanic.env.mep.code_length =  130;
-  titanic.env.individuals     = 1000;
-  titanic.env.generations     =  100;
 
   src_search<> s(titanic, metric_flags::accuracy);
   const auto summary(s.run());
@@ -52,6 +47,14 @@ int main()
   const auto result2(model2->tag(example));
   std::cout << "   Prediction: " << result2.label
             << "   Sureness: " << result2.sureness << '\n';
+  assert(result2.label == result.label);
 
-  assert(result.label == result.label);
+  // If need be, individuals can be printed/exported in alternative languages:
+  std::cout << "\nC LANGUAGE\n" << std::string(40, '-') << '\n'
+            << out::print_format(out::c_language_f) << summary.best.solution
+            << "\n\nGRAPHVIZ FORMAT\n" << std::string(40, '-') << '\n'
+            << out::print_format(out::graphviz_f) << summary.best.solution
+            << "\n\nLIST (DEBUG) FORMAT\n" << std::string(40, '-') << '\n'
+            << out::print_format(out::list_f) << summary.best.solution
+            << '\n';
 }

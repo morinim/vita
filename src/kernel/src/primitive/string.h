@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,6 +35,18 @@ public:
   explicit ife(const cvect &c)
     : function("SIFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case c_format:
+    case cpp_format:
+    case mql_format:     return "(%%1%%) == (%%2%%) ? (%%3%%) : (%%4%%)";
+    case python_format:  return "(%%3%%) if (%%1%%) == (%%2%%) else (%%4%%)";
+    default:             return function::display();
+    }
+  }
 
   any eval(core_interpreter *ci) const final
   {

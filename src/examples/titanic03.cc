@@ -21,16 +21,15 @@ int main()
   using namespace vita;
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
-
   if (!titanic)
     return EXIT_FAILURE;
 
   titanic.env.mep.code_length =  130;
-  titanic.env.individuals     = 1000;
+  titanic.env.individuals     = 3000;
   titanic.env.generations     =  200;
 
   src_search<> s(titanic, metric_flags::accuracy);
-  const auto summary(s.run(10));
+  const auto summary(s.run(5));
 
   std::cout << summary.best.solution << '\n'
             << summary.best.score.accuracy << '\n';
