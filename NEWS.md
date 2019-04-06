@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- Clearer format exporting individuals.
+
+    **Part** of the redundant parentheses has been removed.
+
+    So, instead of `((sin(X1)) + (ln(((X1)+(X2)))` you get
+    `(sin(X1) + ln(X1+X2))`
+
 ## [1.0.0] - 2019-03-22
 
 ### Added

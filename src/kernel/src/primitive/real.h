@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,8 +25,8 @@
 namespace vita
 {
 /// We assume that errors during floating-point operations aren't terminal
-/// error. So we dont't try to prevent domain errors (e.g. square root of a
-/// negative number) or range error (e.g. pow(10.0, 1e6)) checking arguments
+/// errors. So we dont't try to prevent domain errors (e.g. square root of a
+/// negative number) or range error (e.g. `pow(10.0, 1e6)`) checking arguments
 /// beforehand (domain errors could be prevented by carefully bounds checking
 /// the arguments before calling functions and taking alternative action if
 /// the bounds are violated; range errors usually cannot be prevented, as
@@ -36,6 +36,7 @@ namespace vita
 /// an empty value).
 namespace real
 {
+
 using base_t = double;
 
 static_assert(std::numeric_limits<base_t>::is_iec559,
@@ -162,7 +163,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%)+(%%2%%)";
+    return "(%%1%%+%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final
@@ -201,10 +202,10 @@ public:
   {
     switch (f)
     {
-    case cpp_format:     return "(%%1%%)/std::sqrt(1.0+std::pow(%%2%%,2.0))";
-    case mql_format:     return        "(%%1%%)/MathSqrt(1+MathPow(%%2%%,2)";
-    case python_format:  return      "(%%1%%)/math.sqrt(1+math.pow(%%2%%,2)";
-    default:             return           "(%%1%%)/sqrt(1.0+pow(%%2%%,2.0))";
+    case cpp_format:     return "(%%1%%/std::sqrt(1.0+std::pow(%%2%%,2.0)))";
+    case mql_format:     return       "(%%1%%/MathSqrt(1+MathPow(%%2%%,2)))";
+    case python_format:  return     "(%%1%%/math.sqrt(1+math.pow(%%2%%,2)))";
+    default:             return           "(%%1%%/sqrt(1.0+pow(%%2%%,2.0)))";
     }
   }
 
@@ -266,7 +267,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%)/(%%2%%)";
+    return "(%%1%%/%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final
@@ -300,7 +301,7 @@ public:
     switch (f)
     {
     case cpp_format:  return "std::isgreater(%%1%%,%%2%%)";
-    default:          return "(%%1%%)>(%%2%%)";
+    default:          return "(%%1%%>%%2%%)";
     }
   }
 
@@ -334,10 +335,10 @@ public:
   {
     switch (f)
     {
-    case cpp_format:     return "std::floor((%%1%%)/(%%2%%))";
-    case mql_format:     return  "MathFloor((%%1%%)/(%%2%%))";
-    case python_format:  return            "(%%1%%)//(%%2%%)";
-    default:             return      "floor((%%1%%)/(%%2%%))";
+    case cpp_format:     return "std::floor(%%1%%/%%2%%)";
+    case mql_format:     return  "MathFloor(%%1%%/%%2%%)";
+    case python_format:  return          "(%%1%%//%%2%%)";
+    default:             return      "floor(%%1%%/%%2%%)";
     }
   }
 
@@ -375,10 +376,10 @@ public:
     switch (f)
     {
     case python_format:
-      return "(%%4%%) if (%%2%%) <= (%%1%%) <= (%%3%%) else (%%5%%)";
+      return "(%%4%% if %%2%% <= %%1%% <= %%3%% else %%5%%)";
     default:
-      return "fmin(%%2%%,%%3%%) <= (%%1%%) && (%%1%%) <= fmax(%%2%%,%%3%%) ?"
-             "(%%4%%) : (%%5%%)";
+      return "(fmin(%%2%%,%%3%%) <= %%1%% && %%1%% <= fmax(%%2%%,%%3%%) ?"
+             "%%4%% : %%5%%)";
     }
   }
 
@@ -424,14 +425,14 @@ public:
     switch (f)
     {
     case cpp_format:
-      return "abs((%%1%%)-(%%2%%))<2*std::numeric_limits<T>::epsilon() ?"
-             "(%%3%%) : (%%4%%)";
+      return "(abs(%%1%%-%%2%%)<2*std::numeric_limits<T>::epsilon() ?"
+             "%%3%% : %%4%%)";
     case mql_format:
-      return "NormalizeDouble((%%1%%)-(%%2%%),8)==0 ? (%%3%%) : (%%4%%)";
+      return "(NormalizeDouble(%%1%%-%%2%%,8)==0 ? %%3%% : %%4%%)";
     case python_format:
-      return "(%%3%%) if math.isclose(%%1%%, %%2%%) else (%%4%%)";
+      return "(%%3%% if math.isclose(%%1%%, %%2%%) else %%4%%)";
     default:
-      return "fabs((%%1%%)-(%%2%%)) < 2*DBL_EPSILON ? (%%3%%) : (%%4%%)";
+      return "(fabs(%%1%%-%%2%%) < 2*DBL_EPSILON ? %%3%% : %%4%%)";
     }
   }
 
@@ -471,8 +472,8 @@ public:
   {
     switch (f)
     {
-    case python_format:  return "(%%3%%) if (%%1%%)<(%%2%%) else (%%4%%)";
-    default:             return     "(%%1%%)<(%%2%%) ? (%%3%%) : (%%4%%)";
+    case python_format:  return "(%%3%% if %%1%%<%%2%% else %%4%%)";
+    default:             return     "(%%1%%<%%2%% ? %%3%% : %%4%%)";
     }
   }
 
@@ -514,14 +515,14 @@ public:
     switch (f)
     {
     case cpp_format:
-      return "abs(%%1%%)<2*std::numeric_limits<T>::epsilon() ?"
-             "(%%3%%) : (%%4%%)";
+      return "(abs(%%1%%)<2*std::numeric_limits<T>::epsilon() ?"
+             "%%3%% : %%4%%)";
     case mql_format:
-      return "NormalizeDouble(%%1%%,8)==0 ? (%%3%%) : (%%4%%)";
+      return "(NormalizeDouble(%%1%%,8)==0 ? %%3%% : %%4%%)";
     case python_format:
-      return "(%%3%%) if abs(%%1%%) < 1e-10 else (%%4%%)";
+      return "(%%3%% if abs(%%1%%) < 1e-10 else %%4%%)";
     default:
-      return "fabs(%%1%%)<2*DBL_EPSILON ? (%%3%%) : (%%4%%)";
+      return "(fabs(%%1%%)<2*DBL_EPSILON ? %%3%% : %%4%%)";
     }
   }
 
@@ -618,7 +619,7 @@ public:
     switch (f)
     {
     case cpp_format:  return "std::isless(%%1%%,%%2%%)";
-    default:          return          "(%%1%%)<(%%2%%)";
+    default:          return            "(%%1%%<%%2%%)";
     }
   }
 
@@ -689,7 +690,7 @@ public:
     {
     case cpp_format:     return "std::fmod(%%1%%,%%2%%)";
     case mql_format:     return   "MathMod(%%1%%,%%2%%)";
-    case python_format:  return        "(%%1%%)%(%%2%%)";
+    case python_format:  return        "(%%1%% % %%2%%)";
     default:             return      "fmod(%%1%%,%%2%%)";
     }
   }
@@ -722,7 +723,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%)*(%%2%%)";
+    return "(%%1%%*%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final
@@ -815,7 +816,7 @@ public:
 
   std::string display(format) const final
   {
-    return "(%%1%%)-(%%2%%)";
+    return "(%%1%%-%%2%%)";
   }
 
   any eval(core_interpreter *ci) const final

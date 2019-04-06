@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -80,8 +80,8 @@ public:
   {
     switch (f)
     {
-    case python_format:  return "(%%1%%) and (%%2%%)";
-    default:             return  "(%%1%%) && (%%2%%)";
+    case python_format:  return "(%%1%% and %%2%%)";
+    default:             return  "(%%1%% && %%2%%)";
     }
   }
 };
@@ -103,7 +103,7 @@ public:
     switch (f)
     {
     case python_format:  return "not(%%1%%)";
-    default:             return   "!(%%1%%)";
+    default:             return   "!%%1%%";
     }
   }
 };
@@ -127,8 +127,8 @@ public:
   {
     switch (f)
     {
-    case python_format:  return "(%%1%%) or (%%2%%)";
-    default:             return "(%%1%%) || (%%2%%)";
+    case python_format:  return "(%%1%% or %%2%%)";
+    default:             return "(%%1%% || %%2%%)";
     }
   }
 };

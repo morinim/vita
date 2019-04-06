@@ -42,8 +42,8 @@ public:
     {
     case c_format:
     case cpp_format:
-    case mql_format:     return "(%%1%%) == (%%2%%) ? (%%3%%) : (%%4%%)";
-    case python_format:  return "(%%3%%) if (%%1%%) == (%%2%%) else (%%4%%)";
+    case mql_format:     return "(%%1%% == %%2%% ? %%3%% : %%4%%)";
+    case python_format:  return "(%%3%% if %%1%% == %%2%% else %%4%%)";
     default:             return function::display();
     }
   }
