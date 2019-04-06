@@ -22,9 +22,8 @@ int main()
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
-  src_search<> s(titanic, metric_flags::accuracy);
-  const auto summary(s.run(5));                    // starting search (5 runs)
-                                                   // and getting a summary
+  src_search<> s(titanic, metric_flags::accuracy);  // starting search...
+  const auto summary(s.run());                      // ...and getting a summary
 
   std::cout << summary.best.solution << '\n'
             << summary.best.score.accuracy << '\n';

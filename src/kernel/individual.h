@@ -91,6 +91,7 @@ std::ostream &graphviz(std::ostream &);
 std::ostream &in_line(std::ostream &);
 std::ostream &list(std::ostream &);
 std::ostream &mql_language(std::ostream &);
+std::ostream &python_language(std::ostream &);
 std::ostream &tree(std::ostream &);
 
 std::ostream &long_form(std::ostream &);

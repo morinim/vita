@@ -21,8 +21,6 @@ int main()
   using namespace vita;
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
-  if (!titanic)
-    return EXIT_FAILURE;
 
   titanic.env.mep.code_length =  130;
   titanic.env.individuals     = 3000;

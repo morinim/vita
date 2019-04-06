@@ -21,8 +21,6 @@ int main()
   using namespace vita;
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
-  if (!titanic)
-    return EXIT_FAILURE;
 
   src_search<> s(titanic, metric_flags::accuracy);
   const auto summary(s.run());
@@ -51,10 +49,12 @@ int main()
 
   // If need be, individuals can be printed/exported in alternative languages:
   std::cout << "\nC LANGUAGE\n" << std::string(40, '-') << '\n'
-            << out::print_format(out::c_language_f) << summary.best.solution
+            << out::c_language << summary.best.solution
+            << "\n\nPYTHON LANGUAGE\n" << std::string(40, '-') << '\n'
+            << out::python_language << summary.best.solution
             << "\n\nGRAPHVIZ FORMAT\n" << std::string(40, '-') << '\n'
-            << out::print_format(out::graphviz_f) << summary.best.solution
+            << out::graphviz << summary.best.solution
             << "\n\nLIST (DEBUG) FORMAT\n" << std::string(40, '-') << '\n'
-            << out::print_format(out::list_f) << summary.best.solution
+            << out::list << summary.best.solution
             << '\n';
 }

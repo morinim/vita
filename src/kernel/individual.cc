@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -78,6 +78,17 @@ std::ostream &c_language(std::ostream &o)
 std::ostream &mql_language(std::ostream &o)
 {
   o.iword(print_format_index) = mql_language_f;
+  return o;
+}
+
+///
+/// Used to print the content of an individual in python-language format.
+///
+/// \remark Sticky manipulator.
+///
+std::ostream &python_language(std::ostream &o)
+{
+  o.iword(print_format_index) = python_language_f;
   return o;
 }
 
