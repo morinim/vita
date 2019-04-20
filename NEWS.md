@@ -6,7 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Changed
-- Clearer format exporting individuals.
+- **BREAKING CHANGE**. Removed `read_csv(filename)` / `read_xrff(filename)` from the interface of the dataframe class.
+
+  Both the member functions can be replaced with the already existing `dataframe::read(filename)` which uses the filename extension to identify the data format.
+
+- Clearer format when exporting individuals.
 
     **Part** of the redundant parentheses has been removed.
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -122,6 +122,7 @@ dataframe::dataframe(std::istream &is, filter_hook_t ft)
 /// New datafame instance containing the learning collection from a file.
 ///
 /// \param[in] filename name of the file containing the learning collection
+///                     (CSV / XRFF format)
 /// \param[in] ft       a filter and transform function
 ///
 dataframe::dataframe(const std::string &filename, filter_hook_t ft)
@@ -370,15 +371,11 @@ dataframe::example dataframe::to_example(const std::vector<std::string> &v,
 /// \return             number of lines parsed (`0` in case of errors)
 ///
 /// \exception exception::data_format wrong data format for data file
-/// \exception std::invalid_argument  missing dataset file name
 ///
 /// \see `dataframe::load_xrff(tinyxml2::XMLDocument &)` for details.
 ///
 std::size_t dataframe::read_xrff(const std::string &filename, filter_hook_t ft)
 {
-  if (trim(filename).empty())
-    throw std::invalid_argument("Missing XRFF dataset filename");
-
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("XRFF data file format error");
@@ -564,16 +561,12 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 /// \param[in] ft       a filter and transform function
 /// \return             number of lines parsed (0 in case of errors)
 ///
-/// \exception std::invalid_argument missing dataset file name
 /// \exception std::runtime_error    cannot read CSV data file
 ///
 /// \see `dataframe::load_csv(const std::string &)` for details.
 ///
 std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
 {
-  if (trim(filename).empty())
-    throw std::invalid_argument("Missing CSV dataset filename");
-
   std::ifstream in(filename);
   if (!in)
     throw std::runtime_error("Cannot read CSV data file");
@@ -691,14 +684,19 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 ///
 /// Loads the content of a file into the active dataset.
 ///
-/// \param[in] f  name of the file containing the data set
+/// \param[in] f  name of the file containing the data set (CSV / XRFF format)
 /// \param[in] ft a filter and transform function
 /// \return       number of lines parsed (0 in case of errors)
+///
+/// \exception std::invalid_argument missing dataset file name
 ///
 /// \note Test set can have an empty output value.
 ///
 std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
 {
+  if (trim(f).empty())
+    throw std::invalid_argument("Missing dataset filename");
+
   auto ends_with(
     [](const std::string &name, const std::string &ext)
     {

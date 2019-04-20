@@ -83,9 +83,7 @@ public:
   // ---- Convenience ----
   std::size_t read(const std::string &, filter_hook_t = nullptr);
   std::size_t read_csv(std::istream &, filter_hook_t = nullptr);
-  std::size_t read_csv(const std::string &, filter_hook_t = nullptr);
   std::size_t read_xrff(std::istream &, filter_hook_t = nullptr);
-  std::size_t read_xrff(const std::string &, filter_hook_t = nullptr);
   bool operator!() const;
 
   void push_back(const example &);
@@ -110,6 +108,8 @@ private:
 
   class_t encode(const std::string &);
 
+  std::size_t read_csv(const std::string &, filter_hook_t);
+  std::size_t read_xrff(const std::string &, filter_hook_t);
   std::size_t read_xrff(tinyxml2::XMLDocument &, filter_hook_t);
 
   void swap_category(category_t, category_t);
