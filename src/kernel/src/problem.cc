@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -68,9 +68,10 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 ///
 /// New empty instance of src_problem.
 ///
-/// Users must initialize:
-/// - the training dataset
-/// - the symbol set
+/// \warning
+/// Users **must** initialize:
+/// - the training dataset;
+/// - the entire symbol set (functions and terminals)
 /// before starting the evolution.
 ///
 src_problem::src_problem() : problem(), training_(), validation_(), factory_()
@@ -78,7 +79,58 @@ src_problem::src_problem() : problem(), training_(), validation_(), factory_()
 }
 
 ///
-/// Initializes the problem with data from a file and the default symbol set.
+/// Initializes problem dataset with examples coming from a file.
+///
+/// \param[in] ds name of the dataset file (CSV or XRFF format)
+///
+/// \warning
+/// - Users **must** specify, at least, the functions to be used;
+/// - terminal directly derived from the data (variables / labels) are
+///   automatically inserted;
+/// - any additional terminals (ephemeral random constants, problem specific
+///   constants...) can be manually inserted.
+///
+src_problem::src_problem(const std::string &ds) : src_problem()
+{
+  vitaINFO << "Reading dataset " << ds << "...";
+  data(dataset_t::training).read(ds);
+
+  vitaINFO << "...dataset read. Examples: " << data(dataset_t::training).size()
+           << ", categories: " << categories()
+           << ", features: " << variables()
+           << ", classes: " << classes();
+
+  setup_terminals();
+}
+
+///
+/// Initializes problem dataset with examples coming from a file.
+///
+/// \param[in] ds name of the dataset file (CSV or XRFF format)
+///
+/// \warning
+/// - Users **must** specify, at least, the functions to be used;
+/// - terminal directly derived from the data (variables / labels) are
+///   automatically inserted;
+/// - any additional terminals (ephemeral random constants, problem specific
+///   constants...) can be manually inserted.
+///
+src_problem::src_problem(std::istream &ds) : src_problem()
+{
+  vitaINFO << "Reading dataset from input stream...";
+  data(dataset_t::training).read_csv(ds);
+
+  vitaINFO << "...dataset read. Examples: " << data(dataset_t::training).size()
+           << ", categories: " << categories()
+           << ", features: " << variables()
+           << ", classes: " << classes();
+
+  setup_terminals();
+}
+
+///
+/// Initializes the problem with the default symbol set and data coming from a
+/// file.
 ///
 /// \param[in] ds name of the dataset file
 ///
@@ -91,7 +143,7 @@ src_problem::src_problem(const std::string &ds, const default_symbols_t &)
 }
 
 ///
-/// Initializes the problem with data from the input files.
+/// Initializes the problem with data / symbols coming from input files.
 ///
 /// \param[in] ds      name of the training dataset file
 /// \param[in] symbols name of the file containing the symbols to be used.
@@ -124,6 +176,9 @@ bool src_problem::operator!() const
 /// \param[in] skip features in this set will be ignored
 /// \return         number of variables inserted (one variable per feature)
 ///
+/// \exception `std::insufficient_data` insufficient data to generate the
+///             terminal set
+///
 /// The names used for variables, if not specified in the dataset, are in the
 /// form `X1`, ... `Xn`.
 ///
@@ -133,22 +188,25 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 
   // Sets up the variables (features).
   const auto columns(training_.columns());
-  for (auto i(decltype(columns){1}); i < columns; ++i)
+  for (std::size_t i(1); i < columns; ++i)
     if (skip.find(i) == skip.end())
     {
       const auto provided_name(training_.get_column(i).name);
       const auto name(provided_name.empty() ? "X" + std::to_string(i)
                                             : provided_name);
       const category_t category(training_.get_column(i).category_id);
-      sset.insert<variable>(name, i - 1, category);
+      insert<variable>(name, i - 1, category);
 
       ++variables;
     }
 
+  if (!variables)
+    throw exception::insufficient_data("Cannot generate the terminal set");
+
   // Sets up the labels for nominal attributes.
   for (const category &c : training_.categories())
     for (const std::string &l : c.labels)
-      sset.insert<constant<std::string>>(l, c.tag);
+      insert<constant<std::string>>(l, c.tag);
 
   return variables;
 }
@@ -162,8 +220,6 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 /// If a file isn't specified, a predefined set is arranged (useful for simple
 /// problems (single category regression / classification).
 ///
-/// \exception `std::insufficient_data` missing data to generate terminal set
-///
 /// \warning
 /// Data should be loaded before symbols: without data we don't know, among
 /// other things, the features the dataset has.
@@ -172,8 +228,7 @@ std::size_t src_problem::setup_symbols(const std::string &file)
 {
   sset.clear();
 
-  if (!setup_terminals())
-    throw exception::insufficient_data("Cannot generate the terminal set");
+  setup_terminals();
 
   return file.empty() ? setup_symbols_impl() : setup_symbols_impl(file);
 }
@@ -215,7 +270,7 @@ std::size_t src_problem::setup_symbols_impl()
       ++inserted;
     }
 
-  vitaINFO << "...symbol set ready. Symbols: " << inserted;
+  vitaINFO << "...default symbol set ready. Symbols: " << inserted;
   return inserted;
 }
 

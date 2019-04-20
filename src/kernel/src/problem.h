@@ -43,12 +43,17 @@ enum class dataset_t {training = 0, validation, test};
 class src_problem : public problem
 {
 public:
+  // --- Constructors ---
+  src_problem();
+
+  explicit src_problem(const std::string &);
+  explicit src_problem(std::istream &);
+
   struct default_symbols_t {};
   static const default_symbols_t default_symbols;
-
-  explicit src_problem();
   src_problem(const std::string &, const default_symbols_t &);
   src_problem(const std::string &, const std::string &);
+  // --------------------
 
   bool operator!() const;
   std::size_t setup_symbols(const std::string & = "");

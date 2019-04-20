@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
           categories[j] = replaced[j].category;
         }
 
-        auto f(p.sset.insert<adf>(blk2, categories));
+        auto f(p.insert<adf>(blk2, categories));
         std::cout << '\n' << f->name() << '\n' << blk2;
 
         i_mep blk3(blk.replace({{f, positions}}));

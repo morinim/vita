@@ -25,6 +25,8 @@ class problem
 public:
   problem();
 
+  template<class S, class ...Args> symbol *insert(Args &&...);
+
   virtual bool debug() const;
 
   // What a horror! Public data members... please read the coding style
@@ -32,6 +34,19 @@ public:
   environment env;
   symbol_set sset;
 };
+
+///
+/// Adds a symbol to the internal symbol set.
+///
+/// \tparam    S    symbol to be added
+/// \param[in] args arguments used to build `S`
+/// \return         a raw pointer to the symbol just added (or `nullptr` in
+///                 case of error)
+///
+template<class S, class ...Args> symbol *problem::insert(Args &&... args)
+{
+  return sset.insert(std::make_unique<S>(std::forward<Args>(args)...));
+}
 
 }  // namespace vita
 
