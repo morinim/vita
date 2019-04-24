@@ -255,19 +255,16 @@ std::size_t src_problem::setup_symbols_impl()
          "FABS", "FADD", "FDIV", "FLN", "FMUL", "FMOD", "FSUB"});
 
       for (const auto &s: base)
-      {
-        sset.insert(factory_.make(s, {tag}));
-        ++inserted;
-      }
+        if (sset.insert(factory_.make(s, {tag})))
+          ++inserted;
     }
     else if (compatible({tag}, {"string"}))
     {
-      // for (decltype(tag) j(0); j < sup; ++j)
+      // for (category_t tag j(0); j < sup; ++j)
       //   if (j != tag)
       //     sset.insert(factory_.make("SIFE", {tag, j}));
-      sset.insert(factory_.make("SIFE", {tag, 0}));
-
-      ++inserted;
+      if (sset.insert(factory_.make("SIFE", {tag, 0})))
+        ++inserted;
     }
 
   vitaINFO << "...default symbol set ready. Symbols: " << inserted;

@@ -50,7 +50,7 @@ public:
 
   any eval(core_interpreter *ci) const final
   {
-    auto *const i(static_cast<interpreter<i_mep> *>(ci));
+    auto *i(static_cast<interpreter<i_mep> *>(ci));
 
     const any v0(i->fetch_arg(0));
     if (!v0.has_value())  return v0;

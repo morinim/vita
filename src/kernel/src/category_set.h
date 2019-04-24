@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -67,7 +67,7 @@ struct category : public untagged_category
 
   category_t tag;
 
-  /// A special value used for missing answers.
+  /// A special value used for missing values.
   static const category null;
 };  // struct category
 
