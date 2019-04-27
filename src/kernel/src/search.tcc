@@ -36,7 +36,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 {
   Expects(p.debug());
 
-  set_evaluator(p.classification() ? p_class : p_symre);
+  evaluator(p.classification() ? p_class : p_symre);
 
   Ensures(this->debug());
 }
@@ -393,56 +393,65 @@ void src_search<T, ES>::log_search_custom(tinyxml2::XMLDocument *d,
 }
 
 ///
+/// Sets the active validation strategy.
+///
 /// \param[in] id  numerical id of the validator to be activated
-/// \return        `true` if the active validator has been changed
+/// \return        a reference to the search class (used for method chaining)
+///
+/// \exception std::invalid_argument unknown validation strategy
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::set_validator(validator_id id)
+src_search<T, ES> &src_search<T, ES>::validation_strategy(validator_id id)
 {
   switch (id)
   {
   case validator_id::as_is:
-    search<T, ES>::template set_validator<as_is_validation>();
-    return true;
+    search<T, ES>::template validation_strategy<as_is_validation>();
+    break;
 
   case validator_id::dss:
     assert(this->eva1_);
     assert(this->eva2_);
-    search<T, ES>::template set_validator<dss>(prob(),
+    search<T, ES>::template validation_strategy<dss>(prob(),
                                                *this->eva1_, *this->eva2_);
-    return true;
+    break;
 
   case validator_id::holdout:
-    search<T, ES>::template set_validator<holdout_validation>(prob());
-    return true;
+    search<T, ES>::template validation_strategy<holdout_validation>(prob());
+    break;
 
   default:
-    return false;
+    throw std::invalid_argument("Unknown validation strategy");
   }
+
+  return *this;
 }
 
 template<class T, template<class> class ES>
 template<class E, class... Args>
 void src_search<T, ES>::set_evaluator(Args && ...args)
 {
-  search<T, ES>::template set_training_evaluator<E>(
+  search<T, ES>::template training_evaluator<E>(
     training_data(), std::forward<Args>(args)...);
 
-  search<T, ES>::template set_validation_evaluator<E>(
+  search<T, ES>::template validation_evaluator<E>(
     validation_data(), std::forward<Args>(args)...);
 }
 
 ///
 /// \param[in] id  numerical id of the evaluator to be activated
 /// \param[in] msg input parameters for the evaluator constructor
-/// \return        `true` if the active evaluator has been changed
+/// \return        a reference to the search class (used for method chaining)
+///
+/// \exception std::invalid_argument unknown evaluator
 ///
 /// \note
 /// If the evaluator `id` is not compatible with the problem type the
 /// function returns `false` and the active evaluator stays the same.
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
+src_search<T, ES> &src_search<T, ES>::evaluator(evaluator_id id,
+                                                const std::string &msg)
 {
   if (training_data().classes() > 1)
   {
@@ -450,7 +459,7 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::bin:
       set_evaluator<binary_evaluator<T>>();
-      return true;
+      break;
 
     case evaluator_id::dyn_slot:
       {
@@ -458,14 +467,14 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
                                                       : std::stoul(msg)));
         set_evaluator<dyn_slot_evaluator<T>>(x_slot);
       }
-      return true;
+      break;
 
     case evaluator_id::gaussian:
       set_evaluator<gaussian_evaluator<T>>();
-      return true;
+      break;
 
     default:
-      return false;
+      throw std::invalid_argument("Unknown evaluator");
     }
   }
   else  // symbolic regression
@@ -474,24 +483,26 @@ bool src_search<T, ES>::set_evaluator(evaluator_id id, const std::string &msg)
     {
     case evaluator_id::count:
       set_evaluator<count_evaluator<T>>();
-      return true;
+      break;
 
     case evaluator_id::mae:
       set_evaluator<mae_evaluator<T>>();
-      return true;
+      break;
 
     case evaluator_id::rmae:
       set_evaluator<rmae_evaluator<T>>();
-      return true;
+      break;
 
     case evaluator_id::mse:
       set_evaluator<mse_evaluator<T>>();
-      return true;
+      break;
 
     default:
-      return false;
+      throw std::invalid_argument("Unknown evaluator");
     }
   }
+
+  return *this;
 }
 
 ///

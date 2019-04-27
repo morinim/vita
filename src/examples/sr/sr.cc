@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -375,11 +375,11 @@ void go(bool = true)
   vita::src_search<vita::i_mep, vita::alps_es> s(*problem);
 
   if (eva != vita::evaluator_id::undefined)
-    s.set_evaluator(eva, eva_args);
+    s.evaluator(eva, eva_args);
 
   if (validator == vita::validator_id::dss
       || validator == vita::validator_id::holdout)
-    s.set_validator(validator);
+    s.validation_strategy(validator);
 
   s.run(runs);
 }

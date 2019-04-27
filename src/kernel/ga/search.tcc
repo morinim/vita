@@ -26,11 +26,11 @@ basic_ga_search<T, ES, F>::basic_ga_search(problem &pr, F f,
   : search<T, ES>(pr)
 {
   if (pf)
-    search<T, ES>::template set_training_evaluator<
+    search<T, ES>::template training_evaluator<
       constrained_evaluator<T, ga_evaluator<T, F>, penalty_func_t<T>>>(
         ga_evaluator<T, F>(f), pf);
   else
-    search<T, ES>::template set_training_evaluator<ga_evaluator<T, F>>(f);
+    search<T, ES>::template training_evaluator<ga_evaluator<T, F>>(f);
 }
 
 ///

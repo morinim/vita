@@ -63,8 +63,8 @@ public:
   template<class U> void arl(const U &);
   template<class U> void arl(const team<U> &);
 
-  bool set_evaluator(evaluator_id, const std::string & = "");
-  bool set_validator(validator_id);
+  src_search &evaluator(evaluator_id, const std::string & = "");
+  src_search &validation_strategy(validator_id);
 
   bool debug() const override;
 
@@ -72,7 +72,6 @@ protected:
   void tune_parameters() override;
 
 private:
-  // *** Private support methods ***
   dataframe &training_data() const;
   dataframe &test_data() const;
   dataframe &validation_data() const;

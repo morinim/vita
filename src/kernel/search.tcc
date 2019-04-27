@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -269,21 +269,24 @@ void search<T, ES>::print_resume(const model_measurements &m) const
 /// \tparam E an evaluator
 ///
 /// \param[in] args arguments used to build the `E` evaluator
+/// \return         a reference to the search class (used for method chaining)
 ///
 /// \warning
 /// We assume that the training evaluator could have a cache. This means that
-/// changes in the training simulation / training set should invalidate fitness
-/// values stored in that cache.
+/// changes in the training simulation / set should invalidate fitness values
+/// stored in that cache.
 ///
 template<class T, template<class> class ES>
 template<class E, class... Args>
-void search<T, ES>::set_training_evaluator(Args && ...args)
+search<T, ES> &search<T, ES>::training_evaluator(Args && ...args)
 {
   if (prob_.env.cache_size)
     eva1_ = std::make_unique<evaluator_proxy<T, E>>(
       E(std::forward<Args>(args)...), prob_.env.cache_size);
   else
     eva1_ = std::make_unique<E>(std::forward<Args>(args)...);
+
+  return *this;
 }
 
 ///
@@ -292,25 +295,31 @@ void search<T, ES>::set_training_evaluator(Args && ...args)
 /// \tparam E an evaluator
 ///
 /// \param[in] args arguments used to build the `E` evaluator
+/// \return         a reference to the search class (used for method chaining)
 ///
 /// \warning
 /// The validation evaluator cannot have a cache.
 ///
 template<class T, template<class> class ES>
 template<class E, class... Args>
-void search<T, ES>::set_validation_evaluator(Args && ...args)
+search<T, ES> &search<T, ES>::validation_evaluator(Args && ...args)
 {
   eva2_ = std::make_unique<E>(std::forward<Args>(args)...);
+  return *this;
 }
 
 ///
+/// Sets the active validation strategy.
+///
 /// \param[in] v a new validation strategy
+/// \return      a reference to the search class (used for method chaining)
 ///
 template<class T, template<class> class ES>
 template<class V, class... Args>
-void search<T, ES>::set_validator(Args && ...args)
+search<T, ES> &search<T, ES>::validation_strategy(Args && ...args)
 {
   vs_ = std::make_unique<V>(std::forward<Args>(args)...);
+  return *this;
 }
 
 ///

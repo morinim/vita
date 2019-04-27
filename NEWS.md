@@ -6,16 +6,37 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Changed
+- **BREAKING CHANGE**. Fluent interface for the search / src_search / ga_search classes.
+
+  Insted of:
+
+  ```C++
+  search<...> engine(...);
+  engine.set_training_evaluator<...>(...);
+  engine.set_validation_evaluator<...>(...);
+  engine.set_validator<...>(...);
+  ```
+
+  you should write:
+
+  ```C++
+  search<...> engine(...)
+              .training_evaluator<...>(...)
+			  .validation_evaluator<...>(...)
+			  .validation_strategy<...>(...);
+  ```
+
+  This benefits the class user by reducing the amount he has to type and makes the interface more natural.
+
 - **BREAKING CHANGE**. Removed `read_csv(filename)` / `read_xrff(filename)` from the interface of the dataframe class.
 
   Both the member functions can be replaced with the already existing `dataframe::read(filename)` which uses the filename extension to identify the data format.
 
 - Clearer format when exporting individuals.
 
-    **Part** of the redundant parentheses has been removed.
+  **Part** of the redundant parentheses has been removed.
 
-    So, instead of `((sin(X1)) + (ln(((X1)+(X2)))` you get
-    `(sin(X1) + ln(X1+X2))`
+  So, instead of `((sin(X1)) + (ln(((X1)+(X2)))` you get `(sin(X1) + ln(X1+X2))`
 
 ## [1.0.0] - 2019-03-22
 

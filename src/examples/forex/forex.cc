@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -284,7 +284,7 @@ int main()
   fxs::search engine(p);
 
   trade_simulator ts;
-  engine.set_training_evaluator<fxs::evaluator>(&ts);
+  engine.training_evaluator<fxs::evaluator>(&ts);
 
   std::cout << "STARTING RUN\n";
   engine.run(1);

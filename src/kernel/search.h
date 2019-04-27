@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,10 +43,10 @@ public:
 
   summary<T> run(unsigned = 1);
 
-  template<class E, class... Args> void set_training_evaluator(Args && ...);
-  template<class E, class... Args> void set_validation_evaluator(Args && ...);
+  template<class E, class... Args> search &training_evaluator(Args && ...);
+  template<class E, class... Args> search &validation_evaluator(Args && ...);
 
-  template<class V, class... Args> void set_validator(Args && ...);
+  template<class V, class... Args> search &validation_strategy(Args && ...);
 
   virtual bool debug() const;
 
@@ -63,7 +63,7 @@ protected:
   // Data members.
   std::unique_ptr<evaluator<T>> eva1_;  // fitness function for training
   std::unique_ptr<evaluator<T>> eva2_;  // fitness function for validation
-  std::unique_ptr<validation_strategy> vs_;
+  std::unique_ptr<vita::validation_strategy> vs_;
 
   // Problem we're working on.
   problem &prob_;

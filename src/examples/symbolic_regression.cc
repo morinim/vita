@@ -16,14 +16,13 @@
 int main()
 {
   // TARGET FUNCTION
-  const auto function([](double x) { return x + std::sin(x); });
-
+  const auto function = [](double x) { return x + std::sin(x); };
 
   // DATA SAMPLE
-  const auto sample([&function](double x) { return std::to_string(function(x))
-                                                   + ","
-                                                   + std::to_string(x)
-                                                   + "\n"; });
+  const auto sample = [&function](double x) { return std::to_string(function(x))
+                                                     + ","
+                                                     + std::to_string(x)
+                                                     + "\n"; };
   std::istringstream training(
     sample(-10) + sample(-8) + sample(-6) + sample(-4) + sample(-2)
     + sample(0) + sample( 2) + sample( 4) + sample( 6) + sample( 8));
