@@ -338,6 +338,8 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
     prob().sset.scale_adf_weights();
     arl(s->best.solution);
   }
+
+  search<T, ES>::after_evolution(s);
 }
 
 ///

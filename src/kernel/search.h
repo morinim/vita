@@ -68,12 +68,20 @@ protected:
   // Problem we're working on.
   problem &prob_;
 
+protected:
+  // Template method of the search::run() member function called at the end of
+  // each run.
+  virtual void after_evolution(summary<T> *);
+
+  // Template method of the search::after_evolution member function.
+  virtual void print_resume(const model_measurements &) const;
+
 private:
-  virtual void after_evolution(summary<T> *) {}
   virtual model_measurements calculate_metrics_custom(const summary<T> &) const;
 
-  // For the search class validation is possible when the validation function
-  // is set. Derived classes could add further requirements.
+  // Returns `true` when a validation criterion is available: i.e. it needs
+  // that `eva2_` is set.
+  // Derived classes can add further requirements.
   virtual bool can_validate() const;
 
   // Template method of the search::run() member function called exactly one
@@ -84,8 +92,6 @@ private:
   virtual void log_search_custom(tinyxml2::XMLDocument *,
                                  const summary<T> &) const
   {}
-
-  virtual void print_resume(const model_measurements &) const;
 };
 
 #include "kernel/search.tcc"

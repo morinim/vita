@@ -135,6 +135,12 @@ void search<T, ES>::tune_parameters()
   Ensures(prob_.env.debug(true));
 }
 
+template<class T, template<class> class ES>
+void search<T, ES>::after_evolution(summary<T> *s)
+{
+  print_resume(s->best.score);
+}
+
 ///
 /// \param[in] n number of runs
 /// \return      a summary of the search
@@ -167,8 +173,6 @@ summary<T> search<T, ES>::run(unsigned n)
 
     after_evolution(&run_summary);
 
-    print_resume(run_summary.best.score);
-
     if (r == 0
         || run_summary.best.score.fitness > overall_summary.best.score.fitness)
     {
@@ -196,7 +200,7 @@ summary<T> search<T, ES>::run(unsigned n)
            || std::find(std::begin(good_runs), std::end(good_runs), best_run)
               != std::end(good_runs));
 
-    this->log_search(overall_summary, fd, good_runs, best_run, n);
+    log_search(overall_summary, fd, good_runs, best_run, n);
   }
 
   save();

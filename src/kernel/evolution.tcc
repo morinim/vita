@@ -137,8 +137,8 @@ analyzer<T> evolution<T, ES>::get_stats() const
 ///
 /// We use this format, instead of XML, because statistics are produced
 /// incrementally and so it's simple and fast to append new data to a
-/// CSV-like file. Note also that data sets are ready to be plotted by
-/// GNUPlot.
+/// CSV-like file. Note also that it's simple to extract and plot data with
+/// GNU Plot.
 ///
 template<class T, template<class> class ES>
 void evolution<T, ES>::log_evolution(unsigned run_count) const
