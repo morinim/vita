@@ -36,47 +36,31 @@ bool search<T, ES>::can_validate() const
 }
 
 ///
-/// Calculates the fitness of the best individual so far.
+/// Calculates and stores the fitness of the best individual so far.
 ///
 /// \param[in] s summary of the evolution run just finished
-/// \return      `s.best.score`
 ///
-/// Specializations of this method can calculate further problem-specific
-/// metrics regarding `s.best.solution` (via the `calculate_metrics_custom`
-/// virtual function).
+/// Specializations of this method can calculate further / distinct
+/// problem-specific metrics regarding `s->best.solution`.
 ///
 /// If a validation set / simulation is available, it's used for the
 /// calculations.
 ///
 template<class T, template<class> class ES>
-model_measurements search<T, ES>::calculate_metrics(const summary<T> &s) const
+void search<T, ES>::calculate_metrics(summary<T> *s) const
 {
-  auto m(calculate_metrics_custom(s));
+  auto &best(s->best);
 
   if (can_validate())
   {
     assert(eva2_);
-    m.fitness = (*eva2_)(s.best.solution);
+    best.score.fitness = (*eva2_)(best.solution);
   }
   else
   {
     assert(eva1_);
-    m.fitness = (*eva1_)(s.best.solution);
+    best.score.fitness = (*eva1_)(best.solution);
   }
-
-  return m;
-}
-
-///
-/// For the base class this is just the identity function.
-///
-/// Derived classes could calculate additional problem-specific metrics.
-///
-template<class T, template<class> class ES>
-model_measurements search<T, ES>::calculate_metrics_custom(
-  const summary<T> &s) const
-{
-  return s.best.score;
 }
 
 ///
@@ -169,7 +153,7 @@ summary<T> search<T, ES>::run(unsigned n)
     vs_->close(r);
 
     // Possibly calculates additional metrics.
-    run_summary.best.score = calculate_metrics(run_summary);
+    calculate_metrics(&run_summary);
 
     after_evolution(&run_summary);
 

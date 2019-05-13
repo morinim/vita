@@ -98,7 +98,7 @@ std::unique_ptr<basic_src_lambda_f> src_search<T, ES>::lambdify(
 template<class T, template<class> class ES>
 bool src_search<T, ES>::can_validate() const
 {
-  return this->eva2_ && validation_data().size();
+  return search<T, ES>::can_validate() && validation_data().size();
 }
 
 ///
@@ -119,20 +119,17 @@ bool src_search<T, ES>::can_validate() const
 /// \warning Can be very time consuming.
 ///
 template<class T, template<class> class ES>
-model_measurements src_search<T, ES>::calculate_metrics_custom(
-  const summary<T> &s) const
+void src_search<T, ES>::calculate_metrics(summary<T> *s) const
 {
-  auto ret(s.best.score);
-
   if ((metrics & metric_flags::accuracy)
       || prob().env.threshold.accuracy > 0.0)
   {
-    const auto model(lambdify(s.best.solution));
+    const auto model(lambdify(s->best.solution));
     const auto &d(can_validate() ? validation_data() : training_data());
-    ret.accuracy = model->measure(accuracy_metric(), d);
+    s->best.score.accuracy = model->measure(accuracy_metric(), d);
   }
 
-  return ret;
+  search<T, ES>::calculate_metrics(s);
 }
 
 ///
@@ -348,14 +345,13 @@ void src_search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 void src_search<T, ES>::print_resume(const model_measurements &m) const
 {
-  const std::string s(can_validate() ? "Validation " : "Training ");
-
-  vitaINFO << s << "fitness: " << m.fitness;
-
   if (0.0 <= m.accuracy && m.accuracy <= 1.0)
   {
+    const std::string s(can_validate() ? "Validation " : "Training ");
     vitaINFO << s << "accuracy: " << 100.0 * m.accuracy << '%';
   }
+
+  search<T, ES>::print_resume(m);
 }
 
 ///

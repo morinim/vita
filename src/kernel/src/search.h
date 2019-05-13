@@ -51,7 +51,7 @@ enum class metric_flags : unsigned
 /// \tparam ES the adopted evolution strategy
 ///
 template<class T = i_mep, template<class> class ES = std_es>
-class src_search : public search<T, ES>
+class src_search final : public search<T, ES>
 {
 public:
   using individual_type = T;
@@ -71,18 +71,9 @@ public:
 protected:
   void tune_parameters() override;
 
-private:
-  dataframe &training_data() const;
-  dataframe &test_data() const;
-  dataframe &validation_data() const;
-  src_problem &prob() const;
-  template<class E, class... Args> void set_evaluator(Args && ...);
-  bool stop_condition(const summary<T> &) const;
-
-  // *** Template methods / customization points for `search::run()` ***
+  // *** Template methods / customization points ***
   void after_evolution(summary<T> *) override;
-  model_measurements calculate_metrics_custom(
-    const summary<T> &) const override;
+  void calculate_metrics(summary<T> *) const override;
 
   // Requires the availability of a validation function and of validation data.
   bool can_validate() const override;
@@ -90,6 +81,14 @@ private:
   void log_search_custom(tinyxml2::XMLDocument *,
                          const summary<T> &) const override;
   void print_resume(const model_measurements &) const override;
+
+private:
+  dataframe &training_data() const;
+  dataframe &test_data() const;
+  dataframe &validation_data() const;
+  src_problem &prob() const;
+  template<class E, class... Args> void set_evaluator(Args && ...);
+  bool stop_condition(const summary<T> &) const;
 
   // *** Private data members ***
   // Preferred evaluator for symbolic regression.

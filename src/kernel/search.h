@@ -51,14 +51,24 @@ public:
   virtual bool debug() const;
 
 protected:
-  // Support methods.
-  void log_search(const summary<T> &, const distribution<fitness_t> &,
-                  const std::vector<unsigned> &, unsigned, unsigned) const;
-  bool load();
-  bool save() const;
-  virtual void tune_parameters();
+  // Template method of the search::run() member function called at the end of
+  // each run.
+  virtual void after_evolution(summary<T> *);
 
-  model_measurements calculate_metrics(const summary<T> &) const;
+  virtual void calculate_metrics(summary<T> *) const;
+
+  // Returns `true` when a validation criterion is available: i.e. it needs
+  // that `eva2_` is set. Derived classes can add further requirements.
+  virtual bool can_validate() const;
+
+  // Template method of the search::run() member function called exactly one
+  // time just before the first run.
+  virtual void init() {}
+
+  // Template method of the search::after_evolution member function.
+  virtual void print_resume(const model_measurements &) const;
+
+  virtual void tune_parameters();
 
   // Data members.
   std::unique_ptr<evaluator<T>> eva1_;  // fitness function for training
@@ -68,30 +78,17 @@ protected:
   // Problem we're working on.
   problem &prob_;
 
-protected:
-  // Template method of the search::run() member function called at the end of
-  // each run.
-  virtual void after_evolution(summary<T> *);
-
-  // Template method of the search::after_evolution member function.
-  virtual void print_resume(const model_measurements &) const;
-
 private:
-  virtual model_measurements calculate_metrics_custom(const summary<T> &) const;
-
-  // Returns `true` when a validation criterion is available: i.e. it needs
-  // that `eva2_` is set.
-  // Derived classes can add further requirements.
-  virtual bool can_validate() const;
-
-  // Template method of the search::run() member function called exactly one
-  // time just before the first run.
-  virtual void init() {}
-
   // Logs additional problem-specific data.
   virtual void log_search_custom(tinyxml2::XMLDocument *,
                                  const summary<T> &) const
   {}
+
+  // Support methods.
+  void log_search(const summary<T> &, const distribution<fitness_t> &,
+                  const std::vector<unsigned> &, unsigned, unsigned) const;
+  bool load();
+  bool save() const;
 };
 
 #include "kernel/search.tcc"
