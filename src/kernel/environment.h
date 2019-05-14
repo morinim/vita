@@ -213,9 +213,9 @@ public:
   facultative<unsigned> validation_percentage = {};
 
   /// Should we use Adaptive Representation through Learning?
-  trilean arl = trilean::unknown;
+  bool arl = false;
 
-  /// \f$2^cache_size\f$ is the number of elements of the cache.
+  /// `2^cache_size` is the number of elements of the cache.
   unsigned cache_size = 16;
 
   struct misc_parameters

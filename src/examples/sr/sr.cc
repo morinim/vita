@@ -179,7 +179,7 @@ void arl(const args_t &a)
 {
   if (a.at("--arl").asBool())
   {
-    problem->env.arl = vita::trilean::yes;
+    problem->env.arl = true;
     vitaINFO << "Adaptive Representation through Learning is enabled";
   }
 }

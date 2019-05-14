@@ -330,7 +330,7 @@ void src_search<T, ES>::tune_parameters()
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(summary<T> *s)
 {
-  if (prob().env.arl == trilean::yes)
+  if (prob().env.arl)
   {
     prob().sset.scale_adf_weights();
     arl(s->best.solution);

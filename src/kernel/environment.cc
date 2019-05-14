@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,7 +54,7 @@ environment &environment::init()
   mate_zone = 20;
   generations = 100;
   max_stuck_time = std::numeric_limits<unsigned>::max();
-  arl = trilean::no;
+  arl = false;
   validation_percentage = 20;
 
   return *this;
@@ -88,7 +88,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
   set_text(e_environment, "mating_zone", mate_zone);
   set_text(e_environment, "max_generations", generations);
   set_text(e_environment, "max_stuck_time", *max_stuck_time);
-  set_text(e_environment, "arl", as_integer(arl));
+  set_text(e_environment, "arl", arl);
   if (validation_percentage.has_value())
     set_text(e_environment, "validation_percentage", *validation_percentage);
   set_text(e_environment, "cache_bits", cache_size);  // size `1u<<cache_size`
@@ -204,12 +204,6 @@ bool environment::debug(bool force_defined) const
     if (!max_stuck_time.has_value())
     {
       vitaERROR << "Undefined max_stuck_time data member";
-      return false;
-    }
-
-    if (arl == trilean::unknown)
-    {
-      vitaERROR << "Undefined arl data member";
       return false;
     }
 

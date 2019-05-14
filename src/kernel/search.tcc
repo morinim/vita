@@ -116,9 +116,6 @@ void search<T, ES>::tune_parameters()
   if (!constrained.max_stuck_time.has_value())
     prob_.env.max_stuck_time = dflt.max_stuck_time;
 
-  if (constrained.arl == trilean::unknown)
-    prob_.env.arl = dflt.arl;
-
   Ensures(prob_.env.debug(true));
 }
 

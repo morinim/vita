@@ -46,7 +46,7 @@ void basic_ga_search<T, ES, F>::tune_parameters()
   if (this->prob_.env.min_individuals < 10)
     this->prob_.env.min_individuals = 10;
 
-  this->prob_.env.arl = trilean::no;
+  this->prob_.env.arl = false;
 
   Ensures(this->prob_.env.debug(true));
 }
