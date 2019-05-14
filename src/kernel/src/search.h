@@ -78,8 +78,9 @@ protected:
   // Requires the availability of a validation function and of validation data.
   bool can_validate() const override;
 
-  void log_search_custom(tinyxml2::XMLDocument *,
-                         const summary<T> &) const override;
+  void log_stats(const search_stats<T> &,
+                 tinyxml2::XMLDocument *) const override;
+
   void print_resume(const model_measurements &) const override;
 
 private:

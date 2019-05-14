@@ -357,16 +357,18 @@ void src_search<T, ES>::print_resume(const model_measurements &m) const
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-/// \param[out] d               output xml document
 /// \param[in]  run_sum summary information regarding the search
+/// \param[out] d               output xml document
 ///
 template<class T, template<class> class ES>
-void src_search<T, ES>::log_search_custom(tinyxml2::XMLDocument *d,
-                                          const summary<T> &run_sum) const
+void src_search<T, ES>::log_stats(const search_stats<T> &s,
+                                  tinyxml2::XMLDocument *d) const
 {
   Expects(d);
 
   const auto &stat(prob().env.stat);
+
+  search<T, ES>::log_stats(s, d);
 
   if (!stat.summary_file.empty())
   {
@@ -376,13 +378,13 @@ void src_search<T, ES>::log_search_custom(tinyxml2::XMLDocument *d,
     auto *e_best(d->FirstChild()->FirstChildElement("summary")
                  ->FirstChildElement("best"));
     assert(e_best);
-    set_text(e_best, "accuracy", run_sum.best.score.accuracy);
+    set_text(e_best, "accuracy", s.overall.best.score.accuracy);
   }
 
   // Test set results logging.
   if (!stat.test_file.empty() && test_data().size())
   {
-    const auto lambda(lambdify(run_sum.best.solution));
+    const auto lambda(lambdify(s.overall.best.solution));
 
     std::ofstream tf(merge_path(stat.dir, stat.test_file));
     for (const auto &example : test_data())

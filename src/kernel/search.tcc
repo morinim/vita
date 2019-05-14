@@ -41,7 +41,7 @@ bool search<T, ES>::can_validate() const
 /// \param[in] s summary of the evolution run just finished
 ///
 /// Specializations of this method can calculate further / distinct
-/// problem-specific metrics regarding `s->best.solution`.
+/// problem-specific metrics regarding the candidate solution.
 ///
 /// If a validation set / simulation is available, it's used for the
 /// calculations.
@@ -61,6 +61,9 @@ void search<T, ES>::calculate_metrics(summary<T> *s) const
     assert(eva1_);
     best.score.fitness = (*eva1_)(best.solution);
   }
+
+  // We use accuracy or fitness (or both) to identify successful runs.
+  best.score.is_solution = (best.score >= this->prob_.env.threshold);
 }
 
 ///
@@ -119,6 +122,14 @@ void search<T, ES>::tune_parameters()
   Ensures(prob_.env.debug(true));
 }
 
+///
+/// Performs after evolution tasks.
+///
+/// The default act is to print the result of the evolutionary run. Derived
+/// classes can change / integrate the base behaviour.
+///
+/// \remark Called at the end of each run.
+///
 template<class T, template<class> class ES>
 void search<T, ES>::after_evolution(summary<T> *s)
 {
@@ -132,19 +143,15 @@ void search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 summary<T> search<T, ES>::run(unsigned n)
 {
+  auto shake([this](unsigned g) { return vs_->shake(g); });
+
   tune_parameters();
 
   init();
 
-  auto shake([this](unsigned g) { return vs_->shake(g); });
-
-  summary<T> overall_summary;
-  distribution<fitness_t> fd;
-
-  unsigned best_run(0);
-  std::vector<unsigned> good_runs;
-
   load();
+
+  search_stats<T> stats;
 
   for (unsigned r(0); r < n; ++r)
   {
@@ -157,39 +164,40 @@ summary<T> search<T, ES>::run(unsigned n)
 
     after_evolution(&run_summary);
 
-    if (r == 0
-        || run_summary.best.score.fitness > overall_summary.best.score.fitness)
-    {
-      overall_summary.best = run_summary.best;
-      best_run = r;
-    }
+    stats.update(run_summary);
 
-    // We use accuracy or fitness (or both) to identify successful runs.
-    const bool solution_found(run_summary.best.score >=
-                              this->prob_.env.threshold);
-
-    if (solution_found)
-    {
-      overall_summary.last_imp += run_summary.last_imp;
-
-      good_runs.push_back(r);
-    }
-
-    if (isfinite(run_summary.best.score.fitness))
-      fd.add(run_summary.best.score.fitness);
-
-    overall_summary.elapsed += run_summary.elapsed;
-
-    assert(good_runs.empty()
-           || std::find(std::begin(good_runs), std::end(good_runs), best_run)
-              != std::end(good_runs));
-
-    log_search(overall_summary, fd, good_runs, best_run, n);
+    log_stats(stats);
   }
 
   save();
 
-  return overall_summary;
+  return stats.overall;
+}
+
+template<class T>
+void search_stats<T>::update(const summary<T> &r)
+{
+  if (runs == 0 || r.best.score.fitness > overall.best.score.fitness)
+  {
+    overall.best = r.best;
+    best_run = runs;
+  }
+
+  if (r.best.score.is_solution)
+  {
+    overall.last_imp += r.last_imp;
+    good_runs.insert(good_runs.end(), runs);
+  }
+
+  if (isfinite(r.best.score.fitness))
+    fd.add(r.best.score.fitness);
+
+  overall.elapsed += r.elapsed;
+  overall.gen += r.gen;
+
+  ++runs;
+
+  Ensures(good_runs.empty() || good_runs.count(best_run));
 }
 
 ///
@@ -241,7 +249,11 @@ bool search<T, ES>::save() const
 }
 
 ///
+/// Prints a resume of the evolutionary run.
+///
 /// \param[in] m metrics relative to the current run
+///
+/// Derived classes can add further specific information.
 ///
 template<class T, template<class> class ES>
 void search<T, ES>::print_resume(const model_measurements &m) const
@@ -322,69 +334,72 @@ bool search<T, ES>::debug() const
 ///
 /// Writes end-of-run logs (run summary, results for test...).
 ///
-/// \param[in] run_sum       summary information regarding the search
-/// \param[in] fd statistics about population fitness
-/// \param[in] good_runs     list of the best runs of the search
-/// \param[in] best_run      best overall run
-/// \param[in] runs          number of runs performed
-/// \return                  `true` if the write operation succeed
+/// \param[in]  stats mixed statistics about the search performed so far
+/// \param[out] d     output file (XML)
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::log_search(const summary<T> &run_sum,
-                               const distribution<fitness_t> &fd,
-                               const std::vector<unsigned> &good_runs,
-                               unsigned best_run, unsigned runs) const
+void search<T, ES>::log_stats(const search_stats<T> &stats,
+                              tinyxml2::XMLDocument *d) const
 {
+  Expects(d);
+
   if (prob_.env.stat.summary_file.empty())
     return;
 
-  tinyxml2::XMLDocument d(false);
+  auto *root(d->NewElement("vita"));
+  d->InsertFirstChild(root);
 
-  auto *root(d.NewElement("vita"));
-  d.InsertFirstChild(root);
-
-  auto *e_summary(d.NewElement("summary"));
+  auto *e_summary(d->NewElement("summary"));
   root->InsertEndChild(e_summary);
 
-  const auto solutions(static_cast<unsigned>(good_runs.size()));
+  const auto solutions(stats.good_runs.size());
   const auto success_rate(
-    runs ? static_cast<double>(solutions) / static_cast<double>(runs)
-         : 0);
+    stats.runs ? static_cast<double>(solutions)
+                 / static_cast<double>(stats.runs)
+               : 0);
 
   set_text(e_summary, "success_rate", success_rate);
-  set_text(e_summary, "elapsed_time", run_sum.elapsed.count());
-  set_text(e_summary, "mean_fitness", fd.mean());
-  set_text(e_summary, "standard_deviation", fd.standard_deviation());
+  set_text(e_summary, "elapsed_time", stats.overall.elapsed.count());
+  set_text(e_summary, "mean_fitness", stats.fd.mean());
+  set_text(e_summary, "standard_deviation", stats.fd.standard_deviation());
 
-  auto *e_best(d.NewElement("best"));
+  auto *e_best(d->NewElement("best"));
   e_summary->InsertEndChild(e_best);
-  set_text(e_best, "fitness", run_sum.best.score.fitness);
-  set_text(e_best, "run", best_run);
+  set_text(e_best, "fitness", stats.overall.best.score.fitness);
+  set_text(e_best, "run", stats.best_run);
 
   std::ostringstream ss;
-  ss << out::print_format(prob_.env.stat.ind_format) << run_sum.best.solution;
+  ss << out::print_format(prob_.env.stat.ind_format)
+     << stats.overall.best.solution;
   set_text(e_best, "code", ss.str());
 
-  auto *e_solutions(d.NewElement("solutions"));
+  auto *e_solutions(d->NewElement("solutions"));
   e_summary->InsertEndChild(e_solutions);
 
-  auto *e_runs(d.NewElement("runs"));
+  auto *e_runs(d->NewElement("runs"));
   e_solutions->InsertEndChild(e_runs);
-  for (const auto &gr : good_runs)
+  for (const auto &gr : stats.good_runs)
     set_text(e_runs, "run", gr);
   set_text(e_solutions, "found", solutions);
 
-  const auto avg_depth(solutions ? run_sum.last_imp / solutions : 0);
+  const auto avg_depth(solutions ? stats.overall.last_imp / solutions
+                                 : 0);
   set_text(e_solutions, "avg_depth", avg_depth);
 
-  auto *e_other(d.NewElement("other"));
+  auto *e_other(d->NewElement("other"));
   e_summary->InsertEndChild(e_other);
   set_text(e_other,"training_evaluator", eva1_->info());
   set_text(e_other,"validation_evaluator", eva2_->info());
 
-  prob_.env.xml(&d);
+  prob_.env.xml(d);
+}
 
-  log_search_custom(&d, run_sum);
+template<class T, template<class> class ES>
+void search<T, ES>::log_stats(const search_stats<T> &stats) const
+{
+  tinyxml2::XMLDocument d(false);
+
+  log_stats(stats, &d);
 
   const std::string f_sum(merge_path(prob_.env.stat.dir,
                                      prob_.env.stat.summary_file));

@@ -19,6 +19,20 @@
 
 namespace vita
 {
+
+template<class T>
+struct search_stats
+{
+  void update(const summary<T> &);
+
+  summary<T> overall = {};
+  distribution<fitness_t> fd = {};
+  std::set<unsigned> good_runs = {};
+
+  unsigned best_run = 0;  /// index of the run giving the best solution
+  unsigned runs     = 0;  /// number of runs performed so far
+};
+
 ///
 /// Search drives the evolution.
 ///
@@ -65,6 +79,11 @@ protected:
   // time just before the first run.
   virtual void init() {}
 
+  // Template method of the search::run() member function called at the end of
+  // each run. Logs search statistics.
+  virtual void log_stats(const search_stats<T> &,
+                         tinyxml2::XMLDocument *) const;
+
   // Template method of the search::after_evolution member function.
   virtual void print_resume(const model_measurements &) const;
 
@@ -79,14 +98,7 @@ protected:
   problem &prob_;
 
 private:
-  // Logs additional problem-specific data.
-  virtual void log_search_custom(tinyxml2::XMLDocument *,
-                                 const summary<T> &) const
-  {}
-
-  // Support methods.
-  void log_search(const summary<T> &, const distribution<fitness_t> &,
-                  const std::vector<unsigned> &, unsigned, unsigned) const;
+  void log_stats(const search_stats<T> &) const;
   bool load();
   bool save() const;
 };

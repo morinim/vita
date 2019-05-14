@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,14 +22,16 @@ namespace vita
 ///
 struct model_measurements
 {
-  explicit model_measurements(const fitness_t &f = {}, double a = -1.0)
-    : fitness(f), accuracy(a)
+  explicit model_measurements(const fitness_t &f = {}, double a = -1.0,
+                              bool s = false)
+    : fitness(f), accuracy(a), is_solution(s)
   {
     Expects(accuracy <= 1.0);
   }
 
   fitness_t fitness;
-  double accuracy;
+  double   accuracy;
+  bool  is_solution;
   //double f1_score = std::numeric_limits<decltype(f1_score)>::quiet_NaN();
 };
 
