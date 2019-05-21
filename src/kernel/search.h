@@ -77,7 +77,7 @@ protected:
 
   // Template method of the search::run() member function called exactly one
   // time just before the first run.
-  virtual void init() {}
+  virtual void init();
 
   // Template method of the search::run() member function called at the end of
   // each run. Logs search statistics.

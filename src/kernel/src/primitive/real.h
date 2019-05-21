@@ -591,7 +591,7 @@ public:
   ///
   /// \param[in] i pointer to the active interpreter
   /// \return      the natural logarithm of its argument or an empty value in
-  ///              case of invalid argument / infinite result.
+  ///              case of invalid argument / infinite result
   ///
   any eval(core_interpreter *i) const final
   {

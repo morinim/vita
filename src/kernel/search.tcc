@@ -120,6 +120,25 @@ void search<T, ES>::tune_parameters()
 }
 
 ///
+/// Performs basic initialization before the search.
+///
+/// The default behaviour involve doing:
+/// - tuning of the search parameters;
+/// - possibly loading cached value for the training evaluator.
+///
+/// \remark
+/// Called at the beginning of the first run (i.e. only one time even for a
+/// multiple-run search).
+///
+template<class T, template<class> class ES>
+void search<T, ES>::init()
+{
+  tune_parameters();
+
+  load();
+}
+
+///
 /// Performs after evolution tasks.
 ///
 /// The default act is to print the result of the evolutionary run. Derived
@@ -140,14 +159,9 @@ void search<T, ES>::after_evolution(summary<T> *s)
 template<class T, template<class> class ES>
 summary<T> search<T, ES>::run(unsigned n)
 {
-  auto shake([this](unsigned g) { return vs_->shake(g); });
-
-  tune_parameters();
-
   init();
 
-  load();
-
+  auto shake([this](unsigned g) { return vs_->shake(g); });
   search_stats<T> stats;
 
   for (unsigned r(0); r < n; ++r)
@@ -162,7 +176,6 @@ summary<T> search<T, ES>::run(unsigned n)
     after_evolution(&run_summary);
 
     stats.update(run_summary);
-
     log_stats(stats);
   }
 

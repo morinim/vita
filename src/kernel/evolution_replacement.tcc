@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,9 +28,9 @@ strategy<T>::strategy(population<T> &pop, evaluator<T> &eva) : pop_(pop),
 }
 
 ///
-/// \param[in] parent coordinates of the parents (in the population).
+/// \param[in] parent    coordinates of the parents (in the population).
 /// \param[in] offspring vector of the "children".
-/// \param[in,out] s statistical summary.
+/// \param[in,out] s     statistical summary.
 ///
 /// Parameters from the environment:
 /// * elitism is `true` => child replaces a member of the population only if
@@ -64,13 +64,13 @@ void family_competition<T>::run(
   }
   else  // !elitism
   {
-    // THIS CODE IS APPROPRIATE ONLY WHEN FITNESS IS A SCALAR. It will work
-    // when fitness is a vector but the replacement probability should be
-    // calculated in a better way.
+    // THIS CODE IS APPROPRIATE ONLY WHEN FITNESS IS A SCALAR. It compiles when
+    // fitness is a vector but the replacement probability should be calculated
+    // in a better way.
 
     //double replace(1.0 / (1.0 + exp(fit_parent[id_worst][0] - fit_off[0])));
-    double replace(1.0 - (fit_off[0] /
-                          (fit_off[0] + fit_parent[id_worst][0])));
+    double replace(1.0 - (fit_off[0]
+                          / (fit_off[0] + fit_parent[id_worst][0])));
     if (random::boolean(replace))
       pop[parent[id_worst]] = offspring[0];
     else
