@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -63,7 +63,7 @@ public:
   /// Initial setup performed before evolution starts.
   void init() const {}
 
-  /// Work to be done at the end of an evolution run.
+  /// Work to be done at the end of an evolutionary run.
   void post_bookkeeping() const {}
 
   /// Used to signal strategy specific stop conditions.

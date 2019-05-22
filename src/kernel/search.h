@@ -76,6 +76,10 @@ protected:
   virtual bool can_validate() const;
 
   // Template method of the search::run() member function called exactly one
+  // time at the end of the last run.
+  virtual void close();
+
+  // Template method of the search::run() member function called exactly one
   // time just before the first run.
   virtual void init();
 

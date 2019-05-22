@@ -122,7 +122,7 @@ void search<T, ES>::tune_parameters()
 ///
 /// Performs basic initialization before the search.
 ///
-/// The default behaviour involve doing:
+/// The default behaviour involve:
 /// - tuning of the search parameters;
 /// - possibly loading cached value for the training evaluator.
 ///
@@ -136,6 +136,22 @@ void search<T, ES>::init()
   tune_parameters();
 
   load();
+}
+
+///
+/// Performs closing actions at the end of the search.
+///
+/// The default behaviour involve (possibly) caching values of the training
+/// evaluator.
+///
+/// \remark
+/// Called at the beginning of the first run (i.e. only one time even for a
+/// multiple-run search).
+///
+template<class T, template<class> class ES>
+void search<T, ES>::close()
+{
+  save();
 }
 
 ///
@@ -179,7 +195,7 @@ summary<T> search<T, ES>::run(unsigned n)
     log_stats(stats);
   }
 
-  save();
+  close();
 
   return stats.overall;
 }

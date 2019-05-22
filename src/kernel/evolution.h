@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,7 +64,7 @@ private:
 
 ///
 /// \example example6.cc
-/// Simple symbolic regression example (\f$x^2+y^2-z^2\f$).
+/// Simple symbolic regression example (`x^2+y^2-z^2`).
 ///
 }  // namespace vita
 

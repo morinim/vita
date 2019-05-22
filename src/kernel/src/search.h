@@ -69,10 +69,9 @@ public:
   bool debug() const override;
 
 protected:
-  void tune_parameters() override;
-
   // *** Template methods / customization points ***
   void after_evolution(summary<T> *) override;
+
   void calculate_metrics(summary<T> *) const override;
 
   // Requires the availability of a validation function and of validation data.
@@ -82,6 +81,8 @@ protected:
                  tinyxml2::XMLDocument *) const override;
 
   void print_resume(const model_measurements &) const override;
+
+  void tune_parameters() override;
 
 private:
   dataframe &training_data() const;

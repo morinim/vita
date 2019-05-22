@@ -105,7 +105,7 @@ bool evolution<T, ES>::stop_condition(const summary<T> &s) const
 }
 
 ///
-/// \return statistical informations about the elements of the population
+/// \return statistical information about the population
 ///
 template<class T, template<class> class ES>
 analyzer<T> evolution<T, ES>::get_stats() const
