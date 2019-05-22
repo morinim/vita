@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -73,7 +73,7 @@ environment basic_alps_es<T, CS>::shape(environment env)
 /// Increments population's age and checks if it's time to add a new layer.
 ///
 template<class T, template<class> class CS>
-void basic_alps_es<T, CS>::post_bookkeeping()
+void basic_alps_es<T, CS>::after_generation()
 {
   const auto &sum(this->sum_);
   auto &pop(this->pop_);

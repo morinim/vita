@@ -77,7 +77,7 @@ inline void set()
 ///
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const problem &p, evaluator<T> &eva)
-  : pop_(p), eva_(eva), es_(pop_, eva, &stats_)
+  : pop_(p), eva_(eva), es_(pop_, eva_, &stats_)
 {
   Expects(p.debug());
   Ensures(debug());
@@ -333,7 +333,7 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
 
     stats_.elapsed = measure.elapsed();
 
-    es_.post_bookkeeping();  // hook for strategy-specific final bookkeeping
+    es_.after_generation();  // hook for strategy-specific bookkeeping
   }
 
   vitaINFO << "Elapsed time: "

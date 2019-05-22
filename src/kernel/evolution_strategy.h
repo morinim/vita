@@ -63,8 +63,8 @@ public:
   /// Initial setup performed before evolution starts.
   void init() const {}
 
-  /// Work to be done at the end of an evolutionary run.
-  void post_bookkeeping() const {}
+  /// Work to be done at the end of a generation.
+  void after_generation() const {}
 
   /// Used to signal strategy specific stop conditions.
   bool stop_condition() const { return false; }
@@ -139,7 +139,7 @@ public:
   using basic_alps_es::evolution_strategy::evolution_strategy;
 
   void log_strategy(unsigned, unsigned) const;
-  void post_bookkeeping();
+  void after_generation();
 
   static environment shape(environment);
 };
