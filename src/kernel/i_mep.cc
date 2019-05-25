@@ -894,7 +894,11 @@ std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
       return ret;
     });
 
-  return s << language_(mep[mep.best()]);
+  std::string out(language_(mep[mep.best()]));
+  if (out.length() > 2 && out.front() == '(' && out.back() == ')')
+    out = out.substr(1, out.length() - 2);
+
+  return s << out;
 }
 
 std::ostream &dump(const i_mep &mep, std::ostream &s)
