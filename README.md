@@ -9,11 +9,11 @@
 
 ## Overview ##
 
-Vita is a scalable, high performance genetic programming / algorithms framework.
+Vita is a scalable, high performance framework for genetic programming and genetic algorithms.
 
-It's suitable for classification, symbolic regression, content base image retrieval, data mining and agent control. Main features:
+It's suitable for [classification][classification], [symbolic regression][sr], content base image retrieval, data mining and [software agent][agent] implementation. Main features:
 
-* flexible, fast and clean design
+* flexible and fast
 * easy integration with other systems
 * simple addition of features and modules
 * fast experimentation with detailed run-log
@@ -24,7 +24,41 @@ This software was originally developed by [EOS][eos] without open source in mind
 
 Although the core development team is still anchored at EOS, Vita is now open source and we would like it to be run by an international team of AI enthusiasts.
 
+## Symbolic regression example ##
+
+```C++
+// TARGET FUNCTION
+const auto function = [](double x) { return x + std::sin(x); };
+
+// DATA SAMPLE
+const auto sample = [&function](double x) { return std::to_string(function(x))
+                                                   + ","
+                                                   + std::to_string(x)
+                                                   + "\n"; };
+std::istringstream training(
+  sample(-10) + sample(-8) + sample(-6) + sample(-4) + sample(-2)
+  + sample(0) + sample( 2) + sample( 4) + sample( 6) + sample( 8));
+
+// READING INPUT DATA
+vita::src_problem prob(training);
+
+// SETTING UP SYMBOLS
+prob.insert<vita::real::sin>();
+prob.insert<vita::real::cos>();
+prob.insert<vita::real::add>();
+prob.insert<vita::real::sub>();
+prob.insert<vita::real::div>();
+prob.insert<vita::real::mul>();
+
+// SEARCHING
+vita::src_search<> s(prob);
+const auto result(s.run());
+```
+
+It's pretty straightforward (further details in the [specific tutorial][symbolic_regression]).
+
 ## Documentation ##
+
 There is a [comprehensive wiki][wiki]. You should probably start with the [tutorials][tutorials].
 
 ## Build requirements ##
@@ -110,8 +144,14 @@ All the output files will be stored in subdirectories of `build/` (out of source
 Windows may need various expedients about which you can read in the [Windows walkthrough][windows].
 
 ## License ##
+
 [Mozilla Public License v2.0][mpl2] (also available in the accompanying [LICENSE][license] file).
 
+## Versioning ##
+
+Vita uses [semantic versioning][semver]. Releases are tagged.
+
+Note that the major version will change rapidly and API changes are fairly common. Read the [NEWS.md][news] file for details about the breaking changes.
 
 
 [cii]: https://bestpractices.coreinfrastructure.org/projects/1012
@@ -124,9 +164,14 @@ Windows may need various expedients about which you can read in the [Windows wal
 [license]: https://github.com/morinim/vita/blob/master/LICENSE
 [mpl2]: https://www.mozilla.org/MPL/2.0/
 [news]: https://github.com/morinim/vita/blob/master/NEWS.md
-[python]: http://www.python.org/
+[python]: https://www.python.org/
+[semver]: https://semver.org/
+[symbolic_regression]: https://github.com/morinim/vita/wiki/symbolic_regression
 [travis]: https://travis-ci.org/morinim/vita
 [tutorials]: https://github.com/morinim/vita/wiki/tutorials
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
 [wiki]: https://github.com/morinim/vita/wiki
 [windows]: https://github.com/morinim/vita/wiki/win_build
+[classification]: https://github.com/morinim/vita/wiki/titanic_tutorial
+[sr]: https://github.com/morinim/vita/wiki/symbolic_regression
+[agent]: https://github.com/morinim/vita/wiki/forex_tutorial
