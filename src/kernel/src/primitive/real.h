@@ -204,7 +204,6 @@ public:
     {
     case cpp_format:     return "(%%1%%/std::sqrt(1.0+std::pow(%%2%%,2.0)))";
     case mql_format:     return       "(%%1%%/MathSqrt(1+MathPow(%%2%%,2)))";
-    case python_format:  return     "(%%1%%/math.sqrt(1+math.pow(%%2%%,2)))";
     default:             return           "(%%1%%/sqrt(1.0+pow(%%2%%,2.0)))";
     }
   }
@@ -242,7 +241,6 @@ public:
     {
     case cpp_format:     return "std::cos(%%1%%)";
     case mql_format:     return  "MathCos(%%1%%)";
-    case python_format:  return "math.cos(%%1%%)";
     default:             return      "cos(%%1%%)";
     }
   }
@@ -430,7 +428,7 @@ public:
     case mql_format:
       return "(NormalizeDouble(%%1%%-%%2%%,8)==0 ? %%3%% : %%4%%)";
     case python_format:
-      return "(%%3%% if math.isclose(%%1%%, %%2%%) else %%4%%)";
+      return "(%%3%% if isclose(%%1%%, %%2%%) else %%4%%)";
     default:
       return "(fabs(%%1%%-%%2%%) < 2*DBL_EPSILON ? %%3%% : %%4%%)";
     }
@@ -758,7 +756,6 @@ public:
     {
     case cpp_format:     return "std::sin(%%1%%)";
     case mql_format:     return  "MathSin(%%1%%)";
-    case python_format:  return "math.sin(%%1%%)";
     default:             return      "sin(%%1%%)";
     }
   }
@@ -787,7 +784,6 @@ public:
     {
     case cpp_format:     return "std::sqrt(%%1%%)";
     case mql_format:     return  "MathSqrt(%%1%%)";
-    case python_format:  return "math.sqrt(%%1%%)";
     default:             return      "sqrt(%%1%%)";
     }
   }
