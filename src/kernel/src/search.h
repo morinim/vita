@@ -70,7 +70,7 @@ public:
 
 protected:
   // *** Template methods / customization points ***
-  void after_evolution(summary<T> *) override;
+  void after_evolution(const summary<T> &) override;
 
   void calculate_metrics(summary<T> *) const override;
 

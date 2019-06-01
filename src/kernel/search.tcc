@@ -24,9 +24,17 @@
 template<class T, template<class> class ES>
 search<T, ES>::search(problem &p) : eva1_(nullptr), eva2_(nullptr),
                                     vs_(std::make_unique<as_is_validation>()),
-                                    prob_(p)
+                                    prob_(p), after_generation_callback_()
 {
   Ensures(debug());
+}
+
+template<class T, template<class> class ES>
+search<T, ES> &search<T, ES>::after_generation(
+  typename evolution<T, ES>::after_generation_callback_t f)
+{
+  after_generation_callback_ = std::move(f);
+  return *this;
 }
 
 template<class T, template<class> class ES>
@@ -163,9 +171,9 @@ void search<T, ES>::close()
 /// \remark Called at the end of each run.
 ///
 template<class T, template<class> class ES>
-void search<T, ES>::after_evolution(summary<T> *s)
+void search<T, ES>::after_evolution(const summary<T> &s)
 {
-  print_resume(s->best.score);
+  print_resume(s.best.score);
 }
 
 ///
@@ -183,13 +191,15 @@ summary<T> search<T, ES>::run(unsigned n)
   for (unsigned r(0); r < n; ++r)
   {
     vs_->init(r);
-    auto run_summary(evolution<T, ES>(prob_, *eva1_).run(r, shake));
+    auto run_summary(evolution<T, ES>(prob_, *eva1_)
+                     .after_generation(after_generation_callback_)
+                     .run(r, shake));
     vs_->close(r);
 
     // Possibly calculates additional metrics.
     calculate_metrics(&run_summary);
 
-    after_evolution(&run_summary);
+    after_evolution(run_summary);
 
     stats.update(run_summary);
     log_stats(stats);

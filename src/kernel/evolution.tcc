@@ -77,10 +77,24 @@ inline void set()
 ///
 template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const problem &p, evaluator<T> &eva)
-  : pop_(p), eva_(eva), es_(pop_, eva_, &stats_)
+  : pop_(p), eva_(eva), es_(pop_, eva_, &stats_), after_generation_callback_()
 {
   Expects(p.debug());
   Ensures(debug());
+}
+
+///
+/// Sets a callback function called at the end of every generation.
+///
+/// \param[in] f callback function
+/// \return      a reference to `*this` object (fluent interface)
+///
+template<class T, template<class> class ES>
+evolution<T, ES> &evolution<T, ES>::after_generation(
+  after_generation_callback_t f)
+{
+  after_generation_callback_ = f;
+  return *this;
 }
 
 ///
@@ -334,6 +348,8 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count, S shake)
     stats_.elapsed = measure.elapsed();
 
     es_.after_generation();  // hook for strategy-specific bookkeeping
+    if (after_generation_callback_)
+      after_generation_callback_(pop_, stats_);
   }
 
   vitaINFO << "Elapsed time: "

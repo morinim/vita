@@ -328,12 +328,12 @@ void src_search<T, ES>::tune_parameters()
 }
 
 template<class T, template<class> class ES>
-void src_search<T, ES>::after_evolution(summary<T> *s)
+void src_search<T, ES>::after_evolution(const summary<T> &s)
 {
   if (prob().env.arl)
   {
     prob().sset.scale_adf_weights();
-    arl(s->best.solution);
+    arl(s.best.solution);
   }
 
   search<T, ES>::after_evolution(s);

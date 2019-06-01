@@ -39,7 +39,12 @@ template<class T, template<class> class ES>
 class evolution
 {
 public:
+  using after_generation_callback_t = std::function<void(const population<T> &,
+                                                         const summary<T> &)>;
+
   evolution(const problem &, evaluator<T> &);
+
+  evolution &after_generation(after_generation_callback_t);
 
   const summary<T> &run(unsigned);
   template<class S> const summary<T> &run(unsigned, S);
@@ -47,17 +52,19 @@ public:
   bool debug() const;
 
 private:
-  // Support methods.
+  // *** Support methods ***
   analyzer<T> get_stats() const;
   void log_evolution(unsigned) const;
   void print_progress(unsigned, unsigned, bool, timer *) const;
   bool stop_condition(const summary<T> &) const;
 
-  // Data members.
-  vita::population<T> pop_;
-  evaluator<T>       &eva_;
-  summary<T>        stats_;
-  ES<T>                es_;
+  // *** Data members ***
+  population<T> pop_;
+  evaluator<T> &eva_;
+  summary<T>  stats_;
+  ES<T>          es_;
+
+  after_generation_callback_t after_generation_callback_;
 };
 
 #include "kernel/evolution.tcc"

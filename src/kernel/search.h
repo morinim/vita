@@ -62,12 +62,15 @@ public:
 
   template<class V, class... Args> search &validation_strategy(Args && ...);
 
+  search &after_generation(
+    typename evolution<T, ES>::after_generation_callback_t);
+
   virtual bool debug() const;
 
 protected:
   // Template method of the search::run() member function called at the end of
   // each run.
-  virtual void after_evolution(summary<T> *);
+  virtual void after_evolution(const summary<T> &);
 
   virtual void calculate_metrics(summary<T> *) const;
 
@@ -93,13 +96,17 @@ protected:
 
   virtual void tune_parameters();
 
-  // Data members.
+  // *** Data members ***
   std::unique_ptr<evaluator<T>> eva1_;  // fitness function for training
   std::unique_ptr<evaluator<T>> eva2_;  // fitness function for validation
   std::unique_ptr<vita::validation_strategy> vs_;
 
   // Problem we're working on.
   problem &prob_;
+
+  // Callback functions.
+  typename evolution<T, ES>::after_generation_callback_t
+  after_generation_callback_;
 
 private:
   void log_stats(const search_stats<T> &) const;
