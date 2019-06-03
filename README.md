@@ -98,7 +98,6 @@ vita/
   LICENSE
   NEWS.md..................Don't let your friends dump git logs into NEWS
   README.md
-  copyright
   contributors/
   doc/
   misc/
