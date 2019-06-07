@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2015 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,8 +20,8 @@
 namespace vita {
 namespace recombination {
 ///
-/// \brief The operation strategy (crossover, recombination, mutation...) for
-///        the evolution class
+/// The operation strategy (crossover, recombination, mutation...) adopted in
+/// the evolution class.
 ///
 /// \tparam T type of program (individual/team)
 ///
@@ -39,21 +39,17 @@ namespace recombination {
 /// This is an abstract class: introduction of new operators or redefinition
 /// of existing ones is obtained implementing recombination::strategy.
 ///
-/// The design adheres to the NVI pattern ("Virtuality" in C/C++ Users
-/// Journal September 2001).
-///
 /// \see
 /// * <http://en.wikipedia.org/wiki/Strategy_pattern>
-/// * <http://www.gotw.ca/publications/mill18.htm>
 ///
 template<class T>
 class strategy
 {
 public:
   using offspring_t = small_vector<T, 1>;
-  using parents_t = typename selection::strategy<T>::parents_t;
+  using parents_t   = typename selection::strategy<T>::parents_t;
 
-  strategy(const population<T> &, evaluator<T> &, summary<T> *const);
+  strategy(const population<T> &, evaluator<T> &, summary<T> *);
 
 protected:
   const population<T> &pop_;
@@ -95,4 +91,4 @@ public:
 }  // namespace recombination
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

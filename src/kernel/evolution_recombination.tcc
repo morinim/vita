@@ -18,23 +18,23 @@
 #define      VITA_EVOLUTION_RECOMBINATION_TCC
 
 ///
-/// \param[in] pop the current population.
-/// \param[in] eva the current evaluator.
-/// \param[in] stats pointer to the current set of statistics.
+/// \param[in] pop   the current population
+/// \param[in] eva   the current evaluator
+/// \param[in] stats pointer to the current set of statistics
 ///
 template<class T>
 strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
-                      summary<T> *const stats)
+                      summary<T> *stats)
   : pop_(pop), eva_(eva), stats_(stats)
 {
-  assert(stats);
+  Expects(stats);
 }
 
 ///
-/// \param[in] parent a vector of ordered parents.
-/// \return the offspring.
-///
 /// This is a quite standard crossover + mutation operator.
+///
+/// \param[in] parent a vector of ordered parents
+/// \return           the offspring
 ///
 template<class T>
 typename strategy<T>::offspring_t base<T>::run(
@@ -77,9 +77,6 @@ typename strategy<T>::offspring_t base<T>::run(
 
     T off(cross_and_mutate(pop[r1], pop[r2]));
 
-    //if (eva_.seen(off))
-    //  stats_->mutations += off.mutation(p_mutation, prob);
-
     if (brood_recombination > 1)
     {
       fitness_t fit_off(this->eva_.fast(off));
@@ -112,14 +109,14 @@ typename strategy<T>::offspring_t base<T>::run(
 ///
 /// This is strictly based on the DE crossover operator.
 ///
-/// \param[in] parent a vector of ordered parents.
-/// \return           the offspring.
+/// \param[in] parent a vector of ordered parents
+/// \return           the offspring
 ///
 template<class T>
 typename strategy<T>::offspring_t de<T>::run(
   const typename strategy<T>::parents_t &parent)
 {
-  assert(parent.size() >= 2);
+  Expects(parent.size() >= 2);
 
   const auto &pop(this->pop_);
   const auto &env(pop.get_problem().env);

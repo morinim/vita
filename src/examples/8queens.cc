@@ -28,7 +28,7 @@ int main()
   {
     double attacks(0);
 
-    for (int queen(0); queen < NQUEENS - 1; ++queen)
+    for (int queen(0); queen < NQUEENS - 1; ++queen)  // skips the last queen
     {
       const int row(x[queen]);
 
