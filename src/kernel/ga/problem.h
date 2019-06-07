@@ -29,7 +29,7 @@ namespace vita
 class ga_problem : public problem
 {
 public:
-  ga_problem() : problem () {}
+  ga_problem() = default;
   ga_problem(std::size_t, const range_t<int> &);
   explicit ga_problem(const std::vector<range_t<int>> &);
 
@@ -52,7 +52,7 @@ template<class... Args> terminal *ga_problem::insert(Args &&... args)
 class de_problem : public problem
 {
 public:
-  de_problem() : problem () {}
+  de_problem() = default;
   de_problem(std::size_t, const range_t<double> &);
   explicit de_problem(const std::vector<range_t<double>> &);
 
