@@ -40,6 +40,12 @@ public:
   explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
   { Ensures(debug()); }
 
+  explicit reg_lambda_f_storage(const reg_lambda_f_storage &rls)
+    : ind_(rls.ind_), int_(src_interpreter<T>(&ind_))
+  {
+    Ensures(debug());
+  }
+
   reg_lambda_f_storage(std::istream &in, const symbol_set &ss)
     : int_(&ind_)
   {

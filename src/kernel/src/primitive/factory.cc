@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,7 +33,7 @@ domain_t find_domain(const std::string &s)
   {
     std::stod(s);
   }
-  catch (std::invalid_argument)  // not a number
+  catch (std::invalid_argument &)  // not a number
   {
     return (s == "{TRUE}" || s == "{FALSE}")
            ? domain_t::d_bool
