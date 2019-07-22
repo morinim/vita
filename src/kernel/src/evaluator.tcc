@@ -257,7 +257,7 @@ fitness_t dyn_slot_evaluator<T>::operator()(const T &ind)
     if (lambda.tag(example).label != label(example))
     {
       ++err;
-      ++example.template difficulty;
+      ++example.difficulty;
     }
 
   return {-err};
@@ -320,7 +320,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
       // So -1.0 is like to say that we have a complete failure.
       d -= 1.0;
 
-      ++example.template difficulty;
+      ++example.difficulty;
     }
   }
 
