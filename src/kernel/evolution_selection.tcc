@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,9 +18,9 @@
 #define      VITA_EVOLUTION_SELECTION_TCC
 
 ///
-/// \param[in] pop current population.
-/// \param[in] eva current evaluator.
-/// \param[in] sum up to date summary of the evolution.
+/// \param[in] pop current population
+/// \param[in] eva current evaluator
+/// \param[in] sum up to date summary of the evolution
 ///
 template<class T>
 strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
@@ -34,14 +34,23 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 ///         fitness.
 ///
 /// Tournament selection works by selecting a number of individuals from the
-/// population at random (a tournament,)and then choosing only the best
-/// of those individuals.
-/// Recall that better individuals have highter fitnesses.
+/// population at random (a tournament) and then choosing only the best of
+/// those individuals.
+/// Recall that better individuals have highter fitness.
 ///
 /// Parameters from the environment:
-/// * mate_zone - to restrict the selection of individuals to a segment of
+/// * `mate_zone` - to restrict the selection of individuals to a segment of
 ///   the population;
-/// * tournament_size - to control selection pressure.
+/// * `tournament_size` - to control selection pressure.
+///
+/// \remark
+/// Different compilers may optimize the code producing slightly different
+/// sortings (due to floating point approximations). This is a known *issue*.
+/// Anyway we keep using the `<` operator because:
+/// - it's faster than a `std::fabs(delta)` approach;
+/// - the additional *noise* is marginal considering (for the GAs/GP standard);
+/// - for debugging purposes *compiler-stability* is enough (and we have faith
+///   in the test suite).
 ///
 template<class T>
 typename strategy<T>::parents_t tournament<T>::run()
@@ -54,8 +63,8 @@ typename strategy<T>::parents_t tournament<T>::run()
   const auto target(pickup(pop));
   typename strategy<T>::parents_t ret(rounds);
 
-  // This is the inner loop of an insertion sort algorithm. It is simple,
-  // fast (if rounds is small) and doesn't perform too much comparisons.
+  // This is the inner loop of an insertion sort algorithm. It's simple, fast
+  // (if `rounds` is small) and doesn't perform too much comparisons.
   // DO NOT USE `std::sort` it's way slower.
   for (unsigned i(0); i < rounds; ++i)
   {

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,16 +20,14 @@
 namespace vita {
 namespace selection {
 ///
-/// \brief The strategy (tournament, fitness proportional...) for the
-///        evolution class.
+/// The strategy (tournament, fitness proportional...) for the evolution class.
 ///
-/// \tparam T the type of program (individual/team).
+/// \tparam T the type of program (individual/team)
 ///
 /// In the strategy design pattern, this class is the strategy interface and
 /// evolution is the context.
 ///
-/// \see
-/// - <http://en.wikipedia.org/wiki/Strategy_pattern>
+/// \see <http://en.wikipedia.org/wiki/Strategy_pattern>
 ///
 template<class T>
 class strategy
@@ -129,4 +127,4 @@ public:
 }  // namespace selection
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard
