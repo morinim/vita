@@ -17,7 +17,7 @@ src/examples/sr/stat
 src/examples/sr/symbolset
 
 # Executables
-src/build/
+build/
 
 # External tools
 tools/cppcheck/

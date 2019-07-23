@@ -93,17 +93,12 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
-  CODE_OF_CONDUCT.md.......Standards for how to engage in this community
-  CONTRIBUTING.md
-  LICENSE
-  NEWS.md..................Don't let your friends dump git logs into NEWS
-  README.md
+  build/ ..................Built executables
   contributors/
   doc/
   misc/
   src/
     CMakeLists.txt
-    build/ ................Built executables
     examples/ .............Various examples
       forex/ ..............Forex example
       sr/ .................Symbolic regression and classification utility
@@ -112,21 +107,26 @@ vita/
     third_party/ ..........Third party libraries
     utility/ ..............Support libraries / files
   tools/ ..................C++ lint checker and other tools
+  CODE_OF_CONDUCT.md.......Standards for how to engage in this community
+  CONTRIBUTING.md
+  LICENSE
+  NEWS.md..................Don't let your friends dump git logs into NEWS
+  README.md
 ```
 
 ## Setting up the build ##
 
 ```shell
-cd vita/src
+cd vita
 mkdir -p build
 cd build/
-cmake ..
+cmake ../src
 ```
 
 To suggest a specific compiler you can write:
 
 ```shell
-CXX=clang++ cmake ..
+CXX=clang++ cmake ../src
 ```
 
 You're now ready to build using the traditional `make` system:
