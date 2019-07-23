@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2018 EOS di Manlio Morini.
+#  Copyright (C) 2011-2019 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -95,7 +95,7 @@ mode_settings = {
 def sr(args, dataset):
     cache_bit = 20
     dataset_dir = "./dataset/"
-    sr_dir = "../../build/examples/sr/"
+    sr_dir = "../../../build/examples/sr/"
     symbol_set_dir = "./symbolset/"
 
     sr = os.path.join(sr_dir, "sr_test")
