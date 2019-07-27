@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,6 +11,7 @@
  */
 
 #include <cstdlib>
+#include <map>
 #include <sstream>
 
 #include "kernel/i_mep.h"
@@ -73,11 +74,10 @@ TEST_CASE_FIXTURE(fixture1, "Serialization")
 
   for (unsigned i(0); i < 100; ++i)
   {
-    prob.env.individuals = random::between(30u, 300u);
-    prob.env.tournament_size = random::between<unsigned>(1,prob.env.mate_zone);
+    prob.env.individuals = random::between(30, 300);
 
     std::stringstream ss;
-    vita::population<i_mep> pop1(prob);
+    population<i_mep> pop1(prob);
 
     CHECK(pop1.save(ss));
 
@@ -93,10 +93,35 @@ TEST_CASE_FIXTURE(fixture1, "Serialization")
 
       for (unsigned j(0); j < pop1.individuals(); ++j)
       {
-        const vita::population<i_mep>::coord c{l, j};
+        const population<i_mep>::coord c{l, j};
         CHECK(pop1[c] == pop2[c]);
       }
     }
+  }
+}
+
+TEST_CASE_FIXTURE(fixture1, "Pickup")
+{
+  prob.env.individuals = 30;
+  prob.env.layers = 1;
+
+  vita::population<vita::i_mep> pop(prob);
+
+  for (unsigned i(0); i < 10; ++i)
+  {
+    std::map<vita::population<vita::i_mep>::coord, int> frequency;
+
+    const int draws(5000 * pop.individuals());
+    for (int j(0); j < draws; ++j)
+      ++frequency[vita::pickup(pop)];
+
+    const int expected(draws / pop.individuals());
+    const int tolerance(expected / 10);
+
+    for (const auto &p : frequency)
+      CHECK(std::abs(p.second - expected) <= tolerance);
+
+    pop.add_layer();
   }
 }
 

@@ -382,11 +382,13 @@ typename population<T>::coord pickup(const population<T> &p)
   // number of individuals. So the simple (and fast) solution:
   //
   //     const auto l(random::sup(n_layers));
+  //     return return {l, random::sup(p.individuals(l)};
   //
   // isn't appropriate.
+
   std::vector<unsigned> s(n_layers);
-  for (auto l(decltype(n_layers){0}); l < n_layers; ++l)
-    s[l] = p.individuals(l);
+  std::generate(s.begin(), s.end(),
+                [&p, l = 0] () mutable { return p.individuals(l++); });
 
   std::discrete_distribution<unsigned> dd(s.begin(), s.end());
   const auto l(dd(random::engine));

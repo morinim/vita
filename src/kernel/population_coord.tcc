@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,7 +28,15 @@ struct population<T>::coord
 
   bool operator==(coord rhs) const
   { return layer == rhs.layer && index == rhs.index; }
-  bool operator!=(coord rhs) const { return !(*this == rhs); }
+
+  bool operator!=(coord rhs) const
+  { return !(*this == rhs); }
+
+  bool operator<(coord rhs) const
+  {
+    return layer < rhs.layer
+           || (layer == rhs.layer && index < rhs.index);
+  }
 };  // struct coord
 
 #endif  // include guard

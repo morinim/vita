@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -83,7 +83,7 @@ private:
   std::vector<unsigned> allowed_;
 };
 
-template<class T> typename population<T>::coord pickup();
+template<class T> typename population<T>::coord pickup(const population<T> &);
 template<class T> typename population<T>::coord pickup(
   const population<T> &, typename population<T>::coord);
 
