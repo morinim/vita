@@ -398,7 +398,7 @@ typename population<T>::coord pickup(const population<T> &p)
 ///
 /// \param[in] p      a population
 /// \param[in] target coordinates of a reference individual
-/// \return           the coordinates of a random individual "near" `target`
+/// \return           the coordinates of a random individual *near* `target`
 ///
 /// \related population
 ///

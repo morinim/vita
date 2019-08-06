@@ -31,7 +31,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 
 ///
 /// \return a collection of coordinates of individuals ordered in descending
-///         fitness.
+///         fitness
 ///
 /// Tournament selection works by selecting a number of individuals from the
 /// population at random (a tournament) and then choosing only the best of
@@ -48,7 +48,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// sortings (due to floating point approximations). This is a known *issue*.
 /// Anyway we keep using the `<` operator because:
 /// - it's faster than a `std::fabs(delta)` approach;
-/// - the additional *noise* is marginal considering (for the GAs/GP standard);
+/// - the additional *noise* is marginal (for the GAs/GP standard);
 /// - for debugging purposes *compiler-stability* is enough (and we have faith
 ///   in the test suite).
 ///
@@ -95,11 +95,11 @@ typename strategy<T>::parents_t tournament<T>::run()
 }
 
 ///
-/// \param[in] l a layer.
+/// \param[in] l a layer
 /// \param[in] p the probability of extracting an individual in layer `l`
 ///              (`1 - p` is the probability of extracting an individual
-///              in layer `l-1`).
-/// \return the coordinates of a random individual in layer `l` or `l-1`.
+///              in layer `l-1`)
+/// \return the coordinates of a random individual in layer `l` or `l-1`
 ///
 template<class T>
 typename population<T>::coord alps<T>::pickup(unsigned l, double p) const

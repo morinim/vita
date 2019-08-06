@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,8 +28,11 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
 {
   using namespace vita;
 
-  prob.env.individuals = 10;
+  prob.env.individuals = 20;
   prob.env.layers      =  1;
+
+  // The test assumes independent draws.
+  prob.env.mate_zone   = std::numeric_limits<unsigned>::max();
 
   population<i_mep>    pop(prob);
   test_evaluator<i_mep>      eva;
@@ -39,7 +42,7 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
 
   selection::tournament<i_mep> sel(pop, eva, sum);
 
-  for (unsigned ts(1); ts < 10; ++ts)
+  for (unsigned ts(1); ts < prob.env.individuals; ++ts)
   {
     prob.env.tournament_size = ts;
 
@@ -52,7 +55,7 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
                          static_cast<double>(pop.individuals()));
     double p_present(1.0 - std::pow(p_not_present, ts));
 
-    const unsigned n(1000);
+    const unsigned n(2000);
     unsigned found(0);
     for (unsigned i(0); i < n; ++i)
     {
@@ -73,8 +76,6 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
         ++found;
     }
     const double frequency(static_cast<double>(found) / n);
-
-    //std::cout << p_present << "    " << frequency << "  " << std::endl;
 
     CHECK(frequency > p_present - 0.1);
     CHECK(frequency < p_present + 0.1);
