@@ -68,34 +68,32 @@ public:
   virtual std::unique_ptr<basic_lambda_f> lambdify(const T &) const;
 };
 
-///
-/// A random fitness function used for debug purpose.
-///
-/// \note
-/// The output doesn't depend on the input parameter (individual).
-///
-template<class T>
-class random_evaluator : public evaluator<T>
-{
-public:
-  fitness_t operator()(const T &) override;
-};
+enum class test_evaluator_type {distinct, fixed, random};
 
 ///
 /// A fitness function used for debug purpose.
 ///
-/// \note
-/// Fixed (unspecified) fitness for every individual. Different individuals
-/// will have a different fitness.
+/// \tparam T  the type of individual used
+/// \tparam ET the type of the test evaluator
+///
+/// Depending on `ET` the evaluator returns:
+/// - a unique fitness (`test_evaluator_type::distinct`). Every individual has
+///   his own (time invariant) fitness;
+/// - a random (time invariant) fitness (`test_evaluator_type::random`);
+/// - a constant fitness (`test_evaluator_type::fixed`). Same fitness for the
+///   entire population.
 ///
 template<class T>
 class test_evaluator : public vita::evaluator<T>
 {
 public:
+  explicit test_evaluator(test_evaluator_type = test_evaluator_type::random);
+
   fitness_t operator()(const T &) override;
 
 private:
-  std::vector<T> buffer_ = {};
+  std::vector<T>  buffer_;
+  test_evaluator_type et_;
 };
 #include "kernel/evaluator.tcc"
 

@@ -34,9 +34,9 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
   // The test assumes independent draws.
   prob.env.mate_zone   = std::numeric_limits<unsigned>::max();
 
-  population<i_mep>    pop(prob);
-  test_evaluator<i_mep>      eva;
-  summary<i_mep>             sum;
+  population<i_mep> pop(prob);
+  summary<i_mep>          sum;
+  test_evaluator<i_mep> eva(test_evaluator_type::distinct);
 
   using coord = typename population<i_mep>::coord;
 

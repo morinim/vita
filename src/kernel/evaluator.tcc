@@ -81,39 +81,46 @@ std::unique_ptr<basic_lambda_f> evaluator<T>::lambdify(const T &) const
   return nullptr;
 }
 
-///
-/// \return a random fitness
-///
 template<class T>
-fitness_t random_evaluator<T>::operator()(const T &)
+test_evaluator<T>::test_evaluator(test_evaluator_type et) : buffer_(), et_(et)
 {
-  const double sup(16000.0);
-
-  fitness_t f;
-  for (unsigned i(0); i < f.size(); ++i)
-    f[i] = random::sup(sup);
-
-  return f;
 }
 
 ///
 /// \param[in] prg a program (individual/team)
-/// \return        a unique, time-invariant, unspecified fitness value for
-///                individual `prg`
+/// \return        fitness value for individual `prg`
+///
+/// Depending on the type of test_evaluator returns:
+/// - a random, time-invariant fitness value for `prg`;
+/// - a fixed, time-invariant fitness value for every individual of the
+///   population;
+/// - a distinct, time-invariant fitness value for each `prg`.
 ///
 template<class T>
 fitness_t test_evaluator<T>::operator()(const T &prg)
 {
   auto it(std::find(buffer_.begin(), buffer_.end(), prg));
 
-  if (it == buffer_.end())
+  if (et_ != test_evaluator_type::fixed && it == buffer_.end())
   {
     buffer_.push_back(prg);
     it = std::prev(buffer_.end());
   }
 
-  return {static_cast<fitness_t::value_type>(std::distance(buffer_.begin(),
-                                                           it))};
+  fitness_t f;
+
+  switch (et_)
+  {
+  case test_evaluator_type::distinct:
+    return {static_cast<fitness_t::value_type>(std::distance(buffer_.begin(),
+                                                             it))};
+
+  case test_evaluator_type::fixed:
+    return {static_cast<fitness_t::value_type>(0)};
+
+  default:
+    return {static_cast<fitness_t::value_type>(random::between(-1000, 1000))};
+  }
 }
 
 #endif  // include guard

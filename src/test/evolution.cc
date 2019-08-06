@@ -35,7 +35,7 @@ TEST_CASE_FIXTURE(fixture2, "Creation")
       prob.env.mep.code_length = l;
       prob.env.tournament_size = 3;
 
-      const auto eva(std::make_unique<vita::random_evaluator<i_mep>>());
+      const auto eva(std::make_unique<vita::test_evaluator<i_mep>>());
 
       vita::evolution<i_mep, alps_es> evo1(prob, *eva);
       CHECK(evo1.debug());

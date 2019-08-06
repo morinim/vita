@@ -99,7 +99,7 @@ typename strategy<T>::parents_t tournament<T>::run()
 /// \param[in] p the probability of extracting an individual in layer `l`
 ///              (`1 - p` is the probability of extracting an individual
 ///              in layer `l-1`)
-/// \return the coordinates of a random individual in layer `l` or `l-1`
+/// \return      the coordinates of a random individual in layer `l` or `l-1`
 ///
 template<class T>
 typename population<T>::coord alps<T>::pickup(unsigned l, double p) const
@@ -114,12 +114,12 @@ typename population<T>::coord alps<T>::pickup(unsigned l, double p) const
 }
 
 ///
-/// \return a vector of coordinates of chosen individuals.
+/// \return a vector of coordinates of chosen individuals
 ///
 /// Parameters from the environment:
-/// * mate_zone - to restrict the selection of individuals to a segment of
+/// - `mate_zone` to restrict the selection of individuals to a segment of
 ///   the population;
-/// * tournament_size - to control number of selected individuals.
+/// - `tournament_size` to control number of selected individuals.
 ///
 template<class T>
 typename strategy<T>::parents_t alps<T>::run()
