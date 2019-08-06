@@ -99,28 +99,25 @@ test_evaluator<T>::test_evaluator(test_evaluator_type et) : buffer_(), et_(et)
 template<class T>
 fitness_t test_evaluator<T>::operator()(const T &prg)
 {
-  auto it(std::find(buffer_.begin(), buffer_.end(), prg));
+  if (et_ == test_evaluator_type::fixed)
+    return {static_cast<fitness_t::value_type>(0)};
 
+  auto it(std::find(buffer_.begin(), buffer_.end(), prg));
   if (et_ != test_evaluator_type::fixed && it == buffer_.end())
   {
     buffer_.push_back(prg);
     it = std::prev(buffer_.end());
   }
 
-  fitness_t f;
+  const auto dist(std::distance(buffer_.begin(), it));
 
-  switch (et_)
-  {
-  case test_evaluator_type::distinct:
-    return {static_cast<fitness_t::value_type>(std::distance(buffer_.begin(),
-                                                             it))};
+  if (et_ == test_evaluator_type::distinct)
+    return {static_cast<fitness_t::value_type>(dist)};
 
-  case test_evaluator_type::fixed:
-    return {static_cast<fitness_t::value_type>(0)};
-
-  default:
-    return {static_cast<fitness_t::value_type>(random::between(-1000, 1000))};
-  }
+  assert(et_ == test_evaluator_type::random);
+  static random::engine_t e;
+  e.seed(dist);
+  return {static_cast<fitness_t::value_type>(e())};
 }
 
 #endif  // include guard

@@ -82,4 +82,71 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
   }
 }
 
+TEST_CASE_FIXTURE(fixture2, "ALPS")
+{
+  using namespace vita;
+
+  const auto alps_select =
+    [this](double psl)
+    {
+      prob.env.individuals       =  20;
+      prob.env.layers            =   1;
+      prob.env.tournament_size   =   2;
+      prob.env.alps.p_same_layer = psl;
+
+      population<i_mep> pop(prob);
+      summary<i_mep>          sum;
+      test_evaluator<i_mep>   eva;
+
+      pop.add_layer();
+
+      std::vector<unsigned> layer_count(pop.layers());
+
+      using coord = typename population<i_mep>::coord;
+
+      const unsigned n(2000);
+      for (unsigned i(0); i < n; ++i)
+      {
+        selection::alps<i_mep> sel(pop, eva, sum);
+
+        const auto parents(sel.run());
+        CHECK(parents.size() == 2);
+
+        const bool is_sorted(
+          std::is_sorted(parents.begin(), parents.end(),
+                         [&](const coord &c1, const coord &c2)
+                         {
+                           std::pair<bool, fitness_t> v1;
+                           v1.first = !vita::alps::aged(pop, c1);
+                           v1.second = eva(pop[c1]);
+
+                           std::pair<bool, fitness_t> v2;
+                           v2.first = !vita::alps::aged(pop, c2);
+                           v2.second = eva(pop[c2]);
+
+                           return v1 > v2;
+                         }));
+        CHECK(is_sorted);
+
+        ++layer_count[parents[0].layer];
+        ++layer_count[parents[1].layer];
+      }
+
+      return layer_count;
+    };
+
+  const auto lc1(alps_select(1.0));
+  auto half((lc1[0] + lc1[1]) / 2.0);
+  CHECK(lc1[0] >= half * 0.95);
+  CHECK(lc1[0] <= half * 1.05);
+
+  const auto lc2(alps_select(0.75));
+  CHECK(lc2[0] > half);
+  CHECK(lc2[1] < half);
+
+  const auto lc3(alps_select(0.50));
+  CHECK(lc3[0] > lc2[0]);
+  CHECK(lc3[1] < lc2[1]);
+}
+
 }  // TEST_SUITE("EVOLUTION SELECTION")
