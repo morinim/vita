@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -41,8 +41,7 @@ namespace vita
 /// - at least 100 times longer than the CPU time resolution
 /// - run multiple times
 /// - run on release builds.
-/// ...and results that are too good to be true need to be investigated
-/// skeptically.
+/// ...and results that are too good need to be investigated skeptically.
 ///
 /// \remark
 /// The original idea is of Kjellkod (http://kjellkod.wordpress.com).
@@ -58,7 +57,7 @@ public:
   /// \return time elapsed in milliseconds (as would be measured by a clock
   ///         on the wall. It's NOT the processor time)
   ///
-  std::chrono::milliseconds elapsed() const
+  std::chrono::milliseconds elapsed() const noexcept
   {
     return std::chrono::duration_cast<std::chrono::milliseconds>(
       std::chrono::steady_clock::now() - start_);

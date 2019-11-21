@@ -4,12 +4,12 @@ project(VITA)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
-endif ()
+endif()
 
 # The general idea is to use the default values and overwrite them only for
 # specific, well experimented systems.
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
-    OR CMAKE_CXX_COMPILER_ID MATCHES "CLang")
+    OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
   set(NO_WARN_FLAGS "-w")
 
@@ -24,7 +24,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
   set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -DBOOST_DISABLE_ASSERTS")
 
   set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-s")
-endif ()
+
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+
+  set(WARN_FLAGS "/W4")
+
+endif()
 
 add_compile_options(${OTHER_FLAGS} ${WARN_FLAGS})
 
