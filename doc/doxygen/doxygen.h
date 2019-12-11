@@ -10,7 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
  *
- *  \mainpage VITA v1.0.0
+ *  \mainpage VITA v1.1.0
  *
  *  \section Introduction
  *  Welcome to the Vita project.

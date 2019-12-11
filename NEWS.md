@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-12-11
+
+**This is the last C++14 compatible version. Next versions of the framework will assume a C++17 compiler.**
+
 ### Changed
 - **BREAKING CHANGE**. Fluent interface for the search / src_search / ga_search classes.
 
@@ -253,7 +257,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Various compilation warning with recent version of gcc (7.x).
 
 
-[Unreleased]: https://github.com/morinim/vita/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/morinim/vita/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/morinim/vita/compare/v1.1.0...v1.0.0
 [1.0.0]: https://github.com/morinim/vita/compare/v0.9.14...v1.0.0
 [0.9.14]: https://github.com/morinim/vita/compare/v0.9.13...v0.9.14
 [0.9.13]: https://github.com/morinim/vita/compare/v0.9.12...v0.9.13
