@@ -1,4 +1,4 @@
-dist: trusty
+dist: bionic
 sudo: false
 language: cpp
 
@@ -18,22 +18,21 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
+      - llvm-toolchain-bionic-8
     packages:
-      - clang-5.0
-      - g++-7
-
+      - clang-8
+      - g++-9
+      - libstdc++-8-dev
 
 install:
-- "[ $CXX = g++ ] && export CXX=g++-7 || true"
-- "[ $CXX = clang++ ] && export CXX=clang++-5.0 || true"
+- "[ $CXX = g++ ] && export CXX=g++-9 || true"
+- "[ $CXX = clang++ ] && export CXX=clang++-8.0 || true"
 
 
 before_script:
-- cd src
 - mkdir -p build
 - cd build/
-- cmake ..
+- cmake ../src
 
 
 script:
