@@ -33,8 +33,8 @@ endif()
 
 add_compile_options(${OTHER_FLAGS} ${WARN_FLAGS})
 
-# Compiler must support the C++14 standard.
-set(CMAKE_CXX_STANDARD 14)
+# Compiler must support the C++17 standard.
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
