@@ -1,8 +1,8 @@
 [![Vita](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
 [![Version](https://img.shields.io/github/tag/morinim/vita.svg)][news]
 
-[![Travis](https://travis-ci.org/morinim/vita.svg?branch=master)][travis]
-![C++14](https://img.shields.io/badge/c%2B%2B-14-blue.svg)
+[![Build Status](https://travis-ci.com/morinim/vita.svg?branch=master)][travis]
+![C++17](https://img.shields.io/badge/c%2B%2B-14-blue.svg)
 [![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/morinim/vita.svg?style=social)][twitter]
@@ -17,7 +17,7 @@ It's suitable for [classification][classification], [symbolic regression][sr], c
 * easy integration with other systems
 * simple addition of features and modules
 * fast experimentation with detailed run-log
-* modern, standard ISO C++14 source code
+* modern, standard ISO C++17 source code
 * [more][features]
 
 This software was originally developed by [EOS][eos] without open source in mind. Later (early 2011) the code has been commented, restructured, documented and released as open source.
@@ -69,7 +69,7 @@ However, since core members of the Vita project have no access to these platform
 
 ### Mandatory ###
 
-* A C++14-standard-compliant compiler (or, at least, partially compatible: e.g. gcc v5.3.x or newer, clang 3.8 or newer)
+* A C++17-standard-compliant compiler
 * [CMake][cmake]
 
 ### Optional ###
@@ -166,7 +166,7 @@ Note that the major version will change rapidly and API changes are fairly commo
 [python]: https://www.python.org/
 [semver]: https://semver.org/
 [symbolic_regression]: https://github.com/morinim/vita/wiki/symbolic_regression
-[travis]: https://travis-ci.org/morinim/vita
+[travis]: https://travis-ci.com/morinim/vita
 [tutorials]: https://github.com/morinim/vita/wiki/tutorials
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
 [wiki]: https://github.com/morinim/vita/wiki
