@@ -1,7 +1,6 @@
-dist: trusty
-sudo: false
+dist: bionic
 language: cpp
-
+sudo: false
 
 notifications:
   email:
@@ -14,26 +13,10 @@ compiler:
   - clang++
 
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-trusty-5.0
-    packages:
-      - clang-5.0
-      - g++-7
-
-
-install:
-- "[ $CXX = g++ ] && export CXX=g++-7 || true"
-- "[ $CXX = clang++ ] && export CXX=clang++-5.0 || true"
-
-
 before_script:
-- cd src
 - mkdir -p build
 - cd build/
-- cmake ..
+- cmake ../src
 
 
 script:
