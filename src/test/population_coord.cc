@@ -22,14 +22,6 @@
 TEST_SUITE("POPULATION_COORD")
 {
 
-TEST_CASE("Creation")
-{
-  vita::population<vita::i_mep>::coord c;
-
-  CHECK(c.layer == 0);
-  CHECK(c.index == 0);
-}
-
 TEST_CASE("Comparison")
 {
   using coord = vita::population<vita::i_mep>::coord;
