@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,13 +15,10 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"
 
-namespace vita
-{
-namespace detail
+namespace vita::detail
 {
 template<class C>
 std::set<std::vector<C>> seq_with_rep(const std::set<C> &, std::size_t);
-}
 }
 
 TEST_SUITE("SRC_PROBLEM")

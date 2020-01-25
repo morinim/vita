@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,6 +19,7 @@
 #include "test/evolution_selection.cc"
 #include "test/facultative.cc"
 #include "test/fitness.cc"
+#include "test/holdout_validation.cc"
 #include "test/ga.cc"
 #include "test/i_de.cc"
 #include "test/i_ga.cc"

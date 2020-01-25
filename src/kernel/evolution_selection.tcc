@@ -36,7 +36,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// Tournament selection works by selecting a number of individuals from the
 /// population at random (a tournament) and then choosing only the best of
 /// those individuals.
-/// Recall that better individuals have highter fitness.
+/// Recall that better individuals have higher fitness.
 ///
 /// Parameters from the environment:
 /// * `mate_zone` - to restrict the selection of individuals to a segment of
@@ -47,7 +47,7 @@ strategy<T>::strategy(const population<T> &pop, evaluator<T> &eva,
 /// Different compilers may optimize the code producing slightly different
 /// sortings (due to floating point approximations). This is a known *issue*.
 /// Anyway we keep using the `<` operator because:
-/// - it's faster than a `std::fabs(delta)` approach;
+/// - it's faster than the `std::fabs(delta)` approach;
 /// - the additional *noise* is marginal (for the GAs/GP standard);
 /// - for debugging purposes *compiler-stability* is enough (and we have faith
 ///   in the test suite).

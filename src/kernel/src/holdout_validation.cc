@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,51 +26,56 @@ holdout_validation::holdout_validation(src_problem &prob)
     validation_(prob.data(dataset_t::validation)),
     env_(prob.env)
 {
-  // Here `!env_.validation_percentage.has_value()` could be true. Validation
+  // Here `env_.validation_percentage.has_value()` could be `false`. Validation
   // strategy is set before parameters are tuned.
 
   Ensures(validation_.empty());
 }
 
 ///
-/// At the first run examples are randomly partitioned into two sets according
-/// to a given percentage.
+/// During the first run examples are randomly partitioned into two sets
+/// according to a given percentage.
 ///
 /// \param[in] run current run
 ///
 void holdout_validation::init(unsigned run)
 {
   Expects(env_.validation_percentage.has_value());
-  Expects(*env_.validation_percentage >   0);
   Expects(*env_.validation_percentage < 100);
   Expects(!training_.empty());
 
-  if (run == 0)  // datasets are set up only one time (at run `0`)
+  if (*env_.validation_percentage == 0)
   {
-    assert(validation_.empty());
-
-    const auto perc(*env_.validation_percentage);
-    const auto available(training_.size());
-    const auto skip(available * (100 - perc) / 100);
-    assert(skip <= available);
-
-    std::shuffle(training_.begin(), training_.end(), random::engine);
-
-    const auto from(std::next(training_.begin(), skip));
-    std::move(from, training_.end(), std::back_inserter(validation_));
-    training_.erase(from, training_.end());
-
-    // An alternative is the Selection sampling / Algorithm S (see
-    // <http://stackoverflow.com/q/35065764/3235496>)
-    //
-    // > Iterate through and for each element make the probability of
-    // >  selection = (number needed)/(number left)
-    // >
-    // > So if you had 40 items, the first would have a 5/40 chance of being
-    // > selected. If it is, the next has a 4/39 chance, otherwise it has a
-    // > 5/39 chance. By the time you get to the end you will have your 5
-    // > items, and often you'll have all of them before that.
+    vitaWARNING << "Holdout with 0% validation is unusual";
   }
+
+  if (run > 0)  // datasets are set up only one time (at run `0`)
+    return;
+
+  assert(validation_.empty());
+
+  const auto perc(*env_.validation_percentage);
+  const auto available(training_.size());
+  const auto skip(std::max<decltype(available)>(
+                    available * (100 - perc) / 100, 1));
+  assert(skip <= available);
+
+  // Reservoir sampling via Fisher-Yates shuffling algorithm.
+  for (std::size_t i(available - 1); i >= skip; --i)
+  {
+    auto curr(std::next(training_.begin(), i));
+    auto rand(std::next(training_.begin(), random::sup(i + 1)));
+
+    std::iter_swap(curr, rand);
+  }
+
+  const auto from(std::next(training_.begin(), skip));
+  std::copy(from, training_.end(), std::back_inserter(validation_));
+  training_.erase(from, training_.end());
+
+  Ensures(!training_.empty());
+  Ensures(training_.size() == skip);
+  Ensures(training_.size() + validation_.size() == available);
 }
 
 }  // namespace vita

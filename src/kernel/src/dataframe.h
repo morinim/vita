@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -122,7 +122,7 @@ private:
   // How is the dataset organized? Sometimes we have a dataset header (XRFF
   // file format), other times it has to be implicitly derived (e.g. CSV).
   // `header_[0]` is the output column (it contains informations about
-  //  problem's output).
+  // problem's output).
   std::vector<column> header_;
 
   // What are the categories we are dealing with?
@@ -150,7 +150,7 @@ domain_t from_weka(const std::string &);
 ///
 struct dataframe::example
 {
-  /// The thing about wich we want to make a prediction (aka instance). The
+  /// The thing about which we want to make a prediction (aka instance). The
   /// elements of the vector are features.
   std::vector<any> input = {};
   /// The answer for the prediction task either the answer produced by the
@@ -170,7 +170,7 @@ struct dataframe::example
 /// \param[in] e an example
 /// \return      the label of `e`
 ///
-/// \warning Use only for classification problems.
+/// \warning Used only in classification tasks.
 ///
 inline class_t label(const dataframe::example &e)
 {
