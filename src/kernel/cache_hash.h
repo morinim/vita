@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017, 2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@ struct hash_t
 {
   explicit hash_t(std::uint64_t a = 0, std::uint64_t b = 0) : data{a, b} {}
 
-  /// Resets the content of hash_t.
+  /// Resets the content of the object.
   void clear() { data[0] = data[1] = 0; }
 
   /// Standard equality operator for hash signature.
@@ -152,22 +152,22 @@ inline hash_t murmurhash3::hash128(const void *const data, std::size_t len,
 
   switch (len & 15)
   {
-  case 15: k2 ^= std::uint64_t(tail[14]) << 48;  //-fallthrough
-  case 14: k2 ^= std::uint64_t(tail[13]) << 40;  //-fallthrough
-  case 13: k2 ^= std::uint64_t(tail[12]) << 32;  //-fallthrough
-  case 12: k2 ^= std::uint64_t(tail[11]) << 24;  //-fallthrough
-  case 11: k2 ^= std::uint64_t(tail[10]) << 16;  //-fallthrough
-  case 10: k2 ^= std::uint64_t(tail[ 9]) << 8;   //-fallthrough
+  case 15: k2 ^= std::uint64_t(tail[14]) << 48;  [[fallthrough]];
+  case 14: k2 ^= std::uint64_t(tail[13]) << 40;  [[fallthrough]];
+  case 13: k2 ^= std::uint64_t(tail[12]) << 32;  [[fallthrough]];
+  case 12: k2 ^= std::uint64_t(tail[11]) << 24;  [[fallthrough]];
+  case 11: k2 ^= std::uint64_t(tail[10]) << 16;  [[fallthrough]];
+  case 10: k2 ^= std::uint64_t(tail[ 9]) << 8;   [[fallthrough]];
   case  9: k2 ^= std::uint64_t(tail[ 8]) << 0;
            k2 *= c2; k2  = ROTL64(k2, 33); k2 *= c1; h.data[1] ^= k2;
-           //-fallthrough
-  case  8: k1 ^= std::uint64_t(tail[ 7]) << 56;  //-fallthrough
-  case  7: k1 ^= std::uint64_t(tail[ 6]) << 48;  //-fallthrough
-  case  6: k1 ^= std::uint64_t(tail[ 5]) << 40;  //-fallthrough
-  case  5: k1 ^= std::uint64_t(tail[ 4]) << 32;  //-fallthrough
-  case  4: k1 ^= std::uint64_t(tail[ 3]) << 24;  //-fallthrough
-  case  3: k1 ^= std::uint64_t(tail[ 2]) << 16;  //-fallthrough
-  case  2: k1 ^= std::uint64_t(tail[ 1]) << 8;   //-fallthrough
+           [[fallthrough]];
+  case  8: k1 ^= std::uint64_t(tail[ 7]) << 56;  [[fallthrough]];
+  case  7: k1 ^= std::uint64_t(tail[ 6]) << 48;  [[fallthrough]];
+  case  6: k1 ^= std::uint64_t(tail[ 5]) << 40;  [[fallthrough]];
+  case  5: k1 ^= std::uint64_t(tail[ 4]) << 32;  [[fallthrough]];
+  case  4: k1 ^= std::uint64_t(tail[ 3]) << 24;  [[fallthrough]];
+  case  3: k1 ^= std::uint64_t(tail[ 2]) << 16;  [[fallthrough]];
+  case  2: k1 ^= std::uint64_t(tail[ 1]) << 8;   [[fallthrough]];
   case  1: k1 ^= std::uint64_t(tail[ 0]) << 0;
            k1 *= c1; k1  = ROTL64(k1, 31); k1 *= c2; h.data[0] ^= k1;
   }
@@ -215,7 +215,7 @@ inline std::uint32_t murmurhash3::fmix(std::uint32_t k)
 template<class T>
 inline T murmurhash3::get_block(const T *p, std::size_t i)
 {
-  // The reason we do a memcpy() instead of simply returning p[i] is because
+  // The reason we do a memcpy() instead of simply returning `p[i]` is because
   // doing it this way avoids violations of the strict aliasing rule.
 
   T tmp;
@@ -226,4 +226,5 @@ inline T murmurhash3::get_block(const T *p, std::size_t i)
 typedef murmurhash3 hash;
 
 }  // namespace vita
+
 #endif  // include guard
