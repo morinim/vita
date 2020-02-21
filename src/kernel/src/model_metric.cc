@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ double accuracy_metric::operator()(const core_reg_lambda_f *l,
 
   for (const auto &example : d)
   {
-    const any res((*l)(example));
+    const std::any res((*l)(example));
     if (res.has_value() &&
         issmall(to<number>(res) - label_as<number>(example)))
       ++ok;

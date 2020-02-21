@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,15 +33,15 @@ namespace
 //              applied
 //
 // `convert("123.1", sym_double) == any(123.1f)`
-any convert(const std::string &s, domain_t d)
+std::any convert(const std::string &s, domain_t d)
 {
   switch (d)
   {
-  case domain_t::d_bool:   return any(std::stoi(s));
-  case domain_t::d_int:    return any(std::stoi(s));
-  case domain_t::d_double: return any(std::stod(s));
-  case domain_t::d_string: return            any(s);
-  default:                 return             any();
+  case domain_t::d_bool:   return std::stoi(s);
+  case domain_t::d_int:    return std::stoi(s);
+  case domain_t::d_double: return std::stod(s);
+  case domain_t::d_string: return            s;
+  default:                 return           {};
   }
 }
 

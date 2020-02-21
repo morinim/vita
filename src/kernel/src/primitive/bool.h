@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,17 +19,16 @@
 #include "kernel/interpreter.h"
 #include "kernel/terminal.h"
 
-namespace vita
+namespace vita::boolean
 {
-namespace boolean
-{
+
 class zero : public terminal
 {
 public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *) const final { return any(false); }
+  std::any eval(core_interpreter *) const final { return false; }
 
   std::string display(terminal::param_t, format f) const final
   {
@@ -48,7 +47,7 @@ public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *) const final { return any(true); }
+  std::any eval(core_interpreter *) const final { return true; }
 
   std::string display(terminal::param_t, format f) const final
   {
@@ -69,11 +68,11 @@ public:
 
   bool associative() const final { return true; }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return any(any_cast<bool>(i.fetch_arg(0)) &&
-               any_cast<bool>(i.fetch_arg(1)));
+    return std::any_cast<bool>(i.fetch_arg(0))
+           && std::any_cast<bool>(i.fetch_arg(1));
   }
 
   std::string display(format f) const final
@@ -92,10 +91,10 @@ public:
   explicit l_not(const cvect &c) : function("NOT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return any(!any_cast<bool>(i.fetch_arg(0)));
+    return !std::any_cast<bool>(i.fetch_arg(0));
   }
 
   std::string display(format f) const final
@@ -116,11 +115,11 @@ public:
 
   bool associative() const final { return true; }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return any(any_cast<bool>(i->fetch_arg(0)) ||
-               any_cast<bool>(i->fetch_arg(1)));
+    return std::any_cast<bool>(i->fetch_arg(0))
+           || std::any_cast<bool>(i->fetch_arg(1));
   }
 
   std::string display(format f) const final
@@ -133,7 +132,6 @@ public:
   }
 };
 
-}  // namespace boolean
-}  // namespace vita
+}  // namespace vita::boolean
 
 #endif  // include guard

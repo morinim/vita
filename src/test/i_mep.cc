@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,6 +15,8 @@
 
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
+
+#include "utility/any.h"
 
 #include "fixture1.h"
 #include "fixture3.h"

@@ -21,7 +21,6 @@
 #include "kernel/distribution.h"
 #include "kernel/problem.h"
 #include "kernel/src/category_set.h"
-#include "utility/any.h"
 
 namespace vita
 {
@@ -152,14 +151,14 @@ struct dataframe::example
 {
   /// The thing about which we want to make a prediction (aka instance). The
   /// elements of the vector are features.
-  std::vector<any> input = {};
+  std::vector<std::any> input = {};
   /// The answer for the prediction task either the answer produced by the
   /// machine learning system, or the right answer supplied in the training
   /// data.
-  any             output = {};
+  std::any             output = {};
 
-  std::uintmax_t difficulty = 0;
-  unsigned              age = 0;
+  std::uintmax_t difficulty   = 0;
+  unsigned              age   = 0;
 
   void clear() { *this = example(); }
 };
@@ -174,7 +173,7 @@ struct dataframe::example
 ///
 inline class_t label(const dataframe::example &e)
 {
-  return any_cast<class_t>(e.output);
+  return std::any_cast<class_t>(e.output);
 }
 
 ///
@@ -187,13 +186,13 @@ inline class_t label(const dataframe::example &e)
 template<class T>
 T label_as(const dataframe::example &e)
 {
-  if (auto *v = any_cast<double>(&e.output))
+  if (auto *v = std::any_cast<double>(&e.output))
     return static_cast<T>(*v);
 
-  if (auto *v = any_cast<int>(&e.output))
+  if (auto *v = std::any_cast<int>(&e.output))
     return static_cast<T>(*v);
 
-  if (auto *v = any_cast<bool>(&e.output))
+  if (auto *v = std::any_cast<bool>(&e.output))
     return static_cast<T>(*v);
 
   return static_cast<T>(0.0);

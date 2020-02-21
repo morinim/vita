@@ -3,7 +3,7 @@
  *  \remark This file is part of VITA.
  *  \details Building blocks run test.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
       i_mep blk(base.get_block(l));
 
       std::cout << "\nBLOCK at locus " << l << '\n' << blk;
-      const any val(interpreter<i_mep>(&blk).run());
+      const std::any val(interpreter<i_mep>(&blk).run());
       if (val.has_value())
         std::cout << "Output: " << to<std::string>(val);
       else
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 
         i_mep blk3(blk.replace({{f, positions}}));
         std::cout << '\n' << blk3;
-        const any val3(interpreter<i_mep>(&blk3).run());
+        const std::any val3(interpreter<i_mep>(&blk3).run());
         if (val3.has_value())
           std::cout << "Output: " << to<std::string>(val3);
         else

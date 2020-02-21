@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,6 +18,7 @@
 
 namespace vita
 {
+
 ///
 /// A constant value (`bool`, `int`, `double`, `string`).
 ///
@@ -43,7 +44,7 @@ public:
   /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
-  any eval(core_interpreter *) const override { return any(val_); }
+  std::any eval(core_interpreter *) const override { return val_; }
 
 private:
   T val_;
@@ -70,11 +71,12 @@ public:
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
-  any eval(core_interpreter *) const override { return any(val_); }
+  std::any eval(core_interpreter *) const override { return val_; }
 
 private:
   std::string val_;
 };
 
 }  // namespace vita
+
 #endif  // include guard

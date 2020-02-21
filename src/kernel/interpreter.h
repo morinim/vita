@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,26 +54,26 @@ public:
   explicit interpreter(const T *, interpreter * = nullptr);
 
   terminal::param_t fetch_param();
-  any fetch_arg(unsigned);
-  any fetch_adf_arg(unsigned);
+  std::any fetch_arg(unsigned);
+  std::any fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
   const T &program() const { return *prg_; }
 
 private:
   // *** Private support methods ***
-  any run_locus(const locus &);
+  std::any run_locus(const locus &);
   double penalty_locus(const locus &);
 
   // Nonvirtual interface.
-  any run_nvi() override;
+  std::any run_nvi() override;
   double penalty_nvi() override;
   bool debug_nvi() const override;
 
   // *** Private data members ***
   const T *prg_;
 
-  struct elem_ {bool valid; any value;};
+  struct elem_ {bool valid; std::any value;};
   mutable matrix<elem_> cache_;
 
   // Instruction pointer.

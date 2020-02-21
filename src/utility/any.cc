@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,19 +30,19 @@ namespace vita
 /// \remark If the conversion cannot be performed the function returns `0.0`.
 ///
 template<>
-double to<double>(const any &a)
+double to<double>(const std::any &a)
 {
   // The pointer form of any_cast uses the nullability of pointers (will
   // return a null pointer rather than throw if the cast fails).
   // The alternatives are a.type() == typeid(double)... or try/catch and
   // both seems inferior.
-  if (auto *p = any_cast<double>(&a))
+  if (auto *p = std::any_cast<double>(&a))
     return *p;
 
-  if (auto *p = any_cast<int>(&a))
+  if (auto *p = std::any_cast<int>(&a))
     return static_cast<double>(*p);
 
-  if (auto *p = any_cast<bool>(&a))
+  if (auto *p = std::any_cast<bool>(&a))
     return static_cast<double>(*p);
 
   return 0.0;
@@ -58,18 +58,18 @@ double to<double>(const any &a)
 /// printing of `any` values is complex).
 ///
 template<>
-std::string to<std::string>(const any &a)
+std::string to<std::string>(const std::any &a)
 {
-  if (auto *p = any_cast<double>(&a))
+  if (auto *p = std::any_cast<double>(&a))
     return std::to_string(*p);
 
-  if (auto *p = any_cast<int>(&a))
+  if (auto *p = std::any_cast<int>(&a))
     return std::to_string(*p);
 
-  if (auto *p = any_cast<bool>(&a))
+  if (auto *p = std::any_cast<bool>(&a))
     return std::to_string(*p);
 
-  return any_cast<std::string>(a);
+  return std::any_cast<std::string>(a);
 }
 
 }  // namespace vita

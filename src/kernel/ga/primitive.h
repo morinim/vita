@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,7 +75,7 @@ public:
 private:
   /// \warning
   /// i_ga / i_de directly access the genome vector.
-  any eval(core_interpreter *) const override { return {}; }
+  std::any eval(core_interpreter *) const override { return {}; }
 
   const range_t<T> range_;
 };

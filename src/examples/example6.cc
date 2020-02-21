@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,7 +25,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::any eval(i_interp *) const override { return vita::any(val); }
+  std::any eval(i_interp *) const override { return val; }
 
   static double val;
 };
@@ -37,7 +37,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::any eval(i_interp *) const override { return vita::any(val); }
+  std::any eval(i_interp *) const override { return val; }
 
   static double val;
 };
@@ -49,7 +49,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::any eval(i_interp *) const override { return vita::any(val); }
+  std::any eval(i_interp *) const override { return val; }
 
   static double val;
 };
@@ -73,11 +73,11 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
           Y::val = y;
           Z::val = z;
 
-          const vita::any res(agent.run());
+          const std::any res(agent.run());
 
           if (res.has_value())
           {
-            const auto dres(vita::any_cast<double>(res));
+            const auto dres(std::any_cast<double>(res));
             assert(std::isfinite(dres));
             fit += std::exp(-std::fabs(dres - (x*x + y*y - z*z)));
           }

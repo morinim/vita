@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,8 +17,9 @@
 #if !defined(VITA_DETAIL_LAMBDA_F_H)
 #define      VITA_DETAIL_LAMBDA_F_H
 
-namespace vita { namespace detail
+namespace vita::detail
 {
+
 template<bool> struct is_true : std::false_type {};
 template<> struct is_true<true> : std::true_type {};
 
@@ -69,7 +70,7 @@ public:
     return *this;
   }
 
-  template<class ...Args> any run(Args && ...args) const
+  template<class ...Args> std::any run(Args && ...args) const
   {
     // Consider that there are situations in which `&int_.program() != &ind_`
     // and this function will blow up.
@@ -114,7 +115,7 @@ public:
   explicit reg_lambda_f_storage(const T &ind) : int_(&ind)
   { Ensures(debug()); }
 
-  template<class ...Args> any run(Args && ...args) const
+  template<class ...Args> std::any run(Args && ...args) const
   {
     return int_.run(std::forward<Args>(args)...);
   }
@@ -208,7 +209,7 @@ protected:
   explicit class_names(const dataframe &) {}
   class_names() = default;
 
-  std::string string(const any &) const;
+  std::string string(const std::any &) const;
 };
 
 template<>
@@ -223,7 +224,7 @@ protected:
   explicit class_names(const dataframe &);
   class_names() : names_() {}
 
-  std::string string(const any &) const;
+  std::string string(const std::any &) const;
 
 private:
   std::vector<std::string> names_;
@@ -298,16 +299,16 @@ inline bool class_names<true>::save(std::ostream &o) const
 /// \return      the name of class `a`
 ///
 template<bool N>
-std::string class_names<N>::string(const any &a) const
+std::string class_names<N>::string(const std::any &a) const
 {
-  return std::to_string(any_cast<class_t>(a));
+  return std::to_string(std::any_cast<class_t>(a));
 }
 
 ///
 /// \param[in] a id of a class
 /// \return      the name of class `a`
 ///
-inline std::string class_names<true>::string(const any &a) const
+inline std::string class_names<true>::string(const std::any &a) const
 {
   // Specialized class templates result in a normal class with a funny name
   // and not a template. When we specialize class_names<true>, it is no
@@ -315,10 +316,9 @@ inline std::string class_names<true>::string(const any &a) const
   // template specializations. So we haven't to put template<> at the
   // beginning.
 
-  return names_[any_cast<class_t>(a)];
+  return names_[std::any_cast<class_t>(a)];
 }
 
-}  // namespace detail
-}  // namespace vita
+}  // namespace vita::detail
 
 #endif  // include guard

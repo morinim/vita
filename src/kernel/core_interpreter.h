@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,7 +13,7 @@
 #if !defined(VITA_CORE_INTERPRETER_H)
 #define      VITA_CORE_INTERPRETER_H
 
-#include "utility/any.h"
+#include <any>
 
 namespace vita
 {
@@ -29,12 +29,12 @@ namespace vita
 class core_interpreter
 {
 public:
-  any run() { return run_nvi(); }
+  std::any run() { return run_nvi(); }
   double penalty() { return penalty_nvi(); }
   bool debug() const { return debug_nvi(); }
 
 private:
-  virtual any run_nvi() = 0;
+  virtual std::any run_nvi() = 0;
   virtual double penalty_nvi() = 0;
   virtual bool debug_nvi() const = 0;
 };

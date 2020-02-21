@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,7 +38,7 @@ public:
   /// \return the value of the variable (as a `any`)
   ///
   /// \note Requires a src_interpreter to work.
-  any eval(core_interpreter *i) const override
+  std::any eval(core_interpreter *i) const override
   {
     return static_cast<src_interpreter<i_mep> *>(i)->fetch_var(var_);
   }

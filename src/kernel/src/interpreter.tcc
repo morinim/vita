@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,7 @@
 /// \return       the output value of the src_interpreter
 ///
 template<class T>
-any src_interpreter<T>::run(const std::vector<any> &ex)
+std::any src_interpreter<T>::run(const std::vector<std::any> &ex)
 {
   example_ = &ex;
   return this->run();
@@ -37,7 +37,7 @@ any src_interpreter<T>::run(const std::vector<any> &ex)
 /// \return      the value of the `i`-th variable
 ///
 template<class T>
-any src_interpreter<T>::fetch_var(unsigned i)
+std::any src_interpreter<T>::fetch_var(unsigned i)
 {
   Expects(i < example_->size());
   return (*example_)[i];

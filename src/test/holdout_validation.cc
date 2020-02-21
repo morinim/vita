@@ -101,7 +101,7 @@ TEST_CASE("Probabilities")
     v.init(0);
 
     for (const auto &e : p.data(dataset_t::validation))
-      ++count[any_cast<std::size_t>(e.output)];
+      ++count[std::any_cast<std::size_t>(e.output)];
   }
 
   const auto expected(extractions * *p.env.validation_percentage / 100);

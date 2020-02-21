@@ -1,14 +1,12 @@
 /**
- *
- *  \file test_primitive_i.cc
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
- *
  */
 
 #include <cstdlib>
@@ -37,7 +35,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = i_interp(&i1).run();
   INFO(i1);
-  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret) == std::any_cast<int>(x->eval(nullptr)));
 
   // ADD(X,Y) == X+Y"
   const i_mep i2({
@@ -47,8 +45,9 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = i_interp(&i2).run();
   INFO(i2);
-  CHECK(any_cast<int>(ret)
-        == any_cast<int>(y->eval(nullptr)) + any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret)
+        == std::any_cast<int>(y->eval(nullptr))
+           + std::any_cast<int>(x->eval(nullptr)));
 
   // ADD(X,-X) == 0
   const i_mep i3({
@@ -58,7 +57,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = i_interp(&i3).run();
   INFO(i3);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 
   // ADD(X,Y) == ADD(Y,X)
   const i_mep i4({
@@ -70,7 +69,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = i_interp(&i4).run();
   INFO(i4);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 }
 
 TEST_CASE_FIXTURE(fixture4, "i_div")
@@ -86,7 +85,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = i_interp(&i1).run();
   INFO(i1);
-  CHECK(any_cast<int>(ret) == 1);
+  CHECK(std::any_cast<int>(ret) == 1);
 
   // DIV(X,1) == X
   const i_mep i2({
@@ -96,7 +95,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = i_interp(&i2).run();
   INFO(i2);
-  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret) == std::any_cast<int>(x->eval(nullptr)));
 
   // DIV(-X,X) == -1
   const i_mep i3({
@@ -106,7 +105,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = i_interp(&i3).run();
   INFO(i3);
-  CHECK(any_cast<int>(ret) == -1);
+  CHECK(std::any_cast<int>(ret) == -1);
 
   // DIV(X,0) == X
   const i_mep i4({
@@ -116,7 +115,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = i_interp(&i4).run();
   INFO(i4);
-  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret) == std::any_cast<int>(x->eval(nullptr)));
 }
 
 TEST_CASE_FIXTURE(fixture4, "i_ife")
@@ -132,7 +131,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
                  });
   ret = i_interp(&i1).run();
   INFO(i1);
-  CHECK(any_cast<int>(ret) == 1);
+  CHECK(std::any_cast<int>(ret) == 1);
 
   // IFE(0,1,1,0) == 0
   const i_mep i2({
@@ -142,7 +141,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
                  });
   ret = i_interp(&i2).run();
   INFO(i2);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 
   // IFE(Z,X,1,0) == 0
   const i_mep i3({
@@ -155,7 +154,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
   static_cast<Z *>(z)->val = 0;
   ret = i_interp(&i3).run();
   INFO(i3);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 
   // IFE SAME TERM COMPARISON PENALTY
   CHECK(i_interp(&i1).penalty() > 0);
@@ -186,7 +185,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                  });
   ret = i_interp(&i1).run();
   INFO(i1);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 
   // MUL(X,1) == X
   const i_mep i2({
@@ -196,7 +195,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                  });
   ret = i_interp(&i2).run();
   INFO(i2);
-  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret) == std::any_cast<int>(x->eval(nullptr)));
 
   // MUL(X,2) == ADD(X,X)
   const i_mep i3({
@@ -208,7 +207,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                  });
   ret = i_interp(&i3).run();
   INFO(i3);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 }
 
 TEST_CASE_FIXTURE(fixture4, "i_sub")
@@ -224,7 +223,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
                  });
   ret = i_interp(&i1).run();
   INFO(i1);
-  CHECK(any_cast<int>(ret) == 0);
+  CHECK(std::any_cast<int>(ret) == 0);
 
   // SUB(X,0) == X
   const i_mep i2({
@@ -234,7 +233,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
                  });
   ret = i_interp(&i2).run();
   INFO(i2);
-  CHECK(any_cast<int>(ret) == any_cast<int>(x->eval(nullptr)));
+  CHECK(std::any_cast<int>(ret) == std::any_cast<int>(x->eval(nullptr)));
 
   // SUB(Z,X) == Z-X
   const i_mep i3({
@@ -247,8 +246,8 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
     static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
     ret = i_interp(&i3).run();
     INFO(i3);
-    CHECK(any_cast<int>(ret)
-          == static_cast<Z *>(z)->val - any_cast<int>(x->eval(nullptr)));
+    CHECK(std::any_cast<int>(ret)
+          == static_cast<Z *>(z)->val - std::any_cast<int>(x->eval(nullptr)));
   }
 }
 
