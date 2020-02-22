@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -410,12 +410,10 @@ template<class T>
 typename population<T>::coord pickup(const population<T> &p,
                                      typename population<T>::coord target)
 {
-  const auto &layer(target.layer);
-  const auto &index(target.index);
   const auto mate_zone(p.get_problem().env.mate_zone);
-  const auto individuals(p.individuals(layer));
+  const auto individuals(p.individuals(target.layer));
 
-  return {layer, random::ring(index, mate_zone,  individuals)};
+  return {target.layer, random::ring(target.index, mate_zone, individuals)};
 }
 
 ///

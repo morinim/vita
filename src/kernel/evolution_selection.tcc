@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -71,15 +71,10 @@ typename strategy<T>::parents_t tournament<T>::run()
     const auto new_coord(pickup(pop, target));
     const auto new_fitness(this->eva_(pop[new_coord]));
 
-    unsigned j(0);
+    auto j(i);
 
-    // Where is the insertion point?
-    while (j < i && new_fitness < this->eva_(pop[ret[j]]))
-      ++j;
-
-    // Shift right elements after the insertion point.
-    for (auto k(j); k < i; ++k)
-      ret[k + 1] = ret[k];
+    for (; j && new_fitness > this->eva_(pop[ret[j - 1]]); --j)
+      ret[j] = ret[j - 1];
 
     ret[j] = new_coord;
   }

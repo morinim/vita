@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,6 +42,8 @@ TEST_CASE_FIXTURE(fixture2, "Tournament")
 
   selection::tournament<i_mep> sel(pop, eva, sum);
 
+  // Every individual has a unique fitness (`test_evaluator_type::distinct`),
+  // so there is just one maximum-fitness-individual.
   for (unsigned ts(1); ts < prob.env.individuals; ++ts)
   {
     prob.env.tournament_size = ts;
