@@ -16,8 +16,6 @@
 #include "kernel/i_mep.h"
 #include "kernel/interpreter.h"
 
-#include "utility/any.h"
-
 #include "fixture1.h"
 #include "fixture3.h"
 

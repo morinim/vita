@@ -20,7 +20,6 @@
 #include "kernel/src/model_metric.h"
 #include "kernel/exceptions.h"
 #include "kernel/team.h"
-#include "utility/any.h"
 #include "utility/discretization.h"
 
 #include "kernel/detail/lambda_f.h"

@@ -101,7 +101,7 @@ std::any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
       avg += (to<number>(res) - avg) / ++count;
   }
 
-  return count > 0.0 ? std::any(avg) : std::any();
+  return count > 0.0 ? avg : std::any();
 }
 
 ///
