@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,6 +11,8 @@
 
 #if !defined(FOREX_TRADE_SIMULATOR_H)
 #define      FOREX_TRADE_SIMULATOR_H
+
+#define HAS_UNCAUGHT_EXCEPTIONS 1
 
 #include "kernel/vita.h"
 #include "third_party/date/date.h"
