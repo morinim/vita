@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 
   std::cout << out::dump << ind << '\n';
 
-  const any val(interpreter<i_mep>(&ind).run());
+  const std::any val(interpreter<i_mep>(&ind).run());
   if (val.has_value())
     std::cout << "Output: " << to<std::string>(val) << '\n';
   else

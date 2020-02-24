@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,21 +36,21 @@ public:
     : interpreter<T>(prg, ctx), example_(nullptr)
   {}
 
-  any run(const std::vector<any> &);
+  std::any run(const std::vector<std::any> &);
 
-  any fetch_var(unsigned);
+  std::any fetch_var(unsigned);
 
 private:
   // Tells the compiler we want both the run function from interpreter and
   // src_interpreter.
-  // Without this statement there will be no any run() function in the scope
+  // Without this statement there will be no `run()` function in the scope
   // of src_interpreter, because it is hidden by another method with the same
   // name (compiler won't search for function in base classes if derived
   // class has at least one method with specified name, even if it has
   // different arguments).
   using interpreter<T>::run;
 
-  const std::vector<any> *example_;
+  const std::vector<std::any> *example_;
 };
 
 #include "kernel/src/interpreter.tcc"

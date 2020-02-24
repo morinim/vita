@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,10 +22,9 @@
 #include "kernel/random.h"
 #include "kernel/terminal.h"
 
-namespace vita
+namespace vita::str
 {
-namespace str
-{
+
 ///
 /// String comparison for equality.
 ///
@@ -48,24 +47,23 @@ public:
     }
   }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto *i(static_cast<interpreter<i_mep> *>(ci));
 
-    const any v0(i->fetch_arg(0));
+    const std::any v0(i->fetch_arg(0));
     if (!v0.has_value())  return v0;
 
-    const any v1(i->fetch_arg(1));
+    const std::any v1(i->fetch_arg(1));
     if (!v1.has_value())  return v1;
 
-    if (any_cast<std::string>(v0) == any_cast<std::string>(v1))
+    if (std::any_cast<std::string>(v0) == std::any_cast<std::string>(v1))
       return i->fetch_arg(2);
     else
       return i->fetch_arg(3);
   }
 };
 
-}  // namespace str
-}  // namespace vita
+}  // namespace vita::str
 
 #endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -120,7 +120,7 @@ template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                dataframe::example &t, int *illegals)
 {
-  const any res(agent(t));
+  const std::any res(agent(t));
 
   number err;
 
@@ -147,7 +147,7 @@ template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                 dataframe::example &t, int *)
 {
-  const any res(agent(t));
+  const std::any res(agent(t));
 
   number err;
 
@@ -193,7 +193,7 @@ template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                dataframe::example &t, int *illegals)
 {
-  const any res(agent(t));
+  const std::any res(agent(t));
   number err;
   if (res.has_value())
   {
@@ -220,7 +220,7 @@ template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                  dataframe::example &t, int *)
 {
-  const any res(agent(t));
+  const std::any res(agent(t));
 
   const bool err(!res.has_value() ||
                  !issmall(to<number>(res) - label_as<number>(t)));

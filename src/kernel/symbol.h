@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,11 +13,12 @@
 #if !defined(VITA_SYMBOL_H)
 #define      VITA_SYMBOL_H
 
+#include <any>
 #include <limits>
 #include <string>
 
 #include "kernel/vitafwd.h"
-#include "utility/any.h"
+#include "kernel/common.h"
 
 namespace vita
 {
@@ -54,7 +55,7 @@ public:
 
   /// Calculates the value of / performs the action associated with the symbol
   /// (it's implementation specific).
-  virtual any eval(core_interpreter *) const = 0;
+  virtual std::any eval(core_interpreter *) const = 0;
 
   double penalty(core_interpreter *) const;
 

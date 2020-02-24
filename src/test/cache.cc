@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -110,9 +110,9 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
   for (unsigned i(0); i < n; ++i)
   {
     vita::i_mep i1(prob);
-    const vita::any val(i_interp(&i1).run());
+    const std::any val(i_interp(&i1).run());
     vita::fitness_t f{val.has_value()
-                      ? vita::any_cast<vita::fitness_t::value_type>(val) : 0.0};
+                      ? std::any_cast<vita::fitness_t::value_type>(val) : 0.0};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -123,9 +123,9 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
     const vita::fitness_t f(cache.find(vi[i].signature()));
     if (f.size())
     {
-      const vita::any val(i_interp(&vi[i]).run());
+      const std::any val(i_interp(&vi[i]).run());
       vita::fitness_t f1{val.has_value()
-                         ? vita::any_cast<vita::fitness_t::value_type>(val)
+                         ? std::any_cast<vita::fitness_t::value_type>(val)
                          : 0.0};
 
       CHECK(f == f1);
@@ -148,8 +148,9 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
   {
     i_mep i1(prob);
-    const vita::any val(i_interp(&i1).run());
-    fitness_t f{val.has_value() ? any_cast<fitness_t::value_type>(val) : 0.0};
+    const std::any val(i_interp(&i1).run());
+    fitness_t f{val.has_value() ? std::any_cast<fitness_t::value_type>(val)
+                                : 0.0};
 
     cache1.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -169,9 +170,9 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
     if (present[i])
     {
-      const vita::any val(i_interp(&vi[i]).run());
+      const std::any val(i_interp(&vi[i]).run());
       fitness_t f{val.has_value()
-                  ? any_cast<fitness_t::value_type>(val) : 0.0};
+                  ? std::any_cast<fitness_t::value_type>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
       CHECK(f1.size());

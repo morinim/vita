@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,6 +14,7 @@
 #define      VITA_UTILITY_H
 
 #include <algorithm>
+#include <any>
 #include <cmath>
 #include <iomanip>
 #include <fstream>
@@ -29,6 +30,7 @@ bool iequals(const std::string &, const std::string &);
 std::string merge_path(const std::string &, const std::string &, char = '/');
 std::string replace(std::string, const std::string &, const std::string &);
 std::string replace_all(std::string, const std::string &, const std::string &);
+template<class T> T to(const std::any &);
 std::string trim(const std::string &);
 
 ///

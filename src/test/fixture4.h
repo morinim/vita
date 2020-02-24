@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,8 +27,7 @@ struct fixture4
 
     bool input() const override { return true; }
 
-    vita::any eval(vita::core_interpreter *) const override
-    { return vita::any(val); }
+    std::any eval(vita::core_interpreter *) const override { return val; }
 
     int val;
   };
@@ -72,7 +71,7 @@ struct fixture4
   vita::problem           prob;
   vita::symbol_factory factory;
 
-  vita::any ret;
+  std::any ret;
 
   const std::vector<vita::index_t> null;
 };

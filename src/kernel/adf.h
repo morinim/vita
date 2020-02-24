@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -78,7 +78,7 @@ public:
 
   bool auto_defined() const final;
 
-  any eval(core_interpreter *) const override;
+  std::any eval(core_interpreter *) const override;
 
   std::string name() const override;
 
@@ -104,7 +104,7 @@ public:
 
   bool auto_defined() const final;
 
-  any eval(core_interpreter *) const override;
+  std::any eval(core_interpreter *) const override;
 
   std::string name() const override;
 

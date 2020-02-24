@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -267,7 +267,7 @@ void test_team(vita::src_problem &pr)
 
     for (const auto &example : pr.data())
     {
-      const std::vector<vita::any> out =
+      const std::vector<std::any> out =
       {
         lambda1(example), lambda2(example), lambda3(example)
       };
@@ -281,7 +281,7 @@ void test_team(vita::src_problem &pr)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        CHECK(any_cast<class_t>(out[j]) == tags[j].label);
+        CHECK(std::any_cast<class_t>(out[j]) == tags[j].label);
 
       std::string s_best(names[0]);
 

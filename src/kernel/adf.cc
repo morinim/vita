@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -43,7 +43,7 @@ bool adf::auto_defined() const
 /// \note
 /// Adf functions need input parameters from a context (contrary to adt::eval).
 ///
-any adf::eval(core_interpreter *i) const
+std::any adf::eval(core_interpreter *i) const
 {
   Expects(typeid(*i) == typeid(interpreter<i_mep>));
 
@@ -110,7 +110,7 @@ bool adt::auto_defined() const
 /// Adt hasn't input parameters so the context is ignored (contrary to
 /// adf::eval).
 ///
-any adt::eval(core_interpreter *) const
+std::any adt::eval(core_interpreter *) const
 {
   return interpreter<i_mep>(&code()).run();
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -54,7 +54,7 @@ std::string argument::name() const
 /// \param[in] agent current interpreter
 /// \return          the value of the argument
 ///
-any argument::eval(core_interpreter *agent) const
+std::any argument::eval(core_interpreter *agent) const
 {
   Expects(typeid(*agent) == typeid(interpreter<i_mep>));
 

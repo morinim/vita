@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,8 +23,6 @@
 #include "kernel/terminal.h"
 #include "kernel/src/primitive/comp_penalty.h"
 
-namespace vita
-{
 /// Integer overflow is undefined behaviour. This means that implementations
 /// have a great deal of latitude in how they deal with signed integer
 /// overflow. An implementation that defines signed integer types as being
@@ -33,7 +31,7 @@ namespace vita
 /// overflows will never happen and generate object code accordingly. For
 /// these reasons, it is important to ensure that operations on signed
 /// integers do no result in signed overflow.
-namespace integer
+namespace vita::integer
 {
 using base_t = int;
 
@@ -42,7 +40,7 @@ using base_t = int;
 ///
 /// \param[in] v the value that must be casted to base type (`base_t`)
 ///
-inline base_t cast(const any &v) { return any_cast<base_t>(v); }
+inline base_t cast(const std::any &v) { return std::any_cast<base_t>(v); }
 
 ///
 /// Integer ephemeral random constant.
@@ -67,10 +65,10 @@ public:
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(v); }
 
-  any eval(core_interpreter *i) const final
+  std::any eval(core_interpreter *i) const final
   {
-    return any(static_cast<base_t>(
-                 static_cast<interpreter<i_mep> *>(i)->fetch_param()));
+    return static_cast<base_t>(
+             static_cast<interpreter<i_mep> *>(i)->fetch_param());
   }
 
 private:
@@ -88,18 +86,18 @@ public:
 
   bool associative() const final { return true; }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
     if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
-      return any(std::numeric_limits<base_t>::max());
+      return std::numeric_limits<base_t>::max();
     if (v0 < 0 && v1 < 0 && (v0 < std::numeric_limits<base_t>::min() - v1))
-      return any(std::numeric_limits<base_t>::min());
+      return std::numeric_limits<base_t>::min();
 
-    return any(v0 + v1);
+    return v0 + v1;
   }
 };
 
@@ -110,16 +108,16 @@ public:
   explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
     if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-      return any(v0);
+      return v0;
 
-    return any(v0 / v1);
+    return v0 / v1;
   }
 };
 
@@ -131,7 +129,7 @@ public:
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -156,7 +154,7 @@ public:
     : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -180,7 +178,7 @@ public:
   explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -204,16 +202,16 @@ public:
   explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
     if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
-      return any(v1);
+      return v1;
 
-    return any(v0 % v1);
+    return v0 % v1;
   }
 };
 
@@ -226,7 +224,7 @@ public:
 
   bool associative() const final { return true; }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
@@ -237,11 +235,11 @@ public:
 
     long long tmp(v0 * v1);
     if (tmp > std::numeric_limits<base_t>::max())
-      return any(std::numeric_limits<base_t>::max());
+      return std::numeric_limits<base_t>::max();
     if (tmp < std::numeric_limits<base_t>::min())
-      return any(std::numeric_limits<base_t>::min());
+      return std::numeric_limits<base_t>::min();
 
-    return any(static_cast<base_t>(tmp));
+    return static_cast<base_t>(tmp);
 
     /*
     // On systems where the above relationship does not hold, the following
@@ -252,29 +250,29 @@ public:
       {
         assert(v0 > 0 && v1 > 0);
         if (v0 > std::numeric_limits<base_t>::max() / v1)
-        return any(std::numeric_limits<base_t>::max());
+        return std::numeric_limits<base_t>::max();
       }
       else  // v0 is positive, v1 is non-positive
       {
         assert(v0 > 0 && v1 <= 0);
         if (v1 < std::numeric_limits<base_t>::min() / v0)
-          return any(std::numeric_limits<base_t>::min());
+          return std::numeric_limits<base_t>::min();
       }
     else  // v0 is non-positive
       if (v1 > 0)
       {
         assert(v0 <= 0 && v1 > 0);
         if (v0 < std::numeric_limits<base_t>::min() / v1)
-          return any(std::numeric_limits<base_t>::min());
+          return std::numeric_limits<base_t>::min();
       }
       else  // v0 is non-positive, v1 is non-positive
       {
         assert(v0 <= 0 && v1 <= 0);
         if (v0 != 0 && v1 < std::numeric_limits<base_t>::max() / v0)
-          return any(std::numeric_limits<base_t>::max());
+          return std::numeric_limits<base_t>::max();
       }
 
-    return any(v0 * v1);
+    return v0 * v1;
     */
   }
 };
@@ -286,7 +284,7 @@ public:
   explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -295,9 +293,9 @@ public:
     if (v0 < 0 || v1 < 0 ||
         v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
         v0 > std::numeric_limits<base_t>::max() >> v1)
-      return any(v0);
+      return v0;
 
-    return any(v0 << v1);
+    return v0 << v1;
   }
 };
 
@@ -308,22 +306,21 @@ public:
   explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  any eval(core_interpreter *ci) const final
+  std::any eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
     if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
-      return any(std::numeric_limits<base_t>::min());
+      return std::numeric_limits<base_t>::min();
     if (v0 > 0 && v1 < 0 && (v0 > std::numeric_limits<base_t>::max() + v1))
-      return any(std::numeric_limits<base_t>::max());
+      return std::numeric_limits<base_t>::max();
 
-    return any(v0 - v1);
+    return v0 - v1;
   }
 };
 
-}  // namespace integer
-}  // namespace vita
+}  // namespace vita::integer
 
 #endif  // include guard
