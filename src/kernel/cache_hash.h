@@ -13,6 +13,7 @@
 #if !defined(VITA_CACHE_HASH_H)
 #define      VITA_CACHE_HASH_H
 
+#include <cstddef>
 #include <cstring>
 #include "kernel/common.h"
 
