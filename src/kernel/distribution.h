@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -23,8 +23,8 @@
 namespace vita
 {
 ///
-/// \brief Simplifies the calculation of statistics regarding a sequence
-///        (mean, variance, standard deviation, entropy, min and max)
+/// Simplifies the calculation of statistics regarding a sequence (mean,
+/// variance, standard deviation, entropy, min and max).
 ///
 template<class T>
 class distribution

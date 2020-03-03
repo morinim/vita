@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,8 +14,9 @@
 
 #include "kernel/alps.h"
 
-namespace vita {
-namespace alps {
+namespace vita::alps
+{
+
 ///
 /// \param[in] l a layer.
 /// \param[in] age_gap see environment::age_gap data member.
@@ -68,5 +69,4 @@ unsigned max_age(unsigned l, unsigned age_gap)
   // return num2;
 }
 
-}  // namespace alps
-}  // namespace vita
+}  // namespace vita::alps

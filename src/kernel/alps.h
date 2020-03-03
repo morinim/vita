@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017, 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2017, 2017, 2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,13 +15,9 @@
 
 #include "kernel/population.h"
 
-namespace vita
+namespace vita::alps
 {
-///
-/// Contains some support functions for the ALPS algorithm.
-///
-namespace alps
-{
+
 unsigned max_age(unsigned, unsigned);
 
 ///
@@ -56,7 +52,6 @@ template<class T> bool aged(const population<T> &p,
   return p[c].age() > allowed_age(p, c.layer);
 }
 
-}  // namespace alps
-}  // namespace vita
+}  // namespace vita::alps
 
 #endif  // include guard

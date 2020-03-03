@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -17,8 +17,9 @@
 
 #include "kernel/alps.h"
 
-namespace vita {
-namespace selection {
+namespace vita::selection
+{
+
 ///
 /// The strategy (tournament, fitness proportional...) for the evolution class.
 ///
@@ -45,8 +46,8 @@ protected:
 
 ///
 /// Tournament selection is a method of selecting an individual from a
-/// population of individuals. It involves running several "tournaments"
-/// among a few individuals chosen "at random" from the population. The
+/// population of individuals. It involves running several *tournaments*
+/// among a few individuals chosen *at random* from the population. The
 /// winner of each tournament (the one with the best fitness) is selected
 /// for crossover.
 ///
@@ -55,13 +56,13 @@ protected:
 /// to be selected.
 /// A 1-way tournament selection is equivalent to random selection.
 ///
-/// Tournament selection has several benefits: it is efficient to code, works
+/// Tournament selection has several benefits: it's efficient to code, works
 /// on parallel architectures and allows the selection pressure to be easily
 /// adjusted.
 ///
 /// The tournament selection algorithm we implemented was modified so that
 /// instead of having only one winner (parent) in each tournament, we select
-/// n winners from each tournament based on the top n fitness values in the
+/// `n` winners from each tournament based on the top `n` fitness values in the
 /// tournament.
 ///
 template<class T>
@@ -107,7 +108,7 @@ private:
 };
 
 ///
-/// \brief Pick a set of random individuals.
+/// Pick a set of random individuals.
 ///
 /// Very simple selection strategy: pick a set of random individuals. The
 /// environment::tournamnet_size property controls the cardinality of the
@@ -124,7 +125,6 @@ public:
 
 #include "kernel/evolution_selection.tcc"
 
-}  // namespace selection
-}  // namespace vita
+}  // namespace vita::selection
 
 #endif  // include guard

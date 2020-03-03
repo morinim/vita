@@ -79,6 +79,7 @@ TEST_CASE("Probabilities")
   src_problem p("./test_resources/iris.csv");
   CHECK(!!p);
 
+  // Output value changed to be used as unique key for example identification.
   std::size_t i(0);
   for (auto &e : p.data())
     e.output = i++;

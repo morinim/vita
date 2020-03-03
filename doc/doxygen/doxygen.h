@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,12 +42,12 @@
  *  \namespace vita
  *  The main namespace for the project.
  *
+ *  \namespace alps
+ *  Contains support functions for the ALPS algorithm.
+ *
  *  \namespace out
  *  Contains flags and manipulators to control the output format of
  *  individuals.
- *
- *  \namespace serialize
- *  Contains support structures / functions for object serialization.
  *
  *  \namespace detail
  *  The contents of this namespace isn't intended for general consumption: it
@@ -57,6 +57,14 @@
  */
 
 /**
+ *  \example pathfinding01.cc
+ *  Simple pathfinding (Genetic Algorithms).
+ *  \example pathfinding02.cc
+ *  More complex pathfinding (Genetic Algorithms).
+ *
+ *  \example rastrigin.cc
+ *  More complex pathfinding (Genetic Algorithms).
+ *
  *  \example titanic01.cc
  *  "Hello world" classification task (Genetic Programming).
  *  \example titanic02.cc
@@ -65,11 +73,6 @@
  *  "Hello world" classification task (setting some parameters).
  *  \example titanic04.cc
  *  "Hello world" classification task (team-based classification).
- *
- *  \example pathfinding01.cc
- *  Simple pathfinding (Genetic Algorithms).
- *  \example pathfinding02.cc
- *  More complex pathfinding (Genetic Algorithms).
  *
  *  \example scheduling.cc
  *  Scheduling concurrent jobs for several machines (Differential Evolution).
