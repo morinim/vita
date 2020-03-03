@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -363,7 +363,7 @@ unsigned distance(const i_mep &lhs, const i_mep &rhs)
 ///
 /// Useful for individual comparison / information retrieval.
 ///
-void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
+void i_mep::pack(const locus &l, std::vector<std::byte> *p) const
 {
   const gene &g(genome_(l));
 
@@ -375,12 +375,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
   const auto opcode(static_cast<std::uint16_t>(g.sym->opcode()));
   assert(g.sym->opcode() <= std::numeric_limits<decltype(opcode)>::max());
 
-  // DO NOT CHANGE reinterpret_cast type to std::uint8_t since even if
-  // std::uint8_t has the exact same size and representation as
-  // unsigned char, if the implementation made it a distinct, non-character
-  // type, the aliasing rules would not apply to it
-  // (see <http://stackoverflow.com/q/16138237/3235496>)
-  auto s1 = reinterpret_cast<const unsigned char *>(&opcode);
+  auto s1 = reinterpret_cast<const std::byte *>(&opcode);
   for (std::size_t i(0); i < sizeof(opcode); ++i)
     p->push_back(s1[i]);
 
@@ -398,7 +393,7 @@ void i_mep::pack(const locus &l, std::vector<unsigned char> *const p) const
     {
       const auto param(g.par);
 
-      auto s2 = reinterpret_cast<const unsigned char *>(&param);
+      auto s2 = reinterpret_cast<const std::byte *>(&param);
       for (std::size_t i(0); i < sizeof(param); ++i)
         p->push_back(s2[i]);
     }
@@ -418,7 +413,7 @@ hash_t i_mep::hash() const
   //   return hash_t();
 
   // From an individual to a packed byte stream...
-  thread_local std::vector<unsigned char> packed;
+  thread_local std::vector<std::byte> packed;
 
   packed.clear();
   pack(best(), &packed);

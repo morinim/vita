@@ -146,7 +146,7 @@ inline hash_t murmurhash3::hash128(const void *const data, std::size_t len,
   }
 
   // Tail.
-  auto tail(reinterpret_cast<const unsigned char *>(data) + n_blocks * 16);
+  auto tail(reinterpret_cast<const std::byte *>(data) + n_blocks * 16);
 
   std::uint64_t k1(0), k2(0);
 
