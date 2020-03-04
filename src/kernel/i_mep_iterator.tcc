@@ -18,7 +18,7 @@
 #define      VITA_INDIVIDUAL_MEP_ITERATOR_TCC
 
 ///
-/// \brief Iterator to scan the active genes of an individual.
+/// Iterator to scan the active genes of an individual.
 ///
 template<bool is_const>
 class i_mep::basic_iterator
@@ -36,17 +36,17 @@ public:
   using ref = std::conditional_t<is_const, const_reference, reference>;
   using ind = std::conditional_t<is_const, const i_mep, i_mep>;
 
-  /// \brief Builds an empty iterator.
+  /// Builds an empty iterator.
   ///
-  /// Empty iterator is used as sentry (it is the value returned by end()).
+  /// Empty iterator is used as sentry (it's the value returned by end()).
   basic_iterator() : loci_(), ind_(nullptr) {}
 
-  /// \param[in] id an individual.
+  /// \param[in] id an individual
   explicit basic_iterator(ind &id) : loci_({id.best_}), ind_(&id)
   {
   }
 
-  /// \return iterator representing the next active gene.
+  /// \return iterator representing the next active gene
   basic_iterator &operator++()
   {
     if (!loci_.empty())
@@ -63,10 +63,9 @@ public:
     return *this;
   }
 
-  /// \param[in] rhs second term of comparison.
-  ///
-  /// Returns `true` if iterators point to the same locus or they are both
-  /// to the end.
+  /// \param[in] rhs second term of comparison
+  /// \return        `true` if iterators point to the same locus or they are
+  ///                both to the end
   bool operator==(const basic_iterator &rhs) const
   {
     Ensures(!ind_ || !rhs.ind_ || ind_ == rhs.ind_);
@@ -80,19 +79,19 @@ public:
     return !(*this == rhs);
   }
 
-  /// \return reference to the current locus of the individual.
+  /// \return reference to the current locus of the individual
   ref operator*() const
   {
     return ind_->genome_(locus());
   }
 
-  /// \return pointer to the current locus of the individual.
+  /// \return pointer to the current locus of the individual
   ptr operator->() const
   {
     return &operator*();
   }
 
-  /// \return the locus of the current gene.
+  /// \return the locus of the current gene
   vita::locus locus() const
   {
     return *loci_.cbegin();

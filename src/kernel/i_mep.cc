@@ -65,7 +65,7 @@ i_mep::i_mep(const problem &p)
 ///
 i_mep::i_mep(const std::vector<gene> &gv)
   : individual(),
-    genome_(static_cast<unsigned>(gv.size()),
+    genome_(gv.size(),
             std::max_element(std::begin(gv), std::end(gv),
                              [](gene g1, gene g2)
                              {
@@ -646,7 +646,7 @@ bool i_mep::save_impl(std::ostream &out) const
 ///
 /// A sort of "common subexpression elimination" optimization.
 ///
-/// \return a cse-optimized individual
+/// \return a CSE-optimized individual
 ///
 /// The function doesn't rely on the meaning of the symbols, just on the
 /// genome layout.
@@ -724,7 +724,7 @@ i_mep i_mep::cse() const
 /// strategies, encapsulated by the different elementary crossover operators
 /// available, via self adaptation.
 ///
-/// We associate, with each individual, the type of crossover used to create it
+/// We associate to each individual the type of crossover used to create it
 /// (initially this is set to a random type). This type is used afterwards to
 /// determine which crossover to apply and allows the algorithm to adjust the
 /// relative mixture of operators.

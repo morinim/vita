@@ -24,7 +24,7 @@
 namespace vita
 {
 ///
-/// A single member of a `population`.
+/// A MEP (Multi Expression Programming) single member of a `population`.
 ///
 /// Each individual contains a genome which represents a possible solution to
 /// the task being tackled (i.e. a point in the search space).
@@ -201,10 +201,6 @@ inline i_mep::iterator i_mep::end()
 
 template<> struct has_introns<i_mep> : std::true_type {};
 
-///
-/// \example example3.cc
-/// Performs various types of crossover between random individuals.
-///
 }  // namespace vita
 
 #endif  // include guard
