@@ -16,21 +16,18 @@
 
 int main()
 {
-  // TARGET FUNCTION
-  const auto function = [](double x) { return x + std::sin(x); };
-
-  const auto sample = [&function](double x)
-                      {
-                        return std::vector{std::to_string(function(x)),
-                                           std::to_string(x)};
-                      };
-
   // DATA SAMPLE
-  const std::vector training =
-  {
-    sample(-10), sample(-8), sample(-6), sample(-4), sample(-2),
-    sample(  0), sample( 2), sample( 4), sample( 6), sample( 8)
-  };
+  std::istringstream training(  // the target function is `x + sin(x)`
+    "-9.456,-10.0\n"
+    "-8.989, -8.0\n"
+    "-5.721, -6.0\n"
+    "-3.243, -4.0\n"
+    "-2.909, -2.0\n"
+    " 0.000,  0.0\n"
+    " 2.909,  2.0\n"
+    " 3.243,  4.0\n"
+    " 5.721,  6.0\n"
+    " 8.989,  8.0\n");
 
   // READING INPUT DATA
   vita::src_problem prob(training);

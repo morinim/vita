@@ -138,52 +138,6 @@ private:
 domain_t from_weka(const std::string &);
 
 ///
-/// New datafame instance containing records from a STL container.
-///
-/// \param[in] c a vector containing (raw) examples
-///
-/// Records are uniform sequences of uniform data. E.g.:
-///
-///     {
-///       {"ISE", "5.1", "3.5", "1.4","0.2"},
-///       {"IVE", "7.0", "3.2", "4.7","1.4"},
-///       {"IVI", "6.3", "3.3", "6.0","2.5"},
-///       ...
-///     }
-///
-/// or
-///
-///     {
-///       {  95.2425, 2.810},
-///       {1554.0000, 6.000},
-///       {2866.5485, 7.043},
-///       ...
-///     }
-///
-template<class T> dataframe::dataframe(const std::vector<T> &c) : dataframe()
-{
-  read(c);
-  Ensures(debug());
-}
-
-///
-/// Loads the content of a vector into the active dataset.
-///
-/// \param[in] c  a vector of uniform examples (see `dataframe(vector)`)
-/// \return       number of lines parsed
-///
-template<class T> std::size_t dataframe::read(const std::vector<T> &c)
-{
-  std::size_t n(0);
-
-  for (const auto &r : c)
-    if (read_record(r))
-      ++n;
-
-  return n;
-}
-
-///
 /// Stores a single element of the dataset.
 ///
 /// The `struct` consists of an input vector (`input`) and an answer value

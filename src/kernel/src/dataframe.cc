@@ -60,7 +60,7 @@ bool is_number(const std::string &s)
 
   return true;
 }
-}  // namespace
+}  // unnamed namespace
 
 ///
 /// \param[in] n the name of a weka domain
@@ -276,48 +276,8 @@ class_t dataframe::encode(const std::string &label)
 }
 
 ///
-/// \param[in] i the encoded (dataframe::encode()) value of a class
-/// \return      the name of the class encoded by `i` (or an empty string if
-///              such class cannot be find)
-///
-/// \note
-/// Boost Bitmap could be used to speed up the search in `classes_map_`, but
-/// to date speed isn't an issue.
-///
-std::string dataframe::class_name(class_t i) const
-{
-  for (const auto &p : classes_map_)
-    if (p.second == i)
-      return p.first;
-
-  return "";
-}
-
-///
-/// Swap two categories of the dataframe.
-///
-/// \param[in] c1 a category
-/// \param[in] c2 a category
-///
-void dataframe::swap_category(category_t c1, category_t c2)
-{
-  const auto n_col(columns());
-
-  Expects(c1 < n_col);
-  Expects(c2 < n_col);
-
-  categories_.swap(c1, c2);
-
-  for (auto i(decltype(n_col){0}); i < n_col; ++i)
-    if (header_[i].category_id == c1)
-      header_[i].category_id = c2;
-    else if (header_[i].category_id == c2)
-      header_[i].category_id = c1;
-}
-
-///
-/// \param[in] v              a record containing the example (features encoded
-///                           as `std::string`)
+/// \param[in] v              a container for the example (features encoded as
+///                           `std::string`s)
 /// \param[in] classification is this a classification task?
 /// \param[in] add_label      should we automatically add labels for
 ///                           text-features?
@@ -361,6 +321,95 @@ dataframe::example dataframe::to_example(const record_t &v,
   }
 
   return ret;
+}
+
+///
+/// \param[in] r input record (an example in raw format)
+/// \return      `true` for a correctly converted/imported record
+///
+bool dataframe::read_record(const record_t &r)
+{
+  const bool classification(!is_number(r.front()));
+
+  const auto fields(r.size());
+
+  // If we don't know the dataset format yet, the current record is used to
+  // discover it.
+  if (const bool format = columns(); !format)
+  {
+    header_.reserve(fields);
+
+    for (std::size_t field(0); field < fields; ++field)
+    {
+      assert(!size());  // if we have data then data format must be known
+
+      std::string s_domain(is_number(r[field])
+                           ? "numeric" : "string" + std::to_string(field));
+
+      // For classification problems we use discriminant functions, so the
+      // actual output type is always numeric.
+      if (field == 0 && classification)
+        s_domain = "numeric";
+
+      const domain_t domain(s_domain == "numeric"
+                            ? domain_t::d_double : domain_t::d_string);
+
+      const category_t tag(categories_.insert({s_domain, domain, {}}));
+
+      header_.push_back({"", tag});
+    }
+  }  // if (!format)
+
+  if (fields != columns())  // skip lines with wrong number of columns
+  {
+    vitaWARNING << "Malformed exampled skipped";
+    return false;
+  }
+
+  const auto instance(to_example(r, classification, true));
+  push_back(instance);
+
+  return true;
+}
+
+///
+/// \param[in] i the encoded (dataframe::encode()) value of a class
+/// \return      the name of the class encoded by `i` (or an empty string if
+///              such class cannot be find)
+///
+/// \note
+/// Boost Bitmap could be used to speed up the search in `classes_map_`, but
+/// to date speed isn't an issue.
+///
+std::string dataframe::class_name(class_t i) const
+{
+  for (const auto &p : classes_map_)
+    if (p.second == i)
+      return p.first;
+
+  return "";
+}
+
+///
+/// Swap two categories of the dataframe.
+///
+/// \param[in] c1 a category
+/// \param[in] c2 a category
+///
+void dataframe::swap_category(category_t c1, category_t c2)
+{
+  const auto n_col(columns());
+
+  Expects(c1 < n_col);
+  Expects(c2 < n_col);
+
+  categories_.swap(c1, c2);
+
+  for (auto i(decltype(n_col){0}); i < n_col; ++i)
+    if (header_[i].category_id == c1)
+      header_[i].category_id = c2;
+    else if (header_[i].category_id == c2)
+      header_[i].category_id = c1;
 }
 
 ///
@@ -552,55 +601,6 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   }
 
   return debug() ? size() : static_cast<std::size_t>(0);
-}
-
-///
-/// \param[in] r input record (an example in raw format)
-/// \return      `true` for a correctly converted/imported record
-///
-bool dataframe::read_record(const record_t &r)
-{
-  const bool classification(!is_number(r[0]));
-
-  const auto fields(r.size());
-
-  // If we don't know the dataset format yet, the current record is used to
-  // discover it.
-  if (const bool format = columns(); !format)
-  {
-    header_.reserve(fields);
-
-    for (std::size_t field(0); field < fields; ++field)
-    {
-      assert(!size());  // if we have data then data format must be known
-
-      std::string s_domain(is_number(r[field])
-                           ? "numeric" : "string" + std::to_string(field));
-
-      // For classification problems we use discriminant functions, so the
-      // actual output type is always numeric.
-      if (field == 0 && classification)
-        s_domain = "numeric";
-
-      const domain_t domain(s_domain == "numeric"
-                            ? domain_t::d_double : domain_t::d_string);
-
-      const category_t tag(categories_.insert({s_domain, domain, {}}));
-
-      header_.push_back({"", tag});
-    }
-  }  // if (!format)
-
-  if (fields != columns())  // skip lines with wrong number of columns
-  {
-    vitaWARNING << "Malformed exampled skipped";
-    return false;
-  }
-
-  const auto instance(to_example(r, classification, true));
-  push_back(instance);
-
-  return true;
 }
 
 ///
