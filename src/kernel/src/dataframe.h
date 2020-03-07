@@ -138,9 +138,27 @@ private:
 domain_t from_weka(const std::string &);
 
 ///
-/// New datafame instance containing examples from a STL container.
+/// New datafame instance containing records from a STL container.
 ///
 /// \param[in] c a vector containing (raw) examples
+///
+/// Records are uniform sequences of uniform data. E.g.:
+///
+///     {
+///       {"ISE", "5.1", "3.5", "1.4","0.2"},
+///       {"IVE", "7.0", "3.2", "4.7","1.4"},
+///       {"IVI", "6.3", "3.3", "6.0","2.5"},
+///       ...
+///     }
+///
+/// or
+///
+///     {
+///       {  95.2425, 2.810},
+///       {1554.0000, 6.000},
+///       {2866.5485, 7.043},
+///       ...
+///     }
 ///
 template<class T> dataframe::dataframe(const std::vector<T> &c) : dataframe()
 {
@@ -149,15 +167,10 @@ template<class T> dataframe::dataframe(const std::vector<T> &c) : dataframe()
 }
 
 ///
-/// Loads the content of a file into the active dataset.
+/// Loads the content of a vector into the active dataset.
 ///
-/// \param[in] f  name of the file containing the data set (CSV / XRFF format)
-/// \param[in] ft a filter and transform function
-/// \return       number of lines parsed (0 in case of errors)
-///
-/// \exception std::invalid_argument missing dataset file name
-///
-/// \note Test set can have an empty output value.
+/// \param[in] c  a vector of uniform examples (see `dataframe(vector)`)
+/// \return       number of lines parsed
 ///
 template<class T> std::size_t dataframe::read(const std::vector<T> &c)
 {

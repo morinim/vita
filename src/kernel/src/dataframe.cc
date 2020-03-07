@@ -689,7 +689,7 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 ///
 /// \param[in] f  name of the file containing the data set (CSV / XRFF format)
 /// \param[in] ft a filter and transform function
-/// \return       number of lines parsed (0 in case of errors)
+/// \return       number of lines parsed
 ///
 /// \exception std::invalid_argument missing dataset file name
 ///
