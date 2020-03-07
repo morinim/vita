@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -63,7 +63,7 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
   swr(size, {});
   return ret;
 }
-}  // unnamed namespace
+}  // namespace detail
 
 ///
 /// New empty instance of src_problem.

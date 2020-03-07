@@ -37,8 +37,8 @@ using class_t = unsigned;
 /// - is modelled on the corresponding *pandas* object;
 /// - is a forward iterable collection of "monomorphic" examples (all samples
 ///   have the same type and arity);
-/// - accepts many different kinds of input: XRFF
-///   (http://weka.wikispaces.com/XRFF) and CSV files.
+/// - accepts many different kinds of input: CSV and XRFF
+///   (http://weka.wikispaces.com/XRFF) files.
 ///
 class dataframe
 {
@@ -64,6 +64,7 @@ public:
   dataframe();
   explicit dataframe(std::istream &, filter_hook_t = nullptr);
   explicit dataframe(const std::string &, filter_hook_t = nullptr);
+  template<class T> explicit dataframe(const std::vector<T> &);
 
   // ---- Iterators ----
   using iterator = typename examples_t::iterator;
@@ -81,6 +82,7 @@ public:
 
   // ---- Convenience ----
   std::size_t read(const std::string &, filter_hook_t = nullptr);
+  template<class T> std::size_t read(const std::vector<T> &);
   std::size_t read_csv(std::istream &, filter_hook_t = nullptr);
   std::size_t read_xrff(std::istream &, filter_hook_t = nullptr);
   bool operator!() const;
@@ -103,7 +105,8 @@ public:
   bool debug() const;
 
 private:
-  example to_example(const std::vector<std::string> &, bool, bool);
+  bool read_record(const record_t &);
+  example to_example(const record_t &, bool, bool);
 
   class_t encode(const std::string &);
 
@@ -133,6 +136,39 @@ private:
 };
 
 domain_t from_weka(const std::string &);
+
+///
+/// New datafame instance containing examples from a STL container.
+///
+/// \param[in] c a vector containing (raw) examples
+///
+template<class T> dataframe::dataframe(const std::vector<T> &c) : dataframe()
+{
+  read(c);
+  Ensures(debug());
+}
+
+///
+/// Loads the content of a file into the active dataset.
+///
+/// \param[in] f  name of the file containing the data set (CSV / XRFF format)
+/// \param[in] ft a filter and transform function
+/// \return       number of lines parsed (0 in case of errors)
+///
+/// \exception std::invalid_argument missing dataset file name
+///
+/// \note Test set can have an empty output value.
+///
+template<class T> std::size_t dataframe::read(const std::vector<T> &c)
+{
+  std::size_t n(0);
+
+  for (const auto &r : c)
+    if (read_record(r))
+      ++n;
+
+  return n;
+}
 
 ///
 /// Stores a single element of the dataset.

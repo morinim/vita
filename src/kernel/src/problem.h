@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,6 +48,7 @@ public:
 
   explicit src_problem(const std::string &);
   explicit src_problem(std::istream &);
+  template<class T> explicit src_problem(const std::vector<T> &);
 
   struct default_symbols_t {};
   static const default_symbols_t default_symbols;
@@ -82,6 +83,18 @@ private:
   dataframe validation_;
   symbol_factory factory_;
 };
+
+template<class T> src_problem::src_problem(const std::vector<T> &ds)
+  : src_problem()
+{
+  data(dataset_t::training).read(ds);
+  vitaINFO << "...dataset read. Examples: " << data(dataset_t::training).size()
+           << ", categories: " << categories()
+           << ", features: " << variables()
+           << ", classes: " << classes();
+  setup_terminals();
+}
+
 
 }  // namespace vita
 
