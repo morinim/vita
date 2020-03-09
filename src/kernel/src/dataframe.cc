@@ -49,16 +49,10 @@ std::any convert(const std::string &s, domain_t d)
 // \return      `true` if `s` contains a number
 bool is_number(const std::string &s)
 {
-  try
-  {
-    std::stod(s);
-  }
-  catch(std::invalid_argument &)
-  {
-    return false;
-  }
+  char *endptr = nullptr;
+  strtod(s.c_str(), &endptr);
 
-  return true;
+  return endptr != s.c_str() && *endptr == '\0';
 }
 }  // unnamed namespace
 
