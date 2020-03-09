@@ -1,32 +1,35 @@
 /*
+ *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  \see https://github.com/morinim/vita/wiki/nonogram_tutorial
+ *  \see https://github.com/morinim/vita/wiki/symbolic_regression
  */
 
 #include "kernel/vita.h"
 
 int main()
 {
-  // TARGET FUNCTION
-  const auto function = [](double x) { return x + std::sin(x); };
-
   // DATA SAMPLE
-  const auto sample = [&function](double x) { return std::to_string(function(x))
-                                                     + ","
-                                                     + std::to_string(x)
-                                                     + "\n"; };
-  std::istringstream training(
-    sample(-10) + sample(-8) + sample(-6) + sample(-4) + sample(-2)
-    + sample(0) + sample( 2) + sample( 4) + sample( 6) + sample( 8));
-
+  // (the target function is `x + sin(x)`)
+  std::istringstream training(R"(
+    -9.456,-10.0
+    -8.989, -8.0
+    -5.721, -6.0
+    -3.243, -4.0
+    -2.909, -2.0
+     0.000,  0.0
+     2.909,  2.0
+     3.243,  4.0
+     5.721,  6.0
+     8.989,  8.0
+  )");
 
   // READING INPUT DATA
   vita::src_problem prob(training);
@@ -40,7 +43,7 @@ int main()
   prob.insert<vita::real::mul>();
 
   // SEARCHING
-  vita::src_search<> s(prob);
+  vita::src_search s(prob);
   const auto result(s.run());
 
   std::cout << "\nCANDIDATE SOLUTION\n"

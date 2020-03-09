@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@ TEST_CASE("load_csv")
   using namespace vita;
 
   dataframe d1, d2, d3;
-  const std::size_t n1(10), n2(150), n3(351);
+  constexpr std::size_t n1(10), n2(150), n3(351);
 
   CHECK(d1.read("./test_resources/mep.csv") == n1);
   CHECK(d1.size() == n1);

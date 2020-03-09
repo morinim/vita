@@ -49,18 +49,12 @@ std::any convert(const std::string &s, domain_t d)
 // \return      `true` if `s` contains a number
 bool is_number(const std::string &s)
 {
-  try
-  {
-    std::stod(s);
-  }
-  catch(std::invalid_argument &)
-  {
-    return false;
-  }
-
-  return true;
+  char *end;
+  strtod(s.c_str(), &end);  // if no conversion can be performed, ​`end` is set
+                            // to `s.c_str()`
+  return end != s.c_str() && *end == '\0';
 }
-}  // namespace
+}  // unnamed namespace
 
 ///
 /// \param[in] n the name of a weka domain
@@ -276,6 +270,103 @@ class_t dataframe::encode(const std::string &label)
 }
 
 ///
+/// \param[in] v              a container for the example (features encoded as
+///                           `std::string`s)
+/// \param[in] classification is this a classification task?
+/// \param[in] add_label      should we automatically add labels for
+///                           text-features?
+/// \return                   `v` converted to `example` type
+///
+/// \remark
+/// When `add_label` is `true` the function can have side-effects (changing
+/// the set of labels associated to a category).
+///
+dataframe::example dataframe::to_example(const record_t &v,
+                                         bool classification, bool add_label)
+{
+  Expects(v.size());
+
+  example ret;
+
+  unsigned index(0);
+  for (const auto &feature : v)
+  {
+    const auto categ(header_[index].category_id);
+    const auto domain(categories_[categ].domain);
+
+    if (index)  // input value
+    {
+      ret.input.push_back(convert(feature, domain));
+
+      if (add_label && domain == domain_t::d_string)
+        categories_.add_label(categ, feature);
+    }
+    else if (!feature.empty())  // output value (not empty)
+    {
+      // Strings could be used as label for classes, but integers
+      // are simpler and faster to manage (arrays instead of maps).
+      if (classification)
+        ret.output = encode(feature);
+      else
+        ret.output = convert(feature, domain);
+    }
+
+    ++index;
+  }
+
+  return ret;
+}
+
+///
+/// \param[in] r input record (an example in raw format)
+/// \return      `true` for a correctly converted/imported record
+///
+bool dataframe::read_record(const record_t &r)
+{
+  const bool classification(!is_number(r.front()));
+
+  const auto fields(r.size());
+
+  // If we don't know the dataset format yet, the current record is used to
+  // discover it.
+  if (const bool format = columns(); !format)
+  {
+    header_.reserve(fields);
+
+    for (std::size_t field(0); field < fields; ++field)
+    {
+      assert(!size());  // if we have data then data format must be known
+
+      std::string s_domain(is_number(r[field])
+                           ? "numeric" : "string" + std::to_string(field));
+
+      // For classification problems we use discriminant functions, so the
+      // actual output type is always numeric.
+      if (field == 0 && classification)
+        s_domain = "numeric";
+
+      const domain_t domain(s_domain == "numeric"
+                            ? domain_t::d_double : domain_t::d_string);
+
+      const category_t tag(categories_.insert({s_domain, domain, {}}));
+
+      header_.push_back({"", tag});
+    }
+  }  // if (!format)
+
+  if (fields != columns())  // skip lines with wrong number of columns
+  {
+    vitaWARNING << "Malformed exampled skipped";
+    return false;
+  }
+
+  const auto instance(to_example(r, classification, true));
+  push_back(instance);
+
+  return true;
+}
+
+///
 /// \param[in] i the encoded (dataframe::encode()) value of a class
 /// \return      the name of the class encoded by `i` (or an empty string if
 ///              such class cannot be find)
@@ -313,54 +404,6 @@ void dataframe::swap_category(category_t c1, category_t c2)
       header_[i].category_id = c2;
     else if (header_[i].category_id == c2)
       header_[i].category_id = c1;
-}
-
-///
-/// \param[in] v              a record containing the example (features encoded
-///                           as `std::string`)
-/// \param[in] classification is this a classification task?
-/// \param[in] add_label      should we automatically add labels for
-///                           text-features?
-/// \return                   `v` converted to `example` type
-///
-/// \remark
-/// When `add_label` is `true` the function can have side-effects (changing
-/// the set of labels associated to a category).
-///
-dataframe::example dataframe::to_example(const std::vector<std::string> &v,
-                                         bool classification, bool add_label)
-{
-  Expects(v.size());
-
-  example ret;
-
-  unsigned index(0);
-  for (const auto &feature : v)
-  {
-    const auto categ(header_[index].category_id);
-    const auto domain(categories_[categ].domain);
-
-    if (index)  // input value
-    {
-      ret.input.push_back(convert(feature, domain));
-
-      if (add_label && domain == domain_t::d_string)
-        categories_.add_label(categ, feature);
-    }
-    else if (!feature.empty())  // output value (not empty)
-    {
-      // Strings could be used as label for classes, but integers
-      // are simpler and faster to manage (arrays instead of maps).
-      if (classification)
-        ret.output = encode(feature);
-      else
-        ret.output = convert(feature, domain);
-    }
-
-    ++index;
-  }
-
-  return ret;
 }
 
 ///
@@ -534,7 +577,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
        i;
        i = i->NextSiblingElement("instance"))
   {
-    std::vector<std::string> record;
+    record_t record;
     for (auto *v = i->FirstChildElement("value");
          v;
          v = v->NextSiblingElement("value"))
@@ -606,14 +649,14 @@ std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
 ///   elements by the learning engine. For example, "end." is not matched to
 ///   "end";
 /// * TEXT STRINGS:
-///   * place double quotes around all text strings;
-///   * text matching is case-sensitive: "wine" is different from "Wine.";
-///   * if a string contains a double quote, the double quote must be escaped
+///   - place double quotes around all text strings;
+///   - text matching is case-sensitive: "wine" is different from "Wine.";
+///   - if a string contains a double quote, the double quote must be escaped
 ///     with another double quote, for example:
 ///     "sentence with a ""double"" quote inside";
 /// * NUMERIC VALUES:
-///   * both integer and decimal values are supported;
-///   * numbers in quotes without whitespace will be treated as numbers, even
+///   - both integer and decimal values are supported;
+///   - numbers in quotes without whitespace will be treated as numbers, even
 ///     if they are in quotation marks. Multiple numeric values within
 ///     quotation marks in the same field will be treated as a string. For
 ///     example:
@@ -626,54 +669,8 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 {
   clear();
 
-  bool classification(false), format(columns());
-
   for (auto record : csv_parser(from).filter_hook(ft))
-  {
-    const auto fields(record.size());
-
-    // If we don't know the dataset format, the first line will be used to
-    // learn it.
-    if (!format)
-    {
-      classification = !is_number(record[0]);
-
-      header_.reserve(fields);
-
-      for (auto field(decltype(fields){0}); field < fields; ++field)
-      {
-        assert(!size());  // if we have data then data format must be known
-
-        std::string s_domain(is_number(record[field])
-                             ? "numeric"
-                             : "string" + std::to_string(field));
-
-        // For classification problems we use discriminant functions, so the
-        // actual output type is always numeric.
-        if (field == 0 && classification)
-          s_domain = "numeric";
-
-        const domain_t domain(s_domain == "numeric" ? domain_t::d_double
-                                                    : domain_t::d_string);
-
-        const category_t tag(categories_.insert({s_domain, domain, {}}));
-
-        header_.push_back({"", tag});
-      }
-
-      format = true;
-    }  // if (!format)
-
-    if (fields != columns())  // skip lines with wrong number of columns
-      continue;
-
-    const auto instance(to_example(record, classification, true));
-
-    if (instance.input.size() + 1 == columns())
-      push_back(instance);
-    else
-      vitaWARNING << "Malformed line " << size() << " skipped";
-  }
+    read_record(record);
 
   if (!debug() || !size())
     throw exception::insufficient_data("Empty / undersized CSV data file");
@@ -686,7 +683,7 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 ///
 /// \param[in] f  name of the file containing the data set (CSV / XRFF format)
 /// \param[in] ft a filter and transform function
-/// \return       number of lines parsed (0 in case of errors)
+/// \return       number of lines parsed
 ///
 /// \exception std::invalid_argument missing dataset file name
 ///

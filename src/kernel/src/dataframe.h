@@ -37,8 +37,8 @@ using class_t = unsigned;
 /// - is modelled on the corresponding *pandas* object;
 /// - is a forward iterable collection of "monomorphic" examples (all samples
 ///   have the same type and arity);
-/// - accepts many different kinds of input: XRFF
-///   (http://weka.wikispaces.com/XRFF) and CSV files.
+/// - accepts many different kinds of input: CSV and XRFF
+///   (http://weka.wikispaces.com/XRFF) files.
 ///
 class dataframe
 {
@@ -64,6 +64,7 @@ public:
   dataframe();
   explicit dataframe(std::istream &, filter_hook_t = nullptr);
   explicit dataframe(const std::string &, filter_hook_t = nullptr);
+  template<class T> explicit dataframe(const std::vector<T> &);
 
   // ---- Iterators ----
   using iterator = typename examples_t::iterator;
@@ -81,6 +82,7 @@ public:
 
   // ---- Convenience ----
   std::size_t read(const std::string &, filter_hook_t = nullptr);
+  template<class T> std::size_t read(const std::vector<T> &);
   std::size_t read_csv(std::istream &, filter_hook_t = nullptr);
   std::size_t read_xrff(std::istream &, filter_hook_t = nullptr);
   bool operator!() const;
@@ -103,7 +105,8 @@ public:
   bool debug() const;
 
 private:
-  example to_example(const std::vector<std::string> &, bool, bool);
+  bool read_record(const record_t &);
+  example to_example(const record_t &, bool, bool);
 
   class_t encode(const std::string &);
 
