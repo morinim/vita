@@ -17,17 +17,19 @@
 int main()
 {
   // DATA SAMPLE
-  std::istringstream training(  // the target function is `x + sin(x)`
-    "-9.456,-10.0\n"
-    "-8.989, -8.0\n"
-    "-5.721, -6.0\n"
-    "-3.243, -4.0\n"
-    "-2.909, -2.0\n"
-    " 0.000,  0.0\n"
-    " 2.909,  2.0\n"
-    " 3.243,  4.0\n"
-    " 5.721,  6.0\n"
-    " 8.989,  8.0\n");
+  // (the target function is `x + sin(x)`)
+  std::istringstream training(R"(
+    -9.456,-10.0
+    -8.989, -8.0
+    -5.721, -6.0
+    -3.243, -4.0
+    -2.909, -2.0
+     0.000,  0.0
+     2.909,  2.0
+     3.243,  4.0
+     5.721,  6.0
+     8.989,  8.0
+  )");
 
   // READING INPUT DATA
   vita::src_problem prob(training);

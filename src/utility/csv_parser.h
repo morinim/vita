@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,8 +53,8 @@ public:
   ///
   /// \remark
   /// Trimming spaces is contentious and in fact the practice is specifically
-  /// prohibited by RFC 4180, which states: "Spaces are considered part of a
-  /// field and should not be ignored".
+  /// prohibited by RFC 4180, which states: *Spaces are considered part of a
+  /// field and should not be ignored*.
   csv_parser trim_ws(bool t)
   {
     trim_ws_ = t;
@@ -83,7 +83,9 @@ public:
   /// the fact that a `csv_parser' is a sort of Python generator and tends to
   /// be used in for-loops.
   /// Users often write:
-  ///     for (auto record : csv_parser(f).filter_hook(filter))
+  ///
+  ///     for (auto record : csv_parser(f).filter_hook(filter)) { ... }
+  ///
   /// but that's broken (it only works if `filter_hook` returns by value).
   /// `csv_parser` is a lighweight parser and this shouldn't be a performance
   /// concern.
