@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING CHANGE**. Sources require a C++17 compatible compiler
+
+
+
 ## [1.1.0] - 2019-12-11
 
 **This is the last C++14 compatible version. Next versions of the framework will assume a C++17 compiler.**
@@ -41,6 +46,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   **Part** of the redundant parentheses has been removed.
 
   So, instead of `((sin(X1)) + (ln(((X1)+(X2)))` you get `(sin(X1) + ln(X1+X2))`
+
+
 
 ## [1.0.0] - 2019-03-22
 
@@ -154,6 +161,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
   The `ga::parameter` help function has been removed.
 
+
+
 ## [0.9.14] - 2017-12-11
 
 ### Added
@@ -239,6 +248,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   ```
 
 - Uniform output results for make / cmake build systems.
+
 
 
 ## [0.9.13] - 2017-09-15
