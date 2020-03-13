@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -566,6 +566,37 @@ TEST_CASE_FIXTURE(fixture3, "f_ln")
     ret = i_interp(&i3).run();
     CHECK(doctest::Approx(real::base(ret))
           == std::log(static_cast<Z *>(z)->val));
+  }
+}
+
+TEST_CASE_FIXTURE(fixture3, "f_sigmoid")
+{
+  using namespace vita;
+
+  // SIGMOID(0) == 0.5
+  const i_mep i1({
+                   {{f_sigmoid,  {1}}},  // [0] FSIGMOID [1]
+                   {{       c0, null}}   // [1] 0.0
+                 });
+  ret = i_interp(&i1).run();
+  CHECK(real::base(ret) == doctest::Approx(0.5));
+
+  // SIGMOID(X) == 1.0 / (1.0 + std::exp(-X))
+  const i_mep i2({
+                   {{f_sigmoid,  {1}}},  // [0] FSIGMOID [1]
+                   {{        z, null}}   // [1] Z
+                 });
+  for (unsigned j(0); j < 200; ++j)
+  {
+    const auto rx(vita::random::between(-100.0, 100.0));
+    static_cast<Z *>(z)->val = rx;
+    ret = i_interp(&i2).run();
+
+    if (ret.has_value())
+    {
+      const auto expected(1.0 / (1.0 + std::exp(-rx)));
+      CHECK(doctest::Approx(real::base(ret)) == expected);
+    }
   }
 }
 

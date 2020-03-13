@@ -73,7 +73,7 @@ public:
   bool parametric() const final { return true; }
 
   terminal::param_t init() const final
-  { return random::between<base_t>(min, upp); }
+  { return random::between(min, upp); }
 
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(v); }
@@ -106,7 +106,7 @@ public:
   bool parametric() const final { return true; }
 
   terminal::param_t init() const final
-  { return random::between<int>(min, upp); }
+  { return random::between(min, upp); }
 
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(static_cast<int>(v)); }
@@ -143,7 +143,7 @@ public:
 
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
 
     return a.has_value() ? std::fabs(base(a)) : a;
   }
@@ -168,10 +168,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) + base(a1));
@@ -210,10 +210,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const auto x(base(a0)), y(base(a1));
@@ -245,7 +245,7 @@ public:
 
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!a.has_value())  return a;
 
     return std::cos(base(a));
@@ -270,10 +270,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) / base(a1));
@@ -305,10 +305,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     return std::isgreater(base(a0), base(a1));
@@ -342,10 +342,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(std::floor(base(a0) / base(a1)));
@@ -383,13 +383,13 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
-    const std::any a2(i->fetch_arg(2));
+    const auto a2(i->fetch_arg(2));
     if (!a2.has_value())  return a2;
 
     const auto v0(base(a0));
@@ -436,10 +436,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     if (issmall(base(a0) - base(a1)))
@@ -477,10 +477,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const auto v0(base(a0)), v1(base(a1));
@@ -526,7 +526,7 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
     if (issmall(base(a0)))
@@ -558,7 +558,7 @@ public:
 
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!a.has_value())  return a;
 
     return static_cast<base_t>(std::any_cast<std::string>(a).length());
@@ -591,7 +591,7 @@ public:
   ///
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
     const auto ret(std::log(base(a0)));
@@ -623,10 +623,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     return std::isless(base(a0), base(a1));
@@ -658,10 +658,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(std::fmax(base(a0), base(a1)));
@@ -695,10 +695,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(std::fmod(base(a0), base(a1)));
@@ -726,10 +726,10 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) * base(a1));
@@ -760,7 +760,7 @@ public:
 
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!a.has_value())  return a;
 
     return std::sin(base(a));
@@ -788,7 +788,7 @@ public:
 
   std::any eval(core_interpreter *i) const final
   {
-    const std::any a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!a.has_value())  return a;
 
     const auto v(base(a));
@@ -817,16 +817,56 @@ public:
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any a0(i->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!a0.has_value())  return a0;
 
-    const std::any a1(i->fetch_arg(1));
+    const auto a1(i->fetch_arg(1));
     if (!a1.has_value())  return a1;
 
     const base_t ret(base(a0) - base(a1));
     if (!std::isfinite(ret))  return {};
 
     return ret;
+  }
+};
+
+
+///
+/// Sigmoid function.
+///
+class sigmoid : public function
+{
+public:
+  explicit sigmoid(const cvect &c = {0}) : function("FSIGMOID", c[0], {c[0]})
+  { Expects(c.size() == 1); }
+
+  std::string display(format f) const final
+  {
+    switch (f)
+    {
+    case cpp_format:     return "1.0 / (1.0 + std::exp(-%%1%%))";
+    case mql_format:     return  "1.0 / (1.0 + MathExp(-%%1%%))";
+    case python_format:  return   "1. / (1. + math.exp(-%%1%%))";
+    default:             return          "1 / (1 + exp(-%%1%%))";
+    }
+  }
+
+  std::any eval(core_interpreter *ci) const final
+  {
+    auto i(static_cast<interpreter<i_mep> *>(ci));
+
+    const auto a0(i->fetch_arg(0));
+    if (!a0.has_value())  return a0;
+
+    // The sigmoid function can be expressed in one of two equivalent ways:
+    //     sigmoid(x) = 1 / (1 + exp(-x)) = exp(x) / (exp(x) + 1)
+    // Each version can be used in order to avoid numerical overflow in extreme
+    // cases (`x --> +inf` and `x --> -inf` respectively).
+    const auto x(base(a0));
+    if (x >= 0.0)
+      return 1.0 / (1.0 + std::exp(-x));
+
+    return std::exp(x) / (1.0 + std::exp(x));
   }
 };
 

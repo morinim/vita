@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -65,6 +65,7 @@ symbol_factory::symbol_factory()
   register_symbol<real::mod>    ("FMOD", 1);
   register_symbol<real::mul>    ("FMUL", 1);
   register_symbol<real::integer>("REAL", 1);
+  register_symbol<real::sigmoid>("FSIGMOID", 1);
   register_symbol<real::sin>    ("FSIN", 1);
   register_symbol<real::sqrt>   ("FSQRT", 1);
   register_symbol<real::sub>    ("FSUB", 1);

@@ -52,6 +52,7 @@ struct fixture3
                f_ln(prob.sset.insert(factory.make("FLN"))),
                f_max(prob.sset.insert(factory.make("FMAX"))),
                f_mul(prob.sset.insert(factory.make("FMUL"))),
+               f_sigmoid(prob.sset.insert(factory.make("FSIGMOID"))),
                f_sin(prob.sset.insert(factory.make("FSIN"))),
                f_sqrt(prob.sset.insert(factory.make("FSQRT"))),
                f_sub(prob.sset.insert(factory.make("FSUB")))
@@ -86,6 +87,7 @@ struct fixture3
   vita::symbol *f_ln;
   vita::symbol *f_max;
   vita::symbol *f_mul;
+  vita::symbol *f_sigmoid;
   vita::symbol *f_sin;
   vita::symbol *f_sqrt;
   vita::symbol *f_sub;
