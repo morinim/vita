@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,7 +18,7 @@ int main()
   vita::src_problem titanic("titanic_train.csv",  // training set
                             vita::src_problem::default_symbols);
 
-  vita::src_search<> s(titanic);
+  vita::src_search s(titanic);
   const auto summary(s.run());                    // go searching
   std::cout << summary.best.solution << '\n';     // print search result
 }

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,8 +22,8 @@ int main()
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
-  src_search<> s(titanic, metric_flags::accuracy);  // starting search...
-  const auto summary(s.run());                      // ...and getting a summary
+  src_search s(titanic, metric_flags::accuracy);  // starting search...
+  const auto summary(s.run());                    // ...and getting a summary
 
   std::cout << summary.best.solution << '\n'
             << summary.best.score.accuracy << '\n';

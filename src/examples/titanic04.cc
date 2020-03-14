@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2019-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@ int main()
 
   src_problem titanic("titanic_train.csv", src_problem::default_symbols);
 
-  src_search<> s(titanic, metric_flags::accuracy);
+  src_search s(titanic, metric_flags::accuracy);
   const auto summary(s.run());
 
   // Now, hopefully, we have a good classifier (`summary.best.solution`).
