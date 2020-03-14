@@ -27,17 +27,20 @@ Although the core development team is still anchored at EOS, Vita is now open so
 ## Symbolic regression example ##
 
 ```C++
-// TARGET FUNCTION
-const auto function = [](double x) { return x + std::sin(x); };
-
 // DATA SAMPLE
-const auto sample = [&function](double x) { return std::to_string(function(x))
-                                                   + ","
-                                                   + std::to_string(x)
-                                                   + "\n"; };
-std::istringstream training(
-  sample(-10) + sample(-8) + sample(-6) + sample(-4) + sample(-2)
-  + sample(0) + sample( 2) + sample( 4) + sample( 6) + sample( 8));
+// (the target function is `x + sin(x)`)
+std::istringstream training(R"(
+  -9.456,-10.0
+  -8.989, -8.0
+  -5.721, -6.0
+  -3.243, -4.0
+  -2.909, -2.0
+   0.000,  0.0
+   2.909,  2.0
+   3.243,  4.0
+   5.721,  6.0
+   8.989,  8.0
+)");
 
 // READING INPUT DATA
 vita::src_problem prob(training);
@@ -51,8 +54,8 @@ prob.insert<vita::real::div>();
 prob.insert<vita::real::mul>();
 
 // SEARCHING
-vita::src_search<> s(prob);
-const auto result(s.run());
+vita::src_search s(prob);
+auto result(s.run());
 ```
 
 It's pretty straightforward (further details in the [specific tutorial][symbolic_regression]).
