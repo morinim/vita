@@ -20,7 +20,7 @@ namespace vita
 /// This is the return type of the src_interpreter::run method. Internal
 /// calculations could be performed via different types but the final
 /// result is stored in a `number`.
-using number = double;
+using number = D_DOUBLE;
 
 ///
 /// \tparam T the type of individual used

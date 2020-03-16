@@ -123,7 +123,7 @@ double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   number err;
 
   if (const auto res = agent(t); has_value(res))
-    err = std::fabs(to<number>(res) - label_as<number>(t));
+    err = std::fabs(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t));
   else
     err = std::pow(100.0, ++(*illegals));
 
@@ -149,8 +149,8 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
   if (const auto res = agent(t); has_value(res))
   {
-    const auto approx(to<number>(res));
-    const auto target(label_as<number>(t));
+    const auto approx(lexical_cast<D_DOUBLE>(res));
+    const auto target(label_as<D_DOUBLE>(t));
 
     const auto delta(std::fabs(target - approx));
 
@@ -193,7 +193,7 @@ double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
 
   if (const auto res = agent(t); has_value(res))
   {
-    err = to<number>(res) - label_as<number>(t);
+    err = lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t);
     err *= err;
   }
   else
@@ -219,7 +219,7 @@ double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   const auto res(agent(t));
 
   const bool err(!has_value(res) ||
-                 !issmall(to<number>(res) - label_as<number>(t)));
+                 !issmall(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t)));
 
   if (err)
     ++t.difficulty;

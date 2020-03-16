@@ -90,7 +90,7 @@ template<class T, bool S>
 value_t basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
                                        std::true_type) const
 {
-  number avg(0), count(0);
+  D_DOUBLE avg(0), count(0);
 
   // Calculate the running average.
   for (const auto &core : this->team_)
@@ -98,7 +98,7 @@ value_t basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
     const auto res(core.run(e.input));
 
     if (has_value(res))
-      avg += (to<number>(res) - avg) / ++count;
+      avg += (lexical_cast<D_DOUBLE>(res) - avg) / ++count;
   }
 
   if (count > 0.0)
@@ -126,7 +126,7 @@ classification_result basic_reg_lambda_f<T, S>::tag(
 template<class T, bool S>
 std::string basic_reg_lambda_f<T, S>::name(const value_t &a) const
 {
-  return std::to_string(to<number>(a));
+  return lexical_cast<std::string>(a);
 }
 
 ///
@@ -351,7 +351,7 @@ std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
   if (!has_value(res))
     return last_slot;
 
-  const auto val(to<number>(res));
+  const auto val(lexical_cast<D_DOUBLE>(res));
   const auto where(discretization(val, last_slot));
 
   return (where >= ns) ? last_slot : where;
@@ -514,7 +514,7 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
   {
     const auto res(lambda_(example));
 
-    number val(has_value(res) ? to<number>(res) : 0.0);
+    number val(has_value(res) ? lexical_cast<D_DOUBLE>(res) : 0.0);
     const number cut(10000000.0);
     if (val > cut)
       val = cut;
@@ -538,7 +538,7 @@ classification_result basic_gaussian_lambda_f<T, S, N>::tag(
   const dataframe::example &example) const
 {
   const auto res(lambda_(example));
-  const number x(has_value(res) ? to<number>(res) : 0.0);
+  const number x(has_value(res) ? lexical_cast<D_DOUBLE>(res) : 0.0);
 
   number val_(0.0), sum_(0.0);
   class_t probable_class(0);
@@ -656,7 +656,7 @@ classification_result basic_binary_lambda_f<T, S, N>::tag(
   const dataframe::example &e) const
 {
   const auto res(lambda_(e));
-  const number val(has_value(res) ? to<number>(res) : 0.0);
+  const number val(has_value(res) ? lexical_cast<D_DOUBLE>(res) : 0.0);
 
   return {val > 0.0 ? 1u : 0u, std::fabs(val)};
 }

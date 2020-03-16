@@ -12,6 +12,8 @@
 
 #include "utility/utility.h"
 
+#include "kernel/value.h"
+
 namespace vita
 {
 ///
@@ -138,52 +140,52 @@ std::string merge_path(const std::string &p1, const std::string &p2, char sep)
 }
 
 ///
-/// Converts an `value_t` to `double`.
+/// Converts a `value_t` to `double`.
 ///
 /// \param[in] v value that should be converted to `double`
-/// \return      the result of the conversion of `v`
+/// \return      the result of the conversion of `v`. If the conversion cannot
+///              be performed returns `0.0`
 ///
 /// This function is useful for:
 /// * debugging purpose;
 /// * symbolic regression and classification task (the value returned by
 ///   the interpeter will be used in a "numeric way").
 ///
-/// \remark If the conversion cannot be performed the function returns `0.0`.
-///
 template<>
-double to<double>(const vita::value_t &v)
+double lexical_cast<double>(const vita::value_t &v)
 {
-  // The pointer form of any_cast uses the nullability of pointers (will
-  // return a null pointer rather than throw if the cast fails).
-  // The alternatives are a.type() == typeid(double)... or try/catch and
-  // both seems inferior.
-  if (auto *p = std::get_if<D_DOUBLE>(&v))
-    return *p;
+  using namespace vita;
 
-  if (auto *p = std::get_if<D_INT>(&v))
-    return static_cast<D_DOUBLE>(*p);
-
-  return 0.0;
+  switch (v.index())
+  {
+  case d_double:  return std::get<D_DOUBLE>(v);
+  case d_int:     return std::get<D_INT>(v);
+  case d_string:  return lexical_cast<double>(std::get<D_STRING>(v));
+  default:        return 0.0;
+  }
 }
 
 ///
-/// Converts an `value_t` to `std::string`.
+/// Converts a `value_t` to `std::string`.
 ///
 /// \param[in] v value that should be converted to `std::string`
-/// \return      the result of the conversion of `v`
+/// \return      the result of the conversion of `v`. If the conversion cannot
+///              be performed returns an empty string
 ///
 /// This function is useful for debugging purpose.
 ///
 template<>
-std::string to<std::string>(const vita::value_t &v)
+std::string lexical_cast<std::string>(const vita::value_t &v)
 {
-  if (auto *p = std::get_if<D_DOUBLE>(&v))
-    return std::to_string(*p);
+  using namespace vita;
 
-  if (auto *p = std::get_if<D_INT>(&v))
-    return std::to_string(*p);
-
-  return std::get<D_STRING>(v);
+  switch (v.index())
+  {
+  case d_double:  return std::to_string(std::get<D_DOUBLE>(v));
+  case d_int:     return std::to_string(   std::get<D_INT>(v));
+  case d_string:  return std::get<D_STRING>(v);
+  default:        return {};
+  }
 }
 
 }  // namespace vita

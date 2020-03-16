@@ -260,11 +260,13 @@ TEST_CASE_FIXTURE(fixture3, "Output")
 
 TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
 {
+  using namespace vita;
+
   const unsigned n(5000);
 
   for (unsigned k(0); k < n; ++k)
   {
-    const vita::i_mep i(prob), i1(i.cse());
+    const i_mep i(prob), i1(i.cse());
 
     CHECK(i1.debug());
 
@@ -275,15 +277,15 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
     i1.list(std::cout, false);
     */
 
-    const auto v(vita::interpreter<vita::i_mep>(&i).run());
-    const auto v1(vita::interpreter<vita::i_mep>(&i1).run());
+    const auto v(interpreter<i_mep>(&i).run());
+    const auto v1(interpreter<i_mep>(&i1).run());
 
-    CHECK(vita::has_value(v) == vita::has_value(v1));
+    CHECK(has_value(v) == has_value(v1));
 
-    if (vita::has_value(v))
+    if (has_value(v))
     {
-      const auto d(vita::to<double>(v));
-      const auto d1(vita::to<double>(v1));
+      const auto d(lexical_cast<D_DOUBLE>(v));
+      const auto d1(lexical_cast<D_DOUBLE>(v1));
 
       CHECK(d == doctest::Approx(d1));
     }

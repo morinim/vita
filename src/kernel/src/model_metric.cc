@@ -31,7 +31,8 @@ double accuracy_metric::operator()(const core_reg_lambda_f *l,
   for (const auto &example : d)
   {
     if (const auto res = (*l)(example);
-        has_value(res) && issmall(to<number>(res) - label_as<number>(example)))
+        has_value(res) && issmall(lexical_cast<D_DOUBLE>(res)
+                                  - label_as<D_DOUBLE>(example)))
       ++ok;
 
     ++total_nr;

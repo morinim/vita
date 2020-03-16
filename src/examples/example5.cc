@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
   const auto val(interpreter<i_mep>(&ind).run());
   if (has_value(val))
-    std::cout << "Output: " << to<std::string>(val) << '\n';
+    std::cout << "Output: " << lexical_cast<std::string>(val) << '\n';
   else
     std::cout << "Incorrect program.\n";
 }

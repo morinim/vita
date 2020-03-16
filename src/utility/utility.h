@@ -32,8 +32,6 @@ std::string replace(std::string, const std::string &, const std::string &);
 std::string replace_all(std::string, const std::string &, const std::string &);
 std::string trim(const std::string &);
 
-template<class T> T to(const value_t &);
-
 ///
 /// Mainly used to initialize an array with a specific value.
 ///
@@ -105,6 +103,7 @@ template<> inline double lexical_cast(const std::string &s)
 { return std::stod(s); }
 template<> inline std::string lexical_cast(const std::string &s)
 { return s; }
+template<class T> T lexical_cast(const value_t &);
 
 ///
 /// A RAII class to restore the state of a stream to its original state.
