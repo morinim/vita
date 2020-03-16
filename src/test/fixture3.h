@@ -27,7 +27,7 @@ struct fixture3
 
     bool input() const override { return true; }
 
-    std::any eval(vita::core_interpreter *) const override { return val; }
+    vita::value_t eval(vita::core_interpreter *) const override { return val; }
 
     double val;
   };
@@ -63,7 +63,7 @@ struct fixture3
   vita::problem           prob;
   vita::symbol_factory factory;
 
-  std::any ret;
+  vita::value_t ret;
 
   const std::vector<vita::index_t> null;
 

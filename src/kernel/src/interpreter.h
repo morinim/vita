@@ -36,9 +36,9 @@ public:
     : interpreter<T>(prg, ctx), example_(nullptr)
   {}
 
-  std::any run(const std::vector<std::any> &);
+  value_t run(const std::vector<value_t> &);
 
-  std::any fetch_var(unsigned);
+  value_t fetch_var(unsigned);
 
 private:
   // Tells the compiler we want both the run function from interpreter and
@@ -50,7 +50,7 @@ private:
   // different arguments).
   using interpreter<T>::run;
 
-  const std::vector<std::any> *example_;
+  const std::vector<value_t> *example_;
 };
 
 #include "kernel/src/interpreter.tcc"

@@ -35,7 +35,7 @@
 namespace vita::real
 {
 
-using base_t = double;
+using base_t = std::variant_alternative_t<d_double, value_t>;
 
 static_assert(std::numeric_limits<base_t>::is_iec559,
               "Vita requires IEC 559/IEEE 754 floating-point types");
@@ -46,7 +46,10 @@ static_assert(std::numeric_limits<base_t>::is_iec559,
 /// \param[in] v the value that must be casted to base type (`base_t`)
 /// \return      the content of `v`
 ///
-inline base_t base(const std::any &v) { return std::any_cast<base_t>(v); }
+inline base_t base(const value_t &v)
+{
+  return std::get<base_t>(v);
+}
 
 ///
 /// Ephemeral random constant.
@@ -78,7 +81,7 @@ public:
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(v); }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     return static_cast<base_t>(
              static_cast<interpreter<i_mep> *>(i)->fetch_param());
@@ -111,7 +114,7 @@ public:
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(static_cast<int>(v)); }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     return static_cast<base_t>(
              static_cast<interpreter<i_mep> *>(i)->fetch_param());
@@ -141,11 +144,10 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-
-    return a.has_value() ? std::fabs(base(a)) : a;
+    return has_value(a) ? std::fabs(base(a)) : a;
   }
 };
 
@@ -164,15 +166,15 @@ public:
     return "(%%1%%+%%2%%)";
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) + base(a1));
     if (!std::isfinite(ret))  return {};
@@ -206,15 +208,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const auto x(base(a0)), y(base(a1));
     const base_t ret(x / std::sqrt(1.0 + y * y));
@@ -243,10 +245,10 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (!a.has_value())  return a;
+    if (!has_value(a))  return a;
 
     return std::cos(base(a));
   }
@@ -266,15 +268,15 @@ public:
     return "(%%1%%/%%2%%)";
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) / base(a1));
     if (!std::isfinite(ret))  return {};
@@ -301,15 +303,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     return std::isgreater(base(a0), base(a1));
     // If one or both arguments of isgreater are NaN, the function returns
@@ -338,15 +340,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(std::floor(base(a0) / base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -379,18 +381,18 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const auto a2(i->fetch_arg(2));
-    if (!a2.has_value())  return a2;
+    if (!has_value(a2))  return a2;
 
     const auto v0(base(a0));
     const auto v1(base(a1));
@@ -432,15 +434,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     if (issmall(base(a0) - base(a1)))
       return i->fetch_arg(2);
@@ -473,15 +475,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const auto v0(base(a0)), v1(base(a1));
     if (std::isless(v0, v1))
@@ -522,12 +524,12 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     if (issmall(base(a0)))
       return i->fetch_arg(1);
@@ -556,12 +558,12 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (!a.has_value())  return a;
+    if (!has_value(a))  return a;
 
-    return static_cast<base_t>(std::any_cast<std::string>(a).length());
+    return static_cast<base_t>(std::get<std::string>(a).length());
   }
 };
 
@@ -589,10 +591,10 @@ public:
   /// \return      the natural logarithm of its argument or an empty value in
   ///              case of invalid argument / infinite result
   ///
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto ret(std::log(base(a0)));
     if (!std::isfinite(ret))  return {};
@@ -619,15 +621,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     return std::isless(base(a0), base(a1));
     // If one or both arguments of `isless` are NaN, the function returns
@@ -654,15 +656,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(std::fmax(base(a0), base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -691,15 +693,15 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(std::fmod(base(a0), base(a1)));
     if (!std::isfinite(ret))  return {};
@@ -722,15 +724,15 @@ public:
     return "(%%1%%*%%2%%)";
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) * base(a1));
     if (!std::isfinite(ret))  return {};
@@ -758,10 +760,10 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (!a.has_value())  return a;
+    if (!has_value(a))  return a;
 
     return std::sin(base(a));
   }
@@ -786,10 +788,10 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
-    if (!a.has_value())  return a;
+    if (!has_value(a))  return a;
 
     const auto v(base(a));
     if (std::isless(v, 0.0))
@@ -813,15 +815,15 @@ public:
     return "(%%1%%-%%2%%)";
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     const auto a1(i->fetch_arg(1));
-    if (!a1.has_value())  return a1;
+    if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) - base(a1));
     if (!std::isfinite(ret))  return {};
@@ -851,12 +853,12 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
 
     const auto a0(i->fetch_arg(0));
-    if (!a0.has_value())  return a0;
+    if (!has_value(a0))  return a0;
 
     // The sigmoid function can be expressed in one of two equivalent ways:
     //     sigmoid(x) = 1 / (1 + exp(-x)) = exp(x) / (exp(x) + 1)

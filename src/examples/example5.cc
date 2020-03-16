@@ -8,6 +8,9 @@
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
+ *
+ *  \example example5.cc
+ *  Output value calculation for an individual.
  */
 
 #include <iostream>
@@ -42,8 +45,8 @@ int main(int argc, char *argv[])
 
   std::cout << out::dump << ind << '\n';
 
-  const std::any val(interpreter<i_mep>(&ind).run());
-  if (val.has_value())
+  const auto val(interpreter<i_mep>(&ind).run());
+  if (has_value(val))
     std::cout << "Output: " << to<std::string>(val) << '\n';
   else
     std::cout << "Incorrect program.\n";

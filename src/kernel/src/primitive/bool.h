@@ -28,7 +28,7 @@ public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *) const final { return false; }
+  value_t eval(core_interpreter *) const final { return false; }
 
   std::string display(terminal::param_t, format f) const final
   {
@@ -47,7 +47,7 @@ public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *) const final { return true; }
+  value_t eval(core_interpreter *) const final { return true; }
 
   std::string display(terminal::param_t, format f) const final
   {
@@ -68,11 +68,10 @@ public:
 
   bool associative() const final { return true; }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return std::any_cast<bool>(i.fetch_arg(0))
-           && std::any_cast<bool>(i.fetch_arg(1));
+    return std::get<int>(i.fetch_arg(0)) && std::get<int>(i.fetch_arg(1));
   }
 
   std::string display(format f) const final
@@ -91,10 +90,10 @@ public:
   explicit l_not(const cvect &c) : function("NOT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return !std::any_cast<bool>(i.fetch_arg(0));
+    return !std::get<int>(i.fetch_arg(0));
   }
 
   std::string display(format f) const final
@@ -115,11 +114,10 @@ public:
 
   bool associative() const final { return true; }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return std::any_cast<bool>(i->fetch_arg(0))
-           || std::any_cast<bool>(i->fetch_arg(1));
+    return std::get<int>(i->fetch_arg(0)) || std::get<int>(i->fetch_arg(1));
   }
 
   std::string display(format f) const final

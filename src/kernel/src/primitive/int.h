@@ -33,14 +33,18 @@
 /// integers do no result in signed overflow.
 namespace vita::integer
 {
-using base_t = int;
+
+using base_t = std::variant_alternative_t<d_int, value_t>;
 
 ///
 /// Just a simple shortcut.
 ///
 /// \param[in] v the value that must be casted to base type (`base_t`)
 ///
-inline base_t cast(const std::any &v) { return std::any_cast<base_t>(v); }
+inline base_t cast(const value_t &v)
+{
+  return std::get<base_t>(v);
+}
 
 ///
 /// Integer ephemeral random constant.
@@ -60,12 +64,12 @@ public:
   bool parametric() const final { return true; }
 
   terminal::param_t init() const final
-  { return random::between<int>(min, upp); }
+  { return random::between(min, upp); }
 
   std::string display(terminal::param_t v, format) const final
   { return std::to_string(v); }
 
-  std::any eval(core_interpreter *i) const final
+  value_t eval(core_interpreter *i) const final
   {
     return static_cast<base_t>(
              static_cast<interpreter<i_mep> *>(i)->fetch_param());
@@ -86,7 +90,7 @@ public:
 
   bool associative() const final { return true; }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -108,7 +112,7 @@ public:
   explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -129,7 +133,7 @@ public:
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -154,7 +158,7 @@ public:
     : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -178,7 +182,7 @@ public:
   explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -202,7 +206,7 @@ public:
   explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -224,7 +228,7 @@ public:
 
   bool associative() const final { return true; }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     static_assert(sizeof(long long) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
@@ -284,7 +288,7 @@ public:
   explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
@@ -306,7 +310,7 @@ public:
   explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));

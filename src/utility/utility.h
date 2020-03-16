@@ -14,13 +14,13 @@
 #define      VITA_UTILITY_H
 
 #include <algorithm>
-#include <any>
 #include <cmath>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 
 #include "kernel/common.h"
+#include "kernel/value.h"
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -30,8 +30,9 @@ bool iequals(const std::string &, const std::string &);
 std::string merge_path(const std::string &, const std::string &, char = '/');
 std::string replace(std::string, const std::string &, const std::string &);
 std::string replace_all(std::string, const std::string &, const std::string &);
-template<class T> T to(const std::any &);
 std::string trim(const std::string &);
+
+template<class T> T to(const value_t &);
 
 ///
 /// Mainly used to initialize an array with a specific value.

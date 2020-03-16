@@ -30,9 +30,8 @@ double accuracy_metric::operator()(const core_reg_lambda_f *l,
 
   for (const auto &example : d)
   {
-    const std::any res((*l)(example));
-    if (res.has_value() &&
-        issmall(to<number>(res) - label_as<number>(example)))
+    if (const auto res = (*l)(example);
+        has_value(res) && issmall(to<number>(res) - label_as<number>(example)))
       ++ok;
 
     ++total_nr;

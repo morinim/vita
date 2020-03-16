@@ -138,59 +138,52 @@ std::string merge_path(const std::string &p1, const std::string &p2, char sep)
 }
 
 ///
-/// Converts an `any` to `double`.
+/// Converts an `value_t` to `double`.
 ///
-/// \param[in] a value that should be converted to `double`
-/// \return      the result of the conversion of `a`
+/// \param[in] v value that should be converted to `double`
+/// \return      the result of the conversion of `v`
 ///
 /// This function is useful for:
-/// * debugging purpose (otherwise comparison of `any` values is complex);
+/// * debugging purpose;
 /// * symbolic regression and classification task (the value returned by
 ///   the interpeter will be used in a "numeric way").
 ///
 /// \remark If the conversion cannot be performed the function returns `0.0`.
 ///
 template<>
-double to<double>(const std::any &a)
+double to<double>(const vita::value_t &v)
 {
   // The pointer form of any_cast uses the nullability of pointers (will
   // return a null pointer rather than throw if the cast fails).
   // The alternatives are a.type() == typeid(double)... or try/catch and
   // both seems inferior.
-  if (auto *p = std::any_cast<double>(&a))
+  if (auto *p = std::get_if<double>(&v))
     return *p;
 
-  if (auto *p = std::any_cast<int>(&a))
-    return static_cast<double>(*p);
-
-  if (auto *p = std::any_cast<bool>(&a))
+  if (auto *p = std::get_if<int>(&v))
     return static_cast<double>(*p);
 
   return 0.0;
 }
 
 ///
-/// Converts an `any` to `std::string`.
+/// Converts an `value_t` to `std::string`.
 ///
-/// \param[in] a value that should be converted to `std::string`
-/// \return      the result of the conversion of `a`
+/// \param[in] v value that should be converted to `std::string`
+/// \return      the result of the conversion of `v`
 ///
-/// This function is useful for debugging purpose (otherwise comparison /
-/// printing of `any` values is complex).
+/// This function is useful for debugging purpose.
 ///
 template<>
-std::string to<std::string>(const std::any &a)
+std::string to<std::string>(const vita::value_t &v)
 {
-  if (auto *p = std::any_cast<double>(&a))
+  if (auto *p = std::get_if<double>(&v))
     return std::to_string(*p);
 
-  if (auto *p = std::any_cast<int>(&a))
+  if (auto *p = std::get_if<int>(&v))
     return std::to_string(*p);
 
-  if (auto *p = std::any_cast<bool>(&a))
-    return std::to_string(*p);
-
-  return std::any_cast<std::string>(a);
+  return std::get<std::string>(v);
 }
 
 }  // namespace vita

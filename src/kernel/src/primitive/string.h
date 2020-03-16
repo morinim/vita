@@ -47,20 +47,17 @@ public:
     }
   }
 
-  std::any eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *ci) const final
   {
     auto *i(static_cast<interpreter<i_mep> *>(ci));
 
-    const std::any v0(i->fetch_arg(0));
-    if (!v0.has_value())  return v0;
+    const auto v0(i->fetch_arg(0));
+    if (!has_value(v0))  return v0;
 
-    const std::any v1(i->fetch_arg(1));
-    if (!v1.has_value())  return v1;
+    const auto v1(i->fetch_arg(1));
+    if (!has_value(v1))  return v1;
 
-    if (std::any_cast<std::string>(v0) == std::any_cast<std::string>(v1))
-      return i->fetch_arg(2);
-    else
-      return i->fetch_arg(3);
+    return v0 == v1 ? i->fetch_arg(2) : i->fetch_arg(3);
   }
 };
 

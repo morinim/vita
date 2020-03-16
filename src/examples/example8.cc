@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
       i_mep blk(base.get_block(l));
 
       std::cout << "\nBLOCK at locus " << l << '\n' << blk;
-      const std::any val(interpreter<i_mep>(&blk).run());
-      if (val.has_value())
+      const auto val(interpreter<i_mep>(&blk).run());
+      if (has_value(val))
         std::cout << "Output: " << to<std::string>(val);
       else
         std::cout << "Empty output.";
@@ -85,16 +85,16 @@ int main(int argc, char *argv[])
 
         i_mep blk3(blk.replace({{f, positions}}));
         std::cout << '\n' << blk3;
-        const std::any val3(interpreter<i_mep>(&blk3).run());
-        if (val3.has_value())
+        const auto val3(interpreter<i_mep>(&blk3).run());
+        if (has_value(val3))
           std::cout << "Output: " << to<std::string>(val3);
         else
           std::cout << "Empty output.";
         std::cout << "\n\n";
 
-        if (val.has_value() != val3.has_value() ||
-            (val.has_value() && val3.has_value() &&
-             to<std::string>(val) != to<std::string>(val3)))
+        if (has_value(val) != has_value(val3)
+            || (has_value(val) && has_value(val3)
+                && to<std::string>(val) != to<std::string>(val3)))
         {
           std::cerr << "ADF EVAL ERROR.\n";
           return EXIT_FAILURE;

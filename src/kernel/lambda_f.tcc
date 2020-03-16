@@ -68,7 +68,7 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(std::istream &in,
 /// \return      the output value associated with `e`
 ///
 template<class T, bool S>
-std::any basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
+value_t basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
 {
   // We use tag dispatching by instance (i.e. to delegate to an implementation
   // function that receives standard arguments plus a dummy argument based on a
@@ -80,15 +80,15 @@ std::any basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
 }
 
 template<class T, bool S>
-std::any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
-                                        std::false_type) const
+value_t basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
+                                       std::false_type) const
 {
   return this->run(e.input);
 }
 
 template<class T, bool S>
-std::any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
-                                        std::true_type) const
+value_t basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
+                                       std::true_type) const
 {
   number avg(0), count(0);
 
@@ -97,11 +97,14 @@ std::any basic_reg_lambda_f<T, S>::eval(const dataframe::example &e,
   {
     const auto res(core.run(e.input));
 
-    if (res.has_value())
+    if (has_value(res))
       avg += (to<number>(res) - avg) / ++count;
   }
 
-  return count > 0.0 ? avg : std::any();
+  if (count > 0.0)
+    return avg;
+
+  return {};
 }
 
 ///
@@ -121,7 +124,7 @@ classification_result basic_reg_lambda_f<T, S>::tag(
 /// \return      the string version of `a`
 ///
 template<class T, bool S>
-std::string basic_reg_lambda_f<T, S>::name(const std::any &a) const
+std::string basic_reg_lambda_f<T, S>::name(const value_t &a) const
 {
   return std::to_string(to<number>(a));
 }
@@ -172,11 +175,10 @@ basic_class_lambda_f<N>::basic_class_lambda_f(const dataframe &d)
 
 ///
 /// \param[in] e example to be classified
-/// \return      the label of the class that includes `e` (wrapped inside a
-///              `any`)
+/// \return      the label of the class that includes `e`
 ///
 template<bool N>
-std::any basic_class_lambda_f<N>::operator()(const dataframe::example &e) const
+value_t basic_class_lambda_f<N>::operator()(const dataframe::example &e) const
 {
   return this->tag(e).label;
 }
@@ -200,7 +202,7 @@ double basic_class_lambda_f< N>::measure(const model_metric &m,
 /// \return      the name of class `a`
 ///
 template<bool N>
-std::string basic_class_lambda_f<N>::name(const std::any &a) const
+std::string basic_class_lambda_f<N>::name(const value_t &a) const
 {
   return detail::class_names<N>::string(a);
 }
@@ -342,11 +344,11 @@ template<class T, bool S, bool N>
 std::size_t basic_dyn_slot_lambda_f<T,S,N>::slot(
   const dataframe::example &e) const
 {
-  const std::any res(lambda_(e));
+  const auto res(lambda_(e));
 
   const auto ns(slot_matrix_.rows());
   const auto last_slot(ns - 1);
-  if (!res.has_value())
+  if (!has_value(res))
     return last_slot;
 
   const auto val(to<number>(res));
@@ -510,9 +512,9 @@ void basic_gaussian_lambda_f<T, S, N>::fill_vector(dataframe &d)
   // of the program outputs for those training examples for that class.
   for (const auto &example : d)
   {
-    const std::any res(lambda_(example));
+    const auto res(lambda_(example));
 
-    number val(res.has_value() ? to<number>(res) : 0.0);
+    number val(has_value(res) ? to<number>(res) : 0.0);
     const number cut(10000000.0);
     if (val > cut)
       val = cut;
@@ -535,8 +537,8 @@ template<class T, bool S, bool N>
 classification_result basic_gaussian_lambda_f<T, S, N>::tag(
   const dataframe::example &example) const
 {
-  const std::any res(lambda_(example));
-  const number x(res.has_value() ? to<number>(res) : 0.0);
+  const auto res(lambda_(example));
+  const number x(has_value(res) ? to<number>(res) : 0.0);
 
   number val_(0.0), sum_(0.0);
   class_t probable_class(0);
@@ -653,10 +655,10 @@ template<class T, bool S, bool N>
 classification_result basic_binary_lambda_f<T, S, N>::tag(
   const dataframe::example &e) const
 {
-  const std::any res(lambda_(e));
-  const number val(res.has_value() ? to<number>(res) : 0.0);
+  const auto res(lambda_(e));
+  const number val(has_value(res) ? to<number>(res) : 0.0);
 
-  return {val > 0.0 ? 1u : 0u, std::fabs(val)};
+  return {val > 0.0 ? 1 : 0, std::fabs(val)};
 }
 
 ///

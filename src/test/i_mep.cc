@@ -278,9 +278,9 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
     const auto v(vita::interpreter<vita::i_mep>(&i).run());
     const auto v1(vita::interpreter<vita::i_mep>(&i1).run());
 
-    CHECK(v.has_value() == v1.has_value());
+    CHECK(vita::has_value(v) == vita::has_value(v1));
 
-    if (v.has_value())
+    if (vita::has_value(v))
     {
       const auto d(vita::to<double>(v));
       const auto d1(vita::to<double>(v1));

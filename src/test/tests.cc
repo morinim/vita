@@ -10,7 +10,6 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "test/any.cc"
 #include "test/cache.cc"
 #include "test/dataframe.cc"
 #include "test/de.cc"

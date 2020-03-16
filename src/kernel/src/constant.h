@@ -39,12 +39,12 @@ public:
   std::string display(terminal::param_t, format) const final
   { return std::to_string(static_cast<T>(val_)); }
 
-  /// \return the value of the constant (as a `any`)
+  /// \return the value of the constant
   ///
   /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
-  std::any eval(core_interpreter *) const override { return val_; }
+  value_t eval(core_interpreter *) const override { return val_; }
 
 private:
   T val_;
@@ -65,13 +65,13 @@ public:
   }
 
   ///
-  /// \return the value of the constant (as a `any`)
+  /// \return the value of the constant
   ///
   /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
-  std::any eval(core_interpreter *) const override { return val_; }
+  value_t eval(core_interpreter *) const override { return val_; }
 
 private:
   std::string val_;

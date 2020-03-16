@@ -29,7 +29,7 @@ namespace vita
 /// not be prevented, as they are dependent on the implementation of
 /// floating-point numbers, as well as the function being applied).
 /// Instead we detect them and take alternative action (usually returning
-/// an empty `any()`).
+/// an empty value).
 namespace ga
 {
 using base_t = terminal::param_t;
@@ -40,7 +40,7 @@ template<class T>
 class number : public terminal
 {
 public:
-  using value_t = T;
+  using value_type = T;
 
   /// A number (terminal symbol) within a range used for genetics algorithms.
   ///
@@ -75,7 +75,7 @@ public:
 private:
   /// \warning
   /// i_ga / i_de directly access the genome vector.
-  std::any eval(core_interpreter *) const override { return {}; }
+  value_t eval(core_interpreter *) const override { return {}; }
 
   const range_t<T> range_;
 };

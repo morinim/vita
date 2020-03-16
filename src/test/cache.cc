@@ -110,9 +110,8 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
   for (unsigned i(0); i < n; ++i)
   {
     vita::i_mep i1(prob);
-    const std::any val(i_interp(&i1).run());
-    vita::fitness_t f{val.has_value()
-                      ? std::any_cast<vita::fitness_t::value_type>(val) : 0.0};
+    const auto val(i_interp(&i1).run());
+    vita::fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -123,10 +122,8 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
     const vita::fitness_t f(cache.find(vi[i].signature()));
     if (f.size())
     {
-      const std::any val(i_interp(&vi[i]).run());
-      vita::fitness_t f1{val.has_value()
-                         ? std::any_cast<vita::fitness_t::value_type>(val)
-                         : 0.0};
+      const auto val(i_interp(&vi[i]).run());
+      vita::fitness_t f1{vita::has_value(val) ? std::get<double>(val) : 0.0};
 
       CHECK(f == f1);
     }
@@ -148,9 +145,8 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
   {
     i_mep i1(prob);
-    const std::any val(i_interp(&i1).run());
-    fitness_t f{val.has_value() ? std::any_cast<fitness_t::value_type>(val)
-                                : 0.0};
+    const auto val(i_interp(&i1).run());
+    fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
 
     cache1.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -170,9 +166,8 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
     if (present[i])
     {
-      const std::any val(i_interp(&vi[i]).run());
-      fitness_t f{val.has_value()
-                  ? std::any_cast<fitness_t::value_type>(val) : 0.0};
+      const auto val(i_interp(&vi[i]).run());
+      fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
       CHECK(f1.size());

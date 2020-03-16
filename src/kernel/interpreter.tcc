@@ -38,7 +38,7 @@ interpreter<T>::interpreter(const T *ind, interpreter *ctx)
 /// \return       the output value of `this` individual
 ///
 template<class T>
-std::any interpreter<T>::run_locus(const locus &ip)
+value_t interpreter<T>::run_locus(const locus &ip)
 {
   for (auto &e : cache_)
     e.valid = false;
@@ -53,7 +53,7 @@ std::any interpreter<T>::run_locus(const locus &ip)
 /// \return the output value of `this` individual
 ///
 template<class T>
-inline std::any interpreter<T>::run_nvi()
+inline value_t interpreter<T>::run_nvi()
 {
   return run_locus(prg_->best_);
 }
@@ -86,7 +86,7 @@ terminal::param_t interpreter<T>::fetch_param()
 /// - <http://wikipedia.org/wiki/Memoization>
 ///
 template<class T>
-std::any interpreter<T>::fetch_arg(unsigned i)
+value_t interpreter<T>::fetch_arg(unsigned i)
 {
   const gene &g((*prg_)[ip_]);
 
@@ -129,7 +129,7 @@ std::any interpreter<T>::fetch_arg(unsigned i)
 /// \return      the value of the i-th argument of the current ADF function
 ///
 template<class T>
-std::any interpreter<T>::fetch_adf_arg(unsigned i)
+value_t interpreter<T>::fetch_adf_arg(unsigned i)
 {
 #if !defined(NDEBUG)
   assert(context_);

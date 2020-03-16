@@ -35,10 +35,10 @@ public:
   std::string display(terminal::param_t, format) const final
   { return name(); }
 
-  /// \return the value of the variable (as a `any`)
+  /// \return the value of the variable
   ///
   /// \note Requires a src_interpreter to work.
-  std::any eval(core_interpreter *i) const override
+  value_t eval(core_interpreter *i) const override
   {
     return static_cast<src_interpreter<i_mep> *>(i)->fetch_var(var_);
   }

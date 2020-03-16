@@ -80,7 +80,7 @@ TEST_CASE("Probabilities")
   CHECK(!!p);
 
   // Output value changed to be used as unique key for example identification.
-  std::size_t i(0);
+  int i(0);
   for (auto &e : p.data())
     e.output = i++;
 
@@ -102,7 +102,7 @@ TEST_CASE("Probabilities")
     v.init(0);
 
     for (const auto &e : p.data(dataset_t::validation))
-      ++count[std::any_cast<std::size_t>(e.output)];
+      ++count[std::get<int>(e.output)];
   }
 
   const auto expected(extractions * *p.env.validation_percentage / 100);

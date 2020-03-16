@@ -43,7 +43,7 @@ bool adf::auto_defined() const
 /// \note
 /// Adf functions need input parameters from a context (contrary to adt::eval).
 ///
-std::any adf::eval(core_interpreter *i) const
+value_t adf::eval(core_interpreter *i) const
 {
   Expects(typeid(*i) == typeid(interpreter<i_mep>));
 
@@ -110,7 +110,7 @@ bool adt::auto_defined() const
 /// Adt hasn't input parameters so the context is ignored (contrary to
 /// adf::eval).
 ///
-std::any adt::eval(core_interpreter *) const
+value_t adt::eval(core_interpreter *) const
 {
   return interpreter<i_mep>(&code()).run();
 }

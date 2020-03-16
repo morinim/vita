@@ -25,7 +25,7 @@
 namespace vita
 {
 /// The type used as class id in classification tasks.
-using class_t = unsigned;
+using class_t = int;
 
 ///
 /// A 2-dimensional labeled data structure with columns of potentially
@@ -96,7 +96,7 @@ public:
   std::size_t size() const;
   bool empty() const;
 
-  unsigned classes() const;
+  class_t classes() const;
   unsigned columns() const;
   unsigned variables() const;
 
@@ -154,14 +154,14 @@ struct dataframe::example
 {
   /// The thing about which we want to make a prediction (aka instance). The
   /// elements of the vector are features.
-  std::vector<std::any> input = {};
+  std::vector<value_t> input = {};
   /// The answer for the prediction task either the answer produced by the
   /// machine learning system, or the right answer supplied in the training
   /// data.
-  std::any             output = {};
+  value_t             output = {};
 
-  std::uintmax_t difficulty   = 0;
-  unsigned              age   = 0;
+  std::uintmax_t difficulty  = 0;
+  unsigned              age  = 0;
 
   void clear() { *this = example(); }
 };
@@ -176,7 +176,8 @@ struct dataframe::example
 ///
 inline class_t label(const dataframe::example &e)
 {
-  return std::any_cast<class_t>(e.output);
+  Expects(std::holds_alternative<int>(e.output));
+  return std::get<int>(e.output);
 }
 
 ///
@@ -189,16 +190,15 @@ inline class_t label(const dataframe::example &e)
 template<class T>
 T label_as(const dataframe::example &e)
 {
-  if (auto *v = std::any_cast<double>(&e.output))
-    return static_cast<T>(*v);
+  const auto &v(e.output);
 
-  if (auto *v = std::any_cast<int>(&e.output))
-    return static_cast<T>(*v);
+  if (std::holds_alternative<double>(v))
+    return static_cast<T>(std::get<double>(v));
 
-  if (auto *v = std::any_cast<bool>(&e.output))
-    return static_cast<T>(*v);
+  if (std::holds_alternative<int>(v))
+    return static_cast<T>(std::get<int>(v));
 
-  return static_cast<T>(0.0);
+  return 0;
 }
 
 ///

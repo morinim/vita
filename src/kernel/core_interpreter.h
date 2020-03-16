@@ -13,10 +13,11 @@
 #if !defined(VITA_CORE_INTERPRETER_H)
 #define      VITA_CORE_INTERPRETER_H
 
-#include <any>
+#include "kernel/value.h"
 
 namespace vita
 {
+
 ///
 /// Minimum interface of an interpreter.
 ///
@@ -29,12 +30,12 @@ namespace vita
 class core_interpreter
 {
 public:
-  std::any run() { return run_nvi(); }
+  value_t run() { return run_nvi(); }
   double penalty() { return penalty_nvi(); }
   bool debug() const { return debug_nvi(); }
 
 private:
-  virtual std::any run_nvi() = 0;
+  virtual value_t run_nvi() = 0;
   virtual double penalty_nvi() = 0;
   virtual bool debug_nvi() const = 0;
 };

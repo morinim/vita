@@ -54,26 +54,26 @@ public:
   explicit interpreter(const T *, interpreter * = nullptr);
 
   terminal::param_t fetch_param();
-  std::any fetch_arg(unsigned);
-  std::any fetch_adf_arg(unsigned);
+  value_t fetch_arg(unsigned);
+  value_t fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
   const T &program() const { return *prg_; }
 
 private:
   // *** Private support methods ***
-  std::any run_locus(const locus &);
+  value_t run_locus(const locus &);
   double penalty_locus(const locus &);
 
   // Nonvirtual interface.
-  std::any run_nvi() override;
+  value_t run_nvi() override;
   double penalty_nvi() override;
   bool debug_nvi() const override;
 
   // *** Private data members ***
   const T *prg_;
 
-  struct elem_ {bool valid; std::any value;};
+  struct elem_ {bool valid; value_t value;};
   mutable matrix<elem_> cache_;
 
   // Instruction pointer.
@@ -85,8 +85,6 @@ private:
 
 #include "kernel/interpreter.tcc"
 
-/// \example example5.cc
-/// Output value calculation for an individual.
 }  // namespace vita
 
 #endif  // include guard

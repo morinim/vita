@@ -32,7 +32,7 @@ public:
 
   unsigned index() const;
 
-  std::any eval(core_interpreter *) const override;
+  value_t eval(core_interpreter *) const override;
 
   bool debug() const override;
 

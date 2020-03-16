@@ -13,12 +13,12 @@
 #if !defined(VITA_SYMBOL_H)
 #define      VITA_SYMBOL_H
 
-#include <any>
 #include <limits>
 #include <string>
 
 #include "kernel/vitafwd.h"
 #include "kernel/common.h"
+#include "kernel/core_interpreter.h"
 
 namespace vita
 {
@@ -35,7 +35,7 @@ using opcode_t = unsigned;
 class symbol
 {
 public:
-  /// Rendering format of the symbol.
+  /// Symbol rendering format.
   enum format {c_format, cpp_format, mql_format, python_format, sup_format};
 
   symbol(const std::string &, category_t);
@@ -55,7 +55,7 @@ public:
 
   /// Calculates the value of / performs the action associated with the symbol
   /// (it's implementation specific).
-  virtual std::any eval(core_interpreter *) const = 0;
+  virtual value_t eval(core_interpreter *) const = 0;
 
   double penalty(core_interpreter *) const;
 
