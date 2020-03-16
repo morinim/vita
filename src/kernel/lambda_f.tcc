@@ -180,7 +180,7 @@ basic_class_lambda_f<N>::basic_class_lambda_f(const dataframe &d)
 template<bool N>
 value_t basic_class_lambda_f<N>::operator()(const dataframe::example &e) const
 {
-  return this->tag(e).label;
+  return static_cast<D_INT>(this->tag(e).label);
 }
 
 ///
@@ -658,7 +658,7 @@ classification_result basic_binary_lambda_f<T, S, N>::tag(
   const auto res(lambda_(e));
   const number val(has_value(res) ? to<number>(res) : 0.0);
 
-  return {val > 0.0 ? 1 : 0, std::fabs(val)};
+  return {val > 0.0 ? 1u : 0u, std::fabs(val)};
 }
 
 ///

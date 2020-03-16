@@ -301,7 +301,7 @@ inline bool class_names<true>::save(std::ostream &o) const
 template<bool N>
 std::string class_names<N>::string(const value_t &a) const
 {
-  return std::to_string(std::get<class_t>(a));
+  return std::to_string(std::get<D_INT>(a));
 }
 
 ///
@@ -316,7 +316,7 @@ inline std::string class_names<true>::string(const value_t &a) const
   // template specializations. So we haven't to put template<> at the
   // beginning.
 
-  return names_[std::get<class_t>(a)];
+  return names_[std::get<D_INT>(a)];
 }
 
 }  // namespace vita::detail

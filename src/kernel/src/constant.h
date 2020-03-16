@@ -20,7 +20,7 @@ namespace vita
 {
 
 ///
-/// A constant value (`bool`, `int`, `double`, `string`).
+/// A constant value in a given domain.
 ///
 template<class T>
 class constant : public terminal
@@ -37,7 +37,7 @@ public:
   /// Arguments aren't used: the value of a constant is stored within the
   /// object.
   std::string display(terminal::param_t, format) const final
-  { return std::to_string(static_cast<T>(val_)); }
+  { return std::to_string(val_); }
 
   /// \return the value of the constant
   ///
@@ -55,13 +55,13 @@ class constant<std::string> : public terminal
 {
 public:
   explicit constant(const std::string &c, category_t t = 0)
-    : terminal("\"" + c + "\"", t), val_(c) {}
+    : terminal(quote_str(c), t), val_(c) {}
   explicit constant(const char c[], category_t t = 0)
     : constant(std::string(c), t) {}
 
   std::string display(param_t, format) const final
   {
-    return "\"" + val_ + "\"";
+    return quote_str(val_);
   }
 
   ///
@@ -74,6 +74,8 @@ public:
   value_t eval(core_interpreter *) const override { return val_; }
 
 private:
+  static std::string quote_str(const std::string &s) { return "\"" + s + "\"";}
+
   std::string val_;
 };
 

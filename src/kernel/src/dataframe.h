@@ -25,7 +25,7 @@
 namespace vita
 {
 /// The type used as class id in classification tasks.
-using class_t = int;
+using class_t = std::size_t;
 
 ///
 /// A 2-dimensional labeled data structure with columns of potentially
@@ -176,8 +176,8 @@ struct dataframe::example
 ///
 inline class_t label(const dataframe::example &e)
 {
-  Expects(std::holds_alternative<int>(e.output));
-  return std::get<int>(e.output);
+  Expects(std::holds_alternative<D_INT>(e.output));
+  return std::get<D_INT>(e.output);
 }
 
 ///
@@ -192,11 +192,11 @@ T label_as(const dataframe::example &e)
 {
   const auto &v(e.output);
 
-  if (std::holds_alternative<double>(v))
-    return static_cast<T>(std::get<double>(v));
+  if (std::holds_alternative<D_DOUBLE>(v))
+    return static_cast<T>(std::get<D_DOUBLE>(v));
 
-  if (std::holds_alternative<int>(v))
-    return static_cast<T>(std::get<int>(v));
+  if (std::holds_alternative<D_INT>(v))
+    return static_cast<T>(std::get<D_INT>(v));
 
   return 0;
 }

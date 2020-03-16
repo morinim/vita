@@ -34,7 +34,7 @@
 namespace vita::integer
 {
 
-using base_t = std::variant_alternative_t<d_int, value_t>;
+using base_t = D_INT;
 
 ///
 /// Just a simple shortcut.

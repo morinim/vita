@@ -71,7 +71,7 @@ public:
   value_t eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return std::get<int>(i.fetch_arg(0)) && std::get<int>(i.fetch_arg(1));
+    return std::get<D_INT>(i.fetch_arg(0)) && std::get<D_INT>(i.fetch_arg(1));
   }
 
   std::string display(format f) const final
@@ -93,7 +93,7 @@ public:
   value_t eval(core_interpreter *ci) const final
   {
     auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return !std::get<int>(i.fetch_arg(0));
+    return !std::get<D_INT>(i.fetch_arg(0));
   }
 
   std::string display(format f) const final
@@ -117,7 +117,7 @@ public:
   value_t eval(core_interpreter *ci) const final
   {
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    return std::get<int>(i->fetch_arg(0)) || std::get<int>(i->fetch_arg(1));
+    return std::get<D_INT>(i->fetch_arg(0)) || std::get<D_INT>(i->fetch_arg(1));
   }
 
   std::string display(format f) const final

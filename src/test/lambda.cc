@@ -281,7 +281,7 @@ void test_team(vita::src_problem &pr)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        CHECK(std::get<class_t>(out[j]) == tags[j].label);
+        CHECK(std::get<D_INT>(out[j]) == tags[j].label);
 
       std::string s_best(names[0]);
 

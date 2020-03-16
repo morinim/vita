@@ -31,20 +31,16 @@ namespace vita
 ///
 enum domain_t {d_void = 0, d_int, d_double, d_string};
 
+using D_VOID   = std::monostate;
+using D_INT    =            int;
+using D_DOUBLE =         double;
+using D_STRING =    std::string;
+
 ///
 /// A variant containing the data types used by the interpreter for internal
 /// calculations / output value and for storing examples.
 ///
-using value_t = std::variant<std::monostate, int, double, std::string>;
-
-static_assert(std::is_same_v<std::monostate,
-                             std::variant_alternative_t<d_void, value_t>>);
-static_assert(std::is_same_v<int,
-                             std::variant_alternative_t<d_int, value_t>>);
-static_assert(std::is_same_v<double,
-                             std::variant_alternative_t<d_double, value_t>>);
-static_assert(std::is_same_v<std::string,
-                             std::variant_alternative_t<d_string, value_t>>);
+using value_t = std::variant<D_VOID, D_INT, D_DOUBLE, D_STRING>;
 
 ///
 /// \param[in] v value to be checked

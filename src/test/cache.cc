@@ -100,18 +100,19 @@ TEST_CASE_FIXTURE(fixture2, "Insert/Find cycle")
 
 TEST_CASE_FIXTURE(fixture2, "Collision detection")
 {
-  using i_interp = vita::interpreter<vita::i_mep>;
-  vita::cache cache(14);
+  using namespace vita;
+  using i_interp = interpreter<i_mep>;
+  cache cache(14);
   prob.env.mep.code_length = 64;
 
   const unsigned n(1000);
 
-  std::vector<vita::i_mep> vi;
+  std::vector<i_mep> vi;
   for (unsigned i(0); i < n; ++i)
   {
-    vita::i_mep i1(prob);
+    i_mep i1(prob);
     const auto val(i_interp(&i1).run());
-    vita::fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
+    fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
     cache.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -119,11 +120,11 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
 
   for (unsigned i(0); i < n; ++i)
   {
-    const vita::fitness_t f(cache.find(vi[i].signature()));
+    const fitness_t f(cache.find(vi[i].signature()));
     if (f.size())
     {
       const auto val(i_interp(&vi[i]).run());
-      vita::fitness_t f1{vita::has_value(val) ? std::get<double>(val) : 0.0};
+      fitness_t f1{has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
       CHECK(f == f1);
     }
@@ -146,7 +147,7 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   {
     i_mep i1(prob);
     const auto val(i_interp(&i1).run());
-    fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
+    fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
     cache1.insert(i1.signature(), f);
     vi.push_back(i1);
@@ -167,7 +168,7 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
     if (present[i])
     {
       const auto val(i_interp(&vi[i]).run());
-      fitness_t f{vita::has_value(val) ? std::get<double>(val) : 0.0};
+      fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));
       CHECK(f1.size());

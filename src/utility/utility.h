@@ -94,6 +94,8 @@ template<class T, class Pred> void erase_if(T &container, Pred pred)
 ///
 /// Reduced version of `boost::lexical_cast`.
 ///
+/// \tparam T type we want to cast to
+///
 /// \param[in] s a string
 /// \return      the content of string `s` converted in an object of type `T`
 ///
@@ -306,8 +308,7 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
 template<class E>
 constexpr std::underlying_type_t<E> as_integer(E v)
 {
-  static_assert(std::is_enum<E>::value,
-                "as_integer needs a scoped enumeration");
+  static_assert(std::is_enum_v<E>);
   return static_cast<std::underlying_type_t<E>>(v);
 }
 
@@ -321,7 +322,7 @@ constexpr std::underlying_type_t<E> as_integer(E v)
 /// \return           the modified output stream
 ///
 template<class E>
-std::enable_if_t<std::is_enum<E>::value, std::ostream> &
+std::enable_if_t<std::is_enum_v<E>, std::ostream> &
 operator<<(std::ostream &s, E v)
 {
   return s << as_integer(v);

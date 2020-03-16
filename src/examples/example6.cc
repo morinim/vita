@@ -77,7 +77,7 @@ class my_evaluator : public vita::evaluator<vita::i_mep>
 
           if (vita::has_value(res))
           {
-            const auto dres(std::get<double>(res));
+            const auto dres(std::get<vita::D_DOUBLE>(res));
             assert(std::isfinite(dres));
             fit += std::exp(-std::fabs(dres - (x*x + y*y - z*z)));
           }

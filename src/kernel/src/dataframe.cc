@@ -302,7 +302,7 @@ dataframe::example dataframe::to_example(const record_t &v,
       // Strings could be used as label for classes, but integers
       // are simpler and faster to manage (arrays instead of maps).
       if (classification)
-        ret.output = encode(feature);
+        ret.output = static_cast<D_INT>(encode(feature));
       else
         ret.output = convert(feature, domain);
     }

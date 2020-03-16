@@ -35,7 +35,7 @@
 namespace vita::real
 {
 
-using base_t = std::variant_alternative_t<d_double, value_t>;
+using base_t = D_DOUBLE;
 
 static_assert(std::numeric_limits<base_t>::is_iec559,
               "Vita requires IEC 559/IEEE 754 floating-point types");
@@ -563,7 +563,7 @@ public:
     const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
     if (!has_value(a))  return a;
 
-    return static_cast<base_t>(std::get<std::string>(a).length());
+    return static_cast<base_t>(std::get<D_STRING>(a).length());
   }
 };
 

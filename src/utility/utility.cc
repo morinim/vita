@@ -157,11 +157,11 @@ double to<double>(const vita::value_t &v)
   // return a null pointer rather than throw if the cast fails).
   // The alternatives are a.type() == typeid(double)... or try/catch and
   // both seems inferior.
-  if (auto *p = std::get_if<double>(&v))
+  if (auto *p = std::get_if<D_DOUBLE>(&v))
     return *p;
 
-  if (auto *p = std::get_if<int>(&v))
-    return static_cast<double>(*p);
+  if (auto *p = std::get_if<D_INT>(&v))
+    return static_cast<D_DOUBLE>(*p);
 
   return 0.0;
 }
@@ -177,13 +177,13 @@ double to<double>(const vita::value_t &v)
 template<>
 std::string to<std::string>(const vita::value_t &v)
 {
-  if (auto *p = std::get_if<double>(&v))
+  if (auto *p = std::get_if<D_DOUBLE>(&v))
     return std::to_string(*p);
 
-  if (auto *p = std::get_if<int>(&v))
+  if (auto *p = std::get_if<D_INT>(&v))
     return std::to_string(*p);
 
-  return std::get<std::string>(v);
+  return std::get<D_STRING>(v);
 }
 
 }  // namespace vita
