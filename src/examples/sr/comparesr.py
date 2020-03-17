@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2017 EOS di Manlio Morini.
+#  Copyright (C) 2011-2020 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,10 +17,8 @@ from xml.etree.ElementTree import ElementTree
 
 max_fn_l = 30
 fn_format = "{:<" + str(max_fn_l) + "} "
-fmt_str_head = "\n" + fn_format + "{:>8} {:>9} {:>14} {:>14}"
-fmt_str_row = fn_format + "{:>+8.2%} {:>+9.2f} {:>14s} {:>14s}"
 
-verbose = False
+times = True
 
 
 def to_tuple(s):
@@ -42,7 +40,9 @@ def tuple_pp(t):
     return "(" + ", ".join([fs.format(x) for x in t]) + ")"
 
 
-def compare_file(files, scores):
+def compare_results(files, scores):
+    fmt_str = fn_format + "{:>+8.2%} {:>+9.2f} {:>14s} {:>14s}"
+
     avg_depth_found = dict()
     f_mean = dict()
     f_deviation = dict()
@@ -72,9 +72,9 @@ def compare_file(files, scores):
 
         fn = f if len(f) <= max_fn_l else "..." + f[-(max_fn_l - 3):]
 
-        print(fmt_str_row.format(fn, success_rate[f],
-                                 avg_depth_found[f], tuple_pp(f_mean[f]),
-                                 tuple_pp(f_deviation[f])))
+        print(fmt_str.format(fn, success_rate[f],
+                             avg_depth_found[f], tuple_pp(f_mean[f]),
+                             tuple_pp(f_deviation[f])))
 
     best = [files[0]]
     for f in files[1:]:
@@ -99,6 +99,33 @@ def compare_file(files, scores):
             scores[decode_opt(f, files)] += Decimal(".01")
 
 
+def compare_times(files, scores):
+    fmt_str = fn_format + "{:>9.2f}s"
+
+    elapsed_time = dict()
+
+    for f in files:
+        tree = ElementTree().parse(f)
+        summary = tree.find("summary")
+        if summary.find("elapsed_time") is None:
+            print("Missing elapsed time in file {0}.".format(f))
+        else:
+            elapsed_time[f] = float(summary.find("elapsed_time").text) / 1000.0
+
+        fn = f if len(f) <= max_fn_l else "..." + f[-(max_fn_l - 3):]
+
+        print(fmt_str.format(fn, elapsed_time[f]))
+
+        scores[os.path.dirname(f)] += Decimal(elapsed_time[f])
+
+
+def compare(files, scores):
+    if times:
+        compare_times(files, scores)
+    else:
+        compare_results(files, scores)
+
+
 def decode_opt(f, files):
     if (len(files) == 1 or
         os.path.dirname(files[0]) != os.path.dirname(files[1])):
@@ -106,48 +133,44 @@ def decode_opt(f, files):
     else:
         return f
 
+def print_header():
+    if times:
+        fmt_str_head = "\n" + fn_format + "{:>10}"
+        print(fmt_str_head.format("FILE", "TIME"))
+    else:
+        fmt_str_head = "\n" + fn_format + "{:>8} {:>9} {:>14} {:>14}"
+        print(fmt_str_head.format("FILE", "SUCCESS", "AVG.DEPTH",
+                                  "AVG.FIT.", "FIT.ST.DEV."))
+
 
 def start_comparison(args):
+    global times
+    times = args.times
+
     scores = defaultdict(Decimal)
 
-    print(fmt_str_head.format("FILE", "SUCCESS", "AVG.DEPTH",
-                              "AVG.FIT.", "FIT.ST.DEV."))
+    print_header()
 
-    # Case 1. Just list the results contained in a directory.
-    if len(args.filepath) == 1 and os.path.isdir(args.filepath[0]):
-        groups = dict()
+    if os.path.isdir(args.filepath[0]):
         dir_list = os.listdir(args.filepath[0])
         dir_list.sort()
-        for f in dir_list:
-            if os.path.splitext(f)[1] == ".sum":
-                dataset = os.path.splitext(f.split("_")[0])[0]
-                fn = os.path.join(args.filepath[0], os.path.basename(f))
-                if groups.get(dataset) is None:
-                    groups[dataset] = [fn]
-                else:
-                    groups[dataset].append(fn)
-        for k in groups.keys():
-            compare_file(groups[k], scores)
-            print("-" * 79)
-    # Case 2. Comparison between two directories.
-    elif os.path.isdir(args.filepath[0]) and os.path.isdir(args.filepath[1]):
-        dir_list = os.listdir(args.filepath[0])
-        for f in dir_list:
-            if os.path.splitext(f)[1] == ".sum":
-                fn1 = os.path.join(args.filepath[0], os.path.basename(f))
-                fn2 = os.path.join(args.filepath[1], os.path.basename(f))
-                if os.path.isfile(fn2):
-                    compare_file([fn1, fn2], scores)
-                    print("-" * 79)
-                else:
-                    print("Missing {0} file".format(fn2))
-    # Case 3. Comparison between two files.
-    elif os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
-        compare_file([args.filepath[0], args.filepath[1]], scores)
 
-    print("\nOverall testsets comparison")
-    for f in sorted(scores.keys()):
-        print(fn_format.format(f), " --> ", "{:>3.2f}".format(scores[f]))
+        for f in dir_list:
+            if os.path.splitext(f)[1] == ".sum":
+                fns = [os.path.join(args.filepath[0], os.path.basename(f))]
+
+                if len(args.filepath) > 1:  # comparing directories
+                    fns.append(os.path.join(args.filepath[1],
+                                            os.path.basename(f)))
+
+                compare(fns, scores)
+                print("-" * 79)
+
+        for f in sorted(scores.keys()):
+            print(fn_format.format(f), " --> ", "{:>3.2f}".format(scores[f]))
+
+    elif len(args.filepath) > 1 and os.path.isfile(args.filepath[0]) and os.path.isfile(args.filepath[1]):
+        compare([args.filepath[0], args.filepath[1]], scores)
 
 
 def get_cmd_line_options():
@@ -156,6 +179,8 @@ def get_cmd_line_options():
 
     parser.add_argument("-v", "--verbose", action = "store_true",
                         help = "Turn on verbose mode")
+    parser.add_argument("-t", "--times", action = "store_true",
+                        help = "Compare execution times")
     parser.add_argument("filepath", nargs = "*")
 
     return parser
@@ -165,8 +190,6 @@ def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
     args = parser.parse_args()
-
-    verbose = args.verbose
 
     start_comparison(args)
 
