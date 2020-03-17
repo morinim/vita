@@ -24,7 +24,7 @@
 /// \return       the output value of the src_interpreter
 ///
 template<class T>
-std::any src_interpreter<T>::run(const std::vector<std::any> &ex)
+value_t src_interpreter<T>::run(const std::vector<value_t> &ex)
 {
   example_ = &ex;
   return this->run();
@@ -37,7 +37,7 @@ std::any src_interpreter<T>::run(const std::vector<std::any> &ex)
 /// \return      the value of the `i`-th variable
 ///
 template<class T>
-std::any src_interpreter<T>::fetch_var(unsigned i)
+value_t src_interpreter<T>::fetch_var(unsigned i)
 {
   Expects(i < example_->size());
   return (*example_)[i];

@@ -35,9 +35,7 @@ domain_t find_domain(const std::string &s)
   }
   catch (std::invalid_argument &)  // not a number
   {
-    return (s == "{TRUE}" || s == "{FALSE}")
-           ? domain_t::d_bool
-           : domain_t::d_string;
+    return domain_t::d_string;
   }
 
   return s.find('.') == std::string::npos ? domain_t::d_int
@@ -135,8 +133,6 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
 
   switch (find_domain(name))
   {
-  case domain_t::d_bool:
-    return std::make_unique<constant<bool>>(name, c[0]);
   case domain_t::d_double:
     return std::make_unique<constant<double>>(name, c[0]);
   case domain_t::d_int:

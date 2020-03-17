@@ -120,12 +120,10 @@ template<class T>
 double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                dataframe::example &t, int *illegals)
 {
-  const std::any res(agent(t));
-
   number err;
 
-  if (res.has_value())
-    err = std::fabs(to<number>(res) - label_as<number>(t));
+  if (const auto res = agent(t); has_value(res))
+    err = std::fabs(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t));
   else
     err = std::pow(100.0, ++(*illegals));
 
@@ -147,14 +145,12 @@ template<class T>
 double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                 dataframe::example &t, int *)
 {
-  const std::any res(agent(t));
-
   number err;
 
-  if (res.has_value())
+  if (const auto res = agent(t); has_value(res))
   {
-    const auto approx(to<number>(res));
-    const auto target(label_as<number>(t));
+    const auto approx(lexical_cast<D_DOUBLE>(res));
+    const auto target(label_as<D_DOUBLE>(t));
 
     const auto delta(std::fabs(target - approx));
 
@@ -193,11 +189,11 @@ template<class T>
 double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                dataframe::example &t, int *illegals)
 {
-  const std::any res(agent(t));
   number err;
-  if (res.has_value())
+
+  if (const auto res = agent(t); has_value(res))
   {
-    err = to<number>(res) - label_as<number>(t);
+    err = lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t);
     err *= err;
   }
   else
@@ -220,10 +216,10 @@ template<class T>
 double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
                                  dataframe::example &t, int *)
 {
-  const std::any res(agent(t));
+  const auto res(agent(t));
 
-  const bool err(!res.has_value() ||
-                 !issmall(to<number>(res) - label_as<number>(t)));
+  const bool err(!has_value(res) ||
+                 !issmall(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t)));
 
   if (err)
     ++t.difficulty;
@@ -300,10 +296,7 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 
   fitness_t::value_type d(0.0);
   for (auto &example : *this->dat_)
-  {
-    const auto res(lambda.tag(example));
-
-    if (res.label == label(example))
+    if (const auto res = lambda.tag(example); res.label == label(example))
     {
       // Note:
       // * (1.0 - confidence) is the sum of the errors;
@@ -322,7 +315,6 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 
       ++example.difficulty;
     }
-  }
 
   return {d};
 }

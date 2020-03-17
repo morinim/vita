@@ -52,7 +52,7 @@ class basic_lambda_f
 public:
   virtual ~basic_lambda_f() = default;
 
-  virtual std::any operator()(const dataframe::example &) const = 0;
+  virtual value_t operator()(const dataframe::example &) const = 0;
 
   virtual bool debug() const = 0;
 };
@@ -96,7 +96,7 @@ class basic_src_lambda_f : public basic_lambda_f
 {
 public:
   virtual double measure(const model_metric &, const dataframe &) const = 0;
-  virtual std::string name(const std::any &) const = 0;
+  virtual std::string name(const value_t &) const = 0;
   virtual classification_result tag(const dataframe::example &) const = 0;
 
 private:
@@ -134,9 +134,9 @@ public:
   explicit basic_reg_lambda_f(const T &);
   basic_reg_lambda_f(std::istream &, const symbol_set &);
 
-  std::any operator()(const dataframe::example &) const final;
+  value_t operator()(const dataframe::example &) const final;
 
-  std::string name(const std::any &) const final;
+  std::string name(const value_t &) const final;
 
   double measure(const model_metric &, const dataframe &) const final;
 
@@ -152,8 +152,8 @@ private:
 
   std::string serialize_id() const final { return SERIALIZE_ID; }
 
-  std::any eval(const dataframe::example &, std::false_type) const;
-  std::any eval(const dataframe::example &, std::true_type) const;
+  value_t eval(const dataframe::example &, std::false_type) const;
+  value_t eval(const dataframe::example &, std::true_type) const;
 };
 
 // ***********************************************************************
@@ -199,9 +199,9 @@ class basic_class_lambda_f : public core_class_lambda_f,
 public:
   explicit basic_class_lambda_f(const dataframe &);
 
-  std::any operator()(const dataframe::example &) const final;
+  value_t operator()(const dataframe::example &) const final;
 
-  std::string name(const std::any &) const final;
+  std::string name(const value_t &) const final;
 
   double measure(const model_metric &, const dataframe &) const final;
 

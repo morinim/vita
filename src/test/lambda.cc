@@ -98,15 +98,15 @@ void test_team_of_one(vita::src_problem &pr)
     {
       const auto out_i(li(e)), out_t(lt(e));
 
-      if (out_i.has_value())
+      if (has_value(out_i))
       {
-        const auto v1(to<number>(out_i));
-        const auto v2(to<number>(out_t));
+        const auto v1(lexical_cast<D_DOUBLE>(out_i));
+        const auto v2(lexical_cast<D_DOUBLE>(out_t));
 
         CHECK(v1 == doctest::Approx(v2));
       }
       else
-        CHECK(!out_t.has_value());
+        CHECK(!has_value(out_t));
     }
   }
 }
@@ -144,15 +144,15 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
     {
       const auto out_i(li(e)), out_t(lt(e));
 
-      if (out_i.has_value())
+      if (has_value(out_i))
       {
-        const auto v1(to<number>(out_i));
-        const auto v2(to<number>(out_t));
+        const auto v1(lexical_cast<D_DOUBLE>(out_i));
+        const auto v2(lexical_cast<D_DOUBLE>(out_t));
 
         CHECK(v1 == doctest::Approx(v2));
       }
       else
-        CHECK(!out_t.has_value());
+        CHECK(!has_value(out_t));
     }
   }
 
@@ -180,24 +180,24 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
       const auto out4(lambda4(e));
 
       number sum(0.0), n(0.0);
-      if (out1.has_value())
+      if (has_value(out1))
       {
-        sum += to<number>(out1);
+        sum += lexical_cast<D_DOUBLE>(out1);
         ++n;
       }
-      if (out2.has_value())
+      if (has_value(out2))
       {
-        sum += to<number>(out2);
+        sum += lexical_cast<D_DOUBLE>(out2);
         ++n;
       }
-      if (out3.has_value())
+      if (has_value(out3))
       {
-        sum += to<number>(out3);
+        sum += lexical_cast<D_DOUBLE>(out3);
         ++n;
       }
-      if (out4.has_value())
+      if (has_value(out4))
       {
-        sum += to<number>(out4);
+        sum += lexical_cast<D_DOUBLE>(out4);
         ++n;
       }
 
@@ -206,9 +206,9 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda")
         const auto out_t(lambda_team(e));
 
         if (std::fabs(sum / n) < 0.000001)
-          CHECK(to<number>(out_t) == doctest::Approx(0.0));
+          CHECK(lexical_cast<D_DOUBLE>(out_t) == doctest::Approx(0.0));
         else
-          CHECK(sum / n == doctest::Approx(to<number>(out_t)));
+          CHECK(sum / n == doctest::Approx(lexical_cast<D_DOUBLE>(out_t)));
       }
     }
   }
@@ -238,10 +238,11 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda serialization")
       const auto out1(lambda1(e));
       const auto out2((*lambda2)(e));
 
-      if (out1.has_value())
-        CHECK(to<number>(out1) == doctest::Approx(to<number>(out2)));
+      if (has_value(out1))
+        CHECK(lexical_cast<D_DOUBLE>(out1)
+              == doctest::Approx(lexical_cast<D_DOUBLE>(out2)));
       else
-        CHECK(!out2.has_value());
+        CHECK(!has_value(out2));
     }
   }
 }
@@ -267,7 +268,7 @@ void test_team(vita::src_problem &pr)
 
     for (const auto &example : pr.data())
     {
-      const std::vector<std::any> out =
+      const std::vector out =
       {
         lambda1(example), lambda2(example), lambda3(example)
       };
@@ -281,7 +282,7 @@ void test_team(vita::src_problem &pr)
       };
 
       for (auto j(decltype(ts){0}); j < ts; ++j)
-        CHECK(std::any_cast<class_t>(out[j]) == tags[j].label);
+        CHECK(std::get<D_INT>(out[j]) == tags[j].label);
 
       std::string s_best(names[0]);
 

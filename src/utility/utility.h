@@ -14,13 +14,13 @@
 #define      VITA_UTILITY_H
 
 #include <algorithm>
-#include <any>
 #include <cmath>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
 
 #include "kernel/common.h"
+#include "kernel/value.h"
 
 #include "tinyxml2/tinyxml2.h"
 
@@ -30,7 +30,6 @@ bool iequals(const std::string &, const std::string &);
 std::string merge_path(const std::string &, const std::string &, char = '/');
 std::string replace(std::string, const std::string &, const std::string &);
 std::string replace_all(std::string, const std::string &, const std::string &);
-template<class T> T to(const std::any &);
 std::string trim(const std::string &);
 
 ///
@@ -93,6 +92,8 @@ template<class T, class Pred> void erase_if(T &container, Pred pred)
 ///
 /// Reduced version of `boost::lexical_cast`.
 ///
+/// \tparam T type we want to cast to
+///
 /// \param[in] s a string
 /// \return      the content of string `s` converted in an object of type `T`
 ///
@@ -102,6 +103,7 @@ template<> inline double lexical_cast(const std::string &s)
 { return std::stod(s); }
 template<> inline std::string lexical_cast(const std::string &s)
 { return s; }
+template<class T> T lexical_cast(const value_t &);
 
 ///
 /// A RAII class to restore the state of a stream to its original state.
@@ -305,8 +307,7 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e, const T &v)
 template<class E>
 constexpr std::underlying_type_t<E> as_integer(E v)
 {
-  static_assert(std::is_enum<E>::value,
-                "as_integer needs a scoped enumeration");
+  static_assert(std::is_enum_v<E>);
   return static_cast<std::underlying_type_t<E>>(v);
 }
 
@@ -320,7 +321,7 @@ constexpr std::underlying_type_t<E> as_integer(E v)
 /// \return           the modified output stream
 ///
 template<class E>
-std::enable_if_t<std::is_enum<E>::value, std::ostream> &
+std::enable_if_t<std::is_enum_v<E>, std::ostream> &
 operator<<(std::ostream &s, E v)
 {
   return s << as_integer(v);

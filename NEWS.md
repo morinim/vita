@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - **BREAKING CHANGE**. Sources require a C++17 compatible compiler
+- **BREAKING CHANGE**. The `interpreter` class performs calculation using `std::variant` insted of `std::any`.
+
+  This gives a performance improvements without important limitations of use cases.
 
 
 

@@ -218,7 +218,7 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
                    {{   c0,   null}}   // [2] 0.0
                  });
   ret = i_interp(&i4).run();
-  CHECK(!ret.has_value());
+  CHECK(!has_value(ret));
 }
 
 TEST_CASE_FIXTURE(fixture3, "f_idiv")
@@ -268,7 +268,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{    c0,   null}}   // [2] 0.0
                  });
   ret = i_interp(&i5).run();
-  CHECK(!ret.has_value());
+  CHECK(!has_value(ret));
 }
 
 TEST_CASE_FIXTURE(fixture3, "f_ife")
@@ -480,7 +480,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sqrt")
                    {{neg_x,  null}}   // [1] -X
                  });
   ret = i_interp(&i2).run();
-  CHECK(!ret.has_value());
+  CHECK(!has_value(ret));
 
   // SQRT(Z) == std::sqrt(Z)
   const i_mep i3({
@@ -553,7 +553,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ln")
                    {{  c0, null}}   // [1] 0.0
                  });
   ret = i_interp(&i2).run();
-  CHECK(!ret.has_value());
+  CHECK(!has_value(ret));
 
   // LN(Z) == std::log(Z)
   const i_mep i3({
@@ -592,7 +592,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sigmoid")
     static_cast<Z *>(z)->val = rx;
     ret = i_interp(&i2).run();
 
-    if (ret.has_value())
+    if (has_value(ret))
     {
       const auto expected(1.0 / (1.0 + std::exp(-rx)));
       CHECK(doctest::Approx(real::base(ret)) == expected);

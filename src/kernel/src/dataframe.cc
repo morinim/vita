@@ -29,19 +29,18 @@ namespace
 {
 // \param[in] s the string to be converted
 // \param[in] d what type should `s` be converted in?
-// \return      the converted data or an empty `any` if no conversion can be
+// \return      the converted data or an empty value if no conversion can be
 //              applied
 //
 // `convert("123.1", sym_double) == any(123.1f)`
-std::any convert(const std::string &s, domain_t d)
+value_t convert(const std::string &s, domain_t d)
 {
   switch (d)
   {
-  case domain_t::d_bool:   return std::stoi(s);
-  case domain_t::d_int:    return std::stoi(s);
-  case domain_t::d_double: return std::stod(s);
-  case domain_t::d_string: return            s;
-  default:                 return           {};
+  case d_int:    return std::stoi(s);
+  case d_double: return std::stod(s);
+  case d_string: return            s;
+  default:       return           {};
   }
 }
 
@@ -65,9 +64,6 @@ domain_t from_weka(const std::string &n)
 {
   static const std::map<const std::string, domain_t> map(
   {
-    // This type is vita-specific (not standard).
-    {"boolean", domain_t::d_bool},
-
     {"integer", domain_t::d_int},
 
     // Real and numeric are treated as double precision number (d_double).
@@ -306,7 +302,7 @@ dataframe::example dataframe::to_example(const record_t &v,
       // Strings could be used as label for classes, but integers
       // are simpler and faster to manage (arrays instead of maps).
       if (classification)
-        ret.output = encode(feature);
+        ret.output = static_cast<D_INT>(encode(feature));
       else
         ret.output = convert(feature, domain);
     }

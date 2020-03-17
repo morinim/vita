@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,15 +34,6 @@
 
 namespace vita
 {
-/// In an environment where a symbol such as '+' may have many different
-/// meanings, it's useful to specify a "domain of computation" to restrict
-/// attention to specific meanings of interest (e.g. double domain:
-/// `1 + 1 = 2`; string domain: `"a" + "b" = "ab"`).
-///
-/// The operations of a domain are defined in files named after the domain
-/// and grouped in the `primitive/` folder.
-enum class domain_t {d_void = 0, d_bool, d_double, d_int, d_string};
-
 /// A category provide operations which supplement or supersede those of the
 /// domain but which are restricted to values lying in the (sub)domain by
 /// which is parametrized.

@@ -54,7 +54,7 @@ std::string argument::name() const
 /// \param[in] agent current interpreter
 /// \return          the value of the argument
 ///
-std::any argument::eval(core_interpreter *agent) const
+value_t argument::eval(core_interpreter *agent) const
 {
   Expects(typeid(*agent) == typeid(interpreter<i_mep>));
 

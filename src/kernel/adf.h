@@ -78,7 +78,7 @@ public:
 
   bool auto_defined() const final;
 
-  std::any eval(core_interpreter *) const override;
+  value_t eval(core_interpreter *) const override;
 
   std::string name() const override;
 
@@ -104,7 +104,7 @@ public:
 
   bool auto_defined() const final;
 
-  std::any eval(core_interpreter *) const override;
+  value_t eval(core_interpreter *) const override;
 
   std::string name() const override;
 
