@@ -111,15 +111,15 @@ dataframe::dataframe(std::istream &is, filter_hook_t ft)
 ///
 /// New datafame instance containing the learning collection from a file.
 ///
-/// \param[in] filename name of the file containing the learning collection
-///                     (CSV / XRFF format)
-/// \param[in] ft       a filter and transform function
+/// \param[in] fn name of the file containing the learning collection (CSV /
+///               XRFF format)
+/// \param[in] ft a filter and transform function
 ///
-dataframe::dataframe(const std::string &filename, filter_hook_t ft)
+dataframe::dataframe(const std::filesystem::path &fn, filter_hook_t ft)
   : dataframe()
 {
-  Expects(!filename.empty());
-  read(filename, ft);
+  Expects(!fn.empty());
+  read(fn, ft);
   Ensures(debug());
 }
 
@@ -405,18 +405,19 @@ void dataframe::swap_category(category_t c1, category_t c2)
 ///
 /// Loads a XRFF file from a file into the dataframe.
 ///
-/// \param[in] filename the xrff filename
-/// \param[in] ft       a "filter and transform" function
-/// \return             number of lines parsed (`0` in case of errors)
+/// \param[in] fn the xrff filename
+/// \param[in] ft a "filter and transform" function
+/// \return       number of lines parsed (`0` in case of errors)
 ///
 /// \exception exception::data_format wrong data format for data file
 ///
 /// \see `dataframe::load_xrff(tinyxml2::XMLDocument &)` for details.
 ///
-std::size_t dataframe::read_xrff(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::read_xrff(const std::filesystem::path &fn,
+                                 filter_hook_t ft)
 {
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_SUCCESS)
+  if (doc.LoadFile(fn.c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("XRFF data file format error");
 
   return read_xrff(doc, ft);
@@ -596,17 +597,18 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 ///
 /// Loads a CSV file into the active dataset.
 ///
-/// \param[in] filename the csv filename
-/// \param[in] ft       a filter and transform function
-/// \return             number of lines parsed (0 in case of errors)
+/// \param[in] fn the csv filename
+/// \param[in] ft a filter and transform function
+/// \return       number of lines parsed (0 in case of errors)
 ///
 /// \exception std::runtime_error    cannot read CSV data file
 ///
 /// \see `dataframe::load_csv(const std::string &)` for details.
 ///
-std::size_t dataframe::read_csv(const std::string &filename, filter_hook_t ft)
+std::size_t dataframe::read_csv(const std::filesystem::path &fn,
+                                filter_hook_t ft)
 {
-  std::ifstream in(filename);
+  std::ifstream in(fn);
   if (!in)
     throw std::runtime_error("Cannot read CSV data file");
 
@@ -677,7 +679,7 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 ///
 /// Loads the content of a file into the active dataset.
 ///
-/// \param[in] f  name of the file containing the data set (CSV / XRFF format)
+/// \param[in] fn name of the file containing the data set (CSV / XRFF format)
 /// \param[in] ft a filter and transform function
 /// \return       number of lines parsed
 ///
@@ -685,21 +687,15 @@ std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::read(const std::string &f, filter_hook_t ft)
+std::size_t dataframe::read(const std::filesystem::path &fn, filter_hook_t ft)
 {
-  if (trim(f).empty())
+  if (fn.empty())
     throw std::invalid_argument("Missing dataset filename");
 
-  auto ends_with(
-    [](const std::string &name, const std::string &ext)
-    {
-      return ext.length() <= name.length()
-        && std::equal(ext.rbegin(), ext.rend(), name.rbegin());
-    });
+  const auto ext(fn.extension());
+  const bool xrff(iequals(ext, ".xrff") || iequals(ext, ".xml"));
 
-  const bool xrff(ends_with(f, ".xrff") || ends_with(f, ".xml"));
-
-  return xrff ? read_xrff(f, ft) : read_csv(f, ft);
+  return xrff ? read_xrff(fn, ft) : read_csv(fn, ft);
 }
 
 ///

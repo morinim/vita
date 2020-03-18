@@ -13,6 +13,7 @@
 #if !defined(VITA_DATAFRAME_H)
 #define      VITA_DATAFRAME_H
 
+#include <filesystem>
 #include <functional>
 #include <map>
 #include <string>
@@ -63,8 +64,7 @@ public:
   // ---- Constructors ----
   dataframe();
   explicit dataframe(std::istream &, filter_hook_t = nullptr);
-  explicit dataframe(const std::string &, filter_hook_t = nullptr);
-  template<class T> explicit dataframe(const std::vector<T> &);
+  explicit dataframe(const std::filesystem::path &, filter_hook_t = nullptr);
 
   // ---- Iterators ----
   using iterator = typename examples_t::iterator;
@@ -81,8 +81,7 @@ public:
   iterator erase(iterator, iterator);
 
   // ---- Convenience ----
-  std::size_t read(const std::string &, filter_hook_t = nullptr);
-  template<class T> std::size_t read(const std::vector<T> &);
+  std::size_t read(const std::filesystem::path &, filter_hook_t = nullptr);
   std::size_t read_csv(std::istream &, filter_hook_t = nullptr);
   std::size_t read_xrff(std::istream &, filter_hook_t = nullptr);
   bool operator!() const;
@@ -110,8 +109,8 @@ private:
 
   class_t encode(const std::string &);
 
-  std::size_t read_csv(const std::string &, filter_hook_t);
-  std::size_t read_xrff(const std::string &, filter_hook_t);
+  std::size_t read_csv(const std::filesystem::path &, filter_hook_t);
+  std::size_t read_xrff(const std::filesystem::path &, filter_hook_t);
   std::size_t read_xrff(tinyxml2::XMLDocument &, filter_hook_t);
 
   void swap_category(category_t, category_t);

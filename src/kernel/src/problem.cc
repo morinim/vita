@@ -90,7 +90,7 @@ src_problem::src_problem() : problem(), training_(), validation_(), factory_()
 /// - any additional terminals (ephemeral random constants, problem specific
 ///   constants...) can be manually inserted.
 ///
-src_problem::src_problem(const std::string &ds) : src_problem()
+src_problem::src_problem(const std::filesystem::path &ds) : src_problem()
 {
   vitaINFO << "Reading dataset " << ds << "...";
   data(dataset_t::training).read(ds);
@@ -137,8 +137,9 @@ src_problem::src_problem(std::istream &ds) : src_problem()
 /// Mainly useful for simple problems (single category regression /
 /// classification).
 ///
-src_problem::src_problem(const std::string &ds, const default_symbols_t &)
-  : src_problem(ds, "")
+src_problem::src_problem(const std::filesystem::path &ds,
+                         const default_symbols_t &)
+  : src_problem(ds, std::filesystem::path())
 {
 }
 
@@ -148,7 +149,8 @@ src_problem::src_problem(const std::string &ds, const default_symbols_t &)
 /// \param[in] ds      name of the training dataset file
 /// \param[in] symbols name of the file containing the symbols to be used.
 ///
-src_problem::src_problem(const std::string &ds, const std::string &symbols)
+src_problem::src_problem(const std::filesystem::path &ds,
+                         const std::filesystem::path &symbols)
   : src_problem()
 {
   vitaINFO << "Reading dataset " << ds << "...";
@@ -224,7 +226,7 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 /// Data should be loaded before symbols: without data we don't know, among
 /// other things, the features the dataset has.
 ///
-std::size_t src_problem::setup_symbols(const std::string &file)
+std::size_t src_problem::setup_symbols(const std::filesystem::path &file)
 {
   sset.clear();
 
@@ -279,7 +281,7 @@ std::size_t src_problem::setup_symbols_impl()
 ///
 /// \exception exception::data_format wrong data format for symbol file
 ///
-std::size_t src_problem::setup_symbols_impl(const std::string &file)
+std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
 {
   vitaINFO << "Reading symbol set " << file << "...";
   tinyxml2::XMLDocument doc;

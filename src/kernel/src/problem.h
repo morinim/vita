@@ -13,6 +13,7 @@
 #if !defined(VITA_SRC_PROBLEM_H)
 #define      VITA_SRC_PROBLEM_H
 
+#include <filesystem>
 #include <string>
 #include <set>
 
@@ -46,20 +47,20 @@ public:
   // --- Constructors ---
   src_problem();
 
-  explicit src_problem(const std::string &);
+  explicit src_problem(const std::filesystem::path &);
   explicit src_problem(std::istream &);
 
   struct default_symbols_t {};
   static const default_symbols_t default_symbols;
-  src_problem(const std::string &, const default_symbols_t &);
-  src_problem(const std::string &, const std::string &);
+  src_problem(const std::filesystem::path &, const default_symbols_t &);
+  src_problem(const std::filesystem::path &, const std::filesystem::path &);
   // --------------------
 
   bool operator!() const;
-  std::size_t setup_symbols(const std::string & = "");
+  std::size_t setup_symbols(const std::filesystem::path & = {});
   std::size_t setup_terminals(const std::set<unsigned> & = {});
 
-  const dataframe &data(dataset_t  = dataset_t::training) const;
+  const dataframe &data(dataset_t = dataset_t::training) const;
   dataframe &data(dataset_t = dataset_t::training);
 
   /// Just a shorthand for checking number of classes.
@@ -75,7 +76,7 @@ private:
   // Private support methods.
   bool compatible(const cvect &, const std::vector<std::string> &) const;
   std::size_t setup_symbols_impl();
-  std::size_t setup_symbols_impl(const std::string &);
+  std::size_t setup_symbols_impl(const std::filesystem::path &);
 
   // Private data members.
   dataframe training_;
