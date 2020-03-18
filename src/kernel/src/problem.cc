@@ -418,7 +418,7 @@ bool src_problem::compatible(const cvect &instance,
     }
     else
     {
-      if (instance[i] != training_.categories().find(p_i).tag)
+      if (instance[i] != training_.categories()[p_i].tag)
         return false;
     }
   }

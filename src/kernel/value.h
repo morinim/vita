@@ -25,7 +25,7 @@ namespace vita
 /// `1 + 1 = 2`; string domain: `"a" + "b" = "ab"`).
 ///
 /// The operations of a domain are defined in files named after the domain
-/// and grouped in the `primitive/` folder.
+/// and grouped in the `src/primitive/` folder.
 ///
 /// \see category_t
 ///

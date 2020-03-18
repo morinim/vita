@@ -68,14 +68,14 @@ domain_t from_weka(const std::string &n)
 
     // Real and numeric are treated as double precision number (d_double).
     {"numeric", domain_t::d_double},
-    {"real", domain_t::d_double},
+    {"real",    domain_t::d_double},
 
     // Nominal values are defined by providing a list of possible values.
     {"nominal", domain_t::d_string},
 
     // String attributes allow us to create attributes containing arbitrary
     // textual values. This is very useful in text-mining applications.
-    {"string", domain_t::d_string}
+    {"string",  domain_t::d_string}
 
     // {"date", ?}, {"relational", ?}
   });

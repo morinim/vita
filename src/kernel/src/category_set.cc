@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -92,7 +92,7 @@ category_t category_set::size() const
 /// \return    the category with the specified `name` or `category::null` if it
 ///            doesn't exists
 ///
-category category_set::find(const std::string &name) const
+category category_set::operator[](const std::string &name) const
 {
   const auto uc(std::find_if(categories_.begin(), categories_.end(),
                              [name](const untagged_category &c)
@@ -126,7 +126,7 @@ category_t category_set::insert(const untagged_category &c)
 {
   Expects(!c.name.empty());
 
-  category c1(find(c.name));
+  category c1(operator[](c.name));
 
   if (!c1)
   {

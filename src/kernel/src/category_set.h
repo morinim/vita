@@ -35,7 +35,7 @@ namespace vita
 ///       </labels>
 ///     </attribute>
 ///
-/// is mapped to:
+/// is mapped to
 ///
 ///     {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
 ///
@@ -43,7 +43,7 @@ namespace vita
 ///
 ///     <attribute type="numeric" category="A" name="Speed" />
 ///
-/// is mapped to:
+/// is mapped to
 ///
 ///     {"A", d_double, {}}
 ///
@@ -66,6 +66,7 @@ struct category : public untagged_category
 
   explicit operator bool() const;
 
+  /// Unique ID assigned to the untagged category.
   category_t tag;
 
   /// A special value used for missing values.
@@ -88,7 +89,7 @@ public:
   const_iterator end() const;
   category_t size() const;
 
-  category find(const std::string &) const;
+  category operator[](const std::string &) const;
   untagged_category operator[](category_t) const;
 
   category_t insert(const untagged_category &);
