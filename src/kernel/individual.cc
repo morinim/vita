@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -67,6 +67,17 @@ std::ostream &operator<<(std::ostream &o, print_format pf)
 std::ostream &c_language(std::ostream &o)
 {
   o.iword(print_format_index) = c_language_f;
+  return o;
+}
+
+///
+/// Used to print the content of an individual in cpp-language format.
+///
+/// \remark Sticky manipulator.
+///
+std::ostream &cpp_language(std::ostream &o)
+{
+  o.iword(print_format_index) = cpp_language_f;
   return o;
 }
 
