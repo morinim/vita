@@ -126,7 +126,7 @@ private:
   // problem's output).
   std::vector<column> header_;
 
-  // What are the categories we are dealing with?
+  // What are the categories we're dealing with?
   // Note: `category_[0]` is the output category.
   category_set categories_;
 
@@ -137,7 +137,7 @@ private:
 domain_t from_weka(const std::string &);
 
 ///
-/// Stores a single element of the dataset.
+/// Stores a single element (row) of the dataset.
 ///
 /// The `struct` consists of an input vector (`input`) and an answer value
 /// (`output`). Depending on the kind of problem, `output` stores:
@@ -180,8 +180,9 @@ inline class_t label(const dataframe::example &e)
 }
 
 ///
-/// Get the output value for a given example in a symbolic regression task.
+/// Get the output value for a given example.
 ///
+/// \tparam    T the result is casted to type `T`
 /// \param[in] e an example
 /// \return      the output value for example  `e`
 ///

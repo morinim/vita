@@ -457,7 +457,8 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
 ///
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
 /// of instances sharing a set of attributes.
-/// The original format is defined in http://weka.wikispaces.com/XRFF, we
+/// The original format is defined in
+/// https://waikato.github.io/weka-wiki/formats_and_processing/xrff/, we
 /// extend it with an additional (non-standard) feature: attribute category.
 ///
 ///     <attribute name="vehicle length" type="numeric" category="length" />
@@ -468,12 +469,7 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
 /// Programming).
 ///
 /// \warning
-/// To date:
-/// * we don't support compressed XRFF files;
-/// * XRFF files cannot be used to load test set (problems with missing
-///   output column and possible column category redefinition).
-///
-/// \note Test set examples can have an empty output value.
+/// To date we don't support compressed XRFF files.
 ///
 std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 {
@@ -497,7 +493,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   {
     column a;
 
-    const char *s = attribute->Attribute("name");
+    const char *s(attribute->Attribute("name"));
     if (s)
       a.name = s;
 
