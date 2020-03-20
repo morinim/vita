@@ -90,13 +90,12 @@ public:
 
   const category_set &categories() const;
 
-  const column &get_column(unsigned) const;
+  const std::vector<column> &columns() const;
 
   std::size_t size() const;
   bool empty() const;
 
   class_t classes() const;
-  unsigned columns() const;
   unsigned variables() const;
 
   std::string class_name(class_t) const;

@@ -194,27 +194,12 @@ const category_set &dataframe::categories() const
 }
 
 ///
-/// \param[in] i index of a column
-/// \return      a const reference to the `i`-th column of the dataset
+/// \return a const reference to a vector containing information about
+///         the dataframe columns
 ///
-const dataframe::column &dataframe::get_column(unsigned i) const
+const std::vector<dataframe::column> &dataframe::columns() const
 {
-  Expects(i < columns());
-  return header_[i];
-}
-
-///
-/// \return number of columns of the dataset
-///
-/// \note
-/// `dataframe` supports just one output for every instance, so, if the dataset
-/// is not empty: `variables() + 1 == columns()`.
-///
-unsigned dataframe::columns() const
-{
-  Expects(dataset_.empty() || variables() + 1 == header_.size());
-
-  return static_cast<unsigned>(header_.size());
+  return header_;
 }
 
 ///
@@ -230,13 +215,13 @@ class_t dataframe::classes() const
 /// \return input vector dimension
 ///
 /// \note data class supports just one output for every instance, so, if the
-///       dataset is not empty, `variables() + 1 == columns()`.
+///       dataset is not empty, `variables() + 1 == columns().size()`.
 ///
 unsigned dataframe::variables() const
 {
   const auto n(empty() ? 0u : static_cast<unsigned>(begin()->input.size()));
 
-  Ensures(empty() || n + 1 == header_.size());
+  Ensures(empty() || n + 1 == columns().size());
   return n;
 }
 
@@ -287,7 +272,7 @@ dataframe::example dataframe::to_example(const record_t &v,
   unsigned index(0);
   for (const auto &feature : v)
   {
-    const auto categ(header_[index].category_id);
+    const auto categ(columns()[index].category_id);
     const auto domain(categories_[categ].domain);
 
     if (index)  // input value
@@ -325,7 +310,7 @@ bool dataframe::read_record(const record_t &r)
 
   // If we don't know the dataset format yet, the current record is used to
   // discover it.
-  if (const bool format = columns(); !format)
+  if (const bool format = columns().size(); !format)
   {
     header_.reserve(fields);
 
@@ -350,7 +335,7 @@ bool dataframe::read_record(const record_t &r)
     }
   }  // if (!format)
 
-  if (fields != columns())  // skip lines with wrong number of columns
+  if (fields != columns().size())  // skip lines with wrong number of columns
   {
     vitaWARNING << "Malformed exampled skipped";
     return false;
@@ -388,7 +373,7 @@ std::string dataframe::class_name(class_t i) const
 ///
 void dataframe::swap_category(category_t c1, category_t c2)
 {
-  const auto n_col(columns());
+  const auto n_col(columns().size());
 
   Expects(c1 < n_col);
   Expects(c2 < n_col);
@@ -546,7 +531,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   }
 
   // XRFF needs information about the columns.
-  if (!columns())
+  if (columns().empty())
     throw exception::data_format("Missing column information in XRFF file");
 
   // If no output column is specified the default XRFF output column is the
@@ -581,7 +566,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 
     const auto instance(to_example(record, classification, false));
 
-    if (instance.input.size() + 1 == columns())
+    if (instance.input.size() + 1 == columns().size())
       push_back(instance);
     else
       vitaWARNING << "Malformed example " << size() << " skipped";

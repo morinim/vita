@@ -11,6 +11,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
   This gives a performance improvements without important limitations of use cases.
 
+- **BREAKING CHANGE**. `dataframe::get_column` and `dataframe::columns` have been removed / merged in the new `dataframe::columns()`; it returns a vector containing information about all the columns of the dataframe.
+
+  So:
+
+  1. `d.columns().size()` replaces `d.columns()`
+  2. `d.columns()[3].name` replaces `d.get_column(3).name`
+  3. `d.columns()[3].category_id` replaces `d.get_column(3).category_id`
+
 
 
 ## [1.1.0] - 2019-12-11

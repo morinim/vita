@@ -189,14 +189,14 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
   std::size_t variables(0);
 
   // Sets up the variables (features).
-  const auto columns(training_.columns());
-  for (std::size_t i(1); i < columns; ++i)
+  const auto &columns(training_.columns());
+  for (std::size_t i(1); i < columns.size(); ++i)
     if (skip.find(i) == skip.end())
     {
-      const auto provided_name(training_.get_column(i).name);
+      const auto provided_name(columns[i].name);
       const auto name(provided_name.empty() ? "X" + std::to_string(i)
                                             : provided_name);
-      const category_t category(training_.get_column(i).category_id);
+      const category_t category(columns[i].category_id);
       insert<variable>(name, i - 1, category);
 
       ++variables;
