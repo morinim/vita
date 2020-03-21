@@ -310,7 +310,7 @@ bool dataframe::read_record(const record_t &r)
 
   // If we don't know the dataset format yet, the current record is used to
   // discover it.
-  if (const bool format = columns().size(); !format)
+  if (columns().empty())
   {
     header_.reserve(fields);
 
@@ -333,7 +333,7 @@ bool dataframe::read_record(const record_t &r)
 
       header_.push_back({"", tag});
     }
-  }  // if (!format)
+  }
 
   if (fields != columns().size())  // skip lines with wrong number of columns
   {
@@ -352,17 +352,13 @@ bool dataframe::read_record(const record_t &r)
 /// \return      the name of the class encoded by `i` (or an empty string if
 ///              such class cannot be find)
 ///
-/// \note
-/// Boost Bitmap could be used to speed up the search in `classes_map_`, but
-/// to date speed isn't an issue.
-///
 std::string dataframe::class_name(class_t i) const
 {
   for (const auto &p : classes_map_)
     if (p.second == i)
       return p.first;
 
-  return "";
+  return {};
 }
 
 ///
@@ -461,9 +457,9 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   // Iterate over `dataset.header.attributes` selection and store all found
   // attributes in the header vector.
   tinyxml2::XMLHandle handle(&doc);
-  auto *attributes = handle.FirstChildElement("dataset")
-                           .FirstChildElement("header")
-                           .FirstChildElement("attributes").ToElement();
+  auto *attributes(handle.FirstChildElement("dataset")
+                         .FirstChildElement("header")
+                         .FirstChildElement("attributes").ToElement());
   if (!attributes)
     throw exception::data_format("Missing `attributes` element in XRFF file");
 
@@ -545,32 +541,33 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
   // Category 0 is the output category.
   swap_category(0, header_[0].category_id);
 
-  auto *instances = handle.FirstChildElement("dataset")
-                          .FirstChildElement("body")
-                          .FirstChildElement("instances").ToElement();
-  if (!instances)
-    throw exception::data_format("Missing `instances` element in XRFF file");
-
-  for (auto *i = instances->FirstChildElement("instance");
-       i;
-       i = i->NextSiblingElement("instance"))
+  if (auto *instances = handle.FirstChildElement("dataset")
+                        .FirstChildElement("body")
+                        .FirstChildElement("instances").ToElement())
   {
-    record_t record;
-    for (auto *v = i->FirstChildElement("value");
-         v;
-         v = v->NextSiblingElement("value"))
-      record.push_back(v->GetText() ? v->GetText() : "");
+    for (auto *i = instances->FirstChildElement("instance");
+         i;
+         i = i->NextSiblingElement("instance"))
+    {
+      record_t record;
+      for (auto *v = i->FirstChildElement("value");
+           v;
+           v = v->NextSiblingElement("value"))
+        record.push_back(v->GetText() ? v->GetText() : "");
 
-    if (ft && ft(record) == false)
-      continue;
+      if (ft && ft(record) == false)
+        continue;
 
-    const auto instance(to_example(record, classification, false));
+      const auto instance(to_example(record, classification, false));
 
-    if (instance.input.size() + 1 == columns().size())
-      push_back(instance);
-    else
-      vitaWARNING << "Malformed example " << size() << " skipped";
+      if (instance.input.size() + 1 == columns().size())
+        push_back(instance);
+      else
+        vitaWARNING << "Malformed example " << size() << " skipped";
+    }
   }
+  else
+    throw exception::data_format("Missing `instances` element in XRFF file");
 
   return debug() ? size() : static_cast<std::size_t>(0);
 }
