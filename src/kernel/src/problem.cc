@@ -189,7 +189,7 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
   std::size_t variables(0);
 
   // Sets up the variables (features).
-  const auto &columns(training_.columns());
+  const auto &columns(training_.columns);
   for (std::size_t i(1); i < columns.size(); ++i)
     if (skip.find(i) == skip.end())
     {

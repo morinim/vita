@@ -5,19 +5,33 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- New `dataframe::front()` public member function which allows simple access to the first element of a dataframe.
+- `dataframe::read_csv` now supports a header row. Also the output column can be specified (before it always was the first column):
+
+  ```C++
+  dataframe d;
+
+  dataframe::params p;
+  p.has_header = true;
+  p.output_index = 2;
+
+  d.read_csv("filename.csv", p);
+  ```
+
 ### Changed
-- **BREAKING CHANGE**. Sources require a C++17 compatible compiler
+- **BREAKING CHANGE**. Sources require a C++17 compatible compiler.
 - **BREAKING CHANGE**. The `interpreter` class performs calculation using `std::variant` insted of `std::any`.
 
   This gives a performance improvements without important limitations of use cases.
 
-- **BREAKING CHANGE**. `dataframe::get_column` and `dataframe::columns` have been removed / merged in the new `dataframe::columns()`; it returns a vector containing information about all the columns of the dataframe.
+- **BREAKING CHANGE**. `dataframe::get_column` and `dataframe::columns` have been removed / merged. The `dataframe::columns` public data member contains information about all the columns of the dataframe.
 
   So:
 
-  1. `d.columns().size()` replaces `d.columns()`
-  2. `d.columns()[3].name` replaces `d.get_column(3).name`
-  3. `d.columns()[3].category_id` replaces `d.get_column(3).category_id`
+  1. `d.columns.size()` replaces `d.columns()`
+  2. `d.columns[3].name` replaces `d.get_column(3).name`
+  3. `d.columns[3].category_id` replaces `d.get_column(3).category_id`
 
 
 

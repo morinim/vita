@@ -32,7 +32,7 @@ namespace
 // \return      the converted data or an empty value if no conversion can be
 //              applied
 //
-// `convert("123.1", sym_double) == any(123.1f)`
+// `convert("123.1", d_double) == value_t(123.1f)`
 value_t convert(const std::string &s, domain_t d)
 {
   switch (d)
@@ -85,9 +85,127 @@ domain_t from_weka(const std::string &n)
 }
 
 ///
+/// Arrange the object in the empty starting state.
+///
+dataframe::columns_info::columns_info() : cols_()
+{
+}
+
+void dataframe::columns_info::push_back(const column_info &v)
+{
+  cols_.push_back(v);
+}
+
+void dataframe::columns_info::push_front(const column_info &v)
+{
+  cols_.insert(begin(), v);
+}
+
+///
+/// Given an example compiles information about the columns of the dataframe.
+///
+/// \param[in] r            a record containing an example
+/// \param[in] header_first `true` if the first example contains the header
+/// \param[in] categories   set of categories (updated according to `r`)
+///
+/// The function can be called multiple times to incrementally collect
+/// information from different examples.
+///
+/// When `header_first` is `true` the first example is used to gather the names
+/// of the columns and successive example contribute to determine the category
+/// of each column.
+///
+/// \remark The function assumes columns `0` as the output column.
+///
+template<>
+void dataframe::columns_info::build(const dataframe::record_t &r,
+                                    bool header_first,
+                                    category_set &categories)
+{
+  Expects(r.size());
+
+  // When available returns the name of the column; otherwise returns a
+  // surrogate, unique name (e.g. `column123`).
+  const auto col_name(
+    [this](std::size_t idx)
+    {
+      if (cols_[idx].name.empty())
+        return idx ? "column" + std::to_string(idx) : "output";
+
+      return cols_[idx].name;
+    });
+
+  // Sets the category associated to a column.
+  const auto set_col_category(
+    [&](std::size_t idx)
+    {
+      if (cols_[idx].category_id != undefined_category)
+        return;
+
+      const std::string &value(trim(r[idx]));
+      if (value.empty())
+        return;  // value not available
+
+      // For numbers we aren't adopting strong typing by default. So values
+      // from distinct numerical columns can be mixed (since they're mapped to
+      // the same domain / category).
+      std::string domain_name(is_number(value) ? "numeric" : col_name(idx));
+
+      // For classification tasks we use discriminant functions and the actual
+      // output type is always numeric.
+      const bool output(!r.front().empty());
+      const bool classification(output && !is_number(r.front()));
+      if (idx == 0 && classification)
+        domain_name = "numeric";
+
+      const domain_t domain(domain_name == "numeric" ? d_double : d_string);
+
+      cols_[idx].category_id = categories.insert({domain_name, domain, {}});
+    });
+
+  const auto fields(r.size());
+
+  if (cols_.empty())
+  {
+    cols_.reserve(fields);
+
+    if (header_first)  // first line contains the names of the columns
+    {
+      vitaDEBUG << "Reading columns header";
+      for (const auto &name : r)
+        cols_.push_back({name, undefined_category});
+      return;
+    }
+    else
+      std::fill_n(std::back_inserter(cols_), fields, column_info());
+  }
+
+  assert(size() == r.size());
+
+  for (std::size_t field(0); field < fields; ++field)
+    set_col_category(field);
+}
+
+///
+/// Swaps two categories of the columns_info object.
+///
+/// \param[in] c1 a category
+/// \param[in] c2 a category
+///
+void dataframe::columns_info::swap_category(category_t c1, category_t c2,
+                                            dataframe_only)
+{
+  for (auto &c : cols_)
+    if (c.category_id == c1)
+      c.category_id = c2;
+    else if (c.category_id == c2)
+      c.category_id = c1;
+}
+
+///
 /// New empty data instance.
 ///
-dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
+dataframe::dataframe() : columns(), classes_map_(), categories_(), dataset_()
 {
   Ensures(debug());
 }
@@ -96,32 +214,34 @@ dataframe::dataframe() : classes_map_(), header_(), categories_(), dataset_()
 /// New dataframe instance containing the learning collection from a stream.
 ///
 /// \param[in] is input stream
-/// \param[in] ft a filter and transform function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 ///
 /// \remark Data from the input stream must be in CSV format.
 ///
-dataframe::dataframe(std::istream &is, filter_hook_t ft)
-  : dataframe()
+dataframe::dataframe(std::istream &is, const params &p) : dataframe()
 {
   Expects(is.good());
-  read_csv(is, ft);
+  read_csv(is, p);
   Ensures(debug());
 }
+dataframe::dataframe(std::istream &is) : dataframe(is, {}) {}
+
 
 ///
 /// New datafame instance containing the learning collection from a file.
 ///
 /// \param[in] fn name of the file containing the learning collection (CSV /
 ///               XRFF format)
-/// \param[in] ft a filter and transform function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 ///
-dataframe::dataframe(const std::filesystem::path &fn, filter_hook_t ft)
+dataframe::dataframe(const std::filesystem::path &fn, const params &p)
   : dataframe()
 {
   Expects(!fn.empty());
-  read(fn, ft);
+  read(fn, p);
   Ensures(debug());
 }
+dataframe::dataframe(const std::filesystem::path &fn) : dataframe(fn, {}) {}
 
 ///
 /// Removes all elements from the container.
@@ -169,6 +289,30 @@ dataframe::const_iterator dataframe::end() const
 }
 
 ///
+/// Returns a constant reference to the first element in the dataframe.
+///
+/// \return a constant reference to the first element int the dataframe
+///
+/// \remark Calling `front` on an empty dataframe is undefined.
+///
+dataframe::value_type dataframe::front() const
+{
+  return dataset_.front();
+}
+
+///
+/// Returns a reference to the first element in the dataframe.
+///
+/// \return a reference to the first element in the dataframe
+///
+/// \remark Calling `front` on an empty dataframe is undefined.
+///
+dataframe::value_type &dataframe::front()
+{
+  return dataset_.front();
+}
+
+///
 /// \return the size of the active dataset
 ///
 std::size_t dataframe::size() const
@@ -194,15 +338,6 @@ const category_set &dataframe::categories() const
 }
 
 ///
-/// \return a const reference to a vector containing information about
-///         the dataframe columns
-///
-const std::vector<dataframe::column> &dataframe::columns() const
-{
-  return header_;
-}
-
-///
 /// \return number of classes of the problem (`== 0` for a symbolic regression
 ///         problem, `> 1` for a classification problem)
 ///
@@ -215,13 +350,13 @@ class_t dataframe::classes() const
 /// \return input vector dimension
 ///
 /// \note data class supports just one output for every instance, so, if the
-///       dataset is not empty, `variables() + 1 == columns().size()`.
+///       dataset is not empty, `variables() + 1 == columns.size()`.
 ///
 unsigned dataframe::variables() const
 {
   const auto n(empty() ? 0u : static_cast<unsigned>(begin()->input.size()));
 
-  Ensures(empty() || n + 1 == columns().size());
+  Ensures(empty() || n + 1 == columns.size());
   return n;
 }
 
@@ -253,33 +388,35 @@ class_t dataframe::encode(const std::string &label)
 ///
 /// \param[in] v              a container for the example (features encoded as
 ///                           `std::string`s)
-/// \param[in] classification is this a classification task?
-/// \param[in] add_label      should we automatically add labels for
+/// \param[in] add_label      should we automatically add instances for
 ///                           text-features?
 /// \return                   `v` converted to `example` type
 ///
 /// \remark
 /// When `add_label` is `true` the function can have side-effects (changing
-/// the set of labels associated to a category).
+/// the set of labels associated with a category).
 ///
-dataframe::example dataframe::to_example(const record_t &v,
-                                         bool classification, bool add_label)
+dataframe::example dataframe::to_example(const record_t &v, bool add_label)
 {
   Expects(v.size());
+  Expects(v.size() == columns.size());
+
+  const bool output(!v.front().empty());
+  const bool classification(output && !is_number(v.front()));
 
   example ret;
 
-  unsigned index(0);
+  std::size_t index(0);
   for (const auto &feature : v)
   {
-    const auto categ(columns()[index].category_id);
+    const auto categ(columns[index].category_id);
     const auto domain(categories_[categ].domain);
 
     if (index)  // input value
     {
       ret.input.push_back(convert(feature, domain));
 
-      if (add_label && domain == domain_t::d_string)
+      if (add_label && domain == d_string)
         categories_.add_label(categ, feature);
     }
     else if (!feature.empty())  // output value (not empty)
@@ -304,44 +441,15 @@ dataframe::example dataframe::to_example(const record_t &v,
 ///
 bool dataframe::read_record(const record_t &r)
 {
-  const bool classification(!is_number(r.front()));
+  Expects(r.size());
 
-  const auto fields(r.size());
-
-  // If we don't know the dataset format yet, the current record is used to
-  // discover it.
-  if (columns().empty())
-  {
-    header_.reserve(fields);
-
-    for (std::size_t field(0); field < fields; ++field)
-    {
-      assert(!size());  // if we have data then data format must be known
-
-      std::string s_domain(is_number(r[field])
-                           ? "numeric" : "string" + std::to_string(field));
-
-      // For classification problems we use discriminant functions, so the
-      // actual output type is always numeric.
-      if (field == 0 && classification)
-        s_domain = "numeric";
-
-      const domain_t domain(s_domain == "numeric"
-                            ? domain_t::d_double : domain_t::d_string);
-
-      const category_t tag(categories_.insert({s_domain, domain, {}}));
-
-      header_.push_back({"", tag});
-    }
-  }
-
-  if (fields != columns().size())  // skip lines with wrong number of columns
+  if (r.size() != columns.size())  // skip lines with wrong number of columns
   {
     vitaWARNING << "Malformed exampled skipped";
     return false;
   }
 
-  const auto instance(to_example(r, classification, true));
+  const auto instance(to_example(r, true));
   push_back(instance);
 
   return true;
@@ -362,32 +470,22 @@ std::string dataframe::class_name(class_t i) const
 }
 
 ///
-/// Swap two categories of the dataframe.
+/// Swaps two categories of the dataframe.
 ///
 /// \param[in] c1 a category
 /// \param[in] c2 a category
 ///
 void dataframe::swap_category(category_t c1, category_t c2)
 {
-  const auto n_col(columns().size());
-
-  Expects(c1 < n_col);
-  Expects(c2 < n_col);
-
   categories_.swap(c1, c2);
-
-  for (auto i(decltype(n_col){0}); i < n_col; ++i)
-    if (header_[i].category_id == c1)
-      header_[i].category_id = c2;
-    else if (header_[i].category_id == c2)
-      header_[i].category_id = c1;
+  columns.swap_category(c1, c2, {});
 }
 
 ///
 /// Loads a XRFF file from a file into the dataframe.
 ///
 /// \param[in] fn the xrff filename
-/// \param[in] ft a "filter and transform" function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 /// \return       number of lines parsed (`0` in case of errors)
 ///
 /// \exception exception::data_format wrong data format for data file
@@ -395,27 +493,27 @@ void dataframe::swap_category(category_t c1, category_t c2)
 /// \see `dataframe::load_xrff(tinyxml2::XMLDocument &)` for details.
 ///
 std::size_t dataframe::read_xrff(const std::filesystem::path &fn,
-                                 filter_hook_t ft)
+                                 const params &p)
 {
   tinyxml2::XMLDocument doc;
   if (doc.LoadFile(fn.c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("XRFF data file format error");
 
-  return read_xrff(doc, ft);
+  return read_xrff(doc, p);
 }
 
 ///
 /// Loads a XRFF file from a stream into the dataframe.
 ///
 /// \param[in] in the xrff stream
-/// \param[in] ft a "filter and transform" function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 /// \return       number of lines parsed (`0` in case of errors)
 ///
 /// \exception exception::data_format wrong data format for data file
 ///
 /// \see `dataframe::read_xrff(tinyxml2::XMLDocument &)` for details.
 ///
-std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
+std::size_t dataframe::read_xrff(std::istream &in, const params &p)
 {
   std::ostringstream ss;
   ss << in.rdbuf();
@@ -424,15 +522,19 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
   if (doc.Parse(ss.str().c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("XRFF data file format error");
 
-  return read_xrff(doc, ft);
+  return read_xrff(doc, p);
+}
+std::size_t dataframe::read_xrff(std::istream &in)
+{
+  return read_xrff(in, {});
 }
 
 ///
 /// Loads a XRFF document into the active dataset.
 ///
-/// \param[in] filename the xrff file
-/// \param[in] ft       a filter and transform function
-/// \return             number of lines parsed (0 in case of errors)
+/// \param[in] doc object containing the xrff file
+/// \param[in] p   additional, optional, parameters (see `params` structure)
+/// \return        number of lines parsed (0 in case of errors)
 ///
 /// \exception exception::data_format wrong data format for data file
 ///
@@ -450,9 +552,9 @@ std::size_t dataframe::read_xrff(std::istream &in, filter_hook_t ft)
 /// Programming).
 ///
 /// \warning
-/// To date we don't support compressed XRFF files.
+/// To date we don't support compressed and sparse format XRFF files.
 ///
-std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
+std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
 {
   // Iterate over `dataset.header.attributes` selection and store all found
   // attributes in the header vector.
@@ -472,7 +574,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
        attribute;
        attribute = attribute->NextSiblingElement("attribute"))
   {
-    column a;
+    columns_info::column_info a;
 
     const char *s(attribute->Attribute("name"));
     if (s)
@@ -511,7 +613,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 
     // Store label1... labelN.
     if (xml_type == "nominal")
-      for (auto *l = attribute->FirstChildElement("label");
+      for (auto *l(attribute->FirstChildElement("label"));
            l;
            l = l->NextSiblingElement("label"))
       {
@@ -521,46 +623,46 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 
     // Output column is always the first one.
     if (output)
-      header_.insert(header_.begin(), a);
+      columns.push_front(a);
     else
-      header_.push_back(a);
+      columns.push_back(a);
   }
 
   // XRFF needs information about the columns.
-  if (columns().empty())
+  if (columns.empty())
     throw exception::data_format("Missing column information in XRFF file");
 
   // If no output column is specified the default XRFF output column is the
   // last one (and it's the first element of the `header_` vector).
   if (n_output == 0)
   {
-    header_.insert(header_.begin(), header_.back());
-    header_.pop_back();
+    columns.push_front(columns.back());
+    columns.pop_back();
   }
 
   // Category 0 is the output category.
-  swap_category(0, header_[0].category_id);
+  swap_category(0, columns[0].category_id);
 
   if (auto *instances = handle.FirstChildElement("dataset")
                         .FirstChildElement("body")
                         .FirstChildElement("instances").ToElement())
   {
-    for (auto *i = instances->FirstChildElement("instance");
+    for (auto *i(instances->FirstChildElement("instance"));
          i;
          i = i->NextSiblingElement("instance"))
     {
       record_t record;
-      for (auto *v = i->FirstChildElement("value");
+      for (auto *v(i->FirstChildElement("value"));
            v;
            v = v->NextSiblingElement("value"))
         record.push_back(v->GetText() ? v->GetText() : "");
 
-      if (ft && ft(record) == false)
+      if (p.filter && p.filter(record) == false)
         continue;
 
-      const auto instance(to_example(record, classification, false));
+      const auto instance(to_example(record, false));
 
-      if (instance.input.size() + 1 == columns().size())
+      if (instance.input.size() + 1 == columns.size())
         push_back(instance);
       else
         vitaWARNING << "Malformed example " << size() << " skipped";
@@ -576,7 +678,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 /// Loads a CSV file into the active dataset.
 ///
 /// \param[in] fn the csv filename
-/// \param[in] ft a filter and transform function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 /// \return       number of lines parsed (0 in case of errors)
 ///
 /// \exception std::runtime_error    cannot read CSV data file
@@ -584,21 +686,21 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, filter_hook_t ft)
 /// \see `dataframe::load_csv(const std::string &)` for details.
 ///
 std::size_t dataframe::read_csv(const std::filesystem::path &fn,
-                                filter_hook_t ft)
+                                const params &p)
 {
   std::ifstream in(fn);
   if (!in)
     throw std::runtime_error("Cannot read CSV data file");
 
-  return read_csv(in, ft);
+  return read_csv(in, p);
 }
 
 ///
 /// Loads a CSV file into the active dataset.
 ///
-/// \param[in] from the csv stream
-/// \param[in] ft   a filter and transform function
-/// \return         number of lines parsed (0 in case of errors)
+/// \param[in] from   the csv stream
+/// \param[in] p  additional, optional, parameters (see `params` structure)
+/// \return           number of lines parsed (0 in case of errors)
 ///
 /// \exception exception::insufficient_data empty / undersized data file
 ///
@@ -612,11 +714,11 @@ std::size_t dataframe::read_csv(const std::filesystem::path &fn,
 ///   surrounded by quotes;
 /// * columns are separated by commas. Commas inside a quoted string aren't
 ///   column delimiters;
-/// * THE FIRST COLUMN REPRESENTS THE VALUE (numeric or string) for that
-///   example. If the first column is numeric, this model is a REGRESSION
-///   model; if the first column is a string, it's a CATEGORIZATION
-///   (i.e. classification) model. Each column must describe the same kind of
-///   information for that example;
+/// * the column containing the labels (numeric or string) for the examples can
+///   be specified by the user; if not specified, the the first column is the
+///   default. If the label is numeric Vita assumes a REGRESSION model; if it's
+///   a string, a CATEGORIZATION (i.e. classification) model is assumed.
+/// * each column must describe the same kind of information;
 /// * the column order of features in the table does not weight the results.
 ///   The first feature is not weighted any more than the last;
 /// * as a best practice, remove punctuation (other than apostrophes) from
@@ -641,31 +743,58 @@ std::size_t dataframe::read_csv(const std::filesystem::path &fn,
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::read_csv(std::istream &from, filter_hook_t ft)
+std::size_t dataframe::read_csv(std::istream &from, const params &p)
 {
   clear();
 
-  for (auto record : csv_parser(from).filter_hook(ft))
-    read_record(record);
+  std::size_t count(0);
+  for (auto record : csv_parser(from).filter_hook(p.filter))
+  {
+    if (p.output_index)
+    {
+      assert(p.output_index < record.size());
+      //std::swap(record[0], record[*p.output_index]);
+      if (p.output_index > 0)
+        std::rotate(record.begin(),
+                    std::next(record.begin(), *p.output_index),
+                    std::next(record.begin(), *p.output_index + 1));
+    }
+    else
+      // When the output index is unspecified, all the columns are treated as
+      // input columns (this is obtained adding a surrogate, empty output
+      // column).
+      record.insert(record.begin(), {});
+
+    // Every new record may add further information about the column domain /
+    // category.
+    if (count < 10)
+      columns.build(record, p.has_header, categories_);
+    if (!p.has_header || count++)
+      read_record(record);
+  }
 
   if (!debug() || !size())
     throw exception::insufficient_data("Empty / undersized CSV data file");
 
   return size();
 }
+std::size_t dataframe::read_csv(std::istream &from)
+{
+  return read_csv(from, {});
+}
 
 ///
 /// Loads the content of a file into the active dataset.
 ///
 /// \param[in] fn name of the file containing the data set (CSV / XRFF format)
-/// \param[in] ft a filter and transform function
+/// \param[in] p  additional, optional, parameters (see `params` structure)
 /// \return       number of lines parsed
 ///
 /// \exception std::invalid_argument missing dataset file name
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::read(const std::filesystem::path &fn, filter_hook_t ft)
+std::size_t dataframe::read(const std::filesystem::path &fn, const params &p)
 {
   if (fn.empty())
     throw std::invalid_argument("Missing dataset filename");
@@ -673,7 +802,11 @@ std::size_t dataframe::read(const std::filesystem::path &fn, filter_hook_t ft)
   const auto ext(fn.extension());
   const bool xrff(iequals(ext, ".xrff") || iequals(ext, ".xml"));
 
-  return xrff ? read_xrff(fn, ft) : read_csv(fn, ft);
+  return xrff ? read_xrff(fn, p) : read_csv(fn, p);
+}
+std::size_t dataframe::read(const std::filesystem::path &fn)
+{
+  return read(fn, {});
 }
 
 ///

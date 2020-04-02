@@ -13,6 +13,7 @@
 #if !defined(VITA_VALUE_H)
 #define      VITA_VALUE_H
 
+#include <iosfwd>
 #include <variant>
 
 namespace vita
@@ -50,6 +51,8 @@ inline bool has_value(const value_t &v)
 {
   return !std::holds_alternative<std::monostate>(v);
 }
+
+std::ostream &operator<<(std::ostream &, const value_t &);
 
 }  // namespace vita
 

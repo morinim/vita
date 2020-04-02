@@ -116,7 +116,7 @@ value_t interpreter<T>::fetch_arg(unsigned i)
 #if !defined(NDEBUG)
   else // Cache not empty... checking if the cached value is right.
   {
-    assert(to<std::string>(get_val()) == to<std::string>(elem.value));
+    assert(get_val() == elem.value);
   }
 #endif
 

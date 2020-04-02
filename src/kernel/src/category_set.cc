@@ -119,8 +119,12 @@ untagged_category category_set::operator[](category_t t) const
 }
 
 ///
+/// Potentially insert a new category in the set.
+///
 /// \param[in] c a new untagged_category for the set
-/// \return      the tag associated with `c`
+/// \return      the tag (category ID) associated with `c`
+///
+/// Categories with the same name are mapped to the same ID.
 ///
 category_t category_set::insert(const untagged_category &c)
 {
