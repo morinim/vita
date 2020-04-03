@@ -26,6 +26,7 @@
 
 namespace vita
 {
+bool is_number(std::string);
 bool iequals(const std::string &, const std::string &);
 std::string merge_path(const std::string &, const std::string &, char = '/');
 std::string replace(std::string, const std::string &, const std::string &);

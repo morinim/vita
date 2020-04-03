@@ -44,15 +44,6 @@ value_t convert(const std::string &s, domain_t d)
   }
 }
 
-// \param[in] s the string to be tested
-// \return      `true` if `s` contains a number
-bool is_number(const std::string &s)
-{
-  char *end;
-  strtod(s.c_str(), &end);  // if no conversion can be performed, ​`end` is set
-                            // to `s.c_str()`
-  return end != s.c_str() && *end == '\0';
-}
 }  // unnamed namespace
 
 ///
