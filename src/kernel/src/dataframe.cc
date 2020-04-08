@@ -446,7 +446,7 @@ bool dataframe::read_record(const record_t &r, bool add_instance)
 
   if (r.size() != columns.size())  // skip lines with wrong number of columns
   {
-    vitaWARNING << "Malformed exampled skipped";
+    vitaWARNING << "Malformed exampled " << size() <<  " skipped";
     return false;
   }
 
@@ -653,6 +653,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
          i = i->NextSiblingElement("instance"))
     {
       record_t record;
+
       for (auto *v(i->FirstChildElement("value"));
            v;
            v = v->NextSiblingElement("value"))
@@ -661,12 +662,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
       if (p.filter && p.filter(record) == false)
         continue;
 
-      const auto instance(to_example(record, false));
-
-      if (instance.input.size() + 1 == columns.size())
-        push_back(instance);
-      else
-        vitaWARNING << "Malformed example " << size() << " skipped";
+      read_record(record, false);
     }
   }
   else
