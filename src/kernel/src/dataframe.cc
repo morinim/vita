@@ -27,6 +27,7 @@ namespace vita
 
 namespace
 {
+
 // \param[in] s the string to be converted
 // \param[in] d what type should `s` be converted in?
 // \return      the converted data or an empty value if no conversion can be
@@ -55,24 +56,24 @@ domain_t from_weka(const std::string &n)
 {
   static const std::map<const std::string, domain_t> map(
   {
-    {"integer", domain_t::d_int},
+    {"integer", d_int},
 
     // Real and numeric are treated as double precision number (d_double).
-    {"numeric", domain_t::d_double},
-    {"real",    domain_t::d_double},
+    {"numeric", d_double},
+    {"real",    d_double},
 
     // Nominal values are defined by providing a list of possible values.
-    {"nominal", domain_t::d_string},
+    {"nominal", d_string},
 
     // String attributes allow us to create attributes containing arbitrary
     // textual values. This is very useful in text-mining applications.
-    {"string",  domain_t::d_string}
+    {"string",  d_string}
 
     // {"date", ?}, {"relational", ?}
   });
 
   const auto &i(map.find(n));
-  return i == map.end() ? domain_t::d_void : i->second;
+  return i == map.end() ? d_void : i->second;
 }
 
 ///
@@ -96,8 +97,8 @@ void dataframe::columns_info::push_front(const column_info &v)
 /// Given an example compiles information about the columns of the dataframe.
 ///
 /// \param[in] r            a record containing an example
-/// \param[in] header_first `true` if the first example contains the header
 /// \param[in] categories   set of categories (updated according to `r`)
+/// \param[in] header_first `true` if the first example contains the header
 ///
 /// The function can be called multiple times to incrementally collect
 /// information from different examples.
@@ -110,8 +111,8 @@ void dataframe::columns_info::push_front(const column_info &v)
 ///
 template<>
 void dataframe::columns_info::build(const dataframe::record_t &r,
-                                    bool header_first,
-                                    category_set &categories)
+                                    category_set &categories,
+                                    bool header_first)
 {
   Expects(r.size());
 
@@ -144,10 +145,14 @@ void dataframe::columns_info::build(const dataframe::record_t &r,
 
       // For classification tasks we use discriminant functions and the actual
       // output type is always numeric.
-      const bool output(!r.front().empty());
-      const bool classification(output && !is_number(r.front()));
-      if (idx == 0 && classification)
-        domain_name = "numeric";
+      if (idx == 0)
+      {
+        const bool output(!value.empty());
+        const bool classification(output && !is_number(value));
+
+        if (classification)
+          domain_name = "numeric";
+      }
 
       const domain_t domain(domain_name == "numeric" ? d_double : d_string);
 
@@ -162,9 +167,15 @@ void dataframe::columns_info::build(const dataframe::record_t &r,
 
     if (header_first)  // first line contains the names of the columns
     {
-      vitaDEBUG << "Reading columns header";
-      for (const auto &name : r)
-        cols_.push_back({name, undefined_category});
+      vitaDEBUG << "Reading CSV header";
+
+      std::transform(r.begin(), r.end(),
+                     std::back_inserter(cols_),
+                     [](const auto &name)
+                     {
+                       return column_info{trim(name), undefined_category};
+                     });
+
       return;
     }
     else
@@ -377,60 +388,59 @@ class_t dataframe::encode(const std::string &label)
 }
 
 ///
-/// \param[in] v              a container for the example (features encoded as
-///                           `std::string`s)
-/// \param[in] add_label      should we automatically add instances for
-///                           text-features?
-/// \return                   `v` converted to `example` type
+/// \param[in] v            a container for the example (features encoded as
+///                         `std::string`s)
+/// \param[in] add_instance should we automatically add instances for
+///                         text-features?
+/// \return                 `v` converted to `example` type
 ///
 /// \remark
-/// When `add_label` is `true` the function can have side-effects (changing
-/// the set of labels associated with a category).
+/// When `add_instance` is `true` the function can have side-effects (changing
+/// the set of admissible instances associated with a text-feature).
 ///
-dataframe::example dataframe::to_example(const record_t &v, bool add_label)
+dataframe::example dataframe::to_example(const record_t &v, bool add_instance)
 {
   Expects(v.size());
   Expects(v.size() == columns.size());
 
-  const bool output(!v.front().empty());
-  const bool classification(output && !is_number(v.front()));
-
   example ret;
 
-  std::size_t index(0);
-  for (const auto &feature : v)
-  {
-    const auto categ(columns[index].category_id);
-    const auto domain(categories_[categ].domain);
-
-    if (index)  // input value
+  for (std::size_t i(0); i < v.size(); ++i)
+    if (const auto categ = columns[i].category_id; categ != undefined_category)
     {
-      ret.input.push_back(convert(feature, domain));
+      const auto domain(categories_[categ].domain);
+      const auto feature(v[i]);
 
-      if (add_label && domain == d_string)
-        categories_.add_label(categ, feature);
-    }
-    else if (!feature.empty())  // output value (not empty)
-    {
-      // Strings could be used as label for classes, but integers
-      // are simpler and faster to manage (arrays instead of maps).
-      if (classification)
-        ret.output = static_cast<D_INT>(encode(feature));
-      else
-        ret.output = convert(feature, domain);
-    }
+      if (i == 0)
+      {
+        const bool classification(!is_number(v.front()));
 
-    ++index;
-  }
+        // Strings could be used as label for classes, but integers
+        // are simpler and faster to manage (arrays instead of maps).
+        if (classification)
+          ret.output = static_cast<D_INT>(encode(feature));
+        else
+          ret.output = convert(feature, domain);
+      }
+      else  // input value
+      {
+        ret.input.push_back(convert(feature, domain));
+
+        if (add_instance && domain == d_string)
+          categories_.add_label(categ, feature);
+      }
+    }
 
   return ret;
 }
 
 ///
-/// \param[in] r input record (an example in raw format)
-/// \return      `true` for a correctly converted/imported record
+/// \param[in] r            input record (an example in raw format)
+/// \param[in] add_instance should we automatically add instances for
+///                         text-features?
+/// \return                 `true` for a correctly converted/imported record
 ///
-bool dataframe::read_record(const record_t &r)
+bool dataframe::read_record(const record_t &r, bool add_instance)
 {
   Expects(r.size());
 
@@ -440,7 +450,7 @@ bool dataframe::read_record(const record_t &r)
     return false;
   }
 
-  const auto instance(to_example(r, true));
+  const auto instance(to_example(r, add_instance));
   push_back(instance);
 
   return true;
@@ -754,14 +764,16 @@ std::size_t dataframe::read_csv(std::istream &from, const params &p)
       // When the output index is unspecified, all the columns are treated as
       // input columns (this is obtained adding a surrogate, empty output
       // column).
-      record.insert(record.begin(), {});
+      record.insert(record.begin(), "");
 
     // Every new record may add further information about the column domain /
     // category.
     if (count < 10)
-      columns.build(record, p.has_header, categories_);
-    if (!p.has_header || count++)
-      read_record(record);
+      columns.build(record, categories_, p.has_header);
+    if (!p.has_header || count)
+      read_record(record, true);
+
+    ++count;
   }
 
   if (!debug() || !size())
@@ -825,24 +837,24 @@ dataframe::iterator dataframe::erase(iterator first, iterator last)
 ///
 bool dataframe::debug() const
 {
+  if (empty())
+    return true;
+
   const auto cl_size(classes());
-  // If this is a classification problem then there should be at least two
-  // classes.
+  // Symbolic regression has 0 classes.
+  // Classification requires at least 2 classes.
   if (cl_size == 1)
     return false;
 
-  if (!empty())
+  const auto in_size(front().input.size());
+
+  for (const auto &e : *this)
   {
-    const auto in_size(begin()->input.size());
+    if (e.input.size() != in_size)
+      return false;
 
-    for (const auto &e : *this)
-    {
-      if (e.input.size() != in_size)
-        return false;
-
-      if (cl_size && label(e) >= cl_size)
-        return false;
-    }
+    if (cl_size && label(e) >= cl_size)
+      return false;
   }
 
   return true;

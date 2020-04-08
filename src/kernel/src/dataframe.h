@@ -30,7 +30,7 @@ using class_t = std::size_t;
 
 /// Used for access protection.
 ///
-/// \ see https://stackoverflow.com/q/3220009/3235496
+/// \see https://stackoverflow.com/q/3220009/3235496
 class dataframe_only
 {
   friend class dataframe;
@@ -82,14 +82,17 @@ public:
     auto end() const { return cols_.end(); }
     auto end() { return cols_.end(); }
 
-    auto back() const { return cols_.back(); }
-    auto back() { return cols_.back(); }
+    const auto &front() const { return cols_.front(); }
+    auto &front() { return cols_.front(); }
+
+    const auto &back() const { return cols_.back(); }
+    auto &back() { return cols_.back(); }
 
     void pop_back() { cols_.pop_back(); }
     void push_back(const column_info &);
     void push_front(const column_info &);
 
-    template<class T> void build(const T &, bool, category_set &);
+    template<class T> void build(const T &, category_set &, bool);
 
     void swap_category(category_t, category_t, dataframe_only);
 
@@ -160,7 +163,7 @@ public:
   columns_info columns;
 
 private:
-  bool read_record(const record_t &);
+  bool read_record(const record_t &, bool);
   example to_example(const record_t &, bool);
 
   class_t encode(const std::string &);
@@ -209,8 +212,8 @@ struct dataframe::example
   /// data.
   value_t             output = {};
 
-  std::uintmax_t difficulty  = 0;
-  unsigned              age  = 0;
+  std::uintmax_t difficulty  =  0;
+  unsigned              age  =  0;
 
   void clear() { *this = example(); }
 };
@@ -231,8 +234,6 @@ inline class_t label(const dataframe::example &e)
 
 struct dataframe::params
 {
-  //params() : has_header(false), filter(nullptr), output_index(0) {}
-
   /// `true` when the CSV file has a header.
   /// \remark Used only when reading CSV files.
   bool has_header = false;

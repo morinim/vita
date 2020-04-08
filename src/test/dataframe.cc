@@ -57,6 +57,19 @@ sepal length,sepal width,petal length,petal width,class
 6.2,3.4,5.4,2.3,Iris-virginica
 5.9,3,5.1,1.8,Iris-virginica)");
 
+std::istringstream ecoli(R"(
+sequence name, mcg,  gvh,  lip,  chg,  aac, alm1, alm2, localization
+AAT_ECOLI,    0.49, 0.29, 0.48, 0.50, 0.56, 0.24, 0.35, cp
+ACEA_ECOLI,   0.07, 0.40, 0.48, 0.50, 0.54, 0.35, 0.44, cp
+ACEK_ECOLI,   0.56, 0.40, 0.48, 0.50, 0.49, 0.37, 0.46, cp
+ACKA_ECOLI,   0.59, 0.49, 0.48, 0.50, 0.52, 0.45, 0.36, cp
+ADI_ECOLI,    0.23, 0.32, 0.48, 0.50, 0.55, 0.25, 0.35, cp
+ALKH_ECOLI,   0.67, 0.39, 0.48, 0.50, 0.36, 0.38, 0.46, cp
+AMPD_ECOLI,   0.29, 0.28, 0.48, 0.50, 0.44, 0.23, 0.34, cp
+AMY2_ECOLI,   0.21, 0.34, 0.48, 0.50, 0.51, 0.28, 0.39, cp
+APT_ECOLI,    0.20, 0.44, 0.48, 0.50, 0.46, 0.51, 0.57, cp
+ARAC_ECOLI,   0.42, 0.40, 0.48, 0.50, 0.56, 0.18, 0.30, cp)");
+
 std::istringstream iris_xrff(R"(
 <dataset name="iris">
   <header>
@@ -141,6 +154,7 @@ TEST_CASE("load_csv_headers")
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(wine, p) == 10);
+  CHECK(d.debug());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
@@ -159,6 +173,7 @@ TEST_CASE("load_csv_headers")
   CHECK(d.columns[11].name ==              "quality");
 
   CHECK(d.columns.begin()->name == d.columns[       0].name);
+  CHECK(d.columns.begin()->name ==   d.columns.front().name);
   CHECK(d.columns.back().name   == d.columns[ncol - 1].name);
 
   std::size_t count(0);
@@ -197,6 +212,7 @@ TEST_CASE("load_csv_output_index")
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(abalone, p) == 10);
+  CHECK(d.debug());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
@@ -212,6 +228,7 @@ TEST_CASE("load_csv_output_index")
   CHECK(d.columns[ 8].name ==   "shell weight");
 
   CHECK(d.columns.begin()->name == d.columns[       0].name);
+  CHECK(d.columns.begin()->name ==   d.columns.front().name);
   CHECK(d.columns.back().name   == d.columns[ncol - 1].name);
 
   CHECK(d.categories()[d.columns[0].category_id].domain == d_double);
@@ -223,6 +240,55 @@ TEST_CASE("load_csv_output_index")
   CHECK(std::holds_alternative<D_DOUBLE>(d.front().output));
   CHECK(std::holds_alternative<D_STRING>(d.front().input[0]));
   CHECK(std::holds_alternative<D_DOUBLE>(d.front().input[1]));
+}
+
+TEST_CASE("load_csv_no_output_index")
+{
+  using namespace vita;
+
+  constexpr std::size_t ncol(9);
+
+  dataframe d;
+  dataframe::params p;
+  p.has_header = true;
+  p.output_index = std::nullopt;
+
+  CHECK(d.columns.size() == 0);
+  CHECK(d.columns.empty());
+
+  CHECK(d.read_csv(ecoli, p) == 10);
+  CHECK(d.debug());
+
+  CHECK(d.columns.size() == ncol + 1);
+  CHECK(!d.columns.empty());
+
+  CHECK(d.columns[ 0].name ==              "");
+  CHECK(d.columns[ 1].name == "sequence name");
+  CHECK(d.columns[ 2].name ==           "mcg");
+  CHECK(d.columns[ 3].name ==           "gvh");
+  CHECK(d.columns[ 4].name ==           "lip");
+  CHECK(d.columns[ 5].name ==           "chg");
+  CHECK(d.columns[ 6].name ==           "aac");
+  CHECK(d.columns[ 7].name ==          "alm1");
+  CHECK(d.columns[ 8].name ==          "alm2");
+  CHECK(d.columns[ 9].name ==  "localization");
+
+  CHECK(d.columns.begin()->name == d.columns[       0].name);
+  CHECK(d.columns.begin()->name ==   d.columns.front().name);
+  CHECK(d.columns.back().name   ==     d.columns[ncol].name);
+
+  CHECK(d.columns.front().category_id == undefined_category);
+
+  CHECK(d.categories()[d.columns[1].category_id].domain == d_string);
+  CHECK(d.categories()[d.columns[2].category_id].domain == d_double);
+
+  CHECK(d.classes() == 0);
+
+  for (const auto &e : d)
+  {
+    CHECK(e.input.size() == ncol);
+    CHECK(!has_value(e.output));
+  }
 }
 
 TEST_CASE("load_csv_classification")
@@ -240,6 +306,8 @@ TEST_CASE("load_csv_classification")
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(iris, p) == 10);
+  CHECK(d.debug());
+
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
 
@@ -250,6 +318,7 @@ TEST_CASE("load_csv_classification")
   CHECK(d.columns[ 4].name ==  "petal width");
 
   CHECK(d.columns.begin()->name == d.columns[       0].name);
+  CHECK(d.columns.begin()->name ==   d.columns.front().name);
   CHECK(d.columns.back().name   == d.columns[ncol - 1].name);
 
   std::size_t count(0);
@@ -281,6 +350,8 @@ TEST_CASE("load_xrff_classification")
   CHECK(d.columns.empty());
 
   CHECK(d.read_xrff(iris_xrff) == 10);
+  CHECK(d.debug());
+
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
 
@@ -291,6 +362,7 @@ TEST_CASE("load_xrff_classification")
   CHECK(d.columns[ 4].name ==  "petalwidth");
 
   CHECK(d.columns.begin()->name == d.columns[       0].name);
+  CHECK(d.columns.begin()->name ==   d.columns.front().name);
   CHECK(d.columns.back().name   == d.columns[ncol - 1].name);
 
   std::size_t count(0);
