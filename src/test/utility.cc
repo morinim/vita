@@ -36,6 +36,8 @@ TEST_CASE("is_number")
   CHECK(!is_number("1 a"));
   CHECK(!is_number("a 12"));
   CHECK(!is_number("11 12"));
+  CHECK(!is_number("\"1\""));
+  CHECK(!is_number("'1'"));
 }
 
 }  // TEST_SUITE("UTILITY")

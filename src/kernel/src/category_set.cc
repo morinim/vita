@@ -18,155 +18,126 @@
 
 namespace vita
 {
-const category category::null(0, {"", domain_t::d_void, {}});
+
+const category_info category_info::null = {};
 
 ///
-/// \return `true` if `*this != category::null`
+/// Builds a category_set extracting data from a columns_info object.
 ///
-category::operator bool() const
+/// \param[in] cols columns of a dataframe
+/// \param[in] t    `weak` or `strong` (see `typing`)
+///
+category_set::category_set(const dataframe::columns_info &cols, typing t)
+  : columns_()
 {
-  return tag != null.tag || name != null.name || domain != null.domain
-         || labels != null.labels;
-}
+  category_t categories(0);
 
-///
-/// Builds an empty category_set.
-///
-category_set::category_set() : categories_()
-{
-}
-
-///
-/// Standard, STL-style, begin method.
-///
-category_set::const_iterator category_set::begin() const
-{
-  return category_set::const_iterator(categories_.begin(),
-                                      categories_.begin());
-}
-
-///
-/// Standard, STL-style, end method.
-///
-category_set::const_iterator category_set::end() const
-{
-  return category_set::const_iterator(categories_.begin(),
-                                      categories_.end());
-}
-
-///
-/// Number of input categories.
-///
-/// \return number of input categories
-///
-/// Please note that the value returned may differ from the intuitive number of
-/// categories of the dataset (it could be `1` unit smaller).
-/// For instance consider the simple *Iris* classification problem:
-///
-///     ...
-///     <attribute class="yes" name="class" type="nominal">
-///       <labels>
-///         <label>Iris-setosa</label> ... <label>Iris-virginica</label>
-///       </labels>
-///     </attribute>
-///     <attribute name="sepallength" type="numeric" />
-///     ...
-///
-/// There is a nominal attribute to describe output classes and four numeric
-/// attributes as input. So two distinct attributes / categories (nominal and
-/// numeric) but... `size()` returns `1` (the number of input categories).
-///
-/// This choice is due to the fact that:
-/// - for regression problems the output category is also in the set of input
-///   categories;
-/// - for classification tasks the algorithm ignores the output category
-///   (because it's based on a discriminant function).
-///
-category_t category_set::size() const
-{
-  return static_cast<category_t>(categories_.size());
-}
-
-///
-/// \param[in] name name of a category
-/// \return    the category with the specified `name` or `category::null` if it
-///            doesn't exists
-///
-category category_set::operator[](const std::string &name) const
-{
-  const auto uc(std::find_if(categories_.begin(), categories_.end(),
-                             [name](const untagged_category &c)
-                             {
-                               return c.name == name;
-                             }));
-
-  if (uc == categories_.end())
-    return category::null;
-
-  const auto tag(
-    static_cast<category_t>(std::distance(categories_.begin(), uc)));
-  return category(tag, categories_[tag]);
-}
-
-///
-/// \param[in] t tag of a category
-/// \return      the untagged_category associated to tag `t
-///
-untagged_category category_set::operator[](category_t t) const
-{
-  assert(t < categories_.size());
-  return categories_[t];
-}
-
-///
-/// Potentially insert a new category in the set.
-///
-/// \param[in] c a new untagged_category for the set
-/// \return      the tag (category ID) associated with `c`
-///
-/// Categories with the same name are mapped to the same ID.
-///
-category_t category_set::insert(const untagged_category &c)
-{
-  Expects(!c.name.empty());
-
-  category c1(operator[](c.name));
-
-  if (!c1)
+  for (const auto &c : cols)
   {
-    c1.tag = static_cast<decltype(c1.tag)>(size());
-    categories_.push_back(c);
+    category_t id;
+    if (c.domain == d_void)
+      id = undefined_category;
+    else if (t == typing::strong || c.domain == d_string)
+      id = categories++;
+    else
+    {
+      const auto it(std::find_if(begin(), end(),
+                                 [target = c.domain](const auto &x)
+                                 {
+                                   return x.domain == target;
+                                 }));
+
+      if (it == columns_.end())
+        id = categories++;
+      else
+        id = it->category;
+    }
+
+    columns_.push_back({id, c.domain, c.name});
+  }
+}
+
+///
+/// \param[in] category a category
+/// \return             information about column 'category'
+///
+const category_info &category_set::category(category_t category) const
+{
+  const auto it(std::find_if(begin(), end(),
+                             [category](const auto &e)
+                             {
+                               return e.category == category;
+                             }));
+  return it == columns_.end() ? category_info::null : *it;
+}
+
+///
+/// \param[in] i index of a dataframe column
+/// \return    information about column 'i'
+///
+const category_info &category_set::column(std::size_t i) const
+{
+  Expects(i < columns_.size());
+  return columns_[i];
+}
+
+///
+/// \param[in] name column name
+/// \return         information about column 'name'
+///
+const category_info &category_set::column(const std::string &name) const
+{
+  const auto it(std::find_if(begin(), end(),
+                             [name](const auto &e)
+                             {
+                               return e.name == name;
+                             }));
+  return it == columns_.end() ? category_info::null : *it;
+}
+
+///
+/// \return the set of used categories
+///
+std::set<category_t> category_set::used_categories() const
+{
+  std::set<category_t> ret;
+
+  std::transform(begin(), end(), std::inserter(ret, ret.end()),
+                 [](const auto &c) { return c.category; });
+
+  return ret;
+}
+
+///
+/// \return `true` if the object satisfies class invariants
+///
+bool category_set::is_valid() const
+{
+  // Unique column name (when available).
+  for (std::size_t i(0); i < columns_.size(); ++i)
+    if (!columns_[i].name.empty())
+      for (std::size_t j(i + 1); j < columns_.size(); ++j)
+        if (columns_[j].name == columns_[i].name)
+          return false;
+
+  // Undefined category implies void domain.
+  for (std::size_t i(0); i < columns_.size(); ++i)
+    if (columns_[i].category == undefined_category
+        && columns_[i].domain != d_void)
+      return false;
+
+  // Same category implies same domain.
+  for (std::size_t i(0); i < columns_.size(); ++i)
+  {
+    const category_t category(columns_[i].category);
+    const domain_t domain(columns_[i].domain);
+
+    for (std::size_t j(i + 1); j < columns_.size(); ++j)
+      if (columns_[j].category == category && columns_[j].domain != domain)
+        return false;
   }
 
-  return c1.tag;
-}
-
-///
-/// Adds a label to the set of labels associated with a category.
-///
-/// \param[in] t the tag of the category `l` should be added to
-/// \param[in] l label to be added
-///
-void category_set::add_label(category_t t, const std::string &l)
-{
-  Expects(t < size());
-  Expects(categories_[t].domain == domain_t::d_string);
-
-  categories_[t].labels.insert(l);
-}
-
-///
-/// Swaps two categories.
-///
-/// \param[in] t1 a tag of a category
-/// \param[in] t2 a tag of a category
-///
-void category_set::swap(category_t t1, category_t t2)
-{
-  Expects(t1 < size());
-  Expects(t2 < size());
-
-  std::swap(categories_[t1], categories_[t2]);
+  return true;
 }
 
 ///
@@ -176,19 +147,22 @@ void category_set::swap(category_t t1, category_t t2)
 /// \param[in] c  category to print
 /// \return       output stream including `c`
 ///
-std::ostream &operator<<(std::ostream &s, const category &c)
+std::ostream &operator<<(std::ostream &s, const category_info &c)
 {
-  s << c.name << " (category " << c.tag << ", domain " << c.domain;
+  return s << c.name << " (category " << c.category << ", domain " << c.domain;
+}
 
-  s << ", [";
-
-  if (!c.labels.empty())
-    std::copy(c.labels.begin(), c.labels.end(),
-              infix_iterator<std::string>(s, " "));
-
-  s << "])";
-
-  return s;
+///
+/// Compares two category_info structs for equality.
+///
+/// \param[in] lhs first term of comparison
+/// \param[in] rhs second term of comparison
+/// return         `true` when `lhs` and `rhs` compare equals
+///
+bool operator==(const category_info &lhs, const category_info &rhs)
+{
+  return lhs.category == rhs.category && lhs.domain == rhs.domain
+         && lhs.name == rhs.name;
 }
 
 }  // namespace vita

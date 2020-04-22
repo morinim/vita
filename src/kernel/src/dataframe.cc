@@ -30,8 +30,8 @@ namespace
 
 // \param[in] s the string to be converted
 // \param[in] d what type should `s` be converted in?
-// \return      the converted data or an empty value if no conversion can be
-//              applied
+// \return      the converted data or an empty value (`std::monostate`) if no
+///             conversion can be applied
 //
 // `convert("123.1", d_double) == value_t(123.1f)`
 value_t convert(const std::string &s, domain_t d)
@@ -49,7 +49,7 @@ value_t convert(const std::string &s, domain_t d)
 
 ///
 /// \param[in] n the name of a weka domain
-/// \return      the internel id of the weka-domain `n` (`d_void` if it's
+/// \return      the internal id of the weka-domain `n` (`d_void` if it's
 ///              unknown or not managed)
 ///
 domain_t from_weka(const std::string &n)
@@ -77,17 +77,27 @@ domain_t from_weka(const std::string &n)
 }
 
 ///
-/// Arrange the object in the empty starting state.
+/// Constructs a new empty columns_info object.
 ///
 dataframe::columns_info::columns_info() : cols_()
 {
 }
 
+///
+/// Adds a new column at the end of the column list.
+///
+/// \param[in] v information about the new column
+///
 void dataframe::columns_info::push_back(const column_info &v)
 {
   cols_.push_back(v);
 }
 
+///
+/// Adds a new column at the front of the column list.
+///
+/// \param[in] v information about the new column
+///
 void dataframe::columns_info::push_front(const column_info &v)
 {
   cols_.insert(begin(), v);
@@ -97,22 +107,18 @@ void dataframe::columns_info::push_front(const column_info &v)
 /// Given an example compiles information about the columns of the dataframe.
 ///
 /// \param[in] r            a record containing an example
-/// \param[in] categories   set of categories (updated according to `r`)
 /// \param[in] header_first `true` if the first example contains the header
 ///
 /// The function can be called multiple times to incrementally collect
 /// information from different examples.
 ///
 /// When `header_first` is `true` the first example is used to gather the names
-/// of the columns and successive example contribute to determine the category
+/// of the columns and successive example contribute to determine the domain
 /// of each column.
 ///
 /// \remark The function assumes columns `0` as the output column.
 ///
-template<>
-void dataframe::columns_info::build(const dataframe::record_t &r,
-                                    category_set &categories,
-                                    bool header_first)
+void dataframe::columns_info::build(const record_t &r, bool header_first)
 {
   Expects(r.size());
 
@@ -127,36 +133,22 @@ void dataframe::columns_info::build(const dataframe::record_t &r,
       return cols_[idx].name;
     });
 
-  // Sets the category associated to a column.
-  const auto set_col_category(
+  // Sets the domain associated to a column.
+  const auto set_domain(
     [&](std::size_t idx)
     {
-      if (cols_[idx].category_id != undefined_category)
-        return;
-
       const std::string &value(trim(r[idx]));
       if (value.empty())
-        return;  // value not available
+        return;
 
-      // For numbers we aren't adopting strong typing by default. So values
-      // from distinct numerical columns can be mixed (since they're mapped to
-      // the same domain / category).
-      std::string domain_name(is_number(value) ? "numeric" : col_name(idx));
+      const bool number(is_number(value));
+      const bool classification(idx == 0 && !number);
 
-      // For classification tasks we use discriminant functions and the actual
-      // output type is always numeric.
-      if (idx == 0)
-      {
-        const bool output(!value.empty());
-        const bool classification(output && !is_number(value));
-
-        if (classification)
-          domain_name = "numeric";
-      }
-
-      const domain_t domain(domain_name == "numeric" ? d_double : d_string);
-
-      cols_[idx].category_id = categories.insert({domain_name, domain, {}});
+      // DOMAIN
+      if (cols_[idx].domain == d_void)
+        // For classification tasks we use discriminant functions and the actual
+        // output type is always numeric.
+        cols_[idx].domain = number || classification ? d_double : d_string;
     });
 
   const auto fields(r.size());
@@ -167,13 +159,11 @@ void dataframe::columns_info::build(const dataframe::record_t &r,
 
     if (header_first)  // first line contains the names of the columns
     {
-      vitaDEBUG << "Reading CSV header";
-
       std::transform(r.begin(), r.end(),
                      std::back_inserter(cols_),
                      [](const auto &name)
                      {
-                       return column_info{trim(name), undefined_category};
+                       return column_info{trim(name), d_void, {}};
                      });
 
       return;
@@ -185,29 +175,23 @@ void dataframe::columns_info::build(const dataframe::record_t &r,
   assert(size() == r.size());
 
   for (std::size_t field(0); field < fields; ++field)
-    set_col_category(field);
+    set_domain(field);
 }
 
 ///
-/// Swaps two categories of the columns_info object.
+/// \return `true` if the object passes the internal consistency check
 ///
-/// \param[in] c1 a category
-/// \param[in] c2 a category
-///
-void dataframe::columns_info::swap_category(category_t c1, category_t c2,
-                                            dataframe_only)
+bool dataframe::columns_info::debug() const
 {
-  for (auto &c : cols_)
-    if (c.category_id == c1)
-      c.category_id = c2;
-    else if (c.category_id == c2)
-      c.category_id = c1;
+  return std::none_of(begin(), end(),
+                      [](const auto &c)
+                      { return c.domain == d_void && !c.states.empty(); });
 }
 
 ///
 /// New empty data instance.
 ///
-dataframe::dataframe() : columns(), classes_map_(), categories_(), dataset_()
+dataframe::dataframe() : columns(), classes_map_(), dataset_()
 {
   Ensures(debug());
 }
@@ -331,15 +315,6 @@ bool dataframe::empty() const
 }
 
 ///
-/// \return a const reference to the set of categories associated with the
-///         dataset
-///
-const category_set &dataframe::categories() const
-{
-  return categories_;
-}
-
-///
 /// \return number of classes of the problem (`== 0` for a symbolic regression
 ///         problem, `> 1` for a classification problem)
 ///
@@ -406,10 +381,9 @@ dataframe::example dataframe::to_example(const record_t &v, bool add_instance)
   example ret;
 
   for (std::size_t i(0); i < v.size(); ++i)
-    if (const auto categ = columns[i].category_id; categ != undefined_category)
+    if (const auto domain = columns[i].domain; domain != d_void)
     {
-      const auto domain(categories_[categ].domain);
-      const auto feature(v[i]);
+      const auto feature(trim(v[i]));
 
       if (i == 0)
       {
@@ -423,12 +397,10 @@ dataframe::example dataframe::to_example(const record_t &v, bool add_instance)
           ret.output = convert(feature, domain);
       }
       else  // input value
-      {
         ret.input.push_back(convert(feature, domain));
 
-        if (add_instance && domain == d_string)
-          categories_.add_label(categ, feature);
-      }
+      if (add_instance && domain == d_string)
+        columns[i].states.insert(feature);
     }
 
   return ret;
@@ -468,18 +440,6 @@ std::string dataframe::class_name(class_t i) const
       return p.first;
 
   return {};
-}
-
-///
-/// Swaps two categories of the dataframe.
-///
-/// \param[in] c1 a category
-/// \param[in] c2 a category
-///
-void dataframe::swap_category(category_t c1, category_t c2)
-{
-  categories_.swap(c1, c2);
-  columns.swap_category(c1, c2, {});
 }
 
 ///
@@ -542,15 +502,7 @@ std::size_t dataframe::read_xrff(std::istream &in)
 /// An XRFF (eXtensible attribute-Relation File Format) file describes a list
 /// of instances sharing a set of attributes.
 /// The original format is defined in
-/// https://waikato.github.io/weka-wiki/formats_and_processing/xrff/, we
-/// extend it with an additional (non-standard) feature: attribute category.
-///
-///     <attribute name="vehicle length" type="numeric" category="length" />
-///     <attribute name="vehicle width" type="numeric" category="length" />
-///     <attribute name="vehicle weight" type="numeric" category="weight" />
-///
-/// This feature is used to constrain the search (Strongly Typed Genetic
-/// Programming).
+/// https://waikato.github.io/weka-wiki/formats_and_processing/xrff/
 ///
 /// \warning
 /// To date we don't support compressed and sparse format XRFF files.
@@ -568,12 +520,11 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
 
   clear();
 
-  unsigned n_output(0);
-  bool classification(false);
+  unsigned n_output(0), output_index(0), index(0);
 
-  for (auto *attribute = attributes->FirstChildElement("attribute");
+  for (auto *attribute(attributes->FirstChildElement("attribute"));
        attribute;
-       attribute = attribute->NextSiblingElement("attribute"))
+       attribute = attribute->NextSiblingElement("attribute"), ++index)
   {
     columns_info::column_info a;
 
@@ -588,12 +539,11 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
     s = attribute->Attribute("type");
     std::string xml_type(s ? s : "");
 
-    s = attribute->Attribute("category");
-    std::string category_name(s ? s : xml_type);
-
     if (output)
     {
       ++n_output;
+
+      output_index = index;
 
       // We can manage only one output column.
       if (n_output > 1)
@@ -601,16 +551,11 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
 
       // For classification problems we use discriminant functions, so the
       // actual output type is always numeric.
-      classification = (xml_type == "nominal" || xml_type == "string");
-      if (classification)
-      {
+      if (xml_type == "nominal" || xml_type == "string")
         xml_type = "numeric";
-        category_name = "numeric";
-      }
     }
 
-    a.category_id = categories_.insert({category_name, from_weka(xml_type),
-                                        {}});
+    a.domain = from_weka(xml_type);
 
     // Store label1... labelN.
     if (xml_type == "nominal")
@@ -619,7 +564,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
            l = l->NextSiblingElement("label"))
       {
         const std::string label(l->GetText() ? l->GetText() : "");
-        categories_.add_label(a.category_id, label);
+        a.states.insert(label);
       }
 
     // Output column is always the first one.
@@ -639,10 +584,8 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
   {
     columns.push_front(columns.back());
     columns.pop_back();
+    output_index = index - 1;
   }
-
-  // Category 0 is the output category.
-  swap_category(0, columns[0].category_id);
 
   if (auto *instances = handle.FirstChildElement("dataset")
                         .FirstChildElement("body")
@@ -661,6 +604,10 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
 
       if (p.filter && p.filter(record) == false)
         continue;
+
+      std::rotate(record.begin(),
+                  std::next(record.begin(), output_index),
+                  std::next(record.begin(), output_index + 1));
 
       read_record(record, false);
     }
@@ -762,10 +709,9 @@ std::size_t dataframe::read_csv(std::istream &from, const params &p)
       // column).
       record.insert(record.begin(), "");
 
-    // Every new record may add further information about the column domain /
-    // category.
+    // Every new record may add further information about the column domain.
     if (count < 10)
-      columns.build(record, categories_, p.has_header);
+      columns.build(record, p.has_header);
     if (!p.has_header || count)
       read_record(record, true);
 
@@ -853,7 +799,7 @@ bool dataframe::debug() const
       return false;
   }
 
-  return true;
+  return columns.debug();
 }
 
 }  // namespace vita

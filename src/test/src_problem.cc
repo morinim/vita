@@ -73,7 +73,8 @@ TEST_CASE("seq_with_rep")
 TEST_CASE("Loading")
 {
   vita::src_problem p("./test_resources/src_problem.xrff",
-                      "./test_resources/src_problem.xml");
+                      "./test_resources/src_problem.xml",
+                      vita::typing::strong);
 
   CHECK(!!p);
 

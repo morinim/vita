@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@ namespace vita
 ///
 csv_parser::const_iterator csv_parser::begin() const
 {
-  return *is_ ? const_iterator(is_, filter_hook_, delimiter_, trim_ws_)
+  return *is_ ? const_iterator(is_, filter_hook_, dialect_)
               : end();
 }
 
@@ -95,7 +95,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
 
   const auto &add_field = [&](const std::string &field) -> void
   {
-    record.push_back(trim_ws_ ? trim(field) : field);
+    record.push_back(dialect_.trim_ws ? trim(field) : field);
   };
 
   for (auto length(line.length()), pos(decltype(length){0});
@@ -116,7 +116,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
       else  // end quote char
         inquotes = false;
     }
-    else if (!inquotes && c == delimiter_)  // end of field
+    else if (!inquotes && c == dialect_.delimiter)  // end of field
     {
       add_field(curstring);
       curstring = "";
