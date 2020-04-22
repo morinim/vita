@@ -13,6 +13,7 @@
 #if !defined(VITA_VALUE_H)
 #define      VITA_VALUE_H
 
+#include <iosfwd>
 #include <variant>
 
 namespace vita
@@ -25,7 +26,7 @@ namespace vita
 /// `1 + 1 = 2`; string domain: `"a" + "b" = "ab"`).
 ///
 /// The operations of a domain are defined in files named after the domain
-/// and grouped in the `primitive/` folder.
+/// and grouped in the `src/primitive/` folder.
 ///
 /// \see category_t
 ///
@@ -50,6 +51,8 @@ inline bool has_value(const value_t &v)
 {
   return !std::holds_alternative<std::monostate>(v);
 }
+
+std::ostream &operator<<(std::ostream &, const value_t &);
 
 }  // namespace vita
 

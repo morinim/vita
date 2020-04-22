@@ -30,6 +30,20 @@ bool iequals(const std::string &lhs, const std::string &rhs)
 }
 
 ///
+/// \param[in] s the string to be tested
+/// \return      `true` if `s` contains a number
+///
+bool is_number(std::string s)
+{
+  s = trim(s);
+
+  char *end;
+  strtod(s.c_str(), &end);  // if no conversion can be performed, ​`end` is set
+                            // to `s.c_str()`
+  return end != s.c_str() && *end == '\0';
+}
+
+///
 /// \param[in] s the input string
 /// \return      a copy of `s` with spaces removed on both sides of the string
 ///
@@ -161,6 +175,20 @@ double lexical_cast<double>(const vita::value_t &v)
   case d_double:  return std::get<D_DOUBLE>(v);
   case d_int:     return std::get<D_INT>(v);
   case d_string:  return lexical_cast<double>(std::get<D_STRING>(v));
+  default:        return 0.0;
+  }
+}
+
+template<>
+int lexical_cast<int>(const vita::value_t &v)
+{
+  using namespace vita;
+
+  switch (v.index())
+  {
+  case d_double:  return std::get<D_DOUBLE>(v);
+  case d_int:     return std::get<D_INT>(v);
+  case d_string:  return lexical_cast<int>(std::get<D_STRING>(v));
   default:        return 0.0;
   }
 }

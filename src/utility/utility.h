@@ -26,6 +26,7 @@
 
 namespace vita
 {
+bool is_number(std::string);
 bool iequals(const std::string &, const std::string &);
 std::string merge_path(const std::string &, const std::string &, char = '/');
 std::string replace(std::string, const std::string &, const std::string &);
@@ -143,7 +144,7 @@ private:
 #define SAVE_FLAGS(s) ios_flag_saver save ## __LINE__(s)
 
 ///
-/// A single-pass output iterator that writes successive objects of type T
+/// A single-pass output iterator that writes successive objects of type `T`
 /// into the `std::basic_ostream` object for which it was constructed, using
 /// `operator<<`. Optional delimiter string is written to the output stream
 /// after the SECOND write operation.

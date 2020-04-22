@@ -11,6 +11,7 @@
  */
 
 #include "test/cache.cc"
+#include "test/category_set.cc"
 #include "test/dataframe.cc"
 #include "test/de.cc"
 #include "test/discretization.cc"
@@ -36,3 +37,5 @@
 #include "test/symbol_set.cc"
 #include "test/team.cc"
 #include "test/terminal.cc"
+#include "test/utility.cc"
+#include "test/value.cc"

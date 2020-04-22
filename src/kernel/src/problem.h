@@ -15,11 +15,10 @@
 
 #include <filesystem>
 #include <string>
-#include <set>
 
 #include "kernel/exceptions.h"
 #include "kernel/problem.h"
-#include "kernel/src/dataframe.h"
+#include "kernel/src/category_set.h"
 #include "kernel/src/primitive/factory.h"
 
 namespace vita
@@ -47,18 +46,22 @@ public:
   // --- Constructors ---
   src_problem();
 
-  explicit src_problem(const std::filesystem::path &);
-  explicit src_problem(std::istream &);
+  explicit src_problem(const std::filesystem::path &, typing = typing::weak);
+  explicit src_problem(std::istream &, typing = typing::weak);
 
   struct default_symbols_t {};
   static const default_symbols_t default_symbols;
-  src_problem(const std::filesystem::path &, const default_symbols_t &);
-  src_problem(const std::filesystem::path &, const std::filesystem::path &);
+  src_problem(const std::filesystem::path &, const default_symbols_t &,
+              typing = typing::weak);
+  src_problem(const std::filesystem::path &, const std::filesystem::path &,
+              typing = typing::weak);
   // --------------------
 
   bool operator!() const;
-  std::size_t setup_symbols(const std::filesystem::path & = {});
-  std::size_t setup_terminals(const std::set<unsigned> & = {});
+  std::size_t setup_symbols(typing = typing::weak);
+  std::size_t setup_symbols(const std::filesystem::path &,
+                            typing = typing::weak);
+  void setup_terminals(typing);
 
   const dataframe &data(dataset_t = dataset_t::training) const;
   dataframe &data(dataset_t = dataset_t::training);
@@ -74,7 +77,8 @@ public:
 
 private:
   // Private support methods.
-  bool compatible(const cvect &, const std::vector<std::string> &) const;
+  bool compatible(const cvect &, const std::vector<std::string> &,
+                  const category_set &) const;
   std::size_t setup_symbols_impl();
   std::size_t setup_symbols_impl(const std::filesystem::path &);
 

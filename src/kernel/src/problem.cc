@@ -10,13 +10,15 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "tinyxml2/tinyxml2.h"
+#include <set>
 
 #include "kernel/src/problem.h"
 #include "kernel/lambda_f.h"
 #include "kernel/src/constant.h"
 #include "kernel/src/evaluator.h"
 #include "kernel/src/variable.h"
+
+#include "third_party/tinyxml2/tinyxml2.h"
 
 namespace vita
 {
@@ -27,7 +29,7 @@ namespace detail
 {
 ///
 /// \param[in] availables the "dictionary" for the sequence
-/// \param[in] size       size of the output sequence
+/// \param[in] size       length of the output sequence
 /// \return               a set of sequences with repetition with elements
 ///                       taken from a given set (`availables`) and fixed
 ///                       length (`size`).
@@ -82,15 +84,17 @@ src_problem::src_problem() : problem(), training_(), validation_(), factory_()
 /// Initializes problem dataset with examples coming from a file.
 ///
 /// \param[in] ds name of the dataset file (CSV or XRFF format)
+/// \param[in] t  weak or strong typing
 ///
 /// \warning
 /// - Users **must** specify, at least, the functions to be used;
-/// - terminal directly derived from the data (variables / labels) are
+/// - terminals directly derived from the data (variables / labels) are
 ///   automatically inserted;
-/// - any additional terminals (ephemeral random constants, problem specific
-///   constants...) can be manually inserted.
+/// - any additional terminal (ephemeral random constant, problem specific
+///   constant...) can be manually inserted.
 ///
-src_problem::src_problem(const std::filesystem::path &ds) : src_problem()
+src_problem::src_problem(const std::filesystem::path &ds, typing t)
+  : src_problem()
 {
   vitaINFO << "Reading dataset " << ds << "...";
   data(dataset_t::training).read(ds);
@@ -100,22 +104,23 @@ src_problem::src_problem(const std::filesystem::path &ds) : src_problem()
            << ", features: " << variables()
            << ", classes: " << classes();
 
-  setup_terminals();
+  setup_terminals(t);
 }
 
 ///
 /// Initializes problem dataset with examples coming from a file.
 ///
-/// \param[in] ds name of the dataset file (CSV or XRFF format)
+/// \param[in] ds dataset
+/// \param[in] t  weak or strong typing
 ///
 /// \warning
 /// - Users **must** specify, at least, the functions to be used;
-/// - terminal directly derived from the data (variables / labels) are
+/// - terminals directly derived from the data (variables / labels) are
 ///   automatically inserted;
-/// - any additional terminals (ephemeral random constants, problem specific
+/// - any additional terminal (ephemeral random constant, problem specific
 ///   constants...) can be manually inserted.
 ///
-src_problem::src_problem(std::istream &ds) : src_problem()
+src_problem::src_problem(std::istream &ds, typing t) : src_problem()
 {
   vitaINFO << "Reading dataset from input stream...";
   data(dataset_t::training).read_csv(ds);
@@ -125,7 +130,7 @@ src_problem::src_problem(std::istream &ds) : src_problem()
            << ", features: " << variables()
            << ", classes: " << classes();
 
-  setup_terminals();
+  setup_terminals(t);
 }
 
 ///
@@ -133,13 +138,14 @@ src_problem::src_problem(std::istream &ds) : src_problem()
 /// file.
 ///
 /// \param[in] ds name of the dataset file
+/// \param[in] t  weak or strong typing
 ///
 /// Mainly useful for simple problems (single category regression /
-/// classification).
+/// classification) or for the initial approach.
 ///
 src_problem::src_problem(const std::filesystem::path &ds,
-                         const default_symbols_t &)
-  : src_problem(ds, std::filesystem::path())
+                         const default_symbols_t &, typing t)
+  : src_problem(ds, std::filesystem::path(), t)
 {
 }
 
@@ -148,9 +154,10 @@ src_problem::src_problem(const std::filesystem::path &ds,
 ///
 /// \param[in] ds      name of the training dataset file
 /// \param[in] symbols name of the file containing the symbols to be used.
+/// \param[in] t       weak or strong typing
 ///
 src_problem::src_problem(const std::filesystem::path &ds,
-                         const std::filesystem::path &symbols)
+                         const std::filesystem::path &symbols, typing t)
   : src_problem()
 {
   vitaINFO << "Reading dataset " << ds << "...";
@@ -161,7 +168,7 @@ src_problem::src_problem(const std::filesystem::path &ds,
            << ", features: " << variables()
            << ", classes: " << classes();
 
-  setup_symbols(symbols);
+  setup_symbols(symbols, t);
 }
 
 ///
@@ -173,44 +180,82 @@ bool src_problem::operator!() const
 }
 
 ///
-/// Inserts variables and labels for nominal attributes into the symbol_set.
+/// Inserts variables and states for nominal attributes into the symbol_set.
 ///
-/// \param[in] skip features in this set will be ignored
-/// \return         number of variables inserted (one variable per feature)
+/// \param[in] t weak or strong typing
 ///
-/// \exception `std::insufficient_data` insufficient data to generate the
-///             terminal set
+/// \exception `std::data_format`       unsupported state domain
+///
+/// There is one variable for each feature.
 ///
 /// The names used for variables, if not specified in the dataset, are in the
 /// form `X1`, ... `Xn`.
 ///
-std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
+void src_problem::setup_terminals(typing t)
 {
-  std::size_t variables(0);
+  vitaINFO << "Setting up terminals...";
 
-  // Sets up the variables (features).
-  const auto columns(training_.columns());
-  for (std::size_t i(1); i < columns; ++i)
-    if (skip.find(i) == skip.end())
-    {
-      const auto provided_name(training_.get_column(i).name);
-      const auto name(provided_name.empty() ? "X" + std::to_string(i)
-                                            : provided_name);
-      const category_t category(training_.get_column(i).category_id);
-      insert<variable>(name, i - 1, category);
-
-      ++variables;
-    }
-
-  if (!variables)
+  const auto &columns(training_.columns);
+  if (columns.size() < 2)
     throw exception::insufficient_data("Cannot generate the terminal set");
 
-  // Sets up the labels for nominal attributes.
-  for (const category &c : training_.categories())
-    for (const std::string &l : c.labels)
-      insert<constant<std::string>>(l, c.tag);
+  std::string variables;
 
-  return variables;
+  category_set categories(training_.columns, t);
+  for (std::size_t i(1); i < columns.size(); ++i)
+  {
+    // Sets up the variables (features).
+    const auto provided_name(columns[i].name);
+    const auto name(provided_name.empty() ? "X" + std::to_string(i)
+                                          : provided_name);
+    const category_t category(categories.column(i).category);
+
+    if (insert<variable>(name, i - 1, category))
+      variables += " `" + name + "`";
+
+    // Sets up states for nominal attributes.
+    for (const auto &s : columns[i].states)
+      switch (columns[i].domain)
+      {
+      case d_double:
+        insert<constant<D_DOUBLE>>(std::get<D_DOUBLE>(s), category);
+        break;
+      case d_int:
+        insert<constant<D_INT>>(std::get<D_INT>(s), category);
+        break;
+      case d_string:
+        insert<constant<D_STRING>>(std::get<D_STRING>(s), category);
+        break;
+      default:
+        exception::insufficient_data("Cannot generate the terminal set");
+      }
+
+    /*std::visit([this, category](const auto &cs)
+                 {
+                   using T = std::decay_t<decltype(cs)>>;
+                   insert<constant<T>(cs, category);
+                   });*/
+  }
+
+  vitaINFO << "...terminals ready. Variables:" << variables;
+}
+
+///
+/// Sets up the symbol set.
+///
+/// \param[in] t weak or strong typing
+/// \return      number of parsed symbols
+///
+/// A predefined set is arranged (useful for simple problems: single category
+/// regression / classification).
+///
+/// \warning
+/// Data should be loaded before symbols: without data we don't know, among
+/// other things, the features the dataset has.
+///
+std::size_t src_problem::setup_symbols(typing t)
+{
+  return setup_symbols({}, t);
 }
 
 ///
@@ -220,17 +265,18 @@ std::size_t src_problem::setup_terminals(const std::set<unsigned> &skip)
 /// \return         number of parsed symbols
 ///
 /// If a file isn't specified, a predefined set is arranged (useful for simple
-/// problems (single category regression / classification).
+/// problems: single category regression / classification).
 ///
 /// \warning
 /// Data should be loaded before symbols: without data we don't know, among
 /// other things, the features the dataset has.
 ///
-std::size_t src_problem::setup_symbols(const std::filesystem::path &file)
+std::size_t src_problem::setup_symbols(const std::filesystem::path &file,
+                                       typing t)
 {
   sset.clear();
 
-  setup_terminals();
+  setup_terminals(t);
 
   return file.empty() ? setup_symbols_impl() : setup_symbols_impl(file);
 }
@@ -247,25 +293,24 @@ std::size_t src_problem::setup_symbols_impl()
 {
   vitaINFO << "Setting up default symbol set...";
 
+  category_set categories(training_.columns);
+  const auto used_categories(categories.used_categories());
   std::size_t inserted(0);
 
-  for (category_t tag(0), sup(categories()); tag < sup; ++tag)
-    if (compatible({tag}, {"numeric"}))
+  for (const auto &category : used_categories)
+    if (compatible({category}, {"numeric"}, categories))
     {
       const std::vector<std::string> base(
         {"1.0", "2.0", "3.0", "4.0", "5.0", "6.0", "7.0", "8.0", "9.0",
          "FABS", "FADD", "FDIV", "FLN", "FMUL", "FMOD", "FSUB"});
 
       for (const auto &s: base)
-        if (sset.insert(factory_.make(s, {tag})))
+        if (sset.insert(factory_.make(s, {category})))
           ++inserted;
     }
-    else if (compatible({tag}, {"string"}))
+    else if (compatible({category}, {"string"}, categories))
     {
-      // for (category_t tag j(0); j < sup; ++j)
-      //   if (j != tag)
-      //     sset.insert(factory_.make("SIFE", {tag, j}));
-      if (sset.insert(factory_.make("SIFE", {tag, 0})))
+      if (sset.insert(factory_.make("SIFE", {category, 0})))
         ++inserted;
     }
 
@@ -288,14 +333,8 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
   if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("Symbol set format error");
 
-  // Records the set of categories as inferred from the dataset.
-  std::set<category_t> used_categories;
-  for (const category &c : training_.categories())
-  {
-    vitaDEBUG << "Using " << c;
-    used_categories.insert(c.tag);
-  }
-
+  category_set categories(training_.columns);
+  const auto used_categories(categories.used_categories());
   std::size_t parsed(0);
 
   // When I wrote this, only God and I understood what I was doing.
@@ -310,29 +349,26 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
        s;
        s = s->NextSiblingElement("symbol"))
   {
-    const char *c_sym_name(s->Attribute("name"));
-    if (!c_sym_name)
+    if (!s->Attribute("name"))
     {
       vitaERROR << "Skipped unnamed symbol in symbolset";
       continue;
     }
-    const std::string sym_name(c_sym_name);
+    const std::string sym_name(s->Attribute("name"));
 
-    const char *sym_sig(s->Attribute("signature"));
-
-    if (sym_sig)  // single category, uniform initialization
-    {
-      for (auto tag : used_categories)
-        if (compatible({tag}, {std::string(sym_sig)}))
+    if (const char *sym_sig = s->Attribute("signature")) // single category,
+    {                                                    // uniform init
+      for (auto category : used_categories)
+        if (compatible({category}, {std::string(sym_sig)}, categories))
         {
           const auto n_args(factory_.args(sym_name));
           std::string signature(sym_name + ":");
 
-          for (auto j(decltype(n_args){0}); j < n_args; ++j)
-            signature += " " + training_.categories()[tag].name;
+          for (std::size_t j(0); j < n_args; ++j)
+            signature += " " + std::to_string(category);
           vitaDEBUG << "Adding to symbol set " << signature;
 
-          sset.insert(factory_.make(sym_name, cvect(n_args, tag)));
+          sset.insert(factory_.make(sym_name, cvect(n_args, category)));
         }
     }
     else  // !sym_sig => complex signature
@@ -366,11 +402,11 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
       // ...we choose those compatible with the xml signature of the current
       // symbol.
       for (const auto &seq : sequences)
-        if (compatible(seq, args))
+        if (compatible(seq, args, categories))
         {
           std::string signature(sym_name + ":");
           for (const auto &j : seq)
-            signature += " " + training_.categories()[j].name;
+            signature += " " + std::to_string(j);
           vitaDEBUG << "Adding to symbol set " << signature;
 
           sset.insert(factory_.make(sym_name, seq));
@@ -387,9 +423,10 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
 ///
 /// Checks if a sequence of categories matches a sequence of domain names.
 ///
-/// \param[in] instance a vector of categories
-/// \param[in] pattern  a mixed vector of category names and domain names
-/// \return             `true` if `instance` match `pattern`
+/// \param[in] instance   a vector of categories
+/// \param[in] pattern    a mixed vector of category names and domain names
+/// \param[in] categories
+/// \return               `true` if `instance` match `pattern`
 ///
 /// For instance:
 ///
@@ -401,24 +438,25 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
 ///     compatible({name}, {"string"}) == true
 ///
 bool src_problem::compatible(const cvect &instance,
-                             const std::vector<std::string> &pattern) const
+                             const std::vector<std::string> &pattern,
+                             const category_set &categories) const
 {
   Expects(instance.size() == pattern.size());
 
   const auto sup(instance.size());
-  for (auto i(decltype(sup){0}); i < sup; ++i)
+  for (std::size_t i(0); i < sup; ++i)
   {
     const std::string p_i(pattern[i]);
-    const bool generic(from_weka(p_i) != domain_t::d_void);
+    const bool generic(from_weka(p_i) != d_void);
 
     if (generic)  // numeric, string, integer...
     {
-      if (training_.categories()[instance[i]].domain != from_weka(p_i))
+      if (categories.category(instance[i]).domain != from_weka(p_i))
         return false;
     }
     else
     {
-      if (instance[i] != training_.categories().find(p_i).tag)
+      if (instance[i] != categories.column(p_i).category)
         return false;
     }
   }
@@ -431,7 +469,7 @@ bool src_problem::compatible(const cvect &instance,
 ///
 unsigned src_problem::categories() const
 {
-  return training_.categories().size();
+  return sset.categories();
 }
 
 ///

@@ -8,9 +8,9 @@
           <label>C</label>
         </labels>
       </attribute>
-      <attribute name="input1" category="km/h" type="numeric" />
-      <attribute name="input2" category="kg" type="numeric" />
-      <attribute name="input3" category="euro" type="integer" />
+      <attribute name="input1" type="numeric" />
+      <attribute name="input2" type="numeric" />
+      <attribute name="input3" type="integer" />
     </attributes>
   </header>
   <body>

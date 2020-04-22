@@ -19,119 +19,72 @@
 
 #include "kernel/common.h"
 #include "kernel/value.h"
+#include "kernel/src/dataframe.h"
 
 namespace vita
 {
+
 ///
-/// Information about a category of the dataset.
+/// Category/type management of the dataframe columns.
 ///
-/// For example:
+/// - `weak`: columns having the same domain can be freely mixed by the engine.
+/// - `strong`: every column has its own type/category (Strongly Typed Genetic
+/// Programming).
 ///
-///     <attribute type="nominal">
-///       <labels>
-///         <label>Iris-setosa</label>
-///         <label>Iris-versicolor</label>
-///         <label>Iris-virginica</label>
-///       </labels>
-///     </attribute>
+/// Even when specifying `weakly_typed` the engine won't mix all the columns.
+/// Particularly a unique category will be assigned to:
+/// - columns associated with distinct domains;
+/// - columns with `d_string` domain.
 ///
-/// is mapped to:
-///
-///     {"", d_string, {"Iris-setosa", "Iris-versicolor", "Iris-virginica"}}
-///
-/// while
-///
-///     <attribute type="numeric" category="A" name="Speed" />
-///
-/// is mapped to:
-///
-///     {"A", d_double, {}}
-///
-struct untagged_category
+enum class typing {weak, strong};
+
+struct category_info
 {
-  std::string             name;
-  domain_t              domain;
-  std::set<std::string> labels;
+  static const category_info null;
+
+  category_t category = undefined_category;
+  domain_t     domain =             d_void;
+  std::string    name =                 {};
 };
 
-///
-/// Integrates untagged_category struct with a unique identifier.
-///
-struct category : public untagged_category
-{
-  category(category_t t, const untagged_category &uc)
-    : untagged_category(uc), tag(t)
-  {
-  }
-
-  explicit operator bool() const;
-
-  category_t tag;
-
-  /// A special value used for missing values.
-  static const category null;
-};  // struct category
-
-std::ostream &operator<<(std::ostream &, const category &);
+std::ostream &operator<<(std::ostream &, const category_info &);
+bool operator==(const category_info &, const category_info &);
 
 ///
-/// The set of categories used in a specific problem.
+/// Information about the set of categories used in a specific problem.
+///
+/// More *fine grained* data types are required for Strongly Typed Genetic
+/// Programming: i.e. not just `double` but possibly multiple categories
+/// (`category_t`) that are subset of a `d_double` `domain_t`. Categories avoid
+/// mixing 3 Km/h with 4 Kg (in simple cases there is only one category for
+/// each domain).
+///
+/// The src_problem class uses a category_set object for creating the symbol
+/// set.
+///
+/// \see https://github.com/morinim/vita/wiki/bibliography#14
 ///
 class category_set
 {
 public:
   class const_iterator;
 
-  category_set();
+  explicit category_set(const dataframe::columns_info &, typing = typing::weak);
 
-  const_iterator begin() const;
-  const_iterator end() const;
-  category_t size() const;
+  const category_info &category(category_t) const;
+  const category_info &column(std::size_t) const;
+  const category_info &column(const std::string &) const;
 
-  category find(const std::string &) const;
-  untagged_category operator[](category_t) const;
+  std::set<category_t> used_categories() const;
 
-  category_t insert(const untagged_category &);
+  auto begin() const { return columns_.begin(); }
+  auto end() const { return columns_.end(); }
 
-  void add_label(category_t, const std::string &);
-  void swap(category_t, category_t);
+  bool is_valid() const;
 
 private:
-  std::vector<untagged_category> categories_;
-
-  // Initially we had an additional `std::map` linking category name and
-  // category tag (used to speed up the `find(std::string)` method).
-  // Now the implementation is a bit slower but simpler and more robust.
+  std::vector<category_info> columns_;
 };  // class category_set
-
-
-///
-/// Forward iterator to read the elements of a category_set.
-///
-class category_set::const_iterator
-{
-private:
-  using const_iter = std::vector<untagged_category>::const_iterator;
-
-  const_iter begin_;
-  const_iter ptr_;
-
-public:
-  using iterator_category = std::forward_iterator_tag;
-  using difference_type = std::ptrdiff_t;
-  using value_type = category;
-  using pointer = value_type *;
-  using reference = value_type &;
-
-  const_iterator(const_iter b, const_iter c) : begin_(b), ptr_(c) {}
-
-  const_iterator operator++() { ++ptr_; return *this; }
-  value_type operator*()
-  { return {static_cast<category_t>(ptr_ - begin_), *ptr_}; }
-
-  bool operator==(const const_iterator &rhs) const { return ptr_ == rhs.ptr_; }
-  bool operator!=(const const_iterator &rhs) const { return ptr_ != rhs.ptr_; }
-};  // class category_set::const_iterator
 
 }  // namespace vita
 #endif  // include guard
