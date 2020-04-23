@@ -12,6 +12,7 @@
 
 #include "test/cache.cc"
 #include "test/category_set.cc"
+#include "test/csv_parser.cc"
 #include "test/dataframe.cc"
 #include "test/de.cc"
 #include "test/discretization.cc"

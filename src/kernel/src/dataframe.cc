@@ -692,7 +692,7 @@ std::size_t dataframe::read_csv(std::istream &from, const params &p)
   clear();
 
   std::size_t count(0);
-  for (auto record : csv_parser(from).filter_hook(p.filter))
+  for (auto record : csv_parser(from, {}).filter_hook(p.filter))
   {
     if (p.output_index)
     {

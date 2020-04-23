@@ -30,7 +30,11 @@ struct csv_dialect
   char delimiter = ',';
   /// When `true` skips leading and trailing spaces adjacent to commas.
   bool trim_ws = false;
-};
+  /// When `true` assumes a header row is present.
+  bool has_header = true;
+};  // class csv_dialect
+
+csv_dialect csv_sniffer(std::istream &);
 
 ///
 /// Simple parser for CSV files.
@@ -43,84 +47,26 @@ public:
   using record_t = std::vector<std::string>;
   using filter_hook_t = std::function<bool (record_t &)>;
 
-  explicit csv_parser(std::istream &is)
-    : is_(&is), filter_hook_(nullptr), dialect_()
-  {}
+  explicit csv_parser(std::istream &);
+  csv_parser(std::istream &, const csv_dialect &);
 
-  /// \param[in] delim separator character for fields
-  /// \return          a reference to `this` object (fluent interface)
-  csv_parser &delimiter(char delim) &
-  {
-    dialect_.delimiter = delim;
-    return *this;
-  }
-  csv_parser delimiter(char delim) &&
-  {
-    dialect_.delimiter = delim;
-    return *this;
-  }
+  const csv_dialect &dialect() const;
 
-  /// \param[in] t if `true` trims leading and trailing spaces adjacent to
-  ///              commas
-  /// \return      a reference to `this` object (fluent interface)
-  ///
-  /// \remark
-  /// Trimming spaces is contentious and in fact the practice is specifically
-  /// prohibited by RFC 4180, which states: *spaces are considered part of a
-  /// field and should not be ignored*.
-  csv_parser &trim_ws(bool t) &
-  {
-    dialect_.trim_ws = t;
-    return *this;
-  }
-  csv_parser trim_ws(bool t) &&
-  {
-    dialect_.trim_ws = t;
-    return *this;
-  }
+  csv_parser &delimiter(char) &;
+  csv_parser delimiter(char) &&;
 
-  /// \param[in] filter a filter function for CSV records
-  /// \return           a reference to `this` object (fluent interface)
-  ///
-  /// \note A filter function returns `true` for records to be keep.
-  ///
-  csv_parser &filter_hook(filter_hook_t filter) &
-  {
-    filter_hook_ = filter;
-    return *this;
-  }
+  csv_parser &trim_ws(bool) &;
+  csv_parser trim_ws(bool) &&;
 
-  /// \param[in] filter a filter function for CSV records
-  /// \return           a reference to `this` object (fluent interface)
-  ///
-  /// \note A filter function returns `true` for records to be keep.
-  ///
-  /// \warning
-  /// Usually, in C++, a fluent interface returns a **reference**.
-  /// Here we return a **copy** of `this` object. The design decision is due to
-  /// the fact that a `csv_parser' is a sort of Python generator and tends to
-  /// be used in for-loops.
-  /// Users often write:
-  ///
-  ///     for (auto record : csv_parser(f).filter_hook(filter)) { ... }
-  ///
-  /// but that's broken (it only works if `filter_hook` returns by value).
-  /// `csv_parser` is a lighweight parser and this shouldn't be a performance
-  /// concern.
-  ///
-  /// \see <http://stackoverflow.com/q/10593686/3235496>.
-  ///
-  csv_parser filter_hook(filter_hook_t filter) &&
-  {
-    filter_hook_ = filter;
-    return *this;
-  }
+  csv_parser &filter_hook(filter_hook_t) &;
+  csv_parser filter_hook(filter_hook_t) &&;
 
   class const_iterator;
   const_iterator begin() const;
   const_iterator end() const;
 
 private:
+  // DO NOT move this. `is` must be initialized before other data members.
   std::istream *is_;
 
   filter_hook_t filter_hook_;
@@ -144,7 +90,7 @@ public:
   const_iterator(std::istream *is = nullptr,
                  csv_parser::filter_hook_t f = nullptr,
                  const csv_dialect &dialect = {})
-    : ptr_(is), filter_hook_(f), dialect_(dialect), value_({})
+    : ptr_(is), filter_hook_(f), dialect_(dialect), value_()
   {
     if (ptr_)
       get_input();

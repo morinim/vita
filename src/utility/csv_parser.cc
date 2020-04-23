@@ -13,8 +13,216 @@
 #include "utility/csv_parser.h"
 #include "utility/utility.h"
 
+namespace
+{
+
+enum column_tag {none_tag = 0, skip_tag = -1,
+                 number_tag = -2, string_tag = -3};
+
+int find_column_tag(const std::string &s)
+{
+  const auto ts(vita::trim(s));
+
+  if (ts.empty())
+    return none_tag;
+  if (vita::is_number(ts))
+    return number_tag;
+
+  return s.length();
+}
+
+}  // unnamed namespace
+
 namespace vita
 {
+
+///
+/// *Sniffs* the format of a CSV file (delimiter, headers).
+///
+/// \param[in] is stream containing CSV data
+/// \return       a csv_dialect object
+///
+/// For detecting the **header** creates a dictionary of types of data in each
+/// column. If any column is of a single type (say, integers), *except* for the
+/// first row, then the first row is presumed to be labels. If the type cannot
+/// be determined, it's assumed to be a string in which case the length of the
+/// string is the determining factor: if all of the rows except for the first
+/// are the same length, it's a header.
+/// Finally, a 'vote' is taken at the end for each column, adding or
+/// subtracting from the likelihood of the first row being a header.
+///
+csv_dialect csv_sniffer(std::istream &is)
+{
+  csv_dialect ret;
+
+  csv_parser parser(is, {});
+
+  const auto header(*parser.begin());  // assume first row is header
+  const auto columns(header.size());
+  std::vector<int> column_types(columns, none_tag);
+
+  unsigned checked(0);
+
+  for (auto it(std::next(parser.begin())); it != parser.end(); ++it)
+    // Skip rows that have irregular number of columns
+    if (const auto row = *it; row.size() == columns)
+    {
+      for (std::size_t field(0); field < columns; ++field)
+        if (column_types[field] != skip_tag  // inconsistent column
+            && !trim(row[field]).empty())   // missing values don't contribute
+        {
+          const auto this_tag(find_column_tag(row[field]));
+
+          if (column_types[field] != this_tag)
+          {
+            if (column_types[field] == none_tag)
+              column_types[field] = this_tag;
+            else
+              column_types[field] = skip_tag;  // type is inconsistent, remove
+          }                                    // column from consideration
+        }
+
+      if (checked++ > 20)
+        break;
+    }
+
+  // Finally, compare results against first row and "vote" on whether it's a
+  // header.
+  int has_header(0);
+
+  for (std::size_t field(0); field < columns; ++field)
+    switch (column_types[field])
+    {
+    case none_tag:
+      if (header[field].length())
+        ++has_header;
+      else
+        --has_header;
+      break;
+
+    case skip_tag:
+      break;
+
+    case number_tag:
+      if (!is_number(header[field]))
+        ++has_header;
+      else
+        --has_header;
+      break;
+
+    default:  // column containing fixed length strings
+      assert(column_types[field] > 0);
+      if (const auto length = static_cast<std::size_t>(column_types[field]);
+          header[field].length() != length)
+        ++has_header;
+      else
+        --has_header;
+    }
+
+  ret.has_header = has_header > 0;
+
+  // is.clear() is not required anymore (C++11)
+  is.seekg(0, std::ios::beg);  // back to the start!
+
+  return ret;
+}
+
+///
+/// Initializes theparser trying to sniff the CSV format.
+///
+/// \param[in] is input stream containing CSV data
+///
+csv_parser::csv_parser(std::istream &is) : csv_parser(is, {})
+{
+  dialect_ = csv_sniffer(is);
+}
+
+///
+/// Initializes theparser trying to sniff the CSV format.
+///
+/// \param[in] is input stream containing CSV data
+/// \param[in] d  dialect used for CSV data
+///
+csv_parser::csv_parser(std::istream &is, const csv_dialect &d)
+  : is_(&is), filter_hook_(nullptr), dialect_(d)
+{
+}
+
+///
+/// \return a constant reference to the active CSV dialect
+///
+const csv_dialect &csv_parser::dialect() const
+{
+  return dialect_;
+}
+
+///
+/// \param[in] delim separator character for fields
+/// \return          a reference to `this` object (fluent interface)
+///
+csv_parser &csv_parser::delimiter(char delim) &
+{
+  dialect_.delimiter = delim;
+  return *this;
+}
+csv_parser csv_parser::delimiter(char delim) &&
+{
+  dialect_.delimiter = delim;
+  return *this;
+}
+
+///
+/// \param[in] t if `true` trims leading and trailing spaces adjacent to
+///              commas
+/// \return      a reference to `this` object (fluent interface)
+///
+/// \remark
+/// Trimming spaces is contentious and in fact the practice is specifically
+/// prohibited by RFC 4180, which states: *spaces are considered part of a
+/// field and should not be ignored*.
+///
+csv_parser &csv_parser::trim_ws(bool t) &
+{
+  dialect_.trim_ws = t;
+  return *this;
+}
+csv_parser csv_parser::trim_ws(bool t) &&
+{
+  dialect_.trim_ws = t;
+  return *this;
+}
+
+///
+/// \param[in] filter a filter function for CSV records
+/// \return           a reference to `this` object (fluent interface)
+///
+/// \note A filter function returns `true` for records to be keep.
+///
+/// \warning
+/// Usually, in C++, a fluent interface returns a **reference**.
+/// Here we return a **copy** of `this` object. The design decision is due to
+/// the fact that a `csv_parser' is a sort of Python generator and tends to
+/// be used in for-loops.
+/// Users often write:
+///
+///     for (auto record : csv_parser(f).filter_hook(filter)) { ... }
+///
+/// but that's broken (it only works if `filter_hook` returns by value).
+/// `csv_parser` is a lighweight parser and this shouldn't be a performance
+/// concern.
+///
+/// \see <http://stackoverflow.com/q/10593686/3235496>.
+///
+csv_parser &csv_parser::filter_hook(filter_hook_t filter) &
+{
+  filter_hook_ = filter;
+  return *this;
+}
+csv_parser csv_parser::filter_hook(filter_hook_t filter) &&
+{
+  filter_hook_ = filter;
+  return *this;
+}
 
 ///
 /// \return an iterator to the first record of the CSV file
