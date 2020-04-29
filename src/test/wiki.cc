@@ -39,7 +39,7 @@ TEST_CASE_FIXTURE(fixture1, "dataframe import data 1")
 {
   using namespace vita;
 
-  d.read_csv(dataset, dataframe::params().header());
+  d.read_csv(dataset);
 
   CHECK(d.columns[0].name == "A");
   CHECK(d.columns[1].name == "B");
@@ -51,7 +51,7 @@ TEST_CASE_FIXTURE(fixture1, "dataframe import data 2")
 {
   using namespace vita;
 
-  d.read_csv(dataset, dataframe::params().header().output(2));
+  d.read_csv(dataset, dataframe::params().output(2));
 
   CHECK(d.columns[0].name == "C");
   CHECK(d.columns[1].name == "A");
@@ -70,7 +70,7 @@ TEST_CASE_FIXTURE(fixture1, "dataframe import data 3")
 {
   using namespace vita;
 
-  d.read_csv(dataset, dataframe::params().header().no_output());
+  d.read_csv(dataset, dataframe::params().no_output());
 
   CHECK(d.columns[0].name == "");
   CHECK(d.columns[1].name == "A");

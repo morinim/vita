@@ -109,7 +109,6 @@ constexpr std::size_t ncol(12);
 
   dataframe d;
   dataframe::params p;
-  p.has_header = true;
 
   CHECK(d.columns.size() == 0);
   CHECK(d.columns.empty());
@@ -178,7 +177,6 @@ TEST_CASE("load_csv output_index")
 
   dataframe d;
   dataframe::params p;
-  p.has_header = true;
   p.output_index = 8;
 
   CHECK(d.columns.size() == 0);
@@ -236,7 +234,6 @@ TEST_CASE("load_csv_no_output_index")
 
   dataframe d;
   dataframe::params p;
-  p.has_header = true;
   p.output_index = std::nullopt;
 
   CHECK(d.columns.size() == 0);
@@ -303,7 +300,6 @@ constexpr std::size_t ncol(5);
 
   dataframe d;
   dataframe::params p;
-  p.has_header = true;
   p.output_index = 4;
 
   CHECK(d.columns.size() == 0);

@@ -22,6 +22,7 @@
 
 #include "kernel/distribution.h"
 #include "kernel/problem.h"
+#include "utility/csv_parser.h"
 
 namespace vita
 {
@@ -135,7 +136,7 @@ public:
   std::size_t read(const std::filesystem::path &);
   std::size_t read(const std::filesystem::path &, const params &);
   std::size_t read_csv(std::istream &);
-  std::size_t read_csv(std::istream &, const params &);
+  std::size_t read_csv(std::istream &, params);
   std::size_t read_xrff(std::istream &);
   std::size_t read_xrff(std::istream &, const params &);
   bool operator!() const;
@@ -221,17 +222,14 @@ inline class_t label(const dataframe::example &e)
 class dataframe::params
 {
 public:
-  params &header()    { has_header =  true; return *this; }
-  params &no_header() { has_header = false; return *this; }
+  params &header()    { dialect.has_header =  true; return *this; }
+  params &no_header() { dialect.has_header = false; return *this; }
 
-  params &output(std::size_t o)
-  { output_index = o; return *this; }
-  params &no_output()
-  { output_index = std::nullopt; return *this; }
+  params &output(std::size_t o) { output_index =            o; return *this; }
+  params &no_output()           { output_index = std::nullopt; return *this; }
 
-  /// `true` when the CSV file has a header.
   /// \remark Used only when reading CSV files.
-  bool has_header = false;
+  csv_dialect dialect = {};
 
   /// A filter and transform function applied when reading data.
   filter_hook_t filter = nullptr;

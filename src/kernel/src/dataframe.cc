@@ -18,8 +18,6 @@
 #include "kernel/random.h"
 #include "kernel/symbol.h"
 
-#include "utility/csv_parser.h"
-
 #include "tinyxml2/tinyxml2.h"
 
 namespace vita
@@ -687,12 +685,15 @@ std::size_t dataframe::read_csv(const std::filesystem::path &fn,
 ///
 /// \note Test set can have an empty output value.
 ///
-std::size_t dataframe::read_csv(std::istream &from, const params &p)
+std::size_t dataframe::read_csv(std::istream &from, params p)
 {
   clear();
 
+  if (p.dialect.has_header == std::nullopt)
+    p.dialect.has_header = csv_sniffer(from).has_header;
+
   std::size_t count(0);
-  for (auto record : csv_parser(from, {}).filter_hook(p.filter))
+  for (auto record : csv_parser(from, p.dialect).filter_hook(p.filter))
   {
     if (p.output_index)
     {
@@ -711,8 +712,8 @@ std::size_t dataframe::read_csv(std::istream &from, const params &p)
 
     // Every new record may add further information about the column domain.
     if (count < 10)
-      columns.build(record, p.has_header);
-    if (!p.has_header || count)
+      columns.build(record, *p.dialect.has_header);
+    if (p.dialect.has_header == false || count)
       read_record(record, true);
 
     ++count;

@@ -31,6 +31,37 @@ int find_column_tag(const std::string &s)
   return s.length();
 }
 
+bool capitalized(std::string s)
+{
+  s = vita::trim(s);
+
+  return !s.empty() && std::isupper(s.front())
+         && std::all_of(std::next(s.begin()), s.end(),
+                        [](auto c)
+                        {
+                          return std::isprint(c)
+                                 && (!std::isalpha(c) || std::islower(c));
+                        });
+}
+
+bool lower_case(const std::string &s)
+{
+  return std::all_of(s.begin(), s.end(),
+                     [](auto c)
+                     {
+                       return !std::isalpha(c) || std::islower(c);
+                     });
+}
+
+bool upper_case(const std::string &s)
+{
+  return std::all_of(s.begin(), s.end(),
+                     [](auto c)
+                     {
+                       return !std::isalpha(c) || std::isupper(c);
+                     });
+}
+
 }  // unnamed namespace
 
 namespace vita
@@ -51,36 +82,54 @@ namespace vita
 /// Finally, a 'vote' is taken at the end for each column, adding or
 /// subtracting from the likelihood of the first row being a header.
 ///
+/// \note
+/// Somewhat inspired by the dialect sniffer developed by Clifford Wells for
+/// his Python-DSV package (Wells, 2002) ehich was incorporated into Python
+/// v2.3.
+///
 csv_dialect csv_sniffer(std::istream &is)
 {
   csv_dialect ret;
 
-  csv_parser parser(is, {});
+  csv_dialect dialect;
+  dialect.has_header = true;
+  csv_parser parser(is, dialect);
 
+  // Quoting allows to correctly identify a column with header `"1980"` (e.g. a
+  // specific year. Notice the double quotes) and values `2012`, `2000`...
+  // (the values observed during 1980).
+  parser.quoting(csv_dialect::KEEP_QUOTES);
   const auto header(*parser.begin());  // assume first row is header
+  parser.quoting(csv_dialect::REMOVE_QUOTES);
+
   const auto columns(header.size());
   std::vector<int> column_types(columns, none_tag);
 
   unsigned checked(0);
-
   for (auto it(std::next(parser.begin())); it != parser.end(); ++it)
     // Skip rows that have irregular number of columns
     if (const auto row = *it; row.size() == columns)
     {
       for (std::size_t field(0); field < columns; ++field)
-        if (column_types[field] != skip_tag  // inconsistent column
-            && !trim(row[field]).empty())   // missing values don't contribute
-        {
-          const auto this_tag(find_column_tag(row[field]));
+      {
+        if (column_types[field] == skip_tag)  // inconsistent column
+          continue;
+        if (trim(row[field]).empty())         // missing values
+          continue;
 
-          if (column_types[field] != this_tag)
-          {
-            if (column_types[field] == none_tag)
-              column_types[field] = this_tag;
-            else
-              column_types[field] = skip_tag;  // type is inconsistent, remove
-          }                                    // column from consideration
-        }
+        const auto this_tag(find_column_tag(row[field]));
+        if (column_types[field] == this_tag)  // matching column type
+          continue;
+
+        if (capitalized(header[field]) && lower_case(row[field]))
+          column_types[field] = string_tag;
+        else if (upper_case(header[field]) && !upper_case(row[field]))
+          column_types[field] = string_tag;
+        else if (column_types[field] == none_tag)
+          column_types[field] = this_tag;
+        else
+          column_types[field] = skip_tag;  // type is inconsistent, remove
+      }                                    // column from consideration
 
       if (checked++ > 20)
         break;
@@ -110,6 +159,10 @@ csv_dialect csv_sniffer(std::istream &is)
         --has_header;
       break;
 
+    case string_tag:  // variable length strings
+      ++has_header;
+      break;
+
     default:  // column containing fixed length strings
       assert(column_types[field] > 0);
       if (const auto length = static_cast<std::size_t>(column_types[field]);
@@ -121,7 +174,7 @@ csv_dialect csv_sniffer(std::istream &is)
 
   ret.has_header = has_header > 0;
 
-  // is.clear() is not required anymore (C++11)
+  is.clear();
   is.seekg(0, std::ios::beg);  // back to the start!
 
   return ret;
@@ -168,6 +221,22 @@ csv_parser &csv_parser::delimiter(char delim) &
 csv_parser csv_parser::delimiter(char delim) &&
 {
   dialect_.delimiter = delim;
+  return *this;
+}
+
+///
+/// \param[in] q quoting style (see csv_dialect)
+/// \return      a reference to `this` object (fluent interface)
+///
+csv_parser &csv_parser::quoting(csv_dialect::quoting_e q) &
+{
+  dialect_.quoting = q;
+  return *this;
+}
+
+csv_parser csv_parser::quoting(csv_dialect::quoting_e q) &&
+{
+  dialect_.quoting = q;
   return *this;
 }
 
@@ -229,6 +298,11 @@ csv_parser csv_parser::filter_hook(filter_hook_t filter) &&
 ///
 csv_parser::const_iterator csv_parser::begin() const
 {
+  Expects(is_);
+
+  is_->clear();
+  is_->seekg(0, std::ios::beg);  // back to the start!
+
   return *is_ ? const_iterator(is_, filter_hook_, dialect_)
               : end();
 }
@@ -283,13 +357,9 @@ void csv_parser::const_iterator::get_input()
 ///
 /// \note
 /// This is a slightly modified version of the function at
-/// <http://www.zedwood.com/article/112/cpp-csv-parser>. A simpler
+/// <http://www.zedwood.com/article/cpp-csv-parser>. A simpler
 /// implementation is <http://stackoverflow.com/a/1120224/3235496> (but it
-/// *doesn't escape comma and newline*).
-///
-/// \note
-/// Escaped List Separator class from Boost C++ libraries is also very nice
-/// and efficient for parsing, but it isn't as easily applied.
+/// **doesn't escape comma and newline**).
 ///
 csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   const std::string &line)
@@ -301,18 +371,24 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   bool inquotes(false);
   std::string curstring;
 
-  const auto &add_field = [&](const std::string &field) -> void
-  {
-    record.push_back(dialect_.trim_ws ? trim(field) : field);
-  };
+  const auto &add_field([&record, this](const std::string &field)
+                        {
+                          record.push_back(dialect_.trim_ws
+                                           ? trim(field) : field);
+                        });
 
-  for (auto length(line.length()), pos(decltype(length){0});
-       pos < length && line[pos];)
+  const auto length(line.length());
+  for (std::size_t pos(0); pos < length && line[pos]; ++pos)
   {
-    const char c(line[pos]);
+    const auto c(line[pos]);
 
-    if (!inquotes && !curstring.length() && c == quote)  // begin quote char
+    if (!inquotes && trim(curstring).empty() && c == quote)  // begin quote char
+    {
+      if (dialect_.quoting == csv_dialect::KEEP_QUOTES)
+        curstring.push_back(c);
+
       inquotes = true;
+    }
     else if (inquotes && c == quote)
     {
       if (pos + 1 < length && line[pos + 1] == quote)  // quote char
@@ -322,7 +398,12 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
         ++pos;
       }
       else  // end quote char
+      {
+        if (dialect_.quoting == csv_dialect::KEEP_QUOTES)
+          curstring.push_back(c);
+
         inquotes = false;
+      }
     }
     else if (!inquotes && c == dialect_.delimiter)  // end of field
     {
@@ -333,8 +414,6 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
       break;
     else
       curstring.push_back(c);
-
-    ++pos;
   }
 
   assert(!inquotes);

@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <fstream>
 #include <functional>
+#include <optional>
 #include <sstream>
 
 #include "kernel/common.h"
@@ -24,14 +25,26 @@
 namespace vita
 {
 
+///
+/// Information about the CSV dialect.
+///
+/// *CSV is a textbook example of how not to design a textual file format*.
+/// The Art of Unix Programming, Raymond (2003).
+///
 struct csv_dialect
 {
   /// A one-character string used to separate fields.
   char delimiter = ',';
   /// When `true` skips leading and trailing spaces adjacent to commas.
   bool trim_ws = false;
-  /// When `true` assumes a header row is present.
-  bool has_header = true;
+  /// When `true` assumes a header row is present. When undefined triggers the
+  /// sniffer.
+  std::optional<bool> has_header = {};
+  /// Controls if quotes should be keep by the reader.
+  /// - `KEEP_QUOTES`. Always keep the quotes;
+  /// - `REMOVE_QUOTES`. Never keep quotes.
+  /// It defaults to `REMOVE_QUOTES`.
+  enum quoting_e {KEEP_QUOTES, REMOVE_QUOTES} quoting = REMOVE_QUOTES;
 };  // class csv_dialect
 
 csv_dialect csv_sniffer(std::istream &);
@@ -54,6 +67,9 @@ public:
 
   csv_parser &delimiter(char) &;
   csv_parser delimiter(char) &&;
+
+  csv_parser &quoting(csv_dialect::quoting_e) &;
+  csv_parser quoting(csv_dialect::quoting_e) &&;
 
   csv_parser &trim_ws(bool) &;
   csv_parser trim_ws(bool) &&;
@@ -114,8 +130,8 @@ public:
   /// \return        `true` if iterators point to the same line
   friend bool operator==(const const_iterator &lhs, const const_iterator &rhs)
   {
-    return lhs.ptr_ == rhs.ptr_ && lhs.value_ == rhs.value_ &&
-           (!lhs.ptr_ || lhs.ptr_->tellg() == rhs.ptr_->tellg());
+    return lhs.ptr_ == rhs.ptr_ && lhs.value_ == rhs.value_
+           && (!lhs.ptr_ || lhs.ptr_->tellg() == rhs.ptr_->tellg());
   }
 
   friend bool operator!=(const const_iterator &lhs, const const_iterator &rhs)
