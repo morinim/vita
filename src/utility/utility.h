@@ -77,20 +77,6 @@ template<class T> bool isnonnegative(T v)
 }
 
 ///
-/// A shorthand for the well known erase-remove C++ idiom.
-///
-/// \param[in] container a STL container
-/// \param[in] pred      a unary predicate
-///
-template<class T, class Pred> void erase_if(T &container, Pred pred)
-{
-  container.erase(std::remove_if(container.begin(),
-                                 container.end(),
-                                 pred),
-                  container.end());
-}
-
-///
 /// Reduced version of `boost::lexical_cast`.
 ///
 /// \tparam T type we want to cast to
