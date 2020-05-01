@@ -34,25 +34,6 @@ std::string replace_all(std::string, const std::string &, const std::string &);
 std::string trim(const std::string &);
 
 ///
-/// Mainly used to initialize an array with a specific value.
-///
-/// \return an `std::array` filled with value `v`
-///
-/// This function is used to initialize array in member initialization list
-/// of a constructor (so to be compliant with Effective C++).
-/// To be efficient the compiler need to perform the RVO optimization / copy
-/// elision.
-///
-/// \see <http://stackoverflow.com/q/21993780/3235496>
-///
-template<class T, unsigned N> std::array<T, N> make_array(T v)
-{
-  std::array<T, N> temp;
-  temp.fill(v);
-  return temp;
-}
-
-///
 /// \param[in] v value to check
 /// \return      `true` if `v` is less than `epsilon`-tolerance
 ///
