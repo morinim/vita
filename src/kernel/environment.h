@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,6 +14,7 @@
 #define      VITA_ENVIRONMENT_H
 
 #include <cmath>
+#include <filesystem>
 #include <string>
 
 #include "tinyxml2/tinyxml2.h"
@@ -228,34 +229,35 @@ public:
   struct statistics
   {
     /// A base common path for the log files.
+    /// \note
     /// A single log file can overwrite this path specifying an absolute path.
-    std::string dir = "";
+    std::filesystem::path dir = {};
 
     /// Name of the log file used to save ARL-specific information.
     /// \note An empty string disable logging.
-    std::string arl_file = "";
+    std::filesystem::path arl_file = {};
 
     /// Name of the log file used to save real-time information.
     /// \note An empty string disable logging.
-    std::string dynamic_file = "";
+    std::filesystem::path dynamic_file = {};
 
     /// Name of the log file used to save layer-specific information.
     /// \note An empty string disable logging.
-    std::string layers_file = "";
+    std::filesystem::path layers_file = {};
 
     /// Name of the log file used to save population-specific information.
     /// \note An empty string disable logging.
     /// \warning
     /// Enabling this log with large populations has a big performance impact.
-    std::string population_file = "";
+    std::filesystem::path population_file = {};
 
     /// Name of the log file used to save a summary report.
     /// \note An empty string disable logging.
-    std::string summary_file = "";
+    std::filesystem::path summary_file = {};
 
     /// Name of the file used to save test results.
     /// \name An empty string disable savings.
-    std::string test_file = "";
+    std::filesystem::path test_file = {};
 
     /// Default rendering format used to print an individual.
     out::print_format_t ind_format = out::list_f;

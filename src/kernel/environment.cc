@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -230,38 +230,38 @@ bool environment::debug(bool force_defined) const
 
   if (mep.code_length == 1)
   {
-    vitaERROR << "code_length is too short";
+    vitaERROR << "`code_length` is too short";
     return false;
   }
 
   if (mep.code_length && mep.patch_length
       && mep.patch_length >= mep.code_length)
   {
-    vitaERROR << "patch_length must be shorter than code_length";
+    vitaERROR << "`patch_length` must be shorter than `code_length`";
     return false;
   }
 
   if (p_mutation > 1.0)
   {
-    vitaERROR << "p_mutation out of range";
+    vitaERROR << "`p_mutation` out of range";
     return false;
   }
 
   if (p_cross > 1.0)
   {
-    vitaERROR << "p_cross out of range";
+    vitaERROR << "`p_cross` out of range";
     return false;
   }
 
   if (validation_percentage.has_value() && *validation_percentage >= 100)
   {
-    vitaERROR << "validation_percentage out of range";
+    vitaERROR << "`validation_percentage` out of range";
     return false;
   }
 
   if (dss.has_value() && *dss == 0)
   {
-    vitaERROR << "dss out of range";
+    vitaERROR << "`dss` out of range";
     return false;
   }
 
@@ -285,7 +285,7 @@ bool environment::debug(bool force_defined) const
 
   if (individuals && tournament_size && tournament_size > individuals)
   {
-    vitaERROR << "tournament_size (" << tournament_size
+    vitaERROR << "`tournament_size` (" << tournament_size
               << ") cannot be greater than population size ("
               << individuals << ")";
     return false;
@@ -293,9 +293,58 @@ bool environment::debug(bool force_defined) const
 
   if (mate_zone && tournament_size && tournament_size > mate_zone)
   {
-    vitaERROR << "tournament_size (" << tournament_size
-              << ") cannot be greater than mate_zone (" << mate_zone
+    vitaERROR << "`tournament_size` (" << tournament_size
+              << ") cannot be greater than `mate_zone` (" << mate_zone
               << ")";
+    return false;
+  }
+
+  if (stat.dir.has_filename())
+  {
+    vitaERROR << "`stat.dir` must contain a directory, not a file ("
+              << stat.dir << ")";
+    return false;
+  }
+
+  if (!stat.arl_file.empty() && !stat.arl_file.has_filename())
+  {
+    vitaERROR << "`stat.arl_file` must specify a file ("
+              << stat.arl_file << ")";
+    return false;
+  }
+
+  if (!stat.dynamic_file.empty() && !stat.dynamic_file.has_filename())
+  {
+    vitaERROR << "`stat.dynamic_file` must specify a file ("
+              << stat.dynamic_file << ")";
+    return false;
+  }
+
+  if (!stat.layers_file.empty() && !stat.layers_file.has_filename())
+  {
+    vitaERROR << "`stat.layers_file` must specify a file ("
+              << stat.layers_file << ")";
+    return false;
+  }
+
+  if (!stat.population_file.empty() && !stat.population_file.has_filename())
+  {
+    vitaERROR << "`stat.population_file` must specify a file ("
+              << stat.population_file << ")";
+    return false;
+  }
+
+  if (!stat.summary_file.empty() && !stat.summary_file.has_filename())
+  {
+    vitaERROR << "`stat.summary_file` must specify a file ("
+              << stat.summary_file << ")";
+    return false;
+  }
+
+  if (!stat.test_file.empty() && !stat.test_file.has_filename())
+  {
+    vitaERROR << "`stat.test_file` must specify a file ("
+              << stat.test_file << ")";
     return false;
   }
 

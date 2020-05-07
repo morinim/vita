@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -161,10 +161,10 @@ void evolution<T, ES>::log_evolution(unsigned run_count) const
 
   const auto &env(pop_.get_problem().env);
 
-  auto fullpath = [env](const std::string &f)
-                  {
-                    return merge_path(env.stat.dir, f);
-                  };
+  const auto fullpath([env](const std::filesystem::path &f)
+                      {
+                        return env.stat.dir / f;
+                      });
 
   if (!env.stat.dynamic_file.empty())
   {

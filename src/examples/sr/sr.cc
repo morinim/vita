@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@
 
 const char USAGE[] =
 R"(Vita - Symbolic Regression and classification
-Copyright 2011-2018 EOS di Manlio Morini (https://eosdev.it/)
+Copyright 2011-2020 EOS di Manlio Morini (https://eosdev.it/)
 
 (==(     )==)
  `-.`. ,',-'
@@ -532,8 +532,14 @@ void stat_dir(const args_t &a)
 {
   if (const auto value = a.at("--stat-dir"))
   {
-    problem->env.stat.dir = value.asString();
-    vitaINFO << "Logging folder is " << problem->env.stat.dir;
+    if (const std::filesystem::path sd = value.asString();
+        std::filesystem::is_directory(sd))
+    {
+      problem->env.stat.dir = sd;
+      vitaINFO << "Logging folder is " << problem->env.stat.dir;
+    }
+    else
+      vitaERROR << "Directory doesn't exist (" << value.asString() << ")";
   }
 }
 
