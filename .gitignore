@@ -22,3 +22,8 @@ build/
 # External tools
 tools/cppcheck/
 tools/*.pyc
+
+# GNU Global files
+GPATH
+GRTAGS
+GTAGS
