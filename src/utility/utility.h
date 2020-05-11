@@ -121,20 +121,24 @@ private:
 /// \remark Lifted from Jerry Coffin's `prefix_ostream_iterator`.
 ///
 template <class T, class C = char, class traits = std::char_traits<C>>
-class infix_iterator : public std::iterator<std::output_iterator_tag, void,
-                                            void, void, void>
+class infix_iterator
 {
-public:  // Type alias
-  using char_type    = C;
-  using traits_type  = traits;
-  using ostream_type = std::basic_ostream<C, traits>;
-
 public:
+  // Type alias
+  using iterator_category = std::output_iterator_tag;
+  using value_type        = void;
+  using difference_type   = void;
+  using pointer           = void;
+  using reference         = void;
+  using char_type         = C;
+  using traits_type       = traits;
+  using ostream_type      = std::basic_ostream<C, traits>;
+
   explicit infix_iterator(ostream_type &s, const C *d = nullptr)
     : os_(&s), delimiter_(d), first_elem_(true)
   {}
 
-  infix_iterator<T, C, traits> &operator=(const T &item)
+  infix_iterator &operator=(const T &item)
   {
     // Here's the only real change from ostream_iterator:
     // normally, the '*os << item;' would come before the 'if'.
@@ -146,9 +150,9 @@ public:
     return *this;
   }
 
-  infix_iterator<T, C, traits> &operator*() { return *this; }
-  infix_iterator<T, C, traits> &operator++() { return *this; }
-  infix_iterator<T, C, traits> &operator++(int) { return *this; }
+  infix_iterator &operator*() { return *this; }
+  infix_iterator &operator++() { return *this; }
+  infix_iterator &operator++(int) { return *this; }
 
 private:
   std::basic_ostream<C, traits> *os_;
