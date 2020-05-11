@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,8 +14,15 @@
 #define      VITA_COMPATIBILITY_PATCH_H
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32)
+// The `windows.h` header file (or more correctly, `windef.h` that it includes
+// in turn) has macros for `min` and `max` that are interfering with
+// `std::min`/`max` and `std::numeric_limits<T>::min`/`max`.
+// The `NOMINMAX` macro suppresses the `min` and `max` definitions in
+// `Windef.h`. The `undef` limits potential side effects.
+#  define NOMINMAX
 #  include <conio.h>
 #  include <windows.h>
+#  undef NOMINMAX
 #else
 #  include <iostream>
 #  include <termios.h>
