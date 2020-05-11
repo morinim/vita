@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@ namespace vita
 /// \param[in] bits `2^bits` is the number of elements of the table
 ///
 cache::cache(std::uint8_t bits)
-  : k_mask((1u << bits) - 1), table_(1u << bits),
+  : k_mask((1ull << bits) - 1), table_(1ull << bits),
     seal_(1), probes_(0), hits_(0)
 {
   Expects(bits);

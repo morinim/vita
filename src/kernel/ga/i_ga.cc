@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -91,15 +91,13 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
   const auto ps(parameters());
   for (category_t c(0); c < ps; ++c)
     if (random::boolean(pgm))
-    {
-      const i_ga::value_type g(prb.sset.roulette_terminal(c).init());
-
-      if (g != genome_[c])
+      if (const auto g =
+          static_cast<value_type>(prb.sset.roulette_terminal(c).init());
+          g != genome_[c])
       {
         ++n;
         genome_[c] = g;
       }
-    }
 
   if (n)
     signature_ = hash();

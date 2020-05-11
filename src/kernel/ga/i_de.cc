@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -287,7 +287,7 @@ std::ostream &operator<<(std::ostream &s, const i_de &ind)
 ///
 /// \return a vector of real values
 ///
-i_de::operator std::vector<value_type>() const
+i_de::operator std::vector<i_de::value_type>() const
 {
   return genome_;
 }
