@@ -455,7 +455,7 @@ std::size_t dataframe::read_xrff(const std::filesystem::path &fn,
                                  const params &p)
 {
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(fn.c_str()) != tinyxml2::XML_SUCCESS)
+  if (doc.LoadFile(fn.string().c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("XRFF data file format error");
 
   return read_xrff(doc, p);
@@ -745,7 +745,7 @@ std::size_t dataframe::read(const std::filesystem::path &fn, const params &p)
   if (fn.empty())
     throw std::invalid_argument("Missing dataset filename");
 
-  const auto ext(fn.extension());
+  const auto ext(fn.extension().string());
   const bool xrff(iequals(ext, ".xrff") || iequals(ext, ".xml"));
 
   return xrff ? read_xrff(fn, p) : read_csv(fn, p);

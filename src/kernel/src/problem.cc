@@ -330,7 +330,7 @@ std::size_t src_problem::setup_symbols_impl(const std::filesystem::path &file)
 {
   vitaINFO << "Reading symbol set " << file << "...";
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(file.c_str()) != tinyxml2::XML_SUCCESS)
+  if (doc.LoadFile(file.string().c_str()) != tinyxml2::XML_SUCCESS)
     throw exception::data_format("Symbol set format error");
 
   category_set categories(training_.columns);
