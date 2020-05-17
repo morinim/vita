@@ -48,7 +48,7 @@ class dataframe
 public:
   // ---- Structures ----
   struct example;
-  struct params;
+  class params;
 
   // ---- Aliases ----
   using examples_t = std::vector<example>;

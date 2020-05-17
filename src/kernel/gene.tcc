@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -111,7 +111,7 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
 /// \return      the locus that `i`-th argument of the current symbol refers to
 ///
 template<unsigned K>
-locus basic_gene<K>::arg_locus(unsigned i) const
+locus basic_gene<K>::arg_locus(std::size_t i) const
 {
   Expects(i < sym->arity());
 

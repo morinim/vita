@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,7 +38,7 @@ public:
   basic_gene(const std::pair<symbol *, std::vector<index_t>> &);
   basic_gene(const symbol &, index_t, index_t);
 
-  locus arg_locus(unsigned) const;
+  locus arg_locus(std::size_t) const;
 
   // Types and constants.
   using packed_index_t = std::uint16_t;

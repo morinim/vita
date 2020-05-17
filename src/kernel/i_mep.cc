@@ -1022,21 +1022,21 @@ std::ostream &list(const i_mep &mep, std::ostream &s)
 
 std::ostream &tree(const i_mep &mep, std::ostream &s)
 {
-  std::function<void (const gene &, const gene &, unsigned)> tree_(
-    [&](const gene &parent, const gene &child, unsigned indent)
-    {
-      if (child == parent ||
-          parent.sym != child.sym ||
-          function::cast(parent.sym)->associative() == false)
-      {
-        s << std::string(indent, ' ') << child << '\n';
-        indent += 2;
-      }
+  std::function<void (const gene &, const gene &, unsigned)> tree_;
+  tree_ = [&](const gene &parent, const gene &child, unsigned indent)
+          {
+            if (child == parent ||
+                parent.sym != child.sym ||
+                function::cast(parent.sym)->associative() == false)
+            {
+              s << std::string(indent, ' ') << child << '\n';
+              indent += 2;
+            }
 
-      const auto arity(child.sym->arity());
-      for (auto i(decltype(arity){0}); i < arity; ++i)
-        tree_(child, mep[child.arg_locus(i)], indent);
-    });
+            const auto arity(child.sym->arity());
+            for (auto i(decltype(arity){0}); i < arity; ++i)
+              tree_(child, mep[child.arg_locus(i)], indent);
+          };
 
   tree_(mep[mep.best()], mep[mep.best()], 0);
   return s;
