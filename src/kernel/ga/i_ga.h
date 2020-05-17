@@ -76,7 +76,7 @@ public:
   ///
   /// \note `size()` and `parameters()` are aliases.
   ///
-  unsigned parameters() const { return size(); }
+  auto parameters() const { return size(); }
 
   hash_t signature() const;
 

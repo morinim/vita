@@ -295,7 +295,7 @@ std::ostream &operator<<(std::ostream &s, const i_ga &ind)
 ///
 /// \return a vector of integer values
 ///
-i_ga::operator std::vector<value_type>() const
+i_ga::operator std::vector<i_ga::value_type>() const
 {
   return genome_;
 }
