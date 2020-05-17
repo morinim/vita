@@ -33,7 +33,8 @@ i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
   std::generate(genome_.begin(), genome_.end(),
                 [&, n = 0]() mutable
                 {
-                  return p.sset.roulette_terminal(n++).init();
+                  return static_cast<value_type>(
+                    p.sset.roulette_terminal(n++).init());
                 });
 
   Ensures(debug());

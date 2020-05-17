@@ -872,22 +872,22 @@ namespace
 {
 std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
 {
-  std::function<std::string (const gene &)> language_(
-    [&](const gene &g)
-    {
-      std::string ret(g.sym->terminal()
-                        ? terminal::cast(g.sym)->display(g.par, f)
-                        : function::cast(g.sym)->display(f));
+  std::function<std::string (const gene &)> language_;
+  language_ = [&](const gene &g)
+              {
+                std::string ret(g.sym->terminal()
+                                ? terminal::cast(g.sym)->display(g.par, f)
+                                : function::cast(g.sym)->display(f));
 
-      auto arity(g.sym->arity());
-      for (decltype(arity) i(0); i < arity; ++i)
-      {
-        const std::string from("%%" + std::to_string(i + 1) + "%%");
-        ret = replace_all(ret, from, language_(mep[g.arg_locus(i)]));
-      }
+                auto arity(g.sym->arity());
+                for (decltype(arity) i(0); i < arity; ++i)
+                {
+                  const std::string from("%%" + std::to_string(i + 1) + "%%");
+                  ret = replace_all(ret, from, language_(mep[g.arg_locus(i)]));
+                }
 
-      return ret;
-    });
+                return ret;
+              };
 
   std::string out(language_(mep[mep.best()]));
   if (out.length() > 2 && out.front() == '(' && out.back() == ')')
@@ -954,19 +954,19 @@ void graphviz(const i_mep &mep, std::ostream &s)
 
 std::ostream &in_line(const i_mep &mep, std::ostream &s)
 {
-  std::function<void (locus)> in_line_(
-    [&](locus l)
-    {
-      const gene &g(mep[l]);
+  std::function<void (locus)> in_line_;
+  in_line_ = [&](locus l)
+             {
+               const gene &g(mep[l]);
 
-      if (l != mep.best())
-        s << ' ';
-      s << g;
+               if (l != mep.best())
+                 s << ' ';
+               s << g;
 
-      const auto arity(g.sym->arity());
-      for (auto i(decltype(arity){0}); i < arity; ++i)
-        in_line_(g.arg_locus(i));
-    });
+               const auto arity(g.sym->arity());
+               for (std::size_t i(0); i < arity; ++i)
+                 in_line_(g.arg_locus(i));
+             };
 
   in_line_(mep.best());
   return s;

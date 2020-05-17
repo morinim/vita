@@ -76,7 +76,7 @@ public:
   ///
   /// \note `size()` and `parameters()` are aliases.
   ///
-  auto parameters() const { return size(); }
+  std::size_t parameters() const { return size(); }
 
   hash_t signature() const;
 
