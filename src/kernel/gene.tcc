@@ -99,7 +99,8 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
     std::generate(args.begin(), args.end(),
                   [from, sup]()
                   {
-                    return random::between<packed_index_t>(from, sup);
+                    return static_cast<packed_index_t>(random::between(from,
+                                                                       sup));
                   });
   }
   else

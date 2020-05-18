@@ -189,7 +189,7 @@ int lexical_cast<int>(const vita::value_t &v)
   case d_double:  return std::get<D_DOUBLE>(v);
   case d_int:     return std::get<D_INT>(v);
   case d_string:  return lexical_cast<int>(std::get<D_STRING>(v));
-  default:        return 0.0;
+  default:        return 0;
   }
 }
 

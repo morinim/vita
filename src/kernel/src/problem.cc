@@ -45,22 +45,22 @@ std::set<std::vector<C>> seq_with_rep(const std::set<C> &availables,
 
   std::set<std::vector<C>> ret;
 
-  std::function<void (std::size_t, std::vector<C>)> swr(
-    [&](std::size_t left, std::vector<C> current)
-    {
-      if (!left)  // we have a sequence of the correct length
-      {
-        ret.insert(current);
-        return;
-      }
+  std::function<void (std::size_t, std::vector<C>)> swr;
+  swr = [&](std::size_t left, std::vector<C> current)
+        {
+          if (!left)  // we have a sequence of the correct length
+          {
+            ret.insert(current);
+            return;
+          }
 
-      for (auto elem : availables)
-      {
-        current.push_back(elem);
-        swr(left - 1, current);
-        current.pop_back();
-      }
-    });
+          for (auto elem : availables)
+          {
+            current.push_back(elem);
+            swr(left - 1, current);
+            current.pop_back();
+          }
+        };
 
   swr(size, {});
   return ret;

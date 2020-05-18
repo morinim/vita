@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -126,7 +126,7 @@ void symbol_set::collection::sum_container::scale_weights(double ratio, F f)
     if (f(s))
     {
       sum_ -= s.weight;
-      s.weight *= ratio;
+      s.weight = static_cast<weight_t>(s.weight * ratio);
       sum_ += s.weight;
     }
 }

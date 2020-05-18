@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -138,11 +138,11 @@ void dss::shake_impl()
   // fact, it averages slightly above `target_size` (Gathercole and Ross felt
   // it might improve performance).
   const auto s(validation_.size());
-  const auto ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
+  const double ratio(std::min(0.6, 0.2 + 100.0 / (s + 100.0)));
   assert(0.2 <= ratio && ratio <= 0.6);
-  const auto target_size(std::max(1.0, s * ratio));
+  const double target_size(std::max(1.0, s * ratio));
   assert(1.0 <= target_size && target_size <= s);
-  const auto k(target_size / static_cast<double>(weight_sum));
+  const double k(target_size / static_cast<double>(weight_sum));
 
   auto pivot(
     std::partition(validation_.begin(), validation_.end(),
@@ -155,7 +155,8 @@ void dss::shake_impl()
                    }));
 
   if (pivot == validation_.begin() || pivot == validation_.end())
-    pivot = std::next(validation_.begin(), target_size);
+    pivot = std::next(validation_.begin(),
+                      static_cast<std::ptrdiff_t>(target_size));
 
   assert(validation_.size() == s);
   std::move(pivot, validation_.end(), std::back_inserter(training_));

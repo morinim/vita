@@ -28,7 +28,7 @@ int find_column_tag(const std::string &s)
   if (vita::is_number(ts))
     return number_tag;
 
-  return s.length();
+  return static_cast<int>(s.length());
 }
 
 bool capitalized(std::string s)
