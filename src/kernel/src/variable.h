@@ -14,6 +14,7 @@
 #define      VITA_SRC_VARIABLE_H
 
 #include "kernel/src/interpreter.h"
+#include "kernel/i_mep.h"  // DO NOT REMOVE. VISUAL STUDIO COMPILATION ERROR.
 #include "kernel/terminal.h"
 
 namespace vita

@@ -186,7 +186,7 @@ int lexical_cast<int>(const vita::value_t &v)
 
   switch (v.index())
   {
-  case d_double:  return std::get<D_DOUBLE>(v);
+  case d_double:  return static_cast<int>(std::get<D_DOUBLE>(v));
   case d_int:     return std::get<D_INT>(v);
   case d_string:  return lexical_cast<int>(std::get<D_STRING>(v));
   default:        return 0;
