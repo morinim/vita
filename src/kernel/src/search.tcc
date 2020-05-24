@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -162,8 +162,7 @@ void src_search<T, ES>::arl(const U &base)
   std::ofstream log_file;
   if (!prob().env.stat.arl_file.empty())
   {
-    const auto filename(merge_path(prob().env.stat.dir,
-                                   prob().env.stat.arl_file));
+    const auto filename(prob().env.stat.dir / prob().env.stat.arl_file);
     log_file.open(filename, std::ios_base::app);
 
     if (log_file.is_open())  // logs ADTs
