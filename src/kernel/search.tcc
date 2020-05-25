@@ -437,8 +437,8 @@ void search<T, ES>::log_stats(const search_stats<T> &stats) const
 
   log_stats(stats, &d);
 
-  const std::string f_sum(merge_path(prob_.env.stat.dir,
-                                     prob_.env.stat.summary_file));
+  const std::string f_sum(merge_path(prob_.env.stat.dir.string(),
+                                     prob_.env.stat.summary_file.string()));
   d.SaveFile(f_sum.c_str());
 }
 
