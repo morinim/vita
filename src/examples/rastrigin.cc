@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2019-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,7 +20,7 @@ double neg_rastrigin(const std::vector<double> &x)
 
   const double rastrigin =
     A * x.size() + std::accumulate(x.begin(), x.end(), 0.0,
-                                   [](double sum, double xi)
+                                   [A, PI](double sum, double xi)
                                    {
                                      return sum + xi*xi - A*std::cos(2*PI*xi);
                                    });
