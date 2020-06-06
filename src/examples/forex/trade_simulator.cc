@@ -269,7 +269,7 @@ vita::fitness_t trade_simulator::run(const vita::team<vita::i_mep> &prg)
 
   const auto results_path(full_path(results_name_));
   trade_results r(results_path);
-  std::remove(results_path.c_str());
+  std::filesystem::remove(results_path);
 
   double fit(fitness(r, training_set_.size().count()));
 
