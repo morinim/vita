@@ -57,7 +57,7 @@ class Config:
 
 
 class Metatrader:
-    def __init__(self, data_dir, install_dir = "C:/Program Files/MetaTrader/",
+    def __init__(self, data_dir, install_dir = "C:/Program Files/MetaTrader 5/",
                  working_dir = "./", metaeditor = "", terminal = "",
                  ea_name = "gpea.mq5", ini_name = "gpea.ini",
                  results_name = "results.txt", timeout = 120, quiet = False):
