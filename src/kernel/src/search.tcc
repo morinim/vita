@@ -385,7 +385,7 @@ void src_search<T, ES>::log_stats(const search_stats<T> &s,
   {
     const auto lambda(lambdify(s.overall.best.solution));
 
-    std::ofstream tf(merge_path(stat.dir, stat.test_file));
+    std::ofstream tf(stat.dir / stat.test_file);
     for (const auto &example : test_data())
       tf << lambda->name((*lambda)(example)) << '\n';
   }

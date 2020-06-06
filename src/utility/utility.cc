@@ -127,33 +127,6 @@ void set_text(tinyxml2::XMLElement *p, const std::string &e,
 }
 
 ///
-/// Merges two paths.
-///
-/// \param[in] p1  first part of the path
-/// \param[in] p2  second part of the path
-/// \param[in] sep path separator character
-/// \return        result of path concatenation
-///
-/// \note
-/// Just an approximation of `std::filesystem::path::operator/`. Should be
-/// replaced when switching to C++17.
-///
-std::string merge_path(const std::string &p1, const std::string &p2, char sep)
-{
-  if (p1.empty()
-      || p2.front() == sep)  // absolute (POSIX) path. `p2` replaces `p1`
-    return p2;
-
-  // If `p2` is empty append the `sep` char to `p1`
-
-  const auto last_p1(p1.back() == sep ? std::prev(p1.end()) : p1.end());
-
-  return std::string(p1.begin(), last_p1)
-         + std::string(1, sep)
-         + std::string(p2.begin(), p2.end());
-}
-
-///
 /// Converts a `value_t` to `double`.
 ///
 /// \param[in] v value that should be converted to `double`

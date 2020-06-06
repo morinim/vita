@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -437,9 +437,8 @@ void search<T, ES>::log_stats(const search_stats<T> &stats) const
 
   log_stats(stats, &d);
 
-  const std::string f_sum(merge_path(prob_.env.stat.dir.string(),
-                                     prob_.env.stat.summary_file.string()));
-  d.SaveFile(f_sum.c_str());
+  const auto f_sum(prob_.env.stat.dir / prob_.env.stat.summary_file);
+  d.SaveFile(f_sum.string().c_str());
 }
 
 #endif  // include guard

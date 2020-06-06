@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,7 @@ namespace
 
 struct trade_results
 {
-  trade_results(const std::string &filepath)
+  trade_results(const std::filesystem::path &filepath)
   {
     std::ifstream results(filepath);
     while (!results.is_open())
@@ -46,20 +46,20 @@ struct trade_results
       results.open(filepath);
     }
 
+    const std::string fps(filepath.string());
+
     if (!(results >> profit))
-      throw std::runtime_error("Cannot read profit from " + filepath);
+      throw std::runtime_error("Cannot read profit from " + fps);
 
     if (!(results >> short_trades))
       throw std::runtime_error("Cannot read number of short trades from "
-                               + filepath);
+                               + fps);
 
     if (!(results >> long_trades))
-      throw std::runtime_error("Cannot read numer of long trades from "
-                               + filepath);
+      throw std::runtime_error("Cannot read numer of long trades from " + fps);
 
     if (!(results >> drawdown))
-      throw std::runtime_error("Cannot read balance drawdown from "
-                               + filepath);
+      throw std::runtime_error("Cannot read balance drawdown from " + fps);
 
     results.close();
   }
@@ -112,9 +112,10 @@ double fitness(const trade_results &r, int days)
 }  // unnamed namespace
 
 
-std::string trade_simulator::full_path(const std::string &fn) const
+std::filesystem::path trade_simulator::full_path(
+  const std::filesystem::path &fn) const
 {
-  return vita::merge_path(working_dir_, fn);
+  return working_dir_ / fn;
 }
 
 ///
@@ -124,11 +125,12 @@ std::string trade_simulator::full_path(const std::string &fn) const
 ///
 trade_simulator::trade_simulator()
 {
-  const std::string ini(full_path("forex.xml"));
+  const auto ini(full_path("forex.xml"));
 
   tinyxml2::XMLDocument doc;
-  if (doc.LoadFile(ini.c_str()) != tinyxml2::XML_SUCCESS)
-    throw std::runtime_error("Error opening configuration file: " + ini);
+  if (const std::string ini_s(ini.string());
+      doc.LoadFile(ini_s.c_str()) != tinyxml2::XML_SUCCESS)
+    throw std::runtime_error("Error opening configuration file: " + ini_s);
 
   tinyxml2::XMLHandle h(&doc);
   tinyxml2::XMLHandle files(h.FirstChildElement("mtgp")
@@ -142,11 +144,11 @@ trade_simulator::trade_simulator()
              ? he.ToElement()->GetText() : def;
   };
 
-  auto read_file = [this](const std::string name)
+  auto read_file = [this](const std::filesystem::path &name)
   {
     std::ifstream from(full_path(name));
     if (!from)
-      throw std::runtime_error("Error opening " + name);
+      throw std::runtime_error("Error opening " + name.string());
 
     std::stringstream buffer;
     buffer << from.rdbuf();
@@ -196,15 +198,12 @@ trade_simulator::trade_simulator()
 void trade_simulator::write_ini_file(const period &p) const
 {
   // Get the expert name removing the extension from EA filename.
-  std::string expert(ea_name_);
-  auto last_dot(expert.find_last_of("."));
-  if (last_dot != std::string::npos)
-    expert = expert.substr(0, last_dot);
+  const auto expert(ea_name_.stem());
 
   // See <https://www.metatrader5.com/en/terminal/help/start_advanced/start>
   std::ofstream o(full_path(ini_name_));
   if (!o)
-    throw std::runtime_error("Error creating ini file: " + ini_name_);
+    throw std::runtime_error("Error creating ini file: " + ini_name_.string());
 
   o << "[Tester]"                          << wendl
     << "Expert="        << expert          << wendl
@@ -248,14 +247,14 @@ void trade_simulator::write_ea_file(const vita::team<vita::i_mep> &prg) const
                      "bool sell_pattern() {return " + ss[1].str() + ";}");
 
   const auto fo(full_path(ea_name_));
-  const auto fo_tmp(fo + ".tmp");
+  const auto fo_tmp(full_path(ea_name_) += ".tmp");
   std::ofstream o(fo_tmp);
   if (!o)
-    throw std::runtime_error("Error creating EA file: " + fo);
+    throw std::runtime_error("Error creating EA file: " + fo_tmp.string());
   o << ea;
   o.close();
 
-  std::rename(fo_tmp.c_str(), fo.c_str());
+  std::filesystem::rename(fo_tmp, fo);
 }
 
 date::days period::size() const

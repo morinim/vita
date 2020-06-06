@@ -14,6 +14,8 @@
 
 #define HAS_UNCAUGHT_EXCEPTIONS 1
 
+#include <filesystem>
+
 #include "kernel/vita.h"
 #include "third_party/date/date.h"
 
@@ -45,15 +47,16 @@ public:
   vita::fitness_t run(const vita::team<vita::i_mep> &);
 
 private:
-  std::string full_path(const std::string &) const;
+  std::filesystem::path full_path(const std::filesystem::path &) const;
   void write_ea_file(const vita::team<vita::i_mep> &) const;
   void write_ini_file(const period &) const;
 
-  std::string      ea_name_;
-  std::string  ea_template_;
-  std::string     ini_name_;
-  std::string results_name_;
-  std::string  working_dir_;
+  std::filesystem::path      ea_name_;
+  std::filesystem::path     ini_name_;
+  std::filesystem::path results_name_;
+  std::filesystem::path  working_dir_;
+
+  std::string ea_template_;
 
   std::string        deposit_;
   std::string execution_mode_;
