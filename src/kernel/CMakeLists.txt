@@ -8,3 +8,6 @@ set(FRAMEWORK_SRC ${KERNEL_SRC} ${UTILITY_SRC})
 add_library(vita ${FRAMEWORK_SRC})
 
 target_link_libraries(vita tinyxml2)
+
+install(TARGETS vita DESTINATION lib)
+install(DIRECTORY ./ DESTINATION include/vita/kernel FILES_MATCHING PATTERN "*.h" PATTERN "*.tcc")

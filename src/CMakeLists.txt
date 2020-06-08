@@ -7,17 +7,17 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 
 # The general idea is to use the default values and overwrite them only for
-# specific, well experimented systems.
+# specific, well experimented environments.
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
   set(NO_WARN_FLAGS "-w")
 
-  # `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
-  # switches to try from time to time (they give many false positives).
   set(WARN_FLAGS "-Wpedantic" "-Wall" "-Wextra" "-Winvalid-pch" "-Wpedantic"
                  "-Wformat=2" "-Wfloat-equal" "-Wshadow" "-Wdouble-promotion"
                  "-Wzero-as-null-pointer-constant")
+  # `-Wconversion`, `-Wsign-conversion`, `-Weffc++` are other interesting
+  # switches to try from time to time (they give many false positives).
 
   set(OTHER_FLAGS "-pipe" "-march=native")
 
@@ -27,6 +27,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
+  set(NO_WARN_FLAGS "/w")
   set(WARN_FLAGS "/W4")
 
 endif()
