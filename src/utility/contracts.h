@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -18,29 +18,15 @@
 namespace vita
 {
 
-#if defined(VITA_CONCEPTS_THROW)
+#if defined(__clang__) || defined(__GNUC__)
+#  define VITA_LIKELY(x) __builtin_expect(!!(x), 1)
+#  define VITA_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#  define VITA_LIKELY(x) (!!(x))
+#  define VITA_UNLIKELY(x) (!!(x))
+#endif
 
-#include <exception>
-#include <stdexcept>
-
-#define VITA_CONCEPT_STRING(x) #x
-
-struct concept_fail : public std::runtime_error
-{
-  explicit concept_fail(const char message[]) : std::runtime_error(message) {}
-};
-
-#define Expects(expression)                                        \
-  if (!(expression))                                               \
-    throw concept_fail("VITA: precondition failure at " __FILE__   \
-                       ": " VITA_CONCEPT_STRING(__LINE__));
-
-#define Ensures(expression)                                        \
-  if (!(expression))                                               \
-    throw concept_fail("VITA: postcondition failure at " __FILE__  \
-                       ": " VITA_CONCEPT_STRING(__LINE__));
-
-#elif defined(NDEBUG)
+#if defined(NDEBUG)
 
 #define Expects(expression)
 #define Ensures(expression)
@@ -53,7 +39,7 @@ struct concept_fail : public std::runtime_error
 /// the wrong semantics (do you always want to abort in debug mode and check
 /// nothing in productions runs?).
 /// \see C++ Core Guidelines I.6 <https://github.com/isocpp/CppCoreGuidelines/>
-#define Expects(expression)  assert(expression)
+#define Expects(expression)  assert(VITA_LIKELY(expression))
 
 /// Postconditions are often informally stated in a comment that states the
 /// purpose of a function; `Ensures()` can be used to make this more
@@ -65,7 +51,7 @@ struct concept_fail : public std::runtime_error
 /// Postconditions of the form "this resource must be released" are best
 /// expressed by RAII.
 /// \see C++ Core Guidelines I.7 <https://github.com/isocpp/CppCoreGuidelines/>
-#define Ensures(expression)  assert(expression)
+#define Ensures(expression)  assert(VITA_LIKELY(expression))
 
 #endif
 

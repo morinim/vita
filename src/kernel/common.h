@@ -50,8 +50,8 @@ using cvect = std::vector<category_t>;  // often used so we define a shortcut
 /// positive with `g++ -Weffc++` so, for now, we keep the macro.
 ///
 /// \see Further details:
-/// - <http://stackoverflow.com/q/7823990/3235496>
-/// - <http://stackoverflow.com/q/1454407/3235496>
+/// - <https://stackoverflow.com/q/7823990/3235496>
+/// - <https://stackoverflow.com/q/1454407/3235496>
 #define DISALLOW_COPY_AND_ASSIGN(Class) \
   Class(const Class &) = delete;        \
   Class &operator=(const Class &) = delete
