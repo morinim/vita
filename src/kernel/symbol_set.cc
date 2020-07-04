@@ -81,7 +81,6 @@ std::vector<const symbol *> symbol_set::adts() const
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
   Expects(s);
-  Expects(s->debug());
   Expects(wr >= 0.0);
 
   const auto w(static_cast<weight_t>(wr * w_symbol::base_weight));
@@ -581,12 +580,6 @@ bool symbol_set::collection::sum_container::debug() const
 
   for (const auto &e : elems_)
   {
-    if (!e.sym->debug())
-    {
-      vitaERROR << name_ << ": invalid symbol " << e.sym->name();
-      return false;
-    }
-
     check_sum += e.weight;
 
     if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))

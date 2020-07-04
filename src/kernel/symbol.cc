@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ opcode_t symbol::opc_count_(0);
 symbol::symbol(const std::string &name, category_t c)
   : opcode_(opc_count_++), category_(c), name_(name)
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -59,7 +59,7 @@ double symbol::penalty_nvi(core_interpreter *) const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool symbol::debug() const
+bool symbol::is_valid() const
 {
   return name().size() > 0;
 }

@@ -44,7 +44,7 @@ public:
 
   unsigned arity() const final;
 
-  bool debug() const override;
+  bool is_valid() const override;
 
   static const function *cast(const symbol *);
 

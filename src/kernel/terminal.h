@@ -37,8 +37,6 @@ public:
 
   virtual std::string display(param_t, format = c_format) const;
 
-  bool debug() const override;
-
   static const terminal *cast(const symbol *);
 };
 

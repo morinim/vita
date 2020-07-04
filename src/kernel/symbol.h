@@ -59,7 +59,7 @@ public:
 
   double penalty(core_interpreter *) const;
 
-  virtual bool debug() const;
+  virtual bool is_valid() const;
 
 private:
   // NVI template methods
