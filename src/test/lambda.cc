@@ -69,7 +69,7 @@ void test_serialization(vita::src_problem &pr)
     CHECK(serialize::save(ss, lambda1));
     const auto lambda2(serialize::lambda::load<T>(ss, pr.sset));
     REQUIRE(lambda2);
-    REQUIRE(lambda2->debug());
+    REQUIRE(lambda2->is_valid());
 
     for (const auto &e : pr.data())
     {
@@ -231,7 +231,7 @@ TEST_CASE_FIXTURE(fixture, "reg_lambda serialization")
     CHECK(serialize::save(ss, lambda1));
     const auto lambda2(serialize::lambda::load(ss, pr.sset));
     REQUIRE(lambda2);
-    REQUIRE(lambda2->debug());
+    REQUIRE(lambda2->is_valid());
 
     for (const auto &e : pr.data())
     {
