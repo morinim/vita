@@ -116,7 +116,6 @@ private:
   adf_core<i_mep> core_;
 };
 
-#include "kernel/adf.tcc"
 }  // namespace vita
 
 #endif  // include guard
