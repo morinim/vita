@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@ problem::problem() : env(), sset()
 ///
 bool problem::debug() const
 {
-  if (!env.debug(false))
+  if (!env.is_valid(false))
     return false;
 
   return sset.debug();

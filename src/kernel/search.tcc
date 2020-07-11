@@ -124,7 +124,7 @@ void search<T, ES>::tune_parameters()
   if (!constrained.max_stuck_time.has_value())
     prob_.env.max_stuck_time = dflt.max_stuck_time;
 
-  Ensures(prob_.env.debug(true));
+  Ensures(prob_.env.is_valid(true));
 }
 
 ///

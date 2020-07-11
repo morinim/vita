@@ -34,8 +34,6 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
   : search<T, ES>(p),
     p_symre(evaluator_id::rmae), p_class(evaluator_id::gaussian), metrics(m)
 {
-  Expects(p.debug());
-
   evaluator(p.classification() ? p_class : p_symre);
 
   Ensures(this->debug());
@@ -323,7 +321,7 @@ void src_search<T, ES>::tune_parameters()
       && typeid(this->vs_.get()) == typeid(holdout_validation))
     env.validation_percentage = dflt.validation_percentage;
 
-  Ensures(env.debug(true));
+  Ensures(env.is_valid(true));
 }
 
 template<class T, template<class> class ES>

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,7 +48,7 @@ void basic_ga_search<T, ES, F>::tune_parameters()
 
   this->prob_.env.arl = false;
 
-  Ensures(this->prob_.env.debug(true));
+  Ensures(this->prob_.env.is_valid(true));
 }
 
 #endif  // include guard

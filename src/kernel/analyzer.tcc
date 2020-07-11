@@ -160,7 +160,7 @@ void analyzer<T>::count(const symbol *sym, bool active)
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
-bool analyzer<T>::debug() const
+bool analyzer<T>::is_valid() const
 {
   for (const auto &i : sym_counter_)
     if (i.second.counter[true] > i.second.counter[false])
