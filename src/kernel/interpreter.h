@@ -68,7 +68,7 @@ private:
   // Nonvirtual interface.
   value_t run_nvi() override;
   double penalty_nvi() override;
-  bool debug_nvi() const override;
+  bool is_valid_nvi() const override;
 
   // *** Private data members ***
   const T *prg_;

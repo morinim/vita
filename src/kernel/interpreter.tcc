@@ -93,10 +93,8 @@ value_t interpreter<T>::fetch_arg(unsigned i)
   assert(g.sym->arity());
   assert(i < g.sym->arity());
 
-  const locus l(g.arg_locus(i));
-
   const auto get_val(
-    [&]()
+    [this](const locus &l)
     {
       const locus backup(ip_);
       ip_ = l;
@@ -106,17 +104,18 @@ value_t interpreter<T>::fetch_arg(unsigned i)
       return ret;
     });
 
+  const locus l(g.arg_locus(i));
   auto &elem(cache_(l));
 
   if (!elem.valid)
   {
-    elem.value = get_val();
+    elem.value = get_val(l);
     elem.valid = true;
   }
 #if !defined(NDEBUG)
   else // Cache not empty... checking if the cached value is right.
   {
-    assert(get_val() == elem.value);
+    assert(get_val(l) == elem.value);
   }
 #endif
 
@@ -133,7 +132,6 @@ value_t interpreter<T>::fetch_adf_arg(unsigned i)
 {
 #if !defined(NDEBUG)
   assert(context_);
-  assert(context_->debug());
   assert(i < gene::k_args);
 
   const gene ctx_g(context_->prg_->operator[](context_->ip_));
@@ -184,11 +182,8 @@ double interpreter<T>::penalty_nvi()
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
-bool interpreter<T>::debug_nvi() const
+bool interpreter<T>::is_valid_nvi() const
 {
-  if (context_ && !context_->debug())
-    return false;
-
   if (!prg_->debug())
     return false;
 

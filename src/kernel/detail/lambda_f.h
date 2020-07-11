@@ -93,9 +93,6 @@ public:
     if (!ind_.debug())
       return false;
 
-    if (!int_.debug())
-      return false;
-
     return &int_.program() == &ind_;
   }
 
@@ -120,7 +117,7 @@ public:
     return int_.run(std::forward<Args>(args)...);
   }
 
-  bool debug() const { return int_.debug(); }
+  bool debug() const { return true; }
 
   // Serialization
   bool save(std::ostream &out) const
