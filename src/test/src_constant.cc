@@ -25,22 +25,22 @@ TEST_CASE("Base")
   const bool b(true);
   constant<bool> bc(b);
   CHECK(std::get<D_INT>(bc.eval(nullptr)) == b);
-  CHECK(bc.debug());
+  CHECK(bc.is_valid());
 
   const int i(1234);
   constant<int> ic(i);
   CHECK(std::get<D_INT>(ic.eval(nullptr)) == i);
-  CHECK(ic.debug());
+  CHECK(ic.is_valid());
 
   const double d(3.14);
   constant<double> dc(d);
   CHECK(std::get<D_DOUBLE>(dc.eval(nullptr)) == doctest::Approx(d));
-  CHECK(dc.debug());
+  CHECK(dc.is_valid());
 
   const std::string s("A STRING CONSTANT");
   constant<std::string> sc(s);
   CHECK(std::get<D_STRING>(sc.eval(nullptr)) == s);
-  CHECK(sc.debug());
+  CHECK(sc.is_valid());
 }
 
 }  // TEST_SUITE("SRC_CONSTANT")

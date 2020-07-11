@@ -26,7 +26,7 @@ search<T, ES>::search(problem &p) : eva1_(nullptr), eva2_(nullptr),
                                     vs_(std::make_unique<as_is_validation>()),
                                     prob_(p), after_generation_callback_()
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 template<class T, template<class> class ES>
@@ -124,7 +124,7 @@ void search<T, ES>::tune_parameters()
   if (!constrained.max_stuck_time.has_value())
     prob_.env.max_stuck_time = dflt.max_stuck_time;
 
-  Ensures(prob_.env.debug(true));
+  Ensures(prob_.env.is_valid(true));
 }
 
 ///
@@ -362,9 +362,9 @@ search<T, ES> &search<T, ES>::validation_strategy(Args && ...args)
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
-bool search<T, ES>::debug() const
+bool search<T, ES>::is_valid() const
 {
-  return prob_.debug();
+  return true;
 }
 
 ///

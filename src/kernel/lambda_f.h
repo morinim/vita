@@ -54,7 +54,7 @@ public:
 
   virtual value_t operator()(const dataframe::example &) const = 0;
 
-  virtual bool debug() const = 0;
+  virtual bool is_valid() const = 0;
 };
 
 // Forward declarations.
@@ -140,7 +140,7 @@ public:
 
   double measure(const model_metric &, const dataframe &) const final;
 
-  bool debug() const final;
+  bool is_valid() const final;
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
@@ -230,7 +230,7 @@ public:
 
   classification_result tag(const dataframe::example &) const final;
 
-  bool debug() const final;
+  bool is_valid() const final;
 
   double training_accuracy() const;
 
@@ -282,7 +282,7 @@ public:
 
   classification_result tag(const dataframe::example &) const final;
 
-  bool debug() const final;
+  bool is_valid() const final;
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
@@ -323,7 +323,7 @@ public:
 
   classification_result tag(const dataframe::example &) const final;
 
-  bool debug() const final;
+  bool is_valid() const final;
 
   // *** Serialization ***
   static const std::string SERIALIZE_ID;
@@ -359,7 +359,7 @@ public:
 
   classification_result tag(const dataframe::example &) const final;
 
-  bool debug() const final;
+  bool is_valid() const final;
 
   static const std::string SERIALIZE_ID;
 

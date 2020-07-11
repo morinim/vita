@@ -27,7 +27,6 @@ namespace vita
 ///
 i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
 {
-  Expects(p.debug());
   Expects(parameters());
 
   std::generate(genome_.begin(), genome_.end(),
@@ -37,7 +36,7 @@ i_ga::i_ga(const problem &p) : individual(), genome_(p.sset.categories())
                     p.sset.roulette_terminal(n++).init());
                 });
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -103,7 +102,7 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
   if (n)
     signature_ = hash();
 
-  Ensures(debug());
+  Ensures(is_valid());
   return n;
 }
 
@@ -125,8 +124,6 @@ unsigned i_ga::mutation(double pgm, const problem &prb)
 ///
 i_ga crossover(const i_ga &lhs, const i_ga &rhs)
 {
-  Expects(lhs.debug());
-  Expects(rhs.debug());
   Expects(lhs.parameters() == rhs.parameters());
 
   const auto ps(lhs.parameters());
@@ -140,7 +137,7 @@ i_ga crossover(const i_ga &lhs, const i_ga &rhs)
   ret.set_older_age(lhs.age());
   ret.signature_ = ret.hash();
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -213,7 +210,7 @@ unsigned i_ga::distance(const i_ga &ind) const
 ///
 /// \return `true` if the individual passes the internal consistency check
 ///
-bool i_ga::debug() const
+bool i_ga::is_valid() const
 {
   if (empty())
   {

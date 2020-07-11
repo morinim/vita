@@ -65,7 +65,7 @@ public:
   //bool load(std::istream &) {}
   //bool save(std::ostream &) const;
 
-  bool debug(bool) const;
+  bool is_valid(bool) const;
 
   struct mep_parameters
   {

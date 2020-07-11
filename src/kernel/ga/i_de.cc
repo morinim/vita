@@ -28,7 +28,6 @@ namespace vita
 ///
 i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
 {
-  Expects(p.debug());
   Expects(parameters());
 
   std::generate(genome_.begin(), genome_.end(),
@@ -37,7 +36,7 @@ i_de::i_de(const problem &p) : individual(), genome_(p.sset.categories())
                   return p.sset.roulette_terminal(n++).init();
                 });
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -106,9 +105,6 @@ i_de i_de::crossover(double p, const range_t<double> &f,
                      const i_de &a, const i_de &b, const i_de &c) const
 {
   Expects(0.0 <= p && p <= 1.0);
-  Expects(a.debug());
-  Expects(b.debug());
-  Expects(c.debug());
 
   const auto ps(parameters());
   Expects(ps == a.parameters());
@@ -132,7 +128,7 @@ i_de i_de::crossover(double p, const range_t<double> &f,
   ret.set_older_age(std::max({age(), a.age(), b.age()}));
 
   ret.signature_.clear();
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -201,7 +197,7 @@ i_de &i_de::operator=(const std::vector<i_de::value_type> &v)
 ///
 /// \return `true` if the individual passes the internal consistency check
 ///
-bool i_de::debug() const
+bool i_de::is_valid() const
 {
   if (empty())
   {

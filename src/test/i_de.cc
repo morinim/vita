@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,7 @@ TEST_CASE_FIXTURE(fixture5, "Random creation")
   {
     vita::i_de ind(prob);
 
-    CHECK(ind.debug());
+    CHECK(ind.is_valid());
     CHECK(ind.parameters() == prob.sset.categories());
     CHECK(ind.age() == 0);
 
@@ -42,7 +42,7 @@ TEST_CASE_FIXTURE(fixture5, "Empty individual")
 {
   vita::i_de ind;
 
-  CHECK(ind.debug());
+  CHECK(ind.is_valid());
   CHECK(ind.empty());
 }
 
@@ -104,13 +104,13 @@ TEST_CASE_FIXTURE(fixture5, "DE crossover")
       c.inc_age();
 
     auto off(p.crossover(prob.env.p_cross, prob.env.de.weight, a, a, p));
-    CHECK(off.debug());
+    CHECK(off.is_valid());
 
     for (unsigned i(0); i < p.parameters(); ++i)
       CHECK(off[i] == doctest::Approx(p[i]));
 
     off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, p);
-    CHECK(off.debug());
+    CHECK(off.is_valid());
     CHECK(off.age() == std::max({p.age(), a.age(), b.age()}));
 
     for (unsigned i(0); i < p.parameters(); ++i)
@@ -125,7 +125,7 @@ TEST_CASE_FIXTURE(fixture5, "DE crossover")
     }
 
     off = p.crossover(prob.env.p_cross, prob.env.de.weight, a, b, c);
-    CHECK(off.debug());
+    CHECK(off.is_valid());
     CHECK(off.age() == std::max({p.age(), a.age(), b.age(), c.age()}));
     for (unsigned i(0); i < p.parameters(); ++i)
     {
@@ -159,7 +159,7 @@ TEST_CASE_FIXTURE(fixture5, "Serialization")
 
     vita::i_de i2(prob);
     CHECK(i2.load(ss));
-    CHECK(i2.debug());
+    CHECK(i2.is_valid());
 
     CHECK(i1 == i2);
   }
@@ -170,7 +170,7 @@ TEST_CASE_FIXTURE(fixture5, "Serialization")
 
   vita::i_de empty1;
   CHECK(empty1.load(ss));
-  CHECK(empty1.debug());
+  CHECK(empty1.is_valid());
   CHECK(empty1.empty());
 
   CHECK(empty == empty1);

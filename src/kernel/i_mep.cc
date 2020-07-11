@@ -53,7 +53,7 @@ i_mep::i_mep(const problem &p)
     for (category_t c(0); c < c_sup; ++c)
       genome_(i, c) = gene(p.sset.roulette_terminal(c));
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -79,7 +79,7 @@ i_mep::i_mep(const std::vector<gene> &gv)
   for (const auto &g : gv)
     genome_(i++, g.sym->category()) = g;
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 
@@ -123,7 +123,7 @@ i_mep i_mep::get_block(const locus &l) const
     ret.signature_.clear();
   }
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -162,7 +162,7 @@ unsigned i_mep::mutation(double pgm, const problem &prb)
   if (n)
     signature_.clear();
 
-  Ensures(debug());
+  Ensures(is_valid());
   return n;
 }
 
@@ -203,7 +203,7 @@ i_mep i_mep::replace(const locus &l, const gene &g) const
   ret.genome_(l) = g;
   ret.signature_.clear();
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -236,7 +236,7 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 
   ret.signature_.clear();
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -284,7 +284,7 @@ std::pair<i_mep, std::vector<locus>> i_mep::generalize(
     ret.genome_(terminals[j]).sym = &sset.arg(j);
   ret.signature_.clear();
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
 
   return {ret, std::vector<locus>(terminals.begin(), terminals.begin() + n)};
 }
@@ -449,7 +449,7 @@ hash_t i_mep::signature() const
 ///
 /// \return `true` if the individual passes the internal consistency check
 ///
-bool i_mep::debug() const
+bool i_mep::is_valid() const
 {
   if (empty())
   {
@@ -783,8 +783,6 @@ i_mep i_mep::cse() const
 ///
 i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 {
-  Expects(lhs.debug());
-  Expects(rhs.debug());
   Expects(lhs.size() == rhs.size());
 
   const bool b(random::boolean());
@@ -864,7 +862,7 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
   to.set_older_age(from.age());
   to.signature_.clear();
 
-  Ensures(to.debug());
+  Ensures(to.is_valid());
   return to;
 }
 

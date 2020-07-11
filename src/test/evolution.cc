@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,10 +38,10 @@ TEST_CASE_FIXTURE(fixture2, "Creation")
       const auto eva(std::make_unique<vita::test_evaluator<i_mep>>());
 
       vita::evolution<i_mep, alps_es> evo1(prob, *eva);
-      CHECK(evo1.debug());
+      CHECK(evo1.is_valid());
 
       vita::evolution<i_mep, std_es> evo2(prob, *eva);
-      CHECK(evo2.debug());
+      CHECK(evo2.is_valid());
     }
 }
 

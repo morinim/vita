@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -27,7 +27,7 @@ adf_core<T>::adf_core(const T &ind) : code_(ind), id_(adf_count())
 
 ///
 /// \param[in] prefix a string identifying adf type
-/// \return           a string identifying an ADF/ADT
+/// \return           an unique identifier (string) for this ADF/ADT symbol
 ///
 template<class T>
 std::string adf_core<T>::name(const std::string &prefix) const
@@ -48,7 +48,7 @@ const T &adf_core<T>::code() const
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
-bool adf_core<T>::debug() const
+bool adf_core<T>::is_valid() const
 {
   return code_.active_symbols() >= 2;
 }

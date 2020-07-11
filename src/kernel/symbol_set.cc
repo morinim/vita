@@ -28,7 +28,7 @@ symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), views_()
   for (unsigned i(0); i < gene::k_args; ++i)
     arguments_[i] = std::make_unique<argument>(i);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -81,7 +81,6 @@ std::vector<const symbol *> symbol_set::adts() const
 symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
 {
   Expects(s);
-  Expects(s->debug());
   Expects(wr >= 0.0);
 
   const auto w(static_cast<weight_t>(wr * w_symbol::base_weight));
@@ -372,12 +371,8 @@ std::ostream &operator<<(std::ostream &o, const symbol_set &ss)
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool symbol_set::debug() const
+bool symbol_set::is_valid() const
 {
-  for (const auto &i : views_)
-    if (!i.debug())
-      return false;
-
   if (!enough_terminals())
   {
     vitaERROR << "Symbol set doesn't contain enough symbols";
@@ -401,10 +396,10 @@ symbol_set::collection::collection(std::string n)
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool symbol_set::collection::debug() const
+bool symbol_set::collection::is_valid() const
 {
-  if (!all.debug() || !functions.debug() || !terminals.debug() || !adf.debug()
-      || !adt.debug())
+  if (!all.is_valid() || !functions.is_valid() || !terminals.is_valid()
+      || !adf.is_valid() || !adt.is_valid())
   {
     vitaERROR << "(inside " << name_ << ")";
     return false;
@@ -575,18 +570,12 @@ const symbol &symbol_set::collection::sum_container::roulette() const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool symbol_set::collection::sum_container::debug() const
+bool symbol_set::collection::sum_container::is_valid() const
 {
   weight_t check_sum(0);
 
   for (const auto &e : elems_)
   {
-    if (!e.sym->debug())
-    {
-      vitaERROR << name_ << ": invalid symbol " << e.sym->name();
-      return false;
-    }
-
     check_sum += e.weight;
 
     if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))

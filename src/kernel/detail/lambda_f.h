@@ -39,12 +39,12 @@ class reg_lambda_f_storage<T, true, false>
 {
 public:
   explicit reg_lambda_f_storage(const T &ind) : ind_(ind), int_(&ind_)
-  { Ensures(debug()); }
+  { Ensures(is_valid()); }
 
   explicit reg_lambda_f_storage(const reg_lambda_f_storage &rls)
     : ind_(rls.ind_), int_(src_interpreter<T>(&ind_))
   {
-    Ensures(debug());
+    Ensures(is_valid());
   }
 
   reg_lambda_f_storage(std::istream &in, const symbol_set &ss)
@@ -55,7 +55,7 @@ public:
 
     int_ = src_interpreter<T>(&ind_);
 
-    Ensures(debug());
+    Ensures(is_valid());
   }
 
   reg_lambda_f_storage &operator=(const reg_lambda_f_storage &rhs)
@@ -66,7 +66,7 @@ public:
       int_ = src_interpreter<T>(&ind_);
     }
 
-    assert(debug());
+    Ensures(is_valid());
     return *this;
   }
 
@@ -74,10 +74,10 @@ public:
   {
     // Consider that there are situations in which `&int_.program() != &ind_`
     // and this function will blow up.
-    // It shouldn't happen: `debug` checks for this problematic condition,
+    // It shouldn't happen: `is_valid` checks for this problematic condition,
     // `operator=` resets the pointer to the reference individual... but it's
     // not enough.
-    // A typical scenario may be that a vector of objects containing
+    // Consider a scenario in which a vector of objects containing
     // `reg_lambda_f_storage` needs reallocation after a `push_back`. All the
     // `int_` object are invalidated...
     //
@@ -88,14 +88,8 @@ public:
     return int_.run(std::forward<Args>(args)...);
   }
 
-  bool debug() const
+  bool is_valid() const
   {
-    if (!ind_.debug())
-      return false;
-
-    if (!int_.debug())
-      return false;
-
     return &int_.program() == &ind_;
   }
 
@@ -113,14 +107,14 @@ class reg_lambda_f_storage<T, false, false>
 {
 public:
   explicit reg_lambda_f_storage(const T &ind) : int_(&ind)
-  { Ensures(debug()); }
+  { Ensures(is_valid()); }
 
   template<class ...Args> value_t run(Args && ...args) const
   {
     return int_.run(std::forward<Args>(args)...);
   }
 
-  bool debug() const { return int_.debug(); }
+  bool is_valid() const { return true; }
 
   // Serialization
   bool save(std::ostream &out) const
@@ -143,7 +137,7 @@ public:
     for (const auto &ind : t)
       team_.emplace_back(ind);
 
-    Ensures(debug());
+    Ensures(is_valid());
   }
 
   reg_lambda_f_storage(std::istream &in, const symbol_set &ss) : team_()
@@ -156,13 +150,12 @@ public:
     for (unsigned j(0); j < n; ++j)
       team_.emplace_back(in, ss);
 
-    Ensures(debug());
+    Ensures(is_valid());
   }
 
-  bool debug() const
+  bool is_valid() const
   {
-    return std::all_of(team_.begin(), team_.end(),
-                       [](const auto &lambda) { return lambda.debug(); });
+    return true;
   }
 
   // Serialization.

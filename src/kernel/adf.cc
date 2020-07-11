@@ -22,10 +22,9 @@ namespace vita
 adf::adf(const i_mep &ind, cvect sv)
   : function("ADF", ind.category(), std::move(sv)), core_(ind)
 {
-  Expects(ind.debug());
   Expects(ind.active_symbols() >= 2);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -41,7 +40,7 @@ bool adf::auto_defined() const
 /// \return      the output of the ADF
 ///
 /// \note
-/// Adf functions need input parameters from a context (contrary to adt::eval).
+/// ADF functions need input parameters from a context (contrary to adt::eval).
 ///
 value_t adf::eval(core_interpreter *i) const
 {
@@ -52,7 +51,7 @@ value_t adf::eval(core_interpreter *i) const
 }
 
 ///
-/// \return the name of the ADF
+/// \return the name (unique identifier) of the ADF
 ///
 std::string adf::name() const
 {
@@ -62,18 +61,14 @@ std::string adf::name() const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool adf::debug() const
+bool adf::is_valid() const
 {
-  const auto cod(code());
   // No recursive calls.
-  for (const auto &g : cod)
-    if (g.sym == this)
-      return false;
-
-  if (!core_.debug())
+  if (std::any_of(code().begin(), code().end(),
+                  [this](const gene &g) { return g.sym == this; }))
     return false;
 
-  return function::debug();
+  return core_.is_valid() && function::is_valid();
 }
 
 ///
@@ -89,10 +84,9 @@ const i_mep &adf::code() const
 ///
 adt::adt(const i_mep &ind) : terminal("ADT", ind.category()), core_(ind)
 {
-  Expects(ind.debug());
   Expects(ind.active_symbols() >= 2);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -107,7 +101,7 @@ bool adt::auto_defined() const
 /// \return the output of the ADT
 ///
 /// \note
-/// Adt hasn't input parameters so the context is ignored (contrary to
+/// ADT hasn't input parameters so the context is ignored (contrary to
 /// adf::eval).
 ///
 value_t adt::eval(core_interpreter *) const
@@ -116,7 +110,7 @@ value_t adt::eval(core_interpreter *) const
 }
 
 ///
-/// \return the name of the ADT
+/// \return the name (unique identifier) of the ADT
 ///
 std::string adt::name() const
 {
@@ -126,18 +120,14 @@ std::string adt::name() const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool adt::debug() const
+bool adt::is_valid() const
 {
-  const auto cod(code());
   // No recursive calls.
-  for (const auto &g : cod)
-    if (g.sym == this)
-      return false;
-
-  if (!core_.debug())
+  if (std::any_of(code().begin(), code().end(),
+                  [this](const gene &g) { return g.sym == this; }))
     return false;
 
-  return terminal::debug();
+  return core_.is_valid() && terminal::is_valid();
 }
 
 ///

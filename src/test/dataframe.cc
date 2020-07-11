@@ -114,7 +114,7 @@ constexpr std::size_t ncol(12);
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(wine, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
@@ -183,7 +183,7 @@ TEST_CASE("load_csv output_index")
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(abalone, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
@@ -240,7 +240,7 @@ TEST_CASE("load_csv_no_output_index")
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(ecoli, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   CHECK(d.columns.size() == ncol + 1);
   CHECK(!d.columns.empty());
@@ -306,7 +306,7 @@ constexpr std::size_t ncol(5);
   CHECK(d.columns.empty());
 
   CHECK(d.read_csv(iris, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());
@@ -349,7 +349,7 @@ TEST_CASE("load_xrff_classification")
   CHECK(d.columns.empty());
 
   CHECK(d.read_xrff(iris_xrff) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   CHECK(d.columns.size() == ncol);
   CHECK(!d.columns.empty());

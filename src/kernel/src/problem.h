@@ -73,7 +73,7 @@ public:
   unsigned classes() const;
   unsigned variables() const;
 
-  bool debug() const override;
+  bool is_valid() const override;
 
 private:
   // Private support methods.

@@ -24,7 +24,7 @@ cache::cache(std::uint8_t bits)
     seal_(1), probes_(0), hits_(0)
 {
   Expects(bits);
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -181,7 +181,7 @@ bool cache::save(std::ostream &out) const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool cache::debug() const
+bool cache::is_valid() const
 {
   return probes() >= hits();
 }

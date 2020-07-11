@@ -34,7 +34,7 @@ public:
 
   value_t eval(core_interpreter *) const override;
 
-  bool debug() const override;
+  bool is_valid() const override;
 
 private:
   const unsigned index_;

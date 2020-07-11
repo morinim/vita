@@ -37,13 +37,12 @@ namespace vita
 /// top level components call lower level ones, which call still lower levels.
 ///
 /// adf_core is the core of vita::adt and vita::adf classes (they are in a
-/// has-a relationship with it).
+/// *has-a* relationship).
 ///
 /// \note
 /// Although the acronym ADF is from Koza's automatically defined functions,
 /// in Vita subroutines are created using the ARL scheme described in
-/// "Discovery of subroutines in genetic programming" - J.P. Rosca and D.H.
-/// Ballard.
+/// [Discovery of Subroutines in Genetic Programming](https://github.com/morinim/vita/wiki/bibliography#15).
 ///
 template<class T>
 class adf_core
@@ -55,14 +54,15 @@ public:
 
   std::string name(const std::string &) const;
 
-  bool debug() const;
+  bool is_valid() const;
 
 private:
-  T        code_;
-  opcode_t   id_;
+  T      code_;
+  opcode_t id_;
 
   static opcode_t adf_count()
   {
+    // Generates identifiers for ADF functions in a threadsafe manner.
     static std::atomic<opcode_t> counter(0);
     return counter++;
   }
@@ -82,7 +82,7 @@ public:
 
   std::string name() const override;
 
-  bool debug() const override;
+  bool is_valid() const override;
 
   const i_mep &code() const;
 
@@ -108,7 +108,7 @@ public:
 
   std::string name() const override;
 
-  bool debug() const override;
+  bool is_valid() const override;
 
   const i_mep &code() const;
 

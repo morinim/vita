@@ -289,7 +289,6 @@ std::unique_ptr<basic_lambda_f> dyn_slot_evaluator<T>::lambdify(
 template<class T>
 fitness_t gaussian_evaluator<T>::operator()(const T &ind)
 {
-  assert(ind.debug());
   assert(this->dat_->classes() >= 2);
 
   basic_gaussian_lambda_f<T, false, false> lambda(ind, *this->dat_);

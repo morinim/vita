@@ -127,7 +127,7 @@ void environment::xml(tinyxml2::XMLDocument *d) const
 /// \return                  `true` if the object passes the internal
 ///                          consistency check
 ///
-bool environment::debug(bool force_defined) const
+bool environment::is_valid(bool force_defined) const
 {
   if (force_defined)
   {

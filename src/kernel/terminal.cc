@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,14 +24,6 @@ namespace vita
 std::string terminal::display(terminal::param_t v, format) const
 {
   return name() + "_" + std::to_string(v);
-}
-
-///
-/// \return `true` if the function passes the internal consistency check
-///
-bool terminal::debug() const
-{
-  return symbol::debug();
 }
 
 }  // namespace vita

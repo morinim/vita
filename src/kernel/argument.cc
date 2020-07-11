@@ -24,14 +24,14 @@ namespace vita
 ///
 /// An adf function may have up to `k_args` arguments. Arguments' category is
 /// special: they haven't a type because arguments are communication channels
-/// among adf functions and their calling environments.
+/// among ADF functions and their calling environments.
 /// So the type that is travelling on channel `i` (`argument(i)`) varies
 /// depending on the function being evaluated (instead, adf functions have a
 /// precise, fixed signature).
 ///
 argument::argument(unsigned n) : terminal("ARG", category_t()), index_(n)
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -64,9 +64,9 @@ value_t argument::eval(core_interpreter *agent) const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool argument::debug() const
+bool argument::is_valid() const
 {
-  return index_ < gene::k_args && terminal::debug();
+  return index_ < gene::k_args && terminal::is_valid();
 }
 
 }  // namespace vita

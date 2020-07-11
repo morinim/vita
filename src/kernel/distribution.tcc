@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -274,7 +274,7 @@ bool distribution<T>::load(std::istream &in)
 /// \return `true` if the object passes the internal consistency check.
 ///
 template<class T>
-bool distribution<T>::debug() const
+bool distribution<T>::is_valid() const
 {
   // This way, for "regular" types we'll use std::infinite / std::isnan
   // ("taken in" by the using statement), while for our types the overload

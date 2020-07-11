@@ -179,7 +179,7 @@ void dataframe::columns_info::build(const record_t &r, bool header_first)
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool dataframe::columns_info::debug() const
+bool dataframe::columns_info::is_valid() const
 {
   return std::none_of(begin(), end(),
                       [](const auto &c)
@@ -191,7 +191,7 @@ bool dataframe::columns_info::debug() const
 ///
 dataframe::dataframe() : columns(), classes_map_(), dataset_()
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -206,7 +206,7 @@ dataframe::dataframe(std::istream &is, const params &p) : dataframe()
 {
   Expects(is.good());
   read_csv(is, p);
-  Ensures(debug());
+  Ensures(is_valid());
 }
 dataframe::dataframe(std::istream &is) : dataframe(is, {}) {}
 
@@ -223,7 +223,7 @@ dataframe::dataframe(const std::filesystem::path &fn, const params &p)
 {
   Expects(!fn.empty());
   read(fn, p);
-  Ensures(debug());
+  Ensures(is_valid());
 }
 dataframe::dataframe(const std::filesystem::path &fn) : dataframe(fn, {}) {}
 
@@ -613,7 +613,7 @@ std::size_t dataframe::read_xrff(tinyxml2::XMLDocument &doc, const params &p)
   else
     throw exception::data_format("Missing `instances` element in XRFF file");
 
-  return debug() ? size() : static_cast<std::size_t>(0);
+  return is_valid() ? size() : static_cast<std::size_t>(0);
 }
 
 ///
@@ -719,7 +719,7 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
     ++count;
   }
 
-  if (!debug() || !size())
+  if (!is_valid() || !size())
     throw exception::insufficient_data("Empty / undersized CSV data file");
 
   return size();
@@ -778,7 +778,7 @@ dataframe::iterator dataframe::erase(iterator first, iterator last)
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool dataframe::debug() const
+bool dataframe::is_valid() const
 {
   if (empty())
     return true;
@@ -800,7 +800,7 @@ bool dataframe::debug() const
       return false;
   }
 
-  return columns.debug();
+  return columns.is_valid();
 }
 
 }  // namespace vita

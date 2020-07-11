@@ -32,12 +32,12 @@ class core_interpreter
 public:
   value_t run() { return run_nvi(); }
   double penalty() { return penalty_nvi(); }
-  bool debug() const { return debug_nvi(); }
+  bool is_valid() const { return is_valid_nvi(); }
 
 private:
   virtual value_t run_nvi() = 0;
   virtual double penalty_nvi() = 0;
-  virtual bool debug_nvi() const = 0;
+  virtual bool is_valid_nvi() const = 0;
 };
 
 }  // namespace vita

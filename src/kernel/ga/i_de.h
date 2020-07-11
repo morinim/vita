@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -71,7 +71,7 @@ public:
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
 
-  bool debug() const;
+  bool is_valid() const;
 
   friend class individual<i_de>;
 

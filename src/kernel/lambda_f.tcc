@@ -45,7 +45,7 @@ template<class T, bool S>
 basic_reg_lambda_f<T, S>::basic_reg_lambda_f(const T &prg)
   : detail::reg_lambda_f_storage<T, S>(prg)
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -60,7 +60,7 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(std::istream &in,
   static_assert(
     S, "reg_lambda_f requires storage space for de-serialization");
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -147,9 +147,9 @@ double basic_reg_lambda_f<T, S>::measure(const model_metric &m,
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S>
-bool basic_reg_lambda_f<T, S>::debug() const
+bool basic_reg_lambda_f<T, S>::is_valid() const
 {
-  return detail::reg_lambda_f_storage<T, S>::debug();
+  return detail::reg_lambda_f_storage<T, S>::is_valid();
 }
 
 ///
@@ -220,14 +220,12 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
     slot_matrix_(d.classes() * x_slot, d.classes()),
     slot_class_(d.classes() * x_slot), dataset_size_(0)
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() > 1);
   Expects(x_slot);
 
   fill_matrix(d, x_slot);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -267,7 +265,7 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(std::istream &in,
     throw exception::data_format(
       "Cannot read dyn_slot_lambda_f class_names component");
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -280,7 +278,6 @@ template<class T, bool S, bool N>
 void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
                                                    unsigned x_slot)
 {
-  Expects(d.debug());
   Expects(d.classes() > 1);
   Expects(x_slot);
 
@@ -429,7 +426,7 @@ bool basic_dyn_slot_lambda_f<T, S, N>::save(std::ostream &out) const
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
-bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
+bool basic_dyn_slot_lambda_f<T, S, N>::is_valid() const
 {
   if (slot_matrix_.cols() <= 1)  // too few classes
     return false;
@@ -437,7 +434,7 @@ bool basic_dyn_slot_lambda_f<T, S, N>::debug() const
   if (slot_matrix_.rows() != slot_class_.size())
     return false;
 
-  return lambda_.debug();
+  return true;
 }
 
 ///
@@ -449,13 +446,11 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
                                                           dataframe &d)
   : basic_class_lambda_f<N>(d), lambda_(ind), gauss_dist_(d.classes())
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() > 1);
 
   fill_vector(d);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -491,7 +486,7 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(std::istream &in,
       throw exception::data_format(
         "Cannot read gaussian_lambda_f class_names component");
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -604,9 +599,9 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
-bool basic_gaussian_lambda_f<T, S, N>::debug() const
+bool basic_gaussian_lambda_f<T, S, N>::is_valid() const
 {
-  return lambda_.debug();
+  return true;
 }
 
 ///
@@ -620,11 +615,9 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
                                                       dataframe &d)
   : basic_class_lambda_f<N>(d), lambda_(ind)
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() == 2);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -643,7 +636,7 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(std::istream &in,
       throw exception::data_format(
         "Cannot read binary_lambda_f class_names component");
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -665,9 +658,9 @@ classification_result basic_binary_lambda_f<T, S, N>::tag(
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, bool S, bool N>
-bool basic_binary_lambda_f<T, S, N>::debug() const
+bool basic_binary_lambda_f<T, S, N>::is_valid() const
 {
-  return lambda_.debug();
+  return true;
 }
 
 ///
@@ -825,13 +818,9 @@ std::string team_class_lambda_f<T, S, N, L, C>::serialize_id() const
 ///
 template<class T, bool S, bool N, template<class, bool, bool> class L,
          team_composition C>
-bool team_class_lambda_f<T, S, N, L, C>::debug() const
+bool team_class_lambda_f<T, S, N, L, C>::is_valid() const
 {
-  if (classes_ <= 1)
-    return false;
-
-  return std::all_of(team_.begin(), team_.end(),
-                     [](const auto &l) { return l.debug(); });
+  return classes_ > 1;
 }
 
 namespace serialize

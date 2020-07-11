@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,7 +25,7 @@ namespace vita
 function::function(const std::string &dis, category_t c, cvect args)
   : symbol(dis, c), argt_(std::move(args))
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -43,12 +43,12 @@ std::string function::display(format) const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool function::debug() const
+bool function::is_valid() const
 {
   if (!arity())  // this is a function, we want some argument...
     return false;
 
-  return symbol::debug();
+  return symbol::is_valid();
 }
 
 }  // namespace vita

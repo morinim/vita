@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,9 +24,9 @@ TEST_CASE("Base")
 {
   vita::constant<std::string> t("A TERMINAL");
 
+  CHECK(t.is_valid());
   CHECK(!t.arity());
   CHECK(!t.auto_defined());
-  CHECK(t.debug());
 }
 
 }  // TEST_SUITE("TERMINAL")

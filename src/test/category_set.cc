@@ -42,7 +42,7 @@ fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur 
   dataframe::params p;
 
   CHECK(d.read_csv(wine, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns);
   CHECK(cs.is_valid());
@@ -108,7 +108,7 @@ fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur 
   dataframe::params p;
 
   CHECK(d.read_csv(wine, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns, typing::strong);
 
@@ -190,7 +190,7 @@ TEST_CASE("abalone categories weak")
   p.output_index = 8;
 
   CHECK(d.read_csv(abalone, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns);
   CHECK(cs.is_valid());
@@ -247,7 +247,7 @@ TEST_CASE("abalone categories strong")
   p.output_index = 8;
 
   CHECK(d.read_csv(abalone, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns, typing::strong);
   CHECK(cs.is_valid());
@@ -311,7 +311,7 @@ TEST_CASE("ecoli categories")
   p.output_index = std::nullopt;
 
   CHECK(d.read_csv(ecoli, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns);
   CHECK(cs.is_valid());
@@ -372,7 +372,7 @@ TEST_CASE("ecoli categories strong")
   p.output_index = std::nullopt;
 
   CHECK(d.read_csv(ecoli, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns, typing::strong);
   CHECK(cs.is_valid());
@@ -440,7 +440,7 @@ TEST_CASE("load_csv classification")
   p.output_index = 4;
 
   CHECK(d.read_csv(iris, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns);
   CHECK(cs.is_valid());
@@ -494,7 +494,7 @@ TEST_CASE("load_csv classification strong")
   p.output_index = 4;
 
   CHECK(d.read_csv(iris, p) == 10);
-  CHECK(d.debug());
+  CHECK(d.is_valid());
 
   category_set cs(d.columns, typing::strong);
   CHECK(cs.is_valid());

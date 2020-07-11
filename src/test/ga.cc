@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -44,7 +44,7 @@ TEST_CASE_FIXTURE(fixture6, "Evolution")
              }));
 
   vita::evolution<vita::i_ga, vita::alps_es> evo1(prob, eva);
-  CHECK(evo1.debug());
+  CHECK(evo1.is_valid());
 
   const auto s1(evo1.run(1));
 
@@ -54,7 +54,7 @@ TEST_CASE_FIXTURE(fixture6, "Evolution")
   CHECK(s1.best.solution[3] > 9950);
 
   vita::evolution<vita::i_ga, vita::std_es> evo2(prob, eva);
-  CHECK(evo2.debug());
+  CHECK(evo2.is_valid());
 
   const auto s2(evo2.run(1));
 

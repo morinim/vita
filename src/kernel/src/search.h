@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -66,7 +66,7 @@ public:
   src_search &evaluator(evaluator_id, const std::string & = "");
   src_search &validation_strategy(validator_id);
 
-  bool debug() const override;
+  bool is_valid() const override;
 
 protected:
   // *** Template methods / customization points ***

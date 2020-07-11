@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,7 +47,7 @@ public:
   /// \return number of successful searches in the hash table
   std::uintmax_t hits() const { return hits_; }
 
-  bool debug() const;
+  bool is_valid() const;
 
   // Serialization.
   bool load(std::istream &);
