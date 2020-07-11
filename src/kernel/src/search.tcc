@@ -36,7 +36,7 @@ src_search<T, ES>::src_search(src_problem &p, metric_flags m)
 {
   evaluator(p.classification() ? p_class : p_symre);
 
-  Ensures(this->debug());
+  Ensures(this->is_valid());
 }
 
 ///
@@ -506,7 +506,7 @@ src_search<T, ES> &src_search<T, ES>::evaluator(evaluator_id id,
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
-bool src_search<T, ES>::debug() const
+bool src_search<T, ES>::is_valid() const
 {
   if (p_symre == evaluator_id::undefined)
   {
@@ -520,7 +520,7 @@ bool src_search<T, ES>::debug() const
     return false;
   }
 
-  return search<T, ES>::debug();
+  return search<T, ES>::is_valid();
 }
 
 #endif  // include guard

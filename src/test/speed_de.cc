@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -95,7 +95,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Test Problem 7")
   };
 
   de_search<decltype(f)> s(prob, f, p);
-  CHECK(s.debug());
+  CHECK(s.is_valid());
 
   vita::timer t;
   const auto res(s.run(10).best.solution);

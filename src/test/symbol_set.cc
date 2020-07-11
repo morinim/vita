@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@ TEST_CASE("Constructor / Insertion")
   CHECK(prob.sset.categories() == 0);
   CHECK(prob.sset.enough_terminals());
   CHECK(prob.sset.arg(1).name() == "ARG_1");
-  CHECK(prob.sset.debug());
+  CHECK(prob.sset.is_valid());
   CHECK(prob.sset.adts().empty());
 
   vita::symbol_factory factory;
@@ -58,7 +58,7 @@ TEST_CASE("Constructor / Insertion")
   CHECK(prob.sset.terminals(0) == 1);
   CHECK(prob.sset.enough_terminals());
   CHECK(prob.sset.weight(*fadd) == prob.sset.weight(*real));
-  CHECK(prob.sset.debug());
+  CHECK(prob.sset.is_valid());
 
   auto *sife = prob.sset.insert(factory.make("SIFE", {1, 0}));
 
@@ -76,7 +76,7 @@ TEST_CASE("Constructor / Insertion")
   CHECK(prob.sset.enough_terminals());
   CHECK(prob.sset.weight(*fadd) == prob.sset.weight(*apple));
 
-  CHECK(prob.sset.debug());
+  CHECK(prob.sset.is_valid());
 
   CHECK(prob.sset.decode("\"apple\"") == apple);
   CHECK(prob.sset.decode(apple->opcode()) == apple);
@@ -94,7 +94,7 @@ TEST_CASE("Constructor / Insertion")
 
   CHECK(prob.sset.categories() == 0);
   CHECK(prob.sset.enough_terminals());
-  CHECK(prob.sset.debug());
+  CHECK(prob.sset.is_valid());
 }
 
 TEST_CASE("Distribution")

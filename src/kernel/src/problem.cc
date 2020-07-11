@@ -511,12 +511,9 @@ const dataframe &src_problem::data(dataset_t t) const
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool src_problem::debug() const
+bool src_problem::is_valid() const
 {
-  if (!problem::debug())
-    return false;
-
-  return training_.debug() && validation_.debug();
+  return problem::is_valid();
 }
 
 }  // namespace vita

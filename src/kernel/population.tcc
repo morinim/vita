@@ -34,7 +34,7 @@ population<T>::population(const problem &p) : prob_(&p), pop_(1),
 
   init_layer(0);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -199,7 +199,7 @@ void population<T>::set_allowed(unsigned l, unsigned n)
 
   allowed_[l] = n;
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -272,7 +272,7 @@ void population<T>::inc_age()
 /// \return `true` if the object passes the internal consistency check
 ///
 template<class T>
-bool population<T>::debug() const
+bool population<T>::is_valid() const
 {
   for (const auto &l : pop_)
     for (const auto &i : l)

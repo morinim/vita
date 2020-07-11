@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -65,7 +65,7 @@ public:
   search &after_generation(
     typename evolution<T, ES>::after_generation_callback_t);
 
-  virtual bool debug() const;
+  virtual bool is_valid() const;
 
 protected:
   // Template method of the search::run() member function called at the end of

@@ -102,7 +102,7 @@ public:
 
     void build(const record_t &, bool);
 
-    bool debug() const;
+    bool is_valid() const;
 
   private:
     std::vector<column_info> cols_;
@@ -151,7 +151,7 @@ public:
 
   std::string class_name(class_t) const;
 
-  bool debug() const;
+  bool is_valid() const;
 
   columns_info columns;
 

@@ -24,12 +24,9 @@ problem::problem() : env(), sset()
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-bool problem::debug() const
+bool problem::is_valid() const
 {
-  if (!env.is_valid(false))
-    return false;
-
-  return sset.debug();
+  return env.is_valid(false);
 }
 
 }  // namespace vita

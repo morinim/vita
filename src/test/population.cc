@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ TEST_CASE_FIXTURE(fixture1, "Creation")
     vita::population<vita::i_mep> pop(prob);
 
     CHECK(prob.env.individuals == pop.individuals());
-    CHECK(pop.debug());
+    CHECK(pop.is_valid());
   }
 }
 
@@ -83,7 +83,7 @@ TEST_CASE_FIXTURE(fixture1, "Serialization")
 
     decltype(pop1) pop2(prob);
     CHECK(pop2.load(ss, prob));
-    CHECK(pop2.debug());
+    CHECK(pop2.is_valid());
 
     CHECK(pop1.layers() == pop2.layers());
     CHECK(pop1.individuals() == pop2.individuals());

@@ -81,7 +81,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Search - Problem1")
                       std::pow(x[0] + x[1] * x[1] - 7, 2.0));
            };
   de_search<decltype(f)> s(prob, f);
-  CHECK(s.debug());
+  CHECK(s.is_valid());
 
   const auto res(s.run().best.solution);
 
@@ -114,7 +114,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Search - Problem1")
   };
 
   de_search<decltype(f)> s2(prob, f, p);
-  CHECK(s2.debug());
+  CHECK(s2.is_valid());
 
   const auto res2(s2.run().best.solution);
 
@@ -242,7 +242,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Search - Problem3")
   };
 
   de_search<decltype(f)> s(prob, f, p);
-  CHECK(s.debug());
+  CHECK(s.is_valid());
 
   const auto res(s.run().best.solution);
 
@@ -301,7 +301,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Search - Problem4")
   };
 
   de_search<decltype(f)> s(prob, f, p);
-  CHECK(s.debug());
+  CHECK(s.is_valid());
 
   const auto res(s.run().best.solution);
 
@@ -363,7 +363,7 @@ TEST_CASE_FIXTURE(fixture5_no_init, "Search - Problem5")
   };
 
   de_search<decltype(f)> s(prob, f, p);
-  CHECK(s.debug());
+  CHECK(s.is_valid());
 
   const auto res(s.run().best.solution);
 

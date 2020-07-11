@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,7 +64,7 @@ public:
   weight_t weight(const symbol &) const;
 
   bool enough_terminals() const;
-  bool debug() const;
+  bool is_valid() const;
 
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
@@ -103,7 +103,7 @@ private:
   public:
     explicit collection(std::string = "");
 
-    bool debug() const;
+    bool is_valid() const;
 
     class sum_container
     {
@@ -133,7 +133,7 @@ private:
       template<class F> void scale_weights(double, F);
       const symbol &roulette() const;
 
-      bool debug() const;
+      bool is_valid() const;
 
     private:
       sum_container_t elems_;
