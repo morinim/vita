@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -88,8 +88,6 @@ std::uintmax_t analyzer<T>::terminals(bool eff) const
 template<class T>
 const distribution<double> &analyzer<T>::age_dist() const
 {
-  Expects(age_.debug());
-
   return age_;
 }
 
@@ -104,7 +102,6 @@ const distribution<double> &analyzer<T>::age_dist(unsigned g) const
   const auto gi(group_stat_.find(g));
   assert(gi != group_stat_.end());
 
-  Ensures(gi->second.age.debug());
   return gi->second.age;
 }
 
@@ -114,7 +111,6 @@ const distribution<double> &analyzer<T>::age_dist(unsigned g) const
 template<class T>
 const distribution<fitness_t> &analyzer<T>::fit_dist() const
 {
-  Ensures(fit_.debug());
   return fit_;
 }
 
@@ -129,7 +125,6 @@ const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned g) const
   const auto gi(group_stat_.find(g));
   assert(gi != group_stat_.end());
 
-  Ensures(gi->second.fitness.debug());
   return gi->second.fitness;
 }
 
@@ -139,7 +134,6 @@ const distribution<fitness_t> &analyzer<T>::fit_dist(unsigned g) const
 template<class T>
 const distribution<double> &analyzer<T>::length_dist() const
 {
-  Ensures(length_.debug());
   return length_;
 }
 
@@ -172,13 +166,7 @@ bool analyzer<T>::debug() const
     if (i.second.counter[true] > i.second.counter[false])
       return false;
 
-  if (!age_.debug())
-    return false;
-
-  if (!fit_.debug())
-    return false;
-
-  return length_.debug();
+  return true;
 }
 
 ///

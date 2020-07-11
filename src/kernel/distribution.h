@@ -45,7 +45,7 @@ public:
   T standard_deviation() const;
   T variance() const;
 
-  bool debug() const;
+  bool is_valid() const;
 
 public:   // Serialization
   bool load(std::istream &);
