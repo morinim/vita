@@ -28,8 +28,6 @@ template<class T>
 population<T>::population(const problem &p) : prob_(&p), pop_(1),
                                               allowed_(1)
 {
-  Expects(p.debug());
-
   const auto n(p.env.individuals);
   pop_[0].reserve(n);
   allowed_[0] = n;
@@ -278,7 +276,7 @@ bool population<T>::debug() const
 {
   for (const auto &l : pop_)
     for (const auto &i : l)
-      if (!i.debug())
+      if (!i.is_valid())
         return false;
 
   if (layers() != allowed_.size())

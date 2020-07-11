@@ -90,9 +90,6 @@ public:
 
   bool debug() const
   {
-    if (!ind_.debug())
-      return false;
-
     return &int_.program() == &ind_;
   }
 

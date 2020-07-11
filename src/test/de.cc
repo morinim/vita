@@ -42,7 +42,7 @@ TEST_CASE_FIXTURE(fixture5, "Evaluator")
   for (unsigned i(0); i < 1000; ++i)
   {
     i_de ind(prob);
-    CHECK(ind.debug());
+    CHECK(ind.is_valid());
 
     const auto eva_ret(eva(ind));
 

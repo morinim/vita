@@ -71,7 +71,7 @@ public:
   category_t category() const;
   locus best() const;
 
-  bool debug() const;
+  bool is_valid() const;
 
   // ---- Iterators ----
   template<bool> class basic_iterator;

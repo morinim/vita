@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,7 +32,7 @@ TEST_CASE_FIXTURE(fixture1, "Random creation")
     prob.env.mep.code_length = l;
     vita::team<vita::i_mep> t(prob);
 
-    CHECK(t.debug());
+    CHECK(t.is_valid());
     CHECK(t.age() == 0);
   }
 }
@@ -122,7 +122,7 @@ TEST_CASE_FIXTURE(fixture1, "Crossover")
   for (unsigned j(0); j < n; ++j)
   {
     const auto tc(crossover(t1, t2));
-    CHECK(tc.debug());
+    CHECK(tc.is_valid());
 
     for (unsigned x(0); x < tc.individuals(); ++x)
       for (index_t i(0); i != tc[x].size(); ++i)
@@ -149,7 +149,7 @@ TEST_CASE_FIXTURE(fixture1, "Serialization")
 
     vita::team<vita::i_mep> t2(prob);
     CHECK(t2.load(ss, prob.sset));
-    CHECK(t2.debug());
+    CHECK(t2.is_valid());
 
     CHECK(t1 == t2);
   }

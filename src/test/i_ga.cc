@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,7 @@ TEST_CASE_FIXTURE(fixture6, "Random creation")
   {
     vita::i_ga ind(prob);
 
-    CHECK(ind.debug());
+    CHECK(ind.is_valid());
     CHECK(ind.parameters() == prob.sset.categories());
     CHECK(ind.age() == 0);
 
@@ -45,7 +45,7 @@ TEST_CASE_FIXTURE(fixture6, "Empty individual")
 {
   vita::i_ga ind;
 
-  CHECK(ind.debug());
+  CHECK(ind.is_valid());
   CHECK(ind.empty());
 }
 
@@ -130,7 +130,7 @@ TEST_CASE_FIXTURE(fixture6, "Standard crossover")
       i2.inc_age();
 
     const auto ic(crossover(i1, i2));
-    CHECK(ic.debug());
+    CHECK(ic.is_valid());
     CHECK(ic.age() == std::max(i1.age(), i2.age()));
 
     const auto d1(i1.distance(ic));
@@ -164,7 +164,7 @@ TEST_CASE_FIXTURE(fixture6, "Serialization")
 
     vita::i_ga i2(prob);
     CHECK(i2.load(ss));
-    CHECK(i2.debug());
+    CHECK(i2.is_valid());
 
     CHECK(i1 == i2);
   }
@@ -176,7 +176,7 @@ TEST_CASE_FIXTURE(fixture6, "Serialization")
 
   vita::i_ga empty1;
   CHECK(empty1.load(ss));
-  CHECK(empty1.debug());
+  CHECK(empty1.is_valid());
   CHECK(empty1.empty());
 
   CHECK(empty == empty1);

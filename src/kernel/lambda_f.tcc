@@ -220,8 +220,6 @@ basic_dyn_slot_lambda_f<T, S, N>::basic_dyn_slot_lambda_f(const T &ind,
     slot_matrix_(d.classes() * x_slot, d.classes()),
     slot_class_(d.classes() * x_slot), dataset_size_(0)
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() > 1);
   Expects(x_slot);
 
@@ -280,7 +278,6 @@ template<class T, bool S, bool N>
 void basic_dyn_slot_lambda_f<T, S, N>::fill_matrix(dataframe &d,
                                                    unsigned x_slot)
 {
-  Expects(d.debug());
   Expects(d.classes() > 1);
   Expects(x_slot);
 
@@ -449,8 +446,6 @@ basic_gaussian_lambda_f<T, S, N>::basic_gaussian_lambda_f(const T &ind,
                                                           dataframe &d)
   : basic_class_lambda_f<N>(d), lambda_(ind), gauss_dist_(d.classes())
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() > 1);
 
   fill_vector(d);
@@ -620,8 +615,6 @@ basic_binary_lambda_f<T, S, N>::basic_binary_lambda_f(const T &ind,
                                                       dataframe &d)
   : basic_class_lambda_f<N>(d), lambda_(ind)
 {
-  Expects(ind.debug());
-  Expects(d.debug());
   Expects(d.classes() == 2);
 
   Ensures(debug());

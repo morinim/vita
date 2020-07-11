@@ -33,7 +33,7 @@ TEST_CASE_FIXTURE(fixture3, "Random creation")
     prob.env.mep.code_length = l;
     vita::i_mep i(prob);
 
-    CHECK(i.debug());
+    CHECK(i.is_valid());
     CHECK(i.size() == l);
     CHECK(i.age() == 0);
   }
@@ -43,7 +43,7 @@ TEST_CASE_FIXTURE(fixture3, "Empty individual")
 {
   vita::i_mep i;
 
-  CHECK(i.debug());
+  CHECK(i.is_valid());
   CHECK(i.empty());
   CHECK(i.size() == 0);
 
@@ -124,7 +124,7 @@ TEST_CASE_FIXTURE(fixture3, "Crossover")
       i2.inc_age();
 
     const auto ic(crossover(i1, i2));
-    CHECK(ic.debug());
+    CHECK(ic.is_valid());
     CHECK(ic.age() == std::max(i1.age(), i2.age()));
 
     for (index_t i(0); i != ic.size(); ++i)
@@ -152,7 +152,7 @@ TEST_CASE_FIXTURE(fixture3, "Serialization")
 
     vita::i_mep i2(prob);
     CHECK(i2.load(ss, prob.sset));
-    CHECK(i2.debug());
+    CHECK(i2.is_valid());
 
     CHECK(i1 == i2);
   }
@@ -164,7 +164,7 @@ TEST_CASE_FIXTURE(fixture3, "Serialization")
 
   vita::i_mep empty1;
   CHECK(empty1.load(ss, prob.sset));
-  CHECK(empty1.debug());
+  CHECK(empty1.is_valid());
   CHECK(empty1.empty());
 
   CHECK(empty == empty1);
@@ -268,7 +268,7 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
   {
     const i_mep i(prob), i1(i.cse());
 
-    CHECK(i1.debug());
+    CHECK(i1.is_valid());
 
     /*
     std::cout << "\n\n";

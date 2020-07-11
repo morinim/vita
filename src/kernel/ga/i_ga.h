@@ -86,7 +86,7 @@ public:
   // Visualization/output methods.
   void graphviz(std::ostream &) const;
 
-  bool debug() const;
+  bool is_valid() const;
 
   friend class individual<i_ga>;
   friend i_ga crossover(const i_ga &, const i_ga &);

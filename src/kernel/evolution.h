@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -49,7 +49,7 @@ public:
   const summary<T> &run(unsigned);
   template<class S> const summary<T> &run(unsigned, S);
 
-  bool debug() const;
+  bool is_valid() const;
 
 private:
   // *** Support methods ***

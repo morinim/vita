@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -35,7 +35,6 @@ team<T>::team(unsigned n) : individuals_(n), signature_()
 template<class T>
 team<T>::team(const problem &p) : signature_()
 {
-  Expects(p.debug());
   Expects(p.env.team.individuals);
 
   auto n(p.env.team.individuals);
@@ -44,7 +43,7 @@ team<T>::team(const problem &p) : signature_()
   for (decltype(n) i(0); i < n; ++i)
     individuals_.emplace_back(p);
 
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -55,7 +54,7 @@ team<T>::team(const problem &p) : signature_()
 template<class T>
 team<T>::team(std::vector<T> v) : individuals_(std::move(v)), signature_()
 {
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -101,8 +100,6 @@ unsigned team<T>::mutation(double pgm, const problem &prb)
 template<class T>
 team<T> crossover(const team<T> &lhs, const team<T> &rhs)
 {
-  Expects(lhs.debug());
-  Expects(rhs.debug());
   Expects(lhs.individuals() == rhs.individuals());
 
 /*
@@ -121,7 +118,7 @@ team<T> crossover(const team<T> &lhs, const team<T> &rhs)
 
   // Clearing signature isn't required.
 
-  Ensures(ret.debug());
+  Ensures(ret.is_valid());
   return ret;
 }
 
@@ -307,12 +304,8 @@ void team<T>::inc_age()
 /// \return            `true` if the team passes the internal consistency check
 ///
 template<class T>
-bool team<T>::debug() const
+bool team<T>::is_valid() const
 {
-  if (!std::all_of(begin(), end(),
-                   [](const T &i) { return i.debug(); }))
-    return false;
-
   return signature_.empty() || signature_ == hash();
 }
 

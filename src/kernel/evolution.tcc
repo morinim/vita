@@ -79,8 +79,7 @@ template<class T, template<class> class ES>
 evolution<T, ES>::evolution(const problem &p, evaluator<T> &eva)
   : pop_(p), eva_(eva), es_(pop_, eva_, &stats_), after_generation_callback_()
 {
-  Expects(p.debug());
-  Ensures(debug());
+  Ensures(is_valid());
 }
 
 ///
@@ -373,8 +372,8 @@ const summary<T> &evolution<T, ES>::run(unsigned run_count)
 /// \return `true` if object passes the internal consistency check
 ///
 template<class T, template<class> class ES>
-bool evolution<T, ES>::debug() const
+bool evolution<T, ES>::is_valid() const
 {
-  return pop_.debug();
+  return true;
 }
 #endif  // include guard

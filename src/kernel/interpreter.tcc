@@ -184,9 +184,6 @@ double interpreter<T>::penalty_nvi()
 template<class T>
 bool interpreter<T>::is_valid_nvi() const
 {
-  if (!prg_->debug())
-    return false;
-
   return ip_.index < prg_->size();
 }
 #endif  // include guard

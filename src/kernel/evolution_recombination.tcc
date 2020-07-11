@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -94,7 +94,6 @@ typename strategy<T>::offspring_t base<T>::run(
       }
     }
 
-    Ensures(off.debug());
     return {off};
   }
 
@@ -102,7 +101,6 @@ typename strategy<T>::offspring_t base<T>::run(
   T off(pop[random::boolean() ? r1 : r2]);
   this->stats_->mutations += off.mutation(p_mutation, prob);
 
-  Ensures(off.debug());
   return {off};
 }
 
