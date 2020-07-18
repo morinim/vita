@@ -1,0 +1,15 @@
+version: '{branch}-{build}'
+image:
+- Visual Studio 2019
+- Ubuntu2004
+configuration:
+- Debug
+- Release
+init:
+- sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
+build_script:
+- >-
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% ../src
+    make
