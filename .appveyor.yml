@@ -9,7 +9,5 @@ init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
 build_script:
 - >-
-    mkdir build
-    cd build
-    cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% ../src
-    make
+    cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
+    cmake --build build/
