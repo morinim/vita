@@ -121,25 +121,23 @@ vita/
 
 ```shell
 cd vita
-mkdir -p build
-cd build/
-cmake ../src
+cmake -B build/ src/
 ```
 
 To suggest a specific compiler you can write:
 
 ```shell
-CXX=clang++ cmake ../src
+CXX=clang++ cmake -B build/ src/
 ```
 
-You're now ready to build using the traditional `make` system:
+You're now ready to build using the underlying build system tool:
 
-* everything: `make`
-* kernel library (`libvita.a`): `make vita`
-* `sr` tool: `make sr`
-* tests: `make tests`
-* the *ABC* example: `make ABC`
-* for the list of the valid targets: `make help`
+* everything: `cmake --build build/`
+* kernel library (`libvita.a`): `cmake --build build/ --target vita`
+* `sr` tool: `cmake --build build/ --target sr`
+* tests: `cmake --build build/ --target tests`
+* the *ABC* example: `cmake --build build/ --target ABC`
+* for a list of valid targets: `cmake --build build/ --target help`
 
 All the output files will be stored in subdirectories of `build/` (out of source builds).
 
