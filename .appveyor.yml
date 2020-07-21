@@ -7,7 +7,5 @@ configuration:
 - Release
 init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
-build_init:
-- cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 build_script:
-- cmake --build build/
+- cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/ ; cmake --build build/
