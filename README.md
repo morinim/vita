@@ -1,7 +1,7 @@
 [![Vita](https://github.com/morinim/vita/wiki/img/logo.png)][homepage]
 [![Version](https://img.shields.io/github/tag/morinim/vita.svg)][news]
 
-[![Build Status](https://travis-ci.com/morinim/vita.svg?branch=master)][travis]
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/morinim/vita?svg=true)][appveyor]
 ![C++17](https://img.shields.io/badge/c%2B%2B-17-blue.svg)
 [![CII](https://bestpractices.coreinfrastructure.org/projects/1012/badge)][cii]
 [![License](https://img.shields.io/badge/license-MPLv2-blue.svg)][mpl2]
@@ -58,7 +58,7 @@ vita::src_search s(prob);
 auto result(s.run());
 ```
 
-It's pretty straightforward (further details in the [specific tutorial][symbolic_regression]).
+It's pretty straightforward (further details in the [specific tutorial][sr]).
 
 ## Documentation ##
 
@@ -156,7 +156,10 @@ Vita uses [semantic versioning][semver]. Releases are tagged.
 Note that the major version will change rapidly and API changes are fairly common. Read the [NEWS.md][news] file for details about the breaking changes.
 
 
+[agent]: https://github.com/morinim/vita/wiki/forex_tutorial
+[appveyor]: https://ci.appveyor.com/project/morinim/vita
 [cii]: https://bestpractices.coreinfrastructure.org/projects/1012
+[classification]: https://github.com/morinim/vita/wiki/titanic_tutorial
 [cmake]: https://cmake.org/
 [download]: https://github.com/morinim/vita/archive/master.zip
 [eos]: https://www.eosdev.it/
@@ -168,12 +171,8 @@ Note that the major version will change rapidly and API changes are fairly commo
 [news]: https://github.com/morinim/vita/blob/master/NEWS.md
 [python]: https://www.python.org/
 [semver]: https://semver.org/
-[symbolic_regression]: https://github.com/morinim/vita/wiki/symbolic_regression
-[travis]: https://travis-ci.com/morinim/vita
+[sr]: https://github.com/morinim/vita/wiki/symbolic_regression
 [tutorials]: https://github.com/morinim/vita/wiki/tutorials
 [twitter]: https://twitter.com/intent/tweet?text=%23Vita+genetic+programming:&url=https%3A%2F%2Fgithub.com%2Fmorinim%2Fvita
 [wiki]: https://github.com/morinim/vita/wiki
 [windows]: https://github.com/morinim/vita/wiki/win_build
-[classification]: https://github.com/morinim/vita/wiki/titanic_tutorial
-[sr]: https://github.com/morinim/vita/wiki/symbolic_regression
-[agent]: https://github.com/morinim/vita/wiki/forex_tutorial
