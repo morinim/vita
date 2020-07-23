@@ -3,17 +3,18 @@ configuration:
 - Debug
 - Release
 environment:
+  APPVEYOR_YML_DISABLE_PS_LINUX: true
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-      COMPILER: clang++
+      CXX_COMPILER: clang++
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-      COMPILER: g++
+      CXX_COMPILER: g++
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
 init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
 - sh: sudo update-alternatives --set clang /usr/bin/clang-10
 before_build:
-- sh: CXX=%COMPILER% cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
+- sh: CXX=%CXX_COMPILER% cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 - ps: cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 build_script:
 - cmake --build build/
