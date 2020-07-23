@@ -1,15 +1,20 @@
 version: '{branch}-{build}'
-image:
-- Visual Studio 2019
-- Ubuntu2004
 configuration:
 - Debug
 - Release
+environment:
+  matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+      COMPILER: clang++
+    - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+      COMPILER: g++
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      COMPILER: not_used
 init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
 - sh: sudo update-alternatives --set clang /usr/bin/clang-10
 before_build:
 - cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 build_script:
-- cmd: cmake --build build/
+- cmd: CXX=%COMPILER% cmake --build build/
 - ps: cmake --build build/
