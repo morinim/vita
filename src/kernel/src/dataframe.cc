@@ -120,17 +120,6 @@ void dataframe::columns_info::build(const record_t &r, bool header_first)
 {
   Expects(r.size());
 
-  // When available returns the name of the column; otherwise returns a
-  // surrogate, unique name (e.g. `column123`).
-  const auto col_name(
-    [this](std::size_t idx)
-    {
-      if (cols_[idx].name.empty())
-        return idx ? "column" + std::to_string(idx) : "output";
-
-      return cols_[idx].name;
-    });
-
   // Sets the domain associated to a column.
   const auto set_domain(
     [&](std::size_t idx)
