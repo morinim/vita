@@ -14,7 +14,7 @@ init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
 - sh: sudo update-alternatives --set clang /usr/bin/clang-10
 before_build:
-- sh: CXX=%CXX_COMPILER% cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
+- sh: CXX=$(CXX_COMPILER) cmake -B build/ -DCMAKE_BUILD_TYPE=$(CONFIGURATION src/
 - ps: cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 build_script:
 - cmake --build build/
