@@ -20,7 +20,7 @@ double neg_rastrigin(const std::vector<double> &x)
 
   const double rastrigin =
     A * x.size() + std::accumulate(x.begin(), x.end(), 0.0,
-                                   [A, PI](double sum, double xi)
+                                   [](double sum, double xi)
                                    {
                                      return sum + xi*xi - A*std::cos(2*PI*xi);
                                    });

@@ -588,7 +588,7 @@ bool basic_gaussian_lambda_f<T, S, N>::save(std::ostream &out) const
   if (!(out << gauss_dist_.size() << '\n'))
       return false;
 
-  for (const auto g : gauss_dist_)
+  for (const auto &g : gauss_dist_)
     if (!g.save(out))
       return false;
 
