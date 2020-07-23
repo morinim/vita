@@ -7,8 +7,9 @@ configuration:
 - Release
 init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
+- sh: sudo update-alternatives --set clang /usr/bin/clang-10
+before_build:
+- cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
 build_script:
-- ps: >-
-    cmake -B build/ -DCMAKE_BUILD_TYPE=%CONFIGURATION% src/
-
-    cmake --build build/
+- cmd: cmake --build build/
+- ps: cmake --build build/
