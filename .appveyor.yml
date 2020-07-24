@@ -19,5 +19,5 @@ before_build:
 build_script:
 - cmake --build build/
 test_script:
-- cd build/test
-- ctest
+- sh: cd build/test ; ctest -C $CONFIGURATION
+- ps: cd build/test ; ctest -C %CONFIGURATION%
