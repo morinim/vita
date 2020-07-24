@@ -162,11 +162,11 @@ void analyzer<T>::count(const symbol *sym, bool active)
 template<class T>
 bool analyzer<T>::is_valid() const
 {
-  for (const auto &i : sym_counter_)
-    if (i.second.counter[true] > i.second.counter[false])
-      return false;
-
-  return true;
+  return std::all_of(sym_counter_.begin(), sym_counter_.end(),
+                     [](const auto &e)
+                     {
+                       return e.second.counter[true] <= e.second.counter[false];
+                     });
 }
 
 ///
@@ -201,17 +201,17 @@ void analyzer<T>::add(const T &ind, const fitness_t &f, unsigned g)
 /// \return        effective length of individual we gathered statistics about
 ///
 template<class T>
-unsigned analyzer<T>::count(const T &ind)
+std::size_t analyzer<T>::count(const T &ind)
 {
   return count_team(ind, is_team<T>());
 }
 
 ///
-/// Specialization of `count_team(T)` for non-teams.
+/// Specialization of `count_team(T)` for non-team.
 ///
 template<class T>
 template<class U>
-unsigned analyzer<T>::count_team(const U &ind, std::false_type)
+std::size_t analyzer<T>::count_team(const U &ind, std::false_type)
 {
   return count_introns(ind, has_introns<T>());
 }
@@ -220,14 +220,13 @@ unsigned analyzer<T>::count_team(const U &ind, std::false_type)
 /// Specialization of `count_team(T)` for teams.
 ///
 template<class T>
-unsigned analyzer<T>::count_team(const T &t, std::true_type)
+std::size_t analyzer<T>::count_team(const T &t, std::true_type)
 {
-  unsigned length(0);
-
-  for (const auto &ind : t)
-    length += count_team(ind, std::false_type());
-
-  return length;
+  return std::accumulate(t.begin(), t.end(), 0,
+                         [this](auto s, const auto &ind)
+                         {
+                           return s + count_team(ind, std::false_type());
+                         });
 }
 
 ///
@@ -235,7 +234,7 @@ unsigned analyzer<T>::count_team(const T &t, std::true_type)
 ///
 template<class T>
 template<class U>
-unsigned analyzer<T>::count_introns(const U &ind, std::true_type)
+std::size_t analyzer<T>::count_introns(const U &ind, std::true_type)
 {
   for (index_t i(0); i < ind.size(); ++i)
     for (category_t c(0); c < ind.categories(); ++c)
@@ -249,9 +248,9 @@ unsigned analyzer<T>::count_introns(const U &ind, std::true_type)
 ///
 template<class T>
 template<class U>
-unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
+std::size_t analyzer<T>::count_introns(const U &ind, std::false_type)
 {
-  unsigned length(0);
+  std::size_t length(0);
   for (const auto &g : ind)
   {
     count(g.sym, true);
@@ -266,7 +265,7 @@ unsigned analyzer<T>::count_introns(const U &ind, std::false_type)
 /// \return        effective length of individual we gathered statistics about
 ///
 template<>
-inline unsigned analyzer<i_de>::count(const i_de &ind)
+inline std::size_t analyzer<i_de>::count(const i_de &ind)
 {
   return ind.parameters();
 }
@@ -276,7 +275,7 @@ inline unsigned analyzer<i_de>::count(const i_de &ind)
 /// \return        effective length of individual we gathered statistics about
 ///
 template<>
-inline unsigned analyzer<i_ga>::count(const i_ga &ind)
+inline std::size_t analyzer<i_ga>::count(const i_ga &ind)
 {
   return ind.parameters();
 }
