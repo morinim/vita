@@ -20,4 +20,4 @@ build_script:
 - cmake --build build/
 test_script:
 - sh: cd build/test ; ctest -C $CONFIGURATION
-- ps: cd build/test ; ctest -C $env:CONFIGURATION
+# - ps: cd build/test ; ctest -C $env:CONFIGURATION
