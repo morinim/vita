@@ -3,6 +3,7 @@ configuration:
 - Debug
 - Release
 environment:
+  # Disables execution of PowerShell commands on Linux-based images.
   APPVEYOR_YML_DISABLE_PS_LINUX: true
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -14,9 +15,13 @@ init:
 - sh: sudo update-alternatives --set gcc /usr/bin/gcc-9
 - sh: sudo update-alternatives --set clang /usr/bin/clang-10
 before_build:
+# Essentially the build command is `cmake -B build/ src/`.
+# The `-DCMAKE_BUILD_TYPE=` switch instructs cmake about the build type.
+# In PowerShell environment variables must prepended with `$env:`.
 - sh: CXX=$CXX_COMPILER cmake -B build/ -DCMAKE_BUILD_TYPE=$CONFIGURATION src/
 - ps: cmake -B build/ -DCMAKE_BUILD_TYPE=$env:CONFIGURATION src/
 build_script:
+# cmake will call the appropriate build tool.
 - cmake --build build/
 test_script:
 - sh: cd build/test ; ctest -C $CONFIGURATION
