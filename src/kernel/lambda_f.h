@@ -371,7 +371,7 @@ private:
   // need the names, the master class will memorize them.
   std::vector<L<T, S, false>> team_;
 
-  unsigned classes_;
+  class_t classes_;
 };
 
 ///

@@ -222,7 +222,7 @@ std::size_t analyzer<T>::count_team(const U &ind, std::false_type)
 template<class T>
 std::size_t analyzer<T>::count_team(const T &t, std::true_type)
 {
-  return std::accumulate(t.begin(), t.end(), 0,
+  return std::accumulate(t.begin(), t.end(), std::size_t{0},
                          [this](auto s, const auto &ind)
                          {
                            return s + count_team(ind, std::false_type());

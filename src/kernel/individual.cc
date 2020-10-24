@@ -18,12 +18,12 @@ namespace
 ///
 /// Index of the print format flag (used as argument of `std::iword`).
 ///
-static const long print_format_index = std::ios_base::xalloc();
+static const int print_format_index = std::ios_base::xalloc();
 
 ///
 /// Index of the long-format flag (used as argument of `std::iword`).
 ///
-static const long long_form_index = std::ios_base::xalloc();
+static const int long_form_index = std::ios_base::xalloc();
 
 }  // unnamed namespace
 

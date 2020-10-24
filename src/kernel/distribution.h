@@ -34,7 +34,7 @@ public:
 
   void clear();
 
-  void add(T);
+  template<class U> void add(U);
 
   std::uintmax_t count() const;
   double entropy() const;

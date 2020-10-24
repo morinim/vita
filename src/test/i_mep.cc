@@ -28,7 +28,7 @@ TEST_SUITE("I_MEP")
 TEST_CASE_FIXTURE(fixture3, "Random creation")
 {
   // Variable length random creation.
-  for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
+  for (auto l(prob.sset.categories() + 2); l < 100; ++l)
   {
     prob.env.mep.code_length = l;
     vita::i_mep i(prob);

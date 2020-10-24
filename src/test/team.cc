@@ -27,7 +27,7 @@ TEST_SUITE("TEAM")
 TEST_CASE_FIXTURE(fixture1, "Random creation")
 {
   // Variable length random creation
-  for (unsigned l(prob.sset.categories() + 2); l < 100; ++l)
+  for (auto l(prob.sset.categories() + 2); l < 100; ++l)
   {
     prob.env.mep.code_length = l;
     vita::team<vita::i_mep> t(prob);

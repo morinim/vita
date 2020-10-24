@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,12 +24,12 @@ struct nonogram_problem
   {
   }
 
-  unsigned rows() const { return row_clues.size(); }
-  unsigned cols() const { return col_clues.size(); }
+  std::size_t rows() const { return row_clues.size(); }
+  std::size_t cols() const { return col_clues.size(); }
 
   unsigned blocks() const
   {
-    return std::accumulate(col_clues.begin(), col_clues.end(), 0,
+    return std::accumulate(col_clues.begin(), col_clues.end(), 0u,
                            [](auto sum, const auto &v)
                            {
                              return sum + v.size();
@@ -45,7 +45,9 @@ struct nonogram_problem
 
     vita::matrix<bool> ret(rows(), cols());
     for (unsigned col(0); col < cols(); ++col)
-      for (unsigned block(0), start(0); block < col_clues[col].size(); ++block)
+      for (std::size_t block(0), start(0);
+           block < col_clues[col].size();
+           ++block)
       {
         // Size of the current block.
         auto block_size(col_clues[col][block]);
@@ -112,7 +114,7 @@ int main()
 
   // A candidate solution is a sequence of `np.blocks()` integers in the
   // `[0, np.rows()[` interval.
-  ga_problem prob(np.blocks(), {0, np.rows()});
+  ga_problem prob(np.blocks(), {0u, np.rows()});
 
   prob.env.individuals = 30000;
   prob.env.generations =   500;

@@ -219,10 +219,13 @@ unsigned population<T>::individuals(unsigned l) const
 template<class T>
 unsigned population<T>::individuals() const
 {
-  return std::accumulate(pop_.begin(), pop_.end(), 0u,
+  using ret_t = decltype(individuals());
+
+  return std::accumulate(pop_.begin(), pop_.end(), ret_t(0),
                          [](auto accumulator, const auto &layer)
                          {
-                           return accumulator + layer.size();
+                           return accumulator
+                                  + static_cast<ret_t>(layer.size());
                          });
 }
 
