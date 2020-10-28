@@ -46,10 +46,15 @@ struct hash_t
   /// <http://stackoverflow.com/q/5889238/3235496>).
   void combine(hash_t h)
   {
-    // This combine is a tip from Bob Jenkins. An alternative from Boost is:
-    // data[i] ^= h.data[i] + 0x9e3779b9 + (data[i] << 6) + (data[i] >> 2);
-    data[0] += 11 * h.data[0];
-    data[1] += 13 * h.data[1];
+    // This is the simple algorithm used in `Apache.Commons.HashCodeBuilder`.
+    // It uses simple prime number multiplication and is a special key of
+    // Bob Jenkins' idea (`m * H(A) + H(B)`0.
+    data[0] = data[0] * 37 + h.data[0];
+    data[1] = data[1] * 37 + h.data[1];
+
+    // An alternative from Boost is:
+    //data[0] ^= h.data[0] + 0x9e3779b9 + (data[0] << 6) + (data[0] >> 2);
+    //data[1] ^= h.data[1] + 0x9e3779b9 + (data[1] << 6) + (data[1] >> 2);
   }
 
   /// We assume that a string of 128 zero bits means empty.
