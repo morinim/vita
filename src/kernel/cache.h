@@ -31,7 +31,7 @@ class cache
 public:
   DISALLOW_COPY_AND_ASSIGN(cache);
 
-  explicit cache(std::uint8_t);
+  explicit cache(unsigned);
 
   void clear();
   void clear(const hash_t &);

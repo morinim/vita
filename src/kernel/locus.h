@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@ namespace vita
 {
 /// Index in the genome. Locus is uniquely identified by an index and a
 /// category.
-using index_t = unsigned;
+using index_t = std::size_t;
 
 static_assert(sizeof(index_t) <= sizeof(std::size_t),
               "index_t size expected to be <= std::size_t");

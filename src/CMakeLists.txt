@@ -30,7 +30,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
   set(NO_WARN_FLAGS "/w")
-  set(WARN_FLAGS "/W4")
+  set(WARN_FLAGS "/W3")
 
 endif()
 

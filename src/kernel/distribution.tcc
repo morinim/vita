@@ -85,29 +85,40 @@ T distribution<T>::variance() const
 }
 
 ///
-/// \brief Add a new value to the distribution
-/// \param[in] val new value upon which statistics are recalculated.
+/// Add a new value to the distribution.
+///
+/// \param[in] val new value upon which statistics are recalculated
+///
+/// \remark Function ignores NAN values.
 ///
 template<class T>
-void distribution<T>::add(T val)
+template<class U>
+void distribution<T>::add(U val)
 {
   using std::isnan;
 
-  if (!isnan(val))
-  {
-    if (!count())
-      min_ = max_ = mean_ = val;
-    else if (val < min())
-      min_ = val;
-    else if (val > max())
-      max_ = val;
+  if constexpr (std::is_floating_point_v<U>)
+    if (isnan(val))
+      return;
 
-    ++count_;
+  const auto v1(static_cast<T>(val));
 
-    ++seen_[round_to(val)];
+  if constexpr (std::is_floating_point_v<T>)
+    if (isnan(v1))
+      return;
 
-    update_variance(val);
-  }
+  if (!count())
+    min_ = max_ = mean_ = v1;
+  else if (v1 < min())
+    min_ = v1;
+  else if (v1 > max())
+    max_ = v1;
+
+  ++count_;
+
+  ++seen_[round_to(v1)];
+
+  update_variance(v1);
 }
 
 template<class T>

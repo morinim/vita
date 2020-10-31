@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2017-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,7 @@ template<class T, T V>
 struct value
 {
   using value_type = T;
-  static constexpr double empty_value() noexcept { return V; }
+  static constexpr T empty_value() noexcept { return V; }
   static constexpr bool is_empty(T v) { return v == V; }
 };
 
@@ -45,7 +45,7 @@ template<class T>
 struct nan
 {
   using value_type = T;
-  static constexpr double empty_value() noexcept
+  static constexpr T empty_value() noexcept
   { return std::numeric_limits<T>::quiet_NaN(); }
 
   static constexpr bool is_empty(T v) { return std::isnan(v); }
@@ -55,7 +55,7 @@ template<class T>
 struct empty
 {
   using value_type = T;
-  static constexpr double empty_value() noexcept(T()) { return T(); }
+  static constexpr T empty_value() noexcept(T()) { return T(); }
   static constexpr bool is_empty(T v) { return v.empty(); }
 };
 

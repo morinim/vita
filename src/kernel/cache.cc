@@ -19,7 +19,7 @@ namespace vita
 ///
 /// \param[in] bits `2^bits` is the number of elements of the table
 ///
-cache::cache(std::uint8_t bits)
+cache::cache(unsigned bits)
   : k_mask((1ull << bits) - 1), table_(1ull << bits),
     seal_(1), probes_(0), hits_(0)
 {

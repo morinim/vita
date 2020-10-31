@@ -747,7 +747,7 @@ template<class T, bool S, bool N, template<class, bool, bool> class L,
 classification_result team_class_lambda_f<T, S, N, L, C>::tag(
   const dataframe::example &instance) const
 {
-  if (C == team_composition::wta)
+  if constexpr (C == team_composition::wta)
   {
     const auto size(team_.size());
     auto best(team_[0].tag(instance));
@@ -762,7 +762,7 @@ classification_result team_class_lambda_f<T, S, N, L, C>::tag(
 
     return best;
   }
-  else if (C == team_composition::mv)
+  else if constexpr (C == team_composition::mv)
   {
     std::vector<unsigned> votes(classes_);
 

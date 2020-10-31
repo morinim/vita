@@ -297,12 +297,13 @@ fitness_t gaussian_evaluator<T>::operator()(const T &ind)
   for (auto &example : *this->dat_)
     if (const auto res = lambda.tag(example); res.label == label(example))
     {
+      const auto scale(static_cast<fitness_t::value_type>(this->dat_->classes()
+                                                          - 1));
       // Note:
-      // * (1.0 - confidence) is the sum of the errors;
-      // * (confidence - 1.0) is the opposite (standardized fitness);
-      // * (confidence - 1.0) / (dat_->classes() - 1) is the opposite of the
-      //   average error.
-      d += (res.sureness - 1.0) / (this->dat_->classes() - 1);
+      // * `(1.0 - res.sureness)` is the sum of the errors;
+      // * `(res.sureness - 1.0)` is the opposite (standardized fitness);
+      // * `(res.sureness - 1.0) / scale` is the opposite of the average error.
+      d += (res.sureness - 1.0) / scale;
     }
     else
     {

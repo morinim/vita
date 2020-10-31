@@ -210,7 +210,7 @@ void src_problem::setup_terminals(typing t)
                                           : provided_name);
     const category_t category(categories.column(i).category);
 
-    if (insert<variable>(name, i - 1, category))
+    if (insert<variable>(name, static_cast<unsigned>(i - 1), category))
       variables += " `" + name + "`";
 
     // Sets up states for nominal attributes.
@@ -469,7 +469,7 @@ bool src_problem::compatible(const cvect &instance,
 ///
 unsigned src_problem::categories() const
 {
-  return sset.categories();
+  return static_cast<unsigned>(sset.categories());
 }
 
 ///
@@ -478,7 +478,7 @@ unsigned src_problem::categories() const
 ///
 unsigned src_problem::classes() const
 {
-  return training_.classes();
+  return static_cast<unsigned>(training_.classes());
 }
 
 ///

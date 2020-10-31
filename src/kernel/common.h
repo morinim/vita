@@ -41,7 +41,7 @@ namespace vita
 /// in two distinct category: 2 (e.g. the category "km/h") and 3 (e.g. the
 /// category "kg").
 /// Categories are the way strong typing GP is enforced in Vita.
-using category_t = unsigned;
+using category_t = std::size_t;
 constexpr category_t undefined_category = static_cast<category_t>(-1);
 using cvect = std::vector<category_t>;  // often used so we define a shortcut
 

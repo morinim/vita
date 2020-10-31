@@ -76,13 +76,13 @@ public:
     /// changed afterwards.
     ///
     /// \note A length of 0 means undefined (auto-tune).
-    unsigned code_length = 0;
+    std::size_t code_length = 0;
 
     /// The number of symbols in the patch section (a section of the genome that
     /// contains terminals only).
     ///
     /// \note A length of `0` means undefined (auto-tune).
-    unsigned patch_length = 0;
+    std::size_t patch_length = 0;
   } mep;
 
   /// Number of layers for the population.

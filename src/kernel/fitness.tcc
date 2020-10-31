@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -626,9 +626,9 @@ double distance(const basic_fitness_t<T> &f1, const basic_fitness_t<T> &f2)
 {
   Expects(f1.size() == f2.size());
 
-  return std::inner_product(f1.begin(), f1.end(), f2.begin(), 0,
+  return std::inner_product(f1.begin(), f1.end(), f2.begin(), 0.0,
                             std::plus<>(),
-                            [](T a, T b) { return std::abs(a - b); });
+                            [](T a, T b) { return std::fabs(a - b); });
 }
 
 
