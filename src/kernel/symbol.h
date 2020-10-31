@@ -38,7 +38,7 @@ public:
   /// Symbol rendering format.
   enum format {c_format, cpp_format, mql_format, python_format, sup_format};
 
-  symbol(const std::string &, category_t);
+  explicit symbol(const std::string &, category_t = 0);
   virtual ~symbol() = default;
 
   virtual unsigned arity() const = 0;
