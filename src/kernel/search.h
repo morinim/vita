@@ -49,7 +49,7 @@ struct search_stats
 /// Knowledge: Template Template Parameters" by Stephen Dewhurst
 /// (<http://www.informit.com/articles/article.aspx?p=376878>).
 ///
-template<class T, template<class> class ES>
+template<class T, template<class> class ES = vita::std_es>
 class search
 {
 public:
