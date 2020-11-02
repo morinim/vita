@@ -63,7 +63,7 @@ int main()
   prob.insert<vita::real::mul>();
 
   // AD HOC EVALUATOR
-  vita::search<candidate_solution, vita::std_es> s(prob);
+  vita::search<candidate_solution> s(prob);
   s.training_evaluator<my_evaluator>();
 
   // SEARCHING

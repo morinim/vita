@@ -14,11 +14,21 @@
 
 #include "kernel/vita.h"
 
-constexpr std::size_t DIM(6);
+constexpr std::size_t N(6);
 
-vita::matrix<double> get_input()
+std::vector<double> get_vector()
 {
-  vita::matrix<double> ret(DIM, DIM);
+  std::vector<double> ret(N);
+
+  std::generate_n(ret.begin(), N,
+                  [] { return vita::random::between(-10.0, 10.0); });
+
+  return ret;
+}
+
+vita::matrix<double> get_matrix()
+{
+  vita::matrix<double> ret(N, N);
 
   std::generate(ret.begin(), ret.end(),
                 [] { return vita::random::between(-10.0, 10.0); });
@@ -26,20 +36,13 @@ vita::matrix<double> get_input()
   return ret;
 }
 
-std::vector<double> get_phi()
-{
-  std::vector<double> ret(DIM);
+const auto a = get_vector();  // N-dimensional vector
+const auto b = get_matrix();  // NxN matrix
 
-  std::generate_n(ret.begin(), DIM,
-                  [] { return vita::random::between(-10.0, 10.0); });
-
-  return ret;
-}
-
-class V : public vita::terminal
+class c : public vita::terminal
 {
 public:
-  V() : vita::terminal("V") {}
+  c() : vita::terminal("c") {}
 
   vita::value_t eval(vita::core_interpreter *) const override
   {
@@ -57,27 +60,22 @@ class my_evaluator : public vita::evaluator<candidate_solution>
 public:
   vita::fitness_t operator()(const candidate_solution &x) override
   {
-    static const auto input(get_input());
-    static const auto phi(get_phi());
+    std::vector<double> f(N);
+    std::transform(x.begin(), x.end(), f.begin(),
+                   [](const auto &prg)
+                   {
+                     const auto ret(vita::run(prg));
 
-    std::vector<double> f(DIM);
-    std::generate(
-      f.begin(), f.end(),
-      [&x, n = 0]() mutable
-      {
-        auto &f_n(x[n++]);
-        const auto ret(vita::run(f_n));
+                     return vita::has_value(ret) ? std::get<vita::D_DOUBLE>(ret)
+                                                 : 0.0;
+                   });
 
-        return vita::has_value(ret) ? std::get<vita::D_DOUBLE>(ret)
-                                    : 0.0;
-      });
+    std::vector<double> model(N, 0.0);
+    for (unsigned i(0); i < N; ++i)
+      for (unsigned j(0); j < N; ++j)
+        model[i] += b(i, j) * f[j];
 
-    std::vector<double> model(DIM, 0.0);
-    for (unsigned i(0); i < DIM; ++i)
-      for (unsigned j(0); j < DIM; ++j)
-        model[i] += input(i, j) * f[j];
-
-    double delta(std::inner_product(phi.begin(), phi.end(), model.begin(), 0.0,
+    double delta(std::inner_product(a.begin(), a.end(), model.begin(), 0.0,
                                     std::plus<>(),
                                     [](auto v1, auto v2)
                                     {
@@ -93,16 +91,16 @@ int main()
 {
   vita::problem prob;
 
-  prob.env.team.individuals = DIM;
+  prob.env.team.individuals = N;
 
   // SETTING UP SYMBOLS
-  prob.sset.insert<V>();
+  prob.sset.insert<c>();
   prob.insert<vita::real::add>();
   prob.insert<vita::real::sub>();
   prob.insert<vita::real::mul>();
 
   // AD HOC EVALUATOR
-  vita::search<candidate_solution, vita::std_es> s(prob);
+  vita::search<candidate_solution> s(prob);
   s.training_evaluator<my_evaluator>();
 
   // SEARCHING
