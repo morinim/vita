@@ -39,7 +39,7 @@ namespace vita
 ///   members of a team undergo a coevolutionary process because they are
 ///   always selected, evaluated and varied simultaneously. This eliminates
 ///   the credit assignment problem and renders the composition of teams an
-///   an object of evolution.
+///   object of evolution.
 ///
 /// \note
 /// The team size has to be large enough to cause an improved prediction
