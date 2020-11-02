@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#  Copyright (C) 2017-2019 EOS di Manlio Morini.
+#  Copyright (C) 2017-2020 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -86,11 +86,11 @@ def main():
     file_process("../doc/doxygen/doxygen.h", doxygen_rule, args)
 
     print("\n\nRELEASE NOTE\n")
-    print("1. Build & check. make TYPE=debug")
-    print('2. Commit.        git commit -am "[DOC] Changed revision number to v'
+    print("1. Build.  cmake -DCMAKE_BUILD_TYPE=Release -B build/ src/ ; cmake --build build/")
+    print("2. Check.  cd build/ ; ./tests")
+    print('3. Commit. git commit -am "[DOC] Changed revision number to v'
           + version_str(args) + '"')
-    print("3. Tag.           git tag -a v" + version_str(args)
-          + " -m \"tag message\"")
+    print("4. Tag.    git tag -a v" + version_str(args) + " -m \"tag message\"")
     print("\nRemember to 'git push' both code and tag. For the tag:\n")
     print("   git push origin [tagname]\n")
 
