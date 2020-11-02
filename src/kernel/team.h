@@ -47,9 +47,7 @@ namespace vita
 /// complexity of the search space and the training time, respectively,
 /// grow exponentially with the number of coevolved programs).
 ///
-/// \see
-/// "Evolving Teams of Predictors with Linear Genetic Programming"
-/// (Markus Braimer, Wolfgang Banzhaf).
+/// \see https://github.com/morinim/vita/wiki/bibliography#16
 ///
 template<class T>
 class team
