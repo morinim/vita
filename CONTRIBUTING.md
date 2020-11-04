@@ -30,8 +30,6 @@ There are several ways you can help Vita's development:
 
 ...and many more ways! Really, ANYONE can do something to help make Vita better.
 
-Approved contributions will be recorded on the commit logs and author's name will appear in the `contributors/` directory.
-
 ## Project governance
 
 ### Project lead / project owner
