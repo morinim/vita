@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,20 +20,21 @@ namespace vita
 ///
 /// An evaluator specialized for symbolic regression / classification problems.
 ///
-/// \tparam T type of individual
+/// \tparam T  type of individual
+/// \tparam DS type of the dataset
 ///
 /// This specialization of the evaluator class is "dataset-aware". It's useful
 /// to group common factors of more specialized symbolic regression or
 /// classification classes.
 ///
-template<class T>
+template<class T, class DS = dataframe>
 class src_evaluator : public evaluator<T>
 {
 public:
-  explicit src_evaluator(dataframe &);
+  explicit src_evaluator(DS &);
 
 protected:
-  class dataframe *dat_;
+  DS *dat_;
 };
 
 ///
@@ -44,11 +45,11 @@ protected:
 ///
 /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
 ///
-template<class T>
-class sum_of_errors_evaluator : public src_evaluator<T>
+template<class T, class DS = dataframe>
+class sum_of_errors_evaluator : public src_evaluator<T, DS>
 {
 public:
-  explicit sum_of_errors_evaluator(dataframe &d) : src_evaluator<T>(d) {}
+  explicit sum_of_errors_evaluator(DS &d) : src_evaluator<T>(d) {}
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
@@ -56,7 +57,7 @@ public:
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
-                       dataframe::example &, int *) = 0;
+                       typename DS::example &, int *) = 0;
 };
 
 ///
@@ -102,9 +103,7 @@ private:
 /// The mathematically precise way to express this notion is to
 /// calculate the relative difference.
 ///
-/// \see
-/// * <http://realityisvirtual.com/book2/?p=81>
-/// * <http://en.wikipedia.org/wiki/Relative_difference>
+/// \see https://github.com/morinim/documents/blob/master/math_notes/relative_difference.md
 ///
 template<class T>
 class rmae_evaluator : public sum_of_errors_evaluator<T>

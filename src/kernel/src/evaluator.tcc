@@ -20,8 +20,8 @@
 ///
 /// \param[in] d dataset that the evaluator will use
 ///
-template<class T>
-src_evaluator<T>::src_evaluator(dataframe &d) : dat_(&d)
+template<class T, class DS>
+src_evaluator<T, DS>::src_evaluator(DS &d) : dat_(&d)
 {
 }
 
@@ -29,34 +29,25 @@ src_evaluator<T>::src_evaluator(dataframe &d) : dat_(&d)
 /// \param[in] prg program (individual/team) used for fitness evaluation
 /// \return        the fitness (greater is better, max is `0`)
 ///
-template<class T>
-fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
+template<class T, class DS>
+fitness_t sum_of_errors_evaluator<T, DS>::operator()(const T &prg)
 {
   Expects(!this->dat_->classes());
-  Expects(this->dat_->begin() != this->dat_->end());
+  Expects(!this->dat_->empty());
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
   fitness_t::value_type err(0.0);
   int illegals(0);
 
-  // We don't use dataframe::size() since it gives the size of the active
-  // dataset, *not* the size of the active *slice* in the dataset (so it isn't
-  // appropriate with the DSS algorithm).
-  unsigned total_nr(0);
-
   for (auto &example : *this->dat_)
-  {
     err += error(agent, example, &illegals);
-
-    ++total_nr;
-  }
 
   assert(total_nr);
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return {-err / total_nr};
+  return {-err / static_cast<fitness_t::value_type>(this->dat_->size())};
 }
 
 ///
@@ -66,31 +57,25 @@ fitness_t sum_of_errors_evaluator<T>::operator()(const T &prg)
 /// This function is similar to operator()() but will skip 3 out of 4
 /// training instances, so it's faster ;-)
 ///
-template<class T>
-fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
+template<class T, class DS>
+fitness_t sum_of_errors_evaluator<T, DS>::fast(const T &prg)
 {
   assert(!this->dat_->classes());
-  assert(this->dat_->begin() != this->dat_->end());
+  assert(!this->dat_->empty());
 
   const basic_reg_lambda_f<T, false> agent(prg);
 
   fitness_t::value_type err(0.0);
   int illegals(0);
-  unsigned total_nr(0), counter(0);
+  std::size_t counter(0);
 
   for (auto &example : *this->dat_)
     if (this->dat_->size() <= 20 || (counter++ % 5) == 0)
-    {
       err += error(agent, example, &illegals);
-
-      ++total_nr;
-    }
-
-  assert(total_nr);
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return {-err / total_nr};
+  return {-err / static_cast<fitness_t::value_type>(this->dat_->size())};
 }
 
 ///
@@ -99,8 +84,8 @@ fitness_t sum_of_errors_evaluator<T>::fast(const T &prg)
 /// \return        the lambda function associated with `prg` (`nullptr` in case
 ///                of errors).
 ///
-template<class T>
-std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T>::lambdify(
+template<class T, class DS>
+std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T, DS>::lambdify(
   const T &prg) const
 {
   return std::make_unique<basic_reg_lambda_f<T, true>>(prg);

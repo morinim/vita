@@ -147,7 +147,9 @@ public:
   /// nature is the reduction of parental resource investment in offspring who
   /// are potentially less fit than others.
   ///
-  /// \see https://github.com/morinim/vita/wiki/bibliography#4
+  /// \see
+  /// https://github.com/morinim/vita/wiki/bibliography#4 and
+  /// https://github.com/morinim/vita/wiki/bibliography#17
   ///
   /// \note
   /// - `0` means undefined (auto-tune);

@@ -24,7 +24,7 @@ template<class T> class team;
 template<class T> class interpreter;
 
 template<class T> class evaluator;
-template<class T> class src_evaluator;
+template<class T, class DS> class src_evaluator;
 
 class basic_src_lambda_f;
 
