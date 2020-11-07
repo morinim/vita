@@ -43,8 +43,6 @@ fitness_t sum_of_errors_evaluator<T, DS>::operator()(const T &prg)
   for (auto &example : *this->dat_)
     err += error(agent, example, &illegals);
 
-  assert(total_nr);
-
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
   return {-err / static_cast<fitness_t::value_type>(this->dat_->size())};

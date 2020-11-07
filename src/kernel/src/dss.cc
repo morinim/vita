@@ -158,13 +158,13 @@ void dss::shake_impl()
     pivot = std::next(validation_.begin(),
                       static_cast<std::ptrdiff_t>(target_size));
 
-  assert(validation_.size() == s);
+  assert(validation_.size() == static_cast<size_t>(s));
   std::move(pivot, validation_.end(), std::back_inserter(training_));
   validation_.erase(pivot, validation_.end());
 
   vitaDEBUG << "DSS SHAKE (weight sum: " << weight_sum << ", training with: "
             << training_.size() << ')';
-  assert(s == training_.size() + validation_.size());
+  assert(static_cast<size_t>(s) == training_.size() + validation_.size());
 
   reset_age_difficulty(training_);
 

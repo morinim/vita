@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -94,7 +94,7 @@ TEST_CASE("push_back")
     CHECK(std::equal(sv2.begin(), sv2.end(), v2.begin(), v2.end()));
   }
 
-  assert(!std::is_pod<not_pod>::value);
+  assert(!std::is_pod_v<not_pod>);
 
   vita::small_vector<not_pod, 3> sv3;
   std::vector<not_pod> v3;
@@ -215,7 +215,7 @@ TEST_CASE("emplace_back")
     CHECK(std::equal(sv2.begin(), sv2.end(), v2.begin(), v2.end()));
   }
 
-  assert(!std::is_pod<not_pod>::value);
+  assert(!std::is_pod_v<not_pod>);
 
   vita::small_vector<not_pod, 3> sv3;
   std::vector<not_pod> v3;
