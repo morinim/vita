@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -89,7 +89,7 @@ T ephemeral(distribution d, T p1, T p2)
 /// - <http://stackoverflow.com/q/25222167/3235496>
 ///
 template<class T>
-std::enable_if_t<std::is_floating_point<T>::value, T>
+std::enable_if_t<std::is_floating_point_v<T>, T>
 between(T min, T sup)
 {
   Expects(min < sup);
@@ -112,7 +112,7 @@ between(T min, T sup)
 /// real number distribution).
 ///
 template<class T>
-std::enable_if_t<std::is_integral<T>::value, T>
+std::enable_if_t<std::is_integral_v<T>, T>
 between(T min, T sup)
 {
   Expects(min < sup);
@@ -122,7 +122,7 @@ between(T min, T sup)
 }
 
 template<class T>
-std::enable_if_t<std::is_enum<T>::value, T>
+std::enable_if_t<std::is_enum_v<T>, T>
 between(T min, T sup)
 {
   Expects(min < sup);

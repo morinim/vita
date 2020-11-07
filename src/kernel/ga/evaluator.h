@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2017, 2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -39,7 +39,7 @@ public:
 
 private:
   // See <https://stackoverflow.com/q/13233213/3235496>
-  std::conditional_t<std::is_function<F>::value, std::add_pointer_t<F>, F> f_;
+  std::conditional_t<std::is_function_v<F>, std::add_pointer_t<F>, F> f_;
 };
 
 template<class T, class F> ga_evaluator<T, F> make_ga_evaluator(F);
