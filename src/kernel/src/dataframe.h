@@ -206,6 +206,20 @@ struct dataframe::example
 };
 
 ///
+/// Get the output value for a given example.
+///
+/// \tparam    T the result is casted to type `T`
+/// \param[in] e an example
+/// \return      the output value for example  `e`
+///
+///
+template<class T>
+T label_as(const dataframe::example &e)
+{
+  return lexical_cast<T>(e.output);
+}
+
+///
 /// Gets the `class_t` ID (aka label) for a given example.
 ///
 /// \param[in] e an example
@@ -238,20 +252,6 @@ public:
   /// \remark Used only when reading CSV files.
   std::optional<std::size_t> output_index = 0;
 };
-
-///
-/// Get the output value for a given example.
-///
-/// \tparam    T the result is casted to type `T`
-/// \param[in] e an example
-/// \return      the output value for example  `e`
-///
-///
-template<class T>
-T label_as(const dataframe::example &e)
-{
-  return lexical_cast<T>(e.output);
-}
 
 }  // namespace vita
 

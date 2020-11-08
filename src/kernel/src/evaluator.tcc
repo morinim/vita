@@ -20,8 +20,8 @@
 ///
 /// \param[in] d dataset that the evaluator will use
 ///
-template<class T, class DS>
-src_evaluator<T, DS>::src_evaluator(DS &d) : dat_(&d)
+template<class T, class DAT>
+src_evaluator<T, DAT>::src_evaluator(DAT &d) : dat_(&d)
 {
 }
 
@@ -29,8 +29,8 @@ src_evaluator<T, DS>::src_evaluator(DS &d) : dat_(&d)
 /// \param[in] prg program (individual/team) used for fitness evaluation
 /// \return        the fitness (greater is better, max is `0`)
 ///
-template<class T, class DS>
-fitness_t sum_of_errors_evaluator<T, DS>::operator()(const T &prg)
+template<class T, class DAT>
+fitness_t sum_of_errors_evaluator<T, DAT>::operator()(const T &prg)
 {
   Expects(!this->dat_->classes());
   Expects(!this->dat_->empty());
@@ -52,11 +52,11 @@ fitness_t sum_of_errors_evaluator<T, DS>::operator()(const T &prg)
 /// \param[in] prg program (individual/team) used for fitness evaluation
 /// \return        the fitness (greater is better, max is `0`)
 ///
-/// This function is similar to operator()() but will skip 3 out of 4
+/// This function is similar to operator()() but will skip 4 out of 5
 /// training instances, so it's faster ;-)
 ///
-template<class T, class DS>
-fitness_t sum_of_errors_evaluator<T, DS>::fast(const T &prg)
+template<class T, class DAT>
+fitness_t sum_of_errors_evaluator<T, DAT>::fast(const T &prg)
 {
   assert(!this->dat_->classes());
   assert(!this->dat_->empty());
@@ -82,8 +82,8 @@ fitness_t sum_of_errors_evaluator<T, DS>::fast(const T &prg)
 /// \return        the lambda function associated with `prg` (`nullptr` in case
 ///                of errors).
 ///
-template<class T, class DS>
-std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T, DS>::lambdify(
+template<class T, class DAT>
+std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T, DAT>::lambdify(
   const T &prg) const
 {
   return std::make_unique<basic_reg_lambda_f<T, true>>(prg);

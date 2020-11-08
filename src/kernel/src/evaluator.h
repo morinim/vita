@@ -17,24 +17,52 @@
 
 namespace vita
 {
+
+///
+/// A trait to check if a container is iterable (has `begin`/`end`).
+///
+template <class T, class = void> struct is_iterable : std::false_type {};
+
+template <class T>
+struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin()),
+                                  decltype(std::declval<T>().end())>>
+  : std::true_type {};
+
+template <typename T>
+constexpr bool is_iterable_v = is_iterable<T>::value;
+
+///
+/// A trait to check if a container has the `example` alias defined.
+///
+template <class T, class = void> struct has_example : std::false_type {};
+
+template <class T>
+struct has_example<T, std::void_t<typename T::example>> : std::true_type {};
+
+template <typename T>
+constexpr bool has_example_v = has_example<T>::value;
+
 ///
 /// An evaluator specialized for symbolic regression / classification problems.
 ///
-/// \tparam T  type of individual
-/// \tparam DS type of the dataset
+/// \tparam T   type of individual
+/// \tparam DAT type of the dataset
 ///
 /// This specialization of the evaluator class is "dataset-aware". It's useful
 /// to group common factors of more specialized symbolic regression or
 /// classification classes.
 ///
-template<class T, class DS = dataframe>
+template<class T, class DAT = dataframe>
 class src_evaluator : public evaluator<T>
 {
 public:
-  explicit src_evaluator(DS &);
+  static_assert(is_iterable_v<DAT>);
+  static_assert(has_example_v<DAT>);
+
+  explicit src_evaluator(DAT &);
 
 protected:
-  DS *dat_;
+  DAT *dat_;
 };
 
 ///
@@ -45,11 +73,11 @@ protected:
 ///
 /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
 ///
-template<class T, class DS = dataframe>
-class sum_of_errors_evaluator : public src_evaluator<T, DS>
+template<class T, class DAT = dataframe>
+class sum_of_errors_evaluator : public src_evaluator<T, DAT>
 {
 public:
-  explicit sum_of_errors_evaluator(DS &d) : src_evaluator<T>(d) {}
+  explicit sum_of_errors_evaluator(DAT &d) : src_evaluator<T, DAT>(d) {}
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
@@ -57,7 +85,7 @@ public:
 
 private:
   virtual double error(const basic_reg_lambda_f<T, false> &,
-                       typename DS::example &, int *) = 0;
+                       typename DAT::example &, int *) = 0;
 };
 
 ///
