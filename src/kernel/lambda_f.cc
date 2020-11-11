@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2019-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,10 +12,7 @@
 
 #include "kernel/lambda_f.h"
 
-namespace vita
-{
-
-namespace serialize
+namespace vita::serialize
 {
 
 ///
@@ -41,18 +38,11 @@ bool save(std::ostream &out, const std::unique_ptr<basic_src_lambda_f> &l)
   return save(out, l.get());
 }
 
-namespace lambda
-{
-
-namespace detail
+namespace lambda::detail
 {
 
 std::map<std::string, build_func> factory_;
 
-}  // namespace detail
+}  // namespace lambda::detail
 
-}  // namespace lambda
-
-}  // namespace serialize
-
-}  // namespace vita
+}  // namespace vita::serialize

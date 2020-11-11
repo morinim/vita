@@ -57,8 +57,7 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(std::istream &in,
                                              const symbol_set &ss)
   : detail::reg_lambda_f_storage<T, S>(in, ss)
 {
-  static_assert(
-    S, "reg_lambda_f requires storage space for de-serialization");
+  static_assert(S, "reg_lambda_f requires storage for de-serialization");
 
   Ensures(is_valid());
 }
@@ -70,10 +69,11 @@ basic_reg_lambda_f<T, S>::basic_reg_lambda_f(std::istream &in,
 template<class T, bool S>
 value_t basic_reg_lambda_f<T, S>::operator()(const dataframe::example &e) const
 {
-  // We use tag dispatching by instance (i.e. to delegate to an implementation
-  // function that receives standard arguments plus a dummy argument based on a
-  // compile-time condition). Usually this is much easier to debug and get
-  // right that the std::enable_if solution.
+  // Here using *tag dispatching by instance*: main function delegates to an
+  // implementation function that receives standard arguments plus a dummy
+  // argument based on a compile-time condition.
+  // Usually this is much easier to debug and get right that the
+  // `std::enable_if` solution.
   // Moreover this is almost guaranteed to be optimized away by a decent
   // compiler.
   return eval(e, is_team<T>());

@@ -45,7 +45,7 @@ namespace vita
 /// a value that is just a building block for basic_lambda_f (e.g.
 /// classification tasks with discriminant functions).
 /// The typical use chain is:
-/// evaluator -uses-> basic_lambda_f -uses-> interpreter.
+/// evaluator --[uses]--> basic_lambda_f --[uses]--> interpreter.
 ///
 class basic_lambda_f
 {
@@ -104,7 +104,7 @@ private:
   virtual std::string serialize_id() const = 0;
   virtual bool save(std::ostream &) const = 0;
 
-  template<class T> friend  std::unique_ptr<basic_src_lambda_f>
+  template<class T> friend std::unique_ptr<basic_src_lambda_f>
   serialize::lambda::load(std::istream &, const symbol_set &);
   friend bool serialize::save(std::ostream &, const basic_src_lambda_f *);
 };
@@ -114,6 +114,7 @@ private:
 // ***********************************************************************
 
 /// The model_metric class choose the appropriate method considering this type.
+/// \see core_class_lambda_f
 class core_reg_lambda_f : public basic_src_lambda_f {};
 
 ///
@@ -178,6 +179,7 @@ enum class team_composition
 };
 
 /// The model_metric class choose the appropriate method considering this type.
+/// \see core_reg_lambda_f
 class core_class_lambda_f : public basic_src_lambda_f {};
 
 ///
