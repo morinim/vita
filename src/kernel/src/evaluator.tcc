@@ -26,26 +26,49 @@ src_evaluator<T, DAT>::src_evaluator(DAT &d) : dat_(&d)
 }
 
 ///
+/// \param[in] d the training dataset
+///
+template<class T, class ERRF, class DAT>
+sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_evaluator(DAT &d)
+  : src_evaluator<T, DAT>(d)
+{
+}
+
+///
 /// \param[in] prg program (individual/team) used for fitness evaluation
 /// \return        the fitness (greater is better, max is `0`)
 ///
-template<class T, class DAT>
-fitness_t sum_of_errors_evaluator<T, DAT>::operator()(const T &prg)
+template<class T, class ERRF, class DAT>
+fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
 {
-  Expects(!this->dat_->classes());
-  Expects(!this->dat_->empty());
+  Expects(this->dat_->begin() != this->dat_->end());
+  Expects(!detail::classes(this->dat_));
 
-  const basic_reg_lambda_f<T, false> agent(prg);
-
-  fitness_t::value_type err(0.0);
+  double total_error(0.0);
   int illegals(0);
 
+  ERRF err_fctr(prg);
+
   for (auto &example : *this->dat_)
-    err += error(agent, example, &illegals);
+  {
+    const auto err(err_fctr(example, &illegals));
+
+    // User specified example could not support difficulty.
+    if constexpr (detail::has_difficulty_v<DAT>)
+      if (!issmall(err))
+        ++example.difficulty;
+
+    total_error += err;
+  }
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return {-err / static_cast<fitness_t::value_type>(this->dat_->size())};
+  return
+    {
+      static_cast<fitness_t::value_type>(
+        -total_error
+        / static_cast<fitness_t::value_type>(this->dat_->size()))
+    };
 }
 
 ///
@@ -55,25 +78,38 @@ fitness_t sum_of_errors_evaluator<T, DAT>::operator()(const T &prg)
 /// This function is similar to operator()() but will skip 4 out of 5
 /// training instances, so it's faster ;-)
 ///
-template<class T, class DAT>
-fitness_t sum_of_errors_evaluator<T, DAT>::fast(const T &prg)
+template<class T, class ERRF, class DAT>
+fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::fast(const T &prg)
 {
-  assert(!this->dat_->classes());
-  assert(!this->dat_->empty());
+  Expects(this->dat_->begin() != this->dat_->end());
+  Expects(!detail::classes(this->dat_));
 
-  const basic_reg_lambda_f<T, false> agent(prg);
-
-  fitness_t::value_type err(0.0);
+  double total_error(0.0);
   int illegals(0);
   std::size_t counter(0);
 
+  ERRF err_fctr(prg);
+
   for (auto &example : *this->dat_)
     if (this->dat_->size() <= 20 || (counter++ % 5) == 0)
-      err += error(agent, example, &illegals);
+    {
+      const auto err(err_fctr(example, &illegals));
+
+      if constexpr (detail::has_difficulty_v<DAT>)
+        if (!issmall(err))
+          ++example.difficulty;
+
+      total_error += err;
+    }
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return {-err / static_cast<fitness_t::value_type>(this->dat_->size())};
+  return
+    {
+      static_cast<fitness_t::value_type>(
+        -total_error
+        / static_cast<fitness_t::value_type>(this->dat_->size()))
+    };
 }
 
 ///
@@ -82,64 +118,74 @@ fitness_t sum_of_errors_evaluator<T, DAT>::fast(const T &prg)
 /// \return        the lambda function associated with `prg` (`nullptr` in case
 ///                of errors).
 ///
-template<class T, class DAT>
-std::unique_ptr<basic_lambda_f> sum_of_errors_evaluator<T, DAT>::lambdify(
-  const T &prg) const
+template<class T, class LAMBDA, class DAT>
+std::unique_ptr<basic_lambda_f>
+sum_of_errors_evaluator<T, LAMBDA, DAT>::lambdify(const T &prg) const
 {
   return std::make_unique<basic_reg_lambda_f<T, true>>(prg);
 }
 
 ///
-/// \param[in] agent        lambda function used for the evaluation of the
-///                         current program
-/// \param[in] t            the current training case
-/// \param[in,out] illegals number of illegals values found evaluating the
-///                         current program so far
-/// \return                 a measurement of the error of the current program
-///                         on the training case `t`. The value returned is in
-///                         the `[0;+inf[` range
+/// Sets up the environment for error measurement.
+///
+/// \param[in] prg the program to be measured
 ///
 template<class T>
-double mae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                               dataframe::example &t, int *illegals)
+mae_error_functor<T>::mae_error_functor(const T &prg) : agent_(prg)
 {
-  number err;
-
-  if (const auto res = agent(t); has_value(res))
-    err = std::fabs(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t));
-  else
-    err = std::pow(100.0, ++(*illegals));
-
-  if (!issmall(err))
-    ++t.difficulty;
-
-  return err;
 }
 
 ///
-/// \param[in] agent lambda function used for the evaluation of the current
-///                  program
-/// \param[in] t     the current training case
-/// \return          a measurement of the error of the current program on the
-///                  training case `t`. The value returned is in the `[0;200]`
-///                  range
+/// \param[in]     example  current training case
+/// \param[in,out] illegals number of illegals values found evaluating the
+///                         current program so far
+/// \return                 a measurement of the error of the model/program on
+///                         the given training case (value in the `[0;+inf[`
+///                         range)
 ///
 template<class T>
-double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                                dataframe::example &t, int *)
+double mae_error_functor<T>::operator()(const dataframe::example &example,
+                                        int *illegals) const
 {
-  number err;
+  if (const auto model_value = agent_(example); has_value(model_value))
+    return std::fabs(lexical_cast<D_DOUBLE>(model_value)
+                     - label_as<D_DOUBLE>(example));
 
-  if (const auto res = agent(t); has_value(res))
+  return std::pow(100.0, ++(*illegals));
+}
+
+///
+/// Sets up the environment for error measurement.
+///
+/// \param[in] prg the program to be measured
+///
+template<class T>
+rmae_error_functor<T>::rmae_error_functor(const T &prg) : agent_(prg)
+{
+}
+
+///
+/// \param[in] example current training case
+/// \return            measurement of the error of the model/program on the
+///                    current training case. The value returned is in the
+///                    `[0;200]` range
+///
+template<class T>
+double rmae_error_functor<T>::operator()(const dataframe::example &example,
+                                         int *) const
+{
+  double err;
+
+  if (const auto model_value = agent_(example); has_value(model_value))
   {
-    const auto approx(lexical_cast<D_DOUBLE>(res));
-    const auto target(label_as<D_DOUBLE>(t));
+    const auto approx(lexical_cast<D_DOUBLE>(model_value));
+    const auto target(label_as<D_DOUBLE>(example));
 
     const auto delta(std::fabs(target - approx));
 
     // Check if the numbers are really close. Needed when comparing numbers
     // near zero.
-    if (delta <= 10.0 * std::numeric_limits<number>::min())
+    if (delta <= 10.0 * std::numeric_limits<D_DOUBLE>::min())
       err = 0.0;
     else
       err = 200.0 * delta / (std::fabs(approx) + std::fabs(target));
@@ -153,59 +199,66 @@ double rmae_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
   else
     err = 200.0;
 
-  if (err > 0.0)
-    ++t.difficulty;
-
   return err;
 }
 
 ///
-/// \param[in] agent        lambda function used for the evaluation of the
-///                         current program
-/// \param[in] t            the current training case
+/// Sets up the environment for error measurement.
+///
+/// \param[in] prg the program to be measured
+///
+template<class T>
+mse_error_functor<T>::mse_error_functor(const T &prg) : agent_(prg)
+{
+}
+
+///
+/// \param[in]     example  current training case
 /// \param[in,out] illegals number of illegals values found evaluating the
 ///                         current program so far
-/// \return                 a measurement of the error of the current program
-///                         on the training case `t`
+/// \return                 a measurement of the error of the model/program on
+///                         the current training case. The value returned is in
+///                         the `[0;+inf[` range
 ///
 template<class T>
-double mse_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                               dataframe::example &t, int *illegals)
+double mse_error_functor<T>::operator()(const dataframe::example &example,
+                                        int *illegals) const
 {
-  number err;
-
-  if (const auto res = agent(t); has_value(res))
+  if (const auto model_value = agent_(example); has_value(model_value))
   {
-    err = lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t);
-    err *= err;
+    const double err(lexical_cast<D_DOUBLE>(model_value)
+                     - label_as<D_DOUBLE>(example));
+    return err * err;
   }
-  else
-    err = std::pow(100.0, ++(*illegals));
 
-  if (!issmall(err))
-    ++t.difficulty;
-
-  return err;
+  return std::pow(100.0, ++(*illegals));
 }
 
 ///
-/// \param[in] agent lambda function used for the evaluation of the current
-///                  program
-/// \param[in] t     the current training case
-/// \return          a measurement of the error of the current program on the
-///                  training case `t`
+/// Sets up the environment for error measurement.
+///
+/// \param[in] prg the program to be measured
 ///
 template<class T>
-double count_evaluator<T>::error(const basic_reg_lambda_f<T, false> &agent,
-                                 dataframe::example &t, int *)
+count_error_functor<T>::count_error_functor(const T &prg) : agent_(prg)
 {
-  const auto res(agent(t));
+}
 
-  const bool err(!has_value(res) ||
-                 !issmall(lexical_cast<D_DOUBLE>(res) - label_as<D_DOUBLE>(t)));
+///
+/// \param[in] example current training case
+/// \return            a measurement of the error of the model/program on the
+///                    current training case. The value returned is in the
+///                    `[0;+inf[` range
+///
+template<class T>
+double count_error_functor<T>::operator()(const dataframe::example &example,
+                                          int *) const
+{
+  const auto model_value(agent_(example));
 
-  if (err)
-    ++t.difficulty;
+  const bool err(!has_value(model_value)
+                 || !issmall(lexical_cast<D_DOUBLE>(model_value)
+                             - label_as<D_DOUBLE>(example)));
 
   return err ? 1.0 : 0.0;
 }

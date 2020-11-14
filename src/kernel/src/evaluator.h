@@ -14,33 +14,10 @@
 #define      VITA_SRC_EVALUATOR_H
 
 #include "kernel/evaluator.h"
+#include "kernel/src/detail/evaluator.h"
 
 namespace vita
 {
-
-///
-/// A trait to check if a container is iterable (has `begin`/`end`).
-///
-template <class T, class = void> struct is_iterable : std::false_type {};
-
-template <class T>
-struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin()),
-                                  decltype(std::declval<T>().end())>>
-  : std::true_type {};
-
-template <typename T>
-constexpr bool is_iterable_v = is_iterable<T>::value;
-
-///
-/// A trait to check if a container has the `example` alias defined.
-///
-template <class T, class = void> struct has_example : std::false_type {};
-
-template <class T>
-struct has_example<T, std::void_t<typename T::example>> : std::true_type {};
-
-template <typename T>
-constexpr bool has_example_v = has_example<T>::value;
 
 ///
 /// An evaluator specialized for symbolic regression / classification problems.
@@ -56,8 +33,7 @@ template<class T, class DAT = dataframe>
 class src_evaluator : public evaluator<T>
 {
 public:
-  static_assert(is_iterable_v<DAT>);
-  static_assert(has_example_v<DAT>);
+  static_assert(detail::is_iterable_v<DAT>);
 
   explicit src_evaluator(DAT &);
 
@@ -68,90 +44,121 @@ protected:
 ///
 /// An evaluator to minimize the sum of some sort of error.
 ///
+/// \tparam T    type of individual
+/// \tparam ERRF the error functor. It returns a measurement of the error that
+///              a given program commits in the current training case
+///              (`DAT::example`)
+/// \tparam DAT  type of the dataset
+///
 /// This class models the evaluators that will drive the evolution towards the
 /// minimum sum of some sort of error.
 ///
 /// \see mse_evaluator, mae_evaluator, rmae_evaluator.
 ///
-template<class T, class DAT = dataframe>
+template<class T, class ERRF, class DAT = dataframe>
 class sum_of_errors_evaluator : public src_evaluator<T, DAT>
 {
 public:
-  explicit sum_of_errors_evaluator(DAT &d) : src_evaluator<T, DAT>(d) {}
+  static_assert(std::is_class_v<ERRF>);
+  //static_assert(std::is_invocable_r_v<double, ERRF,
+  //                                    const typename DAT::example &, int *>);
+
+  explicit sum_of_errors_evaluator(DAT &);
 
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
   std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
+};
+
+///
+/// Mean Absolute Error.
+///
+/// This functor will drive the evolution towards the minimum sum of
+/// absolute errors (\f$\frac{1}{n} \sum_{i=1}^n |target_i - actual_i|\f$).
+///
+/// There is also a penalty for illegal values (it's a function of the number
+/// of illegal values).
+///
+/// \see mae_evaluator
+///
+template<class T>
+class mae_error_functor
+{
+public:
+  mae_error_functor(const T &);
+
+  double operator()(const dataframe::example &, int *) const;
 
 private:
-  virtual double error(const basic_reg_lambda_f<T, false> &,
-                       typename DAT::example &, int *) = 0;
+  basic_reg_lambda_f<T, false> agent_;
 };
 
 ///
 /// Evaluator based on the mean absolute error.
 ///
-/// This evaluator will drive the evolution towards the minimum sum of
-/// absolute errors(\f$\frac{1}{n} \sum_{i=1}^n |target_i - actual_i|\f$).
-///
-/// There is also a penalty for illegal values (it is a function of the
-/// number of illegal values).
-///
-/// \note
-/// When the dataset contains outliers, the mse_evaluator will heavily
-/// weight each of them (this is the result of squaring the outliers).
-/// mae_evaluator is less sensitive to the presence of outliers (a
-/// desirable property in many application).
-///
-/// \see mse_evaluator.
+/// \see mae_error_functor
 ///
 template<class T>
-class mae_evaluator : public sum_of_errors_evaluator<T>
+class mae_evaluator : public sum_of_errors_evaluator<T, mae_error_functor<T>>
 {
 public:
-  explicit mae_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mae_evaluator(dataframe &d)
+    : sum_of_errors_evaluator<T, mae_error_functor<T>>(d)
+  {}
+};
+
+///
+/// Mean of Relative Differences.
+///
+/// This functor will drive the evolution towards the minimum sum of
+/// relative differences between target values and actual ones:
+///
+/// \f[\frac{1}{n} \sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
+///
+/// This is similar to mae_error_functor but here we sum the *relative* errors.
+/// The idea is that the absolute difference of `1` between `6` and `5` is more
+/// significant than the same absolute difference between `1000001` and
+/// `1000000`.
+/// The mathematically precise way to express this notion is to calculate the
+/// relative difference.
+///
+/// \see rmae_evaluator
+/// \see https://github.com/morinim/documents/blob/master/math_notes/relative_difference.md
+///
+template<class T>
+class rmae_error_functor
+{
+public:
+  explicit rmae_error_functor(const T &);
+
+  double operator()(const dataframe::example &, int *) const;
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
-               int *) override;
+  basic_reg_lambda_f<T, false> agent_;
 };
 
 ///
 /// Evaluator based on the mean of relative differences.
 ///
-/// This evaluator will drive the evolution towards the minimum sum of
-/// relative differences between target values and actual ones:
-///
-/// \f[\frac{1}{n} \sum_{i=1}^n \frac{|target_i - actual_i|}{\frac{|target_i| + |actual_i|}{2}}\f]
-///
-/// This is similar to mae_evaluator but here we sum the _relative_ errors.
-/// The idea is that the absolute difference of 1 between 6 and 5 is more
-/// significant than the same absolute difference between 1000001 and
-/// 1000000.
-/// The mathematically precise way to express this notion is to
-/// calculate the relative difference.
-///
-/// \see https://github.com/morinim/documents/blob/master/math_notes/relative_difference.md
+/// \see rmae_error_functor
 ///
 template<class T>
-class rmae_evaluator : public sum_of_errors_evaluator<T>
+class rmae_evaluator : public sum_of_errors_evaluator<T, rmae_error_functor<T>>
 {
 public:
-  explicit rmae_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
-
-private:
-  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
-               int *) override;
+  explicit rmae_evaluator(dataframe &d)
+    : sum_of_errors_evaluator<T, rmae_error_functor<T>>(d)
+  {}
 };
 
 ///
-/// Evaluator based on the mean squared error.
+/// Mean Squared Error.
 ///
-/// This evaluator will drive the evolution towards the minimum sum of
+/// This fumctpr will drive the evolution towards the minimum sum of
 /// squared errors (\f$\frac{1}{n} \sum_{i=1}^n (target_i - actual_i)^2\f$).
 ///
-/// There is also a penalty for illegal values (it is a function of the
-/// number of illegal values).
+/// There is also a penalty for illegal values (it's a function of the number
+/// of illegal values).
 ///
 /// \note
 /// Real data always have noise (sampling/measurement errors) and noise
@@ -160,35 +167,74 @@ private:
 /// most likely to find the "correct" underlying model if you seek to
 /// minimize the sum of squared errors.
 ///
-/// \see mae_evaluator.
+/// \remark
+/// When the dataset contains outliers, the mse_error_functor will heavily
+/// weight each of them (this is the result of squaring the outliers).
+/// mae_error_functor is less sensitive to the presence of outliers (a
+/// desirable property in many applications).
+///
+/// \see mse_evaluator
 ///
 template<class T>
-class mse_evaluator : public sum_of_errors_evaluator<T>
+class mse_error_functor
 {
 public:
-  explicit mse_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
+  explicit mse_error_functor(const T &);
+
+  double operator()(const dataframe::example &, int *) const;
 
 private:
-  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
-               int *) override;
+  basic_reg_lambda_f<T, false> agent_;
+};
+
+///
+/// Evaluator based on the mean squared error.
+///
+/// \see mse_error_functor
+///
+template<class T>
+class mse_evaluator : public sum_of_errors_evaluator<T, mse_error_functor<T>>
+{
+public:
+  explicit mse_evaluator(dataframe &d)
+    : sum_of_errors_evaluator<T, mse_error_functor<T>>(d)
+  {}
+};
+
+///
+/// Number of matches functor.
+///
+/// This functor will drive the evolution towards the maximum sum of matches
+/// (\f$\sum_{i=1}^n target_i == actual_i\f$). Incorrect answers receive the
+/// same penalty.
+///
+/// \see count_evaluator
+///
+template<class T>
+class count_error_functor
+{
+public:
+  explicit count_error_functor(const T &);
+
+  double operator()(const dataframe::example &, int *) const;
+
+private:
+  basic_reg_lambda_f<T, false> agent_;
 };
 
 ///
 /// Evaluator based on the number of matches.
 ///
-/// This evaluator will drive the evolution towards the maximum sum of
-/// matches (\f$\sum_{i=1}^n target_i == actual_i\f$).
-/// All incorrect answers receive the same fitness penalty.
+/// \see count_error_functor
 ///
 template<class T>
-class count_evaluator : public sum_of_errors_evaluator<T>
+class count_evaluator
+  : public sum_of_errors_evaluator<T, count_error_functor<T>>
 {
 public:
-  explicit count_evaluator(dataframe &d) : sum_of_errors_evaluator<T>(d) {}
-
-private:
-  double error(const basic_reg_lambda_f<T, false> &, dataframe::example &,
-               int *) override;
+  explicit count_evaluator(dataframe &d)
+    : sum_of_errors_evaluator<T, count_error_functor<T>>(d)
+  {}
 };
 
 ///

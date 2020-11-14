@@ -43,4 +43,18 @@ value_t src_interpreter<T>::fetch_var(unsigned i)
   return (*example_)[i];
 }
 
+///
+/// A handy short-cut for one-time execution of an individual.
+///
+/// \param[in] ind individual/program to be run
+/// \param[in] ex  input values for the current training case (used to valorize
+///                the variables of `ind`)
+/// \return        possible output value of the individual
+///
+template<class T>
+value_t run(const T &ind, const std::vector<value_t> &ex)
+{
+  return src_interpreter<T>(&ind).run(ex);
+}
+
 #endif  // include guard

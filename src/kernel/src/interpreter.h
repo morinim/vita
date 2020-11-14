@@ -53,6 +53,8 @@ private:
   const std::vector<value_t> *example_;
 };
 
+template<class T> value_t run(const T &, const std::vector<value_t> &);
+
 #include "kernel/src/interpreter.tcc"
 
 }  // namespace vita

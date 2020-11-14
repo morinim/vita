@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,6 +31,7 @@
 #include "kernel/src/primitive/int.h"
 #include "kernel/src/primitive/real.h"
 #include "kernel/src/primitive/string.h"
+#include "kernel/src/variable.h"
 #include "utility/csv_parser.h"
 
 #endif  // include guard
