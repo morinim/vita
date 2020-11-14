@@ -71,7 +71,7 @@ class error_functor
 public:
   error_functor(const candidate_solution &x) : x_(x) {}
 
-  double operator()(const example &ex, int *) const
+  double operator()(const example &ex) const
   {
     std::vector<double> f(N);
     std::transform(x_.begin(), x_.end(), f.begin(),

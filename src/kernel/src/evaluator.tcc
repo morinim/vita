@@ -49,7 +49,9 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
   Expects(!detail::classes(this->dat_));
 
   double total_error(0.0);
-  int illegals(0);
+
+  // Number of illegals values found evaluating the current program so far.
+  double illegals(0);
 
   ERRF err_fctr(prg);
 
@@ -60,14 +62,14 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
        it != this->dat_->end();
        std::advance(it, n))
   {
-    const auto err(err_fctr(*it, &illegals));
+    const auto err(err_fctr(*it));
 
     // User specified examples could not support difficulty.
     if constexpr (detail::has_difficulty_v<DAT>)
       if (!issmall(err))
         ++it->difficulty;
 
-    total_error += err;
+    total_error += std::isfinite(err) ? err : std::pow(100.0, ++illegals);
   }
 
   // Note that we take the average error: this way fast() and operator()
@@ -127,22 +129,18 @@ mae_error_functor<T>::mae_error_functor(const T &prg) : agent_(prg)
 }
 
 ///
-/// \param[in]     example  current training case
-/// \param[in,out] illegals number of illegals values found evaluating the
-///                         current program so far
-/// \return                 a measurement of the error of the model/program on
-///                         the given training case (value in the `[0;+inf[`
-///                         range)
+/// \param[in] example current training case
+/// \return            a measurement of the error of the model/program on the
+///                    given training case (value in the `[0;+inf[` range)
 ///
 template<class T>
-double mae_error_functor<T>::operator()(const dataframe::example &example,
-                                        int *illegals) const
+double mae_error_functor<T>::operator()(const dataframe::example &example) const
 {
   if (const auto model_value = agent_(example); has_value(model_value))
     return std::fabs(lexical_cast<D_DOUBLE>(model_value)
                      - label_as<D_DOUBLE>(example));
 
-  return std::pow(100.0, ++(*illegals));
+  return NAN;
 }
 
 ///
@@ -162,8 +160,8 @@ rmae_error_functor<T>::rmae_error_functor(const T &prg) : agent_(prg)
 ///                    `[0;200]` range
 ///
 template<class T>
-double rmae_error_functor<T>::operator()(const dataframe::example &example,
-                                         int *) const
+double rmae_error_functor<T>::operator()(
+  const dataframe::example &example) const
 {
   double err;
 
@@ -204,16 +202,13 @@ mse_error_functor<T>::mse_error_functor(const T &prg) : agent_(prg)
 }
 
 ///
-/// \param[in]     example  current training case
-/// \param[in,out] illegals number of illegals values found evaluating the
-///                         current program so far
-/// \return                 a measurement of the error of the model/program on
-///                         the current training case. The value returned is in
-///                         the `[0;+inf[` range
+/// \param[in] example current training case
+/// \return            a measurement of the error of the model/program on the
+///                    the current training case. The value returned is in the
+///                    `[0;+inf[` range
 ///
 template<class T>
-double mse_error_functor<T>::operator()(const dataframe::example &example,
-                                        int *illegals) const
+double mse_error_functor<T>::operator()(const dataframe::example &example) const
 {
   if (const auto model_value = agent_(example); has_value(model_value))
   {
@@ -222,7 +217,7 @@ double mse_error_functor<T>::operator()(const dataframe::example &example,
     return err * err;
   }
 
-  return std::pow(100.0, ++(*illegals));
+  return NAN;
 }
 
 ///
@@ -242,8 +237,8 @@ count_error_functor<T>::count_error_functor(const T &prg) : agent_(prg)
 ///                    `[0;+inf[` range
 ///
 template<class T>
-double count_error_functor<T>::operator()(const dataframe::example &example,
-                                          int *) const
+double count_error_functor<T>::operator()(
+  const dataframe::example &example) const
 {
   const auto model_value(agent_(example));
 

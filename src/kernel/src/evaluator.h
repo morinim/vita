@@ -61,7 +61,7 @@ class sum_of_errors_evaluator : public src_evaluator<T, DAT>
 public:
   static_assert(std::is_class_v<ERRF>);
   //static_assert(std::is_invocable_r_v<double, ERRF,
-  //                                    const typename DAT::example &, int *>);
+  //                                    const typename DAT::example &>);
 
   explicit sum_of_errors_evaluator(DAT &);
 
@@ -90,7 +90,7 @@ class mae_error_functor
 public:
   mae_error_functor(const T &);
 
-  double operator()(const dataframe::example &, int *) const;
+  double operator()(const dataframe::example &) const;
 
 private:
   basic_reg_lambda_f<T, false> agent_;
@@ -101,13 +101,11 @@ private:
 ///
 /// \see mae_error_functor
 ///
-template<class T>
-class mae_evaluator : public sum_of_errors_evaluator<T, mae_error_functor<T>>
+template<class T, class ERRF = mae_error_functor<T>>
+class mae_evaluator : public sum_of_errors_evaluator<T, ERRF>
 {
 public:
-  explicit mae_evaluator(dataframe &d)
-    : sum_of_errors_evaluator<T, mae_error_functor<T>>(d)
-  {}
+  using sum_of_errors_evaluator<T, ERRF>::sum_of_errors_evaluator;
 };
 
 ///
@@ -134,7 +132,7 @@ class rmae_error_functor
 public:
   explicit rmae_error_functor(const T &);
 
-  double operator()(const dataframe::example &, int *) const;
+  double operator()(const dataframe::example &) const;
 
 private:
   basic_reg_lambda_f<T, false> agent_;
@@ -145,13 +143,11 @@ private:
 ///
 /// \see rmae_error_functor
 ///
-template<class T>
-class rmae_evaluator : public sum_of_errors_evaluator<T, rmae_error_functor<T>>
+template<class T, class ERRF = rmae_error_functor<T>>
+class rmae_evaluator : public sum_of_errors_evaluator<T, ERRF>
 {
 public:
-  explicit rmae_evaluator(dataframe &d)
-    : sum_of_errors_evaluator<T, rmae_error_functor<T>>(d)
-  {}
+  using sum_of_errors_evaluator<T, ERRF>::sum_of_errors_evaluator;
 };
 
 ///
@@ -184,7 +180,7 @@ class mse_error_functor
 public:
   explicit mse_error_functor(const T &);
 
-  double operator()(const dataframe::example &, int *) const;
+  double operator()(const dataframe::example &) const;
 
 private:
   basic_reg_lambda_f<T, false> agent_;
@@ -195,13 +191,11 @@ private:
 ///
 /// \see mse_error_functor
 ///
-template<class T>
-class mse_evaluator : public sum_of_errors_evaluator<T, mse_error_functor<T>>
+template<class T, class ERRF = mse_error_functor<T>>
+class mse_evaluator : public sum_of_errors_evaluator<T, ERRF>
 {
 public:
-  explicit mse_evaluator(dataframe &d)
-    : sum_of_errors_evaluator<T, mse_error_functor<T>>(d)
-  {}
+  using sum_of_errors_evaluator<T, ERRF>::sum_of_errors_evaluator;
 };
 
 ///
@@ -219,7 +213,7 @@ class count_error_functor
 public:
   explicit count_error_functor(const T &);
 
-  double operator()(const dataframe::example &, int *) const;
+  double operator()(const dataframe::example &) const;
 
 private:
   basic_reg_lambda_f<T, false> agent_;
@@ -230,14 +224,11 @@ private:
 ///
 /// \see count_error_functor
 ///
-template<class T>
-class count_evaluator
-  : public sum_of_errors_evaluator<T, count_error_functor<T>>
+template<class T, class ERRF = count_error_functor<T>>
+class count_evaluator : public sum_of_errors_evaluator<T, ERRF>
 {
 public:
-  explicit count_evaluator(dataframe &d)
-    : sum_of_errors_evaluator<T, count_error_functor<T>>(d)
-  {}
+  using sum_of_errors_evaluator<T, ERRF>::sum_of_errors_evaluator;
 };
 
 ///
