@@ -35,11 +35,15 @@ sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_evaluator(DAT &d)
 }
 
 ///
+/// Sums the error reported by the error functor over a training set.
+///
 /// \param[in] prg program (individual/team) used for fitness evaluation
+/// \param[in] n   consider just '1' example every 'n'
 /// \return        the fitness (greater is better, max is `0`)
 ///
 template<class T, class ERRF, class DAT>
-fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
+fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
+  const T &prg, unsigned n)
 {
   Expects(this->dat_->begin() != this->dat_->end());
   Expects(!detail::classes(this->dat_));
@@ -49,14 +53,19 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
 
   ERRF err_fctr(prg);
 
-  for (auto &example : *this->dat_)
-  {
-    const auto err(err_fctr(example, &illegals));
+  if (this->dat_->size() <= 20)
+    n = 1;
 
-    // User specified example could not support difficulty.
+  for (auto it(this->dat_->begin());
+       it != this->dat_->end();
+       std::advance(it, n))
+  {
+    const auto err(err_fctr(*it, &illegals));
+
+    // User specified examples could not support difficulty.
     if constexpr (detail::has_difficulty_v<DAT>)
       if (!issmall(err))
-        ++example.difficulty;
+        ++it->difficulty;
 
     total_error += err;
   }
@@ -75,41 +84,23 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
 /// \param[in] prg program (individual/team) used for fitness evaluation
 /// \return        the fitness (greater is better, max is `0`)
 ///
+template<class T, class ERRF, class DAT>
+fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
+{
+  return sum_of_errors_impl(prg, 1);
+}
+
+///
+/// \param[in] prg program (individual/team) used for fitness evaluation
+/// \return        the fitness (greater is better, max is `0`)
+///
 /// This function is similar to operator()() but will skip 4 out of 5
-/// training instances, so it's faster ;-)
+/// training instances, so it's faster.
 ///
 template<class T, class ERRF, class DAT>
 fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::fast(const T &prg)
 {
-  Expects(this->dat_->begin() != this->dat_->end());
-  Expects(!detail::classes(this->dat_));
-
-  double total_error(0.0);
-  int illegals(0);
-  std::size_t counter(0);
-
-  ERRF err_fctr(prg);
-
-  for (auto &example : *this->dat_)
-    if (this->dat_->size() <= 20 || (counter++ % 5) == 0)
-    {
-      const auto err(err_fctr(example, &illegals));
-
-      if constexpr (detail::has_difficulty_v<DAT>)
-        if (!issmall(err))
-          ++example.difficulty;
-
-      total_error += err;
-    }
-
-  // Note that we take the average error: this way fast() and operator()
-  // outputs can be compared.
-  return
-    {
-      static_cast<fitness_t::value_type>(
-        -total_error
-        / static_cast<fitness_t::value_type>(this->dat_->size()))
-    };
+  return sum_of_errors_impl(prg, 5);
 }
 
 ///

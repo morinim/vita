@@ -68,6 +68,9 @@ public:
   fitness_t operator()(const T &) override;
   fitness_t fast(const T &) override;
   std::unique_ptr<basic_lambda_f> lambdify(const T &) const override;
+
+private:
+  fitness_t sum_of_errors_impl(const T &, unsigned);
 };
 
 ///
