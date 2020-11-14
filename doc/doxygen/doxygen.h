@@ -46,8 +46,7 @@
  *  Contains support functions for the ALPS algorithm.
  *
  *  \namespace out
- *  Contains flags and manipulators to control the output format of
- *  individuals.
+ *  Contains flags and manipulators to control the output format of individuals.
  *
  *  \namespace detail
  *  The contents of this namespace isn't intended for general consumption: it
