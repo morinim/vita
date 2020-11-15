@@ -73,7 +73,6 @@ template<class ERRF, class DAT>
 constexpr bool is_error_functor_v =
   std::is_invocable_r_v<double, ERRF, decltype(*std::declval<DAT>().begin())>;
 
-
 }  // namespace vita::detail
 
 #endif  // include guard

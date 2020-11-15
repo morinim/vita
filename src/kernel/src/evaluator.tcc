@@ -50,9 +50,6 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
 
   double total_error(0.0);
 
-  // Number of illegals values found evaluating the current program so far.
-  double illegals(0);
-
   ERRF err_fctr(prg);
 
   if (this->dat_->size() <= 20)
@@ -69,7 +66,7 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
       if (!issmall(err))
         ++it->difficulty;
 
-    total_error += std::isfinite(err) ? err : std::pow(100.0, ++illegals);
+    total_error += err;
   }
 
   // Note that we take the average error: this way fast() and operator()
@@ -77,8 +74,7 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
   return
     {
       static_cast<fitness_t::value_type>(
-        -total_error
-        / static_cast<fitness_t::value_type>(this->dat_->size()))
+        -total_error / static_cast<double>(this->dat_->size()))
     };
 }
 
@@ -140,7 +136,7 @@ double mae_error_functor<T>::operator()(const dataframe::example &example) const
     return std::fabs(lexical_cast<D_DOUBLE>(model_value)
                      - label_as<D_DOUBLE>(example));
 
-  return NAN;
+  return std::numeric_limits<double>::max() / 100.0;
 }
 
 ///
@@ -163,7 +159,7 @@ template<class T>
 double rmae_error_functor<T>::operator()(
   const dataframe::example &example) const
 {
-  double err;
+  double err(200.0);
 
   if (const auto model_value = agent_(example); has_value(model_value))
   {
@@ -185,8 +181,6 @@ double rmae_error_functor<T>::operator()(
     // The chosen formula seems numerically more stable and gives a result
     // in a limited range of values.
   }
-  else
-    err = 200.0;
 
   return err;
 }
@@ -217,7 +211,7 @@ double mse_error_functor<T>::operator()(const dataframe::example &example) const
     return err * err;
   }
 
-  return NAN;
+  return std::numeric_limits<double>::max() / 100.0;
 }
 
 ///
