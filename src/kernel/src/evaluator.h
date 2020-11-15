@@ -60,8 +60,8 @@ class sum_of_errors_evaluator : public src_evaluator<T, DAT>
 {
 public:
   static_assert(std::is_class_v<ERRF>);
-  //static_assert(std::is_invocable_r_v<double, ERRF,
-  //                                    const typename DAT::example &>);
+  static_assert(detail::is_iterable_v<DAT>);
+  static_assert(detail::is_error_functor_v<ERRF, DAT>);
 
   explicit sum_of_errors_evaluator(DAT &);
 

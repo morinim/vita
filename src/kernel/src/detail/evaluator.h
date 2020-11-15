@@ -23,26 +23,26 @@ namespace vita::detail
 ///
 /// A trait to check if a container is iterable (has `begin`/`end`).
 ///
-template <class T, class = void> struct is_iterable : std::false_type {};
+template<class T, class = void> struct is_iterable : std::false_type {};
 
-template <class T>
+template<class T>
 struct is_iterable<T, std::void_t<decltype(std::declval<T>().begin()),
                                   decltype(std::declval<T>().end())>>
   : std::true_type {};
 
-template <typename T>
+template<class T>
 constexpr bool is_iterable_v = is_iterable<T>::value;
 
 ///
 /// A trait to check if a container has the `classes` method.
 ///
-template <class T, class = void> struct has_classes : std::false_type {};
+template<class T, class = void> struct has_classes : std::false_type {};
 
-template <class T>
+template<class T>
 struct has_classes<T, std::void_t<decltype(std::declval<T>().classes())>>
   : std::true_type {};
 
-template <typename T>
+template<class T>
 constexpr bool has_classes_v = has_classes<T>::value;
 
 template<class DAT> std::size_t classes(const DAT &d)
@@ -54,16 +54,25 @@ template<class DAT> std::size_t classes(const DAT &d)
 }
 
 ///
-/// A trait to if an example has an incrementable `difficulty` field.
+/// A trait to check if an example has an incrementable `difficulty` field.
 ///
-template <class T, class = void> struct has_difficulty : std::false_type {};
+template<class T, class = void> struct has_difficulty : std::false_type {};
 
-template <class T>
+template<class T>
 struct has_difficulty<T, std::void_t<decltype(++std::declval<T>().begin()->difficulty)>>
   : std::true_type {};
 
-template <typename T>
+template<class T>
 constexpr bool has_difficulty_v = has_difficulty<T>::value;
+
+///
+/// A trait to check if `ERRF` can be applied to elements of `DAT` returning a
+/// `double`.
+///
+template<class ERRF, class DAT>
+constexpr bool is_error_functor_v =
+  std::is_invocable_r_v<double, ERRF, decltype(*std::declval<DAT>().begin())>;
+
 
 }  // namespace vita::detail
 
