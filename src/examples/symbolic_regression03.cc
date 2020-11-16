@@ -9,7 +9,7 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  \see https://github.com/morinim/vita/wiki/symbolic_regression
+ *  \see https://github.com/morinim/vita/wiki/symbolic_regression_part2
  */
 
 #include "kernel/vita.h"

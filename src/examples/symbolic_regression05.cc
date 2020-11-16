@@ -9,7 +9,7 @@
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  *
- *  \see https://github.com/morinim/vita/wiki/symbolic_regression
+ *  \see https://github.com/morinim/vita/wiki/symbolic_regression_part4
  */
 
 #include "kernel/vita.h"
@@ -20,15 +20,15 @@ constexpr std::size_t VARS(3);
 struct example
 {
   example(const std::vector<double> &ex_a, const vita::matrix<double> &ex_b,
-          const std::vector<double> &ex_c)
-    : a(ex_a), b(ex_b), c()
+          const std::vector<double> &ex_x)
+    : a(ex_a), b(ex_b), x()
   {
-    std::copy(ex_c.begin(), ex_c.end(), std::back_inserter(c));
+    std::copy(ex_x.begin(), ex_x.end(), std::back_inserter(x));
   }
 
   std::vector<double>        a;
   vita::matrix<double>       b;
-  std::vector<vita::value_t> c;
+  std::vector<vita::value_t> x;
 };
 
 using training_set = std::vector<example>;
@@ -69,15 +69,15 @@ using candidate_solution = vita::team<vita::i_mep>;
 class error_functor
 {
 public:
-  error_functor(const candidate_solution &x) : x_(x) {}
+  error_functor(const candidate_solution &s) : s_(s) {}
 
   double operator()(const example &ex) const
   {
     std::vector<double> f(N);
-    std::transform(x_.begin(), x_.end(), f.begin(),
+    std::transform(s_.begin(), s_.end(), f.begin(),
                    [&ex](const auto &i)
                    {
-                     const auto ret(vita::run(i, ex.c));
+                     const auto ret(vita::run(i, ex.x));
 
                      return vita::has_value(ret) ? std::get<vita::D_DOUBLE>(ret)
                                                  : 0.0;
@@ -100,7 +100,7 @@ public:
   }
 
 private:
-  candidate_solution x_;
+  candidate_solution s_;
 };
 
 // Given a team (i.e. a candidate solution of the problem), returns a score

@@ -50,10 +50,10 @@ protected:
 ///              (`DAT::example`)
 /// \tparam DAT  type of the dataset
 ///
-/// This class models the evaluators that will drive the evolution towards the
-/// minimum sum of some sort of error.
+/// This class drive the evolution towards the minimum sum of some sort of
+/// error.
 ///
-/// \see mse_evaluator, mae_evaluator, rmae_evaluator.
+/// \see mse_evaluator, mae_evaluator, rmae_evaluator, count_evaluator
 ///
 template<class T, class ERRF, class DAT = dataframe>
 class sum_of_errors_evaluator : public src_evaluator<T, DAT>
