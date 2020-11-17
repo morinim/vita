@@ -124,9 +124,9 @@ int main()
   prob.env.team.individuals = N;
 
   // SETTING UP SYMBOLS
-  prob.sset.insert<vita::variable>("c1", 0);
-  prob.sset.insert<vita::variable>("c2", 1);
-  prob.sset.insert<vita::variable>("c3", 2);
+  prob.sset.insert<vita::variable>("x1", 0);
+  prob.sset.insert<vita::variable>("x2", 1);
+  prob.sset.insert<vita::variable>("x3", 2);
   prob.insert<vita::real::add>();
   prob.insert<vita::real::sub>();
   prob.insert<vita::real::mul>();
