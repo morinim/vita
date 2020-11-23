@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2020-11-23
+
+### Added
+- Base support for user-provided datasets. Part of the classes/functions for symbolic regression can now work with a generic STL container. The new features are described in the extended [symbolic regression example](https://github.com/morinim/vita/wiki/symbolic_regression).
+
+### Changed
+- `sum_of_errors_evaluator` now uses a running average technique (numerically more stable). This could produce minor differences in a specific test case (because of floating point arithmetic) but the general behavior doesn't change.
+
+### Deprecated
+- Support for Genetic Programming with Adaptive representations will be removed and replaced with (a sort of) Straight Line Program structure. The new approach is simpler and fits easily in the current architecture.
+
 ## [2.0.0] - 2020-11-02
 
 ### Added
@@ -294,7 +305,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Various compilation warning with recent version of gcc (7.x).
 
 
-[Unreleased]: https://github.com/morinim/vita/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/morinim/vita/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/morinim/vita/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/morinim/vita/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/morinim/vita/compare/v1.1.0...v1.0.0
 [1.0.0]: https://github.com/morinim/vita/compare/v0.9.14...v1.0.0
