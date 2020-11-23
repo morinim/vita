@@ -37,27 +37,23 @@ sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_evaluator(DAT &d)
 ///
 /// Sums the error reported by the error functor over a training set.
 ///
-/// \param[in] prg program (individual/team) used for fitness evaluation
-/// \param[in] n   consider just '1' example every 'n'
-/// \return        the fitness (greater is better, max is `0`)
+/// \param[in] prg  program (individual/team) used for fitness evaluation
+/// \param[in] step consider just `1` example every `step`
+/// \return         the fitness (greater is better, max is `0`)
 ///
 template<class T, class ERRF, class DAT>
 fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
-  const T &prg, unsigned n)
+  const T &prg, unsigned step)
 {
   Expects(this->dat_->begin() != this->dat_->end());
   Expects(!detail::classes(this->dat_));
 
-  double total_error(0.0);
+  const ERRF err_fctr(prg);
 
-  ERRF err_fctr(prg);
-
-  if (this->dat_->size() <= 20)
-    n = 1;
-
-  for (auto it(this->dat_->begin());
-       it != this->dat_->end();
-       std::advance(it, n))
+  double average_error(0.0), n(0.0);
+  for (auto it(std::begin(*this->dat_));
+       std::distance(it, std::end(*this->dat_)) >= step;
+       std::advance(it, step))
   {
     const auto err(err_fctr(*it));
 
@@ -66,16 +62,12 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::sum_of_errors_impl(
       if (!issmall(err))
         ++it->difficulty;
 
-    total_error += err;
+    average_error += (err - average_error) / ++n;
   }
 
   // Note that we take the average error: this way fast() and operator()
   // outputs can be compared.
-  return
-    {
-      static_cast<fitness_t::value_type>(
-        -total_error / static_cast<double>(this->dat_->size()))
-    };
+  return {static_cast<fitness_t::value_type>(-average_error)};
 }
 
 ///
@@ -98,6 +90,7 @@ fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::operator()(const T &prg)
 template<class T, class ERRF, class DAT>
 fitness_t sum_of_errors_evaluator<T, ERRF, DAT>::fast(const T &prg)
 {
+  Expects(std::distance(this->dat_->begin(), this->dat_->end()) >= 100);
   return sum_of_errors_impl(prg, 5);
 }
 
