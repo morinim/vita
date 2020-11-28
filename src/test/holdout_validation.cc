@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/src/holdout_validation.h"
-#include "kernel/src/problem.h"
+#include "kernel/gp/src/holdout_validation.h"
+#include "kernel/gp/src/problem.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

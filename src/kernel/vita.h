@@ -20,18 +20,18 @@
 #if !defined(VITA_VITA_H)
 #define      VITA_VITA_H
 
-#include "kernel/i_mep.h"
-#include "kernel/team.h"
 #include "kernel/ga/i_ga.h"
 #include "kernel/ga/i_de.h"
 #include "kernel/ga/primitive.h"
 #include "kernel/ga/search.h"
-#include "kernel/src/search.h"
-#include "kernel/src/primitive/bool.h"
-#include "kernel/src/primitive/int.h"
-#include "kernel/src/primitive/real.h"
-#include "kernel/src/primitive/string.h"
-#include "kernel/src/variable.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/src/search.h"
+#include "kernel/gp/src/primitive/bool.h"
+#include "kernel/gp/src/primitive/int.h"
+#include "kernel/gp/src/primitive/real.h"
+#include "kernel/gp/src/primitive/string.h"
+#include "kernel/gp/src/variable.h"
+#include "kernel/gp/team.h"
 #include "utility/csv_parser.h"
 
 #endif  // include guard

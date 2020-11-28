@@ -16,9 +16,9 @@
 #include <map>
 
 #include "kernel/distribution.h"
-#include "kernel/symbol.h"
 #include "kernel/ga/i_de.h"
 #include "kernel/ga/i_ga.h"
+#include "kernel/gp/symbol.h"
 
 namespace vita
 {

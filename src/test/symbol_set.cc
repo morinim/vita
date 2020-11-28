@@ -14,9 +14,9 @@
 #include <iostream>
 #include <map>
 
-#include "kernel/i_mep.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/src/primitive/factory.h"
 #include "kernel/random.h"
-#include "kernel/src/primitive/factory.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

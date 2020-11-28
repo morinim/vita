@@ -14,7 +14,7 @@
 #include <iostream>
 
 #include "kernel/evolution.h"
-#include "kernel/i_mep.h"
+#include "kernel/gp/mep/i_mep.h"
 
 #include "test/fixture2.h"
 

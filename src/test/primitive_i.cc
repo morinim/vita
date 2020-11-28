@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/i_mep.h"
+#include "kernel/gp/mep/i_mep.h"
 #include "kernel/random.h"
 
 #include "test/fixture4.h"

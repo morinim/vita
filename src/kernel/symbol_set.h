@@ -15,9 +15,9 @@
 
 #include <string>
 
-#include "kernel/function.h"
+#include "kernel/gp/function.h"
+#include "kernel/gp/terminal.h"
 #include "kernel/range.h"
-#include "kernel/terminal.h"
 
 namespace vita
 {

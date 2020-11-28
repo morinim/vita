@@ -12,10 +12,10 @@
 
 #include <cstdlib>
 
-#include "kernel/i_mep.h"
-#include "kernel/lambda_f.h"
-#include "kernel/team.h"
-#include "kernel/src/problem.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/src/lambda_f.h"
+#include "kernel/gp/src/problem.h"
+#include "kernel/gp/team.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

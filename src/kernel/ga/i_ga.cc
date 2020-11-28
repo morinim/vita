@@ -13,6 +13,7 @@
 #include "kernel/ga/i_ga.h"
 #include "kernel/cache_hash.h"
 #include "kernel/log.h"
+#include "kernel/random.h"
 
 namespace vita
 {

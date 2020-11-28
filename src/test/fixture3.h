@@ -13,10 +13,10 @@
 #if !defined(FIXTURE3_H)
 #define      FIXTURE3_H
 
+#include "kernel/gp/interpreter.h"
+#include "kernel/gp/terminal.h"
+#include "kernel/gp/src/primitive/factory.h"
 #include "kernel/problem.h"
-#include "kernel/interpreter.h"
-#include "kernel/terminal.h"
-#include "kernel/src/primitive/factory.h"
 
 struct fixture3
 {

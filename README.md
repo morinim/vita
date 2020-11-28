@@ -96,8 +96,6 @@ git clone https://github.com/morinim/vita.git
 This is a sketch of the resulting directory structure:
 ```
 vita/
-  build/ ..................Built executables
-  contributors/
   doc/
   misc/
   src/

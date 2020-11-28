@@ -10,7 +10,7 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "kernel/src/constant.h"
+#include "kernel/gp/src/constant.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

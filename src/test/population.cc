@@ -14,7 +14,7 @@
 #include <map>
 #include <sstream>
 
-#include "kernel/i_mep.h"
+#include "kernel/gp/mep/i_mep.h"
 #include "kernel/population.h"
 
 #include "test/fixture1.h"

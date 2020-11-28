@@ -13,7 +13,7 @@
 #include <sstream>
 
 #include "kernel/random.h"
-#include "kernel/src/dataframe.h"
+#include "kernel/gp/src/dataframe.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

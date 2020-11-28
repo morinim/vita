@@ -13,9 +13,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "kernel/i_mep.h"
 #include "kernel/random.h"
-#include "kernel/src/primitive/real.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/src/primitive/real.h"
 
 #include "test/fixture3.h"
 

@@ -16,9 +16,9 @@
 #include <string>
 
 #include "kernel/random.h"
-#include "kernel/terminal.h"
+#include "kernel/gp/terminal.h"
 
-namespace vita
+namespace vita::ga
 {
 /// We assume that errors during floating-point operations aren't terminal
 /// error. So we dont't try to prevent domain errors (e.g. square root of a
@@ -30,8 +30,6 @@ namespace vita
 /// floating-point numbers, as well as the function being applied).
 /// Instead we detect them and take alternative action (usually returning
 /// an empty value).
-namespace ga
-{
 using base_t = terminal::param_t;
 
 namespace detail
@@ -73,8 +71,7 @@ public:
   { return std::to_string(static_cast<T>(v)); }
 
 private:
-  /// \warning
-  /// i_ga / i_de directly access the genome vector.
+  /// \warning i_ga / i_de directly access the genome vector.
   value_t eval(core_interpreter *) const override { return {}; }
 
   const range_t<T> range_;
@@ -117,7 +114,6 @@ public:
   }
 };
 
-}  // namespace ga
-}  // namespace vita
+}  // namespace vita::ga
 
 #endif  // include guard

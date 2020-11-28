@@ -11,8 +11,8 @@
  */
 
 #include "kernel/symbol_set.h"
-#include "kernel/adf.h"
-#include "kernel/argument.h"
+#include "kernel/gp/adf.h"
+#include "kernel/gp/argument.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
 

@@ -13,7 +13,6 @@
 #if !defined(VITA_GA_I_GA_H)
 #define      VITA_GA_I_GA_H
 
-#include "kernel/gene.h"
 #include "kernel/individual.h"
 
 namespace vita

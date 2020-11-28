@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-#include "kernel/src/constant.h"
+#include "kernel/gp/src/constant.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"

@@ -17,7 +17,7 @@
 
 #include "kernel/cache.h"
 #include "kernel/environment.h"
-#include "kernel/locus.h"
+#include "kernel/gp/locus.h"
 #include "kernel/problem.h"
 #include "kernel/vitafwd.h"
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,7 @@
 #define      FIXTURE2_H
 
 #include "kernel/problem.h"
-#include "kernel/src/primitive/factory.h"
+#include "kernel/gp/src/primitive/factory.h"
 
 struct fixture2
 {

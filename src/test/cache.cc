@@ -17,10 +17,10 @@
 #include "third_party/doctest/doctest.h"
 
 #include "kernel/cache.h"
-#include "kernel/i_mep.h"
-#include "kernel/interpreter.h"
+#include "kernel/gp/interpreter.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/src/primitive/factory.h"
 #include "kernel/problem.h"
-#include "kernel/src/primitive/factory.h"
 
 #include "test/fixture2.h"
 

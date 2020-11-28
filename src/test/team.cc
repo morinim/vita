@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/i_mep.h"
-#include "kernel/team.h"
+#include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/team.h"
 
 #include "test/fixture1.h"
 
