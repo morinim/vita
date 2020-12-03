@@ -18,7 +18,7 @@
 #include <string>
 
 #include "kernel/gp/function.h"
-#include "kernel/gp/interpreter.h"
+#include "kernel/gp/mep/interpreter.h"
 #include "kernel/gp/terminal.h"
 #include "kernel/random.h"
 

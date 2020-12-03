@@ -25,8 +25,6 @@
 TEST_SUITE("PRIMITIVE_D")
 {
 
-using i_interp = vita::interpreter<vita::i_mep>;
-
 TEST_CASE_FIXTURE(fixture3, "f_abs")
 {
   using namespace vita;
@@ -36,7 +34,7 @@ TEST_CASE_FIXTURE(fixture3, "f_abs")
                    {{f_abs,  {1}}},  // [0] FABS [1]
                    {{neg_x, null}}   // [1] -X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
 
   // ABS(X) == X
@@ -44,7 +42,7 @@ TEST_CASE_FIXTURE(fixture3, "f_abs")
                    {{f_abs,  {1}}},  // [0] FABS [1]
                    {{    x, null}}   // [1] X
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
 }
 
@@ -58,7 +56,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                    {{   c0,   null}},  // [1] 0.0
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
 
   // ADD(X,Y) == X+Y
@@ -67,7 +65,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                    {{    x,   null}},  // [1] X
                    {{    y,   null}}   // [2] Y
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   const auto res1(real::base(ret));
   CHECK(doctest::Approx(res1)
         == real::base(y->eval(nullptr)) + real::base(x->eval(nullptr)));
@@ -78,7 +76,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                    {{    x,   null}},  // [1] X
                    {{neg_x,   null}}   // [2] -X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // ADD(X,Y) == ADD(Y,X)
@@ -87,7 +85,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                    {{    x,   null}},  // [1] X
                    {{    y,   null}}   // [2] Y
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   CHECK(real::base(ret) == doctest::Approx(res1));
 }
 
@@ -103,7 +101,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
                    {{   x,   null}},  // [1] X
                    {{   x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   const auto res1(real::base(ret));
   CHECK(doctest::Approx(res1) == rx / std::sqrt(1.0 + std::pow(rx, 2.0)));
 
@@ -116,7 +114,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000000.0, 1000000.0);
-    ret = i_interp(&i2).run();
+    ret = run(i2);
 
     const auto rz(static_cast<Z *>(z)->val);
     CHECK(doctest::Approx(real::base(ret)) == rz / std::sqrt(2.0));
@@ -128,7 +126,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
                    {{neg_x,   null}},  // [1] -X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(-res1));
 
   // AQ(X,0) == X
@@ -137,7 +135,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
                    {{   x,   null}},  // [1] X
                    {{  c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   CHECK(real::base(ret) == doctest::Approx(rx));
 
   // AQ(0,X) == 0
@@ -146,7 +144,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
                    {{   x,   null}},  // [1] X
                    {{  c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i5).run();
+  ret = run(i5);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 }
 
@@ -162,7 +160,7 @@ TEST_CASE_FIXTURE(fixture3, "f_cos")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
-    ret = i_interp(&i1).run();
+    ret = run(i1);
     CHECK(doctest::Approx(real::base(ret))
           == std::cos(static_cast<Z *>(z)->val));
   }
@@ -172,7 +170,7 @@ TEST_CASE_FIXTURE(fixture3, "f_cos")
                    {{f_cos,  {1}}},  // [0] FCOS [1]
                    {{   c0, null}}   // [1] 0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 }
 
@@ -186,7 +184,7 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // DIV(Z,1) == Z
@@ -198,7 +196,7 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000000.0, 1000000.0);
-    ret = i_interp(&i2).run();
+    ret = run(i2);
     CHECK(doctest::Approx(real::base(ret)) == static_cast<Z *>(z)->val);
   }
 
@@ -208,7 +206,7 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
                    {{neg_x,   null}},  // [1] -X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(-1.0));
 
   // DIV(X,0) == NaN
@@ -217,7 +215,7 @@ TEST_CASE_FIXTURE(fixture3, "f_div")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   CHECK(!has_value(ret));
 }
 
@@ -231,7 +229,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{     x,   null}},  // [1] X
                    {{     x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // IDIV(X,1) == X
@@ -240,7 +238,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{     x,   null}},  // [1] X
                    {{    c1,   null}}   // [2] 1.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
 
   // IDIV(-X,X) == -1
@@ -249,7 +247,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{ neg_x,   null}},  // [1] -X
                    {{     x,   null}}   // [2] X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(-1.0));
 
   // IDIV(3,2) == 1
@@ -258,7 +256,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{    c3,   null}},  // [1] 3.0
                    {{    c2,   null}}   // [2] 2.0
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // IDIV(X,0) == NaN
@@ -267,13 +265,14 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{     x,   null}},  // [1] X
                    {{    c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i5).run();
+  ret = run(i5);
   CHECK(!has_value(ret));
 }
 
 TEST_CASE_FIXTURE(fixture3, "f_ife")
 {
   using namespace vita;
+  using i_interp = vita::interpreter<vita::i_mep>;
 
   // IFE(0,0,1,0) == 1
   const i_mep i1({
@@ -281,7 +280,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ife")
                    {{   c0,         null}},  // [1] 0.0
                    {{   c1,         null}}   // [2] 1.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // IFE(0,1,1,0) == 0
@@ -290,7 +289,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ife")
                    {{   c0,         null}},  // [1] 0.0
                    {{   c1,         null}}   // [2] 1.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // IFE(Z,X,1,0) == 0
@@ -302,7 +301,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ife")
                    {{   c0,         null}}   // [4] 0.0
                  });
   static_cast<Z *>(z)->val = 0;
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // IFE SAME TERM COMPARISON PENALTY");
@@ -331,7 +330,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ifz")
                    {{   c0,      null}},  // [1] 0.0
                    {{   c1,      null}}   // [2] 1.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // IFE(1,1,0) == 0
@@ -340,7 +339,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ifz")
                    {{   c0,      null}},  // [1] 0.0
                    {{   c1,      null}}   // [2] 1.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // IFZ(Z,Z,Z-Z) == 0
@@ -352,7 +351,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ifz")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000000.0, 1000000.0);
-    ret = i_interp(&i3).run();
+    ret = run(i3);
 
     CHECK(real::base(ret) == doctest::Approx(0.0));
   }
@@ -368,7 +367,7 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
                    {{   c0,   null}},  // [1] 0.0
                    {{   c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // MAX(0,1) == 1
@@ -377,7 +376,7 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
                    {{   c0,   null}},  // [1] 0.0
                    {{   c1,   null}}   // [2] 1.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // MAX(X,Y) == (X>Y ? X : Y)
@@ -386,7 +385,7 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
                    {{    x,   null}},  // [1] X
                    {{    y,   null}}   // [2] Y
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   const auto res1(real::base(ret));
   CHECK(doctest::Approx(res1)
         == std::max(real::base(x->eval(nullptr)),
@@ -398,7 +397,7 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
                    {{    x,   null}},  // [1] X
                    {{    y,   null}}   // [2] Y
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   CHECK(real::base(ret) == doctest::Approx(res1));
 }
 
@@ -412,7 +411,7 @@ TEST_CASE_FIXTURE(fixture3, "f_mul")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // MUL(X,1) == X
@@ -421,7 +420,7 @@ TEST_CASE_FIXTURE(fixture3, "f_mul")
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
 
   // MUL(X,2) == ADD(X,X)
@@ -432,7 +431,7 @@ TEST_CASE_FIXTURE(fixture3, "f_mul")
                    {{    x,   null}},  // [3] X
                    {{   c2,   null}}   // [4] 2.0
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 }
 
@@ -448,7 +447,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sin")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
-    ret = i_interp(&i1).run();
+    ret = run(i1);
     CHECK(doctest::Approx(real::base(ret))
           == std::sin(static_cast<Z *>(z)->val));
   }
@@ -458,7 +457,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sin")
                    {{f_sin,  {1}}},  // [0] FCOS [1]
                    {{   c0, null}}   // [1] 0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 }
 
@@ -471,7 +470,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sqrt")
                    {{f_sqrt,  {1}}},  // [0] SQRT [1]
                    {{    c1, null}}   // [1] 1.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(1.0));
 
   // SQRT(-X) == NaN
@@ -479,7 +478,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sqrt")
                    {{f_sqrt,  {1}}},  // [0] FSQRT [1]
                    {{neg_x,  null}}   // [1] -X
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(!has_value(ret));
 
   // SQRT(Z) == std::sqrt(Z)
@@ -490,7 +489,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sqrt")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.0, 1000000.0);
-    ret = i_interp(&i3).run();
+    ret = run(i3);
     CHECK(doctest::Approx(real::base(ret))
           == std::sqrt(static_cast<Z *>(z)->val));
   }
@@ -506,7 +505,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // SUB(X,0) == X
@@ -515,7 +514,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
 
   // SUB(Z,X) == Z-X
@@ -527,7 +526,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
   for (unsigned j(0); j < 1000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(-1000.0, 1000.0);
-    ret = i_interp(&i3).run();
+    ret = run(i3);
 
     const auto v1(real::base(ret));
     const auto v2(static_cast<Z *>(z)->val - real::base(x->eval(nullptr)));
@@ -544,7 +543,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ln")
                    {{f_ln,  {1}}},  // [0] FLN [1]
                    {{  c1, null}}   // [1] 1.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(0.0));
 
   // LN(0) == NaN
@@ -552,7 +551,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ln")
                    {{f_ln,  {1}}},  // [0] FLN [1]
                    {{  c0, null}}   // [1] 0.0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   CHECK(!has_value(ret));
 
   // LN(Z) == std::log(Z)
@@ -563,7 +562,7 @@ TEST_CASE_FIXTURE(fixture3, "f_ln")
   for (unsigned j(0); j < 100; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between(0.1, 1000000.0);
-    ret = i_interp(&i3).run();
+    ret = run(i3);
     CHECK(doctest::Approx(real::base(ret))
           == std::log(static_cast<Z *>(z)->val));
   }
@@ -578,7 +577,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sigmoid")
                    {{f_sigmoid,  {1}}},  // [0] FSIGMOID [1]
                    {{       c0, null}}   // [1] 0.0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   CHECK(real::base(ret) == doctest::Approx(0.5));
 
   // SIGMOID(X) == 1.0 / (1.0 + std::exp(-X))
@@ -590,7 +589,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sigmoid")
   {
     const auto rx(vita::random::between(-100.0, 100.0));
     static_cast<Z *>(z)->val = rx;
-    ret = i_interp(&i2).run();
+    ret = run(i2);
 
     if (has_value(ret))
     {

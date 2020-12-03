@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/mep/interpreter.h"
 #include "kernel/random.h"
 
 #include "test/fixture4.h"
@@ -26,14 +27,13 @@ TEST_SUITE("PRIMITIVE_I")
 TEST_CASE_FIXTURE(fixture4, "i_add")
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::i_mep>;
 
   const i_mep i1({
                   {{i_add, {1, 2}}},  // [0] ADD 1,2
                   {{   c0,   null}},  // [1] 0
                   {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   INFO(i1);
   CHECK(ret == x->eval(nullptr));
 
@@ -43,7 +43,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                    {{    y,   null}},  // [1] Y
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   INFO(i2);
   CHECK(std::get<D_INT>(ret)
         == std::get<D_INT>(y->eval(nullptr))
@@ -55,7 +55,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                    {{    x,   null}},  // [1] X
                    {{neg_x,   null}}   // [2] -X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   INFO(i3);
   CHECK(std::get<D_INT>(ret) == 0);
 
@@ -67,7 +67,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                    {{    x,   null}},  // [3] X
                    {{    y,   null}}  // [4] Y
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   INFO(i4);
   CHECK(std::get<D_INT>(ret) == 0);
 }
@@ -75,7 +75,6 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
 TEST_CASE_FIXTURE(fixture4, "i_div")
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::i_mep>;
 
   // DIV(X,X) == 1
   const i_mep i1({
@@ -83,7 +82,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   INFO(i1);
   CHECK(std::get<D_INT>(ret) == 1);
 
@@ -93,7 +92,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   INFO(i2);
   CHECK(ret == x->eval(nullptr));
 
@@ -103,7 +102,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                    {{neg_x,   null}},  // [1] -X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   INFO(i3);
   CHECK(std::get<D_INT>(ret) == -1);
 
@@ -113,7 +112,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
-  ret = i_interp(&i4).run();
+  ret = run(i4);
   INFO(i4);
   CHECK(ret == x->eval(nullptr));
 }
@@ -129,7 +128,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   INFO(i1);
   CHECK(std::get<D_INT>(ret) == 1);
 
@@ -139,7 +138,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
                    {{   c0,         null}},  // [1] 0
                    {{   c1,         null}}   // [2] 1
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   INFO(i2);
   CHECK(std::get<D_INT>(ret) == 0);
 
@@ -152,7 +151,7 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
                    {{   c0,         null}}   // [1] 0
                  });
   static_cast<Z *>(z)->val = 0;
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   INFO(i3);
   CHECK(std::get<D_INT>(ret) == 0);
 
@@ -175,7 +174,6 @@ TEST_CASE_FIXTURE(fixture4, "i_ife")
 TEST_CASE_FIXTURE(fixture4, "i_mul")
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::i_mep>;
 
   // MUL(X,0) == 0
   const i_mep i1({
@@ -183,7 +181,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   INFO(i1);
   CHECK(std::get<D_INT>(ret) == 0);
 
@@ -193,7 +191,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                    {{    x,   null}},  // [1] X
                    {{   c1,   null}}   // [2] 1
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   INFO(i2);
   CHECK(ret == x->eval(nullptr));
 
@@ -205,7 +203,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                    {{    x,   null}},  // [3] X
                    {{   c2,   null}}   // [4] 2
                  });
-  ret = i_interp(&i3).run();
+  ret = run(i3);
   INFO(i3);
   CHECK(std::get<D_INT>(ret) == 0);
 }
@@ -213,7 +211,6 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
 TEST_CASE_FIXTURE(fixture4, "i_sub")
 {
   using namespace vita;
-  using i_interp = vita::interpreter<vita::i_mep>;
 
   // SUB(X,-X) == 0
   const i_mep i1({
@@ -221,7 +218,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
                    {{    x,   null}},  // [1] X
                    {{    x,   null}}   // [2] X
                  });
-  ret = i_interp(&i1).run();
+  ret = run(i1);
   INFO(i1);
   CHECK(std::get<D_INT>(ret) == 0);
 
@@ -231,7 +228,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
                    {{    x,   null}},  // [1] X
                    {{   c0,   null}}   // [2] 0
                  });
-  ret = i_interp(&i2).run();
+  ret = run(i2);
   INFO(i2);
   CHECK(ret == x->eval(nullptr));
 
@@ -244,7 +241,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
   for (unsigned j(0); j < 1000; ++j)
   {
     static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
-    ret = i_interp(&i3).run();
+    ret = run(i3);
     INFO(i3);
     CHECK(std::get<D_INT>(ret)
           == static_cast<Z *>(z)->val - std::get<D_INT>(x->eval(nullptr)));

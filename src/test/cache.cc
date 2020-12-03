@@ -17,8 +17,8 @@
 #include "third_party/doctest/doctest.h"
 
 #include "kernel/cache.h"
-#include "kernel/gp/interpreter.h"
 #include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/mep/interpreter.h"
 #include "kernel/gp/src/primitive/factory.h"
 #include "kernel/problem.h"
 
@@ -101,7 +101,6 @@ TEST_CASE_FIXTURE(fixture2, "Insert/Find cycle")
 TEST_CASE_FIXTURE(fixture2, "Collision detection")
 {
   using namespace vita;
-  using i_interp = interpreter<i_mep>;
   cache cache(14);
   prob.env.mep.code_length = 64;
 
@@ -111,7 +110,7 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
   for (unsigned i(0); i < n; ++i)
   {
     i_mep i1(prob);
-    const auto val(i_interp(&i1).run());
+    const auto val(run(i1));
     fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
     cache.insert(i1.signature(), f);
@@ -123,7 +122,7 @@ TEST_CASE_FIXTURE(fixture2, "Collision detection")
     const fitness_t f(cache.find(vi[i].signature()));
     if (f.size())
     {
-      const auto val(i_interp(&vi[i]).run());
+      const auto val(run(vi[i]));
       fitness_t f1{has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
       CHECK(f == f1);
@@ -135,7 +134,6 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
 {
   using namespace vita;
 
-  using i_interp = interpreter<i_mep>;
   vita::cache cache1(14), cache2(14);
   prob.env.mep.code_length = 64;
 
@@ -146,7 +144,7 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
   {
     i_mep i1(prob);
-    const auto val(i_interp(&i1).run());
+    const auto val(run(i1));
     fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
     cache1.insert(i1.signature(), f);
@@ -167,7 +165,7 @@ TEST_CASE_FIXTURE(fixture2, "Serialization")
   for (unsigned i(0); i < n; ++i)
     if (present[i])
     {
-      const auto val(i_interp(&vi[i]).run());
+      const auto val(run(vi[i]));
       fitness_t f{vita::has_value(val) ? std::get<D_DOUBLE>(val) : 0.0};
 
       fitness_t f1(cache2.find(vi[i].signature()));

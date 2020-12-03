@@ -83,9 +83,7 @@ private:
   interpreter *context_;
 };
 
-template<class T> value_t run(const T &);
-
-#include "kernel/gp/interpreter.tcc"
+#include "kernel/gp/mep/interpreter.tcc"
 
 }  // namespace vita
 

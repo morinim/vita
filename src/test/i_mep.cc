@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <sstream>
 
-#include "kernel/gp/interpreter.h"
 #include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/mep/interpreter.h"
 
 #include "fixture1.h"
 #include "fixture3.h"
@@ -277,8 +277,8 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
     i1.list(std::cout, false);
     */
 
-    const auto v(interpreter<i_mep>(&i).run());
-    const auto v1(interpreter<i_mep>(&i1).run());
+    const auto v(run(i));
+    const auto v1(run(i1));
 
     CHECK(has_value(v) == has_value(v1));
 

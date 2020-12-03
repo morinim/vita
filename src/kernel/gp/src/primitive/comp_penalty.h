@@ -14,7 +14,7 @@
 #define      VITA_COMP_PENALTY_H
 
 #include "kernel/gp/mep/i_mep.h"
-#include "kernel/gp/interpreter.h"
+#include "kernel/gp/mep/interpreter.h"
 
 namespace vita
 {

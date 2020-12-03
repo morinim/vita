@@ -187,15 +187,4 @@ bool interpreter<T>::is_valid_nvi() const
   return ip_.index < prg_->size();
 }
 
-///
-/// A handy short-cut for one-time execution of an individual.
-///
-/// \param[in] ind individual/program to be run
-/// \return        possible output value of the individual
-///
-template<class T> value_t run(const T &ind)
-{
-  return interpreter<T>(&ind).run();
-}
-
 #endif  // include guard

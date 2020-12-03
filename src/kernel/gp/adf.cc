@@ -11,7 +11,7 @@
  */
 
 #include "kernel/gp/adf.h"
-#include "kernel/gp/interpreter.h"
+#include "kernel/gp/mep/interpreter.h"
 
 namespace vita
 {

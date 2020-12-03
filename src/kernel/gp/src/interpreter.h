@@ -13,7 +13,7 @@
 #if !defined(VITA_SRC_INTERPRETER_H)
 #define      VITA_SRC_INTERPRETER_H
 
-#include "kernel/gp/interpreter.h"
+#include "kernel/gp/mep/interpreter.h"
 
 namespace vita
 {

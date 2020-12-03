@@ -12,8 +12,8 @@
 
 #include "kernel/gp/argument.h"
 #include "kernel/gp/gene.h"
-#include "kernel/gp/interpreter.h"
 #include "kernel/gp/mep/i_mep.h"
+#include "kernel/gp/mep/interpreter.h"
 
 namespace vita
 {
