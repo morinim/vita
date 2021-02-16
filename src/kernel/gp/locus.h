@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -20,8 +20,8 @@
 
 namespace vita
 {
-/// Index in the genome. Locus is uniquely identified by an index and a
-/// category.
+/// Index in the genome.
+/// \note A locus is uniquely identified by an index **and** a category.
 using index_t = std::size_t;
 
 static_assert(sizeof(index_t) <= sizeof(std::size_t),
@@ -42,9 +42,9 @@ struct locus
 };
 
 ///
-/// \param[in] l1 first locus.
-/// \param[in] l2 second locus.
-/// \return `true` if `l1` is equal to `l2`.
+/// \param[in] l1 first locus
+/// \param[in] l2 second locus
+/// \return       `true` if `l1` is equal to `l2`
 ///
 inline bool operator==(const locus &l1, const locus &l2)
 {
@@ -52,9 +52,9 @@ inline bool operator==(const locus &l1, const locus &l2)
 }
 
 ///
-/// \param[in] l1 first locus.
-/// \param[in] l2 second locus.
-/// \return `true` if `l1` is not equal to `l2`.
+/// \param[in] l1 first locus
+/// \param[in] l2 second locus
+/// \return       `true` if `l1` is not equal to `l2`
 ///
 inline bool operator!=(const locus &l1, const locus &l2)
 {
@@ -62,10 +62,10 @@ inline bool operator!=(const locus &l1, const locus &l2)
 }
 
 ///
-/// \param[in] l1 first locus.
-/// \param[in] l2 second locus.
-/// \return `true` if `l1` precedes `l2` in lexicographic order
-///         (http://en.wikipedia.org/wiki/Lexicographical_order).
+/// \param[in] l1 first locus
+/// \param[in] l2 second locus
+/// \return       `true` if `l1` precedes `l2` in lexicographic order
+///               (http://en.wikipedia.org/wiki/Lexicographical_order)
 ///
 /// This operator is required by the STL `std::map` container.
 ///
@@ -76,10 +76,10 @@ inline bool operator<(const locus &l1, const locus &l2)
 }
 
 ///
-/// \param[in] l base locus.
-/// \param[in] i displacement.
-/// \return a new locus obtained from `l` incrementing index component by
-///         `i` (and not changing the category component).
+/// \param[in] l base locus
+/// \param[in] i displacement
+/// \return      a new locus obtained from `l` incrementing index component by
+///              `i` (and not changing the category component)
 ///
 inline locus operator+(const locus &l, index_t i)
 {
@@ -87,9 +87,9 @@ inline locus operator+(const locus &l, index_t i)
 }
 
 ///
-/// \param[out] s output stream.
-/// \param[in] l locus to print.
-/// \return output stream including `l`.
+/// \param[out] s output stream
+/// \param[in]  l locus to print
+/// \return       output stream including `l`
 ///
 inline std::ostream &operator<<(std::ostream &s, const locus &l)
 {
@@ -97,4 +97,4 @@ inline std::ostream &operator<<(std::ostream &s, const locus &l)
 }
 }  // namespace vita
 
-#endif  // Include guard
+#endif  // include guard

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -104,7 +104,7 @@ value_t interpreter<T>::fetch_arg(unsigned i)
       return ret;
     });
 
-  const locus l(g.arg_locus(i));
+  const locus l(g.locus_of_argument(i));
   auto &elem(cache_(l));
 
   if (!elem.valid)
@@ -113,7 +113,7 @@ value_t interpreter<T>::fetch_arg(unsigned i)
     elem.valid = true;
   }
 #if !defined(NDEBUG)
-  else // Cache not empty... checking if the cached value is right.
+  else  // cache not empty... checking if the cached value is right
   {
     assert(get_val(l) == elem.value);
   }

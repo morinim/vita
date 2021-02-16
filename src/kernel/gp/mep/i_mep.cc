@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -381,12 +381,8 @@ void i_mep::pack(const locus &l, std::vector<std::byte> *p) const
 
   auto arity(g.sym->arity());
   if (arity)
-  {
-    decltype(arity) i(0);
-    do
-      pack(g.arg_locus(i), p);
-    while (++i < arity);
-  }
+    for (const auto &al : g.arguments())
+      pack(al, p);
   else
   {
     if (terminal::cast(g.sym)->parametric())
@@ -662,7 +658,7 @@ i_mep i_mep::cse() const
 
   // std::map needs a compare function and there isn't a predefined less
   // operator for gene class.
-  struct cmp_gene
+  struct gene_cmp
   {
     bool operator()(const gene &a, const gene &b) const
     {
@@ -684,27 +680,31 @@ i_mep i_mep::cse() const
     }
   };
 
-  std::map<gene, locus, cmp_gene> new_locus;
+  std::map<gene, locus, gene_cmp> new_locus;
 
   for (index_t i(size()); i > 0; --i)
     for (category_t c(0); c < genome_.cols(); ++c)
     {
-      gene &g(ret.genome_(i - 1, c));
+      const locus current_locus({i - 1, c});
+      gene &g(ret.genome_(current_locus));
 
-      const auto arity(g.sym->arity());
-      for (auto p(decltype(arity){0}); p < arity; ++p)
-      {
-        const auto where(new_locus.find(ret[g.arg_locus(p)]));
-        if (where != new_locus.end())
+      std::transform(
+        g.args.begin(), g.args.end(),
+        g.args.begin(),
+        [&, i=0u](auto arg) mutable -> gene::packed_index_t
         {
+          const gene gene_arg(ret[g.locus_of_argument(i++)]);
+          const auto where(new_locus.find(gene_arg));
+
+          if (where == new_locus.end())
+            return arg;
+
           assert(where->second.index <=
                  std::numeric_limits<gene::packed_index_t>::max());
+          return where->second.index;
+        });
 
-          g.args[p] = static_cast<gene::packed_index_t>(where->second.index);
-        }
-      }
-
-      new_locus.insert({g, {i - 1, c}});
+      new_locus.try_emplace(g, current_locus);
     }
 
   return ret;
@@ -844,12 +844,8 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
       {
         to.genome_(l) = from[l];
 
-        if (!from[l].sym->terminal())
-        {
-          const auto &f(*function::cast(from[l].sym));
-          for (unsigned i(0); i < f.arity(); ++i)
-            lambda(from[l].arg_locus(i), lambda);
-        }
+        for (const auto &al : from[l].arguments())
+          lambda(al, lambda);
       };
 
       const auto delta(random::sup(from.active_symbols()));
@@ -881,7 +877,8 @@ std::ostream &language(std::ostream &s, symbol::format f, const i_mep &mep)
                 for (decltype(arity) i(0); i < arity; ++i)
                 {
                   const std::string from("%%" + std::to_string(i + 1) + "%%");
-                  ret = replace_all(ret, from, language_(mep[g.arg_locus(i)]));
+                  ret = replace_all(ret, from,
+                                    language_(mep[g.locus_of_argument(i)]));
                 }
 
                 return ret;
@@ -916,14 +913,11 @@ std::ostream &dump(const i_mep &mep, std::ostream &s)
 
       s  << "] " << g;
 
-      const auto arity(g.sym->arity());
-      for (auto j(decltype(arity){0}); j < arity; ++j)
+      for (const auto &l : g.arguments())
       {
-        const auto arg_j(g.arg_locus(j));
-
-        s << " [" << std::setw(w1) << arg_j.index;
+        s << " [" << std::setw(w1) << l.index;
         if (categories > 1)
-          s << ',' << std::setw(w2) << arg_j.category;
+          s << ',' << std::setw(w2) << l.category;
         s << ']';
       }
 
@@ -961,9 +955,8 @@ std::ostream &in_line(const i_mep &mep, std::ostream &s)
                  s << ' ';
                s << g;
 
-               const auto arity(g.sym->arity());
-               for (std::size_t i(0); i < arity; ++i)
-                 in_line_(g.arg_locus(i));
+               for (const auto &al : g.arguments())
+                 in_line_(al);
              };
 
   in_line_(mep.best());
@@ -994,20 +987,17 @@ std::ostream &list(const i_mep &mep, std::ostream &s)
 
     s << "] " << *i;
 
-    const auto arity(i->sym->arity());
-    for (unsigned j(0); j < arity; ++j)
+    for (const auto &l: i->arguments())
     {
       s << ' ';
 
-      const auto arg_j(i->arg_locus(j));
-
-      if (short_form && mep[arg_j].sym->terminal())
-        s << mep[arg_j];
+      if (short_form && mep[l].sym->terminal())
+        s << mep[l];
       else
       {
-        s << '[' << std::setw(w1) << arg_j.index;
+        s << '[' << std::setw(w1) << l.index;
         if (categories > 1)
-          s << ',' << std::setw(w2) << arg_j.category;
+          s << ',' << std::setw(w2) << l.category;
         s << ']';
       }
     }
@@ -1031,9 +1021,8 @@ std::ostream &tree(const i_mep &mep, std::ostream &s)
               indent += 2;
             }
 
-            const auto arity(child.sym->arity());
-            for (auto i(decltype(arity){0}); i < arity; ++i)
-              tree_(child, mep[child.arg_locus(i)], indent);
+            for (const auto &l : child.arguments())
+              tree_(child, mep[l], indent);
           };
 
   tree_(mep[mep.best()], mep[mep.best()], 0);

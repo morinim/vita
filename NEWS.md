@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING CHANGE**. `gene::arg_locus` has been renamed to `locus_of_argument`. This should only affect secondary the end user since the function is mainly used in the meanderings of the `i_mep` class.
+
 ## [2.1.0] - 2020-11-23
 
 ### Added

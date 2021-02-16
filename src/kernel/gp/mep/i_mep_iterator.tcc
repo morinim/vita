@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2016 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,8 +14,8 @@
 #  error "Don't include this file directly, include the specific .h instead"
 #endif
 
-#if !defined(VITA_INDIVIDUAL_MEP_ITERATOR_TCC)
-#define      VITA_INDIVIDUAL_MEP_ITERATOR_TCC
+#if !defined(VITA_I_MEP_ITERATOR_TCC)
+#define      VITA_I_MEP_ITERATOR_TCC
 
 ///
 /// Iterator to scan the active genes of an individual.
@@ -53,9 +53,8 @@ public:
     {
       const gene &g(operator*());
 
-      const auto arity(g.sym->arity());
-      for (auto j(decltype(arity){0}); j < arity; ++j)
-        loci_.insert(g.arg_locus(j));
+      for (const auto &l : g.arguments())
+        loci_.insert(l);
 
       loci_.erase(loci_.begin());
     }

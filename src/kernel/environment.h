@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,11 +75,11 @@ public:
     /// Code length have to be chosen before population is created and cannot be
     /// changed afterwards.
     ///
-    /// \note A length of 0 means undefined (auto-tune).
+    /// \note A length of `0` means undefined (auto-tune).
     std::size_t code_length = 0;
 
-    /// The number of symbols in the patch section (a section of the genome that
-    /// contains terminals only).
+    /// The number of symbols in the patch section (the tail section of the
+    /// genome containing only terminals).
     ///
     /// \note A length of `0` means undefined (auto-tune).
     std::size_t patch_length = 0;

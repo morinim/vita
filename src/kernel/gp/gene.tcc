@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -67,7 +67,6 @@ basic_gene<K>::basic_gene(const std::pair<symbol *, std::vector<index_t>> &g)
                    [](index_t i)
                    {
                      Expects(i <= std::numeric_limits<packed_index_t>::max());
-
                      return static_cast<packed_index_t>(i);
                    });
   }
@@ -91,16 +90,14 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
 {
   Expects(from < sup);
 
-
   if (s.arity())
   {
     assert(sup <= std::numeric_limits<packed_index_t>::max());
 
     std::generate(args.begin(), args.end(),
-                  [from, sup]()
+                  [from, sup]() -> packed_index_t
                   {
-                    return static_cast<packed_index_t>(random::between(from,
-                                                                       sup));
+                    return random::between(from, sup);
                   });
   }
   else
@@ -108,11 +105,29 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
 }
 
 ///
+/// \return the list of loci associated with the arguments of the current
+///         gene.
+///
+template<unsigned K>
+small_vector<locus, K> basic_gene<K>::arguments() const
+{
+  small_vector<locus, K> ret(sym->arity());
+
+  std::generate(ret.begin(), ret.end(),
+                [this, i = 0u]() mutable
+                {
+                  return locus_of_argument(i++);
+                });
+
+  return ret;
+}
+
+///
 /// \param[in] i ordinal of an argument
 /// \return      the locus that `i`-th argument of the current symbol refers to
 ///
 template<unsigned K>
-locus basic_gene<K>::arg_locus(std::size_t i) const
+locus basic_gene<K>::locus_of_argument(std::size_t i) const
 {
   Expects(i < sym->arity());
 
