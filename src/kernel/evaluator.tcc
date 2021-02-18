@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -55,17 +55,6 @@ template<class T>
 bool evaluator<T>::save(std::ostream &) const
 {
   return true;
-}
-
-///
-/// \return some info about the status / efficiency of the evaluator
-///
-/// The default implementation is empty.
-///
-template<class T>
-std::string evaluator<T>::info() const
-{
-  return std::string();
 }
 
 ///

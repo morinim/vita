@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,9 +19,8 @@ namespace vita
 ///
 /// \param[in] bits `2^bits` is the number of elements of the table
 ///
-cache::cache(unsigned bits)
-  : k_mask((1ull << bits) - 1), table_(1ull << bits),
-    seal_(1), probes_(0), hits_(0)
+cache::cache(unsigned bits) : mutex_(), k_mask((1ull << bits) - 1),
+                              table_(1ull << bits), seal_(1)
 {
   Expects(bits);
   Ensures(is_valid());
@@ -43,7 +42,7 @@ inline std::size_t cache::index(const hash_t &h) const
 ///
 void cache::clear()
 {
-  probes_ = hits_ = 0;
+  std::unique_lock lock(mutex_);
 
   ++seal_;
 
@@ -61,6 +60,8 @@ void cache::clear()
 ///
 void cache::clear(const hash_t &h)
 {
+  std::unique_lock lock(mutex_);
+
   table_[index(h)].hash = hash_t();
 
   // An alternative to invalidate the slot:
@@ -77,16 +78,13 @@ void cache::clear(const hash_t &h)
 ///
 const fitness_t &cache::find(const hash_t &h) const
 {
-  ++probes_;
+  std::shared_lock lock(mutex_);
 
   const slot &s(table_[index(h)]);
   const bool ret(seal_ == s.seal && h == s.hash);
 
   if (ret)
-  {
-    ++hits_;
     return s.fitness;
-  }
 
   static const fitness_t empty{};
   return empty;
@@ -101,6 +99,8 @@ const fitness_t &cache::find(const hash_t &h) const
 ///
 void cache::insert(const hash_t &h, const fitness_t &fitness)
 {
+  std::unique_lock lock(mutex_);
+
   slot s;
   s.hash    =       h;
   s.fitness = fitness;
@@ -118,16 +118,10 @@ void cache::insert(const hash_t &h, const fitness_t &fitness)
 ///
 bool cache::load(std::istream &in)
 {
+  std::unique_lock lock(mutex_);
+
   decltype(seal_) t_seal;
   if (!(in >> t_seal))
-    return false;
-
-  decltype(probes_) t_probes;
-  if (!(in >> t_probes))
-    return false;
-
-  decltype(hits_) t_hits;
-  if (!(in >> t_hits))
     return false;
 
   std::size_t n;
@@ -147,9 +141,7 @@ bool cache::load(std::istream &in)
     table_[index(s.hash)] = s;
   }
 
-  seal_   = t_seal;
-  probes_ = t_probes;
-  hits_   = t_hits;
+  seal_ = t_seal;
 
   return true;
 }
@@ -160,7 +152,9 @@ bool cache::load(std::istream &in)
 ///
 bool cache::save(std::ostream &out) const
 {
-  out << seal_ << ' ' << probes_ << ' ' << hits_ << '\n';
+  std::shared_lock lock(mutex_);
+
+  out << seal_ << ' ' << '\n';
 
   std::size_t num(0);
   for (const auto &s : table_)
@@ -183,7 +177,7 @@ bool cache::save(std::ostream &out) const
 ///
 bool cache::is_valid() const
 {
-  return probes() >= hits();
+  return true;
 }
 
 }  // namespace vita

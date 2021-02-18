@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -424,8 +424,6 @@ void search<T, ES>::log_stats(const search_stats<T> &stats,
 
   auto *e_other(d->NewElement("other"));
   e_summary->InsertEndChild(e_other);
-  set_text(e_other,"training_evaluator", eva1_->info());
-  set_text(e_other,"validation_evaluator", eva2_->info());
 
   prob_.env.xml(d);
 }

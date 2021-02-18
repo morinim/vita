@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -64,7 +64,6 @@ public:
 
   // The following methods have a default implementation (usually empty).
   virtual fitness_t fast(const T &);
-  virtual std::string info() const;
   virtual std::unique_ptr<basic_lambda_f> lambdify(const T &) const;
 };
 

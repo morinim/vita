@@ -5,7 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- Support for concurrent access to the fitness cache (hash table). The current solution uses a global [(shared) lock](https://en.cppreference.com/w/cpp/thread/shared_lock).
+
+  This approach is simple and allows preliminary parallel search extensions; furthermore performance of single-thread code isn't affected. It lacks [granularity](https://en.wikipedia.org/wiki/Lock_%28computer_science%29#Granularity).
+
+  In future an array of mutexes could be used to minimize contention.
+
 ### Changed
+- **BREAKING CHANGE**. `hits` and `probes` statistical information were hardly used and have been removed. The removal implies a (minor) change in the saving format of the cache.
 - **BREAKING CHANGE**. `gene::arg_locus` has been renamed to `locus_of_argument`. This should only affect secondary the end user since the function is mainly used in the meanderings of the `i_mep` class.
 
 ## [2.1.0] - 2020-11-23

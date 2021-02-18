@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,6 +12,8 @@
 
 #if !defined(VITA_CACHE_H)
 #define      VITA_CACHE_H
+
+#include <shared_mutex>
 
 #include "kernel/cache_hash.h"
 #include "kernel/environment.h"
@@ -40,13 +42,6 @@ public:
 
   const fitness_t &find(const hash_t &) const;
 
-  /// \return number of searches in the hash table
-  /// \note Every call to the find method increment the counter.
-  std::uintmax_t probes() const { return probes_; }
-
-  /// \return number of successful searches in the hash table
-  std::uintmax_t hits() const { return hits_; }
-
   bool is_valid() const;
 
   // Serialization.
@@ -68,13 +63,11 @@ private:
     unsigned     seal;
   };
 
+  mutable std::shared_mutex mutex_;
+
   const std::uint64_t k_mask;
   std::vector<slot>   table_;
-
   decltype(slot::seal) seal_;
-
-  mutable std::uintmax_t probes_;
-  mutable std::uintmax_t   hits_;
 };
 
 /// \example example4.cc

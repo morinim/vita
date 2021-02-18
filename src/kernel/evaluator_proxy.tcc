@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -122,21 +122,6 @@ template<class T, class E>
 void evaluator_proxy<T, E>::clear()
 {
   cache_.clear();
-}
-
-///
-/// \return number of cache probes / hits
-///
-template<class T, class E>
-std::string evaluator_proxy<T, E>::info() const
-{
-  const auto hits(cache_.hits());
-  const auto probes(cache_.probes());
-
-  return
-    "hits " + std::to_string(hits) +
-    ", probes " + std::to_string(probes) +
-    (probes ? " (ratio " + std::to_string(hits * 100 / probes) + "%)" : "");
 }
 
 ///
