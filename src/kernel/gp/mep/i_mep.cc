@@ -143,7 +143,7 @@ unsigned i_mep::mutation(double pgm, const problem &prb)
   const auto i_size(size());
   const auto patch(i_size - prb.env.mep.patch_length);
 
-  for (auto i(begin()); i != end(); ++i)  // Here mutation affects only exons
+  for (auto i(begin()); i != end(); ++i)  // here mutation affects only exons
     if (random::boolean(pgm))
     {
       const auto ix(i.locus().index);
@@ -848,8 +848,7 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
           lambda(al, lambda);
       };
 
-      const auto delta(random::sup(from.active_symbols()));
-      crossover_(std::next(from.begin(), delta).locus(), crossover_);
+      crossover_(random_locus(from), crossover_);
     }
     break;
   }
@@ -860,6 +859,19 @@ i_mep crossover(const i_mep &lhs, const i_mep &rhs)
 
   Ensures(to.is_valid());
   return to;
+}
+
+locus random_locus(const i_mep &prg)
+{
+  std::set exons({prg.best()});
+  auto iter(exons.begin());
+  do
+  {
+    const auto args(prg[*iter].arguments());
+    exons.insert(args.begin(), args.end());
+  } while (++iter != exons.end());
+
+  return random::element(as_const(exons));
 }
 
 namespace

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -113,7 +113,8 @@ private:
   crossover_t active_crossover_type_;
 };  // class i_mep
 
-unsigned distance(const i_mep &, const i_mep &);
+[[nodiscard]] unsigned distance(const i_mep &, const i_mep &);
+[[nodiscard]] locus random_locus(const i_mep &);
 
 ///
 /// \return the starting locus of the best sequence available

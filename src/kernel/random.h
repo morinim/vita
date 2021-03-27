@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,10 +21,7 @@
 #include "kernel/range.h"
 #include "utility/xoshiro256ss.h"
 
-namespace vita
-{
-
-namespace random
+namespace vita::random
 {
 
 enum class distribution {uniform, normal};
@@ -40,9 +37,6 @@ using engine_t = vigna::xoshiro256ss;
 extern thread_local engine_t engine;
 
 template<class T> T sup(T);
-
-template<class C> const typename C::value_type &element(const C &);
-template<class C> typename C::value_type &element(C &);
 
 unsigned ring(unsigned, unsigned, unsigned);
 
@@ -161,10 +155,11 @@ T sup(T sup)
 template<class C>
 const typename C::value_type &element(const C &c)
 {
-  const auto size(c.size());
-  Expects(size);
+  Expects(c.size());
 
-  return *std::next(c.begin(), sup<typename C::difference_type>(size));
+  return *std::next(
+    c.begin(),
+    static_cast<typename C::difference_type>(sup(c.size())));
 }
 
 ///
@@ -174,11 +169,11 @@ const typename C::value_type &element(const C &c)
 template<class C>
 typename C::value_type &element(C &c)
 {
-  const auto size(c.size());
-  Expects(size);
+  Expects(c.size());
 
-  return *std::next(c.begin(),
-                    static_cast<typename C::difference_type>(sup(size)));
+  return *std::next(
+    c.begin(),
+    static_cast<typename C::difference_type>(sup(c.size())));
 }
 
 ///
@@ -198,7 +193,6 @@ inline bool boolean(double p)
   //return between<double>(0, 1) < p;
 }
 
-}  // namespace random
-}  // namespace vita
+}  // namespace vita::random
 
 #endif  // include guard

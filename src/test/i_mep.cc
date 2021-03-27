@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -270,13 +270,6 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
 
     CHECK(i1.is_valid());
 
-    /*
-    std::cout << "\n\n";
-    i.list(std::cout, false);
-    std::cout << "\n\n";
-    i1.list(std::cout, false);
-    */
-
     const auto v(run(i));
     const auto v1(run(i1));
 
@@ -293,6 +286,32 @@ TEST_CASE_FIXTURE(fixture3, "Common subexpression elimination")
     CHECK(i1.active_symbols() <= i.active_symbols());
 
     CHECK(i.signature() == i1.signature());
+  }
+}
+
+TEST_CASE_FIXTURE(fixture3, "Random locus")
+{
+  using namespace vita;
+
+  for (unsigned k(0); k < 100; ++k)
+  {
+    std::map<locus, unsigned> exons;
+
+    const i_mep prg(prob);
+    CHECK(prg.is_valid());
+
+    const unsigned as(prg.active_symbols());
+
+    const unsigned n(10000);
+    for (unsigned j(0); j < n; ++j)
+      ++exons[random_locus(prg)];
+
+    const double avg(n / as);
+    for (const auto &e : exons)
+    {
+      CHECK(avg * 0.90 <= e.second);
+      CHECK(e.second <= 1.10 *avg);
+    }
   }
 }
 

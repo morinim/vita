@@ -42,7 +42,7 @@ public:
   basic_iterator() : loci_(), ind_(nullptr) {}
 
   /// \param[in] id an individual
-  explicit basic_iterator(ind &id) : loci_({id.best_}), ind_(&id)
+  explicit basic_iterator(ind &id) : loci_({id.best()}), ind_(&id)
   {
   }
 
