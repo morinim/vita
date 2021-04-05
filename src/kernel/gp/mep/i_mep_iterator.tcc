@@ -51,12 +51,18 @@ public:
   {
     if (!loci_.empty())
     {
-      const gene &g(operator*());
+      const auto args(operator*().arguments());
 
-      for (const auto &l : g.arguments())
-        loci_.insert(l);
+      if (args.empty())
+        loci_.erase(loci_.begin());
+      else
+      {
+        auto node(loci_.extract(loci_.begin()));
+        node.value() = args.front();
+        loci_.insert(std::move(node));
 
-      loci_.erase(loci_.begin());
+        loci_.insert(std::next(args.begin()), args.end());
+      }
     }
 
     return *this;

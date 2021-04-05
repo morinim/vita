@@ -112,7 +112,7 @@ std::uint64_t speed_random_locus()
     }
 
   std::cout << std::left << std::setw(padding1) << std::setfill('.')
-            << "iterator based";
+            << "reservoir - iterator based";
   std::cout << std::right << std::setw(padding2) << std::setfill('.')
             << t.elapsed().count() << "ms\n";
 
@@ -127,23 +127,59 @@ std::uint64_t speed_random_locus()
       std::set left(args0.begin(), args0.end());
       std::size_t seen(1);
 
-      auto iter(left.cbegin());
-      while (iter != left.end())
+      for (auto iter(left.cbegin()); iter != left.end(); ++iter)
       {
         if (random::sup(++seen) == 0)
           l = *iter;
 
         const auto args(prg[i][*iter].arguments());
         left.insert(args.begin(), args.end());
-
-        ++iter;
       }
 
       dummy += l.index + l.category;
     }
 
   std::cout << std::left << std::setw(padding1) << std::setfill('.')
-            << "reservoir sampling";
+            << "optimized reservoir sampling";
+  std::cout << std::right << std::setw(padding2) << std::setfill('.')
+            << t.elapsed().count() << "ms\n";
+
+  // -------------------------------------------------------------------------
+  t.restart();
+
+  for (unsigned i(0); i < N; ++i)
+    for (unsigned j(0); j < N*10; ++j)
+    {
+      auto l(prg[i].best());
+      std::set left({l});
+
+      auto W(random::sup(1.0));
+
+      for (auto iter(left.cbegin()); iter != left.end();)
+      {
+        for (std::size_t s(std::floor(std::log(random::sup(1.0))
+                                      / std::log(1.0-W)) + 1);
+             s && iter != left.end();
+             --s)
+        {
+          const auto args(prg[i][*iter].arguments());
+          left.insert(args.begin(), args.end());
+
+          ++iter;
+        }
+
+        if (iter != left.end())
+        {
+          l = *iter;
+          W *= random::sup(1.0);
+        }
+      }
+
+      dummy += l.index + l.category;
+    }
+
+  std::cout << std::left << std::setw(padding1) << std::setfill('.')
+            << "reservoir - algorithm L";
   std::cout << std::right << std::setw(padding2) << std::setfill('.')
             << t.elapsed().count() << "ms\n";
 
