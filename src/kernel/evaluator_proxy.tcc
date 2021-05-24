@@ -39,8 +39,6 @@ fitness_t evaluator_proxy<T, E>::operator()(const T &prg)
 
   if (f.size())
   {
-    assert(cache_.hits());
-
     // Hash collision checking code can slow down the program very much.
 #if !defined(NDEBUG)
     const fitness_t f1(eva_(prg));
