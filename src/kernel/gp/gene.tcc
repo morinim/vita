@@ -26,7 +26,7 @@
 /// This is usually called for filling the patch section of an individual.
 ///
 template<unsigned K>
-basic_gene<K>::basic_gene(const terminal &t) : sym(&t), args(0)
+basic_gene<K>::basic_gene(const terminal &t) : sym(&t), par(), args(0)
 {
   init_if_parametric();
 }
