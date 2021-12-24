@@ -137,9 +137,30 @@ You're now ready to build using the underlying build system tool:
 * the *ABC* example: `cmake --build build/ --target ABC`
 * for a list of valid targets: `cmake --build build/ --target help`
 
-All the output files will be stored in subdirectories of `build/` (out of source builds).
+The output files are stored in subdirectories of `build/` (out of source build).
 
 Windows may need various expedients about which you can read in the [Windows walkthrough][windows].
+
+## Installing Vita ##
+
+To install Vita use the command:
+
+```shell
+cmake --install build/
+```
+(requires superuser, i.e. root, privileges)
+
+Manually installing is also very easy. There are just two files, both inside the `build/kernel` directory:
+
+- a static library (e.g. `libvita.a` under Unix);
+- an automatically generated global/single header (`auto_vita.h` which can be renamed).
+
+As a side note, the command to build the global header is:
+
+```shell
+./tools/single_include.py --src-include-dir src/ --src-include kernel/vita.h --dst-include mysingleheaderfile.h
+```
+(must be executed from the repository main directory)
 
 ## License ##
 
