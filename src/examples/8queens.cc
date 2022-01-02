@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,6 +21,9 @@ int main()
 {
   // A candidate solution is a sequence of `NQUEENS` integers in the
   // `[0, NQUEENS[` interval.
+  // For instance `{4, 2, 0, 6, 1, 7, 5, 3}` means first queen on
+  // `a5`, second queen on `b3`, third queen on `c1`, fourth queen on
+  // `d7`...
   vita::ga_problem prob(NQUEENS, {0, NQUEENS});
 
   // Fitness function.

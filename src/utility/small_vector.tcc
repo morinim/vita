@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2017 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -69,7 +69,7 @@ small_vector<T, S>::small_vector(size_type n)
     data_ = static_cast<T *>(::operator new(n * sizeof(T)));
     capacity_ = size_ = data_ + n;
 
-    if (!std::is_pod<T>::value)
+    if (!std::is_trivially_default_constructible_v<T>)
       for (size_type k(0); k < n; ++k)
         new (data_ + k) T();
   }
@@ -206,7 +206,7 @@ small_vector<T, S> &small_vector<T, S>::operator=(const small_vector &rhs)
     }
     else  // !needs_memory
     {
-      if (!std::is_pod<T>::value)
+      if (!std::is_trivially_default_constructible_v<T>)
       {
         if (!local_storage_used())
           destroy_range(begin() + n, end());
@@ -412,7 +412,7 @@ void small_vector<T, S>::resize(size_type n)
 {
   if (n <= capacity())
   {
-    if (!std::is_pod<T>::value)
+    if (!std::is_trivially_default_constructible_v<T>)
     {
       if (local_storage_used())
       {
@@ -474,7 +474,7 @@ void small_vector<T, S>::free_heap_memory()
 {
   assert(!local_storage_used());
 
-  if (!std::is_pod<T>::value)
+  if (!std::is_trivially_default_constructible_v<T>)
     destroy_range(begin(), end());
 
   ::operator delete(data_);
@@ -501,7 +501,7 @@ void small_vector<T, S>::grow(size_type n)
   if (!local_storage_used())
     free_heap_memory();
 #if defined(VITA_SMALL_VECTOR_LOW_MEMORY)
-  else if (!std::is_pod<T>::value)
+  else if (!std::is_trivially_default_constructible_v<T>)
     std::fill(begin(), end(), T());
 #endif
 
