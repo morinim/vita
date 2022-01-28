@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -34,7 +34,7 @@ namespace vita
 struct csv_dialect
 {
   /// A one-character string used to separate fields.
-  char delimiter = ',';
+  std::optional<char> delimiter = {};
   /// When `true` skips leading and trailing spaces adjacent to commas.
   bool trim_ws = false;
   /// When `true` assumes a header row is present. When undefined triggers the

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -678,8 +678,16 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
 {
   clear();
 
-  if (p.dialect.has_header == std::nullopt)
-    p.dialect.has_header = csv_sniffer(from).has_header;
+  if (p.dialect.has_header == std::nullopt
+      || p.dialect.delimiter == std::nullopt)
+  {
+    const auto sniff(csv_sniffer(from));
+
+    if (p.dialect.has_header == std::nullopt)
+      p.dialect.has_header = sniff.has_header;
+    if (p.dialect.delimiter == std::nullopt)
+      p.dialect.delimiter = sniff.delimiter;
+  }
 
   std::size_t count(0);
   for (auto record : csv_parser(from, p.dialect).filter_hook(p.filter))

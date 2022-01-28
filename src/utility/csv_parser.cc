@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -13,13 +13,67 @@
 #include "utility/csv_parser.h"
 #include "utility/utility.h"
 
+#include <map>
+
 namespace
 {
 
 enum column_tag {none_tag = 0, skip_tag = -1,
                  number_tag = -2, string_tag = -3};
 
-int find_column_tag(const std::string &s)
+struct char_stat
+{
+  char_stat(unsigned cf = 0, unsigned w = 0) : char_freq(cf), weight(w) {}
+
+  unsigned char_freq;
+  unsigned weight;
+};
+
+///
+/// Calculates the mode of a sequence of natural numbers.
+///
+/// \param[in] v a sequence of natural number
+/// \return    a vector of {mode, counter} pairs (the input sequence
+///            may have more than one mode)
+///
+/// \warning
+/// Assumes a sorted input vector.
+///
+[[nodiscard]] std::vector<char_stat> mode(const std::vector<unsigned> &v)
+{
+  Expects(std::is_sorted(v.begin(), v.end()));
+
+  if (v.empty())
+    return {};
+
+  auto current(*v.begin());
+  unsigned count(1), max_count(1);
+
+  std::vector<char_stat> ret({{current, 1}});
+
+  for (auto i(std::next(v.begin())); i != v.end(); ++i)
+  {
+    if (*i == current)
+      ++count;
+    else
+    {
+      count = 1;
+      current = *i;
+    }
+
+    if (count > max_count)
+    {
+      max_count = count;
+      ret = {{current, max_count}};
+    }
+    else if (count == max_count)
+      ret.emplace_back(current, max_count);
+  }
+
+  return ret;
+}
+
+[[nodiscard]] int find_column_tag(const std::string &s)
 {
   const auto ts(vita::trim(s));
 
@@ -31,7 +85,7 @@ int find_column_tag(const std::string &s)
   return static_cast<int>(s.length());
 }
 
-bool capitalized(std::string s)
+[[nodiscard]] bool capitalized(std::string s)
 {
   s = vita::trim(s);
 
@@ -44,7 +98,7 @@ bool capitalized(std::string s)
                         });
 }
 
-bool lower_case(const std::string &s)
+[[nodiscard]] bool lower_case(const std::string &s)
 {
   return std::all_of(s.begin(), s.end(),
                      [](auto c)
@@ -53,13 +107,168 @@ bool lower_case(const std::string &s)
                      });
 }
 
-bool upper_case(const std::string &s)
+[[nodiscard]] bool upper_case(const std::string &s)
 {
   return std::all_of(s.begin(), s.end(),
                      [](auto c)
                      {
                        return !std::isalpha(c) || std::isupper(c);
                      });
+}
+
+[[nodiscard]] bool has_header(std::istream &is, std::size_t lines, char delim)
+{
+  vita::csv_dialect dialect;
+  dialect.delimiter = delim;
+  dialect.has_header = true;  // assume first row is header (1)
+  vita::csv_parser parser(is, dialect);
+
+  // Quoting allows to correctly identify a column with header `"1980"` (e.g. a
+  // specific year. Notice the double quotes) and values `2012`, `2000`...
+  // (the values observed during 1980).
+  parser.quoting(vita::csv_dialect::KEEP_QUOTES);
+  const auto header(*parser.begin());  // assume first row is header (2)
+  parser.quoting(vita::csv_dialect::REMOVE_QUOTES);
+
+  const auto columns(header.size());
+  std::vector<int> column_types(columns, none_tag);
+
+  unsigned checked(0);
+  for (auto it(std::next(parser.begin())); it != parser.end(); ++it)
+    // Skip rows that have irregular number of columns
+    if (const auto row = *it; row.size() == columns)
+    {
+      for (std::size_t field(0); field < columns; ++field)
+      {
+        if (column_types[field] == skip_tag)  // inconsistent column
+          continue;
+        if (vita::trim(row[field]).empty())         // missing values
+          continue;
+
+        const auto this_tag(find_column_tag(row[field]));
+        if (column_types[field] == this_tag)  // matching column type
+          continue;
+
+        if (capitalized(header[field]) && lower_case(row[field]))
+          column_types[field] = string_tag;
+        else if (upper_case(header[field]) && !upper_case(row[field]))
+          column_types[field] = string_tag;
+        else if (column_types[field] == none_tag)
+          column_types[field] = this_tag;
+        else
+          column_types[field] = skip_tag;  // type is inconsistent, remove
+      }                                    // column from consideration
+
+      if (checked++ > lines)
+        break;
+    }
+
+  // Finally, compare results against first row and "vote" on whether it's a
+  // header.
+  int has_header(0);
+
+  for (std::size_t field(0); field < columns; ++field)
+    switch (column_types[field])
+    {
+    case none_tag:
+      if (header[field].length())
+        ++has_header;
+      else
+        --has_header;
+      break;
+
+    case skip_tag:
+      break;
+
+    case number_tag:
+      if (!vita::is_number(header[field]))
+        ++has_header;
+      else
+        --has_header;
+      break;
+
+    case string_tag:  // variable length strings
+      ++has_header;
+      break;
+
+    default:  // column containing fixed length strings
+      assert(column_types[field] > 0);
+      if (const auto length = static_cast<std::size_t>(column_types[field]);
+          header[field].length() != length)
+        ++has_header;
+      else
+        --has_header;
+    }
+
+  is.clear();
+  is.seekg(0, std::ios::beg);  // back to the start!
+
+  return has_header > 0;
+}
+
+[[nodiscard]] char guess_delimiter(std::istream &is, std::size_t lines)
+{
+  const std::vector preferred = {',', ';', '\t', ':', '|'};
+
+  // `count[c]` is a vector with information about character `c`. It grows
+  // one element every time a new input line is read.
+  // `count[c][l]` contains the number of times character `c` appears in line
+  // `l`.
+  std::map<char, std::vector<unsigned>> count;
+
+  std::size_t scanned(0);
+
+  for (std::string line; std::getline(is, line) && lines;)
+  {
+    if (vita::trim(line).empty())
+      continue;
+
+    // A new non-empty line. Initially every character has a `0` counter.
+    for (auto c : preferred)
+      count[c].push_back(0u);
+
+    for (auto c : line)
+      if (std::find(preferred.begin(), preferred.end(), c) != preferred.end())
+        ++count[c].back();
+
+    --lines;
+    ++scanned;
+  }
+
+  if (count.empty())  // empty input file
+    return 0;
+
+  // `mode_weight[c]` stores a couple of values specifying:
+  // 1. how many time character `c` usually repeats in a line of the CSV file;
+  // 2. a weight (the effective number of lines condition 1 is verified).
+  std::map<char, char_stat> mode_weight;
+
+  for (auto &[c, cf] : count)
+  {
+    std::sort(cf.begin(), cf.end());
+
+    const auto mf(mode(cf));
+
+    if (mf.empty() || mf.size() > 1 || mf.front().char_freq == 0)
+      mode_weight[c] = {0u, 0u};
+    else
+      mode_weight[c] = mf.front();
+  }
+
+  const auto res(std::max_element(mode_weight.begin(), mode_weight.end(),
+                                  [](const auto &l, const auto &r)
+                                  {
+                                    return l.second.weight < r.second.weight;
+                                  }));
+
+  if (res->second.char_freq == 0)
+    return '\n';
+
+  // Delimiter must consistently appear in the input lines.
+  if (3 * res->second.weight < 2 * scanned)
+    return 0;
+
+  return res->first;
 }
 
 }  // unnamed namespace
@@ -82,6 +291,22 @@ namespace vita
 /// Finally, a 'vote' is taken at the end for each column, adding or
 /// subtracting from the likelihood of the first row being a header.
 ///
+/// ---
+///
+/// The delimiter *should* occur the same number of times on each row. However,
+/// due to malformed data, it may not. We don't want an all or nothing
+/// approach, so we allow for small variations in this number:
+///
+/// 1. build a table of the frequency of usual delimiters (comma, tab, colon,
+///    semicolon, vertical bar) on every line;
+/// 2. build a table of frequencies of this frequency (meta-frequency?), e.g.
+///    'x occurred 5 times in 10 rows, 6 times in 1000 rows, 7 times in 2
+///    rows';
+/// 3. use the mode of the meta-frequency to determine the *expected* frequency
+///    for that character;
+/// 4. find out how often the character actually meets that goal;
+/// 5. the character that best meets its goal is the delimiter.
+///
 /// \note
 /// Somewhat inspired by the dialect sniffer developed by Clifford Wells for
 /// his Python-DSV package (Wells, 2002) ehich was incorporated into Python
@@ -89,95 +314,14 @@ namespace vita
 ///
 csv_dialect csv_sniffer(std::istream &is)
 {
-  csv_dialect ret;
+  const std::size_t lines(20);
 
   csv_dialect dialect;
-  dialect.has_header = true;
-  csv_parser parser(is, dialect);
 
-  // Quoting allows to correctly identify a column with header `"1980"` (e.g. a
-  // specific year. Notice the double quotes) and values `2012`, `2000`...
-  // (the values observed during 1980).
-  parser.quoting(csv_dialect::KEEP_QUOTES);
-  const auto header(*parser.begin());  // assume first row is header
-  parser.quoting(csv_dialect::REMOVE_QUOTES);
+  dialect.delimiter = guess_delimiter(is, lines);
+  dialect.has_header = has_header(is, lines, *dialect.delimiter);
 
-  const auto columns(header.size());
-  std::vector<int> column_types(columns, none_tag);
-
-  unsigned checked(0);
-  for (auto it(std::next(parser.begin())); it != parser.end(); ++it)
-    // Skip rows that have irregular number of columns
-    if (const auto row = *it; row.size() == columns)
-    {
-      for (std::size_t field(0); field < columns; ++field)
-      {
-        if (column_types[field] == skip_tag)  // inconsistent column
-          continue;
-        if (trim(row[field]).empty())         // missing values
-          continue;
-
-        const auto this_tag(find_column_tag(row[field]));
-        if (column_types[field] == this_tag)  // matching column type
-          continue;
-
-        if (capitalized(header[field]) && lower_case(row[field]))
-          column_types[field] = string_tag;
-        else if (upper_case(header[field]) && !upper_case(row[field]))
-          column_types[field] = string_tag;
-        else if (column_types[field] == none_tag)
-          column_types[field] = this_tag;
-        else
-          column_types[field] = skip_tag;  // type is inconsistent, remove
-      }                                    // column from consideration
-
-      if (checked++ > 20)
-        break;
-    }
-
-  // Finally, compare results against first row and "vote" on whether it's a
-  // header.
-  int has_header(0);
-
-  for (std::size_t field(0); field < columns; ++field)
-    switch (column_types[field])
-    {
-    case none_tag:
-      if (header[field].length())
-        ++has_header;
-      else
-        --has_header;
-      break;
-
-    case skip_tag:
-      break;
-
-    case number_tag:
-      if (!is_number(header[field]))
-        ++has_header;
-      else
-        --has_header;
-      break;
-
-    case string_tag:  // variable length strings
-      ++has_header;
-      break;
-
-    default:  // column containing fixed length strings
-      assert(column_types[field] > 0);
-      if (const auto length = static_cast<std::size_t>(column_types[field]);
-          header[field].length() != length)
-        ++has_header;
-      else
-        --has_header;
-    }
-
-  ret.has_header = has_header > 0;
-
-  is.clear();
-  is.seekg(0, std::ios::beg);  // back to the start!
-
-  return ret;
+  return dialect;
 }
 
 ///

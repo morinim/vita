@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2015-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2015-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -38,7 +38,7 @@ bool is_number(std::string s)
   s = trim(s);
 
   char *end;
-  strtod(s.c_str(), &end);  // if no conversion can be performed, ​`end` is set
+  strtod(s.c_str(), &end);  // if no conversion can be performed, `end` is set
                             // to `s.c_str()`
   return end != s.c_str() && *end == '\0';
 }
