@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -223,7 +223,7 @@ template<class T>
 std::size_t analyzer<T>::count_team(const T &t, std::true_type)
 {
   return std::accumulate(t.begin(), t.end(), std::size_t{0},
-                         [this](auto s, const auto &ind)
+                         [=](auto s, const auto &ind)
                          {
                            return s + count_team(ind, std::false_type());
                          });
