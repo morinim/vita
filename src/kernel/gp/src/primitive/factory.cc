@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2020, 2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,17 +29,10 @@ namespace
 ///
 domain_t find_domain(const std::string &s)
 {
-  try
-  {
-    std::stod(s);
-  }
-  catch (std::invalid_argument &)  // not a number
-  {
-    return domain_t::d_string;
-  }
-
-  return s.find('.') == std::string::npos ? domain_t::d_int
-                                          : domain_t::d_double;
+  if (is_number(s))
+    return s.find('.') == std::string::npos ? domain_t::d_int
+                                            : domain_t::d_double;
+  return domain_t::d_string;
 }
 }  // unnamed namespace
 

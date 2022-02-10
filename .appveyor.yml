@@ -27,7 +27,7 @@ build_script:
 - ps: cmake --build build/ --config "$env:CONFIGURATION"
 test_script:
 - sh: cd build/test ; ctest -V -C $CONFIGURATION
-- ps: cd build/test ; ctest -V -C "$env:CONFIGURATION"
+#- ps: cd build/test ; ctest -V -C "$env:CONFIGURATION"
 
 # GENERAL NOTES:
 # In PowerShell environment variables must prepended with `$env:`.

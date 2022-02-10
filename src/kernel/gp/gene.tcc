@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -95,9 +95,10 @@ basic_gene<K>::basic_gene(const symbol &s, index_t from, index_t sup)
     assert(sup <= std::numeric_limits<packed_index_t>::max());
 
     std::generate(args.begin(), args.end(),
-                  [from, sup]() -> packed_index_t
+                  [from, sup]()
                   {
-                    return random::between(from, sup);
+                    return static_cast<packed_index_t>(random::between(from,
+                                                                       sup));
                   });
   }
   else
