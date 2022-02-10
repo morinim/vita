@@ -6,7 +6,7 @@ environment:
   # Disables execution of PowerShell commands on Linux-based images.
   APPVEYOR_YML_DISABLE_PS_LINUX: true
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
       CXX_COMPILER: clang++
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
@@ -17,12 +17,17 @@ init:
 before_build:
 # Essentially the build command is `cmake -B build/ src/`.
 # The `-DCMAKE_BUILD_TYPE=` switch instructs cmake about the build type.
-# In PowerShell environment variables must prepended with `$env:`.
 - sh: CXX=$CXX_COMPILER cmake -B build/ -DCMAKE_BUILD_TYPE=$CONFIGURATION src/
-- ps: cmake -B build/ -DCMAKE_BUILD_TYPE=$env:CONFIGURATION src/
+# Visual Studio is a multi-configuration generator, build type is specified
+# when building binaries.
+- ps: cmake -B build/ src/
 build_script:
 # cmake will call the appropriate build tool.
-- cmake --build build/
+- sh: cmake --build build/
+- ps: cmake --build build/ --config "$env:CONFIGURATION"
 test_script:
-- sh: cd build/test ; ctest -C $CONFIGURATION
-# - ps: cd build/test ; ctest -C $env:CONFIGURATION
+- sh: cd build/test ; ctest -V -C $CONFIGURATION
+- ps: cd build/test ; ctest -V -C "$env:CONFIGURATION"
+
+# GENERAL NOTES:
+# In PowerShell environment variables must prepended with `$env:`.
