@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -22,7 +22,7 @@
 
 #include "kernel/distribution.h"
 #include "kernel/problem.h"
-#include "utility/csv_parser.h"
+#include "utility/pocket_csv.h"
 
 namespace vita
 {
@@ -243,7 +243,7 @@ public:
   params &no_output()           { output_index = std::nullopt; return *this; }
 
   /// \remark Used only when reading CSV files.
-  csv_dialect dialect = {};
+  pocket_csv::dialect dialect = {};
 
   /// A filter and transform function applied when reading data.
   filter_hook_t filter = nullptr;

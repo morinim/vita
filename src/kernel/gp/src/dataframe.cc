@@ -681,7 +681,7 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
   if (p.dialect.has_header == std::nullopt
       || p.dialect.delimiter == std::nullopt)
   {
-    const auto sniff(csv_sniffer(from));
+    const auto sniff(pocket_csv::sniffer(from));
 
     if (p.dialect.has_header == std::nullopt)
       p.dialect.has_header = sniff.has_header;
@@ -690,7 +690,7 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
   }
 
   std::size_t count(0);
-  for (auto record : csv_parser(from, p.dialect).filter_hook(p.filter))
+  for (auto record : pocket_csv::parser(from, p.dialect).filter_hook(p.filter))
   {
     if (p.output_index)
     {

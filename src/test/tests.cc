@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -12,7 +12,6 @@
 
 #include "test/cache.cc"
 #include "test/category_set.cc"
-#include "test/csv_parser.cc"
 #include "test/dataframe.cc"
 #include "test/de.cc"
 #include "test/discretization.cc"

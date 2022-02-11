@@ -1,8 +1,8 @@
 /**
  *  \file
- *  \remark This file is part of VITA.
+ *  \remark This file is part of POCKET_CSV.
  *
- *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016, 2022 Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,12 +10,148 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include "utility/csv_parser.h"
-#include "utility/utility.h"
+#if !defined(POCKET_CSV_PARSER_H)
+#define      POCKET_CSV_PARSER_H
 
+#include <algorithm>
+#include <cassert>
+#include <iomanip>
+#include <fstream>
+#include <functional>
 #include <map>
+#include <optional>
+#include <sstream>
 
-namespace
+namespace pocket_csv
+{
+
+///
+/// Information about the CSV dialect.
+///
+/// *CSV is a textbook example of how not to design a textual file format*.
+/// The Art of Unix Programming, Raymond (2003).
+///
+struct dialect
+{
+  /// A one-character string used to separate fields.
+  std::optional<char> delimiter = {};
+  /// When `true` skips leading and trailing spaces adjacent to commas.
+  bool trim_ws = false;
+  /// When `true` assumes a header row is present. When undefined triggers the
+  /// sniffer.
+  std::optional<bool> has_header = {};
+  /// Controls if quotes should be keep by the reader.
+  /// - `KEEP_QUOTES`. Always keep the quotes;
+  /// - `REMOVE_QUOTES`. Never keep quotes.
+  /// It defaults to `REMOVE_QUOTES`.
+  enum quoting_e {KEEP_QUOTES, REMOVE_QUOTES} quoting = REMOVE_QUOTES;
+};  // class dialect
+
+///
+/// Simple parser for CSV files.
+///
+/// \warning The class doesn't support multi-line fields.
+///
+class parser
+{
+public:
+  using record_t = std::vector<std::string>;
+  using filter_hook_t = std::function<bool (record_t &)>;
+
+  explicit parser(std::istream &);
+  parser(std::istream &, const dialect &);
+
+  [[nodiscard]] const dialect &active_dialect() const;
+
+  parser &delimiter(char) &;
+  parser delimiter(char) &&;
+
+  parser &quoting(dialect::quoting_e) &;
+  parser quoting(dialect::quoting_e) &&;
+
+  parser &trim_ws(bool) &;
+  parser trim_ws(bool) &&;
+
+  parser &filter_hook(filter_hook_t) &;
+  parser filter_hook(filter_hook_t) &&;
+
+  class const_iterator;
+  [[nodiscard]] const_iterator begin() const;
+  [[nodiscard]] const_iterator end() const;
+
+private:
+  // DO NOT move this. `is` must be initialized before other data members.
+  std::istream *is_;
+
+  filter_hook_t filter_hook_;
+  dialect dialect_;
+};  // class parser
+
+///
+/// A forward iterator for CSV records.
+///
+class parser::const_iterator
+{
+public:
+  using iterator_category = std::forward_iterator_tag;
+  using difference_type = std::ptrdiff_t;
+  using value_type = parser::record_t;
+  using pointer = value_type *;
+  using const_pointer = const value_type *;
+  using reference = value_type &;
+  using const_reference = const value_type &;
+
+  const_iterator(std::istream *is = nullptr,
+                 parser::filter_hook_t f = nullptr,
+                 const dialect &d = {})
+    : ptr_(is), filter_hook_(f), dialect_(d), value_()
+  {
+    if (ptr_)
+      get_input();
+  }
+
+  /// \return an iterator pointing to the next record of the CSV file
+  const_iterator &operator++()
+  {
+    get_input();
+    return *this;
+  }
+
+  /// \return reference to the current record of the CSV file
+  const_reference operator*() const { return value_; }
+
+  /// \return pointer to the current record of the CSV file
+  const_pointer operator->() const { return &operator*(); }
+
+  /// \param[in] lhs first term of comparison
+  /// \param[in] rhs second term of comparison
+  /// \return        `true` if iterators point to the same line
+  friend bool operator==(const const_iterator &lhs, const const_iterator &rhs)
+  {
+    return lhs.ptr_ == rhs.ptr_ && lhs.value_ == rhs.value_
+           && (!lhs.ptr_ || lhs.ptr_->tellg() == rhs.ptr_->tellg());
+  }
+
+  friend bool operator!=(const const_iterator &lhs, const const_iterator &rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+private:
+  value_type parse_line(const std::string &);
+  void get_input();
+
+  // Data members MUST BE INITIALIZED IN THE CORRECT ORDER:
+  // * `value_` is initialized via the `get_input` member function;
+  // * `get_input` works only if `_ptr` is already initialized.
+  // So it's important that `value_` is the last value to be initialized.
+  std::istream *ptr_;
+  parser::filter_hook_t filter_hook_;
+  dialect dialect_;
+  value_type value_;
+};  // class parser::const_iterator
+
+namespace detail
 {
 
 enum column_tag {none_tag = 0, skip_tag = -1,
@@ -30,6 +166,41 @@ struct char_stat
 };
 
 ///
+/// \param[in] s the input string
+/// \return      a copy of `s` with spaces removed on both sides of the string
+///
+/// \see http://stackoverflow.com/a/24425221/3235496
+///
+[[nodiscard]] inline std::string trim(const std::string &s)
+{
+  const auto front(std::find_if_not(
+               s.begin(), s.end(),
+               [](auto c) { return std::isspace(c); }));
+
+  // The search is limited in the reverse direction to the last non-space value
+  // found in the search in the forward direction.
+  const auto back(std::find_if_not(
+                    s.rbegin(), std::make_reverse_iterator(front),
+                    [](auto c) { return std::isspace(c); }).base());
+
+  return {front, back};
+}
+
+///
+/// \param[in] s the string to be tested
+/// \return      `true` if `s` contains a number
+///
+[[nodiscard]] inline bool is_number(std::string s)
+{
+  s = trim(s);
+
+  char *end;
+  strtod(s.c_str(), &end);  // if no conversion can be performed, `end` is set
+                            // to `s.c_str()`
+  return end != s.c_str() && *end == '\0';
+}
+
+///
 /// Calculates the mode of a sequence of natural numbers.
 ///
 /// \param[in] v a sequence of natural number
@@ -39,9 +210,9 @@ struct char_stat
 /// \warning
 /// Assumes a sorted input vector.
 ///
-[[nodiscard]] std::vector<char_stat> mode(const std::vector<unsigned> &v)
+[[nodiscard]] inline std::vector<char_stat> mode(const std::vector<unsigned> &v)
 {
-  Expects(std::is_sorted(v.begin(), v.end()));
+  assert(std::is_sorted(v.begin(), v.end()));
 
   if (v.empty())
     return {};
@@ -73,21 +244,21 @@ struct char_stat
   return ret;
 }
 
-[[nodiscard]] int find_column_tag(const std::string &s)
+[[nodiscard]] inline int find_column_tag(const std::string &s)
 {
-  const auto ts(vita::trim(s));
+  const auto ts(detail::trim(s));
 
   if (ts.empty())
     return none_tag;
-  if (vita::is_number(ts))
+  if (detail::is_number(ts))
     return number_tag;
 
   return static_cast<int>(s.length());
 }
 
-[[nodiscard]] bool capitalized(std::string s)
+[[nodiscard]] inline bool capitalized(std::string s)
 {
-  s = vita::trim(s);
+  s = detail::trim(s);
 
   return !s.empty() && std::isupper(s.front())
          && std::all_of(std::next(s.begin()), s.end(),
@@ -98,7 +269,7 @@ struct char_stat
                         });
 }
 
-[[nodiscard]] bool lower_case(const std::string &s)
+[[nodiscard]] inline bool lower_case(const std::string &s)
 {
   return std::all_of(s.begin(), s.end(),
                      [](auto c)
@@ -107,7 +278,7 @@ struct char_stat
                      });
 }
 
-[[nodiscard]] bool upper_case(const std::string &s)
+[[nodiscard]] inline bool upper_case(const std::string &s)
 {
   return std::all_of(s.begin(), s.end(),
                      [](auto c)
@@ -116,19 +287,20 @@ struct char_stat
                      });
 }
 
-[[nodiscard]] bool has_header(std::istream &is, std::size_t lines, char delim)
+[[nodiscard]] inline bool has_header(std::istream &is, std::size_t lines,
+                                     char delim)
 {
-  vita::csv_dialect dialect;
-  dialect.delimiter = delim;
-  dialect.has_header = true;  // assume first row is header (1)
-  vita::csv_parser parser(is, dialect);
+  dialect d;
+  d.delimiter = delim;
+  d.has_header = true;  // assume first row is header (1)
+  pocket_csv::parser parser(is, d);
 
   // Quoting allows to correctly identify a column with header `"1980"` (e.g. a
   // specific year. Notice the double quotes) and values `2012`, `2000`...
   // (the values observed during 1980).
-  parser.quoting(vita::csv_dialect::KEEP_QUOTES);
+  parser.quoting(pocket_csv::dialect::KEEP_QUOTES);
   const auto header(*parser.begin());  // assume first row is header (2)
-  parser.quoting(vita::csv_dialect::REMOVE_QUOTES);
+  parser.quoting(pocket_csv::dialect::REMOVE_QUOTES);
 
   const auto columns(header.size());
   std::vector<int> column_types(columns, none_tag);
@@ -142,7 +314,7 @@ struct char_stat
       {
         if (column_types[field] == skip_tag)  // inconsistent column
           continue;
-        if (vita::trim(row[field]).empty())         // missing values
+        if (trim(row[field]).empty())         // missing values
           continue;
 
         const auto this_tag(find_column_tag(row[field]));
@@ -181,7 +353,7 @@ struct char_stat
       break;
 
     case number_tag:
-      if (!vita::is_number(header[field]))
+      if (!is_number(header[field]))
         ++has_header;
       else
         --has_header;
@@ -206,7 +378,7 @@ struct char_stat
   return has_header > 0;
 }
 
-[[nodiscard]] char guess_delimiter(std::istream &is, std::size_t lines)
+[[nodiscard]] inline char guess_delimiter(std::istream &is, std::size_t lines)
 {
   const std::vector preferred = {',', ';', '\t', ':', '|'};
 
@@ -220,7 +392,7 @@ struct char_stat
 
   for (std::string line; std::getline(is, line) && lines;)
   {
-    if (vita::trim(line).empty())
+    if (trim(line).empty())
       continue;
 
     // A new non-empty line. Initially every character has a `0` counter.
@@ -271,16 +443,13 @@ struct char_stat
   return res->first;
 }
 
-}  // unnamed namespace
-
-namespace vita
-{
+}  // detail namespace
 
 ///
 /// *Sniffs* the format of a CSV file (delimiter, headers).
 ///
 /// \param[in] is stream containing CSV data
-/// \return       a csv_dialect object
+/// \return       a `dialect` object
 ///
 /// For detecting the **header** creates a dictionary of types of data in each
 /// column. If any column is of a single type (say, integers), *except* for the
@@ -312,26 +481,26 @@ namespace vita
 /// his Python-DSV package (Wells, 2002) ehich was incorporated into Python
 /// v2.3.
 ///
-csv_dialect csv_sniffer(std::istream &is)
+[[nodiscard]] inline dialect sniffer(std::istream &is)
 {
   const std::size_t lines(20);
 
-  csv_dialect dialect;
+  dialect d;
 
-  dialect.delimiter = guess_delimiter(is, lines);
-  dialect.has_header = has_header(is, lines, *dialect.delimiter);
+  d.delimiter = detail::guess_delimiter(is, lines);
+  d.has_header = detail::has_header(is, lines, *d.delimiter);
 
-  return dialect;
+  return d;
 }
 
 ///
-/// Initializes theparser trying to sniff the CSV format.
+/// Initializes the parser trying to sniff the CSV format.
 ///
 /// \param[in] is input stream containing CSV data
 ///
-csv_parser::csv_parser(std::istream &is) : csv_parser(is, {})
+inline parser::parser(std::istream &is) : parser(is, {})
 {
-  dialect_ = csv_sniffer(is);
+  dialect_ = sniffer(is);
 }
 
 ///
@@ -340,7 +509,7 @@ csv_parser::csv_parser(std::istream &is) : csv_parser(is, {})
 /// \param[in] is input stream containing CSV data
 /// \param[in] d  dialect used for CSV data
 ///
-csv_parser::csv_parser(std::istream &is, const csv_dialect &d)
+inline parser::parser(std::istream &is, const dialect &d)
   : is_(&is), filter_hook_(nullptr), dialect_(d)
 {
 }
@@ -348,7 +517,7 @@ csv_parser::csv_parser(std::istream &is, const csv_dialect &d)
 ///
 /// \return a constant reference to the active CSV dialect
 ///
-const csv_dialect &csv_parser::dialect() const
+inline const pocket_csv::dialect &parser::active_dialect() const
 {
   return dialect_;
 }
@@ -357,28 +526,28 @@ const csv_dialect &csv_parser::dialect() const
 /// \param[in] delim separator character for fields
 /// \return          a reference to `this` object (fluent interface)
 ///
-csv_parser &csv_parser::delimiter(char delim) &
+inline parser &parser::delimiter(char delim) &
 {
   dialect_.delimiter = delim;
   return *this;
 }
-csv_parser csv_parser::delimiter(char delim) &&
+inline parser parser::delimiter(char delim) &&
 {
   dialect_.delimiter = delim;
   return *this;
 }
 
 ///
-/// \param[in] q quoting style (see csv_dialect)
+/// \param[in] q quoting style (see `pocket_csv::dialect`)
 /// \return      a reference to `this` object (fluent interface)
 ///
-csv_parser &csv_parser::quoting(csv_dialect::quoting_e q) &
+inline parser &parser::quoting(dialect::quoting_e q) &
 {
   dialect_.quoting = q;
   return *this;
 }
 
-csv_parser csv_parser::quoting(csv_dialect::quoting_e q) &&
+inline parser parser::quoting(dialect::quoting_e q) &&
 {
   dialect_.quoting = q;
   return *this;
@@ -394,12 +563,12 @@ csv_parser csv_parser::quoting(csv_dialect::quoting_e q) &&
 /// prohibited by RFC 4180, which states: *spaces are considered part of a
 /// field and should not be ignored*.
 ///
-csv_parser &csv_parser::trim_ws(bool t) &
+inline parser &parser::trim_ws(bool t) &
 {
   dialect_.trim_ws = t;
   return *this;
 }
-csv_parser csv_parser::trim_ws(bool t) &&
+inline parser parser::trim_ws(bool t) &&
 {
   dialect_.trim_ws = t;
   return *this;
@@ -414,24 +583,24 @@ csv_parser csv_parser::trim_ws(bool t) &&
 /// \warning
 /// Usually, in C++, a fluent interface returns a **reference**.
 /// Here we return a **copy** of `this` object. The design decision is due to
-/// the fact that a `csv_parser' is a sort of Python generator and tends to
-/// be used in for-loops.
+/// the fact that a `parser' is a sort of Python generator and tends to be used
+/// in for-loops.
 /// Users often write:
 ///
-///     for (auto record : csv_parser(f).filter_hook(filter)) { ... }
+///     for (auto record : parser(f).filter_hook(filter)) { ... }
 ///
 /// but that's broken (it only works if `filter_hook` returns by value).
-/// `csv_parser` is a lighweight parser and this shouldn't be a performance
-/// concern.
+/// `parser` is a lighweight object and this shouldn't have an impact on
+/// performance.
 ///
 /// \see <http://stackoverflow.com/q/10593686/3235496>.
 ///
-csv_parser &csv_parser::filter_hook(filter_hook_t filter) &
+inline parser &parser::filter_hook(filter_hook_t filter) &
 {
   filter_hook_ = filter;
   return *this;
 }
-csv_parser csv_parser::filter_hook(filter_hook_t filter) &&
+inline parser parser::filter_hook(filter_hook_t filter) &&
 {
   filter_hook_ = filter;
   return *this;
@@ -440,9 +609,9 @@ csv_parser csv_parser::filter_hook(filter_hook_t filter) &&
 ///
 /// \return an iterator to the first record of the CSV file
 ///
-csv_parser::const_iterator csv_parser::begin() const
+inline parser::const_iterator parser::begin() const
 {
-  Expects(is_);
+  assert(is_);
 
   is_->clear();
   is_->seekg(0, std::ios::beg);  // back to the start!
@@ -454,7 +623,7 @@ csv_parser::const_iterator csv_parser::begin() const
 ///
 /// \return an iterator used as sentry value to stop a cycle
 ///
-csv_parser::const_iterator csv_parser::end() const
+inline parser::const_iterator parser::end() const
 {
   return const_iterator();
 }
@@ -462,7 +631,7 @@ csv_parser::const_iterator csv_parser::end() const
 ///
 /// \return the next record of the CSV file
 ///
-void csv_parser::const_iterator::get_input()
+inline void parser::const_iterator::get_input()
 {
   if (!ptr_)
   {
@@ -480,7 +649,7 @@ void csv_parser::const_iterator::get_input()
         *this = const_iterator();
         return;
       }
-    while (trim(line).empty());
+    while (detail::trim(line).empty());
 
     value_ = parse_line(line);
   } while (filter_hook_ && !filter_hook_(value_));
@@ -499,13 +668,7 @@ void csv_parser::const_iterator::get_input()
 /// quotes. This also means the quotes need to be parsed out, this function
 /// accounts for that as well.
 ///
-/// \note
-/// This is a slightly modified version of the function at
-/// <http://www.zedwood.com/article/cpp-csv-parser>. A simpler
-/// implementation is <http://stackoverflow.com/a/1120224/3235496> (but it
-/// **doesn't escape comma and newline**).
-///
-csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
+inline parser::const_iterator::value_type parser::const_iterator::parse_line(
   const std::string &line)
 {
   value_type record;  // the return value
@@ -518,7 +681,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   const auto &add_field([&record, this](const std::string &field)
                         {
                           record.push_back(dialect_.trim_ws
-                                           ? trim(field) : field);
+                                           ? detail::trim(field) : field);
                         });
 
   const auto length(line.length());
@@ -526,9 +689,10 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   {
     const auto c(line[pos]);
 
-    if (!inquotes && trim(curstring).empty() && c == quote)  // begin quote char
+    if (!inquotes && detail::trim(curstring).empty()
+        && c == quote)  // begin quote char
     {
-      if (dialect_.quoting == csv_dialect::KEEP_QUOTES)
+      if (dialect_.quoting == dialect::KEEP_QUOTES)
         curstring.push_back(c);
 
       inquotes = true;
@@ -543,7 +707,7 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
       }
       else  // end quote char
       {
-        if (dialect_.quoting == csv_dialect::KEEP_QUOTES)
+        if (dialect_.quoting == dialect::KEEP_QUOTES)
           curstring.push_back(c);
 
         inquotes = false;
@@ -567,4 +731,6 @@ csv_parser::const_iterator::value_type csv_parser::const_iterator::parse_line(
   return record;
 }
 
-}  // namespace vita
+}  // namespace pocket_csv
+
+#endif  // include guard
