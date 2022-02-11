@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2018 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -29,7 +29,7 @@ TEST_CASE("Constructor")
   CHECK(m.rows() == 3);
   CHECK(m.cols() == 4);
   CHECK(!m.empty());
-  CHECK(m(0, 0) == decltype(m)::value_type());
+  CHECK(m(0, 0) == vita::matrix<int>::value_type());
 
   m = { {1, 2, 3},
         {4, 5, 6} };
