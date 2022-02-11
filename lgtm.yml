@@ -1,0 +1,12 @@
+extraction:
+  cpp:
+    prepare:
+      packages: "cmake"
+    configure:
+      command:
+      - "cmake -Bbuild/ src/"
+    index:
+      # Override the autobuild process by specifying a list of custom build
+	  # commands to use instead.
+      build_command:
+        - "cmake --build build/"
