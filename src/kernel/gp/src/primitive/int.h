@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -79,7 +79,7 @@ private:
   const int min, upp;
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Addition
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class add : public function
 {
 public:
@@ -105,7 +105,7 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Division
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class div : public function
 {
 public:
@@ -124,7 +124,6 @@ public:
     return v0 / v1;
   }
 };
-
 
 class ife : public function
 {
@@ -199,7 +198,7 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Modulo
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class mod : public function
 {
 public:
@@ -219,7 +218,7 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Multiplication
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class mul : public function
 {
 public:
@@ -230,14 +229,14 @@ public:
 
   value_t eval(core_interpreter *ci) const final
   {
-    static_assert(sizeof(long long) >= 2 * sizeof(base_t),
+    static_assert(sizeof(std::intmax_t) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
 
     auto i(static_cast<interpreter<i_mep> *>(ci));
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const std::intmax_t v0(integer::cast(i->fetch_arg(0)));
+    const std::intmax_t v1(integer::cast(i->fetch_arg(1)));
 
-    long long tmp(v0 * v1);
+    const auto tmp(v0 * v1);
     if (tmp > std::numeric_limits<base_t>::max())
       return std::numeric_limits<base_t>::max();
     if (tmp < std::numeric_limits<base_t>::min())
@@ -281,7 +280,7 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-LeftShiftOperator
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class shl : public function
 {
 public:
@@ -303,7 +302,7 @@ public:
   }
 };
 
-/// \see https://www.securecoding.cert.org/confluence/display/cplusplus/VOID+INT32-CPP.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow#VOIDINT32-CPP.Ensurethatoperationsonsignedintegersdonotresultinoverflow-Subtraction
+/// \see https://wiki.sei.cmu.edu/confluence/display/c/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
 class sub : public function
 {
 public:
