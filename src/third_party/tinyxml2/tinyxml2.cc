@@ -100,6 +100,21 @@ distribution.
 	#define TIXML_SSCANF   sscanf
 #endif
 
+#if defined(_WIN64)
+	#define TIXML_FSEEK _fseeki64
+	#define TIXML_FTELL _ftelli64
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) \
+	|| defined(__NetBSD__) || defined(__DragonFly__) || defined(__ANDROID__)
+	#define TIXML_FSEEK fseeko
+	#define TIXML_FTELL ftello
+#elif defined(__unix__) && defined(__x86_64__)
+	#define TIXML_FSEEK fseeko64
+	#define TIXML_FTELL ftello64
+#else
+	#define TIXML_FSEEK fseek
+	#define TIXML_FTELL ftell
+#endif
+
 
 static const char LINE_FEED				= static_cast<char>(0x0a);			// all line endings are normalized to LF
 static const char LF = LINE_FEED;
@@ -220,13 +235,13 @@ char* StrPair::ParseName( char* p )
     if ( !p || !(*p) ) {
         return 0;
     }
-    if ( !XMLUtil::IsNameStartChar( *p ) ) {
+    if ( !XMLUtil::IsNameStartChar( (unsigned char) *p ) ) {
         return 0;
     }
 
     char* const start = p;
     ++p;
-    while ( *p && XMLUtil::IsNameChar( *p ) ) {
+    while ( *p && XMLUtil::IsNameChar( (unsigned char) *p ) ) {
         ++p;
     }
 
@@ -594,17 +609,26 @@ void XMLUtil::ToStr( uint64_t v, char* buffer, int bufferSize )
     TIXML_SNPRINTF(buffer, bufferSize, "%llu", (long long)v);
 }
 
-bool XMLUtil::ToInt( const char* str, int* value )
+bool XMLUtil::ToInt(const char* str, int* value)
 {
-    if ( TIXML_SSCANF( str, "%d", value ) == 1 ) {
-        return true;
+    if (IsPrefixHex(str)) {
+        unsigned v;
+        if (TIXML_SSCANF(str, "%x", &v) == 1) {
+            *value = static_cast<int>(v);
+            return true;
+        }
+    }
+    else {
+        if (TIXML_SSCANF(str, "%d", value) == 1) {
+            return true;
+        }
     }
     return false;
 }
 
-bool XMLUtil::ToUnsigned( const char* str, unsigned *value )
+bool XMLUtil::ToUnsigned(const char* str, unsigned* value)
 {
-    if ( TIXML_SSCANF( str, "%u", value ) == 1 ) {
+    if (TIXML_SSCANF(str, IsPrefixHex(str) ? "%x" : "%u", value) == 1) {
         return true;
     }
     return false;
@@ -617,17 +641,17 @@ bool XMLUtil::ToBool( const char* str, bool* value )
         *value = (ival==0) ? false : true;
         return true;
     }
-    static const char* TRUE[] = { "true", "True", "TRUE", 0 };
-    static const char* FALSE[] = { "false", "False", "FALSE", 0 };
+    static const char* TRUE_VALS[] = { "true", "True", "TRUE", 0 };
+    static const char* FALSE_VALS[] = { "false", "False", "FALSE", 0 };
 
-    for (int i = 0; TRUE[i]; ++i) {
-        if (StringEqual(str, TRUE[i])) {
+    for (int i = 0; TRUE_VALS[i]; ++i) {
+        if (StringEqual(str, TRUE_VALS[i])) {
             *value = true;
             return true;
         }
     }
-    for (int i = 0; FALSE[i]; ++i) {
-        if (StringEqual(str, FALSE[i])) {
+    for (int i = 0; FALSE_VALS[i]; ++i) {
+        if (StringEqual(str, FALSE_VALS[i])) {
             *value = false;
             return true;
         }
@@ -656,18 +680,27 @@ bool XMLUtil::ToDouble( const char* str, double* value )
 
 bool XMLUtil::ToInt64(const char* str, int64_t* value)
 {
-	long long v = 0;	// horrible syntax trick to make the compiler happy about %lld
-	if (TIXML_SSCANF(str, "%lld", &v) == 1) {
-		*value = static_cast<int64_t>(v);
-		return true;
-	}
+    if (IsPrefixHex(str)) {
+        unsigned long long v = 0;	// horrible syntax trick to make the compiler happy about %llx
+        if (TIXML_SSCANF(str, "%llx", &v) == 1) {
+            *value = static_cast<int64_t>(v);
+            return true;
+        }
+    }
+    else {
+        long long v = 0;	// horrible syntax trick to make the compiler happy about %lld
+        if (TIXML_SSCANF(str, "%lld", &v) == 1) {
+            *value = static_cast<int64_t>(v);
+            return true;
+        }
+    }
 	return false;
 }
 
 
 bool XMLUtil::ToUnsigned64(const char* str, uint64_t* value) {
     unsigned long long v = 0;	// horrible syntax trick to make the compiler happy about %llu
-    if(TIXML_SSCANF(str, "%llu", &v) == 1) {
+    if(TIXML_SSCANF(str, IsPrefixHex(str) ? "%llx" : "%llu", &v) == 1) {
         *value = (uint64_t)v;
         return true;
     }
@@ -1623,8 +1656,18 @@ float XMLElement::FloatAttribute(const char* name, float defaultValue) const
 
 const char* XMLElement::GetText() const
 {
-    if ( FirstChild() && FirstChild()->ToText() ) {
-        return FirstChild()->Value();
+    /* skip comment node */
+    const XMLNode* node = FirstChild();
+    while (node) {
+        if (node->ToComment()) {
+            node = node->NextSibling();
+            continue;
+        }
+        break;
+    }
+
+    if ( node && node->ToText() ) {
+        return node->Value();
     }
     return 0;
 }
@@ -1895,7 +1938,7 @@ char* XMLElement::ParseAttributes( char* p, int* curLineNumPtr )
         }
 
         // attribute.
-        if (XMLUtil::IsNameStartChar( *p ) ) {
+        if (XMLUtil::IsNameStartChar( (unsigned char) *p ) ) {
             XMLAttribute* attrib = CreateAttribute();
             TIXMLASSERT( attrib );
             attrib->_parseLineNum = _document->_parseCurLineNum;
@@ -1960,6 +2003,39 @@ XMLAttribute* XMLElement::CreateAttribute()
     attrib->_memPool->SetTracked();
     return attrib;
 }
+
+
+XMLElement* XMLElement::InsertNewChildElement(const char* name)
+{
+    XMLElement* node = _document->NewElement(name);
+    return InsertEndChild(node) ? node : 0;
+}
+
+XMLComment* XMLElement::InsertNewComment(const char* comment)
+{
+    XMLComment* node = _document->NewComment(comment);
+    return InsertEndChild(node) ? node : 0;
+}
+
+XMLText* XMLElement::InsertNewText(const char* text)
+{
+    XMLText* node = _document->NewText(text);
+    return InsertEndChild(node) ? node : 0;
+}
+
+XMLDeclaration* XMLElement::InsertNewDeclaration(const char* text)
+{
+    XMLDeclaration* node = _document->NewDeclaration(text);
+    return InsertEndChild(node) ? node : 0;
+}
+
+XMLUnknown* XMLElement::InsertNewUnknown(const char* text)
+{
+    XMLUnknown* node = _document->NewUnknown(text);
+    return InsertEndChild(node) ? node : 0;
+}
+
+
 
 //
 //	<ele></ele>
@@ -2101,7 +2177,7 @@ XMLDocument::~XMLDocument()
 }
 
 
-void XMLDocument::MarkInUse(XMLNode* node)
+void XMLDocument::MarkInUse(const XMLNode* const node)
 {
 	TIXMLASSERT(node);
 	TIXMLASSERT(node->_parent == 0);
@@ -2253,49 +2329,34 @@ XMLError XMLDocument::LoadFile( const char* filename )
     return _errorID;
 }
 
-// This is likely overengineered template art to have a check that unsigned long value incremented
-// by one still fits into size_t. If size_t type is larger than unsigned long type
-// (x86_64-w64-mingw32 target) then the check is redundant and gcc and clang emit
-// -Wtype-limits warning. This piece makes the compiler select code with a check when a check
-// is useful and code with no check when a check is redundant depending on how size_t and unsigned long
-// types sizes relate to each other.
-template
-<bool = (sizeof(unsigned long) >= sizeof(size_t))>
-struct LongFitsIntoSizeTMinusOne {
-    static bool Fits( unsigned long value )
-    {
-        return value < static_cast<size_t>(-1);
-    }
-};
-
-template <>
-struct LongFitsIntoSizeTMinusOne<false> {
-    static bool Fits( unsigned long )
-    {
-        return true;
-    }
-};
-
 XMLError XMLDocument::LoadFile( FILE* fp )
 {
     Clear();
 
-    fseek( fp, 0, SEEK_SET );
+    TIXML_FSEEK( fp, 0, SEEK_SET );
     if ( fgetc( fp ) == EOF && ferror( fp ) != 0 ) {
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;
     }
 
-    fseek( fp, 0, SEEK_END );
-    const long filelength = ftell( fp );
-    fseek( fp, 0, SEEK_SET );
-    if ( filelength == -1L ) {
-        SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
-        return _errorID;
-    }
-    TIXMLASSERT( filelength >= 0 );
+    TIXML_FSEEK( fp, 0, SEEK_END );
 
-    if ( !LongFitsIntoSizeTMinusOne<>::Fits( filelength ) ) {
+    unsigned long long filelength;
+    {
+        const long long fileLengthSigned = TIXML_FTELL( fp );
+        TIXML_FSEEK( fp, 0, SEEK_SET );
+        if ( fileLengthSigned == -1L ) {
+            SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
+            return _errorID;
+        }
+        TIXMLASSERT( fileLengthSigned >= 0 );
+        filelength = static_cast<unsigned long long>(fileLengthSigned);
+    }
+
+    const size_t maxSizeT = static_cast<size_t>(-1);
+    // We'll do the comparison as an unsigned long long, because that's guaranteed to be at
+    // least 8 bytes, even on a 32-bit platform.
+    if ( filelength >= static_cast<unsigned long long>(maxSizeT) ) {
         // Cannot handle files which won't fit in buffer together with null terminator
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;
@@ -2306,7 +2367,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
         return _errorID;
     }
 
-    const size_t size = filelength;
+    const size_t size = static_cast<size_t>(filelength);
     TIXMLASSERT( _charBuffer == 0 );
     _charBuffer = new char[size+1];
     const size_t read = fread( _charBuffer, 1, size, fp );
@@ -2392,6 +2453,13 @@ void XMLDocument::Print( XMLPrinter* streamer ) const
         XMLPrinter stdoutStreamer( stdout );
         Accept( &stdoutStreamer );
     }
+}
+
+
+void XMLDocument::ClearError() {
+    _errorID = XML_SUCCESS;
+    _errorLineNum = 0;
+    _errorStr.Reset();
 }
 
 
@@ -2627,24 +2695,33 @@ void XMLPrinter::PushHeader( bool writeBOM, bool writeDec )
     }
 }
 
+void XMLPrinter::PrepareForNewNode( bool compactMode )
+{
+    SealElementIfJustOpened();
+
+    if ( compactMode ) {
+        return;
+    }
+
+    if ( _firstElement ) {
+        PrintSpace (_depth);
+    } else if ( _textDepth < 0) {
+        Putc( '\n' );
+        PrintSpace( _depth );
+    }
+
+    _firstElement = false;
+}
 
 void XMLPrinter::OpenElement( const char* name, bool compactMode )
 {
-    SealElementIfJustOpened();
+    PrepareForNewNode( compactMode );
     _stack.Push( name );
-
-    if ( _textDepth < 0 && !_firstElement && !compactMode ) {
-        Putc( '\n' );
-    }
-    if ( !compactMode ) {
-        PrintSpace( _depth );
-    }
 
     Write ( "<" );
     Write ( name );
 
     _elementJustOpened = true;
-    _firstElement = false;
     ++_depth;
 }
 
@@ -2820,12 +2897,7 @@ void XMLPrinter::PushText( double value )
 
 void XMLPrinter::PushComment( const char* comment )
 {
-    SealElementIfJustOpened();
-    if ( _textDepth < 0 && !_firstElement && !_compactMode) {
-        Putc( '\n' );
-        PrintSpace( _depth );
-    }
-    _firstElement = false;
+    PrepareForNewNode( _compactMode );
 
     Write( "<!--" );
     Write( comment );
@@ -2835,12 +2907,7 @@ void XMLPrinter::PushComment( const char* comment )
 
 void XMLPrinter::PushDeclaration( const char* value )
 {
-    SealElementIfJustOpened();
-    if ( _textDepth < 0 && !_firstElement && !_compactMode) {
-        Putc( '\n' );
-        PrintSpace( _depth );
-    }
-    _firstElement = false;
+    PrepareForNewNode( _compactMode );
 
     Write( "<?" );
     Write( value );
@@ -2850,12 +2917,7 @@ void XMLPrinter::PushDeclaration( const char* value )
 
 void XMLPrinter::PushUnknown( const char* value )
 {
-    SealElementIfJustOpened();
-    if ( _textDepth < 0 && !_firstElement && !_compactMode) {
-        Putc( '\n' );
-        PrintSpace( _depth );
-    }
-    _firstElement = false;
+    PrepareForNewNode( _compactMode );
 
     Write( "<!" );
     Write( value );
