@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2016-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2016-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,9 +19,10 @@ namespace vita
 namespace
 {
 
-std::uintmax_t weight(const dataframe::example &v)
+auto weight(const dataframe::example &v)
 {
-  return v.difficulty + v.age * v.age * v.age;
+  return static_cast<std::uintmax_t>(v.difficulty)
+         + static_cast<std::uintmax_t>(v.age) * v.age * v.age;
 }
 
 }  // unnamed namespace
