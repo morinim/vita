@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2013-2014 EOS di Manlio Morini.
+#  Copyright (C) 2013-2022 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -11,12 +11,7 @@
 #
 
 import argparse
-import os
 import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement
-
-
-verbose = False
 
 
 def is_number(s):
@@ -81,8 +76,6 @@ def get_cmd_line_options():
     description = "Common preprocessing for XRFF dataset files."
     parser = argparse.ArgumentParser(description = description)
 
-    parser.add_argument("-v", "--verbose", action = "store_true",
-                        help = "Turn on verbose mode")
     parser.add_argument("-n", "--numbers_only", action = "store_true",
                         default = False,
                         help = "Transforms nominal (string) attributes into " \
@@ -98,8 +91,6 @@ def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
     args = parser.parse_args()
-
-    verbose = args.verbose
 
     if args.numbers_only:
         numbers_only(args)

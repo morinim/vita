@@ -4,8 +4,6 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 
-from numpy import sin, cos
-
 # First set up the figure, the axis, and the plot element we want to animate
 fig, ax = plt.subplots()
 ax.axis([-10.1,8.1,-10.5,10.0])

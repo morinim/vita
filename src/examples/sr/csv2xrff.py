@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011 EOS di Manlio Morini.
+#  Copyright (C) 2011-2022 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -12,9 +12,6 @@ import argparse
 import csv
 import os
 from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-
-verbose = False
 
 
 def is_number(s):
@@ -85,8 +82,6 @@ def get_cmd_line_options():
     description = "Convert a file from CSV data format to XRFF."
     parser = argparse.ArgumentParser(description=description)
 
-    parser.add_argument("-v", "--verbose", action="store_true",
-                        help="Turn on verbose mode")
     parser.add_argument("-c", "--class_column", type=int, default=0,
                         help="Which attribute should act as class attribute?")
 
@@ -100,8 +95,6 @@ def main():
     # Get argument flags and command options
     parser = get_cmd_line_options()
     args = parser.parse_args()
-
-    verbose = args.verbose
 
     csv_to_xrff(args)
 

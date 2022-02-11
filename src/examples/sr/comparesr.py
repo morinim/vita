@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2020 EOS di Manlio Morini.
+#  Copyright (C) 2011-2022 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -11,7 +11,7 @@
 import argparse
 import os
 from collections import defaultdict
-from decimal import *
+from decimal import Decimal
 from xml.etree.ElementTree import ElementTree
 
 
