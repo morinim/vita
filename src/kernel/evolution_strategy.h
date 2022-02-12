@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2019 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -58,7 +58,10 @@ public:
   void log_strategy(unsigned, unsigned) const {}
 
   /// Sets strategy-specific parameters.
-  static environment shape(environment env) { return env; }
+  /// The default implementation doesn't change the user-specified
+  /// environment. Some evolution strategies force parameters to
+  /// specific values.
+  static environment shape(const environment &env) { return env; }
 
   /// Initial setup performed before evolution starts.
   void init() const {}
