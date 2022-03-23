@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <functional>
 #include <map>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -236,8 +237,10 @@ inline class_t label(const dataframe::example &e)
 class dataframe::params
 {
 public:
-  params &header()    { dialect.has_header =  true; return *this; }
-  params &no_header() { dialect.has_header = false; return *this; }
+  params &header()
+  { dialect.has_header = pocket_csv::dialect::HAS_HEADER; return *this; }
+  params &no_header()
+  { dialect.has_header =  pocket_csv::dialect::NO_HEADER; return *this; }
 
   params &output(std::size_t o) { output_index =            o; return *this; }
   params &no_output()           { output_index = std::nullopt; return *this; }

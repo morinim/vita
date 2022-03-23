@@ -19,7 +19,6 @@
 #include <fstream>
 #include <functional>
 #include <map>
-#include <optional>
 #include <sstream>
 
 namespace pocket_csv
@@ -33,13 +32,15 @@ namespace pocket_csv
 ///
 struct dialect
 {
-  /// A one-character string used to separate fields.
-  std::optional<char> delimiter = {};
+  /// A one-character string used to separate fields. When `0` triggers the
+  /// sniffer.
+  char delimiter = 0;
   /// When `true` skips leading and trailing spaces adjacent to commas.
   bool trim_ws = false;
-  /// When `true` assumes a header row is present. When undefined triggers the
-  /// sniffer.
-  std::optional<bool> has_header = {};
+  /// When `HAS_HEADER` assumes a header row is present. When `GUESS_HEADER`
+  /// triggers the sniffer.
+  enum header_e {GUESS_HEADER = -1, NO_HEADER = 0, HAS_HEADER = 1} has_header
+    = GUESS_HEADER;
   /// Controls if quotes should be keep by the reader.
   /// - `KEEP_QUOTES`. Always keep the quotes;
   /// - `REMOVE_QUOTES`. Never keep quotes.
@@ -287,12 +288,13 @@ struct char_stat
                      });
 }
 
-[[nodiscard]] inline bool has_header(std::istream &is, std::size_t lines,
-                                     char delim)
+[[nodiscard]] inline dialect::header_e has_header(std::istream &is,
+                                                  std::size_t lines,
+                                                  char delim)
 {
   dialect d;
   d.delimiter = delim;
-  d.has_header = true;  // assume first row is header (1)
+  d.has_header = dialect::HAS_HEADER;  // assume first row is header (1)
   pocket_csv::parser parser(is, d);
 
   // Quoting allows to correctly identify a column with header `"1980"` (e.g. a
@@ -337,16 +339,16 @@ struct char_stat
 
   // Finally, compare results against first row and "vote" on whether it's a
   // header.
-  int has_header(0);
+  int vote_header(0);
 
   for (std::size_t field(0); field < columns; ++field)
     switch (column_types[field])
     {
     case none_tag:
       if (header[field].length())
-        ++has_header;
+        ++vote_header;
       else
-        --has_header;
+        --vote_header;
       break;
 
     case skip_tag:
@@ -354,28 +356,28 @@ struct char_stat
 
     case number_tag:
       if (!is_number(header[field]))
-        ++has_header;
+        ++vote_header;
       else
-        --has_header;
+        --vote_header;
       break;
 
     case string_tag:  // variable length strings
-      ++has_header;
+      ++vote_header;
       break;
 
     default:  // column containing fixed length strings
       assert(column_types[field] > 0);
       if (const auto length = static_cast<std::size_t>(column_types[field]);
           header[field].length() != length)
-        ++has_header;
+        ++vote_header;
       else
-        --has_header;
+        --vote_header;
     }
 
   is.clear();
   is.seekg(0, std::ios::beg);  // back to the start!
 
-  return has_header > 0;
+  return vote_header > 0 ? dialect::HAS_HEADER : dialect::NO_HEADER;
 }
 
 [[nodiscard]] inline char guess_delimiter(std::istream &is, std::size_t lines)
@@ -488,7 +490,7 @@ struct char_stat
   dialect d;
 
   d.delimiter = detail::guess_delimiter(is, lines);
-  d.has_header = detail::has_header(is, lines, *d.delimiter);
+  d.has_header = detail::has_header(is, lines, d.delimiter);
 
   return d;
 }

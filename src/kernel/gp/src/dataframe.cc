@@ -678,14 +678,14 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
 {
   clear();
 
-  if (p.dialect.has_header == std::nullopt
-      || p.dialect.delimiter == std::nullopt)
+  if (p.dialect.has_header == pocket_csv::dialect::GUESS_HEADER
+      || !p.dialect.delimiter)
   {
     const auto sniff(pocket_csv::sniffer(from));
 
-    if (p.dialect.has_header == std::nullopt)
+    if (p.dialect.has_header == pocket_csv::dialect::GUESS_HEADER)
       p.dialect.has_header = sniff.has_header;
-    if (p.dialect.delimiter == std::nullopt)
+    if (!p.dialect.delimiter)
       p.dialect.delimiter = sniff.delimiter;
   }
 
@@ -708,9 +708,11 @@ std::size_t dataframe::read_csv(std::istream &from, params p)
       record.insert(record.begin(), "");
 
     // Every new record may add further information about the column domain.
+    const bool has_header(p.dialect.has_header
+                          == pocket_csv::dialect::HAS_HEADER);
     if (count < 10)
-      columns.build(record, *p.dialect.has_header);
-    if (p.dialect.has_header == false || count)
+      columns.build(record, has_header);
+    if (has_header == false || count)
       read_record(record, true);
 
     ++count;
