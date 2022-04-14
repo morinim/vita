@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,9 +53,6 @@ public:
   i_mep replace(const locus &, const gene &) const;
 
   i_mep cse() const;
-
-  std::pair<i_mep, std::vector<locus>> generalize(unsigned,
-                                                  const symbol_set &) const;
 
   bool operator==(const i_mep &) const;
 

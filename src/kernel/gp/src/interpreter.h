@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -32,8 +32,8 @@ template<class T>
 class src_interpreter : public interpreter<T>
 {
 public:
-  explicit src_interpreter(const T *prg, interpreter<T> *ctx = nullptr)
-    : interpreter<T>(prg, ctx), example_(nullptr)
+  explicit src_interpreter(const T *prg) : interpreter<T>(prg),
+                                           example_(nullptr)
   {}
 
   value_t run(const std::vector<value_t> &);

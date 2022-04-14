@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,6 @@ TEST_CASE("Base")
 
   CHECK(t.is_valid());
   CHECK(!t.arity());
-  CHECK(!t.auto_defined());
 }
 
 }  // TEST_SUITE("TERMINAL")

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,10 +11,9 @@
  */
 
 #include "kernel/symbol_set.h"
-#include "kernel/gp/adf.h"
-#include "kernel/gp/argument.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
+#include "kernel/gp/gene.h"
 
 namespace vita
 {
@@ -23,11 +22,8 @@ namespace vita
 ///
 /// The constructor allocates memory for up to `k_args` arguments.
 ///
-symbol_set::symbol_set() : arguments_(gene::k_args), symbols_(), views_()
+symbol_set::symbol_set() : symbols_(), views_()
 {
-  for (unsigned i(0); i < gene::k_args; ++i)
-    arguments_[i] = std::make_unique<argument>(i);
-
   Ensures(is_valid());
 }
 
@@ -40,30 +36,6 @@ void symbol_set::clear()
 
   symbols_.clear();
   views_.clear();
-}
-
-///
-/// \param[in] n index of an argument symbol
-/// \return      a reference to the `n`-th `argument` symbol
-///
-const symbol &symbol_set::arg(std::size_t n) const
-{
-  Expects(n < gene::k_args);
-  return *arguments_[n];
-}
-
-///
-/// \return a container with all the ADTs
-///
-std::vector<const symbol *> symbol_set::adts() const
-{
-  std::vector<const symbol *> ret;
-
-  for (category_t c(0); c < views_.size(); ++c)
-    for (const auto &adt : views_[c].adt)
-      ret.push_back(adt.sym);
-
-  return ret;
 }
 
 ///
@@ -100,19 +72,9 @@ symbol *symbol_set::insert(std::unique_ptr<symbol> s, double wr)
   views_[category].all.insert(ws);
 
   if (s->terminal())
-  {
     views_[category].terminals.insert(ws);
-
-    if (s->auto_defined())
-      views_[category].adt.insert(ws);
-  }
   else  // function
-  {
     views_[category].functions.insert(ws);
-
-    if (s->auto_defined())
-      views_[category].adf.insert(ws);
-  }
 
   symbols_.push_back(std::move(s));
   return ws.sym;
@@ -128,37 +90,6 @@ void symbol_set::collection::sum_container::scale_weights(double ratio, F f)
       s.weight = static_cast<weight_t>(s.weight * ratio);
       sum_ += s.weight;
     }
-}
-
-///
-/// Halves ADF / ADT weights.
-///
-void symbol_set::scale_adf_weights()
-{
-  for (category_t c(0); c < views_.size(); ++c)
-  {
-    views_[c].all.scale_weights(0.5,
-                                [](const auto &ws)
-                                {
-                                  return ws.sym->auto_defined();
-                                });
-
-    views_[c].functions.scale_weights(0.5,
-                                      [](const auto &ws)
-                                      {
-                                        return ws.sym->auto_defined();
-                                      });
-
-    views_[c].terminals.scale_weights(0.5,
-                                      [](const auto &ws)
-                                      {
-                                        return ws.sym->auto_defined();
-                                      });
-  }
-
-  // Weights in the `views_[c].adt` / `views_[c].adf` containers dont't change:
-  // we just want to lower the probability of auto-defined symbols selection
-  // compared to standard symbols.
 }
 
 ///
@@ -388,8 +319,8 @@ bool symbol_set::is_valid() const
 /// \param[in] n name of the collection
 ///
 symbol_set::collection::collection(std::string n)
-  : all("all"), functions("functions"), terminals("terminals"), adf("adf"),
-    adt("adt"), name_(std::move(n))
+  : all("all"), functions("functions"), terminals("terminals"),
+    name_(std::move(n))
 {
 }
 
@@ -398,8 +329,7 @@ symbol_set::collection::collection(std::string n)
 ///
 bool symbol_set::collection::is_valid() const
 {
-  if (!all.is_valid() || !functions.is_valid() || !terminals.is_valid()
-      || !adf.is_valid() || !adt.is_valid())
+  if (!all.is_valid() || !functions.is_valid() || !terminals.is_valid())
   {
     vitaERROR << "(inside " << name_ << ")";
     return false;
@@ -423,13 +353,6 @@ bool symbol_set::collection::is_valid() const
                   << " badly stored";
         return false;
       }
-
-      if (s.sym->auto_defined()
-          && std::find(adt.begin(), adt.end(), s) == adt.end())
-      {
-        vitaERROR << name_ << ": ADT " << s.sym->name() << " badly stored";
-        return false;
-      }
     }
     else  // function
     {
@@ -437,13 +360,6 @@ bool symbol_set::collection::is_valid() const
       {
         vitaERROR << name_ << ": function " << s.sym->name()
                   << " badly stored";
-        return false;
-      }
-
-      if (s.sym->auto_defined()
-          && std::find(adf.begin(), adf.end(), s) == adf.end())
-      {
-        vitaERROR << name_ << ": ADF " << s.sym->name() << " badly stored";
         return false;
       }
     }
@@ -471,18 +387,6 @@ bool symbol_set::collection::is_valid() const
   if (ssize < terminals.size())
   {
     vitaERROR << name_ << ": wrong terminal set size (more than symbol set)";
-    return false;
-  }
-
-  if (functions.size() < adf.size())
-  {
-    vitaERROR << name_ << ": wrong ADF set size (more than symbol set)";
-    return false;
-  }
-
-  if (terminals.size() < adt.size())
-  {
-    vitaERROR << name_ << ": wrong ADT set size (more than symbol set)";
     return false;
   }
 
@@ -578,7 +482,7 @@ bool symbol_set::collection::sum_container::is_valid() const
   {
     check_sum += e.weight;
 
-    if (e.weight == 0 && !(e.sym->terminal() || e.sym->auto_defined()))
+    if (e.weight == 0 && !e.sym->terminal())
     {
       vitaERROR << name_ << ": null weight for symbol " << e.sym->name();
       return false;

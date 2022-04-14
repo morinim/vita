@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,7 +42,6 @@ public:
   virtual ~symbol() = default;
 
   virtual unsigned arity() const = 0;
-  virtual bool auto_defined() const;
   virtual bool input() const;
 
   category_t category() const;
@@ -87,15 +86,6 @@ private:
 inline double symbol::penalty(core_interpreter *ci) const
 {
   return penalty_nvi(ci);
-}
-
-///
-/// \return `true` if the symbol has been automatically defined (e.g.
-///         ADF / ADT), `false` otherwise (this is the default value)
-///
-inline bool symbol::auto_defined() const
-{
-  return false;
 }
 
 ///

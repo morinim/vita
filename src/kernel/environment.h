@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -215,9 +215,6 @@ public:
   /// \see https://github.com/morinim/vita/wiki/validation
   facultative<unsigned> validation_percentage = {};
 
-  /// Should we use Adaptive Representation through Learning?
-  bool arl = false;
-
   /// `2^cache_size` is the number of elements of the cache.
   unsigned cache_size = 16;
 
@@ -234,10 +231,6 @@ public:
     /// \note
     /// A single log file can overwrite this path specifying an absolute path.
     std::filesystem::path dir = {};
-
-    /// Name of the log file used to save ARL-specific information.
-    /// \note An empty string disable logging.
-    std::filesystem::path arl_file = {};
 
     /// Name of the log file used to save real-time information.
     /// \note An empty string disable logging.

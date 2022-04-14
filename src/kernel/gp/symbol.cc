@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,7 +24,6 @@ opcode_t symbol::opc_count_(0);
 /// \note
 /// By default a symbol:
 /// - is NOT associative;
-/// - is NOT auto defined;
 /// - is NOT an input;
 /// - is NOT parametric.
 /// These are safe values for derived classes.

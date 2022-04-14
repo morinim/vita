@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -131,108 +131,6 @@ void src_search<T, ES>::calculate_metrics(summary<T> *s) const
 }
 
 ///
-/// Adaptive Representation through Learning (ARL).
-///
-/// \param[in] base individual we are examining to extract building blocks
-///
-/// The algorithm extracts common knowledge (building blocks) emerging during
-/// the evolutionary process and acquires the necessary structures for solving
-/// the problem (see ARL - Justinian P. Rosca and Dana H. Ballard).
-///
-/// \note
-/// No partial specialization for member functions of class templates is
-/// allowed but we need it for this method (we need partial specialization on
-/// `T`).
-/// The tipical work around is to introduce overloaded functions inside the
-/// class (this has the benefit that they have the same access to member
-/// variables, functions...).
-///
-template<class T, template<class> class ES>
-template<class U>
-void src_search<T, ES>::arl(const U &base)
-{
-  auto &eval(*this->eva1_);  // just a shorthand
-
-  const auto base_fit(eval(base));
-  if (!isfinite(base_fit))
-    return;  // we need a finite fitness to search for an improvement
-
-  std::ofstream log_file;
-  if (!prob().env.stat.arl_file.empty())
-  {
-    const auto filename(prob().env.stat.dir / prob().env.stat.arl_file);
-    log_file.open(filename, std::ios_base::app);
-
-    if (log_file.is_open())  // logs ADTs
-    {
-      for (const auto &s : prob().sset.adts())
-        log_file << s->name() << ' ' << prob().sset.weight(*s) << '\n';
-      log_file << '\n';
-    }
-  }
-
-  const unsigned adf_args(0);
-  auto blk_idx(base.blocks());
-  for (const locus &l : blk_idx)
-  {
-    auto candidate_block(base.get_block(l));
-
-    // Building blocks must be simple.
-    if (candidate_block.active_symbols() > 5 + adf_args)
-      continue;
-
-    // This is an approximation of the fitness due to the current block.
-    // The idea is to see how the individual (base) would perform without
-    // (`base.destroy_block`) the current block.
-    // Useful blocks have positive `delta` values.
-    const auto delta(base_fit
-                     - eval(base.destroy_block(l.index, prob().sset)));
-
-    using std::isfinite;
-    using std::abs;
-
-    // Semantic introns cannot be building blocks...
-    // When delta is greater than 10% of the base fitness we have a
-    // building block.
-    if (isfinite(delta) && abs(base_fit / 10.0) < delta)
-    {
-      std::unique_ptr<symbol> p;
-      if (adf_args)
-      {
-        auto generalized(candidate_block.generalize(adf_args, prob().sset));
-        cvect categories(generalized.second.size());
-
-        for (const auto &replaced : generalized.second)
-          categories.push_back(replaced.category);
-
-        p = std::make_unique<adf>(generalized.first, categories);
-      }
-      else  // !adf_args
-        p = std::make_unique<adt>(candidate_block);
-
-      if (log_file.is_open())  // logs ADFs
-      {
-        log_file << p->name() << " (Base: " << base_fit
-                 << "  DF: " << delta << ")\n" << candidate_block << '\n';
-      }
-
-      prob().sset.insert(std::move(p));
-    }
-  }
-}
-
-///
-/// Repeatedly calls `arl()` for each member of the team.
-///
-/// \param[in] base a team we are examining to extract building blocks
-///
-template<class T, template<class> class ES>
-template<class U>
-void src_search<T, ES>::arl(const team<U> &)
-{
-}
-
-///
 /// Tries to tune search parameters for the current problem.
 ///
 /// Parameter tuning is a typical approach to algorithm design. Such tuning
@@ -327,12 +225,6 @@ void src_search<T, ES>::tune_parameters()
 template<class T, template<class> class ES>
 void src_search<T, ES>::after_evolution(const summary<T> &s)
 {
-  if (prob().env.arl)
-  {
-    prob().sset.scale_adf_weights();
-    arl(s.best.solution);
-  }
-
   search<T, ES>::after_evolution(s);
 }
 

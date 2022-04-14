@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -31,9 +31,7 @@ TEST_CASE("Constructor / Insertion")
   // Empty symbol set
   CHECK(prob.sset.categories() == 0);
   CHECK(prob.sset.enough_terminals());
-  CHECK(prob.sset.arg(1).name() == "ARG_1");
   CHECK(prob.sset.is_valid());
-  CHECK(prob.sset.adts().empty());
 
   vita::symbol_factory factory;
 
@@ -86,8 +84,6 @@ TEST_CASE("Constructor / Insertion")
   CHECK(prob.sset.decode(fsub->opcode()) == fsub);
   CHECK(prob.sset.decode("FADD") == fadd);
   CHECK(prob.sset.decode(fadd->opcode()) == fadd);
-
-  CHECK(prob.sset.adts().empty());
 
   // Reset
   prob.sset.clear();

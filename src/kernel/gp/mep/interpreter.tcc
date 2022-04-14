@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -19,16 +19,14 @@
 
 ///
 /// \param[in] ind individual whose value we are interested in
-/// \param[in] ctx context in which we calculate the output value (used for
-///                the evaluation of ADF). It can be empty (`nullptr`)
 ///
 /// \warning
 /// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
 ///
 template<class T>
-interpreter<T>::interpreter(const T *ind, interpreter *ctx)
+interpreter<T>::interpreter(const T *ind)
   : core_interpreter(), prg_(ind), cache_(ind->size(), ind->categories()),
-    ip_(ind->best_), context_(ctx)
+    ip_(ind->best_)
 {
   Expects(ind);
 }
@@ -82,8 +80,8 @@ terminal::param_t interpreter<T>::fetch_param()
 /// REFERENTIAL TRANSPARENCY for all the expressions.
 ///
 /// \see
-/// - <http://wikipedia.org/wiki/Referential_transparency_(computer_science)>
-/// - <http://wikipedia.org/wiki/Memoization>
+/// - <https://en.wikipedia.org/wiki/Referential_transparency>
+/// - <https://en.wikipedia.org/wiki/Memoization>
 ///
 template<class T>
 value_t interpreter<T>::fetch_arg(unsigned i)
@@ -121,23 +119,6 @@ value_t interpreter<T>::fetch_arg(unsigned i)
 
   Ensures(elem.valid);
   return elem.value;
-}
-
-///
-/// \param[in] i i-th argument of the current ADF
-/// \return      the value of the i-th argument of the current ADF function
-///
-template<class T>
-value_t interpreter<T>::fetch_adf_arg(unsigned i)
-{
-#if !defined(NDEBUG)
-  assert(context_);
-  assert(i < gene::k_args);
-
-  const gene ctx_g(context_->prg_->operator[](context_->ip_));
-  assert(!ctx_g.sym->terminal() && ctx_g.sym->auto_defined());
-#endif
-  return context_->fetch_arg(i);
 }
 
 ///

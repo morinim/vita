@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#  Copyright (C) 2011-2019 EOS di Manlio Morini.
+#  Copyright (C) 2011-2022 EOS di Manlio Morini.
 #
 #  This Source Code Form is subject to the terms of the Mozilla Public
 #  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -17,7 +17,6 @@ import random
 import subprocess
 
 
-arl_filename = "arl"
 dynamic_filename = "dynamic"
 stat_dir = "stat/"
 summary_filename = "summary"
@@ -156,7 +155,6 @@ def save_results(args, dataset):
 
     # SR can produce up to three output files...
     files = {
-        arl_filename: ".arl",
         dynamic_filename: ".dyn",
         summary_filename: ".sum"}
 

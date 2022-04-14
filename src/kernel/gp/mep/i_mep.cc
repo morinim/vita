@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -16,8 +16,6 @@
 
 #include "kernel/gp/mep/i_mep.h"
 #include "kernel/cache_hash.h"
-#include "kernel/gp/adf.h"
-#include "kernel/gp/argument.h"
 #include "kernel/log.h"
 #include "kernel/random.h"
 
@@ -238,55 +236,6 @@ i_mep i_mep::destroy_block(index_t index, const symbol_set &sset) const
 
   Ensures(ret.is_valid());
   return ret;
-}
-
-///
-/// Produces the body for a ADF.
-///
-/// \param[in] sset     a symbol set
-/// \param[in] max_args maximum number of arguments for the ADF
-/// \return             the generalized individual and a set of loci (ADF
-///                     arguments positions)
-///
-/// Changes up to `max_args` terminals (exactly `max_args` when available)
-/// of `this` individual with formal arguments, thus producing the body for a
-/// ADF.
-///
-std::pair<i_mep, std::vector<locus>> i_mep::generalize(
-  unsigned max_args, const symbol_set &sset) const
-{
-  Expects(max_args && max_args <= gene::k_args);
-
-  std::vector<locus> terminals;
-
-  // Step 1: mark the active terminal symbols.
-  for (auto i(begin()); i != end(); ++i)
-    if (i->sym->terminal())
-      terminals.push_back(i.locus());
-
-  const auto t_size(static_cast<unsigned>(terminals.size()));
-
-  // Step 2: shuffle the terminals and pick elements `0...n-1`.
-  const auto n(std::min<unsigned>(max_args, t_size));
-  assert(n);
-
-  if (n < size())
-    for (auto j(decltype(n){0}); j < n; ++j)
-    {
-      const auto r(random::between(j, t_size));
-
-      std::swap(terminals[j], terminals[r]);
-    }
-
-  // Step 3: randomly substitute `n` terminals with function arguments.
-  i_mep ret(*this);
-  for (auto j(decltype(n){0}); j < n; ++j)
-    ret.genome_(terminals[j]).sym = &sset.arg(j);
-  ret.signature_.clear();
-
-  Ensures(ret.is_valid());
-
-  return {ret, std::vector<locus>(terminals.begin(), terminals.begin() + n)};
 }
 
 ///

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -68,12 +68,10 @@ Options:
   --runs=<runs>          number of runs to be tried
   --mate-zone=<dist>     mating zone (0 for panmictic)
   --threshold=<val>      success threshold for a run
-  --arl                  enables Adaptive Representation through Learning
   --cache=<bits>         cache will contain `2^bits` elements
   --random-seed=<seed>   sets the seed for the pseudo-random number generator
                          (equences are repeatable by using the same seed value)
   --stat-dir=DIR         base path for log files
-  --stat-arl             enables ARL logging
   --stat-dynamic         enables real-time logging
   --stat-layers          enables layer-specific information logging
   --stat-population      enables population-specific information logging
@@ -173,16 +171,6 @@ vita::validator_id validator(vita::validator_id::undefined);
 
 // Reference problem (the problem we will work on).
 vita::src_problem *problem;
-
-// Enables Adaptive Representation through Learning.
-void arl(const args_t &a)
-{
-  if (a.at("--arl").asBool())
-  {
-    problem->env.arl = true;
-    vitaINFO << "Adaptive Representation through Learning is enabled";
-  }
-}
 
 // Sets the brood size for recombination.
 //
@@ -517,16 +505,6 @@ void set_runs(const args_t &a)
   vitaINFO << "Number of runs set to " << r;
 }
 
-// Enables ARL logging.
-void stat_arl(const args_t &a)
-{
-  if (a.at("--stat-arl").asBool())
-  {
-    problem->env.stat.arl_file = "arl";
-    vitaINFO << "ARL logging is enabled";
-  }
-}
-
 // Sets the base path for log files.
 void stat_dir(const args_t &a)
 {
@@ -730,11 +708,9 @@ void parse_command_line(int argc, char *const argv[])
   ui::max_stuck_time(args);
   ui::set_runs(args);
   ui::mate_zone(args);
-  ui::arl(args);
   ui::threshold(args);
 
   ui::stat_dir(args);
-  ui::stat_arl(args);
   ui::stat_dynamic(args);
   ui::stat_layers(args);
   ui::stat_population(args);

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -42,20 +42,19 @@ namespace vita
 /// instantiation.
 ///
 /// \see
-/// - <http://en.wikipedia.org/wiki/Dependency_injection>
-/// - <http://stackoverflow.com/q/4542789/3235496>
-/// - <http://stackoverflow.com/q/12387239/3235496>
-/// - <http://stackoverflow.com/q/1974682/3235496>
+/// - https://en.wikipedia.org/wiki/Dependency_injection
+/// - https://stackoverflow.com/q/4542789/3235496
+/// - https://stackoverflow.com/q/12387239/3235496
+/// - https://stackoverflow.com/q/1974682/3235496
 ///
 template<class T>
 class interpreter : public core_interpreter
 {
 public:
-  explicit interpreter(const T *, interpreter * = nullptr);
+  explicit interpreter(const T *);
 
   terminal::param_t fetch_param();
   value_t fetch_arg(unsigned);
-  value_t fetch_adf_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
   const T &program() const { return *prg_; }
@@ -78,9 +77,6 @@ private:
 
   // Instruction pointer.
   locus ip_;
-
-  // This is a pointer since we need to describe a one-or-zero relationship.
-  interpreter *context_;
 };
 
 #include "kernel/gp/mep/interpreter.tcc"

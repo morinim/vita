@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -52,9 +52,6 @@ public:
 
   const symbol &arg(std::size_t) const;
 
-  std::vector<const symbol *> adts() const;
-  void scale_adf_weights();
-
   symbol *decode(opcode_t) const;
   symbol *decode(const std::string &) const;
 
@@ -69,13 +66,6 @@ public:
   friend std::ostream &operator<<(std::ostream &, const symbol_set &);
 
 private:
-  // `arguments_` data member is not:
-  // * present in the `collection` struct because an argument isn't bounded to
-  //   a category (see `argument` class for more details);
-  // * a subset of `symbols_` (the intersection of `arguments_` and `symbol_`
-  //   is empty) because arguments aren't returned by the roulette functions.
-  std::vector<std::unique_ptr<symbol>> arguments_;
-
   // This is the real, raw repository of symbols (it owns/stores the symbols).
   std::vector<std::unique_ptr<symbol>> symbols_;
 
@@ -147,8 +137,6 @@ private:
     sum_container       all;
     sum_container functions;
     sum_container terminals;
-    sum_container       adf;
-    sum_container       adt;
 
   private:
     std::string name_;

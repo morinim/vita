@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,7 +14,6 @@
 #define      VITA_SRC_SEARCH_H
 
 #include "kernel/vitafwd.h"
-#include "kernel/gp/adf.h"
 #include "kernel/gp/src/dss.h"
 #include "kernel/gp/src/evaluator.h"
 #include "kernel/gp/src/holdout_validation.h"
@@ -59,9 +58,6 @@ public:
   explicit src_search(src_problem &, metric_flags = metric_flags::nothing);
 
   std::unique_ptr<basic_src_lambda_f> lambdify(const T &) const;
-
-  template<class U> void arl(const U &);
-  template<class U> void arl(const team<U> &);
 
   src_search &evaluator(evaluator_id, const std::string & = "");
   src_search &validation_strategy(validator_id);
