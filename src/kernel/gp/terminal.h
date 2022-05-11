@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -28,16 +28,16 @@ class terminal : public symbol
 public:
   using symbol::symbol;
 
-  unsigned arity() const final;
+  [[nodiscard]] unsigned arity() const final;
 
-  virtual bool parametric() const;
+  [[nodiscard]] virtual bool parametric() const;
 
   using param_t = double;
-  virtual param_t init() const;
+  [[nodiscard]] virtual param_t init() const;
 
-  virtual std::string display(param_t, format = c_format) const;
+  [[nodiscard]] virtual std::string display(param_t, format = c_format) const;
 
-  static const terminal *cast(const symbol *);
+  [[nodiscard]] static const terminal *cast(const symbol *);
 };
 
 ///

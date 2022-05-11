@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,17 +36,17 @@ class function : public symbol
 public:
   function(const std::string &, category_t, cvect);
 
-  category_t arg_category(std::size_t) const;
+  [[nodiscard]] category_t arg_category(std::size_t) const;
 
-  virtual bool associative() const;
+  [[nodiscard]] virtual bool associative() const;
 
-  virtual std::string display(format = c_format) const;
+  [[nodiscard]] virtual std::string display(format = c_format) const;
 
-  unsigned arity() const final;
+  [[nodiscard]] unsigned arity() const final;
 
-  bool is_valid() const override;
+  [[nodiscard]] bool is_valid() const override;
 
-  static const function *cast(const symbol *);
+  [[nodiscard]] static const function *cast(const symbol *);
 
 private:
   cvect argt_;

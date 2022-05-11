@@ -44,9 +44,9 @@ public:
   virtual unsigned arity() const = 0;
   virtual bool input() const;
 
-  category_t category() const;
-  opcode_t opcode() const;
-  bool terminal() const;
+  [[nodiscard]] category_t category() const;
+  [[nodiscard]] opcode_t opcode() const;
+  [[nodiscard]] bool terminal() const;
 
   void category(category_t);
 
@@ -56,7 +56,7 @@ public:
   /// (it's implementation specific).
   virtual value_t eval(core_interpreter *) const = 0;
 
-  double penalty(core_interpreter *) const;
+  [[nodiscard]] double penalty(core_interpreter *) const;
 
   virtual bool is_valid() const;
 
