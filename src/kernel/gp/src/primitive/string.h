@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -47,10 +47,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto *i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto v0(i->fetch_arg(0));
     if (!has_value(v0))  return v0;
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2012-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2012-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -36,7 +36,7 @@ public:
   /// \remark
   /// Arguments aren't used: the value of a constant is stored within the
   /// object.
-  std::string display(terminal::param_t, format) const final
+  std::string display(terminal_param_t, format) const final
   { return std::to_string(val_); }
 
   /// \return the value of the constant
@@ -59,7 +59,7 @@ public:
   explicit constant(const char c[], category_t t = 0)
     : constant(std::string(c), t) {}
 
-  std::string display(param_t, format) const final
+  std::string display(terminal_param_t, format) const final
   {
     return quote_str(val_);
   }

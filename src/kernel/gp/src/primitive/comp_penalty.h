@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -26,7 +26,7 @@ namespace vita
 ///
 /// Maximum penalty for `if ("apple" == "apple") then "orange" else "orange"`
 ///
-inline double comparison_function_penalty(core_interpreter *ci)
+[[nodiscard]] inline double comparison_function_penalty(core_interpreter *ci)
 {
   auto i(static_cast<interpreter<i_mep> *>(ci));
 

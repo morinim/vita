@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,7 +21,7 @@ namespace vita
 /// The `v` argument is required for parametric symbols (i.e. for a numeric
 /// terminal we have to print 123 rather than "NUMBER").
 ///
-std::string terminal::display(terminal::param_t v, format) const
+std::string terminal::display(terminal_param_t v, format) const
 {
   return name() + "_" + std::to_string(v);
 }

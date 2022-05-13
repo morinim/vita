@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ public:
 
   value_t eval(core_interpreter *) const final { return false; }
 
-  std::string display(terminal::param_t, format f) const final
+  std::string display(terminal_param_t, format f) const final
   {
     switch (f)
     {
@@ -49,7 +49,7 @@ public:
 
   value_t eval(core_interpreter *) const final { return true; }
 
-  std::string display(terminal::param_t, format f) const final
+  std::string display(terminal_param_t, format f) const final
   {
     switch (f)
     {
@@ -68,10 +68,10 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return std::get<D_INT>(i.fetch_arg(0)) && std::get<D_INT>(i.fetch_arg(1));
+    return std::get<D_INT>(i->fetch_arg(0))
+           && std::get<D_INT>(i->fetch_arg(1));
   }
 
   std::string display(format f) const final
@@ -90,10 +90,9 @@ public:
   explicit l_not(const cvect &c) : function("NOT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto &i(*static_cast<interpreter<i_mep> *>(ci));
-    return !std::get<D_INT>(i.fetch_arg(0));
+    return !std::get<D_INT>(i->fetch_arg(0));
   }
 
   std::string display(format f) const final
@@ -114,10 +113,10 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-    return std::get<D_INT>(i->fetch_arg(0)) || std::get<D_INT>(i->fetch_arg(1));
+    return std::get<D_INT>(i->fetch_arg(0))
+           || std::get<D_INT>(i->fetch_arg(1));
   }
 
   std::string display(format f) const final

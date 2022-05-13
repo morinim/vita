@@ -63,16 +63,14 @@ public:
 
   bool parametric() const final { return true; }
 
-  terminal::param_t init() const final
-  { return random::between(min, upp); }
+  terminal_param_t init() const final { return random::between(min, upp); }
 
-  std::string display(terminal::param_t v, format) const final
+  std::string display(terminal_param_t v, format) const final
   { return std::to_string(v); }
 
   value_t eval(core_interpreter *i) const final
   {
-    return static_cast<base_t>(
-             static_cast<interpreter<i_mep> *>(i)->fetch_param());
+    return static_cast<base_t>(i->fetch_param());
   }
 
 private:
@@ -90,9 +88,8 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -112,9 +109,8 @@ public:
   explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -132,9 +128,8 @@ public:
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -157,9 +152,8 @@ public:
     : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -181,9 +175,8 @@ public:
   explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
 
     if (v0 == 0)
@@ -205,9 +198,8 @@ public:
   explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -227,12 +219,11 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
     static_assert(sizeof(std::intmax_t) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
 
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const std::intmax_t v0(integer::cast(i->fetch_arg(0)));
     const std::intmax_t v1(integer::cast(i->fetch_arg(1)));
 
@@ -287,9 +278,8 @@ public:
   explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 
@@ -309,9 +299,8 @@ public:
   explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
     const auto v0(integer::cast(i->fetch_arg(0)));
     const auto v1(integer::cast(i->fetch_arg(1)));
 

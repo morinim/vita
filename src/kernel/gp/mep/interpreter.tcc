@@ -60,7 +60,7 @@ inline value_t interpreter<T>::run_nvi()
 /// \return the output value of the current terminal symbol
 ///
 template<class T>
-terminal::param_t interpreter<T>::fetch_param()
+terminal_param_t interpreter<T>::fetch_param_nvi() const
 {
   const gene &g((*prg_)[ip_]);
 
@@ -84,7 +84,7 @@ terminal::param_t interpreter<T>::fetch_param()
 /// - <https://en.wikipedia.org/wiki/Memoization>
 ///
 template<class T>
-value_t interpreter<T>::fetch_arg(unsigned i)
+value_t interpreter<T>::fetch_arg_nvi(unsigned i)
 {
   const gene &g((*prg_)[ip_]);
 

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -44,6 +44,8 @@ namespace vita
 using category_t = std::size_t;
 constexpr category_t undefined_category = static_cast<category_t>(-1);
 using cvect = std::vector<category_t>;  // often used so we define a shortcut
+
+using terminal_param_t = double;
 
 /// A macro to disallow the copy constructor and operator= functions.
 /// A good alternative is boost::noncopyable but that gives some false

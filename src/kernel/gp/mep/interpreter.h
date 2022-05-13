@@ -53,8 +53,6 @@ class interpreter : public core_interpreter
 public:
   explicit interpreter(const T *);
 
-  terminal::param_t fetch_param();
-  value_t fetch_arg(unsigned);
   index_t fetch_index(unsigned) const;
 
   const T &program() const { return *prg_; }
@@ -66,8 +64,10 @@ private:
 
   // Nonvirtual interface.
   value_t run_nvi() override;
-  double penalty_nvi() override;
-  bool is_valid_nvi() const override;
+  [[nodiscard]] double penalty_nvi() override;
+  [[nodiscard]] bool is_valid_nvi() const override;
+  [[nodiscard]] terminal_param_t fetch_param_nvi() const final;
+  value_t fetch_arg_nvi(unsigned) final;
 
   // *** Private data members ***
   const T *prg_;

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2020-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -45,7 +45,7 @@ using value_t = std::variant<D_VOID, D_INT, D_DOUBLE, D_STRING>;
 
 ///
 /// \param[in] v value to be checked
-/// \return      `true` if the `v` isn't empty
+/// \return      `true` if `v` isn't empty
 ///
 inline bool has_value(const value_t &v)
 {

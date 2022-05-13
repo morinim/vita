@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -21,23 +21,33 @@ namespace vita
 ///
 /// Minimum interface of an interpreter.
 ///
-/// The class "executes" an individual (a program) in its environment. The
-/// program can produce an output or perform some actions.
+/// The class "executes" an individual (a program). The program can produce an
+/// output or perform some actions.
 ///
-/// The class can also check if an individual breaks some constraints
-/// assigning a penalty to infeasible individuals.
+/// The class can also check if an individual breaks some constraints assigning
+/// a penalty to infeasible individuals.
 ///
 class core_interpreter
 {
 public:
   value_t run() { return run_nvi(); }
-  double penalty() { return penalty_nvi(); }
-  bool is_valid() const { return is_valid_nvi(); }
+  [[nodiscard]] double penalty() { return penalty_nvi(); }
+  [[nodiscard]] bool is_valid() const { return is_valid_nvi(); }
+
+  // Return value could be ignored. E.g. the caller is only interested in the
+  // side effects of the `fetch_arg` call (typically agent simulation).
+  value_t fetch_arg(unsigned i) { return fetch_arg_nvi(i); }
+
+  [[nodiscard]] terminal_param_t fetch_param() const
+  { return fetch_param_nvi(); }
 
 private:
   virtual value_t run_nvi() = 0;
   virtual double penalty_nvi() = 0;
   virtual bool is_valid_nvi() const = 0;
+
+  virtual value_t fetch_arg_nvi(unsigned) = 0;
+  virtual terminal_param_t fetch_param_nvi() const = 0;
 };
 
 ///

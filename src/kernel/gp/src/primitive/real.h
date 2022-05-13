@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -75,16 +75,14 @@ public:
 
   bool parametric() const final { return true; }
 
-  terminal::param_t init() const final
-  { return random::between(min, upp); }
+  terminal_param_t init() const final { return random::between(min, upp); }
 
-  std::string display(terminal::param_t v, format) const final
+  std::string display(terminal_param_t v, format) const final
   { return std::to_string(v); }
 
   value_t eval(core_interpreter *i) const final
   {
-    return static_cast<base_t>(
-             static_cast<interpreter<i_mep> *>(i)->fetch_param());
+    return static_cast<base_t>(i->fetch_param());
   }
 
 private:
@@ -108,16 +106,14 @@ public:
 
   bool parametric() const final { return true; }
 
-  terminal::param_t init() const final
-  { return random::between(min, upp); }
+  terminal_param_t init() const final { return random::between(min, upp); }
 
-  std::string display(terminal::param_t v, format) const final
+  std::string display(terminal_param_t v, format) const final
   { return std::to_string(static_cast<int>(v)); }
 
   value_t eval(core_interpreter *i) const final
   {
-    return static_cast<base_t>(
-             static_cast<interpreter<i_mep> *>(i)->fetch_param());
+    return static_cast<base_t>(i->fetch_param());
   }
 
 private:
@@ -146,7 +142,7 @@ public:
 
   value_t eval(core_interpreter *i) const final
   {
-    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(i->fetch_arg(0));
     return has_value(a) ? std::fabs(base(a)) : a;
   }
 };
@@ -166,10 +162,8 @@ public:
     return "(%%1%%+%%2%%)";
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -208,10 +202,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -247,7 +239,7 @@ public:
 
   value_t eval(core_interpreter *i) const final
   {
-    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(i->fetch_arg(0));
     if (!has_value(a))  return a;
 
     return std::cos(base(a));
@@ -268,10 +260,8 @@ public:
     return "(%%1%%/%%2%%)";
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -303,10 +293,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -340,10 +328,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -381,10 +367,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -434,10 +418,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -475,10 +457,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -524,10 +504,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -560,7 +538,7 @@ public:
 
   value_t eval(core_interpreter *i) const final
   {
-    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(i->fetch_arg(0));
     if (!has_value(a))  return a;
 
     return static_cast<base_t>(std::get<D_STRING>(a).length());
@@ -593,7 +571,7 @@ public:
   ///
   value_t eval(core_interpreter *i) const final
   {
-    const auto a0(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
     const auto ret(std::log(base(a0)));
@@ -621,10 +599,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -656,10 +632,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -693,10 +667,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -724,10 +696,8 @@ public:
     return "(%%1%%*%%2%%)";
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -762,7 +732,7 @@ public:
 
   value_t eval(core_interpreter *i) const final
   {
-    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(i->fetch_arg(0));
     if (!has_value(a))  return a;
 
     return std::sin(base(a));
@@ -790,7 +760,7 @@ public:
 
   value_t eval(core_interpreter *i) const final
   {
-    const auto a(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    const auto a(i->fetch_arg(0));
     if (!has_value(a))  return a;
 
     const auto v(base(a));
@@ -815,10 +785,8 @@ public:
     return "(%%1%%-%%2%%)";
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 
@@ -853,10 +821,8 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *ci) const final
+  value_t eval(core_interpreter *i) const final
   {
-    auto i(static_cast<interpreter<i_mep> *>(ci));
-
     const auto a0(i->fetch_arg(0));
     if (!has_value(a0))  return a0;
 

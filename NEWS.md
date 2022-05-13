@@ -15,6 +15,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Changed
 - **BREAKING CHANGE**. `hits` and `probes` statistical information were hardly used and have been removed. The removal implies a (minor) change in the saving format of the cache.
 - **BREAKING CHANGE**. `gene::arg_locus` has been renamed to `locus_of_argument`. This should only affect secondary the end user since the function is mainly used in the meanderings of the `i_mep` class.
+- **BREAKING CHANGE**. Implementing user defined functions is simpler. Instead of:
+
+  ```C++
+  value_t eval(core_interpreter *i) const final
+  {
+    const auto arg(static_cast<interpreter<i_mep> *>(i)->fetch_arg(0));
+    if (has_value(a)) { /* do something with `arg` */ }
+    // ...
+  }
+  ```
+
+  you can simply write:
+
+  ```C++
+  value_t eval(core_interpreter *i) const final
+  {
+    const auto arg(i->fetch_arg(0));
+    if (has_value(a)) { /* do something with `arg` */ }
+	// ...
+  }
+  ```
+
+  This way user doesn't have to know details about specific interpreters.
 
 ## [2.1.0] - 2020-11-23
 

@@ -32,10 +32,10 @@ public:
 
   [[nodiscard]] virtual bool parametric() const;
 
-  using param_t = double;
-  [[nodiscard]] virtual param_t init() const;
+  [[nodiscard]] virtual terminal_param_t init() const;
 
-  [[nodiscard]] virtual std::string display(param_t, format = c_format) const;
+  [[nodiscard]] virtual std::string display(terminal_param_t,
+                                            format = c_format) const;
 
   [[nodiscard]] static const terminal *cast(const symbol *);
 };
@@ -62,14 +62,14 @@ inline bool terminal::parametric() const
 }
 
 ///
-/// Used to initialize the terminal's internal parameter.
+/// Used to initialize the internal parameter of the terminal.
 ///
 /// \return `0.0`
 ///
 /// \remark
 /// Derived classes should redefine this member function in a meaningful way.
 ///
-inline terminal::param_t terminal::init() const
+inline terminal_param_t terminal::init() const
 {
   return 0.0;
 }

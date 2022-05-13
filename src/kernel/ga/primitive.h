@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2014-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2014-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -30,7 +30,7 @@ namespace vita::ga
 /// floating-point numbers, as well as the function being applied).
 /// Instead we detect them and take alternative action (usually returning
 /// an empty value).
-using base_t = terminal::param_t;
+using base_t = terminal_param_t;
 
 namespace detail
 {
@@ -65,9 +65,9 @@ public:
 
   bool parametric() const final { return true; }
 
-  terminal::param_t init() const override { return random::in(range_); }
+  terminal_param_t init() const override { return random::in(range_); }
 
-  std::string display(terminal::param_t v, format) const override
+  std::string display(terminal_param_t v, format) const override
   { return std::to_string(static_cast<T>(v)); }
 
 private:

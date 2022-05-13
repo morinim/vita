@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2021 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -48,9 +48,9 @@ public:
   enum : decltype(K) {k_args = K};
 
   // Public data members.
-  const symbol     *sym;
-  terminal::param_t par;
-  arg_pack         args;
+  const symbol    *sym;
+  terminal_param_t par;
+  arg_pack        args;
 
 private:
   void init_if_parametric();
