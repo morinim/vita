@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2020-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,13 +10,48 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#include <sstream>
-
-#include "kernel/gp/src/category_set.h"
-#include "kernel/gp/src/dataframe.h"
+#include "kernel/vita.h"
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include "third_party/doctest/doctest.h"
+
+TEST_SUITE("README_SYMBOLIC_REGRESSION")
+{
+
+TEST_CASE("symbolic regression")
+{
+  // DATA SAMPLE
+  // (the target function is `x + sin(x)`)
+  std::istringstream training(R"(
+    -9.456,-10.0
+    -8.989, -8.0
+    -5.721, -6.0
+    -3.243, -4.0
+    -2.909, -2.0
+     0.000,  0.0
+     2.909,  2.0
+     3.243,  4.0
+     5.721,  6.0
+     8.989,  8.0
+  )");
+
+  // READING INPUT DATA
+  vita::src_problem prob(training);
+
+  // SETTING UP SYMBOLS
+  prob.insert<vita::real::sin>();
+  prob.insert<vita::real::cos>();
+  prob.insert<vita::real::add>();
+  prob.insert<vita::real::sub>();
+  prob.insert<vita::real::div>();
+  prob.insert<vita::real::mul>();
+
+  // SEARCHING
+  vita::src_search s(prob);
+  auto result(s.run());
+}
+
+}  // TEST_SUITE("README_SYMBOLIC_REGRESSION")
 
 TEST_SUITE("WIKI_DATAFRAME")
 {

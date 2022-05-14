@@ -1,7 +1,7 @@
 /*
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2018-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2018-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -10,6 +10,8 @@
  *
  *  \see https://github.com/morinim/vita/wiki/symbolic_regression
  */
+
+/* CHANGES IN THIS FILE MUST BE APPLIED TO THE LINKED WIKI PAGE */
 
 #include "kernel/vita.h"
 

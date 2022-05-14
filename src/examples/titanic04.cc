@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2019-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2019-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -11,6 +11,8 @@
  *
  *  \see https://github.com/morinim/vita/wiki/titanic_tutorial
  */
+
+/* CHANGES IN THIS FILE MUST BE APPLIED TO THE LINKED WIKI PAGE */
 
 #include <cstdlib>
 
