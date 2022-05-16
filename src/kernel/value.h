@@ -14,6 +14,7 @@
 #define      VITA_VALUE_H
 
 #include <iosfwd>
+#include <string>
 #include <variant>
 
 namespace vita

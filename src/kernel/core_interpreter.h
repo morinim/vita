@@ -13,7 +13,9 @@
 #if !defined(VITA_CORE_INTERPRETER_H)
 #define      VITA_CORE_INTERPRETER_H
 
+#include "kernel/common.h"
 #include "kernel/value.h"
+#include "kernel/vitafwd.h"
 
 namespace vita
 {

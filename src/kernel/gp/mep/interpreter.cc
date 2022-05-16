@@ -10,12 +10,11 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INTERPRETER_H)
-#  error "Don't include this file directly, include the specific .h instead"
-#endif
+#include "kernel/gp/mep/interpreter.h"
+#include "kernel/gp/mep/i_mep.h"
 
-#if !defined(VITA_INTERPRETER_TCC)
-#define      VITA_INTERPRETER_TCC
+namespace vita
+{
 
 ///
 /// \param[in] ind individual whose value we are interested in
@@ -23,8 +22,7 @@
 /// \warning
 /// The lifetime of `ind` and `ctx` must extend beyond that of the interpreter.
 ///
-template<class T>
-interpreter<T>::interpreter(const T *ind)
+interpreter<i_mep>::interpreter(const i_mep *ind)
   : core_interpreter(), prg_(ind), cache_(ind->size(), ind->categories()),
     ip_(ind->best_)
 {
@@ -35,8 +33,7 @@ interpreter<T>::interpreter(const T *ind)
 /// \param[in] ip locus of the genome we are starting evaluation from
 /// \return       the output value of `this` individual
 ///
-template<class T>
-value_t interpreter<T>::run_locus(const locus &ip)
+value_t interpreter<i_mep>::run_locus(const locus &ip)
 {
   for (auto &e : cache_)
     e.valid = false;
@@ -50,8 +47,7 @@ value_t interpreter<T>::run_locus(const locus &ip)
 ///
 /// \return the output value of `this` individual
 ///
-template<class T>
-inline value_t interpreter<T>::run_nvi()
+value_t interpreter<i_mep>::run_nvi()
 {
   return run_locus(prg_->best_);
 }
@@ -59,8 +55,7 @@ inline value_t interpreter<T>::run_nvi()
 ///
 /// \return the output value of the current terminal symbol
 ///
-template<class T>
-terminal_param_t interpreter<T>::fetch_param_nvi() const
+terminal_param_t interpreter<i_mep>::fetch_param_nvi() const
 {
   const gene &g((*prg_)[ip_]);
 
@@ -83,8 +78,7 @@ terminal_param_t interpreter<T>::fetch_param_nvi() const
 /// - <https://en.wikipedia.org/wiki/Referential_transparency>
 /// - <https://en.wikipedia.org/wiki/Memoization>
 ///
-template<class T>
-value_t interpreter<T>::fetch_arg_nvi(unsigned i)
+value_t interpreter<i_mep>::fetch_arg_nvi(unsigned i)
 {
   const gene &g((*prg_)[ip_]);
 
@@ -126,8 +120,7 @@ value_t interpreter<T>::fetch_arg_nvi(unsigned i)
 /// \return      the index referenced by the `i`-th argument of the current
 ///              function
 ///
-template<class T>
-index_t interpreter<T>::fetch_index(unsigned i) const
+index_t interpreter<i_mep>::fetch_index(unsigned i) const
 {
   const gene &g((*prg_)[ip_]);
 
@@ -141,8 +134,7 @@ index_t interpreter<T>::fetch_index(unsigned i) const
 /// \param[in] ip locus of the genome we are starting evaluation from
 /// \return       the penalty value for `this` individual
 ///
-template<class T>
-double interpreter<T>::penalty_locus(const locus &ip)
+double interpreter<i_mep>::penalty_locus(const locus &ip)
 {
   ip_ = ip;
   return (*prg_)[ip_].sym->penalty(this);
@@ -153,8 +145,7 @@ double interpreter<T>::penalty_locus(const locus &ip)
 ///
 /// \return the penalty for `this` individual
 ///
-template<class T>
-double interpreter<T>::penalty_nvi()
+double interpreter<i_mep>::penalty_nvi()
 {
   return penalty_locus(prg_->best_);
 }
@@ -162,10 +153,9 @@ double interpreter<T>::penalty_nvi()
 ///
 /// \return `true` if the object passes the internal consistency check
 ///
-template<class T>
-bool interpreter<T>::is_valid_nvi() const
+bool interpreter<i_mep>::is_valid_nvi() const
 {
   return ip_.index < prg_->size();
 }
 
-#endif  // include guard
+}  // namespace vita

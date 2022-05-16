@@ -10,8 +10,8 @@
  *  You can obtain one at http://mozilla.org/MPL/2.0/
  */
 
-#if !defined(VITA_INTERPRETER_H)
-#define      VITA_INTERPRETER_H
+#if !defined(VITA_MEP_INTERPRETER_H)
+#define      VITA_MEP_INTERPRETER_H
 
 #include "kernel/core_interpreter.h"
 #include "kernel/gp/function.h"
@@ -22,16 +22,7 @@
 namespace vita
 {
 ///
-/// A template specialization of the core_interpreter class.
-///
-/// \tparam T the type of individual used
-///
-/// \note
-/// This class would like to be a generic `interpreter<T>` implementation,
-/// but interpreter and individual are strongly coupled objects: the
-/// interpreter must be build around the peculiarities of the specific
-/// individual class. So don't expect to use this template for `T` different
-/// from `i_mep` without some modifications.
+/// A specialization of the core_interpreter class.
 ///
 /// \note
 /// This is an example of dependency injection via constructor injection: the
@@ -47,20 +38,20 @@ namespace vita
 /// - https://stackoverflow.com/q/12387239/3235496
 /// - https://stackoverflow.com/q/1974682/3235496
 ///
-template<class T>
-class interpreter : public core_interpreter
+template<>
+class interpreter<i_mep> : public core_interpreter
 {
 public:
-  explicit interpreter(const T *);
+  explicit interpreter(const i_mep *);
 
-  index_t fetch_index(unsigned) const;
+  [[nodiscard]] index_t fetch_index(unsigned) const;
 
-  const T &program() const { return *prg_; }
+  [[nodiscard]] const i_mep &program() const { return *prg_; }
 
 private:
   // *** Private support methods ***
   value_t run_locus(const locus &);
-  double penalty_locus(const locus &);
+  [[nodiscard]] double penalty_locus(const locus &);
 
   // Nonvirtual interface.
   value_t run_nvi() override;
@@ -70,7 +61,7 @@ private:
   value_t fetch_arg_nvi(unsigned) final;
 
   // *** Private data members ***
-  const T *prg_;
+  const i_mep *prg_;
 
   struct elem_ {bool valid; value_t value;};
   mutable matrix<elem_> cache_;
@@ -78,8 +69,6 @@ private:
   // Instruction pointer.
   locus ip_;
 };
-
-#include "kernel/gp/mep/interpreter.tcc"
 
 }  // namespace vita
 
