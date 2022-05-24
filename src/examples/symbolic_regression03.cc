@@ -59,7 +59,7 @@ int main()
   vita::problem prob;
 
   // SETTING UP SYMBOLS
-  prob.sset.insert<c>();
+  prob.insert<c>();
   prob.insert<vita::real::add>();
   prob.insert<vita::real::sub>();
   prob.insert<vita::real::mul>();
