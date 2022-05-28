@@ -33,16 +33,12 @@ public:
   bool input() const override { return true; }
 
   /// \return the name of the variable
-  std::string display(terminal_param_t, format) const final
-  { return name(); }
+  std::string display(terminal_param_t, format) const final { return name(); }
 
   /// \return the value of the variable
   ///
   /// \note Requires a src_interpreter to work.
-  value_t eval(core_interpreter *i) const override
-  {
-    return static_cast<src_interpreter<i_mep> *>(i)->fetch_var(var_);
-  }
+  value_t eval(symbol_params &p) const override { return p.fetch_var(var_); }
 
 private:
   unsigned var_;

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,8 +15,6 @@
 
 #include "kernel/vita.h"
 
-using i_interp = vita::core_interpreter;
-
 // This class models the first input.
 class X : public vita::terminal
 {
@@ -25,7 +23,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::value_t eval(i_interp *) const override { return val; }
+  vita::value_t eval(vita::symbol_params &) const override { return val; }
 
   static double val;
 };
@@ -37,7 +35,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::value_t eval(i_interp *) const override { return val; }
+  vita::value_t eval(vita::symbol_params &) const override { return val; }
 
   static double val;
 };
@@ -49,7 +47,7 @@ public:
 
   bool input() const override { return true; }
 
-  vita::value_t eval(i_interp *) const override { return val; }
+  vita::value_t eval(vita::symbol_params &) const override { return val; }
 
   static double val;
 };

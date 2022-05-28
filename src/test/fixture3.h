@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,6 +14,7 @@
 #define      FIXTURE3_H
 
 #include "kernel/gp/src/primitive/factory.h"
+#include "kernel/gp/src/primitive/real.h"
 #include "kernel/gp/terminal.h"
 #include "kernel/problem.h"
 
@@ -26,19 +27,22 @@ struct fixture3
 
     bool input() const override { return true; }
 
-    vita::value_t eval(vita::core_interpreter *) const override { return val; }
+    vita::value_t eval(vita::symbol_params &) const override { return val; }
 
     double val;
   };
+
+  static constexpr vita::real::base_t x_val = 123.0;
+  static constexpr vita::real::base_t y_val = 321.0;
 
   fixture3() : prob(), factory(), null(),
                c0(prob.sset.insert(factory.make("0.0"))),
                c1(prob.sset.insert(factory.make("1.0"))),
                c2(prob.sset.insert(factory.make("2.0"))),
                c3(prob.sset.insert(factory.make("3.0"))),
-               x(prob.sset.insert(factory.make("123.0"))),
-               neg_x(prob.sset.insert(factory.make("-123.0"))),
-               y(prob.sset.insert(factory.make("321.0"))),
+               x(prob.sset.insert(factory.make(std::to_string(x_val)))),
+               neg_x(prob.sset.insert(factory.make(std::to_string(-x_val)))),
+               y(prob.sset.insert(factory.make(std::to_string(y_val)))),
                z(prob.sset.insert<Z>()),
                f_abs(prob.sset.insert(factory.make("FABS"))),
                f_add(prob.sset.insert(factory.make("FADD"))),

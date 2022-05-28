@@ -38,7 +38,7 @@ public:
 
   value_t run(const std::vector<value_t> &);
 
-  value_t fetch_var(unsigned);
+  [[nodiscard]] value_t fetch_var(unsigned) final;
 
 private:
   // Tells the compiler we want both the run function from interpreter and

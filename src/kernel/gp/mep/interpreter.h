@@ -48,6 +48,9 @@ public:
 
   [[nodiscard]] const i_mep &program() const { return *prg_; }
 
+  [[nodiscard]] terminal_param_t fetch_param() const final;
+  value_t fetch_arg(unsigned) final;
+
 private:
   // *** Private support methods ***
   value_t run_locus(const locus &);
@@ -57,8 +60,6 @@ private:
   value_t run_nvi() override;
   [[nodiscard]] double penalty_nvi() override;
   [[nodiscard]] bool is_valid_nvi() const override;
-  [[nodiscard]] terminal_param_t fetch_param_nvi() const final;
-  value_t fetch_arg_nvi(unsigned) final;
 
   // *** Private data members ***
   const i_mep *prg_;

@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -15,7 +15,6 @@
 
 #include "kernel/random.h"
 #include "kernel/gp/mep/i_mep.h"
-#include "kernel/gp/src/primitive/real.h"
 
 #include "test/fixture3.h"
 
@@ -35,7 +34,7 @@ TEST_CASE_FIXTURE(fixture3, "f_abs")
                    {{neg_x, null}}   // [1] -X
                  });
   ret = run(i1);
-  CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
+  CHECK(real::base(ret) == doctest::Approx(x_val));
 
   // ABS(X) == X
   const i_mep i2({
@@ -43,7 +42,7 @@ TEST_CASE_FIXTURE(fixture3, "f_abs")
                    {{    x, null}}   // [1] X
                  });
   ret = run(i2);
-  CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
+  CHECK(real::base(ret) == doctest::Approx(x_val));
 }
 
 TEST_CASE_FIXTURE(fixture3, "f_add")
@@ -57,7 +56,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                    {{    x,   null}}   // [2] X
                  });
   ret = run(i1);
-  CHECK(real::base(ret) == doctest::Approx(real::base(x->eval(nullptr))));
+  CHECK(real::base(ret) == doctest::Approx(x_val));
 
   // ADD(X,Y) == X+Y
   const i_mep i2({
@@ -67,8 +66,7 @@ TEST_CASE_FIXTURE(fixture3, "f_add")
                  });
   ret = run(i2);
   const auto res1(real::base(ret));
-  CHECK(doctest::Approx(res1)
-        == real::base(y->eval(nullptr)) + real::base(x->eval(nullptr)));
+  CHECK(doctest::Approx(res1) == y_val + x_val);
 
   // ADD(X,-X) == 0
   const i_mep i3({
@@ -93,7 +91,7 @@ TEST_CASE_FIXTURE(fixture3, "f_aq")
 {
   using namespace vita;
 
-  const auto rx(real::base(x->eval(nullptr)));
+  const auto rx(x_val);
 
   // AQ(X,X) == 1
   const i_mep i1({
@@ -239,7 +237,7 @@ TEST_CASE_FIXTURE(fixture3, "f_idiv")
                    {{    c1,   null}}   // [2] 1.0
                  });
   ret = run(i2);
-  CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
+  CHECK(doctest::Approx(real::base(ret)) == x_val);
 
   // IDIV(-X,X) == -1
   const i_mep i3({
@@ -387,9 +385,7 @@ TEST_CASE_FIXTURE(fixture3, "f_max")
                  });
   ret = run(i3);
   const auto res1(real::base(ret));
-  CHECK(doctest::Approx(res1)
-        == std::max(real::base(x->eval(nullptr)),
-                    real::base(y->eval(nullptr))));
+  CHECK(doctest::Approx(res1) == std::max(x_val, y_val));
 
   // MAX(X,Y) == MAX(Y,X)
   const i_mep i4({
@@ -421,7 +417,7 @@ TEST_CASE_FIXTURE(fixture3, "f_mul")
                    {{   c1,   null}}   // [2] 1.0
                  });
   ret = run(i2);
-  CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
+  CHECK(doctest::Approx(real::base(ret)) == x_val);
 
   // MUL(X,2) == ADD(X,X)
   const i_mep i3({
@@ -515,7 +511,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
                    {{   c0,   null}}   // [2] 0.0
                  });
   ret = run(i2);
-  CHECK(doctest::Approx(real::base(ret)) == real::base(x->eval(nullptr)));
+  CHECK(doctest::Approx(real::base(ret)) == x_val);
 
   // SUB(Z,X) == Z-X
   const i_mep i3({
@@ -529,7 +525,7 @@ TEST_CASE_FIXTURE(fixture3, "f_sub")
     ret = run(i3);
 
     const auto v1(real::base(ret));
-    const auto v2(static_cast<Z *>(z)->val - real::base(x->eval(nullptr)));
+    const auto v2(static_cast<Z *>(z)->val - x_val);
     CHECK(v1 == doctest::Approx(v2));
   }
 }

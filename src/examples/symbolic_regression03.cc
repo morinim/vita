@@ -24,7 +24,7 @@ class c : public vita::terminal
 public:
   c() : vita::terminal("c") {}
 
-  vita::value_t eval(vita::core_interpreter *) const override
+  vita::value_t eval(vita::symbol_params &) const override
   {
     static const double val(vita::random::between(-10.0, 10.0));
     return val;

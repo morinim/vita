@@ -115,8 +115,7 @@ std::unique_ptr<symbol> symbol_factory::make(const std::string &name, cvect c)
   Expects(!name.empty());
   Expects(!c.empty());
 
-  const auto it(factory_.find(name));
-  if (it != factory_.end())
+  if (const auto it = factory_.find(name); it != factory_.end())
   {
     while (c.size() < it->second.args)
       c.push_back(category_t(0));

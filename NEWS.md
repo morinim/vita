@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - **BREAKING CHANGE**. `hits` and `probes` statistical information were hardly used and have been removed. The removal implies a (minor) change in the saving format of the cache.
-- **BREAKING CHANGE**. `gene::arg_locus` has been renamed to `locus_of_argument`. This should only affect secondary the end user since the function is mainly used in the meanderings of the `i_mep` class.
+- **BREAKING CHANGE**. `gene::arg_locus` has been renamed to `locus_of_argument`. This should only affect secondarly the end user since the function is mainly used in the meanderings of the `i_mep` class.
 - **BREAKING CHANGE**. Implementing user defined functions is simpler. Instead of:
 
   ```C++
@@ -29,15 +29,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
   you can simply write:
 
   ```C++
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto arg(i->fetch_arg(0));
+    const auto arg(args[0]);
     if (has_value(a)) { /* do something with `arg` */ }
 	// ...
   }
   ```
 
-  This way user doesn't have to know details about specific interpreters.
+  Note:
+  - `symbol_params` gives access to a subset of the interface of a `core_interpreter` so the user doesn't have to know unnecessary details about interpreters;
+  - `symbol_params::operator[](unsigned)` is equivalent to `symbol_params::fetch_arg(unsigned)` (syntactic sugar).
 
 ## [2.1.0] - 2020-11-23
 

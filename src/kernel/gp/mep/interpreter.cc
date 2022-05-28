@@ -39,7 +39,7 @@ value_t interpreter<i_mep>::run_locus(const locus &ip)
     e.valid = false;
 
   ip_ = ip;
-  return (*prg_)[ip_].sym->eval(this);
+  return (*prg_)[ip_].sym->eval(*this);
 }
 
 ///
@@ -55,7 +55,7 @@ value_t interpreter<i_mep>::run_nvi()
 ///
 /// \return the output value of the current terminal symbol
 ///
-terminal_param_t interpreter<i_mep>::fetch_param_nvi() const
+terminal_param_t interpreter<i_mep>::fetch_param() const
 {
   const gene &g((*prg_)[ip_]);
 
@@ -78,7 +78,7 @@ terminal_param_t interpreter<i_mep>::fetch_param_nvi() const
 /// - <https://en.wikipedia.org/wiki/Referential_transparency>
 /// - <https://en.wikipedia.org/wiki/Memoization>
 ///
-value_t interpreter<i_mep>::fetch_arg_nvi(unsigned i)
+value_t interpreter<i_mep>::fetch_arg(unsigned i)
 {
   const gene &g((*prg_)[ip_]);
 
@@ -91,7 +91,7 @@ value_t interpreter<i_mep>::fetch_arg_nvi(unsigned i)
       const locus backup(ip_);
       ip_ = l;
       assert(ip_.index > backup.index);
-      const auto ret((*prg_)[ip_].sym->eval(this));
+      const auto ret((*prg_)[ip_].sym->eval(*this));
       ip_ = backup;
       return ret;
     });

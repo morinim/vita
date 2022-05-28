@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -14,6 +14,7 @@
 #define      FIXTURE4_H
 
 #include "kernel/gp/src/primitive/factory.h"
+#include "kernel/gp/src/primitive/int.h"
 #include "kernel/gp/terminal.h"
 #include "kernel/problem.h"
 
@@ -26,10 +27,13 @@ struct fixture4
 
     bool input() const override { return true; }
 
-    vita::value_t eval(vita::core_interpreter *) const override { return val; }
+    vita::value_t eval(vita::symbol_params &) const override { return val; }
 
     int val;
   };
+
+  static constexpr vita::integer::base_t x_val = 123;
+  static constexpr vita::integer::base_t y_val = 321;
 
   fixture4() : prob(), factory(), null({})
   {
@@ -39,9 +43,9 @@ struct fixture4
     c1 = prob.sset.insert(factory.make("1"));
     c2 = prob.sset.insert(factory.make("2"));
     c3 = prob.sset.insert(factory.make("3"));
-    x = prob.sset.insert(factory.make("123"));
-    neg_x = prob.sset.insert(factory.make("-123"));
-    y = prob.sset.insert(factory.make("321"));
+    x = prob.sset.insert(factory.make(std::to_string(x_val)));
+    neg_x = prob.sset.insert(factory.make(std::to_string(-x_val)));
+    y = prob.sset.insert(factory.make(std::to_string(y_val)));
     z = prob.sset.insert<Z>();
     i_add = prob.sset.insert(factory.make("ADD"));
     i_div = prob.sset.insert(factory.make("DIV"));

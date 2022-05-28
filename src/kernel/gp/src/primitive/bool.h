@@ -28,7 +28,7 @@ public:
   explicit zero(const cvect &c) : terminal("0", c[0])
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *) const final { return false; }
+  value_t eval(symbol_params &) const final { return false; }
 
   std::string display(terminal_param_t, format f) const final
   {
@@ -47,7 +47,7 @@ public:
   explicit one(const cvect &c) : terminal("1", c[0])
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *) const final { return true; }
+  value_t eval(symbol_params &) const final { return true; }
 
   std::string display(terminal_param_t, format f) const final
   {
@@ -68,10 +68,9 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    return std::get<D_INT>(i->fetch_arg(0))
-           && std::get<D_INT>(i->fetch_arg(1));
+    return std::get<D_INT>(args[0]) && std::get<D_INT>(args[1]);
   }
 
   std::string display(format f) const final
@@ -90,9 +89,9 @@ public:
   explicit l_not(const cvect &c) : function("NOT", c[0], {c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    return !std::get<D_INT>(i->fetch_arg(0));
+    return !std::get<D_INT>(args[0]);
   }
 
   std::string display(format f) const final
@@ -113,10 +112,9 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    return std::get<D_INT>(i->fetch_arg(0))
-           || std::get<D_INT>(i->fetch_arg(1));
+    return std::get<D_INT>(args[0]) || std::get<D_INT>(args[1]);
   }
 
   std::string display(format f) const final

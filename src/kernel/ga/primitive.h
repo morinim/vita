@@ -72,7 +72,7 @@ public:
 
 private:
   /// \warning i_ga / i_de directly access the genome vector.
-  value_t eval(core_interpreter *) const override { return {}; }
+  value_t eval(symbol_params &) const override { return {}; }
 
   const range_t<T> range_;
 };

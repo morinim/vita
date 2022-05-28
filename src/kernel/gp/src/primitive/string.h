@@ -47,15 +47,18 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(i->fetch_arg(0));
+    const auto v0(args[0]);
     if (!has_value(v0))  return v0;
 
-    const auto v1(i->fetch_arg(1));
+    const auto v1(args[1]);
     if (!has_value(v1))  return v1;
 
-    return v0 == v1 ? i->fetch_arg(2) : i->fetch_arg(3);
+    if (v0 == v1)
+      return args[2];
+
+    return args[3];
   }
 };
 

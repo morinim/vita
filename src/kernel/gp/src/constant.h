@@ -36,7 +36,7 @@ public:
   /// \remark
   /// Arguments aren't used: the value of a constant is stored within the
   /// object.
-  std::string display(terminal_param_t, format) const final
+  [[nodiscard]] std::string display(terminal_param_t, format) const final
   { return std::to_string(val_); }
 
   /// \return the value of the constant
@@ -44,7 +44,8 @@ public:
   /// \remark
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
-  value_t eval(core_interpreter *) const override { return val_; }
+  value_t eval(symbol_params &) const override { return eval(); }
+  value_t eval() const { return val_; }
 
 private:
   T val_;
@@ -59,7 +60,7 @@ public:
   explicit constant(const char c[], category_t t = 0)
     : constant(std::string(c), t) {}
 
-  std::string display(terminal_param_t, format) const final
+  [[nodiscard]] std::string display(terminal_param_t, format) const final
   {
     return quote_str(val_);
   }
@@ -71,7 +72,8 @@ public:
   /// The argument is not used: the value of a constant is stored within the
   /// object and we don't need an interpreter to discover it.
   ///
-  value_t eval(core_interpreter *) const override { return val_; }
+  value_t eval(symbol_params &) const override { return eval(); }
+  value_t eval() const { return val_; }
 
 private:
   static std::string quote_str(const std::string &s) { return "\"" + s + "\"";}

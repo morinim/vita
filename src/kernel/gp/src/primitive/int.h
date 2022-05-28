@@ -68,9 +68,9 @@ public:
   std::string display(terminal_param_t v, format) const final
   { return std::to_string(v); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &p) const final
   {
-    return static_cast<base_t>(i->fetch_param());
+    return static_cast<base_t>(p.fetch_param());
   }
 
 private:
@@ -88,10 +88,10 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v0 > 0 && v1 > 0 && (v0 > std::numeric_limits<base_t>::max() - v1))
       return std::numeric_limits<base_t>::max();
@@ -109,10 +109,10 @@ public:
   explicit div(const cvect &c) : function("DIV", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
       return v0;
@@ -128,15 +128,15 @@ public:
     : function("IFE", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v0 == v1)
-      return i->fetch_arg(2);
+      return args[2];
 
-    return i->fetch_arg(3);
+    return args[3];
   }
 
   double penalty_nvi(core_interpreter *ci) const final
@@ -152,15 +152,15 @@ public:
     : function("IFL", c[1], {c[0], c[0], c[1], c[1]})
   { Expects(c.size() == 2); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v0 < v1)
-      return i->fetch_arg(2);
+      return args[2];
 
-    return i->fetch_arg(3);
+    return args[3];
   }
 
   double penalty_nvi(core_interpreter *ci) const final
@@ -175,14 +175,14 @@ public:
   explicit ifz(const cvect &c) : function("IFZ", c[0], {c[0], c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
+    const auto v0(integer::cast(args[0]));
 
     if (v0 == 0)
-      return i->fetch_arg(1);
+      return args[1];
 
-    return i->fetch_arg(2);
+    return args[2];
   }
 
   double penalty_nvi(core_interpreter *ci) const final
@@ -198,10 +198,10 @@ public:
   explicit mod(const cvect &c) : function("MOD", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v1 == 0 || (v0 == std::numeric_limits<base_t>::min() && (v1 == -1)))
       return v1;
@@ -219,13 +219,13 @@ public:
 
   bool associative() const final { return true; }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
     static_assert(sizeof(std::intmax_t) >= 2 * sizeof(base_t),
                   "Unable to detect overflow after multiplication");
 
-    const std::intmax_t v0(integer::cast(i->fetch_arg(0)));
-    const std::intmax_t v1(integer::cast(i->fetch_arg(1)));
+    const std::intmax_t v0(integer::cast(args[0]));
+    const std::intmax_t v1(integer::cast(args[1]));
 
     const auto tmp(v0 * v1);
     if (tmp > std::numeric_limits<base_t>::max())
@@ -278,10 +278,10 @@ public:
   explicit shl(const cvect &c) : function("SHL", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v0 < 0 || v1 < 0 ||
         v1 >= static_cast<base_t>(sizeof(base_t) * CHAR_BIT) ||
@@ -299,10 +299,10 @@ public:
   explicit sub(const cvect &c) : function("SUB", c[0], {c[0], c[0]})
   { Expects(c.size() == 1); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto v0(integer::cast(i->fetch_arg(0)));
-    const auto v1(integer::cast(i->fetch_arg(1)));
+    const auto v0(integer::cast(args[0]));
+    const auto v1(integer::cast(args[1]));
 
     if (v0 < 0 && v1 > 0 && (v0 < std::numeric_limits<base_t>::min() + v1))
       return std::numeric_limits<base_t>::min();

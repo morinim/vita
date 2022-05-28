@@ -80,9 +80,9 @@ public:
   std::string display(terminal_param_t v, format) const final
   { return std::to_string(v); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &p) const final
   {
-    return static_cast<base_t>(i->fetch_param());
+    return static_cast<base_t>(p.fetch_param());
   }
 
 private:
@@ -111,9 +111,9 @@ public:
   std::string display(terminal_param_t v, format) const final
   { return std::to_string(static_cast<int>(v)); }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &p) const final
   {
-    return static_cast<base_t>(i->fetch_param());
+    return static_cast<base_t>(p.fetch_param());
   }
 
 private:
@@ -140,9 +140,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a(i->fetch_arg(0));
+    const auto a(args[0]);
     return has_value(a) ? std::fabs(base(a)) : a;
   }
 };
@@ -162,12 +162,12 @@ public:
     return "(%%1%%+%%2%%)";
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) + base(a1));
@@ -202,12 +202,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const auto x(base(a0)), y(base(a1));
@@ -237,9 +237,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a(i->fetch_arg(0));
+    const auto a(args[0]);
     if (!has_value(a))  return a;
 
     return std::cos(base(a));
@@ -260,12 +260,12 @@ public:
     return "(%%1%%/%%2%%)";
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) / base(a1));
@@ -293,12 +293,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     return std::isgreater(base(a0), base(a1));
@@ -328,12 +328,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(std::floor(base(a0) / base(a1)));
@@ -367,15 +367,15 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
-    const auto a2(i->fetch_arg(2));
+    const auto a2(args[2]);
     if (!has_value(a2))  return a2;
 
     const auto v0(base(a0));
@@ -386,9 +386,9 @@ public:
     const auto max(std::fmax(v1, v2));
 
     if (std::isless(v0, min) || std::isgreater(v0, max))
-      return i->fetch_arg(4);
+      return args[4];
     else
-      return i->fetch_arg(3);
+      return args[3];
   }
 };
 
@@ -418,18 +418,18 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     if (issmall(base(a0) - base(a1)))
-      return i->fetch_arg(2);
+      return args[2];
     else
-      return i->fetch_arg(3);
+      return args[3];
   }
 
   double penalty_nvi(core_interpreter *ci) const final
@@ -457,19 +457,19 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const auto v0(base(a0)), v1(base(a1));
     if (std::isless(v0, v1))
-      return i->fetch_arg(2);
+      return args[2];
     else
-      return i->fetch_arg(3);
+      return args[3];
   }
 
   double penalty_nvi(core_interpreter *ci) const final
@@ -504,15 +504,15 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
     if (issmall(base(a0)))
-      return i->fetch_arg(1);
+      return args[1];
     else
-      return i->fetch_arg(2);
+      return args[2];
   }
 };
 
@@ -536,9 +536,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a(i->fetch_arg(0));
+    const auto a(args[0]);
     if (!has_value(a))  return a;
 
     return static_cast<base_t>(std::get<D_STRING>(a).length());
@@ -569,9 +569,9 @@ public:
   /// \return      the natural logarithm of its argument or an empty value in
   ///              case of invalid argument / infinite result
   ///
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
     const auto ret(std::log(base(a0)));
@@ -599,12 +599,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     return std::isless(base(a0), base(a1));
@@ -632,12 +632,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(std::fmax(base(a0), base(a1)));
@@ -667,12 +667,12 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(std::fmod(base(a0), base(a1)));
@@ -696,12 +696,12 @@ public:
     return "(%%1%%*%%2%%)";
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) * base(a1));
@@ -730,9 +730,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a(i->fetch_arg(0));
+    const auto a(args[0]);
     if (!has_value(a))  return a;
 
     return std::sin(base(a));
@@ -758,9 +758,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a(i->fetch_arg(0));
+    const auto a(args[0]);
     if (!has_value(a))  return a;
 
     const auto v(base(a));
@@ -785,12 +785,12 @@ public:
     return "(%%1%%-%%2%%)";
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
-    const auto a1(i->fetch_arg(1));
+    const auto a1(args[1]);
     if (!has_value(a1))  return a1;
 
     const base_t ret(base(a0) - base(a1));
@@ -821,9 +821,9 @@ public:
     }
   }
 
-  value_t eval(core_interpreter *i) const final
+  value_t eval(symbol_params &args) const final
   {
-    const auto a0(i->fetch_arg(0));
+    const auto a0(args[0]);
     if (!has_value(a0))  return a0;
 
     // The sigmoid function can be expressed in one of two equivalent ways:

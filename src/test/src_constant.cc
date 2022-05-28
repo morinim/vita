@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -24,22 +24,22 @@ TEST_CASE("Base")
 
   const bool b(true);
   constant<bool> bc(b);
-  CHECK(std::get<D_INT>(bc.eval(nullptr)) == b);
+  CHECK(std::get<D_INT>(bc.eval()) == b);
   CHECK(bc.is_valid());
 
   const int i(1234);
   constant<int> ic(i);
-  CHECK(std::get<D_INT>(ic.eval(nullptr)) == i);
+  CHECK(std::get<D_INT>(ic.eval()) == i);
   CHECK(ic.is_valid());
 
   const double d(3.14);
   constant<double> dc(d);
-  CHECK(std::get<D_DOUBLE>(dc.eval(nullptr)) == doctest::Approx(d));
+  CHECK(std::get<D_DOUBLE>(dc.eval()) == doctest::Approx(d));
   CHECK(dc.is_valid());
 
   const std::string s("A STRING CONSTANT");
   constant<std::string> sc(s);
-  CHECK(std::get<D_STRING>(sc.eval(nullptr)) == s);
+  CHECK(std::get<D_STRING>(sc.eval()) == s);
   CHECK(sc.is_valid());
 }
 

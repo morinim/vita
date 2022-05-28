@@ -54,7 +54,7 @@ public:
 
   /// Calculates the value of / performs the action associated with the symbol
   /// (it's implementation specific).
-  virtual value_t eval(core_interpreter *) const = 0;
+  virtual value_t eval(symbol_params &) const = 0;
 
   [[nodiscard]] double penalty(core_interpreter *) const;
 

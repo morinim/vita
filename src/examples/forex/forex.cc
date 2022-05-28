@@ -43,7 +43,7 @@ public:
   }
 
   bool input() const override { return true; }
-  vita::value_t eval(vita::core_interpreter *) const override { return {}; }
+  vita::value_t eval(vita::symbol_params &) const override { return {}; }
 
   std::string display(vita::terminal_param_t, format) const override
   {

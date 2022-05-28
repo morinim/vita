@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  Copyright (C) 2013-2020 EOS di Manlio Morini.
+ *  Copyright (C) 2013-2022 EOS di Manlio Morini.
  *
  *  This Source Code Form is subject to the terms of the Mozilla Public
  *  License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -35,7 +35,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = run(i1);
   INFO(i1);
-  CHECK(ret == x->eval(nullptr));
+  CHECK(std::get<D_INT>(ret) == x_val);
 
   // ADD(X,Y) == X+Y"
   const i_mep i2({
@@ -45,9 +45,7 @@ TEST_CASE_FIXTURE(fixture4, "i_add")
                  });
   ret = run(i2);
   INFO(i2);
-  CHECK(std::get<D_INT>(ret)
-        == std::get<D_INT>(y->eval(nullptr))
-           + std::get<D_INT>(x->eval(nullptr)));
+  CHECK(std::get<D_INT>(ret) == x_val + y_val);
 
   // ADD(X,-X) == 0
   const i_mep i3({
@@ -94,7 +92,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = run(i2);
   INFO(i2);
-  CHECK(ret == x->eval(nullptr));
+  CHECK(std::get<D_INT>(ret) == x_val);
 
   // DIV(-X,X) == -1
   const i_mep i3({
@@ -114,7 +112,7 @@ TEST_CASE_FIXTURE(fixture4, "i_div")
                  });
   ret = run(i4);
   INFO(i4);
-  CHECK(ret == x->eval(nullptr));
+  CHECK(std::get<D_INT>(ret) == x_val);
 }
 
 TEST_CASE_FIXTURE(fixture4, "i_ife")
@@ -193,7 +191,7 @@ TEST_CASE_FIXTURE(fixture4, "i_mul")
                  });
   ret = run(i2);
   INFO(i2);
-  CHECK(ret == x->eval(nullptr));
+  CHECK(std::get<D_INT>(ret) == x_val);
 
   // MUL(X,2) == ADD(X,X)
   const i_mep i3({
@@ -230,7 +228,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
                  });
   ret = run(i2);
   INFO(i2);
-  CHECK(ret == x->eval(nullptr));
+  CHECK(std::get<D_INT>(ret) == x_val);
 
   // SUB(Z,X) == Z-X
   const i_mep i3({
@@ -243,8 +241,7 @@ TEST_CASE_FIXTURE(fixture4, "i_sub")
     static_cast<Z *>(z)->val = vita::random::between<int>(-1000, 1000);
     ret = run(i3);
     INFO(i3);
-    CHECK(std::get<D_INT>(ret)
-          == static_cast<Z *>(z)->val - std::get<D_INT>(x->eval(nullptr)));
+    CHECK(std::get<D_INT>(ret) == static_cast<Z *>(z)->val - x_val);
   }
 }
 
