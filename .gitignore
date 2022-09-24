@@ -20,7 +20,6 @@ src/examples/sr/symbolset
 build/
 
 # External tools
-tools/cppcheck/
 tools/*.pyc
 
 # GNU Global files

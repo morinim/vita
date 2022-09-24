@@ -2,7 +2,7 @@
  *  \file
  *  \remark This file is part of VITA.
  *
- *  \copyright Copyright (C) 2011-2020 EOS di Manlio Morini.
+ *  \copyright Copyright (C) 2011-2022 EOS di Manlio Morini.
  *
  *  \license
  *  This Source Code Form is subject to the terms of the Mozilla Public
@@ -37,7 +37,11 @@ function::function(const std::string &dis, category_t c, cvect args)
 ///
 std::string function::display(format) const
 {
-  return name();
+  std::string args("%%1%%");
+  for (unsigned i(1); i < arity(); ++i)
+    args += ",%%" + std::to_string(i + 1) + "%%";
+
+  return name() + "(" + args + ")";
 }
 
 ///
