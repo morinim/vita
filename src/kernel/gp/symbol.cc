@@ -43,7 +43,6 @@ symbol::symbol(const std::string &name, category_t c)
 ///
 std::string symbol::name() const
 {
-  // This has to be a virtual member functions because of ADT/ADF functions.
   return name_;
 }
 

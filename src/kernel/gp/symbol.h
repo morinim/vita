@@ -50,7 +50,7 @@ public:
 
   void category(category_t);
 
-  virtual std::string name() const;
+  [[nodiscard]] std::string name() const;
 
   /// Calculates the value of / performs the action associated with the symbol
   /// (it's implementation specific).
