@@ -23,7 +23,7 @@ namespace vita
 ///
 std::string terminal::display(terminal_param_t v, format) const
 {
-  return name() + "_" + std::to_string(v);
+  return parametric() ? name() + "_" + std::to_string(v) : name();
 }
 
 }  // namespace vita
