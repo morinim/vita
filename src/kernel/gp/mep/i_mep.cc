@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <functional>
 #include <map>
+#include <utility>
 
 #include "kernel/gp/mep/i_mep.h"
 #include "kernel/cache_hash.h"
@@ -820,7 +821,7 @@ locus random_locus(const i_mep &prg)
     exons.insert(args.begin(), args.end());
   } while (++iter != exons.end());
 
-  return random::element(as_const(exons));
+  return random::element(std::as_const(exons));
 }
 
 namespace
