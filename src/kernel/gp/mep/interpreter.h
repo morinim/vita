@@ -49,7 +49,8 @@ public:
   [[nodiscard]] const i_mep &program() const { return *prg_; }
 
   [[nodiscard]] terminal_param_t fetch_param() const final;
-  value_t fetch_arg(unsigned) final;
+  [[nodiscard]] value_t fetch_arg(unsigned) final;
+  value_t fetch_opaque_arg(unsigned) final;
 
 private:
   // *** Private support methods ***

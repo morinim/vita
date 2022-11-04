@@ -20,13 +20,35 @@
 namespace vita
 {
 
+///
+/// An interface for parameter passing to functions / terminals.
+///
+/// symbol_params is a subset of the core_interpreter interface. Coding a user
+/// defined function is more natural when you can think the input parameters as
+/// a simple array of values.
+/// Actually things are more complex but user doesn't have to know. The only
+/// detail you must remember is that parameters are lazy evaluated so:
+/// - store the value of `fetch_arg(i)` (i.e. `operator[](i)`) in a local
+///   variable for multiple uses;
+/// - call `fetch_arg(i)` only if you need the `i`-th argument.
+///
 class symbol_params
 {
 public:
-  // Return value could be ignored. E.g. the caller is only interested in the
-  // side effects of the call (typically agent simulation).
-  virtual value_t fetch_arg(unsigned) = 0;
+  /// Fetches a specific input parameter assuming referential transparency.
+  /// Referential transparency allows cache based optimization for argument
+  /// retrieval. If this kind of optimization isn't required the implementation
+  /// can be a simple call to `fetch_upaque_arg`.
+  [[nodiscard]] virtual value_t fetch_arg(unsigned) = 0;
 
+  /// Fetches a specific input parameter without assuming referential
+  /// transparency.
+  /// \remark
+  /// Sometimes return value is ignored: typically for agent simulation (the
+  /// caller is only interested in the side effects of the call).
+  virtual value_t fetch_opaque_arg(unsigned) = 0;
+
+  /// Equivalent to fetch_arg().
   [[nodiscard]] value_t operator[](unsigned i) { return fetch_arg(i); }
 
   [[nodiscard]] virtual terminal_param_t fetch_param() const = 0;

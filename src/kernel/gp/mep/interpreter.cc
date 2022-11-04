@@ -85,34 +85,39 @@ value_t interpreter<i_mep>::fetch_arg(unsigned i)
   assert(g.sym->arity());
   assert(i < g.sym->arity());
 
-  const auto get_val(
-    [this](const locus &l)
-    {
-      const locus backup(ip_);
-      ip_ = l;
-      assert(ip_.index > backup.index);
-      const auto ret((*prg_)[ip_].sym->eval(*this));
-      ip_ = backup;
-      return ret;
-    });
-
-  const locus l(g.locus_of_argument(i));
-  auto &elem(cache_(l));
+  auto &elem(cache_(g.locus_of_argument(i)));
 
   if (!elem.valid)
   {
-    elem.value = get_val(l);
+    elem.value = fetch_opaque_arg(i);
     elem.valid = true;
   }
 #if !defined(NDEBUG)
   else  // cache not empty... checking if the cached value is right
   {
-    assert(get_val(l) == elem.value);
+    assert(fetch_opaque_arg(i) == elem.value);
   }
 #endif
 
   Ensures(elem.valid);
   return elem.value;
+}
+
+value_t interpreter<i_mep>::fetch_opaque_arg(unsigned i)
+{
+  const gene &g((*prg_)[ip_]);
+
+  assert(g.sym->arity());
+  assert(i < g.sym->arity());
+
+  const locus backup(ip_);
+  ip_ = g.locus_of_argument(i);
+  assert(ip_.index > backup.index);
+
+  const auto ret((*prg_)[ip_].sym->eval(*this));
+  ip_ = backup;
+
+  return ret;
 }
 
 ///
